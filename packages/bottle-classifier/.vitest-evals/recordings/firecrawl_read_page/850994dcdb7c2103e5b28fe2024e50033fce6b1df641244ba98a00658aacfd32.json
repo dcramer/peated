@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T22:43:25.381Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://westlanddistillery.com/products/watchpost-whiskey?srsltid=AfmBOoqELy2VhqvXUvisytjlRyYyV9bUTf28h30A9uUWULkd8pKime6I",
+    "focus": "Confirm Watchpost's stated age, category, ABV, producer/distillery, and any exact release traits."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm Watchpost's stated age, category, ABV, producer/distillery, and any exact release traits.",
+    "summary": "$34.99",
+    "results": [
+      {
+        "title": "Watchpost Whiskey\n – Westland Distillery",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey?srsltid=AfmBOoqELy2VhqvXUvisytjlRyYyV9bUTf28h30A9uUWULkd8pKime6I",
+        "domain": "westlanddistillery.com",
+        "description": "Rooted in the Pacific Northwest and committed to crafting American Single Malt whiskey with intention, Westland has always honored the landscape that has inspired our whiskeys. Now, with the launch of our newest brand, Watchpost Whiskey, we are taking that commitment a step further with a blended whiskey that directly",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "850994dcdb7c2103e5b28fe2024e50033fce6b1df641244ba98a00658aacfd32",
+    "mode": "auto"
+  }
+}

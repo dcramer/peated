@@ -181,52 +181,68 @@ URLs; public image URLs are passed through as image references.
 Live eval commands:
 
 ```bash
-# Baseline: provider-default reasoning effort
+# Baseline: GPT-5.6 Terra with medium reasoning
 pnpm evals
 
 # Compare GPT-5.6 Luna at an explicit effort
-OPENAI_MODEL=gpt-5.6-luna OPENAI_REASONING_EFFORT=high pnpm evals
+BOTTLE_CLASSIFIER_MODEL=gpt-5.6-luna \
+  BOTTLE_CLASSIFIER_REASONING_EFFORT=high pnpm evals
 
 pnpm --filter @peated/bottle-classifier evals
 pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
+
+# Focused classifier quality-debt cases
+pnpm evals:classifier:flaky
 ```
+
+The focused command runs only these production-regression cases:
+
+- `Rogues' Banquet: image-backed match and repair`
+- `image-backed photo: matches and repairs Compass Box Spice Tree Extravaganza`
+- `store listing: matches Laphroaig Càirdeas 2022 Warehouse 1 and merges the malformed duplicate`
+- `audit: restore Pōkeno 2019 vintage without inferring a cask number`
+
+Keep this list narrow: it is the fast iteration slice for known classifier
+quality debt, not a replacement for the full live eval suite.
 
 `pnpm evals` is the intended repo-root entrypoint. It forwards extra Vitest args
 to the package runner and uses the `vitest-evals` reporter configured in
 [`vitest.evals.config.mts`](./vitest.evals.config.mts).
-The eval config loads the repo-root `.env.local`. Shell-provided env vars still
-take precedence.
+The eval config loads the repo-root `.env.local`. Shell-provided environment
+variables still take precedence.
 `AI_GATEWAY_API_KEY` or `OPENAI_API_KEY` is required. The gateway key takes
-precedence when both are set. With the gateway, `OPENAI_MODEL` defaults to
-`openai/gpt-5.4` and `OPENAI_EVAL_MODEL` defaults to
-`openai/gpt-5.6-luna`; direct OpenAI defaults omit the provider prefix. The judge
-uses `medium` reasoning by default; override it with
-`OPENAI_EVAL_REASONING_EFFORT`. Override either model if you want a different
-cost or quality tradeoff.
-`OPENAI_REASONING_EFFORT` accepts `none`, `low`, `medium`, `high`, or `xhigh` for
-GPT-5 models. When it is unset, the classifier omits the setting and uses the
-provider default; GPT-5.6 currently defaults to `medium`. Reasoning tokens are
-included in output-token usage and billed as output tokens. The eval metadata
-and visible usage annotation record the resolved effort for repeatable
-comparisons. Image extraction separately defaults to `gpt-5.6-luna` with
+precedence when both are set. With the gateway, `BOTTLE_CLASSIFIER_MODEL`
+defaults to `openai/gpt-5.6-terra` and `OPENAI_EVAL_MODEL` defaults to
+`openai/gpt-5.6-luna`; direct OpenAI defaults omit the provider prefix. The eval
+judge uses `medium` reasoning by default; override it with
+`OPENAI_EVAL_REASONING_EFFORT`.
+`BOTTLE_CLASSIFIER_REASONING_EFFORT` accepts `none`, `low`, `medium`, `high`, or
+`xhigh` for GPT-5 models and defaults to `medium`. The classifier sends the
+resolved effort explicitly so production and eval baselines stay repeatable.
+Reasoning tokens are included in output-token usage and billed as output tokens.
+The eval metadata and visible usage annotation record the resolved effort. Image
+extraction separately defaults to `gpt-5.6-luna` with
 `high` reasoning; use `OPENAI_IMAGE_EXTRACTION_MODEL` and
 `OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT` to override it. Image extraction
 evals report their own token usage, estimated cost, and latency rather than
 mixing those measurements into the classifier agent loop. `FIRECRAWL_API_KEY`
-enables live web evidence search;
-`FIRECRAWL_API_URL` can override the default Firecrawl API host.
+enables the classifier's live web search and focused page-reading tools;
+`FIRECRAWL_API_URL` can override the default Firecrawl API host. Without the
+key, the classifier has no web-evidence tools; it does not substitute an OpenAI
+search-agent call.
 
 The live evals use a `vitest-evals` harness around the same
 `runBottleReference(...)` and `runBottleAudit(...)` entrypoints used in
 production. The harness records model usage and real tool events, and replays
-`firecrawl_web_search` when `FIRECRAWL_API_KEY` enables that tool; otherwise it
-replays `openai_web_search`.
+`firecrawl_web_search` and `firecrawl_read_page` when `FIRECRAWL_API_KEY`
+enables those tools. A batched search consumes one configured search-budget
+unit per query, and a page read consumes one unit.
 
 Reported token usage and estimated USD cost cover the measured agent loop only.
 The estimate uses the dated standard, short-context OpenAI rates recorded in the
 harness metadata. The native eval summary shows total tokens, while one `usage`
 annotation shows input tokens, output tokens, and estimated USD for each result.
-Extraction, separate web-search response tokens and tool fees, pre-agent work,
+Extraction, web-search tool fees, pre-agent work,
 long-context pricing, alternate service tiers, and regional adjustments are not
 included. Unknown models or unavailable usage omit the estimate rather than
 reporting zero. Cache detail remains in structured usage metadata for pricing

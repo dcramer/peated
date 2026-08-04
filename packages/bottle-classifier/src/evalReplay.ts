@@ -1,24 +1,45 @@
 import type { JsonValue } from "vitest-evals/harness";
 import type { ToolRecording } from "vitest-evals/replay";
 
-function isWebSearchError(
-  result: JsonValue | undefined,
-): result is { error: string } {
-  return (
-    result !== undefined &&
-    !Array.isArray(result) &&
-    typeof result === "object" &&
-    result !== null &&
-    typeof result.error === "string"
-  );
+function getWebSearchError(result: JsonValue | undefined): string | null {
+  if (
+    result === undefined ||
+    Array.isArray(result) ||
+    typeof result !== "object" ||
+    result === null
+  ) {
+    return null;
+  }
+
+  if (typeof result.error === "string") {
+    return result.error;
+  }
+
+  if (!Array.isArray(result.errors)) {
+    return null;
+  }
+
+  for (const item of result.errors) {
+    if (
+      !Array.isArray(item) &&
+      typeof item === "object" &&
+      item !== null &&
+      typeof item.error === "string"
+    ) {
+      return item.error;
+    }
+  }
+
+  return null;
 }
 
 export function assertSuccessfulWebSearchReplay(
   result: JsonValue | undefined,
 ): void {
-  if (isWebSearchError(result)) {
+  const error = getWebSearchError(result);
+  if (error) {
     throw new Error(
-      `Web-search replay recordings must contain evidence, not an error: ${result.error}`,
+      `Web-search replay recordings must contain evidence, not an error: ${error}`,
     );
   }
 }

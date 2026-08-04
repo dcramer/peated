@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T22:42:29.618Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+    "focus": "Confirm the distillation year, ABV, bottling or release year, and Distillers Edition identity for this Talisker release."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the distillation year, ABV, bottling or release year, and Distillers Edition identity for this Talisker release.",
+    "summary": "The Distillers Edition\n\nBottlerDistillery BottlingBottling seriesThe Distillers EditionVintage2001Bottled2012Cask TypeDouble Matured in Amoroso Sherry WoodCask numberTD-S: 5OAStrength45.8 %Size[200 ml](https://www.whiskybase.com/whiskies/whisky/68685)700 ml[750 ml](https://www.whiskybase.com/whiskies/whisky/39673)[1000 ml](https://www.whiskybase.com/whiskies/whisky/37923)Barcode5000281013985Added on20 oct 2012 4:08 pmColoredChill Filtered More info",
+    "results": [
+      {
+        "title": "Talisker 2001 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Talisker 2001 . This is the 700 ml from 2001. The strength of this whisky is 45.8 % Vol. A bottle from Talisker",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f6023e9682119749926e7f73aa6e071edcdf057e4cde5dcb7151ea40c3938f73",
+    "mode": "auto"
+  }
+}

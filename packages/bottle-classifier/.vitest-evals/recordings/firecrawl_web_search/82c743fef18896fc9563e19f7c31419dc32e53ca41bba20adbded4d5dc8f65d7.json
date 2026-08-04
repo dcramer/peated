@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T04:51:42.591Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve Double Double Oaked official release ABV editions",
+      "Woodford Reserve \"Double Double Oaked\" bourbon 45.2%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Double Oaked official release ABV editions",
+        "summary": "Our most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. 45.2% Alc. by Vol. Double Oaked takes the standard Woodford formula and cuts it with water until it reaches 100 proof. Then they fill a second heavily toasted, ... Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character. Woodford Reserve's most indulgent double-barreled expression, Double Double Oaked. Limited quantities available! volume: 700ml abv: 45.2% Current … 43.2",
+        "results": [
+          {
+            "title": "Double Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Our most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. 45.2% Alc. by Vol.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon (2025) Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/",
+            "domain": "thebourbonculture.com",
+            "description": "Double Oaked takes the standard Woodford formula and cuts it with water until it reaches 100 proof. Then they fill a second heavily toasted, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character.",
+            "extraSnippets": []
+          },
+          {
+            "title": "2026 Double Double Oaked",
+            "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "Woodford Reserve's most indulgent double-barreled expression, Double Double Oaked. Limited quantities available! volume: 700ml abv: 45.2% Current … 43.2%-45.2% ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: The Woodford Reserve Double Double Oaked : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ht2ryo/review_the_woodford_reserve_double_double_oaked/",
+            "domain": "reddit.com",
+            "description": "The double double oaked has changed from the 375ml to the 700ml like the master collection bottles last yr it was 170 for 2 375ml bottles for me ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve \"Double Double Oaked\" bourbon 45.2%",
+        "summary": "Double Double Oaked. Our most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply ... Shop Woodford Reserve Double Double Oaked Bourbon at the best prices ... United States - 45.2% - This double-barreled bourbon whiskey has a deep richness ... # 2026 Double Double Oaked\n_special:1shipping_type_spirits:Yvolume:700mlabv:45.2% Woodford Reserve Double Double Oaked Heavy Toasted New Oak Barrel Finished (2025 Release), 45.2%. Price: $200.00 ○ Issue: Spring 2025 ○ Reviewer: David ... # Comments Section\nThis is [Woodford Reserve D",
+        "results": [
+          {
+            "title": "Double Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Double Double Oaked. Our most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon",
+            "url": "https://www.totalwine.com/spirits/bourbon/woodford-reserve-double-double-oaked-bourbon/p/2126257229?srsltid=AfmBOop5cwz0lnC3W4kfOnWdEvImCNkExD5PLSHOochE5uUlH2j-QiVl",
+            "domain": "totalwine.com",
+            "description": "Shop Woodford Reserve Double Double Oaked Bourbon at the best prices ... United States - 45.2% - This double-barreled bourbon whiskey has a deep richness ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2026 Double Double Oaked",
+            "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "# 2026 Double Double Oaked\n_special:1shipping_type_spirits:Yvolume:700mlabv:45.2%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Heavy Toasted New Oak ...",
+            "url": "https://whiskyadvocate.com/Woodford-Reserve-Double-Double-Oaked-Heavy-Toasted-New-Oak-Barrel-Finished-2025-Release-45-2",
+            "domain": "whiskyadvocate.com",
+            "description": "Woodford Reserve Double Double Oaked Heavy Toasted New Oak Barrel Finished (2025 Release), 45.2%. Price: $200.00 ○ Issue: Spring 2025 ○ Reviewer: David ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked (Review in comments) : r/whiskey",
+            "url": "https://www.reddit.com/r/whiskey/comments/10p556y/woodford_reserve_double_oaked_review_in_comments/",
+            "domain": "reddit.com",
+            "description": "# Comments Section\nThis is [Woodford Reserve Double Oaked](https://www.reddit.com/search/?q=Woodford+Reserve+Double+Oaked+review&cId=9e9fe8f8-d055-4738-b3f3-5c6902d6d8ca&iId=aaf01512-b0ed-4dbe-945e-884eaff5342d); 45.2% A",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "82c743fef18896fc9563e19f7c31419dc32e53ca41bba20adbded4d5dc8f65d7",
+    "mode": "auto"
+  }
+}

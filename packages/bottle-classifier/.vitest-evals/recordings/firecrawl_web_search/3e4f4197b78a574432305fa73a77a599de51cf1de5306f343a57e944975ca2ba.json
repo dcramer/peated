@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T22:45:58.071Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Komagatake 2022 50% single malt \"Limited Edition\"",
+      "Komagatake 2022 50% ABV release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Komagatake 2022 50% single malt \"Limited Edition\"",
+        "summary": "This limited edition matured in sherry, port and bourbon casks and was bottled in 2022 at 50% ABV as a limited edition small batch release. Official tasting ... Mars Komagatake Limited Edition Single Malt 2022. See More Mars. 700ml Bottle. Mars Komagatake Limited Edition Single Malt 2022. $139.99. Quantity. Add to cart. # Single Malt Whisky 'Komagatake Edition 2022'\n## Single Malt Whisky 'Komagatake Edition 2022'\n- Non-chill filtered; 50% ABV A single malt whisky bottled in a limited edition of 2022, consisting mainly of bourbon barrel-aged spirit, accented with sherry cask-aged spirit and por",
+        "results": [
+          {
+            "title": "Mars Komagatake Limited Edition 2022 (50%) - Dramtime",
+            "url": "https://www.dramtime.eu/product/mars-komagatake-limited-edition-2022/",
+            "domain": "dramtime.eu",
+            "description": "This limited edition matured in sherry, port and bourbon casks and was bottled in 2022 at 50% ABV as a limited edition small batch release. Official tasting ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake Limited Edition Single Malt 2022",
+            "url": "https://www.totalwine.com/spirits/japanese-whisky/mars-komagatake-limited-edition-single-malt-2022/p/2126216321?srsltid=AfmBOoqxkdkYEeR9rQgrFDlL0Iri7Bc_JHkauZV58GllAoExy3sXWtTp",
+            "domain": "totalwine.com",
+            "description": "Mars Komagatake Limited Edition Single Malt 2022. See More Mars. 700ml Bottle. Mars Komagatake Limited Edition Single Malt 2022. $139.99. Quantity. Add to cart.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Whisky 'Komagatake Edition 2022'",
+            "url": "https://www.skurnik.com/sku/single-malt-whisky-komagatake-limited-edition-2018-mars-shinshu-5/",
+            "domain": "skurnik.com",
+            "description": "# Single Malt Whisky 'Komagatake Edition 2022'\n## Single Malt Whisky 'Komagatake Edition 2022'\n- Non-chill filtered; 50% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "[Review] Single Malt Komagatake 2022 Edition",
+            "url": "https://en.jpwhisky.net/komagatake-2022-edition-2-20135/",
+            "domain": "en.jpwhisky.net",
+            "description": "A single malt whisky bottled in a limited edition of 2022, consisting mainly of bourbon barrel-aged spirit, accented with sherry cask-aged spirit and port cask ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake Single Malt Limited Edition 2022",
+            "url": "https://dcsake.com/products/mars-komagatake-single-malt-limited-edition-2022?srsltid=AfmBOorUffedEae8hxAPgMoY4QxmPDRdkPoOkX_sAe6esytkMTbVZR0I",
+            "domain": "dcsake.com",
+            "description": "On the palate, it reveals layers of dried fruit, vanilla, and a hint of smokiness. The finish is elegantly long, with a subtle spiciness.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Komagatake 2022 50% ABV release",
+        "summary": "This limited edition matured in sherry, port and bourbon casks and was bottled in 2022 at 50% ABV as a limited edition small batch release. # Single Malt Whisky 'Komagatake Edition 2022'\n## Single Malt Whisky 'Komagatake Edition 2022'\n- Non-chill filtered; 50% ABV There is a yearly release of Komagatake Single Malt from Mars Shinshu Distillery; this was the 2022 version. Komagatake \"2022 Edition\" (50%, OB) # KOMAGATAKE 2022 EDITION 700ML SINGLE MALT JAPANESE WHISKY\n## Details\nNon-chill filtered; 50% ABV 2022 Edition of Komagatake Single Malt from Mars Shinshu aged in ex-bourbon, sherry, and po",
+        "results": [
+          {
+            "title": "Mars Komagatake Limited Edition 2022 (50%) - Dramtime",
+            "url": "https://www.dramtime.eu/product/mars-komagatake-limited-edition-2022/",
+            "domain": "dramtime.eu",
+            "description": "This limited edition matured in sherry, port and bourbon casks and was bottled in 2022 at 50% ABV as a limited edition small batch release.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Whisky 'Komagatake Edition 2022'",
+            "url": "https://www.skurnik.com/sku/single-malt-whisky-komagatake-limited-edition-2018-mars-shinshu-5/",
+            "domain": "skurnik.com",
+            "description": "# Single Malt Whisky 'Komagatake Edition 2022'\n## Single Malt Whisky 'Komagatake Edition 2022'\n- Non-chill filtered; 50% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Komagatake \"2022 Edition\" (50%, OB) : r/worldwhisky",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/za9dte/komagatake_2022_edition_50_ob/",
+            "domain": "reddit.com",
+            "description": "There is a yearly release of Komagatake Single Malt from Mars Shinshu Distillery; this was the 2022 version. Komagatake \"2022 Edition\" (50%, OB)",
+            "extraSnippets": []
+          },
+          {
+            "title": "KOMAGATAKE 2022 EDITION 50% 700ML SINGLE MALT ...",
+            "url": "https://www.hitimewine.net/komagatake-2022-edition-50-700ml-single-malt-japanese-whisky-mars-shinshu-distillery-122616",
+            "domain": "hitimewine.net",
+            "description": "# KOMAGATAKE 2022 EDITION 700ML SINGLE MALT JAPANESE WHISKY\n## Details\nNon-chill filtered; 50% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Komagatake 2022 Edition Bourbon - Shinshu Mars Distillery",
+            "url": "https://theepicureantrader.com/products/shinshu-mars-distillery-komagatake-2022-edition-japanese-whisky-700ml?srsltid=AfmBOopkc8Mtg7hJp0m1bBbEA0X-AYKXGmHEGkHhOkRgV3wBqJy9TV0B",
+            "domain": "theepicureantrader.com",
+            "description": "2022 Edition of Komagatake Single Malt from Mars Shinshu aged in ex-bourbon, sherry, and port casks and bottled at 50% ABV. Regular price $350.00 USD",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3e4f4197b78a574432305fa73a77a599de51cf1de5306f343a57e944975ca2ba",
+    "mode": "auto"
+  }
+}

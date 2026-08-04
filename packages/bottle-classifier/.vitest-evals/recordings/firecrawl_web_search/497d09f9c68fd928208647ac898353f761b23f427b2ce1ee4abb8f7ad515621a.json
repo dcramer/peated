@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T04:55:10.032Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Glenmorangie Quinta Ruban 14 Year Old 46% 4th Edition official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glenmorangie Quinta Ruban 14 Year Old 46% 4th Edition official",
+        "summary": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal. # Comments Section\n**Age Statement**: 14 Years\n\n**Strength**: 46% ABV Quinta Ruban, 46% Price: $55.00. Orange segments sprinkled with black pepper on the nose, then spicy dark chocolate and coffee with cream. # Comments Section\n46% ABV.",
+        "results": [
+          {
+            "title": "The Quinta Ruban 14 Years Old",
+            "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban?srsltid=AfmBOorV4jP2eQkKLVY2dbRimdNIQQjrJiFasRLPGsEg75CyCBQOWj5r",
+            "domain": "glenmorangie.com",
+            "description": "In our giraffe-high stills, it begins soft and fruity, then gets darker and deeper as we let it age for 14 years in bourbon casks and port casks from Portugal.",
+            "extraSnippets": []
+          },
+          {
+            "title": "[Whisky Review #46] Glenmorangie Quinta Ruban 14",
+            "url": "https://www.reddit.com/r/Scotch/comments/1c5hnoa/whisky_review_46_glenmorangie_quinta_ruban_14/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #64 - Glenmorangie 14 Year Quinta Ruban",
+            "url": "https://www.reddit.com/r/Scotch/comments/11ryxdr/review_64_glenmorangie_14_year_quinta_ruban/",
+            "domain": "reddit.com",
+            "description": "# Comments Section\n**Age Statement**: 14 Years\n\n**Strength**: 46% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 14 year old Quinta Ruban, 46%",
+            "url": "https://whiskyadvocate.com/Glenmorangie-14-year-old-Quinta-Ruban-46",
+            "domain": "whiskyadvocate.com",
+            "description": "Quinta Ruban, 46% Price: $55.00. Orange segments sprinkled with black pepper on the nose, then spicy dark chocolate and coffee with cream.",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Review #874 - Glenmorangie 14 Quinta Ruban",
+            "url": "https://www.reddit.com/r/Scotch/comments/12xm6z5/review_874_glenmorangie_14_quinta_ruban/",
+            "domain": "reddit.com",
+            "description": "# Comments Section\n46% ABV.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "497d09f9c68fd928208647ac898353f761b23f427b2ce1ee4abb8f7ad515621a",
+    "mode": "auto"
+  }
+}

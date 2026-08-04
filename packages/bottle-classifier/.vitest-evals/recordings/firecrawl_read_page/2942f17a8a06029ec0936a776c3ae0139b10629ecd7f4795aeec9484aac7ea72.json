@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T22:44:03.347Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+    "focus": "Confirm the marketed Double Double Oaked product name, bourbon category, bottler/distillery attribution, ABV, and whether a release year or edition is stated."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed Double Double Oaked product name, bourbon category, bottler/distillery attribution, ABV, and whether a release year or edition is stated.",
+    "summary": "Double Double Oaked\n\nOur most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel.\n\n90.4 °",
+    "results": [
+      {
+        "title": "Double Double Oaked - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": "Our most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – a richness and complexity rarely encountered in American whiskey. Video Message From Master Distiller Elizabeth McCall “This handcrafted, double-barreled bourbon has a deep richness unlike any […]",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2942f17a8a06029ec0936a776c3ae0139b10629ecd7f4795aeec9484aac7ea72",
+    "mode": "auto"
+  }
+}

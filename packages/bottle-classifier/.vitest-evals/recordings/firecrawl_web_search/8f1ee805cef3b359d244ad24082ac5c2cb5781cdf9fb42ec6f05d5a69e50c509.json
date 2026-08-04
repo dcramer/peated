@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T23:26:48.892Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Ardbeg Traigh Bhan 19 year old annual batch releases edition 46.2%",
+      "site:ardbeg.com Traigh Bhan 19 Years Old batch release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg Traigh Bhan 19 year old annual batch releases edition 46.2%",
+        "summary": "This annual small-batch release from Islay producer Ardbeg, Traigh Banh is named for Islay's Traigh Bhan beach, aka the Singing Sands. Ardbeg 'Traigh Bhan' 19 year old 'First Annual Release Batch 1' The Ultimate Islay Single Malt Scotch Whisky 46.2% 70cl. The Ardbeg Distillery lies on the ... This Ardbeg has matured in American oak casks and Oloroso sherry casks for 19 years and is bottled at 46.2% ABV. Ardbeg Traigh Bhan tasting ... Traigh Bhan is aged for 19 years in American Oak and Oloroso Sherry Casks before being watered down to 46.2% abv. Ardbeg 19 Years Old Traigh Bhan Batch 6, a rare",
+        "results": [
+          {
+            "title": "Review #2320 - Ardbeg 19 Years Old Traigh Bhan (Batch 4)",
+            "url": "https://www.reddit.com/r/Scotch/comments/1f6isil/review_2320_ardbeg_19_years_old_traigh_bhan_batch/",
+            "domain": "reddit.com",
+            "description": "This annual small-batch release from Islay producer Ardbeg, Traigh Banh is named for Islay's Traigh Bhan beach, aka the Singing Sands.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 year old First Annual Release ...",
+            "url": "https://whiskycastle.com/ardbeg-traigh-bhan-19-year-old-first-annual-release-batch-1-the-ultimate-islay-single-malt-scotch-whisky-46-2-70cl/",
+            "domain": "whiskycastle.com",
+            "description": "Ardbeg 'Traigh Bhan' 19 year old 'First Annual Release Batch 1' The Ultimate Islay Single Malt Scotch Whisky 46.2% 70cl. The Ardbeg Distillery lies on the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review:Ardbeg Traigh Bhan, 19 year old, batch 2",
+            "url": "https://www.whiskylifestyle.com/ardbeg-traigh-bhan-19-year-old-batch-2/",
+            "domain": "whiskylifestyle.com",
+            "description": "This Ardbeg has matured in American oak casks and Oloroso sherry casks for 19 years and is bottled at 46.2% ABV. Ardbeg Traigh Bhan tasting ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 (2019): Review #209",
+            "url": "https://www.youtube.com/watch?v=q3EbNj_WmUk",
+            "domain": "youtube.com",
+            "description": "Traigh Bhan is aged for 19 years in American Oak and Oloroso Sherry Casks before being watered down to 46.2% abv.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 19 Years Old Traigh Bhan Batch 6",
+            "url": "https://www.ardbeg.com/en-int/products/ardbeg-19-years-old-traigh-bhan-batch-6",
+            "domain": "ardbeg.com",
+            "description": "Ardbeg 19 Years Old Traigh Bhan Batch 6, a rare small batch Islay single malt Scotch whisky. 46.2% Colour Bright Gold … £245.00 Sale price £245 Regular. Dark ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "site:ardbeg.com Traigh Bhan 19 Years Old batch release",
+        "summary": "Incredibly rare, this small batch 19 Year Old Ardbeg greets the senses with a delicate aroma of olive oil Curious hints of freshly cut grass, ginger and soot ... 19 Years Old Traigh Bhan Batch 7, a limited small batch Islay single malt Scotch whisky bottled at 50.3%. £245.00 Sale price £245 Regular Ardbeg Traigh Bhan is a sublime 19 year old whisky and the Distillery's latest small batch release. Non chill-filtered at 46.2% ABV. Batch No. TB/03-10.10.01/21/BL Join The Committee A community. Get access to exclusive releases and be part of an international community. Ardbeg Heavy Vapours Committ",
+        "results": [
+          {
+            "title": "Ardbeg 19 Years Old Traigh Bhan Batch 6",
+            "url": "https://www.ardbeg.com/en-gb/products/ardbeg-19-years-old-traigh-bhan-batch-6",
+            "domain": "ardbeg.com",
+            "description": "Incredibly rare, this small batch 19 Year Old Ardbeg greets the senses with a delicate aroma of olive oil Curious hints of freshly cut grass, ginger and soot ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 19 Years Old Traigh Bhan Batch 7",
+            "url": "https://www.ardbeg.com/en-gb/products/ardbeg-19-years-old-traigh-bhan-batch-7",
+            "domain": "ardbeg.com",
+            "description": "19 Years Old Traigh Bhan Batch 7, a limited small batch Islay single malt Scotch whisky bottled at 50.3%. £245.00 Sale price £245 Regular",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 Years Old Batch 1",
+            "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+            "domain": "ardbeg.com",
+            "description": "Ardbeg Traigh Bhan is a sublime 19 year old whisky and the Distillery's latest small batch release. Non chill-filtered at 46.2% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 Years Old Batch 3 | Archive",
+            "url": "https://www.ardbeg.com/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%203-2021ARDTB3.html",
+            "domain": "ardbeg.com",
+            "description": "Batch No. TB/03-10.10.01/21/BL Join The Committee A community. Get access to exclusive releases and be part of an international community.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shop the Full Range | Islay Single Malt Scotch Whisky",
+            "url": "https://www.ardbeg.com/en-gb/collections/all-whisky",
+            "domain": "ardbeg.com",
+            "description": "Ardbeg Heavy Vapours Committee Release. Sale price £121 Regular price. Unit price ... Ardbeg 19 Years Old Traigh Bhan Batch 5 Islay Single Malt Scotch Whisky.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8f1ee805cef3b359d244ad24082ac5c2cb5781cdf9fb42ec6f05d5a69e50c509",
+    "mode": "auto"
+  }
+}

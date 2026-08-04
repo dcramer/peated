@@ -1,4 +1,6 @@
 import {
+  DEFAULT_BOTTLE_CLASSIFIER_MODEL,
+  DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT,
   DEFAULT_OPENAI_EVAL_MODEL,
   DEFAULT_OPENAI_EVAL_REASONING_EFFORT,
   DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL,
@@ -14,6 +16,8 @@ const DEFAULT_OPENAI_EMBEDDING_MODEL = "text-embedding-3-large";
 
 type OpenAICompatibleEnvKey =
   | "AI_GATEWAY_API_KEY"
+  | "BOTTLE_CLASSIFIER_MODEL"
+  | "BOTTLE_CLASSIFIER_REASONING_EFFORT"
   | "OPENAI_API_KEY"
   | "OPENAI_EVAL_MODEL"
   | "OPENAI_EVAL_REASONING_EFFORT"
@@ -29,6 +33,8 @@ type OpenAICompatibleEnvKey =
 export type OpenAICompatibleConfig = {
   apiKey: string | undefined;
   baseURL: string;
+  bottleClassifierModel: string;
+  bottleClassifierReasoningEffort: OpenAIReasoningEffort | undefined;
   embeddingModel: string;
   evalModel: string;
   evalReasoningEffort: OpenAIReasoningEffort | undefined;
@@ -63,6 +69,9 @@ export function resolveOpenAICompatibleConfig(
 ): OpenAICompatibleConfig {
   const gatewayApiKey = nonEmpty(envValue(env, "AI_GATEWAY_API_KEY"));
   const usesGateway = Boolean(gatewayApiKey);
+  const bottleClassifierModel =
+    nonEmpty(envValue(env, "BOTTLE_CLASSIFIER_MODEL")) ??
+    DEFAULT_BOTTLE_CLASSIFIER_MODEL;
   const model = nonEmpty(envValue(env, "OPENAI_MODEL")) ?? DEFAULT_OPENAI_MODEL;
   const evalModel =
     nonEmpty(envValue(env, "OPENAI_EVAL_MODEL")) ?? DEFAULT_OPENAI_EVAL_MODEL;
@@ -78,6 +87,13 @@ export function resolveOpenAICompatibleConfig(
     baseURL: usesGateway
       ? VERCEL_AI_GATEWAY_BASE_URL
       : (nonEmpty(envValue(env, "OPENAI_HOST")) ?? OPENAI_BASE_URL),
+    bottleClassifierModel: usesGateway
+      ? gatewayModel(bottleClassifierModel)
+      : bottleClassifierModel,
+    bottleClassifierReasoningEffort: parseOpenAIReasoningEffort(
+      nonEmpty(envValue(env, "BOTTLE_CLASSIFIER_REASONING_EFFORT")) ??
+        DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT,
+    ),
     embeddingModel: usesGateway ? gatewayModel(embeddingModel) : embeddingModel,
     evalModel: usesGateway ? gatewayModel(evalModel) : evalModel,
     evalReasoningEffort: parseOpenAIReasoningEffort(

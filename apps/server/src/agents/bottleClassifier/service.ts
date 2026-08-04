@@ -91,8 +91,8 @@ export function getBottleClassifier() {
 
   bottleClassifier = createBottleClassifier({
     client,
-    model: config.OPENAI_MODEL,
-    reasoningEffort: config.OPENAI_REASONING_EFFORT,
+    model: config.BOTTLE_CLASSIFIER_MODEL,
+    reasoningEffort: config.BOTTLE_CLASSIFIER_REASONING_EFFORT,
     imageExtractionModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,
     imageExtractionReasoningEffort:
       config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,

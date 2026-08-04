@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T04:56:09.277Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Glenmorangie The Cadboll Estate\" \"Batch 2\" \"15 Year Old\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Glenmorangie The Cadboll Estate\" \"Batch 2\" \"15 Year Old\"",
+        "summary": "Glenmorangie The Cadboll Estate 15 year old (Batch 2), 43%. Price: $85.00 ○ Issue: Winter 2021 ○ Reviewer: Ted Simmons ○ Category: Single Malt Scotch. Buy ... Glenmorangie The Cadboll Estate 15 Year Old Single Malt Scotch Whisky Batch 2 700ml Bottle. In stock (). See all 46 results. It doesn't have to end here ... Buy Glenmorangie The Cadboll Estate 15 Year Old online at sudsandspirirts.com and have it. Gift wrapping: Options available. Glenmorangie The Cadboll Estate 15 Year Old Single Malt Batch #2..$85.99. American Oak Bourbon Cask Our first single estate whisky created at the ... This 15 y",
+        "results": [
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 2), 43%",
+            "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-2-43",
+            "domain": "whiskyadvocate.com",
+            "description": "Glenmorangie The Cadboll Estate 15 year old (Batch 2), 43%. Price: $85.00 ○ Issue: Winter 2021 ○ Reviewer: Ted Simmons ○ Category: Single Malt Scotch. Buy ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 'The Cadboll Estate' 15 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/glen+morangie+the+cadboll+estate+fifteen+old+single+malt+scotch+whisky+highlands+scotland?srsltid=AfmBOoo7N1W3yNLyy5sKLp7W0Md0znVrcpqM4deUT4qrLpAZnfv0trUg",
+            "domain": "wine-searcher.com",
+            "description": "Glenmorangie The Cadboll Estate 15 Year Old Single Malt Scotch Whisky Batch 2 700ml Bottle. In stock (). See all 46 results. It doesn't have to end here ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 Year Old (750ml)",
+            "url": "https://sudsandspirits.com/glenmorangie-the-cadboll-estate-15-year-old-750ml/?srsltid=AfmBOoolyAdL8EHqwLbkqQzBgjIKddt0DhCiIbEuXoT0y4M52q276IrY",
+            "domain": "sudsandspirits.com",
+            "description": "Buy Glenmorangie The Cadboll Estate 15 Year Old online at sudsandspirirts.com and have it. Gift wrapping: Options available.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 Year Old Single Malt Batch ...",
+            "url": "https://www.wineandcheeseplace.com/blogs/news/glenmorangie-cadboll-estate-15-year-old?srsltid=AfmBOoqu6_zlkIDXJjbvtEbKqRpbJVNrZ8RMQ_uoErMgGoWNgSrOFpiG",
+            "domain": "wineandcheeseplace.com",
+            "description": "Glenmorangie The Cadboll Estate 15 Year Old Single Malt Batch #2..$85.99. American Oak Bourbon Cask Our first single estate whisky created at the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 Year (Batch #2)",
+            "url": "https://distiller.com/spirits/glenmorangie-the-cadboll-estate-15-year-batch-2",
+            "domain": "distiller.com",
+            "description": "This 15 year-old limited edition is the second batch release of ... Glenmorangie The Cadboll Estate 15 Year (Batch #2). Single Malt. Glenmorangie ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3e797db5356418d14adfaf4cc3f812dd88dc2d2380ba5cf56ebdcc86fe8c023e",
+    "mode": "auto"
+  }
+}

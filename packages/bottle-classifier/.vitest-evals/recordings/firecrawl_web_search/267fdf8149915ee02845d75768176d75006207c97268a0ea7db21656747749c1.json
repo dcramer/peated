@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:44:26.215Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Woodford Reserve Double Oaked official bourbon 43.2%"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Oaked official bourbon 43.2%",
+        "summary": "Rich notes of dark fruit, caramel, sharp honey, chocolate, marzipan and toasted oak. Taste A full-bodied mix of vanilla, dark caramel, hazelnut, apple, fruit ... Double Oaked takes the standard Woodford formula and cuts it with water until it reaches 100 proof. Then they fill a second heavily toasted, ... Each sip offers a full-bodied mix of vanilla, caramel and spice that's perfect for enjoying neat or in cocktails. Each sip of this Woodford Reserve bourbon offers a full-bodied mix of vanilla, dark caramel, hazelnut and spice flavors, followed by a long and creamy finish ... Double Double Oak",
+        "results": [
+          {
+            "title": "Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Rich notes of dark fruit, caramel, sharp honey, chocolate, marzipan and toasted oak. Taste A full-bodied mix of vanilla, dark caramel, hazelnut, apple, fruit ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon (2025) Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/",
+            "domain": "thebourbonculture.com",
+            "description": "Double Oaked takes the standard Woodford formula and cuts it with water until it reaches 100 proof. Then they fill a second heavily toasted, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey",
+            "url": "https://www.totalwine.com/spirits/bourbon/small-batch-bourbon/woodford-reserve-double-oaked-kentucky-straight-bourbon-whiskey/p/120640750?srsltid=AfmBOoqptb9f3N0tj346VI2TqVi2t4x7LP8zmtqcwDMlwFVEVADTKhle",
+            "domain": "totalwine.com",
+            "description": "Each sip offers a full-bodied mix of vanilla, caramel and spice that's perfect for enjoying neat or in cocktails.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey",
+            "url": "https://www.towerwinespirits.com/shop/product/woodford-reserve-double-oaked-kentucky-straight-bourbon-whiskey/5891f76e39e21c1a7a569702?option-id=1fb21098ac4cf6237956c9d57d7e11c990a7df2fd13d96e78b85531d0796b153&srsltid=AfmBOorHcDsOTk9uM5BTJ87OnwXVLNvkYZ9x25Y0gF0GYvGpfe9Gs7Fd",
+            "domain": "towerwinespirits.com",
+            "description": "Each sip of this Woodford Reserve bourbon offers a full-bodied mix of vanilla, dark caramel, hazelnut and spice flavors, followed by a long and creamy finish ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2026 Double Double Oaked",
+            "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon ... Woodford Reserve Kentucky Straight Whiskey 43.2%-45.2% ALC.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "267fdf8149915ee02845d75768176d75006207c97268a0ea7db21656747749c1",
+    "mode": "auto"
+  }
+}

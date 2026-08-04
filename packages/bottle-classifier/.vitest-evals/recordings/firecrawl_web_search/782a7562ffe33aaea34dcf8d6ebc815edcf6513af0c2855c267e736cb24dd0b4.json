@@ -1,0 +1,89 @@
+{
+  "writtenAt": "2026-08-03T22:47:40.545Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Canadian Club\" \"9 Year Old Reserve\" Canadian Whisky",
+      "site:reservebar.com \"Canadian Club 9-Year-Old Reserve\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Canadian Club\" \"9 Year Old Reserve\" Canadian Whisky",
+        "summary": "Hand-selected and barrel-blended by our Master Blender, this reserve whisky is matured in white-oak barrels for 9 years to create a rich and smooth flavor. The ... ## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-4686-804a-b38ffe556181.jpg&w=1080&q=75)\n\n# canadian club 9 year old reserve canadian whisky\n### Size\n750 ML\n\nEngravable\n\n#### +$50\nMake it memorable with a personalized message\n\nCheck Availability\n\nCheck Availability\n\nW",
+        "results": [
+          {
+            "title": "Canadian Club 9 Year Old Reserve",
+            "url": "https://sipwhiskey.com/products/canadian-club-9-year-old-reserve?srsltid=AfmBOopw3cP6FNZzTC81Z9FpFOLuu7npM2dlOAvu7xzbQMnTheyMmOd8",
+            "domain": "sipwhiskey.com",
+            "description": "Hand-selected and barrel-blended by our Master Blender, this reserve whisky is matured in white-oak barrels for 9 years to create a rich and smooth flavor. The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club 9 Year Old Reserve Canadian Whisky",
+            "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+            "domain": "reservebar.com",
+            "description": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-468",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club 9 Year Old Reserve Whisky",
+            "url": "https://tastersclub.com/products/canadian-club-9-year-old-reserve-whisky?srsltid=AfmBOoqLBR9Xzoy14yNgEPQ1W05ddKvMFYnWrSMl3OEMsRb3_Lau0Yx8",
+            "domain": "tastersclub.com",
+            "description": "Canadian Club 9 Year Old Reserve Whisky—aged 9 years for refined complexity with English toffee, mellow oak, and warm vanilla finish.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve Aged 9 Year Blended Canadian Whisky",
+            "url": "https://www.wine-searcher.com/find/canadaclub+rsrv+aged+nine+blend+whisky+ontario+canada/0/usa-ok-y?srsltid=AfmBOop_BS8cai5Nuyf4WudABeYHm43ZXEv7htpQQILTVs4BRg9g9yU9",
+            "domain": "wine-searcher.com",
+            "description": "Canadian Club - 9 Year Old Reserve Canadian Whisky. In stock (). See all 25 results. It doesn't have to end here. Become a Wine-Searcher PRO to see all 25 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "9 Year Old Reserve Whiskey | Spec's Wines, Spirits & Foods",
+            "url": "https://specsonline.com/shop/spirits/canadian-club-reserve-9yr-2/",
+            "domain": "specsonline.com",
+            "description": "# Canadian Club 9 Year Old Reserve Whiskey\n$16.83\n\nEach\n\nquantityADD TO CART\n\nAvailable Sizes750ML\n\nLow Stock AT [Downtown - Smith Street](https://specsonline.com/liquor-stores/houston/downtown-smith-street-0/)\n\nCheck ot",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "site:reservebar.com \"Canadian Club 9-Year-Old Reserve\"",
+        "summary": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-4686-804a-b38ffe556181.jpg&w=1080&q=75)\n\n# canadian club 9 year old reserve canadian whisky\n### Size\n750 ML\n\nEngravable\n\n#### +$50\nMake it memorable with a personalized message\n\nCheck Availability\n\nCheck Availability\n\nCheck Availability\n\nCheck Availability\n\n### Product Detail\nCategory\n\nColor\n\nABV\n\n40%\n\nCountry\n\nCANADA\n\nRegion\n\nCANADA\n\n### About\nFor more than 150 years, Canadian Cl",
+        "results": [
+          {
+            "title": "Canadian Club 9 Year Old Reserve Canadian Whisky",
+            "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+            "domain": "reservebar.com",
+            "description": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-468",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shop For Whiskey",
+            "url": "https://www.reservebar.com/collections/whiskey?page=67",
+            "domain": "reservebar.com",
+            "description": "CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY. 750 ML. N/A. Add to cart ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Collections",
+            "url": "https://www.reservebar.com/collections/collections?page=241",
+            "domain": "reservebar.com",
+            "description": "CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY. 750 ML. N/A. Add to cart ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "782a7562ffe33aaea34dcf8d6ebc815edcf6513af0c2855c267e736cb24dd0b4",
+    "mode": "auto"
+  }
+}

@@ -724,7 +724,7 @@ describe("finalizeBottleReferenceClassification", () => {
         confidenceBasis: {
           positiveEvidence: ["producer product page states five years old"],
           unresolvedRisks: [],
-          toolsUsed: ["openai_web_search"],
+          toolsUsed: ["firecrawl_web_search"],
           webEvidence: "supportive",
         },
         proposedBottle: {

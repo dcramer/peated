@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T22:51:15.774Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+    "focus": "Confirm C923 exact age statement, ABV/proof, release-year context, and bourbon/barrel-proof identity."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm C923 exact age statement, ABV/proof, release-year context, and bourbon/barrel-proof identity.",
+    "summary": "Details: 66.5% ABV. 13 years, 7 months",
+    "results": [
+      {
+        "title": "Elijah Craig Barrel Proof, C923 — BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+        "domain": "bourbonguy.com",
+        "description": "I’d like to thank the folks at Heaven Hill for providing this review sample with no strings attached.,",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9f3eb531bfd40eb6c9df69f744e742ac7465d95e2e6ba7ea9f29830ac5607c15",
+    "mode": "auto"
+  }
+}

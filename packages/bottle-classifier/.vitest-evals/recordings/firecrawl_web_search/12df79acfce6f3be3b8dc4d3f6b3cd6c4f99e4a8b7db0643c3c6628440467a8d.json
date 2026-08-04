@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:56:46.189Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Creag Isle\" \"12\" \"Island Single Malt\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Creag Isle\" \"12\" \"Island Single Malt\"",
+        "summary": "Creag Isle 12Yr Island Single Malt Scotch Whisky ... Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and ... # Creag Isle 12 Year Island Single Malt\nSingle Malt\n\nCreag Isle // Islands, Scotland\n\nRequested By\n\n##### Filter\nratings\n\nnotes\n\nprices\n\nlocations\n\n##### Sort\nNewest\n\nOldest\n\nHighest Rated\n\nLowest Rated Buy Creag Isle 12 Year Island Single Malt 750ml for $40.95 from Bansum Wine & Liquor in Patchogue, NY. Free local delivery over $99. Free shipping over $0. Find the best local price for Creag Isle 12 Year Old Single Malt Scotch Whisky, Is",
+        "results": [
+          {
+            "title": "Creag Isle 12Yr Island Single Malt Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750?srsltid=AfmBOoquDyJXFGKraipe_sKp2AM6Ig-fJa5dLoZGPFZAIDHC4o_0SORA",
+            "domain": "totalwine.com",
+            "description": "Creag Isle 12Yr Island Single Malt Scotch Whisky ... Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Island Single Malt | Reviews",
+            "url": "https://distiller.com/spirits/creag-isle-12-year-island-single-malt/tastes?require_note=true",
+            "domain": "distiller.com",
+            "description": "# Creag Isle 12 Year Island Single Malt\nSingle Malt\n\nCreag Isle // Islands, Scotland\n\nRequested By\n\n##### Filter\nratings\n\nnotes\n\nprices\n\nlocations\n\n##### Sort\nNewest\n\nOldest\n\nHighest Rated\n\nLowest Rated",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Island Single Malt",
+            "url": "https://bansumwineandliquor.com/shop/product/creag-isle-12-year-island-single-malt/633dfbe9039c175531fd3693?option-id=de7b90e71776bd8e0d26d815e5ece27905d7cada79576015e15817b95b7fed23&srsltid=AfmBOoqkP8KO5G-WXfyq-9kEsmbB9tOKlvP7fBeCEmXxaJ35A8uVMWHV",
+            "domain": "bansumwineandliquor.com",
+            "description": "Buy Creag Isle 12 Year Island Single Malt 750ml for $40.95 from Bansum Wine & Liquor in Patchogue, NY. Free local delivery over $99. Free shipping over $0.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/creag+isle+twelve+old+single+malt+scotch+whisky+island+scotland/1/usa?srsltid=AfmBOoqXP05MwUcaCAhoaubuzJ_GiwHnuZKeRzS4cU_mr_AgSDGl-L30",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Creag Isle 12 Year Old Single Malt Scotch Whisky, Islands, Scotland ... Creag Isle 12Yr Island Single Malt Scotch Whisky, Single ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Island Single Malt Scotch Whisky",
+            "url": "https://caskcartel.com/products/creag-isle-12-year-island-single-malt-scotch-whisky",
+            "domain": "caskcartel.com",
+            "description": "Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with smoke and ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "12df79acfce6f3be3b8dc4d3f6b3cd6c4f99e4a8b7db0643c3c6628440467a8d",
+    "mode": "auto"
+  }
+}

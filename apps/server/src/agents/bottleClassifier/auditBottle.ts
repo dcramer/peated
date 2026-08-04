@@ -52,7 +52,7 @@ async function runAndPersistBottleAudit({
     intent: "audit_bottle",
     input,
     result,
-    model: config.OPENAI_MODEL,
+    model: config.BOTTLE_CLASSIFIER_MODEL,
     modelMetadata,
     ...(backgroundEventKey ? { backgroundEventKey } : {}),
   });
@@ -88,7 +88,7 @@ export async function runModeratorBottleAudit(
     intent: "audit_bottle",
     input: auditInput,
     result,
-    model: config.OPENAI_MODEL,
+    model: config.BOTTLE_CLASSIFIER_MODEL,
     modelMetadata,
   });
   await deleteTerminalModeratorBottleAudits({

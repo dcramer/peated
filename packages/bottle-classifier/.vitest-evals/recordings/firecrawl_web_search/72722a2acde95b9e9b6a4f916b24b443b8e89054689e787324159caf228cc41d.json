@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:39:58.532Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Heaven's Door Bootleg Series Vol. III exact ABV bourbon"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Heaven's Door Bootleg Series Vol. III exact ABV bourbon",
+        "summary": "Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. Bottled at cask strength with a proof of 121.2, For Volume 3, which was released late in 2021, the company chose to finish a 13 year Kentucky bourbon in used Vino De Naranja Casks. The company ... Heaven's Door “Bootleg Volume 3”. 120 proof, 13 year aged bourbon finished in Spanish Orange Dessert wine barrels. Nose: Enchanting. Very crisp ... Bottled at 45% ABV and presented in a 750ML format, this American whiskey exemplifies premium craftsmanship. Its intricate maturation and finishing techniques .",
+        "results": [
+          {
+            "title": "Heaven's Door The Bootleg Series Volume 3",
+            "url": "https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d828847c144b0cca4d8d&srsltid=AfmBOordrzIzuJGyNTvmi5Fpg5yqRjH_Td7zbk--Fth8lSgam_vkznXe",
+            "domain": "markaysliquors.com",
+            "description": "Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. Bottled at cask strength with a proof of 121.2,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heaven's Door Bootleg Series Volume 3 Review",
+            "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+            "domain": "breakingbourbon.com",
+            "description": "For Volume 3, which was released late in 2021, the company chose to finish a 13 year Kentucky bourbon in used Vino De Naranja Casks. The company ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "My first review! Heaven's Door Bootleg Volume 3 : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/vfifyt/my_first_review_heavens_door_bootleg_volume_3/",
+            "domain": "reddit.com",
+            "description": "Heaven's Door “Bootleg Volume 3”. 120 proof, 13 year aged bourbon finished in Spanish Orange Dessert wine barrels. Nose: Enchanting. Very crisp ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heaven's Door The Bootleg Series Volume VI 12 Year ...",
+            "url": "https://whiskyandwhiskey.com/products/heavens-door-the-bootleg-series-volume-vi-12-year-bourbon-finished-in-limousin-cigar-barrels?srsltid=AfmBOorc1h8x21hRhSPPTnauvWcHq240anP0iLJ2lOys388acUzObe1f",
+            "domain": "whiskyandwhiskey.com",
+            "description": "Bottled at 45% ABV and presented in a 750ML format, this American whiskey exemplifies premium craftsmanship. Its intricate maturation and finishing techniques ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heaven's Door Whiskey",
+            "url": "https://buy.heavensdoor.com/?srsltid=AfmBOoquO8wnepWeuYIAYiCy3Q_Ct8iU7TaoiaYhOzyzOQctIUKxZtXQ",
+            "domain": "buy.heavensdoor.com",
+            "description": "Heaven&#39;s Door is a collection of handcrafted American Whiskeys. Regular price $84.99 USD ・ price $99.99 USD Sale price $99.99. Bootleg Series Volume V ・ ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "72722a2acde95b9e9b6a4f916b24b443b8e89054689e787324159caf228cc41d",
+    "mode": "auto"
+  }
+}

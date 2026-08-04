@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T05:12:41.294Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Skrewball Peanut Butter Whiskey official product ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Skrewball Peanut Butter Whiskey official product ABV",
+        "summary": "an award-winning, original peanut butter whiskey. SPIRITS, LLC, NEW YORK, NY, WHISKEY WITH NATURAL FLAVORS, 35% ABV Copyright ©2024 Skrewball Whiskey Built on a corn-and-barley mash, it's infused with natural peanut butter flavor, cane sugar, caramel, and vanilla notes, bottled at 70 proof (35% ABV)— ... Skrewball Whiskey is an unexpected mix of sweet & savory ï¬‚avors, combining smooth whiskey & creamy peanut butter. WHISKEY WITH NATURAL FLAVORS, 35% ABV ... Skrewball has become THE brand for peanut butter whiskey, but did you know you can easily make your own? This is a fat washed whiskey, w",
+        "results": [
+          {
+            "title": "Where to Buy Skrewball Whiskey",
+            "url": "https://www.skrewballwhiskey.com/en/buy-now/",
+            "domain": "skrewballwhiskey.com",
+            "description": "an award-winning, original peanut butter whiskey. SPIRITS, LLC, NEW YORK, NY, WHISKEY WITH NATURAL FLAVORS, 35% ABV Copyright ©2024 Skrewball Whiskey",
+            "extraSnippets": []
+          },
+          {
+            "title": "Skrewball Peanut Butter Whiskey 1.75L",
+            "url": "https://www.blackwellswines.com/products/skrewball-peanut-butter-whiskey-1-75l?srsltid=AfmBOorDOTt93oGW6YAvfYLFw9tiaiGz66VaiBNPq8W-b_61XfsSKVEh",
+            "domain": "blackwellswines.com",
+            "description": "Built on a corn-and-barley mash, it's infused with natural peanut butter flavor, cane sugar, caramel, and vanilla notes, bottled at 70 proof (35% ABV)— ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Skrewball | The Original Peanut Butter Whiskey",
+            "url": "https://www.skrewballwhiskey.com/en/",
+            "domain": "skrewballwhiskey.com",
+            "description": "Skrewball Whiskey is an unexpected mix of sweet & savory ï¬‚avors, combining smooth whiskey & creamy peanut butter. WHISKEY WITH NATURAL FLAVORS, 35% ABV ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "How to make Peanut Butter Whiskey | HOMEMADE SKREWBALL",
+            "url": "https://www.youtube.com/watch?v=uYbhtHZ6VCM",
+            "domain": "youtube.com",
+            "description": "Skrewball has become THE brand for peanut butter whiskey, but did you know you can easily make your own? This is a fat washed whiskey, with ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "SKREWBALL Peanut Butter Liqueur 750 ml",
+            "url": "https://crownwineandspirits.com/skrewball-peanut-butter-liqueur-750-ml/",
+            "domain": "crownwineandspirits.com",
+            "description": "Alcohol Grade:: 15% ABV Content:: 750 ml Year of Manufacture: Varies depending on the specific product. Ingredients:: Peanut butter, sugar, neutral spirits, ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3793e9821bb132fe51468067d69cb309881da211197e9e16bc41c0c1ca221adb",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T23:03:20.981Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Skrewball Peanut Butter Whiskey official 35% ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Skrewball Peanut Butter Whiskey official 35% ABV",
+        "summary": "a smooth blend of whiskey and creamy peanut butter with caramel and vanilla notes. Available sizes: 350ml, 750ml, 1L. ##### [Recipes of classic cocktails and my creations.](http://keyifadami.net/kokteyl/)\n**ABV:** 35%\n\nSince, Skrewball is bottled at 35%, we can stop calling it a whiskey. Skrewball - Peanut Butter Whiskey Liqueur 70cl 35% ABV at the best prices. $175.99 price per bottle. ABV: 35.0% Size: 70 cl Availability: In Stock # Am I a Screwball for Not Loving Skrewball?\nBut American whiskey, by law, cannot be bottled below 80 proof, and Skrewball comes in at a dainty 70 proof (35% ABV),",
+        "results": [
+          {
+            "title": "Skrewball Peanut Butter Whiskey",
+            "url": "https://www.skrewballwhiskey.com/en/product/skrewball-peanut-butter-whiskey/",
+            "domain": "skrewballwhiskey.com",
+            "description": "a smooth blend of whiskey and creamy peanut butter with caramel and vanilla notes. Available sizes: 350ml, 750ml, 1L.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Skrewball Peanut Butter Whiskey Review",
+            "url": "https://www.whiskymonster.com/skrewball-peanut-butter-whiskey-review/",
+            "domain": "whiskymonster.com",
+            "description": "##### [Recipes of classic cocktails and my creations.](http://keyifadami.net/kokteyl/)\n**ABV:** 35%\n\nSince, Skrewball is bottled at 35%, we can stop calling it a whiskey.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Skrewball - Peanut Butter Whiskey Liqueur 70cl 35% ABV",
+            "url": "https://www.nationwideliquor.com/255378/skrewball-peanut-butter-whiskey-liqueur-70cl-35-abv?srsltid=AfmBOoqWbYTiT8Xez-tcOZ5NjckpaSeSmdZDJRuqysSoNguFrTC-GbcD",
+            "domain": "nationwideliquor.com",
+            "description": "Skrewball - Peanut Butter Whiskey Liqueur 70cl 35% ABV at the best prices. $175.99 price per bottle. ABV: 35.0% Size: 70 cl Availability: In Stock",
+            "extraSnippets": []
+          },
+          {
+            "title": "Am I a Screwball for Not Loving Skrewball?",
+            "url": "https://www.alcoholprofessor.com/blog-posts/skrewball-peanut-butter-whiskey",
+            "domain": "alcoholprofessor.com",
+            "description": "# Am I a Screwball for Not Loving Skrewball?\nBut American whiskey, by law, cannot be bottled below 80 proof, and Skrewball comes in at a dainty 70 proof (35% ABV), so it’s disqualified on those grounds alone.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Skrewball Peanutbutter Whiskey 200ml Bottle 35% ABV",
+            "url": "https://bevmo.com/products/76446?srsltid=AfmBOopsoGMnAIcuz2ckYiZdect4-XxEZPdd8WbC82HET4ioeRTWzVQy",
+            "domain": "bevmo.com",
+            "description": "Skrewball Peanutbutter Whiskey 200ml Bottle 35% ABV. Availability: In Stock (66 Proof) Government Issued ID Required for Purchase.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "08d85fc79e6ff1be37cb0dbf76fdfa872ef7f348db8c3cb0b682857b67373891",
+    "mode": "auto"
+  }
+}

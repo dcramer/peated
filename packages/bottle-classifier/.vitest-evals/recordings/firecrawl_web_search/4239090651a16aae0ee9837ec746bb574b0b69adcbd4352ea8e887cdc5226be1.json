@@ -1,0 +1,82 @@
+{
+  "writtenAt": "2026-08-03T04:57:07.587Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Elijah Craig 18-year-old Single Barrel Bourbon\" 45%",
+      "\"Elijah Craig 18 Year Old Single Barrel\" \"45%\" bourbon"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig 18-year-old Single Barrel Bourbon\" 45%",
+        "summary": "Elijah Craig 18 Year Old Single Barrel Bourbon 2023 Barrel 6341 750ml Bottle ... 45%. Alcohol °Proof. 90. Sweetness. Dry. Production Attributes. Maturation. Oaked. Elijah Craig 18-Year-Old Single Barrel Bourbon is aged for at least 18 years in white oak barrels and is composed of a mash bill that includes 78% corn, 12% ... Bottled at 90-proof, Elijah Craig 18 Year Old Single Barrel Bourbon is one of the oldest single-barrel whiskeys ever produced in Kentucky, distilled with ... Elijah Craig 18 Year Old Single Barrel Bourbon ; Age 18 Years ; Mash Bill Undisclosed ; Proof 90 / 45% ABV. £6.95 shi",
+        "results": [
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Straight Bourbon ...",
+            "url": "https://www.wine-searcher.com/find/elijah+craig+eighteen+old+single+barrel+straight+bourbon+whisky+kentucky+usa?srsltid=AfmBOopRt3oZZfx2HqvEE1a_7qTpFkWAEPFrNHMRxPn0KahP9u_qlX1w",
+            "domain": "wine-searcher.com",
+            "description": "Elijah Craig 18 Year Old Single Barrel Bourbon 2023 Barrel 6341 750ml Bottle ... 45%. Alcohol °Proof. 90. Sweetness. Dry. Production Attributes. Maturation. Oaked.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Bourbon",
+            "url": "https://www.penguinliquor.com/p/elijah-craig-18-year-old-single-barrel-bourbon/2705",
+            "domain": "penguinliquor.com",
+            "description": "Elijah Craig 18-Year-Old Single Barrel Bourbon is aged for at least 18 years in white oak barrels and is composed of a mash bill that includes 78% corn, 12% ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Bourbon",
+            "url": "https://www.frootbat.com/p/2426/elijah-craig-18-year-old-single-barrel-bourbon?srsltid=AfmBOoo2zr6k-S6E75VamLHiBsTLflIeIoteq_223N2DW7UEajeJpd7g",
+            "domain": "frootbat.com",
+            "description": "Bottled at 90-proof, Elijah Craig 18 Year Old Single Barrel Bourbon is one of the oldest single-barrel whiskeys ever produced in Kentucky, distilled with ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18",
+            "url": "https://www.tasteselectrepeat.com/products/elijah-craig-18?srsltid=AfmBOoospLSc96PK2mI4feaHQCW-qU1xtRcSlcyElleHRYY_f1ujJ8U2",
+            "domain": "tasteselectrepeat.com",
+            "description": "Elijah Craig 18 Year Old Single Barrel Bourbon ; Age 18 Years ; Mash Bill Undisclosed ; Proof 90 / 45% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel 45% 75cl",
+            "url": "https://www.pricerunner.com/pl/1424-3200153651/Beer-Spirits/Elijah-Craig-18-Year-Old-Single-Barrel-45-75cl-Compare-Prices",
+            "domain": "pricerunner.com",
+            "description": "£6.95 shipping, 2-5 days · Elijah Craig 18-Year-Old Single-Barrel Bourbon Whisky 700ml. £225.00. Or 3 payments of £75.00*. *Pay in 24 installments with Klarna ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig 18 Year Old Single Barrel\" \"45%\" bourbon",
+        "summary": "... Elijah Craig 18 year old Single Barrel (No. 7194), 45%. Price: $150.00 ○ Issue: Summer 2025 ○ Reviewer: Shane English ○ Category: Bourbon/Tennessee Whiskey. Elijah Craig – 18 Year Old – Single Barrel – Straight Bourbon Whiskey – Barrel 4002 – Distilled 5-23-1990 | 45% (90 Proof).",
+        "results": [
+          {
+            "title": "Elijah Craig 18 year old Single Barrel (No. 7194), 45%",
+            "url": "https://whiskyadvocate.com/Elijah-Craig-18-year-old-Single-Barrel-No-7194",
+            "domain": "whiskyadvocate.com",
+            "description": "... Elijah Craig 18 year old Single Barrel (No. 7194), 45%. Price: $150.00 ○ Issue: Summer 2025 ○ Reviewer: Shane English ○ Category: Bourbon/Tennessee Whiskey.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig – 18 Year Old – Single Barrel – Straight Bourbon Whiskey",
+            "url": "https://smokeypeat.wordpress.com/2014/08/18/elijah-craig-18-year-old-single-barrel-straight-bourbon-whiskey-barrel-4002-review/",
+            "domain": "smokeypeat.wordpress.com",
+            "description": "Elijah Craig – 18 Year Old – Single Barrel – Straight Bourbon Whiskey – Barrel 4002 – Distilled 5-23-1990 | 45% (90 Proof).",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "4239090651a16aae0ee9837ec746bb574b0b69adcbd4352ea8e887cdc5226be1",
+    "mode": "auto"
+  }
+}

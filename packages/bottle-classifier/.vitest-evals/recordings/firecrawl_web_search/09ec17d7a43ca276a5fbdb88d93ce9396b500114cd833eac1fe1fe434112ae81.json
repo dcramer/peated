@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T04:58:09.229Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Shieldaig\" \"Speyside\" \"30 Year Old\" whisky",
+      "site:totalwine.com \"Shieldaig Speyside\" \"30yr\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Shieldaig\" \"Speyside\" \"30 Year Old\" whisky",
+        "summary": "... Shieldaig's 30-year-old Speyside in my right. In my left hand are several pages of detail-oriented instructions from the HOA concerning ... Some of the most popular expressions of Shieldaig include: Shielding 30 Year Old Speyside Scotch Whisky, Shieldaig Islay Single Malt Whisky, Shieldaig The ... Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky ; Avg Price (ex-tax); $ 201 / 750ml ; Style Single Malt Scotch Whisky ; NY (ships to OK).",
+        "results": [
+          {
+            "title": "Review - Shieldaig, 30 Years Old, 43% - AngelsPortion",
+            "url": "https://angelsportion.com/2025/10/01/review-shieldaig-30-years-old-43/",
+            "domain": "angelsportion.com",
+            "description": "... Shieldaig's 30-year-old Speyside in my right. In my left hand are several pages of detail-oriented instructions from the HOA concerning ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig",
+            "url": "https://flaviar.com/collections/shieldaig",
+            "domain": "flaviar.com",
+            "description": "Some of the most popular expressions of Shieldaig include: Shielding 30 Year Old Speyside Scotch Whisky, Shieldaig Islay Single Malt Whisky, Shieldaig The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Finest Old Scotch whiskey review",
+            "url": "https://www.facebook.com/groups/728721443657698/posts/1114939215035917/",
+            "domain": "facebook.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Review No. 1: Shieldaig Speyside 12",
+            "url": "https://www.reddit.com/r/Scotch/comments/1r1sa3/review_no_1_shieldaig_speyside_12/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+thirty+old+single+malt+scotch+whisky+speyside+scotland?srsltid=AfmBOoqocNkSZK9LIMIrXe1Am_ZtG4Bc1RwUy5M7GQ9aD2-q8wQVxeii",
+            "domain": "wine-searcher.com",
+            "description": "Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky ; Avg Price (ex-tax); $ 201 / 750ml ; Style Single Malt Scotch Whisky ; NY (ships to OK).",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "site:totalwine.com \"Shieldaig Speyside\" \"30yr\"",
+        "summary": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ; Not Available. Sorry, this item cannot be found within 60 miles of Sacramento (Arden), CA. ; Product Highlights. Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ... Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries ... Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ... Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ... Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Shieldaig Speyside S",
+        "results": [
+          {
+            "title": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750?srsltid=AfmBOoom-9MCxRczzW1i0EGXtx9M1lJLXcANjshe7VmZuuq9v4TaOhgJ",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ; Not Available. Sorry, this item cannot be found within 60 miles of Sacramento (Arden), CA. ; Product Highlights.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Scotch Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/shieldaig-scotch-whiskey?srsltid=AfmBOorEvdtAM2KpodAYJoMHOE_eL5YSLKTbBTCiNZ7RmgAIMFwNBN5O",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ... Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shop Spirit Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/spirit-whiskey?page=30&srsltid=AfmBOopKymrhCzuMNJqQf8taBuoJTqVAXO4hhdJHR-ARdGh-s7ZF1ixa",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ... Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Malt Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/malt-whiskey?page=3&srsltid=AfmBOopNqq-FmlFD0OFf-5SZW1kuK7745p-CSERi4WmcdKgEfBzZLNoY",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky ... Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Scotch Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/scotch-whiskey?page=7&srsltid=AfmBOopghu_qJ9xTAkaKyTV3Rpg68W67BpPxjulBF8YLDPhbwwLOQyif",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky · 4 out of 5 stars. 21 reviews.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "09ec17d7a43ca276a5fbdb88d93ce9396b500114cd833eac1fe1fe434112ae81",
+    "mode": "auto"
+  }
+}

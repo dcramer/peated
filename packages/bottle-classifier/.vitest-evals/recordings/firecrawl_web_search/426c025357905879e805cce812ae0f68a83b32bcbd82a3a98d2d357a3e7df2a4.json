@@ -1,0 +1,31 @@
+{
+  "writtenAt": "2026-08-03T05:00:38.943Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"SMWS 1.285\" \"Party in the afternoon\" 63.4",
+      "\"Society Distillery No. 1\" \"Single Cask No. 285\" 63.4"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"SMWS 1.285\" \"Party in the afternoon\" 63.4",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Society Distillery No. 1\" \"Single Cask No. 285\" 63.4",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "426c025357905879e805cce812ae0f68a83b32bcbd82a3a98d2d357a3e7df2a4",
+    "mode": "auto"
+  }
+}

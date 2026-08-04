@@ -31,6 +31,8 @@ describe("resolveOpenAICompatibleConfig", () => {
     ).toEqual({
       apiKey: "openai-key",
       baseURL: "https://api.openai.com/v1",
+      bottleClassifierModel: "gpt-5.6-terra",
+      bottleClassifierReasoningEffort: "medium",
       embeddingModel: "text-embedding-3-large",
       evalModel: "gpt-5.6-luna",
       evalReasoningEffort: "medium",
@@ -53,6 +55,8 @@ describe("resolveOpenAICompatibleConfig", () => {
     expect(config).toEqual({
       apiKey: "gateway-key",
       baseURL: "https://ai-gateway.vercel.sh/v1",
+      bottleClassifierModel: "openai/gpt-5.6-terra",
+      bottleClassifierReasoningEffort: "medium",
       embeddingModel: "openai/text-embedding-3-large",
       evalModel: "openai/gpt-5.6-luna",
       evalReasoningEffort: "medium",
@@ -66,6 +70,12 @@ describe("resolveOpenAICompatibleConfig", () => {
     });
     expect(getStableOpenAISettings(config.model)).toEqual({});
     expect(
+      getStableOpenAISettings(
+        config.bottleClassifierModel,
+        config.bottleClassifierReasoningEffort,
+      ),
+    ).toEqual({ reasoning: { effort: "medium" } });
+    expect(
       getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
     ).toEqual({ reasoning: { effort: "medium" } });
   });
@@ -74,6 +84,8 @@ describe("resolveOpenAICompatibleConfig", () => {
     expect(
       resolveOpenAICompatibleConfig({
         AI_GATEWAY_API_KEY: "gateway-key",
+        BOTTLE_CLASSIFIER_MODEL: "gpt-5.6-luna",
+        BOTTLE_CLASSIFIER_REASONING_EFFORT: "low",
         OPENAI_EMBEDDING_MODEL: "openai/text-embedding-3-small",
         OPENAI_EVAL_MODEL: "gpt-5-mini",
         OPENAI_EVAL_REASONING_EFFORT: "xhigh",
@@ -86,6 +98,8 @@ describe("resolveOpenAICompatibleConfig", () => {
       }),
     ).toMatchObject({
       baseURL: "https://ai-gateway.vercel.sh/v1",
+      bottleClassifierModel: "openai/gpt-5.6-luna",
+      bottleClassifierReasoningEffort: "low",
       embeddingModel: "openai/text-embedding-3-small",
       evalModel: "openai/gpt-5-mini",
       evalReasoningEffort: "xhigh",

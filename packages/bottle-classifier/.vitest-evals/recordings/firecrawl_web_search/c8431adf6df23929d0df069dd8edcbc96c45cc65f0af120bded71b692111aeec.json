@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T04:52:38.696Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"High West\" \"A Midwinter Night's Dram\" \"Act 10 Scene 4\" 49.3%",
+      "\"A Midwinter Night's Dram\" \"Act 10 Scene 4\" 2022"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"High West\" \"A Midwinter Night's Dram\" \"Act 10 Scene 4\" 49.3%",
+        "summary": "A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol. # High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3%\nPrice: $150.00● Issue: Spring 2023 ● Reviewer: Ted Simmons ● Category: Rye Whiskey\n\n[Buy Now](https://whiskyadvocate.com/High-West-A-Midwinter-Night-s-Dram-Act-10-Scene-4-49-3)\n\nRich dark fruit highlights a pungent nose of blood orange, baked apples, and plums, situated next to buttered popcorn, toasted marshmallows, pecans, wax paper, and strawberry jam. Creamy and light on the palate, with Gr",
+        "results": [
+          {
+            "title": "r/bourbon - Review 003 - A Midwinter Night's Dram, Act 10, Scene 4",
+            "url": "https://www.reddit.com/r/bourbon/comments/195819a/review_003_a_midwinter_nights_dram_act_10_scene_4/",
+            "domain": "reddit.com",
+            "description": "A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol.",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3%",
+            "url": "https://whiskyadvocate.com/High-West-A-Midwinter-Night-s-Dram-Act-10-Scene-4-49-3",
+            "domain": "whiskyadvocate.com",
+            "description": "# High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3%\nPrice: $150.00● Issue: Spring 2023 ● Reviewer: Ted Simmons ● Category: Rye Whiskey\n\n[Buy Now](https://whiskyadvocate.com/High-West-A-Midwinter-Night-s-Dram-Ac",
+            "extraSnippets": []
+          },
+          {
+            "title": "A Midwinter Night's Dram Act 10 Scene 2 - High West Distillery",
+            "url": "https://www.youtube.com/watch?v=wbhG5S53EuI",
+            "domain": "youtube.com",
+            "description": "A Midwinter Night's Dram Act 10 (Scene 4). This is the brand's ... A Midwinter Night's Dram Act 10 Scene 2 - High West Distillery.",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram Act 10 Rye Whiskey",
+            "url": "https://www.pastemagazine.com/drink/whiskey/high-west-midwinter-nights-dram-act-10-review-encore-price-tasting-rye",
+            "domain": "pastemagazine.com",
+            "description": "High West A Midwinter Night's Dram Act 10 Rye Whiskey. By Jim Vorel ... So with that said, let's get to tasting A Midwinter Night's Dram Act 10 (Scene 4).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Well, seeing it was the Winter Solstice …. a Midwinter Night's Dram seemed ...",
+            "url": "https://www.instagram.com/reel/DSlQXEdjXH8/?hl=en",
+            "domain": "instagram.com",
+            "description": "... (Act 10, Scene 4) blend of #straightrye whiskeys, I think 80% rye & ... High West A Midwinter Night's Dram. This bottle is Act 13, Scene 13 ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"A Midwinter Night's Dram\" \"Act 10 Scene 4\" 2022",
+        "summary": "## A Midwinter Night’s Dram (Act 10, Scene 4) Scoresheet & Review\nTake their pinnacle, recurring release, for example: A Midwinter Night’s Dram, which had a yield of 115,000 bottles for 2022 and an eye-watering 189,000 for 2023. A Midwinter Night’s Dram was also going through a transition around that time, since more recent releases (denoted by Acts, with batches identified by Scenes) use a notably different whiskey base.\n\nThe third whiskey was the popular 95% rye, 5% malted barley from [MGP (now Ross & Squibb)](https://thewhiskeyramble.com/tag/mgp/), which is still used today.\n\nA new componen",
+        "results": [
+          {
+            "title": "A Midwinter Night's Dram (Act 10, Scene 4) Scoresheet & ...",
+            "url": "https://thewhiskeyramble.com/2023/12/01/a-midwinter-nights-dram-act-10-scene-4-scoresheet-review/",
+            "domain": "thewhiskeyramble.com",
+            "description": "## A Midwinter Night’s Dram (Act 10, Scene 4) Scoresheet & Review\nTake their pinnacle, recurring release, for example: A Midwinter Night’s Dram, which had a yield of 115,000 bottles for 2022 and an eye-watering 189,000 f",
+            "extraSnippets": []
+          },
+          {
+            "title": "Episode 299: New RELEASE!!- Midwinter Night's Dram - Act ...",
+            "url": "https://www.youtube.com/watch?v=9LV4VwHVY1E",
+            "domain": "youtube.com",
+            "description": "!!- Midwinter Night's Dram - Act 10 - Scene 4- Worth $150?? ... A Midwinter Night's Dram The Encore | High West Limited Edition Rye Deliciousness.",
+            "extraSnippets": []
+          },
+          {
+            "title": "A Midwinter Night's Dram Review (Act 10, Scene 4)",
+            "url": "https://bourboninspector.com/midwinter-nights-dram-review-act-10-scene-4/",
+            "domain": "bourboninspector.com",
+            "description": "A Midwinter Night's Dram Review: Act 10, Scene 4 ; Distillery: High West ; Proof: 98.6 ; Age: No Age Statement ; Mashbill: ; Price: $150 (MSRP) | ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram Act 10 Rye Whiskey",
+            "url": "https://www.pastemagazine.com/drink/whiskey/high-west-midwinter-nights-dram-act-10-review-encore-price-tasting-rye",
+            "domain": "pastemagazine.com",
+            "description": "So with that said, let's get to tasting A Midwinter Night's Dram Act 10 (Scene 4). This is the brand's Rendezvous Rye Whiskey, finished in ruby and tawny ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Back in stock @drinkhighwest A Midwinter Night's Dram.Act 10 ...",
+            "url": "https://www.instagram.com/p/CkgTxXGrshL/",
+            "domain": "instagram.com",
+            "description": "Back in stock @drinkhighwest A Midwinter Night's Dram.Act 10 Scene 4!! Come grab this limited release while supplies last! Stock is very limited!!!!",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "c8431adf6df23929d0df069dd8edcbc96c45cc65f0af120bded71b692111aeec",
+    "mode": "auto"
+  }
+}

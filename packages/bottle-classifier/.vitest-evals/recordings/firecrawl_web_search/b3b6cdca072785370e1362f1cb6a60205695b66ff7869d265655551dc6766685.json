@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T22:59:54.031Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Hudson Whiskey\" \"Back Room Deal\" \"Peated Scotch Barrels\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Hudson Whiskey\" \"Back Room Deal\" \"Peated Scotch Barrels\"",
+        "summary": "# Back Room Deal\nWe send our ex-bourbon barrels across the Atlantic where they’re used to age peated whiskey, then emptied and returned to our distillery where we fill them up again with straight rye whiskey.\n\nPeated Scotch Barrels\n\n## Come Visit Us\nHudson Hudson Whiskey NY \"Back Room Deal\" Peated Scotch Barrel Finished Straight Rye Whiskey ... Finished in Peated Scotch Barrels; Aged a minimum of 3 ... Hudson Whiskey NY Back Room Deal Rye Whiskey · NOSE There's a bit of smoke in the air, and a soft aroma of vanilla, apricot, and brown sugar · PALATE Take a sip, ... This one is called back room",
+        "results": [
+          {
+            "title": "Backroom Deal | Hudson Peated Rye Whiskey",
+            "url": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+            "domain": "hudsonwhiskey.com",
+            "description": "# Back Room Deal\nWe send our ex-bourbon barrels across the Atlantic where they’re used to age peated whiskey, then emptied and returned to our distillery where we fill them up again with straight rye whiskey.\n\nPeated Sco",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey NY \"Back Room Deal\" Peated Scotch ...",
+            "url": "https://caskcartel.com/en-de/products/hudson-whiskey-ny-back-room-deal-straight-rye-whiskey",
+            "domain": "caskcartel.com",
+            "description": "Hudson Whiskey NY \"Back Room Deal\" Peated Scotch Barrel Finished Straight Rye Whiskey ... Finished in Peated Scotch Barrels; Aged a minimum of 3 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey NY Back Room Deal Rye Whiskey",
+            "url": "https://internetwines.com/products/hudson-whiskey-ny-back-room-deal-rye-whiskey?srsltid=AfmBOooL1FBw0UG9VS15zM9CPBk83tdzf3Use53n3QtF8TLxYpR57nx5",
+            "domain": "internetwines.com",
+            "description": "Hudson Whiskey NY Back Room Deal Rye Whiskey · NOSE There's a bit of smoke in the air, and a soft aroma of vanilla, apricot, and brown sugar · PALATE Take a sip, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey Back Room Deal Review - WWR #204",
+            "url": "https://www.youtube.com/watch?v=sNkRO40qdgw",
+            "domain": "youtube.com",
+            "description": "This one is called back room deal which is their New York Straight rye whiskey which is technically considered an Empire ey.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey NY Back Room Deal",
+            "url": "https://bestbuyliquors.com/hudson-whiskey-back-room-deal",
+            "domain": "bestbuyliquors.com",
+            "description": "Hudson Whiskey NY Back Room Deal ... New York Straight Rye Whiskey Finished in Peated Scotch Barrels. We send our ex-bourbon barrels across the Atlantic where ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b3b6cdca072785370e1362f1cb6a60205695b66ff7869d265655551dc6766685",
+    "mode": "auto"
+  }
+}

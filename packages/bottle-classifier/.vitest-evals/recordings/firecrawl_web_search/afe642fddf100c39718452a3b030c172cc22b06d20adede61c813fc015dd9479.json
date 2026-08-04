@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:48:10.337Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Highland Park Cask Strength No. 5\" official ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Highland Park Cask Strength No. 5\" official ABV",
+        "summary": "ABV: 129.4 Proof (64.7%) Mashbill: 100% malted barley. Age: No Age ... For Highland Park Cask Strength No. 5, this 'Motion' expression ... Get Highland Park Cask Strength No. 5 Release for $97.99 ✓ Earn up to 5 ... Earn up to 5% back on this product with Caskers Rewards. Size750mL Proof129.4 (64.7% ... Highland Park Cask Strength No 5. In this video Erik Wait reviews the Highland Park Cask Strength No. 5 Single Malt Scotch Whisky. Check out Erik Wait's review of Highland ... Highland Park Cask Strength No. 5 Release. Engravable. Highland Park Cask Strength No. 5 Release. No reviews. •. 750ml.",
+        "results": [
+          {
+            "title": "Highland Park Cask Strength Release No. 5 - Barleycorn Drinks",
+            "url": "https://www.barleycorndrinks.com/barleycorn-review-highland-park-cask-strength-release-no-5/",
+            "domain": "barleycorndrinks.com",
+            "description": "ABV: 129.4 Proof (64.7%) Mashbill: 100% malted barley. Age: No Age ... For Highland Park Cask Strength No. 5, this 'Motion' expression ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No. 5 Release",
+            "url": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/?srsltid=AfmBOoo_tjZ7S_bQ0yALtDcqgyW2uTUENVSOtoimtv0o2oVVWsYtn30h",
+            "domain": "caskers.com",
+            "description": "Get Highland Park Cask Strength No. 5 Release for $97.99 ✓ Earn up to 5 ... Earn up to 5% back on this product with Caskers Rewards. Size750mL Proof129.4 (64.7% ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No 5 : r/whisky",
+            "url": "https://www.reddit.com/r/whisky/comments/1db2hvn/highland_park_cask_strength_no_5/",
+            "domain": "reddit.com",
+            "description": "Highland Park Cask Strength No 5.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No.5 Single Malt Scotch Whisky",
+            "url": "https://www.youtube.com/watch?v=rxy8MrGtJPk",
+            "domain": "youtube.com",
+            "description": "In this video Erik Wait reviews the Highland Park Cask Strength No. 5 Single Malt Scotch Whisky. Check out Erik Wait's review of Highland ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No. 5 Release",
+            "url": "https://flaviar.com/products/highland-park-cask-strength-no-5-release-750",
+            "domain": "flaviar.com",
+            "description": "Highland Park Cask Strength No. 5 Release. Engravable. Highland Park Cask Strength No. 5 Release. No reviews. •. 750ml. •. 64.7% ABV. hand Only left •Last few ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "afe642fddf100c39718452a3b030c172cc22b06d20adede61c813fc015dd9479",
+    "mode": "auto"
+  }
+}

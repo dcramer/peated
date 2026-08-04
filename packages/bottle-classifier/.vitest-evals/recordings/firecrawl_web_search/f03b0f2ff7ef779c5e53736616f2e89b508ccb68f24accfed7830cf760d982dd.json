@@ -1,0 +1,17 @@
+{
+  "writtenAt": "2026-08-03T01:41:01.325Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Pokeno \"Pedro Ximenez Sherry Cask #60\" 2019"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Pokeno \"Pedro Ximenez Sherry Cask #60\" 2019",
+    "summary": null,
+    "results": []
+  },
+  "metadata": {
+    "cacheKey": "f03b0f2ff7ef779c5e53736616f2e89b508ccb68f24accfed7830cf760d982dd",
+    "mode": "auto"
+  }
+}

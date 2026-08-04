@@ -162,7 +162,14 @@ describe("Bottle context contracts", () => {
       sourceImageId: "bottle:10",
       model: "test-model",
       extractedIdentity: null,
+      rawLabelText: null,
     });
+    expect(
+      BottleContextLabelEvidenceSchema.parse({
+        ...evidence,
+        rawLabelText: "Pokeno CASK NO 71 BOTTLE NO 100",
+      }).rawLabelText,
+    ).toBe("Pokeno CASK NO 71 BOTTLE NO 100");
     expect(
       BottleContextLabelEvidenceSchema.safeParse({
         ...evidence,

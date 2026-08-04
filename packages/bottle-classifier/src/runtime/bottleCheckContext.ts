@@ -76,10 +76,19 @@ export function createBottleContextLoader({
     imageModel: options.imageExtractionModel,
     imageReasoningEffort: options.imageExtractionReasoningEffort,
   });
-  const extractFromImage = async (imageUrl: string) =>
-    options.overrides?.extractFromImage
-      ? await options.overrides.extractFromImage(imageUrl)
-      : await extractor.extractFromImage(imageUrl);
+  const extractLabelEvidence = async (imageUrl: string) => {
+    if (options.overrides?.extractFromImage) {
+      return {
+        extractedIdentity: await options.overrides.extractFromImage(imageUrl),
+        rawLabelText: null,
+      };
+    }
+    const extraction = await extractor.extractFromImageWithMetadata(imageUrl);
+    return {
+      extractedIdentity: extraction.result,
+      rawLabelText: extraction.rawLabelText,
+    };
+  };
 
   return async (bottleId: number): Promise<BottleContext | null> => {
     const rawContext = await getBottleContext(bottleId);
@@ -91,10 +100,14 @@ export function createBottleContextLoader({
     const publicImages = await Promise.all(
       imageSources.map(async (imageSource) => {
         let extractedIdentity: BottleExtractedDetails | null = null;
+        let rawLabelText: string | null = null;
         try {
-          extractedIdentity = await extractFromImage(imageSource.url);
+          ({ extractedIdentity, rawLabelText } = await extractLabelEvidence(
+            imageSource.url,
+          ));
         } catch {
           extractedIdentity = null;
+          rawLabelText = null;
         }
         const sourceImageId =
           imageSource.source.kind === "bottle"
@@ -107,6 +120,7 @@ export function createBottleContextLoader({
             sourceImageId,
             model: options.imageExtractionModel ?? options.model,
             extractedIdentity,
+            rawLabelText,
           },
         };
       }),

@@ -271,7 +271,13 @@ export const ProposedSeriesChoiceSchema = z
 
 export const ProposedBottleSchema = z
   .object({
-    name: z.string().trim().min(1),
+    name: z
+      .string()
+      .trim()
+      .min(1)
+      .describe(
+        "Stable marketed expression relative to the Brand. Omit the Brand prefix and exact traits represented by other fields. When no separate expression is marketed, use the source-supported product or style phrase. Do not repeat the Brand, copy a retailer title, or invent an expression.",
+      ),
     series: ProposedSeriesChoiceSchema.nullable().default(null),
     category: CategoryEnum.nullable().default(null),
     edition: z.string().trim().nullable().default(null),
@@ -455,8 +461,8 @@ export const BottleConfidenceBasisSchema = z
           "initial_local_candidates",
           "search_bottles",
           "search_entities",
-          "openai_web_search",
           "firecrawl_web_search",
+          "firecrawl_read_page",
           "none",
         ]),
       )
@@ -537,9 +543,9 @@ export const BottleClassifierAgentDecisionSchema = z
       .describe(
         [
           "Decision action.",
-          "match: an existing Bottle safely covers the marketed identity; set matchedBottleId.",
-          "repair_bottle: existing bottle is the right identity but needs bottle-level field repair; set matchedBottleId and proposedBottle.",
-          "create_bottle: create one independently complete Bottle; set proposedBottle only, including every marketed release trait needed to identify it.",
+          "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId. A reviewed update proposal may separately correct optional or malformed stored fields.",
+          "repair_bottle: an existing Bottle is the exact marketed product but cannot be assigned safely until its Bottle identity is repaired; set matchedBottleId and proposedBottle.",
+          "create_bottle: no inspected existing Bottle represents the exact marketed product, including plausible malformed candidates; set proposedBottle only, including every marketed release trait needed to identify it.",
           "no_match: no safe existing target and no supported create action, or creation would invent an ambiguous hybrid.",
         ].join(" "),
       ),

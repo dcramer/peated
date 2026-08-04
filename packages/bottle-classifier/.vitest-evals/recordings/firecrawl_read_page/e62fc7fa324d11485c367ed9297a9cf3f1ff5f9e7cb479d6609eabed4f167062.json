@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T05:13:12.768Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://house.suntory.com/hibiki-whisky/hibiki-21-years-old",
+    "focus": "Verify the exact product's age, style/category, alcohol by volume, and producer presentation."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact product's age, style/category, alcohol by volume, and producer presentation.",
+    "summary": "WHISKY\n\nHibiki 21 Years Old\n\nServing Japanese Whisky",
+    "results": [
+      {
+        "title": "Hibiki® 21 | Japanese Whisky | The House of Suntory",
+        "url": "https://house.suntory.com/hibiki-whisky/hibiki-21-years-old",
+        "domain": "house.suntory.com",
+        "description": "Hibiki 21 celebrates an unrivaled art of blending, fine Japanese craftsmanship and a sense of luxury. Enjoy a tenderly calm essence, full of grace.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e62fc7fa324d11485c367ed9297a9cf3f1ff5f9e7cb479d6609eabed4f167062",
+    "mode": "auto"
+  }
+}

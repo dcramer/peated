@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T02:02:52.886Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza",
+    "focus": "Confirm Spice Tree Extravaganza’s category, ABV, limited-edition status, release timing, and whether any age statement is marketed."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm Spice Tree Extravaganza’s category, ABV, limited-edition status, release timing, and whether any age statement is marketed.",
+    "summary": "Blended Malt Scotch Whisky\n\n46% ABV, Natural Colour, Not Chill-Filtered.\n\nThanks to our cooper friends in both France and Scotland, we were able to bring back The Spice Tree, and to celebrate the tenth anniversary of the original bottling being banned, we released Spice Tree Extravaganza.",
+    "results": [
+      {
+        "title": "Spice Tree Extravaganza\n – Compass Box",
+        "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza",
+        "domain": "compassboxwhisky.com",
+        "description": "Compass Box",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "24f60aa8bcc2fa3c42f4d61456f39737e924b417eae2e34ea6f3c0ca788f0c07",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "writtenAt": "2026-08-03T01:15:11.574Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Pōkeno \"55.8%\" \"2019\" \"Pedro Ximenez\""
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Pōkeno \"55.8%\" \"2019\" \"Pedro Ximenez\"",
+    "summary": "... Pedro Ximenez & Olorroso. Abv 43% - Revelation ... 2019, their expressions, aged just over 3 years ... 55.8% • Locally sourced ingredients and being ... This expression brings together some of Pōkeno's oldest whiskies, fully matured across six cask types: Pedro Ximénez ... ABV: 55.8%, Cask strength ... 2019 and ... [Skip to content](https://www.mizunaratheshop.com/collections/pokeno/cask_sherry#MainContent) Dear Valued Customer: Happy HKSAR Establishment Day! Our store will be closed on 1st July 2026. [Whatsapp Us +852 3705 9770](https://wa.me/85237059770) - [Facebook](https://www.facebook",
+    "results": [
+      {
+        "title": "𝗣ō𝗸𝗲𝗻𝗼 𝗪𝗵𝗶𝘀𝗸𝘆 𝗧𝗮𝘀𝘁𝗶𝗻𝗴 - 𝗠𝗶𝘇𝘂𝗻𝗮𝗿𝗮",
+        "url": "https://www.instagram.com/p/C0x49aAydRt/",
+        "domain": "instagram.com",
+        "description": "... Pedro Ximenez & Olorroso. Abv 43% - Revelation ... 2019, their expressions, aged just over 3 years ... 55.8% • Locally sourced ingredients and being ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Pōkeno New Zealand Single Malt Whisky – tagged \"Cask_Sherry\"",
+        "url": "https://www.mizunaratheshop.com/collections/pokeno/cask_sherry?srsltid=AfmBOoqS6fsOba_T6V1Ah_uvWLsL9IQrqlKR6Mi1e_Lw-SbjksylymEG",
+        "domain": "mizunaratheshop.com",
+        "description": "This expression brings together some of Pōkeno's oldest whiskies, fully matured across six cask types: Pedro Ximénez ... ABV: 55.8%, Cask strength ... 2019 and ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.mizunaratheshop.com/collections/pokeno/cask_sherry#MainContent) Dear Valued Customer: Happy HKSAR Establishment Day! Our store will be closed on 1st J"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2a22cffbc6916883518e2e5e8cf22857caa2d3902db3171e6e50e4f91a4da20b",
+    "mode": "auto"
+  }
+}

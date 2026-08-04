@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:53:23.703Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Laphroaig Elements L2.0\" \"59.6%\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Laphroaig Elements L2.0\" \"59.6%\"",
+        "summary": "# Comments Section\nProof: 119.2 proof (59.6%)\n\nI find it quite mild for over 59%abv. Laphroaig Elements L2.0 is the 2024 Whisky of the Year. Tropical fruit, sweet smoke, and maritime peat at cask strength 59.6% ABV. Shop now.",
+        "results": [
+          {
+            "title": "Review #266: Laphroaig Elements L2.0 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1fvc6cz/review_266_laphroaig_elements_l20/",
+            "domain": "reddit.com",
+            "description": "# Comments Section\nProof: 119.2 proof (59.6%)\n\nI find it quite mild for over 59%abv.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements L2.0 700ml | 2024 Whisky of the Year",
+            "url": "https://theliquorbarn.com/products/laphroaig-elements-l2-0-700ml?srsltid=AfmBOopHiosZlKnD36gvuk-tBYWKULmMI08HmW2RR1Kj4zjIrxokIiFX",
+            "domain": "theliquorbarn.com",
+            "description": "Laphroaig Elements L2.0 is the 2024 Whisky of the Year. Tropical fruit, sweet smoke, and maritime peat at cask strength 59.6% ABV. Shop now.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Reviews #445 and #446 - Laphroaig Elements L1.0 vs. L2.0",
+            "url": "https://www.reddit.com/r/Scotch/comments/1hhvqkn/reviews_445_and_446_laphroaig_elements_l10_vs_l20/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Great to try the three Laphroaig Elements releases L1.0, L2.0 and L3. ...",
+            "url": "https://www.facebook.com/groups/4967477276/posts/10163649866037277/",
+            "domain": "facebook.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Review of Laphroaig Elements L2.0 Whiskey",
+            "url": "https://www.facebook.com/groups/4967477276/posts/10161395361327277/",
+            "domain": "facebook.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "688d848aaa9f84d605f404e6f23c3b006fc55f1eb741e74731f67ec24dc72bfe",
+    "mode": "auto"
+  }
+}

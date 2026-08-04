@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T04:55:31.543Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Canadian Club Reserve\" \"9 Year Old\" Canadian whisky",
+      "\"Canadian Club Reserve 9-year-old\" \"Triple Aged\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Canadian Club Reserve\" \"9 Year Old\" Canadian whisky",
+        "summary": "# Canadian Club Reserve 9 year - Thoughts?\n[Canadian Club Reserve 9 year - Thoughts?](http://therumhowlerblog.wordpress.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/)\n\n[![](https://external-preview.redd.it/canadian-club-reserve-9-year-thoughts-v0-q79m9b3wd4nJjuY4NIl5TZEiBf7DbroyS4C1DfMvxiM.jpeg?auto=webp&s=31aa292e7a7b8ddcff61f9426413fe788877afbc)](http://therumhowlerblog.wordpress.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/)[![r/worldwhisky - Canadian Club Reserve 9 year - Thoughts?](https://external-preview.redd.it/canadian-club-reserve-9-y",
+        "results": [
+          {
+            "title": "Canadian Club Reserve 9 year - Thoughts? : r/worldwhisky",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/27g4vo/canadian_club_reserve_9_year_thoughts/",
+            "domain": "reddit.com",
+            "description": "# Canadian Club Reserve 9 year - Thoughts?\n[Canadian Club Reserve 9 year - Thoughts?](http://therumhowlerblog.wordpress.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/)\n\n[![](https://external-previ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9yr Blended Canadian Whisky",
+            "url": "https://internetwines.com/products/canadian-club-reserve-9-year-old-whisky?srsltid=AfmBOoq29LUXhIpegytdRHH6IEFOqZCVIn8ilWs_ZK4YVHWZuu8NmgBt",
+            "domain": "internetwines.com",
+            "description": "Canadian Club Reserve 9yr Blended Canadian Whisky ... Think of Reserve 9 year old as the more mature, older sibling of Canadian Club 1858 with a greater Rye ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9 Year Old Whisky",
+            "url": "https://shopwoodmans.com/store/woodmans-food-markets/products/29578894-canadian-club-blended-canadian-whisky?srsltid=AfmBOopSTP2uG697TH_U7iZJBRLMGe_iSfrxuO7lFyQ8cAnXg9jXn1uD",
+            "domain": "shopwoodmans.com",
+            "description": "Get Canadian Club Reserve 9 Year Old Whisky delivered to you in as fast as 1 hour with Woodman's Food Markets same-day delivery or curbside pickup.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve (9 Year Old)",
+            "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+            "domain": "therumhowlerblog.com",
+            "description": "# Canadian Club Reserve (9 Year Old)\n**Review: Canadian Club Reserve (9 Year Old) 85.5/100**\n\na review by Chip Dykstra (Aka Arctic Wolf)\n\nPosted January 22, 2014\n\n[**Canadian Club Whisky**](http://www.canadianclubwhisky.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Whisky | Crown Royal, Pendleton & ...",
+            "url": "https://woodencork.com/collections/canadian-whiskey?page=2&srsltid=AfmBOorwQQDwHVYR4qyi915-fwQtm85MJnmFFBXeSJjmv4E0UTwmIjzS",
+            "domain": "woodencork.com",
+            "description": "Canadian Club Canadian Whisky Reserve Triple Aged 9 Yr - Available at Wooden Cork. Canadian Club Reserve 9 Year Old Blended Canadian Whisky 750 ml. Canadian ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Canadian Club Reserve 9-year-old\" \"Triple Aged\"",
+        "summary": "# Canadian Club Reserve (9 Year Old)\nOne of the brands which has undergone a revamping is the **Canadian Club Reserve** which used to be a 10-year-old blend, but which was recently revamped and now carries a 9 year age statement. The newer version of the whisky has a new square bottle (_shown below_) and the two words, “Triple Aged” have been added to the label.\n\n## **![ccr-9yr](https://therumhowlerblog.com/wp-content/uploads/2016/10/ccr-9yr.jpg?w=250&h=501)In the Bottle 4/5**\nThe words “triple aged” found at the bottom of the label (just above the age statement) refers to the fact that this w",
+        "results": [
+          {
+            "title": "Canadian Club Reserve (9 Year Old)",
+            "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+            "domain": "therumhowlerblog.com",
+            "description": "# Canadian Club Reserve (9 Year Old)\nOne of the brands which has undergone a revamping is the **Canadian Club Reserve** which used to be a 10-year-old blend, but which was recently revamped and now carries a 9 year age s",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9 year old Triple Aged, 40%",
+            "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+            "domain": "whiskyadvocate.com",
+            "description": "# Canadian Club Reserve 9 year old Triple Aged, 40%\nPrice: $17.00● Issue: Canadian\n\n[Buy Now](https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40)\n\nThe discontinued 10 year old CC Reserve was typic",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9 Year Old Blended ...",
+            "url": "https://woodencork.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-yr?srsltid=AfmBOop_S2jNGuJarl1fUYXed58ZMG4lQIoKSNEEdS9CskY8QWtMRdSb",
+            "domain": "woodencork.com",
+            "description": "Canadian Club Canadian Whisky Reserve Triple Aged 9 Yr - Available at Wooden Cork. Home /. Canadian Club Reserve 9 Year Old Blended Canadian Whisky 750 ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9 Year Old Whisky",
+            "url": "https://listex.online/product/80686824046-us-canadian-club-reserve-9-year-old-whisky",
+            "domain": "listex.online",
+            "description": "Canadian Club Reserve 9 Year Old Whisky. ×. Listex ... Characteristics Canadian Club Reserve 9 Year Old Whisky. ... Triple aged. Aged 9 years for a balanced spice ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9-year-old Triple Aged | Peated",
+            "url": "https://peated.com/bottles/16913",
+            "domain": "peated.com",
+            "description": "Canadian Club Reserve 9-year-old Triple Aged is a blend that has been meticulously aged for nine years, offering a refined and balanced experience.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5401940932ae7e284adb723f10d7c78a159653464e99c302f9957050c3ebbd7b",
+    "mode": "auto"
+  }
+}

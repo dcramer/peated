@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T04:09:42.056Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.compassboxwhisky.com/pages/whiskies",
+    "focus": "Spice Tree Extravaganza archive listing and whether it identifies the product as a limited edition or provides release details."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Spice Tree Extravaganza archive listing and whether it identifies the product as a limited edition or provides release details.",
+    "summary": "Spice Tree Extravaganza\n\n[Spice Tree Extravaganza](https://www.compassboxwhisky.com/products/spice-tree-extraveganza)\n\n[Spice Tree Extravaganza](https://www.compassboxwhisky.com/products/spice-tree-extraveganza)\n\nBlended Malt Scotch Whisky\n\nThe Spice Tree Cask Strength\n\n[The Spice Tree Cask Strength](https://www.compassboxwhisky.com/products/the-spice-tree-cask-strength)\n\n[The Spice Tree Cask Strength](https://www.compassboxwhisky.com/products/the-spice-tree-cask-strength)\n\nBlended Malt Scotch Whisky",
+    "results": [
+      {
+        "title": "Whiskies\n – Compass Box",
+        "url": "https://www.compassboxwhisky.com/pages/whiskies",
+        "domain": "compassboxwhisky.com",
+        "description": "Compass Box",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "879d94b5b57244d6a131c3ec1c5f1d43e1d4e9a167208aad99527d6f6afacf11",
+    "mode": "auto"
+  }
+}

@@ -142,8 +142,8 @@ function buildCreateBottleDecision({
       | "initial_local_candidates"
       | "search_bottles"
       | "search_entities"
-      | "openai_web_search"
       | "firecrawl_web_search"
+      | "firecrawl_read_page"
       | "none"
     )[];
     webEvidence?:
@@ -726,7 +726,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(checks[0]).toMatchObject({
       intent: "resolve_reference",
       sourceId: first.pendingImage.id,
-      model: config.OPENAI_MODEL,
+      model: config.BOTTLE_CLASSIFIER_MODEL,
       modelMetadata: expect.objectContaining({
         usage: expect.objectContaining({ totalTokens: 120 }),
       }),
@@ -929,7 +929,7 @@ describe("POST /tastings/photo-identification", () => {
             note: "Keep this proposal in manual review for the test.",
           },
         ],
-        toolsUsed: ["openai_web_search"],
+        toolsUsed: ["firecrawl_web_search"],
         webEvidence: "supportive",
       },
     });

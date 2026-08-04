@@ -1108,7 +1108,7 @@ export async function upsertStorePriceMatchProposal({
     searchEvidence: searchEvidence || [],
     automationAssessment: automationAssessment ?? null,
     rationale: parsedDecision?.rationale ?? null,
-    model: config.OPENAI_MODEL,
+    model: config.BOTTLE_CLASSIFIER_MODEL,
     error: error || null,
     lastEvaluatedAt: sql`NOW()`,
     enteredQueueAt,

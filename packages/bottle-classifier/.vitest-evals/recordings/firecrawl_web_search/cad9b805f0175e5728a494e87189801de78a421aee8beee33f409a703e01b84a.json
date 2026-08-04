@@ -1,0 +1,75 @@
+{
+  "writtenAt": "2026-08-03T04:47:18.575Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:fourrosesbourbon.com \"Single Barrel Barrel Strength\"",
+      "Four Roses Single Barrel Barrel Strength release batches ABV official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:fourrosesbourbon.com \"Single Barrel Barrel Strength\"",
+        "summary": "For sipping at the end of a long day, I usually go with Single Barrel, barrel strength, neat. If it's after an event, on the rocks. What ...",
+        "results": [
+          {
+            "title": "BARTENDER FEATURE: NIC CHRISTIANSEN",
+            "url": "https://www.fourrosesbourbon.com/blog/bartender-feature-nic-christiansen",
+            "domain": "fourrosesbourbon.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses Single Barrel Barrel Strength release batches ABV official",
+        "summary": "Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected ・ 100 Proof / Aged 7 - 9 Years. Cinnamon and Stave ・ ed, non-chill- ... Details: Each recipe is aged from 7-9 years old and at 50% ABV. OBSF. Nose: Sweet and floral, with mint and oak. Mouth: Crème brûlée, mint ... This mashbill consists of 60% corn, 35% rye, and 5% malted barley. The strain of yeast used is version “V” which is described as being delicate fruit, spicy, ...",
+        "results": [
+          {
+            "title": "Single Barrel OBSV",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "domain": "fourrosesbourbon.com",
+            "description": "Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected ・ 100 Proof / Aged 7 - 9 Years. Cinnamon and Stave ・ ed, non-chill- ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #439 - Four Roses 10 Year OESV Single Barrel Barrel Strength",
+            "url": "https://www.reddit.com/r/bourbon/comments/1hbvvpc/review_439_four_roses_10_year_oesv_single_barrel/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Single Barrel Barrel Strength Review (OBSV)",
+            "url": "https://www.reddit.com/r/bourbon/comments/1hs991a/four_roses_single_barrel_barrel_strength_review/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Single Barrel Collection, 2025",
+            "url": "https://www.bourbonguy.com/blog/2025/1/15/four-roses-single-barrel-collection-2025",
+            "domain": "bourbonguy.com",
+            "description": "Details: Each recipe is aged from 7-9 years old and at 50% ABV. OBSF. Nose: Sweet and floral, with mint and oak. Mouth: Crème brûlée, mint ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Single Barrel Review",
+            "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+            "domain": "breakingbourbon.com",
+            "description": "This mashbill consists of 60% corn, 35% rye, and 5% malted barley. The strain of yeast used is version “V” which is described as being delicate fruit, spicy, ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "cad9b805f0175e5728a494e87189801de78a421aee8beee33f409a703e01b84a",
+    "mode": "auto"
+  }
+}

@@ -539,6 +539,7 @@ export function buildWhiskyLabelExtractorInstructions({
       ? [
           "Read only the bottle and label text that is actually visible in the image.",
           "Scan the complete readable label, including smaller secondary bands, subtitles, and neck tags, for identity-bearing edition, batch, release, finish, and variant text.",
+          "Transcribe all readable bottle and label text verbatim into `rawLabelText`. Preserve exact cask, barrel, batch, bottle, vintage, and date markers without normalizing or silently dropping them.",
           "Do not infer missing text from bottle shape, brand colors, or background page elements.",
         ]
       : [
@@ -604,6 +605,10 @@ export function buildWhiskyLabelExtractorInstructions({
     "Output requirements:",
     renderBulletLines([
       "Return only the structured object. Do not add commentary.",
+      "Return the normalized bottle fields inside `result`.",
+      mode === "image"
+        ? "Return the complete readable label transcription in `rawLabelText`, or null when no label text is readable."
+        : "Return `rawLabelText: null` for text input.",
       "Use `null` for missing scalar values.",
       "Use an array for `distillery`; prefer `[]` when the distillery is unknown.",
       "The object fields are `brand`, `bottler`, `expression`, `series`, `distillery`, `category`, `stated_age`, `abv`, `release_year`, `vintage_year`, `cask_strength`, `single_cask`, `cask_type`, `cask_size`, `cask_fill`, and `edition`.",

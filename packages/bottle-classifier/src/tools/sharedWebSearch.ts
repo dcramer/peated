@@ -3,19 +3,55 @@ import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
 } from "../classifierTypes";
+import { canonicalizeWebEvidenceUrl } from "../webEvidenceUrl";
 
 export const BottleWebSearchProviderSchema = z.enum(["openai", "firecrawl"]);
 export type BottleWebSearchProvider = z.infer<
   typeof BottleWebSearchProviderSchema
 >;
 
+const BottleWebSearchQuerySchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(500)
+  .describe(
+    "Focused discovery query for one exact Bottle. Include the brand plus reliable identity anchors. When an extracted age, ABV, year, edition, or cask marker is uncertain or disputed, one formulation may omit only that field so search can surface corrective evidence. Firecrawl supports quoted non-fuzzy fragments for unusual exact markers.",
+  );
+
 export const BottleWebSearchArgsSchema = z.object({
-  query: z
+  queries: z
+    .array(BottleWebSearchQuerySchema)
+    .min(1)
+    .max(3)
+    .refine(
+      (queries) =>
+        new Set(queries.map((query) => query.toLowerCase())).size ===
+        queries.length,
+      { message: "Search queries must be distinct" },
+    )
+    .describe(
+      "One focused query, or up to three distinct formulations when wording or an extracted trait is uncertain. Search discovers candidates; each returned result still requires exact-product validation before it becomes evidence. Each query consumes one unit of the web-evidence budget.",
+    ),
+});
+
+export const BottleWebReadPageArgsSchema = z.object({
+  url: z
+    .string()
+    .url()
+    .refine((value) => ["http:", "https:"].includes(new URL(value).protocol), {
+      message: "URL must use HTTP or HTTPS",
+    })
+    .describe(
+      "Exact URL of a promising search result consistent with confirmed Bottle traits, or differing only on the uncertain trait being resolved. Never use a confirmed conflicting sibling as repair evidence.",
+    ),
+  focus: z
     .string()
     .trim()
     .min(1)
+    .max(240)
     .describe(
-      "Focused query for corroborating bottle evidence. Include the brand and decisive product words, but do not wrap the full title in quotes; broad unquoted queries are more reliable for retailer wording variants.",
+      "Short description of the identity-critical fact to locate, such as exact cask code, edition, age, year, or ABV.",
     ),
 });
 
@@ -28,35 +64,47 @@ export const MAX_BOTTLE_SEARCH_SUMMARY_CHARS = 1200;
 const MAX_BOTTLE_SEARCH_TITLE_CHARS = 160;
 const MAX_BOTTLE_SEARCH_DESCRIPTION_CHARS = 220;
 const MAX_BOTTLE_SEARCH_EXTRA_SNIPPETS = 1;
-const MAX_BOTTLE_SEARCH_EXTRA_SNIPPET_CHARS = 180;
+const MAX_BOTTLE_SEARCH_EXTRA_SNIPPET_CHARS = 1200;
 
 export type BottleWebSearchBudget = {
-  tryConsume: () => boolean;
+  tryConsume: (units?: number) => boolean;
   getExhaustedError: () => {
     error: string;
   };
 };
 
+export type BottleWebSearchBatchResult = {
+  evidence: BottleSearchEvidence[];
+  errors: Array<{ query: string; error: string }>;
+};
+
+export type BottleWebToolResult =
+  | BottleSearchEvidence
+  | BottleWebSearchBatchResult
+  | { error: string };
+
 export type BottleWebSearchExecutor = (input: {
-  toolName: "openai_web_search" | "firecrawl_web_search";
-  args: { query: string };
-  execute: () => Promise<BottleSearchEvidence | { error: string }>;
-}) => Promise<BottleSearchEvidence | { error: string }>;
+  toolName: "firecrawl_web_search" | "firecrawl_read_page";
+  args: { queries: string[] } | { url: string; focus: string };
+  execute: () => Promise<BottleWebToolResult>;
+}) => Promise<BottleWebToolResult>;
 
 export async function executeBottleWebSearchInvocation({
   budget,
+  budgetUnits = 1,
   toolName,
   args,
   execute,
   executeWebSearch,
 }: {
   budget: BottleWebSearchBudget;
-  toolName: "openai_web_search" | "firecrawl_web_search";
-  args: { query: string };
-  execute: () => Promise<BottleSearchEvidence | { error: string }>;
+  budgetUnits?: number;
+  toolName: "firecrawl_web_search" | "firecrawl_read_page";
+  args: { queries: string[] } | { url: string; focus: string };
+  execute: () => Promise<BottleWebToolResult>;
   executeWebSearch?: BottleWebSearchExecutor;
-}): Promise<BottleSearchEvidence | { error: string }> {
-  if (!budget.tryConsume()) {
+}): Promise<BottleWebToolResult> {
+  if (!budget.tryConsume(budgetUnits)) {
     return budget.getExhaustedError();
   }
 
@@ -66,9 +114,17 @@ export async function executeBottleWebSearchInvocation({
 }
 
 export function hydrateBottleSearchEvidence(
-  result: BottleSearchEvidence | { error: string },
+  result: BottleWebToolResult,
   onEvidence?: (evidence: BottleSearchEvidence) => void,
 ): boolean {
+  if ("evidence" in result) {
+    let hydrated = false;
+    for (const evidence of result.evidence) {
+      hydrated = hydrateBottleSearchEvidence(evidence, onEvidence) || hydrated;
+    }
+    return hydrated;
+  }
+
   const parsed = BottleSearchEvidenceSchema.safeParse(result);
   if (!parsed.success || parsed.data.results.length === 0) {
     return false;
@@ -79,21 +135,21 @@ export function hydrateBottleSearchEvidence(
 }
 
 export function createBottleWebSearchBudget(
-  maxQueries: number,
+  maxUnits: number,
 ): BottleWebSearchBudget {
-  let searchCalls = 0;
+  let consumedUnits = 0;
 
   return {
-    tryConsume: () => {
-      if (searchCalls >= maxQueries) {
+    tryConsume: (units = 1) => {
+      if (units < 1 || consumedUnits + units > maxUnits) {
         return false;
       }
 
-      searchCalls += 1;
+      consumedUnits += units;
       return true;
     },
     getExhaustedError: () => ({
-      error: `Search budget exhausted after ${maxQueries} queries`,
+      error: `Web evidence budget exhausted after ${maxUnits} units`,
     }),
   };
 }
@@ -140,93 +196,6 @@ export function compactBottleSearchEvidence(
   evidence: BottleSearchEvidence,
 ): BottleSearchEvidence {
   return buildBottleSearchEvidence(evidence);
-}
-
-export function mergeBottleSearchResults(
-  ...resultSets: BottleSearchEvidence["results"][]
-): BottleSearchEvidence["results"] {
-  const seenUrls = new Set<string>();
-  const mergedResults: BottleSearchEvidence["results"] = [];
-
-  for (const results of resultSets) {
-    for (const result of results) {
-      if (seenUrls.has(result.url)) {
-        continue;
-      }
-
-      seenUrls.add(result.url);
-      mergedResults.push(result);
-    }
-  }
-
-  return mergedResults;
-}
-
-export function getDistinctResultDomains(
-  results: BottleSearchEvidence["results"],
-): string[] {
-  return Array.from(
-    new Set(
-      results
-        .map((result) => result.domain)
-        .filter((domain): domain is string => Boolean(domain)),
-    ),
-  );
-}
-
-export function isThinBottleSearchEvidence(
-  evidence: Pick<BottleSearchEvidence, "results">,
-): boolean {
-  return (
-    evidence.results.length < 2 ||
-    getDistinctResultDomains(evidence.results).length < 2
-  );
-}
-
-export function mergeBottleSearchEvidence({
-  provider,
-  query,
-  evidences,
-}: {
-  provider: BottleWebSearchProvider;
-  query: string;
-  evidences: BottleSearchEvidence[];
-}): BottleSearchEvidence {
-  const summary = Array.from(
-    new Set(
-      evidences
-        .map((evidence) => evidence.summary?.trim())
-        .filter((value): value is string => Boolean(value)),
-    ),
-  )
-    .join(" ")
-    .slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS);
-
-  return buildBottleSearchEvidence({
-    provider,
-    query,
-    summary: summary || null,
-    results: mergeBottleSearchResults(
-      ...evidences.map((evidence) => evidence.results),
-    ),
-  });
-}
-
-export function summarizeSearchResults(
-  results: Pick<
-    BottleSearchEvidence["results"][number],
-    "description" | "extraSnippets"
-  >[],
-): string | null {
-  const snippets = results
-    .flatMap((result) => [result.description, ...result.extraSnippets])
-    .filter((value): value is string => !!value && value.trim().length > 0);
-
-  if (!snippets.length) {
-    return null;
-  }
-
-  return snippets.join(" ").slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS);
 }
 
 function normalizeSearchText(
@@ -282,6 +251,7 @@ function normalizeBottleSearchResult({
 
   return {
     ...result,
+    url: canonicalizeWebEvidenceUrl(result.url),
     title:
       normalizeSearchText(result.title, MAX_BOTTLE_SEARCH_TITLE_CHARS) ??
       result.url,

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T22:58:03.219Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.shibuiwhisky.com/grain-select",
+    "focus": "Product category/style and composition for Shibui Grain Select World Whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Product category/style and composition for Shibui Grain Select World Whisky",
+    "summary": "WORLD WHISKY\n\nA light & subtly sweet whisky made with 95% wheat & 5% malted barley.\n\nMashbill\n\n95% Wheat\n\n5% Malted Barley",
+    "results": [
+      {
+        "title": "Grain Select World Whisky | Shibui Whisky<br/> — Shibui Whisky",
+        "url": "https://www.shibuiwhisky.com/grain-select",
+        "domain": "shibuiwhisky.com",
+        "description": "Indulge in the harmonious blend of Scottish and Japanese grain whiskies with the Shibui Grain Select World Whisky. This light-bodied and fruitful spirit is perfect for sipping neat, on the rocks, or in your favorite cocktail., Indulge in the harmonious blend of Scottish and Japanese grain whiskies with the Shibui Grain Select World Whisky. This light-bodied and fruitful spirit is perfect for sipping neat, on the rocks, or in your favorite cocktail.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "edfa481b6a941938ff9331fd6150a7856ad38b75380f852e6800a4d0179184df",
+    "mode": "auto"
+  }
+}

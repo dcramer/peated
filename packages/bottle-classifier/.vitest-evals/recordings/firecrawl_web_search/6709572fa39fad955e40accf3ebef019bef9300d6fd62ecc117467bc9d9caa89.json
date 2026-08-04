@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-08-03T22:54:10.374Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"SMWS 95.71\" \"Prepare for Winter\" 57.0%",
+      "\"SMWS 95.71\" \"Serrano-wrapped plums\" 57.0%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"SMWS 95.71\" \"Prepare for Winter\" 57.0%",
+        "summary": "Authroisk SMWS 95.71 (14 year - Oct. 2007) \"Prepare for winter\" - After 11 years in an ex-bourbon hogshead, transferred into a 1st-fill ...",
+        "results": [
+          {
+            "title": "So, what are you drinking now? (page 640) - Whisky ...",
+            "url": "https://www.connosr.com/so-what-are-you-drinking-now-whisky-discussion-128:640",
+            "domain": "connosr.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"SMWS 95.71\" \"Serrano-wrapped plums\" 57.0%",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6709572fa39fad955e40accf3ebef019bef9300d6fd62ecc117467bc9d9caa89",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-08-03T01:15:02.725Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Pokeno 4 year old 55.8 Pedro Ximenez single cask 2019"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Pokeno 4 year old 55.8 Pedro Ximenez single cask 2019",
+    "summary": "Pedro Ximenez Casks. It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; Bottled at ... [Skip to content](https://jvsimports.com/pokeno-whisky/#content) ![](https://jvsimports.com/wp-content/uploads/2023/01/Pokeno_Embossed_Light-Backgrounds.png) [For Bottle Images and More Click Here](https://drive.google.com/drive/folders/1NXt6xGxOUsxyuB2B6imjUYHRSZYAXbSN) [Whiskeyfellow Reviews](https://reviews.whiskeyfellow.net/2023/01/pokeno-whisky-discovery-origin-and.html) In 2017 Pōkeno Whisky was founded with a vision to put New",
+    "results": [
+      {
+        "title": "Pōkeno Whisky",
+        "url": "https://jvsimports.com/pokeno-whisky/",
+        "domain": "jvsimports.com",
+        "description": "Pedro Ximenez Casks. It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; Bottled at ...",
+        "extraSnippets": [
+          "[Skip to content](https://jvsimports.com/pokeno-whisky/#content) ![](https://jvsimports.com/wp-content/uploads/2023/01/Pokeno_Embossed_Light-Backgrounds.png) [For Bottle Images and"
+        ]
+      },
+      {
+        "title": "Pōkeno Single Cask 4-year-old - Tasting Notes by dcramer - Peated",
+        "url": "https://peated.com/tastings/436",
+        "domain": "peated.com",
+        "description": "Pōkeno Single Cask 4-year-old - 55.8% ABV - Cask Strength - Pedro Ximenez Cask - Tasting Notes by dcramer",
+        "extraSnippets": [
+          "[Beta](https://peated.com/) - ![avatar](https://api.peated.com/uploads/avatars-qeily1ludrwc54pldg8dbu4u.webp) [dcramer](https://peated.com/users/dcramer) [4 days ago](https://peate"
+        ]
+      },
+      {
+        "title": "Pokeno Discovery",
+        "url": "https://www.whiskyshopusa.com/pokeno-discovery/",
+        "domain": "whiskyshopusa.com",
+        "description": "Previous\n\nNext\n\n# Pokeno Discovery\n## [Pokeno](https://www.whiskyshopusa.com/pokeno/)\n$59.99",
+        "extraSnippets": [
+          "[Toggle menu](https://www.whiskyshopusa.com/pokeno-discovery/#) 415 989-1030 - [USD](https://www.whiskyshopusa.com/pokeno-discovery/# \"Currency Selector\") - [**![](https://cdn11.bi"
+        ]
+      },
+      {
+        "title": "Pokeno - PX Sherry (Single Cask)",
+        "url": "https://www.drinqy.com/shop/p/pokeno-origin-acmb2",
+        "domain": "drinqy.com",
+        "description": "Image 1 of 1\n\n# Pokeno - PX Sherry (Single Cask)\n700ml, 55.8% ABV _.”_",
+        "extraSnippets": [
+          "![](https://images.squarespace-cdn.com/content/v1/646eb163a8179b5f24d0880a/cbe320c5-2da6-47b4-a9e7-b86e6e927bfc/Pokeno+-+PX+Sherry+Single+Cask+-+New+Zealand+Single+Malt+-+DRINQY+-+"
+        ]
+      },
+      {
+        "title": "Pokeno Whisky Company 4 Years Old Cask No. 71 PX Sherry Cask Single Ca",
+        "url": "https://chipsliquor.com/collections/whiskey/products/pokeno-whisky-company-4-years-old-cask-no-71-px-sherry-cask-single-cask?srsltid=AfmBOooVzoxKpifXtaERxwqTJv4F_ZREzoSQsBC7hs1I8YBZ40vcU2yF",
+        "domain": "chipsliquor.com",
+        "description": "Product Type: WhiskySize: 700mLProof: 56.5% Alc/Vol Region: New Zealand Description: Pokeno Whisky Company presents their 4 Years Old Cask No.",
+        "extraSnippets": [
+          "Save gift options ## Gift Options Gift Note - $8.00Add a personal note to the recipient of this gift Remaining characters: 250 Gift ReceiptHide prices from the receipt Gift Wrap \\-"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "11fd19e9b46b3d3de64e07ec1261697bc5a409532a990683c79a4d26fc039c42",
+    "mode": "auto"
+  }
+}

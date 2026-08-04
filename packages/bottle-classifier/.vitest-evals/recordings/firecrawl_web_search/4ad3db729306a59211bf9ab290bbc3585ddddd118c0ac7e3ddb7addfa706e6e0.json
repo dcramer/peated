@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-08-03T01:17:51.998Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Compass Box Spice Tree Extravaganza limited edition whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Compass Box Spice Tree Extravaganza limited edition whisky",
+    "summary": "# Spice Tree Extravaganza\nBlended Malt Scotch Whisky [Skip to content](https://www.compassboxwhisky.com/products/spice-tree-extraveganza#MainContent) #### Choose your location Continue to our UK websiteContinue to United States Shop Europe: [France](https://www.whisky.fr/les-marques/compass-box.html) [Germany](https://whic.de/compass-box) Shop United States: [U.S.A](https://buycompassbox.myshopify.com/) ## Your cart is empty [Continue shopping](https://www.compassboxwhisky.com/collections) Have an account? [Log in](https://www.compassboxwhisky.com/customer_authentication/redirect?locale=en&reg",
+    "results": [
+      {
+        "title": "Spice Tree Extravaganza",
+        "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza",
+        "domain": "compassboxwhisky.com",
+        "description": "# Spice Tree Extravaganza\nBlended Malt Scotch Whisky",
+        "extraSnippets": [
+          "[Skip to content](https://www.compassboxwhisky.com/products/spice-tree-extraveganza#MainContent) #### Choose your location Continue to our UK websiteContinue to United States Shop "
+        ]
+      },
+      {
+        "title": "Review #457 - Compass Box Spice Tree Extravaganza : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/fve3lk/review_457_compass_box_spice_tree_extravaganza/",
+        "domain": "reddit.com",
+        "description": "This special edition from 2016 adds some first-fill sherry casks to the usual extra-charred-French-oak wizardry, and uses generally much older stocks of whisky.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Compass Box 'The Spice Tree Extravaganza' Limited Edition ...",
+        "url": "https://www.wine-searcher.com/find/compass+box+the+spice+tree+extravagant+ltd+edition+blend+malt+scotch+whisky+scotland?srsltid=AfmBOooUg0O_645RgVGo6gQdK3VHiLQ6U0fnXKOTmxcttg0QX14i69Ya",
+        "domain": "wine-searcher.com",
+        "description": "Compass Box 'The Spice Tree Extravaganza' Limited Edition Blended Malt Scotch Whisky. Scotland. Avg Price (ex-tax); $ 309 / 750ml. 4 from 2 User Ratings. 93 ...",
+        "extraSnippets": [
+          "~~~~ Remove Reduce item quantity by oneIncrease item quantity by one Order now, store closes in minutes View cart & checkoutContinue shopping Final shipping and taxes calculated at"
+        ]
+      },
+      {
+        "title": "Compass Box Spice Tree Extravaganza, 46%",
+        "url": "https://whiskyadvocate.com/Compass-Box-Spice-Tree-Extravaganza-46",
+        "domain": "whiskyadvocate.com",
+        "description": "# Compass Box Spice Tree Extravaganza, 46%\nBlended Malt Scotch Whisky",
+        "extraSnippets": [
+          "Back Save ![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0) ### 93 Score # Compass Box Spice Tree Extravaganza, 46% Price: $140.00● Issue: Spring 2017 ● Reviewer: Jonny "
+        ]
+      },
+      {
+        "title": "Compass Box 'Spice Tree Extravaganza' Limited Edition ...",
+        "url": "https://craftshack.com/products/compass-box-spice-tree-extravaganza-limited-edition-blended-malt-scotch-whisky?srsltid=AfmBOoqWhxZlb4mILSAv7zp-EgU6zPVacz0w1s4IpLPB1_sEX2It3vNi",
+        "domain": "craftshack.com",
+        "description": "Regular price $204.99 Sale price. This Limited Edition is a reinterpretation of our beloved The Spice Tree, using older components and a significant portion of ...",
+        "extraSnippets": [
+          "[Skip to content](https://craftshack.com/products/compass-box-spice-tree-extravaganza-limited-edition-blended-malt-scotch-whisky#MainContent) **Spend $150 Get $10 Off Coupon!** 🚚 "
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4ad3db729306a59211bf9ab290bbc3585ddddd118c0ac7e3ddb7addfa706e6e0",
+    "mode": "auto"
+  }
+}

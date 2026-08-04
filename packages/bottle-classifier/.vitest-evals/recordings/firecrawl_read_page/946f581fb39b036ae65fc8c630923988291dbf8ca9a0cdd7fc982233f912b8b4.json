@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T22:49:02.695Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://elijahcraig.com/18-year-old",
+    "focus": "Confirm 18-Year-Old Single Barrel bourbon ABV and whether a barrel number defines separately marketed releases."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm 18-Year-Old Single Barrel bourbon ABV and whether a barrel number defines separately marketed releases.",
+    "summary": "47% Alc./Vol.\n\nindividually dumped &\n\nbottled.\n\non the label.",
+    "results": [
+      {
+        "title": "Elijah Craig | 18 Year Old",
+        "url": "https://elijahcraig.com/18-year-old",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "946f581fb39b036ae65fc8c630923988291dbf8ca9a0cdd7fc982233f912b8b4",
+    "mode": "auto"
+  }
+}

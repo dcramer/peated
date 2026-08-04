@@ -39,6 +39,7 @@
     "test:e2e:ui": "pnpm --dir apps/web test:e2e:ui",
     "evals": "pnpm evals:classifier",
     "evals:classifier": "pnpm --filter @peated/bottle-classifier evals",
+    "evals:classifier:flaky": "pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts -t 'Rogues|matches and repai|matches Laphroaig|restore Pōkeno'",
     "test:ci": "CI=true pnpm -r run test:ci",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",

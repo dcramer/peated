@@ -1,0 +1,48 @@
+{
+  "writtenAt": "2026-08-03T02:13:55.180Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Pōkeno \"Bottle 009/340\" \"18.06.19\"",
+      "Pōkeno \"Pedro Ximenez Sherry Cask\" \"55.8%\" \"4 Years\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno \"Bottle 009/340\" \"18.06.19\"",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno \"Pedro Ximenez Sherry Cask\" \"55.8%\" \"4 Years\"",
+        "summary": "Aged 4 years in a Pedro Ximenez sherry cask and bottled at 55.8% ABV. this is yet another rare insight into the authentic artistry created by Founder Matt ... ... Pedro Ximenez Sherry Cask for the Taiwan market and bottled at an impressive ... Age: 3-4 years. ABV: 50%. Cask: Islay Quarter Cask, Bourbon from KOVAL ...",
+        "results": [
+          {
+            "title": "Chris Uhde | Akemashite Omedetou! Happy new year y'all!",
+            "url": "https://www.instagram.com/p/BOs_6tOhr5Z/",
+            "domain": "instagram.com",
+            "description": "Aged 4 years in a Pedro Ximenez sherry cask and bottled at 55.8% ABV. this is yet another rare insight into the authentic artistry created by Founder Matt ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Sherry Cask Matured Whisky",
+            "url": "https://www.mizunaratheshop.com/collections/sherry-cask-whisky?srsltid=AfmBOoovQUT3tLCYifCEJSsxWaSahKfY2flmgou2MJ6IsP1lHJiVJm8J",
+            "domain": "mizunaratheshop.com",
+            "description": "... Pedro Ximenez Sherry Cask for the Taiwan market and bottled at an impressive ... Age: 3-4 years. ABV: 50%. Cask: Islay Quarter Cask, Bourbon from KOVAL ...",
+            "extraSnippets": [
+              "[Skip to content](https://www.mizunaratheshop.com/collections/sherry-cask-whisky#MainContent) Dear Valued Customer: Happy HKSAR Establishment Day! Our store will be closed on 1st July 2026. [Whatsapp Us +852 3705 9770](https://wa.me/85237059770) - [Facebook](https://www.facebook.com/mizunaratheshopHK/) - [Instagram](https://www.instagram.com/mizunaratheshop.hk) - [YouTube](https://www.youtube.com/@mizunaratheshop1463) English - [English](https://www.mizunaratheshop.com/collections/sherry-cask-whisky#) - [繁體中文](https://www.mizunaratheshop.com/collections/sherry-cask-whisky#) - [日本語](https://www.mizunaratheshop.com/collections/sherry-cask-whisky#) United States (USD $) - [Log in](https://www.mizunaratheshop.com/customer_authentication/redirect?locale=en&region_country=US) - - [Facebook](https://www.facebook.com/mizunaratheshopHK/) - [Instagram](https://www.instagram.com/mizunaratheshop.hk) - [YouTube](https://www.youtube.com/@mizunaratheshop1463) - Shop Shop [New Arrivals](https://www.mizunaratheshop.com/collections/sherry-cask-whisky) [Mizunara: Private Cask Selection](https://www.mizunaratheshop.com/collections/sherry-cask-whisky) [Vintage & Rare Whisky](https://www.mizunaratheshop"
+            ]
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e5a4cba522d4c2c0b0c9e0dd2c4cc1c672c9447c75181c1d524bfeda20c1e5b9",
+    "mode": "auto"
+  }
+}

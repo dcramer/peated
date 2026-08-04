@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T23:00:00.983Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+    "focus": "Confirm exact marketed name, category, stated age, ABV, and whether this is the peated Scotch barrel-finished rye release."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm exact marketed name, category, stated age, ABV, and whether this is the peated Scotch barrel-finished rye release.",
+    "summary": "Back Room Deal\n\nStraight Rye Whiskey\n\nFinished in\n\nPeated Scotch Barrels\n\nAged a minimum of 3 years\n\nABV 46% / 92 Proof",
+    "results": [
+      {
+        "title": "Backroom Deal | Hudson Peated Rye Whiskey | Hudson Whiskey » Hudson Whiskey NY",
+        "url": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+        "domain": "hudsonwhiskey.com",
+        "description": "Backroom Deal is our signature 92 proof peated rye whiskey offering a smoky and spicy tasting note. Browse and shop online today at Hudson Whiskey.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "572777ee6fef990e8de3f747ef599cd81cf4c90a640d6f931d82c998480b5f58",
+    "mode": "auto"
+  }
+}

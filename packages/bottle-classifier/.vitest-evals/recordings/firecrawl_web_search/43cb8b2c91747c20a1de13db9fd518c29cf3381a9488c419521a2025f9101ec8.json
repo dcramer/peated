@@ -1,0 +1,89 @@
+{
+  "writtenAt": "2026-08-03T23:03:40.993Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:house.suntory.com hibiki 21 year 43%",
+      "site:suntory.com Hibiki 21 Year 43%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:house.suntory.com hibiki 21 year 43%",
+        "summary": "Hibiki 21 celebrates an unrivaled art of blending, fine Japanese craftsmanship and a sense of luxury. Enjoy a tenderly calm essence, full of grace. Hibiki 21 Years Old A harmonious blend of malt and grain whiskies aged over 21 years to achieve a seductive, blossoming and subtle taste. Hibiki 40 Years Old is a groundbreaking Japanese whisky, blend comprises five supremely aged whiskies. American oak casks. hibiki 21 year WHISKY Hibiki 21 ...",
+        "results": [
+          {
+            "title": "Hibiki® 21 | Japanese Whisky",
+            "url": "https://house.suntory.com/hibiki-whisky/hibiki-21-years-old",
+            "domain": "house.suntory.com",
+            "description": "Hibiki 21 celebrates an unrivaled art of blending, fine Japanese craftsmanship and a sense of luxury. Enjoy a tenderly calm essence, full of grace.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki® Blended Japanese Whisky",
+            "url": "https://house.suntory.com/hibiki-whisky",
+            "domain": "house.suntory.com",
+            "description": "Hibiki 21 Years Old A harmonious blend of malt and grain whiskies aged over 21 years to achieve a seductive, blossoming and subtle taste.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki 40 Years Old",
+            "url": "https://house.suntory.com/hibiki-whisky/hibiki-40-years-old",
+            "domain": "house.suntory.com",
+            "description": "Hibiki 40 Years Old is a groundbreaking Japanese whisky, blend comprises five supremely aged whiskies. American oak casks. hibiki 21 year WHISKY Hibiki 21 ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "site:suntory.com Hibiki 21 Year 43%",
+        "summary": "Hibiki 21 celebrates an unrivaled art of blending, fine Japanese craftsmanship and a sense of luxury. Enjoy a tenderly calm essence, full of grace. Hibiki 21 Years Old A harmonious blend of malt and grain whiskies aged over 21 years to achieve a seductive, blossoming and subtle taste. Hibiki 40 Years Old is a groundbreaking Japanese whisky, blend comprises five supremely aged whiskies , Spanish and American oak casks. hibiki 21 year WHISKY ... In July, Hibiki 21 Years Old won the top prize in the whisky category at a global spirits competition. Imported whiskies made favorable movement Explore",
+        "results": [
+          {
+            "title": "Hibiki® 21 | Japanese Whisky",
+            "url": "https://house.suntory.com/hibiki-whisky/hibiki-21-years-old",
+            "domain": "house.suntory.com",
+            "description": "Hibiki 21 celebrates an unrivaled art of blending, fine Japanese craftsmanship and a sense of luxury. Enjoy a tenderly calm essence, full of grace.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki® Blended Japanese Whisky",
+            "url": "https://house.suntory.com/hibiki-whisky",
+            "domain": "house.suntory.com",
+            "description": "Hibiki 21 Years Old A harmonious blend of malt and grain whiskies aged over 21 years to achieve a seductive, blossoming and subtle taste.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki 40 Years Old",
+            "url": "https://house.suntory.com/hibiki-whisky/hibiki-40-years-old",
+            "domain": "house.suntory.com",
+            "description": "Hibiki 40 Years Old is a groundbreaking Japanese whisky, blend comprises five supremely aged whiskies , Spanish and American oak casks. hibiki 21 year WHISKY ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Suntory Holdings Limited",
+            "url": "https://www.suntory.com/about/financial/pdf/201412.pdf",
+            "domain": "suntory.com",
+            "description": "In July, Hibiki 21 Years Old won the top prize in the whisky category at a global spirits competition. Imported whiskies made favorable movement",
+            "extraSnippets": []
+          },
+          {
+            "title": "Authentic Suntory Japanese Spirits | The House of Suntory",
+            "url": "https://house.suntory.com/",
+            "domain": "house.suntory.com",
+            "description": "Explore Hibiki Whisky. Explore our full range of gin, vodka and whiskies. Learn more Hibiki Japanese Harmony. Experience the artistry of Japanese Whisky with ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "43cb8b2c91747c20a1de13db9fd518c29cf3381a9488c419521a2025f9101ec8",
+    "mode": "auto"
+  }
+}

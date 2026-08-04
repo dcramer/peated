@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T23:28:05.433Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://house.suntory.com/hibiki-whisky",
+    "focus": "Hibiki 21 Years Old: official category, age, ABV, and product composition/distillery evidence."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Hibiki 21 Years Old: official category, age, ABV, and product composition/distillery evidence.",
+    "summary": "Hibiki 21 Years Old\n\nA harmonious blend of malt and grain whiskies aged over 21 years to achieve a seductive, blossoming and subtle taste.",
+    "results": [
+      {
+        "title": "Hibiki® Blended Japanese Whisky | The House of Suntory",
+        "url": "https://house.suntory.com/hibiki-whisky",
+        "domain": "house.suntory.com",
+        "description": "Hibiki Whisky is a harmonious blend embodying the soul of Japanese craftsmanship. Discover the calm complexity and \"Wa\", oneness with Hibiki.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "998f39217d5768e65004f1a06104777168a3b50bf9bbd5d583bf4ec3b698087b",
+    "mode": "auto"
+  }
+}

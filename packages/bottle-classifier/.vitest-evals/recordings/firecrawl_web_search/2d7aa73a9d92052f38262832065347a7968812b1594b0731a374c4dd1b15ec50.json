@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T22:55:23.133Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Woodford Reserve\" \"Double Double Oaked\" \"2022 release\" \"45.2%\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Woodford Reserve\" \"Double Double Oaked\" \"2022 release\" \"45.2%\"",
+        "summary": "4-proofing is the equivalent of 45.2% ABV. ... 2021 Woodford Reserve Distillery Series Double Double Oaked bourbon, 90.4 proof (45.2% ABV), 375ml, February 2022 release with the first national ... More results from www.facebook.com ... ...",
+        "results": [
+          {
+            "title": "Woodford Reserve Doubled Double Oaked 2022 “Distillery Series ...",
+            "url": "https://blog.kysupplyco.com/woodford-reserve-doubled-double-oaked-2022-distillery-series-release-price-review-proof/",
+            "domain": "blog.kysupplyco.com",
+            "description": "4-proofing is the equivalent of 45.2% ABV. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2021 Woodford Reserve Double Double Oaked Bourbon 375ml",
+            "url": "https://canawineco.com/products/2021-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml?srsltid=AfmBOoqEsaf30vsGQDKbV82IYbIhpDutmfii3pfy-rP1PSpyOlBX5kJF",
+            "domain": "canawineco.com",
+            "description": "2021 Woodford Reserve Distillery Series Double Double Oaked bourbon, 90.4 proof (45.2% ABV), 375ml, February 2022 release with the first national ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rolling Fork 9 year rum with Woodford Double Oaked finish",
+            "url": "https://www.facebook.com/groups/626962266447486/posts/649361574207555/",
+            "domain": "facebook.com",
+            "description": "More results from www.facebook.com",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford 'Masters Collection' Historic Barrel 2023 :: Bourbon",
+            "url": "https://www.empirewine.com/liquor/woodford-masters-collection-historic-barrel-2023-h53808/?srsltid=AfmBOoqIv17DRDoF5zrz_WYMG6XXN5GGgPigp13vAjvAtRVccCt_q5Lc",
+            "domain": "empirewine.com",
+            "description": "...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Another bottle officially out of the Cabinet. This was the ... - Instagram",
+            "url": "https://www.instagram.com/reel/DYKZsLLxeoA/",
+            "domain": "instagram.com",
+            "description": "...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2d7aa73a9d92052f38262832065347a7968812b1594b0731a374c4dd1b15ec50",
+    "mode": "auto"
+  }
+}

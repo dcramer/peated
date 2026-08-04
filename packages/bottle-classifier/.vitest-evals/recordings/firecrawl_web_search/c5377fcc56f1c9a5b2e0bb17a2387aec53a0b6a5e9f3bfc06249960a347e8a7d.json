@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-03T05:05:14.635Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:woodencork.com/products \"Springbank Aged 25-year-old\" \"750\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:woodencork.com/products \"Springbank Aged 25-year-old\" \"750\"",
+        "summary": "Springbank 25 Year Old 2023 is an annual limited release from Scotland's oldest family-owned distillery -- the Mitchell family's Springbank in Campbeltown, the ...",
+        "results": [
+          {
+            "title": "Springbank Aged 25 Year Old",
+            "url": "https://woodencork.com/products/springbank-aged-25-year-old-750-ml?srsltid=AfmBOor1ooFNWLtA4cQta9Q_IfUN97D1IE-ASu9w3A7oV1-5AU9fA5Od",
+            "domain": "woodencork.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "c5377fcc56f1c9a5b2e0bb17a2387aec53a0b6a5e9f3bfc06249960a347e8a7d",
+    "mode": "auto"
+  }
+}

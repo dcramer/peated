@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:52:00.296Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Woodford Reserve Double Oaked official bourbon ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Oaked official bourbon ABV",
+        "summary": "Woodford Reserve Kentucky Straight Whiskey 45.2% Alc. by Vol. The Woodford Reserve Distillery, Versailles, KY. ... To learn more about responsible consumption, ... Double Oaked takes the standard Woodford formula and cuts it with water until it reaches 100 proof. Then they fill a second heavily toasted ... USA - Kentucky - 45.2% - Woodford Reserve Double Oaked is an innovative approach to twice-barreled bourbon, showcasing a rich flavor unlike any other Kentucky ... # Review: Woodford Reserve Double Oaked Is Dessert in a Glass\n## **Woodford Reserve Double Oaked Bourbon at a Glance:**\n**ABV:**",
+        "results": [
+          {
+            "title": "Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Woodford Reserve Kentucky Straight Whiskey 45.2% Alc. by Vol. The Woodford Reserve Distillery, Versailles, KY. ... To learn more about responsible consumption, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon (2025) Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/",
+            "domain": "thebourbonculture.com",
+            "description": "Double Oaked takes the standard Woodford formula and cuts it with water until it reaches 100 proof. Then they fill a second heavily toasted ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey",
+            "url": "https://www.totalwine.com/spirits/bourbon/small-batch-bourbon/woodford-reserve-double-oaked-kentucky-straight-bourbon-whiskey/p/120640750?srsltid=AfmBOopqeQBOrn7ZlCYIBfxAt4ebcjEpDET9acp5sR7WjVdMS4xVALe4",
+            "domain": "totalwine.com",
+            "description": "USA - Kentucky - 45.2% - Woodford Reserve Double Oaked is an innovative approach to twice-barreled bourbon, showcasing a rich flavor unlike any other Kentucky ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Bourbon, Reviewed",
+            "url": "https://whiskyadvocate.com/woodford-reserve-double-oaked-bourbon-review",
+            "domain": "whiskyadvocate.com",
+            "description": "# Review: Woodford Reserve Double Oaked Is Dessert in a Glass\n## **Woodford Reserve Double Oaked Bourbon at a Glance:**\n**ABV:** 42.5%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Official Store | Premium Kentucky Bourbon ...",
+            "url": "https://shop.woodfordreserve.com/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "## Frequently Asked Questions\nWoodford Reserve has earned 14 gold medals in international competition, including Double Gold at the San Francisco World Spirits Competition, and is the official bourbon of the Kentucky Der",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "c23cc97c726102b6e2ea1bedf68b2e45c0e5df15afcde084526bb2485a175543",
+    "mode": "auto"
+  }
+}

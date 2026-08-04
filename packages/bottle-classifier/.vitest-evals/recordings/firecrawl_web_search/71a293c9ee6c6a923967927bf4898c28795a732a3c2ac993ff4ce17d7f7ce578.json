@@ -1,0 +1,31 @@
+{
+  "writtenAt": "2026-08-03T23:05:16.603Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Pōkeno\" \"55.8%\" \"18.06.19\" \"Pedro Ximenez\"",
+      "\"Pokeno\" \"Cask 34\" \"55.8\" \"Pedro Ximenez\" whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Pōkeno\" \"55.8%\" \"18.06.19\" \"Pedro Ximenez\"",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Pokeno\" \"Cask 34\" \"55.8\" \"Pedro Ximenez\" whisky",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "71a293c9ee6c6a923967927bf4898c28795a732a3c2ac993ff4ce17d7f7ce578",
+    "mode": "auto"
+  }
+}

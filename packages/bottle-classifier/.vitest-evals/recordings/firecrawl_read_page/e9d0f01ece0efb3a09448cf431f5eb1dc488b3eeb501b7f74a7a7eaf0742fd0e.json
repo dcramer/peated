@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T04:47:49.605Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.heavensdoor.com/bootleg-series",
+    "focus": "Bootleg Vol. III (2021): exact age, ABV/proof, bourbon and cask-strength traits"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Bootleg Vol. III (2021): exact age, ABV/proof, bourbon and cask-strength traits",
+    "summary": null,
+    "results": [
+      {
+        "title": "The Bootleg Series | Heaven's Door Whiskey",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": "Bootleg Vol. III (2021) from Heaven’s Door features a cask strength 13-year Kentucky Bourbon finished in Spanish wine barrels. Named after Bob Dylan’s “Bootleg Series” of albums, this annual limited release blends art and craft with rare expressions presented in a handmade leather case and ceramic bottle featuring Dylan’s original paintings.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e9d0f01ece0efb3a09448cf431f5eb1dc488b3eeb501b7f74a7a7eaf0742fd0e",
+    "mode": "auto"
+  }
+}

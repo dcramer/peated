@@ -166,10 +166,9 @@ describe("eval fixture validation", () => {
     });
   });
 
-  test("keeps the Pōkeno Cask No. 71 audit tied to the observed production repair", () => {
+  test("keeps the Pōkeno audit limited to the supported vintage repair", () => {
     const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      ({ id }) =>
-        id === "audit-production-pokeno-single-cask-71-missing-edition",
+      ({ id }) => id === "audit-production-pokeno-single-cask-missing-vintage",
     );
 
     expect(fixture).toBeDefined();
@@ -178,7 +177,7 @@ describe("eval fixture validation", () => {
     expect(fixture?.input.audit.bottleId).toBe(45174);
     expect(fixture?.provenance.verifiedSourceUrls).toEqual(
       expect.arrayContaining([
-        "https://jvsimports.com/pokeno-whisky/",
+        "https://api.peated.com/uploads/bottles/bottle-45174-pending-upload-nh8e88y2d7atvkesunuwvo5z.webp",
         "https://www.drinqy.com/shop/p/pokeno-origin-acmb2",
       ]),
     );
@@ -189,19 +188,17 @@ describe("eval fixture validation", () => {
           bottleId: 45174,
           patch: {
             exact: {
-              edition: "Cask No. 71",
               vintageYear: 2019,
             },
           },
         },
       },
     ]);
-    expect(JSON.stringify(fixture?.expected.proposedOperations)).not.toContain(
-      '"edition":"11"',
+    const expectedOperations = JSON.stringify(
+      fixture?.expected.proposedOperations,
     );
-    expect(JSON.stringify(fixture?.expected.proposedOperations)).not.toContain(
-      '"edition":"71"',
-    );
+    expect(expectedOperations).not.toContain('"edition"');
+    expect(expectedOperations).not.toContain('"shared"');
   });
 
   test("covers real Compass Box photo misses without forcing duplicate creation", () => {

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T23:28:17.625Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://theliquorbarn.com/products/suntory-hibiki-21-year-whisky-750ml",
+    "focus": "Verify whether this exact standard Hibiki 21 Year product is bottled at 43% ABV, distinct from limited editions."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify whether this exact standard Hibiki 21 Year product is bottled at 43% ABV, distinct from limited editions.",
+    "summary": "Suntory Hibiki 21 Year Whisky 750ML is a premium Japanese blended whisky bottled at 43% ABV (86 proof) in a 750ml bottle, combining single malts and grain whiskies each aged a minimum of 21 years.\n\nQuick Facts: ABV: 43% | Origin: Japan | Age Statement: 21 Years | Distilleries: Yamazaki, Hakushu & Chita (Suntory)",
+    "results": [
+      {
+        "title": "Suntory Hibiki 21 Year Whisky 750ML | Mizunara Oak Blend – The Liquor Barn",
+        "url": "https://theliquorbarn.com/products/suntory-hibiki-21-year-whisky-750ml",
+        "domain": "theliquorbarn.com",
+        "description": "Suntory Hibiki 21 Year blends Yamazaki, Hakushu, and Chita whiskies aged in rare Mizunara oak. Bronze amber with sandalwood, incense, and kumquat depth at 43% ABV.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bc5467e2592ac161844f629c233204be04f8f74f0018992124f6150715fa2b0f",
+    "mode": "auto"
+  }
+}

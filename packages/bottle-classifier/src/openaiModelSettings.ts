@@ -1,5 +1,7 @@
 import type { ModelSettings } from "@openai/agents";
 
+export const DEFAULT_BOTTLE_CLASSIFIER_MODEL = "gpt-5.6-terra";
+export const DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT = "medium";
 export const DEFAULT_OPENAI_MODEL = "gpt-5.4";
 export const DEFAULT_OPENAI_EVAL_MODEL = "gpt-5.6-luna";
 export const DEFAULT_OPENAI_EVAL_REASONING_EFFORT = "medium";

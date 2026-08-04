@@ -1,0 +1,27 @@
+{
+  "writtenAt": "2026-08-03T01:15:21.037Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Pokeno \"4 Year Old\" \"55.8%\" PX Sherry Single Cask"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Pokeno \"4 Year Old\" \"55.8%\" PX Sherry Single Cask",
+    "summary": "91 Starward 4 year old Peated Islay Whisky Barrel Finished Single Malt, 48%, $100. Warm scents of baked apple, candied orange peel, and baked ... # Whisky Advocate - Fall 2024 ## Buying Guide _2024-09-20 14:26:52_ ![Nc’nean Distillery](https://cdn.coverstand.com/67189/831242/article_assets/24-2637298114-66ed08a77c111.jpg) Single malt scotch features prominently in this issue’s Buying Guide—welcome news after some lean years during Covid and the tariff war. Over 30 single malt scotches are reviewed here. And while our Collectibles section certainly has some stratospheric prices, bargains exist",
+    "results": [
+      {
+        "title": "Whisky Advocate • Fall 2024 • Buying Guide",
+        "url": "https://mydigitalpublication.com/article/Buying+Guide/4855860/831242/article.html",
+        "domain": "mydigitalpublication.com",
+        "description": "91 Starward 4 year old Peated Islay Whisky Barrel Finished Single Malt, 48%, $100. Warm scents of baked apple, candied orange peel, and baked ...",
+        "extraSnippets": [
+          "# Whisky Advocate - Fall 2024 ## Buying Guide _2024-09-20 14:26:52_ ![Nc’nean Distillery](https://cdn.coverstand.com/67189/831242/article_assets/24-2637298114-66ed08a77c111.jpg) Si"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "27465096d31644f7f62f94f4909d3bc8e231f2d46a8a3e26c600716eb2c3187b",
+    "mode": "auto"
+  }
+}

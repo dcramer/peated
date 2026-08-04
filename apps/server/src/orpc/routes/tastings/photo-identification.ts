@@ -598,7 +598,7 @@ async function persistPhotoIdentificationReview({
       input: classificationInput,
       result: classification,
       backgroundEventKey: `photo_identification:${pendingImageId}`,
-      model: config.OPENAI_MODEL,
+      model: config.BOTTLE_CLASSIFIER_MODEL,
       modelMetadata,
     });
   } catch (error) {

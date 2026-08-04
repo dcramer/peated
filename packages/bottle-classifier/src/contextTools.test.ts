@@ -327,21 +327,31 @@ describe("Bottle-check context tools", () => {
         client: {} as OpenAI,
         model: "test-model",
         maxSearchQueries: 2,
-        executeWebSearch: async ({ args }) => {
+        firecrawlApiKey: "firecrawl-test-key",
+        executeWebSearch: async ({ toolName, args }) => {
+          expect(toolName).toBe("firecrawl_web_search");
+          if (!("queries" in args)) {
+            throw new Error("Expected Firecrawl search arguments");
+          }
           events.push("web_replayed");
           return {
-            provider: "openai",
-            query: args.query,
-            summary: "Laphroaig confirms the 2022 Warehouse 1 release.",
-            results: [
+            evidence: [
               {
-                title: "Càirdeas 2022 Warehouse 1 Whisky",
-                url: officialUrl,
-                domain: "laphroaig.com",
-                description: null,
-                extraSnippets: [],
+                provider: "firecrawl",
+                query: args.queries[0],
+                summary: "Laphroaig confirms the 2022 Warehouse 1 release.",
+                results: [
+                  {
+                    title: "Càirdeas 2022 Warehouse 1 Whisky",
+                    url: officialUrl,
+                    domain: "laphroaig.com",
+                    description: null,
+                    extraSnippets: [],
+                  },
+                ],
               },
             ],
+            errors: [],
           };
         },
         adapters: {
@@ -364,8 +374,8 @@ describe("Bottle-check context tools", () => {
     await invokePreparedTool(prepared, "get_bottle_context", {
       bottleId: canonical.bottleId,
     });
-    await invokePreparedTool(prepared, "openai_web_search", {
-      query: "Laphroaig Cairdeas Warehouse 1 2022 official",
+    await invokePreparedTool(prepared, "firecrawl_web_search", {
+      queries: ["Laphroaig Cairdeas Warehouse 1 2022 official"],
     });
     events.push("web_result");
     const proposalResult = await invokePreparedTool(

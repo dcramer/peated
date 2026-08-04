@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T05:08:00.732Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Glenmorangie The Cadboll Estate\" \"Batch 4\" 15 year old"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Glenmorangie The Cadboll Estate\" \"Batch 4\" 15 year old",
+        "summary": "# Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%\nPrice: $100.00● Issue: Fall 2024 ● Reviewer: ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43)\n\nSingle-estate whisky made from the Cadboll Estate’s 2007 harvest, matured in custom-toasted air-dried casks. The nose is buttery, with creamy vanilla, brioche, honeycomb, flowers, and delicate white pear, honeydew, peach, and marzipan fruits. A rich, rewarding mouthful of dried fruits, vanilla, apricot, candied lemon, juicy pear, and cantaloupe, with hints of green",
+        "results": [
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%",
+            "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43",
+            "domain": "whiskyadvocate.com",
+            "description": "# Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%\nPrice: $100.00● Issue: Fall 2024 ● Reviewer: ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-B",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 Year Old Scotch Whisky Batch 4",
+            "url": "https://www.purdyswine.com/product/glenmorangie-the-cadboll-estate-15-year-old-scotch-whisky-batch-2/?srsltid=AfmBOoolF-6s7_JBEqV3E977mAvhDVfvL1Zty5IKohN65Isd6eYhM0VC",
+            "domain": "purdyswine.com",
+            "description": "Glenmorangie The Cadboll Estate 15 Year Old Scotch Whisky Batch 4. SKU: 003895. •. 1 in stock. Country.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 15 Y.O. The Cadboll Estate Batch 4 - Spirit Academy",
+            "url": "https://www.spiritacademy.it/en/whisky/scotch-whisky/glenmorangie-15-yo-the-cadboll-estate-batch-4-6840.html",
+            "domain": "spiritacademy.it",
+            "description": "Glenmorangie 15 Y.O. The Cadboll Estate Batch 4 ; Price per degree: 1,86 € ; Price per dosage: 4,57 € ; Glenmorangie The Cadboll Estate: a smooth and fruity whisky.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 15 Year The Cadboll Estate Batch 4",
+            "url": "https://tastersclub.com/products/glenmorangie-15-year-the-cadboll-estate-batch-4?srsltid=AfmBOoqDruJDU41upW9k8suG8a3uQ8QAPRCeTe4_Nzi3JEpdB3Jjo5hw",
+            "domain": "tastersclub.com",
+            "description": "This exceptional single malt Scotch whisky is crafted as an ode to Glenmorangie's homeland, offering a grain-to-glass masterpiece sourced exclusively from the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie Unveils Fourth Cadboll Estate Expression",
+            "url": "https://thewhiskeywash.com/scotch-whiskey/glenmorangie-unveils-fourth-cadboll-estate-expression/",
+            "domain": "thewhiskeywash.com",
+            "description": "Glenmorangie The Cadboll Estate Batch 4 pays tribute to the distillery's homeland. ... The 15 year old single malt was matured in “designer ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "249a8cbff8edf66dda2b139bff4e05581a6557643aabc89918d9a5b86750662d",
+    "mode": "auto"
+  }
+}

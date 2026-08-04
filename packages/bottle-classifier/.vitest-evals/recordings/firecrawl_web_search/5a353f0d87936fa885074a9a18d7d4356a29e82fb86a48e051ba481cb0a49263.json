@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T23:04:08.231Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Laphroaig Càirdeas Warehouse 1 52.2% 2022 official"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Laphroaig Càirdeas Warehouse 1 52.2% 2022 official",
+        "summary": "The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today. Taste: Big medicinal peat, hits thick and clean, brine, buttery wood, vanilla custard, bright lemon, tropical fruit, spice. It's creamy and ... This limited edition single malt, aged in first-fill ex-Maker's Mark bourbon barrels, dials up the quintessential Laphroaig taste. Warehouse 1 | 52.2% ABV Score: 8/10 Something special. TL;DR A fine drop — as subtle and delicate. ABV £ 100 or €100 via the distillery's ... ## **2022 Laphroaig Cairdeas Warehouse 1 – D",
+        "results": [
+          {
+            "title": "Càirdeas 2022 Warehouse 1 Whisky",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky?srsltid=AfmBOor_8Onku6nYUljEWa7LSKPQJ-rxVjKvTaR4UG7B4MVP0B8UV1lP",
+            "domain": "laphroaig.com",
+            "description": "The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #755: Laphroaig Cairdeas 2022 \"Warehouse 1,\" 52.2% : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/y1u64c/review_755_laphroaig_cairdeas_2022_warehouse_1_522/",
+            "domain": "reddit.com",
+            "description": "Taste: Big medicinal peat, hits thick and clean, brine, buttery wood, vanilla custard, bright lemon, tropical fruit, spice. It's creamy and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Càirdeas Warehouse 1 Islay Single Malt Scotch Whisky",
+            "url": "https://jensensliquors.com/products/laphroaig-cairdeas-warehouse-1-islay-single-malt-scotch-whisky?srsltid=AfmBOopDVwzFVw4y0rAw2t5iI9iOYfhdAjLQkqwRVKFTi_OxRoG4S1b_",
+            "domain": "jensensliquors.com",
+            "description": "This limited edition single malt, aged in first-fill ex-Maker's Mark bourbon barrels, dials up the quintessential Laphroaig taste.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Càirdeas 2022",
+            "url": "https://www.dramface.com/all-reviews/laphroaig-cairdeas-2022",
+            "domain": "dramface.com",
+            "description": "Warehouse 1 | 52.2% ABV Score: 8/10 Something special. TL;DR A fine drop — as subtle and delicate. ABV £ 100 or €100 via the distillery's ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2022 Laphroaig Cairdeas Warehouse 1 Review",
+            "url": "https://thewhiskeyjug.com/scotch-whisky/2022-laphroaig-cairdeas-warehouse-1-review/",
+            "domain": "thewhiskeyjug.com",
+            "description": "## **2022 Laphroaig Cairdeas Warehouse 1 – Details and Tasting Notes**\n### **Whiskey Details**\n**ABV**: 52.2%",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5a353f0d87936fa885074a9a18d7d4356a29e82fb86a48e051ba481cb0a49263",
+    "mode": "auto"
+  }
+}

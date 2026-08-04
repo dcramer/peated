@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:59:00.180Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Penelope Bourbon Barrel Strength\" \"Batch 11\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Penelope Bourbon Barrel Strength\" \"Batch 11\"",
+        "summary": "... Penelope Bourbon Barrel Strength Four Grain review ... But to the bourbon at hand – Penelope Four Grain Barrel Strength Bourbon, batch 11. Penelope Bourbon Barrel Strength Batch 4 review. Summarized by AI ... Copper & Cask Small Batch Series Batch 11 6 Year Wheated Bourbon ... Penelope Bourbon Barrel Strength Batch 11 Straight Bourbon Whiskey - 750ML · Aroma: Sweet caramel with hints of maple syrup and candied sweetness. · Taste: Smooth ... Penelope Bourbon Barrel Strength is one of the most awarded bourbons of 2020 ... Copper & Cask Small Batch #11==lto. Copper & Cask Small Batch #11==lto",
+        "results": [
+          {
+            "title": "Penelope Bourbon Barrel Strength Four Grain",
+            "url": "https://www.thewhiskeyshelf.com/penelope-bourbon-barrel-strength-four-grain-review/",
+            "domain": "thewhiskeyshelf.com",
+            "description": "... Penelope Bourbon Barrel Strength Four Grain review ... But to the bourbon at hand – Penelope Four Grain Barrel Strength Bourbon, batch 11.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Bourbon Barrel Strength Batch 4 review",
+            "url": "https://www.facebook.com/ExploringWhiskey/posts/today-we-review-our-second-penelope-bourbonthe-barrel-strength-batch-4-penelopes/122231603412000/",
+            "domain": "facebook.com",
+            "description": "Penelope Bourbon Barrel Strength Batch 4 review. Summarized by AI ... Copper & Cask Small Batch Series Batch 11 6 Year Wheated Bourbon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Bourbon Barrel Strength Batch 11 Straight Bourbon ...",
+            "url": "https://www.realliquor1.com/products/penelope-bourbon-barrel-strength-batch-11-straight-bourbon-whiskey?srsltid=AfmBOoqZqLdZUk9upEhxPNqD1fKeFX49Awb_WSlcEFl_M1mkDee37Hd-",
+            "domain": "realliquor1.com",
+            "description": "Penelope Bourbon Barrel Strength Batch 11 Straight Bourbon Whiskey - 750ML · Aroma: Sweet caramel with hints of maple syrup and candied sweetness. · Taste: Smooth ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Bourbon Tstd",
+            "url": "https://www.lukescapecod.com/product/s-10074/p-14054271/buy-penelope-bourbon-tstd",
+            "domain": "lukescapecod.com",
+            "description": "Penelope Bourbon Barrel Strength is one of the most awarded bourbons of 2020 ... Copper & Cask Small Batch #11==lto. Copper & Cask Small Batch #11==lto.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: Old Forester - Single Barrel - Bourbon By Proxy",
+            "url": "https://bourbonbyproxy.com/review-old-forester-single-barrel-barrel-strength-kentucky-straight-bourbon-whiskey/",
+            "domain": "bourbonbyproxy.com",
+            "description": "I did a quick sip of Stagg Jr – Batch 11 (127.9 Proof) and Old ... Review: Penelope Bourbon – Barrel Strength – Batch 5. Penelope ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b06c59eed0f71860aa7f70a71585c2f453e3d9a89969fe774d78b1be14760adf",
+    "mode": "auto"
+  }
+}

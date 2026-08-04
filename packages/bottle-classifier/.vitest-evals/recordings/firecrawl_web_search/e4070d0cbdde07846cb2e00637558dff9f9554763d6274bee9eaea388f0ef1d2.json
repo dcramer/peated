@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:50:43.865Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Johnnie Walker Black Label Islay Origin\" 12 year old"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Johnnie Walker Black Label Islay Origin\" 12 year old",
+        "summary": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky ; Style: Whiskey - Malt ; Region: UK ; Score: 85-90 pts ; Price: $ 80-150. Buy Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky, Islay, Scotland 1.75 LTR 1.75L for $69.99 from Wine Expo Santa Monica ... Tasting Notes: Johnnie Walker – Black Label (Islay Origin) ... 12 Year Old, 12 Years Old, 12yo, Black Label, Blend, Blended, Blended Malt ... Limited edition. Johnnie Walker Black label Islay Origin. Whisky.de Award ... 12 Years. ABV: 42%. Bottle size: 0.7 l. Bottler: Original bottli",
+        "results": [
+          {
+            "title": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt ...",
+            "url": "https://www.wine-searcher.com/find/johnny+walker+black+origin+twelve+old+blend+malt+scotch+whisky+islay+scotland?srsltid=AfmBOop108ITMjp1DLvTQsKV8Xj3USeY_sZYQMDwb6iUF6AhM6ZGvI29",
+            "domain": "wine-searcher.com",
+            "description": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky ; Style: Whiskey - Malt ; Region: UK ; Score: 85-90 pts ; Price: $ 80-150.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt ...",
+            "url": "https://wineexpo.com/shop/product/johnnie-walker-black-label-islay-origin-12-year-old-blended-malt-scotch-whisky-islay-scotland-1-75-ltr/5521cefa6561310003220300?option-id=10e0077c045cc9f34c3ee9bc6f0cd3d5f08c3b831bb547eed0acdd339b5493de",
+            "domain": "wineexpo.com",
+            "description": "Buy Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky, Islay, Scotland 1.75 LTR 1.75L for $69.99 from Wine Expo Santa Monica ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Tasting Notes: Johnnie Walker – Black Label (Islay Origin)",
+            "url": "https://whiskyunplugged.com/2025/02/05/tasting-notes-johnnie-walker-black-label-islay-origins/",
+            "domain": "whiskyunplugged.com",
+            "description": "Tasting Notes: Johnnie Walker – Black Label (Islay Origin) ... 12 Year Old, 12 Years Old, 12yo, Black Label, Blend, Blended, Blended Malt ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker 12 Years Black label Islay Origin - Whisky.com",
+            "url": "https://www.whisky.com/whisky-database/details/johnnie-walker-black-label-islay-origin-1.html",
+            "domain": "whisky.com",
+            "description": "Limited edition. Johnnie Walker Black label Islay Origin. Whisky.de Award ... 12 Years. ABV: 42%. Bottle size: 0.7 l. Bottler: Original bottling. Post ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label 12 Year Old Whisky",
+            "url": "https://www.htfw.com/blog/johnnie-walker-black-label-the-complete-guide-to-the-iconic-12-year-old-scotch-whisky/?srsltid=AfmBOorsYuii85NrQT1VSZZ2W1pwYk6avu6PJvNE2LSwrNwm3KhFVy5l",
+            "domain": "htfw.com",
+            "description": "Johnnie Walker Black Label: The Complete Guide to the Iconic 12 Year Old Scotch Whisky ... Johnnie Walker - Black Label Islay Origin Blended ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e4070d0cbdde07846cb2e00637558dff9f9554763d6274bee9eaea388f0ef1d2",
+    "mode": "auto"
+  }
+}

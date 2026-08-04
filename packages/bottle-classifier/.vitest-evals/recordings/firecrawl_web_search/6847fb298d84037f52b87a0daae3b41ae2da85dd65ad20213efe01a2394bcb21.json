@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:49:39.257Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Octomore 13.1 official Bruichladdich ABV age release"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 official Bruichladdich ABV age release",
+        "summary": "Age Statement: 5 Years Strength: 59.2% ABV Cask Makeup: Ex-bourbon Details: Concerto barley, peated to 137.3 PPM Age Statement: 5 Years. Strength: 59.2% ABV. Cask Makeup: Ex-bourbon. Details: Concerto barley, peated to 137.3 PPM. Tasting Methodology ... Official releases ; Octomore 13.1, 1st fill ex-bourbon barrels, 137.3, 5 YO, 59.2% ; Octomore 13.2, 1st fill ex-Oloroso sherry butts from Fernando dè Castilla ... In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Age Stated Single Malt Scotches. Bruichladdich Octomore 13.1 Super ... This whisky spent its entire five-yea",
+        "results": [
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Age Statement: 5 Years Strength: 59.2% ABV Cask Makeup: Ex-bourbon Details: Concerto barley, peated to 137.3 PPM",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+            "domain": "memywifeandwhisky.com",
+            "description": "Age Statement: 5 Years. Strength: 59.2% ABV. Cask Makeup: Ex-bourbon. Details: Concerto barley, peated to 137.3 PPM. Tasting Methodology ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore",
+            "url": "https://www.whiskysaga.com/octomore",
+            "domain": "whiskysaga.com",
+            "description": "Official releases ; Octomore 13.1, 1st fill ex-bourbon barrels, 137.3, 5 YO, 59.2% ; Octomore 13.2, 1st fill ex-Oloroso sherry butts from Fernando dè Castilla ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Age Stated Single Malt Scotches. Bruichladdich Octomore 13.1 Super ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "This New Whisky From Bruichladdich Is One of the Smokiest Single Malts on ...",
+            "url": "https://robbreport.com/food-drink/spirits/bruichladdich-octomore-whisky-series-1234757781/",
+            "domain": "robbreport.com",
+            "description": "This whisky spent its entire five-year aging period in first-fill Oloroso sherry casks from Spain, 58.3 percent ABV",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6847fb298d84037f52b87a0daae3b41ae2da85dd65ad20213efe01a2394bcb21",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-08-03T23:02:46.924Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Glenglassaugh 1978 Rare Cask Release\" \"Batch 1\" \"35 Year Old\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Glenglassaugh 1978 Rare Cask Release\" \"Batch 1\" \"35 Year Old\"",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "9ad5297cd378c9c45df216b46e512b46973209e0fc40ff11daac80d66b5f02b1",
+    "mode": "auto"
+  }
+}

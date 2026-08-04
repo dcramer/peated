@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:39:13.362Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Four Roses Limited Edition Small Batch 2017 official ABV ages"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses Limited Edition Small Batch 2017 official ABV ages",
+        "summary": "(54.15% ABV) The 2017 uses a slightly different age composition at 108.3 proof. The blend for this release is 15 year OESK 13 year OESK 12 year … 54% ABV; $125; was 7 yrs 7 mo old. Maybe a great barrel. 109 Proof / Aged 13 & 19 years add a. This release will also feature a 15-year-old OESK, 15-year-old OESV and 11-year-old OESV. Aged Minimum 12-15 Years (54.5% ABV) Age: 13 Years (3 Components, 90%), 19 Years (1 Component, 10%) 107.3 proof bourbon with barrel aged over a range of 12-15 years. Intensely fruity on entry, the mouth waters instantly as if sucking on hard candy. Excellent ...",
+        "results": [
+          {
+            "title": "Four Roses Limited Edition Small Batch 2017",
+            "url": "https://woodencork.com/products/four-roses-limited-edition-small-batch-2017?srsltid=AfmBOoqaciIidzp_nmuy7iTxmPzkJU2ejogxXwgCk3t_XnJWw6dsxO__",
+            "domain": "woodencork.com",
+            "description": "(54.15% ABV) The 2017 uses a slightly different age composition at 108.3 proof.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #250: Four Roses Limited Edition Small Batch 2017",
+            "url": "https://www.reddit.com/r/bourbon/comments/7s1z6f/review_250_four_roses_limited_edition_small_batch/",
+            "domain": "reddit.com",
+            "description": "The blend for this release is 15 year OESK 13 year OESK 12 year … 54% ABV; $125; was 7 yrs 7 mo old. Maybe a great barrel.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Limited Edition Four Roses Barrels Light Up Your Palate",
+            "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+            "domain": "fourrosesbourbon.com",
+            "description": "109 Proof / Aged 13 & 19 years add a. This release will also feature a 15-year-old OESK, 15-year-old OESV and 11-year-old OESV. Aged Minimum 12-15 Years",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses 2025 Limited Edition Small Batch",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/four-roses-2025-limited-edition-small-batch",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "(54.5% ABV) Age: 13 Years (3 Components, 90%), 19 Years (1 Component, 10%)",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Small Batch Limited Edition - Bot.2017",
+            "url": "https://www.thewhiskyexchange.com/p/40603/four-roses-small-batch-limited-edition-bot2017",
+            "domain": "thewhiskyexchange.com",
+            "description": "107.3 proof bourbon with barrel aged over a range of 12-15 years. Intensely fruity on entry, the mouth waters instantly as if sucking on hard candy. Excellent ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f4a51093e24431c2e5452b789172f4f4fd8898dcde570a25524c42c48b1e7874",
+    "mode": "auto"
+  }
+}

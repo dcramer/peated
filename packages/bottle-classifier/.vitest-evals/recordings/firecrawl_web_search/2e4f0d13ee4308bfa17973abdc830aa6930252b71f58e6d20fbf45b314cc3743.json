@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-08-03T05:02:29.262Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Pappy Van Winkle's Family Reserve\" \"15 years old\" \"53.5%\" \"Old Rip Van Winkle Distillery\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Pappy Van Winkle's Family Reserve\" \"15 years old\" \"53.5%\" \"Old Rip Van Winkle Distillery\"",
+        "summary": "Pappy Van Winkle's Family Reserve 15 years old / 20 years old / 23 ... Old Rip Van Winkle Distillery Alc. 53.5% Vol. (107 Proof) 107 ... Pappy Van Winkle's Family Reserve Kentucky Straight Bourbon Whiskey 15 years old 53.5% ALC/VOL (107 PROOF) OLD RIP VAN WINKLE DISTILLERY ...",
+        "results": [
+          {
+            "title": "Pappy 15 is waiting for you",
+            "url": "https://www.instagram.com/reel/DRqXMDzlWSt/",
+            "domain": "instagram.com",
+            "description": "Pappy Van Winkle's Family Reserve 15 years old / 20 years old / 23 ... Old Rip Van Winkle Distillery Alc. 53.5% Vol. (107 Proof) 107 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "How much would you pay for a bottle of Pappy 15?",
+            "url": "https://www.instagram.com/reel/DTygJ5djKME/",
+            "domain": "instagram.com",
+            "description": "Pappy Van Winkle's Family Reserve Kentucky Straight Bourbon Whiskey 15 years old 53.5% ALC/VOL (107 PROOF) OLD RIP VAN WINKLE DISTILLERY ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2e4f0d13ee4308bfa17973abdc830aa6930252b71f58e6d20fbf45b314cc3743",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-08-03T22:45:20.207Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "High West \"A Midwinter Night's Dram\" \"Act 12 Scene 9\" \"49.3%\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "High West \"A Midwinter Night's Dram\" \"Act 12 Scene 9\" \"49.3%\"",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f765cf0414823400dd0f99ff962f8e73f9e2e1619022d08fe924a27c803b21df",
+    "mode": "auto"
+  }
+}

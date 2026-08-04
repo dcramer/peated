@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:51:07.795Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Elijah Craig Barrel Proof\" \"C923\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig Barrel Proof\" \"C923\"",
+        "summary": "The Schtick: The third and final Elijah Craig Barrel Proof release of 2023, C923 is the oldest batch (via age statement) we've seen to date at ... Elijah Craig Barrel Proof C923 · Thoughts: Right off the bat, the nose is fantastic. I'd be happy just to nose this all night. · Comparison to ... Elijah Craig Barrel Proof Batch C923: Tasting Notes. Eye: Dark amber. Nose: Warm, classic Heaven Hill nose, if a little tight at first (it opens ... Elijah Craig, a burly, lightly smoky monster that's loaded with barrel char, cloves, old leather, and musty book notes, though hints of incense point toward",
+        "results": [
+          {
+            "title": "Review #2321 - Elijah Craig Barrel Proof 13 Year C923 : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/1f78skw/review_2321_elijah_craig_barrel_proof_13_year_c923/",
+            "domain": "reddit.com",
+            "description": "The Schtick: The third and final Elijah Craig Barrel Proof release of 2023, C923 is the oldest batch (via age statement) we've seen to date at ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof, C923",
+            "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+            "domain": "bourbonguy.com",
+            "description": "Elijah Craig Barrel Proof C923 · Thoughts: Right off the bat, the nose is fantastic. I'd be happy just to nose this all night. · Comparison to ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Batch C923",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-batch-c923",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "Elijah Craig Barrel Proof Batch C923: Tasting Notes. Eye: Dark amber. Nose: Warm, classic Heaven Hill nose, if a little tight at first (it opens ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Batch C923 750ML",
+            "url": "https://www.fengfinewine.com/product/elijah-craig-barrel-proof-batch-c923-750ml/728?srsltid=AfmBOoovz13Ev1l-tWZZ8Mh9JWvNMXeI_cTsQf2XdjV568YjLIYcmhBD",
+            "domain": "fengfinewine.com",
+            "description": "Elijah Craig, a burly, lightly smoky monster that's loaded with barrel char, cloves, old leather, and musty book notes, though hints of incense point toward ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Bourbon C923 Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/",
+            "domain": "thebourbonculture.com",
+            "description": "Elijah Craig Barrel Proof Batch C923 · Tasting Notes · Score: 8.4/10 · Final Thoughts · Post navigation.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6d530b21a5e25d5ce331c74b4f26d522227531e56ec1b5445505c06480f6cde2",
+    "mode": "auto"
+  }
+}
