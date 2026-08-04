@@ -42,9 +42,9 @@ For each `store_price`, the matcher should decide one of four outcomes:
 The system persists one `store_price_match_proposal` row per `store_price`.
 
 The primary match proposal remains authoritative for the listing decision.
-When enabled, the classifier may also persist a linked Bottle check with
-supplemental proposed operations. That check does not replace, delay, or
-reinterpret the primary proposal.
+Every full classifier run also persists a linked Bottle check with supplemental
+proposed operations. That check does not replace or reinterpret the primary
+proposal.
 
 ## Matching Modes
 
@@ -98,11 +98,20 @@ Evaluation order:
 6. map and sanitize classifier output against real candidates and resolved entities
 7. compute automation eligibility from deterministic checks
 8. upsert the proposal row
-9. auto-create only when the deterministic gate says it is safe
+9. record the match attempt and a linked Bottle check from the classifier result
+10. auto-create only when the deterministic gate says it is safe
 
-A full reference run may also create a `resolve_reference` Bottle check from
-the same reviewed artifacts. Its proposed operations are supplemental catalog
-work, not additional price-match outcomes.
+Every full reference run creates a `resolve_reference` Bottle check from the
+same reviewed artifacts. This includes initial unresolved listings, ignored
+results, and individual or bulk retries. Its proposed operations are
+supplemental catalog work, not additional price-match outcomes. Deterministic
+accepted-alias matches do not create a check because they do not run the
+classifier.
+
+The proposal, attempt, and linked check commit as one transaction before
+automation begins. If the check cannot be validated or persisted, the resolver
+rolls back that successful match state and records an errored proposal and
+attempt for inspection or retry.
 
 ## Observation Persistence
 

@@ -225,53 +225,59 @@ async function countBottles() {
 }
 
 function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
-  if (
-    decision.action === "match" ||
-    decision.action === "create_bottle" ||
-    decision.action === "repair_bottle" ||
-    decision.action === "no_match"
-  ) {
-    return {
-      identityScope: "product",
-      observation: null,
-      ...decision,
-    };
-  }
+  const action =
+    decision.action === "match_existing" || decision.action === "correction"
+      ? "match"
+      : decision.action === "create_new"
+        ? "create_bottle"
+        : decision.action;
+  const base = {
+    rationale: decision.rationale ?? null,
+    candidateBottleIds: decision.candidateBottleIds ?? [],
+    identityScope: decision.identityScope ?? "product",
+    aliasScope: decision.aliasScope,
+    observation: decision.observation ?? null,
+    identityBasis: decision.identityBasis ?? null,
+    confidenceBasis: decision.confidenceBasis ?? null,
+  };
 
-  if (
-    decision.action === "match_existing" ||
-    decision.action === "correction"
-  ) {
+  if (action === "match") {
     return {
-      action: "match",
-      confidence: decision.confidence ?? 0,
-      rationale: decision.rationale ?? null,
-      candidateBottleIds: decision.candidateBottleIds ?? [],
-      identityScope: decision.identityScope ?? "product",
-      observation: decision.observation ?? null,
-      identityBasis: decision.identityBasis ?? null,
-      confidenceBasis: decision.confidenceBasis ?? null,
-      matchedBottleId: decision.suggestedBottleId,
+      ...base,
+      action,
+      matchedBottleId: decision.matchedBottleId ?? decision.suggestedBottleId,
       proposedBottle: null,
     };
   }
 
-  if (decision.action === "create_new") {
+  if (action === "create_bottle") {
     return {
-      action: "create_bottle",
-      confidence: decision.confidence ?? 0,
-      rationale: decision.rationale ?? null,
-      candidateBottleIds: decision.candidateBottleIds ?? [],
-      identityScope: decision.identityScope ?? "product",
-      observation: decision.observation ?? null,
-      identityBasis: decision.identityBasis ?? null,
-      confidenceBasis: decision.confidenceBasis ?? null,
+      ...base,
+      action,
       matchedBottleId: null,
       proposedBottle: decision.proposedBottle ?? null,
     };
   }
 
-  return decision;
+  if (action === "repair_bottle") {
+    return {
+      ...base,
+      action,
+      matchedBottleId: decision.matchedBottleId,
+      proposedBottle: decision.proposedBottle ?? null,
+    };
+  }
+
+  if (action === "no_match") {
+    return {
+      ...base,
+      action,
+      matchedBottleId: null,
+      proposedBottle: null,
+    };
+  }
+
+  return { ...base, action };
 }
 
 describe("priceMatching", () => {
@@ -2538,9 +2544,7 @@ describe("priceMatching", () => {
       }),
     );
 
-    const proposal = await resolveStorePriceMatchProposal(price.id, {
-      generateBottleCheck: true,
-    });
+    const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("correction");
@@ -7830,9 +7834,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("does not persist a Bottle check when the caller opts out", async ({
-    fixtures,
-  }) => {
+  test("persists a linked Bottle check by default", async ({ fixtures }) => {
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
@@ -7869,9 +7871,7 @@ describe("priceMatching", () => {
       }),
     );
 
-    const proposal = await resolveStorePriceMatchProposal(price.id, {
-      generateBottleCheck: false,
-    });
+    const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal).toMatchObject({
       status: "pending_review",
@@ -7879,8 +7879,82 @@ describe("priceMatching", () => {
       suggestedBottleId: bottle.id,
     });
     expect(await db.select().from(storePriceMatchAttempts)).toHaveLength(1);
+    expect(await db.select().from(bottleChecks)).toEqual([
+      expect.objectContaining({
+        intent: "resolve_reference",
+        sourceKind: "store_price",
+        sourceId: String(price.id),
+        storePriceMatchProposalId: proposal.id,
+      }),
+    ]);
+    expect(await db.select().from(bottleOperations)).toEqual([
+      expect.objectContaining({
+        status: "blocked",
+        preparationError: expect.objectContaining({
+          code: "target_not_inspected",
+        }),
+      }),
+    ]);
+  });
+
+  test("does not retain a successful match when its linked check cannot persist", async ({
+    fixtures,
+  }) => {
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Unpersistable Classifier Evidence",
+      imageUrl: null,
+    });
+    const candidate = await getBottleCandidateById(bottle.id);
+    expect(candidate).not.toBeNull();
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "match",
+          rationale: "The source matches the inspected Bottle.",
+          candidateBottleIds: [bottle.id],
+          aliasScope: "none",
+          matchedBottleId: bottle.id,
+          proposedBottle: null,
+        },
+        candidateBottles: [candidate],
+        proposedOperations: [],
+        findings: [
+          {
+            scope: "bottle",
+            summary: "This finding cites evidence the run did not collect.",
+            evidenceRefs: [
+              {
+                kind: "web_result",
+                url: "https://example.com/missing-evidence",
+              },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal).toMatchObject({
+      status: "errored",
+      proposalType: "no_match",
+      suggestedBottleId: null,
+      error: expect.stringContaining(
+        "Evidence reference was not collected by this Bottle check",
+      ),
+    });
+    expect(await db.select().from(storePriceMatchAttempts)).toEqual([
+      expect.objectContaining({
+        proposalId: proposal.id,
+        initialStatus: "errored",
+        finalStatus: "errored",
+      }),
+    ]);
     expect(await db.select().from(bottleChecks)).toHaveLength(0);
-    expect(await db.select().from(bottleOperations)).toHaveLength(0);
   });
 
   test("blocks a proposal that would retire the classifier's matched Bottle", async ({
@@ -7937,9 +8011,7 @@ describe("priceMatching", () => {
       }),
     );
 
-    const proposal = await resolveStorePriceMatchProposal(price.id, {
-      generateBottleCheck: true,
-    });
+    const proposal = await resolveStorePriceMatchProposal(price.id);
     const check = await db.query.bottleChecks.findFirst({
       where: eq(bottleChecks.storePriceMatchProposalId, proposal.id),
       with: { operations: true },
@@ -8038,7 +8110,6 @@ describe("priceMatching", () => {
     const firstProposal = await resolveStorePriceMatchProposal(price.id);
     const secondProposal = await resolveStorePriceMatchProposal(price.id, {
       force: true,
-      generateBottleCheck: true,
     });
 
     expect(secondProposal).toMatchObject({
@@ -8061,8 +8132,10 @@ describe("priceMatching", () => {
       with: { operations: true },
     });
     expect(attempts).toHaveLength(2);
-    expect(checks).toHaveLength(1);
-    expect(checks[0]?.storePriceMatchAttemptId).toBe(attempts[1]?.id);
+    expect(checks).toHaveLength(2);
+    expect(
+      checks.map(({ storePriceMatchAttemptId }) => storePriceMatchAttemptId),
+    ).toEqual(expect.arrayContaining(attempts.map(({ id }) => id)));
     expect(classifyBottleReference).toHaveBeenNthCalledWith(
       1,
       expect.any(Object),
@@ -8126,9 +8199,7 @@ describe("priceMatching", () => {
       }),
     );
 
-    const proposal = await resolveStorePriceMatchProposal(price.id, {
-      generateBottleCheck: true,
-    });
+    const proposal = await resolveStorePriceMatchProposal(price.id);
     const attempt = await db.query.storePriceMatchAttempts.findFirst({
       where: eq(storePriceMatchAttempts.proposalId, proposal.id),
     });
