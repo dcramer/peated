@@ -29,6 +29,10 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import {
+  ExactBottleAliasConflictError,
+  reserveLiteralCanonicalBottleAliasInTransaction,
+} from "@peated/server/lib/bottleAliases";
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
@@ -732,10 +736,15 @@ export async function mergeConcreteBottlesInTransaction(
     .where(sql`LOWER(${bottleAliases.name}) = LOWER(${source.fullName})`)
     .limit(1)
     .for("update");
+  const canonicalAliasOwner = canonicalAlias?.bottleId
+    ? bottleById.get(canonicalAlias.bottleId)
+    : null;
   if (
     canonicalAlias &&
+    canonicalAlias.bottleId !== null &&
     canonicalAlias.bottleId !== sourceBottleId &&
-    canonicalAlias.bottleId !== destinationBottleId
+    canonicalAlias.bottleId !== destinationBottleId &&
+    canonicalAliasOwner?.groupId !== sourceGroupId
   ) {
     throw new ConcreteBottleMergeConflictError("identity_conflict");
   }
@@ -764,13 +773,22 @@ export async function mergeConcreteBottlesInTransaction(
     .update(bottleAliases)
     .set({ bottleId: destinationBottleId })
     .where(eq(bottleAliases.bottleId, sourceBottleId));
-  if (!canonicalAlias) {
-    await tx.insert(bottleAliases).values({
-      name: source.fullName,
-      bottleId: destinationBottleId,
-      assignmentSource: "human_approved",
-      assignedByActorId: actorId,
-    });
+  if (!canonicalAlias || canonicalAlias.bottleId === null) {
+    try {
+      await reserveLiteralCanonicalBottleAliasInTransaction(tx, {
+        name: source.fullName,
+        bottleId: destinationBottleId,
+        assignmentSource: "human_approved",
+        assignedByActorId: actorId,
+      });
+    } catch (error) {
+      if (error instanceof ExactBottleAliasConflictError) {
+        throw new ConcreteBottleMergeConflictError("identity_conflict", {
+          cause: error,
+        });
+      }
+      throw error;
+    }
   }
 
   const sourceTags = await tx
