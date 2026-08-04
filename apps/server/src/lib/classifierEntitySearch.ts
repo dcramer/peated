@@ -113,28 +113,28 @@ export async function searchClassifierEntities(
     });
   }
 
-  const textMatches = await db.execute<{
-    entityId: number;
-    name: string;
-    shortName: string | null;
-    type: string[];
-    score: number | null;
-  }>(sql`
-    SELECT
-      ${entities.id} AS "entityId",
-      ${entities.name} AS "name",
-      ${entities.shortName} AS "shortName",
-      ${entities.type} AS "type",
-      ts_rank(${entities.searchVector}, websearch_to_tsquery('english', ${args.query})) AS score
-    FROM ${entities}
-    WHERE ${entities.searchVector} IS NOT NULL
-      AND ${entities.searchVector} @@ websearch_to_tsquery('english', ${args.query})
-      ${args.type ? sql`AND ${args.type} = ANY(${entities.type})` : sql``}
-    ORDER BY score DESC, ${entities.name} ASC
-    LIMIT ${args.limit}
-  `);
+  const textQuery = sql`websearch_to_tsquery('english', ${args.query})`;
+  const textScore = sql<number>`ts_rank(${entities.searchVector}, ${textQuery})`;
+  const textMatches = await db
+    .select({
+      entityId: entities.id,
+      name: entities.name,
+      shortName: entities.shortName,
+      type: entities.type,
+      score: textScore,
+    })
+    .from(entities)
+    .where(
+      and(
+        sql`${entities.searchVector} IS NOT NULL`,
+        sql`${entities.searchVector} @@ ${textQuery}`,
+        args.type ? sql`${args.type} = ANY(${entities.type})` : undefined,
+      ),
+    )
+    .orderBy(sql`${textScore} DESC`, entities.name)
+    .limit(args.limit);
 
-  for (const row of textMatches.rows) {
+  for (const row of textMatches) {
     mergeResult(results, {
       entityId: row.entityId,
       name: row.name,

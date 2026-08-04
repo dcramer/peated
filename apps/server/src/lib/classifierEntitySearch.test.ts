@@ -1,3 +1,4 @@
+import { EntityResolutionSchema } from "@peated/bottle-classifier/internal/types";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
 
 describe("searchClassifierEntities", () => {
@@ -30,6 +31,31 @@ describe("searchClassifierEntities", () => {
 
     expect(fuzzyResults.map((result) => result.entityId)).not.toContain(
       entity.id,
+    );
+  });
+
+  test("returns schema-valid full-text entity matches", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Ichiro’s Malt",
+      type: ["brand"],
+    });
+
+    const results = await searchClassifierEntities({
+      query: "Ichiro's Malt",
+      type: "brand",
+      limit: 10,
+    });
+
+    expect(
+      results.map((result) => EntityResolutionSchema.parse(result)),
+    ).toEqual(results);
+    expect(results).toContainEqual(
+      expect.objectContaining({
+        entityId: entity.id,
+        type: ["brand"],
+      }),
     );
   });
 
