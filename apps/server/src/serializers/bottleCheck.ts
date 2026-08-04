@@ -51,6 +51,7 @@ export function serializeBottleCheck(check: BottleCheckWithOperations) {
     sourceId: check.sourceId,
     bottleId: check.bottleId,
     model: check.model,
+    modelMetadata: check.modelMetadata,
     error: check.error,
     storePriceMatchProposalId: check.storePriceMatchProposalId,
     storePriceMatchAttemptId: check.storePriceMatchAttemptId,

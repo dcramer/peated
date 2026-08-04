@@ -34,7 +34,10 @@ test("disposes non-ready and live-ready operations independently", async ({
 
   expect(details.audit).not.toHaveProperty("inputSnapshot");
   expect(details.audit).not.toHaveProperty("artifacts");
-  expect(details.audit).not.toHaveProperty("modelMetadata");
+  expect(details.audit.modelMetadata).toMatchObject({
+    usage: { totalTokens: 10_800 },
+    cost: { estimatedAgentLoopCostUsd: 0.044 },
+  });
   expect(details.audit).not.toHaveProperty("subjectKey");
   expect(details.audit).not.toHaveProperty("backgroundEventKey");
   for (const operation of details.audit.operations) {
@@ -46,7 +49,15 @@ test("disposes non-ready and live-ready operations independently", async ({
 
   await page.goto("/admin/audits/91");
 
-  await expect(page.getByRole("heading", { name: "Audit #91" })).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Audited Bottle" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Bottle audit" }),
+  ).toBeVisible();
+  await expect(page.getByText("10,800", { exact: true })).toBeVisible();
+  await expect(page.getByText("$0.0440", { exact: true })).toBeVisible();
+  await expect(page.getByText("2.4 sec", { exact: true })).toBeVisible();
   const readyOperation = page
     .getByRole("article")
     .filter({ hasText: "Rename the inspected Brand" });
@@ -188,7 +199,9 @@ test("redirects an actionable admin audit to its current check", async ({
   await page.getByRole("button", { name: "Run Bottle Audit" }).click();
 
   await expect(page).toHaveURL("/admin/audits/91");
-  await expect(page.getByRole("heading", { name: "Audit #91" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Bottle audit" }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
 

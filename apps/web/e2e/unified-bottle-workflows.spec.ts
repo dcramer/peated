@@ -136,7 +136,10 @@ test.describe("unified Bottle workflows", () => {
 
     expect(details.audit).not.toHaveProperty("inputSnapshot");
     expect(details.audit).not.toHaveProperty("artifacts");
-    expect(details.audit).not.toHaveProperty("modelMetadata");
+    expect(details.audit.modelMetadata).toMatchObject({
+      usage: { totalTokens: 10_800 },
+      cost: { estimatedAgentLoopCostUsd: 0.044 },
+    });
     expect(details.audit).not.toHaveProperty("subjectKey");
     expect(details.audit).not.toHaveProperty("backgroundEventKey");
     expect(details.audit.output.decision).toMatchObject({

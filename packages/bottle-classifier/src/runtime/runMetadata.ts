@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getRunCostMetadata } from "./cost";
 
 const NonnegativeIntegerSchema = z.number().int().nonnegative();
 
@@ -22,6 +23,25 @@ export const BottleClassifierRunMetadataSchema = z
         names: z.array(z.string().trim().min(1)),
       })
       .strict(),
+    cost: z
+      .object({
+        scope: z.literal("agent_loop_only"),
+        costCoverage: z.enum([
+          "priced_model_tokens",
+          "cached_input_unreported_assumed_uncached",
+          "cache_write_unreported_assumed_standard_input",
+          "cache_details_unreported_assumed_standard_input",
+          "usage_unavailable",
+          "unsupported_model",
+        ]),
+        estimatedAgentLoopCostUsd: z.number().nonnegative().optional(),
+        pricingModel: z.string().trim().min(1).optional(),
+        pricingEffectiveDate: z.iso.date(),
+        pricingSource: z.url(),
+        pricingBasis: z.literal("standard_short_context"),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 
@@ -78,9 +98,11 @@ function stringProperty(value: unknown, property: string): string | null {
 export function getBottleClassifierRunMetadata({
   result,
   durationMs,
+  model,
 }: {
   result: unknown;
   durationMs: number;
+  model?: string;
 }): BottleClassifierRunMetadata {
   const usage =
     objectProperty(objectProperty(result, "state"), "usage") ??
@@ -118,26 +140,36 @@ export function getBottleClassifierRunMetadata({
     }
   }
 
+  const normalizedUsage = {
+    requests: numberProperty(usage, "requests"),
+    inputTokens: numberProperty(usage, "inputTokens"),
+    ...(measuredCachedInputTokens === undefined
+      ? {}
+      : { cachedInputTokens: measuredCachedInputTokens }),
+    ...(measuredCacheWriteTokens === undefined
+      ? {}
+      : { cacheWriteTokens: measuredCacheWriteTokens }),
+    outputTokens: numberProperty(usage, "outputTokens"),
+    ...(measuredReasoningTokens === undefined
+      ? {}
+      : { reasoningTokens: measuredReasoningTokens }),
+    totalTokens: numberProperty(usage, "totalTokens"),
+  };
+
   return BottleClassifierRunMetadataSchema.parse({
     agentDurationMs: Math.max(0, Math.round(durationMs)),
-    usage: {
-      requests: numberProperty(usage, "requests"),
-      inputTokens: numberProperty(usage, "inputTokens"),
-      ...(measuredCachedInputTokens === undefined
-        ? {}
-        : { cachedInputTokens: measuredCachedInputTokens }),
-      ...(measuredCacheWriteTokens === undefined
-        ? {}
-        : { cacheWriteTokens: measuredCacheWriteTokens }),
-      outputTokens: numberProperty(usage, "outputTokens"),
-      ...(measuredReasoningTokens === undefined
-        ? {}
-        : { reasoningTokens: measuredReasoningTokens }),
-      totalTokens: numberProperty(usage, "totalTokens"),
-    },
+    usage: normalizedUsage,
     toolCalls: {
       count: toolCallCount,
       names: toolNames,
     },
+    ...(model
+      ? {
+          cost: getRunCostMetadata({
+            model,
+            usage: normalizedUsage,
+          }),
+        }
+      : {}),
   });
 }

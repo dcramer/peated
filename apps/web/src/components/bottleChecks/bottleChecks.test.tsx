@@ -368,6 +368,7 @@ describe("Bottle Check review components", () => {
         findings: [],
       },
       model: null,
+      modelMetadata: null,
       error: null,
       storePriceMatchProposalId: null,
       storePriceMatchAttemptId: null,

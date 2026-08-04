@@ -1,4 +1,4 @@
-import type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
+import type { BottleClassifierRunMetadata } from "./runMetadata";
 
 const PRICING_EFFECTIVE_DATE = "2026-08-01";
 const PRICING_SOURCE_URL = "https://developers.openai.com/api/docs/pricing";
@@ -12,7 +12,7 @@ type TokenPricing = {
   outputUsdPerMillion: number;
 };
 
-type EvalTokenUsage = {
+type TokenUsage = {
   requests: number;
   inputTokens: number;
   cachedInputTokens?: number;
@@ -50,7 +50,7 @@ const STANDARD_SHORT_CONTEXT_PRICING: TokenPricing[] = [
   },
 ];
 
-export type EvalRunCostMetadata = {
+export type RunCostMetadata = {
   scope: "agent_loop_only" | "full_llm_run";
   costCoverage:
     | "priced_model_tokens"
@@ -67,8 +67,8 @@ export type EvalRunCostMetadata = {
   pricingBasis: "standard_short_context";
 };
 
-export type EvalModelCostMetadata = Omit<
-  EvalRunCostMetadata,
+export type ModelCostMetadata = Omit<
+  RunCostMetadata,
   "scope" | "estimatedAgentLoopCostUsd"
 > & {
   scope: "image_extraction_only";
@@ -109,16 +109,16 @@ function resolveTokenPricing(model: string): TokenPricing | undefined {
  * Estimates the measured model tokens in the supplied usage scope. Provider
  * tool fees and pricing adjustments remain outside the token estimate.
  */
-export function getEvalRunCostMetadata({
+export function getRunCostMetadata({
   model,
   usage,
   scope = "agent_loop_only",
 }: {
   model: string;
   usage: BottleClassifierRunMetadata["usage"];
-  scope?: EvalRunCostMetadata["scope"];
-}): EvalRunCostMetadata {
-  const metadata = getEvalModelCostMetadata({ model, usage });
+  scope?: RunCostMetadata["scope"];
+}): RunCostMetadata {
+  const metadata = getModelCostMetadata({ model, usage });
   const { estimatedCostUsd, ...sharedMetadata } = metadata;
   return {
     ...sharedMetadata,
@@ -131,13 +131,13 @@ export function getEvalRunCostMetadata({
   };
 }
 
-export function getEvalModelCostMetadata({
+export function getModelCostMetadata({
   model,
   usage,
 }: {
   model: string;
-  usage: EvalTokenUsage;
-}): EvalModelCostMetadata {
+  usage: TokenUsage;
+}): ModelCostMetadata {
   const pricing = resolveTokenPricing(model);
   const baseMetadata = {
     scope: "image_extraction_only" as const,
@@ -172,7 +172,7 @@ export function getEvalModelCostMetadata({
       usage.outputTokens * pricing.outputUsdPerMillion) /
     TOKENS_PER_MILLION;
 
-  let costCoverage: EvalRunCostMetadata["costCoverage"] = "priced_model_tokens";
+  let costCoverage: RunCostMetadata["costCoverage"] = "priced_model_tokens";
   if (
     usage.cachedInputTokens === undefined &&
     pricing.cacheWriteUsdPerMillion !== undefined &&

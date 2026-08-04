@@ -27,6 +27,7 @@ test("formats one Bottle operation with its check context and live review", () =
     schemaVersion: 1,
     output: { summary: "Review the proposed catalog work.", findings: [] },
     model: "test-model",
+    modelMetadata: null,
     error: null,
     storePriceMatchProposalId: null,
     storePriceMatchAttemptId: null,
