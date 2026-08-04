@@ -26,29 +26,20 @@ describe("catalog verifier policy", () => {
     expect(getCatalogVerificationSkipReason("manual_entry")).toBeNull();
   });
 
-  test("skips trusted creation flows", () => {
+  test("runs verification for automated price matches", () => {
+    expect(shouldRunCatalogVerification("price_match_automation")).toBe(true);
+    expect(
+      getCatalogVerificationSkipReason("price_match_automation"),
+    ).toBeNull();
+  });
+
+  test("skips reviewed and repair creation flows", () => {
     expect(shouldRunCatalogVerification("bottle_classifier")).toBe(false);
     expect(shouldRunCatalogVerification("price_match_review")).toBe(false);
-    expect(shouldRunCatalogVerification("price_match_automation")).toBe(false);
     expect(shouldRunCatalogVerification("repair_workflow")).toBe(false);
     expect(getCatalogVerificationSkipReason("bottle_classifier")).toContain(
       "classifier",
     );
-  });
-
-  test("samples price match automation deterministically", () => {
-    expect(
-      shouldRunCatalogVerification("price_match_automation", {
-        sampleKey: "same-bottle",
-        sampleRate: 1,
-      }),
-    ).toBe(true);
-    expect(
-      shouldRunCatalogVerification("price_match_automation", {
-        sampleKey: "same-bottle",
-        sampleRate: 0,
-      }),
-    ).toBe(false);
   });
 
   test("builds parsed creation metadata and results", () => {

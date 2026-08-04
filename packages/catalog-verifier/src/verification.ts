@@ -99,35 +99,10 @@ export type PersistedCatalogVerificationResult = z.infer<
   typeof CatalogVerificationResultSchema
 >;
 
-function getDeterministicSampleBucket(sampleKey: string | number): number {
-  let hash = 0;
-  for (const char of String(sampleKey)) {
-    hash = (hash * 31 + char.charCodeAt(0)) % 10_000;
-  }
-  return hash / 10_000;
-}
-
 export function shouldRunCatalogVerification(
   source: CatalogVerificationCreationSource,
-  options: {
-    sampleKey?: string | number | null;
-    sampleRate?: number;
-  } = {},
 ) {
-  if (source === "manual_entry") {
-    return true;
-  }
-
-  if (source !== "price_match_automation") {
-    return false;
-  }
-
-  if (options.sampleKey === undefined || options.sampleKey === null) {
-    return false;
-  }
-
-  const sampleRate = Math.min(1, Math.max(0, options.sampleRate ?? 0));
-  return getDeterministicSampleBucket(options.sampleKey) < sampleRate;
+  return source === "manual_entry" || source === "price_match_automation";
 }
 
 export function getCatalogVerificationSkipReason(
@@ -139,7 +114,7 @@ export function getCatalogVerificationSkipReason(
     case "price_match_review":
       return "Created through the moderator-reviewed price match workflow.";
     case "price_match_automation":
-      return "Created through price match automation and not selected for verification sampling.";
+      return null;
     case "repair_workflow":
       return "Created through a dedicated repair workflow.";
     case "manual_entry":
