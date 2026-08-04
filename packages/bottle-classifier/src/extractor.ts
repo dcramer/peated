@@ -9,6 +9,7 @@ import {
 
 const ResponseSchema = z.object({
   result: BottleExtractedDetailsSchema.nullable(),
+  rawLabelText: z.string().trim().min(1).max(4000).nullable().default(null),
 });
 
 export type WhiskyLabelExtractionMetadata = {
@@ -27,9 +28,8 @@ export type WhiskyLabelExtractionMetadata = {
   } | null;
 };
 
-export type WhiskyLabelExtractionResult = WhiskyLabelExtractionMetadata & {
-  result: z.infer<typeof ResponseSchema>["result"];
-};
+export type WhiskyLabelExtractionResult = WhiskyLabelExtractionMetadata &
+  z.infer<typeof ResponseSchema>;
 
 export function createWhiskyLabelExtractor({
   client,
@@ -156,9 +156,12 @@ export async function extractFromImageWithMetadata({
   };
   onMetadata?.(metadata);
 
-  const { result } = ResponseSchema.parse(JSON.parse(response.output_text));
+  const { result, rawLabelText } = ResponseSchema.parse(
+    JSON.parse(response.output_text),
+  );
   return {
     result,
+    rawLabelText,
     ...metadata,
   };
 }

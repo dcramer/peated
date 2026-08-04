@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:57:54.094Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Shieldaig Speyside\" \"21 Year Old\" single malt whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Shieldaig Speyside\" \"21 Year Old\" single malt whisky",
+        "summary": "Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml. An exceptional Shieldaig Single Malt Scotch Whisky from the esteemed Scotland distiller, Shieldaig Speyside 21 Year Old Single Malt Scotch Whisky is a ... Tamdhu 21 Year Old Single Malt Double Sherry Cask Scotch 700ml ... Shieldaig Speyside Single Malt 12Yr Scotch Whisky 750ml Bottle. Buy Shieldaig Speyside Single Malt Scotch Whisky 21 Year Old online with quick same day delivery to your door. Shop with Shipt. Home PageSpeyside Single Malt WhiskyShielda",
+        "results": [
+          {
+            "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland?srsltid=AfmBOop0e4P6YXYW0qv5uJBnOq3CSrasQVPyEpRa9iXWSnEbCf9U717N",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside 21 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.frootbat.com/p/313202/shieldaig-speyside-21-year-old-single-malt-scotch-whisky?srsltid=AfmBOoqvbrmkMGq5_vk-T17BeYsn_nbN-bs81l9kDuNSxsQzabb_Fnjh",
+            "domain": "frootbat.com",
+            "description": "An exceptional Shieldaig Single Malt Scotch Whisky from the esteemed Scotland distiller, Shieldaig Speyside 21 Year Old Single Malt Scotch Whisky is a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Speyside - Page 3 | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotland/speyside/c/001099?spiritsvarietaltype=Single+Malt&page=3&srsltid=AfmBOoojOxReeygIw6OR2lYrXFzGgiZafxiaXU26fkDqKP_vxAFDBm8r",
+            "domain": "totalwine.com",
+            "description": "Tamdhu 21 Year Old Single Malt Double Sherry Cask Scotch 700ml ... Shieldaig Speyside Single Malt 12Yr Scotch Whisky 750ml Bottle.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt Scotch Whisky 21 Year Old 750 ml",
+            "url": "https://www.shipt.com/shop/products/38a315b4-d949-11ef-ad6c-0ff3b48cac1a",
+            "domain": "shipt.com",
+            "description": "Buy Shieldaig Speyside Single Malt Scotch Whisky 21 Year Old online with quick same day delivery to your door. Shop with Shipt.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Sin Malt 25Yr",
+            "url": "https://finewineliquors.com/product/shieldaig-speyside-sin-malt-25yr/?srsltid=AfmBOors9iYWyQXEoblgcwxkaymTPo9tc88xqee5YKGq388rduExYdgj",
+            "domain": "finewineliquors.com",
+            "description": "Home PageSpeyside Single Malt WhiskyShieldaig Speyside Sin Malt 25Yr.. -17 ... 21 Year Old Whiskey, 25 Year Old Whiskey, 30 Year Old Whiskey, 40 Year Old ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "39416f66a02df95175107fd0fec27a546c9f512807408d6f99c44934edb5db6f",
+    "mode": "auto"
+  }
+}

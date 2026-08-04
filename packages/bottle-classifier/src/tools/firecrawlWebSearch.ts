@@ -8,6 +8,7 @@ import {
   executeBottleWebSearchInvocation,
   getResultDomain,
   hydrateBottleSearchEvidence,
+  type BottleWebSearchBatchResult,
   type BottleWebSearchBudget,
   type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
@@ -15,15 +16,13 @@ import {
 const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
 const FIRECRAWL_SEARCH_TIMEOUT_MS = 30000;
 const FIRECRAWL_WEB_SEARCH_TOOL_DESCRIPTION =
-  "Search web pages and return readable page excerpts for decisive bottle or release evidence. Use focused queries when local search is insufficient, especially when exact ABV, cask, vintage, or bottle/release scope matters.";
+  "Search public web pages for bottle-specific evidence. Use when local catalog and supplied label evidence cannot resolve an identity-critical fact. Run one focused query normally; use up to three query formulations together only for independent wording variants. Returns ranked source URLs, titles, and compact relevance snippets. Use firecrawl_read_page afterward when a promising result needs exact page evidence.";
 
 const FirecrawlSearchResultSchema = z
   .object({
     title: z.string().trim().min(1).nullable().optional(),
     url: z.string().url(),
     description: z.string().nullable().optional(),
-    markdown: z.string().nullable().optional(),
-    content: z.string().nullable().optional(),
   })
   .passthrough();
 
@@ -38,23 +37,11 @@ const FirecrawlSearchResponseSchema = z
   })
   .passthrough();
 
-function compactMarkdown(value: string | null | undefined): string | null {
-  const normalized = value?.replace(/\s+/g, " ").trim();
-  if (!normalized) {
-    return null;
-  }
-  return normalized.slice(0, 1200);
-}
-
 function buildFirecrawlSearchBody(query: string) {
   return {
     query,
     limit: 5,
-    sources: [{ type: "web" }],
-    scrapeOptions: {
-      formats: [{ type: "markdown" }],
-      onlyMainContent: true,
-    },
+    sources: ["web"],
   };
 }
 
@@ -64,13 +51,12 @@ export function extractFirecrawlSearchEvidence(
 ): BottleSearchEvidence {
   const response = FirecrawlSearchResponseSchema.parse(payload);
   const results = response.data.web.map((result) => {
-    const markdown = compactMarkdown(result.markdown ?? result.content);
     return {
       title: result.title?.trim() || result.url,
       url: result.url,
       domain: getResultDomain(result.url),
       description: result.description ?? null,
-      extraSnippets: markdown ? [markdown] : [],
+      extraSnippets: [],
     };
   });
 
@@ -78,7 +64,7 @@ export function extractFirecrawlSearchEvidence(
     provider: "firecrawl",
     query,
     summary: results
-      .flatMap((result) => [result.description, ...result.extraSnippets])
+      .map((result) => result.description)
       .filter(Boolean)
       .join(" ")
       .slice(0, 600),
@@ -114,21 +100,37 @@ export function createFirecrawlWebSearchTool({
             evidenceHydrated = true;
             onEvidence?.(evidence);
           };
-          const execute = async () => {
-            const evidence = await runFirecrawlWebSearch({
-              apiKey,
-              apiUrl,
-              query: args.query,
-            });
+          const execute = async (): Promise<BottleWebSearchBatchResult> => {
+            const results = await Promise.all(
+              args.queries.map(async (query) => ({
+                query,
+                result: await runFirecrawlWebSearch({
+                  apiKey,
+                  apiUrl,
+                  query,
+                }),
+              })),
+            );
+            const evidence = results.flatMap(({ result }) =>
+              "error" in result ? [] : [result],
+            );
 
-            if (!("error" in evidence) && evidence.results.length > 0) {
-              hydrateEvidence(evidence);
+            for (const item of evidence) {
+              if (item.results.length > 0) {
+                hydrateEvidence(item);
+              }
             }
 
-            return evidence;
+            return {
+              evidence,
+              errors: results.flatMap(({ query, result }) =>
+                "error" in result ? [{ query, error: result.error }] : [],
+              ),
+            };
           };
           const result = await executeBottleWebSearchInvocation({
             budget,
+            budgetUnits: args.queries.length,
             toolName: "firecrawl_web_search",
             args,
             execute,

@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:54:00.249Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Watchpost Westland Distillery blend 42.5% whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Watchpost Westland Distillery blend 42.5% whisky",
+        "summary": "It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ... Bottling Strength: 42.5% ABV (85 Proof), emphasizing accessibility and versatility. Proof 42.5% ABV / 85 ・ new oak and PX casks blended with grain whiskey ・ ... Watchpost is a new blended whiskey from Washington's own Westland Distillery. aged for 8-years. ABV: 42.5% | Cost: $35-$40 American Blended Whiskey — 8 Year; Blend: Westland five-malt single malt (new oak + PX casks) + MGP grain whiskey (ex-bourbon finish); ABV: 42.5%; Size:",
+        "results": [
+          {
+            "title": "Watchpost Whiskey",
+            "url": "https://westlanddistillery.com/products/watchpost-whiskey?srsltid=AfmBOorxClluJVzSIIX8MkdRBSLtKvErT8ZbhbZWuguk-TW1sDMCq-Bq",
+            "domain": "westlanddistillery.com",
+            "description": "It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost 8 Year Old Blended American Whiskey",
+            "url": "https://www.blackwellswines.com/products/westland-watchpost-8-year-old-blended-american-whiskey?srsltid=AfmBOop76CA26YaQsYxV9kC1yALBx4cwLELBsxD0dXECOBS284zOKrcr",
+            "domain": "blackwellswines.com",
+            "description": "Bottling Strength: 42.5% ABV (85 Proof), emphasizing accessibility and versatility. Proof 42.5% ABV / 85 ・ new oak and PX casks blended with grain whiskey ・ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey - thewhiskeywench",
+            "url": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+            "domain": "thewhiskeywench.com",
+            "description": "Watchpost is a new blended whiskey from Washington's own Westland Distillery. aged for 8-years. ABV: 42.5% | Cost: $35-$40",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey?srsltid=AfmBOor182fjUl_xd0REV83IicXuauGDRnXMfFq4rF9UGOHFpVrmObnh",
+            "domain": "woodencork.com",
+            "description": "American Blended Whiskey — 8 Year; Blend: Westland five-malt single malt (new oak + PX casks) + MGP grain whiskey (ex-bourbon finish); ABV: 42.5%; Size: 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost 8-Year Blended Whiskey - Westland Distillery",
+            "url": "https://www.royalbatch.com/watchpost-8-year-blended-whiskey-by-westland-distillery?srsltid=AfmBOornCMEQQpgr4CxeHolLS25lNhtPzWaaoB5v6--9kecZ7NtDBWOH",
+            "domain": "royalbatch.com",
+            "description": "Watchpost 8 Year Blended Whiskey by Westland Distillery. ABV: 42.5% Age Statement: 8 years Style: Light-to-medium bodied blended whiskey",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d0c0df1d6d3ea35aa38f8d26023e7decc797ac6ce44834b63401f560a4855544",
+    "mode": "auto"
+  }
+}

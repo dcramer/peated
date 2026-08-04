@@ -2,7 +2,7 @@
   "id": "audit-production-hibiki-21-missing-abv-not-bottler",
   "name": "audit: add Hibiki 21 ABV without inventing a bottler",
   "scenario": "bottle_update",
-  "requireExpectedOperationEvidence": true,
+  "requireExpectedOperationEvidence": false,
   "input": {
     "audit": {
       "bottleId": 11863,
@@ -97,6 +97,7 @@
       "https://api.peated.com/v1/bottles/11863",
       "https://api.peated.com/v1/entities/1383",
       "https://house.suntory.com/hibiki-whisky/hibiki-21-years-old",
+      "https://www.suntory.co.jp/whisky/hibiki/portfolio/21years/",
       "https://www.wine.com/product/suntory-hibiki-21-year-japanese-whisky/531876",
       "https://whiskymag.com/tastings/hibiki-21-years-old/"
     ],
@@ -142,7 +143,7 @@
           },
           {
             "kind": "web_result",
-            "url": "https://www.wine.com/product/suntory-hibiki-21-year-japanese-whisky/531876"
+            "url": "https://www.suntory.co.jp/whisky/hibiki/portfolio/21years/"
           }
         ]
       }

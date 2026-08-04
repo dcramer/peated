@@ -1,363 +1,41 @@
-import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
+import {
+  createFirecrawlReadPageTool,
+  extractFirecrawlPageEvidence,
+  runFirecrawlReadPage,
+} from "./firecrawlReadPage";
 import {
   createFirecrawlWebSearchTool,
   extractFirecrawlSearchEvidence,
   runFirecrawlWebSearch,
 } from "./firecrawlWebSearch";
 import {
-  buildOpenAIWebSearchRequest,
-  createOpenAIWebSearchTool,
-  extractOpenAISearchEvidence,
-  runBottleWebEvidenceSearch,
-} from "./openaiWebSearch";
-import {
   buildBottleSearchEvidence,
   createBottleWebSearchBudget,
-  isThinBottleSearchEvidence,
   type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
 
-describe("bottleClassifier web search tools", () => {
-  test("extracts OpenAI search evidence from web search call sources when citations are missing", () => {
-    const evidence = extractOpenAISearchEvidence(
-      "lagavulin distillers edition 2023",
-      {
-        output: [
-          {
-            type: "web_search_call",
-            action: {
-              type: "search",
-              query: "lagavulin distillers edition 2023",
-              sources: [
-                {
-                  type: "url",
-                  url: "https://www.malts.com/en-row/products/lagavulin-distillers-edition-single-malt-scotch-whisky",
-                },
-                {
-                  type: "url",
-                  url: "https://www.whiskyadvocate.com/ratings-reviews/lagavulin-distillers-edition-2023/",
-                },
-              ],
-            },
-          },
-          {
-            type: "message",
-            content: [
-              {
-                type: "output_text",
-                text: "OpenAI searched the web and found official plus independent references.",
-                annotations: [],
-              },
-            ],
-          },
-        ],
-      },
-    );
-
-    expect(evidence).toMatchObject({
-      provider: "openai",
-      query: "lagavulin distillers edition 2023",
-      summary:
-        "OpenAI searched the web and found official plus independent references.",
-    });
-    expect(evidence.results).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          domain: "malts.com",
-          url: "https://www.malts.com/en-row/products/lagavulin-distillers-edition-single-malt-scotch-whisky",
-        }),
-        expect.objectContaining({
-          domain: "whiskyadvocate.com",
-          url: "https://www.whiskyadvocate.com/ratings-reviews/lagavulin-distillers-edition-2023/",
-        }),
-      ]),
-    );
-  });
-
-  test("prefers citation titles while deduping against OpenAI web search call sources", () => {
-    const evidence = extractOpenAISearchEvidence("wild turkey rare breed rye", {
-      output_text: "Wild Turkey confirms Rare Breed Rye is barrel proof.",
-      output: [
+describe("bottleClassifier web search tool", () => {
+  test("removes tracking parameters from collected evidence URLs", () => {
+    const evidence = buildBottleSearchEvidence({
+      provider: "firecrawl",
+      query: "example bottle",
+      summary: null,
+      results: [
         {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            query: "wild turkey rare breed rye",
-            sources: [
-              {
-                type: "url",
-                url: "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
-              },
-            ],
-          },
-        },
-        {
-          type: "message",
-          content: [
-            {
-              type: "output_text",
-              annotations: [
-                {
-                  type: "url_citation",
-                  url: "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
-                  title: "Rare Breed Rye",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-
-    expect(evidence.results).toEqual([
-      expect.objectContaining({
-        title: "Rare Breed Rye",
-        domain: "wildturkeybourbon.com",
-        description: null,
-      }),
-    ]);
-  });
-
-  test("recovers and dedupes gateway Markdown citations before summary truncation", () => {
-    const independentUrl =
-      "https://www.whiskyadvocate.com/ratings-reviews/wild-turkey-rare-breed-rye/";
-    const evidence = extractOpenAISearchEvidence("wild turkey rare breed rye", {
-      output: [
-        {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            query: "wild turkey rare breed rye",
-            sources: [
-              {
-                type: "url",
-                url: "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
-              },
-            ],
-          },
-        },
-        {
-          type: "message",
-          content: [
-            {
-              type: "output_text",
-              text: [
-                "Wild Turkey confirms Rare Breed Rye is barrel proof.",
-                "x".repeat(1250),
-                "[Rare Breed Rye](https://www.wildturkeybourbon.com/products/rare-breed-rye/)",
-                `[Whisky Advocate review](${independentUrl})`,
-              ].join(" "),
-              annotations: [],
-            },
-          ],
-        },
-      ],
-    });
-
-    expect(evidence.summary).toHaveLength(1200);
-    expect(evidence.results).toEqual([
-      expect.objectContaining({
-        title: "Rare Breed Rye",
-        domain: "wildturkeybourbon.com",
-        url: "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
-      }),
-      expect.objectContaining({
-        title: "Whisky Advocate review",
-        domain: "whiskyadvocate.com",
-        url: independentUrl,
-      }),
-    ]);
-  });
-
-  test("preserves decisive bottle facts after the first 600 summary characters", () => {
-    const decisiveFacts =
-      "Confirmed traits: age 12 years; ABV 48.0%; bottled 2022; cask 2nd fill hogshead.";
-    const evidence = extractOpenAISearchEvidence("Example whisky release", {
-      output: [
-        {
-          type: "message",
-          content: [
-            {
-              type: "output_text",
-              text: ["x".repeat(650), decisiveFacts, "y".repeat(600)].join(" "),
-              annotations: [],
-            },
-          ],
-        },
-      ],
-    });
-
-    expect(evidence.summary).toContain(decisiveFacts);
-    expect(evidence.summary).toHaveLength(1200);
-  });
-
-  test.each(["Markdown", "structured"] as const)(
-    "prioritizes %s citations over uncited search sources",
-    (citationFormat) => {
-      const citedUrl =
-        "https://www.whiskyadvocate.com/ratings-reviews/wild-turkey-rare-breed-rye/";
-      const uncitedUrls = Array.from(
-        { length: 7 },
-        (_, index) => `https://search-source-${index + 1}.example/product`,
-      );
-      const content =
-        citationFormat === "Markdown"
-          ? {
-              type: "output_text",
-              text: `An independent [Whisky Advocate review](${citedUrl}) confirms the release.`,
-              annotations: [],
-            }
-          : {
-              type: "output_text",
-              text: "An independent review confirms the release.",
-              annotations: [
-                {
-                  type: "url_citation",
-                  title: "Whisky Advocate review",
-                  url: citedUrl,
-                },
-              ],
-            };
-      const evidence = extractOpenAISearchEvidence(
-        "wild turkey rare breed rye",
-        {
-          output: [
-            {
-              type: "web_search_call",
-              action: {
-                type: "search",
-                query: "wild turkey rare breed rye",
-                sources: uncitedUrls.map((url) => ({ type: "url", url })),
-              },
-            },
-            {
-              type: "message",
-              content: [content],
-            },
-          ],
-        },
-      );
-
-      expect(evidence.results).toHaveLength(6);
-      expect(evidence.results[0]).toMatchObject({
-        title: "Whisky Advocate review",
-        url: citedUrl,
-      });
-      expect(evidence.results.map(({ url }) => url)).not.toContain(
-        uncitedUrls.at(-1),
-      );
-    },
-  );
-
-  test("does not duplicate the top-level summary into each OpenAI result description", () => {
-    const evidence = extractOpenAISearchEvidence("jura 12 official", {
-      output_text: "Jura confirms the 12-year-old core single malt bottling.",
-      output: [
-        {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            query: "jura 12 official",
-            sources: [
-              {
-                type: "url",
-                url: "https://jurawhisky.com/products/12-year-old",
-              },
-              {
-                type: "url",
-                url: "https://www.masterofmalt.com/whiskies/jura/jura-12-year-old-whisky/",
-              },
-            ],
-          },
-        },
-      ],
-    });
-
-    expect(evidence.summary).toBe(
-      "Jura confirms the 12-year-old core single malt bottling.",
-    );
-    expect(evidence.results).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
+          title: "Example Bottle",
+          url: "https://example.com/bottle?srsltid=search&utm_source=google#details",
+          domain: "example.com",
           description: null,
-        }),
-      ]),
-    );
-  });
-
-  test("automatically supplements thin OpenAI evidence within the shared budget", async () => {
-    const create = vi
-      .fn()
-      .mockResolvedValueOnce({
-        output_text:
-          "Four Roses confirms [Single Barrel Barrel Strength](https://www.fourrosesbourbon.com/bourbon/single-barrel-barrel-strength/).",
-        output: [],
-      })
-      .mockResolvedValueOnce({
-        output_text:
-          "Breaking Bourbon covers [Four Roses barrel strength private selections](https://www.breakingbourbon.com/review/four-roses-single-barrel-barrel-strength-private-selection).",
-        output: [],
-      });
-    const client = {
-      responses: {
-        create,
-      },
-    } as unknown as OpenAI;
-
-    const evidence = await runBottleWebEvidenceSearch({
-      client,
-      model: "gpt-5.4",
-      query: "four roses single barrel barrel strength",
-      budget: createBottleWebSearchBudget(2),
+          extraSnippets: [],
+        },
+      ],
     });
 
-    expect(create).toHaveBeenCalledTimes(2);
-    expect("error" in evidence).toBe(false);
-    if ("error" in evidence) return;
-    expect(evidence.results).toHaveLength(2);
-    expect(isThinBottleSearchEvidence(evidence)).toBe(false);
-    expect(evidence.summary).toContain("Four Roses confirms");
-    expect(evidence.summary).toContain("Breaking Bourbon covers");
+    expect(evidence.results[0]?.url).toBe("https://example.com/bottle");
   });
 
-  test("does not supplement gateway Markdown evidence from two domains", async () => {
-    const primaryUrls = [
-      "https://example-distillery.com/bottles/private-cask",
-      "https://whisky.example/reviews/private-cask",
-    ];
-    const supplementalUrl =
-      "https://another-review.example/bottles/private-cask";
-    const create = vi
-      .fn()
-      .mockResolvedValueOnce({
-        output_text: `Official [product details](${primaryUrls[0]}) agree with an [independent review](${primaryUrls[1]}).`,
-        output: [],
-      })
-      .mockResolvedValueOnce({
-        output_text: `Another [independent review](${supplementalUrl}) confirms the bottle.`,
-        output: [],
-      });
-    const client = {
-      responses: {
-        create,
-      },
-    } as unknown as OpenAI;
-
-    const evidence = await runBottleWebEvidenceSearch({
-      client,
-      model: "gpt-5.4",
-      query: "example distillery private cask",
-      budget: createBottleWebSearchBudget(2),
-    });
-
-    expect("error" in evidence).toBe(false);
-    if ("error" in evidence) return;
-    expect(evidence.results.map(({ url }) => url)).toEqual(primaryUrls);
-    expect(isThinBottleSearchEvidence(evidence)).toBe(false);
-  });
-
-  test("extracts Firecrawl search evidence with scraped page markdown", () => {
+  test("keeps Firecrawl search results compact until a page is selected", () => {
     const evidence = extractFirecrawlSearchEvidence(
       "example distillery private cask",
       {
@@ -380,12 +58,12 @@ describe("bottleClassifier web search tools", () => {
     expect(evidence).toMatchObject({
       provider: "firecrawl",
       query: "example distillery private cask",
-      summary: expect.stringContaining("57.1% ABV"),
+      summary: expect.stringContaining("Whisky Advocate reviews"),
       results: [
         expect.objectContaining({
           title: "Example Private Cask Review",
           domain: "whiskyadvocate.com",
-          extraSnippets: [expect.stringContaining("single cask bottling")],
+          extraSnippets: [],
         }),
       ],
     });
@@ -428,6 +106,14 @@ describe("bottleClassifier web search tools", () => {
           body: expect.stringContaining("example distillery private cask"),
         }),
       );
+      const searchBody = JSON.parse(
+        String(fetch.mock.calls[0]?.[1]?.body),
+      ) as Record<string, unknown>;
+      expect(searchBody).toEqual({
+        query: "example distillery private cask",
+        limit: 5,
+        sources: ["web"],
+      });
       expect("error" in evidence).toBe(false);
       if ("error" in evidence) return;
       expect(evidence.results).toHaveLength(1);
@@ -437,9 +123,9 @@ describe("bottleClassifier web search tools", () => {
     }
   });
 
-  test("can replay either web search tool through one execution boundary", async () => {
+  test("replays Firecrawl through the shared execution boundary", async () => {
     const evidence = buildBottleSearchEvidence({
-      provider: "openai",
+      provider: "firecrawl",
       query: "laphroaig cairdeas 2022 warehouse 1",
       summary: "Laphroaig confirms the 2022 Warehouse 1 release.",
       results: [
@@ -452,159 +138,64 @@ describe("bottleClassifier web search tools", () => {
         },
       ],
     });
-    const events: string[] = [];
-    const executeWebSearch: BottleWebSearchExecutor = vi.fn(
-      async ({ toolName }) => {
-        events.push(`execute:${toolName}`);
-        return evidence;
-      },
-    );
-    const onOpenAIEvidence = vi.fn(() => events.push("hydrate:openai"));
-    const onFirecrawlEvidence = vi.fn(() => events.push("hydrate:firecrawl"));
-    const budget = createBottleWebSearchBudget(2);
-    const openAITool = createOpenAIWebSearchTool({
-      client: {} as OpenAI,
-      model: "gpt-5.4",
-      budget,
-      executeWebSearch,
-      onEvidence: onOpenAIEvidence,
-    });
-    const firecrawlTool = createFirecrawlWebSearchTool({
-      apiKey: "firecrawl-test-key",
-      budget,
-      executeWebSearch,
-      onEvidence: onFirecrawlEvidence,
-    });
-    const args = JSON.stringify({
-      query: "laphroaig cairdeas 2022 warehouse 1",
-    });
-
-    await openAITool.invoke({} as never, args);
-    await firecrawlTool.invoke({} as never, args);
-
-    expect(executeWebSearch).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        toolName: "openai_web_search",
-        args: { query: "laphroaig cairdeas 2022 warehouse 1" },
-        execute: expect.any(Function),
-      }),
-    );
-    expect(executeWebSearch).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        toolName: "firecrawl_web_search",
-        args: { query: "laphroaig cairdeas 2022 warehouse 1" },
-        execute: expect.any(Function),
-      }),
-    );
-    expect(onOpenAIEvidence).toHaveBeenCalledOnce();
-    expect(onOpenAIEvidence).toHaveBeenCalledWith(evidence);
-    expect(onFirecrawlEvidence).toHaveBeenCalledOnce();
-    expect(onFirecrawlEvidence).toHaveBeenCalledWith(evidence);
-    expect(events).toEqual([
-      "execute:openai_web_search",
-      "hydrate:openai",
-      "execute:firecrawl_web_search",
-      "hydrate:firecrawl",
-    ]);
-  });
-
-  test.each(["openai", "firecrawl"] as const)(
-    "charges replayed %s agent-tool calls against the shared budget",
-    async (firstProvider) => {
-      const evidence = buildBottleSearchEvidence({
-        provider: firstProvider,
-        query: "laphroaig cairdeas 2022 warehouse 1",
-        summary: "Laphroaig confirms the Warehouse 1 release.",
-        results: [
-          {
-            title: "Càirdeas 2022 Warehouse 1 Whisky",
-            url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
-            domain: "laphroaig.com",
-            description: null,
-            extraSnippets: [],
-          },
-        ],
-      });
-      const executeWebSearch: BottleWebSearchExecutor = vi.fn(
-        async () => evidence,
-      );
-      const budget = createBottleWebSearchBudget(1);
-      const tools = {
-        openai: createOpenAIWebSearchTool({
-          client: {} as OpenAI,
-          model: "gpt-5.4",
-          budget,
-          executeWebSearch,
-        }),
-        firecrawl: createFirecrawlWebSearchTool({
-          apiKey: "firecrawl-test-key",
-          budget,
-          executeWebSearch,
-        }),
-      };
-      const args = JSON.stringify({
-        query: "laphroaig cairdeas 2022 warehouse 1",
-      });
-
-      await tools[firstProvider].invoke({} as never, args);
-      const secondProvider =
-        firstProvider === "openai" ? "firecrawl" : "openai";
-      const exhausted = await tools[secondProvider].invoke({} as never, args);
-
-      expect(executeWebSearch).toHaveBeenCalledOnce();
-      expect(executeWebSearch).toHaveBeenCalledWith(
-        expect.objectContaining({
-          toolName: `${firstProvider}_web_search`,
-        }),
-      );
-      expect(exhausted).toEqual({
-        error: "Search budget exhausted after 1 queries",
-      });
-    },
-  );
-
-  test("does not hydrate twice when a custom executor uses live execution", async () => {
-    const client = {
-      responses: {
-        create: vi.fn().mockResolvedValue({
-          output_text: [
-            "[Official product](https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky)",
-            "[Independent listing](https://www.whiskybase.com/whiskies/whisky/209611/laphroaig-cairdeas)",
-          ].join(" "),
-          output: [],
-        }),
-      },
-    } as unknown as OpenAI;
+    const executeWebSearch: BottleWebSearchExecutor = vi.fn(async () => ({
+      evidence: [evidence],
+      errors: [],
+    }));
     const onEvidence = vi.fn();
-    const budget = createBottleWebSearchBudget(1);
-    const tool = createOpenAIWebSearchTool({
-      client,
-      model: "gpt-5.4",
-      budget,
-      executeWebSearch: async ({ execute }) => await execute(),
+    const tool = createFirecrawlWebSearchTool({
+      apiKey: "firecrawl-test-key",
+      budget: createBottleWebSearchBudget(1),
+      executeWebSearch,
       onEvidence,
     });
 
     await tool.invoke(
       {} as never,
-      JSON.stringify({ query: "laphroaig cairdeas warehouse 1" }),
+      JSON.stringify({
+        queries: ["laphroaig cairdeas 2022 warehouse 1"],
+      }),
     );
 
+    expect(executeWebSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolName: "firecrawl_web_search",
+        args: { queries: ["laphroaig cairdeas 2022 warehouse 1"] },
+        execute: expect.any(Function),
+      }),
+    );
     expect(onEvidence).toHaveBeenCalledOnce();
-    expect(client.responses.create).toHaveBeenCalledOnce();
-    await expect(
-      tool.invoke(
-        {} as never,
-        JSON.stringify({ query: "laphroaig cairdeas warehouse 1 again" }),
-      ),
-    ).resolves.toEqual({
-      error: "Search budget exhausted after 1 queries",
-    });
+    expect(onEvidence).toHaveBeenCalledWith(evidence);
   });
 
-  test("does not double-charge Firecrawl when a custom executor delegates live", async () => {
+  test("charges Firecrawl calls against the shared search budget", async () => {
+    const evidence = buildBottleSearchEvidence({
+      provider: "firecrawl",
+      query: "laphroaig cairdeas 2022 warehouse 1",
+      summary: "Laphroaig confirms the Warehouse 1 release.",
+      results: [],
+    });
+    const executeWebSearch: BottleWebSearchExecutor = vi.fn(async () => ({
+      evidence: [evidence],
+      errors: [],
+    }));
+    const tool = createFirecrawlWebSearchTool({
+      apiKey: "firecrawl-test-key",
+      budget: createBottleWebSearchBudget(1),
+      executeWebSearch,
+    });
+    const args = JSON.stringify({
+      queries: ["laphroaig cairdeas 2022 warehouse 1"],
+    });
+
+    await tool.invoke({} as never, args);
+    await expect(tool.invoke({} as never, args)).resolves.toEqual({
+      error: "Web evidence budget exhausted after 1 units",
+    });
+    expect(executeWebSearch).toHaveBeenCalledOnce();
+  });
+
+  test("does not double-charge when a custom executor delegates live", async () => {
     const fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -623,30 +214,169 @@ describe("bottleClassifier web search tools", () => {
     vi.stubGlobal("fetch", fetch);
 
     try {
-      const budget = createBottleWebSearchBudget(1);
       const tool = createFirecrawlWebSearchTool({
         apiKey: "firecrawl-test-key",
-        budget,
+        budget: createBottleWebSearchBudget(1),
         executeWebSearch: async ({ execute }) => await execute(),
       });
 
       await tool.invoke(
         {} as never,
-        JSON.stringify({ query: "laphroaig cairdeas warehouse 1" }),
+        JSON.stringify({ queries: ["laphroaig cairdeas warehouse 1"] }),
       );
 
       expect(fetch).toHaveBeenCalledOnce();
       await expect(
         tool.invoke(
           {} as never,
-          JSON.stringify({ query: "laphroaig cairdeas warehouse 1 again" }),
+          JSON.stringify({
+            queries: ["laphroaig cairdeas warehouse 1 again"],
+          }),
         ),
       ).resolves.toEqual({
-        error: "Search budget exhausted after 1 queries",
+        error: "Web evidence budget exhausted after 1 units",
       });
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+
+  test("runs up to three focused searches in one tool turn", async () => {
+    const fetch = vi
+      .fn()
+      .mockImplementation(async (_url, init: RequestInit) => {
+        if (typeof init.body !== "string") {
+          throw new TypeError("Expected a JSON request body");
+        }
+        const body = JSON.parse(init.body) as { query: string };
+        return {
+          ok: true,
+          json: async () => ({
+            success: true,
+            data: {
+              web: [
+                {
+                  title: body.query,
+                  url: `https://example.com/${encodeURIComponent(body.query)}`,
+                  description: `Evidence for ${body.query}`,
+                },
+              ],
+            },
+          }),
+        };
+      });
+    vi.stubGlobal("fetch", fetch);
+
+    try {
+      const tool = createFirecrawlWebSearchTool({
+        apiKey: "firecrawl-test-key",
+        budget: createBottleWebSearchBudget(3),
+      });
+      const result = await tool.invoke(
+        {} as never,
+        JSON.stringify({
+          queries: ["example cask 71", "example single cask 2019"],
+        }),
+      );
+
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(result).toMatchObject({
+        evidence: [
+          { query: "example cask 71" },
+          { query: "example single cask 2019" },
+        ],
+        errors: [],
+      });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test("reads a promising Firecrawl result with a focused page excerpt", async () => {
+    const pageUrl = "https://example.com/pokeno-cask-71";
+    const fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          highlights:
+            "Cask No. 71 was distilled in 2019 and bottled at 55.8% ABV.",
+          metadata: {
+            title: "Pōkeno Cask No. 71",
+            description: "A single-cask Pōkeno release.",
+          },
+        },
+      }),
+    });
+    vi.stubGlobal("fetch", fetch);
+
+    try {
+      const evidence = await runFirecrawlReadPage({
+        apiKey: "firecrawl-test-key",
+        url: pageUrl,
+        focus: "Cask No. 71 vintage and ABV",
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        new URL("https://api.firecrawl.dev/v2/scrape"),
+        expect.objectContaining({
+          method: "POST",
+          body: expect.stringContaining(pageUrl),
+        }),
+      );
+      const scrapeBody = JSON.parse(String(fetch.mock.calls[0]?.[1]?.body)) as {
+        formats: Array<{ type: string; query: string }>;
+      };
+      expect(scrapeBody.formats).toEqual([
+        {
+          type: "highlights",
+          query: "Cask No. 71 vintage and ABV",
+        },
+      ]);
+      expect(evidence).toMatchObject({
+        provider: "firecrawl",
+        query: "Cask No. 71 vintage and ABV",
+        summary: expect.stringContaining("distilled in 2019"),
+        results: [expect.objectContaining({ url: pageUrl })],
+      });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test("replays and hydrates a Firecrawl page read", async () => {
+    const pageUrl = "https://example.com/release";
+    const evidence = extractFirecrawlPageEvidence(pageUrl, "exact edition", {
+      success: true,
+      data: {
+        markdown: "The exact marketed edition is Release No. 2.",
+        metadata: { title: "Release No. 2" },
+      },
+    });
+    const executeWebSearch: BottleWebSearchExecutor = vi.fn(
+      async () => evidence,
+    );
+    const onEvidence = vi.fn();
+    const tool = createFirecrawlReadPageTool({
+      apiKey: "firecrawl-test-key",
+      budget: createBottleWebSearchBudget(1),
+      executeWebSearch,
+      onEvidence,
+    });
+
+    await tool.invoke(
+      {} as never,
+      JSON.stringify({ url: pageUrl, focus: "exact edition" }),
+    );
+
+    expect(executeWebSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolName: "firecrawl_read_page",
+        args: { url: pageUrl, focus: "exact edition" },
+        execute: expect.any(Function),
+      }),
+    );
+    expect(onEvidence).toHaveBeenCalledWith(evidence);
   });
 
   test("caps bottle search evidence payload size", () => {
@@ -660,7 +390,7 @@ describe("bottleClassifier web search tools", () => {
         url: `https://example.com/${index + 1}`,
         domain: "example.com",
         description: "z".repeat(400),
-        extraSnippets: ["a".repeat(250), "b".repeat(250)],
+        extraSnippets: ["a".repeat(1500), "b".repeat(1500)],
       })),
     });
 
@@ -671,35 +401,7 @@ describe("bottleClassifier web search tools", () => {
       expect(result.title.length).toBeLessThanOrEqual(160);
       expect((result.description ?? "").length).toBeLessThanOrEqual(220);
       expect(result.extraSnippets.length).toBeLessThanOrEqual(1);
-      expect((result.extraSnippets[0] ?? "").length).toBeLessThanOrEqual(180);
+      expect((result.extraSnippets[0] ?? "").length).toBeLessThanOrEqual(1200);
     }
-  });
-
-  test("requests OpenAI web search sources in the response payload", () => {
-    const request = buildOpenAIWebSearchRequest({
-      model: "openai/gpt-5.6-luna",
-      reasoningEffort: "high",
-      query: "lagavulin distillers edition 2023",
-      instructions: "Search the web.",
-    });
-
-    expect(request).toEqual(
-      expect.objectContaining({
-        include: ["web_search_call.action.sources"],
-        reasoning: { effort: "high" },
-      }),
-    );
-  });
-
-  test("keeps custom OpenAI-compatible web search requests stable", () => {
-    const request = buildOpenAIWebSearchRequest({
-      model: "custom-model",
-      reasoningEffort: "high",
-      query: "lagavulin distillers edition 2023",
-      instructions: "Search the web.",
-    });
-
-    expect(request).toMatchObject({ temperature: 0 });
-    expect(request).not.toHaveProperty("reasoning");
   });
 });

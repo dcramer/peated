@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T22:39:35.668Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Four Roses Single Barrel Barrel Strength official bourbon single barrel cask strength"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses Single Barrel Barrel Strength official bourbon single barrel cask strength",
+        "summary": "This new lineup features three new 100-proof bourbons—OBSF, OESK, and OESO—alongside the classic. The collection is priced at $49.99 per bottle ... Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected ・ 100 Proof / Aged 7 - 9 Years. Cinnamon and Stave ・ vanilla & maple ... includes 35% Rye ABV: 56.8% being minty, spicy, fruity, and robust. it punches harder than any \"real rye\" whiskey. Finish: Strong and striking. ... 124.2 Proof! It's thick, rich and intense with red ripe cherries, roasted peanuts, brown sugar and a continuously indulgent caramel $149.99 Sale",
+        "results": [
+          {
+            "title": "Four Roses Single Barrel Collection, 2025",
+            "url": "https://www.bourbonguy.com/blog/2025/1/15/four-roses-single-barrel-collection-2025",
+            "domain": "bourbonguy.com",
+            "description": "This new lineup features three new 100-proof bourbons—OBSF, OESK, and OESO—alongside the classic. The collection is priced at $49.99 per bottle ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Barrel OBSV",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "domain": "fourrosesbourbon.com",
+            "description": "Four Roses Single Barrel embodies the uniqueness of an individual barrel hand-selected ・ 100 Proof / Aged 7 - 9 Years. Cinnamon and Stave ・ vanilla & maple ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #4: Four Roses, single barrel, barrel strength, Fine Wine & Good ...",
+            "url": "https://www.reddit.com/r/bourbon/comments/1gpmru2/review_4_four_roses_single_barrel_barrel_strength/",
+            "domain": "reddit.com",
+            "description": "includes 35% Rye ABV: 56.8% being minty, spicy, fruity, and robust. it punches harder than any \"real rye\" whiskey. Finish: Strong and striking. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Single Barrel Barrel Strength Bourbon Review",
+            "url": "https://www.amongstthewhiskey.com/post/four-roses-single-barrel-barrel-strength-bourbon-review",
+            "domain": "amongstthewhiskey.com",
+            "description": "124.2 Proof! It's thick, rich and intense with red ripe cherries, roasted peanuts, brown sugar and a continuously indulgent caramel",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Distillery Single Barrel Cask Strength Bourbon Private Select",
+            "url": "https://www.westchesterwine.com/spirits/Four-Roses-Distillery-Four-Roses-Distillery-Single-Barrel-Cask-Strength-Bourbon-Private-Select-w2622890cy?srsltid=AfmBOorlgcBjj9oLX9VqyjzYsRSFO9Sv71kRuyiMv6PGVuMeXGU7xAzL",
+            "domain": "westchesterwine.com",
+            "description": "$149.99 Sale: $109.99 … 75% corn 20% rye, and 5% malted barley. Floral, oak and slight spice flavors round out this cask strength bourbon.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8fcf6b253afbc0c18a6f66957a87013e7f32fc719d776d64e9285edb24264e3d",
+    "mode": "auto"
+  }
+}

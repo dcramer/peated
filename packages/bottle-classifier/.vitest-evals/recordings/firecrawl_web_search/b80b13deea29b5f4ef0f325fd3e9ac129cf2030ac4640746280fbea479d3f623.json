@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-08-03T04:52:58.569Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"High West\" \"A Midwinter Night's Dram\" \"Act 12 Scene 9\" \"49.3%\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"High West\" \"A Midwinter Night's Dram\" \"Act 12 Scene 9\" \"49.3%\"",
+        "summary": "... Act 12, Scene 9 ... High West A Midwinter Night's Dram is back! STATE ... A Midwinter Night's Dram High West Distillery Act 12 Scene 3 SAVE $2.30 MARLBORO 49.3% ALC ... Pouring A Midwinter Night's Dram tonight — High West's blend of straight rye whiskeys finished in port barrels, bottled at 49.3% out of Park ...",
+        "results": [
+          {
+            "title": "Another recent pour from Park City, Utah's High West Distillery ...",
+            "url": "https://www.instagram.com/p/DSfOM-3DdHE/",
+            "domain": "instagram.com",
+            "description": "... Act 12, Scene 9 ... High West A Midwinter Night's Dram is back! STATE ... A Midwinter Night's Dram High West Distillery Act 12 Scene 3 SAVE $2.30 MARLBORO 49.3% ALC ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "A Midwinter Night's Dram Act 13 Scene 14. Smash or Pass? #whiskey ...",
+            "url": "https://www.instagram.com/p/DSNJJh_kf_I/",
+            "domain": "instagram.com",
+            "description": "Pouring A Midwinter Night's Dram tonight — High West's blend of straight rye whiskeys finished in port barrels, bottled at 49.3% out of Park ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b80b13deea29b5f4ef0f325fd3e9ac129cf2030ac4640746280fbea479d3f623",
+    "mode": "auto"
+  }
+}

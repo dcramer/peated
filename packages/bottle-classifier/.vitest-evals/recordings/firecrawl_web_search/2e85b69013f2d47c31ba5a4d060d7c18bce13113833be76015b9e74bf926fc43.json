@@ -1,0 +1,22 @@
+{
+  "writtenAt": "2026-08-03T22:44:40.628Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Compass Box\" \"Hedonism²\" \"49%\" \"648 bottles\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Compass Box\" \"Hedonism²\" \"49%\" \"648 bottles\"",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2e85b69013f2d47c31ba5a4d060d7c18bce13113833be76015b9e74bf926fc43",
+    "mode": "auto"
+  }
+}

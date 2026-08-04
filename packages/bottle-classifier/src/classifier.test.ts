@@ -99,7 +99,7 @@ const supportiveWebEvidenceConfidenceBasis = {
     "Reliable non-origin web evidence supports the proposed bottle identity.",
   ],
   unresolvedRisks: [],
-  toolsUsed: ["openai_web_search"],
+  toolsUsed: ["firecrawl_web_search"],
   webEvidence: "supportive",
 } as const satisfies NonNullable<
   BottleClassifierAgentDecisionInput["confidenceBasis"]
@@ -978,7 +978,7 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("uses Firecrawl web search instead of OpenAI web search when configured", async () => {
+  test("exposes Firecrawl search and page reading when configured", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: {} as OpenAI,
@@ -1001,10 +1001,10 @@ describe("createBottleClassifier", () => {
     const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
 
     expect(toolNames).toContain("firecrawl_web_search");
-    expect(toolNames).not.toContain("openai_web_search");
+    expect(toolNames).toContain("firecrawl_read_page");
   });
 
-  test("uses OpenAI web search as the no-Firecrawl fallback", async () => {
+  test("does not expose a web-search substitute without Firecrawl", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: {} as OpenAI,
@@ -1025,11 +1025,11 @@ describe("createBottleClassifier", () => {
 
     const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
 
-    expect(toolNames).toContain("openai_web_search");
     expect(toolNames).not.toContain("firecrawl_web_search");
+    expect(toolNames).not.toContain("firecrawl_read_page");
   });
 
-  test("rebuilds search artifacts from OpenAI Agents tool output", async () => {
+  test("rebuilds search artifacts from batched Firecrawl tool output", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: {} as OpenAI,
@@ -1048,7 +1048,7 @@ describe("createBottleClassifier", () => {
       },
     );
     const webSearchEvidence = {
-      provider: "openai",
+      provider: "firecrawl",
       query: "Ardbeg Uigeadail official",
       summary: "Official producer evidence for Ardbeg Uigeadail.",
       results: [
@@ -1077,8 +1077,11 @@ describe("createBottleClassifier", () => {
           type: "tool_call_output_item",
           rawItem: {
             type: "function_call_result",
-            name: "openai_web_search",
-            output: JSON.stringify(webSearchEvidence),
+            name: "firecrawl_web_search",
+            output: JSON.stringify({
+              evidence: [webSearchEvidence],
+              errors: [],
+            }),
           },
         },
       ],
@@ -1291,7 +1294,7 @@ describe("createBottleClassifier", () => {
           confidenceBasis: {
             positiveEvidence: ["The local candidate matches."],
             unresolvedRisks: [],
-            toolsUsed: ["initial_local_candidates", "openai_web_search"],
+            toolsUsed: ["initial_local_candidates", "firecrawl_web_search"],
             webEvidence: "supportive",
           },
           matchedBottleId: 11,
@@ -1813,7 +1816,7 @@ describe("createBottleClassifier", () => {
               "A non-origin source corroborates the exact bottle name.",
             ],
             unresolvedRisks: [],
-            toolsUsed: ["openai_web_search"],
+            toolsUsed: ["firecrawl_web_search"],
             webEvidence: "supportive",
           },
           matchedBottleId: null,
@@ -1911,7 +1914,7 @@ describe("createBottleClassifier", () => {
                 note: "The corroborating result may be copied retailer text.",
               },
             ],
-            toolsUsed: ["openai_web_search"],
+            toolsUsed: ["firecrawl_web_search"],
             webEvidence: "weak",
           },
           matchedBottleId: null,
@@ -2067,218 +2070,54 @@ describe("createBottleClassifier", () => {
   });
 
   test.each([
-    {
-      provider: "OpenAI",
-      toolName: "openai_web_search" as const,
-      firecrawlApiKey: undefined,
-    },
-    {
-      provider: "Firecrawl",
-      toolName: "firecrawl_web_search" as const,
-      firecrawlApiKey: "firecrawl-test-key",
-    },
-  ])(
-    "replays and observes $provider preloaded web evidence within the shared budget",
-    async ({ toolName, firecrawlApiKey }) => {
-      const extractedIdentity: BottleExtractedDetails = {
-        brand: "Creag Isle",
-        bottler: null,
-        expression: null,
-        series: null,
-        distillery: [],
-        category: "single_malt",
-        stated_age: 12,
-        abv: null,
-        release_year: null,
-        vintage_year: null,
-        cask_strength: null,
-        single_cask: null,
-        cask_type: "oloroso",
-        cask_size: "hogshead",
-        cask_fill: "1st_fill",
-        edition: null,
-      };
-      const create = vi.fn().mockResolvedValue({
-        output_text:
-          "Distiller lists Creag Isle 12-year-old Island Single Malt Scotch Whisky as a real 12 year single malt.",
-        output: [
-          {
-            type: "web_search_call",
-            action: {
-              type: "search",
-              sources: [
-                {
-                  type: "url",
-                  url: "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
-                },
-              ],
-            },
+    { label: "without Firecrawl", firecrawlApiKey: undefined },
+    { label: "with Firecrawl", firecrawlApiKey: "firecrawl-test-key" },
+  ])("does not preload web evidence $label", async ({ firecrawlApiKey }) => {
+    const executeWebSearch = vi.fn();
+    const toolEvents: BottleClassifierToolEvent[] = [];
+    const runBottleClassifierAgent = vi.fn(
+      async ({ searchEvidence, webSearchBudget }): Promise<ReasoningResult> => {
+        expect(searchEvidence).toEqual([]);
+        expect(webSearchBudget?.tryConsume()).toBe(true);
+        return {
+          decision: {
+            action: "no_match",
+            rationale: "No safe local match.",
+            candidateBottleIds: [],
+            identityScope: "product",
+            observation: null,
+            matchedBottleId: null,
+            proposedBottle: null,
           },
-        ],
-      });
-      const replayedEvidence = {
-        ...createReliableSearchEvidence({
-          query: "Creag Isle 12 year old single malt",
-          summary:
-            "Distiller lists Creag Isle 12-year-old Island Single Malt Scotch Whisky as a real 12 year single malt.",
-        }),
-        provider: firecrawlApiKey
-          ? ("firecrawl" as const)
-          : ("openai" as const),
-      };
-      const executeWebSearch: NonNullable<
-        CreateBottleClassifierOptions["executeWebSearch"]
-      > = vi.fn(async ({ args }) => ({
-        ...replayedEvidence,
-        query: args.query,
-      }));
-      const toolEvents: BottleClassifierToolEvent[] = [];
-      const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
-      const runBottleClassifierAgent = vi.fn(
-        async ({
-          searchEvidence,
-          webSearchBudget,
-        }): Promise<ReasoningResult> => {
-          expect(webSearchBudget?.tryConsume()).toBe(false);
-          if (searchEvidence?.length) {
-            return {
-              decision: {
-                action: "create_bottle",
-                rationale:
-                  "Web evidence confirms Creag Isle 12-year-old Island Single Malt as a standalone bottle.",
-                candidateBottleIds: [],
-                identityScope: "product",
-                observation: null,
-                confidenceBasis: {
-                  ...supportiveWebEvidenceConfidenceBasis,
-                  toolsUsed: [toolName],
-                },
-                matchedBottleId: null,
-                proposedBottle: {
-                  name: "12-year-old Island Single Malt",
-                  series: null,
-                  category: "single_malt",
-                  edition: null,
-                  statedAge: 12,
-                  caskStrength: null,
-                  singleCask: null,
-                  caskType: null,
-                  caskSize: null,
-                  caskFill: null,
-                  abv: null,
-                  vintageYear: null,
-                  releaseYear: null,
-                  brand: {
-                    id: null,
-                    name: "Creag Isle",
-                  },
-                  distillers: [],
-                  bottler: null,
-                },
-              },
-              artifacts: {
-                extractedIdentity,
-                searchEvidence,
-                candidates: [],
-                resolvedEntities: [],
-              },
-            };
-          }
-
-          return {
-            decision: {
-              action: "no_match",
-              rationale:
-                "No safe local match, and creation was not allowed without web confirmation.",
-              candidateBottleIds: [],
-              identityScope: "product",
-              observation: null,
-              matchedBottleId: null,
-              proposedBottle: null,
-            },
-            artifacts: {
-              extractedIdentity,
-              searchEvidence: [],
-              candidates: [],
-              resolvedEntities: [],
-            },
-          };
-        },
-      );
-      const { classifier } = createTestClassifier({
-        client: {
-          responses: {
-            create,
+          artifacts: {
+            extractedIdentity: null,
+            searchEvidence: [],
+            candidates: [],
+            resolvedEntities: [],
           },
-        } as unknown as OpenAI,
-        extractedIdentity,
-        maxSearchQueries: 1,
-        firecrawlApiKey,
-        searchBottles,
-        runBottleClassifierAgent,
-        executeWebSearch,
-        observeToolEvent: (event) => toolEvents.push(event),
-      });
+        };
+      },
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      maxSearchQueries: 1,
+      firecrawlApiKey,
+      runBottleClassifierAgent,
+      executeWebSearch,
+      observeToolEvent: (event) => toolEvents.push(event),
+    });
 
-      const result = await classifier.classifyBottleReference({
-        reference: {
-          name: "Creag Isle 12-year-old Island Single Malt Scotch Whisky",
-          url: "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
-        },
-      });
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Example Single Malt Whisky" },
+    });
 
-      expect(create).not.toHaveBeenCalled();
-      expect(executeWebSearch).toHaveBeenCalledOnce();
-      expect(executeWebSearch).toHaveBeenCalledWith({
-        toolName,
-        args: { query: "Creag Isle 12 year old single malt" },
-        execute: expect.any(Function),
-      });
-      expect(toolEvents).toHaveLength(2);
-      expect(toolEvents[0]).toMatchObject({
-        type: "tool_call",
-        phase: "preload",
-        name: toolName,
-        arguments: { query: "Creag Isle 12 year old single malt" },
-      });
-      expect(toolEvents[1]).toMatchObject({
-        type: "tool_result",
-        phase: "preload",
-        name: toolName,
-        toolCallId:
-          toolEvents[0]?.type === "tool_call" ? toolEvents[0].id : undefined,
-        result: replayedEvidence,
-      });
-      expect(searchBottles).toHaveBeenCalledTimes(2);
-      expect(searchBottles).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          query: "Creag Isle 12 year old single malt",
-        }),
-      );
-      expect(runBottleClassifierAgent).toHaveBeenCalledTimes(1);
-      expect(runBottleClassifierAgent).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          investigationHint: expect.stringContaining("before reasoning"),
-          searchEvidence: expect.arrayContaining([
-            expect.objectContaining({
-              query: "Creag Isle 12 year old single malt",
-            }),
-          ]),
-        }),
-      );
-      expect(result.status).toBe("classified");
-      if (result.status !== "classified") return;
-      expect(result.decision).toMatchObject({
-        action: "create_bottle",
-        proposedBottle: {
-          brand: {
-            name: "Creag Isle",
-          },
-          name: "12-year-old Island Single Malt",
-        },
-      });
-    },
-  );
+    expect(executeWebSearch).not.toHaveBeenCalled();
+    expect(toolEvents).toEqual([]);
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") return;
+    expect(result.decision.action).toBe("no_match");
+  });
 
   test("does not investigate an otherwise sparse reference solely from optional cask metadata", async () => {
     const extractedIdentity: BottleExtractedDetails = {
@@ -2361,106 +2200,6 @@ describe("createBottleClassifier", () => {
         searchEvidence: [],
       }),
     );
-  });
-
-  test("does not retry no_match solely because evidence is from a known review domain", async () => {
-    const extractedIdentity: BottleExtractedDetails = {
-      brand: "Creag Isle",
-      bottler: null,
-      expression: null,
-      series: null,
-      distillery: [],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      edition: null,
-    };
-    const searchEvidence = [
-      createReliableSearchEvidence({
-        query: "Creag Isle 12 year old single malt",
-        summary:
-          "Creag Isle 12 Year Island Single Malt is a 12 year old single malt Scotch whisky.",
-      }),
-    ];
-    const create = vi.fn().mockResolvedValue({
-      output_text:
-        "Creag Isle 12-year-old Island Single Malt is a 12 year old single malt Scotch whisky.",
-      output: [
-        {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            sources: [
-              {
-                type: "url",
-                url: "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
-              },
-            ],
-          },
-        },
-      ],
-    });
-    const runBottleClassifierAgent = vi.fn(
-      async (): Promise<ReasoningResult> => ({
-        decision: {
-          action: "no_match",
-          rationale: "No safe local match.",
-          candidateBottleIds: [],
-          identityScope: "product",
-          observation: null,
-          matchedBottleId: null,
-          proposedBottle: null,
-        },
-        artifacts: {
-          extractedIdentity,
-          searchEvidence,
-          candidates: [],
-          resolvedEntities: [],
-        },
-      }),
-    );
-    const { classifier } = createTestClassifier({
-      client: {
-        responses: {
-          create,
-        },
-      } as unknown as OpenAI,
-      extractedIdentity,
-      maxSearchQueries: 1,
-      runBottleClassifierAgent,
-    });
-
-    const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "Creag Isle 12-year-old Island Single Malt Scotch Whisky",
-        url: "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
-      },
-      initialCandidates: [],
-    });
-
-    expect(runBottleClassifierAgent).toHaveBeenCalledTimes(1);
-    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        investigationHint: expect.stringContaining("before reasoning"),
-        searchEvidence: expect.arrayContaining([
-          expect.objectContaining({
-            query: "Creag Isle 12 year old single malt",
-          }),
-        ]),
-      }),
-    );
-    expect(result.status).toBe("classified");
-    if (result.status !== "classified") return;
-    expect(result.decision).toMatchObject({
-      action: "no_match",
-    });
   });
 
   test("reports metadata for one native reference reasoning call", async () => {
@@ -3485,7 +3224,7 @@ describe("createBottleClassifier", () => {
                 note: "A broader sibling omits the age statement.",
               },
             ],
-            toolsUsed: ["openai_web_search"],
+            toolsUsed: ["firecrawl_web_search"],
             webEvidence: "supportive",
           },
           matchedBottleId: 16913,

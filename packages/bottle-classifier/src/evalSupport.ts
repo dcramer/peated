@@ -15,10 +15,10 @@ import {
 
 const evalOpenAIConfig = resolveOpenAICompatibleConfig(process.env);
 
-export const evalClassifierModel = evalOpenAIConfig.model;
+export const evalClassifierModel = evalOpenAIConfig.bottleClassifierModel;
 export const evalClassifierReasoningEffort = resolveOpenAIReasoningEffort(
   evalClassifierModel,
-  evalOpenAIConfig.reasoningEffort,
+  evalOpenAIConfig.bottleClassifierReasoningEffort,
 );
 export const evalImageExtractionModel = evalOpenAIConfig.imageExtractionModel;
 export const evalImageExtractionReasoningEffort = resolveOpenAIReasoningEffort(

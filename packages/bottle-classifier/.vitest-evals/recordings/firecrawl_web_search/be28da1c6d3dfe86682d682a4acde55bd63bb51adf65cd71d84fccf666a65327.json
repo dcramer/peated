@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T04:47:37.719Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Heaven's Door Bootleg Series Volume III bourbon exact ABV release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Heaven's Door Bootleg Series Volume III bourbon exact ABV release",
+        "summary": "Bootleg Vol. III (2021) from Heaven's Door features a cask strength 13-year Kentucky Bourbon finished in Spanish wine barrels. 750ml for $699.99. Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. proof of 121.2, (631) 473-6588 This 13 year old bourbon is 121.2 proof and $545 MSRP. Heaven's Door “Bootleg Volume 3”. 120 proof, 13 year aged bourbon finished in Spanish Orange Dessert wine barrels. At a little over $500, The Bootleg Series Volume V release: an 18-year-old straight bourbon whiskey finished in Spanish vermouth rouge casks.",
+        "results": [
+          {
+            "title": "The Bootleg Series | Heaven's Door Whiskey",
+            "url": "https://www.heavensdoor.com/bootleg-series",
+            "domain": "heavensdoor.com",
+            "description": "Bootleg Vol. III (2021) from Heaven's Door features a cask strength 13-year Kentucky Bourbon finished in Spanish wine barrels.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heaven's Door The Bootleg Series Volume 3 - Markay's Wine & Spirits",
+            "url": "https://markaysliquors.com/shop/product/heavens-door-the-bootleg-series-volume-3/614b93f13107887d31a02ba1?option-id=448701fcd722e75d9f696ebfe2aa4312bf3d595a91c2d828847c144b0cca4d8d&srsltid=AfmBOoryzFyvuAf6S80sNIOYqEKDIOy4-P3s9yS_hQznzJCHrRJmSb5M",
+            "domain": "markaysliquors.com",
+            "description": "750ml for $699.99. Bootleg Volume III, features a 13-year-old Kentucky bourbon finished in Vino de Naranja Casks. proof of 121.2, (631) 473-6588",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heaven's Door Bootleg Volume 3 Bourbon Review | Whiskey Quickie",
+            "url": "https://www.youtube.com/watch?v=ojFEqvT_F3E",
+            "domain": "youtube.com",
+            "description": "This 13 year old bourbon is 121.2 proof and $545 MSRP.",
+            "extraSnippets": []
+          },
+          {
+            "title": "My first review! Heaven's Door Bootleg Volume 3 : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/vfifyt/my_first_review_heavens_door_bootleg_volume_3/",
+            "domain": "reddit.com",
+            "description": "Heaven's Door “Bootleg Volume 3”. 120 proof, 13 year aged bourbon finished in Spanish Orange Dessert wine barrels. At a little over $500,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heavens Door Bootleg Vol. V 2023 Release Bourbon",
+            "url": "https://www.empirewine.com/liquor/heavens-door-bootleg-vol-v-2023-release-bourbon-h59557/?srsltid=AfmBOoq4oYy8TKYSxVfEWhCg1W3UqxQNeMng5mUVQamTxpMEqtpfq2Sy",
+            "domain": "empirewine.com",
+            "description": "The Bootleg Series Volume V release: an 18-year-old straight bourbon whiskey finished in Spanish vermouth rouge casks.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "be28da1c6d3dfe86682d682a4acde55bd63bb51adf65cd71d84fccf666a65327",
+    "mode": "auto"
+  }
+}

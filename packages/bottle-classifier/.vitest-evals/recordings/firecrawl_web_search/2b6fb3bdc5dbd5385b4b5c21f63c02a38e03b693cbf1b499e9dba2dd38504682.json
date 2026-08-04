@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T04:46:14.807Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Four Roses Limited Edition Small Batch 2017 official 57.2% ages"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses Limited Edition Small Batch 2017 official 57.2% ages",
+        "summary": "54% ABV. A blend of 20% 15-year-old OESK, 40% 13-year-old OESK and 12-year-old OESV bourbons. Fruity and soft with notes of vanilla, caramel, ... Smells like classic, well aged Four Roses. Taste: All of the same from the nose. Lots of lush caramel and other oak derived sweets up front ... 109 Proof / Aged 13 & 19 years … 108.2 Proof year-old OBSK and a 16-year-old OESK. Proof / Aged Minimum 12-19 Years. This release will also feature a 15-year- ... The 2017 recipe combination: OBSV at 13 years (high-rye, delicate fruit and cream yeast), OBSK at 16 years (high-rye, spicy full-bodied yeast), ...",
+        "results": [
+          {
+            "title": "Four Roses 2017 Limited Edition Small Batch Bourbon",
+            "url": "https://www.bourbonguy.com/blog/2017/9/26/four-roses-2017-limited-edition-small-batch-bourbon",
+            "domain": "bourbonguy.com",
+            "description": "54% ABV. A blend of 20% 15-year-old OESK, 40% 13-year-old OESK and 12-year-old OESV bourbons. Fruity and soft with notes of vanilla, caramel, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #250: Four Roses Limited Edition Small Batch 2017 : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/7s1z6f/review_250_four_roses_limited_edition_small_batch/",
+            "domain": "reddit.com",
+            "description": "Smells like classic, well aged Four Roses. Taste: All of the same from the nose. Lots of lush caramel and other oak derived sweets up front ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Limited Edition Four Roses Barrels Light Up Your Palate",
+            "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+            "domain": "fourrosesbourbon.com",
+            "description": "109 Proof / Aged 13 & 19 years … 108.2 Proof year-old OBSK and a 16-year-old OESK. Proof / Aged Minimum 12-19 Years. This release will also feature a 15-year- ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Limited Edition Small Batch 2017",
+            "url": "https://woodencork.com/products/four-roses-limited-edition-small-batch-2017?srsltid=AfmBOoqZGFme2rEDSxFNDgqLVnpuRpbsFHnT--wbcxev2ucIn80SLL68",
+            "domain": "woodencork.com",
+            "description": "The 2017 recipe combination: OBSV at 13 years (high-rye, delicate fruit and cream yeast), OBSK at 16 years (high-rye, spicy full-bodied yeast), ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: Four Roses Limited Edition Small Batch Bourbon 2017 Edition",
+            "url": "https://www.drinkhacker.com/2017/10/20/review-four-roses-limited-edition-small-batch-bourbon-2017-edition/?srsltid=AfmBOordrrtSVHp1dAtm3mQXDHb8Ua99UCXreod634XBEBaz9OlIlJK0",
+            "domain": "drinkhacker.com",
+            "description": "For 2017, the whiskey is composed of a 15-year-old Bourbon from Four Roses' OESK recipe, a 13-year-old OESK, and a 12-year-old OESV.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2b6fb3bdc5dbd5385b4b5c21f63c02a38e03b693cbf1b499e9dba2dd38504682",
+    "mode": "auto"
+  }
+}

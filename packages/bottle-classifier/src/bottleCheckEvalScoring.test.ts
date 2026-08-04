@@ -539,6 +539,13 @@ describe("Bottle-check eval scoring", () => {
       grounded: true,
     },
     {
+      name: "Google organic search tracking",
+      expectedUrl: "https://example.com/products/example-bottle",
+      actualUrl:
+        "https://example.com/products/example-bottle?srsltid=AfmBOoqExample",
+      grounded: true,
+    },
+    {
       name: "the same terminal slug on a different path",
       expectedUrl: "https://www.example.com/products/example-bottle",
       actualUrl: "https://example.com/archive/example-bottle",

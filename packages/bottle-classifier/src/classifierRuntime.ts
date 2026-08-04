@@ -97,12 +97,7 @@ import {
   type BottleClassifierRunMetadata,
 } from "./runtime/runMetadata";
 import type { BottleWebSearchExecutor } from "./tools";
-import {
-  createBottleWebSearchBudget,
-  executeBottleWebSearchInvocation,
-  runBottleWebEvidenceSearch,
-  runFirecrawlWebSearch,
-} from "./tools";
+import { createBottleWebSearchBudget } from "./tools";
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 export { createBottleContextLoader } from "./runtime/bottleCheckContext";
 export type {
@@ -114,8 +109,6 @@ const CLASSIFIER_MAX_TURNS = 8;
 // Parallel tool calls are disabled, and the agent needs one final-output turn.
 const CLASSIFIER_MAX_PROPOSED_OPERATIONS = CLASSIFIER_MAX_TURNS - 1;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
-const WHISKY_REFERENCE_PATTERN =
-  /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisk(?:e)?y)\b/i;
 
 export type BottleClassifierAgentResult = {
   decision: BottleClassifierAgentDecisionInput;
@@ -479,90 +472,6 @@ function mergeCandidateLists(
   return sortedBottleCandidates(candidatesByKey);
 }
 
-function hasUsableOpenAIResponsesClient(client: OpenAI): boolean {
-  return (
-    typeof (client as { responses?: { create?: unknown } }).responses
-      ?.create === "function"
-  );
-}
-
-function addSearchPart(
-  parts: string[],
-  value: string | number | null | undefined,
-) {
-  const normalizedValue =
-    typeof value === "number" ? String(value) : value?.trim();
-  if (!normalizedValue) {
-    return;
-  }
-
-  if (
-    !parts.some((part) => part.toLowerCase() === normalizedValue.toLowerCase())
-  ) {
-    parts.push(normalizedValue);
-  }
-}
-
-function referenceHasVariantSearchWording(referenceName: string): boolean {
-  return /\b(?:finish(?:ed)?|barrel[-\s]+finished|double[-\s]+oaked|oak|sherry|port|wine|rum|cognac|mizunara|bodega|distillers?\s+edition)\b/i.test(
-    referenceName,
-  );
-}
-
-function extractedIdentityLooksWebInvestigable({
-  reference,
-  extractedIdentity,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleExtractedDetails | null;
-}): boolean {
-  if (!extractedIdentity?.brand) {
-    return false;
-  }
-
-  return (
-    WHISKY_REFERENCE_PATTERN.test(reference.name) ||
-    extractedIdentity.category !== null ||
-    extractedIdentity.expression !== null ||
-    extractedIdentity.series !== null ||
-    Boolean(extractedIdentity.distillery?.length) ||
-    extractedIdentity.stated_age !== null ||
-    extractedIdentity.abv !== null ||
-    extractedIdentity.edition !== null ||
-    extractedIdentity.cask_strength === true ||
-    extractedIdentity.single_cask === true ||
-    extractedIdentity.vintage_year !== null ||
-    extractedIdentity.release_year !== null
-  );
-}
-
-function shouldPreloadWebInvestigation({
-  candidateExpansion,
-  artifacts,
-  options,
-  reference,
-}: {
-  candidateExpansion: CandidateExpansionMode;
-  artifacts: BottleClassificationArtifacts;
-  options: CreateBottleClassifierOptions;
-  reference: BottleReference;
-}): boolean {
-  return (
-    candidateExpansion === "open" &&
-    artifacts.searchEvidence.length === 0 &&
-    reference.currentBottleId == null &&
-    !artifacts.candidates.some((candidate) =>
-      candidate.source.includes("exact"),
-    ) &&
-    options.maxSearchQueries > 0 &&
-    hasUsableOpenAIResponsesClient(options.client) &&
-    extractedIdentityLooksWebInvestigable({
-      reference,
-      extractedIdentity: artifacts.extractedIdentity,
-    })
-  );
-}
-
 function addEntitySearchRequest(
   requests: SearchEntitiesArgs[],
   seen: Set<string>,
@@ -703,151 +612,6 @@ function hasContainedSourceEntityCandidate({
         sourceQueries.has(`${requestedType}:${query.toLowerCase()}`),
       ),
   );
-}
-
-function buildNoMatchInvestigationQuery({
-  reference,
-  extractedIdentity,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleExtractedDetails | null;
-}): string | null {
-  const parts: string[] = [];
-
-  addSearchPart(parts, extractedIdentity?.brand);
-  addSearchPart(parts, extractedIdentity?.series);
-  addSearchPart(parts, extractedIdentity?.expression);
-  if (extractedIdentity?.stated_age != null) {
-    addSearchPart(parts, `${extractedIdentity.stated_age} year old`);
-  }
-  addSearchPart(parts, extractedIdentity?.category?.replace(/_/g, " "));
-  for (const distillery of extractedIdentity?.distillery ?? []) {
-    addSearchPart(parts, distillery);
-  }
-  addSearchPart(parts, extractedIdentity?.bottler);
-  addSearchPart(parts, extractedIdentity?.edition);
-  if (extractedIdentity?.cask_strength) {
-    addSearchPart(parts, "cask strength");
-  }
-  if (extractedIdentity?.single_cask) {
-    addSearchPart(parts, "single cask");
-  }
-  if (extractedIdentity?.abv != null) {
-    addSearchPart(parts, `${extractedIdentity.abv}% ABV`);
-  }
-  if (extractedIdentity?.vintage_year != null) {
-    addSearchPart(parts, `${extractedIdentity.vintage_year} vintage`);
-  }
-  if (extractedIdentity?.release_year != null) {
-    addSearchPart(parts, `${extractedIdentity.release_year} release`);
-  }
-
-  if (referenceHasVariantSearchWording(reference.name)) {
-    addSearchPart(parts, reference.name);
-  }
-
-  if (!parts.length) {
-    addSearchPart(parts, reference.name);
-  }
-
-  return parts.length ? parts.join(" ") : null;
-}
-
-async function collectNoMatchWebInvestigationArtifacts({
-  options,
-  reference,
-  artifacts,
-  webSearchBudget,
-}: {
-  options: CreateBottleClassifierOptions;
-  reference: BottleReference;
-  artifacts: BottleClassificationArtifacts;
-  webSearchBudget?: BottleWebSearchBudget;
-}): Promise<BottleClassificationArtifacts> {
-  const query = buildNoMatchInvestigationQuery({
-    reference,
-    extractedIdentity: artifacts.extractedIdentity,
-  });
-
-  if (!query) {
-    return artifacts;
-  }
-
-  const searchEvidence = [...artifacts.searchEvidence];
-  const budget =
-    webSearchBudget ?? createBottleWebSearchBudget(options.maxSearchQueries);
-  const firecrawlApiKey = options.firecrawlApiKey;
-  const toolName = firecrawlApiKey
-    ? "firecrawl_web_search"
-    : "openai_web_search";
-  const toolCallId = `preload_web_search:${randomUUID()}`;
-  options.observeToolEvent?.({
-    type: "tool_call",
-    phase: "preload",
-    id: toolCallId,
-    name: toolName,
-    arguments: { query },
-  });
-  const result = firecrawlApiKey
-    ? await executeBottleWebSearchInvocation({
-        budget,
-        toolName,
-        args: { query },
-        execute: async () =>
-          await runFirecrawlWebSearch({
-            apiKey: firecrawlApiKey,
-            apiUrl: options.firecrawlApiUrl ?? undefined,
-            query,
-          }),
-        executeWebSearch: options.executeWebSearch,
-      })
-    : await runBottleWebEvidenceSearch({
-        client: options.client,
-        model: options.model,
-        reasoningEffort: options.reasoningEffort,
-        query,
-        budget,
-        executeWebSearch: options.executeWebSearch,
-      });
-  options.observeToolEvent?.({
-    type: "tool_result",
-    phase: "preload",
-    toolCallId,
-    name: toolName,
-    result,
-  });
-
-  if ("error" in result || result.results.length === 0) {
-    return buildBottleClassificationArtifacts({
-      ...artifacts,
-      searchEvidence,
-    });
-  }
-
-  mergeSearchEvidence(searchEvidence, result);
-
-  let candidates = artifacts.candidates;
-  const dataSource = getBottleClassifierDataSource(options);
-  try {
-    candidates = mergeCandidateLists(
-      candidates,
-      await dataSource.searchBottles({
-        ...buildDefaultBottleSearchInput({
-          reference,
-          extractedIdentity: artifacts.extractedIdentity,
-        }),
-        query,
-      }),
-    );
-  } catch {
-    candidates = artifacts.candidates;
-  }
-
-  return buildBottleClassificationArtifacts({
-    ...artifacts,
-    candidates,
-    searchEvidence,
-  });
 }
 
 export async function finalizeBottleClassifierAgentResult({
@@ -1386,22 +1150,6 @@ export function createBottleClassifier(
     const webSearchBudget = createBottleWebSearchBudget(
       options.maxSearchQueries,
     );
-
-    if (
-      shouldPreloadWebInvestigation({
-        candidateExpansion,
-        artifacts: preparedArtifacts,
-        options,
-        reference,
-      })
-    ) {
-      preparedArtifacts = await collectNoMatchWebInvestigationArtifacts({
-        options,
-        reference,
-        artifacts: preparedArtifacts,
-        webSearchBudget,
-      });
-    }
 
     return {
       artifacts: preparedArtifacts,

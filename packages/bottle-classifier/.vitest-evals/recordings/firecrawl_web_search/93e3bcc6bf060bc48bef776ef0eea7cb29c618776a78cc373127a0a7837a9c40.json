@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T05:06:50.197Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Shibui Grain Select\" whisky single grain"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Shibui Grain Select\" whisky single grain",
+        "summary": "Japan - A light, and subtly sweet whisky made with 95% wheat & 5% malted barley. Indulge in the harmonious blend of Scottish and Japanese grain whiskies with the Shibui Grain Select World Whisky. This light-bodied and fruitful spirit is ... Shibui Grain Select is a whisky produced in Japan where the company blends in a Scottish Lowland single grain whisky together with a Japanese distillate.",
+        "results": [
+          {
+            "title": "Shibui Grain Select Whisky",
+            "url": "https://www.totalwine.com/spirits/japanese-whisky/shibui-grain-select-whisky/p/231071750?srsltid=AfmBOor9b8PPlS2O6aVx2nlhz89mIRuIJ-nynob12gE6-nvqtBFsGF_1",
+            "domain": "totalwine.com",
+            "description": "Japan - A light, and subtly sweet whisky made with 95% wheat & 5% malted barley.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Grain Select World Whisky",
+            "url": "https://www.shibuiwhisky.com/grain-select",
+            "domain": "shibuiwhisky.com",
+            "description": "Indulge in the harmonious blend of Scottish and Japanese grain whiskies with the Shibui Grain Select World Whisky. This light-bodied and fruitful spirit is ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Grain Select Whiskey?",
+            "url": "https://www.reddit.com/r/ATXwhisky/comments/tymg15/shibui_grain_select_whiskey/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "139 – Shibui Grain Select, Shibui Pure Malt, Shibui 10 Year Old Virgin White Oak, Shibui 15 ...",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/xz64zj/review_136_139_shibui_grain_select_shibui_pure/?tl=da",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Grain Select",
+            "url": "https://distiller.com/spirits/shibui-grain-select",
+            "domain": "distiller.com",
+            "description": "Shibui Grain Select is a whisky produced in Japan where the company blends in a Scottish Lowland single grain whisky together with a Japanese distillate.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "93e3bcc6bf060bc48bef776ef0eea7cb29c618776a78cc373127a0a7837a9c40",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T22:44:58.379Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "High West \"A Midwinter Night's Dram\" \"Act 10 Scene 4\" 49.3% 2022"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "High West \"A Midwinter Night's Dram\" \"Act 10 Scene 4\" 49.3% 2022",
+        "summary": "The bottle I'm reviewing comes from the Act 10 Scene 4 batch and is also my first bottle of A Midwinter Night's Dram. 2022 also saw pricing for ... A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol. So with that said, let's get to tasting A Midwinter Night's Dram Act 10 (Scene 4). This is the brand's Rendezvous Rye Whiskey, finished in ruby and tawny ... A Midwinter Night's Dram Review: Act 10, Scene 4 ; Distillery: High West ; Proof: 98.6 ; Age: No Age Statement ; Mashbill: ; Price: $150 (MSRP) | ... Hig",
+        "results": [
+          {
+            "title": "A Midwinter Night's Dram (Act 10, Scene 4) Scoresheet & ...",
+            "url": "https://thewhiskeyramble.com/2023/12/01/a-midwinter-nights-dram-act-10-scene-4-scoresheet-review/",
+            "domain": "thewhiskeyramble.com",
+            "description": "The bottle I'm reviewing comes from the Act 10 Scene 4 batch and is also my first bottle of A Midwinter Night's Dram. 2022 also saw pricing for ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review 003 - A Midwinter Night's Dram, Act 10, Scene 4",
+            "url": "https://www.reddit.com/r/bourbon/comments/195819a/review_003_a_midwinter_nights_dram_act_10_scene_4/",
+            "domain": "reddit.com",
+            "description": "A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol.",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram Act 10 Rye Whiskey",
+            "url": "https://www.pastemagazine.com/drink/whiskey/high-west-midwinter-nights-dram-act-10-review-encore-price-tasting-rye",
+            "domain": "pastemagazine.com",
+            "description": "So with that said, let's get to tasting A Midwinter Night's Dram Act 10 (Scene 4). This is the brand's Rendezvous Rye Whiskey, finished in ruby and tawny ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "A Midwinter Night's Dram Review (Act 10, Scene 4)",
+            "url": "https://bourboninspector.com/midwinter-nights-dram-review-act-10-scene-4/",
+            "domain": "bourboninspector.com",
+            "description": "A Midwinter Night's Dram Review: Act 10, Scene 4 ; Distillery: High West ; Proof: 98.6 ; Age: No Age Statement ; Mashbill: ; Price: $150 (MSRP) | ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West Distillery (Page 1) - Brands",
+            "url": "https://www.spiritradar.com/whisky-db/brands/high-west-distillery/",
+            "domain": "spiritradar.com",
+            "description": "High West A Midwinter Nights Dram Act 10 Scene 4 French Oak Port Barrel Finish 49.3% 750ml ... High West A Midwinter Night's Dram Act 12 Scene 1 49.3% 750ml.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "224e43431da79486ad6497d38de2d559ab46371cf76c7aa135fc331c4902939e",
+    "mode": "auto"
+  }
+}

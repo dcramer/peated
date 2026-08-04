@@ -8,7 +8,10 @@ describe("createWhiskyLabelExtractor", () => {
     const create = vi.fn().mockResolvedValue({
       id: "resp_123",
       model: "gpt-5.6-luna-2026-07-15",
-      output_text: JSON.stringify({ result: null }),
+      output_text: JSON.stringify({
+        result: null,
+        rawLabelText: "Pokeno CASK NO 71 BOTTLE NO 100",
+      }),
       service_tier: "default",
       usage: {
         input_tokens: 1_000,
@@ -38,6 +41,7 @@ describe("createWhiskyLabelExtractor", () => {
     );
     expect(extraction).toMatchObject({
       result: null,
+      rawLabelText: "Pokeno CASK NO 71 BOTTLE NO 100",
       response: {
         id: "resp_123",
         model: "gpt-5.6-luna-2026-07-15",

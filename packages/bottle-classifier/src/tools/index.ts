@@ -1,14 +1,15 @@
 export {
+  createFirecrawlReadPageTool,
+  extractFirecrawlPageEvidence,
+  runFirecrawlReadPage,
+} from "./firecrawlReadPage";
+export {
   createFirecrawlWebSearchTool,
   extractFirecrawlSearchEvidence,
   runFirecrawlWebSearch,
 } from "./firecrawlWebSearch";
 export { createGetBottleContextTool } from "./getBottleContext";
 export { createGetEntityContextTool } from "./getEntityContext";
-export {
-  createOpenAIWebSearchTool,
-  runBottleWebEvidenceSearch,
-} from "./openaiWebSearch";
 export {
   createBottleProposalCollector,
   createBottleProposalTools,
@@ -22,5 +23,7 @@ export {
 export {
   createBottleWebSearchBudget,
   executeBottleWebSearchInvocation,
+  type BottleWebSearchBatchResult,
   type BottleWebSearchExecutor,
+  type BottleWebToolResult,
 } from "./sharedWebSearch";

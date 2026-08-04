@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T23:03:34.875Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Hibiki 21 Year Old official 43% blended Japanese whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Hibiki 21 Year Old official 43% blended Japanese whisky",
+        "summary": "Hibiki 21 Year is a Blended Japanese Whisky, made up of both malt and grain whiskies. Nose: Confit plums, stewed raisins. Gentle caramel ... Hibiki 21 Year Old Blended Whisky, Japan. Avg Price (ex-tax) $965 / 750ml. each aged for a minimum of 21 years. Shop $798.97 $1,065.29 / 1000ml ex. Hibiki 21 Year Old is a premium blended whisky from the Japanese distillery Suntory. includes notes of honey, orange peel, and dark chocolate. This Hibiki 21-Year-Old Blended Whisky combines single malts from Yamazaki and Hakushu distilleries with ultra-aged grain whiskies from the Chita distillery, ... On the",
+        "results": [
+          {
+            "title": "Review #147 – Hibiki 21 Year Old : r/worldwhisky",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/z43agv/review_147_hibiki_21_year_old/",
+            "domain": "reddit.com",
+            "description": "Hibiki 21 Year is a Blended Japanese Whisky, made up of both malt and grain whiskies. Nose: Confit plums, stewed raisins. Gentle caramel ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Hibiki 21 Year Old Blended Whisky",
+            "url": "https://www.wine-searcher.com/find/hibiki+21+old+blend+whisky+japan?srsltid=AfmBOopsVyP_5-10zolxD7BXR1MOuYgRWFyEuXDrO0MVusMOAOVp66zP",
+            "domain": "wine-searcher.com",
+            "description": "Hibiki 21 Year Old Blended Whisky, Japan. Avg Price (ex-tax) $965 / 750ml. each aged for a minimum of 21 years. Shop $798.97 $1,065.29 / 1000ml ex.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Suntory Hibiki 21 Year Old Blended Whisky 700ML",
+            "url": "https://internationalwineshop.com/shop/product/suntory-hibiki-21-year-old-blended-whisky/56c28e1b756275139d6b0200?option-id=c02975f4fecb524bb23568f2a92cfcf706859a654ba8b305ffce295d8f954df3&srsltid=AfmBOorzzwtiWCEx2Ga7IufxNQjwgCpAOn-5B2t58k4tx4ix2LremjJZ",
+            "domain": "internationalwineshop.com",
+            "description": "Hibiki 21 Year Old is a premium blended whisky from the Japanese distillery Suntory. includes notes of honey, orange peel, and dark chocolate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki 21 Year Old Blended Whisky - 700ml",
+            "url": "https://www.japanesedrams.com/products/hibiki-21-year-old-blended-whisky?srsltid=AfmBOoqPoWD1vzupGOlXvPIrGccb2HN-Ukv1113PjKAoSik9h5q-xkrd",
+            "domain": "japanesedrams.com",
+            "description": "This Hibiki 21-Year-Old Blended Whisky combines single malts from Yamazaki and Hakushu distilleries with ultra-aged grain whiskies from the Chita distillery, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki 21 Year Japanese Whisky",
+            "url": "https://www.totalwine.com/spirits/japanese-whisky/hibiki-21-year-japanese-whisky/p/145162750?srsltid=AfmBOooINSIpRZCZYtq1HNu-zkH3nkzWB63BfnIcv3p10fqJ0zWoUQSF",
+            "domain": "totalwine.com",
+            "description": "On the palate, oak, dark cherry and sweet caramel notes, buttery with a wisp of smoke and some wood spice. The finish is long, with a hint of smoke. Rich ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "bc1052343aee035c2a92baafb70c6832a356c6d2134e082afa33e1cd49cd0ac9",
+    "mode": "auto"
+  }
+}

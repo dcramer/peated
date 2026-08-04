@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T04:46:23.507Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.bourbonguy.com/blog/2017/9/26/four-roses-2017-limited-edition-small-batch-bourbon",
+    "focus": "Confirm that the 2017 Limited Edition Small Batch release is 54% ABV and its stated age, identifying it as distinct annual release."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm that the 2017 Limited Edition Small Batch release is 54% ABV and its stated age, identifying it as distinct annual release.",
+    "summary": "Purchase Info: $130 at Four Roses Gift Center, Lawrenceburg, KY.\n\nDetails: 54% ABV. A blend of 20% 15-year-old OESK, 40% 13-year-old OESK and 12-year-old OESV bourbons ( [percentages reported by Sipp'n Corn](http://sippncorn.blogspot.com/2017/09/sippn-corn-bourbon-heritage-month.html), but confirmed by Master Distiller Brent Elliot).",
+    "results": [
+      {
+        "title": "Four Roses 2017 Limited Edition Small Batch Bourbon — BOURBON GUY",
+        "url": "https://www.bourbonguy.com/blog/2017/9/26/four-roses-2017-limited-edition-small-batch-bourbon",
+        "domain": "bourbonguy.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5f82fa778e2199a4040388259ea8b6298fbb1a588584aa47187277f6a26411fb",
+    "mode": "auto"
+  }
+}

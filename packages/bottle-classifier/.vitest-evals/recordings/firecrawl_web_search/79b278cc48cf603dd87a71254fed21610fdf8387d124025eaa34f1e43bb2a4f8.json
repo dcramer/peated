@@ -1,0 +1,27 @@
+{
+  "writtenAt": "2026-08-03T01:18:02.258Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "site:compassboxwhisky.com \"Spice Tree Extravaganza\" 46% 2016"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "site:compassboxwhisky.com \"Spice Tree Extravaganza\" 46% 2016",
+    "summary": "Spice Tree Extravaganza. Blended Malt Scotch Whisky. Stranger & Stranger ... Whisky De Table 2016 · Whisky De Table 2016. Blended Malt ... [Skip to content](https://www.compassboxwhisky.com/pages/whiskies#MainContent) #### Choose your location Continue to our UK websiteContinue to United States Shop Europe: [France](https://www.whisky.fr/les-marques/compass-box.html) [Germany](https://whic.de/compass-box) Shop United States: [U.S.A](https://buycompassbox.myshopify.com/) ## Your cart is empty [Continue shopping](https://www.compassboxwhisky.com/collections) Have an account? [Log in](https://www",
+    "results": [
+      {
+        "title": "Whiskies",
+        "url": "https://www.compassboxwhisky.com/pages/whiskies",
+        "domain": "compassboxwhisky.com",
+        "description": "Spice Tree Extravaganza. Blended Malt Scotch Whisky. Stranger & Stranger ... Whisky De Table 2016 · Whisky De Table 2016. Blended Malt ...",
+        "extraSnippets": [
+          "[Skip to content](https://www.compassboxwhisky.com/pages/whiskies#MainContent) #### Choose your location Continue to our UK websiteContinue to United States Shop Europe: [France](h"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "79b278cc48cf603dd87a71254fed21610fdf8387d124025eaa34f1e43bb2a4f8",
+    "mode": "auto"
+  }
+}

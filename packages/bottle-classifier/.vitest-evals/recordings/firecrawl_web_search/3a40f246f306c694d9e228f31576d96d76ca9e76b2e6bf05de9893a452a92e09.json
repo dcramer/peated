@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:45:39.819Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Ardbeg Traigh Bhan 19 Year Old official editions batch ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg Traigh Bhan 19 Year Old official editions batch ABV",
+        "summary": "a rare small batch Islay single malt Scotch whisky. Years Old ABV 46.2% Colour Bright Gold. Dark Chocolate. Peppermint. # Comments Section\n**Age:** 19 Years\n\n[Ardbeg Traigh Bhan 19 Year Batch 1 - #48](https://www.reddit.com/r/Scotch/comments/logpo7/ardbeg_traigh_bhan_19_year_batch_1_48/)\n\n[**Ardbeg Traigh Bhan 19 Year Batch 1 - #48**](https://www.reddit.com/r/Scotch/comments/logpo7/ardbeg_traigh_bhan_19_year_batch_1_48/) **ABV:** 46.2%\n\n**Age:** 19 Year The epitome of an aged Ardbeg – matured in American oak and Oloroso sherry casks – Ardbeg Traigh Bhan 19 Years Old achieves the impossible bal",
+        "results": [
+          {
+            "title": "Ardbeg 19 Years Old Traigh Bhan Batch 6",
+            "url": "https://www.ardbeg.com/en-int/products/ardbeg-19-years-old-traigh-bhan-batch-6",
+            "domain": "ardbeg.com",
+            "description": "a rare small batch Islay single malt Scotch whisky. Years Old ABV 46.2% Colour Bright Gold. Dark Chocolate. Peppermint.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #2320 - Ardbeg 19 Years Old Traigh Bhan (Batch 4)",
+            "url": "https://www.reddit.com/r/Scotch/comments/1f6isil/review_2320_ardbeg_19_years_old_traigh_bhan_batch/",
+            "domain": "reddit.com",
+            "description": "# Comments Section\n**Age:** 19 Years\n\n[Ardbeg Traigh Bhan 19 Year Batch 1 - #48](https://www.reddit.com/r/Scotch/comments/logpo7/ardbeg_traigh_bhan_19_year_batch_1_48/)\n\n[**Ardbeg Traigh Bhan 19 Year Batch 1 - #48**](htt",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 Year Batch 1 - Scotch & Sheen",
+            "url": "https://scotchandsheen.com/2019/12/06/ardbeg-traigh-bhan-19-year/",
+            "domain": "scotchandsheen.com",
+            "description": "**ABV:** 46.2%\n\n**Age:** 19 Year",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Bhan 19 Year Single Malt Scotch Whisky",
+            "url": "https://www.sfwtc.com/spirit/7777-ardbeg-bhan-19-year-single-malt-scotch-whisky/7777-224355-750/?srsltid=AfmBOor7Ziu5WpEaA-0TGdcmZ3yeMIHq55dBH0lN4K_gKc4flpvnkBxB",
+            "domain": "sfwtc.com",
+            "description": "The epitome of an aged Ardbeg – matured in American oak and Oloroso sherry casks – Ardbeg Traigh Bhan 19 Years Old achieves the impossible balance.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 Year Single Malt Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/ardbeg-traigh-bhan-19-year-single-malt-scotch-whisky/p/220109750?srsltid=AfmBOor1HwtyPg5yN2QMGfkZENU57LTbHFn8o_SqB8ZVsppgszyVgG7C",
+            "domain": "totalwine.com",
+            "description": "Whisky $329.99. Produced in small batches to be released each year, Matured in American oak and Oloroso sherry casks.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3a40f246f306c694d9e228f31576d96d76ca9e76b2e6bf05de9893a452a92e09",
+    "mode": "auto"
+  }
+}

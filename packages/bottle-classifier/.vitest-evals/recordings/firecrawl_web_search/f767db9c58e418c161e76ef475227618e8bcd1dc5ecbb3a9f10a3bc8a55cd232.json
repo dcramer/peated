@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T05:14:39.436Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Pōkeno Pedro Ximenez Single Cask 55.8% 2019 4 year 009/340"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno Pedro Ximenez Single Cask 55.8% 2019 4 year 009/340",
+        "summary": "Pedro Ximenez Casks. It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; 56.5% abv ... Pōkeno Single Cask 4-year-old - 55.8% ABV - Cask Strength - Pedro Ximenez Cask - Tasting Notes by dcramer No information is available for this page. This is the 700 ml from 2019. The strength of this whisky is 55.8 % Vol. Average rating is 87.75 points. it is a single cask aged for only 3 ... Pedro Ximénez sherry … this 51% single malt brings out the malty, nutty flavour of Knockando with sweet fruity notes.",
+        "results": [
+          {
+            "title": "Pōkeno Whisky",
+            "url": "https://jvsimports.com/pokeno-whisky/",
+            "domain": "jvsimports.com",
+            "description": "Pedro Ximenez Casks. It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; 56.5% abv ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pōkeno Single Cask 4-year-old - Tasting Notes by dcramer - Peated",
+            "url": "https://peated.com/tastings/436",
+            "domain": "peated.com",
+            "description": "Pōkeno Single Cask 4-year-old - 55.8% ABV - Cask Strength - Pedro Ximenez Cask - Tasting Notes by dcramer",
+            "extraSnippets": []
+          },
+          {
+            "title": "https://starward.com.au/products/pedro-ximenez-cas...",
+            "url": "https://starward.com.au/products/pedro-ximenez-cask?srsltid=AfmBOoqrBd-JjD-Wln5lejAT_KWjxTmcV3Q5ITwpSFwA72udPd1YHmPB",
+            "domain": "starward.com.au",
+            "description": "No information is available for this page.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pōkeno 2019 - Ratings and reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019",
+            "domain": "whiskybase.com",
+            "description": "This is the 700 ml from 2019. The strength of this whisky is 55.8 % Vol. Average rating is 87.75 points. it is a single cask aged for only 3 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Knockando First Fill Pedro Ximénez Sherry Hogshead Finish 16 Years ...",
+            "url": "https://www.youtube.com/watch?v=WtiCma4o1U4",
+            "domain": "youtube.com",
+            "description": "Pedro Ximénez sherry … this 51% single malt brings out the malty, nutty flavour of Knockando with sweet fruity notes.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f767db9c58e418c161e76ef475227618e8bcd1dc5ecbb3a9f10a3bc8a55cd232",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T22:55:31.797Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://blog.kysupplyco.com/woodford-reserve-doubled-double-oaked-2022-distillery-series-release-price-review-proof/",
+    "focus": "Confirm whether this is marketed as the 2022 Double Double Oaked release, its ABV, and whether 2022 is release year or distillation vintage."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm whether this is marketed as the 2022 Double Double Oaked release, its ABV, and whether 2022 is release year or distillation vintage.",
+    "summary": "January 18, 2022\n\nWoodford Reserve Doubled Double Oaked Limited Edition “Distillery Series” Release\n\nThe latestWoodford Reserve Doubled Double Oaked 2022 “Distillery Series” release if officially set to drop in February, 2022!\n\nTheWoodford Reserve Doubled Double Oaked 2022 “Distillery Series” release officially drops February 1st, and will only be available at the Woodford Reserve Distillery.\n\nThis Double Double Oaked release is bottled at 90.4 proof and is non-chill filtered. The90.4-proofing is the equivalent of 45.2% ABV.",
+    "results": [
+      {
+        "title": "Woodford Reserve Doubled Double Oaked 2022 “Distillery Series” Release, Price, Review, and Proof - KY Supply Co",
+        "url": "https://blog.kysupplyco.com/woodford-reserve-doubled-double-oaked-2022-distillery-series-release-price-review-proof/",
+        "domain": "blog.kysupplyco.com",
+        "description": "Get all of the details on Woodford Reserve Doubled Double Oaked 2022 “Distillery Series” release, price, review, and proof!",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "1026d6fbd2e5794d6dc89b5f10eace04ec28134d1b2df6acd230fe9c85783126",
+    "mode": "auto"
+  }
+}

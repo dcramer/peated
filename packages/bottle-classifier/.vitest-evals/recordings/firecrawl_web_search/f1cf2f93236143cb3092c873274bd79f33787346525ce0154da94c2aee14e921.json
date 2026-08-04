@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:46:15.319Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Watchpost\" whiskey 42.5% Westland Distillery"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Watchpost\" whiskey 42.5% Westland Distillery",
+        "summary": "42.5% ABV (85 Proof), emphasizing accessibility and versatility. Watchpost also reflects Westland's deep connection to its home region. The whiskey was ... Bottled at 42.5% ABV, with a portion of proceeds benefiting the Washington Trails Association. Watchpost is Westland's approachable, outdoors-minded blended ... Watchpost is an American blended whiskey bottled at 42.5% ABV (85 proof). It blends Westland's signature Pacific Northwest single malt with lighter, smoother ... Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV: 42.5% | Cost: $35-$40. I really en",
+        "results": [
+          {
+            "title": "Westland Watchpost 8 Year Old Blended American Whiskey",
+            "url": "https://www.blackwellswines.com/products/westland-watchpost-8-year-old-blended-american-whiskey?srsltid=AfmBOoqIfKYG6ePdiDorckktd0RzzykQEeuJQY_EIhDhKf3Ni1Tti2Uy",
+            "domain": "blackwellswines.com",
+            "description": "42.5% ABV (85 Proof), emphasizing accessibility and versatility. Watchpost also reflects Westland's deep connection to its home region. The whiskey was ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey?srsltid=AfmBOorUpnqGpdAH8mxdEDFP_DEigReDw19aIYg2C8VqJ7O0cZdMTrft",
+            "domain": "woodencork.com",
+            "description": "Bottled at 42.5% ABV, with a portion of proceeds benefiting the Washington Trails Association. Watchpost is Westland's approachable, outdoors-minded blended ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey",
+            "url": "https://thecampwest.com/watchpost-whiskey/",
+            "domain": "thecampwest.com",
+            "description": "Watchpost is an American blended whiskey bottled at 42.5% ABV (85 proof). It blends Westland's signature Pacific Northwest single malt with lighter, smoother ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey - thewhiskeywench",
+            "url": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+            "domain": "thewhiskeywench.com",
+            "description": "Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV: 42.5% | Cost: $35-$40. I really enjoyed this both ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "N.V. Westland Distillery 8 Year Old Watchpost American ...",
+            "url": "https://www.cellartracker.com/wine.asp?iWine=5577281",
+            "domain": "cellartracker.com",
+            "description": "N.V. Westland Distillery 8 Year Old Watchpost American Blended Whiskey, 42.5%. Grain. USA; American. (Add Drinking Window).",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f1cf2f93236143cb3092c873274bd79f33787346525ce0154da94c2aee14e921",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:49:06.377Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"The Macallan Classic Cut 2021 Edition\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Macallan Classic Cut 2021 Edition\"",
+        "summary": "The Macallan Classic Cut 2021 Edition Highland Single Malt Scotch Whisky. Vendor The Macallan. Regular price $84.99. # Classic Cut\n### [The Macallan Classic Cut - 2022 Edition](https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut-2022-edition)\n![the macallan classic cut 2021](https://brand-assets.edrington.com/transform/90b5b841-5c1f-4004-9dd7-ba49a869d7ca/MAC-2021-Classic-Cut-Secondary-Card-4X5-WEB-initial?quality=100&io=transform%3Afit%2Cwidth%3A599%2Cheight%3A799)![](https://brand-assets.edrington.com/transform/bc00b66f-c5f1-40af-9220-99398fbb22a0/MAC-2021-Classic-Cut-Sta",
+        "results": [
+          {
+            "title": "The Macallan Classic Cut 2021 Edition Highland Single ...",
+            "url": "https://craftshack.com/products/the-macallan-classic-cut-2021-edition-highland-single-malt-scotch-whisky?srsltid=AfmBOorP1lMGjI543mOh-TNEE-Xu9gTsqHSsTjU72uJCMl0Yfl_y8ns_",
+            "domain": "craftshack.com",
+            "description": "The Macallan Classic Cut 2021 Edition Highland Single Malt Scotch Whisky. Vendor The Macallan. Regular price $84.99.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Classic Cut Whisky",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut",
+            "domain": "themacallan.com",
+            "description": "# Classic Cut\n### [The Macallan Classic Cut - 2022 Edition](https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut-2022-edition)\n![the macallan classic cut 2021](https://brand-assets.edrington.com/transf",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Classic Cut 2021 – An unforgettable whisky journey",
+            "url": "https://whiskystack.com/en/blogs/anmeldelser/macallan-classic-cut-2021-en-uforglemmelig-whiskyrejse?srsltid=AfmBOor3L_uMFcIypv4k4PWZCOgac_0NGQikq4poYaIakkmUFcopLiVj",
+            "domain": "whiskystack.com",
+            "description": "The Macallan Classic Cut 2021 Edition is the latest addition to The Macallan's iconic releases – and what a release it is!",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut Limited 2021 Edition Highland ...",
+            "url": "https://caskcartel.com/products/the-macallan-classic-cut-limited-2021-edition-highland-single-malt-scotch-whiskey",
+            "domain": "caskcartel.com",
+            "description": "The Macallan Classic Cut 2021 Edition - The Macallan Classic Cut 2021 Edition, this Highland Single Malt Scotch Whisky is matured in an exquisite ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Classic Cut 2021. Video 119",
+            "url": "https://www.youtube.com/watch?v=qnyUcHHmBi8",
+            "domain": "youtube.com",
+            "description": "... the Macallan Classic Cut 2021 edition for $159. And the reason was, I thought at the time that I was getting a pretty good price (well maybe ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "798871c938854e1341a1159af99250e480a7ed12d6b579c7675bb2d13f1c2b71",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "writtenAt": "2026-08-03T05:03:00.144Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"SMWS 95.71\" \"Prepare for Winter\" 57.0% 14 years 2007"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"SMWS 95.71\" \"Prepare for Winter\" 57.0% 14 years 2007",
+        "summary": "Authroisk SMWS 95.71 (14 year - Oct. 2007) \"Prepare for winter\" - After 11 years in an ex-bourbon hogshead, transferred into a 1st-fill ...",
+        "results": [
+          {
+            "title": "So, what are you drinking now? (page 640) - Whisky ...",
+            "url": "https://www.connosr.com/so-what-are-you-drinking-now-whisky-discussion-128:640",
+            "domain": "connosr.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b5043b9ee95f421193bce074e4df2960acff82d51384cdef4feb06d2d554a94a",
+    "mode": "auto"
+  }
+}

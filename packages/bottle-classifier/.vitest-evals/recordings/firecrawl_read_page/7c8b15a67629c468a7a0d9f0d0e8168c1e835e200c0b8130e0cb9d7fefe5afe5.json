@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T05:14:06.725Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky?srsltid=AfmBOopkmiOzrX4VXmwy9FAdy6r_Agwy1LdM5DYumUKTE5vFuguSDde5",
+    "focus": "Confirm Càirdeas Warehouse 1 is the 2022 release and its exact 52.2% ABV."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm Càirdeas Warehouse 1 is the 2022 release and its exact 52.2% ABV.",
+    "summary": "Càirdeas 2022 Warehouse 1 Whisky\n\nWhile traditional distilling, careful cask selection and patience deliver renowned flavours.​ ​ Laphroaig® Càirdeas 2022 is bottled at a fixed strength of 52.2% for a memorable experience to share with Friends.",
+    "results": [
+      {
+        "title": "Laphroaig Cairdeas 2022 | Peaty & Smoky Whisky | Laphroaig",
+        "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky?srsltid=AfmBOopkmiOzrX4VXmwy9FAdy6r_Agwy1LdM5DYumUKTE5vFuguSDde5",
+        "domain": "laphroaig.com",
+        "description": "The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7c8b15a67629c468a7a0d9f0d0e8168c1e835e200c0b8130e0cb9d7fefe5afe5",
+    "mode": "auto"
+  }
+}

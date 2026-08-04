@@ -11,6 +11,15 @@ import {
 } from "./classifierTypes";
 
 describe("BottleClassifierAgentDecisionSchema", () => {
+  test("defines proposed Bottle names at the field boundary", () => {
+    expect(ProposedBottleSchema.shape.name.description).toContain(
+      "Stable marketed expression relative to the Brand",
+    );
+    expect(ProposedBottleSchema.shape.name.description).toContain(
+      "When no separate expression is marketed, use the source-supported product or style phrase",
+    );
+  });
+
   test("uses a flat structured-output schema at the root", () => {
     const jsonSchema = z.toJSONSchema(BottleClassifierAgentDecisionSchema) as {
       type?: string;

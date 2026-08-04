@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:56:28.605Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Macallan 18 Year Old Sherry Oak\" \"1994 Vintage\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Macallan 18 Year Old Sherry Oak\" \"1994 Vintage\"",
+        "summary": "This 1994 vintage Sherry Oak 18 Year Old opens with dried fruit, orange peel and warm spice, developing into a rich, full-bodied palate of raisin, dark ... ... Macallan 18 Year Old Sherry Oak Single Malt 1980 - Flask Fine Wine & Whisky ... The 1983 and 1994 vintage releases represent the furthest back in this ... MACALLAN 18 Year Old Sherry Oak Single Malt Scotch Whisky 1994 ... This 1994 vintage matured exclusively in oloroso sherry oak casks from Jerez ... This 1994 vintage matured exclusively in oloroso sherry oak casks from Jerez ... Macallan 18 Year Old - Sherry Oak ... Currently no price",
+        "results": [
+          {
+            "title": "Macallan 18 Year Old Sherry Oak 1994",
+            "url": "https://hedonism.co.uk/product/macallan-18-year-old-sherry-oak-1994-whisky?srsltid=AfmBOorB61OCqQw0bhjY3_h35QQi8ZT1u3j7qtT4UFDa3lMe6ZDsAHYe",
+            "domain": "hedonism.co.uk",
+            "description": "This 1994 vintage Sherry Oak 18 Year Old opens with dried fruit, orange peel and warm spice, developing into a rich, full-bodied palate of raisin, dark ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old & Rare Vintage Macallan Whisky",
+            "url": "https://flaskfinewines.com/collections/old-rare-vintage-macallan-single-malt-scotch-whisky?srsltid=AfmBOorDNBwoLWjKVz2l2_U4cP-g9OmKbjtNCS-3805GB4pGIxfQ1FV9",
+            "domain": "flaskfinewines.com",
+            "description": "... Macallan 18 Year Old Sherry Oak Single Malt 1980 - Flask Fine Wine & Whisky ... The 1983 and 1994 vintage releases represent the furthest back in this ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan 18 Year Old Sherry Oak Single Malt Scotch ...",
+            "url": "https://barrelbroker.net/product/macallan-18-year-old-sherry-oak-single-malt-scotch-whisky-1994/?srsltid=AfmBOooaaStqaAqLhdd-GcZCXxdcI6hv9RL8Q3CKpMlLjD7a5PjkU6Aq",
+            "domain": "barrelbroker.net",
+            "description": "MACALLAN 18 Year Old Sherry Oak Single Malt Scotch Whisky 1994 ... This 1994 vintage matured exclusively in oloroso sherry oak casks from Jerez ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan 18 Year Old 1994 Sherry Oak 70cl Whisky",
+            "url": "https://www.pinterest.com/pin/the-macallan-1994-18-year-old-sherry-oak--21040323248550733/",
+            "domain": "pinterest.com",
+            "description": "This 1994 vintage matured exclusively in oloroso sherry oak casks from Jerez ... Macallan 18 Year Old - Sherry Oak ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "1994 The Macallan Fine & Rare Vintage Single Malt ...",
+            "url": "https://www.wine-searcher.com/find/the+macallan+fine+rare+vintage+single+malt+scotch+whisky+speyside+highlands+scotland/1994?srsltid=AfmBOop5kOnJ0x7hRPk_5qa1sbp7WbhRWpH1VCRQMWcEhZ8kEgfKvwS6",
+            "domain": "wine-searcher.com",
+            "description": "Currently no prices for 1994 vintage ... Also from 'The Macallan' (20+) Learn more · Label of The Macallan 18 Year Old Sherry Oak Single Malt Scotch Whisky · The ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "89ab6f9ca55bc5d9be306168d02b30b6a5958d22249365b0033d35254758137b",
+    "mode": "auto"
+  }
+}

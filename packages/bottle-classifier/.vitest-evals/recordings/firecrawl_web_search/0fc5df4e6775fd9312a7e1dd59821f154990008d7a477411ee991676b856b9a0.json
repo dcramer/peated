@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T23:28:00.935Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Hibiki 21 Year Old official product 43% ABV Suntory"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Hibiki 21 Year Old official product 43% ABV Suntory",
+        "summary": "Buy Hibiki - 21 year old Suntory 100th Anniversary Edition Japanese Whisky 70cl 43% ABV Online ; Aroma: Caramel, toasted oak, and warm baking spices ; Palate: ... Hibiki 21 Year Whisky 750ML is a premium Japanese blended whisky bottled at 43% ABV (86 proof) in a 750ml bottle, combining single malts and grain whiskies ... Bottled at 86 proof (43% ABV), this highly allocated, discontinued Hibiki 21 Year Old Limited Edition is a magnificent tribute to Japan's iconic peak. Hibiki 21 Year is a Blended Japanese Whisky, made up of both malt and grain whiskies. Nose: Confit plums, stewed raisins. Gent",
+        "results": [
+          {
+            "title": "21 year old Suntory 100th Anniversary Edition Japanese Whisky 70cl 43% ...",
+            "url": "https://www.nationwideliquor.com/217978/hibiki-21-year-old-suntory-100th-anniversary-edition-japanese-whisky-70cl-43-abv",
+            "domain": "nationwideliquor.com",
+            "description": "Buy Hibiki - 21 year old Suntory 100th Anniversary Edition Japanese Whisky 70cl 43% ABV Online ; Aroma: Caramel, toasted oak, and warm baking spices ; Palate: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Suntory Hibiki 21 Year Whisky 750ML | Mizunara Oak Blend",
+            "url": "https://theliquorbarn.com/products/suntory-hibiki-21-year-whisky-750ml",
+            "domain": "theliquorbarn.com",
+            "description": "Hibiki 21 Year Whisky 750ML is a premium Japanese blended whisky bottled at 43% ABV (86 proof) in a 750ml bottle, combining single malts and grain whiskies ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki 21 Year Old Mount Fuji Limited Edition Blended Whisky",
+            "url": "https://liquoruslos.com/product/hibiki-21-year-old-mount-fuji-limited-edition-blended-whisky/",
+            "domain": "liquoruslos.com",
+            "description": "Bottled at 86 proof (43% ABV), this highly allocated, discontinued Hibiki 21 Year Old Limited Edition is a magnificent tribute to Japan's iconic peak.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #147 – Hibiki 21 Year Old : r/worldwhisky",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/z43agv/review_147_hibiki_21_year_old/",
+            "domain": "reddit.com",
+            "description": "Hibiki 21 Year is a Blended Japanese Whisky, made up of both malt and grain whiskies. Nose: Confit plums, stewed raisins. Gentle caramel ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki® Blended Japanese Whisky",
+            "url": "https://house.suntory.com/hibiki-whisky",
+            "domain": "house.suntory.com",
+            "description": "Hibiki 21 Years Old A harmonious blend of malt and grain whiskies aged over 21 years to achieve a seductive, blossoming and subtle taste.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "0fc5df4e6775fd9312a7e1dd59821f154990008d7a477411ee991676b856b9a0",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T22:29:44.685Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve \"Double Double Oaked\" official product ABV release",
+      "Woodford Reserve \"Double Double Oaked\" bourbon exact release edition ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve \"Double Double Oaked\" official product ABV release",
+        "summary": "## Double Double Oaked\nMaster Distiller # Written By: Jordan Moskal\n### Disqus is a discussion network\nPer the press release for Double Double Oaked: \"Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon for an additional two years in a second, heavily toasted, lightly charred, new oak barrel (hence the name Double Double Oaked).\" Woodford Reserve Double Double Oaked Straight Bourbon Whiskey 700ml 45.2% ABV ... Product details. Size 700ml; ABV 45.2%; Country United States; Region ... The whiskey ($50 a 375-ml.), bottled at 45.2% abv, starts off as",
+        "results": [
+          {
+            "title": "Double Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "## Double Double Oaked\nMaster Distiller",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon Review",
+            "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-double-oak-bourbon",
+            "domain": "breakingbourbon.com",
+            "description": "# Written By: Jordan Moskal\n### Disqus is a discussion network\nPer the press release for Double Double Oaked: \"Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon for an add",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Straight ...",
+            "url": "https://bevmo.com/products/256909?srsltid=AfmBOoqjvmUq9dBvcMQJjlY4CxcI4b3strwlxyxtbuvp4pykiquZNS5v",
+            "domain": "bevmo.com",
+            "description": "Woodford Reserve Double Double Oaked Straight Bourbon Whiskey 700ml 45.2% ABV ... Product details. Size 700ml; ABV 45.2%; Country United States; Region ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Unveils Double Double Oaked Bourbon –",
+            "url": "https://www.marketwatchmag.com/woodford-reserve-unveils-double-double-oaked-bourbon/",
+            "domain": "marketwatchmag.com",
+            "description": "The whiskey ($50 a 375-ml.), bottled at 45.2% abv, starts off as Woodford's ... Beyond the sweepstakes, Woodford Reserve Double Double Oaked will ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Double Double Oaked · Woodford Reserve 2025 Batch Proof 119.5. Batch Proof ... Get the latest cocktail recipes, early access to limited release products, and ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve \"Double Double Oaked\" bourbon exact release edition ABV",
+        "summary": "It's their own blend of MGP product, but the regular (Whiskey War), Double Oaked, and Double Double Oaked all work for me (probably the ... Woodford Reserve Double Double Oaked Straight Bourbon Whiskey 750ML — 45% ABV — USA Born from the storied heart of Kentucky bourbon country, this ... Woodford Reserve's limited-edition Double Double Oaked bourbon is back, available at the distillery and select Kentucky retailers. Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon for an additional two years in a second, heavily toasted, ... Finally Barrel Pro",
+        "results": [
+          {
+            "title": "Woodford Double Oaked is one of the best tasting bourbons on the planet.",
+            "url": "https://www.reddit.com/r/bourbon/comments/1mu8e6t/woodford_double_oaked_is_one_of_the_best_tasting/",
+            "domain": "reddit.com",
+            "description": "It's their own blend of MGP product, but the regular (Whiskey War), Double Oaked, and Double Double Oaked all work for me (probably the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Straight Bourbon Whiskey",
+            "url": "https://whiskyandwhiskey.com/products/woodford-reserve-double-double-oaked-straight-bourbon-whiskey?srsltid=AfmBOorXHmLFWqwFr8u6Egzo4hSBak5N6OAExv-hNTM8EdjvZ4gk8sBc",
+            "domain": "whiskyandwhiskey.com",
+            "description": "Woodford Reserve Double Double Oaked Straight Bourbon Whiskey 750ML — 45% ABV — USA Born from the storied heart of Kentucky bourbon country, this ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Double Double Oaked Returns, 70 Year Old Scotch & More ...",
+            "url": "https://whiskyadvocate.com/woodford-double-double-oaked-gordon-macphail-1948-glen-grant-70-year-whisky-whiskey",
+            "domain": "whiskyadvocate.com",
+            "description": "Woodford Reserve's limited-edition Double Double Oaked bourbon is back, available at the distillery and select Kentucky retailers.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Kentucky Straight Bourbon ...",
+            "url": "https://shop.coborns.com/store/coborns-liquor/products/64354854-woodford-double-double-oaked",
+            "domain": "shop.coborns.com",
+            "description": "Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon for an additional two years in a second, heavily toasted, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Barrel Proof Bourbon Release",
+            "url": "https://www.facebook.com/groups/889144718291853/posts/1859715021234813/",
+            "domain": "facebook.com",
+            "description": "Finally Barrel Proof is being released from Woodford Reserve The Woodford Hotel 🙌",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d087535fef507e3b07ee8b4984bd6aafbb99736829251302f9d962e54472ef68",
+    "mode": "auto"
+  }
+}

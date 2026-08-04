@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T04:59:00.151Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+    "focus": "Johnnie Walker Black Label Islay Origin exact age, ABV, blend category, and named distillery components"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Johnnie Walker Black Label Islay Origin exact age, ABV, blend category, and named distillery components",
+    "summary": null,
+    "results": [
+      {
+        "title": "Explore the Flavours of Scotland With the Johnnie Walker Black Label Origin Series",
+        "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+        "domain": "prnewswire.com",
+        "description": "/PRNewswire/ -- \"I've always been fascinated by the distinct favour profiles that distilleries from each of the four corners of Scotland offer, and what they..., /PRNewswire/ -- \"I've always been fascinated by the distinct favour profiles that distilleries from each of the four corners of Scotland offer, and what they...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "24d1bf8fc1b285c434ab2335e5efc80d1486fa93809f96c6f9bc7b6726fc3b2c",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T05:08:37.260Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://shop.klwines.com/products/details/1706166",
+    "focus": "Confirm the 2023 release's distillation year, ABV, stated age if any, and exact marketed product wording."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the 2023 release's distillation year, ABV, stated age if any, and exact marketed product wording.",
+    "summary": "2007 Lagavulin \"Distiller's Edition 2023\" Islay Single Malt Scotch Whisky (750ml) Zoom\n\nOrigin: South Shore, Islay, Scotland\n\nAlcohol Content: 43%",
+    "results": [
+      {
+        "title": "2007 Lagavulin \"Distiller's Edition 2023\" Islay Single Malt Scotch Whisky (750ml) - SKU 1706166",
+        "url": "https://shop.klwines.com/products/details/1706166",
+        "domain": "shop.klwines.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d84f7292b279c9dad712b592a4ba2e91024b4e3e2c3ecf3d6e1173f285770e6a",
+    "mode": "auto"
+  }
+}

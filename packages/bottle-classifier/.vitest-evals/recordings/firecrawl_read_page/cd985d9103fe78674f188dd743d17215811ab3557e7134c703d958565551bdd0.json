@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T04:51:08.605Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+    "focus": "Confirm the stated age, ABV, category, and marketed Bodega Cask product identity."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the stated age, ABV, category, and marketed Bodega Cask product identity.",
+    "summary": "AGED 5 YEARS\n\nBodega Cask\n\n86   Proof\n\nSmall   batch\n\nTripled   Distilled",
+    "results": [
+      {
+        "title": "Bodega Cask – The Whistler Whiskey",
+        "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cd985d9103fe78674f188dd743d17215811ab3557e7134c703d958565551bdd0",
+    "mode": "auto"
+  }
+}

@@ -55,6 +55,9 @@ export default {
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
 
   OPENAI_API_KEY: openAIConfig.apiKey,
+  BOTTLE_CLASSIFIER_MODEL: openAIConfig.bottleClassifierModel,
+  BOTTLE_CLASSIFIER_REASONING_EFFORT:
+    openAIConfig.bottleClassifierReasoningEffort,
   OPENAI_EMBEDDING_MODEL: openAIConfig.embeddingModel,
   OPENAI_HOST: openAIConfig.baseURL,
   OPENAI_IMAGE_EXTRACTION_MODEL: openAIConfig.imageExtractionModel,

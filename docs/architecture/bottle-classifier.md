@@ -188,7 +188,7 @@ Audit agent runs persist agent-loop request/token usage, cache-token detail when
 the provider supplies it, agent latency, and tool-call counts in `modelMetadata`.
 Cache coverage is reported separately so missing provider detail is not treated
 as a cache miss. Agent-loop token usage plus the stored model is the durable cost
-input; extraction and pre-agent search usage are outside that measurement. Live
+input; extraction usage is outside that measurement. Live
 evals estimate agent-loop cost from a dated standard, short-context pricing
 table and label unsupported models, unavailable usage, and missing cache detail
 explicitly. Separate web-search response tokens and tool fees, alternate
@@ -254,15 +254,16 @@ The pipeline is:
 4. Run deterministic resolvers before the agent. Today this is limited to SMWS
    code references.
 5. Resolve local brand, bottler, and distillery entities.
-6. Preload targeted web evidence when local candidates are missing or unsafe.
-7. Run one bounded classifier agent loop with local search, Entity search,
+6. Run one bounded classifier agent loop with local search, Entity search,
    focused web search, context tools, and four non-mutating proposal tools.
+   The agent decides when web evidence is needed; the runtime does not search
+   before the agent or delegate web interpretation to another model.
    Deterministic resolution, such as an SMWS code, is supplied as an identity
    anchor rather than bypassing the agent.
-8. The reference agent returns the strict authoritative decision and findings.
+7. The reference agent returns the strict authoritative decision and findings.
    Successful proposal-tool calls are collected by runtime and attached as
    `proposedOperations`; the model does not echo operations in final output.
-9. Validate and finalize the decision, then hand each collected proposal to
+8. Validate and finalize the decision, then hand each collected proposal to
    server preparation independently. A proposal tool accepts work only when its
    payload is canonical, its existing targets were inspected, its evidence was
    collected, it is not an exact duplicate, and the per-run ceiling is not
@@ -460,9 +461,14 @@ entities, and live web evidence:
 - `search_entities`: local Peated brand, distillery, and bottler entities
 - `get_bottle_context`: bounded identity context for one inspected Bottle
 - `get_entity_context`: bounded identity context for one inspected Entity
-- `firecrawl_web_search`: configured default live web evidence search with
-  scraped page excerpts
-- `openai_web_search`: no-Firecrawl fallback web evidence search
+- `firecrawl_web_search`: one to three focused live searches in one agent turn,
+  with ranked source URLs and compact relevance snippets without scraping every
+  result page
+- `firecrawl_read_page`: focused reading of one promising search result when
+  its short excerpt does not expose the identity-critical fact
+
+When Firecrawl is not configured, the agent has no web-evidence tools. The runtime
+does not silently replace it with a second model or another provider.
 
 Tool descriptions should state the tool's purpose, arguments, result, hard
 limits, and tool-specific preconditions. Keep cross-tool classifier policy in

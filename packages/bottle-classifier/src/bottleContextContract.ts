@@ -123,6 +123,7 @@ export const BottleContextLabelEvidenceSchema = z
     sourceImageId: NonEmptyTextSchema,
     model: NonEmptyTextSchema,
     extractedIdentity: BottleExtractedDetailsSchema.nullable(),
+    rawLabelText: z.string().trim().min(1).max(4000).nullable().default(null),
   })
   .strict();
 

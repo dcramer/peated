@@ -132,7 +132,7 @@ describe("server-owned Bottle audit workflows", () => {
       origin: "moderator",
       bottleId: bottle.id,
       backgroundEventKey: null,
-      model: config.OPENAI_MODEL,
+      model: config.BOTTLE_CLASSIFIER_MODEL,
       modelMetadata: {
         agentDurationMs: 840,
         usage: {

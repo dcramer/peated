@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T05:06:04.445Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"The Glenlivet Caribbean Reserve\" \"Rum Barrel Selection\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Glenlivet Caribbean Reserve\" \"Rum Barrel Selection\"",
+        "summary": "Whisky: The Glenlivet Caribbean Reserve – Rum Barrel Selection · Country/Region: Scotland/Speyside · ABV: 40% · Cask: Primary aging not stated, but ... The Glenlivet Caribbean Reserve Rum Barrel Selection (750ml). Regular price$38.99. /. Shipping calculated at checkout. Glenlivet Caribbean Reserve Rum Barrel Selection Single Malt Scotch Whisky 750ML - Lighthouse Canton ... Glenlivet Caribbean Reserve Rum Barrel Selection ... The Glenlivet Caribbean Reserve Rum Barrel Selection (750ml). $38.99. Description; Review. Scotland. The Glenlivet Caribbean Reserve Rum Barrel Selection Single Malt Whisk",
+        "results": [
+          {
+            "title": "Review #3: The Glenlivet Caribbean Reserve : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/lsma4w/review_3_the_glenlivet_caribbean_reserve/",
+            "domain": "reddit.com",
+            "description": "Whisky: The Glenlivet Caribbean Reserve – Rum Barrel Selection · Country/Region: Scotland/Speyside · ABV: 40% · Cask: Primary aging not stated, but ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Glenlivet Caribbean Reserve Rum Barrel Selection (750ml)",
+            "url": "https://www.kingswineandspirits.com/products/the-glenlivet-caribbean-reserve-rum-barrel-selection-750ml?srsltid=AfmBOooQGiT5J-XSJLEzwRKaj-DWjLoP2C28le5CBZ_gzx2WEhPwN2Cz",
+            "domain": "kingswineandspirits.com",
+            "description": "The Glenlivet Caribbean Reserve Rum Barrel Selection (750ml). Regular price$38.99. /. Shipping calculated at checkout.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Caribbean Reserve Rum Barrel Selection Single Malt ...",
+            "url": "https://www.lhcanton.com/the-glenlivet-caribbean-reserve-single-malt-scotch.html",
+            "domain": "lhcanton.com",
+            "description": "Glenlivet Caribbean Reserve Rum Barrel Selection Single Malt Scotch Whisky 750ML - Lighthouse Canton ... Glenlivet Caribbean Reserve Rum Barrel Selection ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Glenlivet Caribbean Reserve Rum Barrel Selection (750ml)",
+            "url": "https://greatbooze.com/products/the-glenlivet-caribbean-reserve-rum-barrel-selection-750ml?srsltid=AfmBOoqgddByF0wTWmoBJHRqrC-AFGV4qzpFzTRGlPaLHXqOV7SWR5k1",
+            "domain": "greatbooze.com",
+            "description": "The Glenlivet Caribbean Reserve Rum Barrel Selection (750ml). $38.99. Description; Review.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Glenlivet Caribbean Reserve Rum Barrel Selection Single ...",
+            "url": "https://chevychasewine.com/Glenlivet-Caribbean-Res-750ml-080432115763-11468/",
+            "domain": "chevychasewine.com",
+            "description": "Scotland. The Glenlivet Caribbean Reserve Rum Barrel Selection Single Malt Whiskey 750ml. $65.99. Quantity. 1, 2, 3. Add to cart. Add to list. 3 In Stock ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "75162ad86ffd06a3541d71a5ca2997e3097670dc936e481673fd0f4ee14c5e87",
+    "mode": "auto"
+  }
+}

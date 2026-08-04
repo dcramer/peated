@@ -5,6 +5,7 @@ import type {
   ProposedOperation,
 } from "./bottleCheckContract";
 import type { BottleClassificationArtifacts } from "./contract";
+import { webEvidenceUrlsMatch } from "./webEvidenceUrl";
 
 export type BottleCheckSetScore = {
   score: number;
@@ -283,10 +284,8 @@ function getBottleCheckGroundingIssues(
   }
 
   const collectedSourceFields = new Set(sourceFields);
-  const collectedWebUrls = new Set(
-    actual.artifacts.searchEvidence.flatMap(({ results }) =>
-      results.map(({ url }) => webEvidenceKey(url)),
-    ),
+  const collectedWebUrls = actual.artifacts.searchEvidence.flatMap(
+    ({ results }) => results.map(({ url }) => url),
   );
   const evidenceWasCollected = (evidenceRef: EvidenceRef) => {
     switch (evidenceRef.kind) {
@@ -297,7 +296,9 @@ function getBottleCheckGroundingIssues(
       case "entity":
         return collectedEntityIds.has(evidenceRef.entityId);
       case "web_result":
-        return collectedWebUrls.has(webEvidenceKey(evidenceRef.url));
+        return collectedWebUrls.some((url) =>
+          webEvidenceUrlsMatch(url, evidenceRef.url),
+        );
     }
   };
 
@@ -359,36 +360,12 @@ export function scoreBottleCheckSemanticOutput(
   };
 }
 
-const TRACKING_QUERY_PARAMETER_NAMES = new Set([
-  "fbclid",
-  "gclid",
-  "mc_cid",
-  "mc_eid",
-]);
-
-function webEvidenceKey(url: string): string {
-  const parsed = new URL(url);
-  const host = parsed.host.toLowerCase().replace(/^www\./, "");
-  const pathname = parsed.pathname.replace(/\/+$/, "") || "/";
-  for (const name of Array.from(parsed.searchParams.keys())) {
-    const normalizedName = name.toLowerCase();
-    if (
-      normalizedName.startsWith("utm_") ||
-      TRACKING_QUERY_PARAMETER_NAMES.has(normalizedName)
-    ) {
-      parsed.searchParams.delete(name);
-    }
-  }
-  parsed.searchParams.sort();
-  return `${host}${pathname}${parsed.search}`;
-}
-
 function requiredEvidenceMatches(
   expected: EvidenceRef,
   actual: EvidenceRef,
 ): boolean {
   if (expected.kind === "web_result" && actual.kind === "web_result") {
-    return webEvidenceKey(expected.url) === webEvidenceKey(actual.url);
+    return webEvidenceUrlsMatch(expected.url, actual.url);
   }
 
   return stableKey(expected) === stableKey(actual);

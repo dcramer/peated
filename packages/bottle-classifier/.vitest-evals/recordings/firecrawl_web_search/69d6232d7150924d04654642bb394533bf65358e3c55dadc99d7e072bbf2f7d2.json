@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-08-03T01:40:45.677Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Pokeno Small Batch Single Cask 2019 4 Year Old 55.8 Pedro Ximenez"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Pokeno Small Batch Single Cask 2019 4 Year Old 55.8 Pedro Ximenez",
+    "summary": "It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; Bottled at 43% abv. [Skip to content](https://jvsimports.com/pokeno-whisky/#content) ![](https://jvsimports.com/wp-content/uploads/2023/01/Pokeno_Embossed_Light-Backgrounds.png) [For Bottle Images and More Click Here](https://drive.google.com/drive/folders/1NXt6xGxOUsxyuB2B6imjUYHRSZYAXbSN) [Whiskeyfellow Reviews](https://reviews.whiskeyfellow.net/2023/01/pokeno-whisky-discovery-origin-and.html) In 2017 Pōkeno Whisky was founded with a vision to put New Zealand on the",
+    "results": [
+      {
+        "title": "Pōkeno Whisky",
+        "url": "https://jvsimports.com/pokeno-whisky/",
+        "domain": "jvsimports.com",
+        "description": "It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; Bottled at 43% abv.",
+        "extraSnippets": [
+          "[Skip to content](https://jvsimports.com/pokeno-whisky/#content) ![](https://jvsimports.com/wp-content/uploads/2023/01/Pokeno_Embossed_Light-Backgrounds.png) [For Bottle Images and"
+        ]
+      },
+      {
+        "title": "Pokeno Discovery",
+        "url": "https://www.whiskyshopusa.com/pokeno-discovery/",
+        "domain": "whiskyshopusa.com",
+        "description": "Pedro Ximenez Casks. It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; Bottled at ...",
+        "extraSnippets": [
+          "[Toggle menu](https://www.whiskyshopusa.com/pokeno-discovery/#) 415 989-1030 - [USD](https://www.whiskyshopusa.com/pokeno-discovery/# \"Currency Selector\") - [**![](https://cdn11.bi"
+        ]
+      },
+      {
+        "title": "Pokeno Discovery New Zealand Single Malt Whiskey",
+        "url": "https://norfolkwineandspirits.com/shop/pokeno-discovery-nz-single-malt-whiskey/",
+        "domain": "norfolkwineandspirits.com",
+        "description": "Pedro Ximenez Casks. It is a rich and complex whisky, with beautiful notes of dark chocolate, black forest gåteau, ripe cherries, and sweet citrus; Bottled at ...",
+        "extraSnippets": [
+          "![Norfolk Wine & Spirits](https://norfolkwineandspirits.com/wp-content/uploads/2018/11/logo-norfolkwineandspirits.png) Are you at least 21 years of age? YesNo Sale! [🔍](https://no"
+        ]
+      },
+      {
+        "title": "Pokeno Distillery - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/distilleries/details/pokeno.html",
+        "domain": "whisky.com",
+        "description": "The Whisky at Pokeno is characterised by the production in batches, a long fermentation time of up to 80 hours and a slow distillation in copper pot stills - ...",
+        "extraSnippets": [
+          "Delivery Country Delivery Country ![DE](https://www.whisky.com/typo3conf/ext/sitepackage/Resources/Public/Libraries/other_whisky_resources/src/public/images/flags/DE.svg?1784106574"
+        ]
+      },
+      {
+        "title": "Pokeno Discovery Single Malt Whiskey (750 ml)",
+        "url": "https://kegnbottle.com/products/pokeno-discovery-single-malt-whiskey-750-ml?srsltid=AfmBOoqP7HNyQ9rW4vWirL1N9uQrJMW3lGcmfQ4lkn99Zica_EmF9YxL",
+        "domain": "kegnbottle.com",
+        "description": "Buy Pokeno Discovery Single Malt Whiskey (750 ml) for only $74.99. Pedro Ximenez Casks. It is a rich and complex whisky, with beautiful notes of dark chocolate ...",
+        "extraSnippets": [
+          "[Skip to content](https://kegnbottle.com/products/pokeno-discovery-single-malt-whiskey-750-ml#main) Close ## Newsletter Join our mailing list for exclusive offers, new products, an"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "69d6232d7150924d04654642bb394533bf65358e3c55dadc99d7e072bbf2f7d2",
+    "mode": "auto"
+  }
+}

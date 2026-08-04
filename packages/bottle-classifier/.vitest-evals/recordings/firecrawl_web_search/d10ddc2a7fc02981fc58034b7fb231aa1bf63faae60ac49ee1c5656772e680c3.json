@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T22:31:17.964Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Elijah Craig Cask Strength\" bourbon Heaven Hill \"Barrel Proof\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig Cask Strength\" bourbon Heaven Hill \"Barrel Proof\"",
+        "summary": "it's a great dram and priced incredibly well given the 12 year age statement and proof. it's my favorite of all the sub $100 barrel proof ... A lot of people have been talking about Elijah Craig Barrel Proof ... Elijah Craig cask strength private barrel, The Alpha. Follow the ... Elijah Craig Barrel Proof (Batch B515) ; Distillery: Heaven Hill ; Type & Region: Bourbon, Kentucky, USA ; Alcohol: 69.9% ; Composition: 75% Corn, 13% Rye, 12% ... png94 points - Elijah Craig 11 Year 2 Month Old Barrel Proof Bourbon (Batch B524), 65.3%, $75 ... Elijah Craig Cask Strength dfleming ... Elijah Craig Barr",
+        "results": [
+          {
+            "title": "Review #1 Elijah Craig Cask Strength (139.4 Proof) : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/5re53h/review_1_elijah_craig_cask_strength_1394_proof/",
+            "domain": "reddit.com",
+            "description": "it's a great dram and priced incredibly well given the 12 year age statement and proof. it's my favorite of all the sub $100 barrel proof ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "An Expert Review of Elijah Craig C923",
+            "url": "https://www.tasteselectrepeat.com/blogs/bts/elijah-craig-c923-expert-review?srsltid=AfmBOortvBtvVgLaaTlP0nJ1fujHQ87__is1NQfdtw_Xf-V0b7MsJrej",
+            "domain": "tasteselectrepeat.com",
+            "description": "A lot of people have been talking about Elijah Craig Barrel Proof ... Elijah Craig cask strength private barrel, The Alpha. Follow the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "In Depth: Elijah Craig Barrel Proof Review",
+            "url": "https://www.thewhiskeyshelf.com/elijah-craig-barrel-proof/",
+            "domain": "thewhiskeyshelf.com",
+            "description": "Elijah Craig Barrel Proof (Batch B515) ; Distillery: Heaven Hill ; Type & Region: Bourbon, Kentucky, USA ; Alcohol: 69.9% ; Composition: 75% Corn, 13% Rye, 12% ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Big Whiskies: 12 High-Proof Expressions That Deliver the Goods",
+            "url": "https://whiskyadvocate.com/High-Proof-Whiskeys-To-Buy-Now",
+            "domain": "whiskyadvocate.com",
+            "description": "png94 points - Elijah Craig 11 Year 2 Month Old Barrel Proof Bourbon (Batch B524), 65.3%, $75 ... Elijah Craig Cask Strength dfleming ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "10 of the Best Bourbons You Can Buy for Less than $100",
+            "url": "https://www.gearpatrol.com/food/drinks/a676535/bourbon-whiskeys-budget-under-100-dollars/",
+            "domain": "gearpatrol.com",
+            "description": "Elijah Craig Barrel Proof. Elijah-Craig-Cask-Strength-gear-patrol. Distillery: Heaven Hill Proof: Varies by batch. Price: $65. Worthy Investment ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d10ddc2a7fc02981fc58034b7fb231aa1bf63faae60ac49ee1c5656772e680c3",
+    "mode": "auto"
+  }
+}

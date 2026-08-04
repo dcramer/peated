@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T22:50:22.555Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve Kentucky Straight Malt Whiskey official 45.2% ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Kentucky Straight Malt Whiskey official 45.2% ABV",
+        "summary": "# Blog\n## Woodford Reserve Straight Malt Whiskey\n**Details:** 45.2% ABV. Price: USD 36 (2024) Age Statement: NAS Strength: 45.2% ABV Details: Mashbill contains 51% malted barley. Rating: 4.3 / 10 Woodford Reserve is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers. Woodford Reserve Kentucky Straight Malt Whiskey uses a base of 51% malt and is aged in new charred oak barrels, 45.2% alcohol by volume. Woodford's Straight Malt Whiskey just meets the legal requirement to be a malt whiskey with a 51% malt mas",
+        "results": [
+          {
+            "title": "Woodford Reserve Straight Malt Whiskey",
+            "url": "https://www.bourbonguy.com/blog/2018/6/5/woodford-reserve-straight-malt-whiskey",
+            "domain": "bourbonguy.com",
+            "description": "# Blog\n## Woodford Reserve Straight Malt Whiskey\n**Details:** 45.2% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #209 - Woodford Reserve Kentucky Straight Malt ...",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ablfpn/review_209_woodford_reserve_kentucky_straight/",
+            "domain": "reddit.com",
+            "description": "Price: USD 36 (2024) Age Statement: NAS Strength: 45.2% ABV Details: Mashbill contains 51% malted barley. Rating: 4.3 / 10",
+            "extraSnippets": []
+          },
+          {
+            "title": "Malt Whiskey",
+            "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+            "domain": "woodfordreserve.com",
+            "description": "Woodford Reserve is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Kentucky Straight Malt Whiskey",
+            "url": "https://www.jerrysfoods.com/store/jerrys-wine-and-spirits/products/18840715-woodford-reserve-whiskey-750-ml",
+            "domain": "jerrysfoods.com",
+            "description": "Woodford Reserve Kentucky Straight Malt Whiskey uses a base of 51% malt and is aged in new charred oak barrels, 45.2% alcohol by volume.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Straight Malt Whiskey Review",
+            "url": "https://www.breakingbourbon.com/review/woodford-reserve-straight-malt-whiskey",
+            "domain": "breakingbourbon.com",
+            "description": "Woodford's Straight Malt Whiskey just meets the legal requirement to be a malt whiskey with a 51% malt mashbill. It is aged in new charred oak barrels.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "54d52837d52ead7c5ff4bee15c2a4f0f4a68ee71315429305123cda210b89a21",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:38:30.939Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Ardbeg Traigh Bhan 19 Year Old official 46.2% ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg Traigh Bhan 19 Year Old official 46.2% ABV",
+        "summary": "46.2% ABV - Islay, Scotland Nose: Begins with malted grain and spices, orange-lime citrus, and tropical fruit atop a sweet, heavy peat smoke. a rare small batch Islay single malt Scotch whisky. 19 Years Old ABV 46.2% Colour Bright Gold … £245.00 Sale price - £245.00 Smoky Soot. Dark Chocolate. ... # Comments Section\n**ABV:** 46.2% ABV This second bottling of exceptionally rare 19 year old draws its inspiration from Islay's Traigh Bhan beach, known locally as the Singing Sands. **ABV:** 46.2%\n\n**Age:** 19 Year",
+        "results": [
+          {
+            "title": "Ardbeg 19-Year Traigh Bhan Batch 5 - Drams of Whisky",
+            "url": "https://dramsofwhisky.com/reviews/ardbeg-19-year-traigh-bhan-batch-5.html",
+            "domain": "dramsofwhisky.com",
+            "description": "46.2% ABV - Islay, Scotland Nose: Begins with malted grain and spices, orange-lime citrus, and tropical fruit atop a sweet, heavy peat smoke.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 19 Years Old Traigh Bhan Batch 6",
+            "url": "https://www.ardbeg.com/en-int/products/ardbeg-19-years-old-traigh-bhan-batch-6",
+            "domain": "ardbeg.com",
+            "description": "a rare small batch Islay single malt Scotch whisky. 19 Years Old ABV 46.2% Colour Bright Gold … £245.00 Sale price - £245.00 Smoky Soot. Dark Chocolate. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #2320 - Ardbeg 19 Years Old Traigh Bhan (Batch 4)",
+            "url": "https://www.reddit.com/r/Scotch/comments/1f6isil/review_2320_ardbeg_19_years_old_traigh_bhan_batch/",
+            "domain": "reddit.com",
+            "description": "# Comments Section\n**ABV:** 46.2% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 Year Single Malt Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/ardbeg-traigh-bhan-19-year-single-malt-scotch-whisky/p/220109750?srsltid=AfmBOopFYLY1loJwx4PJlh-YPgSjyMatfZGcEuqwu_wuUmIJMtBQYpfn",
+            "domain": "totalwine.com",
+            "description": "This second bottling of exceptionally rare 19 year old draws its inspiration from Islay's Traigh Bhan beach, known locally as the Singing Sands.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan 19 Year Batch 1 - Scotch & Sheen",
+            "url": "https://scotchandsheen.com/2019/12/06/ardbeg-traigh-bhan-19-year/",
+            "domain": "scotchandsheen.com",
+            "description": "**ABV:** 46.2%\n\n**Age:** 19 Year",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5733eaae31f3e141741e65702ea2952f919d2fbaebb89e6790103bd53cdda1ac",
+    "mode": "auto"
+  }
+}

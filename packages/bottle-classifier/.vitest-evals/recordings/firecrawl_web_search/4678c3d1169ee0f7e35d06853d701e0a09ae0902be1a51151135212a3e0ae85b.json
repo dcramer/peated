@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-08-03T23:27:34.588Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:reservebar.com \"Laphroaig Càirdeas 2022\"",
+      "Laphroaig Càirdeas 2022 Warehouse 1 52.2%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:reservebar.com \"Laphroaig Càirdeas 2022\"",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Laphroaig Càirdeas 2022 Warehouse 1 52.2%",
+        "summary": "​ ​ Laphroaig® Càirdeas 2022 is bottled at a fixed strength of 52.2% for a memorable experience to share with Friends. Close up of Laphroaig Cairdeas Warehouse ... Warehouse 1 | 52.2% ABV Score: 8/10 Something special. TL;DR A fine drop — as subtle and delicate … 2% ABV £ 100 or €100. A pleasant vanilla sweetness from the ... flavors of peat, smoke, and salt. 52.2% ABV / 104.4 Proof 750 ML Reviews … flavors of peat, smoke, and salt. Pale Gold Nose: Peaty, sweet and nutty with “ ... Taste: Big medicinal peat, hits thick and clean, brine, buttery wood, vanilla custard, bright lemon, tropical fru",
+        "results": [
+          {
+            "title": "Càirdeas 2022 Warehouse 1 Whisky",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+            "domain": "laphroaig.com",
+            "description": "​ ​ Laphroaig® Càirdeas 2022 is bottled at a fixed strength of 52.2% for a memorable experience to share with Friends. Close up of Laphroaig Cairdeas Warehouse ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Càirdeas 2022",
+            "url": "https://www.dramface.com/all-reviews/laphroaig-cairdeas-2022",
+            "domain": "dramface.com",
+            "description": "Warehouse 1 | 52.2% ABV Score: 8/10 Something special. TL;DR A fine drop — as subtle and delicate … 2% ABV £ 100 or €100. A pleasant vanilla sweetness from the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Càirdeas Warehouse 1 Islay Single Malt Scotch ...",
+            "url": "https://jensensliquors.com/products/laphroaig-cairdeas-warehouse-1-islay-single-malt-scotch-whisky",
+            "domain": "jensensliquors.com",
+            "description": "flavors of peat, smoke, and salt. 52.2% ABV / 104.4 Proof 750 ML Reviews … flavors of peat, smoke, and salt. Pale Gold Nose: Peaty, sweet and nutty with “ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas 2022 \"Warehouse 1,\" 52.2% : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/y1u64c/review_755_laphroaig_cairdeas_2022_warehouse_1_522/",
+            "domain": "reddit.com",
+            "description": "Taste: Big medicinal peat, hits thick and clean, brine, buttery wood, vanilla custard, bright lemon, tropical fruit, spice. It's creamy and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas 2022, Warehouse No. 1",
+            "url": "https://myannoyingopinions.com/2022/11/28/laphroaig-cairdeas-2022-release/",
+            "domain": "myannoyingopinions.com",
+            "description": "Laphroaig Cairdeas, 2022 Release (52.2%; ex-bourbon casks; lemon, vanilla and brine. A good bite at 52.2% and rich texture. really pops out is ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "4678c3d1169ee0f7e35d06853d701e0a09ae0902be1a51151135212a3e0ae85b",
+    "mode": "auto"
+  }
+}

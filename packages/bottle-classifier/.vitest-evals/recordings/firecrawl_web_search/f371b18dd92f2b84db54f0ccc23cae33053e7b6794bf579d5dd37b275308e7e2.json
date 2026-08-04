@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:50:55.055Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey",
+        "summary": "The Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole ... The Whistler Bodega Cask ... The Whistler Bodega Cask Single Malt Irish Whiskey. 750ml . 46% ABV. We review The Whistler Bodega Cask Irish Single Malt, an Irish whiskey aged for five years in sherry butts from the Bodegas of Jerez de la ... The Whistler 5-Year-Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole ... The Whistler Single Malt Bodega Cask is",
+        "results": [
+          {
+            "title": "Bodega Cask – The Whistler Whiskey",
+            "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+            "domain": "thewhistlerwhiskey.com",
+            "description": "The Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler",
+            "url": "https://flaviar.com/collections/the-whistler",
+            "domain": "flaviar.com",
+            "description": "The Whistler Bodega Cask ... The Whistler Bodega Cask Single Malt Irish Whiskey. 750ml . 46% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskey Review: The Whistler Bodega Cask Irish Single Malt",
+            "url": "https://thewhiskeywash.com/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+            "domain": "thewhiskeywash.com",
+            "description": "We review The Whistler Bodega Cask Irish Single Malt, an Irish whiskey aged for five years in sherry butts from the Bodegas of Jerez de la ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Irish Whiskey • Bodega Cask",
+            "url": "https://specsonline.com/shop/spirits/the-whistler-irish-whiskey-bodega-cask/",
+            "domain": "specsonline.com",
+            "description": "The Whistler 5-Year-Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask Mini - Irish Single Malt Whiskey",
+            "url": "https://www.bondston.com/the-whistler-bodega-cask-mini-p13576",
+            "domain": "bondston.com",
+            "description": "The Whistler Single Malt Bodega Cask is a 5-year-old Irish whiskey made from 100% malted barley and aged for a full 5 years in Spanish ex-sherry Bodega ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f371b18dd92f2b84db54f0ccc23cae33053e7b6794bf579d5dd37b275308e7e2",
+    "mode": "auto"
+  }
+}

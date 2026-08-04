@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:57:26.343Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Masterson's\" \"French Oak Barrel Finished\" \"10\" rye"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Masterson's\" \"French Oak Barrel Finished\" \"10\" rye",
+        "summary": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr. Masterson's. Price. Regular price $9999 $99.99. Regular price Sale price $9999 $99.99. Save. Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr for only $99.99 at BottleBuzz! Find the best local price for NV Masterson's French Oak Barrel Finished 10 Year Old Straight Rye Whisky, Canada. Avg Price (ex-tax) $101 / 750ml. Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old 750ml for $94.99 from Wise Guys Discount Liquors - Valparaiso in Valparaiso, ... Buy Masterson's Straight Rye Whiske",
+        "results": [
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel ...",
+            "url": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?srsltid=AfmBOoqBxH51FHPWW7xE5grb3RHiazXECw9wezeNFfic7J4gzxPEhxmH",
+            "domain": "woodencork.com",
+            "description": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr. Masterson's. Price. Regular price $9999 $99.99. Regular price Sale price $9999 $99.99. Save.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Canadian Straight Rye Whiskey 10 Year",
+            "url": "https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?srsltid=AfmBOopOoJ6SZe3F5jkHbB-Ka5C58bMcRDvrTwPa456Fcd6yRGp517JQ",
+            "domain": "bottlebuzz.com",
+            "description": "Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr for only $99.99 at BottleBuzz!",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's French Oak Barrel Finished 10 Year Old Straight ...",
+            "url": "https://www.wine-searcher.com/find/mastersons+france+oak+barrel+ten+old+straight+rye+whisky+canada/0?srsltid=AfmBOoqj2raUR5-xGAPPpAyajclFuTCrEQlqmrigcgytuCVx8NP-z_Ic",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for NV Masterson's French Oak Barrel Finished 10 Year Old Straight Rye Whisky, Canada. Avg Price (ex-tax) $101 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel ...",
+            "url": "https://shop.wiseguysliquors.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb0c7376d58871766ab99b5411403598c73da23dd3e747304a0cf",
+            "domain": "shop.wiseguysliquors.com",
+            "description": "Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old 750ml for $94.99 from Wise Guys Discount Liquors - Valparaiso in Valparaiso, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel ...",
+            "url": "https://silverbrookwines.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb0c7376d58871766ab99b5411403598c73da23dd3e747304a0cf&srsltid=AfmBOoq69vdBlP3zj5--QpRy-m86hEnGo-5Puvg062Bi1HKRLLqgJDUz",
+            "domain": "silverbrookwines.com",
+            "description": "Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old 750ml for $74.99 from Silverbrook Wines in Orange, CT. Free local delivery over ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "922e36bf531674387e9eb436cf50a0ce62a5ac9fea234bb8d0a20decce9b3a15",
+    "mode": "auto"
+  }
+}

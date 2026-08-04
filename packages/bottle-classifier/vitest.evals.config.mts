@@ -45,6 +45,8 @@ export default defineConfig({
     env: {
       ...pickDefinedEnv([
         "AI_GATEWAY_API_KEY",
+        "BOTTLE_CLASSIFIER_MODEL",
+        "BOTTLE_CLASSIFIER_REASONING_EFFORT",
         "OPENAI_API_KEY",
         "OPENAI_HOST",
         "OPENAI_IMAGE_EXTRACTION_MODEL",

@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:41:51.519Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Octomore 13.1 official Bruichladdich 59.2% 5 years 2022"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 official Bruichladdich 59.2% 5 years 2022",
+        "summary": "Price (per 750ml): USD 230 Age Statement: 5 Years Strength: 59.2% ABV Cask Makeup: Ex-bourbon Details: Concerto barley, peated to 137.3 PPM Octomore 13.1 5 Year Old Single Malt. Availability: In Stock $219.99 13.1 Aged: 5 Years PPM: 137.3 59.2% ABV - 118.4 Proof 750ml (202)-333-2847 59.2% is a super-heavily peated Islay single malt Scotch whisky from Bruichladdich, bottled at 59.2% ABV after five years of maturation. ### Octomore 13.1\nIt was then bottled at five years old. Octomore is the über-peated whisky produced at Bruichladdich Distillery on the isle of Islay, Scotland. 100 % Scottish bar",
+        "results": [
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Price (per 750ml): USD 230 Age Statement: 5 Years Strength: 59.2% ABV Cask Makeup: Ex-bourbon Details: Concerto barley, peated to 137.3 PPM",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 5 Year Old Single Malt",
+            "url": "https://potomacwines.com/en-gb/product/spirits/single-malt-whisky/bruichladdich-octomore-13-1-5-year-old-single-malt?limit=50",
+            "domain": "potomacwines.com",
+            "description": "Octomore 13.1 5 Year Old Single Malt. Availability: In Stock $219.99 13.1 Aged: 5 Years PPM: 137.3 59.2% ABV - 118.4 Proof 750ml (202)-333-2847",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 5 Year Old Scottish Barley Bourbon Cask ...",
+            "url": "https://whiskyonlinecy.com/product/bruichladdich-octomore-13-1-5-year-old-scottish-barley-bourbon-cask-70cl-59-2/",
+            "domain": "whiskyonlinecy.com",
+            "description": "59.2% is a super-heavily peated Islay single malt Scotch whisky from Bruichladdich, bottled at 59.2% ABV after five years of maturation.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13 Series Review (13.1, 13.2 & 13.3)",
+            "url": "https://twowhiskybros.co.uk/blogs/blog/octomore-13-series",
+            "domain": "twowhiskybros.co.uk",
+            "description": "### Octomore 13.1\nIt was then bottled at five years old.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore",
+            "url": "https://www.whiskysaga.com/octomore",
+            "domain": "whiskysaga.com",
+            "description": "Octomore is the über-peated whisky produced at Bruichladdich Distillery on the isle of Islay, Scotland. 100 % Scottish barley, matured in American oak, ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "9de86884bfd9a5c93bf27275250f18536226a91069731e7fec7bbf14b142b8b9",
+    "mode": "auto"
+  }
+}

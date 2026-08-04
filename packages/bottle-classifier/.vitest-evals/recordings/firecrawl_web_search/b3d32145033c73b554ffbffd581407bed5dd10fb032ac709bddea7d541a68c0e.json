@@ -1,0 +1,75 @@
+{
+  "writtenAt": "2026-08-03T22:46:27.881Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:westlanddistillery.com Watchpost 8 Year 42.5%",
+      "\"Westland Watchpost\" \"8 Year\" \"42.5%\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:westlanddistillery.com Watchpost 8 Year 42.5%",
+        "summary": "It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ...",
+        "results": [
+          {
+            "title": "Watchpost Whiskey",
+            "url": "https://westlanddistillery.com/products/watchpost-whiskey?srsltid=AfmBOoppbgzLjMZHSMtMJ4coUHpE5sow2SyjAk4N7XhmzeC4Ly19GBr9",
+            "domain": "westlanddistillery.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Westland Watchpost\" \"8 Year\" \"42.5%\"",
+        "summary": "Westland Watchpost 8 Year Old Blended American Whiskey is a distinctive ... 42.5% ABV (85 Proof), emphasizing accessibility and versatility. Watchpost ... Shop Westland Watchpost Single Malt Whiskey - 750 ML from haggen ... Blended for Adventure in the Pacific Northwest: Watchpost is an adventurous blend of 8-year ... Westland Watchpost is an 8-year American Blended Whiskey from Seattle's ... Bottled at 42.5% ABV, with a portion of proceeds benefiting the Washington Trails ... Westland Watchpost 8 Year American Blended Whiskey. May 22. Written By Chris ... ABV: 42.5%. Cask: Combination of new",
+        "results": [
+          {
+            "title": "Westland Watchpost 8 Year Old Blended American Whiskey",
+            "url": "https://www.blackwellswines.com/products/westland-watchpost-8-year-old-blended-american-whiskey?srsltid=AfmBOooIgbhqWni41fBvu6A9pyXnnt0BDzfvsudoHdi3U2t4RS0GqfL5",
+            "domain": "blackwellswines.com",
+            "description": "Westland Watchpost 8 Year Old Blended American Whiskey is a distinctive ... 42.5% ABV (85 Proof), emphasizing accessibility and versatility. Watchpost ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost Single Malt Whiskey - 750 ML",
+            "url": "https://www.haggen.com/shop/product-details.971301781.html",
+            "domain": "haggen.com",
+            "description": "Shop Westland Watchpost Single Malt Whiskey - 750 ML from haggen ... Blended for Adventure in the Pacific Northwest: Watchpost is an adventurous blend of 8-year ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey?srsltid=AfmBOoptGW5lf0cvlWGdujoIwkZnESdMp_vfzLm5eG38H5m28uBrUzoE",
+            "domain": "woodencork.com",
+            "description": "Westland Watchpost is an 8-year American Blended Whiskey from Seattle's ... Bottled at 42.5% ABV, with a portion of proceeds benefiting the Washington Trails ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost 8 Year American Blended Whiskey",
+            "url": "https://thewhiskystudy.com/reviews-1/westland-watchpost-8-year-american-blended-whiskey",
+            "domain": "thewhiskystudy.com",
+            "description": "Westland Watchpost 8 Year American Blended Whiskey. May 22. Written By Chris ... ABV: 42.5%. Cask: Combination of new oak, PX casks and ex-bourbon barrels.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost American Blended Whiskey 8 Year ...",
+            "url": "https://www.ubereats.com/product/b/6cce6534-68fb-58d4-80d8-0f2a4219adb6?srsltid=AfmBOoow5e_yPB_GVj9HmkoRknCkMMq7TSUNiNBL_KgHbBgKQ8h4Yr2n",
+            "domain": "ubereats.com",
+            "description": "Westland Watchpost American Blended Whiskey 8 Year Old (750 ml). 750 ml • 42.5% ABV. DetailsAlcohol by volume: 42.5% ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b3d32145033c73b554ffbffd581407bed5dd10fb032ac709bddea7d541a68c0e",
+    "mode": "auto"
+  }
+}

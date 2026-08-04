@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T04:50:37.091Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+    "focus": "Confirm Talisker 2001 Distillers Edition 2012 exact ABV and release identity."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm Talisker 2001 Distillers Edition 2012 exact ABV and release identity.",
+    "summary": "2001\n\n2012\n\n45.8%\n\nThe whisky was bottled in 2012 at 45.8% for Diageo’s popular Distillers Edition series.",
+    "results": [
+      {
+        "title": "Talisker Distillers Edition 2012 - Must Have Malts",
+        "url": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+        "domain": "musthavemalts.com",
+        "description": "Talisker Distillers Edition 2012 ✅ Great service ✅ Fast Shipping ✅ Find this rare single malt whisky at MusthaveMalts.com >>",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "85442a25a4f5c0a8e660cd02073867110fdcf03808131b89dc25c0979327e9a8",
+    "mode": "auto"
+  }
+}

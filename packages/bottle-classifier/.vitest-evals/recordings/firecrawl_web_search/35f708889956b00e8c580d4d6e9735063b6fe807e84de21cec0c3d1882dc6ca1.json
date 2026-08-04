@@ -1,0 +1,75 @@
+{
+  "writtenAt": "2026-08-03T04:58:53.902Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:prnewswire.com \"Johnnie Walker Black Label Islay Origin\" \"12\"",
+      "\"Johnnie Walker Black Label Islay Origin\" \"42%\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:prnewswire.com \"Johnnie Walker Black Label Islay Origin\" \"12\"",
+        "summary": "This new collection of four, 12-year-old blended Scotch whiskies ... Johnnie Walker Black Label Islay Origin has a slight spice and is ...",
+        "results": [
+          {
+            "title": "Explore the Flavours of Scotland With the Johnnie Walker ...",
+            "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+            "domain": "prnewswire.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Johnnie Walker Black Label Islay Origin\" \"42%\"",
+        "summary": "Johnnie Walker Black Label Islay Origin, 42%. Price: $46.00 ○ Issue: Winter 2019 ○ Reviewer: Jonny McCormick ○ Category: Blended Malt Scotch Whisky. Buy ... Johnnie Walker Black Label Islay Origin, 12yo, 42% ... There is no superlative to describing my wonderment at why this is bottled at 42%. Almost ... Palate: In the mouth it's peppery with dried fruit, fresh red fruits and honey, with the smoke lingering but not dominating. Bottled at 42% ABV (84-proof) and composed of distillates sourced from Caol Ila and Lagavulin, each sip of Johnnie Walker Black Label Islay Origin is a true ... Limited",
+        "results": [
+          {
+            "title": "Johnnie Walker Black Label Islay Origin, 42%",
+            "url": "https://whiskyadvocate.com/Johnnie-Walker-Black-Label-Islay-Origin-42",
+            "domain": "whiskyadvocate.com",
+            "description": "Johnnie Walker Black Label Islay Origin, 42%. Price: $46.00 ○ Issue: Winter 2019 ○ Reviewer: Jonny McCormick ○ Category: Blended Malt Scotch Whisky. Buy ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label Islay Origin, 12yo, 42%",
+            "url": "https://maltfascination.com/2021/11/03/johnnie-walker-black-label-islay-origin-12yo-42/",
+            "domain": "maltfascination.com",
+            "description": "Johnnie Walker Black Label Islay Origin, 12yo, 42% ... There is no superlative to describing my wonderment at why this is bottled at 42%. Almost ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label 12 YO Islay Origin + GB 42% ...",
+            "url": "https://spades.com.mt/products/johnnie-walker-black-label-12-yo-islay-origin-gb-42-1ltr?srsltid",
+            "domain": "spades.com.mt",
+            "description": "Palate: In the mouth it's peppery with dried fruit, fresh red fruits and honey, with the smoke lingering but not dominating.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label Islay Origin 12 year old Blended ...",
+            "url": "https://www.frootbat.com/p/29819/johnnie-walker-black-label-islay-origin-12-year-old-blended-malt-scotch-whisky?srsltid",
+            "domain": "frootbat.com",
+            "description": "Bottled at 42% ABV (84-proof) and composed of distillates sourced from Caol Ila and Lagavulin, each sip of Johnnie Walker Black Label Islay Origin is a true ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker 12 Years Black label Islay Origin - Whisky.com",
+            "url": "https://www.whisky.com/whisky-database/details/johnnie-walker-black-label-islay-origin-1.html",
+            "domain": "whisky.com",
+            "description": "Limited edition. Johnnie Walker Black label Islay Origin. Whisky.de Award ... 42%. Bottle size: 0.7 l. Bottler: Original bottling. Post treatment: Chill ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "35f708889956b00e8c580d4d6e9735063b6fe807e84de21cec0c3d1882dc6ca1",
+    "mode": "auto"
+  }
+}

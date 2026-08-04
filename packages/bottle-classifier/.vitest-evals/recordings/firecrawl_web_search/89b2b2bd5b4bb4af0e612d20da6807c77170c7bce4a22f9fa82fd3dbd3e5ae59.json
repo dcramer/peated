@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:50:06.298Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Shieldaig\" \"Speyside\" \"30 Year Old\" single malt whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Shieldaig\" \"Speyside\" \"30 Year Old\" single malt whisky",
+        "summary": "... Shieldaig's 30-year-old Speyside in my right. In my left hand are several pages of detail-oriented instructions from the HOA concerning ... Some of the most popular expressions of Shieldaig include: Shielding 30 Year Old Speyside Scotch Whisky, Shieldaig Islay Single Malt Whisky, Shieldaig The ... Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky ; Avg Price (ex-tax); $ 201 / 750ml ; Style Single Malt Scotch Whisky ; NY (ships to OK). Shieldaig Speyside Single Malt Scotch 30 year old 750ml. Shieldaig Speyside Single Malt Scotch 30 year old. SKU: 20841. 750ml. Unavailable. We're so",
+        "results": [
+          {
+            "title": "Review - Shieldaig, 30 Years Old, 43% - AngelsPortion",
+            "url": "https://angelsportion.com/2025/10/01/review-shieldaig-30-years-old-43/amp/",
+            "domain": "angelsportion.com",
+            "description": "... Shieldaig's 30-year-old Speyside in my right. In my left hand are several pages of detail-oriented instructions from the HOA concerning ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig",
+            "url": "https://flaviar.com/collections/shieldaig",
+            "domain": "flaviar.com",
+            "description": "Some of the most popular expressions of Shieldaig include: Shielding 30 Year Old Speyside Scotch Whisky, Shieldaig Islay Single Malt Whisky, Shieldaig The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+thirty+old+single+malt+scotch+whisky+speyside+scotland?srsltid=AfmBOorKKJwoj42z5b7pyb9lHL1D92C2kL4Qqaw1qNq9JmERa_7WX7mg",
+            "domain": "wine-searcher.com",
+            "description": "Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky ; Avg Price (ex-tax); $ 201 / 750ml ; Style Single Malt Scotch Whisky ; NY (ships to OK).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt Scotch 30 year old 750ml",
+            "url": "https://www.thewineguyli.com/products/13515236/shieldaig-speyside-single-malt-scotch-30-year-old?srsltid=AfmBOooRuYrqMPAz3JrUxvApbjV79fZf-asOFxdYFgGsSm-KTVgnBy4Y",
+            "domain": "thewineguyli.com",
+            "description": "Shieldaig Speyside Single Malt Scotch 30 year old 750ml. Shieldaig Speyside Single Malt Scotch 30 year old. SKU: 20841. 750ml. Unavailable. We're sorry, but ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Finest Old Scotch whiskey review",
+            "url": "https://www.facebook.com/groups/728721443657698/posts/1114939215035917/",
+            "domain": "facebook.com",
+            "description": "I absolutely love the Shieldaig brand!!! Cheers enjoy because for the price that is an outstanding Speyside scotch!!",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "89b2b2bd5b4bb4af0e612d20da6807c77170c7bce4a22f9fa82fd3dbd3e5ae59",
+    "mode": "auto"
+  }
+}

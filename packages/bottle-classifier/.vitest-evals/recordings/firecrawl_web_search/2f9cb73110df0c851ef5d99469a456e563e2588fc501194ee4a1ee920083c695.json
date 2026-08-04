@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T22:42:21.887Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Talisker 2001\" \"The Distillers Edition\" whisky",
+      "Talisker Distillers Edition 2001 2011 45.8%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Talisker 2001\" \"The Distillers Edition\" whisky",
+        "summary": "The Distillers Edition. Talisker 2001. Overall rating: 87.04/100 ... Whisky reviews for Talisker 2001. 47 users have left 47 reviews for ... Talisker 2001 The Distillers Edition 45.8% alc. Double Matured in Amoroso Sherry Wood. Distillery: Talisker Bottler: Distillery Bottling Region: The Islands Talisker 2001 The Distillers Edition Single Malt Scotch (2012) ; Estimate. $50-$75 ; 12M Range. $85-$130 ; Reserve. No Reserve ; Size. 750 ml ; Quantity1. Talisker - 2001. 4.5 (50), 10 Rate. This bottling of the Talisker is part of the Distillers Edition of the Classic Malts of Scotland. ... Whisky ..",
+        "results": [
+          {
+            "title": "Talisker 2001 - Ratings and reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+            "domain": "whiskybase.com",
+            "description": "The Distillers Edition. Talisker 2001. Overall rating: 87.04/100 ... Whisky reviews for Talisker 2001. 47 users have left 47 reviews for ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition 45.8% - Whiskyshop",
+            "url": "https://rarevintagewhisky.nl/en/Talisker-2001-The-Distillers-Edition-45.8",
+            "domain": "rarevintagewhisky.nl",
+            "description": "Talisker 2001 The Distillers Edition 45.8% alc. Double Matured in Amoroso Sherry Wood. Distillery: Talisker Bottler: Distillery Bottling Region: The Islands",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition Single Malt Scotch (2012)",
+            "url": "https://www.unicornauctions.com/auction/fc491c1c-af66-4987-8d12-80e1f50db1cc/lot/4d52dba9-baf1-49a2-b68e-cd6034ea196d",
+            "domain": "unicornauctions.com",
+            "description": "Talisker 2001 The Distillers Edition Single Malt Scotch (2012) ; Estimate. $50-$75 ; 12M Range. $85-$130 ; Reserve. No Reserve ; Size. 750 ml ; Quantity1.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker - 2001 - Whisky.com",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html?tx_datamintsflaschendb_flaschentastingnotes%5Baction%5D=listGeschmacksbeschreibungen&tx_datamintsflaschendb_flaschentastingnotes%5Bcontroller%5D=Flaschen&tx_datamintsflaschendb_flaschentastingnotes%5BcurPage%5D=3&cHash=c1e3b9bbbced60aa0550b21cfe5545c8",
+            "domain": "whisky.com",
+            "description": "Talisker - 2001. 4.5 (50), 10 Rate. This bottling of the Talisker is part of the Distillers Edition of the Classic Malts of Scotland. ... Whisky ... Saving ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition Amoroso Sherry Cask ...",
+            "url": "https://www.spiritradar.com/whisky-db/talisker-2001-the-distillers-edition-45.8-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": "Talisker 2001 The Distillers Edition Amoroso Sherry Cask Finished 45.8% 700ml information ... The age of this spirit isn't known. The year of distillation is 2001 ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Talisker Distillers Edition 2001 2011 45.8%",
+        "summary": "Nose: Fresh, sea spray, a bit musty and woody. Easily recognizable as a Talisker with added sweetness, toffee and some meat (often with Sherry). Age Statement: NAS (10 Years, distilled 2011 and bottled 2021) Strength: 45.8% ABV Cask Makeup: American oak, finished in Amoroso sherry Talisker Distiller's Edition, 2005-2015 (45.8%; Palate: Comes in with the smoke and pepper and some dried orange peel. Good weight and drinking ... Whisky.com reviews the Talisker Distillers Edition. Edition of the Classic Malts of Scotland. The Single Malt matured for at least three months ... A well balanced whisky",
+        "results": [
+          {
+            "title": "Talisker Distillers Edition 1988/2001 (45.8%, OB, TD-S: 5CO) | Master Quill",
+            "url": "https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/",
+            "domain": "masterquill.com",
+            "description": "Nose: Fresh, sea spray, a bit musty and woody. Easily recognizable as a Talisker with added sweetness, toffee and some meat (often with Sherry).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: Talisker 2011 – The Distillers Edition 2021 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1p6ckhd/review_talisker_2011_the_distillers_edition_2021/",
+            "domain": "reddit.com",
+            "description": "Age Statement: NAS (10 Years, distilled 2011 and bottled 2021) Strength: 45.8% ABV Cask Makeup: American oak, finished in Amoroso sherry",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker Distiller's Edition, 2005-2015",
+            "url": "https://myannoyingopinions.com/2021/12/08/talisker-distillers-edition-2005-2015/",
+            "domain": "myannoyingopinions.com",
+            "description": "Talisker Distiller's Edition, 2005-2015 (45.8%; Palate: Comes in with the smoke and pepper and some dried orange peel. Good weight and drinking ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker Distillers Edition | Whisky Review",
+            "url": "https://www.youtube.com/watch?v=mS3NIH0-v08",
+            "domain": "youtube.com",
+            "description": "Whisky.com reviews the Talisker Distillers Edition. Edition of the Classic Malts of Scotland. The Single Malt matured for at least three months ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 Distillers Edition",
+            "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+            "domain": "whiskynotes.be",
+            "description": "A well balanced whisky, better than the standard 10 in my opinion. Prices tend to go from € 45 to around € 65. Score: 87/100",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2f9cb73110df0c851ef5d99469a456e563e2588fc501194ee4a1ee920083c695",
+    "mode": "auto"
+  }
+}

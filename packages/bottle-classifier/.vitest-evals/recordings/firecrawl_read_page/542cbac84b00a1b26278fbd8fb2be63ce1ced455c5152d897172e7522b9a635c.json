@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-03T02:07:29.577Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019",
+    "focus": "Confirm the marketed Single Cask release's vintage date, bottling date, stated age, ABV, PX cask, cask number, and cask strength."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed Single Cask release's vintage date, bottling date, stated age, ABV, PX cask, cask number, and cask strength.",
+    "summary": "BottlerDistillery BottlingBottling seriesSingle CaskVintage22.11.2019Bottled19.05.2023Stated Age03 yearsCask TypePX SherryCask number69Number of bottles300Strength55.8 %Size700 mlAdded on08 oct 2023 3:57 pm by [springtank](https://www.whiskybase.com/profile/119475)UncoloredNon-chill FilteredCask StrengthSingle Cask Whisky More info",
+    "results": [
+      {
+        "title": "Pōkeno 2019 - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019",
+        "domain": "whiskybase.com",
+        "description": "Pōkeno 2019 03 yr. This is the 700 ml from 2019. The strength of this whisky is 55.8 % Vol. A bottle from Pōkeno",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "542cbac84b00a1b26278fbd8fb2be63ce1ced455c5152d897172e7522b9a635c",
+    "mode": "auto"
+  }
+}

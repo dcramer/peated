@@ -1,0 +1,31 @@
+{
+  "writtenAt": "2026-08-03T23:29:56.292Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Pōkeno \"Pedro Ximenez Sherry\" \"55.8%\" \"18.06.19\"",
+      "Pōkeno \"Bottle No 009/340\" whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno \"Pedro Ximenez Sherry\" \"55.8%\" \"18.06.19\"",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno \"Bottle No 009/340\" whisky",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5e6dd9aa06fb3a19aa578878bf0a154688fd43cd50fe59d3de2af75f3cc7861b",
+    "mode": "auto"
+  }
+}

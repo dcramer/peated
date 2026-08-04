@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:41:12.071Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["The Macallan Classic Cut 2021 Edition official ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "The Macallan Classic Cut 2021 Edition official ABV",
+        "summary": "The Macallan Classic Cut - 2024 Edition has been bottled at 52.4% ABV and features notes of vanilla, tropical fruit and lemon. 51% ABV Commercial … bottled at 102 proof, matured in a combination of sherry seasoned American oak and ex-bourbon American oak casks Bottled at a robust 55% ABV and presented in a 750ML format, this American offering stands out within the premium whiskey category for its elevated strength and ... They're all in the 40% range of ABV except Classic Cut. its debut price of $160. from an elevated ABV%, preferably up around 48%. It's ... 2021 The Macallan Limited Edition C",
+        "results": [
+          {
+            "title": "The Macallan Classic Cut 2024, Limited Edition",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/macallan-classic-cut-2024-edition",
+            "domain": "themacallan.com",
+            "description": "The Macallan Classic Cut - 2024 Edition has been bottled at 52.4% ABV and features notes of vanilla, tropical fruit and lemon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut 2021 Edition Highland Single Malt Scotch Whisky",
+            "url": "https://craftshack.com/products/the-macallan-classic-cut-2021-edition-highland-single-malt-scotch-whisky?srsltid=AfmBOop6OXvKNmoXlKvy7y7t7yteipUwUGdaSlzv22ZCSs6xAcNhY61L",
+            "domain": "craftshack.com",
+            "description": "51% ABV Commercial … bottled at 102 proof, matured in a combination of sherry seasoned American oak and ex-bourbon American oak casks",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut Single Malt Scotch Whisky",
+            "url": "https://whiskyandwhiskey.com/products/the-macallan-classic-cut-single-malt-scotch-whisky?srsltid=AfmBOoo3qxtmTAdPMHLHBJX9-dVfp1rG5nEghaU0sujx-EtC2qE7g06B",
+            "domain": "whiskyandwhiskey.com",
+            "description": "Bottled at a robust 55% ABV and presented in a 750ML format, this American offering stands out within the premium whiskey category for its elevated strength and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "If I wanted to buy one Macallan bottle, would Classic Cut be the one due ...",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ig41pm/if_i_wanted_to_buy_one_macallan_bottle_would/",
+            "domain": "reddit.com",
+            "description": "They're all in the 40% range of ABV except Classic Cut. its debut price of $160. from an elevated ABV%, preferably up around 48%. It's ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2021 The Macallan Limited Edition Classic Cut Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/the+macallan+ltd+edition+cls+cut+single+malt+scotch+whisky+speyside+highlands+scotland/2021?srsltid=AfmBOopW6jsfB9fuZkRdWEUtcQRvAaKQvx5VYu5Yiuj6kLnKDThVtQeV",
+            "domain": "wine-searcher.com",
+            "description": "2021 The Macallan Limited Edition Classic Cut Single Malt Scotch Whisky ; Style: Whisky - Single Malt ; Region: UK ; Price: $ 300-750.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ed5af5889c8d50e1e184a2a899cfaf92646d730ec39770f677a5b95da1537636",
+    "mode": "auto"
+  }
+}

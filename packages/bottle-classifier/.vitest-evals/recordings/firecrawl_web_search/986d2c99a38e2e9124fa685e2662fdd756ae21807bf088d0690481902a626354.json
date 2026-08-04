@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T05:12:12.642Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Glenglassaugh 1978 Rare Cask Release\" \"Batch 1\" \"35\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Glenglassaugh 1978 Rare Cask Release\" \"Batch 1\" \"35\"",
+        "summary": "... Batch 1. 93.55. Single Malt. 37 years. 54.80 %. 700 ml. Glendronach. Distillery ... 35. Bowmore 1964 Bicentenary. 92.97. Single Malt. 43.00 %. 750 ml. Bowmore. Glenglassaugh 1978 Rare Cask Release · Single Malt ... 29 years · TBWC Islay #2 (Batch 1) · Single Malt. 0, 25 ... 0, 35 years · Bruichladdich Black Art 9.1. 57.6 % Vol. 700 ml, 681, 1853 + 2379, 36, 85.56. Glenfiddich 08-year-old Pure Malt, 8, 70 (proof), 757 ml, –, –, 5, 86.2. Glenglassaugh 1978 Rare Cask Release ... Bw1, Elements of Islay, Batch 1 1994/2012. Single ... 35 11th, 2012, (1976/1977), 48,1% (o. Verp ... Glenglassaugh",
+        "results": [
+          {
+            "title": "The top 1000 whiskies of all time Official",
+            "url": "https://www.whiskybase.com/en-en-highest-rated-whisky",
+            "domain": "whiskybase.com",
+            "description": "... Batch 1. 93.55. Single Malt. 37 years. 54.80 %. 700 ml. Glendronach. Distillery ... 35. Bowmore 1964 Bicentenary. 92.97. Single Malt. 43.00 %. 750 ml. Bowmore.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Search Whisky Bottles | Peated",
+            "url": "https://peated.com/bottles?flavorProfile=old_dignified&category=&sort=tastings&tag=",
+            "domain": "peated.com",
+            "description": "Glenglassaugh 1978 Rare Cask Release · Single Malt ... 29 years · TBWC Islay #2 (Batch 1) · Single Malt. 0, 25 ... 0, 35 years · Bruichladdich Black Art 9.1.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky List - CRANN Whisky Club",
+            "url": "https://crannwhiskyclub.be/whisky-list/",
+            "domain": "crannwhiskyclub.be",
+            "description": "57.6 % Vol. 700 ml, 681, 1853 + 2379, 36, 85.56. Glenfiddich 08-year-old Pure Malt, 8, 70 (proof), 757 ml, –, –, 5, 86.2. Glenglassaugh 1978 Rare Cask Release ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Eddie's Whiskies",
+            "url": "https://www.eddies.ch/fileadmin/dateien/PrixRari.824.pdf",
+            "domain": "eddies.ch",
+            "description": "Bw1, Elements of Islay, Batch 1 1994/2012. Single ... 35 11th, 2012, (1976/1977), 48,1% (o. Verp ... Glenglassaugh 1978 Rare Cask Release 2014, Sherry ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Search Whisky Bottles | Peated",
+            "url": "https://peated.com/bottles?flavorProfile=old_dignified&sort=rating&category=single_malt&page=1",
+            "domain": "peated.com",
+            "description": "TBWC Islay #2 (Batch 1) · Single Malt. 0, 25 years ... Glenglassaugh 1978 Rare Cask Release · Single Malt ... 0, 20 years · Glenglassaugh Massandra Connection 35- ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "986d2c99a38e2e9124fa685e2662fdd756ae21807bf088d0690481902a626354",
+    "mode": "auto"
+  }
+}

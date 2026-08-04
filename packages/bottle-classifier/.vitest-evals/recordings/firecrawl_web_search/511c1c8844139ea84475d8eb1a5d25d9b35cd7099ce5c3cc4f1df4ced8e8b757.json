@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:48:55.548Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Elijah Craig 18-year-old Single Barrel\" 45% bourbon"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig 18-year-old Single Barrel\" 45% bourbon",
+        "summary": "Compare our Single Barrel expressions and discover the depth of the Elijah Craig portfolio. Explore. ReviewsELIJAH CRAIG 18-Year-Old Single Barrel. Write A ... Find the best local price for Elijah Craig 18 Year Old Single Barrel Straight Bourbon Whiskey, Kentucky, USA. Avg Price (ex-tax) $219 / 750ml. Polished oak, musty books, and cracked leather on the nose make for a quintessential well-aged bourbon. On the pa ... Elijah Craig 18 year old Single Barrel (No. Elijah Craig 18 Year Old Single Barrel Kentucky Straight Bourbon Whiskey. 95WE. 92WA. Elijah Craig 18-Year-Old Single Barrel: Revisited",
+        "results": [
+          {
+            "title": "18-Year-Old Single Barrel",
+            "url": "https://elijahcraig.com/18-year-old",
+            "domain": "elijahcraig.com",
+            "description": "Compare our Single Barrel expressions and discover the depth of the Elijah Craig portfolio. Explore. ReviewsELIJAH CRAIG 18-Year-Old Single Barrel. Write A ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Straight Bourbon ...",
+            "url": "https://www.wine-searcher.com/find/elijah+craig+eighteen+old+single+barrel+straight+bourbon+whisky+kentucky+usa?srsltid=AfmBOopoefO036nvWM_aesxh8FRARmHxR96XKVmE7WK69KeN3Ygs0a9L",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Elijah Craig 18 Year Old Single Barrel Straight Bourbon Whiskey, Kentucky, USA. Avg Price (ex-tax) $219 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 year old Single Barrel (No. 7194), 45%",
+            "url": "https://whiskyadvocate.com/Elijah-Craig-18-year-old-Single-Barrel-No-7194",
+            "domain": "whiskyadvocate.com",
+            "description": "Polished oak, musty books, and cracked leather on the nose make for a quintessential well-aged bourbon. On the pa ... Elijah Craig 18 year old Single Barrel (No.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Kentucky Straight ...",
+            "url": "https://shop.klwines.com/products/details/1005102",
+            "domain": "shop.klwines.com",
+            "description": "Elijah Craig 18 Year Old Single Barrel Kentucky Straight Bourbon Whiskey. 95WE. 92WA.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Revisiting Elijah Craig 18-Year-Old Single Barrel to ...",
+            "url": "https://www.bourbonguy.com/blog/2022/7/26/revisiting-elijah-craig-18-year-old-single-barrel-to-celebrate-a-major-cancer-milestone",
+            "domain": "bourbonguy.com",
+            "description": "Elijah Craig 18-Year-Old Single Barrel: Revisited. Purchase Info: $164.99 for a 750 mL bottle at Ace Spirits, Hopkins, MN (March 13, 2021).",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "511c1c8844139ea84475d8eb1a5d25d9b35cd7099ce5c3cc4f1df4ced8e8b757",
+    "mode": "auto"
+  }
+}

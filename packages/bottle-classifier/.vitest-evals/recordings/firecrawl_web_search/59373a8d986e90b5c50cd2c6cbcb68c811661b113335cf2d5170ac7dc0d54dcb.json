@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T04:50:17.886Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Talisker 2001 \"The Distillers Edition\" whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Talisker 2001 \"The Distillers Edition\" whisky",
+        "summary": "Talisker; The Distillers Edition. Talisker 2001. Overall rating: 87.04/100; ratings: 329. Whiskybase ID: WB36535; Category: Single Malt ... # Talisker Distillers Edition 2012\n2001\n\nThis richly flavoured maritime malt, distilled in 2001, has been double matured in Amoroso cask wood. Talisker - The Distillers Edition. ### Product Description\nThis rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.\n\n### Specifications\nThe Distillers Edition\n\n# Talisker 1988, The Distillers Edition 2001 Bottling\nSINGLE SKYE",
+        "results": [
+          {
+            "title": "Talisker 2001 - Ratings and reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+            "domain": "whiskybase.com",
+            "description": "Talisker; The Distillers Edition. Talisker 2001. Overall rating: 87.04/100; ratings: 329. Whiskybase ID: WB36535; Category: Single Malt ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker Distillers Edition 2012",
+            "url": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+            "domain": "musthavemalts.com",
+            "description": "# Talisker Distillers Edition 2012\n2001\n\nThis richly flavoured maritime malt, distilled in 2001, has been double matured in Amoroso cask wood.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker - The Distillers Edition : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/2swigk/talisker_the_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "Talisker - The Distillers Edition.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+            "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+            "domain": "thewhiskyvault.com",
+            "description": "### Product Description\nThis rare single malt from the Isle of Skye legend, Talisker, was distilled in 1988 and bottled specially for The Distillers Edition series in 2001.\n\n### Specifications\nThe Distillers Edition\n\n# T",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition Single Malt Scotch (2012)",
+            "url": "https://www.unicornauctions.com/auction/fc491c1c-af66-4987-8d12-80e1f50db1cc/lot/4d52dba9-baf1-49a2-b68e-cd6034ea196d",
+            "domain": "unicornauctions.com",
+            "description": "Talisker 2001 The Distillers Edition Single Malt Scotch (2012) ; Estimate. $50-$75 ; 12M Range. $85-$130 ; Reserve. No Reserve ; Size. 750 ml ; Quantity1.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "59373a8d986e90b5c50cd2c6cbcb68c811661b113335cf2d5170ac7dc0d54dcb",
+    "mode": "auto"
+  }
+}

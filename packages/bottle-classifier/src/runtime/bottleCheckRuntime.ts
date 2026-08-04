@@ -32,14 +32,15 @@ import type {
 import {
   createBottleProposalCollector,
   createBottleProposalTools,
+  createFirecrawlReadPageTool,
   createFirecrawlWebSearchTool,
   createGetBottleContextTool,
   createGetEntityContextTool,
-  createOpenAIWebSearchTool,
   createSearchBottlesTool,
   createSearchEntitiesTool,
 } from "../tools";
 import type { BottleWebSearchBudget } from "../tools/sharedWebSearch";
+import { webEvidenceUrlsMatch } from "../webEvidenceUrl";
 import {
   bottleContextToCandidate,
   createBottleContextLoader,
@@ -65,14 +66,14 @@ export type BottleClassifierDataSource = {
 export type BottleClassifierToolEvent =
   | {
       type: "tool_call";
-      phase: "agent" | "preload";
+      phase: "agent";
       id: string;
       name: string;
       arguments: unknown;
     }
   | {
       type: "tool_result";
-      phase: "agent" | "preload";
+      phase: "agent";
       toolCallId: string;
       name: string;
       result: unknown;
@@ -312,7 +313,21 @@ function mergeToolOutputArtifacts({
     return;
   }
 
-  if (toolName === "openai_web_search" || toolName === "firecrawl_web_search") {
+  if (
+    toolName === "firecrawl_web_search" ||
+    toolName === "firecrawl_read_page"
+  ) {
+    const batchEvidence = getObjectProperty(normalizedOutput, "evidence");
+    if (Array.isArray(batchEvidence)) {
+      for (const item of batchEvidence) {
+        const evidence = BottleSearchEvidenceSchema.safeParse(item);
+        if (evidence.success) {
+          mergeSearchEvidence(state.searchEvidence, evidence.data);
+        }
+      }
+      return;
+    }
+
     const evidence = BottleSearchEvidenceSchema.safeParse(normalizedOutput);
     if (evidence.success) {
       mergeSearchEvidence(state.searchEvidence, evidence.data);
@@ -368,8 +383,6 @@ export function createBottleCheckTools({
     ? createBottleProposalTools(proposalCollector)
     : [];
   const allowContextInspection = proposalCollector !== null;
-  const useFirecrawlWebSearch =
-    allowCandidateExpansion && !!options.firecrawlApiKey;
   const loadBottleContext = allowContextInspection
     ? createBottleContextLoader({
         dataSource,
@@ -438,14 +451,9 @@ export function createBottleCheckTools({
               mergeSearchEvidence(state.searchEvidence, evidence);
             },
           }),
-        ]
-      : []),
-    ...(allowCandidateExpansion && !useFirecrawlWebSearch
-      ? [
-          createOpenAIWebSearchTool({
-            client: options.client,
-            model: options.model,
-            reasoningEffort: options.reasoningEffort,
+          createFirecrawlReadPageTool({
+            apiKey: options.firecrawlApiKey,
+            apiUrl: options.firecrawlApiUrl ?? undefined,
             budget: webSearchBudget,
             executeWebSearch: options.executeWebSearch,
             onEvidence: (evidence) => {
@@ -517,7 +525,9 @@ export function createRunProposalCollector({
       hasSourceEvidence: (field) => sourceFieldSet.has(field),
       hasWebEvidence: (url) =>
         state.searchEvidence.some((evidence) =>
-          evidence.results.some((result) => result.url === url),
+          evidence.results.some((result) =>
+            webEvidenceUrlsMatch(result.url, url),
+          ),
         ),
       isBottleInspected: (bottleId) => state.bottleContexts.has(bottleId),
       isEntityInspected: (entityId) => state.entityContexts.has(entityId),

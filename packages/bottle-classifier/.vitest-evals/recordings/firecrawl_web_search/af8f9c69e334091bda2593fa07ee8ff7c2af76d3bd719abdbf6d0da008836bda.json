@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T22:38:53.327Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Elijah Craig Cask Strength\" bourbon \"Heaven Hill\"",
+      "\"Elijah Craig Barrel Proof\" official product cask strength"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig Cask Strength\" bourbon \"Heaven Hill\"",
+        "summary": "As an aside, oh how I want to try that Heaven Hill 15 year 147 proof gift store...I imagine it in my head as the GTS to Stagg Jr. comparison ... Elijah Craig Barrel Proof (Batch B515). Elijah Craig Cask Strength. Distillery: Heaven Hill. Type & Region: Bourbon, Kentucky, USA. Alcohol: 69.9%. Composition ... ... Heaven Hill's most coveted bourbons; Elijah Craig Barrel Proof. ... In a few months we will be introducing our Elijah Craig, Cask Strength Single Barrel. A lot of people have been talking about Elijah Craig Barrel Proof Bourbon C923 since Heaven Hill removed the 12-year age statement re",
+        "results": [
+          {
+            "title": "Review #1 Elijah Craig Cask Strength (139.4 Proof)",
+            "url": "https://www.reddit.com/r/bourbon/comments/5re53h/review_1_elijah_craig_cask_strength_1394_proof/",
+            "domain": "reddit.com",
+            "description": "As an aside, oh how I want to try that Heaven Hill 15 year 147 proof gift store...I imagine it in my head as the GTS to Stagg Jr. comparison ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "In Depth: Elijah Craig Barrel Proof Review",
+            "url": "https://www.thewhiskeyshelf.com/elijah-craig-barrel-proof/",
+            "domain": "thewhiskeyshelf.com",
+            "description": "Elijah Craig Barrel Proof (Batch B515). Elijah Craig Cask Strength. Distillery: Heaven Hill. Type & Region: Bourbon, Kentucky, USA. Alcohol: 69.9%. Composition ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Something good is coming… 11-Year Elijah Craig Private Barrel ...",
+            "url": "https://www.facebook.com/bourbonenthusiast/posts/something-good-is-coming11-year-elijah-craig-private-barrel-aka-raspberry-surpri/489985229800851/",
+            "domain": "facebook.com",
+            "description": "... Heaven Hill's most coveted bourbons; Elijah Craig Barrel Proof. ... In a few months we will be introducing our Elijah Craig, Cask Strength Single Barrel.",
+            "extraSnippets": []
+          },
+          {
+            "title": "An Expert Review of Elijah Craig C923",
+            "url": "https://www.tasteselectrepeat.com/blogs/bts/elijah-craig-c923-expert-review?srsltid=AfmBOopLWs6TkwHkKCdBXsRfwBRVHIAh0qSffn38T6fVbhKPG9fti7DF",
+            "domain": "tasteselectrepeat.com",
+            "description": "A lot of people have been talking about Elijah Craig Barrel Proof Bourbon C923 since Heaven Hill removed the 12-year age statement requirement.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Toasted Elijah Craig •Heaven Hill 7Year Bottled In Bond • ...",
+            "url": "https://www.instagram.com/p/CewTyNbpOuN/",
+            "domain": "instagram.com",
+            "description": "... Heaven Hill 7Year Bottled In Bond •Knob Creek 12 Year •Castle ... Elijah Craig Cask Strength Toasted Bourbon Is Here! We Picked This ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig Barrel Proof\" official product cask strength",
+        "summary": "# BARREL PROOF\n88%\n\n# 4.6\n88% ## Show us some ID and we’ll show you some great whiskey.\n### Elijah Craig Barrel Proof\n88%\n\n# 4.6\n88% Then in 2021, none of the batches were proofed above 123.6. Heaven Hill does not try to conceal the fact why Elijah Craig Barrel Proof Batches ...",
+        "results": [
+          {
+            "title": "Barrel Proof",
+            "url": "https://elijahcraig.com/barrel-proof",
+            "domain": "elijahcraig.com",
+            "description": "# BARREL PROOF\n88%\n\n# 4.6\n88%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof",
+            "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+            "domain": "heavenhilldistillery.com",
+            "description": "## Show us some ID and we’ll show you some great whiskey.\n### Elijah Craig Barrel Proof\n88%\n\n# 4.6\n88%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #886: Elijah Craig Barrel Proof Bourbon Batch 6 (140.2 proof)",
+            "url": "https://www.reddit.com/r/bourbon/comments/1hycvk8/review_886_elijah_craig_barrel_proof_bourbon/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #88: Elijah Craig Barrel Proof A124, 10y9mo, 59.5% ECBP A124",
+            "url": "https://www.reddit.com/r/bourbon/comments/1b4dbff/review_88_elijah_craig_barrel_proof_a124_10y9mo/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Why I don't buy Elijah Craig Barrel Proof batches anymore",
+            "url": "https://www.reddit.com/r/bourbon/comments/xjaosg/why_i_dont_buy_elijah_craig_barrel_proof_batches/",
+            "domain": "reddit.com",
+            "description": "Then in 2021, none of the batches were proofed above 123.6. Heaven Hill does not try to conceal the fact why Elijah Craig Barrel Proof Batches ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "af8f9c69e334091bda2593fa07ee8ff7c2af76d3bd719abdbf6d0da008836bda",
+    "mode": "auto"
+  }
+}

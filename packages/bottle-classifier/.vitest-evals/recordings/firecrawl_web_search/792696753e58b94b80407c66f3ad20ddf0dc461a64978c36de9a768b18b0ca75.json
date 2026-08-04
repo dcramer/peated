@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-03T04:47:11.445Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Four Roses \"Single Barrel Barrel Strength\" official bourbon product ABV recipe"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses \"Single Barrel Barrel Strength\" official bourbon product ABV recipe",
+        "summary": "It is the single barrel, barrel strength version from Four Roses. The ABV is 58.5% and is produced in Lawrenceburg, Kentucky. Being a barrel ... Four Roses Single Barrel Barrel Strength OBSQ is one of the best bourbons I've reviewed to date. This barrel delivered red delicious apple from ... ... bourbon is right up my alley and the ABV is in my excitement zone. ... r/bourbon - Review #591: Four Roses Single Barrel Barrel Strength OBSK,. ✨Just cracked open this Four Roses Private Selection Single Barrel Barrel Strength, and it's a special one. This is an official Texas State ... ... Four Roses",
+        "results": [
+          {
+            "title": "Four Roses bourbon recipe a hit",
+            "url": "https://www.facebook.com/groups/935086413269446/posts/4772787806165935/",
+            "domain": "facebook.com",
+            "description": "It is the single barrel, barrel strength version from Four Roses. The ABV is 58.5% and is produced in Lawrenceburg, Kentucky. Being a barrel ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Bourbon | There's no wrong way to enjoy ...",
+            "url": "https://www.instagram.com/reel/DOox8JPkgCg/?hl=en",
+            "domain": "instagram.com",
+            "description": "Four Roses Single Barrel Barrel Strength OBSQ is one of the best bourbons I've reviewed to date. This barrel delivered red delicious apple from ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Community Review #53: Four Roses OB Private Selections",
+            "url": "https://www.reddit.com/r/bourbon/comments/7uruhl/community_review_53_four_roses_ob_private/",
+            "domain": "reddit.com",
+            "description": "... bourbon is right up my alley and the ABV is in my excitement zone. ... r/bourbon - Review #591: Four Roses Single Barrel Barrel Strength OBSK,.",
+            "extraSnippets": []
+          },
+          {
+            "title": "For those who appreciate the details... Four Roses Bourbon ...",
+            "url": "https://www.instagram.com/reel/DYkowt6pmma/",
+            "domain": "instagram.com",
+            "description": "✨Just cracked open this Four Roses Private Selection Single Barrel Barrel Strength, and it's a special one. This is an official Texas State ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses – Page 2 - Sipology",
+            "url": "https://sipologyblog.com/tag/four-roses/page/2/",
+            "domain": "sipologyblog.com",
+            "description": "... Four Roses Small batch or another single barrel barrel strength recipe. Both are recommended, the OBSK highly. Four Roses Small Batch · September 8, 2011 ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "792696753e58b94b80407c66f3ad20ddf0dc461a64978c36de9a768b18b0ca75",
+    "mode": "auto"
+  }
+}

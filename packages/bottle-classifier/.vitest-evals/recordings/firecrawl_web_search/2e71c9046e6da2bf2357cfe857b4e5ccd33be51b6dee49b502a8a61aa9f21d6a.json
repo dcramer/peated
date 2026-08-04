@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-08-03T22:43:10.833Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Watchpost whiskey 42.5% Westland Distillery blend",
+      "\"Watchpost\" \"42.5%\" whiskey"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Watchpost whiskey 42.5% Westland Distillery blend",
+        "summary": "Bottling Strength: 42.5% ABV (85 Proof), emphasizing accessibility and versatility. grain, milk chocolate, and hints of cherry pie. blended with grain whiskey. ... key Watchpost Whiskey $34.99 … further with a blended whiskey. Aged in New Oak & PX. Nose: Apricot, Toasted Biscuit, Milk Chocolate, Cherry Pie Watchpost Whiskey will be available exclusively in Washington State beginning August 1, 2025, with bottles for sale at Westland's SoDo ... Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV: 42.5% | Cost: $35-$40. I really enjoyed this both ... 8-year Ameri",
+        "results": [
+          {
+            "title": "Westland Watchpost 8 Year Old Blended American Whiskey",
+            "url": "https://www.blackwellswines.com/products/westland-watchpost-8-year-old-blended-american-whiskey?srsltid=AfmBOop7MCT7EW58dkzWnpjFrAyj_By7XyA_HO20AX4r4ipSzl5rnj_J",
+            "domain": "blackwellswines.com",
+            "description": "Bottling Strength: 42.5% ABV (85 Proof), emphasizing accessibility and versatility. grain, milk chocolate, and hints of cherry pie. blended with grain whiskey. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey",
+            "url": "https://westlanddistillery.com/products/watchpost-whiskey?srsltid=AfmBOoqELy2VhqvXUvisytjlRyYyV9bUTf28h30A9uUWULkd8pKime6I",
+            "domain": "westlanddistillery.com",
+            "description": "key Watchpost Whiskey $34.99 … further with a blended whiskey. Aged in New Oak & PX. Nose: Apricot, Toasted Biscuit, Milk Chocolate, Cherry Pie",
+            "extraSnippets": []
+          },
+          {
+            "title": "Announcing Watchpost American Blended Whiskey From the Team at ...",
+            "url": "https://sipmagazine.com/announcing-watchpost-american-blended-whiskey-from-the-team-at-westland-distillery/",
+            "domain": "sipmagazine.com",
+            "description": "Watchpost Whiskey will be available exclusively in Washington State beginning August 1, 2025, with bottles for sale at Westland's SoDo ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey - thewhiskeywench",
+            "url": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+            "domain": "thewhiskeywench.com",
+            "description": "Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV: 42.5% | Cost: $35-$40. I really enjoyed this both ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey?srsltid=AfmBOorlvT61ylyo41YPmucjoLLhceUbNdtrHsbWRxAoIxJ9s8nHc-Zi",
+            "domain": "woodencork.com",
+            "description": "8-year American blended whiskey from Seattle's Westland — five-malt single malt blended with ex-bourbon grain whiskey, 42.5% ABV.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Watchpost\" \"42.5%\" whiskey",
+        "summary": "Watchpost is an American blended whiskey bottled at 42.5% ABV (85 proof). It blends Westland's signature Pacific Northwest single malt with lighter, smoother ... Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV: 42.5% | Cost: $35-$40. I really enjoyed this both ... Bottled at 42.5% ABV, with a portion of proceeds benefiting the Washington Trails Association. Watchpost is Westland's approachable, outdoors-minded blended ... An American blended whiskey. Aged 8 years. Good friends. Safe travels. Blended for Adventure in the Pacific Northwest: Watchpost is an a",
+        "results": [
+          {
+            "title": "Watchpost Whiskey",
+            "url": "https://thecampwest.com/watchpost-whiskey/",
+            "domain": "thecampwest.com",
+            "description": "Watchpost is an American blended whiskey bottled at 42.5% ABV (85 proof). It blends Westland's signature Pacific Northwest single malt with lighter, smoother ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey - thewhiskeywench",
+            "url": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+            "domain": "thewhiskeywench.com",
+            "description": "Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV: 42.5% | Cost: $35-$40. I really enjoyed this both ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey?srsltid=AfmBOordOnGNHxNRK0sdcoFLU-XB4hkadR8YpseFagyxfwD2FoMiorb9",
+            "domain": "woodencork.com",
+            "description": "Bottled at 42.5% ABV, with a portion of proceeds benefiting the Washington Trails Association. Watchpost is Westland's approachable, outdoors-minded blended ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost Single Malt Whiskey - 750 ML",
+            "url": "https://www.haggen.com/shop/product-details.971301781.html",
+            "domain": "haggen.com",
+            "description": "An American blended whiskey. Aged 8 years. Good friends. Safe travels. Blended for Adventure in the Pacific Northwest: Watchpost is an adventurous blend of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "so not only do you get a great whiskey (truly), you're ...",
+            "url": "https://www.instagram.com/p/DYFv8oggQDn/",
+            "domain": "instagram.com",
+            "description": "WATCHPOST WATCHPOST WHISKEY GOOD FRIENDS SAFE TRAVELS AN AMERICAN BLENDED WHISKEY 42.5% ALC/VOL 85 PROOF A PRODUCT OF THE WESTLAND DISTILLERY ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2e71c9046e6da2bf2357cfe857b4e5ccd33be51b6dee49b502a8a61aa9f21d6a",
+    "mode": "auto"
+  }
+}

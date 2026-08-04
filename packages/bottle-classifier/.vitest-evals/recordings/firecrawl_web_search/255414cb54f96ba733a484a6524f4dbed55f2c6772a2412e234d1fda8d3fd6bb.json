@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T05:08:26.099Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Lagavulin Distiller's Edition\" \"2023\" Islay single malt"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Lagavulin Distiller's Edition\" \"2023\" Islay single malt",
+        "summary": "# Comments Section\nLike a number of the Diageo distilleries that have a core range, Lagavulin releases an annual 'Distiller's Edition' single malt.\n\n**Lagavulin Distiller's Edition**\n\n_Scotland/Islay - Single Malt_ Whiskey: Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch. Enjoy neat, on the rocks or in your favorite classic cocktail. Order from the ... This limited-edition single malt Scotch whisky is double-matured, combining the robust smoky character of Lagavulin with the luscious sweetness of Pedro Ximé ... 2007 Lagavulin \"Distiller's Edition 2023\" Islay Single Malt Scotch Whis",
+        "results": [
+          {
+            "title": "r/Scotch - Review #204 - Lagavulin Distiller's Edition",
+            "url": "https://www.reddit.com/r/Scotch/comments/199s2zi/review_204_lagavulin_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "# Comments Section\nLike a number of the Diageo distilleries that have a core range, Lagavulin releases an annual 'Distiller's Edition' single malt.\n\n**Lagavulin Distiller's Edition**\n\n_Scotland/Islay - Single Malt_",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch ...",
+            "url": "https://caskcartel.com/products/lagavulin-distillers-edition-2023-islay-single-malt-scotch-whisky",
+            "domain": "caskcartel.com",
+            "description": "Whiskey: Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch. Enjoy neat, on the rocks or in your favorite classic cocktail. Order from the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distiller's Edition 2024",
+            "url": "https://woodencork.com/products/lagavulin-the-distillers-edition-2024?srsltid=AfmBOorsRMKMn2Tp3XUWXIR2ZFJ8WUdznzbttTV1Ps9jjdQkusinC8BS",
+            "domain": "woodencork.com",
+            "description": "This limited-edition single malt Scotch whisky is double-matured, combining the robust smoky character of Lagavulin with the luscious sweetness of Pedro Ximé ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2007 Lagavulin \"Distiller's Edition 2023\" Islay Single Malt ...",
+            "url": "https://shop.klwines.com/products/details/1706166",
+            "domain": "shop.klwines.com",
+            "description": "2007 Lagavulin \"Distiller's Edition 2023\" Islay Single Malt Scotch Whisky (750ml). Price: $149.99. Product Details. Origin: South Shore, Islay, Scotland.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Is this better than Lagavulin 16? Lagavulin Distiller's Edition ...",
+            "url": "https://www.youtube.com/watch?v=mo3P_UMOlr4",
+            "domain": "youtube.com",
+            "description": "Lagavulin Distiller's Edition 2023 Single Malt Scotch! ... 9 Famous Islay Scotch Ranked Worst To Best. Boozeology. New. 142 views · 16:11 · Go to ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "255414cb54f96ba733a484a6524f4dbed55f2c6772a2412e234d1fda8d3fd6bb",
+    "mode": "auto"
+  }
+}

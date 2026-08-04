@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-03T22:29:06.743Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Elijah Craig \"Cask Strength\" bourbon official"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Elijah Craig \"Cask Strength\" bourbon official",
+        "summary": "The Elijah Craig Barrel Proof program releases three batches annually. Each batch reflects a different barrel selection at its natural cask strength — no ... ... Cask Strength Straight Bourbon (Alamo City Liquor Pick) · r/bourbon - Review #57: Still Austin Single Barrel Cask Strength Straight Bourbon. $86.00 ... An 8 year single barrel Cask Exclusive bourbon bottled at cask strength, Chosen by Berkeley Cask. It's rich and has a full bodied texture. Look for ... Elijah Craig Barrel Proof B525 750ml. Limited 2025 release uncut, unfiltered bourbon at cask strength. Rich caramel, oak & spice. Coll",
+        "results": [
+          {
+            "title": "Elijah Craig Barrel Proof Batch 2",
+            "url": "https://woodencork.com/products/elijah-craig-barrel-proof-kentucky-straight-bourbon-whiskey-batch-2?srsltid=AfmBOoqdq7sZ21iNC8OF95tu75EnG9wekWssF2PylpfPgJ9DoR2WZC0y",
+            "domain": "woodencork.com",
+            "description": "The Elijah Craig Barrel Proof program releases three batches annually. Each batch reflects a different barrel selection at its natural cask strength — no ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Why I don't buy Elijah Craig Barrel Proof batches anymore",
+            "url": "https://www.reddit.com/r/bourbon/comments/xjaosg/why_i_dont_buy_elijah_craig_barrel_proof_batches/",
+            "domain": "reddit.com",
+            "description": "... Cask Strength Straight Bourbon (Alamo City Liquor Pick) · r/bourbon - Review #57: Still Austin Single Barrel Cask Strength Straight Bourbon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "ELIJAH CRAIG PRIVATE BARREL 8 YEAR BOURBON ...",
+            "url": "https://caskstore.com/products/elijah-craig-private-barrel-8-year-bourbon-750-ml",
+            "domain": "caskstore.com",
+            "description": "$86.00 ... An 8 year single barrel Cask Exclusive bourbon bottled at cask strength, Chosen by Berkeley Cask. It's rich and has a full bodied texture. Look for ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Bourbon B525 750ml",
+            "url": "https://unwindbottleshop.com/products/elijah-craig-barrel-proof-bourbon-b525-750ml?srsltid=AfmBOopvzp3doPzl7qVWTcjiyU0kHmfu1Wnl6lzdNsT2xArZLY91pj8X",
+            "domain": "unwindbottleshop.com",
+            "description": "Elijah Craig Barrel Proof B525 750ml. Limited 2025 release uncut, unfiltered bourbon at cask strength. Rich caramel, oak & spice. Collector's batch.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskey of the Week: Elijah Craig 15 year old Single Barrel",
+            "url": "https://whiskyadvocate.com/elijah-craig-15-year-old-bourbon-reviewed",
+            "domain": "whiskyadvocate.com",
+            "description": "The store picks are usually cask strength, but the official single barrels have historically been bottled at 90 proof. Make no mistake: They provide an ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "0da27231934a1a2e2d4ddd42c2e3a2fdb7950d95dc299b2a9cdbc9539ab40be1",
+    "mode": "auto"
+  }
+}
