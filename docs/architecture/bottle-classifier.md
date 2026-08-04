@@ -464,8 +464,8 @@ entities, and live web evidence:
 - `firecrawl_web_search`: one to three focused live searches in one agent turn,
   with ranked source URLs and compact relevance snippets without scraping every
   result page
-- `firecrawl_read_page`: focused reading of one promising search result when
-  its short excerpt does not expose the identity-critical fact
+- `firecrawl_read_page`: focused reading of one promising public page when a
+  short search excerpt does not expose the identity-critical fact
 
 When Firecrawl is not configured, the agent has no web-evidence tools. The runtime
 does not silently replace it with a second model or another provider.

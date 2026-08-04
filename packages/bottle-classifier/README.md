@@ -127,13 +127,14 @@ Package-specific reminders:
 
 When changing classifier behavior:
 
-1. Update or add a focused unit test only for deterministic behavior.
-2. Update or add the relevant file-backed eval fixtures when the behavior changes exact Bottle identity boundaries.
-3. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
+1. Inspect the trace from extraction through tools, agent output, review policy, and fixture expectation. A poor model query belongs to the prompt or tool description; a valid query that errors or returns malformed data belongs to the adapter or provider and is not negative evidence.
+2. Update or add a focused unit test only for deterministic behavior.
+3. Update or add the relevant file-backed eval fixtures when the behavior changes exact Bottle identity boundaries.
+4. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
    When automation behavior matters, assert the code-derived `expected.expectedTier: auto | review`. The tier comes from action risk, unresolved risks, and structured evidence or deterministic anchors; it does not read model-supplied numeric scores.
-4. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
-5. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
-6. Run package typecheck, focused unit tests, and fixture validation for routine changes. Run live evals only when explicitly requested or when doing an intentional scoped eval pass.
+5. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
+6. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
+7. Run package typecheck, focused unit tests, and fixture validation for routine changes. Use focused live evals while iterating and run the full live suite once at a deliberate checkpoint.
 
 When adding an eval from a real production miss:
 
