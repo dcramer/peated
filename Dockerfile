@@ -4,7 +4,7 @@ ENV NODE_ENV="production" \
     DEBIAN_FRONTEND="noninteractive" \
     PNPM_HOME="/pnpm" \
     PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@10.3.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.20.0 --activate
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \

@@ -9,18 +9,18 @@ Design or review agents by identifying the success contract first, mapping the r
 
 Load only what applies:
 
-| Need | Read |
-| --- | --- |
-| Choose architecture or multi-agent shape | `references/principles.md` |
-| Rewrite prompts or improve cache reuse | `references/prompt-and-caching.md` |
-| Draft or rewrite an actual system prompt | `references/system-prompt-templates.md` |
+| Need                                                                        | Read                                        |
+| --------------------------------------------------------------------------- | ------------------------------------------- |
+| Choose architecture or multi-agent shape                                    | `references/principles.md`                  |
+| Rewrite prompts or improve cache reuse                                      | `references/prompt-and-caching.md`          |
+| Draft or rewrite an actual system prompt                                    | `references/system-prompt-templates.md`     |
 | Draft a provider-specific prompt for OpenAI Responses or Anthropic tool use | `references/provider-specific-templates.md` |
-| Improve tool calling, tool schemas, or final outputs | `references/tool-and-schema-design.md` |
-| Draft or fix actual tool schemas | `references/tool-schema-examples.md` |
-| Review loops, approvals, side effects, or trust boundaries | `references/runtime-and-guardrails.md` |
-| Build evals or decide how to iterate | `references/evals-and-iteration.md` |
-| Review classifier, matcher, router, extractor, ranker, or moderation agent | `references/classifier-agents.md` |
-| Need examples of strong and weak output | `references/review-examples.md` |
+| Improve tool calling, tool schemas, or final outputs                        | `references/tool-and-schema-design.md`      |
+| Draft or fix actual tool schemas                                            | `references/tool-schema-examples.md`        |
+| Review loops, approvals, side effects, or trust boundaries                  | `references/runtime-and-guardrails.md`      |
+| Build evals or decide how to iterate                                        | `references/evals-and-iteration.md`         |
+| Review classifier, matcher, router, extractor, ranker, or moderation agent  | `references/classifier-agents.md`           |
+| Need examples of strong and weak output                                     | `references/review-examples.md`             |
 
 ## Step 1: Set Mode and Success Contract
 
@@ -49,11 +49,11 @@ Use `references/principles.md`.
 
 Classify the system before proposing changes:
 
-| Pattern | Use when | Avoid when |
-| --- | --- | --- |
-| Deterministic workflow | The task is mostly rule-based or decomposes cleanly in code | The model must explore or use tools adaptively |
-| Single agent | One prompt plus tools can reliably solve the task in a loop | Prompt complexity or tool overload makes behavior unstable |
-| Multi-agent system | Distinct roles, tools, or trust boundaries must stay separate | You are adding agents without a measured bottleneck |
+| Pattern                | Use when                                                      | Avoid when                                                 |
+| ---------------------- | ------------------------------------------------------------- | ---------------------------------------------------------- |
+| Deterministic workflow | The task is mostly rule-based or decomposes cleanly in code   | The model must explore or use tools adaptively             |
+| Single agent           | One prompt plus tools can reliably solve the task in a loop   | Prompt complexity or tool overload makes behavior unstable |
+| Multi-agent system     | Distinct roles, tools, or trust boundaries must stay separate | You are adding agents without a measured bottleneck        |
 
 Prefer deterministic preprocessing, retrieval, routing, or thresholds before adding more agent autonomy.
 
@@ -78,17 +78,17 @@ For classifier-style systems, separate deterministic stages from model-driven st
 
 Inspect the highest-risk layer first:
 
-| Layer | Check |
-| --- | --- |
-| Architecture | Is this over-agentized? |
-| Prompt | Is policy explicit, structured, and stable enough for caching? |
-| Retrieval | Is the right evidence or candidate set available before the model decides? |
-| Tools | Are tool interfaces narrow, typed, and easy to choose correctly? |
-| Output contract | Are actions and state machine-checkable? |
-| Runtime | Are retries, stop conditions, and fallbacks explicit? |
-| Boundaries | Are approvals, auth, and trust boundaries enforced outside the prompt? |
-| Thresholds | Do confidence and automation gates map to real consequences? |
-| Evals | Can proposed changes be measured? |
+| Layer           | Check                                                                      |
+| --------------- | -------------------------------------------------------------------------- |
+| Architecture    | Is this over-agentized?                                                    |
+| Prompt          | Is policy explicit, structured, and stable enough for caching?             |
+| Retrieval       | Is the right evidence or candidate set available before the model decides? |
+| Tools           | Are tool interfaces narrow, typed, and easy to choose correctly?           |
+| Output contract | Are actions and state machine-checkable?                                   |
+| Runtime         | Are retries, stop conditions, and fallbacks explicit?                      |
+| Boundaries      | Are approvals, auth, and trust boundaries enforced outside the prompt?     |
+| Thresholds      | Do confidence and automation gates map to real consequences?               |
+| Evals           | Can proposed changes be measured?                                          |
 
 Do not default to prompt rewrites if retrieval, thresholds, or post-model guards dominate the failures.
 
