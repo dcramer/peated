@@ -11,8 +11,8 @@ import { EntityTypeEnum } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-if (!config.OPENAI_API_KEY) {
-  logWarn("OPENAI_API_KEY is not configured", {});
+if (!config.AI_GATEWAY_API_KEY) {
+  logWarn("AI_GATEWAY_API_KEY is not configured", {});
 }
 
 type InputEntity = Partial<Entity> & {
@@ -120,7 +120,7 @@ export default async ({
   entityId: number;
   force?: boolean;
 }) => {
-  if (!config.OPENAI_API_KEY) {
+  if (!config.AI_GATEWAY_API_KEY) {
     return;
   }
 

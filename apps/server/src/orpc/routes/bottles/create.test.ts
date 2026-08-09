@@ -52,7 +52,7 @@ vi.mock("@peated/server/agents/bottleClassifier", async () => {
 describe("POST /bottles", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
   });
 
   test("requires authentication, verification, and accepted terms without writes", async ({
@@ -751,7 +751,7 @@ describe("POST /bottles", () => {
     defaults,
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = "test-key";
+    config.AI_GATEWAY_API_KEY = "test-key";
 
     const brand = await fixtures.Entity({ name: "Yamazaki" });
     classifyBottleReferenceMock.mockRejectedValue(
@@ -778,7 +778,7 @@ describe("POST /bottles", () => {
     defaults,
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = "test-key";
+    config.AI_GATEWAY_API_KEY = "test-key";
 
     const brand = await fixtures.Entity({ name: "Yamazaki" });
     await fixtures.Bottle({

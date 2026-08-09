@@ -21,12 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       evals_requested: ${{ steps.gate.outputs.evals_requested }}
-      openai_ready: ${{ steps.gate.outputs.openai_ready }}
+      gateway_ready: ${{ steps.gate.outputs.gateway_ready }}
       should_run: ${{ steps.gate.outputs.should_run }}
     steps:
       - id: gate
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
         run: |
           set -euo pipefail
 
@@ -42,20 +42,20 @@ jobs:
             evals_requested=true
           fi
 
-          if [[ -n "${OPENAI_API_KEY:-}" ]]; then
-            openai_ready=true
+          if [[ -n "${AI_GATEWAY_API_KEY:-}" ]]; then
+            gateway_ready=true
           else
-            openai_ready=false
+            gateway_ready=false
           fi
 
           should_run=false
-          if [[ "$evals_requested" == "true" && "$openai_ready" == "true" ]]; then
+          if [[ "$evals_requested" == "true" && "$gateway_ready" == "true" ]]; then
             should_run=true
           fi
 
           {
             echo "evals_requested=$evals_requested"
-            echo "openai_ready=$openai_ready"
+            echo "gateway_ready=$gateway_ready"
             echo "should_run=$should_run"
           } >> "$GITHUB_OUTPUT"
           {
@@ -63,12 +63,12 @@ jobs:
             echo
             echo "- label: $label_name"
             echo "- evals_requested: $evals_requested"
-            echo "- openai_ready: $openai_ready"
+            echo "- gateway_ready: $gateway_ready"
             echo "- will_run: $should_run"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [[ "$evals_requested" == "true" && "$openai_ready" != "true" ]]; then
-            echo "::error::The trigger-evals label requires OPENAI_API_KEY."
+          if [[ "$evals_requested" == "true" && "$gateway_ready" != "true" ]]; then
+            echo "::error::The trigger-evals label requires AI_GATEWAY_API_KEY."
             exit 1
           fi
 
@@ -78,7 +78,7 @@ jobs:
     if: needs.gate.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
       BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
     steps:
       - uses: actions/checkout@v4

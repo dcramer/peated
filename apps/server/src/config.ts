@@ -1,7 +1,7 @@
 import { resolveOpenAICompatibleConfig } from "@peated/bottle-classifier/openaiCompatibleConfig";
 import { tmpdir } from "node:os";
 
-const openAIConfig = resolveOpenAICompatibleConfig(process.env);
+const aiGatewayConfig = resolveOpenAICompatibleConfig(process.env);
 
 export default {
   ENV:
@@ -54,23 +54,17 @@ export default {
 
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
 
-  OPENAI_API_KEY: openAIConfig.apiKey,
-  BOTTLE_CLASSIFIER_MODEL: openAIConfig.bottleClassifierModel,
+  AI_GATEWAY_API_KEY: aiGatewayConfig.apiKey,
+  BOTTLE_CLASSIFIER_MODEL: aiGatewayConfig.bottleClassifierModel,
   BOTTLE_CLASSIFIER_REASONING_EFFORT:
-    openAIConfig.bottleClassifierReasoningEffort,
-  OPENAI_EMBEDDING_MODEL: openAIConfig.embeddingModel,
-  OPENAI_HOST: openAIConfig.baseURL,
-  OPENAI_IMAGE_EXTRACTION_MODEL: openAIConfig.imageExtractionModel,
+    aiGatewayConfig.bottleClassifierReasoningEffort,
+  OPENAI_EMBEDDING_MODEL: aiGatewayConfig.embeddingModel,
+  AI_GATEWAY_HOST: aiGatewayConfig.baseURL,
+  OPENAI_IMAGE_EXTRACTION_MODEL: aiGatewayConfig.imageExtractionModel,
   OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT:
-    openAIConfig.imageExtractionReasoningEffort,
-  OPENAI_MODEL: openAIConfig.model,
-  OPENAI_REASONING_EFFORT: openAIConfig.reasoningEffort,
-  OPENAI_ORGANIZATION:
-    openAIConfig.organization ||
-    (openAIConfig.provider === "openai"
-      ? "org-c11AVkF35wixZcGri1YBH9Pq"
-      : null),
-  OPENAI_PROJECT: openAIConfig.project || null,
+    aiGatewayConfig.imageExtractionReasoningEffort,
+  OPENAI_MODEL: aiGatewayConfig.model,
+  OPENAI_REASONING_EFFORT: aiGatewayConfig.reasoningEffort,
   FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || null,
   FIRECRAWL_API_URL: process.env.FIRECRAWL_API_URL || null,
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(

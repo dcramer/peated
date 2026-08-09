@@ -15,7 +15,7 @@ import {
   createEvalOpenAIClient,
   evalImageExtractionModel,
   evalImageExtractionReasoningEffort,
-  hasEvalOpenAICredentials,
+  hasEvalAIGatewayCredentials,
 } from "./evalSupport";
 import { withEvalModelCallCapture } from "./evalTelemetry";
 import { createWhiskyLabelExtractor } from "./extractor";
@@ -174,7 +174,7 @@ const imageExtractionHarness = createHarness<
 describeEval(
   "image extraction evals",
   {
-    skipIf: () => !hasEvalOpenAICredentials,
+    skipIf: () => !hasEvalAIGatewayCredentials,
     harness: imageExtractionHarness,
   },
   (it) => {

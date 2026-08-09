@@ -281,7 +281,7 @@ function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
 }
 
 describe("priceMatching", () => {
-  const originalOpenAIApiKey = config.OPENAI_API_KEY;
+  const originalAIGatewayApiKey = config.AI_GATEWAY_API_KEY;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -291,17 +291,17 @@ describe("priceMatching", () => {
       result: await vi.mocked(classifyBottleReference)(...args),
       modelMetadata: null,
     }));
-    config.OPENAI_API_KEY = originalOpenAIApiKey;
+    config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   });
 
   afterEach(() => {
-    config.OPENAI_API_KEY = originalOpenAIApiKey;
+    config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   });
 
   test("falls back to exact candidates when embeddings fail", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = "test-openai-key";
+    config.AI_GATEWAY_API_KEY = "test-gateway-key";
     const { getOpenAIEmbedding } =
       await import("@peated/server/lib/openaiEmbeddings");
     vi.mocked(getOpenAIEmbedding).mockRejectedValue(
@@ -335,7 +335,7 @@ describe("priceMatching", () => {
   test("resolves exact aliases through direct Bottle ownership", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const targetBottle = await fixtures.Bottle({
       name: "Authoritative Exact Candidate",
@@ -367,7 +367,7 @@ describe("priceMatching", () => {
   test("uses assigned aliases and excludes ignored or unresolved aliases", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const member = await fixtures.Bottle({ name: "Alias Scope Member" });
     await fixtures.BottleAlias({
@@ -411,7 +411,7 @@ describe("priceMatching", () => {
   test("excludes tombstoned Bottles from exact, text, and direct candidate lookup", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const retired = await fixtures.Bottle({
       name: "Retired Candidate Identity ZXQ",
@@ -436,7 +436,7 @@ describe("priceMatching", () => {
   test("loads an active Bottle candidate directly by id", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const parent = await fixtures.LegacyBottle({ name: "Historical Parent" });
     await expect(getBottleCandidateById(parent.id)).resolves.toMatchObject({
@@ -454,7 +454,7 @@ describe("priceMatching", () => {
   test("finds age-specific photo candidates when stored bottles are missing ABV", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       type: ["brand", "distiller"],
@@ -560,7 +560,7 @@ describe("priceMatching", () => {
   test("prefers structured extracted identity over noisy retailer titles for exact lookup", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       type: ["brand"],
@@ -602,7 +602,7 @@ describe("priceMatching", () => {
   test("includes extracted cask flags in exact alias lookup", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       type: ["brand"],
@@ -652,7 +652,7 @@ describe("priceMatching", () => {
   test("finds existing SMWS bottles by code when the source omits the subtitle", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       type: ["brand", "bottler"],
@@ -713,7 +713,7 @@ describe("priceMatching", () => {
   test("the canonical price create path safely reuses an existing SMWS code identity", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const reviewer = await fixtures.User();
     const brand = await fixtures.Entity({
@@ -997,7 +997,7 @@ describe("priceMatching", () => {
   test("prefers a literal exact alias over apostrophe-normalized fallback matches", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       type: ["brand"],
@@ -1050,7 +1050,7 @@ describe("priceMatching", () => {
   });
 
   test("normalizes string bottle ids returned from raw candidate queries", async () => {
-    config.OPENAI_API_KEY = "test-openai-key";
+    config.AI_GATEWAY_API_KEY = "test-gateway-key";
 
     const { getOpenAIEmbedding } =
       await import("@peated/server/lib/openaiEmbeddings");
@@ -1099,7 +1099,7 @@ describe("priceMatching", () => {
   test("normalizes fractional classifier confidence before persisting proposals", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -1183,7 +1183,7 @@ describe("priceMatching", () => {
   test("keeps a plain age-statement match instead of drifting into a cask-strength release proposal", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -1357,7 +1357,7 @@ describe("priceMatching", () => {
   test("auto approves high-confidence matches that reaffirm the current bottle assignment", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -1480,7 +1480,7 @@ describe("priceMatching", () => {
   test("auto approves unmatched exact matches when classifier confidence is extremely high", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -1593,7 +1593,7 @@ describe("priceMatching", () => {
   test("auto approves unmatched high-confidence text matches when the raw title clearly reaffirms the bottle", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -1675,7 +1675,7 @@ describe("priceMatching", () => {
   test("persists classifier-reviewed no_match decisions for unsupported non-exact matches", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -1788,7 +1788,7 @@ describe("priceMatching", () => {
   test("keeps non-exact existing matches when validated web evidence validates an omitted target trait", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -1909,7 +1909,7 @@ describe("priceMatching", () => {
   test("auto-approves high-confidence existing matches when validated web evidence confirms the bottle identity", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -2052,7 +2052,7 @@ describe("priceMatching", () => {
   test("auto-approves high-confidence unassigned correction assignments without applying repair fields", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -2214,7 +2214,7 @@ describe("priceMatching", () => {
   test("keeps exact-ish bottle matches when only generic retailer words differ", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -2295,7 +2295,7 @@ describe("priceMatching", () => {
   test("keeps local-only create_new proposals in review without mutating model confidence", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -2376,7 +2376,7 @@ describe("priceMatching", () => {
   test("routes same-bottle create drafts into correction review when the current bottle metadata is wrong", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -2578,7 +2578,7 @@ describe("priceMatching", () => {
   test("stores first-class repair decisions as existing-bottle repairs", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -3041,7 +3041,7 @@ describe("priceMatching", () => {
   test("persists normalized proposed bottle drafts from the classifier", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -3131,7 +3131,7 @@ describe("priceMatching", () => {
   test("treats classifier-reviewed unknown categories as review-only", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -3257,7 +3257,7 @@ describe("priceMatching", () => {
   });
 
   test("does not auto-create from empty web evidence", async ({ fixtures }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -3346,7 +3346,7 @@ describe("priceMatching", () => {
   });
 
   test("auto ignores clearly non-whisky listings", async ({ fixtures }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -3375,7 +3375,7 @@ describe("priceMatching", () => {
   test("routes unsupported novelty flavored-whiskey listings through the classifier", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -3415,7 +3415,7 @@ describe("priceMatching", () => {
   test("auto approves SMWS matches through the bottle classifier when aliases differ", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -3533,7 +3533,7 @@ describe("priceMatching", () => {
   test("auto approves SMWS classifier matches when the price is already linked to the same bottle", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -3652,7 +3652,7 @@ describe("priceMatching", () => {
   test("auto creates SMWS bottles through classifier-reviewed exact-cask identity", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -3815,7 +3815,7 @@ describe("priceMatching", () => {
   test("SMWS classifier auto approval succeeds while a retry lease is active", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -3955,7 +3955,7 @@ describe("priceMatching", () => {
   test("does not finalize a replacement attempt after retry lease ownership changes", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -4131,7 +4131,7 @@ describe("priceMatching", () => {
   test("SMWS classifier creation preserves the parsed cask code in the canonical bottle name", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -4297,7 +4297,7 @@ describe("priceMatching", () => {
   test("auto creates high-confidence web-validated new bottles", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -4474,7 +4474,7 @@ describe("priceMatching", () => {
   test("auto creates high-confidence bottles while a retry lease is active", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -4617,7 +4617,7 @@ describe("priceMatching", () => {
   test("does not auto-reuse an existing Bottle through a noncanonical alias collision", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -4730,7 +4730,7 @@ describe("priceMatching", () => {
   test("auto creates new bottles even when replacing an existing assignment", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     await fixtures.User({
       username: "dcramer",
@@ -4876,7 +4876,7 @@ describe("priceMatching", () => {
   test("preserves extracted label and candidates when classification fails", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -4980,7 +4980,7 @@ describe("priceMatching", () => {
   });
 
   test("includes decision-relevant structured bottle fields in candidate search text", async () => {
-    config.OPENAI_API_KEY = "test-openai-key";
+    config.AI_GATEWAY_API_KEY = "test-gateway-key";
 
     const { getOpenAIEmbedding } =
       await import("@peated/server/lib/openaiEmbeddings");
@@ -5038,7 +5038,7 @@ describe("priceMatching", () => {
   });
 
   test("re-ranks local candidates using structured bottle fields", async () => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const executeSpy = vi.spyOn(db, "execute") as any;
     executeSpy
@@ -5108,7 +5108,7 @@ describe("priceMatching", () => {
   test("penalizes an ordinary Bottle stated-age conflict", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = "test-openai-key";
+    config.AI_GATEWAY_API_KEY = "test-gateway-key";
     const { getOpenAIEmbedding } =
       await import("@peated/server/lib/openaiEmbeddings");
     const queryEmbedding = [1, ...Array.from({ length: 3071 }, () => 0)];
@@ -5158,7 +5158,7 @@ describe("priceMatching", () => {
   test("enriches candidates from the independently complete Bottle", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       name: "Independent Label",
@@ -5243,7 +5243,7 @@ describe("priceMatching", () => {
   test("surfaces an exact Distillers Edition Bottle from apostrophe retailer wording without web search", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const lagavulin = await fixtures.Entity({
       name: "Lagavulin",
@@ -5297,7 +5297,7 @@ describe("priceMatching", () => {
   test("keeps same-year marketed variants as ordinary Bottle candidates", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const lagavulin = await fixtures.Entity({
       name: "Lagavulin",
@@ -5363,7 +5363,7 @@ describe("priceMatching", () => {
   test("returns both exact and broader Bottle candidates for age-statement listings", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       name: "The Macallan",
@@ -5424,7 +5424,7 @@ describe("priceMatching", () => {
   test("finds buggy batch aliases and still surfaces the broader Bottle", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
       name: "Penelope",
@@ -5486,7 +5486,7 @@ describe("priceMatching", () => {
   });
 
   test("does not treat edition substring collisions as matching evidence", async () => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const executeSpy = vi.spyOn(db, "execute") as any;
     executeSpy
@@ -5552,7 +5552,7 @@ describe("priceMatching", () => {
   });
 
   test("ranks same-brand local candidates ahead of cross-brand options", async () => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const executeSpy = vi.spyOn(db, "execute") as any;
     executeSpy
@@ -5615,7 +5615,7 @@ describe("priceMatching", () => {
   test("passes a generic bottle reference payload into the classifier", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -5647,7 +5647,7 @@ describe("priceMatching", () => {
   test("records price match attempts and moderator outcomes", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const reviewer = await fixtures.User();
     const currentBottle = await fixtures.Bottle();
@@ -5800,7 +5800,7 @@ describe("priceMatching", () => {
   test("force reevaluation reopens closed proposals and clears review metadata", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const reviewer = await fixtures.User();
     const bottle = await fixtures.Bottle();
@@ -5908,7 +5908,7 @@ describe("priceMatching", () => {
   test("persists classifier-reviewed create_new drafts without re-sanitizing them", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -6024,7 +6024,7 @@ describe("priceMatching", () => {
   test("persists classifier-reviewed canonical entity choices on create_new proposals", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -6181,7 +6181,7 @@ describe("priceMatching", () => {
   test("marks proposals errored when classifier suggests an unknown bottle id", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -6267,7 +6267,7 @@ describe("priceMatching", () => {
   test("clears retry processing leases after forced resolution", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -6343,7 +6343,7 @@ describe("priceMatching", () => {
   test("refreshes queue entry time when forced re-resolution requeues a proposal", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6425,7 +6425,7 @@ describe("priceMatching", () => {
   test("active ignored-processing owner clears durable identity and releases its lease", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6482,7 +6482,7 @@ describe("priceMatching", () => {
   test("replacement owner survives ignored invalid-target recovery with unchanged identity", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6555,7 +6555,7 @@ describe("priceMatching", () => {
   test("auto ignored listings preserve unresolved assignment timestamps", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6596,7 +6596,7 @@ describe("priceMatching", () => {
   test("ignored listings do not resolve retained retired-Bottle evidence", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6645,7 +6645,7 @@ describe("priceMatching", () => {
   test("serializes ignored Bottle clearing through the StorePrice row", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6728,7 +6728,7 @@ describe("priceMatching", () => {
   test("auto ignored listings preserve a replacement Bottle assigned during classification", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6767,7 +6767,7 @@ describe("priceMatching", () => {
   test("continues an ignored proposal when concurrent reassignment retires the stale Bottle", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6818,7 +6818,7 @@ describe("priceMatching", () => {
   test("preserves a replacement Bottle assigned while ignored clearing waits", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
@@ -6912,7 +6912,7 @@ describe("priceMatching", () => {
   test("locks proven identity drift through ignored fallback persistence", async ({
     fixtures,
   }) => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
 
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");

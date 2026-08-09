@@ -56,7 +56,7 @@ import {
   createEvalClassifierOptions,
   evalClassifierModel,
   evalClassifierReasoningEffort,
-  hasEvalOpenAICredentials,
+  hasEvalAIGatewayCredentials,
 } from "./evalSupport";
 import { withEvalModelCallCapture } from "./evalTelemetry";
 import { createLocalCatalogDataSource } from "./localCatalog";
@@ -1063,7 +1063,7 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
   describeEval(
     label,
     {
-      skipIf: () => !hasEvalOpenAICredentials,
+      skipIf: () => !hasEvalAIGatewayCredentials,
       harness: classifierHarness,
       judges: [ClassifierExpectationJudge, ClassifierGroundingJudge],
       judgeThreshold: threshold,
@@ -1087,7 +1087,7 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
 describeEval(
   "bottle audits",
   {
-    skipIf: () => !hasEvalOpenAICredentials,
+    skipIf: () => !hasEvalAIGatewayCredentials,
     harness: auditHarness,
     judges: [
       AuditGroundingJudge,

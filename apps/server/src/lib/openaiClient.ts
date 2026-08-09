@@ -9,10 +9,8 @@ export function createOpenAIClient({
   instrumentWithSentry?: boolean;
 } = {}): OpenAI {
   const client = new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-    baseURL: config.OPENAI_HOST,
-    organization: config.OPENAI_ORGANIZATION,
-    project: config.OPENAI_PROJECT,
+    apiKey: config.AI_GATEWAY_API_KEY,
+    baseURL: config.AI_GATEWAY_HOST,
   });
 
   if (!instrumentWithSentry) {
