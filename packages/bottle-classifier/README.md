@@ -200,8 +200,8 @@ pnpm evals:classifier:flaky
 
 The focused command runs only these production-regression cases:
 
-- `Rogues' Banquet: image-backed match and repair`
-- `image-backed photo: matches and repairs Compass Box Spice Tree Extravaganza`
+- `Rogues' Banquet: image-backed match and Suggested Change`
+- `image-backed photo: requires a Spice Tree Extravaganza Suggested Change`
 - `store listing: matches Laphroaig Càirdeas 2022 Warehouse 1 and merges the malformed duplicate`
 - `audit: restore Pōkeno 2019 vintage without inferring a cask number`
 

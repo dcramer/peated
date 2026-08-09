@@ -2,7 +2,7 @@
 
 This spec defines the reviewed boundaries for turning a raw Bottle Reference
 into Peated bottle identity evidence or a Peated DB outcome. Price matching,
-review ingestion, repair tools, and other consumers should use these boundaries
+review ingestion, catalog tools, and other consumers should use these boundaries
 instead of redoing identity reasoning.
 
 Use the terms in the
@@ -16,8 +16,8 @@ The package has three distinct contracts:
 - `extractBottleReferenceIdentity(...)`: reads bottle identity facts from image
   or text. It does not decide whether the facts are canonical Peated identity.
 - `classifyBottleReference(...)`: full reviewed classification. It can match,
-  create, repair, or decline after considering local candidates, entity
-  resolution, and web evidence when required.
+  create, or decline after considering local candidates, entity resolution, and
+  web evidence when required.
 - `auditBottle(...)`: checks one existing Bottle and returns a summary,
   Suggested Changes, and non-executable findings. It does not return another
   identity decision.
@@ -38,7 +38,11 @@ It returns either `ignored` with a reason, or `classified` with:
 - web/search evidence used for reasoning
 - resolved brand, bottler, and distillery entities
 
-Decision actions are `match`, `repair_bottle`, `create_bottle`, and `no_match`.
+Decision actions are `match`, `create_bottle`, and `no_match`. A required
+catalog correction is a separate Suggested Change. The decision stays
+`no_match` until the current Bottle is safe for assignment. An optional
+Suggested Change can accompany `match` only when it does not affect assignment
+safety.
 `create_bottle` proposes one complete observed marketed Bottle: a stable
 expression in `proposedBottle.name` plus required exact fields, including edition,
 vintage year, release year, exact age, ABV, and cask flags. Canonical
@@ -50,7 +54,7 @@ manages grouping automatically. The classifier never selects a BottleGroup.
 Schemas, stored context, replay data, and explicit supplied values remain
 compatible. Once candidates are retrieved, the classifier does not use them as
 explicit identity constraints or deterministic score adjustments and does not
-investigate, reject, create, repair, or gate automation solely on those three
+investigate, reject, create, suggest a change, or gate automation solely on those three
 fields.
 Marketed finish wording in the Bottle name or edition, exact cask or barrel
 codes, `singleCask`, and `caskStrength` remain identity evidence.
@@ -78,9 +82,9 @@ A Bottle check is persisted workflow state for a server-owned intent:
 
 - `resolve_reference` identifies a Bottle from a listing or other external
   reference. Its existing structured decision remains the authoritative result.
-  Photo identification persists this state only when an existing-Bottle match
-  or repair result also contains supplemental operations or findings; the
-  end-user flow still receives only its existing match/create response.
+  Photo identification persists this state when a `match` or `no_match` result
+  also contains Suggested Changes or findings. The end-user flow receives only
+  the three identity results.
   Actionable store-price checks enter the Audits inbox only after the
   linked primary listing decision is complete.
 - `audit_bottle` reviews an existing Bottle from a moderator request or a
@@ -171,7 +175,7 @@ audit operation and finding precision. Measure:
 - intent accuracy and schema-valid output;
 - authoritative reference-decision and canonical/collected grounding gates;
 - exact Suggested Change and finding sets, with missing and extra reference
-  entries reported diagnostically and exact audit repair gating;
+  entries reported diagnostically and exact audit Suggested Change gating;
 - reviewer rejection/correction and time to disposition;
 - stale, failed, retry, and reconciliation outcomes;
 - model cost, latency, and tool calls.
@@ -226,14 +230,13 @@ for that complete Bottle.
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a
   closed-form deterministic anchor.
-- Repair and enrichment are secondary to identity routing. Missing optional
-  fields, questionable catalog metadata, or non-target-defining repair
-  opportunities should be recorded as observations or downstream repair work;
-  they should not block a clear match or create outcome.
-- Use repair actions only when a stored field conflict makes the selected target
-  identity unsafe.
-- Return `no_match` only when the Bottle identity is unresolved or when
-  creating would invent an ambiguous hybrid.
+- Catalog cleanup is secondary to identity routing. Missing optional fields or
+  other changes that do not affect assignment safety can use a separate
+  Suggested Change without blocking a clear match or create outcome.
+- Return `no_match` when a stored conflict requires a Suggested Change before
+  the reference is safe to assign.
+- Also return `no_match` when the Bottle identity is unresolved or when creating
+  would invent an ambiguous hybrid.
 
 False positive existing-bottle matches are worse than `no_match` or reviewed
 creation.
@@ -244,17 +247,16 @@ evidence bars:
 - Local identification may stop at an existing match when local evidence is
   sufficient for the requested workflow. It must return `no_match` when the
   local evidence is ambiguous, incomplete, or requires canonical interpretation.
-- Full classification is required when the caller wants a create, repair, or
-  other canonical DB outcome.
+- Full classification is required when the caller wants a create or a separate
+  Suggested Change.
 - Web evidence is not required for every existing local match. It is one way to
   corroborate missing canonical identity, but complete-Bottle creation may also
   be supported by reviewed label/image evidence, closed-form deterministic
   anchors, or explicit local sibling evidence where policy allows it.
 - Local sibling evidence comes only from explicit BottleGroup membership.
   Catalog adapters must not infer sibling relationships from Bottle names.
-- Manual-search consumers should treat `no_match` as unresolved identity, not as
-  a generic fallback for clear identities that happen to expose catalog repair
-  or enrichment work.
+- Manual-search consumers must not assign a `no_match` candidate. A linked
+  Suggested Change can explain which current Bottle must change first.
 
 ## Execution
 
@@ -515,7 +517,7 @@ a fixture cannot prove that an otherwise supported Suggested Change is harmful m
 omitting it. This does not turn opportunistic cleanup into a requirement for
 every reference, and every Suggested Change still requires moderator approval before
 mutation. For `audit_bottle`, exact operations, findings, and required evidence
-are gating because active repair investigation is the intent.
+are gating because catalog investigation is the intent.
 
 Full-classification evals own match quality and candidate recall. Server
 integration tests prove that an exact alias becomes an initial candidate and

@@ -171,7 +171,7 @@ function getDerivedVerifyEligibility(
 function getDerivedSuggestedNextStep(
   testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
-): "confirm_match" | "confirm_create" | "manual_search" | "needs_review" {
+): "confirm_match" | "confirm_create" | "manual_search" {
   if (result.status === "ignored") {
     return "manual_search";
   }
@@ -183,8 +183,6 @@ function getDerivedSuggestedNextStep(
       return tier === "auto" ? "confirm_match" : "manual_search";
     case "create_bottle":
       return tier === "auto" ? "confirm_create" : "manual_search";
-    case "repair_bottle":
-      return "needs_review";
     case "no_match":
       return "manual_search";
   }

@@ -272,50 +272,6 @@ function classifyStructuredExactName({
   });
 }
 
-function classifyCaskMetadataRepair(
-  changedFlag: { caskStrength?: boolean; singleCask?: boolean } = {},
-) {
-  const target: BottleCandidate = {
-    ...existingPrivateCask,
-    caskStrength: true,
-    caskType: "bourbon",
-    caskSize: "barrel",
-    caskFill: "refill",
-  };
-
-  return finalizeBottleReferenceClassification({
-    reference: { name: "Example Private Cask" },
-    decision: {
-      action: "repair_bottle",
-      rationale: "The cask metadata differs.",
-      candidateBottleIds: [target.bottleId],
-      identityScope: "product",
-      observation: null,
-      matchedBottleId: target.bottleId,
-      proposedBottle: {
-        name: "Private Cask",
-        brand: { name: "Example" },
-        bottler: null,
-        series: null,
-        category: "single_malt",
-        statedAge: null,
-        abv: null,
-        caskStrength: true,
-        singleCask: true,
-        caskType: "oloroso",
-        caskSize: "hogshead",
-        caskFill: "1st_fill",
-        vintageYear: null,
-        releaseYear: null,
-        edition: null,
-        distillers: [],
-        ...changedFlag,
-      },
-    },
-    artifacts: buildBottleClassificationArtifacts({ candidates: [target] }),
-  });
-}
-
 describe("finalizeBottleReferenceClassification", () => {
   test("removes a parenthesized structured edition without leaving empty punctuation", () => {
     const result = classifyStructuredExactName({
@@ -800,67 +756,6 @@ describe("finalizeBottleReferenceClassification", () => {
     });
     expect(result.rationale).toContain(
       "proposed bottle name duplicates the brand",
-    );
-  });
-
-  test("rejects bottle repair when the repaired name duplicates the brand", () => {
-    const decision: BottleClassifierAgentDecisionInput = {
-      action: "repair_bottle",
-      rationale: "Repair the existing bottle.",
-      candidateBottleIds: [existingPrivateCask.bottleId],
-      identityScope: "product",
-      observation: null,
-      matchedBottleId: existingPrivateCask.bottleId,
-      proposedBottle: {
-        name: "Example",
-        brand: { name: "Example" },
-        bottler: null,
-        series: null,
-        category: "single_malt",
-        statedAge: null,
-        abv: null,
-        caskStrength: null,
-        singleCask: true,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
-        vintageYear: null,
-        releaseYear: null,
-        edition: null,
-        distillers: [],
-      },
-    };
-
-    const result = finalizeBottleReferenceClassification({
-      reference: { name: "Example Private Cask" },
-      decision,
-      artifacts: buildBottleClassificationArtifacts({
-        candidates: [existingPrivateCask],
-      }),
-    });
-
-    expect(result).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
-    });
-  });
-
-  test("normalizes a repair based only on optional cask metadata to an unchanged match", () => {
-    const result = classifyCaskMetadataRepair();
-
-    expect(result).toMatchObject({
-      action: "match",
-      matchedBottleId: existingPrivateCask.bottleId,
-      proposedBottle: null,
-    });
-  });
-
-  test.each([
-    ["cask strength", { caskStrength: false }],
-    ["single cask", { singleCask: false }],
-  ] as const)("keeps a repair for a changed %s flag", (_label, changedFlag) => {
-    expect(classifyCaskMetadataRepair(changedFlag).action).toBe(
-      "repair_bottle",
     );
   });
 
@@ -1418,7 +1313,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("keeps a match when its grounded update repairs the extracted identity conflict", () => {
+  test("rejects a match that conflicts with the current Bottle identity", () => {
     const targetCandidate: BottleCandidate = {
       ...existingPrivateCask,
       bottleId: 9900,
@@ -1441,26 +1336,6 @@ describe("finalizeBottleReferenceClassification", () => {
     };
     const artifacts = buildBottleClassificationArtifacts({
       candidates: [targetCandidate],
-      resolvedEntities: [
-        {
-          entityId: 1422,
-          name: "Compass Box",
-          shortName: null,
-          type: ["brand", "bottler"],
-          alias: null,
-          score: 1,
-          source: ["search"],
-        },
-        {
-          entityId: 9999,
-          name: "Unrelated Brand",
-          shortName: null,
-          type: ["brand"],
-          alias: null,
-          score: 1,
-          source: ["search"],
-        },
-      ],
       extractedIdentity: {
         brand: "Compass Box",
         bottler: "Compass Box",
@@ -1486,147 +1361,8 @@ describe("finalizeBottleReferenceClassification", () => {
         reference: { name: "Compass Box Spice Tree Extravaganza" },
         decision,
         artifacts,
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: 9900,
-              patch: { exact: { abv: 46 } },
-            },
-            rationale: "Fill a missing field unrelated to the Brand conflict.",
-            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
-          },
-        ],
       }),
-    ).toMatchObject({ action: "no_match" });
-
-    expect(
-      finalizeBottleReferenceClassification({
-        reference: { name: "Compass Box Spice Tree Extravaganza" },
-        decision,
-        artifacts,
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: 9900,
-              patch: {
-                shared: {
-                  brand: { kind: "existing", entityId: 123456 },
-                },
-              },
-            },
-            rationale: "Replace the Brand with an unknown Entity.",
-            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
-          },
-        ],
-      }),
-    ).toMatchObject({ action: "no_match" });
-
-    expect(
-      finalizeBottleReferenceClassification({
-        reference: { name: "Compass Box Spice Tree Extravaganza" },
-        decision,
-        artifacts,
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: 9900,
-              patch: {
-                shared: {
-                  brand: { kind: "existing", entityId: 9999 },
-                },
-              },
-            },
-            rationale: "Replace the Brand with an unrelated inspected Entity.",
-            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
-          },
-        ],
-      }),
-    ).toMatchObject({ action: "no_match" });
-
-    expect(
-      finalizeBottleReferenceClassification({
-        reference: { name: "Compass Box Spice Tree Extravaganza" },
-        decision,
-        artifacts,
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: 9900,
-              patch: {
-                shared: {
-                  brand: { kind: "existing", entityId: 1422 },
-                },
-              },
-            },
-            rationale: "Repair the malformed Brand on the exact product.",
-            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
-          },
-        ],
-      }),
-    ).toMatchObject({ action: "match", matchedBottleId: 9900 });
-  });
-
-  test("requires a Bottle update value to resolve the extracted scalar conflict", () => {
-    const targetCandidate: BottleCandidate = {
-      ...existingPrivateCask,
-      abv: 45,
-    };
-    const decision: BottleClassifierAgentDecisionInput = {
-      action: "match",
-      rationale: "The source otherwise identifies the existing Bottle.",
-      candidateBottleIds: [100],
-      identityScope: "product",
-      aliasScope: "none",
-      observation: null,
-      matchedBottleId: 100,
-      proposedBottle: null,
-    };
-    const artifacts = buildBottleClassificationArtifacts({
-      candidates: [targetCandidate],
-      extractedIdentity: {
-        brand: "Example",
-        bottler: null,
-        expression: "Private Cask",
-        series: null,
-        distillery: [],
-        category: "single_malt",
-        stated_age: null,
-        abv: 46,
-        release_year: null,
-        vintage_year: null,
-        cask_strength: null,
-        single_cask: true,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
-        edition: null,
-      },
-    });
-    const finalizeWithAbv = (abv: number | null) =>
-      finalizeBottleReferenceClassification({
-        reference: { name: "Example Private Cask" },
-        decision,
-        artifacts,
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: { bottleId: 100, patch: { exact: { abv } } },
-            rationale: "Update the conflicting ABV.",
-            evidenceRefs: [{ kind: "bottle", bottleId: 100 }],
-          },
-        ],
-      });
-
-    expect(finalizeWithAbv(null)).toMatchObject({ action: "no_match" });
-    expect(finalizeWithAbv(44)).toMatchObject({ action: "no_match" });
-    expect(finalizeWithAbv(46)).toMatchObject({
-      action: "match",
-      matchedBottleId: 100,
-    });
+    ).toMatchObject({ action: "no_match", matchedBottleId: null });
   });
 
   test("keeps the extracted SMWS title in exact-cask create proposals", () => {

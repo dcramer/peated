@@ -120,8 +120,6 @@ function getSuggestedNextStep(
       )
         ? "confirm_create"
         : "manual_search";
-    case "repair_bottle":
-      return "needs_review";
     case "no_match":
       return "manual_search";
   }
@@ -231,11 +229,6 @@ async function serializePhotoIdentificationClassification(
               }
             : null,
         },
-      };
-      break;
-    case "repair_bottle":
-      serializedDecision = {
-        action: "repair_bottle",
       };
       break;
     case "no_match":
@@ -577,7 +570,7 @@ async function persistPhotoIdentificationReview({
 }) {
   if (
     classification.status !== "classified" ||
-    !["match", "repair_bottle"].includes(classification.decision.action) ||
+    classification.decision.action === "create_bottle" ||
     (classification.proposedOperations.length === 0 &&
       classification.findings.length === 0)
   ) {
@@ -609,7 +602,7 @@ async function persistPhotoIdentificationReview({
 /**
  * Runs label extraction and local candidate discovery for a pending scan, then
  * gives the full classifier the chance to identify the Bottle and propose any
- * supported catalog repairs.
+ * supported catalog changes.
  *
  * This is the shared Photo Identification workflow span boundary for all callers.
  */

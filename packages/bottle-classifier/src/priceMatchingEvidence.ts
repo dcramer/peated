@@ -96,7 +96,6 @@ export type AutomationTier = "auto" | "review";
 export const AUTOMATION_ACTION_RISK_CLASSES = [
   "match",
   "create",
-  "repair",
   "none",
 ] as const;
 export type AutomationActionRiskClass =
@@ -124,7 +123,7 @@ export type AutomationTierInput = {
   // A closed-form deterministic identity anchor (SMWS exact cask, exact_cask
   // scope, or a unique plain-age structured match).
   hasDeterministicAnchor: boolean;
-  // Create/repair anchors --------------------------------------------------
+  // Create anchors ---------------------------------------------------------
   // Reviewed label or image evidence is the primary support (e.g. a photo
   // scan), independent of web search.
   hasPrimaryLabelOrImageEvidence: boolean;
@@ -164,8 +163,8 @@ function deriveMatchTier(input: AutomationTierInput): AutomationTier {
   return hasMatchAnchor ? "auto" : "review";
 }
 
-function deriveCreateOrRepairTier(input: AutomationTierInput): AutomationTier {
-  // Creates and repairs require corroborating evidence: supportive web
+function deriveCreateTier(input: AutomationTierInput): AutomationTier {
+  // Creates require corroborating evidence: supportive web
   // evidence, a closed-form deterministic anchor, or reviewed label/image
   // primary evidence. `webEvidence = not_needed` does NOT anchor here — writing
   // new canonical identity needs concrete support, not just the absence of a
@@ -197,25 +196,22 @@ export function deriveAutomationTier(
     case "match":
       return deriveMatchTier(input);
     case "create":
-    case "repair":
-      return deriveCreateOrRepairTier(input);
-    default:
+      return deriveCreateTier(input);
+    case "none":
       return "review";
   }
 }
 
 // Maps the agent decision action enum onto the shared automation risk class.
 export function agentActionRiskClass(
-  action: "match" | "create_bottle" | "repair_bottle" | "no_match",
+  action: "match" | "create_bottle" | "no_match",
 ): AutomationActionRiskClass {
   switch (action) {
     case "match":
       return "match";
     case "create_bottle":
       return "create";
-    case "repair_bottle":
-      return "repair";
-    default:
+    case "no_match":
       return "none";
   }
 }

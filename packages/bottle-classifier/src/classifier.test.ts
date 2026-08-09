@@ -4873,7 +4873,7 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
   });
 
-  test("normalizes a legacy generic-category repair into a plain existing match", async () => {
+  test("keeps an optional catalog correction separate from a safe match", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Shibui",
       bottler: null,
@@ -4917,35 +4917,26 @@ describe("createBottleClassifier", () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
-          action: "repair_bottle",
+          action: "match",
           rationale:
             "The exact local bottle matches, but the stored category is generic.",
           candidateBottleIds: [13025],
           identityScope: "product",
           observation: null,
           matchedBottleId: 13025,
-          proposedBottle: {
-            name: "Grain Select",
-            series: null,
-            category: "single_grain",
-            edition: null,
-            statedAge: null,
-            caskStrength: null,
-            singleCask: null,
-            caskType: null,
-            caskSize: null,
-            caskFill: null,
-            abv: null,
-            vintageYear: null,
-            releaseYear: null,
-            brand: {
-              id: null,
-              name: "Shibui",
-            },
-            distillers: [],
-            bottler: null,
-          },
+          proposedBottle: null,
         },
+        proposedOperations: [
+          {
+            type: "update_bottle",
+            input: {
+              bottleId: 13025,
+              patch: { shared: { category: "single_grain" } },
+            },
+            rationale: "Replace the generic stored category.",
+            evidenceRefs: [{ kind: "bottle", bottleId: 13025 }],
+          },
+        ],
         artifacts: {
           extractedIdentity,
           searchEvidence: [],
@@ -4978,9 +4969,18 @@ describe("createBottleClassifier", () => {
       proposedBottle: null,
       identityScope: "product",
     });
+    expect(result.proposedOperations).toEqual([
+      expect.objectContaining({
+        type: "update_bottle",
+        input: {
+          bottleId: 13025,
+          patch: { shared: { category: "single_grain" } },
+        },
+      }),
+    ]);
   });
 
-  test("keeps first-class same-bottle repair decisions", async () => {
+  test("keeps a required catalog correction separate from no_match", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "The Whistler",
       bottler: null,
@@ -5024,40 +5024,28 @@ describe("createBottleClassifier", () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
-          action: "repair_bottle",
+          action: "no_match",
           rationale:
-            "The bottle identity matches, but the stored distillery and category are wrong.",
+            "The candidate needs a catalog correction before assignment is safe.",
           candidateBottleIds: [currentBottleCandidate.bottleId],
           identityScope: "product",
           observation: null,
-          matchedBottleId: currentBottleCandidate.bottleId,
-          proposedBottle: {
-            name: "Bodega Cask",
-            series: null,
-            category: "single_malt",
-            edition: null,
-            statedAge: null,
-            caskStrength: null,
-            singleCask: null,
-            caskType: null,
-            caskSize: null,
-            caskFill: null,
-            abv: null,
-            vintageYear: null,
-            releaseYear: null,
-            brand: {
-              id: null,
-              name: "The Whistler",
-            },
-            distillers: [
-              {
-                id: null,
-                name: "Boann Distillery",
-              },
-            ],
-            bottler: null,
-          },
+          matchedBottleId: null,
+          proposedBottle: null,
         },
+        proposedOperations: [
+          {
+            type: "update_bottle",
+            input: {
+              bottleId: currentBottleCandidate.bottleId,
+              patch: { shared: { category: "single_malt" } },
+            },
+            rationale: "Correct the stored Bottle category.",
+            evidenceRefs: [
+              { kind: "bottle", bottleId: currentBottleCandidate.bottleId },
+            ],
+          },
+        ],
         artifacts: {
           extractedIdentity,
           searchEvidence: [],
@@ -5085,17 +5073,18 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "repair_bottle",
-      matchedBottleId: currentBottleCandidate.bottleId,
-      proposedBottle: {
-        name: "Bodega Cask",
-        category: "single_malt",
-        distillers: [
-          {
-            name: "Boann Distillery",
-          },
-        ],
-      },
+      action: "no_match",
+      matchedBottleId: null,
+      proposedBottle: null,
     });
+    expect(result.proposedOperations).toEqual([
+      expect.objectContaining({
+        type: "update_bottle",
+        input: {
+          bottleId: currentBottleCandidate.bottleId,
+          patch: { shared: { category: "single_malt" } },
+        },
+      }),
+    ]);
   });
 });

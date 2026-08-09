@@ -94,7 +94,7 @@ Evaluation order:
 3. auto-ignore obvious non-whisky rows plus clearly non-single-bottle listings such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings
 4. build local Bottle candidates
 5. ask the shared bottle classifier for Bottle-centric actions (`match`,
-   `repair_bottle`, `create_bottle`, or `no_match`)
+   `create_bottle`, or `no_match`)
 6. map and sanitize classifier output against real candidates and resolved entities
 7. compute automation eligibility from deterministic checks
 8. upsert the proposal row
@@ -205,18 +205,21 @@ It returns a reviewed classification result with:
 When `status = classified`, the decision must be one of:
 
 - `match`
-- `repair_bottle`
 - `create_bottle`
 - `no_match`
 
 Additional rules:
 
 - `matchedBottleId` must be a known candidate bottle id when `action = match`
-- `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; `proposedBottle` is the full canonical repair draft, and the price-matching adapter must not treat null or unknown values as sparse clears. Sparse field changes belong to supplemental `update_bottle` operations
+- a required catalog correction uses a separate `update_bottle` Suggested
+  Change and keeps the identity action at `no_match`
+- an optional Suggested Change can accompany `match` only when it does not
+  affect assignment safety
 - classifier decisions carry Bottle ids only; they do not expose a legacy
   release-id picker
 - `create_bottle` carries one complete marketed Bottle draft, including exact
   Bottle traits; it never chooses a Bottle Group
+- the price adapter does not change `create_bottle` into a match or correction
 - `identityScope` is reviewed as `product | exact_cask`
 - Unsupported novelty flavored-whiskey or whiskey-liqueur products should end in classifier-driven `no_match`, but a flavor-adjacent noun in the title is not enough to exclude a bottle by itself
 - When re-evaluation auto-ignores a bundle or damaged-condition listing, price
@@ -236,7 +239,7 @@ clear the historical release ids, parent id, `creationTarget`, and
 audit evidence, but a release-shaped current proposal must be reclassified
 before approval; it is not translated into a live picker choice.
 
-### Correction repair compatibility
+### Same-Bottle correction compatibility
 
 `proposedBottle` on a same-bottle correction remains a sparse compatibility
 draft. Live classifier correction producers persist `statedAgeScope: exact`.
@@ -267,14 +270,14 @@ unmarked shared-age fallback together.
 
 `verified` is driven by automation policy on top of the classifier result.
 The shared code-derived tier is `auto | review`; it never reads a
-model-supplied numeric score. It maps the action to a match/create/repair risk class, forces
+model-supplied numeric score. It maps the action to a match/create/none risk class, forces
 review for unresolved risks, and evaluates structured evidence and explicit
 identity anchors. Proposal-specific deterministic blockers may narrow an
 `auto` result further but cannot upgrade a `review` result.
 
 An unassigned correction that only assigns an existing Bottle may be eligible
 for automatic assignment when the match tier and downstream blockers allow it.
-Any proposed Bottle repair fields remain review-only and must not be applied by
+Any proposed Bottle correction fields remain review-only and must not be applied by
 that assignment.
 
 ## Automation
@@ -286,7 +289,7 @@ Automation is schema-first and code-derived:
   current assignment, and needs an explicit anchor such as reaffirmed current
   identity, deterministic exact identity, an accepted exact alias, primary
   label/image evidence, or supportive reviewed evidence
-- create and repair actions require supportive reviewed evidence, a
+- create actions require supportive reviewed evidence, a
   deterministic identity anchor, or primary label/image evidence
 - originating retailer evidence is never decisive for differentiating traits
 - downstream policy may impose additional deterministic blockers for a
@@ -325,7 +328,7 @@ Auto-create only proceeds when:
 Moderators can:
 
 - approve an existing match
-- apply a same-bottle correction repair
+- apply a same-Bottle correction
 - ignore a proposal
 - approve complete Bottle create-new input
 

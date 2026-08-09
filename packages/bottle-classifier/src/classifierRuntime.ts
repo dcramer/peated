@@ -544,7 +544,6 @@ export async function finalizeBottleClassifierAgentResult({
     reference,
     decision: agentResult.decision,
     artifacts,
-    proposedOperations: agentResult.proposedOperations ?? [],
   });
 
   return {

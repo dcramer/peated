@@ -101,9 +101,7 @@ export const evalFixtureProvenanceSchema = z
 
 export const classifierEvalExpectationSchema = z.object({
   status: z.enum(["ignored", "classified"]),
-  action: z
-    .enum(["match", "create_bottle", "repair_bottle", "no_match"])
-    .optional(),
+  action: z.enum(["match", "create_bottle", "no_match"]).optional(),
   identityScope: z.enum(["product", "exact_cask"]).optional(),
   aliasScope: AliasScopeEnum.optional(),
   matchedBottleId: z.number().int().nullable().optional(),
@@ -122,7 +120,7 @@ export const classifierEvalExpectationSchema = z.object({
   expectedTier: z.enum(["auto", "review"]).optional(),
   verifyEligible: z.boolean().optional(),
   suggestedNextStep: z
-    .enum(["confirm_match", "confirm_create", "manual_search", "needs_review"])
+    .enum(["confirm_match", "confirm_create", "manual_search"])
     .optional(),
   proposedOperations: ProposedOperationsSchema.default([]),
   findings: z.array(FindingSchema).default([]),
@@ -506,9 +504,7 @@ export const bottleNormalizationExpectationSchema = z
       .array(z.enum(["bottle", "exact_cask", "review_required"]))
       .min(1)
       .optional(),
-    action: z
-      .enum(["match", "create_bottle", "repair_bottle", "no_match"])
-      .optional(),
+    action: z.enum(["match", "create_bottle", "no_match"]).optional(),
     matchedBottleId: z.number().int().nullable().optional(),
     exactBottleIdentity:
       bottleNormalizationExactBottleIdentitySchema.nullable(),

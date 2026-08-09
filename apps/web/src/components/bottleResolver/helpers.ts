@@ -173,8 +173,7 @@ function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
 
 export function getMatchedBottle(result: PhotoIdentification | null) {
   if (
-    result &&
-    result.suggestedNextStep !== "needs_review" &&
+    result?.suggestedNextStep === "confirm_match" &&
     result.classification.status === "classified" &&
     result.classification.decision.action === "match"
   ) {
@@ -230,15 +229,6 @@ export function getManualResultCopy(
     result?.classification.status === "classified"
       ? result.classification.decision.action
       : null;
-
-  if (result?.suggestedNextStep === "needs_review") {
-    return {
-      title: "We couldn't identify this bottle",
-      description:
-        "We found a possible match, but it was not reliable enough to use automatically. Search can still find the right bottle.",
-      createLabel: undefined,
-    };
-  }
 
   if (action === "match") {
     return {

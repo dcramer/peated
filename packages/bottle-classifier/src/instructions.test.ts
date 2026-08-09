@@ -34,8 +34,9 @@ describe("Bottle check instructions", () => {
       "Do not infer this from a generic catalog row or collapse a family marketed only as distinct batches",
       "Prefer `no_match` over a false-positive match",
       "never create a duplicate merely because its stored Brand",
-      "Return `match` when that exact candidate is safe for the reference assignment",
-      "Return `repair_bottle` only when the candidate is the exact product",
+      "Return `match` only when that exact candidate is safe for the reference assignment",
+      "When a candidate needs a catalog change before assignment is safe",
+      "Do not return `match` for the future corrected state",
       "Return `create_bottle` only when no inspected local candidate represents",
       "Return `no_match` when the exact identity remains missing, ambiguous, conflicting, underspecified",
     ]) {
@@ -84,11 +85,9 @@ describe("Bottle check instructions", () => {
     const audit = buildBottleAuditInstructions();
 
     expect(reference).toContain(
-      "Return `match` when that exact candidate is safe",
+      "Return `match` only when that exact candidate is safe",
     );
-    expect(audit).toContain(
-      "Do not return a reference match, create, repair decision",
-    );
+    expect(audit).toContain("Do not return a reference identity decision");
     expect(audit).toContain("Investigate the preloaded Bottle");
     expect(audit).toContain("Return its typed audit summary and findings");
     expect(audit).toContain(

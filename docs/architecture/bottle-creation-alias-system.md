@@ -141,7 +141,7 @@ Bottle or BottleGroup.
 The classifier decides:
 
 - whether the source matches an existing complete Bottle;
-- whether an existing Bottle needs a canonical repair;
+- whether an existing Bottle needs a separate Suggested Change;
 - whether evidence supports creating one complete Bottle;
 - which wording is the stable expression and which facts are structured
   exact-Bottle fields or observations;
@@ -150,7 +150,8 @@ The classifier decides:
 - whether available local, label, image, or web evidence is supportive,
   conflicting, or insufficient.
 
-Classifier actions are `match`, `repair_bottle`, `create_bottle`, and
+Classifier actions are `match`, `create_bottle`, and `no_match`. A required
+catalog correction is a separate Suggested Change and the identity result stays
 `no_match`. `create_bottle` contains one independently complete Bottle. There is
 no live create-release, create-bottle-and-release, repair-parent, or group
 selection action.

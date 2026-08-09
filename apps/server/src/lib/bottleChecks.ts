@@ -420,9 +420,7 @@ function getProtectedBottleIds(
   if (input.result.status === "ignored") return [];
 
   const { decision } = input.result;
-  return decision.action === "match" || decision.action === "repair_bottle"
-    ? [decision.matchedBottleId]
-    : [];
+  return decision.action === "match" ? [decision.matchedBottleId] : [];
 }
 
 async function findCheckByBackgroundEventKey({

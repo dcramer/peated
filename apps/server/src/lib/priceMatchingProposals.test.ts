@@ -8,7 +8,6 @@ describe("toStorePriceMatchDecision", () => {
       price: {
         bottleId: null,
       },
-      candidates: [],
       decision: {
         action: "match",
         rationale: "Exact source page identifies a generic listing title.",
@@ -29,85 +28,38 @@ describe("toStorePriceMatchDecision", () => {
   });
 });
 
-const candidate = {
-  bottleId: 1,
-  alias: "Example Distillery Warehouse Selection",
-  fullName: "Example Distillery Warehouse Selection",
-  brand: "Example Distillery",
-  bottler: null,
-  series: null,
-  distillery: ["Example Distillery"],
-  category: "single_malt" as const,
-  statedAge: 10,
-  edition: null,
-  caskStrength: null,
-  singleCask: null,
-  abv: 46,
-  vintageYear: null,
-  releaseYear: null,
-  caskType: "bourbon" as const,
-  caskSize: "barrel" as const,
-  caskFill: "1st_fill" as const,
-  score: 1,
-  source: ["current"],
-};
-
-function buildRepairDecision(statedAge: number) {
-  return {
-    action: "repair_bottle" as const,
-    confidence: 90,
-    rationale: "Review the extracted metadata.",
-    candidateBottleIds: [candidate.bottleId],
-    identityScope: "product" as const,
-    aliasScope: "none" as const,
-    observation: null,
-    identityBasis: null,
-    confidenceBasis: null,
-    matchedBottleId: candidate.bottleId,
-    proposedBottle: {
-      name: "Warehouse Selection",
-      series: null,
-      category: "single_malt" as const,
-      edition: null,
-      statedAge,
-      caskStrength: null,
-      singleCask: null,
-      abv: 46,
-      vintageYear: null,
-      releaseYear: null,
-      caskType: "oloroso" as const,
-      caskSize: "butt" as const,
-      caskFill: "2nd_fill" as const,
-      brand: { id: null, name: "Example Distillery" },
-      distillers: [{ id: null, name: "Example Distillery" }],
-      bottler: null,
+test("does not change create_bottle into a correction", () => {
+  const decision = toStorePriceMatchDecision({
+    price: { bottleId: 1 },
+    decision: {
+      action: "create_bottle",
+      rationale: "The observed Bottle is not in the catalog.",
+      candidateBottleIds: [1],
+      identityScope: "product",
+      aliasScope: "none",
+      observation: null,
+      matchedBottleId: null,
+      proposedBottle: {
+        name: "Warehouse Selection",
+        series: null,
+        category: "single_malt",
+        edition: null,
+        statedAge: 10,
+        abv: 46,
+        caskStrength: null,
+        singleCask: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        vintageYear: null,
+        releaseYear: null,
+        brand: { id: null, name: "Example Distillery" },
+        distillers: [],
+        bottler: null,
+      },
     },
-  };
-}
-
-test("does not turn normalized cask differences into a bottle repair", () => {
-  const decision = toStorePriceMatchDecision({
-    price: { bottleId: candidate.bottleId },
-    decision: buildRepairDecision(candidate.statedAge),
-    candidates: [candidate],
   });
 
-  expect(decision.action).toBe("match_existing");
-  expect(decision.proposedBottle).toBeNull();
-});
-
-test("strips normalized cask fields from a repair with material changes", () => {
-  const decision = toStorePriceMatchDecision({
-    price: { bottleId: candidate.bottleId },
-    decision: buildRepairDecision(12),
-    candidates: [candidate],
-  });
-
-  expect(decision.action).toBe("correction");
-  expect(decision.proposedBottle).toMatchObject({
-    statedAge: 12,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
-  });
+  expect(decision.action).toBe("create_new");
+  expect(decision.suggestedBottleId).toBeNull();
 });
