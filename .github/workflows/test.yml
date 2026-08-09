@@ -23,8 +23,10 @@ jobs:
       server: ${{ steps.filter.outputs.server }}
       web: ${{ steps.filter.outputs.web }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
           filters: |
@@ -35,7 +37,7 @@ jobs:
               - "packages/design/**"
               - "packages/orpc/**"
             infra:
-              - ".tflint.hcl"
+              - "terraform/.tflint.hcl"
               - "terraform/**"
             packages:
               - "packages/**"
@@ -45,6 +47,7 @@ jobs:
               - "packages/entity-classifier/**"
             repo:
               - ".oxlintrc.json"
+              - "knip.jsonc"
               - "package.json"
               - "pnpm-lock.yaml"
               - "pnpm-workspace.yaml"
@@ -54,6 +57,7 @@ jobs:
             server:
               - "apps/server/**"
               - "apps/cli/**"
+              - "Dockerfile"
               - "docker-compose.yml"
               - "packages/bottle-classifier/**"
               - "packages/catalog-verifier/**"
@@ -76,25 +80,35 @@ jobs:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.infra == 'true'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
-          key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
-      - uses: terraform-linters/setup-tflint@v3
+          key: ${{ runner.os }}-tflint-${{ hashFiles('terraform/.tflint.hcl') }}
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        name: Setup Terraform
+        with:
+          terraform_version: 1.15.8
+      - uses: terraform-linters/setup-tflint@6e1e0642c0289bd619021bf6b34e3c08ed1e005a # v6.3.0
         name: Setup TFLint
         with:
-          tflint_version: v0.50.0
-      - name: Show version
-        run: tflint --version
+          tflint_version: v0.64.0
+      - name: Check Terraform formatting
+        run: terraform -chdir=terraform fmt -check -recursive
+      - name: Initialize Terraform
+        run: terraform -chdir=terraform init -backend=false -lockfile=readonly
+      - name: Validate Terraform
+        run: terraform -chdir=terraform validate
       - name: Init TFLint
-        run: tflint --init
+        run: tflint --chdir=terraform --init
         env:
           # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run TFLint
-        run: tflint -f compact
+        run: tflint --chdir=terraform -f compact
 
   quality:
     name: "quality / lint and typecheck"
@@ -102,20 +116,34 @@ jobs:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true' || needs.changes.outputs.web == 'true' || needs.changes.outputs.packages == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - name: Audit GitHub Actions security
+        run: uvx zizmor==1.29.0 --min-severity medium .
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm format:check
       - name: Run lint
         run: pnpm lint
+      - name: Test ast-grep rules
+        run: pnpm ast-grep:test
+      - name: Check monorepo manifests
+        run: pnpm sherif
+      - name: Check dead files and dependency integrity
+        run: pnpm knip
       - name: Run typecheck
         run: pnpm typecheck
 
@@ -125,13 +153,15 @@ jobs:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true' || needs.changes.outputs.web == 'true' || needs.changes.outputs.packages == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -146,13 +176,15 @@ jobs:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -167,13 +199,15 @@ jobs:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.web == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -193,13 +227,15 @@ jobs:
         shard: [1, 2, 3, 4]
         total: [4]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -216,13 +252,15 @@ jobs:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.package_tests == 'true' || needs.changes.outputs.repo == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -231,19 +269,44 @@ jobs:
       - name: Run package tests
         run: pnpm -r --filter='./packages/*' run --if-present test
 
+  cli-tests:
+    name: "test / cli"
+    runs-on: ubuntu-latest
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run CLI tests
+        run: pnpm test:cli
+
   web-unit-tests:
     name: "test / web unit"
     runs-on: ubuntu-latest
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.web == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
@@ -262,6 +325,7 @@ jobs:
       - package-build
       - server-build
       - web-build
+      - cli-tests
       - package-tests
       - server-tests
       - web-unit-tests
@@ -280,6 +344,7 @@ jobs:
             "${{ needs['package-build'].result }}" \
             "${{ needs['server-build'].result }}" \
             "${{ needs['web-build'].result }}" \
+            "${{ needs['cli-tests'].result }}" \
             "${{ needs['package-tests'].result }}" \
             "${{ needs['server-tests'].result }}" \
             "${{ needs['web-unit-tests'].result }}" \
@@ -296,17 +361,19 @@ jobs:
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.e2e == 'true' || needs.changes.outputs.repo == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
           cache: pnpm
-      - uses: actions/cache@v4
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         name: Setup Playwright cache
         with:
           path: ~/.cache/ms-playwright

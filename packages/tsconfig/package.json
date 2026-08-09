@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "@peated/tsconfig",
-  "dependencies": {},
   "peerDependencies": {
     "typescript": "*"
   },

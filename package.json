@@ -29,6 +29,8 @@
     "lint": "github-actionlint && oxlint . && pnpm ast-grep:lint",
     "ast-grep:lint": "ast-grep scan",
     "ast-grep:test": "ast-grep test --skip-snapshot-tests",
+    "knip": "knip --include files,dependencies,devDependencies,optionalPeerDependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
+    "sherif": "sherif -i @openai/agents",
     "test": "turbo test",
     "test:all": "turbo test && pnpm --dir apps/web test:e2e",
     "test:web": "pnpm --dir apps/web test",
@@ -37,52 +39,43 @@
     "test:e2e:install": "pnpm --dir apps/web test:e2e:install",
     "test:e2e:report": "pnpm --dir apps/web test:e2e:report",
     "test:e2e:ui": "pnpm --dir apps/web test:e2e:ui",
+    "test:cli": "pnpm --filter @peated/cli test",
     "evals": "pnpm evals:classifier",
     "evals:classifier": "pnpm --filter @peated/bottle-classifier evals",
     "evals:classifier:flaky": "pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts -t 'Rogues|matches and repai|matches Laphroaig|restore Pōkeno'",
     "test:ci": "CI=true pnpm -r run test:ci",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
-    "format": "prettier --write --cache ."
+    "format": "prettier --write --cache .",
+    "format:check": "prettier --check --cache ."
   },
   "author": "David Cramer",
   "license": "Apache-2.0",
-  "dependencies": {
+  "devDependencies": {
+    "@ast-grep/cli": "0.45.1",
     "@fission-ai/openspec": "^1.5.0",
-    "@orpc/client": "1.13.6",
-    "@orpc/openapi": "1.13.6",
-    "@orpc/server": "1.13.6",
-    "@orpc/zod": "1.13.6",
-    "dotenv": "^16.4.7",
-    "dotenv-cli": "^7.4.4",
+    "@tanstack/eslint-plugin-query": "5.101.4",
+    "dotenv-cli": "catalog:",
+    "github-actionlint": "1.7.12",
+    "knip": "6.32.0",
+    "lint-staged": "^14.0.1",
+    "oxlint": "^1.77.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "prettier-plugin-tailwindcss": "catalog:",
+    "sherif": "1.13.0",
     "simple-git-hooks": "^2.13.1",
     "turbo": "^2.9.14",
     "typescript": "catalog:"
   },
-  "devDependencies": {
-    "@ast-grep/cli": "0.45.0",
-    "@tanstack/eslint-plugin-query": "5.101.4",
-    "github-actionlint": "1.7.12",
-    "lint-staged": "^14.0.1",
-    "oxlint": "^1.72.0",
-    "oxlint-tsgolint": "7.0.2001",
-    "prettier": "catalog:",
-    "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-tailwindcss": "catalog:"
-  },
   "engines": {
     "node": ">=24.18.0 <25.0.0"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@ast-grep/cli",
-      "bcrypt"
-    ]
-  },
-  "packageManager": "pnpm@10.3.0",
+  "packageManager": "pnpm@11.20.0",
   "volta": {
     "node": "24.18.0",
-    "pnpm": "10.3.0"
+    "pnpm": "11.20.0"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"

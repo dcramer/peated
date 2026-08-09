@@ -16,7 +16,7 @@
 
 ## Package Manager
 
-- Use `pnpm@10.3.0` with Node `24.18.0`.
+- Use `pnpm@11.20.0` with Node `24.18.0`.
 - Core commands: `pnpm install`, `pnpm dev`, `pnpm dev:server`, `pnpm dev:web`,
   `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format`.
 

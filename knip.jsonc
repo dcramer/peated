@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  "workspaces": {
+    ".": {
+      // OpenSpec is invoked directly by the repository's change workflow.
+      "ignoreDependencies": ["@fission-ai/openspec"],
+      // The workflow runs the web workspace's Playwright binary via pnpm --dir.
+      "ignoreBinaries": ["playwright"],
+    },
+    "apps/server": {
+      // The binary is nested in shell conditionals that Knip cannot parse.
+      "ignoreDependencies": ["dotenv-cli"],
+    },
+    "apps/web": {
+      "entry": ["e2e/mock-rpc-server.mjs"],
+      // Next.js consumes this loader name from webpack/turbopack configuration.
+      "ignoreDependencies": ["@svgr/webpack"],
+    },
+    "packages/bottle-classifier": {
+      "entry": ["vitest.evals.config.mts"],
+    },
+  },
+}

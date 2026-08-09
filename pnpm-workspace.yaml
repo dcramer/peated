@@ -3,35 +3,53 @@ packages:
   - 'apps/*'
   - '!**/test/**'
 
+allowBuilds:
+  '@ast-grep/cli': true
+  '@fission-ai/openspec': false
+  '@sentry/cli': false
+  bcrypt: true
+  core-js: false
+  esbuild: false
+  msgpackr-extract: false
+  sharp: false
+  simple-git-hooks: false
+
 catalog:
+  '@orpc/client': 1.15.0
+  '@orpc/openapi': 1.15.0
+  '@orpc/server': 1.15.0
+  '@orpc/shared': 1.15.0
+  '@orpc/tanstack-query': 1.15.0
+  '@orpc/zod': 1.15.0
+  dotenv: ^16.4.7
+  dotenv-cli: ^7.4.4
   drizzle-kit: ^0.30.6
   drizzle-orm: ^0.39.3
   "@fontsource/raleway": ^5.0.19
   jsx-email: ^1.10.11
   pg: ^8.20.0
   prettier: ^3.8.1
-  "@sentry/core": 10.53.0
-  "@sentry/hono": 10.53.0
-  "@sentry/nextjs": 10.53.0
-  "@sentry/node": 10.53.0
+  "@sentry/core": 10.69.0
+  "@sentry/hono": 10.69.0
+  "@sentry/nextjs": 10.69.0
+  "@sentry/node": 10.69.0
   "@logtape/hono": 2.2.3
   "@logtape/logtape": 2.2.3
   "@logtape/redaction": 2.2.3
   "@opentelemetry/api": 1.9.1
-  superjson: ^2.2.6
   tailwindcss: ^3.4.19
   "@tailwindcss/forms": ^0.5.11
   "@tailwindcss/typography": ^0.5.19
   "prettier-plugin-tailwindcss": ^0.5.14
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-next-experimental": ^5.91.0
-  // TODO: theres an issue upgrading right now to 11.0.1
+  # TODO: theres an issue upgrading right now to 11.0.1
 
   tsx: ^4.21.0
   typescript: ^5.9.3
   "@types/node": ^24.13.2
   "@types/pg": ^8.18.0
-  vite: ^8.0.8
+  vite: ^8.2.1
   vitest: "~4.1.4"
   "@vitest/coverage-v8": "~4.1.4"
   "@playwright/test": "^1.60.0"

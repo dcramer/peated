@@ -39,7 +39,6 @@ yarn-error.log*
 /postgres-data
 
 .terraform
-.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 kubeconfig

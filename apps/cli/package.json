@@ -19,20 +19,16 @@
     "@peated/tsconfig": "workspace:*",
     "@sentry/node": "catalog:",
     "@sindresorhus/slugify": "^2.2.1",
-    "@types/bcrypt": "^5.0.2",
-    "@types/node": "catalog:",
-    "@types/pg": "catalog:",
-    "bcrypt": "^5.1.1",
     "commander": "^12.1.0",
-    "dotenv": "^16.4.5",
-    "dotenv-cli": "^7.4.2",
-    "drizzle-kit": "catalog:",
+    "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "pg": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "esbuild": "^0.27.7",
     "vite": "catalog:",
     "vitest": "catalog:"
