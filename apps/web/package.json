@@ -48,7 +48,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.414.0",
     "marked": "^9.1.6",
-    "next": "16.2.9",
+    "next": "16.2.11",
     "pica": "^9.0.1",
     "react": "^19.2.7",
     "react-avatar-editor": "^15.1.0",
