@@ -80,8 +80,7 @@
     "@types/react": "catalog:",
     "axios-mock-adapter": "~2.1.0",
     "vite": "catalog:",
-    "vitest": "catalog:",
-    "vitest-mock-axios": "^0.1.0"
+    "vitest": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"
