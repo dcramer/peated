@@ -12,44 +12,24 @@ describe("resolveOpenAICompatibleConfig", () => {
     expectTypeOf<"minimal">().not.toMatchTypeOf<OpenAIReasoningEffort>();
   });
 
-  it("accepts typed environment objects without declared OpenAI keys", () => {
+  it("accepts typed environment objects without declared gateway keys", () => {
     const env: Readonly<{ NODE_ENV: "test" }> = {
       NODE_ENV: "test",
     };
 
     expect(resolveOpenAICompatibleConfig(env)).toMatchObject({
-      baseURL: "https://api.openai.com/v1",
-      provider: "openai",
-    });
-  });
-
-  it("uses direct OpenAI defaults", () => {
-    expect(
-      resolveOpenAICompatibleConfig({
-        OPENAI_API_KEY: "openai-key",
-      }),
-    ).toEqual({
-      apiKey: "openai-key",
-      baseURL: "https://api.openai.com/v1",
-      bottleClassifierModel: "gpt-5.6-terra",
-      bottleClassifierReasoningEffort: "medium",
-      embeddingModel: "text-embedding-3-large",
-      evalModel: "gpt-5.6-luna",
-      evalReasoningEffort: "medium",
-      imageExtractionModel: "gpt-5.6-luna",
-      imageExtractionReasoningEffort: "high",
-      model: "gpt-5.4",
-      organization: undefined,
-      project: undefined,
-      provider: "openai",
-      reasoningEffort: undefined,
+      apiKey: undefined,
+      baseURL: "https://ai-gateway.vercel.sh/v1",
+      bottleClassifierModel: "openai/gpt-5.6-terra",
+      embeddingModel: "openai/text-embedding-3-large",
+      model: "openai/gpt-5.4",
     });
   });
 
   it("uses gateway credentials and provider-qualified defaults", () => {
     const config = resolveOpenAICompatibleConfig({
       AI_GATEWAY_API_KEY: "gateway-key",
-      OPENAI_API_KEY: "openai-key",
+      NODE_ENV: "production",
     });
 
     expect(config).toEqual({
@@ -63,9 +43,6 @@ describe("resolveOpenAICompatibleConfig", () => {
       imageExtractionModel: "openai/gpt-5.6-luna",
       imageExtractionReasoningEffort: "high",
       model: "openai/gpt-5.4",
-      organization: undefined,
-      project: undefined,
-      provider: "vercel-ai-gateway",
       reasoningEffort: undefined,
     });
     expect(getStableOpenAISettings(config.model)).toEqual({});
@@ -80,7 +57,15 @@ describe("resolveOpenAICompatibleConfig", () => {
     ).toEqual({ reasoning: { effort: "medium" } });
   });
 
-  it("normalizes gateway overrides and ignores direct-provider settings", () => {
+  it("requires gateway credentials in production", () => {
+    expect(() =>
+      resolveOpenAICompatibleConfig({
+        NODE_ENV: "production",
+      }),
+    ).toThrowError("AI_GATEWAY_API_KEY is required in production");
+  });
+
+  it("normalizes gateway model overrides", () => {
     expect(
       resolveOpenAICompatibleConfig({
         AI_GATEWAY_API_KEY: "gateway-key",
@@ -89,12 +74,9 @@ describe("resolveOpenAICompatibleConfig", () => {
         OPENAI_EMBEDDING_MODEL: "openai/text-embedding-3-small",
         OPENAI_EVAL_MODEL: "gpt-5-mini",
         OPENAI_EVAL_REASONING_EFFORT: "xhigh",
-        OPENAI_HOST: "https://example.com/v1",
         OPENAI_IMAGE_EXTRACTION_MODEL: "gpt-5.6-luna",
         OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT: "xhigh",
         OPENAI_MODEL: "gpt-5.4",
-        OPENAI_ORGANIZATION: "organization",
-        OPENAI_PROJECT: "project",
       }),
     ).toMatchObject({
       baseURL: "https://ai-gateway.vercel.sh/v1",
@@ -106,24 +88,19 @@ describe("resolveOpenAICompatibleConfig", () => {
       imageExtractionModel: "openai/gpt-5.6-luna",
       imageExtractionReasoningEffort: "xhigh",
       model: "openai/gpt-5.4",
-      organization: undefined,
-      project: undefined,
     });
   });
 
-  it("falls back to direct OpenAI when the gateway key is blank", () => {
+  it("keeps gateway routing outside production when credentials are blank", () => {
     expect(
       resolveOpenAICompatibleConfig({
         AI_GATEWAY_API_KEY: "  ",
-        OPENAI_API_KEY: "openai-key",
-        OPENAI_HOST: "https://example.com/v1",
         OPENAI_MODEL: "custom-model",
       }),
     ).toMatchObject({
-      apiKey: "openai-key",
-      baseURL: "https://example.com/v1",
-      model: "custom-model",
-      provider: "openai",
+      apiKey: undefined,
+      baseURL: "https://ai-gateway.vercel.sh/v1",
+      model: "openai/custom-model",
     });
   });
 

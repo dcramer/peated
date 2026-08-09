@@ -862,7 +862,7 @@ async function runCandidateLookupSafely<T>(
 async function getVectorCandidates(
   queryText: string,
 ): Promise<BottleCandidate[]> {
-  if (!config.OPENAI_API_KEY || !queryText.trim()) {
+  if (!config.AI_GATEWAY_API_KEY || !queryText.trim()) {
     return [];
   }
 

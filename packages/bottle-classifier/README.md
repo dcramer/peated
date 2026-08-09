@@ -211,11 +211,12 @@ to the package runner and uses the `vitest-evals` reporter configured in
 [`vitest.evals.config.mts`](./vitest.evals.config.mts).
 The eval config loads the repo-root `.env.local`. Shell-provided environment
 variables still take precedence.
-`AI_GATEWAY_API_KEY` or `OPENAI_API_KEY` is required. The gateway key takes
-precedence when both are set. With the gateway, `BOTTLE_CLASSIFIER_MODEL`
-defaults to `openai/gpt-5.6-terra` and `OPENAI_EVAL_MODEL` defaults to
-`openai/gpt-5.6-luna`; direct OpenAI defaults omit the provider prefix. The eval
-judge uses `medium` reasoning by default; override it with
+`AI_GATEWAY_API_KEY` is required for hosted model calls. Production fails at
+startup without it, and local evals skip when it is absent. All model calls use
+Vercel AI Gateway. `BOTTLE_CLASSIFIER_MODEL` defaults to
+`openai/gpt-5.6-terra` and `OPENAI_EVAL_MODEL` defaults to
+`openai/gpt-5.6-luna`. The eval judge uses `medium` reasoning by default;
+override it with
 `OPENAI_EVAL_REASONING_EFFORT`.
 `BOTTLE_CLASSIFIER_REASONING_EFFORT` accepts `none`, `low`, `medium`, `high`, or
 `xhigh` for GPT-5 models and defaults to `medium`. The classifier sends the

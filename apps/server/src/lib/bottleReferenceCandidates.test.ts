@@ -9,17 +9,17 @@ import {
 } from "./bottleReferenceCandidates";
 import * as openaiEmbeddings from "./openaiEmbeddings";
 
-const originalOpenAiApiKey = config.OPENAI_API_KEY;
+const originalAIGatewayApiKey = config.AI_GATEWAY_API_KEY;
 
 afterEach(() => {
-  config.OPENAI_API_KEY = originalOpenAiApiKey;
+  config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   vi.restoreAllMocks();
 });
 
 test("returns a complete Bottle candidate with active BottleGroup siblings", async ({
   fixtures,
 }) => {
-  config.OPENAI_API_KEY = undefined;
+  config.AI_GATEWAY_API_KEY = undefined;
   const bottle = await fixtures.Bottle({
     name: "Warehouse Selection",
     edition: "Batch 1",
@@ -123,7 +123,7 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
 });
 
 test("normalizes proof-like ABV before building candidate search evidence", async () => {
-  config.OPENAI_API_KEY = "test-openai-key";
+  config.AI_GATEWAY_API_KEY = "test-gateway-key";
   const embeddingSpy = vi
     .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
     .mockResolvedValue(new Array<number>(1536).fill(0));
@@ -139,7 +139,7 @@ test("normalizes proof-like ABV before building candidate search evidence", asyn
 });
 
 test("does not inject normalized cask metadata into candidate search evidence", async () => {
-  config.OPENAI_API_KEY = "test-openai-key";
+  config.AI_GATEWAY_API_KEY = "test-gateway-key";
   const embeddingSpy = vi
     .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
     .mockResolvedValue(new Array<number>(1536).fill(0));

@@ -271,7 +271,7 @@ export async function identifyExistingBottleReference(
       }
     }
 
-    if (!config.OPENAI_API_KEY) {
+    if (!config.AI_GATEWAY_API_KEY) {
       return createLocalIdentificationNoMatch(normalizedInput);
     }
 

@@ -31,8 +31,8 @@ import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
-if (!config.OPENAI_API_KEY) {
-  logWarn("OPENAI_API_KEY is not configured", {});
+if (!config.AI_GATEWAY_API_KEY) {
+  logWarn("AI_GATEWAY_API_KEY is not configured", {});
 }
 
 export const GenerateBottleDetailsJobArgsSchema = z
@@ -179,7 +179,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     series: owned.series,
   });
 
-  if (!config.OPENAI_API_KEY) {
+  if (!config.AI_GATEWAY_API_KEY) {
     return;
   }
 

@@ -144,7 +144,7 @@ export async function extractPhotoBottleEvidence({
   extractedIdentity: BottleExtractedDetails | null;
   imageEvidence: ImageBottleEvidence;
 }> {
-  if (!config.OPENAI_API_KEY) {
+  if (!config.AI_GATEWAY_API_KEY) {
     return {
       extractedIdentity: null,
       imageEvidence: buildPhotoEvidenceFromExtractedIdentity({
@@ -159,7 +159,7 @@ export async function extractPhotoBottleEvidence({
     conversationId,
     async () => {
       return await instrumentOpenAIResponsesCall({
-        baseURL: config.OPENAI_HOST,
+        baseURL: config.AI_GATEWAY_HOST,
         conversationId,
         model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
         callback: async (reportResponse) => {

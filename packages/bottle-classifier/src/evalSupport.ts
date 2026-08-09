@@ -13,31 +13,29 @@ import {
   resolveOpenAIReasoningEffort,
 } from "./openaiModelSettings";
 
-const evalOpenAIConfig = resolveOpenAICompatibleConfig(process.env);
+const evalGatewayConfig = resolveOpenAICompatibleConfig(process.env);
 
-export const evalClassifierModel = evalOpenAIConfig.bottleClassifierModel;
+export const evalClassifierModel = evalGatewayConfig.bottleClassifierModel;
 export const evalClassifierReasoningEffort = resolveOpenAIReasoningEffort(
   evalClassifierModel,
-  evalOpenAIConfig.bottleClassifierReasoningEffort,
+  evalGatewayConfig.bottleClassifierReasoningEffort,
 );
-export const evalImageExtractionModel = evalOpenAIConfig.imageExtractionModel;
+export const evalImageExtractionModel = evalGatewayConfig.imageExtractionModel;
 export const evalImageExtractionReasoningEffort = resolveOpenAIReasoningEffort(
   evalImageExtractionModel,
-  evalOpenAIConfig.imageExtractionReasoningEffort,
+  evalGatewayConfig.imageExtractionReasoningEffort,
 );
-export const evalJudgeModel = evalOpenAIConfig.evalModel;
+export const evalJudgeModel = evalGatewayConfig.evalModel;
 export const evalJudgeReasoningEffort = resolveOpenAIReasoningEffort(
   evalJudgeModel,
-  evalOpenAIConfig.evalReasoningEffort,
+  evalGatewayConfig.evalReasoningEffort,
 );
-export const hasEvalOpenAICredentials = Boolean(evalOpenAIConfig.apiKey);
+export const hasEvalAIGatewayCredentials = Boolean(evalGatewayConfig.apiKey);
 
 export function createEvalOpenAIClient() {
   const client = new OpenAI({
-    apiKey: evalOpenAIConfig.apiKey,
-    baseURL: evalOpenAIConfig.baseURL,
-    organization: evalOpenAIConfig.organization,
-    project: evalOpenAIConfig.project,
+    apiKey: evalGatewayConfig.apiKey,
+    baseURL: evalGatewayConfig.baseURL,
   });
   const originalCreate = client.responses.create.bind(client.responses);
 

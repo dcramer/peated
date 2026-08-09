@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 
 describe("PUT /bottles", () => {
   beforeEach(() => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
   });
 
   test("requires moderator access without Bottle or group writes", async ({

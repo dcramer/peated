@@ -23,7 +23,7 @@ vi.mock("@peated/server/config", async (importOriginal) => {
   return {
     default: {
       ...actual.default,
-      OPENAI_API_KEY: "test-api-key",
+      AI_GATEWAY_API_KEY: "test-api-key",
     },
   };
 });

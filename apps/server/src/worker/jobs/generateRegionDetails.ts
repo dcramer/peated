@@ -8,8 +8,8 @@ import { type Region } from "@peated/server/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-if (!config.OPENAI_API_KEY) {
-  logWarn("OPENAI_API_KEY is not configured", {});
+if (!config.AI_GATEWAY_API_KEY) {
+  logWarn("AI_GATEWAY_API_KEY is not configured", {});
 }
 
 type InputRegion = Partial<Region> & Pick<Region, "country">;
@@ -64,7 +64,7 @@ export async function getGeneratedRegionDetails(
 }
 
 export default async ({ regionId }: { regionId: number }) => {
-  if (!config.OPENAI_API_KEY) {
+  if (!config.AI_GATEWAY_API_KEY) {
     return;
   }
 

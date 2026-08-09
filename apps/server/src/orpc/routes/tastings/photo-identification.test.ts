@@ -29,7 +29,7 @@ const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributeMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributesMock = vi.hoisted(() => vi.fn());
-const originalOpenAiApiKey = config.OPENAI_API_KEY;
+const originalAIGatewayApiKey = config.AI_GATEWAY_API_KEY;
 
 vi.mock("@sentry/node", { spy: true });
 vi.mock(
@@ -275,7 +275,7 @@ async function countCatalogRows() {
 
 describe("POST /tastings/photo-identification", () => {
   beforeEach(() => {
-    config.OPENAI_API_KEY = undefined;
+    config.AI_GATEWAY_API_KEY = undefined;
     classifyBottleReferenceMock.mockReset();
     runBottleReferenceMock.mockReset();
     runBottleReferenceMock.mockImplementation(async (input) => ({
@@ -296,7 +296,7 @@ describe("POST /tastings/photo-identification", () => {
   });
 
   afterEach(() => {
-    config.OPENAI_API_KEY = originalOpenAiApiKey;
+    config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
     vi.mocked(Sentry.startSpan).mockReset();
   });
 

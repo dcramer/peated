@@ -10,7 +10,6 @@ import {
   type OpenAIReasoningEffort,
 } from "./openaiModelSettings";
 
-const OPENAI_BASE_URL = "https://api.openai.com/v1";
 const VERCEL_AI_GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
 const DEFAULT_OPENAI_EMBEDDING_MODEL = "text-embedding-3-large";
 
@@ -18,16 +17,13 @@ type OpenAICompatibleEnvKey =
   | "AI_GATEWAY_API_KEY"
   | "BOTTLE_CLASSIFIER_MODEL"
   | "BOTTLE_CLASSIFIER_REASONING_EFFORT"
-  | "OPENAI_API_KEY"
+  | "NODE_ENV"
   | "OPENAI_EVAL_MODEL"
   | "OPENAI_EVAL_REASONING_EFFORT"
   | "OPENAI_EMBEDDING_MODEL"
-  | "OPENAI_HOST"
   | "OPENAI_IMAGE_EXTRACTION_MODEL"
   | "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT"
   | "OPENAI_MODEL"
-  | "OPENAI_ORGANIZATION"
-  | "OPENAI_PROJECT"
   | "OPENAI_REASONING_EFFORT";
 
 export type OpenAICompatibleConfig = {
@@ -41,9 +37,6 @@ export type OpenAICompatibleConfig = {
   imageExtractionModel: string;
   imageExtractionReasoningEffort: OpenAIReasoningEffort | undefined;
   model: string;
-  organization: string | undefined;
-  project: string | undefined;
-  provider: "openai" | "vercel-ai-gateway";
   reasoningEffort: OpenAIReasoningEffort | undefined;
 };
 
@@ -68,7 +61,14 @@ export function resolveOpenAICompatibleConfig(
   env: object,
 ): OpenAICompatibleConfig {
   const gatewayApiKey = nonEmpty(envValue(env, "AI_GATEWAY_API_KEY"));
-  const usesGateway = Boolean(gatewayApiKey);
+  const isProduction = nonEmpty(envValue(env, "NODE_ENV")) === "production";
+
+  // Every hosted model call is owned by Vercel AI Gateway. Production fails at
+  // startup instead of silently running with missing gateway credentials.
+  if (isProduction && !gatewayApiKey) {
+    throw new Error("AI_GATEWAY_API_KEY is required in production");
+  }
+
   const bottleClassifierModel =
     nonEmpty(envValue(env, "BOTTLE_CLASSIFIER_MODEL")) ??
     DEFAULT_BOTTLE_CLASSIFIER_MODEL;
@@ -83,40 +83,27 @@ export function resolveOpenAICompatibleConfig(
     DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL;
 
   return {
-    apiKey: gatewayApiKey ?? nonEmpty(envValue(env, "OPENAI_API_KEY")),
-    baseURL: usesGateway
-      ? VERCEL_AI_GATEWAY_BASE_URL
-      : (nonEmpty(envValue(env, "OPENAI_HOST")) ?? OPENAI_BASE_URL),
-    bottleClassifierModel: usesGateway
-      ? gatewayModel(bottleClassifierModel)
-      : bottleClassifierModel,
+    apiKey: gatewayApiKey,
+    baseURL: VERCEL_AI_GATEWAY_BASE_URL,
+    bottleClassifierModel: gatewayModel(bottleClassifierModel),
     bottleClassifierReasoningEffort: parseOpenAIReasoningEffort(
       nonEmpty(envValue(env, "BOTTLE_CLASSIFIER_REASONING_EFFORT")) ??
         DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT,
     ),
-    embeddingModel: usesGateway ? gatewayModel(embeddingModel) : embeddingModel,
-    evalModel: usesGateway ? gatewayModel(evalModel) : evalModel,
+    embeddingModel: gatewayModel(embeddingModel),
+    evalModel: gatewayModel(evalModel),
     evalReasoningEffort: parseOpenAIReasoningEffort(
       envValue(env, "OPENAI_EVAL_REASONING_EFFORT") ??
         DEFAULT_OPENAI_EVAL_REASONING_EFFORT,
       "OPENAI_EVAL_REASONING_EFFORT",
     ),
-    imageExtractionModel: usesGateway
-      ? gatewayModel(imageExtractionModel)
-      : imageExtractionModel,
+    imageExtractionModel: gatewayModel(imageExtractionModel),
     imageExtractionReasoningEffort: parseOpenAIReasoningEffort(
       envValue(env, "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT") ??
         DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
       "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT",
     ),
-    model: usesGateway ? gatewayModel(model) : model,
-    organization: usesGateway
-      ? undefined
-      : nonEmpty(envValue(env, "OPENAI_ORGANIZATION")),
-    project: usesGateway
-      ? undefined
-      : nonEmpty(envValue(env, "OPENAI_PROJECT")),
-    provider: usesGateway ? "vercel-ai-gateway" : "openai",
+    model: gatewayModel(model),
     reasoningEffort: parseOpenAIReasoningEffort(
       envValue(env, "OPENAI_REASONING_EFFORT"),
     ),
