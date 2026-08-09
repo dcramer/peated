@@ -14,16 +14,16 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActorByIdForDatabase } from "@peated/server/lib/actors";
 import {
-  getConcreteBottleExactIdentity,
-  materializeConcreteBottleForGroup,
-} from "@peated/server/lib/concreteBottleIdentity";
+  getBottleExactIdentity,
+  materializeBottleForGroup,
+} from "@peated/server/lib/bottleIdentity";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import {
-  concreteBottleUpdateExpectedSharedState,
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-} from "@peated/server/lib/updateConcreteBottle";
+  bottleUpdateExpectedSharedState,
+  finalizeBottleUpdate,
+  updateBottleInTransaction,
+} from "@peated/server/lib/updateBottle";
 import { and, asc, eq, ilike, inArray, sql } from "drizzle-orm";
 
 type RepairSeriesAction = "none" | "reuse_existing" | "create_new";
@@ -103,9 +103,9 @@ function materializeTargetBottle({
       name: `${brand.shortName || brand.name} ${group.name}`,
     }),
   };
-  return materializeConcreteBottleForGroup({
+  return materializeBottleForGroup({
     group: targetGroup,
-    exact: getConcreteBottleExactIdentity({
+    exact: getBottleExactIdentity({
       bottle,
       sourceGroupStatedAge: group.statedAge,
     }),
@@ -303,9 +303,9 @@ export async function repairBottleBrandDistilleryAssignments({
           throw new Error(`Repair user ${user!.id} no longer exists.`);
         }
         const actor = await getUserActorByIdForDatabase(tx, persistedUser.id);
-        return updateConcreteBottleInTransaction(tx, {
+        return updateBottleInTransaction(tx, {
           bottleId: selectedBottle.id,
-          expectedSharedState: concreteBottleUpdateExpectedSharedState({
+          expectedSharedState: bottleUpdateExpectedSharedState({
             group,
             distillerIds,
             referencedSeries: targetSeries ? [targetSeries] : [],
@@ -336,7 +336,7 @@ export async function repairBottleBrandDistilleryAssignments({
           creationSource: "repair_workflow",
         });
       });
-      await finalizeConcreteBottleUpdate(manifest);
+      await finalizeBottleUpdate(manifest);
       items.push({
         bottleFullName: manifest.bottle.fullName,
         bottleId: selectedBottle.id,

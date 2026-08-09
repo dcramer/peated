@@ -343,7 +343,6 @@
     "dbOutcome": {
       "bottleId": 45146,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Merge malformed Bottle 39096 into complete Warehouse 1 Bottle 45146, create a Bottle tombstone from 39096 to 45146, and repoint Bottle consumers and aliases including tasting 223 to 45146. Leave generic Càirdeas Bottle 44288 unchanged. Do not create a Bottle or propose a BottleGroup mutation."
     },
     "catalogFieldObservations": [

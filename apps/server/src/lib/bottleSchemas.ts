@@ -84,7 +84,7 @@ const ExactBottleInputSchema = BottleInputSchema.pick({
   })
   .strict();
 
-const IndependentConcreteBottleCreateRouteFieldsSchema =
+const IndependentBottleCreateRouteFieldsSchema =
   StableBottleGroupFieldsSchema.extend({
     edition: ExactBottleInputSchema.shape.edition,
     abv: ExactBottleInputSchema.shape.abv,
@@ -104,12 +104,10 @@ const IndependentConcreteBottleCreateRouteFieldsSchema =
  * Public independent creation reuses stable/exact validation without exposing
  * group authority or image-upload fields; uploads use a separate route.
  */
-export const IndependentConcreteBottleCreateRouteInputSchema =
-  IndependentConcreteBottleCreateRouteFieldsSchema.superRefine(
-    validateStableChoiceIds,
-  );
+export const IndependentBottleCreateRouteInputSchema =
+  IndependentBottleCreateRouteFieldsSchema.superRefine(validateStableChoiceIds);
 
-const ConcreteBottleSharedPatchSchema = z
+const BottleSharedPatchSchema = z
   .object({
     name: StableBottleGroupFieldsSchema.shape.name.optional(),
     statedAge: z.number().int().min(0).max(100).nullable().optional(),
@@ -136,7 +134,7 @@ const ConcreteBottleSharedPatchSchema = z
   .strict()
   .superRefine(validateStableChoiceIds);
 
-const ConcreteBottleExactPatchSchema = z
+const BottleExactPatchSchema = z
   .object({
     edition: ExactBottleInputSchema.shape.edition.removeDefault().optional(),
     statedAge: z.number().int().min(0).max(100).nullable().optional(),
@@ -177,45 +175,40 @@ const ConcreteBottleExactPatchSchema = z
   })
   .strict();
 
-const ModeratorConcreteBottleExactPatchSchema =
-  ConcreteBottleExactPatchSchema.omit({
-    suggestedTags: true,
-  });
+const ModeratorBottleExactPatchSchema = BottleExactPatchSchema.omit({
+  suggestedTags: true,
+});
 
-export const ConcreteBottleUpdateInputSchema = z
+export const BottleUpdateInputSchema = z
   .object({
-    shared: ConcreteBottleSharedPatchSchema.optional(),
-    exact: ModeratorConcreteBottleExactPatchSchema.optional(),
+    shared: BottleSharedPatchSchema.optional(),
+    exact: ModeratorBottleExactPatchSchema.optional(),
   })
   .strict();
 
-export type ConcreteBottleUpdateInput = z.infer<
-  typeof ConcreteBottleUpdateInputSchema
->;
+export type BottleUpdateInput = z.infer<typeof BottleUpdateInputSchema>;
 
 /**
  * Internal update contract for system-owned exact content such as generated
  * tags. Public moderator input remains limited to user-editable fields.
  */
-export const SystemConcreteBottleUpdateInputSchema = z
+export const SystemBottleUpdateInputSchema = z
   .object({
-    shared: ConcreteBottleSharedPatchSchema.optional(),
-    exact: ConcreteBottleExactPatchSchema.optional(),
+    shared: BottleSharedPatchSchema.optional(),
+    exact: BottleExactPatchSchema.optional(),
   })
   .strict();
 
-export type SystemConcreteBottleUpdateInput = z.infer<
-  typeof SystemConcreteBottleUpdateInputSchema
+export type SystemBottleUpdateInput = z.infer<
+  typeof SystemBottleUpdateInputSchema
 >;
 
 /** Runtime contract for independently complete singleton Bottle creation. */
-export const ConcreteBottleCreateInputSchema = z
+export const BottleCreateInputSchema = z
   .object({
     stable: StableBottleGroupInputSchema,
     exact: ExactBottleInputSchema,
   })
   .strict();
 
-export type ConcreteBottleCreateInput = z.infer<
-  typeof ConcreteBottleCreateInputSchema
->;
+export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;

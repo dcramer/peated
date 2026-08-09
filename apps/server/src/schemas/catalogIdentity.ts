@@ -56,8 +56,8 @@ export const BottleGroupV1Schema = z.object({
   updatedAt: z.string().datetime(),
 });
 
-/** Runtime-owned v1 result for one concrete marketed release. */
-export const ConcreteBottleV1Schema = z.object({
+/** Runtime-owned v1 result for one complete Bottle. */
+export const BottleV1Schema = z.object({
   schemaVersion: CatalogIdentitySchemaVersion,
   id: z.number().int().positive(),
   groupId: z.number().int().positive(),
@@ -93,4 +93,4 @@ export const ConcreteBottleV1Schema = z.object({
 });
 
 export type BottleGroupV1 = z.infer<typeof BottleGroupV1Schema>;
-export type ConcreteBottleV1 = z.infer<typeof ConcreteBottleV1Schema>;
+export type BottleV1 = z.infer<typeof BottleV1Schema>;

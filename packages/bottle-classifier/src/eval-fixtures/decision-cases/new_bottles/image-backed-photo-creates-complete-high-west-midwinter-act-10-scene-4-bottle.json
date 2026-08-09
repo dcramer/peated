@@ -78,23 +78,21 @@
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-10-scene-4.jpg",
     "dbOutcome": {
-      "bottleId": 43397,
-      "releaseId": null,
-      "createsBottle": false,
-      "createsRelease": true,
-      "summary": "Historical production DB outcome under the legacy model: create a new release under bottle 43397. Nearby broad release row: release 3, Act 10. The flattened model creates one complete Act 10 Scene 4 Bottle instead of selecting that parent."
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Create one complete Act 10 Scene 4 Bottle. Do not use broad Act 10 Bottle -3 or Bottle 43397."
     },
     "catalogFieldObservations": [
       {
-        "target": "candidate_release",
-        "releaseId": 3,
+        "target": "candidate_bottle",
+        "bottleId": -3,
         "field": "edition",
         "productionValue": "Act 10",
         "evidenceValue": "Act 10 Scene 4",
         "source": "image_evidence",
         "issue": "competing_candidate",
         "safeToAutoFill": false,
-        "notes": "The observed label uses the fuller release edition Act 10 Scene 4; the existing production release is the broader Act 10 row."
+        "notes": "The observed label uses the full edition Act 10 Scene 4. The existing Bottle is the broader Act 10 product."
       }
     ],
     "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label explicitly reads A Midwinter Night's Dram, Act 10 Scene 4, 49.3% ABV. High West names these releases by act and scene, so Act 10 Scene 4 is the bottling edition rather than incidental label text."

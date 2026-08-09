@@ -1,10 +1,10 @@
-import { ConcreteBottleUpdateInputSchema } from "@peated/server/lib/concreteBottleSchemas";
+import { BottleUpdateInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
-  ConcreteBottleUpdateConflictError,
-  ConcreteBottleUpdateGraphError,
-  ConcreteBottleUpdateInputError,
-  updateConcreteBottle,
-} from "@peated/server/lib/updateConcreteBottle";
+  BottleUpdateConflictError,
+  BottleUpdateGraphError,
+  BottleUpdateInputError,
+  updateBottle,
+} from "@peated/server/lib/updateBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
 import { BottleSchema } from "@peated/server/schemas";
@@ -12,7 +12,7 @@ import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { z } from "zod";
 
-const InputSchema = ConcreteBottleUpdateInputSchema.extend({
+const InputSchema = BottleUpdateInputSchema.extend({
   bottle: z.coerce.number().int().positive(),
 }).strict();
 
@@ -37,7 +37,7 @@ export default procedure
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
-      const result = await updateConcreteBottle({
+      const result = await updateBottle({
         bottleId: input.bottle,
         input: { shared: input.shared, exact: input.exact },
         context,
@@ -51,22 +51,22 @@ export default procedure
         { includeGroupSummary: true },
       );
     } catch (error) {
-      if (error instanceof ConcreteBottleUpdateInputError) {
+      if (error instanceof BottleUpdateInputError) {
         throw errors.BAD_REQUEST({ message: error.message, cause: error });
       }
 
       if (
-        error instanceof ConcreteBottleUpdateGraphError &&
+        error instanceof BottleUpdateGraphError &&
         error.code === "not_found"
       ) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
       }
 
-      if (error instanceof ConcreteBottleUpdateGraphError) {
+      if (error instanceof BottleUpdateGraphError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
 
-      if (error instanceof ConcreteBottleUpdateConflictError) {
+      if (error instanceof BottleUpdateConflictError) {
         throw errors.CONFLICT({
           message: error.message,
           data:

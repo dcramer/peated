@@ -293,7 +293,7 @@ test.describe("create bottle", () => {
     ).toBeVisible();
   });
 
-  test("adds the created concrete bottle to library from a proposal", async ({
+  test("adds the created Bottle to the library from a proposal", async ({
     context,
     page,
   }, testInfo) => {
@@ -332,7 +332,7 @@ test.describe("create bottle", () => {
     ).toBeVisible();
   });
 
-  test("uploads a replacement scan to the created concrete Bottle", async ({
+  test("uploads a replacement scan to the created Bottle", async ({
     context,
     page,
   }, testInfo) => {

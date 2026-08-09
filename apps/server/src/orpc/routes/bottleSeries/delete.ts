@@ -7,10 +7,10 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-  type ConcreteBottleUpdateFinalizationManifest,
-} from "@peated/server/lib/updateConcreteBottle";
+  finalizeBottleUpdate,
+  updateBottleInTransaction,
+  type BottleUpdateFinalizationManifest,
+} from "@peated/server/lib/updateBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { and, asc, eq, isNull } from "drizzle-orm";
@@ -51,7 +51,7 @@ export default procedure
         .where(eq(bottleGroups.seriesId, series.id))
         .orderBy(asc(bottleGroups.id))
         .for("update");
-      const manifests: ConcreteBottleUpdateFinalizationManifest[] = [];
+      const manifests: BottleUpdateFinalizationManifest[] = [];
 
       for (const group of groups) {
         if (group.representativeBottleId === null) {
@@ -60,7 +60,7 @@ export default procedure
           });
         }
         manifests.push(
-          await updateConcreteBottleInTransaction(tx, {
+          await updateBottleInTransaction(tx, {
             bottleId: group.representativeBottleId,
             input: { shared: { series: null } },
             user: context.user,
@@ -91,7 +91,7 @@ export default procedure
 
     for (const manifest of manifests) {
       // The deleted series has no search vector to rebuild.
-      await finalizeConcreteBottleUpdate({
+      await finalizeBottleUpdate({
         ...manifest,
         affectedSeriesIds: manifest.affectedSeriesIds.filter(
           (seriesId) => seriesId !== input.series,

@@ -2,7 +2,7 @@
  * Transactional moderator editing for Bottles. Shared patches fan out
  * durable member Bottle materialization; exact patches remain isolated.
  */
-// TODO(dcramer): Rename this module's ConcreteBottleUpdate symbols now that
+// TODO(dcramer): Rename this module's BottleUpdate symbols now that
 // the Bottle/BottleRelease distinction is retired.
 import { ORPCError } from "@orpc/server";
 import {
@@ -31,21 +31,21 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import {
+  BottleIdentityConflictError,
+  reserveBottleIdentitiesInTransaction,
+} from "@peated/server/lib/bottleConflicts";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
+import {
+  getBottleExactIdentity,
+  materializeBottleForGroup,
+} from "@peated/server/lib/bottleIdentity";
+import {
+  BottleUpdateInputSchema,
+  type BottleUpdateInput,
+  type SystemBottleUpdateInput,
+} from "@peated/server/lib/bottleSchemas";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
-import {
-  ConcreteBottleIdentityConflictError,
-  reserveConcreteBottleIdentitiesInTransaction,
-} from "@peated/server/lib/concreteBottleConflicts";
-import {
-  getConcreteBottleExactIdentity,
-  materializeConcreteBottleForGroup,
-} from "@peated/server/lib/concreteBottleIdentity";
-import {
-  ConcreteBottleUpdateInputSchema,
-  type ConcreteBottleUpdateInput,
-  type SystemConcreteBottleUpdateInput,
-} from "@peated/server/lib/concreteBottleSchemas";
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
@@ -53,81 +53,80 @@ import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 
-export { ConcreteBottleUpdateInputSchema } from "@peated/server/lib/concreteBottleSchemas";
-export type { ConcreteBottleUpdateInput } from "@peated/server/lib/concreteBottleSchemas";
+export { BottleUpdateInputSchema } from "@peated/server/lib/bottleSchemas";
+export type { BottleUpdateInput } from "@peated/server/lib/bottleSchemas";
 
-type SharedPatch = NonNullable<ConcreteBottleUpdateInput["shared"]>;
-type ExactPatch = NonNullable<SystemConcreteBottleUpdateInput["exact"]>;
+type SharedPatch = NonNullable<BottleUpdateInput["shared"]>;
+type ExactPatch = NonNullable<SystemBottleUpdateInput["exact"]>;
 
-export class ConcreteBottleUpdateAuthorizationError extends Error {
+export class BottleUpdateAuthorizationError extends Error {
   constructor() {
     super("Moderator authorization is required to update a Bottle.");
-    this.name = "ConcreteBottleUpdateAuthorizationError";
+    this.name = "BottleUpdateAuthorizationError";
   }
 }
 
-export type ConcreteBottleUpdateGraphErrorCode =
+export type BottleUpdateGraphErrorCode =
   | "not_found"
   | "retired"
   | "missing_group"
   | "invalid_catalog_graph";
 
-export class ConcreteBottleUpdateGraphError extends Error {
+export class BottleUpdateGraphError extends Error {
   constructor(
-    readonly code: ConcreteBottleUpdateGraphErrorCode,
+    readonly code: BottleUpdateGraphErrorCode,
     readonly bottleId: number,
     readonly groupId: number | null = null,
   ) {
     super(`Cannot update Bottle ${bottleId}: ${code}.`);
-    this.name = "ConcreteBottleUpdateGraphError";
+    this.name = "BottleUpdateGraphError";
   }
 }
 
-export class ConcreteBottleUpdateInputError extends Error {
+export class BottleUpdateInputError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "ConcreteBottleUpdateInputError";
+    this.name = "BottleUpdateInputError";
   }
 }
 
-export class ConcreteBottleUpdateConflictError extends Error {
+export class BottleUpdateConflictError extends Error {
   constructor(readonly conflictingBottleId: number | null) {
     super("Bottle identity conflicts with an existing Bottle.");
-    this.name = "ConcreteBottleUpdateConflictError";
+    this.name = "BottleUpdateConflictError";
   }
 }
 
-export class ConcreteBottleUpdateExpectedStateError extends Error {
+export class BottleUpdateExpectedStateError extends Error {
   constructor(readonly groupId: number) {
     super(`BottleGroup ${groupId} shared authority changed before update.`);
-    this.name = "ConcreteBottleUpdateExpectedStateError";
+    this.name = "BottleUpdateExpectedStateError";
   }
 }
 
-export class ConcreteBottleUpdateExpectedBottleStateError extends Error {
+export class BottleUpdateExpectedBottleStateError extends Error {
   constructor(readonly bottleId: number) {
     super(
       `Bottle ${bottleId} exact content or membership changed before update.`,
     );
-    this.name = "ConcreteBottleUpdateExpectedBottleStateError";
+    this.name = "BottleUpdateExpectedBottleStateError";
   }
 }
 
-export type ConcreteBottleUpdateResult = {
+export type BottleUpdateResult = {
   bottle: Bottle;
   group: BottleGroup;
   changed: boolean;
 };
 
-export type ConcreteBottleUpdateFinalizationManifest =
-  ConcreteBottleUpdateResult & {
-    creationSource: CatalogVerificationCreationSource;
-    changedBottleIds: number[];
-    changedAliasNames: string[];
-    changedEntityIds: number[];
-    newEntityIds: number[];
-    affectedSeriesIds: number[];
-  };
+export type BottleUpdateFinalizationManifest = BottleUpdateResult & {
+  creationSource: CatalogVerificationCreationSource;
+  changedBottleIds: number[];
+  changedAliasNames: string[];
+  changedEntityIds: number[];
+  newEntityIds: number[];
+  affectedSeriesIds: number[];
+};
 
 type DesiredBottle = Pick<
   Bottle,
@@ -188,15 +187,15 @@ type ExpectedSeries = Pick<
   BottleSeries,
   "id" | "brandId" | "name" | "fullName" | "description"
 >;
-export type ConcreteBottleUpdateExpectedEntityState = Pick<
+export type BottleUpdateExpectedEntityState = Pick<
   Entity,
   "id" | "name" | "shortName" | "type"
 >;
 
-export type ConcreteBottleUpdateExpectedSharedState = {
+export type BottleUpdateExpectedSharedState = {
   group: Pick<BottleGroup, (typeof expectedGroupKeys)[number]>;
   distillerIds: number[];
-  referencedEntities: ConcreteBottleUpdateExpectedEntityState[];
+  referencedEntities: BottleUpdateExpectedEntityState[];
   series: ExpectedSeries | null;
   referencedSeries: ExpectedSeries[];
 };
@@ -213,22 +212,22 @@ const expectedSelectedBottleKeys = [
   "suggestedTags",
 ] as const satisfies ReadonlyArray<keyof Bottle>;
 
-export type ConcreteBottleUpdateExpectedSelectedBottleState = Pick<
+export type BottleUpdateExpectedSelectedBottleState = Pick<
   Bottle,
   (typeof expectedSelectedBottleKeys)[number]
 >;
 
 /** Captures selected-Bottle state used to plan an exact-content edit. */
-export function concreteBottleUpdateExpectedSelectedBottleState(
+export function bottleUpdateExpectedSelectedBottleState(
   bottle: Bottle,
-): ConcreteBottleUpdateExpectedSelectedBottleState {
+): BottleUpdateExpectedSelectedBottleState {
   return Object.fromEntries(
     expectedSelectedBottleKeys.map((key) => [key, bottle[key]]),
-  ) as ConcreteBottleUpdateExpectedSelectedBottleState;
+  ) as BottleUpdateExpectedSelectedBottleState;
 }
 
 /** Captures the shared authority a maintenance caller used to plan an edit. */
-export function concreteBottleUpdateExpectedSharedState({
+export function bottleUpdateExpectedSharedState({
   group,
   distillerIds,
   referencedEntities = [],
@@ -237,14 +236,14 @@ export function concreteBottleUpdateExpectedSharedState({
 }: {
   group: BottleGroup;
   distillerIds: number[];
-  referencedEntities?: ConcreteBottleUpdateExpectedEntityState[];
+  referencedEntities?: BottleUpdateExpectedEntityState[];
   referencedSeries?: BottleSeries[];
   series: BottleSeries | null;
-}): ConcreteBottleUpdateExpectedSharedState {
+}): BottleUpdateExpectedSharedState {
   return {
     group: Object.fromEntries(
       expectedGroupKeys.map((key) => [key, group[key]]),
-    ) as ConcreteBottleUpdateExpectedSharedState["group"],
+    ) as BottleUpdateExpectedSharedState["group"],
     distillerIds: [...distillerIds].sort((left, right) => left - right),
     referencedEntities: referencedEntities
       .map(({ id, name, shortName, type }) => ({
@@ -290,9 +289,7 @@ function existingEntityChoiceId(choice: unknown): number | null {
   return null;
 }
 
-function existingEntityIdsForUpdate(
-  input: SystemConcreteBottleUpdateInput,
-): number[] {
+function existingEntityIdsForUpdate(input: SystemBottleUpdateInput): number[] {
   const choices = [
     input.shared?.brand,
     input.shared?.bottler,
@@ -357,12 +354,12 @@ function desiredBottleFor({
   materializeSharedFields: boolean;
   regenerateIdentity: boolean;
 }): DesiredBottle {
-  const exact = getConcreteBottleExactIdentity({
+  const exact = getBottleExactIdentity({
     bottle,
     sourceGroupStatedAge: oldGroupStatedAge,
     exactPatch,
   });
-  const sharedMaterialization = materializeConcreteBottleForGroup({
+  const sharedMaterialization = materializeBottleForGroup({
     group: stable,
     exact,
   });
@@ -467,7 +464,7 @@ async function loadEntity(tx: AnyTransaction, entityId: number) {
     .where(eq(entities.id, entityId))
     .limit(1);
   if (!entity) {
-    throw new ConcreteBottleUpdateInputError(
+    throw new BottleUpdateInputError(
       `Entity ${entityId} could not be resolved.`,
     );
   }
@@ -476,7 +473,7 @@ async function loadEntity(tx: AnyTransaction, entityId: number) {
 
 function requireUpdateUser(user: User | undefined): User {
   if (!user) {
-    throw new ConcreteBottleUpdateInputError(
+    throw new BottleUpdateInputError(
       "A user is required to create or resolve shared catalog choices.",
     );
   }
@@ -511,7 +508,7 @@ async function addEntityRoleIfNeeded({
     type: role,
   });
   if (!result) {
-    throw new ConcreteBottleUpdateInputError(
+    throw new BottleUpdateInputError(
       `Entity ${entity.id} could not be resolved.`,
     );
   }
@@ -603,7 +600,7 @@ async function resolveStableState(
       type: "brand",
     });
     if (!result) {
-      throw new ConcreteBottleUpdateInputError("Brand could not be resolved.");
+      throw new BottleUpdateInputError("Brand could not be resolved.");
     }
     brand = result.result;
     if (result.changed) changedEntityIds.add(result.id);
@@ -630,9 +627,7 @@ async function resolveStableState(
       type: "bottler",
     });
     if (!result) {
-      throw new ConcreteBottleUpdateInputError(
-        "Bottler could not be resolved.",
-      );
+      throw new BottleUpdateInputError("Bottler could not be resolved.");
     }
     bottler = result.result;
     if (result.changed) changedEntityIds.add(result.id);
@@ -660,9 +655,7 @@ async function resolveStableState(
         type: "distiller",
       });
       if (!result) {
-        throw new ConcreteBottleUpdateInputError(
-          "Distiller could not be resolved.",
-        );
+        throw new BottleUpdateInputError("Distiller could not be resolved.");
       }
       distillerIds.push(result.id);
       if (result.changed) changedEntityIds.add(result.id);
@@ -685,7 +678,7 @@ async function resolveStableState(
   }
   name = stripDuplicateBrandPrefixFromBottleName(name, brand.name);
   if (!name || bottleNameDuplicatesBrand(name, brand.name)) {
-    throw new ConcreteBottleUpdateInputError(
+    throw new BottleUpdateInputError(
       "Bottle name must identify an expression distinct from the brand.",
     );
   }
@@ -707,7 +700,7 @@ async function resolveStableState(
           error.code,
         )
       ) {
-        throw new ConcreteBottleUpdateInputError(error.message);
+        throw new BottleUpdateInputError(error.message);
       }
       throw error;
     }
@@ -724,7 +717,7 @@ async function resolveStableState(
       .limit(1)
       .for("update");
     if (!currentSeries) {
-      throw new ConcreteBottleUpdateInputError(
+      throw new BottleUpdateInputError(
         `Series ${seriesId} could not be resolved.`,
       );
     }
@@ -800,7 +793,7 @@ async function resolveStableState(
               error.code,
             )
           ) {
-            throw new ConcreteBottleUpdateInputError(error.message);
+            throw new BottleUpdateInputError(error.message);
           }
           throw error;
         }
@@ -814,12 +807,12 @@ async function resolveStableState(
       .where(eq(bottleSeries.id, seriesId))
       .limit(1);
     if (!series) {
-      throw new ConcreteBottleUpdateInputError(
+      throw new BottleUpdateInputError(
         `Series ${seriesId} could not be resolved.`,
       );
     }
     if (series.brandId !== brand.id) {
-      throw new ConcreteBottleUpdateInputError(
+      throw new BottleUpdateInputError(
         `Series ${seriesId} does not belong to brand ${brand.id}.`,
       );
     }
@@ -859,7 +852,7 @@ function emptyResult(
   bottle: Bottle,
   group: BottleGroup,
   creationSource: CatalogVerificationCreationSource,
-): ConcreteBottleUpdateFinalizationManifest {
+): BottleUpdateFinalizationManifest {
   return {
     bottle,
     group,
@@ -877,7 +870,7 @@ function emptyResult(
  * Locks existing Entity choices before the selected BottleGroup and Bottle.
  * The order matches Entity writers and is safe to repeat before execution.
  */
-export async function lockConcreteBottleUpdateDependencies(
+export async function lockBottleUpdateDependencies(
   tx: AnyTransaction,
   bottleId: number,
   referencedEntityIds: readonly number[] = [],
@@ -890,7 +883,7 @@ export async function lockConcreteBottleUpdateDependencies(
     (left, right) => left - right,
   );
   if (entityIds.some((id) => !Number.isInteger(id) || id <= 0)) {
-    throw new ConcreteBottleUpdateInputError(
+    throw new BottleUpdateInputError(
       "Referenced Entity IDs must be positive integers.",
     );
   }
@@ -909,10 +902,10 @@ export async function lockConcreteBottleUpdateDependencies(
     .where(eq(bottles.id, bottleId))
     .limit(1);
   if (!discoveredBottle) {
-    throw new ConcreteBottleUpdateGraphError("not_found", bottleId);
+    throw new BottleUpdateGraphError("not_found", bottleId);
   }
   if (discoveredBottle.groupId === null) {
-    throw new ConcreteBottleUpdateGraphError("missing_group", bottleId);
+    throw new BottleUpdateGraphError("missing_group", bottleId);
   }
   const groupId = discoveredBottle.groupId;
 
@@ -923,7 +916,7 @@ export async function lockConcreteBottleUpdateDependencies(
     .limit(1)
     .for("update");
   if (!group) {
-    throw new ConcreteBottleUpdateGraphError(
+    throw new BottleUpdateGraphError(
       "invalid_catalog_graph",
       bottleId,
       groupId,
@@ -937,7 +930,7 @@ export async function lockConcreteBottleUpdateDependencies(
     .limit(1)
     .for("update");
   if (!bottle || bottle.groupId !== groupId) {
-    throw new ConcreteBottleUpdateGraphError(
+    throw new BottleUpdateGraphError(
       "invalid_catalog_graph",
       bottleId,
       groupId,
@@ -953,7 +946,7 @@ export async function lockConcreteBottleUpdateDependencies(
  * commits. Optional expected shared state is compared while its dependencies
  * remain locked.
  */
-export async function updateConcreteBottleInTransaction(
+export async function updateBottleInTransaction(
   tx: AnyTransaction,
   {
     bottleId,
@@ -965,21 +958,21 @@ export async function updateConcreteBottleInTransaction(
     creationSource,
   }: {
     bottleId: number;
-    input: SystemConcreteBottleUpdateInput;
-    expectedSelectedBottleState?: ConcreteBottleUpdateExpectedSelectedBottleState;
-    expectedSharedState?: ConcreteBottleUpdateExpectedSharedState;
+    input: SystemBottleUpdateInput;
+    expectedSelectedBottleState?: BottleUpdateExpectedSelectedBottleState;
+    expectedSharedState?: BottleUpdateExpectedSharedState;
     user?: User;
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
   },
-): Promise<ConcreteBottleUpdateFinalizationManifest> {
+): Promise<BottleUpdateFinalizationManifest> {
   const expectedReferencedEntityIds =
     expectedSharedState?.referencedEntities.map(({ id }) => id) ?? [];
   const {
     bottle: lockedBottle,
     group,
     referencedEntities,
-  } = await lockConcreteBottleUpdateDependencies(tx, bottleId, [
+  } = await lockBottleUpdateDependencies(tx, bottleId, [
     ...expectedReferencedEntityIds,
     ...existingEntityIdsForUpdate(input),
   ]);
@@ -992,7 +985,7 @@ export async function updateConcreteBottleInTransaction(
         JSON.stringify(expectedSelectedBottleState[key]),
     )
   ) {
-    throw new ConcreteBottleUpdateExpectedBottleStateError(bottleId);
+    throw new BottleUpdateExpectedBottleStateError(bottleId);
   }
 
   const [bottleTombstone] = await tx
@@ -1001,7 +994,7 @@ export async function updateConcreteBottleInTransaction(
     .where(eq(bottleTombstones.bottleId, bottleId))
     .limit(1);
   if (bottleTombstone) {
-    throw new ConcreteBottleUpdateGraphError("retired", bottleId, groupId);
+    throw new BottleUpdateGraphError("retired", bottleId, groupId);
   }
 
   const sharedIntent = hasFields(input.shared);
@@ -1032,7 +1025,7 @@ export async function updateConcreteBottleInTransaction(
       group.representativeBottleId === null ||
       !members.some(({ id }) => id === group.representativeBottleId)
     ) {
-      throw new ConcreteBottleUpdateGraphError(
+      throw new BottleUpdateGraphError(
         "invalid_catalog_graph",
         bottleId,
         groupId,
@@ -1100,7 +1093,7 @@ export async function updateConcreteBottleInTransaction(
       seriesChanged ||
       referencedEntitiesChanged
     ) {
-      throw new ConcreteBottleUpdateExpectedStateError(groupId);
+      throw new BottleUpdateExpectedStateError(groupId);
     }
   }
   const changedEntityIds = new Set<number>();
@@ -1231,33 +1224,30 @@ export async function updateConcreteBottleInTransaction(
         : await loadEntity(tx, group.bottlerId);
   let changedAliasNames: string[];
   try {
-    ({ changedAliasNames } = await reserveConcreteBottleIdentitiesInTransaction(
-      tx,
-      {
-        candidates: affectedMembers.map((member) => {
-          const desired = desiredByBottleId.get(member.id)!;
-          return {
-            bottleId: member.id,
-            current: {
-              name: member.name,
-              fullName: member.fullName,
-              brand: currentBrand,
-              bottler: currentBottler,
-            },
-            desired: {
-              name: desired.name,
-              fullName: desired.fullName,
-              brand: stable.brand,
-              bottler: stable.bottler,
-            },
-          };
-        }),
-        assignedByActorId: actorId,
-      },
-    ));
+    ({ changedAliasNames } = await reserveBottleIdentitiesInTransaction(tx, {
+      candidates: affectedMembers.map((member) => {
+        const desired = desiredByBottleId.get(member.id)!;
+        return {
+          bottleId: member.id,
+          current: {
+            name: member.name,
+            fullName: member.fullName,
+            brand: currentBrand,
+            bottler: currentBottler,
+          },
+          desired: {
+            name: desired.name,
+            fullName: desired.fullName,
+            brand: stable.brand,
+            bottler: stable.bottler,
+          },
+        };
+      }),
+      assignedByActorId: actorId,
+    }));
   } catch (error) {
-    if (error instanceof ConcreteBottleIdentityConflictError) {
-      throw new ConcreteBottleUpdateConflictError(error.conflictingBottleId);
+    if (error instanceof BottleIdentityConflictError) {
+      throw new BottleUpdateConflictError(error.conflictingBottleId);
     }
     throw error;
   }
@@ -1280,7 +1270,7 @@ export async function updateConcreteBottleInTransaction(
       .where(eq(bottleGroups.id, groupId))
       .returning();
     if (!persistedGroup) {
-      throw new ConcreteBottleUpdateGraphError(
+      throw new BottleUpdateGraphError(
         "invalid_catalog_graph",
         bottleId,
         groupId,
@@ -1323,7 +1313,7 @@ export async function updateConcreteBottleInTransaction(
       .where(and(eq(bottles.id, member.id), eq(bottles.groupId, groupId)))
       .returning();
     if (!updated) {
-      throw new ConcreteBottleUpdateGraphError(
+      throw new BottleUpdateGraphError(
         "invalid_catalog_graph",
         bottleId,
         groupId,
@@ -1405,8 +1395,8 @@ export async function updateConcreteBottleInTransaction(
 }
 
 /** Dispatches idempotent update work only after the outer transaction commits. */
-export async function finalizeConcreteBottleUpdate(
-  result: ConcreteBottleUpdateFinalizationManifest,
+export async function finalizeBottleUpdate(
+  result: BottleUpdateFinalizationManifest,
 ) {
   for (const bottleId of result.changedBottleIds) {
     try {
@@ -1452,7 +1442,7 @@ export async function finalizeConcreteBottleUpdate(
 }
 
 /** Authorizes and parses an untrusted moderator update before touching storage. */
-export async function updateConcreteBottle({
+export async function updateBottle({
   bottleId,
   input: rawInput,
   context,
@@ -1460,20 +1450,18 @@ export async function updateConcreteBottle({
   bottleId: number;
   input: unknown;
   context: Context;
-}): Promise<ConcreteBottleUpdateResult> {
+}): Promise<BottleUpdateResult> {
   if (!context.user?.admin && !context.user?.mod) {
-    throw new ConcreteBottleUpdateAuthorizationError();
+    throw new BottleUpdateAuthorizationError();
   }
   if (!Number.isInteger(bottleId) || bottleId <= 0) {
-    throw new ConcreteBottleUpdateInputError(
-      "Bottle ID must be a positive integer.",
-    );
+    throw new BottleUpdateInputError("Bottle ID must be a positive integer.");
   }
-  const input = ConcreteBottleUpdateInputSchema.parse(rawInput);
+  const input = BottleUpdateInputSchema.parse(rawInput);
   const user = context.user;
   const actor = await getUserActor(user);
   const result = await db.transaction((tx) =>
-    updateConcreteBottleInTransaction(tx, {
+    updateBottleInTransaction(tx, {
       bottleId,
       input,
       user,
@@ -1481,7 +1469,7 @@ export async function updateConcreteBottle({
       creationSource: "manual_entry",
     }),
   );
-  await finalizeConcreteBottleUpdate(result);
+  await finalizeBottleUpdate(result);
   return {
     bottle: result.bottle,
     group: result.group,

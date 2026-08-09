@@ -307,7 +307,6 @@
     ],
     "dbOutcome": {
       "createsBottle": true,
-      "createsRelease": false,
       "summary": "No safe Peated bottle or release matched the observed candidate set; the correct reviewed outcome is a new product-scope Creag Isle 12-year-old Island Single Malt bottle."
     },
     "notes": "Production match queue proposal 23 returned no_match with empty searchEvidence even though independent sources verify the product."

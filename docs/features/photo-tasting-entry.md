@@ -19,7 +19,7 @@ action.
 3. The server processes the image, creates an owned pending upload, extracts
    label evidence, searches the local catalog, and runs the Bottle classifier.
 4. The resolver presents one of three outcomes:
-   - a concrete existing Bottle match;
+   - an existing Bottle match;
    - an approved proposal for one new, independently complete Bottle; or
    - manual search when the evidence is insufficient or conflicting.
 5. After resolving a Bottle, the user may log a tasting, add it to their

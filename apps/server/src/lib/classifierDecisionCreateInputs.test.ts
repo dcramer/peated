@@ -1,9 +1,9 @@
 import type { ProposedBottle } from "@peated/bottle-classifier/internal/types";
+import { materializeBottleIdentity } from "./bottleIdentity";
 import {
   buildBottleInputFromProposedBottle,
-  buildClassifierConcreteBottleInput,
+  buildClassifierBottleInput,
 } from "./classifierDecisionCreateInputs";
-import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
 
 test("materializes a classifier draft into one independently complete Bottle", () => {
   const proposedBottle: ProposedBottle = {
@@ -25,16 +25,16 @@ test("materializes a classifier draft into one independently complete Bottle", (
     bottler: null,
   };
 
-  const bottleInput = buildBottleInputFromProposedBottle(proposedBottle);
-  const concreteInput = buildClassifierConcreteBottleInput(proposedBottle);
+  const routeInput = buildBottleInputFromProposedBottle(proposedBottle);
+  const bottleInput = buildClassifierBottleInput(proposedBottle);
 
-  expect(bottleInput).toMatchObject({
+  expect(routeInput).toMatchObject({
     caskType: "ruby_port",
     caskSize: "barrel",
     caskFill: "2nd_fill",
   });
-  expect(concreteInput.stable.name).toBe("A Midwinter Night's Dram");
-  expect(concreteInput.exact).toMatchObject({
+  expect(bottleInput.stable.name).toBe("A Midwinter Night's Dram");
+  expect(bottleInput.exact).toMatchObject({
     edition: "Act 10 Scene 4",
     releaseYear: 2022,
     abv: 49.3,
@@ -43,23 +43,23 @@ test("materializes a classifier draft into one independently complete Bottle", (
     caskFill: "2nd_fill",
   });
   expect(
-    materializeConcreteBottleIdentity({
+    materializeBottleIdentity({
       stable: {
-        name: concreteInput.stable.name,
-        fullName: `High West ${concreteInput.stable.name}`,
-        statedAge: concreteInput.stable.statedAge,
+        name: bottleInput.stable.name,
+        fullName: `High West ${bottleInput.stable.name}`,
+        statedAge: bottleInput.stable.statedAge,
       },
       exact: {
-        edition: concreteInput.exact.edition ?? null,
-        statedAge: concreteInput.exact.statedAge ?? null,
-        releaseYear: concreteInput.exact.releaseYear ?? null,
-        vintageYear: concreteInput.exact.vintageYear ?? null,
-        abv: concreteInput.exact.abv ?? null,
-        singleCask: concreteInput.exact.singleCask ?? null,
-        caskStrength: concreteInput.exact.caskStrength ?? null,
-        caskType: concreteInput.exact.caskType ?? null,
-        caskSize: concreteInput.exact.caskSize ?? null,
-        caskFill: concreteInput.exact.caskFill ?? null,
+        edition: bottleInput.exact.edition ?? null,
+        statedAge: bottleInput.exact.statedAge ?? null,
+        releaseYear: bottleInput.exact.releaseYear ?? null,
+        vintageYear: bottleInput.exact.vintageYear ?? null,
+        abv: bottleInput.exact.abv ?? null,
+        singleCask: bottleInput.exact.singleCask ?? null,
+        caskStrength: bottleInput.exact.caskStrength ?? null,
+        caskType: bottleInput.exact.caskType ?? null,
+        caskSize: bottleInput.exact.caskSize ?? null,
+        caskFill: bottleInput.exact.caskFill ?? null,
       },
     }),
   ).toEqual({
@@ -90,28 +90,28 @@ test("keeps a marketed age exact without duplicating its name wording", () => {
     bottler: null,
   };
 
-  const concreteInput = buildClassifierConcreteBottleInput(proposedBottle);
+  const bottleInput = buildClassifierBottleInput(proposedBottle);
 
-  expect(concreteInput.stable.statedAge).toBeNull();
-  expect(concreteInput.exact.statedAge).toBe(12);
+  expect(bottleInput.stable.statedAge).toBeNull();
+  expect(bottleInput.exact.statedAge).toBe(12);
   expect(
-    materializeConcreteBottleIdentity({
+    materializeBottleIdentity({
       stable: {
-        name: concreteInput.stable.name,
-        fullName: `Shieldaig ${concreteInput.stable.name}`,
-        statedAge: concreteInput.stable.statedAge,
+        name: bottleInput.stable.name,
+        fullName: `Shieldaig ${bottleInput.stable.name}`,
+        statedAge: bottleInput.stable.statedAge,
       },
       exact: {
-        edition: concreteInput.exact.edition ?? null,
-        statedAge: concreteInput.exact.statedAge ?? null,
-        releaseYear: concreteInput.exact.releaseYear ?? null,
-        vintageYear: concreteInput.exact.vintageYear ?? null,
-        abv: concreteInput.exact.abv ?? null,
-        singleCask: concreteInput.exact.singleCask ?? null,
-        caskStrength: concreteInput.exact.caskStrength ?? null,
-        caskType: concreteInput.exact.caskType ?? null,
-        caskSize: concreteInput.exact.caskSize ?? null,
-        caskFill: concreteInput.exact.caskFill ?? null,
+        edition: bottleInput.exact.edition ?? null,
+        statedAge: bottleInput.exact.statedAge ?? null,
+        releaseYear: bottleInput.exact.releaseYear ?? null,
+        vintageYear: bottleInput.exact.vintageYear ?? null,
+        abv: bottleInput.exact.abv ?? null,
+        singleCask: bottleInput.exact.singleCask ?? null,
+        caskStrength: bottleInput.exact.caskStrength ?? null,
+        caskType: bottleInput.exact.caskType ?? null,
+        caskSize: bottleInput.exact.caskSize ?? null,
+        caskFill: bottleInput.exact.caskFill ?? null,
       },
     }),
   ).toEqual({

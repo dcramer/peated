@@ -17,13 +17,13 @@ import {
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import {
-  ConcreteBottleUpdateConflictError,
-  ConcreteBottleUpdateGraphError,
-  ConcreteBottleUpdateInputError,
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-  type ConcreteBottleUpdateFinalizationManifest,
-} from "@peated/server/lib/updateConcreteBottle";
+  BottleUpdateConflictError,
+  BottleUpdateGraphError,
+  BottleUpdateInputError,
+  finalizeBottleUpdate,
+  updateBottleInTransaction,
+  type BottleUpdateFinalizationManifest,
+} from "@peated/server/lib/updateBottle";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { asc, eq, sql } from "drizzle-orm";
@@ -113,7 +113,7 @@ function isEntityNameConflict(error: unknown): boolean {
 export type EntityUpdateFinalizationManifest = {
   entity: Entity;
   changed: boolean;
-  bottleUpdates: ConcreteBottleUpdateFinalizationManifest[];
+  bottleUpdates: BottleUpdateFinalizationManifest[];
 };
 
 export type EntityUpdateExpectedState = {
@@ -287,7 +287,7 @@ export async function updateEntityInTransaction(
   }
 
   let newEntity: Entity | undefined;
-  const bottleUpdates: ConcreteBottleUpdateFinalizationManifest[] = [];
+  const bottleUpdates: BottleUpdateFinalizationManifest[] = [];
   try {
     [newEntity] = await transaction
       .update(entities)
@@ -341,7 +341,7 @@ export async function updateEntityInTransaction(
           throw new BottleGroupRepresentativeMissingError(group.id);
         }
         bottleUpdates.push(
-          await updateConcreteBottleInTransaction(transaction, {
+          await updateBottleInTransaction(transaction, {
             bottleId: group.representativeBottleId,
             input: { shared: { brand: newEntity.id } },
             user,
@@ -362,9 +362,9 @@ export async function updateEntityInTransaction(
     });
   } catch (error) {
     if (
-      error instanceof ConcreteBottleUpdateConflictError ||
-      error instanceof ConcreteBottleUpdateGraphError ||
-      error instanceof ConcreteBottleUpdateInputError ||
+      error instanceof BottleUpdateConflictError ||
+      error instanceof BottleUpdateGraphError ||
+      error instanceof BottleUpdateInputError ||
       error instanceof ExactBottleAliasConflictError ||
       error instanceof BottleGroupRepresentativeMissingError
     ) {
@@ -381,7 +381,7 @@ export async function finalizeEntityUpdate(
 ) {
   if (!result.changed) return;
   for (const bottleUpdate of result.bottleUpdates) {
-    await finalizeConcreteBottleUpdate(bottleUpdate);
+    await finalizeBottleUpdate(bottleUpdate);
   }
 
   try {

@@ -7,10 +7,10 @@ import {
   bottleTombstones,
   changes,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import { createBottle } from "@peated/server/lib/createBottle";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
-import { updateConcreteBottle } from "@peated/server/lib/updateConcreteBottle";
+import { updateBottle } from "@peated/server/lib/updateBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
@@ -35,7 +35,7 @@ vi.mock("@peated/server/lib/openai", () => ({
 function contextFor(user: User) {
   return {
     user,
-  } as Parameters<typeof createConcreteBottle>[0]["context"];
+  } as Parameters<typeof createBottle>[0]["context"];
 }
 
 function generatedDetails(): GeneratedBottleDetails {
@@ -61,7 +61,7 @@ function deferModelResult() {
 }
 
 async function createTwoMemberGroup(user: User, brandId: number) {
-  const source = await createConcreteBottle({
+  const source = await createBottle({
     context: contextFor(user),
     input: {
       stable: {
@@ -234,7 +234,7 @@ test("preserves a concurrent moderator exact-content edit", async ({
   const work = generateBottleDetails({ bottleId: source.bottle.id });
   await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
 
-  await updateConcreteBottle({
+  await updateBottle({
     bottleId: source.bottle.id,
     input: {
       exact: {
@@ -289,7 +289,7 @@ test("discards generated work planned from stale exact identity", async ({
   const work = generateBottleDetails({ bottleId: source.bottle.id });
   await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
 
-  await updateConcreteBottle({
+  await updateBottle({
     bottleId: source.bottle.id,
     input: {
       exact: {
@@ -348,7 +348,7 @@ test("preserves a concurrent moderator shared-flavor edit", async ({
   const work = generateBottleDetails({ bottleId: source.bottle.id });
   await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
 
-  await updateConcreteBottle({
+  await updateBottle({
     bottleId: source.bottle.id,
     input: { shared: { flavorProfile: "lightly_peated" } },
     context: contextFor(mod),
@@ -424,7 +424,7 @@ test("does not fan out after the selected Bottle moves groups", async ({
     defaults.user,
     brand.id,
   );
-  const destination = await createConcreteBottle({
+  const destination = await createBottle({
     context: contextFor(defaults.user),
     input: {
       stable: {

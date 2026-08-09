@@ -27,6 +27,8 @@ const textExtensions = new Set([
 ]);
 
 const prohibitedTerms = [
+  /\b(?:ConcreteBottle|concreteBottle)\w*\b/gu,
+  /\breleaseIdentity\b/giu,
   /\bconcrete[\s-]+bottles?\b/giu,
   /\bparent[\s-]+bottles?\b/giu,
   /\bproposed[\s-]+operations?\b/giu,

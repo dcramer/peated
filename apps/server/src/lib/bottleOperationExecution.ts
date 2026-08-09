@@ -3,13 +3,13 @@ import type { User } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import type { PreparedOperationExecution } from "@peated/server/lib/bottleOperationReview";
 import {
-  finalizeConcreteBottleMerge,
-  mergeConcreteBottlesInTransaction,
-} from "@peated/server/lib/mergeConcreteBottles";
+  finalizeBottleMerge,
+  mergeBottlesInTransaction,
+} from "@peated/server/lib/mergeBottles";
 import {
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-} from "@peated/server/lib/updateConcreteBottle";
+  finalizeBottleUpdate,
+  updateBottleInTransaction,
+} from "@peated/server/lib/updateBottle";
 import {
   finalizeEntityUpdate,
   updateEntityInTransaction,
@@ -67,7 +67,7 @@ export async function executePreparedOperationInTransaction({
 
   switch (prepared.type) {
     case "update_bottle": {
-      const manifest = await updateConcreteBottleInTransaction(transaction, {
+      const manifest = await updateBottleInTransaction(transaction, {
         ...prepared.canonicalInput,
         user: approvingModerator,
         actorId,
@@ -81,11 +81,11 @@ export async function executePreparedOperationInTransaction({
           groupId: manifest.group.id,
           changed: manifest.changed,
         }),
-        afterCommit: async () => await finalizeConcreteBottleUpdate(manifest),
+        afterCommit: async () => await finalizeBottleUpdate(manifest),
       };
     }
     case "merge_bottles": {
-      const manifest = await mergeConcreteBottlesInTransaction(transaction, {
+      const manifest = await mergeBottlesInTransaction(transaction, {
         ...prepared.canonicalInput,
         actorId,
       });
@@ -97,7 +97,7 @@ export async function executePreparedOperationInTransaction({
           destinationBottleId: manifest.destinationBottleId,
           changed: manifest.changed,
         }),
-        afterCommit: async () => await finalizeConcreteBottleMerge(manifest),
+        afterCommit: async () => await finalizeBottleMerge(manifest),
       };
     }
     case "update_entity": {

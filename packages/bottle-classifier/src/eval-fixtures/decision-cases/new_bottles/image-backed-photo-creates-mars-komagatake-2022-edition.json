@@ -36,9 +36,7 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/mars-komagatake-2022-edition.webp",
     "dbOutcome": {
       "bottleId": 44298,
-      "releaseId": null,
       "createsBottle": true,
-      "createsRelease": false,
       "summary": "Production add-bottle flow created bottle 44298 because no Mars Komagatake parent existed. The submitted draft used existing brand Mars (entity 1169) and distiller Shinshu (entity 238555), with expression Komagatake, category single malt, 50% ABV, release year 2022, and edition 2022 Edition flattened onto the bottle row."
     },
     "catalogFieldObservations": [

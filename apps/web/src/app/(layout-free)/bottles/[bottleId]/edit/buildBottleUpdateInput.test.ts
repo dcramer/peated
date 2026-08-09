@@ -4,7 +4,7 @@ import type {
   BottleFormSubmitValue,
 } from "@peated/web/components/bottleForm";
 import { describe, expect, test } from "vitest";
-import { buildConcreteBottleUpdateInput } from "./buildConcreteBottleUpdateInput";
+import { buildBottleUpdateInput } from "./buildBottleUpdateInput";
 
 function formValue(
   overrides: Partial<BottleFormSubmitValue> = {},
@@ -41,25 +41,22 @@ function submitMeta(
   return { dirtyFields: new Set(dirtyFields) };
 }
 
-describe("buildConcreteBottleUpdateInput", () => {
+describe("buildBottleUpdateInput", () => {
   test("omits both scopes when the age field is not dirty", () => {
     expect(
-      buildConcreteBottleUpdateInput(
-        formValue({ statedAge: 18 }),
-        submitMeta(),
-      ),
+      buildBottleUpdateInput(formValue({ statedAge: 18 }), submitMeta()),
     ).toEqual({});
   });
 
   test("builds an exact-only patch without shared values", () => {
     expect(
-      buildConcreteBottleUpdateInput(formValue(), submitMeta("edition", "abv")),
+      buildBottleUpdateInput(formValue(), submitMeta("edition", "abv")),
     ).toEqual({ exact: { edition: "Batch 24", abv: 57.2 } });
   });
 
   test("routes an exact-owned age without exposing a second form field", () => {
     expect(
-      buildConcreteBottleUpdateInput(
+      buildBottleUpdateInput(
         formValue({ statedAge: 15 }),
         submitMeta("statedAge"),
         { statedAgeScope: "exact" },
@@ -69,7 +66,7 @@ describe("buildConcreteBottleUpdateInput", () => {
 
   test("clears an exact-owned age without changing shared values", () => {
     expect(
-      buildConcreteBottleUpdateInput(
+      buildBottleUpdateInput(
         formValue({ statedAge: null }),
         submitMeta("statedAge"),
         { statedAgeScope: "exact" },
@@ -79,10 +76,7 @@ describe("buildConcreteBottleUpdateInput", () => {
 
   test("builds a shared-only patch without exact values", () => {
     expect(
-      buildConcreteBottleUpdateInput(
-        formValue(),
-        submitMeta("name", "statedAge"),
-      ),
+      buildBottleUpdateInput(formValue(), submitMeta("name", "statedAge")),
     ).toEqual({
       shared: { name: "Springbank 12 Cask Strength", statedAge: 12 },
     });
@@ -90,7 +84,7 @@ describe("buildConcreteBottleUpdateInput", () => {
 
   test("maps the complete shared and exact form contract", () => {
     expect(
-      buildConcreteBottleUpdateInput(
+      buildBottleUpdateInput(
         formValue({
           series: 3,
           brand: 4,
@@ -154,11 +148,11 @@ describe("buildConcreteBottleUpdateInput", () => {
 
   test("clears a removed image but leaves a new canvas to the upload route", () => {
     expect(
-      buildConcreteBottleUpdateInput(formValue({ image: null }), submitMeta()),
+      buildBottleUpdateInput(formValue({ image: null }), submitMeta()),
     ).toEqual({ exact: { image: null } });
 
     expect(
-      buildConcreteBottleUpdateInput(
+      buildBottleUpdateInput(
         formValue({ image: {} as HTMLCanvasElement }),
         submitMeta(),
       ),

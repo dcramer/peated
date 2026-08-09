@@ -11,7 +11,7 @@ Classifier terms are governed by the
 
 ## Identity Objects
 
-- **Bottle** is one concrete marketed release. It has its own stable identity
+- **Bottle** is one complete product release. It has its own stable identity
   and durably stores every field needed to search, render, and understand that
   release without loading its BottleGroup.
 - **BottleGroup** relates releases of the same expression. It owns the shared

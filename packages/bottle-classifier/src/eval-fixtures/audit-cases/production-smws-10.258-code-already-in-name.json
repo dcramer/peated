@@ -105,7 +105,6 @@
     "dbOutcome": {
       "bottleId": 25608,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Keep Bottle 25608 and its canonical name 10.258 Quo vadis?. Add exact ABV 58.1%, singleCask true, and vintageYear 2013. Leave edition null because the SMWS code is already materialized in the Bottle name."
     },
     "catalogFieldObservations": [

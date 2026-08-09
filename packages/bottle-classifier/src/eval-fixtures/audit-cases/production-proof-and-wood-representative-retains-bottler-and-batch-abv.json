@@ -118,7 +118,6 @@
     "dbOutcome": {
       "bottleId": 45249,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Keep Bottle 45249, retain Proof and Wood Entity 365733 as both Brand and bottler, preserve the stored 57.97% ABV because the cited 57.4% belongs to a different batch, add caskStrength true, and add singleCask false because the release is a blend of about 20 barrels. Do not merge or create a Bottle."
     },
     "catalogFieldObservations": [

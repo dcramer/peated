@@ -32,24 +32,24 @@ export const searchResponseFixtureSchema = z.object({
 
 const evalFixtureDbOutcomeSchema = z
   .object({
-    bottleId: z.number().int().positive().nullable().optional(),
-    releaseId: z.number().int().positive().nullable().optional(),
+    bottleId: z
+      .number()
+      .int()
+      .refine((id) => id !== 0)
+      .nullable()
+      .optional(),
     createsBottle: z.boolean().optional(),
-    createsRelease: z.boolean().optional(),
     summary: z.string().min(1),
   })
   .strict();
 
 const evalFixtureCatalogFieldObservationSchema = z
   .object({
-    target: z.enum([
-      "matched_bottle",
-      "matched_release",
-      "candidate_bottle",
-      "candidate_release",
-    ]),
-    bottleId: z.number().int().positive().optional(),
-    releaseId: z.number().int().positive().optional(),
+    target: z.enum(["matched_bottle", "candidate_bottle"]),
+    bottleId: z
+      .number()
+      .int()
+      .refine((id) => id !== 0),
     field: z.string().trim().min(1),
     productionValue: z.unknown().optional(),
     evidenceValue: z.unknown(),
@@ -62,32 +62,7 @@ const evalFixtureCatalogFieldObservationSchema = z
     safeToAutoFill: z.boolean(),
     notes: z.string().trim().min(1).optional(),
   })
-  .strict()
-  .superRefine((value, ctx) => {
-    if (
-      (value.target === "matched_bottle" ||
-        value.target === "candidate_bottle") &&
-      value.bottleId === undefined
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Bottle field observations must include bottleId.",
-        path: ["bottleId"],
-      });
-    }
-
-    if (
-      (value.target === "matched_release" ||
-        value.target === "candidate_release") &&
-      value.releaseId === undefined
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Release field observations must include releaseId.",
-        path: ["releaseId"],
-      });
-    }
-  });
+  .strict();
 
 export const evalFixtureProvenanceSchema = z
   .object({

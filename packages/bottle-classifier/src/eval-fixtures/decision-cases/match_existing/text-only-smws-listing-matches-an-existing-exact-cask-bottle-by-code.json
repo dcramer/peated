@@ -68,9 +68,7 @@
     ],
     "dbOutcome": {
       "bottleId": 43260,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Current Peated outcome: match Bottle 43260, SMWS RW6.5 Appley ever after."
     },
     "notes": "Re-verified July 31, 2026. The official SMWS product page identifies cask RW6.5 as Appley ever after, and Peated Bottle 43260 stores that exact single-cask rye identity."

@@ -117,10 +117,8 @@
     ],
     "dbOutcome": {
       "bottleId": 11904,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
-      "summary": "Assign the store price to bottle 11904 with releaseId null. Do not create a bottle_release or a separate generic Back Room Deal parent; preserve the listing's peated Scotch barrel finish wording as source observation evidence."
+      "summary": "Assign the store price to Bottle 11904. Do not create another Back Room Deal Bottle. Preserve the listing's peated Scotch barrel finish wording as source observation evidence."
     },
     "notes": "Hudson treats Back Room Deal as a named range product: New York Straight Rye Whiskey finished in peated Scotch barrels at 46% ABV. The finish is part of the marketed bottle identity, not a child-release discriminator."
   },

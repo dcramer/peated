@@ -10,37 +10,37 @@ import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, notInArray, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-export type ConcreteBottleIdentityEntity = {
+export type BottleIdentityEntity = {
   name: string;
   shortName?: string | null;
 };
 
-export type ConcreteBottleIdentityState = {
+export type BottleIdentityState = {
   name: string;
   fullName: string;
-  brand: ConcreteBottleIdentityEntity;
-  bottler: ConcreteBottleIdentityEntity | null;
+  brand: BottleIdentityEntity;
+  bottler: BottleIdentityEntity | null;
 };
 
-export type ConcreteBottleIdentityCandidate = {
+export type BottleIdentityCandidate = {
   bottleId: number;
-  current: ConcreteBottleIdentityState;
-  desired: ConcreteBottleIdentityState;
+  current: BottleIdentityState;
+  desired: BottleIdentityState;
 };
 
-export type ConcreteBottleIdentityConflictCause =
+export type BottleIdentityConflictCause =
   | "full_name"
   | "smws_code"
   | "exact_alias";
 
-export class ConcreteBottleIdentityConflictError extends Error {
+export class BottleIdentityConflictError extends Error {
   constructor(
     readonly conflictingBottleId: number | null,
-    readonly conflictCause: ConcreteBottleIdentityConflictCause,
+    readonly conflictCause: BottleIdentityConflictCause,
     options?: ErrorOptions,
   ) {
     super("Bottle identity conflicts with an existing Bottle.", options);
-    this.name = "ConcreteBottleIdentityConflictError";
+    this.name = "BottleIdentityConflictError";
   }
 }
 
@@ -63,7 +63,7 @@ function valuesHaveSmwsCode(
 }
 
 function entityNameVariants(
-  entity: ConcreteBottleIdentityEntity | null,
+  entity: BottleIdentityEntity | null,
   name: string | null,
 ) {
   if (!entity || !name) {
@@ -85,8 +85,8 @@ export function getSmwsCodeForBottleIdentity({
 }: {
   name: string;
   fullName: string;
-  brand: ConcreteBottleIdentityEntity;
-  bottler: ConcreteBottleIdentityEntity | null;
+  brand: BottleIdentityEntity;
+  bottler: BottleIdentityEntity | null;
 }) {
   return getSmwsCodeFromValues([
     fullName,
@@ -141,8 +141,8 @@ export async function findConflictingSmwsBottleId(
   }: {
     name: string;
     fullName: string;
-    brand: ConcreteBottleIdentityEntity;
-    bottler: ConcreteBottleIdentityEntity | null;
+    brand: BottleIdentityEntity;
+    bottler: BottleIdentityEntity | null;
   },
   { excludeBottleIds = [] }: { excludeBottleIds?: number[] } = {},
 ): Promise<number | null> {
@@ -216,16 +216,16 @@ export async function findConflictingSmwsBottleId(
 }
 
 /**
- * Preflights concrete identities and reserves their old/new exact aliases.
+ * Preflights Bottle identities and reserves their old/new exact aliases.
  * Callers explicitly choose which current Bottle rows are replaced atomically.
  */
-export async function reserveConcreteBottleIdentitiesInTransaction(
+export async function reserveBottleIdentitiesInTransaction(
   tx: AnyTransaction,
   {
     candidates,
     assignedByActorId,
   }: {
-    candidates: ConcreteBottleIdentityCandidate[];
+    candidates: BottleIdentityCandidate[];
     assignedByActorId: number;
   },
 ): Promise<{
@@ -243,7 +243,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
     const key = candidate.desired.fullName.toLowerCase();
     const owner = fullNameOwners.get(key);
     if (owner !== undefined && owner !== candidate.bottleId) {
-      throw new ConcreteBottleIdentityConflictError(owner, "full_name");
+      throw new BottleIdentityConflictError(owner, "full_name");
     }
     fullNameOwners.set(key, candidate.bottleId);
   }
@@ -269,10 +269,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
       .orderBy(asc(bottles.id))
       .limit(1);
     if (conflictingBottle) {
-      throw new ConcreteBottleIdentityConflictError(
-        conflictingBottle.id,
-        "full_name",
-      );
+      throw new BottleIdentityConflictError(conflictingBottle.id, "full_name");
     }
   }
 
@@ -296,7 +293,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
 
       const owner = smwsCodeOwners.get(code);
       if (owner !== undefined && owner !== candidate.bottleId) {
-        throw new ConcreteBottleIdentityConflictError(owner, "smws_code");
+        throw new BottleIdentityConflictError(owner, "smws_code");
       }
       smwsCodeOwners.set(code, candidate.bottleId);
     }
@@ -312,10 +309,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
         { excludeBottleIds: sortedCandidates.map(({ bottleId }) => bottleId) },
       );
       if (conflictingBottleId !== null) {
-        throw new ConcreteBottleIdentityConflictError(
-          conflictingBottleId,
-          "smws_code",
-        );
+        throw new BottleIdentityConflictError(conflictingBottleId, "smws_code");
       }
     }
   }
@@ -333,10 +327,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
       const key = normalizeBottleAliasKey(name).toLowerCase();
       const existing = reservations.get(key);
       if (existing && existing.bottleId !== candidate.bottleId) {
-        throw new ConcreteBottleIdentityConflictError(
-          existing.bottleId,
-          "exact_alias",
-        );
+        throw new BottleIdentityConflictError(existing.bottleId, "exact_alias");
       }
       reservations.set(key, {
         name,
@@ -348,7 +339,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
     const literalKey = literalName.toLowerCase();
     const existingLiteral = literalReservations.get(literalKey);
     if (existingLiteral && existingLiteral.bottleId !== candidate.bottleId) {
-      throw new ConcreteBottleIdentityConflictError(
+      throw new BottleIdentityConflictError(
         existingLiteral.bottleId,
         "exact_alias",
       );
@@ -376,7 +367,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
       }
     } catch (error) {
       if (error instanceof ExactBottleAliasConflictError) {
-        throw new ConcreteBottleIdentityConflictError(
+        throw new BottleIdentityConflictError(
           error.conflictingBottleId,
           "exact_alias",
           { cause: error },

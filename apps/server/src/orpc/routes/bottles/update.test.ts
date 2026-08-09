@@ -9,7 +9,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import { createBottle } from "@peated/server/lib/createBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -30,7 +30,7 @@ async function createGroup(
   stable: Record<string, unknown>,
   exacts: GroupMemberExact[],
 ) {
-  const first = await createConcreteBottle({
+  const first = await createBottle({
     context: { user },
     input: { stable, exact: exacts[0] },
   });

@@ -548,9 +548,7 @@
     ],
     "dbOutcome": {
       "bottleId": 45146,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Assign source listing 11828042 to the existing independently complete Warehouse 1 Bottle 45146. Propose retiring malformed duplicate Bottle 39096 by merging it into Bottle 45146 so tasting 223 and its public Warehouse 1 label image follow the surviving exact Bottle. Leave generic Càirdeas Bottle 44288 unchanged."
     },
     "catalogFieldObservations": [

@@ -554,7 +554,7 @@ describe("priceMatchingAutomation", () => {
     });
 
     expect(assessment.automationBlockers).toContain(
-      "auto-create requires a concrete whisky category",
+      "auto-create requires a known whisky category",
     );
     expect(
       shouldVerifyStorePriceMatch({

@@ -1,18 +1,18 @@
-import type { ConcreteBottleUpdateInput } from "@peated/server/lib/concreteBottleSchemas";
+import type { BottleUpdateInput } from "@peated/server/lib/bottleSchemas";
 import type {
   BottleFormSubmitMeta,
   BottleFormSubmitValue,
 } from "@peated/web/components/bottleForm";
 
-type SharedPatch = NonNullable<ConcreteBottleUpdateInput["shared"]>;
-type ExactPatch = NonNullable<ConcreteBottleUpdateInput["exact"]>;
+type SharedPatch = NonNullable<BottleUpdateInput["shared"]>;
+type ExactPatch = NonNullable<BottleUpdateInput["exact"]>;
 
 /**
  * Partitions only dirty fields rendered by the live form into sparse
  * shared/exact patches. The edit context keeps stated-age ownership internal
  * while the form presents one effective value.
  */
-export function buildConcreteBottleUpdateInput(
+export function buildBottleUpdateInput(
   value: BottleFormSubmitValue,
   { dirtyFields }: BottleFormSubmitMeta,
   {
@@ -20,7 +20,7 @@ export function buildConcreteBottleUpdateInput(
   }: {
     statedAgeScope?: "shared" | "exact";
   } = {},
-): ConcreteBottleUpdateInput {
+): BottleUpdateInput {
   const shared: SharedPatch = {};
   const exact: ExactPatch = {};
 

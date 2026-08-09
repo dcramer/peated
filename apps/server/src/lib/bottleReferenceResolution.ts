@@ -17,10 +17,10 @@ import { type User } from "@peated/server/db/schema";
 import type { BottleAliasIdentitySnapshot } from "@peated/server/lib/bottleAliases";
 import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
 import {
-  createOrReuseConcreteBottleInTransaction,
+  createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
-} from "@peated/server/lib/createConcreteBottle";
-import { buildClassifierConcreteBottleInput } from "./classifierDecisionCreateInputs";
+} from "@peated/server/lib/createBottle";
+import { buildClassifierBottleInput } from "./classifierDecisionCreateInputs";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -142,9 +142,9 @@ export async function applyClassifierCreateDecision({
   createdBottle: boolean;
   assignment: BottleReferenceAssignment;
 }> {
-  const input = buildClassifierConcreteBottleInput(decision.proposedBottle);
+  const input = buildClassifierBottleInput(decision.proposedBottle);
   const result = await db.transaction(async (tx) =>
-    createOrReuseConcreteBottleInTransaction(tx, {
+    createOrReuseBottleInTransaction(tx, {
       creationSource: "bottle_classifier",
       createdByActorId,
       input,

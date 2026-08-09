@@ -14,7 +14,7 @@ export default procedure
     path: "/bottles/apply-brand-repair-group",
     summary: "Apply BottleGroup-wide brand/entity repairs",
     description:
-      "Group eligible candidate Bottles by BottleGroup, then fan each shared brand, optional distillery, and series repair out to every concrete member. Requires moderator privileges",
+      "Group eligible candidate Bottles by BottleGroup. Apply each shared brand, optional distillery, and series repair to every Bottle in the group. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "applyBottleBrandRepairGroup",

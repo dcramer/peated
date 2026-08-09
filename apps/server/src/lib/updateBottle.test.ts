@@ -12,29 +12,29 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import { createBottle } from "@peated/server/lib/createBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import {
-  ConcreteBottleUpdateAuthorizationError,
-  ConcreteBottleUpdateConflictError,
-  ConcreteBottleUpdateExpectedStateError,
-  ConcreteBottleUpdateGraphError,
-  ConcreteBottleUpdateInputError,
-  ConcreteBottleUpdateInputSchema,
-  concreteBottleUpdateExpectedSharedState,
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottle,
-  updateConcreteBottleInTransaction,
-} from "@peated/server/lib/updateConcreteBottle";
+  BottleUpdateAuthorizationError,
+  BottleUpdateConflictError,
+  BottleUpdateExpectedStateError,
+  BottleUpdateGraphError,
+  BottleUpdateInputError,
+  BottleUpdateInputSchema,
+  bottleUpdateExpectedSharedState,
+  finalizeBottleUpdate,
+  updateBottle,
+  updateBottleInTransaction,
+} from "@peated/server/lib/updateBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ZodError } from "zod";
 
 function contextFor(user: User | null) {
-  return { user } as Parameters<typeof updateConcreteBottle>[0]["context"];
+  return { user } as Parameters<typeof updateBottle>[0]["context"];
 }
 
 type GroupMemberExact = Omit<
@@ -53,10 +53,8 @@ async function createGroup({
 }) {
   if (!exacts.length) throw new Error("At least one exact Bottle is required.");
 
-  const first = await createConcreteBottle({
-    context: contextFor(user) as Parameters<
-      typeof createConcreteBottle
-    >[0]["context"],
+  const first = await createBottle({
+    context: contextFor(user) as Parameters<typeof createBottle>[0]["context"],
     input: {
       stable,
       exact: exacts[0],
@@ -146,28 +144,28 @@ describe("Bottle updates", () => {
     };
     for (const user of [null, defaults.user]) {
       const error = await waitError(
-        updateConcreteBottle({
+        updateBottle({
           bottleId: 999_999,
           input: invalidRawInput,
           context: contextFor(user),
         }),
-        ConcreteBottleUpdateAuthorizationError,
+        BottleUpdateAuthorizationError,
       );
-      expect(error).toBeInstanceOf(ConcreteBottleUpdateAuthorizationError);
+      expect(error).toBeInstanceOf(BottleUpdateAuthorizationError);
     }
 
     const bottle = await fixtures.Bottle();
     const mod = await fixtures.User({ mod: true });
     const admin = await fixtures.User({ admin: true });
     await expect(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: bottle.id,
         input: {},
         context: contextFor(mod),
       }),
     ).resolves.toMatchObject({ changed: false });
     await expect(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: bottle.id,
         input: {},
         context: contextFor(admin),
@@ -183,7 +181,7 @@ describe("Bottle updates", () => {
     ]) {
       expect(
         await waitError(
-          updateConcreteBottle({
+          updateBottle({
             bottleId: bottle.id,
             input,
             context: contextFor(mod),
@@ -193,14 +191,14 @@ describe("Bottle updates", () => {
     }
     expect(
       await waitError(
-        updateConcreteBottle({
+        updateBottle({
           bottleId: 0,
           input: {},
           context: contextFor(mod),
         }),
-        ConcreteBottleUpdateInputError,
+        BottleUpdateInputError,
       ),
-    ).toBeInstanceOf(ConcreteBottleUpdateInputError);
+    ).toBeInstanceOf(BottleUpdateInputError);
     expect(await loadUpdateAudits([bottle.id])).toEqual([]);
   });
 
@@ -229,12 +227,12 @@ describe("Bottle updates", () => {
       .where(eq(bottleGroups.id, first.group.id));
     const aliasesBefore = await loadAliases([first.bottle.id]);
 
-    const empty = await updateConcreteBottle({
+    const empty = await updateBottle({
       bottleId: first.bottle.id,
       input: {},
       context: contextFor(mod),
     });
-    const semantic = await updateConcreteBottle({
+    const semantic = await updateBottle({
       bottleId: first.bottle.id,
       input: {
         shared: {
@@ -278,9 +276,9 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const manifest = await db.transaction(async (tx) => {
-      const result = await updateConcreteBottleInTransaction(tx, {
+      const result = await updateBottleInTransaction(tx, {
         bottleId: first.bottle.id,
-        input: ConcreteBottleUpdateInputSchema.parse({
+        input: BottleUpdateInputSchema.parse({
           shared: {
             brand: { name: "Composed Review Brand" },
             distillers: [{ name: "Composed Review Distillery" }],
@@ -304,7 +302,7 @@ describe("Bottle updates", () => {
     });
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 
-    await finalizeConcreteBottleUpdate(manifest);
+    await finalizeBottleUpdate(manifest);
 
     const createdEntities = await db
       .select({ id: entities.id })
@@ -353,13 +351,13 @@ describe("Bottle updates", () => {
       .select({ distillerId: bottleGroupDistillers.distillerId })
       .from(bottleGroupDistillers)
       .where(eq(bottleGroupDistillers.groupId, first.group.id));
-    const expectedSharedState = concreteBottleUpdateExpectedSharedState({
+    const expectedSharedState = bottleUpdateExpectedSharedState({
       group: groupBefore,
       distillerIds: distillersBefore.map(({ distillerId }) => distillerId),
       series: null,
     });
 
-    await updateConcreteBottle({
+    await updateBottle({
       bottleId: first.bottle.id,
       input: { shared: { name: "New Authority" } },
       context: contextFor(mod),
@@ -367,7 +365,7 @@ describe("Bottle updates", () => {
 
     const error = await waitError(
       db.transaction((tx) =>
-        updateConcreteBottleInTransaction(tx, {
+        updateBottleInTransaction(tx, {
           bottleId: first.bottle.id,
           input: { shared: { brand: targetBrand.id } },
           expectedSharedState,
@@ -376,7 +374,7 @@ describe("Bottle updates", () => {
           creationSource: "repair_workflow",
         }),
       ),
-      ConcreteBottleUpdateExpectedStateError,
+      BottleUpdateExpectedStateError,
     );
     expect(error).toMatchObject({ groupId: first.group.id });
     expect(
@@ -405,7 +403,7 @@ describe("Bottle updates", () => {
       where: eq(bottleGroups.id, first.group.id),
     });
     if (!groupBefore) throw new Error("Expected BottleGroup fixture.");
-    const expectedSharedState = concreteBottleUpdateExpectedSharedState({
+    const expectedSharedState = bottleUpdateExpectedSharedState({
       group: groupBefore,
       distillerIds: [],
       referencedSeries: [targetSeries],
@@ -421,7 +419,7 @@ describe("Bottle updates", () => {
 
     const error = await waitError(
       db.transaction((tx) =>
-        updateConcreteBottleInTransaction(tx, {
+        updateBottleInTransaction(tx, {
           bottleId: first.bottle.id,
           input: { shared: { series: targetSeries.id } },
           expectedSharedState,
@@ -430,7 +428,7 @@ describe("Bottle updates", () => {
           creationSource: "repair_workflow",
         }),
       ),
-      ConcreteBottleUpdateExpectedStateError,
+      BottleUpdateExpectedStateError,
     );
 
     expect(error).toMatchObject({ groupId: first.group.id });
@@ -468,7 +466,7 @@ describe("Bottle updates", () => {
     });
     resetQueueMock();
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: first.bottle.id,
       input: {
         shared: {
@@ -540,7 +538,7 @@ describe("Bottle updates", () => {
       },
     );
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: first.bottle.id,
       input: { shared: { brand: { name: brand.name } } },
       context: contextFor(mod),
@@ -624,7 +622,7 @@ describe("Bottle updates", () => {
       },
     );
 
-    await updateConcreteBottle({
+    await updateBottle({
       bottleId: first.bottle.id,
       input: {
         shared: {
@@ -657,7 +655,7 @@ describe("Bottle updates", () => {
 
     resetQueueMock();
     await expect(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: first.bottle.id,
         input: {
           shared: {
@@ -694,7 +692,7 @@ describe("Bottle updates", () => {
       exacts: [{ edition: "One" }, { edition: "Two" }],
     });
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: first.bottle.id,
       input: { shared: { brand: newBrand.id } },
       context: contextFor(mod),
@@ -765,7 +763,7 @@ describe("Bottle updates", () => {
       exacts: [{ edition: "One" }],
     });
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: moving.first.bottle.id,
       input: { shared: { brand: newBrand.id } },
       context: contextFor(mod),
@@ -823,7 +821,7 @@ describe("Bottle updates", () => {
       exacts: [{ edition: "One" }],
     });
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: first.bottle.id,
       input: { shared: { brand: newBrand.id } },
       context: contextFor(mod),
@@ -869,14 +867,14 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const error = await waitError(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: first.bottle.id,
         input: {
           shared: { brand: newBrand.id, series: otherSeries.id },
         },
         context: contextFor(mod),
       }),
-      ConcreteBottleUpdateInputError,
+      BottleUpdateInputError,
     );
     expect(error.message).toMatch(/series/i);
 
@@ -941,7 +939,7 @@ describe("Bottle updates", () => {
       .from(bottleGroups)
       .where(eq(bottleGroups.id, first.group.id));
 
-    const identityResult = await updateConcreteBottle({
+    const identityResult = await updateBottle({
       bottleId: selectedBefore.id,
       input: {
         exact: {
@@ -1010,7 +1008,7 @@ describe("Bottle updates", () => {
     expect(identityResult.group).toEqual(groupBefore);
 
     const identityBeforeContent = identityResult.bottle;
-    const contentResult = await updateConcreteBottle({
+    const contentResult = await updateBottle({
       bottleId: selectedBefore.id,
       input: { exact: { description: "Updated exact content" } },
       context: contextFor(mod),
@@ -1051,7 +1049,7 @@ describe("Bottle updates", () => {
       .where(eq(bottles.id, first.bottle.id));
     resetQueueMock();
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: first.bottle.id,
       input: { exact: { edition: "Updated" } },
       context: contextFor(mod),
@@ -1221,7 +1219,7 @@ describe("Bottle updates", () => {
       .where(eq(bottlesToDistillers.bottleId, members[1].bottle.id));
     resetQueueMock();
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: members[0].bottle.id,
       input: {
         shared: {
@@ -1327,7 +1325,7 @@ describe("Bottle updates", () => {
       })
       .where(eq(bottleGroups.id, first.group.id));
 
-    const repair = await updateConcreteBottle({
+    const repair = await updateBottle({
       bottleId: members[0].bottle.id,
       input: {
         shared: {
@@ -1370,7 +1368,7 @@ describe("Bottle updates", () => {
       .where(eq(bottleGroups.id, first.group.id));
     const membersBeforeNameOnly = await loadGroupMembers(first.group.id);
     const distillersBeforeNameOnly = await loadBottleDistillers(memberIds);
-    const nameOnly = await updateConcreteBottle({
+    const nameOnly = await updateBottle({
       bottleId: members[0].bottle.id,
       input: { shared: { name: "Omission Label" } },
       context: contextFor(mod),
@@ -1453,7 +1451,7 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const error = await waitError(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: members[0].bottle.id,
         input: {
           shared: {
@@ -1463,7 +1461,7 @@ describe("Bottle updates", () => {
         },
         context: contextFor(mod),
       }),
-      ConcreteBottleUpdateGraphError,
+      BottleUpdateGraphError,
     );
 
     expect(error).toMatchObject({
@@ -1495,7 +1493,7 @@ describe("Bottle updates", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 
     resetQueueMock();
-    const exactResult = await updateConcreteBottle({
+    const exactResult = await updateBottle({
       bottleId: members[0].bottle.id,
       input: { exact: { description: "Selected Bottle content" } },
       context: contextFor(mod),
@@ -1564,7 +1562,7 @@ describe("Bottle updates", () => {
     });
     resetQueueMock();
 
-    await updateConcreteBottle({
+    await updateBottle({
       bottleId: members[0].bottle.id,
       input: {
         shared: {
@@ -1619,7 +1617,7 @@ describe("Bottle updates", () => {
     });
     resetQueueMock();
 
-    const mixed = await updateConcreteBottle({
+    const mixed = await updateBottle({
       bottleId: members[0].bottle.id,
       input: {
         shared: { statedAge: 15 },
@@ -1632,7 +1630,7 @@ describe("Bottle updates", () => {
     let persisted = await loadGroupMembers(first.group.id);
     expect(persisted.map(({ statedAge }) => statedAge)).toEqual([15, 13, 15]);
 
-    const cleared = await updateConcreteBottle({
+    const cleared = await updateBottle({
       bottleId: members[1].bottle.id,
       input: { exact: { statedAge: null } },
       context: contextFor(mod),
@@ -1643,7 +1641,7 @@ describe("Bottle updates", () => {
       members.map(({ bottle }) => bottle.id),
     );
     resetQueueMock();
-    const equal = await updateConcreteBottle({
+    const equal = await updateBottle({
       bottleId: members[1].bottle.id,
       input: { exact: { statedAge: 15 } },
       context: contextFor(mod),
@@ -1654,7 +1652,7 @@ describe("Bottle updates", () => {
     ).toEqual(auditsBeforeEqual);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 
-    await updateConcreteBottle({
+    await updateBottle({
       bottleId: members[0].bottle.id,
       input: { shared: { statedAge: 18 } },
       context: contextFor(mod),
@@ -1678,10 +1676,8 @@ describe("Bottle updates", () => {
       },
       exacts: [{ edition: "One" }, { edition: "Two" }],
     });
-    const outsider = await createConcreteBottle({
-      context: contextFor(mod) as Parameters<
-        typeof createConcreteBottle
-      >[0]["context"],
+    const outsider = await createBottle({
+      context: contextFor(mod) as Parameters<typeof createBottle>[0]["context"],
       input: {
         stable: { name: "Collision Label", brand: brand.id },
         exact: { edition: "Two" },
@@ -1698,7 +1694,7 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const error = await waitError(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: members[0].bottle.id,
         input: {
           shared: {
@@ -1708,7 +1704,7 @@ describe("Bottle updates", () => {
         },
         context: contextFor(mod),
       }),
-      ConcreteBottleUpdateConflictError,
+      BottleUpdateConflictError,
     );
     expect(error).toMatchObject({ conflictingBottleId: outsider.bottle.id });
     expect(
@@ -1725,10 +1721,8 @@ describe("Bottle updates", () => {
     expect(await loadUpdateAudits(memberIds)).toEqual([]);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 
-    const aliasOwner = await createConcreteBottle({
-      context: contextFor(mod) as Parameters<
-        typeof createConcreteBottle
-      >[0]["context"],
+    const aliasOwner = await createBottle({
+      context: contextFor(mod) as Parameters<typeof createBottle>[0]["context"],
       input: {
         stable: { name: "Unrelated Alias Owner", brand: brand.id },
         exact: {},
@@ -1754,7 +1748,7 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const aliasError = await waitError(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: members[0].bottle.id,
         input: {
           shared: {
@@ -1764,7 +1758,7 @@ describe("Bottle updates", () => {
         },
         context: contextFor(mod),
       }),
-      ConcreteBottleUpdateConflictError,
+      BottleUpdateConflictError,
     );
     expect(aliasError).toMatchObject({
       conflictingBottleId: aliasOwner.bottle.id,
@@ -1817,12 +1811,12 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const error = await waitError(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: first.bottle.id,
         input: { shared: { name: "35.331 Alternate hoggie" } },
         context: contextFor(mod),
       }),
-      ConcreteBottleUpdateConflictError,
+      BottleUpdateConflictError,
     );
     expect(error).toMatchObject({ conflictingBottleId: existing.id });
     const [persistedGroup] = await db
@@ -1868,12 +1862,12 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const error = await waitError(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: first.bottle.id,
         input: { shared: { bottler: smws.id } },
         context: contextFor(mod),
       }),
-      ConcreteBottleUpdateConflictError,
+      BottleUpdateConflictError,
     );
 
     expect(error).toMatchObject({ conflictingBottleId: existing.id });
@@ -1918,7 +1912,7 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     const error = await waitError(
-      updateConcreteBottle({
+      updateBottle({
         bottleId: members[0].bottle.id,
         input: {
           shared: {
@@ -1929,7 +1923,7 @@ describe("Bottle updates", () => {
         },
         context: contextFor(mod),
       }),
-      ConcreteBottleUpdateConflictError,
+      BottleUpdateConflictError,
     );
 
     expect(error).toMatchObject({
@@ -1968,12 +1962,12 @@ describe("Bottle updates", () => {
     ] as const;
     for (const expected of cases) {
       const error = await waitError(
-        updateConcreteBottle({
+        updateBottle({
           bottleId: expected.bottleId,
           input: { exact: { edition: "Must Not Persist" } },
           context: contextFor(mod),
         }),
-        ConcreteBottleUpdateGraphError,
+        BottleUpdateGraphError,
       );
       expect(error).toMatchObject(expected);
     }
@@ -2003,7 +1997,7 @@ describe("Bottle updates", () => {
     });
     resetQueueMock();
 
-    await updateConcreteBottle({
+    await updateBottle({
       bottleId: members[0].bottle.id,
       input: { shared: { series: newSeries.id } },
       context: contextFor(mod),
@@ -2054,7 +2048,7 @@ describe("Bottle updates", () => {
       },
     );
 
-    const result = await updateConcreteBottle({
+    const result = await updateBottle({
       bottleId: first.bottle.id,
       input: {
         shared: {

@@ -1,18 +1,18 @@
-import { formatCanonicalReleaseName } from "@peated/bottle-classifier/releaseIdentity";
+import { formatCanonicalBottleName } from "@peated/bottle-classifier/bottleIdentity";
 import type { Bottle, BottleGroup } from "@peated/server/db/schema";
 import { toTitleCase } from "@peated/server/lib/strings";
 
-type StableConcreteBottleIdentity = Pick<
+type StableBottleIdentity = Pick<
   BottleGroup,
   "name" | "fullName" | "statedAge"
 >;
 
-type MaterializedConcreteBottleIdentity = Pick<
+type MaterializedBottleIdentity = Pick<
   Bottle,
   "name" | "fullName" | "statedAge"
 >;
 
-export type ConcreteBottleExactIdentity = Pick<
+export type BottleExactIdentity = Pick<
   Bottle,
   | "edition"
   | "statedAge"
@@ -26,10 +26,9 @@ export type ConcreteBottleExactIdentity = Pick<
   | "caskFill"
 >;
 
-export type ConcreteBottleExactIdentityPatch =
-  Partial<ConcreteBottleExactIdentity>;
+export type BottleExactIdentityPatch = Partial<BottleExactIdentity>;
 
-export type ConcreteBottleGroupMaterialization = Pick<
+export type BottleGroupMaterialization = Pick<
   BottleGroup,
   | "name"
   | "fullName"
@@ -41,7 +40,7 @@ export type ConcreteBottleGroupMaterialization = Pick<
   | "flavorProfile"
 >;
 
-export type MaterializedConcreteBottleForGroup = Pick<
+export type MaterializedBottleForGroup = Pick<
   Bottle,
   | "name"
   | "fullName"
@@ -58,7 +57,7 @@ function valueOrCurrent<T>(value: T | undefined, current: T): T {
 }
 
 /** Returns only a non-redundant exact age relative to the shared age. */
-export function getConcreteBottleExactStatedAge({
+export function getBottleExactStatedAge({
   bottleStatedAge,
   stableStatedAge,
 }: {
@@ -71,18 +70,18 @@ export function getConcreteBottleExactStatedAge({
 }
 
 /** Applies an exact patch while classifying age against the source group. */
-export function getConcreteBottleExactIdentity({
+export function getBottleExactIdentity({
   bottle,
   sourceGroupStatedAge,
   exactPatch,
 }: {
-  bottle: ConcreteBottleExactIdentity;
+  bottle: BottleExactIdentity;
   sourceGroupStatedAge: number | null;
-  exactPatch?: ConcreteBottleExactIdentityPatch;
-}): ConcreteBottleExactIdentity {
+  exactPatch?: BottleExactIdentityPatch;
+}): BottleExactIdentity {
   return {
     edition: valueOrCurrent(exactPatch?.edition, bottle.edition),
-    statedAge: getConcreteBottleExactStatedAge({
+    statedAge: getBottleExactStatedAge({
       bottleStatedAge: valueOrCurrent(exactPatch?.statedAge, bottle.statedAge),
       stableStatedAge: sourceGroupStatedAge,
     }),
@@ -97,7 +96,7 @@ export function getConcreteBottleExactIdentity({
   };
 }
 
-function formatConcreteCaskIdentity({
+function formatExactCaskIdentity({
   fullName,
   name,
   caskType,
@@ -131,27 +130,27 @@ function formatConcreteCaskIdentity({
 }
 
 /** Materializes the complete exact identity without retaining redundant age overrides. */
-export function materializeConcreteBottleIdentity({
+export function materializeBottleIdentity({
   stable,
   exact,
 }: {
-  stable: StableConcreteBottleIdentity;
-  exact: ConcreteBottleExactIdentity;
-}): MaterializedConcreteBottleIdentity {
-  const exactStatedAge = getConcreteBottleExactStatedAge({
+  stable: StableBottleIdentity;
+  exact: BottleExactIdentity;
+}): MaterializedBottleIdentity {
+  const exactStatedAge = getBottleExactStatedAge({
     bottleStatedAge: exact.statedAge,
     stableStatedAge: stable.statedAge,
   });
-  const identity = formatConcreteCaskIdentity({
-    ...formatCanonicalReleaseName({
+  const identity = formatExactCaskIdentity({
+    ...formatCanonicalBottleName({
       bottleName: stable.name,
       bottleFullName: stable.fullName,
-      bottleReleaseTraits: {
+      bottleNameTraits: {
         caskStrength: exact.caskStrength,
         singleCask: exact.singleCask,
       },
       bottleStatedAge: stable.statedAge,
-      release: {
+      exact: {
         ...exact,
         statedAge: exactStatedAge,
       },
@@ -168,15 +167,15 @@ export function materializeConcreteBottleIdentity({
 }
 
 /** Materializes only the durable Bottle fields owned by shared group identity. */
-export function materializeConcreteBottleForGroup({
+export function materializeBottleForGroup({
   group,
   exact,
 }: {
-  group: ConcreteBottleGroupMaterialization;
-  exact: ConcreteBottleExactIdentity;
-}): MaterializedConcreteBottleForGroup {
+  group: BottleGroupMaterialization;
+  exact: BottleExactIdentity;
+}): MaterializedBottleForGroup {
   return {
-    ...materializeConcreteBottleIdentity({ stable: group, exact }),
+    ...materializeBottleIdentity({ stable: group, exact }),
     brandId: group.brandId,
     bottlerId: group.bottlerId,
     seriesId: group.seriesId,

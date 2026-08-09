@@ -1,4 +1,4 @@
-import { BottleGroupV1Schema, ConcreteBottleV1Schema } from "./catalogIdentity";
+import { BottleGroupV1Schema, BottleV1Schema } from "./catalogIdentity";
 
 const ratingStats = {
   pass: 0,
@@ -31,7 +31,7 @@ const group = BottleGroupV1Schema.parse({
   updatedAt: "2026-07-14T00:00:00.000Z",
 });
 
-const bottle = ConcreteBottleV1Schema.parse({
+const bottle = BottleV1Schema.parse({
   schemaVersion: 1,
   id: 3,
   groupId: 1,
@@ -69,7 +69,7 @@ const bottle = ConcreteBottleV1Schema.parse({
 describe("catalog identity runtime schemas", () => {
   test("parses BottleGroup and independently complete Bottle results", () => {
     expect(BottleGroupV1Schema.parse(group)).toEqual(group);
-    expect(ConcreteBottleV1Schema.parse(bottle)).toMatchObject({
+    expect(BottleV1Schema.parse(bottle)).toMatchObject({
       id: 3,
       groupId: 1,
       brandId: 2,
@@ -84,6 +84,6 @@ describe("catalog identity runtime schemas", () => {
   test("rejects a Bottle without its independently owned identity", () => {
     const { brandId: _, ...incompleteBottle } = bottle;
 
-    expect(() => ConcreteBottleV1Schema.parse(incompleteBottle)).toThrow();
+    expect(() => BottleV1Schema.parse(incompleteBottle)).toThrow();
   });
 });

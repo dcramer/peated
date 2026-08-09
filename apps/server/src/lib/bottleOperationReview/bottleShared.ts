@@ -15,9 +15,9 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import {
-  getConcreteBottleExactIdentity,
-  type ConcreteBottleExactIdentity,
-} from "@peated/server/lib/concreteBottleIdentity";
+  getBottleExactIdentity,
+  type BottleExactIdentity,
+} from "@peated/server/lib/bottleIdentity";
 import { asc, eq } from "drizzle-orm";
 import { fail, loadEntity } from "./shared";
 
@@ -128,10 +128,8 @@ export function existingEntityChoice(entity: Entity) {
   };
 }
 
-export function bottleExact(
-  resource: BottleResource,
-): ConcreteBottleExactIdentity {
-  return getConcreteBottleExactIdentity({
+export function bottleExact(resource: BottleResource): BottleExactIdentity {
+  return getBottleExactIdentity({
     bottle: resource.bottle,
     sourceGroupStatedAge: resource.group.statedAge,
   });

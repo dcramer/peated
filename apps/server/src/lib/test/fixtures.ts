@@ -45,7 +45,7 @@ import {
 } from "../../constants";
 import { getUserActorByIdForDatabase } from "../actors";
 import { createAccessToken, generatePasswordHash } from "../auth";
-import { materializeConcreteBottleForGroup } from "../concreteBottleIdentity";
+import { materializeBottleForGroup } from "../bottleIdentity";
 import { mapRows } from "../db";
 import { formatBottleName } from "../format";
 import { choose, random, sample } from "../rand";
@@ -524,7 +524,7 @@ async function createBottleFixture(
 
     const baseName = data.name ?? chooseBottleName();
     const materializedGroupFields = existingGroup
-      ? materializeConcreteBottleForGroup({
+      ? materializeBottleForGroup({
           group: existingGroup,
           exact: {
             edition: data.edition ?? null,

@@ -26,9 +26,9 @@ import {
 } from "@peated/server/lib/bottleReferenceCandidates";
 import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
 import {
-  buildIndependentConcreteBottleCreateInput,
-  buildIndependentConcreteBottleRouteInput,
-} from "@peated/server/lib/flatConcreteBottleInput";
+  buildIndependentBottleCreateInput,
+  buildIndependentBottleRouteInput,
+} from "@peated/server/lib/flatBottleInput";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
@@ -823,12 +823,12 @@ describe("priceMatching", () => {
       flavorProfile: null,
     };
 
-    const concreteInput = buildIndependentConcreteBottleCreateInput(
-      buildIndependentConcreteBottleRouteInput(input),
+    const bottleInput = buildIndependentBottleCreateInput(
+      buildIndependentBottleRouteInput(input),
     );
     const result = await createBottleFromStorePriceMatchProposal({
       proposalId: proposal.id,
-      concreteInput,
+      bottleInput,
       user: reviewer,
       actor: await getUserActor(reviewer),
     });
@@ -932,19 +932,19 @@ describe("priceMatching", () => {
       imageUrl: null,
       flavorProfile: null,
     };
-    const concreteInput = buildIndependentConcreteBottleCreateInput(
-      buildIndependentConcreteBottleRouteInput(input),
+    const bottleInput = buildIndependentBottleCreateInput(
+      buildIndependentBottleRouteInput(input),
     );
 
     const first = await createBottleFromStorePriceMatchProposal({
       proposalId: firstProposal.id,
-      concreteInput,
+      bottleInput,
       user: reviewer,
       actor: await getUserActor(reviewer),
     });
     const second = await createBottleFromStorePriceMatchProposal({
       proposalId: secondProposal.id,
-      concreteInput,
+      bottleInput,
       user: reviewer,
       actor: await getUserActor(reviewer),
     });
@@ -979,7 +979,7 @@ describe("priceMatching", () => {
     await expect(
       createBottleFromStorePriceMatchProposal({
         proposalId: ignoredProposal.id,
-        concreteInput,
+        bottleInput,
         user: reviewer,
         actor: await getUserActor(reviewer),
       }),

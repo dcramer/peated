@@ -7,10 +7,7 @@ import {
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
-import {
-  BottleGroupV1Schema,
-  ConcreteBottleV1Schema,
-} from "@peated/server/schemas";
+import { BottleGroupV1Schema, BottleV1Schema } from "@peated/server/schemas";
 import { z } from "zod";
 
 const BottleEditChoiceSchema = z
@@ -33,7 +30,7 @@ const BottleEditSharedContextSchema = z
   })
   .strict();
 
-const BottleEditExactContextSchema = ConcreteBottleV1Schema.pick({
+const BottleEditExactContextSchema = BottleV1Schema.pick({
   edition: true,
   statedAge: true,
   abv: true,

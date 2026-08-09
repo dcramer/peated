@@ -37,15 +37,15 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
+import type { BottleCreateInput } from "@peated/server/lib/bottleSchemas";
 import {
   buildBottleInputFromProposedBottle,
-  buildClassifierConcreteBottleInput,
+  buildClassifierBottleInput,
 } from "@peated/server/lib/classifierDecisionCreateInputs";
-import type { ConcreteBottleCreateInput } from "@peated/server/lib/concreteBottleSchemas";
 import {
-  createOrReuseConcreteBottleInTransaction,
+  createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
-} from "@peated/server/lib/createConcreteBottle";
+} from "@peated/server/lib/createBottle";
 import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
@@ -75,10 +75,10 @@ import {
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-  type ConcreteBottleUpdateInput,
-} from "@peated/server/lib/updateConcreteBottle";
+  finalizeBottleUpdate,
+  updateBottleInTransaction,
+  type BottleUpdateInput,
+} from "@peated/server/lib/updateBottle";
 import type { PriceMatchSearchEvidenceSchema } from "@peated/server/schemas";
 import {
   ProposedBottleSchema,
@@ -235,15 +235,15 @@ function normalizeClassifierDecisionForPriceMatching(
  * drafts retain the legacy shared-age contract. Unknown null fields or empty
  * distiller lists are omitted rather than cleared.
  */
-function buildConcreteBottleRepairInput(
+function buildBottleRepairInput(
   proposedBottle: StorePriceBottleRepairDraft,
-): ConcreteBottleUpdateInput {
+): BottleUpdateInput {
   const proposedInput = buildBottleInputFromProposedBottle(proposedBottle);
-  const shared: NonNullable<ConcreteBottleUpdateInput["shared"]> = {
+  const shared: NonNullable<BottleUpdateInput["shared"]> = {
     name: proposedInput.name,
     brand: proposedInput.brand,
   };
-  const exact: NonNullable<ConcreteBottleUpdateInput["exact"]> = {};
+  const exact: NonNullable<BottleUpdateInput["exact"]> = {};
 
   if (proposedBottle.series !== null) shared.series = proposedInput.series!;
   if (proposedBottle.category !== null) {
@@ -944,16 +944,16 @@ async function canContinueStorePriceMatchProcessing(
   );
 }
 
-function buildStorePriceMatchConcreteInput(
+function buildStorePriceMatchBottleInput(
   decision: StorePriceMatchDecision,
-): ConcreteBottleCreateInput {
+): BottleCreateInput {
   if (decision.action !== "create_new" || decision.proposedBottle === null) {
     throw new Error(
       "Price match decision does not contain one Bottle creation input.",
     );
   }
 
-  return buildClassifierConcreteBottleInput(decision.proposedBottle);
+  return buildClassifierBottleInput(decision.proposedBottle);
 }
 
 function getStorePriceBottleRepairDraft(
@@ -1164,14 +1164,14 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   tx: AnyTransaction,
   {
     proposalId,
-    concreteInput,
+    bottleInput,
     user,
     creationSource,
     actor,
     expectedProcessingToken,
   }: {
     proposalId: number;
-    concreteInput: ConcreteBottleCreateInput;
+    bottleInput: BottleCreateInput;
     user: User;
     creationSource: CatalogVerificationCreationSource;
     actor: IncomingBottleDecisionActor;
@@ -1186,10 +1186,10 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   });
 
   const { createResult, bottle: resolvedBottle } =
-    await createOrReuseConcreteBottleInTransaction(tx, {
+    await createOrReuseBottleInTransaction(tx, {
       creationSource,
       createdByActorId: writeActor.id,
-      input: concreteInput,
+      input: bottleInput,
       context: { user },
     });
 
@@ -1235,14 +1235,14 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
 
 export async function createBottleFromStorePriceMatchProposal({
   proposalId,
-  concreteInput,
+  bottleInput,
   user,
   creationSource = "price_match_review",
   actor,
   expectedProcessingToken,
 }: {
   proposalId: number;
-  concreteInput: ConcreteBottleCreateInput;
+  bottleInput: BottleCreateInput;
   user: User;
   creationSource?: CatalogVerificationCreationSource;
   actor: IncomingBottleDecisionActor;
@@ -1251,7 +1251,7 @@ export async function createBottleFromStorePriceMatchProposal({
   const result = await db.transaction(async (tx) =>
     createBottleFromStorePriceMatchProposalInTransaction(tx, {
       proposalId,
-      concreteInput,
+      bottleInput,
       user,
       creationSource,
       actor,
@@ -1512,11 +1512,11 @@ export async function resolveStorePriceMatchProposal(
         return await reloadStorePriceMatchProposal(proposal.id);
       }
 
-      const concreteInput = buildStorePriceMatchConcreteInput(decision);
+      const bottleInput = buildStorePriceMatchBottleInput(decision);
 
       await createBottleFromStorePriceMatchProposal({
         proposalId: proposal.id,
-        concreteInput,
+        bottleInput,
         user: automationUser,
         creationSource: "price_match_automation",
         actor: await getPeatedSystemActor(),
@@ -1953,9 +1953,9 @@ export async function applyStorePriceBottleRepairFromProposal({
     });
     // The Bottle writer acquires and validates the active Bottle graph
     // before the proposal and its consumers are locked below.
-    const updateManifest = await updateConcreteBottleInTransaction(tx, {
+    const updateManifest = await updateBottleInTransaction(tx, {
       bottleId: repairBottleId,
-      input: buildConcreteBottleRepairInput(proposedBottle),
+      input: buildBottleRepairInput(proposedBottle),
       user,
       actorId: writeActor.id,
       creationSource: "price_match_review",
@@ -1999,7 +1999,7 @@ export async function applyStorePriceBottleRepairFromProposal({
       id: updateManifest.bottle.id,
     },
   });
-  await finalizeConcreteBottleUpdate(updateManifest);
+  await finalizeBottleUpdate(updateManifest);
 
   return updateManifest.bottle;
 }

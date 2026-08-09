@@ -91,9 +91,7 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg",
     "dbOutcome": {
       "bottleId": null,
-      "releaseId": null,
       "createsBottle": true,
-      "createsRelease": false,
       "summary": "Production DB outcome: no bottle found for barrel no. 4769; create a new exact-cask bottle. Nearby rows: bottle 2, bottle 43924, and bottle 17073."
     },
     "catalogFieldObservations": [

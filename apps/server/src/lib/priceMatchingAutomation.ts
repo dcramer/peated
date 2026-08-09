@@ -647,7 +647,7 @@ function getCreateNewScore({
   const automationBlockers: string[] = [];
 
   if (!proposedBottle?.category) {
-    automationBlockers.push("auto-create requires a concrete whisky category");
+    automationBlockers.push("auto-create requires a known whisky category");
   }
 
   if (proposedBottle?.brand.name) {

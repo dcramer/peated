@@ -13,18 +13,18 @@ import type { AnyDatabase } from "@peated/server/db";
 import type { BottleSeries, Entity } from "@peated/server/db/schema";
 import { bottleAliases, bottles, bottleSeries } from "@peated/server/db/schema";
 import {
-  getConcreteBottleExactIdentity,
-  materializeConcreteBottleIdentity,
-} from "@peated/server/lib/concreteBottleIdentity";
+  getBottleExactIdentity,
+  materializeBottleIdentity,
+} from "@peated/server/lib/bottleIdentity";
 import {
-  ConcreteBottleUpdateInputSchema,
-  type ConcreteBottleUpdateInput,
-} from "@peated/server/lib/concreteBottleSchemas";
+  BottleUpdateInputSchema,
+  type BottleUpdateInput,
+} from "@peated/server/lib/bottleSchemas";
 import { formatBottleName } from "@peated/server/lib/format";
 import {
-  concreteBottleUpdateExpectedSelectedBottleState,
-  concreteBottleUpdateExpectedSharedState,
-} from "@peated/server/lib/updateConcreteBottle";
+  bottleUpdateExpectedSelectedBottleState,
+  bottleUpdateExpectedSharedState,
+} from "@peated/server/lib/updateBottle";
 import { and, asc, count, eq, isNotNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
@@ -539,33 +539,32 @@ export async function prepareBottleUpdate(
     delete canonicalSharedPatch.bottler;
     delete canonicalSharedPatch.distillers;
   }
-  const canonicalInput: ConcreteBottleUpdateInput =
-    ConcreteBottleUpdateInputSchema.parse({
-      ...(proposal.input.patch.shared
-        ? {
-            shared: {
-              ...canonicalSharedPatch,
-              ...(proposal.input.patch.shared.seriesId !== undefined
-                ? { series: seriesId }
-                : {}),
-              ...(proposal.input.patch.shared.brand !== undefined
-                ? { brand: brand.canonical }
-                : {}),
-              ...(proposal.input.patch.shared.bottler !== undefined
-                ? { bottler: bottler.canonical }
-                : {}),
-              ...(proposal.input.patch.shared.distillers !== undefined
-                ? {
-                    distillers: distillers.map(({ canonical }) => canonical),
-                  }
-                : {}),
-            },
-          }
-        : {}),
-      ...(proposal.input.patch.exact
-        ? { exact: proposal.input.patch.exact }
-        : {}),
-    });
+  const canonicalInput: BottleUpdateInput = BottleUpdateInputSchema.parse({
+    ...(proposal.input.patch.shared
+      ? {
+          shared: {
+            ...canonicalSharedPatch,
+            ...(proposal.input.patch.shared.seriesId !== undefined
+              ? { series: seriesId }
+              : {}),
+            ...(proposal.input.patch.shared.brand !== undefined
+              ? { brand: brand.canonical }
+              : {}),
+            ...(proposal.input.patch.shared.bottler !== undefined
+              ? { bottler: bottler.canonical }
+              : {}),
+            ...(proposal.input.patch.shared.distillers !== undefined
+              ? {
+                  distillers: distillers.map(({ canonical }) => canonical),
+                }
+              : {}),
+          },
+        }
+      : {}),
+    ...(proposal.input.patch.exact
+      ? { exact: proposal.input.patch.exact }
+      : {}),
+  });
 
   let sharedName =
     canonicalInput.shared?.name === undefined
@@ -603,12 +602,12 @@ export async function prepareBottleUpdate(
   const stableFullName = formatBottleName({
     name: `${brandShortName || brandName} ${sharedName}`,
   });
-  const exactAfter = getConcreteBottleExactIdentity({
+  const exactAfter = getBottleExactIdentity({
     bottle: resource.bottle,
     sourceGroupStatedAge: resource.group.statedAge,
     exactPatch: canonicalInput.exact,
   });
-  const materialized = materializeConcreteBottleIdentity({
+  const materialized = materializeBottleIdentity({
     stable: {
       name: sharedName,
       fullName: stableFullName,
@@ -653,13 +652,13 @@ export async function prepareBottleUpdate(
       const desired =
         member.id === resource.bottle.id
           ? after
-          : materializeConcreteBottleIdentity({
+          : materializeBottleIdentity({
               stable: {
                 name: sharedName,
                 fullName: stableFullName,
                 statedAge: sharedStatedAge,
               },
-              exact: getConcreteBottleExactIdentity({
+              exact: getBottleExactIdentity({
                 bottle: member,
                 sourceGroupStatedAge: resource.group.statedAge,
               }),
@@ -739,11 +738,12 @@ export async function prepareBottleUpdate(
     canonicalInput: {
       bottleId: proposal.input.bottleId,
       input: canonicalInput,
-      expectedSelectedBottleState:
-        concreteBottleUpdateExpectedSelectedBottleState(resource.bottle),
+      expectedSelectedBottleState: bottleUpdateExpectedSelectedBottleState(
+        resource.bottle,
+      ),
       ...(proposal.input.patch.shared
         ? {
-            expectedSharedState: concreteBottleUpdateExpectedSharedState({
+            expectedSharedState: bottleUpdateExpectedSharedState({
               group: resource.group,
               distillerIds: resource.distillerIds,
               referencedEntities: stateToken.referencedEntities.map(

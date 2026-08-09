@@ -122,9 +122,7 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/trestle-spirit-of-eclipse.jpg",
     "dbOutcome": {
       "bottleId": 38004,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Production DB outcome: match Bottle 38004 with no release; the Bottle still stores releaseYear 2011 and null ABV."
     },
     "catalogFieldObservations": [

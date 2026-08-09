@@ -33,8 +33,8 @@ The package root is intentionally small. It should export only the core ways we 
 import {
   createBottleClassifier,
   createWhiskyLabelExtractor,
-  formatCanonicalReleaseName,
-  getResolvedReleaseIdentity,
+  formatCanonicalBottleName,
+  getResolvedBottleIdentity,
   normalizeBottle,
   normalizeProposedBottleDraft,
 } from "@peated/bottle-classifier";
@@ -118,7 +118,7 @@ Package-specific reminders:
 - [`src/instructions.ts`](./src/instructions.ts): classifier and extractor prompts
 - [`src/extractor.ts`](./src/extractor.ts): bottle-label extraction
 - [`src/normalize.ts`](./src/normalize.ts): bottle/name/category/volume normalization
-- [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): canonical Bottle name and exact-trait normalization shared with staged migration consumers
+- [`src/bottleIdentity.ts`](./src/bottleIdentity.ts): canonical Bottle name and exact-trait normalization shared with staged migration consumers
 - [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts): create-draft normalization
 - [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts): shared evidence checks
 - [`src/smws.ts`](./src/smws.ts): SMWS parsing and exact-code behavior

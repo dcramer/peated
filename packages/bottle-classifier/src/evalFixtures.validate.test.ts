@@ -162,7 +162,6 @@ describe("eval fixture validation", () => {
     expect(fixture?.provenance.dbOutcome).toMatchObject({
       bottleId: 45146,
       createsBottle: false,
-      createsRelease: false,
     });
   });
 
@@ -232,7 +231,6 @@ describe("eval fixture validation", () => {
     expect(fixture?.provenance.dbOutcome).toMatchObject({
       bottleId: 45249,
       createsBottle: false,
-      createsRelease: false,
     });
   });
 
@@ -585,7 +583,6 @@ describe("eval fixture validation", () => {
     expect(fixture.provenance?.dbOutcome).toMatchObject({
       bottleId: 45146,
       createsBottle: false,
-      createsRelease: false,
     });
   });
 

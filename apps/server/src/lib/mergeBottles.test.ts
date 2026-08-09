@@ -22,18 +22,18 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
-  ConcreteBottleMergeAuthorizationError,
-  ConcreteBottleMergeConflictError,
-  ConcreteBottleMergeGraphError,
-  mergeConcreteBottles,
-  mergeConcreteBottlesInTransaction,
-} from "@peated/server/lib/mergeConcreteBottles";
+  BottleMergeAuthorizationError,
+  BottleMergeConflictError,
+  BottleMergeGraphError,
+  mergeBottles,
+  mergeBottlesInTransaction,
+} from "@peated/server/lib/mergeBottles";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 function contextFor(user: User | null) {
-  return { user } as Parameters<typeof mergeConcreteBottles>[0]["context"];
+  return { user } as Parameters<typeof mergeBottles>[0]["context"];
 }
 
 describe("exact Bottle merges", () => {
@@ -197,7 +197,7 @@ describe("exact Bottle merges", () => {
       count: 3,
     });
 
-    const result = await mergeConcreteBottles({
+    const result = await mergeBottles({
       sourceBottleId: source.id,
       destinationBottleId: destination.id,
       context: contextFor(mod),
@@ -379,7 +379,7 @@ describe("exact Bottle merges", () => {
     });
 
     expect(
-      await mergeConcreteBottles({
+      await mergeBottles({
         sourceBottleId: source.id,
         destinationBottleId: destination.id,
         context: contextFor(mod),
@@ -425,7 +425,7 @@ describe("exact Bottle merges", () => {
     ]);
 
     await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
+      mergeBottlesInTransaction(tx, {
         sourceBottleId: source.id,
         destinationBottleId: destination.id,
         actorId: actor.id,
@@ -471,7 +471,7 @@ describe("exact Bottle merges", () => {
     });
 
     const manifest = await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
+      mergeBottlesInTransaction(tx, {
         sourceBottleId: source.id,
         destinationBottleId: destination.id,
         actorId: actor.id,
@@ -507,7 +507,7 @@ describe("exact Bottle merges", () => {
     });
 
     await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
+      mergeBottlesInTransaction(tx, {
         sourceBottleId: source.id,
         destinationBottleId: destination.id,
         actorId: actor.id,
@@ -562,7 +562,7 @@ describe("exact Bottle merges", () => {
     if (!canonicalAlias) throw new Error("Expected the canonical alias.");
 
     await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
+      mergeBottlesInTransaction(tx, {
         sourceBottleId: source.id,
         destinationBottleId: destination.id,
         actorId: actor.id,
@@ -603,7 +603,7 @@ describe("exact Bottle merges", () => {
     if (!canonicalAlias) throw new Error("Expected the canonical alias.");
 
     await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
+      mergeBottlesInTransaction(tx, {
         sourceBottleId: source.id,
         destinationBottleId: destination.id,
         actorId: actor.id,
@@ -636,7 +636,7 @@ describe("exact Bottle merges", () => {
       .where(eq(bottleAliases.name, source.fullName));
 
     await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
+      mergeBottlesInTransaction(tx, {
         sourceBottleId: source.id,
         destinationBottleId: destination.id,
         actorId: actor.id,
@@ -673,15 +673,13 @@ describe("exact Bottle merges", () => {
 
     await expect(
       db.transaction((tx) =>
-        mergeConcreteBottlesInTransaction(tx, {
+        mergeBottlesInTransaction(tx, {
           sourceBottleId: source.id,
           destinationBottleId: destination.id,
           actorId: actor.id,
         }),
       ),
-    ).rejects.toEqual(
-      new ConcreteBottleMergeConflictError("identity_conflict"),
-    );
+    ).rejects.toEqual(new BottleMergeConflictError("identity_conflict"));
     expect(
       await db.query.bottles.findFirst({
         where: eq(bottles.id, source.id),
@@ -712,15 +710,13 @@ describe("exact Bottle merges", () => {
 
     await expect(
       db.transaction((tx) =>
-        mergeConcreteBottlesInTransaction(tx, {
+        mergeBottlesInTransaction(tx, {
           sourceBottleId: source.id,
           destinationBottleId: destination.id,
           actorId: actor.id,
         }),
       ),
-    ).rejects.toEqual(
-      new ConcreteBottleMergeConflictError("consumer_conflict"),
-    );
+    ).rejects.toEqual(new BottleMergeConflictError("consumer_conflict"));
     expect(
       await db.query.bottles.findFirst({
         where: eq(bottles.id, source.id),
@@ -746,7 +742,7 @@ describe("exact Bottle merges", () => {
     });
 
     await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
+      mergeBottlesInTransaction(tx, {
         sourceBottleId: source.id,
         destinationBottleId: firstDestination.id,
         actorId: actor.id,
@@ -755,35 +751,35 @@ describe("exact Bottle merges", () => {
 
     await expect(
       db.transaction((tx) =>
-        mergeConcreteBottlesInTransaction(tx, {
+        mergeBottlesInTransaction(tx, {
           sourceBottleId: source.id,
           destinationBottleId: otherDestination.id,
           actorId: actor.id,
         }),
       ),
     ).rejects.toEqual(
-      new ConcreteBottleMergeConflictError("retired_to_other_destination"),
+      new BottleMergeConflictError("retired_to_other_destination"),
     );
     await expect(
       db.transaction((tx) =>
-        mergeConcreteBottlesInTransaction(tx, {
+        mergeBottlesInTransaction(tx, {
           sourceBottleId: otherDestination.id,
           destinationBottleId: source.id,
           actorId: actor.id,
         }),
       ),
-    ).rejects.toEqual(new ConcreteBottleMergeGraphError("retired", source.id));
+    ).rejects.toEqual(new BottleMergeGraphError("retired", source.id));
   });
 
   test("enforces moderator authorization at the public boundary", async ({
     defaults,
   }) => {
     await expect(
-      mergeConcreteBottles({
+      mergeBottles({
         sourceBottleId: 1,
         destinationBottleId: 2,
         context: contextFor(defaults.user),
       }),
-    ).rejects.toBeInstanceOf(ConcreteBottleMergeAuthorizationError);
+    ).rejects.toBeInstanceOf(BottleMergeAuthorizationError);
   });
 });

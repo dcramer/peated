@@ -30,13 +30,11 @@
       "https://thedailypour.com/spirit/shieldaig-speyside-single-malt-scotch-whisky-21-year/"
     ],
     "dbOutcome": {
-      "bottleId": 44175,
-      "releaseId": null,
-      "createsBottle": false,
-      "createsRelease": false,
-      "summary": "Production proposal 28 selected bottle 44175, a Shieldaig Speyside row with a conflicting structured age of 18, as the parent for a 21-year child release. The corrected outcome is a separate Shieldaig Speyside 21-year-old bottle, not a release under the 18-year product."
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Create a separate Shieldaig Speyside 21-year-old Bottle. Do not use Bottle 44175 because its structured age is 18."
     },
-    "notes": "Production match queue proposal 28 redirected the supported 21-year source listing to a child release under bottle 44175 even though the parent row carried conflicting statedAge 18. The observed web evidence included Total Wine plus independent Shieldaig Speyside 21-year pages. The localCatalog models the relevant Peated state that should inform the decision. Age is a marketed bottle-level differentiator for this Shieldaig Speyside family, so the display name must include the age."
+    "notes": "Production match queue proposal 28 selected Bottle 44175 even though its statedAge is 18. The observed web evidence included Total Wine plus independent Shieldaig Speyside 21-year pages. The localCatalog models the relevant Peated state that should inform the decision. Age identifies this marketed Bottle, so the display name must include the age."
   },
   "expected": {
     "status": "classified",

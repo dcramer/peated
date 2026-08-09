@@ -1,5 +1,5 @@
 /**
- * Pure exact-Bottle identity rules for materializing already extracted release
+ * Pure exact-Bottle identity rules for materializing already extracted exact
  * traits.
  *
  * Keep this module structurally safe and brand-agnostic. If a decision depends
@@ -9,7 +9,7 @@
  */
 import { normalizeBottle } from "./normalize";
 
-export type ReleaseIdentityInput = {
+export type BottleExactIdentityInput = {
   edition: string | null;
   statedAge: number | null;
   releaseYear: number | null;
@@ -22,10 +22,9 @@ export type ReleaseIdentityInput = {
   caskFill?: string | null;
 };
 
-type BottleLevelReleaseTraitsInput = Omit<ReleaseIdentityInput, "statedAge">;
+type BottleNameTraitsInput = Omit<BottleExactIdentityInput, "statedAge">;
 
-type BottleReleaseIdentityBottleInput = BottleNameInput &
-  Partial<BottleLevelReleaseTraitsInput>;
+type BottleNameIdentityInput = BottleNameInput & Partial<BottleNameTraitsInput>;
 
 type BottleNameInput = {
   fullName: string | null | undefined;
@@ -33,7 +32,7 @@ type BottleNameInput = {
   statedAge: number | null | undefined;
 };
 
-const RELEASE_IDENTITY_FIELDS = [
+const BOTTLE_EXACT_IDENTITY_FIELDS = [
   "edition",
   "statedAge",
   "releaseYear",
@@ -44,12 +43,12 @@ const RELEASE_IDENTITY_FIELDS = [
   "caskType",
   "caskSize",
   "caskFill",
-] as const satisfies ReadonlyArray<keyof ReleaseIdentityInput>;
+] as const satisfies ReadonlyArray<keyof BottleExactIdentityInput>;
 
-const STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
+const BOTTLE_NAME_TRAIT_FIELDS = [
   "singleCask",
   "caskStrength",
-] as const satisfies ReadonlyArray<keyof BottleLevelReleaseTraitsInput>;
+] as const satisfies ReadonlyArray<keyof BottleNameTraitsInput>;
 
 function bottleNameMarketsPattern(
   bottle: BottleNameInput,
@@ -64,9 +63,9 @@ function bottleNameMarketsPattern(
   });
 }
 
-function bottleMarketsInheritedReleaseTrait(
+function bottleNameMarketsTrait(
   bottle: BottleNameInput,
-  field: (typeof STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS)[number],
+  field: (typeof BOTTLE_NAME_TRAIT_FIELDS)[number],
 ): boolean {
   switch (field) {
     case "singleCask":
@@ -82,19 +81,19 @@ function bottleMarketsInheritedReleaseTrait(
   }
 }
 
-function isInheritedBottleLevelReleaseTrait({
+function isTraitAlreadyInBottleName({
   bottle,
   field,
-  release,
+  exact,
 }: {
-  bottle: BottleReleaseIdentityBottleInput;
-  field: (typeof STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS)[number];
-  release: Partial<ReleaseIdentityInput>;
+  bottle: BottleNameIdentityInput;
+  field: (typeof BOTTLE_NAME_TRAIT_FIELDS)[number];
+  exact: Partial<BottleExactIdentityInput>;
 }) {
   return (
     bottle[field] === true &&
-    release[field] === true &&
-    bottleMarketsInheritedReleaseTrait(bottle, field)
+    exact[field] === true &&
+    bottleNameMarketsTrait(bottle, field)
   );
 }
 
@@ -132,27 +131,27 @@ export function bottleMarketsStatedAge(bottle: BottleNameInput) {
   );
 }
 
-export function hasDirtyBottleLevelStatedAgeConflict({
+export function hasBottleStatedAgeConflict({
   bottle,
-  releaseStatedAge,
+  exactStatedAge,
 }: {
   bottle: BottleNameInput;
-  releaseStatedAge: number | null | undefined;
+  exactStatedAge: number | null | undefined;
 }) {
   return (
     bottle.statedAge !== null &&
     bottle.statedAge !== undefined &&
-    releaseStatedAge !== null &&
-    releaseStatedAge !== undefined &&
-    bottle.statedAge !== releaseStatedAge &&
+    exactStatedAge !== null &&
+    exactStatedAge !== undefined &&
+    bottle.statedAge !== exactStatedAge &&
     !bottleMarketsStatedAge(bottle)
   );
 }
 
-function formatReleaseTraitLabel(
-  field: (typeof RELEASE_IDENTITY_FIELDS)[number],
+function formatExactIdentityLabel(
+  field: (typeof BOTTLE_EXACT_IDENTITY_FIELDS)[number],
   value: NonNullable<
-    ReleaseIdentityInput[(typeof RELEASE_IDENTITY_FIELDS)[number]]
+    BottleExactIdentityInput[(typeof BOTTLE_EXACT_IDENTITY_FIELDS)[number]]
   >,
 ): string | null {
   switch (field) {
@@ -193,82 +192,82 @@ function editionIncludesReleaseYearEditionPhrase({
 }
 
 /**
- * Produces the canonical release identity after accounting for bottle-level
- * stated-age carryover and dirty-parent conflicts.
+ * Produces the canonical exact identity after accounting for bottle-level
+ * stated-age carryover and shared-age conflicts.
  */
-export function getResolvedReleaseIdentity({
+export function getResolvedBottleIdentity({
   bottle,
-  release,
+  exact,
 }: {
   bottle: BottleNameInput;
-  release: ReleaseIdentityInput;
-}): ReleaseIdentityInput {
-  const hasDirtyParentStatedAgeConflict = hasDirtyBottleLevelStatedAgeConflict({
+  exact: BottleExactIdentityInput;
+}): BottleExactIdentityInput {
+  const statedAgeConflicts = hasBottleStatedAgeConflict({
     bottle,
-    releaseStatedAge: release.statedAge,
+    exactStatedAge: exact.statedAge,
   });
 
   return {
-    edition: release.edition ?? null,
-    statedAge: hasDirtyParentStatedAgeConflict
-      ? (release.statedAge ?? null)
-      : (bottle.statedAge ?? release.statedAge ?? null),
-    releaseYear: release.releaseYear ?? null,
-    vintageYear: release.vintageYear ?? null,
-    abv: release.abv ?? null,
-    singleCask: release.singleCask ?? null,
-    caskStrength: release.caskStrength ?? null,
-    caskType: release.caskType ?? null,
-    caskSize: release.caskSize ?? null,
-    caskFill: release.caskFill ?? null,
+    edition: exact.edition ?? null,
+    statedAge: statedAgeConflicts
+      ? (exact.statedAge ?? null)
+      : (bottle.statedAge ?? exact.statedAge ?? null),
+    releaseYear: exact.releaseYear ?? null,
+    vintageYear: exact.vintageYear ?? null,
+    abv: exact.abv ?? null,
+    singleCask: exact.singleCask ?? null,
+    caskStrength: exact.caskStrength ?? null,
+    caskType: exact.caskType ?? null,
+    caskSize: exact.caskSize ?? null,
+    caskFill: exact.caskFill ?? null,
   };
 }
 
-export function formatCanonicalReleaseName({
+export function formatCanonicalBottleName({
   bottleName,
   bottleFullName,
-  bottleReleaseTraits,
+  bottleNameTraits,
   bottleStatedAge,
-  release,
+  exact,
 }: {
   bottleName: string;
   bottleFullName: string;
-  bottleReleaseTraits?: Partial<BottleLevelReleaseTraitsInput>;
+  bottleNameTraits?: Partial<BottleNameTraitsInput>;
   bottleStatedAge: number | null;
-  release: ReleaseIdentityInput;
+  exact: BottleExactIdentityInput;
 }): {
   fullName: string;
   name: string;
 } {
-  const resolvedRelease = getResolvedReleaseIdentity({
+  const resolvedIdentity = getResolvedBottleIdentity({
     bottle: {
       name: bottleName,
       fullName: bottleFullName,
       statedAge: bottleStatedAge,
     },
-    release,
+    exact,
   });
 
   const nameBits = [bottleName];
   const fullNameBits = [bottleFullName];
 
-  for (const field of RELEASE_IDENTITY_FIELDS) {
+  for (const field of BOTTLE_EXACT_IDENTITY_FIELDS) {
     if (
       field === "releaseYear" &&
-      editionIncludesReleaseYearEditionPhrase(resolvedRelease)
+      editionIncludesReleaseYearEditionPhrase(resolvedIdentity)
     ) {
       continue;
     }
 
     if (
       field === "statedAge" &&
-      resolvedRelease.statedAge !== null &&
+      resolvedIdentity.statedAge !== null &&
       ((bottleStatedAge !== null &&
-        resolvedRelease.statedAge === bottleStatedAge) ||
+        resolvedIdentity.statedAge === bottleStatedAge) ||
         bottleMarketsStatedAge({
           name: bottleName,
           fullName: bottleFullName,
-          statedAge: resolvedRelease.statedAge,
+          statedAge: resolvedIdentity.statedAge,
         }))
     ) {
       continue;
@@ -276,26 +275,26 @@ export function formatCanonicalReleaseName({
 
     if (
       (field === "singleCask" || field === "caskStrength") &&
-      isInheritedBottleLevelReleaseTrait({
+      isTraitAlreadyInBottleName({
         bottle: {
           name: bottleName,
           fullName: bottleFullName,
           statedAge: bottleStatedAge,
-          ...bottleReleaseTraits,
+          ...bottleNameTraits,
         },
         field,
-        release: resolvedRelease,
+        exact: resolvedIdentity,
       })
     ) {
       continue;
     }
 
-    const value = resolvedRelease[field];
+    const value = resolvedIdentity[field];
     if (value === null || value === undefined) {
       continue;
     }
 
-    const label = formatReleaseTraitLabel(field, value);
+    const label = formatExactIdentityLabel(field, value);
     if (!label) {
       continue;
     }

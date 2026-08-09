@@ -1,9 +1,9 @@
 import {
-  ConcreteBottleMergeConflictError,
-  ConcreteBottleMergeGraphError,
-  ConcreteBottleMergeInputError,
-  mergeConcreteBottles,
-} from "@peated/server/lib/mergeConcreteBottles";
+  BottleMergeConflictError,
+  BottleMergeGraphError,
+  BottleMergeInputError,
+  mergeBottles,
+} from "@peated/server/lib/mergeBottles";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleSchema } from "@peated/server/schemas";
@@ -39,7 +39,7 @@ export default procedure
       input.direction === "mergeInto" ? input.other : input.bottle;
 
     try {
-      const result = await mergeConcreteBottles({
+      const result = await mergeBottles({
         sourceBottleId,
         destinationBottleId,
         context,
@@ -51,21 +51,21 @@ export default procedure
       );
     } catch (error) {
       if (
-        error instanceof ConcreteBottleMergeInputError ||
-        (error instanceof ConcreteBottleMergeConflictError &&
+        error instanceof BottleMergeInputError ||
+        (error instanceof BottleMergeConflictError &&
           error.code === "same_bottle")
       ) {
         throw errors.BAD_REQUEST({ message: error.message, cause: error });
       }
       if (
-        error instanceof ConcreteBottleMergeGraphError &&
+        error instanceof BottleMergeGraphError &&
         error.code === "not_found"
       ) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
       }
       if (
-        error instanceof ConcreteBottleMergeGraphError ||
-        error instanceof ConcreteBottleMergeConflictError
+        error instanceof BottleMergeGraphError ||
+        error instanceof BottleMergeConflictError
       ) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }

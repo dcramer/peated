@@ -158,23 +158,21 @@
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/woodford-reserve-double-double-oaked-2022.jpg",
     "dbOutcome": {
-      "bottleId": 44022,
-      "releaseId": 195,
+      "bottleId": -195,
       "createsBottle": false,
-      "createsRelease": false,
-      "summary": "Production DB outcome: match existing release 195, Woodford Reserve Double Double Oaked - 2022 Release, under bottle 44022. Do not match plain Double Oaked bottle 11855 or create another 2022 release."
+      "summary": "Match the complete Woodford Reserve Double Double Oaked 2022 Bottle represented by fixture id -195. Do not match plain Double Oaked Bottle 11855. Do not create another 2022 Bottle."
     },
     "catalogFieldObservations": [
       {
-        "target": "matched_release",
-        "releaseId": 195,
+        "target": "matched_bottle",
+        "bottleId": -195,
         "field": "abv",
         "productionValue": null,
         "evidenceValue": 45.2,
         "source": "image_evidence",
         "issue": "missing_in_production",
         "safeToAutoFill": false,
-        "notes": "The photo label gives 45.2% ABV for the 2022 release, but this eval is about routing to the existing release rather than enriching it."
+        "notes": "The photo label gives 45.2% ABV for the 2022 Bottle. This eval checks routing to the existing Bottle and does not require enrichment."
       }
     ],
     "notes": "Added from failed image photo-identification trace 413c334005c60d8dcc8dbf109761c5e3. The observed pending upload was t2l6vj6tc6zixonbv54lc87o at https://api.peated.com/uploads/pending-uploads/pending-upload-o5klpnm5zbjknwcu8w0sm3fd.webp, expiring 2026-07-10T02:41:47.889Z. The form returned suggestedNextStep manual_search even though classification matched the captured exact 2022 Bottle candidate. This fixture requires the eligible exact match to route to confirm_match automatically. The label evidence reads Woodford Reserve Double Double Oaked, 2022 release, 45.2% ABV, Distillery Series."

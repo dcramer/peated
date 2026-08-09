@@ -4,11 +4,11 @@ import {
 } from "@peated/bottle-classifier";
 import type { AnyDatabase } from "@peated/server/db";
 import { bottles, entities } from "@peated/server/db/schema";
-import { lockConcreteBottleMergeDependencies } from "@peated/server/lib/mergeConcreteBottles";
+import { lockBottleMergeDependencies } from "@peated/server/lib/mergeBottles";
 import {
-  ConcreteBottleUpdateGraphError,
-  lockConcreteBottleUpdateDependencies,
-} from "@peated/server/lib/updateConcreteBottle";
+  BottleUpdateGraphError,
+  lockBottleUpdateDependencies,
+} from "@peated/server/lib/updateBottle";
 import { eq, inArray } from "drizzle-orm";
 import type { z } from "zod";
 import {
@@ -285,22 +285,19 @@ export async function prepareOperationForExecution({
   const proposal = ProposedOperationSchema.parse(operation.proposal);
   if (proposal.type === "update_bottle") {
     try {
-      await lockConcreteBottleUpdateDependencies(
+      await lockBottleUpdateDependencies(
         rawContext.database,
         proposal.input.bottleId,
         proposedBottleUpdateEntityIds(proposal),
       );
     } catch (error) {
-      if (error instanceof ConcreteBottleUpdateGraphError) {
+      if (error instanceof BottleUpdateGraphError) {
         fail("invalid_current_state", error.message);
       }
       throw error;
     }
   } else if (proposal.type === "merge_bottles") {
-    await lockConcreteBottleMergeDependencies(
-      rawContext.database,
-      proposal.input,
-    );
+    await lockBottleMergeDependencies(rawContext.database, proposal.input);
   } else if (proposal.type === "update_entity") {
     await rawContext.database
       .select({ id: entities.id })

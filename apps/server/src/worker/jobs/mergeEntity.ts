@@ -15,9 +15,9 @@ import {
   getUserActorForDatabase,
 } from "@peated/server/lib/actors";
 import {
-  getConcreteBottleExactIdentity,
-  materializeConcreteBottleForGroup,
-} from "@peated/server/lib/concreteBottleIdentity";
+  getBottleExactIdentity,
+  materializeBottleForGroup,
+} from "@peated/server/lib/bottleIdentity";
 import {
   EntityMergeOperationExecutionError,
   loadEntityMergeOperation,
@@ -29,17 +29,17 @@ import {
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
-  finalizeConcreteBottleMerge,
-  mergeConcreteBottlesInTransaction,
-  type ConcreteBottleMergeFinalizationManifest,
-} from "@peated/server/lib/mergeConcreteBottles";
+  finalizeBottleMerge,
+  mergeBottlesInTransaction,
+  type BottleMergeFinalizationManifest,
+} from "@peated/server/lib/mergeBottles";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
-  concreteBottleUpdateExpectedSharedState,
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-  type ConcreteBottleUpdateFinalizationManifest,
-} from "@peated/server/lib/updateConcreteBottle";
+  bottleUpdateExpectedSharedState,
+  finalizeBottleUpdate,
+  updateBottleInTransaction,
+  type BottleUpdateFinalizationManifest,
+} from "@peated/server/lib/updateBottle";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import {
   EntityMergeJobInputSchema,
@@ -127,8 +127,8 @@ async function performEntityMerge({
     },
   });
 
-  const bottleMergeManifests: ConcreteBottleMergeFinalizationManifest[] = [];
-  const bottleUpdateManifests: ConcreteBottleUpdateFinalizationManifest[] = [];
+  const bottleMergeManifests: BottleMergeFinalizationManifest[] = [];
+  const bottleUpdateManifests: BottleUpdateFinalizationManifest[] = [];
   let completedOperationResult: ReturnType<typeof buildOperationResult> | null =
     null;
   let performedMutation = false;
@@ -355,9 +355,9 @@ async function performEntityMerge({
           }),
         };
         for (const member of members) {
-          const desired = materializeConcreteBottleForGroup({
+          const desired = materializeBottleForGroup({
             group: targetGroup,
-            exact: getConcreteBottleExactIdentity({
+            exact: getBottleExactIdentity({
               bottle: member,
               sourceGroupStatedAge: group.statedAge,
             }),
@@ -382,7 +382,7 @@ async function performEntityMerge({
             .limit(1);
           if (!duplicate) continue;
           bottleMergeManifests.push(
-            await mergeConcreteBottlesInTransaction(tx, {
+            await mergeBottlesInTransaction(tx, {
               sourceBottleId: member.id,
               destinationBottleId: duplicate.id,
               actorId: actor.id,
@@ -403,9 +403,9 @@ async function performEntityMerge({
         throw new Error(`BottleGroup ${groupId} has no representative Bottle.`);
       }
       bottleUpdateManifests.push(
-        await updateConcreteBottleInTransaction(tx, {
+        await updateBottleInTransaction(tx, {
           bottleId: selectedBottleId,
-          expectedSharedState: concreteBottleUpdateExpectedSharedState({
+          expectedSharedState: bottleUpdateExpectedSharedState({
             group,
             distillerIds: groupDistillers.map(({ distillerId }) => distillerId),
             series: currentSeries,
@@ -572,10 +572,10 @@ async function performEntityMerge({
   }
 
   for (const manifest of bottleMergeManifests) {
-    await finalizeConcreteBottleMerge(manifest);
+    await finalizeBottleMerge(manifest);
   }
   for (const manifest of bottleUpdateManifests) {
-    await finalizeConcreteBottleUpdate(manifest);
+    await finalizeBottleUpdate(manifest);
   }
   try {
     await pushUniqueJob(

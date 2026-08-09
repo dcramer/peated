@@ -85,9 +85,7 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-hedonism-squared.jpg",
     "dbOutcome": {
       "bottleId": null,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Production search on 2026-08-02 returned eight other Hedonism bottles but no Hedonism² row. Photo identification proposed creation but routed the user to the manual Bottle form, so the observed flow created no Bottle automatically."
     },
     "catalogFieldObservations": [
