@@ -78,7 +78,7 @@ export class ConcreteBottleMergeConflictError extends Error {
     readonly code: ConcreteBottleMergeConflictCode,
     options?: ErrorOptions,
   ) {
-    super(`Concrete Bottle merge failed: ${code}.`, options);
+    super(`Bottle merge failed: ${code}.`, options);
     this.name = "ConcreteBottleMergeConflictError";
   }
 }
@@ -369,7 +369,7 @@ async function repointBottleConsumers(
 
 /**
  * Locks every row represented by the Bottle-merge state token. New dependent
- * rows are blocked by the parent Bottle locks, so preparation remains stable
+ * rows are blocked by the owning Bottle locks, so preparation remains stable
  * until the caller executes or rolls back.
  */
 export async function lockConcreteBottleMergeDependencies(

@@ -172,7 +172,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     expect(pushUniqueJobMock).not.toHaveBeenCalled();
   });
 
-  test("fans shared brand, distillery, name, and series changes to every concrete Bottle", async ({
+  test("fans shared brand, distillery, name, and series changes to every Bottle", async ({
     fixtures,
   }) => {
     const systemUser = await fixtures.User({ admin: true });

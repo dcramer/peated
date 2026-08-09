@@ -11,7 +11,7 @@ import update from "./update";
 
 /**
  * Translation-only, measured legacy compatibility. All writes delegate to the
- * concrete Bottle routes. Task 7.1 removes this adapter after supported callers
+ * Bottle routes. Task 7.1 removes this adapter after supported callers
  * use the canonical create and update operations.
  */
 export default procedure

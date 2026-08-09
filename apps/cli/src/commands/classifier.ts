@@ -66,7 +66,7 @@ async function buildClassifierInput({
 
   const imageUrl = image ? await getImageReference(image) : undefined;
   const referenceName =
-    name ?? (image ? `Image bottle reference: ${basename(image)}` : null);
+    name ?? (image ? `Image Bottle Reference: ${basename(image)}` : null);
   if (!referenceName) {
     throw new Error("Pass a bottle name, --image, or --input-file");
   }
@@ -83,7 +83,7 @@ async function buildClassifierInput({
 subcommand
   .command("run")
   .description("Run the bottle classifier against a bottle name or image")
-  .argument("[name]", "bottle reference name")
+  .argument("[name]", "Bottle Reference name")
   .option("--input-file <path>", "JSON ClassifyBottleReferenceInput payload")
   .option("--image <path-or-url>", "local image path or public image URL")
   .option("--initial-only", "disable candidate expansion")

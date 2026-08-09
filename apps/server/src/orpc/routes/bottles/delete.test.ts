@@ -208,7 +208,7 @@ describe("DELETE /bottles/:bottle", () => {
     );
   });
 
-  test("clears system-owned bottle references when deleting a bottle", async ({
+  test("clears system-owned Bottle ids when deleting a Bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });

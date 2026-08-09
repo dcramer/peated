@@ -13,7 +13,7 @@ export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
 
-/** Audit decisions record the concrete Bottle effect, never a classifier verb. */
+/** Audit decisions record the Bottle effect, never a classifier verb. */
 export function getIncomingBottleDecisionFromResolutionSource(
   source: string,
   { createdBottle }: { createdBottle: boolean },

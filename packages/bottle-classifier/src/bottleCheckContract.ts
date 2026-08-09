@@ -84,7 +84,7 @@ export const FindingSchema = z
   })
   .strict()
   .describe(
-    "An unresolved catalog problem that still needs separate moderator attention after all proposed operations apply. Not an observation, confirmation, or correct unchanged state.",
+    "An unresolved catalog problem that still needs separate moderator attention after all Suggested Changes apply. Not an observation, confirmation, or correct unchanged state.",
   );
 
 export const ProposedEntityDraftSchema = z

@@ -1,5 +1,5 @@
 /**
- * Owns preparation and persistence for complete concrete Bottle transactions.
+ * Owns preparation and persistence for complete Bottle transactions.
  * Stable fields and distiller joins are durable parts of each Bottle's
  * independently renderable identity.
  */

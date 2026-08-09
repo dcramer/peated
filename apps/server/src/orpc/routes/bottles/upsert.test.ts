@@ -101,7 +101,7 @@ describe("PUT /bottles", () => {
     expect(data.id).toEqual(bottle.id);
   });
 
-  test("translates a conflicting flat update through the concrete Bottle path", async ({
+  test("translates a conflicting flat update through the Bottle path", async ({
     fixtures,
   }) => {
     const modUser = await fixtures.User({ mod: true });

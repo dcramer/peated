@@ -2,7 +2,7 @@
 
 Generic bottle identity classifier for Peated.
 
-This package takes a bottle reference such as a retailer listing, label OCR result, or user-entered bottle name and returns a reviewed bottle identity decision. It owns the extraction, prompt/tool orchestration, and deterministic post-processing needed to turn weak source text into a safe canonical result.
+This package takes a Bottle Reference such as a retailer listing, label OCR result, or user-entered Bottle name and returns a reviewed Bottle identity decision. It owns the extraction, prompt/tool orchestration, and deterministic post-processing needed to turn weak source text into a safe canonical result.
 
 ## Ownership
 
@@ -97,6 +97,8 @@ and response boundary itself.
 
 The behavior spec lives in
 [`docs/architecture/bottle-classifier.md`](../../docs/architecture/bottle-classifier.md).
+The controlled terms live in the
+[`Bottle Classifier Glossary`](../../docs/architecture/bottle-classifier-glossary.md).
 Package-specific reminders:
 
 - Keep price-matching proposal language out of this package.

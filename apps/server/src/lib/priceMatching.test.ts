@@ -5612,7 +5612,7 @@ describe("priceMatching", () => {
     ]);
   });
 
-  test("passes a generic bottle reference payload into the classifier", async ({
+  test("passes a generic Bottle Reference payload into the classifier", async ({
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;

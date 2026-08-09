@@ -70,7 +70,7 @@ describe("handleBottle", () => {
     vi.unstubAllGlobals();
   });
 
-  it("creates a concrete Bottle and consumes it directly for image upload", async () => {
+  it("creates a Bottle and consumes it directly for image upload", async () => {
     const bottle = bottleResult({ bottleId: 41 });
     const imageBlob = new Blob(["image"]);
     vi.mocked(orpcClient.bottles.create).mockResolvedValue(bottle);

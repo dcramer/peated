@@ -33,7 +33,7 @@ const TastingNotesSchema = z.object({
   finish: z.string(),
 });
 
-/** Runtime-owned v1 result for the stable expression shared by concrete Bottles. */
+/** Runtime-owned v1 result for the stable expression shared by Bottles. */
 export const BottleGroupV1Schema = z.object({
   schemaVersion: CatalogIdentitySchemaVersion,
   id: z.number().int().positive(),

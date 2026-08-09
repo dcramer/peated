@@ -39,10 +39,7 @@ export class ConcreteBottleIdentityConflictError extends Error {
     readonly conflictCause: ConcreteBottleIdentityConflictCause,
     options?: ErrorOptions,
   ) {
-    super(
-      "Concrete Bottle identity conflicts with an existing Bottle.",
-      options,
-    );
+    super("Bottle identity conflicts with an existing Bottle.", options);
     this.name = "ConcreteBottleIdentityConflictError";
   }
 }
@@ -79,7 +76,7 @@ function entityNameVariants(
   ];
 }
 
-/** Returns the exact SMWS code implied by a concrete Bottle identity. */
+/** Returns the exact SMWS code implied by a Bottle identity. */
 export function getSmwsCodeForBottleIdentity({
   name,
   fullName,

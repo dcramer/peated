@@ -6,6 +6,8 @@ Deterministic name cleanup is governed by the
 [Bottle Normalization Contract](./bottle-normalization-contract.md).
 Surface-specific rendering is governed by
 [Bottle Identity Presentation](./bottle-identity-presentation.md).
+Classifier terms are governed by the
+[Bottle Classifier Glossary](./bottle-classifier-glossary.md).
 
 ## Identity Objects
 

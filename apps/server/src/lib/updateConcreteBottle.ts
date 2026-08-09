@@ -1,5 +1,5 @@
 /**
- * Transactional moderator editing for concrete Bottles. Shared patches fan out
+ * Transactional moderator editing for Bottles. Shared patches fan out
  * durable member Bottle materialization; exact patches remain isolated.
  */
 // TODO(dcramer): Rename this module's ConcreteBottleUpdate symbols now that
@@ -61,7 +61,7 @@ type ExactPatch = NonNullable<SystemConcreteBottleUpdateInput["exact"]>;
 
 export class ConcreteBottleUpdateAuthorizationError extends Error {
   constructor() {
-    super("Moderator authorization is required to update a concrete Bottle.");
+    super("Moderator authorization is required to update a Bottle.");
     this.name = "ConcreteBottleUpdateAuthorizationError";
   }
 }
@@ -92,7 +92,7 @@ export class ConcreteBottleUpdateInputError extends Error {
 
 export class ConcreteBottleUpdateConflictError extends Error {
   constructor(readonly conflictingBottleId: number | null) {
-    super("Concrete Bottle identity conflicts with an existing Bottle.");
+    super("Bottle identity conflicts with an existing Bottle.");
     this.name = "ConcreteBottleUpdateConflictError";
   }
 }
@@ -948,7 +948,7 @@ export async function lockConcreteBottleUpdateDependencies(
 }
 
 /**
- * Performs the complete locked concrete Bottle update transaction. The caller
+ * Performs the complete locked Bottle update transaction. The caller
  * must finalize the returned manifest only after its outermost transaction
  * commits. Optional expected shared state is compared while its dependencies
  * remain locked.

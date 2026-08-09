@@ -97,7 +97,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     );
   });
 
-  it("exposes release-free concrete Bottle mutation contracts", async () => {
+  it("exposes release-free Bottle mutation contracts", async () => {
     const spec = await generateSpec();
 
     expect(spec.paths?.["/bottles/from/{bottle}"]).toBeUndefined();

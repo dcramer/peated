@@ -131,7 +131,7 @@ function resetQueueMock() {
   vi.mocked(workerClient.pushUniqueJob).mockResolvedValue(undefined);
 }
 
-describe("concrete Bottle updates", () => {
+describe("Bottle updates", () => {
   beforeEach(() => {
     resetQueueMock();
   });
@@ -744,7 +744,7 @@ describe("concrete Bottle updates", () => {
       brandId: oldBrand.id,
       name: "Shared Range",
       fullName: `${oldBrand.name} Shared Range`,
-      description: "A range shared by multiple bottle groups.",
+      description: "A range shared by multiple Bottle Groups.",
     });
     const moving = await createGroup({
       user: mod,

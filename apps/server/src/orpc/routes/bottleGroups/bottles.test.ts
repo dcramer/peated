@@ -60,6 +60,6 @@ describe("GET /bottle-groups/:group/bottles", () => {
       routerClient.bottleGroups.bottles({ group: 999_999 }),
     );
 
-    expect(error.message).toBe("Bottle group not found (groupId=999999).");
+    expect(error.message).toBe("Bottle Group not found (groupId=999999).");
   });
 });

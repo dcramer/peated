@@ -24,7 +24,7 @@ manual creation with supported label fields and the pending photo. The
 
 ## Editing
 
-- Add and edit use one concrete Bottle form with explicit shared-versus-exact
+- Add and edit use one Bottle form with explicit shared-versus-exact
   field ownership.
 - An exact edit changes only the selected Bottle and its exact aliases.
 - A shared edit updates the BottleGroup and atomically rematerializes every

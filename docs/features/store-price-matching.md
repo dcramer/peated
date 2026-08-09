@@ -10,7 +10,7 @@ Authoritative policy lives in:
 - [Bottle Creation And Alias System](../architecture/bottle-creation-alias-system.md)
 - [Bottle Classifier](../architecture/bottle-classifier.md)
 
-Price matching is one consumer of the shared bottle-reference classifier. It
+Price matching is one consumer of the shared Reference Classification. It
 adds store-price persistence, queueing, moderation, and automation policy around
 that classifier boundary.
 
@@ -36,14 +36,14 @@ For each `store_price`, the matcher should decide one of four outcomes:
 
 1. The current assignment is already correct.
 2. The price should match an existing Bottle.
-3. The price should create or safely reuse an independent concrete Bottle.
+3. The price should create or safely reuse an independent Bottle.
 4. There is no safe match.
 
 The system persists one `store_price_match_proposal` row per `store_price`.
 
 The primary match proposal remains authoritative for the listing decision.
 Every full classifier run also persists a linked Bottle check with supplemental
-proposed operations. That check does not replace or reinterpret the primary
+Suggested Changes. That check does not replace or reinterpret the primary
 proposal.
 
 ## Matching Modes
@@ -92,7 +92,7 @@ Evaluation order:
 1. trusted SMWS fast path
 2. extract structured identity from image or text
 3. auto-ignore obvious non-whisky rows plus clearly non-single-bottle listings such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings
-4. build local concrete Bottle candidates
+4. build local Bottle candidates
 5. ask the shared bottle classifier for Bottle-centric actions (`match`,
    `repair_bottle`, `create_bottle`, or `no_match`)
 6. map and sanitize classifier output against real candidates and resolved entities
@@ -103,7 +103,7 @@ Evaluation order:
 
 Every full reference run creates a `resolve_reference` Bottle check from the
 same reviewed artifacts. This includes initial unresolved listings, ignored
-results, and individual or bulk retries. Its proposed operations are
+results, and individual or bulk retries. Its Suggested Changes are
 supplemental catalog work, not additional price-match outcomes. Deterministic
 accepted-alias matches do not create a check because they do not run the
 classifier.
@@ -115,7 +115,7 @@ attempt for inspection or retry.
 
 ## Observation Persistence
 
-Every approved bottle-reference match writes one `bottle_observation` keyed by `store_price:<priceId>`.
+Every approved Match writes one `bottle_observation` keyed by `store_price:<priceId>`.
 
 That observation stores:
 
@@ -146,8 +146,8 @@ Sources:
 
 Important behavior:
 
-- exact alias matches select a concrete Bottle
-- sibling concrete Bottles can surface independently
+- exact alias matches select a Bottle
+- sibling Bottles can surface independently
 - exact Bottle metadata is used in scoring and automation, not just the
   candidate name
 
@@ -182,7 +182,7 @@ only as compatibility shims around the canonical bottle-classifier modules.
 
 The classifier receives:
 
-- bottle-reference metadata
+- Bottle Reference metadata
 - the current Bottle, if present
 - extracted identity
 - initial local candidates
@@ -216,7 +216,7 @@ Additional rules:
 - classifier decisions carry Bottle ids only; they do not expose a legacy
   release-id picker
 - `create_bottle` carries one complete marketed Bottle draft, including exact
-  Bottle traits; it never chooses a parent Bottle or BottleGroup
+  Bottle traits; it never chooses a Bottle Group
 - `identityScope` is reviewed as `product | exact_cask`
 - Unsupported novelty flavored-whiskey or whiskey-liqueur products should end in classifier-driven `no_match`, but a flavor-adjacent noun in the title is not enough to exclude a bottle by itself
 - When re-evaluation auto-ignores a bundle or damaged-condition listing, price
@@ -243,8 +243,8 @@ draft. Live classifier correction producers persist `statedAgeScope: exact`.
 With that marker, a non-null `statedAge` is an exact edit for only the selected
 Bottle. Historical unmarked proposals retain their original shared-age
 interpretation, and approval applies that value through the canonical
-BottleGroup update service so it atomically rematerializes every concrete
-Bottle in the group.
+BottleGroup update service so it atomically rematerializes every Bottle in the
+group.
 
 Required name and brand, non-null series, category, and bottler, and non-empty
 distillers are shared catalog edits. Non-null edition, ABV, single-cask and
@@ -282,7 +282,7 @@ that assignment.
 Automation is schema-first and code-derived:
 
 - every unresolved model risk forces `review`
-- an existing match requires a concrete Bottle, must not replace a different
+- an existing match requires a Bottle, must not replace a different
   current assignment, and needs an explicit anchor such as reaffirmed current
   identity, deterministic exact identity, an accepted exact alias, primary
   label/image evidence, or supportive reviewed evidence
@@ -332,11 +332,11 @@ Moderators can:
 Incoming Listings owns only the primary listing decision. Once that decision is
 complete, an actionable linked check appears in Audits under the
 Incoming Listings source and the completed proposal leaves the listing queue.
-This keeps supplemental catalog findings and review operations in the same
+This keeps supplemental catalog findings and Review Operations in the same
 inbox as other Bottle audit work without exposing them before their primary
 listing decision is settled.
 
-Each review operation is read-only until separately approved. Approval never
+Each Review Operation is read-only until separately approved. Approval never
 means “apply the whole agent result”: selected `update_bottle`,
 `merge_bottles`, `update_entity`, and `merge_entities` operations execute
 independently through canonical services. Failed operations may be retried
@@ -354,7 +354,7 @@ after that transaction commits. The correction path retains its Bottle response
 for the current queue UI, but it does not maintain a separate Bottle updater or
 mutate staged legacy BottleRelease rows. Repair is available only when the
 proposal's current and suggested identities are the same non-null active
-concrete Bottle; that Bottle id is locked and revalidated before the update
+Bottle; that Bottle id is locked and revalidated before the update
 commits.
 
 The moderation queue renders current and suggested Bottles independently or an

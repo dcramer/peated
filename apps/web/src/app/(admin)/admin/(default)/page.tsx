@@ -172,8 +172,8 @@ export default function Admin() {
             </h2>
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
               Start with Incoming Listings to decide the Bottle assigned to a
-              retailer listing. Use Audits for classifier-proposed catalog
-              changes, including Bottle and Entity updates or merges.
+              retailer listing. Use Audits for Suggested Changes, including
+              Bottle and Entity updates or merges.
             </p>
 
             <div className="mt-4 grid gap-3 lg:grid-cols-2">
@@ -197,7 +197,7 @@ export default function Admin() {
                   Catalog changes
                 </div>
                 <div className="mt-1 text-sm text-slate-300">
-                  Review proposed operations and findings in{" "}
+                  Review Suggested Changes and findings in{" "}
                   <Link
                     href={audits.href}
                     className="font-medium text-white underline"
@@ -264,7 +264,7 @@ export default function Admin() {
             whenToUse={incomingListings.whenToUse}
           />
           <WorkbenchCard
-            detail="Review classifier-proposed operations, strike out unsupported fields, remove incorrect operations, and move directly to the next audit."
+            detail="Review Suggested Changes, strike out unsupported fields, remove incorrect changes, and move directly to the next audit."
             href={audits.href}
             hrefLabel="Open Audits"
             summary={audits.summary}

@@ -20,7 +20,7 @@ export default procedure
     path: "/bottles/{bottle}/apply-brand-repair",
     summary: "Apply BottleGroup-wide brand/entity repair",
     description:
-      "Repair the BottleGroup shared brand identity and fan the resulting name, optional distillery link, and re-homed series out to every concrete Bottle member. Requires moderator privileges",
+      "Repair the Bottle Group shared brand identity and apply the resulting name, optional distillery link, and moved series to every Bottle. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "applyBottleBrandRepair",

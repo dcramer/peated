@@ -126,7 +126,7 @@ function assertKnownClassifierTarget(
 }
 
 /**
- * Creates one complete concrete Bottle in a singleton group. A verified exact
+ * Creates one complete Bottle in a singleton group. A verified exact
  * duplicate reuses its existing Bottle instead of creating a group.
  */
 export async function applyClassifierCreateDecision({
@@ -169,9 +169,9 @@ export async function applyClassifierCreateDecision({
 }
 
 /**
- * Resolve a raw external bottle reference into Bottle identity. Exact aliases
+ * Resolve a raw external Bottle Reference into Bottle identity. Exact aliases
  * retain their accepted fast path; ambiguous references use the reviewed
- * classifier. `create_bottle` returns the created or reused concrete Bottle.
+ * classifier. `create_bottle` returns the created or reused Bottle.
  *
  * Classifier and creation failures return unresolved results so ingestion can
  * preserve its raw source record.

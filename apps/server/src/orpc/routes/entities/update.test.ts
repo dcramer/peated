@@ -619,7 +619,7 @@ describe("PATCH /entities/:entity", () => {
       ),
     );
     expect(error.message).toBe(
-      "Concrete Bottle identity conflicts with an existing Bottle.",
+      "Bottle identity conflicts with an existing Bottle.",
     );
 
     const unchangedEntity = await db.query.entities.findFirst({

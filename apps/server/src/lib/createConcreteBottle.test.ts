@@ -27,7 +27,7 @@ function contextFor(user: Parameters<typeof getUserActor>[0]) {
   return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
 }
 
-describe("concrete Bottle creation", () => {
+describe("Bottle creation", () => {
   test("creates an atomic singleton graph with stable and exact field ownership", async ({
     defaults,
     fixtures,

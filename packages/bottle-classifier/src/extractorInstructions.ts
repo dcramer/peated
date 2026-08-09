@@ -549,7 +549,7 @@ export function buildWhiskyLabelExtractorInstructions({
 
   return [
     "You extract structured whisky bottle identity from label text and source titles.",
-    "Return the best normalized bottle record for the input. If the input is not a whisky bottle reference, return null.",
+    "Return the best normalized Bottle for the input. If the input is not a whisky Bottle Reference, return null.",
     "",
     "Mode-specific rules:",
     renderBulletLines(modeSpecificRules),

@@ -63,18 +63,18 @@ describe("Bottle check instructions", () => {
     expect(reference).not.toContain("before reasoning");
   });
 
-  test("keeps proposal tools review-only and evidence-bound", () => {
+  test("keeps Suggested Change tools review-only and evidence-bound", () => {
     for (const instructions of [
       buildBottleClassifierInstructions(),
       buildBottleAuditInstructions(),
     ]) {
       expect(instructions).toContain(
-        "Proposal tools record suggestions for moderator review",
+        "Suggested Change tools record catalog changes for moderator review",
       );
-      expect(instructions).toContain("a search result alone is not inspection");
+      expect(instructions).toContain("A search result alone is not inspection");
       expect(instructions).toContain("`availableSourceEvidenceFields`");
       expect(instructions).toContain(
-        "Do not include proposed operations in the final structured output",
+        "Do not include Suggested Changes in the final structured output",
       );
     }
   });
@@ -89,9 +89,8 @@ describe("Bottle check instructions", () => {
     expect(audit).toContain(
       "Do not return a reference match, create, repair decision",
     );
-    expect(audit).toContain(
-      "Investigate the preloaded Bottle and return its typed audit summary",
-    );
+    expect(audit).toContain("Investigate the preloaded Bottle");
+    expect(audit).toContain("Return its typed audit summary and findings");
     expect(audit).toContain(
       "compare every evidence-supported identity field with the stored Bottle",
     );
