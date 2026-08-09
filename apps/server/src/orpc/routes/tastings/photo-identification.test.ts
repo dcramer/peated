@@ -406,6 +406,7 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(runBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
       expect.objectContaining({
         conversationId: `photo_identification:${response.pendingImage.id}`,
@@ -437,13 +438,9 @@ describe("POST /tastings/photo-identification", () => {
       "photo_identification.field.expression",
       "Uigeadail",
     );
-    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
-      "photo_identification.local.action",
-      "no_match",
-    );
-    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
-      "photo_identification.local.candidate_bottle_ids",
-      [],
+    expect(sentrySpanSetAttributeMock).not.toHaveBeenCalledWith(
+      expect.stringMatching(/^photo_identification\.local\./),
+      expect.anything(),
     );
     expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
       "photo_identification.final.candidate_bottle_ids",
@@ -607,6 +604,7 @@ describe("POST /tastings/photo-identification", () => {
         ],
       }),
     );
+    expect(runBottleReferenceMock).toHaveBeenCalledTimes(1);
   });
 
   test("persists photo match repairs once for moderator review without exposing them to the user", async ({

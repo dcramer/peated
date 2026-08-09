@@ -13,7 +13,6 @@ import { afterEach, expect, test, vi } from "vitest";
 vi.mock("@peated/server/agents/bottleClassifier/service", () => ({
   runBottleAudit: vi.fn(),
   classifyBottleReference: vi.fn(),
-  identifyExistingBottleReference: vi.fn(),
 }));
 
 afterEach(() => {

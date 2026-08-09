@@ -22,7 +22,6 @@ vi.mock("./service", () => {
   return {
     runBottleAudit: vi.fn(),
     classifyBottleReference: vi.fn(),
-    identifyExistingBottleReference: vi.fn(),
   };
 });
 
