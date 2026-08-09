@@ -33,9 +33,7 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/watchpost-8-year-old.webp",
     "dbOutcome": {
       "bottleId": 44299,
-      "releaseId": null,
       "createsBottle": true,
-      "createsRelease": false,
       "summary": "At capture, the production add-bottle flow created Watchpost Watchpost with new brand Watchpost (entity 365682), category blend, stated age 8, 42.5% ABV, and new distiller Westland Distillery Co. (entity 365683) even though Westland Distillery (entity 1987) and Westland (entity 1481) already existed."
     },
     "notes": "The exact observed extraction is preserved above, including the null age because the numeric age is not reliably readable in the image crop. At classification time the Watchpost brand and bottle did not exist, while Westland Distillery and Westland already existed as distiller candidates. Official Watchpost and Westland pages establish that the product is an eight-year-old American blended whiskey created by the Westland team at 42.5% ABV. The current API record was later corrected to Watchpost 8-year-old with stated age 8, while the duplicate Westland Distillery Co. entity 365683 remains attached."

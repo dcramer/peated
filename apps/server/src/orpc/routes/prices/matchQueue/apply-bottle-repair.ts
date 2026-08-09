@@ -12,10 +12,10 @@ import {
   UnknownStorePriceMatchProposalError,
 } from "@peated/server/lib/priceMatching";
 import {
-  ConcreteBottleUpdateConflictError,
-  ConcreteBottleUpdateGraphError,
-  ConcreteBottleUpdateInputError,
-} from "@peated/server/lib/updateConcreteBottle";
+  BottleUpdateConflictError,
+  BottleUpdateGraphError,
+  BottleUpdateInputError,
+} from "@peated/server/lib/updateBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleSchema } from "@peated/server/schemas";
@@ -79,28 +79,25 @@ export default procedure
         });
       }
 
-      if (err instanceof ConcreteBottleUpdateInputError) {
+      if (err instanceof BottleUpdateInputError) {
         throw errors.BAD_REQUEST({
           message: err.message,
         });
       }
 
-      if (
-        err instanceof ConcreteBottleUpdateGraphError &&
-        err.code === "not_found"
-      ) {
+      if (err instanceof BottleUpdateGraphError && err.code === "not_found") {
         throw errors.NOT_FOUND({
           message: err.message,
         });
       }
 
-      if (err instanceof ConcreteBottleUpdateGraphError) {
+      if (err instanceof BottleUpdateGraphError) {
         throw errors.CONFLICT({
           message: err.message,
         });
       }
 
-      if (err instanceof ConcreteBottleUpdateConflictError) {
+      if (err instanceof BottleUpdateConflictError) {
         throw errors.CONFLICT({
           message: err.message,
           data:

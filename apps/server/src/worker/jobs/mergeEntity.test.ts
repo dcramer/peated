@@ -18,7 +18,7 @@ import {
 import type { getUserActor } from "@peated/server/lib/actors";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import { createBottle } from "@peated/server/lib/createBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, inArray } from "drizzle-orm";
@@ -85,7 +85,7 @@ async function deleteDestinationWhileMergeWaits(
 }
 
 function contextFor(user: Parameters<typeof getUserActor>[0]) {
-  return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
+  return { user } as Parameters<typeof createBottle>[0]["context"];
 }
 
 beforeEach(async ({ fixtures }) => {
@@ -599,7 +599,7 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
     groupId: source.groupId as number,
     edition: "Batch 2",
   });
-  const destinationBatch = await createConcreteBottle({
+  const destinationBatch = await createBottle({
     context: contextFor(defaults.user),
     input: {
       stable: { brand: destinationEntity.id, name: "Annual" },

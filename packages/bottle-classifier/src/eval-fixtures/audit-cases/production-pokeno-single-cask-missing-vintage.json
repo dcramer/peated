@@ -111,7 +111,6 @@
     "dbOutcome": {
       "bottleId": 45174,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Keep Bottle 45174 and add vintageYear 2019. Preserve its stored name, edition, age, 55.8% ABV, singleCask true, caskStrength true, and releaseYear null. Do not merge or create a Bottle."
     },
     "catalogFieldObservations": [

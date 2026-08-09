@@ -2541,7 +2541,7 @@ describe("price match queue", () => {
     expect(decisionLogs).toEqual([priorDecision]);
   });
 
-  test("creates an independent Bottle from a complete concrete input", async ({
+  test("creates an independent Bottle from a complete Bottle input", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });

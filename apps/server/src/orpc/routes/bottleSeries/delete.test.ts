@@ -7,7 +7,7 @@ import {
   bottleSeries,
   changes,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import { createBottle } from "@peated/server/lib/createBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -61,7 +61,7 @@ async function createGroup({
   seriesId: number;
   name: string;
 }) {
-  const first = await createConcreteBottle({
+  const first = await createBottle({
     context: { user },
     input: {
       stable: { name, brand: brandId, series: seriesId },

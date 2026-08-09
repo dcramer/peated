@@ -152,16 +152,14 @@
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp",
     "dbOutcome": {
-      "bottleId": 44286,
-      "releaseId": null,
+      "bottleId": 43018,
       "createsBottle": false,
-      "createsRelease": true,
-      "summary": "Historical production DB outcome under the legacy model: bottle 44286 stored Laphroaig Elements and the desired catalog change was a new L2.0 child release. Nearby release 412 is L1.0 and must not be used for this L2.0 photo. The flattened model instead creates one complete L2.0 Bottle without repairing bottle 44286."
+      "summary": "Match complete Laphroaig Elements L2.0 Bottle 43018. Do not use broad Elements Bottle 44286 or the L1.0 Bottle represented by fixture id -412."
     },
     "catalogFieldObservations": [
       {
-        "target": "candidate_release",
-        "releaseId": 412,
+        "target": "candidate_bottle",
+        "bottleId": -412,
         "field": "edition",
         "productionValue": "L1.0",
         "evidenceValue": "L2.0",

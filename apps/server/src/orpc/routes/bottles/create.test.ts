@@ -300,7 +300,7 @@ describe("POST /bottles", () => {
         caskSize: "hogshead",
         caskType: "bourbon",
         caskFill: "1st_fill",
-        description: "A complete concrete release.",
+        description: "A complete Bottle description.",
         descriptionSrc: "user",
       },
       { context: { user: defaults.user } },
@@ -340,7 +340,7 @@ describe("POST /bottles", () => {
       caskSize: "hogshead",
       caskType: "bourbon",
       caskFill: "1st_fill",
-      description: "A complete concrete release.",
+      description: "A complete Bottle description.",
       descriptionSrc: "user",
     });
     expect(data).toMatchObject({

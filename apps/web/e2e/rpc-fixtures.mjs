@@ -284,17 +284,17 @@ export const exactMatchedBottle = {
  *   series: {id: number} | null
  * }} FixtureBottle
  */
-/** @typedef {import("@peated/server/schemas").ConcreteBottleV1} ConcreteBottleV1 */
+/** @typedef {import("@peated/server/schemas").BottleV1} BottleV1 */
 /**
  * @typedef {Omit<FixtureBottle,
  *   "edition" | "statedAge" | "abv" | "singleCask" | "caskStrength" |
  *   "vintageYear" | "releaseYear" | "caskSize" | "caskType" | "caskFill" |
  *   "imageUrl"
- * > & Pick<ConcreteBottleV1,
+ * > & Pick<BottleV1,
  *   "edition" | "statedAge" | "abv" | "singleCask" | "caskStrength" |
  *   "vintageYear" | "releaseYear" | "caskSize" | "caskType" | "caskFill" |
  *   "imageUrl"
- * >} ConcreteFixtureBottle
+ * >} CatalogFixtureBottle
  */
 /** @typedef {import("@peated/server/schemas").BottleGroupV1} BottleGroupV1 */
 /** @typedef {import("@peated/server/types").CollectionBottle} CollectionBottle */
@@ -304,7 +304,7 @@ export const exactMatchedBottle = {
  * @property {number} [id]
  * @property {string} [fullName]
  * @property {string} [name]
- * @property {FixtureBottle | ConcreteFixtureBottle} [bottle]
+ * @property {FixtureBottle | CatalogFixtureBottle} [bottle]
  * @property {number | null} [representativeBottleId]
  */
 
@@ -342,7 +342,7 @@ export function buildBottleGroup({
   };
 }
 
-/** @type {ConcreteFixtureBottle} */
+/** @type {CatalogFixtureBottle} */
 const homeBottleWithoutGroup = {
   ...buildBottle({
     id: 50_000,
@@ -382,7 +382,7 @@ const bottleGroupRatingStats = {
   },
 };
 
-/** @type {ConcreteFixtureBottle} */
+/** @type {CatalogFixtureBottle} */
 export const bottleGroupRepresentative = {
   ...buildBottle({
     id: 50_101,
@@ -403,7 +403,7 @@ export const bottleGroupRepresentative = {
   caskSize: "hogshead",
 };
 
-/** @type {ConcreteFixtureBottle} */
+/** @type {CatalogFixtureBottle} */
 export const bottleGroupMember = {
   ...buildBottle({
     id: 50_102,
@@ -418,7 +418,7 @@ export const bottleGroupMember = {
   releaseYear: 2023,
 };
 
-/** @type {ConcreteFixtureBottle} */
+/** @type {CatalogFixtureBottle} */
 const bottleGroupThirdMember = {
   ...buildBottle({
     id: 50_103,
@@ -446,7 +446,7 @@ export const bottleGroup = {
   totalBottles: 3,
 };
 
-/** @type {(ConcreteFixtureBottle & {group: BottleGroupV1})[]} */
+/** @type {(CatalogFixtureBottle & {group: BottleGroupV1})[]} */
 export const bottleGroupMembers = [
   bottleGroupRepresentative,
   bottleGroupMember,
@@ -625,7 +625,7 @@ export function buildCollection({
 /**
  * @param {{
  *   id?: number,
- *   bottle?: FixtureBottle | ConcreteFixtureBottle,
+ *   bottle?: FixtureBottle | CatalogFixtureBottle,
  *   notes?: string,
  *   rating?: number,
  *   tags?: string[],

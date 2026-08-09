@@ -325,9 +325,7 @@
     ],
     "dbOutcome": {
       "bottleId": null,
-      "releaseId": null,
       "createsBottle": true,
-      "createsRelease": false,
       "summary": "The observed Peated queue proposal had no current or suggested bottle/release target. The nearest local row was bottle 16142, Elijah Craig Single Barrel 18-year-old (No. 4040), which is barrel-specific and therefore too narrow for the Astor listing. The correct outcome is a new uncoded Elijah Craig 18-year-old Single Barrel bottle."
     },
     "notes": "Heaven Hill's official Elijah Craig 18-Year-Old Single Barrel page verifies the stable product identity, states the bottle is from one barrel, and lists Proof: 90 Proof and Age: 18 Years Old. For U.S. spirits labeling, 90 proof is 45% ABV, matching the extracted identity. The production automation snapshot blocked because deterministic web-evidence validation did not recognize proof as ABV evidence."

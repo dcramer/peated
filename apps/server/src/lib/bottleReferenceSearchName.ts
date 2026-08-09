@@ -43,7 +43,7 @@ function buildLooseEditionPattern(edition: string) {
   return escapeRegExp(normalizedEdition).replace(/\\ /g, "\\s+");
 }
 
-export function stripReleaseIdentityFromSearchName(
+export function stripBottleIdentityFromSearchName(
   name: string,
   signals: BottleReferenceSearchSignals,
 ) {

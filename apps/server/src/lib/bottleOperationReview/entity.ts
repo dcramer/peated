@@ -11,9 +11,9 @@ import {
   entityTombstones,
 } from "@peated/server/db/schema";
 import {
-  getConcreteBottleExactIdentity,
-  materializeConcreteBottleIdentity,
-} from "@peated/server/lib/concreteBottleIdentity";
+  getBottleExactIdentity,
+  materializeBottleIdentity,
+} from "@peated/server/lib/bottleIdentity";
 import { formatBottleName } from "@peated/server/lib/format";
 import {
   EntityUpdateInputSchema,
@@ -399,13 +399,13 @@ async function entityMergeCollisions(
       const stableFullName = formatBottleName({
         name: `${destination.entity.shortName || destination.entity.name} ${group.name}`,
       });
-      return materializeConcreteBottleIdentity({
+      return materializeBottleIdentity({
         stable: {
           name: group.name,
           fullName: stableFullName,
           statedAge: group.statedAge,
         },
-        exact: getConcreteBottleExactIdentity({
+        exact: getBottleExactIdentity({
           bottle,
           sourceGroupStatedAge: group.statedAge,
         }),

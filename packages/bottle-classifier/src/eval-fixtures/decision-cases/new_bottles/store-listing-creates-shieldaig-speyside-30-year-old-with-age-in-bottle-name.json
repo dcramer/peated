@@ -30,9 +30,7 @@
     ],
     "dbOutcome": {
       "bottleId": 44266,
-      "releaseId": null,
       "createsBottle": true,
-      "createsRelease": false,
       "summary": "Peated now contains bottle 44266 as Shieldaig Speyside 30-year-old. The regression being protected is the earlier classifier-created draft that used the confusing display name Shieldaig Speyside while storing the 30-year age only as structured bottle metadata."
     },
     "notes": "Total Wine markets this as Shieldaig Speyside Sin Malt 30Yr Scotch Whisky and describes it as matured for at least 30 years. The eval simulates the pre-creation local-search state: the 30-year bottle is absent, but a same-family Shieldaig Speyside 18-year-old bottle exists, so the agent must include the bottle-level age in the new bottle display name instead of hiding it only in statedAge."

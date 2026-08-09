@@ -6,12 +6,12 @@ import {
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { countries, entities, regions } from "@peated/server/db/schema";
-import type { ConcreteBottleUpdateInput } from "@peated/server/lib/concreteBottleSchemas";
+import type { BottleUpdateInput } from "@peated/server/lib/bottleSchemas";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import type {
-  ConcreteBottleUpdateExpectedSelectedBottleState,
-  ConcreteBottleUpdateExpectedSharedState,
-} from "@peated/server/lib/updateConcreteBottle";
+  BottleUpdateExpectedSelectedBottleState,
+  BottleUpdateExpectedSharedState,
+} from "@peated/server/lib/updateBottle";
 import type {
   EntityUpdateExpectedState,
   EntityUpdateInput,
@@ -54,9 +54,9 @@ export type PreparedOperationExecution =
       review: z.infer<typeof PreparedBottleUpdateDataSchema>;
       canonicalInput: {
         bottleId: number;
-        input: ConcreteBottleUpdateInput;
-        expectedSelectedBottleState: ConcreteBottleUpdateExpectedSelectedBottleState;
-        expectedSharedState?: ConcreteBottleUpdateExpectedSharedState;
+        input: BottleUpdateInput;
+        expectedSelectedBottleState: BottleUpdateExpectedSelectedBottleState;
+        expectedSharedState?: BottleUpdateExpectedSharedState;
       };
     }
   | {

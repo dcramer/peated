@@ -1,10 +1,10 @@
-import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
+import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
-  createConcreteBottle,
-} from "@peated/server/lib/createConcreteBottle";
-import { buildIndependentConcreteBottleCreateInput } from "@peated/server/lib/flatConcreteBottleInput";
+  createBottle,
+} from "@peated/server/lib/createBottle";
+import { buildIndependentBottleCreateInput } from "@peated/server/lib/flatBottleInput";
 import { procedure } from "@peated/server/orpc";
 import {
   requireTosAccepted,
@@ -28,13 +28,13 @@ export default procedure
       operationId: "createBottle",
     }),
   })
-  .input(IndependentConcreteBottleCreateRouteInputSchema)
+  .input(IndependentBottleCreateRouteInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
-      const result = await createConcreteBottle({
+      const result = await createBottle({
         context,
-        input: buildIndependentConcreteBottleCreateInput(input),
+        input: buildIndependentBottleCreateInput(input),
       });
       return await serialize(
         BottleSerializer,

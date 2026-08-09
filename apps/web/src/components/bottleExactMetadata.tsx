@@ -1,11 +1,11 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { BottleGroupV1, ConcreteBottleV1 } from "@peated/server/schemas";
+import type { BottleGroupV1, BottleV1 } from "@peated/server/schemas";
 import classNames from "@peated/web/lib/classNames";
 import type { ReactNode } from "react";
 
 export type BottleExactMetadataSource = Pick<
-  ConcreteBottleV1,
+  BottleV1,
   | "category"
   | "statedAge"
   | "abv"
@@ -17,7 +17,7 @@ export type BottleExactMetadataSource = Pick<
   | "caskType"
   | "caskSize"
 > & {
-  edition?: ConcreteBottleV1["edition"];
+  edition?: BottleV1["edition"];
   group?: Partial<Pick<BottleGroupV1, "statedAge">>;
 };
 

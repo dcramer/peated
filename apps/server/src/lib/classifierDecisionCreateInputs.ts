@@ -1,9 +1,9 @@
 import type { ProposedBottle } from "@peated/bottle-classifier/internal/types";
-import type { ConcreteBottleCreateInput } from "@peated/server/lib/concreteBottleSchemas";
+import type { BottleCreateInput } from "@peated/server/lib/bottleSchemas";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { z } from "zod";
 
-type BottleCreateInput = z.infer<typeof BottleInputSchema>;
+type RouteBottleInput = z.infer<typeof BottleInputSchema>;
 
 function buildBottleEntityInput(
   choice: {
@@ -11,7 +11,7 @@ function buildBottleEntityInput(
     name: string;
   },
   entityType: "brand" | "distiller" | "bottler",
-): BottleCreateInput["brand"] {
+): RouteBottleInput["brand"] {
   return (
     choice.id ?? {
       name: choice.name,
@@ -36,7 +36,7 @@ function buildBottleEntityInput(
  */
 export function buildBottleInputFromProposedBottle(
   proposedBottle: ProposedBottle,
-): BottleCreateInput {
+): RouteBottleInput {
   return {
     ...proposedBottle,
     series: proposedBottle.series
@@ -64,9 +64,9 @@ export function buildBottleInputFromProposedBottle(
  * creation. Group assignment is automatic; classifier output never selects a
  * parent or existing group.
  */
-export function buildClassifierConcreteBottleInput(
+export function buildClassifierBottleInput(
   proposedBottle: ProposedBottle,
-): ConcreteBottleCreateInput {
+): BottleCreateInput {
   const input = buildBottleInputFromProposedBottle(proposedBottle);
   return {
     stable: {

@@ -39,9 +39,9 @@
       "types": "./src/error.ts",
       "default": "./src/error.ts"
     },
-    "./releaseIdentity": {
-      "types": "./src/releaseIdentity.ts",
-      "default": "./src/releaseIdentity.ts"
+    "./bottleIdentity": {
+      "types": "./src/bottleIdentity.ts",
+      "default": "./src/bottleIdentity.ts"
     },
     "./bottleSchemaGuidance": {
       "types": "./src/bottleSchemaGuidance.ts",

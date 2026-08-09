@@ -19,9 +19,9 @@ import type {
 } from "../schemas";
 import BatchQueue from "./batchQueue";
 import {
-  buildConcreteBottleUpdatePatch,
-  buildIndependentConcreteBottleRouteInput,
-} from "./flatConcreteBottleInput";
+  buildBottleUpdatePatch,
+  buildIndependentBottleRouteInput,
+} from "./flatBottleInput";
 import { formatBottleName } from "./format";
 
 const CACHE = ".cache";
@@ -175,11 +175,9 @@ export async function handleBottle(
       },
     });
 
-    let createInput: ReturnType<
-      typeof buildIndependentConcreteBottleRouteInput
-    >;
+    let createInput: ReturnType<typeof buildIndependentBottleRouteInput>;
     try {
-      createInput = buildIndependentConcreteBottleRouteInput(bottle);
+      createInput = buildIndependentBottleRouteInput(bottle);
     } catch (error) {
       logError(error, {
         extra: {
@@ -216,7 +214,7 @@ export async function handleBottle(
       const updateResult = await safe(
         orpcClient.bottles.update({
           bottle: conflict.data.bottle,
-          ...buildConcreteBottleUpdatePatch(createInput),
+          ...buildBottleUpdatePatch(createInput),
         }),
       );
       if (updateResult.error) {

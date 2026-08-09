@@ -45,7 +45,7 @@ Related architecture:
 
 Peated has three relevant identity layers:
 
-- `Bottle`: one concrete marketed version with a stable expression plus every
+- `Bottle`: one complete product release with a stable expression plus every
   supported structured exact field.
 - `BottleGroup`: a same-expression relationship aggregate established by
   singleton creation or deterministic legacy migration. It owns shared editing

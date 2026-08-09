@@ -1,8 +1,8 @@
 import {
-  getConcreteBottleExactIdentity,
-  materializeConcreteBottleForGroup,
-  materializeConcreteBottleIdentity,
-} from "./concreteBottleIdentity";
+  getBottleExactIdentity,
+  materializeBottleForGroup,
+  materializeBottleIdentity,
+} from "./bottleIdentity";
 
 const exactIdentity = {
   edition: null,
@@ -38,7 +38,7 @@ test.each([
   },
 ])("$label", ({ exactStatedAge, expectedName, expectedStatedAge }) => {
   expect(
-    materializeConcreteBottleIdentity({
+    materializeBottleIdentity({
       stable: {
         name: "Old Malt",
         fullName: "Example Brand Old Malt",
@@ -55,14 +55,14 @@ test.each([
 
 test("classifies patched exact identity against the source group age", () => {
   expect(
-    getConcreteBottleExactIdentity({
+    getBottleExactIdentity({
       bottle: { ...exactIdentity, statedAge: 13 },
       sourceGroupStatedAge: 12,
     }),
   ).toEqual({ ...exactIdentity, statedAge: 13 });
 
   expect(
-    getConcreteBottleExactIdentity({
+    getBottleExactIdentity({
       bottle: { ...exactIdentity, statedAge: 13 },
       sourceGroupStatedAge: 12,
       exactPatch: { edition: "Batch 2", statedAge: 12, abv: 48 },
@@ -77,7 +77,7 @@ test("classifies patched exact identity against the source group age", () => {
 
 test("materializes only durable shared Bottle fields", () => {
   expect(
-    materializeConcreteBottleForGroup({
+    materializeBottleForGroup({
       group: {
         name: "Old Malt",
         fullName: "Example Brand Old Malt",

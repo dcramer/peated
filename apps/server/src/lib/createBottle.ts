@@ -53,15 +53,15 @@ import type { z } from "zod";
 import {
   findConflictingSmwsBottleId,
   getSmwsCodeForBottleIdentity,
-} from "./concreteBottleConflicts";
-import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
+} from "./bottleConflicts";
+import { materializeBottleIdentity } from "./bottleIdentity";
 import {
-  ConcreteBottleCreateInputSchema,
-  type ConcreteBottleCreateInput,
-} from "./concreteBottleSchemas";
+  BottleCreateInputSchema,
+  type BottleCreateInput,
+} from "./bottleSchemas";
 
-export { ConcreteBottleCreateInputSchema } from "./concreteBottleSchemas";
-export type { ConcreteBottleCreateInput } from "./concreteBottleSchemas";
+export { BottleCreateInputSchema } from "./bottleSchemas";
+export type { BottleCreateInput } from "./bottleSchemas";
 
 export class BottleCreateBadRequestError extends Error {
   constructor(message: string) {
@@ -84,7 +84,7 @@ export class BottleAlreadyExistsError extends Error {
   }
 }
 
-export type CreateBottleResult = {
+type PersistedBottleResult = {
   bottle: Bottle;
   newAliases: string[];
   newEntityIds: number[];
@@ -102,18 +102,18 @@ type PreparedBottleCreate = {
   stableName: string;
 };
 
-type ConcreteIdentityPreparation = {
+type BottleIdentityPreparation = {
   exactNormalizedFields: Pick<
-    ConcreteBottleCreateInput["exact"],
+    BottleCreateInput["exact"],
     "statedAge" | "vintageYear" | "releaseYear" | "singleCask" | "caskStrength"
   >;
   stableName: string;
   stableStatedAge: number | null;
 };
 
-type StableBottleGroupInput = ConcreteBottleCreateInput["stable"];
+type StableBottleGroupInput = BottleCreateInput["stable"];
 
-export type ConcreteBottleCreateResult = CreateBottleResult & {
+export type BottleCreateResult = PersistedBottleResult & {
   group: BottleGroup;
 };
 
@@ -122,13 +122,13 @@ async function prepareBottleCreateInTransaction(
   tx: AnyTransaction,
   {
     creationSource = "manual_entry",
-    concreteIdentity,
+    bottleIdentity,
     createdByActorId,
     input,
     context,
   }: {
     creationSource?: CatalogVerificationCreationSource;
-    concreteIdentity?: ConcreteIdentityPreparation;
+    bottleIdentity?: BottleIdentityPreparation;
     createdByActorId: number;
     input: z.infer<typeof BottleInputSchema>;
     context: Context & { user: User };
@@ -138,9 +138,9 @@ async function prepareBottleCreateInTransaction(
   const actorId = createdByActorId;
   const bottleData: BottlePreviewResult & Record<string, any> =
     await bottleNormalize({ input, context, entityDb: tx });
-  if (concreteIdentity) {
+  if (bottleIdentity) {
     // Explicit exact input overrides traits inferred from the stable name.
-    Object.assign(bottleData, concreteIdentity.exactNormalizedFields);
+    Object.assign(bottleData, bottleIdentity.exactNormalizedFields);
   }
 
   if (input.description !== undefined) {
@@ -151,7 +151,7 @@ async function prepareBottleCreateInTransaction(
   }
 
   const stableName = stripDuplicateBrandPrefixFromBottleName(
-    concreteIdentity?.stableName ?? bottleData.name,
+    bottleIdentity?.stableName ?? bottleData.name,
     bottleData.brand.name,
   );
 
@@ -265,12 +265,12 @@ async function prepareBottleCreateInTransaction(
   const stableFullName = formatBottleName({
     name: `${brand.shortName || brand.name} ${stableName}`,
   });
-  const concreteName = concreteIdentity
-    ? materializeConcreteBottleIdentity({
+  const bottleName = bottleIdentity
+    ? materializeBottleIdentity({
         stable: {
           name: stableName,
           fullName: stableFullName,
-          statedAge: concreteIdentity.stableStatedAge,
+          statedAge: bottleIdentity.stableStatedAge,
         },
         exact: {
           edition: bottleData.edition ?? null,
@@ -287,7 +287,7 @@ async function prepareBottleCreateInTransaction(
       })
     : null;
   const fullName =
-    concreteName?.fullName ??
+    bottleName?.fullName ??
     formatBottleName({
       ...bottleData,
       name: `${brand.shortName || brand.name} ${bottleData.name}`,
@@ -295,8 +295,8 @@ async function prepareBottleCreateInTransaction(
 
   const bottleInsertData: NewBottle = {
     ...bottleData,
-    name: concreteName?.name ?? bottleData.name,
-    statedAge: concreteName ? concreteName.statedAge : bottleData.statedAge,
+    name: bottleName?.name ?? bottleData.name,
+    statedAge: bottleName ? bottleName.statedAge : bottleData.statedAge,
     brandId: brand.id,
     bottlerId: bottler?.id || null,
     seriesId,
@@ -373,7 +373,7 @@ async function insertPreparedBottleInTransaction(
   tx: AnyTransaction,
   prepared: PreparedBottleCreate,
   { groupId = null }: { groupId?: number | null } = {},
-): Promise<CreateBottleResult> {
+): Promise<PersistedBottleResult> {
   const {
     bottleInsertData,
     creationSource,
@@ -429,9 +429,9 @@ async function insertPreparedBottleInTransaction(
   };
 }
 
-function buildConcreteBottleInput(
+function buildBottleInput(
   stable: StableBottleGroupInput,
-  exact: ConcreteBottleCreateInput["exact"],
+  exact: BottleCreateInput["exact"],
 ): z.infer<typeof BottleInputSchema> {
   const input: z.infer<typeof BottleInputSchema> = {
     name: stable.name,
@@ -503,7 +503,7 @@ async function createIndependentGroupPrefix(
 }
 
 /** Owns the complete singleton Bottle graph transaction. */
-export async function createConcreteBottleInTransaction(
+export async function createBottleInTransaction(
   tx: AnyTransaction,
   {
     creationSource = "manual_entry",
@@ -513,10 +513,10 @@ export async function createConcreteBottleInTransaction(
   }: {
     creationSource?: CatalogVerificationCreationSource;
     createdByActorId: number;
-    input: ConcreteBottleCreateInput;
+    input: BottleCreateInput;
     context: Context & { user: User };
   },
-): Promise<ConcreteBottleCreateResult> {
+): Promise<BottleCreateResult> {
   // Exact age is name-normalization context only; it cannot become group-owned state.
   const normalizedStable = normalizeBottleAge({
     name: normalizeBottleAliasKey(input.stable.name),
@@ -528,7 +528,7 @@ export async function createConcreteBottleInTransaction(
   };
   const prepared = await prepareBottleCreateInTransaction(tx, {
     creationSource,
-    concreteIdentity: {
+    bottleIdentity: {
       exactNormalizedFields: {
         statedAge: input.exact.statedAge,
         vintageYear: input.exact.vintageYear,
@@ -540,7 +540,7 @@ export async function createConcreteBottleInTransaction(
       stableStatedAge: stable.statedAge,
     },
     createdByActorId,
-    input: buildConcreteBottleInput(stable, input.exact),
+    input: buildBottleInput(stable, input.exact),
     context,
   });
 
@@ -573,12 +573,12 @@ export async function createConcreteBottleInTransaction(
   };
 }
 
-export type ConcreteBottleCreateOrReuseResult = {
+export type BottleCreateOrReuseResult = {
   bottle: Bottle;
-  createResult: ConcreteBottleCreateResult | null;
+  createResult: BottleCreateResult | null;
 };
 
-function isSafeConcreteBottleReuse(
+function isSafeBottleReuse(
   error: BottleAlreadyExistsError,
   existingBottle: Bottle,
 ) {
@@ -605,11 +605,11 @@ function isSafeConcreteBottleReuse(
 }
 
 /**
- * Owns the savepoint-backed concrete create-or-safe-reuse decision. Reuse is
+ * Owns the savepoint-backed create-or-safe-reuse decision. Reuse is
  * limited to an exact canonical-name collision or the structurally verified
  * SMWS code that caused creation to conflict.
  */
-export async function createOrReuseConcreteBottleInTransaction(
+export async function createOrReuseBottleInTransaction(
   tx: AnyTransaction,
   {
     creationSource,
@@ -619,13 +619,13 @@ export async function createOrReuseConcreteBottleInTransaction(
   }: {
     creationSource: CatalogVerificationCreationSource;
     createdByActorId: number;
-    input: ConcreteBottleCreateInput;
+    input: BottleCreateInput;
     context: Context & { user: User };
   },
-): Promise<ConcreteBottleCreateOrReuseResult> {
+): Promise<BottleCreateOrReuseResult> {
   try {
     const createResult = await tx.transaction(async (creationTx) =>
-      createConcreteBottleInTransaction(creationTx, {
+      createBottleInTransaction(creationTx, {
         creationSource,
         createdByActorId,
         input,
@@ -644,7 +644,7 @@ export async function createOrReuseConcreteBottleInTransaction(
     const existingBottle = await tx.query.bottles.findFirst({
       where: eq(bottles.id, error.bottleId),
     });
-    if (!existingBottle || !isSafeConcreteBottleReuse(error, existingBottle)) {
+    if (!existingBottle || !isSafeBottleReuse(error, existingBottle)) {
       throw error;
     }
 
@@ -657,12 +657,7 @@ export async function createOrReuseConcreteBottleInTransaction(
 
 /** Dispatches unique, best-effort work only after the Bottle transaction commits. */
 export async function finalizeCreatedBottle(
-  {
-    bottle,
-    seriesCreated,
-    newAliases,
-    newEntityIds,
-  }: ConcreteBottleCreateResult,
+  { bottle, seriesCreated, newAliases, newEntityIds }: BottleCreateResult,
   {
     creationSource = "manual_entry",
   }: {
@@ -747,13 +742,10 @@ export async function finalizeCreatedBottle(
   }
 }
 
-export type CreateConcreteBottleResult = Pick<
-  ConcreteBottleCreateResult,
-  "bottle" | "group"
->;
+export type CreateBottleResult = Pick<BottleCreateResult, "bottle" | "group">;
 
 /** Parses untrusted input once and owns transaction plus post-commit dispatch. */
-export async function createConcreteBottle({
+export async function createBottle({
   creationSource = "manual_entry",
   input: rawInput,
   context,
@@ -761,11 +753,11 @@ export async function createConcreteBottle({
   creationSource?: CatalogVerificationCreationSource;
   input: unknown;
   context: Context & { user: User };
-}): Promise<CreateConcreteBottleResult> {
-  const input = ConcreteBottleCreateInputSchema.parse(rawInput);
+}): Promise<CreateBottleResult> {
+  const input = BottleCreateInputSchema.parse(rawInput);
   const actor = await getUserActor(context.user);
   const result = await db.transaction(async (tx) =>
-    createConcreteBottleInTransaction(tx, {
+    createBottleInTransaction(tx, {
       creationSource,
       createdByActorId: actor.id,
       input,

@@ -36,71 +36,70 @@ import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 
-export class ConcreteBottleMergeAuthorizationError extends Error {
+export class BottleMergeAuthorizationError extends Error {
   constructor() {
     super("Moderator authorization is required to merge Bottles.");
-    this.name = "ConcreteBottleMergeAuthorizationError";
+    this.name = "BottleMergeAuthorizationError";
   }
 }
 
-export class ConcreteBottleMergeInputError extends Error {
+export class BottleMergeInputError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "ConcreteBottleMergeInputError";
+    this.name = "BottleMergeInputError";
   }
 }
 
-export type ConcreteBottleMergeGraphErrorCode =
+export type BottleMergeGraphErrorCode =
   | "not_found"
   | "retired"
   | "unmigrated"
   | "invalid_catalog_graph";
 
-export class ConcreteBottleMergeGraphError extends Error {
+export class BottleMergeGraphError extends Error {
   constructor(
-    readonly code: ConcreteBottleMergeGraphErrorCode,
+    readonly code: BottleMergeGraphErrorCode,
     readonly bottleId: number,
     options?: ErrorOptions,
   ) {
     super(`Cannot merge Bottle ${bottleId}: ${code}.`, options);
-    this.name = "ConcreteBottleMergeGraphError";
+    this.name = "BottleMergeGraphError";
   }
 }
 
-export type ConcreteBottleMergeConflictCode =
+export type BottleMergeConflictCode =
   | "same_bottle"
   | "retired_to_other_destination"
   | "identity_conflict"
   | "consumer_conflict";
 
-export class ConcreteBottleMergeConflictError extends Error {
+export class BottleMergeConflictError extends Error {
   constructor(
-    readonly code: ConcreteBottleMergeConflictCode,
+    readonly code: BottleMergeConflictCode,
     options?: ErrorOptions,
   ) {
     super(`Bottle merge failed: ${code}.`, options);
-    this.name = "ConcreteBottleMergeConflictError";
+    this.name = "BottleMergeConflictError";
   }
 }
 
-export type ConcreteBottleMergeResult = {
+export type BottleMergeResult = {
   sourceBottleId: number;
   destinationBottleId: number;
   destinationBottle: Bottle;
   changed: boolean;
 };
 
-export type ConcreteBottleMergeFinalizationManifest =
-  ConcreteBottleMergeResult & {
-    aliasNames: string[];
-    entityIds: number[];
-    seriesIds: number[];
-  };
+export type BottleMergeFinalizationManifest = BottleMergeResult & {
+  aliasNames: string[];
+  entityIds: number[];
+  seriesIds: number[];
+};
 
 function inertManifest(
   sourceBottleId: number,
   destinationBottle: Bottle,
-): ConcreteBottleMergeFinalizationManifest {
+): BottleMergeFinalizationManifest {
   return {
     sourceBottleId,
     destinationBottleId: destinationBottle.id,
@@ -123,17 +122,17 @@ function validateMergeInput(
   destinationBottleId: number,
 ) {
   if (!Number.isInteger(sourceBottleId) || sourceBottleId <= 0) {
-    throw new ConcreteBottleMergeInputError(
+    throw new BottleMergeInputError(
       "Source Bottle ID must be a positive integer.",
     );
   }
   if (!Number.isInteger(destinationBottleId) || destinationBottleId <= 0) {
-    throw new ConcreteBottleMergeInputError(
+    throw new BottleMergeInputError(
       "Destination Bottle ID must be a positive integer.",
     );
   }
   if (sourceBottleId === destinationBottleId) {
-    throw new ConcreteBottleMergeConflictError("same_bottle");
+    throw new BottleMergeConflictError("same_bottle");
   }
 }
 
@@ -295,7 +294,7 @@ async function assertNoTastingCollision(
   for (const { createdById, createdAt } of rows) {
     const key = `${createdById}:${createdAt.getTime()}`;
     if (projectedKeys.has(key)) {
-      throw new ConcreteBottleMergeConflictError("consumer_conflict");
+      throw new BottleMergeConflictError("consumer_conflict");
     }
     projectedKeys.add(key);
   }
@@ -372,7 +371,7 @@ async function repointBottleConsumers(
  * rows are blocked by the owning Bottle locks, so preparation remains stable
  * until the caller executes or rolls back.
  */
-export async function lockConcreteBottleMergeDependencies(
+export async function lockBottleMergeDependencies(
   tx: AnyTransaction,
   {
     sourceBottleId,
@@ -534,7 +533,7 @@ export async function lockConcreteBottleMergeDependencies(
  * Commits one exact duplicate merge inside the caller-owned transaction. The
  * returned manifest must only be finalized after the outermost commit.
  */
-export async function mergeConcreteBottlesInTransaction(
+export async function mergeBottlesInTransaction(
   tx: AnyTransaction,
   {
     sourceBottleId,
@@ -545,12 +544,10 @@ export async function mergeConcreteBottlesInTransaction(
     destinationBottleId: number;
     actorId: number;
   },
-): Promise<ConcreteBottleMergeFinalizationManifest> {
+): Promise<BottleMergeFinalizationManifest> {
   validateMergeInput(sourceBottleId, destinationBottleId);
   if (!Number.isInteger(actorId) || actorId <= 0) {
-    throw new ConcreteBottleMergeInputError(
-      "Actor ID must be a positive integer.",
-    );
+    throw new BottleMergeInputError("Actor ID must be a positive integer.");
   }
 
   const requestedBottleIds = [sourceBottleId, destinationBottleId].sort(
@@ -567,10 +564,10 @@ export async function mergeConcreteBottlesInTransaction(
   const discoveredSource = discoveredById.get(sourceBottleId);
   const discoveredDestination = discoveredById.get(destinationBottleId);
   if (discoveredSource?.groupId === null) {
-    throw new ConcreteBottleMergeGraphError("unmigrated", sourceBottleId);
+    throw new BottleMergeGraphError("unmigrated", sourceBottleId);
   }
   if (discoveredDestination?.groupId === null) {
-    throw new ConcreteBottleMergeGraphError("unmigrated", destinationBottleId);
+    throw new BottleMergeGraphError("unmigrated", destinationBottleId);
   }
 
   const groupIds = uniqueSorted([
@@ -610,12 +607,12 @@ export async function mergeConcreteBottlesInTransaction(
   );
 
   if (tombstoneByBottleId.has(destinationBottleId)) {
-    throw new ConcreteBottleMergeGraphError("retired", destinationBottleId);
+    throw new BottleMergeGraphError("retired", destinationBottleId);
   }
   const sourceTombstone = tombstoneByBottleId.get(sourceBottleId);
   if (sourceTombstone?.newBottleId === destinationBottleId) {
     if (!destination || destination.groupId === null) {
-      throw new ConcreteBottleMergeGraphError(
+      throw new BottleMergeGraphError(
         "invalid_catalog_graph",
         destinationBottleId,
       );
@@ -630,7 +627,7 @@ export async function mergeConcreteBottlesInTransaction(
           groupId === destinationGroup.id,
       )
     ) {
-      throw new ConcreteBottleMergeGraphError(
+      throw new BottleMergeGraphError(
         "invalid_catalog_graph",
         destinationBottleId,
       );
@@ -638,31 +635,31 @@ export async function mergeConcreteBottlesInTransaction(
     return inertManifest(sourceBottleId, destination);
   }
   if (sourceTombstone) {
-    throw new ConcreteBottleMergeConflictError("retired_to_other_destination");
+    throw new BottleMergeConflictError("retired_to_other_destination");
   }
   if (!source) {
-    throw new ConcreteBottleMergeGraphError(
+    throw new BottleMergeGraphError(
       discoveredSource ? "invalid_catalog_graph" : "not_found",
       sourceBottleId,
     );
   }
   if (!destination) {
-    throw new ConcreteBottleMergeGraphError(
+    throw new BottleMergeGraphError(
       discoveredDestination ? "invalid_catalog_graph" : "not_found",
       destinationBottleId,
     );
   }
   if (source.groupId === null) {
-    throw new ConcreteBottleMergeGraphError("unmigrated", sourceBottleId);
+    throw new BottleMergeGraphError("unmigrated", sourceBottleId);
   }
   if (destination.groupId === null) {
-    throw new ConcreteBottleMergeGraphError("unmigrated", destinationBottleId);
+    throw new BottleMergeGraphError("unmigrated", destinationBottleId);
   }
   if (
     source.groupId !== discoveredSource?.groupId ||
     destination.groupId !== discoveredDestination?.groupId
   ) {
-    throw new ConcreteBottleMergeGraphError(
+    throw new BottleMergeGraphError(
       "invalid_catalog_graph",
       source.groupId !== discoveredSource?.groupId
         ? sourceBottleId
@@ -675,7 +672,7 @@ export async function mergeConcreteBottlesInTransaction(
   const sourceGroup = groupById.get(sourceGroupId);
   const destinationGroup = groupById.get(destinationGroupId);
   if (!sourceGroup || !destinationGroup) {
-    throw new ConcreteBottleMergeGraphError(
+    throw new BottleMergeGraphError(
       "invalid_catalog_graph",
       !sourceGroup ? sourceBottleId : destinationBottleId,
     );
@@ -696,10 +693,7 @@ export async function mergeConcreteBottlesInTransaction(
       ({ id }) => id === destinationGroup.representativeBottleId,
     )
   ) {
-    throw new ConcreteBottleMergeGraphError(
-      "invalid_catalog_graph",
-      sourceBottleId,
-    );
+    throw new BottleMergeGraphError("invalid_catalog_graph", sourceBottleId);
   }
   const crossGroup = sourceGroupId !== destinationGroupId;
   const survivingSourceMembers = sourceMembers.filter(
@@ -737,7 +731,7 @@ export async function mergeConcreteBottlesInTransaction(
     typeof canonicalAliasOwnerId === "number" &&
     !bottleById.has(canonicalAliasOwnerId)
   ) {
-    throw new ConcreteBottleMergeConflictError("identity_conflict");
+    throw new BottleMergeConflictError("identity_conflict");
   }
 
   let consumerCounts: Record<string, number>;
@@ -753,7 +747,7 @@ export async function mergeConcreteBottlesInTransaction(
         postgresConstraint(error) ?? "",
       )
     ) {
-      throw new ConcreteBottleMergeConflictError("consumer_conflict", {
+      throw new BottleMergeConflictError("consumer_conflict", {
         cause: error,
       });
     }
@@ -934,7 +928,7 @@ export async function mergeConcreteBottlesInTransaction(
     .where(eq(bottles.id, destinationBottleId))
     .limit(1);
   if (!destinationBottle) {
-    throw new ConcreteBottleMergeGraphError(
+    throw new BottleMergeGraphError(
       "invalid_catalog_graph",
       destinationBottleId,
     );
@@ -972,8 +966,8 @@ export async function mergeConcreteBottlesInTransaction(
 }
 
 /** Dispatches only idempotent derived work after the outermost commit. */
-export async function finalizeConcreteBottleMerge(
-  manifest: ConcreteBottleMergeFinalizationManifest,
+export async function finalizeBottleMerge(
+  manifest: BottleMergeFinalizationManifest,
 ) {
   if (!manifest.changed) return;
   const jobs: Array<
@@ -1008,7 +1002,7 @@ export async function finalizeConcreteBottleMerge(
 }
 
 /** Authorizes, commits, and finalizes one exact Bottle duplicate merge. */
-export async function mergeConcreteBottles({
+export async function mergeBottles({
   sourceBottleId,
   destinationBottleId,
   context,
@@ -1016,21 +1010,21 @@ export async function mergeConcreteBottles({
   sourceBottleId: number;
   destinationBottleId: number;
   context: Context;
-}): Promise<ConcreteBottleMergeResult> {
+}): Promise<BottleMergeResult> {
   if (!context.user?.admin && !context.user?.mod) {
-    throw new ConcreteBottleMergeAuthorizationError();
+    throw new BottleMergeAuthorizationError();
   }
   validateMergeInput(sourceBottleId, destinationBottleId);
   const user: User = context.user;
   const actor = await getUserActor(user);
   const manifest = await db.transaction((tx) =>
-    mergeConcreteBottlesInTransaction(tx, {
+    mergeBottlesInTransaction(tx, {
       sourceBottleId,
       destinationBottleId,
       actorId: actor.id,
     }),
   );
-  await finalizeConcreteBottleMerge(manifest);
+  await finalizeBottleMerge(manifest);
   return {
     sourceBottleId,
     destinationBottleId,

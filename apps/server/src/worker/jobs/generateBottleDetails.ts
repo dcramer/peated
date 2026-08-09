@@ -11,22 +11,22 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
-  SystemConcreteBottleUpdateInputSchema,
-  type SystemConcreteBottleUpdateInput,
-} from "@peated/server/lib/concreteBottleSchemas";
+  SystemBottleUpdateInputSchema,
+  type SystemBottleUpdateInput,
+} from "@peated/server/lib/bottleSchemas";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import {
-  ConcreteBottleUpdateExpectedBottleStateError,
-  concreteBottleUpdateExpectedSelectedBottleState,
-  concreteBottleUpdateExpectedSharedState,
-  ConcreteBottleUpdateExpectedStateError,
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-} from "@peated/server/lib/updateConcreteBottle";
+  BottleUpdateExpectedBottleStateError,
+  bottleUpdateExpectedSelectedBottleState,
+  bottleUpdateExpectedSharedState,
+  BottleUpdateExpectedStateError,
+  finalizeBottleUpdate,
+  updateBottleInTransaction,
+} from "@peated/server/lib/updateBottle";
 import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
@@ -172,8 +172,8 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     .from(bottleGroupDistillers)
     .where(eq(bottleGroupDistillers.groupId, owned.group.id));
   const expectedSelectedBottleState =
-    concreteBottleUpdateExpectedSelectedBottleState(bottle);
-  const expectedSharedState = concreteBottleUpdateExpectedSharedState({
+    bottleUpdateExpectedSelectedBottleState(bottle);
+  const expectedSharedState = bottleUpdateExpectedSharedState({
     group: owned.group,
     distillerIds: groupDistillers.map(({ distillerId }) => distillerId),
     series: owned.series,
@@ -204,7 +204,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     throw new Error(`Failed to generate details for bottle: ${bottleId}`);
   }
 
-  const exact: NonNullable<SystemConcreteBottleUpdateInput["exact"]> = {};
+  const exact: NonNullable<SystemBottleUpdateInput["exact"]> = {};
 
   if (
     generateDesc &&
@@ -242,7 +242,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     }
   }
 
-  let shared: SystemConcreteBottleUpdateInput["shared"];
+  let shared: SystemBottleUpdateInput["shared"];
   if (!bottle.flavorProfile) {
     const flavorProfile = owned.group.flavorProfile ?? result.flavorProfile;
     if (flavorProfile) {
@@ -251,7 +251,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
   }
 
   if (!shared && Object.keys(exact).length === 0) return;
-  const input = SystemConcreteBottleUpdateInputSchema.parse({
+  const input = SystemBottleUpdateInputSchema.parse({
     shared,
     exact: Object.keys(exact).length ? exact : undefined,
   });
@@ -259,7 +259,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
   try {
     update = await db.transaction(async (tx) => {
       const actor = await getPeatedSystemActorForDatabase(tx);
-      return await updateConcreteBottleInTransaction(tx, {
+      return await updateBottleInTransaction(tx, {
         bottleId: bottle.id,
         input,
         expectedSelectedBottleState,
@@ -272,12 +272,12 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     // Generated details belong only to the snapshot sent to the model. A newer
     // authoritative edit supersedes them, so the stale result is discarded.
     if (
-      error instanceof ConcreteBottleUpdateExpectedBottleStateError ||
-      error instanceof ConcreteBottleUpdateExpectedStateError
+      error instanceof BottleUpdateExpectedBottleStateError ||
+      error instanceof BottleUpdateExpectedStateError
     ) {
       return;
     }
     throw error;
   }
-  await finalizeConcreteBottleUpdate(update);
+  await finalizeBottleUpdate(update);
 }

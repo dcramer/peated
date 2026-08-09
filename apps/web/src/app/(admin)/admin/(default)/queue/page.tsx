@@ -1,6 +1,6 @@
 "use client";
 
-import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
+import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Bottle } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -240,7 +240,7 @@ export default function Page() {
 
     const created = await createBottleMutation.mutateAsync({
       proposal: item.id,
-      independentBottle: IndependentConcreteBottleCreateRouteInputSchema.parse(
+      independentBottle: IndependentBottleCreateRouteInputSchema.parse(
         item.proposedBottle,
       ),
     });

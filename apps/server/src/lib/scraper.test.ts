@@ -113,7 +113,7 @@ describe("handleBottle", () => {
     });
   });
 
-  it("directs a canonical create conflict to the strict concrete update", async () => {
+  it("directs a canonical create conflict to the strict Bottle update", async () => {
     const conflictBottleId = 52;
     const bottle = bottleResult({ bottleId: conflictBottleId });
     vi.mocked(orpcClient.bottles.create).mockRejectedValue(
@@ -158,7 +158,7 @@ describe("handleBottle", () => {
     expect(orpcClient.prices.createBatch).not.toHaveBeenCalled();
   });
 
-  it("does not call the API when flat input cannot satisfy concrete creation", async () => {
+  it("does not call the API when flat input cannot satisfy Bottle creation", async () => {
     await handleBottle({ ...bottleInput, name: "" }, priceInput);
 
     expect(orpcClient.bottles.create).not.toHaveBeenCalled();

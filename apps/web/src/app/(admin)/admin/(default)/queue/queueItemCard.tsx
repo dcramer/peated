@@ -290,7 +290,7 @@ function getChoiceName(
   return typeof choice === "object" && choice?.name ? choice.name : null;
 }
 
-function getConcreteBottleDraftFields(
+function getBottleDraftFields(
   bottle: NonNullable<QueueItem["proposedBottle"]>,
 ): RecommendationField[] {
   const fields: RecommendationField[] = [
@@ -710,7 +710,7 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
       <RecommendationSection
         label="Bottle Draft"
         title={item.price.name}
-        fields={getConcreteBottleDraftFields(item.proposedBottle)}
+        fields={getBottleDraftFields(item.proposedBottle)}
       />
     </div>
   );

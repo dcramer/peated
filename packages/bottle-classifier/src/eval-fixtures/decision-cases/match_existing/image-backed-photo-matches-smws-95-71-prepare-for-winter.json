@@ -89,10 +89,8 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-95-71-prepare-for-winter.jpg",
     "dbOutcome": {
       "bottleId": 11939,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
-      "summary": "Production DB outcome: match bottle 11939 with releaseId null. Nearby non-target row: bottle 38409, SMWS 95.71 Serrano-wrapped plums."
+      "summary": "Production DB outcome: match Bottle 11939. Nearby non-target Bottle 38409 is SMWS 95.71 Serrano-wrapped plums."
     },
     "catalogFieldObservations": [
       {

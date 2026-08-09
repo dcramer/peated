@@ -1,5 +1,10 @@
 export { normalizeProposedBottleDraft } from "./bottleCreationDrafts";
 export {
+  formatCanonicalBottleName,
+  getResolvedBottleIdentity,
+} from "./bottleIdentity";
+export type { BottleExactIdentityInput } from "./bottleIdentity";
+export {
   BottleClassifierRunMetadataSchema,
   createBottleClassifier,
   type BottleClassifier,
@@ -130,8 +135,3 @@ export type {
   ImageTextSpan,
 } from "./imageEvidence";
 export { normalizeBottle, type NormalizedBottle } from "./normalize";
-export {
-  formatCanonicalReleaseName,
-  getResolvedReleaseIdentity,
-} from "./releaseIdentity";
-export type { ReleaseIdentityInput } from "./releaseIdentity";

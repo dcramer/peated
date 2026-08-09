@@ -159,11 +159,9 @@
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-12-scene-9.jpg",
     "dbOutcome": {
-      "bottleId": 43397,
-      "releaseId": null,
-      "createsBottle": false,
-      "createsRelease": true,
-      "summary": "Historical production DB outcome under the legacy model: bottle 43397 stored the reusable A Midwinter Night's Dram identity and the desired catalog change was a new Act 12 Scene 9 child release. The observed production response returned no_match because legacy create-release handling was blocked by release-like parent traits. The flattened model instead creates one complete Act 12 Scene 9 Bottle and does not repair bottle 43397."
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Create one complete Act 12 Scene 9 Bottle. Do not repair or select broad Bottle 43397."
     },
     "catalogFieldObservations": [
       {
@@ -178,15 +176,15 @@
         "notes": "Bottle 43397 historically carried Act 12 traits. Under the flattened model, the observed Act 12 Scene 9 product becomes its own complete Bottle and this candidate is not repaired by classification."
       },
       {
-        "target": "candidate_release",
-        "releaseId": 1,
+        "target": "candidate_bottle",
+        "bottleId": -1,
         "field": "edition",
         "productionValue": "Act 12",
         "evidenceValue": "Act 12 Scene 9",
         "source": "image_evidence",
         "issue": "competing_candidate",
         "safeToAutoFill": false,
-        "notes": "The observed label uses the fuller release edition Act 12 Scene 9; the existing production release is the broader Act 12 row."
+        "notes": "The observed label uses the full edition Act 12 Scene 9. The existing Bottle is the broader Act 12 product."
       }
     ],
     "notes": "Added from failed image photo-identification trace 73ec524d6a6298dfe005cbf3a6778e58. The observed pending upload was zg6qndh3rdnoch7roonscz8v at https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp, expiring 2026-07-10T02:45:26.290Z, and the checked-in image preserves that label evidence for replay. The production response returned suggestedNextStep manual_search and decision no_match even though diagnostics identified the observed product as Act 12 Scene 9 under legacy catalog row 43397. The old downgrade reason was a dirty-parent conflict; the flattened contract removes that intervention and expects one independently complete Act 12 Scene 9 Bottle. Kept as curated_regression because independent online verification of the exact Act 12 Scene 9 release was unavailable during fixture review."

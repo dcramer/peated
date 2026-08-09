@@ -170,9 +170,7 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-spice-tree-extravaganza.webp",
     "dbOutcome": {
       "bottleId": 45175,
-      "releaseId": null,
       "createsBottle": true,
-      "createsRelease": false,
       "summary": "Production created Bottle 45175 with null ABV, release year, bottler, and distillers; a moderator later repaired it to 46% ABV, releaseYear 2016, Compass Box bottler, and six component distilleries. Bottle 9900 already represented the same product with malformed identity data."
     },
     "catalogFieldObservations": [

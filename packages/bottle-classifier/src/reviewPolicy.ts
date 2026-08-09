@@ -584,7 +584,7 @@ function stripSafeStrengthPhrases(value: string): string {
   );
 }
 
-function stripExtractedReleaseIdentityFromReferenceName(
+function stripExtractedBottleIdentityFromReferenceName(
   referenceName: string,
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"],
 ): string {
@@ -625,7 +625,7 @@ function buildReferenceNameTokenVariants({
     variants.push(referenceTokens);
   }
 
-  const strippedReferenceName = stripExtractedReleaseIdentityFromReferenceName(
+  const strippedReferenceName = stripExtractedBottleIdentityFromReferenceName(
     referenceName,
     extractedIdentity,
   );

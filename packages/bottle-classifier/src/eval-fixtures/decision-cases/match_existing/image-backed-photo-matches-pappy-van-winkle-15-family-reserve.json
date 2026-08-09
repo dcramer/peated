@@ -209,10 +209,8 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/pappy-van-winkle-15-family-reserve.jpg",
     "dbOutcome": {
       "bottleId": 11868,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
-      "summary": "Assign the photo tasting to existing Peated bottle 11868, Pappy Van Winkle's 15-year-old Family Reserve, with releaseId null. Do not create a new Pappy Van Winkle bottle and do not match the 20-year sibling."
+      "summary": "Assign the photo tasting to existing Peated Bottle 11868, Pappy Van Winkle's 15-year-old Family Reserve. Do not create another Pappy Van Winkle Bottle. Do not match the 20-year Bottle."
     },
     "notes": "Added from a failed production photo auto-match using the preserved uploaded image. The label visibly shows Pappy Van Winkle's Family Reserve, Kentucky Straight Bourbon Whiskey, 15 years old, 750ml, 53.5% ABV / 107 proof. External sources verify the Pappy Van Winkle's Family Reserve family, the 15/20/23-year variants, and the 15-year expression at 107 proof. At the time of the production miss, bottle 11868 had no stored ABV; missing stored ABV is not a conflict when the label age and product identity disambiguate the existing bottle. Production search surfaced both existing Pappy candidates, 11868 and 11867; the expected outcome is bottle 11868 because the label age disambiguates it from the 20-year sibling."
   },

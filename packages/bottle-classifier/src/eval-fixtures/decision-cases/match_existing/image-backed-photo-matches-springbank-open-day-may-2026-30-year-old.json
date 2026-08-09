@@ -87,10 +87,8 @@
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/springbank-open-day-may-2026-30-year-old.jpg",
     "dbOutcome": {
       "bottleId": 44256,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
-      "summary": "Production DB outcome: match existing bottle 44256, Springbank Open Day, releaseId null. Do not create a second Springbank Open Day May 2026 bottle from this photo."
+      "summary": "Production DB outcome: match existing Bottle 44256, Springbank Open Day. Do not create a second Springbank Open Day May 2026 Bottle from this photo."
     },
     "catalogFieldObservations": [
       {

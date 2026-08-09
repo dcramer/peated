@@ -1,22 +1,20 @@
 import {
-  ConcreteBottleUpdateInputSchema,
-  IndependentConcreteBottleCreateRouteInputSchema,
-  type ConcreteBottleCreateInput,
-  type ConcreteBottleUpdateInput,
-} from "@peated/server/lib/concreteBottleSchemas";
+  BottleUpdateInputSchema,
+  IndependentBottleCreateRouteInputSchema,
+  type BottleCreateInput,
+  type BottleUpdateInput,
+} from "@peated/server/lib/bottleSchemas";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { z } from "zod";
 
 type FlatBottleInput = z.input<typeof BottleInputSchema>;
 
 /**
- * Translates the retained flat Bottle input into the strict concrete create
+ * Translates the retained flat Bottle input into the strict Bottle create
  * route contract without carrying legacy response or image fields forward.
  */
-export function buildIndependentConcreteBottleRouteInput(
-  input: FlatBottleInput,
-) {
-  return IndependentConcreteBottleCreateRouteInputSchema.parse({
+export function buildIndependentBottleRouteInput(input: FlatBottleInput) {
+  return IndependentBottleCreateRouteInputSchema.parse({
     name: input.name,
     statedAge: input.statedAge,
     series: input.series,
@@ -41,9 +39,9 @@ export function buildIndependentConcreteBottleRouteInput(
 }
 
 /** Maps the public flat create contract to canonical independent creation. */
-export function buildIndependentConcreteBottleCreateInput(
-  input: ReturnType<typeof buildIndependentConcreteBottleRouteInput>,
-): ConcreteBottleCreateInput {
+export function buildIndependentBottleCreateInput(
+  input: ReturnType<typeof buildIndependentBottleRouteInput>,
+): BottleCreateInput {
   return {
     stable: {
       name: input.name,
@@ -74,10 +72,10 @@ export function buildIndependentConcreteBottleCreateInput(
 }
 
 /** Maps a parsed flat upsert input to the canonical shared/exact patch. */
-export function buildConcreteBottleUpdatePatch(
-  input: ReturnType<typeof buildIndependentConcreteBottleRouteInput>,
-): ConcreteBottleUpdateInput {
-  return ConcreteBottleUpdateInputSchema.parse({
+export function buildBottleUpdatePatch(
+  input: ReturnType<typeof buildIndependentBottleRouteInput>,
+): BottleUpdateInput {
+  return BottleUpdateInputSchema.parse({
     shared: {
       name: input.name,
       statedAge: input.statedAge,

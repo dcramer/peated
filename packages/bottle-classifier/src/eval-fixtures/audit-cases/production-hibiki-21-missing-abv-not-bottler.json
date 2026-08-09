@@ -104,7 +104,6 @@
     "dbOutcome": {
       "bottleId": 11863,
       "createsBottle": false,
-      "createsRelease": false,
       "summary": "Keep Bottle 11863, add exact ABV 43%, and leave bottler null. Do not create or assign a Suntory bottler Entity and do not merge or create a Bottle."
     },
     "catalogFieldObservations": [

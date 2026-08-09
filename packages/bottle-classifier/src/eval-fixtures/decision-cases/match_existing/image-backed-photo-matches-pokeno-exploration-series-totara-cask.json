@@ -102,10 +102,8 @@
     ],
     "dbOutcome": {
       "bottleId": 44263,
-      "releaseId": null,
       "createsBottle": false,
-      "createsRelease": false,
-      "summary": "Assign the photo tasting to existing Peated bottle 44263, Pōkeno Exploration Series No. 1 Totara Cask, with releaseId null. Do not create a new Pōkeno bottle or release for this photo."
+      "summary": "Assign the photo tasting to existing Peated Bottle 44263, Pōkeno Exploration Series No. 1 Totara Cask. Do not create another Bottle for this photo."
     },
     "notes": "Added from a failed /addTasting photo-identification attempt using the preserved uploaded image. The label visibly shows Pōkeno Aotearoa New Zealand Single Malt Whisky, Exploration Series No. 01, Totara Cask, 700ml, 40% ABV. The official Pokeno product page and blog verify Totara Cask as part of the Exploration Series."
   },

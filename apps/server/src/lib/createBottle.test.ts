@@ -9,22 +9,22 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import { buildClassifierConcreteBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
+import { buildClassifierBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
   BottleAlreadyExistsError,
-  ConcreteBottleCreateInputSchema,
-  createConcreteBottle,
-  createConcreteBottleInTransaction,
-  createOrReuseConcreteBottleInTransaction,
-} from "@peated/server/lib/createConcreteBottle";
+  BottleCreateInputSchema,
+  createBottle,
+  createBottleInTransaction,
+  createOrReuseBottleInTransaction,
+} from "@peated/server/lib/createBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { updateConcreteBottle } from "@peated/server/lib/updateConcreteBottle";
+import { updateBottle } from "@peated/server/lib/updateBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq } from "drizzle-orm";
 import { vi } from "vitest";
 
 function contextFor(user: Parameters<typeof getUserActor>[0]) {
-  return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
+  return { user } as Parameters<typeof createBottle>[0]["context"];
 }
 
 describe("Bottle creation", () => {
@@ -49,7 +49,7 @@ describe("Bottle creation", () => {
       flavorProfile: "peated" as const,
     };
 
-    const result = await createConcreteBottle({
+    const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
         stable: {
@@ -163,7 +163,7 @@ describe("Bottle creation", () => {
       },
     );
 
-    const result = await createConcreteBottle({
+    const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
         stable: { name: "Canonical Alias", brand: brand.id },
@@ -204,7 +204,7 @@ describe("Bottle creation", () => {
       name: "Classifier Exact Age Brand",
       type: ["brand"],
     });
-    const input = buildClassifierConcreteBottleInput({
+    const input = buildClassifierBottleInput({
       name: "Speyside 12-year-old",
       series: null,
       category: "single_malt",
@@ -223,7 +223,7 @@ describe("Bottle creation", () => {
       bottler: null,
     });
 
-    const created = await createConcreteBottle({
+    const created = await createBottle({
       context: contextFor(mod),
       creationSource: "bottle_classifier",
       input,
@@ -239,7 +239,7 @@ describe("Bottle creation", () => {
       statedAge: 12,
     });
 
-    const rematerialized = await updateConcreteBottle({
+    const rematerialized = await updateBottle({
       bottleId: created.bottle.id,
       input: { shared: { statedAge: 15 } },
       context: contextFor(mod),
@@ -258,7 +258,7 @@ describe("Bottle creation", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Stable Age Brand" });
-    const result = await createConcreteBottle({
+    const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
         stable: { name: "Old Malt 12 years old", brand: brand.id },
@@ -281,7 +281,7 @@ describe("Bottle creation", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Stable Text Brand" });
-    const result = await createConcreteBottle({
+    const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
         stable: {
@@ -344,7 +344,7 @@ describe("Bottle creation", () => {
     ];
 
     for (const { exactCask, nameSuffix } of variants) {
-      const result = await createConcreteBottle({
+      const result = await createBottle({
         context,
         input: {
           stable: { name: "Exact Cask Expression", brand: brand.id },
@@ -371,7 +371,7 @@ describe("Bottle creation", () => {
     const stableOverrides = "stable" in overrides ? overrides.stable : {};
     const exactOverrides = "exact" in overrides ? overrides.exact : {};
     expect(() =>
-      ConcreteBottleCreateInputSchema.parse({
+      BottleCreateInputSchema.parse({
         stable: {
           name: "Integer Boundary",
           brand: 1,
@@ -396,7 +396,7 @@ describe("Bottle creation", () => {
     ],
   ])("rejects an invalid %s id", (_label, stableOverrides) => {
     expect(() =>
-      ConcreteBottleCreateInputSchema.parse({
+      BottleCreateInputSchema.parse({
         stable: {
           name: "Entity ID Boundary",
           brand: 1,
@@ -425,7 +425,7 @@ describe("Bottle creation", () => {
       },
     },
   ])("rejects $label at the runtime boundary", ({ input }) => {
-    expect(() => ConcreteBottleCreateInputSchema.parse(input)).toThrow();
+    expect(() => BottleCreateInputSchema.parse(input)).toThrow();
   });
 
   test("blocks exact canonical aliases and duplicate SMWS codes", async ({
@@ -438,11 +438,9 @@ describe("Bottle creation", () => {
       stable: { name: "Duplicate Expression", brand: brand.id },
       exact: { edition: "Batch 1" },
     };
-    const first = await createConcreteBottle({ context, input });
+    const first = await createBottle({ context, input });
 
-    await expect(
-      createConcreteBottle({ context, input }),
-    ).rejects.toMatchObject({
+    await expect(createBottle({ context, input })).rejects.toMatchObject({
       bottleId: first.bottle.id,
       collision: {
         kind: "canonical_name",
@@ -462,7 +460,7 @@ describe("Bottle creation", () => {
       singleCask: true,
     });
     await expect(
-      createConcreteBottle({
+      createBottle({
         context,
         input: {
           stable: {
@@ -488,17 +486,17 @@ describe("Bottle creation", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Reuse Result Brand" });
     const actor = await getUserActor(defaults.user);
-    const input = ConcreteBottleCreateInputSchema.parse({
+    const input = BottleCreateInputSchema.parse({
       stable: { name: "Reuse Result Expression", brand: brand.id },
       exact: { edition: "Batch 1" },
     });
-    const created = await createConcreteBottle({
+    const created = await createBottle({
       context: contextFor(defaults.user),
       input,
     });
 
     const reused = await db.transaction((tx) =>
-      createOrReuseConcreteBottleInTransaction(tx, {
+      createOrReuseBottleInTransaction(tx, {
         creationSource: "bottle_classifier",
         createdByActorId: actor.id,
         input,
@@ -523,9 +521,7 @@ describe("Bottle creation", () => {
     const scenarios = [
       {
         reason: "bottle_retired",
-        retire: async (
-          bottle: Awaited<ReturnType<typeof createConcreteBottle>>,
-        ) => {
+        retire: async (bottle: Awaited<ReturnType<typeof createBottle>>) => {
           await db.insert(bottleTombstones).values({
             bottleId: bottle.bottle.id,
             newBottleId: replacement.id,
@@ -538,19 +534,19 @@ describe("Bottle creation", () => {
       const brand = await fixtures.Entity({
         name: `Inactive Reuse Brand ${index}`,
       });
-      const input = ConcreteBottleCreateInputSchema.parse({
+      const input = BottleCreateInputSchema.parse({
         stable: {
           name: `Inactive Reuse Expression ${index}`,
           brand: brand.id,
         },
         exact: {},
       });
-      const created = await createConcreteBottle({ context, input });
+      const created = await createBottle({ context, input });
       await scenario.retire(created);
 
       await expect(
         db.transaction((tx) =>
-          createOrReuseConcreteBottleInTransaction(tx, {
+          createOrReuseBottleInTransaction(tx, {
             creationSource: "bottle_classifier",
             createdByActorId: actor.id,
             input,
@@ -583,7 +579,7 @@ describe("Bottle creation", () => {
     });
     const changesBefore = await db.select({ id: changes.id }).from(changes);
     await expect(
-      createConcreteBottle({
+      createBottle({
         context: contextFor(defaults.user),
         input: {
           stable: { name: "Blocked Expression", brand: brand.id },
@@ -634,14 +630,14 @@ describe("Bottle creation", () => {
   }) => {
     const context = contextFor(defaults.user);
     const brand = await fixtures.Entity({ name: "Singleton Test Brand" });
-    const first = await createConcreteBottle({
+    const first = await createBottle({
       context,
       input: {
         stable: { name: "Shared Expression", brand: brand.id },
         exact: { edition: "Batch 1" },
       },
     });
-    const second = await createConcreteBottle({
+    const second = await createBottle({
       context,
       input: {
         stable: { name: "Shared Expression", brand: brand.id },
@@ -672,14 +668,14 @@ describe("Bottle creation", () => {
       stable: { name: "Rollback Expression", brand: brand.id },
       exact: { edition: "Retryable" },
     };
-    const parsedInput = ConcreteBottleCreateInputSchema.parse(input);
+    const parsedInput = BottleCreateInputSchema.parse(input);
     const attempt: {
-      result?: Awaited<ReturnType<typeof createConcreteBottleInTransaction>>;
+      result?: Awaited<ReturnType<typeof createBottleInTransaction>>;
     } = {};
 
     await expect(
       db.transaction(async (tx) => {
-        attempt.result = await createConcreteBottleInTransaction(tx, {
+        attempt.result = await createBottleInTransaction(tx, {
           createdByActorId: actor.id,
           input: parsedInput,
           context: contextFor(defaults.user),
@@ -723,7 +719,7 @@ describe("Bottle creation", () => {
         ),
     ).toEqual([]);
 
-    const retried = await createConcreteBottle({
+    const retried = await createBottle({
       context: contextFor(defaults.user),
       input,
     });
@@ -746,7 +742,7 @@ describe("Bottle creation", () => {
       throw new Error("queue unavailable");
     });
 
-    const result = await createConcreteBottle({
+    const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
         stable: { name: "Committed Before Queue", brand: brand.id },

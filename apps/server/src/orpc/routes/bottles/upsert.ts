@@ -1,6 +1,6 @@
 import { call, ORPCError } from "@orpc/server";
-import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
-import { buildConcreteBottleUpdatePatch } from "@peated/server/lib/flatConcreteBottleInput";
+import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
+import { buildBottleUpdatePatch } from "@peated/server/lib/flatBottleInput";
 import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -27,7 +27,7 @@ export default procedure
       operationId: "upsertBottle",
     }),
   })
-  .input(IndependentConcreteBottleCreateRouteInputSchema)
+  .input(IndependentBottleCreateRouteInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context }) {
     try {
@@ -48,7 +48,7 @@ export default procedure
           update,
           {
             bottle: err.data.bottle,
-            ...buildConcreteBottleUpdatePatch(input),
+            ...buildBottleUpdatePatch(input),
           },
           { context },
         );
