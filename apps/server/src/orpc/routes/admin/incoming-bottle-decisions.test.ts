@@ -158,6 +158,34 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     expect("target" in result.results[0]).toBe(false);
   });
 
+  test("preserves decisions for deleted bottles", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const actor = await getPeatedSystemActor();
+    const site = await fixtures.ExternalSiteOrExisting();
+    await db.insert(incomingBottleDecisionLogs).values({
+      sourceKind: "store_price",
+      sourceId: 106,
+      externalSiteId: site.id,
+      name: "Deleted invalid bottle decision",
+      decision: "create_bottle",
+      actorId: actor.id,
+      bottleId: null,
+      createdBottle: true,
+    });
+
+    const result = await routerClient.admin.incomingBottleDecisions(undefined, {
+      context: { user: admin },
+    });
+
+    expect(result.results).toEqual([
+      expect.objectContaining({
+        sourceId: 106,
+        bottle: null,
+        createdBottle: true,
+      }),
+    ]);
+  });
+
   test("filters by actor type", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const userActor = await getUserActor(admin);

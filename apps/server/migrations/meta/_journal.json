@@ -1415,6 +1415,13 @@
       "when": 1785820769562,
       "tag": "0201_puzzling_annihilus",
       "breakpoints": false
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1786255271554,
+      "tag": "0202_glamorous_cerise",
+      "breakpoints": false
     }
   ]
 }

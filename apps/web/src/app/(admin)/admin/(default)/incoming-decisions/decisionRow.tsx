@@ -20,8 +20,12 @@ export function formatDecision(value: DecisionLogItem["decision"]): string {
 export function DecisionBottle({
   bottle,
 }: {
-  bottle: Pick<DecisionLogItem["bottle"], "id" | "fullName">;
+  bottle: DecisionLogItem["bottle"];
 }) {
+  if (!bottle) {
+    return <span className="text-sm text-slate-400">Deleted Bottle</span>;
+  }
+
   return (
     <Link href={`/bottles/${bottle.id}`} className="text-sm underline">
       {bottle.fullName}

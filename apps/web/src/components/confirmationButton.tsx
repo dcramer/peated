@@ -1,6 +1,6 @@
 "use client";
 
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import ConfirmationDialog from "./confirmationDialog.client";
 
@@ -11,9 +11,20 @@ export default forwardRef<
     className?: string;
     disabled?: boolean;
     style?: any;
+    confirmationTitle?: string;
+    confirmationMessage?: ReactNode;
+    continueLabel?: string;
   }>
 >(function ConfirmationButton(
-  { onContinue, children, disabled, ...props },
+  {
+    onContinue,
+    children,
+    disabled,
+    confirmationTitle,
+    confirmationMessage,
+    continueLabel,
+    ...props
+  },
   ref,
 ) {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,6 +50,9 @@ export default forwardRef<
         onCancel={() => {
           setIsOpen(false);
         }}
+        title={confirmationTitle}
+        message={confirmationMessage}
+        continueLabel={continueLabel}
       />
     </button>
   );

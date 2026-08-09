@@ -49,9 +49,11 @@ export const incomingBottleDecisionLogs = pgTable(
     actorId: bigint("actor_id", { mode: "number" })
       .references(() => actors.id)
       .notNull(),
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
+    // Decision history outlives an invalid Bottle retired by an admin.
+    bottleId: bigint("bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+      { onDelete: "set null" },
+    ),
     // Retained compatibility field for safe migrations; do not use in new logic.
     legacyReleaseId: bigint("release_id", { mode: "number" }),
     createdBottle: boolean("created_bottle").default(false).notNull(),
