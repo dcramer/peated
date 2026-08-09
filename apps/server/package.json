@@ -57,7 +57,7 @@
     "jsonwebtoken": "^9.0.3",
     "jsx-email": "catalog:",
     "mime-types": "^3.0.2",
-    "nanoid": "^3.3.17",
+    "nanoid": "^5.1.16",
     "nodemailer": "^9.0.1",
     "openai": "^6.27.0",
     "pg": "catalog:",
