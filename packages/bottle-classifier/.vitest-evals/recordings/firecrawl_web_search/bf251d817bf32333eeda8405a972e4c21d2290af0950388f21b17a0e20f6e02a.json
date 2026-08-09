@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-08-09T05:58:26.567Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Harbor Ledger Batch 24 58.0 cask strength bourbon Stone Arch Distillery"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Harbor Ledger Batch 24 58.0 cask strength bourbon Stone Arch Distillery",
+    "summary": "The written content covered in this video - https://www.thespiritseducator.com/american-whiskey/port-cask-finished-bourbons-ryes-2024 00:44 ... ![Thumbnail (1920x1080)](https://i.ytimg.com/vi/c59wH_G8JHM/maxresdefault.jpg) # [Port Cask-Finished Bourbons & Ryes - 10 Recommendations You Can Actually Find (Non-Allocated)](https://www.youtube.com/watch?v=c59wH_G8JHM) **Visibility**: Public **Uploaded by**: [The Spirits Educator](https://www.youtube.com/@TheSpiritsEducator) **Uploaded at**: 2024-12-02 **Published at**: **Length**: 36:02 **Views**: 325 **Likes**: 6 **Category**: People & Blogs ## De",
+    "results": [
+      {
+        "title": "Port Cask-Finished Bourbons & Ryes - 10 Recommendations You Can ...",
+        "url": "https://www.youtube.com/watch?v=c59wH_G8JHM",
+        "domain": "youtube.com",
+        "description": "The written content covered in this video - https://www.thespiritseducator.com/american-whiskey/port-cask-finished-bourbons-ryes-2024 00:44 ...",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/c59wH_G8JHM/maxresdefault.jpg) # [Port Cask-Finished Bourbons & Ryes - 10 Recommendations You Can Actually Find (Non-Allocated)](htt"
+        ]
+      },
+      {
+        "title": "Bourbon | The Whisky Ledger",
+        "url": "https://whiskyledger.com/tag/bourbon/",
+        "domain": "whiskyledger.com",
+        "description": null,
+        "extraSnippets": [
+          "[Wild Turkey](http://www.wildturkeybourbon.com.au/) are probably best known for their easily accessible and affordable bourbons, things like the classic [Wild Turkey 101](http://ww"
+        ]
+      },
+      {
+        "title": "New Kentucky bourbon and gin releases from distilleries",
+        "url": "https://www.kentucky.com/lexgoeat/bourbon/article316641112.html",
+        "domain": "kentucky.com",
+        "description": "Bottled at cask strength of 120.4 proof and unfiltered, the 100 bottles will be available on site beginning Aug. 1.",
+        "extraSnippets": [
+          "Key Takeaways Key Takeaways AI-generated summary reviewed by our newsroom. [Read our AI Policy.](https://www.kentucky.com/news/nation-world/national/article280707640.html) * * * - "
+        ]
+      },
+      {
+        "title": "Founders' Cask Strength Series Straight Bourbon Whiskey",
+        "url": "https://smoothambler.com/founders-cask-strength-series-straight-bourbon-whiskey/",
+        "domain": "smoothambler.com",
+        "description": "With this Bourbon recipe, we add a modest amount of rye. CASK STRENGTH? ALWAYS Graham Cracker, Dark Chocolate, Cherry, Allspice",
+        "extraSnippets": [
+          "­ [Skip to content](https://smoothambler.com/founders-cask-strength-series-straight-bourbon-whiskey/#fl-main-content) # FOUNDERS’ ## CASK STRENGTH SERIES BOURBON MASHBILL \\#2 ![Smo"
+        ]
+      },
+      {
+        "title": "Ship Ironclad Whiskey",
+        "url": "https://www.ironcladdistillery.com/ship-old",
+        "domain": "ironcladdistillery.com",
+        "description": "Our own fully-aged proprietary four-grain mash bill bourbon whiskey. Notes of dried fig, raisin, leather and tobacco. 98 proof / $78.29 … ash Small Batch ...",
+        "extraSnippets": [
+          "Ship Ironclad Whiskey — Ironclad Distillery Co. [![Ironclad Distillery Co.](https://images.squarespace-cdn.com/content/v1/5a4ce44e51a5840a334ac5bb/1515269558923-0E4GZ9HG3VI3LKR68MO"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bf251d817bf32333eeda8405a972e4c21d2290af0950388f21b17a0e20f6e02a",
+    "mode": "auto"
+  }
+}

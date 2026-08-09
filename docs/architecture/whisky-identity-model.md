@@ -72,11 +72,15 @@ exact identity and additionally owns:
 This duplication is intentional. BottleGroup is the authority for shared
 edits, while Bottle remains the authority for exact reads.
 
-`bottler` is the named, market-facing bottler or release imprint for the
-product. It may point to the same Entity as `brand` or a producing distillery.
-Ownership, importer/distributor, and physical packing relationships alone do
-not establish the role. Leave it null when product-specific evidence does not
-establish it.
+`bottler` is the market-facing bottler or release imprint named for the product.
+It may point to the same Entity as `brand` or a producing distillery; a separate
+imprint is not required. Ownership, importing, distribution, and physical
+packing alone do not establish the role.
+
+During an audit, do not remove a populated bottler because the same Entity fills
+another role or because a source omits it. Remove it only when product evidence
+shows the assignment is wrong. Leave `bottler` null when classifying a product
+whose evidence does not establish the role.
 
 Observation-only facts by default include exact cask or barrel number, bottle
 number, outturn, retailer-exclusive wording, label notes, and unmodeled
@@ -178,6 +182,9 @@ attributes do not make a clear exact identity unresolved, while conflicting
 age, edition, year, marketed finish or exact cask code, single-cask, or
 cask-strength facts are strong evidence of distinct Bottles. Cask type, size,
 and fill metadata alone is not such a conflict.
+
+Change a populated exact field only with evidence for the same Bottle. A value
+from another batch, edition, year, or exact cask does not qualify.
 
 Grouping is a separate decision. Same-expression evidence may relate exact
 Bottles through a BottleGroup, but uncertain grouping leaves each Bottle in its

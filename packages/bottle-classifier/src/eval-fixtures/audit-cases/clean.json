@@ -6,7 +6,7 @@
     "audit": {
       "bottleId": 50101,
       "origin": "moderator",
-      "note": "Verify whether this ordinary official North Channel distillery bottling has any supported catalog gaps, including a distinct bottler."
+      "note": "Audit this existing Bottle against the available product evidence."
     },
     "context": {
       "currentBottle": {

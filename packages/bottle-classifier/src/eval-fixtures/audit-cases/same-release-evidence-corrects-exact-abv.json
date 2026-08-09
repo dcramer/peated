@@ -1,0 +1,108 @@
+{
+  "id": "audit-same-release-evidence-corrects-exact-abv",
+  "name": "audit: same-release evidence corrects exact ABV",
+  "scenario": "bottle_update",
+  "input": {
+    "audit": {
+      "bottleId": 60301,
+      "origin": "moderator"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 60301,
+        "fullName": "Harbor Ledger Batch 24 - 58.0% ABV - Cask Strength",
+        "brand": "Harbor Ledger",
+        "distillery": ["Stone Arch Distillery"],
+        "category": "bourbon",
+        "edition": "Batch 24",
+        "caskStrength": true,
+        "abv": 57.97,
+        "releaseYear": 2024,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 60301,
+          "fullName": "Harbor Ledger Batch 24 - 58.0% ABV - Cask Strength",
+          "groupId": 60301,
+          "shared": {
+            "name": "Harbor Ledger",
+            "statedAge": null,
+            "series": null,
+            "category": "bourbon",
+            "brand": {
+              "entityId": 603011,
+              "name": "Harbor Ledger"
+            },
+            "distillers": [
+              {
+                "entityId": 603012,
+                "name": "Stone Arch Distillery"
+              }
+            ],
+            "bottler": null
+          },
+          "exact": {
+            "edition": "Batch 24",
+            "statedAge": null,
+            "abv": 57.97,
+            "singleCask": null,
+            "caskStrength": true,
+            "vintageYear": null,
+            "releaseYear": 2024,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [],
+          "aliases": [],
+          "observations": [
+            {
+              "sourceType": "producer_factsheet",
+              "sourceKey": "harbor-ledger-batch-24-factsheet",
+              "sourceName": "Harbor Ledger Batch 24 factsheet",
+              "sourceUrl": "https://example.com/harbor-ledger/batch-24",
+              "rawText": "Harbor Ledger Batch 24, released in 2024, was bottled at 114.8 proof (57.4% ABV).",
+              "parsedIdentity": {
+                "edition": "Batch 24",
+                "releaseYear": 2024,
+                "abv": 57.4
+              },
+              "facts": null
+            }
+          ],
+          "imageSources": []
+        }
+      ]
+    }
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Paired generalized case proving that the conservative exact-field rule still permits a correction when product evidence identifies the same exact batch and release year. All names, ids, and URLs are fictional."
+  },
+  "expected": {
+    "summary": "The producer factsheet identifies the audited Batch 24 release and contradicts its stored ABV, supporting a correction to 57.4%.",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 60301,
+          "patch": {
+            "exact": {
+              "abv": 57.4
+            }
+          }
+        },
+        "rationale": "The product-specific producer factsheet names the same Batch 24 and 2024 release and states 114.8 proof, directly contradicting the stored ABV.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 60301
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}

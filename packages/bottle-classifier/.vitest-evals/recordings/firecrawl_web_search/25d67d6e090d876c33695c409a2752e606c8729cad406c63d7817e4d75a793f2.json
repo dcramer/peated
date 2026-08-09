@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-09T06:18:08.408Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Proof and Wood The Representative 58% ABV 4 year MGP bourbon"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Proof and Wood The Representative 58% ABV 4 year MGP bourbon",
+        "summary": "This corn-forward bourbon is aged for a minimum of four years, roughly equivalent to two congressional terms. Distilled in Indiana from a mash bill of 75% corn, ... The Representative is aged at least 4 years or 2 Congressional Terms. It is a classic small batch, approximately 20 barrels, MGP bourbon. I did recently pick up The Representative at Hokus Pokus, which is a four year old bourbon produced at MGP in Indiana and aged for four years (two Congressional terms as they put it). The Spirit Barrel proof straight bourbon whiskey distilled in Indiana (MGP) bill of 75% corn, 21% rye, 4% malted",
+        "results": [
+          {
+            "title": "Proof & Wood The Representative Straight Bourbon ...",
+            "url": "https://www.passionspirits.com/proof-wood-the-representative",
+            "domain": "passionspirits.com",
+            "description": "This corn-forward bourbon is aged for a minimum of four years, roughly equivalent to two congressional terms. Distilled in Indiana from a mash bill of 75% corn, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: Proof & Wood's The Representative : r/DMVWhisky",
+            "url": "https://www.reddit.com/r/DMVWhisky/comments/1qdvpfz/review_proof_woods_the_representative/",
+            "domain": "reddit.com",
+            "description": "The Representative is aged at least 4 years or 2 Congressional Terms. It is a classic small batch, approximately 20 barrels, MGP bourbon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Proof and Wood's The Representative Barrel Proof Straight ...",
+            "url": "https://whiskeyjar.blog/2021/11/15/proof-and-woods-the-representative-barrel-proof-straight-bourbon-whiskey/",
+            "domain": "whiskeyjar.blog",
+            "description": "I did recently pick up The Representative at Hokus Pokus, which is a four year old bourbon produced at MGP in Indiana and aged for four years (two Congressional terms as they put it).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Proof & Wood Representative Straight Bourbon Whiskey ...",
+            "url": "https://www.empirewine.com/liquor/proof-and-wood-representative-straight-bourbon-whiskey-4year-h53179/",
+            "domain": "empirewine.com",
+            "description": "The Spirit Barrel proof straight bourbon whiskey distilled in Indiana (MGP) bill of 75% corn, 21% rye, 4% malted barley Aged a minimum 4 years … 57.4% ABV (ABV ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Proof and Wood DC Collection",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/proof-and-wood-dc-collection",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "# Proof and Wood DC Collection\n### The Presidential Dram 4-Year-Old Barrel Proof Bourbon\n117.6 Proof (58.8% ABV)",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "25d67d6e090d876c33695c409a2752e606c8729cad406c63d7817e4d75a793f2",
+    "mode": "auto"
+  }
+}

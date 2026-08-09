@@ -1,0 +1,37 @@
+{
+  "writtenAt": "2026-08-09T06:21:59.292Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Proof and Wood\" \"The Representative\" 58.0% ABV bourbon"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Proof and Wood\" \"The Representative\" 58.0% ABV bourbon",
+        "summary": "Buy Proof And Wood Straight Bourbon Whiskey “The Representative” 750ml – rated 91 points. Ships immediately. Available online from SaratogaWine.com. Proof and Wood The Representative Straight Bourbon Whiskey - Barrel Proof, Proper No. Twelve, Provenance (distilled at Inchgower), 14 year old, 1990 vintage ...",
+        "results": [
+          {
+            "title": "Proof And Wood Straight Bourbon Whiskey \"The Representative\"",
+            "url": "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+            "domain": "saratogawine.com",
+            "description": "Buy Proof And Wood Straight Bourbon Whiskey “The Representative” 750ml – rated 91 points. Ships immediately. Available online from SaratogaWine.com.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Business suite | DramAtlas",
+            "url": "https://www.dramatlas.com/business",
+            "domain": "dramatlas.com",
+            "description": "Proof and Wood The Representative Straight Bourbon Whiskey - Barrel Proof, Proper No. Twelve, Provenance (distilled at Inchgower), 14 year old, 1990 vintage ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "23493530e623bf09cfa34ccde840d0565095edde2b37ea0a68f56f12d35a59c5",
+    "mode": "auto"
+  }
+}

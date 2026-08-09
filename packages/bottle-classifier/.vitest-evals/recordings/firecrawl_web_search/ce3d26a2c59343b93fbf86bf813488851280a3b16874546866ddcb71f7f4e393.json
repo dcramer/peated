@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-09T06:19:56.284Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Proof and Wood\" \"The Representative\" 58% bourbon"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Proof and Wood\" \"The Representative\" 58% bourbon",
+        "summary": "Proof and Wood DC Collection · The Presidential Dram 4-Year-Old Barrel Proof Bourbon · The Representative 4-Year-Old Barrel Proof Bourbon · The ... evidently, Proof and Wood have sent us some things to try. Wow, we got 'The Representative'. And 'The Senator'. Here's a smaller one ... Proof and Wood ~ 53.5% ~ « Crossborder Jackpot” ~ Blended. $37.00 · Puncher's ... The Representative ~ 57.3% ~ 4yr ~ Barrel Proof Straight Rye. $23.00 · The ... ... Proof and Wood Ventures in Bardstown, Kentucky. ... Other releases include: The Presidential Dram, The Justice, The Representative, and The ... The Wo",
+        "results": [
+          {
+            "title": "Proof and Wood DC Collection - Whiskey in my Wedding Ring",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/proof-and-wood-dc-collection",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "Proof and Wood DC Collection · The Presidential Dram 4-Year-Old Barrel Proof Bourbon · The Representative 4-Year-Old Barrel Proof Bourbon · The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review of the newest batch of Penelope Rio. Coming in at 98 proof ...",
+            "url": "https://www.instagram.com/reel/DWxTvesAKbt/",
+            "domain": "instagram.com",
+            "description": "evidently, Proof and Wood have sent us some things to try. Wow, we got 'The Representative'. And 'The Senator'. Here's a smaller one ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whiskey House 420 3rd Ave - James E Pepper ~ 53.7%%",
+            "url": "https://www.toasttab.com/local/order/thewhiskeyhousesd/item-james-e-pepper-537-barrel-proof-straight-bourbon_d9104a1a-2bd7-4da6-b5a3-51432d09edd7",
+            "domain": "toasttab.com",
+            "description": "Proof and Wood ~ 53.5% ~ « Crossborder Jackpot” ~ Blended. $37.00 · Puncher's ... The Representative ~ 57.3% ~ 4yr ~ Barrel Proof Straight Rye. $23.00 · The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Senator 6 Year Old Barrel Proof Straight Rye Whiskey",
+            "url": "https://wineandwhiskeyglobe.com/whiskey/tasting-note-the-senator-6-year-old-barrel-proof-straight-rye-whiskey/",
+            "domain": "wineandwhiskeyglobe.com",
+            "description": "... Proof and Wood Ventures in Bardstown, Kentucky. ... Other releases include: The Presidential Dram, The Justice, The Representative, and The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "South County Distillers chosen to represent Rhode Island in ...",
+            "url": "https://www.facebook.com/TheWesterlySun/posts/south-county-distillers-chosen-to-represent-rhode-island-in-nationwide-bourbon-b/1480757060754894/",
+            "domain": "facebook.com",
+            "description": "The World Whisky Awards have crowned The Representative as Best Bourbon of 2022. ... Proof and Wood. 75% corn, 21% rye and 4% malted barley ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ce3d26a2c59343b93fbf86bf813488851280a3b16874546866ddcb71f7f4e393",
+    "mode": "auto"
+  }
+}

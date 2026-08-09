@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-09T06:22:04.320Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+    "focus": "The Representative product's age, barrel-proof/cask-strength designation, and ABV."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Representative product's age, barrel-proof/cask-strength designation, and ABV.",
+    "summary": "Alcohol by Vol: 58.0%\n\nBarrel proof straight bourbon whiskey distilled in Indiana (MGP) and bottled in Bardstown, KY, by Proof and Wood · Mash bill of 75% corn, 21% rye, 4% malted barley · Aged a minimum 4 years · Small batch, blended from approximately 20 barrels · Nose of tree bark and crème pâtissière; browned butter and violet on the mid-palate with an earthy finish that hints of licorice root, tobacco, and bitter herbs · Non-chill filtered; 57.4% ABV (ABV may vary batch to batch)\n\nDistilled in Indiana from the same mash bill as Proof and Wood’s Deadwood Bourbon, this distinct and sultry bourbon is a must-try for those that love barrel-strength expressions.",
+    "results": [
+      {
+        "title": "Proof And Wood Straight Bourbon Whiskey \"The Representative\" 750ml - Buy online at SaratogaWine.com",
+        "url": "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+        "domain": "saratogawine.com",
+        "description": "Buy Proof And Wood Straight Bourbon Whiskey “The Representative” 750ml – rated 91 points. Ships immediately. Available online from SaratogaWine.com.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4df190f0b08432a72c043a7e0551884f7b014ee373d8740f9ee419a594b2d4e6",
+    "mode": "auto"
+  }
+}

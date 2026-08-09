@@ -1,0 +1,90 @@
+{
+  "id": "audit-independent-bottler-may-equal-brand",
+  "name": "audit: independent bottler may use the Brand entity",
+  "scenario": "clean",
+  "input": {
+    "audit": {
+      "bottleId": 60101,
+      "origin": "moderator"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 60101,
+        "fullName": "Keel and Cooper Harbor Reserve - 56.2% ABV",
+        "brand": "Keel and Cooper",
+        "bottler": "Keel and Cooper",
+        "distillery": ["Arrow Gap Distillery"],
+        "category": "bourbon",
+        "statedAge": 5,
+        "abv": 56.2,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 60101,
+          "fullName": "Keel and Cooper Harbor Reserve - 56.2% ABV",
+          "groupId": 60101,
+          "shared": {
+            "name": "Harbor Reserve",
+            "statedAge": 5,
+            "series": null,
+            "category": "bourbon",
+            "brand": {
+              "entityId": 601011,
+              "name": "Keel and Cooper"
+            },
+            "distillers": [
+              {
+                "entityId": 601012,
+                "name": "Arrow Gap Distillery"
+              }
+            ],
+            "bottler": {
+              "entityId": 601011,
+              "name": "Keel and Cooper"
+            }
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": 56.2,
+            "singleCask": null,
+            "caskStrength": true,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [],
+          "aliases": [],
+          "observations": [
+            {
+              "sourceType": "producer_factsheet",
+              "sourceKey": "harbor-reserve-factsheet",
+              "sourceName": "Keel and Cooper Harbor Reserve factsheet",
+              "sourceUrl": "https://example.com/keel-and-cooper/harbor-reserve",
+              "rawText": "Harbor Reserve was distilled at Arrow Gap Distillery, then selected, blended, and bottled by independent bottler Keel and Cooper.",
+              "parsedIdentity": null,
+              "facts": {
+                "distiller": "Arrow Gap Distillery",
+                "bottler": "Keel and Cooper"
+              }
+            }
+          ],
+          "imageSources": []
+        }
+      ]
+    }
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Generalized regression for a sourced release where one Entity is correctly assigned as both Brand and independent bottler. All names, ids, and URLs are fictional."
+  },
+  "expected": {
+    "summary": "The Bottle's Brand, bottler, and distillery relationships agree with the product-specific evidence; sharing one Entity between Brand and bottler is valid here.",
+    "proposedOperations": [],
+    "findings": []
+  }
+}

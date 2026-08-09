@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-09T06:20:01.383Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.whiskeyinmyweddingring.com/reviews/proof-and-wood-dc-collection",
+    "focus": "The Representative exact release: age, category, ABV/proof, barrel-proof trait, producer and bottler."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Representative exact release: age, category, ABV/proof, barrel-proof trait, producer and bottler.",
+    "summary": "The Representative.jpg\n\nThe Representative 4-Year-Old Barrel Proof Bourbon\n\nAge: 4 Years Old\n\n114.8 Proof (57.4% ABV)",
+    "results": [
+      {
+        "title": "Proof and Wood DC Collection",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/proof-and-wood-dc-collection",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": "These are my tasting notes for the DC Collection from Proof and Wood. Dave Schmier of Proof and Wood Spirits joined me on the podcast recently ( listen here! ) - he was a fantastic guest who went into detail on all of these whiskies as well as the  Vertigo ,  100 Seasons ,  The Stranger Polish Rye ,,",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6812a913f63ea785e9bfff7c96802ef9926ab56cba8eb1352f632058c448711b",
+    "mode": "auto"
+  }
+}

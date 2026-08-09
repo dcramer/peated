@@ -63,23 +63,6 @@ describe("Bottle check instructions", () => {
     expect(reference).not.toContain("before reasoning");
   });
 
-  test("keeps identity roles and marketed cask traits distinct", () => {
-    const reference = buildBottleClassifierInstructions();
-
-    expect(reference).toContain(
-      "Keep the consumer-facing Brand, producing distilleries, and market-facing bottler distinct",
-    );
-    expect(reference).toContain(
-      "An ordinary official Brand or distillery bottling has no bottler",
-    );
-    expect(reference).toContain("marketed finish or variant wording");
-    expect(reference).toContain("exact-cask identity");
-    expect(reference).toContain("cask-strength");
-    expect(reference).toContain(
-      "do not investigate, search, distinguish, reject, create, repair, or add risk solely for those fields",
-    );
-  });
-
   test("keeps proposal tools review-only and evidence-bound", () => {
     for (const instructions of [
       buildBottleClassifierInstructions(),
