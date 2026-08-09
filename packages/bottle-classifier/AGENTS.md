@@ -6,6 +6,7 @@ Before changing classifier behavior, read:
 
 - `packages/bottle-classifier/README.md`
 - `docs/architecture/bottle-classifier.md`
+- `docs/architecture/bottle-classifier-glossary.md`
 - `docs/architecture/whisky-identity-model.md`
 - `docs/policies/agent-design.md`
 - `docs/policies/evals.md`
@@ -42,7 +43,7 @@ Before changing classifier behavior, read:
 ## Bottle Identity
 
 - Every marketed release is one independently complete Bottle. The classifier
-  never selects a parent Bottle, BottleGroup, or release-family owner.
+  never selects a Bottle Group or release-family owner.
 - Existing-Bottle identification and full canonical classification are separate
   contracts. `create_bottle` and `repair_bottle` require the full evidence bar.
 - False-positive existing matches are worse than conservative creation or

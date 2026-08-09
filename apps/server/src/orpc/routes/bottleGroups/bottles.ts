@@ -12,8 +12,7 @@ export default procedure
     method: "GET",
     path: "/bottle-groups/{group}/bottles",
     summary: "List related bottles",
-    description:
-      "List the independently complete concrete Bottles in one BottleGroup",
+    description: "List the independently complete Bottles in one Bottle Group",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottleGroupBottles",

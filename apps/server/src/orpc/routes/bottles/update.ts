@@ -18,7 +18,7 @@ const InputSchema = ConcreteBottleUpdateInputSchema.extend({
 
 /**
  * Strict moderator HTTP adapter that delegates every shared or exact mutation
- * to the canonical concrete-Bottle service and returns the updated Bottle.
+ * to the canonical Bottle service and returns the updated Bottle.
  */
 export default procedure
   .use(requireMod)

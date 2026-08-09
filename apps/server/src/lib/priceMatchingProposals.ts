@@ -949,7 +949,7 @@ function buildStorePriceMatchConcreteInput(
 ): ConcreteBottleCreateInput {
   if (decision.action !== "create_new" || decision.proposedBottle === null) {
     throw new Error(
-      "Price match decision does not contain one concrete Bottle creation input.",
+      "Price match decision does not contain one Bottle creation input.",
     );
   }
 
@@ -1951,7 +1951,7 @@ export async function applyStorePriceBottleRepairFromProposal({
     const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
       userId: user.id,
     });
-    // The concrete Bottle writer acquires and validates the active Bottle graph
+    // The Bottle writer acquires and validates the active Bottle graph
     // before the proposal and its consumers are locked below.
     const updateManifest = await updateConcreteBottleInTransaction(tx, {
       bottleId: repairBottleId,

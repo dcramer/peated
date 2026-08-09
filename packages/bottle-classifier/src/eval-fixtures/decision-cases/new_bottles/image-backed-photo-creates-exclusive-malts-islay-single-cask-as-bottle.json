@@ -96,7 +96,7 @@
       "releaseId": 407,
       "createsBottle": true,
       "createsRelease": true,
-      "summary": "Production photo identification created bottle 44274 as the generic parent The Exclusive Malts Islay, then created release 407 with the observed 8-year age, 2007 vintage, 2016 release year, 57.1% ABV, cask-strength flag, and uploaded image. The parent bottle page therefore displayed null age and null vintage/ABV despite the label-specific identity being the only useful marketed form."
+      "summary": "Production photo identification created bottle 44274 as the generic The Exclusive Malts Islay row, then created release 407 with the observed 8-year age, 2007 vintage, 2016 release year, 57.1% ABV, cask-strength flag, and uploaded image. The generic Bottle page therefore displayed null age and null vintage/ABV despite the label-specific identity being the only useful marketed form."
     },
     "notes": "The checked-in fixture image is the observed source. Text search did not find a reliable public product page for this exact cask, so the fixture preserves the photo itself as verification rather than inventing external evidence. The label reads The Exclusive Malts Scotch Single Malt Whisky, 2007, aged 8 years, distilled at an Islay distillery, Islay, distilled 17 October 2007, bottled May 2016, cask no. 1661, one of 312 bottles, 750ml, 57.1%, cask strength, natural colour. The desired outcome keeps this one-off independent bottling as a single canonical bottle instead of creating a weak generic parent plus one child release."
   },

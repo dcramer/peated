@@ -1,7 +1,7 @@
 /**
  * Confirms signed photo-identification create proposals without rerunning AI.
  * The route owns token/user validation, pending-upload ownership, durable
- * concrete Bottle creation, and API-facing conflict mapping.
+ * Bottle creation, and API-facing conflict mapping.
  */
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";

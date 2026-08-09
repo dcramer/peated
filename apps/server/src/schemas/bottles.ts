@@ -37,7 +37,7 @@ export const BottleSchema = z.object({
     .trim()
     .nullable()
     .default(null)
-    .describe("Optional edition label for this concrete bottle"),
+    .describe("Optional edition label for this Bottle"),
   statedAge: z
     .number()
     .min(0)

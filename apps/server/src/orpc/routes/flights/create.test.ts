@@ -105,7 +105,7 @@ describe("POST /flights", () => {
       name: "Zulu release",
     });
     if (laterBottle.groupId === null) {
-      throw new Error("Bottle group fixture not found");
+      throw new Error("Bottle Group fixture not found");
     }
     const [firstBottle] = await db
       .insert(bottles)

@@ -1,9 +1,13 @@
 # Bottle Classifier
 
-This spec defines the reviewed boundaries for turning a raw bottle reference
+This spec defines the reviewed boundaries for turning a raw Bottle Reference
 into Peated bottle identity evidence or a Peated DB outcome. Price matching,
 review ingestion, repair tools, and other consumers should use these boundaries
 instead of redoing identity reasoning.
+
+Use the terms in the
+[Bottle Classifier Glossary](./bottle-classifier-glossary.md) for classifier
+prompts, schemas, code, documentation, and user text.
 
 ## Contract
 
@@ -11,7 +15,7 @@ The package has four distinct contracts:
 
 - `extractBottleReferenceIdentity(...)`: reads bottle identity facts from image
   or text. It does not decide whether the facts are canonical Peated identity.
-- `identifyExistingBottleReference(...)`: proposed match-only local
+- `identifyExistingBottleReference(...)`: match-only local
   identification. It can return only `match` or `no_match`, must use local
   Peated candidates, and must not create, repair, or infer missing canonical
   identity.
@@ -19,7 +23,7 @@ The package has four distinct contracts:
   create, repair, or decline after considering local candidates, entity
   resolution, and web evidence when required.
 - `auditBottle(...)`: checks one existing Bottle and returns a summary,
-  proposed operations, and non-executable findings. It does not return another
+  Suggested Changes, and non-executable findings. It does not return another
   identity decision.
 
 `classifyBottleReference(...)` accepts a generic reference:
@@ -84,11 +88,11 @@ A Bottle check is persisted workflow state for a server-owned intent:
   Actionable store-price checks enter the Audits inbox only after the
   linked primary listing decision is complete.
 - `audit_bottle` reviews an existing Bottle from a moderator request or a
-  post-user-creation job. Its result is a narrative summary, proposed
-  operations, and findings; it has no redundant structured conclusion.
+  post-user-creation job. Its result is a narrative summary, Suggested Changes,
+  and findings; it has no redundant structured conclusion.
 
-A proposed operation is an agent suggestion with a typed input, rationale, and
-evidence references. V1 supports exactly four:
+A Suggested Change is an untrusted catalog change from an agent. It has a typed
+input, rationale, and evidence references. V1 supports exactly four:
 
 - `update_bottle`
 - `merge_bottles`
@@ -99,22 +103,22 @@ The agent has bounded read-only Bottle, BottleGroup, Entity, local-search, and
 focused web-evidence tools. It cannot mutate the catalog. Proposals may refer
 only to inspected resources and collected evidence. Unsupported or unresolved
 work remains a finding instead of becoming an invented operation, but only when
-positive evidence establishes a real catalog defect that remains after proposed
-operations apply. Uncertainty about whether an underspecified, generic, or
+positive evidence establishes a real catalog defect that remains after all
+Suggested Changes apply. Uncertainty about whether an underspecified, generic, or
 family row is intentional is not a finding; no operations and no findings is a
 valid reviewed result.
 
-The server prepares each proposal independently as a review operation. A review
-operation adds the live diff, bounded impact, warnings, state token, and either
-`pending_review` or a mechanical blocking reason. One blocked proposal does not
-hide valid siblings, and operations are independent rather than an ordered
-plan.
+The server prepares each Suggested Change independently as a Review Operation.
+A Review Operation adds the live diff, bounded impact, warnings, state token,
+and either `pending_review` or a mechanical blocking reason. One blocked
+Suggested Change does not hide valid siblings. Review Operations are independent
+and are not an ordered plan.
 
 An `update_bottle` cannot target a Bottle that is also a `merge_bottles` source
 in the same batch. The merge retires the source and subsumes correction of that
 row; proposing both would be redundant and dependent.
 
-Proposed catalog operations always require explicit moderator approval.
+Suggested Changes always require explicit moderator approval.
 This remains true for a high-confidence result and for checks created after an
 end-user save. Only the existing add-Bottle classification may
 auto-apply under its established policy. Approval locks and revalidates the
@@ -125,7 +129,7 @@ immutable.
 
 Moderators may remove an entire operation with a structured rejection reason.
 For `update_bottle` and `update_entity`, they may also strike out direct patch
-fields before approval. The original classifier proposal remains immutable for
+fields before approval. The original Suggested Change remains immutable for
 audit history, while the operation records the excluded field paths and
 executes only the remaining patch after the original state token is
 revalidated. At least one field must remain. Merge operations are all-or-nothing
@@ -170,7 +174,7 @@ audit operation and finding precision. Measure:
 
 - intent accuracy and schema-valid output;
 - authoritative reference-decision and canonical/collected grounding gates;
-- exact proposed operation and finding sets, with missing and extra reference
+- exact Suggested Change and finding sets, with missing and extra reference
   entries reported diagnostically and exact audit repair gating;
 - reviewer rejection/correction and time to disposition;
 - stale, failed, retry, and reconciliation outcomes;
@@ -188,13 +192,13 @@ These measurements guide classifier and review-workflow improvements; a schema
 existing in the database is not itself a quality measurement.
 
 Run `pnpm cli classifier rollout-report --days 30` for the durable rollout
-inputs. The report counts accepted and rejected proposals separately and labels
+inputs. The report counts accepted and rejected Suggested Changes separately and labels
 `wrong_target`, `wrong_change`, and `insufficient_evidence` as quality
-rejections; it does not claim that a rejected proposal was corrected. Counts are
+rejections; it does not claim that a rejected Suggested Change was corrected. Counts are
 broken down by check intent, origin, and operation type. Review time runs from
 check completion to operation review. Stale and failure rates use all operations
 that reached approval or execution as their denominator; blocked, pending, and
-rejected proposals are not execution attempts. The report includes measurement
+rejected Suggested Changes are not execution attempts. The report includes measurement
 coverage, and malformed persisted telemetry fails reporting instead of being
 treated as zero.
 
@@ -269,16 +273,16 @@ The pipeline is:
    code references.
 5. Resolve local brand, bottler, and distillery entities.
 6. Run one bounded classifier agent loop with local search, Entity search,
-   focused web search, context tools, and four non-mutating proposal tools.
+   focused web search, context tools, and four non-mutating Suggested Change tools.
    The agent decides when web evidence is needed; the runtime does not search
    before the agent or delegate web interpretation to another model.
    Deterministic resolution, such as an SMWS code, is supplied as an identity
    anchor rather than bypassing the agent.
 7. The reference agent returns the strict authoritative decision and findings.
-   Successful proposal-tool calls are collected by runtime and attached as
+   Successful Suggested Change tool calls are collected by runtime and attached as
    `proposedOperations`; the model does not echo operations in final output.
-8. Validate and finalize the decision, then hand each collected proposal to
-   server preparation independently. A proposal tool accepts work only when its
+8. Validate and finalize the decision, then hand each Suggested Change to
+   server preparation independently. A Suggested Change tool accepts work only when its
    payload is canonical, its existing targets were inspected, its evidence was
    collected, it is not an exact duplicate, and the per-run ceiling is not
    exceeded. The tools never mutate, approve, order, replace, or withdraw work.
@@ -286,25 +290,25 @@ The pipeline is:
 With `candidateExpansion: initial_only`, full classification omits Bottle,
 Entity, and web search but retains Bottle and Entity context tools for ids the
 agent already knows. Local match-only identification receives neither context
-nor proposal tools.
+nor Suggested Change tools.
 
 Existing-Bottle audits reuse the full reference evidence preparation: public
 label extraction, initial Bottle candidates, Entity resolution, deterministic
-identity anchors, the focused-web budget, and the same read/proposal tools. The
+identity anchors, the focused-web budget, and the same read and Suggested Change tools. The
 audited Bottle and its complete context are preloaded, then one bounded audit
 agent loop compares the authoritative marketed identity with the stored Bottle.
 Its strict final output remains only a summary and findings, without a redundant
 reference decision.
 
 Ignored references do not run the agent. Local match-only identification stays
-separate and does not receive catalog proposal tools.
+separate and does not receive Suggested Change tools.
 
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
 
 ### Local Identification
 
-The proposed match-only local identification pipeline is:
+The match-only local identification pipeline is:
 
 1. Accept already-extracted identity and image/text evidence.
 2. Retrieve local Bottle candidates.
@@ -382,7 +386,7 @@ Cask No. 285` / `Cask No. 285`) are present, for example composing `1.285`
   SMWS rows
 - derive the rough distillery/category from the curated SMWS code table when the
   code prefix is present
-- carry a visible or extracted subtitle into the create proposal display name,
+- carry a visible or extracted subtitle into the Create Bottle display name,
   for example `95.71 Prepare for Winter`, while keeping the code as the match
   anchor
 
@@ -433,7 +437,7 @@ there against this boundary:
 Use the agent for:
 
 - source interpretation and reliability
-- stable proposed expression versus structured exact-Bottle fields
+- stable suggested expression versus structured exact-Bottle fields
 - source fact versus canonical identity
 - over-specific candidate detection
 - supportive, weak, conflicting, or unnecessary web-evidence judgment
@@ -520,16 +524,16 @@ do not encode `caskType`, `caskSize`, or `caskFill` as classifier requirements.
 Missing unencoded optional enrichment can be tolerated; wrong required identity
 fields should fail.
 Reference and audit fixtures exercise the same single agent loop and four
-proposal tools used by production Bottle checks. On a replay cache hit the eval
+Suggested Change tools used by production Bottle checks. On a replay cache hit the eval
 harness does not invoke the underlying web tool, so replay does not consume the
 in-process web-query budget; live runs remain the budget authority.
 
 For `resolve_reference`, the authoritative identity decision and
 canonical/collected grounding are gating. Exact operation and finding sets,
 including missing and extra entries, are reported by named informational judges;
-a fixture cannot prove that an otherwise supported proposal is harmful merely by
+a fixture cannot prove that an otherwise supported Suggested Change is harmful merely by
 omitting it. This does not turn opportunistic cleanup into a requirement for
-every reference, and every proposal still requires moderator approval before
+every reference, and every Suggested Change still requires moderator approval before
 mutation. For `audit_bottle`, exact operations, findings, and required evidence
 are gating because active repair investigation is the intent.
 
@@ -564,6 +568,6 @@ Keep responsibilities narrow:
 - `apps/server/src/agents/bottleClassifier/service.ts`: server adapter wiring
 
 `classifyBottleReference` means the full reviewed pipeline.
-`identifyExistingBottleReference` means a proposed match-only local
+`identifyExistingBottleReference` means a match-only local
 identification pipeline.
 `runBottleClassifierAgent` means only the raw LLM/tool pass.

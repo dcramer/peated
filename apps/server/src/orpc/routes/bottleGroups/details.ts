@@ -10,7 +10,7 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottle-groups/{group}",
-    summary: "Get bottle group details",
+    summary: "Get Bottle Group details",
     description:
       "Retrieve one stable BottleGroup identity and its aggregate statistics",
     spec: (spec) => ({

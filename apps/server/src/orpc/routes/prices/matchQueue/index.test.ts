@@ -2363,9 +2363,7 @@ describe("price match queue", () => {
     });
   });
 
-  test("creates one concrete Bottle with release-owned fields", async ({
-    fixtures,
-  }) => {
+  test("creates one Bottle with release-owned fields", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Creation Brand" });
     const site = await fixtures.ExternalSiteOrExisting({ type: "astorwines" });

@@ -231,7 +231,7 @@ describe("Audit review action routes", () => {
       intent: "audit_bottle",
       input: { bottleId: bottle.id, origin: "moderator" },
       result: {
-        summary: "The Bottle group needs manual review.",
+        summary: "The Bottle Group needs manual review.",
         proposedOperations: [],
         findings: [
           {

@@ -60,7 +60,7 @@ export function buildBottleInputFromProposedBottle(
 }
 
 /**
- * Maps the classifier's one create action to independent concrete Bottle
+ * Maps the classifier's one create action to independent Bottle
  * creation. Group assignment is automatic; classifier output never selects a
  * parent or existing group.
  */

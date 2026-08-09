@@ -349,7 +349,7 @@ describe("Bottle check persistence", () => {
     ).rejects.toThrow("does not belong to price");
   });
 
-  test("prepares and inserts proposed operations at the persistence boundary", async ({
+  test("prepares and inserts Suggested Changes at the persistence boundary", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();

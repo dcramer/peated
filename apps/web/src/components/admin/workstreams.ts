@@ -24,7 +24,7 @@ export const ADMIN_WORKSTREAMS: AdminWorkstream[] = [
     pageTitle: "Audits",
     sidebarLabel: "Audits",
     summary:
-      "Review catalog changes and findings proposed by Bottle and incoming-listing audits.",
+      "Review Suggested Changes and findings from Bottle and incoming-listing audits.",
     whenToUse:
       "Use this when an audit found catalog work that still needs approval, rejection, retry, or closure.",
   },

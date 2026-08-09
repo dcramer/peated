@@ -46,7 +46,7 @@ the Bottle and action before any tasting is saved.
 ## Identity And Classification
 
 The [Whisky Identity Model](../architecture/whisky-identity-model.md) governs
-every result. Photo resolution identifies one concrete Bottle, never a
+every result. Photo resolution identifies one Bottle, never a
 BottleGroup or a legacy Bottle/BottleRelease pair.
 
 Image extraction produces evidence rather than catalog authority. OCR, vision,

@@ -26,7 +26,7 @@
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
     "start": "dotenv -e .env.local -- turbo start",
     "typecheck": "turbo typecheck",
-    "lint": "github-actionlint && oxlint . && pnpm ast-grep:lint",
+    "lint": "github-actionlint && oxlint . && pnpm ast-grep:lint && pnpm --filter @peated/bottle-classifier run terms:check",
     "ast-grep:lint": "ast-grep scan",
     "ast-grep:test": "ast-grep test --skip-snapshot-tests",
     "knip": "knip --include files,dependencies,devDependencies,optionalPeerDependencies,unlisted,binaries,unresolved,catalog,catalogReferences",

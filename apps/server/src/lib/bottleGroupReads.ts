@@ -91,7 +91,7 @@ function bottleOrderBy(sort: BottleGroupBottleSort): SQL<unknown>[] {
 
 export class BottleGroupNotFoundError extends Error {
   constructor(public readonly groupId: number) {
-    super(`Bottle group not found (groupId=${groupId}).`);
+    super(`Bottle Group not found (groupId=${groupId}).`);
   }
 }
 

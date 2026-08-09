@@ -115,7 +115,7 @@ function materializeTargetBottle({
 /**
  * Plans or applies one canonical shared repair per BottleGroup. Applied edits
  * validate the previewed shared authority under the canonical group lock and
- * fan out complete identity materialization to every concrete Bottle member.
+ * fan out complete identity materialization to every Bottle member.
  */
 export async function repairBottleBrandDistilleryAssignments({
   bottleIds = [],

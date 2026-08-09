@@ -137,7 +137,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
             <TextAreaField
               name="note"
               label="Optional context"
-              helpText="The audit is read-only. Any proposed catalog changes will require separate admin approval."
+              helpText="The audit is read-only. Each Suggested Change requires separate admin approval."
               onChange={(event) => setNote(event.target.value)}
               placeholder="What looks wrong?"
               rows={4}

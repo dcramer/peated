@@ -60,7 +60,7 @@ describe("GET /bottles/:bottle/similar", () => {
     );
   });
 
-  test("excludes releases from the same Bottle group", async ({ fixtures }) => {
+  test("excludes releases from the same Bottle Group", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ name: "Release Family Brand" });
     const distiller = await fixtures.Entity({
       name: "Release Family Distiller",

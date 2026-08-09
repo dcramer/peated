@@ -1,5 +1,5 @@
 /**
- * Runtime contracts for concrete Bottle creation and moderator patching. Patch
+ * Runtime contracts for Bottle creation and moderator patching. Patch
  * schemas preserve omitted fields so service code can distinguish them from null.
  */
 import { BottleInputSchema } from "@peated/server/schemas";
