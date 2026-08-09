@@ -6,7 +6,7 @@ import {
   deriveAutomationTier,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
 import { runBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
-import { identifyExistingBottleReference } from "@peated/server/agents/bottleClassifier/identifyExistingBottleReference";
+import { findExactAliasBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactAliasBottleCandidate";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -447,7 +447,6 @@ function logPhotoIdentificationOutcome({
   file,
   referenceName,
   imageEvidence,
-  localIdentification,
   classification,
   diagnostics,
   suggestedNextStep,
@@ -458,7 +457,6 @@ function logPhotoIdentificationOutcome({
   file: Blob;
   referenceName: string;
   imageEvidence: z.infer<typeof PhotoIdentificationSchema>["imageEvidence"];
-  localIdentification: PhotoIdentificationClassification;
   classification: PhotoIdentificationClassification;
   diagnostics: z.infer<typeof PhotoIdentificationDiagnosticsSchema>;
   suggestedNextStep: z.infer<typeof PhotoIdentificationSuggestedNextStepEnum>;
@@ -483,10 +481,6 @@ function logPhotoIdentificationOutcome({
         imageEvidence.photoSuitability.suitableAsTastingImage,
       "photo_identification.suitable_as_bottle_image":
         imageEvidence.photoSuitability.suitableAsBottleImage,
-      ...getClassificationLogAttributes(
-        "photo_identification.local",
-        localIdentification,
-      ),
       ...getClassificationLogAttributes(
         "photo_identification.final",
         classification,
@@ -660,12 +654,13 @@ export async function identifyPendingImage({
         extractedIdentity,
         imageEvidence,
       };
-      const localIdentification =
-        await identifyExistingBottleReference(classificationInput);
+      const exactAliasCandidate = await findExactAliasBottleCandidate(
+        classificationInput.reference.name,
+      );
       const classificationInputWithCandidates = {
         ...classificationInput,
-        ...(localIdentification.artifacts.candidates.length > 0
-          ? { initialCandidates: localIdentification.artifacts.candidates }
+        ...(exactAliasCandidate
+          ? { initialCandidates: [exactAliasCandidate] }
           : {}),
       };
       const classificationRun = await runBottleReference(
@@ -692,15 +687,11 @@ export async function identifyPendingImage({
         "photo_identification.image_evidence_summary":
           diagnostics.extraction.summary ?? "none",
         "photo_identification.initial_candidate_count":
-          localIdentification.artifacts.candidates.length,
+          exactAliasCandidate === null ? 0 : 1,
         "photo_identification.final_candidate_count":
           classification.artifacts.candidates.length,
         "photo_identification.suggested_next_step": suggestedNextStep,
         ...getImageEvidenceFieldAttributes(imageEvidence),
-        ...getClassificationLogAttributes(
-          "photo_identification.local",
-          localIdentification,
-        ),
         ...getClassificationLogAttributes(
           "photo_identification.final",
           classification,
@@ -709,7 +700,6 @@ export async function identifyPendingImage({
 
       return {
         imageEvidence,
-        localIdentification,
         classification,
         modelMetadata: classificationRun.modelMetadata,
         referenceName,
@@ -797,7 +787,6 @@ export default procedure
 
     const {
       imageEvidence,
-      localIdentification,
       classification,
       referenceName,
       diagnostics,
@@ -810,7 +799,6 @@ export default procedure
       file,
       referenceName,
       imageEvidence,
-      localIdentification,
       classification,
       diagnostics,
       suggestedNextStep,

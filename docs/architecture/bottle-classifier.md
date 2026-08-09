@@ -11,14 +11,10 @@ prompts, schemas, code, documentation, and user text.
 
 ## Contract
 
-The package has four distinct contracts:
+The package has three distinct contracts:
 
 - `extractBottleReferenceIdentity(...)`: reads bottle identity facts from image
   or text. It does not decide whether the facts are canonical Peated identity.
-- `identifyExistingBottleReference(...)`: match-only local
-  identification. It can return only `match` or `no_match`, must use local
-  Peated candidates, and must not create, repair, or infer missing canonical
-  identity.
 - `classifyBottleReference(...)`: full reviewed classification. It can match,
   create, repair, or decline after considering local candidates, entity
   resolution, and web evidence when required.
@@ -289,8 +285,7 @@ The pipeline is:
 
 With `candidateExpansion: initial_only`, full classification omits Bottle,
 Entity, and web search but retains Bottle and Entity context tools for ids the
-agent already knows. Local match-only identification receives neither context
-nor Suggested Change tools.
+agent already knows.
 
 Existing-Bottle audits reuse the full reference evidence preparation: public
 label extraction, initial Bottle candidates, Entity resolution, deterministic
@@ -300,29 +295,19 @@ agent loop compares the authoritative marketed identity with the stored Bottle.
 Its strict final output remains only a summary and findings, without a redundant
 reference decision.
 
-Ignored references do not run the agent. Local match-only identification stays
-separate and does not receive Suggested Change tools.
+Ignored references do not run the agent.
 
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
 
-### Local Identification
+### Exact Alias Candidate Preflight
 
-The match-only local identification pipeline is:
-
-1. Accept already-extracted identity and image/text evidence.
-2. Retrieve local Bottle candidates.
-3. Return a strict deterministic match only for an unambiguous literal stored
-   alias or other closed-form local id assertion.
-4. Otherwise run a local-identification agent with local bottle search tools
-   only.
-5. Return `match` only when an existing Bottle safely covers the
-   marketed identity; otherwise return `no_match`.
-
-Local identification must not use web search, create or repair Bottles, or
-normalize a missing Bottle into existence.
-If the caller needs those outcomes, it should fall through to full
-classification.
+A caller can look up one unambiguous literal stored alias before full
+classification. The lookup returns a Bottle candidate as deterministic evidence.
+It does not return an identity decision and does not call a model. The caller
+passes the candidate to `classifyBottleReference(...)`, which remains the only
+model-based identification pass. When no exact alias exists, the full classifier
+retrieves local candidates through its normal adapter.
 
 ## Determinism
 
@@ -335,7 +320,7 @@ Deterministic code is allowed for closed-form behavior:
 - the code-derived automation tier (`deriveAutomationTier`), which routes an
   automated decision to review or auto from action risk plus structured evidence
 - exact identity anchors such as SMWS bottle codes
-- unambiguous literal stored alias lookup for match-only local identification
+- unambiguous literal stored alias lookup for classifier candidate seeding
 - direct field contradictions, such as an extracted brand, category, distillery,
   stated age, ABV, vintage year, release year, cask-strength or single-cask
   flag, expression, or edition
@@ -495,11 +480,6 @@ the stable prompt or review policy rather than only in tool prose.
 Add source-specific tools only when they return materially better structured
 evidence than general web search and preserve the same trust boundary.
 
-A local-identification agent should have a narrower tool set: local bottle
-search, and entity search only when it materially improves matching. It should
-not have web-search tools because it is not allowed to create, repair, or assert
-new canonical identity.
-
 ## Identity Scope
 
 `identityScope = product` is the default complete marketed Bottle identity.
@@ -537,11 +517,9 @@ every reference, and every Suggested Change still requires moderator approval be
 mutation. For `audit_bottle`, exact operations, findings, and required evidence
 are gating because active repair investigation is the intent.
 
-Local-identification evals should be scored separately from full
-classification evals. They should cover exact alias matches, safe non-exact
-local matches, ambiguous local candidates, missing local bottles, and cases that
-require full classification. A local-identification eval must fail if the result
-creates, repairs, searches the web, or matches an ambiguous candidate.
+Full-classification evals own match quality and candidate recall. Server
+integration tests prove that an exact alias becomes an initial candidate and
+that photo identification invokes only one classifier run.
 
 Production-miss evals must preserve the observed reference, URL, extracted
 identity, current assignment, local candidates, and failed outcome. Verify the
@@ -568,6 +546,6 @@ Keep responsibilities narrow:
 - `apps/server/src/agents/bottleClassifier/service.ts`: server adapter wiring
 
 `classifyBottleReference` means the full reviewed pipeline.
-`identifyExistingBottleReference` means a match-only local
-identification pipeline.
+`findExactAliasBottleCandidate` means a deterministic evidence lookup. It does
+not make an identity decision.
 `runBottleClassifierAgent` means only the raw LLM/tool pass.

@@ -413,28 +413,4 @@ describe("Bottle-check context tools", () => {
       }),
     ]);
   });
-
-  test("keeps local match-only identification free of context and proposal tools", async () => {
-    const prepared = await prepareBottleClassifierAgentRun(
-      {
-        client: {} as OpenAI,
-        model: "test-model",
-        maxSearchQueries: 0,
-        adapters: {
-          searchBottles: vi.fn(async () => []),
-          getBottleContext: vi.fn(async () => null),
-          getEntityContext: vi.fn(async () => null),
-        },
-      },
-      {
-        reference: { name: "Laphroaig Cairdeas 2022" },
-        extractedIdentity: null,
-        initialCandidates: [],
-        candidateExpansion: "initial_only",
-        instructionMode: "local_identification",
-      },
-    );
-
-    expect(prepared.agent.tools).toEqual([]);
-  });
 });

@@ -18,7 +18,6 @@ export type BottleClassifier = Pick<
   | "runBottleReference"
   | "classifyBottleReference"
   | "auditBottle"
-  | "identifyExistingBottleReference"
   | "extractBottleReferenceIdentity"
 >;
 

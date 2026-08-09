@@ -18,7 +18,6 @@ vi.mock("@peated/server/agents/bottleClassifier/service", () => {
   return {
     runBottleAudit: vi.fn(),
     classifyBottleReference: vi.fn(),
-    identifyExistingBottleReference: vi.fn(),
   };
 });
 

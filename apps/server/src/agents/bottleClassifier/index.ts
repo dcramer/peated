@@ -66,5 +66,5 @@ export {
   type PostUserCreationBottleAuditInput,
 } from "./auditBottle";
 export { classifyBottleReference } from "./classifyBottleReference";
-export { identifyExistingBottleReference } from "./identifyExistingBottleReference";
+export { findExactAliasBottleCandidate } from "./findExactAliasBottleCandidate";
 export { runBottleReference } from "./service";

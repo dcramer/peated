@@ -167,32 +167,3 @@ const BOTTLE_AUDIT_INSTRUCTIONS = [
 export function buildBottleAuditInstructions() {
   return BOTTLE_AUDIT_INSTRUCTIONS;
 }
-
-const BOTTLE_LOCAL_IDENTIFIER_INSTRUCTIONS = [
-  "<mission>",
-  "Identify whether one whisky reference safely matches an existing local Peated Bottle candidate.",
-  "</mission>",
-  "",
-  "<decision_policy>",
-  renderBulletLines([
-    "Return `match` only when one local candidate safely covers the complete marketed identity.",
-    "Return `no_match` when local evidence is missing, ambiguous, incomplete, or requires web or canonical classification.",
-    "Use structured source fields first, then names and aliases when structured data is sparse.",
-    "Ignore `cask_type`, `cask_size`, and `cask_fill` as matching constraints. Marketed finish wording, exact cask codes, `single_cask`, and `cask_strength` still matter.",
-    "Do not create or repair Bottles, assign BottleGroups, request web evidence, or infer missing canonical identity.",
-    "Prefer `no_match` over a false-positive local match.",
-  ]),
-  "</decision_policy>",
-  "",
-  "<output_contract>",
-  renderBulletLines([
-    "Return only the structured decision.",
-    "Always fill `identityBasis` and `confidenceBasis` from local evidence only.",
-    "Set `confidenceBasis.webEvidence` to `not_used` or `not_needed` and list only local tools actually used.",
-  ]),
-  "</output_contract>",
-].join("\n");
-
-export function buildBottleLocalIdentifierInstructions() {
-  return BOTTLE_LOCAL_IDENTIFIER_INSTRUCTIONS;
-}
