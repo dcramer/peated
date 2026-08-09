@@ -259,6 +259,13 @@ recording and record a new one on a miss automatically.
 Replay JSON is reproducible eval evidence, not a disposable local cache. Review
 and commit replay changes only when they are intentional.
 
+Classifier eval CI publishes the native `vitest-evals` summary and a dedicated
+`classifier eval score` Check Run. The check requires at least 80% of cases to
+pass so isolated qualitative misses remain visible without hiding the suite's
+aggregate signal. The workflow job also fails below that floor, so the gate does
+not depend on branch-protection configuration. Missing or invalid Vitest result
+reports are infrastructure failures and still fail the workflow job directly.
+
 ## Related Docs
 
 - [`docs/architecture/bottle-classifier.md`](../../docs/architecture/bottle-classifier.md)
