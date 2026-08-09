@@ -125,7 +125,7 @@ export const BottleSharedPatchSchema = z
     bottler: BottleOperationEntityChoiceSchema.nullable()
       .optional()
       .describe(
-        "Market-facing bottler or release imprint. `null` clears a populated assignment and requires positive product-specific evidence that the stored role is wrong; source omission, equality with the Brand, or lack of a separately named imprint is not contradictory evidence.",
+        "Market-facing bottler or release imprint. Clear an existing value only when product evidence shows it is wrong; omission or matching the Brand or a distiller is not enough.",
       ),
   })
   .strict()
@@ -139,7 +139,7 @@ export const BottleExactPatchSchema = z
       .removeDefault()
       .optional()
       .describe(
-        "ABV for this exact marketed release. Changing a populated value requires evidence tied to this release; another batch's or release's ABV establishes variability, not a correction.",
+        "ABV for this Bottle. Change an existing value only with evidence for the same Bottle, not another batch or release.",
       ),
     singleCask: ProposedBottleSchema.shape.singleCask
       .removeDefault()
@@ -148,7 +148,7 @@ export const BottleExactPatchSchema = z
       .removeDefault()
       .optional()
       .describe(
-        "Strength trait for this exact marketed release. Product-specific cask-strength, barrel-proof, or barrel-strength evidence supports `true`; a stored `null` is unknown and may be filled from that evidence.",
+        "Whether this Bottle is marketed as cask strength, barrel proof, or barrel strength. A stored `null` may be filled from product evidence.",
       ),
     vintageYear: ProposedBottleSchema.shape.vintageYear
       .removeDefault()

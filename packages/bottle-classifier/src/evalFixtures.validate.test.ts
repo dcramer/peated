@@ -201,7 +201,7 @@ describe("eval fixture validation", () => {
     expect(expectedOperations).not.toContain('"shared"');
   });
 
-  test("keeps the Proof and Wood regression limited to supported exact traits", () => {
+  test("keeps Proof and Wood and fills only supported Bottle fields", () => {
     const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
       ({ id }) =>
         id ===
