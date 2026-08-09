@@ -161,9 +161,12 @@ describe("PATCH /flights/:flight", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({
+      name: "Flight Update Ordering Brand",
+    });
     const laterBottle = await fixtures.Bottle({
+      brandId: brand.id,
       name: "Zulu release",
-      fullName: "Zulu release",
     });
     if (laterBottle.groupId === null) {
       throw new Error("Bottle group fixture not found");
@@ -175,7 +178,7 @@ describe("PATCH /flights/:flight", () => {
         brandId: laterBottle.brandId,
         createdByActorId: laterBottle.createdByActorId,
         name: "Alpha release",
-        fullName: "Alpha release",
+        fullName: `${brand.name} Alpha release`,
       })
       .returning();
     if (!firstBottle) throw new Error("Same-group Bottle fixture not found");
