@@ -55,10 +55,12 @@ const IncomingBottleDecisionListResponseSchema = z.object({
         key: z.string(),
         displayName: z.string(),
       }),
-      bottle: z.object({
-        id: z.number(),
-        fullName: z.string(),
-      }),
+      bottle: z
+        .object({
+          id: z.number(),
+          fullName: z.string(),
+        })
+        .nullable(),
       createdBottle: z.boolean(),
       createdRelease: z.boolean(),
       confidence: z.number().nullable(),
@@ -118,7 +120,7 @@ export default procedure
         eq(externalSites.id, incomingBottleDecisionLogs.externalSiteId),
       )
       .innerJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
-      .innerJoin(bottles, eq(bottles.id, incomingBottleDecisionLogs.bottleId))
+      .leftJoin(bottles, eq(bottles.id, incomingBottleDecisionLogs.bottleId))
       .where(where.length ? and(...where) : undefined)
       .orderBy(
         desc(incomingBottleDecisionLogs.createdAt),

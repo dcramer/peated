@@ -14,6 +14,13 @@ describe("DecisionBottle", () => {
     expect(html).toContain('href="/bottles/19"');
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");
   });
+
+  it("labels a deleted Bottle without linking it", () => {
+    const html = renderToStaticMarkup(<DecisionBottle bottle={null} />);
+
+    expect(html).toContain("Deleted Bottle");
+    expect(html).not.toContain("href=");
+  });
 });
 
 describe("formatDecision", () => {

@@ -1,16 +1,23 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import type { ReactNode } from "react";
 import Button from "./button";
 
 type Props = {
   isOpen: boolean;
   onContinue: () => void;
   onCancel: () => void;
+  title?: string;
+  message?: ReactNode;
+  continueLabel?: string;
 };
 
 export default function ConfirmationDialog({
   isOpen,
   onContinue,
   onCancel,
+  title = "Warning",
+  message = "Are you sure you want to continue with this action?",
+  continueLabel = "Continue",
 }: Props) {
   return (
     <Dialog as="div" open={isOpen} className="dialog" onClose={onCancel}>
@@ -21,12 +28,10 @@ export default function ConfirmationDialog({
               as="h3"
               className="text-highlight text-lg font-medium leading-6"
             >
-              Warning
+              {title}
             </DialogTitle>
             <div className="mt-2">
-              <p className="text-sm text-white">
-                Are you sure you want to continue with this action?.
-              </p>
+              <p className="text-sm text-white">{message}</p>
             </div>
 
             <div className="mt-4 flex space-x-2">
@@ -46,7 +51,7 @@ export default function ConfirmationDialog({
                   onContinue();
                 }}
               >
-                Continue
+                {continueLabel}
               </Button>
             </div>
           </DialogPanel>

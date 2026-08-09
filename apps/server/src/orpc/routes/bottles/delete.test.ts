@@ -5,9 +5,11 @@ import {
   bottleFlavorProfiles,
   bottleGroups,
   bottleObservations,
+  bottleSeries,
   bottles,
   collectionBottles,
   flightBottles,
+  incomingBottleDecisionLogs,
   reviews,
   storePriceMatchProposals,
   storePrices,
@@ -34,7 +36,7 @@ async function loadGroupedBottleGraph(groupId: number) {
 }
 
 describe("DELETE /bottles/:bottle", () => {
-  test("deletes bottle", async ({ fixtures }) => {
+  test("deletes a legacy ungrouped bottle", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const bottle = await fixtures.LegacyBottle();
 
@@ -74,86 +76,69 @@ describe("DELETE /bottles/:bottle", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
-  test("requires an explicit merge destination for a grouped singleton", async ({
-    fixtures,
-  }) => {
+  test("deletes a grouped singleton and its group", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({ name: "Grouped Singleton" });
     const groupId = bottle.groupId as number;
-    const before = await loadGroupedBottleGraph(groupId);
-    expect(before.group[0]?.representativeBottleId).toBe(bottle.id);
-    expect(before.members).toHaveLength(1);
-
-    const err = await waitError(
-      routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } }),
+    await routerClient.bottles.delete(
+      { bottle: bottle.id },
+      { context: { user } },
     );
 
-    expect(err).toMatchObject({ status: 409 });
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Grouped Bottles cannot be deleted directly. Merge this Bottle into an explicit destination Bottle instead.]`,
-    );
-    expect(await loadGroupedBottleGraph(groupId)).toEqual(before);
+    expect(await loadGroupedBottleGraph(groupId)).toEqual({
+      group: [],
+      members: [],
+    });
     expect(
       await db.query.bottleTombstones.findFirst({
         where: (table, { eq }) => eq(table.bottleId, bottle.id),
       }),
-    ).toBeUndefined();
+    ).toMatchObject({ bottleId: bottle.id, newBottleId: null });
   });
 
-  test("preserves a grouped representative and non-representative", async ({
+  test("selects a remaining representative and recomputes group and series counts", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const series = await fixtures.BottleSeries({ numReleases: 2 });
     const representative = await fixtures.Bottle({
       name: "Grouped Representative",
-    });
-    const sibling = await fixtures.LegacyBottle({
-      brandId: representative.brandId,
-      name: "Grouped Representative - Batch 2",
+      brandId: series.brandId,
+      seriesId: series.id,
     });
     const groupId = representative.groupId as number;
-
-    await db.transaction(async (tx) => {
-      await tx
-        .update(bottles)
-        .set({ groupId })
-        .where(eq(bottles.id, sibling.id));
-      await tx
-        .update(bottleGroups)
-        .set({ totalBottles: 2 })
-        .where(eq(bottleGroups.id, groupId));
+    const sibling = await fixtures.BottleGroupMember({
+      groupId,
+      edition: "Batch 2",
     });
 
     const before = await loadGroupedBottleGraph(groupId);
     expect(before.group[0]?.representativeBottleId).toBe(representative.id);
     expect(before.members).toHaveLength(2);
 
-    for (const bottleId of [representative.id, sibling.id]) {
-      const err = await waitError(
-        routerClient.bottles.delete(
-          { bottle: bottleId },
-          { context: { user } },
-        ),
-      );
-      expect(err).toMatchObject({ status: 409 });
-      expect(err.message).toBe(
-        "Grouped Bottles cannot be deleted directly. Merge this Bottle into an explicit destination Bottle instead.",
-      );
-      expect(
-        await db.query.bottleTombstones.findFirst({
-          where: (table, { eq }) => eq(table.bottleId, bottleId),
-        }),
-      ).toBeUndefined();
-    }
+    await routerClient.bottles.delete(
+      { bottle: representative.id },
+      { context: { user } },
+    );
 
-    expect(await loadGroupedBottleGraph(groupId)).toEqual(before);
+    const after = await loadGroupedBottleGraph(groupId);
+    expect(after.members.map(({ id }) => id)).toEqual([sibling.id]);
+    expect(after.group[0]).toMatchObject({
+      representativeBottleId: sibling.id,
+      totalBottles: 1,
+    });
+    expect(
+      await db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, series.id),
+      }),
+    ).toMatchObject({ numReleases: 1 });
   });
 
   test("blocks delete when the bottle is used in tastings", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
-    const bottle = await fixtures.LegacyBottle();
+    const bottle = await fixtures.Bottle();
 
     await fixtures.Tasting({ bottleId: bottle.id });
 
@@ -257,6 +242,16 @@ describe("DELETE /bottles/:bottle", () => {
       gtin14: "00000096385074",
       createdByActorId: actor.id,
     });
+    await db.insert(incomingBottleDecisionLogs).values({
+      sourceKind: "store_price",
+      sourceId: price.id,
+      externalSiteId: price.externalSiteId,
+      name: price.name,
+      decision: "create_bottle",
+      actorId: actor.id,
+      bottleId: bottle.id,
+      createdBottle: true,
+    });
 
     const [proposal] = await db
       .insert(storePriceMatchProposals)
@@ -266,6 +261,7 @@ describe("DELETE /bottles/:bottle", () => {
         proposalType: "match_existing",
         currentBottleId: bottle.id,
         suggestedBottleId: bottle.id,
+        legacyParentBottleId: bottle.id,
         enteredQueueAt: priorQueueEntryAt,
         reviewedById: reviewer.id,
         reviewedAt: new Date("2026-03-11T00:30:00.000Z"),
@@ -301,12 +297,17 @@ describe("DELETE /bottles/:bottle", () => {
     const deletedBarcode = await db.query.bottleBarcodes.findFirst({
       where: eq(bottleBarcodes.bottleId, bottle.id),
     });
+    const preservedDecisionLog =
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: eq(incomingBottleDecisionLogs.sourceId, price.id),
+      });
 
     expect(updatedPrice?.bottleId).toBeNull();
     expect(updatedReview?.bottleId).toBeNull();
     expect(updatedProposal).toMatchObject({
       currentBottleId: null,
       suggestedBottleId: null,
+      legacyParentBottleId: null,
       status: "pending_review",
       reviewedById: null,
       reviewedAt: null,
@@ -321,5 +322,6 @@ describe("DELETE /bottles/:bottle", () => {
     expect(remainingFlavorProfiles).toHaveLength(0);
     expect(deletedObservation).toBeUndefined();
     expect(deletedBarcode).toBeUndefined();
+    expect(preservedDecisionLog).toMatchObject({ bottleId: null });
   });
 });
