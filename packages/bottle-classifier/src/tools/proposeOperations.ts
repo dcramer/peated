@@ -346,7 +346,7 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
     tool({
       name: "propose_update_bottle",
       description: proposalToolDescription(
-        "Record a read-only proposal to update one inspected Bottle. This may accompany a match when the Bottle is the exact marketed product but its stored fields need reviewed cleanup. Use only after investigating the Bottle and collecting every cited piece of evidence. Do not propose an update solely for cask type, size, or fill. This does not mutate or approve catalog data.",
+        "Record a read-only proposal to update one inspected Bottle. This may accompany a match when the Bottle is the exact marketed product but its stored fields need reviewed cleanup. Use only after investigating the Bottle and collecting every cited piece of evidence. Clearing a populated relationship or changing a populated exact field requires positive evidence tied to that relationship or exact release; omission is not a correction. Do not propose an update solely for cask type, size, or fill. This does not mutate or approve catalog data.",
       ),
       parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
       strict: false,

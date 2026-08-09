@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-08-09T05:58:07.305Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Proof and Wood The Representative bourbon 58% 4 year MGP"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Proof and Wood The Representative bourbon 58% 4 year MGP",
+    "summary": "The Representative is aged at least 4 years or 2 Congressional Terms. It is a classic small batch, approximately 20 barrels, MGP bourbon. I did recently pick up The Representative at Hokus Pokus, which is a four year old bourbon produced at MGP in Indiana and aged for four years (two Congressional terms as they put it). [Proof and Wood](https://www.proofandwood.com/) is a newer producer in Bardstown, Kentucky. They have released a number of different whiskies and other spirits. Of particular note is Tumbling Dice and Idle Hands, which I have seen posts regarding on the internet. Their [DC coll",
+    "results": [
+      {
+        "title": "Review: Proof & Wood's The Representative : r/DMVWhisky - Reddit",
+        "url": "https://www.reddit.com/r/DMVWhisky/comments/1qdvpfz/review_proof_woods_the_representative/",
+        "domain": "reddit.com",
+        "description": "The Representative is aged at least 4 years or 2 Congressional Terms. It is a classic small batch, approximately 20 barrels, MGP bourbon.",
+        "extraSnippets": []
+      },
+      {
+        "title": "Proof and Wood's The Representative Barrel Proof Straight Bourbon ...",
+        "url": "https://whiskeyjar.blog/2021/11/15/proof-and-woods-the-representative-barrel-proof-straight-bourbon-whiskey/",
+        "domain": "whiskeyjar.blog",
+        "description": "I did recently pick up The Representative at Hokus Pokus, which is a four year old bourbon produced at MGP in Indiana and aged for four years (two Congressional terms as they put it).",
+        "extraSnippets": [
+          "[Proof and Wood](https://www.proofandwood.com/) is a newer producer in Bardstown, Kentucky. They have released a number of different whiskies and other spirits. Of particular note "
+        ]
+      },
+      {
+        "title": "The Representative | 4 Year Old Barrel Proof Straight Bourbon ...",
+        "url": "https://caskcartel.com/products/proof-and-wood-the-representative-4-year-old-barrel-proof-straight-bourbon-whiskey",
+        "domain": "caskcartel.com",
+        "description": "The Representative is a Barrel Proof Straight Rye Whiskey of approximately 20 barrels that are aged for a minimum of 2 Congressional Terms (4 Years) ...",
+        "extraSnippets": [
+          "![English](https://cdn.shopify.com/static/images/flags/gb.svg)United States - [![English](https://cdn.shopify.com/static/images/flags/gb.svg)United States](https://caskcartel.com/p"
+        ]
+      },
+      {
+        "title": "Review of The Representative 4 Year Old Barrel Proof 2023 ...",
+        "url": "https://bourbonbossman.com/2024/08/09/review-of-the-representative-4-year-old-barrel-proof-2023-release-straight-bourbon-whiskey/",
+        "domain": "bourbonbossman.com",
+        "description": "From the Proof and Wood website: Aged a minimum of 4 years (2 Congressional Terms), Small batch, approximately 20 barrels, Barrel entry 120 ...",
+        "extraSnippets": [
+          "[Skip to content](https://bourbonbossman.com/2024/08/09/review-of-the-representative-4-year-old-barrel-proof-2023-release-straight-bourbon-whiskey/#wp--skip-link--target) ![](https"
+        ]
+      },
+      {
+        "title": "Proof & Wood Representative Straight Bourbon Whiskey 4year",
+        "url": "https://www.empirewine.com/liquor/proof-and-wood-representative-straight-bourbon-whiskey-4year-h53179/?srsltid=AfmBOoqMG7r7ehaDooPNUaPsSalQwPi7r1eIBj3aVW--aum5MiFuyQ_h",
+        "domain": "empirewine.com",
+        "description": "The Spirit Barrel proof straight bourbon whiskey distilled in Indiana (MGP) bill of 75% corn, 21% rye, 4% malted barley Aged a minimum 4 years",
+        "extraSnippets": [
+          "STORE PICKUP![store pickup](https://www.empirewine.com/assets/svg/icon-store-white.svg) [Ask a Question](https://www.empirewine.com/ask/) [Gift Cards](https://www.empirewine.com/gi"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "dc5f406f369d4c4277d3bcd951167735af4f1ef8d9fa7472f948ae023d4b4b12",
+    "mode": "auto"
+  }
+}

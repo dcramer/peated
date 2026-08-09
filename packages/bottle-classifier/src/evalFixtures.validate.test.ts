@@ -201,6 +201,41 @@ describe("eval fixture validation", () => {
     expect(expectedOperations).not.toContain('"shared"');
   });
 
+  test("keeps the Proof and Wood regression limited to supported exact traits", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id ===
+        "audit-production-proof-and-wood-representative-retains-bottler-and-batch-abv",
+    );
+
+    expect(fixture).toBeDefined();
+    expect(fixture?.scenario).toBe("bottle_update");
+    expect(fixture?.provenance.source).toBe("production_miss");
+    expect(fixture?.input.audit).toEqual({
+      bottleId: 45249,
+      origin: "post_user_creation",
+    });
+    expect(fixture?.expected.proposedOperations).toEqual([
+      expect.objectContaining({
+        type: "update_bottle",
+        input: {
+          bottleId: 45249,
+          patch: {
+            exact: {
+              caskStrength: true,
+              singleCask: false,
+            },
+          },
+        },
+      }),
+    ]);
+    expect(fixture?.provenance.dbOutcome).toMatchObject({
+      bottleId: 45249,
+      createsBottle: false,
+      createsRelease: false,
+    });
+  });
+
   test("covers real Compass Box photo misses without forcing duplicate creation", () => {
     const matchFixture = loadDecisionFixture(roguesBanquetMatchFixtureFile);
     const repairFixture = loadDecisionFixture(spiceTreeRepairFixtureFile);

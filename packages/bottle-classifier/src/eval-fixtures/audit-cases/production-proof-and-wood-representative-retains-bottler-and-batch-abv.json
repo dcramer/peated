@@ -1,0 +1,186 @@
+{
+  "id": "audit-production-proof-and-wood-representative-retains-bottler-and-batch-abv",
+  "name": "audit: retain Proof and Wood bottler and batch ABV",
+  "scenario": "bottle_update",
+  "input": {
+    "audit": {
+      "bottleId": 45249,
+      "origin": "post_user_creation"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 45249,
+        "fullName": "Proof and Wood The Representative - 58.0% ABV",
+        "brand": "Proof and Wood",
+        "bottler": "Proof and Wood",
+        "distillery": ["MGP (Midwest Grain Products)"],
+        "category": "bourbon",
+        "statedAge": 4,
+        "edition": "",
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 57.97,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 45249,
+          "fullName": "Proof and Wood The Representative - 58.0% ABV",
+          "groupId": 18209,
+          "shared": {
+            "name": "The Representative",
+            "statedAge": 4,
+            "series": null,
+            "category": "bourbon",
+            "brand": {
+              "entityId": 365733,
+              "name": "Proof and Wood"
+            },
+            "distillers": [
+              {
+                "entityId": 32266,
+                "name": "MGP (Midwest Grain Products)"
+              }
+            ],
+            "bottler": {
+              "entityId": 365733,
+              "name": "Proof and Wood"
+            }
+          },
+          "exact": {
+            "edition": "",
+            "statedAge": null,
+            "abv": 57.97,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [],
+          "aliases": [],
+          "observations": [],
+          "imageSources": []
+        }
+      ],
+      "inspectedEntities": [
+        {
+          "entityId": 365733,
+          "name": "Proof and Wood",
+          "shortName": null,
+          "type": ["brand", "bottler"],
+          "alias": null,
+          "score": 1,
+          "source": ["context"]
+        }
+      ]
+    }
+  },
+  "searchResponses": [
+    {
+      "when": ["proof"],
+      "results": [
+        {
+          "bottleId": 45249,
+          "fullName": "Proof and Wood The Representative - 58.0% ABV",
+          "brand": "Proof and Wood",
+          "bottler": "Proof and Wood",
+          "distillery": ["MGP (Midwest Grain Products)"],
+          "category": "bourbon",
+          "statedAge": 4,
+          "edition": "",
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 57.97,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 1,
+          "source": ["search"]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://api.peated.com/v1/bottles/45249",
+      "https://www.proofandwood.com/press",
+      "https://whiskymag.com/articles/interview-proof-and-wood-founder-dave-schmier/",
+      "https://www.whiskeyinmyweddingring.com/reviews/proof-and-wood-dc-collection",
+      "https://www.whiskybase.com/whiskies/whisky/243821/proof-and-wood-the-representative",
+      "https://www.whiskybase.com/whiskies/whisky/274259/proof-and-wood-the-representative"
+    ],
+    "dbOutcome": {
+      "bottleId": 45249,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Keep Bottle 45249, retain Proof and Wood Entity 365733 as both Brand and bottler, preserve the stored 57.97% ABV because the cited 57.4% belongs to a different batch, add caskStrength true, and add singleCask false because the release is a blend of about 20 barrels. Do not merge or create a Bottle."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 45249,
+        "field": "abv",
+        "productionValue": 57.97,
+        "evidenceValue": [57.4, 57.5, 57.8, 58.25],
+        "source": "production_search",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "Public references describe different batches of The Representative at different barrel-proof strengths. A review of another batch at 57.4% is evidence of release variability, not proof that this Bottle's stored 57.97% is wrong."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 45249,
+        "field": "caskStrength",
+        "productionValue": null,
+        "evidenceValue": true,
+        "source": "production_search",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "The Representative is consistently marketed as barrel proof, supporting caskStrength true without identifying a replacement ABV for this exact batch."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 45249,
+        "field": "singleCask",
+        "productionValue": null,
+        "evidenceValue": false,
+        "source": "production_search",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "Product-specific evidence describes The Representative as a small batch of approximately 20 barrels, positively supporting singleCask false."
+      }
+    ],
+    "notes": "Observed August 7, 2026 from production audit 158 and operation 62 for Bottle 45249. The audit proposed clearing shared.bottler and replacing 57.97% with 57.4% after reading a review of another batch. Proof and Wood's own press page says The Representative is bottled by Proof and Wood Ventures, while its founder describes the company as an independent bottler that does not distill. Other public records show The Representative batches at several ABVs, and product-specific evidence describes each release as a blend of approximately 20 barrels. The verified outcome therefore keeps the same Entity in both Brand and bottler roles, preserves this Bottle's batch-specific ABV, and fills only the supported strength and multi-barrel traits."
+  },
+  "expected": {
+    "summary": "Bottle 45249 correctly identifies Proof and Wood as both the Brand and independent bottler, and evidence from other batches does not justify changing its stored ABV; its barrel-proof and multi-barrel traits are missing.",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 45249,
+          "patch": {
+            "exact": {
+              "caskStrength": true,
+              "singleCask": false
+            }
+          }
+        },
+        "rationale": "Product evidence consistently markets The Representative as barrel proof and describes it as a blend of approximately 20 barrels. It also establishes Proof and Wood's bottler role, while differing ABVs for other batches do not contradict this exact Bottle's stored 57.97% ABV.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 45249
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}

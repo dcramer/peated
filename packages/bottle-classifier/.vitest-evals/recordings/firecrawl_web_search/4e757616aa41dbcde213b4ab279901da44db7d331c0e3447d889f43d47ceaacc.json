@@ -1,0 +1,31 @@
+{
+  "writtenAt": "2026-08-09T06:18:37.001Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Harbor Ledger\" \"Batch 24\" \"114.8 proof\"",
+      "\"Harbor Ledger Batch 24\" bourbon 57.4"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Harbor Ledger\" \"Batch 24\" \"114.8 proof\"",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Harbor Ledger Batch 24\" bourbon 57.4",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "4e757616aa41dbcde213b4ab279901da44db7d331c0e3447d889f43d47ceaacc",
+    "mode": "auto"
+  }
+}

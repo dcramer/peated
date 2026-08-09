@@ -1,0 +1,59 @@
+{
+  "writtenAt": "2026-08-09T05:57:14.846Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "\"North Channel\" whisky"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "\"North Channel\" whisky",
+    "summary": "Moving southwest... across the North Channel. Whisky · Japanese Whisky · Irish Whiskey · Liqueurs · Absinthe · Wine · Red Wine ... North-Channel-Lighthouse-Lager-12OZ ... [Skip to content](https://craftshack.com/collections/vendors?q=North%20Channel%20Brewing%20Co.#MainContent) **Spend $150 Get $10 Off Coupon!** 🚚 **💨 Speedy Delivery!** [**Pick the Perfect Gift** _**Here**_](https://craftshack.com/collections/craft-beer-gifts) # Collection: North Channel Brewing Co. Search [Filter](https://craftshack.com/collections/vendors?q=North%20Channel%20Brewing%20Co.#) #### Refine [view all](https://c",
+    "results": [
+      {
+        "title": "Moving southwest... across the North Channel. : r/whiskey",
+        "url": "https://www.reddit.com/r/whiskey/comments/1v34t3m/moving_southwest_across_the_north_channel/",
+        "domain": "reddit.com",
+        "description": "Moving southwest... across the North Channel.",
+        "extraSnippets": []
+      },
+      {
+        "title": "North Channel Brewing Co.",
+        "url": "https://craftshack.com/collections/vendors?q=North%20Channel%20Brewing%20Co.&srsltid=AfmBOopAsBq0fB-fdZ5p3qJ0LkvPZMWDMt6sOZ6Wsok6YMkHbEkFkzU6",
+        "domain": "craftshack.com",
+        "description": "Whisky · Japanese Whisky · Irish Whiskey · Liqueurs · Absinthe · Wine · Red Wine ... North-Channel-Lighthouse-Lager-12OZ ...",
+        "extraSnippets": [
+          "[Skip to content](https://craftshack.com/collections/vendors?q=North%20Channel%20Brewing%20Co.#MainContent) **Spend $150 Get $10 Off Coupon!** 🚚 **💨 Speedy Delivery!** [**Pick th"
+        ]
+      },
+      {
+        "title": "Friday Specials at North Channel Brewing in Manistee",
+        "url": "https://www.facebook.com/groups/manisteeambassadors/posts/2787018578145838/",
+        "domain": "facebook.com",
+        "description": "It's Finally Friday and that means Friday Specials at North Channel Brewing. 3 piece IPA battered cod or Fried Shrimp dinner - both with ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "North Channel — Casual Dining · Manistee, Michigan",
+        "url": "https://northchannelmanistee.com/",
+        "domain": "northchannelmanistee.com",
+        "description": "North Channel. Manistee, Michigan. Casual Dining · Manistee, Michigan. View Menu The Barge Burger Challenge. ❧ Full Bar & Spirits Coming Soon ❧ ... Shrimp ...",
+        "extraSnippets": [
+          "_Under New Ownership_ ![](https://northchannelmanistee.com/images/hero_building_dusk.png) _Under New Ownership_ ![North Channel](https://northchannelmanistee.com/images/nc_logo_hq."
+        ]
+      },
+      {
+        "title": "Whisky Rocks: The Best View on the North Channel",
+        "url": "https://northernontario.travel/algoma-country/whisky-rocks-best-view-north-channel",
+        "domain": "northernontario.travel",
+        "description": "Fantastic food, panoramic views, and a menu full of \"docktails\" make this North Channel eatery a can't-miss destination. whisky rocks patio.",
+        "extraSnippets": [
+          "Northern Portal LogoNord de l'Ontario LogoRemoveSearchHomePopularSuitcaseSubscribeOpen Menumenuopensearchlicense-keyicon-arrow-lefticon-arrow-rightstay-homecompasscalendarfile-lock"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f207597594748d0e15c0f2b5cc4620b0a2092929dd2d0cadafef2fb40c72eb94",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-09T06:17:43.518Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"North Channel\" \"12-year-old\" whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"North Channel\" \"12-year-old\" whisky",
+        "summary": "He pours me a dram of 12-year-old Bushmills Distillery Reserve, a whiskey that is sold only at Bushmills, and my journey from hell is transformed into a ... Ardbeg 10-Year-Old (Scotch) Balvenie DoubleWood 12-Year-Old ... ” From Ireland, whiskey spread across the North Channel to Scotland. $125 for a 12 year old cask strength whisky was a crazy price when I ... North Channel. This is an example of a first-fill bourbon ... Featuring Greg Cull of North Channel Sound and John Clement of Whisky ... This year is a 12 year old single mall from the Highlands aged in Bourbon and Sherry ... That evening",
+        "results": [
+          {
+            "title": "Journey from hell to reach whisky heaven (Bushmills)",
+            "url": "https://www.whiskymag.com/articles/journey-from-hell-to-reach-whisky-heaven-bushmills/",
+            "domain": "whiskymag.com",
+            "description": "He pours me a dram of 12-year-old Bushmills Distillery Reserve, a whiskey that is sold only at Bushmills, and my journey from hell is transformed into a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Good whisky has no occasion limits But World Whisky Day is the ...",
+            "url": "https://www.facebook.com/ShopriteZM/posts/good-whisky-has-no-occasion-limits-but-world-whisky-day-is-the-perfect-reason-to/971277002275424/",
+            "domain": "facebook.com",
+            "description": "Ardbeg 10-Year-Old (Scotch) Balvenie DoubleWood 12-Year-Old ... ” From Ireland, whiskey spread across the North Channel to Scotland.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jul 27, 2018 - Diving for Pearls",
+            "url": "http://www.divingforpearlsblog.com/2018_07_27_archive.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "$125 for a 12 year old cask strength whisky was a crazy price when I ... North Channel. This is an example of a first-fill bourbon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Photo by GoodTimeJoe (@gtjwhiskey) · May 22, 2026 - Instagram",
+            "url": "https://www.instagram.com/p/DYn21fiRy4O/",
+            "domain": "instagram.com",
+            "description": "Featuring Greg Cull of North Channel Sound and John Clement of Whisky ... This year is a 12 year old single mall from the Highlands aged in Bourbon and Sherry ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Cadenhead's Glen Garioch 9yo - Dramface",
+            "url": "https://www.dramface.com/all-reviews/2022-cadenheads-glen-garioch-9yo",
+            "domain": "dramface.com",
+            "description": "That evening I opened it, with a certain amount of trepidation, if I'm honest - the 12 year old ... North Channel, where we will don our ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "41103ca20cf30811d9fd9bc1bc08d9acda47af6850b2b2c7c75e56bd9a31340b",
+    "mode": "auto"
+  }
+}

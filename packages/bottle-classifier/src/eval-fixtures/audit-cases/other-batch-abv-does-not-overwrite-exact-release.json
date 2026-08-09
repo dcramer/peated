@@ -1,0 +1,128 @@
+{
+  "id": "audit-other-batch-abv-does-not-overwrite-exact-release",
+  "name": "audit: another batch does not overwrite exact ABV",
+  "scenario": "bottle_update",
+  "input": {
+    "audit": {
+      "bottleId": 60201,
+      "origin": "moderator"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 60201,
+        "fullName": "Ember Ledger Batch 24 - 58.0% ABV",
+        "brand": "Ember Ledger",
+        "distillery": ["West Crown Distillery"],
+        "category": "bourbon",
+        "edition": "Batch 24",
+        "caskStrength": null,
+        "abv": 57.97,
+        "releaseYear": 2024,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 60201,
+          "fullName": "Ember Ledger Batch 24 - 58.0% ABV",
+          "groupId": 60201,
+          "shared": {
+            "name": "Ember Ledger",
+            "statedAge": null,
+            "series": null,
+            "category": "bourbon",
+            "brand": {
+              "entityId": 602011,
+              "name": "Ember Ledger"
+            },
+            "distillers": [
+              {
+                "entityId": 602012,
+                "name": "West Crown Distillery"
+              }
+            ],
+            "bottler": null
+          },
+          "exact": {
+            "edition": "Batch 24",
+            "statedAge": null,
+            "abv": 57.97,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": 2024,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [
+            {
+              "bottleId": 60200,
+              "fullName": "Ember Ledger Batch 20 - 57.4% ABV - Cask Strength",
+              "exact": {
+                "edition": "Batch 20",
+                "statedAge": null,
+                "abv": 57.4,
+                "singleCask": null,
+                "caskStrength": true,
+                "vintageYear": null,
+                "releaseYear": 2020,
+                "caskSize": null,
+                "caskType": null,
+                "caskFill": null
+              }
+            }
+          ],
+          "aliases": [],
+          "observations": [
+            {
+              "sourceType": "review",
+              "sourceKey": "ember-ledger-batch-20-review",
+              "sourceName": "Ember Ledger Batch 20 review",
+              "sourceUrl": "https://example.com/reviews/ember-ledger-batch-20",
+              "rawText": "Ember Ledger is released in numbered batches at cask strength, with the exact proof varying by batch. Batch 20, released in 2020, was bottled at 114.8 proof (57.4% ABV).",
+              "parsedIdentity": {
+                "edition": "Batch 20",
+                "releaseYear": 2020,
+                "abv": 57.4
+              },
+              "facts": {
+                "caskStrength": true,
+                "abvVariesByBatch": true
+              }
+            }
+          ],
+          "imageSources": []
+        }
+      ]
+    }
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Generalized regression showing that an exact ABV from a different named batch and release year establishes numeric variability rather than a correction, while consistent expression-level cask-strength marketing can still fill the missing boolean trait. All names, ids, and URLs are fictional."
+  },
+  "expected": {
+    "summary": "The available 57.4% evidence belongs to Batch 20, not the audited Batch 24 Bottle, so it does not support changing the stored 57.97% ABV; the expression-level evidence does support filling its missing cask-strength trait.",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 60201,
+          "patch": {
+            "exact": {
+              "caskStrength": true
+            }
+          }
+        },
+        "rationale": "The product evidence establishes that Ember Ledger batches are released at cask strength while their numeric ABV varies, so caskStrength is supported without copying Batch 20's 57.4% ABV onto Batch 24.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 60201
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}

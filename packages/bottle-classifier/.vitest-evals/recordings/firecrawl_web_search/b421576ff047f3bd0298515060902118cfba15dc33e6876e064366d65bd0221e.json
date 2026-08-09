@@ -1,0 +1,22 @@
+{
+  "writtenAt": "2026-08-09T06:17:55.409Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Ember Ledger\" \"Batch 24\" bourbon 58.0"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Ember Ledger\" \"Batch 24\" bourbon 58.0",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b421576ff047f3bd0298515060902118cfba15dc33e6876e064366d65bd0221e",
+    "mode": "auto"
+  }
+}

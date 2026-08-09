@@ -1,0 +1,59 @@
+{
+  "writtenAt": "2026-08-09T05:57:08.145Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "North Channel 12 year old whisky 46%"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "North Channel 12 year old whisky 46%",
+    "summary": "The 12-year-old Glenallachie forms the heart of the series in the new design. It matured in former sherry casks and in new, unseasoned oak ... ![Thumbnail (1920x1080)](https://i.ytimg.com/vi/ASNZRbR7Klc/maxresdefault.jpg) # [Glenallachie 12 Years | Whisky Review with Patrick Ahluwalia](https://www.youtube.com/watch?v=ASNZRbR7Klc) **Visibility**: Public **Uploaded by**: [Whisky.com](https://www.youtube.com/@Whiskycom) **Uploaded at**: 2026-01-02 **Published at**: **Length**: 09:55 **Views**: 2225 **Likes**: 89 **Category**: People & Blogs ## Description ``` https://whisky.com/p.php?id=GALLA1202",
+    "results": [
+      {
+        "title": "Glenallachie 12 Years | Whisky Review with Patrick Ahluwalia",
+        "url": "https://www.youtube.com/watch?v=ASNZRbR7Klc",
+        "domain": "youtube.com",
+        "description": "The 12-year-old Glenallachie forms the heart of the series in the new design. It matured in former sherry casks and in new, unseasoned oak ...",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/ASNZRbR7Klc/maxresdefault.jpg) # [Glenallachie 12 Years | Whisky Review with Patrick Ahluwalia](https://www.youtube.com/watch?v=ASNZ"
+        ]
+      },
+      {
+        "title": "My Top 10 Best 12-Year-Old Scotch Whiskies",
+        "url": "https://thewhiskeywash.com/whiskey-articles/my-top-10-12-year-old-scotch-whiskies-you-can-actually-buy-right-now/",
+        "domain": "thewhiskeywash.com",
+        "description": "My honest ranking of the best 12-year-old Scotch whiskies available now, all bottled at 46% ABV or higher, The Macallan 12 at 110 proof, the ...",
+        "extraSnippets": [
+          "[Skip to content](https://thewhiskeywash.com/whiskey-articles/my-top-10-12-year-old-scotch-whiskies-you-can-actually-buy-right-now/#content) # My Top 10 12-Year-Old Scotch Whiskies"
+        ]
+      },
+      {
+        "title": "The Dalmore 12 Review: Whisky Review #46",
+        "url": "https://www.youtube.com/watch?v=r6qWZ3u2xX8",
+        "domain": "youtube.com",
+        "description": "Tasting starts at 6:20 for this week's whisky: The Dalmore 12! Score: C New Grading Scale: A: Excellent B: Good C: Okay D: Don't waste your ...",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/r6qWZ3u2xX8/maxresdefault.jpg) # [The Dalmore 12 Review: Whisky Review #46](https://www.youtube.com/watch?v=r6qWZ3u2xX8) **Visibilit"
+        ]
+      },
+      {
+        "title": "Glenmorangie 12 Year Bourbon Cast Scotch review",
+        "url": "https://www.facebook.com/groups/165318518234/posts/10161508723233235/",
+        "domain": "facebook.com",
+        "description": "It is bottled at 46%, which gives it a bit of a kick without being overpowering. Overall, Kilkerran 12 Year Old is a fantastic example of a ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "[Whisky Review #79] GlenAllachie 12 : r/Scotch",
+        "url": "https://www.reddit.com/r/Scotch/comments/1gmjr07/whisky_review_79_glenallachie_12/",
+        "domain": "reddit.com",
+        "description": "GlenAllachie 12 is the youngest whisky they bottle. It is aged for 12 years … bottled at 46% ABV. Price: $60 Nose: Cedar, coconut, melon, ...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9ba79cde2b5cdb23f72c0186bce7d70ec97dcd0a83d28da9a82b39dbbe9a99b1",
+    "mode": "auto"
+  }
+}

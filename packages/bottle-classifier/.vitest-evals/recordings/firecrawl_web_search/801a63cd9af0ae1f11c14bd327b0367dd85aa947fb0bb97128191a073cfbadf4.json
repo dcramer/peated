@@ -1,0 +1,63 @@
+{
+  "writtenAt": "2026-08-09T05:57:51.317Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Ember Ledger Batch 24 bourbon 58.0% cask strength West Crown Distillery"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Ember Ledger Batch 24 bourbon 58.0% cask strength West Crown Distillery",
+    "summary": "Hand selected, single barrel bourbon. Exclusively bottled for Ember Wood Fired Grill. Woodford Reserve Double Oak - 18. Woodford Reserve Batch Proof - 35. [0](https://www.emberwfg.com/cart) ![](https://images.squarespace-cdn.com/content/v1/58d01cdd59cc681d3c150e65/1636839932695-BBWOG5XZ6BFV9GCLZLQH/IMG_4563.jpg) ­ ­ reCAPTCHA Recaptcha requires verification. protected by **reCAPTCHA** Made from heirloom corn, mesquite smoked malted barley (24%), and cherry wood. Aged for 4 years in new charred oak barrels,Oaked / 92 PROOF (46% ABV) ![Wigle Whiskey](https://wiglewhiskey.com/wp-content/uploads/2",
+    "results": [
+      {
+        "title": "Whiskey Selection — Ember",
+        "url": "https://www.emberwfg.com/whiskey-selection",
+        "domain": "emberwfg.com",
+        "description": "Hand selected, single barrel bourbon. Exclusively bottled for Ember Wood Fired Grill. Woodford Reserve Double Oak - 18. Woodford Reserve Batch Proof - 35.",
+        "extraSnippets": [
+          "[0](https://www.emberwfg.com/cart) ![](https://images.squarespace-cdn.com/content/v1/58d01cdd59cc681d3c150e65/1636839932695-BBWOG5XZ6BFV9GCLZLQH/IMG_4563.jpg) ­ ­ reCAPTCHA Recaptc"
+        ]
+      },
+      {
+        "title": "Oaked & Ember Straight Bourbon Whiskey – 375 mL",
+        "url": "https://wiglewhiskey.com/shop/spirits-bourbon/smoked-bourbon-375-ml/",
+        "domain": "wiglewhiskey.com",
+        "description": "Made from heirloom corn, mesquite smoked malted barley (24%), and cherry wood. Aged for 4 years in new charred oak barrels,Oaked / 92 PROOF (46% ABV)",
+        "extraSnippets": [
+          "![Wigle Whiskey](https://wiglewhiskey.com/wp-content/uploads/2025/02/LOGO-pghsp-ww-altmark-horiz-png.webp) Are you over 21 years of age? NoYes Remember me By submitting this form, "
+        ]
+      },
+      {
+        "title": "Ember Craft Double Barrel Custom Micro Batch Straight ...",
+        "url": "https://seelbachs.com/products/ember-craft-double-barrel-custom-micro-batch-straight-bourbon-whiskey-limited-edition?srsltid=AfmBOoqKfCJgqNX6WKAon2apVMImrj6oHVHrl1Eldkt75FTi0bJDOKnK",
+        "domain": "seelbachs.com",
+        "description": "Batch Straight Bourbon Whiskey … $149.99 $127.49. Age: 5 years Proof: 100.4 Distilled In: Indiana Flavor: Toffee, Cherry, Orange marmalade, dried cherry, thick ...",
+        "extraSnippets": [
+          "Back [![Bourbon](https://seelbachs.com/cdn/shop/files/Bourbon_2_78f57401-e73e-4454-8993-f35cb6c211b9.webp?v=1758308624)\\\\ \\\\ **Bourbon** \\\\ \\\\ America's amber comfort, aged in char"
+        ]
+      },
+      {
+        "title": "High West Cask Strength Whiskey '24",
+        "url": "https://ship.highwest.com/products/high-west-cask-strength-bourbon-24",
+        "domain": "ship.highwest.com",
+        "description": "This exceptional blend of straight bourbon and rye whiskeys, aged 6–10 years. Bottle Details: Alcohol Content 59.9 Sensory",
+        "extraSnippets": [
+          "Your browser does not support the video tag. ![Brand Logo](https://agegate.cbrands.com/api/v1/s3-media/asset/img-1761287616-337/proxy) Please enter your birth date. MM0102030405060"
+        ]
+      },
+      {
+        "title": "Spirits List",
+        "url": "https://www.emberandoak.com/spirits-list",
+        "domain": "emberandoak.com",
+        "description": "Ember & Oak. Kentucky Bourbon - Beast Bourbon Redwood. Bourbon Wild Turkey. Willet - Pot Still Willet",
+        "extraSnippets": [
+          "## Ember & Oak # Spirits List ## Spirits List ### as a living breathing thing, this list is always subject to change ### \\\\* denotes rare, exclusive, and elusive offerings ## Bourb"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "801a63cd9af0ae1f11c14bd327b0367dd85aa947fb0bb97128191a073cfbadf4",
+    "mode": "auto"
+  }
+}

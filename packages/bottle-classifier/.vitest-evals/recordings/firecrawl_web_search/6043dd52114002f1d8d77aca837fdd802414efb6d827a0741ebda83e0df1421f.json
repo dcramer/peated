@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-08-09T05:57:36.011Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Keel and Cooper Harbor Reserve 56.2 Arrow Gap Distillery bourbon"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Keel and Cooper Harbor Reserve 56.2 Arrow Gap Distillery bourbon",
+    "summary": "Barrel Proof Straight Bourbon Whiskey $ 64.00 USD … 70% Corn, 21% Wheat, 9% Malted. Proof AGE: 6 and 4 Years Old. Toasted caramel and maple syrup, citrus, and ... Search Search Search our collections, stories, and Cocktails. Search Search Search our collection, stories, and categories. [Collections](https://www.kooperswhiskey.com/shop-koopers-whiskey) / [Barrel Reserve Bourbon - Barrel Proof](https://www.kooperswhiskey.com/product/barrel-reserve-bourbon#) [![](https://cdn.prod.website-files.com/69d278c2fc76c8ae1e1244c5/6a3dd135ca7f97498feeb601_koopers-brb.avif)![](https://cdn.prod.website-file",
+    "results": [
+      {
+        "title": "Barrel Reserve Bourbon - Barrel Proof",
+        "url": "https://www.kooperswhiskey.com/product/barrel-reserve-bourbon?srsltid=AfmBOorc1N5oDoyTCASKI4Fpn8_EW20YAg1Gj4qhXcUjUADuhTYKZygi",
+        "domain": "kooperswhiskey.com",
+        "description": "Barrel Proof Straight Bourbon Whiskey $ 64.00 USD … 70% Corn, 21% Wheat, 9% Malted. Proof AGE: 6 and 4 Years Old. Toasted caramel and maple syrup, citrus, and ...",
+        "extraSnippets": [
+          "Search Search Search our collections, stories, and Cocktails. Search Search Search our collection, stories, and categories. [Collections](https://www.kooperswhiskey.com/shop-kooper"
+        ]
+      },
+      {
+        "title": "New Whisky Releases From Old Forester, Dewar's ...",
+        "url": "https://whiskyadvocate.com/Old-Forester-Presidents-Choice-Dewars-19-year-Woodford-And-More-New-Whiskies",
+        "domain": "whiskyadvocate.com",
+        "description": "series of seven bourbons. The first is said to taste like sweet tobacco, baking spice, and dark fruits. : 47% SRP: $50",
+        "extraSnippets": [
+          "![Dewar's Champion's Edition, Woodford Reserve Father's Day, Old Forester, Blue Run, & More](https://whiskyadvocate.com/get/files/image/galleries/Dewars-19-Hero.jpg?resize=1920x0) "
+        ]
+      },
+      {
+        "title": "Blind Flight #4 - 64 Bourbons Under $30",
+        "url": "https://www.youtube.com/watch?v=IRWFZJqqQ7g",
+        "domain": "youtube.com",
+        "description": "64 Bourbons under $30 brings us Cooper's Craft Barrel Reserve at 100 proof, all at 90 proof.",
+        "extraSnippets": [
+          "![Thumbnail (1920x1080)](https://i.ytimg.com/vi/IRWFZJqqQ7g/maxresdefault.jpg) # [Blind Flight #4 - 64 Bourbons Under $30](https://www.youtube.com/watch?v=IRWFZJqqQ7g) **Visibility"
+        ]
+      },
+      {
+        "title": "Cooper's Craft Barrel Reserve review : r/bourbon",
+        "url": "https://www.reddit.com/r/bourbon/comments/10wazn8/coopers_craft_barrel_reserve_review/",
+        "domain": "reddit.com",
+        "description": "A basic nose, a watery bourbon with heavy wood influence that throws off the balance, and a pleasant, if boozy finish. This isn't great, and for ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Cooper's Craft Bourbon and Coopers' Craft Barrel Reserve ...",
+        "url": "https://www.bourbonguy.com/blog/2019/3/7/coopers-craft-bourbon-and-coopers-craft-barrel-reserve-bourbon",
+        "domain": "bourbonguy.com",
+        "description": "This is a super gentle bourbon. The suggested retail price is between $29.99 and ginger, caramel and vanilla. Finish: Warm and of medium length ...",
+        "extraSnippets": [
+          "Menu ![bourbonguy-production.png](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1643153327081-HHA5R15FYO0L4X0HLWVH/bourbonguy-production.png) # Blog _I sta"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6043dd52114002f1d8d77aca837fdd802414efb6d827a0741ebda83e0df1421f",
+    "mode": "auto"
+  }
+}

@@ -74,9 +74,17 @@ edits, while Bottle remains the authority for exact reads.
 
 `bottler` is the named, market-facing bottler or release imprint for the
 product. It may point to the same Entity as `brand` or a producing distillery.
-Ownership, importer/distributor, and physical packing relationships alone do
-not establish the role. Leave it null when product-specific evidence does not
-establish it.
+Brand, bottler, and distillery are distinct roles; role distinctness does not
+require distinct Entities or a separately named imprint. Product-specific
+marketing must establish the bottler role. Ownership, importer/distributor, and
+physical packing relationships alone do not establish it.
+
+For an existing-Bottle audit, clearing a populated bottler is a correction and
+requires positive product-specific evidence that contradicts the stored role.
+A source that omits the bottler, or a bottler that equals the Brand or a
+producing distillery, is not contradictory evidence. Leave `bottler` null when
+classifying a product whose evidence does not establish the role; do not use
+that creation default to erase an existing assignment.
 
 Observation-only facts by default include exact cask or barrel number, bottle
 number, outturn, retailer-exclusive wording, label notes, and unmodeled
@@ -178,6 +186,10 @@ attributes do not make a clear exact identity unresolved, while conflicting
 age, edition, year, marketed finish or exact cask code, single-cask, or
 cask-strength facts are strong evidence of distinct Bottles. Cask type, size,
 and fill metadata alone is not such a conflict.
+
+Changing a populated exact field requires evidence tied to the same exact
+marketed release. A value from another batch, edition, year, or exact cask is
+evidence of release variability, not a correction to the audited Bottle.
 
 Grouping is a separate decision. Same-expression evidence may relate exact
 Bottles through a BottleGroup, but uncertain grouping leaves each Bottle in its

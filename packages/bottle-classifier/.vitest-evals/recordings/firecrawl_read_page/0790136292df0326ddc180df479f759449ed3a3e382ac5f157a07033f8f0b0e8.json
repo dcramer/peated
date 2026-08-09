@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-09T06:18:17.731Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.passionspirits.com/proof-wood-the-representative",
+    "focus": "The Representative exact age, ABV/proof, producer or bottler, and release-specific identity"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "The Representative exact age, ABV/proof, producer or bottler, and release-specific identity",
+    "summary": "750 ml\n\nABV\n\n57.5%\n\nProduction Details\n\n• Age: 4 years old\n\n• ABV: 57.5%",
+    "results": [
+      {
+        "title": "Proof & Wood The Representative Straight Bourbon Whiskey Aged 4 Years Barrel Proof | Passion Spirits",
+        "url": "https://www.passionspirits.com/proof-wood-the-representative",
+        "domain": "passionspirits.com",
+        "description": ", Proof & Wood The Representative Straight Bourbon Whiskey Aged 4 Years Barrel Proof - Classic fully aged Bourbon Whiskey. This corn-forward bourbon is aged for a minimum of four years, roughly equivalent to two congressional terms. Distilled in Indiana from a mash bill of 75% corn, 21% rye, and 4% malted barley, it is initially entered into new charred barrels at 120 proof. We carefully select a small batch of 20 to 40 barrels, which are then bottled at a robust barrel proof. The average bottled proof is around 115.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0790136292df0326ddc180df479f759449ed3a3e382ac5f157a07033f8f0b0e8",
+    "mode": "auto"
+  }
+}

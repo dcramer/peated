@@ -59,10 +59,18 @@ codes, `singleCask`, and `caskStrength` remain identity evidence.
 imprint for the product. An ordinary official Brand or distillery bottling does
 not gain a bottler merely because the same company produces, owns, releases, or
 hosts a page for it. It may equal the Brand or a producing distillery only when
-product-specific marketing establishes that separate role. Ownership,
+product-specific marketing establishes that role. Role distinctness does not
+require a distinct Entity or separately named imprint. Ownership,
 importer/distributor, and physical packing relationships alone do not establish
-it. Otherwise the classifier leaves it null and does not treat the missing value
-as a generic enrichment gap.
+the role. Otherwise the classifier leaves it null and does not treat the missing
+value as a generic enrichment gap.
+
+An audit may clear a populated bottler only when positive product-specific
+evidence contradicts the stored role. Source omission and equality with the
+Brand or a producing distillery are not contradictions. Likewise, changing a
+populated exact field requires evidence tied to the same exact marketed
+release; another batch's or release's value establishes variability rather than
+a correction.
 
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
