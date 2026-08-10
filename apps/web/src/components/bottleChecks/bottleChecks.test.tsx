@@ -364,7 +364,7 @@ describe("Bottle Check review components", () => {
       sourceId: null,
       bottleId: 44,
       schemaSupported: true,
-      schemaVersion: 1,
+      schemaVersion: 2,
       output: {
         summary: "The Bottle is supported.",
         findings: [],
@@ -389,7 +389,7 @@ describe("Bottle Check review components", () => {
         check={{
           ...safeBaseCheck,
           schemaSupported: false,
-          schemaVersion: 2,
+          schemaVersion: 1,
           canClose: true,
           operationCount: 1,
           operations: [],

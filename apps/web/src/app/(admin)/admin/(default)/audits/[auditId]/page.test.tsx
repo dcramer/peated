@@ -177,7 +177,7 @@ function details(
       sourceId: null,
       bottleId: 44,
       schemaSupported: true,
-      schemaVersion: 1,
+      schemaVersion: 2,
       output: {
         summary: "Review the proposed catalog work.",
         findings: [

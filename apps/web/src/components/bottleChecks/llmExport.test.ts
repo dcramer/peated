@@ -24,7 +24,7 @@ test("formats one Bottle operation with its check context and live review", () =
     sourceId: null,
     bottleId: 44,
     schemaSupported: true,
-    schemaVersion: 1,
+    schemaVersion: 2,
     output: { summary: "Review the proposed catalog work.", findings: [] },
     model: "test-model",
     modelMetadata: null,
@@ -60,7 +60,7 @@ test("formats one Bottle operation with its check context and live review", () =
       id: 9,
       intent: "audit_bottle",
       bottleId: 44,
-      schemaVersion: 1,
+      schemaVersion: 2,
       output: {
         summary: "Review the proposed catalog work.",
         findings: [],

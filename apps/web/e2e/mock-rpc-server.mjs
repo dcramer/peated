@@ -1789,8 +1789,7 @@ function buildManualReviewPhotoIdentification() {
     classification: {
       status: "classified",
       decision: {
-        action: "match",
-        matchedBottle: existingBottle,
+        action: "no_match",
       },
       artifacts: {
         candidates: [
@@ -1813,7 +1812,7 @@ function buildManualReviewPhotoIdentification() {
       },
       classification: {
         status: "classified",
-        action: "match",
+        action: "no_match",
         confidence: 55,
         reason: "Possible match needs user review.",
       },

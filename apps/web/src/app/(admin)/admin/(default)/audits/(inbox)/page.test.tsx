@@ -30,7 +30,7 @@ test("Audits renders one inbox row per actionable check", () => {
     sourceId: null,
     bottleId: 45146,
     schemaSupported: true,
-    schemaVersion: 1,
+    schemaVersion: 2,
     output: {
       summary: "One catalog correction needs review.",
       findings: [
