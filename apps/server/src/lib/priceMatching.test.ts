@@ -24,10 +24,7 @@ import {
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
 import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
-import {
-  buildIndependentBottleCreateInput,
-  buildIndependentBottleRouteInput,
-} from "@peated/server/lib/flatBottleInput";
+import { buildBottleCreateInput } from "@peated/server/lib/flatBottleInput";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
@@ -813,9 +810,7 @@ describe("priceMatching", () => {
       flavorProfile: null,
     };
 
-    const bottleInput = buildIndependentBottleCreateInput(
-      buildIndependentBottleRouteInput(input),
-    );
+    const bottleInput = buildBottleCreateInput(input);
     const result = await createBottleFromStorePriceMatchProposal({
       proposalId: proposal.id,
       bottleInput,
@@ -922,9 +917,7 @@ describe("priceMatching", () => {
       imageUrl: null,
       flavorProfile: null,
     };
-    const bottleInput = buildIndependentBottleCreateInput(
-      buildIndependentBottleRouteInput(input),
-    );
+    const bottleInput = buildBottleCreateInput(input);
 
     const first = await createBottleFromStorePriceMatchProposal({
       proposalId: firstProposal.id,

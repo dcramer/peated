@@ -42,6 +42,10 @@ does not create another catalog identity layer.
 - Ordinary creation atomically creates a complete Bottle and a singleton
   BottleGroup. “Add a similar bottle” only prefills a new Bottle draft; it does
   not reuse the source Bottle's group.
+- Creation accepts one flat Bottle input. The server assigns storage ownership.
+  A submitted `statedAge` starts as the Bottle's exact age. The singleton
+  BottleGroup starts with no shared age because one release does not prove that
+  the age is invariant across a future group.
 - Semantic grouping happens outside ordinary creation. Similar names, a shared
   brand, or a shared BottleSeries may suggest a relationship but do not prove
   same-expression identity. This release does not ship an automatic regrouping

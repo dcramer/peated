@@ -64,14 +64,10 @@ async function createTwoMemberGroup(user: User, brandId: number) {
   const source = await createBottle({
     context: contextFor(user),
     input: {
-      stable: {
-        name: "Generated Details",
-        brand: brandId,
-        category: "single_malt",
-      },
-      exact: {
-        edition: "Batch 1",
-      },
+      name: "Generated Details",
+      brand: brandId,
+      category: "single_malt",
+      edition: "Batch 1",
     },
   });
   const siblingBottle = await testFixtures.BottleGroupMember({
@@ -427,12 +423,10 @@ test("does not fan out after the selected Bottle moves groups", async ({
   const destination = await createBottle({
     context: contextFor(defaults.user),
     input: {
-      stable: {
-        name: "Generated Membership Destination",
-        brand: brand.id,
-        category: "single_malt",
-      },
-      exact: { edition: "Destination" },
+      name: "Generated Membership Destination",
+      brand: brand.id,
+      category: "single_malt",
+      edition: "Destination",
     },
   });
   const deferred = deferModelResult();

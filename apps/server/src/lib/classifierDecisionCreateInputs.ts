@@ -1,5 +1,8 @@
 import type { ProposedBottle } from "@peated/bottle-classifier/internal/types";
-import type { BottleCreateInput } from "@peated/server/lib/bottleSchemas";
+import {
+  BottleCreateInputSchema,
+  type BottleCreateInput,
+} from "@peated/server/lib/bottleSchemas";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { z } from "zod";
 
@@ -67,32 +70,7 @@ export function buildBottleInputFromProposedBottle(
 export function buildClassifierBottleInput(
   proposedBottle: ProposedBottle,
 ): BottleCreateInput {
-  const input = buildBottleInputFromProposedBottle(proposedBottle);
-  return {
-    stable: {
-      name: input.name,
-      statedAge: null,
-      series: input.series,
-      category: input.category,
-      brand: input.brand,
-      distillers: input.distillers,
-      bottler: input.bottler,
-      flavorProfile: input.flavorProfile,
-    },
-    exact: {
-      edition: input.edition,
-      statedAge: input.statedAge,
-      abv: input.abv,
-      singleCask: input.singleCask,
-      caskStrength: input.caskStrength,
-      vintageYear: input.vintageYear,
-      releaseYear: input.releaseYear,
-      caskSize: input.caskSize,
-      caskType: input.caskType,
-      caskFill: input.caskFill,
-      description: input.description,
-      descriptionSrc: input.descriptionSrc,
-      tastingNotes: input.tastingNotes,
-    },
-  };
+  const { imageUrl: _imageUrl, ...input } =
+    buildBottleInputFromProposedBottle(proposedBottle);
+  return BottleCreateInputSchema.parse(input);
 }

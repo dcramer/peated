@@ -5,7 +5,7 @@
 import { BottleInputSchema } from "@peated/server/schemas";
 import { z } from "zod";
 
-const StableBottleGroupFieldsSchema = BottleInputSchema.pick({
+const BottleGroupFieldsSchema = BottleInputSchema.pick({
   name: true,
   statedAge: true,
   series: true,
@@ -20,8 +20,8 @@ const StableBottleGroupFieldsSchema = BottleInputSchema.pick({
   })
   .strict();
 
-function validateStableChoiceIds(
-  input: Partial<z.infer<typeof StableBottleGroupFieldsSchema>>,
+function validateGroupChoiceIds(
+  input: Partial<z.infer<typeof BottleGroupFieldsSchema>>,
   ctx: z.RefinementCtx,
 ) {
   const validateChoiceId = (
@@ -45,10 +45,6 @@ function validateStableChoiceIds(
     validateChoiceId(distiller, ["distillers", index]),
   );
 }
-
-const StableBottleGroupInputSchema = StableBottleGroupFieldsSchema.superRefine(
-  validateStableChoiceIds,
-);
 
 const ExactBottleInputSchema = BottleInputSchema.pick({
   edition: true,
@@ -84,8 +80,11 @@ const ExactBottleInputSchema = BottleInputSchema.pick({
   })
   .strict();
 
-const IndependentBottleCreateRouteFieldsSchema =
-  StableBottleGroupFieldsSchema.extend({
+const BottleCreateFieldsSchema = BottleGroupFieldsSchema.omit({
+  statedAge: true,
+})
+  .extend({
+    statedAge: ExactBottleInputSchema.shape.statedAge,
     edition: ExactBottleInputSchema.shape.edition,
     abv: ExactBottleInputSchema.shape.abv,
     singleCask: ExactBottleInputSchema.shape.singleCask,
@@ -98,41 +97,43 @@ const IndependentBottleCreateRouteFieldsSchema =
     description: ExactBottleInputSchema.shape.description,
     descriptionSrc: ExactBottleInputSchema.shape.descriptionSrc,
     tastingNotes: ExactBottleInputSchema.shape.tastingNotes,
-  }).strict();
+  })
+  .strict();
 
 /**
- * Public independent creation reuses stable/exact validation without exposing
- * group authority or image-upload fields; uploads use a separate route.
+ * Flat Bottle creation is the only creation contract. The service owns which
+ * fields are stored as BottleGroup authority and which fields stay exact.
  */
-export const IndependentBottleCreateRouteInputSchema =
-  IndependentBottleCreateRouteFieldsSchema.superRefine(validateStableChoiceIds);
+export const BottleCreateInputSchema = BottleCreateFieldsSchema.superRefine(
+  validateGroupChoiceIds,
+);
+
+export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;
 
 const BottleSharedPatchSchema = z
   .object({
-    name: StableBottleGroupFieldsSchema.shape.name.optional(),
+    name: BottleGroupFieldsSchema.shape.name.optional(),
     statedAge: z.number().int().min(0).max(100).nullable().optional(),
-    series: StableBottleGroupFieldsSchema.shape.series
+    series: BottleGroupFieldsSchema.shape.series
       .unwrap()
       .removeDefault()
       .optional(),
-    category: StableBottleGroupFieldsSchema.shape.category
-      .removeDefault()
-      .optional(),
-    brand: StableBottleGroupFieldsSchema.shape.brand.optional(),
-    distillers: StableBottleGroupFieldsSchema.shape.distillers
+    category: BottleGroupFieldsSchema.shape.category.removeDefault().optional(),
+    brand: BottleGroupFieldsSchema.shape.brand.optional(),
+    distillers: BottleGroupFieldsSchema.shape.distillers
       .unwrap()
       .removeDefault()
       .optional(),
-    bottler: StableBottleGroupFieldsSchema.shape.bottler
+    bottler: BottleGroupFieldsSchema.shape.bottler
       .unwrap()
       .removeDefault()
       .optional(),
-    flavorProfile: StableBottleGroupFieldsSchema.shape.flavorProfile
+    flavorProfile: BottleGroupFieldsSchema.shape.flavorProfile
       .removeDefault()
       .optional(),
   })
   .strict()
-  .superRefine(validateStableChoiceIds);
+  .superRefine(validateGroupChoiceIds);
 
 const BottleExactPatchSchema = z
   .object({
@@ -202,13 +203,3 @@ export const SystemBottleUpdateInputSchema = z
 export type SystemBottleUpdateInput = z.infer<
   typeof SystemBottleUpdateInputSchema
 >;
-
-/** Runtime contract for independently complete singleton Bottle creation. */
-export const BottleCreateInputSchema = z
-  .object({
-    stable: StableBottleGroupInputSchema,
-    exact: ExactBottleInputSchema,
-  })
-  .strict();
-
-export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;

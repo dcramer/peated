@@ -1,10 +1,9 @@
-import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
+import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
   createBottle,
 } from "@peated/server/lib/createBottle";
-import { buildIndependentBottleCreateInput } from "@peated/server/lib/flatBottleInput";
 import { procedure } from "@peated/server/orpc";
 import {
   requireTosAccepted,
@@ -28,13 +27,13 @@ export default procedure
       operationId: "createBottle",
     }),
   })
-  .input(IndependentBottleCreateRouteInputSchema)
+  .input(BottleCreateInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
       const result = await createBottle({
         context,
-        input: buildIndependentBottleCreateInput(input),
+        input,
       });
       return await serialize(
         BottleSerializer,

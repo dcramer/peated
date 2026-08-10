@@ -28,7 +28,7 @@ function contextFor(user: Parameters<typeof getUserActor>[0]) {
 }
 
 describe("Bottle creation", () => {
-  test("creates an atomic singleton graph with stable and exact field ownership", async ({
+  test("creates an atomic singleton graph from flat Bottle input", async ({
     defaults,
     fixtures,
   }) => {
@@ -52,24 +52,19 @@ describe("Bottle creation", () => {
     const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
-        stable: {
-          name: "Cask Strength",
-          statedAge: 12,
-          brand: brand.id,
-          bottler: bottler.id,
-          distillers: [distiller.id],
-          series: series.id,
-          category: "single_malt",
-          flavorProfile: "peated",
-        },
-        exact: {
-          edition: "Batch 24",
-          statedAge: 13,
-          releaseYear: 2026,
-          abv: 55.4,
-          caskStrength: true,
-          description: "Exact release content",
-        },
+        name: "Cask Strength",
+        statedAge: 13,
+        brand: brand.id,
+        bottler: bottler.id,
+        distillers: [distiller.id],
+        series: series.id,
+        category: "single_malt",
+        flavorProfile: "peated",
+        edition: "Batch 24",
+        releaseYear: 2026,
+        abv: 55.4,
+        caskStrength: true,
+        description: "Exact release content",
       },
     });
 
@@ -89,7 +84,7 @@ describe("Bottle creation", () => {
       ...stableCompatibilityFields,
       name: "Cask Strength",
       fullName: "Creation Test Brand Cask Strength",
-      statedAge: 12,
+      statedAge: null,
       totalBottles: 1,
       representativeBottleId: result.bottle.id,
     });
@@ -166,8 +161,8 @@ describe("Bottle creation", () => {
     const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
-        stable: { name: "Canonical Alias", brand: brand.id },
-        exact: {},
+        name: "Canonical Alias",
+        brand: brand.id,
       },
     });
 
@@ -196,7 +191,7 @@ describe("Bottle creation", () => {
     expect(failedAliasName).not.toBeNull();
   });
 
-  test("preserves classifier exact age through singleton creation and shared rematerialization", async ({
+  test("gives manual and classifier statedAge the same storage owner", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -228,16 +223,21 @@ describe("Bottle creation", () => {
       creationSource: "bottle_classifier",
       input,
     });
+    const manual = await createBottle({
+      context: contextFor(mod),
+      input: {
+        ...input,
+        name: "Manual 12-year-old",
+      },
+    });
 
-    expect(created.group).toMatchObject({
-      name: "Speyside 12-year-old",
-      statedAge: null,
-    });
-    expect(created.bottle).toMatchObject({
-      name: "Speyside 12-year-old",
-      fullName: "Classifier Exact Age Brand Speyside 12-year-old",
-      statedAge: 12,
-    });
+    for (const result of [created, manual]) {
+      expect(result.group.statedAge).toBeNull();
+      expect(result.bottle.statedAge).toBe(12);
+    }
+    expect(created.bottle.fullName).toBe(
+      "Classifier Exact Age Brand Speyside 12-year-old",
+    );
 
     const rematerialized = await updateBottle({
       bottleId: created.bottle.id,
@@ -261,8 +261,8 @@ describe("Bottle creation", () => {
     const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
-        stable: { name: "Old Malt 12 years old", brand: brand.id },
-        exact: {},
+        name: "Old Malt 12 years old",
+        brand: brand.id,
       },
     });
 
@@ -284,14 +284,10 @@ describe("Bottle creation", () => {
     const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
-        stable: {
-          name: "Distillers Edition 2011 Release Cask Strength",
-          brand: brand.id,
-        },
-        exact: {
-          vintageYear: 1998,
-          singleCask: true,
-        },
+        name: "Distillers Edition 2011 Release Cask Strength",
+        brand: brand.id,
+        vintageYear: 1998,
+        singleCask: true,
       },
     });
 
@@ -347,8 +343,10 @@ describe("Bottle creation", () => {
       const result = await createBottle({
         context,
         input: {
-          stable: { name: "Exact Cask Expression", brand: brand.id },
-          exact: { edition: "Cask Selection", ...exactCask },
+          name: "Exact Cask Expression",
+          brand: brand.id,
+          edition: "Cask Selection",
+          ...exactCask,
         },
       });
       expect(result.bottle).toMatchObject({
@@ -363,21 +361,15 @@ describe("Bottle creation", () => {
   });
 
   test.each([
-    ["stable stated age", { stable: { statedAge: 12.5 } }],
-    ["exact stated age", { exact: { statedAge: 12.5 } }],
-    ["exact vintage year", { exact: { vintageYear: 2000.5 } }],
-    ["exact release year", { exact: { releaseYear: 2020.5 } }],
+    ["stated age", { statedAge: 12.5 }],
+    ["vintage year", { vintageYear: 2000.5 }],
+    ["release year", { releaseYear: 2020.5 }],
   ])("rejects a fractional %s", (_label, overrides) => {
-    const stableOverrides = "stable" in overrides ? overrides.stable : {};
-    const exactOverrides = "exact" in overrides ? overrides.exact : {};
     expect(() =>
       BottleCreateInputSchema.parse({
-        stable: {
-          name: "Integer Boundary",
-          brand: 1,
-          ...stableOverrides,
-        },
-        exact: { ...exactOverrides },
+        name: "Integer Boundary",
+        brand: 1,
+        ...overrides,
       }),
     ).toThrow();
   });
@@ -394,34 +386,41 @@ describe("Bottle creation", () => {
       "nested distiller",
       { distillers: [{ id: 0, name: "Invalid Distiller" }] },
     ],
-  ])("rejects an invalid %s id", (_label, stableOverrides) => {
+  ])("rejects an invalid %s id", (_label, overrides) => {
     expect(() =>
       BottleCreateInputSchema.parse({
-        stable: {
-          name: "Entity ID Boundary",
-          brand: 1,
-          ...stableOverrides,
-        },
-        exact: {},
+        name: "Entity ID Boundary",
+        brand: 1,
+        ...overrides,
       }),
     ).toThrow();
   });
 
   test.each([
     {
+      label: "caller-selected storage scopes",
+      input: {
+        name: "Unauthorized Storage Scope",
+        brand: 1,
+        stable: {},
+        exact: {},
+      },
+    },
+    {
       label: "source Bottle authority",
       input: {
         kind: "source_bottle",
         sourceBottleId: 1,
-        exact: {},
+        name: "Unauthorized Source",
+        brand: 1,
       },
     },
     {
       label: "raw group authority",
       input: {
         groupId: 1,
-        stable: { name: "Unauthorized Group Reuse", brand: 1 },
-        exact: {},
+        name: "Unauthorized Group Reuse",
+        brand: 1,
       },
     },
   ])("rejects $label at the runtime boundary", ({ input }) => {
@@ -435,8 +434,9 @@ describe("Bottle creation", () => {
     const context = contextFor(defaults.user);
     const brand = await fixtures.Entity({ name: "Duplicate Test Brand" });
     const input = {
-      stable: { name: "Duplicate Expression", brand: brand.id },
-      exact: { edition: "Batch 1" },
+      name: "Duplicate Expression",
+      brand: brand.id,
+      edition: "Batch 1",
     };
     const first = await createBottle({ context, input });
 
@@ -463,12 +463,10 @@ describe("Bottle creation", () => {
       createBottle({
         context,
         input: {
-          stable: {
-            name: "35.331",
-            brand: smws.id,
-            bottler: smws.id,
-          },
-          exact: { singleCask: true },
+          name: "35.331",
+          brand: smws.id,
+          bottler: smws.id,
+          singleCask: true,
         },
       }),
     ).rejects.toEqual(
@@ -487,8 +485,9 @@ describe("Bottle creation", () => {
     const brand = await fixtures.Entity({ name: "Reuse Result Brand" });
     const actor = await getUserActor(defaults.user);
     const input = BottleCreateInputSchema.parse({
-      stable: { name: "Reuse Result Expression", brand: brand.id },
-      exact: { edition: "Batch 1" },
+      name: "Reuse Result Expression",
+      brand: brand.id,
+      edition: "Batch 1",
     });
     const created = await createBottle({
       context: contextFor(defaults.user),
@@ -535,11 +534,8 @@ describe("Bottle creation", () => {
         name: `Inactive Reuse Brand ${index}`,
       });
       const input = BottleCreateInputSchema.parse({
-        stable: {
-          name: `Inactive Reuse Expression ${index}`,
-          brand: brand.id,
-        },
-        exact: {},
+        name: `Inactive Reuse Expression ${index}`,
+        brand: brand.id,
       });
       const created = await createBottle({ context, input });
       await scenario.retire(created);
@@ -582,8 +578,8 @@ describe("Bottle creation", () => {
       createBottle({
         context: contextFor(defaults.user),
         input: {
-          stable: { name: "Blocked Expression", brand: brand.id },
-          exact: {},
+          name: "Blocked Expression",
+          brand: brand.id,
         },
       }),
     ).rejects.toEqual(
@@ -633,15 +629,17 @@ describe("Bottle creation", () => {
     const first = await createBottle({
       context,
       input: {
-        stable: { name: "Shared Expression", brand: brand.id },
-        exact: { edition: "Batch 1" },
+        name: "Shared Expression",
+        brand: brand.id,
+        edition: "Batch 1",
       },
     });
     const second = await createBottle({
       context,
       input: {
-        stable: { name: "Shared Expression", brand: brand.id },
-        exact: { edition: "Batch 2" },
+        name: "Shared Expression",
+        brand: brand.id,
+        edition: "Batch 2",
       },
     });
 
@@ -665,8 +663,9 @@ describe("Bottle creation", () => {
     const brand = await fixtures.Entity({ name: "Rollback Test Brand" });
     const actor = await getUserActor(defaults.user);
     const input = {
-      stable: { name: "Rollback Expression", brand: brand.id },
-      exact: { edition: "Retryable" },
+      name: "Rollback Expression",
+      brand: brand.id,
+      edition: "Retryable",
     };
     const parsedInput = BottleCreateInputSchema.parse(input);
     const attempt: {
@@ -745,8 +744,8 @@ describe("Bottle creation", () => {
     const result = await createBottle({
       context: contextFor(defaults.user),
       input: {
-        stable: { name: "Committed Before Queue", brand: brand.id },
-        exact: {},
+        name: "Committed Before Queue",
+        brand: brand.id,
       },
     });
 

@@ -1,10 +1,12 @@
 import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import {
+  bottleGroups,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
 } from "@peated/server/db/schema";
+import { materializeBottleForGroup } from "@peated/server/lib/bottleIdentity";
 import { createBottle } from "@peated/server/lib/createBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
@@ -23,8 +25,36 @@ async function createGroup(
 ) {
   const first = await createBottle({
     context: { user },
-    input: { stable, exact: exacts[0] },
+    input: { ...stable, ...exacts[0] },
   });
+  if ("statedAge" in stable) {
+    const statedAge = stable.statedAge as number | null;
+    const materialized = materializeBottleForGroup({
+      group: { ...first.group, statedAge },
+      exact: {
+        edition: first.bottle.edition,
+        statedAge: exacts[0].statedAge ?? null,
+        releaseYear: first.bottle.releaseYear,
+        vintageYear: first.bottle.vintageYear,
+        abv: first.bottle.abv,
+        singleCask: first.bottle.singleCask,
+        caskStrength: first.bottle.caskStrength,
+        caskType: first.bottle.caskType,
+        caskSize: first.bottle.caskSize,
+        caskFill: first.bottle.caskFill,
+      },
+    });
+    await db
+      .update(bottleGroups)
+      .set({ statedAge })
+      .where(eq(bottleGroups.id, first.group.id));
+    await db
+      .update(bottles)
+      .set(materialized)
+      .where(eq(bottles.id, first.bottle.id));
+    Object.assign(first.group, { statedAge });
+    Object.assign(first.bottle, materialized);
+  }
   for (const exact of exacts.slice(1)) {
     await testFixtures.BottleGroupMember({
       groupId: first.group.id,

@@ -1,6 +1,6 @@
 /**
  * Owns preparation and persistence for complete Bottle transactions.
- * Stable fields and distiller joins are durable parts of each Bottle's
+ * Group-owned fields and distiller joins are durable parts of each Bottle's
  * independently renderable identity.
  */
 import {
@@ -98,20 +98,76 @@ type PreparedBottleCreate = {
   distillerIds: number[];
   newEntityIds: number[];
   seriesCreated: boolean;
-  stableFullName: string;
-  stableName: string;
+  groupFullName: string;
+  groupName: string;
 };
 
 type BottleIdentityPreparation = {
   exactNormalizedFields: Pick<
-    BottleCreateInput["exact"],
+    BottleCreateInput,
     "statedAge" | "vintageYear" | "releaseYear" | "singleCask" | "caskStrength"
   >;
-  stableName: string;
-  stableStatedAge: number | null;
+  groupName: string;
+  groupStatedAge: number | null;
 };
 
-type StableBottleGroupInput = BottleCreateInput["stable"];
+type BottleGroupCreateInput = Pick<
+  BottleCreateInput,
+  | "name"
+  | "series"
+  | "category"
+  | "brand"
+  | "distillers"
+  | "bottler"
+  | "flavorProfile"
+> & { statedAge: number | null };
+
+type ExactBottleCreateInput = Pick<
+  BottleCreateInput,
+  | "edition"
+  | "statedAge"
+  | "abv"
+  | "singleCask"
+  | "caskStrength"
+  | "vintageYear"
+  | "releaseYear"
+  | "caskSize"
+  | "caskType"
+  | "caskFill"
+  | "description"
+  | "descriptionSrc"
+  | "tastingNotes"
+>;
+
+/** The server owns storage scope. New singleton groups have no shared age. */
+function splitBottleCreateInput(input: BottleCreateInput): {
+  group: BottleGroupCreateInput;
+  exact: ExactBottleCreateInput;
+} {
+  const {
+    name,
+    series,
+    category,
+    brand,
+    distillers,
+    bottler,
+    flavorProfile,
+    ...exact
+  } = input;
+  return {
+    group: {
+      name,
+      statedAge: null,
+      series,
+      category,
+      brand,
+      distillers,
+      bottler,
+      flavorProfile,
+    },
+    exact,
+  };
+}
 
 export type BottleCreateResult = PersistedBottleResult & {
   group: BottleGroup;
@@ -139,7 +195,7 @@ async function prepareBottleCreateInTransaction(
   const bottleData: BottlePreviewResult & Record<string, any> =
     await bottleNormalize({ input, context, entityDb: tx });
   if (bottleIdentity) {
-    // Explicit exact input overrides traits inferred from the stable name.
+    // Explicit exact input overrides traits inferred from the group name.
     Object.assign(bottleData, bottleIdentity.exactNormalizedFields);
   }
 
@@ -150,16 +206,16 @@ async function prepareBottleCreateInTransaction(
       (input.description && input.description !== null ? "user" : null);
   }
 
-  const stableName = stripDuplicateBrandPrefixFromBottleName(
-    bottleIdentity?.stableName ?? bottleData.name,
+  const groupName = stripDuplicateBrandPrefixFromBottleName(
+    bottleIdentity?.groupName ?? bottleData.name,
     bottleData.brand.name,
   );
 
-  if (!stableName) {
+  if (!groupName) {
     throw new BottleCreateBadRequestError("Invalid bottle name.");
   }
 
-  if (bottleNameDuplicatesBrand(stableName, bottleData.brand.name)) {
+  if (bottleNameDuplicatesBrand(groupName, bottleData.brand.name)) {
     throw new BottleCreateBadRequestError(
       "Bottle name must identify an expression distinct from the brand.",
     );
@@ -262,15 +318,15 @@ async function prepareBottleCreateInTransaction(
     }
   }
 
-  const stableFullName = formatBottleName({
-    name: `${brand.shortName || brand.name} ${stableName}`,
+  const groupFullName = formatBottleName({
+    name: `${brand.shortName || brand.name} ${groupName}`,
   });
   const bottleName = bottleIdentity
     ? materializeBottleIdentity({
         stable: {
-          name: stableName,
-          fullName: stableFullName,
-          statedAge: bottleIdentity.stableStatedAge,
+          name: groupName,
+          fullName: groupFullName,
+          statedAge: bottleIdentity.groupStatedAge,
         },
         exact: {
           edition: bottleData.edition ?? null,
@@ -311,8 +367,8 @@ async function prepareBottleCreateInTransaction(
     distillerIds,
     newEntityIds: Array.from(newEntityIds),
     seriesCreated,
-    stableFullName,
-    stableName,
+    groupFullName,
+    groupName,
   };
 }
 
@@ -430,18 +486,18 @@ async function insertPreparedBottleInTransaction(
 }
 
 function buildBottleInput(
-  stable: StableBottleGroupInput,
-  exact: BottleCreateInput["exact"],
+  group: BottleGroupCreateInput,
+  exact: ExactBottleCreateInput,
 ): z.infer<typeof BottleInputSchema> {
   const input: z.infer<typeof BottleInputSchema> = {
-    name: stable.name,
+    name: group.name,
     imageUrl: null,
-    brand: stable.brand,
-    distillers: stable.distillers,
-    bottler: stable.bottler,
-    series: stable.series,
-    category: stable.category,
-    flavorProfile: stable.flavorProfile,
+    brand: group.brand,
+    distillers: group.distillers,
+    bottler: group.bottler,
+    series: group.series,
+    category: group.category,
+    flavorProfile: group.flavorProfile,
     ...exact,
   };
   return input;
@@ -452,9 +508,9 @@ async function createIndependentGroupPrefix(
   tx: AnyTransaction,
   {
     actorId,
-    stable,
-    stableFullName,
-    stableName,
+    fields,
+    groupFullName,
+    groupName,
     brandId,
     bottlerId,
     seriesId,
@@ -463,9 +519,9 @@ async function createIndependentGroupPrefix(
     distillerIds,
   }: {
     actorId: number;
-    stable: StableBottleGroupInput;
-    stableFullName: string;
-    stableName: string;
+    fields: BottleGroupCreateInput;
+    groupFullName: string;
+    groupName: string;
     brandId: number;
     bottlerId: number | null;
     seriesId: number | null;
@@ -477,9 +533,9 @@ async function createIndependentGroupPrefix(
   const [group] = await tx
     .insert(bottleGroups)
     .values({
-      fullName: stableFullName,
-      name: stableName,
-      statedAge: stable.statedAge,
+      fullName: groupFullName,
+      name: groupName,
+      statedAge: fields.statedAge,
       seriesId,
       category,
       brandId,
@@ -517,38 +573,39 @@ export async function createBottleInTransaction(
     context: Context & { user: User };
   },
 ): Promise<BottleCreateResult> {
+  const { group: storageGroup, exact } = splitBottleCreateInput(input);
   // Exact age is name-normalization context only; it cannot become group-owned state.
-  const normalizedStable = normalizeBottleAge({
-    name: normalizeBottleAliasKey(input.stable.name),
-    statedAge: input.stable.statedAge ?? input.exact.statedAge,
+  const normalizedGroup = normalizeBottleAge({
+    name: normalizeBottleAliasKey(storageGroup.name),
+    statedAge: exact.statedAge,
   });
-  const stable = {
-    ...input.stable,
-    name: normalizedStable.name,
+  const groupFields = {
+    ...storageGroup,
+    name: normalizedGroup.name,
   };
   const prepared = await prepareBottleCreateInTransaction(tx, {
     creationSource,
     bottleIdentity: {
       exactNormalizedFields: {
-        statedAge: input.exact.statedAge,
-        vintageYear: input.exact.vintageYear,
-        releaseYear: input.exact.releaseYear,
-        singleCask: input.exact.singleCask,
-        caskStrength: input.exact.caskStrength,
+        statedAge: exact.statedAge,
+        vintageYear: exact.vintageYear,
+        releaseYear: exact.releaseYear,
+        singleCask: exact.singleCask,
+        caskStrength: exact.caskStrength,
       },
-      stableName: stable.name,
-      stableStatedAge: stable.statedAge,
+      groupName: groupFields.name,
+      groupStatedAge: groupFields.statedAge,
     },
     createdByActorId,
-    input: buildBottleInput(stable, input.exact),
+    input: buildBottleInput(groupFields, exact),
     context,
   });
 
   const group = await createIndependentGroupPrefix(tx, {
     actorId: createdByActorId,
-    stable,
-    stableFullName: prepared.stableFullName,
-    stableName: prepared.stableName,
+    fields: groupFields,
+    groupFullName: prepared.groupFullName,
+    groupName: prepared.groupName,
     brandId: prepared.bottleInsertData.brandId,
     bottlerId: prepared.bottleInsertData.bottlerId ?? null,
     seriesId: prepared.bottleInsertData.seriesId ?? null,
