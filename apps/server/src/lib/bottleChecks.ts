@@ -6,6 +6,7 @@ import {
   BottleClassifierRunMetadataSchema,
   ClassifyBottleReferenceInputSchema,
   DecidedBottleClassificationResultSchema,
+  FindingSchema,
   getBottleCheckSourceEvidencePaths,
   IgnoredBottleClassificationResultSchema,
   type BottleClassificationArtifacts,
@@ -134,13 +135,13 @@ export const PersistedAuditBottleCheckOutputSchema =
 export const PersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
   "status",
   [
-    IgnoredBottleClassificationResultSchema.omit({
-      proposedOperations: true,
-      artifacts: true,
+    IgnoredBottleClassificationResultSchema.omit({ artifacts: true }).extend({
+      // Version 2 reference checks can contain findings from the former
+      // combined identity-and-review agent. New reference checks write none.
+      findings: z.array(FindingSchema).default([]),
     }),
-    DecidedBottleClassificationResultSchema.omit({
-      proposedOperations: true,
-      artifacts: true,
+    DecidedBottleClassificationResultSchema.omit({ artifacts: true }).extend({
+      findings: z.array(FindingSchema).default([]),
     }),
   ],
 );
@@ -187,14 +188,20 @@ const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
 function buildPersistedBottleCheckOutput(
   input: z.infer<typeof CreateBottleCheckInputSchema>,
 ) {
-  const {
-    artifacts: _artifacts,
-    proposedOperations: _proposedOperations,
-    ...output
-  } = input.result;
-  return input.intent === "audit_bottle"
-    ? PersistedAuditBottleCheckOutputSchema.parse(output)
-    : PersistedReferenceBottleCheckOutputSchema.parse(output);
+  if (input.intent === "audit_bottle") {
+    const {
+      artifacts: _artifacts,
+      proposedOperations: _proposedOperations,
+      ...output
+    } = input.result;
+    return PersistedAuditBottleCheckOutputSchema.parse(output);
+  }
+
+  const { artifacts: _artifacts, ...output } = input.result;
+  return PersistedReferenceBottleCheckOutputSchema.parse({
+    ...output,
+    findings: [],
+  });
 }
 
 const BottleCheckSubjectSchema = z.discriminatedUnion("intent", [
@@ -473,7 +480,10 @@ export async function createBottleCheck(
       );
     }
   }
-  const findingEvidenceRefs = input.result.findings.flatMap(
+  const findings = input.intent === "audit_bottle" ? input.result.findings : [];
+  const proposedOperations =
+    input.intent === "audit_bottle" ? input.result.proposedOperations : [];
+  const findingEvidenceRefs = findings.flatMap(
     ({ evidenceRefs }) => evidenceRefs,
   );
   const evidenceSource = {
@@ -507,7 +517,7 @@ export async function createBottleCheck(
           };
     const { suggestedBottleId, ...storePriceLink } = resolvedStorePriceLink;
     const operations = await prepareProposals({
-      proposals: input.result.proposedOperations,
+      proposals: proposedOperations,
       artifacts: input.result.artifacts,
       sourceFields,
       protectedBottleIds: getProtectedBottleIds(input, suggestedBottleId),

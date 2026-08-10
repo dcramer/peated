@@ -532,9 +532,9 @@ export const BottleClassifierAgentDecisionSchema = z
       .describe(
         [
           "Decision action.",
-          "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId. A reviewed update proposal may separately correct optional or malformed stored fields.",
+          "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId.",
           "create_bottle: no inspected existing Bottle represents the exact marketed product, including plausible malformed candidates; set proposedBottle only, including every marketed release trait needed to identify it.",
-          "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a Suggested Change before assignment is safe.",
+          "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a separate Bottle Review before assignment is safe.",
         ].join(" "),
       ),
     rationale: z.string().nullable().default(null),

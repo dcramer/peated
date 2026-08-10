@@ -165,30 +165,6 @@
     "expectedTier": "auto",
     "verifyEligible": true,
     "suggestedNextStep": "confirm_match",
-    "proposedOperations": [
-      {
-        "type": "update_bottle",
-        "input": {
-          "bottleId": 44256,
-          "patch": {
-            "exact": {
-              "singleCask": false
-            }
-          }
-        },
-        "rationale": "Bottle 44256 is the exact Springbank Open Day release, but its single-cask flag conflicts with the label's Bourbon, Oloroso, and rum cask vatting.",
-        "evidenceRefs": [
-          {
-            "kind": "source",
-            "field": "reference.imageUrl"
-          },
-          {
-            "kind": "bottle",
-            "bottleId": 44256
-          }
-        ]
-      }
-    ],
     "summary": "Match existing bottle 44256, Springbank Open Day, from the label's May 2026 30-year-old Open Day identity."
   },
   "localCatalog": {

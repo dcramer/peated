@@ -1,6 +1,6 @@
 {
-  "id": "image-backed-photo-requires-spice-tree-extravaganza-catalog-change",
-  "name": "image-backed photo: requires a Spice Tree Extravaganza Suggested Change",
+  "id": "image-backed-photo-requires-spice-tree-extravaganza-catalog-review",
+  "name": "image-backed photo: requires a separate Spice Tree Extravaganza catalog review",
   "input": {
     "reference": {
       "name": "Bottle photo upload",
@@ -183,7 +183,7 @@
         "source": "production_search",
         "issue": "conflicts_with_evidence",
         "safeToAutoFill": false,
-        "notes": "Bottle 9900 is the same marketed product but has a malformed Brand, name, category, and stated age. The Suggested Change must remain moderator-reviewed."
+        "notes": "Bottle 9900 is the same marketed product but has a malformed Brand, name, category, and stated age. A separate Bottle audit must own any moderator-reviewed Suggested Change."
       },
       {
         "target": "candidate_bottle",
@@ -206,7 +206,7 @@
         "safeToAutoFill": true
       }
     ],
-    "notes": "This curated regression uses the exact production image and exact malformed Bottle 9900 catalog row. The original classifier extraction and candidate trace are unavailable, so it does not claim to reproduce that hidden trace. It models the preferred pre-create outcome: return no_match and propose one complete, reviewable Suggested Change instead of assigning malformed Bottle 9900 or creating duplicate Bottle 45175. Official and independent sources support 46% ABV, release year 2016, Compass Box as bottler, and the six component distilleries. Cask type, size, and fill are intentionally outside the expectation."
+    "notes": "This curated regression uses the exact production image and exact malformed Bottle 9900 catalog row. The original classifier extraction and candidate trace are unavailable, so it does not claim to reproduce that hidden trace. It models the preferred pre-create outcome: return no_match instead of assigning malformed Bottle 9900 or creating duplicate Bottle 45175. A separate Bottle audit owns any reviewable catalog correction. Official and independent sources support 46% ABV, release year 2016, Compass Box as bottler, and the six component distilleries. Cask type, size, and fill are intentionally outside the expectation."
   },
   "expected": {
     "status": "classified",
@@ -214,76 +214,7 @@
     "identityScope": "product",
     "matchedBottleId": null,
     "suggestedNextStep": "manual_search",
-    "proposedOperations": [
-      {
-        "type": "update_bottle",
-        "input": {
-          "bottleId": 9900,
-          "patch": {
-            "shared": {
-              "name": "Spice Tree Extravaganza",
-              "statedAge": null,
-              "category": "blend",
-              "brand": {
-                "kind": "existing",
-                "entityId": 1422
-              },
-              "distillers": [
-                {
-                  "kind": "existing",
-                  "entityId": 15
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 89
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 242
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 410
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 516
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 843
-                }
-              ]
-            },
-            "exact": {
-              "edition": "Limited Edition",
-              "abv": 46,
-              "releaseYear": 2016
-            }
-          }
-        },
-        "rationale": "Bottle 9900 is the same marketed Spice Tree Extravaganza release, but authoritative product evidence requires a Suggested Change before the reference is safe to assign.",
-        "evidenceRefs": [
-          {
-            "kind": "bottle",
-            "bottleId": 9900
-          },
-          {
-            "kind": "source",
-            "field": "imageEvidence.fieldCandidates.expression"
-          },
-          {
-            "kind": "source",
-            "field": "imageEvidence.fieldCandidates.edition"
-          },
-          {
-            "kind": "web_result",
-            "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza?variant=41954227519623"
-          }
-        ]
-      }
-    ],
-    "summary": "Return no_match and propose one complete moderator-reviewed Suggested Change instead of assigning a malformed Bottle or creating a duplicate."
+    "summary": "Return no_match instead of assigning a malformed Bottle or creating a duplicate; catalog review is separate."
   },
   "localCatalog": {
     "entities": [

@@ -10,7 +10,6 @@ import { findExactAliasBottleCandidate } from "@peated/server/agents/bottleClass
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { logError } from "@peated/server/lib/log";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
@@ -46,9 +45,6 @@ type AuthenticatedContext = Context & {
 type PhotoIdentificationClassification = Awaited<
   ReturnType<typeof runBottleReference>
 >["result"];
-type PhotoIdentificationModelMetadata = Awaited<
-  ReturnType<typeof runBottleReference>
->["modelMetadata"];
 type PhotoIdentificationAttributeValue =
   | boolean
   | number
@@ -557,52 +553,9 @@ function logPhotoIdentificationFailure({
   });
 }
 
-async function persistPhotoIdentificationReview({
-  classification,
-  classificationInput,
-  modelMetadata,
-  pendingImageId,
-}: {
-  classification: PhotoIdentificationClassification;
-  classificationInput: Parameters<typeof runBottleReference>[0];
-  modelMetadata: PhotoIdentificationModelMetadata;
-  pendingImageId: string;
-}) {
-  if (
-    classification.status !== "classified" ||
-    classification.decision.action === "create_bottle" ||
-    (classification.proposedOperations.length === 0 &&
-      classification.findings.length === 0)
-  ) {
-    return;
-  }
-
-  try {
-    await createBottleCheck({
-      intent: "resolve_reference",
-      sourceKind: "photo_identification",
-      sourceId: pendingImageId,
-      input: classificationInput,
-      result: classification,
-      backgroundEventKey: `photo_identification:${pendingImageId}`,
-      model: config.BOTTLE_CLASSIFIER_MODEL,
-      modelMetadata,
-    });
-  } catch (error) {
-    // Supplemental review must never break the user's photo-tasting flow.
-    logError(error, {
-      photoIdentification: {
-        pendingImageId,
-        phase: "persist_bottle_check",
-      },
-    });
-  }
-}
-
 /**
  * Runs label extraction and local candidate discovery for a pending scan, then
- * gives the full classifier the chance to identify the Bottle and propose any
- * supported catalog changes.
+ * gives the full classifier the chance to identify the Bottle.
  *
  * This is the shared Photo Identification workflow span boundary for all callers.
  */
@@ -660,12 +613,6 @@ export async function identifyPendingImage({
         classificationInputWithCandidates,
       );
       const classification = classificationRun.result;
-      await persistPhotoIdentificationReview({
-        classification,
-        classificationInput: classificationInputWithCandidates,
-        modelMetadata: classificationRun.modelMetadata,
-        pendingImageId: pendingImage.id,
-      });
       const referenceName = classificationInput.reference.name;
       const diagnostics = buildPhotoIdentificationDiagnostics({
         extractionStatus: extractedIdentity ? "found" : "empty",

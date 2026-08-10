@@ -134,7 +134,6 @@ describe("classifier output boundary", () => {
         confidenceBasis: null,
         matchedBottleId: null,
         proposedBottle: null,
-        findings: [],
       },
     );
 
@@ -150,10 +149,9 @@ describe("classifier output boundary", () => {
     expect(outputType.schema.properties).not.toHaveProperty(
       "proposedOperations",
     );
-    expect(outputType.schema.properties).toHaveProperty("findings");
-    expect(outputType.schema.required).toContain("findings");
+    expect(outputType.schema.properties).not.toHaveProperty("findings");
     expect(hasFormatAnnotation(outputType.schema)).toBe(false);
-    expect(prepared.agent.tools.map((tool) => tool.name)).toEqual(
+    expect(prepared.agent.tools.map((tool) => tool.name)).not.toEqual(
       expect.arrayContaining([
         "propose_update_bottle",
         "propose_merge_bottles",
@@ -162,15 +160,9 @@ describe("classifier output boundary", () => {
       ]),
     );
     expect(dynamicInput.reference.externalSiteId).toBe(7);
-    expect(dynamicInput.availableSourceEvidenceFields).toEqual([
-      "reference.id",
-      "reference.externalSiteId",
-      "reference.name",
-    ]);
+    expect(dynamicInput).not.toHaveProperty("availableSourceEvidenceFields");
     expect(prepared.getAgentResult(result)).toMatchObject({
       decision: { action: "no_match" },
-      findings: [],
-      proposedOperations: [],
     });
   });
 
@@ -215,193 +207,6 @@ describe("classifier output boundary", () => {
     expect(JSON.parse(prepared.input).availableSourceEvidenceFields).toEqual(
       [],
     );
-  });
-
-  test("keeps canonical web evidence URL validation", async () => {
-    const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
-      reference: { name: "Laphroaig Cairdeas 2022" },
-      extractedIdentity: null,
-      initialCandidates: [],
-    });
-
-    expect(() =>
-      prepared.getAgentResult({
-        finalOutput: {
-          action: "no_match",
-          findings: [
-            {
-              scope: "bottle",
-              summary: "The evidence URL is malformed.",
-              evidenceRefs: [{ kind: "web_result", url: "not a URL" }],
-            },
-          ],
-        },
-      }),
-    ).toThrow();
-  });
-
-  test("rejects well-formed finding evidence that was not collected", async () => {
-    const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
-      reference: { name: "Laphroaig Cairdeas 2022" },
-      extractedIdentity: null,
-      initialCandidates: [],
-    });
-
-    expect(() =>
-      prepared.getAgentResult({
-        finalOutput: {
-          action: "no_match",
-          findings: [
-            {
-              scope: "bottle",
-              summary: "An unsupported page allegedly establishes a defect.",
-              evidenceRefs: [
-                {
-                  kind: "web_result",
-                  url: "https://example.com/not-collected",
-                },
-              ],
-            },
-          ],
-        },
-      }),
-    ).toThrow("Finding 0 cites evidence that was not collected");
-  });
-
-  test("rejects finding evidence from an uninspected Bottle candidate", async () => {
-    const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
-      reference: { name: "Laphroaig Cairdeas 2022" },
-      extractedIdentity: null,
-      initialCandidates: [
-        {
-          bottleId: 39096,
-          alias: null,
-          fullName: "Laphroaig Cairdeas 2022",
-          brand: "Laphroaig",
-          bottler: null,
-          series: null,
-          distillery: ["Laphroaig"],
-          category: "single_malt",
-          statedAge: null,
-          edition: null,
-          caskStrength: null,
-          singleCask: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: 2022,
-          score: 0.9,
-          source: ["vector"],
-        },
-      ],
-    });
-
-    expect(() =>
-      prepared.getAgentResult({
-        finalOutput: {
-          action: "no_match",
-          findings: [
-            {
-              scope: "bottle",
-              summary: "A search candidate appears malformed.",
-              evidenceRefs: [{ kind: "bottle", bottleId: 39096 }],
-            },
-          ],
-        },
-      }),
-    ).toThrow(
-      "Finding 0 cites Bottle or Entity evidence that was not inspected",
-    );
-  });
-
-  test("rejects finding evidence from an uninspected resolved Entity", async () => {
-    const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
-      reference: { name: "Laphroaig Cairdeas 2022" },
-      extractedIdentity: null,
-      initialCandidates: [],
-      resolvedEntities: [
-        {
-          entityId: 9,
-          name: "Laphroaig",
-          shortName: null,
-          type: ["brand"],
-          alias: null,
-          score: 0.9,
-          source: ["search"],
-        },
-      ],
-    });
-
-    expect(() =>
-      prepared.getAgentResult({
-        finalOutput: {
-          action: "no_match",
-          findings: [
-            {
-              scope: "entity",
-              summary: "A search result appears to identify a bad Entity.",
-              evidenceRefs: [{ kind: "entity", entityId: 9 }],
-            },
-          ],
-        },
-      }),
-    ).toThrow(
-      "Finding 0 cites Bottle or Entity evidence that was not inspected",
-    );
-  });
-
-  test("accepts collected source and web finding evidence", async () => {
-    const evidenceUrl = "https://example.com/laphroaig-cairdeas";
-    const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
-      reference: { name: "Laphroaig Cairdeas 2022" },
-      extractedIdentity: null,
-      initialCandidates: [],
-      searchEvidence: [
-        {
-          provider: "openai",
-          query: "Laphroaig Cairdeas official",
-          summary: null,
-          results: [
-            {
-              title: "Cairdeas",
-              url: evidenceUrl,
-              domain: "example.com",
-              description: null,
-              extraSnippets: [],
-            },
-          ],
-        },
-      ],
-    });
-
-    expect(
-      prepared.getAgentResult({
-        finalOutput: {
-          action: "no_match",
-          findings: [
-            {
-              scope: "other",
-              summary: "The collected evidence needs moderator review.",
-              evidenceRefs: [
-                { kind: "source", field: "reference.name" },
-                { kind: "web_result", url: evidenceUrl },
-              ],
-            },
-          ],
-        },
-      }),
-    ).toMatchObject({
-      findings: [
-        expect.objectContaining({
-          evidenceRefs: [
-            { kind: "source", field: "reference.name" },
-            { kind: "web_result", url: evidenceUrl },
-          ],
-        }),
-      ],
-    });
   });
 
   test("accepts finding evidence from the preloaded audit Bottle", () => {

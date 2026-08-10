@@ -964,67 +964,6 @@ const ClassifierExpectationJudge = createJudge<ClassifierJudgeContext>(
   },
 );
 
-function scoreScenarioSemanticOutput(
-  input: ClassifierScenarioEvalCase,
-  result: BottleClassificationResult,
-) {
-  const expected =
-    input.kind === "decision"
-      ? input.testCase.expected
-      : { proposedOperations: [], findings: [] };
-  const actual =
-    result.status === "classified"
-      ? result
-      : { proposedOperations: [], findings: [] };
-
-  return scoreBottleCheckSemanticOutput(expected, actual);
-}
-
-const ClassifierGroundingJudge = createJudge<ClassifierJudgeContext>(
-  "ClassifierGroundingJudge",
-  ({ input, run }) => {
-    const result = parseClassificationRunOutput(run.output);
-    const score = scoreBottleCheckGrounding(
-      result,
-      getBottleCheckSourceEvidencePaths({
-        intent: "resolve_reference",
-        input: input.testCase.input,
-        artifacts: result.artifacts,
-      }),
-      input.kind === "decision"
-        ? input.testCase.expected.proposedOperations
-        : undefined,
-    );
-    return { score: score.score, metadata: score };
-  },
-);
-
-const OperationExpectationJudge = createJudge<ClassifierJudgeContext>(
-  "OperationExpectationJudge",
-  ({ input, run }) => {
-    const result = parseClassificationRunOutput(run.output);
-    const score = scoreScenarioSemanticOutput(input, result).operations;
-
-    return {
-      score: score.score,
-      metadata: score,
-    };
-  },
-);
-
-const FindingExpectationJudge = createJudge<ClassifierJudgeContext>(
-  "FindingExpectationJudge",
-  ({ input, run }) => {
-    const result = parseClassificationRunOutput(run.output);
-    const score = scoreScenarioSemanticOutput(input, result).findings;
-
-    return {
-      score: score.score,
-      metadata: score,
-    };
-  },
-);
-
 const SCENARIO_CONFIG: Array<{
   label: string;
   scenario: LiveClassifierEvalScenario;
@@ -1063,20 +1002,13 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     {
       skipIf: () => !hasEvalAIGatewayCredentials,
       harness: classifierHarness,
-      judges: [ClassifierExpectationJudge, ClassifierGroundingJudge],
+      judges: [ClassifierExpectationJudge],
       judgeThreshold: threshold,
     },
     (it) => {
       it.for(cases)("$name", async ({ testCase }, { run, annotate }) => {
         const result = await run(testCase);
         await annotate(formatEvalUsageAnnotation(result.usage), "usage");
-
-        await expect(result).toSatisfyJudge(OperationExpectationJudge, {
-          threshold: null,
-        });
-        await expect(result).toSatisfyJudge(FindingExpectationJudge, {
-          threshold: null,
-        });
       });
     },
   );

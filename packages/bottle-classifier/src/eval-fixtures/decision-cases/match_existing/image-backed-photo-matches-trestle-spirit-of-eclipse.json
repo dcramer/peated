@@ -157,35 +157,6 @@
     "identityScope": "product",
     "matchedBottleId": 38004,
     "suggestedNextStep": "confirm_match",
-    "proposedOperations": [
-      {
-        "type": "update_bottle",
-        "input": {
-          "bottleId": 38004,
-          "patch": {
-            "exact": {
-              "abv": 50,
-              "releaseYear": 2021
-            }
-          }
-        },
-        "rationale": "The matched Bottle is the exact Spirit of Eclipse product, but its stored 2011 release year conflicts with the producer's 2021 release date and its ABV is missing despite the label stating 50% ABV.",
-        "evidenceRefs": [
-          {
-            "kind": "source",
-            "field": "imageEvidence.fieldCandidates.abv"
-          },
-          {
-            "kind": "bottle",
-            "bottleId": 38004
-          },
-          {
-            "kind": "web_result",
-            "url": "https://www.oldtrestle.com/product-page/spirit-of-eclipse-whiskey"
-          }
-        ]
-      }
-    ],
     "summary": "Match existing bottle 38004 with no release."
   },
   "localCatalog": {

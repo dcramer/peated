@@ -8,7 +8,6 @@ import {
   bottleChecks,
   bottleGroups,
   bottleObservations,
-  bottleOperations,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -2040,7 +2039,7 @@ describe("priceMatching", () => {
     expect(updatedPrice?.bottleId).toBe(bottle.id);
   });
 
-  test("auto-approves a safe match without applying its separate Suggested Change", async ({
+  test("auto-approves a safe match without catalog review", async ({
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
@@ -2119,20 +2118,6 @@ describe("priceMatching", () => {
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
         },
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: bottle.id,
-              patch: { exact: { abv: 50 } },
-            },
-            rationale: "Add the supported ABV for moderator review.",
-            evidenceRefs: [
-              { kind: "source", field: "reference.name" },
-              { kind: "bottle", bottleId: bottle.id },
-            ],
-          },
-        ],
         searchEvidence: [],
         candidateBottles: [
           {
@@ -2194,12 +2179,7 @@ describe("priceMatching", () => {
       where: eq(bottleChecks.storePriceMatchProposalId, proposal.id),
       with: { operations: true },
     });
-    expect(check?.operations).toEqual([
-      expect.objectContaining({
-        proposal: expect.objectContaining({ type: "update_bottle" }),
-        status: "pending_review",
-      }),
-    ]);
+    expect(check?.operations).toEqual([]);
   });
 
   test("keeps exact-ish bottle matches when only generic retailer words differ", async ({
@@ -2383,10 +2363,6 @@ describe("priceMatching", () => {
       category: "blend",
       distillerIds: [],
     });
-    const otherBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Unrelated Destination",
-    });
     const price = await fixtures.StorePrice({
       bottleId: currentBottle.id,
       name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
@@ -2512,25 +2488,7 @@ describe("priceMatching", () => {
             source: ["exact"],
           },
         ],
-        bottleContexts: [
-          await inspectedBottleContext(currentBottle.id),
-          await inspectedBottleContext(otherBottle.id),
-        ],
-        proposedOperations: [
-          {
-            type: "merge_bottles",
-            input: {
-              sourceBottleId: currentBottle.id,
-              destinationBottleId: otherBottle.id,
-            },
-            rationale:
-              "This deliberately conflicts with the translated primary repair target.",
-            evidenceRefs: [
-              { kind: "bottle", bottleId: currentBottle.id },
-              { kind: "bottle", bottleId: otherBottle.id },
-            ],
-          },
-        ],
+        bottleContexts: [await inspectedBottleContext(currentBottle.id)],
         resolvedEntities: [],
       }),
     );
@@ -2558,11 +2516,7 @@ describe("priceMatching", () => {
       where: eq(bottleChecks.storePriceMatchProposalId, proposal.id),
       with: { operations: true },
     });
-    expect(check?.operations).toEqual([
-      expect.objectContaining({
-        status: "pending_review",
-      }),
-    ]);
+    expect(check?.operations).toEqual([]);
   });
 
   test("keeps a required Bottle correction separate from no_match", async ({
@@ -2625,25 +2579,6 @@ describe("priceMatching", () => {
           matchedBottleId: null,
           proposedBottle: null,
         },
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: currentBottle.id,
-              patch: {
-                shared: { category: "single_malt" },
-                exact: { statedAge: 12 },
-              },
-            },
-            rationale:
-              "Correct the category and exact stated age before this reference is assigned.",
-            evidenceRefs: [
-              { kind: "source", field: "extractedIdentity.category" },
-              { kind: "source", field: "extractedIdentity.stated_age" },
-              { kind: "bottle", bottleId: currentBottle.id },
-            ],
-          },
-        ],
         extractedLabel: {
           brand: "The Whistler",
           bottler: null,
@@ -2720,21 +2655,7 @@ describe("priceMatching", () => {
     expect(check?.output).toMatchObject({
       decision: { action: "no_match", matchedBottleId: null },
     });
-    expect(check?.operations).toEqual([
-      expect.objectContaining({
-        status: "pending_review",
-        proposal: expect.objectContaining({
-          type: "update_bottle",
-          input: {
-            bottleId: currentBottle.id,
-            patch: {
-              shared: { category: "single_malt" },
-              exact: { statedAge: 12 },
-            },
-          },
-        }),
-      }),
-    ]);
+    expect(check?.operations).toEqual([]);
   });
 
   test("rolls back a repair when its suggested Bottle changes behind the Bottle lock", async ({
@@ -7778,18 +7699,6 @@ describe("priceMatching", () => {
           proposedBottle: null,
         },
         candidateBottles: [candidate],
-        proposedOperations: [
-          {
-            type: "update_entity",
-            input: {
-              entityId: 999999,
-              patch: { name: "Uninspected Entity" },
-            },
-            rationale: "This proposal must remain supplemental.",
-            evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
-          },
-        ],
-        findings: [],
       }),
     );
 
@@ -7809,147 +7718,14 @@ describe("priceMatching", () => {
         storePriceMatchProposalId: proposal.id,
       }),
     ]);
-    expect(await db.select().from(bottleOperations)).toEqual([
-      expect.objectContaining({
-        status: "blocked",
-        preparationError: expect.objectContaining({
-          code: "target_not_inspected",
-        }),
-      }),
-    ]);
-  });
-
-  test("does not retain a successful match when its linked check cannot persist", async ({
-    fixtures,
-  }) => {
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    const bottle = await fixtures.Bottle();
-    const price = await fixtures.StorePrice({
-      bottleId: null,
-      name: "Unpersistable Classifier Evidence",
-      imageUrl: null,
-    });
-    const candidate = await getBottleCandidateById(bottle.id);
-    expect(candidate).not.toBeNull();
-    vi.mocked(classifyBottleReference).mockResolvedValue(
-      buildMockBottleReferenceClassification({
-        decision: {
-          action: "match",
-          rationale: "The source matches the inspected Bottle.",
-          candidateBottleIds: [bottle.id],
-          aliasScope: "none",
-          matchedBottleId: bottle.id,
-          proposedBottle: null,
-        },
-        candidateBottles: [candidate],
-        proposedOperations: [],
-        findings: [
-          {
-            scope: "bottle",
-            summary: "This finding cites evidence the run did not collect.",
-            evidenceRefs: [
-              {
-                kind: "web_result",
-                url: "https://example.com/missing-evidence",
-              },
-            ],
-          },
-        ],
-      }),
-    );
-
-    const proposal = await resolveStorePriceMatchProposal(price.id);
-
-    expect(proposal).toMatchObject({
-      status: "errored",
-      proposalType: "no_match",
-      suggestedBottleId: null,
-      error: expect.stringContaining(
-        "Evidence reference was not collected by this Bottle check",
-      ),
-    });
-    expect(await db.select().from(storePriceMatchAttempts)).toEqual([
-      expect.objectContaining({
-        proposalId: proposal.id,
-        initialStatus: "errored",
-        finalStatus: "errored",
-      }),
-    ]);
-    expect(await db.select().from(bottleChecks)).toHaveLength(0);
-  });
-
-  test("blocks a proposal that would retire the classifier's matched Bottle", async ({
-    fixtures,
-  }) => {
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    const matchedBottle = await fixtures.Bottle({
-      name: "Protected Matched Bottle",
-    });
-    const otherBottle = await fixtures.Bottle({
-      name: "Other Inspected Bottle",
-    });
-    const price = await fixtures.StorePrice({
-      bottleId: null,
-      name: "Protected Match Reference",
-      imageUrl: null,
-    });
-    const matchedCandidate = await getBottleCandidateById(matchedBottle.id);
-    const otherCandidate = await getBottleCandidateById(otherBottle.id);
-    expect(matchedCandidate).not.toBeNull();
-    expect(otherCandidate).not.toBeNull();
-
-    vi.mocked(classifyBottleReference).mockResolvedValue(
-      buildMockBottleReferenceClassification({
-        decision: {
-          action: "match",
-          rationale: "The source matches the protected Bottle.",
-          candidateBottleIds: [matchedBottle.id, otherBottle.id],
-          aliasScope: "none",
-          matchedBottleId: matchedBottle.id,
-          proposedBottle: null,
-        },
-        candidateBottles: [matchedCandidate, otherCandidate],
-        bottleContexts: [
-          await inspectedBottleContext(matchedBottle.id),
-          await inspectedBottleContext(otherBottle.id),
-        ],
-        proposedOperations: [
-          {
-            type: "merge_bottles",
-            input: {
-              sourceBottleId: matchedBottle.id,
-              destinationBottleId: otherBottle.id,
-            },
-            rationale: "This conflicts with the primary match decision.",
-            evidenceRefs: [
-              { kind: "bottle", bottleId: matchedBottle.id },
-              { kind: "bottle", bottleId: otherBottle.id },
-            ],
-          },
-        ],
-        findings: [],
-      }),
-    );
-
-    const proposal = await resolveStorePriceMatchProposal(price.id);
     const check = await db.query.bottleChecks.findFirst({
       where: eq(bottleChecks.storePriceMatchProposalId, proposal.id),
       with: { operations: true },
     });
-
-    expect(check?.operations).toEqual([
-      expect.objectContaining({
-        status: "blocked",
-        preparationError: expect.objectContaining({
-          code: "direct_conflict",
-        }),
-      }),
-    ]);
+    expect(check?.operations).toEqual([]);
   });
 
-  test("links every classified full retry to an immutable check and preserves blocked siblings", async ({
+  test("links every classified full retry to an immutable identity check", async ({
     fixtures,
   }) => {
     const { classifyBottleReference, runBottleReference } =
@@ -7985,30 +7761,6 @@ describe("priceMatching", () => {
         },
         candidateBottles: [sourceCandidate, destinationCandidate],
         bottleContexts: [sourceContext, destinationContext],
-        proposedOperations: [
-          {
-            type: "update_entity",
-            input: {
-              entityId: 999999,
-              patch: { name: "Uninspected Entity" },
-            },
-            rationale: "The Entity name appears malformed.",
-            evidenceRefs: [{ kind: "bottle", bottleId: destinationBottle.id }],
-          },
-          {
-            type: "merge_bottles",
-            input: {
-              sourceBottleId: sourceBottle.id,
-              destinationBottleId: destinationBottle.id,
-            },
-            rationale: "The inspected Bottles are exact duplicates.",
-            evidenceRefs: [
-              { kind: "bottle", bottleId: sourceBottle.id },
-              { kind: "bottle", bottleId: destinationBottle.id },
-            ],
-          },
-        ],
-        findings: [],
       }),
     );
     const modelMetadata = {
@@ -8080,24 +7832,7 @@ describe("priceMatching", () => {
         },
         modelMetadata,
       });
-      const blocked = check.operations.find(
-        ({ proposal }) => proposal.type === "update_entity",
-      );
-      const prepared = check.operations.find(
-        ({ proposal }) => proposal.type === "merge_bottles",
-      );
-      expect(blocked).toMatchObject({
-        status: "blocked",
-        preparationError: { code: "target_not_inspected" },
-        stateToken: null,
-      });
-      expect(prepared).toMatchObject({
-        status: "pending_review",
-      });
-      expect(prepared?.stateToken).toMatchObject({
-        source: { bottleId: sourceBottle.id },
-        destination: { bottleId: destinationBottle.id },
-      });
+      expect(check.operations).toEqual([]);
     }
   });
 
@@ -8116,8 +7851,6 @@ describe("priceMatching", () => {
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason: "The source is a multi-bottle bundle.",
-        proposedOperations: [],
-        findings: [],
       }),
     );
 
