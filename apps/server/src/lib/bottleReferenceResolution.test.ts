@@ -401,7 +401,6 @@ describe("resolveBottleReferenceTarget", () => {
         rationale: "The exact marketed Bottle is missing.",
         identityScope: "product",
         observation: null,
-        identityBasis: null,
         confidenceBasis: null,
         matchedBottleId: null,
         matchedReleaseId: null,

@@ -242,7 +242,6 @@ describe("buildAgentInput", () => {
           identityScope: "exact_cask",
           aliasScope: "none",
           observation: null,
-          identityBasis: null,
           confidenceBasis: null,
           matchedBottleId: 95,
           proposedBottle: null,

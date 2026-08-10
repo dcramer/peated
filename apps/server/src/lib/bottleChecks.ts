@@ -146,31 +146,34 @@ const CurrentPersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
   ],
 );
 
-function removeLegacyModelToolTelemetry(output: unknown): unknown {
+function removeLegacyClassifierOutputFields(output: unknown): unknown {
   if (!output || typeof output !== "object") return output;
 
   const decision = (output as Record<string, unknown>).decision;
   if (!decision || typeof decision !== "object") return output;
 
-  const confidenceBasis = (decision as Record<string, unknown>).confidenceBasis;
-  if (!confidenceBasis || typeof confidenceBasis !== "object") return output;
+  const { identityBasis: _identityBasis, ...currentDecision } =
+    decision as Record<string, unknown>;
+  const confidenceBasis = currentDecision.confidenceBasis;
+  if (!confidenceBasis || typeof confidenceBasis !== "object") {
+    return { ...output, decision: currentDecision };
+  }
 
   const { toolsUsed: _toolsUsed, ...currentConfidenceBasis } =
     confidenceBasis as Record<string, unknown>;
   return {
     ...output,
     decision: {
-      ...decision,
+      ...currentDecision,
       confidenceBasis: currentConfidenceBasis,
     },
   };
 }
 
-// Version 2 decisions can contain model-reported tool telemetry. Runtime-owned
-// metadata is authoritative now, so the persisted boundary drops that obsolete
-// field before current strict validation.
+// Version 2 decisions can contain obsolete model output. Drop fields with no
+// current reader before current strict validation; runtime metadata owns tools.
 export const PersistedReferenceBottleCheckOutputSchema = z.preprocess(
-  removeLegacyModelToolTelemetry,
+  removeLegacyClassifierOutputFields,
   CurrentPersistedReferenceBottleCheckOutputSchema,
 );
 

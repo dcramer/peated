@@ -36,7 +36,7 @@ Builds on: `output-contract-map.md` (confidence/band consumer inventory),
 | `identityScope`      | `priceMatchingEvidence.ts:133-134` (exact_cask threshold), `classifierTypes.ts:594-615` superRefine, eval scorer `classifier.eval.test.ts:533/556/585`, `reviewPolicy.ts:1985` exact-cask anchor path                                                      | decision-affecting + eval                                        | **KEEP**                                                                                                                                                                                                                                                               |
 | `aliasScope`         | `priceMatchingProposals.ts:577-729` (persisted as `aliasScope ?? "none"`), eval scorer `classifier.eval.test.ts:380-384`. **No code reads the stored value to gate `global_alias` alias creation** (grep for stored-`aliasScope` reads returns none).      | display-persist + eval-scorer only — **no live gating consumer** | **ABLATE** — spec-mandated (`spec.md:122-139`) but the write-gating consumer it exists for is not implemented. Experiment: wire alias creation to read it, then measure global-alias precision with vs without the gate; if no wiring lands, it is a REMOVE candidate. |
 | `observation`        | subfields split in A.3                                                                                                                                                                                                                                     | —                                                                | **KEEP (trim subfields)**                                                                                                                                                                                                                                              |
-| `identityBasis`      | subfields split in A.2                                                                                                                                                                                                                                     | —                                                                | see A.2                                                                                                                                                                                                                                                                |
+| `identityBasis`      | no production or eval reader; passed through and persisted only                                                                                                                                                                                            | NO CONSUMER                                                      | **REMOVE** — completed in issue #566 output cleanup                                                                                                                                                                                                                    |
 | `confidenceBasis`    | subfields split in A.4                                                                                                                                                                                                                                     | —                                                                | see A.4                                                                                                                                                                                                                                                                |
 | `matchedBottleId`    | `reviewPolicy.ts:2916`, `bottleReferenceResolution.ts:82`, `priceMatchingProposals.ts`, `photo-identification.ts`                                                                                                                                          | decision-affecting                                               | **KEEP**                                                                                                                                                                                                                                                               |
 | `matchedReleaseId`   | `reviewPolicy.ts` finalize, `priceMatchingEvidence.ts:129`, superRefine `classifierTypes.ts:608`                                                                                                                                                           | decision-affecting                                               | **KEEP**                                                                                                                                                                                                                                                               |
@@ -44,7 +44,7 @@ Builds on: `output-contract-map.md` (confidence/band consumer inventory),
 | `proposedBottle`     | `reviewPolicy.ts:2831` (`sanitizeProposedBottleDraft`), `priceMatchingProposals.ts`, `createMissingBottles.ts`                                                                                                                                             | decision-affecting                                               | **KEEP**                                                                                                                                                                                                                                                               |
 | `proposedRelease`    | `reviewPolicy.ts` finalize, `priceMatchingProposals.ts`                                                                                                                                                                                                    | decision-affecting                                               | **KEEP**                                                                                                                                                                                                                                                               |
 
-### A.2 `identityBasis.*` (`classifierTypes.ts:410-451`) — the strongest removal cluster
+### A.2 `identityBasis.*` (`classifierTypes.ts:410-451`) — removed
 
 `reviewPolicy.ts` only ever **passes `identityBasis` through unread**
 (`:2451, :3805, :3914, :3955`); a targeted grep for reads of any nested field
@@ -54,26 +54,18 @@ Builds on: `output-contract-map.md` (confidence/band consumer inventory),
 (`classifier.eval.test.ts`, `evalFixtureSchemas.ts:127-139`). The only writers are
 the deterministic fast-paths (`service.ts:261-268`, `smwsPolicy.ts:470-479`).
 
-| Nested field         | Consumer                                                              | Class       | Verdict                                                            |
-| -------------------- | --------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------ |
-| `bottleTraits`       | writers only (`service.ts:262`, `smwsPolicy.ts:473`)                  | NO CONSUMER | **ABLATE** (mandated; write-only today)                            |
-| `releaseTraits`      | writers only (`service.ts:263`, `smwsPolicy.ts:474`)                  | NO CONSUMER | **ABLATE**                                                         |
-| `observationTraits`  | writers only (`service.ts:265`, `smwsPolicy.ts:475`)                  | NO CONSUMER | **ABLATE**                                                         |
-| `yearInterpretation` | writers only, always `"none"` (`service.ts:266`, `smwsPolicy.ts:478`) | NO CONSUMER | **ABLATE**                                                         |
-| `siblingEvidence`    | writers only, always `"none"` (`service.ts:267`, `smwsPolicy.ts:479`) | NO CONSUMER | **ABLATE**                                                         |
-| `uncertainties`      | **no reference anywhere** (grep returns only the schema def)          | NO CONSUMER | **REMOVE** — not even written by the fast-paths; pure dead weight. |
+| Nested field         | Consumer                                                              | Class       | Verdict     |
+| -------------------- | --------------------------------------------------------------------- | ----------- | ----------- |
+| `bottleTraits`       | writers only (`service.ts:262`, `smwsPolicy.ts:473`)                  | NO CONSUMER | **REMOVED** |
+| `releaseTraits`      | writers only (`service.ts:263`, `smwsPolicy.ts:474`)                  | NO CONSUMER | **REMOVED** |
+| `observationTraits`  | writers only (`service.ts:265`, `smwsPolicy.ts:475`)                  | NO CONSUMER | **REMOVED** |
+| `yearInterpretation` | writers only, always `"none"` (`service.ts:266`, `smwsPolicy.ts:478`) | NO CONSUMER | **REMOVED** |
+| `siblingEvidence`    | writers only, always `"none"` (`service.ts:267`, `smwsPolicy.ts:479`) | NO CONSUMER | **REMOVED** |
+| `uncertainties`      | **no reference anywhere** (grep returns only the schema def)          | NO CONSUMER | **REMOVED** |
 
-Whole-object note: `identityBasis` is spec-required (`spec.md:146-153`) as the
-structure code will derive gating from, but **today nothing consumes it and no eval
-scores it**. It is currently unread weight the model must fill on every run. The
-`design.md` typed-trait migration (`output-contract-map.md:254-297`) is what would
-give it a mechanical consumer.
-
-**Ablation for the whole object:** land the review-policy placement check that reads
-`releaseTraits`/`bottleTraits` (a trait in `releaseTraits` must not appear in
-`proposedBottle.name`) and re-run focused create/repair evals; keep the sub-fields
-only if the check catches real mis-placements. Until a reader exists, everything
-except `uncertainties` is ABLATE, and `uncertainties` is REMOVE.
+Issue #566 replaced the parent/release output model with one complete Bottle.
+No production or eval reader existed for this duplicate explanation channel.
+The whole object was removed instead of adding a new semantic check to keep it.
 
 ### A.3 `observation.*` (`classifierTypes.ts:398-408`)
 
@@ -156,7 +148,7 @@ decision value (`spec.md:208-211`). All three are therefore **ABLATE**.
 
 ## Verdict tally
 
-- **Output fields:** KEEP 10 top-level (+`unresolvedRisks`, `webEvidence`, `observation.selector/caskNumber/barrelNumber`); REMOVE 1 (`confidence`) + `band` + `toolsUsed` + `identityBasis.uncertainties` + (envelope-serialization) `market`/`exclusive`/`outturn`; ABLATE `identityBasis.{bottleTraits,releaseTraits,observationTraits,yearInterpretation,siblingEvidence}`, `observation.bottleNumber`, `confidenceBasis.positiveEvidence`, `aliasScope`; KEEP-but-demote `rationale`.
+- **Output fields:** KEEP the fields with named readers (+`unresolvedRisks`, `webEvidence`, `observation.selector/caskNumber/barrelNumber`); REMOVE `confidence`, `band`, `toolsUsed`, and the complete `identityBasis` object, plus the no-reader observation fields; ABLATE `observation.bottleNumber`, `confidenceBasis.positiveEvidence`, and `aliasScope`; KEEP-but-demote `rationale`.
 - **Input fields:** KEEP `alias`, `currentBottle`, `imageEvidence.{photoSuitability,conflicts,fieldCandidates}`; REMOVE-from-model-envelope `candidate.score`, `candidate.source`, `imageEvidence.textRegions` (score/source retained as code-only).
 - **Tools:** KEEP web search (firecrawl default); ABLATE `search_entities` (live vs preload) and `search_bottles` (frequency).
 - **Runtime stages:** ABLATE all 3 (unit-tested mechanism, no eval outcome proof).

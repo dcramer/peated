@@ -421,13 +421,14 @@ Use the agent for:
 - supportive, weak, conflicting, or unnecessary web-evidence judgment
 - match decisions that are not closed-form local id assertions
 
-The full classifier agent must fill `identityBasis` and `confidenceBasis` for
-reviewed decisions. The contract has no numeric confidence score and no
-confidence band; the agent expresses certainty only through positive evidence,
-typed `unresolvedRisks` (category plus note), `webEvidence`, and the action
-itself. The runtime records actual tool calls; the model does not report them.
-Any asserted unresolved risk forces automated review and no field can upgrade a
-decision the derived tier routes to review.
+The full classifier agent must fill `confidenceBasis` for reviewed decisions.
+The contract has no separate identity-basis object, numeric confidence score,
+or confidence band. The complete proposed Bottle and explicit observation
+fields carry identity facts. The agent expresses certainty only through
+positive evidence, typed `unresolvedRisks` (category plus note), `webEvidence`,
+and the action itself. The runtime records actual tool calls; the model does not
+report them. Any asserted unresolved risk forces automated review and no field
+can upgrade a decision the derived tier routes to review.
 `confidenceBasis.webEvidence = supportive` is required before automation can
 treat web-backed create evidence as validated.
 

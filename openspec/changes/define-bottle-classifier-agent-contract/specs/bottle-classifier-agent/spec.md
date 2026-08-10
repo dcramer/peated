@@ -148,14 +148,9 @@ The classifier SHALL distinguish the Peated identity being matched or created fr
 - **WHEN** automation creates a reusable alias from a classified listing title
 - **THEN** the alias-writing code SHALL read the asserted alias scope and SHALL NOT store the title as a reusable global alias unless `global_alias` was asserted; an asserted scope with no enforcing consumer is a contract violation
 
-### Requirement: Output basis fields explain the decision
+### Requirement: Output evidence explains the decision
 
-The classifier SHALL return structured basis fields that explain identity placement, evidence, and unresolved risk without relying on freeform rationale or a numeric confidence score.
-
-#### Scenario: Identity basis is present
-
-- **WHEN** the agent returns a reviewed match, create, repair, or no-match decision
-- **THEN** the decision SHALL include `identityBasis` or an equivalent structured basis identifying bottle traits, release traits, observation traits, year interpretation, and sibling evidence, with all uncertainty expressed in the single typed risk list rather than a second freeform uncertainty field
+The classifier SHALL return structured evidence and unresolved risk without relying on freeform rationale or a numeric confidence score. The decision and proposed Bottle SHALL carry identity facts directly instead of duplicating them in an unread basis object.
 
 #### Scenario: Confidence basis is present
 
@@ -170,7 +165,7 @@ The classifier SHALL return structured basis fields that explain identity placem
 #### Scenario: Evidence precedes the action in the output schema
 
 - **WHEN** the agent output schema is defined
-- **THEN** structured basis and rationale fields SHALL be ordered before the action, target ids, and proposed drafts so the model asserts evidence before committing to the decision
+- **THEN** structured evidence and rationale fields SHALL be ordered before the action, target ids, and proposed drafts so the model asserts evidence before committing to the decision
 
 #### Scenario: Every output field has agent-facing semantics
 
@@ -220,19 +215,14 @@ Every input envelope field, tool, output field, and runtime stage in the classif
 - **WHEN** a runtime stage such as a retry pass or evidence preload lacks measured benefit
 - **THEN** its value SHALL be established with an eval comparison before it is extended, and it MAY be removed if the comparison shows no benefit
 
-### Requirement: Basis fields evolve toward machine-checkable structure
+### Requirement: Evidence fields evolve toward machine-checkable structure
 
-Because code derives gating from the basis fields, revisions to basis-field schemas SHALL prefer typed, verifiable structure over freeform strings, landing each revision only when evals show the structure is reliable.
+Because code derives gating from evidence fields, revisions to evidence schemas SHALL prefer typed, verifiable structure over freeform strings, landing each revision only when evals show the structure is reliable.
 
 #### Scenario: Evidence claims are verifiable
 
 - **WHEN** the schema for `positiveEvidence` is revised
 - **THEN** each evidence entry SHOULD name its source kind and locator (source label, image, local candidate id, or web result URL) so validation can confirm the citation exists in the collected run artifacts and reject fabricated evidence
-
-#### Scenario: Trait placement is structured
-
-- **WHEN** the schema for `identityBasis` is revised
-- **THEN** bottle, release, and observation trait placement SHOULD be expressed as typed trait fields with values rather than freeform strings, so evals and review policy can check placement mechanically
 
 #### Scenario: Schema changes are eval-gated
 

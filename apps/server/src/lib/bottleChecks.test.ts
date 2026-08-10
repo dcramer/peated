@@ -101,12 +101,20 @@ function auditCheckInput({
 }
 
 describe("Bottle check persistence", () => {
-  test("removes legacy model-reported tool telemetry from persisted decisions", () => {
+  test("removes obsolete agent-only fields from persisted decisions", () => {
     const output = PersistedReferenceBottleCheckOutputSchema.parse({
       status: "classified",
       decision: {
         action: "no_match",
         candidateBottleIds: [],
+        identityBasis: {
+          bottleTraits: ["Brand and expression"],
+          releaseTraits: [],
+          observationTraits: [],
+          yearInterpretation: "none",
+          siblingEvidence: "none",
+          uncertainties: [],
+        },
         confidenceBasis: {
           positiveEvidence: [],
           unresolvedRisks: [],
@@ -121,6 +129,7 @@ describe("Bottle check persistence", () => {
 
     expect(output.status).toBe("classified");
     if (output.status !== "classified") throw new Error("Expected decision");
+    expect(output.decision).not.toHaveProperty("identityBasis");
     expect(output.decision.confidenceBasis).not.toHaveProperty("toolsUsed");
   });
 

@@ -511,18 +511,6 @@ export function resolveSmwsExactCaskReference({
       ...(existingTarget ? [existingTarget.bottleId] : []),
     ]),
   );
-  const identityBasis: NonNullable<
-    BottleClassificationDecision["identityBasis"]
-  > = {
-    bottleTraits: [`SMWS exact-cask code ${smwsCode}`],
-    releaseTraits: [],
-    observationTraits: observation?.selector
-      ? [`selector ${observation.selector}`]
-      : [],
-    yearInterpretation: "none",
-    siblingEvidence: "none",
-    uncertainties: [],
-  };
   const confidenceBasis: NonNullable<
     BottleClassificationDecision["confidenceBasis"]
   > = {
@@ -541,7 +529,6 @@ export function resolveSmwsExactCaskReference({
       candidateBottleIds,
       identityScope: "exact_cask",
       observation,
-      identityBasis,
       confidenceBasis,
       matchedBottleId: existingTarget.bottleId,
       proposedBottle: null,
@@ -555,7 +542,6 @@ export function resolveSmwsExactCaskReference({
     candidateBottleIds,
     identityScope: "exact_cask",
     observation,
-    identityBasis,
     confidenceBasis,
     matchedBottleId: null,
     proposedBottle: buildSmwsExactCaskBottleDraft({

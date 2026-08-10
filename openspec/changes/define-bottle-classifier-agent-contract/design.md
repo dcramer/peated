@@ -16,12 +16,12 @@ That question has to be answered from first principles, not from prompt folklore
 2. The observed bottle identity comes before the database outcome.
 3. Local Peated candidates are prior art, not instructions.
 4. Web and source evidence can support identity, but cannot launder vague input into canonical truth.
-5. Bottle, release, exact-cask, and observation facts are different precision layers.
+5. Bottle, exact-cask, and observation facts are different precision layers.
 6. Common user-recognizable bottle labels are the create target; every observed fact does not belong in the bottle name.
 7. The model owns semantic whisky judgment; code owns validation, permissions, persistence, and irreversible gates.
 8. The output contract must be structured enough that review policy and evals can reject unsafe decisions without becoming a second classifier.
 
-The current prompt contains useful domain guidance, but edits have become hard to reason about because field semantics, bottle/release modeling, evidence policy, action semantics, and examples are interleaved. The output schema also has fields whose intended use is not obvious from names alone, such as `fullName`, `bottleFullName`, `kind`, `familyContext`, `identityBasis`, `confidenceBasis`, `identityScope`, and `aliasScope`.
+The current prompt contains useful domain guidance, but edits have become hard to reason about because field semantics, Bottle modeling, evidence policy, action semantics, and examples are interleaved. The output schema also has fields whose intended use is not obvious from names alone, such as `fullName`, `familyContext`, `confidenceBasis`, `identityScope`, and `aliasScope`.
 
 ## Goals / Non-Goals
 
@@ -118,7 +118,7 @@ Alternative considered: require web evidence for all accepted outcomes. Rejected
 
 ### Decision: Remove numeric confidence; consumers derive gating from evidence
 
-Numeric `confidence` is removed from the agent output contract. The agent's job ends at the identity outcome: `action`, target ids or create drafts, `identityBasis`, and `confidenceBasis` evidence fields (`positiveEvidence`, `unresolvedRisks`, `webEvidence`). The runtime records actual tool calls. The model does not report them. Verbalized numeric self-confidence is systematically overconfident and adds a second channel that can disagree with the structured decision, which is why review policy has grown reconciliation caps whose only job is to referee that disagreement.
+Numeric `confidence` is removed from the agent output contract. The agent's job ends at the identity outcome: `action`, target ids or create drafts, and `confidenceBasis` evidence fields (`positiveEvidence`, `unresolvedRisks`, `webEvidence`). Identity facts live on the decision, proposed Bottle, or observation instead of a duplicated basis object. The runtime records actual tool calls. The model does not report them. Verbalized numeric self-confidence is systematically overconfident and adds a second channel that can disagree with the structured decision, which is why review policy has grown reconciliation caps whose only job is to referee that disagreement.
 
 Whether a decision needs human review is consumer policy, derived in code:
 
@@ -134,15 +134,14 @@ Alternative considered: tune numeric confidence thresholds in the prompt. Reject
 
 ### Decision: Output schema orders evidence before the action
 
-Structured output is generated in schema field order. The agent decision schema must place `identityBasis`, `confidenceBasis`, and `rationale` before `action`, target ids, and drafts so the model commits to evidence before committing to the decision. This is a schema-shape requirement with eval-visible effects, so it lands with re-recorded replays and before-vs-after comparison.
+Structured output is generated in schema field order. The agent decision schema must place `confidenceBasis` and `rationale` before `action`, target ids, and drafts so the model commits to evidence before committing to the decision. This is a schema-shape requirement with eval-visible effects, so it lands with re-recorded replays and before-vs-after comparison.
 
 ### Decision: Schema attributes may be redesigned toward verifiability
 
-No existing attribute is grandfathered. Because gating moves to code, the basis fields become load-bearing, and freeform string arrays are a weak foundation for deterministic gates. The preferred evolution, staged behind evals:
+No existing attribute is grandfathered. Because gating moves to code, the evidence fields become load-bearing, and freeform string arrays are a weak foundation for deterministic gates. The preferred evolution, staged behind evals:
 
 - `unresolvedRisks` entries gain a typed category plus a note, so "no material risk" is a category check, not an empty-array check on prose.
 - `positiveEvidence` entries gain a source kind and locator, so validation can confirm each citation against the run's collected artifacts (search evidence URLs, candidate ids, image evidence) and reject fabricated support.
-- `identityBasis` trait lists move from freeform strings to typed trait fields with values, aligned with the existing `traitFields` vocabulary on candidates, so bottle-versus-release placement is mechanically checkable by evals and review policy.
 
 These are larger changes than the prompt reorganization and must not block it; each lands separately with re-recorded replays. The action enum stays: compound actions such as `create_bottle_and_release` keep the action set explicit and mutually exclusive, which is safer than orthogonal axes that allow invalid combinations.
 

@@ -231,7 +231,6 @@ function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
     identityScope: decision.identityScope ?? "product",
     aliasScope: decision.aliasScope,
     observation: decision.observation ?? null,
-    identityBasis: decision.identityBasis ?? null,
     confidenceBasis: decision.confidenceBasis ?? null,
   };
 
