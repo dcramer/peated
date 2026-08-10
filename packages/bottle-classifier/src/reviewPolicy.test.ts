@@ -389,7 +389,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("downgrades a create draft when a Bottle with release fields may already cover it", () => {
+  test("preserves a create draft when a candidate has an unsupported release field", () => {
     const candidate: BottleCandidate = {
       bottleId: 38004,
       alias: "Trestle Spirit of Eclipse",
@@ -474,10 +474,14 @@ describe("finalizeBottleReferenceClassification", () => {
     });
 
     expect(result).toMatchObject({
-      action: "no_match",
+      action: "create_bottle",
       candidateBottleIds: [38004],
       matchedBottleId: null,
-      proposedBottle: null,
+      proposedBottle: {
+        name: "Spirit of Eclipse",
+        abv: 50,
+        releaseYear: null,
+      },
       confidenceBasis: {
         unresolvedRisks: [
           {
@@ -797,7 +801,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("does not let generic cask details bypass duplicate product creation checks", () => {
+  test("preserves creation instead of reclassifying it from candidate names", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
       rationale:
@@ -844,15 +848,11 @@ describe("finalizeBottleReferenceClassification", () => {
     });
 
     expect(result).toMatchObject({
-      action: "no_match",
-      identityScope: "product",
+      action: "create_bottle",
       candidateBottleIds: [existingPrivateCask.bottleId],
       matchedBottleId: null,
-      proposedBottle: null,
+      proposedBottle: { name: "Private Cask" },
     });
-    expect(result.rationale).toContain(
-      "exact existing Bottle candidate may already cover",
-    );
   });
 
   test("does not resolve exact-cask creation to a wrong-family code match", () => {

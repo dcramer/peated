@@ -2275,7 +2275,7 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("downgrades create_bottle drafts that duplicate surfaced bottle candidates", async () => {
+  test("preserves classifier create decisions for surfaced bottle candidates", async () => {
     const springbank10YearOldIdentity: BottleExtractedDetails = {
       brand: "Springbank",
       bottler: null,
@@ -2363,14 +2363,15 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
-      candidateBottleIds: [springbank10YearOldCandidate.bottleId],
+      action: "create_bottle",
+      candidateBottleIds: [],
       matchedBottleId: null,
-      proposedBottle: null,
+      proposedBottle: {
+        name: "10-year-old",
+        statedAge: 10,
+        abv: 46,
+      },
     });
-    expect(result.decision.rationale).toContain(
-      "exact existing Bottle candidate may already cover",
-    );
   });
 
   test("does not invent a branded bottle from sparse generic batch wording", async () => {
