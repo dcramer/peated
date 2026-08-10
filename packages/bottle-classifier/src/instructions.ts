@@ -101,7 +101,7 @@ const BOTTLE_REFERENCE_INSTRUCTIONS = [
   renderBulletLines([
     "1. Establish the complete source identity, including any marketed exact-version traits and whether a printed code is marketed identity or observation.",
     "2. Compare local candidates. Inspect a plausible target before you select it or reject it for a possible stored error.",
-    "3. Use local search when the initial candidate set is thin or web evidence reveals a decisive new trait. Use Firecrawl search when current label and catalog evidence cannot resolve an identity-critical fact or candidate conflict; keep queries focused and do not perform a general audit. Read a returned page only when its short search excerpt does not expose the needed fact.",
+    "3. Use a search tool only when it is attached to this run. Use local search when the initial candidate set is thin or web evidence reveals a decisive new trait. Use Firecrawl search when current label and catalog evidence cannot resolve an identity-critical fact or candidate conflict. Keep queries focused. Do not perform a general audit. Read a returned page only when its short search excerpt does not expose the needed fact.",
     "4. When an inspected candidate is the same exact marketed product, never create a duplicate merely because its stored Brand, name, category, age, or other canonical fields are wrong.",
     "5. Return `match` only when that exact candidate is safe for the reference assignment before any catalog change.",
     "6. When a candidate needs a catalog change before assignment is safe, return `no_match`. Bottle Review owns Suggested Changes. Do not return `match` for the future corrected state.",
@@ -112,7 +112,7 @@ const BOTTLE_REFERENCE_INSTRUCTIONS = [
   "",
   "<tool_policy>",
   renderBulletLines([
-    "Use the narrowest read-only tool that supplies the missing evidence. Local catalog search precedes broader web search.",
+    "Use the narrowest attached read-only tool that supplies the missing evidence. Use local catalog search before web search when both tools are attached.",
     "Do not call Firecrawl when trusted input and inspected local context already determine the decision.",
     "Batch independent Firecrawl query formulations in one search call. Search with reliable identity anchors; when one extracted trait is uncertain or disputed, add a formulation that omits only that trait. Search results are candidates, not evidence. A conflict with a confirmed age, ABV, year, edition, or cask identifies a sibling; a difference on the uncertain trait is a question to resolve before relying on the page.",
     "When Firecrawl is unavailable or returns insufficient evidence, use the supported local outcome or `no_match`; do not invent missing facts.",

@@ -145,13 +145,13 @@ describe("buildAgentInput", () => {
           fullName: "Current Bottle",
         }),
         hasExactAliasMatch: false,
-        candidateExpansion: "initial_only",
       }),
     );
 
     expect(input.localSearch).not.toHaveProperty("familyContextSummary");
     expect(input.reference).not.toHaveProperty("id");
     expect(input.reference).not.toHaveProperty("externalSiteId");
+    expect(input).not.toHaveProperty("candidateExpansion");
     expect(input.currentBottle).not.toHaveProperty("score");
     expect(input.currentBottle).not.toHaveProperty("source");
     expect(input.localSearch.candidates[0]).not.toHaveProperty("score");
@@ -226,7 +226,6 @@ describe("buildAgentInput", () => {
         initialCandidates: [],
         currentBottle: null,
         hasExactAliasMatch: false,
-        candidateExpansion: "initial_only",
       }),
     );
 
@@ -245,7 +244,6 @@ describe("buildAgentInput", () => {
         initialCandidates: [],
         currentBottle: null,
         hasExactAliasMatch: false,
-        candidateExpansion: "open",
         identityAnchor: {
           action: "match",
           rationale: "The SMWS code is a closed identity anchor.",

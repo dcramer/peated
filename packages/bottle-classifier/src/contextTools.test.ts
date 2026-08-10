@@ -268,6 +268,7 @@ describe("Bottle-check context tools", () => {
       "get_bottle_context",
       "get_entity_context",
     ]);
+    expect(JSON.parse(prepared.input)).not.toHaveProperty("candidateExpansion");
 
     await invokePreparedTool(prepared, "get_bottle_context", {
       bottleId: duplicate.bottleId,
