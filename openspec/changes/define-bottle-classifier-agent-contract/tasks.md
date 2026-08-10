@@ -38,7 +38,7 @@
 
 ## 5. Review Policy Boundary Audit
 
-- [x] 5.1 Audit `reviewPolicy.ts` transforms against the determinism boundary in `docs/architecture/bottle-classifier.md` (Review Policy Audit section); classify each transform as schema validation, closed-form gate, or second-classifier drift, and list drift candidates for removal or narrowing with eval proof. (2026-08-10: added `audit/review-policy-audit.md`; removed the generic duplicate-create name classifier and sparse-reference token gate while retaining the exact-cask code collision gate.)
+- [x] 5.1 Audit `reviewPolicy.ts` transforms against the determinism boundary in `docs/architecture/bottle-classifier.md` (Review Policy Audit section); classify each transform as schema validation, closed-form gate, or second-classifier drift, and list drift candidates for removal or narrowing with eval proof. (2026-08-10: added `audit/review-policy-audit.md`; removed the generic duplicate-create name classifier, sparse-reference token gate, and age/exact-trait name rewrites while retaining the exact-cask code collision gate.)
 
 ## 6. Eval And Fixture Review
 

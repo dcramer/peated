@@ -2442,7 +2442,7 @@ describe("createBottleClassifier", () => {
       action: "create_bottle",
       matchedBottleId: null,
       proposedBottle: {
-        name: "Blenders' Sherry Cask Finish 12-year-old",
+        name: "Blenders' Sherry Cask Finish EXP#7 12-year-old",
         series: {
           name: "Blenders' Batch",
         },
@@ -3204,7 +3204,7 @@ describe("createBottleClassifier", () => {
       matchedBottleId: null,
       identityScope: "product",
       proposedBottle: {
-        name: "Reserve 9-year-old",
+        name: "Reserve",
         statedAge: 9,
       },
     });
@@ -3551,7 +3551,7 @@ describe("createBottleClassifier", () => {
       action: "create_bottle",
       identityScope: "product",
       proposedBottle: {
-        name: "The Distillers Edition",
+        name: "2001 The Distillers Edition",
         brand: {
           name: "Talisker",
         },
@@ -3561,7 +3561,7 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("preserves exact-cask age and vintage in standalone bottle display names", async () => {
+  test("preserves the agent name and structured exact-cask age and vintage", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "The Exclusive Malts",
       bottler: "Creative Whisky Company",
@@ -3650,14 +3650,14 @@ describe("createBottleClassifier", () => {
       action: "create_bottle",
       identityScope: "exact_cask",
       proposedBottle: {
-        name: "Islay 8-year-old",
+        name: "Islay",
         statedAge: 8,
         vintageYear: 2007,
       },
     });
   });
 
-  test("keeps an exact-cask marker structured outside the stable bottle name", async () => {
+  test("keeps an exact-cask marker structured without rewriting the agent name", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Willett",
       bottler: null,
@@ -3737,7 +3737,7 @@ describe("createBottleClassifier", () => {
       action: "create_bottle",
       identityScope: "exact_cask",
       proposedBottle: {
-        name: "Family Estate Bottled Single Barrel Bourbon 5-year-old",
+        name: "Family Estate Bottled Single Barrel Bourbon",
         edition: "Barrel No. 4769",
       },
     });

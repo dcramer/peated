@@ -199,20 +199,16 @@ function classifyAgeCreationWithoutSiblingConflict(
 function classifyStructuredExactName({
   referenceName,
   proposedName,
-  brand = "Example",
   expression,
-  edition = null,
   vintageYear = null,
-  releaseYear = null,
 }: {
   referenceName: string;
   proposedName: string;
-  brand?: string;
   expression: string | null;
-  edition?: string | null;
   vintageYear?: number | null;
-  releaseYear?: number | null;
 }) {
+  const brand = "Example";
+
   return finalizeBottleReferenceClassification({
     reference: { name: referenceName },
     decision: {
@@ -226,7 +222,7 @@ function classifyStructuredExactName({
         name: proposedName,
         series: null,
         category: "single_malt",
-        edition,
+        edition: null,
         statedAge: null,
         caskStrength: null,
         singleCask: null,
@@ -235,7 +231,7 @@ function classifyStructuredExactName({
         caskFill: null,
         abv: null,
         vintageYear,
-        releaseYear,
+        releaseYear: null,
         brand: { id: null, name: brand },
         distillers: [],
         bottler: null,
@@ -252,96 +248,21 @@ function classifyStructuredExactName({
         category: "single_malt",
         stated_age: null,
         abv: null,
-        release_year: releaseYear,
+        release_year: null,
         vintage_year: vintageYear,
         cask_strength: null,
         single_cask: null,
         cask_type: null,
         cask_size: null,
         cask_fill: null,
-        edition,
+        edition: null,
       },
     }),
   });
 }
 
 describe("finalizeBottleReferenceClassification", () => {
-  test("removes a parenthesized structured edition without leaving empty punctuation", () => {
-    const result = classifyStructuredExactName({
-      referenceName: "Elijah Craig Barrel Proof Batch C923",
-      proposedName: "Barrel Proof (Batch C923)",
-      brand: "Elijah Craig",
-      expression: "Barrel Proof",
-      edition: "Batch C923",
-    });
-
-    expect(result).toMatchObject({
-      action: "create_bottle",
-      proposedBottle: {
-        name: "Barrel Proof",
-        edition: "Batch C923",
-      },
-    });
-  });
-
-  test("collapses internal dash separators after removing a structured edition", () => {
-    const result = classifyStructuredExactName({
-      referenceName: "Example Special Reserve Batch 2 Cask Strength",
-      proposedName: "Special Reserve - Batch 2 - Cask Strength",
-      expression: "Special Reserve Cask Strength",
-      edition: "Batch 2",
-    });
-
-    expect(result).toMatchObject({
-      action: "create_bottle",
-      proposedBottle: {
-        name: "Special Reserve - Cask Strength",
-        edition: "Batch 2",
-      },
-    });
-  });
-
-  test("collapses internal comma separators after removing a structured edition", () => {
-    const result = classifyStructuredExactName({
-      referenceName: "Example Special Reserve Batch 2 Cask Strength",
-      proposedName: "Special Reserve, Batch 2, Cask Strength",
-      expression: "Special Reserve Cask Strength",
-      edition: "Batch 2",
-    });
-
-    expect(result).toMatchObject({
-      action: "create_bottle",
-      proposedBottle: {
-        name: "Special Reserve Cask Strength",
-        edition: "Batch 2",
-      },
-    });
-  });
-
-  test.each(["Classic Cut 2021 Edition", "Classic Cut - 2021 Edition"])(
-    "keeps the stable Macallan expression after removing structured edition and year from %s",
-    (proposedName) => {
-      const result = classifyStructuredExactName({
-        referenceName: "The Macallan Classic Cut 2021 Edition",
-        proposedName,
-        brand: "The Macallan",
-        expression: "Classic Cut",
-        edition: "2021 Edition",
-        releaseYear: 2021,
-      });
-
-      expect(result).toMatchObject({
-        action: "create_bottle",
-        proposedBottle: {
-          name: "Classic Cut",
-          edition: "2021 Edition",
-          releaseYear: 2021,
-        },
-      });
-    },
-  );
-
-  test("removes a labeled structured vintage from the stable expression", () => {
+  test("preserves exact-trait wording selected by the agent", () => {
     const result = classifyStructuredExactName({
       referenceName: "Example Special Reserve 1994 Vintage",
       proposedName: "Special Reserve 1994 Vintage",
@@ -352,13 +273,13 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result).toMatchObject({
       action: "create_bottle",
       proposedBottle: {
-        name: "Special Reserve",
+        name: "Special Reserve 1994 Vintage",
         vintageYear: 1994,
       },
     });
   });
 
-  test("rejects a create draft whose name contains only structured exact identity", () => {
+  test("preserves a valid create whose name contains only structured exact identity", () => {
     const result = classifyStructuredExactName({
       referenceName: "Example 1994 Vintage",
       proposedName: "1994 Vintage",
@@ -367,15 +288,16 @@ describe("finalizeBottleReferenceClassification", () => {
     });
 
     expect(result).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
+      action: "create_bottle",
+      matchedBottleId: null,
+      proposedBottle: {
+        name: "1994 Vintage",
+        vintageYear: 1994,
+      },
     });
-    expect(result.rationale).toContain(
-      "no stable expression distinct from the brand",
-    );
   });
 
-  test("rejects a create draft when exact-trait removal leaves only the brand", () => {
+  test("preserves a valid create when exact-trait removal would leave the brand", () => {
     const result = classifyStructuredExactName({
       referenceName: "Example 1994 Vintage",
       proposedName: "1994 Vintage Example",
@@ -384,8 +306,12 @@ describe("finalizeBottleReferenceClassification", () => {
     });
 
     expect(result).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
+      action: "create_bottle",
+      matchedBottleId: null,
+      proposedBottle: {
+        name: "1994 Vintage Example",
+        vintageYear: 1994,
+      },
     });
   });
 
@@ -635,7 +561,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("restores source-marketed bottle age in the display name", () => {
+  test("preserves an agent name that omits structured age wording", () => {
     const result = classifyShieldaigAgeCreation(
       buildShieldaigAgeCreationDecision("Speyside"),
     );
@@ -644,13 +570,13 @@ describe("finalizeBottleReferenceClassification", () => {
       action: "create_bottle",
       matchedBottleId: null,
       proposedBottle: {
-        name: "Speyside 30-year-old",
+        name: "Speyside",
         statedAge: 30,
       },
     });
   });
 
-  test("restores source-marketed bottle age without sibling conflict evidence", () => {
+  test("preserves an agent name without age wording when no siblings exist", () => {
     const result = classifyAgeCreationWithoutSiblingConflict(
       buildShieldaigAgeCreationDecision("Speyside"),
     );
@@ -658,7 +584,7 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result).toMatchObject({
       action: "create_bottle",
       proposedBottle: {
-        name: "Speyside 30-year-old",
+        name: "Speyside",
         statedAge: 30,
       },
     });
@@ -739,18 +665,19 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("rejects bottle creation when the expression duplicates the brand", () => {
+  test("preserves a valid create when the expression duplicates the brand", () => {
     const result = classifyShieldaigAgeCreation(
       buildShieldaigAgeCreationDecision("Shieldaig"),
     );
 
     expect(result).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
+      action: "create_bottle",
+      matchedBottleId: null,
+      proposedBottle: {
+        name: "Shieldaig",
+        statedAge: 30,
+      },
     });
-    expect(result.rationale).toContain(
-      "proposed bottle name duplicates the brand",
-    );
   });
 
   test("keeps bottle creation when bottle-level age is displayed as a word-age name", () => {

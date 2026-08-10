@@ -30,12 +30,7 @@ import {
   inferBottleIdentityScope,
 } from "./exactCaskPolicy";
 import { listMatchesExpectedValue } from "./identityEvidenceCore";
-import {
-  bottleNameDuplicatesBrand,
-  normalizeBottle,
-  normalizeString,
-  stripDuplicateBrandPrefixFromBottleName,
-} from "./normalize";
+import { normalizeString } from "./normalize";
 import { normalizeObservation } from "./observation";
 import {
   candidateLooksSmws,
@@ -114,40 +109,6 @@ const GIFT_SET_PACKAGING_TOKENS = new Set([
   "unknown",
   "with",
 ]);
-const AGE_WORD_ONES = [
-  "",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine",
-] as const;
-const AGE_WORD_TEENS = [
-  "ten",
-  "eleven",
-  "twelve",
-  "thirteen",
-  "fourteen",
-  "fifteen",
-  "sixteen",
-  "seventeen",
-  "eighteen",
-  "nineteen",
-] as const;
-const AGE_WORD_TENS: Record<number, string> = {
-  20: "twenty",
-  30: "thirty",
-  40: "forty",
-  50: "fifty",
-  60: "sixty",
-  70: "seventy",
-  80: "eighty",
-  90: "ninety",
-};
 function appendRationale(
   rationale: string | null,
   addition: string,
@@ -168,42 +129,6 @@ function normalizeComparableText(value: string | null | undefined): string {
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function getComparableAgeStatementPattern(statedAge: number): RegExp {
-  const age = escapeRegExp(String(statedAge));
-
-  return new RegExp(
-    `\\b${age}(?:\\s|-)?(?:year|yr)s?(?:\\s|-)?old\\b|\\b${age}(?:\\s|-)?(?:year|yr)s?\\b|\\b${age}(?:\\s|-)?y(?:\\.?o\\.?)?\\b`,
-    "i",
-  );
-}
-
-function stripComparableAgeStatement(
-  value: string,
-  statedAge: number | null | undefined,
-): string {
-  if (statedAge === null || statedAge === undefined) {
-    return value;
-  }
-
-  return value
-    .replace(getComparableAgeStatementPattern(statedAge), " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function comparableTextMarketsStatedAge(
-  value: string | null | undefined,
-  statedAge: number | null | undefined,
-): boolean {
-  if (!value || statedAge === null || statedAge === undefined) {
-    return false;
-  }
-
-  return getComparableAgeStatementPattern(statedAge).test(
-    normalizeComparableText(value),
-  );
 }
 
 function containsComparablePhrase(haystack: string, needle: string): boolean {
@@ -249,316 +174,6 @@ function normalizeNameTokenizationText(
   return normalizeComparableText(value)
     .replace(/\b([a-z0-9]+)'s\b/g, "$1s")
     .replace(/\b([a-z0-9]+)s'\b/g, "$1s");
-}
-
-function getReferenceBottleName({
-  reference,
-  brandName,
-  extractedBrand,
-}: {
-  reference: BottleReference;
-  brandName: string;
-  extractedBrand: string | null | undefined;
-}): string {
-  return stripDuplicateBrandPrefixFromBottleName(
-    stripDuplicateBrandPrefixFromBottleName(reference.name, brandName),
-    extractedBrand,
-  ).trim();
-}
-
-function stripReferenceBottleSuffixNoise(name: string): string {
-  return name
-    .replace(/\b(?:scotch\s+)?whisk(?:e)?y\b\.?$/i, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function restoreSparseAgeOnlyBottleName({
-  reference,
-  extractedIdentity,
-  proposedBottle,
-  forceAgeStatement = false,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-  forceAgeStatement?: boolean;
-}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
-  const statedAge = proposedBottle.statedAge ?? extractedIdentity?.stated_age;
-  const normalizedProposedName = normalizeComparableText(proposedBottle.name);
-  const ageStrippedProposedName = stripComparableAgeStatement(
-    normalizedProposedName,
-    statedAge,
-  );
-  const isAgeOnlyName =
-    !ageStrippedProposedName || normalizedProposedName === String(statedAge);
-  if (statedAge === null || statedAge === undefined) {
-    return proposedBottle;
-  }
-
-  if (
-    forceAgeStatement &&
-    !isAgeOnlyName &&
-    (comparableTextMarketsStatedAge(reference.name, statedAge) ||
-      extractedIdentity?.stated_age === statedAge) &&
-    !comparableTextMarketsStatedAge(proposedBottle.name, statedAge)
-  ) {
-    const normalizedName = normalizeBottle({
-      name: proposedBottle.name,
-      statedAge,
-    }).name;
-
-    return {
-      ...proposedBottle,
-      name: comparableTextMarketsStatedAge(normalizedName, statedAge)
-        ? normalizedName
-        : `${normalizedName} ${statedAge}-year-old`,
-      statedAge,
-    };
-  }
-
-  const referenceBottleName = stripReferenceBottleSuffixNoise(
-    getReferenceBottleName({
-      reference,
-      brandName: proposedBottle.brand.name,
-      extractedBrand: extractedIdentity?.brand,
-    }),
-  );
-  if (
-    !isAgeOnlyName ||
-    !referenceBottleName ||
-    referenceBottleName.length > 120 ||
-    !comparableTextMarketsStatedAge(referenceBottleName, statedAge) ||
-    normalizeComparableText(referenceBottleName) ===
-      normalizeComparableText(proposedBottle.name)
-  ) {
-    return proposedBottle;
-  }
-
-  return {
-    ...proposedBottle,
-    name: referenceBottleName,
-    statedAge,
-  };
-}
-
-function shouldRestoreMissingBottleAgeStatement(
-  missingTraits: string[],
-): boolean {
-  return missingTraits.length === 1 && missingTraits[0] === "statedAge";
-}
-
-function restoreExactCaskBottleDisplayName({
-  reference,
-  extractedIdentity,
-  proposedBottle,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
-  let name = proposedBottle.name;
-  const statedAge = proposedBottle.statedAge ?? extractedIdentity?.stated_age;
-
-  if (
-    statedAge !== null &&
-    statedAge !== undefined &&
-    (comparableTextMarketsStatedAge(reference.name, statedAge) ||
-      extractedIdentity?.stated_age === statedAge) &&
-    !comparableTextMarketsStatedAge(name, statedAge)
-  ) {
-    name = `${name} ${statedAge}-year-old`;
-  }
-
-  return name === proposedBottle.name
-    ? proposedBottle
-    : {
-        ...proposedBottle,
-        name: normalizeString(name),
-      };
-}
-
-function stripStructuredExactTraitsFromStableBottleName(
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>,
-): NonNullable<BottleClassificationDecision["proposedBottle"]> | null {
-  let name = proposedBottle.name;
-  const exactPhrases = [
-    proposedBottle.edition,
-    proposedBottle.vintageYear != null
-      ? `${proposedBottle.vintageYear} Vintage`
-      : null,
-    proposedBottle.vintageYear != null
-      ? `Vintage ${proposedBottle.vintageYear}`
-      : null,
-    proposedBottle.releaseYear != null
-      ? `${proposedBottle.releaseYear} Release`
-      : null,
-    proposedBottle.releaseYear != null
-      ? `Release ${proposedBottle.releaseYear}`
-      : null,
-    proposedBottle.releaseYear != null
-      ? `${proposedBottle.releaseYear} Bottling`
-      : null,
-    proposedBottle.releaseYear != null
-      ? `Bottled ${proposedBottle.releaseYear}`
-      : null,
-    proposedBottle.vintageYear != null
-      ? String(proposedBottle.vintageYear)
-      : null,
-    proposedBottle.releaseYear != null
-      ? String(proposedBottle.releaseYear)
-      : null,
-  ];
-
-  for (const phrase of exactPhrases) {
-    const normalizedPhrase = normalizeString(phrase ?? "");
-    if (!normalizedPhrase) {
-      continue;
-    }
-
-    name = name
-      .replace(
-        new RegExp(
-          `(^|[^a-z0-9])${escapeRegExp(normalizedPhrase)}(?=$|[^a-z0-9])`,
-          "gi",
-        ),
-        "$1",
-      )
-      .replace(/\(\s*\)|\[\s*\]|\{\s*\}/g, " ");
-  }
-
-  name = normalizeString(name)
-    .replace(/([,;:/|–—-])(?:\s*[,;:/|–—-])+/g, "$1")
-    .replace(/\s+([,;:])/g, "$1")
-    .replace(/^[\s,;:/|\-–—]+|[\s,;:/|\-–—]+$/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (
-    !name ||
-    bottleNameDuplicatesBrand(name, proposedBottle.brand.name) ||
-    normalizeComparableText(name) ===
-      normalizeComparableText(proposedBottle.brand.name)
-  ) {
-    return null;
-  }
-
-  return name === proposedBottle.name
-    ? proposedBottle
-    : { ...proposedBottle, name };
-}
-
-function sourceMarketsProposedBottleAge({
-  reference,
-  extractedIdentity,
-  statedAge,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  statedAge: number | null | undefined;
-}): boolean {
-  if (statedAge === null || statedAge === undefined) {
-    return false;
-  }
-
-  return (
-    comparableTextMarketsStatedAge(reference.name, statedAge) ||
-    extractedIdentity?.stated_age === statedAge
-  );
-}
-
-function proposedBottleNameMarketsStatedAge({
-  proposedBottle,
-  statedAge,
-}: {
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-  statedAge: number | null | undefined;
-}): boolean {
-  if (statedAge === null || statedAge === undefined) {
-    return false;
-  }
-
-  return (
-    comparableTextMarketsStatedAge(proposedBottle.name, statedAge) ||
-    comparableTextMarketsWordAge(proposedBottle.name, statedAge) ||
-    comparableTextMarketsStatedAge(
-      normalizeBottle({
-        name: proposedBottle.name,
-        statedAge: null,
-      }).name,
-      statedAge,
-    )
-  );
-}
-
-function getComparableAgeWordPhrase(statedAge: number): string | null {
-  if (statedAge >= 1 && statedAge < 10) {
-    return AGE_WORD_ONES[statedAge] ?? null;
-  }
-
-  if (statedAge >= 10 && statedAge < 20) {
-    return AGE_WORD_TEENS[statedAge - 10] ?? null;
-  }
-
-  if (statedAge >= 20 && statedAge < 100) {
-    const tens = Math.floor(statedAge / 10) * 10;
-    const ones = statedAge % 10;
-    const tensWord = AGE_WORD_TENS[tens];
-    const onesWord = AGE_WORD_ONES[ones];
-    if (!tensWord) {
-      return null;
-    }
-
-    return onesWord ? `${tensWord} ${onesWord}` : tensWord;
-  }
-
-  return null;
-}
-
-function comparableTextMarketsWordAge(
-  value: string | null | undefined,
-  statedAge: number | null | undefined,
-): boolean {
-  if (!value || statedAge === null || statedAge === undefined) {
-    return false;
-  }
-
-  const ageWords = getComparableAgeWordPhrase(statedAge);
-  if (!ageWords) {
-    return false;
-  }
-
-  const normalizedValue = normalizeComparableText(value).replace(/-/g, " ");
-  return containsComparablePhrase(normalizedValue, ageWords);
-}
-
-function getCreateBottleDisplayIdentityMissingTraits({
-  reference,
-  extractedIdentity,
-  proposedBottle,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-}): string[] {
-  const missingTraits: string[] = [];
-  const statedAge = proposedBottle.statedAge;
-
-  if (
-    sourceMarketsProposedBottleAge({
-      reference,
-      extractedIdentity,
-      statedAge,
-    }) &&
-    !proposedBottleNameMarketsStatedAge({
-      proposedBottle,
-      statedAge,
-    })
-  ) {
-    missingTraits.push("statedAge");
-  }
-
-  return missingTraits;
 }
 
 function getMatchedTarget(
@@ -1114,52 +729,14 @@ function sanitizeClassifierDecision({
 
     const sanitizedBottleDraft = normalizeSmwsExactCaskProposedBottleDraft({
       extractedIdentity: artifacts.extractedIdentity,
-      proposedBottle: restoreSparseAgeOnlyBottleName({
-        reference,
-        extractedIdentity: artifacts.extractedIdentity,
-        proposedBottle: sanitizeProposedBottleDraft(
-          decision.proposedBottle,
-          resolvedEntitiesById,
-        ),
-      }),
+      proposedBottle: sanitizeProposedBottleDraft(
+        decision.proposedBottle,
+        resolvedEntitiesById,
+      ),
       reference,
     });
-    let proposedBottleDraft =
+    const proposedBottleDraft =
       normalizeProposedBottleDraft(sanitizedBottleDraft);
-
-    if (
-      bottleNameDuplicatesBrand(
-        proposedBottleDraft.name,
-        proposedBottleDraft.brand.name,
-      )
-    ) {
-      return createNoMatchDecision({
-        decision,
-        candidateBottleIds: filteredCandidateBottleIds,
-        observation,
-        identityScope: "product",
-        rationale: appendRationale(
-          decision.rationale,
-          "Server downgraded create_bottle because the proposed bottle name duplicates the brand instead of naming an expression.",
-        ),
-      });
-    }
-
-    const stableBottleDraft =
-      stripStructuredExactTraitsFromStableBottleName(proposedBottleDraft);
-    if (!stableBottleDraft) {
-      return createNoMatchDecision({
-        decision,
-        candidateBottleIds: filteredCandidateBottleIds,
-        observation,
-        identityScope: "product",
-        rationale: appendRationale(
-          decision.rationale,
-          "Server downgraded create_bottle because removing structured exact traits leaves no stable expression distinct from the brand.",
-        ),
-      });
-    }
-    proposedBottleDraft = stableBottleDraft;
     const smwsAnchorDecision: BottleClassificationDecision = {
       ...decision,
       action: "create_bottle",
@@ -1175,65 +752,6 @@ function sanitizeClassifierDecision({
         artifacts,
       }),
     );
-
-    if (
-      (decision.identityScope ?? "product") === "exact_cask" &&
-      !hasSmwsCodeAnchor
-    ) {
-      proposedBottleDraft = restoreExactCaskBottleDisplayName({
-        reference,
-        extractedIdentity: artifacts.extractedIdentity,
-        proposedBottle: proposedBottleDraft,
-      });
-    }
-
-    if ((decision.identityScope ?? "product") !== "exact_cask") {
-      const displayIdentityMissingTraits =
-        getCreateBottleDisplayIdentityMissingTraits({
-          reference,
-          extractedIdentity: artifacts.extractedIdentity,
-          proposedBottle: proposedBottleDraft,
-        });
-
-      if (
-        shouldRestoreMissingBottleAgeStatement(displayIdentityMissingTraits)
-      ) {
-        const ageRestoredBottleDraft = restoreSparseAgeOnlyBottleName({
-          reference,
-          extractedIdentity: artifacts.extractedIdentity,
-          proposedBottle: proposedBottleDraft,
-          forceAgeStatement: true,
-        });
-        proposedBottleDraft = normalizeProposedBottleDraft(
-          ageRestoredBottleDraft,
-        );
-      }
-    }
-
-    if ((decision.identityScope ?? "product") !== "exact_cask") {
-      const displayIdentityMissingTraits =
-        getCreateBottleDisplayIdentityMissingTraits({
-          reference,
-          extractedIdentity: artifacts.extractedIdentity,
-          proposedBottle: proposedBottleDraft,
-        });
-      if (displayIdentityMissingTraits.length > 0) {
-        return createNoMatchDecision({
-          decision: {
-            ...decision,
-          },
-          candidateBottleIds: filteredCandidateBottleIds,
-          observation,
-          identityScope: "product",
-          rationale: appendRationale(
-            decision.rationale,
-            `Server downgraded create_bottle because the proposed bottle display name omits bottle-level traits (${displayIdentityMissingTraits.join(
-              "; ",
-            )}) that the source markets; include those traits in proposedBottle.name.`,
-          ),
-        });
-      }
-    }
 
     return {
       action: "create_bottle",
@@ -1379,21 +897,12 @@ export function finalizeBottleReferenceClassification({
     decision: agentEvidenceAdjustedDecision,
     artifacts,
   });
-  const finalDecision = reviewedDecision.proposedBottle
-    ? {
-        ...reviewedDecision,
-        proposedBottle: restoreSparseAgeOnlyBottleName({
-          reference,
-          extractedIdentity: artifacts.extractedIdentity,
-          proposedBottle: reviewedDecision.proposedBottle,
-        }),
-      }
-    : reviewedDecision;
 
   return BottleClassificationDecisionSchema.parse({
-    ...finalDecision,
-    aliasScope: finalDecision.aliasScope ?? parsedDecision.aliasScope ?? "none",
+    ...reviewedDecision,
+    aliasScope:
+      reviewedDecision.aliasScope ?? parsedDecision.aliasScope ?? "none",
     confidenceBasis:
-      finalDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
+      reviewedDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
   });
 }
