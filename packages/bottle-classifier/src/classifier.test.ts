@@ -19,15 +19,11 @@ import type {
 import {
   buildBottleClassificationArtifacts,
   type BottleClassificationArtifacts,
-  type Finding,
-  type ProposedOperation,
 } from "./contract";
 import { buildBottleCandidate } from "./evalFixtureBuilders";
 
 type ReasoningResult = {
   decision: BottleClassifierAgentDecisionInput;
-  proposedOperations?: ProposedOperation[];
-  findings?: Finding[];
   artifacts: Parameters<typeof buildBottleClassificationArtifacts>[0];
 };
 
@@ -4873,7 +4869,7 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
   });
 
-  test("keeps an optional catalog correction separate from a safe match", async () => {
+  test("returns a safe match without catalog review output", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Shibui",
       bottler: null,
@@ -4926,17 +4922,6 @@ describe("createBottleClassifier", () => {
           matchedBottleId: 13025,
           proposedBottle: null,
         },
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: 13025,
-              patch: { shared: { category: "single_grain" } },
-            },
-            rationale: "Replace the generic stored category.",
-            evidenceRefs: [{ kind: "bottle", bottleId: 13025 }],
-          },
-        ],
         artifacts: {
           extractedIdentity,
           searchEvidence: [],
@@ -4969,18 +4954,10 @@ describe("createBottleClassifier", () => {
       proposedBottle: null,
       identityScope: "product",
     });
-    expect(result.proposedOperations).toEqual([
-      expect.objectContaining({
-        type: "update_bottle",
-        input: {
-          bottleId: 13025,
-          patch: { shared: { category: "single_grain" } },
-        },
-      }),
-    ]);
+    expect(result).not.toHaveProperty("proposedOperations");
   });
 
-  test("keeps a required catalog correction separate from no_match", async () => {
+  test("returns no_match when a separate catalog review is required", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "The Whistler",
       bottler: null,
@@ -5033,19 +5010,6 @@ describe("createBottleClassifier", () => {
           matchedBottleId: null,
           proposedBottle: null,
         },
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: currentBottleCandidate.bottleId,
-              patch: { shared: { category: "single_malt" } },
-            },
-            rationale: "Correct the stored Bottle category.",
-            evidenceRefs: [
-              { kind: "bottle", bottleId: currentBottleCandidate.bottleId },
-            ],
-          },
-        ],
         artifacts: {
           extractedIdentity,
           searchEvidence: [],
@@ -5077,14 +5041,6 @@ describe("createBottleClassifier", () => {
       matchedBottleId: null,
       proposedBottle: null,
     });
-    expect(result.proposedOperations).toEqual([
-      expect.objectContaining({
-        type: "update_bottle",
-        input: {
-          bottleId: currentBottleCandidate.bottleId,
-          patch: { shared: { category: "single_malt" } },
-        },
-      }),
-    ]);
+    expect(result).not.toHaveProperty("proposedOperations");
   });
 });

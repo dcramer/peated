@@ -7,12 +7,10 @@ import {
   bottleAliases,
   bottleChecks,
   bottleGroups,
-  bottleOperations,
   bottles,
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
-import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
 import type * as pendingUploadsModule from "@peated/server/lib/pendingUploads";
 import type * as photoIdentificationModule from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
@@ -607,7 +605,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(runBottleReferenceMock).toHaveBeenCalledTimes(1);
   });
 
-  test("persists photo match repairs once for moderator review without exposing them to the user", async ({
+  test("does not run catalog review for a photo match", async ({
     fixtures,
     defaults,
   }) => {
@@ -675,20 +673,6 @@ describe("POST /tastings/photo-identification", () => {
         bottleContexts: [{ ...persistedBottleContext, publicImages: [] }],
       },
     );
-    classification.proposedOperations = [
-      {
-        type: "update_bottle",
-        input: {
-          bottleId: bottle.id,
-          patch: { exact: { abv: 54.2 } },
-        },
-        rationale: "The readable label states 54.2% ABV.",
-        evidenceRefs: [
-          { kind: "bottle", bottleId: bottle.id },
-          { kind: "source", field: "imageEvidence.fieldCandidates.abv" },
-        ],
-      },
-    ];
     runBottleReferenceMock.mockResolvedValue({
       result: classification,
       modelMetadata: {
@@ -699,7 +683,7 @@ describe("POST /tastings/photo-identification", () => {
           outputTokens: 20,
           totalTokens: 120,
         },
-        toolCalls: { count: 1, names: ["propose_update_bottle"] },
+        toolCalls: { count: 1, names: ["get_bottle_context"] },
       },
     });
 
@@ -720,34 +704,7 @@ describe("POST /tastings/photo-identification", () => {
       .select()
       .from(bottleChecks)
       .where(eq(bottleChecks.sourceKind, "photo_identification"));
-    expect(checks).toHaveLength(1);
-    expect(checks[0]).toMatchObject({
-      intent: "resolve_reference",
-      sourceId: first.pendingImage.id,
-      model: config.BOTTLE_CLASSIFIER_MODEL,
-      modelMetadata: expect.objectContaining({
-        usage: expect.objectContaining({ totalTokens: 120 }),
-      }),
-    });
-    await expect(
-      db
-        .select()
-        .from(bottleOperations)
-        .where(eq(bottleOperations.checkId, checks[0].id)),
-    ).resolves.toMatchObject([
-      {
-        status: "pending_review",
-        proposal: expect.objectContaining({ type: "update_bottle" }),
-      },
-    ]);
-    await expect(listActionableBottleChecks()).resolves.toMatchObject({
-      results: [
-        expect.objectContaining({
-          id: checks[0].id,
-          sourceKind: "photo_identification",
-        }),
-      ],
-    });
+    expect(checks).toEqual([]);
   });
 
   test("falls back to manual search when classifier does not match", async ({

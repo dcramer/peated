@@ -141,7 +141,6 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
-        availableSourceEvidenceFields: ["reference.name"],
       }),
     );
 
@@ -217,13 +216,6 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
-        availableSourceEvidenceFields: [
-          "reference.name",
-          "reference.imageUrl",
-          "extractedIdentity.brand",
-          "extractedIdentity.abv",
-          "imageEvidence.fieldCandidates.expression",
-        ],
       }),
     );
 
@@ -231,9 +223,7 @@ describe("buildAgentInput", () => {
     expect(input.imageEvidence.fieldCandidates.expression.value).toBe(
       "Uigeadail",
     );
-    expect(input.availableSourceEvidenceFields).toContain(
-      "imageEvidence.fieldCandidates.expression",
-    );
+    expect(input).not.toHaveProperty("availableSourceEvidenceFields");
   });
 
   test("serializes a deterministic identity anchor without a phase handoff", () => {
@@ -245,7 +235,6 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "open",
-        availableSourceEvidenceFields: ["reference.name"],
         identityAnchor: {
           action: "match",
           rationale: "The SMWS code is a closed identity anchor.",

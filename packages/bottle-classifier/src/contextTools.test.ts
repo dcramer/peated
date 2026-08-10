@@ -123,7 +123,7 @@ describe("Bottle-check context tools", () => {
     ).toEqual([]);
   });
 
-  test("offers bounded context and proposal tools and retains each loaded context once", async () => {
+  test("offers bounded reference context without catalog-change tools", async () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
         client: {} as OpenAI,
@@ -147,7 +147,7 @@ describe("Bottle-check context tools", () => {
     const toolNames = prepared.agent.tools.map((tool) => tool.name);
     expect(toolNames).toContain("get_bottle_context");
     expect(toolNames).toContain("get_entity_context");
-    expect(toolNames).toEqual(
+    expect(toolNames).not.toEqual(
       expect.arrayContaining([
         "propose_update_bottle",
         "propose_merge_bottles",
@@ -229,7 +229,7 @@ describe("Bottle-check context tools", () => {
     );
   });
 
-  test("keeps known-target inspection and proposals usable without candidate expansion", async () => {
+  test("keeps known-target inspection usable without candidate expansion", async () => {
     const canonical = bottleContext();
     const duplicate = {
       ...canonical,
@@ -267,10 +267,6 @@ describe("Bottle-check context tools", () => {
     expect(prepared.agent.tools.map((tool) => tool.name)).toEqual([
       "get_bottle_context",
       "get_entity_context",
-      "propose_update_bottle",
-      "propose_merge_bottles",
-      "propose_update_entity",
-      "propose_merge_entities",
     ]);
 
     await invokePreparedTool(prepared, "get_bottle_context", {
@@ -280,33 +276,12 @@ describe("Bottle-check context tools", () => {
       bottleId: canonical.bottleId,
     });
     expect(
-      await invokePreparedTool(prepared, "propose_merge_bottles", {
-        sourceBottleId: duplicate.bottleId,
-        destinationBottleId: canonical.bottleId,
-        rationale: "Both inspected rows are the same marketed Bottle.",
-        evidenceRefs: [
-          { kind: "bottle", bottleId: duplicate.bottleId },
-          { kind: "bottle", bottleId: canonical.bottleId },
-        ],
-      }),
-    ).toMatchObject({ status: "recorded", proposalIndex: 0 });
-
-    expect(
-      prepared.getAgentResult({
-        finalOutput: { action: "no_match", findings: [] },
-      }).proposedOperations,
-    ).toEqual([
-      expect.objectContaining({
-        type: "merge_bottles",
-        input: {
-          sourceBottleId: duplicate.bottleId,
-          destinationBottleId: canonical.bottleId,
-        },
-      }),
-    ]);
+      prepared.getAgentResult({ finalOutput: { action: "no_match" } }).artifacts
+        .bottleContexts,
+    ).toEqual(expect.arrayContaining([canonical, duplicate]));
   });
 
-  test("lets replayed web evidence immediately ground a proposal", async () => {
+  test("lets Bottle Review ground a proposal with replayed web evidence", async () => {
     const canonical = bottleContext();
     const duplicate = {
       ...canonical,
@@ -322,7 +297,7 @@ describe("Bottle-check context tools", () => {
     const officialUrl =
       "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky";
     const events: string[] = [];
-    const prepared = await prepareBottleClassifierAgentRun(
+    const prepared = prepareBottleAuditAgentRun(
       {
         client: {} as OpenAI,
         model: "test-model",
@@ -362,15 +337,12 @@ describe("Bottle-check context tools", () => {
         },
       },
       {
-        reference: { name: "Laphroaig Cairdeas 2022" },
-        extractedIdentity: null,
-        initialCandidates: [],
+        audit: { bottleId: duplicate.bottleId, origin: "moderator" },
+        currentBottleContext: duplicate,
+        conversationId: "catalog-review-web-evidence",
       },
     );
 
-    await invokePreparedTool(prepared, "get_bottle_context", {
-      bottleId: duplicate.bottleId,
-    });
     await invokePreparedTool(prepared, "get_bottle_context", {
       bottleId: canonical.bottleId,
     });
@@ -401,8 +373,8 @@ describe("Bottle-check context tools", () => {
     });
     expect(events).toEqual(["web_replayed", "web_result", "proposal_result"]);
     expect(
-      prepared.getAgentResult({
-        finalOutput: { action: "no_match", findings: [] },
+      prepared.getOutput({
+        finalOutput: { summary: "The duplicate can be merged.", findings: [] },
       }).proposedOperations,
     ).toEqual([
       expect.objectContaining({

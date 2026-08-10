@@ -11,7 +11,6 @@ import {
   BottleContextSchema,
   EntityContextSchema,
 } from "./bottleContextContract";
-import { EVAL_CASES } from "./classifier.eval.fixtures";
 import { BottleClassificationArtifactsSchema } from "./contract";
 
 function inspectedBottleContext(
@@ -293,10 +292,10 @@ describe("Bottle-check eval scoring", () => {
   });
 
   test("treats a reversed current-to-matched merge as both missing and harmful", () => {
-    const fixture = EVAL_CASES.find(
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
       (candidate) =>
-        candidate.fixtureId ===
-        "store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate",
+        candidate.id ===
+        "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
     );
     expect(fixture).toBeDefined();
     const expectedMerge = fixture!.expected.proposedOperations[0];

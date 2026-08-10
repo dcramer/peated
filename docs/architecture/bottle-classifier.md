@@ -38,11 +38,9 @@ It returns either `ignored` with a reason, or `classified` with:
 - web/search evidence used for reasoning
 - resolved brand, bottler, and distillery entities
 
-Decision actions are `match`, `create_bottle`, and `no_match`. A required
-catalog correction is a separate Suggested Change. The decision stays
-`no_match` until the current Bottle is safe for assignment. An optional
-Suggested Change can accompany `match` only when it does not affect assignment
-safety.
+Decision actions are `match`, `create_bottle`, and `no_match`. The decision stays
+`no_match` until the current Bottle is safe for assignment. Catalog corrections
+belong to a separate Bottle audit and never accompany the reference result.
 `create_bottle` proposes one complete observed marketed Bottle: a stable
 expression in `proposedBottle.name` plus required exact fields, including edition,
 vintage year, release year, exact age, ABV, and cask flags. Canonical
@@ -82,11 +80,8 @@ A Bottle check is persisted workflow state for a server-owned intent:
 
 - `resolve_reference` identifies a Bottle from a listing or other external
   reference. Its existing structured decision remains the authoritative result.
-  Photo identification persists this state when a `match` or `no_match` result
-  also contains Suggested Changes or findings. The end-user flow receives only
-  the three identity results.
-  Actionable store-price checks enter the Audits inbox only after the
-  linked primary listing decision is complete.
+  It does not contain Suggested Changes or findings. The end-user flow receives
+  only the three identity results.
 - `audit_bottle` reviews an existing Bottle from a moderator request or a
   post-user-creation job. Its result is a narrative summary, Suggested Changes,
   and findings; it has no redundant structured conclusion.
@@ -169,13 +164,13 @@ move, merge, and split operations merely for symmetry.
 
 ### Measurement
 
-Keep reference-decision accuracy and diagnostic cleanup recall separate from
-audit operation and finding precision. Measure:
+Keep reference-decision accuracy separate from audit operation and finding
+precision. Measure:
 
 - intent accuracy and schema-valid output;
-- authoritative reference-decision and canonical/collected grounding gates;
-- exact Suggested Change and finding sets, with missing and extra reference
-  entries reported diagnostically and exact audit Suggested Change gating;
+- authoritative reference-decision gates;
+- exact audit Suggested Change and finding sets, with missing and extra entries
+  and required evidence gated;
 - reviewer rejection/correction and time to disposition;
 - stale, failed, retry, and reconciliation outcomes;
 - model cost, latency, and tool calls.
@@ -230,11 +225,11 @@ for that complete Bottle.
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a
   closed-form deterministic anchor.
-- Catalog cleanup is secondary to identity routing. Missing optional fields or
-  other changes that do not affect assignment safety can use a separate
-  Suggested Change without blocking a clear match or create outcome.
-- Return `no_match` when a stored conflict requires a Suggested Change before
-  the reference is safe to assign.
+- Catalog cleanup is outside identity routing. Missing optional fields do not
+  block a clear match or create outcome; a separate Bottle audit can review
+  them.
+- Return `no_match` when a stored conflict requires catalog review before the
+  reference is safe to assign.
 - Also return `no_match` when the Bottle identity is unresolved or when creating
   would invent an ambiguous hybrid.
 
@@ -247,16 +242,16 @@ evidence bars:
 - Local identification may stop at an existing match when local evidence is
   sufficient for the requested workflow. It must return `no_match` when the
   local evidence is ambiguous, incomplete, or requires canonical interpretation.
-- Full classification is required when the caller wants a create or a separate
-  Suggested Change.
+- Full classification is required when the caller wants a create. Bottle audit
+  is required when the caller wants catalog review.
 - Web evidence is not required for every existing local match. It is one way to
   corroborate missing canonical identity, but complete-Bottle creation may also
   be supported by reviewed label/image evidence, closed-form deterministic
   anchors, or explicit local sibling evidence where policy allows it.
 - Local sibling evidence comes only from explicit BottleGroup membership.
   Catalog adapters must not infer sibling relationships from Bottle names.
-- Manual-search consumers must not assign a `no_match` candidate. A linked
-  Suggested Change can explain which current Bottle must change first.
+- Manual-search consumers must not assign a `no_match` candidate. A separate
+  Bottle audit can explain which current Bottle must change first.
 
 ## Execution
 
@@ -271,19 +266,14 @@ The pipeline is:
    code references.
 5. Resolve local brand, bottler, and distillery entities.
 6. Run one bounded classifier agent loop with local search, Entity search,
-   focused web search, context tools, and four non-mutating Suggested Change tools.
+   focused web search, and read-only context tools.
    The agent decides when web evidence is needed; the runtime does not search
    before the agent or delegate web interpretation to another model.
    Deterministic resolution, such as an SMWS code, is supplied as an identity
    anchor rather than bypassing the agent.
-7. The reference agent returns the strict authoritative decision and findings.
-   Successful Suggested Change tool calls are collected by runtime and attached as
-   `proposedOperations`; the model does not echo operations in final output.
-8. Validate and finalize the decision, then hand each Suggested Change to
-   server preparation independently. A Suggested Change tool accepts work only when its
-   payload is canonical, its existing targets were inspected, its evidence was
-   collected, it is not an exact duplicate, and the per-run ceiling is not
-   exceeded. The tools never mutate, approve, order, replace, or withdraw work.
+7. The reference agent returns the strict authoritative decision.
+8. Validate and finalize the decision. A caller can stop here without running a
+   catalog review.
 
 With `candidateExpansion: initial_only`, full classification omits Bottle,
 Entity, and web search but retains Bottle and Entity context tools for ids the
@@ -291,7 +281,8 @@ agent already knows.
 
 Existing-Bottle audits reuse the full reference evidence preparation: public
 label extraction, initial Bottle candidates, Entity resolution, deterministic
-identity anchors, the focused-web budget, and the same read and Suggested Change tools. The
+identity anchors, and the focused-web budget. The audit agent has the read and
+Suggested Change tools. The
 audited Bottle and its complete context are preloaded, then one bounded audit
 agent loop compares the authoritative marketed identity with the stored Bottle.
 Its strict final output remains only a summary and findings, without a redundant
@@ -505,19 +496,15 @@ model-scored confidence. Encoded expected fields are required. Creation fixtures
 do not encode `caskType`, `caskSize`, or `caskFill` as classifier requirements.
 Missing unencoded optional enrichment can be tolerated; wrong required identity
 fields should fail.
-Reference and audit fixtures exercise the same single agent loop and four
-Suggested Change tools used by production Bottle checks. On a replay cache hit the eval
+Reference fixtures exercise the identity agent. Audit fixtures exercise the
+catalog review agent and its four Suggested Change tools. On a replay cache hit the eval
 harness does not invoke the underlying web tool, so replay does not consume the
 in-process web-query budget; live runs remain the budget authority.
 
-For `resolve_reference`, the authoritative identity decision and
-canonical/collected grounding are gating. Exact operation and finding sets,
-including missing and extra entries, are reported by named informational judges;
-a fixture cannot prove that an otherwise supported Suggested Change is harmful merely by
-omitting it. This does not turn opportunistic cleanup into a requirement for
-every reference, and every Suggested Change still requires moderator approval before
-mutation. For `audit_bottle`, exact operations, findings, and required evidence
-are gating because catalog investigation is the intent.
+For `resolve_reference`, the authoritative identity decision is gating. For
+`audit_bottle`, exact operations, findings, and required evidence are gating
+because catalog investigation is the intent. This keeps identity quality and
+Suggested Change precision as separate measurements.
 
 Full-classification evals own match quality and candidate recall. Server
 integration tests prove that an exact alias becomes an initial candidate and

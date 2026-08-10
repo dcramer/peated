@@ -1,6 +1,6 @@
 {
-  "id": "image-backed-photo-matches-and-suggests-compass-box-rogues-banquet",
-  "name": "Rogues' Banquet: image-backed match and Suggested Change",
+  "id": "image-backed-photo-matches-compass-box-rogues-banquet",
+  "name": "Rogues' Banquet: image-backed match",
   "input": {
     "reference": {
       "name": "Compass Box Rogues' Banquet",
@@ -175,80 +175,6 @@
     "expectedTier": "auto",
     "verifyEligible": true,
     "suggestedNextStep": "confirm_match",
-    "proposedOperations": [
-      {
-        "type": "update_bottle",
-        "input": {
-          "bottleId": 13364,
-          "patch": {
-            "shared": {
-              "distillers": [
-                {
-                  "kind": "existing",
-                  "entityId": 237
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 843
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 1185
-                },
-                {
-                  "kind": "existing",
-                  "entityId": 1204
-                }
-              ],
-              "bottler": {
-                "kind": "existing",
-                "entityId": 1422
-              }
-            },
-            "exact": {
-              "edition": "Limited Edition",
-              "abv": 46,
-              "releaseYear": 2020
-            }
-          }
-        },
-        "rationale": "Bottle 13364 is the exact Rogues' Banquet product, while the official facts support its missing 46% ABV, 2020 release year, Compass Box bottler, and four component distilleries.",
-        "evidenceRefs": [
-          {
-            "kind": "web_result",
-            "url": "https://www.compassboxwhisky.com/products/rogues-banquet"
-          },
-          {
-            "kind": "web_result",
-            "url": "https://cdn.shopify.com/s/files/1/0605/1990/7463/files/Rogues_Banquet_Recipe_Fact_Sheet_2020.pdf?v=1727337875"
-          },
-          {
-            "kind": "bottle",
-            "bottleId": 13364
-          },
-          {
-            "kind": "entity",
-            "entityId": 1422
-          },
-          {
-            "kind": "entity",
-            "entityId": 237
-          },
-          {
-            "kind": "entity",
-            "entityId": 843
-          },
-          {
-            "kind": "entity",
-            "entityId": 1185
-          },
-          {
-            "kind": "entity",
-            "entityId": 1204
-          }
-        ]
-      }
-    ],
     "summary": "Match existing Bottle 13364 and retain one sparse moderator-reviewed proposal for its supported missing facts."
   },
   "localCatalog": {

@@ -39,7 +39,6 @@ import {
   type BottleReference,
   type CandidateExpansionMode,
   type ClassifyBottleReferenceInput,
-  type Finding,
   type ProposedOperation,
 } from "./contract";
 import { BottleClassificationError } from "./error";
@@ -111,15 +110,10 @@ const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
 
 export type BottleClassifierAgentResult = {
   decision: BottleClassifierAgentDecisionInput;
-  proposedOperations?: ProposedOperation[];
-  findings?: Finding[];
   artifacts: BottleClassificationArtifacts;
 };
 
-const BottleReferenceAgentOutputSchema =
-  BottleClassifierAgentDecisionSchema.extend({
-    findings: z.array(FindingSchema).default([]),
-  });
+const BottleReferenceAgentOutputSchema = BottleClassifierAgentDecisionSchema;
 
 const BottleAuditAgentOutputSchema = z
   .object({
@@ -532,7 +526,6 @@ export async function finalizeBottleClassifierAgentResult({
   reference: BottleReference;
   agentResult: {
     decision: BottleClassifierAgentDecisionInput;
-    proposedOperations?: ProposedOperation[];
     artifacts: BottleClassificationArtifacts;
   };
 }): Promise<{
@@ -616,26 +609,11 @@ export async function prepareBottleClassifierAgentRun(
     inputWebSearchBudget ??
     createBottleWebSearchBudget(options.maxSearchQueries);
   const instructions = buildBottleClassifierInstructions();
-  const availableSourceEvidenceFields = getBottleCheckSourceEvidencePaths({
-    intent: "resolve_reference",
-    input: { reference },
-    artifacts: buildBottleClassificationArtifacts({
-      extractedIdentity: normalizedExtractedIdentity,
-      imageEvidence: normalizedImageEvidence,
-    }),
-  });
-
-  const proposalCollector = createRunProposalCollector({
-    maxProposals: CLASSIFIER_MAX_PROPOSED_OPERATIONS,
-    sourceFields: availableSourceEvidenceFields,
-    state,
-  });
-
   const tools = createBottleCheckTools({
     allowCandidateExpansion,
     dataSource,
     options,
-    proposalCollector,
+    proposalCollector: null,
     state,
     webSearchBudget,
   });
@@ -691,7 +669,6 @@ export async function prepareBottleClassifierAgentRun(
     resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
     investigationHint,
     identityAnchor,
-    availableSourceEvidenceFields,
   });
   const getArtifacts = () =>
     buildAgentArtifacts({
@@ -729,15 +706,9 @@ export async function prepareBottleClassifierAgentRun(
       if (!finalOutput) {
         throw new Error("Agent returned empty output");
       }
-      const parsed = BottleReferenceAgentOutputSchema.parse(finalOutput);
-      const { findings, ...decision } = parsed;
-      if (proposalCollector) {
-        assertFindingsUseCollectedEvidence(findings, proposalCollector);
-      }
+      const decision = BottleReferenceAgentOutputSchema.parse(finalOutput);
       return {
         decision: parseAgentDecision(decision),
-        proposedOperations: proposalCollector?.getProposals() ?? [],
-        findings,
         artifacts: getArtifacts(),
       };
     },
@@ -1421,8 +1392,6 @@ export function createBottleClassifier(
         result: BottleClassificationResultSchema.parse(
           createDecidedBottleClassification({
             decision: finalized.decision,
-            proposedOperations: agentRun.agentResult.proposedOperations ?? [],
-            findings: agentRun.agentResult.findings ?? [],
             artifacts,
           }),
         ),

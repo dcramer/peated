@@ -42,9 +42,8 @@ For each `store_price`, the matcher should decide one of four outcomes:
 The system persists one `store_price_match_proposal` row per `store_price`.
 
 The primary match proposal remains authoritative for the listing decision.
-Every full classifier run also persists a linked Bottle check with supplemental
-Suggested Changes. That check does not replace or reinterpret the primary
-proposal.
+Every full classifier run also persists a linked identity-only Bottle check.
+Catalog review is a separate Bottle audit.
 
 ## Matching Modes
 
@@ -103,10 +102,9 @@ Evaluation order:
 
 Every full reference run creates a `resolve_reference` Bottle check from the
 same reviewed artifacts. This includes initial unresolved listings, ignored
-results, and individual or bulk retries. Its Suggested Changes are
-supplemental catalog work, not additional price-match outcomes. Deterministic
-accepted-alias matches do not create a check because they do not run the
-classifier.
+results, and individual or bulk retries. The check contains no Suggested Changes
+or findings. Deterministic accepted-alias matches do not create a check because
+they do not run the classifier.
 
 The proposal, attempt, and linked check commit as one transaction before
 automation begins. If the check cannot be validated or persisted, the resolver
@@ -211,10 +209,9 @@ When `status = classified`, the decision must be one of:
 Additional rules:
 
 - `matchedBottleId` must be a known candidate bottle id when `action = match`
-- a required catalog correction uses a separate `update_bottle` Suggested
-  Change and keeps the identity action at `no_match`
-- an optional Suggested Change can accompany `match` only when it does not
-  affect assignment safety
+- a required catalog correction keeps the identity action at `no_match`; a
+  separate Bottle audit owns any Suggested Change
+- reference results never contain Suggested Changes or findings
 - classifier decisions carry Bottle ids only; they do not expose a legacy
   release-id picker
 - `create_bottle` carries one complete marketed Bottle draft, including exact
@@ -333,11 +330,9 @@ Moderators can:
 - approve complete Bottle create-new input
 
 Incoming Listings owns only the primary listing decision. Once that decision is
-complete, an actionable linked check appears in Audits under the
-Incoming Listings source and the completed proposal leaves the listing queue.
-This keeps supplemental catalog findings and Review Operations in the same
-inbox as other Bottle audit work without exposing them before their primary
-listing decision is settled.
+complete, the completed proposal leaves the listing queue. Reference
+Classification does not create Review Operations. A separate Bottle audit owns
+catalog findings and Suggested Changes when catalog review is required.
 
 Each Review Operation is read-only until separately approved. Approval never
 means “apply the whole agent result”: selected `update_bottle`,

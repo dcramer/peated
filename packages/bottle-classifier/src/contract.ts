@@ -270,8 +270,6 @@ export const IgnoredBottleClassificationResultSchema = z
   .object({
     status: z.literal("ignored"),
     reason: z.string().min(1),
-    proposedOperations: z.tuple([]).default([]),
-    findings: z.tuple([]).default([]),
     artifacts: BottleClassificationArtifactsSchema,
   })
   .strict();
@@ -280,8 +278,6 @@ export const DecidedBottleClassificationResultSchema = z
   .object({
     status: z.literal("classified"),
     decision: BottleClassificationDecisionSchema,
-    proposedOperations: ProposedOperationsSchema.default([]),
-    findings: z.array(FindingSchema).default([]),
     artifacts: BottleClassificationArtifactsSchema,
   })
   .strict();
@@ -357,20 +353,14 @@ export function createIgnoredBottleClassification({
 
 export function createDecidedBottleClassification({
   decision,
-  proposedOperations = [],
-  findings = [],
   artifacts,
 }: {
   decision: z.infer<typeof BottleClassificationDecisionSchema>;
-  proposedOperations?: ProposedOperation[];
-  findings?: Finding[];
   artifacts: Partial<BottleClassificationArtifacts>;
 }): DecidedBottleClassificationResult {
   return DecidedBottleClassificationResultSchema.parse({
     status: "classified",
     decision,
-    proposedOperations,
-    findings,
     artifacts: buildBottleClassificationArtifacts(artifacts),
   });
 }

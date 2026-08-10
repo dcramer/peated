@@ -122,8 +122,6 @@ export const classifierEvalExpectationSchema = z.object({
   suggestedNextStep: z
     .enum(["confirm_match", "confirm_create", "manual_search"])
     .optional(),
-  proposedOperations: ProposedOperationsSchema.default([]),
-  findings: z.array(FindingSchema).default([]),
   summary: z.string().min(1),
 });
 
@@ -222,48 +220,6 @@ export const classifierEvalFixtureSchema = z
         "Explicit Bottle contexts must exactly cover inspected Bottle ids.",
       path: ["context", "bottleContexts"],
     });
-    const inspectedEntityIds = new Set(
-      value.context.inspectedEntities.map(({ entityId }) => entityId),
-    );
-    const inspectedSeriesIds = new Set(
-      value.context.inspectedSeries.map(({ seriesId }) => seriesId),
-    );
-
-    for (const [
-      operationIndex,
-      operation,
-    ] of value.expected.proposedOperations.entries()) {
-      for (const target of listBottleCheckOperationTargets(operation)) {
-        const inspected =
-          target.kind === "bottle"
-            ? inspectedBottleIds.has(target.id)
-            : target.kind === "entity"
-              ? inspectedEntityIds.has(target.id)
-              : inspectedSeriesIds.has(target.id);
-        if (inspected) {
-          continue;
-        }
-
-        const label =
-          target.kind === "bottle"
-            ? "Bottle"
-            : target.kind === "entity"
-              ? "Entity"
-              : "BottleSeries";
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Expected operation references uninspected ${label} id ${target.id}.`,
-          path: [
-            "expected",
-            "proposedOperations",
-            operationIndex,
-            "input",
-            ...target.path,
-          ],
-        });
-      }
-    }
-
     if (value.localCatalog !== undefined) {
       if (value.input.initialCandidates !== undefined) {
         ctx.addIssue({

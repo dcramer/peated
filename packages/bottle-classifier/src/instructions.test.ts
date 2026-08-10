@@ -18,11 +18,11 @@ describe("Bottle check instructions", () => {
       "<evidence_policy>",
       "<decision_policy>",
       "<tool_policy>",
-      "<operation_policy>",
       "<output_contract>",
     ]) {
       expect(reference).toContain(section);
     }
+    expect(reference).not.toContain("<operation_policy>");
   });
 
   test("preserves the exact Bottle and conservative-decision boundaries", () => {
@@ -65,19 +65,25 @@ describe("Bottle check instructions", () => {
   });
 
   test("keeps Suggested Change tools review-only and evidence-bound", () => {
-    for (const instructions of [
-      buildBottleClassifierInstructions(),
-      buildBottleAuditInstructions(),
-    ]) {
-      expect(instructions).toContain(
-        "Suggested Change tools record catalog changes for moderator review",
-      );
-      expect(instructions).toContain("A search result alone is not inspection");
-      expect(instructions).toContain("`availableSourceEvidenceFields`");
-      expect(instructions).toContain(
-        "Do not include Suggested Changes in the final structured output",
-      );
-    }
+    const reference = buildBottleClassifierInstructions();
+    const audit = buildBottleAuditInstructions();
+
+    expect(reference).toContain(
+      "Reference Classification tools only collect identity evidence",
+    );
+    expect(reference).not.toContain(
+      "Suggested Change tools record catalog changes for moderator review",
+    );
+    expect(reference).not.toContain("`availableSourceEvidenceFields`");
+
+    expect(audit).toContain(
+      "Suggested Change tools record catalog changes for moderator review",
+    );
+    expect(audit).toContain("A search result alone is not inspection");
+    expect(audit).toContain("`availableSourceEvidenceFields`");
+    expect(audit).toContain(
+      "Do not include Suggested Changes in the final structured output",
+    );
   });
 
   test("keeps audit intent separate from reference resolution", () => {

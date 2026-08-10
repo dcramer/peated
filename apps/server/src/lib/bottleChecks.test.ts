@@ -138,8 +138,6 @@ describe("Bottle check persistence", () => {
       result: {
         status: "ignored",
         reason: "Test fixture",
-        proposedOperations: [],
-        findings: [],
         artifacts: {
           candidates: [],
           searchEvidence: [],
@@ -210,8 +208,6 @@ describe("Bottle check persistence", () => {
       result: {
         status: "ignored",
         reason: "Not one Bottle.",
-        proposedOperations: [],
-        findings: [],
         artifacts: {},
       },
       storePrice: { attemptId: attempt!.id },
@@ -223,7 +219,7 @@ describe("Bottle check persistence", () => {
     });
   });
 
-  test("derives primary Bottle protection from the exact store-price attempt", async ({
+  test("rejects Suggested Changes from reference classification", async ({
     fixtures,
   }) => {
     const primary = await fixtures.Bottle({ name: "Primary match" });
@@ -250,8 +246,6 @@ describe("Bottle check persistence", () => {
         suggestedBottleId: primary.id,
       })
       .returning();
-    const primaryArtifacts = await bottleArtifacts(primary.id);
-    const duplicateArtifacts = await bottleArtifacts(duplicate.id);
     const mergeProposal = {
       type: "merge_bottles" as const,
       input: {
@@ -265,40 +259,27 @@ describe("Bottle check persistence", () => {
       ],
     };
 
-    const result = await createBottleCheck({
-      intent: "resolve_reference",
-      sourceKind: "store_price",
-      sourceId: price.id,
-      input: { reference: { id: price.id, name: price.name } },
-      result: {
-        status: "classified",
-        decision: {
-          action: "match",
-          matchedBottleId: primary.id,
-          proposedBottle: null,
-          rationale: "The listing matches the primary Bottle.",
-          candidateBottleIds: [primary.id, duplicate.id],
+    await expect(
+      createBottleCheck({
+        intent: "resolve_reference",
+        sourceKind: "store_price",
+        sourceId: price.id,
+        input: { reference: { id: price.id, name: price.name } },
+        result: {
+          status: "classified",
+          decision: {
+            action: "match",
+            matchedBottleId: primary.id,
+            proposedBottle: null,
+            rationale: "The listing matches the primary Bottle.",
+            candidateBottleIds: [primary.id, duplicate.id],
+          },
+          proposedOperations: [mergeProposal],
+          artifacts: {},
         },
-        proposedOperations: [mergeProposal],
-        findings: [],
-        artifacts: {
-          bottleContexts: [
-            ...primaryArtifacts.bottleContexts,
-            ...duplicateArtifacts.bottleContexts,
-          ],
-        },
-      },
-      storePrice: { attemptId: attempt!.id },
-    });
-
-    expect(result.check.operations).toEqual([
-      expect.objectContaining({
-        status: "blocked",
-        preparationError: expect.objectContaining({
-          code: "direct_conflict",
-        }),
+        storePrice: { attemptId: attempt!.id },
       }),
-    ]);
+    ).rejects.toThrow("proposedOperations");
   });
 
   test("rejects missing and mismatched store-price attempts", async ({
@@ -332,8 +313,6 @@ describe("Bottle check persistence", () => {
       result: {
         status: "ignored" as const,
         reason: "Not one Bottle.",
-        proposedOperations: [],
-        findings: [],
         artifacts: {},
       },
     };

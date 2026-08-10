@@ -15,9 +15,9 @@ const fixtureRootDir = fileURLToPath(
 );
 const decisionFixtureDir = `${fixtureRootDir}/decision-cases`;
 const newBottleFixtureDir = `${fixtureRootDir}/new-bottles`;
-const laphroaigDecisionFixtureFile = `${decisionFixtureDir}/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate.json`;
-const roguesBanquetMatchFixtureFile = `${decisionFixtureDir}/match_existing/image-backed-photo-matches-and-suggests-compass-box-rogues-banquet.json`;
-const spiceTreeRequiredChangeFixtureFile = `${decisionFixtureDir}/ignore_or_reject/image-backed-photo-requires-spice-tree-extravaganza-catalog-change.json`;
+const laphroaigDecisionFixtureFile = `${decisionFixtureDir}/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1.json`;
+const roguesBanquetMatchFixtureFile = `${decisionFixtureDir}/match_existing/image-backed-photo-matches-compass-box-rogues-banquet.json`;
+const spiceTreeRequiredChangeFixtureFile = `${decisionFixtureDir}/ignore_or_reject/image-backed-photo-requires-spice-tree-extravaganza-catalog-review.json`;
 
 function loadLaphroaigDecisionFixture() {
   return classifierEvalFixtureSchema.parse(
@@ -249,26 +249,6 @@ describe("eval fixture validation", () => {
     expect(matchFixture.expected).toMatchObject({
       action: "match",
       matchedBottleId: 13364,
-      proposedOperations: [
-        {
-          type: "update_bottle",
-          input: {
-            bottleId: 13364,
-            patch: {
-              exact: { abv: 46, releaseYear: 2020 },
-              shared: {
-                bottler: { kind: "existing", entityId: 1422 },
-                distillers: [
-                  { kind: "existing", entityId: 237 },
-                  { kind: "existing", entityId: 843 },
-                  { kind: "existing", entityId: 1185 },
-                  { kind: "existing", entityId: 1204 },
-                ],
-              },
-            },
-          },
-        },
-      ],
     });
     expect(matchFixture.localCatalog?.bottles).toMatchObject([
       {
@@ -293,35 +273,6 @@ describe("eval fixture validation", () => {
     expect(requiredChangeFixture.expected).toMatchObject({
       action: "no_match",
       matchedBottleId: null,
-      proposedOperations: [
-        {
-          type: "update_bottle",
-          input: {
-            bottleId: 9900,
-            patch: {
-              shared: {
-                name: "Spice Tree Extravaganza",
-                statedAge: null,
-                category: "blend",
-                brand: { kind: "existing", entityId: 1422 },
-                distillers: [
-                  { kind: "existing", entityId: 15 },
-                  { kind: "existing", entityId: 89 },
-                  { kind: "existing", entityId: 242 },
-                  { kind: "existing", entityId: 410 },
-                  { kind: "existing", entityId: 516 },
-                  { kind: "existing", entityId: 843 },
-                ],
-              },
-              exact: {
-                edition: "Limited Edition",
-                abv: 46,
-                releaseYear: 2016,
-              },
-            },
-          },
-        },
-      ],
     });
 
     expect(matchFixture.provenance?.verifiedSourceUrls).toEqual(
@@ -340,31 +291,6 @@ describe("eval fixture validation", () => {
       expect(encodedExpectations).not.toContain("caskType");
       expect(encodedExpectations).not.toContain("caskSize");
       expect(encodedExpectations).not.toContain("caskFill");
-
-      const availableSourcePaths = new Set([
-        ...Object.entries(fixture.input.reference).flatMap(([field, value]) =>
-          value == null ? [] : [`reference.${field}`],
-        ),
-        ...Object.entries(fixture.input.extractedIdentity ?? {}).flatMap(
-          ([field, value]) =>
-            value == null ? [] : [`extractedIdentity.${field}`],
-        ),
-        ...Object.keys(fixture.input.imageEvidence?.fieldCandidates ?? {}).map(
-          (field) => `imageEvidence.fieldCandidates.${field}`,
-        ),
-      ]);
-      const verifiedUrls = new Set(
-        fixture.provenance?.verifiedSourceUrls ?? [],
-      );
-      for (const operation of fixture.expected.proposedOperations) {
-        for (const evidenceRef of operation.evidenceRefs) {
-          if (evidenceRef.kind === "source") {
-            expect(availableSourcePaths).toContain(evidenceRef.field);
-          } else if (evidenceRef.kind === "web_result") {
-            expect(verifiedUrls).toContain(evidenceRef.url);
-          }
-        }
-      }
     }
   });
 
@@ -564,23 +490,6 @@ describe("eval fixture validation", () => {
       status: "classified",
       action: "match",
       matchedBottleId: 45146,
-      proposedOperations: [
-        {
-          type: "merge_bottles",
-          input: {
-            sourceBottleId: 39096,
-            destinationBottleId: 45146,
-          },
-          evidenceRefs: [
-            { kind: "bottle", bottleId: 39096 },
-            { kind: "bottle", bottleId: 45146 },
-            {
-              kind: "web_result",
-              url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
-            },
-          ],
-        },
-      ],
     });
     expect(fixture.provenance?.dbOutcome).toMatchObject({
       bottleId: 45146,
@@ -663,23 +572,32 @@ describe("eval fixture validation", () => {
   });
 
   test("requires expected operation targets to be inspectable", () => {
-    const fixture = loadLaphroaigDecisionFixture();
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+    );
+    expect(fixture).toBeDefined();
 
-    const uninspected = classifierEvalFixtureSchema.safeParse({
+    const uninspected = auditBottleEvalFixtureSchema.safeParse({
       ...fixture,
-      context: {
-        ...fixture.context,
-        inspectedBottleIds: [45146, 44288],
-        bottleContexts: fixture.context.bottleContexts?.filter(
-          ({ bottleId }) => bottleId !== 39096,
-        ),
+      input: {
+        ...fixture!.input,
+        context: {
+          ...fixture!.input.context,
+          inspectedBottles: fixture!.input.context.inspectedBottles.filter(
+            ({ bottleId }) => bottleId !== 45146,
+          ),
+          bottleContexts: fixture!.input.context.bottleContexts.filter(
+            ({ bottleId }) => bottleId !== 45146,
+          ),
+        },
       },
     });
     expect(uninspected.success).toBe(false);
     if (!uninspected.success) {
       expect(uninspected.error.issues).toContainEqual(
         expect.objectContaining({
-          message: "Expected operation references uninspected Bottle id 39096.",
+          message: "Expected operation references uninspected Bottle id 45146.",
         }),
       );
     }

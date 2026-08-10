@@ -11,8 +11,10 @@ This package owns:
 - the public classifier contract
 - file-backed classifier eval fixtures and their validation
 - whisky-specific extraction prompts and parsing
-- the LLM reasoning loop, including local search, optional entity search, and web search
-- deterministic review and downgrade policy
+- the identity reasoning loop, including local search, optional entity search,
+  and web search
+- the separate Bottle audit loop that can propose catalog changes
+- deterministic identity validation and downgrade policy
 - exact-cask versus product-scope inference
 - package-local unit tests and LLM-as-a-judge evals
 
@@ -103,6 +105,8 @@ Package-specific reminders:
 
 - Keep price-matching proposal language out of this package.
 - The model may only match candidate ids that were actually retrieved.
+- Reference Classification has read-only evidence tools. Bottle audits own
+  Suggested Change tools.
 - Deterministic helpers must stay limited to structurally safe behavior.
 - SMWS code references are deterministic; most other whisky-family semantics are not.
 - Keep request-specific evidence in runtime input, tool results, schemas, and post-model validation.

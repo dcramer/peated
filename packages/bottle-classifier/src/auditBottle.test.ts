@@ -414,7 +414,7 @@ describe("auditBottle", () => {
     });
   });
 
-  test("attaches proposals and findings from the reference agent", async () => {
+  test("keeps catalog review output out of Reference Classification", async () => {
     const classifier = createBottleClassifier({
       client: {} as OpenAI,
       model: "test-model",
@@ -434,26 +434,6 @@ describe("auditBottle", () => {
               matchedBottleId: null,
               proposedBottle: null,
             },
-            proposedOperations: [
-              {
-                type: "update_entity" as const,
-                input: {
-                  entityId: 10,
-                  patch: { name: "Canonical Brand" },
-                },
-                rationale: "The inspected Entity has a stale name.",
-                evidenceRefs: [{ kind: "entity" as const, entityId: 10 }],
-              },
-            ],
-            findings: [
-              {
-                scope: "series" as const,
-                summary: "The related Series needs a workflow outside v1.",
-                evidenceRefs: [
-                  { kind: "source" as const, field: "reference.name" },
-                ],
-              },
-            ],
             artifacts: buildBottleClassificationArtifacts({
               entityContexts: [
                 {
@@ -501,8 +481,9 @@ describe("auditBottle", () => {
 
     expect(result).toMatchObject({
       status: "classified",
-      proposedOperations: [{ type: "update_entity" }],
-      findings: [{ scope: "series" }],
+      decision: { action: "no_match" },
     });
+    expect(result).not.toHaveProperty("proposedOperations");
+    expect(result).not.toHaveProperty("findings");
   });
 });

@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate",
-  "name": "store listing: matches Laphroaig Càirdeas 2022 Warehouse 1 and merges the malformed duplicate",
+  "id": "store-listing-matches-laphroaig-cairdeas-2022-warehouse-1",
+  "name": "store listing: matches Laphroaig Càirdeas 2022 Warehouse 1",
   "input": {
     "reference": {
       "id": 11828042,
@@ -593,31 +593,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 45146,
-    "proposedOperations": [
-      {
-        "type": "merge_bottles",
-        "input": {
-          "sourceBottleId": 39096,
-          "destinationBottleId": 45146
-        },
-        "rationale": "Bottle 39096 is a malformed duplicate of the exact 2022 Càirdeas Warehouse 1 release represented by Bottle 45146; its tasting image shows Warehouse 1 and 52.2% ABV, and 2022 is the release year rather than a vintage year.",
-        "evidenceRefs": [
-          {
-            "kind": "bottle",
-            "bottleId": 39096
-          },
-          {
-            "kind": "bottle",
-            "bottleId": 45146
-          },
-          {
-            "kind": "web_result",
-            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky"
-          }
-        ]
-      }
-    ],
-    "findings": [],
     "summary": "Hard expectation: match listing 11828042 to exact Warehouse 1 Bottle 45146 and do not harm generic Càirdeas Bottle 44288. Diagnostic operation-recall target: merge malformed duplicate Bottle 39096 into 45146."
   }
 }

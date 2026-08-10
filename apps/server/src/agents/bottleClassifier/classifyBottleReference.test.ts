@@ -21,8 +21,6 @@ describe("server bottleClassifier wrapper", () => {
     vi.mocked(classifyBottleReferenceInService).mockResolvedValue({
       status: "ignored",
       reason: "ignored",
-      proposedOperations: [],
-      findings: [],
       artifacts: {
         extractedIdentity: null,
         candidates: [],
@@ -52,8 +50,6 @@ describe("server bottleClassifier wrapper", () => {
       result: {
         status: "ignored" as const,
         reason: "ignored",
-        proposedOperations: [] as [],
-        findings: [] as [],
         artifacts: {
           extractedIdentity: null,
           imageEvidence: null,

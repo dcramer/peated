@@ -382,13 +382,10 @@ export function createBottleCheckTools({
   const proposalTools = proposalCollector
     ? createBottleProposalTools(proposalCollector)
     : [];
-  const allowContextInspection = proposalCollector !== null;
-  const loadBottleContext = allowContextInspection
-    ? createBottleContextLoader({
-        dataSource,
-        options,
-      })
-    : null;
+  const loadBottleContext = createBottleContextLoader({
+    dataSource,
+    options,
+  });
   return [
     ...(allowCandidateExpansion
       ? [
@@ -430,7 +427,7 @@ export function createBottleCheckTools({
           }),
         ]
       : []),
-    ...(allowContextInspection && dataSource.getEntityContext
+    ...(dataSource.getEntityContext
       ? [
           createGetEntityContextTool({
             getEntityContext: dataSource.getEntityContext,
