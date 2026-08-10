@@ -155,7 +155,7 @@ The classifier SHALL return structured evidence and unresolved risk without rely
 #### Scenario: Confidence basis is present
 
 - **WHEN** the agent returns a reviewed decision
-- **THEN** the decision SHALL include `confidenceBasis` or an equivalent structured basis identifying positive evidence, unresolved risks, and web-evidence status, with each unresolved risk carrying a typed category and a freeform note
+- **THEN** the decision SHALL include `confidenceBasis` or an equivalent structured basis identifying unresolved risks and web-evidence status, with each unresolved risk carrying a typed category and a freeform note
 
 #### Scenario: Runtime records tool calls
 
@@ -215,14 +215,9 @@ Every input envelope field, tool, output field, and runtime stage in the classif
 - **WHEN** a runtime stage such as a retry pass or evidence preload lacks measured benefit
 - **THEN** its value SHALL be established with an eval comparison before it is extended, and it MAY be removed if the comparison shows no benefit
 
-### Requirement: Evidence fields evolve toward machine-checkable structure
+### Requirement: Evidence fields use machine-checkable structure
 
-Because code derives gating from evidence fields, revisions to evidence schemas SHALL prefer typed, verifiable structure over freeform strings, landing each revision only when evals show the structure is reliable.
-
-#### Scenario: Evidence claims are verifiable
-
-- **WHEN** the schema for `positiveEvidence` is revised
-- **THEN** each evidence entry SHOULD name its source kind and locator (source label, image, local candidate id, or web result URL) so validation can confirm the citation exists in the collected run artifacts and reject fabricated evidence
+Because code derives gating from evidence fields, revisions to evidence schemas SHALL prefer typed, verifiable structure over freeform strings. An output field with no decision, review, or eval reader SHALL be removed.
 
 #### Scenario: Schema changes are eval-gated
 

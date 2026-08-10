@@ -125,7 +125,7 @@ describe("Bottle check persistence", () => {
           exclusive: "travel retail",
         },
         confidenceBasis: {
-          positiveEvidence: [],
+          positiveEvidence: ["Legacy model-reported support."],
           unresolvedRisks: [],
           toolsUsed: ["search_bottles"],
           webEvidence: "not_used",
@@ -143,6 +143,9 @@ describe("Bottle check persistence", () => {
     expect(output.decision.observation).not.toHaveProperty("outturn");
     expect(output.decision.observation).not.toHaveProperty("market");
     expect(output.decision.observation).not.toHaveProperty("exclusive");
+    expect(output.decision.confidenceBasis).not.toHaveProperty(
+      "positiveEvidence",
+    );
     expect(output.decision.confidenceBasis).not.toHaveProperty("toolsUsed");
   });
 

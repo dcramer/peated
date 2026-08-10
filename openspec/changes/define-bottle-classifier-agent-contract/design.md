@@ -118,7 +118,7 @@ Alternative considered: require web evidence for all accepted outcomes. Rejected
 
 ### Decision: Remove numeric confidence; consumers derive gating from evidence
 
-Numeric `confidence` is removed from the agent output contract. The agent's job ends at the identity outcome: `action`, target ids or create drafts, and `confidenceBasis` evidence fields (`positiveEvidence`, `unresolvedRisks`, `webEvidence`). Identity facts live on the decision, proposed Bottle, or observation instead of a duplicated basis object. The runtime records actual tool calls. The model does not report them. Verbalized numeric self-confidence is systematically overconfident and adds a second channel that can disagree with the structured decision, which is why review policy has grown reconciliation caps whose only job is to referee that disagreement.
+Numeric `confidence` is removed from the agent output contract. The agent's job ends at the identity outcome: `action`, target ids or create drafts, and `confidenceBasis` fields (`unresolvedRisks` and `webEvidence`). Identity facts live on the decision, proposed Bottle, or observation instead of a duplicated basis object. The runtime records actual tool calls. The model does not report them. Verbalized numeric self-confidence is systematically overconfident and adds a second channel that can disagree with the structured decision, which is why review policy has grown reconciliation caps whose only job is to referee that disagreement.
 
 Whether a decision needs human review is consumer policy, derived in code:
 
@@ -138,12 +138,11 @@ Structured output is generated in schema field order. The agent decision schema 
 
 ### Decision: Schema attributes may be redesigned toward verifiability
 
-No existing attribute is grandfathered. Because gating moves to code, the evidence fields become load-bearing, and freeform string arrays are a weak foundation for deterministic gates. The preferred evolution, staged behind evals:
+No existing attribute is grandfathered. Because gating moves to code, the fields that drive it must be machine-checkable. The preferred evolution, staged behind evals:
 
 - `unresolvedRisks` entries gain a typed category plus a note, so "no material risk" is a category check, not an empty-array check on prose.
-- `positiveEvidence` entries gain a source kind and locator, so validation can confirm each citation against the run's collected artifacts (search evidence URLs, candidate ids, image evidence) and reject fabricated support.
 
-These are larger changes than the prompt reorganization and must not block it; each lands separately with re-recorded replays. The action enum stays: compound actions such as `create_bottle_and_release` keep the action set explicit and mutually exclusive, which is safer than orthogonal axes that allow invalid combinations.
+This is a larger change than the prompt reorganization and must not block it. The action enum stays explicit and mutually exclusive.
 
 Alternative considered: keep all basis fields freeform and let review policy parse prose. Rejected because prose parsing is exactly the second-classifier drift the determinism boundary forbids.
 
@@ -186,7 +185,7 @@ Rollback strategy: each step is independently revertable; revert the offending s
 
 ## Resolved Questions
 
-- **Confidence band**: `confidenceBasis.band` is retired in the same schema revision that removes numeric `confidence`. Its one remaining job under this contract (downgrade-only veto) is better expressed as a typed unresolved risk, so the veto always carries a reason that the review queue can sort and moderators can act on; an opaque band gives reviewers nothing to triage with. `current_assignment` reaffirmation is evidence, not confidence, and moves to positive evidence where the derived tier consumes it. Until that revision lands, the band is downgrade-only.
+- **Confidence band**: `confidenceBasis.band` is retired in the same schema revision that removes numeric `confidence`. Its one remaining job under this contract (downgrade-only veto) is better expressed as a typed unresolved risk, so the veto always carries a reason that the review queue can sort and moderators can act on; an opaque band gives reviewers nothing to triage with. Current-assignment reaffirmation is a consumer-owned automation anchor. It is not model confidence.
 - **Local-only identification**: stays a separate future capability, per the existing single-contract decision. Its product surfaces (photo tasting entry, Add Bottle fast path) are latency-sensitive and match-only, and its worst failure is attributing a user's tasting to the wrong bottle, so its contract will differ enough to deserve its own spec when the implementation is scheduled.
 - **Prompt examples**: hand-authored in `instructions.ts`, never generated from eval fixtures. Fixtures are the measurement; reusing their concrete bottles in the prompt is training on the test set, and a fixture edit would silently change the production prompt. Any example must be disjoint from eval fixture bottles. If examples are added, prioritize create-naming cases, because proposed bottle names are the most user-visible artifact the classifier produces.
 - **SMWS placement**: stays pre-agent. SMWS exact-cask codes are a closed identifier scheme, the same class as the exact-alias fast path, so resolving them before the agent is cheaper, faster, and zero-variance for a bottle family that core users add constantly. Post-agent SMWS handling remains only as presentation normalization for agent-path outputs, with one shared parsing module so the two paths cannot drift.

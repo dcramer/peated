@@ -98,7 +98,6 @@ function buildShieldaigAgeCreationDecision(
     identityScope: "product",
     observation: null,
     confidenceBasis: {
-      positiveEvidence: ["source title states 30-year-old"],
       unresolvedRisks: [
         {
           category: "sibling_ambiguity",
@@ -347,7 +346,6 @@ describe("finalizeBottleReferenceClassification", () => {
         identityScope: "product",
         observation: null,
         confidenceBasis: {
-          positiveEvidence: ["readable exact bottle label"],
           unresolvedRisks: [
             {
               category: "trait_conflict",
@@ -453,7 +451,6 @@ describe("finalizeBottleReferenceClassification", () => {
         identityScope: "product",
         observation: null,
         confidenceBasis: {
-          positiveEvidence: ["readable complete edition marker"],
           unresolvedRisks: [],
           webEvidence: "not_needed",
         },
@@ -599,7 +596,6 @@ describe("finalizeBottleReferenceClassification", () => {
         rationale:
           "Reviewed producer evidence identifies Octomore 13.1 as five years old.",
         confidenceBasis: {
-          positiveEvidence: ["producer product page states five years old"],
           unresolvedRisks: [],
           webEvidence: "supportive",
         },
@@ -1012,7 +1008,6 @@ describe("finalizeBottleReferenceClassification", () => {
           selector: null,
         },
         confidenceBasis: {
-          positiveEvidence: ["readable exact cask code"],
           unresolvedRisks: [unresolvedRisk],
           webEvidence: "not_needed",
         },
@@ -1086,7 +1081,6 @@ describe("finalizeBottleReferenceClassification", () => {
         barrelNumber: "4779",
       },
       confidenceBasis: {
-        positiveEvidence: ["Readable bottle label states barrel 4779."],
         unresolvedRisks: [],
         webEvidence: "not_needed",
       },
@@ -1231,7 +1225,6 @@ describe("finalizeBottleReferenceClassification", () => {
           barrelNumber: null,
         },
         confidenceBasis: {
-          positiveEvidence: ["The source uses cask code 95.71."],
           unresolvedRisks: [],
           webEvidence: "not_needed",
         },

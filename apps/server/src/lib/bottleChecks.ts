@@ -175,8 +175,11 @@ function removeLegacyClassifierOutputFields(output: unknown): unknown {
     return { ...output, decision: currentDecision };
   }
 
-  const { toolsUsed: _toolsUsed, ...currentConfidenceBasis } =
-    confidenceBasis as Record<string, unknown>;
+  const {
+    positiveEvidence: _positiveEvidence,
+    toolsUsed: _toolsUsed,
+    ...currentConfidenceBasis
+  } = confidenceBasis as Record<string, unknown>;
   return {
     ...output,
     decision: {
@@ -187,7 +190,8 @@ function removeLegacyClassifierOutputFields(output: unknown): unknown {
 }
 
 // Version 2 decisions can contain obsolete model output. Drop fields with no
-// current reader before current strict validation; runtime metadata owns tools.
+// current reader before current strict validation; runtime metadata owns actual
+// tool calls.
 export const PersistedReferenceBottleCheckOutputSchema = z.preprocess(
   removeLegacyClassifierOutputFields,
   CurrentPersistedReferenceBottleCheckOutputSchema,

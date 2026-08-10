@@ -338,8 +338,6 @@ function getClassificationLogAttributes(
   if (decision.confidenceBasis) {
     attrs[`${prefix}.confidence_basis_web_evidence`] =
       decision.confidenceBasis.webEvidence;
-    attrs[`${prefix}.confidence_basis_positive_evidence_count`] =
-      decision.confidenceBasis.positiveEvidence.length;
     attrs[`${prefix}.confidence_basis_unresolved_risk_count`] =
       decision.confidenceBasis.unresolvedRisks.length;
   }

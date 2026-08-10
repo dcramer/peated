@@ -134,7 +134,6 @@ vi.mock("@peated/server/worker/client", () => ({
 }));
 
 const supportiveWebEvidenceConfidenceBasis = {
-  positiveEvidence: ["Web evidence supports the required bottle identity."],
   unresolvedRisks: [],
   webEvidence: "supportive",
 };
@@ -144,7 +143,6 @@ const supportiveWebEvidenceConfidenceBasis = {
 // anchor that auto-verifies an unmatched existing bottle match; it replaces the
 // retired `band: "auto_verification"` signal.
 const autoVerificationConfidenceBasis = {
-  positiveEvidence: ["The candidate covers the observed bottle identity."],
   unresolvedRisks: [],
   webEvidence: "supportive",
 };

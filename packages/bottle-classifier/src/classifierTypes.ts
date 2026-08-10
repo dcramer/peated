@@ -403,12 +403,6 @@ export const UnresolvedRiskSchema = z
 
 export const BottleConfidenceBasisSchema = z
   .object({
-    positiveEvidence: z
-      .array(z.string().trim().min(1))
-      .default([])
-      .describe(
-        "Concrete evidence that supports the decision, such as exact local aliases, exact-cask codes, label text, image evidence, a reaffirmed current assignment, or agent-reviewed supportive web evidence.",
-      ),
     unresolvedRisks: z
       .array(UnresolvedRiskSchema)
       .default([])
