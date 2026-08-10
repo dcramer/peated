@@ -15,7 +15,7 @@
 - [ ] 2.3 Consolidate in slices: fold precedence-override rules into the decision workflow order, remove duplicated prose and bottle-specific exceptions, and replace undefined jargon with glossary terms; run focused evals per slice with eval parity required.
 - [ ] 2.4 Resolve the instruction/tool-surface mismatch for `candidateExpansion = initial_only` classification (instructions reference search tools that are not attached) and remove or use the dead options on `buildBottleClassifierInstructions`.
 - [ ] 2.7 Replace `investigationHint` directive prose with structured retry/preload facts in the envelope (for example a pass indicator and prior-outcome field) explained by the input map, per the envelope-carries-facts requirement.
-- [ ] 2.8 Strip no-value envelope fields per the value audit (`candidate.score`, `candidate.source`, `imageEvidence.textRegions`, `reference.id`); re-run focused evals to confirm no regression.
+- [x] 2.8 Strip no-value envelope fields per the value audit (`candidate.score`, `candidate.source`, `imageEvidence.textRegions`, `reference.id`); re-run focused evals to confirm no regression. (2026-08-10: removed the runtime-only candidate score and source from initial, current, audit, and local-search tool evidence sent to the agent; removed the internal reference id; confirmed that image evidence no longer contains text regions.)
 - [ ] 2.5 Preserve existing behavior unless the audit identifies a contradiction, stale schema reference, or missing first-principles rule.
 - [ ] 2.6 If examples are added, hand-author diverse canonical cases per action whose concrete bottles are disjoint from eval fixtures, prioritizing create-naming cases.
 

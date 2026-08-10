@@ -1,4 +1,5 @@
 import {
+  AgentBottleCandidateSchema,
   BottleCandidateSearchInputSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
@@ -49,7 +50,6 @@ export function buildAgentInput({
   return JSON.stringify(
     {
       reference: {
-        id: reference.id ?? null,
         externalSiteId: reference.externalSiteId ?? null,
         name: reference.name,
         url: reference.url ?? null,
@@ -57,12 +57,16 @@ export function buildAgentInput({
         currentBottleId: reference.currentBottleId ?? null,
       },
       candidateExpansion,
-      currentBottle,
+      currentBottle: currentBottle
+        ? AgentBottleCandidateSchema.parse(currentBottle)
+        : null,
       extractedIdentity,
       imageEvidence: imageEvidence ?? null,
       localSearch: {
         hasExactAliasMatch,
-        candidates: initialCandidates,
+        candidates: initialCandidates.map((candidate) =>
+          AgentBottleCandidateSchema.parse(candidate),
+        ),
       },
       webEvidence: {
         results: searchEvidence,
@@ -112,7 +116,6 @@ export function buildAuditBottleAgentInput({
         note: audit.note ?? null,
       },
       reference: {
-        id: reference.id ?? null,
         externalSiteId: reference.externalSiteId ?? null,
         name: reference.name,
         url: reference.url ?? null,
@@ -122,7 +125,9 @@ export function buildAuditBottleAgentInput({
       extractedIdentity,
       imageEvidence: imageEvidence ?? null,
       localSearch: {
-        candidates: initialCandidates,
+        candidates: initialCandidates.map((candidate) =>
+          AgentBottleCandidateSchema.parse(candidate),
+        ),
       },
       localEntitySearch: {
         results: resolvedEntities,
