@@ -2374,7 +2374,7 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("does not invent a branded bottle from sparse generic batch wording", async () => {
+  test("preserves a create decision for a sparse source reference", async () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
@@ -2439,12 +2439,21 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
+      action: "create_bottle",
       matchedBottleId: null,
+      proposedBottle: {
+        name: "Blenders' Sherry Cask Finish 12-year-old",
+        series: {
+          name: "Blenders' Batch",
+        },
+        edition: "EXP#7",
+        statedAge: 12,
+        releaseYear: 2018,
+        brand: {
+          name: "Johnnie Walker",
+        },
+      },
     });
-    expect(result.decision.rationale).toContain(
-      "expanded too far beyond a sparse unanchored reference",
-    );
   });
 
   test("keeps a matched bottle when the only name difference is a canonical proof suffix", async () => {

@@ -26,15 +26,15 @@ Use these classes:
 | Infer or rewrite `identityScope` from general cask-number and name patterns                                       | Second-classifier drift | Narrow in a later slice. Code must not promote product scope from semantic text patterns. Keep only explicit scope validation and the SMWS exception. |
 | Rewrite Bottle names to restore age text or remove exact traits                                                   | Second-classifier drift | Remove or narrow in later eval-backed slices. The agent owns common marketed Bottle identity and field placement.                                     |
 | Reject a Bottle draft because its normalized name duplicates the Brand or becomes empty after exact-trait removal | Second-classifier drift | Narrow in a later slice to schema-level empty-name validation. Do not infer the correct expression in code.                                           |
-| Reject `create_bottle` when token counts say that the proposal expanded beyond a sparse reference                 | Second-classifier drift | Remove in a later eval-backed slice. Source interpretation belongs to the agent.                                                                      |
-| Reject `create_bottle` when normalized or possessive-insensitive candidate names look like the proposed Bottle    | Second-classifier drift | Removed in this slice. The comparison could hide a valid create when the candidate had an unsupported release trait.                                  |
+| Reject `create_bottle` when token counts say that the proposal expanded beyond a sparse reference                 | Second-classifier drift | Removed. Source interpretation belongs to the agent.                                                                                                  |
+| Reject `create_bottle` when normalized or possessive-insensitive candidate names look like the proposed Bottle    | Second-classifier drift | Removed. The comparison could hide a valid create when the candidate had an unsupported release trait.                                                |
 | Reject obvious non-whisky, multi-item, packaging-only, or damaged-sale references before classification           | Closed-form gate        | Keep. This is the documented non-whisky and impossible-input boundary.                                                                                |
 
 ## Removal order
 
-1. Remove the generic duplicate-create name classifier. This slice completes
-   that removal and keeps the exact-cask code collision gate.
-2. Remove the sparse-reference token gate.
+1. Remove the generic duplicate-create name classifier. Removed. The exact-cask
+   code collision gate remains.
+2. Remove the sparse-reference token gate. Removed.
 3. Stop rewriting and rejecting common Bottle identity from age and exact-trait
    name patterns.
 4. Narrow identity-scope checks to explicit structured facts and the SMWS code
