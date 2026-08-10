@@ -12,9 +12,6 @@ export function normalizeObservation(
     caskNumber: observation.caskNumber?.trim() || null,
     barrelNumber: observation.barrelNumber?.trim() || null,
     bottleNumber: observation.bottleNumber?.trim() || null,
-    outturn: observation.outturn ?? null,
-    market: observation.market?.trim() || null,
-    exclusive: observation.exclusive?.trim() || null,
   };
 
   return Object.values(normalized).some((value) => value !== null)

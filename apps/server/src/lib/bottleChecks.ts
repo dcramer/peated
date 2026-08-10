@@ -152,8 +152,23 @@ function removeLegacyClassifierOutputFields(output: unknown): unknown {
   const decision = (output as Record<string, unknown>).decision;
   if (!decision || typeof decision !== "object") return output;
 
-  const { identityBasis: _identityBasis, ...currentDecision } =
+  const { identityBasis: _identityBasis, ...decisionWithoutIdentityBasis } =
     decision as Record<string, unknown>;
+  let currentDecision = decisionWithoutIdentityBasis;
+  const observation = currentDecision.observation;
+  if (observation && typeof observation === "object") {
+    const {
+      outturn: _outturn,
+      market: _market,
+      exclusive: _exclusive,
+      ...currentObservation
+    } = observation as Record<string, unknown>;
+    currentDecision = {
+      ...currentDecision,
+      observation: currentObservation,
+    };
+  }
+
   const confidenceBasis = currentDecision.confidenceBasis;
   if (!confidenceBasis || typeof confidenceBasis !== "object") {
     return { ...output, decision: currentDecision };

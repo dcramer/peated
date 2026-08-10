@@ -66,6 +66,26 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     ).toBe(false);
   });
 
+  test.each([
+    ["outturn", 240],
+    ["market", "US"],
+    ["exclusive", "travel retail"],
+  ] as const)("rejects obsolete observation field %s", (field, value) => {
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse({
+        action: "no_match",
+        observation: { [field]: value },
+      }).success,
+    ).toBe(false);
+    expect(
+      BottleClassificationDecisionSchema.safeParse({
+        action: "no_match",
+        candidateBottleIds: [],
+        observation: { [field]: value },
+      }).success,
+    ).toBe(false);
+  });
+
   test("accepts legacy decisions without alias metadata", () => {
     const decision = BottleClassificationDecisionSchema.parse({
       action: "no_match",
