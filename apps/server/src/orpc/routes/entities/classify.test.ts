@@ -70,7 +70,6 @@ describe("POST /entities/{entity}/classify", () => {
     classifyEntityMock.mockResolvedValue({
       decision: {
         verdict: "reassign_bottles_to_existing_brand",
-        confidence: 97,
         rationale: "Bottle evidence supports Canadian Club.",
         targetEntityId: canadianClub.id,
         targetEntityName: canadianClub.name,
