@@ -26,7 +26,6 @@ export function buildAgentInput({
   hasExactAliasMatch,
   searchEvidence = [],
   resolvedEntities = [],
-  investigationHint = null,
   identityAnchor = null,
 }: {
   reference: BottleReference;
@@ -37,7 +36,6 @@ export function buildAgentInput({
   hasExactAliasMatch: boolean;
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
-  investigationHint?: string | null;
   identityAnchor?: BottleClassificationDecision | null;
 }): string {
   /**
@@ -70,7 +68,6 @@ export function buildAgentInput({
       localEntitySearch: {
         results: resolvedEntities,
       },
-      investigationHint,
       identityAnchor,
     },
     null,
@@ -87,7 +84,6 @@ export function buildAuditBottleAgentInput({
   currentBottleContext,
   searchEvidence = [],
   resolvedEntities = [],
-  investigationHint = null,
   identityAnchor = null,
   availableSourceEvidenceFields,
 }: {
@@ -99,7 +95,6 @@ export function buildAuditBottleAgentInput({
   currentBottleContext: BottleContext;
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
-  investigationHint?: string | null;
   identityAnchor?: BottleClassificationDecision | null;
   availableSourceEvidenceFields: readonly string[];
 }): string {
@@ -131,7 +126,6 @@ export function buildAuditBottleAgentInput({
       webEvidence: {
         results: searchEvidence,
       },
-      investigationHint,
       identityAnchor,
       availableSourceEvidenceFields,
     },

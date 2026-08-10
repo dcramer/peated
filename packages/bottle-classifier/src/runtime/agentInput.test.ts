@@ -152,6 +152,7 @@ describe("buildAgentInput", () => {
     expect(input.reference).not.toHaveProperty("id");
     expect(input.reference).not.toHaveProperty("externalSiteId");
     expect(input).not.toHaveProperty("candidateExpansion");
+    expect(input).not.toHaveProperty("investigationHint");
     expect(input.currentBottle).not.toHaveProperty("score");
     expect(input.currentBottle).not.toHaveProperty("source");
     expect(input.localSearch.candidates[0]).not.toHaveProperty("score");
@@ -324,6 +325,7 @@ describe("buildAuditBottleAgentInput", () => {
     });
     expect(input.reference).not.toHaveProperty("id");
     expect(input.reference).not.toHaveProperty("externalSiteId");
+    expect(input).not.toHaveProperty("investigationHint");
     expect(input.localSearch.candidates[0]).not.toHaveProperty("score");
     expect(input.localSearch.candidates[0]).not.toHaveProperty("source");
     expect(input.extractedIdentity).toBeNull();
