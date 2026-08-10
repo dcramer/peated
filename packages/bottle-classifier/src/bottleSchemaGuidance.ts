@@ -6,7 +6,7 @@ export const BOTTLE_SCHEMA_RULES = {
   yearPolicy:
     "Year fields are not interchangeable. `vintageYear` is a distillation year; `releaseYear` is a bottling or marketed release year. If the source gives a bare year, classify it from label wording, family pattern, and sibling evidence; if that evidence is weak, record the uncertainty instead of guessing the field.",
   observationPolicy:
-    "Exact source facts like cask numbers, bottle numbers, outturns, exclusives, and raw maturation wording should be preserved as observations first. Promote them to canonical Bottle identity only when they are clearly part of the marketed product.",
+    "Preserve exact source facts like cask numbers, barrel numbers, bottle numbers, and selector names as observations first. Promote them to canonical Bottle identity only when they are clearly part of the marketed product.",
   aliasPolicy:
     "Retailer listing aliases are evidence for the exact Bottle only when they safely identify that marketed product.",
 } as const;

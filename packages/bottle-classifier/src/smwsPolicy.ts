@@ -424,9 +424,6 @@ export function maybeResolveSmwsExactCaskCodeDecision({
   const observation = normalizeObservation({
     barrelNumber: currentObservation?.barrelNumber ?? null,
     bottleNumber: currentObservation?.bottleNumber ?? null,
-    outturn: currentObservation?.outturn ?? null,
-    market: currentObservation?.market ?? null,
-    exclusive: currentObservation?.exclusive ?? null,
     selector:
       currentObservation?.selector ??
       getSmwsSelectorFromReference({
@@ -496,9 +493,6 @@ export function resolveSmwsExactCaskReference({
   const observation = normalizeObservation({
     barrelNumber: null,
     bottleNumber: null,
-    outturn: null,
-    market: null,
-    exclusive: null,
     selector: getSmwsSelectorFromReference({
       referenceName: reference.name,
       code: smwsCode,

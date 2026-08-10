@@ -364,9 +364,6 @@ export const BottleObservationSchema = z
     caskNumber: z.string().trim().nullable().default(null),
     barrelNumber: z.string().trim().nullable().default(null),
     bottleNumber: z.string().trim().nullable().default(null),
-    outturn: z.number().int().positive().nullable().default(null),
-    market: z.string().trim().nullable().default(null),
-    exclusive: z.string().trim().nullable().default(null),
   })
   .strict();
 

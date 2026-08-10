@@ -28,9 +28,9 @@ The classifier SHALL treat names, retailer titles, review titles, image text, UR
 - **WHEN** a retailer title includes category, package, SEO, store, price, shipping, tasting-note, or condition wording that is not part of the marketed bottle identity
 - **THEN** the agent SHALL exclude that wording from canonical bottle and release drafts
 
-#### Scenario: Source fact is exact but not shared canon
+#### Scenario: Supported observation fact is exact but not shared canon
 
-- **WHEN** a cask number, barrel number, bottle number, outturn, market, store-exclusive phrase, or similar exact source fact is useful evidence but not proven reusable catalog identity
+- **WHEN** a cask number, barrel number, bottle number, selector, or similar supported observation fact is useful evidence but not proven reusable catalog identity
 - **THEN** the agent SHALL preserve it as observation evidence instead of forcing a bottle or release split
 
 ### Requirement: Bottle precision layers are distinct
@@ -66,9 +66,9 @@ For create or repair actions, `proposedBottle.name` SHALL be the common bottle l
 - **WHEN** a batch, edition, year, ABV, or release code is reusable child release identity under a stable parent
 - **THEN** the agent SHALL place that trait in `proposedRelease` and not duplicate it unnecessarily in `proposedBottle.name`
 
-#### Scenario: Observation trait is too exact
+#### Scenario: Supported observation trait is too exact
 
-- **WHEN** an exact barrel, cask, bottle number, outturn, or retailer-exclusive fact is not proven shared catalog identity
+- **WHEN** an exact barrel, cask, bottle number, selector, or similar supported observation fact is not proven shared catalog identity
 - **THEN** the agent SHALL NOT include that fact in the common parent bottle name solely because it appears in source text
 
 ### Requirement: Local candidates are evidence not commands
