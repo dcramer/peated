@@ -12,6 +12,7 @@ import {
 } from "@peated/server/db/schema";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { approveBottleOperations } from "@peated/server/lib/bottleOperationModeration";
+import { createLegacyStorePriceReviewCheck } from "@peated/server/lib/test/legacyBottleChecks";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -20,11 +21,13 @@ import pg from "pg";
 import { describe, expect, test } from "vitest";
 
 async function createStorePriceUpdateEntityCheck({
+  bottleId,
   entity,
   nextName,
   price,
   storePrice,
 }: {
+  bottleId: number;
   entity: { id: number; name: string };
   nextName: string;
   price: { id: number; name: string };
@@ -56,26 +59,12 @@ async function createStorePriceUpdateEntityCheck({
       },
     ],
   };
-  return await createBottleCheck({
-    intent: "resolve_reference",
-    sourceKind: "store_price",
-    sourceId: price.id,
-    input: {
-      reference: { id: price.id, name: price.name },
-    },
-    result: {
-      status: "classified",
-      decision: {
-        action: "no_match",
-        candidateBottleIds: [],
-        matchedBottleId: null,
-        proposedBottle: null,
-      },
-      proposedOperations: [proposal],
-      findings: [],
-      artifacts,
-    },
-    storePrice,
+  return await createLegacyStorePriceReviewCheck({
+    artifacts,
+    bottleId,
+    price,
+    proposal,
+    storePriceAttemptId: storePrice.attemptId,
   });
 }
 
@@ -488,6 +477,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       })
       .returning();
     const created = await createStorePriceUpdateEntityCheck({
+      bottleId: (await fixtures.Bottle({ brandId: entity.id })).id,
       entity,
       nextName: "Primary Gate After",
       price,
@@ -639,24 +629,12 @@ describe("POST /audits/{audit}/operations/approve", () => {
         await inspectedBottleContext(originalTarget.id),
       ],
     };
-    const created = await createBottleCheck({
-      intent: "resolve_reference",
-      sourceKind: "store_price",
-      sourceId: price.id,
-      input: { reference: { id: price.id, name: price.name } },
-      result: {
-        status: "classified",
-        decision: {
-          action: "match",
-          candidateBottleIds: [duplicate.id, originalTarget.id],
-          matchedBottleId: originalTarget.id,
-          proposedBottle: null,
-        },
-        proposedOperations: [proposal],
-        findings: [],
-        artifacts,
-      },
-      storePrice: { attemptId: originalAttempt!.id },
+    const created = await createLegacyStorePriceReviewCheck({
+      artifacts,
+      bottleId: duplicate.id,
+      price,
+      proposal,
+      storePriceAttemptId: originalAttempt!.id,
     });
     const operation = created.check.operations[0]!;
 
@@ -713,6 +691,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       })
       .returning();
     const created = await createStorePriceUpdateEntityCheck({
+      bottleId: (await fixtures.Bottle({ brandId: entity.id })).id,
       entity,
       nextName: "Deleted Link After",
       price,
@@ -806,6 +785,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       })
       .returning();
     const created = await createStorePriceUpdateEntityCheck({
+      bottleId: (await fixtures.Bottle({ brandId: entity.id })).id,
       entity,
       nextName: "Mismatched Link After",
       price,
@@ -880,6 +860,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       })
       .returning();
     const created = await createStorePriceUpdateEntityCheck({
+      bottleId: (await fixtures.Bottle({ brandId: entity.id })).id,
       entity,
       nextName: "Retry Gate After",
       price,
@@ -951,6 +932,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       })
       .returning();
     const created = await createStorePriceUpdateEntityCheck({
+      bottleId: (await fixtures.Bottle({ brandId: entity.id })).id,
       entity,
       nextName: "Concurrent Gate After",
       price,

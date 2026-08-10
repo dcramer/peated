@@ -23,6 +23,7 @@ import {
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createBottle } from "@peated/server/lib/createBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
+import { createLegacyStorePriceReviewCheck } from "@peated/server/lib/test/legacyBottleChecks";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, inArray } from "drizzle-orm";
 import pg from "pg";
@@ -143,26 +144,12 @@ async function createApplyingEntityMergeOperation({
     })),
   };
   const created = storePrice
-    ? await createBottleCheck({
-        intent: "resolve_reference",
-        sourceKind: "store_price",
-        sourceId: storePrice.priceId,
-        input: {
-          reference: { id: storePrice.priceId, name: storePrice.priceName },
-        },
-        result: {
-          status: "classified",
-          decision: {
-            action: "no_match",
-            candidateBottleIds: [],
-            matchedBottleId: null,
-            proposedBottle: null,
-          },
-          proposedOperations: [proposal],
-          findings: [],
-          artifacts,
-        },
-        storePrice: { attemptId: storePrice.attemptId },
+    ? await createLegacyStorePriceReviewCheck({
+        artifacts,
+        bottleId,
+        price: { id: storePrice.priceId, name: storePrice.priceName },
+        proposal,
+        storePriceAttemptId: storePrice.attemptId,
       })
     : await createBottleCheck({
         intent: "audit_bottle",
