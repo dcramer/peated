@@ -3480,7 +3480,7 @@ describe("createBottleClassifier", () => {
           action: "create_bottle",
           rationale:
             "Web evidence found a 2001 vintage and 2012 bottling year.",
-          identityScope: "exact_cask",
+          identityScope: "product",
           observation: null,
           confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           matchedBottleId: null,
@@ -4384,7 +4384,7 @@ describe("createBottleClassifier", () => {
           rationale:
             "This is a bottle-level product, but the reference does not identify a specific cask.",
           candidateBottleIds: [],
-          identityScope: "exact_cask",
+          identityScope: "product",
           observation: null,
           confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           matchedBottleId: null,
