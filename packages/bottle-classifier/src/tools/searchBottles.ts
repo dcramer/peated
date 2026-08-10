@@ -1,7 +1,7 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
 import {
-  BottleCandidateSchema,
+  AgentBottleCandidateSchema,
   BottleCandidateSearchInputSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
@@ -9,7 +9,7 @@ import {
 import { startToolSpan } from "../observability";
 
 const SearchBottlesResultSchema = z.object({
-  results: z.array(BottleCandidateSchema),
+  results: z.array(AgentBottleCandidateSchema),
 });
 const SEARCH_BOTTLES_TOOL_DESCRIPTION =
   "Search local Peated Bottle candidates. Use before web search when local matches are missing or conflicting, and again after web evidence reveals a canonical trait that could recover a better local candidate.";

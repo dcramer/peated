@@ -200,6 +200,13 @@ export const BottleCandidateSchema = z
   })
   .strict();
 
+// Score orders runtime retrieval, and source tracks retrieval provenance.
+// Neither is Bottle identity evidence, so neither reaches the agent.
+export const AgentBottleCandidateSchema = BottleCandidateSchema.omit({
+  score: true,
+  source: true,
+}).strip();
+
 export const BottleSearchResultSchema = z.object({
   title: z.string(),
   url: z.string().url(),

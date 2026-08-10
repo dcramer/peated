@@ -103,6 +103,7 @@ describe("buildAgentInput", () => {
     const input = JSON.parse(
       buildAgentInput({
         reference: {
+          id: "reference-44175",
           name: "Example Parent 21-year-old",
         },
         extractedIdentity: null,
@@ -138,13 +139,21 @@ describe("buildAgentInput", () => {
             },
           }),
         ],
-        currentBottle: null,
+        currentBottle: buildCandidate({
+          bottleId: 500,
+          fullName: "Current Bottle",
+        }),
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
       }),
     );
 
     expect(input.localSearch).not.toHaveProperty("familyContextSummary");
+    expect(input.reference).not.toHaveProperty("id");
+    expect(input.currentBottle).not.toHaveProperty("score");
+    expect(input.currentBottle).not.toHaveProperty("source");
+    expect(input.localSearch.candidates[0]).not.toHaveProperty("score");
+    expect(input.localSearch.candidates[0]).not.toHaveProperty("source");
     expect(input.localSearch.candidates[0].familyContext).toEqual({
       siblingBottles: [
         {
@@ -305,7 +314,6 @@ describe("buildAuditBottleAgentInput", () => {
         ],
       },
       reference: {
-        id: "audit:45146",
         currentBottleId: 45146,
       },
       localSearch: {
@@ -313,6 +321,9 @@ describe("buildAuditBottleAgentInput", () => {
       },
       availableSourceEvidenceFields: ["audit.note"],
     });
+    expect(input.reference).not.toHaveProperty("id");
+    expect(input.localSearch.candidates[0]).not.toHaveProperty("score");
+    expect(input.localSearch.candidates[0]).not.toHaveProperty("source");
     expect(input.extractedIdentity).toBeNull();
   });
 });
