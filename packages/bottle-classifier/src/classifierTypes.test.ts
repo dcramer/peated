@@ -42,39 +42,14 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     );
   });
 
-  test("parses first-class existing-bottle repair decisions", () => {
-    const decision = BottleClassificationDecisionSchema.parse({
-      action: "repair_bottle",
-      rationale: "Bottle identity matches, but distillery metadata is wrong.",
-      candidateBottleIds: [123],
-      matchedBottleId: 123,
-      proposedBottle: {
-        name: "Bodega Cask",
-        brand: {
-          id: 456,
-          name: "The Whistler",
-        },
-        distillers: [
-          {
-            id: 789,
-            name: "Boann Distillery",
-          },
-        ],
-      },
-    });
+  test("exposes only the three identity results", () => {
+    const actionSchema = BottleClassifierAgentDecisionSchema.shape.action;
 
-    expect(decision).toMatchObject({
-      action: "repair_bottle",
-      matchedBottleId: 123,
-      proposedBottle: {
-        category: null,
-        distillers: [
-          {
-            name: "Boann Distillery",
-          },
-        ],
-      },
-    });
+    expect(actionSchema.options).toEqual([
+      "match",
+      "create_bottle",
+      "no_match",
+    ]);
   });
 
   test("accepts legacy decisions without alias metadata", () => {

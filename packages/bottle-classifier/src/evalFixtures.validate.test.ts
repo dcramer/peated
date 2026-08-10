@@ -16,8 +16,8 @@ const fixtureRootDir = fileURLToPath(
 const decisionFixtureDir = `${fixtureRootDir}/decision-cases`;
 const newBottleFixtureDir = `${fixtureRootDir}/new-bottles`;
 const laphroaigDecisionFixtureFile = `${decisionFixtureDir}/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate.json`;
-const roguesBanquetMatchFixtureFile = `${decisionFixtureDir}/match_existing/image-backed-photo-matches-and-repairs-compass-box-rogues-banquet.json`;
-const spiceTreeRepairFixtureFile = `${decisionFixtureDir}/match_existing/image-backed-photo-repairs-spice-tree-extravaganza.json`;
+const roguesBanquetMatchFixtureFile = `${decisionFixtureDir}/match_existing/image-backed-photo-matches-and-suggests-compass-box-rogues-banquet.json`;
+const spiceTreeRequiredChangeFixtureFile = `${decisionFixtureDir}/ignore_or_reject/image-backed-photo-requires-spice-tree-extravaganza-catalog-change.json`;
 
 function loadLaphroaigDecisionFixture() {
   return classifierEvalFixtureSchema.parse(
@@ -236,7 +236,9 @@ describe("eval fixture validation", () => {
 
   test("covers real Compass Box photo misses without forcing duplicate creation", () => {
     const matchFixture = loadDecisionFixture(roguesBanquetMatchFixtureFile);
-    const repairFixture = loadDecisionFixture(spiceTreeRepairFixtureFile);
+    const requiredChangeFixture = loadDecisionFixture(
+      spiceTreeRequiredChangeFixtureFile,
+    );
     const roguesVerifiedUrls = [
       "https://www.compassboxwhisky.com/products/rogues-banquet",
       "https://www.whiskybase.com/whiskies/whisky/145016/rogues-banquet-blended-scotch-whisky-cb",
@@ -278,8 +280,8 @@ describe("eval fixture validation", () => {
       },
     ]);
 
-    expect(repairFixture.provenance?.source).toBe("curated_regression");
-    expect(repairFixture.localCatalog?.bottles).toMatchObject([
+    expect(requiredChangeFixture.provenance?.source).toBe("curated_regression");
+    expect(requiredChangeFixture.localCatalog?.bottles).toMatchObject([
       {
         id: 9900,
         brandId: 1361,
@@ -288,9 +290,9 @@ describe("eval fixture validation", () => {
         statedAge: 3,
       },
     ]);
-    expect(repairFixture.expected).toMatchObject({
-      action: "match",
-      matchedBottleId: 9900,
+    expect(requiredChangeFixture.expected).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
       proposedOperations: [
         {
           type: "update_bottle",
@@ -325,7 +327,7 @@ describe("eval fixture validation", () => {
     expect(matchFixture.provenance?.verifiedSourceUrls).toEqual(
       expect.arrayContaining(roguesVerifiedUrls),
     );
-    expect(repairFixture.provenance?.verifiedSourceUrls).toEqual(
+    expect(requiredChangeFixture.provenance?.verifiedSourceUrls).toEqual(
       expect.arrayContaining([
         "https://api.peated.com/v1/bottles/45175",
         "https://api.peated.com/v1/bottles/9900",
@@ -333,7 +335,7 @@ describe("eval fixture validation", () => {
       ]),
     );
 
-    for (const fixture of [matchFixture, repairFixture]) {
+    for (const fixture of [matchFixture, requiredChangeFixture]) {
       const encodedExpectations = JSON.stringify(fixture.expected);
       expect(encodedExpectations).not.toContain("caskType");
       expect(encodedExpectations).not.toContain("caskSize");

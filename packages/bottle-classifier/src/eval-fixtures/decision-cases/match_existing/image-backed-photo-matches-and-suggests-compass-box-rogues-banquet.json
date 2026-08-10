@@ -1,6 +1,6 @@
 {
-  "id": "image-backed-photo-matches-and-repairs-compass-box-rogues-banquet",
-  "name": "Rogues' Banquet: image-backed match and repair",
+  "id": "image-backed-photo-matches-and-suggests-compass-box-rogues-banquet",
+  "name": "Rogues' Banquet: image-backed match and Suggested Change",
   "input": {
     "reference": {
       "name": "Compass Box Rogues' Banquet",
@@ -165,7 +165,7 @@
       "createsBottle": false,
       "summary": "Keep existing Bottle 13364 and propose its missing Limited Edition marker, 46% ABV, 2020 release year, Compass Box bottler, and Glen Elgin, Clynelish, Miltonduff, and North British distillers."
     },
-    "notes": "The original user-uploaded scan and its exact extraction were no longer available, so this is deliberately a curated regression rather than a production_miss fixture. Its image evidence contains only facts visible on the official bottle art; the classifier must gather ABV, release year, bottler, and component distilleries through focused web evidence. The incomplete catalog snapshot models the reported pre-repair state; the public API now shows Bottle 13364 after manual correction with 46% ABV, releaseYear 2020, Compass Box as bottler, and all four component distilleries. The official product page explicitly says the whisky was released in March 2020 and bottled at 46%; the recipe sheet names all four components; Whiskybase independently corroborates the bottler, distilleries, bottling date, and ABV. Cask type, size, and fill are intentionally outside this expectation."
+    "notes": "The original user-uploaded scan and its exact extraction were no longer available, so this is deliberately a curated regression rather than a production_miss fixture. Its image evidence contains only facts visible on the official bottle art; the classifier must gather ABV, release year, bottler, and component distilleries through focused web evidence. The incomplete catalog snapshot models the reported pre-change state; the public API now shows Bottle 13364 after manual correction with 46% ABV, releaseYear 2020, Compass Box as bottler, and all four component distilleries. The official product page explicitly says the whisky was released in March 2020 and bottled at 46%; the recipe sheet names all four components; Whiskybase independently corroborates the bottler, distilleries, bottling date, and ABV. Cask type, size, and fill are intentionally outside this expectation."
   },
   "expected": {
     "status": "classified",

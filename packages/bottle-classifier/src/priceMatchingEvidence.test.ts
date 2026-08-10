@@ -417,7 +417,6 @@ describe("agentActionRiskClass", () => {
   test.each([
     ["match", "match"],
     ["create_bottle", "create"],
-    ["repair_bottle", "repair"],
     ["no_match", "none"],
   ] as const)("maps %s to %s", (action, expected) => {
     expect(agentActionRiskClass(action)).toBe(expected);
@@ -594,41 +593,6 @@ describe("deriveAutomationTier", () => {
             reaffirmsCurrentAssignment: true,
             hasExactAliasAnchor: true,
             webEvidence: "weak",
-          }),
-        ),
-      ).toBe("review");
-    });
-  });
-
-  describe("repair risk class", () => {
-    test("repair follows the create evidence rules", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            actionRiskClass: "repair",
-            webEvidence: "supportive",
-          }),
-        ),
-      ).toBe("auto");
-    });
-
-    test("unsupported repair routes to review", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            actionRiskClass: "repair",
-            webEvidence: "not_used",
-          }),
-        ),
-      ).toBe("review");
-    });
-
-    test("webEvidence=not_needed does not rescue a repair", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            actionRiskClass: "repair",
-            webEvidence: "not_needed",
           }),
         ),
       ).toBe("review");

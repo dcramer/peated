@@ -19,7 +19,7 @@ const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
 const FIRECRAWL_READ_TIMEOUT_MS = 30000;
 const MAX_PAGE_EVIDENCE_CHARS = 3000;
 const FIRECRAWL_READ_PAGE_TOOL_DESCRIPTION =
-  "Read exact relevant passages from one promising public page returned by web search when its search excerpt does not expose the identity-critical fact. The result must agree with every confirmed decisive Bottle trait, or differ only on the uncertain trait being resolved; never use a confirmed conflicting sibling as repair evidence. Use for focused inspection only, not general browsing.";
+  "Read exact relevant passages from one promising public page returned by web search when its search excerpt does not expose the identity-critical fact. The result must agree with every confirmed decisive Bottle trait, or differ only on the uncertain trait being resolved; never use a confirmed conflicting sibling as Suggested Change evidence. Use for focused inspection only, not general browsing.";
 
 const FirecrawlScrapeResponseSchema = z
   .object({

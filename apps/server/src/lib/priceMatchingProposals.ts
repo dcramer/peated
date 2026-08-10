@@ -68,10 +68,6 @@ import {
   CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
   REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
 } from "@peated/server/lib/priceMatchingStatus";
-import {
-  listMatchesExpectedValue,
-  textsOverlap,
-} from "@peated/server/lib/priceMatchingText";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
@@ -215,17 +211,6 @@ function normalizeClassifierDecisionForPriceMatching(
     );
   }
 
-  if (
-    decision.action === "repair_bottle" &&
-    !candidates.some(
-      (candidate) => candidate.bottleId === decision.matchedBottleId,
-    )
-  ) {
-    throw new Error(
-      `Classifier returned unknown repair bottle id (${decision.matchedBottleId}).`,
-    );
-  }
-
   return decision;
 }
 
@@ -290,211 +275,6 @@ function buildBottleRepairInput(
   };
 }
 
-function buildClassifierBottleRepairDraft(
-  proposedBottle: BottleClassificationDecision["proposedBottle"],
-): StorePriceBottleRepairDraft | null {
-  const normalized = parseClassifierProposedBottle(proposedBottle);
-  return normalized
-    ? {
-        ...normalized,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
-        statedAgeScope: "exact",
-      }
-    : null;
-}
-
-function appendRationale(
-  rationale: string | null | undefined,
-  addition: string,
-): string {
-  const trimmedAddition = addition.trim();
-  if (!rationale) {
-    return trimmedAddition;
-  }
-
-  const trimmedRationale = rationale.trim();
-  if (!trimmedRationale) {
-    return trimmedAddition;
-  }
-
-  return `${trimmedRationale} ${trimmedAddition}`;
-}
-
-function candidateMatchesRepairDraftIdentity(
-  candidate: PriceMatchCandidate,
-  proposedBottle: ProposedBottle,
-): boolean {
-  const proposedFullName =
-    `${proposedBottle.brand.name} ${proposedBottle.name}`.trim();
-  const candidateNames = [candidate.alias, candidate.fullName].filter(
-    (value): value is string => Boolean(value),
-  );
-
-  const brandMatches =
-    textsOverlap(candidate.brand, proposedBottle.brand.name) ||
-    candidateNames.some((value) =>
-      textsOverlap(value, proposedBottle.brand.name),
-    );
-  const nameMatches = candidateNames.some(
-    (value) =>
-      textsOverlap(value, proposedBottle.name) ||
-      textsOverlap(value, proposedFullName),
-  );
-
-  if (!brandMatches || !nameMatches) {
-    return false;
-  }
-
-  if (!proposedBottle.series) {
-    return true;
-  }
-
-  return (
-    textsOverlap(candidate.series, proposedBottle.series.name) ||
-    candidateNames.some((value) =>
-      textsOverlap(value, proposedBottle.series?.name),
-    )
-  );
-}
-
-function candidateNeedsExistingBottleRepair(
-  candidate: PriceMatchCandidate,
-  proposedBottle: ProposedBottle,
-): boolean {
-  if (!textsOverlap(candidate.brand, proposedBottle.brand.name)) {
-    return true;
-  }
-
-  if (
-    proposedBottle.category !== null &&
-    candidate.category !== proposedBottle.category
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.series &&
-    !textsOverlap(candidate.series, proposedBottle.series.name)
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.bottler &&
-    !textsOverlap(candidate.bottler, proposedBottle.bottler.name)
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.distillers.length > 0 &&
-    !listMatchesExpectedValue(
-      candidate.distillery,
-      proposedBottle.distillers.map((distiller) => distiller.name),
-    )
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.statedAge !== null &&
-    candidate.statedAge !== proposedBottle.statedAge
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.edition &&
-    !textsOverlap(candidate.edition, proposedBottle.edition)
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskStrength !== null &&
-    candidate.caskStrength !== proposedBottle.caskStrength
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.singleCask !== null &&
-    candidate.singleCask !== proposedBottle.singleCask
-  ) {
-    return true;
-  }
-
-  if (proposedBottle.abv !== null && candidate.abv !== proposedBottle.abv) {
-    return true;
-  }
-
-  if (
-    proposedBottle.vintageYear !== null &&
-    candidate.vintageYear !== proposedBottle.vintageYear
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.releaseYear !== null &&
-    candidate.releaseYear !== proposedBottle.releaseYear
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
-function maybeBuildExistingBottleRepairDecision({
-  price,
-  decision,
-  candidates,
-}: {
-  price: Pick<StorePrice, "bottleId">;
-  decision: Extract<BottleClassificationDecision, { action: "create_bottle" }>;
-  candidates: PriceMatchCandidate[];
-}): StorePriceMatchDecision | null {
-  if (price.bottleId === null || !decision.proposedBottle) {
-    return null;
-  }
-
-  const currentBottleCandidate =
-    candidates.find((candidate) => candidate.bottleId === price.bottleId) ??
-    null;
-  if (!currentBottleCandidate) {
-    return null;
-  }
-
-  if (
-    !candidateMatchesRepairDraftIdentity(
-      currentBottleCandidate,
-      parseClassifierProposedBottle(decision.proposedBottle),
-    ) ||
-    !candidateNeedsExistingBottleRepair(
-      currentBottleCandidate,
-      parseClassifierProposedBottle(decision.proposedBottle),
-    )
-  ) {
-    return null;
-  }
-
-  return {
-    action: "correction",
-    confidence: null,
-    rationale: appendRationale(
-      decision.rationale,
-      "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits. Review this as an existing-bottle repair instead of creating a duplicate bottle.",
-    ),
-    candidateBottleIds: decision.candidateBottleIds,
-    identityScope: decision.identityScope,
-    aliasScope: decision.aliasScope ?? "none",
-    suggestedBottleId: price.bottleId,
-    proposedBottle: buildClassifierBottleRepairDraft(decision.proposedBottle),
-  };
-}
-
 /**
  * Converts classifier decisions into store-price match decisions while carrying
  * review metadata needed by later proposal handling.
@@ -502,11 +282,9 @@ function maybeBuildExistingBottleRepairDecision({
 export function toStorePriceMatchDecision({
   price,
   decision,
-  candidates,
 }: {
   price: Pick<StorePrice, "bottleId">;
   decision: BottleClassificationDecision;
-  candidates: PriceMatchCandidate[];
 }): StorePriceMatchDecision {
   if (decision.action === "match") {
     const action =
@@ -526,53 +304,7 @@ export function toStorePriceMatchDecision({
     };
   }
 
-  if (decision.action === "repair_bottle") {
-    const proposedBottle = buildClassifierBottleRepairDraft(
-      decision.proposedBottle,
-    );
-    const candidate = candidates.find(
-      ({ bottleId }) => bottleId === decision.matchedBottleId,
-    );
-    const needsRepair =
-      candidate !== undefined &&
-      proposedBottle !== null &&
-      candidateNeedsExistingBottleRepair(candidate, proposedBottle);
-
-    if (!needsRepair && price.bottleId === decision.matchedBottleId) {
-      return {
-        action: "match_existing",
-        confidence: null,
-        rationale: decision.rationale,
-        candidateBottleIds: decision.candidateBottleIds,
-        identityScope: decision.identityScope,
-        aliasScope: decision.aliasScope ?? "none",
-        suggestedBottleId: decision.matchedBottleId,
-        proposedBottle: null,
-      };
-    }
-
-    return {
-      action: "correction",
-      confidence: null,
-      rationale: decision.rationale,
-      candidateBottleIds: decision.candidateBottleIds,
-      identityScope: decision.identityScope,
-      aliasScope: decision.aliasScope ?? "none",
-      suggestedBottleId: decision.matchedBottleId,
-      proposedBottle: needsRepair ? proposedBottle : null,
-    };
-  }
-
   if (decision.action === "create_bottle") {
-    const existingBottleRepair = maybeBuildExistingBottleRepairDecision({
-      price,
-      decision,
-      candidates,
-    });
-    if (existingBottleRepair) {
-      return existingBottleRepair;
-    }
-
     return {
       action: "create_new",
       confidence: null,
@@ -1420,7 +1152,6 @@ export async function resolveStorePriceMatchProposal(
     const decision = toStorePriceMatchDecision({
       price,
       decision: classifierDecision,
-      candidates,
     });
     const automationAssessment = getStorePriceMatchAutomationAssessment({
       action: decision.action,

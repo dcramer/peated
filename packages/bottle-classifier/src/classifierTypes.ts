@@ -510,12 +510,6 @@ const CreateBottleDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   proposedBottle: ProposedBottleSchema,
 });
 
-const RepairBottleDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
-  action: z.literal("repair_bottle"),
-  matchedBottleId: z.number().int(),
-  proposedBottle: ProposedBottleSchema,
-});
-
 const NoMatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   action: z.literal("no_match"),
   matchedBottleId: z.null().default(null),
@@ -524,12 +518,7 @@ const NoMatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
 
 export const BottleClassificationDecisionSchema = z.discriminatedUnion(
   "action",
-  [
-    MatchDecisionSchema,
-    CreateBottleDecisionSchema,
-    RepairBottleDecisionSchema,
-    NoMatchDecisionSchema,
-  ],
+  [MatchDecisionSchema, CreateBottleDecisionSchema, NoMatchDecisionSchema],
 );
 
 const AgentProposedBottleSchema = ProposedBottleSchema.extend({
@@ -539,14 +528,13 @@ const AgentProposedBottleSchema = ProposedBottleSchema.extend({
 export const BottleClassifierAgentDecisionSchema = z
   .object({
     action: z
-      .enum(["match", "create_bottle", "repair_bottle", "no_match"])
+      .enum(["match", "create_bottle", "no_match"])
       .describe(
         [
           "Decision action.",
           "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId. A reviewed update proposal may separately correct optional or malformed stored fields.",
-          "repair_bottle: an existing Bottle is the exact marketed product but cannot be assigned safely until its Bottle identity is repaired; set matchedBottleId and proposedBottle.",
           "create_bottle: no inspected existing Bottle represents the exact marketed product, including plausible malformed candidates; set proposedBottle only, including every marketed release trait needed to identify it.",
-          "no_match: no safe existing target and no supported create action, or creation would invent an ambiguous hybrid.",
+          "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a Suggested Change before assignment is safe.",
         ].join(" "),
       ),
     rationale: z.string().nullable().default(null),
@@ -563,7 +551,7 @@ export const BottleClassifierAgentDecisionSchema = z
     proposedBottle: AgentProposedBottleSchema.nullable()
       .default(null)
       .describe(
-        "Required for create_bottle and repair_bottle. A create draft describes one independently complete Bottle, including every supported marketed release trait; unknown optional fields may remain null.",
+        "Required for create_bottle. A create draft describes one independently complete Bottle, including every supported marketed release trait; unknown optional fields may remain null.",
       ),
   })
   .strict();

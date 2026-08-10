@@ -124,7 +124,6 @@ export const PhotoIdentificationSuggestedNextStepEnum = z.enum([
   "confirm_match",
   "confirm_create",
   "manual_search",
-  "needs_review",
 ]);
 
 export const PhotoIdentificationInputSchema = z.object({
@@ -204,9 +203,6 @@ export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(
     z.object({
       action: z.literal("create_bottle"),
       proposedBottle: PhotoIdentificationProposedBottleSchema,
-    }),
-    z.object({
-      action: z.literal("repair_bottle"),
     }),
     z.object({
       action: z.literal("no_match"),

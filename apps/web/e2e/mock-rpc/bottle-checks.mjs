@@ -253,7 +253,7 @@ export function createBottleCheckMock({
         sourceKind: "store_price",
         sourceId: "9912",
         bottleId: null,
-        schemaVersion: 1,
+        schemaVersion: 2,
         schemaSupported: true,
         output: {
           status: "classified",
@@ -464,7 +464,7 @@ export function createBottleCheckMock({
         sourceKind: null,
         sourceId: null,
         bottleId: existingBottleId,
-        schemaVersion: 1,
+        schemaVersion: 2,
         schemaSupported: true,
         output: {
           summary: "Review two independent Entity corrections.",

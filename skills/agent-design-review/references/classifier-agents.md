@@ -67,7 +67,7 @@ Then check:
 - extraction conservatism: prefer `null` or `[]` over guessing
 - decisive identity fields: producer, distillery, expression, series, edition, age, cask flags, ABV, and years
 - candidate generation before web search
-- reviewed action boundaries: `match`, `repair_bottle`, `create_bottle`, `create_release`, `create_bottle_and_release`, `repair_parent_and_create_release`, `no_match`
+- reviewed identity boundaries: `match`, `create_bottle`, and `no_match`, with catalog changes represented separately
 - `identityScope` boundaries: `product` versus `exact_cask`
 - deterministic downgrade and validation; automation gating is code-derived
   from action risk plus structured evidence, and `confidenceBasis.band` only

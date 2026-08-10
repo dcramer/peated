@@ -20,6 +20,7 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
@@ -250,7 +251,7 @@ describe("price match queue", () => {
       sourceKind: "store_price",
       sourceId: String(price.id),
       subjectKey: `resolve_reference:store_price:${price.id}`,
-      schemaVersion: 1,
+      schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
       inputSnapshot: {},
       output: {
         status: "classified",
@@ -303,7 +304,7 @@ describe("price match queue", () => {
         sourceKind: "store_price",
         sourceId: String(price.id),
         subjectKey: `resolve_reference:store_price:${price.id}`,
-        schemaVersion: 1,
+        schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
         inputSnapshot: {},
         output: {
           status: "classified",
@@ -379,7 +380,7 @@ describe("price match queue", () => {
         sourceKind: "store_price",
         sourceId: String(price.id),
         subjectKey: `resolve_reference:store_price:${price.id}`,
-        schemaVersion: 1,
+        schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
         inputSnapshot: {},
         output: {
           status: "classified",
@@ -418,7 +419,7 @@ describe("price match queue", () => {
       sourceKind: "store_price",
       sourceId: String(price.id),
       subjectKey: `resolve_reference:store_price:${price.id}`,
-      schemaVersion: 1,
+      schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
       inputSnapshot: {},
       output: {
         status: "classified",

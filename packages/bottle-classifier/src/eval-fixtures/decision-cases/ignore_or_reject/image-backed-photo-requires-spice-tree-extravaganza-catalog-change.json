@@ -1,6 +1,6 @@
 {
-  "id": "image-backed-photo-repairs-spice-tree-extravaganza",
-  "name": "image-backed photo: matches and repairs Compass Box Spice Tree Extravaganza",
+  "id": "image-backed-photo-requires-spice-tree-extravaganza-catalog-change",
+  "name": "image-backed photo: requires a Spice Tree Extravaganza Suggested Change",
   "input": {
     "reference": {
       "name": "Bottle photo upload",
@@ -171,7 +171,7 @@
     "dbOutcome": {
       "bottleId": 45175,
       "createsBottle": true,
-      "summary": "Production created Bottle 45175 with null ABV, release year, bottler, and distillers; a moderator later repaired it to 46% ABV, releaseYear 2016, Compass Box bottler, and six component distilleries. Bottle 9900 already represented the same product with malformed identity data."
+      "summary": "Production created Bottle 45175 with null ABV, release year, bottler, and distillers; a moderator later corrected it to 46% ABV, releaseYear 2016, Compass Box bottler, and six component distilleries. Bottle 9900 already represented the same product with malformed identity data."
     },
     "catalogFieldObservations": [
       {
@@ -183,7 +183,7 @@
         "source": "production_search",
         "issue": "conflicts_with_evidence",
         "safeToAutoFill": false,
-        "notes": "Bottle 9900 is the same marketed product but has a malformed Brand, name, category, and stated age. The repair must remain moderator-reviewed."
+        "notes": "Bottle 9900 is the same marketed product but has a malformed Brand, name, category, and stated age. The Suggested Change must remain moderator-reviewed."
       },
       {
         "target": "candidate_bottle",
@@ -206,14 +206,14 @@
         "safeToAutoFill": true
       }
     ],
-    "notes": "This curated regression uses the exact production image and exact malformed Bottle 9900 catalog row. The original classifier extraction and candidate trace are unavailable, so it does not claim to reproduce that hidden trace. It models the preferred pre-create outcome: match the already-existing exact product and propose one complete, reviewable repair instead of creating duplicate Bottle 45175. Official and independent sources support 46% ABV, release year 2016, Compass Box as bottler, and the six component distilleries. Cask type, size, and fill are intentionally outside the expectation."
+    "notes": "This curated regression uses the exact production image and exact malformed Bottle 9900 catalog row. The original classifier extraction and candidate trace are unavailable, so it does not claim to reproduce that hidden trace. It models the preferred pre-create outcome: return no_match and propose one complete, reviewable Suggested Change instead of assigning malformed Bottle 9900 or creating duplicate Bottle 45175. Official and independent sources support 46% ABV, release year 2016, Compass Box as bottler, and the six component distilleries. Cask type, size, and fill are intentionally outside the expectation."
   },
   "expected": {
     "status": "classified",
-    "action": "match",
+    "action": "no_match",
     "identityScope": "product",
-    "matchedBottleId": 9900,
-    "suggestedNextStep": "confirm_match",
+    "matchedBottleId": null,
+    "suggestedNextStep": "manual_search",
     "proposedOperations": [
       {
         "type": "update_bottle",
@@ -262,7 +262,7 @@
             }
           }
         },
-        "rationale": "Bottle 9900 is the same marketed Spice Tree Extravaganza release, but authoritative product evidence supports repairing its malformed identity and filling its release facts.",
+        "rationale": "Bottle 9900 is the same marketed Spice Tree Extravaganza release, but authoritative product evidence requires a Suggested Change before the reference is safe to assign.",
         "evidenceRefs": [
           {
             "kind": "bottle",
@@ -283,7 +283,7 @@
         ]
       }
     ],
-    "summary": "Match the existing malformed exact product and propose one complete moderator-reviewed repair instead of creating a duplicate."
+    "summary": "Return no_match and propose one complete moderator-reviewed Suggested Change instead of assigning a malformed Bottle or creating a duplicate."
   },
   "localCatalog": {
     "entities": [

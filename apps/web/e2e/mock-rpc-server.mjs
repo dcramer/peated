@@ -691,7 +691,7 @@ async function handleRpcRequest({ request, response, url }) {
       if (getAccessToken(request).includes("photo-needs-review")) {
         sendRpcResponse(
           response,
-          buildNeedsReviewPhotoIdentification(),
+          buildManualReviewPhotoIdentification(),
           "66666666666666666666666666666666",
         );
         return true;
@@ -1741,7 +1741,7 @@ function buildManualSearchMatchPhotoIdentification() {
   };
 }
 
-function buildNeedsReviewPhotoIdentification() {
+function buildManualReviewPhotoIdentification() {
   return {
     pendingImage: {
       id: "playwright-photo-upload",
@@ -1789,8 +1789,7 @@ function buildNeedsReviewPhotoIdentification() {
     classification: {
       status: "classified",
       decision: {
-        action: "match",
-        matchedBottle: existingBottle,
+        action: "no_match",
       },
       artifacts: {
         candidates: [
@@ -1802,7 +1801,7 @@ function buildNeedsReviewPhotoIdentification() {
         ],
       },
     },
-    suggestedNextStep: "needs_review",
+    suggestedNextStep: "manual_search",
     diagnostics: {
       extraction: {
         status: "found",
@@ -1813,7 +1812,7 @@ function buildNeedsReviewPhotoIdentification() {
       },
       classification: {
         status: "classified",
-        action: "match",
+        action: "no_match",
         confidence: 55,
         reason: "Possible match needs user review.",
       },

@@ -43,7 +43,7 @@ export const BottleWebReadPageArgsSchema = z.object({
       message: "URL must use HTTP or HTTPS",
     })
     .describe(
-      "Exact URL of a promising search result consistent with confirmed Bottle traits, or differing only on the uncertain trait being resolved. Never use a confirmed conflicting sibling as repair evidence.",
+      "Exact URL of a promising search result consistent with confirmed Bottle traits, or differing only on the uncertain trait being resolved. Never use a confirmed conflicting sibling as Suggested Change evidence.",
     ),
   focus: z
     .string()

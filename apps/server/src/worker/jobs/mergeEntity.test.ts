@@ -16,7 +16,10 @@ import {
   storePriceMatchProposals,
 } from "@peated/server/db/schema";
 import type { getUserActor } from "@peated/server/lib/actors";
-import { createBottleCheck } from "@peated/server/lib/bottleChecks";
+import {
+  BOTTLE_CHECK_SCHEMA_VERSION,
+  createBottleCheck,
+} from "@peated/server/lib/bottleChecks";
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createBottle } from "@peated/server/lib/createBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
@@ -280,6 +283,7 @@ test("validates persisted Entity merge results by lifecycle state", async ({
 test("fails an operation when its check schema version is unsupported", async ({
   fixtures,
 }) => {
+  const unsupportedSchemaVersion = BOTTLE_CHECK_SCHEMA_VERSION + 1;
   const sourceEntity = await fixtures.Entity({ name: "Version Source" });
   const destinationEntity = await fixtures.Entity({
     name: "Version Destination",
@@ -294,7 +298,7 @@ test("fails an operation when its check schema version is unsupported", async ({
   });
   await db
     .update(bottleChecks)
-    .set({ schemaVersion: 2 })
+    .set({ schemaVersion: unsupportedSchemaVersion })
     .where(eq(bottleChecks.id, operation.checkId));
 
   await mergeEntity({
@@ -309,7 +313,9 @@ test("fails an operation when its check schema version is unsupported", async ({
     }),
   ).toEqual({
     status: "failed",
-    error: expect.stringContaining("uses unsupported schema version 2"),
+    error: expect.stringContaining(
+      `uses unsupported schema version ${unsupportedSchemaVersion}`,
+    ),
   });
   expect(
     await db.query.entities.findMany({

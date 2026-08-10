@@ -44,8 +44,9 @@ Before changing classifier behavior, read:
 
 - Every marketed release is one independently complete Bottle. The classifier
   never selects a Bottle Group or release-family owner.
-- Existing-Bottle identification and full canonical classification are separate
-  contracts. `create_bottle` and `repair_bottle` require the full evidence bar.
+- Reference classification returns `match`, `create_bottle`, or `no_match`.
+  A required catalog correction is a separate Suggested Change and forces
+  `no_match` until the current Bottle is safe for assignment.
 - False-positive existing matches are worse than conservative creation or
   `no_match`. Bounded ambiguity resolves to `no_match` at this boundary.
 - Creation may use reviewed source, label, image, local-catalog, or web evidence.
