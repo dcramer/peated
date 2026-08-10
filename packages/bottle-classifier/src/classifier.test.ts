@@ -1726,7 +1726,6 @@ describe("createBottleClassifier", () => {
           candidateBottleIds: [],
           identityScope: "product",
           observation: null,
-          identityBasis: null,
           confidenceBasis: {
             positiveEvidence: [
               "A non-origin page mentions the same bottle name.",

@@ -370,49 +370,6 @@ export const BottleObservationSchema = z
   })
   .strict();
 
-export const BottleIdentityBasisSchema = z
-  .object({
-    bottleTraits: z
-      .array(z.string().trim().min(1))
-      .default([])
-      .describe(
-        "Stable facts on the complete Bottle, such as brand, expression, series, category, and stable age.",
-      ),
-    releaseTraits: z
-      .array(z.string().trim().min(1))
-      .default([])
-      .describe(
-        "Exact marketed-version traits retained on the complete Bottle, such as batch, edition, vintage year, release year, exact ABV, or cask details.",
-      ),
-    observationTraits: z
-      .array(z.string().trim().min(1))
-      .default([])
-      .describe(
-        "Exact source facts preserved as observations instead of canonical Bottle identity.",
-      ),
-    yearInterpretation: z
-      .enum([
-        "none",
-        "vintage_year",
-        "release_year",
-        "both",
-        "ambiguous",
-        "not_identity",
-      ])
-      .default("none"),
-    siblingEvidence: z
-      .enum([
-        "none",
-        "single_known_bottle",
-        "existing_sibling_bottles",
-        "dirty_sibling_candidates",
-        "unclear",
-      ])
-      .default("none"),
-    uncertainties: z.array(z.string().trim().min(1)).default([]),
-  })
-  .strict();
-
 // Typed categories for unresolved risks. `other` is the uncategorizable
 // holistic veto ("something feels off") that still forces review. Any asserted
 // risk routes an automated decision to review; risks never upgrade a decision.
@@ -478,7 +435,6 @@ const BottleClassifierDecisionBaseSchema = z
       "`global_alias` only when the listing label is safe to store as a reusable bottle alias; `none` when no reusable alias should be created.",
     ),
     observation: BottleObservationSchema.nullable().default(null),
-    identityBasis: BottleIdentityBasisSchema.nullable().optional(),
     confidenceBasis: BottleConfidenceBasisSchema.nullable().optional(),
   })
   .strict();
@@ -530,7 +486,6 @@ export const BottleClassifierAgentDecisionSchema = z
     identityScope: BottleIdentityScopeEnum.nullable().default(null),
     aliasScope: AliasScopeEnum.nullable().default(null),
     observation: BottleObservationSchema.nullable().default(null),
-    identityBasis: BottleIdentityBasisSchema.nullable().default(null),
     confidenceBasis: BottleConfidenceBasisSchema.nullable().default(null),
     matchedBottleId: z.number().int().nullable().default(null),
     proposedBottle: AgentProposedBottleSchema.nullable()
@@ -573,7 +528,6 @@ export type BottleExtractedDetails = z.infer<
 export type BottleConfidenceBasis = z.infer<typeof BottleConfidenceBasisSchema>;
 export type UnresolvedRisk = z.infer<typeof UnresolvedRiskSchema>;
 export type UnresolvedRiskCategory = z.infer<typeof UnresolvedRiskCategoryEnum>;
-export type BottleIdentityBasis = z.infer<typeof BottleIdentityBasisSchema>;
 export type AliasScope = z.infer<typeof AliasScopeEnum>;
 export type BottleEvidenceSourceTier = z.infer<
   typeof BottleEvidenceSourceTierEnum

@@ -7,7 +7,6 @@ import type {
   BottleClassificationDecision,
   BottleConfidenceBasis,
   BottleExtractedDetails,
-  BottleIdentityBasis,
   BottleObservation,
 } from "@peated/bottle-classifier/internal/types";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
@@ -36,7 +35,6 @@ export type BottleReferenceClassifierEvidence = {
   action: BottleClassificationDecision["action"];
   identityScope: BottleClassificationDecision["identityScope"] | null;
   observation: BottleObservation | null;
-  identityBasis: BottleIdentityBasis | null;
   confidenceBasis: BottleConfidenceBasis | null;
 };
 
@@ -95,7 +93,6 @@ function projectClassifierEvidence(
     action: decision.action,
     identityScope: decision.identityScope ?? null,
     observation: decision.observation ?? null,
-    identityBasis: decision.identityBasis ?? null,
     confidenceBasis: decision.confidenceBasis ?? null,
   };
 }

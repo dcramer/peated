@@ -116,7 +116,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     ).toBe(false);
   });
 
-  test("parses identity basis and candidate family context", () => {
+  test("parses candidate family context and confidence evidence", () => {
     const candidate = BottleCandidateSchema.parse({
       bottleId: 100,
       fullName: "Example 18-year-old",
@@ -138,14 +138,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       identityScope: "product",
       aliasScope: "none",
       observation: null,
-      identityBasis: {
-        bottleTraits: ["brand", "18-year-old"],
-        releaseTraits: ["1994 vintage"],
-        observationTraits: [],
-        yearInterpretation: "vintage_year",
-        siblingEvidence: "existing_sibling_bottles",
-        uncertainties: [],
-      },
       confidenceBasis: {
         positiveEvidence: ["local related Bottle candidate exists"],
         unresolvedRisks: [
@@ -166,7 +158,12 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     });
 
     expect(candidate.familyContext?.siblingBottles[0]?.statedAge).toBe(21);
-    expect(decision.identityBasis?.yearInterpretation).toBe("vintage_year");
+    expect(decision.confidenceBasis?.unresolvedRisks).toEqual([
+      {
+        category: "release_ambiguity",
+        note: "new vintage release needs review",
+      },
+    ]);
   });
 
   test("preserves structured cask fields at classifier boundaries", () => {
@@ -220,42 +217,43 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     });
   });
 
-  test.each(["matchedReleaseId", "parentBottleId", "proposedRelease"] as const)(
-    "rejects obsolete decision field %s",
-    (field) => {
-      const agentDecision = {
-        action: "no_match" as const,
-        rationale: null,
-        candidateBottleIds: [],
-        identityScope: null,
-        aliasScope: null,
-        observation: null,
-        identityBasis: null,
-        confidenceBasis: null,
-        matchedBottleId: null,
-        proposedBottle: null,
-      };
-      const finalizedDecision = {
-        action: "no_match" as const,
-        candidateBottleIds: [],
-        matchedBottleId: null,
-        proposedBottle: null,
-      };
+  test.each([
+    "identityBasis",
+    "matchedReleaseId",
+    "parentBottleId",
+    "proposedRelease",
+  ] as const)("rejects obsolete decision field %s", (field) => {
+    const agentDecision = {
+      action: "no_match" as const,
+      rationale: null,
+      candidateBottleIds: [],
+      identityScope: null,
+      aliasScope: null,
+      observation: null,
+      confidenceBasis: null,
+      matchedBottleId: null,
+      proposedBottle: null,
+    };
+    const finalizedDecision = {
+      action: "no_match" as const,
+      candidateBottleIds: [],
+      matchedBottleId: null,
+      proposedBottle: null,
+    };
 
-      expect(
-        BottleClassifierAgentDecisionSchema.safeParse({
-          ...agentDecision,
-          [field]: null,
-        }).success,
-      ).toBe(false);
-      expect(
-        BottleClassificationDecisionSchema.safeParse({
-          ...finalizedDecision,
-          [field]: null,
-        }).success,
-      ).toBe(false);
-    },
-  );
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse({
+        ...agentDecision,
+        [field]: null,
+      }).success,
+    ).toBe(false);
+    expect(
+      BottleClassificationDecisionSchema.safeParse({
+        ...finalizedDecision,
+        [field]: null,
+      }).success,
+    ).toBe(false);
+  });
 
   test.each([
     "create_release",
@@ -269,7 +267,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       identityScope: null,
       aliasScope: null,
       observation: null,
-      identityBasis: null,
       confidenceBasis: null,
       matchedBottleId: null,
       proposedBottle: null,

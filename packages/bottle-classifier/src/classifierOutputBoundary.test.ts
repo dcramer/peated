@@ -130,7 +130,6 @@ describe("classifier output boundary", () => {
         identityScope: null,
         aliasScope: null,
         observation: null,
-        identityBasis: null,
         confidenceBasis: null,
         matchedBottleId: null,
         proposedBottle: null,
@@ -149,6 +148,7 @@ describe("classifier output boundary", () => {
     expect(outputType.schema.properties).not.toHaveProperty(
       "proposedOperations",
     );
+    expect(outputType.schema.properties).not.toHaveProperty("identityBasis");
     expect(outputType.schema.properties).not.toHaveProperty("findings");
     expect(hasFormatAnnotation(outputType.schema)).toBe(false);
     expect(prepared.agent.tools.map((tool) => tool.name)).not.toEqual(
@@ -259,7 +259,6 @@ describe("classifier output boundary", () => {
         identityScope: null,
         aliasScope: null,
         observation: null,
-        identityBasis: null,
         confidenceBasis: null,
         matchedBottleId: null,
         proposedBottle: null,

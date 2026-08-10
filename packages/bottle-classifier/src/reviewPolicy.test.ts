@@ -97,12 +97,6 @@ function buildShieldaigAgeCreationDecision(
     candidateBottleIds: [ageBearingCandidate.bottleId],
     identityScope: "product",
     observation: null,
-    identityBasis: {
-      bottleTraits: ["brand", "expression", "statedAge"],
-      releaseTraits: [],
-      observationTraits: [],
-      siblingEvidence: "dirty_sibling_candidates",
-    },
     confidenceBasis: {
       positiveEvidence: ["source title states 30-year-old"],
       unresolvedRisks: [
@@ -1118,7 +1112,6 @@ describe("finalizeBottleReferenceClassification", () => {
         market: null,
         exclusive: null,
       },
-      identityBasis: null,
       confidenceBasis: {
         positiveEvidence: ["Readable bottle label states barrel 4779."],
         unresolvedRisks: [],
@@ -1268,7 +1261,6 @@ describe("finalizeBottleReferenceClassification", () => {
           market: null,
           exclusive: null,
         },
-        identityBasis: null,
         confidenceBasis: {
           positiveEvidence: ["The source uses cask code 95.71."],
           unresolvedRisks: [],

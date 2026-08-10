@@ -1365,9 +1365,7 @@ function createNoMatchDecision({
 }: {
   decision: Pick<BottleClassifierAgentDecision, "rationale" | "identityScope"> &
     Partial<Pick<BottleClassifierAgentDecision, "aliasScope">> &
-    Partial<
-      Pick<BottleClassifierAgentDecision, "identityBasis" | "confidenceBasis">
-    >;
+    Partial<Pick<BottleClassifierAgentDecision, "confidenceBasis">>;
   candidateBottleIds: number[];
   rationale: string | null;
   observation: BottleObservation | null;
@@ -1380,7 +1378,6 @@ function createNoMatchDecision({
     identityScope: identityScope ?? decision.identityScope ?? "product",
     aliasScope: decision.aliasScope ?? "none",
     observation,
-    identityBasis: decision.identityBasis ?? null,
     confidenceBasis: decision.confidenceBasis ?? null,
     matchedBottleId: null,
     proposedBottle: null,
@@ -1821,7 +1818,6 @@ function sanitizeClassifierDecision({
         proposedBottle: null,
         observation,
       }),
-      identityBasis: decision.identityBasis,
       confidenceBasis: decision.confidenceBasis,
     },
     candidateBottleIds: filteredCandidateBottleIds,
@@ -1912,10 +1908,8 @@ export function finalizeBottleReferenceClassification({
       decision: smwsCodeAdjustedDecision,
       artifacts,
     }) ?? smwsCodeAdjustedDecision;
-  const agentBasisAdjustedDecision = {
+  const agentEvidenceAdjustedDecision = {
     ...exactCaskAdjustedDecision,
-    identityBasis:
-      exactCaskAdjustedDecision.identityBasis ?? parsedDecision.identityBasis,
     confidenceBasis:
       exactCaskAdjustedDecision.confidenceBasis ??
       parsedDecision.confidenceBasis,
@@ -1927,7 +1921,7 @@ export function finalizeBottleReferenceClassification({
   // `deriveAutomationTier`, so review gating no longer lives in this pipeline.
   const reviewedDecision = rejectInvalidExistingMatch({
     reference,
-    decision: agentBasisAdjustedDecision,
+    decision: agentEvidenceAdjustedDecision,
     artifacts,
   });
   const finalDecision = reviewedDecision.proposedBottle
@@ -1944,7 +1938,6 @@ export function finalizeBottleReferenceClassification({
   return BottleClassificationDecisionSchema.parse({
     ...finalDecision,
     aliasScope: finalDecision.aliasScope ?? parsedDecision.aliasScope ?? "none",
-    identityBasis: finalDecision.identityBasis ?? parsedDecision.identityBasis,
     confidenceBasis:
       finalDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
   });

@@ -265,7 +265,6 @@ export function createBottleCheckMock({
             identityScope: "product",
             aliasScope: null,
             observation: null,
-            identityBasis: null,
             confidenceBasis: null,
             matchedBottleId: existingBottleId,
             proposedBottle: null,
