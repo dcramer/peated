@@ -363,7 +363,6 @@ export const BottleObservationSchema = z
     selector: z.string().trim().nullable().default(null),
     caskNumber: z.string().trim().nullable().default(null),
     barrelNumber: z.string().trim().nullable().default(null),
-    bottleNumber: z.string().trim().nullable().default(null),
   })
   .strict();
 

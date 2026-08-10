@@ -807,7 +807,6 @@ describe("finalizeBottleReferenceClassification", () => {
       observation: {
         caskNumber: "123",
         barrelNumber: null,
-        bottleNumber: null,
         selector: null,
       },
       matchedBottleId: null,
@@ -866,7 +865,6 @@ describe("finalizeBottleReferenceClassification", () => {
       observation: {
         caskNumber: "12.1",
         barrelNumber: null,
-        bottleNumber: null,
         selector: null,
       },
       matchedBottleId: null,
@@ -945,7 +943,6 @@ describe("finalizeBottleReferenceClassification", () => {
         observation: {
           caskNumber: "12.1",
           barrelNumber: null,
-          bottleNumber: null,
           selector: null,
         },
         matchedBottleId: null,
@@ -1019,7 +1016,6 @@ describe("finalizeBottleReferenceClassification", () => {
         observation: {
           caskNumber: "12.1",
           barrelNumber: null,
-          bottleNumber: null,
           selector: null,
         },
         confidenceBasis: {
@@ -1095,7 +1091,6 @@ describe("finalizeBottleReferenceClassification", () => {
         selector: null,
         caskNumber: "4779",
         barrelNumber: "4779",
-        bottleNumber: null,
       },
       confidenceBasis: {
         positiveEvidence: ["Readable bottle label states barrel 4779."],
@@ -1241,7 +1236,6 @@ describe("finalizeBottleReferenceClassification", () => {
           selector: null,
           caskNumber: "95.71",
           barrelNumber: null,
-          bottleNumber: null,
         },
         confidenceBasis: {
           positiveEvidence: ["The source uses cask code 95.71."],
@@ -1396,7 +1390,6 @@ describe("finalizeBottleReferenceClassification", () => {
           selector: null,
           caskNumber: "95.71",
           barrelNumber: null,
-          bottleNumber: null,
         },
         matchedBottleId: null,
         proposedBottle: {

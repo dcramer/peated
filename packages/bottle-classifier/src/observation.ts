@@ -11,7 +11,6 @@ export function normalizeObservation(
     selector: observation.selector?.trim() || null,
     caskNumber: observation.caskNumber?.trim() || null,
     barrelNumber: observation.barrelNumber?.trim() || null,
-    bottleNumber: observation.bottleNumber?.trim() || null,
   };
 
   return Object.values(normalized).some((value) => value !== null)
