@@ -1,6 +1,6 @@
 "use client";
 
-import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
+import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Bottle } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -240,9 +240,7 @@ export default function Page() {
 
     const created = await createBottleMutation.mutateAsync({
       proposal: item.id,
-      independentBottle: IndependentBottleCreateRouteInputSchema.parse(
-        item.proposedBottle,
-      ),
+      independentBottle: BottleCreateInputSchema.parse(item.proposedBottle),
     });
     await refreshQueueList();
     flash(

@@ -2693,7 +2693,7 @@ describe("price match queue", () => {
     expect(createdBottle?.groupId).not.toBe(sourceBottle.groupId);
     expect(createdGroup).toMatchObject({
       name: "Trusted Expression",
-      statedAge: 14,
+      statedAge: null,
       seriesId: durableSeries.id,
       category: "bourbon",
       brandId: durableBrand.id,
@@ -2787,9 +2787,9 @@ describe("price match queue", () => {
     });
     const existing = await fixtures.BottleGroupMember({
       groupId: sourceBottle.groupId!,
-      edition: "Batch 9",
-      statedAge: 15,
-      abv: 54,
+      edition: "Batch 8",
+      statedAge: 14,
+      abv: 53,
     });
     const price = await fixtures.StorePrice({
       name: "Retry Expression Batch 9 Listing",

@@ -3,12 +3,11 @@ import {
   ExactBottleAliasConflictError,
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
-import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
+import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
 } from "@peated/server/lib/createBottle";
-import { buildIndependentBottleCreateInput } from "@peated/server/lib/flatBottleInput";
 import {
   createBottleFromStorePriceMatchProposal,
   InvalidStorePriceMatchProposalTypeError,
@@ -27,7 +26,7 @@ import { z } from "zod";
 const IndependentInputSchema = z
   .object({
     proposal: z.coerce.number(),
-    independentBottle: IndependentBottleCreateRouteInputSchema,
+    independentBottle: BottleCreateInputSchema,
   })
   .strict();
 
@@ -48,7 +47,7 @@ export default procedure
       const actor = await getUserActor(context.user);
       const result = await createBottleFromStorePriceMatchProposal({
         proposalId: input.proposal,
-        bottleInput: buildIndependentBottleCreateInput(input.independentBottle),
+        bottleInput: input.independentBottle,
         user: context.user,
         actor,
       });

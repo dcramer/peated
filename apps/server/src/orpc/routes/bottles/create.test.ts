@@ -313,7 +313,7 @@ describe("POST /bottles", () => {
       bottlerId: distiller.id,
       distillerIds: [distiller.id],
       category: "single_malt",
-      statedAge: 12,
+      statedAge: null,
       flavorProfile: FLAVOR_PROFILES[0],
       representativeBottleId: data.id,
       totalBottles: 1,
@@ -325,7 +325,7 @@ describe("POST /bottles", () => {
       .where(eq(bottles.id, data.id));
     expect(bottle).toMatchObject({
       groupId: data.group!.id,
-      name: "Delicious Wood - Batch 7 - 2024 Release - 2010 Vintage - 57.1% ABV - Single Cask - Cask Strength - Bourbon Cask - Hogshead - 1st Fill",
+      name: "Delicious Wood - Batch 7 - 12-year-old - 2024 Release - 2010 Vintage - 57.1% ABV - Single Cask - Cask Strength - Bourbon Cask - Hogshead - 1st Fill",
       brandId: brand.id,
       bottlerId: distiller.id,
       category: "single_malt",

@@ -595,8 +595,9 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
   const destinationBatch = await createBottle({
     context: contextFor(defaults.user),
     input: {
-      stable: { brand: destinationEntity.id, name: "Annual" },
-      exact: { edition: "Batch 2" },
+      brand: destinationEntity.id,
+      name: "Annual",
+      edition: "Batch 2",
     },
   });
   await db

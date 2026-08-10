@@ -64,8 +64,10 @@ async function createGroup({
   const first = await createBottle({
     context: { user },
     input: {
-      stable: { name, brand: brandId, series: seriesId },
-      exact: { edition: "Batch One" },
+      name,
+      brand: brandId,
+      series: seriesId,
+      edition: "Batch One",
     },
   });
   const second = {

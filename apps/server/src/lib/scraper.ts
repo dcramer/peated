@@ -19,8 +19,8 @@ import type {
 } from "../schemas";
 import BatchQueue from "./batchQueue";
 import {
+  buildBottleCreateInput,
   buildBottleUpdatePatch,
-  buildIndependentBottleRouteInput,
 } from "./flatBottleInput";
 import { formatBottleName } from "./format";
 
@@ -175,9 +175,9 @@ export async function handleBottle(
       },
     });
 
-    let createInput: ReturnType<typeof buildIndependentBottleRouteInput>;
+    let createInput: ReturnType<typeof buildBottleCreateInput>;
     try {
-      createInput = buildIndependentBottleRouteInput(bottle);
+      createInput = buildBottleCreateInput(bottle);
     } catch (error) {
       logError(error, {
         extra: {

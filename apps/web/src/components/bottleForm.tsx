@@ -12,7 +12,7 @@ import {
   CATEGORY_LIST,
   FLAVOR_PROFILES,
 } from "@peated/server/constants";
-import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
+import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
   formatCategoryName,
   formatFlavorProfile,
@@ -76,10 +76,8 @@ const caskTypeList = CASK_TYPES.map(({ id }) => ({
   name: toTitleCase(id),
 }));
 
-type CreateFormSchemaType = z.infer<
-  typeof IndependentBottleCreateRouteInputSchema
->;
-const BottleFormSchema = IndependentBottleCreateRouteInputSchema;
+type CreateFormSchemaType = z.infer<typeof BottleCreateInputSchema>;
+const BottleFormSchema = BottleCreateInputSchema;
 type FormSchemaType = CreateFormSchemaType;
 type ChoiceLike = {
   id?: number | null;

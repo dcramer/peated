@@ -6,8 +6,10 @@ field ownership, grouping, and merge semantics.
 
 ## Creation
 
-- Add Bottle accepts the shared expression and exact marketed-release fields in
-  one submission and returns one independently complete Bottle.
+- Add Bottle accepts one flat Bottle input. The server owns field storage and
+  returns one independently complete Bottle.
+- A submitted stated age belongs to the new Bottle. The singleton BottleGroup
+  starts without a shared age. A reviewed shared edit can establish one later.
 - Creation atomically creates a singleton BottleGroup. Users do not select,
   name, or submit authority for a group.
 - Deterministic alias duplicate checks remain in the request path. Slow catalog

@@ -1,5 +1,5 @@
 import { call, ORPCError } from "@orpc/server";
-import { IndependentBottleCreateRouteInputSchema } from "@peated/server/lib/bottleSchemas";
+import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import { buildBottleUpdatePatch } from "@peated/server/lib/flatBottleInput";
 import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
@@ -27,7 +27,7 @@ export default procedure
       operationId: "upsertBottle",
     }),
   })
-  .input(IndependentBottleCreateRouteInputSchema)
+  .input(BottleCreateInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context }) {
     try {
