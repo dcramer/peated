@@ -463,8 +463,12 @@ const AgentProposedBottleSchema = ProposedBottleSchema.extend({
   abv: z.number().nullable().default(null),
 });
 
+// Zod preserves this property order in the JSON schema sent to the model.
+// Evidence and rationale must precede the action and its target or draft.
 export const BottleClassifierAgentDecisionSchema = z
   .object({
+    confidenceBasis: BottleConfidenceBasisSchema.nullable().default(null),
+    rationale: z.string().nullable().default(null),
     action: z
       .enum(["match", "create_bottle", "no_match"])
       .describe(
@@ -475,15 +479,13 @@ export const BottleClassifierAgentDecisionSchema = z
           "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a separate Bottle Review before assignment is safe.",
         ].join(" "),
       ),
-    rationale: z.string().nullable().default(null),
+    identityScope: BottleIdentityScopeEnum.nullable().default(null),
+    aliasScope: AliasScopeEnum.nullable().default(null),
+    observation: BottleObservationSchema.nullable().default(null),
     candidateBottleIds: z
       .array(z.number().int())
       .max(MAX_BOTTLE_CANDIDATES)
       .default([]),
-    identityScope: BottleIdentityScopeEnum.nullable().default(null),
-    aliasScope: AliasScopeEnum.nullable().default(null),
-    observation: BottleObservationSchema.nullable().default(null),
-    confidenceBasis: BottleConfidenceBasisSchema.nullable().default(null),
     matchedBottleId: z.number().int().nullable().default(null),
     proposedBottle: AgentProposedBottleSchema.nullable()
       .default(null)

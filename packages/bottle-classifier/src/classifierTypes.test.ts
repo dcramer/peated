@@ -42,6 +42,25 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     );
   });
 
+  test("asks for evidence and rationale before the decision", () => {
+    const jsonSchema = z.toJSONSchema(BottleClassifierAgentDecisionSchema) as {
+      properties?: Record<string, unknown>;
+    };
+    const fields = Object.keys(jsonSchema.properties ?? {});
+
+    expect(fields.slice(0, 3)).toEqual([
+      "confidenceBasis",
+      "rationale",
+      "action",
+    ]);
+    expect(fields.indexOf("action")).toBeLessThan(
+      fields.indexOf("matchedBottleId"),
+    );
+    expect(fields.indexOf("action")).toBeLessThan(
+      fields.indexOf("proposedBottle"),
+    );
+  });
+
   test("exposes only the three identity results", () => {
     const actionSchema = BottleClassifierAgentDecisionSchema.shape.action;
 
