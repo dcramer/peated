@@ -25,6 +25,7 @@
 - [ ] 3.2 Design the typed-basis evolution (typed risk categories, source-locator evidence entries, typed trait placement) as separate eval-gated follow-ups; do not block prompt work on them.
 - [ ] 3.3 Merge `identityBasis.uncertainties` into the typed `unresolvedRisks` list (one risk channel) and remove no-consumer observation subfields (`market`, `exclusive`, `outturn`) or land their first consumer, per the value audit.
 - [ ] 3.4 Land the `identityBasis` trait-placement reader (releaseTraits must not leak into `proposedBottle.name`) so the basis object has a mechanical consumer; drop subfields the check proves unused.
+- [x] 3.5 Remove model-reported `confidenceBasis.toolsUsed`; keep actual tool-call measurement in runtime-owned metadata. (2026-08-09: removed from the prompt, schema, deterministic producers, tests, and photo telemetry mapping; photo telemetry now reads `modelMetadata.toolCalls`, and the persisted version 2 read boundary drops the obsolete field.)
 
 ## 4. Confidence Removal And Gating
 

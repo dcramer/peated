@@ -132,7 +132,7 @@ export const PersistedAuditBottleCheckOutputSchema =
     artifacts: true,
   });
 
-export const PersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
+const CurrentPersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
   "status",
   [
     IgnoredBottleClassificationResultSchema.omit({ artifacts: true }).extend({
@@ -144,6 +144,34 @@ export const PersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
       findings: z.array(FindingSchema).default([]),
     }),
   ],
+);
+
+function removeLegacyModelToolTelemetry(output: unknown): unknown {
+  if (!output || typeof output !== "object") return output;
+
+  const decision = (output as Record<string, unknown>).decision;
+  if (!decision || typeof decision !== "object") return output;
+
+  const confidenceBasis = (decision as Record<string, unknown>).confidenceBasis;
+  if (!confidenceBasis || typeof confidenceBasis !== "object") return output;
+
+  const { toolsUsed: _toolsUsed, ...currentConfidenceBasis } =
+    confidenceBasis as Record<string, unknown>;
+  return {
+    ...output,
+    decision: {
+      ...decision,
+      confidenceBasis: currentConfidenceBasis,
+    },
+  };
+}
+
+// Version 2 decisions can contain model-reported tool telemetry. Runtime-owned
+// metadata is authoritative now, so the persisted boundary drops that obsolete
+// field before current strict validation.
+export const PersistedReferenceBottleCheckOutputSchema = z.preprocess(
+  removeLegacyModelToolTelemetry,
+  CurrentPersistedReferenceBottleCheckOutputSchema,
 );
 
 export const PersistedBottleCheckOutputSchema = z.union([

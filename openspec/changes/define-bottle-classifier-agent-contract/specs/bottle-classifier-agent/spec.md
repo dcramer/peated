@@ -160,7 +160,12 @@ The classifier SHALL return structured basis fields that explain identity placem
 #### Scenario: Confidence basis is present
 
 - **WHEN** the agent returns a reviewed decision
-- **THEN** the decision SHALL include `confidenceBasis` or an equivalent structured basis identifying positive evidence, unresolved risks, tools used, and web-evidence status, with each unresolved risk carrying a typed category and a freeform note
+- **THEN** the decision SHALL include `confidenceBasis` or an equivalent structured basis identifying positive evidence, unresolved risks, and web-evidence status, with each unresolved risk carrying a typed category and a freeform note
+
+#### Scenario: Runtime records tool calls
+
+- **WHEN** the classifier uses a tool
+- **THEN** the runtime SHALL record the actual tool call and the agent output SHALL NOT duplicate that telemetry
 
 #### Scenario: Evidence precedes the action in the output schema
 

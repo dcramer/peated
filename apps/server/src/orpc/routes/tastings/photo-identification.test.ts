@@ -136,14 +136,6 @@ function buildCreateBottleDecision({
         | "other";
       note: string;
     }[];
-    toolsUsed?: (
-      | "initial_local_candidates"
-      | "search_bottles"
-      | "search_entities"
-      | "firecrawl_web_search"
-      | "firecrawl_read_page"
-      | "none"
-    )[];
     webEvidence?:
       | "not_needed"
       | "not_used"
@@ -159,7 +151,6 @@ function buildCreateBottleDecision({
       ? {
           positiveEvidence: [],
           unresolvedRisks: [],
-          toolsUsed: [],
           webEvidence: "not_used",
           ...confidenceBasis,
         }
@@ -700,6 +691,10 @@ describe("POST /tastings/photo-identification", () => {
 
     expect(first.classification).not.toHaveProperty("proposedOperations");
     expect(second.pendingImage.id).toBe(first.pendingImage.id);
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.final.tool_calls",
+      ["get_bottle_context"],
+    );
     const checks = await db
       .select()
       .from(bottleChecks)
@@ -839,7 +834,6 @@ describe("POST /tastings/photo-identification", () => {
               note: "Evidence is too weak to auto-create this bottle.",
             },
           ],
-          toolsUsed: [],
           webEvidence: "not_used",
         },
       }),
@@ -884,7 +878,6 @@ describe("POST /tastings/photo-identification", () => {
             note: "Keep this proposal in manual review for the test.",
           },
         ],
-        toolsUsed: ["firecrawl_web_search"],
         webEvidence: "supportive",
       },
     });
@@ -946,7 +939,6 @@ describe("POST /tastings/photo-identification", () => {
               note: "The bottle versus bottling model is uncertain.",
             },
           ],
-          toolsUsed: ["initial_local_candidates"],
           webEvidence: "not_used",
         },
       }),

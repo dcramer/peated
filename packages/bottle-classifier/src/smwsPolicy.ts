@@ -530,7 +530,6 @@ export function resolveSmwsExactCaskReference({
       `SMWS exact-cask code ${smwsCode} deterministically identifies the bottle.`,
     ],
     unresolvedRisks: [],
-    toolsUsed: ["initial_local_candidates"],
     webEvidence: "not_needed",
   };
 

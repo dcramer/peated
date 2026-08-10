@@ -124,7 +124,7 @@ const BOTTLE_REFERENCE_INSTRUCTIONS = [
   renderBulletLines([
     "Return only the required structured output.",
     "Always fill `aliasScope`, `identityBasis`, and `confidenceBasis` from evidence actually used.",
-    "List actual `toolsUsed`. Put only action- or target-changing uncertainty in `unresolvedRisks`; any listed risk routes to review.",
+    "Put only action- or target-changing uncertainty in `unresolvedRisks`. Any listed risk routes to review.",
     "Use `observation` and `identityBasis.observationTraits` for source-specific facts that are not canonical Bottle identity.",
     "Verify every selected id belongs to the exact inspected candidate or Entity described by the rationale.",
     "Never invent websites, relationships, release details, proof numbers, or ids.",

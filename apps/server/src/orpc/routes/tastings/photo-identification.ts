@@ -45,6 +45,9 @@ type AuthenticatedContext = Context & {
 type PhotoIdentificationClassification = Awaited<
   ReturnType<typeof runBottleReference>
 >["result"];
+type PhotoIdentificationModelMetadata = Awaited<
+  ReturnType<typeof runBottleReference>
+>["modelMetadata"];
 type PhotoIdentificationAttributeValue =
   | boolean
   | number
@@ -292,6 +295,7 @@ function buildPhotoIdentificationDiagnostics({
 function getClassificationLogAttributes(
   prefix: string,
   classification: PhotoIdentificationClassification,
+  modelMetadata?: PhotoIdentificationModelMetadata,
 ) {
   const candidates = classification.artifacts.candidates;
   const candidateBottleIds = classification.artifacts.candidates
@@ -338,8 +342,9 @@ function getClassificationLogAttributes(
       decision.confidenceBasis.positiveEvidence.length;
     attrs[`${prefix}.confidence_basis_unresolved_risk_count`] =
       decision.confidenceBasis.unresolvedRisks.length;
-    attrs[`${prefix}.confidence_basis_tools_used`] =
-      decision.confidenceBasis.toolsUsed;
+  }
+  if (modelMetadata) {
+    attrs[`${prefix}.tool_calls`] = modelMetadata.toolCalls.names;
   }
   if (decision.rationale) attrs[`${prefix}.reason`] = decision.rationale;
 
@@ -437,6 +442,7 @@ function logPhotoIdentificationOutcome({
   referenceName,
   imageEvidence,
   classification,
+  modelMetadata,
   diagnostics,
   suggestedNextStep,
 }: {
@@ -447,6 +453,7 @@ function logPhotoIdentificationOutcome({
   referenceName: string;
   imageEvidence: z.infer<typeof PhotoIdentificationSchema>["imageEvidence"];
   classification: PhotoIdentificationClassification;
+  modelMetadata: PhotoIdentificationModelMetadata;
   diagnostics: z.infer<typeof PhotoIdentificationDiagnosticsSchema>;
   suggestedNextStep: z.infer<typeof PhotoIdentificationSuggestedNextStepEnum>;
 }) {
@@ -473,6 +480,7 @@ function logPhotoIdentificationOutcome({
       ...getClassificationLogAttributes(
         "photo_identification.final",
         classification,
+        modelMetadata,
       ),
       ...getSearchEvidenceLogAttributes(
         "photo_identification.final",
@@ -635,6 +643,7 @@ export async function identifyPendingImage({
         ...getClassificationLogAttributes(
           "photo_identification.final",
           classification,
+          classificationRun.modelMetadata,
         ),
       });
 
@@ -728,6 +737,7 @@ export default procedure
     const {
       imageEvidence,
       classification,
+      modelMetadata,
       referenceName,
       diagnostics,
       suggestedNextStep,
@@ -740,6 +750,7 @@ export default procedure
       referenceName,
       imageEvidence,
       classification,
+      modelMetadata,
       diagnostics,
       suggestedNextStep,
     });

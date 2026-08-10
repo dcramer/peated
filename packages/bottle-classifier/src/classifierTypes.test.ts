@@ -52,6 +52,20 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     ]);
   });
 
+  test("rejects model-reported tool telemetry", () => {
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse({
+        action: "no_match",
+        confidenceBasis: {
+          positiveEvidence: [],
+          unresolvedRisks: [],
+          toolsUsed: ["search_bottles"],
+          webEvidence: "not_used",
+        },
+      }).success,
+    ).toBe(false);
+  });
+
   test("accepts legacy decisions without alias metadata", () => {
     const decision = BottleClassificationDecisionSchema.parse({
       action: "no_match",
@@ -140,7 +154,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
             note: "new vintage release needs review",
           },
         ],
-        toolsUsed: ["initial_local_candidates"],
         webEvidence: "not_used",
       },
       matchedBottleId: null,

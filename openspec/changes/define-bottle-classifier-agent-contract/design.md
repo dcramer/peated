@@ -118,7 +118,7 @@ Alternative considered: require web evidence for all accepted outcomes. Rejected
 
 ### Decision: Remove numeric confidence; consumers derive gating from evidence
 
-Numeric `confidence` is removed from the agent output contract. The agent's job ends at the identity outcome: `action`, target ids or create drafts, `identityBasis`, and `confidenceBasis` evidence fields (`positiveEvidence`, `unresolvedRisks`, `webEvidence`, `toolsUsed`). Verbalized numeric self-confidence is systematically overconfident and adds a second channel that can disagree with the structured decision, which is why review policy has grown reconciliation caps whose only job is to referee that disagreement.
+Numeric `confidence` is removed from the agent output contract. The agent's job ends at the identity outcome: `action`, target ids or create drafts, `identityBasis`, and `confidenceBasis` evidence fields (`positiveEvidence`, `unresolvedRisks`, `webEvidence`). The runtime records actual tool calls. The model does not report them. Verbalized numeric self-confidence is systematically overconfident and adds a second channel that can disagree with the structured decision, which is why review policy has grown reconciliation caps whose only job is to referee that disagreement.
 
 Whether a decision needs human review is consumer policy, derived in code:
 
@@ -165,7 +165,7 @@ Alternative considered: accept eval improvements case by case without provenance
 - Spec duplicates architecture docs -> Keep the OpenSpec focused on agent-facing SHALL/MUST behavior and reference architecture docs for broader runtime ownership.
 - Prompt cleanup may change model behavior even without schema changes -> Freeze a full eval baseline before any edit, then run fixture validation and focused classifier evals per slice.
 - Consolidating rules can silently drop a behavior a patch rule was carrying -> The contradiction/override inventory names the behavior each patch rule owns before it is folded into the workflow, and eval parity is required per slice.
-- Web evidence wording could make the agent over-search -> Require web use only when needed for create, repair, release, or uncertainty, and score tool use in `confidenceBasis.toolsUsed`.
+- Web evidence wording could make the agent over-search -> Require web use only to create a Bottle or resolve uncertainty. Measure actual runtime tool calls.
 - Common-label naming can become subjective -> Validate with evals that check bottle, release, and observation placement instead of comparing prose rationale.
 - Removing numeric confidence breaks existing consumers -> Stage the migration: consumers move to the derived tier while the numeric field is emitted but ignored, then the field is deleted from the agent schema. Stored proposal columns remain as historical telemetry.
 - Heavy review policy absorbs prompt errors and muddies eval attribution -> Audit `reviewPolicy.ts` transforms against the determinism boundary in `docs/architecture/bottle-classifier.md` and separate gate failures from prompt failures in eval summaries.
