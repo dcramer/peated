@@ -159,7 +159,7 @@ describe("classifier output boundary", () => {
         "propose_merge_entities",
       ]),
     );
-    expect(dynamicInput.reference.externalSiteId).toBe(7);
+    expect(dynamicInput.reference).not.toHaveProperty("externalSiteId");
     expect(dynamicInput).not.toHaveProperty("availableSourceEvidenceFields");
     expect(prepared.getAgentResult(result)).toMatchObject({
       decision: { action: "no_match" },
