@@ -243,89 +243,12 @@ function getComparableNameTokens(value: string | null | undefined): string[] {
     .filter((token) => token.length > 0 && !GENERIC_NAME_TOKENS.has(token));
 }
 
-function getStrictComparableNameTokens(
-  value: string | null | undefined,
-): string[] {
-  return normalizeNameTokenizationText(value)
-    .replace(/\b\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/g, " ")
-    .split(/[^a-z0-9]+/g)
-    .filter((token) => token.length > 0);
-}
-
 function normalizeNameTokenizationText(
   value: string | null | undefined,
 ): string {
   return normalizeComparableText(value)
     .replace(/\b([a-z0-9]+)'s\b/g, "$1s")
     .replace(/\b([a-z0-9]+)s'\b/g, "$1s");
-}
-
-function getReferenceAnchoredCreateTokens({
-  proposedBottle,
-}: {
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-}): string[] {
-  return Array.from(
-    new Set([
-      ...getStrictComparableNameTokens(proposedBottle.brand.name),
-      ...getStrictComparableNameTokens(proposedBottle.series?.name),
-      ...getStrictComparableNameTokens(proposedBottle.name),
-      ...getStrictComparableNameTokens(
-        proposedBottle.releaseYear != null
-          ? String(proposedBottle.releaseYear)
-          : null,
-      ),
-    ]),
-  );
-}
-
-function hasReferenceAnchoredSparseCreateProposal({
-  reference,
-  extractedIdentity,
-  candidates,
-  proposedBottle,
-}: {
-  reference: BottleReference;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  candidates: BottleCandidate[];
-  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-}): boolean {
-  if (extractedIdentity || candidates.length > 0) {
-    return true;
-  }
-
-  const referenceTokens = new Set(
-    getStrictComparableNameTokens(reference.name),
-  );
-  if (!referenceTokens.size) {
-    return false;
-  }
-
-  const brandTokens = getStrictComparableNameTokens(proposedBottle.brand.name);
-  const seriesTokens = getStrictComparableNameTokens(
-    proposedBottle.series?.name,
-  );
-  const nameTokens = getStrictComparableNameTokens(proposedBottle.name);
-  const proposedTokens = getReferenceAnchoredCreateTokens({ proposedBottle });
-  const introducedTokens = proposedTokens.filter(
-    (token) => !referenceTokens.has(token),
-  );
-  const hasAnchoredBrand =
-    brandTokens.length === 0 ||
-    brandTokens.every((token) => referenceTokens.has(token));
-  const hasAnchoredSeries =
-    seriesTokens.length === 0 ||
-    seriesTokens.some((token) => referenceTokens.has(token));
-  const hasAnchoredName = nameTokens.some((token) =>
-    referenceTokens.has(token),
-  );
-
-  return (
-    hasAnchoredBrand &&
-    hasAnchoredSeries &&
-    hasAnchoredName &&
-    introducedTokens.length <= 2
-  );
 }
 
 function getReferenceBottleName({
@@ -1310,28 +1233,6 @@ function sanitizeClassifierDecision({
           ),
         });
       }
-    }
-
-    if (
-      !hasReferenceAnchoredSparseCreateProposal({
-        reference,
-        extractedIdentity: artifacts.extractedIdentity,
-        candidates: artifacts.candidates,
-        proposedBottle: proposedBottleDraft,
-      })
-    ) {
-      return createNoMatchDecision({
-        decision: {
-          ...decision,
-        },
-        candidateBottleIds: filteredCandidateBottleIds,
-        observation,
-        identityScope: "product",
-        rationale: appendRationale(
-          decision.rationale,
-          "Server downgraded create_bottle because the proposed bottle identity expanded too far beyond a sparse unanchored reference.",
-        ),
-      });
     }
 
     return {
