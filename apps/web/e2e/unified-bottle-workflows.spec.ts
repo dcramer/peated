@@ -318,7 +318,8 @@ test.describe("unified Bottle workflows", () => {
     const updateInput = getRpcInput(await updateRequestPromise);
     expect(updateInput).toEqual({
       bottle: existingBottleId,
-      exact: { edition: "Cask 43", statedAge: 22 },
+      edition: "Cask 43",
+      statedAge: 22,
     });
     await expectNoHorizontalOverflow(page);
   });
