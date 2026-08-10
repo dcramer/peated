@@ -664,7 +664,6 @@ export async function prepareBottleClassifierAgentRun(
     initialCandidates,
     currentBottle,
     hasExactAliasMatch,
-    candidateExpansion,
     searchEvidence: state.searchEvidence,
     resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
     investigationHint,

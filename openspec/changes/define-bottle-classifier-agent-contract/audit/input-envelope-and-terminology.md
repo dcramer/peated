@@ -7,12 +7,10 @@ terminology used across the classifier prompt
 (`tools/searchBottles.ts`, `tools/searchEntities.ts`), the output schema
 (`classifierTypes.ts`), and the input envelope.
 
-Prompt-side semantics referenced below come from
-`BOTTLE_CLASSIFIER_INSTRUCTIONS` (`instructions.ts:664-789`) unless noted.
-`buildBottleClassifierInstructions` **ignores** its `hasBottleSearch`,
-`hasEntitySearch`, and `maxSearchQueries` arguments
-(`instructions.ts:791-798`, `void _options`), so the prompt text is identical
-for every non-`local_identification` run regardless of the attached tools.
+Prompt-side semantics referenced below describe the state at the time of the
+audit. Later hard-cut slices removed release fields, model-reported tool
+telemetry, dead instruction-builder options, and the local-identification pass.
+Current resolutions are marked where they affect this audit.
 
 ---
 
@@ -22,7 +20,6 @@ Serialized shape (from `agentInput.ts:42-70`):
 
 ```
 reference: { name, url, imageUrl, currentBottleId }
-candidateExpansion
 currentBottle
 extractedIdentity
 imageEvidence
@@ -46,11 +43,11 @@ Legend for **Prompt explanation**: quote + `instructions.ts` line, or **NONE**.
 | `reference.currentBottleId` (`:49`)  | Partial: `current_assignment` band "only when cleanly reaffirming the current bottle/release assignment" (`:762`). Field name never tied to the band. | Model may not connect this id to `confidenceBasis.band = current_assignment` or to the hydrated `currentBottle`.                                                                                | **EXPLAIN** — "`reference.currentBottleId`/`currentReleaseId` is the reference's existing Peated assignment; reaffirming it is `current_assignment` evidence." |
 | `reference.currentReleaseId` (`:50`) | Partial (as above).                                                                                                                                   | As above.                                                                                                                                                                                       | **EXPLAIN** (same one-liner).                                                                                                                                  |
 
-### `candidateExpansion` (`agentInput.ts:52`)
+### `candidateExpansion` (removed)
 
-| Field                                             | Prompt explanation | Misread risk                                                                                                                                                                                                                         | Verdict                                                                                                                                                                                                          |
-| ------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `candidateExpansion` (`"initial_only" \| "open"`) | NONE.              | An internal mode flag that governs **tool attachment in code** (`classifierRuntime.ts:924,940-987`), not model behavior. Model may try to interpret it, or (worse) in `initial_only` it does not tell the model that tools are gone. | **REMOVE** from the envelope. Tool availability is already expressed by the attached tool set; the mode belongs in the (currently static) instructions, not as a data field the model must decode. (See Part C.) |
+| Field                                             | Prompt explanation | Misread risk                                                                             | Verdict                                                                                                                                                |
+| ------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `candidateExpansion` (`"initial_only" \| "open"`) | NONE.              | This runtime flag controls which search tools are attached. It is not identity evidence. | **REMOVED** — the caller and runtime still use the flag, but the model no longer receives it. Tool availability is expressed by the attached tool set. |
 
 ### `currentBottle` (`agentInput.ts:53`)
 
@@ -289,75 +286,18 @@ term (prefer the schema field name), and a one-line glossary definition.
 
 ## C. Tool-surface consistency
 
-`buildBottleClassifierInstructions` returns the same static string for both
-`open` and `initial_only` runs and **ignores** `hasBottleSearch`/`hasEntitySearch`
-(`instructions.ts:791-798`). Tool attachment is decided separately in
-`classifierRuntime.ts:924-987`. This produces the following mismatches.
+The instruction string stays static for prompt caching. Tool descriptions state
+the capability of each attached tool. The prompt now tells the model to use a
+search tool only when that tool is attached to the run.
 
-### C1. `initial_only` runs the full prompt with zero tools
+`candidateExpansion = initial_only` omits Bottle, Entity, and web search. It can
+still attach Bottle and Entity context tools for ids that the model already
+knows. The runtime-only expansion mode no longer appears in the model input.
 
-- Code: `allowCandidateExpansion = candidateExpansion === "open"`
-  (`classifierRuntime.ts:924`); `const tools = allowCandidateExpansion ? [ … ] : []`
-  (`:940-987`). So `initial_only` attaches **no tools at all**.
-- Yet the prompt still directs tool use:
-  - "Use local candidates first; use web search for disputed, missing, or
-    create-critical traits. … search contrastively …" (`instructions.ts:676`).
-  - "Creation requires supportive web evidence and a local candidate check …
-    rerun local search when web evidence reveals a decisive trait …"
-    (`instructions.ts:677`).
-  - "rerun local search when web evidence reveals a decisive trait not already
-    covered by provided candidates" (`:677`).
-  - "List only tools actually used in `confidenceBasis.toolsUsed`" (`:764`) with
-    an enum offering `search_bottles`/`openai_web_search`/`firecrawl_web_search`
-    (`classifierTypes.ts:475-483`).
-- This violates spec `:232-235` ("SHALL NOT direct the model to call tools that
-  are not attached").
-- **Resolution (static per mode):** add a distinct static instruction constant
-  for `initial_only` (mirroring how `local_identification` already branches at
-  `classifierRuntime.ts:930-938`) whose evidence/tool section says: "No retrieval
-  tools are available on this pass. Decide only from the provided envelope
-  (`localSearch.candidates`, `webEvidence.results`, `extractedIdentity`,
-  `imageEvidence`). If a decisive trait is unverifiable from the envelope, return
-  `no_match` rather than assuming a search you cannot run." Set
-  `toolsUsed = ["initial_local_candidates"]` expectations accordingly.
+Open runs can attach `search_bottles`, optional `search_entities`, and optional
+Firecrawl tools. The model no longer reports tool telemetry. The runtime records
+actual tool calls.
 
-### C2. Entity search is optional but the prompt is fixed
-
-- Code: `search_entities` attaches only when `dataSource.searchEntities` exists
-  **and** `allowCandidateExpansion` (`classifierRuntime.ts:937, :950-961`).
-- The prompt body never directs `search_entities` use (only the tool's own
-  description does, `tools/searchEntities.ts:13-14`), yet
-  `confidenceBasis.toolsUsed` lists `search_entities` (`classifierTypes.ts:479`)
-  and `localEntitySearch.results` is always serialized (`agentInput.ts:63-65`)
-  even when the tool is absent.
-- **Resolution:** keep entity guidance out of the static prose (it is fine to
-  rely on the tool description), but make the input map state that
-  `localEntitySearch.results` may be present as preloaded evidence, and that the
-  `search_entities` tool "may or may not be attached — use it only if listed in
-  your tool set." Do not name `search_entities` in `toolsUsed` guidance for the
-  `initial_only`/no-entity modes.
-
-### C3. firecrawl vs openai web search — exactly one, model-blind
-
-- Code: firecrawl attaches when `firecrawlApiKey` is set
-  (`classifierRuntime.ts:962-973`); openai attaches only when
-  `!useFirecrawlWebSearch`, i.e. when firecrawl is absent
-  (`:928-929, :974-985`). So in `open` mode exactly one web tool is present; in
-  `initial_only` neither is present.
-- The prompt says generic "web search" and the `toolsUsed` enum offers **both**
-  `openai_web_search` and `firecrawl_web_search` (`classifierTypes.ts:475-483`),
-  so the model must name a provider it cannot see chosen.
-- **Resolution:** the prompt should refer only to "the web search tool"
-  generically (it already mostly does) and instruct the model to report the web
-  tool by whatever name appears in its attached tool set; do not enumerate both
-  provider names as if the model chooses. The provider distinction is a code
-  concern and can be normalized post-hoc when recording `toolsUsed`.
-
-### Tool-surface mismatch tally
-
-**3 tool-surface mismatches**: (C1) full prompt + zero tools on `initial_only`;
-(C2) fixed prompt/`toolsUsed`/`localEntitySearch` regardless of whether
-`search_entities` is attached; (C3) both web-provider tool names exposed while
-only one (or none) is attached. Root cause for all three: `instructions.ts:795-797`
-discards the tool-surface flags the runtime already computes, so the prompt is
-never reconciled with the attached tool set.
+**Current mismatch tally: 0.** The static instructions are valid for both tool
+surfaces because each search instruction is conditional on that tool being
+attached.

@@ -24,7 +24,6 @@ export function buildAgentInput({
   initialCandidates,
   currentBottle,
   hasExactAliasMatch,
-  candidateExpansion,
   searchEvidence = [],
   resolvedEntities = [],
   investigationHint = null,
@@ -36,7 +35,6 @@ export function buildAgentInput({
   initialCandidates: BottleCandidate[];
   currentBottle: BottleCandidate | null;
   hasExactAliasMatch: boolean;
-  candidateExpansion: "initial_only" | "open";
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
   investigationHint?: string | null;
@@ -55,7 +53,6 @@ export function buildAgentInput({
         imageUrl: reference.imageUrl ?? null,
         currentBottleId: reference.currentBottleId ?? null,
       },
-      candidateExpansion,
       currentBottle: currentBottle
         ? AgentBottleCandidateSchema.parse(currentBottle)
         : null,
