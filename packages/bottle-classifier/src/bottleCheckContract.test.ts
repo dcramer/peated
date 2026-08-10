@@ -4,7 +4,7 @@ import {
   AuditBottleInputSchema,
   AuditBottleResultSchema,
   BottleOperationEntityChoiceSchema,
-  BottleSharedPatchSchema,
+  BottlePatchSchema,
   EvidenceRefSchema,
   FindingSchema,
   ProposedOperationSchema,
@@ -49,22 +49,18 @@ describe("bottle check public contract", () => {
         input: {
           bottleId: 42,
           patch: {
-            shared: {
-              name: "Cairdeas 2022 Warehouse 1",
-              brand: { kind: "existing", entityId: 10 },
-              bottler: {
-                kind: "create",
-                entity: {
-                  name: "Example Bottler",
-                  roles: ["bottler"],
-                  country: "Scotland",
-                },
+            name: "Cairdeas 2022 Warehouse 1",
+            brand: { kind: "existing", entityId: 10 },
+            bottler: {
+              kind: "create",
+              entity: {
+                name: "Example Bottler",
+                roles: ["bottler"],
+                country: "Scotland",
               },
             },
-            exact: {
-              releaseYear: 2022,
-              abv: 52.2,
-            },
+            releaseYear: 2022,
+            abv: 52.2,
           },
         },
         rationale: "The catalog row combines the release with the wrong Brand.",
@@ -125,7 +121,7 @@ describe("bottle check public contract", () => {
         type: "update_bottle",
         input: {
           bottleId: 42,
-          patch: { shared: { description: "Model-authored content" } },
+          patch: { description: "Model-authored content" },
         },
         rationale: "Change presentation content.",
         evidenceRefs,
@@ -166,11 +162,11 @@ describe("bottle check public contract", () => {
     ).toBe(false);
   });
 
-  test("preserves omission and null in the shared stated-age patch", () => {
-    const omitted = BottleSharedPatchSchema.parse({
+  test("preserves omission and null in the flat Bottle patch", () => {
+    const omitted = BottlePatchSchema.parse({
       name: "Cairdeas 2022 Warehouse 1",
     });
-    const cleared = BottleSharedPatchSchema.parse({
+    const cleared = BottlePatchSchema.parse({
       statedAge: null,
       seriesId: null,
     });

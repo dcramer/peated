@@ -92,7 +92,7 @@ function updateBottleAbvProposal(
 ): ProposedOperation {
   return {
     type: "update_bottle",
-    input: { bottleId, patch: { exact: { abv } } },
+    input: { bottleId, patch: { abv } },
     rationale: "The inspected label confirms the Bottle ABV.",
     evidenceRefs: [{ kind: "bottle", bottleId }],
   };
@@ -107,7 +107,7 @@ function updateBottleBrandProposal(
     input: {
       bottleId,
       patch: {
-        shared: { brand: { kind: "existing", entityId: brandId } },
+        brand: { kind: "existing", entityId: brandId },
       },
     },
     rationale: "The inspected catalog records confirm the canonical Brand.",

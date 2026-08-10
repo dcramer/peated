@@ -549,14 +549,18 @@ function getEditableFields(
     return Object.keys(proposal.input.patch) as ExcludedOperationField[];
   }
   if (proposal.type === "update_bottle") {
-    return [
-      ...Object.keys(proposal.input.patch.shared ?? {}).map(
-        (field) => `shared.${field}` as ExcludedOperationField,
-      ),
-      ...Object.keys(proposal.input.patch.exact ?? {}).map(
-        (field) => `exact.${field}` as ExcludedOperationField,
-      ),
-    ];
+    const sharedFields = new Set([
+      "name",
+      "seriesId",
+      "category",
+      "brand",
+      "distillers",
+      "bottler",
+    ]);
+    return Object.keys(proposal.input.patch).map(
+      (field) =>
+        `${sharedFields.has(field) ? "shared" : "exact"}.${field}` as ExcludedOperationField,
+    );
   }
   return [];
 }

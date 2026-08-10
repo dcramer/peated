@@ -18,7 +18,6 @@ import {
   createOrReuseBottleInTransaction,
 } from "@peated/server/lib/createBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { updateBottle } from "@peated/server/lib/updateBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq } from "drizzle-orm";
 import { vi } from "vitest";
@@ -238,19 +237,6 @@ describe("Bottle creation", () => {
     expect(created.bottle.fullName).toBe(
       "Classifier Exact Age Brand Speyside 12-year-old",
     );
-
-    const rematerialized = await updateBottle({
-      bottleId: created.bottle.id,
-      input: { shared: { statedAge: 15 } },
-      context: contextFor(mod),
-    });
-
-    expect(rematerialized.group.statedAge).toBe(15);
-    expect(rematerialized.bottle).toMatchObject({
-      name: "Speyside 12-year-old",
-      fullName: "Classifier Exact Age Brand Speyside 12-year-old",
-      statedAge: 12,
-    });
   });
 
   test("normalizes age wording without inferring structured age ownership", async ({

@@ -142,13 +142,11 @@ describe("Bottle operation review preparation", () => {
             input: {
               bottleId: bottleToUpdate.id,
               patch: {
-                shared: {
-                  brand: {
-                    kind: "create",
-                    entity: {
-                      name: "Review Created Brand",
-                      roles: ["brand"],
-                    },
+                brand: {
+                  kind: "create",
+                  entity: {
+                    name: "Review Created Brand",
+                    roles: ["brand"],
                   },
                 },
               },
@@ -289,10 +287,8 @@ describe("Bottle operation review preparation", () => {
           input: {
             bottleId: bottle.id,
             patch: {
-              shared: {
-                category: "single_malt",
-                distillers: [{ kind: "existing", entityId: distiller.id }],
-              },
+              category: "single_malt",
+              distillers: [{ kind: "existing", entityId: distiller.id }],
             },
           },
           rationale:
@@ -730,7 +726,7 @@ describe("Bottle operation review preparation", () => {
             type: "update_bottle",
             input: {
               bottleId: discoveredBottle.id,
-              patch: { exact: { edition: "Candidate Only" } },
+              patch: { edition: "Candidate Only" },
             },
             rationale: "A search candidate is not a fully inspected target.",
             evidenceRefs: [{ kind: "bottle", bottleId: discoveredBottle.id }],
@@ -742,7 +738,7 @@ describe("Bottle operation review preparation", () => {
             type: "update_bottle",
             input: {
               bottleId: inspectedBottle.id,
-              patch: { exact: { edition: "Inspected Target" } },
+              patch: { edition: "Inspected Target" },
             },
             rationale:
               "Collected candidate evidence may support another target.",
@@ -849,7 +845,7 @@ describe("Bottle operation review preparation", () => {
         type: "update_bottle",
         input: {
           bottleId: bottle.id,
-          patch: { exact: { edition: "Claimable Edition" } },
+          patch: { edition: "Claimable Edition" },
         },
         rationale: "The inspected evidence confirms this edition.",
         evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
@@ -963,7 +959,7 @@ describe("Bottle operation review preparation", () => {
             type: "update_bottle",
             input: {
               bottleId: bottleToSet.id,
-              patch: { shared: { seriesId: series.id } },
+              patch: { seriesId: series.id },
             },
             rationale: "The inspected catalog context identifies the series.",
             evidenceRefs: [{ kind: "bottle", bottleId: bottleToSet.id }],
@@ -975,7 +971,7 @@ describe("Bottle operation review preparation", () => {
             type: "update_bottle",
             input: {
               bottleId: bottleToClear.id,
-              patch: { shared: { seriesId: null } },
+              patch: { seriesId: null },
             },
             rationale: "The inspected Bottle is not part of this series.",
             evidenceRefs: [{ kind: "bottle", bottleId: bottleToClear.id }],
@@ -1030,9 +1026,7 @@ describe("Bottle operation review preparation", () => {
           input: {
             bottleId: bottle.id,
             patch: {
-              shared: {
-                brand: { kind: "existing", entityId: proposedBrand.id },
-              },
+              brand: { kind: "existing", entityId: proposedBrand.id },
             },
           },
           rationale: "Moves the Bottle to the inspected Brand.",
@@ -1086,7 +1080,7 @@ describe("Bottle operation review preparation", () => {
             type: "update_bottle",
             input: {
               bottleId: firstBottle.id,
-              patch: { shared: { name: "First Shared Name" } },
+              patch: { name: "First Shared Name" },
             },
             rationale: "First write to shared authority.",
             evidenceRefs: [{ kind: "bottle", bottleId: firstBottle.id }],
@@ -1098,23 +1092,17 @@ describe("Bottle operation review preparation", () => {
             type: "update_bottle",
             input: {
               bottleId: sibling.id,
-              patch: { shared: { statedAge: 12 } },
+              patch: { statedAge: 12 },
             },
-            rationale: "Writes the age that shared name normalization owns.",
+            rationale: "Writes the selected Bottle age.",
             evidenceRefs: [{ kind: "bottle", bottleId: sibling.id }],
           },
         },
       ],
     });
     expect(siblingResult).toEqual([
-      expect.objectContaining({
-        status: "blocked",
-        preparationError: expect.objectContaining({ code: "direct_conflict" }),
-      }),
-      expect.objectContaining({
-        status: "blocked",
-        preparationError: expect.objectContaining({ code: "direct_conflict" }),
-      }),
+      expect.objectContaining({ status: "pending_review" }),
+      expect.objectContaining({ status: "pending_review" }),
     ]);
 
     const destinationIdentityConflict = await prepareOperations({
@@ -1304,7 +1292,7 @@ describe("Bottle operation review preparation", () => {
             type: "update_bottle",
             input: {
               bottleId: source.id,
-              patch: { exact: { abv: 51.2 } },
+              patch: { abv: 51.2 },
             },
             rationale: "Corrects the malformed duplicate row.",
             evidenceRefs: [{ kind: "bottle", bottleId: source.id }],
@@ -1500,7 +1488,7 @@ describe("Bottle operation review preparation", () => {
         type: "update_bottle",
         input: {
           bottleId: bottle.id,
-          patch: { shared: { name: "Name Token After" } },
+          patch: { name: "Name Token After" },
         },
         rationale: "Repairs the shared Bottle name.",
         evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
@@ -1543,7 +1531,7 @@ describe("Bottle operation review preparation", () => {
         type: "update_bottle",
         input: {
           bottleId: bottle.id,
-          patch: { shared: { category: "single_malt" } },
+          patch: { category: "single_malt" },
         },
         rationale: "Repairs a shared category.",
         evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
@@ -1686,13 +1674,11 @@ describe("Bottle operation review preparation", () => {
           input: {
             bottleId: bottle.id,
             patch: {
-              shared: {
-                distillers: [
-                  { kind: "existing", entityId: secondDistiller.id },
-                  { kind: "existing", entityId: firstDistiller.id },
-                  { kind: "existing", entityId: secondDistiller.id },
-                ],
-              },
+              distillers: [
+                { kind: "existing", entityId: secondDistiller.id },
+                { kind: "existing", entityId: firstDistiller.id },
+                { kind: "existing", entityId: secondDistiller.id },
+              ],
             },
           },
           rationale: "Only reorders and duplicates the same distiller set.",
@@ -1858,7 +1844,7 @@ describe("Bottle operation review preparation", () => {
           type: "update_bottle",
           input: {
             bottleId: primary.id,
-            patch: { exact: { edition: "Corrected Edition" } },
+            patch: { edition: "Corrected Edition" },
           },
           rationale: "The primary Bottle needs a supported field correction.",
           evidenceRefs: [{ kind: "bottle", bottleId: primary.id }],

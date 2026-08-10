@@ -17,11 +17,12 @@ import {
   materializeBottleIdentity,
 } from "@peated/server/lib/bottleIdentity";
 import {
-  BottleUpdateInputSchema,
-  type BottleUpdateInput,
+  BottlePatchSchema,
+  type BottlePatch,
 } from "@peated/server/lib/bottleSchemas";
 import { formatBottleName } from "@peated/server/lib/format";
 import {
+  bottleStoragePatch,
   bottleUpdateExpectedSelectedBottleState,
   bottleUpdateExpectedSharedState,
 } from "@peated/server/lib/updateBottle";
@@ -258,13 +259,24 @@ function relevantBottleUpdateToken({
   referencedSeries: BottleSeries[];
   relationshipDigest?: string;
 }) {
-  const sharedFields = proposal.input.patch.shared
-    ? new Set(Object.keys(proposal.input.patch.shared))
-    : null;
-  if (sharedFields?.has("name")) {
+  const patchFields = Object.keys(proposal.input.patch);
+  const requestedSharedFields = new Set(
+    patchFields.filter((field) =>
+      [
+        "name",
+        "category",
+        "seriesId",
+        "brand",
+        "distillers",
+        "bottler",
+      ].includes(field),
+    ),
+  );
+  const sharedFields = new Set(requestedSharedFields);
+  if (sharedFields.has("name")) {
     sharedFields.add("statedAge");
   }
-  const shared = sharedFields
+  const shared = sharedFields.size
     ? Object.fromEntries(
         [...sharedFields].map((field) => {
           switch (field) {
@@ -286,9 +298,12 @@ function relevantBottleUpdateToken({
       )
     : undefined;
   const currentExact = bottleExact(resource);
-  const exact = proposal.input.patch.exact
+  const exactFields = patchFields.filter(
+    (field) => !requestedSharedFields.has(field),
+  );
+  const exact = exactFields.length
     ? Object.fromEntries(
-        Object.keys(proposal.input.patch.exact).map((field) => [
+        exactFields.map((field) => [
           field,
           currentExact[field as keyof typeof currentExact],
         ]),
@@ -396,14 +411,14 @@ export async function prepareBottleUpdate(
       roles: sortedRoles(resource.brand.type),
     },
   };
-  if (proposal.input.patch.shared?.brand) {
+  if (proposal.input.patch.brand) {
     brand = await resolveEntityChoice({
-      choice: proposal.input.patch.shared.brand,
+      choice: proposal.input.patch.brand,
       requiredRole: "brand",
       context,
     });
   }
-  if (brand.dependency && proposal.input.patch.shared !== undefined) {
+  if (brand.dependency && proposal.input.patch.brand !== undefined) {
     referencedEntities.push(brand.dependency);
   }
   if (brand.preview.kind === "create") entityCreations.push(brand.preview);
@@ -415,11 +430,11 @@ export async function prepareBottleUpdate(
         canonical: null;
         dependency: null;
       };
-  if (proposal.input.patch.shared?.bottler === null) {
+  if (proposal.input.patch.bottler === null) {
     bottler = { preview: null, canonical: null, dependency: null };
-  } else if (proposal.input.patch.shared?.bottler) {
+  } else if (proposal.input.patch.bottler) {
     bottler = await resolveEntityChoice({
-      choice: proposal.input.patch.shared.bottler,
+      choice: proposal.input.patch.bottler,
       requiredRole: "bottler",
       context,
     });
@@ -437,10 +452,7 @@ export async function prepareBottleUpdate(
   } else {
     bottler = { preview: null, canonical: null, dependency: null };
   }
-  if (
-    bottler.dependency &&
-    proposal.input.patch.shared?.bottler !== undefined
-  ) {
+  if (bottler.dependency && proposal.input.patch.bottler !== undefined) {
     referencedEntities.push(bottler.dependency);
   }
   if (bottler.preview?.kind === "create") {
@@ -448,8 +460,8 @@ export async function prepareBottleUpdate(
   }
 
   const proposedDistillers: ResolvedEntityChoice[] = [];
-  if (proposal.input.patch.shared?.distillers) {
-    for (const choice of proposal.input.patch.shared.distillers) {
+  if (proposal.input.patch.distillers) {
+    for (const choice of proposal.input.patch.distillers) {
       proposedDistillers.push(
         await resolveEntityChoice({
           choice,
@@ -474,10 +486,7 @@ export async function prepareBottleUpdate(
   }
   const distillers = normalizeResolvedEntityChoices(proposedDistillers);
   for (const distiller of distillers) {
-    if (
-      distiller.dependency &&
-      proposal.input.patch.shared?.distillers !== undefined
-    ) {
+    if (distiller.dependency && proposal.input.patch.distillers !== undefined) {
       referencedEntities.push(distiller.dependency);
     }
     if (distiller.preview.kind === "create") {
@@ -487,11 +496,11 @@ export async function prepareBottleUpdate(
 
   const referencedSeries: BottleSeries[] = [];
   let seriesId = resource.group.seriesId;
-  const seriesTouched = proposal.input.patch.shared?.seriesId !== undefined;
-  const brandTouched = proposal.input.patch.shared?.brand !== undefined;
+  const seriesTouched = proposal.input.patch.seriesId !== undefined;
+  const brandTouched = proposal.input.patch.brand !== undefined;
   if (seriesTouched || brandTouched) {
     if (seriesTouched) {
-      seriesId = proposal.input.patch.shared?.seriesId ?? null;
+      seriesId = proposal.input.patch.seriesId ?? null;
     }
     if (seriesId !== null) {
       if (seriesTouched && !context.inspectedSeriesIds.has(seriesId)) {
@@ -530,59 +539,42 @@ export async function prepareBottleUpdate(
     }
   }
 
-  const canonicalSharedPatch = proposal.input.patch.shared
-    ? { ...proposal.input.patch.shared }
-    : undefined;
-  if (canonicalSharedPatch) {
-    delete canonicalSharedPatch.seriesId;
-    delete canonicalSharedPatch.brand;
-    delete canonicalSharedPatch.bottler;
-    delete canonicalSharedPatch.distillers;
-  }
-  const canonicalInput: BottleUpdateInput = BottleUpdateInputSchema.parse({
-    ...(proposal.input.patch.shared
-      ? {
-          shared: {
-            ...canonicalSharedPatch,
-            ...(proposal.input.patch.shared.seriesId !== undefined
-              ? { series: seriesId }
-              : {}),
-            ...(proposal.input.patch.shared.brand !== undefined
-              ? { brand: brand.canonical }
-              : {}),
-            ...(proposal.input.patch.shared.bottler !== undefined
-              ? { bottler: bottler.canonical }
-              : {}),
-            ...(proposal.input.patch.shared.distillers !== undefined
-              ? {
-                  distillers: distillers.map(({ canonical }) => canonical),
-                }
-              : {}),
-          },
-        }
+  const {
+    seriesId: _seriesId,
+    brand: _brand,
+    bottler: _bottler,
+    distillers: _distillers,
+    ...plainPatch
+  } = proposal.input.patch;
+  const canonicalInput: BottlePatch = BottlePatchSchema.parse({
+    ...plainPatch,
+    ...(proposal.input.patch.seriesId !== undefined
+      ? { series: seriesId }
       : {}),
-    ...(proposal.input.patch.exact
-      ? { exact: proposal.input.patch.exact }
+    ...(proposal.input.patch.brand !== undefined
+      ? { brand: brand.canonical }
+      : {}),
+    ...(proposal.input.patch.bottler !== undefined
+      ? { bottler: bottler.canonical }
+      : {}),
+    ...(proposal.input.patch.distillers !== undefined
+      ? { distillers: distillers.map(({ canonical }) => canonical) }
       : {}),
   });
+  const storage = bottleStoragePatch(canonicalInput);
 
   let sharedName =
-    canonicalInput.shared?.name === undefined
+    storage.shared?.name === undefined
       ? resource.group.name
-      : canonicalInput.shared.name;
-  let sharedStatedAge =
-    canonicalInput.shared?.statedAge === undefined
-      ? resource.group.statedAge
-      : canonicalInput.shared.statedAge;
-  if (canonicalInput.shared?.name !== undefined) {
+      : storage.shared.name;
+  let sharedStatedAge = resource.group.statedAge;
+  if (storage.shared?.name !== undefined) {
     const normalized = normalizeBottleAge({
-      name: normalizeBottleAliasKey(canonicalInput.shared.name),
+      name: normalizeBottleAliasKey(storage.shared.name),
       statedAge: sharedStatedAge,
     });
     sharedName = normalized.name;
-    if (canonicalInput.shared.statedAge === undefined) {
-      sharedStatedAge = normalized.statedAge;
-    }
+    sharedStatedAge = normalized.statedAge;
   }
   const brandName =
     brand.preview.kind === "existing"
@@ -605,7 +597,7 @@ export async function prepareBottleUpdate(
   const exactAfter = getBottleExactIdentity({
     bottle: resource.bottle,
     sourceGroupStatedAge: resource.group.statedAge,
-    exactPatch: canonicalInput.exact,
+    exactPatch: storage.exact,
   });
   const materialized = materializeBottleIdentity({
     stable: {
@@ -624,9 +616,9 @@ export async function prepareBottleUpdate(
       statedAge: sharedStatedAge,
       seriesId,
       category:
-        canonicalInput.shared?.category === undefined
+        storage.shared?.category === undefined
           ? resource.group.category
-          : canonicalInput.shared.category,
+          : storage.shared.category,
       brand: brand.preview,
       distillers: distillers.map(({ preview }) => preview),
       bottler: bottler.preview,
@@ -711,7 +703,7 @@ export async function prepareBottleUpdate(
     proposal,
     referencedEntities,
     referencedSeries,
-    relationshipDigest: proposal.input.patch.shared
+    relationshipDigest: storage.shared
       ? relationshipDigest(
           await relationshipStateForGroups(context.database, [
             resource.group.id,
@@ -741,7 +733,7 @@ export async function prepareBottleUpdate(
       expectedSelectedBottleState: bottleUpdateExpectedSelectedBottleState(
         resource.bottle,
       ),
-      ...(proposal.input.patch.shared
+      ...(storage.shared
         ? {
             expectedSharedState: bottleUpdateExpectedSharedState({
               group: resource.group,

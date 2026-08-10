@@ -10,7 +10,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { buildBottleUpdateInput } from "./buildBottleUpdateInput";
+import { buildBottlePatch } from "./buildBottlePatch";
 
 export default function Page(props: { params: Promise<{ bottleId: string }> }) {
   const params = use(props.params);
@@ -48,10 +48,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
         const { image } = value;
         await bottleUpdateMutation.mutateAsync({
           bottle: context.bottleId,
-          ...buildBottleUpdateInput(value, meta, {
-            statedAgeScope:
-              context.exact.statedAge === null ? "shared" : "exact",
-          }),
+          ...buildBottlePatch(value, meta),
         });
 
         if (image) {

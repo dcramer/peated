@@ -136,9 +136,7 @@
         "input": {
           "bottleId": 45174,
           "patch": {
-            "exact": {
-              "vintageYear": 2019
-            }
+            "vintageYear": 2019
           }
         },
         "rationale": "The public label explicitly states a 2019 distillation date. The available normalized evidence does not reliably establish an exact cask number or support changing the stored shared name.",

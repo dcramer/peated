@@ -73,7 +73,7 @@ describe("verifyBottleCreation", () => {
             type: "update_bottle",
             input: {
               bottleId: bottle.id,
-              patch: { exact: { edition: "Audited Edition" } },
+              patch: { edition: "Audited Edition" },
             },
             rationale: "The inspected Bottle has a missing edition.",
             evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],

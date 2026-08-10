@@ -26,8 +26,10 @@ manual creation with supported label fields and the pending photo. The
 
 ## Editing
 
-- Add and edit use one Bottle form with explicit shared-versus-exact
-  field ownership.
+- Add and edit use one Bottle form and flat Bottle input. The server owns field
+  storage and shared fan-out.
+- A stated-age edit changes the selected Bottle. The client does not select an
+  age storage scope.
 - An exact edit changes only the selected Bottle and its exact aliases.
 - A shared edit updates the BottleGroup and atomically rematerializes every
   member Bottle while preserving exact fields and aliases.

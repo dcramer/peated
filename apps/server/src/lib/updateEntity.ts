@@ -343,7 +343,7 @@ export async function updateEntityInTransaction(
         bottleUpdates.push(
           await updateBottleInTransaction(transaction, {
             bottleId: group.representativeBottleId,
-            input: { shared: { brand: newEntity.id } },
+            input: { brand: newEntity.id },
             user,
             actorId,
             creationSource: "manual_entry",

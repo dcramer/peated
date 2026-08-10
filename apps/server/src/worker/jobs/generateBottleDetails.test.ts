@@ -233,13 +233,11 @@ test("preserves a concurrent moderator exact-content edit", async ({
   await updateBottle({
     bottleId: source.bottle.id,
     input: {
-      exact: {
-        description: "Moderator description",
-        tastingNotes: {
-          nose: "Moderator nose",
-          palate: "Moderator palate",
-          finish: "Moderator finish",
-        },
+      description: "Moderator description",
+      tastingNotes: {
+        nose: "Moderator nose",
+        palate: "Moderator palate",
+        finish: "Moderator finish",
       },
     },
     context: contextFor(mod),
@@ -288,10 +286,8 @@ test("discards generated work planned from stale exact identity", async ({
   await updateBottle({
     bottleId: source.bottle.id,
     input: {
-      exact: {
-        edition: "Moderator Edition",
-        statedAge: 12,
-      },
+      edition: "Moderator Edition",
+      statedAge: 12,
     },
     context: contextFor(mod),
   });
@@ -346,7 +342,7 @@ test("preserves a concurrent moderator shared-flavor edit", async ({
 
   await updateBottle({
     bottleId: source.bottle.id,
-    input: { shared: { flavorProfile: "lightly_peated" } },
+    input: { flavorProfile: "lightly_peated" },
     context: contextFor(mod),
   });
   vi.mocked(workerClient.pushUniqueJob).mockClear();

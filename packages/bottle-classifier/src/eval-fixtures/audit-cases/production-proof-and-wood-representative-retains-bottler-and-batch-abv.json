@@ -165,10 +165,8 @@
         "input": {
           "bottleId": 45249,
           "patch": {
-            "exact": {
-              "caskStrength": true,
-              "singleCask": false
-            }
+            "caskStrength": true,
+            "singleCask": false
           }
         },
         "rationale": "Product evidence consistently markets The Representative as barrel proof and describes it as a blend of approximately 20 barrels. It also establishes Proof and Wood's bottler role, while differing ABVs for other batches do not contradict this exact Bottle's stored 57.97% ABV.",

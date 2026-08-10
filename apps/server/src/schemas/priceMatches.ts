@@ -174,13 +174,7 @@ export const ProposedBottleSchema = z.object({
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
 });
 
-/**
- * Persisted classifier repair drafts mark exact Bottle age ownership. Older
- * correction rows omit the marker and retain their legacy shared-age meaning.
- */
-export const StorePriceBottleRepairDraftSchema = ProposedBottleSchema.extend({
-  statedAgeScope: z.literal("exact").optional(),
-});
+export const StorePriceBottleRepairDraftSchema = ProposedBottleSchema;
 
 const StorePriceMatchDecisionBaseSchema = z
   .object({

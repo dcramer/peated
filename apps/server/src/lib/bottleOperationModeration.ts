@@ -370,17 +370,19 @@ function proposalWithoutExcludedFields(
     });
   }
 
-  const shared = proposal.input.patch.shared
-    ? { ...proposal.input.patch.shared }
-    : undefined;
-  const exact = proposal.input.patch.exact
-    ? { ...proposal.input.patch.exact }
-    : undefined;
+  const patch = { ...proposal.input.patch };
+  const sharedFields = new Set([
+    "name",
+    "category",
+    "seriesId",
+    "brand",
+    "distillers",
+    "bottler",
+  ]);
   for (const field of excluded) {
     const [scope, name, extra] = field.split(".");
-    const patch =
-      scope === "shared" ? shared : scope === "exact" ? exact : null;
-    if (!patch || !name || extra || !(name in patch)) {
+    const expectedScope = name && sharedFields.has(name) ? "shared" : "exact";
+    if (scope !== expectedScope || !name || extra || !(name in patch)) {
       throw new BottleOperationActionError(
         `Field ${field} is not part of Bottle operation ${operation.id}.`,
         operation.status,
@@ -388,11 +390,7 @@ function proposalWithoutExcludedFields(
     }
     delete patch[name as keyof typeof patch];
   }
-  const filteredPatch = {
-    ...(shared && Object.keys(shared).length > 0 ? { shared } : {}),
-    ...(exact && Object.keys(exact).length > 0 ? { exact } : {}),
-  };
-  if (Object.keys(filteredPatch).length === 0) {
+  if (Object.keys(patch).length === 0) {
     throw new BottleOperationActionError(
       "At least one field must remain, or the whole operation should be removed.",
       operation.status,
@@ -400,7 +398,7 @@ function proposalWithoutExcludedFields(
   }
   return ProposedOperationSchema.parse({
     ...proposal,
-    input: { ...proposal.input, patch: filteredPatch },
+    input: { ...proposal.input, patch },
   });
 }
 

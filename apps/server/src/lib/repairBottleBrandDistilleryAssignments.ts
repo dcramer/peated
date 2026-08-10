@@ -312,24 +312,22 @@ export async function repairBottleBrandDistilleryAssignments({
             series: currentSeries,
           }),
           input: {
-            shared: {
-              brand: toBrand.id,
-              ...(shouldAddDistillery
-                ? {
-                    distillers: Array.from(
-                      new Set([...distillerIds, distilleryId!]),
-                    ).sort((left, right) => left - right),
-                  }
-                : {}),
-              ...(currentSeries && currentSeries.brandId !== toBrand.id
-                ? {
-                    series: targetSeries?.id ?? {
-                      name: currentSeries.name,
-                      description: currentSeries.description,
-                    },
-                  }
-                : {}),
-            },
+            brand: toBrand.id,
+            ...(shouldAddDistillery
+              ? {
+                  distillers: Array.from(
+                    new Set([...distillerIds, distilleryId!]),
+                  ).sort((left, right) => left - right),
+                }
+              : {}),
+            ...(currentSeries && currentSeries.brandId !== toBrand.id
+              ? {
+                  series: targetSeries?.id ?? {
+                    name: currentSeries.name,
+                    description: currentSeries.description,
+                  },
+                }
+              : {}),
           },
           user: persistedUser,
           actorId: actor.id,

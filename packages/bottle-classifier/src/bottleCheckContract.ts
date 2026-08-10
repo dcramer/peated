@@ -114,7 +114,7 @@ export const BottleOperationEntityChoiceSchema = z.union([
     .strict(),
 ]);
 
-export const BottleSharedPatchSchema = z
+export const BottlePatchSchema = z
   .object({
     name: ProposedBottleSchema.shape.name.optional(),
     statedAge: ProposedBottleSchema.shape.statedAge.removeDefault().optional(),
@@ -127,14 +127,7 @@ export const BottleSharedPatchSchema = z
       .describe(
         "Market-facing bottler or release imprint. Clear an existing value only when product evidence shows it is wrong; omission or matching the Brand or a distiller is not enough.",
       ),
-  })
-  .strict()
-  .superRefine(requireAtLeastOneField);
-
-export const BottleExactPatchSchema = z
-  .object({
     edition: ProposedBottleSchema.shape.edition.removeDefault().optional(),
-    statedAge: ProposedBottleSchema.shape.statedAge.removeDefault().optional(),
     abv: ProposedBottleSchema.shape.abv
       .removeDefault()
       .optional()
@@ -159,14 +152,6 @@ export const BottleExactPatchSchema = z
     caskSize: ProposedBottleSchema.shape.caskSize.removeDefault().optional(),
     caskType: ProposedBottleSchema.shape.caskType.removeDefault().optional(),
     caskFill: ProposedBottleSchema.shape.caskFill.removeDefault().optional(),
-  })
-  .strict()
-  .superRefine(requireAtLeastOneField);
-
-export const BottleUpdatePatchSchema = z
-  .object({
-    shared: BottleSharedPatchSchema.optional(),
-    exact: BottleExactPatchSchema.optional(),
   })
   .strict()
   .superRefine(requireAtLeastOneField);
@@ -202,7 +187,7 @@ export const UpdateBottleOperationSchema = z
     input: z
       .object({
         bottleId: PositiveIdSchema,
-        patch: BottleUpdatePatchSchema,
+        patch: BottlePatchSchema,
       })
       .strict(),
     ...ProposedOperationEnvelope,
@@ -284,9 +269,7 @@ export type ProposedEntityDraft = z.infer<typeof ProposedEntityDraftSchema>;
 export type BottleOperationEntityChoice = z.infer<
   typeof BottleOperationEntityChoiceSchema
 >;
-export type BottleSharedPatch = z.infer<typeof BottleSharedPatchSchema>;
-export type BottleExactPatch = z.infer<typeof BottleExactPatchSchema>;
-export type BottleUpdatePatch = z.infer<typeof BottleUpdatePatchSchema>;
+export type BottlePatch = z.infer<typeof BottlePatchSchema>;
 export type EntityIdentityPatch = z.infer<typeof EntityIdentityPatchSchema>;
 export type ProposedOperationType = z.infer<typeof ProposedOperationTypeSchema>;
 export type UpdateBottleOperation = z.infer<typeof UpdateBottleOperationSchema>;

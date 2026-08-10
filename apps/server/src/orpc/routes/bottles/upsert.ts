@@ -1,6 +1,5 @@
 import { call, ORPCError } from "@orpc/server";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
-import { buildBottleUpdatePatch } from "@peated/server/lib/flatBottleInput";
 import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -48,7 +47,7 @@ export default procedure
           update,
           {
             bottle: err.data.bottle,
-            ...buildBottleUpdatePatch(input),
+            ...input,
           },
           { context },
         );

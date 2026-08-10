@@ -18,12 +18,12 @@ import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import {
+  BottlePatchSchema,
   BottleUpdateAuthorizationError,
   BottleUpdateConflictError,
   BottleUpdateExpectedStateError,
   BottleUpdateGraphError,
   BottleUpdateInputError,
-  BottleUpdateInputSchema,
   bottleUpdateExpectedSharedState,
   finalizeBottleUpdate,
   updateBottle,
@@ -166,7 +166,8 @@ describe("Bottle updates", () => {
   }) => {
     const invalidRawInput = {
       groupId: 123,
-      shared: { brand: 0, unknown: true },
+      brand: 0,
+      unknown: true,
     };
     for (const user of [null, defaults.user]) {
       const error = await waitError(
@@ -200,10 +201,9 @@ describe("Bottle updates", () => {
 
     for (const input of [
       { groupId: bottle.groupId },
-      { shared: { groupId: bottle.groupId } },
-      { exact: { unexpected: true } },
-      { shared: { brand: 0 } },
-      { shared: { distillers: [{ id: -1, name: "Invalid" }] } },
+      { unexpected: true },
+      { brand: 0 },
+      { distillers: [{ id: -1, name: "Invalid" }] },
     ]) {
       expect(
         await waitError(
@@ -261,15 +261,14 @@ describe("Bottle updates", () => {
     const semantic = await updateBottle({
       bottleId: first.bottle.id,
       input: {
-        shared: {
-          name: groupBefore.name,
-          statedAge: groupBefore.statedAge,
-          brand: groupBefore.brandId,
-          distillers: [],
-          category: groupBefore.category,
-          flavorProfile: groupBefore.flavorProfile,
-        },
-        exact: { edition: bottleBefore.edition, abv: bottleBefore.abv },
+        name: groupBefore.name,
+        statedAge: groupBefore.statedAge,
+        brand: groupBefore.brandId,
+        distillers: [],
+        category: groupBefore.category,
+        flavorProfile: groupBefore.flavorProfile,
+        edition: bottleBefore.edition,
+        abv: bottleBefore.abv,
       },
       context: contextFor(mod),
     });
@@ -304,11 +303,9 @@ describe("Bottle updates", () => {
     const manifest = await db.transaction(async (tx) => {
       const result = await updateBottleInTransaction(tx, {
         bottleId: first.bottle.id,
-        input: BottleUpdateInputSchema.parse({
-          shared: {
-            brand: { name: "Composed Review Brand" },
-            distillers: [{ name: "Composed Review Distillery" }],
-          },
+        input: BottlePatchSchema.parse({
+          brand: { name: "Composed Review Brand" },
+          distillers: [{ name: "Composed Review Distillery" }],
         }),
         user: mod,
         actorId: actor.id,
@@ -385,7 +382,7 @@ describe("Bottle updates", () => {
 
     await updateBottle({
       bottleId: first.bottle.id,
-      input: { shared: { name: "New Authority" } },
+      input: { name: "New Authority" },
       context: contextFor(mod),
     });
 
@@ -393,7 +390,7 @@ describe("Bottle updates", () => {
       db.transaction((tx) =>
         updateBottleInTransaction(tx, {
           bottleId: first.bottle.id,
-          input: { shared: { brand: targetBrand.id } },
+          input: { brand: targetBrand.id },
           expectedSharedState,
           user: mod,
           actorId: actor.id,
@@ -447,7 +444,7 @@ describe("Bottle updates", () => {
       db.transaction((tx) =>
         updateBottleInTransaction(tx, {
           bottleId: first.bottle.id,
-          input: { shared: { series: targetSeries.id } },
+          input: { series: targetSeries.id },
           expectedSharedState,
           user: mod,
           actorId: actor.id,
@@ -495,11 +492,9 @@ describe("Bottle updates", () => {
     const result = await updateBottle({
       bottleId: first.bottle.id,
       input: {
-        shared: {
-          brand: rolelessBrand.id,
-          bottler: rolelessBottler.id,
-          distillers: [rolelessDistiller.id],
-        },
+        brand: rolelessBrand.id,
+        bottler: rolelessBottler.id,
+        distillers: [rolelessDistiller.id],
       },
       context: contextFor(mod),
     });
@@ -566,7 +561,7 @@ describe("Bottle updates", () => {
 
     const result = await updateBottle({
       bottleId: first.bottle.id,
-      input: { shared: { brand: { name: brand.name } } },
+      input: { brand: { name: brand.name } },
       context: contextFor(mod),
     });
 
@@ -651,11 +646,9 @@ describe("Bottle updates", () => {
     await updateBottle({
       bottleId: first.bottle.id,
       input: {
-        shared: {
-          brand: newBrand.id,
-          bottler: newBottler.id,
-          distillers: [newDistiller.id],
-        },
+        brand: newBrand.id,
+        bottler: newBottler.id,
+        distillers: [newDistiller.id],
       },
       context: contextFor(mod),
     });
@@ -684,11 +677,9 @@ describe("Bottle updates", () => {
       updateBottle({
         bottleId: first.bottle.id,
         input: {
-          shared: {
-            brand: newBrand.id,
-            bottler: newBottler.id,
-            distillers: [newDistiller.id],
-          },
+          brand: newBrand.id,
+          bottler: newBottler.id,
+          distillers: [newDistiller.id],
         },
         context: contextFor(mod),
       }),
@@ -720,7 +711,7 @@ describe("Bottle updates", () => {
 
     const result = await updateBottle({
       bottleId: first.bottle.id,
-      input: { shared: { brand: newBrand.id } },
+      input: { brand: newBrand.id },
       context: contextFor(mod),
     });
 
@@ -791,7 +782,7 @@ describe("Bottle updates", () => {
 
     const result = await updateBottle({
       bottleId: moving.first.bottle.id,
-      input: { shared: { brand: newBrand.id } },
+      input: { brand: newBrand.id },
       context: contextFor(mod),
     });
 
@@ -849,7 +840,7 @@ describe("Bottle updates", () => {
 
     const result = await updateBottle({
       bottleId: first.bottle.id,
-      input: { shared: { brand: newBrand.id } },
+      input: { brand: newBrand.id },
       context: contextFor(mod),
     });
 
@@ -895,9 +886,7 @@ describe("Bottle updates", () => {
     const error = await waitError(
       updateBottle({
         bottleId: first.bottle.id,
-        input: {
-          shared: { brand: newBrand.id, series: otherSeries.id },
-        },
+        input: { brand: newBrand.id, series: otherSeries.id },
         context: contextFor(mod),
       }),
       BottleUpdateInputError,
@@ -968,13 +957,11 @@ describe("Bottle updates", () => {
     const identityResult = await updateBottle({
       bottleId: selectedBefore.id,
       input: {
-        exact: {
-          edition: "Batch 3",
-          statedAge: 14,
-          releaseYear: 2025,
-          abv: 50,
-          caskStrength: true,
-        },
+        edition: "Batch 3",
+        statedAge: 14,
+        releaseYear: 2025,
+        abv: 50,
+        caskStrength: true,
       },
       context: contextFor(mod),
     });
@@ -1036,7 +1023,7 @@ describe("Bottle updates", () => {
     const identityBeforeContent = identityResult.bottle;
     const contentResult = await updateBottle({
       bottleId: selectedBefore.id,
-      input: { exact: { description: "Updated exact content" } },
+      input: { description: "Updated exact content" },
       context: contextFor(mod),
     });
     expect(contentResult).toMatchObject({
@@ -1077,7 +1064,7 @@ describe("Bottle updates", () => {
 
     const result = await updateBottle({
       bottleId: first.bottle.id,
-      input: { exact: { edition: "Updated" } },
+      input: { edition: "Updated" },
       context: contextFor(mod),
     });
 
@@ -1248,16 +1235,14 @@ describe("Bottle updates", () => {
     const result = await updateBottle({
       bottleId: members[0].bottle.id,
       input: {
-        shared: {
-          name: "New Label",
-          statedAge: 15,
-          brand: newBrand.id,
-          bottler: newBottler.id,
-          distillers: newDistillers.map(({ id }) => id),
-          series: newSeries.id,
-          category: "bourbon",
-          flavorProfile: "spicy_sweet",
-        },
+        name: "New Label",
+        statedAge: 15,
+        brand: newBrand.id,
+        bottler: newBottler.id,
+        distillers: newDistillers.map(({ id }) => id),
+        series: newSeries.id,
+        category: "bourbon",
+        flavorProfile: "spicy_sweet",
       },
       context: contextFor(mod),
     });
@@ -1272,7 +1257,7 @@ describe("Bottle updates", () => {
       id: first.group.id,
       name: "New Label",
       fullName: "New Shared Brand New Label",
-      statedAge: 15,
+      statedAge: 12,
       brandId: newBrand.id,
       bottlerId: newBottler.id,
       seriesId: newSeries.id,
@@ -1294,10 +1279,10 @@ describe("Bottle updates", () => {
         seriesId: newSeries.id,
         category: "bourbon",
         flavorProfile: "spicy_sweet",
-        statedAge: 15,
       });
       expect(member.fullName).toMatch(/^New Shared Brand New Label/);
     }
+    expect(updatedMembers.map(({ statedAge }) => statedAge)).toEqual([15, 12]);
     const updatedSibling = updatedMembers.find(
       ({ id }) => id === siblingExactBefore.id,
     )!;
@@ -1354,16 +1339,13 @@ describe("Bottle updates", () => {
     const repair = await updateBottle({
       bottleId: members[0].bottle.id,
       input: {
-        shared: {
-          name: result.group.name,
-          statedAge: result.group.statedAge,
-          brand: result.group.brandId,
-          bottler: result.group.bottlerId,
-          distillers: newDistillers.map(({ id }) => id),
-          series: result.group.seriesId,
-          category: result.group.category,
-          flavorProfile: result.group.flavorProfile,
-        },
+        name: result.group.name,
+        brand: result.group.brandId,
+        bottler: result.group.bottlerId,
+        distillers: newDistillers.map(({ id }) => id),
+        series: result.group.seriesId,
+        category: result.group.category,
+        flavorProfile: result.group.flavorProfile,
       },
       context: contextFor(mod),
     });
@@ -1396,7 +1378,7 @@ describe("Bottle updates", () => {
     const distillersBeforeNameOnly = await loadBottleDistillers(memberIds);
     const nameOnly = await updateBottle({
       bottleId: members[0].bottle.id,
-      input: { shared: { name: "Omission Label" } },
+      input: { name: "Omission Label" },
       context: contextFor(mod),
     });
     expect(nameOnly.group).toMatchObject({
@@ -1480,10 +1462,8 @@ describe("Bottle updates", () => {
       updateBottle({
         bottleId: members[0].bottle.id,
         input: {
-          shared: {
-            name: "Must Not Persist",
-            distillers: [secondDistiller.id],
-          },
+          name: "Must Not Persist",
+          distillers: [secondDistiller.id],
         },
         context: contextFor(mod),
       }),
@@ -1521,7 +1501,7 @@ describe("Bottle updates", () => {
     resetQueueMock();
     const exactResult = await updateBottle({
       bottleId: members[0].bottle.id,
-      input: { exact: { description: "Selected Bottle content" } },
+      input: { description: "Selected Bottle content" },
       context: contextFor(mod),
     });
 
@@ -1591,11 +1571,9 @@ describe("Bottle updates", () => {
     await updateBottle({
       bottleId: members[0].bottle.id,
       input: {
-        shared: {
-          name: "Updated Audit Label",
-          distillers: [secondDistiller.id],
-        },
-        exact: { edition: "Selected Exact" },
+        name: "Updated Audit Label",
+        distillers: [secondDistiller.id],
+        edition: "Selected Exact",
       },
       context: contextFor(mod),
     });
@@ -1643,25 +1621,22 @@ describe("Bottle updates", () => {
     });
     resetQueueMock();
 
-    const mixed = await updateBottle({
+    const changedAge = await updateBottle({
       bottleId: members[0].bottle.id,
-      input: {
-        shared: { statedAge: 15 },
-        exact: { statedAge: 12 },
-      },
+      input: { statedAge: 15 },
       context: contextFor(mod),
     });
-    expect(mixed.bottle.statedAge).toBe(15);
-    expect(mixed.group.statedAge).toBe(15);
+    expect(changedAge.bottle.statedAge).toBe(15);
+    expect(changedAge.group.statedAge).toBe(12);
     let persisted = await loadGroupMembers(first.group.id);
-    expect(persisted.map(({ statedAge }) => statedAge)).toEqual([15, 13, 15]);
+    expect(persisted.map(({ statedAge }) => statedAge)).toEqual([15, 13, 12]);
 
     const cleared = await updateBottle({
       bottleId: members[1].bottle.id,
-      input: { exact: { statedAge: null } },
+      input: { statedAge: null },
       context: contextFor(mod),
     });
-    expect(cleared.bottle.statedAge).toBe(15);
+    expect(cleared.bottle.statedAge).toBe(12);
 
     const auditsBeforeEqual = await loadUpdateAudits(
       members.map(({ bottle }) => bottle.id),
@@ -1669,7 +1644,7 @@ describe("Bottle updates", () => {
     resetQueueMock();
     const equal = await updateBottle({
       bottleId: members[1].bottle.id,
-      input: { exact: { statedAge: 15 } },
+      input: { statedAge: 12 },
       context: contextFor(mod),
     });
     expect(equal.changed).toBe(false);
@@ -1679,12 +1654,12 @@ describe("Bottle updates", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 
     await updateBottle({
-      bottleId: members[0].bottle.id,
-      input: { shared: { statedAge: 18 } },
+      bottleId: members[2].bottle.id,
+      input: { statedAge: 18 },
       context: contextFor(mod),
     });
     persisted = await loadGroupMembers(first.group.id);
-    expect(persisted.map(({ statedAge }) => statedAge)).toEqual([18, 18, 18]);
+    expect(persisted.map(({ statedAge }) => statedAge)).toEqual([15, 12, 18]);
   });
 
   test("rolls back a shared update on Bottle or exact-alias collisions", async ({
@@ -1724,10 +1699,8 @@ describe("Bottle updates", () => {
       updateBottle({
         bottleId: members[0].bottle.id,
         input: {
-          shared: {
-            name: "Collision Label",
-            distillers: [],
-          },
+          name: "Collision Label",
+          distillers: [],
         },
         context: contextFor(mod),
       }),
@@ -1778,10 +1751,8 @@ describe("Bottle updates", () => {
       updateBottle({
         bottleId: members[0].bottle.id,
         input: {
-          shared: {
-            name: "Alias Collision Label",
-            distillers: [],
-          },
+          name: "Alias Collision Label",
+          distillers: [],
         },
         context: contextFor(mod),
       }),
@@ -1840,7 +1811,7 @@ describe("Bottle updates", () => {
     const error = await waitError(
       updateBottle({
         bottleId: first.bottle.id,
-        input: { shared: { name: "35.331 Alternate hoggie" } },
+        input: { name: "35.331 Alternate hoggie" },
         context: contextFor(mod),
       }),
       BottleUpdateConflictError,
@@ -1891,7 +1862,7 @@ describe("Bottle updates", () => {
     const error = await waitError(
       updateBottle({
         bottleId: first.bottle.id,
-        input: { shared: { bottler: smws.id } },
+        input: { bottler: smws.id },
         context: contextFor(mod),
       }),
       BottleUpdateConflictError,
@@ -1942,11 +1913,9 @@ describe("Bottle updates", () => {
       updateBottle({
         bottleId: members[0].bottle.id,
         input: {
-          shared: {
-            name: "35.331 Shared hoggie",
-            brand: smws.id,
-            bottler: smws.id,
-          },
+          name: "35.331 Shared hoggie",
+          brand: smws.id,
+          bottler: smws.id,
         },
         context: contextFor(mod),
       }),
@@ -1991,7 +1960,7 @@ describe("Bottle updates", () => {
       const error = await waitError(
         updateBottle({
           bottleId: expected.bottleId,
-          input: { exact: { edition: "Must Not Persist" } },
+          input: { edition: "Must Not Persist" },
           context: contextFor(mod),
         }),
         BottleUpdateGraphError,
@@ -2026,7 +1995,7 @@ describe("Bottle updates", () => {
 
     await updateBottle({
       bottleId: members[0].bottle.id,
-      input: { shared: { series: newSeries.id } },
+      input: { series: newSeries.id },
       context: contextFor(mod),
     });
 
@@ -2078,12 +2047,10 @@ describe("Bottle updates", () => {
     const result = await updateBottle({
       bottleId: first.bottle.id,
       input: {
-        shared: {
-          name: "Dispatch Updated",
-          brand: { name: "Dispatch New Brand" },
-          distillers: [{ name: "Dispatch New Distillery" }],
-          series: { name: "Dispatch New Series" },
-        },
+        name: "Dispatch Updated",
+        brand: { name: "Dispatch New Brand" },
+        distillers: [{ name: "Dispatch New Distillery" }],
+        series: { name: "Dispatch New Series" },
       },
       context: contextFor(mod),
     });

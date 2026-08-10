@@ -90,7 +90,7 @@ function uninspectedTarget(
       if (!context.isBottleInspected(proposal.input.bottleId)) {
         return `Bottle ${proposal.input.bottleId} was not inspected.`;
       }
-      const seriesId = proposal.input.patch.shared?.seriesId;
+      const seriesId = proposal.input.patch.seriesId;
       if (
         seriesId !== undefined &&
         seriesId !== null &&
@@ -99,9 +99,9 @@ function uninspectedTarget(
         return `BottleSeries ${seriesId} was not inspected.`;
       }
       const choices = [
-        proposal.input.patch.shared?.brand,
-        ...(proposal.input.patch.shared?.distillers ?? []),
-        proposal.input.patch.shared?.bottler,
+        proposal.input.patch.brand,
+        ...(proposal.input.patch.distillers ?? []),
+        proposal.input.patch.bottler,
       ];
       const uninspectedEntity = choices.find(
         (choice) =>
@@ -137,9 +137,9 @@ function requiredTargetEvidence(proposal: ProposedOperation): EvidenceRef[] {
   switch (proposal.type) {
     case "update_bottle": {
       const choices = [
-        proposal.input.patch.shared?.brand,
-        ...(proposal.input.patch.shared?.distillers ?? []),
-        proposal.input.patch.shared?.bottler,
+        proposal.input.patch.brand,
+        ...(proposal.input.patch.distillers ?? []),
+        proposal.input.patch.bottler,
       ];
       return [
         { kind: "bottle", bottleId: proposal.input.bottleId },
@@ -183,11 +183,7 @@ function changesOnlyOptionalCaskMetadata(proposal: ProposedOperation) {
     return false;
   }
 
-  if (proposal.input.patch.shared !== undefined) {
-    return false;
-  }
-
-  const exactFields = Object.keys(proposal.input.patch.exact ?? {});
+  const exactFields = Object.keys(proposal.input.patch);
   return (
     exactFields.length > 0 &&
     exactFields.every((field) => OPTIONAL_CASK_METADATA_FIELDS.has(field))
@@ -202,7 +198,7 @@ function getSmwsEditionError(
     return null;
   }
 
-  const edition = proposal.input.patch.exact?.edition;
+  const edition = proposal.input.patch.edition;
   if (!edition || !getExactCaskCodeAnchor(edition)) {
     return null;
   }
@@ -217,7 +213,7 @@ function getSmwsEditionError(
 
   // SMWS code identity is materialized in the Bottle name by the package's
   // deterministic SMWS policy; accepting it as edition would render it twice.
-  return "SMWS exact-cask codes belong in the Bottle name, not exact.edition. Omit the edition field from this proposal.";
+  return "SMWS exact-cask codes belong in the Bottle name, not the edition field. Omit the edition field from this proposal.";
 }
 
 export function createBottleProposalCollector({

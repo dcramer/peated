@@ -127,22 +127,18 @@ describe("handleBottle", () => {
     await handleBottle(bottleInput);
 
     expect(orpcClient.bottles.update).toHaveBeenCalledOnce();
-    expect(orpcClient.bottles.update).toHaveBeenCalledWith({
-      bottle: conflictBottleId,
-      shared: expect.objectContaining({
+    expect(orpcClient.bottles.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bottle: conflictBottleId,
         name: bottleInput.name,
         statedAge: bottleInput.statedAge,
         brand: bottleInput.brand,
         category: bottleInput.category,
-      }),
-      exact: expect.objectContaining({
         edition: bottleInput.edition,
         abv: bottleInput.abv,
         singleCask: bottleInput.singleCask,
       }),
-    });
-    const [updateInput] = vi.mocked(orpcClient.bottles.update).mock.calls[0];
-    expect(updateInput.exact).not.toHaveProperty("statedAge");
+    );
     expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
   });
 
