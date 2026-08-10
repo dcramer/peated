@@ -425,10 +425,10 @@ The full classifier agent must fill `confidenceBasis` for reviewed decisions.
 The contract has no separate identity-basis object, numeric confidence score,
 or confidence band. The complete proposed Bottle and explicit observation
 fields carry identity facts. The agent expresses certainty only through
-positive evidence, typed `unresolvedRisks` (category plus note), `webEvidence`,
-and the action itself. The runtime records actual tool calls; the model does not
-report them. Any asserted unresolved risk forces automated review and no field
-can upgrade a decision the derived tier routes to review.
+typed `unresolvedRisks` (category plus note), `webEvidence`, and the action
+itself. The runtime records actual tool calls; the model does not report them.
+Any asserted unresolved risk forces automated review and no field can upgrade a
+decision the derived tier routes to review.
 `confidenceBasis.webEvidence = supportive` is required before automation can
 treat web-backed create evidence as validated.
 

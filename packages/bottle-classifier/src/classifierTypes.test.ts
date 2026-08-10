@@ -57,9 +57,21 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       BottleClassifierAgentDecisionSchema.safeParse({
         action: "no_match",
         confidenceBasis: {
-          positiveEvidence: [],
           unresolvedRisks: [],
           toolsUsed: ["search_bottles"],
+          webEvidence: "not_used",
+        },
+      }).success,
+    ).toBe(false);
+  });
+
+  test("rejects model-reported positive evidence", () => {
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse({
+        action: "no_match",
+        confidenceBasis: {
+          positiveEvidence: ["The source title supports the decision."],
+          unresolvedRisks: [],
           webEvidence: "not_used",
         },
       }).success,
@@ -160,7 +172,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       aliasScope: "none",
       observation: null,
       confidenceBasis: {
-        positiveEvidence: ["local related Bottle candidate exists"],
         unresolvedRisks: [
           {
             category: "release_ambiguity",

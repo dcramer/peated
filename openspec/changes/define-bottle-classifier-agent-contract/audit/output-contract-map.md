@@ -41,7 +41,7 @@ Contract anchors:
 | 6   | `aliasScope`         | `AliasScopeEnum.nullable().default(null)` (`:665`)                                                                                                        | Prompt `instructions.ts:714-716`; **no** `.describe()` on agent field (base-union copy `:504-506` has one)                         | **KEEP**                              | Alias safety is separate from identity scope (`spec.md:122-139`). Note the `Omit`+re-add TS gymnastics `classifierTypes.ts:724-736`.                                                                                         |
 | 7   | `observation`        | `BottleObservationSchema.nullable().default(null)` (`:666`)                                                                                               | Prompt `instructions.ts:779`; nested fields have no describes (`:398-408`)                                                         | **KEEP**                              | Already typed (selector/caskNumber/barrelNumber/bottleNumber/outturn/market/exclusive). Good verifiability model to imitate.                                                                                                 |
 | 8   | `identityBasis`      | `BottleIdentityBasisSchema.nullable().default(null)` (`:667`)                                                                                             | Prompt `instructions.ts:776-778`; nested fields have describes (`:415-449`)                                                        | **KEEP + RETYPE**                     | `spec.md:184-197`, `design.md:143`: move `bottleTraits`/`releaseTraits`/`observationTraits` from `array(string)` to typed trait fields aligned with `BOTTLE_RELEASE_TRAIT_FIELDS` (`:78-86`). See §4. Must be ordered first. |
-| 9   | `confidenceBasis`    | `BottleConfidenceBasisSchema.nullable().default(null)` (`:668`)                                                                                           | Prompt "Confidence:" `instructions.ts:753-764`; nested describes `:453-495`                                                        | **KEEP + RETYPE, drop `band`**        | `band` removed with numeric confidence (`design.md:125,188`). `unresolvedRisks`/`positiveEvidence` become typed (`spec.md:151-153,189-193`). See §4.                                                                         |
+| 9   | `confidenceBasis`    | `BottleConfidenceBasisSchema.nullable().default(null)` (`:668`)                                                                                           | Prompt "Confidence:" `instructions.ts:753-764`; nested describes `:453-495`                                                        | **KEEP typed readers only**           | `band` and `positiveEvidence` were removed. Typed `unresolvedRisks` and `webEvidence` remain because automation reads them.                                                                                                  |
 | 10  | `matchedBottleId`    | `z.number().int().nullable().default(null)` (`:669`)                                                                                                      | Prompt Output `:769`; no `.describe()`                                                                                             | **KEEP**                              | Target id; ordered after basis.                                                                                                                                                                                              |
 | 11  | `matchedReleaseId`   | `z.number().int().nullable().default(null)` (`:670`)                                                                                                      | Prompt Output `:769`; no `.describe()`                                                                                             | **KEEP**                              | Target id.                                                                                                                                                                                                                   |
 | 12  | `parentBottleId`     | `z.number().int().nullable().default(null)` (`:671`)                                                                                                      | Prompt Output `:772,774,778`; no `.describe()`                                                                                     | **KEEP**                              | Target id.                                                                                                                                                                                                                   |
@@ -50,13 +50,13 @@ Contract anchors:
 
 ### Nested `confidenceBasis` fields (`classifierTypes.ts:453-495`)
 
-| Nested field       | Type / default                                                                                       | Spec verdict                                                                                                         |
-| ------------------ | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `band`             | `enum(low, review, auto_verification, current_assignment)` default `review`, has describe `:456-460` | **REMOVE** (`design.md:125,188`; `spec.md:180-182`). `current_assignment` reaffirmation moves to `positiveEvidence`. |
-| `positiveEvidence` | `array(string.min(1))` default `[]`, describe `:461-466`                                             | **RETYPE** to `{kind, locator, claim}` (`spec.md:189-191`).                                                          |
-| `unresolvedRisks`  | `array(string.min(1))` default `[]`, describe `:467-472`                                             | **RETYPE** to `{category, note}` (`spec.md:153,187-188`; `design.md:125,140`).                                       |
-| `toolsUsed`        | `enum[]` default `[]`, describe `:473-487`                                                           | **KEEP** (already typed enum).                                                                                       |
-| `webEvidence`      | `enum(not_needed, not_used, supportive, weak, conflicting)` default `not_used`, describe `:488-493`  | **KEEP** (consumed by derived tier; `design.md:124`).                                                                |
+| Nested field       | Type / default                                                                                       | Spec verdict                                                                             |
+| ------------------ | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `band`             | `enum(low, review, auto_verification, current_assignment)` default `review`, has describe `:456-460` | **REMOVED.** Current-assignment reaffirmation is now a consumer-owned automation anchor. |
+| `positiveEvidence` | `array(string.min(1))` default `[]`, describe `:461-466`                                             | **REMOVED.** It had no decision, review, or eval reader.                                 |
+| `unresolvedRisks`  | `array(string.min(1))` default `[]`, describe `:467-472`                                             | **RETYPE** to `{category, note}` (`spec.md:153,187-188`; `design.md:125,140`).           |
+| `toolsUsed`        | `enum[]` default `[]`, describe `:473-487`                                                           | **KEEP** (already typed enum).                                                           |
+| `webEvidence`      | `enum(not_needed, not_used, supportive, weak, conflicting)` default `not_used`, describe `:488-493`  | **KEEP** (consumed by derived tier; `design.md:124`).                                    |
 
 ---
 
@@ -80,7 +80,7 @@ evidence. Structured output is generated in field order, so this violates
 
 ```
 1  identityBasis        (evidence: trait placement)
-2  confidenceBasis      (evidence: positiveEvidence, unresolvedRisks, webEvidence, toolsUsed)
+2  confidenceBasis      (evidence: unresolvedRisks, webEvidence)
 3  rationale            (freeform, demoted, before action)
 4  action               (the committed decision)
 5  identityScope
@@ -149,10 +149,9 @@ migration. Split into **decision-affecting** (must migrate to derived tier) and
 | `packages/bottle-classifier/src/smwsPolicy.ts:485`       | SMWS exact-cask sets `band: "auto_verification"`.       |
 | `classifierRuntime.ts:210,238`                           | Local-identification paths set/propagate band.          |
 
-These deterministic anchors currently express certainty via `band`; under the
-new contract they express it via `positiveEvidence` + empty `unresolvedRisks`
-and let the derived tier decide (`design.md:188` — `current_assignment` becomes
-positive evidence).
+These deterministic anchors no longer express certainty through model output.
+The consumer passes exact-alias, current-assignment, and deterministic anchors
+directly to the derived tier.
 
 ### 3d. Telemetry-only `confidence` / `band` writes (persist as history, not gates)
 
@@ -222,33 +221,11 @@ const UnresolvedRiskEntrySchema = z
   .strict();
 ```
 
-### 4b. Typed `positiveEvidence` entries
+### 4b. Removed `positiveEvidence`
 
-```ts
-export const POSITIVE_EVIDENCE_KINDS = [
-  "source_label", // observed submitted title / label text
-  "image", // image evidence
-  "local_candidate", // an existing Peated candidate row
-  "web_result", // agent-reviewed web/source page
-  "exact_alias", // exact accepted local alias
-  "exact_cask_code", // closed-form deterministic anchor (e.g. SMWS)
-  "current_assignment", // reaffirms the current bottle/release assignment (design.md:188)
-] as const;
-
-const PositiveEvidenceEntrySchema = z
-  .object({
-    kind: z.enum(POSITIVE_EVIDENCE_KINDS),
-    // locator lets validation confirm the citation exists in run artifacts
-    // (candidate id, web result URL, image ref) and reject fabricated support:
-    locator: z.string().trim().min(1).nullable().default(null),
-    claim: z.string().trim().min(1), // what this evidence establishes
-  })
-  .strict();
-```
-
-Validation target (`spec.md:189-191`): for `kind = web_result`, `locator` must
-be a URL present in the run's collected `BottleSearchEvidence`; for
-`local_candidate`, `locator` must resolve to a candidate `bottleId`/`releaseId`.
+The proposed typed evidence entries were not implemented. The existing string
+array had no decision, review, or eval reader, so issue #566 removed the field
+instead of adding a validator and a new contract only to preserve unread output.
 
 ### 4c. Typed `identityBasis` trait placement
 
@@ -362,12 +339,12 @@ requirement (`spec.md:88-91`, `design.md:99`) applies here too.
 ## Summary (10 lines)
 
 1. `BottleClassifierAgentDecisionSchema` has 14 top-level fields (`classifierTypes.ts:638-678`).
-2. Spec verdict: KEEP 11, REMOVE 1 (`confidence`), plus nested `confidenceBasis.band` removed; RETYPE `identityBasis` + `confidenceBasis.positiveEvidence`/`unresolvedRisks`.
+2. Final output cleanup removed `confidence`, `identityBasis`, and the nested `confidenceBasis.band`, `positiveEvidence`, and `toolsUsed` fields; typed `unresolvedRisks` remains.
 3. Fields with NO explanation (neither prompt nor `.describe()`): `confidence` and `candidateBottleIds` (2).
 4. `identityScope`/`aliasScope` are prompt-only on the agent schema (their `.describe()` lives only on the internal validated-union base).
 5. Current order emits `action` first, basis at #8-9 — violates evidence-before-action; proposed order leads with `identityBasis`, `confidenceBasis`, `rationale`, then `action`, ids, drafts.
 6. Decision-affecting confidence consumers: 18 (13 numeric-`confidence` + 5 `confidenceBasis.band`) across 7 files.
 7. Plus deterministic band producers (service.ts:271, smwsPolicy.ts:485, classifierRuntime) and telemetry-only writes that stay as history.
 8. Proposed risk categories: `trait_conflict`, `sibling_ambiguity`, `release_ambiguity`, `web_evidence_conflict`, `insufficient_evidence`, `identity_ambiguity`, `other`.
-9. Typed sketches drafted for `{category,note}` risks, `{kind,locator,claim}` evidence, and `identityBasis` trait entries keyed on `BOTTLE_RELEASE_TRAIT_FIELDS`.
+9. Typed `{category,note}` risks remain. The unused evidence and identity-basis fields were removed instead of retyped.
 10. Five gaps documented; the sharpest is required-but-undocumented numeric `confidence` and the `band` describe claiming model authority the prompt+reviewPolicy revoke.

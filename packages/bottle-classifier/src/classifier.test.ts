@@ -91,9 +91,6 @@ function createReliableSearchEvidence({
 }
 
 const supportiveWebEvidenceConfidenceBasis = {
-  positiveEvidence: [
-    "Reliable non-origin web evidence supports the proposed bottle identity.",
-  ],
   unresolvedRisks: [],
   webEvidence: "supportive",
 } as const satisfies NonNullable<
@@ -1481,7 +1478,6 @@ describe("createBottleClassifier", () => {
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            positiveEvidence: ["The label supports the proposed bottle."],
             unresolvedRisks: [],
             webEvidence: "not_needed",
           },
@@ -1636,9 +1632,6 @@ describe("createBottleClassifier", () => {
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            positiveEvidence: [
-              "A non-origin source corroborates the exact bottle name.",
-            ],
             unresolvedRisks: [],
             webEvidence: "supportive",
           },
@@ -1727,9 +1720,6 @@ describe("createBottleClassifier", () => {
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            positiveEvidence: [
-              "A non-origin page mentions the same bottle name.",
-            ],
             unresolvedRisks: [
               {
                 category: "web_evidence_conflict",
@@ -2554,7 +2544,6 @@ describe("createBottleClassifier", () => {
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            positiveEvidence: ["Local search found the rye sibling."],
             unresolvedRisks: [
               {
                 category: "web_evidence_conflict",
@@ -2630,7 +2619,6 @@ describe("createBottleClassifier", () => {
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            positiveEvidence: ["Local search found the rye sibling."],
             unresolvedRisks: [],
             webEvidence: "not_needed",
           },
@@ -3040,9 +3028,6 @@ describe("createBottleClassifier", () => {
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            positiveEvidence: [
-              "Official web evidence supports Canadian Club Reserve 9 Year Old.",
-            ],
             unresolvedRisks: [
               {
                 category: "sibling_ambiguity",
@@ -3406,7 +3391,6 @@ describe("createBottleClassifier", () => {
           identityScope: "product",
           observation: null,
           confidenceBasis: {
-            positiveEvidence: ["The exact local parent covers the family."],
             unresolvedRisks: [
               {
                 category: "trait_conflict",

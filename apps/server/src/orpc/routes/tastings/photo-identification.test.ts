@@ -124,7 +124,6 @@ function buildCreateBottleDecision({
   brandName: string;
   bottleName: string;
   confidenceBasis?: {
-    positiveEvidence?: string[];
     unresolvedRisks?: {
       category:
         | "trait_conflict"
@@ -149,7 +148,6 @@ function buildCreateBottleDecision({
     rationale: "Reliable photo evidence supports creating the bottle.",
     confidenceBasis: confidenceBasis
       ? {
-          positiveEvidence: [],
           unresolvedRisks: [],
           webEvidence: "not_used",
           ...confidenceBasis,
@@ -827,7 +825,6 @@ describe("POST /tastings/photo-identification", () => {
         brandName: "Low Confidence Photo Brand",
         bottleName: "Review Bottle",
         confidenceBasis: {
-          positiveEvidence: [],
           unresolvedRisks: [
             {
               category: "insufficient_evidence",
@@ -871,7 +868,6 @@ describe("POST /tastings/photo-identification", () => {
       brandName: "Compass Box",
       bottleName: "Hedonism²",
       confidenceBasis: {
-        positiveEvidence: ["The label identifies Hedonism²."],
         unresolvedRisks: [
           {
             category: "insufficient_evidence",
@@ -932,7 +928,6 @@ describe("POST /tastings/photo-identification", () => {
         brandName: "Review Band Photo Brand",
         bottleName: "Review Band Bottle",
         confidenceBasis: {
-          positiveEvidence: ["The label text matches a plausible bottle."],
           unresolvedRisks: [
             {
               category: "identity_ambiguity",

@@ -506,9 +506,6 @@ export function resolveSmwsExactCaskReference({
   const confidenceBasis: NonNullable<
     BottleClassificationDecision["confidenceBasis"]
   > = {
-    positiveEvidence: [
-      `SMWS exact-cask code ${smwsCode} deterministically identifies the bottle.`,
-    ],
     unresolvedRisks: [],
     webEvidence: "not_needed",
   };
