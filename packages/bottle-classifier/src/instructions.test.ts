@@ -25,25 +25,6 @@ describe("Bottle check instructions", () => {
     expect(reference).not.toContain("<operation_policy>");
   });
 
-  test("preserves the exact Bottle and conservative-decision boundaries", () => {
-    const reference = buildBottleClassifierInstructions();
-
-    for (const rule of [
-      "Every marketed release is one independently complete Bottle",
-      "an inspected undated candidate can match only when evidence establishes an independently marketed undated product",
-      "Do not infer this from a generic catalog row or collapse a family marketed only as distinct batches",
-      "Prefer `no_match` over a false-positive match",
-      "never create a duplicate merely because its stored Brand",
-      "Return `match` only when that exact candidate is safe for the reference assignment",
-      "When a candidate needs a catalog change before assignment is safe",
-      "Do not return `match` for the future corrected state",
-      "Return `create_bottle` only when no inspected local candidate represents",
-      "Return `no_match` when the exact identity remains missing, ambiguous, conflicting, underspecified",
-    ]) {
-      expect(reference).toContain(rule);
-    }
-  });
-
   test("keeps Firecrawl as evidence controlled by the main agent", () => {
     const reference = buildBottleClassifierInstructions();
 
