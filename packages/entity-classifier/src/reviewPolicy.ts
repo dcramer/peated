@@ -37,7 +37,6 @@ function manualReviewDecision({
   return {
     ...decision,
     verdict: "manual_review",
-    confidence: Math.min(decision.confidence, 60),
     targetEntityId: null,
     targetEntityName: null,
     reassignBottleIds: [],

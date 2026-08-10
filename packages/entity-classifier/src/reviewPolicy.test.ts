@@ -51,7 +51,6 @@ describe("finalizeEntityClassification", () => {
       artifacts: buildEntityClassificationArtifacts({}),
       decision: {
         verdict: "reassign_bottles_to_existing_brand",
-        confidence: 95,
         rationale: "Canadian Club owns the verified bottle.",
         targetEntityId: 2,
         targetEntityName: "Wrong model text",
@@ -79,7 +78,6 @@ describe("finalizeEntityClassification", () => {
       artifacts: buildEntityClassificationArtifacts({}),
       decision: {
         verdict: "reassign_bottles_to_existing_brand",
-        confidence: 95,
         rationale: "Move it.",
         targetEntityId: 999,
         targetEntityName: "Invented",
@@ -94,6 +92,9 @@ describe("finalizeEntityClassification", () => {
     expect(result.verdict).toBe("manual_review");
     expect(result.targetEntityId).toBeNull();
     expect(result.reassignBottleIds).toEqual([]);
+    expect(result.blockers).toContain(
+      "Server downgraded reassignment because target entity 999 was not present in local candidates or resolved entities.",
+    );
   });
 
   test("requires evidence URLs for metadata patches", () => {
@@ -102,7 +103,6 @@ describe("finalizeEntityClassification", () => {
       artifacts: buildEntityClassificationArtifacts({}),
       decision: {
         verdict: "fix_entity_metadata",
-        confidence: 90,
         rationale: "Looks like a distillery.",
         targetEntityId: null,
         targetEntityName: null,

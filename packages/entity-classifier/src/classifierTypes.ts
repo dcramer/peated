@@ -137,10 +137,11 @@ export const EntityClassificationMetadataPatchSchema = z
   .strict()
   .default({});
 
+// No live eval gives a numeric confidence score a measured meaning. The
+// verdict, blockers, and evidence carry the review recommendation.
 export const EntityClassificationDecisionSchema = z
   .object({
     verdict: EntityClassificationVerdictEnum,
-    confidence: z.number().int().min(0).max(100),
     rationale: z.string().trim().min(1),
     targetEntityId: z.number().int().nullable().default(null),
     targetEntityName: z.string().trim().nullable().default(null),

@@ -63,7 +63,6 @@ describe("entity classifier contract", () => {
       EntityClassificationResultSchema.parse({
         decision: {
           verdict: "reassign_bottles_to_existing_brand",
-          confidence: 95,
           rationale:
             "Bottle evidence and official branding support Canadian Club as the correct target.",
           targetEntityId: 2,
@@ -80,5 +79,37 @@ describe("entity classifier contract", () => {
         },
       }),
     ).toBeTruthy();
+  });
+
+  test("rejects an unmeasured numeric confidence score", () => {
+    const result = EntityClassificationResultSchema.safeParse({
+      decision: {
+        verdict: "keep_as_is",
+        confidence: 95,
+        rationale: "The reviewed evidence supports the current Entity.",
+        targetEntityId: null,
+        targetEntityName: null,
+        reassignBottleIds: [],
+        preserveSourceAsDistillery: false,
+        metadataPatch: {},
+        blockers: [],
+        evidenceUrls: [],
+      },
+      artifacts: {
+        resolvedEntities: [],
+        searchEvidence: [],
+      },
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          code: "unrecognized_keys",
+          keys: ["confidence"],
+          path: ["decision"],
+        }),
+      );
+    }
   });
 });
