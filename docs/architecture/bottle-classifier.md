@@ -529,7 +529,6 @@ Keep responsibilities narrow:
 - `classifierRuntime.ts`: extraction, retrieval, tools, agent loop
 - `runtime/deterministic.ts`: pre-agent deterministic resolver registry
 - `reviewPolicy.ts`: validation, normalization, and invalid-state rejection
-- `exactCaskPolicy.ts`: generic exact-cask signal validation for reviewed scope
 - `instructions.ts`: stable classifier and extractor prompts
 - `priceMatchingEvidence.ts`: pure evidence checks and the code-derived
   automation tier (`deriveAutomationTier`) shared with price matching

@@ -25,10 +25,6 @@ import {
   candidateHasExactCaskCodeAnchor,
   getExactCaskCodeAnchor,
 } from "./exactCask";
-import {
-  hasExactCaskSignals,
-  inferBottleIdentityScope,
-} from "./exactCaskPolicy";
 import { listMatchesExpectedValue } from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
 import { normalizeObservation } from "./observation";
@@ -688,23 +684,11 @@ function sanitizeClassifierDecision({
       );
     }
 
-    const target =
-      artifacts.candidates.find(
-        (candidate) => candidate.bottleId === matchedBottleId,
-      ) ?? null;
-
     return {
       action: "match",
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
-      identityScope: inferBottleIdentityScope({
-        requestedIdentityScope: decision.identityScope,
-        reference,
-        target,
-        extractedIdentity: artifacts.extractedIdentity,
-        proposedBottle: null,
-        observation,
-      }),
+      identityScope: decision.identityScope ?? "product",
       observation,
       matchedBottleId,
       proposedBottle: null,
@@ -757,23 +741,9 @@ function sanitizeClassifierDecision({
       action: "create_bottle",
       rationale: decision.rationale,
       candidateBottleIds: filteredCandidateBottleIds,
-      identityScope: inferBottleIdentityScope({
-        requestedIdentityScope:
-          decision.identityScope === "exact_cask" ||
-          hasExactCaskSignals({
-            reference,
-            proposedBottle: proposedBottleDraft,
-            extractedIdentity: artifacts.extractedIdentity,
-            observation,
-          })
-            ? "exact_cask"
-            : decision.identityScope,
-        reference,
-        target: null,
-        extractedIdentity: artifacts.extractedIdentity,
-        proposedBottle: proposedBottleDraft,
-        observation,
-      }),
+      identityScope: hasSmwsCodeAnchor
+        ? "exact_cask"
+        : (decision.identityScope ?? "product"),
       observation,
       matchedBottleId: null,
       proposedBottle: proposedBottleDraft,
@@ -783,14 +753,7 @@ function sanitizeClassifierDecision({
   return createNoMatchDecision({
     decision: {
       rationale: decision.rationale,
-      identityScope: inferBottleIdentityScope({
-        requestedIdentityScope: decision.identityScope,
-        reference,
-        target: null,
-        extractedIdentity: artifacts.extractedIdentity,
-        proposedBottle: null,
-        observation,
-      }),
+      identityScope: decision.identityScope ?? "product",
       confidenceBasis: decision.confidenceBasis,
     },
     candidateBottleIds: filteredCandidateBottleIds,

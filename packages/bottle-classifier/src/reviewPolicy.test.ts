@@ -728,7 +728,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("preserves creation instead of reclassifying it from candidate names", () => {
+  test("does not promote product scope from cask text or observations", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
       rationale:
@@ -777,8 +777,74 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result).toMatchObject({
       action: "create_bottle",
       candidateBottleIds: [existingPrivateCask.bottleId],
+      identityScope: "product",
       matchedBottleId: null,
       proposedBottle: { name: "Private Cask" },
+    });
+  });
+
+  test("preserves explicit exact-cask scope without text-pattern validation", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Example Private Selection",
+      },
+      decision: {
+        action: "create_bottle",
+        rationale:
+          "Reviewed evidence identifies the selection as a marketed exact-cask Bottle.",
+        candidateBottleIds: [],
+        identityScope: "exact_cask",
+        observation: null,
+        matchedBottleId: null,
+        proposedBottle: {
+          name: "Private Selection",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: true,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          brand: {
+            id: null,
+            name: "Example",
+          },
+          distillers: [],
+          bottler: null,
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [],
+        extractedIdentity: {
+          brand: "Example",
+          bottler: null,
+          expression: "Private Selection",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: true,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          edition: null,
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: { name: "Private Selection" },
     });
   });
 
