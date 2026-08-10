@@ -61,7 +61,6 @@ describe("inferBottleIdentityScope", () => {
         observation: {
           caskNumber: "123",
           barrelNumber: null,
-          bottleNumber: null,
           selector: null,
         },
       }),
@@ -80,7 +79,6 @@ describe("inferBottleIdentityScope", () => {
         observation: {
           caskNumber: "123",
           barrelNumber: null,
-          bottleNumber: null,
           selector: null,
         },
       }),

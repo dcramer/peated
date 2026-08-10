@@ -139,6 +139,7 @@ describe("Bottle check persistence", () => {
     expect(output.status).toBe("classified");
     if (output.status !== "classified") throw new Error("Expected decision");
     expect(output.decision).not.toHaveProperty("identityBasis");
+    expect(output.decision.observation).not.toHaveProperty("bottleNumber");
     expect(output.decision.observation).not.toHaveProperty("outturn");
     expect(output.decision.observation).not.toHaveProperty("market");
     expect(output.decision.observation).not.toHaveProperty("exclusive");

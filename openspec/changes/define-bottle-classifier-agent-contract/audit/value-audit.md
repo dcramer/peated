@@ -69,19 +69,19 @@ The whole object was removed instead of adding a new semantic check to keep it.
 
 ### A.3 `observation.*` (`classifierTypes.ts:398-408`)
 
-| Nested field   | Consumer                                                                                                                                               | Class                     | Verdict                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `selector`     | `smwsPolicy.ts:378-379,458,475-476`, `observation.ts:11`                                                                                               | decision-affecting (SMWS) | **KEEP**                                                                                                 |
-| `caskNumber`   | `reviewPolicy.ts:1985` (`getExactCaskCodeAnchor` — deterministic exact-cask anchor), `smwsPolicy.ts:97`, `reviewPolicy.ts:1644/1787/1796` (name dedup) | decision-affecting        | **KEEP**                                                                                                 |
-| `barrelNumber` | `reviewPolicy.ts:1645/1788/1797` (anchor/name dedup)                                                                                                   | decision-affecting        | **KEEP**                                                                                                 |
-| `bottleNumber` | `smwsPolicy.ts:374` passthrough only; `observation.ts:14` normalize                                                                                    | NO decision read          | **ABLATE** — never read for an action; measure whether removing it changes any decision (expected none). |
-| `outturn`      | writers only before removal                                                                                                                            | NO CONSUMER               | **REMOVED** — no decision, review, display, or eval reader existed.                                      |
-| `market`       | writers only before removal                                                                                                                            | NO CONSUMER               | **REMOVED** — no decision, review, display, or eval reader existed.                                      |
-| `exclusive`    | writers only before removal                                                                                                                            | NO CONSUMER               | **REMOVED** — no decision, review, display, or eval reader existed.                                      |
+| Nested field   | Consumer                                                                                                                                               | Class                     | Verdict                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- | ------------------------------------------------------------------- |
+| `selector`     | `smwsPolicy.ts:378-379,458,475-476`, `observation.ts:11`                                                                                               | decision-affecting (SMWS) | **KEEP**                                                            |
+| `caskNumber`   | `reviewPolicy.ts:1985` (`getExactCaskCodeAnchor` — deterministic exact-cask anchor), `smwsPolicy.ts:97`, `reviewPolicy.ts:1644/1787/1796` (name dedup) | decision-affecting        | **KEEP**                                                            |
+| `barrelNumber` | `reviewPolicy.ts:1645/1788/1797` (anchor/name dedup)                                                                                                   | decision-affecting        | **KEEP**                                                            |
+| `bottleNumber` | writers only before removal                                                                                                                            | NO CONSUMER               | **REMOVED** — no decision, review, display, or eval reader existed. |
+| `outturn`      | writers only before removal                                                                                                                            | NO CONSUMER               | **REMOVED** — no decision, review, display, or eval reader existed. |
+| `market`       | writers only before removal                                                                                                                            | NO CONSUMER               | **REMOVED** — no decision, review, display, or eval reader existed. |
+| `exclusive`    | writers only before removal                                                                                                                            | NO CONSUMER               | **REMOVED** — no decision, review, display, or eval reader existed. |
 
 `observation.caskNumber`/`barrelNumber`/`selector` earn their place via the exact-cask
-anchor and SMWS paths. `outturn`/`market`/`exclusive` were removed because they
-were only normalized and copied. `bottleNumber` remains an ablation candidate.
+anchor and SMWS paths. `bottleNumber`/`outturn`/`market`/`exclusive` were removed
+because they were only normalized and copied.
 
 ### A.4 `confidenceBasis.*` (`classifierTypes.ts:453-495`)
 
@@ -148,7 +148,7 @@ decision value (`spec.md:208-211`). All three are therefore **ABLATE**.
 
 ## Verdict tally
 
-- **Output fields:** KEEP the fields with named readers (+`unresolvedRisks`, `webEvidence`, `observation.selector/caskNumber/barrelNumber`); REMOVE `confidence`, `band`, `toolsUsed`, the complete `identityBasis` object, and the no-reader `observation.outturn`/`market`/`exclusive` fields; ABLATE `observation.bottleNumber`, `confidenceBasis.positiveEvidence`, and `aliasScope`; KEEP-but-demote `rationale`.
+- **Output fields:** KEEP the fields with named readers (+`unresolvedRisks`, `webEvidence`, `observation.selector/caskNumber/barrelNumber`); REMOVE `confidence`, `band`, `toolsUsed`, the complete `identityBasis` object, and the no-reader `observation.bottleNumber`/`outturn`/`market`/`exclusive` fields; ABLATE `confidenceBasis.positiveEvidence` and `aliasScope`; KEEP-but-demote `rationale`.
 - **Input fields:** KEEP `alias`, `currentBottle`, `imageEvidence.{photoSuitability,conflicts,fieldCandidates}`; REMOVE-from-model-envelope `candidate.score`, `candidate.source`, `imageEvidence.textRegions` (score/source retained as code-only).
 - **Tools:** KEEP web search (firecrawl default); ABLATE `search_entities` (live vs preload) and `search_bottles` (frequency).
 - **Runtime stages:** ABLATE all 3 (unit-tested mechanism, no eval outcome proof).

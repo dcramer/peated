@@ -26,6 +26,7 @@
 - [x] 3.3 Remove no-consumer observation subfields (`market`, `exclusive`, `outturn`) or land their first consumer, per the value audit. (2026-08-10: removed the fields from current schemas, prompts, normalization, deterministic producers, and tests; the persisted version 2 read boundary drops the obsolete fields.)
 - [x] 3.4 Remove the unread `identityBasis` object instead of adding a reader for the obsolete Bottle/release split. (2026-08-10: removed from the prompt, agent and reviewed schemas, deterministic producers, server evidence logs, tests, and active architecture documentation; the persisted version 2 read boundary drops the obsolete field.)
 - [x] 3.5 Remove model-reported `confidenceBasis.toolsUsed`; keep actual tool-call measurement in runtime-owned metadata. (2026-08-09: removed from the prompt, schema, deterministic producers, tests, and photo telemetry mapping; photo telemetry now reads `modelMetadata.toolCalls`, and the persisted version 2 read boundary drops the obsolete field.)
+- [x] 3.6 Remove the unread `observation.bottleNumber` field. (2026-08-10: removed from current schemas, normalization, deterministic producers, and tests; the persisted version 2 read boundary drops the obsolete field.)
 
 ## 4. Confidence Removal And Gating
 

@@ -67,6 +67,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
   });
 
   test.each([
+    ["bottleNumber", "144 of 240"],
     ["outturn", 240],
     ["market", "US"],
     ["exclusive", "travel retail"],

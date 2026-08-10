@@ -158,6 +158,7 @@ function removeLegacyClassifierOutputFields(output: unknown): unknown {
   const observation = currentDecision.observation;
   if (observation && typeof observation === "object") {
     const {
+      bottleNumber: _bottleNumber,
       outturn: _outturn,
       market: _market,
       exclusive: _exclusive,
