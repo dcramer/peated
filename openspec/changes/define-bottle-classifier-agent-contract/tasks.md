@@ -21,7 +21,7 @@
 
 ## 3. Output Schema
 
-- [ ] 3.1 Reorder the agent decision schema so `confidenceBasis` and `rationale` precede `action`, target ids, and drafts; re-record replays and compare focused evals.
+- [ ] 3.1 Reorder the agent decision schema so `confidenceBasis` and `rationale` precede `action`, target ids, and drafts; re-record replays and compare focused evals. (2026-08-10: implemented the strict schema order and added a schema-boundary test. The local 97-case hosted eval skipped without `AI_GATEWAY_API_KEY`, so the replay and comparison gate remains.)
 - [x] 3.2 Give unresolved risks typed categories and notes. Do not parse freeform risk text in automation policy. (2026-07-06: `unresolvedRisks` moved to `{ category, note }`; the later value audit found no reader for source-locator positive evidence, so task 3.7 removes that field.)
 - [x] 3.3 Remove no-consumer observation subfields (`market`, `exclusive`, `outturn`) or land their first consumer, per the value audit. (2026-08-10: removed the fields from current schemas, prompts, normalization, deterministic producers, and tests; the persisted version 2 read boundary drops the obsolete fields.)
 - [x] 3.4 Remove the unread `identityBasis` object instead of adding a reader for the obsolete Bottle/release split. (2026-08-10: removed from the prompt, agent and reviewed schemas, deterministic producers, server evidence logs, tests, and active architecture documentation; the persisted version 2 read boundary drops the obsolete field.)
