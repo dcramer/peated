@@ -1,4 +1,6 @@
-export const BOTTLE_CHECK_SCHEMA_VERSION = 1;
+// Bump when persisted Bottle Check output or operation shapes stop parsing.
+// Older rows stay opaque so reviewers rerun them instead of executing stale data.
+export const BOTTLE_CHECK_SCHEMA_VERSION = 2;
 
 export class UnsupportedBottleCheckSchemaVersionError extends Error {
   constructor(

@@ -68,7 +68,7 @@ describe("Audit review action routes", () => {
     };
   }
 
-  test("keeps incompatible check versions visible, opaque, and closable", async ({
+  test("keeps version-1 checks visible, opaque, and closable", async ({
     fixtures,
   }) => {
     const moderator = await fixtures.User({ mod: true });
@@ -76,7 +76,7 @@ describe("Audit review action routes", () => {
     await db
       .update(bottleChecks)
       .set({
-        schemaVersion: 2,
+        schemaVersion: 1,
         output: {
           findings: { legacyFinding: true },
           legacySummary: ["not", "the", "current", "shape"],
@@ -101,7 +101,7 @@ describe("Audit review action routes", () => {
     expect(details.audit).toMatchObject({
       id: created.check.id,
       schemaSupported: false,
-      schemaVersion: 2,
+      schemaVersion: 1,
       canClose: true,
       operationCount: 1,
       operations: [],
