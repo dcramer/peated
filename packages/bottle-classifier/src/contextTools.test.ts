@@ -108,7 +108,7 @@ describe("Bottle-check context tools", () => {
     expect(
       await invokePreparedTool(prepared, "propose_update_bottle", {
         bottleId: currentBottleContext.bottleId,
-        patch: { exact: { caskType: "oloroso" } },
+        patch: { caskType: "oloroso" },
         rationale: "Fill optional cask metadata.",
         evidenceRefs: [
           { kind: "bottle", bottleId: currentBottleContext.bottleId },

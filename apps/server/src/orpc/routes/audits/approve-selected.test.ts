@@ -270,9 +270,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       input: {
         bottleId: bottle.id,
         patch: {
-          shared: {
-            bottler: { kind: "existing", entityId: producer.id },
-          },
+          bottler: { kind: "existing", entityId: producer.id },
         },
       },
       rationale: "The inspected release is bottled by its producer.",

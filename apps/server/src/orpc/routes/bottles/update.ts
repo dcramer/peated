@@ -1,4 +1,4 @@
-import { BottleUpdateInputSchema } from "@peated/server/lib/bottleSchemas";
+import { BottlePatchSchema } from "@peated/server/lib/bottleSchemas";
 import {
   BottleUpdateConflictError,
   BottleUpdateGraphError,
@@ -12,13 +12,13 @@ import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { z } from "zod";
 
-const InputSchema = BottleUpdateInputSchema.extend({
+const InputSchema = BottlePatchSchema.extend({
   bottle: z.coerce.number().int().positive(),
 }).strict();
 
 /**
- * Strict moderator HTTP adapter that delegates every shared or exact mutation
- * to the canonical Bottle service and returns the updated Bottle.
+ * Strict moderator HTTP adapter that delegates each flat Bottle patch to the
+ * canonical Bottle service and returns the updated Bottle.
  */
 export default procedure
   .use(requireMod)
@@ -27,7 +27,7 @@ export default procedure
     path: "/bottles/{bottle}",
     summary: "Update bottle",
     description:
-      "Update exact Bottle fields or atomically fan shared BottleGroup fields out to every member",
+      "Update Bottle fields; the server owns shared BottleGroup fan-out",
     spec: (spec) => ({
       ...spec,
       operationId: "updateBottle",
@@ -37,9 +37,10 @@ export default procedure
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
+      const { bottle, ...patch } = input;
       const result = await updateBottle({
-        bottleId: input.bottle,
-        input: { shared: input.shared, exact: input.exact },
+        bottleId: bottle,
+        input: patch,
         context,
       });
 

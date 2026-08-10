@@ -236,15 +236,11 @@ clear the historical release ids, parent id, `creationTarget`, and
 audit evidence, but a release-shaped current proposal must be reclassified
 before approval; it is not translated into a live picker choice.
 
-### Same-Bottle correction compatibility
+### Same-Bottle corrections
 
-`proposedBottle` on a same-bottle correction remains a sparse compatibility
-draft. Live classifier correction producers persist `statedAgeScope: exact`.
-With that marker, a non-null `statedAge` is an exact edit for only the selected
-Bottle. Historical unmarked proposals retain their original shared-age
-interpretation, and approval applies that value through the canonical
-BottleGroup update service so it atomically rematerializes every Bottle in the
-group.
+`proposedBottle` on a same-bottle correction remains a sparse draft. A non-null
+`statedAge` is an exact edit for only the selected Bottle. The server owns that
+storage decision; proposal producers do not annotate fields with storage scope.
 
 Required name and brand, non-null series, category, and bottler, and non-empty
 distillers are shared catalog edits. Non-null edition, ABV, single-cask and
@@ -346,7 +342,7 @@ independently complete Bottle, and returns that Bottle directly. It has no
 staged response wrapper and writes no BottleRelease. A non-null legacy image URL
 is rejected because image creation must use the canonical upload boundary.
 
-Applying a correction commits its canonical shared/exact Bottle update and
+Applying a correction commits its canonical flat Bottle patch and
 proposal approval in one database transaction. Canonical update jobs run only
 after that transaction commits. The correction path retains its Bottle response
 for the current queue UI, but it does not maintain a separate Bottle updater or

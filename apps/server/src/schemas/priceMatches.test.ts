@@ -200,17 +200,8 @@ describe("StorePriceMatchDecisionSchema", () => {
     ).toBe(true);
   });
 
-  test("preserves exact-age repair scope and direct historical repair drafts", () => {
-    const exactRepair = StorePriceMatchDecisionSchema.parse({
-      action: "correction",
-      suggestedBottleId: 1,
-      proposedBottle: {
-        ...baseProposedBottle,
-        statedAge: 12,
-        statedAgeScope: "exact",
-      },
-    });
-    const unmarkedRepair = StorePriceMatchDecisionSchema.parse({
+  test("parses correction age as a direct Bottle field", () => {
+    const repair = StorePriceMatchDecisionSchema.parse({
       action: "correction",
       suggestedBottleId: 1,
       proposedBottle: {
@@ -219,12 +210,7 @@ describe("StorePriceMatchDecisionSchema", () => {
       },
     });
 
-    expect(exactRepair.proposedBottle).toMatchObject({
-      statedAge: 12,
-      statedAgeScope: "exact",
-    });
-    expect(unmarkedRepair.proposedBottle).toMatchObject({ statedAge: 12 });
-    expect(unmarkedRepair.proposedBottle).not.toHaveProperty("statedAgeScope");
+    expect(repair.proposedBottle).toMatchObject({ statedAge: 12 });
   });
 
   test("rejects fractional entity ids in Bottle drafts", () => {

@@ -186,9 +186,7 @@ describe("eval fixture validation", () => {
         input: {
           bottleId: 45174,
           patch: {
-            exact: {
-              vintageYear: 2019,
-            },
+            vintageYear: 2019,
           },
         },
       },
@@ -220,10 +218,8 @@ describe("eval fixture validation", () => {
         input: {
           bottleId: 45249,
           patch: {
-            exact: {
-              caskStrength: true,
-              singleCask: false,
-            },
+            caskStrength: true,
+            singleCask: false,
           },
         },
       }),

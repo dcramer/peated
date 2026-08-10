@@ -173,7 +173,7 @@ describe("Bottle proposal tools", () => {
     expect(
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
-        patch: { exact: { abv: 46 } },
+        patch: { abv: 46 },
         rationale: "The inspected Bottle has the wrong ABV.",
         evidenceRefs: [
           { kind: "web_result", url: "https://example.com/not-collected" },
@@ -191,11 +191,9 @@ describe("Bottle proposal tools", () => {
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
         patch: {
-          exact: {
-            caskType: "oloroso",
-            caskSize: "hogshead",
-            caskFill: "1st_fill",
-          },
+          caskType: "oloroso",
+          caskSize: "hogshead",
+          caskFill: "1st_fill",
         },
         rationale: "Fill optional cask metadata.",
         evidenceRefs,
@@ -209,7 +207,7 @@ describe("Bottle proposal tools", () => {
     expect(
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
-        patch: { exact: { abv: 46, caskType: "oloroso" } },
+        patch: { abv: 46, caskType: "oloroso" },
         rationale: "Correct the ABV while preserving supplied cask metadata.",
         evidenceRefs,
       }),
@@ -218,7 +216,7 @@ describe("Bottle proposal tools", () => {
       expect.objectContaining({
         input: {
           bottleId: 10,
-          patch: { exact: { abv: 46, caskType: "oloroso" } },
+          patch: { abv: 46, caskType: "oloroso" },
         },
       }),
     ]);
@@ -232,12 +230,10 @@ describe("Bottle proposal tools", () => {
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
         patch: {
-          exact: {
-            edition: "95.71",
-            abv: 57,
-            singleCask: true,
-            vintageYear: 2007,
-          },
+          edition: "95.71",
+          abv: 57,
+          singleCask: true,
+          vintageYear: 2007,
         },
         rationale: "Add the verified exact Bottle traits.",
         evidenceRefs,
@@ -245,7 +241,7 @@ describe("Bottle proposal tools", () => {
     ).toEqual({
       status: "rejected",
       reason:
-        "SMWS exact-cask codes belong in the Bottle name, not exact.edition. Omit the edition field from this proposal.",
+        "SMWS exact-cask codes belong in the Bottle name, not the edition field. Omit the edition field from this proposal.",
     });
     expect(collector.getProposals()).toEqual([]);
 
@@ -253,7 +249,9 @@ describe("Bottle proposal tools", () => {
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
         patch: {
-          exact: { abv: 57, singleCask: true, vintageYear: 2007 },
+          abv: 57,
+          singleCask: true,
+          vintageYear: 2007,
         },
         rationale: "Add the verified exact Bottle traits.",
         evidenceRefs,
@@ -264,7 +262,9 @@ describe("Bottle proposal tools", () => {
         input: {
           bottleId: 10,
           patch: {
-            exact: { abv: 57, singleCask: true, vintageYear: 2007 },
+            abv: 57,
+            singleCask: true,
+            vintageYear: 2007,
           },
         },
       }),
@@ -277,7 +277,7 @@ describe("Bottle proposal tools", () => {
     expect(
       await invoke(tools, "propose_update_bottle", {
         bottleId: 11,
-        patch: { exact: { edition: "10.258" } },
+        patch: { edition: "10.258" },
         rationale: "Add the marketed release code.",
         evidenceRefs: [{ kind: "bottle", bottleId: 11 }],
       }),
@@ -303,7 +303,7 @@ describe("Bottle proposal tools", () => {
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
         patch: {
-          shared: { brand: { kind: "existing", entityId: 20 } },
+          brand: { kind: "existing", entityId: 20 },
         },
         rationale: "Use the inspected canonical Brand.",
         evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
@@ -326,7 +326,7 @@ describe("Bottle proposal tools", () => {
     expect(
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
-        patch: { shared: { seriesId: 72 } },
+        patch: { seriesId: 72 },
         rationale: "Assign a Series that no inspected Bottle exposes.",
         evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
       }),
@@ -338,7 +338,7 @@ describe("Bottle proposal tools", () => {
     expect(
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
-        patch: { shared: { seriesId: 71 } },
+        patch: { seriesId: 71 },
         rationale: "An inspected Bottle exposes the canonical Series.",
         evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
       }),
@@ -346,7 +346,7 @@ describe("Bottle proposal tools", () => {
     expect(collector.getProposals()).toEqual([
       expect.objectContaining({
         input: expect.objectContaining({
-          patch: { shared: { seriesId: 71 } },
+          patch: { seriesId: 71 },
         }),
       }),
     ]);

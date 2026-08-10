@@ -89,9 +89,7 @@
         "input": {
           "bottleId": 60301,
           "patch": {
-            "exact": {
-              "abv": 57.4
-            }
+            "abv": 57.4
           }
         },
         "rationale": "The product-specific producer factsheet names the same Batch 24 and 2024 release and states 114.8 proof, directly contradicting the stored ABV.",

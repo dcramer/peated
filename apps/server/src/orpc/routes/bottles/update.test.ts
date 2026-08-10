@@ -84,7 +84,7 @@ async function loadMembers(groupId: number) {
 }
 
 describe("PATCH /bottles/{bottle}", () => {
-  test("requires moderator access and strictly rejects the old flat input", async ({
+  test("requires moderator access and rejects storage-shaped input", async ({
     defaults,
     fixtures,
   }) => {
@@ -101,9 +101,9 @@ describe("PATCH /bottles/{bottle}", () => {
 
     const mod = await fixtures.User({ mod: true });
     for (const oldInput of [
-      { bottle: bottle.id, name: "Flat Name" },
       { bottle: bottle.id, groupId: bottle.groupId },
       { bottle: bottle.id, exact: { unknown: true } },
+      { bottle: bottle.id, shared: { name: "Storage Name" } },
     ]) {
       const error = await waitError(
         routerClient.bottles.update(
@@ -178,13 +178,11 @@ describe("PATCH /bottles/{bottle}", () => {
     const result = await routerClient.bottles.update(
       {
         bottle: first.bottle.id,
-        exact: {
-          edition: "Batch 3",
-          statedAge: 14,
-          releaseYear: 2026,
-          abv: 52,
-          description: "Selected content",
-        },
+        edition: "Batch 3",
+        statedAge: 14,
+        releaseYear: 2026,
+        abv: 52,
+        description: "Selected content",
       },
       { context: { user: mod } },
     );
@@ -234,17 +232,16 @@ describe("PATCH /bottles/{bottle}", () => {
     const result = await routerClient.bottles.update(
       {
         bottle: first.bottle.id,
-        shared: {
-          name: "New Route Label",
-          statedAge: 13,
-          brand: newBrand.id,
-          bottler: newBottler.id,
-          distillers: newDistillers.map(({ id }) => id),
-          series: newSeries.id,
-          category: "single_malt",
-          flavorProfile: "peated",
-        },
-        exact: { edition: "Batch 3", abv: 50 },
+        name: "New Route Label",
+        statedAge: 13,
+        brand: newBrand.id,
+        bottler: newBottler.id,
+        distillers: newDistillers.map(({ id }) => id),
+        series: newSeries.id,
+        category: "single_malt",
+        flavorProfile: "peated",
+        edition: "Batch 3",
+        abv: 50,
       },
       { context: { user: mod } },
     );
@@ -253,7 +250,7 @@ describe("PATCH /bottles/{bottle}", () => {
       group: {
         id: first.group.id,
         name: "New Route Label",
-        statedAge: 13,
+        statedAge: 12,
         brandId: newBrand.id,
         bottlerId: newBottler.id,
         distillerIds: newDistillers.map(({ id }) => id).sort((a, b) => a - b),
@@ -321,7 +318,7 @@ describe("PATCH /bottles/{bottle}", () => {
     const mod = await fixtures.User({ mod: true });
     const missing = await waitError(
       routerClient.bottles.update(
-        { bottle: 999_999, exact: { edition: "Missing" } },
+        { bottle: 999_999, edition: "Missing" },
         { context: { user: mod } },
       ),
     );
@@ -330,7 +327,7 @@ describe("PATCH /bottles/{bottle}", () => {
     const legacy = await fixtures.LegacyBottle({ name: "Missing Group" });
     const missingGroup = await waitError(
       routerClient.bottles.update(
-        { bottle: legacy.id, exact: { edition: "Invalid" } },
+        { bottle: legacy.id, edition: "Invalid" },
         { context: { user: mod } },
       ),
     );
@@ -344,7 +341,7 @@ describe("PATCH /bottles/{bottle}", () => {
     });
     const retiredError = await waitError(
       routerClient.bottles.update(
-        { bottle: retired.id, exact: { edition: "Retired" } },
+        { bottle: retired.id, edition: "Retired" },
         { context: { user: mod } },
       ),
     );
@@ -353,7 +350,7 @@ describe("PATCH /bottles/{bottle}", () => {
     const valid = await fixtures.Bottle({ name: "Invalid Route Input" });
     const badInput = await waitError(
       routerClient.bottles.update(
-        { bottle: valid.id, shared: { brand: 999_999 } },
+        { bottle: valid.id, brand: 999_999 },
         { context: { user: mod } },
       ),
     );
@@ -369,7 +366,7 @@ describe("PATCH /bottles/{bottle}", () => {
       routerClient.bottles.update(
         {
           bottle: members[0].bottle.id,
-          exact: { edition: "Two" },
+          edition: "Two",
         },
         { context: { user: mod } },
       ),

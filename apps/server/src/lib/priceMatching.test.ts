@@ -2800,7 +2800,7 @@ describe("priceMatching", () => {
     expect(observation).toBeUndefined();
   });
 
-  test("keeps unmarked historical repair ages as shared group intent", async ({
+  test("gives unmarked historical repair ages the exact Bottle owner", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User();
@@ -2870,8 +2870,8 @@ describe("priceMatching", () => {
       }),
     ]);
     expect(updatedBottle?.statedAge).toBe(14);
-    expect(updatedSibling?.statedAge).toBe(14);
-    expect(updatedGroup?.statedAge).toBe(14);
+    expect(updatedSibling?.statedAge).toBe(10);
+    expect(updatedGroup?.statedAge).toBe(10);
   });
 
   test("persists normalized proposed bottle drafts from the classifier", async ({

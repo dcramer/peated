@@ -152,11 +152,9 @@
         "input": {
           "bottleId": 25608,
           "patch": {
-            "exact": {
-              "abv": 58.1,
-              "singleCask": true,
-              "vintageYear": 2013
-            }
+            "abv": 58.1,
+            "singleCask": true,
+            "vintageYear": 2013
           }
         },
         "rationale": "Official SMWS product evidence identifies cask 10.258 at 58.1% ABV and as a 2013 single-cask distillation; the code is already present in the canonical Bottle name and does not belong in edition.",

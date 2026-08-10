@@ -48,14 +48,7 @@ function overlappingPatchFields(
     if (operation.type === "update_entity") {
       return Object.keys(operation.input.patch);
     }
-    return [
-      ...Object.keys(operation.input.patch.shared ?? {}).map(
-        (field) => `shared.${field}`,
-      ),
-      ...Object.keys(operation.input.patch.exact ?? {}).map(
-        (field) => `exact.${field}`,
-      ),
-    ];
+    return Object.keys(operation.input.patch);
   };
   const rightFields = new Set(fields(right));
   return fields(left).some((field) => rightFields.has(field));
@@ -64,9 +57,8 @@ function overlappingPatchFields(
 function existingEntityChoices(
   proposal: Extract<ProposedOperation, { type: "update_bottle" }>,
 ) {
-  const shared = proposal.input.patch.shared;
-  if (!shared) return [];
-  return [shared.brand, shared.bottler, ...(shared.distillers ?? [])].flatMap(
+  const patch = proposal.input.patch;
+  return [patch.brand, patch.bottler, ...(patch.distillers ?? [])].flatMap(
     (choice) => (choice?.kind === "existing" ? [choice.entityId] : []),
   );
 }
@@ -78,7 +70,18 @@ function overlappingBottleSharedFields(
   const fields = (
     operation: Extract<ProposedOperation, { type: "update_bottle" }>,
   ) => {
-    const result = new Set(Object.keys(operation.input.patch.shared ?? {}));
+    const result = new Set(
+      Object.keys(operation.input.patch).filter((field) =>
+        [
+          "name",
+          "category",
+          "seriesId",
+          "brand",
+          "distillers",
+          "bottler",
+        ].includes(field),
+      ),
+    );
     if (result.has("name")) result.add("statedAge");
     return result;
   };
@@ -261,12 +264,8 @@ async function prepareParsedProposals(
 function proposedBottleUpdateEntityIds(
   proposal: Extract<ProposedOperation, { type: "update_bottle" }>,
 ): number[] {
-  const shared = proposal.input.patch.shared;
-  const choices = [
-    shared?.brand,
-    shared?.bottler,
-    ...(shared?.distillers ?? []),
-  ];
+  const patch = proposal.input.patch;
+  const choices = [patch.brand, patch.bottler, ...(patch.distillers ?? [])];
   return choices.flatMap((choice) =>
     choice?.kind === "existing" ? [choice.entityId] : [],
   );

@@ -11,8 +11,8 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
-  SystemBottleUpdateInputSchema,
-  type SystemBottleUpdateInput,
+  SystemBottlePatchSchema,
+  type SystemBottlePatch,
 } from "@peated/server/lib/bottleSchemas";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
@@ -204,15 +204,15 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     throw new Error(`Failed to generate details for bottle: ${bottleId}`);
   }
 
-  const exact: NonNullable<SystemBottleUpdateInput["exact"]> = {};
+  const patch: SystemBottlePatch = {};
 
   if (
     generateDesc &&
     result.description &&
     result.description !== bottle.description
   ) {
-    exact.description = result.description;
-    exact.descriptionSrc = "generated";
+    patch.description = result.description;
+    patch.descriptionSrc = "generated";
   }
 
   if (
@@ -220,7 +220,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     (!bottle.tastingNotes ||
       !objectsShallowEqual(result.tastingNotes, bottle.tastingNotes))
   ) {
-    exact.tastingNotes = result.tastingNotes;
+    patch.tastingNotes = result.tastingNotes;
   }
 
   if (
@@ -228,7 +228,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     !arraysEqual(result.suggestedTags, bottle.suggestedTags)
   ) {
     if (!result.suggestedTags.find((t) => !tagList.includes(t))) {
-      exact.suggestedTags = result.suggestedTags;
+      patch.suggestedTags = result.suggestedTags;
     } else {
       logError(`Invalid value for suggestedTags`, {
         tag: {
@@ -242,19 +242,15 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     }
   }
 
-  let shared: SystemBottleUpdateInput["shared"];
   if (!bottle.flavorProfile) {
     const flavorProfile = owned.group.flavorProfile ?? result.flavorProfile;
     if (flavorProfile) {
-      shared = { flavorProfile };
+      patch.flavorProfile = flavorProfile;
     }
   }
 
-  if (!shared && Object.keys(exact).length === 0) return;
-  const input = SystemBottleUpdateInputSchema.parse({
-    shared,
-    exact: Object.keys(exact).length ? exact : undefined,
-  });
+  if (Object.keys(patch).length === 0) return;
+  const input = SystemBottlePatchSchema.parse(patch);
   let update;
   try {
     update = await db.transaction(async (tx) => {

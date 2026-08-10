@@ -6,7 +6,7 @@ import {
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { countries, entities, regions } from "@peated/server/db/schema";
-import type { BottleUpdateInput } from "@peated/server/lib/bottleSchemas";
+import type { BottlePatch } from "@peated/server/lib/bottleSchemas";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import type {
   BottleUpdateExpectedSelectedBottleState,
@@ -54,7 +54,7 @@ export type PreparedOperationExecution =
       review: z.infer<typeof PreparedBottleUpdateDataSchema>;
       canonicalInput: {
         bottleId: number;
-        input: BottleUpdateInput;
+        input: BottlePatch;
         expectedSelectedBottleState: BottleUpdateExpectedSelectedBottleState;
         expectedSharedState?: BottleUpdateExpectedSharedState;
       };

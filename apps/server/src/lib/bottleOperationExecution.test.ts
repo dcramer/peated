@@ -200,13 +200,11 @@ describe("Bottle operation execution", () => {
       input: {
         bottleId: bottle.id,
         patch: {
-          shared: {
-            brand: {
-              kind: "create",
-              entity: {
-                name: "Execution Created Brand",
-                roles: ["brand"],
-              },
+          brand: {
+            kind: "create",
+            entity: {
+              name: "Execution Created Brand",
+              roles: ["brand"],
             },
           },
         },

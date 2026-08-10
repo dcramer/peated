@@ -61,7 +61,7 @@ test("Audits renders one inbox row per actionable check", () => {
           type: "update_bottle",
           input: {
             bottleId: 45146,
-            patch: { exact: { edition: "Warehouse 1" } },
+            patch: { edition: "Warehouse 1" },
           },
           rationale: "The label names Warehouse 1.",
           evidenceRefs: [{ kind: "bottle", bottleId: 45146 }],

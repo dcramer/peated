@@ -390,10 +390,8 @@ describe("Bottle-check eval scoring", () => {
               input: {
                 bottleId: 1,
                 patch: {
-                  shared: {
-                    seriesId: 100,
-                    brand: { kind: "existing", entityId: 10 },
-                  },
+                  seriesId: 100,
+                  brand: { kind: "existing", entityId: 10 },
                 },
               },
               rationale: "Grounded update.",
@@ -634,10 +632,8 @@ describe("Bottle-check eval scoring", () => {
           input: {
             bottleId: 3,
             patch: {
-              shared: {
-                seriesId: 999,
-                brand: { kind: "existing", entityId: 30 },
-              },
+              seriesId: 999,
+              brand: { kind: "existing", entityId: 30 },
             },
           },
           rationale: "Targets only shallow resources.",

@@ -171,12 +171,10 @@ describe("Bottle Check review components", () => {
         input: {
           bottleId: 44,
           patch: {
-            exact: {
-              edition: "Warehouse 1",
-              abv: 52.2,
-              releaseYear: 2022,
-              caskType: "bourbon",
-            },
+            edition: "Warehouse 1",
+            abv: 52.2,
+            releaseYear: 2022,
+            caskType: "bourbon",
           },
         },
         rationale: "The release details are present on the label.",

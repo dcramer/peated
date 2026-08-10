@@ -62,7 +62,7 @@ export default procedure
         manifests.push(
           await updateBottleInTransaction(tx, {
             bottleId: group.representativeBottleId,
-            input: { shared: { series: null } },
+            input: { series: null },
             user: context.user,
             actorId,
             creationSource: "manual_entry",

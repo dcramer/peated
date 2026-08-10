@@ -18,10 +18,7 @@ import type {
   StorePriceInputSchema,
 } from "../schemas";
 import BatchQueue from "./batchQueue";
-import {
-  buildBottleCreateInput,
-  buildBottleUpdatePatch,
-} from "./flatBottleInput";
+import { buildBottleCreateInput } from "./flatBottleInput";
 import { formatBottleName } from "./format";
 
 const CACHE = ".cache";
@@ -214,7 +211,7 @@ export async function handleBottle(
       const updateResult = await safe(
         orpcClient.bottles.update({
           bottle: conflict.data.bottle,
-          ...buildBottleUpdatePatch(createInput),
+          ...createInput,
         }),
       );
       if (updateResult.error) {

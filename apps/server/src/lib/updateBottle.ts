@@ -41,9 +41,9 @@ import {
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import {
-  BottleUpdateInputSchema,
-  type BottleUpdateInput,
-  type SystemBottleUpdateInput,
+  BottlePatchSchema,
+  type BottlePatch,
+  type SystemBottlePatch,
 } from "@peated/server/lib/bottleSchemas";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
@@ -53,11 +53,46 @@ import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 
-export { BottleUpdateInputSchema } from "@peated/server/lib/bottleSchemas";
-export type { BottleUpdateInput } from "@peated/server/lib/bottleSchemas";
+export { BottlePatchSchema } from "@peated/server/lib/bottleSchemas";
+export type { BottlePatch } from "@peated/server/lib/bottleSchemas";
 
-type SharedPatch = NonNullable<BottleUpdateInput["shared"]>;
-type ExactPatch = NonNullable<SystemBottleUpdateInput["exact"]>;
+type SharedPatch = Partial<
+  Pick<
+    SystemBottlePatch,
+    | "name"
+    | "series"
+    | "category"
+    | "brand"
+    | "distillers"
+    | "bottler"
+    | "flavorProfile"
+  >
+>;
+type ExactPatch = Partial<
+  Pick<
+    SystemBottlePatch,
+    | "edition"
+    | "statedAge"
+    | "abv"
+    | "singleCask"
+    | "caskStrength"
+    | "vintageYear"
+    | "releaseYear"
+    | "caskSize"
+    | "caskType"
+    | "caskFill"
+    | "description"
+    | "descriptionSrc"
+    | "image"
+    | "tastingNotes"
+    | "suggestedTags"
+  >
+>;
+
+type BottleStoragePatch = {
+  shared?: SharedPatch;
+  exact?: ExactPatch;
+};
 
 export class BottleUpdateAuthorizationError extends Error {
   constructor() {
@@ -276,6 +311,46 @@ function hasFields(value: object | undefined): boolean {
   return value !== undefined && Object.keys(value).length > 0;
 }
 
+/**
+ * Bottle update owns the storage map. Callers submit Bottle fields and never
+ * choose BottleGroup versus Bottle persistence.
+ */
+export function bottleStoragePatch(
+  input: SystemBottlePatch,
+): BottleStoragePatch {
+  const shared: SharedPatch = {};
+  const exact: ExactPatch = {};
+
+  if ("name" in input) shared.name = input.name;
+  if ("series" in input) shared.series = input.series;
+  if ("category" in input) shared.category = input.category;
+  if ("brand" in input) shared.brand = input.brand;
+  if ("distillers" in input) shared.distillers = input.distillers;
+  if ("bottler" in input) shared.bottler = input.bottler;
+  if ("flavorProfile" in input) shared.flavorProfile = input.flavorProfile;
+
+  if ("edition" in input) exact.edition = input.edition;
+  if ("statedAge" in input) exact.statedAge = input.statedAge;
+  if ("abv" in input) exact.abv = input.abv;
+  if ("singleCask" in input) exact.singleCask = input.singleCask;
+  if ("caskStrength" in input) exact.caskStrength = input.caskStrength;
+  if ("vintageYear" in input) exact.vintageYear = input.vintageYear;
+  if ("releaseYear" in input) exact.releaseYear = input.releaseYear;
+  if ("caskSize" in input) exact.caskSize = input.caskSize;
+  if ("caskType" in input) exact.caskType = input.caskType;
+  if ("caskFill" in input) exact.caskFill = input.caskFill;
+  if ("description" in input) exact.description = input.description;
+  if ("descriptionSrc" in input) exact.descriptionSrc = input.descriptionSrc;
+  if ("image" in input) exact.image = input.image;
+  if ("tastingNotes" in input) exact.tastingNotes = input.tastingNotes;
+  if ("suggestedTags" in input) exact.suggestedTags = input.suggestedTags;
+
+  return {
+    ...(hasFields(shared) ? { shared } : {}),
+    ...(hasFields(exact) ? { exact } : {}),
+  };
+}
+
 function existingEntityChoiceId(choice: unknown): number | null {
   if (typeof choice === "number") return choice;
   if (
@@ -289,12 +364,8 @@ function existingEntityChoiceId(choice: unknown): number | null {
   return null;
 }
 
-function existingEntityIdsForUpdate(input: SystemBottleUpdateInput): number[] {
-  const choices = [
-    input.shared?.brand,
-    input.shared?.bottler,
-    ...(input.shared?.distillers ?? []),
-  ];
+function existingEntityIdsForUpdate(input: SystemBottlePatch): number[] {
+  const choices = [input.brand, input.bottler, ...(input.distillers ?? [])];
   return choices.flatMap((choice) => {
     const id = existingEntityChoiceId(choice);
     return id === null ? [] : [id];
@@ -666,7 +737,7 @@ async function resolveStableState(
     (left, right) => left - right,
   );
 
-  let statedAge = valueOrCurrent(patch?.statedAge, group.statedAge);
+  let statedAge = group.statedAge;
   let name = patch?.name ?? group.name;
   if (patch?.name !== undefined) {
     const normalized = normalizeBottleAge({
@@ -674,7 +745,7 @@ async function resolveStableState(
       statedAge,
     });
     name = normalized.name;
-    if (patch.statedAge === undefined) statedAge = normalized.statedAge;
+    statedAge = normalized.statedAge;
   }
   name = stripDuplicateBrandPrefixFromBottleName(name, brand.name);
   if (!name || bottleNameDuplicatesBrand(name, brand.name)) {
@@ -958,7 +1029,7 @@ export async function updateBottleInTransaction(
     creationSource,
   }: {
     bottleId: number;
-    input: SystemBottleUpdateInput;
+    input: SystemBottlePatch;
     expectedSelectedBottleState?: BottleUpdateExpectedSelectedBottleState;
     expectedSharedState?: BottleUpdateExpectedSharedState;
     user?: User;
@@ -977,6 +1048,7 @@ export async function updateBottleInTransaction(
     ...existingEntityIdsForUpdate(input),
   ]);
   const groupId = group.id;
+  const storage = bottleStoragePatch(input);
   if (
     expectedSelectedBottleState &&
     expectedSelectedBottleKeys.some(
@@ -997,8 +1069,8 @@ export async function updateBottleInTransaction(
     throw new BottleUpdateGraphError("retired", bottleId, groupId);
   }
 
-  const sharedIntent = hasFields(input.shared);
-  const exactIntent = hasFields(input.exact);
+  const sharedIntent = hasFields(storage.shared);
+  const exactIntent = hasFields(storage.exact);
   let members = [lockedBottle];
   if (sharedIntent) {
     const lockedMembers = await tx
@@ -1100,7 +1172,7 @@ export async function updateBottleInTransaction(
   const newEntityIds = new Set<number>();
   const stable = await resolveStableState(tx, {
     group,
-    patch: sharedIntent ? input.shared : undefined,
+    patch: sharedIntent ? storage.shared : undefined,
     currentDistillerIds: currentGroupDistillerIds,
     actorId,
     user,
@@ -1129,7 +1201,7 @@ export async function updateBottleInTransaction(
       changedEntityIds.add(distillerId);
     }
   }
-  const exactIdentityIntent = hasExactIdentityFields(input.exact);
+  const exactIdentityIntent = hasExactIdentityFields(storage.exact);
 
   const bottleDistillerRows = await tx
     .select()
@@ -1171,7 +1243,7 @@ export async function updateBottleInTransaction(
             bottle: member,
             oldGroupStatedAge: group.statedAge,
             stable,
-            exactPatch: input.exact,
+            exactPatch: storage.exact,
             materializeSharedFields: sharedIntent,
             regenerateIdentity: sharedIntent || exactIdentityIntent,
           })
@@ -1457,7 +1529,7 @@ export async function updateBottle({
   if (!Number.isInteger(bottleId) || bottleId <= 0) {
     throw new BottleUpdateInputError("Bottle ID must be a positive integer.");
   }
-  const input = BottleUpdateInputSchema.parse(rawInput);
+  const input = BottlePatchSchema.parse(rawInput);
   const user = context.user;
   const actor = await getUserActor(user);
   const result = await db.transaction((tx) =>

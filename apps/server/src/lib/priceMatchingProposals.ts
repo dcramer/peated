@@ -73,7 +73,7 @@ import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
   finalizeBottleUpdate,
   updateBottleInTransaction,
-  type BottleUpdateInput,
+  type BottlePatch,
 } from "@peated/server/lib/updateBottle";
 import type { PriceMatchSearchEvidenceSchema } from "@peated/server/schemas";
 import {
@@ -215,64 +215,54 @@ function normalizeClassifierDecisionForPriceMatching(
 }
 
 /**
- * Maps sparse persisted repair drafts to canonical shared and exact patches.
- * Classifier repairs mark stated age as exact Bottle data; unmarked historical
- * drafts retain the legacy shared-age contract. Unknown null fields or empty
- * distiller lists are omitted rather than cleared.
+ * Maps sparse persisted repair drafts to the canonical flat Bottle patch.
+ * Unknown null fields or empty distiller lists are omitted rather than cleared.
  */
 function buildBottleRepairInput(
   proposedBottle: StorePriceBottleRepairDraft,
-): BottleUpdateInput {
+): BottlePatch {
   const proposedInput = buildBottleInputFromProposedBottle(proposedBottle);
-  const shared: NonNullable<BottleUpdateInput["shared"]> = {
+  const patch: BottlePatch = {
     name: proposedInput.name,
     brand: proposedInput.brand,
   };
-  const exact: NonNullable<BottleUpdateInput["exact"]> = {};
 
-  if (proposedBottle.series !== null) shared.series = proposedInput.series!;
+  if (proposedBottle.series !== null) patch.series = proposedInput.series!;
   if (proposedBottle.category !== null) {
-    shared.category = proposedBottle.category;
+    patch.category = proposedBottle.category;
   }
   if (proposedBottle.statedAge !== null) {
-    if (proposedBottle.statedAgeScope === "exact") {
-      exact.statedAge = proposedBottle.statedAge;
-    } else {
-      shared.statedAge = proposedBottle.statedAge;
-    }
+    patch.statedAge = proposedBottle.statedAge;
   }
   if (proposedBottle.distillers.length > 0) {
-    shared.distillers = proposedInput.distillers;
+    patch.distillers = proposedInput.distillers;
   }
   if (proposedBottle.bottler !== null) {
-    shared.bottler = proposedInput.bottler!;
+    patch.bottler = proposedInput.bottler!;
   }
 
-  if (proposedBottle.edition !== null) exact.edition = proposedBottle.edition;
-  if (proposedBottle.abv !== null) exact.abv = proposedBottle.abv;
+  if (proposedBottle.edition !== null) patch.edition = proposedBottle.edition;
+  if (proposedBottle.abv !== null) patch.abv = proposedBottle.abv;
   if (proposedBottle.singleCask !== null) {
-    exact.singleCask = proposedBottle.singleCask;
+    patch.singleCask = proposedBottle.singleCask;
   }
   if (proposedBottle.caskStrength !== null) {
-    exact.caskStrength = proposedBottle.caskStrength;
+    patch.caskStrength = proposedBottle.caskStrength;
   }
   if (proposedBottle.vintageYear !== null) {
-    exact.vintageYear = proposedBottle.vintageYear;
+    patch.vintageYear = proposedBottle.vintageYear;
   }
   if (proposedBottle.releaseYear !== null) {
-    exact.releaseYear = proposedBottle.releaseYear;
+    patch.releaseYear = proposedBottle.releaseYear;
   }
   if (proposedBottle.caskType !== null)
-    exact.caskType = proposedBottle.caskType;
+    patch.caskType = proposedBottle.caskType;
   if (proposedBottle.caskSize !== null)
-    exact.caskSize = proposedBottle.caskSize;
+    patch.caskSize = proposedBottle.caskSize;
   if (proposedBottle.caskFill !== null)
-    exact.caskFill = proposedBottle.caskFill;
+    patch.caskFill = proposedBottle.caskFill;
 
-  return {
-    shared,
-    ...(Object.keys(exact).length > 0 ? { exact } : {}),
-  };
+  return patch;
 }
 
 /**

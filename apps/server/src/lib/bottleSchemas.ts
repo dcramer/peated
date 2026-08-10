@@ -110,10 +110,9 @@ export const BottleCreateInputSchema = BottleCreateFieldsSchema.superRefine(
 
 export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;
 
-const BottleSharedPatchSchema = z
+const BottlePatchFieldsSchema = z
   .object({
     name: BottleGroupFieldsSchema.shape.name.optional(),
-    statedAge: z.number().int().min(0).max(100).nullable().optional(),
     series: BottleGroupFieldsSchema.shape.series
       .unwrap()
       .removeDefault()
@@ -131,12 +130,6 @@ const BottleSharedPatchSchema = z
     flavorProfile: BottleGroupFieldsSchema.shape.flavorProfile
       .removeDefault()
       .optional(),
-  })
-  .strict()
-  .superRefine(validateGroupChoiceIds);
-
-const BottleExactPatchSchema = z
-  .object({
     edition: ExactBottleInputSchema.shape.edition.removeDefault().optional(),
     statedAge: z.number().int().min(0).max(100).nullable().optional(),
     abv: ExactBottleInputSchema.shape.abv.unwrap().removeDefault().optional(),
@@ -176,30 +169,22 @@ const BottleExactPatchSchema = z
   })
   .strict();
 
-const ModeratorBottleExactPatchSchema = BottleExactPatchSchema.omit({
+/**
+ * Flat Bottle edits are the only public patch contract. The Bottle service
+ * owns field storage and shared BottleGroup fan-out.
+ */
+export const BottlePatchSchema = BottlePatchFieldsSchema.omit({
   suggestedTags: true,
-});
+}).superRefine(validateGroupChoiceIds);
 
-export const BottleUpdateInputSchema = z
-  .object({
-    shared: BottleSharedPatchSchema.optional(),
-    exact: ModeratorBottleExactPatchSchema.optional(),
-  })
-  .strict();
-
-export type BottleUpdateInput = z.infer<typeof BottleUpdateInputSchema>;
+export type BottlePatch = z.infer<typeof BottlePatchSchema>;
 
 /**
  * Internal update contract for system-owned exact content such as generated
  * tags. Public moderator input remains limited to user-editable fields.
  */
-export const SystemBottleUpdateInputSchema = z
-  .object({
-    shared: BottleSharedPatchSchema.optional(),
-    exact: BottleExactPatchSchema.optional(),
-  })
-  .strict();
+export const SystemBottlePatchSchema = BottlePatchFieldsSchema.superRefine(
+  validateGroupChoiceIds,
+);
 
-export type SystemBottleUpdateInput = z.infer<
-  typeof SystemBottleUpdateInputSchema
->;
+export type SystemBottlePatch = z.infer<typeof SystemBottlePatchSchema>;

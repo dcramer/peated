@@ -411,12 +411,10 @@ async function performEntityMerge({
             series: currentSeries,
           }),
           input: {
-            shared: {
-              brand: brandChanges ? toEntityId : group.brandId,
-              ...(bottlerChanges ? { bottler: toEntityId } : {}),
-              ...(distillersChange ? { distillers: nextDistillerIds } : {}),
-              ...(seriesInput !== undefined ? { series: seriesInput } : {}),
-            },
+            brand: brandChanges ? toEntityId : group.brandId,
+            ...(bottlerChanges ? { bottler: toEntityId } : {}),
+            ...(distillersChange ? { distillers: nextDistillerIds } : {}),
+            ...(seriesInput !== undefined ? { series: seriesInput } : {}),
           },
           user: mutationUser,
           actorId: actor.id,

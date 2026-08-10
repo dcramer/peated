@@ -31,9 +31,7 @@ function updateBottleProposal(
     input: {
       bottleId,
       patch: {
-        exact: {
-          edition,
-        },
+        edition,
       },
     },
     rationale: `Use the ${edition} edition.`,

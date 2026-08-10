@@ -48,7 +48,7 @@ async function auditResult({
         type: "update_bottle",
         input: {
           bottleId,
-          patch: { exact: { edition: "Audited Edition" } },
+          patch: { edition: "Audited Edition" },
         },
         rationale: "The inspected Bottle has a missing edition.",
         evidenceRefs: [{ kind: "bottle", bottleId }],

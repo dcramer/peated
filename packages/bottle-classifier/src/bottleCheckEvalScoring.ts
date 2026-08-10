@@ -149,7 +149,7 @@ export function listBottleCheckOperationTargets(
 ): BottleCheckOperationTarget[] {
   switch (operation.type) {
     case "update_bottle": {
-      const shared = operation.input.patch.shared;
+      const patch = operation.input.patch;
       const entityTarget = (
         choice: BottleOperationEntityChoice | null | undefined,
         path: Array<number | string>,
@@ -163,36 +163,20 @@ export function listBottleCheckOperationTargets(
           id: operation.input.bottleId,
           path: ["bottleId"],
         },
-        ...(shared?.seriesId
+        ...(patch.seriesId
           ? [
               {
                 kind: "series" as const,
-                id: shared.seriesId,
-                path: ["patch", "shared", "seriesId"],
+                id: patch.seriesId,
+                path: ["patch", "seriesId"],
               },
             ]
           : []),
-        ...entityTarget(shared?.brand, [
-          "patch",
-          "shared",
-          "brand",
-          "entityId",
-        ]),
-        ...(shared?.distillers ?? []).flatMap((choice, index) =>
-          entityTarget(choice, [
-            "patch",
-            "shared",
-            "distillers",
-            index,
-            "entityId",
-          ]),
+        ...entityTarget(patch.brand, ["patch", "brand", "entityId"]),
+        ...(patch.distillers ?? []).flatMap((choice, index) =>
+          entityTarget(choice, ["patch", "distillers", index, "entityId"]),
         ),
-        ...entityTarget(shared?.bottler, [
-          "patch",
-          "shared",
-          "bottler",
-          "entityId",
-        ]),
+        ...entityTarget(patch.bottler, ["patch", "bottler", "entityId"]),
       ];
     }
     case "merge_bottles":

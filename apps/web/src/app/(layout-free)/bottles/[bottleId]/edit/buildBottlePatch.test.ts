@@ -4,7 +4,7 @@ import type {
   BottleFormSubmitValue,
 } from "@peated/web/components/bottleForm";
 import { describe, expect, test } from "vitest";
-import { buildBottleUpdateInput } from "./buildBottleUpdateInput";
+import { buildBottlePatch } from "./buildBottlePatch";
 
 function formValue(
   overrides: Partial<BottleFormSubmitValue> = {},
@@ -41,50 +41,43 @@ function submitMeta(
   return { dirtyFields: new Set(dirtyFields) };
 }
 
-describe("buildBottleUpdateInput", () => {
-  test("omits both scopes when the age field is not dirty", () => {
+describe("buildBottlePatch", () => {
+  test("omits the age when it is not dirty", () => {
     expect(
-      buildBottleUpdateInput(formValue({ statedAge: 18 }), submitMeta()),
+      buildBottlePatch(formValue({ statedAge: 18 }), submitMeta()),
     ).toEqual({});
   });
 
-  test("builds an exact-only patch without shared values", () => {
-    expect(
-      buildBottleUpdateInput(formValue(), submitMeta("edition", "abv")),
-    ).toEqual({ exact: { edition: "Batch 24", abv: 57.2 } });
+  test("builds a sparse flat patch", () => {
+    expect(buildBottlePatch(formValue(), submitMeta("edition", "abv"))).toEqual(
+      { edition: "Batch 24", abv: 57.2 },
+    );
   });
 
-  test("routes an exact-owned age without exposing a second form field", () => {
+  test("submits one stated-age field", () => {
     expect(
-      buildBottleUpdateInput(
-        formValue({ statedAge: 15 }),
-        submitMeta("statedAge"),
-        { statedAgeScope: "exact" },
-      ),
-    ).toEqual({ exact: { statedAge: 15 } });
+      buildBottlePatch(formValue({ statedAge: 15 }), submitMeta("statedAge")),
+    ).toEqual({ statedAge: 15 });
   });
 
-  test("clears an exact-owned age without changing shared values", () => {
+  test("clears stated age without a storage scope", () => {
     expect(
-      buildBottleUpdateInput(
-        formValue({ statedAge: null }),
-        submitMeta("statedAge"),
-        { statedAgeScope: "exact" },
-      ),
-    ).toEqual({ exact: { statedAge: null } });
+      buildBottlePatch(formValue({ statedAge: null }), submitMeta("statedAge")),
+    ).toEqual({ statedAge: null });
   });
 
-  test("builds a shared-only patch without exact values", () => {
+  test("combines expression and Bottle fields in one patch", () => {
     expect(
-      buildBottleUpdateInput(formValue(), submitMeta("name", "statedAge")),
+      buildBottlePatch(formValue(), submitMeta("name", "statedAge")),
     ).toEqual({
-      shared: { name: "Springbank 12 Cask Strength", statedAge: 12 },
+      name: "Springbank 12 Cask Strength",
+      statedAge: 12,
     });
   });
 
-  test("maps the complete shared and exact form contract", () => {
+  test("maps the complete flat form contract", () => {
     expect(
-      buildBottleUpdateInput(
+      buildBottlePatch(
         formValue({
           series: 3,
           brand: 4,
@@ -120,39 +113,35 @@ describe("buildBottleUpdateInput", () => {
         ),
       ),
     ).toEqual({
-      shared: {
-        name: "Springbank 12 Cask Strength",
-        statedAge: 12,
-        series: 3,
-        category: "single_malt",
-        brand: 4,
-        distillers: [5, 6],
-        bottler: 7,
-        flavorProfile: "deep_rich_dried_fruit",
-      },
-      exact: {
-        edition: "Batch 24",
-        abv: 57.2,
-        singleCask: true,
-        caskStrength: true,
-        vintageYear: 2012,
-        releaseYear: 2024,
-        caskSize: "hogshead",
-        caskType: "oloroso",
-        caskFill: "1st_fill",
-        description: "A batch release.",
-        descriptionSrc: "user",
-      },
+      name: "Springbank 12 Cask Strength",
+      statedAge: 12,
+      series: 3,
+      category: "single_malt",
+      brand: 4,
+      distillers: [5, 6],
+      bottler: 7,
+      flavorProfile: "deep_rich_dried_fruit",
+      edition: "Batch 24",
+      abv: 57.2,
+      singleCask: true,
+      caskStrength: true,
+      vintageYear: 2012,
+      releaseYear: 2024,
+      caskSize: "hogshead",
+      caskType: "oloroso",
+      caskFill: "1st_fill",
+      description: "A batch release.",
+      descriptionSrc: "user",
     });
   });
 
   test("clears a removed image but leaves a new canvas to the upload route", () => {
-    expect(
-      buildBottleUpdateInput(formValue({ image: null }), submitMeta()),
-    ).toEqual({ exact: { image: null } });
+    expect(buildBottlePatch(formValue({ image: null }), submitMeta())).toEqual({
+      image: null,
+    });
 
     expect(
-      buildBottleUpdateInput(
+      buildBottlePatch(
         formValue({ image: {} as HTMLCanvasElement }),
         submitMeta(),
       ),

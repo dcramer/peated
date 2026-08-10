@@ -109,9 +109,7 @@
         "input": {
           "bottleId": 60201,
           "patch": {
-            "exact": {
-              "caskStrength": true
-            }
+            "caskStrength": true
           }
         },
         "rationale": "The product evidence establishes that Ember Ledger batches are released at cask strength while their numeric ABV varies, so caskStrength is supported without copying Batch 20's 57.4% ABV onto Batch 24.",
