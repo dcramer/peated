@@ -136,7 +136,6 @@ vi.mock("@peated/server/worker/client", () => ({
 const supportiveWebEvidenceConfidenceBasis = {
   positiveEvidence: ["Web evidence supports the required bottle identity."],
   unresolvedRisks: [],
-  toolsUsed: ["firecrawl_web_search"],
   webEvidence: "supportive",
 };
 
@@ -147,7 +146,6 @@ const supportiveWebEvidenceConfidenceBasis = {
 const autoVerificationConfidenceBasis = {
   positiveEvidence: ["The candidate covers the observed bottle identity."],
   unresolvedRisks: [],
-  toolsUsed: ["initial_local_candidates", "firecrawl_web_search"],
   webEvidence: "supportive",
 };
 

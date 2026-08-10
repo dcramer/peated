@@ -95,7 +95,6 @@ const supportiveWebEvidenceConfidenceBasis = {
     "Reliable non-origin web evidence supports the proposed bottle identity.",
   ],
   unresolvedRisks: [],
-  toolsUsed: ["firecrawl_web_search"],
   webEvidence: "supportive",
 } as const satisfies NonNullable<
   BottleClassifierAgentDecisionInput["confidenceBasis"]
@@ -1484,7 +1483,6 @@ describe("createBottleClassifier", () => {
           confidenceBasis: {
             positiveEvidence: ["The label supports the proposed bottle."],
             unresolvedRisks: [],
-            toolsUsed: ["none"],
             webEvidence: "not_needed",
           },
           matchedBottleId: null,
@@ -1642,7 +1640,6 @@ describe("createBottleClassifier", () => {
               "A non-origin source corroborates the exact bottle name.",
             ],
             unresolvedRisks: [],
-            toolsUsed: ["firecrawl_web_search"],
             webEvidence: "supportive",
           },
           matchedBottleId: null,
@@ -1740,7 +1737,6 @@ describe("createBottleClassifier", () => {
                 note: "The corroborating result may be copied retailer text.",
               },
             ],
-            toolsUsed: ["firecrawl_web_search"],
             webEvidence: "weak",
           },
           matchedBottleId: null,
@@ -2560,7 +2556,6 @@ describe("createBottleClassifier", () => {
                 note: "The source omits the barrel-proof wording on the canonical bottle.",
               },
             ],
-            toolsUsed: ["initial_local_candidates"],
             webEvidence: "not_needed",
           },
           matchedBottleId: 501,
@@ -2632,7 +2627,6 @@ describe("createBottleClassifier", () => {
           confidenceBasis: {
             positiveEvidence: ["Local search found the rye sibling."],
             unresolvedRisks: [],
-            toolsUsed: ["initial_local_candidates"],
             webEvidence: "not_needed",
           },
           matchedBottleId: 501,
@@ -3050,7 +3044,6 @@ describe("createBottleClassifier", () => {
                 note: "A broader sibling omits the age statement.",
               },
             ],
-            toolsUsed: ["firecrawl_web_search"],
             webEvidence: "supportive",
           },
           matchedBottleId: 16913,
@@ -3419,7 +3412,6 @@ describe("createBottleClassifier", () => {
                 note: "Age conflict between source and matched bottle record.",
               },
             ],
-            toolsUsed: ["initial_local_candidates"],
             webEvidence: "not_used",
           },
           matchedBottleId: 2457,

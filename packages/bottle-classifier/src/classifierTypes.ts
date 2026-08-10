@@ -455,21 +455,6 @@ export const BottleConfidenceBasisSchema = z
       .describe(
         "Material conflicts, missing traits, sibling ambiguity, or weak evidence that could change the action or target. Any entry forces automated flows to route the decision to human review.",
       ),
-    toolsUsed: z
-      .array(
-        z.enum([
-          "initial_local_candidates",
-          "search_bottles",
-          "search_entities",
-          "firecrawl_web_search",
-          "firecrawl_read_page",
-          "none",
-        ]),
-      )
-      .default([])
-      .describe(
-        "Evidence sources actually used to decide confidence. Include search tools only when called.",
-      ),
     webEvidence: z
       .enum(["not_needed", "not_used", "supportive", "weak", "conflicting"])
       .default("not_used")

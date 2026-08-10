@@ -111,7 +111,6 @@ function buildShieldaigAgeCreationDecision(
           note: "same-family aged bottle siblings exist",
         },
       ],
-      toolsUsed: ["initial_local_candidates"],
       webEvidence: "not_used",
     },
     matchedBottleId: null,
@@ -435,7 +434,6 @@ describe("finalizeBottleReferenceClassification", () => {
               note: "candidate has a release year and lacks optional ABV",
             },
           ],
-          toolsUsed: ["initial_local_candidates"],
           webEvidence: "not_needed",
         },
         matchedBottleId: null,
@@ -533,7 +531,6 @@ describe("finalizeBottleReferenceClassification", () => {
         confidenceBasis: {
           positiveEvidence: ["readable complete edition marker"],
           unresolvedRisks: [],
-          toolsUsed: ["initial_local_candidates"],
           webEvidence: "not_needed",
         },
         matchedBottleId: null,
@@ -680,7 +677,6 @@ describe("finalizeBottleReferenceClassification", () => {
         confidenceBasis: {
           positiveEvidence: ["producer product page states five years old"],
           unresolvedRisks: [],
-          toolsUsed: ["firecrawl_web_search"],
           webEvidence: "supportive",
         },
         proposedBottle: {
@@ -1047,7 +1043,6 @@ describe("finalizeBottleReferenceClassification", () => {
         confidenceBasis: {
           positiveEvidence: ["readable exact cask code"],
           unresolvedRisks: [unresolvedRisk],
-          toolsUsed: ["initial_local_candidates"],
           webEvidence: "not_needed",
         },
         matchedBottleId: null,
@@ -1127,7 +1122,6 @@ describe("finalizeBottleReferenceClassification", () => {
       confidenceBasis: {
         positiveEvidence: ["Readable bottle label states barrel 4779."],
         unresolvedRisks: [],
-        toolsUsed: ["initial_local_candidates"],
         webEvidence: "not_needed",
       },
       matchedBottleId: null,
@@ -1278,7 +1272,6 @@ describe("finalizeBottleReferenceClassification", () => {
         confidenceBasis: {
           positiveEvidence: ["The source uses cask code 95.71."],
           unresolvedRisks: [],
-          toolsUsed: ["initial_local_candidates"],
           webEvidence: "not_needed",
         },
         matchedBottleId: targetCandidate.bottleId,

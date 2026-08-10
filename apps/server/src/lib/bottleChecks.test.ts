@@ -17,6 +17,7 @@ import {
   createBottleCheck,
   getBottleCheckForReview,
   listActionableBottleChecks,
+  PersistedReferenceBottleCheckOutputSchema,
 } from "@peated/server/lib/bottleChecks";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -100,6 +101,29 @@ function auditCheckInput({
 }
 
 describe("Bottle check persistence", () => {
+  test("removes legacy model-reported tool telemetry from persisted decisions", () => {
+    const output = PersistedReferenceBottleCheckOutputSchema.parse({
+      status: "classified",
+      decision: {
+        action: "no_match",
+        candidateBottleIds: [],
+        confidenceBasis: {
+          positiveEvidence: [],
+          unresolvedRisks: [],
+          toolsUsed: ["search_bottles"],
+          webEvidence: "not_used",
+        },
+        matchedBottleId: null,
+        proposedBottle: null,
+      },
+      findings: [],
+    });
+
+    expect(output.status).toBe("classified");
+    if (output.status !== "classified") throw new Error("Expected decision");
+    expect(output.decision.confidenceBasis).not.toHaveProperty("toolsUsed");
+  });
+
   test("rejects malformed classifier run metadata before persistence", async ({
     fixtures,
   }) => {
