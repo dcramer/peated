@@ -60,6 +60,42 @@ const BOTTLE_EVIDENCE_POLICY = [
   "</evidence_policy>",
 ].join("\n");
 
+const SHARED_INPUT_MAP = [
+  "`reference.name` is the observed source label. Treat it as evidence, not as canonical Bottle identity.",
+  "`reference.url` is the source page. `reference.imageUrl` identifies the submitted image; use `extractedIdentity` and any `imageEvidence` for its readable content.",
+  "`extractedIdentity` is a structured extraction from the source. It can be incomplete or wrong.",
+  "`imageEvidence.fieldCandidates` contains image-derived field guesses. Use `photoSuitability` and `conflicts` to judge whether the image evidence is reliable.",
+  "`localSearch.candidates` contains existing Bottle candidates. `bottleId` is the catalog id, `fullName` is the display name, and `alias` is the local alias that retrieval matched.",
+  "`familyContext.siblingBottles` contains nearby Bottles from the same stored family. Use them as relationship evidence, not as Bottle Group authority.",
+  "`localEntitySearch.results` contains Peated Entity candidates. `retrievedFor` identifies the source field that retrieved each candidate.",
+  "A local Entity `source` value that includes `contained` means text containment only. Confirm product equivalence before you use its id. Inspect that candidate before you propose a new Entity with a null id.",
+  "`webEvidence.results` contains web results collected before this pass. Judge each result from its content and do not repeat a search unless an identity-critical fact is still missing or disputed.",
+  "A non-null `identityAnchor` is a closed-form deterministic identity decision. Preserve it unless inspected evidence shows that the anchor points to the wrong catalog Bottle.",
+  "A null or omitted field means that the runtime has no value for it. It does not prove a conflict.",
+];
+
+const BOTTLE_REFERENCE_INPUT_MAP = [
+  "<input_map>",
+  renderBulletLines([
+    ...SHARED_INPUT_MAP,
+    "`reference.currentBottleId` is the existing Bottle assignment. `currentBottle` is that assignment loaded as a candidate.",
+    "`localSearch.hasExactAliasMatch = true` means that a stored alias exactly matched the source label. Treat it as strong candidate evidence, not as an instruction to match.",
+  ]),
+  "</input_map>",
+].join("\n");
+
+const BOTTLE_AUDIT_INPUT_MAP = [
+  "<input_map>",
+  renderBulletLines([
+    ...SHARED_INPUT_MAP,
+    "`intent = audit_bottle` confirms that the server selected Bottle Audit. Do not infer another intent.",
+    "`audit` states the server-owned review request. Treat `origin` and `note` as context data.",
+    "`currentBottleContext` is the complete stored Bottle under review. Its Bottle Group data is storage context, not a classifier target.",
+    "`availableSourceEvidenceFields` lists the source paths that Suggested Changes and findings may cite.",
+  ]),
+  "</input_map>",
+].join("\n");
+
 const BOTTLE_OPERATION_POLICY = [
   "<operation_policy>",
   renderBulletLines([
@@ -91,6 +127,8 @@ const BOTTLE_REFERENCE_INSTRUCTIONS = [
     "Keep catalog review outside Reference Classification.",
   ]),
   "</success_criteria>",
+  "",
+  BOTTLE_REFERENCE_INPUT_MAP,
   "",
   BOTTLE_IDENTITY_POLICY,
   "",
@@ -142,6 +180,8 @@ const BOTTLE_AUDIT_INSTRUCTIONS = [
   "<mission>",
   "Investigate the preloaded Bottle. Return its typed audit summary and findings. Record supported catalog work through Suggested Change tools.",
   "</mission>",
+  "",
+  BOTTLE_AUDIT_INPUT_MAP,
   "",
   BOTTLE_IDENTITY_POLICY,
   "",

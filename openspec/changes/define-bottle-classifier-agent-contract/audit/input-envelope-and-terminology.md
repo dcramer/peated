@@ -29,6 +29,11 @@ localEntitySearch: { results[] }
 investigationHint
 ```
 
+Current resolution (2026-08-10): the active reference and audit prompts now
+contain a static `<input_map>` for every current envelope object. The runtime
+removed `investigationHint`; existing structured fields carry the facts that
+the dynamic prose previously described.
+
 Legend for **Prompt explanation**: quote + `instructions.ts` line, or **NONE**.
 
 ### Top-level container: `reference` (`agentInput.ts:44-51`)
@@ -111,9 +116,9 @@ Legend for **Prompt explanation**: quote + `instructions.ts` line, or **NONE**.
 
 ### `investigationHint` (`agentInput.ts:66`)
 
-| Field                                  | Prompt explanation                                                                                                                                             | Misread risk                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Verdict                                                                                                                                                                                                                                             |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `investigationHint` (`string \| null`) | **NONE** — the field name is never referenced; its _content_ is free-form instruction prose injected by code (`classifierRuntime.ts:1383-1386`, `:1428-1429`). | This is a **dynamic instruction smuggled through the data channel**: it competes with the static prompt (e.g. "use local search tools if the evidence suggests a better database candidate") and directly violates the "instructions are static per mode" requirement (spec `:227-230`) and the tool-surface rule (spec `:232-235`) — on `initial_only` no tools exist. Two different hint strings also mean the effective prompt is not stable, breaking prompt-cache intent. | **REMOVE** from the envelope. Fold its durable content into the static per-mode instructions; the transient "web evidence was gathered because no exact alias" state is already conveyed by `hasExactAliasMatch` + populated `webEvidence.results`. |
+| Field                                  | Prompt explanation                                                                                              | Misread risk                                                                                                                                  | Verdict                                                                                                                                                                                       |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `investigationHint` (`string \| null`) | **NONE** — the field name was never referenced; its _content_ was free-form instruction prose injected by code. | This was a **dynamic instruction smuggled through the data channel**. It competed with the static prompt and broke the prompt-cache boundary. | **REMOVED** — static input maps now explain `identityAnchor`, `webEvidence.results`, `localEntitySearch.results`, and `hasExactAliasMatch`. The runtime no longer serializes directive prose. |
 
 ### Unexplained-field tally
 
