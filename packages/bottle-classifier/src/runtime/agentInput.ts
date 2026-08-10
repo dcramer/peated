@@ -43,14 +43,13 @@ export function buildAgentInput({
   identityAnchor?: BottleClassificationDecision | null;
 }): string {
   /**
-   * The model should see the raw reference, extracted identity, photo evidence,
-   * and local candidate context in one stable envelope. Keeping this serialized
-   * input shape explicit makes evals and downstream debugging much easier.
+   * The model should see the reference facts used for identity, extracted
+   * identity, photo evidence, and local candidate context in one stable
+   * envelope. Runtime-only correlation fields stay outside this boundary.
    */
   return JSON.stringify(
     {
       reference: {
-        externalSiteId: reference.externalSiteId ?? null,
         name: reference.name,
         url: reference.url ?? null,
         imageUrl: reference.imageUrl ?? null,
@@ -116,7 +115,6 @@ export function buildAuditBottleAgentInput({
         note: audit.note ?? null,
       },
       reference: {
-        externalSiteId: reference.externalSiteId ?? null,
         name: reference.name,
         url: reference.url ?? null,
         imageUrl: reference.imageUrl ?? null,

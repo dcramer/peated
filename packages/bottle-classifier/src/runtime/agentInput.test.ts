@@ -104,6 +104,7 @@ describe("buildAgentInput", () => {
       buildAgentInput({
         reference: {
           id: "reference-44175",
+          externalSiteId: 7,
           name: "Example Parent 21-year-old",
         },
         extractedIdentity: null,
@@ -150,6 +151,7 @@ describe("buildAgentInput", () => {
 
     expect(input.localSearch).not.toHaveProperty("familyContextSummary");
     expect(input.reference).not.toHaveProperty("id");
+    expect(input.reference).not.toHaveProperty("externalSiteId");
     expect(input.currentBottle).not.toHaveProperty("score");
     expect(input.currentBottle).not.toHaveProperty("source");
     expect(input.localSearch.candidates[0]).not.toHaveProperty("score");
@@ -277,6 +279,7 @@ describe("buildAuditBottleAgentInput", () => {
         },
         reference: {
           id: "audit:45146",
+          externalSiteId: 7,
           name: "Laphroaig Càirdeas 2022 Warehouse 1",
           currentBottleId: 45146,
         },
@@ -322,6 +325,7 @@ describe("buildAuditBottleAgentInput", () => {
       availableSourceEvidenceFields: ["audit.note"],
     });
     expect(input.reference).not.toHaveProperty("id");
+    expect(input.reference).not.toHaveProperty("externalSiteId");
     expect(input.localSearch.candidates[0]).not.toHaveProperty("score");
     expect(input.localSearch.candidates[0]).not.toHaveProperty("source");
     expect(input.extractedIdentity).toBeNull();
