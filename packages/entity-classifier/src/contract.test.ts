@@ -61,16 +61,11 @@ describe("entity classifier contract", () => {
   test("parses a structured classification result", () => {
     expect(
       EntityClassificationResultSchema.parse({
-        decision: {
-          verdict: "reassign_bottles_to_existing_brand",
-          rationale:
-            "Bottle evidence and official branding support Canadian Club as the correct target.",
+        advice: {
+          kind: "brand_assignment_issue",
+          summary:
+            "Bottle evidence and official branding identify Canadian Club as the probable Brand.",
           targetEntityId: 2,
-          targetEntityName: "Canadian Club",
-          reassignBottleIds: [1, 2],
-          preserveSourceAsDistillery: true,
-          metadataPatch: {},
-          blockers: [],
           evidenceUrls: ["https://www.canadianclub.com/"],
         },
         artifacts: {
@@ -81,18 +76,16 @@ describe("entity classifier contract", () => {
     ).toBeTruthy();
   });
 
-  test("rejects an unmeasured numeric confidence score", () => {
+  test("rejects legacy change payloads", () => {
     const result = EntityClassificationResultSchema.safeParse({
-      decision: {
-        verdict: "keep_as_is",
-        confidence: 95,
-        rationale: "The reviewed evidence supports the current Entity.",
+      advice: {
+        kind: "brand_assignment_issue",
+        summary: "The reviewed evidence supports another Brand.",
         targetEntityId: null,
-        targetEntityName: null,
+        confidence: 95,
         reassignBottleIds: [],
         preserveSourceAsDistillery: false,
         metadataPatch: {},
-        blockers: [],
         evidenceUrls: [],
       },
       artifacts: {
@@ -106,8 +99,13 @@ describe("entity classifier contract", () => {
       expect(result.error.issues).toContainEqual(
         expect.objectContaining({
           code: "unrecognized_keys",
-          keys: ["confidence"],
-          path: ["decision"],
+          keys: [
+            "confidence",
+            "reassignBottleIds",
+            "preserveSourceAsDistillery",
+            "metadataPatch",
+          ],
+          path: ["advice"],
         }),
       );
     }

@@ -8,13 +8,15 @@ export function buildEntityClassifierInstructions({
   maxSearchQueries: number;
 }) {
   return [
-    "You classify suspect whisky entity rows that may be invalid, overly generic, mislocated, or attached to bottles that belong to a better existing brand.",
-    "Prefer conservative, reviewable decisions. Do not invent producers, countries, websites, or bottle assignments.",
-    "If the current row clearly owns a verified subset of bottles that belong to an existing target brand, choose `reassign_bottles_to_existing_brand` and include only those bottle ids.",
-    "Use `fix_entity_metadata` only when the official producer website or other authoritative sources clearly support the correction.",
-    "Use `generic_or_invalid_brand_row` when the row looks like a junk umbrella or generic category row and you cannot safely recommend one exact corrective reassignment.",
-    "Use `possible_duplicate_entity` when a sibling entity likely represents the same producer but bottle reassignment evidence is incomplete.",
-    "Use `keep_as_is` when the current entity still looks valid after review.",
+    "You inspect one suspect whisky Entity and return advice about its catalog identity.",
+    "Return advice only. Do not return a Suggested Change, Review Operation, catalog patch, or list of fields or Bottles to change.",
+    "Prefer conservative advice. Do not invent producers, countries, websites, targets, or Bottle assignments.",
+    "Use `brand_assignment_issue` when reviewed evidence shows that one existing Entity is probably the correct Brand for Bottles attached to the subject.",
+    "Use `metadata_issue` only when an authoritative source clearly shows that the subject metadata is wrong.",
+    "Use `generic_or_invalid` when the subject is a generic category, junk row, or invalid Entity and no exact target is safe.",
+    "Use `possible_duplicate` when one inspected Entity probably represents the same producer but the evidence is not sufficient for a merge.",
+    "Use `insufficient_evidence` when the available evidence cannot support one of the other findings safely.",
+    "Use `no_issue` when the subject still looks valid after review.",
     `You may issue at most ${maxSearchQueries} web searches.`,
     hasEntitySearch
       ? "Use `search_entities` to resolve likely sibling brands, distillers, or bottlers before relying on web search."
@@ -22,7 +24,7 @@ export function buildEntityClassifierInstructions({
     hasOpenAIWebSearch
       ? "Use `openai_web_search` for official-site confirmation, trademark/branding language, or location/type verification."
       : "No web search tool is available.",
-    "When recommending reassignment, preserve the source as a distillery only when the source row still appears to represent a real distillery identity.",
-    "Always cite evidence URLs when web evidence materially informed the decision.",
+    "Set `targetEntityId` only for `brand_assignment_issue` or `possible_duplicate`. Select an Entity that is present in local evidence.",
+    "Always cite evidence URLs when web evidence materially informs the advice.",
   ].join("\n\n");
 }

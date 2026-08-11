@@ -116,39 +116,22 @@ export const EntityClassificationSearchEvidenceSchema = z
   })
   .strict();
 
-export const EntityClassificationVerdictEnum = z.enum([
-  "reassign_bottles_to_existing_brand",
-  "fix_entity_metadata",
-  "possible_duplicate_entity",
-  "generic_or_invalid_brand_row",
-  "manual_review",
-  "keep_as_is",
+export const EntityClassificationAdviceKindEnum = z.enum([
+  "brand_assignment_issue",
+  "metadata_issue",
+  "possible_duplicate",
+  "generic_or_invalid",
+  "insufficient_evidence",
+  "no_issue",
 ]);
 
-export const EntityClassificationMetadataPatchSchema = z
+// Entity Classification is advice only. Bottle Review owns agent-proposed
+// Entity changes, and the server owns validated Review Operations.
+export const EntityClassificationAdviceSchema = z
   .object({
-    name: z.string().trim().nullable().optional(),
-    shortName: z.string().trim().nullable().optional(),
-    website: z.string().trim().nullable().optional(),
-    type: z.array(EntityTypeEnum).optional(),
-    countryName: z.string().trim().nullable().optional(),
-    regionName: z.string().trim().nullable().optional(),
-  })
-  .strict()
-  .default({});
-
-// No live eval gives a numeric confidence score a measured meaning. The
-// verdict, blockers, and evidence carry the review recommendation.
-export const EntityClassificationDecisionSchema = z
-  .object({
-    verdict: EntityClassificationVerdictEnum,
-    rationale: z.string().trim().min(1),
+    kind: EntityClassificationAdviceKindEnum,
+    summary: z.string().trim().min(1),
     targetEntityId: z.number().int().nullable().default(null),
-    targetEntityName: z.string().trim().nullable().default(null),
-    reassignBottleIds: z.array(z.number().int()).default([]),
-    preserveSourceAsDistillery: z.boolean().default(false),
-    metadataPatch: EntityClassificationMetadataPatchSchema,
-    blockers: z.array(z.string().trim().min(1)).default([]),
     evidenceUrls: z.array(z.string().url()).default([]),
   })
   .strict();
@@ -173,9 +156,6 @@ export type EntityResolution = z.infer<typeof EntityResolutionSchema>;
 export type EntityClassificationSearchEvidence = z.infer<
   typeof EntityClassificationSearchEvidenceSchema
 >;
-export type EntityClassificationDecision = z.infer<
-  typeof EntityClassificationDecisionSchema
->;
-export type EntityClassificationMetadataPatch = z.infer<
-  typeof EntityClassificationMetadataPatchSchema
+export type EntityClassificationAdvice = z.infer<
+  typeof EntityClassificationAdviceSchema
 >;

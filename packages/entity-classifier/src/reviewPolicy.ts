@@ -1,52 +1,25 @@
 import type {
-  EntityClassificationCandidateTarget,
-  EntityClassificationDecision,
+  EntityClassificationAdvice,
   EntityClassificationReference,
-  EntityResolution,
 } from "./classifierTypes";
 import type { EntityClassificationArtifacts } from "./contract";
 
-function uniqueStrings(values: string[]) {
-  return Array.from(new Set(values));
-}
-
-function getTargetName(
-  target:
-    | EntityClassificationCandidateTarget
-    | EntityResolution
-    | null
-    | undefined,
-) {
-  return target?.name ?? null;
-}
-
-function appendBlockers(
-  decision: EntityClassificationDecision,
-  blockers: string[],
-) {
-  return uniqueStrings([...decision.blockers, ...blockers]);
-}
-
-function manualReviewDecision({
-  decision,
-  blockers,
+function insufficientEvidenceAdvice({
+  advice,
+  reason,
 }: {
-  decision: EntityClassificationDecision;
-  blockers: string[];
-}): EntityClassificationDecision {
+  advice: EntityClassificationAdvice;
+  reason: string;
+}): EntityClassificationAdvice {
   return {
-    ...decision,
-    verdict: "manual_review",
+    ...advice,
+    kind: "insufficient_evidence",
+    summary: `${advice.summary} ${reason}`,
     targetEntityId: null,
-    targetEntityName: null,
-    reassignBottleIds: [],
-    preserveSourceAsDistillery: false,
-    metadataPatch: {},
-    blockers: appendBlockers(decision, blockers),
   };
 }
 
-function findKnownTarget({
+function isKnownTarget({
   targetEntityId,
   reference,
   artifacts,
@@ -56,152 +29,90 @@ function findKnownTarget({
   artifacts: EntityClassificationArtifacts;
 }) {
   if (targetEntityId === null) {
-    return {
-      candidateTarget: null,
-      resolvedEntity: null,
-    };
+    return false;
   }
 
-  return {
-    candidateTarget:
-      reference.candidateTargets.find(
-        (target) => target.entityId === targetEntityId,
-      ) ?? null,
-    resolvedEntity:
-      artifacts.resolvedEntities.find(
-        (entity) => entity.entityId === targetEntityId,
-      ) ?? null,
-  };
+  return (
+    reference.candidateTargets.some(
+      (target) => target.entityId === targetEntityId,
+    ) ||
+    artifacts.resolvedEntities.some(
+      (entity) => entity.entityId === targetEntityId,
+    )
+  );
 }
 
-function hasMetadataPatch(decision: EntityClassificationDecision) {
-  return Object.keys(decision.metadataPatch).length > 0;
+function getKnownEvidenceUrls(
+  reference: EntityClassificationReference,
+  artifacts: EntityClassificationArtifacts,
+) {
+  return new Set(
+    [
+      reference.entity.website,
+      ...reference.candidateTargets.map((target) => target.website),
+      ...artifacts.searchEvidence.flatMap((evidence) =>
+        evidence.results.map((result) => result.url),
+      ),
+    ].filter((url): url is string => url !== null),
+  );
 }
 
 export function finalizeEntityClassification({
   reference,
-  decision,
+  advice,
   artifacts,
 }: {
   reference: EntityClassificationReference;
-  decision: EntityClassificationDecision;
+  advice: EntityClassificationAdvice;
   artifacts: EntityClassificationArtifacts;
-}): EntityClassificationDecision {
-  if (decision.verdict === "reassign_bottles_to_existing_brand") {
-    if (decision.targetEntityId === null) {
-      return manualReviewDecision({
-        decision,
-        blockers: [
-          "Server downgraded reassignment because no target entity id was returned.",
-        ],
+}): EntityClassificationAdvice {
+  const knownEvidenceUrls = getKnownEvidenceUrls(reference, artifacts);
+  const reviewedAdvice = {
+    ...advice,
+    evidenceUrls: advice.evidenceUrls.filter((url) =>
+      knownEvidenceUrls.has(url),
+    ),
+  };
+
+  if (
+    reviewedAdvice.kind === "brand_assignment_issue" ||
+    reviewedAdvice.kind === "possible_duplicate"
+  ) {
+    if (reviewedAdvice.targetEntityId === null) {
+      return insufficientEvidenceAdvice({
+        advice: reviewedAdvice,
+        reason: "The advice did not identify a target Entity.",
       });
     }
 
-    const { candidateTarget, resolvedEntity } = findKnownTarget({
-      targetEntityId: decision.targetEntityId,
-      reference,
-      artifacts,
-    });
-    const knownTarget = candidateTarget ?? resolvedEntity;
-    if (!knownTarget) {
-      return manualReviewDecision({
-        decision,
-        blockers: [
-          `Server downgraded reassignment because target entity ${decision.targetEntityId} was not present in local candidates or resolved entities.`,
-        ],
+    if (
+      !isKnownTarget({
+        targetEntityId: reviewedAdvice.targetEntityId,
+        reference,
+        artifacts,
+      })
+    ) {
+      return insufficientEvidenceAdvice({
+        advice: reviewedAdvice,
+        reason: `Target Entity ${reviewedAdvice.targetEntityId} was not present in local evidence.`,
       });
     }
 
-    const supportedBottleIds = new Set(
-      candidateTarget?.supportingBottleIds ?? [],
-    );
-    const reassignBottleIds = decision.reassignBottleIds.filter((bottleId) =>
-      supportedBottleIds.has(bottleId),
-    );
-    const blockers: string[] = [];
-
-    if (reassignBottleIds.length !== decision.reassignBottleIds.length) {
-      blockers.push(
-        "Server removed reassignment bottle ids that were not in grouped local evidence.",
-      );
-    }
-
-    if (reassignBottleIds.length === 0) {
-      return manualReviewDecision({
-        decision: {
-          ...decision,
-          targetEntityName: getTargetName(knownTarget),
-          blockers: appendBlockers(decision, blockers),
-        },
-        blockers: [
-          "Server downgraded reassignment because no returned bottle ids were supported by grouped local evidence.",
-        ],
-      });
-    }
-
-    return {
-      ...decision,
-      targetEntityName: getTargetName(knownTarget),
-      reassignBottleIds,
-      metadataPatch: {},
-      blockers: appendBlockers(decision, blockers),
-    };
+    return reviewedAdvice;
   }
 
-  if (decision.verdict === "possible_duplicate_entity") {
-    if (decision.targetEntityId === null) {
-      return decision;
-    }
-
-    const { candidateTarget, resolvedEntity } = findKnownTarget({
-      targetEntityId: decision.targetEntityId,
-      reference,
-      artifacts,
+  if (
+    reviewedAdvice.kind === "metadata_issue" &&
+    reviewedAdvice.evidenceUrls.length === 0
+  ) {
+    return insufficientEvidenceAdvice({
+      advice: reviewedAdvice,
+      reason: "Metadata advice requires an authoritative evidence URL.",
     });
-    const knownTarget = candidateTarget ?? resolvedEntity;
-    if (!knownTarget) {
-      return manualReviewDecision({
-        decision,
-        blockers: [
-          `Server downgraded duplicate decision because target entity ${decision.targetEntityId} was not present in local candidates or resolved entities.`,
-        ],
-      });
-    }
-
-    return {
-      ...decision,
-      targetEntityName: getTargetName(knownTarget),
-      reassignBottleIds: [],
-      preserveSourceAsDistillery: false,
-      metadataPatch: {},
-    };
-  }
-
-  if (decision.verdict === "fix_entity_metadata") {
-    if (hasMetadataPatch(decision) && decision.evidenceUrls.length === 0) {
-      return manualReviewDecision({
-        decision,
-        blockers: [
-          "Server downgraded metadata fix because no authoritative evidence URL was returned.",
-        ],
-      });
-    }
-
-    return {
-      ...decision,
-      targetEntityId: null,
-      targetEntityName: null,
-      reassignBottleIds: [],
-      preserveSourceAsDistillery: false,
-    };
   }
 
   return {
-    ...decision,
+    ...reviewedAdvice,
     targetEntityId: null,
-    targetEntityName: null,
-    reassignBottleIds: [],
-    preserveSourceAsDistillery: false,
-    metadataPatch: {},
   };
 }

@@ -68,15 +68,10 @@ describe("POST /entities/{entity}/classify", () => {
     });
 
     classifyEntityMock.mockResolvedValue({
-      decision: {
-        verdict: "reassign_bottles_to_existing_brand",
-        rationale: "Bottle evidence supports Canadian Club.",
+      advice: {
+        kind: "brand_assignment_issue",
+        summary: "Bottle evidence supports Canadian Club.",
         targetEntityId: canadianClub.id,
-        targetEntityName: canadianClub.name,
-        reassignBottleIds: [reserveBottle.id],
-        preserveSourceAsDistillery: true,
-        metadataPatch: {},
-        blockers: [],
         evidenceUrls: [],
       },
       artifacts: {
@@ -92,8 +87,8 @@ describe("POST /entities/{entity}/classify", () => {
       { context: { user } },
     );
 
-    expect(result.decision).toMatchObject({
-      verdict: "reassign_bottles_to_existing_brand",
+    expect(result.advice).toMatchObject({
+      kind: "brand_assignment_issue",
       targetEntityId: canadianClub.id,
     });
     expect(classifyEntityMock).toHaveBeenCalledWith({

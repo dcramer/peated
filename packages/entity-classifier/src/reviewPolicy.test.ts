@@ -45,78 +45,94 @@ const reference: EntityClassificationReference = {
 };
 
 describe("finalizeEntityClassification", () => {
-  test("filters reassignment bottle ids to grouped local evidence", () => {
+  test("uses the known name for a brand-assignment target", () => {
     const result = finalizeEntityClassification({
       reference,
       artifacts: buildEntityClassificationArtifacts({}),
-      decision: {
-        verdict: "reassign_bottles_to_existing_brand",
-        rationale: "Canadian Club owns the verified bottle.",
+      advice: {
+        kind: "brand_assignment_issue",
+        summary: "Canadian Club probably owns the reviewed Bottles.",
         targetEntityId: 2,
-        targetEntityName: "Wrong model text",
-        reassignBottleIds: [10, 99],
-        preserveSourceAsDistillery: true,
-        metadataPatch: {},
-        blockers: [],
         evidenceUrls: [],
       },
     });
 
     expect(result).toMatchObject({
-      verdict: "reassign_bottles_to_existing_brand",
-      targetEntityName: "Canadian Club",
-      reassignBottleIds: [10],
+      kind: "brand_assignment_issue",
+      targetEntityId: 2,
     });
-    expect(result.blockers).toContain(
-      "Server removed reassignment bottle ids that were not in grouped local evidence.",
-    );
   });
 
-  test("downgrades reassignment to unknown target ids", () => {
+  test("uses insufficient evidence for an unknown target id", () => {
     const result = finalizeEntityClassification({
       reference,
       artifacts: buildEntityClassificationArtifacts({}),
-      decision: {
-        verdict: "reassign_bottles_to_existing_brand",
-        rationale: "Move it.",
+      advice: {
+        kind: "possible_duplicate",
+        summary: "The subject could duplicate another Entity.",
         targetEntityId: 999,
-        targetEntityName: "Invented",
-        reassignBottleIds: [10],
-        preserveSourceAsDistillery: false,
-        metadataPatch: {},
-        blockers: [],
         evidenceUrls: [],
       },
     });
 
-    expect(result.verdict).toBe("manual_review");
+    expect(result.kind).toBe("insufficient_evidence");
     expect(result.targetEntityId).toBeNull();
-    expect(result.reassignBottleIds).toEqual([]);
-    expect(result.blockers).toContain(
-      "Server downgraded reassignment because target entity 999 was not present in local candidates or resolved entities.",
+    expect(result.summary).toContain(
+      "Target Entity 999 was not present in local evidence.",
     );
   });
 
-  test("requires evidence URLs for metadata patches", () => {
+  test("requires an evidence URL for metadata advice", () => {
     const result = finalizeEntityClassification({
       reference,
       artifacts: buildEntityClassificationArtifacts({}),
-      decision: {
-        verdict: "fix_entity_metadata",
-        rationale: "Looks like a distillery.",
+      advice: {
+        kind: "metadata_issue",
+        summary: "The subject could be a distillery.",
         targetEntityId: null,
-        targetEntityName: null,
-        reassignBottleIds: [],
-        preserveSourceAsDistillery: false,
-        metadataPatch: {
-          type: ["distiller"],
-        },
-        blockers: [],
         evidenceUrls: [],
       },
     });
 
-    expect(result.verdict).toBe("manual_review");
-    expect(result.metadataPatch).toEqual({});
+    expect(result.kind).toBe("insufficient_evidence");
+    expect(result.summary).toContain(
+      "Metadata advice requires an authoritative evidence URL.",
+    );
+  });
+
+  test("removes a target from advice that does not use one", () => {
+    const result = finalizeEntityClassification({
+      reference,
+      artifacts: buildEntityClassificationArtifacts({}),
+      advice: {
+        kind: "no_issue",
+        summary: "The subject is a valid Entity.",
+        targetEntityId: 2,
+        evidenceUrls: [],
+      },
+    });
+
+    expect(result).toMatchObject({
+      kind: "no_issue",
+      targetEntityId: null,
+    });
+  });
+
+  test("removes evidence URLs that the server did not collect", () => {
+    const result = finalizeEntityClassification({
+      reference,
+      artifacts: buildEntityClassificationArtifacts({}),
+      advice: {
+        kind: "possible_duplicate",
+        summary: "The subject could duplicate Canadian Club.",
+        targetEntityId: 2,
+        evidenceUrls: [
+          "https://www.canadianclub.com/",
+          "https://invented.example/",
+        ],
+      },
+    });
+
+    expect(result.evidenceUrls).toEqual(["https://www.canadianclub.com/"]);
   });
 });
