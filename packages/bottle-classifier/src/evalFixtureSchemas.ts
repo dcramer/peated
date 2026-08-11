@@ -99,31 +99,82 @@ export const evalFixtureProvenanceSchema = z
     }
   });
 
-export const classifierEvalExpectationSchema = z.object({
-  status: z.enum(["ignored", "classified"]),
-  action: z.enum(["match", "create_bottle", "no_match"]).optional(),
-  identityScope: z.enum(["product", "exact_cask"]).optional(),
-  aliasScope: AliasScopeEnum.optional(),
-  matchedBottleId: z.number().int().nullable().optional(),
-  proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
-  proposedBottleNameOneOf: z.array(z.string().min(1)).min(1).optional(),
-  proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
-  proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
-  proposedBottleDistillerIdOneOf: z
-    .array(z.number().int().positive())
-    .min(1)
-    .optional(),
-  proposedBottleDistillerIds: z
-    .array(z.number().int().positive())
-    .min(1)
-    .optional(),
-  expectedTier: z.enum(["auto", "review"]).optional(),
-  verifyEligible: z.boolean().optional(),
-  suggestedNextStep: z
-    .enum(["confirm_match", "confirm_create", "manual_search"])
-    .optional(),
-  summary: z.string().min(1),
-});
+export const classifierEvalExpectationSchema = z
+  .object({
+    status: z.enum(["ignored", "classified"]),
+    action: z.enum(["match", "create_bottle", "no_match"]).optional(),
+    identityScope: z.enum(["product", "exact_cask"]).optional(),
+    aliasScope: AliasScopeEnum.optional(),
+    matchedBottleId: z.number().int().nullable().optional(),
+    proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
+    proposedBottleNameOneOf: z.array(z.string().min(1)).min(1).optional(),
+    proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
+    proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
+    proposedBottleDistillerIdOneOf: z
+      .array(z.number().int().positive())
+      .min(1)
+      .optional(),
+    proposedBottleDistillerIds: z
+      .array(z.number().int().positive())
+      .min(1)
+      .optional(),
+    expectedTier: z.enum(["auto", "review"]).optional(),
+    verifyEligible: z.boolean().optional(),
+    suggestedNextStep: z
+      .enum(["confirm_match", "confirm_create", "manual_search"])
+      .optional(),
+    summary: z.string().min(1),
+  })
+  .superRefine((value, ctx) => {
+    if (value.status === "ignored") {
+      if (value.action !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Ignored fixtures cannot expect a classification action.",
+          path: ["action"],
+        });
+      }
+      return;
+    }
+
+    if (value.action === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Classified fixtures must expect an action.",
+        path: ["action"],
+      });
+    }
+
+    if (value.identityScope === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Classified fixtures must expect an identity scope.",
+        path: ["identityScope"],
+      });
+    }
+
+    if (value.action === "match" && value.matchedBottleId == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Match fixtures must expect a Bottle id.",
+        path: ["matchedBottleId"],
+      });
+    }
+
+    const hasProposedBottleExpectation =
+      value.proposedBottle != null ||
+      value.proposedBottleNameOneOf !== undefined ||
+      value.proposedBottleNameIncludes !== undefined ||
+      value.proposedBottleNameExcludes !== undefined;
+    if (value.action === "create_bottle" && !hasProposedBottleExpectation) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Create Bottle fixtures must expect Bottle fields or Bottle name text.",
+        path: ["proposedBottle"],
+      });
+    }
+  });
 
 const classifierEvalContextSchema = z
   .object({

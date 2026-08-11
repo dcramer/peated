@@ -339,6 +339,8 @@ describe("eval fixture validation", () => {
       expected: {
         status: "classified",
         action: "create_bottle",
+        identityScope: "product",
+        proposedBottle: { name: "Speyside 21-year-old" },
         summary: "Should reject before judging the outcome.",
       },
     });
@@ -398,6 +400,8 @@ describe("eval fixture validation", () => {
       expected: {
         status: "classified",
         action: "create_bottle",
+        identityScope: "product",
+        proposedBottle: { name: "Speyside 21-year-old" },
         summary: "Should reject before judging the outcome.",
       },
     });
@@ -444,6 +448,7 @@ describe("eval fixture validation", () => {
       expected: {
         status: "classified",
         action: "match",
+        identityScope: "product",
         matchedBottleId: 45146,
         summary: "Match the existing Warehouse 1 Bottle.",
       },
@@ -553,6 +558,7 @@ describe("eval fixture validation", () => {
       expected: {
         status: "classified",
         action: "match",
+        identityScope: "product",
         matchedBottleId: 1,
         summary: "Duplicate candidate ids are invalid.",
       },
@@ -637,6 +643,92 @@ describe("eval fixture validation", () => {
       releaseYear: 2024,
       vintageYear: 2012,
     });
+  });
+
+  test("requires classified expectations to name their action boundary", () => {
+    const baseFixture = {
+      id: "incomplete-classified-expectation",
+      name: "Incomplete classified expectation",
+      input: {
+        reference: { name: "Example 10-year-old" },
+      },
+      expected: {
+        status: "classified" as const,
+        summary: "The expectation is intentionally incomplete.",
+      },
+    };
+
+    const missingAction = classifierEvalFixtureSchema.safeParse(baseFixture);
+    expect(missingAction.success).toBe(false);
+    if (!missingAction.success) {
+      expect(missingAction.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            path: ["expected", "action"],
+            message: "Classified fixtures must expect an action.",
+          }),
+          expect.objectContaining({
+            path: ["expected", "identityScope"],
+            message: "Classified fixtures must expect an identity scope.",
+          }),
+        ]),
+      );
+    }
+
+    const missingTarget = classifierEvalFixtureSchema.safeParse({
+      ...baseFixture,
+      expected: {
+        ...baseFixture.expected,
+        action: "match",
+        identityScope: "product",
+      },
+    });
+    expect(missingTarget.success).toBe(false);
+    if (!missingTarget.success) {
+      expect(missingTarget.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["expected", "matchedBottleId"],
+          message: "Match fixtures must expect a Bottle id.",
+        }),
+      );
+    }
+
+    const missingBottle = classifierEvalFixtureSchema.safeParse({
+      ...baseFixture,
+      expected: {
+        ...baseFixture.expected,
+        action: "create_bottle",
+        identityScope: "product",
+      },
+    });
+    expect(missingBottle.success).toBe(false);
+    if (!missingBottle.success) {
+      expect(missingBottle.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["expected", "proposedBottle"],
+          message:
+            "Create Bottle fixtures must expect Bottle fields or Bottle name text.",
+        }),
+      );
+    }
+
+    const ignoredWithAction = classifierEvalFixtureSchema.safeParse({
+      ...baseFixture,
+      expected: {
+        status: "ignored",
+        action: "no_match",
+        summary: "Ignored references do not have a decision action.",
+      },
+    });
+    expect(ignoredWithAction.success).toBe(false);
+    if (!ignoredWithAction.success) {
+      expect(ignoredWithAction.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["expected", "action"],
+          message: "Ignored fixtures cannot expect a classification action.",
+        }),
+      );
+    }
   });
 
   test("keeps file-backed eval fixture ids globally unique", () => {

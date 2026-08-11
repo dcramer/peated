@@ -1,0 +1,77 @@
+{
+  "id": "store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix",
+  "name": "store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+  "input": {
+    "reference": {
+      "name": "Glenmorangie Quinta Ruban 14-year-old",
+      "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban"
+    },
+    "initialCandidates": [
+      {
+        "alias": null,
+        "brand": "Glenmorangie",
+        "bottler": "Glenmorangie",
+        "series": null,
+        "distillery": [],
+        "category": "single_malt",
+        "statedAge": 14,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.87,
+        "source": ["vector"],
+        "bottleId": 2466,
+        "fullName": "Glenmorangie 14-year-old Quinta Ruban - 4th Edition"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["quinta", "ruban"],
+      "results": [
+        {
+          "alias": null,
+          "brand": "Glenmorangie",
+          "bottler": "Glenmorangie",
+          "series": null,
+          "distillery": [],
+          "category": "single_malt",
+          "statedAge": 14,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 0.87,
+          "source": ["vector"],
+          "bottleId": 2466,
+          "fullName": "Glenmorangie 14-year-old Quinta Ruban - 4th Edition"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+      "https://api.peated.com/v1/bottles/2466"
+    ],
+    "dbOutcome": {
+      "bottleId": 2466,
+      "createsBottle": false,
+      "summary": "The official product page identifies Quinta Ruban 14 without an edition suffix. Peated Bottle 2466 stores the same marketed Bottle with a 4th Edition suffix."
+    },
+    "notes": "The old synthetic expectation created a duplicate Bottle because the source omitted the stored edition suffix. Official product evidence and the current Peated row show that both names identify the same marketed Bottle."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 2466,
+    "summary": "Match the official Quinta Ruban 14 product to Bottle 2466. The stored 4th Edition suffix does not prove a different marketed Bottle."
+  }
+}
