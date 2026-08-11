@@ -24,6 +24,7 @@ export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
 export const EXTERNAL_SITE_TYPE_LIST = [
   "astorwines",
+  "decadentdrinks",
   "healthyspirits",
   "reservebar",
   "smws",
@@ -183,7 +184,7 @@ export const defaultHeaders = (url: string) => {
 
 export const BOT_USER_AGENT = "PeatedBot/1.0 (https://peated.com)";
 
-export const ALLOWED_VOLUMES = [500, 750, 1000, 1500, 1750];
+export const ALLOWED_VOLUMES = [500, 700, 750, 1000, 1500, 1750];
 
 export const SCRAPER_PRICE_BATCH_SIZE = 5;
 
