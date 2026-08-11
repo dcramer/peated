@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  EntityClassificationDecisionSchema,
+  EntityClassificationAdviceSchema,
   EntityClassificationReferenceSchema,
   EntityClassificationSearchEvidenceSchema,
   EntityResolutionSchema,
@@ -23,7 +23,7 @@ export const EntityClassificationArtifactsSchema = z
 
 export const EntityClassificationResultSchema = z
   .object({
-    decision: EntityClassificationDecisionSchema,
+    advice: EntityClassificationAdviceSchema,
     artifacts: EntityClassificationArtifactsSchema,
   })
   .strict();

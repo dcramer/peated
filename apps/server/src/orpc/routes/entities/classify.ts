@@ -10,9 +10,9 @@ export default procedure
   .route({
     method: "POST",
     path: "/entities/{entity}/classify",
-    summary: "Run entity classifier for one entity",
+    summary: "Run Entity classifier for one Entity",
     description:
-      "Run the entity classifier against one local entity row using server-assembled bottle evidence, sibling targets, and optional web research.",
+      "Return read-only identity advice for one local Entity using server-assembled Bottle evidence, sibling targets, and optional web research. This operation does not propose or apply catalog changes.",
     spec: (spec) => ({
       ...spec,
       operationId: "classifyEntity",

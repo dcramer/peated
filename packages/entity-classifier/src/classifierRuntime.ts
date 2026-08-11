@@ -1,10 +1,10 @@
 import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import type OpenAI from "openai";
 import {
-  EntityClassificationDecisionSchema,
+  EntityClassificationAdviceSchema,
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
-  type EntityClassificationDecision,
+  type EntityClassificationAdvice,
   type EntityClassificationReference,
   type EntityResolution,
   type SearchEntitiesArgs,
@@ -148,7 +148,7 @@ export function createEntityClassifier(
         parallelToolCalls: false,
         ...getDeterministicOpenAISettings(options.model),
       },
-      outputType: EntityClassificationDecisionSchema,
+      outputType: EntityClassificationAdviceSchema,
       tools,
     });
     const conversationId = `entity:${reference.entity.id}`;
@@ -189,16 +189,16 @@ export function createEntityClassifier(
         ),
         searchEvidence,
       });
-      const decision = finalizeEntityClassification({
+      const advice = finalizeEntityClassification({
         reference,
-        decision: EntityClassificationDecisionSchema.parse(
-          result.finalOutput as EntityClassificationDecision,
+        advice: EntityClassificationAdviceSchema.parse(
+          result.finalOutput as EntityClassificationAdvice,
         ),
         artifacts,
       });
 
       return EntityClassificationResultSchema.parse({
-        decision,
+        advice,
         artifacts,
       });
     } catch (error) {
