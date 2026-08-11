@@ -16,9 +16,9 @@ action.
 1. The user takes or uploads one Bottle photo, or chooses manual search.
 2. The browser shows a local preview immediately and sends the photo to
    `POST /tastings/photo-identification` with an idempotency key.
-3. The server processes the image, creates an owned pending upload, extracts
-   label evidence, checks for one literal stored alias, and runs the Bottle
-   classifier once.
+3. The server processes the image, creates an owned pending upload, and extracts
+   label evidence. One literal stored alias resolves directly. All other
+   references run the Bottle classifier once.
 4. The resolver presents one of three outcomes:
    - an existing Bottle match;
    - an approved proposal for one new, independently complete Bottle; or
@@ -62,8 +62,7 @@ Bottle classifier may propose a match or creation, while server code owns:
 - automation and review thresholds.
 
 Existing-Bottle matches may use strong local evidence without web research.
-An exact alias seeds the full classifier with one candidate. It does not produce
-a separate identity decision or model call.
+An exact alias produces a deterministic Match without a classifier model call.
 Creation requires the classifier's complete `create_bottle` proposal and the
 approved automation tier. Otherwise the flow falls back to search or manual
 creation.

@@ -1,6 +1,7 @@
 // This route owns the photo lookup boundary for add-tasting. It may create or
 // reuse a pending upload, but it must not create tastings, bottles, or durable
 // classifier trace rows.
+import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
 import {
   agentActionRiskClass,
   deriveAutomationTier,
@@ -560,8 +561,9 @@ function logPhotoIdentificationFailure({
 }
 
 /**
- * Runs label extraction and local candidate discovery for a pending scan, then
- * gives the full classifier the chance to identify the Bottle.
+ * Runs label extraction and local candidate discovery for a pending scan. A
+ * literal accepted alias resolves directly; all other references run the full
+ * classifier once.
  *
  * This is the shared Photo Identification workflow span boundary for all callers.
  */
@@ -609,15 +611,32 @@ export async function identifyPendingImage({
       const exactAliasCandidate = await findExactAliasBottleCandidate(
         classificationInput.reference.name,
       );
-      const classificationInputWithCandidates = {
-        ...classificationInput,
-        ...(exactAliasCandidate
-          ? { initialCandidates: [exactAliasCandidate] }
-          : {}),
-      };
-      const classificationRun = await runBottleReference(
-        classificationInputWithCandidates,
-      );
+      const classificationRun = exactAliasCandidate
+        ? {
+            result: createDecidedBottleClassification({
+              decision: {
+                action: "match",
+                rationale:
+                  "A literal stored Bottle alias identifies this Bottle.",
+                candidateBottleIds: [exactAliasCandidate.bottleId],
+                identityScope: "product",
+                observation: null,
+                confidenceBasis: {
+                  unresolvedRisks: [],
+                  webEvidence: "not_needed",
+                },
+                matchedBottleId: exactAliasCandidate.bottleId,
+                proposedBottle: null,
+              },
+              artifacts: {
+                extractedIdentity,
+                imageEvidence,
+                candidates: [exactAliasCandidate],
+              },
+            }),
+            modelMetadata: null,
+          }
+        : await runBottleReference(classificationInput);
       const classification = classificationRun.result;
       const referenceName = classificationInput.reference.name;
       const diagnostics = buildPhotoIdentificationDiagnostics({

@@ -514,7 +514,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("passes exact Peated alias candidates through full photo classification", async ({
+  test("resolves an exact Peated alias without classifier model work", async ({
     fixtures,
     defaults,
   }) => {
@@ -543,25 +543,6 @@ describe("POST /tastings/photo-identification", () => {
         imageEvidence: buildImageEvidence(pendingUpload.id),
       }),
     );
-    classifyBottleReferenceMock.mockResolvedValue(
-      buildClassification(
-        {
-          action: "match",
-          matchedBottleId: bottle.id,
-        },
-        {
-          candidates: [
-            {
-              bottleId: bottle.id,
-              fullName: "Ardbeg Uigeadail",
-              brand: "Ardbeg",
-              source: ["exact"],
-            },
-          ],
-        },
-      ),
-    );
-
     const response = await routerClient.tastings.photoIdentification(
       {
         file: await fixtures.SampleSquareImage(),
@@ -580,18 +561,21 @@ describe("POST /tastings/photo-identification", () => {
         matchedBottle: { id: bottle.id },
       },
     });
-    expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        initialCandidates: [
-          expect.objectContaining({
-            bottleId: bottle.id,
-            fullName: bottle.fullName,
-            source: expect.arrayContaining(["exact"]),
-          }),
-        ],
-      }),
+    expect(response.classification).toMatchObject({
+      artifacts: {
+        candidates: [{ fullName: bottle.fullName }],
+      },
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(runBottleReferenceMock).not.toHaveBeenCalled();
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.final.matched_bottle_id",
+      bottle.id,
     );
-    expect(runBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(sentrySpanSetAttributeMock).not.toHaveBeenCalledWith(
+      "photo_identification.final.tool_calls",
+      expect.anything(),
+    );
   });
 
   test("does not run catalog review for a photo match", async ({
