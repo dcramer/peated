@@ -10,6 +10,7 @@
   "expected": {
     "status": "classified",
     "action": "no_match",
+    "identityScope": "product",
     "summary": "Treat unsupported novelty flavored-whiskey products as out of scope and return `no_match` rather than creating or matching a whisky bottle."
   }
 }
