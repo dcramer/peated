@@ -1422,6 +1422,13 @@
       "when": 1786255271554,
       "tag": "0202_glamorous_cerise",
       "breakpoints": false
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1786486599551,
+      "tag": "0203_sparkling_gorgon",
+      "breakpoints": false
     }
   ]
 }
