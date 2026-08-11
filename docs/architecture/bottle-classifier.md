@@ -293,14 +293,12 @@ Ignored references do not run the agent.
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
 
-### Exact Alias Candidate Preflight
+### Exact Alias Preflight
 
 A caller can look up one unambiguous literal stored alias before full
-classification. The lookup returns a Bottle candidate as deterministic evidence.
-It does not return an identity decision and does not call a model. The caller
-passes the candidate to `classifyBottleReference(...)`, which remains the only
-model-based identification pass. When no exact alias exists, the full classifier
-retrieves local candidates through its normal adapter.
+classification. An accepted alias identifies its assigned Bottle without a
+classifier model call. When no exact alias exists, the full classifier retrieves
+local candidates through its normal adapter.
 
 ## Determinism
 
@@ -509,8 +507,8 @@ because catalog investigation is the intent. This keeps identity quality and
 Suggested Change precision as separate measurements.
 
 Full-classification evals own match quality and candidate recall. Server
-integration tests prove that an exact alias becomes an initial candidate and
-that photo identification invokes only one classifier run.
+integration tests prove that an exact alias skips classification and that other
+photo identification paths invoke only one classifier run.
 
 Production-miss evals must preserve the observed reference, URL, extracted
 identity, current assignment, local candidates, and failed outcome. Verify the
@@ -537,5 +535,6 @@ Keep responsibilities narrow:
 
 `classifyBottleReference` means the full reviewed pipeline.
 `findExactAliasBottleCandidate` means a deterministic evidence lookup. It does
-not make an identity decision.
+not call a model. The caller can accept the assigned Bottle as a deterministic
+Match.
 `runBottleClassifierAgent` means only the raw LLM/tool pass.

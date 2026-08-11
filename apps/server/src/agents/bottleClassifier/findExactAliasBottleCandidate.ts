@@ -4,8 +4,8 @@ import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 
 /**
- * Returns one literal stored-alias candidate. The full classifier still owns
- * the identity decision and receives this result only as deterministic evidence.
+ * Returns one literal stored-alias candidate. A caller can accept its assigned
+ * Bottle as a deterministic Match without a classifier model call.
  */
 export async function findExactAliasBottleCandidate(
   referenceName: string,

@@ -55,5 +55,5 @@
 ## 7. Validation
 
 - [x] 7.1 Run `pnpm --filter @peated/bottle-classifier fixtures:validate`. (2026-08-10: all 17 fixture validation checks pass.)
-- [ ] 7.2 Run focused classifier evals for the touched behavior with `pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts`. (2026-08-11: invoked after the fixture-contract review; all 97 hosted cases skipped because `AI_GATEWAY_API_KEY` is unavailable.)
-- [ ] 7.3 Summarize any eval regressions by separating prompt failures, fixture expectation errors, and review-policy or deterministic-gate issues.
+- [x] 7.2 Run focused classifier evals for the touched behavior with `pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts`. (2026-08-11: the credentialed 97-case run completed with 67 passes and 30 failures. Among 71 cases with an explicit expected action, it produced 9 false `no_match` results and 1 false-positive accepted result. The gate remains below the required quality threshold.)
+- [x] 7.3 Summarize any eval regressions by separating prompt failures, fixture expectation errors, and review-policy or deterministic-gate issues. (2026-08-11: 26 reference failures were model-semantic expectation misses, led by incomplete create fields, unsupported abstentions, wrong match targets, and alias-scope errors. Four audit failures returned incomplete Suggested Change field sets. No fixture expectation was proven wrong or changed. The exact-alias route change is outside the classifier eval runtime and its deterministic integration test passes.)
