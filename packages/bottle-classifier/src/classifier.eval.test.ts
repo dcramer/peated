@@ -1,4 +1,4 @@
-import { expect } from "vitest";
+import { afterAll, expect } from "vitest";
 import {
   createHarness,
   createJudge,
@@ -43,6 +43,12 @@ import {
   getBottleCheckSourceEvidencePaths,
   type BottleClassificationResult,
 } from "./contract";
+import {
+  createEvalActionBreakdown,
+  formatEvalActionBreakdown,
+  recordEvalAction,
+  type EvalAction,
+} from "./evalActionBreakdown";
 import type { AuditBottleEvalFixture } from "./evalFixtureSchemas";
 import {
   buildEvalHarnessMeasurements,
@@ -72,6 +78,26 @@ type ClassifiedBottleClassificationResult = Extract<
   BottleClassificationResult,
   { status: "classified" }
 >;
+
+const evalActionBreakdown = createEvalActionBreakdown();
+
+function getExpectedEvalAction(
+  input: ClassifierScenarioEvalCase,
+): EvalAction | null {
+  if (input.kind === "new_bottle_fixture") {
+    return input.testCase.expected.action ?? null;
+  }
+
+  if (input.testCase.expected.status === "ignored") {
+    return "ignored";
+  }
+
+  return input.testCase.expected.action ?? null;
+}
+
+function getActualEvalAction(result: BottleClassificationResult): EvalAction {
+  return result.status === "ignored" ? "ignored" : result.decision.action;
+}
 
 function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
   if (testCase.kind === "decision") {
@@ -952,6 +978,12 @@ const ClassifierExpectationJudge = createJudge<ClassifierJudgeContext>(
       input.kind === "new_bottle_fixture"
         ? evaluateNormalizationShape(input.testCase, result)
         : evaluateDecisionShape(input.testCase, result);
+    const expectedAction = getExpectedEvalAction(input);
+    const actualAction = getActualEvalAction(result);
+
+    if (expectedAction !== null) {
+      recordEvalAction(evalActionBreakdown, expectedAction, actualAction);
+    }
 
     return {
       score: verdict.score,
@@ -959,10 +991,19 @@ const ClassifierExpectationJudge = createJudge<ClassifierJudgeContext>(
         rationale:
           verdict.failures.join("; ") || "All expected fields matched.",
         failures: verdict.failures,
+        expectedAction,
+        actualAction,
       },
     };
   },
 );
+
+afterAll(() => {
+  const summary = formatEvalActionBreakdown(evalActionBreakdown);
+  if (summary !== null) {
+    process.stdout.write(`\n${summary}\n`);
+  }
+});
 
 const SCENARIO_CONFIG: Array<{
   label: string;
