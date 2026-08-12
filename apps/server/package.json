@@ -42,7 +42,7 @@
     "@sindresorhus/slugify": "^2.2.1",
     "@vitest/coverage-v8": "catalog:",
     "axios": "~1.19.0",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "bullmq": "^5.40.3",
     "cheerio": "1.2.0",
     "concurrently": "^8.2.2",
@@ -70,7 +70,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
+    "@types/bcrypt": "^6.0.0",
     "@types/error-cause": "^1.0.4",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mime-types": "^3.0.1",
