@@ -1,0 +1,80 @@
+{
+  "products": [
+    {
+      "title": "The Speyside Connection",
+      "handle": "speyside-connection",
+      "body_html": "<p>A North Star vatting of Speyside malts.</p>",
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/speyside-connection.png"
+        }
+      ],
+      "variants": [
+        {
+          "available": true,
+          "price": "69.99"
+        }
+      ]
+    },
+    {
+      "title": "Caol Ila Sherry Octave",
+      "handle": "caol-ila-sherry-octave",
+      "body_html": "<p>Single malt Scotch whisky. 50cl bottle.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "57.00"
+        }
+      ]
+    },
+    {
+      "title": "Archived Linkwood",
+      "handle": "archive-linkwood",
+      "body_html": "<p>70cl single malt Scotch whisky.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": false,
+          "price": "0.00"
+        }
+      ]
+    },
+    {
+      "title": "Unavailable Ardmore",
+      "handle": "unavailable-ardmore",
+      "body_html": "<p>70cl single malt Scotch whisky.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": false,
+          "price": "60.00"
+        }
+      ]
+    },
+    {
+      "title": "Wee Star Linkwood",
+      "handle": "wee-star-linkwood",
+      "body_html": "<p>20cl single malt Scotch whisky.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "24.00"
+        }
+      ]
+    },
+    {
+      "title": "Obscurities & Curiosities Navy Strength London Dry Gin",
+      "handle": "navy-strength-london-dry-gin",
+      "body_html": "<p>A deliciously obscure gin.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "33.00"
+        }
+      ]
+    }
+  ]
+}

@@ -27,6 +27,7 @@ export type JobName =
   | "ScrapeAstorWines"
   | "ScrapeDecadentDrinks"
   | "ScrapeHealthySpirits"
+  | "ScrapeNorthStarSpirits"
   | "ScrapeReserveBar"
   | "ScrapeSMWS"
   | "ScrapeSMWSA"
