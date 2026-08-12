@@ -1436,6 +1436,13 @@
       "when": 1786575968418,
       "tag": "0204_slim_micromacro",
       "breakpoints": false
+    },
+    {
+      "idx": 205,
+      "version": "7",
+      "when": 1786577815428,
+      "tag": "0205_chunky_angel",
+      "breakpoints": false
     }
   ]
 }
