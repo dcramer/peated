@@ -346,6 +346,6 @@
     "proposedBottleNameIncludes": ["18-year-old", "Single Barrel"],
     "proposedBottleNameExcludes": ["4040", "No. 4040", "Barrel No."],
     "verifyEligible": false,
-    "summary": "Create the complete uncoded Elijah Craig 18-year-old Single Barrel Bottle. Do not match the narrower local No. 4040 barrel row or infer an unsupported group relationship."
+    "summary": "Create the complete uncoded Elijah Craig 18-year-old Single Barrel Bottle. Candidate No. 4040 adds a marketed barrel identity unsupported by the source and is therefore too specific."
   }
 }

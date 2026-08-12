@@ -173,6 +173,6 @@
     "action": "match",
     "identityScope": "exact_cask",
     "matchedBottleId": 347,
-    "summary": "Use the extracted label identity and local candidates to match existing bottle 347. The deterministic review layer must not turn this non-conflicting classifier-selected match into no_match just because deterministic support heuristics are incomplete."
+    "summary": "Match existing Bottle 347 because its populated exact-cask identity covers the source without a conflict. Incomplete deterministic support is not a candidate identity conflict."
   }
 }

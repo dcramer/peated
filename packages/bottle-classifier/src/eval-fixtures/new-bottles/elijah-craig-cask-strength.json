@@ -2,12 +2,12 @@
   "id": "elijah-craig-cask-strength",
   "referenceName": "Elijah Craig Cask Strength",
   "expectedBottleName": "Elijah Craig Barrel Proof",
-  "summary": "Match Elijah Craig Cask Strength shorthand to retained general Bottle 44014, Elijah Craig Barrel Proof, unless an actual batch code or release marker identifies a different Bottle.",
+  "summary": "Match Elijah Craig Cask Strength shorthand to Bottle 44014, Elijah Craig Barrel Proof. Its missing structured cask-strength field is compatible with the same marketed product because no populated identity field conflicts.",
   "peatedBottleIds": [44014],
   "provenance": {
     "source": "curated_regression",
     "verifiedSourceUrls": ["https://api.peated.com/v1/bottles/44014"],
-    "notes": "The retained production search candidate is general Bottle 44014, Elijah Craig Barrel Proof. The fixture captures that candidate so normalization cannot pass by creating a duplicate generic Bottle."
+    "notes": "The retained production search candidate is Bottle 44014, Elijah Craig Barrel Proof, the marketed name of Elijah Craig's cask-strength release. The fixture captures that candidate so a missing structured enrichment field cannot cause a duplicate Bottle."
   },
   "expected": {
     "handlingStrategy": "classifier_required",

@@ -1,6 +1,6 @@
 {
-  "id": "image-backed-photo-matches-springbank-open-day-may-2026-30-year-old",
-  "name": "image-backed photo: matches Springbank Open Day May 2026 30-year-old",
+  "id": "image-backed-photo-requires-review-for-springbank-open-day-may-2026-30-year-old",
+  "name": "image-backed photo: requires review for Springbank Open Day May 2026 30-year-old",
   "input": {
     "reference": {
       "name": "Bottle photo upload",
@@ -88,7 +88,7 @@
     "dbOutcome": {
       "bottleId": 44256,
       "createsBottle": false,
-      "summary": "Production DB outcome: match existing Bottle 44256, Springbank Open Day. Do not create a second Springbank Open Day May 2026 Bottle from this photo."
+      "summary": "Bottle 44256 is the existing exact product, but the classifier must not assign it or create a duplicate while its populated single-cask identity conflicts with the source. Bottle Review owns that correction."
     },
     "catalogFieldObservations": [
       {
@@ -103,7 +103,7 @@
         "notes": "The label and independently verified bottle records identify a vatting from Bourbon, Oloroso, and rum casks rather than a single-cask release."
       }
     ],
-    "notes": "Added from a failed image photo-identification flow using the checked-in photo as the observed source and replay artifact. Re-verified July 31, 2026: the label, Whiskybase WB300303, and Whisky Auctioneer agree this is the Springbank 30-year-old Open Day May 2026 bottling at 47.8% ABV, matured in Bourbon, Oloroso, and rum casks, with 1,572 35cl bottles. Production Bottle 44256 remains the exact Peated Bottle, but it incorrectly stores singleCask=true. Production currently assigns only the aliases Springbank Open Day and Springbank Open Day 2026; the longer May 2026 alias previously in this fixture was not production data."
+    "notes": "Added from a failed image photo-identification flow using the checked-in photo as the observed source and replay artifact. Re-verified July 31, 2026: the label, Whiskybase WB300303, and Whisky Auctioneer agree this is the Springbank 30-year-old Open Day May 2026 bottling at 47.8% ABV, matured in Bourbon, Oloroso, and rum casks, with 1,572 35cl bottles. Production Bottle 44256 remains the exact Peated Bottle, but it incorrectly stores singleCask=true. That populated conflict defines the classifier/Bottle Review boundary: return no_match without creating a duplicate until review corrects the row. Production currently assigns only the aliases Springbank Open Day and Springbank Open Day 2026; the longer May 2026 alias previously in this fixture was not production data."
   },
   "context": {
     "inspectedBottleIds": [44256],
@@ -159,13 +159,14 @@
   },
   "expected": {
     "status": "classified",
-    "action": "match",
+    "action": "no_match",
     "identityScope": "product",
-    "matchedBottleId": 44256,
-    "expectedTier": "auto",
-    "verifyEligible": true,
-    "suggestedNextStep": "confirm_match",
-    "summary": "Match existing bottle 44256, Springbank Open Day, from the label's May 2026 30-year-old Open Day identity."
+    "matchedBottleId": null,
+    "proposedBottle": null,
+    "expectedTier": "review",
+    "verifyEligible": false,
+    "suggestedNextStep": "manual_search",
+    "summary": "Return no_match for catalog review. Bottle 44256 is the exact marketed Open Day product, but its populated singleCask=true field conflicts with evidence that the release is a multi-cask vatting; do not assign it or create a duplicate until Bottle Review corrects the row."
   },
   "localCatalog": {
     "entities": [

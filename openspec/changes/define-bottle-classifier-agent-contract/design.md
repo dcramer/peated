@@ -100,6 +100,14 @@ Terminology must be consistent across the prompt, tool schemas, output schema, a
 
 Alternative considered: rely on schema descriptions only. Rejected because the model sees both prompt and schema but schema descriptions are too terse to teach cross-field identity semantics.
 
+### Decision: Candidate compatibility separates missing data, conflicts, and scope
+
+A missing candidate field is compatible when reviewed evidence identifies the same exact marketed Bottle and no populated candidate field conflicts. Reference Classification may match that Bottle; Bottle Review owns later enrichment. A populated conflict makes the Bottle unsafe for assignment and returns No Match until review corrects it.
+
+Marketed scope is separate from field completeness. An extra marketed trait can make a candidate too specific for the source. An additional source trait can make a broad candidate incomplete when evidence establishes a distinct marketed Bottle. In either direction, the classifier must not collapse two products merely because one name contains the other.
+
+Alternative considered: treat every missing identity field as a required correction. Rejected because that creates false No Match results and duplicate Bottles for incomplete catalog rows. Alternative considered: ignore populated conflicts when the name looks right. Rejected because it can assign a reference to a Bottle whose stored identity describes another product.
+
 ### Decision: Instructions stay static and consistent with the tool surface
 
 The classifier prompt must remain static per instruction mode so provider-side prompt caching works and runtime facts stay in the input, tools, and validation. That guardrail currently lives only in a code comment; it becomes contract.

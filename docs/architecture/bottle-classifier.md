@@ -221,6 +221,14 @@ for that complete Bottle.
   must not erase clear source identity.
 - Match an existing candidate only when it covers the complete identified Bottle
   without conflicting source-stated identity traits.
+- Treat a missing candidate field as compatible when evidence identifies the
+  same exact marketed Bottle and no populated candidate field conflicts. Match
+  that Bottle and leave enrichment to a separate Bottle audit.
+- Treat a populated identity conflict as unsafe. Return `no_match` until Bottle
+  Review makes that Bottle safe for assignment.
+- Do not collapse marketed scope. An unsupported extra trait makes a candidate
+  too specific. A source trait that evidence proves defines a distinct Bottle
+  makes a broad candidate incomplete.
 - Create a Bottle only when reviewed source, label, image,
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a

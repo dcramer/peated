@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-creates-canadian-club-reserve-9-year-old-instead-of-dirty-candidates",
-  "name": "store listing: creates Canadian Club Reserve 9-year-old instead of matching dirty candidates",
+  "id": "store-listing-requires-review-for-canadian-club-reserve-9-year-old",
+  "name": "store listing: requires review for Canadian Club Reserve 9-year-old",
   "input": {
     "reference": {
       "name": "Canadian Club 9-year-old Reserve Canadian Whisky",
@@ -64,16 +64,13 @@
   },
   "expected": {
     "status": "classified",
-    "action": "create_bottle",
+    "action": "no_match",
     "identityScope": "product",
-    "proposedBottle": {
-      "name": "Reserve 9-year-old",
-      "brand": {
-        "name": "Canadian Club"
-      },
-      "category": "blend",
-      "statedAge": 9
-    },
-    "summary": "Create the independently correct Canadian Club Reserve 9-year-old Bottle instead of matching the unsupported Triple Aged Limited Edition row or age-less Reserve row."
+    "matchedBottleId": null,
+    "proposedBottle": null,
+    "expectedTier": "review",
+    "verifyEligible": false,
+    "suggestedNextStep": "manual_search",
+    "summary": "Return no_match for catalog review. Bottle 16913 is a more-specific Triple Aged Limited Edition product; Bottle 17346 may be the same Reserve product but its populated Brand conflicts with Canadian Club, so creating a duplicate is unsafe."
   }
 }

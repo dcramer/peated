@@ -593,6 +593,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 45146,
-    "summary": "Hard expectation: match listing 11828042 to exact Warehouse 1 Bottle 45146 and do not harm generic Càirdeas Bottle 44288. Diagnostic operation-recall target: merge malformed duplicate Bottle 39096 into 45146."
+    "summary": "Match listing 11828042 to exact Warehouse 1 Bottle 45146. Malformed duplicate Bottle 39096 and generic Càirdeas Bottle 44288 do not block this safe target; their catalog state belongs to Bottle Review."
   }
 }

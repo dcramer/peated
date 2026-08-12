@@ -105,6 +105,35 @@ The classifier SHALL use local candidates to determine whether Peated already co
 - **WHEN** a parent bottle candidate covers the observed stable bottle identity but the observed release traits are unsupported or not reusable
 - **THEN** the agent SHALL match the parent bottle and preserve unsupported exact facts as observations when appropriate
 
+### Requirement: Candidate compatibility uses populated identity and marketed scope
+
+The classifier SHALL compare populated candidate fields and marketed Bottle scope. A missing candidate field is not a conflict by itself.
+
+#### Scenario: Exact candidate is missing enrichment
+
+- **WHEN** evidence identifies one candidate as the same exact marketed Bottle, its populated fields do not conflict, and it omits supported fields
+- **THEN** the agent SHALL return `match` and SHALL leave enrichment to Bottle Review
+
+#### Scenario: Exact candidate has a populated conflict
+
+- **WHEN** a populated candidate field conflicts with supported identity evidence for the same marketed Bottle
+- **THEN** the agent SHALL return `no_match` until Bottle Review makes the candidate safe for assignment
+
+#### Scenario: Candidate is more specific than the source Bottle
+
+- **WHEN** a candidate adds a marketed edition, batch, cask, barrel, age, year, or other identity trait that the source Bottle does not support
+- **THEN** the agent SHALL NOT match that candidate
+
+#### Scenario: Source Bottle is more specific than a broad candidate
+
+- **WHEN** evidence shows that an additional source trait defines a distinct marketed Bottle that a broad candidate does not cover
+- **THEN** the agent SHALL create the distinct Bottle when no exact candidate exists
+
+#### Scenario: Another candidate needs catalog review
+
+- **WHEN** one candidate safely matches the source Bottle and another candidate is malformed or conflicting
+- **THEN** the malformed candidate SHALL NOT block the safe match
+
 ### Requirement: Web and source evidence support identity decisions
 
 The classifier SHALL use web, source-page, image, local, and deterministic evidence according to the uncertainty and action risk of the decision.
