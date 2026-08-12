@@ -558,6 +558,40 @@ describe("bottleClassificationEvidence", () => {
     ).toEqual([]);
   });
 
+  test("does not treat missing candidate enrichment as an existing-match conflict", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 44014,
+      fullName: "Elijah Craig Barrel Proof",
+      brand: "Elijah Craig",
+      category: "bourbon",
+    });
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName: "Elijah Craig Cask Strength",
+        extractedLabel: {
+          brand: "Elijah Craig",
+          bottler: null,
+          expression: "Barrel Proof",
+          series: null,
+          distillery: [],
+          category: "bourbon",
+          stated_age: 12,
+          abv: 68.3,
+          release_year: 2024,
+          vintage_year: null,
+          cask_strength: true,
+          single_cask: false,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          edition: null,
+        },
+        targetCandidate,
+      }),
+    ).toEqual([]);
+  });
+
   test("treats a partial marketed edition marker as an existing-match conflict", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 43397,
