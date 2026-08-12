@@ -95,7 +95,6 @@ export function createSearchBottlesTool({
       return await startToolSpan({
         name: "search_bottles",
         description: SEARCH_BOTTLES_TOOL_DESCRIPTION,
-        args,
         callback: async () => {
           const results = await searchBottles(args);
           onResults?.(results);

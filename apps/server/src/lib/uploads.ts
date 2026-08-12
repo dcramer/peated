@@ -10,11 +10,51 @@ import path from "node:path";
 import sharp from "sharp";
 
 import { startSpan } from "@sentry/node";
+import { lookup } from "mime-types";
 import type { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import config from "../config";
 import { getStorage } from "./gcs";
 import { logInfo } from "./log";
+
+const MODEL_IMAGE_MEDIA_TYPES = new Set([
+  "image/gif",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
+function filenameFromUploadUrl(imageUrl: string): string {
+  const pathname = new URL(imageUrl, "https://peated.invalid").pathname;
+  if (!pathname.startsWith("/uploads/")) {
+    throw new Error("Image URL is not an upload URL.");
+  }
+
+  const filename = decodeURIComponent(pathname.slice("/uploads/".length));
+  if (
+    !filename ||
+    filename.includes("\\") ||
+    filename
+      .split("/")
+      .some((segment) => segment === "." || segment === "..") ||
+    path.isAbsolute(filename)
+  ) {
+    throw new Error("Image URL has an invalid upload path.");
+  }
+  return filename;
+}
+
+/** Reads one server-owned upload into the model image-input format. */
+export async function getUploadImageDataUrl(imageUrl: string) {
+  const filename = filenameFromUploadUrl(imageUrl);
+  const mediaType = lookup(filename);
+  if (!mediaType || !MODEL_IMAGE_MEDIA_TYPES.has(mediaType)) {
+    throw new Error("Upload URL does not reference a supported image type.");
+  }
+
+  const image = await readFile({ filename });
+  return `data:${mediaType};base64,${image.toString("base64")}`;
+}
 
 /**
  * Normalizes EXIF orientation, resizes the image, and emits a WebP stream.

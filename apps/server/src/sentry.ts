@@ -1,6 +1,9 @@
 import * as Sentry from "@sentry/hono/node";
 import config from "./config";
-import { normalizeStreamedGenAiSpan } from "./lib/genAiTelemetry";
+import {
+  dropOpenAiInstrumentationError,
+  normalizeStreamedGenAiSpan,
+} from "./lib/genAiTelemetry";
 import { configureLogging } from "./lib/log";
 
 type HonoNodeOptionsWithLocalVariables = Parameters<typeof Sentry.init>[0] & {
@@ -14,11 +17,16 @@ if (config.ENV !== "test") {
     tracesSampleRate: 1.0,
     enableLogs: true,
     streamGenAiSpans: true,
+    beforeSend: dropOpenAiInstrumentationError,
     beforeSendSpan: Sentry.withStreamedSpan(normalizeStreamedGenAiSpan),
     tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
     includeLocalVariables: true,
     sendDefaultPii: true,
-    integrations: [Sentry.zodErrorsIntegration()],
+    integrations: [
+      // Keep request spans and usage while excluding model-controlled content.
+      Sentry.openAIIntegration({ recordInputs: false, recordOutputs: false }),
+      Sentry.zodErrorsIntegration(),
+    ],
   } satisfies HonoNodeOptionsWithLocalVariables;
 
   Sentry.init(sentryOptions);

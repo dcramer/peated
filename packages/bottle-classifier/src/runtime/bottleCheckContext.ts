@@ -15,6 +15,7 @@ import type { OpenAIReasoningEffort } from "../openaiModelSettings";
 
 type BottleContextLoaderDataSource = {
   getBottleContext?: (bottleId: number) => Promise<BottleContextSource | null>;
+  getBottleContextImageInput?: (imageUrl: string) => Promise<string>;
 };
 
 type BottleContextLoaderOptions = {
@@ -102,9 +103,11 @@ export function createBottleContextLoader({
         let extractedIdentity: BottleExtractedDetails | null = null;
         let rawLabelText: string | null = null;
         try {
-          ({ extractedIdentity, rawLabelText } = await extractLabelEvidence(
-            imageSource.url,
-          ));
+          const imageInput = dataSource.getBottleContextImageInput
+            ? await dataSource.getBottleContextImageInput(imageSource.url)
+            : imageSource.url;
+          ({ extractedIdentity, rawLabelText } =
+            await extractLabelEvidence(imageInput));
         } catch {
           extractedIdentity = null;
           rawLabelText = null;

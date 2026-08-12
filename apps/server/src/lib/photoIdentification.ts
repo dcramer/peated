@@ -11,28 +11,19 @@ import {
   withSentryConversation,
 } from "@peated/server/lib/openaiClient";
 import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
-import { readFile } from "@peated/server/lib/uploads";
+import { getUploadImageDataUrl } from "@peated/server/lib/uploads";
 
 type PhotoIdentificationPendingImage = {
   id: string;
   imageUrl: string;
 };
 
-function filenameFromUploadUrl(imageUrl: string): string {
-  if (!imageUrl.startsWith("/uploads/")) {
-    throw new Error("Pending image URL is not an upload URL.");
-  }
-  return imageUrl.slice("/uploads/".length);
-}
-
 export async function getPhotoExtractionImageInput({
   pendingUpload,
 }: {
   pendingUpload: PhotoIdentificationPendingImage;
 }) {
-  const filename = filenameFromUploadUrl(pendingUpload.imageUrl);
-  const image = await readFile({ filename });
-  return `data:image/webp;base64,${image.toString("base64")}`;
+  return await getUploadImageDataUrl(pendingUpload.imageUrl);
 }
 
 function maybeField<T extends boolean | number | string | string[]>(
@@ -164,7 +155,7 @@ export async function extractPhotoBottleEvidence({
         model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
         callback: async (reportResponse) => {
           const extractor = createWhiskyLabelExtractor({
-            client: createOpenAIClient({ instrumentWithSentry: false }),
+            client: createOpenAIClient(),
             model: config.OPENAI_MODEL,
             reasoningEffort: config.OPENAI_REASONING_EFFORT,
             imageModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,

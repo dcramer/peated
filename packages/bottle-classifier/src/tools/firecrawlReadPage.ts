@@ -99,7 +99,6 @@ export function createFirecrawlReadPageTool({
       return await startToolSpan({
         name: "firecrawl_read_page",
         description: FIRECRAWL_READ_PAGE_TOOL_DESCRIPTION,
-        args,
         callback: async () => {
           let evidenceHydrated = false;
           const hydrateEvidence = (evidence: BottleSearchEvidence) => {

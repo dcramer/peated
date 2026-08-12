@@ -1,8 +1,31 @@
 import { describe, expect, test } from "vitest";
 import {
+  dropOpenAiInstrumentationError,
   normalizeGenAiSpan,
   normalizeStreamedGenAiSpan,
 } from "./genAiTelemetry";
+
+describe("dropOpenAiInstrumentationError", () => {
+  test("drops eager OpenAI integration issues but keeps normal errors", () => {
+    const event = { type: undefined };
+
+    expect(
+      dropOpenAiInstrumentationError(event, {
+        mechanism: { type: "auto.ai.openai" },
+      }),
+    ).toBeNull();
+    expect(
+      dropOpenAiInstrumentationError(event, {
+        mechanism: { type: "auto.ai.openai.stream" },
+      }),
+    ).toBeNull();
+    expect(
+      dropOpenAiInstrumentationError(event, {
+        mechanism: { type: "onunhandledrejection" },
+      }),
+    ).toBe(event);
+  });
+});
 
 describe("normalizeGenAiSpan", () => {
   test("adds the current provider attribute to Sentry OpenAI spans", () => {

@@ -29,6 +29,7 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
+import { getUploadImageDataUrl } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { and, asc, desc, eq, isNotNull, notExists } from "drizzle-orm";
 
@@ -80,6 +81,22 @@ function normalizedHttpUrl(value: string | null) {
   } catch {
     return null;
   }
+}
+
+/** Resolves Peated-owned images without asking a model provider to refetch them. */
+export async function getBottleClassifierImageInput(
+  imageUrl: string,
+): Promise<string> {
+  const parsedImageUrl = new URL(imageUrl);
+  const apiUrl = new URL(config.API_SERVER);
+  if (
+    parsedImageUrl.origin !== apiUrl.origin ||
+    !parsedImageUrl.pathname.startsWith("/uploads/")
+  ) {
+    return imageUrl;
+  }
+
+  return await getUploadImageDataUrl(imageUrl);
 }
 
 function boundedObservationData(value: Record<string, unknown> | null) {

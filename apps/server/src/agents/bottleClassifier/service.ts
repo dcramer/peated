@@ -26,6 +26,7 @@ import { absoluteUrl } from "@peated/server/lib/urls";
 import { randomUUID } from "node:crypto";
 import {
   getBottleClassifierContext,
+  getBottleClassifierImageInput,
   getEntityClassifierContext,
 } from "./contextAdapters";
 
@@ -105,6 +106,7 @@ export function getBottleClassifier() {
       searchBottles: searchBottleCandidates,
       getBottleCandidateById,
       getBottleContext: getBottleClassifierContext,
+      getBottleContextImageInput: getBottleClassifierImageInput,
       getEntityContext: getEntityClassifierContext,
       searchEntities: searchBottleClassifierEntities,
     },

@@ -600,6 +600,7 @@ export async function prepareBottleClassifierAgentRun(
     conversationId,
   );
   const runner = new Runner({
+    tracingDisabled: true,
     modelProvider: new OpenAIProvider({
       openAIClient: options.client,
       useResponses: true,
@@ -774,6 +775,7 @@ export function prepareBottleAuditAgentRun(
     }),
   });
   const runner = new Runner({
+    tracingDisabled: true,
     modelProvider: new OpenAIProvider({
       openAIClient: options.client,
       useResponses: true,

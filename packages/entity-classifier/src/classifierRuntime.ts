@@ -153,6 +153,7 @@ export function createEntityClassifier(
     });
     const conversationId = `entity:${reference.entity.id}`;
     const runner = new Runner({
+      tracingDisabled: true,
       modelProvider: new OpenAIProvider({
         openAIClient: options.client,
         useResponses: true,
@@ -172,7 +173,6 @@ export function createEntityClassifier(
         attributes: {
           "gen_ai.request.model": options.model,
           "entity_classifier.entity_id": `${reference.entity.id}`,
-          "entity_classifier.entity_name": reference.entity.name,
         },
         callback: async () =>
           await runner.run(agent, buildAgentInput(reference), {
