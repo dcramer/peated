@@ -158,6 +158,7 @@ export function createOpenAIWebSearchTool({
       return await startToolSpan({
         name: "openai_web_search",
         description: OPENAI_WEB_SEARCH_TOOL_DESCRIPTION,
+        args,
         callback: async () => {
           if (remainingQueries <= 0) {
             return {

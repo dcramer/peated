@@ -3,12 +3,23 @@ import OpenAI from "openai";
 
 import config from "../config";
 
-export function createOpenAIClient(): OpenAI {
-  // Sentry owns provider telemetry globally; wrapping individual clients would
-  // duplicate spans and capture handled provider failures as separate issues.
-  return new OpenAI({
+export function createOpenAIClient({
+  instrumentWithSentry = true,
+}: {
+  instrumentWithSentry?: boolean;
+} = {}): OpenAI {
+  const client = new OpenAI({
     apiKey: config.AI_GATEWAY_API_KEY,
     baseURL: config.AI_GATEWAY_HOST,
+  });
+
+  if (!instrumentWithSentry) {
+    return client;
+  }
+
+  return Sentry.instrumentOpenAiClient(client, {
+    recordInputs: true,
+    recordOutputs: true,
   });
 }
 

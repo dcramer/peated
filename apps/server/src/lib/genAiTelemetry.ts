@@ -1,17 +1,9 @@
-import type { ErrorEvent, EventHint, StreamedSpanJSON } from "@sentry/core";
+import type { StreamedSpanJSON } from "@sentry/core";
 
 type SentrySpanJson = {
   op?: string;
   data?: Record<string, unknown>;
 };
-
-/** Drops the OpenAI integration's eager issue while preserving normal error capture. */
-export function dropOpenAiInstrumentationError(
-  event: ErrorEvent,
-  hint: EventHint,
-): ErrorEvent | null {
-  return hint.mechanism?.type?.startsWith("auto.ai.openai") ? null : event;
-}
 
 /**
  * Bridges Sentry's OpenAI integration from the legacy `gen_ai.system`

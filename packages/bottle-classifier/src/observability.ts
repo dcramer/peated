@@ -1,11 +1,21 @@
 import { startSpan } from "@sentry/core";
 
+const MAX_ATTRIBUTE_LENGTH = 12_000;
 const OPENAI_PROVIDER = "openai";
 
 export type AgentSpanAttributes = Record<
   string,
   boolean | number | string | string[] | undefined
 >;
+
+function compactJson(value: unknown): string {
+  const serialized = JSON.stringify(value) ?? String(value);
+  if (serialized.length <= MAX_ATTRIBUTE_LENGTH) {
+    return serialized;
+  }
+
+  return `${serialized.slice(0, MAX_ATTRIBUTE_LENGTH)}...`;
+}
 
 function objectProperty(value: unknown, property: string): unknown {
   return value && typeof value === "object"
@@ -118,14 +128,16 @@ export function buildAgentSpanContext({
 }
 
 /**
- * Builds content-free `gen_ai.execute_tool` metadata.
+ * Builds `gen_ai.execute_tool` metadata with compact JSON tool arguments.
  */
 export function buildToolSpanContext({
   name,
   description,
+  args,
 }: {
   name: string;
   description: string;
+  args: unknown;
 }) {
   return {
     op: "gen_ai.execute_tool",
@@ -134,6 +146,7 @@ export function buildToolSpanContext({
       "gen_ai.operation.name": "execute_tool",
       "gen_ai.tool.name": name,
       "gen_ai.tool.description": description,
+      "gen_ai.tool.call.arguments": compactJson(args),
     },
   };
 }
@@ -164,16 +177,26 @@ export async function startAgentSpan<T>({
 }
 
 /**
- * Wraps tool execution without recording model-controlled arguments or results.
+ * Wraps tool execution in `gen_ai.execute_tool` and records compact JSON
+ * arguments/results so spans stay useful without carrying oversized payloads.
  */
 export async function startToolSpan<T>({
   name,
   description,
+  args,
   callback,
 }: {
   name: string;
   description: string;
+  args: unknown;
   callback: () => Promise<T>;
 }): Promise<T> {
-  return await startSpan(buildToolSpanContext({ name, description }), callback);
+  return await startSpan(
+    buildToolSpanContext({ name, description, args }),
+    async (span) => {
+      const result = await callback();
+      span.setAttribute("gen_ai.tool.call.result", compactJson(result));
+      return result;
+    },
+  );
 }

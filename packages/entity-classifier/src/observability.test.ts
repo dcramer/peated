@@ -36,10 +36,13 @@ describe("observability span contexts", () => {
     });
   });
 
-  test("builds content-free tool execution span metadata", () => {
+  test("builds tool execution span metadata with compact JSON arguments", () => {
     const context = buildToolSpanContext({
       name: "search_entities",
       description: "Search local entities.",
+      args: {
+        query: "Ardbeg",
+      },
     });
 
     expect(context).toMatchObject({
@@ -49,9 +52,11 @@ describe("observability span contexts", () => {
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "search_entities",
         "gen_ai.tool.description": "Search local entities.",
+        "gen_ai.tool.call.arguments": JSON.stringify({
+          query: "Ardbeg",
+        }),
       },
     });
-    expect(context.attributes).not.toHaveProperty("gen_ai.tool.call.arguments");
   });
 
   test("wraps agent runs in a Sentry agent invocation span", async () => {
@@ -115,7 +120,7 @@ describe("observability span contexts", () => {
     );
   });
 
-  test("does not record tool arguments or results on the Sentry span", async () => {
+  test("records tool results on the Sentry tool span", async () => {
     const setAttribute = vi.fn();
     vi.mocked(Sentry.startSpan).mockImplementationOnce(
       async (_context, callback) =>
@@ -128,6 +133,9 @@ describe("observability span contexts", () => {
       startToolSpan({
         name: "search_entities",
         description: "Search local entities.",
+        args: {
+          query: "Ardbeg",
+        },
         callback: async () => ({
           results: [{ entityId: 1 }],
         }),
@@ -136,6 +144,11 @@ describe("observability span contexts", () => {
       results: [{ entityId: 1 }],
     });
 
-    expect(setAttribute).not.toHaveBeenCalled();
+    expect(setAttribute).toHaveBeenCalledWith(
+      "gen_ai.tool.call.result",
+      JSON.stringify({
+        results: [{ entityId: 1 }],
+      }),
+    );
   });
 });

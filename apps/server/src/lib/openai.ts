@@ -79,6 +79,9 @@ export async function getStructuredResponse<
 
   const responseSchema = (fullSchema || schema) as ZodSchema<any>;
   const input = typeof prompt === "string" ? prompt : prompt;
+  const inputMessages: Message[] =
+    typeof prompt === "string" ? [{ role: "user", content: prompt }] : prompt;
+
   const response = await startSpan(
     buildStructuredResponseSpanContext(pipelineName, model),
     async (span) => {
@@ -123,13 +126,20 @@ export async function getStructuredResponse<
 
   if (!output) {
     const err = new Error("OpenAI returned empty structured output");
-    logError(err, {
-      ...(logContext || {}),
-      openai: {
-        completionId: response.id,
-        ...response.usage,
+    logError(
+      err,
+      {
+        ...(logContext || {}),
+        openai: {
+          completionId: response.id,
+          ...response.usage,
+        },
       },
-    });
+      {
+        "messages.json": JSON.stringify(inputMessages),
+        "response.json": JSON.stringify(response.output),
+      },
+    );
     throw err;
   }
 
@@ -138,26 +148,40 @@ export async function getStructuredResponse<
     structuredResponse = JSON.parse(output);
   } catch (err) {
     // likely a json parse error - so assume malformed
-    logError(err, {
-      ...(logContext || {}),
-      openai: {
-        completionId: response.id,
-        ...response.usage,
+    logError(
+      err,
+      {
+        ...(logContext || {}),
+        openai: {
+          completionId: response.id,
+          ...response.usage,
+        },
       },
-    });
+      {
+        "messages.json": JSON.stringify(inputMessages),
+        "output.txt": output,
+      },
+    );
     throw err;
   }
 
   try {
     return responseSchema.parse(structuredResponse) as z.infer<FullSchema>;
   } catch (err) {
-    logError(err, {
-      ...(logContext || {}),
-      openai: {
-        completionId: response.id,
-        ...response.usage,
+    logError(
+      err,
+      {
+        ...(logContext || {}),
+        openai: {
+          completionId: response.id,
+          ...response.usage,
+        },
       },
-    });
+      {
+        "messages.json": JSON.stringify(inputMessages),
+        "output.json": output,
+      },
+    );
 
     throw err;
   }

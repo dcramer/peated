@@ -37,6 +37,7 @@ export function createGetBottleContextTool({
       await startToolSpan({
         name: "get_bottle_context",
         description: GET_BOTTLE_CONTEXT_DESCRIPTION,
+        args: { bottleId },
         callback: async () => {
           const context = BottleContextSchema.nullable().parse(
             await getBottleContext(bottleId),

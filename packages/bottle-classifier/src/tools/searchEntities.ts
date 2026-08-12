@@ -32,6 +32,7 @@ export function createSearchEntitiesTool(
       return await startToolSpan({
         name: "search_entities",
         description: SEARCH_ENTITIES_TOOL_DESCRIPTION,
+        args,
         callback: async () => {
           const results = await searchEntities(args);
           const parsedResults = SearchEntitiesResultSchema.parse({

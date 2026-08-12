@@ -155,7 +155,7 @@ export async function extractPhotoBottleEvidence({
         model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
         callback: async (reportResponse) => {
           const extractor = createWhiskyLabelExtractor({
-            client: createOpenAIClient(),
+            client: createOpenAIClient({ instrumentWithSentry: false }),
             model: config.OPENAI_MODEL,
             reasoningEffort: config.OPENAI_REASONING_EFFORT,
             imageModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,

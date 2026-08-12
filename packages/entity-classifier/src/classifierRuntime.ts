@@ -173,6 +173,7 @@ export function createEntityClassifier(
         attributes: {
           "gen_ai.request.model": options.model,
           "entity_classifier.entity_id": `${reference.entity.id}`,
+          "entity_classifier.entity_name": reference.entity.name,
         },
         callback: async () =>
           await runner.run(agent, buildAgentInput(reference), {

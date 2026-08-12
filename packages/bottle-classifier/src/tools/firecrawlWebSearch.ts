@@ -93,6 +93,7 @@ export function createFirecrawlWebSearchTool({
       return await startToolSpan({
         name: "firecrawl_web_search",
         description: FIRECRAWL_WEB_SEARCH_TOOL_DESCRIPTION,
+        args,
         callback: async () => {
           let evidenceHydrated = false;
           const hydrateEvidence = (evidence: BottleSearchEvidence) => {

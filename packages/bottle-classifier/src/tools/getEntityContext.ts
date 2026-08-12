@@ -37,6 +37,7 @@ export function createGetEntityContextTool({
       await startToolSpan({
         name: "get_entity_context",
         description: GET_ENTITY_CONTEXT_DESCRIPTION,
+        args: { entityId },
         callback: async () => {
           const context = EntityContextSchema.nullable().parse(
             await getEntityContext(entityId),
