@@ -93,10 +93,14 @@ shows the assignment is wrong. Leave `bottler` null when classifying a product
 whose evidence does not establish the role.
 
 Observation-only facts by default include exact cask or barrel number, bottle
-number, outturn, retailer-exclusive wording, label notes, and unmodeled
-maturation details. Promote one of these facts into Bottle identity only when
-it is part of the marketed release or is needed for recurring canonical
-disambiguation.
+number, outturn, non-marketed production lot codes, retailer-exclusive wording,
+label notes, and unmodeled maturation details. Promote one of these facts into
+Bottle identity only when it is part of the marketed release or is needed for
+recurring canonical disambiguation.
+
+A fact about one component of a blend does not become a field on the complete
+Bottle. Set the Bottle's age, year, ABV, or other exact trait only when evidence
+states that trait for the marketed blend itself.
 
 `caskType`, `caskSize`, and `caskFill` remain nullable storage fields for
 compatibility but are soft-deprecated for automated identity decisions. Preserve
@@ -166,8 +170,10 @@ authority.
   product. It may equal the Brand or a producing distillery.
 - `distillery` identifies the actual producer or producers.
 - `series` is a stable range or family, not a batch code or release year.
-- `edition` is a human-facing release descriptor such as `Batch 24`,
-  `2024 Release`, or `S2B13`.
+- `edition` is a complete human-facing release descriptor such as `Batch 24`,
+  `2024 Release`, or `S2B13`. Preserve its descriptor words. A printed batch or
+  lot code is not an edition when the producer sells one ongoing product
+  without batch-specific marketing.
 - `vintageYear` is the distillation year. `releaseYear` is the bottling or
   marketed release year. A bare year is ambiguous until source evidence gives
   it meaning.
@@ -178,6 +184,11 @@ Brand identity is not a longest-prefix match. Distillery, bottler, owner,
 importer, and parent-company names may appear in source text without becoming
 the brand. Canonical names and aliases are evidence, but stale or
 source-specific strings cannot prove an entity repair by themselves.
+
+Entity selection is also not a shortest-name match. When existing Bottle data
+uses separate Entities for the consumer Brand and producing distillery, reuse
+the Entity established in the required role unless stronger evidence shows the
+catalog assignment is wrong.
 
 Do not automate brand moves where the only difference is a generic suffix or
 prefix such as `Whisky`, `Bourbon`, `Distillery`, `House`, or `Company`.

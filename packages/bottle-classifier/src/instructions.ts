@@ -35,8 +35,8 @@ const BOTTLE_IDENTITY_POLICY = [
     BOTTLE_SCHEMA_RULES.observationPolicy,
     BOTTLE_SCHEMA_RULES.aliasPolicy,
     "Unsupported novelty flavored whisky, whiskey liqueur, and additive-flavor products are outside the whisky catalog. Return `no_match` instead of matching or creating a Bottle.",
-    "Brand, distillers, and bottler are separate roles, but one Entity may fill more than one. Set `bottler` only when product evidence identifies the Entity as the market-facing bottler or release imprint. It may be the Brand or a distiller; a separate imprint is not required. Ownership, importing, distribution, packing, or page hosting alone does not establish the role.",
-    "For a blend, keep every product-specific component distillery established by reviewed evidence in `proposedBottle.distillers`.",
+    "Brand, distillers, and bottler are separate roles, but one Entity may fill more than one. Set `bottler` only when product evidence identifies the Entity as the market-facing bottler or release imprint. It may be the Brand or a distiller; a separate imprint is not required. Ownership, importing, distribution, packing, or page hosting alone does not establish the role. When local Bottle evidence separates a Brand Entity from a distillery Entity, reuse the Entity established in the required role; exact or shorter name overlap is not stronger role evidence.",
+    "For a blend, keep every product-specific component distillery established by reviewed evidence in `proposedBottle.distillers`. Do not copy a component's age, year, ABV, or other trait onto the complete Bottle unless product-level evidence states that trait for the marketed blend.",
   ]),
   "</identity_policy>",
 ].join("\n");

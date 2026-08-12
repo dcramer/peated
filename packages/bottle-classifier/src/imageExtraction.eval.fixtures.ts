@@ -46,8 +46,8 @@ const assetPath = (filename: string) => `${assetDir}/${filename}`;
 
 export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
   {
-    id: "image-extraction-watchpost-8-year-old",
-    name: "Watchpost 8-year-old American Blended Whiskey",
+    id: "image-extraction-watchpost-whiskey",
+    name: "Watchpost American Blended Whiskey",
     imagePath: assetPath("watchpost-8-year-old.webp"),
     expected: {
       fields: {

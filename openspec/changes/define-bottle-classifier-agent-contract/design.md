@@ -108,6 +108,14 @@ Marketed scope is separate from field completeness. An extra marketed trait can 
 
 Alternative considered: treat every missing identity field as a required correction. Rejected because that creates false No Match results and duplicate Bottles for incomplete catalog rows. Alternative considered: ignore populated conflicts when the name looks right. Rejected because it can assign a reference to a Bottle whose stored identity describes another product.
 
+### Decision: Source facts keep their product level and marketed form
+
+A trait stated for one blend component is not a trait of the complete Bottle unless product-level evidence says it is. Human-facing edition text keeps its complete descriptor, while a printed batch or lot code becomes Bottle identity only when the producer markets it as a distinct release. An ongoing product sold without batch variants keeps one Bottle even when individual labels carry production codes.
+
+Entity selection follows established catalog roles rather than shortest-name overlap. When local Bottle usage separates a consumer Brand from its producing distillery Entity, a new Bottle reuses the Entity already used in the required role.
+
+Alternative considered: promote every explicit source fact into the nearest structured Bottle field. Rejected because that turns component ages and production lots into false product identity. Alternative considered: select the closest Entity name without role evidence. Rejected because it repeats duplicate Brand and distillery records.
+
 ### Decision: Instructions stay static and consistent with the tool surface
 
 The classifier prompt must remain static per instruction mode so provider-side prompt caching works and runtime facts stay in the input, tools, and validation. That guardrail currently lives only in a code comment; it becomes contract.
