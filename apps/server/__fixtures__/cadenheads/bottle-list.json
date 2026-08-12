@@ -1,0 +1,125 @@
+[
+  {
+    "name": "Cadenhead&#8217;s Glen Spey-Glenlivet 16yo 54.7% abv 70cl Single Malt Whisky",
+    "permalink": "https://www.cadenhead.shop/product/glen-spey-glenlivet-16yo/",
+    "prices": {
+      "price": "7500",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2,
+      "currency_symbol": "£"
+    },
+    "images": [
+      {
+        "src": "https://www.cadenhead.shop/wp-content/uploads/glen-spey.png",
+        "alt": ""
+      }
+    ],
+    "attributes": [
+      {
+        "taxonomy": "pa_volume-ml",
+        "terms": [{ "name": "700", "slug": "700" }]
+      }
+    ],
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "provider_extension": { "ignored": true }
+  },
+  {
+    "name": "Campbeltown Loch (46% 70cl Blended Malt Scotch Whisky)",
+    "permalink": "https://www.cadenhead.shop/product/campbeltown-loch/",
+    "prices": {
+      "price": "4300",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "attributes": [],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Unavailable Tullibardine 11yo 70cl",
+    "permalink": "https://www.cadenhead.shop/product/unavailable-tullibardine/",
+    "prices": {
+      "price": "6500",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "attributes": [
+      {
+        "taxonomy": "pa_volume-ml",
+        "terms": [{ "name": "700" }]
+      }
+    ],
+    "is_in_stock": false,
+    "is_purchasable": true
+  },
+  {
+    "name": "Unpurchasable Ben Nevis 13yo 70cl",
+    "permalink": "https://www.cadenhead.shop/product/unpurchasable-ben-nevis/",
+    "prices": {
+      "price": "6500",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "attributes": [
+      {
+        "taxonomy": "pa_volume-ml",
+        "terms": [{ "name": "700" }]
+      }
+    ],
+    "is_in_stock": true,
+    "is_purchasable": false
+  },
+  {
+    "name": "Zero Price Benriach 12yo 70cl",
+    "permalink": "https://www.cadenhead.shop/product/zero-price-benriach/",
+    "prices": {
+      "price": "0",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "attributes": [
+      {
+        "taxonomy": "pa_volume-ml",
+        "terms": [{ "name": "700" }]
+      }
+    ],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Wee Cadenhead 20cl Single Malt Whisky",
+    "permalink": "https://www.cadenhead.shop/product/wee-cadenhead/",
+    "prices": {
+      "price": "2400",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "attributes": [
+      {
+        "taxonomy": "pa_volume-ml",
+        "terms": [{ "name": "200" }]
+      }
+    ],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Springbank and Kilkerran Tasting Pack 6x20ml Whisky Samples",
+    "permalink": "https://www.cadenhead.shop/product/tasting-pack/",
+    "prices": {
+      "price": "4000",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "attributes": [],
+    "is_in_stock": true,
+    "is_purchasable": true
+  }
+]
