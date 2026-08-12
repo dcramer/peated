@@ -3,17 +3,22 @@ import {
   normalizeCategory,
 } from "@peated/bottle-classifier/normalize";
 import {
-  logError,
-  logInfo,
-  logTelemetryError,
-  logWarn,
-} from "@peated/server/lib/log";
-import { orpcClient } from "@peated/server/lib/orpc-client/server";
+  createExternalReview,
+  ExternalReviewBottleStateError,
+} from "@peated/server/lib/createExternalReview";
+import {
+  getExternalSiteConfig,
+  setExternalSiteConfig,
+} from "@peated/server/lib/externalSiteConfig";
+import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
+import { z } from "zod";
 
-export default async function scrapeWhiskeyAdvocate() {
+export default async function scrapeWhiskeyAdvocate({
+  dryRun = false,
+}: { dryRun?: boolean } = {}) {
   const issueList = await scrapeIssueList(
     "https://whiskyadvocate.com/ratings-reviews",
   );
@@ -28,13 +33,15 @@ export default async function scrapeWhiskeyAdvocate() {
     },
   });
 
-  const processedIssues = process.env.ACCESS_TOKEN
-    ? await orpcClient.externalSites.config.get({
-        site: "whiskyadvocate",
-        key: "processedIssues",
-        default: [],
-      })
-    : [];
+  const processedIssues = dryRun
+    ? []
+    : z.array(z.string()).parse(
+        await getExternalSiteConfig({
+          site: "whiskyadvocate",
+          key: "processedIssues",
+          defaultValue: [],
+        }),
+      );
 
   const newIssues = issueList.filter((i) => !processedIssues.includes(i));
   if (newIssues.length === 0) {
@@ -59,7 +66,7 @@ export default async function scrapeWhiskeyAdvocate() {
         issueName,
       )}&order_by=published_desc`,
       async (item) => {
-        if (process.env.ACCESS_TOKEN) {
+        if (!dryRun) {
           logInfo("[Whisky Advocate] Submitting {name}", {
             extra: {
               name: item.name,
@@ -67,16 +74,23 @@ export default async function scrapeWhiskeyAdvocate() {
           });
 
           try {
-            await orpcClient.reviews.create({
+            await createExternalReview({
               site: "whiskyadvocate",
               ...item,
             });
-          } catch (err) {
-            logTelemetryError(err, {
-              extra: {
-                name: item.name,
+          } catch (error) {
+            if (!(error instanceof ExternalReviewBottleStateError)) throw error;
+
+            logWarn(
+              "[Whisky Advocate] Skipping review for unavailable bottle",
+              {
+                extra: {
+                  bottleId: error.bottleId,
+                  name: item.name,
+                  reason: error.reason,
+                },
               },
-            });
+            );
           }
         } else {
           logInfo("[Whisky Advocate] Dry Run {name}", {
@@ -95,8 +109,8 @@ export default async function scrapeWhiskeyAdvocate() {
       },
     });
 
-    if (process.env.ACCESS_TOKEN) {
-      await orpcClient.externalSites.config.set({
+    if (!dryRun) {
+      await setExternalSiteConfig({
         site: "whiskyadvocate",
         key: "processedIssues",
         value: processedIssues,

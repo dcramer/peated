@@ -1,9 +1,8 @@
-import { db } from "@peated/server/db";
-import { externalSiteConfig, externalSites } from "@peated/server/db/schema";
+import { setExternalSiteConfig } from "@peated/server/lib/externalSiteConfig";
+import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ExternalSiteTypeEnum } from "@peated/server/schemas";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -25,29 +24,14 @@ export default procedure
   )
   .output(z.object({}))
   .handler(async function ({ input, errors }) {
-    const [site] = await db
-      .select()
-      .from(externalSites)
-      .where(eq(externalSites.type, input.site));
-    if (!site) {
-      throw errors.NOT_FOUND({
-        message: "Site not found.",
-      });
+    try {
+      await setExternalSiteConfig(input);
+    } catch (error) {
+      if (error instanceof ExternalSiteNotFoundError) {
+        throw errors.NOT_FOUND({ message: "Site not found.", cause: error });
+      }
+      throw error;
     }
-
-    await db
-      .insert(externalSiteConfig)
-      .values({
-        externalSiteId: site.id,
-        key: input.key,
-        value: input.value,
-      })
-      .onConflictDoUpdate({
-        target: [externalSiteConfig.externalSiteId, externalSiteConfig.key],
-        set: {
-          value: input.value,
-        },
-      });
 
     return {};
   });

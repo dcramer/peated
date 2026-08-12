@@ -1,8 +1,8 @@
-import { ORPCError } from "@orpc/client";
-import { orpcClient } from "@peated/server/lib/orpc-client/server";
-import type { BottleSchema } from "@peated/server/schemas";
+import { db } from "@peated/server/db";
+import { bottles, entities, storePrices } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { and, eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { z } from "zod";
 import scrapePrices, {
   handleBottle,
   type ScrapePricesCallback,
@@ -10,37 +10,15 @@ import scrapePrices, {
 } from "./scraper";
 import waitError from "./test/waitError";
 
-vi.mock("@peated/server/lib/orpc-client/server", () => ({
-  orpcClient: {
-    bottles: {
-      create: vi.fn(),
-      update: vi.fn(),
-      imageUpdate: vi.fn(),
-    },
-    prices: {
-      createBatch: vi.fn(),
-    },
-  },
+vi.mock("@peated/server/worker/client", () => ({
+  pushJob: vi.fn(),
+  pushUniqueJob: vi.fn(),
 }));
 
-function bottleResult({
-  bottleId,
-  imageUrl = null,
-}: {
-  bottleId: number;
-  imageUrl?: string | null;
-}): z.infer<typeof BottleSchema> {
-  return {
-    id: bottleId,
-    imageUrl,
-  } as z.infer<typeof BottleSchema>;
-}
-
 describe("handleBottle", () => {
-  const originalAccessToken = process.env.ACCESS_TOKEN;
   const bottleInput = {
     name: "Cask No. 1.2",
-    brand: 7,
+    brand: { name: "System Scraper Brand" },
     statedAge: 12,
     edition: "Batch 3",
     abv: 57.2,
@@ -48,7 +26,7 @@ describe("handleBottle", () => {
     category: "single_malt" as const,
   };
   const priceInput = {
-    name: "Cask No. 1.2",
+    name: "System Scraper Brand Cask No. 1.2",
     price: 12_000,
     currency: "usd" as const,
     url: "https://example.com/products/1-2",
@@ -57,146 +35,77 @@ describe("handleBottle", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.ACCESS_TOKEN = "test-token";
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
-    if (originalAccessToken === undefined) {
-      delete process.env.ACCESS_TOKEN;
-    } else {
-      process.env.ACCESS_TOKEN = originalAccessToken;
-    }
     vi.unstubAllGlobals();
   });
 
-  it("creates a Bottle and consumes it directly for image upload", async () => {
-    const bottle = bottleResult({ bottleId: 41 });
-    const imageBlob = new Blob(["image"]);
-    vi.mocked(orpcClient.bottles.create).mockResolvedValue(bottle);
-    vi.mocked(orpcClient.bottles.imageUpdate).mockResolvedValue({
-      imageUrl: "https://api.example.com/uploads/bottles/1.webp",
+  it("persists without a user token and attributes the Bottle to Peated", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const previousAccessToken = process.env.ACCESS_TOKEN;
+    delete process.env.ACCESS_TOKEN;
+
+    try {
+      await handleBottle(bottleInput, priceInput);
+    } finally {
+      if (previousAccessToken === undefined) {
+        delete process.env.ACCESS_TOKEN;
+      } else {
+        process.env.ACCESS_TOKEN = previousAccessToken;
+      }
+    }
+
+    const systemActor = await getPeatedSystemActor();
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.createdByActorId, systemActor.id),
     });
-    vi.mocked(orpcClient.prices.createBatch).mockResolvedValue({} as never);
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({ blob: vi.fn().mockResolvedValue(imageBlob) }),
-    );
-
-    await handleBottle(
-      bottleInput,
-      priceInput,
-      "https://example.com/images/1-2.jpg",
-    );
-
-    expect(orpcClient.bottles.create).toHaveBeenCalledOnce();
-    const [createInput] = vi.mocked(orpcClient.bottles.create).mock.calls[0];
-    expect(createInput).toMatchObject({
-      name: bottleInput.name,
-      brand: bottleInput.brand,
-      statedAge: bottleInput.statedAge,
+    expect(bottle).toMatchObject({
+      createdByActorId: systemActor.id,
       edition: bottleInput.edition,
-      abv: bottleInput.abv,
-      singleCask: bottleInput.singleCask,
-      category: bottleInput.category,
+      statedAge: bottleInput.statedAge,
     });
-    expect(createInput).not.toHaveProperty("imageUrl");
-    expect(createInput).not.toHaveProperty("image");
-    expect(orpcClient.bottles.update).not.toHaveBeenCalled();
-    expect(orpcClient.bottles.imageUpdate).toHaveBeenCalledWith({
-      bottle: bottle.id,
-      file: imageBlob,
-    });
-    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
-      site: "smws",
-      prices: [priceInput],
-    });
-  });
-
-  it("directs a canonical create conflict to the strict Bottle update", async () => {
-    const conflictBottleId = 52;
-    const bottle = bottleResult({ bottleId: conflictBottleId });
-    vi.mocked(orpcClient.bottles.create).mockRejectedValue(
-      new ORPCError("CONFLICT", {
-        defined: true,
-        data: { bottle: conflictBottleId },
+    expect(
+      await db.query.storePrices.findFirst({
+        where: and(
+          eq(storePrices.externalSiteId, site.id),
+          eq(storePrices.price, priceInput.price),
+        ),
       }),
-    );
-    vi.mocked(orpcClient.bottles.update).mockResolvedValue(bottle);
-
-    await handleBottle(bottleInput);
-
-    expect(orpcClient.bottles.update).toHaveBeenCalledOnce();
-    expect(orpcClient.bottles.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bottle: conflictBottleId,
-        name: bottleInput.name,
-        statedAge: bottleInput.statedAge,
-        brand: bottleInput.brand,
-        category: bottleInput.category,
-        edition: bottleInput.edition,
-        abv: bottleInput.abv,
-        singleCask: bottleInput.singleCask,
-      }),
-    );
-    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
+    ).toMatchObject({ price: priceInput.price });
   });
 
-  it("stops after a non-conflict create failure", async () => {
-    vi.mocked(orpcClient.bottles.create).mockRejectedValue(
-      new Error("API unavailable"),
-    );
+  it("updates the canonical Bottle when repeated ingestion conflicts", async () => {
+    await handleBottle({ ...bottleInput, description: "Initial description" });
+    await handleBottle({ ...bottleInput, description: "Updated description" });
 
-    await handleBottle(bottleInput, priceInput);
-
-    expect(orpcClient.bottles.update).not.toHaveBeenCalled();
-    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
-    expect(orpcClient.prices.createBatch).not.toHaveBeenCalled();
-  });
-
-  it("does not call the API when flat input cannot satisfy Bottle creation", async () => {
-    await handleBottle({ ...bottleInput, name: "" }, priceInput);
-
-    expect(orpcClient.bottles.create).not.toHaveBeenCalled();
-    expect(orpcClient.bottles.update).not.toHaveBeenCalled();
-    expect(orpcClient.prices.createBatch).not.toHaveBeenCalled();
-  });
-
-  it("stops after the conflict-directed update fails", async () => {
-    vi.mocked(orpcClient.bottles.create).mockRejectedValue(
-      new ORPCError("CONFLICT", {
-        defined: true,
-        data: { bottle: 63 },
-      }),
-    );
-    vi.mocked(orpcClient.bottles.update).mockRejectedValue(
-      new ORPCError("BAD_REQUEST", { defined: true }),
-    );
-
-    await handleBottle(bottleInput, priceInput);
-
-    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
-    expect(orpcClient.prices.createBatch).not.toHaveBeenCalled();
-  });
-
-  it("continues price ingestion when image transfer fails", async () => {
-    vi.mocked(orpcClient.bottles.create).mockResolvedValue(
-      bottleResult({ bottleId: 74 }),
-    );
-    vi.mocked(orpcClient.prices.createBatch).mockResolvedValue({} as never);
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("image down")));
-
-    await handleBottle(
-      bottleInput,
-      priceInput,
-      "https://example.com/images/1-2.jpg",
-    );
-
-    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
-    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
-      site: "smws",
-      prices: [priceInput],
+    const matchingBottles = await db.query.bottles.findMany();
+    expect(matchingBottles).toHaveLength(1);
+    expect(matchingBottles[0]).toMatchObject({
+      description: "Updated description",
     });
+  });
+
+  it("rejects invalid flat Bottle input before persistence", async () => {
+    await expect(handleBottle({ ...bottleInput, name: "" })).rejects.toThrow();
+
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.name, bottleInput.brand.name),
+      }),
+    ).toBeUndefined();
+  });
+
+  it("requires dry-run explicitly and skips persistence", async () => {
+    await handleBottle(bottleInput, priceInput, null, { dryRun: true });
+
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.name, bottleInput.brand.name),
+      }),
+    ).toBeUndefined();
   });
 });
 
@@ -205,16 +114,14 @@ describe("scrapePrices", () => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
-  it("should scrape prices and submit them in batches", async () => {
-    const mockSite = "totalwine";
-    const mockUrlFn = (page: number) => `https://test.com/page/${page}`;
-    const mockScrapeProducts = vi.fn(
+  it("scrapes pages and persists the discovered prices", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const urlForPage = (page: number) => `https://test.com/page/${page}`;
+    const scrapeProducts = vi.fn(
       async (url: string, cb: ScrapePricesCallback) => {
-        if (url === "https://test.com/page/1") {
+        if (url === urlForPage(1)) {
           await cb({
             name: "Product 1",
             price: 1000,
@@ -229,7 +136,7 @@ describe("scrapePrices", () => {
             url: "https://test.com/product2",
             volume: 750,
           });
-        } else if (url === "https://test.com/page/2") {
+        } else if (url === urlForPage(2)) {
           await cb({
             name: "Product 3",
             price: 3000,
@@ -237,89 +144,68 @@ describe("scrapePrices", () => {
             url: "https://test.com/product3",
             volume: 750,
           });
-        } else {
-          // No more products
         }
       },
     );
 
-    await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
+    await scrapePrices(site.type, urlForPage, scrapeProducts);
 
-    expect(mockScrapeProducts).toHaveBeenCalledTimes(3);
-    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
-      site: mockSite,
-      prices: [
-        {
-          name: "Product 1",
-          price: 1000,
-          currency: "usd",
-          url: "https://test.com/product1",
-          volume: 750,
-        },
-        {
-          name: "Product 2",
-          price: 2000,
-          currency: "usd",
-          url: "https://test.com/product2",
-          volume: 750,
-        },
-        {
-          name: "Product 3",
-          price: 3000,
-          currency: "usd",
-          url: "https://test.com/product3",
-          volume: 750,
-        },
-      ],
-    });
+    expect(scrapeProducts).toHaveBeenCalledTimes(3);
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+        orderBy: (table, { asc }) => asc(table.name),
+      }),
+    ).toMatchObject([
+      { name: "Product 1", price: 1000 },
+      { name: "Product 2", price: 2000 },
+      { name: "Product 3", price: 3000 },
+    ]);
   });
 
-  it("should handle duplicate products", async () => {
-    const mockSite = "totalwine";
-    const mockUrlFn = (page: number) => `https://test.com/page/${page}`;
-    const mockScrapeProducts = vi.fn(
-      async (url: string, cb: ScrapePricesCallback) => {
-        if (url === "https://test.com/page/1") {
-          await cb({
-            name: "Product 1",
-            price: 1000,
-            currency: "usd",
-            url: "https://test.com/product1",
-            volume: 750,
-          });
-          await cb({
-            name: "Product 1",
-            price: 1000,
-            currency: "usd",
-            url: "https://test.com/product1",
-            volume: 750,
-          }); // Duplicate
-        } else {
-          // No more products
-        }
-      },
+  it("deduplicates same-name same-volume products", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
+      if (!url.endsWith("/1")) return;
+      await cb({
+        name: "Product 1",
+        price: 1000,
+        currency: "usd",
+        url: "https://test.com/product1",
+        volume: 750,
+      });
+      await cb({
+        name: "Product 1",
+        price: 1100,
+        currency: "usd",
+        url: "https://test.com/product1-special",
+        volume: 750,
+      });
+    };
+
+    await scrapePrices(
+      site.type,
+      (page) => `https://test.com/page/${page}`,
+      scrapeProducts,
     );
 
-    await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
-
-    expect(mockScrapeProducts).toHaveBeenCalledTimes(2);
-    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
-      site: mockSite,
-      prices: [
-        {
-          name: "Product 1",
-          price: 1000,
-          currency: "usd",
-          url: "https://test.com/product1",
-          volume: 750,
-        },
-      ],
-    });
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject([
+      {
+        name: "Product 1",
+        price: 1000,
+        url: "https://test.com/product1",
+      },
+    ]);
   });
 
-  it("keeps same-name products with different volumes", async () => {
-    const mockSite = "totalwine";
-    const mockUrlFn = (page: number) => `https://test.com/page/${page}`;
+  it("keeps same-name products with different volumes", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const prices: StorePrice[] = [
       {
         name: "Product 1",
@@ -336,81 +222,62 @@ describe("scrapePrices", () => {
         volume: 1750,
       },
     ];
-    const mockScrapeProducts = vi.fn(
-      async (url: string, cb: ScrapePricesCallback) => {
-        if (url !== "https://test.com/page/1") {
-          return;
-        }
+    const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
+      if (!url.endsWith("/1")) return;
+      for (const price of prices) await cb(price);
+    };
 
-        for (const price of prices) {
-          await cb(price);
-        }
-      },
+    await scrapePrices(
+      site.type,
+      (page) => `https://test.com/page/${page}`,
+      scrapeProducts,
     );
 
-    await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
-
-    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
-      site: mockSite,
-      prices,
-    });
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toHaveLength(2);
   });
 
-  it("deduplicates same-name same-volume products with different URLs", async () => {
-    const mockSite = "totalwine";
-    const mockUrlFn = (page: number) => `https://test.com/page/${page}`;
-    const mockScrapeProducts = vi.fn(
-      async (url: string, cb: ScrapePricesCallback) => {
-        if (url !== "https://test.com/page/1") {
-          return;
-        }
-
-        await cb({
-          name: "Product 1",
-          price: 1000,
-          currency: "usd",
-          url: "https://test.com/product1",
-          volume: 750,
-        });
-        await cb({
-          name: "Product 1",
-          price: 1100,
-          currency: "usd",
-          url: "https://test.com/product1-special",
-          volume: 750,
-        });
-      },
-    );
-
-    await scrapePrices(mockSite, mockUrlFn, mockScrapeProducts);
-
-    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
-      site: mockSite,
-      prices: [
-        {
-          name: "Product 1",
-          price: 1000,
-          currency: "usd",
-          url: "https://test.com/product1",
-          volume: 750,
-        },
-      ],
-    });
-  });
-
-  it("should throw an error if no products are found", async () => {
-    const mockSite = "totalwine";
-    const mockUrlFn = (page: number) => `https://test.com/page/${page}`;
-    const mockScrapeProducts = vi.fn(async () => {
-      // No products
-    });
-
+  it("throws when no products are found", async () => {
     const error = await waitError(() =>
-      scrapePrices(mockSite, mockUrlFn, mockScrapeProducts),
+      scrapePrices(
+        "totalwine",
+        (page) => `https://test.com/page/${page}`,
+        async () => undefined,
+      ),
     );
 
     expect(error).toMatchInlineSnapshot(
       `[Error: Failed to scrape any products.]`,
     );
+  });
+
+  it("does not persist an explicit dry run", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
+      if (!url.endsWith("/1")) return;
+      await cb({
+        name: "Dry Run Product",
+        price: 1000,
+        currency: "usd",
+        url: "https://test.com/dry-run",
+        volume: 750,
+      });
+    };
+
+    await scrapePrices(
+      site.type,
+      (page) => `https://test.com/page/${page}`,
+      scrapeProducts,
+      { dryRun: true },
+    );
+
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toHaveLength(0);
   });
 });

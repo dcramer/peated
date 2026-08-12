@@ -67,7 +67,6 @@ export async function fixBadReviewEntities({
       // classifier sees the real reference title.
       aliasLookupNames: [review.name],
       createdByActorId: actor.id,
-      user,
     });
 
     const resolvedAssignment = resolution.assignment;

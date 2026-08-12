@@ -24,7 +24,6 @@
     "@logtape/logtape": "catalog:",
     "@logtape/redaction": "catalog:",
     "@opentelemetry/api": "catalog:",
-    "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",

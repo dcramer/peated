@@ -261,9 +261,6 @@ importers:
       '@opentelemetry/api':
         specifier: 'catalog:'
         version: 1.9.1
-      '@orpc/client':
-        specifier: 'catalog:'
-        version: 1.15.0(@opentelemetry/api@1.9.1)
       '@orpc/openapi':
         specifier: 'catalog:'
         version: 1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3)

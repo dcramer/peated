@@ -329,7 +329,6 @@ export async function repairBottleBrandDistilleryAssignments({
                 }
               : {}),
           },
-          user: persistedUser,
           actorId: actor.id,
           creationSource: "repair_workflow",
         });

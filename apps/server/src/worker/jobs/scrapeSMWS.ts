@@ -35,14 +35,6 @@ export default async function scrapeSMWS() {
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
     handleBottle,
   );
-
-  // if (process.env.ACCESS_TOKEN) {
-  //   await trpcClient.externalSiteUpdate.mutate({
-  //     site: "smwsa",
-  //     key: "processedIssues",
-  //     value: processedIssues,
-  //   });
-  // }
 }
 
 const SMWSPayloadSchema = z.object({

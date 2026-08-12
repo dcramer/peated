@@ -912,7 +912,6 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
       creationSource,
       createdByActorId: writeActor.id,
       input: bottleInput,
-      context: { user },
     });
 
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
@@ -1677,7 +1676,6 @@ export async function applyStorePriceBottleRepairFromProposal({
     const updateManifest = await updateBottleInTransaction(tx, {
       bottleId: repairBottleId,
       input: buildBottleRepairInput(proposedBottle),
-      user,
       actorId: writeActor.id,
       creationSource: "price_match_review",
     });

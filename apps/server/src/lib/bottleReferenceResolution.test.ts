@@ -153,7 +153,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       aliasLookupNames: [bottle.fullName],
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({
@@ -191,7 +190,6 @@ describe("resolveBottleReferenceTarget", () => {
         currentBottleId: null,
       },
       aliasLookupNames: [alias.name],
-      user: await fixtures.User(),
       createdByActorId: retired.createdByActorId,
     });
 
@@ -232,7 +230,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       aliasLookupNames: [alias.name],
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({
@@ -265,7 +262,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       aliasLookupNames: [alias.name],
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({
@@ -304,7 +300,6 @@ describe("resolveBottleReferenceTarget", () => {
         currentBottleId: null,
       },
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({
@@ -336,7 +331,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       aliasLookupNames: ["Ardbeg 10 years old"],
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({
@@ -380,7 +374,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       aliasLookupNames: ["Ardbeg Ten Years"],
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({
@@ -431,7 +424,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       aliasLookupNames: [],
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({
@@ -529,7 +521,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       aliasLookupNames: [],
       createdByActorId: actor.id,
-      user,
     });
 
     expect(result).toMatchObject({

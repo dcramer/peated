@@ -1,33 +1,32 @@
-import { safe } from "@orpc/client";
+/**
+ * Owns retailer fetching, normalization, and dispatch into durable server
+ * capabilities. Persistence failures escape to the worker boundary; optional
+ * image transfer may degrade without discarding the authoritative listing.
+ */
 import {
   defaultHeaders,
   SCRAPER_PRICE_BATCH_SIZE,
 } from "@peated/server/constants";
 import { logError, logInfo } from "@peated/server/lib/log";
-import { orpcClient } from "@peated/server/lib/orpc-client/server";
 import type { ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
 import { open } from "fs/promises";
-import { z } from "zod";
+import type { z } from "zod";
 import config from "../config";
-import type {
-  BottleInputSchema,
-  BottleSchema,
-  StorePriceInputSchema,
-} from "../schemas";
+import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
 import BatchQueue from "./batchQueue";
+import { BottleAlreadyExistsError, createBottleAsPeated } from "./createBottle";
+import { createStorePricesAsPeated } from "./createStorePrices";
 import { buildBottleCreateInput } from "./flatBottleInput";
 import { formatBottleName } from "./format";
+import { updateBottleAsPeated } from "./updateBottle";
+import { updateBottleImageAsPeated } from "./updateBottleImage";
 
 const CACHE = ".cache";
 
 const CACHE_EXPIRE = 60 * 60 * 18 * 1000;
-
-const BottleConflictDataSchema = z.object({
-  bottle: z.number().int().positive(),
-});
 
 mkdirSync(CACHE, { recursive: true });
 
@@ -149,7 +148,6 @@ export async function chunked<T>(
 }
 
 export type StorePrice = z.infer<typeof StorePriceInputSchema>;
-type BottleResult = z.infer<typeof BottleSchema>;
 
 export type BottleReview = {
   name: string;
@@ -164,115 +162,53 @@ export async function handleBottle(
   bottle: z.input<typeof BottleInputSchema>,
   price?: z.input<typeof StorePriceInputSchema> | null,
   imageUrl?: string | null,
+  { dryRun = false }: { dryRun?: boolean } = {},
 ) {
-  if (process.env.ACCESS_TOKEN) {
-    logInfo("Submitting bottle {bottleName}", {
-      extra: {
-        bottleName: formatBottleName(bottle),
-      },
-    });
-
-    let createInput: ReturnType<typeof buildBottleCreateInput>;
-    try {
-      createInput = buildBottleCreateInput(bottle);
-    } catch (error) {
-      logError(error, {
-        extra: {
-          bottle,
-        },
-      });
-      return;
-    }
-    const createResult = await safe(orpcClient.bottles.create(createInput));
-
-    let resultBottle: BottleResult | undefined = createResult.data;
-    if (createResult.error) {
-      if (!createResult.isDefined || createResult.error.code !== "CONFLICT") {
-        logError(createResult.error, {
-          extra: {
-            bottle,
-          },
-        });
-        return;
-      }
-
-      const conflict = BottleConflictDataSchema.safeParse(
-        createResult.error.data,
-      );
-      if (!conflict.success) {
-        logError(createResult.error, {
-          extra: {
-            bottle,
-          },
-        });
-        return;
-      }
-
-      const updateResult = await safe(
-        orpcClient.bottles.update({
-          bottle: conflict.data.bottle,
-          ...createInput,
-        }),
-      );
-      if (updateResult.error) {
-        logError(updateResult.error, {
-          extra: {
-            bottle,
-          },
-        });
-        return;
-      }
-      resultBottle = updateResult.data;
-    }
-
-    if (!resultBottle) {
-      const error = new Error("Bottle create/update returned no Bottle.");
-      logError(error, {
-        extra: {
-          bottle,
-        },
-      });
-      return;
-    }
-
-    if (!resultBottle.imageUrl && imageUrl) {
-      try {
-        const blob = await downloadFileAsBlob(imageUrl);
-        await orpcClient.bottles.imageUpdate({
-          bottle: resultBottle.id,
-          file: blob,
-        });
-      } catch (err) {
-        logError(err, {
-          extra: {
-            bottle,
-          },
-        });
-      }
-    }
-
-    if (price) {
-      const { error: priceError, isDefined: priceIsDefined } = await safe(
-        orpcClient.prices.createBatch({
-          site: "smws",
-          prices: [price],
-        }),
-      );
-      if (priceError && (!priceIsDefined || priceError.name !== "CONFLICT")) {
-        logError(priceError, {
-          extra: {
-            bottle,
-            price,
-          },
-        });
-      }
-    }
-  } else {
+  if (dryRun) {
     logInfo("Dry run bottle {bottleName}", {
       extra: {
         bottleName: formatBottleName(bottle),
       },
     });
+    return;
+  }
+
+  logInfo("Submitting bottle {bottleName}", {
+    extra: { bottleName: formatBottleName(bottle) },
+  });
+
+  let createInput: ReturnType<typeof buildBottleCreateInput>;
+  createInput = buildBottleCreateInput(bottle);
+
+  let resultBottle;
+  try {
+    resultBottle = (await createBottleAsPeated(createInput)).bottle;
+  } catch (error) {
+    if (!(error instanceof BottleAlreadyExistsError)) throw error;
+    resultBottle = (
+      await updateBottleAsPeated({
+        bottleId: error.bottleId,
+        input: createInput,
+      })
+    ).bottle;
+  }
+
+  if (!resultBottle.imageUrl && imageUrl) {
+    try {
+      const blob = await downloadFileAsBlob(imageUrl);
+      await updateBottleImageAsPeated({
+        bottleId: resultBottle.id,
+        file: blob,
+      });
+    } catch (error) {
+      logError(error, {
+        bottle: { id: resultBottle.id, name: resultBottle.fullName },
+      });
+    }
+  }
+
+  if (price) {
+    await createStorePricesAsPeated({ site: "smws", prices: [price] });
   }
 }
 
@@ -288,20 +224,18 @@ export default async function scrapePrices(
   site: ExternalSiteType,
   urlFn: (page: number) => string,
   scrapeProducts: (url: string, cb: ScrapePricesCallback) => Promise<void>,
+  { dryRun = false }: { dryRun?: boolean } = {},
 ) {
   const workQueue = new BatchQueue<StorePrice>(
     SCRAPER_PRICE_BATCH_SIZE,
     async (prices) => {
-      logInfo("Pushing new price data to API", {
+      logInfo(dryRun ? "Dry run price batch" : "Persisting price batch", {
         extra: {
           site,
           count: prices.length,
         },
       });
-      await orpcClient.prices.createBatch({
-        site,
-        prices,
-      });
+      if (!dryRun) await createStorePricesAsPeated({ site, prices });
     },
   );
 

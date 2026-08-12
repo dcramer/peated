@@ -6,11 +6,9 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import { db, type AnyDatabase } from "@peated/server/db";
-import type { User } from "@peated/server/db/schema";
 import { entities, entityTombstones } from "@peated/server/db/schema";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
-import type { Context } from "@peated/server/orpc/context";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import {
   BottleInputSchema,
@@ -107,11 +105,9 @@ async function getEntity(
 
 export async function bottleNormalize({
   input,
-  context: _context,
   entityDb = db,
 }: {
   input: z.infer<typeof BottleInputSchema>;
-  context: Context & { user: User };
   entityDb?: AnyDatabase;
 }): Promise<BottlePreviewResult & NormalizedBottle> {
   const brand = await getEntity(input.brand, entityDb);
@@ -211,10 +207,9 @@ export default procedure
   })
   .input(BottleInputSchema)
   .output(BottlePreviewResultSchema)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input }) {
     const normalized = await bottleNormalize({
       input,
-      context,
     });
 
     // Extract only the properties specified in the output schema
