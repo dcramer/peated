@@ -18,7 +18,6 @@ import type {
   BottleGroup,
   BottleSeries,
   Entity,
-  User,
 } from "@peated/server/db/schema";
 import {
   bottleGroupDistillers,
@@ -30,7 +29,7 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import { getUserActor } from "@peated/server/lib/actors";
+import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import {
   BottleIdentityConflictError,
   reserveBottleIdentitiesInTransaction,
@@ -542,20 +541,10 @@ async function loadEntity(tx: AnyTransaction, entityId: number) {
   return entity;
 }
 
-function requireUpdateUser(user: User | undefined): User {
-  if (!user) {
-    throw new BottleUpdateInputError(
-      "A user is required to create or resolve shared catalog choices.",
-    );
-  }
-  return user;
-}
-
 async function addEntityRoleIfNeeded({
   tx,
   entity,
   role,
-  user,
   actorId,
   creationSource,
   changedEntityIds,
@@ -563,7 +552,6 @@ async function addEntityRoleIfNeeded({
   tx: AnyTransaction;
   entity: Entity;
   role: Entity["type"][number];
-  user?: User;
   actorId: number;
   creationSource: CatalogVerificationCreationSource;
   changedEntityIds: Set<number>;
@@ -574,7 +562,6 @@ async function addEntityRoleIfNeeded({
     db: tx,
     data: entity.id,
     creationSource,
-    userId: requireUpdateUser(user).id,
     createdByActorId: actorId,
     type: role,
   });
@@ -598,7 +585,6 @@ async function resolveStableState(
     patch,
     currentDistillerIds,
     actorId,
-    user,
     creationSource,
     changedEntityIds,
     newEntityIds,
@@ -607,7 +593,6 @@ async function resolveStableState(
     patch?: SharedPatch;
     currentDistillerIds: number[];
     actorId: number;
-    user?: User;
     creationSource: CatalogVerificationCreationSource;
     changedEntityIds: Set<number>;
     newEntityIds: Set<number>;
@@ -620,7 +605,6 @@ async function resolveStableState(
       tx,
       entity: numericBrand,
       role: "brand",
-      user,
       actorId,
       creationSource,
       changedEntityIds,
@@ -636,7 +620,6 @@ async function resolveStableState(
       tx,
       entity: numericBottler,
       role: "bottler",
-      user,
       actorId,
       creationSource,
       changedEntityIds,
@@ -650,7 +633,6 @@ async function resolveStableState(
       tx,
       entity: await loadEntity(tx, choice),
       role: "distiller",
-      user,
       actorId,
       creationSource,
       changedEntityIds,
@@ -666,7 +648,6 @@ async function resolveStableState(
       db: tx,
       data: coerceToUpsert(patch.brand),
       creationSource,
-      userId: requireUpdateUser(user).id,
       createdByActorId: actorId,
       type: "brand",
     });
@@ -693,7 +674,6 @@ async function resolveStableState(
       db: tx,
       data: coerceToUpsert(patch.bottler),
       creationSource,
-      userId: requireUpdateUser(user).id,
       createdByActorId: actorId,
       type: "bottler",
     });
@@ -721,7 +701,6 @@ async function resolveStableState(
         db: tx,
         data: coerceToUpsert(choice),
         creationSource,
-        userId: requireUpdateUser(user).id,
         createdByActorId: actorId,
         type: "distiller",
       });
@@ -761,7 +740,6 @@ async function resolveStableState(
         tx,
         series: patch.series,
         brand,
-        userId: requireUpdateUser(user).id,
         createdByActorId: actorId,
       });
     } catch (error) {
@@ -854,7 +832,6 @@ async function resolveStableState(
               description: currentSeries.description,
             },
             brand,
-            userId: requireUpdateUser(user).id,
             createdByActorId: actorId,
           });
         } catch (error) {
@@ -1024,7 +1001,6 @@ export async function updateBottleInTransaction(
     input,
     expectedSelectedBottleState,
     expectedSharedState,
-    user,
     actorId,
     creationSource,
   }: {
@@ -1032,7 +1008,6 @@ export async function updateBottleInTransaction(
     input: SystemBottlePatch;
     expectedSelectedBottleState?: BottleUpdateExpectedSelectedBottleState;
     expectedSharedState?: BottleUpdateExpectedSharedState;
-    user?: User;
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
   },
@@ -1175,7 +1150,6 @@ export async function updateBottleInTransaction(
     patch: sharedIntent ? storage.shared : undefined,
     currentDistillerIds: currentGroupDistillerIds,
     actorId,
-    user,
     creationSource,
     changedEntityIds,
     newEntityIds,
@@ -1513,10 +1487,42 @@ export async function finalizeBottleUpdate(
   }
 }
 
+/** Actor resolution stays outside this transaction and post-commit boundary. */
+async function updateBottleForActor({
+  bottleId,
+  input: rawInput,
+  actorId,
+  creationSource,
+}: {
+  bottleId: number;
+  input: unknown;
+  actorId: number;
+  creationSource: CatalogVerificationCreationSource;
+}): Promise<BottleUpdateResult> {
+  if (!Number.isInteger(bottleId) || bottleId <= 0) {
+    throw new BottleUpdateInputError("Bottle ID must be a positive integer.");
+  }
+  const input = BottlePatchSchema.parse(rawInput);
+  const result = await db.transaction((tx) =>
+    updateBottleInTransaction(tx, {
+      bottleId,
+      input,
+      actorId,
+      creationSource,
+    }),
+  );
+  await finalizeBottleUpdate(result);
+  return {
+    bottle: result.bottle,
+    group: result.group,
+    changed: result.changed,
+  };
+}
+
 /** Authorizes and parses an untrusted moderator update before touching storage. */
 export async function updateBottle({
   bottleId,
-  input: rawInput,
+  input,
   context,
 }: {
   bottleId: number;
@@ -1526,25 +1532,28 @@ export async function updateBottle({
   if (!context.user?.admin && !context.user?.mod) {
     throw new BottleUpdateAuthorizationError();
   }
-  if (!Number.isInteger(bottleId) || bottleId <= 0) {
-    throw new BottleUpdateInputError("Bottle ID must be a positive integer.");
-  }
-  const input = BottlePatchSchema.parse(rawInput);
-  const user = context.user;
-  const actor = await getUserActor(user);
-  const result = await db.transaction((tx) =>
-    updateBottleInTransaction(tx, {
-      bottleId,
-      input,
-      user,
-      actorId: actor.id,
-      creationSource: "manual_entry",
-    }),
-  );
-  await finalizeBottleUpdate(result);
-  return {
-    bottle: result.bottle,
-    group: result.group,
-    changed: result.changed,
-  };
+  const actor = await getUserActor(context.user);
+  return updateBottleForActor({
+    bottleId,
+    input,
+    actorId: actor.id,
+    creationSource: "manual_entry",
+  });
+}
+
+/** Trusted scraper capability; automated updates are always Peated-owned. */
+export async function updateBottleAsPeated({
+  bottleId,
+  input: rawInput,
+}: {
+  bottleId: number;
+  input: unknown;
+}): Promise<BottleUpdateResult> {
+  const actor = await getPeatedSystemActor();
+  return updateBottleForActor({
+    bottleId,
+    input: rawInput,
+    actorId: actor.id,
+    creationSource: "manual_entry",
+  });
 }

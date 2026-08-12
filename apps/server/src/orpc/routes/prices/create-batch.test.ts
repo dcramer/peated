@@ -7,6 +7,8 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
 import {
   normalizeBottle,
   normalizeBottleAliasKey,
@@ -190,6 +192,42 @@ describe("POST /external-sites/:site/prices", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
+    });
+  });
+
+  test("worker ingestion attributes alias approval to Peated", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({ name: "System Price Bottle" });
+    const alias = await fixtures.BottleAlias({
+      name: "System Price Alias",
+      bottleId: bottle.id,
+    });
+    const systemActor = await getPeatedSystemActor();
+    expect(alias.assignedByActorId).not.toBe(systemActor.id);
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          name: alias.name,
+          price: 8_999,
+          currency: "usd",
+          volume: 750,
+          url: "https://example.com/prices/system-attribution",
+        },
+      ],
+    });
+
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, alias.name),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "source_approved",
+      assignedByActorId: systemActor.id,
     });
   });
 

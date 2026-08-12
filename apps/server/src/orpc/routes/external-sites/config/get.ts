@@ -1,9 +1,8 @@
-import { db } from "@peated/server/db";
-import { externalSiteConfig, externalSites } from "@peated/server/db/schema";
+import { getExternalSiteConfig } from "@peated/server/lib/externalSiteConfig";
+import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ExternalSiteTypeEnum } from "@peated/server/schemas";
-import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -25,25 +24,16 @@ export default procedure
   )
   .output(z.any())
   .handler(async function ({ input, errors }) {
-    const [site] = await db
-      .select()
-      .from(externalSites)
-      .where(eq(externalSites.type, input.site));
-    if (!site) {
-      throw errors.NOT_FOUND({
-        message: "Site not found.",
+    try {
+      return await getExternalSiteConfig({
+        site: input.site,
+        key: input.key,
+        defaultValue: input.default,
       });
+    } catch (error) {
+      if (error instanceof ExternalSiteNotFoundError) {
+        throw errors.NOT_FOUND({ message: "Site not found.", cause: error });
+      }
+      throw error;
     }
-
-    const [result] = await db
-      .select({ value: externalSiteConfig.value })
-      .from(externalSiteConfig)
-      .where(
-        and(
-          eq(externalSiteConfig.externalSiteId, site.id),
-          eq(externalSiteConfig.key, input.key),
-        ),
-      );
-
-    return result?.value ?? input.default;
   });

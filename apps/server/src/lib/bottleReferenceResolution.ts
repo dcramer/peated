@@ -12,7 +12,6 @@ import type {
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import config from "@peated/server/config";
 import { db, type AnyTransaction } from "@peated/server/db";
-import { type User } from "@peated/server/db/schema";
 import type { BottleAliasIdentitySnapshot } from "@peated/server/lib/bottleAliases";
 import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
 import {
@@ -128,11 +127,9 @@ function assertKnownClassifierTarget(
  */
 export async function applyClassifierCreateDecision({
   decision,
-  user,
   createdByActorId,
 }: {
   decision: ClassifierCreateDecision;
-  user: User;
   createdByActorId: number;
 }): Promise<{
   bottleId: number;
@@ -145,7 +142,6 @@ export async function applyClassifierCreateDecision({
       creationSource: "bottle_classifier",
       createdByActorId,
       input,
-      context: { user },
     }),
   );
 
@@ -177,13 +173,11 @@ export async function resolveBottleReferenceTarget({
   reference,
   aliasLookupNames = [],
   extractedIdentity = null,
-  user,
   createdByActorId,
 }: {
   reference: BottleReference;
   aliasLookupNames?: string[];
   extractedIdentity?: Partial<BottleExtractedDetails> | null;
-  user: User;
   createdByActorId: number;
 }): Promise<BottleReferenceResolution> {
   const uniqueAliasLookupNames = Array.from(
@@ -302,7 +296,6 @@ export async function resolveBottleReferenceTarget({
 
     const result = await applyClassifierCreateDecision({
       decision: classification.decision,
-      user,
       createdByActorId,
     });
     return {

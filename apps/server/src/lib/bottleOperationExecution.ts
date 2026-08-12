@@ -69,7 +69,6 @@ export async function executePreparedOperationInTransaction({
     case "update_bottle": {
       const manifest = await updateBottleInTransaction(transaction, {
         ...prepared.canonicalInput,
-        user: approvingModerator,
         actorId,
         creationSource: "manual_entry",
       });

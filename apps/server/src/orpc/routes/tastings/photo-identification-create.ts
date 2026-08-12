@@ -245,7 +245,6 @@ export default procedure
       result = await applyClassifierCreateDecision({
         createdByActorId: actor.id,
         decision,
-        user,
       });
     } catch (err) {
       if (err instanceof BottleAlreadyExistsError) {

@@ -1,18 +1,14 @@
-import config from "@peated/server/config";
-import { MAX_FILESIZE } from "@peated/server/constants";
-import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
-import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import { humanizeBytes } from "@peated/server/lib/strings";
-import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
-import { absoluteUrl } from "@peated/server/lib/urls";
+import {
+  BottleImageBottleNotFoundError,
+  BottleImageForbiddenError,
+  BottleImageTooLargeError,
+  updateBottleImageForUser,
+} from "@peated/server/lib/updateBottleImage";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { eq } from "drizzle-orm";
-import { Readable } from "node:stream";
 import { z } from "zod";
 
 export default procedure
@@ -42,68 +38,25 @@ export default procedure
   )
   .handler(async function ({ input, context, errors }) {
     const { bottle: bottleId, file } = input;
-
-    const [targetBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleId))
-      .limit(1);
-
-    if (!targetBottle) {
-      throw errors.NOT_FOUND({
-        message: "Bottle not found.",
-      });
-    }
-
-    const userActor = await getUserActorForDatabase(db, context.user);
-
-    if (
-      !context.user.admin &&
-      !context.user.mod &&
-      targetBottle.createdByActorId !== userActor.id
-    ) {
-      throw errors.FORBIDDEN({
-        message: "You don't have permission to update this bottle.",
-      });
-    }
-
-    // TODO: this is upsampling images...
-    let imageUrl: string;
     try {
-      // Convert Blob to the format expected by storeFile
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const fileStream = Readable.from(buffer);
-
-      imageUrl = await storeFile({
-        data: {
-          file: fileStream,
-        },
-        namespace: `bottles`,
-        urlPrefix: "/uploads",
-        onProcess: (...args) =>
-          compressAndResizeImage(...args, undefined, 1024),
+      return await updateBottleImageForUser({
+        bottleId,
+        file,
+        user: context.user,
       });
-    } catch (err) {
-      // Check for file size limits
-      if (file.size > MAX_FILESIZE) {
-        const errMessage = `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`;
+    } catch (error) {
+      if (error instanceof BottleImageBottleNotFoundError) {
+        throw errors.NOT_FOUND({ message: error.message, cause: error });
+      }
+      if (error instanceof BottleImageForbiddenError) {
+        throw errors.FORBIDDEN({ message: error.message, cause: error });
+      }
+      if (error instanceof BottleImageTooLargeError) {
         throw errors.PAYLOAD_TOO_LARGE({
-          message: errMessage,
-          cause: err,
+          message: error.message,
+          cause: error.cause,
         });
       }
-      throw err;
+      throw error;
     }
-
-    await db
-      .update(bottles)
-      .set({
-        imageUrl,
-      })
-      .where(eq(bottles.id, targetBottle.id));
-
-    return {
-      imageUrl: absoluteUrl(config.API_SERVER, imageUrl),
-    };
   });

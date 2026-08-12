@@ -27,7 +27,7 @@ import {
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
-import { getUserActor } from "@peated/server/lib/actors";
+import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import {
   ExactBottleAliasConflictError,
   reserveExactBottleAliasInTransaction,
@@ -181,19 +181,16 @@ async function prepareBottleCreateInTransaction(
     bottleIdentity,
     createdByActorId,
     input,
-    context,
   }: {
     creationSource?: CatalogVerificationCreationSource;
     bottleIdentity?: BottleIdentityPreparation;
     createdByActorId: number;
     input: z.infer<typeof BottleInputSchema>;
-    context: Context & { user: User };
   },
 ): Promise<PreparedBottleCreate> {
-  const user = context.user;
   const actorId = createdByActorId;
   const bottleData: BottlePreviewResult & Record<string, any> =
-    await bottleNormalize({ input, context, entityDb: tx });
+    await bottleNormalize({ input, entityDb: tx });
   if (bottleIdentity) {
     // Explicit exact input overrides traits inferred from the group name.
     Object.assign(bottleData, bottleIdentity.exactNormalizedFields);
@@ -251,7 +248,6 @@ async function prepareBottleCreateInTransaction(
     data: coerceToUpsert(bottleData.brand),
     creationSource,
     type: "brand",
-    userId: user.id,
     createdByActorId: actorId,
   });
 
@@ -269,7 +265,6 @@ async function prepareBottleCreateInTransaction(
       data: coerceToUpsert(bottleData.bottler),
       creationSource,
       type: "bottler",
-      userId: user.id,
       createdByActorId: actorId,
     });
     if (!bottlerUpsert) {
@@ -284,7 +279,6 @@ async function prepareBottleCreateInTransaction(
     [seriesId, seriesCreated] = await processSeries({
       series: input.series,
       brand,
-      userId: user.id,
       createdByActorId: actorId,
       tx,
     });
@@ -306,7 +300,6 @@ async function prepareBottleCreateInTransaction(
         db: tx,
         data: coerceToUpsert(distData),
         creationSource,
-        userId: user.id,
         createdByActorId: actorId,
         type: "distiller",
       });
@@ -565,12 +558,10 @@ export async function createBottleInTransaction(
     creationSource = "manual_entry",
     createdByActorId,
     input,
-    context,
   }: {
     creationSource?: CatalogVerificationCreationSource;
     createdByActorId: number;
     input: BottleCreateInput;
-    context: Context & { user: User };
   },
 ): Promise<BottleCreateResult> {
   const { group: storageGroup, exact } = splitBottleCreateInput(input);
@@ -598,7 +589,6 @@ export async function createBottleInTransaction(
     },
     createdByActorId,
     input: buildBottleInput(groupFields, exact),
-    context,
   });
 
   const group = await createIndependentGroupPrefix(tx, {
@@ -672,12 +662,10 @@ export async function createOrReuseBottleInTransaction(
     creationSource,
     createdByActorId,
     input,
-    context,
   }: {
     creationSource: CatalogVerificationCreationSource;
     createdByActorId: number;
     input: BottleCreateInput;
-    context: Context & { user: User };
   },
 ): Promise<BottleCreateOrReuseResult> {
   try {
@@ -686,7 +674,6 @@ export async function createOrReuseBottleInTransaction(
         creationSource,
         createdByActorId,
         input,
-        context,
       }),
     );
     return {
@@ -801,24 +788,22 @@ export async function finalizeCreatedBottle(
 
 export type CreateBottleResult = Pick<BottleCreateResult, "bottle" | "group">;
 
-/** Parses untrusted input once and owns transaction plus post-commit dispatch. */
-export async function createBottle({
-  creationSource = "manual_entry",
+/** Actor resolution stays outside this transaction and post-commit boundary. */
+async function createBottleForActor({
+  actorId,
+  creationSource,
   input: rawInput,
-  context,
 }: {
-  creationSource?: CatalogVerificationCreationSource;
+  actorId: number;
+  creationSource: CatalogVerificationCreationSource;
   input: unknown;
-  context: Context & { user: User };
 }): Promise<CreateBottleResult> {
   const input = BottleCreateInputSchema.parse(rawInput);
-  const actor = await getUserActor(context.user);
   const result = await db.transaction(async (tx) =>
     createBottleInTransaction(tx, {
       creationSource,
-      createdByActorId: actor.id,
+      createdByActorId: actorId,
       input,
-      context,
     }),
   );
 
@@ -827,4 +812,30 @@ export async function createBottle({
     bottle: result.bottle,
     group: result.group,
   };
+}
+
+/** Parses untrusted input once and owns transaction plus post-commit dispatch. */
+export async function createBottle({
+  creationSource = "manual_entry",
+  input,
+  context,
+}: {
+  creationSource?: CatalogVerificationCreationSource;
+  input: unknown;
+  context: Context & { user: User };
+}): Promise<CreateBottleResult> {
+  const actor = await getUserActor(context.user);
+  return createBottleForActor({ actorId: actor.id, creationSource, input });
+}
+
+/** Trusted scraper capability; automated creation is always Peated-owned. */
+export async function createBottleAsPeated(
+  input: unknown,
+): Promise<CreateBottleResult> {
+  const actor = await getPeatedSystemActor();
+  return createBottleForActor({
+    actorId: actor.id,
+    creationSource: "manual_entry",
+    input,
+  });
 }

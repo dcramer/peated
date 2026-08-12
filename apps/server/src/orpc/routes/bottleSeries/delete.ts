@@ -63,7 +63,6 @@ export default procedure
           await updateBottleInTransaction(tx, {
             bottleId: group.representativeBottleId,
             input: { series: null },
-            user: context.user,
             actorId,
             creationSource: "manual_entry",
           }),

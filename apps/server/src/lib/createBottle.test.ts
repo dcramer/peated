@@ -485,7 +485,6 @@ describe("Bottle creation", () => {
         creationSource: "bottle_classifier",
         createdByActorId: actor.id,
         input,
-        context: contextFor(defaults.user),
       }),
     );
 
@@ -532,7 +531,6 @@ describe("Bottle creation", () => {
             creationSource: "bottle_classifier",
             createdByActorId: actor.id,
             input,
-            context,
           }),
         ),
       ).rejects.toMatchObject({
@@ -663,7 +661,6 @@ describe("Bottle creation", () => {
         attempt.result = await createBottleInTransaction(tx, {
           createdByActorId: actor.id,
           input: parsedInput,
-          context: contextFor(defaults.user),
         });
         throw new Error("force rollback");
       }),

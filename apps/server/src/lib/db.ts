@@ -294,14 +294,12 @@ export async function upsertEntityAliases({
 export const upsertEntity = async ({
   db,
   data,
-  userId,
   createdByActorId,
   type,
   creationSource,
 }: {
   db: AnyDatabase;
   data: EntityInput;
-  userId: number;
   createdByActorId: number;
   type?: EntityType;
   creationSource?: CatalogVerificationCreationSource;

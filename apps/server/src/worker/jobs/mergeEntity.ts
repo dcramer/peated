@@ -416,7 +416,6 @@ async function performEntityMerge({
             ...(distillersChange ? { distillers: nextDistillerIds } : {}),
             ...(seriesInput !== undefined ? { series: seriesInput } : {}),
           },
-          user: mutationUser,
           actorId: actor.id,
           creationSource: "repair_workflow",
         }),

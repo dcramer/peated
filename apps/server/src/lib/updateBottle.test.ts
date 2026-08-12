@@ -307,7 +307,6 @@ describe("Bottle updates", () => {
           brand: { name: "Composed Review Brand" },
           distillers: [{ name: "Composed Review Distillery" }],
         }),
-        user: mod,
         actorId: actor.id,
         creationSource: "price_match_review",
       });
@@ -392,7 +391,6 @@ describe("Bottle updates", () => {
           bottleId: first.bottle.id,
           input: { brand: targetBrand.id },
           expectedSharedState,
-          user: mod,
           actorId: actor.id,
           creationSource: "repair_workflow",
         }),
@@ -446,7 +444,6 @@ describe("Bottle updates", () => {
           bottleId: first.bottle.id,
           input: { series: targetSeries.id },
           expectedSharedState,
-          user: mod,
           actorId: actor.id,
           creationSource: "repair_workflow",
         }),

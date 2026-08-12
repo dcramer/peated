@@ -21,14 +21,6 @@ export default async function scrapeSMWSA() {
     `https://newmake.smwsa.com/collections/all-products`,
     handleBottle,
   );
-
-  // if (process.env.ACCESS_TOKEN) {
-  //   await trpcClient.externalSiteUpdate.mutate({
-  //     site: "smwsa",
-  //     key: "processedIssues",
-  //     value: processedIssues,
-  //   });
-  // }
 }
 
 export async function scrapeBottles(

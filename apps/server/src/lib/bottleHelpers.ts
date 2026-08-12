@@ -14,7 +14,6 @@ export async function processSeries({
   tx,
   series,
   brand,
-  userId,
   createdByActorId,
 }: {
   tx: AnyTransaction;
@@ -23,7 +22,6 @@ export async function processSeries({
     | number
     | null;
   brand: Entity;
-  userId: number;
   createdByActorId: number;
 }): Promise<[number | null, boolean]> {
   if (!series) return [null, false];

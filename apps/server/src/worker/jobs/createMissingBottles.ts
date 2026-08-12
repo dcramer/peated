@@ -14,11 +14,9 @@ import {
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { and, asc, gt, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {
-  const systemUser = await getAutomationModeratorUser();
   const systemActor = await getPeatedSystemActor();
 
   // Advance by id so unresolved reviews are visited once per run instead of
@@ -52,7 +50,6 @@ export default async function createMissingBottles() {
         // Normalized fallback aliases can collapse exact identity detail before
         // the classifier reviews the full reference title.
         aliasLookupNames: [aliasKey, review.name],
-        user: systemUser,
         createdByActorId: systemActor.id,
       });
 

@@ -344,7 +344,6 @@ export async function updateEntityInTransaction(
           await updateBottleInTransaction(transaction, {
             bottleId: group.representativeBottleId,
             input: { brand: newEntity.id },
-            user,
             actorId,
             creationSource: "manual_entry",
           }),
