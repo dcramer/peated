@@ -146,7 +146,7 @@
       "caskStrength": true,
       "singleCask": true
     },
-    "proposedBottleNameIncludes": ["Family Estate", "Single Barrel"],
+    "proposedBottleNameIncludes": ["Single Barrel"],
     "proposedBottleNameExcludes": ["4769", "2504", "Small Batch"],
     "verifyEligible": false,
     "suggestedNextStep": "confirm_create",

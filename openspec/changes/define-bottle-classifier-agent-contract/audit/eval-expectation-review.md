@@ -52,5 +52,11 @@ record as verified sources. Its provenance records the exact DB outcome.
 No prompt rule was added for one Bottle. Existing non-identical cases retain
 the general boundaries: Cadboll Estate Batch 2 and Macallan 1994 prevent
 over-specific sibling matches; SMWS and Willett cases cover exact-cask create
-and match decisions; Shieldaig and Creag Isle cases cover common-label age
-placement.
+and match decisions; Shieldaig and Creag Isle cases keep age in `statedAge`
+without duplicating it in the stable expression.
+
+The 2026-08-11 result review found eight create expectations that contradicted
+the current flat proposed Bottle schema. The fixtures required structured age
+or series traits to also appear in `proposedBottle.name`. Their action, exact
+identity, and catalog outcomes remain unchanged. Their name expectations now
+use the stable expression while the structured fields retain the exact traits.

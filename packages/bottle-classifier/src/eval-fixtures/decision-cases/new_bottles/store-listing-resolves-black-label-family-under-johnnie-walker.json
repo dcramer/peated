@@ -36,7 +36,7 @@
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
-      "name": "Black Label Islay Origin 12-year-old",
+      "name": "Black Label Islay Origin",
       "brand": {
         "id": 1093,
         "name": "Johnnie Walker"
@@ -44,12 +44,8 @@
       "category": "blend",
       "statedAge": 12
     },
-    "proposedBottleNameIncludes": [
-      "Black Label",
-      "Islay Origin",
-      "12-year-old"
-    ],
-    "summary": "Use the verified sibling family and launch evidence to keep Johnnie Walker as the resolved brand and Black Label Islay Origin 12-year-old as the independently complete Bottle name."
+    "proposedBottleNameIncludes": ["Black Label", "Islay Origin"],
+    "summary": "Use the verified sibling family and launch evidence to keep Johnnie Walker as the resolved brand, Black Label Islay Origin as the stable expression, and 12 in the structured statedAge field."
   },
   "localCatalog": {
     "entities": [

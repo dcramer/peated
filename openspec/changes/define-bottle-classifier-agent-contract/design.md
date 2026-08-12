@@ -146,11 +146,11 @@ This is a larger change than the prompt reorganization and must not block it. Th
 
 Alternative considered: keep all basis fields freeform and let review policy parse prose. Rejected because prose parsing is exactly the second-classifier drift the determinism boundary forbids.
 
-### Decision: Common-label output naming is the core create goal
+### Decision: Stable-expression output naming is the core create goal
 
-For proposed bottles, `proposedBottle.name` should be the common bottle label identity users would recognize, not a maximal dump of every observed fact. Stable bottle-level identity belongs in the bottle draft; reusable release identity belongs in the release draft; exact source facts that are not shared canon belong in `observation`.
+For proposed Bottles, `proposedBottle.name` is the stable marketed expression relative to the Brand. Exact age, edition, year, ABV, and cask traits belong in their structured proposed Bottle fields. Canonical materialization combines those fields into the complete display identity. Exact source facts that are not Bottle identity belong in `observation`.
 
-Alternative considered: include all age, year, ABV, batch, cask, and finish text in bottle names to avoid losing detail. Rejected because that creates dirty parent bottles and bypasses the bottle/release/observation model.
+Alternative considered: duplicate age, year, ABV, batch, cask, and finish text in the stable name to avoid losing detail. Rejected because structured exact fields already retain those facts and canonical materialization adds them to the complete display identity.
 
 ### Decision: Evals validate behavior and guard against overfitting
 
