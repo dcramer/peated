@@ -1429,6 +1429,13 @@
       "when": 1786486599551,
       "tag": "0203_sparkling_gorgon",
       "breakpoints": false
+    },
+    {
+      "idx": 204,
+      "version": "7",
+      "when": 1786575968418,
+      "tag": "0204_slim_micromacro",
+      "breakpoints": false
     }
   ]
 }

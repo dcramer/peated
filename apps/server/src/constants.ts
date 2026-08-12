@@ -26,6 +26,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "astorwines",
   "decadentdrinks",
   "healthyspirits",
+  "northstarspirits",
   "reservebar",
   "smws",
   "smwsa",
