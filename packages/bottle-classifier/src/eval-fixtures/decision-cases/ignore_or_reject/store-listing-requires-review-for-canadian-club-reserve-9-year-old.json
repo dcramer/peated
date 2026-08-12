@@ -62,6 +62,24 @@
       }
     ]
   },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+      "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+      "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+      "https://api.peated.com/v1/bottles/16913",
+      "https://whiskyadvocate.com/Canadian-Club-Reserve-40-ABV",
+      "https://www.wineenthusiast.com/buying-guide/canadian-club-reserve-aged-10-years/",
+      "https://api.peated.com/v1/bottles/17346"
+    ],
+    "dbOutcome": {
+      "bottleId": 16913,
+      "createsBottle": false,
+      "summary": "Bottle 16913 is the existing Canadian Club Reserve 9 Year Old product, but its populated Brand must be corrected from Canadian to Canadian Club before the classifier can assign the reference. Do not create a duplicate or assign the older Reserve candidate 17346."
+    },
+    "notes": "The producer identifies the source as Canadian Club Reserve 9 Year Old. Contemporary coverage identifies Triple Aged as wording on that same nine-year product, not a separate Limited Edition. Bottle 16913 carries the matching nine-year Whisky Advocate review and is the exact underlying product despite its stale name and Brand metadata. Bottle 17346 carries an earlier Reserve review that predates the nine-year replacement and does not establish a match to the observed nine-year listing. Preserve the captured candidates, return no_match while Bottle 16913 has a populated Brand conflict, and let Bottle Review own the catalog correction."
+  },
   "expected": {
     "status": "classified",
     "action": "no_match",
@@ -71,6 +89,6 @@
     "expectedTier": "review",
     "verifyEligible": false,
     "suggestedNextStep": "manual_search",
-    "summary": "Return no_match for catalog review. Bottle 16913 is a more-specific Triple Aged Limited Edition product; Bottle 17346 may be the same Reserve product but its populated Brand conflicts with Canadian Club, so creating a duplicate is unsafe."
+    "summary": "Return no_match for catalog review. Bottle 16913 is the exact Reserve 9 Year Old product; Triple Aged is label wording, not a separate edition, but its populated Brand conflicts with Canadian Club. Bottle 17346 predates the nine-year replacement and is not a safe target, so creating a duplicate is unsafe."
   }
 }
