@@ -4,6 +4,14 @@
   "expectedBottleName": "Lagavulin Distillers Edition",
   "summary": "Keep Lagavulin Distillers Edition as bottle identity when no release year is present instead of inventing a child annual release from the family wording alone.",
   "peatedBottleIds": [44006],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
+      "https://api.peated.com/v1/bottles/44006"
+    ],
+    "notes": "Lagavulin markets Distillers Edition as a complete product. The reference contains no vintage or release year that would establish a separate annual release, and Peated Bottle 44006 is the broad existing product."
+  },
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",

@@ -74,7 +74,10 @@
     "source": "production_miss",
     "verifiedSourceUrls": [
       "https://highwest.com/",
+      "https://highwest.com/pages/product-information",
       "https://ship.highwest.com/products/high-country-american-single-malt",
+      "https://api.peated.com/v1/bottles/12825",
+      "https://api.peated.com/v1/bottles/44284",
       "https://www.breakingbourbon.com/review/high-west-high-country-american-single-malt-2022-release",
       "https://whiskyadvocate.com/High-West-High-Country-American-Single-Malt-Batch-19I04-44",
       "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-high-country-batch-23j12.jpg"
@@ -98,7 +101,7 @@
         "notes": "The plain production Bottle lacks ABV; the observed 44% is the ongoing product's label strength seen on this lot-coded bottle, corroborated at 44% on independent batch reviews, but is left to enrichment rather than auto-fill."
       }
     ],
-    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads High West High Country American Single Malt Whiskey, 44% ABV, batch no. 23J12. Production Bottle 44284 is a legacy standalone row flattened around the lot code; production Bottle 12825 is the plain ongoing product. High West sells High Country as one default product and SKU with no per-batch variants, unlike A Midwinter Night's Dram Act/Scene releases. Batch No. 23J12 therefore remains source lot evidence and the plain Bottle is the correct match target."
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads High West High Country American Single Malt Whiskey, 44% ABV, batch no. 23J12. High West's product information lists High Country as one 44% product without marketed batch variants. The current Peated API resolves legacy Bottle 44284 to plain ongoing Bottle 12825. Batch No. 23J12 therefore remains source lot evidence and the plain Bottle is the correct match target."
   },
   "expected": {
     "status": "classified",

@@ -62,6 +62,14 @@
       }
     ]
   },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.shibuiwhisky.com/grain-select",
+      "https://api.peated.com/v1/bottles/13025"
+    ],
+    "notes": "Shibui describes Grain Select as a grain-led world whisky made from wheat and malt. Peated Bottle 13025 has the exact marketed identity; its legacy generic spirit category is catalog debt rather than evidence of a different product."
+  },
   "expected": {
     "status": "classified",
     "action": "match",
