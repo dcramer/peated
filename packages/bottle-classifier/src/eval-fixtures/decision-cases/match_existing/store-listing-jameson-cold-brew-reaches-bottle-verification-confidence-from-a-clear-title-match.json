@@ -54,6 +54,14 @@
       ]
     }
   ],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.jamesonwhiskey.com/en/our-whiskey/jameson-cold-brew/",
+      "https://api.peated.com/v1/bottles/13437"
+    ],
+    "notes": "The producer markets Jameson Cold Brew under that concise product name, and Peated Bottle 13437 represents the same product. The store title's trailing Irish Whiskey wording is generic category context."
+  },
   "expected": {
     "status": "classified",
     "action": "match",

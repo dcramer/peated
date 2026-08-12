@@ -4,6 +4,15 @@
   "expectedBottleName": "Highland Park Cask Strength",
   "summary": "Treat Highland Park Cask Strength No. 5 as one complete 2024 Bottle, preserving No. 5 as its exact edition and in the marketed Bottle identity.",
   "peatedBottleIds": [44080],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+      "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
+      "https://api.peated.com/v1/bottles/44080"
+    ],
+    "notes": "Highland Park markets Cask Strength Release No. 5 as the exact expression at 64.7% ABV. Contemporary release coverage dates its launch to 2024; the broad Peated row lacks the release-specific identity."
+  },
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",

@@ -10,11 +10,21 @@
   ],
   "summary": "Treat Heaven's Door Bootleg Vol 3 as one complete Bottle with Volume III as its exact edition; reviewed web evidence may enrich it with the marketed 13-year-old age and Vino de Naranja finish, but the source does not require those optional fields.",
   "peatedBottleIds": [44067],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.heavensdoor.com/bootleg-series",
+      "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
+      "https://api.peated.com/v1/bottles/44067"
+    ],
+    "notes": "The producer's Bootleg archive identifies Volume III as the 2021 release. Independent product detail corroborates its 13-year age and Vino de Naranja finish; those enrichments are optional for this sparse reference, while Volume III and release year 2021 are exact release identity."
+  },
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
     "exactBottleIdentity": {
-      "edition": "Volume III"
+      "edition": "Volume III",
+      "releaseYear": 2021
     }
   }
 }

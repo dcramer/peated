@@ -4,6 +4,16 @@
   "expectedBottleName": "Woodford Reserve Double Oaked",
   "summary": "Treat Woodford Reserve Double Oaked as a distinct bottle identity and avoid mutating it into the separate Double Double Oaked sibling.",
   "peatedBottleIds": [11855],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.woodfordreserve.com/en-uk/our-whiskey/",
+      "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+      "https://www.prnewswire.com/news-releases/woodford-reserve-introduces-first-permanent-line-extension-in-15-year-history-137570558.html",
+      "https://api.peated.com/v1/bottles/11855"
+    ],
+    "notes": "Woodford Reserve lists Double Oaked as an ongoing expression, and its launch announcement identifies it as a permanent line extension. The producer separately markets Double Double Oaked, so the two names are distinct Bottle identities."
+  },
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
