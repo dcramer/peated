@@ -1,0 +1,28 @@
+{
+  "id": "watchpost-whiskey",
+  "referenceName": "Watchpost",
+  "expectedBottleName": "Watchpost Whiskey",
+  "summary": "Create Watchpost Whiskey as an American blended whiskey at 42.5% ABV. Reuse the established Westland distillery Entity and do not copy the age of one blend component into the Bottle's stated age.",
+  "peatedBottleIds": [44299],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+      "https://westlanddistillery.com/products/watchpost-whiskey",
+      "https://api.peated.com/v1/bottles/44299"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/watchpost-8-year-old.webp",
+    "dbOutcome": {
+      "bottleId": 44299,
+      "createsBottle": true,
+      "summary": "At capture, the production add-bottle flow created Bottle 44299 as Watchpost Watchpost with unsupported stated age 8 and new Westland Distillery Co. Entity 365683 instead of using the marketed Whiskey expression and established distillery Entity."
+    },
+    "notes": "Added from the exact failed image add-bottle flow and its persisted production image. The label shows Watchpost, An American Blended Whiskey, 42.5% Alc/Vol, and Westland Distillery Co.; it does not state an age. Official Watchpost copy says the blend contains 8-year-old Westland American Single Malt, which does not make the complete blended product age-stated. This fixture preserves the pre-creation local state. Production Bottle 44299 later stored that component age as statedAge 8 and retained duplicate Entity 365683; those catalog defects are not the expected classifier identity."
+  },
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "action": "create_bottle",
+    "exactBottleIdentity": null
+  }
+}

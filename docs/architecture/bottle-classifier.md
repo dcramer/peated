@@ -229,6 +229,13 @@ for that complete Bottle.
 - Do not collapse marketed scope. An unsupported extra trait makes a candidate
   too specific. A source trait that evidence proves defines a distinct Bottle
   makes a broad candidate incomplete.
+- Keep source facts at their supported product level. Do not assign a blend a
+  component's age, year, or strength. Preserve complete marketed edition
+  descriptors, but keep non-marketed production lot codes out of Bottle
+  identity.
+- Reuse Entities by their established catalog role. Exact or shorter name
+  overlap does not override local evidence that distinguishes a Brand from its
+  producing distillery.
 - Create a Bottle only when reviewed source, label, image,
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a

@@ -33,6 +33,11 @@ The classifier SHALL treat names, retailer titles, review titles, image text, UR
 - **WHEN** a cask number, barrel number, bottle number, selector, or similar supported observation fact is useful evidence but not proven reusable catalog identity
 - **THEN** the agent SHALL preserve it as observation evidence instead of forcing a bottle or release split
 
+#### Scenario: A component fact is not a Bottle fact
+
+- **WHEN** evidence gives an age, year, strength, or other trait for one component of a blend but does not state that trait for the complete marketed Bottle
+- **THEN** the agent SHALL NOT copy the component trait into the Bottle field
+
 ### Requirement: Bottle precision layers are distinct
 
 The classifier SHALL separate stable parent bottle identity, reusable child release identity, exact-cask bottle identity, and observation-only facts.
@@ -65,6 +70,11 @@ For Create Bottle, `proposedBottle.name` SHALL be the stable marketed expression
 
 - **WHEN** a batch, edition, year, ABV, or exact code identifies the marketed Bottle
 - **THEN** the agent SHALL put that trait in its structured proposed Bottle field and SHALL NOT duplicate it unnecessarily in `proposedBottle.name`
+
+#### Scenario: Edition keeps its marketed descriptor
+
+- **WHEN** evidence names a human-facing release descriptor such as `2022 Edition` or `Batch 24`
+- **THEN** the agent SHALL preserve the complete descriptor in `edition` and SHALL NOT replace the stable expression with generic limited-release wording
 
 #### Scenario: Supported observation trait is too exact
 
@@ -133,6 +143,16 @@ The classifier SHALL compare populated candidate fields and marketed Bottle scop
 
 - **WHEN** one candidate safely matches the source Bottle and another candidate is malformed or conflicting
 - **THEN** the malformed candidate SHALL NOT block the safe match
+
+#### Scenario: Printed batch code is a production lot
+
+- **WHEN** the producer sells one ongoing product without batch variants and a printed batch code identifies only its production lot
+- **THEN** the agent SHALL match the ongoing Bottle and SHALL NOT promote the lot code into `edition`
+
+#### Scenario: Entity candidates represent different catalog roles
+
+- **WHEN** local catalog evidence uses one Entity as the Brand and another Entity as the producing distillery for the same producer
+- **THEN** the agent SHALL preserve that role-specific Entity assignment instead of choosing by shortest or exact name overlap
 
 ### Requirement: Web and source evidence support identity decisions
 

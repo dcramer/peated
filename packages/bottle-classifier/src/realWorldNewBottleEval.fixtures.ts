@@ -209,7 +209,7 @@ const REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES: Partial<
       },
     ],
   },
-  "watchpost-8-year-old": {
+  "watchpost-whiskey": {
     input: {
       extractedIdentity: buildExtractedIdentity({
         brand: "Watchpost",

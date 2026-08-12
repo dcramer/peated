@@ -1,6 +1,6 @@
 {
   "id": "image-backed-photo-creates-mars-komagatake-2022-edition",
-  "name": "image-backed photo: creates complete Mars Komagatake 2022 Edition Bottle",
+  "name": "Mars Komagatake: image-backed photo creates complete 2022 Edition Bottle",
   "input": {
     "reference": {
       "name": "Bottle photo upload",
@@ -82,7 +82,7 @@
     },
     "proposedBottleDistillerIdOneOf": [1953],
     "suggestedNextStep": "confirm_create",
-    "summary": "Create one independently complete Mars Komagatake 2022 Edition Bottle with the existing Mars brand and canonical Komagatake distiller; classification does not create a broader Bottle or select a group."
+    "summary": "Create Mars Komagatake with the complete human-facing edition `2022 Edition`, release year 2022, existing Mars Brand, and canonical Komagatake distiller. Generic limited-release wording does not replace the stable Komagatake expression."
   },
   "localCatalog": {
     "entities": [
