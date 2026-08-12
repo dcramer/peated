@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-creates-shieldaig-speyside-21-year-old-with-age-in-bottle-name",
-  "name": "store listing: creates Shieldaig Speyside 21-year-old with age in bottle name",
+  "id": "store-listing-creates-shieldaig-speyside-21-year-old-with-structured-age",
+  "name": "store listing: creates Shieldaig Speyside 21-year-old with structured age",
   "input": {
     "reference": {
       "name": "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
@@ -34,22 +34,22 @@
       "createsBottle": true,
       "summary": "Create a separate Shieldaig Speyside 21-year-old Bottle. Do not use Bottle 44175 because its structured age is 18."
     },
-    "notes": "Production match queue proposal 28 selected Bottle 44175 even though its statedAge is 18. The observed web evidence included Total Wine plus independent Shieldaig Speyside 21-year pages. The localCatalog models the relevant Peated state that should inform the decision. Age identifies this marketed Bottle, so the display name must include the age."
+    "notes": "Production match queue proposal 28 selected Bottle 44175 even though its statedAge is 18. The observed web evidence included Total Wine plus independent Shieldaig Speyside 21-year pages. The localCatalog models the relevant Peated state that should inform the decision. The structured age distinguishes this marketed Bottle; canonical materialization adds it to the complete display identity."
   },
   "expected": {
     "status": "classified",
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
+      "name": "Speyside",
       "brand": {
         "name": "Shieldaig"
       },
       "category": "single_malt",
       "statedAge": 21
     },
-    "proposedBottleNameIncludes": ["Speyside", "21-year-old"],
     "verifyEligible": false,
-    "summary": "Create a separate Shieldaig Speyside 21-year-old bottle and keep the age statement in the displayed bottle identity because same-family aged bottles would otherwise be confusing."
+    "summary": "Create a separate Shieldaig Speyside 21-year-old Bottle with Speyside as the stable expression and 21 in the structured statedAge field."
   },
   "localCatalog": {
     "entities": [

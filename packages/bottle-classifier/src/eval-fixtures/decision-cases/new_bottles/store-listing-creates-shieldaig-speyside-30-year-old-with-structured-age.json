@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-creates-shieldaig-speyside-30-year-old-with-age-in-bottle-name",
-  "name": "store listing: creates Shieldaig Speyside 30-year-old with age in bottle name",
+  "id": "store-listing-creates-shieldaig-speyside-30-year-old-with-structured-age",
+  "name": "store listing: creates Shieldaig Speyside 30-year-old with structured age",
   "input": {
     "reference": {
       "name": "Shieldaig Speyside Sin Malt 30-year-old Scotch Whisky",
@@ -33,22 +33,22 @@
       "createsBottle": true,
       "summary": "Peated now contains bottle 44266 as Shieldaig Speyside 30-year-old. The regression being protected is the earlier classifier-created draft that used the confusing display name Shieldaig Speyside while storing the 30-year age only as structured bottle metadata."
     },
-    "notes": "Total Wine markets this as Shieldaig Speyside Sin Malt 30Yr Scotch Whisky and describes it as matured for at least 30 years. The eval simulates the pre-creation local-search state: the 30-year bottle is absent, but a same-family Shieldaig Speyside 18-year-old bottle exists, so the agent must include the bottle-level age in the new bottle display name instead of hiding it only in statedAge."
+    "notes": "Total Wine markets this as Shieldaig Speyside Sin Malt 30Yr Scotch Whisky and describes it as matured for at least 30 years. The eval simulates the pre-creation local-search state: the 30-year Bottle is absent, but a same-family Shieldaig Speyside 18-year-old Bottle exists. The agent must preserve the age in statedAge while keeping Speyside as the stable expression."
   },
   "expected": {
     "status": "classified",
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
+      "name": "Speyside",
       "brand": {
         "name": "Shieldaig"
       },
       "category": "single_malt",
       "statedAge": 30
     },
-    "proposedBottleNameIncludes": ["Speyside", "30-year-old"],
     "verifyEligible": false,
-    "summary": "Create a new Shieldaig Speyside 30-year-old bottle and keep the age statement in the displayed bottle identity because same-family aged bottles would otherwise be confusing."
+    "summary": "Create a new Shieldaig Speyside 30-year-old Bottle with Speyside as the stable expression and 30 in the structured statedAge field."
   },
   "localCatalog": {
     "entities": [

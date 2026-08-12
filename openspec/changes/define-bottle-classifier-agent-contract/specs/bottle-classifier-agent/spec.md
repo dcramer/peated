@@ -52,24 +52,24 @@ The classifier SHALL separate stable parent bottle identity, reusable child rele
 - **WHEN** the exact cask or code is itself the marketed bottle identity
 - **THEN** the agent SHALL use `identityScope = exact_cask` and SHALL NOT create a child release for that exact-cask identity
 
-### Requirement: Proposed bottle names use common label identity
+### Requirement: Proposed Bottle names use the stable marketed expression
 
-For create or repair actions, `proposedBottle.name` SHALL be the common bottle label identity a user would recognize, not a maximal concatenation of every observed fact.
+For Create Bottle, `proposedBottle.name` SHALL be the stable marketed expression relative to the Brand. It SHALL omit exact traits represented by other proposed Bottle fields. Canonical materialization SHALL combine the stable expression and exact fields into the complete Bottle identity.
 
-#### Scenario: Bottle-level age is stable identity
+#### Scenario: Exact age has a structured field
 
-- **WHEN** an age statement is part of the common label identity for the bottle family
-- **THEN** the agent SHALL include that age in the proposed bottle identity rather than hiding it only in structured metadata
+- **WHEN** evidence supports an exact age and a separate stable expression
+- **THEN** the agent SHALL put the age in `proposedBottle.statedAge` and SHALL NOT require the age text in `proposedBottle.name`
 
-#### Scenario: Release trait belongs below parent
+#### Scenario: Exact trait has a structured field
 
-- **WHEN** a batch, edition, year, ABV, or release code is reusable child release identity under a stable parent
-- **THEN** the agent SHALL place that trait in `proposedRelease` and not duplicate it unnecessarily in `proposedBottle.name`
+- **WHEN** a batch, edition, year, ABV, or exact code identifies the marketed Bottle
+- **THEN** the agent SHALL put that trait in its structured proposed Bottle field and SHALL NOT duplicate it unnecessarily in `proposedBottle.name`
 
 #### Scenario: Supported observation trait is too exact
 
 - **WHEN** an exact barrel, cask, bottle number, selector, or similar supported observation fact is not proven shared catalog identity
-- **THEN** the agent SHALL NOT include that fact in the common parent bottle name solely because it appears in source text
+- **THEN** the agent SHALL NOT include that fact in `proposedBottle.name` solely because it appears in source text
 
 ### Requirement: Local candidates are evidence not commands
 

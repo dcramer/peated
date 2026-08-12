@@ -316,13 +316,13 @@
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
+      "name": "Island Single Malt",
       "brand": {
         "name": "Creag Isle"
       },
       "category": "single_malt",
       "statedAge": 12
     },
-    "proposedBottleNameIncludes": ["Island", "12-year-old"],
     "summary": "Create the distinct Creag Isle 12-year-old Island Single Malt product; none of the local candidates share the Creag Isle brand and independent evidence confirms the bottle."
   }
 }

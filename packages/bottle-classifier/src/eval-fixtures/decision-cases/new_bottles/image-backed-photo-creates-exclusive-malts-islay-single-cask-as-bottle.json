@@ -116,7 +116,7 @@
       "caskStrength": true,
       "singleCask": true
     },
-    "proposedBottleNameIncludes": ["Islay", "8-year-old"],
+    "proposedBottleNameIncludes": ["Islay"],
     "proposedBottleNameExcludes": ["2007"],
     "verifyEligible": false,
     "summary": "Create one complete Bottle for this The Exclusive Malts undisclosed Islay single-cask bottling, retaining its age, vintage, ABV, and cask-strength/single-cask facts without selecting a group."
