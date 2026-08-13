@@ -555,6 +555,20 @@ function AddedToLibrary({
         <div className="grid gap-3 sm:grid-cols-2">
           <Button
             color="highlight"
+            href={`/bottles/${entry.bottle.id}/addTasting`}
+            fullWidth
+            icon={<Wine className="h-4 w-4" />}
+          >
+            Log Tasting
+          </Button>
+          <Button
+            href={getViewBottleHref(entry.bottle)}
+            fullWidth
+            icon={<Eye className="h-4 w-4" />}
+          >
+            View Bottle
+          </Button>
+          <Button
             fullWidth
             icon={<Plus className="h-4 w-4" />}
             onClick={onAddAnother}
@@ -599,10 +613,15 @@ function AddBottleFlowContent() {
   const requestedBottleKey = useMemo(() => {
     const pendingImageKey = requestedPendingImage?.id ?? "no-image";
     if (requestedBottleId) {
-      return `bottle:${requestedBottleId}:${pendingImageKey}:${requestedResultSource ?? "found"}`;
+      return `bottle:${requestedBottleId}:${pendingImageKey}:${requestedResultSource ?? "found"}:${intent}`;
     }
     return null;
-  }, [requestedBottleId, requestedPendingImage?.id, requestedResultSource]);
+  }, [
+    intent,
+    requestedBottleId,
+    requestedPendingImage?.id,
+    requestedResultSource,
+  ]);
 
   const [loadedBottleKey, setLoadedBottleKey] = useState<string | null>(null);
   const [loadingBottle, setLoadingBottle] = useState(false);
@@ -670,14 +689,38 @@ function AddBottleFlowContent() {
 
         if (cancelled) return;
         const libraryEntry = collectionStatus.results[0] ?? null;
-        setSelectedBottle({
+        const selection: FlowBottle = {
           bottle,
           hasLibraryEntry: Boolean(libraryEntry),
           libraryEntryImageUrl: libraryEntry?.imageUrl ?? null,
           pendingImage: requestedPendingImage,
           previewUrl: requestedPendingImage?.imageUrl || null,
           resultSource: requestedResultSource,
-        });
+        };
+
+        if (intent === "tasting") {
+          try {
+            const suggestedTags = await orpc.bottles.suggestedTags.call({
+              bottle: selection.bottle.id,
+            });
+            if (cancelled) return;
+            setSelectedBottle(null);
+            setTastingDraft({
+              ...selection,
+              suggestedTags,
+              createdAt: new Date().toISOString(),
+            });
+          } catch (err) {
+            logError(err);
+            if (cancelled) return;
+            setSelectedBottle(selection);
+            setTastingLoadError(
+              "We couldn't load the tasting form. Try again or search for the bottle.",
+            );
+          }
+        } else {
+          setSelectedBottle(selection);
+        }
         setLoadedBottleKey(requestedBottleKey);
       } catch (err) {
         logError(err);
@@ -700,6 +743,7 @@ function AddBottleFlowContent() {
       cancelled = true;
     };
   }, [
+    intent,
     loadedBottleKey,
     orpc,
     requestedBottleId,

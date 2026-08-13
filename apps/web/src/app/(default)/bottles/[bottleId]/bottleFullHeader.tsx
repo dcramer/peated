@@ -6,7 +6,6 @@ import CollectionAction from "@peated/web/components/collectionAction";
 import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
-import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { Suspense } from "react";
 import BottleActions from "./bottleActions";
@@ -35,13 +34,7 @@ export default function BottleFullHeader({
             <CollectionAction bottleId={bottle.id} />
           </Suspense>
 
-          <Button
-            href={getAddBottleHref({
-              bottleId: bottle.id,
-              intent: "tasting",
-            })}
-            color="primary"
-          >
+          <Button href={`/bottles/${bottle.id}/addTasting`} color="primary">
             <PeatedGlyph className="h-4 w-4" /> Log Tasting
           </Button>
 
