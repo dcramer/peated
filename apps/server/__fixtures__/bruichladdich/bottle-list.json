@@ -1,0 +1,115 @@
+{
+  "products": [
+    {
+      "title": "Bruichladdich Bere Barley 2013",
+      "handle": "bruichladdich-bere-barley-2013",
+      "product_type": "Unpeated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Bruichladdich", "Single Malt"],
+      "variants": [{"available": true, "price": "100.00", "title": "70cl"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/bruichladdich-bere-barley.png"}]
+    },
+    {
+      "title": "Port Charlotte 10",
+      "handle": "port-charlotte-10",
+      "product_type": "Heavily Peated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Port Charlotte"],
+      "variants": [{"available": true, "price": "60", "title": "700ml"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/port-charlotte-10.png"}]
+    },
+    {
+      "title": "Octomore Edition 16.1",
+      "handle": "octomore-16-1",
+      "product_type": "Super Heavily Peated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Octomore"],
+      "variants": [{"available": true, "price": "140.00", "title": "70CL"}],
+      "images": [{"src": "https://www.bruichladdich.com/cdn/shop/files/octomore-16-1.png"}]
+    },
+    {
+      "title": "The Biodynamic Project",
+      "handle": "the-biodynamic-project",
+      "product_type": "Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Single Malt"],
+      "variants": [{"available": true, "price": "100.00", "title": "70 cl"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/biodynamic-project.png"}]
+    },
+    {
+      "title": "Bruichladdich Sold Out",
+      "handle": "bruichladdich-sold-out",
+      "product_type": "Unpeated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Bruichladdich"],
+      "variants": [{"available": false, "price": "85.00", "title": "70cl"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/sold-out.png"}]
+    },
+    {
+      "title": "Bruichladdich Zero Price",
+      "handle": "bruichladdich-zero-price",
+      "product_type": "Unpeated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Bruichladdich"],
+      "variants": [{"available": true, "price": "0.00", "title": "700ml"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/zero-price.png"}]
+    },
+    {
+      "title": "The Botanist Islay Dry Gin",
+      "handle": "the-botanist-islay-dry-gin",
+      "product_type": "Islay Dry Gin",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["The Botanist"],
+      "variants": [{"available": true, "price": "35.00", "title": "70cl"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/botanist.png"}]
+    },
+    {
+      "title": "Bruichladdich Small Batch",
+      "handle": "bruichladdich-small-batch",
+      "product_type": "Unpeated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Bruichladdich"],
+      "variants": [{"available": true, "price": "45.00", "title": "50cl"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/small-batch.png"}]
+    },
+    {
+      "title": "Bruichladdich Variant Release",
+      "handle": "bruichladdich-variant-release",
+      "product_type": "Unpeated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Bruichladdich"],
+      "variants": [
+        {"available": true, "price": "50.00", "title": "70cl"},
+        {"available": true, "price": "60.00", "title": "70cl"}
+      ],
+      "images": [{"src": "https://cdn.shopify.com/s/files/variant-release.png"}]
+    },
+    {
+      "title": "Unknown Project",
+      "handle": "unknown-project",
+      "product_type": "Islay Single Malt Scotch Whisky",
+      "vendor": "Unknown Vendor",
+      "tags": ["Single Malt"],
+      "variants": [{"available": true, "price": "90.00", "title": "70cl"}],
+      "images": [{"src": "https://cdn.shopify.com/s/files/unknown-project.png"}]
+    },
+    {
+      "title": "Bruichladdich Invalid Image",
+      "handle": "bruichladdich-invalid-image",
+      "product_type": "Unpeated Islay Single Malt Scotch Whisky",
+      "vendor": "Bruichladdich Distillery",
+      "tags": ["Bruichladdich"],
+      "variants": [{"available": true, "price": "70.00", "title": "70cl"}],
+      "images": [{"src": "https://example.com/not-official.png"}]
+    },
+    {
+      "title": "Broken Product",
+      "handle": null,
+      "product_type": null,
+      "vendor": null,
+      "tags": null,
+      "variants": null,
+      "images": null
+    }
+  ]
+}

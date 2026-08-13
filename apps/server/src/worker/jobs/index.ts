@@ -25,6 +25,7 @@ import reconcileStorePriceMatchProposals from "./reconcileStorePriceMatchProposa
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
 import scrapeAstorWines from "./scrapeAstorWines";
 import scrapeBerryBrosRudd from "./scrapeBerryBrosRudd";
+import scrapeBruichladdich from "./scrapeBruichladdich";
 import scrapeCadenheads from "./scrapeCadenheads";
 import scrapeCompassBox from "./scrapeCompassBox";
 import scrapeDecadentDrinks from "./scrapeDecadentDrinks";
@@ -79,6 +80,7 @@ registry.add("ResolveStorePriceBottle", resolveStorePriceBottle);
 const scraperJobs = [
   ["ScrapeAstorWines", "astorwines", scrapeAstorWines],
   ["ScrapeBerryBrosRudd", "berrybrosrudd", scrapeBerryBrosRudd],
+  ["ScrapeBruichladdich", "bruichladdich", scrapeBruichladdich],
   ["ScrapeCadenheads", "cadenheads", scrapeCadenheads],
   ["ScrapeCompassBox", "compassbox", scrapeCompassBox],
   ["ScrapeDecadentDrinks", "decadentdrinks", scrapeDecadentDrinks],
