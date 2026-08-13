@@ -34,7 +34,7 @@ test("health list distinguishes listings from latest execution", async ({
       trigger: "manual",
       requestedById: admin.id,
       attemptCount: 1,
-      error: "Unexpected scraper failure. See Sentry using this run id.",
+      error: "Unexpected scraper failure. See Sentry for this run.",
       startedAt: new Date("2026-08-12T11:59:00.000Z"),
       completedAt,
     })

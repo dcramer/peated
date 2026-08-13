@@ -4,6 +4,7 @@ import {
   firstStorePriceName,
   priceChangeFirstBottle,
   priceSite,
+  priceSiteRun,
   testAccessToken,
   testUser,
   unresolvedStorePriceName,
@@ -75,5 +76,27 @@ test.describe("Bottle prices", () => {
       .locator("tr")
       .filter({ hasText: unresolvedStorePriceName });
     await expect(unresolvedRow.locator('a[href^="/bottles/"]')).toHaveCount(0);
+  });
+
+  test("shows durable run IDs in scraper history", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-site-runs-${testInfo.project.name}`,
+      user: { ...testUser, admin: true },
+    });
+
+    await page.goto(`/admin/sites/${priceSite.type}/runs`, {
+      waitUntil: "commit",
+    });
+
+    const runEntry = testInfo.project.name.includes("mobile")
+      ? page.locator("article")
+      : page.locator("tr");
+    await expect(runEntry.getByText(`Run #${priceSiteRun.id}`)).toBeVisible();
+    await expect(
+      runEntry.getByText(priceSiteRun.error, { exact: true }),
+    ).toBeVisible();
   });
 });

@@ -70,6 +70,7 @@ export default function Page(props: {
               </span>
             </div>
             <div className="text-muted mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+              <span>Run #{run.id}</span>
               <span className="capitalize">{run.trigger}</span>
               <span>
                 {run.attemptCount} attempt
@@ -101,7 +102,7 @@ export default function Page(props: {
                 <div>
                   <RunStatus status={run.status} />
                   <div className="text-muted mt-1 text-xs">
-                    {run.attemptCount} attempt
+                    Run #{run.id} · {run.attemptCount} attempt
                     {run.attemptCount === 1 ? "" : "s"}
                     {run.itemCount !== null
                       ? ` · ${run.itemCount.toLocaleString("en-US")} items`

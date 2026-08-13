@@ -214,7 +214,10 @@ forcing either a new Bottle or a group change.
 
 SMWS codes are exact identity anchors when printed or when deterministically
 composed from an SMWS distillery number and single-cask number visible on the
-label. A code must not invent a missing component or subtitle.
+label. A code must not invent a missing component or subtitle. SMWS may rename
+the subtitle marketed for a cask, but that does not create a new Bottle: the
+code continues to identify the same Bottle, the new subtitle becomes its
+canonical name, and the previous canonical name remains an alias.
 
 ## Activity Identity
 

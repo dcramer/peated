@@ -42,6 +42,7 @@ import {
   photoTastingNotes,
   priceChangeList,
   priceSite,
+  priceSiteRuns,
   replacementSourceBottleId,
   storePriceList,
   suggestedTags,
@@ -419,6 +420,13 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
       sendRpcResponse(response, priceSite);
+      return true;
+    case "externalSites/runs":
+      if (input?.site !== priceSite.type) {
+        sendRpcError(response, "Unexpected external site runs payload");
+        return true;
+      }
+      sendRpcResponse(response, priceSiteRuns);
       return true;
     case "bottleGroups/details": {
       const group = getBottleGroup(input?.group);

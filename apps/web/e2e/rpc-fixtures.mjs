@@ -533,6 +533,27 @@ export const priceSite = {
   lastSucceededAt: null,
 };
 
+export const priceSiteRun = {
+  id: 27,
+  status: "failed",
+  trigger: "scheduled",
+  requestedById: null,
+  attemptCount: 1,
+  itemCount: null,
+  error: "Unexpected scraper failure. See Sentry for this run.",
+  startedAt: timestamp,
+  completedAt: timestamp,
+  createdAt: timestamp,
+};
+
+export const priceSiteRuns = {
+  results: [priceSiteRun],
+  rel: {
+    nextCursor: null,
+    prevCursor: null,
+  },
+};
+
 export const firstStorePriceName = "First Bottle store listing";
 export const secondStorePriceName = "Second Bottle store listing";
 export const unresolvedStorePriceName = "Unresolved store listing";

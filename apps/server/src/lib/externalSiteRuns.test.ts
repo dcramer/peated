@@ -7,6 +7,7 @@ import {
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
 } from "@peated/server/lib/externalSiteRuns";
+import * as Sentry from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
 
@@ -100,7 +101,13 @@ test("worker persists a safe failure and rethrows", async ({ fixtures }) => {
     throw failure;
   });
 
-  await expect(job({ runId: run.id })).rejects.toBe(failure);
+  await Sentry.withIsolationScope(async (scope) => {
+    await expect(job({ runId: run.id })).rejects.toBe(failure);
+    expect(scope.getScopeData().contexts?.externalSiteRun).toEqual({
+      id: run.id,
+      site: "decadentdrinks",
+    });
+  });
 
   const [storedRun] = await db
     .select()
@@ -109,7 +116,7 @@ test("worker persists a safe failure and rethrows", async ({ fixtures }) => {
   expect(storedRun).toMatchObject({
     status: "failed",
     attemptCount: 1,
-    error: "Unexpected scraper failure. See Sentry using this run id.",
+    error: "Unexpected scraper failure. See Sentry for this run.",
   });
   expect(storedRun?.error).not.toContain("secret");
 });
