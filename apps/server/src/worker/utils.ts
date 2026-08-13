@@ -13,6 +13,8 @@ export function getJobForSite(site: ExternalSiteType): JobName {
       return "ScrapeCompassBox";
     case "decadentdrinks":
       return "ScrapeDecadentDrinks";
+    case "douglaslaing":
+      return "ScrapeDouglasLaing";
     case "gordonmacphail":
       return "ScrapeGordonMacphail";
     case "kilchoman":

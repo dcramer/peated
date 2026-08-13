@@ -1,0 +1,146 @@
+{
+  "products": [
+    {
+      "title": "Big Peat The World Football Edition 2026",
+      "handle": "big-peat-the-world-football-edition-2026",
+      "product_type": "Blended Malt",
+      "tags": ["Abv: 48", "Blended-Malt", "Vol: 70"],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/big-peat-football.png"
+        }
+      ],
+      "variants": [
+        {
+          "available": true,
+          "price": "65.00"
+        }
+      ]
+    },
+    {
+      "title": "Rangers Girvan 17 Years Old",
+      "handle": "rangers-girvan-17-years-old",
+      "product_type": "Single Grain",
+      "tags": ["Abv: 50", "Single-Grain", "Vol: 50"],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/rangers-girvan.png"
+        }
+      ],
+      "variants": [
+        {
+          "available": true,
+          "price": "87.50"
+        }
+      ]
+    },
+    {
+      "title": "XOP North British 35 Years Old",
+      "handle": "xop-north-british-35-years-old",
+      "product_type": "Single Grain",
+      "tags": ["Single-Grain", "Vol: 70"],
+      "images": [],
+      "variants": [
+        {
+          "available": false,
+          "price": "499.00"
+        },
+        {
+          "available": true,
+          "price": "425.00"
+        }
+      ]
+    },
+    {
+      "title": "Scallywag Glass Pack",
+      "handle": "scallywag-glass-pack",
+      "product_type": "Whisky",
+      "tags": ["Abv: 46", "Vol: 70", "Whisky-Gift-Set"],
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "48.00"
+        }
+      ]
+    },
+    {
+      "title": "The Epicurean Mini",
+      "handle": "the-epicurean-mini",
+      "product_type": "Blended Malt",
+      "tags": ["Abv: 46.2", "Vol: 5"],
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "7.00"
+        }
+      ]
+    },
+    {
+      "title": "Remarkable Regional Malts Miniature Gift Pack",
+      "handle": "remarkable-regional-malts-miniature-gift-pack-1",
+      "product_type": "Blended Malt",
+      "tags": ["Abv: Avg 46.4", "Vol: 6x5", "Whisky-Gift-Set"],
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "36.00"
+        }
+      ]
+    },
+    {
+      "title": "Big Peat Boulevardier Cask Aged Cocktail",
+      "handle": "big-peat-boulevardier-cask-aged-cocktail",
+      "product_type": "Blended Malt",
+      "tags": ["Abv: 29.5", "Vol: 50"],
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "34.00"
+        }
+      ]
+    },
+    {
+      "title": "Provenance Strathmill 8 Years Old",
+      "handle": "provenance-strathmill-8-years-old",
+      "product_type": "Single Malt",
+      "tags": ["Abv: 46", "Vol: 70"],
+      "images": [],
+      "variants": [
+        {
+          "available": false,
+          "price": "69.00"
+        }
+      ]
+    },
+    {
+      "title": "The Epicurean Nosing Glass",
+      "handle": "the-epicurean-nosing-glass",
+      "product_type": "Merchandise",
+      "tags": [],
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "12.00"
+        }
+      ]
+    },
+    {
+      "title": "Archived Whisky",
+      "handle": "archived-whisky",
+      "product_type": "Single Malt",
+      "tags": ["Abv: 46", "Vol: 70"],
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "0.00"
+        }
+      ]
+    }
+  ]
+}

@@ -1464,6 +1464,13 @@
       "when": 1786581781109,
       "tag": "0208_peaceful_juggernaut",
       "breakpoints": false
+    },
+    {
+      "idx": 209,
+      "version": "7",
+      "when": 1786583221351,
+      "tag": "0209_sad_living_lightning",
+      "breakpoints": false
     }
   ]
 }
