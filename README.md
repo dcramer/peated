@@ -92,3 +92,30 @@ checks, use `pnpm dev:server:api`.
 The web app runs on Vercel and the API and worker run on Render. Use the
 [Production Debugging](./docs/development/production-debugging.md) playbook for
 current hosts, logs, traces, and diagnostic commands.
+
+### Authenticated API maintenance
+
+The CLI can authorize against production without storing a password. The
+checked-in public OAuth client uses the registered redirect URI
+`http://127.0.0.1/oauth/callback`. `PEATED_OAUTH_CLIENT_ID` or the login
+command's `--client-id` option can override that client for another deployment.
+
+Log in and inspect the current credential with:
+
+```bash
+pnpm cli auth login
+pnpm cli auth status
+```
+
+The CLI chooses an available callback port and stores the seven-day bearer token
+in `$XDG_CONFIG_HOME/peated/credentials.json`, or `~/.config/peated` when
+`XDG_CONFIG_HOME` is unset. It never prints the token.
+
+Authenticated API reads produce JSON. Mutations require an interactive
+confirmation or an explicit `--yes`, and JSON bodies are read from files:
+
+```bash
+pnpm cli api get /bottles/123
+pnpm cli api patch /bottles/123 --input ./change.json --yes
+pnpm cli auth logout
+```

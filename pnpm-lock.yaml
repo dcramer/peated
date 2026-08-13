@@ -185,6 +185,12 @@ importers:
 
   apps/cli:
     dependencies:
+      '@orpc/client':
+        specifier: 'catalog:'
+        version: 1.15.0(@opentelemetry/api@1.9.1)
+      '@orpc/server':
+        specifier: 'catalog:'
+        version: 1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3)
       '@peated/bottle-classifier':
         specifier: workspace:*
         version: link:../../packages/bottle-classifier
@@ -218,6 +224,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
