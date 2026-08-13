@@ -105,25 +105,70 @@ describe("BottleIdentity", () => {
     const html = renderToStaticMarkup(
       <BottleIdentity
         bottle={makeBottle({
-          brand: { id: 2, name: "Decadent Drinks" } as Bottle["brand"],
+          brand: { id: 2, name: "Woodford Reserve" } as Bottle["brand"],
           series: {
             id: 3,
-            name: "Whiskyland",
+            name: "Master's Collection",
           } as Bottle["series"],
           group: {
             ...makeBottle().group!,
-            name: "Glenburgie 38-year-old",
+            name: "Batch Proof",
           },
-          edition: "Chapter Thirty Two",
+          edition: null,
         })}
       />,
     );
 
-    expect(html).toContain("Decadent Drinks");
-    expect(html).toContain("Whiskyland");
+    expect(html).toContain("Woodford Reserve");
+    expect(html).toContain("Master&#x27;s Collection");
     expect(html).toContain('href="/bottles?series=3"');
-    expect(html).toContain("Glenburgie 38-year-old");
-    expect(html).toContain("Chapter Thirty Two");
+    expect(html).toContain("Batch Proof");
+  });
+
+  it("keeps series context when the surrounding view supplies the Brand", () => {
+    const html = renderToStaticMarkup(
+      <BottleIdentity
+        bottle={makeBottle({
+          brand: { id: 2, name: "Woodford Reserve" } as Bottle["brand"],
+          series: {
+            id: 3,
+            name: "Master's Collection",
+          } as Bottle["series"],
+          group: {
+            ...makeBottle().group!,
+            name: "Batch Proof",
+          },
+          edition: null,
+        })}
+        showBrand={false}
+      />,
+    );
+
+    expect(html).not.toContain("Woodford Reserve");
+    expect(html).toContain("Master&#x27;s Collection");
+    expect(html).toContain('href="/bottles?series=3"');
+    expect(html).toContain("Batch Proof");
+  });
+
+  it("does not repeat a historical Series that equals the Brand", () => {
+    const html = renderToStaticMarkup(
+      <BottleIdentity
+        bottle={makeBottle({
+          brand: { id: 2, name: "Whiskyland" } as Bottle["brand"],
+          series: { id: 3, name: "Whiskyland" } as Bottle["series"],
+          group: {
+            ...makeBottle().group!,
+            name: "Pittyvaich",
+          },
+          edition: "Chapter Thirty",
+        })}
+        showBrand={false}
+      />,
+    );
+
+    expect(html).not.toContain('href="/bottles?series=3"');
+    expect(html).toContain("Pittyvaich");
+    expect(html).toContain("Chapter Thirty");
   });
 
   it("does not use exact age as a subtitle when the family title includes it", () => {

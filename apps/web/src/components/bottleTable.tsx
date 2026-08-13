@@ -31,8 +31,14 @@ export default function BottleTable({
   showBottleStats = true,
   showRatingSummary = false,
   compactIdentity = false,
+  groupBy,
+  groupItem,
+  groupTo,
   ...props
-}: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
+}: Omit<
+  ComponentProps<typeof Table<BottleRow, Bottle["brand"]>>,
+  "items" | "rel" | "columns" | "groupBy" | "groupItem" | "groupTo"
+> & {
   bottleList: (Bottle | CollectionBottle)[];
   rel?: PagingRel;
   renderCollectionBottleImage?: (item: CollectionBottle) => ReactNode;
@@ -42,6 +48,9 @@ export default function BottleTable({
   showBottleStats?: boolean;
   showRatingSummary?: boolean;
   compactIdentity?: boolean;
+  groupBy?: (item: Bottle) => Bottle["brand"];
+  groupItem?: (item: Bottle["brand"]) => ReactNode;
+  groupTo?: (group: Bottle["brand"]) => string;
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
     "bottle" in item
@@ -54,10 +63,13 @@ export default function BottleTable({
   );
 
   return (
-    <Table<BottleRow>
+    <Table<BottleRow, Bottle["brand"]>
       items={rows}
       primaryKey={(item) => item.key}
       rel={rel}
+      groupBy={groupBy ? (item) => groupBy(item.bottle) : undefined}
+      groupItem={groupItem}
+      groupTo={groupTo}
       columns={[
         {
           name: "name",
@@ -100,7 +112,7 @@ export default function BottleTable({
                     bottle={bottle}
                     mode="absolute"
                     metadataVariant={compactIdentity ? "summary" : "full"}
-                    showBrand={!props.groupBy}
+                    showBrand={!groupBy}
                     trailingContent={statusIndicators}
                   />
                   {collectionMeta ? (
