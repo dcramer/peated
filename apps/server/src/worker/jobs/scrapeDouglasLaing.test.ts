@@ -70,7 +70,7 @@ test("paginates a dry run and stops after an empty page", async ({
     )
     .reply(200, { products: [] });
 
-  await expect(scrapeDouglasLaing({ dryRun: true })).resolves.toBeUndefined();
+  await expect(scrapeDouglasLaing({ dryRun: true })).resolves.toBe(3);
 });
 
 test("fails when a complete scrape yields no supported listings", async ({

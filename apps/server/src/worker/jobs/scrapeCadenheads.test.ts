@@ -60,7 +60,7 @@ test("paginates a dry run and stops after an empty page", async ({
     )
     .reply(200, []);
 
-  await expect(scrapeCadenheads({ dryRun: true })).resolves.toBeUndefined();
+  await expect(scrapeCadenheads({ dryRun: true })).resolves.toBe(2);
 });
 
 test("fails when a complete scrape yields no supported listings", async ({

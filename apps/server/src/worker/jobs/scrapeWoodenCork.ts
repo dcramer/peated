@@ -102,7 +102,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 }
 
 export default async function scrapeWoodenCork() {
-  await scrapePrices(
+  return scrapePrices(
     SITE,
     (page) => `https://woodencork.com/collections/whiskey?cursor=${page}`,
     scrapeProducts,

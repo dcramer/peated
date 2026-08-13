@@ -1,3 +1,4 @@
+import { createExternalSiteRunJob } from "@peated/server/lib/externalSiteRuns";
 import registry from "../registry";
 import capturePriceImage from "./capturePriceImage";
 import cleanupPendingUploads from "./cleanupPendingUploads";
@@ -69,21 +70,27 @@ registry.add(
   reconcileStorePriceMatchProposals,
 );
 registry.add("ResolveStorePriceBottle", resolveStorePriceBottle);
-registry.add("ScrapeAstorWines", scrapeAstorWines);
-registry.add("ScrapeCadenheads", scrapeCadenheads);
-registry.add("ScrapeCompassBox", scrapeCompassBox);
-registry.add("ScrapeDecadentDrinks", scrapeDecadentDrinks);
-registry.add("ScrapeDouglasLaing", scrapeDouglasLaing);
-registry.add("ScrapeGordonMacphail", scrapeGordonMacphail);
-registry.add("ScrapeHealthySpirits", scrapeHealthySpirits);
-registry.add("ScrapeKilchoman", scrapeKilchoman);
-registry.add("ScrapeNorthStarSpirits", scrapeNorthStarSpirits);
-registry.add("ScrapeReserveBar", scrapeReserveBar);
-registry.add("ScrapeSMWS", scrapeSMWS);
-registry.add("ScrapeSMWSA", scrapeSMWSA);
-registry.add("ScrapeTotalWine", scrapeTotalWine);
-registry.add("ScrapeWoodenCork", scrapeWoodenCork);
-registry.add("ScrapeWhiskyAdvocate", scrapeWhiskeyAdvocate);
+const scraperJobs = [
+  ["ScrapeAstorWines", "astorwines", scrapeAstorWines],
+  ["ScrapeCadenheads", "cadenheads", scrapeCadenheads],
+  ["ScrapeCompassBox", "compassbox", scrapeCompassBox],
+  ["ScrapeDecadentDrinks", "decadentdrinks", scrapeDecadentDrinks],
+  ["ScrapeDouglasLaing", "douglaslaing", scrapeDouglasLaing],
+  ["ScrapeGordonMacphail", "gordonmacphail", scrapeGordonMacphail],
+  ["ScrapeHealthySpirits", "healthyspirits", scrapeHealthySpirits],
+  ["ScrapeKilchoman", "kilchoman", scrapeKilchoman],
+  ["ScrapeNorthStarSpirits", "northstarspirits", scrapeNorthStarSpirits],
+  ["ScrapeReserveBar", "reservebar", scrapeReserveBar],
+  ["ScrapeSMWS", "smws", scrapeSMWS],
+  ["ScrapeSMWSA", "smwsa", scrapeSMWSA],
+  ["ScrapeTotalWine", "totalwine", scrapeTotalWine],
+  ["ScrapeWoodenCork", "woodencork", scrapeWoodenCork],
+  ["ScrapeWhiskyAdvocate", "whiskyadvocate", scrapeWhiskeyAdvocate],
+] as const;
+
+for (const [jobName, siteType, scrape] of scraperJobs) {
+  registry.add(jobName, createExternalSiteRunJob(siteType, scrape));
+}
 registry.add("CreateMissingBottles", createMissingBottles);
 registry.add("UpdateBottleStats", updateBottleStats);
 registry.add("UpdateCountryStats", updateCountryStats);

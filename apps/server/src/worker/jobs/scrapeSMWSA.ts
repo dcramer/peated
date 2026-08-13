@@ -17,7 +17,7 @@ import { logScrapeWarning } from "./scrapeLogging";
 const SITE = "smwsa";
 
 export default async function scrapeSMWSA() {
-  await scrapeBottles(
+  return scrapeBottles(
     `https://newmake.smwsa.com/collections/all-products`,
     handleBottle,
   );
@@ -33,6 +33,7 @@ export async function scrapeBottles(
 ) {
   const data = await getUrl(url);
   const $ = cheerio(data);
+  let itemCount = 0;
 
   for (const el of $(".product-collection-module__grid-item")) {
     const itemType = $(".product-collection-module__type", el)
@@ -158,5 +159,7 @@ export async function scrapeBottles(
         : null,
       imageUrl,
     );
+    itemCount += 1;
   }
+  return itemCount;
 }

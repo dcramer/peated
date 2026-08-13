@@ -31,7 +31,11 @@ describe("POST /external-sites/:site/trigger", () => {
       { context: { user: adminUser } },
     );
 
-    expect(result.success).toBe(true);
+    expect(result).toMatchObject({
+      status: "queued",
+      trigger: "manual",
+      requestedById: adminUser.id,
+    });
     expect(pushJob).toHaveBeenCalledOnce();
   });
 });

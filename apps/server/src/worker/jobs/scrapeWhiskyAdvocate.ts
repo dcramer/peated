@@ -24,7 +24,7 @@ export default async function scrapeWhiskeyAdvocate({
   );
   if (issueList.length === 0) {
     logError("[Whisky Advocate] No issues found");
-    return;
+    return 0;
   }
 
   logInfo("[Whisky Advocate] Found {issueCount} issues", {
@@ -46,7 +46,7 @@ export default async function scrapeWhiskeyAdvocate({
   const newIssues = issueList.filter((i) => !processedIssues.includes(i));
   if (newIssues.length === 0) {
     logInfo("[Whisky Advocate] No unprocessed issues found", {});
-    return;
+    return 0;
   }
 
   logInfo("[Whisky Advocate] Found {issueCount} new issues", {
@@ -55,6 +55,7 @@ export default async function scrapeWhiskeyAdvocate({
     },
   });
 
+  let itemCount = 0;
   for (const issueName of newIssues) {
     logInfo("[Whisky Advocate] Fetching reviews for issue {issueName}", {
       extra: {
@@ -66,6 +67,7 @@ export default async function scrapeWhiskeyAdvocate({
         issueName,
       )}&order_by=published_desc`,
       async (item) => {
+        itemCount += 1;
         if (!dryRun) {
           logInfo("[Whisky Advocate] Submitting {name}", {
             extra: {
@@ -117,6 +119,7 @@ export default async function scrapeWhiskeyAdvocate({
       });
     }
   }
+  return itemCount;
 }
 
 export async function scrapeIssueList(

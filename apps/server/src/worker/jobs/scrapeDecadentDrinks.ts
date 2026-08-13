@@ -86,7 +86,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 }
 
 export default async function scrapeDecadentDrinks() {
-  await scrapePrices(
+  return scrapePrices(
     SITE,
     (page) => `https://decadent-drinks.com/shop?category=5&page=${page - 1}`,
     scrapeProducts,

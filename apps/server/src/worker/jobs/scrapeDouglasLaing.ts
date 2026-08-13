@@ -132,7 +132,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeDouglasLaing({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
-  await scrapePrices(
+  return await scrapePrices(
     SITE,
     (page) =>
       `${STORE_ORIGIN}/en-us/collections/scotch-whisky/products.json?limit=250&page=${page}`,

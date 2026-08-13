@@ -413,6 +413,13 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, priceSite);
       return true;
+    case "externalSites/healthDetails":
+      if (input?.site !== priceSite.type) {
+        sendRpcError(response, "Unexpected external site health payload");
+        return true;
+      }
+      sendRpcResponse(response, priceSite);
+      return true;
     case "bottleGroups/details": {
       const group = getBottleGroup(input?.group);
       if (!group) {

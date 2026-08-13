@@ -63,17 +63,18 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 }
 
 export default async function scrapeTotalWine() {
-  await scrapePrices(
+  const scotchCount = await scrapePrices(
     SITE,
     (page) =>
       `https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
     scrapeProducts,
   );
 
-  await scrapePrices(
+  const whiskeyCount = await scrapePrices(
     SITE,
     (page) =>
       `https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
     scrapeProducts,
   );
+  return scotchCount + whiskeyCount;
 }

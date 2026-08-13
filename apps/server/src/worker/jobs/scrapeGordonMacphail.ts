@@ -149,7 +149,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeGordonMacphail({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
-  await scrapePrices(
+  return scrapePrices(
     SITE,
     (page) =>
       `https://shop.gordonandmacphail.com/products.json?limit=250&page=${page}`,

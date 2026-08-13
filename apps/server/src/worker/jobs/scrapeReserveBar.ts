@@ -80,7 +80,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeReserveBar() {
   const limit = 36;
 
-  await scrapePrices(
+  return scrapePrices(
     SITE,
     (page) =>
       `https://www.reservebar.com/collections/whiskey?start=${page * limit}&sz=${limit}`,

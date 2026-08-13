@@ -1,12 +1,17 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/worker/client";
-import { and, eq, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
-import { getJobForSite } from "../utils";
+import {
+  ExternalSiteRunActiveError,
+  queueScheduledExternalSiteRun,
+  redispatchStaleExternalSiteRuns,
+} from "@peated/server/lib/externalSiteRuns";
+import { and, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
 export default async function scheduleScrapers() {
+  await redispatchStaleExternalSiteRuns();
+
   const pending = await db
-    .select()
+    .select({ id: externalSites.id })
     .from(externalSites)
     .where(
       and(
@@ -17,20 +22,11 @@ export default async function scheduleScrapers() {
         isNotNull(externalSites.runEvery),
       ),
     );
-
-  await db.transaction(async (tx) => {
-    for (const site of pending) {
-      await pushJob(getJobForSite(site.type));
-      // TODO: have the job update nextRunAt when it finishes
-      await tx
-        .update(externalSites)
-        .set({
-          lastRunAt: sql`NOW()`,
-          nextRunAt: sql`NOW() + INTERVAL '${sql.raw(
-            `${site.runEvery} minutes`,
-          )}'`,
-        })
-        .where(eq(externalSites.id, site.id));
+  for (const site of pending) {
+    try {
+      await queueScheduledExternalSiteRun(site.id);
+    } catch (error) {
+      if (!(error instanceof ExternalSiteRunActiveError)) throw error;
     }
-  });
+  }
 }

@@ -80,7 +80,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 }
 
 export default async function scrapeHealthySpirits() {
-  await scrapePrices(
+  return scrapePrices(
     SITE,
     (page) =>
       `https://www.healthyspirits.com/spirits/whiskey/page${page}.html?limit=72`,

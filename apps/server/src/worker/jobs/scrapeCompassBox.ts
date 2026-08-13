@@ -106,5 +106,5 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeCompassBox({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
-  await scrapePrices(SITE, () => SHOP_URL, scrapeProducts, { dryRun });
+  return await scrapePrices(SITE, () => SHOP_URL, scrapeProducts, { dryRun });
 }
