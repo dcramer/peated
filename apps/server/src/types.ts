@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type {
   ActivityCollectionAddEntrySchema,
   ActivityEntrySchema,
+  ActivityTastingSessionEntrySchema,
   BadgeAwardSchema,
   BadgeCheckSchema,
   BadgeCheckTypeEnum,
@@ -37,7 +38,7 @@ import type {
   PointSchema,
   ProfileActivityEntrySchema,
   ProfileCollectionAddActivitySchema,
-  ProfileTastingActivitySchema,
+  ProfileTastingSessionActivitySchema,
   RegionSchema,
   ReviewSchema,
   ServingStyleEnum,
@@ -70,12 +71,15 @@ export type ActivityEntry = z.infer<typeof ActivityEntrySchema>;
 export type ActivityCollectionAddEntry = z.infer<
   typeof ActivityCollectionAddEntrySchema
 >;
+export type ActivityTastingSessionEntry = z.infer<
+  typeof ActivityTastingSessionEntrySchema
+>;
 export type ProfileActivityEntry = z.infer<typeof ProfileActivityEntrySchema>;
 export type ProfileCollectionAddActivity = z.infer<
   typeof ProfileCollectionAddActivitySchema
 >;
-export type ProfileTastingActivity = z.infer<
-  typeof ProfileTastingActivitySchema
+export type ProfileTastingSessionActivity = z.infer<
+  typeof ProfileTastingSessionActivitySchema
 >;
 
 export type Badge = z.infer<typeof BadgeSchema>;

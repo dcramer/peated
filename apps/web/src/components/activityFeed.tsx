@@ -49,7 +49,7 @@ export default function ActivityFeed({
         results: filterFavoriteActivity(page.results),
       };
     },
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: undefined as string | undefined,
     staleTime: Infinity,
     initialData: () => {
       return {

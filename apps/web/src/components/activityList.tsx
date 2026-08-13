@@ -3,9 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import BottleIdentity from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
-import { AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import TastingListItem from "./tastingListItem";
+import TastingSessionListItem from "./tastingSessionListItem";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
@@ -131,36 +129,23 @@ export default function ActivityList({
 }: {
   values: ActivityListResult["results"];
 }) {
-  const [deletedTastingIds, setDeletedTastingIds] = useState<number[]>([]);
-
   return (
     <ul className="mt-1">
-      <AnimatePresence>
-        {values.map((activity) => {
-          switch (activity.type) {
-            case "tasting":
-              if (deletedTastingIds.includes(activity.tasting.id)) {
-                return null;
-              }
-              return (
-                <TastingListItem
-                  key={activity.id}
-                  tasting={activity.tasting}
-                  onDelete={(tasting) => {
-                    setDeletedTastingIds((ids) => [...ids, tasting.id]);
-                  }}
-                />
-              );
-            case "collection_add":
-              return (
-                <CollectionAddActivityItem
-                  key={activity.id}
-                  activity={activity}
-                />
-              );
-          }
-        })}
-      </AnimatePresence>
+      {values.map((activity) => {
+        switch (activity.type) {
+          case "tasting_session":
+            return (
+              <TastingSessionListItem key={activity.id} session={activity} />
+            );
+          case "collection_add":
+            return (
+              <CollectionAddActivityItem
+                key={activity.id}
+                activity={activity}
+              />
+            );
+        }
+      })}
     </ul>
   );
 }

@@ -711,10 +711,17 @@ export const homeAwards = [
 ];
 
 export function buildActivity({
-  tasting = buildTasting({
-    bottle: homeBottle,
-    awards: homeAwards,
-  }),
+  tastingSession = [
+    buildTasting({
+      bottle: homeBottle,
+      awards: homeAwards,
+    }),
+    buildTasting({
+      id: createdTastingId + 1,
+      bottle: existingBottle,
+      notes: "A second tasting from the same session.",
+    }),
+  ],
   collectionBottle = buildCollectionBottle({
     id: 9701,
     bottle: /** @type {CollectionBottle["bottle"]} */ (homeBottle),
@@ -723,11 +730,13 @@ export function buildActivity({
   return {
     results: [
       {
-        id: `tasting:${tasting.id}`,
-        type: "tasting",
+        id: `tasting_session:${testUser.id}:${createdTastingId}`,
+        type: "tasting_session",
         priority: "primary",
-        createdAt: tasting.createdAt,
-        tasting,
+        startedAt: timestamp,
+        lastActivityAt: timestamp,
+        createdBy: testUser,
+        tastings: tastingSession,
       },
       {
         id: "collection_add:9101:9601:1780833600000",

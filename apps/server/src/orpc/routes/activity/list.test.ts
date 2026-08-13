@@ -57,15 +57,22 @@ describe("GET /activity", () => {
 
     expect(result.results).toHaveLength(2);
     expect(result.results[0]).toMatchObject({
-      id: `tasting:${tasting.id}`,
-      type: "tasting",
+      id: `tasting_session:${user.id}:${tasting.id}`,
+      type: "tasting_session",
       priority: "primary",
-      tasting: {
-        id: tasting.id,
-        bottle: {
-          id: tasting.bottleId,
-        },
+      startedAt: "2026-01-03T12:30:00.000Z",
+      lastActivityAt: "2026-01-03T12:30:00.000Z",
+      createdBy: {
+        id: user.id,
       },
+      tastings: [
+        {
+          id: tasting.id,
+          bottle: {
+            id: tasting.bottleId,
+          },
+        },
+      ],
     });
     expect(result.results[1]).toMatchObject({
       type: "collection_add",
@@ -121,10 +128,8 @@ describe("GET /activity", () => {
 
     expect(result.results).toHaveLength(1);
     expect(result.results[0]).toMatchObject({
-      type: "tasting",
-      tasting: {
-        id: visibleTasting.id,
-      },
+      type: "tasting_session",
+      tastings: [{ id: visibleTasting.id }],
     });
   });
 
@@ -161,14 +166,12 @@ describe("GET /activity", () => {
     );
 
     expect(result.results.map((entry) => entry.type)).toEqual([
-      "tasting",
+      "tasting_session",
       "collection_add",
     ]);
     expect(result.results[0]).toMatchObject({
-      type: "tasting",
-      tasting: {
-        id: tasting.id,
-      },
+      type: "tasting_session",
+      tastings: [{ id: tasting.id }],
     });
     expect(result.results[1]).toMatchObject({
       type: "collection_add",
@@ -238,10 +241,8 @@ describe("GET /activity", () => {
 
     expect(result.results).toHaveLength(2);
     expect(result.results[0]).toMatchObject({
-      type: "tasting",
-      tasting: {
-        id: friendTasting.id,
-      },
+      type: "tasting_session",
+      tastings: [{ id: friendTasting.id }],
     });
     expect(result.results[1]).toMatchObject({
       type: "collection_add",
@@ -314,10 +315,50 @@ describe("GET /activity", () => {
     });
 
     expect(
-      result.results.filter((entry) => entry.type === "tasting"),
+      result.results.filter((entry) => entry.type === "tasting_session"),
     ).toHaveLength(1);
     expect(
       result.results.filter((entry) => entry.type === "collection_add"),
     ).toHaveLength(2);
+  });
+
+  test("groups each user's nearby tastings despite interleaved activity", async ({
+    fixtures,
+  }) => {
+    const [firstUser, secondUser] = await Promise.all([
+      fixtures.User(),
+      fixtures.User(),
+    ]);
+    const first = await fixtures.Tasting({
+      createdById: firstUser.id,
+      createdAt: new Date("2026-01-03T12:00:00Z"),
+    });
+    const interleaved = await fixtures.Tasting({
+      createdById: secondUser.id,
+      createdAt: new Date("2026-01-03T12:30:00Z"),
+    });
+    const latest = await fixtures.Tasting({
+      createdById: firstUser.id,
+      createdAt: new Date("2026-01-03T13:00:00Z"),
+    });
+
+    const result = await routerClient.activity.list({
+      filter: "global",
+      limit: 10,
+    });
+
+    expect(result.results).toHaveLength(2);
+    expect(result.results[0]).toMatchObject({
+      type: "tasting_session",
+      createdBy: { id: firstUser.id },
+      startedAt: "2026-01-03T12:00:00.000Z",
+      lastActivityAt: "2026-01-03T13:00:00.000Z",
+      tastings: [{ id: latest.id }, { id: first.id }],
+    });
+    expect(result.results[1]).toMatchObject({
+      type: "tasting_session",
+      createdBy: { id: secondUser.id },
+      tastings: [{ id: interleaved.id }],
+    });
   });
 });

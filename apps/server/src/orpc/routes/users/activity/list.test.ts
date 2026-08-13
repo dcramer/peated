@@ -30,13 +30,51 @@ describe("GET /users/:user/activity", () => {
 
     expect(result.results).toHaveLength(1);
     expect(result.results[0]).toMatchObject({
-      id: `tasting:${tasting.id}`,
-      type: "tasting",
+      id: `tasting_session:${defaults.user.id}:${tasting.id}`,
+      type: "tasting_session",
       priority: "primary",
-      createdAt: "2026-01-03T12:00:00.000Z",
-      tasting: {
-        id: tasting.id,
+      startedAt: "2026-01-03T12:00:00.000Z",
+      lastActivityAt: "2026-01-03T12:00:00.000Z",
+      createdBy: {
+        id: defaults.user.id,
       },
+      tastings: [{ id: tasting.id }],
+    });
+  });
+
+  test("groups nearby tastings and starts a new session after inactivity", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const first = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      createdAt: new Date("2026-01-03T12:00:00Z"),
+    });
+    const second = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      createdAt: new Date("2026-01-03T14:00:00Z"),
+    });
+    const third = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      createdAt: new Date("2026-01-03T18:00:00Z"),
+    });
+
+    const result = await routerClient.users.activity.list({
+      user: defaults.user.username,
+    });
+
+    expect(result.results).toHaveLength(2);
+    expect(result.results[0]).toMatchObject({
+      type: "tasting_session",
+      startedAt: "2026-01-03T18:00:00.000Z",
+      lastActivityAt: "2026-01-03T18:00:00.000Z",
+      tastings: [{ id: third.id }],
+    });
+    expect(result.results[1]).toMatchObject({
+      type: "tasting_session",
+      startedAt: "2026-01-03T12:00:00.000Z",
+      lastActivityAt: "2026-01-03T14:00:00.000Z",
+      tastings: [{ id: second.id }, { id: first.id }],
     });
   });
 
@@ -47,7 +85,9 @@ describe("GET /users/:user/activity", () => {
     for (let i = 0; i < 12; i++) {
       await fixtures.Tasting({
         createdById: defaults.user.id,
-        createdAt: new Date(`2026-01-03T${String(i).padStart(2, "0")}:00:00Z`),
+        createdAt: new Date(
+          new Date("2026-01-01T00:00:00Z").getTime() + i * 4 * 60 * 60 * 1000,
+        ),
       });
     }
 
@@ -55,17 +95,24 @@ describe("GET /users/:user/activity", () => {
       user: defaults.user.username,
       limit: 10,
     });
+    expect(firstPage.results).toHaveLength(10);
+    expect(firstPage.rel.nextCursor).toEqual(expect.any(String));
+
+    // New activity must not shift the offset inside an existing feed snapshot.
+    await fixtures.Tasting({
+      createdById: defaults.user.id,
+      createdAt: new Date(Date.now() + 60_000),
+    });
+
     const secondPage = await routerClient.users.activity.list({
       user: defaults.user.username,
-      cursor: firstPage.rel.nextCursor ?? 2,
+      cursor: firstPage.rel.nextCursor!,
       limit: 10,
     });
 
-    expect(firstPage.results).toHaveLength(10);
-    expect(firstPage.results.every((entry) => entry.type === "tasting")).toBe(
-      true,
-    );
-    expect(firstPage.rel.nextCursor).toBe(2);
+    expect(
+      firstPage.results.every((entry) => entry.type === "tasting_session"),
+    ).toBe(true);
     expect(secondPage.results).toHaveLength(2);
     expect(secondPage.rel.nextCursor).toBeNull();
   });
@@ -318,8 +365,8 @@ describe("GET /users/:user/activity", () => {
     });
 
     expect(
-      result.results.filter((entry) => entry.type === "tasting"),
-    ).toHaveLength(3);
+      result.results.filter((entry) => entry.type === "tasting_session"),
+    ).toHaveLength(1);
     expect(
       result.results.filter((entry) => entry.type === "collection_add"),
     ).toHaveLength(2);
@@ -353,17 +400,17 @@ describe("GET /users/:user/activity", () => {
     });
     const secondPage = await routerClient.users.activity.list({
       user: defaults.user.username,
-      cursor: firstPage.rel.nextCursor ?? 2,
+      cursor: firstPage.rel.nextCursor!,
       limit: 3,
     });
 
     expect(
-      firstPage.results.filter((entry) => entry.type === "tasting"),
+      firstPage.results.filter((entry) => entry.type === "tasting_session"),
     ).toHaveLength(1);
     expect(
       firstPage.results.filter((entry) => entry.type === "collection_add"),
     ).toHaveLength(2);
-    expect(firstPage.rel.nextCursor).toBe(2);
+    expect(firstPage.rel.nextCursor).toEqual(expect.any(String));
     expect(secondPage.results).toHaveLength(2);
     expect(
       secondPage.results.every((entry) => entry.type === "collection_add"),
@@ -396,13 +443,13 @@ describe("GET /users/:user/activity", () => {
     });
     const secondPage = await routerClient.users.activity.list({
       user: defaults.user.username,
-      cursor: firstPage.rel.nextCursor ?? 2,
+      cursor: firstPage.rel.nextCursor!,
       limit: 1,
     });
 
     expect(firstPage.results).toHaveLength(1);
-    expect(firstPage.results[0].type).toBe("tasting");
-    expect(firstPage.rel.nextCursor).toBe(2);
+    expect(firstPage.results[0].type).toBe("tasting_session");
+    expect(firstPage.rel.nextCursor).toEqual(expect.any(String));
     expect(secondPage.results).toHaveLength(1);
     expect(secondPage.results[0].type).toBe("collection_add");
     expect(secondPage.rel.nextCursor).toBeNull();

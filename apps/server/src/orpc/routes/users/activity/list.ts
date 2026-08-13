@@ -2,28 +2,28 @@ import { db } from "@peated/server/db";
 import {
   collectionBottles,
   collections,
-  tastings,
+  users,
 } from "@peated/server/db/schema";
 import {
   coerceActivityDate,
   composeActivity,
+  countTastingSessions,
+  encodeActivityCursor,
   getActivitySourceWindow,
+  getTastingSessions,
+  parseActivityCursor,
   serializeCollectionAddEntries,
-  serializeTastingEntries,
+  serializeTastingSessionEntries,
   type CollectionAddGroup,
 } from "@peated/server/lib/activityFeed";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
-import {
-  ProfileActivityEntrySchema,
-  listResponse,
-} from "@peated/server/schemas";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { ActivityListResponseSchema } from "@peated/server/schemas";
+import { and, desc, eq, lte, sql } from "drizzle-orm";
 import { z } from "zod";
 
 type CollectionAddGroupRow = {
   collection: typeof collections.$inferSelect;
-  bucket: Date | string;
   windowStart: Date | string;
   windowEnd: Date | string;
   totalItems: string;
@@ -41,11 +41,17 @@ export default procedure
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-      cursor: z.coerce.number().gte(1).default(1),
+      cursor: z
+        .string()
+        .max(64)
+        .refine((value) => parseActivityCursor(value) !== null, {
+          message: "Invalid activity cursor.",
+        })
+        .optional(),
       limit: z.coerce.number().gte(1).lte(100).default(10),
     }),
   )
-  .output(listResponse(ProfileActivityEntrySchema))
+  .output(ActivityListResponseSchema)
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
@@ -63,15 +69,17 @@ export default procedure
       });
     }
 
+    const activityCursor = input.cursor
+      ? parseActivityCursor(input.cursor)!
+      : { page: 1, snapshotAt: new Date() };
+    const userCondition = eq(users.id, user.id);
     const collectionBucket = sql<Date>`DATE_TRUNC('day', ${collectionBottles.createdAt})`;
     const collectionGroupCreatedAt = sql<Date>`MAX(${collectionBottles.createdAt})`;
-    const [primaryCountRows, secondaryCountResult] = await Promise.all([
-      db
-        .select({
-          count: sql<string>`COUNT(${tastings.id})`,
-        })
-        .from(tastings)
-        .where(eq(tastings.createdById, user.id)),
+    const [totalPrimary, secondaryCountResult] = await Promise.all([
+      countTastingSessions({
+        userCondition,
+        snapshotAt: activityCursor.snapshotAt,
+      }),
       db.execute<{ count: string }>(sql`
         SELECT COUNT(*) as count
         FROM (
@@ -80,31 +88,29 @@ export default procedure
           INNER JOIN ${collections}
             ON ${collections.id} = ${collectionBottles.collectionId}
             AND ${collections.createdById} = ${user.id}
+          WHERE ${collectionBottles.createdAt} <= ${activityCursor.snapshotAt}
           GROUP BY ${collections.id}, DATE_TRUNC('day', ${collectionBottles.createdAt})
         ) activity_groups
       `),
     ]);
-    const totalPrimary = Number(primaryCountRows[0]?.count ?? 0);
     const totalSecondary = Number(secondaryCountResult.rows[0]?.count ?? 0);
     const sourceWindow = getActivitySourceWindow({
-      cursor: input.cursor,
+      cursor: activityCursor.page,
       limit: input.limit,
       totalPrimary,
       totalSecondary,
     });
 
     const [tastingRows, collectionGroupRows] = await Promise.all([
-      db
-        .select()
-        .from(tastings)
-        .where(eq(tastings.createdById, user.id))
-        .orderBy(desc(tastings.createdAt))
-        .limit(sourceWindow.primaryLimit)
-        .offset(sourceWindow.primaryOffset),
+      getTastingSessions({
+        userCondition,
+        snapshotAt: activityCursor.snapshotAt,
+        limit: sourceWindow.primaryLimit,
+        offset: sourceWindow.primaryOffset,
+      }),
       db
         .select({
           collection: collections,
-          bucket: collectionBucket,
           windowStart: sql<Date>`MIN(${collectionBottles.createdAt})`,
           windowEnd: sql<Date>`MAX(${collectionBottles.createdAt})`,
           totalItems: sql<string>`COUNT(${collectionBottles.id})`,
@@ -117,13 +123,14 @@ export default procedure
             eq(collections.createdById, user.id),
           ),
         )
+        .where(lte(collectionBottles.createdAt, activityCursor.snapshotAt))
         .groupBy(collections.id, collectionBucket)
         .orderBy(desc(collectionGroupCreatedAt))
         .limit(sourceWindow.secondaryLimit)
         .offset(sourceWindow.secondaryOffset),
     ]);
 
-    const primaryEntries = await serializeTastingEntries(
+    const primaryEntries = await serializeTastingSessionEntries(
       tastingRows,
       context.user,
     );
@@ -132,7 +139,6 @@ export default procedure
         (row: CollectionAddGroupRow): CollectionAddGroup => ({
           collection: row.collection,
           user,
-          bucket: row.bucket,
           windowStart: coerceActivityDate(row.windowStart),
           windowEnd: coerceActivityDate(row.windowEnd),
           totalItems: Number(row.totalItems),
@@ -153,8 +159,19 @@ export default procedure
     return {
       results: activity.results,
       rel: {
-        nextCursor: activity.hasNext ? input.cursor + 1 : null,
-        prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
+        nextCursor: activity.hasNext
+          ? encodeActivityCursor({
+              page: activityCursor.page + 1,
+              snapshotAt: activityCursor.snapshotAt,
+            })
+          : null,
+        prevCursor:
+          activityCursor.page > 1
+            ? encodeActivityCursor({
+                page: activityCursor.page - 1,
+                snapshotAt: activityCursor.snapshotAt,
+              })
+            : null,
       },
     };
   });
