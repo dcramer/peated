@@ -272,63 +272,77 @@ export async function getTastingSessions({
 }): Promise<TastingSessionGroup[]> {
   if (!limit) return [];
 
-  const result = await db.execute<TastingSessionRow>(sql`
-    WITH marked_tastings AS (
-      ${markedTastingsSql({ userCondition, snapshotAt })}
-    ),
-    numbered_tastings AS (
-      SELECT
-        marked_tastings.*,
-        SUM(marked_tastings.is_session_start) OVER (
-          PARTITION BY marked_tastings.created_by_id
-          ORDER BY marked_tastings.created_at, marked_tastings.id
-          ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) AS session_number
-      FROM marked_tastings
-    ),
-    tasting_sessions AS (
-      SELECT
-        MIN(numbered_tastings.id) AS session_id,
-        numbered_tastings.created_by_id,
-        MIN(numbered_tastings.created_at) AS started_at,
-        MAX(numbered_tastings.created_at) AS last_activity_at,
-        ARRAY_AGG(
-          numbered_tastings.id
-          ORDER BY numbered_tastings.created_at DESC, numbered_tastings.id DESC
-        ) AS tasting_ids
-      FROM numbered_tastings
-      GROUP BY
-        numbered_tastings.created_by_id,
-        numbered_tastings.session_number
-    )
-    SELECT *
-    FROM tasting_sessions
-    ORDER BY tasting_sessions.last_activity_at DESC, tasting_sessions.session_id DESC
-    OFFSET ${offset}
-    LIMIT ${limit}
-  `);
+  // Session membership and hydration must share one MVCC snapshot so a
+  // concurrent deletion cannot leave an aggregate referencing a missing row.
+  return await db.transaction(
+    async (tx) => {
+      const result = await tx.execute<TastingSessionRow>(sql`
+        WITH marked_tastings AS (
+          ${markedTastingsSql({ userCondition, snapshotAt })}
+        ),
+        numbered_tastings AS (
+          SELECT
+            marked_tastings.*,
+            SUM(marked_tastings.is_session_start) OVER (
+              PARTITION BY marked_tastings.created_by_id
+              ORDER BY marked_tastings.created_at, marked_tastings.id
+              ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+            ) AS session_number
+          FROM marked_tastings
+        ),
+        tasting_sessions AS (
+          SELECT
+            MIN(numbered_tastings.id) AS session_id,
+            numbered_tastings.created_by_id,
+            MIN(numbered_tastings.created_at) AS started_at,
+            MAX(numbered_tastings.created_at) AS last_activity_at,
+            ARRAY_AGG(
+              numbered_tastings.id
+              ORDER BY numbered_tastings.created_at DESC, numbered_tastings.id DESC
+            ) AS tasting_ids
+          FROM numbered_tastings
+          GROUP BY
+            numbered_tastings.created_by_id,
+            numbered_tastings.session_number
+        )
+        SELECT *
+        FROM tasting_sessions
+        ORDER BY tasting_sessions.last_activity_at DESC, tasting_sessions.session_id DESC
+        OFFSET ${offset}
+        LIMIT ${limit}
+      `);
 
-  const tastingIds = result.rows.flatMap((row) => row.tasting_ids.map(Number));
-  const tastingRows = tastingIds.length
-    ? await db.select().from(tastings).where(inArray(tastings.id, tastingIds))
-    : [];
-  const tastingsById = new Map(
-    tastingRows.map((tasting) => [tasting.id, tasting]),
+      const tastingIds = result.rows.flatMap((row) =>
+        row.tasting_ids.map(Number),
+      );
+      const tastingRows = tastingIds.length
+        ? await tx
+            .select()
+            .from(tastings)
+            .where(inArray(tastings.id, tastingIds))
+        : [];
+      const tastingsById = new Map(
+        tastingRows.map((tasting) => [tasting.id, tasting]),
+      );
+
+      return result.rows.map((row) => ({
+        id: Number(row.session_id),
+        createdById: Number(row.created_by_id),
+        startedAt: coerceActivityDate(row.started_at),
+        lastActivityAt: coerceActivityDate(row.last_activity_at),
+        tastings: row.tasting_ids.map((id) => {
+          const tasting = tastingsById.get(Number(id));
+          if (!tasting) {
+            throw new Error(
+              `Activity session references missing Tasting ${id}.`,
+            );
+          }
+          return tasting;
+        }),
+      }));
+    },
+    { accessMode: "read only", isolationLevel: "repeatable read" },
   );
-
-  return result.rows.map((row) => ({
-    id: Number(row.session_id),
-    createdById: Number(row.created_by_id),
-    startedAt: coerceActivityDate(row.started_at),
-    lastActivityAt: coerceActivityDate(row.last_activity_at),
-    tastings: row.tasting_ids.map((id) => {
-      const tasting = tastingsById.get(Number(id));
-      if (!tasting) {
-        throw new Error(`Activity session references missing Tasting ${id}.`);
-      }
-      return tasting;
-    }),
-  }));
 }
 
 /** Serializes logical tasting sessions into the shared activity contract. */
