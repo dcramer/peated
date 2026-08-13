@@ -1520,6 +1520,13 @@
       "when": 1786607602991,
       "tag": "0216_hard_daimon_hellstrom",
       "breakpoints": false
+    },
+    {
+      "idx": 217,
+      "version": "7",
+      "when": 1786639636385,
+      "tag": "0217_close_schema_version_1_bottle_checks",
+      "breakpoints": false
     }
   ]
 }
