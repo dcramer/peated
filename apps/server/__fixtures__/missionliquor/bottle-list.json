@@ -1,0 +1,135 @@
+{
+  "products": [
+    {
+      "title": "E.H. Taylor Small Batch Bottled In Bond Kentucky Straight Bourbon Whiskey 750ml",
+      "handle": "eh-taylor-small-batch",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML", "varietal-BOURBON"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/eh-taylor.png" }],
+      "variants": [{ "available": true, "price": "49.99" }]
+    },
+    {
+      "title": "The Macallan Sherry Oak Single Malt Scotch Whisky 12 Year Old 700ml",
+      "handle": "macallan-sherry-oak-12",
+      "product_type": "WHISKEY",
+      "tags": ["country-SCOTLAND", "size-700ML", "varietal-SINGLE MALT"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/macallan.png" }],
+      "variants": [{ "available": true, "price": "89.99" }]
+    },
+    {
+      "title": "Minor Case Sherry Cask Rye Whiskey 750ml",
+      "handle": "minor-case-sherry-cask-rye",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML", "varietal-RYE"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/minor-case.png" }],
+      "variants": [{ "available": true, "price": "43.99" }]
+    },
+    {
+      "title": "Collector's Edition Semi Truck American Whiskey 1L (IN STORE PICK UP ONLY)",
+      "handle": "collectors-edition-semi-truck",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-1L", "varietal-WHISKEY"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/collector-truck.png" }],
+      "variants": [{ "available": true, "price": "99.99" }]
+    },
+    {
+      "title": "Highland Harvest Organic Blended Scotch Whiskey",
+      "handle": "highland-harvest-organic",
+      "product_type": "WHISKEY",
+      "tags": ["country-SCOTLAND", "size-750ML-ND", "varietal-BLENDED"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/highland-harvest.png" }],
+      "variants": [{ "available": true, "price": "35.99" }]
+    },
+    {
+      "title": "Doc Holliday Straight Bourbon Whiskey Gift Set 10 Year Old 700ml",
+      "handle": "doc-holliday-gift-set",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-700ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/doc-holliday.png" }],
+      "variants": [{ "available": true, "price": "199.99" }]
+    },
+    {
+      "title": "Whistlepig Barrel Aged Gift Set 3x375ml",
+      "handle": "whistlepig-three-pack",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-375ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/whistlepig.png" }],
+      "variants": [{ "available": true, "price": "114.99" }]
+    },
+    {
+      "title": "Old Crow Bourbon Whiskey 1.75L",
+      "handle": "old-crow-bourbon",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/old-crow.png" }],
+      "variants": [{ "available": true, "price": "19.99" }]
+    },
+    {
+      "title": "Small Format Bourbon Whiskey 375ml",
+      "handle": "small-format-bourbon",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-375ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/small-format.png" }],
+      "variants": [{ "available": true, "price": "19.99" }]
+    },
+    {
+      "title": "Sold Out Bourbon Whiskey 750ml",
+      "handle": "sold-out-bourbon",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/sold-out.png" }],
+      "variants": [{ "available": false, "price": "39.99" }]
+    },
+    {
+      "title": "Ambiguous Bourbon Whiskey 750ml",
+      "handle": "ambiguous-bourbon",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/ambiguous.png" }],
+      "variants": [
+        { "available": true, "price": "39.99" },
+        { "available": true, "price": "49.99" }
+      ]
+    },
+    {
+      "title": "Gin 750ml",
+      "handle": "gin",
+      "product_type": "GIN",
+      "tags": ["country-USA", "size-750ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/gin.png" }],
+      "variants": [{ "available": true, "price": "29.99" }]
+    },
+    {
+      "title": "BUY 2, SAVE $6",
+      "handle": "buy-two-save-six",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/promo.png" }],
+      "variants": [{ "available": true, "price": "59.99" }]
+    },
+    {
+      "title": "Zero Price Bourbon Whiskey 750ml",
+      "handle": "zero-price-bourbon",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML"],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/zero-price.png" }],
+      "variants": [{ "available": true, "price": "0.00" }]
+    },
+    {
+      "title": "Invalid Image Bourbon Whiskey 750ml",
+      "handle": "invalid-image-bourbon",
+      "product_type": "WHISKEY",
+      "tags": ["country-USA", "size-750ML"],
+      "images": [{ "src": "https://images.example.com/invalid.png" }],
+      "variants": [{ "available": true, "price": "39.99" }]
+    },
+    {
+      "title": "Broken Product 750ml",
+      "handle": "broken product",
+      "product_type": "WHISKEY",
+      "tags": ["size-750ML"],
+      "images": [],
+      "variants": []
+    }
+  ]
+}
