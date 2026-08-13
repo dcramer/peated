@@ -25,6 +25,7 @@ export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 export const EXTERNAL_SITE_TYPE_LIST = [
   "astorwines",
   "cadenheads",
+  "compassbox",
   "decadentdrinks",
   "gordonmacphail",
   "healthyspirits",
