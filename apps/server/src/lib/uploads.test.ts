@@ -3,7 +3,7 @@ import { buffer } from "node:stream/consumers";
 import sharp from "sharp";
 import { describe, expect, test } from "vitest";
 
-import { compressAndResizeImage } from "./uploads";
+import { compressAndResizeImage, getUploadImageDataUrl } from "./uploads";
 
 function createGradientPixels(width: number, height: number) {
   const pixels = Buffer.alloc(width * height * 3);
@@ -50,5 +50,19 @@ describe("compressAndResizeImage", () => {
     expect(metadata.height).toBe(80);
     expect(metadata.orientation).toBeUndefined();
     expect(metadata.exif).toBeUndefined();
+  });
+});
+
+describe("model upload inputs", () => {
+  test("rejects non-upload and unsafe paths", async () => {
+    await expect(
+      getUploadImageDataUrl("https://example.com/images/bottle.webp"),
+    ).rejects.toThrow("Image URL is not an upload URL");
+    await expect(
+      getUploadImageDataUrl("/uploads/bottles/../../private.webp"),
+    ).rejects.toThrow();
+    await expect(
+      getUploadImageDataUrl("/uploads/bottles/readme.txt"),
+    ).rejects.toThrow("supported image type");
   });
 });

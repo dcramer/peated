@@ -88,6 +88,10 @@ describe("auditBottle", () => {
   test("preloads the Bottle and keeps origin and note as audit data", async () => {
     const currentBottle = buildAuditedBottleContext();
     const getBottleContext = vi.fn(async () => currentBottle);
+    const getBottleContextImageInput = vi.fn(
+      async (url: string) =>
+        `data:image/webp;base64,${Buffer.from(url).toString("base64")}`,
+    );
     const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
     const extractFromImage = vi.fn(async () => ({
       brand: "Laphroaig",
@@ -183,6 +187,7 @@ describe("auditBottle", () => {
       adapters: {
         searchBottles,
         getBottleContext,
+        getBottleContextImageInput,
       },
       overrides: {
         extractFromImage,
@@ -257,12 +262,17 @@ describe("auditBottle", () => {
     expect(extractFromImage).toHaveBeenCalledTimes(2);
     expect(extractFromImage).toHaveBeenNthCalledWith(
       1,
-      "https://example.com/bottles/45146.webp",
+      `data:image/webp;base64,${Buffer.from(
+        "https://example.com/bottles/45146.webp",
+      ).toString("base64")}`,
     );
     expect(extractFromImage).toHaveBeenNthCalledWith(
       2,
-      "https://example.com/tastings/901.webp",
+      `data:image/webp;base64,${Buffer.from(
+        "https://example.com/tastings/901.webp",
+      ).toString("base64")}`,
     );
+    expect(getBottleContextImageInput).toHaveBeenCalledTimes(2);
     expect(extractFromText).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
     expect(searchBottles).toHaveBeenCalledOnce();
@@ -293,6 +303,57 @@ describe("auditBottle", () => {
     ).rejects.toThrow(
       "Bottle audits require the getBottleContext data-source capability.",
     );
+  });
+
+  test("keeps a missing context image as unavailable label evidence", async () => {
+    const auditedBottle = buildAuditedBottleContext();
+    const currentBottle = {
+      ...auditedBottle,
+      imageSources: [auditedBottle.imageSources[0]!],
+    };
+    const extractFromImage = vi.fn();
+    const runBottleAuditAgent = vi.fn(
+      async ({ currentBottleContext }: RunBottleAuditAgentInput) => {
+        expect(currentBottleContext.publicImages).toEqual([
+          expect.objectContaining({
+            url: "https://example.com/bottles/45146.webp",
+            labelEvidence: expect.objectContaining({
+              extractedIdentity: null,
+              rawLabelText: null,
+            }),
+          }),
+        ]);
+        return {
+          summary: "The missing image does not establish a catalog defect.",
+          proposedOperations: [],
+          findings: [],
+        };
+      },
+    );
+    const classifier = createBottleClassifier({
+      client: {} as OpenAI,
+      model: "test-model",
+      maxSearchQueries: 0,
+      adapters: {
+        searchBottles: vi.fn(async () => []),
+        getBottleContext: vi.fn(async () => currentBottle),
+        getBottleContextImageInput: vi.fn(async () => {
+          throw new Error("Image object is missing.");
+        }),
+      },
+      overrides: {
+        extractFromImage,
+        extractFromText: vi.fn(),
+        runBottleAuditAgent,
+      },
+    });
+
+    await expect(
+      classifier.auditBottle({ bottleId: 45146, origin: "moderator" }),
+    ).resolves.toMatchObject({
+      summary: "The missing image does not establish a catalog defect.",
+    });
+    expect(extractFromImage).not.toHaveBeenCalled();
   });
 
   test("preserves gathered artifacts when final finding validation fails", async () => {

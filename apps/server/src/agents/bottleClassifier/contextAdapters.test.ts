@@ -1,9 +1,14 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { bottleObservations } from "@peated/server/db/schema";
+import { storeFile } from "@peated/server/lib/uploads";
+import { absoluteUrl } from "@peated/server/lib/urls";
+import { Readable } from "node:stream";
 import { describe, expect, test } from "vitest";
 
 import {
   getBottleClassifierContext,
+  getBottleClassifierImageInput,
   getEntityClassifierContext,
 } from "./contextAdapters";
 
@@ -169,6 +174,30 @@ describe("Bottle classifier context adapters", () => {
     ]) {
       expect(serialized).not.toContain(privateValue);
     }
+  });
+
+  test("inlines owned uploads and leaves external URLs unchanged", async () => {
+    const imageUrl = await storeFile({
+      data: {
+        filename: "context-image.webp",
+        file: Readable.from(Buffer.from("context image")),
+      },
+      namespace: "context-image",
+      directory: "bottles",
+      urlPrefix: "/uploads",
+      onProcess: (stream, filename) => ({
+        stream,
+        filename: `${filename}.webp`,
+      }),
+    });
+    const ownedImageUrl = absoluteUrl(config.API_SERVER, imageUrl);
+
+    await expect(getBottleClassifierImageInput(ownedImageUrl)).resolves.toBe(
+      `data:image/webp;base64,${Buffer.from("context image").toString("base64")}`,
+    );
+    await expect(
+      getBottleClassifierImageInput("https://images.example.com/external.webp"),
+    ).resolves.toBe("https://images.example.com/external.webp");
   });
 
   test("returns narrow Entity identity and related Bottle roles", async ({

@@ -59,6 +59,7 @@ export type BottleClassifierDataSource = {
     bottleId: number,
   ) => Promise<BottleCandidate | null>;
   getBottleContext?: (bottleId: number) => Promise<BottleContextSource | null>;
+  getBottleContextImageInput?: (imageUrl: string) => Promise<string>;
   getEntityContext?: (entityId: number) => Promise<EntityContext | null>;
   searchEntities?: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
 };

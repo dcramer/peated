@@ -968,6 +968,7 @@ describe("createBottleClassifier", () => {
       parallelToolCalls: false,
       reasoning: { effort: "high" },
     });
+    expect(preparedRun.runner.config.tracingDisabled).toBe(true);
   });
 
   test("exposes Firecrawl search and page reading when configured", async () => {

@@ -153,6 +153,7 @@ export function createEntityClassifier(
     });
     const conversationId = `entity:${reference.entity.id}`;
     const runner = new Runner({
+      tracingDisabled: true,
       modelProvider: new OpenAIProvider({
         openAIClient: options.client,
         useResponses: true,
