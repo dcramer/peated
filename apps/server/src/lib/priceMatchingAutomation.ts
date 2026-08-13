@@ -46,6 +46,8 @@ type MatchAutomationInput = {
   extractedLabel: ExtractedBottleDetails | null;
   proposedBottle: ProposedBottle | null;
   searchEvidence: SearchEvidence[];
+  sourceBottleIdentity?: ExtractedBottleDetails | null;
+  hasUnresolvedRisks?: boolean;
   webEvidenceJudgment?: WebEvidenceJudgment;
 };
 
@@ -390,6 +392,74 @@ function getProposedSmwsCode(
   );
 }
 
+/**
+ * A scraper opts into this creation anchor only by supplying the minimum
+ * marketed identity needed to draft a normal Bottle. The classifier still
+ * owns the semantic create decision; code only blocks missing or contradictory
+ * explicit facts.
+ */
+function hasUsableStructuredSourceIdentity(
+  sourceIdentity: ExtractedBottleDetails | null,
+) {
+  return Boolean(
+    sourceIdentity?.brand?.trim() &&
+    sourceIdentity.expression?.trim() &&
+    sourceIdentity.category &&
+    sourceIdentity.category !== "spirit",
+  );
+}
+
+function getStructuredSourceIdentityConflicts({
+  proposedBottle,
+  sourceBottleIdentity,
+}: {
+  proposedBottle: ProposedBottle | null;
+  sourceBottleIdentity: ExtractedBottleDetails | null;
+}) {
+  if (!proposedBottle || !sourceBottleIdentity) {
+    return [];
+  }
+
+  const comparableFacts: Array<
+    [MatchAttribute, string | number | boolean | null, unknown]
+  > = [
+    ["category", sourceBottleIdentity.category, proposedBottle.category],
+    ["statedAge", sourceBottleIdentity.stated_age, proposedBottle.statedAge],
+    ["abv", sourceBottleIdentity.abv, proposedBottle.abv],
+    [
+      "releaseYear",
+      sourceBottleIdentity.release_year,
+      proposedBottle.releaseYear,
+    ],
+    [
+      "vintageYear",
+      sourceBottleIdentity.vintage_year,
+      proposedBottle.vintageYear,
+    ],
+    [
+      "caskStrength",
+      sourceBottleIdentity.cask_strength,
+      proposedBottle.caskStrength,
+    ],
+    ["singleCask", sourceBottleIdentity.single_cask, proposedBottle.singleCask],
+  ];
+  const conflicts = comparableFacts
+    .filter(
+      ([, sourceValue, proposedValue]) =>
+        sourceValue !== null && sourceValue !== proposedValue,
+    )
+    .map(([attribute]) => attribute);
+  if (
+    sourceBottleIdentity.edition !== null &&
+    normalizeComparableText(sourceBottleIdentity.edition) !==
+      normalizeComparableText(proposedBottle.edition)
+  ) {
+    conflicts.push("edition");
+  }
+
+  return conflicts;
+}
+
 function isDeterministicSmwsExactCaskCreate({
   price,
   proposedBottle,
@@ -635,12 +705,16 @@ function getCreateNewScore({
   candidateBottles,
   searchEvidence,
   price,
+  sourceBottleIdentity,
+  hasUnresolvedRisks,
   webEvidenceJudgment,
 }: {
   proposedBottle: ProposedBottle | null;
   candidateBottles: PriceMatchCandidate[];
   searchEvidence: SearchEvidence[];
   price: Pick<StorePrice, "bottleId" | "name" | "url">;
+  sourceBottleIdentity: ExtractedBottleDetails | null;
+  hasUnresolvedRisks: boolean;
   webEvidenceJudgment?: WebEvidenceJudgment;
 }) {
   let score = 30;
@@ -703,6 +777,22 @@ function getCreateNewScore({
     priceUrl: price.url,
     webEvidenceJudgment,
   });
+  const sourceIdentityConflicts = getStructuredSourceIdentityConflicts({
+    proposedBottle,
+    sourceBottleIdentity,
+  });
+  const hasStructuredSourceAnchor =
+    hasUsableStructuredSourceIdentity(sourceBottleIdentity) &&
+    sourceIdentityConflicts.length === 0;
+
+  if (hasUnresolvedRisks) {
+    automationBlockers.push("classifier reported unresolved identity risks");
+  }
+  if (sourceIdentityConflicts.length > 0) {
+    automationBlockers.push(
+      `proposed Bottle conflicts with structured scraper facts (${sourceIdentityConflicts.join(", ")})`,
+    );
+  }
 
   if (!candidateBottles.length) {
     score += 6;
@@ -717,6 +807,7 @@ function getCreateNewScore({
 
   if (
     !deterministicSmwsExactCaskCreate &&
+    !hasStructuredSourceAnchor &&
     !searchEvidence.some((evidence) => evidence.results.length > 0)
   ) {
     automationBlockers.push("no web evidence validated this bottle");
@@ -724,6 +815,7 @@ function getCreateNewScore({
 
   if (
     !deterministicSmwsExactCaskCreate &&
+    !hasStructuredSourceAnchor &&
     requiredChecks.some((check) => !check.validated && !check.weaklySupported)
   ) {
     automationBlockers.push(
@@ -733,6 +825,7 @@ function getCreateNewScore({
 
   if (
     !deterministicSmwsExactCaskCreate &&
+    !hasStructuredSourceAnchor &&
     requiredChecks.some(
       (check) =>
         !check.validated &&
@@ -747,6 +840,7 @@ function getCreateNewScore({
 
   if (
     !deterministicSmwsExactCaskCreate &&
+    !hasStructuredSourceAnchor &&
     requiredChecks.length > 0 &&
     validatedRequiredChecks.length === 0 &&
     requiredChecks.some((check) => check.weaklySupported)
@@ -770,9 +864,12 @@ function getCreateNewScore({
     };
   }
 
-  const automationScore = hasBlockers
-    ? Math.min(clampScore(score), AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1)
-    : clampScore(score);
+  const automationScore =
+    hasStructuredSourceAnchor && !hasBlockers
+      ? 100
+      : hasBlockers
+        ? Math.min(clampScore(score), AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1)
+        : clampScore(score);
 
   return {
     automationScore,
@@ -804,6 +901,8 @@ export function getStorePriceMatchAutomationAssessment({
   extractedLabel,
   proposedBottle,
   searchEvidence,
+  sourceBottleIdentity = null,
+  hasUnresolvedRisks = false,
   webEvidenceJudgment,
 }: MatchAutomationInput): StorePriceMatchAutomationAssessment {
   if (
@@ -842,6 +941,8 @@ export function getStorePriceMatchAutomationAssessment({
       candidateBottles,
       searchEvidence,
       price,
+      sourceBottleIdentity,
+      hasUnresolvedRisks,
       webEvidenceJudgment,
     });
 

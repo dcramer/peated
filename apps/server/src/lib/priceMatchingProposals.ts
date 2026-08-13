@@ -1154,6 +1154,12 @@ export async function resolveStorePriceMatchProposal(
       extractedLabel,
       proposedBottle: decision.proposedBottle,
       searchEvidence,
+      sourceBottleIdentity: price.sourceBottleIdentity
+        ? BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity)
+        : null,
+      hasUnresolvedRisks:
+        (classification.decision.confidenceBasis?.unresolvedRisks.length ?? 0) >
+        0,
       webEvidenceJudgment:
         classification.decision.confidenceBasis?.webEvidence ?? null,
     });

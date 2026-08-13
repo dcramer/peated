@@ -57,6 +57,28 @@ NOT infer release year from publication metadata or bottler from page hosting.
   category `blend`, ABV `52.9`, the marketed finish, null bottler, and null
   release year
 
+### Requirement: Complete scraper facts can anchor automatic creation
+
+Price matching SHALL treat a complete normalized scraper identity as concrete
+creation evidence without requiring redundant web corroboration when the
+classifier reports no unresolved identity risks and its proposed exact fields
+do not contradict the scraper facts.
+
+#### Scenario: Complete source identity supports a new Bottle
+
+- **WHEN** a scraper supplies Brand, expression, supported whisky category, and
+  exact available traits for an unresolved listing
+- **AND** the classifier proposes a consistent new Bottle with no unresolved
+  identity risks
+- **THEN** price matching may automatically create and assign that Bottle
+  without web evidence
+
+#### Scenario: Proposed Bottle conflicts with scraper facts
+
+- **WHEN** the classifier proposal contradicts a populated structured source
+  category, age, edition, ABV, cask flag, vintage year, or release year
+- **THEN** automatic creation is blocked and the proposal remains reviewable
+
 ### Requirement: Discovery cannot consume page verification
 
 The Bottle classifier SHALL enforce independent per-run allowances for web

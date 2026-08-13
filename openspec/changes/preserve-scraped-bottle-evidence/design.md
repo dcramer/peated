@@ -18,6 +18,8 @@ Bottle shown by that product.
 **Goals:**
 
 - Reuse normalized provider-owned facts before paying to infer them again.
+- Let a complete structured scraper identity support automatic Bottle creation
+  without requiring a redundant web search.
 - Bound default Firecrawl usage while preserving exact-page verification.
 - Keep provider payloads, timestamps, hosting, and taxonomy from becoming
   unsupported Bottle claims.
@@ -49,6 +51,13 @@ input already skips image extraction, so no new classifier branch or prompt
 field is required. Fresh provider facts take precedence over a stale extraction
 when a retry asks to reuse an older proposal.
 
+For creation automation, a scraper identity containing Brand, expression, and
+a supported whisky category is concrete source evidence. It may replace web
+corroboration when the classifier proposes a Bottle with no unresolved risks
+and no explicit category, age, edition, strength, cask-flag, or year conflict
+with those facts. Partial identities and conflicts retain the existing review
+path.
+
 ### Map only facts owned by the Douglas Laing feed
 
 The scraper maps vendor to consumer Brand only when the title has the same Brand
@@ -75,8 +84,8 @@ operational knob without a proven need.
 
 ## Risks / Trade-offs
 
-- [A provider field is wrong] → Keep structured identity as fallible evidence
-  and retain classifier review/web corroboration policy.
+- [A provider field is wrong] → Require a classifier create decision with no
+  unresolved risks and block explicit source/proposal contradictions.
 - [Basic proxy cannot read a JavaScript-heavy page] → Return the provider
   failure at the tool boundary; do not silently spend more credits on fallback.
 - [A scraper emits partial facts] → The normalized schema fills missing fields

@@ -459,13 +459,21 @@ accepts only the classifier's normalized identity schema, never a provider's
 raw payload. Missing source facts remain null, and source timestamps must not
 be promoted to Bottle release years without explicit product evidence.
 
+For an unresolved store listing, Brand, expression, and a supported whisky
+category supplied through this scraper-owned contract can anchor automatic
+Bottle creation without a redundant web search. The classifier must still
+propose the Bottle without unresolved identity risks, and code blocks creation
+when populated category, age, edition, ABV, cask flags, or year facts conflict
+with the proposal. Partial identities keep the normal web or review path.
+
 The classifier does not maintain producer, critic, database, or retailer domain
 allowlists. The agent judges source quality from content, independence,
 specificity, and corroboration. Code may separate the originating listing from
 other web results; it must not infer truth from a hardcoded domain class.
 
-The originating retailer can support extraction, but it is not decisive creation
-evidence by itself.
+An originating retailer title or snippet can support extraction, but it is not
+decisive creation evidence by itself. Deliberately normalized structured facts
+emitted by a reviewed scraper use the stricter creation boundary above.
 
 For image inputs, extraction scans the complete readable label, including
 smaller secondary bands, subtitles, and neck tags, for identity-bearing edition,

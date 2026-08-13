@@ -5,6 +5,9 @@
       during upsert.
 - [x] 1.3 Seed price classification from fresh persisted source Bottle facts.
 - [x] 1.4 Generate the additive store-price migration.
+- [x] 1.5 Use complete, conflict-free scraper facts as an auto-create evidence
+      anchor while retaining review for partial, contradictory, or unresolved
+      identities.
 
 ## 2. Douglas Laing Evidence
 

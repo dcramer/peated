@@ -12,6 +12,8 @@ false `no_match` outcomes more likely.
   strict `sourceBottleIdentity` contract and persist them with the listing.
 - Seed price classification from those facts so image extraction remains a
   fallback instead of mandatory work.
+- Let complete, conflict-free scraper facts satisfy the auto-create evidence
+  gate when the classifier reports no unresolved identity risk.
 - Preserve Douglas Laing's structured vendor, product type, ABV, age/cask
   markers, and finish wording without inferring a bottler or release year.
 - Bound Firecrawl to at most two search queries and one independently reserved
