@@ -1,0 +1,120 @@
+{
+  "products": [
+    {
+      "title": "Rock Town 10 Year Old",
+      "handle": "rock-town-10-year-old",
+      "product_type": "Bourbon Whisky",
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/rock-town-10.png"
+        }
+      ],
+      "variants": [
+        {
+          "available": true,
+          "price": "90.00"
+        }
+      ]
+    },
+    {
+      "title": "Balcones 6 Year Old",
+      "handle": "balcones-6-year-old",
+      "product_type": "American Single Malt Whisky",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "80.50"
+        }
+      ]
+    },
+    {
+      "title": "Backwoods 4 Year Old",
+      "handle": "backwoods-4-year-old",
+      "product_type": "Australian Rye Whisky",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "95"
+        }
+      ]
+    },
+    {
+      "title": "Girvan 33 Year Old",
+      "handle": "girvan-33-year-old",
+      "product_type": "Single Grain Scotch Whisky",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "255.00"
+        }
+      ]
+    },
+    {
+      "title": "Ben Nevis 8 Year Old",
+      "handle": "ben-nevis-8-year-old",
+      "product_type": "Single Malt Scotch Whisky",
+      "images": [],
+      "variants": [
+        {
+          "available": false,
+          "price": "75.00"
+        },
+        {
+          "available": true,
+          "price": "90.00"
+        }
+      ]
+    },
+    {
+      "title": "New York Distilling 10 Year Old",
+      "handle": "new-york-distilling-10-year-old",
+      "product_type": "Straight Rye Whisky",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "100.00"
+        }
+      ]
+    },
+    {
+      "title": "Single Cask Nation Gift Card",
+      "handle": "gift-card",
+      "product_type": "Gift Card",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "50.00"
+        }
+      ]
+    },
+    {
+      "title": "Macduff 12 Year Old",
+      "handle": "macduff-12-year-old",
+      "product_type": "Single Malt Scotch Whisky",
+      "images": [],
+      "variants": [
+        {
+          "available": false,
+          "price": "110.00"
+        }
+      ]
+    },
+    {
+      "title": "Cameronbridge 25 Year Old",
+      "handle": "cameronbridge-25-year-old",
+      "product_type": "Single Grain Scotch Whisky",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "0.00"
+        }
+      ]
+    }
+  ]
+}

@@ -33,6 +33,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "kilchoman",
   "northstarspirits",
   "reservebar",
+  "singlecasknation",
   "smws",
   "smwsa",
   "totalwine",
