@@ -1,15 +1,15 @@
 import { ExternalSiteInputSchema, ExternalSiteTypeEnum } from "./externalSites";
 
 test("accepts registered external-site types", () => {
-  expect(ExternalSiteTypeEnum.parse("edradour")).toBe("edradour");
+  expect(ExternalSiteTypeEnum.parse("glenallachie")).toBe("glenallachie");
   expect(
     ExternalSiteInputSchema.parse({
-      name: "Edradour",
-      type: "edradour",
+      name: "The GlenAllachie",
+      type: "glenallachie",
     }),
   ).toMatchObject({
-    name: "Edradour",
-    type: "edradour",
+    name: "The GlenAllachie",
+    type: "glenallachie",
   });
 });
 
