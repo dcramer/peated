@@ -43,6 +43,9 @@ test.describe("create bottle", () => {
       page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
     await expect(page.getByText("Take or upload a photo")).toBeVisible();
+    const photoInput = page.locator('input[type="file"]');
+    await expect(photoInput).toHaveAttribute("accept", "image/*");
+    await expect(photoInput).not.toHaveAttribute("capture");
     await expectNoHorizontalOverflow(page);
   });
 
