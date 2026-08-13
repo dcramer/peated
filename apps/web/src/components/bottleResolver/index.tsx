@@ -439,7 +439,6 @@ export default function BottleResolver({
         className="hidden"
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={onFileChange}
       />
 
