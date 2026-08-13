@@ -36,6 +36,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "gordonmacphail",
   "healthyspirits",
   "kilchoman",
+  "ncnean",
   "northstarspirits",
   "reservebar",
   "singlecasknation",
