@@ -22,29 +22,23 @@ test.describe("log tasting", () => {
   test("logs a tasting for a fixture bottle", async ({ context, page }) => {
     await signIn(context);
 
-    await page.goto(`/bottles/${existingBottle.id}/addTasting`);
+    await page.goto(`/bottles/${existingBottle.id}`);
+    const logTastingLink = page.getByRole("link", { name: "Log Tasting" });
+    await expect(logTastingLink).toHaveAttribute(
+      "href",
+      `/bottles/${existingBottle.id}/addTasting`,
+    );
+    await logTastingLink.click();
 
     await expect(page).toHaveURL(
       new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=tasting$`),
     );
     await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
-    ).toBeVisible();
-    await expect(
-      getBottleIdentityLink(page, destinationBottleGroup.name),
-    ).toBeVisible();
-    await expect(
-      page
-        .locator("main section")
-        .filter({ hasText: "Bottle found" })
-        .getByRole("button")
-        .first(),
-    ).toHaveText("Log Tasting");
-    await page.getByRole("button", { name: "Log Tasting" }).click();
-
-    await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Bottle found" }),
+    ).toBeHidden();
     await expect(page.getByTitle(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
@@ -74,7 +68,9 @@ test.describe("log tasting", () => {
     });
 
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
-    await page.getByRole("button", { name: "Log Tasting" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Log Tasting" }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     await uploadTastingImage(page);

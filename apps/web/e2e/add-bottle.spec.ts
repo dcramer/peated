@@ -153,12 +153,9 @@ test.describe("create bottle", () => {
       ),
     );
     await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
+      page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expect(getBottleIdentityLink(page, createdBottleName)).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Log Tasting" }),
-    ).toBeVisible();
+    await expect(page.getByTitle(createdBottleName)).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
@@ -178,10 +175,6 @@ test.describe("create bottle", () => {
         `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=tasting$`,
       ),
     );
-    await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Log Tasting" }).click();
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
@@ -518,6 +511,16 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await expect(
       getBottleIdentityLink(page, destinationBottleGroup.name),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Log Tasting" }),
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/addTasting`);
+    await expect(
+      page.getByRole("link", { name: "View Bottle" }),
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
+    await page.getByRole("link", { name: "Log Tasting" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
