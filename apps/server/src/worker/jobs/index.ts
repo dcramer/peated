@@ -36,6 +36,7 @@ import scrapeGlenAllachie from "./scrapeGlenAllachie";
 import scrapeGordonMacphail from "./scrapeGordonMacphail";
 import scrapeHealthySpirits from "./scrapeHealthySpirits";
 import scrapeKilchoman from "./scrapeKilchoman";
+import scrapeMasterOfMalt from "./scrapeMasterOfMalt";
 import scrapeMissionLiquor from "./scrapeMissionLiquor";
 import scrapeNcnean from "./scrapeNcnean";
 import scrapeNorthStarSpirits from "./scrapeNorthStarSpirits";
@@ -94,6 +95,7 @@ const scraperJobs = [
   ["ScrapeGordonMacphail", "gordonmacphail", scrapeGordonMacphail],
   ["ScrapeHealthySpirits", "healthyspirits", scrapeHealthySpirits],
   ["ScrapeKilchoman", "kilchoman", scrapeKilchoman],
+  ["ScrapeMasterOfMalt", "masterofmalt", scrapeMasterOfMalt],
   ["ScrapeMissionLiquor", "missionliquor", scrapeMissionLiquor],
   ["ScrapeNcnean", "ncnean", scrapeNcnean],
   ["ScrapeNorthStarSpirits", "northstarspirits", scrapeNorthStarSpirits],
