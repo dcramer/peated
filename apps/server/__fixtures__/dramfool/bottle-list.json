@@ -1,0 +1,99 @@
+{
+  "items": [
+    {
+      "title": "Dramfool Glenallachie 11",
+      "fullUrl": "/shop/glenallachie-11",
+      "assetUrl": "https://images.squarespace-cdn.com/glenallachie-11.png",
+      "productType": 1,
+      "variants": [
+        {
+          "attributes": { "Size": "70cl" },
+          "priceMoney": { "currency": "GBP", "value": "100.00" },
+          "salePriceMoney": { "currency": "GBP", "value": "0.00" },
+          "onSale": false,
+          "unlimited": false,
+          "qtyInStock": 248
+        },
+        {
+          "attributes": { "Size": "5cl" },
+          "priceMoney": { "currency": "GBP", "value": "10.00" },
+          "salePriceMoney": { "currency": "GBP", "value": "0.00" },
+          "onSale": false,
+          "unlimited": false,
+          "qtyInStock": 8
+        }
+      ]
+    },
+    {
+      "title": "Rhinns 2011, 13 year old cask #R11/281-1",
+      "fullUrl": "/shop/rhinns-13",
+      "assetUrl": null,
+      "productType": 1,
+      "variants": [
+        {
+          "attributes": { "size": "0.7 L" },
+          "priceMoney": { "currency": "GBP", "value": "162.50" },
+          "salePriceMoney": { "currency": "GBP", "value": "150.00" },
+          "onSale": true,
+          "unlimited": true,
+          "qtyInStock": 0
+        }
+      ]
+    },
+    {
+      "title": "Dramfool Sold Out 12",
+      "fullUrl": "/shop/sold-out-12",
+      "assetUrl": null,
+      "productType": 1,
+      "variants": [
+        {
+          "attributes": { "Size": "700ml" },
+          "priceMoney": { "currency": "GBP", "value": "80.00" },
+          "onSale": false,
+          "unlimited": false,
+          "qtyInStock": 0
+        }
+      ]
+    },
+    {
+      "title": "Dramfool Whisky Without Size",
+      "fullUrl": "/shop/whisky-without-size",
+      "assetUrl": null,
+      "productType": 1,
+      "variants": [
+        {
+          "attributes": {},
+          "priceMoney": { "currency": "GBP", "value": "90.00" },
+          "onSale": false,
+          "unlimited": false,
+          "qtyInStock": 2
+        }
+      ]
+    },
+    {
+      "title": "Dramfool Tasting Ticket",
+      "fullUrl": "/shop/tasting-ticket",
+      "assetUrl": null,
+      "productType": 2,
+      "variants": []
+    },
+    {
+      "title": "Broken Product"
+    },
+    {
+      "title": "Dramfool Wrong Currency 10",
+      "fullUrl": "/shop/wrong-currency-10",
+      "assetUrl": null,
+      "productType": 1,
+      "variants": [
+        {
+          "attributes": { "Size": "700 ML" },
+          "priceMoney": { "currency": "USD", "value": "75.00" },
+          "onSale": false,
+          "unlimited": false,
+          "qtyInStock": 3
+        }
+      ]
+    }
+  ]
+}

@@ -29,6 +29,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "compassbox",
   "decadentdrinks",
   "douglaslaing",
+  "dramfool",
   "gordonmacphail",
   "healthyspirits",
   "kilchoman",
