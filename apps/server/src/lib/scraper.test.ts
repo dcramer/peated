@@ -204,6 +204,72 @@ describe("scrapePrices", () => {
     ]);
   });
 
+  it("uses source products rather than emitted products to continue pagination", async () => {
+    const urlForPage = (page: number) => `https://test.com/page/${page}`;
+    const scrapeProducts = vi.fn(
+      async (url: string, cb: ScrapePricesCallback) => {
+        if (url === urlForPage(1)) {
+          await cb({
+            name: "Product 1",
+            price: 1000,
+            currency: "usd",
+            url: "https://test.com/product1",
+            volume: 750,
+          });
+          return { hasSourceProducts: true };
+        }
+        if (url === urlForPage(2)) {
+          return { hasSourceProducts: true };
+        }
+        if (url === urlForPage(3)) {
+          await cb({
+            name: "Product 2",
+            price: 2000,
+            currency: "usd",
+            url: "https://test.com/product2",
+            volume: 750,
+          });
+          return { hasSourceProducts: true };
+        }
+        return { hasSourceProducts: false };
+      },
+    );
+
+    await expect(
+      scrapePrices("totalwine", urlForPage, scrapeProducts, { dryRun: true }),
+    ).resolves.toBe(2);
+    expect(scrapeProducts).toHaveBeenCalledTimes(4);
+  });
+
+  it("flushes queued prices before propagating a later page failure", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const urlForPage = (page: number) => `https://test.com/page/${page}`;
+    const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
+      if (url === urlForPage(1)) {
+        await cb({
+          name: "Queued Product",
+          price: 1000,
+          currency: "usd",
+          url: "https://test.com/queued-product",
+          volume: 750,
+        });
+        return { hasSourceProducts: true };
+      }
+      throw new Error("Later page failed");
+    };
+
+    await expect(
+      scrapePrices(site.type, urlForPage, scrapeProducts),
+    ).rejects.toThrow("Later page failed");
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject([{ name: "Queued Product", price: 1000 }]);
+  });
+
   it("deduplicates same-name same-volume products", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {

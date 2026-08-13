@@ -32,6 +32,7 @@ import scrapeDecadentDrinks from "./scrapeDecadentDrinks";
 import scrapeDouglasLaing from "./scrapeDouglasLaing";
 import scrapeDramfool from "./scrapeDramfool";
 import scrapeEdradour from "./scrapeEdradour";
+import scrapeFineDrams from "./scrapeFineDrams";
 import scrapeGlenAllachie from "./scrapeGlenAllachie";
 import scrapeGordonMacphail from "./scrapeGordonMacphail";
 import scrapeHealthySpirits from "./scrapeHealthySpirits";
@@ -91,6 +92,7 @@ const scraperJobs = [
   ["ScrapeDouglasLaing", "douglaslaing", scrapeDouglasLaing],
   ["ScrapeDramfool", "dramfool", scrapeDramfool],
   ["ScrapeEdradour", "edradour", scrapeEdradour],
+  ["ScrapeFineDrams", "finedrams", scrapeFineDrams],
   ["ScrapeGlenAllachie", "glenallachie", scrapeGlenAllachie],
   ["ScrapeGordonMacphail", "gordonmacphail", scrapeGordonMacphail],
   ["ScrapeHealthySpirits", "healthyspirits", scrapeHealthySpirits],

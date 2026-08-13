@@ -33,6 +33,7 @@ export type JobName =
   | "ScrapeDouglasLaing"
   | "ScrapeDramfool"
   | "ScrapeEdradour"
+  | "ScrapeFineDrams"
   | "ScrapeGlenAllachie"
   | "ScrapeGordonMacphail"
   | "ScrapeHealthySpirits"

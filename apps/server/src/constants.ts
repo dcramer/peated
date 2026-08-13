@@ -32,6 +32,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "douglaslaing",
   "dramfool",
   "edradour",
+  "finedrams",
   "glenallachie",
   "gordonmacphail",
   "healthyspirits",
