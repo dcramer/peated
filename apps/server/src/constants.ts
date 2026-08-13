@@ -47,6 +47,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "totalwine",
   "woodencork",
   "whiskyadvocate",
+  "whiskyworld",
 ] as const;
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
