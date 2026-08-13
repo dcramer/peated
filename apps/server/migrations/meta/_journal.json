@@ -1478,6 +1478,13 @@
       "when": 1786584292548,
       "tag": "0210_wandering_roulette",
       "breakpoints": false
+    },
+    {
+      "idx": 211,
+      "version": "7",
+      "when": 1786588260224,
+      "tag": "0211_plain_energizer",
+      "breakpoints": false
     }
   ]
 }

@@ -23,6 +23,8 @@ export function getJobForSite(site: ExternalSiteType): JobName {
       return "ScrapeNorthStarSpirits";
     case "reservebar":
       return "ScrapeReserveBar";
+    case "singlecasknation":
+      return "ScrapeSingleCaskNation";
     case "smws":
       return "ScrapeSMWS";
     case "smwsa":
