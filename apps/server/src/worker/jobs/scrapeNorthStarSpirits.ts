@@ -4,7 +4,14 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  parseShopifyPrice,
+  scrapeShopifyProducts,
+  ShopifyCatalogSchema,
+  ShopifyImageSchema,
+  ShopifyProductSchema,
+} from "@peated/server/lib/shopify";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
@@ -12,36 +19,14 @@ import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 const SITE = "northstarspirits";
 const DEFAULT_VOLUME = 700;
 
-const NorthStarProductsSchema = z.object({
-  products: z.array(
-    z.object({
-      title: z.string().trim().min(1),
-      handle: z.string().trim().min(1),
-      body_html: z.string().nullish(),
-      images: z.array(
-        z.object({
-          src: z.string().url(),
-        }),
-      ),
-      variants: z.array(
-        z.object({
-          available: z.boolean(),
-          price: z.string(),
-        }),
-      ),
-    }),
-  ),
+const NorthStarProductSchema = ShopifyProductSchema.extend({
+  body_html: z.string().nullish(),
+  images: z.array(ShopifyImageSchema),
 });
 
-function parsePrice(value: string): number | null {
-  const match = value.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-  if (!match) return null;
-
-  const pounds = Number.parseInt(match[1], 10);
-  const pence = Number.parseInt((match[2] ?? "").padEnd(2, "0"), 10) || 0;
-  const price = pounds * 100 + pence;
-  return price > 0 ? price : null;
-}
+const NorthStarProductsSchema = ShopifyCatalogSchema.extend({
+  products: z.array(NorthStarProductSchema),
+});
 
 function extractVolume(title: string, bodyHtml: string | null): number {
   const match = `${title} ${bodyHtml ?? ""}`.match(
@@ -83,7 +68,7 @@ export function parseNorthStarProducts(
     const pricedVariant = product.variants
       .map((variant) => ({
         ...variant,
-        parsedPrice: parsePrice(variant.price),
+        parsedPrice: parseShopifyPrice(variant.price),
       }))
       .find((variant) => variant.available && variant.parsedPrice !== null);
     if (!pricedVariant || pricedVariant.parsedPrice === null) continue;
@@ -118,9 +103,7 @@ export function parseNorthStarProducts(
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseNorthStarProducts(JSON.parse(data), url);
-  await Promise.all(products.map(cb));
+  return scrapeShopifyProducts(url, cb, parseNorthStarProducts);
 }
 
 export default async function scrapeNorthStarSpirits({

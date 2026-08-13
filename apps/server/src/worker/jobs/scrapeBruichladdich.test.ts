@@ -79,6 +79,31 @@ test("paginates a dry run and stops after an empty page", async ({
   expect(axiosMock.history.get).toHaveLength(2);
 });
 
+test("continues after a page whose products are all filtered", async ({
+  axiosMock,
+}) => {
+  const result: { products: Array<{ title?: unknown }> } = JSON.parse(
+    await loadFixture("bruichladdich", "bottle-list.json"),
+  );
+  const filteredProduct = result.products.find(
+    (product) => product.title === "The Botanist Islay Dry Gin",
+  );
+  expect(filteredProduct).toBeDefined();
+
+  axiosMock.onGet(firstPageUrl).reply(200, {
+    products: [filteredProduct],
+  });
+  axiosMock.onGet(secondPageUrl).reply(200, result);
+  axiosMock
+    .onGet(
+      "https://www.bruichladdich.com/collections/all/products.json?country=GB&limit=250&page=3",
+    )
+    .reply(200, { products: [] });
+
+  await expect(scrapeBruichladdich({ dryRun: true })).resolves.toBe(4);
+  expect(axiosMock.history.get).toHaveLength(3);
+});
+
 test("fails when a complete scrape yields no supported listings", async ({
   axiosMock,
 }) => {

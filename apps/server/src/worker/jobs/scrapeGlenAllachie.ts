@@ -3,7 +3,16 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  getShopifyImageUrl,
+  getShopifyProductTitle,
+  parseShopifyPrice,
+  scrapeShopifyProducts,
+  ShopifyCatalogSchema,
+  ShopifyProductSchema,
+  ShopifyVariantSchema,
+} from "@peated/server/lib/shopify";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
@@ -18,54 +27,19 @@ const SUPPORTED_PRODUCT_TYPES = new Set([
   "Single Malt Scotch Whisky",
 ]);
 
-const GlenAllachieCatalogSchema = z
-  .object({
-    products: z.array(z.unknown()),
-  })
-  .passthrough();
+const GlenAllachieProductSchema = ShopifyProductSchema.extend({
+  handle: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  body_html: z.string(),
+  product_type: z.string(),
+  tags: z.array(z.string()),
+  images: z.array(z.unknown()),
+  variants: z.array(z.unknown()),
+});
 
-const GlenAllachieProductSchema = z
-  .object({
-    title: z.string().trim().min(1),
-    handle: z
-      .string()
-      .trim()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-    body_html: z.string(),
-    product_type: z.string(),
-    tags: z.array(z.string()),
-    images: z.array(z.unknown()),
-    variants: z.array(z.unknown()),
-  })
-  .passthrough();
-
-const GlenAllachieVariantSchema = z
-  .object({
-    available: z.boolean(),
-    price: z.string(),
-  })
-  .passthrough();
-
-const GlenAllachieImageSchema = z
-  .object({
-    src: z.string().url(),
-  })
-  .passthrough();
-
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("title" in input)) return null;
-  return typeof input.title === "string" ? input.title : null;
-}
-
-function parsePrice(value: string): number | null {
-  const match = value.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-  if (!match) return null;
-
-  const pounds = Number.parseInt(match[1], 10);
-  const pence = Number.parseInt((match[2] ?? "").padEnd(2, "0"), 10) || 0;
-  const price = pounds * 100 + pence;
-  return Number.isSafeInteger(price) && price > 0 ? price : null;
-}
+const GlenAllachieVariantSchema = ShopifyVariantSchema;
 
 function parseExplicitVolumes(value: string): number[] {
   const volumes = new Set<number>();
@@ -96,27 +70,15 @@ function getProductName(title: string, tags: string[]): string | null {
   return null;
 }
 
-function getImageUrl(value: unknown): string | null {
-  const result = GlenAllachieImageSchema.safeParse(value);
-  if (!result.success) return null;
-
-  const url = new URL(result.data.src);
-  return url.protocol === "https:" &&
-    (url.hostname === "cdn.shopify.com" ||
-      url.hostname === "shop.theglenallachie.com")
-    ? url.toString()
-    : null;
-}
-
 export function parseGlenAllachieProducts(input: unknown): StorePrice[] {
-  const payload = GlenAllachieCatalogSchema.parse(input);
+  const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 
   for (const productInput of payload.products) {
     const productResult = GlenAllachieProductSchema.safeParse(productInput);
     if (!productResult.success) {
       logScrapeWarning(SITE, "Invalid product record", {
-        rawName: getRawName(productInput),
+        rawName: getShopifyProductTitle(productInput),
       });
       continue;
     }
@@ -152,7 +114,7 @@ export function parseGlenAllachieProducts(input: unknown): StorePrice[] {
     const variant = availableVariants[0];
     if (!variant) continue;
 
-    const price = parsePrice(variant.price);
+    const price = parseShopifyPrice(variant.price);
     if (price === null) {
       logScrapeWarning(SITE, "Invalid product price", {
         rawName: product.title,
@@ -169,7 +131,9 @@ export function parseGlenAllachieProducts(input: unknown): StorePrice[] {
       continue;
     }
 
-    const imageUrl = getImageUrl(product.images[0]);
+    const imageUrl = getShopifyImageUrl(product.images[0], [
+      "shop.theglenallachie.com",
+    ]);
     if (!imageUrl) {
       logScrapeWarning(SITE, "Invalid product image URL", {
         rawName: product.title,
@@ -196,9 +160,7 @@ export function parseGlenAllachieProducts(input: unknown): StorePrice[] {
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseGlenAllachieProducts(JSON.parse(data));
-  await Promise.all(products.map(cb));
+  return scrapeShopifyProducts(url, cb, parseGlenAllachieProducts);
 }
 
 export default async function scrapeGlenAllachie({

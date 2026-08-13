@@ -41,27 +41,27 @@ describe("BatchQueue", () => {
     expect(processBatchMock).toHaveBeenNthCalledWith(2, [4, 5, 6]);
   });
 
-  test("handles errors during batch processing", async () => {
+  test("propagates errors during batch processing", async () => {
     processBatchMock.mockRejectedValue(new Error("Processing error"));
 
     await batchQueue.push(1);
     await batchQueue.push(2);
-    await batchQueue.push(3);
+    await expect(batchQueue.push(3)).rejects.toThrow("Processing error");
 
     expect(processBatchMock).toHaveBeenCalledTimes(1);
   });
 
-  test("continues processing after an error", async () => {
+  test("can process a later batch after an error", async () => {
     processBatchMock
       .mockRejectedValueOnce(new Error("Processing error"))
       .mockResolvedValueOnce(undefined);
 
-    for (let i = 1; i <= 6; i++) {
-      await batchQueue.push(i);
-    }
-
-    // Add a small delay to allow for async processing
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await batchQueue.push(1);
+    await batchQueue.push(2);
+    await expect(batchQueue.push(3)).rejects.toThrow("Processing error");
+    await batchQueue.push(4);
+    await batchQueue.push(5);
+    await batchQueue.push(6);
 
     expect(processBatchMock).toHaveBeenCalledTimes(2);
     expect(processBatchMock).toHaveBeenNthCalledWith(1, [1, 2, 3]);
