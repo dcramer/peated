@@ -134,7 +134,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeCadenheads({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
-  await scrapePrices(
+  return scrapePrices(
     SITE,
     (page) =>
       `https://www.cadenhead.shop/wp-json/wc/store/v1/products?category=whisky&per_page=100&stock_status=instock&page=${page}`,

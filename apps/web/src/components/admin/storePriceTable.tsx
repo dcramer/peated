@@ -13,10 +13,10 @@ export default function StorePriceTable({
 }) {
   return (
     <>
-      <table className="min-w-full">
+      <table className="min-w-full table-fixed sm:table-auto">
         <colgroup>
-          <col className="min-w-full sm:w-1/12" />
-          <col className="min-w-full sm:w-7/12" />
+          <col className="w-16 sm:w-1/12" />
+          <col className="sm:w-7/12" />
           <col className="sm:w-2/12" />
           <col className="sm:w-2/12" />
         </colgroup>
@@ -48,16 +48,16 @@ export default function StorePriceTable({
           {priceList.map((price) => {
             return (
               <tr key={price.id} className="border-b border-slate-800 text-sm">
-                <td>
+                <td className="py-3 align-top">
                   {price.imageUrl && (
                     <img
                       src={price.imageUrl}
                       alt={price.name}
-                      className="max-h-16 max-w-full"
+                      className="mx-auto max-h-16 max-w-14 object-contain"
                     />
                   )}
                 </td>
-                <td className="max-w-0 px-3 py-3">
+                <td className="min-w-0 px-3 py-3 align-top">
                   <Link
                     href={price.url}
                     className="font-medium hover:underline"
@@ -76,8 +76,13 @@ export default function StorePriceTable({
                       <em>No Bottle</em>
                     )}
                   </div>
-                  <div className="text-muted mt-1 text-xs sm:hidden">
-                    Last seen <TimeSince date={price.updatedAt} />
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:hidden">
+                    <span className="font-medium text-white">
+                      <Price value={price.price} currency={price.currency} />
+                    </span>
+                    <span className="text-muted">
+                      Last seen <TimeSince date={price.updatedAt} />
+                    </span>
                   </div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">

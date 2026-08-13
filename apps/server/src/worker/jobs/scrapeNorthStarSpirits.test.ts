@@ -62,9 +62,7 @@ test("paginates a dry run and stops after an empty page", async ({
     )
     .reply(200, { products: [] });
 
-  await expect(
-    scrapeNorthStarSpirits({ dryRun: true }),
-  ).resolves.toBeUndefined();
+  await expect(scrapeNorthStarSpirits({ dryRun: true })).resolves.toBe(2);
 });
 
 test("fails when a complete scrape yields no supported listings", async ({

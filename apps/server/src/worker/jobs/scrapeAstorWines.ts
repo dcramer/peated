@@ -67,17 +67,18 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 }
 
 export default async function scrapeAstorWines() {
-  await scrapePrices(
+  const scotchCount = await scrapePrices(
     SITE,
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
     scrapeProducts,
   );
 
-  await scrapePrices(
+  const whiskeyCount = await scrapePrices(
     SITE,
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
     scrapeProducts,
   );
+  return scotchCount + whiskeyCount;
 }

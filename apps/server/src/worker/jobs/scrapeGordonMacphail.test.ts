@@ -61,7 +61,7 @@ test("paginates a dry run and stops after an empty page", async ({
     .onGet("https://shop.gordonandmacphail.com/products.json?limit=250&page=2")
     .reply(200, { products: [] });
 
-  await expect(scrapeGordonMacphail({ dryRun: true })).resolves.toBeUndefined();
+  await expect(scrapeGordonMacphail({ dryRun: true })).resolves.toBe(2);
 });
 
 test("fails when a complete scrape yields no supported listings", async ({

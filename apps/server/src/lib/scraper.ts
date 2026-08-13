@@ -30,7 +30,9 @@ const CACHE_EXPIRE = 60 * 60 * 18 * 1000;
 
 mkdirSync(CACHE, { recursive: true });
 
-export class PageNotFound extends Error {}
+export class PageNotFound extends Error {
+  override name = "PageNotFound";
+}
 
 export function downloadFileAsBlob(url: string) {
   return fetch(url).then((res) => res.blob());
@@ -274,4 +276,5 @@ export default async function scrapePrices(
       count: uniqueProducts.size,
     },
   });
+  return uniqueProducts.size;
 }

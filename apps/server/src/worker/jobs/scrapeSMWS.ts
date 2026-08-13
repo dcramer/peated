@@ -31,7 +31,7 @@ function parseAbv(value: string | number | null | undefined): number | null {
 }
 
 export default async function scrapeSMWS() {
-  await scrapeBottles(
+  return scrapeBottles(
     `https://api.smws.com/api/v1/bottles?store_id=uk&parent_id=61&page=1&sortBy=featured&minPrice=0&maxPrice=0&perPage=128`,
     handleBottle,
   );
@@ -64,6 +64,7 @@ export async function scrapeBottles(
 ) {
   const body = await getUrl(url);
   const data = SMWSPayloadSchema.parse(JSON.parse(body));
+  let itemCount = 0;
 
   await chunked(data.items, 10, async (items) => {
     await Promise.all(
@@ -158,7 +159,9 @@ export async function scrapeBottles(
           },
           item.image,
         );
+        itemCount += 1;
       }),
     );
   });
+  return itemCount;
 }

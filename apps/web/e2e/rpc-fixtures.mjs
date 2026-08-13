@@ -528,6 +528,9 @@ export const priceSite = {
   lastRunAt: timestamp,
   nextRunAt: null,
   runEvery: 60,
+  listingCount: 3,
+  latestRun: null,
+  lastSucceededAt: null,
 };
 
 export const firstStorePriceName = "First Bottle store listing";

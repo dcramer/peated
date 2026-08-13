@@ -244,10 +244,5 @@ export async function createExternalReview(
     });
   }
 
-  await db
-    .update(externalSites)
-    .set({ lastRunAt: sql`NOW()` })
-    .where(eq(externalSites.id, site.id));
-
   return review;
 }

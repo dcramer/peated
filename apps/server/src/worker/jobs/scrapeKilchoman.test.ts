@@ -66,7 +66,7 @@ test("runs a single-page dry run and stops on duplicate listings", async ({
   const result = await loadFixture("kilchoman", "bottle-list.html");
   axiosMock.onGet(shopUrl).reply(200, result);
 
-  await expect(scrapeKilchoman({ dryRun: true })).resolves.toBeUndefined();
+  await expect(scrapeKilchoman({ dryRun: true })).resolves.toBe(2);
   expect(axiosMock.history.get).toHaveLength(2);
 });
 

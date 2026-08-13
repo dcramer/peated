@@ -126,7 +126,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeNorthStarSpirits({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
-  await scrapePrices(
+  return scrapePrices(
     SITE,
     (page) =>
       `https://northstarspirits.com/collections/shop/products.json?limit=250&page=${page}`,

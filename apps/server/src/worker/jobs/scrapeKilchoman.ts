@@ -97,5 +97,5 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeKilchoman({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
-  await scrapePrices(SITE, () => SHOP_URL, scrapeProducts, { dryRun });
+  return scrapePrices(SITE, () => SHOP_URL, scrapeProducts, { dryRun });
 }
