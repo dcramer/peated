@@ -239,18 +239,6 @@ export function getManualResultCopy(
   }
 
   if (action === "no_match") {
-    if (
-      result?.classification.status === "classified" &&
-      result.classification.artifacts.candidates.length > 0
-    ) {
-      return {
-        title: "We couldn't identify this bottle",
-        description:
-          "We found a possible match, but it was not reliable enough to use automatically. Search can still find the right bottle.",
-        createLabel: undefined,
-      };
-    }
-
     if (hasRecognizedLabelDetails(result)) {
       return {
         title: "We couldn't find this bottle",

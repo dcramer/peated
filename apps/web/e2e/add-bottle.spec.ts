@@ -1277,7 +1277,7 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("does not offer manual creation for an uncertain scan match", async ({
+  test("carries uncertain scan details into manual bottle creation", async ({
     context,
     page,
   }, testInfo) => {
@@ -1288,26 +1288,46 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(
-      page.getByText("We couldn't identify this bottle"),
-    ).toBeVisible();
+    await expect(page.getByText("We couldn't find this bottle")).toBeVisible();
     await expect(
       page.getByText(
-        "We found a possible match, but it was not reliable enough to use automatically.",
+        "We found label details, but not enough to choose an existing bottle automatically.",
       ),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Search Bottles" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Create Manually" }),
-    ).toBeHidden();
-    await expect(
-      page.getByRole("link", { name: "Create Bottle" }),
-    ).toBeHidden();
+    const createBottleLink = page.getByRole("link", {
+      name: "Create Bottle",
+    });
+    await expect(createBottleLink).toBeVisible();
+    const href = await createBottleLink.getAttribute("href");
+    expect(href).not.toBeNull();
+    const createUrl = new URL(href!, page.url());
+    expect(createUrl.pathname).toBe("/bottles/new");
+    expect(createUrl.searchParams.get("returnAction")).toBe("addBottle");
+    expect(createUrl.searchParams.get("pendingImageId")).toBe(
+      "playwright-photo-upload",
+    );
+    expect(createUrl.searchParams.get("pendingImageUrl")).toBe(
+      pendingScanImageUrl,
+    );
+    expect(createUrl.searchParams.get("brandName")).toBe(testBrand.name);
+    expect(createUrl.searchParams.get("name")).toBe(existingBottle.name);
     await expect(
       page.getByRole("button", { name: "Start Over" }),
     ).toBeVisible();
+    await createBottleLink.click();
+    await expect(
+      page.getByRole("textbox", { name: "Bottle Name", exact: true }),
+    ).toHaveValue(existingBottle.name);
+    await expect(
+      page.getByRole("button", { name: testBrand.name }).first(),
+    ).toBeVisible();
+    await expect(page.getByAltText("uploaded image")).toHaveAttribute(
+      "src",
+      pendingScanImageUrl,
+    );
     await expectNoHorizontalOverflow(page);
   });
 

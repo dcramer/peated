@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   getCreateBottlePrefill,
   getCreateNameSeed,
+  getManualResultCopy,
   type PhotoIdentification,
 } from "./helpers";
 
@@ -125,6 +126,32 @@ describe("photo create prefill", () => {
       edition: "2024 Edition",
       abv: 48,
       releaseYear: 2024,
+    });
+  });
+
+  test("offers creation from extracted details when catalog candidates are uncertain", () => {
+    const result = buildPhotoResult();
+    result.classification = {
+      status: "classified",
+      decision: { action: "no_match" },
+      artifacts: {
+        candidates: [
+          {
+            fullName: "Possible Existing Bottle",
+          },
+        ],
+      },
+    };
+
+    expect(getManualResultCopy(result)).toMatchObject({
+      title: "We couldn't find this bottle",
+      createLabel: "Create Bottle",
+      primaryAction: "create",
+    });
+    expect(getCreateBottlePrefill(result)).toMatchObject({
+      brandName: "Raw Label Brand",
+      category: "single_malt",
+      distillers: [{ id: null, name: "Qualified Existing Distillery Co." }],
     });
   });
 });
