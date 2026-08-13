@@ -1,0 +1,81 @@
+{
+  "products": [
+    {
+      "id": 6631010533443,
+      "title": "Distillery Labels Linkwood 15 Years Old 46%",
+      "handle": "distillery-labels-linkwood-15-years-old-46",
+      "body_html": "<p><strong>Strength</strong> 46%</p>",
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/1/1914/4899/products/G_M_DistilleryLabels_Linkwood15YearsOld_46__70cl.jpg"
+        }
+      ],
+      "variants": [
+        {
+          "available": true,
+          "price": "90.00"
+        }
+      ]
+    },
+    {
+      "title": "CC CASK STRENGTH GLENTURRET 2007 59.8% - 70cl",
+      "handle": "cc-cask-strength-glenturret-2007-59-8-70cl",
+      "body_html": null,
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "160.00"
+        }
+      ]
+    },
+    {
+      "title": "DM LINKWOOD 15yo 43% - 70cl",
+      "handle": "dm-linkwood-15yo-43-70cl",
+      "body_html": null,
+      "images": [],
+      "variants": [
+        {
+          "available": false,
+          "price": "69.99"
+        }
+      ]
+    },
+    {
+      "title": "Archived Mortlach 12-year-old 70cl",
+      "handle": "archived-mortlach-12-year-old-70cl",
+      "body_html": "<p>Single malt Scotch whisky.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "0.00"
+        }
+      ]
+    },
+    {
+      "title": "G&M London Dry Gin 70cl",
+      "handle": "g-m-london-dry-gin-70cl",
+      "body_html": "<p>Small-batch Scottish gin.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "35.00"
+        }
+      ]
+    },
+    {
+      "title": "Private Collection Mystery Malt",
+      "handle": "private-collection-mystery-malt",
+      "body_html": "<p>Single malt Scotch whisky.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "125.00"
+        }
+      ]
+    }
+  ]
+}
