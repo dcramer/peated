@@ -24,6 +24,7 @@ import reconcileStorePriceMatchProposals from "./reconcileStorePriceMatchProposa
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
 import scrapeAstorWines from "./scrapeAstorWines";
 import scrapeCadenheads from "./scrapeCadenheads";
+import scrapeCompassBox from "./scrapeCompassBox";
 import scrapeDecadentDrinks from "./scrapeDecadentDrinks";
 import scrapeGordonMacphail from "./scrapeGordonMacphail";
 import scrapeHealthySpirits from "./scrapeHealthySpirits";
@@ -69,6 +70,7 @@ registry.add(
 registry.add("ResolveStorePriceBottle", resolveStorePriceBottle);
 registry.add("ScrapeAstorWines", scrapeAstorWines);
 registry.add("ScrapeCadenheads", scrapeCadenheads);
+registry.add("ScrapeCompassBox", scrapeCompassBox);
 registry.add("ScrapeDecadentDrinks", scrapeDecadentDrinks);
 registry.add("ScrapeGordonMacphail", scrapeGordonMacphail);
 registry.add("ScrapeHealthySpirits", scrapeHealthySpirits);

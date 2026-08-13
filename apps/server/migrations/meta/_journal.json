@@ -1457,6 +1457,13 @@
       "when": 1786580263649,
       "tag": "0207_windy_stone_men",
       "breakpoints": false
+    },
+    {
+      "idx": 208,
+      "version": "7",
+      "when": 1786581781109,
+      "tag": "0208_peaceful_juggernaut",
+      "breakpoints": false
     }
   ]
 }
