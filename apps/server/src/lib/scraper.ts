@@ -219,6 +219,11 @@ export async function handleBottle(
 
 export type ScrapePricesCallback = (product: StorePrice) => Promise<void>;
 
+/** Lets source-card presence drive pagination when every eligible output is filtered. */
+export type ScrapePricesPageResult = {
+  hasSourceProducts: boolean;
+};
+
 function getScrapedProductKey(product: StorePrice): string {
   return [product.name.trim().toLowerCase(), String(product.volume)].join(
     "\u0000",
@@ -228,7 +233,10 @@ function getScrapedProductKey(product: StorePrice): string {
 export default async function scrapePrices(
   site: ExternalSiteType,
   urlFn: (page: number) => string,
-  scrapeProducts: (url: string, cb: ScrapePricesCallback) => Promise<void>,
+  scrapeProducts: (
+    url: string,
+    cb: ScrapePricesCallback,
+  ) => Promise<ScrapePricesPageResult | void>,
   { dryRun = false }: { dryRun?: boolean } = {},
 ) {
   const workQueue = new BatchQueue<StorePrice>(
@@ -246,32 +254,36 @@ export default async function scrapePrices(
 
   const uniqueProducts = new Set<string>();
 
-  let hasProducts = true;
+  let hasSourceProducts = true;
   let page = 1;
-  while (hasProducts) {
-    hasProducts = false;
-    await scrapeProducts(urlFn(page), async (product) => {
-      logInfo("Scraped product price {name}", {
-        extra: {
-          name: product.name,
-          price: product.price,
-          site,
-        },
+  try {
+    while (hasSourceProducts) {
+      let emittedProduct = false;
+      const result = await scrapeProducts(urlFn(page), async (product) => {
+        logInfo("Scraped product price {name}", {
+          extra: {
+            name: product.name,
+            price: product.price,
+            site,
+          },
+        });
+        const productKey = getScrapedProductKey(product);
+        if (uniqueProducts.has(productKey)) return;
+        await workQueue.push(product);
+        uniqueProducts.add(productKey);
+        emittedProduct = true;
       });
-      const productKey = getScrapedProductKey(product);
-      if (uniqueProducts.has(productKey)) return;
-      await workQueue.push(product);
-      uniqueProducts.add(productKey);
-      hasProducts = true;
-    });
-    page += 1;
-  }
+      hasSourceProducts = result?.hasSourceProducts ?? emittedProduct;
+      page += 1;
+    }
 
-  if (uniqueProducts.size === 0) {
-    throw new Error("Failed to scrape any products.");
+    if (uniqueProducts.size === 0) {
+      throw new Error("Failed to scrape any products.");
+    }
+  } finally {
+    // Full batches persist during pagination, so the same run also owns its remainder.
+    await workQueue.processRemaining();
   }
-
-  await workQueue.processRemaining();
 
   logInfo("Scrape complete", {
     extra: {

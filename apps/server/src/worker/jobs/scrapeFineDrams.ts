@@ -98,15 +98,20 @@ function getImageUrl(
   return null;
 }
 
-export function parseFineDramsProducts(html: string): StorePrice[] {
+export function parseFineDramsPage(html: string): {
+  products: StorePrice[];
+  hasSourceProducts: boolean;
+} {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);
+  let malformedCards = 0;
 
   cards.each((_, element) => {
     const card = $(element);
     const rawName = card.find(".details .name").first().text().trim();
     if (!rawName) {
+      malformedCards += 1;
       logScrapeWarning(SITE, "Unable to identify product name");
       return;
     }
@@ -147,12 +152,14 @@ export function parseFineDramsProducts(html: string): StorePrice[] {
       .trim();
     const price = parsePrice(priceRaw);
     if (price === null) {
+      malformedCards += 1;
       logScrapeWarning(SITE, "Invalid product price", { priceRaw, rawName });
       return;
     }
 
     const url = getProductUrl(card.attr("href"));
     if (!url) {
+      malformedCards += 1;
       logScrapeWarning(SITE, "Invalid product URL", {
         rawName,
         url: card.attr("href"),
@@ -162,6 +169,7 @@ export function parseFineDramsProducts(html: string): StorePrice[] {
 
     const imageUrl = getImageUrl(card);
     if (!imageUrl) {
+      malformedCards += 1;
       logScrapeWarning(SITE, "Invalid product image URL", { rawName });
       return;
     }
@@ -180,19 +188,23 @@ export function parseFineDramsProducts(html: string): StorePrice[] {
     products.push(listing);
   });
 
-  if (cards.length > 0 && products.length === 0) {
+  if (products.length === 0 && malformedCards > 0) {
     throw new Error(
       "Fine Drams page contained product cards but no supported listings.",
     );
   }
 
-  return products;
+  return {
+    products,
+    hasSourceProducts: cards.length > 0,
+  };
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
-  const products = parseFineDramsProducts(data);
+  const { products, hasSourceProducts } = parseFineDramsPage(data);
   await Promise.all(products.map(cb));
+  return { hasSourceProducts };
 }
 
 export default async function scrapeFineDrams({
