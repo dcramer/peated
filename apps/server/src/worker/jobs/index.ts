@@ -46,6 +46,7 @@ import scrapeSMWSA from "./scrapeSMWSA";
 import scrapeThompsonBros from "./scrapeThompsonBros";
 import scrapeTotalWine from "./scrapeTotalWine";
 import scrapeWhiskeyAdvocate from "./scrapeWhiskyAdvocate";
+import scrapeWhiskyWorld from "./scrapeWhiskyWorld";
 import scrapeWoodenCork from "./scrapeWoodenCork";
 import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
@@ -104,6 +105,7 @@ const scraperJobs = [
   ["ScrapeTotalWine", "totalwine", scrapeTotalWine],
   ["ScrapeWoodenCork", "woodencork", scrapeWoodenCork],
   ["ScrapeWhiskyAdvocate", "whiskyadvocate", scrapeWhiskeyAdvocate],
+  ["ScrapeWhiskyWorld", "whiskyworld", scrapeWhiskyWorld],
 ] as const;
 
 for (const [jobName, siteType, scrape] of scraperJobs) {
