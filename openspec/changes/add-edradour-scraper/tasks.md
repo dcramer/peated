@@ -1,7 +1,8 @@
 ## 1. Source Registration
 
 - [x] 1.1 Register `edradour` in the external-site type list and worker routing
-- [x] 1.2 Generate the PostgreSQL external-site enum migration
+- [x] 1.2 Convert external-site type storage from a PostgreSQL enum to text with a generated migration
+- [x] 1.3 Verify registered types remain accepted and unknown types are rejected by application validation
 
 ## 2. Scraper Implementation
 

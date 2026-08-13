@@ -8,7 +8,8 @@ Peated does not currently collect first-party pricing from Edradour, despite the
 - Scrape the official server-rendered shop and product detail pages for purchasable whisky bottles.
 - Normalize supported bottle volumes, GBP prices, product URLs, images, and Edradour identity where the source omits it.
 - Exclude sold-out products, merchandise, liqueur, and other unsupported products.
-- Add fixture-based coverage, local live verification, and a generated database enum migration.
+- Store external-site types as text while retaining the application-owned source-type validator, so future scraper registrations do not require PostgreSQL enum migrations.
+- Add fixture-based coverage and local live verification.
 
 ## Capabilities
 
@@ -22,6 +23,6 @@ None.
 
 ## Impact
 
-- Adds a new `external_site_type` enum value and generated migration.
+- Converts the external-site type column from a PostgreSQL enum to text through a generated migration; API and worker boundaries continue to validate registered source types.
 - Adds a server worker scraper, routing, fixtures, and tests.
 - Reads public Edradour storefront pages; no new runtime dependency or protected credential is required.

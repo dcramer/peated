@@ -1,1 +1,0 @@
-ALTER TYPE "public"."external_site_type" ADD VALUE 'edradour' BEFORE 'gordonmacphail';

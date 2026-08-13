@@ -55,3 +55,17 @@ The scraper SHALL log and skip an invalid individual product without aborting va
 
 - **WHEN** the complete paginated run emits no supported listings
 - **THEN** the scraper fails explicitly instead of reporting success
+
+### Requirement: Validate registered source types in the application
+
+Peated SHALL store external-site types as text while validating all supported application inputs and outputs against the registered external-site type list.
+
+#### Scenario: Registered source type
+
+- **WHEN** an application boundary receives the registered `edradour` source type
+- **THEN** it accepts the value without requiring a source-specific database enum value
+
+#### Scenario: Unknown source type
+
+- **WHEN** an application boundary receives an unregistered source type
+- **THEN** it rejects the value before it reaches external-site persistence or worker routing

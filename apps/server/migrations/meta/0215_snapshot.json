@@ -1,5 +1,5 @@
 {
-  "id": "c5b23643-a21c-4ebd-bed3-37bd3fdd60be",
+  "id": "1f25ee5e-4df8-4982-aaa0-b38a485e69ae",
   "prevId": "098aad16-0a41-4ea3-b08f-a5cc1a413d68",
   "version": "7",
   "dialect": "postgresql",
@@ -4212,8 +4212,7 @@
         },
         "type": {
           "name": "type",
-          "type": "external_site_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -8096,32 +8095,6 @@
       "values": [
         "scheduled",
         "manual"
-      ]
-    },
-    "public.external_site_type": {
-      "name": "external_site_type",
-      "schema": "public",
-      "values": [
-        "astorwines",
-        "berrybrosrudd",
-        "cadenheads",
-        "compassbox",
-        "decadentdrinks",
-        "douglaslaing",
-        "dramfool",
-        "edradour",
-        "gordonmacphail",
-        "healthyspirits",
-        "kilchoman",
-        "northstarspirits",
-        "reservebar",
-        "singlecasknation",
-        "smws",
-        "smwsa",
-        "thompsonbros",
-        "totalwine",
-        "woodencork",
-        "whiskyadvocate"
       ]
     },
     "public.follow_status": {
