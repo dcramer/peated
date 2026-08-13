@@ -1077,7 +1077,10 @@ export async function resolveStorePriceMatchProposal(
     if (candidateExpansion !== "open") {
       classificationInput.candidateExpansion = candidateExpansion;
     }
-    if (reuseExistingExtraction) {
+    if (price.sourceBottleIdentity) {
+      classificationInput.extractedIdentity =
+        BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity);
+    } else if (reuseExistingExtraction) {
       classificationInput.extractedIdentity =
         parseStoredExtractedLabel(existingProposal);
     }

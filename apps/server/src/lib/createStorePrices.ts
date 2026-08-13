@@ -107,8 +107,26 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
           } = await tx.execute<
             Pick<StorePrice, "id" | "imageUrl" | "bottleId">
           >(sql`
-            INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
-            VALUES (${bottleId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
+            INSERT INTO ${storePrices} (
+              bottle_id,
+              external_site_id,
+              name,
+              volume,
+              price,
+              currency,
+              url,
+              source_bottle_identity
+            )
+            VALUES (
+              ${bottleId},
+              ${site.id},
+              ${name},
+              ${sp.volume},
+              ${sp.price},
+              ${sp.currency},
+              ${sp.url},
+              ${JSON.stringify(sp.sourceBottleIdentity ?? null)}::jsonb
+            )
             ON CONFLICT (external_site_id, LOWER(name), volume)
             DO UPDATE
             SET bottle_id = CASE
@@ -121,6 +139,10 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
                 price = excluded.price,
                 currency = excluded.currency,
                 url = excluded.url,
+                source_bottle_identity = COALESCE(
+                  excluded.source_bottle_identity,
+                  ${storePrices.sourceBottleIdentity}
+                ),
                 updated_at = NOW()
             RETURNING id, image_url AS "imageUrl", bottle_id AS "bottleId"
           `);

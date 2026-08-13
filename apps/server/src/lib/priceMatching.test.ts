@@ -280,6 +280,55 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   });
 
+  test("passes normalized source identity to the classifier", async ({
+    fixtures,
+  }) => {
+    const { classifyBottleReference, runBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const sourceIdentity = {
+      brand: "The Gauldrons",
+      bottler: null,
+      expression: "Eclipse – Finished in Orange Wine Casks",
+      series: null,
+      distillery: null,
+      category: "blend" as const,
+      stated_age: null,
+      abv: 52.9,
+      release_year: null,
+      vintage_year: null,
+      cask_strength: null,
+      single_cask: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      edition: null,
+    };
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "The Gauldrons Eclipse",
+      imageUrl: "/media/the-gauldrons-eclipse.png",
+      sourceBottleIdentity: sourceIdentity,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "no_match",
+          rationale: "No safe local match.",
+          candidateBottleIds: [],
+          matchedBottleId: null,
+          proposedBottle: null,
+        },
+        extractedLabel: sourceIdentity,
+      }),
+    );
+
+    await resolveStorePriceMatchProposal(price.id);
+
+    expect(runBottleReference).toHaveBeenCalledWith(
+      expect.objectContaining({ extractedIdentity: sourceIdentity }),
+    );
+  });
+
   test("falls back to exact candidates when embeddings fail", async ({
     fixtures,
   }) => {

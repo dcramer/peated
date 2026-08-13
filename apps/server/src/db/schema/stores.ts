@@ -1,3 +1,4 @@
+import type { BottleExtractedDetails } from "@peated/bottle-classifier/contract";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
@@ -56,6 +57,11 @@ export const storePrices = pgTable(
       .notNull(),
     name: text("name").notNull(),
     imageUrl: text("image_url"),
+    // Provider-owned facts are normalized classifier evidence, never raw
+    // provider payloads or canonical catalog authority.
+    sourceBottleIdentity: jsonb(
+      "source_bottle_identity",
+    ).$type<BottleExtractedDetails>(),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),

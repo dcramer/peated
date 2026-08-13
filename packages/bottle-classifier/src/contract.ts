@@ -96,7 +96,11 @@ export type {
   EntityContext,
   EntityContextBottleSample,
 } from "./bottleContextContract";
-export { BottleCandidateSchema } from "./classifierTypes";
+export {
+  BottleCandidateSchema,
+  BottleExtractedDetailsSchema,
+} from "./classifierTypes";
+export type { BottleExtractedDetails } from "./classifierTypes";
 export {
   ImageBottleEvidenceConflictSchema,
   ImageBottleEvidenceSchema,

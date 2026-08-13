@@ -1905,7 +1905,7 @@ describe("createBottleClassifier", () => {
     const runBottleClassifierAgent = vi.fn(
       async ({ searchEvidence, webSearchBudget }): Promise<ReasoningResult> => {
         expect(searchEvidence).toEqual([]);
-        expect(webSearchBudget?.tryConsume()).toBe(true);
+        expect(webSearchBudget?.tryConsumeSearch()).toBe(true);
         return {
           decision: {
             action: "no_match",

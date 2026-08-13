@@ -1000,6 +1000,7 @@ export const StorePrice = async (
         url,
         hidden,
         image_url,
+        source_bottle_identity,
         updated_at
       )
       VALUES (
@@ -1012,6 +1013,7 @@ export const StorePrice = async (
         ${data.url},
         ${data.hidden},
         ${data.imageUrl ?? null},
+        ${JSON.stringify(data.sourceBottleIdentity ?? null)}::jsonb,
         ${data.updatedAt || sql`NOW()`}
       )
       ON CONFLICT (external_site_id, LOWER(name), volume)
@@ -1020,6 +1022,7 @@ export const StorePrice = async (
           price = excluded.price,
           currency = excluded.currency,
           url = excluded.url,
+          source_bottle_identity = excluded.source_bottle_identity,
           updated_at = ${data.updatedAt || sql`NOW()`}
       RETURNING *
     `);

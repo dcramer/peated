@@ -23,7 +23,7 @@ export const BottleWebSearchArgsSchema = z.object({
   queries: z
     .array(BottleWebSearchQuerySchema)
     .min(1)
-    .max(3)
+    .max(2)
     .refine(
       (queries) =>
         new Set(queries.map((query) => query.toLowerCase())).size ===
@@ -31,7 +31,7 @@ export const BottleWebSearchArgsSchema = z.object({
       { message: "Search queries must be distinct" },
     )
     .describe(
-      "One focused query, or up to three distinct formulations when wording or an extracted trait is uncertain. Search discovers candidates; each returned result still requires exact-product validation before it becomes evidence. Each query consumes one unit of the web-evidence budget.",
+      "One focused query, or two distinct formulations when wording or an extracted trait is uncertain. Search discovers candidates; each returned result still requires exact-product validation before it becomes evidence. Each query consumes one search allowance; page verification has a separate reserved allowance.",
     ),
 });
 
@@ -43,7 +43,7 @@ export const BottleWebReadPageArgsSchema = z.object({
       message: "URL must use HTTP or HTTPS",
     })
     .describe(
-      "Exact URL of a promising search result consistent with confirmed Bottle traits, or differing only on the uncertain trait being resolved. Never use a confirmed conflicting sibling as Suggested Change evidence.",
+      "Exact source URL from `reference.url`, or a promising search result consistent with confirmed Bottle traits or differing only on the uncertain trait being resolved. Never use a confirmed conflicting sibling as Suggested Change evidence.",
     ),
   focus: z
     .string()
@@ -67,8 +67,9 @@ const MAX_BOTTLE_SEARCH_EXTRA_SNIPPETS = 1;
 const MAX_BOTTLE_SEARCH_EXTRA_SNIPPET_CHARS = 1200;
 
 export type BottleWebSearchBudget = {
-  tryConsume: (units?: number) => boolean;
-  getExhaustedError: () => {
+  tryConsumeSearch: (queries?: number) => boolean;
+  tryConsumePageRead: () => boolean;
+  getExhaustedError: (kind: "search" | "page_read") => {
     error: string;
   };
 };
@@ -104,8 +105,14 @@ export async function executeBottleWebSearchInvocation({
   execute: () => Promise<BottleWebToolResult>;
   executeWebSearch?: BottleWebSearchExecutor;
 }): Promise<BottleWebToolResult> {
-  if (!budget.tryConsume(budgetUnits)) {
-    return budget.getExhaustedError();
+  const budgetKind =
+    toolName === "firecrawl_web_search" ? "search" : "page_read";
+  const allowed =
+    budgetKind === "search"
+      ? budget.tryConsumeSearch(budgetUnits)
+      : budget.tryConsumePageRead();
+  if (!allowed) {
+    return budget.getExhaustedError(budgetKind);
   }
 
   return executeWebSearch
@@ -135,21 +142,34 @@ export function hydrateBottleSearchEvidence(
 }
 
 export function createBottleWebSearchBudget(
-  maxUnits: number,
+  maxSearchQueries: number,
+  maxPageReads = 1,
 ): BottleWebSearchBudget {
-  let consumedUnits = 0;
+  let consumedSearchQueries = 0;
+  let consumedPageReads = 0;
 
   return {
-    tryConsume: (units = 1) => {
-      if (units < 1 || consumedUnits + units > maxUnits) {
+    tryConsumeSearch: (queries = 1) => {
+      if (queries < 1 || consumedSearchQueries + queries > maxSearchQueries) {
         return false;
       }
 
-      consumedUnits += units;
+      consumedSearchQueries += queries;
       return true;
     },
-    getExhaustedError: () => ({
-      error: `Web evidence budget exhausted after ${maxUnits} units`,
+    tryConsumePageRead: () => {
+      if (consumedPageReads >= maxPageReads) {
+        return false;
+      }
+
+      consumedPageReads += 1;
+      return true;
+    },
+    getExhaustedError: (kind) => ({
+      error:
+        kind === "search"
+          ? `Web search budget exhausted after ${maxSearchQueries} ${maxSearchQueries === 1 ? "query" : "queries"}`
+          : `Web page-read budget exhausted after ${maxPageReads} ${maxPageReads === 1 ? "page" : "pages"}`,
     }),
   };
 }

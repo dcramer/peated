@@ -80,7 +80,7 @@ export function createEvalClassifierOptions(
     imageExtractionModel: evalImageExtractionModel,
     imageExtractionReasoningEffort: evalImageExtractionReasoningEffort,
     maxSearchQueries: Number(
-      process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
+      process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 2,
     ),
     firecrawlApiKey: process.env.FIRECRAWL_API_KEY ?? null,
     firecrawlApiUrl: process.env.FIRECRAWL_API_URL ?? null,

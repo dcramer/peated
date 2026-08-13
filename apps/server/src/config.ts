@@ -70,7 +70,7 @@ export default {
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
       process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||
-      "3",
+      "2",
   ),
   ENTITY_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.ENTITY_CLASSIFIER_MAX_SEARCH_QUERIES ||
@@ -82,7 +82,7 @@ export default {
   PRICE_MATCH_MAX_SEARCH_QUERIES: Number(
     process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||
       process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
-      "3",
+      "2",
   ),
   PRICE_MATCH_RETRY_RUN_BATCH_SIZE: Number(
     process.env.PRICE_MATCH_RETRY_RUN_BATCH_SIZE || "10",
