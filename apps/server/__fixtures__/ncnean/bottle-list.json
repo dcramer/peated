@@ -1,0 +1,136 @@
+{
+  "products": [
+    {
+      "title": "AON 17-163 MADEIRA CASK (SINGLE CASK)",
+      "handle": "aon-17-163-madeira-single-cask",
+      "body_html": "<p>Unpeated single malt / 57.1% abv / 70cl / natural colour</p>",
+      "tags": ["All Products", "Limited Edition Whiskies", "Whiskies"],
+      "vendor": "Nc'nean Distillery ",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/ncnean-aon.png" }],
+      "variants": [{ "available": true, "price": "94.95", "title": "Default Title" }]
+    },
+    {
+      "title": "ORGANIC SINGLE MALT SCOTCH WHISKY",
+      "handle": "organic-single-malt",
+      "body_html": "<p>Organic single malt / 46% abv / 70cl</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://ncnean.com/cdn/shop/files/organic.png" }],
+      "variants": [
+        { "available": true, "price": "55.95", "title": "Without gift tube - £55.95" },
+        { "available": true, "price": "58.95", "title": "With gift tube - £58.95" }
+      ]
+    },
+    {
+      "title": "NC'NEAN QUIET REBELS: SIMON (LIMITED EDITION)",
+      "handle": "quiet-rebels-simon",
+      "body_html": "<p>Limited release. 0.7 litre bottle.</p>",
+      "tags": ["All Products", "Limited Edition Whiskies", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/quiet-rebels-simon.png" }],
+      "variants": [{ "available": true, "price": "79.95", "title": "Default Title" }]
+    },
+    {
+      "title": "CASK STRENGTH MINIATURE",
+      "handle": "cask-strength-miniature",
+      "body_html": "<p>5cl miniature</p>",
+      "tags": ["All Products", "Miniatures", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/miniature.png" }],
+      "variants": [{ "available": true, "price": "9.95", "title": "Default Title" }]
+    },
+    {
+      "title": "WHISKY SIX SET",
+      "handle": "whisky-six-set",
+      "body_html": "<p>A gift set with one 70cl whisky bottle.</p>",
+      "tags": ["All Products", "Gift Sets"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/gift-set.png" }],
+      "variants": [{ "available": true, "price": "90.25", "title": "Default Title" }]
+    },
+    {
+      "title": "SOLD OUT WHISKY",
+      "handle": "sold-out-whisky",
+      "body_html": "<p>70cl single malt</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/sold-out.png" }],
+      "variants": [{ "available": false, "price": "60.00", "title": "Default Title" }]
+    },
+    {
+      "title": "ORGANIC BOTANICAL SPIRIT",
+      "handle": "botanical-spirit",
+      "body_html": "<p>70cl botanical spirit</p>",
+      "tags": ["All Products", "Other Spirits"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/botanical.png" }],
+      "variants": [{ "available": true, "price": "34.95", "title": "Default Title" }]
+    },
+    {
+      "title": "SMALL FORMAT WHISKY",
+      "handle": "small-format-whisky",
+      "body_html": "<p>50cl single malt</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/small-format.png" }],
+      "variants": [{ "available": true, "price": "45.00", "title": "Default Title" }]
+    },
+    {
+      "title": "MULTI-SIZE WHISKY",
+      "handle": "multi-size-whisky",
+      "body_html": "<p>Available as a 70cl bottle with a 5cl sample.</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/multi-size.png" }],
+      "variants": [{ "available": true, "price": "65.00", "title": "Default Title" }]
+    },
+    {
+      "title": "AMBIGUOUS PACKAGING",
+      "handle": "ambiguous-packaging",
+      "body_html": "<p>70cl single malt</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/ambiguous.png" }],
+      "variants": [
+        { "available": true, "price": "60.00", "title": "Standard" },
+        { "available": true, "price": "65.00", "title": "Presentation box" }
+      ]
+    },
+    {
+      "title": "UNKNOWN VENDOR WHISKY",
+      "handle": "unknown-vendor-whisky",
+      "body_html": "<p>70cl single malt</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Unknown Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/unknown-vendor.png" }],
+      "variants": [{ "available": true, "price": "60.00", "title": "Default Title" }]
+    },
+    {
+      "title": "ZERO PRICE WHISKY",
+      "handle": "zero-price-whisky",
+      "body_html": "<p>70cl single malt</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://cdn.shopify.com/s/files/zero-price.png" }],
+      "variants": [{ "available": true, "price": "0.00", "title": "Default Title" }]
+    },
+    {
+      "title": "INVALID IMAGE WHISKY",
+      "handle": "invalid-image-whisky",
+      "body_html": "<p>70cl single malt</p>",
+      "tags": ["All Products", "Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [{ "src": "https://images.example.com/invalid.png" }],
+      "variants": [{ "available": true, "price": "60.00", "title": "Default Title" }]
+    },
+    {
+      "title": "BROKEN PRODUCT",
+      "handle": "broken product",
+      "body_html": null,
+      "tags": ["Whiskies"],
+      "vendor": "Nc'nean Distillery",
+      "images": [],
+      "variants": []
+    }
+  ]
+}
