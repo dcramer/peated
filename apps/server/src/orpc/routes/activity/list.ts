@@ -3,21 +3,24 @@ import {
   collectionBottles,
   collections,
   follows,
-  tastings,
   users,
 } from "@peated/server/db/schema";
 import {
   coerceActivityDate,
   composeActivity,
+  countTastingSessions,
+  encodeActivityCursor,
   getActivitySourceWindow,
+  getTastingSessions,
+  parseActivityCursor,
   serializeCollectionAddEntries,
-  serializeTastingEntries,
+  serializeTastingSessionEntries,
   type CollectionAddGroup,
 } from "@peated/server/lib/activityFeed";
 import { procedure } from "@peated/server/orpc";
-import { ActivityEntrySchema, listResponse } from "@peated/server/schemas";
+import { ActivityListResponseSchema } from "@peated/server/schemas";
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, lte, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 // Main activity is read-time composition over authoritative source tables. The
@@ -29,7 +32,6 @@ type ActivityFilter = "global" | "friends" | "local";
 type CollectionAddGroupRow = {
   collection: typeof collections.$inferSelect;
   user: typeof users.$inferSelect;
-  bucket: Date | string;
   windowStart: Date | string;
   windowEnd: Date | string;
   totalItems: string;
@@ -64,7 +66,7 @@ function visibleActivityUserCondition({
     );
   }
 
-  return or(...visibleUsers);
+  return or(...visibleUsers)!;
 }
 
 export default procedure
@@ -80,16 +82,21 @@ export default procedure
     z
       .object({
         filter: z.enum(["global", "friends", "local"]).default("global"),
-        cursor: z.coerce.number().gte(1).default(1),
+        cursor: z
+          .string()
+          .max(64)
+          .refine((value) => parseActivityCursor(value) !== null, {
+            message: "Invalid activity cursor.",
+          })
+          .optional(),
         limit: z.coerce.number().gte(1).lte(100).default(10),
       })
       .default({
         filter: "global",
-        cursor: 1,
         limit: 10,
       }),
   )
-  .output(listResponse(ActivityEntrySchema))
+  .output(ActivityListResponseSchema)
   .handler(async function ({ input, context, errors }) {
     if (input.filter === "friends" && !context.user) {
       throw errors.UNAUTHORIZED();
@@ -99,17 +106,17 @@ export default procedure
       filter: input.filter,
       currentUserId: context.user?.id,
     });
+    const activityCursor = input.cursor
+      ? parseActivityCursor(input.cursor)!
+      : { page: 1, snapshotAt: new Date() };
     const collectionBucket = sql<Date>`DATE_TRUNC('day', ${collectionBottles.createdAt})`;
     const collectionGroupCreatedAt = sql<Date>`MAX(${collectionBottles.createdAt})`;
 
-    const [primaryCountRows, secondaryCountResult] = await Promise.all([
-      db
-        .select({
-          count: sql<string>`COUNT(${tastings.id})`,
-        })
-        .from(tastings)
-        .innerJoin(users, eq(users.id, tastings.createdById))
-        .where(userCondition),
+    const [totalPrimary, secondaryCountResult] = await Promise.all([
+      countTastingSessions({
+        userCondition,
+        snapshotAt: activityCursor.snapshotAt,
+      }),
       db.execute<{ count: string }>(sql`
         SELECT COUNT(*) as count
         FROM (
@@ -120,33 +127,30 @@ export default procedure
           INNER JOIN ${users}
             ON ${users.id} = ${collections.createdById}
           WHERE ${userCondition}
+            AND ${collectionBottles.createdAt} <= ${activityCursor.snapshotAt}
           GROUP BY ${users.id}, ${collections.id}, DATE_TRUNC('day', ${collectionBottles.createdAt})
         ) activity_groups
       `),
     ]);
-    const totalPrimary = Number(primaryCountRows[0]?.count ?? 0);
     const totalSecondary = Number(secondaryCountResult.rows[0]?.count ?? 0);
     const sourceWindow = getActivitySourceWindow({
-      cursor: input.cursor,
+      cursor: activityCursor.page,
       limit: input.limit,
       totalPrimary,
       totalSecondary,
     });
 
     const [tastingRows, collectionGroupRows] = await Promise.all([
-      db
-        .select({ tasting: tastings })
-        .from(tastings)
-        .innerJoin(users, eq(users.id, tastings.createdById))
-        .where(userCondition)
-        .orderBy(desc(tastings.createdAt))
-        .limit(sourceWindow.primaryLimit)
-        .offset(sourceWindow.primaryOffset),
+      getTastingSessions({
+        userCondition,
+        snapshotAt: activityCursor.snapshotAt,
+        limit: sourceWindow.primaryLimit,
+        offset: sourceWindow.primaryOffset,
+      }),
       db
         .select({
           collection: collections,
           user: users,
-          bucket: collectionBucket,
           windowStart: sql<Date>`MIN(${collectionBottles.createdAt})`,
           windowEnd: sql<Date>`MAX(${collectionBottles.createdAt})`,
           totalItems: sql<string>`COUNT(${collectionBottles.id})`,
@@ -157,15 +161,20 @@ export default procedure
           eq(collections.id, collectionBottles.collectionId),
         )
         .innerJoin(users, eq(users.id, collections.createdById))
-        .where(and(userCondition))
+        .where(
+          and(
+            userCondition,
+            lte(collectionBottles.createdAt, activityCursor.snapshotAt),
+          ),
+        )
         .groupBy(users.id, collections.id, collectionBucket)
         .orderBy(desc(collectionGroupCreatedAt))
         .limit(sourceWindow.secondaryLimit)
         .offset(sourceWindow.secondaryOffset),
     ]);
 
-    const primaryEntries = await serializeTastingEntries(
-      tastingRows.map((row) => row.tasting),
+    const primaryEntries = await serializeTastingSessionEntries(
+      tastingRows,
       context.user,
     );
     const secondaryEntries = await serializeCollectionAddEntries({
@@ -173,7 +182,6 @@ export default procedure
         (row: CollectionAddGroupRow): CollectionAddGroup => ({
           collection: row.collection,
           user: row.user,
-          bucket: row.bucket,
           windowStart: coerceActivityDate(row.windowStart),
           windowEnd: coerceActivityDate(row.windowEnd),
           totalItems: Number(row.totalItems),
@@ -194,8 +202,19 @@ export default procedure
     return {
       results: activity.results,
       rel: {
-        nextCursor: activity.hasNext ? input.cursor + 1 : null,
-        prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
+        nextCursor: activity.hasNext
+          ? encodeActivityCursor({
+              page: activityCursor.page + 1,
+              snapshotAt: activityCursor.snapshotAt,
+            })
+          : null,
+        prevCursor:
+          activityCursor.page > 1
+            ? encodeActivityCursor({
+                page: activityCursor.page - 1,
+                snapshotAt: activityCursor.snapshotAt,
+              })
+            : null,
       },
     };
   });

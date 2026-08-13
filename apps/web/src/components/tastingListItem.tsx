@@ -74,19 +74,21 @@ function ImageSkeleton() {
   );
 }
 
-export default function TastingListItem({
-  tasting,
-  noBottle,
-  onDelete,
-  onToast,
-  noCommentAction = false,
-}: {
+type TastingContentProps = {
   tasting: Tasting;
   noBottle?: boolean;
   onDelete?: (tasting: Tasting) => void;
   onToast?: (tasting: Tasting) => void;
   noCommentAction?: boolean;
-}) {
+};
+
+export function TastingContent({
+  tasting,
+  noBottle,
+  onDelete,
+  onToast,
+  noCommentAction = false,
+}: TastingContentProps) {
   const { user } = useAuth();
 
   const pathname = usePathname();
@@ -110,27 +112,7 @@ export default function TastingListItem({
   const canToast = Boolean(user && !hasToasted && !isTaster);
 
   return (
-    <li className="-mt-1 flex flex-col gap-y-4 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
-      <div className="flex items-center space-x-4 px-3 pt-3 lg:px-5 lg:pt-5">
-        <UserAvatar size={32} user={tasting.createdBy} />
-        <div className="flex-auto space-y-1 font-semibold">
-          <Link
-            href={`/users/${tasting.createdBy.username}`}
-            className="truncate hover:underline"
-          >
-            {tasting.createdBy.username}
-          </Link>
-        </div>
-        <div className="flex flex-col items-end">
-          <Link href={`/tastings/${tasting.id}`} className="hover:underline">
-            <TimeSince
-              className="font-muted block text-sm"
-              date={tasting.createdAt}
-            />
-          </Link>
-        </div>
-      </div>
-
+    <>
       {!noBottle && (
         <div className="px-3 sm:px-5">
           <TastingBottleIdentity bottle={tasting.bottle} variant="inline" />
@@ -335,6 +317,38 @@ export default function TastingListItem({
           </Menu>
         )}
       </aside>
+    </>
+  );
+}
+
+export default function TastingListItem(props: TastingContentProps) {
+  const { tasting } = props;
+
+  return (
+    <li className="-mt-1 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
+      <article className="flex flex-col gap-y-4">
+        <div className="flex items-center space-x-4 px-3 pt-3 lg:px-5 lg:pt-5">
+          <UserAvatar size={32} user={tasting.createdBy} />
+          <div className="flex-auto space-y-1 font-semibold">
+            <Link
+              href={`/users/${tasting.createdBy.username}`}
+              className="truncate hover:underline"
+            >
+              {tasting.createdBy.username}
+            </Link>
+          </div>
+          <div className="flex flex-col items-end">
+            <Link href={`/tastings/${tasting.id}`} className="hover:underline">
+              <TimeSince
+                className="font-muted block text-sm"
+                date={tasting.createdAt}
+              />
+            </Link>
+          </div>
+        </div>
+
+        <TastingContent {...props} />
+      </article>
     </li>
   );
 }

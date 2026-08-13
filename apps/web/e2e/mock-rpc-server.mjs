@@ -153,7 +153,7 @@ async function handleRpcRequest({ request, response, url }) {
         response,
         input?.cursor
           ? buildActivity()
-          : buildFavoriteActivity({ nextCursor: 1 }),
+          : buildFavoriteActivity({ nextCursor: "2:1780833600000" }),
       );
       return true;
     case "users/activity/list":
@@ -161,7 +161,7 @@ async function handleRpcRequest({ request, response, url }) {
         response,
         input?.cursor
           ? buildActivity()
-          : buildFavoriteActivity({ nextCursor: 1 }),
+          : buildFavoriteActivity({ nextCursor: "2:1780833600000" }),
       );
       return true;
     case "entities/list":

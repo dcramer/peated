@@ -6,6 +6,7 @@ import ActivityList, {
   filterFavoriteActivity,
 } from "@peated/web/components/activityList";
 import EmptyActivity from "@peated/web/components/emptyActivity";
+import { profileActivityQueryKeys } from "@peated/web/lib/activityQueryKeys";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
@@ -20,10 +21,10 @@ export default function UserActivityPage(props: {
   const orpc = useORPC();
   const { data: activity } = useSuspenseQuery(
     queryOptions({
-      queryKey: ["profile-activity", username, "favorites-hidden"],
+      queryKey: profileActivityQueryKeys.list(username),
       queryFn: async () => {
         const results = [];
-        let cursor: number | undefined;
+        let cursor: string | undefined;
         let fetchedPageCount = 0;
 
         do {

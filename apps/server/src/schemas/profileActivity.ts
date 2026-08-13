@@ -3,16 +3,27 @@ import { CollectionBottleSchema, CollectionSchema } from "./collections";
 import { TastingSchema } from "./tastings";
 import { UserSchema } from "./users";
 
-export const ActivityTastingEntrySchema = z.object({
+export const ActivityTastingSessionEntrySchema = z.object({
   id: z.string().describe("Stable activity entry identifier"),
-  type: z.literal("tasting"),
+  type: z.literal("tasting_session"),
   priority: z.literal("primary"),
-  createdAt: z
+  startedAt: z
     .string()
     .datetime()
     .readonly()
-    .describe("Timestamp used to order this activity entry"),
-  tasting: TastingSchema.describe("Tasting represented by this activity entry"),
+    .describe("Timestamp of the first tasting in this session"),
+  lastActivityAt: z
+    .string()
+    .datetime()
+    .readonly()
+    .describe("Timestamp of the latest tasting in this session"),
+  createdBy: UserSchema.readonly().describe(
+    "User who created the tastings in this session",
+  ),
+  tastings: z
+    .array(TastingSchema)
+    .min(1)
+    .describe("Tastings represented by this activity session"),
 });
 
 export const ActivityCollectionSchema = CollectionSchema.extend({
@@ -56,11 +67,28 @@ export const ActivityCollectionAddEntrySchema = z.object({
 });
 
 export const ActivityEntrySchema = z.discriminatedUnion("type", [
-  ActivityTastingEntrySchema,
+  ActivityTastingSessionEntrySchema,
   ActivityCollectionAddEntrySchema,
 ]);
 
-export const ProfileTastingActivitySchema = ActivityTastingEntrySchema;
+export const ActivityCursorSchema = z.object({
+  nextCursor: z
+    .string()
+    .nullable()
+    .describe("Opaque cursor for the next page of activity"),
+  prevCursor: z
+    .string()
+    .nullable()
+    .describe("Opaque cursor for the previous page of activity"),
+});
+
+export const ActivityListResponseSchema = z.object({
+  results: z.array(ActivityEntrySchema),
+  rel: ActivityCursorSchema,
+});
+
+export const ProfileTastingSessionActivitySchema =
+  ActivityTastingSessionEntrySchema;
 export const ProfileCollectionActivityCollectionSchema =
   ActivityCollectionSchema;
 export const ProfileCollectionAddActivitySchema =
