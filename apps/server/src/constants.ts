@@ -28,6 +28,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "decadentdrinks",
   "gordonmacphail",
   "healthyspirits",
+  "kilchoman",
   "northstarspirits",
   "reservebar",
   "smws",

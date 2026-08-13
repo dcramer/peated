@@ -1450,6 +1450,13 @@
       "when": 1786578980383,
       "tag": "0206_concerned_invisible_woman",
       "breakpoints": false
+    },
+    {
+      "idx": 207,
+      "version": "7",
+      "when": 1786580263649,
+      "tag": "0207_windy_stone_men",
+      "breakpoints": false
     }
   ]
 }
