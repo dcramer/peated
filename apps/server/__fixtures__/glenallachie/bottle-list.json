@@ -1,0 +1,118 @@
+{
+  "products": [
+    {
+      "title": "The GlenAllachie 12 Year Old",
+      "handle": "the-glenallachie-12-year-old",
+      "body_html": "<p>Our flagship single malt.</p>",
+      "product_type": "Single Malt Scotch Whisky",
+      "tags": ["glenallachie"],
+      "images": [{"src": "https://cdn.shopify.com/s/files/glenallachie-12.png"}],
+      "variants": [{"available": true, "price": "54.99"}]
+    },
+    {
+      "title": "Online-Exclusive 3.0 2021 Chinquapin Virgin Oak Barrel #2300",
+      "handle": "online-exclusive-3-0-chinquapin-virgin-oak",
+      "body_html": "<p>A heavily peated single malt.</p>",
+      "product_type": "Peated Single Malt Whisky",
+      "tags": ["meikle toir", "online exclusive"],
+      "images": [{"src": "https://cdn.shopify.com/s/files/meikle-toir-exclusive.png"}],
+      "variants": [{"available": true, "price": "69.99"}]
+    },
+    {
+      "title": "White Heather 15 Year Old",
+      "handle": "white-heather-15-year-old",
+      "body_html": "<p>Blended Scotch whisky.</p>",
+      "product_type": "Blended Scotch Whisky",
+      "tags": [],
+      "images": [{"src": "https://cdn.shopify.com/s/files/white-heather-15.png"}],
+      "variants": [{"available": true, "price": "49"}]
+    },
+    {
+      "title": "MacNair’s Lum Reek 10 Year Old Cask Strength",
+      "handle": "macnairs-lum-reek-10-year-old-cask-strength",
+      "body_html": "<p>Blended malt whisky in a 70cl bottle.</p>",
+      "product_type": "Blended Malt Whisky",
+      "tags": [],
+      "images": [{"src": "https://shop.theglenallachie.com/cdn/shop/files/lum-reek-10.png"}],
+      "variants": [{"available": true, "price": "62.50"}]
+    },
+    {
+      "title": "The GlenAllachie 18 Year Old",
+      "handle": "the-glenallachie-18-year-old",
+      "body_html": "",
+      "product_type": "Single Malt Scotch Whisky",
+      "tags": [],
+      "images": [{"src": "https://cdn.shopify.com/s/files/glenallachie-18.png"}],
+      "variants": [{"available": false, "price": "94.99"}]
+    },
+    {
+      "title": "Meikle Tòir The Original Miniature 5cl",
+      "handle": "meikle-toir-the-original-miniature",
+      "body_html": "",
+      "product_type": "Peated Single Malt Whisky",
+      "tags": ["meikle toir"],
+      "images": [{"src": "https://cdn.shopify.com/s/files/meikle-toir-miniature.png"}],
+      "variants": [{"available": true, "price": "6.50"}]
+    },
+    {
+      "title": "MacNair’s Exploration Rum",
+      "handle": "macnairs-exploration-rum",
+      "body_html": "",
+      "product_type": "Rum",
+      "tags": [],
+      "images": [{"src": "https://cdn.shopify.com/s/files/rum.png"}],
+      "variants": [{"available": true, "price": "49.99"}]
+    },
+    {
+      "title": "Mystery 10 Year Old",
+      "handle": "mystery-10-year-old",
+      "body_html": "",
+      "product_type": "Single Malt Scotch Whisky",
+      "tags": [],
+      "images": [{"src": "https://cdn.shopify.com/s/files/mystery.png"}],
+      "variants": [{"available": true, "price": "60.00"}]
+    },
+    {
+      "title": "The GlenAllachie Variant Release",
+      "handle": "the-glenallachie-variant-release",
+      "body_html": "",
+      "product_type": "Single Malt Scotch Whisky",
+      "tags": [],
+      "images": [{"src": "https://cdn.shopify.com/s/files/variant-release.png"}],
+      "variants": [
+        {"available": true, "price": "50.00"},
+        {"available": true, "price": "60.00"}
+      ]
+    },
+    {
+      "title": "The GlenAllachie Special Edition 500ml",
+      "handle": "the-glenallachie-special-edition",
+      "body_html": "",
+      "product_type": "Single Malt Scotch Whisky",
+      "tags": [],
+      "images": [{"src": "https://cdn.shopify.com/s/files/special-edition.png"}],
+      "variants": [{"available": true, "price": "45.00"}]
+    },
+    {
+      "title": "The GlenAllachie Invalid Price",
+      "handle": "the-glenallachie-invalid-price",
+      "body_html": "",
+      "product_type": "Single Malt Scotch Whisky",
+      "tags": [],
+      "images": [{"src": "https://cdn.shopify.com/s/files/invalid-price.png"}],
+      "variants": [{"available": true, "price": "free"}]
+    },
+    {
+      "title": "The GlenAllachie Invalid Image",
+      "handle": "the-glenallachie-invalid-image",
+      "body_html": "",
+      "product_type": "Single Malt Scotch Whisky",
+      "tags": [],
+      "images": [{"src": "https://example.com/not-official.png"}],
+      "variants": [{"available": true, "price": "55.00"}]
+    },
+    {
+      "title": "Broken Product"
+    }
+  ]
+}
