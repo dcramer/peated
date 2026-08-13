@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottles, entities, storePrices } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottles,
+  entities,
+  storePrices,
+} from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { and, eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -85,6 +90,42 @@ describe("handleBottle", () => {
     expect(matchingBottles).toHaveLength(1);
     expect(matchingBottles[0]).toMatchObject({
       description: "Updated description",
+    });
+  });
+
+  it("treats an SMWS subtitle rename as an alias for the same cask", async () => {
+    const society = "The Scotch Malt Whisky Society";
+    const originalName = "35.331 Ultra hoggie";
+    const renamedName = "35.331 Citrus on the sea";
+    const sharedInput = {
+      brand: { name: society },
+      bottler: { name: society },
+      statedAge: 9,
+      abv: 60.2,
+      singleCask: true,
+      category: "single_malt" as const,
+    };
+
+    await handleBottle({ ...sharedInput, name: originalName });
+    const [original] = await db.select().from(bottles);
+    expect(original).toBeDefined();
+
+    await handleBottle({ ...sharedInput, name: renamedName });
+
+    const persisted = await db.select().from(bottles);
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0]).toMatchObject({
+      id: original!.id,
+      name: expect.stringContaining(renamedName),
+    });
+    expect(
+      await db
+        .select({ bottleId: bottleAliases.bottleId, name: bottleAliases.name })
+        .from(bottleAliases)
+        .where(eq(bottleAliases.bottleId, original!.id)),
+    ).toContainEqual({
+      bottleId: original!.id,
+      name: original!.fullName,
     });
   });
 

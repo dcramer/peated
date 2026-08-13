@@ -129,7 +129,9 @@ function rowHasSmwsCode(
 /**
  * Finds an equivalent SMWS reference outside the Bottles replaced atomically.
  * The per-code transaction advisory lock serializes create/update decisions
- * until the caller's transaction completes.
+ * until the caller's transaction completes. SMWS subtitles are mutable names:
+ * the cask code owns the Bottle, and canonical updates preserve old names as
+ * aliases rather than creating another Bottle for a renamed subtitle.
  */
 export async function findConflictingSmwsBottleId(
   tx: AnyTransaction,

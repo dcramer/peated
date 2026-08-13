@@ -268,7 +268,7 @@ function summarizeExternalSiteRunError(error: unknown): string {
       return error.message;
     }
   }
-  return "Unexpected scraper failure. See Sentry using this run id.";
+  return "Unexpected scraper failure. See Sentry for this run.";
 }
 
 export function createExternalSiteRunJob(
@@ -311,19 +311,23 @@ export function createExternalSiteRunJob(
 
     if (!run) return;
 
-    return Sentry.withScope(async (scope) => {
-      scope.setContext("externalSiteRun", { id: run.id, site: siteType });
-      try {
-        const itemCount = await scrape();
-        await completeExternalSiteRun({ run, status: "succeeded", itemCount });
-      } catch (error) {
-        await completeExternalSiteRun({
-          run,
-          status: "failed",
-          error: summarizeExternalSiteRunError(error),
-        });
-        throw error;
-      }
+    // The worker registry owns error capture after this handler rejects, so
+    // correlation must live on its job isolation scope rather than a child
+    // scope that would close before the exception reaches that boundary.
+    Sentry.getIsolationScope().setContext("externalSiteRun", {
+      id: run.id,
+      site: siteType,
     });
+    try {
+      const itemCount = await scrape();
+      await completeExternalSiteRun({ run, status: "succeeded", itemCount });
+    } catch (error) {
+      await completeExternalSiteRun({
+        run,
+        status: "failed",
+        error: summarizeExternalSiteRunError(error),
+      });
+      throw error;
+    }
   };
 }

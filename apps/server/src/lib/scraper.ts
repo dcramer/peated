@@ -187,6 +187,9 @@ export async function handleBottle(
     resultBottle = (await createBottleAsPeated(createInput)).bottle;
   } catch (error) {
     if (!(error instanceof BottleAlreadyExistsError)) throw error;
+    // An SMWS cask code outlives its mutable subtitle. Reuse its Bottle id;
+    // the update boundary makes the new title canonical and retains the old
+    // canonical title as an alias.
     resultBottle = (
       await updateBottleAsPeated({
         bottleId: error.bottleId,
