@@ -36,7 +36,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
       "Use the most prominent consumer-facing brand on the label.",
       "For official single-distillery releases, `brand` is often the distillery name, but not always.",
       "Keep the consumer-facing brand even when the actual distillery is a different or longer name, such as `Jura` bottled at `Isle of Jura` or `Ledaig` bottled at `Tobermory`.",
-      "For independent bottlings, `brand` is usually the bottler label and the actual producer belongs in `distillery`.",
+      "For independent bottlings, use the bottler label as `brand` only when that label is also the consumer-facing Brand. Keep a distinct consumer-facing label as `brand`, put the independent bottler in `bottler`, and put the actual producer in `distillery`.",
     ],
   },
   {

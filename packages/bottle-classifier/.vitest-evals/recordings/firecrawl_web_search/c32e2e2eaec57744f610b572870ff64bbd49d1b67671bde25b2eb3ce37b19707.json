@@ -1,0 +1,68 @@
+{
+  "writtenAt": "2026-08-13T00:27:00.974Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:decadent-drinks.com \"Whiskyland Twenty Nine\" Glenturret",
+      "\"Whiskyland Twenty Nine\" \"Glenturret\" \"35\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:decadent-drinks.com \"Whiskyland Twenty Nine\" Glenturret",
+        "summary": "[Skip to main content](https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old#main-content)\n\n# Shop\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion in the nick of time and marvel at its soft, generous waxiness, its phantasmagoric mineral properties, its luscious white and yellow fruit notes and its general old school glory. WL29 - Glenturret - Front. Whiskyland Twenty Nine Glenturret 35 years old. £350.00 incVAT (£291.67 exVAT). DD - Ardmore 27 - Front. Decadent Drams Ardmore 27 ... Whiskyland Twenty Nine Glenturret 35 ye",
+        "results": [
+          {
+            "title": "Whiskyland Twenty Nine Glenturret 35 years old",
+            "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+            "domain": "decadent-drinks.com",
+            "description": "[Skip to main content](https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old#main-content)\n\n# Shop\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky, Cognac and more....",
+            "url": "https://decadent-drinks.com/shop?category%5B52%5D=52&category%5B53%5D=53&category%5B5%5D=5&category%5B6%5D=6",
+            "domain": "decadent-drinks.com",
+            "description": "WL29 - Glenturret - Front. Whiskyland Twenty Nine Glenturret 35 years old. £350.00 incVAT (£291.67 exVAT). DD - Ardmore 27 - Front. Decadent Drams Ardmore 27 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky, Cognac and more....",
+            "url": "https://decadent-drinks.com/shop?page=1",
+            "domain": "decadent-drinks.com",
+            "description": "Whiskyland Twenty Nine Glenturret 35 years old. £350.00 incVAT (£291.67 exVAT) ... Decadent Drams Glenturret 12 years old. £95.00 incVAT (£79.17 exVAT). 1 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shop",
+            "url": "https://decadent-drinks.com/shop/brand/whiskyland",
+            "domain": "decadent-drinks.com",
+            "description": "WL29 - Glenturret - Front · Whiskyland Twenty Nine Glenturret 35 years old. 41.5% ABV. £350.00 (£291.67 exvat). Quantity. 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. WL31- ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Whiskyland Twenty Nine\" \"Glenturret\" \"35\"",
+        "summary": "Whiskyland Twenty Nine Glenturret 35 years old. £350.00 incVAT (£291.67 exVAT) ... Decadent Drams Glenturret 12 years old. £95.00 incVAT (£79.17 exVAT). 1 ...",
+        "results": [
+          {
+            "title": "Whisky, Cognac and more....",
+            "url": "https://decadent-drinks.com/shop?page=1",
+            "domain": "decadent-drinks.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "c32e2e2eaec57744f610b572870ff64bbd49d1b67671bde25b2eb3ce37b19707",
+    "mode": "auto"
+  }
+}

@@ -607,21 +607,30 @@ function sanitizeProposedBottleDraft(
   proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>,
   resolvedEntitiesById: Map<number, EntityResolution>,
 ): NonNullable<BottleClassificationDecision["proposedBottle"]> {
+  const brand = sanitizeResolvedEntityChoice(
+    proposedBottle.brand,
+    "brand",
+    resolvedEntitiesById,
+  );
+  const series = proposedBottle.series
+    ? {
+        ...proposedBottle.series,
+        id: null,
+      }
+    : null;
+
   return {
     ...proposedBottle,
     category:
       proposedBottle.category === "spirit" ? null : proposedBottle.category,
-    series: proposedBottle.series
-      ? {
-          ...proposedBottle.series,
-          id: null,
-        }
-      : null,
-    brand: sanitizeResolvedEntityChoice(
-      proposedBottle.brand,
-      "brand",
-      resolvedEntitiesById,
-    ),
+    // A Series is subordinate to its Brand and cannot repeat the Brand itself.
+    series:
+      series &&
+      normalizeEntityChoiceName(series.name) !==
+        normalizeEntityChoiceName(brand.name)
+        ? series
+        : null,
+    brand,
     distillers: proposedBottle.distillers.map((distiller) =>
       sanitizeResolvedEntityChoice(
         distiller,

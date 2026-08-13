@@ -1280,7 +1280,7 @@ describe("createBottleClassifier", () => {
       brand: "Bothan",
       bottler: "Alexander Murray & Co",
       expression: "Bourbon Cask",
-      series: null,
+      series: "Whiskyland",
       distillery: ["Unknown Lowland Distillery"],
       category: "single_malt",
       stated_age: null,
@@ -1344,6 +1344,11 @@ describe("createBottleClassifier", () => {
       limit: 5,
     });
     expect(searchEntities).toHaveBeenCalledWith({
+      query: "Whiskyland",
+      type: "brand",
+      limit: 5,
+    });
+    expect(searchEntities).toHaveBeenCalledWith({
       query: "Alexander Murray & Co",
       type: "bottler",
       limit: 5,
@@ -1362,6 +1367,16 @@ describe("createBottleClassifier", () => {
             retrievedFor: [
               {
                 query: "Bothan",
+                requestedType: "brand",
+              },
+            ],
+          }),
+          expect.objectContaining({
+            name: "Whiskyland",
+            type: ["brand"],
+            retrievedFor: [
+              {
+                query: "Whiskyland",
                 requestedType: "brand",
               },
             ],

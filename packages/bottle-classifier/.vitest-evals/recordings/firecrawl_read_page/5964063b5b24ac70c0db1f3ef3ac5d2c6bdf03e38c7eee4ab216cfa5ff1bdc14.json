@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-13T00:24:38.674Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+    "focus": "Exact marketed Whiskyland release title/edition, distillation vintage, age, ABV, category, and bottler identity."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Exact marketed Whiskyland release title/edition, distillation vintage, age, ABV, category, and bottler identity.",
+    "summary": "[Skip to main content](https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old#main-content)\n\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion in the nick of time and marvel at its soft, generous waxiness, its phantasmagoric mineral properties, its luscious white and yellow fruit notes and its general old school glory.\n\n£350.00 (£291.67 exvat)",
+    "results": [
+      {
+        "title": "Whiskyland Twenty Nine Glenturret 35 years old | Decadent Drinks",
+        "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+        "domain": "decadent-drinks.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5964063b5b24ac70c0db1f3ef3ac5d2c6bdf03e38c7eee4ab216cfa5ff1bdc14",
+    "mode": "auto"
+  }
+}
