@@ -4,62 +4,45 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
-import { load as cheerio } from "cheerio";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  decodeWooCommerceText,
+  parseWooCommercePrice,
+  scrapeWooCommerceProducts,
+  WooCommerceImageSchema,
+  WooCommercePriceSchema,
+  WooCommerceProductSchema,
+} from "@peated/server/lib/woocommerce";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "cadenheads";
 
-const CadenheadsProductsSchema = z.array(
-  z
-    .object({
-      name: z.string().trim().min(1),
-      permalink: z.string().url(),
-      prices: z
-        .object({
-          price: z.string().regex(/^\d+$/),
-          currency_code: z.literal("GBP"),
-          currency_minor_unit: z.literal(2),
-        })
-        .passthrough(),
-      images: z.array(
-        z
-          .object({
-            src: z.string().url(),
-          })
-          .passthrough(),
-      ),
-      attributes: z.array(
-        z
-          .object({
-            taxonomy: z.string(),
-            terms: z.array(
-              z
-                .object({
-                  name: z.string().trim().min(1),
-                })
-                .passthrough(),
-            ),
-          })
-          .passthrough(),
-      ),
-      is_in_stock: z.boolean(),
-      is_purchasable: z.boolean(),
-    })
-    // WooCommerce adds extension fields that are irrelevant to this parser.
-    .passthrough(),
-);
+const CadenheadsProductSchema = WooCommerceProductSchema.extend({
+  permalink: z.string().url(),
+  prices: WooCommercePriceSchema.extend({
+    price: z.string().regex(/^\d+$/),
+    currency_code: z.literal("GBP"),
+    currency_minor_unit: z.literal(2),
+  }),
+  images: z.array(WooCommerceImageSchema),
+  attributes: z.array(
+    z
+      .object({
+        taxonomy: z.string(),
+        terms: z.array(
+          z
+            .object({
+              name: z.string().trim().min(1),
+            })
+            .passthrough(),
+        ),
+      })
+      .passthrough(),
+  ),
+});
 
-function decodeProductName(value: string): string {
-  const $ = cheerio(`<span>${value}</span>`);
-  return $("span").text().trim();
-}
-
-function parsePrice(value: string): number | null {
-  const price = Number.parseInt(value, 10);
-  return Number.isSafeInteger(price) && price > 0 ? price : null;
-}
+const CadenheadsProductsSchema = z.array(CadenheadsProductSchema);
 
 function parseVolume(amountRaw: string, unit = "ml"): number | null {
   const amount = Number.parseFloat(amountRaw);
@@ -98,10 +81,10 @@ export function parseCadenheadsProducts(input: unknown): StorePrice[] {
   for (const product of payload) {
     if (!product.is_in_stock || !product.is_purchasable) continue;
 
-    const price = parsePrice(product.prices.price);
+    const price = parseWooCommercePrice(product.prices.price);
     if (price === null) continue;
 
-    const rawName = decodeProductName(product.name);
+    const rawName = decodeWooCommerceText(product.name);
     const volume = extractVolume(product, rawName);
     if (volume === null || !ALLOWED_VOLUMES.includes(volume)) {
       logScrapeWarning(SITE, "Invalid product size", { rawName, volume });
@@ -126,9 +109,7 @@ export function parseCadenheadsProducts(input: unknown): StorePrice[] {
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseCadenheadsProducts(JSON.parse(data));
-  await Promise.all(products.map(cb));
+  return scrapeWooCommerceProducts(url, cb, parseCadenheadsProducts);
 }
 
 export default async function scrapeCadenheads({

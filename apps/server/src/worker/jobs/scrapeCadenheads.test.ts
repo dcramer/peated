@@ -7,6 +7,10 @@ process.env.DISABLE_HTTP_CACHE = "1";
 
 const firstPageUrl =
   "https://www.cadenhead.shop/wp-json/wc/store/v1/products?category=whisky&per_page=100&stock_status=instock&page=1";
+const secondPageUrl =
+  "https://www.cadenhead.shop/wp-json/wc/store/v1/products?category=whisky&per_page=100&stock_status=instock&page=2";
+const thirdPageUrl =
+  "https://www.cadenhead.shop/wp-json/wc/store/v1/products?category=whisky&per_page=100&stock_status=instock&page=3";
 
 test("routes the Cadenhead's source to its scraper job", () => {
   expect(getJobForSite("cadenheads")).toBe("ScrapeCadenheads");
@@ -54,13 +58,28 @@ test("paginates a dry run and stops after an empty page", async ({
 }) => {
   const result = await loadFixture("cadenheads", "bottle-list.json");
   axiosMock.onGet(firstPageUrl).reply(200, result);
-  axiosMock
-    .onGet(
-      "https://www.cadenhead.shop/wp-json/wc/store/v1/products?category=whisky&per_page=100&stock_status=instock&page=2",
-    )
-    .reply(200, []);
+  axiosMock.onGet(secondPageUrl).reply(200, []);
 
   await expect(scrapeCadenheads({ dryRun: true })).resolves.toBe(2);
+});
+
+test("continues after a page whose products are all filtered", async ({
+  axiosMock,
+}) => {
+  const result: Array<{ name?: unknown }> = JSON.parse(
+    await loadFixture("cadenheads", "bottle-list.json"),
+  );
+  const filteredProduct = result.find(
+    (product) => product.name === "Unavailable Tullibardine 11yo 70cl",
+  );
+  expect(filteredProduct).toBeDefined();
+
+  axiosMock.onGet(firstPageUrl).reply(200, [filteredProduct]);
+  axiosMock.onGet(secondPageUrl).reply(200, result);
+  axiosMock.onGet(thirdPageUrl).reply(200, []);
+
+  await expect(scrapeCadenheads({ dryRun: true })).resolves.toBe(2);
+  expect(axiosMock.history.get).toHaveLength(3);
 });
 
 test("fails when a complete scrape yields no supported listings", async ({

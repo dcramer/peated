@@ -4,56 +4,21 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
-import { load as cheerio } from "cheerio";
-import { z } from "zod";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  decodeWooCommerceText,
+  getWooCommerceProductName,
+  parseWooCommercePrice,
+  scrapeWooCommerceProducts,
+  WooCommerceCatalogSchema,
+  WooCommerceImageSchema,
+  WooCommerceProductSchema,
+} from "@peated/server/lib/woocommerce";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "thompsonbros";
 const STORE_ORIGIN = "https://www.thompsonbrosdistillers.com";
 const CATALOG_URL = `${STORE_ORIGIN}/wp-json/wc/store/v1/products?category=18&per_page=100&stock_status=instock`;
-
-const ThompsonBrosCatalogSchema = z.array(z.unknown());
-
-const ThompsonBrosProductSchema = z
-  .object({
-    name: z.string().trim().min(1),
-    permalink: z.string().trim().min(1),
-    prices: z
-      .object({
-        price: z.string(),
-        currency_code: z.string(),
-        currency_minor_unit: z.number().int(),
-      })
-      .passthrough(),
-    images: z.array(z.unknown()),
-    is_in_stock: z.boolean(),
-    is_purchasable: z.boolean(),
-  })
-  // WooCommerce adds extension fields that are irrelevant to this parser.
-  .passthrough();
-
-const ProductImageSchema = z
-  .object({
-    src: z.string().url(),
-  })
-  .passthrough();
-
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("name" in input)) return null;
-  return typeof input.name === "string" ? input.name : null;
-}
-
-function decodeProductName(value: string): string {
-  const $ = cheerio(`<span>${value}</span>`);
-  return $("span").text().trim();
-}
-
-function parsePrice(value: string): number | null {
-  if (!/^\d+$/.test(value)) return null;
-  const price = Number.parseInt(value, 10);
-  return Number.isSafeInteger(price) && price > 0 ? price : null;
-}
 
 function parseVolume(name: string): number | null {
   const match = name.match(/\b(\d+(?:\.\d+)?)\s*(ml|cl|l)\b/i);
@@ -78,7 +43,7 @@ function getProductUrl(value: string): string | null {
 function getImageUrl(value: unknown, rawName: string): string | null {
   if (value === undefined) return null;
 
-  const result = ProductImageSchema.safeParse(value);
+  const result = WooCommerceImageSchema.safeParse(value);
   if (!result.success) {
     logScrapeWarning(SITE, "Invalid product image URL", { rawName });
     return null;
@@ -87,14 +52,14 @@ function getImageUrl(value: unknown, rawName: string): string | null {
 }
 
 export function parseThompsonBrosProducts(input: unknown): StorePrice[] {
-  const payload = ThompsonBrosCatalogSchema.parse(input);
+  const payload = WooCommerceCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 
   for (const productInput of payload) {
-    const productResult = ThompsonBrosProductSchema.safeParse(productInput);
+    const productResult = WooCommerceProductSchema.safeParse(productInput);
     if (!productResult.success) {
       logScrapeWarning(SITE, "Invalid product record", {
-        rawName: getRawName(productInput),
+        rawName: getWooCommerceProductName(productInput),
       });
       continue;
     }
@@ -102,7 +67,7 @@ export function parseThompsonBrosProducts(input: unknown): StorePrice[] {
     const product = productResult.data;
     if (!product.is_in_stock || !product.is_purchasable) continue;
 
-    const rawName = decodeProductName(product.name);
+    const rawName = decodeWooCommerceText(product.name);
     if (/\brum\b/i.test(rawName)) continue;
 
     const productUrl = getProductUrl(product.permalink);
@@ -123,7 +88,7 @@ export function parseThompsonBrosProducts(input: unknown): StorePrice[] {
     const price =
       product.prices.currency_code === "GBP" &&
       product.prices.currency_minor_unit === 2
-        ? parsePrice(product.prices.price)
+        ? parseWooCommercePrice(product.prices.price)
         : null;
     if (price === null) {
       logScrapeWarning(SITE, "Invalid product price", {
@@ -155,9 +120,7 @@ export function parseThompsonBrosProducts(input: unknown): StorePrice[] {
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseThompsonBrosProducts(JSON.parse(data));
-  await Promise.all(products.map(cb));
+  return scrapeWooCommerceProducts(url, cb, parseThompsonBrosProducts);
 }
 
 export default async function scrapeThompsonBros({
