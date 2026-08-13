@@ -5,6 +5,7 @@ import type { JobsOptions } from "bullmq";
 import { Worker } from "bullmq";
 import IORedis from "ioredis";
 import config from "../config";
+import { syncExternalSites } from "../lib/externalSites";
 import { logError, logInfo } from "../lib/log";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
@@ -124,6 +125,8 @@ export async function gracefulShutdown(signal?: string, worker?: Worker) {
 }
 
 export async function runWorker() {
+  await syncExternalSites();
+
   // dont run the scraper in dev
   if (config.ENV === "production") {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);

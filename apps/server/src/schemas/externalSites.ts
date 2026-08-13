@@ -42,17 +42,3 @@ export const ExternalSiteHealthSchema = ExternalSiteSchema.extend({
   latestRun: ExternalSiteRunSchema.nullable(),
   lastSucceededAt: z.string().datetime().nullable(),
 });
-
-export const ExternalSiteInputSchema = z.object({
-  type: ExternalSiteTypeEnum.describe("Type of external site"),
-  name: z
-    .string()
-    .trim()
-    .min(1, "Required")
-    .describe("Name of the external site"),
-  runEvery: z
-    .number()
-    .nullable()
-    .default(null)
-    .describe("Interval in minutes between runs"),
-});

@@ -22,35 +22,44 @@ export const CATEGORY_LIST = [
 
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
-export const EXTERNAL_SITE_TYPE_LIST = [
-  "astorwines",
-  "berrybrosrudd",
-  "bruichladdich",
-  "cadenheads",
-  "compassbox",
-  "decadentdrinks",
-  "douglaslaing",
-  "dramfool",
-  "edradour",
-  "finedrams",
-  "glenallachie",
-  "gordonmacphail",
-  "healthyspirits",
-  "kilchoman",
-  "masterofmalt",
-  "missionliquor",
-  "ncnean",
-  "northstarspirits",
-  "reservebar",
-  "singlecasknation",
-  "smws",
-  "smwsa",
-  "thompsonbros",
-  "totalwine",
-  "woodencork",
-  "whiskyadvocate",
-  "whiskyworld",
-] as const;
+export const EXTERNAL_SITE_DEFINITIONS = {
+  astorwines: { name: "Astor Wines", runEvery: 1440 },
+  berrybrosrudd: { name: "Berry Bros. & Rudd", runEvery: 10080 },
+  bruichladdich: { name: "Bruichladdich", runEvery: 10080 },
+  cadenheads: { name: "Cadenheads", runEvery: 10080 },
+  compassbox: { name: "Compass Box", runEvery: 10080 },
+  decadentdrinks: { name: "Decadent Drinks", runEvery: 10080 },
+  douglaslaing: { name: "Douglas Laing", runEvery: 10080 },
+  dramfool: { name: "Dramfool", runEvery: 10080 },
+  edradour: { name: "Edradour", runEvery: 10080 },
+  finedrams: { name: "Fine Drams", runEvery: 1440 },
+  glenallachie: { name: "The GlenAllachie", runEvery: 10080 },
+  gordonmacphail: { name: "Gordon Macphail", runEvery: 10080 },
+  healthyspirits: { name: "Healthy Spirits", runEvery: 1440 },
+  kilchoman: { name: "Kilchoman", runEvery: 10080 },
+  masterofmalt: { name: "Master of Malt", runEvery: 1440 },
+  missionliquor: { name: "Mission Liquor", runEvery: 1440 },
+  ncnean: { name: "Nc'nean", runEvery: 10080 },
+  northstarspirits: { name: "North Star", runEvery: 10080 },
+  reservebar: { name: "ReserveBar", runEvery: 1440 },
+  singlecasknation: { name: "Single Cask Nation", runEvery: 10080 },
+  smws: { name: "The Scotch Malt Whisky Society", runEvery: 1440 },
+  smwsa: {
+    name: "The Scotch Malt Whisky Society (America)",
+    runEvery: 1440,
+  },
+  thompsonbros: { name: "Thompson Bros.", runEvery: 10080 },
+  totalwine: { name: "Total Wines", runEvery: 1440 },
+  woodencork: { name: "Wooden Cork", runEvery: 1440 },
+  whiskyadvocate: { name: "Whisky Advocate", runEvery: 21600 },
+  whiskyworld: { name: "The Whisky World", runEvery: 1440 },
+} as const;
+
+type ExternalSiteDefinitionType = keyof typeof EXTERNAL_SITE_DEFINITIONS;
+
+export const EXTERNAL_SITE_TYPE_LIST = Object.keys(
+  EXTERNAL_SITE_DEFINITIONS,
+) as [ExternalSiteDefinitionType, ...ExternalSiteDefinitionType[]];
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 

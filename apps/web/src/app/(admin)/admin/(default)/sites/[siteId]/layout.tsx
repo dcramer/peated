@@ -141,7 +141,6 @@ export default function Layout(props: {
         </div>
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
           <div className="flex gap-x-2">
-            <Button href={`/admin/sites/${site.type}/edit`}>Edit Site</Button>
             <TriggerJobButton siteId={site.type} />
           </div>
         </div>
