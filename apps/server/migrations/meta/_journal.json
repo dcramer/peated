@@ -1513,6 +1513,13 @@
       "when": 1786606471232,
       "tag": "0215_narrow_turbo",
       "breakpoints": false
+    },
+    {
+      "idx": 216,
+      "version": "7",
+      "when": 1786607602991,
+      "tag": "0216_hard_daimon_hellstrom",
+      "breakpoints": false
     }
   ]
 }

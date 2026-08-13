@@ -280,6 +280,152 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   });
 
+  test("passes normalized source identity to the classifier", async ({
+    fixtures,
+  }) => {
+    const { classifyBottleReference, runBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const sourceIdentity = {
+      brand: "The Gauldrons",
+      bottler: null,
+      expression: "Eclipse – Finished in Orange Wine Casks",
+      series: null,
+      distillery: null,
+      category: "blend" as const,
+      stated_age: null,
+      abv: 52.9,
+      release_year: null,
+      vintage_year: null,
+      cask_strength: null,
+      single_cask: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      edition: null,
+    };
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "The Gauldrons Eclipse",
+      imageUrl: "/media/the-gauldrons-eclipse.png",
+      sourceBottleIdentity: sourceIdentity,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "no_match",
+          rationale: "No safe local match.",
+          candidateBottleIds: [],
+          matchedBottleId: null,
+          proposedBottle: null,
+        },
+        extractedLabel: sourceIdentity,
+      }),
+    );
+
+    await resolveStorePriceMatchProposal(price.id);
+
+    expect(runBottleReference).toHaveBeenCalledWith(
+      expect.objectContaining({ extractedIdentity: sourceIdentity }),
+    );
+  });
+
+  test("auto creates a Bottle from complete structured scraper facts without web evidence", async ({
+    fixtures,
+  }) => {
+    config.AI_GATEWAY_API_KEY = undefined;
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const sourceIdentity = {
+      brand: "The Gauldrons",
+      bottler: null,
+      expression: "Eclipse – Finished in Orange Wine Casks",
+      series: null,
+      distillery: null,
+      category: "blend" as const,
+      stated_age: null,
+      abv: 52.9,
+      release_year: null,
+      vintage_year: null,
+      cask_strength: null,
+      single_cask: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      edition: null,
+    };
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "The Gauldrons Eclipse",
+      imageUrl: null,
+      sourceBottleIdentity: sourceIdentity,
+    });
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "create_new",
+          rationale: "Structured scraper facts identify a distinct Bottle.",
+          confidenceBasis: {
+            unresolvedRisks: [],
+            webEvidence: "not_needed",
+          },
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "Eclipse – Finished in Orange Wine Casks",
+            series: null,
+            category: "blend",
+            edition: null,
+            statedAge: null,
+            caskStrength: null,
+            singleCask: null,
+            abv: 52.9,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            brand: { id: null, name: "The Gauldrons" },
+            distillers: [],
+            bottler: null,
+          },
+        },
+        extractedLabel: sourceIdentity,
+        searchEvidence: [],
+        candidateBottles: [],
+        resolvedEntities: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const createdBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, proposal.suggestedBottleId!),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "create_new",
+      automationAssessment: expect.objectContaining({
+        automationEligible: true,
+        automationScore: 100,
+        automationBlockers: [],
+      }),
+    });
+    expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(createdBottle).toMatchObject({
+      name: "Eclipse – Finished in Orange Wine Casks - 52.9% ABV",
+      category: "blend",
+      abv: 52.9,
+    });
+  });
+
   test("falls back to exact candidates when embeddings fail", async ({
     fixtures,
   }) => {

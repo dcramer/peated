@@ -1,4 +1,11 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import {
+  BottleExtractedDetailsSchema,
+  type BottleExtractedDetails,
+} from "@peated/bottle-classifier/contract";
+import {
+  normalizeBottle,
+  stripDuplicateBrandPrefixFromBottleName,
+} from "@peated/bottle-classifier/normalize";
 import type {
   ScrapePricesCallback,
   StorePrice,
@@ -21,6 +28,16 @@ const SUPPORTED_VOLUME_TAGS = new Map([
   ["Vol: 50", 500],
   ["Vol: 70", 700],
 ]);
+const PRODUCT_TYPE_CATEGORIES = new Map<
+  string,
+  BottleExtractedDetails["category"]
+>([
+  ["Blended Malt", "blend"],
+  ["Blended Scotch", "blend"],
+  ["Single Grain", "single_grain"],
+  ["Single Malt", "single_malt"],
+  ["Whisky", null],
+]);
 
 const DouglasLaingProductsSchema = z
   .object({
@@ -29,6 +46,7 @@ const DouglasLaingProductsSchema = z
         .object({
           title: z.string().trim().min(1),
           handle: z.string().trim().min(1),
+          vendor: z.string().trim().min(1),
           product_type: z.string(),
           tags: z.array(z.string()),
           images: z.array(
@@ -66,6 +84,45 @@ function extractAbv(tags: string[]): number | null {
   const abvTag = tags.find((tag) => /^Abv:/i.test(tag));
   const match = abvTag?.match(/^Abv:\s*(\d+(?:\.\d+)?)$/i);
   return match ? Number.parseFloat(match[1]) : null;
+}
+
+function extractCaskFinish(tags: string[]): string | null {
+  const caskTag = tags.find((tag) => /^Cask:\s*Finished\b/i.test(tag));
+  return caskTag?.replace(/^Cask:\s*/i, "").trim() || null;
+}
+
+function buildSourceIdentity({
+  title,
+  vendor,
+  productType,
+  tags,
+}: {
+  title: string;
+  vendor: string;
+  productType: string;
+  tags: string[];
+}): BottleExtractedDetails {
+  const sourceExpression = stripDuplicateBrandPrefixFromBottleName(
+    title,
+    vendor,
+  );
+  const hasConsumerBrandEvidence = sourceExpression !== title;
+  const normalized = normalizeBottle({
+    name: sourceExpression,
+    isFullName: false,
+  });
+  const caskFinish = extractCaskFinish(tags);
+
+  return BottleExtractedDetailsSchema.parse({
+    brand: hasConsumerBrandEvidence ? vendor : null,
+    expression:
+      [normalized.name, caskFinish].filter(Boolean).join(" – ") || null,
+    category: PRODUCT_TYPE_CATEGORIES.get(productType) ?? null,
+    stated_age: normalized.statedAge,
+    abv: extractAbv(tags),
+    cask_strength: normalized.caskStrength ?? null,
+    single_cask: normalized.singleCask ?? null,
+  });
 }
 
 export function parseDouglasLaingProducts(
@@ -114,6 +171,12 @@ export function parseDouglasLaingProducts(
         `/en-us/products/${encodeURIComponent(product.handle)}`,
       ),
       imageUrl: product.images[0]?.src ?? null,
+      sourceBottleIdentity: buildSourceIdentity({
+        title: product.title,
+        vendor: product.vendor,
+        productType: product.product_type,
+        tags: product.tags,
+      }),
     };
 
     logScrapedProduct(SITE, listing);

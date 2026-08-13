@@ -1,3 +1,4 @@
+import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
 import { z } from "zod";
 import { ALLOWED_VOLUMES } from "../constants";
 import { BottleSchema } from "./bottles";
@@ -65,6 +66,9 @@ export const StorePriceInputSchema = z.object({
     .default(null)
     .optional()
     .describe("Optional URL to the product image"),
+  sourceBottleIdentity: BottleExtractedDetailsSchema.optional().describe(
+    "Optional normalized Bottle identity facts supplied by the source",
+  ),
 });
 
 export const PriceChangeSchema = z.object({

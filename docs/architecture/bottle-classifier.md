@@ -28,7 +28,8 @@ The package has three distinct contracts:
 - optional `url` and `imageUrl`
 - optional current Bottle id
 - optional trace metadata
-- optional seeded extracted identity or candidates for closed review flows
+- optional normalized source identity or seeded extracted identity, plus
+  candidates for closed review flows
 
 It returns either `ignored` with a reason, or `classified` with:
 
@@ -450,13 +451,29 @@ treat web-backed create evidence as validated.
 Source pages, snippets, search results, and retailer titles are evidence, not
 policy.
 
+Scrapers should preserve normalized identity facts supplied by their provider
+instead of forcing image extraction to rediscover them. Store-price ingestion
+persists those facts as `sourceBottleIdentity`, and price matching passes them
+through the classifier's existing `extractedIdentity` input. This boundary
+accepts only the classifier's normalized identity schema, never a provider's
+raw payload. Missing source facts remain null, and source timestamps must not
+be promoted to Bottle release years without explicit product evidence.
+
+For an unresolved store listing, Brand, expression, and a supported whisky
+category supplied through this scraper-owned contract can anchor automatic
+Bottle creation without a redundant web search. The classifier must still
+propose the Bottle without unresolved identity risks, and code blocks creation
+when populated category, age, edition, ABV, cask flags, or year facts conflict
+with the proposal. Partial identities keep the normal web or review path.
+
 The classifier does not maintain producer, critic, database, or retailer domain
 allowlists. The agent judges source quality from content, independence,
 specificity, and corroboration. Code may separate the originating listing from
 other web results; it must not infer truth from a hardcoded domain class.
 
-The originating retailer can support extraction, but it is not decisive creation
-evidence by itself.
+An originating retailer title or snippet can support extraction, but it is not
+decisive creation evidence by itself. Deliberately normalized structured facts
+emitted by a reviewed scraper use the stricter creation boundary above.
 
 For image inputs, extraction scans the complete readable label, including
 smaller secondary bands, subtitles, and neck tags, for identity-bearing edition,
@@ -472,11 +489,17 @@ entities, and live web evidence:
 - `search_entities`: local Peated brand, distillery, and bottler entities
 - `get_bottle_context`: bounded identity context for one inspected Bottle
 - `get_entity_context`: bounded identity context for one inspected Entity
-- `firecrawl_web_search`: one to three focused live searches in one agent turn,
+- `firecrawl_web_search`: one or two focused live searches in one agent turn,
   with ranked source URLs and compact relevance snippets without scraping every
   result page
-- `firecrawl_read_page`: focused reading of one promising public page when a
-  short search excerpt does not expose the identity-critical fact
+- `firecrawl_read_page`: one reserved basic-proxy read of the originating source
+  page or a promising search result when an excerpt does not expose the
+  identity-critical fact
+
+Search-query and page-read allowances are independent so discovery cannot spend
+the verification allowance. The default maximum is two search queries and one
+page read per classifier run; reducing search therefore bounds provider spend
+without making exact-page verification impossible.
 
 When Firecrawl is not configured, the agent has no web-evidence tools. The runtime
 does not silently replace it with a second model or another provider.

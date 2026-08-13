@@ -168,7 +168,7 @@ describe("bottleClassifier web search tool", () => {
     expect(onEvidence).toHaveBeenCalledWith(evidence);
   });
 
-  test("charges Firecrawl calls against the shared search budget", async () => {
+  test("charges Firecrawl calls against the search-query budget", async () => {
     const evidence = buildBottleSearchEvidence({
       provider: "firecrawl",
       query: "laphroaig cairdeas 2022 warehouse 1",
@@ -190,7 +190,7 @@ describe("bottleClassifier web search tool", () => {
 
     await tool.invoke({} as never, args);
     await expect(tool.invoke({} as never, args)).resolves.toEqual({
-      error: "Web evidence budget exhausted after 1 units",
+      error: "Web search budget exhausted after 1 query",
     });
     expect(executeWebSearch).toHaveBeenCalledOnce();
   });
@@ -234,14 +234,14 @@ describe("bottleClassifier web search tool", () => {
           }),
         ),
       ).resolves.toEqual({
-        error: "Web evidence budget exhausted after 1 units",
+        error: "Web search budget exhausted after 1 query",
       });
     } finally {
       vi.unstubAllGlobals();
     }
   });
 
-  test("runs up to three focused searches in one tool turn", async () => {
+  test("runs up to two focused searches in one tool turn", async () => {
     const fetch = vi
       .fn()
       .mockImplementation(async (_url, init: RequestInit) => {
@@ -270,7 +270,7 @@ describe("bottleClassifier web search tool", () => {
     try {
       const tool = createFirecrawlWebSearchTool({
         apiKey: "firecrawl-test-key",
-        budget: createBottleWebSearchBudget(3),
+        budget: createBottleWebSearchBudget(2),
       });
       const result = await tool.invoke(
         {} as never,
@@ -326,6 +326,7 @@ describe("bottleClassifier web search tool", () => {
       );
       const scrapeBody = JSON.parse(String(fetch.mock.calls[0]?.[1]?.body)) as {
         formats: Array<{ type: string; query: string }>;
+        proxy: string;
       };
       expect(scrapeBody.formats).toEqual([
         {
@@ -333,6 +334,7 @@ describe("bottleClassifier web search tool", () => {
           query: "Cask No. 71 vintage and ABV",
         },
       ]);
+      expect(scrapeBody.proxy).toBe("basic");
       expect(evidence).toMatchObject({
         provider: "firecrawl",
         query: "Cask No. 71 vintage and ABV",
@@ -377,6 +379,58 @@ describe("bottleClassifier web search tool", () => {
       }),
     );
     expect(onEvidence).toHaveBeenCalledWith(evidence);
+  });
+
+  test("reserves a page read after the search-query budget is spent", async () => {
+    const budget = createBottleWebSearchBudget(1);
+    const searchExecutor = vi.fn(async () => ({ evidence: [], errors: [] }));
+    const readExecutor = vi.fn(async ({ args }) =>
+      extractFirecrawlPageEvidence(
+        "url" in args ? args.url : "https://example.com/bottle",
+        "focus" in args ? args.focus : "identity",
+        {
+          success: true,
+          data: { markdown: "The bottle is 52.9% ABV." },
+        },
+      ),
+    );
+    const searchTool = createFirecrawlWebSearchTool({
+      apiKey: "firecrawl-test-key",
+      budget,
+      executeWebSearch: searchExecutor,
+    });
+    const readTool = createFirecrawlReadPageTool({
+      apiKey: "firecrawl-test-key",
+      budget,
+      executeWebSearch: readExecutor,
+    });
+
+    await searchTool.invoke(
+      {} as never,
+      JSON.stringify({ queries: ["the gauldrons eclipse 52.9"] }),
+    );
+    await expect(
+      readTool.invoke(
+        {} as never,
+        JSON.stringify({
+          url: "https://www.douglaslaing.com/products/the-gauldrons-eclipse",
+          focus: "ABV",
+        }),
+      ),
+    ).resolves.toMatchObject({ summary: "The bottle is 52.9% ABV." });
+    await expect(
+      readTool.invoke(
+        {} as never,
+        JSON.stringify({
+          url: "https://example.com/second-page",
+          focus: "release year",
+        }),
+      ),
+    ).resolves.toEqual({
+      error: "Web page-read budget exhausted after 1 page",
+    });
+    expect(searchExecutor).toHaveBeenCalledOnce();
+    expect(readExecutor).toHaveBeenCalledOnce();
   });
 
   test("caps bottle search evidence payload size", () => {

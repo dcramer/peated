@@ -16,7 +16,7 @@ import {
 const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
 const FIRECRAWL_SEARCH_TIMEOUT_MS = 30000;
 const FIRECRAWL_WEB_SEARCH_TOOL_DESCRIPTION =
-  "Search public web pages for bottle-specific evidence. Use when local catalog and supplied label evidence cannot resolve an identity-critical fact, including a disputed bottler or stored field. Run one focused query normally; use up to three query formulations together only for independent wording variants. Returns ranked source URLs, titles, and compact relevance snippets. Use firecrawl_read_page afterward when a promising result needs exact page evidence.";
+  "Search public web pages for bottle-specific evidence. Use when local catalog and supplied label evidence cannot resolve an identity-critical fact, including a disputed bottler or stored field. Run one focused query normally; use two query formulations together only when wording is genuinely uncertain. Returns ranked source URLs, titles, and compact relevance snippets. A separate page-read allowance is reserved for exact verification.";
 
 const FirecrawlSearchResultSchema = z
   .object({

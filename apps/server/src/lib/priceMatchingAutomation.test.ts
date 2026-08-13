@@ -62,7 +62,105 @@ function buildCandidate(
   };
 }
 
+function buildProposedBottle(
+  overrides: Partial<NonNullable<AssessmentInput["proposedBottle"]>> = {},
+): NonNullable<AssessmentInput["proposedBottle"]> {
+  return {
+    name: "Port Cask",
+    series: null,
+    category: "single_malt",
+    edition: null,
+    statedAge: 10,
+    caskStrength: null,
+    singleCask: null,
+    abv: 58.4,
+    vintageYear: null,
+    releaseYear: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
+    brand: { id: null, name: "Example Distillery" },
+    distillers: [{ id: null, name: "Example Distillery" }],
+    bottler: null,
+    ...overrides,
+  };
+}
+
 describe("priceMatchingAutomation", () => {
+  test("uses complete structured scraper facts as an auto-create anchor", () => {
+    const sourceBottleIdentity = buildExtractedLabel();
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "create_new",
+      modelConfidence: null,
+      price: {
+        bottleId: null,
+        name: "Example Distillery Port Cask 10 Year",
+        url: "https://example.com/port-cask",
+      },
+      suggestedBottleId: null,
+      candidateBottles: [buildCandidate({ abv: 46 })],
+      extractedLabel: sourceBottleIdentity,
+      proposedBottle: buildProposedBottle(),
+      searchEvidence: [],
+      sourceBottleIdentity,
+      hasUnresolvedRisks: false,
+    });
+
+    expect(assessment).toMatchObject({
+      automationEligible: true,
+      automationScore: 100,
+      automationBlockers: [],
+    });
+  });
+
+  test("keeps structured scraper creates in review when facts conflict or risks remain", () => {
+    const sourceBottleIdentity = buildExtractedLabel();
+    const baseInput = {
+      action: "create_new" as const,
+      modelConfidence: null,
+      price: {
+        bottleId: null,
+        name: "Example Distillery Port Cask 10 Year",
+        url: "https://example.com/port-cask",
+      },
+      suggestedBottleId: null,
+      candidateBottles: [],
+      extractedLabel: sourceBottleIdentity,
+      searchEvidence: [],
+      sourceBottleIdentity,
+    };
+
+    const conflicting = getStorePriceMatchAutomationAssessment({
+      ...baseInput,
+      proposedBottle: buildProposedBottle({ abv: 46 }),
+      hasUnresolvedRisks: false,
+    });
+    const unresolved = getStorePriceMatchAutomationAssessment({
+      ...baseInput,
+      proposedBottle: buildProposedBottle(),
+      hasUnresolvedRisks: true,
+    });
+    const partial = getStorePriceMatchAutomationAssessment({
+      ...baseInput,
+      proposedBottle: buildProposedBottle(),
+      sourceBottleIdentity: buildExtractedLabel({ category: null }),
+      hasUnresolvedRisks: false,
+    });
+
+    expect(conflicting.automationEligible).toBe(false);
+    expect(conflicting.automationBlockers).toContain(
+      "proposed Bottle conflicts with structured scraper facts (abv)",
+    );
+    expect(unresolved.automationEligible).toBe(false);
+    expect(unresolved.automationBlockers).toContain(
+      "classifier reported unresolved identity risks",
+    );
+    expect(partial.automationEligible).toBe(false);
+    expect(partial.automationBlockers).toContain(
+      "no web evidence validated this bottle",
+    );
+  });
+
   test("treats exact ABV as a decisive positive signal for strong existing matches", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",

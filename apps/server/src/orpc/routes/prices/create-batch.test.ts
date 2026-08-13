@@ -231,6 +231,66 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
+  test("persists and refreshes normalized source identity", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({
+      type: "douglaslaing",
+    });
+    const listing = {
+      name: "The Gauldrons Eclipse",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 700,
+      url: "https://www.douglaslaing.com/en-us/products/the-gauldrons-eclipse",
+      sourceBottleIdentity: {
+        brand: "The Gauldrons",
+        expression: "Eclipse – Finished in Orange Wine Casks",
+        category: "blend" as const,
+        abv: 52.9,
+      },
+    };
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [listing],
+    });
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          ...listing,
+          sourceBottleIdentity: { ...listing.sourceBottleIdentity, abv: 53 },
+        },
+      ],
+    });
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          ...listing,
+          price: 7_300,
+          sourceBottleIdentity: undefined,
+        },
+      ],
+    });
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject({
+      sourceBottleIdentity: {
+        brand: "The Gauldrons",
+        bottler: null,
+        expression: "Eclipse – Finished in Orange Wine Casks",
+        category: "blend",
+        abv: 53,
+        release_year: null,
+      },
+    });
+  });
+
   test("uses an identity-preserving alias key as an exact match", async ({
     fixtures,
   }) => {
