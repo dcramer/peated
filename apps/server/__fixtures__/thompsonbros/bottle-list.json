@@ -1,0 +1,118 @@
+[
+  {
+    "name": "Glen Scotia Single Malt Scotch Whisky, 2013, 12 Year Old, 70CL, 56.7%ABV",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/glen-scotia-2013/",
+    "prices": {
+      "price": "5833",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [
+      {
+        "src": "https://www.thompsonbrosdistillers.com/wp-content/uploads/glen-scotia.png"
+      }
+    ],
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "provider_extension": { "ignored": true }
+  },
+  {
+    "name": "Thompson Bros Mystery Malt &#8211; Series 6, 0.7 L",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/mystery-malt-series-6/",
+    "prices": {
+      "price": "5417",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [{ "src": "not-a-url" }],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Monymusk Jamaican Rum, 1998, 27 Years Old, 70CL",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/monymusk-rum/",
+    "prices": {
+      "price": "10000",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Sold Out Clynelish Single Malt Whisky 70cl",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/sold-out-clynelish/",
+    "prices": {
+      "price": "4500",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "is_in_stock": false,
+    "is_purchasable": true
+  },
+  {
+    "name": "Unpurchasable Ardmore Single Malt Whisky 70cl",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/unpurchasable-ardmore/",
+    "prices": {
+      "price": "5000",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "is_in_stock": true,
+    "is_purchasable": false
+  },
+  {
+    "name": "Zero Price Ben Nevis Single Malt Whisky 70cl",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/zero-price-ben-nevis/",
+    "prices": {
+      "price": "0",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Dollar Price Benrinnes Single Malt Whisky 70cl",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/dollar-price-benrinnes/",
+    "prices": {
+      "price": "7000",
+      "currency_code": "USD",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Thompson Bros Whisky Sample 20cl",
+    "permalink": "https://www.thompsonbrosdistillers.com/product/whisky-sample/",
+    "prices": {
+      "price": "1500",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "External Link Single Malt Whisky 70cl",
+    "permalink": "https://example.com/product/external/",
+    "prices": {
+      "price": "6000",
+      "currency_code": "GBP",
+      "currency_minor_unit": 2
+    },
+    "images": [],
+    "is_in_stock": true,
+    "is_purchasable": true
+  },
+  {
+    "name": "Malformed Product"
+  }
+]
