@@ -75,14 +75,21 @@ export function getAbsoluteBottleLabel(bottle: BottleIdentitySource) {
 }
 
 export function getBottleIdentitySeriesName(
-  bottle: Pick<BottleIdentitySource, "series">,
+  bottle: Pick<BottleIdentitySource, "brand" | "series">,
   displayedIdentity: string,
 ) {
+  if (!bottle.series) {
+    return null;
+  }
+
+  const normalizedSeriesName = bottle.series.name.toLocaleLowerCase();
+  const normalizedBrandNames = [bottle.brand.name, bottle.brand.shortName]
+    .filter((name): name is string => Boolean(name))
+    .map((name) => name.toLocaleLowerCase());
+
   if (
-    !bottle.series ||
-    displayedIdentity
-      .toLocaleLowerCase()
-      .includes(bottle.series.name.toLocaleLowerCase())
+    normalizedBrandNames.includes(normalizedSeriesName) ||
+    displayedIdentity.toLocaleLowerCase().includes(normalizedSeriesName)
   ) {
     return null;
   }
@@ -366,17 +373,19 @@ export default function BottleIdentity({
 
   return (
     <div className={classNames("min-w-0", className)}>
-      {isAbsolute && showBrand ? (
+      {isAbsolute && (showBrand || seriesName) ? (
         <div className="text-muted flex min-w-0 items-center gap-1.5 truncate text-xs font-medium uppercase tracking-wide">
-          <Link
-            href={`/entities/${bottle.brand.id}`}
-            className="truncate hover:underline"
-          >
-            {bottle.brand.shortName || bottle.brand.name}
-          </Link>
+          {showBrand ? (
+            <Link
+              href={`/entities/${bottle.brand.id}`}
+              className="truncate hover:underline"
+            >
+              {bottle.brand.shortName || bottle.brand.name}
+            </Link>
+          ) : null}
           {seriesName ? (
             <>
-              <span aria-hidden="true">&middot;</span>
+              {showBrand ? <span aria-hidden="true">&middot;</span> : null}
               <Link
                 href={`/bottles?series=${bottle.series!.id}`}
                 className="truncate hover:underline"

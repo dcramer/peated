@@ -287,17 +287,17 @@ marketed expression or edition.
 Examples validate these branches; they must not become named special cases in
 the implementation.
 
-| Bottle                                                                | Important identity                                                              | Concise consequence                                                    |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Decadent Drinks Whiskyland Glenburgie 38-year-old, Chapter Thirty Two | `Whiskyland` is the series; `Chapter Thirty Two` is the release marker          | Show both; omit 1988 vintage and 2026 release from the ordinary header |
-| High West A Midwinter Night's Dram, Act 12 Scene 9                    | Act and scene identify the release                                              | Prefer the edition; do not also require its release year               |
-| Elijah Craig Barrel Proof, Batch C923                                 | `Barrel Proof` is marketed expression wording; the batch identifies the release | Preserve the expression and batch; do not add a cask-strength flag     |
-| Four Roses Limited Edition Small Batch 2017                           | The year is the annual release identity when no stronger marker exists          | Show the release year                                                  |
-| Macallan Sherry Oak 18-year-old, 1994 Vintage                         | Vintage is the marketed discriminator                                           | Show the vintage and do not manufacture another year label             |
-| Willett Family Estate, Barrel 4769                                    | The exact barrel code identifies the marketed release                           | Show the code; do not add `Single cask` merely from the boolean        |
-| SMWS 95.71 Prepare for Winter                                         | The society code and subtitle are marketed identity                             | Preserve them; age and ABV may support the detailed header             |
-| Highland Park Cask Strength No. 5                                     | `Cask Strength` belongs to the expression                                       | Keep the words in the title; do not repeat them as metadata            |
-| Pōkeno Exploration Series No. 1 Totara Cask                           | Series wording is already present in the marketed expression                    | Do not repeat the series in a second visible token                     |
+| Bottle                                                | Important identity                                                              | Concise consequence                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Whiskyland Glenburgie 38-year-old, Chapter Thirty Two | `Whiskyland` is the Brand; `Chapter Thirty Two` is the release marker           | Show both; omit 1988 vintage and 2026 release from the ordinary header |
+| High West A Midwinter Night's Dram, Act 12 Scene 9    | Act and scene identify the release                                              | Prefer the edition; do not also require its release year               |
+| Elijah Craig Barrel Proof, Batch C923                 | `Barrel Proof` is marketed expression wording; the batch identifies the release | Preserve the expression and batch; do not add a cask-strength flag     |
+| Four Roses Limited Edition Small Batch 2017           | The year is the annual release identity when no stronger marker exists          | Show the release year                                                  |
+| Macallan Sherry Oak 18-year-old, 1994 Vintage         | Vintage is the marketed discriminator                                           | Show the vintage and do not manufacture another year label             |
+| Willett Family Estate, Barrel 4769                    | The exact barrel code identifies the marketed release                           | Show the code; do not add `Single cask` merely from the boolean        |
+| SMWS 95.71 Prepare for Winter                         | The society code and subtitle are marketed identity                             | Preserve them; age and ABV may support the detailed header             |
+| Highland Park Cask Strength No. 5                     | `Cask Strength` belongs to the expression                                       | Keep the words in the title; do not repeat them as metadata            |
+| Pōkeno Exploration Series No. 1 Totara Cask           | Series wording is already present in the marketed expression                    | Do not repeat the series in a second visible token                     |
 
 ## Implementation Map
 
