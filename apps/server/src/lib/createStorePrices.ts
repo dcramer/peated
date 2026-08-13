@@ -65,6 +65,10 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
         const { price, aliasAssignment } = await db.transaction(async (tx) => {
           const { name } = normalizeBottle({ name: sp.name });
           const aliasKey = normalizeBottleAliasKey(sp.name);
+          const sourceBottleIdentity =
+            sp.sourceBottleIdentity === undefined
+              ? sql`NULL`
+              : sql`${JSON.stringify(sp.sourceBottleIdentity)}::jsonb`;
           // New assignments use the deterministic key, but lookup still
           // accepts legacy raw aliases created before alias keys existed.
           let match = await findBottleAliasAssignment(aliasKey, tx);
@@ -125,7 +129,7 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
               ${sp.price},
               ${sp.currency},
               ${sp.url},
-              ${JSON.stringify(sp.sourceBottleIdentity ?? null)}::jsonb
+              ${sourceBottleIdentity}
             )
             ON CONFLICT (external_site_id, LOWER(name), volume)
             DO UPDATE

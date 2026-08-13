@@ -264,6 +264,16 @@ describe("POST /external-sites/:site/prices", () => {
         },
       ],
     });
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          ...listing,
+          price: 7_300,
+          sourceBottleIdentity: undefined,
+        },
+      ],
+    });
 
     expect(
       await db.query.storePrices.findFirst({
