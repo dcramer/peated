@@ -2,7 +2,6 @@
 
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
@@ -40,12 +39,6 @@ export default function Page() {
           },
         ]}
       />
-      <div className="flex items-center justify-end">
-        <Button color="primary" href="/admin/sites/add">
-          Add Site
-        </Button>
-      </div>
-
       {siteList.results.length > 0 ? (
         <Table
           items={siteList.results}
