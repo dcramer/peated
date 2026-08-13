@@ -1,0 +1,75 @@
+{
+  "nbHits": 7,
+  "hits": [
+    {
+      "bundle_skus": null,
+      "calculated_prices": { "GBP": 72.95 },
+      "image_url": "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/lagavulin.jpg",
+      "in_stock": true,
+      "name": "Lagavulin 16 Year Old",
+      "sku": "2444",
+      "url": "/whiskies/lagavulin/lagavulin-16-year-old-whisky/",
+      "volume": 70
+    },
+    {
+      "bundle_skus": null,
+      "calculated_prices": { "GBP": 56 },
+      "image_url": "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/johnnie-walker.jpg",
+      "in_stock": true,
+      "name": "Johnnie Walker Island Green",
+      "sku": "JW-100CL",
+      "url": "/whiskies/johnnie-walker/johnnie-walker-island-green-whisky/",
+      "volume": 100
+    },
+    {
+      "bundle_skus": ["DRAM-1", "DRAM-2"],
+      "calculated_prices": { "GBP": 45 },
+      "image_url": "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/bundle.jpg",
+      "in_stock": true,
+      "name": "Islay Whisky Bundle",
+      "sku": "BUNDLE-1",
+      "url": "/whiskies/islay/islay-whisky-bundle/",
+      "volume": 70
+    },
+    {
+      "bundle_skus": null,
+      "calculated_prices": { "GBP": 35 },
+      "image_url": "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/set.jpg",
+      "in_stock": true,
+      "name": "Japanese Whisky Tasting Set",
+      "sku": "SET-1",
+      "url": "/whiskies/japanese/japanese-whisky-tasting-set/",
+      "volume": 70
+    },
+    {
+      "bundle_skus": null,
+      "calculated_prices": { "GBP": 20 },
+      "image_url": "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/small.jpg",
+      "in_stock": true,
+      "name": "Small Format Whisky",
+      "sku": "SMALL-1",
+      "url": "/whiskies/small/small-format-whisky/",
+      "volume": 20
+    },
+    {
+      "bundle_skus": null,
+      "calculated_prices": { "GBP": 65 },
+      "image_url": "https://images.example.com/wrong-host.jpg",
+      "in_stock": true,
+      "name": "Invalid Image Whisky",
+      "sku": "IMAGE-1",
+      "url": "/whiskies/invalid/invalid-image-whisky/",
+      "volume": 70
+    },
+    {
+      "bundle_skus": null,
+      "calculated_prices": { "GBP": 70 },
+      "image_url": "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/wrong-url.jpg",
+      "in_stock": true,
+      "name": "Invalid URL Whisky",
+      "sku": "URL-1",
+      "url": "https://example.com/whiskies/invalid-url-whisky/",
+      "volume": 70
+    }
+  ]
+}
