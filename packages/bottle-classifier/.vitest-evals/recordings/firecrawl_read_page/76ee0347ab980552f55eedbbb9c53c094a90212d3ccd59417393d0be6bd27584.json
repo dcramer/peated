@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-13T00:29:03.782Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+    "focus": "Confirm exact ABV, stated age, Whiskyland chapter/release descriptor, producer/bottler identity, and any vintage or cask-specific wording."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm exact ABV, stated age, Whiskyland chapter/release descriptor, producer/bottler identity, and any vintage or cask-specific wording.",
+    "summary": null,
+    "results": [
+      {
+        "title": "Whiskyland Twenty Nine Glenturret 35 years old | Decadent Drinks",
+        "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+        "domain": "decadent-drinks.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "76ee0347ab980552f55eedbbb9c53c094a90212d3ccd59417393d0be6bd27584",
+    "mode": "auto"
+  }
+}

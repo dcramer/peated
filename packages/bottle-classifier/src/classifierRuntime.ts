@@ -423,6 +423,9 @@ export async function collectInitialResolvedEntities({
   const requests: SearchEntitiesArgs[] = [];
   const seen = new Set<string>();
   addEntitySearchRequest(requests, seen, extractedIdentity.brand, "brand");
+  // Extracted roles are hypotheses. A consumer Brand can be mislabeled as a
+  // series, so expose that local Brand candidate without rewriting the source.
+  addEntitySearchRequest(requests, seen, extractedIdentity.series, "brand");
   addEntitySearchRequest(requests, seen, extractedIdentity.bottler, "bottler");
   for (const distillery of extractedIdentity.distillery ?? []) {
     addEntitySearchRequest(requests, seen, distillery, "distiller");

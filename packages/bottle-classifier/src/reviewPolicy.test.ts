@@ -261,6 +261,69 @@ function classifyStructuredExactName({
 }
 
 describe("finalizeBottleReferenceClassification", () => {
+  test("rejects a proposed series that repeats the Brand", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Whiskyland Twenty Nine Glenturret 35-year-old",
+      },
+      decision: {
+        action: "create_bottle",
+        rationale:
+          "Whiskyland is the consumer Brand and Decadent Drinks is the bottler.",
+        candidateBottleIds: [],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: null,
+        proposedBottle: {
+          name: "Glenturret",
+          series: { id: null, name: "whiskyland" },
+          category: "single_malt",
+          edition: "Twenty Nine",
+          statedAge: 35,
+          caskStrength: null,
+          singleCask: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          abv: 41.5,
+          vintageYear: null,
+          releaseYear: null,
+          brand: { id: null, name: "Whiskyland" },
+          distillers: [{ id: null, name: "Glenturret" }],
+          bottler: { id: null, name: "Decadent Drinks" },
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        extractedIdentity: {
+          brand: "Decadent Drinks",
+          bottler: "Decadent Drinks",
+          expression: null,
+          series: "Whiskyland",
+          distillery: [],
+          category: "single_malt",
+          stated_age: null,
+          abv: 46,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          edition: "Chapter Twenty Six",
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      rationale: expect.stringContaining(
+        "the proposed Series repeats the Brand",
+      ),
+      proposedBottle: null,
+    });
+  });
+
   test("preserves exact-trait wording selected by the agent", () => {
     const result = classifyStructuredExactName({
       referenceName: "Example Special Reserve 1994 Vintage",

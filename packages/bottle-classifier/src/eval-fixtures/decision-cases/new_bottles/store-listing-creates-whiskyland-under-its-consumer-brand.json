@@ -1,0 +1,138 @@
+{
+  "id": "store-listing-creates-whiskyland-under-its-consumer-brand",
+  "name": "store listing: creates Whiskyland under its consumer Brand instead of the independent bottler",
+  "input": {
+    "reference": {
+      "id": 12028356,
+      "externalSiteId": 9,
+      "name": "Whiskyland Twenty Nine Glenturret 35-year-old",
+      "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old?utm=peated",
+      "imageUrl": "https://api.peated.com/uploads/prices-lomerkvdt7l7hq6gtpl65wid.webp"
+    },
+    "extractedIdentity": {
+      "brand": "Decadent Drinks",
+      "bottler": "Decadent Drinks",
+      "expression": null,
+      "series": "Whiskyland",
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 46,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Chapter Twenty Six"
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+      "https://decadent-drinks.com/"
+    ],
+    "dbOutcome": {
+      "bottleId": 45265,
+      "createsBottle": true,
+      "summary": "Production price-match automation created Bottle 45265 with Decadent Drinks as Brand and Whiskyland as Series. The corrected Bottle uses Whiskyland as Brand, Decadent Drinks as bottler, Glenturret as distiller, and no Series."
+    },
+    "notes": "Observed from production price-match proposal 10322 and store price 12028356. The persisted extraction assigned Decadent Drinks to Brand and bottler, Whiskyland to Series, Chapter Twenty Six to edition, and 46% ABV. Exact-product evidence corrected the release fields but the reference decision retained the incorrect Brand/Series split and auto-created Bottle 45265. Decadent Drinks' official site identifies the company as an independent bottler and explicitly describes Whiskyland as one of its brands. The existing Exclusive Malts production fixture provides the separate generalized case where a consumer Brand differs from its independent bottler."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "series": null,
+      "brand": {
+        "id": 365738,
+        "name": "Whiskyland"
+      },
+      "bottler": {
+        "id": 5775,
+        "name": "Decadent Drinks"
+      },
+      "distillers": [
+        {
+          "id": 987,
+          "name": "Glenturret"
+        }
+      ],
+      "category": "single_malt",
+      "statedAge": 35,
+      "abv": 41.5
+    },
+    "expectedTier": "auto",
+    "summary": "Create the exact Whiskyland Chapter Twenty Nine Bottle under the consumer-facing Whiskyland Brand. Keep Decadent Drinks as the independent bottler and Glenturret as the distiller; do not model Whiskyland as a Series beneath Decadent Drinks."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 5775,
+        "name": "Decadent Drinks",
+        "type": ["brand", "bottler", "distiller"]
+      },
+      {
+        "id": 365738,
+        "name": "Whiskyland",
+        "type": ["brand"]
+      },
+      {
+        "id": 987,
+        "name": "Glenturret",
+        "type": ["brand", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 45149,
+        "name": "Glen Garioch 52-year-old",
+        "fullName": "Decadent Drinks Glen Garioch 52-year-old - Chapter Thirty Three - 2026 Release - 1973 Vintage - 53.2% ABV",
+        "brandId": 5775,
+        "series": "Whiskyland",
+        "category": "single_malt",
+        "statedAge": 52,
+        "edition": "Chapter Thirty Three",
+        "abv": 53.2,
+        "vintageYear": 1973,
+        "releaseYear": 2026
+      },
+      {
+        "id": 45181,
+        "name": "Glenburgie 38-year-old",
+        "fullName": "Decadent Drinks Glenburgie 38-year-old - Chapter Thirty Two - 2026 Release - 1988 Vintage - 46.7% ABV",
+        "brandId": 5775,
+        "series": "Whiskyland",
+        "category": "single_malt",
+        "statedAge": 38,
+        "edition": "Chapter Thirty Two",
+        "abv": 46.7,
+        "vintageYear": 1988,
+        "releaseYear": 2026
+      },
+      {
+        "id": 44304,
+        "name": "Whiskeyland Chapter Six",
+        "fullName": "Decadent Drinks Whiskeyland Chapter Six",
+        "brandId": 5775,
+        "bottlerId": 5775,
+        "category": "single_malt",
+        "statedAge": 38
+      }
+    ],
+    "aliases": [
+      {
+        "name": "Decadent Drinks Whiskyland - Chapter Thirty Three - 52-year-old - 2026 Release - 1973 Vintage - 53.2% ABV",
+        "bottleId": 45149
+      },
+      {
+        "name": "Decadent Drinks Whiskeyland Chapter Six",
+        "bottleId": 44304
+      }
+    ]
+  }
+}

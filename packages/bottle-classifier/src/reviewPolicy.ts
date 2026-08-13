@@ -607,21 +607,24 @@ function sanitizeProposedBottleDraft(
   proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>,
   resolvedEntitiesById: Map<number, EntityResolution>,
 ): NonNullable<BottleClassificationDecision["proposedBottle"]> {
+  const brand = sanitizeResolvedEntityChoice(
+    proposedBottle.brand,
+    "brand",
+    resolvedEntitiesById,
+  );
+  const series = proposedBottle.series
+    ? {
+        ...proposedBottle.series,
+        id: null,
+      }
+    : null;
+
   return {
     ...proposedBottle,
     category:
       proposedBottle.category === "spirit" ? null : proposedBottle.category,
-    series: proposedBottle.series
-      ? {
-          ...proposedBottle.series,
-          id: null,
-        }
-      : null,
-    brand: sanitizeResolvedEntityChoice(
-      proposedBottle.brand,
-      "brand",
-      resolvedEntitiesById,
-    ),
+    series,
+    brand,
     distillers: proposedBottle.distillers.map((distiller) =>
       sanitizeResolvedEntityChoice(
         distiller,
@@ -719,6 +722,22 @@ function sanitizeClassifierDecision({
       ),
       reference,
     });
+    if (
+      sanitizedBottleDraft.series &&
+      normalizeEntityChoiceName(sanitizedBottleDraft.series.name) ===
+        normalizeEntityChoiceName(sanitizedBottleDraft.brand.name)
+    ) {
+      return createNoMatchDecision({
+        decision,
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded create_bottle because the proposed Series repeats the Brand.",
+        ),
+      });
+    }
     const proposedBottleDraft =
       normalizeProposedBottleDraft(sanitizedBottleDraft);
     const smwsAnchorDecision: BottleClassificationDecision = {
