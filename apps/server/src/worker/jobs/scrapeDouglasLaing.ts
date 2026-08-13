@@ -10,7 +10,14 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  parseShopifyPrice,
+  scrapeShopifyProducts,
+  ShopifyCatalogSchema,
+  ShopifyImageSchema,
+  ShopifyProductSchema,
+} from "@peated/server/lib/shopify";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
@@ -39,46 +46,16 @@ const PRODUCT_TYPE_CATEGORIES = new Map<
   ["Whisky", null],
 ]);
 
-const DouglasLaingProductsSchema = z
-  .object({
-    products: z.array(
-      z
-        .object({
-          title: z.string().trim().min(1),
-          handle: z.string().trim().min(1),
-          vendor: z.string().trim().min(1),
-          product_type: z.string(),
-          tags: z.array(z.string()),
-          images: z.array(
-            z
-              .object({
-                src: z.string().url(),
-              })
-              .passthrough(),
-          ),
-          variants: z.array(
-            z
-              .object({
-                available: z.boolean(),
-                price: z.string(),
-              })
-              .passthrough(),
-          ),
-        })
-        .passthrough(),
-    ),
-  })
-  .passthrough();
+const DouglasLaingProductSchema = ShopifyProductSchema.extend({
+  vendor: z.string().trim().min(1),
+  product_type: z.string(),
+  tags: z.array(z.string()),
+  images: z.array(ShopifyImageSchema),
+});
 
-function parsePrice(value: string): number | null {
-  const match = value.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-  if (!match) return null;
-
-  const dollars = Number.parseInt(match[1], 10);
-  const cents = Number.parseInt((match[2] ?? "").padEnd(2, "0"), 10) || 0;
-  const price = dollars * 100 + cents;
-  return Number.isSafeInteger(price) && price > 0 ? price : null;
-}
+const DouglasLaingProductsSchema = ShopifyCatalogSchema.extend({
+  products: z.array(DouglasLaingProductSchema),
+});
 
 function extractAbv(tags: string[]): number | null {
   const abvTag = tags.find((tag) => /^Abv:/i.test(tag));
@@ -155,7 +132,7 @@ export function parseDouglasLaingProducts(
     const pricedVariant = product.variants
       .map((variant) => ({
         ...variant,
-        parsedPrice: parsePrice(variant.price),
+        parsedPrice: parseShopifyPrice(variant.price),
       }))
       .find((variant) => variant.available && variant.parsedPrice !== null);
     if (!pricedVariant || pricedVariant.parsedPrice === null) continue;
@@ -187,9 +164,7 @@ export function parseDouglasLaingProducts(
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseDouglasLaingProducts(JSON.parse(data), url);
-  await Promise.all(products.map(cb));
+  return scrapeShopifyProducts(url, cb, parseDouglasLaingProducts);
 }
 
 export default async function scrapeDouglasLaing({

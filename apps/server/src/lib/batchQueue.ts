@@ -1,5 +1,4 @@
-import { logTelemetryError } from "./log";
-
+/** Batches work without changing error ownership; callback failures escape. */
 export default class BatchQueue<T> {
   private queue: T[] = [];
   private batchSize: number;
@@ -36,12 +35,6 @@ export default class BatchQueue<T> {
     const batch = this.queue.splice(0, this.batchSize);
     try {
       await this.processBatchCallback(batch);
-    } catch (error) {
-      logTelemetryError(error, {
-        extra: {
-          batchSize: batch.length,
-        },
-      });
     } finally {
       this.processingBatch = false;
     }

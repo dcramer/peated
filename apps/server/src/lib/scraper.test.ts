@@ -361,6 +361,27 @@ describe("scrapePrices", () => {
     );
   });
 
+  it("propagates price persistence failures", async () => {
+    const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
+      if (!url.endsWith("/1")) return;
+      await cb({
+        name: "Unpersisted Product",
+        price: 1000,
+        currency: "gbp",
+        url: "https://test.com/unpersisted-product",
+        volume: 700,
+      });
+    };
+
+    await expect(
+      scrapePrices(
+        "bruichladdich",
+        (page) => `https://test.com/page/${page}`,
+        scrapeProducts,
+      ),
+    ).rejects.toThrow("External site not found: bruichladdich");
+  });
+
   it("does not persist an explicit dry run", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {

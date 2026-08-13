@@ -3,7 +3,16 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  getShopifyImageUrl,
+  getShopifyProductTitle,
+  parseShopifyPrice,
+  scrapeShopifyProducts,
+  ShopifyCatalogSchema,
+  ShopifyProductSchema,
+  ShopifyVariantSchema,
+} from "@peated/server/lib/shopify";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
@@ -23,55 +32,21 @@ const BRAND_TAGS = new Map([
   ["port charlotte", "Port Charlotte"],
 ]);
 
-const CatalogSchema = z
-  .object({
-    products: z.array(z.unknown()),
-  })
-  .passthrough();
+const VariantSchema = ShopifyVariantSchema.extend({
+  title: z.string().trim().min(1),
+});
 
-const VariantSchema = z
-  .object({
-    available: z.boolean(),
-    price: z.string(),
-    title: z.string().trim().min(1),
-  })
-  .passthrough();
-
-const ProductSchema = z
-  .object({
-    title: z.string().trim().min(1),
-    handle: z
-      .string()
-      .trim()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-    product_type: z.string(),
-    tags: z.array(z.string()),
-    vendor: z.string(),
-    images: z.array(z.unknown()).min(1),
-    variants: z.array(VariantSchema),
-  })
-  .passthrough();
-
-const ImageSchema = z
-  .object({
-    src: z.string().url(),
-  })
-  .passthrough();
-
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("title" in input)) return null;
-  return typeof input.title === "string" ? input.title : null;
-}
-
-function parsePrice(value: string): number | null {
-  const match = value.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-  if (!match) return null;
-
-  const pounds = Number.parseInt(match[1], 10);
-  const pence = Number.parseInt((match[2] ?? "").padEnd(2, "0"), 10) || 0;
-  const price = pounds * 100 + pence;
-  return Number.isSafeInteger(price) && price > 0 ? price : null;
-}
+const ProductSchema = ShopifyProductSchema.extend({
+  handle: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  product_type: z.string(),
+  tags: z.array(z.string()),
+  vendor: z.string(),
+  images: z.array(z.unknown()).min(1),
+  variants: z.array(VariantSchema),
+});
 
 function parseVolume(value: string): number | null {
   const match = value.match(/^(\d+(?:\.\d+)?)\s*(ml|cl|l)$/i);
@@ -107,27 +82,15 @@ function getProductName(
   return brand ? normalizeBottle({ name: `${brand} ${title}` }).name : null;
 }
 
-function getImageUrl(value: unknown): string | null {
-  const result = ImageSchema.safeParse(value);
-  if (!result.success) return null;
-
-  const url = new URL(result.data.src);
-  return url.protocol === "https:" &&
-    (url.hostname === "cdn.shopify.com" ||
-      url.hostname === "www.bruichladdich.com")
-    ? url.toString()
-    : null;
-}
-
 export function parseBruichladdichProducts(input: unknown): StorePrice[] {
-  const payload = CatalogSchema.parse(input);
+  const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 
   for (const productInput of payload.products) {
     const productResult = ProductSchema.safeParse(productInput);
     if (!productResult.success) {
       logScrapeWarning(SITE, "Invalid product record", {
-        rawName: getRawName(productInput),
+        rawName: getShopifyProductTitle(productInput),
       });
       continue;
     }
@@ -159,7 +122,7 @@ export function parseBruichladdichProducts(input: unknown): StorePrice[] {
       continue;
     }
 
-    const price = parsePrice(variant.price);
+    const price = parseShopifyPrice(variant.price);
     if (price === null) {
       logScrapeWarning(SITE, "Invalid product price", {
         rawName: product.title,
@@ -176,7 +139,9 @@ export function parseBruichladdichProducts(input: unknown): StorePrice[] {
       continue;
     }
 
-    const imageUrl = getImageUrl(product.images[0]);
+    const imageUrl = getShopifyImageUrl(product.images[0], [
+      "www.bruichladdich.com",
+    ]);
     if (!imageUrl) {
       logScrapeWarning(SITE, "Invalid product image URL", {
         rawName: product.title,
@@ -201,9 +166,7 @@ export function parseBruichladdichProducts(input: unknown): StorePrice[] {
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseBruichladdichProducts(JSON.parse(data));
-  await Promise.all(products.map(cb));
+  return scrapeShopifyProducts(url, cb, parseBruichladdichProducts);
 }
 
 export default async function scrapeBruichladdich({

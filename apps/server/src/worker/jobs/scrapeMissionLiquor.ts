@@ -4,7 +4,16 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  getShopifyImageUrl,
+  getShopifyProductTitle,
+  parseShopifyPrice,
+  scrapeShopifyProducts,
+  ShopifyCatalogSchema,
+  ShopifyProductSchema,
+  ShopifyVariantSchema,
+} from "@peated/server/lib/shopify";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
@@ -16,53 +25,18 @@ const TITLE_VOLUME_PATTERN = /(\d+(?:\.\d+)?)\s*(ml|cl|l)\b/gi;
 const MULTIPRODUCT_PATTERN =
   /\b(?:gift|tasting)\s+set\b|\bsampler\b|\bbundle\b|\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:ml|cl|l)\b|\b\d+\s*(?:pack|pk)\b/i;
 
-const CatalogSchema = z
-  .object({
-    products: z.array(z.unknown()),
-  })
-  .passthrough();
+const VariantSchema = ShopifyVariantSchema;
 
-const VariantSchema = z
-  .object({
-    available: z.boolean(),
-    price: z.string(),
-  })
-  .passthrough();
-
-const ProductSchema = z
-  .object({
-    title: z.string().trim().min(1),
-    handle: z
-      .string()
-      .trim()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-    product_type: z.string().trim(),
-    tags: z.array(z.string()),
-    images: z.array(z.unknown()).min(1),
-    variants: z.array(VariantSchema),
-  })
-  .passthrough();
-
-const ImageSchema = z
-  .object({
-    src: z.string().url(),
-  })
-  .passthrough();
-
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("title" in input)) return null;
-  return typeof input.title === "string" ? input.title : null;
-}
-
-function parsePrice(value: string): number | null {
-  const match = value.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-  if (!match) return null;
-
-  const dollars = Number.parseInt(match[1], 10);
-  const cents = Number.parseInt((match[2] ?? "").padEnd(2, "0"), 10) || 0;
-  const price = dollars * 100 + cents;
-  return Number.isSafeInteger(price) && price > 0 ? price : null;
-}
+const ProductSchema = ShopifyProductSchema.extend({
+  handle: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  product_type: z.string().trim(),
+  tags: z.array(z.string()),
+  images: z.array(z.unknown()).min(1),
+  variants: z.array(VariantSchema),
+});
 
 function parseVolume(amountRaw: string, unitRaw: string): number | null {
   const amount = Number.parseFloat(amountRaw);
@@ -103,27 +77,15 @@ function getProductName(title: string): string | null {
   return normalizeBottle({ name: withoutTerminalVolume }).name;
 }
 
-function getImageUrl(value: unknown): string | null {
-  const result = ImageSchema.safeParse(value);
-  if (!result.success) return null;
-
-  const url = new URL(result.data.src);
-  return url.protocol === "https:" &&
-    (url.hostname === "cdn.shopify.com" ||
-      url.hostname === "www.missionliquor.com")
-    ? url.toString()
-    : null;
-}
-
 export function parseMissionLiquorProducts(input: unknown): StorePrice[] {
-  const payload = CatalogSchema.parse(input);
+  const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 
   for (const productInput of payload.products) {
     const productResult = ProductSchema.safeParse(productInput);
     if (!productResult.success) {
       logScrapeWarning(SITE, "Invalid product record", {
-        rawName: getRawName(productInput),
+        rawName: getShopifyProductTitle(productInput),
       });
       continue;
     }
@@ -164,7 +126,7 @@ export function parseMissionLiquorProducts(input: unknown): StorePrice[] {
       continue;
     }
 
-    const price = parsePrice(availableVariants[0].price);
+    const price = parseShopifyPrice(availableVariants[0].price);
     if (price === null) {
       logScrapeWarning(SITE, "Invalid product price", {
         rawName: product.title,
@@ -181,7 +143,9 @@ export function parseMissionLiquorProducts(input: unknown): StorePrice[] {
       continue;
     }
 
-    const imageUrl = getImageUrl(product.images[0]);
+    const imageUrl = getShopifyImageUrl(product.images[0], [
+      "www.missionliquor.com",
+    ]);
     if (!imageUrl) {
       logScrapeWarning(SITE, "Invalid product image URL", {
         rawName: product.title,
@@ -206,9 +170,7 @@ export function parseMissionLiquorProducts(input: unknown): StorePrice[] {
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseMissionLiquorProducts(JSON.parse(data));
-  await Promise.all(products.map(cb));
+  return scrapeShopifyProducts(url, cb, parseMissionLiquorProducts);
 }
 
 export default async function scrapeMissionLiquor({

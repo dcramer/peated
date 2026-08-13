@@ -4,52 +4,28 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl } from "@peated/server/lib/scraper";
+import scrapePrices from "@peated/server/lib/scraper";
+import {
+  parseShopifyPrice,
+  scrapeShopifyProducts,
+  ShopifyCatalogSchema,
+  ShopifyImageSchema,
+  ShopifyProductSchema,
+} from "@peated/server/lib/shopify";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "gordonmacphail";
 
-const GordonMacphailProductsSchema = z
-  .object({
-    products: z.array(
-      z
-        .object({
-          title: z.string().trim().min(1),
-          handle: z.string().trim().min(1),
-          body_html: z.string().nullish(),
-          images: z.array(
-            z
-              .object({
-                src: z.string().url(),
-              })
-              .passthrough(),
-          ),
-          variants: z.array(
-            z
-              .object({
-                available: z.boolean(),
-                price: z.string(),
-              })
-              .passthrough(),
-          ),
-        })
-        // Shopify owns additional catalog fields that this parser does not use.
-        .passthrough(),
-    ),
-  })
-  .passthrough();
+const GordonMacphailProductSchema = ShopifyProductSchema.extend({
+  body_html: z.string().nullish(),
+  images: z.array(ShopifyImageSchema),
+});
 
-function parsePrice(value: string): number | null {
-  const match = value.match(/^(\d+)(?:\.(\d{1,2}))?$/);
-  if (!match) return null;
-
-  const pounds = Number.parseInt(match[1], 10);
-  const pence = Number.parseInt((match[2] ?? "").padEnd(2, "0"), 10) || 0;
-  const price = pounds * 100 + pence;
-  return Number.isSafeInteger(price) && price > 0 ? price : null;
-}
+const GordonMacphailProductsSchema = ShopifyCatalogSchema.extend({
+  products: z.array(GordonMacphailProductSchema),
+});
 
 function parseVolume(amountRaw: string, unit: string): number | null {
   const amount = Number.parseFloat(amountRaw);
@@ -106,7 +82,7 @@ export function parseGordonMacphailProducts(
     const pricedVariant = product.variants
       .map((variant) => ({
         ...variant,
-        parsedPrice: parsePrice(variant.price),
+        parsedPrice: parseShopifyPrice(variant.price),
       }))
       .find((variant) => variant.available && variant.parsedPrice !== null);
     if (!pricedVariant || pricedVariant.parsedPrice === null) continue;
@@ -141,9 +117,7 @@ export function parseGordonMacphailProducts(
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url);
-  const products = parseGordonMacphailProducts(JSON.parse(data), url);
-  await Promise.all(products.map(cb));
+  return scrapeShopifyProducts(url, cb, parseGordonMacphailProducts);
 }
 
 export default async function scrapeGordonMacphail({
