@@ -623,13 +623,7 @@ function sanitizeProposedBottleDraft(
     ...proposedBottle,
     category:
       proposedBottle.category === "spirit" ? null : proposedBottle.category,
-    // A Series is subordinate to its Brand and cannot repeat the Brand itself.
-    series:
-      series &&
-      normalizeEntityChoiceName(series.name) !==
-        normalizeEntityChoiceName(brand.name)
-        ? series
-        : null,
+    series,
     brand,
     distillers: proposedBottle.distillers.map((distiller) =>
       sanitizeResolvedEntityChoice(
@@ -728,6 +722,22 @@ function sanitizeClassifierDecision({
       ),
       reference,
     });
+    if (
+      sanitizedBottleDraft.series &&
+      normalizeEntityChoiceName(sanitizedBottleDraft.series.name) ===
+        normalizeEntityChoiceName(sanitizedBottleDraft.brand.name)
+    ) {
+      return createNoMatchDecision({
+        decision,
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded create_bottle because the proposed Series repeats the Brand.",
+        ),
+      });
+    }
     const proposedBottleDraft =
       normalizeProposedBottleDraft(sanitizedBottleDraft);
     const smwsAnchorDecision: BottleClassificationDecision = {

@@ -261,7 +261,7 @@ function classifyStructuredExactName({
 }
 
 describe("finalizeBottleReferenceClassification", () => {
-  test("removes a proposed series that repeats the Brand", () => {
+  test("rejects a proposed series that repeats the Brand", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {
         name: "Whiskyland Twenty Nine Glenturret 35-year-old",
@@ -316,12 +316,11 @@ describe("finalizeBottleReferenceClassification", () => {
     });
 
     expect(result).toMatchObject({
-      action: "create_bottle",
-      proposedBottle: {
-        brand: { name: "Whiskyland" },
-        series: null,
-        bottler: { name: "Decadent Drinks" },
-      },
+      action: "no_match",
+      rationale: expect.stringContaining(
+        "the proposed Series repeats the Brand",
+      ),
+      proposedBottle: null,
     });
   });
 
