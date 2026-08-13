@@ -38,6 +38,7 @@ export const EXTERNAL_SITE_TYPE_LIST = [
   "singlecasknation",
   "smws",
   "smwsa",
+  "thompsonbros",
   "totalwine",
   "woodencork",
   "whiskyadvocate",

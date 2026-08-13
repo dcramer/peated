@@ -38,6 +38,7 @@ import scrapeReserveBar from "./scrapeReserveBar";
 import scrapeSingleCaskNation from "./scrapeSingleCaskNation";
 import scrapeSMWS from "./scrapeSMWS";
 import scrapeSMWSA from "./scrapeSMWSA";
+import scrapeThompsonBros from "./scrapeThompsonBros";
 import scrapeTotalWine from "./scrapeTotalWine";
 import scrapeWhiskeyAdvocate from "./scrapeWhiskyAdvocate";
 import scrapeWoodenCork from "./scrapeWoodenCork";
@@ -89,6 +90,7 @@ const scraperJobs = [
   ["ScrapeSingleCaskNation", "singlecasknation", scrapeSingleCaskNation],
   ["ScrapeSMWS", "smws", scrapeSMWS],
   ["ScrapeSMWSA", "smwsa", scrapeSMWSA],
+  ["ScrapeThompsonBros", "thompsonbros", scrapeThompsonBros],
   ["ScrapeTotalWine", "totalwine", scrapeTotalWine],
   ["ScrapeWoodenCork", "woodencork", scrapeWoodenCork],
   ["ScrapeWhiskyAdvocate", "whiskyadvocate", scrapeWhiskeyAdvocate],
