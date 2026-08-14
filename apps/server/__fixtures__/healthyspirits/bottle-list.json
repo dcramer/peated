@@ -1,0 +1,74 @@
+{
+  "expandedCategories": [
+    {
+      "categoryInfo": {
+        "id": 179389817
+      },
+      "products": [
+        {
+          "defaultOptionsOverrides": {
+            "pricesOverrides": {
+              "basePrice": 39.99
+            },
+            "variationOverrides": {
+              "isSoldOut": false,
+              "productGridMediaItems": [
+                {
+                  "image800pxUrl": "https://d2j6dbq0eux0bg.cloudfront.net/images/bushmills.jpg",
+                  "isMain": true
+                }
+              ]
+            }
+          },
+          "name": "(DECEMBER 2023 WHISKEY CLUB) BUSHMILLS BLACK BUSH 750ML",
+          "seo": {
+            "canonicalUrl": "https://www.healthyspirits.com/products/bushmills-black-bush-750ml"
+          }
+        },
+        {
+          "defaultOptionsOverrides": {
+            "pricesOverrides": {
+              "basePrice": 79.99
+            },
+            "variationOverrides": {
+              "isSoldOut": false
+            }
+          },
+          "name": "FUJI JAPANESE WHISKY BLEND 700ML",
+          "seo": {
+            "canonicalUrl": "https://www.healthyspirits.com/products/fuji-japanese-whisky-blend-700ml"
+          }
+        },
+        {
+          "defaultOptionsOverrides": {
+            "pricesOverrides": {
+              "basePrice": 899.99
+            },
+            "variationOverrides": {
+              "isSoldOut": true
+            }
+          },
+          "name": "ARDBEG TWENTY SOMETHING 23 YEAR 750ML",
+          "seo": {
+            "canonicalUrl": "https://www.healthyspirits.com/products/ardbeg-twenty-something-23-year-750ml"
+          }
+        },
+        {
+          "defaultOptionsOverrides": {
+            "pricesOverrides": {
+              "basePrice": 14.99
+            },
+            "variationOverrides": {
+              "isSoldOut": false
+            }
+          },
+          "name": "WHISKEY SAMPLE 100ML",
+          "seo": {
+            "canonicalUrl": "https://www.healthyspirits.com/products/whiskey-sample-100ml"
+          }
+        }
+      ],
+      "totalProductsCount": 61
+    }
+  ]
+}
