@@ -23,7 +23,10 @@ export const CATEGORY_LIST = [
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
 export const EXTERNAL_SITE_DEFINITIONS = {
-  astorwines: { name: "Astor Wines", runEvery: 1440 },
+  // Disabled: Astor rejects non-browser clients, while Total Wine requires an
+  // interactive human-verification challenge. Keep both registered so their
+  // existing data and scraper implementations remain available for a future fix.
+  astorwines: { name: "Astor Wines", runEvery: null },
   berrybrosrudd: { name: "Berry Bros. & Rudd", runEvery: 10080 },
   bruichladdich: { name: "Bruichladdich", runEvery: 10080 },
   cadenheads: { name: "Cadenheads", runEvery: 10080 },
@@ -32,27 +35,27 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   douglaslaing: { name: "Douglas Laing", runEvery: 10080 },
   dramfool: { name: "Dramfool", runEvery: 10080 },
   edradour: { name: "Edradour", runEvery: 10080 },
-  finedrams: { name: "Fine Drams", runEvery: 1440 },
+  finedrams: { name: "Fine Drams", runEvery: 10080 },
   glenallachie: { name: "The GlenAllachie", runEvery: 10080 },
   gordonmacphail: { name: "Gordon Macphail", runEvery: 10080 },
-  healthyspirits: { name: "Healthy Spirits", runEvery: 1440 },
+  healthyspirits: { name: "Healthy Spirits", runEvery: 10080 },
   kilchoman: { name: "Kilchoman", runEvery: 10080 },
-  masterofmalt: { name: "Master of Malt", runEvery: 1440 },
-  missionliquor: { name: "Mission Liquor", runEvery: 1440 },
+  masterofmalt: { name: "Master of Malt", runEvery: 10080 },
+  missionliquor: { name: "Mission Liquor", runEvery: 10080 },
   ncnean: { name: "Nc'nean", runEvery: 10080 },
   northstarspirits: { name: "North Star", runEvery: 10080 },
-  reservebar: { name: "ReserveBar", runEvery: 1440 },
+  reservebar: { name: "ReserveBar", runEvery: 10080 },
   singlecasknation: { name: "Single Cask Nation", runEvery: 10080 },
-  smws: { name: "The Scotch Malt Whisky Society", runEvery: 1440 },
+  smws: { name: "The Scotch Malt Whisky Society", runEvery: 10080 },
   smwsa: {
     name: "The Scotch Malt Whisky Society (America)",
-    runEvery: 1440,
+    runEvery: 10080,
   },
   thompsonbros: { name: "Thompson Bros.", runEvery: 10080 },
-  totalwine: { name: "Total Wines", runEvery: 1440 },
-  woodencork: { name: "Wooden Cork", runEvery: 1440 },
+  totalwine: { name: "Total Wines", runEvery: null },
+  woodencork: { name: "Wooden Cork", runEvery: 10080 },
   whiskyadvocate: { name: "Whisky Advocate", runEvery: 21600 },
-  whiskyworld: { name: "The Whisky World", runEvery: 1440 },
+  whiskyworld: { name: "The Whisky World", runEvery: 10080 },
 } as const;
 
 type ExternalSiteDefinitionType = keyof typeof EXTERNAL_SITE_DEFINITIONS;
