@@ -1,0 +1,78 @@
+{
+  "navigation": {
+    "currentPage": 1,
+    "totalPages": 2
+  },
+  "products": [
+    {
+      "images": [
+        "https://assets.liquidcommerce.co/catalog/macallan.png"
+      ],
+      "name": "THE MACALLAN DOUBLE CASK 12 YEAR OLD",
+      "priceInfo": {
+        "average": 9289,
+        "currency": "USD"
+      },
+      "salsifyGrouping": "GROUPING-1234",
+      "sizes": [
+        {
+          "pack": false,
+          "size": "700 ML",
+          "uom": "MILLILITRE",
+          "volume": "700"
+        }
+      ]
+    },
+    {
+      "images": [],
+      "name": "GENTLEMAN JACK TENNESSEE WHISKEY",
+      "priceInfo": {
+        "average": 2839,
+        "currency": "USD"
+      },
+      "salsifyGrouping": "GROUPING-38632",
+      "sizes": [
+        {
+          "pack": false,
+          "size": "750 ML",
+          "uom": "MILLILITRE",
+          "volume": "750"
+        }
+      ]
+    },
+    {
+      "images": [],
+      "name": "BOURBON GIFT PACK",
+      "priceInfo": {
+        "average": 4999,
+        "currency": "USD"
+      },
+      "salsifyGrouping": "GROUPING-PACK",
+      "sizes": [
+        {
+          "pack": true,
+          "size": "750 ML",
+          "uom": "MILLILITRE",
+          "volume": "750"
+        }
+      ]
+    },
+    {
+      "images": [],
+      "name": "SMALL BOTTLE",
+      "priceInfo": {
+        "average": 1999,
+        "currency": "USD"
+      },
+      "salsifyGrouping": "GROUPING-SMALL",
+      "sizes": [
+        {
+          "pack": false,
+          "size": "375 ML",
+          "uom": "MILLILITRE",
+          "volume": "375"
+        }
+      ]
+    }
+  ]
+}
