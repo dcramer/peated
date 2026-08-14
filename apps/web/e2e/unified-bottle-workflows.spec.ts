@@ -3,7 +3,6 @@ import { expect, type Request, test, type TestInfo } from "@playwright/test";
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
   anotherReleaseSourceBottle,
-  createdBottleId,
   createdBottleName,
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
@@ -16,7 +15,7 @@ import {
 import { signIn } from "./session";
 
 test.describe("unified Bottle workflows", () => {
-  test("applies a direct Bottle queue draft as one independent Bottle", async ({
+  test("creates a Bottle from one focused listing task", async ({
     context,
     page,
   }, testInfo) => {
@@ -25,29 +24,25 @@ test.describe("unified Bottle workflows", () => {
       user: { ...testUser, admin: true, mod: true },
     });
 
-    await page.goto("/admin/queue");
+    await page.goto("/admin/moderation/inbox/listing/9911");
 
     await expect(
-      page.getByRole("heading", { name: "Incoming Listings" }),
-    ).toBeVisible();
-    await expect(page.getByText("Bottle Draft", { exact: true })).toHaveCount(
-      1,
-    );
-    await expect(page.getByText("Bottling Draft", { exact: true })).toHaveCount(
-      0,
-    );
-    await expect(page.getByText("16 years", { exact: true })).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Apply Bottle Draft" }),
+      page.getByRole("heading", {
+        name: "Should this Bottle be added to the catalog?",
+      }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /Apply Bottling Draft/ }),
-    ).toHaveCount(0);
+      page.getByRole("heading", { name: "Proposed Bottle" }),
+    ).toBeVisible();
+    await expect(page.getByText("16", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Create Bottle" }),
+    ).toBeVisible();
 
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
     );
-    await page.getByRole("button", { name: "Apply Bottle Draft" }).click();
+    await page.getByRole("button", { name: "Create Bottle" }).click();
     const input = getRpcInput(await createRequestPromise);
 
     expect(Object.keys(input).sort()).toEqual([
@@ -83,17 +78,14 @@ test.describe("unified Bottle workflows", () => {
       expect(independentBottle).not.toHaveProperty(legacyField);
     }
 
-    const createdFullName = `${anotherReleaseSourceBottle.brand.name} ${anotherReleaseSourceBottle.name} Cask 17`;
+    await expect(page).toHaveURL("/admin/moderation/inbox");
     await expect(
-      page.getByRole("link", { name: createdFullName }),
-    ).toHaveAttribute("href", `/bottles/${createdBottleId}`);
-    await expect(
-      page.getByText("No actionable queue items match", { exact: false }),
+      page.getByText("Nothing needs a decision", { exact: true }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
-  test("moves completed Incoming Listing work into the Audits inbox", async ({
+  test("reviews an Incoming Listing follow-up as a focused catalog task", async ({
     context,
     page,
     request,
@@ -104,21 +96,6 @@ test.describe("unified Bottle workflows", () => {
       user: { ...testUser, admin: true, mod: true },
     });
 
-    await page.goto("/admin/queue");
-
-    await expect(
-      page.getByRole("heading", { name: "Incoming Listings" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Actionable (0)" }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(
-        "Playwright Store matched listing with supplemental work",
-        { exact: true },
-      ),
-    ).toHaveCount(0);
-
     const detailsResponse = await request.post(
       `${mockApiServer}/rpc/audits/details`,
       {
@@ -128,8 +105,6 @@ test.describe("unified Bottle workflows", () => {
     );
     expect(detailsResponse.ok()).toBe(true);
     const details = (await detailsResponse.json()).json;
-
-    await page.goto("/admin/audits?source=incoming_listing");
 
     expect(details.audit).not.toHaveProperty("inputSnapshot");
     expect(details.audit).not.toHaveProperty("artifacts");
@@ -149,33 +124,17 @@ test.describe("unified Bottle workflows", () => {
     for (const operation of details.reviewOperations) {
       expect(operation.review).not.toHaveProperty("stateToken");
     }
+    await page.goto("/admin/moderation/inbox/operation/703");
+
     await expect(
-      page.getByText(
-        "The store listing is matched; one duplicate Bottle still needs moderator disposition.",
-        { exact: true },
-      ),
+      page.getByRole("heading", { name: "Merge these Bottle records?" }),
     ).toBeVisible();
-    await expect(page.getByText("Incoming listing audit")).toBeVisible();
-    await expectNoHorizontalOverflow(page);
-
-    await page.getByRole("link", { name: "Review", exact: true }).click();
-    await expect(page).toHaveURL("/admin/audits/92?source=incoming_listing");
-    let reviewPanel = page.getByRole("dialog", { name: "Audit #92" });
-    await expect(reviewPanel).toBeVisible();
-    await expect(
-      page.getByText("1 audit ready", { exact: true }),
-    ).toBeVisible();
-
-    await reviewPanel.getByRole("button", { name: "Close panel" }).click();
-    await expect(page).toHaveURL("/admin/audits?source=incoming_listing");
-    await expect(reviewPanel).toHaveCount(0);
-
-    await page.getByRole("link", { name: "Review", exact: true }).click();
-    await expect(page).toHaveURL("/admin/audits/92?source=incoming_listing");
-    reviewPanel = page.getByRole("dialog", { name: "Audit #92" });
-    const reviewOperation = reviewPanel.getByRole("article").filter({
+    const reviewOperation = page.getByRole("article").filter({
       hasText: "The inspected listing matched the canonical Bottle",
     });
+    await expect(reviewOperation).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
     const approvalRequest = page.waitForRequest((request) =>
       request.url().includes("/rpc/audits/approveSelected"),
     );
@@ -183,15 +142,9 @@ test.describe("unified Bottle workflows", () => {
       .getByRole("button", { name: "Apply included changes" })
       .click();
     await approvalRequest;
-    await expect(page).toHaveURL("/admin/audits/92?source=incoming_listing");
-    await reviewPanel.getByText("Reviewed (1)", { exact: true }).click();
+    await expect(page).toHaveURL("/admin/moderation/inbox");
     await expect(
-      reviewOperation.getByText("Applied", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      reviewPanel.getByText("Close audit", {
-        exact: true,
-      }),
+      page.getByText("Nothing needs a decision", { exact: true }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });

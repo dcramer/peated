@@ -23,6 +23,17 @@ export function createBottleCheckMock({
 
   function handleRpcRequest({ path, input, token }) {
     switch (path) {
+      case "admin/moderation/listTasks": {
+        const tasks = moderationTasks(token);
+        if (tasks === null) return null;
+        return response(taskList(tasks));
+      }
+      case "admin/moderation/task": {
+        const tasks = moderationTasks(token);
+        if (tasks === null) return null;
+        const task = tasks.find(({ key }) => key === input?.key);
+        return task ? response({ task }) : error("Moderation task not found");
+      }
       case "audits/create":
         if (
           !token.includes("bottle-audit") ||
@@ -152,6 +163,71 @@ export function createBottleCheckMock({
 
   function isLinkedStorePriceRequest(token) {
     return token.includes("queue-linked-check");
+  }
+
+  function moderationTasks(token) {
+    if (isLinkedStorePriceRequest(token)) {
+      const details = buildLinkedStorePriceCheckDetails({
+        approved: approvedTokens.has(token),
+      });
+      return details.audit.operations
+        .filter(({ status }) => ["blocked", "pending_review"].includes(status))
+        .map((operation) => operationTask(details.audit, operation));
+    }
+    if (!token.includes("bottle-check-review")) return null;
+    const details = buildBottleCheckDetails({
+      approved: approvedTokens.has(token),
+      rejected: rejectedTokens.has(token),
+    });
+    return details.audit.operations
+      .filter(({ status }) => ["blocked", "pending_review"].includes(status))
+      .map((operation) => operationTask(details.audit, operation));
+  }
+
+  function taskList(tasks) {
+    return {
+      results: tasks,
+      counts: {
+        all: tasks.length,
+        listing: 0,
+        catalog: tasks.length,
+        blocked: tasks.filter(({ state }) => state === "blocked").length,
+      },
+      rel: { nextCursor: null, prevCursor: null },
+    };
+  }
+
+  function operationTask(audit, operation) {
+    const copy =
+      operation.proposal.type === "merge_bottles"
+        ? {
+            question: "Merge these Bottle records?",
+            title: `Merge Bottle #${operation.proposal.input.sourceBottleId} into #${operation.proposal.input.destinationBottleId}`,
+          }
+        : {
+            question: "Apply these changes to the Entity?",
+            title: `Update Entity #${operation.proposal.input.entityId}`,
+          };
+    return {
+      key: `operation:${operation.id}`,
+      kind: "operation",
+      category: "catalog",
+      state: operation.status === "blocked" ? "blocked" : "ready",
+      title: copy.title,
+      sourceLabel:
+        audit.intent === "resolve_reference"
+          ? "Incoming listing follow-up"
+          : "Moderator audit",
+      question: copy.question,
+      statusLabel:
+        operation.status === "blocked" ? "Blocked" : "Suggested change",
+      attentionAt: operation.createdAt,
+      source: {
+        kind: "operation",
+        checkId: audit.id,
+        operationId: operation.id,
+      },
+    };
   }
 
   function buildLinkedStorePriceCheckDetails({ approved }) {
