@@ -15,9 +15,9 @@ import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier
 import {
   BottleClassificationError,
   isIgnoredBottleClassification,
-  runBottleReference,
   type BottleClassificationDecision,
 } from "@peated/server/agents/bottleClassifier";
+import { runScrapedBottleReference } from "@peated/server/agents/bottleClassifier/scrapedBottleReference";
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
@@ -1085,7 +1085,8 @@ export async function resolveStorePriceMatchProposal(
         parseStoredExtractedLabel(existingProposal);
     }
 
-    const classificationRun = await runBottleReference(classificationInput);
+    const classificationRun =
+      await runScrapedBottleReference(classificationInput);
     const classification = classificationRun.result;
     classificationModelMetadata = classificationRun.modelMetadata;
 

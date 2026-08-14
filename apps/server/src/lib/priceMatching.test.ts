@@ -109,6 +109,13 @@ vi.mock("@peated/server/agents/bottleClassifier", async (importOriginal) => {
   };
 });
 
+vi.mock(
+  "@peated/server/agents/bottleClassifier/scrapedBottleReference",
+  () => ({
+    runScrapedBottleReference: vi.fn(),
+  }),
+);
+
 vi.mock("@peated/server/lib/openaiEmbeddings", async () => {
   const actual = await vi.importActual("@peated/server/lib/openaiEmbeddings");
   return {
@@ -267,12 +274,16 @@ describe("priceMatching", () => {
 
   beforeEach(async () => {
     vi.resetAllMocks();
-    const { classifyBottleReference, runBottleReference } =
+    const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
-    vi.mocked(runBottleReference).mockImplementation(async (...args) => ({
-      result: await vi.mocked(classifyBottleReference)(...args),
-      modelMetadata: null,
-    }));
+    const { runScrapedBottleReference } =
+      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
+    vi.mocked(runScrapedBottleReference).mockImplementation(
+      async (...args) => ({
+        result: await vi.mocked(classifyBottleReference)(...args),
+        modelMetadata: null,
+      }),
+    );
     config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   });
 
@@ -283,8 +294,10 @@ describe("priceMatching", () => {
   test("passes normalized source identity to the classifier", async ({
     fixtures,
   }) => {
-    const { classifyBottleReference, runBottleReference } =
+    const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    const { runScrapedBottleReference } =
+      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
     const sourceIdentity = {
       brand: "The Gauldrons",
       bottler: null,
@@ -324,7 +337,7 @@ describe("priceMatching", () => {
 
     await resolveStorePriceMatchProposal(price.id);
 
-    expect(runBottleReference).toHaveBeenCalledWith(
+    expect(runScrapedBottleReference).toHaveBeenCalledWith(
       expect.objectContaining({ extractedIdentity: sourceIdentity }),
     );
   });
@@ -7862,8 +7875,10 @@ describe("priceMatching", () => {
   test("links every classified full retry to an immutable identity check", async ({
     fixtures,
   }) => {
-    const { classifyBottleReference, runBottleReference } =
+    const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
+    const { runScrapedBottleReference } =
+      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
     const sourceBottle = await fixtures.Bottle({ name: "Duplicate Source" });
     const destinationBottle = await fixtures.Bottle({
       name: "Canonical Destination",
@@ -7910,10 +7925,12 @@ describe("priceMatching", () => {
         names: ["search_bottles", "get_bottle_context"],
       },
     };
-    vi.mocked(runBottleReference).mockImplementation(async (...args) => ({
-      result: await vi.mocked(classifyBottleReference)(...args),
-      modelMetadata,
-    }));
+    vi.mocked(runScrapedBottleReference).mockImplementation(
+      async (...args) => ({
+        result: await vi.mocked(classifyBottleReference)(...args),
+        modelMetadata,
+      }),
+    );
 
     const firstProposal = await resolveStorePriceMatchProposal(price.id);
     const secondProposal = await resolveStorePriceMatchProposal(price.id, {

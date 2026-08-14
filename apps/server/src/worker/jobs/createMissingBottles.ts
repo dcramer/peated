@@ -6,7 +6,7 @@ import {
   finalizeBottleAliasAssignment,
   StaleBottleAliasReviewIdentityError,
 } from "@peated/server/lib/bottleAliases";
-import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import { resolveScrapedBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import {
   getIncomingBottleDecisionFromResolutionSource,
   recordIncomingBottleDecisionInTransaction,
@@ -38,7 +38,7 @@ export default async function createMissingBottles() {
       cursor = review.id;
       const aliasKey = normalizeBottleAliasKey(review.name);
 
-      const resolution = await resolveBottleReferenceTarget({
+      const resolution = await resolveScrapedBottleReferenceTarget({
         reference: {
           id: review.id,
           externalSiteId: review.externalSiteId,

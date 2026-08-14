@@ -10,6 +10,7 @@ import type {
   BottleObservation,
 } from "@peated/bottle-classifier/internal/types";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
+import { classifyScrapedBottleReference } from "@peated/server/agents/bottleClassifier/scrapedBottleReference";
 import config from "@peated/server/config";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { BottleAliasIdentitySnapshot } from "@peated/server/lib/bottleAliases";
@@ -169,17 +170,22 @@ export async function applyClassifierCreateDecision({
  * Classifier and creation failures return unresolved results so ingestion can
  * preserve its raw source record.
  */
-export async function resolveBottleReferenceTarget({
-  reference,
-  aliasLookupNames = [],
-  extractedIdentity = null,
-  createdByActorId,
-}: {
+type ResolveBottleReferenceTargetInput = {
   reference: BottleReference;
   aliasLookupNames?: string[];
   extractedIdentity?: Partial<BottleExtractedDetails> | null;
   createdByActorId: number;
-}): Promise<BottleReferenceResolution> {
+};
+
+async function resolveBottleReferenceTargetWithClassifier(
+  {
+    reference,
+    aliasLookupNames = [],
+    extractedIdentity = null,
+    createdByActorId,
+  }: ResolveBottleReferenceTargetInput,
+  classify: typeof classifyBottleReference,
+): Promise<BottleReferenceResolution> {
   const uniqueAliasLookupNames = Array.from(
     new Set(aliasLookupNames.map((name) => name.trim()).filter(Boolean)),
   );
@@ -206,7 +212,7 @@ export async function resolveBottleReferenceTarget({
 
   let classification: BottleClassificationResult;
   try {
-    classification = await classifyBottleReference({
+    classification = await classify({
       reference,
       extractedIdentity: extractedIdentity
         ? {
@@ -323,4 +329,23 @@ export async function resolveBottleReferenceTarget({
       createdBottle: false,
     };
   }
+}
+
+export async function resolveBottleReferenceTarget(
+  input: ResolveBottleReferenceTargetInput,
+) {
+  return await resolveBottleReferenceTargetWithClassifier(
+    input,
+    classifyBottleReference,
+  );
+}
+
+/** External scraper ingestion uses the scraper classifier credential policy. */
+export async function resolveScrapedBottleReferenceTarget(
+  input: ResolveBottleReferenceTargetInput,
+) {
+  return await resolveBottleReferenceTargetWithClassifier(
+    input,
+    classifyScrapedBottleReference,
+  );
 }

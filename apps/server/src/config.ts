@@ -55,6 +55,8 @@ export default {
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
 
   AI_GATEWAY_API_KEY: aiGatewayConfig.apiKey,
+  SCRAPER_AI_GATEWAY_API_KEY:
+    process.env.SCRAPER_AI_GATEWAY_API_KEY?.trim() || undefined,
   BOTTLE_CLASSIFIER_MODEL: aiGatewayConfig.bottleClassifierModel,
   BOTTLE_CLASSIFIER_REASONING_EFFORT:
     aiGatewayConfig.bottleClassifierReasoningEffort,
@@ -66,6 +68,8 @@ export default {
   OPENAI_MODEL: aiGatewayConfig.model,
   OPENAI_REASONING_EFFORT: aiGatewayConfig.reasoningEffort,
   FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || null,
+  SCRAPER_FIRECRAWL_API_KEY:
+    process.env.SCRAPER_FIRECRAWL_API_KEY?.trim() || null,
   FIRECRAWL_API_URL: process.env.FIRECRAWL_API_URL || null,
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||

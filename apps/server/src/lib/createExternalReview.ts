@@ -9,7 +9,10 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  resolveBottleReferenceTarget,
+  resolveScrapedBottleReferenceTarget,
+} from "@peated/server/lib/bottleReferenceResolution";
 import { mapRows } from "@peated/server/lib/db";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import {
@@ -67,7 +70,11 @@ export async function createExternalReview(
   const rawName = input.name;
   const { name: normalizedName } = normalizeBottle({ name: rawName });
   const aliasKey = normalizeBottleAliasKey(rawName);
-  const resolution = await resolveBottleReferenceTarget({
+  const resolveReference =
+    initiatedByUserId === undefined
+      ? resolveScrapedBottleReferenceTarget
+      : resolveBottleReferenceTarget;
+  const resolution = await resolveReference({
     reference: {
       externalSiteId: site.id,
       name: rawName,
