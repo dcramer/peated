@@ -719,11 +719,11 @@ export function prepareBottleAuditAgentRun(
     currentBottleId: audit.bottleId,
   };
   const normalizedExtractedIdentity =
-    extractedIdentity ??
-    currentBottleContext.publicImages.find(
-      ({ labelEvidence }) => labelEvidence.extractedIdentity !== null,
-    )?.labelEvidence.extractedIdentity ??
-    null;
+    extractedIdentity !== undefined
+      ? extractedIdentity
+      : (currentBottleContext.publicImages.find(
+          ({ labelEvidence }) => labelEvidence.extractedIdentity !== null,
+        )?.labelEvidence.extractedIdentity ?? null);
   const state: BottleClassifierAgentRunState = {
     searchEvidence: [...searchEvidence],
     candidateBottles: new Map(),
@@ -1157,8 +1157,9 @@ export function createBottleClassifier(
       };
       const preparedEvidence = await prepareBottleReferenceEvidence({
         reference,
-        extractedIdentity:
-          preferredImage?.labelEvidence.extractedIdentity ?? null,
+        // The audited Bottle name seeds retrieval. A fallible image extraction
+        // stays visible as context evidence but must not steer candidate search.
+        extractedIdentity: null,
         imageEvidence: null,
         candidateExpansion: "open",
         allowAutoIgnore: false,

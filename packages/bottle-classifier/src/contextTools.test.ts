@@ -123,6 +123,106 @@ describe("Bottle-check context tools", () => {
     ).toEqual([]);
   });
 
+  test("does not let unrelated web evidence or one label extraction overwrite populated Bottle fields", async () => {
+    const currentBottleContext: BottleContext = {
+      ...bottleContext(),
+      publicImages: [
+        {
+          source: { kind: "bottle" },
+          url: "https://example.com/bottles/45146.webp",
+          labelEvidence: {
+            sourceImageId: "bottle:45146",
+            model: "test-model",
+            extractedIdentity: {
+              brand: "Laphroaig",
+              bottler: null,
+              expression: "Càirdeas",
+              series: "Càirdeas",
+              distillery: ["Laphroaig"],
+              category: "single_malt",
+              stated_age: null,
+              abv: 56.4,
+              release_year: 2022,
+              vintage_year: null,
+              cask_strength: true,
+              single_cask: false,
+              cask_type: null,
+              cask_size: null,
+              cask_fill: null,
+              edition: "Cask 7445",
+            },
+            rawLabelText: "CASK 7445 56.4% ABV",
+          },
+        },
+      ],
+    };
+    const unrelatedWebUrl = "https://example.com/laphroaig";
+    const prepared = prepareBottleAuditAgentRun(
+      {
+        client: {} as OpenAI,
+        model: "test-model",
+        maxSearchQueries: 1,
+        firecrawlApiKey: "firecrawl-test-key",
+        executeWebSearch: async () => ({
+          evidence: [
+            {
+              provider: "firecrawl",
+              query: "Laphroaig brand",
+              summary: "General information about the Laphroaig brand.",
+              results: [
+                {
+                  title: "Laphroaig",
+                  url: unrelatedWebUrl,
+                  domain: "example.com",
+                  description: "The history of the Laphroaig brand.",
+                  extraSnippets: [],
+                },
+              ],
+            },
+          ],
+          errors: [],
+        }),
+        adapters: {
+          searchBottles: vi.fn(async () => []),
+          getBottleContext: vi.fn(async () => null),
+        },
+      },
+      {
+        audit: {
+          bottleId: currentBottleContext.bottleId,
+          origin: "post_user_creation",
+        },
+        extractedIdentity: null,
+        currentBottleContext,
+        conversationId: "single-image-replacement",
+      },
+    );
+
+    await invokePreparedTool(prepared, "firecrawl_web_search", {
+      queries: ["Laphroaig brand"],
+    });
+
+    expect(
+      await invokePreparedTool(prepared, "propose_update_bottle", {
+        bottleId: currentBottleContext.bottleId,
+        patch: { edition: "Cask 7445", abv: 56.4 },
+        rationale: "The single image extraction conflicts with stored fields.",
+        evidenceRefs: [
+          { kind: "bottle", bottleId: currentBottleContext.bottleId },
+          { kind: "web_result", url: unrelatedWebUrl },
+        ],
+      }),
+    ).toMatchObject({
+      status: "rejected",
+      reason: expect.stringContaining('field "edition"'),
+    });
+    expect(
+      prepared.getOutput({
+        finalOutput: { summary: "No supported replacement remains." },
+      }).proposedOperations,
+    ).toEqual([]);
+  });
+
   test("offers bounded reference context without catalog-change tools", async () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {

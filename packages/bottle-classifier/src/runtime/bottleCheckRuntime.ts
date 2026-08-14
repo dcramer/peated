@@ -45,6 +45,7 @@ import {
   bottleContextToCandidate,
   createBottleContextLoader,
 } from "./bottleCheckContext";
+import { findUnsupportedPopulatedBottlePatchField } from "./bottlePatchEvidence";
 import { mergeBottleCandidate, mergeResolvedEntity } from "./candidates";
 
 export type BottleClassifierDataSource = {
@@ -540,6 +541,15 @@ export function createRunProposalCollector({
               brand: context.shared.brand.name,
               bottler: context.shared.bottler?.name ?? null,
             }
+          : null;
+      },
+      getUnsupportedPopulatedBottlePatchField: (bottleId, patch) => {
+        const context = state.bottleContexts.get(bottleId);
+        return context
+          ? findUnsupportedPopulatedBottlePatchField({
+              context,
+              patch,
+            })
           : null;
       },
     },
