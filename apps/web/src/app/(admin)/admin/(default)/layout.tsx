@@ -7,5 +7,9 @@ export default async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <Layout sidebar={<AdminSidebar />}>{children}</Layout>;
+  return (
+    <Layout footer={null} sidebar={<AdminSidebar />}>
+      {children}
+    </Layout>
+  );
 }

@@ -68,7 +68,7 @@ export function ProfileDropdown() {
               {user.admin ? (
                 <div>
                   <MenuItem>
-                    <Link href="/admin/audits">Audits</Link>
+                    <Link href="/admin/moderation/inbox">Moderation</Link>
                   </MenuItem>
                   <MenuItem>
                     <Link href={`/admin`}>Admin</Link>

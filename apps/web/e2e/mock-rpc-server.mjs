@@ -311,6 +311,39 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, bottle);
       return true;
     }
+    case "admin/moderation/listTasks": {
+      const token = getAccessToken(request);
+      const task =
+        token.includes("queue-direct-bottle") &&
+        !appliedQueueProposalTokens.has(token)
+          ? buildDirectBottleModerationTask()
+          : null;
+      sendRpcResponse(response, {
+        results: task ? [task] : [],
+        counts: {
+          all: task ? 1 : 0,
+          listing: task ? 1 : 0,
+          catalog: 0,
+          blocked: 0,
+        },
+        rel: { nextCursor: null, prevCursor: null },
+      });
+      return true;
+    }
+    case "admin/moderation/task": {
+      const token = getAccessToken(request);
+      const task =
+        token.includes("queue-direct-bottle") &&
+        !appliedQueueProposalTokens.has(token)
+          ? buildDirectBottleModerationTask()
+          : null;
+      if (!task || input?.key !== task.key) {
+        sendRpcError(response, "Moderation task not found");
+        return true;
+      }
+      sendRpcResponse(response, { task });
+      return true;
+    }
     case "prices/matchQueue/list": {
       const token = getAccessToken(request);
       if (bottleCheckMock.isLinkedStorePriceRequest(token)) {
@@ -349,6 +382,10 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, { run: null });
       return true;
     case "prices/matchQueue/details":
+      if (input?.proposal === directBottleQueueProposalId) {
+        sendRpcResponse(response, buildDirectBottleQueueProposal());
+        return true;
+      }
       if (input?.proposal !== 9901) {
         sendRpcError(
           response,
@@ -1426,6 +1463,22 @@ function buildDirectBottleQueueProposal() {
       id: 9912,
       name: `${anotherReleaseSourceBottle.fullName} ${directBottleQueueEdition}`,
     },
+  };
+}
+
+function buildDirectBottleModerationTask() {
+  const proposal = buildDirectBottleQueueProposal();
+  return {
+    key: `listing:${proposal.id}`,
+    kind: "listing",
+    category: "listing",
+    state: "ready",
+    title: proposal.price.name,
+    sourceLabel: proposal.price.site.name,
+    question: "Should this Bottle be added to the catalog?",
+    statusLabel: "create new",
+    attentionAt: proposal.createdAt,
+    source: { kind: "listing", proposalId: proposal.id },
   };
 }
 
