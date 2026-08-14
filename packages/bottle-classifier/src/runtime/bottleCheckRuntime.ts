@@ -543,17 +543,12 @@ export function createRunProposalCollector({
             }
           : null;
       },
-      getUnsupportedPopulatedBottlePatchField: (
-        bottleId,
-        patch,
-        evidenceRefs,
-      ) => {
+      getUnsupportedPopulatedBottlePatchField: (bottleId, patch) => {
         const context = state.bottleContexts.get(bottleId);
         return context
           ? findUnsupportedPopulatedBottlePatchField({
               context,
               patch,
-              evidenceRefs,
             })
           : null;
       },

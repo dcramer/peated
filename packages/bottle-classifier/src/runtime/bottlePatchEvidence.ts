@@ -1,4 +1,4 @@
-import type { BottlePatch, EvidenceRef } from "../bottleCheckContract";
+import type { BottlePatch } from "../bottleCheckContract";
 import type { BottleContext } from "../bottleContextContract";
 
 const GUARDED_PATCH_FIELDS = [
@@ -105,22 +105,17 @@ function agreeingImageCount(
 
 /**
  * Protects populated scalar Bottle identity from a single fallible image pass.
- * Missing fields can still use one label; replacements need independent
- * structured context or a cited web result before they reach moderator review.
+ * Missing fields can still use one label; replacements need structured
+ * field-level context before they reach moderator review. Unstructured web
+ * results cannot prove which value they support.
  */
 export function findUnsupportedPopulatedBottlePatchField({
   context,
   patch,
-  evidenceRefs,
 }: {
   context: BottleContext;
   patch: BottlePatch;
-  evidenceRefs: readonly EvidenceRef[];
 }): GuardedPatchField | null {
-  if (evidenceRefs.some(({ kind }) => kind === "web_result")) {
-    return null;
-  }
-
   for (const field of GUARDED_PATCH_FIELDS) {
     const proposedValue = patch[field];
     if (proposedValue === undefined) continue;

@@ -253,7 +253,7 @@ describe("Bottle proposal tools", () => {
     ).toEqual({
       status: "rejected",
       reason:
-        'Changing populated Bottle field "abv" requires a cited web result, a matching structured Bottle observation, or two agreeing label images. One image extraction cannot overwrite an existing value.',
+        'Changing populated Bottle field "abv" requires a matching structured Bottle observation or two agreeing label images. Unstructured web results and one image extraction cannot overwrite an existing value.',
     });
     expect(collector.getProposals()).toEqual([]);
   });

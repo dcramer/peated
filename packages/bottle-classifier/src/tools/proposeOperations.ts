@@ -45,7 +45,6 @@ type ProposalCollectionContext = {
   getUnsupportedPopulatedBottlePatchField: (
     bottleId: number,
     patch: BottlePatch,
-    evidenceRefs: readonly EvidenceRef[],
   ) => keyof BottlePatch | null;
 };
 
@@ -304,12 +303,11 @@ export function createBottleProposalCollector({
           context.getUnsupportedPopulatedBottlePatchField(
             proposal.input.bottleId,
             proposal.input.patch,
-            proposal.evidenceRefs,
           );
         if (unsupportedField) {
           return {
             status: "rejected",
-            reason: `Changing populated Bottle field ${JSON.stringify(unsupportedField)} requires a cited web result, a matching structured Bottle observation, or two agreeing label images. One image extraction cannot overwrite an existing value.`,
+            reason: `Changing populated Bottle field ${JSON.stringify(unsupportedField)} requires a matching structured Bottle observation or two agreeing label images. Unstructured web results and one image extraction cannot overwrite an existing value.`,
           };
         }
       }
@@ -363,7 +361,7 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
     tool({
       name: "propose_update_bottle",
       description: proposalToolDescription(
-        "Record one read-only proposal to update one inspected Bottle. Include every supported field change for that Bottle in one sparse patch. Use only after investigating the Bottle and collecting every cited piece of evidence. Remove a populated relationship or change a populated exact field only when evidence for that Bottle shows it is wrong; omission is not enough. One label-image extraction may fill a missing scalar field but cannot replace a populated value without a cited exact-product web result, a matching structured Bottle observation, or a second agreeing label image. Do not propose an update solely for cask type, size, or fill. This does not mutate or approve catalog data.",
+        "Record one read-only proposal to update one inspected Bottle. Include every supported field change for that Bottle in one sparse patch. Use only after investigating the Bottle and collecting every cited piece of evidence. Remove a populated relationship or change a populated exact field only when evidence for that Bottle shows it is wrong; omission is not enough. One label-image extraction may fill a missing scalar field but cannot replace a populated value without a matching structured Bottle observation or a second agreeing label image. Unstructured web results may inform review but cannot authorize the replacement. Do not propose an update solely for cask type, size, or fill. This does not mutate or approve catalog data.",
       ),
       parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
       strict: false,

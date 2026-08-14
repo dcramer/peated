@@ -92,12 +92,11 @@ describe("populated Bottle patch evidence", () => {
       findUnsupportedPopulatedBottlePatchField({
         context: bottleContext({ imageAbvs: [56.4] }),
         patch: { abv: 56.4 },
-        evidenceRefs: [{ kind: "bottle", bottleId: 45453 }],
       }),
     ).toBe("abv");
   });
 
-  test("accepts independent structured or web support for a replacement", () => {
+  test("accepts matching structured support for a replacement", () => {
     expect(
       findUnsupportedPopulatedBottlePatchField({
         context: bottleContext({
@@ -105,17 +104,6 @@ describe("populated Bottle patch evidence", () => {
           observationAbv: 56.4,
         }),
         patch: { abv: 56.4 },
-        evidenceRefs: [{ kind: "bottle", bottleId: 45453 }],
-      }),
-    ).toBeNull();
-    expect(
-      findUnsupportedPopulatedBottlePatchField({
-        context: bottleContext({ imageAbvs: [56.4] }),
-        patch: { abv: 56.4 },
-        evidenceRefs: [
-          { kind: "bottle", bottleId: 45453 },
-          { kind: "web_result", url: "https://example.com/bottle" },
-        ],
       }),
     ).toBeNull();
   });
@@ -125,14 +113,12 @@ describe("populated Bottle patch evidence", () => {
       findUnsupportedPopulatedBottlePatchField({
         context: bottleContext({ imageAbvs: [56.4, 56.4] }),
         patch: { abv: 56.4 },
-        evidenceRefs: [{ kind: "bottle", bottleId: 45453 }],
       }),
     ).toBeNull();
     expect(
       findUnsupportedPopulatedBottlePatchField({
         context: bottleContext({ abv: null, imageAbvs: [56.4] }),
         patch: { abv: 56.4 },
-        evidenceRefs: [{ kind: "bottle", bottleId: 45453 }],
       }),
     ).toBeNull();
   });
@@ -142,7 +128,6 @@ describe("populated Bottle patch evidence", () => {
       findUnsupportedPopulatedBottlePatchField({
         context: bottleContext({ observationAbv: 56.4 }),
         patch: { abv: 56.4, edition: "Cask 7445" },
-        evidenceRefs: [{ kind: "bottle", bottleId: 45453 }],
       }),
     ).toBe("edition");
   });

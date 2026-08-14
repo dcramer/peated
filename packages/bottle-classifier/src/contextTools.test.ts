@@ -123,7 +123,7 @@ describe("Bottle-check context tools", () => {
     ).toEqual([]);
   });
 
-  test("does not let one label extraction overwrite populated Bottle fields", async () => {
+  test("does not let unrelated web evidence or one label extraction overwrite populated Bottle fields", async () => {
     const currentBottleContext: BottleContext = {
       ...bottleContext(),
       publicImages: [
@@ -156,11 +156,32 @@ describe("Bottle-check context tools", () => {
         },
       ],
     };
+    const unrelatedWebUrl = "https://example.com/laphroaig";
     const prepared = prepareBottleAuditAgentRun(
       {
         client: {} as OpenAI,
         model: "test-model",
-        maxSearchQueries: 0,
+        maxSearchQueries: 1,
+        firecrawlApiKey: "firecrawl-test-key",
+        executeWebSearch: async () => ({
+          evidence: [
+            {
+              provider: "firecrawl",
+              query: "Laphroaig brand",
+              summary: "General information about the Laphroaig brand.",
+              results: [
+                {
+                  title: "Laphroaig",
+                  url: unrelatedWebUrl,
+                  domain: "example.com",
+                  description: "The history of the Laphroaig brand.",
+                  extraSnippets: [],
+                },
+              ],
+            },
+          ],
+          errors: [],
+        }),
         adapters: {
           searchBottles: vi.fn(async () => []),
           getBottleContext: vi.fn(async () => null),
@@ -177,6 +198,10 @@ describe("Bottle-check context tools", () => {
       },
     );
 
+    await invokePreparedTool(prepared, "firecrawl_web_search", {
+      queries: ["Laphroaig brand"],
+    });
+
     expect(
       await invokePreparedTool(prepared, "propose_update_bottle", {
         bottleId: currentBottleContext.bottleId,
@@ -184,6 +209,7 @@ describe("Bottle-check context tools", () => {
         rationale: "The single image extraction conflicts with stored fields.",
         evidenceRefs: [
           { kind: "bottle", bottleId: currentBottleContext.bottleId },
+          { kind: "web_result", url: unrelatedWebUrl },
         ],
       }),
     ).toMatchObject({
