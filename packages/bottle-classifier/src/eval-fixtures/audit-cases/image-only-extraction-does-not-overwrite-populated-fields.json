@@ -1,0 +1,143 @@
+{
+  "id": "audit-image-only-extraction-does-not-overwrite-populated-fields",
+  "name": "audit: one image extraction does not overwrite populated exact fields",
+  "scenario": "clean",
+  "input": {
+    "audit": {
+      "bottleId": 45453,
+      "origin": "post_user_creation"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 45453,
+        "fullName": "Single Cask Nation Mannochmore - Red Wine Barrique - Cask 173445 - 17-year-old - 2024 Release - 2007 Vintage - 53.0% ABV - Cask Strength - Other Cask - Barrique - Refill",
+        "brand": "Single Cask Nation",
+        "bottler": "Single Cask Nation",
+        "distillery": ["Mannochmore"],
+        "category": "single_malt",
+        "statedAge": 17,
+        "edition": "Red Wine Barrique - Cask 173445",
+        "caskStrength": true,
+        "singleCask": true,
+        "caskType": "other",
+        "caskSize": "barrique",
+        "caskFill": "refill",
+        "abv": 53,
+        "vintageYear": 2007,
+        "releaseYear": 2024,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 45453,
+          "fullName": "Single Cask Nation Mannochmore - Red Wine Barrique - Cask 173445 - 17-year-old - 2024 Release - 2007 Vintage - 53.0% ABV - Cask Strength - Other Cask - Barrique - Refill",
+          "groupId": 18413,
+          "shared": {
+            "name": "Mannochmore",
+            "statedAge": null,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 365762,
+              "name": "Single Cask Nation"
+            },
+            "distillers": [
+              {
+                "entityId": 1168,
+                "name": "Mannochmore"
+              }
+            ],
+            "bottler": {
+              "entityId": 365762,
+              "name": "Single Cask Nation"
+            }
+          },
+          "exact": {
+            "edition": "Red Wine Barrique - Cask 173445",
+            "statedAge": 17,
+            "abv": 53,
+            "singleCask": true,
+            "caskStrength": true,
+            "vintageYear": 2007,
+            "releaseYear": 2024,
+            "caskSize": "barrique",
+            "caskType": "other",
+            "caskFill": "refill"
+          },
+          "siblings": [],
+          "aliases": [],
+          "observations": [],
+          "imageSources": [
+            {
+              "source": {
+                "kind": "bottle"
+              },
+              "url": "https://api.peated.com/uploads/prices-wq9juag4geacz75tq1rbgy8o.webp"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "searchResponses": [
+    {
+      "when": ["mannochmore"],
+      "results": [
+        {
+          "bottleId": 45453,
+          "fullName": "Single Cask Nation Mannochmore - Red Wine Barrique - Cask 173445 - 17-year-old - 2024 Release - 2007 Vintage - 53.0% ABV - Cask Strength - Other Cask - Barrique - Refill",
+          "brand": "Single Cask Nation",
+          "bottler": "Single Cask Nation",
+          "distillery": ["Mannochmore"],
+          "category": "single_malt",
+          "statedAge": 17,
+          "edition": "Red Wine Barrique - Cask 173445",
+          "caskStrength": true,
+          "singleCask": true,
+          "caskType": "other",
+          "caskSize": "barrique",
+          "caskFill": "refill",
+          "abv": 53,
+          "vintageYear": 2007,
+          "releaseYear": 2024,
+          "score": 1,
+          "source": ["search"]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://api.peated.com/v1/bottles/45453",
+      "https://api.peated.com/uploads/prices-wq9juag4geacz75tq1rbgy8o.webp",
+      "https://www.skurnik.com/sku/mannochmore-2007-17-year-red-wine-barrique-cask-173445-single-cask-nation/",
+      "https://impexbev.com/single-cask-nation/"
+    ],
+    "dbOutcome": {
+      "bottleId": 45453,
+      "createsBottle": false,
+      "summary": "Keep Bottle 45453 unchanged. Its marketed release is cask 173445, finished in a refill red-wine barrique and bottled at 53% ABV."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 45453,
+        "field": "edition",
+        "productionValue": "Red Wine Barrique - Cask 173445",
+        "evidenceValue": "Cask 7445",
+        "source": "image_evidence",
+        "issue": "conflicts_with_evidence",
+        "safeToAutoFill": false,
+        "notes": "A low-resolution extraction can misread the cask number and must not replace the populated edition without independent support."
+      }
+    ],
+    "notes": "Curated from Bottle Check 1135 and its public Bottle image. The admin export omitted the original stored artifacts, so this fixture preserves the observed Bottle, image, failed operation, and independently verified DB outcome without claiming to reproduce unavailable observation rows."
+  },
+  "expected": {
+    "summary": "The available exact-product evidence supports the stored red-wine-barrique cask 173445 release at 53% ABV; no catalog change is supported.",
+    "proposedOperations": [],
+    "findings": []
+  }
+}

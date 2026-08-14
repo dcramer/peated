@@ -25,6 +25,7 @@ function createHarness() {
               bottler: "The Scotch Malt Whisky Society",
             }
           : { brand: "Example Distillery", bottler: null },
+      getUnsupportedPopulatedBottlePatchField: () => null,
     },
   });
   return {
@@ -220,6 +221,41 @@ describe("Bottle proposal tools", () => {
         },
       }),
     ]);
+  });
+
+  test("returns the evidence boundary reason for an unsupported populated-field replacement", async () => {
+    const inspectedBottleIds = new Set([10]);
+    const collector = createBottleProposalCollector({
+      context: {
+        hasBottleEvidence: (bottleId) => inspectedBottleIds.has(bottleId),
+        hasEntityEvidence: () => false,
+        hasSourceEvidence: () => false,
+        hasWebEvidence: () => false,
+        isBottleInspected: (bottleId) => inspectedBottleIds.has(bottleId),
+        isEntityInspected: () => false,
+        isSeriesInspected: () => false,
+        getBottleBranding: () => ({
+          brand: "Example Distillery",
+          bottler: null,
+        }),
+        getUnsupportedPopulatedBottlePatchField: () => "abv",
+      },
+    });
+    const tools = createBottleProposalTools(collector);
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        bottleId: 10,
+        patch: { abv: 56.4 },
+        rationale: "A single label extraction contradicts the stored ABV.",
+        evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
+      }),
+    ).toEqual({
+      status: "rejected",
+      reason:
+        'Changing populated Bottle field "abv" requires a cited web result, a matching structured Bottle observation, or two agreeing label images. One image extraction cannot overwrite an existing value.',
+    });
+    expect(collector.getProposals()).toEqual([]);
   });
 
   test("rejects an SMWS cask code as edition while keeping the other exact repairs", async () => {

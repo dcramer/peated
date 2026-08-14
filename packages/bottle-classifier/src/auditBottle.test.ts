@@ -131,10 +131,7 @@ describe("auditBottle", () => {
           imageUrl: "https://example.com/bottles/45146.webp",
           currentBottleId: 45146,
         });
-        expect(extractedIdentity).toMatchObject({
-          edition: "Warehouse 1",
-          release_year: 2022,
-        });
+        expect(extractedIdentity).toBeNull();
         expect(initialCandidates).toEqual([
           expect.objectContaining({ bottleId: 45146 }),
         ]);
@@ -217,11 +214,7 @@ describe("auditBottle", () => {
         },
       ],
       artifacts: {
-        extractedIdentity: {
-          expression: "Càirdeas",
-          edition: "Warehouse 1",
-          release_year: 2022,
-        },
+        extractedIdentity: null,
         candidates: [{ bottleId: 45146 }],
         bottleContexts: [
           {
@@ -280,7 +273,7 @@ describe("auditBottle", () => {
       expect.objectContaining({
         query: "Laphroaig Càirdeas 2022 Warehouse 1",
         currentBottleId: 45146,
-        edition: "Warehouse 1",
+        edition: null,
       }),
     );
   });

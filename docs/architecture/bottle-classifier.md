@@ -71,6 +71,13 @@ shows the assignment is wrong. Likewise, change a populated exact field only
 with evidence for the same Bottle. Values from other batches or releases show
 variation, not a correction.
 
+A single public-image extraction may fill a missing scalar Bottle field, but it
+cannot replace a populated scalar value. Replacement requires a cited exact-product
+web result, a matching structured Bottle observation, or two distinct label
+images whose structured extractions agree. The audited Bottle name, not its
+image extraction, seeds initial candidate retrieval so one OCR or vision error
+cannot redirect the investigation before the agent sees the complete context.
+
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
 policy.

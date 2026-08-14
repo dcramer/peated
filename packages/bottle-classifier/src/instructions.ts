@@ -102,6 +102,7 @@ const BOTTLE_OPERATION_POLICY = [
     "Before an identity-changing Bottle update, search for the corrected identity. If an independently complete canonical Bottle already represents it, merge the malformed duplicate into that survivor.",
     "Remove a populated Brand, bottler, distillery, series, category, or shared age only when product evidence shows it is wrong. Omission or one Entity filling multiple roles is not enough.",
     "Change a populated exact field only with evidence for the same Bottle. A value from another batch, edition, year, or exact cask does not qualify.",
+    "One label-image extraction can fill a missing scalar Bottle field, but it cannot replace a populated value by itself. A replacement needs a cited exact-product web result, a matching structured Bottle observation, or two agreeing label images.",
     "If evidence says an expression's batches are cask strength, barrel proof, or barrel strength but their ABVs vary, keep each Bottle's own ABV and set `caskStrength` to true.",
     "Never update a Bottle that is also a merge source in the same run. Keep Suggested Changes independent. Include only fields that change.",
     "Use `update_entity` and `merge_entities` only for inspected Entities materially related to the checked Bottle. Create a related Entity only through an explicit `kind: create` choice in an `update_bottle` patch.",
