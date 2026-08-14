@@ -72,7 +72,10 @@ function isMultiproduct(title: string): boolean {
   return MULTIPRODUCT_PATTERN.test(title);
 }
 
-export function parseWhiskyWorldProducts(html: string): StorePrice[] {
+export function parseWhiskyWorldPage(html: string): {
+  products: StorePrice[];
+  hasNextPage: boolean;
+} {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);
@@ -132,19 +135,17 @@ export function parseWhiskyWorldProducts(html: string): StorePrice[] {
     products.push(listing);
   });
 
-  if (cards.length > 0 && products.length === 0) {
-    throw new Error(
-      "Whisky World page contained product cards but no supported listings.",
-    );
-  }
-
-  return products;
+  return {
+    products,
+    hasNextPage: $('link[rel="next"]').length > 0,
+  };
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
-  const products = parseWhiskyWorldProducts(data);
+  const { products, hasNextPage } = parseWhiskyWorldPage(data);
   await Promise.all(products.map(cb));
+  return { hasNextPage };
 }
 
 export default async function scrapeWhiskyWorld({

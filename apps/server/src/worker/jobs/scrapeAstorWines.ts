@@ -10,13 +10,15 @@ import { load as cheerio } from "cheerio";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "astorwines";
+const PRODUCT_CARD_SELECTOR = "#search-results .item-teaser";
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
   const $ = cheerio(data);
 
   const promises: Promise<void>[] = [];
-  $("#search-results .item-teaser").each((_, el) => {
+  const cards = $(PRODUCT_CARD_SELECTOR);
+  cards.each((_, el) => {
     const rawName = ($(".header > h2", el).first().attr("title") || "").trim();
     if (!rawName) {
       logScrapeWarning(SITE, "Unable to identify product name");
@@ -64,14 +66,21 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   });
 
   await Promise.all(promises);
+  const hasNextPage = $(".pagination a")
+    .toArray()
+    .some((link) => $(link).find(".fa-angle-right").length);
+  return { hasNextPage };
 }
 
-export default async function scrapeAstorWines() {
+export default async function scrapeAstorWines({
+  dryRun = false,
+}: { dryRun?: boolean } = {}) {
   const scotchCount = await scrapePrices(
     SITE,
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=3_41&srt=1&instockonly=True&Page=${page}`,
     scrapeProducts,
+    { dryRun },
   );
 
   const whiskeyCount = await scrapePrices(
@@ -79,6 +88,7 @@ export default async function scrapeAstorWines() {
     (page) =>
       `https://www.astorwines.com/SpiritsSearchResult.aspx?search=Advanced&searchtype=Contains&term=&cat=2&style=2_32&srt=1&instockonly=True&Page=${page}`,
     scrapeProducts,
+    { dryRun },
   );
   return scotchCount + whiskeyCount;
 }

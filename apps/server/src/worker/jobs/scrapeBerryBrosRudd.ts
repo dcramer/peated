@@ -38,14 +38,15 @@ function parseVolume(value: string): number | null {
   return Number.isInteger(volume) ? volume : null;
 }
 
-export function parseBerryBrosRuddProducts(
+export function parseBerryBrosRuddPage(
   html: string,
   sourceUrl: string,
-): StorePrice[] {
+): { products: StorePrice[]; hasSourceProducts: boolean } {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
+  const cards = $(PRODUCT_CARD_SELECTOR);
 
-  $(PRODUCT_CARD_SELECTOR).each((_, element) => {
+  cards.each((_, element) => {
     const card = $(element);
     const rawName = card.find("span.body--strong").first().text().trim();
     const action = card.find("button.add-item").first().text().trim();
@@ -109,13 +110,14 @@ export function parseBerryBrosRuddProducts(
     products.push(listing);
   });
 
-  return products;
+  return { products, hasSourceProducts: cards.length > 0 };
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
-  const products = parseBerryBrosRuddProducts(data, url);
+  const { products, hasSourceProducts } = parseBerryBrosRuddPage(data, url);
   await Promise.all(products.map(cb));
+  return { hasSourceProducts };
 }
 
 export default async function scrapeBerryBrosRudd({

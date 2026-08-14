@@ -21,9 +21,10 @@ test("scrapes purchasable own-selection bottles and excludes ineligible cards", 
   axiosMock.onGet(firstPageUrl).reply(200, result);
 
   const items: unknown[] = [];
-  await scrapeProducts(firstPageUrl, async (item) => {
+  const page = scrapeProducts(firstPageUrl, async (item) => {
     items.push(StorePriceInputSchema.parse(item));
   });
+  await expect(page).resolves.toEqual({ hasSourceProducts: true });
 
   expect(items).toEqual([
     {
@@ -65,6 +66,24 @@ test("paginates a dry run and stops after an empty page", async ({
   expect(axiosMock.history.get.map(({ url }: { url?: string }) => url)).toEqual(
     [firstPageUrl, secondPageUrl],
   );
+});
+
+test("continues after a page whose products are all filtered", async ({
+  axiosMock,
+}) => {
+  const filteredPage = `<div data-testid="product-card" class="sf-product-card">
+    <span class="body--strong">Unavailable whisky</span>
+    <button class="add-item">Sold out</button>
+  </div>`;
+  const result = await loadFixture("berrybrosrudd", "bottle-list.html");
+  const thirdPageUrl =
+    "https://www.bbr.com/search?page=3&spirit_type=Scotch%20Whisky&own_selection=true";
+  axiosMock.onGet(firstPageUrl).reply(200, filteredPage);
+  axiosMock.onGet(secondPageUrl).reply(200, result);
+  axiosMock.onGet(thirdPageUrl).reply(200, "<main></main>");
+
+  await expect(scrapeBerryBrosRudd({ dryRun: true })).resolves.toBe(3);
+  expect(axiosMock.history.get).toHaveLength(3);
 });
 
 test("fails when a complete scrape yields no supported listings", async ({

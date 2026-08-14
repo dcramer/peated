@@ -21,9 +21,10 @@ test("scrapes directly buyable bottles and excludes ineligible cards", async ({
   axiosMock.onGet(firstPageUrl).reply(200, result);
 
   const items: unknown[] = [];
-  await scrapeProducts(firstPageUrl, async (item) => {
+  const page = scrapeProducts(firstPageUrl, async (item) => {
     items.push(StorePriceInputSchema.parse(item));
   });
+  await expect(page).resolves.toEqual({ hasNextPage: false });
 
   expect(items).toEqual([
     {
@@ -77,7 +78,10 @@ test("scrapes directly buyable bottles and excludes ineligible cards", async ({
 test("paginates a dry run and stops after an empty page", async ({
   axiosMock,
 }) => {
-  const result = await loadFixture("whiskyworld", "bottle-list.html");
+  const result = `<link rel="next" href="${secondPageUrl}">${await loadFixture(
+    "whiskyworld",
+    "bottle-list.html",
+  )}`;
   axiosMock.onGet(firstPageUrl).reply(200, result);
   axiosMock.onGet(secondPageUrl).reply(200, "<main></main>");
 
@@ -87,24 +91,30 @@ test("paginates a dry run and stops after an empty page", async ({
   );
 });
 
-test("fails a page that has cards but no supported listings", async ({
+test("continues after a page whose products are all filtered", async ({
   axiosMock,
 }) => {
-  axiosMock.onGet(firstPageUrl).reply(
-    200,
-    `<main id="js-search-results-products__list">
+  const filteredPage = `<link rel="next" href="${secondPageUrl}">
+    <main id="js-search-results-products__list">
       <div class="product" id="product_1_1">
         <div class="product__details__title">
           <a href="/unavailable-whisky-p1">Unavailable Whisky</a>
         </div>
         <a class="product__options__view"><span>View</span></a>
       </div>
-    </main>`,
-  );
+    </main>`;
+  const thirdPageUrl =
+    "https://www.thewhiskyworld.com/whisky-c7/70cl-t24?show=48&page=3";
+  const result = `<link rel="next" href="${thirdPageUrl}">${await loadFixture(
+    "whiskyworld",
+    "bottle-list.html",
+  )}`;
+  axiosMock.onGet(firstPageUrl).reply(200, filteredPage);
+  axiosMock.onGet(secondPageUrl).reply(200, result);
+  axiosMock.onGet(thirdPageUrl).reply(200, "<main></main>");
 
-  await expect(scrapeProducts(firstPageUrl, async () => {})).rejects.toThrow(
-    "Whisky World page contained product cards but no supported listings.",
-  );
+  await expect(scrapeWhiskyWorld({ dryRun: true })).resolves.toBe(5);
+  expect(axiosMock.history.get).toHaveLength(3);
 });
 
 test("fails when a complete scrape yields no supported listings", async ({

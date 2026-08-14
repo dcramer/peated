@@ -219,9 +219,10 @@ export async function handleBottle(
 
 export type ScrapePricesCallback = (product: StorePrice) => Promise<void>;
 
-/** Lets source-card presence drive pagination when every eligible output is filtered. */
+/** Lets a source own pagination when emitted products are not a reliable signal. */
 export type ScrapePricesPageResult = {
-  hasSourceProducts: boolean;
+  hasSourceProducts?: boolean;
+  hasNextPage?: boolean;
 };
 
 function getScrapedProductKey(product: StorePrice): string {
@@ -254,10 +255,10 @@ export default async function scrapePrices(
 
   const uniqueProducts = new Set<string>();
 
-  let hasSourceProducts = true;
+  let hasMorePages = true;
   let page = 1;
   try {
-    while (hasSourceProducts) {
+    while (hasMorePages) {
       let emittedProduct = false;
       const result = await scrapeProducts(urlFn(page), async (product) => {
         logInfo("Scraped product price {name}", {
@@ -273,7 +274,8 @@ export default async function scrapePrices(
         uniqueProducts.add(productKey);
         emittedProduct = true;
       });
-      hasSourceProducts = result?.hasSourceProducts ?? emittedProduct;
+      hasMorePages =
+        result?.hasNextPage ?? result?.hasSourceProducts ?? emittedProduct;
       page += 1;
     }
 

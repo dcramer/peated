@@ -193,6 +193,8 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     const product = parseEdradourProduct(detail, productCard.url);
     if (product) await cb(product);
   }
+
+  return { hasSourceProducts: productCards.length > 0 };
 }
 
 export default async function scrapeEdradour({

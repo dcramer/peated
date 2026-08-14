@@ -9,6 +9,8 @@ import { load as cheerio } from "cheerio";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "woodencork";
+const PRODUCT_CARD_SELECTOR =
+  "#CollectionAjaxContent div.grid-item, .collection-grid .product-grid-item";
 
 function extractVolume(name: string) {
   const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
@@ -35,7 +37,8 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const $ = cheerio(data);
 
   const promises: Promise<void>[] = [];
-  $("#CollectionAjaxContent div.grid-item").each((_, el) => {
+  const cards = $(PRODUCT_CARD_SELECTOR);
+  cards.each((_, el) => {
     const bottle = $("div.grid-product__title", el).first().text();
     if (!bottle) {
       logScrapeWarning(SITE, "Unable to identify product name");
@@ -93,18 +96,25 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         currency: "usd",
         volume,
         // image,
-        url: absoluteUrl(url, productUrl),
+        url: absoluteUrl("https://woodencork.com", productUrl),
       }),
     );
   });
 
   await Promise.all(promises);
+  return {
+    hasNextPage:
+      $('link[rel="next"]').length > 0 || $(".pagination .next a").length > 0,
+  };
 }
 
-export default async function scrapeWoodenCork() {
+export default async function scrapeWoodenCork({
+  dryRun = false,
+}: { dryRun?: boolean } = {}) {
   return scrapePrices(
     SITE,
     (page) => `https://woodencork.com/collections/whiskey?cursor=${page}`,
     scrapeProducts,
+    { dryRun },
   );
 }

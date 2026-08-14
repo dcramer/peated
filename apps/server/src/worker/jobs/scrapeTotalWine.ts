@@ -10,13 +10,15 @@ import { load as cheerio } from "cheerio";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "totalwine";
+const PRODUCT_CARD_SELECTOR = "#main article";
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const data = await getUrl(url);
   const $ = cheerio(data);
 
   const promises: Promise<void>[] = [];
-  $("#main article").each((_, el) => {
+  const cards = $(PRODUCT_CARD_SELECTOR);
+  cards.each((_, el) => {
     const rawName = $("h2.title__2RoYeYuO > a", el).first().text();
     if (!rawName) {
       logScrapeWarning(SITE, "Unable to identify product name");
@@ -60,14 +62,24 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   });
 
   await Promise.all(promises);
+  const nextPage = $('[data-at="product-search-pagination-nextlink"]');
+  return {
+    hasNextPage:
+      nextPage.length > 0 &&
+      !nextPage.is("[disabled]") &&
+      nextPage.attr("aria-disabled") !== "true",
+  };
 }
 
-export default async function scrapeTotalWine() {
+export default async function scrapeTotalWine({
+  dryRun = false,
+}: { dryRun?: boolean } = {}) {
   const scotchCount = await scrapePrices(
     SITE,
     (page) =>
       `https://www.totalwine.com/spirits/scotch/c/000887?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
     scrapeProducts,
+    { dryRun },
   );
 
   const whiskeyCount = await scrapePrices(
@@ -75,6 +87,7 @@ export default async function scrapeTotalWine() {
     (page) =>
       `https://www.totalwine.com/spirits/whiskey/c/9238919?viewall=true&pageSize=120&aty=0,0,0,0&page=${page}`,
     scrapeProducts,
+    { dryRun },
   );
   return scotchCount + whiskeyCount;
 }

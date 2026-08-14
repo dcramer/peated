@@ -11,9 +11,10 @@ test("scrapes whisky listings and ignores unsupported sizes", async ({
   axiosMock.onGet(url).reply(200, result);
 
   const items: any[] = [];
-  await scrapeProducts(url, async (item) => {
+  const page = scrapeProducts(url, async (item) => {
     items.push(StorePriceInputSchema.parse(item));
   });
+  await expect(page).resolves.toEqual({ hasSourceProducts: true });
 
   expect(items).toEqual([
     {
