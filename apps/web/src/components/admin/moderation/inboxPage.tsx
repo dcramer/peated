@@ -9,6 +9,13 @@ import InboxList, { inboxTaskHref } from "./inboxList";
 import ModerationNav from "./moderationNav";
 import TaskDetail from "./taskDetail";
 
+export function nextTaskAfterCompletion<Task>(
+  tasks: readonly Task[],
+  completedIndex: number,
+): Task | undefined {
+  return tasks[completedIndex >= 0 ? completedIndex : 0];
+}
+
 export default function InboxPage({
   selected,
 }: {
@@ -46,7 +53,7 @@ export default function InboxPage({
     setAnnouncement(message);
     await queryClient.invalidateQueries({ queryKey: listOptions.queryKey });
     const refreshed = await queryClient.fetchQuery(listOptions);
-    const next = refreshed.results[0];
+    const next = nextTaskAfterCompletion(refreshed.results, selectedIndex);
     router.push(
       next ? inboxTaskHref(next, searchParams) : "/admin/moderation/inbox",
     );
