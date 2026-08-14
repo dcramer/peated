@@ -1,89 +1,203 @@
-import {
-  normalizeBottle,
-  normalizeVolume,
-} from "@peated/bottle-classifier/normalize";
+import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
-import type { ScrapePricesCallback } from "@peated/server/lib/scraper";
-import scrapePrices, { getUrl, parsePrice } from "@peated/server/lib/scraper";
-import { absoluteUrl } from "@peated/server/lib/urls";
-import { load as cheerio } from "cheerio";
+import type {
+  ScrapePricesCallback,
+  StorePrice,
+} from "@peated/server/lib/scraper";
+import scrapePrices from "@peated/server/lib/scraper";
+import { toTitleCase } from "@peated/server/lib/strings";
+import slugify from "@sindresorhus/slugify";
+import axios from "axios";
+import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "reservebar";
+const STORE_ORIGIN = "https://www.reservebar.com";
+const API_ORIGIN = "https://api.liquidcommerce.cloud";
+const AUTH_URL = `${API_ORIGIN}/api/authentication`;
+const CATALOG_URL = `${API_ORIGIN}/api/catalog/search`;
+// ReserveBar publishes this storefront credential to its browser client.
+const API_KEY = "3874058558b6dd82dc652e770b6b689e";
+const PRODUCTS_PER_PAGE = 16;
 
-const cookieValue =
-  'priceBookisIsSet=true; persisted="{\\"address\\":\\"301 Mission St, San Francisco, CA 94105, USA\\",\\"address1\\":\\"301 Mission St\\",\\"city\\":\\"SF\\",\\"postalCode\\":\\"94105\\",\\"place_id\\":\\"ChIJ68ImfGOAhYARGxkajD7cq9M\\",\\"lat\\":\\"37.7904705\\",\\"long\\":\\"-122.3961641\\",\\"state_code\\":\\"CA\\",\\"is_gift\\":false}"';
+const AuthenticationResponseSchema = z.object({
+  data: z.object({
+    token: z.string().min(1),
+  }),
+});
 
-export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const data = await getUrl(url, false, {
-    Cookie: cookieValue,
-  });
-  const $ = cheerio(data);
-  const promises: Promise<void>[] = [];
+const CatalogResponseSchema = z.object({
+  navigation: z.object({
+    currentPage: z.number().int().positive(),
+    totalPages: z.number().int().nonnegative(),
+  }),
+  products: z.array(z.unknown()),
+});
 
-  $(".product-grid .b-product-grid__item").each((_, el) => {
-    const bottle = $("div.pdp-link > a", el).first();
-    if (!bottle) {
-      logScrapeWarning(SITE, "Unable to identify product name");
-      return;
-    }
+const ProductSchema = z
+  .object({
+    images: z.array(z.string()).optional(),
+    name: z.string().trim().min(1),
+    priceInfo: z.object({
+      average: z.number().int().positive(),
+      currency: z.literal("USD"),
+    }),
+    salsifyGrouping: z.string().trim().min(1),
+    sizes: z
+      .array(
+        z.object({
+          pack: z.boolean().optional(),
+          size: z.string().trim().min(1),
+          uom: z.string().trim().min(1),
+          volume: z.string().trim().min(1),
+        }),
+      )
+      .min(1),
+  })
+  .passthrough();
 
-    const productUrl = bottle.attr("href");
-    if (!productUrl) {
-      logScrapeWarning(SITE, "Unable to identify product URL");
-      return;
-    }
-
-    const { name } = normalizeBottle({ name: bottle.text() });
-
-    const volumeRaw = $(".product-tile__volume", el).first().text();
-    if (!volumeRaw) {
-      logScrapeWarning(SITE, "Unable to identify product volume");
-      return;
-    }
-
-    const volume = volumeRaw ? normalizeVolume(volumeRaw) : 750;
-    if (!volume) {
-      logScrapeWarning(SITE, "Invalid product size", { volumeRaw });
-      return;
-    }
-
-    if (!ALLOWED_VOLUMES.includes(volume)) {
-      logScrapeWarning(SITE, "Invalid product size", { volume });
-      return;
-    }
-
-    const priceRaw = $(".sales > .value", el).first().text();
-    const price = parsePrice(priceRaw);
-    if (!price) {
-      logScrapeWarning(SITE, "Invalid product price", { priceRaw });
-      return;
-    }
-
-    logScrapedProduct(SITE, { name, price });
-
-    promises.push(
-      cb({
-        name,
-        price,
-        currency: "usd",
-        volume,
-        // image,
-        url: absoluteUrl(url, productUrl),
-      }),
-    );
-  });
-
-  await Promise.all(promises);
+function getRawName(input: unknown): string | null {
+  if (!input || typeof input !== "object" || !("name" in input)) return null;
+  return typeof input.name === "string" ? input.name : null;
 }
 
-export default async function scrapeReserveBar() {
-  const limit = 36;
+function parseVolume(size: z.infer<typeof ProductSchema>["sizes"][number]) {
+  if (size.pack) return null;
 
+  const unit = size.uom.toUpperCase();
+  const amount = Number(size.volume);
+  const volume = unit === "LITRE" ? amount * 1000 : amount;
+  return Number.isInteger(volume) && ALLOWED_VOLUMES.includes(volume)
+    ? volume
+    : null;
+}
+
+function getImageUrl(images: string[] | undefined): string | undefined {
+  const value = images?.[0];
+  if (!value) return;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : undefined;
+  } catch {
+    return;
+  }
+}
+
+export function parseReserveBarProducts(input: unknown): {
+  products: StorePrice[];
+  hasNextPage: boolean;
+} {
+  const payload = CatalogResponseSchema.parse(input);
+  const products: StorePrice[] = [];
+
+  for (const productInput of payload.products) {
+    const result = ProductSchema.safeParse(productInput);
+    if (!result.success) {
+      logScrapeWarning(SITE, "Invalid product record", {
+        rawName: getRawName(productInput),
+      });
+      continue;
+    }
+
+    const product = result.data;
+    const volume = parseVolume(product.sizes[0]);
+    if (!volume) {
+      logScrapeWarning(SITE, "Unsupported product size", {
+        rawName: product.name,
+        size: product.sizes[0].size,
+      });
+      continue;
+    }
+
+    const rawName =
+      product.name === product.name.toUpperCase()
+        ? toTitleCase(product.name)
+        : product.name;
+    const { name } = normalizeBottle({ name: rawName });
+    const listing = {
+      currency: "usd" as const,
+      imageUrl: getImageUrl(product.images),
+      name,
+      price: product.priceInfo.average,
+      url: `${STORE_ORIGIN}/products/${slugify(product.name)}/${product.salsifyGrouping}`,
+      volume,
+    };
+
+    logScrapedProduct(SITE, listing);
+    products.push(listing);
+  }
+
+  return {
+    products,
+    hasNextPage: payload.navigation.currentPage < payload.navigation.totalPages,
+  };
+}
+
+async function getAccessToken(): Promise<string> {
+  const { data } = await axios.get(AUTH_URL, {
+    headers: {
+      "X-LIQUID-API-KEY": API_KEY,
+      "X-LIQUID-API-OBF": "true",
+    },
+  });
+  return AuthenticationResponseSchema.parse(data).data.token;
+}
+
+export async function scrapeProducts(
+  url: string,
+  cb: ScrapePricesCallback,
+  accessToken?: string,
+) {
+  const page = Number(new URL(url).searchParams.get("page"));
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error("Invalid ReserveBar catalog page URL.");
+  }
+
+  const token = accessToken ?? (await getAccessToken());
+  const { data } = await axios.post(
+    url,
+    {
+      entity: "reservebar.com",
+      filters: [
+        { key: "availability", values: "IN_STOCK" },
+        { key: "categories", values: ["SPIRITS > WHISKEY"] },
+      ],
+      isLean: false,
+      isLegacy: true,
+      loc: {},
+      orderBy: "price",
+      orderDirection: "desc",
+      page,
+      perPage: PRODUCTS_PER_PAGE,
+      refresh: false,
+      search: "",
+      shouldShowOffHours: false,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "X-LIQUID-API-KEY": API_KEY,
+        "X-LIQUID-API-OBF": "true",
+        "X-LIQUID-API-SDK": "true",
+        "X-LIQUID-SDK-VERSION": "1.11.1",
+      },
+    },
+  );
+
+  const result = parseReserveBarProducts(data);
+  await Promise.all(result.products.map(cb));
+  return { hasNextPage: result.hasNextPage };
+}
+
+export default async function scrapeReserveBar({
+  dryRun = false,
+}: { dryRun?: boolean } = {}) {
+  const accessToken = await getAccessToken();
   return scrapePrices(
     SITE,
-    (page) =>
-      `https://www.reservebar.com/collections/whiskey?start=${page * limit}&sz=${limit}`,
-    scrapeProducts,
+    (page) => `${CATALOG_URL}?page=${page}`,
+    (url, cb) => scrapeProducts(url, cb, accessToken),
+    { dryRun },
   );
 }
