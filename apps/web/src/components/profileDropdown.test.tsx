@@ -53,7 +53,7 @@ describe("ProfileDropdown", () => {
       </AuthProvider>,
     );
 
-    expect(html).toContain('href="/admin/audits"');
+    expect(html).toContain('href="/admin/moderation/inbox"');
     expect(html).toContain('href="/admin"');
   });
 });

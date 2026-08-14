@@ -4,7 +4,6 @@ import Button from "@peated/web/components/button";
 import HeaderLogo from "@peated/web/components/headerLogo";
 import SidebarLink from "@peated/web/components/sidebarLink";
 import { usePathname } from "next/navigation";
-import { ADMIN_WORKSTREAMS } from "./workstreams";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -25,33 +24,26 @@ export default function AdminSidebar() {
               </li>
               <li>
                 <div className="px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Workbench
+                  Moderation
                 </div>
                 <ul role="list" className="-mx-2 space-y-1">
-                  <SidebarLink href="/admin" active={pathname === "/admin"}>
-                    Review Workbench
-                  </SidebarLink>
-                </ul>
-              </li>
-              <li>
-                <div className="px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Review Flow
-                </div>
-                <ul role="list" className="-mx-2 space-y-1">
-                  {ADMIN_WORKSTREAMS.map((workstream) => (
-                    <SidebarLink
-                      key={workstream.id}
-                      href={workstream.href}
-                      active={pathname.startsWith(workstream.href)}
-                    >
-                      {workstream.sidebarLabel}
-                    </SidebarLink>
-                  ))}
                   <SidebarLink
-                    href="/admin/incoming-decisions"
-                    active={pathname.startsWith("/admin/incoming-decisions")}
+                    href="/admin/moderation/inbox"
+                    active={pathname.startsWith("/admin/moderation/inbox")}
                   >
-                    Decision Log
+                    Inbox
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/admin/moderation/history"
+                    active={pathname.startsWith("/admin/moderation/history")}
+                  >
+                    History
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/admin/moderation/automation"
+                    active={pathname.startsWith("/admin/moderation/automation")}
+                  >
+                    Automation
                   </SidebarLink>
                 </ul>
               </li>

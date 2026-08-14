@@ -1,5 +1,6 @@
 "use client";
 
+import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
@@ -45,7 +46,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
       ...(note.trim() ? { note: note.trim() } : {}),
     });
     if (result.status === "needs_review") {
-      router.replace(`/admin/audits/${result.audit.id}`);
+      router.replace(moderationHrefForAudit(result.audit));
       return;
     }
     setCleanSummary(result.summary);
