@@ -241,6 +241,28 @@ describe("scrapePrices", () => {
     expect(scrapeProducts).toHaveBeenCalledTimes(4);
   });
 
+  it("prefers an explicit next-page signal over source product presence", async () => {
+    const scrapeProducts = vi.fn(
+      async (_url: string, cb: ScrapePricesCallback) => {
+        await cb({
+          name: "Product 1",
+          price: 1000,
+          currency: "usd",
+          url: "https://test.com/product1",
+          volume: 750,
+        });
+        return { hasNextPage: false, hasSourceProducts: true };
+      },
+    );
+
+    await expect(
+      scrapePrices("totalwine", () => "https://test.com/page", scrapeProducts, {
+        dryRun: true,
+      }),
+    ).resolves.toBe(1);
+    expect(scrapeProducts).toHaveBeenCalledOnce();
+  });
+
   it("flushes queued prices before propagating a later page failure", async ({
     fixtures,
   }) => {

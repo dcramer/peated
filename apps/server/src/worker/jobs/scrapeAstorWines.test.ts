@@ -10,11 +10,11 @@ test("simple", async ({ axiosMock }) => {
 
   const items: any[] = [];
 
-  const fn = scrapeProducts(url, async (item) => {
+  const page = scrapeProducts(url, async (item) => {
     items.push(item);
   });
 
-  await fn;
+  await expect(page).resolves.toEqual({ hasNextPage: true });
 
   expect(items.length).toMatchInlineSnapshot(`12`);
   expect(items[0]).toMatchInlineSnapshot(`

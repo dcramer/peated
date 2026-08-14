@@ -48,9 +48,10 @@ test("scrapes purchasable whisky and excludes unsupported products", async ({
   await mockFirstPage(axiosMock);
 
   const items: unknown[] = [];
-  await scrapeProducts(firstPageUrl, async (item) => {
+  const page = scrapeProducts(firstPageUrl, async (item) => {
     items.push(StorePriceInputSchema.parse(item));
   });
+  await expect(page).resolves.toEqual({ hasSourceProducts: true });
 
   expect(items).toEqual([
     {

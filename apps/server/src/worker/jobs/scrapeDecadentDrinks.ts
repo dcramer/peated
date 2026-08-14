@@ -7,6 +7,8 @@ import { load as cheerio } from "cheerio";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "decadentdrinks";
+const PRODUCT_CARD_SELECTOR =
+  ".catalog-results .view-content > .col > .product-card";
 const DEFAULT_VOLUME = 700;
 
 function extractVolume(name: string): [string, number] {
@@ -39,7 +41,8 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const $ = cheerio(data);
 
   const promises: Promise<void>[] = [];
-  $(".catalog-results .view-content > .col > .product-card").each((_, el) => {
+  const cards = $(PRODUCT_CARD_SELECTOR);
+  cards.each((_, el) => {
     const rawName = $(".product-card__title", el).first().text().trim();
     if (!rawName) {
       logScrapeWarning(SITE, "Unable to identify product name");
@@ -83,12 +86,16 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   });
 
   await Promise.all(promises);
+  return { hasSourceProducts: cards.length > 0 };
 }
 
-export default async function scrapeDecadentDrinks() {
+export default async function scrapeDecadentDrinks({
+  dryRun = false,
+}: { dryRun?: boolean } = {}) {
   return scrapePrices(
     SITE,
     (page) => `https://decadent-drinks.com/shop?category=5&page=${page - 1}`,
     scrapeProducts,
+    { dryRun },
   );
 }
