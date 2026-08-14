@@ -52,7 +52,7 @@ import {
   type IncomingBottleDecisionActor,
   type IncomingBottleDecisionType,
 } from "@peated/server/lib/incomingBottleDecisionLog";
-import { logError } from "@peated/server/lib/log";
+import { logError, logInfo } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   getStorePriceMatchAutomationAssessment,
@@ -64,10 +64,7 @@ import {
   refreshStorePriceMatchProposalProcessingLease,
   releaseStorePriceMatchProposalProcessingLease,
 } from "@peated/server/lib/priceMatchingProcessingLease";
-import {
-  CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
-  REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
-} from "@peated/server/lib/priceMatchingStatus";
+import { REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES } from "@peated/server/lib/priceMatchingStatus";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
@@ -1023,13 +1020,17 @@ export async function resolveStorePriceMatchProposal(
   const existingProposal = await db.query.storePriceMatchProposals.findFirst({
     where: eq(storePriceMatchProposals.priceId, price.id),
   });
-  if (
-    existingProposal &&
-    CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES.includes(
-      existingProposal.status,
-    ) &&
-    !force
-  ) {
+  // The proposal is the durable classification receipt. Automatic scraper and
+  // image redispatches must not spend model work again; explicit retries own
+  // reevaluation through force or a processing lease.
+  if (existingProposal && !force && !processingToken) {
+    logInfo("Skipped automatic store-price classification", {
+      extra: {
+        priceId: price.id,
+        proposalId: existingProposal.id,
+        proposalStatus: existingProposal.status,
+      },
+    });
     return existingProposal;
   }
 

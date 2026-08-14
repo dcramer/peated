@@ -5774,6 +5774,34 @@ describe("priceMatching", () => {
     expect(result.reviewedById).toBe(reviewer.id);
   });
 
+  test("does not reevaluate reviewable proposals during automatic resolution", async ({
+    fixtures,
+  }) => {
+    const { classifyBottleReference, runBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+
+    for (const status of ["verified", "pending_review", "errored"] as const) {
+      const price = await fixtures.StorePrice({
+        name: `Already Classified ${status}`,
+      });
+      const [proposal] = await db
+        .insert(storePriceMatchProposals)
+        .values({
+          priceId: price.id,
+          status,
+          proposalType: "no_match",
+        })
+        .returning();
+
+      const result = await resolveStorePriceMatchProposal(price.id);
+
+      expect(result).toEqual(proposal);
+    }
+
+    expect(runBottleReference).not.toHaveBeenCalled();
+    expect(classifyBottleReference).not.toHaveBeenCalled();
+  });
+
   test("force reevaluation reopens closed proposals and clears review metadata", async ({
     fixtures,
   }) => {
@@ -6668,7 +6696,7 @@ describe("priceMatching", () => {
         [price.id],
       );
 
-      resolution = resolveStorePriceMatchProposal(price.id);
+      resolution = resolveStorePriceMatchProposal(price.id, { force: true });
       void resolution.catch(() => undefined);
       await waitForSessionBlockedBy(observer, blockerPid);
 
@@ -6954,7 +6982,7 @@ describe("priceMatching", () => {
         "LOCK TABLE store_price_match_attempt IN ACCESS EXCLUSIVE MODE",
       );
 
-      resolution = resolveStorePriceMatchProposal(price.id);
+      resolution = resolveStorePriceMatchProposal(price.id, { force: true });
       void resolution.catch(() => undefined);
       const resolverPid = await waitForSessionBlockedBy(
         observer,
