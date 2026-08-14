@@ -8,7 +8,7 @@ import {
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { getQueue } from "@peated/server/worker/client";
-import { and, desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
+import { desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { ModerationAutomationResponseSchema } from "./schemas";
 
 export default procedure
@@ -33,30 +33,50 @@ export default procedure
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    const [proposalCounts, operationCounts, decisionCounts, retryRuns] =
-      await Promise.all([
-        db
-          .select({
-            processing: sql<number>`count(*) filter (where ${storePriceMatchProposals.processingExpiresAt} > NOW())::int`,
-          })
-          .from(storePriceMatchProposals),
-        db
-          .select({
-            processing: sql<number>`count(*) filter (where ${bottleOperations.status} = 'applying')::int`,
-            failed: sql<number>`count(*) filter (where ${bottleOperations.status} IN ('stale', 'failed'))::int`,
-            clearedToday: sql<number>`count(*) filter (where ${bottleOperations.executionCompletedAt} >= ${startOfToday} OR (${bottleOperations.reviewedAt} >= ${startOfToday} AND ${bottleOperations.status} = 'rejected'))::int`,
-          })
-          .from(bottleOperations),
-        db
-          .select({ count: sql<number>`count(*)::int` })
-          .from(incomingBottleDecisionLogs)
-          .where(gte(incomingBottleDecisionLogs.createdAt, startOfToday)),
-        db
-          .select()
-          .from(storePriceMatchRetryRuns)
-          .orderBy(desc(storePriceMatchRetryRuns.createdAt))
-          .limit(10),
-      ]);
+    // Health totals cover all durable work; limits apply only to rendered lists.
+    const [
+      proposalCounts,
+      operationCounts,
+      decisionCounts,
+      retryCounts,
+      recentRetryRuns,
+      failedRetries,
+    ] = await Promise.all([
+      db
+        .select({
+          processing: sql<number>`count(*) filter (where ${storePriceMatchProposals.processingExpiresAt} > NOW())::int`,
+        })
+        .from(storePriceMatchProposals),
+      db
+        .select({
+          processing: sql<number>`count(*) filter (where ${bottleOperations.status} = 'applying')::int`,
+          failed: sql<number>`count(*) filter (where ${bottleOperations.status} IN ('stale', 'failed'))::int`,
+          clearedToday: sql<number>`count(*) filter (where ${bottleOperations.executionCompletedAt} >= ${startOfToday} OR (${bottleOperations.reviewedAt} >= ${startOfToday} AND ${bottleOperations.status} = 'rejected'))::int`,
+        })
+        .from(bottleOperations),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(incomingBottleDecisionLogs)
+        .where(gte(incomingBottleDecisionLogs.createdAt, startOfToday)),
+      db
+        .select({
+          processing: sql<number>`count(*) filter (where ${storePriceMatchRetryRuns.status} IN ('pending', 'running'))::int`,
+          failed: sql<number>`count(*) filter (where ${storePriceMatchRetryRuns.status} = 'failed')::int`,
+          completedToday: sql<number>`count(*) filter (where ${storePriceMatchRetryRuns.status} = 'completed' AND ${storePriceMatchRetryRuns.completedAt} >= ${startOfToday})::int`,
+        })
+        .from(storePriceMatchRetryRuns),
+      db
+        .select()
+        .from(storePriceMatchRetryRuns)
+        .orderBy(desc(storePriceMatchRetryRuns.createdAt))
+        .limit(10),
+      db
+        .select()
+        .from(storePriceMatchRetryRuns)
+        .where(eq(storePriceMatchRetryRuns.status, "failed"))
+        .orderBy(desc(storePriceMatchRetryRuns.updatedAt))
+        .limit(25),
+    ]);
 
     const failedOperations = await db
       .select()
@@ -64,15 +84,6 @@ export default procedure
       .where(inArray(bottleOperations.status, ["stale", "failed"]))
       .orderBy(desc(bottleOperations.updatedAt))
       .limit(25);
-    const processingRetries = retryRuns.filter(
-      ({ status }) => status === "pending" || status === "running",
-    ).length;
-    const failedRetries = retryRuns.filter(({ status }) => status === "failed");
-    const completedRetriesToday = retryRuns.filter(
-      ({ completedAt, status }) =>
-        status === "completed" && completedAt && completedAt >= startOfToday,
-    ).length;
-
     return {
       generatedAt: new Date().toISOString(),
       counts: {
@@ -80,16 +91,16 @@ export default procedure
           (queueCounts.active ?? 0) +
           (proposalCounts[0]?.processing ?? 0) +
           (operationCounts[0]?.processing ?? 0) +
-          processingRetries,
+          (retryCounts[0]?.processing ?? 0),
         waiting: queueCounts.wait ?? 0,
         failed:
           (queueCounts.failed ?? 0) +
           (operationCounts[0]?.failed ?? 0) +
-          failedRetries.length,
+          (retryCounts[0]?.failed ?? 0),
         clearedToday:
           (decisionCounts[0]?.count ?? 0) +
           (operationCounts[0]?.clearedToday ?? 0) +
-          completedRetriesToday,
+          (retryCounts[0]?.completedToday ?? 0),
       },
       needsAttention: [
         ...failedOperations.map((operation) => ({
@@ -111,7 +122,7 @@ export default procedure
           occurredAt: (run.completedAt ?? run.updatedAt).toISOString(),
         })),
       ],
-      recentRuns: retryRuns.map((run) => ({
+      recentRuns: recentRetryRuns.map((run) => ({
         key: `retry_run:${run.id}`,
         kind: "retry_run" as const,
         title: run.query || "All matching listings",

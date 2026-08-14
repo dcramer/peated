@@ -96,4 +96,54 @@ describe("admin moderation automation", () => {
     );
     expect(workerClient.getQueue).toHaveBeenCalledWith("default");
   });
+
+  test("counts retry health beyond the ten most recent runs", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const now = new Date();
+    const [failedRun] = await db
+      .insert(storePriceMatchRetryRuns)
+      .values({
+        status: "failed",
+        error: "Older retry failed.",
+        createdById: admin.id,
+        createdAt: new Date("2020-01-01T00:00:00.000Z"),
+        updatedAt: new Date("2020-01-01T00:00:00.000Z"),
+      })
+      .returning();
+    await db.insert(storePriceMatchRetryRuns).values({
+      status: "pending",
+      createdById: admin.id,
+      createdAt: new Date("2020-01-02T00:00:00.000Z"),
+      updatedAt: new Date("2020-01-02T00:00:00.000Z"),
+    });
+    await db.insert(storePriceMatchRetryRuns).values(
+      Array.from({ length: 11 }, (_, index) => ({
+        query: `Completed retry ${index + 1}`,
+        status: "completed" as const,
+        createdById: admin.id,
+        completedAt: now,
+        createdAt: new Date(now.getTime() + index),
+        updatedAt: new Date(now.getTime() + index),
+      })),
+    );
+
+    const result = await routerClient.admin.moderation.automation(undefined, {
+      context: { user: admin },
+    });
+
+    expect(result.counts).toMatchObject({
+      processing: 3,
+      failed: 2,
+      clearedToday: 11,
+    });
+    expect(result.recentRuns).toHaveLength(10);
+    expect(result.needsAttention).toContainEqual(
+      expect.objectContaining({
+        key: `retry_run:${failedRun!.id}`,
+        status: "failed",
+      }),
+    );
+  });
 });
