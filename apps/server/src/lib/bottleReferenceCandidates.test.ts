@@ -10,9 +10,11 @@ import {
 import * as openaiEmbeddings from "./openaiEmbeddings";
 
 const originalAIGatewayApiKey = config.AI_GATEWAY_API_KEY;
+const originalScraperAIGatewayApiKey = config.SCRAPER_AI_GATEWAY_API_KEY;
 
 afterEach(() => {
   config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
+  config.SCRAPER_AI_GATEWAY_API_KEY = originalScraperAIGatewayApiKey;
   vi.restoreAllMocks();
 });
 
@@ -136,6 +138,23 @@ test("normalizes proof-like ABV before building candidate search evidence", asyn
   expect(embeddingSpy).toHaveBeenCalledWith(
     expect.stringContaining("59.2% ABV"),
   );
+});
+
+test("uses the scraper credential workload for scraper candidate embeddings", async () => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  config.SCRAPER_AI_GATEWAY_API_KEY = "scraper-key";
+  const embeddingSpy = vi
+    .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
+    .mockResolvedValue(new Array<number>(1536).fill(0));
+
+  await searchBottleCandidates(
+    { query: "Scraped Candidate" },
+    { workload: "scraper" },
+  );
+
+  expect(embeddingSpy).toHaveBeenCalledWith(expect.any(String), {
+    workload: "scraper",
+  });
 });
 
 test("does not inject normalized cask metadata into candidate search evidence", async () => {

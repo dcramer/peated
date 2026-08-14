@@ -14,7 +14,6 @@ import {
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -29,6 +28,10 @@ import {
   normalizePotentialProofToAbv,
 } from "@peated/server/lib/abv";
 import { logError } from "@peated/server/lib/log";
+import {
+  isAIGatewayConfigured,
+  type AIGatewayWorkload,
+} from "@peated/server/lib/openaiClient";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
@@ -861,12 +864,16 @@ async function runCandidateLookupSafely<T>(
 
 async function getVectorCandidates(
   queryText: string,
+  workload: AIGatewayWorkload,
 ): Promise<BottleCandidate[]> {
-  if (!config.AI_GATEWAY_API_KEY || !queryText.trim()) {
+  if (!isAIGatewayConfigured(workload) || !queryText.trim()) {
     return [];
   }
 
-  const embedding = await getOpenAIEmbedding(queryText);
+  const embedding =
+    workload === "scraper"
+      ? await getOpenAIEmbedding(queryText, { workload })
+      : await getOpenAIEmbedding(queryText);
   const vector = sql.raw(`'[${embedding.join(",")}]'::vector`);
 
   const result = await db.execute<{
@@ -1262,31 +1269,36 @@ export async function findBottleReferenceCandidates(
     bottleId?: number | null;
   },
   extractedLabel: BottleExtractedDetails | null,
+  { workload = "application" }: { workload?: AIGatewayWorkload } = {},
 ) {
-  return await searchBottleCandidates({
-    query: reference.name,
-    brand: extractedLabel?.brand ?? null,
-    bottler: extractedLabel?.bottler ?? null,
-    expression: extractedLabel?.expression ?? null,
-    series: extractedLabel?.series ?? null,
-    distillery: extractedLabel?.distillery ?? [],
-    category: normalizeMatchCategory(extractedLabel?.category ?? null),
-    stated_age: extractedLabel?.stated_age ?? null,
-    abv: extractedLabel?.abv ?? null,
-    cask_type: extractedLabel?.cask_type ?? null,
-    cask_size: extractedLabel?.cask_size ?? null,
-    cask_fill: extractedLabel?.cask_fill ?? null,
-    cask_strength: extractedLabel?.cask_strength ?? null,
-    single_cask: extractedLabel?.single_cask ?? null,
-    edition: extractedLabel?.edition ?? null,
-    vintage_year: extractedLabel?.vintage_year ?? null,
-    release_year: extractedLabel?.release_year ?? null,
-    currentBottleId: reference.bottleId ?? null,
-  });
+  return await searchBottleCandidates(
+    {
+      query: reference.name,
+      brand: extractedLabel?.brand ?? null,
+      bottler: extractedLabel?.bottler ?? null,
+      expression: extractedLabel?.expression ?? null,
+      series: extractedLabel?.series ?? null,
+      distillery: extractedLabel?.distillery ?? [],
+      category: normalizeMatchCategory(extractedLabel?.category ?? null),
+      stated_age: extractedLabel?.stated_age ?? null,
+      abv: extractedLabel?.abv ?? null,
+      cask_type: extractedLabel?.cask_type ?? null,
+      cask_size: extractedLabel?.cask_size ?? null,
+      cask_fill: extractedLabel?.cask_fill ?? null,
+      cask_strength: extractedLabel?.cask_strength ?? null,
+      single_cask: extractedLabel?.single_cask ?? null,
+      edition: extractedLabel?.edition ?? null,
+      vintage_year: extractedLabel?.vintage_year ?? null,
+      release_year: extractedLabel?.release_year ?? null,
+      currentBottleId: reference.bottleId ?? null,
+    },
+    { workload },
+  );
 }
 
 export async function searchBottleCandidates(
   rawInput: BottleCandidateSearchInputRequest,
+  { workload = "application" }: { workload?: AIGatewayWorkload } = {},
 ) {
   const input = normalizePotentialProofLikeAbvFields(
     BottleCandidateSearchInputSchema.parse(rawInput),
@@ -1324,7 +1336,7 @@ export async function searchBottleCandidates(
       "vector",
       searchName,
       [] as BottleCandidate[],
-      async () => await getVectorCandidates(queryText),
+      async () => await getVectorCandidates(queryText, workload),
     ),
     runCandidateLookupSafely(
       "text",

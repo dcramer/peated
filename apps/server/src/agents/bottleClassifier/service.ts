@@ -21,6 +21,7 @@ import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySea
 import {
   createOpenAIClient,
   withSentryConversation,
+  type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { randomUUID } from "node:crypto";
@@ -30,7 +31,9 @@ import {
   getEntityClassifierContext,
 } from "./contextAdapters";
 
-let bottleClassifier: ReturnType<typeof createBottleClassifier> | null = null;
+const bottleClassifiers: Partial<
+  Record<AIGatewayWorkload, ReturnType<typeof createBottleClassifier>>
+> = {};
 
 async function searchBottleClassifierEntities(args: SearchEntitiesArgs) {
   const parsedArgs = SearchEntitiesArgsSchema.parse(args);
@@ -77,14 +80,17 @@ async function withReferenceConversation<T>(
   return await withSentryConversation(conversationId, callback);
 }
 
-export function getBottleClassifier() {
-  if (bottleClassifier) {
-    return bottleClassifier;
+export function getBottleClassifier(
+  workload: AIGatewayWorkload = "application",
+) {
+  const existingClassifier = bottleClassifiers[workload];
+  if (existingClassifier) {
+    return existingClassifier;
   }
 
-  const client = createOpenAIClient();
+  const client = createOpenAIClient({ workload });
 
-  bottleClassifier = createBottleClassifier({
+  const bottleClassifier = createBottleClassifier({
     client,
     model: config.BOTTLE_CLASSIFIER_MODEL,
     reasoningEffort: config.BOTTLE_CLASSIFIER_REASONING_EFFORT,
@@ -92,7 +98,10 @@ export function getBottleClassifier() {
     imageExtractionReasoningEffort:
       config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
     maxSearchQueries: config.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES,
-    firecrawlApiKey: config.FIRECRAWL_API_KEY,
+    firecrawlApiKey:
+      workload === "scraper"
+        ? (config.SCRAPER_FIRECRAWL_API_KEY ?? config.FIRECRAWL_API_KEY)
+        : config.FIRECRAWL_API_KEY,
     firecrawlApiUrl: config.FIRECRAWL_API_URL,
     adapters: {
       findInitialCandidates: async ({ reference, extractedIdentity }) =>
@@ -102,8 +111,10 @@ export function getBottleClassifier() {
             bottleId: reference.currentBottleId ?? null,
           },
           extractedIdentity,
+          { workload },
         ),
-      searchBottles: searchBottleCandidates,
+      searchBottles: async (input) =>
+        await searchBottleCandidates(input, { workload }),
       getBottleCandidateById,
       getBottleContext: getBottleClassifierContext,
       getBottleContextImageInput: getBottleClassifierImageInput,
@@ -112,10 +123,14 @@ export function getBottleClassifier() {
     },
   });
 
+  bottleClassifiers[workload] = bottleClassifier;
   return bottleClassifier;
 }
 
-export async function runBottleReference(input: ClassifyBottleReferenceInput) {
+async function runBottleReferenceForWorkload(
+  input: ClassifyBottleReferenceInput,
+  workload: AIGatewayWorkload,
+) {
   const reference = normalizeReferenceForClassifier(input.reference);
   const conversationId = buildReferenceConversationId(
     "bottle_reference",
@@ -124,7 +139,7 @@ export async function runBottleReference(input: ClassifyBottleReferenceInput) {
   );
 
   return await withReferenceConversation(conversationId, async () => {
-    return await getBottleClassifier().runBottleReference({
+    return await getBottleClassifier(workload).runBottleReference({
       ...input,
       reference,
       conversationId,
@@ -136,6 +151,22 @@ export async function classifyBottleReference(
   input: ClassifyBottleReferenceInput,
 ) {
   return (await runBottleReference(input)).result;
+}
+
+export async function runBottleReference(input: ClassifyBottleReferenceInput) {
+  return await runBottleReferenceForWorkload(input, "application");
+}
+
+export async function runScrapedBottleReference(
+  input: ClassifyBottleReferenceInput,
+) {
+  return await runBottleReferenceForWorkload(input, "scraper");
+}
+
+export async function classifyScrapedBottleReference(
+  input: ClassifyBottleReferenceInput,
+) {
+  return (await runScrapedBottleReference(input)).result;
 }
 
 export async function runBottleAudit(input: AuditBottleInput) {

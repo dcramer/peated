@@ -23,6 +23,13 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  "@peated/server/agents/bottleClassifier/scrapedBottleReference",
+  () => ({
+    classifyScrapedBottleReference: classifyBottleReferenceMock,
+  }),
+);
+
 vi.mock("@peated/server/worker/client", () => ({
   pushJob: pushJobMock,
   pushUniqueJob: pushUniqueJobMock,

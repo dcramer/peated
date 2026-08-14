@@ -4,17 +4,26 @@ import { getUserActor } from "@peated/server/lib/actors";
 import {
   lockBottleReferenceResolutionAssignmentInTransaction,
   resolveBottleReferenceTarget,
+  resolveScrapedBottleReferenceTarget,
   type BottleReferenceResolution,
 } from "@peated/server/lib/bottleReferenceResolution";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
+const classifyScrapedBottleReferenceMock = vi.hoisted(() => vi.fn());
 
 vi.mock(
   "@peated/server/agents/bottleClassifier/classifyBottleReference",
   () => ({
     classifyBottleReference: classifyBottleReferenceMock,
+  }),
+);
+
+vi.mock(
+  "@peated/server/agents/bottleClassifier/scrapedBottleReference",
+  () => ({
+    classifyScrapedBottleReference: classifyScrapedBottleReferenceMock,
   }),
 );
 
@@ -133,6 +142,24 @@ describe("resolveBottleReferenceTarget", () => {
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({ action: "no_match" }),
     );
+    classifyScrapedBottleReferenceMock.mockReset();
+    classifyScrapedBottleReferenceMock.mockResolvedValue(
+      buildClassification({ action: "no_match" }),
+    );
+  });
+
+  test("routes scraper references to the isolated classifier", async ({
+    fixtures,
+  }) => {
+    const actor = await getUserActor(await fixtures.User({ admin: true }));
+
+    await resolveScrapedBottleReferenceTarget({
+      reference: { name: "Scraped Bottle" },
+      createdByActorId: actor.id,
+    });
+
+    expect(classifyScrapedBottleReferenceMock).toHaveBeenCalledOnce();
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("uses exact aliases without calling the classifier", async ({

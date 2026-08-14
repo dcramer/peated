@@ -366,6 +366,20 @@ Bottle-specific price lists and history include only rows assigned to that
 Bottle. Unresolved prices remain unresolved; BottleGroup is not a display or
 activity identity.
 
+## Runtime Credentials
+
+Scraper-driven Bottle classification uses `SCRAPER_AI_GATEWAY_API_KEY` for
+model, image-extraction, and embedding calls when configured, and otherwise
+uses the application `AI_GATEWAY_API_KEY`. Scraper web evidence similarly uses
+`SCRAPER_FIRECRAWL_API_KEY` when configured and otherwise uses
+`FIRECRAWL_API_KEY`.
+
+This boundary also covers external-review scraping and missing-review Bottle
+resolution. User and moderator requests, photo identification, and post-create
+Bottle checks retain the application credentials, so scraper quota exhaustion
+or credential revocation does not take those flows offline when the scraper
+overrides are configured.
+
 ## Alias Behavior
 
 Approving a price proposal does two separate things:
