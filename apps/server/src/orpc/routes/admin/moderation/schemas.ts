@@ -40,6 +40,7 @@ export const ModerationTaskSummarySchema = z
     kind: ModerationTaskKindSchema,
     category: ModerationTaskCategorySchema,
     state: ModerationTaskStateSchema,
+    inconclusive: z.boolean(),
     title: z.string(),
     sourceLabel: z.string(),
     question: z.string(),
@@ -56,6 +57,7 @@ export const ModerationTaskListInputSchema = z
     query: z.string().trim().max(200).optional(),
     category: ModerationTaskCategorySchema.optional(),
     blocked: z.coerce.boolean().optional(),
+    inconclusive: z.coerce.boolean().optional(),
   })
   .strict()
   .default({ cursor: 1, limit: 50 });
@@ -69,6 +71,7 @@ export const ModerationTaskListResponseSchema = z
         listing: z.number().int().min(0),
         catalog: z.number().int().min(0),
         blocked: z.number().int().min(0),
+        inconclusive: z.number().int().min(0),
       })
       .strict(),
     rel: z

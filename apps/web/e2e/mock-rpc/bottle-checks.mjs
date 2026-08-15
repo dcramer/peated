@@ -192,6 +192,7 @@ export function createBottleCheckMock({
         listing: 0,
         catalog: tasks.length,
         blocked: tasks.filter(({ state }) => state === "blocked").length,
+        inconclusive: 0,
       },
       rel: { nextCursor: null, prevCursor: null },
     };
@@ -213,6 +214,7 @@ export function createBottleCheckMock({
       kind: "operation",
       category: "catalog",
       state: operation.status === "blocked" ? "blocked" : "ready",
+      inconclusive: false,
       title: copy.title,
       sourceLabel:
         audit.intent === "resolve_reference"

@@ -20,6 +20,8 @@ function listingQuestion(proposalType: string): string {
       return "Should this Bottle be added to the catalog?";
     case "correction":
       return "Should this Bottle record be corrected?";
+    case "no_match":
+      return "No Bottle match was found. Should this listing be ignored?";
     default:
       return "How should this listing be resolved?";
   }
@@ -110,13 +112,18 @@ async function listingTasks(): Promise<ModerationTaskSummary[]> {
     kind: "listing",
     category: "listing",
     state: proposal.status === "errored" ? "blocked" : "ready",
+    inconclusive:
+      proposal.status === "pending_review" &&
+      proposal.proposalType === "no_match",
     title: price.name,
     sourceLabel: site.name,
     question: listingQuestion(proposal.proposalType),
     statusLabel:
       proposal.status === "errored"
         ? "Needs recovery"
-        : proposal.proposalType.replaceAll("_", " "),
+        : proposal.proposalType === "no_match"
+          ? "Inconclusive"
+          : proposal.proposalType.replaceAll("_", " "),
     attentionAt: (proposal.enteredQueueAt ?? proposal.createdAt).toISOString(),
     source: { kind: "listing", proposalId: proposal.id },
   }));
@@ -151,6 +158,7 @@ async function catalogTasks(): Promise<ModerationTaskSummary[]> {
           kind: "operation",
           category: "catalog",
           state: operation.status === "blocked" ? "blocked" : "ready",
+          inconclusive: false,
           title: copy.title,
           sourceLabel: checkSourceLabel(check),
           question: copy.question,
@@ -177,6 +185,7 @@ async function catalogTasks(): Promise<ModerationTaskSummary[]> {
           kind: "finding" as const,
           category: "catalog" as const,
           state: findings === null ? ("blocked" as const) : ("ready" as const),
+          inconclusive: false,
           title: subject,
           sourceLabel: checkSourceLabel(check),
           question:
@@ -213,11 +222,18 @@ export function filterModerationTasks(
     query?: string;
     category?: "listing" | "catalog";
     blocked?: boolean;
+    inconclusive?: boolean;
   },
 ): ModerationTaskSummary[] {
   const query = input.query?.toLocaleLowerCase();
   return tasks.filter((task) => {
     if (input.category && task.category !== input.category) return false;
+    if (
+      input.inconclusive !== undefined &&
+      task.inconclusive !== input.inconclusive
+    ) {
+      return false;
+    }
     if (
       input.blocked !== undefined &&
       (task.state === "blocked") !== input.blocked

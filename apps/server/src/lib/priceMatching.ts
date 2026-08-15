@@ -20,6 +20,7 @@ export {
   canClearIgnoredStorePriceAssignment,
   createBottleFromStorePriceMatchProposal,
   getStorePriceMatchProposalForReviewInTransaction,
+  ignoreInconclusiveStorePriceMatchProposals,
   ignoreStorePriceMatchProposal,
   resolveStorePriceMatchProposal,
   upsertStorePriceMatchProposal,

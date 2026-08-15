@@ -71,7 +71,9 @@ const mockUploadImage = Buffer.from(
 
 const collectionStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
+const userModeratorStateByToken = new Map();
 const appliedQueueProposalTokens = new Set();
+const ignoredInconclusiveProposalTokens = new Set();
 let collectionBottleId = 1;
 let pendingUploadId = 1;
 
@@ -313,6 +315,22 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "admin/moderation/listTasks": {
       const token = getAccessToken(request);
+      if (token.includes("queue-inconclusive")) {
+        const ignored = ignoredInconclusiveProposalTokens.has(token);
+        const tasks = ignored ? [] : buildInconclusiveModerationTasks();
+        sendRpcResponse(response, {
+          results: tasks,
+          counts: {
+            all: tasks.length,
+            listing: tasks.length,
+            catalog: 0,
+            blocked: 0,
+            inconclusive: tasks.length,
+          },
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
       const task =
         token.includes("queue-direct-bottle") &&
         !appliedQueueProposalTokens.has(token)
@@ -325,9 +343,21 @@ async function handleRpcRequest({ request, response, url }) {
           listing: task ? 1 : 0,
           catalog: 0,
           blocked: 0,
+          inconclusive: 0,
         },
         rel: { nextCursor: null, prevCursor: null },
       });
+      return true;
+    }
+    case "admin/moderation/ignoreInconclusive": {
+      const token = getAccessToken(request);
+      if (!token.includes("queue-inconclusive")) return false;
+      if (input && Object.keys(input).length > 0) {
+        sendRpcError(response, "Unexpected bulk inconclusive input");
+        return true;
+      }
+      ignoredInconclusiveProposalTokens.add(token);
+      sendRpcResponse(response, { ignored: 2 });
       return true;
     }
     case "admin/moderation/task": {
@@ -877,7 +907,12 @@ async function handleRpcRequest({ request, response, url }) {
         input?.user === testUser.id ||
         input?.user === testUser.username
       ) {
-        sendRpcResponse(response, testUser);
+        sendRpcResponse(response, {
+          ...testUser,
+          mod:
+            userModeratorStateByToken.get(getAccessToken(request)) ??
+            testUser.mod,
+        });
         return true;
       }
       if (input?.user === adminUser.id || input?.user === adminUser.username) {
@@ -895,6 +930,21 @@ async function handleRpcRequest({ request, response, url }) {
 
       sendRpcError(response, "Unexpected user details payload");
       return true;
+    case "users/update": {
+      const token = getAccessToken(request);
+      if (
+        !token.includes("profile-role-update") ||
+        input?.user !== testUser.id ||
+        typeof input?.mod !== "boolean"
+      ) {
+        sendRpcError(response, "Unexpected user update payload");
+        return true;
+      }
+
+      userModeratorStateByToken.set(token, input.mod);
+      sendRpcResponse(response, { ...testUser, mod: input.mod });
+      return true;
+    }
     case "users/libraryStats":
       sendRpcResponse(response, libraryInsightsStats);
       return true;
@@ -1473,6 +1523,7 @@ function buildDirectBottleModerationTask() {
     kind: "listing",
     category: "listing",
     state: "ready",
+    inconclusive: false,
     title: proposal.price.name,
     sourceLabel: proposal.price.site.name,
     question: "Should this Bottle be added to the catalog?",
@@ -1480,6 +1531,22 @@ function buildDirectBottleModerationTask() {
     attentionAt: proposal.createdAt,
     source: { kind: "listing", proposalId: proposal.id },
   };
+}
+
+function buildInconclusiveModerationTasks() {
+  return [9921, 9922].map((proposalId, index) => ({
+    key: `listing:${proposalId}`,
+    kind: "listing",
+    category: "listing",
+    state: "ready",
+    inconclusive: true,
+    title: `Unresolved whisky listing ${index + 1}`,
+    sourceLabel: "Example Store",
+    question: "No Bottle match was found. Should this listing be ignored?",
+    statusLabel: "Inconclusive",
+    attentionAt: new Date(Date.UTC(2026, 7, 12, 10 + index)).toISOString(),
+    source: { kind: "listing", proposalId },
+  }));
 }
 
 function isExpectedDirectBottleQueueCreateInput(input) {

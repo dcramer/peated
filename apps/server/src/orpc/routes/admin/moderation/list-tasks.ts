@@ -22,16 +22,21 @@ export default procedure
   .input(ModerationTaskListInputSchema)
   .output(ModerationTaskListResponseSchema)
   .handler(async ({ input }) => {
-    const tasks = filterModerationTasks(await projectModerationTasks(), input);
+    const allTasks = await projectModerationTasks();
+    const tasks = filterModerationTasks(allTasks, input);
     const offset = (input.cursor - 1) * input.limit;
     const page = tasks.slice(offset, offset + input.limit);
     return {
       results: page,
       counts: {
-        all: tasks.length,
-        listing: tasks.filter(({ category }) => category === "listing").length,
-        catalog: tasks.filter(({ category }) => category === "catalog").length,
-        blocked: tasks.filter(({ state }) => state === "blocked").length,
+        all: allTasks.length,
+        listing: allTasks.filter(({ category }) => category === "listing")
+          .length,
+        catalog: allTasks.filter(({ category }) => category === "catalog")
+          .length,
+        blocked: allTasks.filter(({ state }) => state === "blocked").length,
+        inconclusive: allTasks.filter(({ inconclusive }) => inconclusive)
+          .length,
       },
       rel: {
         nextCursor:

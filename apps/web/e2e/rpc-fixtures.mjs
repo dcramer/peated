@@ -62,6 +62,8 @@ export const moderatorUser = {
 
 export const libraryInsightsStats = {
   total: 76,
+  status: { open: 12, sealed: 64, unspecified: 0 },
+  brands: [{ id: 201, name: "Islay Favorites", count: 12 }],
   distillers: [
     { id: 101, name: "Laphroaig", count: 8 },
     { id: 102, name: "Caol Ila", count: 4 },
