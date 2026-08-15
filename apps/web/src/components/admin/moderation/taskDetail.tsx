@@ -8,6 +8,7 @@ import type { ExcludedOperationField } from "@peated/web/components/bottleChecks
 import OperationCard from "@peated/web/components/bottleChecks/operationCard";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
+import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,
@@ -15,8 +16,10 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { Check, Copy, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import BottleSelector from "./bottleSelector";
+import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 type QueueItem = Outputs["prices"]["matchQueue"]["details"];
@@ -53,7 +56,7 @@ function TaskHeader({ task }: { task: Task }) {
 
   return (
     <header className="border-b border-slate-800 pb-5">
-      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
         <span>{task.category}</span>
         <span aria-hidden="true">/</span>
         <span
@@ -101,6 +104,9 @@ function ListingTask({
   );
   const retry = useMutation(orpc.prices.matchQueue.retry.mutationOptions());
   const [selecting, setSelecting] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copying" | "copied">(
+    "idle",
+  );
   const [error, setError] = useState<string | null>(null);
   const busy =
     resolve.isPending ||
@@ -134,6 +140,26 @@ function ListingTask({
     setSelecting(false);
   }
 
+  async function copyDetails() {
+    setCopyStatus("copying");
+    setError(null);
+    try {
+      await copyTextToClipboard(formatPriceMatchQueueLlmExport(item));
+      setCopyStatus("copied");
+      window.setTimeout(() => setCopyStatus("idle"), 1800);
+    } catch (cause) {
+      setCopyStatus("idle");
+      setError(errorMessage(cause));
+    }
+  }
+
+  function retryClassification() {
+    return finish(
+      () => retry.mutateAsync({ proposal: item.id }),
+      "Listing requeued for classification.",
+    );
+  }
+
   const primary = (() => {
     if (item.status === "errored") {
       return (
@@ -141,13 +167,9 @@ function ListingTask({
           className="min-h-11"
           color="highlight"
           disabled={busy}
+          icon={<RotateCcw aria-hidden="true" className="h-4 w-4" />}
           loading={retry.isPending}
-          onClick={() =>
-            void finish(
-              () => retry.mutateAsync({ proposal: item.id }),
-              "Listing requeued for classification.",
-            )
-          }
+          onClick={() => void retryClassification()}
         >
           Retry classification
         </Button>
@@ -229,7 +251,7 @@ function ListingTask({
         className="rounded-xl border border-slate-800 bg-slate-950 p-4 sm:p-5"
       >
         <h2
-          className="text-xs font-semibold uppercase tracking-wide text-slate-500"
+          className="text-xs font-semibold uppercase tracking-wide text-slate-400"
           id="listing-source"
         >
           Source listing
@@ -286,7 +308,7 @@ function ListingTask({
           <dl className="mt-4 grid gap-3 sm:grid-cols-2">
             {Object.entries(item.proposedBottle).map(([field, value]) => (
               <div className="border-b border-slate-800 pb-2" key={field}>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   {field.replaceAll("_", " ")}
                 </dt>
                 <dd className="mt-1 text-sm text-slate-200">
@@ -338,6 +360,33 @@ function ListingTask({
           onClick={() => setSelecting(true)}
         >
           {item.suggestedBottle ? "Choose another Bottle" : "Choose Bottle"}
+        </Button>
+        {item.status !== "errored" ? (
+          <Button
+            className="min-h-11"
+            disabled={busy || item.isProcessing}
+            icon={<RotateCcw aria-hidden="true" className="h-4 w-4" />}
+            loading={retry.isPending}
+            onClick={() => void retryClassification()}
+          >
+            Retry classification
+          </Button>
+        ) : null}
+        <Button
+          className="min-h-11"
+          disabled={copyStatus === "copying"}
+          icon={
+            copyStatus === "copied" ? (
+              <Check aria-hidden="true" className="h-4 w-4" />
+            ) : (
+              <Copy aria-hidden="true" className="h-4 w-4" />
+            )
+          }
+          loading={copyStatus === "copying"}
+          onClick={() => void copyDetails()}
+          title="Copy structured listing, identity, evidence, and recommendation data as JSON"
+        >
+          {copyStatus === "copied" ? "Copied details" : "Copy details"}
         </Button>
         {item.proposalType === "create_new" && item.proposedBottle ? (
           <Button
