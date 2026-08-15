@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleChecks,
   bottleOperations,
+  storePriceMatchAttempts,
   storePriceMatchProposals,
 } from "@peated/server/db/schema";
 import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
@@ -102,6 +103,7 @@ describe("admin moderation tasks", () => {
       listing: 1,
       catalog: 2,
       blocked: 1,
+      inconclusive: 0,
     });
 
     const blocked = await routerClient.admin.moderation.listTasks(
@@ -114,6 +116,7 @@ describe("admin moderation tasks", () => {
         state: "blocked",
       }),
     ]);
+    expect(blocked.counts).toMatchObject({ all: 3, blocked: 1 });
 
     await db
       .update(bottleOperations)
@@ -128,6 +131,116 @@ describe("admin moderation tasks", () => {
     expect(error.message).toBe(
       "This moderation task no longer needs attention.",
     );
+  });
+
+  test("filters and bulk-ignores only actionable inconclusive listings", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const inconclusivePrice = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Unresolved listing",
+    });
+    const matchedPrice = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Matched listing",
+    });
+    const processingPrice = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Processing unresolved listing",
+    });
+    const hiddenPrice = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      hidden: true,
+      name: "Hidden unresolved listing",
+    });
+    const [inconclusive, matched, processing, hidden] = await db
+      .insert(storePriceMatchProposals)
+      .values([
+        {
+          priceId: inconclusivePrice.id,
+          proposalType: "no_match",
+          status: "pending_review",
+        },
+        {
+          priceId: matchedPrice.id,
+          proposalType: "match_existing",
+          status: "pending_review",
+        },
+        {
+          priceId: processingPrice.id,
+          proposalType: "no_match",
+          status: "pending_review",
+          processingExpiresAt: new Date(Date.now() + 60_000),
+          processingToken: "active-classification",
+        },
+        {
+          priceId: hiddenPrice.id,
+          proposalType: "no_match",
+          status: "pending_review",
+        },
+      ])
+      .returning();
+    const [attempt] = await db
+      .insert(storePriceMatchAttempts)
+      .values({
+        priceId: inconclusivePrice.id,
+        proposalId: inconclusive!.id,
+        proposalType: "no_match",
+        initialStatus: "pending_review",
+      })
+      .returning();
+
+    const filtered = await routerClient.admin.moderation.listTasks(
+      { inconclusive: true },
+      { context: { user: admin } },
+    );
+    expect(filtered.results).toEqual([
+      expect.objectContaining({
+        key: `listing:${inconclusive!.id}`,
+        inconclusive: true,
+        question: "No Bottle match was found. Should this listing be ignored?",
+        statusLabel: "Inconclusive",
+      }),
+    ]);
+    expect(filtered.counts.inconclusive).toBe(1);
+
+    await expect(
+      routerClient.admin.moderation.ignoreInconclusive(
+        {},
+        { context: { user: await fixtures.User({ mod: true }) } },
+      ),
+    ).rejects.toThrow("Unauthorized");
+
+    await expect(
+      routerClient.admin.moderation.ignoreInconclusive(
+        {},
+        { context: { user: admin } },
+      ),
+    ).resolves.toEqual({ ignored: 1 });
+
+    const proposals = await db.query.storePriceMatchProposals.findMany();
+    expect(
+      Object.fromEntries(proposals.map(({ id, status }) => [id, status])),
+    ).toMatchObject({
+      [inconclusive!.id]: "ignored",
+      [matched!.id]: "pending_review",
+      [processing!.id]: "pending_review",
+      [hidden!.id]: "pending_review",
+    });
+    await expect(
+      db.query.storePriceMatchAttempts.findFirst({
+        where: eq(storePriceMatchAttempts.id, attempt!.id),
+      }),
+    ).resolves.toMatchObject({
+      finalStatus: "ignored",
+      reviewedById: admin.id,
+    });
   });
 
   test("projects findings only after independent operations are resolved", async ({

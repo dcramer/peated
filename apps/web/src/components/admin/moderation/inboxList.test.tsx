@@ -15,6 +15,7 @@ const operationTask = {
   kind: "operation",
   category: "catalog",
   state: "ready",
+  inconclusive: false,
   title: "Update Entity #42",
   sourceLabel: "Moderator audit",
   question: "Apply these changes to the Entity?",
@@ -28,6 +29,7 @@ const listingTask = {
   kind: "listing",
   category: "listing",
   state: "blocked",
+  inconclusive: false,
   title: "Mystery whisky listing",
   sourceLabel: "Example Store",
   question: "How should this listing be resolved?",
@@ -42,7 +44,13 @@ describe("Moderation Inbox list", () => {
       <InboxList
         data={{
           results: [listingTask, operationTask],
-          counts: { all: 2, listing: 1, catalog: 1, blocked: 1 },
+          counts: {
+            all: 2,
+            listing: 1,
+            catalog: 1,
+            blocked: 1,
+            inconclusive: 0,
+          },
           rel: { nextCursor: null, prevCursor: null },
         }}
         selectedKey="operation:22"

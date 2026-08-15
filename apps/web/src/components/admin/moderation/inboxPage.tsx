@@ -2,7 +2,11 @@
 
 import Button from "@peated/web/components/button";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import InboxList, { inboxTaskHref } from "./inboxList";
@@ -34,10 +38,17 @@ export default function InboxPage({
       ? { category: searchParams.get("category") as "listing" | "catalog" }
       : {}),
     ...(searchParams.get("blocked") === "true" ? { blocked: true } : {}),
+    ...(searchParams.get("inconclusive") === "true"
+      ? { inconclusive: true }
+      : {}),
   };
   const listOptions = orpc.admin.moderation.listTasks.queryOptions({ input });
   const { data } = useSuspenseQuery(listOptions);
+  const ignoreInconclusive = useMutation(
+    orpc.admin.moderation.ignoreInconclusive.mutationOptions(),
+  );
   const [announcement, setAnnouncement] = useState("");
+  const [bulkError, setBulkError] = useState<string | null>(null);
   const selectedKey = selected ? `${selected.kind}:${selected.id}` : undefined;
 
   function openTask(index: number) {
@@ -59,6 +70,31 @@ export default function InboxPage({
     );
   }
 
+  async function ignoreAllInconclusive() {
+    setBulkError(null);
+    try {
+      const { ignored } = await ignoreInconclusive.mutateAsync({});
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: orpc.admin.moderation.listTasks.key(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: orpc.prices.matchQueue.key(),
+        }),
+      ]);
+      setAnnouncement(
+        `${ignored} inconclusive ${ignored === 1 ? "listing" : "listings"} ignored.`,
+      );
+      router.push("/admin/moderation/inbox?inconclusive=true");
+    } catch (cause) {
+      setBulkError(
+        cause instanceof Error
+          ? cause.message
+          : "The inconclusive listings could not be ignored.",
+      );
+    }
+  }
+
   const selectedIndex = selectedKey
     ? data.results.findIndex(({ key }) => key === selectedKey)
     : -1;
@@ -67,7 +103,13 @@ export default function InboxPage({
     <div className="min-h-[calc(100vh-4rem)] bg-slate-950 lg:grid lg:grid-cols-[22rem_minmax(0,1fr)]">
       <ModerationNav />
       <div className={selected ? "hidden lg:block" : "block"}>
-        <InboxList data={data} selectedKey={selectedKey} />
+        <InboxList
+          bulkError={bulkError}
+          data={data}
+          ignoreInconclusivePending={ignoreInconclusive.isPending}
+          onIgnoreInconclusive={ignoreAllInconclusive}
+          selectedKey={selectedKey}
+        />
       </div>
       <main className={selected ? "block min-w-0" : "hidden lg:block"}>
         <div aria-live="polite" className="sr-only">

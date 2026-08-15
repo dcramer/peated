@@ -304,6 +304,15 @@ function ListingTask({
           <p className="mt-1">{item.error}</p>
         </div>
       ) : null}
+      {item.proposalType === "no_match" && item.status !== "errored" ? (
+        <div className="rounded-lg border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-200">
+          <strong>No clear Bottle outcome was found.</strong>
+          <p className="mt-1 text-slate-400">
+            Choose a Bottle if you recognize the listing. Otherwise, ignore it
+            to remove it from moderation without assigning a Bottle.
+          </p>
+        </div>
+      ) : null}
       {item.rationale ? (
         <p className="text-sm leading-6 text-slate-300">{item.rationale}</p>
       ) : null}
@@ -328,7 +337,7 @@ function ListingTask({
           disabled={busy}
           onClick={() => setSelecting(true)}
         >
-          Choose another Bottle
+          {item.suggestedBottle ? "Choose another Bottle" : "Choose Bottle"}
         </Button>
         {item.proposalType === "create_new" && item.proposedBottle ? (
           <Button
@@ -349,7 +358,9 @@ function ListingTask({
             )
           }
         >
-          Ignore listing
+          {item.proposalType === "no_match"
+            ? "Ignore as inconclusive"
+            : "Ignore listing"}
         </Button>
       </div>
 

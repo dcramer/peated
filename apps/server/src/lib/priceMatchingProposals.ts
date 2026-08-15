@@ -79,7 +79,7 @@ import {
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
 import type { z } from "zod";
 
@@ -1771,5 +1771,71 @@ export async function ignoreStorePriceMatchProposal({
       finalStatus: "ignored",
       reviewedById,
     });
+  });
+}
+
+export async function ignoreInconclusiveStorePriceMatchProposals({
+  reviewedById,
+  actor,
+}: {
+  reviewedById: number;
+  actor: IncomingBottleDecisionActor;
+}): Promise<number> {
+  return await db.transaction(async (tx) => {
+    await getPriceMatchWriteActorForDatabase(tx, actor, {
+      userId: reviewedById,
+    });
+
+    // Bulk moderation owns only pending, unleased no-match proposals that are
+    // visible in the listing inbox. Other proposal outcomes keep their normal
+    // per-item review boundary.
+    const ignored = await tx
+      .update(storePriceMatchProposals)
+      .set({
+        status: "ignored",
+        reviewedById,
+        reviewedAt: sql`NOW()`,
+        updatedAt: sql`NOW()`,
+        processingToken: null,
+        processingQueuedAt: null,
+        processingExpiresAt: null,
+        error: null,
+      })
+      .where(
+        and(
+          eq(storePriceMatchProposals.status, "pending_review"),
+          eq(storePriceMatchProposals.proposalType, "no_match"),
+          sql`(${storePriceMatchProposals.processingExpiresAt} IS NULL OR ${storePriceMatchProposals.processingExpiresAt} <= NOW())`,
+          sql`EXISTS (
+            SELECT 1
+            FROM ${storePrices}
+            WHERE ${storePrices.id} = ${storePriceMatchProposals.priceId}
+              AND ${storePrices.hidden} = false
+          )`,
+        ),
+      )
+      .returning({ id: storePriceMatchProposals.id });
+
+    for (let offset = 0; offset < ignored.length; offset += 10_000) {
+      const proposalIds = ignored
+        .slice(offset, offset + 10_000)
+        .map(({ id }) => id);
+      await tx.execute(sql`
+        UPDATE ${storePriceMatchAttempts}
+        SET
+          final_status = 'ignored',
+          reviewed_by_id = ${reviewedById},
+          reviewed_at = NOW(),
+          updated_at = NOW()
+        WHERE id IN (
+          SELECT MAX(id)
+          FROM ${storePriceMatchAttempts}
+          WHERE ${inArray(storePriceMatchAttempts.proposalId, proposalIds)}
+          GROUP BY ${storePriceMatchAttempts.proposalId}
+        )
+      `);
+    }
+
+    return ignored.length;
   });
 }

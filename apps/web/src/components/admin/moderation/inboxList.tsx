@@ -1,10 +1,13 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
+import Button from "@peated/web/components/button";
+import ConfirmationDialog from "@peated/web/components/confirmationDialog.client";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import { buildQueryString } from "@peated/web/lib/urls";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 
@@ -31,15 +34,23 @@ export function inboxTaskHref(
 export default function InboxList({
   data,
   selectedKey,
+  onIgnoreInconclusive,
+  ignoreInconclusivePending = false,
+  bulkError,
 }: {
   data: Outputs["admin"]["moderation"]["listTasks"];
   selectedKey?: string;
+  onIgnoreInconclusive?: () => Promise<void>;
+  ignoreInconclusivePending?: boolean;
+  bulkError?: string | null;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const category = searchParams.get("category");
   const blocked = searchParams.get("blocked") === "true";
+  const inconclusive = searchParams.get("inconclusive") === "true";
   const query = searchParams.get("query") ?? "";
+  const [confirmingIgnore, setConfirmingIgnore] = useState(false);
   const listPath = pathname.includes("/inbox/")
     ? "/admin/moderation/inbox"
     : pathname;
@@ -63,6 +74,9 @@ export default function InboxList({
             <input name="category" type="hidden" value={category} />
           ) : null}
           {blocked ? <input name="blocked" type="hidden" value="true" /> : null}
+          {inconclusive ? (
+            <input name="inconclusive" type="hidden" value="true" />
+          ) : null}
           <label className="sr-only" htmlFor="moderation-search">
             Search Inbox
           </label>
@@ -79,23 +93,39 @@ export default function InboxList({
           {[
             {
               label: `All ${data.counts.all}`,
-              active: !category,
-              href: filterHref({ category: null }),
+              active: !category && !blocked && !inconclusive,
+              href: filterHref({
+                category: null,
+                blocked: null,
+                inconclusive: null,
+              }),
             },
             {
               label: `Listings ${data.counts.listing}`,
               active: category === "listing",
-              href: filterHref({ category: "listing" }),
+              href: filterHref({ category: "listing", inconclusive: null }),
             },
             {
               label: `Catalog ${data.counts.catalog}`,
               active: category === "catalog",
-              href: filterHref({ category: "catalog" }),
+              href: filterHref({ category: "catalog", inconclusive: null }),
+            },
+            {
+              label: `Inconclusive ${data.counts.inconclusive}`,
+              active: inconclusive,
+              href: filterHref({
+                inconclusive: inconclusive ? null : "true",
+                category: null,
+                blocked: null,
+              }),
             },
             {
               label: `Blocked ${data.counts.blocked}`,
               active: blocked,
-              href: filterHref({ blocked: blocked ? null : "true" }),
+              href: filterHref({
+                blocked: blocked ? null : "true",
+                inconclusive: null,
+              }),
             },
           ].map((filter) => (
             <Link
@@ -113,7 +143,41 @@ export default function InboxList({
             </Link>
           ))}
         </div>
+        {inconclusive && data.counts.inconclusive > 0 ? (
+          <div className="mt-4">
+            <Button
+              color="danger"
+              disabled={ignoreInconclusivePending}
+              fullWidth
+              loading={ignoreInconclusivePending}
+              onClick={() => setConfirmingIgnore(true)}
+            >
+              Ignore all {data.counts.inconclusive} inconclusive
+            </Button>
+            <p className="mt-2 text-xs leading-5 text-slate-400">
+              These listings have no recommended Bottle. Ignoring them removes
+              them from the inbox without assigning one.
+            </p>
+          </div>
+        ) : null}
+        {bulkError ? (
+          <p className="mt-3 text-sm text-red-300" role="alert">
+            {bulkError}
+          </p>
+        ) : null}
       </div>
+
+      <ConfirmationDialog
+        continueLabel={`Ignore ${data.counts.inconclusive} listings`}
+        isOpen={confirmingIgnore}
+        message="Every actionable inconclusive listing will leave the moderation inbox without a Bottle assignment. Listings with a match, proposed Bottle, correction, error, or active classification will not be changed."
+        onCancel={() => setConfirmingIgnore(false)}
+        onContinue={() => {
+          setConfirmingIgnore(false);
+          void onIgnoreInconclusive?.();
+        }}
+        title="Ignore all inconclusive listings?"
+      />
 
       {data.results.length ? (
         <ol className="divide-y divide-slate-800 overflow-y-auto">

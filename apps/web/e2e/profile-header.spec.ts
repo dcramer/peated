@@ -1,7 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 import { expectNoHorizontalOverflow } from "./assertions";
-import { adminUser, moderatorUser, testAccessToken } from "./rpc-fixtures.mjs";
+import {
+  adminUser,
+  moderatorUser,
+  testAccessToken,
+  testUser,
+} from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 const roleProfiles = [
@@ -67,3 +72,23 @@ for (const { label, slug, user } of roleProfiles) {
     }
   });
 }
+
+test("refreshes the profile after an administrator changes the moderator role", async ({
+  context,
+  page,
+}, testInfo) => {
+  await signIn(context, {
+    accessToken: `${testAccessToken}-profile-role-update-${testInfo.project.name}`,
+    user: adminUser,
+  });
+
+  await page.goto(`/users/${testUser.username}/activity`, {
+    waitUntil: "commit",
+  });
+  await page.getByRole("button", { name: "Manage user" }).click();
+  await page.getByRole("menuitem", { name: "Add Moderator Role" }).click();
+
+  await expect(page.getByText("Moderator", { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("Moderator", { exact: true })).toBeVisible();
+});
