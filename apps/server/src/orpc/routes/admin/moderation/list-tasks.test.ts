@@ -105,6 +105,22 @@ describe("admin moderation tasks", () => {
       blocked: 1,
       inconclusive: 0,
     });
+    await expect(
+      routerClient.admin.moderation.task(
+        { key: `listing:${listing!.id}` },
+        { context: { user: admin } },
+      ),
+    ).resolves.toEqual({
+      task: expect.objectContaining({ key: `listing:${listing!.id}` }),
+    });
+    await expect(
+      routerClient.admin.moderation.task(
+        { key: `operation:${operations[0]!.id}` },
+        { context: { user: admin } },
+      ),
+    ).resolves.toEqual({
+      task: expect.objectContaining({ key: `operation:${operations[0]!.id}` }),
+    });
 
     const blocked = await routerClient.admin.moderation.listTasks(
       { blocked: true },
@@ -270,7 +286,19 @@ describe("admin moderation tasks", () => {
       { context: { user: admin } },
     );
     expect(result.results).toEqual([
-      expect.objectContaining({ key: `finding:${check!.id}`, kind: "finding" }),
+      expect.objectContaining({
+        key: `finding:${check!.id}`,
+        kind: "finding",
+        statusLabel: "1 finding",
+      }),
     ]);
+    await expect(
+      routerClient.admin.moderation.task(
+        { key: `finding:${check!.id}` },
+        { context: { user: admin } },
+      ),
+    ).resolves.toEqual({
+      task: expect.objectContaining({ key: `finding:${check!.id}` }),
+    });
   });
 });

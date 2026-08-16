@@ -33,6 +33,7 @@ import {
 } from "@peated/server/lib/bottleOperationReview";
 import {
   and,
+  asc,
   desc,
   eq,
   exists,
@@ -283,6 +284,26 @@ export type ListActionableBottleChecksInput = z.input<
 >;
 export type BottleCheckWithOperations = BottleCheck & {
   operations: BottleOperation[];
+};
+
+/** Narrow actionable-check projection; full audit context stays in review reads. */
+export type ActionableBottleCheckSummary = Pick<
+  BottleCheck,
+  | "bottleId"
+  | "completedAt"
+  | "createdAt"
+  | "id"
+  | "intent"
+  | "origin"
+  | "schemaVersion"
+  | "sourceKind"
+> & {
+  findingCount: number;
+  hasOutput: boolean;
+  operations: Pick<
+    BottleOperation,
+    "checkId" | "createdAt" | "id" | "proposal" | "status"
+  >[];
 };
 
 export type CreateBottleCheckResult = {
@@ -755,6 +776,50 @@ export async function listActionableBottleChecks(
 ): Promise<ActionableBottleCheckList> {
   const input = ListActionableBottleChecksInputSchema.parse(rawInput);
   const offset = (input.cursor - 1) * input.limit;
+  const rows = await database
+    .select()
+    .from(bottleChecks)
+    .where(actionableBottleCheckWhere(database, input.source))
+    .orderBy(desc(bottleChecks.createdAt), desc(bottleChecks.id))
+    .limit(input.limit + 1)
+    .offset(offset);
+  const hasNextPage = rows.length > input.limit;
+  const page = rows.slice(0, input.limit);
+  const operations = page.length
+    ? await database
+        .select()
+        .from(bottleOperations)
+        .where(
+          inArray(
+            bottleOperations.checkId,
+            page.map(({ id }) => id),
+          ),
+        )
+        .orderBy(bottleOperations.id)
+    : [];
+  const operationsByCheckId = Map.groupBy(
+    operations,
+    (operation) => operation.checkId,
+  );
+
+  return {
+    results: page.map((check) => ({
+      ...check,
+      operations: operationsByCheckId.get(check.id) ?? [],
+    })),
+    rel: {
+      nextCursor: hasNextPage ? input.cursor + 1 : null,
+      prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
+    },
+  };
+}
+
+function actionableBottleCheckWhere(
+  database: AnyDatabase,
+  source?: "incoming_listing" | "moderator" | "new_bottle" | "photo_scan",
+) {
+  // List and targeted reads share this predicate so stable task keys always
+  // revalidate the same source-owned actionability rules.
   const hasFindings = sql<boolean>`CASE
     WHEN jsonb_typeof(${bottleChecks.output}->'findings') = 'array'
     THEN jsonb_array_length(${bottleChecks.output}->'findings') > 0
@@ -803,7 +868,7 @@ export async function listActionableBottleChecks(
     ),
     completedStorePriceCheck,
   );
-  switch (input.source) {
+  switch (source) {
     case "incoming_listing":
       sourceFilter = completedStorePriceCheck;
       break;
@@ -828,33 +893,67 @@ export async function listActionableBottleChecks(
     case undefined:
       break;
   }
-  const rows = await database
-    .select()
+  return and(
+    sourceFilter,
+    isNull(bottleChecks.closedAt),
+    or(
+      ne(bottleChecks.schemaVersion, BOTTLE_CHECK_SCHEMA_VERSION),
+      hasFindings,
+      hasActionableOperation,
+    ),
+  );
+}
+
+async function findActionableBottleCheckSummaries(
+  {
+    checkId,
+    limit,
+  }: {
+    checkId?: number;
+    limit: number;
+  },
+  database: AnyDatabase,
+): Promise<ActionableBottleCheckSummary[]> {
+  const checks = await database
+    .select({
+      bottleId: bottleChecks.bottleId,
+      completedAt: bottleChecks.completedAt,
+      createdAt: bottleChecks.createdAt,
+      findingCount: sql<number>`CASE
+        WHEN jsonb_typeof(${bottleChecks.output}->'findings') = 'array'
+        THEN jsonb_array_length(${bottleChecks.output}->'findings')
+        ELSE 0
+      END`,
+      hasOutput: sql<boolean>`${bottleChecks.output} IS NOT NULL`,
+      id: bottleChecks.id,
+      intent: bottleChecks.intent,
+      origin: bottleChecks.origin,
+      schemaVersion: bottleChecks.schemaVersion,
+      sourceKind: bottleChecks.sourceKind,
+    })
     .from(bottleChecks)
     .where(
       and(
-        sourceFilter,
-        isNull(bottleChecks.closedAt),
-        or(
-          ne(bottleChecks.schemaVersion, BOTTLE_CHECK_SCHEMA_VERSION),
-          hasFindings,
-          hasActionableOperation,
-        ),
+        checkId === undefined ? undefined : eq(bottleChecks.id, checkId),
+        actionableBottleCheckWhere(database),
       ),
     )
-    .orderBy(desc(bottleChecks.createdAt), desc(bottleChecks.id))
-    .limit(input.limit + 1)
-    .offset(offset);
-  const hasNextPage = rows.length > input.limit;
-  const page = rows.slice(0, input.limit);
-  const operations = page.length
+    .orderBy(asc(bottleChecks.createdAt), asc(bottleChecks.id))
+    .limit(limit);
+  const operations = checks.length
     ? await database
-        .select()
+        .select({
+          checkId: bottleOperations.checkId,
+          createdAt: bottleOperations.createdAt,
+          id: bottleOperations.id,
+          proposal: bottleOperations.proposal,
+          status: bottleOperations.status,
+        })
         .from(bottleOperations)
         .where(
           inArray(
             bottleOperations.checkId,
-            page.map(({ id }) => id),
+            checks.map(({ id }) => id),
           ),
         )
         .orderBy(bottleOperations.id)
@@ -864,16 +963,30 @@ export async function listActionableBottleChecks(
     (operation) => operation.checkId,
   );
 
-  return {
-    results: page.map((check) => ({
-      ...check,
-      operations: operationsByCheckId.get(check.id) ?? [],
-    })),
-    rel: {
-      nextCursor: hasNextPage ? input.cursor + 1 : null,
-      prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
-    },
-  };
+  return checks.map((check) => ({
+    ...check,
+    operations: operationsByCheckId.get(check.id) ?? [],
+  }));
+}
+
+/** Returns oldest actionable summaries without loading full audit records. */
+export async function listActionableBottleCheckSummaries(
+  limit: number,
+  database: AnyDatabase = db,
+): Promise<ActionableBottleCheckSummary[]> {
+  return findActionableBottleCheckSummaries({ limit }, database);
+}
+
+/** Revalidates one check against the same membership rules as the list. */
+export async function getActionableBottleCheckSummary(
+  checkId: number,
+  database: AnyDatabase = db,
+): Promise<ActionableBottleCheckSummary | null> {
+  return (
+    (
+      await findActionableBottleCheckSummaries({ checkId, limit: 1 }, database)
+    ).at(0) ?? null
+  );
 }
 
 export async function getBottleCheckForReview(

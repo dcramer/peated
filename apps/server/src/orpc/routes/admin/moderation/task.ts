@@ -1,4 +1,4 @@
-import { projectModerationTasks } from "@peated/server/lib/moderationTasks";
+import { locateModerationTask } from "@peated/server/lib/moderationTasks";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
@@ -19,9 +19,7 @@ export default procedure
   .input(ModerationTaskLocatorInputSchema)
   .output(ModerationTaskLocatorResponseSchema)
   .handler(async ({ input, errors }) => {
-    const task = (await projectModerationTasks()).find(
-      ({ key }) => key === input.key,
-    );
+    const task = await locateModerationTask(input.key);
     if (!task) {
       throw errors.NOT_FOUND({
         message: "This moderation task no longer needs attention.",

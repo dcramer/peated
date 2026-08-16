@@ -1,16 +1,23 @@
+// Inbox tasks are narrow projections of source-owned decisions. This module
+// must not load full listing or audit detail while listing or locating them.
 import { db } from "@peated/server/db";
-import type { bottleChecks, bottleOperations } from "@peated/server/db/schema";
 import {
+  bottleOperations,
   externalSites,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
 import { isSupportedBottleCheckSchemaVersion } from "@peated/server/lib/bottleCheckSchemaVersion";
-import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
+import {
+  getActionableBottleCheckSummary,
+  listActionableBottleCheckSummaries,
+  type ActionableBottleCheckSummary,
+} from "@peated/server/lib/bottleChecks";
 import type { ModerationTaskSummary } from "@peated/server/orpc/routes/admin/moderation/schemas";
 import { and, asc, eq, inArray, isNull, lte, or } from "drizzle-orm";
 
 const MAX_PROJECTED_SOURCE_ROWS = 10_000;
+const OPERATIONAL_STATUSES = new Set(["applying", "stale", "failed"]);
 
 function listingQuestion(proposalType: string): string {
   switch (proposalType) {
@@ -57,7 +64,7 @@ function operationCopy(
   }
 }
 
-function checkSourceLabel(check: typeof bottleChecks.$inferSelect): string {
+function checkSourceLabel(check: ActionableBottleCheckSummary): string {
   if (check.intent === "audit_bottle") {
     return check.origin === "moderator" ? "Moderator audit" : "Catalog audit";
   }
@@ -67,47 +74,30 @@ function checkSourceLabel(check: typeof bottleChecks.$inferSelect): string {
   return "Bottle check";
 }
 
-function persistedFindings(
-  check: typeof bottleChecks.$inferSelect,
-): unknown[] | null {
-  if (!isSupportedBottleCheckSchemaVersion(check) || check.output === null) {
+function persistedFindingCount(
+  check: ActionableBottleCheckSummary,
+): number | null {
+  if (!isSupportedBottleCheckSchemaVersion(check) || !check.hasOutput) {
     return null;
   }
-  const findings = check.output.findings;
-  return Array.isArray(findings) ? findings : [];
+  return check.findingCount;
 }
 
-async function listingTasks(): Promise<ModerationTaskSummary[]> {
-  const rows = await db
-    .select({
-      proposal: storePriceMatchProposals,
-      price: storePrices,
-      site: externalSites,
-    })
-    .from(storePriceMatchProposals)
-    .innerJoin(
-      storePrices,
-      eq(storePrices.id, storePriceMatchProposals.priceId),
-    )
-    .innerJoin(externalSites, eq(externalSites.id, storePrices.externalSiteId))
-    .where(
-      and(
-        eq(storePrices.hidden, false),
-        inArray(storePriceMatchProposals.status, ["pending_review", "errored"]),
-        or(
-          isNull(storePriceMatchProposals.processingExpiresAt),
-          lte(storePriceMatchProposals.processingExpiresAt, new Date()),
-        ),
-      ),
-    )
-    .orderBy(
-      asc(storePriceMatchProposals.enteredQueueAt),
-      asc(storePriceMatchProposals.createdAt),
-      asc(storePriceMatchProposals.id),
-    )
-    .limit(MAX_PROJECTED_SOURCE_ROWS);
+type ListingTaskRow = {
+  proposal: Pick<
+    typeof storePriceMatchProposals.$inferSelect,
+    "createdAt" | "enteredQueueAt" | "id" | "proposalType" | "status"
+  >;
+  price: Pick<typeof storePrices.$inferSelect, "name">;
+  site: Pick<typeof externalSites.$inferSelect, "name">;
+};
 
-  return rows.map(({ proposal, price, site }) => ({
+function listingTask({
+  proposal,
+  price,
+  site,
+}: ListingTaskRow): ModerationTaskSummary {
+  return {
     key: `listing:${proposal.id}`,
     kind: "listing",
     category: "listing",
@@ -126,94 +116,164 @@ async function listingTasks(): Promise<ModerationTaskSummary[]> {
           : proposal.proposalType.replaceAll("_", " "),
     attentionAt: (proposal.enteredQueueAt ?? proposal.createdAt).toISOString(),
     source: { kind: "listing", proposalId: proposal.id },
-  }));
+  };
+}
+
+async function listingTasks(
+  proposalId?: number,
+): Promise<ModerationTaskSummary[]> {
+  const rows = await db
+    .select({
+      proposal: {
+        createdAt: storePriceMatchProposals.createdAt,
+        enteredQueueAt: storePriceMatchProposals.enteredQueueAt,
+        id: storePriceMatchProposals.id,
+        proposalType: storePriceMatchProposals.proposalType,
+        status: storePriceMatchProposals.status,
+      },
+      price: { name: storePrices.name },
+      site: { name: externalSites.name },
+    })
+    .from(storePriceMatchProposals)
+    .innerJoin(
+      storePrices,
+      eq(storePrices.id, storePriceMatchProposals.priceId),
+    )
+    .innerJoin(externalSites, eq(externalSites.id, storePrices.externalSiteId))
+    .where(
+      and(
+        proposalId === undefined
+          ? undefined
+          : eq(storePriceMatchProposals.id, proposalId),
+        eq(storePrices.hidden, false),
+        inArray(storePriceMatchProposals.status, ["pending_review", "errored"]),
+        or(
+          isNull(storePriceMatchProposals.processingExpiresAt),
+          lte(storePriceMatchProposals.processingExpiresAt, new Date()),
+        ),
+      ),
+    )
+    .orderBy(
+      asc(storePriceMatchProposals.enteredQueueAt),
+      asc(storePriceMatchProposals.createdAt),
+      asc(storePriceMatchProposals.id),
+    )
+    .limit(MAX_PROJECTED_SOURCE_ROWS);
+
+  return rows.map(listingTask);
+}
+
+function catalogTasksForCheck(
+  check: ActionableBottleCheckSummary,
+): ModerationTaskSummary[] {
+  if (check.operations.some(({ status }) => OPERATIONAL_STATUSES.has(status))) {
+    return [];
+  }
+
+  const operations = check.operations.filter(
+    ({ status }) => status === "pending_review" || status === "blocked",
+  );
+  if (operations.length > 0) {
+    return operations.map((operation): ModerationTaskSummary => {
+      const copy = operationCopy(operation.proposal);
+      return {
+        key: `operation:${operation.id}`,
+        kind: "operation",
+        category: "catalog",
+        state: operation.status === "blocked" ? "blocked" : "ready",
+        inconclusive: false,
+        title: copy.title,
+        sourceLabel: checkSourceLabel(check),
+        question: copy.question,
+        statusLabel:
+          operation.status === "blocked" ? "Blocked" : "Suggested change",
+        attentionAt: operation.createdAt.toISOString(),
+        source: {
+          kind: "operation",
+          checkId: check.id,
+          operationId: operation.id,
+        },
+      };
+    });
+  }
+
+  const findingCount = persistedFindingCount(check);
+  if (findingCount === null || findingCount > 0) {
+    const subject = check.bottleId
+      ? `Bottle #${check.bottleId}`
+      : `Check #${check.id}`;
+    return [
+      {
+        key: `finding:${check.id}`,
+        kind: "finding" as const,
+        category: "catalog" as const,
+        state:
+          findingCount === null ? ("blocked" as const) : ("ready" as const),
+        inconclusive: false,
+        title: subject,
+        sourceLabel: checkSourceLabel(check),
+        question:
+          findingCount === null
+            ? "How should this unavailable check be resolved?"
+            : "Have these catalog findings been resolved?",
+        statusLabel:
+          findingCount === null
+            ? "Unsupported check version"
+            : `${findingCount} ${findingCount === 1 ? "finding" : "findings"}`,
+        attentionAt: (check.completedAt ?? check.createdAt).toISOString(),
+        source: { kind: "finding" as const, checkId: check.id },
+      },
+    ];
+  }
+  return [];
 }
 
 async function catalogTasks(): Promise<ModerationTaskSummary[]> {
-  const checks: Awaited<
-    ReturnType<typeof listActionableBottleChecks>
-  >["results"] = [];
-  for (let cursor = 1; checks.length < MAX_PROJECTED_SOURCE_ROWS; cursor += 1) {
-    const page = await listActionableBottleChecks({ cursor, limit: 100 });
-    checks.push(...page.results);
-    if (page.rel.nextCursor === null) break;
-  }
-
-  return checks.flatMap((check) => {
-    const operationalStatuses = new Set(["applying", "stale", "failed"]);
-    if (
-      check.operations.some(({ status }) => operationalStatuses.has(status))
-    ) {
-      return [];
-    }
-
-    const operations = check.operations.filter(
-      ({ status }) => status === "pending_review" || status === "blocked",
-    );
-    if (operations.length > 0) {
-      return operations.map((operation): ModerationTaskSummary => {
-        const copy = operationCopy(operation.proposal);
-        return {
-          key: `operation:${operation.id}`,
-          kind: "operation",
-          category: "catalog",
-          state: operation.status === "blocked" ? "blocked" : "ready",
-          inconclusive: false,
-          title: copy.title,
-          sourceLabel: checkSourceLabel(check),
-          question: copy.question,
-          statusLabel:
-            operation.status === "blocked" ? "Blocked" : "Suggested change",
-          attentionAt: operation.createdAt.toISOString(),
-          source: {
-            kind: "operation",
-            checkId: check.id,
-            operationId: operation.id,
-          },
-        };
-      });
-    }
-
-    const findings = persistedFindings(check);
-    if (findings === null || findings.length > 0) {
-      const subject = check.bottleId
-        ? `Bottle #${check.bottleId}`
-        : `Check #${check.id}`;
-      return [
-        {
-          key: `finding:${check.id}`,
-          kind: "finding" as const,
-          category: "catalog" as const,
-          state: findings === null ? ("blocked" as const) : ("ready" as const),
-          inconclusive: false,
-          title: subject,
-          sourceLabel: checkSourceLabel(check),
-          question:
-            findings === null
-              ? "How should this unavailable check be resolved?"
-              : "Have these catalog findings been resolved?",
-          statusLabel:
-            findings === null
-              ? "Unsupported check version"
-              : `${findings.length} ${findings.length === 1 ? "finding" : "findings"}`,
-          attentionAt: (check.completedAt ?? check.createdAt).toISOString(),
-          source: { kind: "finding" as const, checkId: check.id },
-        },
-      ];
-    }
-    return [];
-  });
+  const checks = await listActionableBottleCheckSummaries(
+    MAX_PROJECTED_SOURCE_ROWS,
+  );
+  return checks.flatMap(catalogTasksForCheck);
 }
 
 export async function projectModerationTasks(): Promise<
   ModerationTaskSummary[]
 > {
-  const tasks = [...(await listingTasks()), ...(await catalogTasks())];
+  const [listings, catalog] = await Promise.all([
+    listingTasks(),
+    catalogTasks(),
+  ]);
+  const tasks = [...listings, ...catalog];
   return tasks.sort(
     (left, right) =>
       left.attentionAt.localeCompare(right.attentionAt) ||
       left.key.localeCompare(right.key),
   );
+}
+
+export async function locateModerationTask(
+  key: string,
+): Promise<ModerationTaskSummary | null> {
+  const [kind, rawId] = key.split(":");
+  const id = Number(rawId);
+  if (kind === "listing") return (await listingTasks(id)).at(0) ?? null;
+
+  const checkId =
+    kind === "finding"
+      ? id
+      : kind === "operation"
+        ? (
+            await db.query.bottleOperations.findFirst({
+              columns: { checkId: true },
+              where: eq(bottleOperations.id, id),
+            })
+          )?.checkId
+        : undefined;
+  if (checkId === undefined) return null;
+
+  const check = await getActionableBottleCheckSummary(checkId);
+  return check
+    ? (catalogTasksForCheck(check).find((task) => task.key === key) ?? null)
+    : null;
 }
 
 export function filterModerationTasks(
