@@ -1,23 +1,23 @@
 # Policies
 
-Policies are durable repo-wide engineering rules and defaults. They are the
-highest-authority repository documentation below executable configuration and
-must remain consistent with code-enforced constraints.
+Policies are durable repo-wide engineering rules and defaults. They sit below
+executable configuration and must match code-enforced constraints.
 
-Use a policy when the repository needs to say "this is how we do this here"
-across multiple packages or features.
+Use a policy when the repo must say "this is how we do this here" across
+packages or features. Examples include testing, comments, security, privacy,
+error handling, interface design, and background work.
 
 Do not use policies for:
 
-- one feature's architecture or lifecycle;
-- implementation plans, status, TODOs, or rollout tracking;
-- copied schemas, commands, or test inventories;
-- public product documentation.
+- one feature's design or state changes
+- plans, status notes, TODOs, or rollout tracking
+- copied schemas, commands, or test inventories
+- public product docs
 
-Feature architecture and non-obvious invariants belong in the owning package,
-module, or feature documentation. Code, runtime schemas, exported types, and
-tests define the implemented contract. Temporary implementation plans live
-under `../../openspec/changes/` and cannot override policy.
+Put feature architecture and non-obvious rules in the owning package, module,
+or feature documentation. Code, runtime schemas, exported types, and tests
+define the real contract. Temporary plans live under `../../openspec/changes/`
+and cannot override policy.
 
 Current policies:
 
@@ -39,8 +39,10 @@ Backend and frontend testing expectations live in
 [../development/frontend-testing.md](../development/frontend-testing.md). Keep
 those documents as the source of truth instead of duplicating them here.
 
-Keep policies short: explain the intent, state the default, and name only
-meaningful exceptions. Update the policy directly when the repo intends to
-change the default; silence elsewhere does not create an exception.
+Keep policies short. Use common words, active voice, short sentences, and one
+idea per sentence. Keep required domain terms, but explain them when the reader
+may not know them. Remove other jargon. State the intent, the default, and only
+real exceptions. Update the policy when the repo changes the default. Silence
+elsewhere does not create an exception.
 
 Use [policy-template.md](policy-template.md) for new policies.

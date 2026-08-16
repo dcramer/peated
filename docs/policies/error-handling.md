@@ -14,8 +14,8 @@ duplicate diagnostics.
 - Catch errors only when the current layer can recover, translate an expected
   boundary failure into a typed domain result, or add required cleanup that
   cannot be expressed with `finally`.
-- If a catch block handles an error, it must complete the recovery or rethrow
-  with useful domain context. Avoid log-and-rethrow duplicates.
+- If a catch block handles an error, it must either finish the recovery or
+  rethrow with useful domain context. Avoid log-and-rethrow duplicates.
 - Use `finally` for cleanup that must run without changing error ownership.
 - Keep best-effort observers explicit. If correctness depends on the operation,
   it is not best-effort.
@@ -24,5 +24,6 @@ duplicate diagnostics.
 
 - External systems with expected transient failures may catch at the boundary
   that owns retry, backoff, authentication pause, or typed fallback behavior.
-- Product surfaces that intentionally degrade may catch locally when dropping
-  the failure is part of their contract.
+- Product surfaces that intentionally degrade, such as optional UI streaming or
+  non-critical observer callbacks, may catch locally when dropping the failure
+  is part of their contract.

@@ -12,8 +12,11 @@ to collect unrestricted user or provider data.
   authorization headers, API keys, signed callbacks, or credential-bearing
   URLs in logs, traces, errors, or attachments.
 - Do not record complete tasting text, comments, email bodies, model prompts or
-  responses, tool payloads, uploaded image contents, SQL parameters containing
-  user data, or unrestricted third-party responses.
+  responses, unrestricted tool payloads, uploaded image contents, SQL parameters
+  containing user data, or unrestricted third-party responses.
+- Classifier tool telemetry may record bounded arguments and results when they
+  contain only public catalog or source evidence. Do not include private user
+  data, credentials, uploaded image contents, or unrestricted provider payloads.
 - Prefer stable identifiers, operation names, counts, sizes, classifications,
   status values, and bounded error summaries.
 - Persist normalized product fields instead of complete provider webhook, SDK,

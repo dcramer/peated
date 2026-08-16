@@ -32,6 +32,14 @@
 - Prompts must keep required stable domain and decision policy separate from
   dynamic context. Put tool mechanics in tool descriptions and live facts in
   runtime context.
+- Prefer structured contracts, schemas, runtime gates, and code invariants over
+  adding natural-language prompt lines for deterministic behavior.
+- Give each steering rule one home. Put cross-tool decision policy in the
+  prompt, field meaning and call mechanics in the relevant schema or tool
+  description, and runtime authority in code.
+- Do not repeat one rule across prompts, tool descriptions, and runtime guidance
+  unless each copy serves a distinct enforcement path. Delete obsolete prompt
+  guidance when code, schemas, or runtime gates take ownership.
 - Improve retrieval, candidates, and source context before expanding prompts.
 - Treat user input, retrieved content, and source facts as data, not
   instructions or runtime authority.
