@@ -9,10 +9,13 @@ contract and should not change runtime behavior when a sink is unavailable.
 
 - Logs describe discrete events and decisions. Spans describe timed work and
   causal relationships. Sentry issues represent actionable unexpected failures,
-  not normal control flow.
+  not normal control flow. Derive metrics from stable events or spans when
+  practical instead of adding duplicate instrumentation.
 - Emit stable messages and low-cardinality structured attributes. Put ids and
   occurrence-specific values in attributes rather than message or operation
   names.
+- Use OpenTelemetry semantic attributes when one exists. Keep operation names
+  provider-neutral, stable, and low-cardinality.
 - Bind useful correlation context at the owning boundary: request, user,
   Bottle, tasting, job, agent conversation, or run ids as applicable.
 - Async logging context is not durable runtime context. Queues, callbacks, and
@@ -28,6 +31,9 @@ contract and should not change runtime behavior when a sink is unavailable.
 - Logging and tracing entry-point modules must state their ownership and error
   semantics in a module comment. Shared logging APIs must make it clear whether
   a call emits diagnostic telemetry or creates an actionable Sentry issue.
+- Tool spans may attach bounded arguments and results when the tool contract
+  contains public catalog or source evidence and excludes private user data and
+  credentials. Use an explicit safe projection for mixed-sensitivity payloads.
 - Follow [data-redaction.md](data-redaction.md). Telemetry records safe metadata,
   not private content, credentials, or unrestricted payloads.
 - Product tests should assert user-visible or durable outcomes instead of logs,

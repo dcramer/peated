@@ -1,3 +1,7 @@
+/**
+ * Owns classifier span metadata. Tool payloads are bounded before they reach
+ * tracing and callers must keep them limited to public catalog/source data.
+ */
 import { startSpan } from "@sentry/core";
 
 const MAX_ATTRIBUTE_LENGTH = 12_000;
@@ -119,9 +123,6 @@ export function buildAgentSpanContext({
   };
 }
 
-/**
- * Builds `gen_ai.execute_tool` metadata with compact JSON tool arguments.
- */
 export function buildToolSpanContext({
   name,
   description,
@@ -168,10 +169,7 @@ export async function startAgentSpan<T>({
   );
 }
 
-/**
- * Wraps tool execution in `gen_ai.execute_tool` and records compact JSON
- * arguments/results so spans stay useful without carrying oversized payloads.
- */
+/** Wraps tool execution and records bounded public catalog/source payloads. */
 export async function startToolSpan<T>({
   name,
   description,
