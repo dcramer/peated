@@ -2098,6 +2098,51 @@ describe("price match queue", () => {
     );
   });
 
+  test("records moderation history when approving the current Bottle", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Already Assigned Queue Approval",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        currentBottleId: bottle.id,
+        suggestedBottleId: bottle.id,
+      })
+      .returning();
+
+    await routerClient.prices.matchQueue.resolve(
+      {
+        proposal: proposal.id,
+        action: "match",
+        bottle: bottle.id,
+      },
+      { context: { user } },
+    );
+
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+        eq(incomingBottleDecisionLogs.sourceId, price.id),
+      ),
+    });
+
+    expect(decisionLog).toMatchObject({
+      proposalId: proposal.id,
+      actorId: (await getUserActor(user)).id,
+      decision: "match_existing",
+      bottleId: bottle.id,
+      createdBottle: false,
+    });
+  });
+
   test("matches the requested exact Bottle without choosing the group representative", async ({
     fixtures,
   }) => {
