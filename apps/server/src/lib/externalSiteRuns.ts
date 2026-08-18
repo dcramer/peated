@@ -6,7 +6,7 @@ import {
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
 import { requireExternalReviewFetchBeforeQueue } from "@peated/server/lib/externalReviewSourcePolicy";
-import { findScraperSourceBySiteType } from "@peated/server/scraper/definitions";
+import { findScraperSourceBySiteType } from "@peated/server/scraper";
 import { scraperRegistry } from "@peated/server/scraper/registry";
 import type { JobName } from "@peated/server/worker/types";
 import { and, asc, eq, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";

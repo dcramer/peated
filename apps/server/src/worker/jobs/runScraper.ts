@@ -1,4 +1,4 @@
-import { executeScraperRun } from "@peated/server/scraper/runs";
+import { executeScraperRun } from "@peated/server/scraper";
 import { z } from "zod";
 
 const InputSchema = z.object({ runId: z.number().int().positive() }).strict();

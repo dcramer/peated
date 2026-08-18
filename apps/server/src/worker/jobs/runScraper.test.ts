@@ -1,9 +1,9 @@
-import { executeScraperRun } from "@peated/server/scraper/runs";
+import { executeScraperRun } from "@peated/server/scraper";
 import { pushJob } from "@peated/server/worker/client";
 import { beforeEach, vi } from "vitest";
 import runScraper from "./runScraper";
 
-vi.mock("@peated/server/scraper/runs", () => ({
+vi.mock("@peated/server/scraper", () => ({
   executeScraperRun: vi.fn(),
 }));
 

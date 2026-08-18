@@ -11,7 +11,7 @@ import {
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
 } from "@peated/server/lib/externalSiteRuns";
-import { executeScraperRun } from "@peated/server/scraper/runs";
+import { executeScraperRun } from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
 
