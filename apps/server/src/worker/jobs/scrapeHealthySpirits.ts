@@ -7,9 +7,8 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices from "@peated/server/lib/scraper";
+import scrapePrices, { requestUrl } from "@peated/server/lib/scraper";
 import { toTitleCase } from "@peated/server/lib/strings";
-import axios from "axios";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
@@ -189,21 +188,28 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     throw new Error("Invalid Healthy Spirits catalog offset.");
   }
 
-  const { data } = await axios.post(url, {
-    categoryViewMode: "COLLAPSED",
-    lang: "en",
-    pagination: { offset, limit: PRODUCTS_PER_PAGE },
-    parentCategoryId: WHISKEY_CATEGORY_ID,
-    urlParams: {
-      baseUrl: "/products",
-      canonicalBaseUrl: `${STORE_ORIGIN}/products`,
-      isCanonicalUrlsEnabled: true,
-      isCleanUrls: true,
-      isSlugsWithoutIds: true,
-      isTrailingSlash: false,
-      urlType: "CLEAN_URL",
-    },
-  });
+  const data = JSON.parse(
+    await requestUrl(url, {
+      method: "POST",
+      retryable: true,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryViewMode: "COLLAPSED",
+        lang: "en",
+        pagination: { offset, limit: PRODUCTS_PER_PAGE },
+        parentCategoryId: WHISKEY_CATEGORY_ID,
+        urlParams: {
+          baseUrl: "/products",
+          canonicalBaseUrl: `${STORE_ORIGIN}/products`,
+          isCanonicalUrlsEnabled: true,
+          isCleanUrls: true,
+          isSlugsWithoutIds: true,
+          isTrailingSlash: false,
+          urlType: "CLEAN_URL",
+        },
+      }),
+    }),
+  );
 
   const result = parseHealthySpiritsProducts(data, offset);
   await Promise.all(result.products.map(cb));

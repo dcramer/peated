@@ -8,11 +8,17 @@ import {
   SCRAPER_PRICE_BATCH_SIZE,
 } from "@peated/server/constants";
 import { logError, logInfo } from "@peated/server/lib/log";
+import { emitLegacyBottleObservation } from "@peated/server/scraper/legacyBottleContext";
+import {
+  beginLegacyPricePagination,
+  checkpointLegacyPricePage,
+  completeLegacyPricePagination,
+  emitLegacyPriceBatch,
+} from "@peated/server/scraper/legacyPriceContext";
+import { requestLegacyUrl } from "@peated/server/scraper/legacyRequestContext";
 import type { ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
-import { existsSync, mkdirSync, statSync } from "fs";
-import { open } from "fs/promises";
 import type { z } from "zod";
 import config from "../config";
 import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
@@ -24,12 +30,6 @@ import { formatBottleName } from "./format";
 import { updateBottleAsPeated } from "./updateBottle";
 import { updateBottleImageAsPeated } from "./updateBottleImage";
 
-const CACHE = ".cache";
-
-const CACHE_EXPIRE = 60 * 60 * 18 * 1000;
-
-mkdirSync(CACHE, { recursive: true });
-
 export class PageNotFound extends Error {
   override name = "PageNotFound";
 }
@@ -40,50 +40,44 @@ export function downloadFileAsBlob(url: string) {
 
 export async function getUrl(
   url: string,
-  noCache = !!process.env.DISABLE_HTTP_CACHE,
+  _noCache = true,
   headers: Record<string, string> = {},
 ) {
-  const filename = `${CACHE}/${encodeURIComponent(url)}`;
-
-  let data = "",
-    status = 0;
-  if (!existsSync(filename) || noCache) {
-    logInfo("URL not cached, fetching from internet", {
-      extra: {
-        url,
-      },
-    });
-    ({ data, status } = await cacheUrl(url, filename, headers));
-  } else if (statSync(filename).mtimeMs < new Date().getTime() - CACHE_EXPIRE) {
-    logInfo("URL cache outdated, fetching from internet", {
-      extra: {
-        url,
-      },
-    });
-    ({ data, status } = await cacheUrl(url, filename, headers));
-  } else {
-    const fs = await open(filename, "r");
-    const payload = await fs.readFile();
-    ({ data, status } = JSON.parse(payload.toString("utf8")));
-    await fs.close();
-  }
-
-  if (status === 404) {
-    throw new PageNotFound(url);
-  }
-
-  return data;
+  return await requestUrl(url, { headers });
 }
 
-export async function cacheUrl(
+export async function requestUrl(
   url: string,
-  filename: string,
-  headers: Record<string, string> = {},
+  {
+    method = "GET",
+    body,
+    headers = {},
+    retryable = false,
+  }: {
+    method?: "GET" | "POST";
+    body?: string;
+    headers?: Record<string, string>;
+    retryable?: boolean;
+  } = {},
 ) {
+  const runtimeBody = await requestLegacyUrl(url, {
+    method,
+    body,
+    headers,
+    retryable,
+  });
+  if (runtimeBody !== null) return runtimeBody;
+  if (config.ENV !== "test") {
+    throw new Error("Scraper HTTP requires an active scraper runtime session.");
+  }
+
   let data = "";
   let status = 0;
   try {
-    ({ status, data } = await axios.get(url, {
+    ({ status, data } = await axios.request({
+      url,
+      method,
+      data: body,
       headers: {
         ...defaultHeaders(url),
         ...headers,
@@ -97,16 +91,8 @@ export async function cacheUrl(
     }
   }
 
-  const fs = await open(filename, "w");
-  await fs.writeFile(
-    JSON.stringify({
-      status,
-      data: data.toString(),
-    }),
-  );
-  await fs.close();
-
-  return { data, status };
+  if (status === 404) throw new PageNotFound(url);
+  return data;
 }
 
 export function absoluteUrl(url: string, baseUrl: string) {
@@ -161,6 +147,21 @@ export type BottleReview = {
 };
 
 export async function handleBottle(
+  bottle: z.input<typeof BottleInputSchema>,
+  price?: z.input<typeof StorePriceInputSchema> | null,
+  imageUrl?: string | null,
+  { dryRun = false }: { dryRun?: boolean } = {},
+) {
+  if (
+    !dryRun &&
+    (await emitLegacyBottleObservation({ bottle, price, imageUrl }))
+  ) {
+    return;
+  }
+  return await persistBottleObservation(bottle, price, imageUrl, { dryRun });
+}
+
+export async function persistBottleObservation(
   bottle: z.input<typeof BottleInputSchema>,
   price?: z.input<typeof StorePriceInputSchema> | null,
   imageUrl?: string | null,
@@ -240,6 +241,8 @@ export default async function scrapePrices(
   ) => Promise<ScrapePricesPageResult | void>,
   { dryRun = false }: { dryRun?: boolean } = {},
 ) {
+  const pagination = beginLegacyPricePagination();
+  if (pagination?.skip) return 0;
   const workQueue = new BatchQueue<StorePrice>(
     SCRAPER_PRICE_BATCH_SIZE,
     async (prices) => {
@@ -249,14 +252,16 @@ export default async function scrapePrices(
           count: prices.length,
         },
       });
-      if (!dryRun) await createStorePricesAsPeated({ site, prices });
+      if (!(await emitLegacyPriceBatch(prices)) && !dryRun) {
+        await createStorePricesAsPeated({ site, prices });
+      }
     },
   );
 
   const uniqueProducts = new Set<string>();
 
   let hasMorePages = true;
-  let page = 1;
+  let page = pagination?.startPage ?? 1;
   try {
     while (hasMorePages) {
       let emittedProduct = false;
@@ -276,6 +281,9 @@ export default async function scrapePrices(
       });
       hasMorePages =
         result?.hasNextPage ?? result?.hasSourceProducts ?? emittedProduct;
+      if (hasMorePages && pagination) {
+        await checkpointLegacyPricePage(pagination.sequence, page + 1);
+      }
       page += 1;
     }
 
@@ -285,6 +293,10 @@ export default async function scrapePrices(
   } finally {
     // Full batches persist during pagination, so the same run also owns its remainder.
     await workQueue.processRemaining();
+  }
+
+  if (pagination) {
+    await completeLegacyPricePagination(pagination.sequence);
   }
 
   logInfo("Scrape complete", {

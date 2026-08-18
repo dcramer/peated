@@ -5,23 +5,14 @@ import {
   type ExternalSite,
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
-import {
-  requireExternalReviewFetchBeforeQueue,
-  requireExternalReviewSourceCapability,
-} from "@peated/server/lib/externalReviewSourcePolicy";
-import type { ExternalSiteType } from "@peated/server/types";
+import { requireExternalReviewFetchBeforeQueue } from "@peated/server/lib/externalReviewSourcePolicy";
+import { findScraperSourceBySiteType } from "@peated/server/scraper/definitions";
+import { scraperRegistry } from "@peated/server/scraper/registry";
 import type { JobName } from "@peated/server/worker/types";
-import { getJobForSite } from "@peated/server/worker/utils";
-import * as Sentry from "@sentry/node";
-import { and, asc, eq, inArray, lte, or, sql } from "drizzle-orm";
-import { z } from "zod";
+import { and, asc, eq, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";
 
 const STALE_EXTERNAL_SITE_RUN_MS = 10 * 60_000;
 const EXTERNAL_SITE_RUN_RECONCILE_LIMIT = 100;
-
-const ExternalSiteRunJobInputSchema = z
-  .object({ runId: z.number().int().positive() })
-  .strict();
 
 type RunTrigger = ExternalSiteRun["trigger"];
 type Enqueue = (
@@ -64,13 +55,24 @@ async function findActiveRun(siteId: number) {
 
 async function insertRun(
   connection: AnyDatabase,
-  siteId: number,
+  site: Pick<ExternalSite, "id" | "type">,
   trigger: RunTrigger,
   requestedById?: number,
 ) {
+  const source = findScraperSourceBySiteType(scraperRegistry, site.type);
+  if (!source) {
+    throw new Error(
+      `External site ${site.type} is not registered with the scraper runtime.`,
+    );
+  }
   const [run] = await connection
     .insert(externalSiteRuns)
-    .values({ externalSiteId: siteId, trigger, requestedById })
+    .values({
+      externalSiteId: site.id,
+      trigger,
+      requestedById,
+      requestLimit: source.requestLimit,
+    })
     .returning();
   if (!run) throw new Error("Failed to create external site run.");
   return run;
@@ -141,8 +143,14 @@ async function dispatchExternalSiteRun(
   { completeOnFailure = true }: { completeOnFailure?: boolean } = {},
 ) {
   try {
+    const source = findScraperSourceBySiteType(scraperRegistry, site.type);
+    if (!source) {
+      throw new Error(
+        `External site ${site.type} is not registered with the scraper runtime.`,
+      );
+    }
     await enqueue(
-      getJobForSite(site.type),
+      "RunScraper",
       { runId: run.id },
       {
         jobId: `external-site-run-${run.id}`,
@@ -171,8 +179,9 @@ async function dispatchExternalSiteRun(
 // The scheduler owns stale-run recovery and reuses both durable and queue identity.
 export async function redispatchStaleExternalSiteRuns({
   staleBefore = new Date(Date.now() - STALE_EXTERNAL_SITE_RUN_MS),
+  eligibleAt = new Date(),
   enqueue = defaultEnqueue,
-}: { staleBefore?: Date; enqueue?: Enqueue } = {}) {
+}: { staleBefore?: Date; eligibleAt?: Date; enqueue?: Enqueue } = {}) {
   const staleRuns = await db
     .select({ run: externalSiteRuns, site: externalSites })
     .from(externalSiteRuns)
@@ -187,10 +196,23 @@ export async function redispatchStaleExternalSiteRuns({
           and(
             eq(externalSiteRuns.status, "queued"),
             lte(externalSiteRuns.createdAt, staleBefore),
+            or(
+              isNull(externalSiteRuns.nextAttemptAt),
+              lte(externalSiteRuns.nextAttemptAt, eligibleAt),
+            ),
           ),
           and(
             eq(externalSiteRuns.status, "running"),
-            lte(externalSiteRuns.startedAt, staleBefore),
+            or(
+              and(
+                isNotNull(externalSiteRuns.executionExpiresAt),
+                lte(externalSiteRuns.executionExpiresAt, eligibleAt),
+              ),
+              and(
+                isNull(externalSiteRuns.executionExpiresAt),
+                lte(externalSiteRuns.startedAt, staleBefore),
+              ),
+            ),
           ),
         ),
       ),
@@ -219,7 +241,7 @@ export async function queueManualExternalSiteRun({
 
   let run: ExternalSiteRun;
   try {
-    run = await insertRun(db, site.id, "manual", requestedById);
+    run = await insertRun(db, site, "manual", requestedById);
   } catch (error) {
     await translateActiveRunConflict(error, site.id);
     throw error;
@@ -251,7 +273,7 @@ export async function queueScheduledExternalSiteRun(
 
       await requireExternalReviewFetchBeforeQueue(tx, site);
 
-      const run = await insertRun(tx, site.id, "scheduled");
+      const run = await insertRun(tx, site, "scheduled");
       await tx
         .update(externalSites)
         .set({ nextRunAt: new Date(Date.now() + site.runEvery * 60_000) })
@@ -266,98 +288,4 @@ export async function queueScheduledExternalSiteRun(
   if (!result) return null;
   await dispatchExternalSiteRun(result.run, result.site, enqueue);
   return result.run;
-}
-
-function summarizeExternalSiteRunError(error: unknown): string {
-  if (error instanceof z.ZodError) return "Scraped data failed validation.";
-  if (error instanceof Error) {
-    if (error.name === "PageNotFound") return "Retailer page was not found.";
-    if (error.message === "Failed to scrape any products.") {
-      return error.message;
-    }
-  }
-  return "Unexpected scraper failure. See Sentry for this run.";
-}
-
-function buildExternalSiteRunJob(
-  siteType: ExternalSiteType,
-  scrape: () => Promise<number>,
-  authorizeFetch?: (site: {
-    id: number;
-    type: ExternalSiteType;
-  }) => Promise<void>,
-) {
-  return async (input: unknown) => {
-    const { runId } = ExternalSiteRunJobInputSchema.parse(input);
-    const run = await db.transaction(async (tx) => {
-      const [candidate] = await tx
-        .select({
-          run: externalSiteRuns,
-          site: externalSites,
-        })
-        .from(externalSiteRuns)
-        .innerJoin(
-          externalSites,
-          eq(externalSites.id, externalSiteRuns.externalSiteId),
-        )
-        .where(eq(externalSiteRuns.id, runId))
-        .for("update");
-
-      if (!candidate) throw new Error(`External site run ${runId} not found.`);
-      if (candidate.site.type !== siteType) {
-        throw new Error(`External site run ${runId} does not match its job.`);
-      }
-      if (["succeeded", "failed"].includes(candidate.run.status)) return null;
-
-      const [claimed] = await tx
-        .update(externalSiteRuns)
-        .set({
-          status: "running",
-          startedAt: candidate.run.startedAt ?? new Date(),
-          attemptCount: sql`${externalSiteRuns.attemptCount} + 1`,
-        })
-        .where(eq(externalSiteRuns.id, runId))
-        .returning();
-      return claimed ?? null;
-    });
-
-    if (!run) return;
-
-    // The worker registry owns error capture after this handler rejects, so
-    // correlation must live on its job isolation scope rather than a child
-    // scope that would close before the exception reaches that boundary.
-    Sentry.getIsolationScope().setContext("externalSiteRun", {
-      id: run.id,
-      site: siteType,
-    });
-    try {
-      await authorizeFetch?.({ id: run.externalSiteId, type: siteType });
-      const itemCount = await scrape();
-      await completeExternalSiteRun({ run, status: "succeeded", itemCount });
-    } catch (error) {
-      await completeExternalSiteRun({
-        run,
-        status: "failed",
-        error: summarizeExternalSiteRunError(error),
-      });
-      throw error;
-    }
-  };
-}
-
-export function createExternalSiteRunJob(
-  siteType: ExternalSiteType,
-  scrape: () => Promise<number>,
-) {
-  return buildExternalSiteRunJob(siteType, scrape);
-}
-
-/** Rechecks publisher authorization immediately before review network access. */
-export function createExternalReviewSiteRunJob(
-  siteType: ExternalSiteType,
-  scrape: () => Promise<number>,
-) {
-  return buildExternalSiteRunJob(siteType, scrape, async (site) => {
-    await requireExternalReviewSourceCapability(db, site, "allowFetching");
-  });
 }

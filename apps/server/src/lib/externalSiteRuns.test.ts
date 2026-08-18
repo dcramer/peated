@@ -6,14 +6,12 @@ import {
 } from "@peated/server/db/schema";
 import { ExternalReviewSourcePolicyError } from "@peated/server/lib/externalReviewSourcePolicy";
 import {
-  createExternalReviewSiteRunJob,
-  createExternalSiteRunJob,
   ExternalSiteRunActiveError,
   queueManualExternalSiteRun,
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
 } from "@peated/server/lib/externalSiteRuns";
-import * as Sentry from "@sentry/node";
+import { executeScraperRun } from "@peated/server/scraper/runs";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
 
@@ -41,7 +39,7 @@ test("manual run is attributed, dispatched deterministically, and does not move 
     requestedById: requestedBy.id,
   });
   expect(enqueue).toHaveBeenCalledWith(
-    "ScrapeDecadentDrinks",
+    "RunScraper",
     { runId: run.id },
     {
       jobId: `external-site-run-${run.id}`,
@@ -125,89 +123,18 @@ test("worker rechecks approval after a review run is queued", async ({
       approvedByActorId: null,
     })
     .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
-  const scrape = vi.fn(async () => 1);
-  const job = createExternalReviewSiteRunJob("whiskyadvocate", scrape);
+  const fetchImpl = vi.fn<typeof fetch>();
 
-  await expect(job({ runId: run.id })).rejects.toBeInstanceOf(
-    ExternalReviewSourcePolicyError,
-  );
+  await expect(
+    executeScraperRun({ runId: run.id }, { fetchImpl }),
+  ).rejects.toBeInstanceOf(ExternalReviewSourcePolicyError);
 
   const [storedRun] = await db
     .select()
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, run.id));
   expect(storedRun).toMatchObject({ status: "failed", itemCount: null });
-  expect(scrape).not.toHaveBeenCalled();
-});
-
-test("worker owns successful lifecycle and terminal delivery is a no-op", async ({
-  fixtures,
-}) => {
-  const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "decadentdrinks" });
-  const run = await queueManualExternalSiteRun({
-    site,
-    requestedById: requestedBy.id,
-    enqueue: async () => undefined,
-  });
-  const scrape = vi.fn(async () => 7);
-  const job = createExternalSiteRunJob("decadentdrinks", scrape);
-
-  await job({ runId: run.id });
-  await job({ runId: run.id });
-
-  const [storedRun] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  const [storedSite] = await db
-    .select()
-    .from(externalSites)
-    .where(eq(externalSites.id, site.id));
-  expect(storedRun).toMatchObject({
-    status: "succeeded",
-    attemptCount: 1,
-    itemCount: 7,
-    error: null,
-  });
-  expect(storedRun?.startedAt).not.toBeNull();
-  expect(storedRun?.completedAt).not.toBeNull();
-  expect(storedSite?.lastRunId).toBe(run.id);
-  expect(storedSite?.lastRunAt).toEqual(storedRun?.completedAt);
-  expect(scrape).toHaveBeenCalledOnce();
-});
-
-test("worker persists a safe failure and rethrows", async ({ fixtures }) => {
-  const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "decadentdrinks" });
-  const run = await queueManualExternalSiteRun({
-    site,
-    requestedById: requestedBy.id,
-    enqueue: async () => undefined,
-  });
-  const failure = new Error("secret provider response");
-  const job = createExternalSiteRunJob("decadentdrinks", async () => {
-    throw failure;
-  });
-
-  await Sentry.withIsolationScope(async (scope) => {
-    await expect(job({ runId: run.id })).rejects.toBe(failure);
-    expect(scope.getScopeData().contexts?.externalSiteRun).toEqual({
-      id: run.id,
-      site: "decadentdrinks",
-    });
-  });
-
-  const [storedRun] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  expect(storedRun).toMatchObject({
-    status: "failed",
-    attemptCount: 1,
-    error: "Unexpected scraper failure. See Sentry for this run.",
-  });
-  expect(storedRun?.error).not.toContain("secret");
+  expect(fetchImpl).not.toHaveBeenCalled();
 });
 
 test("active run prevents overlap", async ({ fixtures }) => {
@@ -303,7 +230,7 @@ test("stale active runs are redispatched with their existing queue identity", as
   expect(count).toBe(2);
   expect(enqueue).toHaveBeenCalledTimes(2);
   expect(enqueue).toHaveBeenCalledWith(
-    "ScrapeDecadentDrinks",
+    "RunScraper",
     { runId: queuedRun?.id },
     {
       jobId: `external-site-run-${queuedRun?.id}`,
@@ -312,7 +239,7 @@ test("stale active runs are redispatched with their existing queue identity", as
     },
   );
   expect(enqueue).toHaveBeenCalledWith(
-    "ScrapeCadenheads",
+    "RunScraper",
     { runId: runningRun?.id },
     {
       jobId: `external-site-run-${runningRun?.id}`,

@@ -1,12 +1,14 @@
 import { context, propagation } from "@opentelemetry/api";
 import { scheduledJob, scheduler } from "@peated/server/lib/cron";
 import * as Sentry from "@sentry/node";
-import type { JobsOptions } from "bullmq";
-import { Worker } from "bullmq";
+import { Queue, Worker, type JobsOptions } from "bullmq";
 import IORedis from "ioredis";
+import { createHash } from "node:crypto";
 import config from "../config";
 import { syncExternalSites } from "../lib/externalSites";
-import { logError, logInfo } from "../lib/log";
+import { logError, logInfo, logTelemetryError } from "../lib/log";
+import { scraperRegistry } from "../scraper/registry";
+import { syncScraperDefinitions } from "../scraper/syncDefinitions";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
 import {
@@ -17,16 +19,15 @@ import {
 import registry from "./registry";
 import { type JobName } from "./types";
 
-import { Queue } from "bullmq";
-import { createHash } from "crypto";
-
 export function generateUniqIdentifier(
   name: string,
   args?: Record<string, any>,
 ) {
   let hash = createHash("md5");
   if (args) {
-    for (const item of Object.entries(args).sort()) {
+    for (const item of Object.entries(args).sort(([left], [right]) =>
+      left.localeCompare(right),
+    )) {
       hash = hash.update(JSON.stringify(item));
     }
   }
@@ -61,9 +62,10 @@ export async function pushJob(
   args?: Record<string, any>,
   opts?: JobsOptions,
 ) {
+  const queueName = registry.getQueueName(jobName);
   await Sentry.startSpan(
     {
-      op: "publish default",
+      op: `publish ${queueName}`,
       name: `bullmq.${jobName.toLowerCase()}`,
     },
     async (span) => {
@@ -72,7 +74,7 @@ export async function pushJob(
       span.setAttribute("messaging.operation.name", "publish");
       // TODO: THIS IS WRONG - it should set from the worker itself but idk that
       // we have that data
-      span.setAttribute("messaging.destination.name", "default");
+      span.setAttribute("messaging.destination.name", queueName);
       // TODO:
       // span.setAttribute("messaging.message.id", jobId);
       span.setAttribute("messaging.system", "bullmq");
@@ -80,13 +82,9 @@ export async function pushJob(
       const activeContext = {};
       propagation.inject(context.active(), activeContext);
 
-      const defaultQueue = await getQueue("default");
+      const queue = await getQueue(queueName);
       try {
-        await defaultQueue.add(
-          jobName,
-          buildQueuedJobData(args, activeContext),
-          opts,
-        );
+        await queue.add(jobName, buildQueuedJobData(args, activeContext), opts);
       } catch (e) {
         span.setStatus({
           code: 2, // ERROR
@@ -126,6 +124,7 @@ export async function gracefulShutdown(signal?: string, worker?: Worker) {
 
 export async function runWorker() {
   await syncExternalSites();
+  await syncScraperDefinitions(scraperRegistry);
 
   // dont run the scraper in dev
   if (config.ENV === "production") {
@@ -144,27 +143,45 @@ export async function runWorker() {
 
   const connection = await getConnection();
   const defaultQueue = await getQueue("default", connection);
-  const worker = new Worker(
-    defaultQueue.name,
-    async (job) => {
-      const jobFn = registry.get(job.name);
-      const { args, context } = parseQueuedJobData(job.data);
-      return await jobFn(args, context);
-    },
-    { connection, autorun: false },
-  );
+  const scraperQueue = await getQueue("scrapers", connection);
+  const processJob = async (job: { name: string; data: unknown }) => {
+    let jobFn;
+    let queuedJob;
+    try {
+      jobFn = registry.get(job.name);
+      queuedJob = parseQueuedJobData(job.data);
+    } catch (error) {
+      // Registry and envelope failures occur before the instrumented job boundary.
+      logError(error);
+      throw error;
+    }
+    const { args, context } = queuedJob;
+    return await jobFn(args, context);
+  };
+  const defaultWorker = new Worker(defaultQueue.name, processJob, {
+    connection,
+    autorun: false,
+  });
+  const scraperWorker = new Worker(scraperQueue.name, processJob, {
+    connection,
+    autorun: false,
+    concurrency: 4,
+  });
 
-  worker.on("failed", (job, error) => {
-    logError(error, {
-      extra: {
-        job: job?.id,
-      },
+  for (const worker of [defaultWorker, scraperWorker]) {
+    worker.on("failed", (job, error) => {
+      // The instrumented job boundary already owns the Sentry issue.
+      logTelemetryError(error, {
+        extra: {
+          job: job?.id,
+        },
+      });
     });
-  });
 
-  worker.on("error", (error) => {
-    logError(error);
-  });
+    worker.on("error", (error) => {
+      logError(error);
+    });
+  }
 
   async function termProcess(signal: string) {
     logInfo("Received {signal}, closing worker", {
@@ -173,8 +190,8 @@ export async function runWorker() {
       },
     });
 
-    await worker.close();
-    await defaultQueue.close();
+    await Promise.all([defaultWorker.close(), scraperWorker.close()]);
+    await Promise.all([defaultQueue.close(), scraperQueue.close()]);
     await gracefulShutdown();
     process.exit(0);
   }
@@ -183,6 +200,9 @@ export async function runWorker() {
 
   process.on("SIGTERM", () => termProcess("SIGTERM"));
 
-  void worker.run();
-  logInfo("Worker running", {});
+  void defaultWorker.run();
+  void scraperWorker.run();
+  logInfo("Workers running", {
+    extra: { queues: [defaultQueue.name, scraperQueue.name] },
+  });
 }

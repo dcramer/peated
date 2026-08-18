@@ -4,9 +4,8 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices from "@peated/server/lib/scraper";
+import scrapePrices, { requestUrl } from "@peated/server/lib/scraper";
 import { GtinSchema } from "@peated/server/schemas";
-import axios from "axios";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
@@ -208,31 +207,33 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const numericFilters = getPartition(url);
   if (!numericFilters) return;
 
-  const { data } = await axios.post(
-    url,
-    {
-      attributesToRetrieve: [
-        "bundle_skus",
-        "calculated_prices.GBP",
-        "image_url",
-        "in_stock",
-        "name",
-        "sku",
-        "upc",
-        "url",
-        "volume",
-      ],
-      filters: CATALOG_FILTER,
-      hitsPerPage: HITS_PER_PARTITION,
-      numericFilters,
-      query: "",
-    },
-    {
+  const data = JSON.parse(
+    await requestUrl(url, {
+      method: "POST",
+      retryable: true,
+      body: JSON.stringify({
+        attributesToRetrieve: [
+          "bundle_skus",
+          "calculated_prices.GBP",
+          "image_url",
+          "in_stock",
+          "name",
+          "sku",
+          "upc",
+          "url",
+          "volume",
+        ],
+        filters: CATALOG_FILTER,
+        hitsPerPage: HITS_PER_PARTITION,
+        numericFilters,
+        query: "",
+      }),
       headers: {
+        "Content-Type": "application/json",
         "x-algolia-api-key": ALGOLIA_SEARCH_API_KEY,
         "x-algolia-application-id": ALGOLIA_APPLICATION_ID,
       },
-    },
+    }),
   );
 
   const payload = SearchResponseSchema.parse(data);

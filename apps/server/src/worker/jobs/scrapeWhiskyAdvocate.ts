@@ -1,8 +1,4 @@
 import {
-  normalizeBottle,
-  normalizeCategory,
-} from "@peated/bottle-classifier/normalize";
-import {
   createExternalReview,
   ExternalReviewBottleStateError,
 } from "@peated/server/lib/createExternalReview";
@@ -11,10 +7,13 @@ import {
   setExternalSiteConfig,
 } from "@peated/server/lib/externalSiteConfig";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
-import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
-import { absoluteUrl } from "@peated/server/lib/urls";
-import { load as cheerio } from "cheerio";
+import {
+  scrapeIssueList,
+  scrapeReviews,
+} from "@peated/server/scraper/adapters/whiskyAdvocate";
 import { z } from "zod";
+
+export { scrapeIssueList, scrapeReviews };
 
 export default async function scrapeWhiskeyAdvocate({
   dryRun = false,
@@ -120,90 +119,4 @@ export default async function scrapeWhiskeyAdvocate({
     }
   }
   return itemCount;
-}
-
-export async function scrapeIssueList(
-  url = "https://whiskyadvocate.com/ratings-reviews",
-) {
-  const data = await getUrl(url);
-  const $ = cheerio(data);
-  const results: string[] = [];
-  $("select")
-    .filter((_, el) => {
-      return el.attribs.name === "filters[default][custom_rating_issue][]";
-    })
-    .find("option")
-    .each((_, el) => {
-      const value = $(el).text().trim();
-      if (el.attribs.value === "" || !value) return;
-      results.push(value);
-    });
-  return results;
-}
-
-export async function scrapeReviews(
-  url: string,
-  cb: (review: BottleReview) => Promise<void>,
-) {
-  const data = await getUrl(url);
-  const $ = cheerio(data);
-
-  for (const el of $("#directoryResults .postsItem")) {
-    // <h5>Claxton's Mannochmore 7 year old Oloroso Hogshead, 50% </h5>
-    const rawName = $(".postsItemContent > h5", el).first().text().trim();
-    if (!rawName) {
-      logWarn("[Whisky Advocate] Unable to identify bottle name", {});
-      continue;
-    }
-    const { name } = normalizeBottle({
-      name: rawName
-        .replaceAll(/\n/gi, "")
-        .trim()
-        .replace(/,\s[\d.]+%,?$/, ""),
-    });
-
-    const reviewUrl = $("a.postsItemLink", el).first().attr("href");
-    if (!reviewUrl) {
-      logWarn("[Whisky Advocate] Unable to identify review URL for {rawName}", {
-        extra: {
-          rawName,
-        },
-      });
-      continue;
-    }
-
-    const rawRating = $(".postsItemRanking > h2", el).first().text().trim();
-    if (!rawRating || Number(rawRating) < 1 || Number(rawRating) > 100) {
-      logWarn("[Whisky Advocate] Unable to identify valid rating", {
-        extra: {
-          rawName,
-          rawRating,
-        },
-      });
-      continue;
-    }
-    const rating = Number(rawRating);
-
-    const issue = $(".postsItemIssue", el).first().text().trim();
-    if (!issue) {
-      logWarn("[Whisky Advocate] Unable to identify issue name for {rawName}", {
-        extra: {
-          rawName,
-        },
-      });
-      continue;
-    }
-
-    // <h6>Single Malt Scotch<br />$116</h6>
-    const rawCategory = $(".postsItemContent h6", el).first().text().trim();
-    const category = normalizeCategory(rawCategory.replace(/<br\s\\>.+$/, ""));
-
-    await cb({
-      name,
-      category,
-      rating,
-      issue,
-      url: absoluteUrl(url, reviewUrl),
-    });
-  }
 }

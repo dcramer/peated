@@ -1,7 +1,7 @@
 import type { ExternalSiteType } from "@peated/server/types";
-import { type JobName } from "./types";
 
-export function getJobForSite(site: ExternalSiteType): JobName {
+/** @deprecated Scraper dispatch is owned by the RunScraper runtime job. */
+export function getJobForSite(site: ExternalSiteType): string {
   switch (site) {
     case "totalwine":
       return "ScrapeTotalWine";

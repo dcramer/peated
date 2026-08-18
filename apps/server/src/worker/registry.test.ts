@@ -16,6 +16,13 @@ function spyOnSentryFlush() {
 }
 
 describe("worker registry", () => {
+  test("keeps scraper jobs on their isolated queue", () => {
+    const jobName = `RegistryScraperJob-${crypto.randomUUID()}`;
+    registry.add(jobName, async () => undefined, { queueName: "scrapers" });
+
+    expect(registry.getQueueName(jobName)).toBe("scrapers");
+  });
+
   test("flushes Sentry after a successful job", async () => {
     const flush = spyOnSentryFlush();
     const jobName = `RegistrySuccessfulJob-${crypto.randomUUID()}`;

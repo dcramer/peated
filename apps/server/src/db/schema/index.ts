@@ -21,6 +21,7 @@ export * from "./passkeys";
 export * from "./pendingUploads";
 export * from "./regions";
 export * from "./reviews";
+export * from "./scraper";
 export * from "./stores";
 export * from "./tags";
 export * from "./tastings";

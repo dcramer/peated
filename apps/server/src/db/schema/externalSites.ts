@@ -3,6 +3,7 @@ import {
   type AnyPgColumn,
   bigint,
   bigserial,
+  check,
   index,
   integer,
   jsonb,
@@ -68,6 +69,16 @@ export const externalSiteRuns = pgTable(
       () => users.id,
     ),
     attemptCount: integer("attempt_count").default(0).notNull(),
+    requestLimit: integer("request_limit").default(100).notNull(),
+    sliceRequestCount: integer("slice_request_count").default(0).notNull(),
+    requestCount: integer("request_count").default(0).notNull(),
+    retryCount: integer("retry_count").default(0).notNull(),
+    rateLimitCount: integer("rate_limit_count").default(0).notNull(),
+    emittedItemCount: integer("emitted_item_count").default(0).notNull(),
+    cursor: jsonb("cursor"),
+    nextAttemptAt: timestamp("next_attempt_at"),
+    executionToken: text("execution_token"),
+    executionExpiresAt: timestamp("execution_expires_at"),
     itemCount: integer("item_count"),
     error: text("error"),
     startedAt: timestamp("started_at"),
@@ -86,6 +97,25 @@ export const externalSiteRuns = pgTable(
       table.externalSiteId,
       table.status,
       table.completedAt,
+    ),
+    index("external_site_run_dispatch_idx").on(
+      table.status,
+      table.nextAttemptAt,
+      table.executionExpiresAt,
+    ),
+    check(
+      "external_site_run_request_budget_check",
+      sql`${table.requestLimit} > 0
+        AND ${table.sliceRequestCount} >= 0
+        AND ${table.sliceRequestCount} <= ${table.requestLimit}
+        AND ${table.requestCount} >= 0
+        AND ${table.retryCount} >= 0
+        AND ${table.rateLimitCount} >= 0
+        AND ${table.emittedItemCount} >= 0`,
+    ),
+    check(
+      "external_site_run_execution_pair_check",
+      sql`(${table.executionToken} IS NULL) = (${table.executionExpiresAt} IS NULL)`,
     ),
   ],
 );

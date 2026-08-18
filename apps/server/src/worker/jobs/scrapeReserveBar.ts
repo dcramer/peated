@@ -4,10 +4,9 @@ import type {
   ScrapePricesCallback,
   StorePrice,
 } from "@peated/server/lib/scraper";
-import scrapePrices from "@peated/server/lib/scraper";
+import scrapePrices, { requestUrl } from "@peated/server/lib/scraper";
 import { toTitleCase } from "@peated/server/lib/strings";
 import slugify from "@sindresorhus/slugify";
-import axios from "axios";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
@@ -135,12 +134,14 @@ export function parseReserveBarProducts(input: unknown): {
 }
 
 async function getAccessToken(): Promise<string> {
-  const { data } = await axios.get(AUTH_URL, {
-    headers: {
-      "X-LIQUID-API-KEY": API_KEY,
-      "X-LIQUID-API-OBF": "true",
-    },
-  });
+  const data = JSON.parse(
+    await requestUrl(AUTH_URL, {
+      headers: {
+        "X-LIQUID-API-KEY": API_KEY,
+        "X-LIQUID-API-OBF": "true",
+      },
+    }),
+  );
   return AuthenticationResponseSchema.parse(data).data.token;
 }
 
@@ -155,34 +156,36 @@ export async function scrapeProducts(
   }
 
   const token = accessToken ?? (await getAccessToken());
-  const { data } = await axios.post(
-    url,
-    {
-      entity: "reservebar.com",
-      filters: [
-        { key: "availability", values: "IN_STOCK" },
-        { key: "categories", values: ["SPIRITS > WHISKEY"] },
-      ],
-      isLean: false,
-      isLegacy: true,
-      loc: {},
-      orderBy: "price",
-      orderDirection: "desc",
-      page,
-      perPage: PRODUCTS_PER_PAGE,
-      refresh: false,
-      search: "",
-      shouldShowOffHours: false,
-    },
-    {
+  const data = JSON.parse(
+    await requestUrl(url, {
+      method: "POST",
+      retryable: true,
+      body: JSON.stringify({
+        entity: "reservebar.com",
+        filters: [
+          { key: "availability", values: "IN_STOCK" },
+          { key: "categories", values: ["SPIRITS > WHISKEY"] },
+        ],
+        isLean: false,
+        isLegacy: true,
+        loc: {},
+        orderBy: "price",
+        orderDirection: "desc",
+        page,
+        perPage: PRODUCTS_PER_PAGE,
+        refresh: false,
+        search: "",
+        shouldShowOffHours: false,
+      }),
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         "X-LIQUID-API-KEY": API_KEY,
         "X-LIQUID-API-OBF": "true",
         "X-LIQUID-API-SDK": "true",
         "X-LIQUID-SDK-VERSION": "1.11.1",
       },
-    },
+    }),
   );
 
   const result = parseReserveBarProducts(data);
