@@ -4969,6 +4969,70 @@ describe("priceMatching", () => {
     );
   });
 
+  test("preserves the last semantic decision when a retry fails", async ({
+    fixtures,
+  }) => {
+    config.AI_GATEWAY_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      name: "Retry Failure Candidate",
+      imageUrl: null,
+    });
+    const [existingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        confidence: 91,
+        suggestedBottleId: bottle.id,
+        extractedLabel: { brand: "Retained Brand" },
+        candidateBottles: [{ bottleId: bottle.id, fullName: bottle.fullName }],
+        rationale: "The prior run found an exact candidate.",
+      })
+      .returning();
+
+    vi.mocked(classifyBottleReference).mockRejectedValue(
+      new Error("Team budget exceeded"),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+    });
+    const attempts = await db.query.storePriceMatchAttempts.findMany({
+      where: eq(storePriceMatchAttempts.proposalId, existingProposal.id),
+    });
+
+    expect(proposal).toMatchObject({
+      id: existingProposal.id,
+      status: "errored",
+      proposalType: "match_existing",
+      confidence: 91,
+      suggestedBottleId: bottle.id,
+      extractedLabel: { brand: "Retained Brand" },
+      candidateBottles: [
+        expect.objectContaining({
+          bottleId: bottle.id,
+          fullName: bottle.fullName,
+        }),
+      ],
+      rationale: "The prior run found an exact candidate.",
+      error: "Team budget exceeded",
+    });
+    expect(attempts).toEqual([
+      expect.objectContaining({
+        proposalType: "match_existing",
+        initialStatus: "errored",
+        finalStatus: "errored",
+        suggestedBottleId: bottle.id,
+        error: "Team budget exceeded",
+      }),
+    ]);
+  });
+
   test("includes decision-relevant structured bottle fields in candidate search text", async () => {
     config.AI_GATEWAY_API_KEY = "test-gateway-key";
 

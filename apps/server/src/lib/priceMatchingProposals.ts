@@ -48,7 +48,6 @@ import {
 } from "@peated/server/lib/createBottle";
 import {
   recordIncomingBottleDecisionInTransaction,
-  shouldRecordIncomingBottleDecision,
   type IncomingBottleDecisionActor,
   type IncomingBottleDecisionType,
 } from "@peated/server/lib/incomingBottleDecisionLog";
@@ -769,6 +768,7 @@ export async function upsertStorePriceMatchProposal({
   searchEvidence,
   error,
   statusOverride,
+  preserveExistingDecision = false,
   expectedProcessingToken,
   tx = db,
 }: {
@@ -781,6 +781,7 @@ export async function upsertStorePriceMatchProposal({
   searchEvidence?: SearchEvidence[];
   error?: string | null;
   statusOverride?: StorePriceMatchProposal["status"] | null;
+  preserveExistingDecision?: boolean;
   expectedProcessingToken?: string;
   tx?: AnyDatabase;
 }) {
@@ -828,10 +829,32 @@ export async function upsertStorePriceMatchProposal({
     ...proposalRuntimeValues,
     enteredQueueAt,
   };
-  const updateValues = {
-    ...proposalRuntimeValues,
-    enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
-  };
+  const updateValues =
+    preserveExistingDecision && !parsedDecision
+      ? {
+          status,
+          candidateBottles:
+            candidates.length > 0
+              ? candidates
+              : sql`${storePriceMatchProposals.candidateBottles}`,
+          extractedLabel:
+            extractedLabel ?? sql`${storePriceMatchProposals.extractedLabel}`,
+          searchEvidence:
+            searchEvidence && searchEvidence.length > 0
+              ? searchEvidence
+              : sql`${storePriceMatchProposals.searchEvidence}`,
+          model: config.BOTTLE_CLASSIFIER_MODEL,
+          error: error || null,
+          lastEvaluatedAt: sql`NOW()`,
+          enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
+          reviewedById: null,
+          reviewedAt: null,
+          updatedAt: sql`NOW()`,
+        }
+      : {
+          ...proposalRuntimeValues,
+          enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
+        };
   const [proposal] = await tx
     .insert(storePriceMatchProposals)
     .values({
@@ -1320,6 +1343,9 @@ export async function resolveStorePriceMatchProposal(
           ? err.artifacts.searchEvidence
           : searchEvidence,
       error: err instanceof Error ? err.message : "Unknown classifier error",
+      // A retry failure is operational, not a new semantic no-match decision.
+      // Preserve the last completed decision while exposing the failed attempt.
+      preserveExistingDecision: true,
       expectedProcessingToken: processingToken,
     });
     await recordStorePriceMatchAttempt({ proposal });
@@ -1543,34 +1569,28 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     createdById: reviewedById,
   });
 
-  if (
-    shouldRecordIncomingBottleDecision({
-      previousBottleId: proposal.price.bottleId ?? proposal.currentBottleId,
-      bottleId,
-      decision: decisionLog.decision,
-    })
-  ) {
-    await recordIncomingBottleDecisionInTransaction(tx, {
-      sourceKind: "store_price",
-      sourceId: proposal.price.id,
-      proposalId: proposal.id,
-      externalSiteId: proposal.price.externalSiteId,
-      name: proposal.price.name,
-      url: proposal.price.url,
-      decision: decisionLog.decision,
-      actor,
-      bottleId,
-      createdBottle: decisionLog.createdBottle ?? false,
-      confidence: proposal.confidence,
-      model: proposal.model,
-      rationale: proposal.rationale,
-      metadata: {
-        proposalType: proposal.proposalType,
-        ...(actor.type === "system" ? { initiatedByUserId: reviewedById } : {}),
-        ...decisionLog.metadata,
-      },
-    });
-  }
+  // The decision writer is idempotent by source. Always offer a completed
+  // moderation decision so legacy or preassigned prices still gain history.
+  await recordIncomingBottleDecisionInTransaction(tx, {
+    sourceKind: "store_price",
+    sourceId: proposal.price.id,
+    proposalId: proposal.id,
+    externalSiteId: proposal.price.externalSiteId,
+    name: proposal.price.name,
+    url: proposal.price.url,
+    decision: decisionLog.decision,
+    actor,
+    bottleId,
+    createdBottle: decisionLog.createdBottle ?? false,
+    confidence: proposal.confidence,
+    model: proposal.model,
+    rationale: proposal.rationale,
+    metadata: {
+      proposalType: proposal.proposalType,
+      ...(actor.type === "system" ? { initiatedByUserId: reviewedById } : {}),
+      ...decisionLog.metadata,
+    },
+  });
 
   return aliasResult;
 }
