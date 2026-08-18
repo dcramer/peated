@@ -1,0 +1,4 @@
+interface:
+  display_name: "Peated CLI"
+  short_description: "Operate Peated safely from the CLI"
+  default_prompt: "Use $peated-cli to inspect Peated data safely through the repository CLI."
