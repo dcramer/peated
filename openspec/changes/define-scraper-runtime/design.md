@@ -71,6 +71,34 @@ Alternative considered: add retries and sleeps to `getUrl`. This leaves direct
 Axios calls, cross-worker coordination, request budgets, and resumable work
 unsolved while making a legacy cache helper more important.
 
+### Keep one public lifecycle boundary
+
+The scraper module owns creation, dispatch state, stale-run reconciliation,
+claiming, deferral, completion, and failure for `external_site_run`. API routes,
+schedules, and BullMQ handlers call lifecycle capabilities exported from the
+module root; they do not mutate run state or import coordinator, HTTP, robots,
+session, registry, or adapter modules directly. Queue publication remains an
+injected server capability because BullMQ is owned by the worker layer.
+
+Core execution accepts a registry explicitly and has no dependency on the
+production source composition. The module root composes the registered sources
+with the core runtime for production. This keeps coordinator, HTTP, robots,
+session, and run state testable without importing worker jobs or product
+persistence code.
+
+Legacy source implementations live under an explicit `adapters/legacy`
+boundary while they still use the compatibility request and pagination bridge.
+Repository checks inspect both native and legacy registered source code. Native
+adapters may use only their injected session; legacy adapters may use only the
+reviewed compatibility bridge and may not import raw network, queue, database,
+or product-persistence clients. The compatibility boundary is removed once the
+last legacy source accepts `ScraperSession` directly.
+
+Alternative considered: a broad barrel that re-exports every runtime helper.
+That makes internal mechanisms callable by unrelated server code and spreads
+production composition dependencies into code that should use only lifecycle
+capabilities.
+
 ### Model source, target, and origin separately
 
 A source definition identifies one `external_site`, its adapter, cursor schema,
@@ -256,6 +284,9 @@ runtime's correctness contract.
    approved; do not use persistent response caching for review bodies.
 7. Remove the legacy disk-cache/fetch path when no registered scraper consumes
    it, then make the new runtime mandatory for scraper registration.
+8. Consolidate run lifecycle operations and registered source implementations
+   under the scraper module, narrow its public exports, and enforce both native
+   and transitional adapter boundaries before merge.
 
 Rollback is per source: its definition can route back to the legacy job while
 the additive SQL state remains unused. Once all sources are migrated and the

@@ -1,32 +1,31 @@
 import { db } from "@peated/server/db";
-import { requireExternalReviewSourceCapability } from "@peated/server/lib/externalReviewSourcePolicy";
-import scrapeAstorWines from "@peated/server/worker/jobs/scrapeAstorWines";
-import scrapeBerryBrosRudd from "@peated/server/worker/jobs/scrapeBerryBrosRudd";
-import scrapeBruichladdich from "@peated/server/worker/jobs/scrapeBruichladdich";
-import scrapeCadenheads from "@peated/server/worker/jobs/scrapeCadenheads";
-import scrapeCompassBox from "@peated/server/worker/jobs/scrapeCompassBox";
-import scrapeDecadentDrinks from "@peated/server/worker/jobs/scrapeDecadentDrinks";
-import scrapeDouglasLaing from "@peated/server/worker/jobs/scrapeDouglasLaing";
-import scrapeDramfool from "@peated/server/worker/jobs/scrapeDramfool";
-import scrapeEdradour from "@peated/server/worker/jobs/scrapeEdradour";
-import scrapeFineDrams from "@peated/server/worker/jobs/scrapeFineDrams";
-import scrapeGlenAllachie from "@peated/server/worker/jobs/scrapeGlenAllachie";
-import scrapeGordonMacphail from "@peated/server/worker/jobs/scrapeGordonMacphail";
-import scrapeHealthySpirits from "@peated/server/worker/jobs/scrapeHealthySpirits";
-import scrapeKilchoman from "@peated/server/worker/jobs/scrapeKilchoman";
-import scrapeMasterOfMalt from "@peated/server/worker/jobs/scrapeMasterOfMalt";
-import scrapeMissionLiquor from "@peated/server/worker/jobs/scrapeMissionLiquor";
-import scrapeNcnean from "@peated/server/worker/jobs/scrapeNcnean";
-import scrapeNorthStarSpirits from "@peated/server/worker/jobs/scrapeNorthStarSpirits";
-import scrapeReserveBar from "@peated/server/worker/jobs/scrapeReserveBar";
-import scrapeSMWS from "@peated/server/worker/jobs/scrapeSMWS";
-import scrapeSMWSA from "@peated/server/worker/jobs/scrapeSMWSA";
-import scrapeSingleCaskNation from "@peated/server/worker/jobs/scrapeSingleCaskNation";
-import scrapeThompsonBros from "@peated/server/worker/jobs/scrapeThompsonBros";
-import scrapeTotalWine from "@peated/server/worker/jobs/scrapeTotalWine";
-import scrapeWhiskyWorld from "@peated/server/worker/jobs/scrapeWhiskyWorld";
-import scrapeWoodenCork from "@peated/server/worker/jobs/scrapeWoodenCork";
 import { z } from "zod";
+import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
+import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
+import scrapeBruichladdich from "./adapters/legacy/scrapeBruichladdich";
+import scrapeCadenheads from "./adapters/legacy/scrapeCadenheads";
+import scrapeCompassBox from "./adapters/legacy/scrapeCompassBox";
+import scrapeDecadentDrinks from "./adapters/legacy/scrapeDecadentDrinks";
+import scrapeDouglasLaing from "./adapters/legacy/scrapeDouglasLaing";
+import scrapeDramfool from "./adapters/legacy/scrapeDramfool";
+import scrapeEdradour from "./adapters/legacy/scrapeEdradour";
+import scrapeFineDrams from "./adapters/legacy/scrapeFineDrams";
+import scrapeGlenAllachie from "./adapters/legacy/scrapeGlenAllachie";
+import scrapeGordonMacphail from "./adapters/legacy/scrapeGordonMacphail";
+import scrapeHealthySpirits from "./adapters/legacy/scrapeHealthySpirits";
+import scrapeKilchoman from "./adapters/legacy/scrapeKilchoman";
+import scrapeMasterOfMalt from "./adapters/legacy/scrapeMasterOfMalt";
+import scrapeMissionLiquor from "./adapters/legacy/scrapeMissionLiquor";
+import scrapeNcnean from "./adapters/legacy/scrapeNcnean";
+import scrapeNorthStarSpirits from "./adapters/legacy/scrapeNorthStarSpirits";
+import scrapeReserveBar from "./adapters/legacy/scrapeReserveBar";
+import scrapeSMWS from "./adapters/legacy/scrapeSMWS";
+import scrapeSMWSA from "./adapters/legacy/scrapeSMWSA";
+import scrapeSingleCaskNation from "./adapters/legacy/scrapeSingleCaskNation";
+import scrapeThompsonBros from "./adapters/legacy/scrapeThompsonBros";
+import scrapeTotalWine from "./adapters/legacy/scrapeTotalWine";
+import scrapeWhiskyWorld from "./adapters/legacy/scrapeWhiskyWorld";
+import scrapeWoodenCork from "./adapters/legacy/scrapeWoodenCork";
 import {
   createLegacyBottleAdapter,
   LegacyBottleObservationSchema,
@@ -49,6 +48,7 @@ import {
 import { bottleObservationSink } from "./sinks/bottles";
 import { whiskyAdvocateReviewSink } from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
+import { requireExternalReviewSourceCapability } from "./sourcePolicy";
 
 const legacyPriceSources = [
   {

@@ -7,8 +7,7 @@ import { createHash } from "node:crypto";
 import config from "../config";
 import { syncExternalSites } from "../lib/externalSites";
 import { logError, logInfo, logTelemetryError } from "../lib/log";
-import { scraperRegistry } from "../scraper/registry";
-import { syncScraperDefinitions } from "../scraper/syncDefinitions";
+import { initializeScraperRuntime } from "../scraper";
 import "./jobs";
 import scheduleScrapers from "./jobs/scheduleScrapers";
 import {
@@ -124,7 +123,7 @@ export async function gracefulShutdown(signal?: string, worker?: Worker) {
 
 export async function runWorker() {
   await syncExternalSites();
-  await syncScraperDefinitions(scraperRegistry);
+  await initializeScraperRuntime();
 
   // dont run the scraper in dev
   if (config.ENV === "production") {

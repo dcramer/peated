@@ -1,5 +1,5 @@
-import { persistBottleObservation } from "@peated/server/lib/scraper";
 import type { LegacyBottleObservation } from "../adapters/legacyBottle";
+import { persistBottleObservation } from "../legacy/scraper";
 import type { ScraperSink } from "../types";
 
 export const bottleObservationSink: ScraperSink<

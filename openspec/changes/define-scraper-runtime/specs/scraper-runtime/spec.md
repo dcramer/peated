@@ -345,3 +345,33 @@ path.
 
 - **WHEN** repository checks inspect runtime-managed adapter code
 - **THEN** the check fails before merge
+
+### Requirement: The scraper module owns one explicit lifecycle boundary
+
+The system SHALL keep scraper run creation, dispatch state, reconciliation,
+execution, deferral, completion, and failure behind lifecycle capabilities
+exported by the scraper module. Core scraper runtime code MUST NOT depend on the
+worker queue layer or on production source composition, and server code outside
+the module MUST NOT call coordinator, HTTP, robots, session, registry, or
+adapter implementation modules directly.
+
+#### Scenario: API or schedule creates scraper work
+
+- **WHEN** an API route or schedule starts or reconciles scraper work
+- **THEN** it calls the scraper lifecycle boundary, whose production facade is
+  configured with an injected queue capability, and does not mutate scraper
+  run state directly
+
+#### Scenario: Worker executes a run
+
+- **WHEN** BullMQ delivers a validated run id
+- **THEN** the worker calls the scraper lifecycle boundary while the core run
+  executor receives its registered source composition explicitly
+
+#### Scenario: Adapter boundary checks run
+
+- **WHEN** repository checks inspect registered native and legacy source code
+- **THEN** native adapters may depend only on the runtime session contract and
+  legacy adapters may depend only on their explicit compatibility bridge, with
+  neither able to import raw network, queue, database, or product-persistence
+  clients

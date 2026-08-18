@@ -3,12 +3,12 @@ import {
   ExternalReviewBottleStateError,
 } from "@peated/server/lib/createExternalReview";
 import { logWarn } from "@peated/server/lib/log";
-import type { BottleReview } from "@peated/server/lib/scraper";
+import type { WhiskyAdvocateObservation } from "../adapters/whiskyAdvocate";
 import type { ScraperSink } from "../types";
 
-export const whiskyAdvocateReviewSink: ScraperSink<BottleReview> = async ({
-  observation,
-}) => {
+export const whiskyAdvocateReviewSink: ScraperSink<
+  WhiskyAdvocateObservation
+> = async ({ observation }) => {
   try {
     await createExternalReview({
       site: "whiskyadvocate",

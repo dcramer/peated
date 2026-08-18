@@ -9,11 +9,26 @@ separate:
 - adapters parse responses and emit source observations through an injected
   session.
 
-Code outside this module may register or queue a scraper run, but it must not
-call scraper adapters, target coordination, robots, or scraper HTTP internals.
-Adapters under `adapters/` must not import raw HTTP, queue, database, or product
-persistence clients. Source sinks remain the narrow boundary to Peated domain
-logic.
+Code outside this module uses `index.ts` to initialize, queue, or execute a
+durable run. It must not call adapters, target coordination, robots, or scraper
+HTTP internals directly. The internal layout keeps those ownership boundaries
+visible:
+
+- `lifecycle.ts` owns durable run creation and dispatch through injected
+  registry and queue capabilities;
+- `runs.ts`, `session.ts`, `http.ts`, `robots.ts`, and `coordinator.ts` own core
+  execution without importing production registry or worker infrastructure;
+- `registry.ts` is the production composition root;
+- `sourcePolicy.ts` owns review-source authorization before queueing and before
+  each request;
+- `adapters/legacy/` contains migrated source implementations that still use
+  the compatibility bridge in `legacy/`;
+- native adapters use only their injected session;
+- `sinks/` is the narrow boundary to Peated domain persistence.
+
+Registered source implementations must not import raw HTTP, queue, database,
+or product persistence clients. Boundary tests inspect the sources composed by
+the production registry, rather than only the top level of `adapters/`.
 
 ## Registering a source
 
@@ -33,6 +48,12 @@ logic.
    between emit and checkpoint.
 5. Synchronize definitions before accepting scraper work. Production dispatch
    has one entry point: the `RunScraper` job with a run id.
+
+Existing retailer sources may use `legacy/scraper.ts` only from
+`adapters/legacy/`. That bridge translates their old helper calls into the
+active scraper session; new sources must not use it. Remove a legacy source's
+bridge dependency when converting it to a native adapter, then move it out of
+`adapters/legacy/`.
 
 Use the same target for multiple sources only when they share a remote
 operator's capacity. Use multiple exact origins under that target when one

@@ -17,7 +17,6 @@ import {
   scraperSystemClock,
   type ScraperHttpClock,
 } from "./http";
-import { scraperRegistry } from "./registry";
 import { ScraperRobotsDeniedError } from "./robots";
 import { createScraperSession, ScraperRunOwnershipError } from "./session";
 import type { ScraperRegistry, ScraperSourceDefinition } from "./types";
@@ -255,16 +254,16 @@ async function deferRun(
 export async function executeScraperRun(
   input: unknown,
   {
-    registry = scraperRegistry,
+    registry,
     fetchImpl = fetch,
     clock = scraperSystemClock,
     executionToken = randomUUID(),
   }: {
-    registry?: ScraperRegistry;
+    registry: ScraperRegistry;
     fetchImpl?: typeof fetch;
     clock?: ScraperHttpClock;
     executionToken?: string;
-  } = {},
+  },
 ): Promise<ScraperRunExecutionResult> {
   const { runId } = ScraperRunJobInputSchema.parse(input);
   const claimed = await claimScraperRun({

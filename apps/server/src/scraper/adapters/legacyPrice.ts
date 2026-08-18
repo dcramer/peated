@@ -1,11 +1,11 @@
 import { SCRAPER_PRICE_BATCH_SIZE } from "@peated/server/constants";
-import type { StorePrice } from "@peated/server/lib/scraper";
 import { StorePriceInputSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import {
   runLegacyPriceAdapter,
   type LegacyPriceCursor,
-} from "../legacyPriceContext";
+} from "../legacy/priceContext";
+import type { StorePrice } from "../legacy/scraper";
 import type { ScraperAdapter } from "../types";
 
 export const LegacyPriceCursorSchema = z

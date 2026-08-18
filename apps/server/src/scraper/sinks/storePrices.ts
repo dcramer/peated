@@ -1,6 +1,6 @@
 import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
-import type { StorePrice } from "@peated/server/lib/scraper";
 import type { ExternalSiteType } from "@peated/server/types";
+import type { StorePrice } from "../legacy/scraper";
 import type { ScraperSink } from "../types";
 
 export function createStorePriceSink(

@@ -4,12 +4,12 @@ import {
   externalSites,
   storePrices,
 } from "@peated/server/db/schema";
-import { queueManualExternalSiteRun } from "@peated/server/lib/externalSiteRuns";
 import { syncExternalSites } from "@peated/server/lib/externalSites";
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
 import { vi } from "vitest";
 import type { ScraperHttpClock } from "./http";
+import { createScraperLifecycle } from "./lifecycle";
 import { scraperRegistry } from "./registry";
 import { executeScraperRun } from "./runs";
 import { syncScraperDefinitions } from "./syncDefinitions";
@@ -132,11 +132,10 @@ test("dispatches migrated sources to the isolated scraper job", async ({
   const site = await fixtures.ExternalSite({ type: "bruichladdich" });
   const enqueue = vi.fn(async () => undefined);
 
-  const run = await queueManualExternalSiteRun({
-    site,
-    requestedById: requestedBy.id,
+  const run = await createScraperLifecycle({
+    registry: scraperRegistry,
     enqueue,
-  });
+  }).queueManualExternalSiteRun({ site, requestedById: requestedBy.id });
 
   expect(run.requestLimit).toBe(100);
   expect(enqueue).toHaveBeenCalledWith(

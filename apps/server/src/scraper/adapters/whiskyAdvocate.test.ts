@@ -1,4 +1,3 @@
-import type { BottleReview } from "@peated/server/lib/scraper";
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { load as cheerio } from "cheerio";
 import { vi } from "vitest";
@@ -6,6 +5,7 @@ import type { z } from "zod";
 import type { ScraperObservation, ScraperSession } from "../types";
 import {
   type WhiskyAdvocateCursorSchema,
+  type WhiskyAdvocateObservation,
   whiskyAdvocateAdapter,
 } from "./whiskyAdvocate";
 
@@ -27,7 +27,7 @@ test("resumes by issue and emits stable review observations", async () => {
       return element.attribs.value === "" || !value ? [] : [value];
     });
   const processedIssues = issueNames.slice(1);
-  const observations: ScraperObservation<BottleReview>[] = [];
+  const observations: ScraperObservation<WhiskyAdvocateObservation>[] = [];
   const checkpoints: Cursor[] = [];
   const request = vi.fn(async ({ url }: { url: URL }) => ({
     url,
@@ -35,7 +35,7 @@ test("resumes by issue and emits stable review observations", async () => {
     headers: {},
     body: url.search.includes("custom_rating_issue") ? reviewHtml : issueHtml,
   }));
-  const session: ScraperSession<Cursor, BottleReview> = {
+  const session: ScraperSession<Cursor, WhiskyAdvocateObservation> = {
     request,
     emit: async (observation) => {
       observations.push(observation);

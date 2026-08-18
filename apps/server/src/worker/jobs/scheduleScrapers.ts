@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { ExternalReviewSourcePolicyError } from "@peated/server/lib/externalReviewSourcePolicy";
 import {
+  ExternalReviewSourcePolicyError,
   ExternalSiteRunActiveError,
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
-} from "@peated/server/lib/externalSiteRuns";
+} from "@peated/server/scraper";
 import { and, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
 export default async function scheduleScrapers() {

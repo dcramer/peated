@@ -55,3 +55,11 @@
 - [x] 7.3 Run targeted coordinator, HTTP, robots, run-lifecycle, queue, and migrated-adapter tests plus server typecheck, lint, formatting, and migration checks
 - [x] 7.4 Exercise the fixture adapter and first migrated source through manual QA, confirming bounded requests, visible counters, durable deferral, shared cooldown, and no persisted response content
 - [ ] 7.5 Run strict OpenSpec validation and use pull request CI as the required full-repository test gate
+
+## 8. Encapsulation Correction
+
+- [x] 8.1 Move scraper run creation, dispatch-failure handling, and stale-run reconciliation into the scraper-owned lifecycle module
+- [x] 8.2 Move every registered legacy source implementation and its fixture tests under an explicit `scraper/adapters/legacy` boundary
+- [x] 8.3 Narrow the scraper module root to lifecycle capabilities and public result/error contracts while requiring core execution to receive registry state explicitly
+- [x] 8.4 Strengthen repository checks so native and legacy registered adapters cannot bypass their allowed dependency boundaries
+- [x] 8.5 Update module documentation and run targeted tests, server typecheck, lint, formatting, Knip, and strict OpenSpec validation

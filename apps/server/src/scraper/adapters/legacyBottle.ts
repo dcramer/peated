@@ -3,7 +3,7 @@ import {
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { z } from "zod";
-import { runLegacyBottleAdapter } from "../legacyBottleContext";
+import { runLegacyBottleAdapter } from "../legacy/bottleContext";
 import type { ScraperAdapter } from "../types";
 
 export const LegacyBottleObservationSchema = z

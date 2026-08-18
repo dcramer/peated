@@ -3,12 +3,10 @@ import {
   normalizeCategory,
 } from "@peated/bottle-classifier/normalize";
 import { logWarn } from "@peated/server/lib/log";
-import { getUrl, type BottleReview } from "@peated/server/lib/scraper";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { CategoryEnum } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
 import { z } from "zod";
-import { runLegacyRequestContext } from "../legacyRequestContext";
 import type { ScraperAdapter } from "../types";
 
 export const WhiskyAdvocateCursorSchema = z
@@ -25,10 +23,11 @@ export const WhiskyAdvocateObservationSchema = z
   })
   .strict();
 
-export async function scrapeIssueList(
-  url = "https://whiskyadvocate.com/ratings-reviews",
-) {
-  const data = await getUrl(url);
+export type WhiskyAdvocateObservation = z.infer<
+  typeof WhiskyAdvocateObservationSchema
+>;
+
+export function parseIssueList(data: string) {
   const $ = cheerio(data);
   const results: string[] = [];
   $("select")
@@ -44,11 +43,11 @@ export async function scrapeIssueList(
   return results;
 }
 
-export async function scrapeReviews(
+export async function parseReviews(
+  data: string,
   url: string,
-  callback: (review: BottleReview) => Promise<void>,
+  callback: (review: WhiskyAdvocateObservation) => Promise<void>,
 ) {
-  const data = await getUrl(url);
   const $ = cheerio(data);
 
   for (const element of $("#directoryResults .postsItem")) {
@@ -107,29 +106,32 @@ export async function scrapeReviews(
 
 export const whiskyAdvocateAdapter: ScraperAdapter<
   z.infer<typeof WhiskyAdvocateCursorSchema>,
-  BottleReview
+  WhiskyAdvocateObservation
 > = async ({ cursor, session }) => {
-  await runLegacyRequestContext({
-    session,
-    targetKey: "whiskyadvocate",
-    run: async () => {
-      const processedIssues = [...(cursor?.processedIssues ?? [])];
-      const issueList = await scrapeIssueList();
-
-      for (const issue of issueList) {
-        if (processedIssues.includes(issue)) continue;
-
-        await scrapeReviews(
-          `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
-            issue,
-          )}&order_by=published_desc`,
-          async (review) => {
-            await session.emit({ sourceKey: review.url, value: review });
-          },
-        );
-        processedIssues.push(issue);
-        await session.checkpoint({ processedIssues });
-      }
-    },
+  const processedIssues = [...(cursor?.processedIssues ?? [])];
+  const issueListUrl = new URL("https://whiskyadvocate.com/ratings-reviews");
+  const issueListResponse = await session.request({
+    target: "whiskyadvocate",
+    url: issueListUrl,
   });
+  const issueList = parseIssueList(issueListResponse.body);
+
+  for (const issue of issueList) {
+    if (processedIssues.includes(issue)) continue;
+
+    const reviewUrl = new URL(
+      `https://whiskyadvocate.com/ratings-reviews?custom_rating_issue%5B0%5D=${encodeURIComponent(
+        issue,
+      )}&order_by=published_desc`,
+    );
+    const reviewResponse = await session.request({
+      target: "whiskyadvocate",
+      url: reviewUrl,
+    });
+    await parseReviews(reviewResponse.body, reviewUrl.href, async (review) => {
+      await session.emit({ sourceKey: review.url, value: review });
+    });
+    processedIssues.push(issue);
+    await session.checkpoint({ processedIssues });
+  }
 };
