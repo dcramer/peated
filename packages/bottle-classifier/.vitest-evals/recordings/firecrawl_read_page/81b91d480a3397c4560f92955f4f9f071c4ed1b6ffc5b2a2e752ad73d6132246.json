@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-18T18:38:39.564Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-rye/",
+    "focus": "Identify the exact Single Barrel Rye product's category, ABV/proof, single-barrel status, producing distillery, and marketed bottler or producer."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Identify the exact Single Barrel Rye product's category, ABV/proof, single-barrel status, producing distillery, and marketed bottler or producer.",
+    "summary": "Single Barrel Rye\n\nA robust rye whiskey that strikes a balance of spicy pepper, vanilla, and tobacco flavors.\n\nSingle barrels are a rarity in the world of American rye whiskey, and Russell’s Reserve Single Barrel Rye delivers in a big way. Each hand-selected barrel of our Kentucky straight rye whiskey is individually bottled at 104 proof and non-chill filtered to retain the color and rich flavor that comes from aging in No.",
+    "results": [
+      {
+        "title": "Single Barrel Rye Whiskey | Russell's Reserve",
+        "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-rye/",
+        "domain": "russellsreserve.com",
+        "description": "Discover our hand-selected Russell's Reserve Single Barrel Rye whiskey: a robust rye whiskey that strikes a balance of spicy pepper, vanilla, and tobacco flavors.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "81b91d480a3397c4560f92955f4f9f071c4ed1b6ffc5b2a2e752ad73d6132246",
+    "mode": "auto"
+  }
+}

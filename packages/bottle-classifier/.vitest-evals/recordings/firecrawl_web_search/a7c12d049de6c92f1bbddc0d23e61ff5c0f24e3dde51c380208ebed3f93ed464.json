@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-18T18:47:38.917Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Russell's Reserve Single Barrel Rye official 104 proof age distillery"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Russell's Reserve Single Barrel Rye official 104 proof age distillery",
+        "summary": "## Russell’s Reserve Single Barrel Rye\n### Kentucky Straight Rye Whiskey\n**Proof:** 104 104 proof, $61.99+tax. 37% corn, 51% rye, 12% malted barley. Finish is a bit flat, with lingering dry oak, mint, baking spices, sweet vanilla ... 51% rye, 37% corn, 12% malted barley PROOF – 104 AGE – NAS DISTILLERY – Wild Turkey PRICE – $63 ・ a super solid rye, both sweet and dry at ... # Single Barrel Rye\nEach hand-selected barrel of our Kentucky straight rye whiskey is individually bottled at 104 proof and non-chill filtered to retain the color and rich flavor that comes from aging in No. 4 alligator cha",
+        "results": [
+          {
+            "title": "Russell's Reserve Rye Comparison",
+            "url": "https://rarebird101.com/2023/02/09/russells-reserve-rye-comparison/",
+            "domain": "rarebird101.com",
+            "description": "## Russell’s Reserve Single Barrel Rye\n### Kentucky Straight Rye Whiskey\n**Proof:** 104",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Single Barrel Rye Review : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/155ymoc/russells_reserve_single_barrel_rye_review/",
+            "domain": "reddit.com",
+            "description": "104 proof, $61.99+tax. 37% corn, 51% rye, 12% malted barley. Finish is a bit flat, with lingering dry oak, mint, baking spices, sweet vanilla ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Revisiting: Russell's Reserve Single Barrel Rye",
+            "url": "https://the-right-spirit.com/2024/01/19/revisiting-russells-reserve-single-barrel-rye/",
+            "domain": "the-right-spirit.com",
+            "description": "51% rye, 37% corn, 12% malted barley PROOF – 104 AGE – NAS DISTILLERY – Wild Turkey PRICE – $63 ・ a super solid rye, both sweet and dry at ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Barrel Rye Whiskey",
+            "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-rye/",
+            "domain": "russellsreserve.com",
+            "description": "# Single Barrel Rye\nEach hand-selected barrel of our Kentucky straight rye whiskey is individually bottled at 104 proof and non-chill filtered to retain the color and rich flavor that comes from aging in No. 4 alligator ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Single Barrel Kentucky Rye Whiskey ...",
+            "url": "https://www.missionliquor.com/products/russells-reserve-single-barrel-rye-104-proof-750ml",
+            "domain": "missionliquor.com",
+            "description": "This non-chill filtered, 104 proof single barrel rye delivers a balance of spicy pepper, vanilla and tobacco flavors. intended for adults only!",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a7c12d049de6c92f1bbddc0d23e61ff5c0f24e3dde51c380208ebed3f93ed464",
+    "mode": "auto"
+  }
+}

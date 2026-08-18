@@ -44,7 +44,7 @@
       "createsBottle": true,
       "summary": "Create the missing Russell's Reserve Single Barrel Rye Bottle and move the price away from bourbon Bottle 15868."
     },
-    "notes": "Price-match proposal 20927 preserved no extracted identity and current Bottle 15868 as the assignment; the candidate snapshot was re-fetched during moderation because the failed retry had erased its candidate artifacts. The producer identifies Single Barrel Rye as Kentucky straight rye whiskey bottled at 104 proof, while Bottle 15868 has the populated category bourbon. Live catalog searches on 2026-08-18 found no exact Single Barrel Rye Bottle, so the safe correction is a review-only Bottle creation rather than retaining the cross-category assignment."
+    "notes": "Price-match proposal 20927 preserved no extracted identity and current Bottle 15868 as the assignment; the candidate snapshot was re-fetched during moderation because the failed retry had erased its candidate artifacts. The producer identifies Single Barrel Rye as Kentucky straight rye whiskey bottled at 104 proof, while Bottle 15868 has the populated category bourbon. Live catalog searches on 2026-08-18 found no exact Single Barrel Rye Bottle, so supportive producer evidence makes creation safer than retaining the cross-category assignment."
   },
   "expected": {
     "status": "classified",
@@ -61,9 +61,9 @@
     },
     "proposedBottleNameIncludes": ["Single Barrel", "Rye"],
     "proposedBottleNameExcludes": ["Bourbon"],
-    "expectedTier": "review",
+    "expectedTier": "auto",
     "verifyEligible": false,
-    "suggestedNextStep": "manual_search",
-    "summary": "Create the missing Russell's Reserve Single Barrel Rye product for review. The only local candidate is bourbon and cannot represent this rye listing."
+    "suggestedNextStep": "confirm_create",
+    "summary": "Create the missing Russell's Reserve Single Barrel Rye product from supportive producer evidence. The only local candidate is bourbon and cannot represent this rye listing."
   }
 }
