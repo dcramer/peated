@@ -1,0 +1,69 @@
+{
+  "id": "store-listing-creates-russells-reserve-single-barrel-rye-instead-of-matching-bourbon",
+  "name": "store listing: creates Russell's Reserve Single Barrel Rye instead of matching bourbon",
+  "input": {
+    "reference": {
+      "id": 20927,
+      "name": "Russell's Reserve Single Barrel Rye",
+      "url": "https://www.reservebar.com/products/russells-reserve-single-barrel-rye/GROUPING-324016?utm=peated",
+      "imageUrl": "https://api.peated.com/uploads/prices-yxp58h9ji2ycuxyjlowwz7qx.webp",
+      "currentBottleId": 15868
+    },
+    "extractedIdentity": null,
+    "initialCandidates": [
+      {
+        "bottleId": 15868,
+        "alias": null,
+        "fullName": "Russell's Reserve Single Barrel",
+        "brand": "Russell's Reserve",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "bourbon",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": true,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null
+      }
+    ]
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.russellsreserve.com/our-products/single-barrel-rye/",
+      "https://api.peated.com/v1/bottles/15868"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Create the missing Russell's Reserve Single Barrel Rye Bottle and move the price away from bourbon Bottle 15868."
+    },
+    "notes": "Price-match proposal 20927 preserved no extracted identity and current Bottle 15868 as the assignment; the candidate snapshot was re-fetched during moderation because the failed retry had erased its candidate artifacts. The producer identifies Single Barrel Rye as Kentucky straight rye whiskey bottled at 104 proof, while Bottle 15868 has the populated category bourbon. Live catalog searches on 2026-08-18 found no exact Single Barrel Rye Bottle, so the safe correction is a review-only Bottle creation rather than retaining the cross-category assignment."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "name": "Russell's Reserve"
+      },
+      "category": "rye",
+      "singleCask": true,
+      "abv": 52
+    },
+    "proposedBottleNameIncludes": ["Single Barrel", "Rye"],
+    "proposedBottleNameExcludes": ["Bourbon"],
+    "expectedTier": "review",
+    "verifyEligible": false,
+    "suggestedNextStep": "manual_search",
+    "summary": "Create the missing Russell's Reserve Single Barrel Rye product for review. The only local candidate is bourbon and cannot represent this rye listing."
+  }
+}

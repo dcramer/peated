@@ -1,0 +1,67 @@
+{
+  "id": "store-listing-creates-glendalough-double-barrel-instead-of-matching-forty-creek",
+  "name": "store listing: creates Glendalough Double Barrel instead of matching Forty Creek",
+  "input": {
+    "reference": {
+      "id": 21116,
+      "name": "Glendalough Double Barrel",
+      "url": "https://www.reservebar.com/products/glendalough-double-barrel/GROUPING-98272?utm=peated",
+      "imageUrl": "https://api.peated.com/uploads/prices-cr0njx6wfke6qvahgxsckyyd.webp",
+      "currentBottleId": 16351
+    },
+    "extractedIdentity": null,
+    "initialCandidates": [
+      {
+        "bottleId": 16351,
+        "alias": null,
+        "fullName": "Forty Creek Double Barrel",
+        "brand": "Forty Creek",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "spirit",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "caskType": null,
+        "caskSize": null,
+        "caskFill": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null
+      }
+    ]
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.glendaloughdistillery.com/products/glendalough-single-grain-double-barrel-finish",
+      "https://api.peated.com/v1/bottles/16351"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Create the missing Glendalough Single Grain Double Barrel Bottle and move the price away from Forty Creek Double Barrel Bottle 16351."
+    },
+    "notes": "Price-match proposal 21116 preserved no extracted identity and current Bottle 16351 as the assignment; the candidate snapshot was re-fetched during moderation because the failed retry had erased its candidate artifacts. The producer identifies Double Barrel as a Glendalough single grain Irish whiskey, while Bottle 16351 has the populated Brand Forty Creek. Live catalog searches on 2026-08-18 found no exact Glendalough Double Barrel Bottle, so the safe correction is a review-only Bottle creation rather than retaining the cross-brand assignment."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "name": "Glendalough"
+      },
+      "category": "single_grain"
+    },
+    "proposedBottleNameIncludes": ["Double Barrel"],
+    "proposedBottleNameExcludes": ["Forty Creek"],
+    "expectedTier": "review",
+    "verifyEligible": false,
+    "suggestedNextStep": "manual_search",
+    "summary": "Create the missing Glendalough Double Barrel product for review. The only local candidate belongs to Forty Creek and cannot represent this listing."
+  }
+}
