@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-18T18:38:09.962Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Glendalough Double Barrel Irish Whiskey official 42% ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glendalough Double Barrel Irish Whiskey official 42% ABV",
+        "summary": "This single grain Irish Whiskey won Gold at the 2024 New York International Spirits Competition. 700mL/ ABV 42%. Tasting Notes. Bottled at 45% ABV, this whiskey showcases refined character and complexity that stands out in any collection. Produced in the USA, it demonstrates a commitment ... This was matured in first-fill bourbon barrels, finished in Spanish oloroso sherry wood. Whisky Advocate Country Ireland ABV 42% Points 86 Rating In this episode, I review Glendalough Double Barrel. This is a single grain Irish whiskey is bottled at 42% ABV and retails for £35. This comes bottled at 42% AB",
+        "results": [
+          {
+            "title": "Glendalough Single Grain Double Barrel Finish",
+            "url": "https://www.glendaloughdistillery.com/products/glendalough-single-grain-double-barrel-finish",
+            "domain": "glendaloughdistillery.com",
+            "description": "This single grain Irish Whiskey won Gold at the 2024 New York International Spirits Competition. 700mL/ ABV 42%. Tasting Notes.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Irish Whiskey",
+            "url": "https://whiskyandwhiskey.com/products/glendalough-double-barrel-irish-whiskey-750ml",
+            "domain": "whiskyandwhiskey.com",
+            "description": "Bottled at 45% ABV, this whiskey showcases refined character and complexity that stands out in any collection. Produced in the USA, it demonstrates a commitment ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Irish Whiskey / 750mL",
+            "url": "https://www.marketviewliquor.com/product/glendalough-double-barrel-irish-whiskey-750ml",
+            "domain": "marketviewliquor.com",
+            "description": "This was matured in first-fill bourbon barrels, finished in Spanish oloroso sherry wood. Whisky Advocate Country Ireland ABV 42% Points 86 Rating",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Review | Irish Whiskey Month 2024",
+            "url": "https://www.youtube.com/watch?v=iWLogzS-Cxo",
+            "domain": "youtube.com",
+            "description": "In this episode, I review Glendalough Double Barrel. This is a single grain Irish whiskey is bottled at 42% ABV and retails for £35.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Irish Whiskey 70cl",
+            "url": "https://www.masterofmalt.com/whiskies/glendalough/glendalough-double-barrel-irish-whiskey/",
+            "domain": "masterofmalt.com",
+            "description": "This comes bottled at 42% ABV, rich in vanilla, caramel, Christmas spices and dried fruit notes. Winner of 1 spirit awards",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "55903ee8c3d6f4da22ae349c7d3894989cf4d96c65884414bda870172ee1f626",
+    "mode": "auto"
+  }
+}

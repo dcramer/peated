@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-08-18T18:38:27.156Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Russell's Reserve Single Barrel Rye official product ABV bottler distillery"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Russell's Reserve Single Barrel Rye official product ABV bottler distillery",
+        "summary": "It is a non-chill filtered rye whiskey bottled at 52% ABV. $59.99 for a 750ml bottle at South Lyndale Liquors, Minneapolis, MN RUSSELL'S RESERVE SINGLE BARREL RYE Batch LL/HH271516 (August 27, 2019). MASH BILL – 51% rye, 37% corn, 12% malted barley. PROOF – 104. # Single Barrel Rye\nRussell's Reserve Single Barrel Rye, 750Ml WHISKEY - Russell's Reserve Single Barrel Rye. DISTILLERY - Wild Turkey. 104 proof, $61.99+tax. NCF, no age statement. 37% corn, 51% rye, ... Russell's Reserve Single Barrel Bourbon … an alcohol content of 104 proof. it is proofed down to 104 proof. Sweet caramel toffee and",
+        "results": [
+          {
+            "title": "Russell's Reserve Single Barrel Rye",
+            "url": "https://www.bourbonguy.com/blog/2016/6/30/russells-reserve-single-barrel-rye",
+            "domain": "bourbonguy.com",
+            "description": "It is a non-chill filtered rye whiskey bottled at 52% ABV. $59.99 for a 750ml bottle at South Lyndale Liquors, Minneapolis, MN",
+            "extraSnippets": []
+          },
+          {
+            "title": "Revisiting: Russell's Reserve Single Barrel Rye",
+            "url": "https://the-right-spirit.com/2024/01/19/revisiting-russells-reserve-single-barrel-rye/",
+            "domain": "the-right-spirit.com",
+            "description": "RUSSELL'S RESERVE SINGLE BARREL RYE Batch LL/HH271516 (August 27, 2019). MASH BILL – 51% rye, 37% corn, 12% malted barley. PROOF – 104.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Barrel Rye Whiskey",
+            "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-rye/",
+            "domain": "russellsreserve.com",
+            "description": "# Single Barrel Rye\nRussell's Reserve Single Barrel Rye, 750Ml",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Single Barrel Rye Review : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/155ymoc/russells_reserve_single_barrel_rye_review/",
+            "domain": "reddit.com",
+            "description": "WHISKEY - Russell's Reserve Single Barrel Rye. DISTILLERY - Wild Turkey. 104 proof, $61.99+tax. NCF, no age statement. 37% corn, 51% rye, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Single Barrel Rye Whiskey Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/russells-reserve-single-barrel-rye-whiskey-review/",
+            "domain": "thebourbonculture.com",
+            "description": "Russell's Reserve Single Barrel Bourbon … an alcohol content of 104 proof. it is proofed down to 104 proof. Sweet caramel toffee and vanilla ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8a0d9ef1ac5428de1001324cfe730412ce946fa1de92b7632de77f0098fb561b",
+    "mode": "auto"
+  }
+}

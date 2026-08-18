@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-08-18T18:38:16.197Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.glendaloughdistillery.com/products/glendalough-single-grain-double-barrel-finish",
+    "focus": "Confirm the marketed product name, producer/bottler, whisky type, maturation/finish, and ABV for Glendalough Double Barrel."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product name, producer/bottler, whisky type, maturation/finish, and ABV for Glendalough Double Barrel.",
+    "summary": "A craft Irish whiskey finished in Spanish Oloroso barrels\n\nGlendalough Single Grain Double Barrel Finish\n\nGlendalough's Single Grain Double Barrel Irish Whiskey begins its maturation process in flame charred ex Bourbon American oak. It is finished in Oloroso casks from Montilla, a small town found in the rolling hills of the Spanish countryside.\n\n700mL/ ABV 42%.",
+    "results": [
+      {
+        "title": "Glendalough Single Grain Double Barrel Finish\n – Glendalough Distillery",
+        "url": "https://www.glendaloughdistillery.com/products/glendalough-single-grain-double-barrel-finish",
+        "domain": "glendaloughdistillery.com",
+        "description": "Introducing our new packaging – a refreshed look that honours our heritage in Glendalough and celebrates the crafting of our award-winning Single Grain Double Barrel Irish Whiskey. Glendalough's Single Grain Double Barrel Irish Whiskey begins its maturation process in flame charred ex Bourbon American oak. It is finish",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ad3c4f91c06a368c3aa00009aaec10bbe57646b77795508f546c298a5ef08673",
+    "mode": "auto"
+  }
+}

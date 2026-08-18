@@ -44,7 +44,7 @@
       "createsBottle": true,
       "summary": "Create the missing Glendalough Single Grain Double Barrel Bottle and move the price away from Forty Creek Double Barrel Bottle 16351."
     },
-    "notes": "Price-match proposal 21116 preserved no extracted identity and current Bottle 16351 as the assignment; the candidate snapshot was re-fetched during moderation because the failed retry had erased its candidate artifacts. The producer identifies Double Barrel as a Glendalough single grain Irish whiskey, while Bottle 16351 has the populated Brand Forty Creek. Live catalog searches on 2026-08-18 found no exact Glendalough Double Barrel Bottle, so the safe correction is a review-only Bottle creation rather than retaining the cross-brand assignment."
+    "notes": "Price-match proposal 21116 preserved no extracted identity and current Bottle 16351 as the assignment; the candidate snapshot was re-fetched during moderation because the failed retry had erased its candidate artifacts. The producer identifies Double Barrel as a Glendalough single grain Irish whiskey, while Bottle 16351 has the populated Brand Forty Creek. Live catalog searches on 2026-08-18 found no exact Glendalough Double Barrel Bottle, so supportive producer evidence makes creation safer than retaining the cross-brand assignment."
   },
   "expected": {
     "status": "classified",
@@ -59,9 +59,9 @@
     },
     "proposedBottleNameIncludes": ["Double Barrel"],
     "proposedBottleNameExcludes": ["Forty Creek"],
-    "expectedTier": "review",
+    "expectedTier": "auto",
     "verifyEligible": false,
-    "suggestedNextStep": "manual_search",
-    "summary": "Create the missing Glendalough Double Barrel product for review. The only local candidate belongs to Forty Creek and cannot represent this listing."
+    "suggestedNextStep": "confirm_create",
+    "summary": "Create the missing Glendalough Double Barrel product from supportive producer evidence. The only local candidate belongs to Forty Creek and cannot represent this listing."
   }
 }

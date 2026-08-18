@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-08-18T18:47:19.401Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Glendalough Double Barrel official product whiskey ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glendalough Double Barrel official product whiskey ABV",
+        "summary": "This single grain Irish Whiskey won Gold at the 2024 New York International Spirits Competition. 700mL/ ABV 42%. Rich with dark fruit, cherry, raisin, fig and ... ## **Glendalough Double Barrel Whiskey – Details and Tasting Notes**\n### **Whiskey Details**\n**ABV**: 42% Ireland - 42% - Glendalough's Single Grain Double Barrel Irish Whiskey begins its maturation process in flame charred ex Bourbon American oak. It is finished in ... Bottled at 45% ABV, this whiskey showcases refined character and complexity that stands out in any collection. Produced in the USA, it demonstrates a commitment ... B",
+        "results": [
+          {
+            "title": "Glendalough Single Grain Double Barrel Finish",
+            "url": "https://www.glendaloughdistillery.com/products/glendalough-single-grain-double-barrel-finish",
+            "domain": "glendaloughdistillery.com",
+            "description": "This single grain Irish Whiskey won Gold at the 2024 New York International Spirits Competition. 700mL/ ABV 42%. Rich with dark fruit, cherry, raisin, fig and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Whiskey Review",
+            "url": "https://thewhiskeyjug.com/irish-whiskey/glendalough-double-barrel-whiskey-review/",
+            "domain": "thewhiskeyjug.com",
+            "description": "## **Glendalough Double Barrel Whiskey – Details and Tasting Notes**\n### **Whiskey Details**\n**ABV**: 42%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/irish-whiskey/glendalough-double-barrel-whiskey/p/162044750",
+            "domain": "totalwine.com",
+            "description": "Ireland - 42% - Glendalough's Single Grain Double Barrel Irish Whiskey begins its maturation process in flame charred ex Bourbon American oak. It is finished in ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Irish Whiskey",
+            "url": "https://whiskyandwhiskey.com/products/glendalough-double-barrel-irish-whiskey-750ml",
+            "domain": "whiskyandwhiskey.com",
+            "description": "Bottled at 45% ABV, this whiskey showcases refined character and complexity that stands out in any collection. Produced in the USA, it demonstrates a commitment ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review 012 - irish single grain, Glendalough Double Barrel (2021)",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/17h1984/review_012_irish_single_grain_glendalough_double/",
+            "domain": "reddit.com",
+            "description": "Bottled at 42%, this single grain whiskey is initially aged in American oak bourbon barrels and then finished for six months in Spanish Oloroso ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "00eeb632bc71ac8251b15ff3f6ef8f8e747f9a2a484dde2c42d7029c18ab6a78",
+    "mode": "auto"
+  }
+}
