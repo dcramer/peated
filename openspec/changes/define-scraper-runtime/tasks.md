@@ -54,7 +54,7 @@
 - [x] 7.2 Document the stable bot identity and public contact/policy URL before production requests use the runtime
 - [x] 7.3 Run targeted coordinator, HTTP, robots, run-lifecycle, queue, and migrated-adapter tests plus server typecheck, lint, formatting, and migration checks
 - [x] 7.4 Exercise the fixture adapter and first migrated source through manual QA, confirming bounded requests, visible counters, durable deferral, shared cooldown, and no persisted response content
-- [ ] 7.5 Run strict OpenSpec validation and use pull request CI as the required full-repository test gate
+- [x] 7.5 Run strict OpenSpec validation and use pull request CI as the required full-repository test gate
 
 ## 8. Encapsulation Correction
 
