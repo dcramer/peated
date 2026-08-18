@@ -146,10 +146,11 @@ export function getAbvSupportLevel(
   expectedValue: number,
   options: { usProofEligible?: boolean } = {},
 ): "none" | "close" | "exact" {
+  const expectedPattern = Number.isInteger(expectedValue)
+    ? `${escapeRegExp(String(expectedValue))}(?:\\.0)?`
+    : escapeRegExp(String(expectedValue));
   const exactPattern = new RegExp(
-    `\\b${escapeRegExp(expectedValue.toFixed(1))}%?(?:\\s*abv)?\\b|\\b${escapeRegExp(
-      `${Math.round(expectedValue)}`,
-    )}%\\s*abv\\b`,
+    `\\b${expectedPattern}\\s*%(?:\\s*abv\\b)?(?!\\w)|\\b${expectedPattern}\\s*abv\\b`,
     "i",
   );
 
