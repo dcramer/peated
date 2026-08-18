@@ -18,6 +18,7 @@ import {
   collections,
   comments,
   entities,
+  externalReviewSourcePolicies,
   externalSites,
   flightBottles,
   flights,
@@ -947,6 +948,56 @@ export const ExternalSite = async (
     .returning();
   if (!result) throw new Error("Unable to create ExternalSite fixture");
   return result;
+};
+
+export const ExternalReviewSourcePolicy = async (
+  { ...data }: Partial<dbSchema.NewExternalReviewSourcePolicy> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.ExternalReviewSourcePolicy> => {
+  const [result] = await db
+    .insert(externalReviewSourcePolicies)
+    .values({
+      externalSiteId:
+        data.externalSiteId ?? (await ExternalSiteOrExisting({}, db)).id,
+      ...data,
+    })
+    .returning();
+  if (!result) {
+    throw new Error("Unable to create ExternalReviewSourcePolicy fixture");
+  }
+  return result;
+};
+
+export const ApprovedExternalReviewSourcePolicy = async (
+  { ...data }: Partial<dbSchema.NewExternalReviewSourcePolicy> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.ExternalReviewSourcePolicy> => {
+  return await db.transaction(async (tx) => {
+    const approvedByActorId =
+      data.approvedByActorId ??
+      (
+        await getUserActorByIdForDatabase(
+          tx,
+          (await User({ mod: true }, tx)).id,
+        )
+      ).id;
+
+    return await ExternalReviewSourcePolicy(
+      {
+        publicationMode: "review_only",
+        allowFetching: true,
+        allowLlmProcessing: true,
+        allowScoreDisplay: true,
+        allowSummaryDisplay: true,
+        policyEvidenceUrl: faker.internet.url(),
+        approvalReference: faker.string.uuid(),
+        reviewedAt: new Date(),
+        ...data,
+        approvedByActorId,
+      },
+      tx,
+    );
+  });
 };
 
 export const StorePrice = async (

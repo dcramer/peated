@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
+import { ExternalReviewSourcePolicyError } from "@peated/server/lib/externalReviewSourcePolicy";
 import {
   ExternalSiteRunActiveError,
   queueManualExternalSiteRun,
@@ -53,6 +54,9 @@ export default procedure
     } catch (error) {
       if (error instanceof ExternalSiteRunActiveError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      if (error instanceof ExternalReviewSourcePolicyError) {
+        throw errors.FORBIDDEN({ message: error.message, cause: error });
       }
       throw error;
     }

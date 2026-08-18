@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
+import { ExternalReviewSourcePolicyError } from "@peated/server/lib/externalReviewSourcePolicy";
 import {
   ExternalSiteRunActiveError,
   queueScheduledExternalSiteRun,
@@ -26,7 +27,12 @@ export default async function scheduleScrapers() {
     try {
       await queueScheduledExternalSiteRun(site.id);
     } catch (error) {
-      if (!(error instanceof ExternalSiteRunActiveError)) throw error;
+      if (
+        !(error instanceof ExternalSiteRunActiveError) &&
+        !(error instanceof ExternalReviewSourcePolicyError)
+      ) {
+        throw error;
+      }
     }
   }
 }

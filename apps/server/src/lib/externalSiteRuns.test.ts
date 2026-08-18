@@ -1,6 +1,12 @@
 import { db } from "@peated/server/db";
-import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
 import {
+  externalReviewSourcePolicies,
+  externalSiteRuns,
+  externalSites,
+} from "@peated/server/db/schema";
+import { ExternalReviewSourcePolicyError } from "@peated/server/lib/externalReviewSourcePolicy";
+import {
+  createExternalReviewSiteRunJob,
   createExternalSiteRunJob,
   ExternalSiteRunActiveError,
   queueManualExternalSiteRun,
@@ -49,6 +55,89 @@ test("manual run is attributed, dispatched deterministically, and does not move 
     .where(eq(externalSites.id, site.id));
   expect(storedSite?.nextRunAt).toEqual(nextRunAt);
   expect(storedSite?.lastRunAt).toBeNull();
+});
+
+test("review runs require fetching approval before dispatch", async ({
+  fixtures,
+}) => {
+  const requestedBy = await fixtures.User({ admin: true });
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const enqueue = vi.fn(async () => undefined);
+
+  await expect(
+    queueManualExternalSiteRun({
+      site,
+      requestedById: requestedBy.id,
+      enqueue,
+    }),
+  ).rejects.toBeInstanceOf(ExternalReviewSourcePolicyError);
+
+  const runs = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.externalSiteId, site.id));
+  expect(runs).toHaveLength(0);
+  expect(enqueue).not.toHaveBeenCalled();
+});
+
+test("approved review runs are dispatched", async ({ fixtures }) => {
+  const requestedBy = await fixtures.User({ admin: true });
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  await fixtures.ApprovedExternalReviewSourcePolicy({
+    externalSiteId: site.id,
+  });
+  const enqueue = vi.fn(async () => undefined);
+
+  const run = await queueManualExternalSiteRun({
+    site,
+    requestedById: requestedBy.id,
+    enqueue,
+  });
+
+  expect(run.status).toBe("queued");
+  expect(enqueue).toHaveBeenCalledOnce();
+});
+
+test("worker rechecks approval after a review run is queued", async ({
+  fixtures,
+}) => {
+  const requestedBy = await fixtures.User({ admin: true });
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  await fixtures.ApprovedExternalReviewSourcePolicy({
+    externalSiteId: site.id,
+  });
+  const run = await queueManualExternalSiteRun({
+    site,
+    requestedById: requestedBy.id,
+    enqueue: async () => undefined,
+  });
+  await db
+    .update(externalReviewSourcePolicies)
+    .set({
+      publicationMode: "disabled",
+      allowFetching: false,
+      allowLlmProcessing: false,
+      allowScoreDisplay: false,
+      allowSummaryDisplay: false,
+      policyEvidenceUrl: null,
+      approvalReference: null,
+      reviewedAt: null,
+      approvedByActorId: null,
+    })
+    .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
+  const scrape = vi.fn(async () => 1);
+  const job = createExternalReviewSiteRunJob("whiskyadvocate", scrape);
+
+  await expect(job({ runId: run.id })).rejects.toBeInstanceOf(
+    ExternalReviewSourcePolicyError,
+  );
+
+  const [storedRun] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(storedRun).toMatchObject({ status: "failed", itemCount: null });
+  expect(scrape).not.toHaveBeenCalled();
 });
 
 test("worker owns successful lifecycle and terminal delivery is a no-op", async ({

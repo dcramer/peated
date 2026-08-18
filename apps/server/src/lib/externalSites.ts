@@ -1,6 +1,12 @@
-import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
+import {
+  EXTERNAL_SITE_DEFINITIONS,
+  isExternalReviewSiteType,
+} from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { externalSites } from "@peated/server/db/schema";
+import {
+  externalReviewSourcePolicies,
+  externalSites,
+} from "@peated/server/db/schema";
 import type { ExternalSiteType } from "@peated/server/types";
 
 export class ExternalSiteNotFoundError extends Error {
@@ -16,7 +22,7 @@ export async function syncExternalSites() {
     for (const [type, definition] of Object.entries(
       EXTERNAL_SITE_DEFINITIONS,
     )) {
-      await tx
+      const [site] = await tx
         .insert(externalSites)
         .values({
           type: type as ExternalSiteType,
@@ -29,7 +35,15 @@ export async function syncExternalSites() {
             name: definition.name,
             runEvery: definition.runEvery,
           },
-        });
+        })
+        .returning({ id: externalSites.id });
+
+      if (site && isExternalReviewSiteType(type as ExternalSiteType)) {
+        await tx
+          .insert(externalReviewSourcePolicies)
+          .values({ externalSiteId: site.id })
+          .onConflictDoNothing();
+      }
     }
   });
 }

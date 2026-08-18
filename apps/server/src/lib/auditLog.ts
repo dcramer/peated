@@ -22,6 +22,9 @@ export enum AuditEvent {
   RATE_LIMIT_EXCEEDED = "security.rate_limit",
   INVALID_CHALLENGE = "security.invalid_challenge",
   REPLAY_ATTACK_DETECTED = "security.replay_attack",
+
+  // External review source authorization
+  EXTERNAL_REVIEW_SOURCE_POLICY_UPDATED = "external_review.source_policy.updated",
 }
 
 interface AuditLogEntry {

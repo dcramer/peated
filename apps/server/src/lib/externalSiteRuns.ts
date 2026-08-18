@@ -5,6 +5,10 @@ import {
   type ExternalSite,
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
+import {
+  requireExternalReviewFetchBeforeQueue,
+  requireExternalReviewSourceCapability,
+} from "@peated/server/lib/externalReviewSourcePolicy";
 import type { ExternalSiteType } from "@peated/server/types";
 import type { JobName } from "@peated/server/worker/types";
 import { getJobForSite } from "@peated/server/worker/utils";
@@ -211,6 +215,8 @@ export async function queueManualExternalSiteRun({
   requestedById: number;
   enqueue?: Enqueue;
 }) {
+  await requireExternalReviewFetchBeforeQueue(db, site);
+
   let run: ExternalSiteRun;
   try {
     run = await insertRun(db, site.id, "manual", requestedById);
@@ -243,6 +249,8 @@ export async function queueScheduledExternalSiteRun(
         return null;
       }
 
+      await requireExternalReviewFetchBeforeQueue(tx, site);
+
       const run = await insertRun(tx, site.id, "scheduled");
       await tx
         .update(externalSites)
@@ -271,9 +279,13 @@ function summarizeExternalSiteRunError(error: unknown): string {
   return "Unexpected scraper failure. See Sentry for this run.";
 }
 
-export function createExternalSiteRunJob(
+function buildExternalSiteRunJob(
   siteType: ExternalSiteType,
   scrape: () => Promise<number>,
+  authorizeFetch?: (site: {
+    id: number;
+    type: ExternalSiteType;
+  }) => Promise<void>,
 ) {
   return async (input: unknown) => {
     const { runId } = ExternalSiteRunJobInputSchema.parse(input);
@@ -319,6 +331,7 @@ export function createExternalSiteRunJob(
       site: siteType,
     });
     try {
+      await authorizeFetch?.({ id: run.externalSiteId, type: siteType });
       const itemCount = await scrape();
       await completeExternalSiteRun({ run, status: "succeeded", itemCount });
     } catch (error) {
@@ -330,4 +343,21 @@ export function createExternalSiteRunJob(
       throw error;
     }
   };
+}
+
+export function createExternalSiteRunJob(
+  siteType: ExternalSiteType,
+  scrape: () => Promise<number>,
+) {
+  return buildExternalSiteRunJob(siteType, scrape);
+}
+
+/** Rechecks publisher authorization immediately before review network access. */
+export function createExternalReviewSiteRunJob(
+  siteType: ExternalSiteType,
+  scrape: () => Promise<number>,
+) {
+  return buildExternalSiteRunJob(siteType, scrape, async (site) => {
+    await requireExternalReviewSourceCapability(db, site, "allowFetching");
+  });
 }

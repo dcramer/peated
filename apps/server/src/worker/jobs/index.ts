@@ -1,4 +1,7 @@
-import { createExternalSiteRunJob } from "@peated/server/lib/externalSiteRuns";
+import {
+  createExternalReviewSiteRunJob,
+  createExternalSiteRunJob,
+} from "@peated/server/lib/externalSiteRuns";
 import registry from "../registry";
 import capturePriceImage from "./capturePriceImage";
 import cleanupPendingUploads from "./cleanupPendingUploads";
@@ -108,13 +111,16 @@ const scraperJobs = [
   ["ScrapeThompsonBros", "thompsonbros", scrapeThompsonBros],
   ["ScrapeTotalWine", "totalwine", scrapeTotalWine],
   ["ScrapeWoodenCork", "woodencork", scrapeWoodenCork],
-  ["ScrapeWhiskyAdvocate", "whiskyadvocate", scrapeWhiskeyAdvocate],
   ["ScrapeWhiskyWorld", "whiskyworld", scrapeWhiskyWorld],
 ] as const;
 
 for (const [jobName, siteType, scrape] of scraperJobs) {
   registry.add(jobName, createExternalSiteRunJob(siteType, scrape));
 }
+registry.add(
+  "ScrapeWhiskyAdvocate",
+  createExternalReviewSiteRunJob("whiskyadvocate", scrapeWhiskeyAdvocate),
+);
 registry.add("CreateMissingBottles", createMissingBottles);
 registry.add("UpdateBottleStats", updateBottleStats);
 registry.add("UpdateCountryStats", updateCountryStats);

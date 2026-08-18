@@ -1,6 +1,9 @@
 import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { externalSites } from "@peated/server/db/schema";
+import {
+  externalReviewSourcePolicies,
+  externalSites,
+} from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { expect, test } from "vitest";
 import { syncExternalSites } from "./externalSites";
@@ -38,4 +41,12 @@ test("syncs code-owned external-site definitions", async () => {
     .from(externalSites)
     .where(eq(externalSites.type, "finedrams"));
   expect(fineDrams).toMatchObject(EXTERNAL_SITE_DEFINITIONS.finedrams);
+
+  const policies = await db.select().from(externalReviewSourcePolicies);
+  expect(policies).toHaveLength(1);
+  expect(policies[0]).toMatchObject({
+    externalSiteId: sites.find((site) => site.type === "whiskyadvocate")?.id,
+    publicationMode: "disabled",
+    allowFetching: false,
+  });
 });

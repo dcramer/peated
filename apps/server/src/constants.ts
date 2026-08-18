@@ -54,7 +54,11 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   thompsonbros: { name: "Thompson Bros.", runEvery: 10080 },
   totalwine: { name: "Total Wines", runEvery: null },
   woodencork: { name: "Wooden Cork", runEvery: 10080 },
-  whiskyadvocate: { name: "Whisky Advocate", runEvery: 21600 },
+  whiskyadvocate: {
+    name: "Whisky Advocate",
+    runEvery: 21600,
+    content: "reviews",
+  },
   whiskyworld: { name: "The Whisky World", runEvery: 10080 },
 } as const;
 
@@ -63,6 +67,11 @@ type ExternalSiteDefinitionType = keyof typeof EXTERNAL_SITE_DEFINITIONS;
 export const EXTERNAL_SITE_TYPE_LIST = Object.keys(
   EXTERNAL_SITE_DEFINITIONS,
 ) as [ExternalSiteDefinitionType, ...ExternalSiteDefinitionType[]];
+
+export function isExternalReviewSiteType(type: ExternalSiteDefinitionType) {
+  const definition = EXTERNAL_SITE_DEFINITIONS[type];
+  return "content" in definition && definition.content === "reviews";
+}
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 
