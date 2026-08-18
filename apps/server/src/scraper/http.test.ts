@@ -403,6 +403,33 @@ test("classifies bounded timeout retries and rejects unsafe headers before conta
   expect(neverFetch).not.toHaveBeenCalled();
 });
 
+test("defers a retryable transport failure when the run budget is exhausted", async () => {
+  const { registry, run } = await setupRuntime({ requestLimit: 1 });
+  const fetchImpl = vi
+    .fn<typeof fetch>()
+    .mockRejectedValue(new DOMException("timed out", "TimeoutError"));
+
+  await expect(
+    requestScraperUrl({
+      runId: run.id,
+      sourceKey: "finedrams",
+      request: {
+        target: "operator",
+        url: new URL("https://example.com/catalog"),
+      },
+      registry,
+      fetchImpl,
+      clock: clockAt(),
+    }),
+  ).rejects.toEqual(
+    expect.objectContaining({
+      reason: "run_budget",
+      nextEligibleAt: null,
+    }) as ScraperRequestDeferredError,
+  );
+  expect(fetchImpl).toHaveBeenCalledTimes(1);
+});
+
 test("parses delta-seconds and HTTP-date Retry-After values", () => {
   const now = new Date("2026-08-18T12:00:00Z");
   expect(parseRetryAfter("30", now)).toEqual(new Date("2026-08-18T12:00:30Z"));

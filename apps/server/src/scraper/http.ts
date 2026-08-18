@@ -323,11 +323,13 @@ export async function requestScraperUrl({
           token: permit.token,
           now: clock.now(),
         });
-        if (
+        const canRetry =
           retry < permit.maxRetries &&
-          permit.remainingRequests > 0 &&
-          (method === "GET" || request.retryable === true)
-        ) {
+          (method === "GET" || request.retryable === true);
+        if (canRetry && permit.remainingRequests <= 0) {
+          throw new ScraperRequestDeferredError("run_budget", null);
+        }
+        if (canRetry) {
           retry += 1;
           await clock.sleep(retryDelay(retry, clock.random()));
           continue;
