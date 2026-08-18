@@ -3,6 +3,7 @@ import {
   bottleChecks,
   bottleOperations,
   incomingBottleDecisionLogs,
+  storePriceMatchProposals,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
@@ -24,11 +25,20 @@ describe("admin moderation history", () => {
       name: "History listing",
       url: "https://example.com/history-listing",
     });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        proposalType: "match_existing",
+        suggestedBottleId: bottle.id,
+      })
+      .returning();
     const [incoming] = await db
       .insert(incomingBottleDecisionLogs)
       .values({
         sourceKind: "store_price",
         sourceId: price.id,
+        proposalId: proposal!.id,
         externalSiteId: site.id,
         name: price.name,
         url: price.url,
@@ -85,6 +95,15 @@ describe("admin moderation history", () => {
       `incoming:${incoming!.id}`,
       `closure:${check!.id}`,
     ]);
+
+    const incomingDetails = await routerClient.admin.moderation.historyDetails(
+      { key: `incoming:${incoming!.id}` },
+      { context: { user: admin } },
+    );
+    expect(incomingDetails.details).toMatchObject({
+      sourceId: price.id,
+      proposalId: proposal!.id,
+    });
 
     const details = await routerClient.admin.moderation.historyDetails(
       { key: `operation:${operation!.id}` },

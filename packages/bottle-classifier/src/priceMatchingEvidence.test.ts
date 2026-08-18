@@ -4,7 +4,10 @@ import type {
   BottleExtractedDetails,
   BottleSearchEvidence,
 } from "./classifierTypes";
-import { classifySearchResultSource } from "./identityEvidenceCore";
+import {
+  classifySearchResultSource,
+  getAbvSupportLevel,
+} from "./identityEvidenceCore";
 import {
   agentActionRiskClass,
   type AutomationTierInput,
@@ -78,6 +81,21 @@ function buildSearchEvidence(
 }
 
 describe("priceMatchingEvidence", () => {
+  test.each([
+    ["Bottled at 40%.", 40],
+    ["Bottled at 40.0%", 40],
+    ["40% ABV", 40],
+    ["Alcohol by volume: 40 ABV", 40],
+    ["Bottled at 43.5%", 43.5],
+    ["Bottled at 57.03%", 57.03],
+  ])("recognizes explicit ABV evidence in %s", (text, expectedValue) => {
+    expect(getAbvSupportLevel(text, expectedValue)).toBe("exact");
+  });
+
+  test("does not round decimal ABV evidence to a neighboring integer", () => {
+    expect(getAbvSupportLevel("Bottled at 44%", 43.5)).toBe("none");
+  });
+
   test("ignores optional cask metadata but keeps cask flags decisive for plain-age verification", () => {
     const target = buildBottleCandidate({
       bottleId: 1,

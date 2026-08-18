@@ -1028,6 +1028,72 @@ describe("priceMatchingAutomation", () => {
     });
   });
 
+  test("allows auto-create when every required check passes below the old metadata score threshold", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "create_new",
+      modelConfidence: 95,
+      price: {
+        bottleId: null,
+        name: "Example Distillery Pedro Ximénez Select Cask",
+        url: "https://shop.example/pedro-ximenez-select-cask",
+      },
+      suggestedBottleId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Distillery",
+        expression: "Pedro Ximénez Select Cask",
+        distillery: [],
+        stated_age: null,
+        abv: 48,
+        cask_type: null,
+      }),
+      proposedBottle: buildProposedBottle({
+        name: "Pedro Ximénez Select Cask",
+        statedAge: null,
+        abv: 48,
+        brand: { id: null, name: "Example Distillery" },
+        distillers: [],
+      }),
+      searchEvidence: [
+        {
+          provider: "openai",
+          query: '"Example Distillery" "Pedro Ximénez Select Cask" 48%',
+          summary:
+            "The producer lists Example Distillery Pedro Ximénez Select Cask at 48%.",
+          results: [
+            {
+              title: "Example Distillery Pedro Ximénez Select Cask",
+              url: "https://www.exampledistillery.com/pedro-ximenez-select-cask",
+              domain: "exampledistillery.com",
+              description:
+                "Example Distillery Pedro Ximénez Select Cask is bottled at 48%.",
+              extraSnippets: [],
+            },
+          ],
+        },
+      ],
+      candidateBottles: [
+        buildCandidate({
+          fullName: "Example Distillery Oloroso Select Cask",
+          brand: "Example Distillery",
+          distillery: [],
+          statedAge: null,
+          abv: 46,
+          caskType: null,
+        }),
+      ],
+      webEvidenceJudgment: "supportive",
+    });
+
+    expect(assessment.automationScore).toBeLessThan(90);
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(
+      assessment.webEvidenceChecks
+        .filter((check) => check.required)
+        .every((check) => check.validated),
+    ).toBe(true);
+    expect(assessment.automationEligible).toBe(true);
+  });
+
   test("validates auto-create ABV evidence from exact US proof", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "create_new",

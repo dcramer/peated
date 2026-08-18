@@ -77,7 +77,7 @@ export type StorePriceMatchAutomationAssessment = z.infer<
   typeof StorePriceMatchAutomationAssessmentSchema
 >;
 
-const AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD = 90;
+const BLOCKED_AUTO_CREATE_SCORE = 89;
 const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
   "bottler",
   "series",
@@ -853,9 +853,7 @@ function getCreateNewScore({
   const hasBlockers = automationBlockers.length > 0;
   if (deterministicSmwsExactCaskCreate) {
     return {
-      automationScore: hasBlockers
-        ? AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1
-        : 100,
+      automationScore: hasBlockers ? BLOCKED_AUTO_CREATE_SCORE : 100,
       automationEligible: !hasBlockers,
       automationBlockers: Array.from(new Set(automationBlockers)),
       differentiatingAttributes,
@@ -868,13 +866,13 @@ function getCreateNewScore({
     hasStructuredSourceAnchor && !hasBlockers
       ? 100
       : hasBlockers
-        ? Math.min(clampScore(score), AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD - 1)
+        ? Math.min(clampScore(score), BLOCKED_AUTO_CREATE_SCORE)
         : clampScore(score);
 
   return {
     automationScore,
-    automationEligible:
-      !hasBlockers && automationScore >= AUTO_CREATE_NEW_CONFIDENCE_THRESHOLD,
+    // Blockers own the create safety contract; score is diagnostic metadata.
+    automationEligible: !hasBlockers,
     automationBlockers: Array.from(new Set(automationBlockers)),
     differentiatingAttributes,
     decisiveMatchAttributes: Array.from(

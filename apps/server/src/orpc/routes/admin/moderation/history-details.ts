@@ -88,6 +88,7 @@ export default procedure
         details: {
           sourceKind: log.sourceKind,
           sourceId: log.sourceId,
+          proposalId: log.proposalId,
           bottleId: log.bottleId,
           confidence: log.confidence,
           model: log.model,
