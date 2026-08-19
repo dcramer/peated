@@ -1,7 +1,9 @@
 "use client";
 
+import type { Outputs } from "@peated/server/orpc/router";
 import { type ExternalSiteType } from "@peated/server/types";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
+import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
@@ -15,10 +17,16 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { use, useState, type ReactNode } from "react";
-import { type z } from "zod";
 
-function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
+type Site = Outputs["externalSites"]["healthDetails"];
+
+function TriggerJobButton({ site }: { site: Site }) {
   const [isLoading, setLoading] = useState(false);
+  const unavailableReason = !site.runtime.registered
+    ? "This scraper is not registered with the runtime."
+    : site.reviewPolicy?.allowFetching === false
+      ? "Fetching is blocked by review policy."
+      : null;
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const triggerJobMutation = useMutation(
@@ -27,19 +35,20 @@ function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
 
   return (
     <Button
-      disabled={isLoading}
+      disabled={isLoading || unavailableReason !== null}
       loading={isLoading}
+      title={unavailableReason ?? undefined}
       onClick={async () => {
         setLoading(true);
         try {
-          await triggerJobMutation.mutateAsync({ site: siteId });
+          await triggerJobMutation.mutateAsync({ site: site.type });
           await Promise.all([
             queryClient.invalidateQueries({
               queryKey: orpc.externalSites.healthList.key(),
             }),
             queryClient.invalidateQueries({
               queryKey: orpc.externalSites.healthDetails.key({
-                input: { site: siteId },
+                input: { site: site.type },
               }),
             }),
             queryClient.invalidateQueries({
@@ -51,7 +60,7 @@ function TriggerJobButton({ siteId }: { siteId: ExternalSiteType }) {
         }
       }}
     >
-      Run Scraper Now
+      {unavailableReason ? "Run unavailable" : "Run Scraper Now"}
     </Button>
   );
 }
@@ -84,7 +93,7 @@ export default function Layout(props: {
             href: "/admin",
           },
           {
-            name: "External Sites",
+            name: "Scrapers",
             href: "/admin/sites",
           },
           {
@@ -106,16 +115,22 @@ export default function Layout(props: {
           <div className="mt-3 self-center text-sm sm:self-start">
             <ExternalSiteRunStatus site={site} />
           </div>
-          <dl className="mt-5 grid w-full max-w-xl grid-cols-3 divide-x divide-slate-800 self-center sm:self-start">
+          <dl className="mt-5 grid w-full max-w-2xl grid-cols-2 divide-x divide-slate-800 self-center sm:grid-cols-4 sm:self-start">
             <div className="flex flex-col px-3 text-center first:pl-0 sm:text-left">
-              <dt className="text-muted order-2 text-xs sm:text-sm">
-                Listings
-              </dt>
+              <dt className="text-muted order-2 text-xs sm:text-sm">Reviews</dt>
               <dd className="order-1 text-lg font-bold tracking-wide text-white">
-                {site.listingCount.toLocaleString("en-US")}
+                {site.reviews.matched.toLocaleString("en-US")} /{" "}
+                {site.reviews.total.toLocaleString("en-US")}
               </dd>
             </div>
             <div className="flex flex-col px-3 text-center sm:text-left">
+              <dt className="text-muted order-2 text-xs sm:text-sm">Prices</dt>
+              <dd className="order-1 text-lg font-bold tracking-wide text-white">
+                {site.priceListings.matched.toLocaleString("en-US")} /{" "}
+                {site.priceListings.total.toLocaleString("en-US")}
+              </dd>
+            </div>
+            <div className="flex flex-col border-t border-slate-800 px-3 pt-3 text-center sm:border-t-0 sm:pt-0 sm:text-left">
               <dt className="text-muted order-2 text-xs sm:text-sm">
                 Schedule
               </dt>
@@ -125,7 +140,7 @@ export default function Layout(props: {
                   : "Manual only"}
               </dd>
             </div>
-            <div className="flex flex-col px-3 text-center last:pr-0 sm:text-left">
+            <div className="flex flex-col border-t border-slate-800 px-3 pt-3 text-center last:pr-0 sm:border-t-0 sm:pt-0 sm:text-left">
               <dt className="text-muted order-2 text-xs sm:text-sm">
                 Next Run
               </dt>
@@ -141,10 +156,12 @@ export default function Layout(props: {
         </div>
         <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
           <div className="flex gap-x-2">
-            <TriggerJobButton siteId={site.type} />
+            <TriggerJobButton site={site} />
           </div>
         </div>
       </div>
+
+      <ScraperReadiness site={site} />
 
       <Tabs border>
         <TabItem as={Link} href={`/admin/sites/${site.type}`} controlled>

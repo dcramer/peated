@@ -80,7 +80,7 @@ export default function AdminSidebar() {
                     href="/admin/sites"
                     active={pathname.startsWith("/admin/sites")}
                   >
-                    Sites
+                    Scrapers
                   </SidebarLink>
                   <SidebarLink
                     href="/admin/tags"

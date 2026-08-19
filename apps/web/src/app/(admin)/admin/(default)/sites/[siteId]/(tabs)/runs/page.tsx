@@ -1,6 +1,7 @@
 "use client";
 
 import { type ExternalSiteType } from "@peated/server/types";
+import ExternalSiteRunTelemetry from "@peated/web/components/admin/externalSiteRunTelemetry";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import Table from "@peated/web/components/table";
@@ -76,11 +77,9 @@ export default function Page(props: {
                 {run.attemptCount} attempt
                 {run.attemptCount === 1 ? "" : "s"}
               </span>
-              {run.itemCount !== null ? (
-                <span>{run.itemCount.toLocaleString("en-US")} items</span>
-              ) : null}
               <span>{runDuration(run)}</span>
             </div>
+            <ExternalSiteRunTelemetry run={run} />
             {run.error ? (
               <div className="mt-3 rounded-md border border-red-900/70 bg-red-950/30 px-3 py-2 text-xs text-red-200">
                 {run.error}
@@ -104,10 +103,8 @@ export default function Page(props: {
                   <div className="text-muted mt-1 text-xs">
                     Run #{run.id} · {run.attemptCount} attempt
                     {run.attemptCount === 1 ? "" : "s"}
-                    {run.itemCount !== null
-                      ? ` · ${run.itemCount.toLocaleString("en-US")} items`
-                      : ""}
                   </div>
+                  <ExternalSiteRunTelemetry run={run} />
                   {run.error ? (
                     <div className="mt-2 text-xs text-red-300">{run.error}</div>
                   ) : null}

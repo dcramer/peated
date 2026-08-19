@@ -26,21 +26,18 @@ export const ExternalSiteRunSchema = z.object({
   trigger: z.enum(["scheduled", "manual"]),
   requestedById: z.number().nullable(),
   attemptCount: z.number().int().min(0),
+  requestLimit: z.number().int().positive(),
+  sliceRequestCount: z.number().int().min(0),
+  requestCount: z.number().int().min(0),
+  retryCount: z.number().int().min(0),
+  rateLimitCount: z.number().int().min(0),
+  emittedItemCount: z.number().int().min(0),
   itemCount: z.number().int().min(0).nullable(),
   error: z.string().nullable(),
+  nextAttemptAt: z.string().datetime().nullable(),
   startedAt: z.string().datetime().nullable(),
   completedAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
-});
-
-export const ExternalSiteHealthSchema = ExternalSiteSchema.extend({
-  listingCount: z
-    .number()
-    .int()
-    .min(0)
-    .describe("Number of visible listings currently owned by the site"),
-  latestRun: ExternalSiteRunSchema.nullable(),
-  lastSucceededAt: z.string().datetime().nullable(),
 });
 
 export const ExternalReviewPublicationModeSchema = z.enum([
@@ -61,6 +58,44 @@ export const ExternalReviewSourcePolicySchema = z.object({
   reviewedAt: z.string().datetime().nullable(),
   approvedByActorId: z.number().int().positive().nullable(),
   updatedAt: z.string().datetime().nullable(),
+});
+
+export const ExternalSiteItemCoverageSchema = z.object({
+  total: z.number().int().min(0),
+  matched: z.number().int().min(0),
+  unmatched: z.number().int().min(0),
+});
+
+export const ExternalSiteScrapeOriginSchema = z.object({
+  origin: z.string().url(),
+  robotsMode: z.enum(["enforce", "not_applicable"]),
+  robotsStatus: z.enum(["unknown", "missing", "rules", "not_applicable"]),
+  robotsFetchedAt: z.string().datetime().nullable(),
+  robotsExpiresAt: z.string().datetime().nullable(),
+});
+
+export const ExternalSiteScrapeTargetSchema = z.object({
+  key: z.string(),
+  enabled: z.boolean(),
+  blockedUntil: z.string().datetime().nullable(),
+  coolingDown: z.boolean(),
+  minimumSpacingMs: z.number().int().min(0),
+  requestsPerWindow: z.number().int().positive(),
+  windowMs: z.number().int().positive(),
+  origins: z.array(ExternalSiteScrapeOriginSchema),
+});
+
+export const ExternalSiteHealthSchema = ExternalSiteSchema.extend({
+  reviews: ExternalSiteItemCoverageSchema,
+  priceListings: ExternalSiteItemCoverageSchema,
+  latestRun: ExternalSiteRunSchema.nullable(),
+  lastSucceededAt: z.string().datetime().nullable(),
+  runtime: z.object({
+    registered: z.boolean(),
+    targetKeys: z.array(z.string()),
+    targets: z.array(ExternalSiteScrapeTargetSchema),
+  }),
+  reviewPolicy: ExternalReviewSourcePolicySchema.nullable(),
 });
 
 const DisabledExternalReviewSourcePolicyInputSchema = z
