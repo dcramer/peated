@@ -75,12 +75,19 @@ export const reviews = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("review_unq_name").using(
-      "btree",
-      table.externalSiteId,
-      sql`LOWER(${table.name})`,
-      table.issue,
-    ),
+    // TODO(external-review-indexing): Remove these legacy-only indexes when
+    // OpenSpec task 3.5 completes the review-article hard cutover.
+    uniqueIndex("review_unq_name")
+      .using(
+        "btree",
+        table.externalSiteId,
+        sql`LOWER(${table.name})`,
+        table.issue,
+      )
+      .where(sql`${table.articleId} IS NULL`),
+    uniqueIndex("review_legacy_site_url_unq")
+      .on(table.externalSiteId, table.url)
+      .where(sql`${table.articleId} IS NULL`),
     uniqueIndex("review_article_source_key_unq").on(
       table.articleId,
       table.sourceKey,

@@ -175,6 +175,7 @@ export async function createExternalReview(
         sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
             VALUES (${bottleId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
             ON CONFLICT (external_site_id, LOWER(name), issue)
+            WHERE article_id IS NULL
             DO UPDATE
             SET bottle_id = CASE
                   WHEN excluded.bottle_id IS NOT NULL

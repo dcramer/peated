@@ -122,6 +122,8 @@ export async function storeReviewArticle(rawInput: unknown) {
             nativeScoreScale: review.nativeScore?.scale ?? null,
             nativeScoreDisplay: review.nativeScore?.display ?? null,
             rating: review.normalizedRating,
+            issue: input.issue ?? input.canonicalUrl,
+            url: input.canonicalUrl,
             updatedAt: sql`NOW()`,
           },
         })
