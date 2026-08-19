@@ -7,6 +7,7 @@ import {
   bottlesToDistillers,
   changes,
   flightBottles,
+  reviewArticles,
 } from "../../db/schema";
 
 describe("catalog identity fixtures", () => {
@@ -23,7 +24,7 @@ describe("catalog identity fixtures", () => {
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
     const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
     const flight = await fixtures.Flight({ bottles: [bottle.id] });
-    const [flightBottle, canonicalAlias] = await Promise.all([
+    const [flightBottle, canonicalAlias, reviewArticle] = await Promise.all([
       db.query.flightBottles.findFirst({
         where: eq(flightBottles.flightId, flight.id),
       }),
@@ -33,10 +34,18 @@ describe("catalog identity fixtures", () => {
           eq(bottleAliases.name, bottle.fullName),
         ),
       }),
+      db.query.reviewArticles.findFirst({
+        where: eq(reviewArticles.id, review.articleId as number),
+      }),
     ]);
 
     expect(tasting.bottleId).toBe(bottle.id);
     expect(review.bottleId).toBe(bottle.id);
+    expect(review.sourceKey).toBe(review.url);
+    expect(reviewArticle).toMatchObject({
+      canonicalUrl: review.url,
+      externalSiteId: review.externalSiteId,
+    });
     expect(price.bottleId).toBe(bottle.id);
     expect(alias.bottleId).toBe(bottle.id);
     expect(canonicalAlias?.assignmentSource).toBe("canonical");
