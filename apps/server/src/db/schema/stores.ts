@@ -4,6 +4,7 @@ import {
   bigint,
   bigserial,
   boolean,
+  check,
   date,
   index,
   integer,
@@ -13,6 +14,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { bottles } from "./bottles";
 import { externalSites } from "./externalSites";
@@ -55,8 +57,10 @@ export const storePrices = pgTable(
     externalSiteId: bigint("external_site_id", { mode: "number" })
       .references(() => externalSites.id)
       .notNull(),
+    externalProductId: text("external_product_id"),
     name: text("name").notNull(),
     imageUrl: text("image_url"),
+    barcode: varchar("barcode", { length: 14 }),
     // Provider-owned facts are normalized classifier evidence, never raw
     // provider payloads or canonical catalog authority.
     sourceBottleIdentity: jsonb(
@@ -76,7 +80,10 @@ export const storePrices = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("store_price_unq_name").using(
+    uniqueIndex("store_price_site_external_product_unq")
+      .on(table.externalSiteId, table.externalProductId)
+      .where(sql`${table.externalProductId} IS NOT NULL`),
+    index("store_price_site_name_volume_idx").using(
       "btree",
       table.externalSiteId,
       sql`LOWER(${table.name})`,
@@ -84,6 +91,10 @@ export const storePrices = pgTable(
     ),
     index("store_price_bottle_idx").on(table.bottleId),
     index("store_price_release_idx").on(table.legacyReleaseId),
+    check(
+      "store_price_barcode_check",
+      sql`${table.barcode} IS NULL OR (${table.barcode} ~ '^[0-9]+$' AND char_length(${table.barcode}) IN (8, 12, 13, 14))`,
+    ),
   ],
 );
 

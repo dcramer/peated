@@ -478,6 +478,7 @@ export const bottleBarcodes = pgTable(
       .notNull(),
     value: varchar("value", { length: 14 }).notNull(),
     gtin14: varchar("gtin14", { length: 14 }).notNull(),
+    volume: integer("volume"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     createdByActorId: bigint("created_by_actor_id", {
       mode: "number",

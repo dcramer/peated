@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
+  bottleBarcodes,
   bottleTombstones,
   reviews,
   storePriceHistories,
@@ -291,6 +292,143 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
+  test("tracks a retailer product across URL changes and preserves its barcode claim", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const listing = {
+      externalProductId: "retailer-sku-123",
+      barcode: "0 36602-30197 9",
+      name: "Generic Single Malt Whisky",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 750,
+      url: "https://example.com/products/old-slug",
+    };
+
+    await createStorePricesAsPeated({ site: site.type, prices: [listing] });
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          ...listing,
+          price: 7_500,
+          url: "https://example.com/products/new-slug",
+        },
+      ],
+    });
+
+    const prices = await db.query.storePrices.findMany({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    expect(prices).toHaveLength(1);
+    expect(prices[0]).toMatchObject({
+      externalProductId: "retailer-sku-123",
+      barcode: "036602301979",
+      bottleId: null,
+      price: 7_500,
+      url: "https://example.com/products/new-slug",
+    });
+  });
+
+  test("keeps distinct generic listings instead of merging by title and volume", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const common = {
+      name: "Single Malt Whisky",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 750,
+    };
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          ...common,
+          externalProductId: "release-1",
+          url: "https://example.com/products/release-1",
+        },
+        {
+          ...common,
+          externalProductId: "release-2",
+          url: "https://example.com/products/release-2",
+        },
+      ],
+    });
+
+    await expect(
+      db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).resolves.toHaveLength(2);
+  });
+
+  test("uses a canonical barcode only for the matching package volume", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({ name: "Barcode Bottle" });
+    const systemActor = await getPeatedSystemActor();
+    await db.insert(bottleBarcodes).values({
+      bottleId: bottle.id,
+      value: "036602301979",
+      gtin14: "00036602301979",
+      volume: 750,
+      createdByActorId: systemActor.id,
+    });
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          externalProductId: "matching-volume",
+          barcode: "036602301979",
+          name: "Generic Retailer Title",
+          price: 7_200,
+          currency: "usd",
+          volume: 750,
+          url: "https://example.com/products/matching-volume",
+        },
+        {
+          externalProductId: "wrong-volume",
+          barcode: "036602301979",
+          name: "Another Generic Retailer Title",
+          price: 7_200,
+          currency: "usd",
+          volume: 700,
+          url: "https://example.com/products/wrong-volume",
+        },
+      ],
+    });
+
+    const prices = await db.query.storePrices.findMany({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    expect(
+      prices.find(
+        ({ externalProductId }) => externalProductId === "matching-volume",
+      ),
+    ).toMatchObject({ bottleId: bottle.id });
+    const unresolved = prices.find(
+      ({ externalProductId }) => externalProductId === "wrong-volume",
+    );
+    expect(unresolved).toMatchObject({ bottleId: null });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: unresolved!.id },
+    );
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(
+          bottleAliases.name,
+          normalizeBottleAliasKey("Generic Retailer Title"),
+        ),
+      }),
+    ).toBeUndefined();
+  });
+
   test("uses an identity-preserving alias key as an exact match", async ({
     fixtures,
   }) => {
@@ -424,6 +562,10 @@ describe("POST /external-sites/:site/prices", () => {
         await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
       ).rows[0]!.pid;
       await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+        ["store-price-url:https://example.com/prices/concurrent-result"],
+      );
+      await client.query(
         `INSERT INTO "store_price"
           ("bottle_id", "external_site_id", "name", "volume", "price", "currency", "url")
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
@@ -434,7 +576,7 @@ describe("POST /external-sites/:site/prices", () => {
           750,
           8_000,
           "usd",
-          "https://example.com/prices/concurrent-holder",
+          "https://example.com/prices/concurrent-result",
         ],
       );
 
@@ -539,7 +681,7 @@ describe("POST /external-sites/:site/prices", () => {
               price: 12_345,
               currency: "usd",
               volume: 750,
-              url: "https://example.com/lock-order",
+              url: existingPrice.url,
             },
           ],
         },
@@ -595,7 +737,7 @@ describe("POST /external-sites/:site/prices", () => {
             price: 6_999,
             currency: "usd",
             volume: 750,
-            url: "https://example.com/prices/durable-retry",
+            url: existing.url,
           },
         ],
       },
@@ -665,7 +807,7 @@ describe("POST /external-sites/:site/prices", () => {
       imageUrl: null,
     });
     const imageUrl = "https://example.com/images/retailer-bottle.jpg";
-    await fixtures.StorePrice({
+    const existingPrice = await fixtures.StorePrice({
       bottleId: bottle.id,
       externalSiteId: site.id,
       name: bottle.fullName,
@@ -682,7 +824,7 @@ describe("POST /external-sites/:site/prices", () => {
             price: 9_999,
             currency: "usd",
             volume: 750,
-            url: "https://example.com/prices/image-finalization",
+            url: existingPrice.url,
           },
         ],
       },

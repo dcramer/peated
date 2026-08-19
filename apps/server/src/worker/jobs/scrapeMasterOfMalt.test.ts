@@ -29,7 +29,9 @@ test("scrapes in-stock single bottles and excludes unsupported products", async 
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "2444",
       imageUrl:
         "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/lagavulin.jpg",
       name: "Lagavulin 16-year-old",
@@ -39,6 +41,7 @@ test("scrapes in-stock single bottles and excludes unsupported products", async 
     },
     {
       currency: "gbp",
+      externalProductId: "JW-100CL",
       imageUrl:
         "https://cdn11.bigcommerce.com/s-e8lbekfe7c/images/johnnie-walker.jpg",
       name: "Johnnie Walker Island Green",

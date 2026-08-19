@@ -14,7 +14,7 @@ describe("bottle barcodes", () => {
     const actor = await getUserActor(moderator);
 
     const first = await routerClient.bottleBarcodes.upsert(
-      { bottle: bottle.id, barcode: "0 36602-30197 9" },
+      { bottle: bottle.id, barcode: "0 36602-30197 9", volume: 750 },
       { context: { user: moderator } },
     );
     const second = await routerClient.bottleBarcodes.upsert(
@@ -25,6 +25,7 @@ describe("bottle barcodes", () => {
     expect(first).toMatchObject({
       bottle: bottle.id,
       value: "036602301979",
+      volume: 750,
     });
     expect(second).toMatchObject({
       bottle: bottle.id,
@@ -87,6 +88,32 @@ describe("bottle barcodes", () => {
 
     expect(second).toEqual(first);
     await expect(db.$count(bottleBarcodes)).resolves.toBe(1);
+  });
+
+  test("fills missing volume but rejects a conflicting volume", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const moderator = await fixtures.User({ mod: true });
+    await routerClient.bottleBarcodes.upsert(
+      { bottle: bottle.id, barcode: "036602301979" },
+      { context: { user: moderator } },
+    );
+
+    await expect(
+      routerClient.bottleBarcodes.upsert(
+        { bottle: bottle.id, barcode: "0036602301979", volume: 750 },
+        { context: { user: moderator } },
+      ),
+    ).resolves.toMatchObject({ volume: 750 });
+    await expect(
+      waitError(
+        routerClient.bottleBarcodes.upsert(
+          { bottle: bottle.id, barcode: "036602301979", volume: 700 },
+          { context: { user: moderator } },
+        ),
+      ),
+    ).resolves.toMatchObject({ status: 409 });
   });
 
   test("rejects assignment of one normalized GTIN to another Bottle", async ({

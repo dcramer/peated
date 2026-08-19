@@ -226,9 +226,9 @@ export type ScrapePricesPageResult = {
 };
 
 function getScrapedProductKey(product: StorePrice): string {
-  return [product.name.trim().toLowerCase(), String(product.volume)].join(
-    "\u0000",
-  );
+  return product.externalProductId
+    ? `external:${product.externalProductId}`
+    : `url:${product.url}`;
 }
 
 export default async function scrapePrices(

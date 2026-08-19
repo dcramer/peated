@@ -72,6 +72,13 @@ function isMultiproduct(title: string): boolean {
   return MULTIPRODUCT_PATTERN.test(title);
 }
 
+function getExternalProductId(url: string): string {
+  const match = new URL(url).pathname.match(/-p(\d+)\/?$/);
+  if (!match)
+    throw new Error(`Validated product URL has no product id: ${url}`);
+  return match[1];
+}
+
 export function parseWhiskyWorldPage(html: string): {
   products: StorePrice[];
   hasNextPage: boolean;
@@ -123,6 +130,7 @@ export function parseWhiskyWorldPage(html: string): {
 
     const { name } = normalizeBottle({ name: rawName });
     const listing = {
+      externalProductId: getExternalProductId(url),
       name,
       price,
       currency: "gbp" as const,

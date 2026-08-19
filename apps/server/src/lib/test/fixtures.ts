@@ -989,44 +989,10 @@ export const StorePrice = async (
 
     data.bottleId = bottleId;
 
-    const { rows } = await tx.execute<dbSchema.StorePrice>(sql`
-      INSERT INTO ${storePrices} (
-        bottle_id,
-        external_site_id,
-        name,
-        volume,
-        price,
-        currency,
-        url,
-        hidden,
-        image_url,
-        source_bottle_identity,
-        updated_at
-      )
-      VALUES (
-        ${data.bottleId},
-        ${data.externalSiteId},
-        ${data.name},
-        ${data.volume},
-        ${data.price},
-        ${data.currency},
-        ${data.url},
-        ${data.hidden},
-        ${data.imageUrl ?? null},
-        ${JSON.stringify(data.sourceBottleIdentity ?? null)}::jsonb,
-        ${data.updatedAt || sql`NOW()`}
-      )
-      ON CONFLICT (external_site_id, LOWER(name), volume)
-      DO UPDATE
-      SET bottle_id = excluded.bottle_id,
-          price = excluded.price,
-          currency = excluded.currency,
-          url = excluded.url,
-          source_bottle_identity = excluded.source_bottle_identity,
-          updated_at = ${data.updatedAt || sql`NOW()`}
-      RETURNING *
-    `);
-    const [price] = mapRows(rows, storePrices);
+    const [price] = await tx
+      .insert(storePrices)
+      .values(data as dbSchema.NewStorePrice)
+      .returning();
 
     if (!price) throw new Error("Unable to create StorePrice fixture");
 
