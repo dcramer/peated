@@ -2,21 +2,21 @@
 
 ## Core Principles
 
+- Write for normal humans. Use concise
+  [ASD-STE100 Simplified Technical English](https://www.asd-ste100.org/) in
+  documentation, plans, comments, and explanations. Use short sentences, active
+  voice, and consistent terms.
 - Optimize for the next maintainer. Choose the smallest design that closes the
   proven failure, keep complexity local, and avoid speculative abstractions,
-  configuration, extension points, and recovery paths; follow
-  `docs/policies/correctness-complexity.md`.
+  configuration, extension points, and recovery paths.
 - Prefer functions, plain objects, simple types, and small modules. Expose
-  narrow capabilities and use the same domain noun for the same concept; follow
-  `docs/policies/interface-design.md`.
+  narrow capabilities and use the same domain noun for the same concept.
 - Keep ownership, permissions, identity, and irreversible actions explicit at
-  their runtime boundaries; follow `docs/policies/runtime-boundaries.md`.
-- Write code, names, documentation, plans, and explanations for normal humans.
-  If they need an architecture lecture to make sense, simplify them.
+  their runtime boundaries.
 
 ## Package Manager
 
-- Use `pnpm@11.20.0` with Node `24.18.0`.
+- Use `pnpm`. Read the required pnpm and Node.js versions from `package.json`.
 - Core commands: `pnpm install`, `pnpm dev`, `pnpm dev:server`, `pnpm dev:web`,
   `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format`.
 
@@ -30,14 +30,6 @@
 | Typecheck server package | `pnpm --filter @peated/server typecheck`                        |
 | Typecheck web package    | `pnpm --filter @peated/web typecheck`                           |
 
-## Commit Attribution
-
-AI commits MUST include:
-
-```text
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
-```
-
 ## Workflow
 
 - For non-trivial changes: discover, implement the smallest useful vertical
@@ -46,51 +38,41 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
   schema, or domain name. Use a hard cutover unless compatibility is explicitly
   required.
 - Let unexpected failures reach the owning boundary. Retry only expected
-  transient failures; follow `docs/policies/error-handling.md`.
+  transient failures.
 - When a policy is enforced by a specific module or exported boundary, keep a
-  brief ownership/invariant comment beside that code; follow
-  `docs/policies/code-comments.md`.
+  brief ownership/invariant comment beside that code.
 - Move durable explanations beside the code or feature that owns them. Delete
   completed plans instead of preserving stale implementation history.
-- Run targeted tests, typechecks, lint, and manual QA for the touched surface.
-  Pull request CI is the required full-repo `pnpm test` gate.
+- After code changes, run the smallest relevant tests, typechecks, lint, and
+  format checks. Use manual QA when automated checks do not prove the changed
+  behavior. Report checks that you did not run. Pull request CI is the required
+  full-repo `pnpm test` gate.
 
 ## Testing and Validation
 
-- Backend tests are integration-first; follow
-  `docs/development/backend-testing.md`.
+- Backend tests are integration-first.
 - Frontend tests prove deterministic component contracts and browser behavior;
-  visual presentation uses manual or agent-based QA. Follow
-  `docs/development/frontend-testing.md`.
+  visual presentation uses manual or agent-based QA.
 - Tests and live evals are separate gates. `pnpm test` runs deterministic Vitest
-  tests; classifier model evals run through `pnpm evals`. Follow
-  `docs/policies/evals.md` and the classifier package instructions.
+  tests; classifier model evals run through `pnpm evals`.
 - Before adding coverage, search existing test and eval layers for the behavior's
   primary owning scenario. Do not duplicate the same contract at several layers.
 
 ## Architecture Conventions
 
-- Monorepo packages live under `apps/server`, `apps/web`, `apps/cli`, and
-  `packages/*`.
 - Backend routes live in `apps/server/src/orpc/routes/<domain>/`; keep one file
   per operation.
 - Serializers live in `apps/server/src/serializers/*` with `attrs()` and
   `item()`, invoked through `serialize(...)`.
-- Database schema lives in `apps/server/src/db/schema/`.
 - Create migrations with `pnpm db:generate`; never hand-write migration SQL or
   edit `apps/server/migrations/meta/*` manually.
-- The web app uses Next.js App Router in `apps/web/src/app/`.
 - `pnpm dev*` and `pnpm cli <cmd>` load `.env.local`; backend tests load
   `.env.test`.
 
 ## API Access
 
-- Production API host: `https://api.peated.com`.
-- OpenAPI spec: `https://api.peated.com/spec.json`.
-- OpenAPI endpoints are mounted under `https://api.peated.com/v1/*`.
-- Most read/list endpoints are anonymous. Protected write and moderator routes
-  require `Authorization: Bearer <token>`.
-- `https://peated.com` is the frontend host, not the API host.
+- For production API work, use `https://api.peated.com`, not
+  `https://peated.com`.
 
 ## Where Rules Live
 
