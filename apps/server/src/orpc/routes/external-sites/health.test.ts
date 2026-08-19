@@ -125,6 +125,53 @@ test("health list reports source inventory, runtime, and latest execution", asyn
   });
 });
 
+test("health list keeps batched source data isolated", async ({ fixtures }) => {
+  const admin = await fixtures.User({ admin: true });
+  const firstSite = await fixtures.ExternalSite({ type: "berrybrosrudd" });
+  const secondSite = await fixtures.ExternalSite({ type: "totalwine" });
+  await fixtures.StorePrice({
+    externalSiteId: firstSite.id,
+    hidden: false,
+  });
+  await fixtures.StorePrice({
+    externalSiteId: secondSite.id,
+    bottleId: null,
+    hidden: false,
+  });
+  await db.insert(externalSiteRuns).values([
+    {
+      externalSiteId: firstSite.id,
+      status: "succeeded",
+      trigger: "scheduled",
+      completedAt: new Date("2026-08-12T12:00:00.000Z"),
+    },
+    {
+      externalSiteId: secondSite.id,
+      status: "failed",
+      trigger: "scheduled",
+      completedAt: new Date("2026-08-12T13:00:00.000Z"),
+    },
+  ]);
+
+  const result = await routerClient.externalSites.healthList(
+    {},
+    { context: { user: admin } },
+  );
+  const first = result.results.find((site) => site.type === firstSite.type);
+  const second = result.results.find((site) => site.type === secondSite.type);
+
+  expect(first).toMatchObject({
+    priceListings: { total: 1, matched: 1, unmatched: 0 },
+    latestRun: { status: "succeeded" },
+    lastSucceededAt: "2026-08-12T12:00:00.000Z",
+  });
+  expect(second).toMatchObject({
+    priceListings: { total: 1, matched: 0, unmatched: 1 },
+    latestRun: { status: "failed" },
+    lastSucceededAt: null,
+  });
+});
+
 test("health details show review inventory and blocked review policy", async ({
   fixtures,
 }) => {

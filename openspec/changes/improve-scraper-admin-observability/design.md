@@ -48,7 +48,7 @@ The admin navigation and breadcrumbs will say “Scrapers,” while existing `/a
 
 ## Risks / Trade-offs
 
-- **Additional health queries could make an admin page slower** → Keep queries bounded to the paginated site set and select only summary fields; the source count is small and no public request path is affected.
+- **Additional health queries could make an admin page slower** → Load the paginated source set with a fixed number of grouped queries keyed by site id; the detail endpoint reuses the same loader for one source.
 - **Robots cache state can be mistaken for a full policy audit** → Label it as cached robots state and show timestamps; review permission remains a separate explicit policy.
 - **A registered source can temporarily lack synchronized SQL definitions during deploy** → Show registration and synchronized targets separately so the mismatch is visible instead of silently treating it as healthy.
 - **No historical trend or persistence disposition is available** → Show recent runs and exact counters only; add new telemetry later only if operators demonstrate a need.

@@ -25,32 +25,44 @@ import {
   serializeExternalSite,
   serializeExternalSiteRun,
 } from "@peated/server/serializers/externalSite";
-import { and, asc, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
-async function getHealth(site: ExternalSite) {
-  const registration = getScraperRegistration(site.type);
-  const hasReviewPolicy = isExternalReviewSiteType(site.type);
+async function getHealthForSites(
+  sites: ExternalSite[],
+): Promise<z.infer<typeof ExternalSiteHealthSchema>[]> {
+  if (sites.length === 0) return [];
+
+  const siteIds = sites.map((site) => site.id);
+  const reviewSiteIds = sites
+    .filter((site) => isExternalReviewSiteType(site.type))
+    .map((site) => site.id);
   const [
-    [reviewCoverage],
-    [priceCoverage],
-    [latestRun],
-    [lastSucceeded],
+    reviewCoverageRows,
+    priceCoverageRows,
+    latestRuns,
+    lastSucceededRuns,
     runtimeRows,
-    reviewPolicy,
+    reviewPolicies,
   ] = await Promise.all([
     db
       .select({
+        externalSiteId: reviews.externalSiteId,
         total: sql<number>`count(*)::int`,
         matched: sql<number>`count(*) filter (where ${reviews.bottleId} is not null)::int`,
         unmatched: sql<number>`count(*) filter (where ${reviews.bottleId} is null)::int`,
       })
       .from(reviews)
       .where(
-        and(eq(reviews.externalSiteId, site.id), eq(reviews.hidden, false)),
-      ),
+        and(
+          inArray(reviews.externalSiteId, siteIds),
+          eq(reviews.hidden, false),
+        ),
+      )
+      .groupBy(reviews.externalSiteId),
     db
       .select({
+        externalSiteId: storePrices.externalSiteId,
         total: sql<number>`count(*)::int`,
         matched: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null)::int`,
         unmatched: sql<number>`count(*) filter (where ${storePrices.bottleId} is null)::int`,
@@ -58,29 +70,38 @@ async function getHealth(site: ExternalSite) {
       .from(storePrices)
       .where(
         and(
-          eq(storePrices.externalSiteId, site.id),
+          inArray(storePrices.externalSiteId, siteIds),
           eq(storePrices.hidden, false),
         ),
+      )
+      .groupBy(storePrices.externalSiteId),
+    db
+      .selectDistinctOn([externalSiteRuns.externalSiteId])
+      .from(externalSiteRuns)
+      .where(inArray(externalSiteRuns.externalSiteId, siteIds))
+      .orderBy(
+        asc(externalSiteRuns.externalSiteId),
+        desc(externalSiteRuns.createdAt),
       ),
     db
-      .select()
-      .from(externalSiteRuns)
-      .where(eq(externalSiteRuns.externalSiteId, site.id))
-      .orderBy(desc(externalSiteRuns.createdAt))
-      .limit(1),
-    db
-      .select({ completedAt: externalSiteRuns.completedAt })
+      .selectDistinctOn([externalSiteRuns.externalSiteId], {
+        externalSiteId: externalSiteRuns.externalSiteId,
+        completedAt: externalSiteRuns.completedAt,
+      })
       .from(externalSiteRuns)
       .where(
         and(
-          eq(externalSiteRuns.externalSiteId, site.id),
+          inArray(externalSiteRuns.externalSiteId, siteIds),
           eq(externalSiteRuns.status, "succeeded"),
         ),
       )
-      .orderBy(desc(externalSiteRuns.completedAt))
-      .limit(1),
+      .orderBy(
+        asc(externalSiteRuns.externalSiteId),
+        desc(externalSiteRuns.completedAt),
+      ),
     db
       .select({
+        externalSiteId: externalSiteScrapeTargets.externalSiteId,
         targetKey: scrapeTargets.key,
         enabled: scrapeTargets.enabled,
         blockedUntil: scrapeTargets.blockedUntil,
@@ -107,23 +128,51 @@ async function getHealth(site: ExternalSite) {
       )
       .where(
         and(
-          eq(externalSiteScrapeTargets.externalSiteId, site.id),
+          inArray(externalSiteScrapeTargets.externalSiteId, siteIds),
           eq(externalSiteScrapeTargets.active, true),
         ),
       )
-      .orderBy(asc(scrapeTargets.key), asc(scrapeOrigins.origin)),
-    hasReviewPolicy
-      ? db.query.externalReviewSourcePolicies.findFirst({
-          where: eq(externalReviewSourcePolicies.externalSiteId, site.id),
-        })
-      : Promise.resolve(undefined),
+      .orderBy(
+        asc(externalSiteScrapeTargets.externalSiteId),
+        asc(scrapeTargets.key),
+        asc(scrapeOrigins.origin),
+      ),
+    reviewSiteIds.length > 0
+      ? db
+          .select()
+          .from(externalReviewSourcePolicies)
+          .where(
+            inArray(externalReviewSourcePolicies.externalSiteId, reviewSiteIds),
+          )
+      : Promise.resolve([]),
   ]);
 
-  const targets = new Map<
-    string,
-    z.infer<typeof ExternalSiteScrapeTargetSchema>
+  const reviewCoverageBySite = new Map(
+    reviewCoverageRows.map((row) => [row.externalSiteId, row]),
+  );
+  const priceCoverageBySite = new Map(
+    priceCoverageRows.map((row) => [row.externalSiteId, row]),
+  );
+  const latestRunBySite = new Map(
+    latestRuns.map((run) => [run.externalSiteId, run]),
+  );
+  const lastSucceededBySite = new Map(
+    lastSucceededRuns.map((run) => [run.externalSiteId, run]),
+  );
+  const reviewPolicyBySite = new Map(
+    reviewPolicies.map((policy) => [policy.externalSiteId, policy]),
+  );
+  const targetsBySite = new Map<
+    number,
+    Map<string, z.infer<typeof ExternalSiteScrapeTargetSchema>>
   >();
+  const now = Date.now();
   for (const row of runtimeRows) {
+    let targets = targetsBySite.get(row.externalSiteId);
+    if (!targets) {
+      targets = new Map();
+      targetsBySite.set(row.externalSiteId, targets);
+    }
     let target = targets.get(row.targetKey);
     if (!target) {
       target = {
@@ -131,7 +180,7 @@ async function getHealth(site: ExternalSite) {
         enabled: row.enabled,
         blockedUntil: row.blockedUntil?.toISOString() ?? null,
         coolingDown:
-          row.blockedUntil !== null && row.blockedUntil.getTime() > Date.now(),
+          row.blockedUntil !== null && row.blockedUntil.getTime() > now,
         minimumSpacingMs: row.minimumSpacingMs,
         requestsPerWindow: row.requestsPerWindow,
         windowMs: row.windowMs,
@@ -153,21 +202,32 @@ async function getHealth(site: ExternalSite) {
     }
   }
 
-  return {
-    ...serializeExternalSite(site),
-    reviews: reviewCoverage ?? { total: 0, matched: 0, unmatched: 0 },
-    priceListings: priceCoverage ?? { total: 0, matched: 0, unmatched: 0 },
-    latestRun: latestRun ? serializeExternalSiteRun(latestRun) : null,
-    lastSucceededAt: lastSucceeded?.completedAt?.toISOString() ?? null,
-    runtime: {
-      registered: registration !== null,
-      targetKeys: registration?.targetKeys ?? [],
-      targets: [...targets.values()],
-    },
-    reviewPolicy: hasReviewPolicy
-      ? serializeExternalReviewSourcePolicy(site.id, reviewPolicy ?? null)
-      : null,
-  };
+  return sites.map((site) => {
+    const registration = getScraperRegistration(site.type);
+    const hasReviewPolicy = isExternalReviewSiteType(site.type);
+    const reviewCoverage = reviewCoverageBySite.get(site.id);
+    const priceCoverage = priceCoverageBySite.get(site.id);
+    const latestRun = latestRunBySite.get(site.id);
+    const lastSucceeded = lastSucceededBySite.get(site.id);
+    const targets = targetsBySite.get(site.id);
+    const reviewPolicy = reviewPolicyBySite.get(site.id);
+
+    return {
+      ...serializeExternalSite(site),
+      reviews: reviewCoverage ?? { total: 0, matched: 0, unmatched: 0 },
+      priceListings: priceCoverage ?? { total: 0, matched: 0, unmatched: 0 },
+      latestRun: latestRun ? serializeExternalSiteRun(latestRun) : null,
+      lastSucceededAt: lastSucceeded?.completedAt?.toISOString() ?? null,
+      runtime: {
+        registered: registration !== null,
+        targetKeys: registration?.targetKeys ?? [],
+        targets: targets ? [...targets.values()] : [],
+      },
+      reviewPolicy: hasReviewPolicy
+        ? serializeExternalReviewSourcePolicy(site.id, reviewPolicy ?? null)
+        : null,
+    };
+  });
 }
 
 const inputSchema = z.object({
@@ -203,8 +263,9 @@ export const healthList = procedure
       .limit(input.limit + 1)
       .offset(offset);
 
+    const sites = results.slice(0, input.limit);
     return {
-      results: await Promise.all(results.slice(0, input.limit).map(getHealth)),
+      results: await getHealthForSites(sites),
       rel: {
         nextCursor: results.length > input.limit ? input.cursor + 1 : null,
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
@@ -229,5 +290,6 @@ export const healthDetails = procedure
       .where(eq(externalSites.type, input.site))
       .limit(1);
     if (!site) throw errors.NOT_FOUND({ message: "Site not found." });
-    return getHealth(site);
+    const [health] = await getHealthForSites([site]);
+    return health!;
   });

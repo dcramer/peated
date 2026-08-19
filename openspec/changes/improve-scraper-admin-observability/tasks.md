@@ -4,6 +4,7 @@
 - [x] 1.2 Extend external-site health with separate review and price match coverage, runtime target/origin state, and applicable review policy
 - [x] 1.3 Extend recent-run serialization with existing request, retry, rate-limit, emitted-item, budget, and deferral telemetry
 - [x] 1.4 Add integration coverage for inventory, readiness, telemetry, and administrator authorization
+- [x] 1.5 Batch administrator health reads across the paginated source set and verify source isolation
 
 ## 2. Administrator experience
 
@@ -16,3 +17,4 @@
 ## 3. Validation
 
 - [x] 3.1 Run targeted server and web tests, typechecks, lint, formatting, full build, and OpenSpec validation
+- [x] 3.2 Re-run validation after the batched health-read correction
