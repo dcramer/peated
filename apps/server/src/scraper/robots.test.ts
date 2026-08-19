@@ -45,9 +45,11 @@ function fixedClock(value = "2026-08-18T12:00:00Z"): ScraperHttpClock {
 async function setupRobotsRuntime({
   mode = "enforce",
   maxRetries = 0,
+  targetEnabled = true,
 }: {
   mode?: "enforce" | "not_applicable";
   maxRetries?: number;
+  targetEnabled?: boolean;
 } = {}) {
   const robots =
     mode === "enforce"
@@ -60,6 +62,7 @@ async function setupRobotsRuntime({
     targets: [
       defineScrapeTarget({
         key: "operator",
+        enabled: targetEnabled,
         maxRetries,
         origins: [{ origin: "https://example.com", robots }],
       }),
@@ -197,6 +200,28 @@ test("defers when robots is unavailable without a fresh decision", async () => {
   });
   const [origin] = await db.select().from(scrapeOrigins);
   expect(origin?.robotsState).toBeNull();
+});
+
+test("does not report a disabled target as unavailable robots", async () => {
+  const { registry, run } = await setupRobotsRuntime({
+    targetEnabled: false,
+  });
+  const fetchImpl = vi.fn<typeof fetch>();
+
+  await expect(
+    ensureRobotsAllowed({
+      runId: run.id,
+      sourceKey: "finedrams",
+      targetKey: "operator",
+      url: new URL("https://example.com/catalog"),
+      registry,
+      fetchImpl,
+      clock: fixedClock(),
+    }),
+  ).rejects.toMatchObject({
+    category: "invalid_request",
+  });
+  expect(fetchImpl).not.toHaveBeenCalled();
 });
 
 test("refreshes expired rules and persists parsed rules rather than content", async () => {

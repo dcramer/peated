@@ -4,6 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { type ExternalSiteType } from "@peated/server/types";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
+import { getScraperRunAvailability } from "@peated/web/components/admin/scraperRunAvailability";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
@@ -22,11 +23,7 @@ type Site = Outputs["externalSites"]["healthDetails"];
 
 function TriggerJobButton({ site }: { site: Site }) {
   const [isLoading, setLoading] = useState(false);
-  const unavailableReason = !site.runtime.registered
-    ? "This scraper is not registered with the runtime."
-    : site.reviewPolicy?.allowFetching === false
-      ? "Fetching is blocked by review policy."
-      : null;
+  const availability = getScraperRunAvailability(site);
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const triggerJobMutation = useMutation(
@@ -35,9 +32,9 @@ function TriggerJobButton({ site }: { site: Site }) {
 
   return (
     <Button
-      disabled={isLoading || unavailableReason !== null}
+      disabled={isLoading || availability !== null}
       loading={isLoading}
-      title={unavailableReason ?? undefined}
+      title={availability?.reason}
       onClick={async () => {
         setLoading(true);
         try {
@@ -60,7 +57,7 @@ function TriggerJobButton({ site }: { site: Site }) {
         }
       }}
     >
-      {unavailableReason ? "Run unavailable" : "Run Scraper Now"}
+      {availability?.label ?? "Run Scraper Now"}
     </Button>
   );
 }

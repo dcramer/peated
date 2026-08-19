@@ -10,7 +10,11 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { ScraperCoordinationError } from "./coordinator";
-import { findScraperSourceBySiteType } from "./definitions";
+import {
+  findScraperSourceBySiteType,
+  requireEnabledScraperTargets,
+  ScraperTargetDisabledError,
+} from "./definitions";
 import {
   ScraperHttpStatusError,
   ScraperRequestDeferredError,
@@ -46,6 +50,7 @@ export type ScraperRunExecutionResult =
   | { status: "deferred"; nextAttemptAt: Date };
 
 function safeRunError(error: unknown) {
+  if (error instanceof ScraperTargetDisabledError) return error.message;
   if (error instanceof z.ZodError) return "Scraper data failed validation.";
   if (error instanceof ScraperRobotsDeniedError) {
     return "Robots policy disallows this scraper path.";
@@ -284,6 +289,7 @@ export async function executeScraperRun(
   });
 
   try {
+    requireEnabledScraperTargets(registry, claimed.source);
     const cursor =
       claimed.run.cursor === null
         ? null

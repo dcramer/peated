@@ -8,6 +8,14 @@ import type {
   ScrapeTargetDefinition,
 } from "./types";
 
+export class ScraperTargetDisabledError extends Error {
+  override name = "ScraperTargetDisabledError";
+
+  constructor(readonly targetKey: string) {
+    super(`Scraper target ${targetKey} is disabled.`);
+  }
+}
+
 export const DEFAULT_SCRAPER_REQUEST_POLICY = Object.freeze({
   minimumSpacingMs: 2_000,
   requestsPerWindow: 300,
@@ -287,4 +295,15 @@ export function findScraperSourceBySiteType(
   return [...registry.sources.values()].find(
     (source) => source.externalSiteType === externalSiteType,
   );
+}
+
+/** Disabled code-owned targets cannot create or execute durable scraper work. */
+export function requireEnabledScraperTargets(
+  registry: ScraperRegistry,
+  source: ScraperSourceDefinition,
+) {
+  for (const targetKey of source.targetKeys) {
+    const target = registry.targets.get(targetKey);
+    if (!target?.enabled) throw new ScraperTargetDisabledError(targetKey);
+  }
 }

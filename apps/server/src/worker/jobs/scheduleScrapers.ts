@@ -5,6 +5,7 @@ import {
   ExternalSiteRunActiveError,
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
+  ScraperTargetDisabledError,
 } from "@peated/server/scraper";
 import { and, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
@@ -29,7 +30,8 @@ export default async function scheduleScrapers() {
     } catch (error) {
       if (
         !(error instanceof ExternalSiteRunActiveError) &&
-        !(error instanceof ExternalReviewSourcePolicyError)
+        !(error instanceof ExternalReviewSourcePolicyError) &&
+        !(error instanceof ScraperTargetDisabledError)
       ) {
         throw error;
       }

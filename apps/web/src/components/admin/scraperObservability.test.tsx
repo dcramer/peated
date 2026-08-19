@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import ExternalSiteRunTelemetry from "./externalSiteRunTelemetry";
 import ScraperCatalogCoverage from "./scraperCatalogCoverage";
 import ScraperReadiness from "./scraperReadiness";
+import { getScraperRunAvailability } from "./scraperRunAvailability";
 
 const timestamp = "2026-08-18T12:00:00.000Z";
 
@@ -78,6 +79,29 @@ const run = {
 } satisfies Outputs["externalSites"]["runs"]["results"][number];
 
 describe("scraper observability", () => {
+  it("explains why a disabled scraper cannot run", () => {
+    expect(getScraperRunAvailability(site)).toEqual({
+      label: "Scraper disabled",
+      reason: "Scraper target whiskyadvocate is disabled.",
+    });
+  });
+
+  it("allows a synchronized enabled scraper", () => {
+    expect(
+      getScraperRunAvailability({
+        ...site,
+        runtime: {
+          ...site.runtime,
+          targets: site.runtime.targets.map((target) => ({
+            ...target,
+            enabled: true,
+          })),
+        },
+        reviewPolicy: { ...site.reviewPolicy, allowFetching: true },
+      }),
+    ).toBeNull();
+  });
+
   it("shows runtime, robots, and review-policy readiness", () => {
     const html = renderToStaticMarkup(<ScraperReadiness site={site} />);
 

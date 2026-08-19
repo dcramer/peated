@@ -12,6 +12,7 @@ import {
   type ScraperHttpClock,
   ScraperHttpStatusError,
   ScraperRequestDeferredError,
+  ScraperRequestError,
 } from "./http";
 import type { ScraperRegistry } from "./types";
 
@@ -215,6 +216,11 @@ export async function ensureRobotsAllowed({
         await writeRobotsCache(url.origin, missing, now);
         state = CachedRobotsRulesSchema.safeParse(missing);
       } else if (error instanceof ScraperRequestDeferredError) {
+        throw error;
+      } else if (
+        error instanceof ScraperRequestError &&
+        error.category === "invalid_request"
+      ) {
         throw error;
       } else {
         throw new ScraperRequestDeferredError(
