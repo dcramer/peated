@@ -105,6 +105,51 @@ describe("PATCH /reviews/:review", () => {
     });
   });
 
+  test("uses article metadata for moderator decisions", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const nextBottle = await fixtures.Bottle();
+    const articleSite = await fixtures.ExternalSite({
+      type: "whiskyadvocate",
+    });
+    const legacySite = await fixtures.ExternalSite({ type: "totalwine" });
+    const canonicalUrl = "https://example.com/article-owned-review";
+    const review = await fixtures.Review({
+      bottleId: null,
+      externalSiteId: articleSite.id,
+      url: canonicalUrl,
+    });
+    await db
+      .update(reviews)
+      .set({
+        externalSiteId: legacySite.id,
+        url: "https://example.com/legacy-review-copy",
+      })
+      .where(eq(reviews.id, review.id));
+
+    const response = await routerClient.reviews.update(
+      { review: review.id, bottle: nextBottle.id },
+      { context: { user } },
+    );
+
+    expect(response).toMatchObject({
+      url: canonicalUrl,
+      site: { id: articleSite.id },
+    });
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "review"),
+          eq(incomingBottleDecisionLogs.sourceId, review.id),
+        ),
+      }),
+    ).toMatchObject({
+      externalSiteId: articleSite.id,
+      url: canonicalUrl,
+    });
+  });
+
   test("supports explicit unassignment", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();

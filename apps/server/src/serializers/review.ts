@@ -6,7 +6,9 @@ import {
   bottles,
   bottleTombstones,
   externalSites,
+  reviewArticles,
   type Review,
+  type ReviewArticle,
   type User,
 } from "../db/schema";
 import { type BottleSchema, type ReviewSchema } from "../schemas";
@@ -14,6 +16,7 @@ import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
 type ReviewAttrs = {
+  article: Pick<ReviewArticle, "canonicalUrl" | "externalSiteId">;
   bottle: z.infer<typeof BottleSchema> | null;
   site: ReturnType<(typeof ExternalSiteSerializer)["item"]>;
 };
@@ -24,6 +27,28 @@ export const ReviewSerializer = serializer({
     itemList: Review[],
     currentUser?: User,
   ): Promise<Record<string, ReviewAttrs>> => {
+    const articleIds = Array.from(
+      new Set(
+        itemList.map((review) => {
+          if (review.articleId === null) {
+            throw new Error(`Review ${review.id} has no article.`);
+          }
+          return review.articleId;
+        }),
+      ),
+    );
+    const articleList = await db
+      .select({
+        id: reviewArticles.id,
+        canonicalUrl: reviewArticles.canonicalUrl,
+        externalSiteId: reviewArticles.externalSiteId,
+      })
+      .from(reviewArticles)
+      .where(inArray(reviewArticles.id, articleIds));
+    const articlesById = new Map(
+      articleList.map((article) => [article.id, article]),
+    );
+
     const bottleIds = Array.from(
       new Set(
         itemList.flatMap(({ bottleId }) =>
@@ -51,7 +76,9 @@ export const ReviewSerializer = serializer({
       serializedBottles.map((bottle) => [bottle.id, bottle]),
     );
 
-    const siteIds = Array.from(new Set(itemList.map((i) => i.externalSiteId)));
+    const siteIds = Array.from(
+      new Set(articleList.map((article) => article.externalSiteId)),
+    );
     const siteList = siteIds.length
       ? await db
           .select()
@@ -66,6 +93,12 @@ export const ReviewSerializer = serializer({
 
     return Object.fromEntries(
       itemList.map((item) => {
+        const article = articlesById.get(item.articleId!);
+        if (!article) {
+          throw new Error(
+            `Review ${item.id} references missing article ${item.articleId}.`,
+          );
+        }
         const bottle =
           item.bottleId === null
             ? null
@@ -78,8 +111,9 @@ export const ReviewSerializer = serializer({
         return [
           item.id,
           {
+            article,
             bottle,
-            site: sitesByRef[item.externalSiteId],
+            site: sitesByRef[article.externalSiteId],
           },
         ];
       }),
@@ -95,7 +129,7 @@ export const ReviewSerializer = serializer({
       id: item.id,
       name: item.name,
       rating: item.rating,
-      url: item.url,
+      url: attrs.article.canonicalUrl,
       bottle: attrs.bottle,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),

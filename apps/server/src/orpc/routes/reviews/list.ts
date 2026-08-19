@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { externalSites, reviews } from "@peated/server/db/schema";
+import {
+  externalSites,
+  reviewArticles,
+  reviews,
+} from "@peated/server/db/schema";
 import { logWarn } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -59,7 +63,7 @@ export default procedure
           message: "Site not found.",
         });
       }
-      baseWhere.push(eq(reviews.externalSiteId, site.id));
+      baseWhere.push(eq(reviewArticles.externalSiteId, site.id));
     }
 
     const hasPublicScope = input.bottle !== undefined;
@@ -89,13 +93,15 @@ export default procedure
       baseWhere.push(ilike(reviews.name, `%${query}%`));
     }
 
-    const results = await db
-      .select()
+    const rows = await db
+      .select({ review: reviews })
       .from(reviews)
+      .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
       .where(and(...baseWhere, ...identityWhere))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(asc(reviews.name));
+    const results = rows.map(({ review }) => review);
 
     return {
       results: await serialize(

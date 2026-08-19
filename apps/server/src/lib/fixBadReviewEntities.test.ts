@@ -67,28 +67,22 @@ describe("fixBadReviewEntities", () => {
       releaseYear: null,
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: wrongBottle.id,
-        name: correctBottle.fullName,
-        issue: "Default",
-        rating: 91,
-        url: "https://example.com/review",
-      })
-      .returning();
-    const [sameNameReview] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: null,
-        name: correctBottle.fullName,
-        issue: "Second",
-        rating: 88,
-        url: "https://example.com/second-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: wrongBottle.id,
+      name: correctBottle.fullName,
+      issue: "Default",
+      rating: 91,
+      url: "https://example.com/review",
+    });
+    const sameNameReview = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: correctBottle.fullName,
+      issue: "Second",
+      rating: 88,
+      url: "https://example.com/second-review",
+    });
     const sameNamePrice = await fixtures.StorePrice({
       externalSiteId: site.id,
       bottleId: null,
@@ -182,17 +176,14 @@ describe("fixBadReviewEntities", () => {
       bottleId: stagedBottle.id,
       name: "Staged Exact Alias Review",
     });
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: wrongBottle.id,
-        name: alias.name,
-        issue: "Default",
-        rating: 90,
-        url: "https://example.com/staged-exact-alias-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: wrongBottle.id,
+      name: alias.name,
+      issue: "Default",
+      rating: 90,
+      url: "https://example.com/staged-exact-alias-review",
+    });
 
     const summary = await fixBadReviewEntities({ user });
 
@@ -222,17 +213,14 @@ describe("fixBadReviewEntities", () => {
       name: "Unpromoted Match Parent",
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: wrongBottle.id,
-        name: "Unpromoted Classifier Match Review",
-        issue: "Default",
-        rating: 90,
-        url: "https://example.com/unpromoted-classifier-match-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: wrongBottle.id,
+      name: "Unpromoted Classifier Match Review",
+      issue: "Default",
+      rating: 90,
+      url: "https://example.com/unpromoted-classifier-match-review",
+    });
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
@@ -286,17 +274,14 @@ describe("fixBadReviewEntities", () => {
       releaseYear: null,
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: bottle.id,
-        name: "Unknown Review Title",
-        issue: "Default",
-        rating: 90,
-        url: "https://example.com/unresolved-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: bottle.id,
+      name: "Unknown Review Title",
+      issue: "Default",
+      rating: 90,
+      url: "https://example.com/unresolved-review",
+    });
 
     const summary = await fixBadReviewEntities({ user });
 
@@ -324,17 +309,14 @@ describe("fixBadReviewEntities", () => {
       releaseYear: null,
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: bottle.id,
-        name: "Errored Review Title",
-        issue: "Default",
-        rating: 90,
-        url: "https://example.com/errored-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: bottle.id,
+      name: "Errored Review Title",
+      issue: "Default",
+      rating: 90,
+      url: "https://example.com/errored-review",
+    });
 
     classifyBottleReferenceMock.mockRejectedValueOnce(
       new Error("Classifier unavailable"),
@@ -370,17 +352,14 @@ describe("fixBadReviewEntities", () => {
       name: "Conflicting Assignment Bottle",
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: wrongBottle.id,
-        name: "Assignment Conflict Review",
-        issue: "Default",
-        rating: 90,
-        url: "https://example.com/assignment-conflict-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: wrongBottle.id,
+      name: "Assignment Conflict Review",
+      issue: "Default",
+      rating: 90,
+      url: "https://example.com/assignment-conflict-review",
+    });
 
     classifyBottleReferenceMock.mockImplementationOnce(async () => {
       await db
@@ -426,17 +405,14 @@ describe("fixBadReviewEntities", () => {
       name: "Concurrent Bottle",
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: site.id,
-        bottleId: wrongBottle.id,
-        name: "Suggested Bottle Review",
-        issue: "Default",
-        rating: 90,
-        url: "https://example.com/concurrent-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: wrongBottle.id,
+      name: "Suggested Bottle Review",
+      issue: "Default",
+      rating: 90,
+      url: "https://example.com/concurrent-review",
+    });
 
     classifyBottleReferenceMock.mockImplementationOnce(async () => {
       await db
