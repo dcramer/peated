@@ -1534,6 +1534,13 @@
       "when": 1787097436494,
       "tag": "0218_volatile_strong_guy",
       "breakpoints": false
+    },
+    {
+      "idx": 219,
+      "version": "7",
+      "when": 1787101360353,
+      "tag": "0219_spotty_green_goblin",
+      "breakpoints": false
     }
   ]
 }

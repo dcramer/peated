@@ -42,3 +42,57 @@ export const ExternalSiteHealthSchema = ExternalSiteSchema.extend({
   latestRun: ExternalSiteRunSchema.nullable(),
   lastSucceededAt: z.string().datetime().nullable(),
 });
+
+export const ExternalReviewPublicationModeSchema = z.enum([
+  "disabled",
+  "review_only",
+  "automatic",
+]);
+
+export const ExternalReviewSourcePolicySchema = z.object({
+  externalSiteId: z.number().int().positive(),
+  publicationMode: ExternalReviewPublicationModeSchema,
+  allowFetching: z.boolean(),
+  allowLlmProcessing: z.boolean(),
+  allowScoreDisplay: z.boolean(),
+  allowSummaryDisplay: z.boolean(),
+  policyEvidenceUrl: z.string().url().nullable(),
+  approvalReference: z.string().nullable(),
+  reviewedAt: z.string().datetime().nullable(),
+  approvedByActorId: z.number().int().positive().nullable(),
+  updatedAt: z.string().datetime().nullable(),
+});
+
+const DisabledExternalReviewSourcePolicyInputSchema = z
+  .object({
+    publicationMode: z.literal("disabled"),
+  })
+  .strict();
+
+const ApprovedExternalReviewSourcePolicyInputSchema = z
+  .object({
+    publicationMode: z.literal("review_only"),
+    allowFetching: z.literal(true),
+    allowLlmProcessing: z.boolean(),
+    allowScoreDisplay: z.boolean(),
+    allowSummaryDisplay: z.boolean(),
+    policyEvidenceUrl: z.string().url(),
+    approvalReference: z.string().trim().min(1).max(500),
+    reviewedAt: z.string().datetime(),
+  })
+  .strict()
+  .refine(
+    (policy) => !policy.allowSummaryDisplay || policy.allowLlmProcessing,
+    {
+      message: "Summary display requires LLM processing permission.",
+      path: ["allowSummaryDisplay"],
+    },
+  );
+
+export const ExternalReviewSourcePolicyInputSchema = z.discriminatedUnion(
+  "publicationMode",
+  [
+    DisabledExternalReviewSourcePolicyInputSchema,
+    ApprovedExternalReviewSourcePolicyInputSchema,
+  ],
+);

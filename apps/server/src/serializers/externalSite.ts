@@ -1,7 +1,13 @@
 import { type z } from "zod";
 import { serializer } from ".";
-import type { ExternalSite, ExternalSiteRun, User } from "../db/schema";
+import type {
+  ExternalReviewSourcePolicy,
+  ExternalSite,
+  ExternalSiteRun,
+  User,
+} from "../db/schema";
 import {
+  type ExternalReviewSourcePolicySchema,
   type ExternalSiteRunSchema,
   type ExternalSiteSchema,
 } from "../schemas";
@@ -51,5 +57,24 @@ export function serializeExternalSiteRun(
     startedAt: item.startedAt?.toISOString() ?? null,
     completedAt: item.completedAt?.toISOString() ?? null,
     createdAt: item.createdAt.toISOString(),
+  };
+}
+
+export function serializeExternalReviewSourcePolicy(
+  externalSiteId: number,
+  policy: ExternalReviewSourcePolicy | null,
+): z.infer<typeof ExternalReviewSourcePolicySchema> {
+  return {
+    externalSiteId,
+    publicationMode: policy?.publicationMode ?? "disabled",
+    allowFetching: policy?.allowFetching ?? false,
+    allowLlmProcessing: policy?.allowLlmProcessing ?? false,
+    allowScoreDisplay: policy?.allowScoreDisplay ?? false,
+    allowSummaryDisplay: policy?.allowSummaryDisplay ?? false,
+    policyEvidenceUrl: policy?.policyEvidenceUrl ?? null,
+    approvalReference: policy?.approvalReference ?? null,
+    reviewedAt: policy?.reviewedAt?.toISOString() ?? null,
+    approvedByActorId: policy?.approvedByActorId ?? null,
+    updatedAt: policy?.updatedAt.toISOString() ?? null,
   };
 }

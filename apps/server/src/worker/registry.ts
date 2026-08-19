@@ -5,11 +5,17 @@ import * as Sentry from "@sentry/node";
 import { applyJobActorContextToSentry } from "./context";
 import { type JobFunction } from "./types";
 
+export type JobQueueName = "default" | "scrapers";
+
 /**
  * Keeps queue failure semantics and telemetry aligned: handler errors escape to
  * BullMQ, while a Sentry flush is attempted after successful and failed runs.
  */
-function instrumentedJob(jobName: string, jobFn: JobFunction) {
+function instrumentedJob(
+  jobName: string,
+  jobFn: JobFunction,
+  queueName: JobQueueName,
+) {
   const wrappedJob: JobFunction = async function wrappedJob(
     params,
     context = {},
@@ -38,14 +44,13 @@ function instrumentedJob(jobName: string, jobFn: JobFunction) {
 
                 return await Sentry.startSpan(
                   {
-                    op: "consume default",
+                    op: `consume ${queueName}`,
                     name: `bullmq.${jobName.toLowerCase()}`,
                   },
                   async (span) => {
                     span.setAttribute("messaging.operation.type", "process");
                     span.setAttribute("messaging.operation.name", "consume");
-                    // Jobs registered here currently run on the default queue.
-                    span.setAttribute("messaging.destination.name", "default");
+                    span.setAttribute("messaging.destination.name", queueName);
                     span.setAttribute("messaging.message.id", jobId);
                     span.setAttribute("messaging.system", "bullmq");
 
@@ -106,10 +111,18 @@ function instrumentedJob(jobName: string, jobFn: JobFunction) {
 }
 
 class Registry {
-  private jobs: Record<string, JobFunction> = {};
+  private jobs: Record<string, { fn: JobFunction; queueName: JobQueueName }> =
+    {};
 
-  add(name: string, fn: JobFunction) {
-    this.jobs[name] = instrumentedJob(name, fn);
+  add(
+    name: string,
+    fn: JobFunction,
+    { queueName = "default" }: { queueName?: JobQueueName } = {},
+  ) {
+    this.jobs[name] = {
+      fn: instrumentedJob(name, fn, queueName),
+      queueName,
+    };
   }
 
   get(name: string) {
@@ -117,7 +130,15 @@ class Registry {
     if (typeof rv === "undefined") {
       throw new Error(`Unknown job: ${name}`);
     }
-    return rv;
+    return rv.fn;
+  }
+
+  getQueueName(name: string) {
+    const rv = this.jobs[name];
+    if (typeof rv === "undefined") {
+      throw new Error(`Unknown job: ${name}`);
+    }
+    return rv.queueName;
   }
 }
 

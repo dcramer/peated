@@ -1,15 +1,16 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import {
-  ExternalSiteRunActiveError,
-  queueManualExternalSiteRun,
-} from "@peated/server/lib/externalSiteRuns";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
   ExternalSiteRunSchema,
   ExternalSiteTypeEnum,
 } from "@peated/server/schemas";
+import {
+  ExternalReviewSourcePolicyError,
+  ExternalSiteRunActiveError,
+  queueManualExternalSiteRun,
+} from "@peated/server/scraper";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteRunSerializer } from "@peated/server/serializers/externalSite";
 import { eq } from "drizzle-orm";
@@ -53,6 +54,9 @@ export default procedure
     } catch (error) {
       if (error instanceof ExternalSiteRunActiveError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      if (error instanceof ExternalReviewSourcePolicyError) {
+        throw errors.FORBIDDEN({ message: error.message, cause: error });
       }
       throw error;
     }

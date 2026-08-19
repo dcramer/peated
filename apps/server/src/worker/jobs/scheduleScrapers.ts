@@ -1,10 +1,11 @@
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
 import {
+  ExternalReviewSourcePolicyError,
   ExternalSiteRunActiveError,
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
-} from "@peated/server/lib/externalSiteRuns";
+} from "@peated/server/scraper";
 import { and, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
 export default async function scheduleScrapers() {
@@ -26,7 +27,12 @@ export default async function scheduleScrapers() {
     try {
       await queueScheduledExternalSiteRun(site.id);
     } catch (error) {
-      if (!(error instanceof ExternalSiteRunActiveError)) throw error;
+      if (
+        !(error instanceof ExternalSiteRunActiveError) &&
+        !(error instanceof ExternalReviewSourcePolicyError)
+      ) {
+        throw error;
+      }
     }
   }
 }
