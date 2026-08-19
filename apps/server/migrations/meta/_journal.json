@@ -1538,15 +1538,8 @@
     {
       "idx": 219,
       "version": "7",
-      "when": 1787083887600,
-      "tag": "0219_salty_bucky",
-      "breakpoints": false
-    },
-    {
-      "idx": 220,
-      "version": "7",
-      "when": 1787084762596,
-      "tag": "0220_keen_ghost_rider",
+      "when": 1787101360353,
+      "tag": "0219_spotty_green_goblin",
       "breakpoints": false
     }
   ]

@@ -1,6 +1,6 @@
 {
-  "id": "1d195621-f3e4-41cf-b3b4-6faf5eff7d50",
-  "prevId": "928c9f84-4de8-402c-a07b-f73aa3b598ce",
+  "id": "6f47de0b-fe47-473c-874c-214e5e0ef261",
+  "prevId": "09d78f8e-cb92-44c2-8a7c-09909b69bf3c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1519,6 +1519,12 @@
           "type": "varchar(14)",
           "primaryKey": false,
           "notNull": true
+        },
+        "volume": {
+          "name": "volume",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -4208,6 +4214,13 @@
           "notNull": true,
           "default": 100
         },
+        "slice_request_count": {
+          "name": "slice_request_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "request_count": {
           "name": "request_count",
           "type": "integer",
@@ -4419,7 +4432,7 @@
       "checkConstraints": {
         "external_site_run_request_budget_check": {
           "name": "external_site_run_request_budget_check",
-          "value": "\"external_site_run\".\"request_limit\" > 0\n        AND \"external_site_run\".\"request_count\" >= 0\n        AND \"external_site_run\".\"request_count\" <= \"external_site_run\".\"request_limit\"\n        AND \"external_site_run\".\"retry_count\" >= 0\n        AND \"external_site_run\".\"rate_limit_count\" >= 0\n        AND \"external_site_run\".\"emitted_item_count\" >= 0"
+          "value": "\"external_site_run\".\"request_limit\" > 0\n        AND \"external_site_run\".\"slice_request_count\" >= 0\n        AND \"external_site_run\".\"slice_request_count\" <= \"external_site_run\".\"request_limit\"\n        AND \"external_site_run\".\"request_count\" >= 0\n        AND \"external_site_run\".\"retry_count\" >= 0\n        AND \"external_site_run\".\"rate_limit_count\" >= 0\n        AND \"external_site_run\".\"emitted_item_count\" >= 0"
         },
         "external_site_run_execution_pair_check": {
           "name": "external_site_run_execution_pair_check",
@@ -7743,6 +7756,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "external_product_id": {
+          "name": "external_product_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -7752,6 +7771,12 @@
         "image_url": {
           "name": "image_url",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "barcode": {
+          "name": "barcode",
+          "type": "varchar(14)",
           "primaryKey": false,
           "notNull": false
         },
@@ -7821,8 +7846,30 @@
         }
       },
       "indexes": {
-        "store_price_unq_name": {
-          "name": "store_price_unq_name",
+        "store_price_site_external_product_unq": {
+          "name": "store_price_site_external_product_unq",
+          "columns": [
+            {
+              "expression": "external_site_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "external_product_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"store_price\".\"external_product_id\" IS NOT NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "store_price_site_name_volume_idx": {
+          "name": "store_price_site_name_volume_idx",
           "columns": [
             {
               "expression": "external_site_id",
@@ -7843,7 +7890,7 @@
               "nulls": "last"
             }
           ],
-          "isUnique": true,
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -7918,7 +7965,12 @@
         }
       },
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "store_price_barcode_check": {
+          "name": "store_price_barcode_check",
+          "value": "\"store_price\".\"barcode\" IS NULL OR (\"store_price\".\"barcode\" ~ '^[0-9]+$' AND char_length(\"store_price\".\"barcode\") IN (8, 12, 13, 14))"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.tag": {

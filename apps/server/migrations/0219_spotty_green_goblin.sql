@@ -1,4 +1,34 @@
+CREATE TYPE "public"."external_review_publication_mode" AS ENUM('disabled', 'review_only', 'automatic');
 CREATE TYPE "public"."scrape_origin_robots_mode" AS ENUM('enforce', 'not_applicable');
+CREATE TABLE "external_review_source_policy" (
+	"external_site_id" bigint PRIMARY KEY NOT NULL,
+	"publication_mode" "external_review_publication_mode" DEFAULT 'disabled' NOT NULL,
+	"allow_fetching" boolean DEFAULT false NOT NULL,
+	"allow_llm_processing" boolean DEFAULT false NOT NULL,
+	"allow_score_display" boolean DEFAULT false NOT NULL,
+	"allow_summary_display" boolean DEFAULT false NOT NULL,
+	"policy_evidence_url" text,
+	"approval_reference" text,
+	"reviewed_at" timestamp,
+	"approved_by_actor_id" bigint,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "external_review_source_policy_disabled_check" CHECK ("external_review_source_policy"."publication_mode" <> 'disabled' OR (
+        NOT "external_review_source_policy"."allow_fetching"
+        AND NOT "external_review_source_policy"."allow_llm_processing"
+        AND NOT "external_review_source_policy"."allow_score_display"
+        AND NOT "external_review_source_policy"."allow_summary_display"
+      )),
+	CONSTRAINT "external_review_source_policy_summary_check" CHECK (NOT "external_review_source_policy"."allow_summary_display" OR "external_review_source_policy"."allow_llm_processing"),
+	CONSTRAINT "external_review_source_policy_approval_check" CHECK ("external_review_source_policy"."publication_mode" = 'disabled' OR (
+        "external_review_source_policy"."allow_fetching"
+        AND "external_review_source_policy"."policy_evidence_url" IS NOT NULL
+        AND "external_review_source_policy"."approval_reference" IS NOT NULL
+        AND "external_review_source_policy"."reviewed_at" IS NOT NULL
+        AND "external_review_source_policy"."approved_by_actor_id" IS NOT NULL
+      ))
+);
+
 CREATE TABLE "external_site_scrape_target" (
 	"external_site_id" bigint NOT NULL,
 	"target_key" text NOT NULL,
@@ -60,6 +90,7 @@ CREATE TABLE "scrape_target" (
 );
 
 ALTER TABLE "external_site_run" ADD COLUMN "request_limit" integer DEFAULT 100 NOT NULL;
+ALTER TABLE "external_site_run" ADD COLUMN "slice_request_count" integer DEFAULT 0 NOT NULL;
 ALTER TABLE "external_site_run" ADD COLUMN "request_count" integer DEFAULT 0 NOT NULL;
 ALTER TABLE "external_site_run" ADD COLUMN "retry_count" integer DEFAULT 0 NOT NULL;
 ALTER TABLE "external_site_run" ADD COLUMN "rate_limit_count" integer DEFAULT 0 NOT NULL;
@@ -68,6 +99,8 @@ ALTER TABLE "external_site_run" ADD COLUMN "cursor" jsonb;
 ALTER TABLE "external_site_run" ADD COLUMN "next_attempt_at" timestamp;
 ALTER TABLE "external_site_run" ADD COLUMN "execution_token" text;
 ALTER TABLE "external_site_run" ADD COLUMN "execution_expires_at" timestamp;
+ALTER TABLE "external_review_source_policy" ADD CONSTRAINT "external_review_source_policy_external_site_id_external_site_id_fk" FOREIGN KEY ("external_site_id") REFERENCES "public"."external_site"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "external_review_source_policy" ADD CONSTRAINT "external_review_source_policy_approved_by_actor_id_actor_id_fk" FOREIGN KEY ("approved_by_actor_id") REFERENCES "public"."actor"("id") ON DELETE restrict ON UPDATE no action;
 ALTER TABLE "external_site_scrape_target" ADD CONSTRAINT "external_site_scrape_target_external_site_id_external_site_id_fk" FOREIGN KEY ("external_site_id") REFERENCES "public"."external_site"("id") ON DELETE cascade ON UPDATE no action;
 ALTER TABLE "external_site_scrape_target" ADD CONSTRAINT "external_site_scrape_target_target_key_scrape_target_key_fk" FOREIGN KEY ("target_key") REFERENCES "public"."scrape_target"("key") ON DELETE restrict ON UPDATE no action;
 ALTER TABLE "scrape_origin" ADD CONSTRAINT "scrape_origin_target_key_scrape_target_key_fk" FOREIGN KEY ("target_key") REFERENCES "public"."scrape_target"("key") ON DELETE restrict ON UPDATE no action;
@@ -76,8 +109,9 @@ CREATE INDEX "scrape_origin_target_idx" ON "scrape_origin" USING btree ("target_
 CREATE INDEX "scrape_target_eligibility_idx" ON "scrape_target" USING btree ("enabled","blocked_until","next_request_at");
 CREATE INDEX "external_site_run_dispatch_idx" ON "external_site_run" USING btree ("status","next_attempt_at","execution_expires_at");
 ALTER TABLE "external_site_run" ADD CONSTRAINT "external_site_run_request_budget_check" CHECK ("external_site_run"."request_limit" > 0
+        AND "external_site_run"."slice_request_count" >= 0
+        AND "external_site_run"."slice_request_count" <= "external_site_run"."request_limit"
         AND "external_site_run"."request_count" >= 0
-        AND "external_site_run"."request_count" <= "external_site_run"."request_limit"
         AND "external_site_run"."retry_count" >= 0
         AND "external_site_run"."rate_limit_count" >= 0
         AND "external_site_run"."emitted_item_count" >= 0);

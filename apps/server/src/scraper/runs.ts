@@ -9,6 +9,7 @@ import * as Sentry from "@sentry/node";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { ScraperCoordinationError } from "./coordinator";
 import { findScraperSourceBySiteType } from "./definitions";
 import {
   ScraperHttpStatusError,
@@ -221,17 +222,20 @@ async function failRun(claim: ClaimedRun, error: unknown, completedAt: Date) {
 
 async function deferRun(
   claim: ClaimedRun,
-  error: ScraperRequestDeferredError,
+  error: ScraperRequestDeferredError | ScraperCoordinationError,
   now: Date,
 ) {
-  const nextAttemptAt =
-    error.nextEligibleAt ??
-    new Date(
-      now.getTime() +
-        (error.reason === "run_budget"
-          ? BUDGET_DEFERRAL_MS
-          : DEFAULT_DEFERRAL_MS),
-    );
+  let nextAttemptAt = new Date(now.getTime() + DEFAULT_DEFERRAL_MS);
+  if (error instanceof ScraperRequestDeferredError) {
+    nextAttemptAt =
+      error.nextEligibleAt ??
+      new Date(
+        now.getTime() +
+          (error.reason === "run_budget"
+            ? BUDGET_DEFERRAL_MS
+            : DEFAULT_DEFERRAL_MS),
+      );
+  }
   await db
     .update(externalSiteRuns)
     .set({
@@ -306,7 +310,10 @@ export async function executeScraperRun(
     await completeRun(claimed, clock.now());
     return { status: "completed" };
   } catch (error) {
-    if (error instanceof ScraperRequestDeferredError) {
+    if (
+      error instanceof ScraperRequestDeferredError ||
+      error instanceof ScraperCoordinationError
+    ) {
       const nextAttemptAt = await deferRun(claimed, error, clock.now());
       return { status: "deferred", nextAttemptAt };
     }

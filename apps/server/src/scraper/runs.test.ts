@@ -8,6 +8,7 @@ import {
   FixtureObservationSchema,
   fixtureScraperAdapter,
 } from "./adapters/fixture";
+import { ScraperCoordinationError } from "./coordinator";
 import {
   createScraperRegistry,
   defineScraperSource,
@@ -412,6 +413,35 @@ test("replay-safe sink prevents duplicate records after a lost checkpoint", asyn
   expect(observations).toEqual(
     new Map([["same", { id: "same", value: "value" }]]),
   );
+});
+
+test("defers transient traffic coordination failures", async () => {
+  const adapter: ScraperAdapter<
+    FixtureCursor,
+    FixtureObservation
+  > = async () => {
+    throw new ScraperCoordinationError(new Error("database unavailable"));
+  };
+  const { registry, run } = await setupRun({ adapter });
+
+  await expect(
+    executeScraperRun(
+      { runId: run.id },
+      { registry, clock: fixedClock(), executionToken: "owner" },
+    ),
+  ).resolves.toEqual({
+    status: "deferred",
+    nextAttemptAt: new Date("2026-08-18T12:15:00Z"),
+  });
+  const [stored] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(stored).toMatchObject({
+    status: "queued",
+    nextAttemptAt: new Date("2026-08-18T12:15:00Z"),
+    error: null,
+  });
 });
 
 test("rechecks source authorization after a queued wait", async () => {
