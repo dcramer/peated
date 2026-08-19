@@ -26,13 +26,14 @@
 
 ## 3. Existing Review Migration
 
-- [ ] 3.1 Backfill one review article for every existing review while
-      preserving source, URL, issue, rating, Bottle assignment, and visibility
+- [x] 3.1 Automatically backfill one review article for every existing review
+      in the schema migration while preserving source, URL, issue, rating,
+      Bottle assignment, and visibility without fetching publisher pages
 - [ ] 3.2 Switch review ingestion, queries, serializers, moderation, and fixtures
       to the article/review model
 - [ ] 3.3 Migrate the Whisky Advocate job to the shared article ingestion
       boundary without expanding its current collection or summary behavior
-- [ ] 3.4 Add migration verification for total, visible, unresolved, Bottle-linked,
+- [x] 3.4 Add migration verification for total, visible, unresolved, Bottle-linked,
       and canonical-URL counts
 - [ ] 3.5 Enforce article relationships and remove duplicated legacy review URL,
       issue, and source fields after the hard cutover

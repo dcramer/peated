@@ -194,7 +194,8 @@ state, or public availability.
 
 - **WHEN** the migration processes a current Whisky Advocate review
 - **THEN** it creates and links a review article while preserving the review's
-  current public behavior and identity
+  current public behavior and identity without fetching the publisher or
+  inventing unknown article metadata
 
 #### Scenario: Migration is verified
 

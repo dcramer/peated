@@ -23,11 +23,12 @@ export const reviewArticles = pgTable(
       .references(() => externalSites.id, { onDelete: "cascade" })
       .notNull(),
     canonicalUrl: text("canonical_url").notNull(),
-    title: text("title").notNull(),
+    // No-network legacy backfills leave source-derived metadata unknown.
+    title: text("title"),
     issue: text("issue"),
     publishedAt: timestamp("published_at"),
-    contentHash: text("content_hash").notNull(),
-    fetchedAt: timestamp("fetched_at").notNull(),
+    contentHash: text("content_hash"),
+    fetchedAt: timestamp("fetched_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

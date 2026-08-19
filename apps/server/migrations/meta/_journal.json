@@ -1555,6 +1555,13 @@
       "when": 1787112710801,
       "tag": "0221_right_hitman",
       "breakpoints": false
+    },
+    {
+      "idx": 222,
+      "version": "7",
+      "when": 1787114345476,
+      "tag": "0222_glossy_eternals",
+      "breakpoints": false
     }
   ]
 }
