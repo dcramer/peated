@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { TSVector } from "../db/columns";
 import type {
   NewBottle,
@@ -10,6 +11,11 @@ import { formatCategoryName } from "./format";
 const CASK_STRENGTH_SEARCH_TERMS =
   "cask strength barrel strength barrel proof full proof natural strength";
 const SINGLE_CASK_SEARCH_TERMS = "single cask single barrel";
+
+/** Parse user-entered names as literal words, never as search operators. */
+export function plainTextSearchQuery(query: string) {
+  return sql`plainto_tsquery('english', ${query})`;
+}
 
 function formatSearchAbv(abv: number | null | undefined) {
   if (abv === null || abv === undefined) {

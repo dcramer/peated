@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries } from "@peated/server/db/schema";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import { BottleSeriesSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -42,7 +43,7 @@ export default procedure
 
     if (query) {
       where.push(
-        sql`${bottleSeries.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${bottleSeries.searchVector} @@ ${plainTextSearchQuery(query)}`,
       );
     }
 

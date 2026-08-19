@@ -31,6 +31,18 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
+  test("treats search punctuation as plain text", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({ name: "Triple Distilled" });
+    await fixtures.Bottle({ name: "Triple Reserve" });
+
+    const { results } = await routerClient.bottles.list({
+      query: "Triple - Distilled",
+      sort: "rank",
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([bottle.id]);
+  });
+
   test("resolves aliases through direct Bottle ownership", async ({
     fixtures,
   }) => {

@@ -11,6 +11,7 @@ import {
   isReservedCollectionSlug,
   reservedCollectionSlugs,
 } from "@peated/server/lib/db";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import {
   CollectionBottleSchema,
@@ -127,7 +128,7 @@ export default procedure
           SELECT FROM ${bottleAliases}
           WHERE ${bottleAliases.bottleId} = ${collectionBottles.bottleId}
             AND LOWER(${bottleAliases.name}) = ${input.query.toLowerCase()}
-        ) OR ${bottles.searchVector} @@ websearch_to_tsquery ('english', ${input.query})`,
+        ) OR ${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
       );
     }
     if (input.brand) {
