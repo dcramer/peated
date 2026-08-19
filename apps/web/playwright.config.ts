@@ -10,19 +10,19 @@ const apiServer =
 export default defineConfig({
   testDir: "./e2e",
   outputDir: ".playwright/test-results",
-  timeout: 60_000,
-  globalTimeout: process.env.CI ? 12 * 60_000 : undefined,
-  maxFailures: process.env.CI ? 5 : 0,
+  timeout: 45_000,
+  globalTimeout: process.env.CI ? 7 * 60_000 : undefined,
+  maxFailures: process.env.CI ? 2 : 0,
   fullyParallel: true,
   workers: 2,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   reporter: [
     ["list"],
     ["html", { open: "never", outputFolder: ".playwright/report" }],
   ],
   expect: {
-    timeout: 30_000,
+    timeout: 15_000,
   },
   use: {
     baseURL,
@@ -32,6 +32,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium-desktop",
+      grepInvert: /@mobile/,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1440, height: 900 },
@@ -39,6 +40,7 @@ export default defineConfig({
     },
     {
       name: "chromium-mobile",
+      grep: /@mobile/,
       use: {
         ...devices["Pixel 5"],
         viewport: { width: 390, height: 844 },

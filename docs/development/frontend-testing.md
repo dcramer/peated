@@ -42,6 +42,9 @@ pnpm test:e2e:install
 - Use Playwright to prove a user-visible behavior: a workflow completes,
   navigation reaches the right destination, a mutation changes state, a filter
   changes results, access boundaries hold, or a browser-only interaction works.
+- Keep one Playwright test for each material user outcome. Test response
+  variants, validation rules, and deterministic rendering in Vitest unless the
+  browser makes a different decision.
 - Add breakpoint-specific Playwright coverage only when responsive behavior
   changes the interaction or available workflow. Do not rerun the same contract
   at multiple sizes solely to verify presentation.
@@ -52,6 +55,9 @@ pnpm test:e2e:install
   responsive appearance through manual QA or agent-browser screenshots.
 - Prefer the fewest assertions that prove the material outcome. Avoid repeating
   lower-level component or API contracts inside an end-to-end workflow.
+- Do not use Playwright for loading fallback structure or element geometry.
+  Prove fallback markup with focused tests. Check geometry during manual or
+  agent-based visual QA.
 - For user-facing web route/layout changes, run the related Vitest coverage and
   targeted `pnpm test:e2e` checks only when the changed workflow has a browser
   behavior to prove.
@@ -69,11 +75,23 @@ The suite starts two local servers:
 - a small mock RPC server on `127.0.0.1:4999`;
 - Next.js on `127.0.0.1:3200`.
 
-This keeps browser tests independent from a local database and API server. The
-current loading-fallback tests intentionally keep unknown `/rpc` calls pending
-so the real Next routes render their Suspense fallbacks. Browser workflow tests
-should reuse the shared e2e fixtures and add narrow mock RPC responses for the
-routes they exercise.
+This keeps browser tests independent from a local database and API server.
+Browser workflow tests should reuse the shared e2e fixtures and add narrow mock
+RPC responses for the routes they exercise.
+
+CI runs all browser workflows once with desktop Chromium. The mobile project
+runs only tests tagged `@mobile`. Use the tag only when a touch interaction,
+responsive control, or mobile-only workflow has a separate product contract:
+
+```ts
+test(
+  "uses the mobile-only interaction",
+  { tag: "@mobile" },
+  async ({ page }) => {
+    // Prove the interaction that differs on mobile.
+  },
+);
+```
 
 Useful overrides:
 
@@ -85,6 +103,23 @@ PLAYWRIGHT_BASE_URL=http://127.0.0.1:3200 pnpm test:e2e
 
 `PLAYWRIGHT_BASE_URL` skips starting Next, so only use it when an equivalent
 web server is already running with the API pointed at a compatible test target.
+
+## CI Budget
+
+- The Playwright command should finish in less than 5 minutes on a healthy CI
+  runner. Its hard timeout is 7 minutes. The 15-minute GitHub job timeout also
+  includes dependency and browser setup.
+- The suite can schedule at most 80 tests across all browser projects. The
+  `test:e2e` command checks this limit and the mobile tagging, timeout, retry,
+  and failure policies before it starts a browser.
+- A test gets one CI retry. Do not increase retries or timeouts to hide an
+  intermittent failure. Fix the ownership or remove browser coverage that a
+  cheaper test already proves.
+- CI stops after two failures so it can retain traces and report the failing
+  scenarios before the outer job timeout.
+- Review the browser count and CI duration when adding a scenario. If a change
+  pushes the healthy run above the budget, consolidate the suite in the same
+  change.
 
 ## Reliability Rules
 

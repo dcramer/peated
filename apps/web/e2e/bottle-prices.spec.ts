@@ -16,11 +16,6 @@ test.describe("Bottle prices", () => {
     context,
     page,
   }, testInfo) => {
-    test.skip(
-      testInfo.project.name.includes("mobile"),
-      "Market Prices is a desktop-only rail",
-    );
-
     await signIn(context, {
       accessToken: `${testAccessToken}-price-changes-${testInfo.project.name}`,
     });
@@ -47,11 +42,6 @@ test.describe("Bottle prices", () => {
     context,
     page,
   }, testInfo) => {
-    test.skip(
-      testInfo.project.name.includes("mobile"),
-      "Price-link behavior is not responsive",
-    );
-
     await signIn(context, {
       accessToken: `${testAccessToken}-store-prices-${testInfo.project.name}`,
       user: { ...testUser, admin: true },

@@ -10,9 +10,10 @@
     "test:ci": "vitest run --reporter=junit --reporter=default --outputFile=junit.xml",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/check-e2e-policy.mjs && playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:install": "playwright install chromium",
+    "test:e2e:policy": "node scripts/check-e2e-policy.mjs",
     "test:e2e:report": "playwright show-report .playwright/report",
     "test:e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit"
