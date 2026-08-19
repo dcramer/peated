@@ -204,6 +204,17 @@ age, edition, year, marketed finish or exact cask code, single-cask, or
 cask-strength facts are strong evidence of distinct Bottles. Cask type, size,
 and fill metadata alone is not such a conflict.
 
+A retailer listing is identified by its source and stable external product id,
+falling back to its canonical product URL when the source exposes no id. Its
+title is evidence, not listing identity: two same-size listings with the same
+generic title may represent different releases and must remain separate.
+
+A retailer GTIN is stored first as a source claim. An existing canonical GTIN
+mapping may assign a listing directly only when package volume and explicit
+Bottle facts do not conflict. Canonical barcode creation remains an explicit
+moderator operation; approving a Bottle match does not promote or overwrite a
+retailer's barcode claim.
+
 Change a populated exact field only with evidence for the same Bottle. A value
 from another batch, edition, year, or exact cask does not qualify.
 

@@ -29,6 +29,7 @@ test("scrapes directly buyable bottles and excludes ineligible cards", async ({
   expect(items).toEqual([
     {
       currency: "gbp",
+      externalProductId: "13670",
       imageUrl:
         "https://www.thewhiskyworld.com/images/hazelwood-legacy-collection-p13670_thumb.jpg",
       name: "A Breath Of Fresh Air - House of Hazelwood Legacy Collection",
@@ -38,6 +39,7 @@ test("scrapes directly buyable bottles and excludes ineligible cards", async ({
     },
     {
       currency: "gbp",
+      externalProductId: "201",
       imageUrl:
         "https://www.thewhiskyworld.com/images/compass-box-orchard-house-p201_thumb.jpg",
       name: "Compass Box Orchard House",
@@ -47,6 +49,7 @@ test("scrapes directly buyable bottles and excludes ineligible cards", async ({
     },
     {
       currency: "gbp",
+      externalProductId: "202",
       imageUrl:
         "https://www.thewhiskyworld.com/images/minor-case-p202_thumb.jpg",
       name: "Minor Case Sherry Cask Rye Whiskey",
@@ -56,6 +59,7 @@ test("scrapes directly buyable bottles and excludes ineligible cards", async ({
     },
     {
       currency: "gbp",
+      externalProductId: "203",
       imageUrl:
         "https://www.thewhiskyworld.com/images/dalmore-trio-p203_thumb.jpg",
       name: "The Dalmore The Trio",
@@ -65,6 +69,7 @@ test("scrapes directly buyable bottles and excludes ineligible cards", async ({
     },
     {
       currency: "gbp",
+      externalProductId: "204",
       imageUrl:
         "https://www.thewhiskyworld.com/images/cask-canvas-p204_thumb.jpg",
       name: "Cask & Canvas The Duo",

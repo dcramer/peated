@@ -24,6 +24,7 @@ export default procedure
       .object({
         bottle: z.coerce.number(),
         barcode: GtinSchema,
+        volume: z.coerce.number().int().positive().nullable().optional(),
       })
       .strict(),
   )
@@ -47,6 +48,7 @@ export default procedure
           bottleId: bottle.id,
           value: normalized.value,
           gtin14: normalized.gtin14,
+          volume: input.volume ?? null,
           createdByActorId: actor.id,
         })
         .onConflictDoNothing({ target: bottleBarcodes.gtin14 })
@@ -69,6 +71,28 @@ export default procedure
         throw errors.CONFLICT({
           message: "Barcode is already assigned to another Bottle.",
         });
+      }
+      if (
+        input.volume !== undefined &&
+        existing.volume !== null &&
+        existing.volume !== input.volume
+      ) {
+        throw errors.CONFLICT({
+          message: "Barcode is already assigned with another volume.",
+        });
+      }
+      if (input.volume !== undefined && existing.volume === null) {
+        const [updated] = await tx
+          .update(bottleBarcodes)
+          .set({ volume: input.volume })
+          .where(eq(bottleBarcodes.id, existing.id))
+          .returning();
+        if (!updated) {
+          throw errors.CONFLICT({
+            message: "Bottle barcode changed while it was being assigned.",
+          });
+        }
+        return updated;
       }
       return existing;
     });

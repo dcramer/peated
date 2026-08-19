@@ -8,6 +8,7 @@ export function serializeBottleBarcode(
     id: barcode.id,
     bottle: barcode.bottleId,
     value: barcode.value,
+    volume: barcode.volume,
     createdAt: barcode.createdAt.toISOString(),
   };
 }

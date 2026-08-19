@@ -71,6 +71,8 @@ function makePrice(overrides: Partial<StorePrice>): StorePrice {
   return {
     id: 1,
     name: "Store listing",
+    externalProductId: null,
+    barcode: null,
     price: 7999,
     currency: "usd",
     url: "https://example.com/store-listing",

@@ -23,6 +23,7 @@ export const BottleBarcodeSchema = z.object({
   id: z.number().readonly(),
   bottle: z.number().readonly(),
   value: z.string().readonly(),
+  volume: z.number().int().positive().nullable().readonly(),
   createdAt: z.string().datetime().readonly(),
 });
 

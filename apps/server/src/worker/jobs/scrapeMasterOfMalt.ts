@@ -5,6 +5,7 @@ import type {
   StorePrice,
 } from "@peated/server/lib/scraper";
 import scrapePrices from "@peated/server/lib/scraper";
+import { GtinSchema } from "@peated/server/schemas";
 import axios from "axios";
 import { z } from "zod";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
@@ -49,6 +50,7 @@ const ProductSchema = z
     in_stock: z.literal(true),
     name: z.string().trim().min(1),
     sku: z.string().trim().min(1),
+    upc: z.string().trim().nullable().optional(),
     url: z.string().trim().min(1),
     volume: z.number().positive(),
   })
@@ -183,13 +185,16 @@ export function parseMasterOfMaltProducts(input: unknown): StorePrice[] {
     }
 
     const { name } = normalizeBottle({ name: product.name });
+    const barcode = GtinSchema.safeParse(product.upc);
     const listing = {
+      externalProductId: product.sku,
       name,
       price,
       currency: "gbp" as const,
       volume,
       url,
       imageUrl,
+      ...(barcode.success ? { barcode: barcode.data } : {}),
     };
 
     logScrapedProduct(SITE, listing);
@@ -213,6 +218,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         "in_stock",
         "name",
         "sku",
+        "upc",
         "url",
         "volume",
       ],

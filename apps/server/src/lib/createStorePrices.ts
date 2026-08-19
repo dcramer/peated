@@ -2,9 +2,10 @@ import {
   normalizeBottle,
   normalizeBottleAliasKey,
 } from "@peated/bottle-classifier/normalize";
-import { db } from "@peated/server/db";
-import type { StorePrice } from "@peated/server/db/schema";
+import { getExistingMatchIdentityConflicts } from "@peated/bottle-classifier/priceMatchingEvidence";
+import { db, type AnyTransaction } from "@peated/server/db";
 import {
+  bottleBarcodes,
   externalSites,
   storePriceHistories,
   storePrices,
@@ -18,7 +19,9 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
+import { normalizeGtin, type NormalizedGtin } from "@peated/server/lib/gtin";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -28,7 +31,7 @@ import {
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 /**
@@ -47,6 +50,173 @@ export type CreateStorePricesInput = z.input<
   typeof CreateStorePricesInputSchema
 >;
 
+type ParsedStorePrice = z.output<typeof StorePriceInputSchema>;
+
+function getStorePriceIdentityCondition({
+  externalProductId,
+  externalSiteId,
+  url,
+}: {
+  externalProductId?: string;
+  externalSiteId: number;
+  url: string;
+}) {
+  const urlCondition = eq(storePrices.url, url);
+  return externalProductId
+    ? or(
+        urlCondition,
+        and(
+          eq(storePrices.externalSiteId, externalSiteId),
+          eq(storePrices.externalProductId, externalProductId),
+        ),
+      )!
+    : urlCondition;
+}
+
+async function findStorePriceForUpdate(
+  tx: AnyTransaction,
+  input: {
+    externalProductId?: string;
+    externalSiteId: number;
+    url: string;
+  },
+) {
+  const rows = await tx
+    .select()
+    .from(storePrices)
+    .where(getStorePriceIdentityCondition(input))
+    .for("update");
+  if (rows.length > 1) {
+    throw new Error(
+      `Store product identity resolves to multiple price rows (${input.externalSiteId}, ${input.externalProductId ?? input.url}).`,
+    );
+  }
+  return rows[0] ?? null;
+}
+
+async function lockStorePriceIdentity(
+  tx: AnyTransaction,
+  {
+    externalProductId,
+    externalSiteId,
+    url,
+  }: {
+    externalProductId?: string;
+    externalSiteId: number;
+    url: string;
+  },
+) {
+  const keys = [
+    `store-price-url:${url}`,
+    ...(externalProductId
+      ? [`store-price-product:${externalSiteId}:${externalProductId}`]
+      : []),
+  ].sort();
+  for (const key of keys) {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))`,
+    );
+  }
+}
+
+async function persistStorePriceInTransaction({
+  tx,
+  externalSiteId,
+  input,
+  name,
+  normalizedBarcode,
+  bottleId,
+}: {
+  tx: AnyTransaction;
+  externalSiteId: number;
+  input: ParsedStorePrice;
+  name: string;
+  normalizedBarcode: NormalizedGtin | null;
+  bottleId: number | null;
+}) {
+  const identity = {
+    externalProductId: input.externalProductId,
+    externalSiteId,
+    url: input.url,
+  };
+  // Both source ids and fallback URLs are serialization boundaries. Ordering
+  // the locks prevents two simultaneous URL/id changes from deadlocking.
+  await lockStorePriceIdentity(tx, identity);
+  let existing = await findStorePriceForUpdate(tx, identity);
+  if (!existing) {
+    const [created] = await tx
+      .insert(storePrices)
+      .values({
+        bottleId,
+        externalSiteId,
+        externalProductId: input.externalProductId ?? null,
+        name,
+        volume: input.volume,
+        price: input.price,
+        currency: input.currency,
+        url: input.url,
+        barcode: normalizedBarcode?.value ?? null,
+        sourceBottleIdentity: input.sourceBottleIdentity ?? null,
+      })
+      .onConflictDoNothing()
+      .returning();
+    if (created) return created;
+
+    existing = await findStorePriceForUpdate(tx, identity);
+    if (!existing) {
+      throw new Error(
+        `Store product changed while its price was being saved (${externalSiteId}, ${input.externalProductId ?? input.url}).`,
+      );
+    }
+  }
+
+  if (
+    existing.externalSiteId !== externalSiteId ||
+    (input.externalProductId &&
+      existing.externalProductId &&
+      input.externalProductId !== existing.externalProductId)
+  ) {
+    throw new Error(
+      `Store URL is already assigned to another source product (${externalSiteId}, ${input.url}).`,
+    );
+  }
+
+  const persistedBottleId =
+    bottleId !== null &&
+    (existing.bottleId === null || existing.bottleId === bottleId)
+      ? bottleId
+      : existing.bottleId;
+  const barcodeUpdate =
+    input.barcode === undefined
+      ? {}
+      : {
+          barcode: normalizedBarcode?.value ?? null,
+        };
+  const [updated] = await tx
+    .update(storePrices)
+    .set({
+      bottleId: persistedBottleId,
+      externalProductId: input.externalProductId ?? existing.externalProductId,
+      name,
+      volume: input.volume,
+      price: input.price,
+      currency: input.currency,
+      url: input.url,
+      ...barcodeUpdate,
+      sourceBottleIdentity:
+        input.sourceBottleIdentity ?? existing.sourceBottleIdentity,
+      updatedAt: sql`NOW()`,
+    })
+    .where(eq(storePrices.id, existing.id))
+    .returning();
+  if (!updated) {
+    throw new Error(
+      `Store price changed while it was being saved (${existing.id}).`,
+    );
+  }
+  return updated;
+}
+
 /** Persists one scraper batch with attribution chosen by the owning boundary. */
 export async function createStorePrices(rawInput: unknown, actorId: number) {
   const input = CreateStorePricesInputSchema.parse(rawInput);
@@ -62,20 +232,58 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
     const prices = input.prices.slice(at, at + 10);
     await Promise.all(
       prices.map(async (sp) => {
+        const normalizedBarcode =
+          sp.barcode === undefined || sp.barcode === null
+            ? null
+            : normalizeGtin(sp.barcode);
+        const initialBarcode = normalizedBarcode
+          ? await db.query.bottleBarcodes.findFirst({
+              where: eq(bottleBarcodes.gtin14, normalizedBarcode.gtin14),
+            })
+          : null;
+        const barcodeCandidate =
+          initialBarcode && sp.sourceBottleIdentity
+            ? await getBottleCandidateById(initialBarcode.bottleId)
+            : null;
+        const barcodeIdentityConflicts = sp.sourceBottleIdentity
+          ? barcodeCandidate
+            ? getExistingMatchIdentityConflicts({
+                target: barcodeCandidate,
+                extractedLabel: sp.sourceBottleIdentity,
+              })
+            : ["barcode target is not an active Bottle"]
+          : [];
+
         const { price, aliasAssignment } = await db.transaction(async (tx) => {
           const { name } = normalizeBottle({ name: sp.name });
           const aliasKey = normalizeBottleAliasKey(sp.name);
-          const sourceBottleIdentity =
-            sp.sourceBottleIdentity === undefined
-              ? sql`NULL`
-              : sql`${JSON.stringify(sp.sourceBottleIdentity)}::jsonb`;
           // New assignments use the deterministic key, but lookup still
           // accepts legacy raw aliases created before alias keys existed.
           let match = await findBottleAliasAssignment(aliasKey, tx);
           if (!match && aliasKey !== sp.name) {
             match = await findBottleAliasAssignment(sp.name, tx);
           }
-          const bottleId = match?.bottleId ?? null;
+          const currentBarcode = normalizedBarcode
+            ? await tx.query.bottleBarcodes.findFirst({
+                where: eq(bottleBarcodes.gtin14, normalizedBarcode.gtin14),
+              })
+            : null;
+          // A canonical barcode bypasses classification only when package
+          // volume, explicit source facts, and any exact alias all agree.
+          const barcodeBottleId =
+            currentBarcode &&
+            currentBarcode.bottleId === initialBarcode?.bottleId &&
+            (currentBarcode.volume === null ||
+              currentBarcode.volume === sp.volume) &&
+            barcodeIdentityConflicts.length === 0
+              ? currentBarcode.bottleId
+              : null;
+          const bottleId = currentBarcode
+            ? barcodeBottleId !== null &&
+              (match === null || match.bottleId === barcodeBottleId)
+              ? barcodeBottleId
+              : null
+            : (match?.bottleId ?? null);
           if (bottleId !== null) {
             try {
               await resolveActiveBottleIds(tx, [bottleId], {
@@ -102,59 +310,19 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
             }
           }
 
-          // A concurrent conflict may add identity first, so only fill an
-          // unresolved row or reaffirm the same Bottle.
-          const {
-            rows: [
-              { id: rawPriceId, imageUrl, bottleId: rawPersistedBottleId },
-            ],
-          } = await tx.execute<
-            Pick<StorePrice, "id" | "imageUrl" | "bottleId">
-          >(sql`
-            INSERT INTO ${storePrices} (
-              bottle_id,
-              external_site_id,
-              name,
-              volume,
-              price,
-              currency,
-              url,
-              source_bottle_identity
-            )
-            VALUES (
-              ${bottleId},
-              ${site.id},
-              ${name},
-              ${sp.volume},
-              ${sp.price},
-              ${sp.currency},
-              ${sp.url},
-              ${sourceBottleIdentity}
-            )
-            ON CONFLICT (external_site_id, LOWER(name), volume)
-            DO UPDATE
-            SET bottle_id = CASE
-                  WHEN excluded.bottle_id IS NOT NULL
-                    AND (${storePrices.bottleId} IS NULL
-                      OR ${storePrices.bottleId} = excluded.bottle_id)
-                  THEN excluded.bottle_id
-                  ELSE ${storePrices.bottleId}
-                END,
-                price = excluded.price,
-                currency = excluded.currency,
-                url = excluded.url,
-                source_bottle_identity = COALESCE(
-                  excluded.source_bottle_identity,
-                  ${storePrices.sourceBottleIdentity}
-                ),
-                updated_at = NOW()
-            RETURNING id, image_url AS "imageUrl", bottle_id AS "bottleId"
-          `);
-          const priceId = Number(rawPriceId);
-          const persistedBottleId =
-            rawPersistedBottleId === null ? null : Number(rawPersistedBottleId);
-          const hasAliasMatch =
+          const persisted = await persistStorePriceInTransaction({
+            tx,
+            externalSiteId: site.id,
+            input: sp,
+            name,
+            normalizedBarcode,
+            bottleId,
+          });
+          const priceId = persisted.id;
+          const persistedBottleId = persisted.bottleId;
+          const hasDirectMatch =
             bottleId !== null && persistedBottleId === bottleId;
+          const hasAliasMatch = hasDirectMatch && match?.bottleId === bottleId;
           const aliasAssignment = hasAliasMatch
             ? await assignBottleAliasInTransaction(tx, {
                 name: aliasKey,
@@ -182,8 +350,8 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
           return {
             price: {
               id: priceId,
-              imageUrl,
-              hasAliasMatch,
+              imageUrl: persisted.imageUrl,
+              hasDirectMatch,
             },
             aliasAssignment,
           };
@@ -202,7 +370,7 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
           });
         }
 
-        if (!price.hasAliasMatch) {
+        if (!price.hasDirectMatch) {
           await pushUniqueJob("ResolveStorePriceBottle", {
             priceId: price.id,
           });

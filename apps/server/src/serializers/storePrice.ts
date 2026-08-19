@@ -88,6 +88,8 @@ export const StorePriceSerializer = serializer({
     return {
       id: item.id,
       name: item.name,
+      externalProductId: item.externalProductId,
+      barcode: item.barcode,
       price: item.price,
       volume: item.volume,
       currency: item.currency,
@@ -150,6 +152,8 @@ export const StorePriceWithSiteSerializer = serializer({
     return {
       id: item.id,
       name: item.name,
+      externalProductId: item.externalProductId,
+      barcode: item.barcode,
       price: item.price,
       volume: item.volume,
       currency: item.currency,

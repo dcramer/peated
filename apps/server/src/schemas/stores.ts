@@ -1,6 +1,7 @@
 import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
 import { z } from "zod";
 import { ALLOWED_VOLUMES } from "../constants";
+import { GtinSchema } from "./bottleBarcodes";
 import { BottleSchema } from "./bottles";
 import { CurrencyEnum } from "./common";
 import { ExternalSiteSchema } from "./externalSites";
@@ -10,6 +11,16 @@ import { ExternalSiteSchema } from "./externalSites";
 export const StorePriceSchema = z.object({
   id: z.number().describe("Unique identifier for the store price"),
   name: z.string().describe("Name of the product as listed by the store"),
+  externalProductId: z
+    .string()
+    .nullable()
+    .readonly()
+    .describe("Stable product or variant identifier assigned by the store"),
+  barcode: z
+    .string()
+    .nullable()
+    .readonly()
+    .describe("GTIN barcode claimed by the store"),
   price: z.number().describe("Current price of the listing"),
   currency: CurrencyEnum.describe("Currency of the price"),
   url: z.string().describe("URL to the product page"),
@@ -39,6 +50,15 @@ export const StorePriceSchema = z.object({
 });
 
 export const StorePriceInputSchema = z.object({
+  externalProductId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(255)
+    .optional()
+    .describe(
+      "Stable product or variant identifier assigned by the store; omission preserves an existing value",
+    ),
   name: z
     .string()
     .trim()
@@ -66,6 +86,11 @@ export const StorePriceInputSchema = z.object({
     .default(null)
     .optional()
     .describe("Optional URL to the product image"),
+  barcode: GtinSchema.nullable()
+    .optional()
+    .describe(
+      "GTIN-8, GTIN-12, GTIN-13, or GTIN-14 barcode; omission preserves an existing claim and null clears it",
+    ),
   sourceBottleIdentity: BottleExtractedDetailsSchema.optional().describe(
     "Optional normalized Bottle identity facts supplied by the source",
   ),

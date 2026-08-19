@@ -292,7 +292,7 @@ describe("scrapePrices", () => {
     ).toMatchObject([{ name: "Queued Product", price: 1000 }]);
   });
 
-  it("deduplicates same-name same-volume products", async ({ fixtures }) => {
+  it("keeps distinct same-name same-volume products", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
       if (!url.endsWith("/1")) return;
@@ -328,7 +328,47 @@ describe("scrapePrices", () => {
         price: 1000,
         url: "https://test.com/product1",
       },
+      {
+        name: "Product 1",
+        price: 1100,
+        url: "https://test.com/product1-special",
+      },
     ]);
+  });
+
+  it("deduplicates repeated external product ids", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
+      if (!url.endsWith("/1")) return;
+      await cb({
+        externalProductId: "sku-123",
+        name: "Product 1",
+        price: 1000,
+        currency: "usd",
+        url: "https://test.com/product1",
+        volume: 750,
+      });
+      await cb({
+        externalProductId: "sku-123",
+        name: "Product 1 renamed",
+        price: 1100,
+        currency: "usd",
+        url: "https://test.com/product1-new-url",
+        volume: 750,
+      });
+    };
+
+    await scrapePrices(
+      site.type,
+      (page) => `https://test.com/page/${page}`,
+      scrapeProducts,
+    );
+
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject([{ externalProductId: "sku-123", price: 1000 }]);
   });
 
   it("keeps same-name products with different volumes", async ({

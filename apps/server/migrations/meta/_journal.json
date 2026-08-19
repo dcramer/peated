@@ -1527,6 +1527,13 @@
       "when": 1786639636385,
       "tag": "0217_close_schema_version_1_bottle_checks",
       "breakpoints": false
+    },
+    {
+      "idx": 218,
+      "version": "7",
+      "when": 1787097436494,
+      "tag": "0218_volatile_strong_guy",
+      "breakpoints": false
     }
   ]
 }
