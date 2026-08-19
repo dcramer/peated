@@ -13,10 +13,8 @@ export default function ExternalSiteRunStatus({
   compact?: boolean;
 }) {
   const run = site.latestRun;
-  const disabled = site.runEvery === null && run === null;
-  const status = disabled ? "disabled" : (run?.status ?? "never");
+  const status = run?.status ?? "never";
   const labels = {
-    disabled: "Disabled",
     never: "Never recorded",
     queued: "Queued",
     running: "Running",
@@ -24,7 +22,6 @@ export default function ExternalSiteRunStatus({
     failed: "Failed",
   } as const;
   const colors = {
-    disabled: "bg-slate-500",
     never: "bg-slate-500",
     queued: "bg-sky-400",
     running: "bg-amber-400",
@@ -46,7 +43,7 @@ export default function ExternalSiteRunStatus({
           className={classNames("h-2 w-2 rounded-full", colors[status])}
         />
         {labels[status]}
-        {timestamp && !disabled ? (
+        {timestamp ? (
           <span className="text-muted font-normal">
             · <TimeSince date={timestamp} />
           </span>

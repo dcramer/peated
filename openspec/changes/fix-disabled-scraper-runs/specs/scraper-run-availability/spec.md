@@ -45,3 +45,22 @@ The administrator scraper detail SHALL make the manual action unavailable when s
 
 - **WHEN** an administrator views a registered source whose required target is absent from synchronized runtime state
 - **THEN** the run action SHALL be disabled and explain that the target is not synchronized
+
+### Requirement: Manual-only scheduling remains runnable
+
+The system MUST treat a null schedule as disabled automatic scheduling, not as disabled scraper traffic or run history.
+
+#### Scenario: Administrator views a manual-only source
+
+- **WHEN** a source has no automatic schedule, has an enabled synchronized target, and has no recorded run
+- **THEN** the admin UI SHALL show a manual-only schedule, show that no run is recorded, and allow the administrator to start a run
+
+#### Scenario: Manual-only run needs robots rules
+
+- **WHEN** an administrator starts a manual-only source with unknown or expired robots state
+- **THEN** the runtime SHALL refresh robots rules through the governed request path before attempting public catalog traffic
+
+#### Scenario: Scheduled source has no next-run timestamp
+
+- **WHEN** a source has an automatic schedule and no next-run timestamp
+- **THEN** the admin UI SHALL identify the source as due now rather than not scheduled

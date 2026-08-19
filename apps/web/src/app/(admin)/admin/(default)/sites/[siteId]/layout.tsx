@@ -144,6 +144,8 @@ export default function Layout(props: {
               <dd className="order-1 text-sm font-bold text-white sm:text-base">
                 {site.nextRunAt ? (
                   <TimeSince date={site.nextRunAt} />
+                ) : site.runEvery !== null ? (
+                  "Due now"
                 ) : (
                   "Not scheduled"
                 )}

@@ -54,7 +54,6 @@ const legacyPriceSources = [
   {
     type: "astorwines",
     origin: "https://www.astorwines.com",
-    enabled: false,
     scrape: scrapeAstorWines,
   },
   {

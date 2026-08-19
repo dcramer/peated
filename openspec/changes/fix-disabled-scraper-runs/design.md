@@ -10,10 +10,11 @@ Scraper target enablement is code-owned and synchronized to SQL. Run admission c
 - Refuse new durable work before insertion or queue dispatch.
 - Recheck the policy during execution so queued work cannot bypass a later change.
 - Make the admin action match the factual runtime state.
+- Keep automatic scheduling, run history, and traffic readiness as separate operator concerns.
 
 **Non-Goals:**
 
-- Enabling Astor Wines or bypassing its Cloudflare response.
+- Bypassing Astor Wines' non-browser catalog response.
 - Adding runtime-editable scraper policy.
 - Adding new logging, cancellation, or database fields.
 
@@ -37,8 +38,15 @@ The web client will use the existing registration, synchronized target, target e
 
 Alternative: return a new server-computed availability field. The existing health response already contains the small set of facts needed by this one component.
 
+### Represent Astor Wines as manual-only
+
+Astor Wines will keep its null schedule so the scheduler never creates work for it. Its traffic target will be enabled so an explicit administrator run can acquire a permit, refresh unknown or expired robots rules, and attempt the catalog. The admin run-status label will describe only recorded runs; schedule and traffic readiness remain separate fields.
+
+Alternative: let manual runs bypass disabled targets. That weakens the code-owned no-network guard and adds a second permit policy when the existing schedule field already represents manual-only operation.
+
 ## Risks / Trade-offs
 
 - **A source later treats a declared target as optional** → Current source definitions describe required traffic targets. Introduce optionality only with a proven source requirement.
 - **The UI health snapshot becomes stale after a deploy** → The server-side admission check remains authoritative and returns a conflict.
 - **An existing queued run is delivered after the change** → Worker execution rechecks enablement and stores a terminal disabled-target error before adapter or network work.
+- **Astor still rejects the catalog request** → The manual run reports the remote failure after robots evaluation instead of appearing disabled or waiting on a false robots deferral.

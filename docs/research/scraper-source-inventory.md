@@ -7,7 +7,7 @@ estimate of current live inventory.
 
 | Source             | Exact origin                               | Request and continuation shape                                                                     | Fixture baseline                                                    |
 | ------------------ | ------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Astor Wines        | `https://www.astorwines.com`               | GET HTML, two paginated categories                                                                 | 12 items on listing fixture; target disabled pending policy review  |
+| Astor Wines        | `https://www.astorwines.com`               | GET HTML, two paginated categories                                                                 | 12 items on listing fixture; manual-only                            |
 | Berry Bros. & Rudd | `https://www.bbr.com`                      | GET HTML pages                                                                                     | 3 items                                                             |
 | Bruichladdich      | `https://www.bruichladdich.com`            | GET JSON pages                                                                                     | 4 items; runtime integration persists 4                             |
 | Cadenhead's        | `https://www.cadenhead.shop`               | GET WooCommerce JSON pages                                                                         | 2 items                                                             |

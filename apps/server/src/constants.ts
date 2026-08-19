@@ -23,9 +23,7 @@ export const CATEGORY_LIST = [
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
 export const EXTERNAL_SITE_DEFINITIONS = {
-  // Disabled: Astor rejects non-browser clients, while Total Wine requires an
-  // interactive human-verification challenge. Keep both registered so their
-  // existing data and scraper implementations remain available for a future fix.
+  // Astor stays manual-only while its non-browser catalog behavior is checked.
   astorwines: { name: "Astor Wines", runEvery: null },
   berrybrosrudd: { name: "Berry Bros. & Rudd", runEvery: 10080 },
   bruichladdich: { name: "Bruichladdich", runEvery: 10080 },
@@ -52,6 +50,8 @@ export const EXTERNAL_SITE_DEFINITIONS = {
     runEvery: 10080,
   },
   thompsonbros: { name: "Thompson Bros.", runEvery: 10080 },
+  // Total Wine requires an interactive human-verification challenge. Its
+  // traffic target remains disabled while existing data stays visible.
   totalwine: { name: "Total Wines", runEvery: null },
   woodencork: { name: "Wooden Cork", runEvery: 10080 },
   whiskyadvocate: {

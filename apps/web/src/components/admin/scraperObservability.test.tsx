@@ -1,6 +1,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import ExternalSiteRunStatus from "./externalSiteRunStatus";
 import ExternalSiteRunTelemetry from "./externalSiteRunTelemetry";
 import ScraperCatalogCoverage from "./scraperCatalogCoverage";
 import ScraperReadiness from "./scraperReadiness";
@@ -86,20 +87,27 @@ describe("scraper observability", () => {
     });
   });
 
-  it("allows a synchronized enabled scraper", () => {
-    expect(
-      getScraperRunAvailability({
-        ...site,
-        runtime: {
-          ...site.runtime,
-          targets: site.runtime.targets.map((target) => ({
-            ...target,
-            enabled: true,
-          })),
-        },
-        reviewPolicy: { ...site.reviewPolicy, allowFetching: true },
-      }),
-    ).toBeNull();
+  it("allows a synchronized enabled manual-only scraper", () => {
+    const manualOnlySite = {
+      ...site,
+      runEvery: null,
+      runtime: {
+        ...site.runtime,
+        targets: site.runtime.targets.map((target) => ({
+          ...target,
+          enabled: true,
+        })),
+      },
+      reviewPolicy: { ...site.reviewPolicy, allowFetching: true },
+    };
+
+    expect(getScraperRunAvailability(manualOnlySite)).toBeNull();
+
+    const html = renderToStaticMarkup(
+      <ExternalSiteRunStatus site={manualOnlySite} />,
+    );
+    expect(html).toContain("Never recorded");
+    expect(html).not.toContain("Disabled");
   });
 
   it("shows runtime, robots, and review-policy readiness", () => {

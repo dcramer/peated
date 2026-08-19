@@ -8,6 +8,7 @@ The admin action can queue a scraper run whose code-owned traffic target is disa
 - Recheck target enablement in the worker so already-queued runs fail before adapter or network execution.
 - Preserve permanent request-policy failures during robots evaluation instead of converting them to transient robots failures.
 - Disable the admin run action and explain the disabled or unsynchronized target state.
+- Keep manual-only scheduling distinct from disabled traffic, and allow Astor Wines manual runs to refresh robots state and attempt the scraper.
 
 ## Capabilities
 
@@ -22,5 +23,5 @@ None.
 ## Impact
 
 - Changes scraper lifecycle admission, worker execution, and robots error translation.
-- Changes the administrator scraper detail action.
+- Changes administrator scraper status, schedule, readiness, and run-action presentation.
 - Adds focused server and web regression coverage without changing storage schemas or traffic policy configuration.
