@@ -3,6 +3,18 @@ import { BottleSchema } from "./bottles";
 import { CategoryEnum } from "./common";
 import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
 
+export const NativeScoreSchema = z
+  .object({
+    value: z.number().finite().nonnegative(),
+    scale: z.number().finite().positive(),
+    display: z.string().trim().min(1).max(50),
+  })
+  .strict()
+  .refine(({ value, scale }) => value <= scale, {
+    message: "Native score value cannot exceed its scale.",
+    path: ["value"],
+  });
+
 export const ReviewSchema = z.object({
   id: z.number().describe("Unique identifier for the review"),
   name: z.string().describe("Name of the reviewed product"),
@@ -14,6 +26,13 @@ export const ReviewSchema = z.object({
   site: ExternalSiteSchema.optional().describe(
     "External site where the review was published",
   ),
+  article: z.object({
+    title: z.string().nullable(),
+    publishedAt: z.string().datetime().nullable(),
+  }),
+  reviewerName: z.string().nullable(),
+  nativeScore: NativeScoreSchema.nullable(),
+  summary: z.string().nullable(),
   bottle: BottleSchema.nullable().describe(
     "Bottle associated with the review, or null when unresolved",
   ),

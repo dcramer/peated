@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  externalReviewSourcePolicies,
   externalSites,
   reviewArticles,
   reviews,
@@ -14,7 +15,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike, isNull } from "drizzle-orm";
+import { and, asc, eq, ilike, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z
@@ -69,6 +70,17 @@ export default procedure
     const hasPublicScope = input.bottle !== undefined;
     const requiresModerator = input.onlyUnknown || !hasPublicScope;
 
+    if (hasPublicScope) {
+      // No-fetch migration articles have no content hash and preserve their
+      // legacy visibility. Newly fetched articles require automatic mode.
+      baseWhere.push(
+        or(
+          isNull(reviewArticles.contentHash),
+          eq(externalReviewSourcePolicies.publicationMode, "automatic"),
+        ),
+      );
+    }
+
     if (requiresModerator && !context.user?.admin && !context.user?.mod) {
       logWarn("User requested review list without moderator permissions", {
         extra: {
@@ -97,6 +109,13 @@ export default procedure
       .select({ review: reviews })
       .from(reviews)
       .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+      .leftJoin(
+        externalReviewSourcePolicies,
+        eq(
+          reviewArticles.externalSiteId,
+          externalReviewSourcePolicies.externalSiteId,
+        ),
+      )
       .where(and(...baseWhere, ...identityWhere))
       .limit(limit + 1)
       .offset(offset)
