@@ -22,7 +22,11 @@ type Site = Outputs["externalSites"]["healthDetails"];
 
 function TriggerJobButton({ site }: { site: Site }) {
   const [isLoading, setLoading] = useState(false);
-  const fetchingBlocked = site.reviewPolicy?.allowFetching === false;
+  const unavailableReason = !site.runtime.registered
+    ? "This scraper is not registered with the runtime."
+    : site.reviewPolicy?.allowFetching === false
+      ? "Fetching is blocked by review policy."
+      : null;
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const triggerJobMutation = useMutation(
@@ -31,11 +35,9 @@ function TriggerJobButton({ site }: { site: Site }) {
 
   return (
     <Button
-      disabled={isLoading || fetchingBlocked}
+      disabled={isLoading || unavailableReason !== null}
       loading={isLoading}
-      title={
-        fetchingBlocked ? "Fetching is blocked by review policy." : undefined
-      }
+      title={unavailableReason ?? undefined}
       onClick={async () => {
         setLoading(true);
         try {
@@ -58,7 +60,7 @@ function TriggerJobButton({ site }: { site: Site }) {
         }
       }}
     >
-      {fetchingBlocked ? "Run unavailable" : "Run Scraper Now"}
+      {unavailableReason ? "Run unavailable" : "Run Scraper Now"}
     </Button>
   );
 }
