@@ -44,9 +44,6 @@ export const reviews = pgTable(
   "review",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    externalSiteId: bigint("external_site_id", { mode: "number" })
-      .references(() => externalSites.id)
-      .notNull(),
     name: text("name").notNull(),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
@@ -56,12 +53,9 @@ export const reviews = pgTable(
     hidden: boolean("hidden").default(false),
     // Normalized ratings are optional compatibility values on a 0-100 scale.
     rating: integer("rating"),
-    issue: text("issue").notNull(),
-    url: text("url").notNull(),
-    articleId: bigint("article_id", { mode: "number" }).references(
-      () => reviewArticles.id,
-      { onDelete: "cascade" },
-    ),
+    articleId: bigint("article_id", { mode: "number" })
+      .references(() => reviewArticles.id, { onDelete: "cascade" })
+      .notNull(),
     sourceKey: text("source_key"),
     reviewerName: text("reviewer_name"),
     nativeScoreValue: doublePrecision("native_score_value"),
@@ -76,19 +70,6 @@ export const reviews = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    // TODO(external-review-indexing): Remove these legacy-only indexes when
-    // OpenSpec task 3.5 completes the review-article hard cutover.
-    uniqueIndex("review_unq_name")
-      .using(
-        "btree",
-        table.externalSiteId,
-        sql`LOWER(${table.name})`,
-        table.issue,
-      )
-      .where(sql`${table.articleId} IS NULL`),
-    uniqueIndex("review_legacy_site_url_unq")
-      .on(table.externalSiteId, table.url)
-      .where(sql`${table.articleId} IS NULL`),
     uniqueIndex("review_article_source_key_unq").on(
       table.articleId,
       table.sourceKey,
@@ -149,10 +130,6 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   bottle: one(bottles, {
     fields: [reviews.bottleId],
     references: [bottles.id],
-  }),
-  externalSite: one(externalSites, {
-    fields: [reviews.externalSiteId],
-    references: [externalSites.id],
   }),
   article: one(reviewArticles, {
     fields: [reviews.articleId],

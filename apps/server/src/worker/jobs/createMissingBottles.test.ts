@@ -76,7 +76,8 @@ describe("createMissingBottles", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    const legacySite = await fixtures.ExternalSite({ type: "totalwine" });
+    const issue = "Default";
+    const url = "https://example.com/review";
     const systemUser = await fixtures.User({
       admin: true,
       username: "dcramer",
@@ -87,17 +88,9 @@ describe("createMissingBottles", () => {
       externalSiteId: site.id,
       bottleId: null,
       name: "Springbank Bottle Name",
-      issue: "Default",
-      url: "https://example.com/review",
+      issue,
+      url,
     });
-    await db
-      .update(reviews)
-      .set({
-        externalSiteId: legacySite.id,
-        issue: "Legacy issue copy",
-        url: "https://example.com/legacy-review-copy",
-      })
-      .where(eq(reviews.id, review.id));
     const price = await fixtures.StorePrice({
       externalSiteId: site.id,
       bottleId: null,
@@ -167,7 +160,7 @@ describe("createMissingBottles", () => {
       sourceKind: "review",
       sourceId: review.id,
       externalSiteId: site.id,
-      url: review.url,
+      url,
       decision: "create_bottle",
       actorId: systemActor.id,
       bottleId: updatedReview?.bottleId,
@@ -184,7 +177,7 @@ describe("createMissingBottles", () => {
           confidenceBasis: null,
         },
         resolutionSource: "classifier_create_bottle",
-        issue: review.issue,
+        issue,
       }),
     });
 
@@ -199,6 +192,7 @@ describe("createMissingBottles", () => {
     const site = await fixtures.ExternalSiteOrExisting();
     const systemUser = await fixtures.User({ admin: true });
     const brand = await fixtures.Entity({ name: "Worker Existing Brand" });
+    const issue = "Canonical reuse";
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
       name: "Worker Existing Bottle",
@@ -216,7 +210,7 @@ describe("createMissingBottles", () => {
       externalSiteId: site.id,
       bottleId: null,
       name: `${bottle.fullName} critic review`,
-      issue: "Canonical reuse",
+      issue,
       url: "https://example.com/worker-safe-canonical-reuse",
     });
     getAutomationModeratorUserMock.mockResolvedValue(systemUser);
@@ -272,7 +266,7 @@ describe("createMissingBottles", () => {
           confidenceBasis: null,
         },
         resolutionSource: "classifier_create_bottle",
-        issue: review.issue,
+        issue,
       }),
     });
   });

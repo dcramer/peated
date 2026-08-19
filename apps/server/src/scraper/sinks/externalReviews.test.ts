@@ -31,17 +31,17 @@ test("Whisky Advocate observations use article and source identity", async ({
   });
 
   const storedReviews = await db
-    .select()
+    .select({ review: reviews })
     .from(reviews)
-    .where(eq(reviews.externalSiteId, site.id));
-  expect(storedReviews).toMatchObject([
+    .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+    .where(eq(reviewArticles.externalSiteId, site.id));
+  expect(storedReviews.map(({ review }) => review)).toMatchObject([
     {
       articleId: expect.any(Number),
       bottleId: bottle.id,
       name: bottle.fullName,
       rating: 93,
       sourceKey: observation.sourceKey,
-      url,
     },
   ]);
   expect(
@@ -56,7 +56,7 @@ test("Whisky Advocate observations use article and source identity", async ({
       ),
   ).toMatchObject([
     {
-      id: storedReviews[0]!.articleId,
+      id: storedReviews[0]!.review.articleId,
       issue: "Fall 2026",
       title: null,
       contentHash: null,

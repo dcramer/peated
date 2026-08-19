@@ -1086,8 +1086,22 @@ export const StorePriceHistory = async (
   return result;
 };
 
+type ReviewFixtureData = Partial<
+  Omit<dbSchema.NewReview, "id" | "articleId">
+> & {
+  articleId?: number;
+  externalSiteId?: number;
+  issue?: string | null;
+  url?: string;
+};
+
 export const Review = async (
-  { ...data }: Partial<Omit<dbSchema.NewReview, "id">> = {},
+  {
+    externalSiteId: requestedExternalSiteId,
+    issue: requestedIssue,
+    url: requestedUrl,
+    ...data
+  }: ReviewFixtureData = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Review> => {
   const [result] = await db.transaction(async (tx) => {
@@ -1113,9 +1127,9 @@ export const Review = async (
     data.bottleId = await resolveFixtureBottleId(data, tx);
 
     const externalSiteId =
-      data.externalSiteId || (await ExternalSiteOrExisting({}, tx)).id;
-    const issue = data.issue ?? "Default";
-    const url = data.url ?? faker.internet.url();
+      requestedExternalSiteId || (await ExternalSiteOrExisting({}, tx)).id;
+    const issue = requestedIssue ?? "Default";
+    const url = requestedUrl ?? faker.internet.url();
     let articleId = data.articleId;
     let sourceKey = data.sourceKey;
     if (articleId === undefined) {
@@ -1136,10 +1150,7 @@ export const Review = async (
       .insert(reviews)
       .values({
         name: "",
-        externalSiteId,
         rating: faker.number.int({ min: 59, max: 100 }),
-        url,
-        issue,
         createdAt: new Date(),
         ...data,
         articleId,

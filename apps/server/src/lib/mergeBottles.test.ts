@@ -81,17 +81,14 @@ describe("exact Bottle merges", () => {
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
       rating: 3,
     });
-    const [review] = await db
-      .insert(reviews)
-      .values({
-        externalSiteId: externalSite.id,
-        name: "Merge review",
-        bottleId: source.id,
-        rating: 88,
-        issue: "1",
-        url: "https://example.com/merge-review",
-      })
-      .returning();
+    const review = await fixtures.Review({
+      externalSiteId: externalSite.id,
+      name: "Merge review",
+      bottleId: source.id,
+      rating: 88,
+      issue: "1",
+      url: "https://example.com/merge-review",
+    });
     const [price] = await db
       .insert(storePrices)
       .values({
