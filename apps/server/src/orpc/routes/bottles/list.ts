@@ -10,6 +10,7 @@ import {
   flights,
   tastings,
 } from "@peated/server/db/schema";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import {
   BottleSchema,
@@ -63,7 +64,10 @@ export default procedure
   })
   .input(
     z.object({
-      query: z.coerce.string().default(""),
+      query: z.coerce
+        .string()
+        .default("")
+        .describe("Plain-text search; operator syntax is not supported."),
       brand: z.coerce.number().nullish(),
       distiller: z.coerce.number().nullish(),
       bottler: z.coerce.number().nullish(),
@@ -87,6 +91,7 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
+    const textQuery = plainTextSearchQuery(query);
     const exactAliasBottleIds = query
       ? (
           await db
@@ -113,7 +118,7 @@ export default procedure
     if (query) {
       where.push(
         or(
-          sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+          sql`${bottles.searchVector} @@ ${textQuery}`,
           exactAliasBottleIds.length
             ? inArray(bottles.id, exactAliasBottleIds)
             : undefined,
@@ -194,7 +199,7 @@ export default procedure
     switch (rest.sort) {
       case "rank":
         if (query) {
-          orderBy = sql`ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${query})) DESC`;
+          orderBy = sql`ts_rank(${bottles.searchVector}, ${textQuery}) DESC`;
         } else {
           orderBy = desc(bottles.totalTastings);
         }

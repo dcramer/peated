@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries } from "@peated/server/db/schema";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import { BottleSeriesSchema, CursorSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -19,7 +20,10 @@ export default procedure
   })
   .input(
     z.object({
-      query: z.coerce.string().default(""),
+      query: z.coerce
+        .string()
+        .default("")
+        .describe("Plain-text search; operator syntax is not supported."),
       brand: z.coerce.number(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
@@ -42,7 +46,7 @@ export default procedure
 
     if (query) {
       where.push(
-        sql`${bottleSeries.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${bottleSeries.searchVector} @@ ${plainTextSearchQuery(query)}`,
       );
     }
 

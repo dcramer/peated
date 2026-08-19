@@ -9,6 +9,7 @@ import {
   entityAliases,
   regions,
 } from "@peated/server/db/schema";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -33,7 +34,10 @@ const SORT_OPTIONS = [
 
 const InputSchema = z
   .object({
-    query: z.string().default(""),
+    query: z
+      .string()
+      .default("")
+      .describe("Plain-text search; operator syntax is not supported."),
     name: z.string().nullish(),
     country: z.coerce.string().nullish().describe("Country slug or id"),
     region: z.coerce.string().nullish().describe("Region slug or id"),
@@ -76,12 +80,11 @@ export default procedure
     errors,
   }) {
     const offset = (cursor - 1) * limit;
+    const textQuery = plainTextSearchQuery(query);
 
     const where: (SQL<unknown> | undefined)[] = [];
     if (query) {
-      where.push(
-        sql`${entities.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
-      );
+      where.push(sql`${entities.searchVector} @@ ${textQuery}`);
     }
     if (input.name) {
       where.push(
@@ -168,7 +171,7 @@ export default procedure
     switch (input.sort) {
       case "rank":
         if (query) {
-          orderBy = sql`ts_rank(${entities.searchVector}, websearch_to_tsquery('english', ${query})) DESC`;
+          orderBy = sql`ts_rank(${entities.searchVector}, ${textQuery}) DESC`;
         } else {
           orderBy = desc(entities.totalTastings);
         }

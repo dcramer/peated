@@ -64,6 +64,27 @@ function expectBottleResponse(schema: any) {
 }
 
 describe("OpenAPI generation ($ref reuse)", () => {
+  it("documents human search input as plain text", async () => {
+    const spec = await generateSpec();
+    const searchPaths = [
+      "/bottles",
+      "/entities",
+      "/bottle-series",
+      "/search",
+      "/users/{user}/collections/{collection}/bottles",
+    ] as const;
+
+    for (const path of searchPaths) {
+      const queryParameter = (
+        spec.paths?.[path]?.get?.parameters as any[]
+      )?.find((parameter) => parameter.name === "query");
+
+      expect(queryParameter?.schema?.description).toBe(
+        "Plain-text search; operator syntax is not supported.",
+      );
+    }
+  });
+
   it("reuses Bottle and Cursor via $ref and composes details via allOf", async () => {
     const spec = await generateSpec();
 

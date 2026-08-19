@@ -11,6 +11,7 @@ import {
   isReservedCollectionSlug,
   reservedCollectionSlugs,
 } from "@peated/server/lib/db";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import {
   CollectionBottleSchema,
@@ -41,7 +42,10 @@ export default procedure
           z.coerce.number(),
         ]),
         user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-        query: z.coerce.string().default(""),
+        query: z.coerce
+          .string()
+          .default("")
+          .describe("Plain-text search; operator syntax is not supported."),
         brand: z.coerce.number().nullish(),
         distiller: z.coerce.number().nullish(),
         bottle: z.number().int().positive().optional(),
@@ -127,7 +131,7 @@ export default procedure
           SELECT FROM ${bottleAliases}
           WHERE ${bottleAliases.bottleId} = ${collectionBottles.bottleId}
             AND LOWER(${bottleAliases.name}) = ${input.query.toLowerCase()}
-        ) OR ${bottles.searchVector} @@ websearch_to_tsquery ('english', ${input.query})`,
+        ) OR ${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
       );
     }
     if (input.brand) {

@@ -31,6 +31,22 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
+  test("treats search text as words, not operators", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({ name: "Triple Distilled" });
+    await fixtures.Bottle({ name: "Triple Reserve" });
+
+    const searches = await Promise.all(
+      ["Triple - Distilled", "Triple OR Distilled"].map((query) =>
+        routerClient.bottles.list({ query, sort: "rank" }),
+      ),
+    );
+
+    expect(searches.map(({ results }) => results.map(({ id }) => id))).toEqual([
+      [bottle.id],
+      [bottle.id],
+    ]);
+  });
+
   test("resolves aliases through direct Bottle ownership", async ({
     fixtures,
   }) => {
