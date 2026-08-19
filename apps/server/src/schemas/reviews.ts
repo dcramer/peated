@@ -6,7 +6,10 @@ import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
 export const ReviewSchema = z.object({
   id: z.number().describe("Unique identifier for the review"),
   name: z.string().describe("Name of the reviewed product"),
-  rating: z.number().describe("Rating given in the review"),
+  rating: z
+    .number()
+    .nullable()
+    .describe("Normalized rating given in the review, when available"),
   url: z.string().describe("URL to the original review"),
   site: ExternalSiteSchema.optional().describe(
     "External site where the review was published",

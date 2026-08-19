@@ -4,7 +4,7 @@
 
 The system MUST maintain an explicit external-review policy for each source and
 MUST NOT fetch, process with an LLM, display scores, display summaries, or
-publish observations unless the corresponding capability is approved.
+publish reviews unless the corresponding capability is approved.
 
 #### Scenario: Disabled source is scheduled
 
@@ -15,60 +15,60 @@ publish observations unless the corresponding capability is approved.
 
 #### Scenario: Summary processing is not approved
 
-- **WHEN** an approved source permits document fetching but not LLM processing
+- **WHEN** an approved source permits article fetching but not LLM processing
 - **THEN** the system ingests permitted metadata without sending article text
   to a model or publishing a generated summary
 
 #### Scenario: Permission is revoked
 
 - **WHEN** a moderator disables a source or removes a display capability
-- **THEN** future fetching stops and public observations no longer expose the
+- **THEN** future fetching stops and public reviews no longer expose the
   revoked content type
 
-### Requirement: Source documents own canonical article identity
+### Requirement: Review articles own canonical article identity
 
 The system SHALL store each external article once per source by canonical URL
-and SHALL allow that document to own multiple Bottle-review observations.
+and SHALL allow that article to own multiple Bottle reviews.
 
 #### Scenario: Article reviews several bottles
 
-- **WHEN** an approved document contains reviews of three distinct bottles
-- **THEN** the system stores one source document and three independently
-  matchable review observations
+- **WHEN** an approved article contains reviews of three distinct bottles
+- **THEN** the system stores one review article and three independently
+  matchable Bottle reviews
 
-#### Scenario: Document is ingested again
+#### Scenario: Article is ingested again
 
 - **WHEN** the same source and canonical URL are ingested with unchanged stable
-  observation keys
-- **THEN** the system updates the existing document and observations without
+  review keys
+- **THEN** the system updates the existing article and reviews without
   creating duplicates
 
 #### Scenario: Same URL exists at another source
 
 - **WHEN** two sources use the same canonical URL value
-- **THEN** each source retains its own document identity
+- **THEN** each source retains its own article identity
 
-### Requirement: Review observations preserve source score semantics
+### Requirement: Bottle reviews preserve source score semantics
 
-The system SHALL allow scored and unscored observations, SHALL preserve the
+The system SHALL allow scored and unscored reviews, SHALL preserve the
 publisher's native score value, scale, and display text, and MAY derive a
 deterministic normalized 0-100 rating for compatibility.
 
 #### Scenario: Decimal ten-point score is ingested
 
 - **WHEN** a publisher assigns a score of `7.8/10`
-- **THEN** the observation retains `7.8`, `10`, and `7.8/10` while any normalized
+- **THEN** the review retains `7.8`, `10`, and `7.8/10` while any normalized
   rating is stored separately
 
 #### Scenario: Review has no score
 
-- **WHEN** a source document contains a review without a score
-- **THEN** the observation remains valid with null native and normalized score
+- **WHEN** a review article contains a review without a score
+- **THEN** the review remains valid with null native and normalized score
   values
 
 #### Scenario: Bottle page displays a score
 
-- **WHEN** a visible observation has an approved native score
+- **WHEN** a visible review has an approved native score
 - **THEN** the Bottle page displays the native score rather than the normalized
   compatibility value
 
@@ -91,9 +91,9 @@ model, prompt version, and generation time used to create it.
 - **THEN** permitted review metadata remains ingested and no fabricated or stale
   fallback summary is published
 
-#### Scenario: Source document changes
+#### Scenario: Review article changes
 
-- **WHEN** a document's content hash changes
+- **WHEN** an article's content hash changes
 - **THEN** its prior generated summaries are not treated as current until they
   are regenerated against the new content
 
@@ -103,13 +103,13 @@ The system MUST NOT persist fetched publisher HTML, article bodies, tasting
 notes, conclusions, or publisher photography as part of external-review
 ingestion.
 
-#### Scenario: Document processing completes
+#### Scenario: Article processing completes
 
 - **WHEN** extraction and optional summary generation finish
-- **THEN** only canonical metadata, structured observation facts, content hash,
+- **THEN** only canonical metadata, structured review facts, content hash,
   Bottle identity, permitted summary, and provenance remain stored
 
-#### Scenario: Document processing fails
+#### Scenario: Article processing fails
 
 - **WHEN** extraction or model processing raises an error
 - **THEN** logs and persisted error state exclude the article body and fetched
@@ -117,26 +117,26 @@ ingestion.
 
 ### Requirement: Bottle identity controls publication
 
-The system SHALL resolve each observation through the shared external-review
-Bottle identity boundary and MUST NOT automatically publish an observation
+The system SHALL resolve each review through the shared external-review Bottle
+identity boundary and MUST NOT automatically publish a review
 without one active resolved Bottle.
 
-#### Scenario: Observation matches an active Bottle
+#### Scenario: Review matches an active Bottle
 
-- **WHEN** an observation resolves to an active Bottle and the source is in
+- **WHEN** a review resolves to an active Bottle and the source is in
   automatic publication mode
-- **THEN** the observation may become visible on that Bottle page
+- **THEN** the review may become visible on that Bottle page
 
-#### Scenario: Observation remains unresolved
+#### Scenario: Review remains unresolved
 
 - **WHEN** no safe Bottle match exists
-- **THEN** the observation remains hidden and available to the existing review
+- **THEN** the review remains hidden and available to the existing review
   moderation workflow
 
 #### Scenario: Assigned Bottle is retired
 
 - **WHEN** the assigned Bottle is retired or otherwise invalid before commit
-- **THEN** the observation is not made visible and no partial identity update is
+- **THEN** the review is not made visible and no partial identity update is
   committed
 
 ### Requirement: Bottle pages send readers to publishers
@@ -148,7 +148,7 @@ review.
 
 #### Scenario: Complete pilot review is displayed
 
-- **WHEN** a visible observation contains all supported metadata
+- **WHEN** a visible review contains all supported metadata
 - **THEN** the Bottle page shows that metadata and a clear `Read the full review`
   link naming the publisher
 
@@ -161,7 +161,7 @@ review.
 
 #### Scenario: Publisher content is rendered
 
-- **WHEN** Peated renders an external review observation
+- **WHEN** Peated renders an external review
 - **THEN** it does not render the publisher's full review, copied tasting notes,
   conclusion, or photography
 
@@ -173,7 +173,7 @@ its extraction and Bottle-matching sample passes the documented rollout gate.
 #### Scenario: First source backfill runs
 
 - **WHEN** an approved pilot source is ingested for the first time
-- **THEN** its observations remain hidden for review regardless of resolved
+- **THEN** its reviews remain hidden for moderation regardless of resolved
   Bottle identity
 
 #### Scenario: Pilot passes its quality gate
@@ -186,14 +186,14 @@ its extraction and Bottle-matching sample passes the documented rollout gate.
 
 ### Requirement: Existing external reviews survive migration
 
-The system SHALL migrate existing external reviews to source documents without
+The system SHALL migrate existing external reviews to review articles without
 changing their Bottle assignments, normalized ratings, canonical links, hidden
 state, or public availability.
 
 #### Scenario: Existing Whisky Advocate review is migrated
 
 - **WHEN** the migration processes a current Whisky Advocate review
-- **THEN** it creates and links a source document while preserving the review's
+- **THEN** it creates and links a review article while preserving the review's
   current public behavior and identity
 
 #### Scenario: Migration is verified

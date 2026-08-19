@@ -43,10 +43,12 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
                 className="absolute inset-0"
               />
               <span className="flex items-center gap-x-2">{r.site.name}</span>
-              <span className="flex items-center justify-end gap-x-2">
-                <RatingIcon rating={r.rating} />
-                <span>{r.rating} points</span>
-              </span>
+              {r.rating === null ? null : (
+                <span className="flex items-center justify-end gap-x-2">
+                  <RatingIcon rating={r.rating} />
+                  <span>{r.rating} points</span>
+                </span>
+              )}
             </li>
           );
         })}

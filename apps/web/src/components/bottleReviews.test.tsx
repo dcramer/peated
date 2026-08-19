@@ -80,4 +80,15 @@ describe("BottleReviews", () => {
 
     expect(renderToStaticMarkup(<BottleReviews bottleId={42} />)).toBe("");
   });
+
+  it("omits the normalized rating for an unscored review", () => {
+    mocks.useSuspenseQuery.mockReturnValue({
+      data: { results: [makeReview({ rating: null })] },
+    });
+
+    const html = renderToStaticMarkup(<BottleReviews bottleId={42} />);
+
+    expect(html).toContain("Whisky Advocate");
+    expect(html).not.toContain("points");
+  });
 });
