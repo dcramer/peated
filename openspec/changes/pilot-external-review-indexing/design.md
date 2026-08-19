@@ -50,6 +50,12 @@ by article and stable source key. The source key is publisher-provided
 when available and otherwise deterministically derived by a source adapter from
 stable page identity; array position alone is not sufficient.
 
+The schema migration automatically backfills legacy reviews without fetching
+publisher pages. Article title, content hash, and fetch time therefore remain
+null until a later approved fetch supplies them; the migration does not invent
+source metadata. Existing review URL and issue fields remain unchanged during
+the additive cutover.
+
 Keeping `review` for each Bottle assessment preserves the public domain noun and
 existing Bottle relationship. Source ownership, URL, title, issue, and fetch
 state move to `review_article` so those facts cannot diverge among reviews.
