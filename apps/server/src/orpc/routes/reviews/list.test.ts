@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { actors, reviews } from "@peated/server/db/schema";
+import {
+  actors,
+  externalReviewSourcePolicies,
+  reviewArticles,
+  reviews,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, sql } from "drizzle-orm";
@@ -132,6 +137,129 @@ describe("GET /reviews", () => {
         site: { id: articleSite.id },
       },
     ]);
+  });
+
+  test("returns approved article details and native review content", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.ApprovedExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+      publicationMode: "automatic",
+    });
+    const summaryContentHash = "current-article-content";
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      rating: 78,
+      reviewerName: "A. Critic",
+      nativeScoreValue: 7.8,
+      nativeScoreScale: 10,
+      nativeScoreDisplay: "7.8/10",
+      summary: "A balanced whisky with coastal smoke and a long finish.",
+      summaryContentHash,
+      summaryModel: "summary-model",
+      summaryPromptVersion: "v1",
+      summaryGeneratedAt: new Date("2026-07-23T00:00:00.000Z"),
+    });
+    await db
+      .update(reviewArticles)
+      .set({
+        title: "A review of Springbank 12 Cask Strength",
+        publishedAt: new Date("2026-07-22T00:00:00.000Z"),
+        contentHash: summaryContentHash,
+      })
+      .where(eq(reviewArticles.id, review.articleId!));
+
+    const { results } = await routerClient.reviews.list({
+      bottle: bottle.id,
+    });
+
+    expect(results).toMatchObject([
+      {
+        id: review.id,
+        rating: 78,
+        article: {
+          title: "A review of Springbank 12 Cask Strength",
+          publishedAt: "2026-07-22T00:00:00.000Z",
+        },
+        reviewerName: "A. Critic",
+        nativeScore: { value: 7.8, scale: 10, display: "7.8/10" },
+        summary: "A balanced whisky with coastal smoke and a long finish.",
+      },
+    ]);
+  });
+
+  test("preserves migrated reviews when their source policy is disabled", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.ExternalReviewSourcePolicy({ externalSiteId: site.id });
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+    });
+
+    const { results } = await routerClient.reviews.list({
+      bottle: bottle.id,
+    });
+
+    expect(results.map(({ id }) => id)).toContain(review.id);
+  });
+
+  test("removes review content and public visibility when policy is revoked", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.ApprovedExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+      publicationMode: "automatic",
+    });
+    const summaryContentHash = "current-article-content";
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      nativeScoreValue: 7.8,
+      nativeScoreScale: 10,
+      nativeScoreDisplay: "7.8/10",
+      summary: "A short generated summary.",
+      summaryContentHash,
+      summaryModel: "summary-model",
+      summaryPromptVersion: "v1",
+      summaryGeneratedAt: new Date("2026-07-23T00:00:00.000Z"),
+    });
+    await db
+      .update(reviewArticles)
+      .set({ contentHash: summaryContentHash })
+      .where(eq(reviewArticles.id, review.articleId!));
+
+    await db
+      .update(externalReviewSourcePolicies)
+      .set({
+        allowLlmProcessing: false,
+        allowScoreDisplay: false,
+        allowSummaryDisplay: false,
+      })
+      .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
+
+    const contentRevoked = await routerClient.reviews.list({
+      bottle: bottle.id,
+    });
+    expect(contentRevoked.results).toMatchObject([
+      { id: review.id, nativeScore: null, summary: null },
+    ]);
+
+    await db
+      .update(externalReviewSourcePolicies)
+      .set({ allowFetching: false, publicationMode: "disabled" })
+      .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
+
+    await expect(
+      routerClient.reviews.list({ bottle: bottle.id }),
+    ).resolves.toMatchObject({ results: [] });
   });
 
   test("lists reviews by direct Bottle identity", async ({ fixtures }) => {

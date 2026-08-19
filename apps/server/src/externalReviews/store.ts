@@ -1,19 +1,8 @@
 import { db } from "@peated/server/db";
 import { reviewArticles, reviews } from "@peated/server/db/schema";
+import { NativeScoreSchema } from "@peated/server/schemas";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
-
-const NativeScoreSchema = z
-  .object({
-    value: z.number().finite().nonnegative(),
-    scale: z.number().finite().positive(),
-    display: z.string().trim().min(1).max(50),
-  })
-  .strict()
-  .refine(({ value, scale }) => value <= scale, {
-    message: "Native score value cannot exceed its scale.",
-    path: ["value"],
-  });
 
 const ArticleReviewSchema = z
   .object({

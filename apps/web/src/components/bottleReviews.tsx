@@ -1,16 +1,14 @@
 "use client";
 
-import { TrophyIcon } from "@heroicons/react/24/outline";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useORPC } from "../lib/orpc/context";
 import Heading from "./heading";
 
-function RatingIcon({ rating }: { rating: number }) {
-  if (rating >= 93) return <TrophyIcon className="text-highlight h-4 w-4" />;
-  if (rating >= 87) return <TrophyIcon className="h-4 w-4 text-gray-400" />;
-  if (rating >= 83) return <TrophyIcon className="h-4 w-4 text-orange-400" />;
-  return null;
-}
+const publicationDateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
 
 export default function BottleReviews({ bottleId }: { bottleId: number }) {
   const orpc = useORPC();
@@ -24,31 +22,57 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
     }),
   );
 
-  if (!results.length) return null;
+  const reviews = results.filter((review) => review.site);
+  if (!reviews.length) return null;
 
   return (
     <>
       <Heading as="h3">The Critics</Heading>
-      <ul className="-mx-2 -mt-2 mb-4 grid grid-cols-2 sm:w-2/3 md:w-1/2">
-        {results.map((r) => {
-          if (!r.site) return null;
+      <ul className="mb-4 divide-y divide-slate-800">
+        {reviews.map((review) => {
+          const site = review.site!;
           return (
-            <li
-              key={r.id}
-              className="relative col-span-3 grid grid-cols-subgrid items-center gap-x-2 gap-y-2 p-2 hover:bg-slate-800"
-            >
+            <li key={review.id} className="py-4 first:pt-2">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-semibold">{site.name}</p>
+                  {review.reviewerName || review.article.publishedAt ? (
+                    <p className="text-muted mt-1 text-sm">
+                      {review.reviewerName ? `By ${review.reviewerName}` : null}
+                      {review.reviewerName && review.article.publishedAt
+                        ? " · "
+                        : null}
+                      {review.article.publishedAt ? (
+                        <time dateTime={review.article.publishedAt}>
+                          {publicationDateFormatter.format(
+                            new Date(review.article.publishedAt),
+                          )}
+                        </time>
+                      ) : null}
+                    </p>
+                  ) : null}
+                </div>
+                {review.nativeScore ? (
+                  <span className="shrink-0 font-semibold">
+                    {review.nativeScore.display}
+                  </span>
+                ) : null}
+              </div>
+              {review.summary ? (
+                <p className="mt-3 text-sm leading-6 text-slate-200">
+                  <span className="font-semibold">
+                    Peated summary of {site.name}:
+                  </span>{" "}
+                  {review.summary}
+                </p>
+              ) : null}
               <a
-                href={r.url}
-                aria-label={`Read ${r.site.name} review`}
-                className="absolute inset-0"
-              />
-              <span className="flex items-center gap-x-2">{r.site.name}</span>
-              {r.rating === null ? null : (
-                <span className="flex items-center justify-end gap-x-2">
-                  <RatingIcon rating={r.rating} />
-                  <span>{r.rating} points</span>
-                </span>
-              )}
+                href={review.url}
+                className="text-highlight mt-3 inline-flex items-center gap-1 text-sm font-semibold hover:underline"
+              >
+                Read the full review on {site.name}
+                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+              </a>
             </li>
           );
         })}

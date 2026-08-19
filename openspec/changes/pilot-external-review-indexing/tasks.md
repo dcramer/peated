@@ -55,13 +55,13 @@
 
 ## 5. Public Review Index
 
-- [ ] 5.1 Extend review API output with article metadata, reviewer, native score,
+- [x] 5.1 Extend review API output with article metadata, reviewer, native score,
       and permitted summary while preserving existing clients during cutover
-- [ ] 5.2 Update Bottle review presentation with publisher, reviewer, date,
+- [x] 5.2 Update Bottle review presentation with publisher, reviewer, date,
       native score, attributed Peated summary, and a prominent canonical link
-- [ ] 5.3 Omit missing or unapproved fields without fallbacks and keep normalized
+- [x] 5.3 Omit missing or unapproved fields without fallbacks and keep normalized
       compatibility ratings out of native-score presentation
-- [ ] 5.4 Add deterministic component and route tests for complete, partial,
+- [x] 5.4 Add deterministic component and route tests for complete, partial,
       unscored, summary-free, revoked, and multi-source reviews
 
 ## 6. Approved Publisher Pilots
