@@ -20,6 +20,7 @@ test("simple", async ({ axiosMock }) => {
   expect(items[0]).toMatchInlineSnapshot(`
     {
       "currency": "usd",
+      "externalProductId": "16747",
       "imageUrl": "https://www.astorwines.com/images/items/16747.jpg",
       "name": "Aberfeldy 12-year-old Single Malt Scotch Whisky",
       "price": 4496,

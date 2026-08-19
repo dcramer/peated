@@ -21,6 +21,7 @@ test("scrapes available bottles and excludes unsupported products", async ({
   expect(items).toEqual([
     {
       currency: "gbp",
+      externalProductId: "6631010533443",
       imageUrl:
         "https://cdn.shopify.com/s/files/1/1914/4899/products/G_M_DistilleryLabels_Linkwood15YearsOld_46__70cl.jpg",
       name: "Distillery Labels Linkwood 15-year-old 46%",

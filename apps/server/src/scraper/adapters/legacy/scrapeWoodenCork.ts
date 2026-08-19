@@ -39,6 +39,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const promises: Promise<void>[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);
   cards.each((_, el) => {
+    const externalProductId = $(el).attr("data-product-id")?.trim();
     const bottle = $("div.grid-product__title", el).first().text();
     if (!bottle) {
       logScrapeWarning(SITE, "Unable to identify product name");
@@ -97,6 +98,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         volume,
         // image,
         url: absoluteUrl("https://woodencork.com", productUrl),
+        ...(externalProductId ? { externalProductId } : {}),
       }),
     );
   });

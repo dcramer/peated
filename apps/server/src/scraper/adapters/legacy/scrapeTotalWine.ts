@@ -40,6 +40,10 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 
     const productUrl = $("h2.title__2RoYeYuO > a", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");
+    const absoluteProductUrl = absoluteUrl(url, productUrl);
+    const externalProductId = new URL(absoluteProductUrl).pathname.match(
+      /\/p\/([^/]+)\/?$/,
+    )?.[1];
 
     const priceRaw =
       $("span.price__1JvDDp_x span.price__1JvDDp_x", el).first().text() ||
@@ -56,7 +60,8 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
         price,
         currency: "usd",
         volume,
-        url: absoluteUrl(url, productUrl),
+        url: absoluteProductUrl,
+        ...(externalProductId ? { externalProductId } : {}),
       }),
     );
   });

@@ -22,6 +22,7 @@ import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
   actors,
+  bottleBarcodes,
   bottleObservations,
   bottles,
   storePriceMatchAttempts,
@@ -46,6 +47,7 @@ import {
   createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
+import { normalizeGtin } from "@peated/server/lib/gtin";
 import {
   recordIncomingBottleDecisionInTransaction,
   type IncomingBottleDecisionActor,
@@ -65,6 +67,7 @@ import {
 } from "@peated/server/lib/priceMatchingProcessingLease";
 import { REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES } from "@peated/server/lib/priceMatchingStatus";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
+import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
   finalizeBottleUpdate,
@@ -770,6 +773,7 @@ export async function upsertStorePriceMatchProposal({
   statusOverride,
   preserveExistingDecision = false,
   expectedProcessingToken,
+  model,
   tx = db,
 }: {
   price: StorePrice;
@@ -783,6 +787,7 @@ export async function upsertStorePriceMatchProposal({
   statusOverride?: StorePriceMatchProposal["status"] | null;
   preserveExistingDecision?: boolean;
   expectedProcessingToken?: string;
+  model?: string | null;
   tx?: AnyDatabase;
 }) {
   const parsedDecision = decision
@@ -817,7 +822,7 @@ export async function upsertStorePriceMatchProposal({
     searchEvidence: searchEvidence || [],
     automationAssessment: automationAssessment ?? null,
     rationale: parsedDecision?.rationale ?? null,
-    model: config.BOTTLE_CLASSIFIER_MODEL,
+    model: model === undefined ? config.BOTTLE_CLASSIFIER_MODEL : model,
     error: error || null,
     lastEvaluatedAt: sql`NOW()`,
     enteredQueueAt,
@@ -843,7 +848,7 @@ export async function upsertStorePriceMatchProposal({
             searchEvidence && searchEvidence.length > 0
               ? searchEvidence
               : sql`${storePriceMatchProposals.searchEvidence}`,
-          model: config.BOTTLE_CLASSIFIER_MODEL,
+          model: model === undefined ? config.BOTTLE_CLASSIFIER_MODEL : model,
           error: error || null,
           lastEvaluatedAt: sql`NOW()`,
           enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
@@ -1014,6 +1019,142 @@ export async function createBottleFromStorePriceMatchProposal({
   };
 }
 
+function hasStorePriceMatchInputChanged(
+  expected: StorePrice,
+  current: StorePrice,
+) {
+  return (
+    expected.name !== current.name ||
+    expected.volume !== current.volume ||
+    expected.barcode !== current.barcode ||
+    !isDeepStrictEqual(
+      expected.sourceBottleIdentity,
+      current.sourceBottleIdentity,
+    )
+  );
+}
+
+/** Applies an approved barcode match without saving the store title as an alias. */
+async function resolveApprovedBarcodeStorePriceMatch({
+  price,
+  existingProposal,
+  processingToken,
+}: {
+  price: StorePrice;
+  existingProposal: StorePriceMatchProposal | null | undefined;
+  processingToken?: string;
+}): Promise<StorePriceMatchProposal | null> {
+  if (!price.barcode) return null;
+
+  const normalizedBarcode = normalizeGtin(price.barcode);
+  const barcodeMapping = await db.query.bottleBarcodes.findFirst({
+    where: eq(bottleBarcodes.gtin14, normalizedBarcode.gtin14),
+  });
+  if (!barcodeMapping) return null;
+
+  const [automationUser, systemActor] = await Promise.all([
+    getAutomationModeratorUser(),
+    getPeatedSystemActor(),
+  ]);
+  const result = await db.transaction(async (tx) => {
+    const sourceBottleIdentity = price.sourceBottleIdentity
+      ? BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity)
+      : null;
+    const match = await resolveStorePriceBottleMatchInTransaction(tx, {
+      name: price.name,
+      normalizedBarcode,
+      sourceBottleIdentity,
+      volume: price.volume,
+    });
+    if (
+      match.source !== "barcode" ||
+      match.bottleId === null ||
+      match.candidate === null
+    ) {
+      return null;
+    }
+
+    const [currentPrice] = await tx
+      .select()
+      .from(storePrices)
+      .where(eq(storePrices.id, price.id))
+      .limit(1)
+      .for("update");
+    if (!currentPrice) {
+      throw new Error(`Unknown price ${price.id}`);
+    }
+    if (hasStorePriceMatchInputChanged(price, currentPrice)) {
+      throw new Error(
+        `Store price details changed during approved barcode matching (${price.id}).`,
+      );
+    }
+    if (
+      currentPrice.bottleId !== null &&
+      currentPrice.bottleId !== match.bottleId
+    ) {
+      return null;
+    }
+
+    const decision: StorePriceMatchDecision = {
+      action: "match_existing",
+      confidence: null,
+      rationale: `Matched approved barcode ${normalizedBarcode.value}. Bottle size and known bottle details agree.`,
+      candidateBottleIds: [match.bottleId],
+      identityScope: "product",
+      aliasScope: "none",
+      suggestedBottleId: match.bottleId,
+      proposedBottle: null,
+    };
+    const proposal = await upsertStorePriceMatchProposal({
+      price: currentPrice,
+      extractedLabel:
+        sourceBottleIdentity ?? parseStoredExtractedLabel(existingProposal),
+      candidates: [match.candidate],
+      decision,
+      searchEvidence: [],
+      statusOverride: "verified",
+      expectedProcessingToken: processingToken,
+      model: null,
+      tx,
+    });
+    if (
+      processingToken &&
+      (proposal.processingToken !== processingToken ||
+        !hasActiveStorePriceMatchProposalProcessingLease(proposal))
+    ) {
+      return proposal.id;
+    }
+
+    await recordStorePriceMatchAttempt({ proposal, tx });
+    const proposalForReview =
+      await getStorePriceMatchProposalForReviewInTransaction(tx, {
+        proposalId: proposal.id,
+        allowedStatuses: ["verified"],
+        expectedProcessingToken: processingToken,
+      });
+    const actor = await getPriceMatchWriteActorForDatabase(tx, systemActor, {
+      userId: automationUser.id,
+      allowSystemActor: true,
+    });
+    await persistApprovedStorePriceMatchInTransaction(tx, {
+      proposal: proposalForReview,
+      reviewedById: automationUser.id,
+      bottleId: match.bottleId,
+      decisionLog: {
+        actor,
+        decision: "match_existing",
+        metadata: {
+          matchingBasis: "canonical_gtin",
+          gtin14: normalizedBarcode.gtin14,
+        },
+      },
+    });
+    return proposal.id;
+  });
+
+  return result === null ? null : await reloadStorePriceMatchProposal(result);
+}
+
 /**
  * Owns full store-price classification persistence: the proposal, attempt, and
  * linked Bottle check commit together before any automated catalog mutation.
@@ -1086,6 +1227,17 @@ export async function resolveStorePriceMatchProposal(
   let searchEvidence: SearchEvidence[] = [];
   let classificationModelMetadata: BottleReferenceRun["modelMetadata"] = null;
   try {
+    const approvedBarcodeProposal = await resolveApprovedBarcodeStorePriceMatch(
+      {
+        price,
+        existingProposal,
+        processingToken,
+      },
+    );
+    if (approvedBarcodeProposal) {
+      return approvedBarcodeProposal;
+    }
+
     // Price matching consumes the generic bottle classifier and only layers
     // price-specific persistence and automation policy on top of its result.
     const classificationInput: ClassifyBottleReferenceInput = {
@@ -1494,6 +1646,73 @@ async function markApprovedStorePriceMatchProposalInTransaction(
   });
 }
 
+async function persistApprovedStorePriceMatchInTransaction(
+  tx: AnyTransaction,
+  {
+    proposal,
+    reviewedById,
+    decisionLog,
+    bottleId,
+  }: {
+    proposal: StorePriceMatchProposalForReview;
+    reviewedById: number;
+    decisionLog: {
+      actor: IncomingBottleDecisionActor;
+      decision: IncomingBottleDecisionType;
+      createdBottle?: boolean;
+      metadata?: Record<string, unknown>;
+    };
+    bottleId: number;
+  },
+) {
+  await tx
+    .update(storePrices)
+    .set({
+      bottleId,
+      updatedAt: sql`NOW()`,
+    })
+    .where(eq(storePrices.id, proposal.price.id));
+
+  await markApprovedStorePriceMatchProposalInTransaction(tx, {
+    proposalId: proposal.id,
+    bottleId,
+    reviewedById,
+  });
+
+  // One approved store price should always leave behind one source record keyed
+  // by the store_price id so moderators can recover the original evidence later.
+  await upsertStorePriceObservationInTransaction(tx, {
+    proposal,
+    bottleId,
+    createdById: reviewedById,
+  });
+
+  // The decision writer is idempotent by source. Always offer a completed
+  // moderation decision so legacy or preassigned prices still gain history.
+  await recordIncomingBottleDecisionInTransaction(tx, {
+    sourceKind: "store_price",
+    sourceId: proposal.price.id,
+    proposalId: proposal.id,
+    externalSiteId: proposal.price.externalSiteId,
+    name: proposal.price.name,
+    url: proposal.price.url,
+    decision: decisionLog.decision,
+    actor: decisionLog.actor,
+    bottleId,
+    createdBottle: decisionLog.createdBottle ?? false,
+    confidence: proposal.confidence,
+    model: proposal.model,
+    rationale: proposal.rationale,
+    metadata: {
+      proposalType: proposal.proposalType,
+      ...(decisionLog.actor.type === "system"
+        ? { initiatedByUserId: reviewedById }
+        : {}),
+      ...decisionLog.metadata,
+    },
+  });
+}
+
 /**
  * Applies one approved proposal to one independently complete Bottle.
  */
@@ -1528,67 +1747,29 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
   );
 
   const aliasKey = normalizeBottleAliasKey(proposal.price.name);
-  // Alias-safety gate: a newly assigned listing title only becomes a reusable
-  // global alias when the decision asserted `aliasScope = global_alias`. For
-  // "none"/null/missing scope the source listing is still assigned (backfilled)
-  // and retained for provenance, but the new alias is marked ignored so a
-  // generic retailer title cannot be reused for future listings. Aliases that
-  // are already assigned to this target keep their existing ignored state.
-  const reusableGlobalAlias = proposal.aliasScope === "global_alias";
+  // Only `global_alias` lets this store title match future listings. Other
+  // approvals still link this listing to the bottle, but keep its title out of
+  // automatic matching. Existing aliases keep their current setting.
+  const mayReuseAlias = proposal.aliasScope === "global_alias";
   const aliasInput = {
     bottleId,
     externalSiteId: proposal.price.externalSiteId,
     name: aliasKey,
     backfillNames: [proposal.price.name],
     volume: proposal.price.volume,
-    ignored: !reusableGlobalAlias,
+    ignored: !mayReuseAlias,
     assignmentSource: "source_approved",
     assignedByActorId: actor.id,
   } satisfies Parameters<typeof assignBottleAliasInTransaction>[1];
   const aliasResult = await assignBottleAliasInTransaction(tx, aliasInput);
 
-  await tx
-    .update(storePrices)
-    .set({
-      bottleId,
-      updatedAt: sql`NOW()`,
-    })
-    .where(eq(storePrices.id, proposal.price.id));
-
-  await markApprovedStorePriceMatchProposalInTransaction(tx, {
-    proposalId: proposal.id,
-    bottleId,
-    reviewedById,
-  });
-
-  // One approved store price should always leave behind one source record keyed
-  // by the store_price id so moderators can recover the original evidence later.
-  await upsertStorePriceObservationInTransaction(tx, {
+  await persistApprovedStorePriceMatchInTransaction(tx, {
     proposal,
+    reviewedById,
     bottleId,
-    createdById: reviewedById,
-  });
-
-  // The decision writer is idempotent by source. Always offer a completed
-  // moderation decision so legacy or preassigned prices still gain history.
-  await recordIncomingBottleDecisionInTransaction(tx, {
-    sourceKind: "store_price",
-    sourceId: proposal.price.id,
-    proposalId: proposal.id,
-    externalSiteId: proposal.price.externalSiteId,
-    name: proposal.price.name,
-    url: proposal.price.url,
-    decision: decisionLog.decision,
-    actor,
-    bottleId,
-    createdBottle: decisionLog.createdBottle ?? false,
-    confidence: proposal.confidence,
-    model: proposal.model,
-    rationale: proposal.rationale,
-    metadata: {
-      proposalType: proposal.proposalType,
-      ...(actor.type === "system" ? { initiatedByUserId: reviewedById } : {}),
-      ...decisionLog.metadata,
+    decisionLog: {
+      ...decisionLog,
+      actor,
     },
   });
 

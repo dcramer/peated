@@ -16,6 +16,7 @@ import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 const SITE = "gordonmacphail";
 
 const GordonMacphailProductSchema = ShopifyProductSchema.extend({
+  id: z.number().int().positive().optional(),
   body_html: z.string().nullish(),
   images: z.array(ShopifyImageSchema),
 });
@@ -104,6 +105,7 @@ export function parseGordonMacphailProducts(
         `/products/${encodeURIComponent(product.handle)}`,
       ),
       imageUrl: product.images[0]?.src ?? null,
+      ...(product.id ? { externalProductId: String(product.id) } : {}),
     };
 
     logScrapedProduct(SITE, listing);

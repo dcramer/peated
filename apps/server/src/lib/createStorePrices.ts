@@ -2,10 +2,8 @@ import {
   normalizeBottle,
   normalizeBottleAliasKey,
 } from "@peated/bottle-classifier/normalize";
-import { getExistingMatchIdentityConflicts } from "@peated/bottle-classifier/priceMatchingEvidence";
 import { db, type AnyTransaction } from "@peated/server/db";
 import {
-  bottleBarcodes,
   externalSites,
   storePriceHistories,
   storePrices,
@@ -18,14 +16,10 @@ import {
   BottleAliasBottleRetiredError,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
-import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { normalizeGtin, type NormalizedGtin } from "@peated/server/lib/gtin";
-import {
-  ActiveBottleSelectionError,
-  resolveActiveBottleIds,
-} from "@peated/server/lib/resolveActiveBottleIds";
+import { ActiveBottleSelectionError } from "@peated/server/lib/resolveActiveBottleIds";
+import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import {
   ExternalSiteTypeEnum,
   StorePriceInputSchema,
@@ -236,79 +230,37 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
           sp.barcode === undefined || sp.barcode === null
             ? null
             : normalizeGtin(sp.barcode);
-        const initialBarcode = normalizedBarcode
-          ? await db.query.bottleBarcodes.findFirst({
-              where: eq(bottleBarcodes.gtin14, normalizedBarcode.gtin14),
-            })
-          : null;
-        const barcodeCandidate =
-          initialBarcode && sp.sourceBottleIdentity
-            ? await getBottleCandidateById(initialBarcode.bottleId)
-            : null;
-        const barcodeIdentityConflicts = sp.sourceBottleIdentity
-          ? barcodeCandidate
-            ? getExistingMatchIdentityConflicts({
-                target: barcodeCandidate,
-                extractedLabel: sp.sourceBottleIdentity,
-              })
-            : ["barcode target is not an active Bottle"]
-          : [];
-
         const { price, aliasAssignment } = await db.transaction(async (tx) => {
           const { name } = normalizeBottle({ name: sp.name });
           const aliasKey = normalizeBottleAliasKey(sp.name);
-          // New assignments use the deterministic key, but lookup still
-          // accepts legacy raw aliases created before alias keys existed.
-          let match = await findBottleAliasAssignment(aliasKey, tx);
-          if (!match && aliasKey !== sp.name) {
-            match = await findBottleAliasAssignment(sp.name, tx);
-          }
-          const currentBarcode = normalizedBarcode
-            ? await tx.query.bottleBarcodes.findFirst({
-                where: eq(bottleBarcodes.gtin14, normalizedBarcode.gtin14),
-              })
-            : null;
-          // A canonical barcode bypasses classification only when package
-          // volume, explicit source facts, and any exact alias all agree.
-          const barcodeBottleId =
-            currentBarcode &&
-            currentBarcode.bottleId === initialBarcode?.bottleId &&
-            (currentBarcode.volume === null ||
-              currentBarcode.volume === sp.volume) &&
-            barcodeIdentityConflicts.length === 0
-              ? currentBarcode.bottleId
-              : null;
-          const bottleId = currentBarcode
-            ? barcodeBottleId !== null &&
-              (match === null || match.bottleId === barcodeBottleId)
-              ? barcodeBottleId
-              : null
-            : (match?.bottleId ?? null);
-          if (bottleId !== null) {
-            try {
-              await resolveActiveBottleIds(tx, [bottleId], {
-                lock: "update",
-              });
-            } catch (error) {
-              if (!(error instanceof ActiveBottleSelectionError)) {
-                throw error;
-              }
-              switch (error.reason) {
-                case "missing":
-                  throw new BottleAliasBottleNotFoundError(error.bottleId);
-                case "bottle_retired":
-                  throw new BottleAliasBottleRetiredError(
-                    error.bottleId,
-                    error.replacementBottleId,
-                  );
-                case "unassigned":
-                  throw new BottleAliasBottleInactiveError(
-                    error.bottleId,
-                    error.reason,
-                  );
-              }
+          let bottleMatch;
+          try {
+            bottleMatch = await resolveStorePriceBottleMatchInTransaction(tx, {
+              name: sp.name,
+              normalizedBarcode,
+              sourceBottleIdentity: sp.sourceBottleIdentity ?? null,
+              volume: sp.volume,
+            });
+          } catch (error) {
+            if (!(error instanceof ActiveBottleSelectionError)) {
+              throw error;
+            }
+            switch (error.reason) {
+              case "missing":
+                throw new BottleAliasBottleNotFoundError(error.bottleId);
+              case "bottle_retired":
+                throw new BottleAliasBottleRetiredError(
+                  error.bottleId,
+                  error.replacementBottleId,
+                );
+              case "unassigned":
+                throw new BottleAliasBottleInactiveError(
+                  error.bottleId,
+                  error.reason,
+                );
             }
           }
+          const { aliasMatch: match, bottleId } = bottleMatch;
 
           const persisted = await persistStorePriceInTransaction({
             tx,
@@ -322,7 +274,8 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
           const persistedBottleId = persisted.bottleId;
           const hasDirectMatch =
             bottleId !== null && persistedBottleId === bottleId;
-          const hasAliasMatch = hasDirectMatch && match?.bottleId === bottleId;
+          const hasAliasMatch =
+            hasDirectMatch && bottleMatch.source === "alias";
           const aliasAssignment = hasAliasMatch
             ? await assignBottleAliasInTransaction(tx, {
                 name: aliasKey,
@@ -352,6 +305,7 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
               id: priceId,
               imageUrl: persisted.imageUrl,
               hasDirectMatch,
+              directMatchSource: hasDirectMatch ? bottleMatch.source : null,
             },
             aliasAssignment,
           };
@@ -370,7 +324,12 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
           });
         }
 
-        if (!price.hasDirectMatch) {
+        if (price.directMatchSource === "barcode") {
+          await pushUniqueJob("ResolveStorePriceBottle", {
+            priceId: price.id,
+            force: true,
+          });
+        } else if (!price.hasDirectMatch) {
           await pushUniqueJob("ResolveStorePriceBottle", {
             priceId: price.id,
           });
