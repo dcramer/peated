@@ -14,14 +14,14 @@
 
 ## 2. Document And Observation Model
 
-- [ ] 2.1 Add the source-document schema and nullable observation fields for
+- [x] 2.1 Add the source-document schema and nullable observation fields for
       stable source key, reviewer, native score, and summary provenance
-- [ ] 2.2 Generate and inspect the additive database migration and relations
-- [ ] 2.3 Implement idempotent source-document and multi-observation upserts with
+- [x] 2.2 Generate and inspect the additive database migration and relations
+- [x] 2.3 Implement idempotent source-document and multi-observation upserts with
       transaction-level tests
-- [ ] 2.4 Allow unscored observations and preserve native score value, scale,
+- [x] 2.4 Allow unscored observations and preserve native score value, scale,
       display text, and normalized compatibility rating
-- [ ] 2.5 Prove that article bodies, HTML, tasting notes, conclusions, and images
+- [x] 2.5 Prove that article bodies, HTML, tasting notes, conclusions, and images
       are absent from persistence and error logs
 
 ## 3. Existing Review Migration

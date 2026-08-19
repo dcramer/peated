@@ -1541,6 +1541,13 @@
       "when": 1787101360353,
       "tag": "0219_spotty_green_goblin",
       "breakpoints": false
+    },
+    {
+      "idx": 220,
+      "version": "7",
+      "when": 1787104454554,
+      "tag": "0220_tidy_gorilla_man",
+      "breakpoints": false
     }
   ]
 }

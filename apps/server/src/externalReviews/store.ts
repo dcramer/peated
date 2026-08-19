@@ -1,0 +1,139 @@
+import { db } from "@peated/server/db";
+import { externalReviewDocuments, reviews } from "@peated/server/db/schema";
+import { sql } from "drizzle-orm";
+import { z } from "zod";
+
+const NativeScoreSchema = z
+  .object({
+    value: z.number().finite().nonnegative(),
+    scale: z.number().finite().positive(),
+    display: z.string().trim().min(1).max(50),
+  })
+  .strict()
+  .refine(({ value, scale }) => value <= scale, {
+    message: "Native score value cannot exceed its scale.",
+    path: ["value"],
+  });
+
+const ObservationSchema = z
+  .object({
+    sourceKey: z.string().trim().min(1).max(255),
+    name: z.string().trim().min(1).max(500),
+    reviewerName: z.string().trim().min(1).max(255).nullable().default(null),
+    nativeScore: NativeScoreSchema.nullable().default(null),
+    normalizedRating: z.number().int().min(0).max(100).nullable().default(null),
+  })
+  .strict();
+
+export const ExternalReviewDocumentInputSchema = z
+  .object({
+    externalSiteId: z.number().int().positive(),
+    canonicalUrl: z
+      .url()
+      .refine(
+        (value) => ["http:", "https:"].includes(new URL(value).protocol),
+        {
+          message: "Canonical URL must use HTTP or HTTPS.",
+        },
+      ),
+    title: z.string().trim().min(1).max(1000),
+    issue: z.string().trim().min(1).max(255).nullable().default(null),
+    publishedAt: z.date().nullable().default(null),
+    contentHash: z.string().trim().min(1).max(128),
+    fetchedAt: z.date(),
+    observations: z.array(ObservationSchema).min(1),
+  })
+  .strict()
+  .superRefine(({ observations }, context) => {
+    const sourceKeys = new Set<string>();
+    for (const [index, observation] of observations.entries()) {
+      if (sourceKeys.has(observation.sourceKey)) {
+        context.addIssue({
+          code: "custom",
+          message: "Observation source keys must be unique within a document.",
+          path: ["observations", index, "sourceKey"],
+        });
+      }
+      sourceKeys.add(observation.sourceKey);
+    }
+  });
+
+/**
+ * Owns durable external-review metadata. The strict input deliberately excludes
+ * publisher bodies, HTML, tasting notes, conclusions, and images; callers must
+ * discard those transient values before crossing this boundary.
+ */
+export async function storeExternalReviewDocument(rawInput: unknown) {
+  const input = ExternalReviewDocumentInputSchema.parse(rawInput);
+
+  return await db.transaction(async (tx) => {
+    const [document] = await tx
+      .insert(externalReviewDocuments)
+      .values({
+        externalSiteId: input.externalSiteId,
+        canonicalUrl: input.canonicalUrl,
+        title: input.title,
+        issue: input.issue,
+        publishedAt: input.publishedAt,
+        contentHash: input.contentHash,
+        fetchedAt: input.fetchedAt,
+      })
+      .onConflictDoUpdate({
+        target: [
+          externalReviewDocuments.externalSiteId,
+          externalReviewDocuments.canonicalUrl,
+        ],
+        set: {
+          title: input.title,
+          issue: input.issue,
+          publishedAt: input.publishedAt,
+          contentHash: input.contentHash,
+          fetchedAt: input.fetchedAt,
+          updatedAt: sql`NOW()`,
+        },
+      })
+      .returning({ id: externalReviewDocuments.id });
+
+    if (!document) throw new Error("Unable to store external review document.");
+
+    const observationIds: number[] = [];
+    for (const observation of input.observations) {
+      const [stored] = await tx
+        .insert(reviews)
+        .values({
+          externalSiteId: input.externalSiteId,
+          documentId: document.id,
+          sourceKey: observation.sourceKey,
+          name: observation.name,
+          reviewerName: observation.reviewerName,
+          nativeScoreValue: observation.nativeScore?.value ?? null,
+          nativeScoreScale: observation.nativeScore?.scale ?? null,
+          nativeScoreDisplay: observation.nativeScore?.display ?? null,
+          rating: observation.normalizedRating,
+          // TODO(external-review-indexing): Remove these copies when OpenSpec
+          // task 3.5 completes the document-model hard cutover.
+          issue: input.issue ?? input.canonicalUrl,
+          url: input.canonicalUrl,
+          hidden: true,
+        })
+        .onConflictDoUpdate({
+          target: [reviews.documentId, reviews.sourceKey],
+          set: {
+            name: observation.name,
+            reviewerName: observation.reviewerName,
+            nativeScoreValue: observation.nativeScore?.value ?? null,
+            nativeScoreScale: observation.nativeScore?.scale ?? null,
+            nativeScoreDisplay: observation.nativeScore?.display ?? null,
+            rating: observation.normalizedRating,
+            updatedAt: sql`NOW()`,
+          },
+        })
+        .returning({ id: reviews.id });
+
+      if (!stored) throw new Error("Unable to store review observation.");
+      observationIds.push(stored.id);
+    }
+
+    return { documentId: document.id, observationIds };
+  });
+}
