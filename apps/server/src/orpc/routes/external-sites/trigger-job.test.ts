@@ -71,7 +71,7 @@ describe("POST /external-sites/:site/trigger", () => {
   test("refuses a disabled scraper before creating durable work", async ({
     fixtures,
   }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "astorwines" });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const adminUser = await fixtures.User({ admin: true });
 
     const err = await waitError(
@@ -82,7 +82,7 @@ describe("POST /external-sites/:site/trigger", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Scraper target astorwines is disabled.]`,
+      `[Error: Scraper target totalwine is disabled.]`,
     );
     expect(pushJob).not.toHaveBeenCalled();
     await expect(
