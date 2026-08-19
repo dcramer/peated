@@ -87,7 +87,6 @@ export async function storeReviewArticle(rawInput: unknown) {
       const [stored] = await tx
         .insert(reviews)
         .values({
-          externalSiteId: input.externalSiteId,
           articleId: article.id,
           sourceKey: review.sourceKey,
           name: review.name,
@@ -96,10 +95,6 @@ export async function storeReviewArticle(rawInput: unknown) {
           nativeScoreScale: review.nativeScore?.scale ?? null,
           nativeScoreDisplay: review.nativeScore?.display ?? null,
           rating: review.normalizedRating,
-          // TODO(external-review-indexing): Remove these copies when OpenSpec
-          // task 3.5 completes the review-article hard cutover.
-          issue: input.issue ?? input.canonicalUrl,
-          url: input.canonicalUrl,
           hidden: true,
         })
         .onConflictDoUpdate({
@@ -111,8 +106,6 @@ export async function storeReviewArticle(rawInput: unknown) {
             nativeScoreScale: review.nativeScore?.scale ?? null,
             nativeScoreDisplay: review.nativeScore?.display ?? null,
             rating: review.normalizedRating,
-            issue: input.issue ?? input.canonicalUrl,
-            url: input.canonicalUrl,
             updatedAt: sql`NOW()`,
           },
         })

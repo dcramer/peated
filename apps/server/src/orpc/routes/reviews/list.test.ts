@@ -98,25 +98,17 @@ describe("GET /reviews", () => {
     const articleSite = await fixtures.ExternalSite({
       type: "whiskyadvocate",
     });
-    const legacySite = await fixtures.ExternalSite({ type: "totalwine" });
+    const otherSite = await fixtures.ExternalSite({ type: "totalwine" });
     const review = await fixtures.Review({
       externalSiteId: articleSite.id,
       url: "https://example.com/article-owned-review",
     });
-    await db
-      .update(reviews)
-      .set({
-        externalSiteId: legacySite.id,
-        url: "https://example.com/legacy-review-copy",
-      })
-      .where(eq(reviews.id, review.id));
-
     const articleResults = await routerClient.reviews.list(
       { site: articleSite.type },
       { context: { user } },
     );
-    const legacyResults = await routerClient.reviews.list(
-      { site: legacySite.type },
+    const otherResults = await routerClient.reviews.list(
+      { site: otherSite.type },
       { context: { user } },
     );
     const allResults = await routerClient.reviews.list(
@@ -130,7 +122,7 @@ describe("GET /reviews", () => {
         url: "https://example.com/article-owned-review",
       },
     ]);
-    expect(legacyResults.results).toEqual([]);
+    expect(otherResults.results).toEqual([]);
     expect(allResults.results).toMatchObject([
       {
         id: review.id,

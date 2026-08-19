@@ -41,10 +41,10 @@ describe("catalog identity fixtures", () => {
 
     expect(tasting.bottleId).toBe(bottle.id);
     expect(review.bottleId).toBe(bottle.id);
-    expect(review.sourceKey).toBe(review.url);
+    expect(review.sourceKey).toBe(reviewArticle?.canonicalUrl);
     expect(reviewArticle).toMatchObject({
-      canonicalUrl: review.url,
-      externalSiteId: review.externalSiteId,
+      canonicalUrl: expect.any(String),
+      externalSiteId: expect.any(Number),
     });
     expect(price.bottleId).toBe(bottle.id);
     expect(alias.bottleId).toBe(bottle.id);

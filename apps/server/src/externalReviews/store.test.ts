@@ -103,7 +103,12 @@ describe("storeReviewArticle", () => {
 
     expect(refreshed).toEqual(first);
     expect(await db.select().from(reviewArticles)).toMatchObject([
-      { id: first.articleId, title: "Spring releases revisited" },
+      {
+        id: first.articleId,
+        title: "Spring releases revisited",
+        issue: "Summer 2026",
+        canonicalUrl: "https://reviews.example/articles/spring-releases",
+      },
     ]);
     expect(await db.select().from(reviews)).toHaveLength(2);
     expect(
@@ -116,14 +121,10 @@ describe("storeReviewArticle", () => {
       nativeScoreScale: 10,
       nativeScoreDisplay: "8.1/10",
       rating: 81,
-      issue: "Summer 2026",
-      url: "https://reviews.example/articles/spring-releases",
     });
   });
 
-  test("uses article identity instead of legacy review identity", async ({
-    fixtures,
-  }) => {
+  test("uses article identity for stable reviews", async ({ fixtures }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
     const secondArticle = inputFor(site.id);
     secondArticle.canonicalUrl =
@@ -134,42 +135,6 @@ describe("storeReviewArticle", () => {
 
     expect(await db.select().from(reviewArticles)).toHaveLength(2);
     expect(await db.select().from(reviews)).toHaveLength(4);
-  });
-
-  test("preserves legacy URL identity during the article cutover", async ({
-    fixtures,
-  }) => {
-    const firstSite = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    const secondSite = await fixtures.ExternalSite({ type: "totalwine" });
-    const url = "https://reviews.example/reviews/shared-url";
-
-    await db.insert(reviews).values([
-      {
-        externalSiteId: firstSite.id,
-        name: "First legacy review",
-        issue: "First issue",
-        rating: 90,
-        url,
-      },
-      {
-        externalSiteId: secondSite.id,
-        name: "Second-site legacy review",
-        issue: "Second issue",
-        rating: 91,
-        url,
-      },
-    ]);
-
-    await waitError(
-      db.insert(reviews).values({
-        externalSiteId: firstSite.id,
-        name: "Duplicate legacy review",
-        issue: "Different issue",
-        rating: 92,
-        url,
-      }),
-    );
-    expect(await db.select().from(reviews)).toHaveLength(2);
   });
 
   test("allows the same canonical URL at different sources", async ({

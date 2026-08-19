@@ -36,7 +36,7 @@
       boundary without expanding its current collection or summary behavior
 - [x] 3.4 Add migration verification for total, visible, unresolved, Bottle-linked,
       and canonical-URL counts
-- [ ] 3.5 Enforce article relationships and remove duplicated legacy review URL,
+- [x] 3.5 Enforce article relationships and remove duplicated legacy review URL,
       issue, and source fields after the hard cutover
 
 ## 4. Extraction And Summary Boundary

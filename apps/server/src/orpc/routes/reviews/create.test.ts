@@ -89,9 +89,13 @@ function buildCreateBottleDecision({
 }
 
 async function findReviewByUrl(url: string) {
-  return await db.query.reviews.findFirst({
-    where: eq(reviews.url, url),
-  });
+  const [result] = await db
+    .select({ review: reviews })
+    .from(reviews)
+    .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+    .where(eq(reviewArticles.canonicalUrl, url))
+    .limit(1);
+  return result?.review;
 }
 
 async function waitForSessionBlockedBy(
@@ -633,18 +637,18 @@ describe("POST /reviews", () => {
       const blockerPid = (
         await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
       ).rows[0]!.pid;
+      const articleId = (
+        await client.query<{ id: number }>(
+          `INSERT INTO "review_article" ("external_site_id", "canonical_url", "issue")
+           VALUES ($1, $2, $3)
+           RETURNING "id"`,
+          [site.id, resultUrl, issue],
+        )
+      ).rows[0]!.id;
       await client.query(
-        `INSERT INTO "review"
-          ("bottle_id", "external_site_id", "name", "issue", "rating", "url")
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          committedBottle.id,
-          site.id,
-          reviewName,
-          issue,
-          82,
-          "https://example.com/reviews/concurrent-holder",
-        ],
+        `INSERT INTO "review" ("article_id", "source_key", "bottle_id", "name", "rating")
+         VALUES ($1, $2, $3, $4, $5)`,
+        [articleId, resultUrl, committedBottle.id, reviewName, 82],
       );
 
       creation = routerClient.reviews.create(
@@ -697,28 +701,29 @@ describe("POST /reviews", () => {
       name: "Durable Review Bottle",
     });
     const reviewName = "Durable Unresolved Review";
+    const issue = "Durable issue";
+    const url = "https://example.com/reviews/durable";
     const existing = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: bottle.id,
       name: reviewName,
-      url: "https://example.com/reviews/durable-original",
+      issue,
+      url,
     });
 
     const result = await routerClient.reviews.create(
       {
         site: site.type,
         name: reviewName,
-        issue: existing.issue,
+        issue,
         rating: 97,
-        url: "https://example.com/reviews/durable-retry",
+        url,
         category: bottle.category,
       },
       { context: { user: admin } },
     );
 
-    expect(
-      await findReviewByUrl("https://example.com/reviews/durable-retry"),
-    ).toMatchObject({
+    expect(await findReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
       rating: 97,
@@ -737,6 +742,8 @@ describe("POST /reviews", () => {
       name: "Incoming Conflict Bottle",
     });
     const aliasName = "Conflicting Resolved Review";
+    const issue = "Conflict issue";
+    const url = "https://example.com/reviews/conflict";
     await fixtures.BottleAlias({
       name: aliasName,
       bottleId: incomingBottle.id,
@@ -745,24 +752,23 @@ describe("POST /reviews", () => {
       externalSiteId: site.id,
       bottleId: durableBottle.id,
       name: aliasName,
-      url: "https://example.com/reviews/conflict-original",
+      issue,
+      url,
     });
 
     const result = await routerClient.reviews.create(
       {
         site: site.type,
         name: aliasName,
-        issue: existing.issue,
+        issue,
         rating: 98,
-        url: "https://example.com/reviews/conflict-retry",
+        url,
         category: incomingBottle.category,
       },
       { context: { user: admin } },
     );
 
-    expect(
-      await findReviewByUrl("https://example.com/reviews/conflict-retry"),
-    ).toMatchObject({
+    expect(await findReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: durableBottle.id,
       rating: 98,

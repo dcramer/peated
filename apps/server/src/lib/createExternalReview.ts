@@ -18,7 +18,6 @@ import {
   resolveBottleReferenceTarget,
   resolveScrapedBottleReferenceTarget,
 } from "@peated/server/lib/bottleReferenceResolution";
-import { mapRows } from "@peated/server/lib/db";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import {
   getIncomingBottleDecisionFromResolutionSource,
@@ -111,7 +110,6 @@ export async function createExternalReview(
   }
   const bottleId = resolution.assignment?.bottleId ?? null;
   const reviewName = normalizedName;
-  const reviewNameCandidates = [reviewName.toLowerCase()];
 
   const { review, aliasAssignment } = await db.transaction(async (tx) => {
     const [article] = await tx
@@ -159,84 +157,43 @@ export async function createExternalReview(
         .for("update");
     }
 
-    let [existingReview] = await tx
+    const [existingReview] = await tx
       .select()
       .from(reviews)
       .where(
-        and(eq(reviews.externalSiteId, site.id), eq(reviews.url, input.url)),
+        and(
+          eq(reviews.articleId, article.id),
+          eq(reviews.sourceKey, sourceKey),
+        ),
       )
       .limit(1)
       .for("update");
-    if (!existingReview) {
-      [existingReview] = await tx
-        .select()
-        .from(reviews)
-        .where(
-          and(
-            eq(reviews.externalSiteId, site.id),
-            eq(reviews.issue, input.issue),
-            or(
-              ...reviewNameCandidates.map((name) =>
-                eq(sql`LOWER(${reviews.name})`, name),
-              ),
-            ),
-          ),
-        )
-        .limit(1)
-        .for("update");
-    }
 
-    let review;
-    if (existingReview) {
-      const incomingIdentityIsAuthoritative =
-        bottleId !== null &&
-        (existingReview.bottleId === null ||
-          existingReview.bottleId === bottleId);
-      [review] = await tx
-        .update(reviews)
-        .set({
-          articleId: article.id,
-          bottleId: incomingIdentityIsAuthoritative
-            ? bottleId
-            : existingReview.bottleId,
-          issue: input.issue,
+    const [review] = await tx
+      .insert(reviews)
+      .values({
+        articleId: article.id,
+        bottleId,
+        name: reviewName,
+        rating: input.rating,
+        sourceKey,
+      })
+      .onConflictDoUpdate({
+        target: [reviews.articleId, reviews.sourceKey],
+        set: {
+          bottleId: sql`CASE
+            WHEN excluded.bottle_id IS NOT NULL
+              AND (${reviews.bottleId} IS NULL OR ${reviews.bottleId} = excluded.bottle_id)
+            THEN excluded.bottle_id
+            ELSE ${reviews.bottleId}
+          END`,
           name: reviewName,
           rating: input.rating,
-          sourceKey,
-          url: input.url,
           updatedAt: sql`NOW()`,
-        })
-        .where(eq(reviews.id, existingReview.id))
-        .returning();
-    } else {
-      // Keep the row on the legacy partial index until this conflict resolves.
-      // That serializes rolling-deploy writers before the row is linked below.
-      const { rows } = await tx.execute(
-        sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
-            VALUES (${bottleId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
-            ON CONFLICT (external_site_id, LOWER(name), issue)
-            WHERE article_id IS NULL
-            DO UPDATE
-            SET bottle_id = CASE
-                  WHEN excluded.bottle_id IS NOT NULL
-                    AND (${reviews.bottleId} IS NULL OR ${reviews.bottleId} = excluded.bottle_id)
-                  THEN excluded.bottle_id
-                  ELSE ${reviews.bottleId}
-                END,
-                rating = excluded.rating,
-                url = excluded.url,
-                updated_at = NOW()
-            RETURNING *`,
-      );
-      [review] = mapRows(rows, reviews);
-      if (!review) throw new Error("Unable to store review.");
-      [review] = await tx
-        .update(reviews)
-        .set({ articleId: article.id, sourceKey })
-        .where(eq(reviews.id, review.id))
-        .returning();
-    }
-    if (!review) throw new Error("Unable to link review article.");
+        },
+      })
+      .returning();
+    if (!review) throw new Error("Unable to store review.");
 
     const appliedIncomingIdentity = review.bottleId === bottleId;
     if (!bottleId || !appliedIncomingIdentity) {

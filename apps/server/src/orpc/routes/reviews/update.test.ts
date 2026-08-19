@@ -113,21 +113,12 @@ describe("PATCH /reviews/:review", () => {
     const articleSite = await fixtures.ExternalSite({
       type: "whiskyadvocate",
     });
-    const legacySite = await fixtures.ExternalSite({ type: "totalwine" });
     const canonicalUrl = "https://example.com/article-owned-review";
     const review = await fixtures.Review({
       bottleId: null,
       externalSiteId: articleSite.id,
       url: canonicalUrl,
     });
-    await db
-      .update(reviews)
-      .set({
-        externalSiteId: legacySite.id,
-        url: "https://example.com/legacy-review-copy",
-      })
-      .where(eq(reviews.id, review.id));
-
     const response = await routerClient.reviews.update(
       { review: review.id, bottle: nextBottle.id },
       { context: { user } },
