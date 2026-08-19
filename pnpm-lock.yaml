@@ -257,10 +257,10 @@ importers:
         version: 3.4.2(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       '@hono/node-server':
         specifier: ^1.19.13
-        version: 1.19.13(hono@4.12.25)
+        version: 1.19.13(hono@4.12.34)
       '@logtape/hono':
         specifier: 'catalog:'
-        version: 2.2.3(@logtape/logtape@2.2.3)(hono@4.12.25)
+        version: 2.2.3(@logtape/logtape@2.2.3)(hono@4.12.34)
       '@logtape/logtape':
         specifier: 'catalog:'
         version: 2.2.3
@@ -305,7 +305,7 @@ importers:
         version: 10.69.0
       '@sentry/hono':
         specifier: 'catalog:'
-        version: 10.69.0(@hono/node-server@1.19.13(hono@4.12.25))(@sentry/node@10.69.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(supports-color@8.1.1))(hono@4.12.25)
+        version: 10.69.0(@hono/node-server@1.19.13(hono@4.12.34))(@sentry/node@10.69.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(supports-color@8.1.1))(hono@4.12.34)
       '@sentry/node':
         specifier: 'catalog:'
         version: 10.69.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(supports-color@8.1.1)
@@ -352,8 +352,8 @@ importers:
         specifier: ^10.6.1
         version: 10.6.1(supports-color@8.1.1)
       hono:
-        specifier: ^4.12.25
-        version: 4.12.25
+        specifier: ^4.12.34
+        version: 4.12.34
       ioredis:
         specifier: ^5.5.0
         version: 5.5.0(supports-color@8.1.1)
@@ -6689,8 +6689,8 @@ packages:
   hmac-drbg@1.0.1:
     resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
 
-  hono@4.12.25:
-    resolution: {integrity: sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==}
+  hono@4.12.34:
+    resolution: {integrity: sha512-GqXJqY/xJkJmuloTrnV1ZEXG3fqte+VjkUqoRNZXcrUidiUOP4fMSIHHY4tsqZBK++kVyWmt/AAfSUuy57/eSA==}
     engines: {node: '>=16.9.0'}
 
   html-encoding-sniffer@4.0.0:
@@ -11546,9 +11546,9 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.13(hono@4.12.25)':
+  '@hono/node-server@1.19.13(hono@4.12.34)':
     dependencies:
-      hono: 4.12.25
+      hono: 4.12.34
 
   '@hookform/resolvers@5.4.0(react-hook-form@7.78.0(react@19.2.7))':
     dependencies:
@@ -12043,10 +12043,10 @@ snapshots:
 
   '@levischuck/tiny-cbor@0.2.11': {}
 
-  '@logtape/hono@2.2.3(@logtape/logtape@2.2.3)(hono@4.12.25)':
+  '@logtape/hono@2.2.3(@logtape/logtape@2.2.3)(hono@4.12.34)':
     dependencies:
       '@logtape/logtape': 2.2.3
-      hono: 4.12.25
+      hono: 4.12.34
 
   '@logtape/logtape@2.2.3': {}
 
@@ -12056,7 +12056,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.27.1(supports-color@8.1.1)(zod@4.3.6)':
     dependencies:
-      '@hono/node-server': 1.19.13(hono@4.12.25)
+      '@hono/node-server': 1.19.13(hono@4.12.34)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -12066,7 +12066,7 @@ snapshots:
       eventsource-parser: 3.0.0
       express: 5.2.1(supports-color@8.1.1)
       express-rate-limit: 8.3.1(express@5.2.1(supports-color@8.1.1))
-      hono: 4.12.25
+      hono: 4.12.34
       jose: 6.2.1
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -13543,14 +13543,14 @@ snapshots:
     dependencies:
       '@sentry/core': 10.69.0
 
-  '@sentry/hono@10.69.0(@hono/node-server@1.19.13(hono@4.12.25))(@sentry/node@10.69.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(supports-color@8.1.1))(hono@4.12.25)':
+  '@sentry/hono@10.69.0(@hono/node-server@1.19.13(hono@4.12.34))(@sentry/node@10.69.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(supports-color@8.1.1))(hono@4.12.34)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.69.0
-      hono: 4.12.25
+      hono: 4.12.34
     optionalDependencies:
-      '@hono/node-server': 1.19.13(hono@4.12.25)
+      '@hono/node-server': 1.19.13(hono@4.12.34)
       '@sentry/node': 10.69.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(supports-color@8.1.1)
 
   '@sentry/nextjs@10.69.0(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(next@16.2.9(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(webpack@5.93.0(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.27.7)(lightningcss@1.33.0)(postcss@8.5.26))':
@@ -16252,7 +16252,7 @@ snapshots:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
-  hono@4.12.25: {}
+  hono@4.12.34: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
