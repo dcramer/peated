@@ -1,11 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("search settles after one request", async ({ page }, testInfo) => {
-  test.skip(
-    testInfo.project.name !== "chromium-desktop",
-    "The request lifecycle is viewport-independent.",
-  );
-
+test("search settles after one request", async ({ page }) => {
   let searchRequestCount = 0;
   let searchRequestBody: unknown;
   page.on("request", (request) => {

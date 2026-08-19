@@ -62,48 +62,50 @@ test.describe("activity feed", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("supports swiping between tastings on touch screens", async ({
-    page,
-  }, testInfo) => {
-    test.skip(!testInfo.project.name.includes("mobile"), "Mobile-only flow");
+  test(
+    "supports swiping between tastings on touch screens",
+    {
+      tag: "@mobile",
+    },
+    async ({ page }) => {
+      await page.goto("/", { waitUntil: "commit" });
+      await expect(page.getByText("1/2")).toBeVisible();
 
-    await page.goto("/", { waitUntil: "commit" });
-    await expect(page.getByText("1/2")).toBeVisible();
-
-    await page.getByTestId("tasting-session-slides").evaluate((element) => {
-      const start = new Touch({
-        identifier: 1,
-        target: element,
-        clientX: 300,
-        clientY: 200,
+      await page.getByTestId("tasting-session-slides").evaluate((element) => {
+        const start = new Touch({
+          identifier: 1,
+          target: element,
+          clientX: 300,
+          clientY: 200,
+        });
+        const end = new Touch({
+          identifier: 1,
+          target: element,
+          clientX: 50,
+          clientY: 200,
+        });
+        element.dispatchEvent(
+          new TouchEvent("touchstart", {
+            bubbles: true,
+            cancelable: true,
+            touches: [start],
+            changedTouches: [start],
+          }),
+        );
+        element.dispatchEvent(
+          new TouchEvent("touchend", {
+            bubbles: true,
+            cancelable: true,
+            touches: [],
+            changedTouches: [end],
+          }),
+        );
       });
-      const end = new Touch({
-        identifier: 1,
-        target: element,
-        clientX: 50,
-        clientY: 200,
-      });
-      element.dispatchEvent(
-        new TouchEvent("touchstart", {
-          bubbles: true,
-          cancelable: true,
-          touches: [start],
-          changedTouches: [start],
-        }),
-      );
-      element.dispatchEvent(
-        new TouchEvent("touchend", {
-          bubbles: true,
-          cancelable: true,
-          touches: [],
-          changedTouches: [end],
-        }),
-      );
-    });
 
-    await expect(page.getByText("2/2")).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: existingBottle.group.fullName }),
-    ).toBeVisible();
-  });
+      await expect(page.getByText("2/2")).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: existingBottle.group.fullName }),
+      ).toBeVisible();
+    },
+  );
 });
