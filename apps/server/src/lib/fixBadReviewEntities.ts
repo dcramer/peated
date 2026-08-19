@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
-import { bottles, reviews } from "@peated/server/db/schema";
+import { bottles, reviewArticles, reviews } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -32,12 +32,13 @@ export async function fixBadReviewEntities({
 }): Promise<FixBadReviewEntitiesResult> {
   const actor = await getUserActor(user);
   const results = await db
-    .select({ bottle: bottles, review: reviews })
+    .select({ article: reviewArticles, bottle: bottles, review: reviews })
     .from(bottles)
     .innerJoin(
       reviews,
       and(eq(reviews.bottleId, bottles.id), ne(reviews.name, bottles.fullName)),
-    );
+    )
+    .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id));
 
   const summary: FixBadReviewEntitiesResult = {
     scanned: 0,
@@ -47,7 +48,7 @@ export async function fixBadReviewEntities({
     unchanged: 0,
   };
 
-  for (const { bottle, review } of results) {
+  for (const { article, bottle, review } of results) {
     if (review.name.startsWith(bottle.fullName)) {
       continue;
     }
@@ -57,9 +58,9 @@ export async function fixBadReviewEntities({
     const resolution = await resolveBottleReferenceTarget({
       reference: {
         id: review.id,
-        externalSiteId: review.externalSiteId,
+        externalSiteId: article.externalSiteId,
         name: review.name,
-        url: review.url,
+        url: article.canonicalUrl,
         imageUrl: null,
         currentBottleId: review.bottleId,
       },

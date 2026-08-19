@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { actors } from "@peated/server/db/schema";
+import { actors, reviews } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, sql } from "drizzle-orm";
@@ -86,6 +86,52 @@ describe("GET /reviews", () => {
 
     expect(results.length).toBe(1);
     expect(results[0].id).toEqual(review.id);
+  });
+
+  test("uses article-owned source and URL metadata", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const articleSite = await fixtures.ExternalSite({
+      type: "whiskyadvocate",
+    });
+    const legacySite = await fixtures.ExternalSite({ type: "totalwine" });
+    const review = await fixtures.Review({
+      externalSiteId: articleSite.id,
+      url: "https://example.com/article-owned-review",
+    });
+    await db
+      .update(reviews)
+      .set({
+        externalSiteId: legacySite.id,
+        url: "https://example.com/legacy-review-copy",
+      })
+      .where(eq(reviews.id, review.id));
+
+    const articleResults = await routerClient.reviews.list(
+      { site: articleSite.type },
+      { context: { user } },
+    );
+    const legacyResults = await routerClient.reviews.list(
+      { site: legacySite.type },
+      { context: { user } },
+    );
+    const allResults = await routerClient.reviews.list(
+      {},
+      { context: { user } },
+    );
+
+    expect(articleResults.results).toMatchObject([
+      {
+        id: review.id,
+        url: "https://example.com/article-owned-review",
+      },
+    ]);
+    expect(legacyResults.results).toEqual([]);
+    expect(allResults.results).toMatchObject([
+      {
+        id: review.id,
+        site: { id: articleSite.id },
+      },
+    ]);
   });
 
   test("lists reviews by direct Bottle identity", async ({ fixtures }) => {

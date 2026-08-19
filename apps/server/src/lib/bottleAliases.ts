@@ -11,6 +11,7 @@ import {
   bottleAliases,
   bottleTombstones,
   bottles,
+  reviewArticles,
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
@@ -22,7 +23,7 @@ import {
   type ActiveBottleRejectionReason,
 } from "@peated/server/lib/resolveActiveBottleIds";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 
 /** Lists unresolved, non-ignored aliases for bounded maintenance output. */
 export async function listUnmatchedBottleAliasNames(
@@ -519,7 +520,13 @@ async function syncBottleAliasConsumersInTransaction(
           ...lookupNames.map((value) => eq(sql`LOWER(${reviews.name})`, value)),
         ),
         externalSiteId !== undefined
-          ? eq(reviews.externalSiteId, externalSiteId)
+          ? inArray(
+              reviews.articleId,
+              tx
+                .select({ id: reviewArticles.id })
+                .from(reviewArticles)
+                .where(eq(reviewArticles.externalSiteId, externalSiteId)),
+            )
           : undefined,
         reviewIdentity,
       ),

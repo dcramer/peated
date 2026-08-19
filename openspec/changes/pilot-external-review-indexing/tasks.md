@@ -30,7 +30,7 @@
       in the schema migration while preserving source, URL, issue, rating,
       Bottle assignment, and visibility without fetching publisher pages
 - [x] 3.2a Switch review ingestion and fixtures to the article/review model
-- [ ] 3.2b Switch review queries, serializers, and moderation to article-owned
+- [x] 3.2b Switch review queries, serializers, and moderation to article-owned
       metadata
 - [x] 3.3 Migrate the Whisky Advocate job to the shared article ingestion
       boundary without expanding its current collection or summary behavior

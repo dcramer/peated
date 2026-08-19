@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { reviews } from "@peated/server/db/schema";
+import { reviewArticles, reviews } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   recordIncomingBottleDecisionInTransaction,
@@ -68,15 +68,17 @@ export default procedure
         }
       }
 
-      const [lockedReview] = await tx
-        .select()
+      const [locked] = await tx
+        .select({ article: reviewArticles, review: reviews })
         .from(reviews)
+        .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
         .where(eq(reviews.id, reviewId))
         .limit(1)
-        .for("update");
-      if (!lockedReview) {
+        .for("update", { of: reviews });
+      if (!locked) {
         throw errors.NOT_FOUND({ message: "Review not found." });
       }
+      const { article, review: lockedReview } = locked;
 
       const [review] = await tx
         .update(reviews)
@@ -104,9 +106,9 @@ export default procedure
         await recordIncomingBottleDecisionInTransaction(tx, {
           sourceKind: "review",
           sourceId: review.id,
-          externalSiteId: review.externalSiteId,
+          externalSiteId: article.externalSiteId,
           name: review.name,
-          url: review.url,
+          url: article.canonicalUrl,
           decision: "match_existing",
           actor,
           bottleId: nextBottleId,

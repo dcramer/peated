@@ -11,6 +11,8 @@ import {
   bottles,
   collectionBottles,
   externalSites,
+  reviewArticles,
+  reviews,
   tastings,
   users,
 } from "@peated/server/db/schema";
@@ -232,17 +234,23 @@ const loadDefaultBottles = async (
           bottleId: bottle.id,
         }));
 
-      (await db.query.reviews.findFirst({
-        where: (reviews, { eq, and }) =>
+      const [review] = await db
+        .select({ id: reviews.id })
+        .from(reviews)
+        .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+        .where(
           and(
-            eq(reviews.externalSiteId, site.id),
+            eq(reviewArticles.externalSiteId, site.id),
             eq(reviews.bottleId, bottle.id),
           ),
-      })) ||
-        (await Fixtures.Review({
+        )
+        .limit(1);
+      if (!review) {
+        await Fixtures.Review({
           externalSiteId: site.id,
           bottleId: bottle.id,
-        }));
+        });
+      }
 
       await Fixtures.Review({
         externalSiteId: site.id,

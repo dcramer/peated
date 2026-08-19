@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { reviews } from "@peated/server/db/schema";
+import { reviewArticles, reviews } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -14,7 +14,7 @@ import {
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { and, asc, gt, isNull } from "drizzle-orm";
+import { and, asc, eq, gt, isNull } from "drizzle-orm";
 
 export default async function createMissingBottles() {
   const systemActor = await getPeatedSystemActor();
@@ -25,8 +25,9 @@ export default async function createMissingBottles() {
   let hasMore = true;
   while (hasMore) {
     const missingInReviews = await db
-      .select()
+      .select({ article: reviewArticles, review: reviews })
       .from(reviews)
+      .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
       .where(and(isNull(reviews.bottleId), gt(reviews.id, cursor)))
       .orderBy(asc(reviews.id))
       .limit(100);
@@ -34,16 +35,16 @@ export default async function createMissingBottles() {
     hasMore = missingInReviews.length > 0;
     if (!hasMore) break;
 
-    for (const review of missingInReviews) {
+    for (const { article, review } of missingInReviews) {
       cursor = review.id;
       const aliasKey = normalizeBottleAliasKey(review.name);
 
       const resolution = await resolveScrapedBottleReferenceTarget({
         reference: {
           id: review.id,
-          externalSiteId: review.externalSiteId,
+          externalSiteId: article.externalSiteId,
           name: review.name,
-          url: review.url,
+          url: article.canonicalUrl,
           imageUrl: null,
           currentBottleId: review.bottleId,
         },
@@ -104,7 +105,7 @@ export default async function createMissingBottles() {
           const aliasInput = {
             name: aliasKey,
             backfillNames: [review.name],
-            externalSiteId: review.externalSiteId,
+            externalSiteId: article.externalSiteId,
             ...(resolution.source === "exact_alias"
               ? {}
               : { assignmentSource: "classifier_approved" as const }),
@@ -128,9 +129,9 @@ export default async function createMissingBottles() {
             await recordIncomingBottleDecisionInTransaction(tx, {
               sourceKind: "review",
               sourceId: review.id,
-              externalSiteId: review.externalSiteId,
+              externalSiteId: article.externalSiteId,
               name: review.name,
-              url: review.url,
+              url: article.canonicalUrl,
               decision,
               actor: systemActor,
               bottleId,
@@ -145,7 +146,7 @@ export default async function createMissingBottles() {
                       classifierEvidence: resolution.classifierEvidence,
                     }
                   : {}),
-                issue: review.issue,
+                issue: article.issue,
               },
             });
           }
@@ -166,7 +167,7 @@ export default async function createMissingBottles() {
         review: {
           id: review.id,
           name: review.name,
-          url: review.url,
+          url: article.canonicalUrl,
         },
       });
     }

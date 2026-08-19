@@ -5,6 +5,7 @@ import {
   externalSiteRuns,
   externalSiteScrapeTargets,
   externalSites,
+  reviewArticles,
   reviews,
   scrapeOrigins,
   scrapeTargets,
@@ -47,19 +48,20 @@ async function getHealthForSites(
   ] = await Promise.all([
     db
       .select({
-        externalSiteId: reviews.externalSiteId,
+        externalSiteId: reviewArticles.externalSiteId,
         total: sql<number>`count(*)::int`,
         matched: sql<number>`count(*) filter (where ${reviews.bottleId} is not null)::int`,
         unmatched: sql<number>`count(*) filter (where ${reviews.bottleId} is null)::int`,
       })
       .from(reviews)
+      .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
       .where(
         and(
-          inArray(reviews.externalSiteId, siteIds),
+          inArray(reviewArticles.externalSiteId, siteIds),
           eq(reviews.hidden, false),
         ),
       )
-      .groupBy(reviews.externalSiteId),
+      .groupBy(reviewArticles.externalSiteId),
     db
       .select({
         externalSiteId: storePrices.externalSiteId,

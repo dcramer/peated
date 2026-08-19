@@ -75,7 +75,8 @@ describe("createMissingBottles", () => {
   test("uses the classifier to create bottles for unmatched reviews", async ({
     fixtures,
   }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const legacySite = await fixtures.ExternalSite({ type: "totalwine" });
     const systemUser = await fixtures.User({
       admin: true,
       username: "dcramer",
@@ -89,6 +90,14 @@ describe("createMissingBottles", () => {
       issue: "Default",
       url: "https://example.com/review",
     });
+    await db
+      .update(reviews)
+      .set({
+        externalSiteId: legacySite.id,
+        issue: "Legacy issue copy",
+        url: "https://example.com/legacy-review-copy",
+      })
+      .where(eq(reviews.id, review.id));
     const price = await fixtures.StorePrice({
       externalSiteId: site.id,
       bottleId: null,
@@ -157,6 +166,8 @@ describe("createMissingBottles", () => {
     expect(decisionLog).toMatchObject({
       sourceKind: "review",
       sourceId: review.id,
+      externalSiteId: site.id,
+      url: review.url,
       decision: "create_bottle",
       actorId: systemActor.id,
       bottleId: updatedReview?.bottleId,

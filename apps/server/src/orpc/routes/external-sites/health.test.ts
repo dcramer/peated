@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import {
   externalSiteRuns,
   externalSiteScrapeTargets,
+  reviews,
   scrapeOrigins,
   scrapeTargets,
   storePrices,
@@ -177,15 +178,24 @@ test("health details show review inventory and blocked review policy", async ({
 }) => {
   const admin = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.Review({
+  const legacySite = await fixtures.ExternalSite({ type: "totalwine" });
+  const matchedReview = await fixtures.Review({
     externalSiteId: site.id,
     hidden: false,
   });
-  await fixtures.Review({
+  const unmatchedReview = await fixtures.Review({
     externalSiteId: site.id,
     bottleId: null,
     hidden: false,
   });
+  await db
+    .update(reviews)
+    .set({ externalSiteId: legacySite.id })
+    .where(eq(reviews.id, matchedReview.id));
+  await db
+    .update(reviews)
+    .set({ externalSiteId: legacySite.id })
+    .where(eq(reviews.id, unmatchedReview.id));
   await db.insert(scrapeTargets).values({
     key: "whiskyadvocate",
     enabled: false,
