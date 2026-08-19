@@ -105,7 +105,7 @@ podcast transcripts need a separate platform-terms and creator-rights review.
 - The public review structure exposes author, score, bottle facts, and a short
   `TL;DR`, but Peated should not assume that the existing summary is reusable.
 - Multi-bottle and multi-author articles make it a good test for the required
-  source-document model.
+  review-article model.
 - Dramface also republishes press releases in a clearly labeled news section.
   Use that as discovery; release facts should link to the original producer or
   issuer when available.
@@ -174,11 +174,11 @@ Suggested outreach:
 The current implementation cannot represent this product cleanly:
 
 - `review.url` is globally unique, so one multi-bottle article cannot own
-  several independent review observations.
+  several independent Bottle reviews.
 - Every review requires a 0-100 score and an issue name.
 - Reviews have no author, publication date, article title, native score scale,
   summary, source evidence, rights mode, or source-policy version.
-- There is no source-document record separate from a bottle review.
+- There is no review-article record separate from a Bottle review.
 - Publisher registration and job dispatch are code-owned, which makes a large
   and changing source portfolio expensive to operate.
 
@@ -191,9 +191,8 @@ Relevant code:
 The eventual model should separate:
 
 - a source and its acquisition/display policy;
-- a source document identified by publisher and canonical URL;
-- zero or more scored or unscored bottle-review observations from that
-  document; and
+- a review article identified by publisher and canonical URL;
+- zero or more scored or unscored Bottle reviews from that article; and
 - a short generated summary with model provenance and source evidence.
 
 Do not design the full generalized pipeline until two publishers validate the
@@ -204,14 +203,14 @@ content and permission model.
 1. Contact WhiskyNotes, Whiskyfun, and Dramface in parallel.
 2. Use WhiskyNotes as the preferred archive pilot because it combines meaningful
    volume, current cadence, clear bottle specifications, and a public contact.
-3. Use Dramface as the preferred ongoing-feed and multi-bottle-document pilot.
+3. Use Dramface as the preferred ongoing-feed and multi-bottle-article pilot.
 4. Treat Whiskyfun as the high-volume backfill target, ideally through an
    author-provided export.
 5. Review the existing Whisky Advocate ingestion with counsel and the publisher
    before adding summaries or attempting a full backfill.
 
 The pilot is successful when Peated has written permission, at least 90%
-document extraction accuracy on a reviewed sample, reliable splitting of
+article extraction accuracy on a reviewed sample, reliable splitting of
 multi-bottle articles, measurable Bottle-match yield, and a display contract
 that clearly sends readers to the publisher.
 

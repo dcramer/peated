@@ -1,5 +1,5 @@
 {
-  "id": "431e31c0-c431-417d-b484-d63e46e0c05f",
+  "id": "09683bd9-7d7c-4410-87bb-1618edf9795a",
   "prevId": "6f47de0b-fe47-473c-874c-214e5e0ef261",
   "version": "7",
   "dialect": "postgresql",
@@ -5956,8 +5956,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.external_review_document": {
-      "name": "external_review_document",
+    "public.review_article": {
+      "name": "review_article",
       "schema": "",
       "columns": {
         "id": {
@@ -6024,8 +6024,8 @@
         }
       },
       "indexes": {
-        "external_review_document_site_url_unq": {
-          "name": "external_review_document_site_url_unq",
+        "review_article_site_url_unq": {
+          "name": "review_article_site_url_unq",
           "columns": [
             {
               "expression": "external_site_id",
@@ -6047,9 +6047,9 @@
         }
       },
       "foreignKeys": {
-        "external_review_document_external_site_id_external_site_id_fk": {
-          "name": "external_review_document_external_site_id_external_site_id_fk",
-          "tableFrom": "external_review_document",
+        "review_article_external_site_id_external_site_id_fk": {
+          "name": "review_article_external_site_id_external_site_id_fk",
+          "tableFrom": "review_article",
           "tableTo": "external_site",
           "columnsFrom": [
             "external_site_id"
@@ -6126,8 +6126,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "document_id": {
-          "name": "document_id",
+        "article_id": {
+          "name": "article_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -6235,11 +6235,11 @@
           "method": "btree",
           "with": {}
         },
-        "review_document_source_key_unq": {
-          "name": "review_document_source_key_unq",
+        "review_article_source_key_unq": {
+          "name": "review_article_source_key_unq",
           "columns": [
             {
-              "expression": "document_id",
+              "expression": "article_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -6271,11 +6271,11 @@
           "method": "btree",
           "with": {}
         },
-        "review_document_idx": {
-          "name": "review_document_idx",
+        "review_article_idx": {
+          "name": "review_article_idx",
           "columns": [
             {
-              "expression": "document_id",
+              "expression": "article_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -6329,12 +6329,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "review_document_id_external_review_document_id_fk": {
-          "name": "review_document_id_external_review_document_id_fk",
+        "review_article_id_review_article_id_fk": {
+          "name": "review_article_id_review_article_id_fk",
           "tableFrom": "review",
-          "tableTo": "external_review_document",
+          "tableTo": "review_article",
           "columnsFrom": [
-            "document_id"
+            "article_id"
           ],
           "columnsTo": [
             "id"

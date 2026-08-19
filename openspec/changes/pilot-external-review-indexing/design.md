@@ -17,7 +17,7 @@ score display, summary display, and automatic publication.
 
 **Goals:**
 
-- Represent one source document with several Bottle-review observations.
+- Represent one review article with several Bottle reviews.
 - Preserve native score semantics and current normalized rating consumers.
 - Make source permission an explicit runtime prerequisite.
 - Generate short, grounded, attributed summaries without retaining article
@@ -36,27 +36,27 @@ score display, summary display, and automatic publication.
 
 ## Decisions
 
-### Separate source documents from Bottle observations
+### Separate review articles from Bottle reviews
 
-Add an external review document owned by one `external_site` and identified by
-its canonical URL. It stores title, publication date, source content hash, and
-fetch timestamps. A document owns zero or more existing `review` rows, which
-become Bottle-review observations and store source key, source bottle name,
-reviewer name, native score, normalized rating, optional summary, summary model,
-prompt version, and generation time.
+Add a `review_article` owned by one `external_site` and identified by its
+canonical URL. It stores title, publication date, source content hash, and fetch
+timestamps. An article owns zero or more existing `review` rows. Each review
+stores its source key, source bottle name, reviewer name, native score,
+normalized rating, optional summary, summary model, prompt version, and
+generation time.
 
-The document URL is unique within its source, not globally. Each observation is
-unique by document and stable source key. The source key is publisher-provided
+The article URL is unique within its source, not globally. Each review is unique
+by article and stable source key. The source key is publisher-provided
 when available and otherwise deterministically derived by a source adapter from
 stable page identity; array position alone is not sufficient.
 
-Keeping `review` as the observation table preserves the public domain noun and
+Keeping `review` for each Bottle assessment preserves the public domain noun and
 existing Bottle relationship. Source ownership, URL, title, issue, and fetch
-state move to the document so those facts cannot diverge among observations.
+state move to `review_article` so those facts cannot diverge among reviews.
 
 Alternative considered: continue duplicating the article URL on each review.
 This was rejected because it preserves conflicting article metadata and cannot
-express document-level refresh or removal correctly.
+express article-level refresh or removal correctly.
 
 ### Store explicit source permission capabilities
 
@@ -68,7 +68,7 @@ reviewed date, approval reference, and approving actor.
 
 All new policies default to disabled and no capability. The scheduler and
 manual job boundary both check the same policy before network access. The
-ingestion boundary rechecks display capabilities before making an observation
+ingestion boundary rechecks display capabilities before making a review
 visible, so a caller cannot bypass policy by directly submitting parsed data.
 Changing a policy is a moderator-only operation and is audit logged.
 
@@ -89,11 +89,11 @@ runtime boundary and permissions must be revocable without deploying code.
 
 ### Use source-specific adapters behind a narrow ingestion contract
 
-Each pilot adapter discovers approved document URLs and extracts a typed
-document with observations. It does not persist data or decide Bottle identity.
-The shared ingestion boundary validates the source policy, upserts the document,
-resolves each observation using the existing external-review Bottle resolver,
-and persists the result.
+Each pilot adapter discovers approved article URLs and extracts a typed article
+with reviews. It does not persist data or decide Bottle identity. The shared
+ingestion boundary validates the source policy, upserts the article, resolves
+each review using the existing external-review Bottle resolver, and persists
+the result.
 
 Only adapters for publishers that approve the pilot are implemented and
 registered. WhiskyNotes is the preferred archive adapter and Dramface is the
@@ -112,7 +112,7 @@ and generated summary, but not the source body or source photography. Logs and
 errors must not include article bodies.
 
 Summary generation is optional. A failed or disallowed summary does not discard
-an otherwise valid metadata/score observation. Each generated summary records
+an otherwise valid metadata/score review. Each generated summary records
 its model and prompt version, and a content-hash change makes the old summary
 stale until regeneration succeeds.
 
@@ -122,7 +122,7 @@ and deletion obligations.
 
 ### Preserve native scores and normalize only for compatibility
 
-An observation may be unscored. A scored observation stores the native value,
+An article review may be unscored. A scored review stores the native value,
 native maximum, and display text. A deterministic source-owned normalizer may
 also produce the existing integer 0-100 rating. Public source rows show the
 native display score; normalized ratings remain an internal compatibility and
@@ -134,14 +134,14 @@ linear conversion as critic calibration.
 ### Roll out hidden before automatic publication
 
 The first backfill for each approved source uses review-only mode. Extracted
-observations remain hidden and appear in moderation until a reviewed sample
-demonstrates at least 90% document/observation extraction accuracy, correct
+reviews remain hidden and appear in moderation until a reviewed sample
+demonstrates at least 90% article/review extraction accuracy, correct
 multi-bottle splitting, and acceptable Bottle-match precision. Automatic mode
-can then publish observations with resolved active Bottles; unresolved or
+can then publish reviews with resolved active Bottles; unresolved or
 invalid Bottle assignments always remain hidden.
 
 Source removal or permission revocation disables fetching immediately and
-hides source observations when the current policy no longer permits display.
+hides source reviews when the current policy no longer permits display.
 
 ## Risks / Trade-offs
 
@@ -152,7 +152,7 @@ hides source observations when the current policy no longer permits display.
   keep summaries optional and hidden until approved.
 - **A source page changes structure** → Use content hashes, stable source keys,
   fixture-backed adapter tests, extraction metrics, and fail the run without
-  deleting prior observations.
+  deleting prior reviews.
 - **Bottle matching creates false associations at archive scale** → Reuse the
   existing resolver, publish only active resolved Bottles, and sample both
   matched and unresolved outcomes before automatic mode.
@@ -160,21 +160,21 @@ hides source observations when the current policy no longer permits display.
   scores and defer cross-source consensus/calibration.
 - **Permission state becomes stale** → Store evidence and review dates, make
   revocation immediate, and require re-review before expanding source use.
-- **Migration affects current Whisky Advocate reviews** → Backfill documents
+- **Migration affects current Whisky Advocate reviews** → Backfill articles
   before switching reads, preserve public API fields through serialization,
   and verify counts and Bottle associations before removing legacy columns.
 
 ## Migration Plan
 
-1. Generate additive schema changes for review-source policy, source documents,
-   and nullable observation fields.
+1. Generate additive schema changes for review-source policy, review articles,
+   and nullable review fields.
 2. Create a disabled policy record for every existing external review source.
-3. Backfill one source document per existing review URL and link each review;
+3. Backfill one review article per existing review URL and link each review;
    preserve its source, issue, URL, normalized rating, visibility, and Bottle.
 4. Switch ingestion, queries, serializers, moderation, and the Whisky Advocate
-   job to the document/observation boundary.
+   job to the article/review boundary.
 5. Verify review counts, visible Bottle review counts, unresolved counts, and
-   canonical URLs before enforcing document relationships and removing the
+   canonical URLs before enforcing article relationships and removing the
    duplicated legacy URL, issue, and source columns.
 6. Deploy pilot adapters disabled. Enable review-only mode only after recording
    the approved source policy.

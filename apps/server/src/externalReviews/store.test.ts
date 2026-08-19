@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
-import { externalReviewDocuments, reviews } from "@peated/server/db/schema";
-import { storeExternalReviewDocument } from "@peated/server/externalReviews/store";
+import { reviewArticles, reviews } from "@peated/server/db/schema";
+import { storeReviewArticle } from "@peated/server/externalReviews/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { asc, eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -14,7 +14,7 @@ function inputFor(externalSiteId: number) {
     publishedAt: new Date("2026-04-12T12:00:00Z"),
     contentHash: "sha256:first",
     fetchedAt: new Date("2026-04-13T12:00:00Z"),
-    observations: [
+    reviews: [
       {
         sourceKey: "ardbeg-ten",
         name: "Ardbeg 10-year-old",
@@ -33,18 +33,18 @@ function inputFor(externalSiteId: number) {
   };
 }
 
-describe("storeExternalReviewDocument", () => {
-  test("stores one document with scored and unscored observations", async ({
+describe("storeReviewArticle", () => {
+  test("stores one article with scored and unscored reviews", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
 
-    const result = await storeExternalReviewDocument(inputFor(site.id));
+    const result = await storeReviewArticle(inputFor(site.id));
 
-    expect(result.observationIds).toHaveLength(2);
+    expect(result.reviewIds).toHaveLength(2);
     expect(
-      await db.query.externalReviewDocuments.findFirst({
-        where: eq(externalReviewDocuments.id, result.documentId),
+      await db.query.reviewArticles.findFirst({
+        where: eq(reviewArticles.id, result.articleId),
       }),
     ).toMatchObject({
       externalSiteId: site.id,
@@ -57,7 +57,7 @@ describe("storeExternalReviewDocument", () => {
       await db
         .select()
         .from(reviews)
-        .where(eq(reviews.documentId, result.documentId))
+        .where(eq(reviews.articleId, result.articleId))
         .orderBy(asc(reviews.sourceKey)),
     ).toMatchObject([
       {
@@ -83,31 +83,31 @@ describe("storeExternalReviewDocument", () => {
     ]);
   });
 
-  test("updates the same document and stable observations idempotently", async ({
+  test("updates the same article and stable reviews idempotently", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    const first = await storeExternalReviewDocument(inputFor(site.id));
+    const first = await storeReviewArticle(inputFor(site.id));
     const refreshedInput = inputFor(site.id);
     refreshedInput.title = "Spring releases revisited";
     refreshedInput.contentHash = "sha256:second";
-    refreshedInput.observations[0] = {
-      ...refreshedInput.observations[0],
+    refreshedInput.reviews[0] = {
+      ...refreshedInput.reviews[0],
       reviewerName: "Another Reviewer",
       nativeScore: { value: 8.1, scale: 10, display: "8.1/10" },
       normalizedRating: 81,
     };
 
-    const refreshed = await storeExternalReviewDocument(refreshedInput);
+    const refreshed = await storeReviewArticle(refreshedInput);
 
     expect(refreshed).toEqual(first);
-    expect(await db.select().from(externalReviewDocuments)).toMatchObject([
-      { id: first.documentId, title: "Spring releases revisited" },
+    expect(await db.select().from(reviewArticles)).toMatchObject([
+      { id: first.articleId, title: "Spring releases revisited" },
     ]);
     expect(await db.select().from(reviews)).toHaveLength(2);
     expect(
       await db.query.reviews.findFirst({
-        where: eq(reviews.id, first.observationIds[0]),
+        where: eq(reviews.id, first.reviewIds[0]),
       }),
     ).toMatchObject({
       reviewerName: "Another Reviewer",
@@ -124,10 +124,10 @@ describe("storeExternalReviewDocument", () => {
     const firstSite = await fixtures.ExternalSite({ type: "whiskyadvocate" });
     const secondSite = await fixtures.ExternalSite({ type: "totalwine" });
 
-    await storeExternalReviewDocument(inputFor(firstSite.id));
-    await storeExternalReviewDocument(inputFor(secondSite.id));
+    await storeReviewArticle(inputFor(firstSite.id));
+    await storeReviewArticle(inputFor(secondSite.id));
 
-    expect(await db.select().from(externalReviewDocuments)).toHaveLength(2);
+    expect(await db.select().from(reviewArticles)).toHaveLength(2);
     expect(await db.select().from(reviews)).toHaveLength(4);
   });
 
@@ -139,14 +139,14 @@ describe("storeExternalReviewDocument", () => {
     const secretNotes = "copied tasting notes must remain transient";
 
     const error = await waitError(
-      storeExternalReviewDocument({
+      storeReviewArticle({
         ...inputFor(site.id),
         html: `<article>${secretBody}</article>`,
         body: secretBody,
         conclusion: secretBody,
         imageUrl: "https://reviews.example/publisher-photo.jpg",
-        observations: inputFor(site.id).observations.map((observation) => ({
-          ...observation,
+        reviews: inputFor(site.id).reviews.map((review) => ({
+          ...review,
           tastingNotes: secretNotes,
         })),
       }),
@@ -154,7 +154,7 @@ describe("storeExternalReviewDocument", () => {
 
     expect(String(error)).not.toContain(secretBody);
     expect(String(error)).not.toContain(secretNotes);
-    expect(await db.select().from(externalReviewDocuments)).toHaveLength(0);
+    expect(await db.select().from(reviewArticles)).toHaveLength(0);
     expect(await db.select().from(reviews)).toHaveLength(0);
   });
 });

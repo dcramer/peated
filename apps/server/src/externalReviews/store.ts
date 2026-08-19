@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { externalReviewDocuments, reviews } from "@peated/server/db/schema";
+import { reviewArticles, reviews } from "@peated/server/db/schema";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -15,7 +15,7 @@ const NativeScoreSchema = z
     path: ["value"],
   });
 
-const ObservationSchema = z
+const ArticleReviewSchema = z
   .object({
     sourceKey: z.string().trim().min(1).max(255),
     name: z.string().trim().min(1).max(500),
@@ -25,7 +25,7 @@ const ObservationSchema = z
   })
   .strict();
 
-export const ExternalReviewDocumentInputSchema = z
+export const ReviewArticleInputSchema = z
   .object({
     externalSiteId: z.number().int().positive(),
     canonicalUrl: z
@@ -41,20 +41,20 @@ export const ExternalReviewDocumentInputSchema = z
     publishedAt: z.date().nullable().default(null),
     contentHash: z.string().trim().min(1).max(128),
     fetchedAt: z.date(),
-    observations: z.array(ObservationSchema).min(1),
+    reviews: z.array(ArticleReviewSchema).min(1),
   })
   .strict()
-  .superRefine(({ observations }, context) => {
+  .superRefine(({ reviews }, context) => {
     const sourceKeys = new Set<string>();
-    for (const [index, observation] of observations.entries()) {
-      if (sourceKeys.has(observation.sourceKey)) {
+    for (const [index, review] of reviews.entries()) {
+      if (sourceKeys.has(review.sourceKey)) {
         context.addIssue({
           code: "custom",
-          message: "Observation source keys must be unique within a document.",
-          path: ["observations", index, "sourceKey"],
+          message: "Review source keys must be unique within an article.",
+          path: ["reviews", index, "sourceKey"],
         });
       }
-      sourceKeys.add(observation.sourceKey);
+      sourceKeys.add(review.sourceKey);
     }
   });
 
@@ -63,12 +63,12 @@ export const ExternalReviewDocumentInputSchema = z
  * publisher bodies, HTML, tasting notes, conclusions, and images; callers must
  * discard those transient values before crossing this boundary.
  */
-export async function storeExternalReviewDocument(rawInput: unknown) {
-  const input = ExternalReviewDocumentInputSchema.parse(rawInput);
+export async function storeReviewArticle(rawInput: unknown) {
+  const input = ReviewArticleInputSchema.parse(rawInput);
 
   return await db.transaction(async (tx) => {
-    const [document] = await tx
-      .insert(externalReviewDocuments)
+    const [article] = await tx
+      .insert(reviewArticles)
       .values({
         externalSiteId: input.externalSiteId,
         canonicalUrl: input.canonicalUrl,
@@ -79,10 +79,7 @@ export async function storeExternalReviewDocument(rawInput: unknown) {
         fetchedAt: input.fetchedAt,
       })
       .onConflictDoUpdate({
-        target: [
-          externalReviewDocuments.externalSiteId,
-          externalReviewDocuments.canonicalUrl,
-        ],
+        target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
         set: {
           title: input.title,
           issue: input.issue,
@@ -92,48 +89,48 @@ export async function storeExternalReviewDocument(rawInput: unknown) {
           updatedAt: sql`NOW()`,
         },
       })
-      .returning({ id: externalReviewDocuments.id });
+      .returning({ id: reviewArticles.id });
 
-    if (!document) throw new Error("Unable to store external review document.");
+    if (!article) throw new Error("Unable to store review article.");
 
-    const observationIds: number[] = [];
-    for (const observation of input.observations) {
+    const reviewIds: number[] = [];
+    for (const review of input.reviews) {
       const [stored] = await tx
         .insert(reviews)
         .values({
           externalSiteId: input.externalSiteId,
-          documentId: document.id,
-          sourceKey: observation.sourceKey,
-          name: observation.name,
-          reviewerName: observation.reviewerName,
-          nativeScoreValue: observation.nativeScore?.value ?? null,
-          nativeScoreScale: observation.nativeScore?.scale ?? null,
-          nativeScoreDisplay: observation.nativeScore?.display ?? null,
-          rating: observation.normalizedRating,
+          articleId: article.id,
+          sourceKey: review.sourceKey,
+          name: review.name,
+          reviewerName: review.reviewerName,
+          nativeScoreValue: review.nativeScore?.value ?? null,
+          nativeScoreScale: review.nativeScore?.scale ?? null,
+          nativeScoreDisplay: review.nativeScore?.display ?? null,
+          rating: review.normalizedRating,
           // TODO(external-review-indexing): Remove these copies when OpenSpec
-          // task 3.5 completes the document-model hard cutover.
+          // task 3.5 completes the review-article hard cutover.
           issue: input.issue ?? input.canonicalUrl,
           url: input.canonicalUrl,
           hidden: true,
         })
         .onConflictDoUpdate({
-          target: [reviews.documentId, reviews.sourceKey],
+          target: [reviews.articleId, reviews.sourceKey],
           set: {
-            name: observation.name,
-            reviewerName: observation.reviewerName,
-            nativeScoreValue: observation.nativeScore?.value ?? null,
-            nativeScoreScale: observation.nativeScore?.scale ?? null,
-            nativeScoreDisplay: observation.nativeScore?.display ?? null,
-            rating: observation.normalizedRating,
+            name: review.name,
+            reviewerName: review.reviewerName,
+            nativeScoreValue: review.nativeScore?.value ?? null,
+            nativeScoreScale: review.nativeScore?.scale ?? null,
+            nativeScoreDisplay: review.nativeScore?.display ?? null,
+            rating: review.normalizedRating,
             updatedAt: sql`NOW()`,
           },
         })
         .returning({ id: reviews.id });
 
-      if (!stored) throw new Error("Unable to store review observation.");
-      observationIds.push(stored.id);
+      if (!stored) throw new Error("Unable to store review.");
+      reviewIds.push(stored.id);
     }
 
-    return { documentId: document.id, observationIds };
+    return { articleId: article.id, reviewIds };
   });
 }

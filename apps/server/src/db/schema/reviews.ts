@@ -15,8 +15,8 @@ import {
 import { bottles } from "./bottles";
 import { externalSites } from "./externalSites";
 
-export const externalReviewDocuments = pgTable(
-  "external_review_document",
+export const reviewArticles = pgTable(
+  "review_article",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     externalSiteId: bigint("external_site_id", { mode: "number" })
@@ -32,7 +32,7 @@ export const externalReviewDocuments = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("external_review_document_site_url_unq").on(
+    uniqueIndex("review_article_site_url_unq").on(
       table.externalSiteId,
       table.canonicalUrl,
     ),
@@ -57,8 +57,8 @@ export const reviews = pgTable(
     rating: integer("rating"),
     issue: text("issue").notNull(),
     url: text("url").notNull(),
-    documentId: bigint("document_id", { mode: "number" }).references(
-      () => externalReviewDocuments.id,
+    articleId: bigint("article_id", { mode: "number" }).references(
+      () => reviewArticles.id,
       { onDelete: "cascade" },
     ),
     sourceKey: text("source_key"),
@@ -81,12 +81,12 @@ export const reviews = pgTable(
       sql`LOWER(${table.name})`,
       table.issue,
     ),
-    uniqueIndex("review_document_source_key_unq").on(
-      table.documentId,
+    uniqueIndex("review_article_source_key_unq").on(
+      table.articleId,
       table.sourceKey,
     ),
     index("review_bottle_idx").on(table.bottleId),
-    index("review_document_idx").on(table.documentId),
+    index("review_article_idx").on(table.articleId),
     index("review_release_idx").on(table.legacyReleaseId),
     check(
       "review_rating_check",
@@ -126,14 +126,14 @@ export const reviews = pgTable(
   ],
 );
 
-export const externalReviewDocumentsRelations = relations(
-  externalReviewDocuments,
+export const reviewArticlesRelations = relations(
+  reviewArticles,
   ({ many, one }) => ({
     externalSite: one(externalSites, {
-      fields: [externalReviewDocuments.externalSiteId],
+      fields: [reviewArticles.externalSiteId],
       references: [externalSites.id],
     }),
-    observations: many(reviews),
+    reviews: many(reviews),
   }),
 );
 
@@ -142,19 +142,17 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.bottleId],
     references: [bottles.id],
   }),
-  store: one(externalSites, {
+  externalSite: one(externalSites, {
     fields: [reviews.externalSiteId],
     references: [externalSites.id],
   }),
-  document: one(externalReviewDocuments, {
-    fields: [reviews.documentId],
-    references: [externalReviewDocuments.id],
+  article: one(reviewArticles, {
+    fields: [reviews.articleId],
+    references: [reviewArticles.id],
   }),
 }));
 
-export type ExternalReviewDocument =
-  typeof externalReviewDocuments.$inferSelect;
-export type NewExternalReviewDocument =
-  typeof externalReviewDocuments.$inferInsert;
+export type ReviewArticle = typeof reviewArticles.$inferSelect;
+export type NewReviewArticle = typeof reviewArticles.$inferInsert;
 export type Review = typeof reviews.$inferSelect;
 export type NewReview = typeof reviews.$inferInsert;
