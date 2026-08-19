@@ -42,7 +42,10 @@ export default procedure
           z.coerce.number(),
         ]),
         user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-        query: z.coerce.string().default(""),
+        query: z.coerce
+          .string()
+          .default("")
+          .describe("Plain-text search; operator syntax is not supported."),
         brand: z.coerce.number().nullish(),
         distiller: z.coerce.number().nullish(),
         bottle: z.number().int().positive().optional(),

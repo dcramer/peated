@@ -70,7 +70,9 @@ export default procedure
   })
   .input(
     z.object({
-      query: z.coerce.string(),
+      query: z.coerce
+        .string()
+        .describe("Plain-text search; operator syntax is not supported."),
       include: z.array(z.enum(INCLUDE_LIST)).default([...INCLUDE_LIST]),
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),

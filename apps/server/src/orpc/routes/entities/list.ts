@@ -34,7 +34,10 @@ const SORT_OPTIONS = [
 
 const InputSchema = z
   .object({
-    query: z.string().default(""),
+    query: z
+      .string()
+      .default("")
+      .describe("Plain-text search; operator syntax is not supported."),
     name: z.string().nullish(),
     country: z.coerce.string().nullish().describe("Country slug or id"),
     region: z.coerce.string().nullish().describe("Region slug or id"),

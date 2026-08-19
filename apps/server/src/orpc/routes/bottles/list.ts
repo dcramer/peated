@@ -64,7 +64,10 @@ export default procedure
   })
   .input(
     z.object({
-      query: z.coerce.string().default(""),
+      query: z.coerce
+        .string()
+        .default("")
+        .describe("Plain-text search; operator syntax is not supported."),
       brand: z.coerce.number().nullish(),
       distiller: z.coerce.number().nullish(),
       bottler: z.coerce.number().nullish(),

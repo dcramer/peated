@@ -20,7 +20,10 @@ export default procedure
   })
   .input(
     z.object({
-      query: z.coerce.string().default(""),
+      query: z.coerce
+        .string()
+        .default("")
+        .describe("Plain-text search; operator syntax is not supported."),
       brand: z.coerce.number(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
