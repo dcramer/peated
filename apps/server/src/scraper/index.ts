@@ -38,7 +38,6 @@ export function getScraperRegistration(siteType: ExternalSiteType) {
   return source
     ? {
         targetKeys: [...source.targetKeys],
-        requiresAuthorization: source.authorize !== undefined,
       }
     : null;
 }

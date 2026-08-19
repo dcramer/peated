@@ -20,28 +20,9 @@ import { use, useState, type ReactNode } from "react";
 
 type Site = Outputs["externalSites"]["healthDetails"];
 
-function runUnavailableReason(site: Site) {
-  if (!site.runtime.registered) return "Source is not registered.";
-  if (
-    site.runtime.targets.length !== site.runtime.targetKeys.length ||
-    site.runtime.targetKeys.some(
-      (key) => !site.runtime.targets.some((target) => target.key === key),
-    )
-  ) {
-    return "Runtime definitions are not synchronized.";
-  }
-  if (site.runtime.targets.some((target) => !target.enabled)) {
-    return "A traffic target is disabled.";
-  }
-  if (site.reviewPolicy && !site.reviewPolicy.allowFetching) {
-    return "Fetching is blocked by review policy.";
-  }
-  return null;
-}
-
 function TriggerJobButton({ site }: { site: Site }) {
   const [isLoading, setLoading] = useState(false);
-  const unavailableReason = runUnavailableReason(site);
+  const fetchingBlocked = site.reviewPolicy?.allowFetching === false;
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const triggerJobMutation = useMutation(
@@ -50,9 +31,11 @@ function TriggerJobButton({ site }: { site: Site }) {
 
   return (
     <Button
-      disabled={isLoading || unavailableReason !== null}
+      disabled={isLoading || fetchingBlocked}
       loading={isLoading}
-      title={unavailableReason ?? undefined}
+      title={
+        fetchingBlocked ? "Fetching is blocked by review policy." : undefined
+      }
       onClick={async () => {
         setLoading(true);
         try {
@@ -75,7 +58,7 @@ function TriggerJobButton({ site }: { site: Site }) {
         }
       }}
     >
-      {unavailableReason ? "Run unavailable" : "Run Scraper Now"}
+      {fetchingBlocked ? "Run unavailable" : "Run Scraper Now"}
     </Button>
   );
 }

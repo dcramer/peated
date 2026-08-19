@@ -1,3 +1,4 @@
+import { isExternalReviewSiteType } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewSourcePolicies,
@@ -29,6 +30,7 @@ import { z } from "zod";
 
 async function getHealth(site: ExternalSite) {
   const registration = getScraperRegistration(site.type);
+  const hasReviewPolicy = isExternalReviewSiteType(site.type);
   const [
     [reviewCoverage],
     [priceCoverage],
@@ -110,7 +112,7 @@ async function getHealth(site: ExternalSite) {
         ),
       )
       .orderBy(asc(scrapeTargets.key), asc(scrapeOrigins.origin)),
-    registration?.requiresAuthorization
+    hasReviewPolicy
       ? db.query.externalReviewSourcePolicies.findFirst({
           where: eq(externalReviewSourcePolicies.externalSiteId, site.id),
         })
@@ -162,7 +164,7 @@ async function getHealth(site: ExternalSite) {
       targetKeys: registration?.targetKeys ?? [],
       targets: [...targets.values()],
     },
-    reviewPolicy: registration?.requiresAuthorization
+    reviewPolicy: hasReviewPolicy
       ? serializeExternalReviewSourcePolicy(site.id, reviewPolicy ?? null)
       : null,
   };

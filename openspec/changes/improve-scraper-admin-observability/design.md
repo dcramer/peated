@@ -24,15 +24,15 @@ The external-site admin already owns the operator workflow: it lists sites, show
 
 Replace the price-only `listingCount` with separate review and price coverage objects containing total, matched, and unmatched counts. This uses the same visible-item semantics as the existing catalog coverage report and prevents review-only sources from appearing empty.
 
-The health contract will also expose a read-only runtime summary: whether the source is registered, its synchronized targets and origins, target enablement/cooldown state, derived robots cache status, and the applicable review-source policy when the registered source requires authorization.
+The health contract will also expose a read-only runtime summary: whether the source is registered, its synchronized targets and origins, target enablement/cooldown state, derived robots cache status, and the applicable policy for review sources.
 
 Alternative: add several new admin endpoints. That creates coordination and loading complexity without a distinct ownership boundary; this data is all part of one source's operational health.
 
 ### Keep code-owned registration behind the scraper boundary
 
-The scraper module will export a narrow registration lookup containing only target keys and whether the source has an authorization hook. API routes will not import the production registry or adapters directly. Synchronized SQL remains authoritative for mutable target/origin state.
+The scraper module will export a narrow registration lookup containing only target keys. API routes will not import the production registry or adapters directly. The existing review-source type boundary determines policy applicability, and synchronized SQL remains authoritative for mutable target/origin state.
 
-Alternative: infer review authorization from existing data or hard-code Whisky Advocate. Both become wrong as sources are added.
+Alternative: infer review authorization from registry callback presence or hard-code Whisky Advocate. Both duplicate the existing review-source policy boundary and can drift as sources are added.
 
 ### Expose existing run counters directly
 
