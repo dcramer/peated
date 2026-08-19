@@ -1,7 +1,12 @@
 import { db } from "@peated/server/db";
 import {
+  externalReviewSourcePolicies,
   externalSiteRuns,
+  externalSiteScrapeTargets,
   externalSites,
+  reviews,
+  scrapeOrigins,
+  scrapeTargets,
   storePrices,
   type ExternalSite,
 } from "@peated/server/db/schema";
@@ -11,18 +16,43 @@ import {
   ExternalSiteHealthSchema,
   ExternalSiteTypeEnum,
   listResponse,
+  type ExternalSiteScrapeTargetSchema,
 } from "@peated/server/schemas";
+import { getScraperRegistration } from "@peated/server/scraper";
 import {
+  serializeExternalReviewSourcePolicy,
   serializeExternalSite,
   serializeExternalSiteRun,
 } from "@peated/server/serializers/externalSite";
-import { and, asc, count, desc, eq, ilike } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
 
 async function getHealth(site: ExternalSite) {
-  const [[listing], [latestRun], [lastSucceeded]] = await Promise.all([
+  const registration = getScraperRegistration(site.type);
+  const [
+    [reviewCoverage],
+    [priceCoverage],
+    [latestRun],
+    [lastSucceeded],
+    runtimeRows,
+    reviewPolicy,
+  ] = await Promise.all([
     db
-      .select({ value: count(storePrices.id) })
+      .select({
+        total: sql<number>`count(*)::int`,
+        matched: sql<number>`count(*) filter (where ${reviews.bottleId} is not null)::int`,
+        unmatched: sql<number>`count(*) filter (where ${reviews.bottleId} is null)::int`,
+      })
+      .from(reviews)
+      .where(
+        and(eq(reviews.externalSiteId, site.id), eq(reviews.hidden, false)),
+      ),
+    db
+      .select({
+        total: sql<number>`count(*)::int`,
+        matched: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null)::int`,
+        unmatched: sql<number>`count(*) filter (where ${storePrices.bottleId} is null)::int`,
+      })
       .from(storePrices)
       .where(
         and(
@@ -47,13 +77,94 @@ async function getHealth(site: ExternalSite) {
       )
       .orderBy(desc(externalSiteRuns.completedAt))
       .limit(1),
+    db
+      .select({
+        targetKey: scrapeTargets.key,
+        enabled: scrapeTargets.enabled,
+        blockedUntil: scrapeTargets.blockedUntil,
+        minimumSpacingMs: scrapeTargets.minimumSpacingMs,
+        requestsPerWindow: scrapeTargets.requestsPerWindow,
+        windowMs: scrapeTargets.windowMs,
+        origin: scrapeOrigins.origin,
+        robotsMode: scrapeOrigins.robotsMode,
+        robotsState: scrapeOrigins.robotsState,
+        robotsFetchedAt: scrapeOrigins.robotsFetchedAt,
+        robotsExpiresAt: scrapeOrigins.robotsExpiresAt,
+      })
+      .from(externalSiteScrapeTargets)
+      .innerJoin(
+        scrapeTargets,
+        eq(externalSiteScrapeTargets.targetKey, scrapeTargets.key),
+      )
+      .leftJoin(
+        scrapeOrigins,
+        and(
+          eq(scrapeOrigins.targetKey, scrapeTargets.key),
+          eq(scrapeOrigins.active, true),
+        ),
+      )
+      .where(
+        and(
+          eq(externalSiteScrapeTargets.externalSiteId, site.id),
+          eq(externalSiteScrapeTargets.active, true),
+        ),
+      )
+      .orderBy(asc(scrapeTargets.key), asc(scrapeOrigins.origin)),
+    registration?.requiresAuthorization
+      ? db.query.externalReviewSourcePolicies.findFirst({
+          where: eq(externalReviewSourcePolicies.externalSiteId, site.id),
+        })
+      : Promise.resolve(undefined),
   ]);
+
+  const targets = new Map<
+    string,
+    z.infer<typeof ExternalSiteScrapeTargetSchema>
+  >();
+  for (const row of runtimeRows) {
+    let target = targets.get(row.targetKey);
+    if (!target) {
+      target = {
+        key: row.targetKey,
+        enabled: row.enabled,
+        blockedUntil: row.blockedUntil?.toISOString() ?? null,
+        coolingDown:
+          row.blockedUntil !== null && row.blockedUntil.getTime() > Date.now(),
+        minimumSpacingMs: row.minimumSpacingMs,
+        requestsPerWindow: row.requestsPerWindow,
+        windowMs: row.windowMs,
+        origins: [],
+      };
+      targets.set(row.targetKey, target);
+    }
+    if (row.origin && row.robotsMode) {
+      target.origins.push({
+        origin: row.origin,
+        robotsMode: row.robotsMode,
+        robotsStatus:
+          row.robotsMode === "not_applicable"
+            ? "not_applicable"
+            : (row.robotsState?.status ?? "unknown"),
+        robotsFetchedAt: row.robotsFetchedAt?.toISOString() ?? null,
+        robotsExpiresAt: row.robotsExpiresAt?.toISOString() ?? null,
+      });
+    }
+  }
 
   return {
     ...serializeExternalSite(site),
-    listingCount: listing?.value ?? 0,
+    reviews: reviewCoverage ?? { total: 0, matched: 0, unmatched: 0 },
+    priceListings: priceCoverage ?? { total: 0, matched: 0, unmatched: 0 },
     latestRun: latestRun ? serializeExternalSiteRun(latestRun) : null,
     lastSucceededAt: lastSucceeded?.completedAt?.toISOString() ?? null,
+    runtime: {
+      registered: registration !== null,
+      targetKeys: registration?.targetKeys ?? [],
+      targets: [...targets.values()],
+    },
+    reviewPolicy: registration?.requiresAuthorization
+      ? serializeExternalReviewSourcePolicy(site.id, reviewPolicy ?? null)
+      : null,
   };
 }
 

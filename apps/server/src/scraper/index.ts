@@ -5,6 +5,8 @@
  * API routes and workers only queue, execute, or initialize durable runs.
  */
 import type { ExternalSite } from "@peated/server/db/schema";
+import type { ExternalSiteType } from "@peated/server/types";
+import { findScraperSourceBySiteType } from "./definitions";
 import {
   createScraperLifecycle,
   ExternalSiteRunActiveError,
@@ -30,6 +32,16 @@ const lifecycle = createScraperLifecycle({
 
 export { ExternalReviewSourcePolicyError, ExternalSiteRunActiveError };
 export type { ScraperRunExecutionResult };
+
+export function getScraperRegistration(siteType: ExternalSiteType) {
+  const source = findScraperSourceBySiteType(scraperRegistry, siteType);
+  return source
+    ? {
+        targetKeys: [...source.targetKeys],
+        requiresAuthorization: source.authorize !== undefined,
+      }
+    : null;
+}
 
 export function queueManualExternalSiteRun(input: {
   site: ExternalSite;
