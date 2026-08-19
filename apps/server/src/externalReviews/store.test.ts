@@ -90,6 +90,7 @@ describe("storeReviewArticle", () => {
     const first = await storeReviewArticle(inputFor(site.id));
     const refreshedInput = inputFor(site.id);
     refreshedInput.title = "Spring releases revisited";
+    refreshedInput.issue = "Summer 2026";
     refreshedInput.contentHash = "sha256:second";
     refreshedInput.reviews[0] = {
       ...refreshedInput.reviews[0],
@@ -115,7 +116,60 @@ describe("storeReviewArticle", () => {
       nativeScoreScale: 10,
       nativeScoreDisplay: "8.1/10",
       rating: 81,
+      issue: "Summer 2026",
+      url: "https://reviews.example/articles/spring-releases",
     });
+  });
+
+  test("uses article identity instead of legacy review identity", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const secondArticle = inputFor(site.id);
+    secondArticle.canonicalUrl =
+      "https://reviews.example/articles/more-spring-releases";
+
+    await storeReviewArticle(inputFor(site.id));
+    await storeReviewArticle(secondArticle);
+
+    expect(await db.select().from(reviewArticles)).toHaveLength(2);
+    expect(await db.select().from(reviews)).toHaveLength(4);
+  });
+
+  test("preserves legacy URL identity during the article cutover", async ({
+    fixtures,
+  }) => {
+    const firstSite = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const secondSite = await fixtures.ExternalSite({ type: "totalwine" });
+    const url = "https://reviews.example/reviews/shared-url";
+
+    await db.insert(reviews).values([
+      {
+        externalSiteId: firstSite.id,
+        name: "First legacy review",
+        issue: "First issue",
+        rating: 90,
+        url,
+      },
+      {
+        externalSiteId: secondSite.id,
+        name: "Second-site legacy review",
+        issue: "Second issue",
+        rating: 91,
+        url,
+      },
+    ]);
+
+    await waitError(
+      db.insert(reviews).values({
+        externalSiteId: firstSite.id,
+        name: "Duplicate legacy review",
+        issue: "Different issue",
+        rating: 92,
+        url,
+      }),
+    );
+    expect(await db.select().from(reviews)).toHaveLength(2);
   });
 
   test("allows the same canonical URL at different sources", async ({

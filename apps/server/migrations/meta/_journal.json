@@ -1548,6 +1548,13 @@
       "when": 1787108492478,
       "tag": "0220_glamorous_sprite",
       "breakpoints": false
+    },
+    {
+      "idx": 221,
+      "version": "7",
+      "when": 1787112710801,
+      "tag": "0221_right_hitman",
+      "breakpoints": false
     }
   ]
 }

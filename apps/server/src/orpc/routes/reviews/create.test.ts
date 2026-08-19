@@ -780,4 +780,25 @@ describe("POST /reviews", () => {
 
     expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
+
+  test("rejects ratings outside the normalized scale", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+
+    const error = await waitError(() =>
+      routerClient.reviews.create(
+        {
+          site: site.type,
+          name: "Invalid Rating Review",
+          issue: "Default",
+          rating: 101,
+          url: "https://example.com/reviews/invalid-rating",
+          category: "single_malt",
+        },
+        { context: { user: admin } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  });
 });

@@ -37,7 +37,12 @@ export const ReviewInputSchema = z.object({
   category: CategoryEnum.nullable()
     .default(null)
     .describe("Category of the whisky being reviewed"),
-  rating: z.number().describe("Rating given in the review"),
+  rating: z
+    .number()
+    .int()
+    .min(0)
+    .max(100)
+    .describe("Normalized rating given in the review"),
   issue: z
     .string()
     .trim()
