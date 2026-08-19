@@ -4,6 +4,7 @@ import {
   bottleAliases,
   bottleTombstones,
   incomingBottleDecisionLogs,
+  reviewArticles,
   reviews,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
@@ -163,11 +164,26 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    expect(await findReviewByUrl(url)).toMatchObject({
+    const review = await findReviewByUrl(url);
+    expect(review).toMatchObject({
       id: result.id,
+      articleId: expect.any(Number),
       bottleId: null,
       name: "Unresolved Review Bottle",
       rating: 89,
+      sourceKey: url,
+    });
+    expect(
+      await db.query.reviewArticles.findFirst({
+        where: eq(reviewArticles.id, review!.articleId!),
+      }),
+    ).toMatchObject({
+      externalSiteId: site.id,
+      canonicalUrl: url,
+      issue: "Default",
+      title: null,
+      contentHash: null,
+      fetchedAt: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({

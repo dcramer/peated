@@ -29,9 +29,10 @@
 - [x] 3.1 Automatically backfill one review article for every existing review
       in the schema migration while preserving source, URL, issue, rating,
       Bottle assignment, and visibility without fetching publisher pages
-- [ ] 3.2 Switch review ingestion, queries, serializers, moderation, and fixtures
-      to the article/review model
-- [ ] 3.3 Migrate the Whisky Advocate job to the shared article ingestion
+- [x] 3.2a Switch review ingestion and fixtures to the article/review model
+- [ ] 3.2b Switch review queries, serializers, and moderation to article-owned
+      metadata
+- [x] 3.3 Migrate the Whisky Advocate job to the shared article ingestion
       boundary without expanding its current collection or summary behavior
 - [x] 3.4 Add migration verification for total, visible, unresolved, Bottle-linked,
       and canonical-URL counts

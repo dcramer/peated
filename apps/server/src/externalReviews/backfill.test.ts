@@ -31,6 +31,7 @@ describe("review article backfill migration", () => {
     const secondSite = await fixtures.ExternalSite({ type: "totalwine" });
     const bottle = await fixtures.Bottle();
     await fixtures.Review({
+      articleId: null,
       externalSiteId: firstSite.id,
       bottleId: bottle.id,
       name: "Visible matched review",
@@ -42,6 +43,7 @@ describe("review article backfill migration", () => {
       updatedAt: new Date("2024-01-02T00:00:00Z"),
     });
     await fixtures.Review({
+      articleId: null,
       externalSiteId: firstSite.id,
       bottleId: null,
       name: "Hidden unresolved review",
@@ -53,6 +55,7 @@ describe("review article backfill migration", () => {
       updatedAt: new Date("2024-02-02T00:00:00Z"),
     });
     await fixtures.Review({
+      articleId: null,
       externalSiteId: secondSite.id,
       bottleId: bottle.id,
       name: "Second-site review",

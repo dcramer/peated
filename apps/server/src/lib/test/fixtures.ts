@@ -25,6 +25,7 @@ import {
   follows,
   oauthClients,
   passkeys,
+  reviewArticles,
   reviews,
   storePriceHistories,
   storePrices,
@@ -1111,17 +1112,38 @@ export const Review = async (
 
     data.bottleId = await resolveFixtureBottleId(data, tx);
 
+    const externalSiteId =
+      data.externalSiteId || (await ExternalSiteOrExisting({}, tx)).id;
+    const issue = data.issue ?? "Default";
+    const url = data.url ?? faker.internet.url();
+    let articleId = data.articleId;
+    let sourceKey = data.sourceKey;
+    if (articleId === undefined) {
+      const [article] = await tx
+        .insert(reviewArticles)
+        .values({ externalSiteId, canonicalUrl: url, issue })
+        .onConflictDoUpdate({
+          target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
+          set: { issue },
+        })
+        .returning({ id: reviewArticles.id });
+      if (!article) throw new Error("Unable to create ReviewArticle fixture");
+      articleId = article.id;
+      if (sourceKey === undefined) sourceKey = url;
+    }
+
     return await tx
       .insert(reviews)
       .values({
         name: "",
-        externalSiteId:
-          data.externalSiteId || (await ExternalSiteOrExisting({}, tx)).id,
+        externalSiteId,
         rating: faker.number.int({ min: 59, max: 100 }),
-        url: faker.internet.url(),
-        issue: "Default",
+        url,
+        issue,
         createdAt: new Date(),
         ...data,
+        articleId,
+        sourceKey,
       })
       .returning();
   });

@@ -3,7 +3,12 @@ import {
   normalizeBottleAliasKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { externalSites, reviews, storePrices } from "@peated/server/db/schema";
+import {
+  externalSites,
+  reviewArticles,
+  reviews,
+  storePrices,
+} from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -56,14 +61,27 @@ export class ExternalReviewBottleStateError extends Error {
 
 export const ExternalReviewInputSchema = ReviewInputSchema.strict();
 
+type ExternalReviewContext =
+  | { initiatedByUserId: number }
+  | { externalSiteId: number; sourceKey: string };
+
 export async function createExternalReview(
   rawInput: unknown,
-  { initiatedByUserId }: { initiatedByUserId?: number } = {},
+  context: ExternalReviewContext,
 ) {
   const input = ExternalReviewInputSchema.parse(rawInput);
+  const initiatedByUserId =
+    "initiatedByUserId" in context ? context.initiatedByUserId : undefined;
+  const sourceKey = "sourceKey" in context ? context.sourceKey : input.url;
   const systemActor = await getPeatedSystemActor();
   const site = await db.query.externalSites.findFirst({
-    where: eq(externalSites.type, input.site),
+    where:
+      "externalSiteId" in context
+        ? and(
+            eq(externalSites.id, context.externalSiteId),
+            eq(externalSites.type, input.site),
+          )
+        : eq(externalSites.type, input.site),
   });
   if (!site) throw new ExternalSiteNotFoundError(input.site);
 
@@ -96,6 +114,23 @@ export async function createExternalReview(
   const reviewNameCandidates = [reviewName.toLowerCase()];
 
   const { review, aliasAssignment } = await db.transaction(async (tx) => {
+    const [article] = await tx
+      .insert(reviewArticles)
+      .values({
+        externalSiteId: site.id,
+        canonicalUrl: input.url,
+        issue: input.issue,
+      })
+      .onConflictDoUpdate({
+        target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
+        set: {
+          issue: input.issue,
+          updatedAt: sql`NOW()`,
+        },
+      })
+      .returning({ id: reviewArticles.id });
+    if (!article) throw new Error("Unable to store review article.");
+
     if (bottleId !== null) {
       try {
         await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
@@ -160,17 +195,22 @@ export async function createExternalReview(
       [review] = await tx
         .update(reviews)
         .set({
+          articleId: article.id,
           bottleId: incomingIdentityIsAuthoritative
             ? bottleId
             : existingReview.bottleId,
+          issue: input.issue,
           name: reviewName,
           rating: input.rating,
+          sourceKey,
           url: input.url,
           updatedAt: sql`NOW()`,
         })
         .where(eq(reviews.id, existingReview.id))
         .returning();
     } else {
+      // Keep the row on the legacy partial index until this conflict resolves.
+      // That serializes rolling-deploy writers before the row is linked below.
       const { rows } = await tx.execute(
         sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
             VALUES (${bottleId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
@@ -189,7 +229,14 @@ export async function createExternalReview(
             RETURNING *`,
       );
       [review] = mapRows(rows, reviews);
+      if (!review) throw new Error("Unable to store review.");
+      [review] = await tx
+        .update(reviews)
+        .set({ articleId: article.id, sourceKey })
+        .where(eq(reviews.id, review.id))
+        .returning();
     }
+    if (!review) throw new Error("Unable to link review article.");
 
     const appliedIncomingIdentity = review.bottleId === bottleId;
     if (!bottleId || !appliedIncomingIdentity) {

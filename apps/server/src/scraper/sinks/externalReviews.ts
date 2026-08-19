@@ -8,12 +8,18 @@ import type { ScraperSink } from "../types";
 
 export const whiskyAdvocateReviewSink: ScraperSink<
   WhiskyAdvocateObservation
-> = async ({ observation }) => {
+> = async ({ externalSiteId, observation }) => {
   try {
-    await createExternalReview({
-      site: "whiskyadvocate",
-      ...observation.value,
-    });
+    await createExternalReview(
+      {
+        site: "whiskyadvocate",
+        ...observation.value,
+      },
+      {
+        externalSiteId,
+        sourceKey: observation.sourceKey,
+      },
+    );
   } catch (error) {
     if (!(error instanceof ExternalReviewBottleStateError)) throw error;
 
