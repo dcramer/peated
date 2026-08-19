@@ -365,7 +365,7 @@ describe("POST /external-sites/:site/prices", () => {
     ).resolves.toHaveLength(2);
   });
 
-  test("uses a canonical barcode only for the matching package volume", async ({
+  test("uses an approved barcode only for the matching package volume", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -411,6 +411,13 @@ describe("POST /external-sites/:site/prices", () => {
         ({ externalProductId }) => externalProductId === "matching-volume",
       ),
     ).toMatchObject({ bottleId: bottle.id });
+    const matched = prices.find(
+      ({ externalProductId }) => externalProductId === "matching-volume",
+    );
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: matched!.id, force: true },
+    );
     const unresolved = prices.find(
       ({ externalProductId }) => externalProductId === "wrong-volume",
     );

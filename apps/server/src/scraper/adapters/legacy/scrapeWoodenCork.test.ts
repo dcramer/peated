@@ -19,6 +19,7 @@ test("simple", async ({ axiosMock }) => {
   expect(items[0]).toMatchInlineSnapshot(`
     {
       "currency": "usd",
+      "externalProductId": "4395720474760",
       "name": "Elmer T. Lee Single Barrel Bourbon",
       "price": 33899,
       "url": "https://woodencork.com/collections/whiskey/products/elmer-t-lee-bourbon",

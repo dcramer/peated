@@ -40,6 +40,7 @@ export default async function scrapeSMWS() {
 const SMWSPayloadSchema = z.object({
   items: z.array(
     z.object({
+      id: z.number().int().positive(),
       name: z.string(),
       age: z.number().nullable(),
       abv: z.union([z.string(), z.number()]).nullable(),
@@ -156,6 +157,7 @@ export async function scrapeBottles(
             currency: "gbp",
             volume: 750,
             url: `https://smws.com${item.url}`,
+            externalProductId: String(item.id),
           },
           item.image,
         );

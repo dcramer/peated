@@ -46,6 +46,7 @@ test("bottle list", async ({ axiosMock }) => {
       },
       {
         "currency": "gbp",
+        "externalProductId": "4399",
         "name": "SMWS RW3.6 Truly a flavour bomb",
         "price": 6500,
         "url": "https://smws.com/truly-a-flavour-bomb/",
@@ -82,6 +83,7 @@ test("bottle list", async ({ axiosMock }) => {
       },
       {
         "currency": "gbp",
+        "externalProductId": "4702",
         "name": "SMWS 3.350 Gladrags of yesteryear",
         "price": 17950,
         "url": "https://smws.com/gladrags-of-yesteryear/",

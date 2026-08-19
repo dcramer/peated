@@ -14,7 +14,7 @@ import {
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
-import { db } from "@peated/server/db";
+import { db, type AnyDatabase } from "@peated/server/db";
 import {
   bottleAliases,
   bottleSeries,
@@ -688,7 +688,10 @@ function buildBottleSiblingContext(
   return siblingContextByBottleId;
 }
 
-async function enrichBottleCandidates(candidates: BottleCandidate[]) {
+async function enrichBottleCandidates(
+  candidates: BottleCandidate[],
+  database: AnyDatabase = db,
+) {
   if (!candidates.length) {
     return candidates;
   }
@@ -698,7 +701,7 @@ async function enrichBottleCandidates(candidates: BottleCandidate[]) {
   const bottlerEntity = alias(entities, "price_match_bottler");
   const distillerEntity = alias(entities, "price_match_distiller");
 
-  const bottleRows = await db
+  const bottleRows = await database
     .select({
       bottleId: bottles.id,
       groupId: bottles.groupId,
@@ -736,7 +739,7 @@ async function enrichBottleCandidates(candidates: BottleCandidate[]) {
   const siblingRows =
     groupIds.length === 0
       ? []
-      : await db
+      : await database
           .select({
             bottleId: bottles.id,
             groupId: bottles.groupId,
@@ -764,7 +767,7 @@ async function enrichBottleCandidates(candidates: BottleCandidate[]) {
     siblingRows,
   );
 
-  const distilleryRows = await db
+  const distilleryRows = await database
     .select({
       bottleId: bottlesToDistillers.bottleId,
       distillery: distillerEntity.name,
@@ -1065,8 +1068,9 @@ async function getBrandCandidates(
 
 async function getOrdinaryBottleCandidateById(
   bottleId: number,
+  database: AnyDatabase = db,
 ): Promise<BottleCandidate | null> {
-  const [result] = await db
+  const [result] = await database
     .select({
       bottleId: bottles.id,
       fullName: bottles.fullName,
@@ -1118,13 +1122,14 @@ async function getOrdinaryBottleCandidateById(
     "current",
   );
 
-  return (await enrichBottleCandidates([candidate]))[0] ?? null;
+  return (await enrichBottleCandidates([candidate], database))[0] ?? null;
 }
 
 export async function getBottleCandidateById(
   bottleId: number,
+  database: AnyDatabase = db,
 ): Promise<BottleCandidate | null> {
-  return await getOrdinaryBottleCandidateById(bottleId);
+  return await getOrdinaryBottleCandidateById(bottleId, database);
 }
 
 async function getExactBottleCandidate(

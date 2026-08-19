@@ -5,6 +5,7 @@ import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
+  bottleBarcodes,
   bottleChecks,
   bottleGroups,
   bottleObservations,
@@ -289,6 +290,110 @@ describe("priceMatching", () => {
 
   afterEach(() => {
     config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
+  });
+
+  test("uses an approved barcode before calling the classifier", async ({
+    fixtures,
+  }) => {
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+    const bottle = await fixtures.Bottle({ name: "Canonical Barcode Bottle" });
+    const actor = await getPeatedSystemActor();
+    await db.insert(bottleBarcodes).values({
+      bottleId: bottle.id,
+      value: "036602301979",
+      gtin14: "00036602301979",
+      volume: 750,
+      createdByActorId: actor.id,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      barcode: "036602301979",
+      name: "Generic Retailer Listing",
+      volume: 750,
+    });
+    const { runScrapedBottleReference } =
+      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal).toMatchObject({
+      status: "approved",
+      proposalType: "match_existing",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      aliasScope: "none",
+      model: null,
+    });
+    await expect(
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).resolves.toMatchObject({ bottleId: bottle.id });
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+      }),
+    ).resolves.toBeUndefined();
+    expect(runScrapedBottleReference).not.toHaveBeenCalled();
+  });
+
+  test("an approved barcode retry replaces a stale pending proposal", async ({
+    fixtures,
+  }) => {
+    await fixtures.User({
+      username: "dcramer",
+      admin: true,
+      mod: true,
+    });
+    const bottle = await fixtures.Bottle({ name: "Later Barcode Bottle" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      barcode: "036602301979",
+      name: "Unresolved Retailer Listing",
+      volume: 750,
+    });
+    const { runScrapedBottleReference } =
+      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
+    vi.mocked(runScrapedBottleReference).mockResolvedValueOnce({
+      result: buildMockBottleReferenceClassification({
+        decision: {
+          action: "no_match",
+          rationale: "No canonical GTIN mapping exists yet.",
+          candidateBottleIds: [],
+          proposedBottle: null,
+        },
+      }),
+      modelMetadata: null,
+    });
+    const pending = await resolveStorePriceMatchProposal(price.id);
+    expect(pending.status).toBe("pending_review");
+
+    const actor = await getPeatedSystemActor();
+    await db.insert(bottleBarcodes).values({
+      bottleId: bottle.id,
+      value: "036602301979",
+      gtin14: "00036602301979",
+      volume: 750,
+      createdByActorId: actor.id,
+    });
+    vi.mocked(runScrapedBottleReference).mockClear();
+
+    const approved = await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+    });
+
+    expect(approved).toMatchObject({
+      id: pending.id,
+      status: "approved",
+      currentBottleId: bottle.id,
+      suggestedBottleId: bottle.id,
+      model: null,
+    });
+    expect(runScrapedBottleReference).not.toHaveBeenCalled();
   });
 
   test("passes normalized source identity to the classifier", async ({
