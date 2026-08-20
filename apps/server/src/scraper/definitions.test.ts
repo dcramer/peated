@@ -34,7 +34,7 @@ test("applies conservative target and run defaults", () => {
   expect(target).toMatchObject({
     enabled: true,
     minimumSpacingMs: 2_000,
-    requestsPerWindow: 300,
+    requestsPerWindow: 60,
     windowMs: 3_600_000,
     timeoutMs: 30_000,
     maxResponseBytes: 10 * 1024 * 1024,

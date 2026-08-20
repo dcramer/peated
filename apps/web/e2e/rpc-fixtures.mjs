@@ -552,7 +552,7 @@ export const priceSite = {
         blockedUntil: null,
         coolingDown: false,
         minimumSpacingMs: 2_000,
-        requestsPerWindow: 300,
+        requestsPerWindow: 60,
         windowMs: 3_600_000,
         origins: [
           {
