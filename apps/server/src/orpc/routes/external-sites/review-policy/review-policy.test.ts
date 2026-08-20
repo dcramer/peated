@@ -1,9 +1,13 @@
 import { db } from "@peated/server/db";
-import { externalReviewSourcePolicies } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  externalReviewSourcePolicies,
+  reviews,
+} from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 vi.mock("@peated/server/lib/auditLog", () => ({
   AuditEvent: {
@@ -201,28 +205,68 @@ describe("external review source policy routes", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Review source not found.]`);
   });
 
-  test("keeps automatic publication unavailable during the pilot", async ({
+  test("publishes staged reviews with active resolved Bottles", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({
       type: "whiskyadvocate",
     });
+    await fixtures.EnabledExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+    });
+    const activeBottle = await fixtures.Bottle({ name: "Active Bottle" });
+    const retiredBottle = await fixtures.Bottle({ name: "Retired Bottle" });
+    const replacementBottle = await fixtures.Bottle({
+      name: "Replacement Bottle",
+    });
+    await fixtures.Review({
+      externalSiteId: site.id,
+      sourceKey: "active",
+      name: "Active review",
+      bottleId: activeBottle.id,
+      hidden: true,
+    });
+    await fixtures.Review({
+      externalSiteId: site.id,
+      sourceKey: "unresolved",
+      name: "Unresolved review",
+      bottleId: null,
+      hidden: true,
+    });
+    await fixtures.Review({
+      externalSiteId: site.id,
+      sourceKey: "retired",
+      name: "Retired review",
+      bottleId: retiredBottle.id,
+      hidden: true,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retiredBottle.id,
+      newBottleId: replacementBottle.id,
+    });
     const moderator = await fixtures.User({ mod: true });
 
-    const error = await waitError(() =>
-      routerClient.externalSites.reviewPolicy.set(
-        {
-          site: site.type,
-          policy: {
-            ...reviewOnlyPolicy,
-            // @ts-expect-error Proves the runtime boundary rejects a future mode.
-            publicationMode: "automatic",
-          },
+    const result = await routerClient.externalSites.reviewPolicy.set(
+      {
+        site: site.type,
+        policy: {
+          ...reviewOnlyPolicy,
+          publicationMode: "automatic",
         },
-        { context: { user: moderator } },
-      ),
+      },
+      { context: { user: moderator } },
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(result.publicationMode).toBe("automatic");
+    expect(
+      await db
+        .select({ name: reviews.name, hidden: reviews.hidden })
+        .from(reviews)
+        .orderBy(asc(reviews.name)),
+    ).toEqual([
+      { name: "Active review", hidden: false },
+      { name: "Retired review", hidden: true },
+      { name: "Unresolved review", hidden: true },
+    ]);
   });
 });

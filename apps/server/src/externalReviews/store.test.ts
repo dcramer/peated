@@ -83,6 +83,40 @@ describe("storeReviewArticle", () => {
     ]);
   });
 
+  test("publishes only resolved reviews in automatic mode", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.ExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+      publicationMode: "automatic",
+      allowFetching: true,
+      allowLlmProcessing: true,
+      allowScoreDisplay: true,
+      allowSummaryDisplay: true,
+    });
+    const bottle = await fixtures.Bottle({ name: "Resolved Review Bottle" });
+    const input = inputFor(site.id);
+
+    await storeReviewArticle({
+      ...input,
+      reviews: [
+        { ...input.reviews[0], bottleId: bottle.id },
+        { ...input.reviews[1], bottleId: null },
+      ],
+    });
+
+    expect(
+      await db
+        .select({ sourceKey: reviews.sourceKey, hidden: reviews.hidden })
+        .from(reviews)
+        .orderBy(asc(reviews.sourceKey)),
+    ).toEqual([
+      { sourceKey: "ardbeg-ten", hidden: false },
+      { sourceKey: "lagavulin-special", hidden: true },
+    ]);
+  });
+
   test("updates the same article and stable reviews idempotently", async ({
     fixtures,
   }) => {

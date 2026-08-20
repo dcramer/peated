@@ -100,9 +100,9 @@ const DisabledExternalReviewSourcePolicyInputSchema = z
   })
   .strict();
 
-const ReviewOnlyExternalReviewSourcePolicyInputSchema = z
+const EnabledExternalReviewSourcePolicyInputSchema = z
   .object({
-    publicationMode: z.literal("review_only"),
+    publicationMode: z.enum(["review_only", "automatic"]),
     allowFetching: z.literal(true),
     allowLlmProcessing: z.boolean(),
     allowScoreDisplay: z.boolean(),
@@ -121,6 +121,6 @@ export const ExternalReviewSourcePolicyInputSchema = z.discriminatedUnion(
   "publicationMode",
   [
     DisabledExternalReviewSourcePolicyInputSchema,
-    ReviewOnlyExternalReviewSourcePolicyInputSchema,
+    EnabledExternalReviewSourcePolicyInputSchema,
   ],
 );

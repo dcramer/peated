@@ -77,11 +77,10 @@ ingestion boundary rechecks display capabilities before making a review
 visible, so a caller cannot bypass policy by directly submitting parsed data.
 Changing a policy is a moderator-only operation and is audit logged.
 
-During the pilot, the moderator API only permits disabled and review-only
-modes. The database retains the automatic mode for the later rollout decision,
-but the API will not expose that transition until the quality gate is
-implemented. A general policy-revision system is deferred until multiple
-revisions create a proven need.
+The moderator API permits automatic mode after the source passes its quality
+gate. The transition publishes staged reviews only when they have an active
+resolved Bottle. Unresolved reviews remain hidden. A general policy-revision
+system is deferred until multiple revisions create a proven need.
 
 The policy records which capabilities Peated has enabled. The fetcher checks
 robots.txt on each run. Robots rules can further restrict crawling but cannot
