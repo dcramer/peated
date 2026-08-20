@@ -8,6 +8,14 @@ test("Whisky Advocate observations use article and source identity", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  await fixtures.ExternalReviewSourcePolicy({
+    externalSiteId: site.id,
+    publicationMode: "review_only",
+    allowFetching: true,
+    allowLlmProcessing: true,
+    allowScoreDisplay: true,
+    allowSummaryDisplay: false,
+  });
   const bottle = await fixtures.Bottle({ name: "Sink Review Bottle" });
   const url = "https://whiskyadvocate.com/reviews/sink-review";
   const observation = {
@@ -41,7 +49,11 @@ test("Whisky Advocate observations use article and source identity", async ({
       bottleId: bottle.id,
       name: bottle.fullName,
       rating: 93,
+      nativeScoreValue: 93,
+      nativeScoreScale: 100,
+      nativeScoreDisplay: "93/100",
       sourceKey: observation.sourceKey,
+      hidden: true,
     },
   ]);
   expect(
@@ -58,9 +70,9 @@ test("Whisky Advocate observations use article and source identity", async ({
     {
       id: storedReviews[0]!.review.articleId,
       issue: "Fall 2026",
-      title: null,
-      contentHash: null,
-      fetchedAt: null,
+      title: bottle.fullName,
+      contentHash: expect.any(String),
+      fetchedAt: expect.any(Date),
     },
   ]);
 });

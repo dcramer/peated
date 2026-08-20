@@ -23,8 +23,8 @@ score display, summary display, and automatic publication.
 - Generate short, grounded, attributed summaries without retaining article
   bodies.
 - Reuse Peated's existing Bottle resolution and unresolved-review moderation.
-- Prove an archive source and an ongoing multi-bottle source through a small,
-  measurable rollout.
+- Prove an archive source and the existing Whisky Advocate source through a
+  small, measurable rollout.
 
 **Non-Goals:**
 
@@ -98,9 +98,11 @@ ingestion boundary validates the source policy, upserts the article, resolves
 each review using the existing external-review Bottle resolver, and persists
 the result.
 
-WhiskyNotes is the preferred archive adapter and Dramface is the preferred
-ongoing/multi-bottle adapter. Each source remains disabled until its current
-robots rules and public terms are checked.
+WhiskyNotes is the archive adapter. Whisky Advocate is the second bounded
+pilot because it already has production history and tests the legacy source
+through the governed runtime. Dramface remains a later multi-bottle candidate.
+Each source remains disabled until its current robots rules and public terms
+are checked.
 
 Alternative considered: build a configurable LLM-only arbitrary-page crawler.
 This was rejected because discovery, rate limits, identity keys, score scales,

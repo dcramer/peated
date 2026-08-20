@@ -1,6 +1,6 @@
 # External Review Content Supply
 
-Status: research notes, checked 2026-08-18. This is product and technical
+Status: research notes, checked 2026-08-20. This is product and technical
 research, not legal advice. Recheck every source before enabling ingestion.
 
 ## Product Intent
@@ -47,7 +47,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 | P0         | [WhiskyNotes](https://www.whiskynotes.be/)                    | About 6,600 reviews across 4,985 articles; new tasting notes every weekday        | Public article paths allowed; feed, search, downloads, and WordPress internals disallowed          | No dedicated terms page located                                                                                                                   | `public_index`, first archive pilot           |
 | P0         | [Whiskyfun](https://www.whiskyfun.com/)                       | About 22,700 whisky reviews dating to 2002                                        | No `Disallow` rule observed; unusual single `Allow` entry                                          | No formal terms located; FAQ and disclosure discuss free commercial use                                                                           | `public_index`, later archive candidate       |
 | P0         | [Dramface](https://www.dramface.com/)                         | Reviews most weekdays, multiple writers, frequent multi-bottle articles           | Public pages allowed; Squarespace rules block API, JSON, search, account, and other internal paths | No dedicated terms page linked in the public footer                                                                                               | `public_index`, ongoing-feed pilot            |
-| P0         | [Whisky Advocate](https://whiskyadvocate.com/ratings-reviews) | Existing Peated source; publisher describes an archive of more than 6,000 reviews | General crawler access allowed, but GPTBot, ChatGPT-User, and CCBot are blocked                    | Public privacy policy references Terms of Service; no review-reuse restriction located                                                            | `public_index`; recheck AI crawler rules      |
+| P0         | [Whisky Advocate](https://whiskyadvocate.com/ratings-reviews) | Existing Peated source; publisher describes an archive of more than 6,000 reviews | Ratings paths allowed for general crawlers; GPTBot, ChatGPT-User, and CCBot are blocked            | Privacy policy references general terms, but no public general terms page or review-reuse restriction was located                                 | `public_index`, second bounded pilot          |
 | P1         | [Whisky Magazine](https://www.whiskymag.com/search/tastings/) | Structured tasting archive spanning more than 200 magazine issues                 | Verification failed because the server reset the automated request                                 | Terms prohibit automated access, aggregation, and commercial reuse without written permission                                                     | `licensed_only`                               |
 | P1         | [Malt](https://malt-review.com/)                              | Large historical review archive with multiple contributors                        | Automated requests returned HTTP 429 during the audit                                              | No current terms page verified because automated access was rate-limited                                                                          | `do_not_ingest`; do not work around the block |
 | P1         | [Breaking Bourbon](https://www.breakingbourbon.com/)          | Deep American whiskey archive with structured ratings and reviewers               | robots file exposes a sitemap and no reviewed article-path restriction                             | Terms prohibit robots, spiders, retrieval/indexing applications, and reuse without written consent                                                | `licensed_only`                               |
@@ -108,9 +108,16 @@ podcast transcripts need a separate platform-terms and creator-rights review.
 - Evidence: [ratings archive](https://whiskyadvocate.com/ratings-reviews),
   [privacy policy](https://whiskyadvocate.com/Privacy-Policy), and
   [robots.txt](https://whiskyadvocate.com/robots.txt).
-- Peated already has a dedicated issue scraper and thousands of stored review
-  rows. Before expanding or generating summaries, recheck the current terms and
-  AI crawler signals.
+- Rechecked on 2026-08-20. The general crawler group allows the ratings paths.
+  It blocks tracking-query variants and separately blocks GPTBot,
+  ChatGPT-User, and CCBot. Peated uses its own identified crawler and does not
+  request the blocked query variants.
+- The privacy policy was last modified on 2026-04-01. It references general
+  Terms of Service, but no public general terms page was linked or found. No
+  reviewed page prohibited the planned metadata indexing and canonical links.
+- Peated already has more than 7,000 stored review rows. The second pilot reads
+  only the issue index and newest issue. It does not fetch review prose or
+  generate summaries.
 
 ### Explicitly Restricted Sources
 
@@ -171,10 +178,11 @@ the content and source-policy model.
 
 1. Use WhiskyNotes as the preferred archive pilot because it combines
    meaningful volume, current cadence, and clear bottle specifications.
-2. Use Dramface as the preferred ongoing and multi-bottle article pilot.
+2. Use the existing Whisky Advocate source as the second bounded pilot. Keep
+   Dramface as a later multi-bottle candidate.
 3. Treat Whiskyfun as a later high-volume backfill target.
-4. Recheck the existing Whisky Advocate robots rules and public terms before
-   adding summaries or attempting a full backfill.
+4. Do not add Whisky Advocate summaries or a full backfill in the bounded
+   pilot.
 
 The pilot is successful with at least 90% article extraction accuracy on a
 reviewed sample, reliable splitting of multi-bottle articles, measurable
