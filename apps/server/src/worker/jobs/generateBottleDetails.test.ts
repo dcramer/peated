@@ -16,6 +16,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 import generateBottleDetails, {
   type GeneratedBottleDetails,
+  getGeneratedBottleDetails,
 } from "./generateBottleDetails";
 
 vi.mock("@peated/server/config", async (importOriginal) => {
@@ -91,6 +92,20 @@ async function createTwoMemberGroup(user: User, brandId: number) {
 beforeEach(() => {
   vi.mocked(getStructuredResponse).mockReset();
   vi.mocked(workerClient.pushUniqueJob).mockClear();
+});
+
+test("filters generated tags to the allowed tag list", async () => {
+  vi.mocked(getStructuredResponse).mockResolvedValue({
+    ...generatedDetails(),
+    suggestedTags: ["smoke", "unsupported", "fruit"],
+  });
+
+  await expect(
+    getGeneratedBottleDetails({ id: 1, fullName: "Generated Tag Example" }, [
+      "smoke",
+      "fruit",
+    ]),
+  ).resolves.toMatchObject({ suggestedTags: ["smoke", "fruit"] });
 });
 
 test("rejects an unassigned Bottle before invoking AI", async ({

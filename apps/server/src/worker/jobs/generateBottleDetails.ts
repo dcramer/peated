@@ -16,7 +16,7 @@ import {
 } from "@peated/server/lib/bottleSchemas";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
-import { logError, logWarn } from "@peated/server/lib/log";
+import { logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import {
@@ -121,7 +121,7 @@ export async function getGeneratedBottleDetails(
     ? `bottle_details:${bottle.id}`
     : `ai:bottle_lookup:${bottle.fullName ?? bottle.name ?? "draft"}`;
 
-  return await withSentryConversation(
+  const result = await withSentryConversation(
     conversationId,
     async () =>
       await getStructuredResponse(
@@ -138,6 +138,14 @@ export async function getGeneratedBottleDetails(
         },
       ),
   );
+
+  if (!result) return null;
+
+  const allowedTags = new Set(tagList);
+  return {
+    ...result,
+    suggestedTags: result.suggestedTags.filter((tag) => allowedTags.has(tag)),
+  };
 }
 
 export default async function generateBottleDetails(rawJobArgs: unknown) {
@@ -227,19 +235,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     result.suggestedTags?.length &&
     !arraysEqual(result.suggestedTags, bottle.suggestedTags)
   ) {
-    if (!result.suggestedTags.find((t) => !tagList.includes(t))) {
-      patch.suggestedTags = result.suggestedTags;
-    } else {
-      logError(`Invalid value for suggestedTags`, {
-        tag: {
-          values: result.suggestedTags.filter((t) => !tagList.includes(t)),
-        },
-        bottle: {
-          id: bottle.id,
-          fullName: bottle.fullName,
-        },
-      });
-    }
+    patch.suggestedTags = result.suggestedTags;
   }
 
   if (!bottle.flavorProfile) {
