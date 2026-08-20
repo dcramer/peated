@@ -141,14 +141,14 @@ export async function generateExternalReviewSummary(
     response = await instrumentOpenAIResponsesCall({
       baseURL: config.AI_GATEWAY_HOST,
       conversationId,
-      model: config.OPENAI_MODEL,
+      model: config.BOTTLE_CLASSIFIER_MODEL,
       callback: async (reportResponse) => {
         try {
           const result = await createOpenAIClient({
             instrumentWithSentry: false,
             workload: "scraper",
           }).responses.create({
-            model: config.OPENAI_MODEL,
+            model: config.BOTTLE_CLASSIFIER_MODEL,
             instructions: INSTRUCTIONS,
             input: JSON.stringify({
               bottleName: input.bottleName,

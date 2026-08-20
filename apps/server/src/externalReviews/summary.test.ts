@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import {
   EXTERNAL_REVIEW_SUMMARY_PROMPT_VERSION,
   generateExternalReviewSummary,
@@ -18,7 +19,7 @@ vi.mock("@peated/server/lib/openaiClient", () => ({
 function response(summary: string) {
   return {
     id: "response-1",
-    model: "gpt-5.4-2026-08-01",
+    model: "gpt-auxiliary-snapshot",
     service_tier: "default",
     output_text: JSON.stringify({ summary }),
     usage: {
@@ -88,7 +89,7 @@ test("generates a short summary with provenance and no provider storage", async 
   expect(result).toMatchObject({
     text: "The reviewer describes a bright whisky with measured smoke. They find the finish dry and balanced.",
     contentHash: "sha256:first",
-    model: "gpt-5.4-2026-08-01",
+    model: "gpt-auxiliary-snapshot",
     promptVersion: EXTERNAL_REVIEW_SUMMARY_PROMPT_VERSION,
     generatedAt: expect.any(Date),
   });
@@ -98,6 +99,7 @@ test("generates a short summary with provenance and no provider storage", async 
   });
   expect(openAIMocks.responsesCreate).toHaveBeenCalledWith(
     expect.objectContaining({
+      model: config.BOTTLE_CLASSIFIER_MODEL,
       store: false,
       max_output_tokens: 500,
       input: expect.stringContaining(sourceText),
