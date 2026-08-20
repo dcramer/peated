@@ -69,6 +69,8 @@ test("resolves each review and hides unresolved or invalid assignments", async (
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   const bottle = await fixtures.Bottle({ name: "Resolved Review Bottle" });
   const missingBottleId = 2_147_483_647;
+  const unresolvedName =
+    "Mister Sam Tribute Whiskey (66,9%, OB 2019 (Batch 1), 1200 btl.)";
   resolveBottleMock
     .mockResolvedValueOnce(resolution(bottle.id))
     .mockResolvedValueOnce(resolution(null))
@@ -83,7 +85,7 @@ test("resolves each review and hides unresolved or invalid assignments", async (
       contentHash: "sha256:first",
       reviews: [
         { sourceKey: "resolved", name: bottle.fullName },
-        { sourceKey: "unresolved", name: "Unknown Review Bottle" },
+        { sourceKey: "unresolved", name: unresolvedName },
         { sourceKey: "invalid", name: "Missing Review Bottle" },
       ],
     },
@@ -106,6 +108,7 @@ test("resolves each review and hides unresolved or invalid assignments", async (
     },
     {
       sourceKey: "unresolved",
+      name: unresolvedName,
       bottleId: null,
       hidden: true,
     },
