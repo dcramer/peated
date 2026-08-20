@@ -11,12 +11,13 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
+  MAX_BOTTLE_SUGGESTED_TAGS,
   SystemBottlePatchSchema,
   type SystemBottlePatch,
 } from "@peated/server/lib/bottleSchemas";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
-import { logError, logWarn } from "@peated/server/lib/log";
+import { logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import {
@@ -74,7 +75,7 @@ function generatePrompt(bottle: Partial<Bottle>, tagList: string[]) {
     ].join("\n"),
     tagList.length
       ? [
-          "'suggestedTags' may contain up to five items when they are strongly supported by the bottle's style or profile.",
+          `'suggestedTags' may contain up to ${MAX_BOTTLE_SUGGESTED_TAGS} items when they are strongly supported by the bottle's style or profile.`,
           "If no tags are well supported, return an empty array.",
           "Values must come from this list:",
           `- ${tagList.join("\n- ")}`,
@@ -96,17 +97,14 @@ export const OpenAIBottleDetailsSchema = z.object({
     .nullable()
     .default(null),
   category: z.string().nullable().default(null),
-  suggestedTags: z.array(z.string()).default([]),
+  suggestedTags: z.array(z.string()).max(MAX_BOTTLE_SUGGESTED_TAGS).default([]),
   flavorProfile: z.string().nullable().default(null),
 });
 
-// we dont send enums to openai as they dont get used
 export const OpenAIBottleDetailsValidationSchema =
   OpenAIBottleDetailsSchema.extend({
     category: CategoryEnum.nullable().default(null),
     flavorProfile: FlavorProfileEnum.nullable().default(null),
-    // TODO: ChatGPT is ignoring this shit, so lets validate later and throw away if invalid
-    // suggestedTags: z.array(DefaultTagEnum).default([]),
   });
 
 export type GeneratedBottleDetails = z.infer<
@@ -115,13 +113,15 @@ export type GeneratedBottleDetails = z.infer<
 
 export async function getGeneratedBottleDetails(
   bottle: Partial<Bottle>,
-  tagList: string[],
 ): Promise<GeneratedBottleDetails | null> {
+  const tagList = (
+    await db.query.tags.findMany({ columns: { name: true } })
+  ).map(({ name }) => name);
   const conversationId = bottle.id
     ? `bottle_details:${bottle.id}`
     : `ai:bottle_lookup:${bottle.fullName ?? bottle.name ?? "draft"}`;
 
-  return await withSentryConversation(
+  const result = await withSentryConversation(
     conversationId,
     async () =>
       await getStructuredResponse(
@@ -138,6 +138,17 @@ export async function getGeneratedBottleDetails(
         },
       ),
   );
+
+  if (!result) return null;
+
+  // The database catalog owns tag identity; model output is only a proposal.
+  const allowedTags = new Set(tagList);
+  return {
+    ...result,
+    suggestedTags: Array.from(
+      new Set(result.suggestedTags.filter((tag) => allowedTags.has(tag))),
+    ).slice(0, MAX_BOTTLE_SUGGESTED_TAGS),
+  };
 }
 
 export default async function generateBottleDetails(rawJobArgs: unknown) {
@@ -197,8 +208,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     return;
   }
 
-  const tagList = (await db.query.tags.findMany()).map((r) => r.name);
-  const result = await getGeneratedBottleDetails(bottle, tagList);
+  const result = await getGeneratedBottleDetails(bottle);
 
   if (!result) {
     throw new Error(`Failed to generate details for bottle: ${bottleId}`);
@@ -227,19 +237,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     result.suggestedTags?.length &&
     !arraysEqual(result.suggestedTags, bottle.suggestedTags)
   ) {
-    if (!result.suggestedTags.find((t) => !tagList.includes(t))) {
-      patch.suggestedTags = result.suggestedTags;
-    } else {
-      logError(`Invalid value for suggestedTags`, {
-        tag: {
-          values: result.suggestedTags.filter((t) => !tagList.includes(t)),
-        },
-        bottle: {
-          id: bottle.id,
-          fullName: bottle.fullName,
-        },
-      });
-    }
+    patch.suggestedTags = result.suggestedTags;
   }
 
   if (!bottle.flavorProfile) {

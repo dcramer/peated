@@ -16,6 +16,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 import generateBottleDetails, {
   type GeneratedBottleDetails,
+  getGeneratedBottleDetails,
 } from "./generateBottleDetails";
 
 vi.mock("@peated/server/config", async (importOriginal) => {
@@ -91,6 +92,44 @@ async function createTwoMemberGroup(user: User, brandId: number) {
 beforeEach(() => {
   vi.mocked(getStructuredResponse).mockReset();
   vi.mocked(workerClient.pushUniqueJob).mockClear();
+});
+
+test("normalizes generated tags to the catalog and storage limit", async ({
+  fixtures,
+}) => {
+  for (const name of ["smoke", "fruit", "oak", "vanilla", "citrus", "malt"]) {
+    await fixtures.Tag({ name });
+  }
+  vi.mocked(getStructuredResponse).mockResolvedValue({
+    ...generatedDetails(),
+    suggestedTags: [
+      "smoke",
+      "unsupported",
+      "smoke",
+      "fruit",
+      "oak",
+      "vanilla",
+      "citrus",
+      "malt",
+    ],
+  });
+
+  await expect(
+    getGeneratedBottleDetails({ id: 1, fullName: "Generated Tag Example" }),
+  ).resolves.toMatchObject({
+    suggestedTags: ["smoke", "fruit", "oak", "vanilla", "citrus"],
+  });
+});
+
+test("returns no generated tags when the catalog is empty", async () => {
+  vi.mocked(getStructuredResponse).mockResolvedValue({
+    ...generatedDetails(),
+    suggestedTags: ["unsupported"],
+  });
+
+  await expect(
+    getGeneratedBottleDetails({ id: 1, fullName: "Generated Tag Example" }),
+  ).resolves.toMatchObject({ suggestedTags: [] });
 });
 
 test("rejects an unassigned Bottle before invoking AI", async ({

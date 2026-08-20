@@ -5,6 +5,8 @@
 import { BottleInputSchema } from "@peated/server/schemas";
 import { z } from "zod";
 
+export const MAX_BOTTLE_SUGGESTED_TAGS = 5;
+
 const BottleGroupFieldsSchema = BottleInputSchema.pick({
   name: true,
   statedAge: true,
@@ -165,7 +167,10 @@ const BottlePatchFieldsSchema = z
       .optional(),
     image: BottleInputSchema.shape.image.optional(),
     tastingNotes: BottleInputSchema.shape.tastingNotes.optional(),
-    suggestedTags: z.array(z.string().max(64)).max(5).optional(),
+    suggestedTags: z
+      .array(z.string().max(64))
+      .max(MAX_BOTTLE_SUGGESTED_TAGS)
+      .optional(),
   })
   .strict();
 
