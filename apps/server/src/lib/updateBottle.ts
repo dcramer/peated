@@ -37,6 +37,7 @@ import {
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   getBottleExactIdentity,
+  getBottleExactStatedAge,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import {
@@ -59,6 +60,7 @@ type SharedPatch = Partial<
   Pick<
     SystemBottlePatch,
     | "name"
+    | "statedAge"
     | "series"
     | "category"
     | "brand"
@@ -316,6 +318,13 @@ function hasFields(value: object | undefined): boolean {
  */
 export function bottleStoragePatch(
   input: SystemBottlePatch,
+  {
+    bottleStatedAge,
+    groupStatedAge,
+  }: {
+    bottleStatedAge: Bottle["statedAge"];
+    groupStatedAge: BottleGroup["statedAge"];
+  },
 ): BottleStoragePatch {
   const shared: SharedPatch = {};
   const exact: ExactPatch = {};
@@ -329,7 +338,22 @@ export function bottleStoragePatch(
   if ("flavorProfile" in input) shared.flavorProfile = input.flavorProfile;
 
   if ("edition" in input) exact.edition = input.edition;
-  if ("statedAge" in input) exact.statedAge = input.statedAge;
+  if ("statedAge" in input) {
+    // Null must clear the effective age. With no exact override, the group is
+    // the storage owner and the clear must fan out to every member.
+    const clearsSharedAge =
+      input.statedAge === null &&
+      groupStatedAge !== null &&
+      getBottleExactStatedAge({
+        bottleStatedAge,
+        stableStatedAge: groupStatedAge,
+      }) === null;
+    if (clearsSharedAge) {
+      shared.statedAge = null;
+    } else {
+      exact.statedAge = input.statedAge;
+    }
+  }
   if ("abv" in input) exact.abv = input.abv;
   if ("singleCask" in input) exact.singleCask = input.singleCask;
   if ("caskStrength" in input) exact.caskStrength = input.caskStrength;
@@ -716,7 +740,7 @@ async function resolveStableState(
     (left, right) => left - right,
   );
 
-  let statedAge = group.statedAge;
+  let statedAge = valueOrCurrent(patch?.statedAge, group.statedAge);
   let name = patch?.name ?? group.name;
   if (patch?.name !== undefined) {
     const normalized = normalizeBottleAge({
@@ -724,7 +748,7 @@ async function resolveStableState(
       statedAge,
     });
     name = normalized.name;
-    statedAge = normalized.statedAge;
+    if (patch.statedAge === undefined) statedAge = normalized.statedAge;
   }
   name = stripDuplicateBrandPrefixFromBottleName(name, brand.name);
   if (!name || bottleNameDuplicatesBrand(name, brand.name)) {
@@ -1023,7 +1047,10 @@ export async function updateBottleInTransaction(
     ...existingEntityIdsForUpdate(input),
   ]);
   const groupId = group.id;
-  const storage = bottleStoragePatch(input);
+  const storage = bottleStoragePatch(input, {
+    bottleStatedAge: lockedBottle.statedAge,
+    groupStatedAge: group.statedAge,
+  });
   if (
     expectedSelectedBottleState &&
     expectedSelectedBottleKeys.some(

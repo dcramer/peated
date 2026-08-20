@@ -1657,6 +1657,26 @@ describe("Bottle updates", () => {
     });
     persisted = await loadGroupMembers(first.group.id);
     expect(persisted.map(({ statedAge }) => statedAge)).toEqual([15, 12, 18]);
+
+    resetQueueMock();
+    const clearedSharedAge = await updateBottle({
+      bottleId: members[1].bottle.id,
+      input: { statedAge: null },
+      context: contextFor(mod),
+    });
+    expect(clearedSharedAge).toMatchObject({
+      bottle: { id: members[1].bottle.id, statedAge: null },
+      group: { id: first.group.id, statedAge: null },
+      changed: true,
+    });
+    persisted = await loadGroupMembers(first.group.id);
+    expect(persisted.map(({ statedAge }) => statedAge)).toEqual([15, null, 18]);
+    expect(
+      vi
+        .mocked(workerClient.pushUniqueJob)
+        .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
+        .map(([, payload]) => payload),
+    ).toEqual(members.map(({ bottle }) => ({ bottleId: bottle.id })));
   });
 
   test("rolls back a shared update on Bottle or exact-alias collisions", async ({
