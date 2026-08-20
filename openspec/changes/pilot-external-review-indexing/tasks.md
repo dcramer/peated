@@ -41,7 +41,7 @@
 
 ## 4. Extraction And Summary Boundary
 
-- [ ] 4.1 Define the narrow source-adapter output contract for article metadata
+- [x] 4.1 Define the narrow source-adapter output contract for article metadata
       and stable reviews
 - [ ] 4.2 Reuse external-review Bottle resolution for every review and keep
       unresolved or invalid Bottle assignments hidden
