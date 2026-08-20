@@ -1,4 +1,4 @@
-import { db } from "@peated/server/db";
+import { MAX_BOTTLE_SUGGESTED_TAGS } from "@peated/server/lib/bottleSchemas";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleInputSchema } from "@peated/server/schemas";
@@ -18,7 +18,7 @@ const OutputSchema = z.object({
       finish: z.string().nullish(),
     })
     .nullish(),
-  suggestedTags: z.array(z.string()).nullish(),
+  suggestedTags: z.array(z.string()).max(MAX_BOTTLE_SUGGESTED_TAGS).nullish(),
 });
 
 export default procedure
@@ -34,10 +34,7 @@ export default procedure
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input }) {
-    const tagList = (
-      await db.query.tags.findMany({ columns: { name: true } })
-    ).map(({ name }) => name);
-    const result = await getGeneratedBottleDetails(input, tagList);
+    const result = await getGeneratedBottleDetails(input);
     return {
       description: result?.description,
       category: result?.category,

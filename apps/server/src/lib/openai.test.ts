@@ -5,6 +5,7 @@ import { OpenAIBottleDetailsValidationSchema } from "../worker/jobs/generateBott
 import { OpenAICountryDetailsSchema } from "../worker/jobs/generateCountryDetails";
 import { OpenAIEntityDetailsValidationSchema } from "../worker/jobs/generateEntityDetails";
 import { OpenAIRegionDetailsSchema } from "../worker/jobs/generateRegionDetails";
+import { MAX_BOTTLE_SUGGESTED_TAGS } from "./bottleSchemas";
 import { buildStructuredResponseSpanContext } from "./openai";
 
 test("uses GenAI workflow semantics for structured responses", () => {
@@ -64,5 +65,19 @@ describe("openai structured output schemas", () => {
         (schema) => schema.format === "uri",
       ),
     ).toBe(false);
+  });
+
+  test("limits generated bottle tags to the storage contract", () => {
+    const jsonSchema = z.toJSONSchema(
+      OpenAIBottleDetailsValidationSchema,
+    ) as unknown as {
+      properties?: {
+        suggestedTags?: { maxItems?: number };
+      };
+    };
+
+    expect(jsonSchema.properties?.suggestedTags?.maxItems).toBe(
+      MAX_BOTTLE_SUGGESTED_TAGS,
+    );
   });
 });
