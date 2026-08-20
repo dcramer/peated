@@ -69,8 +69,9 @@
       planned WhiskyNotes requests
 - [x] 6.2 Implement and fixture-test the first source adapter with
       bounded discovery and stable source keys
-- [ ] 6.3 Run the first backfill in review-only mode and capture article,
-      review, extraction, matched, and unresolved counts
+- [x] 6.3 Run the first backfill in review-only mode and capture article,
+      review, extraction, matched, and unresolved counts. Production run 239
+      stored 42 articles and 80 extracted reviews: 67 matched and 13 unresolved.
 - [ ] 6.4 Review the selected sample for at least 90% extraction accuracy,
       multi-bottle splitting, summary quality, and Bottle-match precision
 - [ ] 6.5 Explicitly enable or reject automatic publication based on the recorded

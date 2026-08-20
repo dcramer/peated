@@ -38,23 +38,29 @@ test("extracts multi-bottle reviews with stable source keys", async () => {
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
     reviews: [
       {
-        name: "Ben Nevis 30 yo 1996",
+        name: "Ben Nevis 30 yo 1996 (43,4%, The Whisky Agency 2026, sherry butt)",
         reviewerName: "Ruben",
         nativeScore: { value: 91, scale: 100, display: "91/100" },
         normalizedRating: 91,
       },
       {
-        name: "Ben Nevis 30 yo 1996",
+        name: "Ben Nevis 30 yo 1996 (45,3%, The Whisky Agency & Sansibar 2026, hogshead)",
         nativeScore: { value: 90, scale: 100, display: "90/100" },
         normalizedRating: 90,
       },
       {
-        name: "Bowmore 20 yo 2005",
+        name: "Bowmore 20 yo 2005 (48,8%, The Whisky Agency 2026, refill sherry hogshead)",
         nativeScore: { value: 91, scale: 100, display: "91/100" },
         normalizedRating: 91,
       },
     ],
   });
+  expect(parsed.article.reviews.map(({ name }) => name)).not.toContain(
+    "Three independent releases",
+  );
+  expect(new Set(parsed.article.reviews.map(({ name }) => name))).toHaveLength(
+    3,
+  );
   expect(parsed.article.reviews.map(({ sourceKey }) => sourceKey)).toEqual(
     reparsed.article.reviews.map(({ sourceKey }) => sourceKey),
   );

@@ -97,11 +97,11 @@ function score(value: string) {
   };
 }
 
-function bottleName(heading: string): string {
-  const details = heading.match(
-    /^(.+)\s+\((?=[^)]*\d{1,3}(?:[.,]\d+)?\s*%)[^)]*\)\s*$/u,
-  );
-  return normalizeText(details?.[1] ?? heading);
+function bottleName(heading: string): string | null {
+  const name = normalizeText(heading);
+  return /^.+\s+\((?=[^)]*\d{1,3}(?:[.,]\d+)?\s*%)[^)]*\)\s*$/u.test(name)
+    ? name
+    : null;
 }
 
 function reviewSourceKey(canonicalUrl: string, heading: string): string {
@@ -147,7 +147,7 @@ export function parseWhiskyNotesArticle(
   const headings = content
     .find("h2")
     .toArray()
-    .filter((heading) => normalizeText($(heading).text()).length > 0);
+    .filter((heading) => bottleName($(heading).text()) !== null);
   const rawPageScore = normalizeText(
     article.find(".entry-score").first().text(),
   );
@@ -157,6 +157,8 @@ export function parseWhiskyNotesArticle(
 
   for (const [index, heading] of headings.entries()) {
     const headingText = normalizeText($(heading).text());
+    const name = bottleName(headingText);
+    if (name === null) continue;
     const sectionText = normalizeText(
       [
         headingText,
@@ -170,7 +172,7 @@ export function parseWhiskyNotesArticle(
     const reviewScore = score(sectionText) ?? (index === 0 ? pageScore : null);
     reviewList.push({
       sourceKey,
-      name: bottleName(headingText),
+      name,
       reviewerName,
       nativeScore: reviewScore?.nativeScore ?? null,
       normalizedRating: reviewScore?.normalizedRating ?? null,
