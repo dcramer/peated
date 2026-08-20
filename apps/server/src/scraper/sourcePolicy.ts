@@ -15,15 +15,13 @@ export class ExternalReviewSourcePolicyError extends Error {
     readonly siteType: ExternalSiteType,
     readonly capability: ExternalReviewSourceCapability,
   ) {
-    super(
-      `External review source ${siteType} is not approved for ${capability}.`,
-    );
+    super(`External review source ${siteType} does not enable ${capability}.`);
   }
 }
 
 /**
- * This is the runtime authorization boundary for publisher content. Callers
- * must still honor robots.txt; robots permission never grants a capability.
+ * This is the runtime capability boundary for publisher content. Callers must
+ * still honor robots.txt; robots rules cannot enable a capability.
  */
 export async function requireExternalReviewSourceCapability(
   connection: AnyDatabase,

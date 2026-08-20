@@ -480,7 +480,8 @@ test("defers transient traffic coordination failures", async () => {
 test("rechecks source authorization after a queued wait", async () => {
   let allowed = true;
   const authorize = vi.fn(async () => {
-    if (!allowed) throw new Error("permission revoked with private detail");
+    if (!allowed)
+      throw new Error("source capability revoked with private detail");
   });
   const adapter: ScraperAdapter<
     FixtureCursor,
@@ -507,7 +508,7 @@ test("rechecks source authorization after a queued wait", async () => {
         executionToken: "second",
       },
     ),
-  ).rejects.toThrow(/permission revoked/);
+  ).rejects.toThrow(/source capability revoked/);
   expect(authorize).toHaveBeenCalledTimes(2);
   const [stored] = await db
     .select()

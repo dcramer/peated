@@ -969,36 +969,21 @@ export const ExternalReviewSourcePolicy = async (
   return result;
 };
 
-export const ApprovedExternalReviewSourcePolicy = async (
+export const EnabledExternalReviewSourcePolicy = async (
   { ...data }: Partial<dbSchema.NewExternalReviewSourcePolicy> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalReviewSourcePolicy> => {
-  return await db.transaction(async (tx) => {
-    const approvedByActorId =
-      data.approvedByActorId ??
-      (
-        await getUserActorByIdForDatabase(
-          tx,
-          (await User({ mod: true }, tx)).id,
-        )
-      ).id;
-
-    return await ExternalReviewSourcePolicy(
-      {
-        publicationMode: "review_only",
-        allowFetching: true,
-        allowLlmProcessing: true,
-        allowScoreDisplay: true,
-        allowSummaryDisplay: true,
-        policyEvidenceUrl: faker.internet.url(),
-        approvalReference: faker.string.uuid(),
-        reviewedAt: new Date(),
-        ...data,
-        approvedByActorId,
-      },
-      tx,
-    );
-  });
+  return await ExternalReviewSourcePolicy(
+    {
+      publicationMode: "review_only",
+      allowFetching: true,
+      allowLlmProcessing: true,
+      allowScoreDisplay: true,
+      allowSummaryDisplay: true,
+      ...data,
+    },
+    db,
+  );
 };
 
 export const StorePrice = async (

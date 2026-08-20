@@ -1,6 +1,6 @@
 /**
  * Owns optional external review summary generation. It checks source
- * permission, keeps publisher text out of storage and telemetry, and returns
+ * capability, keeps publisher text out of storage and telemetry, and returns
  * validated derived data.
  */
 import config from "@peated/server/config";
@@ -125,7 +125,7 @@ export async function generateExternalReviewSummary(
 
   if (!isAIGatewayConfigured("scraper")) return null;
 
-  // This query owns the LLM permission check immediately before model access.
+  // This query owns the LLM capability check immediately before model access.
   const policy = await db.query.externalReviewSourcePolicies.findFirst({
     columns: { allowLlmProcessing: true },
     where: eq(

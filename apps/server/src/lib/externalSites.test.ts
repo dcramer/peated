@@ -43,10 +43,19 @@ test("syncs code-owned external-site definitions", async () => {
   expect(fineDrams).toMatchObject(EXTERNAL_SITE_DEFINITIONS.finedrams);
 
   const policies = await db.select().from(externalReviewSourcePolicies);
-  expect(policies).toHaveLength(1);
-  expect(policies[0]).toMatchObject({
-    externalSiteId: sites.find((site) => site.type === "whiskyadvocate")?.id,
-    publicationMode: "disabled",
-    allowFetching: false,
-  });
+  expect(policies).toHaveLength(2);
+  expect(policies).toEqual(
+    expect.arrayContaining(
+      ["whiskyadvocate", "whiskynotes"].map((type) =>
+        expect.objectContaining({
+          externalSiteId: sites.find((site) => site.type === type)?.id,
+          publicationMode: "disabled",
+          allowFetching: false,
+          allowLlmProcessing: false,
+          allowScoreDisplay: false,
+          allowSummaryDisplay: false,
+        }),
+      ),
+    ),
+  );
 });

@@ -4,7 +4,6 @@ import {
   externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
-import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -83,18 +82,10 @@ export default procedure
               allowLlmProcessing: false,
               allowScoreDisplay: false,
               allowSummaryDisplay: false,
-              policyEvidenceUrl: previousPolicy?.policyEvidenceUrl ?? null,
-              approvalReference: previousPolicy?.approvalReference ?? null,
-              reviewedAt: previousPolicy?.reviewedAt ?? null,
-              approvedByActorId: previousPolicy?.approvedByActorId ?? null,
             }
           : {
               externalSiteId: site.id,
               ...inputPolicy,
-              reviewedAt: new Date(inputPolicy.reviewedAt),
-              approvedByActorId: (
-                await getUserActorForDatabase(tx, context.user)
-              ).id,
             };
 
       const [policy] = await tx

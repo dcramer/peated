@@ -141,12 +141,6 @@ export default function ScraperReadiness({ site }: { site: Site }) {
               <h3 className="font-semibold text-white">Review policy</h3>
               <div className="text-muted mt-1 text-xs capitalize">
                 Publication: {reviewPolicy.publicationMode.replace("_", " ")}
-                {reviewPolicy.reviewedAt ? (
-                  <>
-                    {" "}
-                    · reviewed <TimeSince date={reviewPolicy.reviewedAt} />
-                  </>
-                ) : null}
               </div>
             </div>
             <Status color={reviewPolicy.allowFetching ? "green" : "red"}>
@@ -165,16 +159,6 @@ export default function ScraperReadiness({ site }: { site: Site }) {
               Summaries:{" "}
               {reviewPolicy.allowSummaryDisplay ? "visible" : "hidden"}
             </span>
-            {reviewPolicy.policyEvidenceUrl ? (
-              <a
-                className="text-highlight hover:text-white"
-                href={reviewPolicy.policyEvidenceUrl}
-                rel="noreferrer"
-                target="_blank"
-              >
-                Policy evidence
-              </a>
-            ) : null}
           </div>
         </div>
       ) : null}

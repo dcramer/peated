@@ -3,8 +3,8 @@
 Peated has enough catalog identity to become a useful review index, but its
 current external-review model assumes one scored bottle per URL and cannot
 represent multi-bottle articles, native score scales, authors, dates, or short
-attributed summaries. The first pilot should prove that an approved publisher
-archive can be indexed accurately and send readers to the canonical article
+attributed summaries. The first pilot should prove that a publisher archive
+can be indexed accurately and send readers to the canonical article
 without republishing the review.
 
 ## What Changes
@@ -15,9 +15,9 @@ without republishing the review.
   normalized 0-100 value where current consumers require it.
 - Store a short Peated-generated summary with source and model provenance, but
   do not persist or display full publisher article text or photography.
-- Require an explicit approved acquisition and display policy before a source
-  can fetch articles, generate summaries, or publish reviews.
-- Add one vertical pilot for up to two approved publishers, with WhiskyNotes
+- Require an explicit source policy before a source can fetch articles,
+  generate summaries, or publish reviews.
+- Add one vertical pilot for up to two publishers, with WhiskyNotes
   preferred for archive ingestion and Dramface preferred for ongoing and
   multi-bottle ingestion.
 - Display pilot reviews on Bottle pages with publisher, reviewer, date, native
@@ -31,7 +31,7 @@ without republishing the review.
 
 ### New Capabilities
 
-- `external-review-indexing`: Permission-gated ingestion, storage, Bottle
+- `external-review-indexing`: Policy-gated ingestion, storage, Bottle
   matching, and referral-oriented display of review articles and their Bottle
   reviews.
 
@@ -46,5 +46,5 @@ None.
   while preserving its existing review rows and public behavior.
 - Adds source policy, article ingestion, summary generation, and Bottle-page
   presentation across `apps/server` and `apps/web`.
-- Requires a publisher agreement or other explicitly approved policy before a
-  pilot source is enabled in production.
+- Requires current robots and terms checks before a pilot source is enabled in
+  production.

@@ -27,15 +27,12 @@ vi.mock("@peated/server/lib/auditLog", () => ({
   auditLog: vi.fn(),
 }));
 
-const approvedPolicy = {
+const reviewOnlyPolicy = {
   publicationMode: "review_only" as const,
   allowFetching: true as const,
   allowLlmProcessing: true,
   allowScoreDisplay: true,
   allowSummaryDisplay: true,
-  policyEvidenceUrl: "https://publisher.example/permission",
-  approvalReference: "Email from publisher, 2026-08-18",
-  reviewedAt: "2026-08-18T12:00:00.000Z",
 };
 
 describe("external review source policy routes", () => {
@@ -53,7 +50,7 @@ describe("external review source policy routes", () => {
     );
     const setError = await waitError(() =>
       routerClient.externalSites.reviewPolicy.set(
-        { site: site.type, policy: approvedPolicy },
+        { site: site.type, policy: reviewOnlyPolicy },
         { context: { user } },
       ),
     );
@@ -62,7 +59,7 @@ describe("external review source policy routes", () => {
     expect(setError).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("returns disabled defaults before a policy is approved", async ({
+  test("returns disabled defaults before a policy is enabled", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({
@@ -82,29 +79,26 @@ describe("external review source policy routes", () => {
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,
-      policyEvidenceUrl: null,
-      approvalReference: null,
-      reviewedAt: null,
-      approvedByActorId: null,
     });
   });
 
-  test("records approval evidence and an audit event", async ({ fixtures }) => {
+  test("enables capabilities and records an audit event", async ({
+    fixtures,
+  }) => {
     const site = await fixtures.ExternalSiteOrExisting({
       type: "whiskyadvocate",
     });
     const moderator = await fixtures.User({ mod: true });
 
     const result = await routerClient.externalSites.reviewPolicy.set(
-      { site: site.type, policy: approvedPolicy },
+      { site: site.type, policy: reviewOnlyPolicy },
       { context: { user: moderator } },
     );
 
     expect(result).toMatchObject({
       externalSiteId: site.id,
-      ...approvedPolicy,
+      ...reviewOnlyPolicy,
     });
-    expect(result.approvedByActorId).not.toBeNull();
     expect(auditLog).toHaveBeenCalledWith(
       expect.objectContaining({
         event: AuditEvent.EXTERNAL_REVIEW_SOURCE_POLICY_UPDATED,
@@ -130,13 +124,11 @@ describe("external review source policy routes", () => {
     );
   });
 
-  test("revocation clears capabilities and preserves approval evidence", async ({
-    fixtures,
-  }) => {
+  test("disabling a source clears its capabilities", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({
       type: "whiskyadvocate",
     });
-    const approved = await fixtures.ApprovedExternalReviewSourcePolicy({
+    await fixtures.EnabledExternalReviewSourcePolicy({
       externalSiteId: site.id,
     });
     const moderator = await fixtures.User({ mod: true });
@@ -155,10 +147,6 @@ describe("external review source policy routes", () => {
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,
-      policyEvidenceUrl: approved.policyEvidenceUrl,
-      approvalReference: approved.approvalReference,
-      reviewedAt: approved.reviewedAt?.toISOString(),
-      approvedByActorId: approved.approvedByActorId,
     });
 
     const persisted = await db.query.externalReviewSourcePolicies.findFirst({
@@ -170,14 +158,10 @@ describe("external review source policy routes", () => {
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,
-      policyEvidenceUrl: approved.policyEvidenceUrl,
-      approvalReference: approved.approvalReference,
-      reviewedAt: approved.reviewedAt,
-      approvedByActorId: approved.approvedByActorId,
     });
   });
 
-  test("rejects summary display without LLM processing permission", async ({
+  test("rejects summary display without the LLM processing capability", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({
@@ -190,7 +174,7 @@ describe("external review source policy routes", () => {
         {
           site: site.type,
           policy: {
-            ...approvedPolicy,
+            ...reviewOnlyPolicy,
             allowLlmProcessing: false,
           },
         },
@@ -230,7 +214,7 @@ describe("external review source policy routes", () => {
         {
           site: site.type,
           policy: {
-            ...approvedPolicy,
+            ...reviewOnlyPolicy,
             // @ts-expect-error Proves the runtime boundary rejects a future mode.
             publicationMode: "automatic",
           },

@@ -41,12 +41,20 @@ import {
   WhiskyAdvocateObservationSchema,
 } from "./adapters/whiskyAdvocate";
 import {
+  whiskyNotesAdapter,
+  WhiskyNotesCursorSchema,
+  WhiskyNotesObservationSchema,
+} from "./adapters/whiskyNotes";
+import {
   createScraperRegistry,
   defineScraperSource,
   defineScrapeTarget,
 } from "./definitions";
 import { bottleObservationSink } from "./sinks/bottles";
-import { whiskyAdvocateReviewSink } from "./sinks/externalReviews";
+import {
+  whiskyAdvocateReviewSink,
+  whiskyNotesReviewSink,
+} from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
 import { requireExternalReviewSourceCapability } from "./sourcePolicy";
 
@@ -215,6 +223,17 @@ export const scraperRegistry = createScraperRegistry({
         },
       ],
     }),
+    defineScrapeTarget({
+      key: "whiskynotes",
+      minimumSpacingMs: 2_500,
+      requestsPerWindow: 30,
+      origins: [
+        {
+          origin: "https://www.whiskynotes.be",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
   ],
   sources: [
     ...legacyPriceSources.map((source) =>
@@ -247,6 +266,23 @@ export const scraperRegistry = createScraperRegistry({
       observationSchema: WhiskyAdvocateObservationSchema,
       adapter: whiskyAdvocateAdapter,
       sink: whiskyAdvocateReviewSink,
+      authorize: async ({ externalSiteId, externalSiteType }) => {
+        await requireExternalReviewSourceCapability(
+          db,
+          { id: externalSiteId, type: externalSiteType },
+          "allowFetching",
+        );
+      },
+    }),
+    defineScraperSource({
+      key: "whiskynotes",
+      externalSiteType: "whiskynotes",
+      targetKeys: ["whiskynotes"],
+      requestLimit: 30,
+      cursorSchema: WhiskyNotesCursorSchema,
+      observationSchema: WhiskyNotesObservationSchema,
+      adapter: whiskyNotesAdapter,
+      sink: whiskyNotesReviewSink,
       authorize: async ({ externalSiteId, externalSiteType }) => {
         await requireExternalReviewSourceCapability(
           db,

@@ -152,7 +152,7 @@ test("uses a fresh SQL cache and refuses a disallowed path without contact", asy
   expect(fetchImpl).not.toHaveBeenCalled();
 });
 
-test("caches a missing robots document as permission for the bounded period", async () => {
+test("caches a missing robots document as allowed for the bounded period", async () => {
   const { registry, run } = await setupRobotsRuntime();
   const fetchImpl = vi
     .fn<typeof fetch>()

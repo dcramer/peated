@@ -1,14 +1,12 @@
-import { relations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
   check,
   pgEnum,
   pgTable,
-  text,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { actors } from "./actors";
 import { externalSites } from "./externalSites";
 
 export const externalReviewPublicationModeEnum = pgEnum(
@@ -17,9 +15,8 @@ export const externalReviewPublicationModeEnum = pgEnum(
 );
 
 /**
- * Owns the runtime authorization for acquiring and displaying publisher
- * reviews. A robots rule can further restrict fetching but never grants a
- * capability absent from this policy.
+ * Owns the runtime controls for acquiring and displaying publisher reviews.
+ * A robots rule can further restrict fetching but cannot enable a capability.
  */
 export const externalReviewSourcePolicies = pgTable(
   "external_review_source_policy",
@@ -38,12 +35,6 @@ export const externalReviewSourcePolicies = pgTable(
     allowSummaryDisplay: boolean("allow_summary_display")
       .default(false)
       .notNull(),
-    policyEvidenceUrl: text("policy_evidence_url"),
-    approvalReference: text("approval_reference"),
-    reviewedAt: timestamp("reviewed_at"),
-    approvedByActorId: bigint("approved_by_actor_id", {
-      mode: "number",
-    }).references(() => actors.id, { onDelete: "restrict" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -61,31 +52,7 @@ export const externalReviewSourcePolicies = pgTable(
       "external_review_source_policy_summary_check",
       sql`NOT ${table.allowSummaryDisplay} OR ${table.allowLlmProcessing}`,
     ),
-    check(
-      "external_review_source_policy_approval_check",
-      sql`${table.publicationMode} = 'disabled' OR (
-        ${table.allowFetching}
-        AND ${table.policyEvidenceUrl} IS NOT NULL
-        AND ${table.approvalReference} IS NOT NULL
-        AND ${table.reviewedAt} IS NOT NULL
-        AND ${table.approvedByActorId} IS NOT NULL
-      )`,
-    ),
   ],
-);
-
-export const externalReviewSourcePoliciesRelations = relations(
-  externalReviewSourcePolicies,
-  ({ one }) => ({
-    externalSite: one(externalSites, {
-      fields: [externalReviewSourcePolicies.externalSiteId],
-      references: [externalSites.id],
-    }),
-    approvedByActor: one(actors, {
-      fields: [externalReviewSourcePolicies.approvedByActorId],
-      references: [actors.id],
-    }),
-  }),
 );
 
 export type ExternalReviewSourcePolicy =
