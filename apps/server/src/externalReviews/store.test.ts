@@ -124,6 +124,56 @@ describe("storeReviewArticle", () => {
     });
   });
 
+  test("keeps a current summary and clears it after the article changes", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const generatedAt = new Date("2026-04-13T12:01:00Z");
+    const firstInput = inputFor(site.id);
+    await storeReviewArticle({
+      ...firstInput,
+      reviews: firstInput.reviews.map((review, index) => ({
+        ...review,
+        summary:
+          index === 0
+            ? {
+                text: "The reviewer finds this whisky bright. They note a dry finish.",
+                contentHash: "sha256:first",
+                model: "gpt-5.4-2026-08-01",
+                promptVersion: "external-review-summary-v1",
+                generatedAt,
+              }
+            : null,
+      })),
+    });
+
+    await storeReviewArticle(inputFor(site.id));
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.sourceKey, "ardbeg-ten"),
+      }),
+    ).toMatchObject({
+      summary: "The reviewer finds this whisky bright. They note a dry finish.",
+      summaryContentHash: "sha256:first",
+    });
+
+    const changedInput = inputFor(site.id);
+    changedInput.contentHash = "sha256:second";
+    await storeReviewArticle(changedInput);
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.sourceKey, "ardbeg-ten"),
+      }),
+    ).toMatchObject({
+      summary: null,
+      summaryContentHash: null,
+      summaryModel: null,
+      summaryPromptVersion: null,
+      summaryGeneratedAt: null,
+    });
+  });
+
   test("uses article identity for stable reviews", async ({ fixtures }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
     const secondArticle = inputFor(site.id);

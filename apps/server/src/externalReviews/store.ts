@@ -8,11 +8,22 @@ import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { sql } from "drizzle-orm";
+import { and, eq, isNotNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
+
+const StoredSummarySchema = z
+  .object({
+    text: z.string().trim().min(1).max(1_000),
+    contentHash: z.string().trim().min(1).max(128),
+    model: z.string().trim().min(1).max(255),
+    promptVersion: z.string().trim().min(1).max(255),
+    generatedAt: z.date(),
+  })
+  .strict();
 
 const StoredReviewSchema = ReviewArticleReviewSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
+  summary: StoredSummarySchema.nullable().default(null),
 });
 
 export const ReviewArticleInputSchema =
@@ -20,6 +31,16 @@ export const ReviewArticleInputSchema =
     externalSiteId: z.number().int().positive(),
     fetchedAt: z.date(),
     reviews: z.array(StoredReviewSchema).min(1),
+  }).superRefine(({ contentHash, reviews: reviewList }, context) => {
+    for (const [index, review] of reviewList.entries()) {
+      if (review.summary && review.summary.contentHash !== contentHash) {
+        context.addIssue({
+          code: "custom",
+          message: "Summary content hash must match its article.",
+          path: ["reviews", index, "summary", "contentHash"],
+        });
+      }
+    }
   });
 
 /**
@@ -75,6 +96,24 @@ export async function storeReviewArticle(rawInput: unknown) {
       }
     }
 
+    await tx
+      .update(reviews)
+      .set({
+        summary: null,
+        summaryContentHash: null,
+        summaryModel: null,
+        summaryPromptVersion: null,
+        summaryGeneratedAt: null,
+        updatedAt: sql`NOW()`,
+      })
+      .where(
+        and(
+          eq(reviews.articleId, article.id),
+          isNotNull(reviews.summary),
+          ne(reviews.summaryContentHash, input.contentHash),
+        ),
+      );
+
     const reviewIds: number[] = [];
     for (const review of input.reviews) {
       const hasInvalidBottle =
@@ -93,6 +132,11 @@ export async function storeReviewArticle(rawInput: unknown) {
           nativeScoreScale: review.nativeScore?.scale ?? null,
           nativeScoreDisplay: review.nativeScore?.display ?? null,
           rating: review.normalizedRating,
+          summary: review.summary?.text ?? null,
+          summaryContentHash: review.summary?.contentHash ?? null,
+          summaryModel: review.summary?.model ?? null,
+          summaryPromptVersion: review.summary?.promptVersion ?? null,
+          summaryGeneratedAt: review.summary?.generatedAt ?? null,
           hidden: true,
         })
         .onConflictDoUpdate({
@@ -110,6 +154,15 @@ export async function storeReviewArticle(rawInput: unknown) {
             nativeScoreScale: review.nativeScore?.scale ?? null,
             nativeScoreDisplay: review.nativeScore?.display ?? null,
             rating: review.normalizedRating,
+            ...(review.summary
+              ? {
+                  summary: review.summary.text,
+                  summaryContentHash: review.summary.contentHash,
+                  summaryModel: review.summary.model,
+                  summaryPromptVersion: review.summary.promptVersion,
+                  summaryGeneratedAt: review.summary.generatedAt,
+                }
+              : {}),
             ...(hasInvalidBottle
               ? {
                   hidden: sql`CASE
