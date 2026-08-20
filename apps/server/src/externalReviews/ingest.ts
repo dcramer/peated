@@ -62,6 +62,8 @@ export async function ingestReviewArticle(rawInput: unknown) {
         currentBottleId: null,
       },
       aliasLookupNames: [aliasKey, rawName],
+      extractedIdentity:
+        review.category === null ? null : { category: review.category },
       createdByActorId: actor.id,
     });
     if (resolution.error) {

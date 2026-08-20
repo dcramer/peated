@@ -7,6 +7,7 @@ import {
   reviewArticles,
   reviews,
 } from "@peated/server/db/schema";
+import { storeReviewArticle } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
@@ -194,6 +195,71 @@ describe("POST /reviews", () => {
         where: eq(bottleAliases.name, "Unresolved Review Bottle"),
       }),
     ).toBeUndefined();
+  });
+
+  test("preserves fetched article and review metadata on a manual update", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({
+      type: "whiskyadvocate",
+    });
+    const admin = await fixtures.User({ admin: true });
+    const url = "https://example.com/reviews/fetched-review";
+    const generatedAt = new Date("2026-08-20T12:00:00Z");
+    await storeReviewArticle({
+      externalSiteId: site.id,
+      canonicalUrl: url,
+      title: "Fetched review title",
+      issue: "Original issue",
+      publishedAt: new Date("2026-08-19T12:00:00Z"),
+      contentHash: "sha256:fetched",
+      fetchedAt: new Date("2026-08-20T11:00:00Z"),
+      reviews: [
+        {
+          sourceKey: url,
+          name: "Fetched Review Bottle",
+          reviewerName: "Source Reviewer",
+          nativeScore: { value: 8.8, scale: 10, display: "8.8/10" },
+          normalizedRating: 88,
+          summary: {
+            text: "The review describes a bright whisky. It notes a dry finish.",
+            contentHash: "sha256:fetched",
+            model: "summary-model",
+            promptVersion: "summary-v1",
+            generatedAt,
+          },
+        },
+      ],
+    });
+
+    await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: "Fetched Review Bottle",
+        issue: "Manual correction",
+        rating: 90,
+        url,
+        category: "single_malt",
+      },
+      { context: { user: admin } },
+    );
+
+    expect(
+      await db.query.reviewArticles.findFirst({
+        where: eq(reviewArticles.canonicalUrl, url),
+      }),
+    ).toMatchObject({
+      title: "Fetched review title",
+      issue: "Manual correction",
+      contentHash: "sha256:fetched",
+    });
+    expect(await findReviewByUrl(url)).toMatchObject({
+      rating: 90,
+      reviewerName: "Source Reviewer",
+      nativeScoreDisplay: "8.8/10",
+      summaryContentHash: "sha256:fetched",
+      summaryGeneratedAt: generatedAt,
+    });
   });
 
   test("writes an exact alias match directly to reviews.bottleId", async ({

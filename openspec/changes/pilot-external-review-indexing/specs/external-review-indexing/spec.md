@@ -139,6 +139,17 @@ without one active resolved Bottle.
 - **THEN** the review is not made visible and no partial identity update is
   committed
 
+#### Scenario: Moderator hides an automatically published review
+
+- **WHEN** a moderator hides a matched review and the source later refreshes it
+- **THEN** the refresh preserves the hidden state
+
+#### Scenario: Source policy changes during ingestion
+
+- **WHEN** article ingestion and a publication-mode update run concurrently
+- **THEN** they serialize so the stored visibility uses one committed policy
+  state
+
 ### Requirement: Bottle pages send readers to publishers
 
 The Bottle page SHALL present a visible external review with its publisher,

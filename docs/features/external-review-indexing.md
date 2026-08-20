@@ -35,9 +35,14 @@ The runtime checks source policy at each owning boundary:
 | Return a native score or summary       | The review serializer checks the matching display capability.                   |
 | Return a fetched review to the public  | The review must be visible and the source must use `automatic` mode.            |
 
-The moderator policy API accepts only `disabled` and `review_only` during the
-pilot. The policy update is moderator-only and audit logged. Automatic
-publication needs a later reviewed change after the pilot gate passes.
+The moderator policy API accepts `disabled`, `review_only`, and `automatic`.
+The policy update is moderator-only and audit logged. A transition to
+`automatic` publishes staged reviews only when they have an active resolved
+Bottle. Unresolved and retired Bottle assignments remain hidden.
+
+Article ingestion and policy updates serialize on the source record. A refresh
+can publish a review when it gains its first active Bottle assignment. A refresh
+does not make an already matched review visible after a moderator hides it.
 
 ## Source Adapter Contract
 
@@ -112,15 +117,15 @@ Use this sequence for each publisher:
    Review the agreed hidden sample for extraction, multi-bottle splitting,
    Bottle matches, and any enabled summaries.
 7. Require at least 90% extraction accuracy and acceptable Bottle-match
-   precision. Record the result before proposing automatic publication.
+   precision. Record the result before setting the source to `automatic`.
 
 The WhiskyNotes pilot is manual-only. It checks at most five archive pages and
 20 article links on each page. Requests are at least 2.5 seconds apart. The
 target allows 30 requests per hour. Each worker pass stops after 30 requests.
 
-Keep automatic publication unavailable until a reviewed code and policy change
-implements that decision. Repeat the robots, terms, and review-only process for
-the second publisher before adding shared adapter behavior.
+Enable automatic publication only after the reviewed sample passes the gate.
+Repeat the robots, terms, and review-only process for the second publisher
+before adding shared adapter behavior.
 
 ## Stop And Roll Back
 
