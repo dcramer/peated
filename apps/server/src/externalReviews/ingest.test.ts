@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottleTombstones, reviews } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  reviewArticles,
+  reviews,
+} from "@peated/server/db/schema";
 import { ingestReviewArticle } from "@peated/server/externalReviews/ingest";
 import { asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
@@ -86,6 +90,7 @@ test("resolves each review and hides unresolved or invalid assignments", async (
   });
 
   expect(resolveBottleMock).toHaveBeenCalledTimes(3);
+  expect(await db.select().from(reviewArticles)).toHaveLength(1);
   expect(
     await db.select().from(reviews).orderBy(asc(reviews.sourceKey)),
   ).toMatchObject([

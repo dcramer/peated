@@ -9,7 +9,7 @@
       tests for enablement, revocation, and unauthorized access
 - [x] 1.4 Enforce fetch policy at scheduled jobs, manual jobs, and the review
       worker immediately before network access
-- [ ] 1.5 Enforce LLM-processing and review-visibility capabilities when those
+- [x] 1.5 Enforce LLM-processing and review-visibility capabilities when those
       consumers are introduced
 
 ## 2. Article And Review Model
@@ -50,7 +50,7 @@
       time
 - [x] 4.4 Make summary failure non-destructive and invalidate summaries when the
       source content hash changes
-- [ ] 4.5 Add deterministic tests for multi-bottle splitting, idempotency, native
+- [x] 4.5 Add deterministic tests for multi-bottle splitting, idempotency, native
       scoring, summary policy enforcement, and redacted failures
 
 ## 5. Public Review Index
