@@ -1,9 +1,34 @@
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import { reviewArticles, reviews } from "@peated/server/db/schema";
 import { storeReviewArticle } from "@peated/server/externalReviews/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { asc, eq } from "drizzle-orm";
+import pg from "pg";
 import { describe, expect, test } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  client: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1
+        FROM pg_stat_activity
+        WHERE $1 = ANY(pg_blocking_pids(pid))
+      ) AS blocked`,
+      [blockerPid],
+    );
+    if (result.rows[0]?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for external review source lock.");
+}
 
 function inputFor(externalSiteId: number) {
   return {
@@ -115,6 +140,105 @@ describe("storeReviewArticle", () => {
       { sourceKey: "ardbeg-ten", hidden: false },
       { sourceKey: "lagavulin-special", hidden: true },
     ]);
+  });
+
+  test("publishes a newly resolved review but preserves a moderator hide", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.ExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+      publicationMode: "automatic",
+      allowFetching: true,
+      allowLlmProcessing: true,
+      allowScoreDisplay: true,
+      allowSummaryDisplay: true,
+    });
+    const bottle = await fixtures.Bottle({ name: "Resolved Review Bottle" });
+    const input = inputFor(site.id);
+
+    await storeReviewArticle({
+      ...input,
+      reviews: [{ ...input.reviews[0], bottleId: null }],
+    });
+    await storeReviewArticle({
+      ...input,
+      reviews: [{ ...input.reviews[0], bottleId: bottle.id }],
+    });
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.sourceKey, "ardbeg-ten"),
+    });
+    expect(review).toMatchObject({ bottleId: bottle.id, hidden: false });
+
+    await db
+      .update(reviews)
+      .set({ hidden: true })
+      .where(eq(reviews.id, review!.id));
+    await storeReviewArticle({
+      ...input,
+      reviews: [{ ...input.reviews[0], bottleId: bottle.id }],
+    });
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review!.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id, hidden: true });
+  });
+
+  test("serializes publication policy changes with article ingestion", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.ExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+      publicationMode: "review_only",
+      allowFetching: true,
+      allowLlmProcessing: true,
+      allowScoreDisplay: true,
+      allowSummaryDisplay: true,
+    });
+    const bottle = await fixtures.Bottle({ name: "Concurrent Review Bottle" });
+    const input = inputFor(site.id);
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let ingestion: ReturnType<typeof storeReviewArticle> | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `SELECT "id" FROM "external_site" WHERE "id" = $1 FOR UPDATE`,
+        [site.id],
+      );
+      ingestion = storeReviewArticle({
+        ...input,
+        reviews: [{ ...input.reviews[0], bottleId: bottle.id }],
+      });
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query(
+        `UPDATE "external_review_source_policy"
+         SET "publication_mode" = 'automatic'
+         WHERE "external_site_id" = $1`,
+        [site.id],
+      );
+      await client.query("COMMIT");
+      committed = true;
+      await ingestion;
+
+      expect(
+        await db.query.reviews.findFirst({
+          where: eq(reviews.sourceKey, "ardbeg-ten"),
+        }),
+      ).toMatchObject({ bottleId: bottle.id, hidden: false });
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await ingestion?.catch(() => undefined);
+    }
   });
 
   test("updates the same article and stable reviews idempotently", async ({

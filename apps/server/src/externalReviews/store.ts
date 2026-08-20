@@ -1,8 +1,10 @@
-import { db } from "@peated/server/db";
+import { db, type AnyTransaction } from "@peated/server/db";
 import {
   externalReviewSourcePolicies,
+  externalSites,
   reviewArticles,
   reviews,
+  storePrices,
 } from "@peated/server/db/schema";
 import {
   ReviewArticleObservationSchema,
@@ -12,7 +14,7 @@ import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { and, eq, isNotNull, ne, sql } from "drizzle-orm";
+import { and, eq, isNotNull, ne, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const StoredSummarySchema = z
@@ -47,68 +49,120 @@ export const ReviewArticleInputSchema =
     }
   });
 
-/**
- * Stores external review metadata. The input excludes full review text, HTML,
- * tasting notes, conclusions, and images. Callers must discard those values
- * before they call this function.
- */
-export async function storeReviewArticle(rawInput: unknown) {
-  const input = ReviewArticleInputSchema.parse(rawInput);
+type SourceReviewArticleInput = z.infer<typeof ReviewArticleInputSchema>;
+type ReviewArticleInput = Omit<
+  SourceReviewArticleInput,
+  "contentHash" | "fetchedAt" | "title"
+> & {
+  contentHash: string | null;
+  fetchedAt: Date | null;
+  title: string | null;
+};
+type ReviewOrigin = "manual" | "source";
+type InvalidBottleAction = "reject" | "stage";
 
-  return await db.transaction(async (tx) => {
-    const policy = await tx.query.externalReviewSourcePolicies.findFirst({
-      columns: { publicationMode: true },
-      where: eq(
-        externalReviewSourcePolicies.externalSiteId,
-        input.externalSiteId,
-      ),
-    });
-    const publishesAutomatically = policy?.publicationMode === "automatic";
+/** Stores one article after locking its source, Bottles, and alias consumers. */
+export async function storeReviewArticleInTransaction(
+  tx: AnyTransaction,
+  input: ReviewArticleInput,
+  {
+    origin,
+    invalidBottleAction,
+    aliasLookupNames = [],
+  }: {
+    origin: ReviewOrigin;
+    invalidBottleAction: InvalidBottleAction;
+    aliasLookupNames?: string[];
+  },
+) {
+  // The source row serializes ingestion with moderator policy updates.
+  const [site] = await tx
+    .select({ id: externalSites.id })
+    .from(externalSites)
+    .where(eq(externalSites.id, input.externalSiteId))
+    .limit(1)
+    .for("share");
+  if (!site) {
+    throw new Error(`External site ${input.externalSiteId} not found.`);
+  }
 
-    const [article] = await tx
-      .insert(reviewArticles)
-      .values({
-        externalSiteId: input.externalSiteId,
-        canonicalUrl: input.canonicalUrl,
-        title: input.title,
-        issue: input.issue,
-        publishedAt: input.publishedAt,
-        contentHash: input.contentHash,
-        fetchedAt: input.fetchedAt,
-      })
-      .onConflictDoUpdate({
-        target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
-        set: {
+  const policy =
+    origin === "source"
+      ? await tx.query.externalReviewSourcePolicies.findFirst({
+          columns: { publicationMode: true },
+          where: eq(
+            externalReviewSourcePolicies.externalSiteId,
+            input.externalSiteId,
+          ),
+        })
+      : null;
+  const publishesAutomatically = policy?.publicationMode === "automatic";
+
+  const articleUpdate =
+    origin === "manual"
+      ? { issue: input.issue, updatedAt: sql`NOW()` }
+      : {
           title: input.title,
           issue: input.issue,
           publishedAt: input.publishedAt,
           contentHash: input.contentHash,
           fetchedAt: input.fetchedAt,
           updatedAt: sql`NOW()`,
-        },
-      })
-      .returning({ id: reviewArticles.id });
+        };
+  const [article] = await tx
+    .insert(reviewArticles)
+    .values({
+      externalSiteId: input.externalSiteId,
+      canonicalUrl: input.canonicalUrl,
+      title: input.title,
+      issue: input.issue,
+      publishedAt: input.publishedAt,
+      contentHash: input.contentHash,
+      fetchedAt: input.fetchedAt,
+    })
+    .onConflictDoUpdate({
+      target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
+      set: articleUpdate,
+    })
+    .returning({ id: reviewArticles.id });
+  if (!article) throw new Error("Unable to store review article.");
 
-    if (!article) throw new Error("Unable to store review article.");
-
-    // Match createExternalReview lock order: article, Bottles, then reviews.
-    const invalidBottleIds = new Set<number>();
-    const bottleIds = [
-      ...new Set(
-        input.reviews.flatMap(({ bottleId }) =>
-          bottleId === null ? [] : [bottleId],
-        ),
+  const invalidBottleIds = new Set<number>();
+  const bottleIds = [
+    ...new Set(
+      input.reviews.flatMap(({ bottleId }) =>
+        bottleId === null ? [] : [bottleId],
       ),
-    ].sort((left, right) => left - right);
-    for (const bottleId of bottleIds) {
-      try {
-        await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
-      } catch (error) {
-        if (!(error instanceof ActiveBottleSelectionError)) throw error;
-        invalidBottleIds.add(bottleId);
-      }
+    ),
+  ].sort((left, right) => left - right);
+  for (const bottleId of bottleIds) {
+    try {
+      await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+    } catch (error) {
+      if (!(error instanceof ActiveBottleSelectionError)) throw error;
+      if (invalidBottleAction === "reject") throw error;
+      invalidBottleIds.add(bottleId);
     }
+  }
 
+  if (aliasLookupNames.length) {
+    await tx
+      .select({ id: storePrices.id })
+      .from(storePrices)
+      .where(
+        and(
+          eq(storePrices.externalSiteId, input.externalSiteId),
+          or(
+            ...aliasLookupNames.map((name) =>
+              eq(sql`LOWER(${storePrices.name})`, name.toLowerCase()),
+            ),
+          ),
+        ),
+      )
+      .for("update");
+  }
+
+  if (origin === "source" && input.contentHash !== null) {
     await tx
       .update(reviews)
       .set({
@@ -126,85 +180,111 @@ export async function storeReviewArticle(rawInput: unknown) {
           ne(reviews.summaryContentHash, input.contentHash),
         ),
       );
+  }
 
-    const reviewIds: number[] = [];
-    for (const review of input.reviews) {
-      const hasInvalidBottle =
-        review.bottleId !== null && invalidBottleIds.has(review.bottleId);
-      const bottleId =
-        review.bottleId !== null && !hasInvalidBottle ? review.bottleId : null;
-      const publish = publishesAutomatically && bottleId !== null;
-      const [stored] = await tx
-        .insert(reviews)
-        .values({
-          articleId: article.id,
-          bottleId,
-          sourceKey: review.sourceKey,
-          name: review.name,
-          reviewerName: review.reviewerName,
-          nativeScoreValue: review.nativeScore?.value ?? null,
-          nativeScoreScale: review.nativeScore?.scale ?? null,
-          nativeScoreDisplay: review.nativeScore?.display ?? null,
-          rating: review.normalizedRating,
-          summary: review.summary?.text ?? null,
-          summaryContentHash: review.summary?.contentHash ?? null,
-          summaryModel: review.summary?.model ?? null,
-          summaryPromptVersion: review.summary?.promptVersion ?? null,
-          summaryGeneratedAt: review.summary?.generatedAt ?? null,
-          hidden: !publish,
-        })
-        .onConflictDoUpdate({
-          target: [reviews.articleId, reviews.sourceKey],
-          set: {
-            bottleId: sql`CASE
-              WHEN excluded.bottle_id IS NOT NULL
-                AND (${reviews.bottleId} IS NULL OR ${reviews.bottleId} = excluded.bottle_id)
-              THEN excluded.bottle_id
-              ELSE ${reviews.bottleId}
-            END`,
-            name: review.name,
+  const storedReviews = [];
+
+  for (const review of input.reviews) {
+    const [existing] = await tx
+      .select()
+      .from(reviews)
+      .where(
+        and(
+          eq(reviews.articleId, article.id),
+          eq(reviews.sourceKey, review.sourceKey),
+        ),
+      )
+      .limit(1)
+      .for("update");
+    const hasInvalidBottle =
+      review.bottleId !== null && invalidBottleIds.has(review.bottleId);
+    const incomingBottleId = hasInvalidBottle ? null : review.bottleId;
+    const bottleId =
+      incomingBottleId !== null &&
+      (existing?.bottleId == null || existing.bottleId === incomingBottleId)
+        ? incomingBottleId
+        : (existing?.bottleId ?? null);
+    const hidden = existing
+      ? hasInvalidBottle &&
+        (existing.bottleId === null || existing.bottleId === review.bottleId)
+        ? true
+        : origin === "source" &&
+            publishesAutomatically &&
+            existing.bottleId === null &&
+            bottleId !== null
+          ? false
+          : (existing.hidden ?? false)
+      : origin === "source"
+        ? !(publishesAutomatically && bottleId !== null)
+        : false;
+    const values = {
+      bottleId,
+      name: review.name,
+      rating: review.normalizedRating,
+      ...(origin === "source"
+        ? {
             reviewerName: review.reviewerName,
             nativeScoreValue: review.nativeScore?.value ?? null,
             nativeScoreScale: review.nativeScore?.scale ?? null,
             nativeScoreDisplay: review.nativeScore?.display ?? null,
-            rating: review.normalizedRating,
-            ...(review.summary
-              ? {
-                  summary: review.summary.text,
-                  summaryContentHash: review.summary.contentHash,
-                  summaryModel: review.summary.model,
-                  summaryPromptVersion: review.summary.promptVersion,
-                  summaryGeneratedAt: review.summary.generatedAt,
-                }
-              : {}),
-            ...(hasInvalidBottle
-              ? {
-                  hidden: sql`CASE
-                    WHEN ${reviews.bottleId} IS NULL
-                      OR ${reviews.bottleId} = ${review.bottleId}
-                    THEN TRUE
-                    ELSE ${reviews.hidden}
-                  END`,
-                }
-              : publish
-                ? {
-                    hidden: sql`CASE
-                      WHEN ${reviews.bottleId} IS NULL
-                        OR ${reviews.bottleId} = ${bottleId}
-                      THEN FALSE
-                      ELSE ${reviews.hidden}
-                    END`,
-                  }
-                : {}),
-            updatedAt: sql`NOW()`,
-          },
-        })
-        .returning({ id: reviews.id });
+          }
+        : {}),
+      ...(review.summary
+        ? {
+            summary: review.summary.text,
+            summaryContentHash: review.summary.contentHash,
+            summaryModel: review.summary.model,
+            summaryPromptVersion: review.summary.promptVersion,
+            summaryGeneratedAt: review.summary.generatedAt,
+          }
+        : {}),
+      hidden,
+      updatedAt: sql`NOW()`,
+    };
+    const [stored] = existing
+      ? await tx
+          .update(reviews)
+          .set(values)
+          .where(eq(reviews.id, existing.id))
+          .returning()
+      : await tx
+          .insert(reviews)
+          .values({
+            articleId: article.id,
+            sourceKey: review.sourceKey,
+            ...values,
+          })
+          .returning();
+    if (!stored) throw new Error("Unable to store review.");
+    storedReviews.push({
+      review: stored,
+      previousBottleId: existing?.bottleId,
+    });
+  }
 
-      if (!stored) throw new Error("Unable to store review.");
-      reviewIds.push(stored.id);
-    }
+  return { articleId: article.id, storedReviews };
+}
 
-    return { articleId: article.id, reviewIds };
+/**
+ * Stores external review metadata. The input excludes full review text, HTML,
+ * tasting notes, conclusions, and images. Callers must discard those values
+ * before they call this function.
+ */
+export async function storeReviewArticle(rawInput: unknown) {
+  const input = ReviewArticleInputSchema.parse(rawInput);
+
+  return await db.transaction(async (tx) => {
+    const { articleId, storedReviews } = await storeReviewArticleInTransaction(
+      tx,
+      input,
+      {
+        origin: "source",
+        invalidBottleAction: "stage",
+      },
+    );
+    return {
+      articleId,
+      reviewIds: storedReviews.map(({ review }) => review.id),
+    };
   });
 }

@@ -3,12 +3,8 @@ import {
   normalizeBottleAliasKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import {
-  externalSites,
-  reviewArticles,
-  reviews,
-  storePrices,
-} from "@peated/server/db/schema";
+import { externalSites } from "@peated/server/db/schema";
+import { storeReviewArticleInTransaction } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -30,7 +26,7 @@ import {
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
 import { ReviewInputSchema } from "@peated/server/schemas";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 /**
  * Owns external-review ingestion and Bottle identity assignment. Both API and
@@ -111,150 +107,111 @@ export async function createExternalReview(
   const bottleId = resolution.assignment?.bottleId ?? null;
   const reviewName = normalizedName;
 
-  const { review, aliasAssignment } = await db.transaction(async (tx) => {
-    const [article] = await tx
-      .insert(reviewArticles)
-      .values({
-        externalSiteId: site.id,
-        canonicalUrl: input.url,
-        issue: input.issue,
-      })
-      .onConflictDoUpdate({
-        target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
-        set: {
+  let stored;
+  try {
+    stored = await db.transaction(async (tx) => {
+      const result = await storeReviewArticleInTransaction(
+        tx,
+        {
+          externalSiteId: site.id,
+          canonicalUrl: input.url,
+          title: null,
           issue: input.issue,
-          updatedAt: sql`NOW()`,
+          publishedAt: null,
+          contentHash: null,
+          fetchedAt: null,
+          reviews: [
+            {
+              sourceKey,
+              name: reviewName,
+              category: input.category,
+              reviewerName: null,
+              nativeScore: null,
+              normalizedRating: input.rating,
+              bottleId,
+              summary: null,
+            },
+          ],
         },
-      })
-      .returning({ id: reviewArticles.id });
-    if (!article) throw new Error("Unable to store review article.");
-
-    if (bottleId !== null) {
-      try {
-        await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
-      } catch (error) {
-        if (!(error instanceof ActiveBottleSelectionError)) throw error;
-        throw new ExternalReviewBottleStateError(error);
-      }
-      const aliasLookupNames = Array.from(
-        new Set(
-          [aliasKey, reviewName, rawName].map((name) => name.toLowerCase()),
-        ),
+        {
+          origin: "manual",
+          invalidBottleAction: "reject",
+          aliasLookupNames:
+            bottleId === null ? [] : [aliasKey, reviewName, rawName],
+        },
       );
-      await tx
-        .select({ id: storePrices.id })
-        .from(storePrices)
-        .where(
-          and(
-            eq(storePrices.externalSiteId, site.id),
-            or(
-              ...aliasLookupNames.map((name) =>
-                eq(sql`LOWER(${storePrices.name})`, name),
-              ),
-            ),
-          ),
-        )
-        .for("update");
-    }
+      const storedReview = result.storedReviews[0];
+      if (!storedReview) throw new Error("Unable to store review.");
+      const { previousBottleId, review } = storedReview;
 
-    const [existingReview] = await tx
-      .select()
-      .from(reviews)
-      .where(
-        and(
-          eq(reviews.articleId, article.id),
-          eq(reviews.sourceKey, sourceKey),
-        ),
-      )
-      .limit(1)
-      .for("update");
+      const appliedIncomingIdentity = review.bottleId === bottleId;
+      if (!bottleId || !appliedIncomingIdentity) {
+        return { review, aliasAssignment: null };
+      }
 
-    const [review] = await tx
-      .insert(reviews)
-      .values({
-        articleId: article.id,
+      const aliasAssignment = await assignBottleAliasInTransaction(tx, {
         bottleId,
-        name: reviewName,
-        rating: input.rating,
-        sourceKey,
-      })
-      .onConflictDoUpdate({
-        target: [reviews.articleId, reviews.sourceKey],
-        set: {
-          bottleId: sql`CASE
-            WHEN excluded.bottle_id IS NOT NULL
-              AND (${reviews.bottleId} IS NULL OR ${reviews.bottleId} = excluded.bottle_id)
-            THEN excluded.bottle_id
-            ELSE ${reviews.bottleId}
-          END`,
-          name: reviewName,
-          rating: input.rating,
-          updatedAt: sql`NOW()`,
-        },
-      })
-      .returning();
-    if (!review) throw new Error("Unable to store review.");
-
-    const appliedIncomingIdentity = review.bottleId === bottleId;
-    if (!bottleId || !appliedIncomingIdentity) {
-      return { review, aliasAssignment: null };
-    }
-
-    const aliasAssignment = await assignBottleAliasInTransaction(tx, {
-      bottleId,
-      name: aliasKey,
-      backfillNames: [reviewName, rawName],
-      externalSiteId: site.id,
-      assignmentSource:
-        resolution.source === "exact_alias" ? undefined : "classifier_approved",
-      assignedByActorId: systemActor.id,
-      sourceAliasIdentity: resolution.sourceAliasIdentity,
-    });
-
-    const decision = getIncomingBottleDecisionFromResolutionSource(
-      resolution.source,
-      { createdBottle: resolution.createdBottle },
-    );
-    if (
-      decision !== null &&
-      shouldRecordIncomingBottleDecision({
-        previousBottleId: existingReview?.bottleId,
-        bottleId,
-        decision,
-      })
-    ) {
-      await recordIncomingBottleDecisionInTransaction(tx, {
-        sourceKind: "review",
-        sourceId: review.id,
+        name: aliasKey,
+        backfillNames: [reviewName, rawName],
         externalSiteId: site.id,
-        name: reviewName,
-        url: input.url,
-        decision,
-        actor: systemActor,
-        bottleId,
-        createdBottle: resolution.createdBottle,
-        confidence: resolution.confidence,
-        model: resolution.model,
-        rationale: resolution.rationale,
-        metadata: {
-          resolutionSource: resolution.source,
-          ...(resolution.classifierEvidence
-            ? { classifierEvidence: resolution.classifierEvidence }
-            : {}),
-          issue: input.issue,
-          ...(initiatedByUserId === undefined ? {} : { initiatedByUserId }),
-        },
+        assignmentSource:
+          resolution.source === "exact_alias"
+            ? undefined
+            : "classifier_approved",
+        assignedByActorId: systemActor.id,
+        sourceAliasIdentity: resolution.sourceAliasIdentity,
       });
+
+      const decision = getIncomingBottleDecisionFromResolutionSource(
+        resolution.source,
+        { createdBottle: resolution.createdBottle },
+      );
+      if (
+        decision !== null &&
+        shouldRecordIncomingBottleDecision({
+          previousBottleId,
+          bottleId,
+          decision,
+        })
+      ) {
+        await recordIncomingBottleDecisionInTransaction(tx, {
+          sourceKind: "review",
+          sourceId: review.id,
+          externalSiteId: site.id,
+          name: reviewName,
+          url: input.url,
+          decision,
+          actor: systemActor,
+          bottleId,
+          createdBottle: resolution.createdBottle,
+          confidence: resolution.confidence,
+          model: resolution.model,
+          rationale: resolution.rationale,
+          metadata: {
+            resolutionSource: resolution.source,
+            ...(resolution.classifierEvidence
+              ? { classifierEvidence: resolution.classifierEvidence }
+              : {}),
+            issue: input.issue,
+            ...(initiatedByUserId === undefined ? {} : { initiatedByUserId }),
+          },
+        });
+      }
+
+      return { review, aliasAssignment };
+    });
+  } catch (error) {
+    if (error instanceof ActiveBottleSelectionError) {
+      throw new ExternalReviewBottleStateError(error);
     }
+    throw error;
+  }
 
-    return { review, aliasAssignment };
-  });
-
-  if (aliasAssignment) {
-    await finalizeBottleAliasAssignment(aliasAssignment, {
+  if (stored.aliasAssignment) {
+    await finalizeBottleAliasAssignment(stored.aliasAssignment, {
       review: { site: input.site, name: reviewName, url: input.url },
     });
   }
 
-  return review;
+  return stored.review;
 }

@@ -1,10 +1,11 @@
-import { NativeScoreSchema } from "@peated/server/schemas";
+import { CategoryEnum, NativeScoreSchema } from "@peated/server/schemas";
 import { z } from "zod";
 
 export const ReviewArticleReviewSchema = z
   .object({
     sourceKey: z.string().trim().min(1).max(255),
     name: z.string().trim().min(1).max(500),
+    category: CategoryEnum.nullable().default(null),
     reviewerName: z.string().trim().min(1).max(255).nullable().default(null),
     nativeScore: NativeScoreSchema.nullable().default(null),
     normalizedRating: z.number().int().min(0).max(100).nullable().default(null),

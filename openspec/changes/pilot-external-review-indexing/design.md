@@ -145,6 +145,18 @@ invalid Bottle assignments always remain hidden.
 Disabling a source stops fetching immediately and hides source reviews when the
 current policy no longer permits display.
 
+Policy updates and article ingestion serialize on the source record. This keeps
+the publication mode used by an ingestion transaction consistent with a
+concurrent moderator update. A refresh can publish a previously unresolved
+review after it gains its first active Bottle assignment. It does not make an
+already matched review visible after a moderator hides it.
+
+Native article scrapers use the article ingestion boundary. The legacy
+single-review source and the moderator API retain their existing entry point
+because they have different source metadata and failure behavior. Both entry
+points use the same persistence helpers for source locking, article identity,
+Bottle validation, and review conflict behavior.
+
 ## Risks / Trade-offs
 
 - **Robots rules or public terms prohibit the planned requests** → Keep the

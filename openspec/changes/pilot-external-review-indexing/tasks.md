@@ -93,3 +93,14 @@
 - [x] 7.4 Validate the OpenSpec change and record remaining source-pilot
       tasks without weakening the disabled-by-default boundary. The second
       publisher and post-deploy manual QA remain.
+
+## 8. Post-Pilot Cleanup
+
+- [x] 8.1 Share article and review persistence between the article ingestion
+      path and the legacy moderator entry point without changing either API
+- [x] 8.2 Serialize source policy updates with article ingestion and add a
+      deterministic concurrency test
+- [x] 8.3 Preserve a moderator-hidden matched review during automatic refresh
+      while still publishing a newly resolved review
+- [x] 8.4 Update the operating document for automatic publication and validate
+      the completed cleanup
