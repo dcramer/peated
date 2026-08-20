@@ -1,19 +1,31 @@
 import { db } from "@peated/server/db";
 import { reviewArticles, reviews } from "@peated/server/db/schema";
-import { ReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
+import {
+  ReviewArticleObservationSchema,
+  ReviewArticleReviewSchema,
+} from "@peated/server/externalReviews/observation";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
+
+const StoredReviewSchema = ReviewArticleReviewSchema.safeExtend({
+  bottleId: z.number().int().positive().nullable().default(null),
+});
 
 export const ReviewArticleInputSchema =
   ReviewArticleObservationSchema.safeExtend({
     externalSiteId: z.number().int().positive(),
     fetchedAt: z.date(),
+    reviews: z.array(StoredReviewSchema).min(1),
   });
 
 /**
- * Owns durable external-review metadata. The strict input deliberately excludes
- * publisher bodies, HTML, tasting notes, conclusions, and images; callers must
- * discard those transient values before crossing this boundary.
+ * Stores external review metadata. The input excludes full review text, HTML,
+ * tasting notes, conclusions, and images. Callers must discard those values
+ * before they call this function.
  */
 export async function storeReviewArticle(rawInput: unknown) {
   const input = ReviewArticleInputSchema.parse(rawInput);
@@ -45,12 +57,35 @@ export async function storeReviewArticle(rawInput: unknown) {
 
     if (!article) throw new Error("Unable to store review article.");
 
+    // Match createExternalReview lock order: article, Bottles, then reviews.
+    const invalidBottleIds = new Set<number>();
+    const bottleIds = [
+      ...new Set(
+        input.reviews.flatMap(({ bottleId }) =>
+          bottleId === null ? [] : [bottleId],
+        ),
+      ),
+    ].sort((left, right) => left - right);
+    for (const bottleId of bottleIds) {
+      try {
+        await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+      } catch (error) {
+        if (!(error instanceof ActiveBottleSelectionError)) throw error;
+        invalidBottleIds.add(bottleId);
+      }
+    }
+
     const reviewIds: number[] = [];
     for (const review of input.reviews) {
+      const hasInvalidBottle =
+        review.bottleId !== null && invalidBottleIds.has(review.bottleId);
+      const bottleId =
+        review.bottleId !== null && !hasInvalidBottle ? review.bottleId : null;
       const [stored] = await tx
         .insert(reviews)
         .values({
           articleId: article.id,
+          bottleId,
           sourceKey: review.sourceKey,
           name: review.name,
           reviewerName: review.reviewerName,
@@ -63,12 +98,28 @@ export async function storeReviewArticle(rawInput: unknown) {
         .onConflictDoUpdate({
           target: [reviews.articleId, reviews.sourceKey],
           set: {
+            bottleId: sql`CASE
+              WHEN excluded.bottle_id IS NOT NULL
+                AND (${reviews.bottleId} IS NULL OR ${reviews.bottleId} = excluded.bottle_id)
+              THEN excluded.bottle_id
+              ELSE ${reviews.bottleId}
+            END`,
             name: review.name,
             reviewerName: review.reviewerName,
             nativeScoreValue: review.nativeScore?.value ?? null,
             nativeScoreScale: review.nativeScore?.scale ?? null,
             nativeScoreDisplay: review.nativeScore?.display ?? null,
             rating: review.normalizedRating,
+            ...(hasInvalidBottle
+              ? {
+                  hidden: sql`CASE
+                    WHEN ${reviews.bottleId} IS NULL
+                      OR ${reviews.bottleId} = ${review.bottleId}
+                    THEN TRUE
+                    ELSE ${reviews.hidden}
+                  END`,
+                }
+              : {}),
             updatedAt: sql`NOW()`,
           },
         })

@@ -43,7 +43,7 @@
 
 - [x] 4.1 Define the narrow source-adapter output contract for article metadata
       and stable reviews
-- [ ] 4.2 Reuse external-review Bottle resolution for every review and keep
+- [x] 4.2 Reuse external-review Bottle resolution for each review and keep
       unresolved or invalid Bottle assignments hidden
 - [ ] 4.3 Add transient summary generation with a constrained two- or
       three-sentence prompt, content hash, model, prompt version, and generation
