@@ -1,5 +1,5 @@
+import { db } from "@peated/server/db";
 import { procedure } from "@peated/server/orpc";
-import type { Context } from "@peated/server/orpc/context";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleInputSchema } from "@peated/server/schemas";
 import { getGeneratedBottleDetails } from "@peated/server/worker/jobs/generateBottleDetails";
@@ -34,7 +34,10 @@ export default procedure
   .input(InputSchema)
   .output(OutputSchema)
   .handler(async function ({ input }) {
-    const result = await getGeneratedBottleDetails(input, []);
+    const tagList = (
+      await db.query.tags.findMany({ columns: { name: true } })
+    ).map(({ name }) => name);
+    const result = await getGeneratedBottleDetails(input, tagList);
     return {
       description: result?.description,
       category: result?.category,
