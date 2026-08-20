@@ -189,18 +189,30 @@ function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
   };
 }
 
-/** Rejects a stale lookup precondition against an alias locked by its caller. */
+function bottleAliasIdentityMatches(
+  alias: BottleAliasIdentitySnapshot,
+  snapshot: BottleAliasIdentitySnapshot,
+) {
+  return (
+    alias.name === snapshot.name &&
+    alias.bottleId === snapshot.bottleId &&
+    alias.ignored === snapshot.ignored &&
+    alias.assignmentSource === snapshot.assignmentSource &&
+    alias.assignedByActorId === snapshot.assignedByActorId
+  );
+}
+
+/** Rejects a stale lookup unless a concurrent assignment already converged. */
 function assertBottleAliasIdentitySnapshot(
   lockedAlias: BottleAliasIdentitySnapshot | undefined,
   snapshot: BottleAliasIdentitySnapshot,
+  convergedSnapshot?: BottleAliasIdentitySnapshot,
 ): asserts lockedAlias is BottleAliasIdentitySnapshot {
   if (
     !lockedAlias ||
-    lockedAlias.name !== snapshot.name ||
-    lockedAlias.bottleId !== snapshot.bottleId ||
-    lockedAlias.ignored !== snapshot.ignored ||
-    lockedAlias.assignmentSource !== snapshot.assignmentSource ||
-    lockedAlias.assignedByActorId !== snapshot.assignedByActorId
+    (!bottleAliasIdentityMatches(lockedAlias, snapshot) &&
+      (!convergedSnapshot ||
+        !bottleAliasIdentityMatches(lockedAlias, convergedSnapshot)))
   ) {
     throw new BottleAliasIdentityChangedError(snapshot.name);
   }
@@ -300,7 +312,21 @@ async function claimBottleAliasNameInTransaction(
       .for("update");
 
     if (expectedIdentity) {
-      assertBottleAliasIdentitySnapshot(existingAlias, expectedIdentity);
+      const convergedIdentity: BottleAliasIdentitySnapshot = {
+        name,
+        bottleId,
+        ignored:
+          reservation || expectedIdentity.bottleId === null
+            ? (ignored ?? false)
+            : expectedIdentity.ignored,
+        assignmentSource: assignmentSource ?? expectedIdentity.assignmentSource,
+        assignedByActorId,
+      };
+      assertBottleAliasIdentitySnapshot(
+        existingAlias,
+        expectedIdentity,
+        convergedIdentity,
+      );
     }
 
     if (!existingAlias) {
