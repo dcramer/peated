@@ -1,50 +1,13 @@
 import { db } from "@peated/server/db";
 import { reviewArticles, reviews } from "@peated/server/db/schema";
-import { NativeScoreSchema } from "@peated/server/schemas";
+import { ReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 
-const ArticleReviewSchema = z
-  .object({
-    sourceKey: z.string().trim().min(1).max(255),
-    name: z.string().trim().min(1).max(500),
-    reviewerName: z.string().trim().min(1).max(255).nullable().default(null),
-    nativeScore: NativeScoreSchema.nullable().default(null),
-    normalizedRating: z.number().int().min(0).max(100).nullable().default(null),
-  })
-  .strict();
-
-export const ReviewArticleInputSchema = z
-  .object({
+export const ReviewArticleInputSchema =
+  ReviewArticleObservationSchema.safeExtend({
     externalSiteId: z.number().int().positive(),
-    canonicalUrl: z
-      .url()
-      .refine(
-        (value) => ["http:", "https:"].includes(new URL(value).protocol),
-        {
-          message: "Canonical URL must use HTTP or HTTPS.",
-        },
-      ),
-    title: z.string().trim().min(1).max(1000),
-    issue: z.string().trim().min(1).max(255).nullable().default(null),
-    publishedAt: z.date().nullable().default(null),
-    contentHash: z.string().trim().min(1).max(128),
     fetchedAt: z.date(),
-    reviews: z.array(ArticleReviewSchema).min(1),
-  })
-  .strict()
-  .superRefine(({ reviews }, context) => {
-    const sourceKeys = new Set<string>();
-    for (const [index, review] of reviews.entries()) {
-      if (sourceKeys.has(review.sourceKey)) {
-        context.addIssue({
-          code: "custom",
-          message: "Review source keys must be unique within an article.",
-          path: ["reviews", index, "sourceKey"],
-        });
-      }
-      sourceKeys.add(review.sourceKey);
-    }
   });
 
 /**
