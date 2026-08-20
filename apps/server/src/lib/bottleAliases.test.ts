@@ -320,10 +320,16 @@ describe("assignBottleAliasInTransaction", () => {
     ).toBeUndefined();
   });
 
-  test("rolls back when source alias Bottle, name, or ignored state changes", async ({
+  test("rolls back when a distinct source alias identity changes", async ({
     fixtures,
   }) => {
-    for (const field of ["bottleId", "name", "ignored"] as const) {
+    for (const field of [
+      "bottleId",
+      "name",
+      "ignored",
+      "assignmentSource",
+      "assignedByActorId",
+    ] as const) {
       const bottle = await fixtures.Bottle();
       const concurrent = await fixtures.Bottle();
       const source = await fixtures.BottleAlias({
@@ -340,10 +346,20 @@ describe("assignBottleAliasInTransaction", () => {
           .update(bottleAliases)
           .set({ name: `${source.name} changed` })
           .where(eq(bottleAliases.name, source.name));
-      } else {
+      } else if (field === "ignored") {
         await db
           .update(bottleAliases)
           .set({ ignored: !source.ignored })
+          .where(eq(bottleAliases.name, source.name));
+      } else if (field === "assignmentSource") {
+        await db
+          .update(bottleAliases)
+          .set({ assignmentSource: "human_approved" })
+          .where(eq(bottleAliases.name, source.name));
+      } else {
+        await db
+          .update(bottleAliases)
+          .set({ assignedByActorId: concurrent.createdByActorId })
           .where(eq(bottleAliases.name, source.name));
       }
 
@@ -364,6 +380,39 @@ describe("assignBottleAliasInTransaction", () => {
         }),
       ).toBeUndefined();
     }
+  });
+
+  test("allows concurrent assignments that converge on the same alias identity", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const source = await fixtures.BottleAlias({
+      name: "Concurrent Source Alias",
+      bottleId: bottle.id,
+      assignmentSource: "source_approved",
+    });
+    expect(source.assignedByActorId).not.toBe(bottle.createdByActorId);
+
+    const results = await Promise.all(
+      [1, 2].map(() =>
+        db.transaction((tx) =>
+          assignBottleAliasInTransaction(tx, {
+            bottleId: bottle.id,
+            name: source.name,
+            assignmentSource: "source_approved",
+            assignedByActorId: bottle.createdByActorId,
+            sourceAliasIdentity: source,
+          }),
+        ),
+      ),
+    );
+
+    expect(results).toHaveLength(2);
+    expect(await getAlias(source.name)).toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "source_approved",
+      assignedByActorId: bottle.createdByActorId,
+    });
   });
 
   test("allows one winner when Bottles race to claim the same alias", async ({
