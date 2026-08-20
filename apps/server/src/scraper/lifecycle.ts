@@ -6,7 +6,10 @@ import {
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
 import { and, asc, eq, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";
-import { findScraperSourceBySiteType } from "./definitions";
+import {
+  findScraperSourceBySiteType,
+  requireEnabledScraperTargets,
+} from "./definitions";
 import { requireExternalReviewFetchBeforeQueue } from "./sourcePolicy";
 import type { ScraperRegistry } from "./types";
 
@@ -65,6 +68,7 @@ async function insertRun(
       `External site ${site.type} is not registered with the scraper runtime.`,
     );
   }
+  requireEnabledScraperTargets(registry, source);
   const [run] = await connection
     .insert(externalSiteRuns)
     .values({

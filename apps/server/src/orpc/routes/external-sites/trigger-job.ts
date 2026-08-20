@@ -10,6 +10,7 @@ import {
   ExternalReviewSourcePolicyError,
   ExternalSiteRunActiveError,
   queueManualExternalSiteRun,
+  ScraperTargetDisabledError,
 } from "@peated/server/scraper";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteRunSerializer } from "@peated/server/serializers/externalSite";
@@ -52,7 +53,10 @@ export default procedure
       });
       return serialize(ExternalSiteRunSerializer, run, context.user);
     } catch (error) {
-      if (error instanceof ExternalSiteRunActiveError) {
+      if (
+        error instanceof ExternalSiteRunActiveError ||
+        error instanceof ScraperTargetDisabledError
+      ) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
       if (error instanceof ExternalReviewSourcePolicyError) {

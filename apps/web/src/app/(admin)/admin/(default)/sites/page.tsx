@@ -106,8 +106,10 @@ export default function Page() {
               value: (site) =>
                 site.nextRunAt ? (
                   <TimeSince date={site.nextRunAt} />
+                ) : site.runEvery === null ? (
+                  "Manual only"
                 ) : (
-                  <>&mdash;</>
+                  "Due now"
                 ),
             },
           ]}

@@ -1,6 +1,9 @@
+import { db } from "@peated/server/db";
+import { externalSiteRuns } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { pushJob } from "@peated/server/worker/client";
+import { eq } from "drizzle-orm";
 
 vi.mock("@peated/server/worker/client");
 
@@ -63,5 +66,30 @@ describe("POST /external-sites/:site/trigger", () => {
       `[Error: External review source whiskyadvocate is not approved for allowFetching.]`,
     );
     expect(pushJob).not.toHaveBeenCalled();
+  });
+
+  test("refuses a disabled scraper before creating durable work", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const err = await waitError(
+      routerClient.externalSites.triggerJob(
+        { site: site.type },
+        { context: { user: adminUser } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Scraper target totalwine is disabled.]`,
+    );
+    expect(pushJob).not.toHaveBeenCalled();
+    await expect(
+      db
+        .select()
+        .from(externalSiteRuns)
+        .where(eq(externalSiteRuns.externalSiteId, site.id)),
+    ).resolves.toHaveLength(0);
   });
 });

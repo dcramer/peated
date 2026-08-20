@@ -6,7 +6,10 @@
  */
 import type { ExternalSite } from "@peated/server/db/schema";
 import type { ExternalSiteType } from "@peated/server/types";
-import { findScraperSourceBySiteType } from "./definitions";
+import {
+  findScraperSourceBySiteType,
+  ScraperTargetDisabledError,
+} from "./definitions";
 import {
   createScraperLifecycle,
   ExternalSiteRunActiveError,
@@ -30,7 +33,11 @@ const lifecycle = createScraperLifecycle({
   enqueue: enqueueScraperRun,
 });
 
-export { ExternalReviewSourcePolicyError, ExternalSiteRunActiveError };
+export {
+  ExternalReviewSourcePolicyError,
+  ExternalSiteRunActiveError,
+  ScraperTargetDisabledError,
+};
 export type { ScraperRunExecutionResult };
 
 export function getScraperRegistration(siteType: ExternalSiteType) {

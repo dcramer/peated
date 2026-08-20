@@ -1,3 +1,4 @@
+import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalSiteRuns,
@@ -63,7 +64,8 @@ test("registers every scraper source with explicit target ownership", () => {
     expect(source.targetKeys).toEqual([source.externalSiteType]);
     expect(scraperRegistry.targets.get(source.targetKeys[0])).toBeDefined();
   }
-  expect(scraperRegistry.targets.get("astorwines")?.enabled).toBe(false);
+  expect(scraperRegistry.targets.get("astorwines")?.enabled).toBe(true);
+  expect(EXTERNAL_SITE_DEFINITIONS.astorwines.runEvery).toBeNull();
   expect(scraperRegistry.targets.get("totalwine")?.enabled).toBe(false);
 });
 

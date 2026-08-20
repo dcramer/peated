@@ -13,6 +13,7 @@ import {
   createScraperRegistry,
   defineScraperSource,
   defineScrapeTarget,
+  ScraperTargetDisabledError,
 } from "./definitions";
 import type { ScraperHttpClock } from "./http";
 import { ScraperRequestDeferredError } from "./http";
@@ -45,12 +46,14 @@ async function setupRun({
   sink,
   authorize,
   cursor,
+  targetEnabled = true,
 }: {
   requestLimit?: number;
   adapter?: ScraperAdapter<FixtureCursor, FixtureObservation>;
   sink?: ScraperSink<FixtureObservation>;
   authorize?: ScraperAuthorization;
   cursor?: unknown;
+  targetEnabled?: boolean;
 } = {}) {
   const observations = new Map<string, FixtureObservation>();
   const sourceSink: ScraperSink<FixtureObservation> =
@@ -62,6 +65,7 @@ async function setupRun({
     targets: [
       defineScrapeTarget({
         key: "fixture-target",
+        enabled: targetEnabled,
         origins: [
           {
             origin: "https://fixture.invalid",
@@ -147,6 +151,35 @@ test("executes the fixture adapter through request, emit, checkpoint, and comple
     itemCount: 2,
     cursor: { page: 2 },
     executionToken: null,
+  });
+});
+
+test("fails a queued run before adapter execution when its target is disabled", async () => {
+  const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>();
+  const { registry, run } = await setupRun({
+    adapter,
+    targetEnabled: false,
+  });
+  const fetchImpl = vi.fn<typeof fetch>();
+
+  await expect(
+    executeScraperRun(
+      { runId: run.id },
+      { registry, fetchImpl, clock: fixedClock(), executionToken: "owner" },
+    ),
+  ).rejects.toBeInstanceOf(ScraperTargetDisabledError);
+  expect(adapter).not.toHaveBeenCalled();
+  expect(fetchImpl).not.toHaveBeenCalled();
+
+  const [stored] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(stored).toMatchObject({
+    status: "failed",
+    attemptCount: 1,
+    requestCount: 0,
+    error: "Scraper target fixture-target is disabled.",
   });
 });
 
