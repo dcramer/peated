@@ -48,8 +48,9 @@ does not create another catalog identity layer.
   the age is invariant across a future group.
 - Updates accept one flat `BottlePatch`. The server assigns storage ownership.
   Name, brand, bottler, distillers, category, series, and flavor profile changes
-  use shared editing semantics. A `statedAge` change belongs to the selected
-  Bottle.
+  use shared editing semantics. A non-null `statedAge` change belongs to the
+  selected Bottle. A null age clears a differing exact override, or clears and
+  fans out the shared age when the selected Bottle has no exact override.
 - Semantic grouping happens outside ordinary creation. Similar names, a shared
   brand, or a shared BottleSeries may suggest a relationship but do not prove
   same-expression identity. This release does not ship an automatic regrouping

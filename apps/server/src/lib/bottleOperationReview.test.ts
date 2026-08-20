@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleGroups,
+  bottles,
   collectionBottles,
   entities,
 } from "@peated/server/db/schema";
@@ -1516,6 +1517,77 @@ describe("Bottle operation review preparation", () => {
       });
       expect(after.stateToken).not.toEqual(before.stateToken);
     }
+  });
+
+  test("previews inherited age clears as shared and override clears as exact", async ({
+    fixtures,
+  }) => {
+    const inherited = await fixtures.Bottle({
+      name: "Inherited Age Review",
+      statedAge: null,
+    });
+    const override = await fixtures.BottleGroupMember({
+      groupId: inherited.groupId as number,
+      edition: "Override",
+      statedAge: 14,
+    });
+    await db
+      .update(bottleGroups)
+      .set({ statedAge: 12 })
+      .where(eq(bottleGroups.id, inherited.groupId as number));
+    await db
+      .update(bottles)
+      .set({ statedAge: 12 })
+      .where(eq(bottles.id, inherited.id));
+
+    const operation = (bottleId: number, id: number) =>
+      ({
+        id,
+        proposal: {
+          type: "update_bottle",
+          input: { bottleId, patch: { statedAge: null } },
+          rationale: "The inspected label has no age statement.",
+          evidenceRefs: [{ kind: "bottle", bottleId }],
+        },
+      }) as const;
+    const [sharedClear, exactClear] = await Promise.all([
+      prepareOperation({
+        operation: operation(inherited.id, 67),
+        artifacts: artifacts({
+          bottleContexts: [await bottleContext(inherited.id)],
+        }),
+      }),
+      prepareOperation({
+        operation: operation(override.id, 68),
+        artifacts: artifacts({
+          bottleContexts: [await bottleContext(override.id)],
+        }),
+      }),
+    ]);
+
+    expect(sharedClear).toMatchObject({
+      status: "pending_review",
+      type: "update_bottle",
+      preview: {
+        changedFields: ["shared.statedAge"],
+        after: { shared: { statedAge: null }, exact: { statedAge: null } },
+        affectedBottles: { total: 2 },
+        warnings: [{ code: "shared_group_fan_out" }],
+      },
+      stateToken: { shared: { statedAge: 12 } },
+    });
+    expect(sharedClear).not.toHaveProperty("stateToken.exact.statedAge");
+    expect(exactClear).toMatchObject({
+      status: "pending_review",
+      type: "update_bottle",
+      preview: {
+        changedFields: ["exact.statedAge"],
+        after: { shared: { statedAge: 12 }, exact: { statedAge: null } },
+        affectedBottles: { total: 1 },
+        warnings: [],
+      },
+      stateToken: { exact: { statedAge: 14 } },
+    });
   });
 
   test("relationship digests change for affected membership drift", async ({

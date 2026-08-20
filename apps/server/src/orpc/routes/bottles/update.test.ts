@@ -158,6 +158,37 @@ describe("PATCH /bottles/{bottle}", () => {
     ).toHaveLength(1);
   });
 
+  test("clears an inherited stated age from a singleton group", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Clear Route Age Brand" });
+    const { first } = await createGroup(
+      mod,
+      { name: "Clear Route Age", statedAge: 10, brand: brand.id },
+      [{}],
+    );
+
+    const result = await routerClient.bottles.update(
+      { bottle: first.bottle.id, statedAge: null },
+      { context: { user: mod } },
+    );
+    const fresh = await routerClient.bottles.details({
+      bottle: first.bottle.id,
+    });
+
+    expect(result).toMatchObject({
+      id: first.bottle.id,
+      statedAge: null,
+      group: { id: first.group.id, statedAge: null },
+    });
+    expect(fresh).toMatchObject({
+      id: first.bottle.id,
+      statedAge: null,
+      group: { id: first.group.id, statedAge: null },
+    });
+  });
+
   test("isolates exact edits to the selected Bottle", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Exact Route Brand" });

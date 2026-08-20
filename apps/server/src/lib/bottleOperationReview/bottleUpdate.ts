@@ -244,12 +244,14 @@ function collectChangedBottleFields(
 function relevantBottleUpdateToken({
   resource,
   proposal,
+  sharedStatedAgeIntent,
   referencedEntities,
   referencedSeries,
   relationshipDigest: relatedMemberships,
 }: {
   resource: BottleResource;
   proposal: Extract<ProposedOperation, { type: "update_bottle" }>;
+  sharedStatedAgeIntent: boolean;
   referencedEntities: Array<{
     entityId: number;
     name: string;
@@ -273,6 +275,10 @@ function relevantBottleUpdateToken({
     ),
   );
   const sharedFields = new Set(requestedSharedFields);
+  if (sharedStatedAgeIntent) {
+    sharedFields.add("statedAge");
+    requestedSharedFields.add("statedAge");
+  }
   if (sharedFields.has("name")) {
     sharedFields.add("statedAge");
   }
@@ -561,20 +567,30 @@ export async function prepareBottleUpdate(
       ? { distillers: distillers.map(({ canonical }) => canonical) }
       : {}),
   });
-  const storage = bottleStoragePatch(canonicalInput);
+  const storage = bottleStoragePatch(canonicalInput, {
+    bottleStatedAge: resource.bottle.statedAge,
+    groupStatedAge: resource.group.statedAge,
+  });
+  const sharedStatedAgeIntent =
+    storage.shared !== undefined && "statedAge" in storage.shared;
 
   let sharedName =
     storage.shared?.name === undefined
       ? resource.group.name
       : storage.shared.name;
-  let sharedStatedAge = resource.group.statedAge;
+  let sharedStatedAge =
+    storage.shared?.statedAge === undefined
+      ? resource.group.statedAge
+      : storage.shared.statedAge;
   if (storage.shared?.name !== undefined) {
     const normalized = normalizeBottleAge({
       name: normalizeBottleAliasKey(storage.shared.name),
       statedAge: sharedStatedAge,
     });
     sharedName = normalized.name;
-    sharedStatedAge = normalized.statedAge;
+    if (storage.shared.statedAge === undefined) {
+      sharedStatedAge = normalized.statedAge;
+    }
   }
   const brandName =
     brand.preview.kind === "existing"
@@ -701,6 +717,7 @@ export async function prepareBottleUpdate(
   const stateToken = relevantBottleUpdateToken({
     resource,
     proposal,
+    sharedStatedAgeIntent,
     referencedEntities,
     referencedSeries,
     relationshipDigest: storage.shared
