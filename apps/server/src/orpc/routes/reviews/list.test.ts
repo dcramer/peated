@@ -93,6 +93,30 @@ describe("GET /reviews", () => {
     expect(results[0].id).toEqual(review.id);
   });
 
+  test("shows staged reviews to moderators but not on public Bottle pages", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      hidden: true,
+    });
+
+    const moderatorResults = await routerClient.reviews.list(
+      { site: site.type },
+      { context: { user } },
+    );
+    const publicResults = await routerClient.reviews.list({
+      bottle: bottle.id,
+    });
+
+    expect(moderatorResults.results.map(({ id }) => id)).toContain(review.id);
+    expect(publicResults.results.map(({ id }) => id)).not.toContain(review.id);
+  });
+
   test("uses article-owned source and URL metadata", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const articleSite = await fixtures.ExternalSite({

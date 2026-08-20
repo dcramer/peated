@@ -51,7 +51,13 @@ export default procedure
     context,
     errors,
   }) {
-    const baseWhere: (SQL<unknown> | undefined)[] = [eq(reviews.hidden, false)];
+    const hasPublicScope = input.bottle !== undefined;
+    const requiresModerator = input.onlyUnknown || !hasPublicScope;
+    // This route owns review visibility. Public Bottle queries exclude staged
+    // reviews. Moderator queries include them for review and matching.
+    const baseWhere: (SQL<unknown> | undefined)[] = requiresModerator
+      ? []
+      : [eq(reviews.hidden, false)];
     const identityWhere: SQL<unknown>[] = [];
 
     if (input.site) {
@@ -66,9 +72,6 @@ export default procedure
       }
       baseWhere.push(eq(reviewArticles.externalSiteId, site.id));
     }
-
-    const hasPublicScope = input.bottle !== undefined;
-    const requiresModerator = input.onlyUnknown || !hasPublicScope;
 
     if (hasPublicScope) {
       // No-fetch migration articles have no content hash and preserve their

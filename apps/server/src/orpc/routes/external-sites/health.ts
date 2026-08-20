@@ -55,12 +55,9 @@ async function getHealthForSites(
       })
       .from(reviews)
       .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
-      .where(
-        and(
-          inArray(reviewArticles.externalSiteId, siteIds),
-          eq(reviews.hidden, false),
-        ),
-      )
+      // Admin health includes staged reviews so operators can verify imports
+      // before publication.
+      .where(inArray(reviewArticles.externalSiteId, siteIds))
       .groupBy(reviewArticles.externalSiteId),
     db
       .select({

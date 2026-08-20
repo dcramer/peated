@@ -180,7 +180,7 @@ test("health details show review inventory and blocked review policy", async ({
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   await fixtures.Review({
     externalSiteId: site.id,
-    hidden: false,
+    hidden: true,
   });
   await fixtures.Review({
     externalSiteId: site.id,
