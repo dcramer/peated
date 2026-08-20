@@ -51,7 +51,7 @@ export async function ingestReviewArticle(rawInput: unknown) {
 
   for (const review of input.article.reviews) {
     const rawName = review.name;
-    const { name } = normalizeBottle({ name: rawName });
+    const { name: normalizedName } = normalizeBottle({ name: rawName });
     const aliasKey = normalizeBottleAliasKey(rawName);
     const resolution = await resolveScrapedBottleReferenceTarget({
       reference: {
@@ -80,7 +80,7 @@ export async function ingestReviewArticle(rawInput: unknown) {
         summary = await generateExternalReviewSummary({
           externalSiteId: input.externalSiteId,
           sourceKey: review.sourceKey,
-          bottleName: name,
+          bottleName: normalizedName,
           sourceText,
           contentHash: input.article.contentHash,
         });
@@ -98,7 +98,6 @@ export async function ingestReviewArticle(rawInput: unknown) {
     }
     resolvedReviews.push({
       ...review,
-      name,
       bottleId: resolution.assignment?.bottleId ?? null,
       summary,
     });
