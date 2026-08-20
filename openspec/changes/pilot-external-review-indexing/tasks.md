@@ -81,7 +81,7 @@
 
 ## 7. Verification And Documentation
 
-- [ ] 7.1 Document the runtime permission boundary, source adapter contract,
+- [x] 7.1 Document the runtime permission boundary, source adapter contract,
       transient-content rule, rollback path, and pilot operating procedure
 - [ ] 7.2 Run targeted server tests, web tests, server and web typechecks, lint,
       and formatting for the touched surface
