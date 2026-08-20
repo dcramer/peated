@@ -18,7 +18,7 @@ export class ScraperTargetDisabledError extends Error {
 
 export const DEFAULT_SCRAPER_REQUEST_POLICY = Object.freeze({
   minimumSpacingMs: 2_000,
-  requestsPerWindow: 300,
+  requestsPerWindow: 60,
   windowMs: 60 * 60_000,
   requestLimit: 100,
   timeoutMs: 30_000,
