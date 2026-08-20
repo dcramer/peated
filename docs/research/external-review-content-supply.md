@@ -169,26 +169,33 @@ Suggested outreach:
 > private feed if you prefer, honor updates and removals, and share referral
 > traffic data.
 
-## Required Product Boundary
+## Implemented Product Boundary
 
-The current implementation cannot represent this product cleanly:
+The external-review feature now has the required article/review model,
+permission policy, governed fetch boundary, and Bottle-page presentation. See
+the [external review indexing guide](../features/external-review-indexing.md)
+for the current contract and pilot procedure.
 
-- `review.url` is globally unique, so one multi-bottle article cannot own
+The pilot started with these limits:
+
+- `review.url` was globally unique, so one multi-bottle article could not own
   several independent Bottle reviews.
-- Every review requires a 0-100 score and an issue name.
-- Reviews have no author, publication date, article title, native score scale,
+- Every review required a 0-100 score and an issue name.
+- Reviews had no author, publication date, article title, native score scale,
   summary, source evidence, rights mode, or source-policy version.
-- There is no review-article record separate from a Bottle review.
-- Publisher registration and job dispatch are code-owned, which makes a large
-  and changing source portfolio expensive to operate.
+- There was no review-article record separate from a Bottle review.
+- Outbound requests did not use one governed runtime with source policy,
+  request budgets, robots checks, and durable runs.
 
-Relevant code:
+Relevant implementation:
 
 - [`reviews` schema](../../apps/server/src/db/schema/reviews.ts)
-- [Whisky Advocate scraper](../../apps/server/src/worker/jobs/scrapeWhiskyAdvocate.ts)
-- [external review ingestion](../../apps/server/src/lib/createExternalReview.ts)
+- [review-source policy](../../apps/server/src/db/schema/externalReviewSources.ts)
+- [article observation contract](../../apps/server/src/externalReviews/observation.ts)
+- [external review ingestion](../../apps/server/src/externalReviews/ingest.ts)
+- [scraper runtime](../../apps/server/src/scraper/README.md)
 
-The eventual model should separate:
+The current model separates:
 
 - a source and its acquisition/display policy;
 - a review article identified by publisher and canonical URL;
