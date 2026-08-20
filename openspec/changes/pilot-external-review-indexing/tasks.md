@@ -45,10 +45,10 @@
       and stable reviews
 - [x] 4.2 Reuse external-review Bottle resolution for each review and keep
       unresolved or invalid Bottle assignments hidden
-- [ ] 4.3 Add transient summary generation with a constrained two- or
+- [x] 4.3 Add transient summary generation with a constrained two- or
       three-sentence prompt, content hash, model, prompt version, and generation
       time
-- [ ] 4.4 Make summary failure non-destructive and invalidate summaries when the
+- [x] 4.4 Make summary failure non-destructive and invalidate summaries when the
       source content hash changes
 - [ ] 4.5 Add deterministic tests for multi-bottle splitting, idempotency, native
       scoring, summary policy enforcement, and redacted failures
