@@ -1,9 +1,11 @@
+import { ingestReviewArticle } from "@peated/server/externalReviews/ingest";
 import {
   createExternalReview,
   ExternalReviewBottleStateError,
 } from "@peated/server/lib/createExternalReview";
 import { logWarn } from "@peated/server/lib/log";
 import type { WhiskyAdvocateObservation } from "../adapters/whiskyAdvocate";
+import type { WhiskyNotesObservation } from "../adapters/whiskyNotes";
 import type { ScraperSink } from "../types";
 
 export const whiskyAdvocateReviewSink: ScraperSink<
@@ -31,4 +33,14 @@ export const whiskyAdvocateReviewSink: ScraperSink<
       },
     });
   }
+};
+
+export const whiskyNotesReviewSink: ScraperSink<
+  WhiskyNotesObservation
+> = async ({ externalSiteId, observation }) => {
+  await ingestReviewArticle({
+    externalSiteId,
+    fetchedAt: new Date(),
+    ...observation.value,
+  });
 };

@@ -84,7 +84,7 @@ test("manual run is attributed, dispatched deterministically, and does not move 
   expect(storedSite?.lastRunAt).toBeNull();
 });
 
-test("review runs require fetching approval before dispatch", async ({
+test("review runs require the fetching capability before dispatch", async ({
   fixtures,
 }) => {
   const requestedBy = await fixtures.User({ admin: true });
@@ -107,10 +107,10 @@ test("review runs require fetching approval before dispatch", async ({
   expect(enqueue).not.toHaveBeenCalled();
 });
 
-test("approved review runs are dispatched", async ({ fixtures }) => {
+test("enabled review runs are dispatched", async ({ fixtures }) => {
   const requestedBy = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.ApprovedExternalReviewSourcePolicy({
+  await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
   });
   const enqueue = vi.fn(async () => undefined);
@@ -125,12 +125,12 @@ test("approved review runs are dispatched", async ({ fixtures }) => {
   expect(enqueue).toHaveBeenCalledOnce();
 });
 
-test("worker rechecks approval after a review run is queued", async ({
+test("worker rechecks the capability after a review run is queued", async ({
   fixtures,
 }) => {
   const requestedBy = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.ApprovedExternalReviewSourcePolicy({
+  await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
   });
   const run = await queueManualExternalSiteRun({
@@ -146,10 +146,6 @@ test("worker rechecks approval after a review run is queued", async ({
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,
-      policyEvidenceUrl: null,
-      approvalReference: null,
-      reviewedAt: null,
-      approvedByActorId: null,
     })
     .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
   const fetchImpl = vi.fn<typeof fetch>();

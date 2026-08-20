@@ -51,10 +51,6 @@ const site = {
     allowLlmProcessing: false,
     allowScoreDisplay: false,
     allowSummaryDisplay: false,
-    policyEvidenceUrl: "https://example.com/policy",
-    approvalReference: null,
-    reviewedAt: null,
-    approvedByActorId: null,
     updatedAt: timestamp,
   },
 } satisfies Outputs["externalSites"]["healthDetails"];
@@ -117,7 +113,6 @@ describe("scraper observability", () => {
     expect(html).toContain("Disabled");
     expect(html).toContain("Robots: Unknown");
     expect(html).toContain("Fetching blocked");
-    expect(html).toContain("Policy evidence");
   });
 
   it("shows responsible-request and deferral telemetry", () => {

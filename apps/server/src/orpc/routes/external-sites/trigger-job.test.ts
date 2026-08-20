@@ -31,7 +31,7 @@ describe("POST /external-sites/:site/trigger", () => {
     const site = await fixtures.ExternalSiteOrExisting({
       type: "whiskyadvocate",
     });
-    await fixtures.ApprovedExternalReviewSourcePolicy({
+    await fixtures.EnabledExternalReviewSourcePolicy({
       externalSiteId: site.id,
     });
     const adminUser = await fixtures.User({ admin: true });
@@ -63,7 +63,7 @@ describe("POST /external-sites/:site/trigger", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: External review source whiskyadvocate is not approved for allowFetching.]`,
+      `[Error: External review source whiskyadvocate does not enable allowFetching.]`,
     );
     expect(pushJob).not.toHaveBeenCalled();
   });

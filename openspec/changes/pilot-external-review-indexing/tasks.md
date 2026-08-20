@@ -1,10 +1,9 @@
 ## 1. Source Policy Boundary
 
 - [x] 1.1 Add the external-review source policy schema with disabled defaults,
-      capability flags, publication mode, policy evidence, review date, approval
-      reference, and approving actor
+      capability flags, and publication mode
 - [x] 1.2 Generate and inspect the database migration for source policy and add
-      fixtures for disabled and approved policies
+      fixtures for disabled and review-only policies
 - [x] 1.3 Add moderator-only policy reads and updates with audit logging and
       tests for enablement, revocation, and unauthorized access
 - [x] 1.4 Enforce fetch policy at scheduled jobs, manual jobs, and the review
@@ -59,33 +58,34 @@
       and permitted summary while preserving existing clients during cutover
 - [x] 5.2 Update Bottle review presentation with publisher, reviewer, date,
       native score, attributed Peated summary, and a prominent canonical link
-- [x] 5.3 Omit missing or unapproved fields without fallbacks and keep normalized
+- [x] 5.3 Omit missing or disabled fields without fallbacks and keep normalized
       compatibility ratings out of native-score presentation
 - [x] 5.4 Add deterministic component and route tests for complete, partial,
       unscored, summary-free, revoked, and multi-source reviews
 
-## 6. Approved Publisher Pilots
+## 6. Source Pilots
 
-- [ ] 6.1 Record written permission and exact capabilities for the first pilot
-      publisher before implementing or enabling its adapter
-- [ ] 6.2 Implement and fixture-test the first approved source adapter with
+- [x] 6.1 Confirm that current robots rules and public terms do not prohibit the
+      planned WhiskyNotes requests
+- [x] 6.2 Implement and fixture-test the first source adapter with
       bounded discovery and stable source keys
-- [ ] 6.3 Run the first approved backfill in review-only mode and capture article,
+- [ ] 6.3 Run the first backfill in review-only mode and capture article,
       review, extraction, matched, and unresolved counts
-- [ ] 6.4 Review the agreed sample for at least 90% extraction accuracy,
+- [ ] 6.4 Review the selected sample for at least 90% extraction accuracy,
       multi-bottle splitting, summary quality, and Bottle-match precision
 - [ ] 6.5 Explicitly enable or reject automatic publication based on the recorded
       pilot results
-- [ ] 6.6 Repeat permission capture and the bounded review-only pilot for the
-      second publisher before generalizing shared adapter behavior
+- [ ] 6.6 Recheck current robots rules and terms, then run the bounded
+      review-only pilot for the second publisher before generalizing shared
+      adapter behavior
 
 ## 7. Verification And Documentation
 
-- [x] 7.1 Document the runtime permission boundary, source adapter contract,
+- [x] 7.1 Document the runtime source-policy boundary, source adapter contract,
       transient-content rule, rollback path, and pilot operating procedure
-- [ ] 7.2 Run targeted server tests, web tests, server and web typechecks, lint,
+- [x] 7.2 Run targeted server tests, web tests, server and web typechecks, lint,
       and formatting for the touched surface
 - [ ] 7.3 Manually QA moderator policy changes, hidden pilot reviews, and
-      Bottle-page referral links without fetching an unapproved source
-- [ ] 7.4 Validate the OpenSpec change and record remaining publisher-dependent
+      Bottle-page referral links without fetching a disabled source
+- [ ] 7.4 Validate the OpenSpec change and record remaining source-pilot
       tasks without weakening the disabled-by-default boundary

@@ -55,7 +55,7 @@ test("skips the model when the source does not permit LLM processing", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.ApprovedExternalReviewSourcePolicy({
+  await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
     allowLlmProcessing: false,
     allowSummaryDisplay: false,
@@ -71,7 +71,7 @@ test("generates a short summary with provenance and no provider storage", async 
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.ApprovedExternalReviewSourcePolicy({
+  await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
   });
   const sourceText =
@@ -111,7 +111,7 @@ test("rejects output that does not contain two or three sentences", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.ApprovedExternalReviewSourcePolicy({
+  await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
   });
   const sourceText = "This source text must not appear in an error.";
@@ -134,7 +134,7 @@ test("rejects a long phrase copied from the publisher text", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.ApprovedExternalReviewSourcePolicy({
+  await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
   });
   const copiedPhrase =

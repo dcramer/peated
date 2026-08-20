@@ -136,7 +136,7 @@ describe("GET /reviews", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.ApprovedExternalReviewSourcePolicy({
+    await fixtures.EnabledExternalReviewSourcePolicy({
       externalSiteId: site.id,
       publicationMode: "automatic",
     });
@@ -206,7 +206,7 @@ describe("GET /reviews", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.ApprovedExternalReviewSourcePolicy({
+    await fixtures.EnabledExternalReviewSourcePolicy({
       externalSiteId: site.id,
       publicationMode: "automatic",
     });

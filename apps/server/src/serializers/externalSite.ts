@@ -78,10 +78,6 @@ export function serializeExternalReviewSourcePolicy(
     allowLlmProcessing: policy?.allowLlmProcessing ?? false,
     allowScoreDisplay: policy?.allowScoreDisplay ?? false,
     allowSummaryDisplay: policy?.allowSummaryDisplay ?? false,
-    policyEvidenceUrl: policy?.policyEvidenceUrl ?? null,
-    approvalReference: policy?.approvalReference ?? null,
-    reviewedAt: policy?.reviewedAt?.toISOString() ?? null,
-    approvedByActorId: policy?.approvedByActorId ?? null,
     updatedAt: policy?.updatedAt.toISOString() ?? null,
   };
 }

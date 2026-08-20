@@ -1,25 +1,25 @@
 ## ADDED Requirements
 
-### Requirement: Source permission gates every operation
+### Requirement: Source policy gates every operation
 
 The system MUST maintain an explicit external-review policy for each source and
 MUST NOT fetch, process with an LLM, display scores, display summaries, or
-publish reviews unless the corresponding capability is approved.
+publish reviews unless the corresponding capability is enabled.
 
 #### Scenario: Disabled source is scheduled
 
 - **WHEN** a scheduled or manually triggered review job targets a disabled
   source
 - **THEN** the system refuses network access and records that the source is not
-  approved for fetching
+  enabled for fetching
 
-#### Scenario: Summary processing is not approved
+#### Scenario: Summary processing is disabled
 
-- **WHEN** an approved source permits article fetching but not LLM processing
+- **WHEN** a source policy permits article fetching but not LLM processing
 - **THEN** the system ingests permitted metadata without sending article text
   to a model or publishing a generated summary
 
-#### Scenario: Permission is revoked
+#### Scenario: Source is disabled
 
 - **WHEN** a moderator disables a source or removes a display capability
 - **THEN** future fetching stops and public reviews no longer expose the
@@ -32,7 +32,7 @@ and SHALL allow that article to own multiple Bottle reviews.
 
 #### Scenario: Article reviews several bottles
 
-- **WHEN** an approved article contains reviews of three distinct bottles
+- **WHEN** an indexed article contains reviews of three distinct bottles
 - **THEN** the system stores one review article and three independently
   matchable Bottle reviews
 
@@ -68,7 +68,7 @@ deterministic normalized 0-100 rating for compatibility.
 
 #### Scenario: Bottle page displays a score
 
-- **WHEN** a visible review has an approved native score
+- **WHEN** a visible review has an enabled native score
 - **THEN** the Bottle page displays the native score rather than the normalized
   compatibility value
 
@@ -78,7 +78,7 @@ The system SHALL treat a generated summary as optional derived data, SHALL
 attribute it to its source review, and SHALL record the source content hash,
 model, prompt version, and generation time used to create it.
 
-#### Scenario: Approved summary is generated
+#### Scenario: Enabled summary is generated
 
 - **WHEN** source policy permits LLM processing and summary display and summary
   generation succeeds
@@ -142,8 +142,8 @@ without one active resolved Bottle.
 ### Requirement: Bottle pages send readers to publishers
 
 The Bottle page SHALL present a visible external review with its publisher,
-reviewer when known, publication date when known, approved native score, short
-attributed summary when approved, and a prominent canonical link to the full
+reviewer when known, publication date when known, enabled native score, short
+attributed summary when enabled, and a prominent canonical link to the full
 review.
 
 #### Scenario: Complete pilot review is displayed
@@ -154,8 +154,7 @@ review.
 
 #### Scenario: Optional metadata is absent
 
-- **WHEN** reviewer, publication date, score, or summary is absent or not
-  approved for display
+- **WHEN** reviewer, publication date, score, or summary is absent or disabled
 - **THEN** the Bottle page omits that field without inventing a value and still
   provides the publisher link
 
@@ -167,12 +166,12 @@ review.
 
 ### Requirement: Pilot sources are reviewed before automatic publication
 
-The system SHALL ingest a newly approved pilot source in review-only mode until
+The system SHALL ingest a new pilot source in review-only mode until
 its extraction and Bottle-matching sample passes the documented rollout gate.
 
 #### Scenario: First source backfill runs
 
-- **WHEN** an approved pilot source is ingested for the first time
+- **WHEN** a pilot source is ingested for the first time
 - **THEN** its reviews remain hidden for moderation regardless of resolved
   Bottle identity
 

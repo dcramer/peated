@@ -4,17 +4,17 @@ Peated indexes external reviews to help readers find the publisher's full
 article. Peated stores structured review facts and an optional short summary.
 It does not republish the article body, tasting notes, conclusion, or images.
 
-This document owns the runtime permission boundary, adapter contract, pilot
+This document owns the runtime source-policy boundary, adapter contract, pilot
 procedure, and rollback path. The [scraper runtime](../../apps/server/src/scraper/README.md)
 owns request control and run execution. The
 [source research](../research/external-review-content-supply.md) records the
-publisher and policy evidence that must be checked before approval.
+publisher robots rules and public terms that must be checked before enablement.
 
-## Permission Boundary
+## Source Policy Boundary
 
 Every external review source starts disabled. Missing policy has the same
 effect as disabled policy. Robots rules can restrict a request, but they never
-grant permission.
+enable a capability.
 
 The source policy has these independent capabilities:
 
@@ -25,7 +25,7 @@ The source policy has these independent capabilities:
   requires `allowLlmProcessing`.
 - `publicationMode` controls public review availability.
 
-The runtime checks permission at each owning boundary:
+The runtime checks source policy at each owning boundary:
 
 | Operation                              | Owning check                                                                    |
 | -------------------------------------- | ------------------------------------------------------------------------------- |
@@ -36,15 +36,13 @@ The runtime checks permission at each owning boundary:
 | Return a fetched review to the public  | The review must be visible and the source must use `automatic` mode.            |
 
 The moderator policy API accepts only `disabled` and `review_only` during the
-pilot. An approved `review_only` policy requires an evidence URL, approval
-reference, review date, and approving actor. The policy update is audit logged.
-Automatic publication needs a later reviewed change after the pilot gate
-passes.
+pilot. The policy update is moderator-only and audit logged. Automatic
+publication needs a later reviewed change after the pilot gate passes.
 
 ## Source Adapter Contract
 
-Add a publisher adapter only after Peated records written permission for that
-publisher and the exact approved capabilities.
+Add a publisher adapter only after checking its current robots rules and public
+terms for the planned requests.
 
 A review adapter must:
 
@@ -81,7 +79,7 @@ Fetched HTML and publisher prose stay in process memory only. Do not put them
 in article metadata, a cursor, checkpoint, log, error, database row, or test
 snapshot.
 
-If an approved source supplies text for summary generation, keep it separate
+If an enabled source supplies text for summary generation, keep it separate
 from the strict article metadata. A source-specific in-memory observation can
 carry only the text needed by its sink. The sink passes that text directly to
 the ingestion boundary as `reviewTexts`, keyed by the review source key. The
@@ -100,35 +98,39 @@ contain stable identifiers and the canonical URL, not publisher prose.
 
 Use this sequence for each publisher:
 
-1. Save the written permission and current terms or policy evidence. Record the
-   exact acquisition, LLM, score, summary, and publication permissions.
-2. Implement and fixture-test only the approved adapter. Keep its source policy
-   disabled while the code is deployed.
+1. Check the current robots rules and public terms for the planned paths and
+   request pattern. Do not work around a block or rate limit.
+2. Implement and fixture-test the adapter. Keep its source policy disabled
+   while the code is deployed.
 3. Synchronize scraper definitions. In **Admin → Scrapers**, confirm that the
    source is registered, its targets are enabled, and its robots state is safe.
-4. Use the moderator review-policy API to set `review_only`. Include the
-   evidence URL, approval reference, review date, and exact capability flags.
+4. Use the moderator review-policy API to set `review_only` with the exact
+   capability flags.
 5. Trigger one bounded manual run from the source page. Do not enable a
    schedule for the first sample.
 6. Record article, review, extracted-item, matched, and unresolved counts.
    Review the agreed hidden sample for extraction, multi-bottle splitting,
-   Bottle matches, and any approved summaries.
+   Bottle matches, and any enabled summaries.
 7. Require at least 90% extraction accuracy and acceptable Bottle-match
    precision. Record the result before proposing automatic publication.
 
+The WhiskyNotes pilot is manual-only. It checks at most five archive pages and
+20 article links on each page. Requests are at least 2.5 seconds apart. The
+target allows 30 requests per hour. Each worker pass stops after 30 requests.
+
 Keep automatic publication unavailable until a reviewed code and policy change
-implements that decision. Repeat the full permission and review-only process
-for the second publisher before adding shared adapter behavior.
+implements that decision. Repeat the robots, terms, and review-only process for
+the second publisher before adding shared adapter behavior.
 
 ## Stop And Roll Back
 
 Set the source policy to `disabled` first. This clears all capabilities. It
 blocks new runs and the next request in an active run. A request already in
 flight can finish. Public fetched reviews disappear, and native scores and
-summaries are no longer returned. Approval evidence stays recorded for audit.
+summaries are no longer returned. The policy change stays in the audit log.
 
 Do not delete review rows as the first response. Keep them hidden while the
-operator checks the adapter, Bottle matches, and publisher request. Disable the
+operator checks the adapter, Bottle matches, and request behavior. Disable the
 code-owned target or remove the adapter registration in a follow-up deployment
 when the adapter itself is unsafe.
 

@@ -32,7 +32,7 @@ the production registry, rather than only the top level of `adapters/`.
 
 External review sources must also follow the
 [external review indexing procedure](../../../../docs/features/external-review-indexing.md).
-It owns publisher permission, transient content, pilot review, and rollback.
+It owns source policy, transient content, pilot review, and rollback.
 
 ## Registering a source
 

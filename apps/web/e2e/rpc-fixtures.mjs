@@ -573,10 +573,6 @@ export const priceSite = {
     allowLlmProcessing: false,
     allowScoreDisplay: true,
     allowSummaryDisplay: false,
-    policyEvidenceUrl: "https://whiskyadvocate.com/terms/",
-    approvalReference: "Browser test fixture",
-    reviewedAt: timestamp,
-    approvedByActorId: null,
     updatedAt: timestamp,
   },
 };
