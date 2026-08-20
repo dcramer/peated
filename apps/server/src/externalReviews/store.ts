@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { reviewArticles, reviews } from "@peated/server/db/schema";
+import {
+  externalReviewSourcePolicies,
+  reviewArticles,
+  reviews,
+} from "@peated/server/db/schema";
 import {
   ReviewArticleObservationSchema,
   ReviewArticleReviewSchema,
@@ -52,6 +56,15 @@ export async function storeReviewArticle(rawInput: unknown) {
   const input = ReviewArticleInputSchema.parse(rawInput);
 
   return await db.transaction(async (tx) => {
+    const policy = await tx.query.externalReviewSourcePolicies.findFirst({
+      columns: { publicationMode: true },
+      where: eq(
+        externalReviewSourcePolicies.externalSiteId,
+        input.externalSiteId,
+      ),
+    });
+    const publishesAutomatically = policy?.publicationMode === "automatic";
+
     const [article] = await tx
       .insert(reviewArticles)
       .values({
@@ -120,6 +133,7 @@ export async function storeReviewArticle(rawInput: unknown) {
         review.bottleId !== null && invalidBottleIds.has(review.bottleId);
       const bottleId =
         review.bottleId !== null && !hasInvalidBottle ? review.bottleId : null;
+      const publish = publishesAutomatically && bottleId !== null;
       const [stored] = await tx
         .insert(reviews)
         .values({
@@ -137,7 +151,7 @@ export async function storeReviewArticle(rawInput: unknown) {
           summaryModel: review.summary?.model ?? null,
           summaryPromptVersion: review.summary?.promptVersion ?? null,
           summaryGeneratedAt: review.summary?.generatedAt ?? null,
-          hidden: true,
+          hidden: !publish,
         })
         .onConflictDoUpdate({
           target: [reviews.articleId, reviews.sourceKey],
@@ -172,7 +186,16 @@ export async function storeReviewArticle(rawInput: unknown) {
                     ELSE ${reviews.hidden}
                   END`,
                 }
-              : {}),
+              : publish
+                ? {
+                    hidden: sql`CASE
+                      WHEN ${reviews.bottleId} IS NULL
+                        OR ${reviews.bottleId} = ${bottleId}
+                      THEN FALSE
+                      ELSE ${reviews.hidden}
+                    END`,
+                  }
+                : {}),
             updatedAt: sql`NOW()`,
           },
         })

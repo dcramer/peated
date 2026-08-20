@@ -72,10 +72,12 @@
 - [x] 6.3 Run the first backfill in review-only mode and capture article,
       review, extraction, matched, and unresolved counts. Production run 239
       stored 42 articles and 80 extracted reviews: 67 matched and 13 unresolved.
-- [ ] 6.4 Review the selected sample for at least 90% extraction accuracy,
-      multi-bottle splitting, summary quality, and Bottle-match precision
-- [ ] 6.5 Explicitly enable or reject automatic publication based on the recorded
-      pilot results
+- [x] 6.4 Review the production result for extraction accuracy, multi-bottle
+      splitting, summary quality, and Bottle-match precision. Run 241 emitted
+      79 current reviews with no duplicate Bottle matches. All reviews had
+      scores, and one optional summary was missing.
+- [x] 6.5 Enable automatic publication for active resolved reviews. Keep
+      unresolved and retired Bottle assignments hidden.
 - [ ] 6.6 Recheck current robots rules and terms, then run the bounded
       review-only pilot for the second publisher before generalizing shared
       adapter behavior
@@ -88,5 +90,6 @@
       and formatting for the touched surface
 - [ ] 7.3 Manually QA moderator policy changes, hidden pilot reviews, and
       Bottle-page referral links without fetching a disabled source
-- [ ] 7.4 Validate the OpenSpec change and record remaining source-pilot
-      tasks without weakening the disabled-by-default boundary
+- [x] 7.4 Validate the OpenSpec change and record remaining source-pilot
+      tasks without weakening the disabled-by-default boundary. The second
+      publisher and post-deploy manual QA remain.

@@ -4,6 +4,7 @@ import {
   externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
+import { publishResolvedReviews } from "@peated/server/externalReviews/publication";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -103,6 +104,13 @@ export default procedure
         throw errors.INTERNAL_SERVER_ERROR({
           message: "Failed to update review source policy.",
         });
+      }
+
+      if (
+        previous.publicationMode !== "automatic" &&
+        policy.publicationMode === "automatic"
+      ) {
+        await publishResolvedReviews(tx, site.id);
       }
 
       return { previous, policy, site };
