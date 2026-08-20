@@ -1,7 +1,7 @@
 import { NativeScoreSchema } from "@peated/server/schemas";
 import { z } from "zod";
 
-const ReviewSchema = z
+export const ReviewArticleReviewSchema = z
   .object({
     sourceKey: z.string().trim().min(1).max(255),
     name: z.string().trim().min(1).max(500),
@@ -27,7 +27,7 @@ export const ReviewArticleObservationSchema = z
     issue: z.string().trim().min(1).max(255).nullable().default(null),
     publishedAt: z.date().nullable().default(null),
     contentHash: z.string().trim().min(1).max(128),
-    reviews: z.array(ReviewSchema).min(1),
+    reviews: z.array(ReviewArticleReviewSchema).min(1),
   })
   .strict()
   .superRefine(({ reviews }, context) => {
