@@ -103,6 +103,13 @@ through the governed runtime. Dramface remains a later multi-bottle candidate.
 Each source remains disabled until its current robots rules and public terms
 are checked.
 
+The Whisky Advocate listing does not expose publication dates. Its review
+pages contain an explicit publisher date in article metadata. The adapter may
+request those pages through the same bounded runtime, store only the date, and
+checkpoint each review so a deferred run resumes without repeating completed
+article requests. Sitemap modification dates and issue seasons are not treated
+as publication dates.
+
 Alternative considered: build a configurable LLM-only arbitrary-page crawler.
 This was rejected because discovery, rate limits, identity keys, score scales,
 and site rules are source-specific and deserve code review during the pilot.

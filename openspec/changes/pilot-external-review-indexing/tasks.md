@@ -81,6 +81,8 @@
 - [ ] 6.6 Recheck current robots rules and terms, then run the bounded
       review-only pilot for the second publisher before generalizing shared
       adapter behavior
+- [x] 6.7 Collect explicit publisher dates for the newest Whisky Advocate issue
+      through bounded article-page requests with resumable checkpoints
 
 ## 7. Verification And Documentation
 

@@ -5,6 +5,8 @@ import type { ScraperObservation, ScraperSession } from "../types";
 import {
   type WhiskyAdvocateCursor,
   type WhiskyAdvocateObservation,
+  parseReviewPublishedAt,
+  parseReviews,
   whiskyAdvocateAdapter,
   WhiskyAdvocateCursorSchema,
 } from "./whiskyAdvocate";
@@ -13,11 +15,33 @@ test("accepts a cursor stored by the previous adapter", () => {
   expect(
     WhiskyAdvocateCursorSchema.parse({ processedIssues: ["Winter 2023"] }),
   ).toEqual({ processedIssues: ["Winter 2023"] });
+  expect(
+    WhiskyAdvocateCursorSchema.parse({
+      issue: "Winter 2023",
+      processedReviewUrls: ["https://whiskyadvocate.com/example-review"],
+    }),
+  ).toEqual({
+    issue: "Winter 2023",
+    processedReviewUrls: ["https://whiskyadvocate.com/example-review"],
+  });
 });
 
-test("fetches the latest issue and preserves Bottle identity facts", async () => {
+test("parses the publisher date template", async () => {
+  const html = await loadFixture("whiskyadvocate", "review-page.html");
+
+  expect(parseReviewPublishedAt(html)).toEqual(
+    new Date("2023-12-19T00:00:00.000Z"),
+  );
+  expect(parseReviewPublishedAt("<html></html>")).toBeNull();
+  expect(() =>
+    parseReviewPublishedAt('<script>"datePublished": "not-a-date"</script>'),
+  ).toThrow("Whisky Advocate review date is invalid.");
+});
+
+test("fetches dates for the latest issue and checkpoints each review", async () => {
   const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
   const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
+  const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
   const $ = cheerio(issueHtml);
   const issueNames = $("select")
     .filter(
@@ -35,8 +59,14 @@ test("fetches the latest issue and preserves Bottle identity facts", async () =>
     url,
     status: 200,
     headers: {},
-    body: url.search.includes("custom_rating_issue") ? reviewHtml : issueHtml,
+    body:
+      url.pathname !== "/ratings-reviews"
+        ? articleHtml
+        : url.search.includes("custom_rating_issue")
+          ? reviewHtml
+          : issueHtml,
   }));
+  const checkpoint = vi.fn();
   const session: ScraperSession<
     WhiskyAdvocateCursor,
     WhiskyAdvocateObservation
@@ -45,13 +75,13 @@ test("fetches the latest issue and preserves Bottle identity facts", async () =>
     emit: async (observation) => {
       observations.push(observation);
     },
-    checkpoint: vi.fn(),
-    remainingRequests: () => 2,
+    checkpoint,
+    remainingRequests: () => 200,
   };
 
   await whiskyAdvocateAdapter({ cursor: null, session });
 
-  expect(request).toHaveBeenCalledTimes(2);
+  expect(request).toHaveBeenCalledTimes(168);
   expect(
     request.mock.calls[1]?.[0].url.searchParams.get("custom_rating_issue[0]"),
   ).toBe(issueNames[0]);
@@ -66,6 +96,7 @@ test("fetches the latest issue and preserves Bottle identity facts", async () =>
         title:
           "Angel’s Envy Cask Strength Sauternes and Toasted Oak Barrel Finished (Batch RC1), 57.2%",
         issue: "Winter 2023",
+        publishedAt: new Date("2023-12-19T00:00:00.000Z"),
         contentHash: expect.any(String),
         reviews: [
           {
@@ -81,12 +112,59 @@ test("fetches the latest issue and preserves Bottle identity facts", async () =>
       reviewTexts: {},
     },
   });
+  expect(checkpoint).toHaveBeenCalledTimes(166);
+  expect(checkpoint).toHaveBeenLastCalledWith({
+    issue: "Winter 2023",
+    processedReviewUrls: observations.map(({ sourceKey }) => sourceKey),
+  });
+});
+
+test("resumes the same issue after the last stored review", async () => {
+  const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
+  const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
+  const reviews = parseReviews(
+    reviewHtml,
+    "https://whiskyadvocate.com/ratings-reviews",
+  );
+  const processedReviewUrls = reviews.slice(0, -1).map((review) => review.url);
+  const emit = vi.fn();
+  const checkpoint = vi.fn();
+  const request = vi.fn(async ({ url }: { url: URL }) => ({
+    url,
+    status: 200,
+    headers: {},
+    body: url.pathname === "/ratings-reviews" ? reviewHtml : articleHtml,
+  }));
+  const session: ScraperSession<
+    WhiskyAdvocateCursor,
+    WhiskyAdvocateObservation
+  > = {
+    request,
+    emit,
+    checkpoint,
+    remainingRequests: () => 20,
+  };
+
+  await whiskyAdvocateAdapter({
+    cursor: { issue: "Winter 2023", processedReviewUrls },
+    session,
+  });
+
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(emit).toHaveBeenCalledOnce();
+  expect(emit).toHaveBeenCalledWith(
+    expect.objectContaining({ sourceKey: reviews.at(-1)?.url }),
+  );
+  expect(checkpoint).toHaveBeenCalledWith({
+    issue: "Winter 2023",
+    processedReviewUrls: reviews.map((review) => review.url),
+  });
 });
 
 test("fails when the newest issue has no review results", async () => {
   const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
-  const request = vi.fn(async ({ url }: { url: URL }) => ({
-    url,
+  const request = vi.fn(async () => ({
+    url: new URL("https://whiskyadvocate.com/ratings-reviews"),
     status: 200,
     headers: {},
     body: issueHtml,
