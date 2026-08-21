@@ -212,7 +212,7 @@ export const scraperRegistry = createScraperRegistry({
     defineScrapeTarget({
       key: "whiskyadvocate",
       minimumSpacingMs: 2_500,
-      requestsPerWindow: 10,
+      requestsPerWindow: 20,
       origins: [
         {
           origin: "https://whiskyadvocate.com",
@@ -259,7 +259,9 @@ export const scraperRegistry = createScraperRegistry({
       key: "whiskyadvocate",
       externalSiteType: "whiskyadvocate",
       targetKeys: ["whiskyadvocate"],
-      requestLimit: 2,
+      // Keep the slice budget above the target quota so one hourly deferral
+      // consumes one execution attempt.
+      requestLimit: 30,
       cursorSchema: WhiskyAdvocateCursorSchema,
       observationSchema: WhiskyAdvocateObservationSchema,
       adapter: whiskyAdvocateAdapter,

@@ -126,11 +126,13 @@ The WhiskyNotes pilot is manual-only. It checks at most five archive pages and
 20 article links on each page. Requests are at least 2.5 seconds apart. The
 target allows 30 requests per hour. Each worker pass stops after 30 requests.
 
-The Whisky Advocate pilot is also manual-only. It requests the issue index and
-the newest issue, with at least 2.5 seconds between requests. Each run stops
-after two requests, and the target allows at most 10 requests per hour. The
-adapter keeps the complete source Bottle title for classification and reads the
-category before the separate price line. It does not fetch review prose.
+The Whisky Advocate pilot is also manual-only. It requests the issue index, the
+newest issue, and each listed review page to collect its explicit publication
+date. Requests are at least 2.5 seconds apart. Each worker pass has a 30-request
+budget, and the target allows at most 20 requests per hour. The run checkpoints
+each stored review and can resume for up to ten worker passes. The adapter keeps
+the complete source Bottle title for classification and reads the category
+before the separate price line. It does not persist review prose.
 
 Enable automatic publication only after the reviewed sample passes the gate.
 Repeat the robots, terms, and review-only process for the second publisher

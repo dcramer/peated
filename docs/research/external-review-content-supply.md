@@ -116,8 +116,9 @@ podcast transcripts need a separate platform-terms and creator-rights review.
   Terms of Service, but no public general terms page was linked or found. No
   reviewed page prohibited the planned metadata indexing and canonical links.
 - Peated already has more than 7,000 stored review rows. The second pilot reads
-  only the issue index and newest issue. It does not fetch review prose or
-  generate summaries.
+  the issue index, newest issue, and listed review pages. Review pages provide
+  explicit publication dates. Peated does not persist review prose or generate
+  summaries from it.
 
 ### Explicitly Restricted Sources
 

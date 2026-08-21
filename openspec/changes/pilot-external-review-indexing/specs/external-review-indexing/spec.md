@@ -170,6 +170,13 @@ review.
 - **THEN** the Bottle page omits that field without inventing a value and still
   provides the publisher link
 
+#### Scenario: Publisher supplies an article date
+
+- **WHEN** a review page provides an explicit publication date
+- **THEN** the source adapter stores that date with the review article
+- **AND** it does not substitute a sitemap modification date or approximate
+  issue season
+
 #### Scenario: Publisher content is rendered
 
 - **WHEN** Peated renders an external review

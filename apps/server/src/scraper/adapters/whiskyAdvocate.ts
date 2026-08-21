@@ -15,11 +15,23 @@ import type { ScraperAdapter } from "../types";
 const ORIGIN = "https://whiskyadvocate.com";
 const TARGET = "whiskyadvocate";
 
-// Active runs can resume across deploys.
-// Accept cursors written by the prior adapter.
-export const WhiskyAdvocateCursorSchema = z
+const LegacyWhiskyAdvocateCursorSchema = z
   .object({ processedIssues: z.array(z.string().min(1)) })
   .strict();
+
+const CurrentWhiskyAdvocateCursorSchema = z
+  .object({
+    issue: z.string().min(1),
+    processedReviewUrls: z.array(z.url()).max(500),
+  })
+  .strict();
+
+// Active runs can resume across deploys.
+// Accept cursors written by the prior adapter.
+export const WhiskyAdvocateCursorSchema = z.union([
+  LegacyWhiskyAdvocateCursorSchema,
+  CurrentWhiskyAdvocateCursorSchema,
+]);
 
 export type WhiskyAdvocateCursor = z.infer<typeof WhiskyAdvocateCursorSchema>;
 
@@ -42,6 +54,28 @@ function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
 }
 
+export function parseReviewPublishedAt(data: string): Date | null {
+  const $ = cheerio(data);
+  const metadata = $("script")
+    .toArray()
+    .map((element) => $(element).text())
+    .find((value) => /"datePublished"\s*:/iu.test(value));
+  const rawValue = metadata?.match(/"datePublished"\s*:\s*"(?<value>[^"]+)"/iu)
+    ?.groups?.value;
+  if (!rawValue) return null;
+
+  const templateValue = rawValue.match(
+    /^\{\{\s*(?<value>.+?)\s*\|\s*iso8601\s*\}\}$/iu,
+  )?.groups?.value;
+  const publishedAt = new Date(
+    templateValue ? `${templateValue} UTC` : rawValue,
+  );
+  if (Number.isNaN(publishedAt.getTime())) {
+    throw new Error("Whisky Advocate review date is invalid.");
+  }
+  return publishedAt;
+}
+
 export function parseIssueList(data: string) {
   const $ = cheerio(data);
   const results: string[] = [];
@@ -58,13 +92,9 @@ export function parseIssueList(data: string) {
   return results;
 }
 
-export async function parseReviews(
-  data: string,
-  url: string,
-  callback: (review: WhiskyAdvocateReview) => Promise<void>,
-) {
+export function parseReviews(data: string, url: string) {
   const $ = cheerio(data);
-  let parsed = 0;
+  const reviews: WhiskyAdvocateReview[] = [];
 
   for (const element of $("#directoryResults .postsItem")) {
     const name = normalizeText(
@@ -107,30 +137,34 @@ export async function parseReviews(
       .contents()
       .first()
       .text();
-    await callback({
+    reviews.push({
       name,
       category: normalizeCategory(normalizeText(rawCategory)),
       rating: Number(rawRating),
       issue,
       url: absoluteUrl(url, reviewUrl),
     });
-    parsed += 1;
   }
 
-  return parsed;
+  return reviews;
 }
 
 export const whiskyAdvocateAdapter: ScraperAdapter<
   WhiskyAdvocateCursor,
   WhiskyAdvocateObservation
-> = async ({ session }) => {
-  const issueListUrl = new URL("/ratings-reviews", ORIGIN);
-  const issueListResponse = await session.request({
-    target: TARGET,
-    url: issueListUrl,
-  });
-  const issue = parseIssueList(issueListResponse.body)[0];
+> = async ({ cursor, session }) => {
+  const activeCursor =
+    cursor && "processedReviewUrls" in cursor ? cursor : null;
+  let issue = activeCursor?.issue;
+  if (!issue) {
+    const issueListResponse = await session.request({
+      target: TARGET,
+      url: new URL("/ratings-reviews", ORIGIN),
+    });
+    issue = parseIssueList(issueListResponse.body)[0];
+  }
   if (!issue) throw new Error("Whisky Advocate issue list is empty.");
+  const processedReviewUrls = new Set(activeCursor?.processedReviewUrls ?? []);
 
   const reviewUrl = new URL("/ratings-reviews", ORIGIN);
   reviewUrl.searchParams.set("custom_rating_issue[0]", issue);
@@ -139,49 +173,58 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
     target: TARGET,
     url: reviewUrl,
   });
-  const parsed = await parseReviews(
-    reviewResponse.body,
-    reviewResponse.url.href,
-    async (review) => {
-      const nativeScore = {
-        value: review.rating,
-        scale: 100,
-        display: `${review.rating}/100`,
-      };
-      const value = WhiskyAdvocateObservationSchema.parse({
-        article: {
-          canonicalUrl: review.url,
-          title: review.name,
-          issue: review.issue,
-          publishedAt: null,
-          contentHash: createHash("sha256")
-            .update(
-              JSON.stringify({
-                name: review.name,
-                category: review.category,
-                rating: review.rating,
-                url: review.url,
-                issue: review.issue,
-              }),
-            )
-            .digest("hex"),
-          reviews: [
-            {
-              sourceKey: review.url,
+  const reviews = parseReviews(reviewResponse.body, reviewResponse.url.href);
+  if (reviews.length === 0) {
+    throw new Error("Whisky Advocate issue contains no reviews.");
+  }
+
+  for (const review of reviews) {
+    if (processedReviewUrls.has(review.url)) continue;
+    const articleResponse = await session.request({
+      target: TARGET,
+      url: new URL(review.url),
+    });
+    const publishedAt = parseReviewPublishedAt(articleResponse.body);
+    const nativeScore = {
+      value: review.rating,
+      scale: 100,
+      display: `${review.rating}/100`,
+    };
+    const value = WhiskyAdvocateObservationSchema.parse({
+      article: {
+        canonicalUrl: review.url,
+        title: review.name,
+        issue: review.issue,
+        publishedAt,
+        contentHash: createHash("sha256")
+          .update(
+            JSON.stringify({
               name: review.name,
               category: review.category,
-              reviewerName: null,
-              nativeScore,
-              normalizedRating: normalizeReviewRating(nativeScore),
-            },
-          ],
-        },
-        reviewTexts: {},
-      });
-      await session.emit({ sourceKey: review.url, value });
-    },
-  );
-  if (parsed === 0) {
-    throw new Error("Whisky Advocate issue contains no reviews.");
+              rating: review.rating,
+              url: review.url,
+              issue: review.issue,
+            }),
+          )
+          .digest("hex"),
+        reviews: [
+          {
+            sourceKey: review.url,
+            name: review.name,
+            category: review.category,
+            reviewerName: null,
+            nativeScore,
+            normalizedRating: normalizeReviewRating(nativeScore),
+          },
+        ],
+      },
+      reviewTexts: {},
+    });
+    await session.emit({ sourceKey: review.url, value });
+    processedReviewUrls.add(review.url);
+    await session.checkpoint({
+      issue,
+      processedReviewUrls: [...processedReviewUrls],
+    });
   }
 };
