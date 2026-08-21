@@ -11,6 +11,7 @@ import {
   currentReviewCursorSchema,
   processCurrentReviews,
 } from "./currentReviews";
+import { parseDate } from "./dates";
 
 // This adapter owns The Whiskey Reviewer parsing. The shared scraper runtime
 // owns every remote request and the shared review sink owns storage.
@@ -88,19 +89,10 @@ function publishedAt(url: URL): Date | null {
   const year = Number(pathMatch.groups.year);
   const pathMonth = Number(pathMatch.groups.month);
   const month = Number(dateMatch.groups.month);
-  const day = Number(dateMatch.groups.day);
   const shortYear = Number(dateMatch.groups.year);
   if (year % 100 !== shortYear || pathMonth !== month) return null;
 
-  const date = new Date(Date.UTC(year, month - 1, day));
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
-    return null;
-  }
-  return date;
+  return parseDate(`${year}-${dateMatch.groups.month}-${dateMatch.groups.day}`);
 }
 
 function reviewGrade(value: string) {

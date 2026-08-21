@@ -12,6 +12,7 @@ import {
   currentReviewCursorSchema,
   processCurrentReviews,
 } from "./currentReviews";
+import { parseDate } from "./dates";
 
 // This adapter owns Dramface-specific discovery and parsing. The shared
 // scraper runtime owns every remote request and the shared sink owns storage.
@@ -22,23 +23,6 @@ const ARTICLE_PATH = /^\/all-reviews\/\d{4}\/[^/]+$/;
 const REVIEW_HEADING =
   /^Review(?:\s+\d+\s*\/\s*\d+)?(?:\s*-\s*(?<reviewer>.+))?$/iu;
 const TASTING_HEADING = /^(?:Nose|Palate|Finish|The Dregs)\s*:?$/iu;
-const MONTHS = new Map(
-  [
-    "jan",
-    "feb",
-    "mar",
-    "apr",
-    "may",
-    "jun",
-    "jul",
-    "aug",
-    "sep",
-    "oct",
-    "nov",
-    "dec",
-  ].map((month, index) => [month, index]),
-);
-
 export const DramfaceCursorSchema =
   currentReviewCursorSchema(MAX_INDEX_ARTICLES);
 
@@ -77,34 +61,13 @@ export function discoverDramfaceArticles(data: string): URL[] {
 }
 
 function publishedAt(value: string, canonicalUrl: URL): Date {
-  const match =
-    /^(?<day>\d{1,2})\s+(?<month>[A-Z][a-z]{2})(?:,?\s+(?<year>\d{4}))?$/u.exec(
-      normalizeText(value),
-    );
-  const month = match?.groups?.month
-    ? MONTHS.get(match.groups.month.toLocaleLowerCase("en"))
-    : undefined;
-  const day = match?.groups?.day ? Number(match.groups.day) : Number.NaN;
   const pathYear = /^\/all-reviews\/(?<year>\d{4})\//u.exec(
     canonicalUrl.pathname,
   )?.groups?.year;
-  const year = Number(match?.groups?.year ?? pathYear);
-  if (
-    month === undefined ||
-    !Number.isInteger(day) ||
-    !Number.isInteger(year)
-  ) {
-    throw new Error("Dramface article date is invalid.");
-  }
-
-  const date = new Date(Date.UTC(year, month, day));
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month ||
-    date.getUTCDate() !== day
-  ) {
-    throw new Error("Dramface article date is invalid.");
-  }
+  const date = parseDate(value, {
+    fallbackYear: pathYear ? Number(pathYear) : undefined,
+  });
+  if (!date) throw new Error("Dramface article date is invalid.");
   return date;
 }
 

@@ -12,6 +12,7 @@ import {
   currentReviewCursorSchema,
   processCurrentReviews,
 } from "./currentReviews";
+import { parseDate } from "./dates";
 
 const ORIGIN = "https://www.whiskyfun.com";
 const TARGET = "whiskyfun";
@@ -70,8 +71,8 @@ export function discoverWhiskyfunArticles(
     const rawPublishedAt = normalizeText(
       $(item).find("pubDate").first().text(),
     );
-    const publishedAt = new Date(rawPublishedAt);
-    if (!rawPublishedAt || Number.isNaN(publishedAt.getTime())) {
+    const publishedAt = parseDate(rawPublishedAt);
+    if (!publishedAt) {
       throw new Error("Whiskyfun feed article date is invalid.");
     }
 

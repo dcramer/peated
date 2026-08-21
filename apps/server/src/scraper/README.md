@@ -22,6 +22,7 @@ visible:
 - `adapters/legacy/` contains migrated source implementations that still use
   the compatibility bridge in `legacy/`;
 - native adapters use only their injected session;
+- `adapters/dates.ts` parses common publisher date formats;
 - `adapters/currentReviews.ts` owns the repeated current-review cursor,
   request, emit, ignore, and checkpoint lifecycle;
 - `sinks/` is the narrow boundary to Peated domain persistence.

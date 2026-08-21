@@ -70,6 +70,18 @@ test("extracts one scored review and only its tasting prose", async () => {
   );
 });
 
+test("accepts a standard HTML datetime value", async () => {
+  const html = await loadFixture("dramface", "single-review.html");
+  const parsed = parseDramfaceArticle(
+    html.replace('datetime="18 Aug"', 'datetime="2026-08-18T09:30:00+01:00"'),
+    new URL(SINGLE_URL),
+  );
+
+  expect(parsed.article.publishedAt).toEqual(
+    new Date("2026-08-18T08:30:00.000Z"),
+  );
+});
+
 test("extracts each bottle and normalizes decimal scores", async () => {
   const html = await loadFixture("dramface", "multi-bottle.html");
   const parsed = parseDramfaceArticle(html, new URL(MULTI_URL));

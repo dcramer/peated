@@ -12,6 +12,7 @@ import {
   currentReviewCursorSchema,
   processCurrentReviews,
 } from "./currentReviews";
+import { parseDate } from "./dates";
 
 // This adapter owns Words of Whisky parsing. The shared scraper runtime owns
 // every remote request and the shared review sink owns storage.
@@ -60,10 +61,8 @@ export function discoverWordsOfWhiskyArticles(data: string): URL[] {
 }
 
 function publishedAt(value: string): Date {
-  const date = new Date(value);
-  if (!value.trim() || Number.isNaN(date.getTime())) {
-    throw new Error("Words of Whisky article date is invalid.");
-  }
+  const date = parseDate(value);
+  if (!date) throw new Error("Words of Whisky article date is invalid.");
   return date;
 }
 

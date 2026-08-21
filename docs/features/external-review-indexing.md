@@ -70,7 +70,8 @@ review-shaped page must still fail without a checkpoint.
 Read each publisher fact from the smallest element that owns it. Do not read a
 container when it can include fallback markup, scripts, captions, or unrelated
 metadata. Prefer structured date attributes and canonical URL components when
-the publisher supplies them. Keep the date parser source-specific.
+the publisher supplies them. Use the shared date parser after the adapter
+extracts the publisher value and any fallback year.
 
 The adapter emits one strict article observation with:
 
