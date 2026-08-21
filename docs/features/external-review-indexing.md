@@ -148,6 +148,15 @@ adapter splits multi-bottle and multi-writer articles into scored reviews. It
 stores exact dates, published reviewer names, native scores, and canonical
 links. Review prose stays transient, and Dramface's TL;DR text is excluded.
 
+Words of Whisky runs once per day. It reads at most 20 current tasting-note
+articles from the public homepage. It does not request the full tasting-notes
+archive, RSS, WordPress APIs, search, or the load-more endpoint. Requests are
+at least 2.5 seconds apart. The target allows 25 requests per hour, and each
+worker pass stops after 25 requests. The adapter splits multi-bottle articles
+into scored reviews. It stores exact timestamps, the published writer, native
+scores, and canonical links. Tasting notes stay transient. Article
+introductions and publisher conclusions are excluded from summary input.
+
 Enable automatic publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a
 generic crawler only because several sources use RSS or HTML.

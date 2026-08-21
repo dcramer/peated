@@ -43,10 +43,16 @@ test("syncs code-owned external-site definitions", async () => {
   expect(fineDrams).toMatchObject(EXTERNAL_SITE_DEFINITIONS.finedrams);
 
   const policies = await db.select().from(externalReviewSourcePolicies);
-  expect(policies).toHaveLength(4);
+  expect(policies).toHaveLength(5);
   expect(policies).toEqual(
     expect.arrayContaining(
-      ["dramface", "whiskyadvocate", "whiskyfun", "whiskynotes"].map((type) =>
+      [
+        "dramface",
+        "whiskyadvocate",
+        "whiskyfun",
+        "whiskynotes",
+        "wordsofwhisky",
+      ].map((type) =>
         expect.objectContaining({
           externalSiteId: sites.find((site) => site.type === type)?.id,
           publicationMode: "disabled",

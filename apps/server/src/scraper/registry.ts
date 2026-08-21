@@ -55,6 +55,11 @@ import {
   WhiskyNotesObservationSchema,
 } from "./adapters/whiskyNotes";
 import {
+  wordsOfWhiskyAdapter,
+  WordsOfWhiskyCursorSchema,
+  WordsOfWhiskyObservationSchema,
+} from "./adapters/wordsOfWhisky";
+import {
   createScraperRegistry,
   defineScraperSource,
   defineScrapeTarget,
@@ -263,6 +268,17 @@ export const scraperRegistry = createScraperRegistry({
         },
       ],
     }),
+    defineScrapeTarget({
+      key: "wordsofwhisky",
+      minimumSpacingMs: 2_500,
+      requestsPerWindow: 25,
+      origins: [
+        {
+          origin: "https://wordsofwhisky.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
   ],
   sources: [
     ...legacyPriceSources.map((source) =>
@@ -327,6 +343,16 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: WhiskyfunCursorSchema,
       observationSchema: WhiskyfunObservationSchema,
       adapter: whiskyfunAdapter,
+      sink: externalReviewSink,
+    }),
+    defineScraperSource({
+      key: "wordsofwhisky",
+      externalSiteType: "wordsofwhisky",
+      targetKeys: ["wordsofwhisky"],
+      requestLimit: 25,
+      cursorSchema: WordsOfWhiskyCursorSchema,
+      observationSchema: WordsOfWhiskyObservationSchema,
+      adapter: wordsOfWhiskyAdapter,
       sink: externalReviewSink,
     }),
   ],
