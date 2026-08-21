@@ -1,6 +1,11 @@
 ## Context
 
-The external-site admin already owns the operator workflow: it lists sites, shows a latest run, supports manual runs, and exposes price, review, and run tabs. The scraper runtime now persists substantially more factual state than these pages expose, including request/retry/rate-limit counters, target enablement and cooldowns, robots cache state, and review-source authorization policy. A separate dashboard would duplicate navigation and lifecycle concepts.
+The external-site admin already owns the operator workflow: it lists sites,
+shows a latest run, supports manual runs, and exposes price, review, and run
+tabs. The scraper runtime now persists substantially more factual state than
+these pages expose, including request/retry/rate-limit counters, target
+enablement and cooldowns, robots cache state, and review content policy. A
+separate dashboard would duplicate navigation and lifecycle concepts.
 
 ## Goals / Non-Goals
 
@@ -32,7 +37,8 @@ Alternative: add several new admin endpoints. That creates coordination and load
 
 The scraper module will export a narrow registration lookup containing only target keys. API routes will not import the production registry or adapters directly. The existing review-source type boundary determines policy applicability, and synchronized SQL remains authoritative for mutable target/origin state.
 
-Alternative: infer review authorization from registry callback presence or hard-code Whisky Advocate. Both duplicate the existing review-source policy boundary and can drift as sources are added.
+Alternative: infer review-source status from adapter details or hard-code
+Whisky Advocate. Both approaches can drift as sources are added.
 
 ### Expose existing run counters directly
 

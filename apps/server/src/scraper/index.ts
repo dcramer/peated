@@ -20,7 +20,6 @@ import {
   executeScraperRun as executeRun,
   type ScraperRunExecutionResult,
 } from "./runs";
-import { ExternalReviewSourcePolicyError } from "./sourcePolicy";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
 const enqueueScraperRun: ScraperEnqueue = async (jobName, args, options) => {
@@ -33,11 +32,7 @@ const lifecycle = createScraperLifecycle({
   enqueue: enqueueScraperRun,
 });
 
-export {
-  ExternalReviewSourcePolicyError,
-  ExternalSiteRunActiveError,
-  ScraperTargetDisabledError,
-};
+export { ExternalSiteRunActiveError, ScraperTargetDisabledError };
 export type { ScraperRunExecutionResult };
 
 export function getScraperRegistration(siteType: ExternalSiteType) {

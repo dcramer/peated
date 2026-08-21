@@ -224,12 +224,11 @@ fresh cached decision defers access rather than guessing.
 
 An origin may be marked `not_applicable` only for a reviewed non-crawler API and
 must include a code comment explaining why. Robots can restrict a permitted
-source but cannot grant publisher permission. External-review authorization is
-checked before the scraper run and again at its existing fetch boundary.
+source but cannot grant publisher permission. Review content policy is enforced
+at its processing and display boundaries.
 
-Alternative considered: treat robots as the source authorization record. Robots
-describes automated access preferences, not copyright, display, LLM, or
-contractual permission.
+Alternative considered: treat robots as the review content policy. Robots
+describes automated access preferences, not display or LLM processing.
 
 ### Keep fetched content transient and telemetry bounded
 
@@ -280,8 +279,9 @@ runtime's correctness contract.
    parsing fixtures and comparing item counts before and after cutover.
 5. Migrate direct-Axios adapters and add a repository check that forbids direct
    Axios or `fetch` imports inside migrated adapter directories.
-6. Migrate the external-review adapter only after its separate source policy is
-   approved; do not use persistent response caching for review bodies.
+6. Migrate the external-review adapter with the runtime request controls and
+   robots enforcement; do not use persistent response caching for review
+   bodies.
 7. Remove the legacy disk-cache/fetch path when no registered scraper consumes
    it, then make the new runtime mandatory for scraper registration.
 8. Consolidate run lifecycle operations and registered source implementations

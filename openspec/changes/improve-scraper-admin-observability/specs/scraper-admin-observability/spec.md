@@ -35,7 +35,9 @@ The system SHALL expose the existing request budget, request, retry, rate-limit,
 
 ### Requirement: Administrators can inspect source readiness
 
-The system SHALL show whether a source is registered, whether each synchronized traffic target is enabled or cooling down, the cached robots status for each active origin, and any review-source authorization policy required by that source.
+The system SHALL show whether a source is registered, whether each synchronized
+traffic target is enabled or cooling down, the cached robots status for each
+active origin, and the content policy for a review source.
 
 #### Scenario: Target is disabled
 

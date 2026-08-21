@@ -10,8 +10,8 @@ needed for a referral-oriented review index.
 The pilot must preserve the existing public reviews while introducing a safer
 boundary for review publishers. Publisher article text is needed transiently
 for extraction and summarization, but Peated does not need to retain or display
-the full text. Source capabilities vary independently across crawling, LLM use,
-score display, summary display, and automatic publication.
+the full text. Source capabilities vary independently across LLM use, score
+display, summary display, and automatic publication.
 
 ## Goals / Non-Goals
 
@@ -19,7 +19,7 @@ score display, summary display, and automatic publication.
 
 - Represent one review article with several Bottle reviews.
 - Preserve native score semantics and current normalized rating consumers.
-- Make source policy an explicit runtime prerequisite.
+- Enforce content policy at processing and display boundaries.
 - Generate short, grounded, attributed summaries without retaining article
   bodies.
 - Reuse Peated's existing Bottle resolution and unresolved-review moderation.
