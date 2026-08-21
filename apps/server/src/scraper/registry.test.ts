@@ -22,6 +22,7 @@ const migratedSources = [
   "astorwines",
   "berrybrosrudd",
   "bruichladdich",
+  "bourbonculture",
   "cadenheads",
   "compassbox",
   "decadentdrinks",
@@ -82,6 +83,13 @@ test("registers every scraper source with explicit target ownership", () => {
   expect(EXTERNAL_SITE_DEFINITIONS.dramfool.runEvery).toBeNull();
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
   expect(scraperRegistry.targets.get("totalwine")?.enabled).toBe(false);
+  expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.runEvery).toBe(1440);
+  expect(scraperRegistry.targets.get("bourbonculture")).toMatchObject({
+    minimumSpacingMs: 5_000,
+    requestsPerWindow: 10,
+    windowMs: 3_600_000,
+  });
+  expect(scraperRegistry.sources.get("bourbonculture")?.requestLimit).toBe(7);
   expect(EXTERNAL_SITE_DEFINITIONS.dramface.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("dramface")).toMatchObject({
     minimumSpacingMs: 2_500,
@@ -133,6 +141,9 @@ test("registers every scraper source with explicit target ownership", () => {
   expect(scraperRegistry.sources.get("dramface")?.observationSchema).toBe(
     scraperRegistry.sources.get("whiskynotes")?.observationSchema,
   );
+  expect(scraperRegistry.sources.get("bourbonculture")?.observationSchema).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
+  );
   expect(
     scraperRegistry.sources.get("whiskeyreviewer")?.observationSchema,
   ).toBe(scraperRegistry.sources.get("whiskynotes")?.observationSchema);
@@ -146,6 +157,9 @@ test("registers every scraper source with explicit target ownership", () => {
     scraperRegistry.sources.get("whiskynotes")?.sink,
   );
   expect(scraperRegistry.sources.get("dramface")?.sink).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.sink,
+  );
+  expect(scraperRegistry.sources.get("bourbonculture")?.sink).toBe(
     scraperRegistry.sources.get("whiskynotes")?.sink,
   );
   expect(scraperRegistry.sources.get("whiskeyreviewer")?.sink).toBe(

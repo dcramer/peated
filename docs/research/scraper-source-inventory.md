@@ -31,6 +31,7 @@ estimate of current live inventory.
 | SMWSA              | `https://newmake.smwsa.com`                | One GET HTML collection                                                    | 35 bottles                                                          |
 | Thompson Bros.     | `https://www.thompsonbrosdistillers.com`   | GET WooCommerce JSON pages                                                 | 2 items                                                             |
 | Total Wine         | `https://www.totalwine.com`                | GET HTML, two paginated categories                                         | 112 items on listing fixture; target disabled pending policy review |
+| Bourbon Culture    | `https://thebourbonculture.com`            | Daily GET of homepage plus up to six current review pages                  | 2 review links and 1 article review in parser fixtures              |
 | Whisky Advocate    | `https://whiskyadvocate.com`               | Manual-only GET of the issue index, newest issue, and listed review pages  | 106 issues and 166 reviews in parser fixtures                       |
 | Whiskyfun          | `https://www.whiskyfun.com`                | Daily GET of RSS plus up to 20 current article pages                       | 2 accepted feed items and 2 article reviews in parser fixtures      |
 | The Whisky World   | `https://www.thewhiskyworld.com`           | GET HTML pages                                                             | 5 items                                                             |

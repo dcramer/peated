@@ -55,7 +55,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 | P1         | [Words of Whisky](https://wordsofwhisky.com/)                 | Active scored reviews, including multi-bottle articles                            | Public pages allowed; WordPress administration restricted                                          | No dedicated terms page located; footer reserves rights                                                                                           | `public_index`                                |
 | P2         | [The Whiskey Reviewer](https://whiskeyreviewer.com/)          | Long-running American and world whiskey review archive                            | Public pages allowed; WordPress administration restricted                                          | No dedicated reuse terms located                                                                                                                  | `public_index`                                |
 | P2         | [Fred Minnick](https://www.fredminnick.com/)                  | Reviews, rankings, and American whiskey news                                      | Public content not disallowed; 30-second crawl delay; calendar implementation paths restricted     | No reuse restriction located                                                                                                                      | `public_index`; enforce 30-second delay       |
-| P2         | [The Bourbon Culture](https://thebourbonculture.com/)         | Bourbon reviews and comparisons                                                   | File defines Cloudflare content-signal semantics but publishes no actual allow/deny signal         | No reuse restriction located                                                                                                                      | `public_index`                                |
+| P2         | [Bourbon Culture](https://thebourbonculture.com/)             | Active scored bourbon and American whiskey reviews                                | File defines Cloudflare content-signal semantics but publishes no actual allow/deny signal         | Public privacy page contains no automated-access or content-reuse restriction; no dedicated terms page located                                    | `public_index`, daily feed                    |
 | P3         | [The Scotch Noob](https://scotchnoob.com/)                    | Useful historical backfill through 2023; little current supply                    | Explicitly allows all pages and publishes a sitemap                                                | No dedicated reuse terms located                                                                                                                  | `public_index`, low priority because inactive |
 | Restricted | [Whiskybase](https://www.whiskybase.com/)                     | Millions of community ratings plus bottle identity data                           | robots request returned HTTP 403 during the audit                                                  | Terms prohibit collection, copying, public display, commercial reuse, archiving, and derivative works; copyright and database rights are asserted | `licensed_only`; do not crawl                 |
 | Restricted | [Distiller](https://distiller.com/)                           | Large editorial and community review database                                     | Only `/data-admin` is disallowed and a sitemap is published                                        | Terms prohibit scraping, indexing, database building, permanent copies, and commercial exploitation                                               | `licensed_only`; do not crawl                 |
@@ -161,6 +161,22 @@ podcast transcripts need a separate platform-terms and creator-rights review.
   sitemaps, feeds, search, or WordPress APIs. It excludes introductions, price
   text, and publisher conclusions from transient summary input.
 
+### Bourbon Culture
+
+- Evidence: [homepage and latest reviews](https://thebourbonculture.com/),
+  [privacy policy](https://thebourbonculture.com/privacy-policy/), and
+  [robots.txt](https://thebourbonculture.com/robots.txt).
+- Rechecked on 2026-08-21. The robots file describes Cloudflare content signals
+  but publishes no allow or deny signal and no path rule. The public privacy
+  page contains no automated-access or content-reuse restriction. No dedicated
+  terms page is linked from the public site.
+- Current article pages expose a canonical link, writer, exact publication
+  timestamp, Bottle title, tasting-note section, and 10-point score.
+- The implemented daily feed reads only the six links under Latest Whiskey
+  Reviews on the homepage. It does not use archives, ratings pages, sitemaps,
+  feeds, search, or WordPress APIs. It excludes introductions and publisher
+  conclusions from transient summary input.
+
 ### Explicitly Restricted Sources
 
 - [Breaking Bourbon terms](https://www.breakingbourbon.com/site/breaking-bourbon-terms-of-use-agreement)
@@ -227,7 +243,8 @@ boundary.
 4. Dramface supplies the next daily multi-bottle and multi-writer feed.
 5. Words of Whisky supplies the next daily multi-bottle feed.
 6. The Whiskey Reviewer supplies the next daily American whiskey feed.
-7. Continue through the reviewed public-index candidates until Peated has at
+7. Bourbon Culture supplies the next daily American whiskey feed.
+8. Continue through the reviewed public-index candidates until Peated has at
    least 12 reliable feeds.
 
 The pilot is successful with at least 90% article extraction accuracy on a

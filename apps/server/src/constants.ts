@@ -56,6 +56,11 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   // traffic target remains disabled while existing data stays visible.
   totalwine: { name: "Total Wines", runEvery: null },
   woodencork: { name: "Wooden Cork", runEvery: 10080 },
+  bourbonculture: {
+    name: "Bourbon Culture",
+    runEvery: 1440,
+    content: "reviews",
+  },
   dramface: {
     name: "Dramface",
     runEvery: 1440,

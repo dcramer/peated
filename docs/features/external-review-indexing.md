@@ -177,6 +177,15 @@ canonical link, displayed letter grade, and URL date when valid. Only direct
 tasting-note paragraphs stay transient for summary generation. Introductions,
 prices, and publisher conclusions are excluded.
 
+Bourbon Culture runs once per day. It reads only the six links under Latest
+Whiskey Reviews on the public homepage. It does not request archives, ratings
+pages, sitemaps, feeds, search, or WordPress APIs. Requests are at least five
+seconds apart. The target allows 10 requests per hour, and each worker pass
+stops after seven requests. The adapter stores the writer, exact publication
+timestamp, canonical link, and native 10-point score. Only direct tasting-note
+paragraphs stay transient for summary generation. Introductions and publisher
+conclusions are excluded.
+
 Enable automatic publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a
 generic crawler only because several sources use RSS or HTML.
