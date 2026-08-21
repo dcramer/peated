@@ -1,6 +1,6 @@
 # External Review Content Supply
 
-Status: research notes, checked 2026-08-20. This is product and technical
+Status: research notes, checked 2026-08-21. This is product and technical
 research, not legal advice. Recheck every source before enabling ingestion.
 
 ## Product Intent
@@ -128,6 +128,22 @@ podcast transcripts need a separate platform-terms and creator-rights review.
   explicit publication dates. Peated does not persist review prose or generate
   summaries from it.
 
+### Words of Whisky
+
+- Evidence: [homepage and current reviews](https://wordsofwhisky.com/),
+  [tasting-notes index](https://wordsofwhisky.com/tasting-notes/), and
+  [robots.txt](https://wordsofwhisky.com/robots.txt).
+- Rechecked on 2026-08-21. Robots rules block WordPress administration and
+  allow the public homepage and article paths. No dedicated terms or privacy
+  page is linked from the public site. The footer reserves rights.
+- Current article pages expose an exact timestamp, writer, Bottle headings,
+  tasting notes, publisher conclusions, and per-Bottle 10-point scores.
+- The implemented daily feed reads at most 20 current tasting-note articles
+  from the homepage. It does not use the full archive, RSS, WordPress APIs,
+  search, or load-more endpoints. It keeps multi-bottle sections separate and
+  excludes article introductions and publisher conclusions from transient
+  summary input.
+
 ### Explicitly Restricted Sources
 
 - [Breaking Bourbon terms](https://www.breakingbourbon.com/site/breaking-bourbon-terms-of-use-agreement)
@@ -192,7 +208,8 @@ boundary.
 3. Whiskyfun supplies the next daily multi-bottle feed. Keep its historical
    archive as a later bounded change.
 4. Dramface supplies the next daily multi-bottle and multi-writer feed.
-5. Continue through the reviewed public-index candidates until Peated has at
+5. Words of Whisky supplies the next daily multi-bottle feed.
+6. Continue through the reviewed public-index candidates until Peated has at
    least 12 reliable feeds.
 
 The pilot is successful with at least 90% article extraction accuracy on a

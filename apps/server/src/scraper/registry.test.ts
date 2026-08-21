@@ -49,6 +49,7 @@ const migratedSources = [
   "whiskynotes",
   "whiskyworld",
   "woodencork",
+  "wordsofwhisky",
 ];
 
 type RuntimeTestClock = ScraperHttpClock & { advanceTo(value: Date): void };
@@ -106,6 +107,13 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("whiskyfun")?.requestLimit).toBe(30);
+  expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.runEvery).toBe(1440);
+  expect(scraperRegistry.targets.get("wordsofwhisky")).toMatchObject({
+    minimumSpacingMs: 2_500,
+    requestsPerWindow: 25,
+    windowMs: 3_600_000,
+  });
+  expect(scraperRegistry.sources.get("wordsofwhisky")?.requestLimit).toBe(25);
   expect(scraperRegistry.sources.get("whiskyadvocate")?.observationSchema).toBe(
     scraperRegistry.sources.get("whiskynotes")?.observationSchema,
   );
@@ -115,6 +123,9 @@ test("registers every scraper source with explicit target ownership", () => {
   expect(scraperRegistry.sources.get("dramface")?.observationSchema).toBe(
     scraperRegistry.sources.get("whiskynotes")?.observationSchema,
   );
+  expect(scraperRegistry.sources.get("wordsofwhisky")?.observationSchema).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
+  );
   expect(scraperRegistry.sources.get("whiskyadvocate")?.sink).toBe(
     scraperRegistry.sources.get("whiskynotes")?.sink,
   );
@@ -122,6 +133,9 @@ test("registers every scraper source with explicit target ownership", () => {
     scraperRegistry.sources.get("whiskynotes")?.sink,
   );
   expect(scraperRegistry.sources.get("dramface")?.sink).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.sink,
+  );
+  expect(scraperRegistry.sources.get("wordsofwhisky")?.sink).toBe(
     scraperRegistry.sources.get("whiskynotes")?.sink,
   );
 });
