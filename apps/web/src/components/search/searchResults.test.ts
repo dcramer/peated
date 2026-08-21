@@ -1,9 +1,27 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { getBottleResultHref } from "./bottleResult";
 import { getCreateBottleHref } from "./createBottleHref";
+import SearchResults from "./searchResults";
 
 describe("search result create bottle links", () => {
+  it("does not suggest creation when search fails", () => {
+    const html = renderToStaticMarkup(
+      createElement(SearchResults, {
+        query: "peated reserve",
+        results: [],
+        canSuggestAdd: false,
+        failed: true,
+      }),
+    );
+
+    expect(html).toContain("Search is temporarily unavailable");
+    expect(html).not.toContain("Create Bottle");
+    expect(html).not.toContain("couldn&#x27;t find anything");
+  });
+
   it("targets the Create Bottle route for missing bottles", () => {
     expect(getCreateBottleHref({ query: "peated reserve" })).toBe(
       "/bottles/new?name=Peated+Reserve",

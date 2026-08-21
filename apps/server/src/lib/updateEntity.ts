@@ -3,6 +3,8 @@ import { db, type AnyTransaction } from "@peated/server/db";
 import type { Entity, User } from "@peated/server/db/schema";
 import {
   bottleGroups,
+  bottles,
+  bottlesToDistillers,
   changes,
   countries,
   entities,
@@ -26,7 +28,7 @@ import {
 } from "@peated/server/lib/updateBottle";
 import { EntityInputSchema } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export const EntityUpdateInputSchema = z.object({
@@ -114,6 +116,7 @@ export type EntityUpdateFinalizationManifest = {
   entity: Entity;
   changed: boolean;
   bottleUpdates: BottleUpdateFinalizationManifest[];
+  searchNameChanged: boolean;
 };
 
 export type EntityUpdateExpectedState = {
@@ -283,7 +286,12 @@ export async function updateEntityInTransaction(
   }
 
   if (Object.keys(data).length === 0) {
-    return { entity, changed: false, bottleUpdates: [] };
+    return {
+      entity,
+      changed: false,
+      bottleUpdates: [],
+      searchNameChanged: false,
+    };
   }
 
   let newEntity: Entity | undefined;
@@ -372,7 +380,12 @@ export async function updateEntityInTransaction(
     throw error;
   }
 
-  return { entity: newEntity, changed: true, bottleUpdates };
+  return {
+    entity: newEntity,
+    changed: true,
+    bottleUpdates,
+    searchNameChanged: data.name !== undefined || data.shortName !== undefined,
+  };
 }
 
 export async function finalizeEntityUpdate(
@@ -381,6 +394,30 @@ export async function finalizeEntityUpdate(
   if (!result.changed) return;
   for (const bottleUpdate of result.bottleUpdates) {
     await finalizeBottleUpdate(bottleUpdate);
+  }
+
+  if (result.searchNameChanged) {
+    const relatedBottles = await db
+      .selectDistinct({ id: bottles.id })
+      .from(bottles)
+      .leftJoin(
+        bottlesToDistillers,
+        eq(bottlesToDistillers.bottleId, bottles.id),
+      )
+      .where(
+        or(
+          eq(bottles.brandId, result.entity.id),
+          eq(bottles.bottlerId, result.entity.id),
+          eq(bottlesToDistillers.distillerId, result.entity.id),
+        ),
+      );
+    for (const { id: bottleId } of relatedBottles) {
+      try {
+        await pushUniqueJob("IndexBottleSearchVectors", { bottleId });
+      } catch (error) {
+        logError(error, { extra: { bottleId }, entity: result.entity });
+      }
+    }
   }
 
   try {

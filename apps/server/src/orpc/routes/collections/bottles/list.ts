@@ -131,6 +131,7 @@ export default procedure
           SELECT FROM ${bottleAliases}
           WHERE ${bottleAliases.bottleId} = ${collectionBottles.bottleId}
             AND LOWER(${bottleAliases.name}) = ${input.query.toLowerCase()}
+            AND ${bottleAliases.ignored} IS NOT TRUE
         ) OR ${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
       );
     }

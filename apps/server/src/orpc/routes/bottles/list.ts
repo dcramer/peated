@@ -10,7 +10,10 @@ import {
   flights,
   tastings,
 } from "@peated/server/db/schema";
-import { plainTextSearchQuery } from "@peated/server/lib/search";
+import {
+  plainTextSearchQuery,
+  prefixTextSearchQuery,
+} from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import {
   BottleSchema,
@@ -92,6 +95,7 @@ export default procedure
     const { query, cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
     const textQuery = plainTextSearchQuery(query);
+    const prefixQuery = prefixTextSearchQuery(query);
     const exactAliasBottleIds = query
       ? (
           await db
@@ -111,6 +115,7 @@ export default procedure
       : [];
 
     const where: (SQL<unknown> | undefined)[] = [];
+    where.push(isNotNull(bottles.groupId));
     where.push(
       sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
     );
@@ -119,6 +124,7 @@ export default procedure
       where.push(
         or(
           sql`${bottles.searchVector} @@ ${textQuery}`,
+          sql`${bottles.searchVector} @@ ${prefixQuery}`,
           exactAliasBottleIds.length
             ? inArray(bottles.id, exactAliasBottleIds)
             : undefined,
@@ -199,7 +205,10 @@ export default procedure
     switch (rest.sort) {
       case "rank":
         if (query) {
-          orderBy = sql`ts_rank(${bottles.searchVector}, ${textQuery}) DESC`;
+          orderBy = sql`GREATEST(
+            ts_rank(${bottles.searchVector}, ${textQuery}),
+            ts_rank(${bottles.searchVector}, ${prefixQuery}) * 0.5
+          ) DESC`;
         } else {
           orderBy = desc(bottles.totalTastings);
         }
@@ -259,8 +268,9 @@ export default procedure
                 sql`, `,
               )}) THEN 0 ELSE 1 END`,
               orderBy,
+              asc(bottles.id),
             ]
-          : [orderBy]),
+          : [orderBy, asc(bottles.id)]),
       );
 
     return {

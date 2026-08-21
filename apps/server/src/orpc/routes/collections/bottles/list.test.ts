@@ -122,6 +122,38 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results[0]?.bottle).not.toHaveProperty("group");
   });
 
+  test("does not match an ignored Bottle alias in Library", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Visible Canonical Name" });
+    const collection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    await db.insert(collectionBottles).values({
+      collectionId: collection.id,
+      bottleId: bottle.id,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Hidden Library Alias",
+      ignored: true,
+    });
+
+    const response = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+        query: "Hidden Library Alias",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.results).toHaveLength(0);
+  });
+
   test("rejects the removed target filter", async ({ defaults, fixtures }) => {
     type Input = Parameters<typeof routerClient.collections.bottles.list>[0];
 

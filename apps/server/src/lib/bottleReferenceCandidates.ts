@@ -32,6 +32,7 @@ import {
   isAIGatewayConfigured,
   type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
+import { webSearchQuery } from "@peated/server/lib/search";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
@@ -937,6 +938,7 @@ async function getTextCandidates(
   if (!queryText.trim()) {
     return [];
   }
+  const textQuery = webSearchQuery(queryText);
 
   const result = await db.execute<{
     bottleId: number;
@@ -970,11 +972,11 @@ async function getTextCandidates(
       ${bottles.caskType} AS "caskType",
       ${bottles.caskSize} AS "caskSize",
       ${bottles.caskFill} AS "caskFill",
-      ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${queryText})) AS score
+      ts_rank(${bottles.searchVector}, ${textQuery}) AS score
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
     WHERE ${bottles.searchVector} IS NOT NULL
-      AND ${bottles.searchVector} @@ websearch_to_tsquery('english', ${queryText})
+      AND ${bottles.searchVector} @@ ${textQuery}
       AND NOT EXISTS(
         SELECT FROM ${bottleTombstones}
         WHERE ${bottleTombstones.bottleId} = ${bottles.id}
