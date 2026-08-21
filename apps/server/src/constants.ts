@@ -66,6 +66,11 @@ export const EXTERNAL_SITE_DEFINITIONS = {
     runEvery: 1440,
     content: "reviews",
   },
+  fredminnick: {
+    name: "Fred Minnick",
+    runEvery: 1440,
+    content: "reviews",
+  },
   whiskeyreviewer: {
     name: "The Whiskey Reviewer",
     runEvery: 1440,

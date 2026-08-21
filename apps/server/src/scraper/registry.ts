@@ -9,6 +9,11 @@ import {
   DramfaceCursorSchema,
   DramfaceObservationSchema,
 } from "./adapters/dramface";
+import {
+  fredMinnickAdapter,
+  FredMinnickCursorSchema,
+  FredMinnickObservationSchema,
+} from "./adapters/fredMinnick";
 import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
 import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
 import scrapeBruichladdich from "./adapters/legacy/scrapeBruichladdich";
@@ -257,6 +262,17 @@ export const scraperRegistry = createScraperRegistry({
       ],
     }),
     defineScrapeTarget({
+      key: "fredminnick",
+      minimumSpacingMs: 30_000,
+      requestsPerWindow: 10,
+      origins: [
+        {
+          origin: "https://www.fredminnick.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
       key: "whiskeyreviewer",
       minimumSpacingMs: 5_000,
       requestsPerWindow: 10,
@@ -353,6 +369,16 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: DramfaceCursorSchema,
       observationSchema: DramfaceObservationSchema,
       adapter: dramfaceAdapter,
+      sink: externalReviewSink,
+    }),
+    defineScraperSource({
+      key: "fredminnick",
+      externalSiteType: "fredminnick",
+      targetKeys: ["fredminnick"],
+      requestLimit: 9,
+      cursorSchema: FredMinnickCursorSchema,
+      observationSchema: FredMinnickObservationSchema,
+      adapter: fredMinnickAdapter,
       sink: externalReviewSink,
     }),
     defineScraperSource({

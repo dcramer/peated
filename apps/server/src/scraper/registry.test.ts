@@ -37,6 +37,7 @@ const migratedSources = [
   "dramfool",
   "edradour",
   "finedrams",
+  "fredminnick",
   "glenallachie",
   "gordonmacphail",
   "healthyspirits",
@@ -103,6 +104,13 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("dramface")?.requestLimit).toBe(30);
+  expect(EXTERNAL_SITE_DEFINITIONS.fredminnick.runEvery).toBe(1440);
+  expect(scraperRegistry.targets.get("fredminnick")).toMatchObject({
+    minimumSpacingMs: 30_000,
+    requestsPerWindow: 10,
+    windowMs: 3_600_000,
+  });
+  expect(scraperRegistry.sources.get("fredminnick")?.requestLimit).toBe(9);
   expect(EXTERNAL_SITE_DEFINITIONS.whiskeyreviewer.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskeyreviewer")).toMatchObject({
     minimumSpacingMs: 5_000,

@@ -229,6 +229,17 @@ timestamp, canonical link, and native 10-point score. Only direct tasting-note
 paragraphs stay transient for summary generation. Introductions and publisher
 conclusions are excluded.
 
+Fred Minnick runs once per day. It reads the public sitemap index and only the
+newest two post sitemaps. It does not request the empty Reviews page, the main
+news feed, older sitemaps, search, pagination, or WordPress APIs. It selects at
+most five single-Bottle review URLs. Requests are at least 30 seconds apart.
+The target allows 10 requests per hour, and each worker pass stops after eight
+source requests plus the governed robots request when its cache is stale. The
+adapter stores the explicit date, canonical link, and Fred
+Minnick reviewer attribution. Native and normalized scores stay absent. Only
+direct tasting paragraphs stay transient for summary generation; comparisons,
+introductions, prices, related links, and site furniture are excluded.
+
 Enable automatic publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a
 generic crawler only because several sources use RSS or HTML.
