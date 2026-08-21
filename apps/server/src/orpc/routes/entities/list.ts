@@ -9,7 +9,10 @@ import {
   entityAliases,
   regions,
 } from "@peated/server/db/schema";
-import { plainTextSearchQuery } from "@peated/server/lib/search";
+import {
+  plainTextSearchQuery,
+  prefixTextSearchQuery,
+} from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -81,10 +84,16 @@ export default procedure
   }) {
     const offset = (cursor - 1) * limit;
     const textQuery = plainTextSearchQuery(query);
+    const prefixQuery = prefixTextSearchQuery(query);
 
     const where: (SQL<unknown> | undefined)[] = [];
     if (query) {
-      where.push(sql`${entities.searchVector} @@ ${textQuery}`);
+      where.push(
+        or(
+          sql`${entities.searchVector} @@ ${textQuery}`,
+          sql`${entities.searchVector} @@ ${prefixQuery}`,
+        ),
+      );
     }
     if (input.name) {
       where.push(
@@ -171,7 +180,10 @@ export default procedure
     switch (input.sort) {
       case "rank":
         if (query) {
-          orderBy = sql`ts_rank(${entities.searchVector}, ${textQuery}) DESC`;
+          orderBy = sql`GREATEST(
+            ts_rank(${entities.searchVector}, ${textQuery}),
+            ts_rank(${entities.searchVector}, ${prefixQuery}) * 0.5
+          ) DESC`;
         } else {
           orderBy = desc(entities.totalTastings);
         }
@@ -266,7 +278,7 @@ export default procedure
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(...orderClauses);
+      .orderBy(...orderClauses, asc(entities.id));
 
     return {
       results: await serialize(

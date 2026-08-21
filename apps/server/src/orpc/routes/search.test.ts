@@ -103,6 +103,34 @@ describe("GET /search", () => {
     expect(results.length).toBe(2);
   });
 
+  test("blends result types within the limit", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Blend Fixture Brand" });
+    await Promise.all(
+      ["One", "Two", "Three"].map((suffix) =>
+        fixtures.Bottle({
+          name: `Blend Release ${suffix}`,
+          brandId: brand.id,
+        }),
+      ),
+    );
+    await fixtures.Entity({ name: "Blend Fixture Entity" });
+    await fixtures.User({ username: "blend-fixture-user" });
+
+    const { results } = await routerClient.search(
+      { query: "blend", limit: 3 },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map(({ type }) => type)).toEqual([
+      "bottle",
+      "user",
+      "entity",
+    ]);
+  });
+
   test("defaults the limit when omitted", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
 

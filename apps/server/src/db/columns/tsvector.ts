@@ -13,7 +13,8 @@ export class TSVector {
   }
 
   mapToDriverValue() {
-    return sql`setweight(to_tsvector(${this.value}), ${this.weight})`;
+    // Search queries must use the same language and accent normalization.
+    return sql`setweight(to_tsvector('english', unaccent(${this.value})), ${this.weight})`;
   }
 }
 
@@ -26,7 +27,8 @@ export function tsvector<TData extends TSVectorType = string>(name: string) {
     },
 
     toDriver(value: TData) {
-      if (typeof value === "string") return sql`to_tsvector(${value})`;
+      if (typeof value === "string")
+        return sql`to_tsvector('english', unaccent(${value}))`;
       else if (Array.isArray(value))
         return sql.join(
           value.map((v) => v.mapToDriverValue()),

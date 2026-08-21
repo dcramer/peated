@@ -4,7 +4,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import Header from "../header";
 import Layout from "../layout";
@@ -68,8 +68,9 @@ export default function SearchPanel({
     "loading",
   );
   const [query, setQuery] = useState(initialValue ?? value ?? "");
-  const [state, setState] = useState<"loading" | "ready">("loading");
+  const [state, setState] = useState<"error" | "loading" | "ready">("loading");
   const [results, setResults] = useState<Result[]>([]);
+  const latestRequest = useRef(0);
 
   const orpc = useORPC();
 
@@ -78,6 +79,8 @@ export default function SearchPanel({
 
   const unsafe_onQuery = useCallback(
     async (query: string) => {
+      const requestId = latestRequest.current + 1;
+      latestRequest.current = requestId;
       setState("loading");
 
       const isUserQuery =
@@ -95,20 +98,28 @@ export default function SearchPanel({
         include.push("users");
       if (!directToTasting && !addBottleIntent) include.push("entities");
 
-      const { results } = await orpc.search.call({
-        query,
-        limit: maxResults,
-        include,
-      });
+      try {
+        const { results } = await orpc.search.call({
+          query,
+          limit: maxResults,
+          include,
+        });
+        if (latestRequest.current !== requestId) return;
 
-      setResults(results);
-      setState("ready");
-      setInitialState("ready");
+        setResults(results);
+        setState("ready");
+        setInitialState("ready");
+      } catch {
+        if (latestRequest.current !== requestId) return;
+
+        setResults([]);
+        setState("error");
+        setInitialState("ready");
+      }
     },
     [addBottleIntent, directToTasting, orpc, searchType, user],
   );
 
-  // TODO: handle errors
   const onQuery = useDebounceCallback(unsafe_onQuery);
 
   useEffect(() => {
@@ -159,7 +170,8 @@ export default function SearchPanel({
         <SearchResults
           query={query}
           results={results}
-          canSuggestAdd={!isUserQuery}
+          canSuggestAdd={state !== "error" && !isUserQuery}
+          failed={state === "error"}
           directToTasting={directToTasting}
           addBottleIntent={addBottleIntent}
           createBottleReturnAction={createBottleReturnAction}

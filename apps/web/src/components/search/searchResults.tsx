@@ -15,6 +15,7 @@ export default function SearchResults({
   query,
   results,
   canSuggestAdd = false,
+  failed = false,
   directToTasting = false,
   addBottleIntent,
   createBottleReturnAction,
@@ -23,6 +24,7 @@ export default function SearchResults({
   query: string;
   results: Outputs["search"]["results"];
   canSuggestAdd?: boolean;
+  failed?: boolean;
   directToTasting?: boolean;
   addBottleIntent?: AddBottleRouteIntent;
   createBottleReturnAction?: CreateBottleReturnAction;
@@ -33,6 +35,13 @@ export default function SearchResults({
       role="list"
       className="divide-y divide-slate-800 border-slate-800 lg:border-b lg:border-r"
     >
+      {failed && (
+        <ListItem noHover>
+          <p className="text-muted p-5">
+            Search is temporarily unavailable. Please try again.
+          </p>
+        </ListItem>
+      )}
       {query && canSuggestAdd && (
         <ListItem color="highlight">
           <PlusIcon className="hidden h-12 w-12 flex-none rounded p-2 sm:block" />
@@ -77,7 +86,7 @@ export default function SearchResults({
           </ListItem>
         );
       })}
-      {!canSuggestAdd && results.length === 0 && query !== "" && (
+      {!failed && !canSuggestAdd && results.length === 0 && query !== "" && (
         <ListItem noHover>
           <p className="text-muted p-5">
             We couldn't find anything matching your search query.

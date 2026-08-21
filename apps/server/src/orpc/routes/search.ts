@@ -23,36 +23,56 @@ export type Result = BottleResult | UserResult | EntityResult;
 
 const INCLUDE_LIST = ["bottles", "entities", "users"] as const;
 
-function sortResults(query: string, unsortedResults: Result[]) {
-  const exactMatches: number[] = [];
-  const lowerQuery = query.toLowerCase();
-  unsortedResults.forEach((value, index) => {
-    if (value.type === "entity") {
-      if (
-        value.ref.name.toLowerCase() === lowerQuery ||
-        value.ref.shortName?.toLowerCase() === lowerQuery
-      ) {
-        exactMatches.push(index);
-      }
-    } else if (value.type === "user") {
-      if (value.ref.username.toLowerCase() === lowerQuery) {
-        exactMatches.push(index);
-      }
-    } else {
-      if (
-        value.ref.fullName.toLowerCase() === lowerQuery ||
-        value.ref.name.toLowerCase() === lowerQuery
-      ) {
-        exactMatches.push(index);
-      }
+function normalizeExactText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+}
+
+function isExactResult(query: string, result: Result) {
+  const normalizedQuery = normalizeExactText(query);
+  if (result.type === "entity") {
+    return [result.ref.name, result.ref.shortName].some(
+      (value) => value && normalizeExactText(value) === normalizedQuery,
+    );
+  }
+  if (result.type === "user") {
+    return normalizeExactText(result.ref.username) === normalizedQuery;
+  }
+  return [result.ref.fullName, result.ref.name].some(
+    (value) => normalizeExactText(value) === normalizedQuery,
+  );
+}
+
+export function blendResults(
+  query: string,
+  sourceResults: Result[][],
+  limit: number,
+) {
+  const exactResults: Result[] = [];
+  const remainingResults = sourceResults.map((source) => {
+    const remaining: Result[] = [];
+    for (const result of source) {
+      if (isExactResult(query, result)) exactResults.push(result);
+      else remaining.push(result);
     }
+    return remaining;
   });
 
-  const results = [...unsortedResults];
-  exactMatches.forEach((resultIndex, index) => {
-    const item = results.splice(resultIndex, 1);
-    results.unshift(...item);
-  });
+  const results = exactResults.slice(0, limit);
+  for (let index = 0; results.length < limit; index += 1) {
+    let added = false;
+    for (const source of remainingResults) {
+      const result = source[index];
+      if (!result) continue;
+      results.push(result);
+      added = true;
+      if (results.length === limit) break;
+    }
+    if (!added) break;
+  }
+
   return results;
 }
 
@@ -98,9 +118,9 @@ export default procedure
       ),
     }),
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async function ({ input, context }) {
     const { query, include, limit } = input;
-    const promises = [];
+    const promises: Promise<Result[]>[] = [];
 
     if (include.includes("bottles")) {
       promises.push(
@@ -114,14 +134,13 @@ export default procedure
             },
             { context },
           )
-          .then((data: any) =>
-            data.results.map((b: any) => ({ type: "bottle", ref: b })),
-          )
-          .catch(() => []),
+          .then((data) =>
+            data.results.map((ref) => ({ type: "bottle" as const, ref })),
+          ),
       );
     }
 
-    if (include.includes("users")) {
+    if (include.includes("users") && context.user) {
       promises.push(
         routerClient.users
           .list(
@@ -133,10 +152,9 @@ export default procedure
             },
             { context },
           )
-          .then((data: any) =>
-            data.results.map((b: any) => ({ type: "user", ref: b })),
-          )
-          .catch(() => []),
+          .then((data) =>
+            data.results.map((ref) => ({ type: "user" as const, ref })),
+          ),
       );
     }
 
@@ -152,22 +170,16 @@ export default procedure
             },
             { context },
           )
-          .then((data: any) =>
-            data.results.map((b: any) => ({ type: "entity", ref: b })),
-          )
-          .catch(() => []),
+          .then((data) =>
+            data.results.map((ref) => ({ type: "entity" as const, ref })),
+          ),
       );
     }
 
     const results = await Promise.all(promises);
 
-    const sortedResults = sortResults(
-      query,
-      results.reduce((prev: any[], cur: any[]) => [...prev, ...cur], []),
-    );
-
     return {
       query,
-      results: sortedResults.slice(0, limit),
+      results: blendResults(query, results, limit),
     };
   });

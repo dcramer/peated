@@ -174,7 +174,7 @@ describe("POST /bottles", () => {
     fixtures,
     defaults,
   }) => {
-    const brand = await fixtures.Entity();
+    const brand = await fixtures.Entity({ name: "Immediate Search Brand" });
     const data = await routerClient.bottles.create(
       {
         name: "Delicious Wood",
@@ -252,6 +252,12 @@ describe("POST /bottles", () => {
       bottleId: bottle.id,
       creationSource: "manual_entry",
     });
+
+    const search = await routerClient.bottles.list({
+      query: "Imme Delic",
+      sort: "rank",
+    });
+    expect(search.results.map(({ id }) => id)).toContain(bottle.id);
   });
 
   test("rejects a bottle name that duplicates its brand", async ({

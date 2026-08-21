@@ -43,6 +43,7 @@ import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
+import { buildBottleSearchVector } from "@peated/server/lib/search";
 import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
@@ -352,6 +353,10 @@ async function prepareBottleCreateInTransaction(
     createdByActorId: actorId,
     fullName,
   };
+  bottleInsertData.searchVector = buildBottleSearchVector(
+    bottleInsertData,
+    brand,
+  );
 
   return {
     bottleInsertData,

@@ -31,6 +31,42 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
+  test("matches prefixes while the user is typing", async ({ fixtures }) => {
+    const brand = await fixtures.Entity({ name: "Macallan" });
+    const bottle = await fixtures.Bottle({
+      name: "Discovery",
+      brandId: brand.id,
+    });
+
+    const { results } = await routerClient.bottles.list({
+      query: "Mac Disc",
+      sort: "rank",
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([bottle.id]);
+  });
+
+  test("treats accented and unaccented search text as equivalent", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Pōkeno" });
+    const bottle = await fixtures.Bottle({
+      name: "Discovery",
+      brandId: brand.id,
+    });
+
+    const searches = await Promise.all(
+      ["Pokeno Discovery", "Pōkeno Discovery"].map((query) =>
+        routerClient.bottles.list({ query }),
+      ),
+    );
+
+    expect(searches.map(({ results }) => results.map(({ id }) => id))).toEqual([
+      [bottle.id],
+      [bottle.id],
+    ]);
+  });
+
   test("treats search text as words, not operators", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ name: "Search Test Brand" });
     const bottle = await fixtures.Bottle({
@@ -672,21 +708,51 @@ describe("GET /bottles", () => {
   });
 
   test("sorts bottles by rank with query", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "Wood Whisky" });
-    const bottle2 = await fixtures.Bottle({ name: "Wooden Cask Whisky" });
+    const brand = await fixtures.Entity({ name: "Ranking Fixture Brand" });
+    const bottle1 = await fixtures.Bottle({
+      name: "Wood Whisky",
+      brandId: brand.id,
+    });
+    const bottle2 = await fixtures.Bottle({
+      name: "Wooden Cask Whisky",
+      brandId: brand.id,
+    });
 
     const { results } = await routerClient.bottles.list({
       query: "wood",
       sort: "rank",
     });
 
-    expect(results.length).toBeGreaterThanOrEqual(1);
-    // Verify our bottles are in the results
-    const foundBottles = results.filter(
-      (b) => b.id === bottle1.id || b.id === bottle2.id,
+    expect(results.map(({ id }) => id)).toEqual([bottle1.id, bottle2.id]);
+  });
+
+  test("uses Bottle id as the stable rank tie breaker", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Paging Fixture Brand" });
+    const created = await Promise.all(
+      ["Alpha", "Bravo", "Charlie"].map((suffix) =>
+        fixtures.Bottle({
+          name: `Common ${suffix}`,
+          brandId: brand.id,
+        }),
+      ),
     );
-    expect(foundBottles.length).toBeGreaterThanOrEqual(1);
-    // Results should be ordered by search relevance
+
+    const pages = await Promise.all(
+      [1, 2, 3].map((cursor) =>
+        routerClient.bottles.list({
+          query: "common",
+          sort: "rank",
+          cursor,
+          limit: 1,
+        }),
+      ),
+    );
+
+    expect(pages.flatMap(({ results }) => results.map(({ id }) => id))).toEqual(
+      created.map(({ id }) => id),
+    );
   });
 
   test("sorts bottles by rank without query (falls back to tastings)", async ({

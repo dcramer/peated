@@ -65,6 +65,18 @@ describe("GET /entities", () => {
       expect(results[0].name).toBe("Highland Distillery");
     });
 
+    test("matches prefixes while the user is typing", async ({ fixtures }) => {
+      const entity = await fixtures.Entity({ name: "Highland Park" });
+      await fixtures.Entity({ name: "Lowland Brewery" });
+
+      const { results } = await routerClient.entities.list({
+        query: "Highl Par",
+        sort: "rank",
+      });
+
+      expect(results.map(({ id }) => id)).toEqual([entity.id]);
+    });
+
     test("filters by name via entity aliases", async ({ fixtures }) => {
       const entity = await fixtures.Entity({ name: "Highland Distillery" });
       await fixtures.EntityAlias({

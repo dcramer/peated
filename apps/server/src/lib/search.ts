@@ -12,9 +12,29 @@ const CASK_STRENGTH_SEARCH_TERMS =
   "cask strength barrel strength barrel proof full proof natural strength";
 const SINGLE_CASK_SEARCH_TERMS = "single cask single barrel";
 
-/** Parse human search text as words, never as search operators. */
+/** Parse human search text as normalized words, never as search operators. */
 export function plainTextSearchQuery(query: string) {
-  return sql`plainto_tsquery('english', ${query})`;
+  return sql`plainto_tsquery('english', unaccent(${query}))`;
+}
+
+/** Build prefix operators only from lexemes parsed by PostgreSQL. */
+export function prefixTextSearchQuery(query: string) {
+  return sql`COALESCE(
+    to_tsquery(
+      'english',
+      (
+        SELECT string_agg(quote_literal(token) || ':*', ' & ')
+        FROM unnest(
+          tsvector_to_array(to_tsvector('english', unaccent(${query})))
+        ) AS token
+      )
+    ),
+    ''::tsquery
+  )`;
+}
+
+export function webSearchQuery(query: string) {
+  return sql`websearch_to_tsquery('english', unaccent(${query}))`;
 }
 
 function formatSearchAbv(abv: number | null | undefined) {
