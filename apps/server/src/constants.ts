@@ -31,7 +31,9 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   compassbox: { name: "Compass Box", runEvery: 10080 },
   decadentdrinks: { name: "Decadent Drinks", runEvery: 10080 },
   douglaslaing: { name: "Douglas Laing", runEvery: 10080 },
-  dramfool: { name: "Dramfool", runEvery: 10080 },
+  // Robots blocks the JSON catalog. Keep manual runs available while the
+  // scheduled source waits for an allowed adapter.
+  dramfool: { name: "Dramfool", runEvery: null },
   edradour: { name: "Edradour", runEvery: 10080 },
   finedrams: { name: "Fine Drams", runEvery: 10080 },
   glenallachie: { name: "The GlenAllachie", runEvery: 10080 },
