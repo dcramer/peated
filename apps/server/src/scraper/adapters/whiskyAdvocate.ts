@@ -1,21 +1,29 @@
 import { normalizeCategory } from "@peated/bottle-classifier/normalize";
+import {
+  normalizeReviewRating,
+  type ReviewArticleIngestion,
+  ReviewArticleIngestionSchema,
+} from "@peated/server/externalReviews/observation";
 import { logWarn } from "@peated/server/lib/log";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { CategoryEnum } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { ScraperAdapter } from "../types";
 
 const ORIGIN = "https://whiskyadvocate.com";
 const TARGET = "whiskyadvocate";
 
+// Active runs can resume across deploys.
+// Accept cursors written by the prior adapter.
 export const WhiskyAdvocateCursorSchema = z
   .object({ processedIssues: z.array(z.string().min(1)) })
   .strict();
 
 export type WhiskyAdvocateCursor = z.infer<typeof WhiskyAdvocateCursorSchema>;
 
-export const WhiskyAdvocateObservationSchema = z
+const WhiskyAdvocateReviewSchema = z
   .object({
     name: z.string().min(1),
     category: CategoryEnum.nullable(),
@@ -25,9 +33,10 @@ export const WhiskyAdvocateObservationSchema = z
   })
   .strict();
 
-export type WhiskyAdvocateObservation = z.infer<
-  typeof WhiskyAdvocateObservationSchema
->;
+type WhiskyAdvocateReview = z.infer<typeof WhiskyAdvocateReviewSchema>;
+
+export const WhiskyAdvocateObservationSchema = ReviewArticleIngestionSchema;
+export type WhiskyAdvocateObservation = ReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -52,7 +61,7 @@ export function parseIssueList(data: string) {
 export async function parseReviews(
   data: string,
   url: string,
-  callback: (review: WhiskyAdvocateObservation) => Promise<void>,
+  callback: (review: WhiskyAdvocateReview) => Promise<void>,
 ) {
   const $ = cheerio(data);
   let parsed = 0;
@@ -134,7 +143,42 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
     reviewResponse.body,
     reviewResponse.url.href,
     async (review) => {
-      await session.emit({ sourceKey: review.url, value: review });
+      const nativeScore = {
+        value: review.rating,
+        scale: 100,
+        display: `${review.rating}/100`,
+      };
+      const value = WhiskyAdvocateObservationSchema.parse({
+        article: {
+          canonicalUrl: review.url,
+          title: review.name,
+          issue: review.issue,
+          publishedAt: null,
+          contentHash: createHash("sha256")
+            .update(
+              JSON.stringify({
+                name: review.name,
+                category: review.category,
+                rating: review.rating,
+                url: review.url,
+                issue: review.issue,
+              }),
+            )
+            .digest("hex"),
+          reviews: [
+            {
+              sourceKey: review.url,
+              name: review.name,
+              category: review.category,
+              reviewerName: null,
+              nativeScore,
+              normalizedRating: normalizeReviewRating(nativeScore),
+            },
+          ],
+        },
+        reviewTexts: {},
+      });
+      await session.emit({ sourceKey: review.url, value });
     },
   );
   if (parsed === 0) {

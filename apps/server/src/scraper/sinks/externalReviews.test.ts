@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { reviewArticles, reviews } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
 import { expect, test } from "vitest";
-import { whiskyAdvocateReviewSink } from "./externalReviews";
+import { externalReviewSink } from "./externalReviews";
 
 test("Whisky Advocate observations use article and source identity", async ({
   fixtures,
@@ -19,22 +19,52 @@ test("Whisky Advocate observations use article and source identity", async ({
   const bottle = await fixtures.Bottle({ name: "Sink Review Bottle" });
   const url = "https://whiskyadvocate.com/reviews/sink-review";
   const observation = {
-    sourceKey: "whisky-advocate-review-123",
+    sourceKey: url,
     value: {
-      name: bottle.fullName,
-      category: bottle.category,
-      rating: 92,
-      url,
-      issue: "Fall 2026",
+      article: {
+        canonicalUrl: url,
+        title: bottle.fullName,
+        issue: "Fall 2026",
+        publishedAt: null,
+        contentHash: "first",
+        reviews: [
+          {
+            sourceKey: url,
+            name: bottle.fullName,
+            category: bottle.category,
+            reviewerName: null,
+            nativeScore: { value: 92, scale: 100, display: "92/100" },
+            normalizedRating: 92,
+          },
+        ],
+      },
+      reviewTexts: {},
     },
   };
 
-  await whiskyAdvocateReviewSink({ externalSiteId: site.id, observation });
-  await whiskyAdvocateReviewSink({
+  await externalReviewSink({ externalSiteId: site.id, observation });
+  await externalReviewSink({
     externalSiteId: site.id,
     observation: {
       ...observation,
-      value: { ...observation.value, rating: 93.5 },
+      value: {
+        ...observation.value,
+        article: {
+          ...observation.value.article,
+          contentHash: "second",
+          reviews: [
+            {
+              ...observation.value.article.reviews[0],
+              nativeScore: {
+                value: 93.5,
+                scale: 100,
+                display: "93.5/100",
+              },
+              normalizedRating: 94,
+            },
+          ],
+        },
+      },
     },
   });
 
@@ -52,7 +82,7 @@ test("Whisky Advocate observations use article and source identity", async ({
       nativeScoreValue: 93.5,
       nativeScoreScale: 100,
       nativeScoreDisplay: "93.5/100",
-      sourceKey: observation.sourceKey,
+      sourceKey: url,
       hidden: true,
     },
   ]);

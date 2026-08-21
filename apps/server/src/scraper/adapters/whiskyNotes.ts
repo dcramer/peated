@@ -1,4 +1,7 @@
-import { ReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
+import {
+  normalizeReviewRating,
+  ReviewArticleIngestionSchema,
+} from "@peated/server/externalReviews/observation";
 import { load as cheerio, type CheerioAPI } from "cheerio";
 import { createHash } from "node:crypto";
 import { z } from "zod";
@@ -8,7 +11,6 @@ const ORIGIN = "https://www.whiskynotes.be";
 const TARGET = "whiskynotes";
 const MAX_DISCOVERY_PAGES = 5;
 const MAX_ARTICLES_PER_PAGE = 20;
-const MAX_REVIEW_TEXT_LENGTH = 50_000;
 const ARTICLE_PATH = /^\/\d{4}\/[^/]+\/[^/]+\/$/;
 const EXCLUDED_CATEGORIES = new Set([
   "category-armagnac",
@@ -27,15 +29,7 @@ export const WhiskyNotesCursorSchema = z
   })
   .strict();
 
-export const WhiskyNotesObservationSchema = z
-  .object({
-    article: ReviewArticleObservationSchema,
-    reviewTexts: z.record(
-      z.string().min(1).max(255),
-      z.string().trim().min(1).max(MAX_REVIEW_TEXT_LENGTH),
-    ),
-  })
-  .strict();
+export const WhiskyNotesObservationSchema = ReviewArticleIngestionSchema;
 
 export type WhiskyNotesCursor = z.infer<typeof WhiskyNotesCursorSchema>;
 export type WhiskyNotesObservation = z.infer<
@@ -87,13 +81,14 @@ function score(value: string) {
   if (!Number.isFinite(nativeValue) || nativeValue < 0 || nativeValue > 100) {
     return null;
   }
+  const nativeScore = {
+    value: nativeValue,
+    scale: 100,
+    display: `${match[1]}/100`,
+  };
   return {
-    nativeScore: {
-      value: nativeValue,
-      scale: 100,
-      display: `${match[1]}/100`,
-    },
-    normalizedRating: Math.round(nativeValue),
+    nativeScore,
+    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 

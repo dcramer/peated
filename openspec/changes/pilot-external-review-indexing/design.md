@@ -127,10 +127,10 @@ and deletion obligations.
 ### Preserve native scores and normalize only for compatibility
 
 An article review may be unscored. A scored review stores the native value,
-native maximum, and display text. A deterministic source-owned normalizer may
-also produce the existing integer 0-100 rating. Public source rows show the
-native display score; normalized ratings remain an internal compatibility and
-future aggregation input.
+native maximum, and display text. A source adapter may use the shared
+deterministic normalizer to produce the existing integer 0-100 rating. Public
+source rows show the native display score; normalized ratings remain an
+internal compatibility and future aggregation input.
 
 The pilot does not compare or average sources. This avoids presenting a simple
 linear conversion as critic calibration.

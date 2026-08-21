@@ -60,10 +60,25 @@ test("fetches the latest issue and preserves Bottle identity facts", async () =>
     sourceKey:
       "https://whiskyadvocate.com/Angel-s-Envy-Cask-Strength-Sauternes-and-Toasted-Oak-Barrel-Finished-Batch-RC1-57-2",
     value: {
-      name: "Angel’s Envy Cask Strength Sauternes and Toasted Oak Barrel Finished (Batch RC1), 57.2%",
-      category: "rye",
-      rating: 94,
-      issue: "Winter 2023",
+      article: {
+        canonicalUrl:
+          "https://whiskyadvocate.com/Angel-s-Envy-Cask-Strength-Sauternes-and-Toasted-Oak-Barrel-Finished-Batch-RC1-57-2",
+        title:
+          "Angel’s Envy Cask Strength Sauternes and Toasted Oak Barrel Finished (Batch RC1), 57.2%",
+        issue: "Winter 2023",
+        contentHash: expect.any(String),
+        reviews: [
+          {
+            sourceKey:
+              "https://whiskyadvocate.com/Angel-s-Envy-Cask-Strength-Sauternes-and-Toasted-Oak-Barrel-Finished-Batch-RC1-57-2",
+            name: "Angel’s Envy Cask Strength Sauternes and Toasted Oak Barrel Finished (Batch RC1), 57.2%",
+            category: "rye",
+            nativeScore: { value: 94, scale: 100, display: "94/100" },
+            normalizedRating: 94,
+          },
+        ],
+      },
+      reviewTexts: {},
     },
   });
 });

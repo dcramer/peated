@@ -90,6 +90,12 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("whiskynotes")?.requestLimit).toBe(30);
+  expect(scraperRegistry.sources.get("whiskyadvocate")?.observationSchema).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
+  );
+  expect(scraperRegistry.sources.get("whiskyadvocate")?.sink).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.sink,
+  );
 });
 
 test("runs Bruichladdich through the production runtime with fixture parity", async () => {

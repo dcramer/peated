@@ -15,13 +15,14 @@ export const NativeScoreSchema = z
     path: ["value"],
   });
 
+export const NormalizedReviewRatingSchema = z.number().int().min(0).max(100);
+
 export const ReviewSchema = z.object({
   id: z.number().describe("Unique identifier for the review"),
   name: z.string().describe("Name of the reviewed product"),
-  rating: z
-    .number()
-    .nullable()
-    .describe("Normalized rating given in the review, when available"),
+  rating: NormalizedReviewRatingSchema.nullable().describe(
+    "Normalized rating given in the review, when available",
+  ),
   url: z.string().describe("URL to the original review"),
   site: ExternalSiteSchema.optional().describe(
     "External site where the review was published",
@@ -56,12 +57,9 @@ export const ReviewInputSchema = z.object({
   category: CategoryEnum.nullable()
     .default(null)
     .describe("Category of the whisky being reviewed"),
-  rating: z
-    .number()
-    .int()
-    .min(0)
-    .max(100)
-    .describe("Normalized rating given in the review"),
+  rating: NormalizedReviewRatingSchema.describe(
+    "Normalized rating given in the review",
+  ),
   issue: z
     .string()
     .trim()

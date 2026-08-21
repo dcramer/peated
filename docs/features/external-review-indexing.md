@@ -73,6 +73,9 @@ The adapter emits one strict article observation with:
 Review keys must be unique within the article and stable across runs. Array
 position is not a stable key. One article can own several reviews.
 
+All review adapters emit `ReviewArticleIngestionSchema` and use the shared
+review sink. Do not translate a source-specific review shape in the sink.
+
 The adapter does not access the database, select a Peated Bottle, decide public
 visibility, call a model, or store records. The sink and external-review
 ingestion boundary own those actions. Unresolved or invalid Bottle matches stay
