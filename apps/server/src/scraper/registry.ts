@@ -1,5 +1,10 @@
 import { z } from "zod";
 import {
+  bourbonCultureAdapter,
+  BourbonCultureCursorSchema,
+  BourbonCultureObservationSchema,
+} from "./adapters/bourbonCulture";
+import {
   dramfaceAdapter,
   DramfaceCursorSchema,
   DramfaceObservationSchema,
@@ -230,6 +235,17 @@ export const scraperRegistry = createScraperRegistry({
       }),
     ),
     defineScrapeTarget({
+      key: "bourbonculture",
+      minimumSpacingMs: 5_000,
+      requestsPerWindow: 10,
+      origins: [
+        {
+          origin: "https://thebourbonculture.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
       key: "dramface",
       minimumSpacingMs: 2_500,
       requestsPerWindow: 25,
@@ -319,6 +335,16 @@ export const scraperRegistry = createScraperRegistry({
         sink: bottleObservationSink,
       }),
     ),
+    defineScraperSource({
+      key: "bourbonculture",
+      externalSiteType: "bourbonculture",
+      targetKeys: ["bourbonculture"],
+      requestLimit: 7,
+      cursorSchema: BourbonCultureCursorSchema,
+      observationSchema: BourbonCultureObservationSchema,
+      adapter: bourbonCultureAdapter,
+      sink: externalReviewSink,
+    }),
     defineScraperSource({
       key: "dramface",
       externalSiteType: "dramface",
