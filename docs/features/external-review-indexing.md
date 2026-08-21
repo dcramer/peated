@@ -140,6 +140,14 @@ least 2.5 seconds apart. The target allows 25 requests per hour, and each worker
 pass stops after 30 requests. The adapter stores explicit feed dates, reviewer
 metadata, native scores, and canonical links. Review prose stays transient.
 
+Dramface runs once per day. It reads at most 20 current links from the public
+review index. It does not request Squarespace feeds, JSON views, APIs, search,
+or author query pages. Requests are at least 2.5 seconds apart. The target
+allows 25 requests per hour, and each worker pass stops after 30 requests. The
+adapter splits multi-bottle and multi-writer articles into scored reviews. It
+stores exact dates, published reviewer names, native scores, and canonical
+links. Review prose stays transient, and Dramface's TL;DR text is excluded.
+
 Enable automatic publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a
 generic crawler only because several sources use RSS or HTML.

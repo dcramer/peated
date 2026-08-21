@@ -103,6 +103,10 @@ podcast transcripts need a separate platform-terms and creator-rights review.
   `TL;DR`, but Peated should not assume that the existing summary is reusable.
 - Multi-bottle and multi-author articles make it a good test for the required
   review-article model.
+- The implemented daily feed reads at most 20 links from the public review
+  index. It uses only allowed article paths through the governed runtime. It
+  keeps each Bottle and reviewer section separate and excludes Dramface's
+  `TL;DR` text from transient summary input.
 - Dramface also republishes press releases in a clearly labeled news section.
   Use that as discovery; release facts should link to the original producer or
   issuer when available.
@@ -187,8 +191,9 @@ boundary.
    issue.
 3. Whiskyfun supplies the next daily multi-bottle feed. Keep its historical
    archive as a later bounded change.
-4. Add Dramface next, then continue through the reviewed public-index
-   candidates until Peated has at least 12 reliable feeds.
+4. Dramface supplies the next daily multi-bottle and multi-writer feed.
+5. Continue through the reviewed public-index candidates until Peated has at
+   least 12 reliable feeds.
 
 The pilot is successful with at least 90% article extraction accuracy on a
 reviewed sample, reliable splitting of multi-bottle articles, measurable
