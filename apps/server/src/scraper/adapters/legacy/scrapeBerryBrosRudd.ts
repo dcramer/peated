@@ -35,6 +35,11 @@ function parseVolume(value: string): number | null {
   return Number.isInteger(volume) ? volume : null;
 }
 
+function getExternalProductId(productUrl: string): string | undefined {
+  const match = new URL(productUrl).pathname.match(/^\/products-(\d+)(?:-|$)/);
+  return match?.[1];
+}
+
 export function parseBerryBrosRuddPage(
   html: string,
   sourceUrl: string,
@@ -93,13 +98,16 @@ export function parseBerryBrosRuddPage(
       .find('[data-testid="image-wrapper"] img.sf-image')
       .first();
     const imageUrl = image.attr("src") ?? image.attr("data-src");
+    const url = absoluteUrl(sourceUrl, productUrl);
+    const externalProductId = getExternalProductId(url);
     const { name } = normalizeBottle({ name: rawName });
     const listing = {
+      ...(externalProductId ? { externalProductId } : {}),
       name,
       price,
       currency: "gbp" as const,
       volume,
-      url: absoluteUrl(sourceUrl, productUrl),
+      url,
       imageUrl: imageUrl ? absoluteUrl(sourceUrl, imageUrl) : null,
     };
 

@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
 import {
+  getShopifyStorePriceIdentity,
   parseShopifyPrice,
   scrapeShopifyProducts,
   ShopifyCatalogSchema,
@@ -81,6 +82,7 @@ export function parseNorthStarProducts(
 
     const { name } = normalizeBottle({ name: product.title });
     const listing = {
+      ...getShopifyStorePriceIdentity(product, pricedVariant),
       name,
       price: pricedVariant.parsedPrice,
       currency: "gbp" as const,

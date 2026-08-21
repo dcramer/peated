@@ -22,7 +22,9 @@ test("scrapes available single bottles and excludes unsupported products", async
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "usd",
+      externalProductId: "4364171083887",
       imageUrl: "https://cdn.shopify.com/s/files/eh-taylor.png",
       name: "E.H. Taylor Small Batch Bottled In Bond Kentucky Straight Bourbon Whiskey",
       price: 4999,

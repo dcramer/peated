@@ -1,6 +1,7 @@
 {
   "products": [
     {
+      "id": 9031243464902,
       "title": "Rock Town 10 Year Old",
       "handle": "rock-town-10-year-old",
       "product_type": "Bourbon Whisky",
@@ -11,7 +12,9 @@
       ],
       "variants": [
         {
+          "id": 46957921599686,
           "available": true,
+          "barcode": "036602301979",
           "price": "90.00"
         }
       ]

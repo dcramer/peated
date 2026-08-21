@@ -1,8 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
 import {
   decodeWooCommerceText,
+  getWooCommerceStorePriceIdentity,
   parseWooCommercePrice,
   scrapeWooCommerceProducts,
+  WooCommerceProductSchema,
 } from "./woocommerce";
 
 process.env.DISABLE_HTTP_CACHE = "1";
@@ -49,4 +51,39 @@ test("rejects malformed catalog payloads", async ({ axiosMock }) => {
       () => [],
     ),
   ).rejects.toThrow();
+});
+
+function productWithIdentity(input: { id?: number; gtin?: string | null }) {
+  return WooCommerceProductSchema.parse({
+    ...input,
+    name: "Example Whisky",
+    permalink: "https://example.com/example-whisky",
+    prices: {
+      price: "5000",
+      currency_code: "GBP",
+      currency_minor_unit: 2,
+    },
+    images: [],
+    is_in_stock: true,
+    is_purchasable: true,
+  });
+}
+
+test("returns the stable product id and a valid GTIN", () => {
+  expect(
+    getWooCommerceStorePriceIdentity(
+      productWithIdentity({ id: 123, gtin: "036602301979" }),
+    ),
+  ).toEqual({
+    barcode: "036602301979",
+    externalProductId: "123",
+  });
+});
+
+test("omits unsupported identity claims", () => {
+  expect(
+    getWooCommerceStorePriceIdentity(
+      productWithIdentity({ gtin: "not-a-gtin" }),
+    ),
+  ).toEqual({});
 });

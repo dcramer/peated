@@ -18,6 +18,7 @@ test("parses supported bottles from the catalog response", async () => {
       [
         {
           "currency": "usd",
+          "externalProductId": "GROUPING-1234",
           "imageUrl": "https://assets.liquidcommerce.co/catalog/macallan.png",
           "name": "The Macallan Double Cask 12-year-old",
           "price": 9289,
@@ -26,6 +27,7 @@ test("parses supported bottles from the catalog response", async () => {
         },
         {
           "currency": "usd",
+          "externalProductId": "GROUPING-38632",
           "imageUrl": null,
           "name": "Gentleman Jack Tennessee Whiskey",
           "price": 2839,

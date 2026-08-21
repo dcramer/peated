@@ -1,3 +1,4 @@
+import { GtinSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
 import { z } from "zod";
 import type {
@@ -25,6 +26,10 @@ export const WooCommerceImageSchema = z
 
 export const WooCommerceProductSchema = z
   .object({
+    id: z
+      .union([z.number().int().positive(), z.string().trim().min(1)])
+      .optional(),
+    gtin: z.string().trim().min(1).nullish(),
     name: z.string().trim().min(1),
     permalink: z.string().trim().min(1),
     prices: WooCommercePriceSchema,
@@ -33,6 +38,18 @@ export const WooCommerceProductSchema = z
     is_purchasable: z.boolean(),
   })
   .passthrough();
+
+export function getWooCommerceStorePriceIdentity(
+  product: z.infer<typeof WooCommerceProductSchema>,
+) {
+  const barcode = GtinSchema.safeParse(product.gtin);
+  return {
+    ...(product.id !== undefined
+      ? { externalProductId: String(product.id) }
+      : {}),
+    ...(barcode.success ? { barcode: barcode.data } : {}),
+  };
+}
 
 export function getWooCommerceProductName(input: unknown): string | null {
   if (!input || typeof input !== "object" || !("name" in input)) return null;

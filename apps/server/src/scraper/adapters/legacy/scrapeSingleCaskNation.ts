@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
 import {
+  getShopifyStorePriceIdentity,
   parseShopifyPrice,
   scrapeShopifyProducts,
   ShopifyCatalogSchema,
@@ -55,6 +56,7 @@ export function parseSingleCaskNationProducts(
       name: `Single Cask Nation ${product.title}`,
     });
     const listing = {
+      ...getShopifyStorePriceIdentity(product, pricedVariant),
       name,
       price: pricedVariant.parsedPrice,
       currency: "usd" as const,

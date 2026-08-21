@@ -1,12 +1,15 @@
 {
   "items": [
     {
+      "id": "6a46b08a4dafad0f5168d302",
       "title": "Dramfool Glenallachie 11",
       "fullUrl": "/shop/glenallachie-11",
       "assetUrl": "https://images.squarespace-cdn.com/glenallachie-11.png",
       "productType": 1,
       "variants": [
         {
+          "id": "6baddfdf-bfb4-4355-bb4d-c98bb7132588",
+          "barcode": "036602301979",
           "attributes": { "Size": "70cl" },
           "priceMoney": { "currency": "GBP", "value": "100.00" },
           "salePriceMoney": { "currency": "GBP", "value": "0.00" },

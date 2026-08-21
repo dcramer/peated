@@ -5,6 +5,7 @@ import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
 import {
   decodeWooCommerceText,
+  getWooCommerceStorePriceIdentity,
   parseWooCommercePrice,
   scrapeWooCommerceProducts,
   WooCommerceImageSchema,
@@ -90,6 +91,7 @@ export function parseCadenheadsProducts(input: unknown): StorePrice[] {
 
     const { name } = normalizeBottle({ name: rawName });
     const listing = {
+      ...getWooCommerceStorePriceIdentity(product),
       name,
       price,
       currency: "gbp" as const,

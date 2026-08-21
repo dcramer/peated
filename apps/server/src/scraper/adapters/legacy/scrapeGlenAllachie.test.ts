@@ -22,7 +22,9 @@ test("scrapes available full-size whisky and excludes unsupported products", asy
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "15633852137812",
       imageUrl: "https://cdn.shopify.com/s/files/glenallachie-12.png",
       name: "The GlenAllachie 12-year-old",
       price: 5499,

@@ -1,13 +1,14 @@
 {
   "products": [
     {
+      "id": 15633852137812,
       "title": "The GlenAllachie 12 Year Old",
       "handle": "the-glenallachie-12-year-old",
       "body_html": "<p>Our flagship single malt.</p>",
       "product_type": "Single Malt Scotch Whisky",
       "tags": ["glenallachie"],
       "images": [{"src": "https://cdn.shopify.com/s/files/glenallachie-12.png"}],
-      "variants": [{"available": true, "price": "54.99"}]
+      "variants": [{"id": 56545593229652, "available": true, "barcode": "036602301979", "price": "54.99"}]
     },
     {
       "title": "Online-Exclusive 3.0 2021 Chinquapin Virgin Oak Barrel #2300",

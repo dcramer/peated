@@ -24,6 +24,7 @@ test("scrapes purchasable own-selection bottles and excludes ineligible cards", 
   expect(items).toEqual([
     {
       currency: "gbp",
+      externalProductId: "20188403652",
       imageUrl:
         "https://media.bbr.com/s/bbr/20188403652-ms?fmt=auto&qlt=default",
       name: "2018 Berry Bros. & Rudd The Auld & The Bold Glen Wyvis, Cask Ref. 157, Highland, Single Malt Scotch Whisky (58.1%)",
@@ -33,6 +34,7 @@ test("scrapes purchasable own-selection bottles and excludes ineligible cards", 
     },
     {
       currency: "gbp",
+      externalProductId: "19798075646",
       imageUrl: "https://www.bbr.com/images/benrinnes.png",
       name: "1979 Berry Bros. & Rudd Exceptional Casks, Benrinnes, Cask Ref. 62, Speyside, Single Malt Scotch Whisky (42.1%)",
       price: 180000,

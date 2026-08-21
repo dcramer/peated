@@ -19,7 +19,9 @@ test("scrapes in-stock full bottles and excludes unsupported variants", async ({
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "6baddfdf-bfb4-4355-bb4d-c98bb7132588",
       imageUrl: "https://images.squarespace-cdn.com/glenallachie-11.png",
       name: "Dramfool Glenallachie 11",
       price: 10000,

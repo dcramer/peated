@@ -1,8 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
 import {
   getShopifyImageUrl,
+  getShopifyStorePriceIdentity,
   parseShopifyPrice,
   scrapeShopifyProducts,
+  ShopifyProductSchema,
 } from "./shopify";
 
 process.env.DISABLE_HTTP_CACHE = "1";
@@ -67,4 +69,44 @@ test("rejects malformed catalog payloads", async ({ axiosMock }) => {
       () => [],
     ),
   ).rejects.toThrow();
+});
+
+test("returns the stable product id and a valid variant barcode", () => {
+  const product = ShopifyProductSchema.parse({
+    id: 123,
+    title: "Example Whisky",
+    handle: "example-whisky",
+    images: [],
+    variants: [
+      {
+        available: true,
+        barcode: "036602301979",
+        price: "50.00",
+      },
+    ],
+  });
+
+  expect(getShopifyStorePriceIdentity(product, product.variants[0]!)).toEqual({
+    barcode: "036602301979",
+    externalProductId: "123",
+  });
+});
+
+test("omits unsupported identity claims", () => {
+  const product = ShopifyProductSchema.parse({
+    title: "Example Whisky",
+    handle: "example-whisky",
+    images: [],
+    variants: [
+      {
+        available: true,
+        barcode: "not-a-gtin",
+        price: "50.00",
+      },
+    ],
+  });
+
+  expect(getShopifyStorePriceIdentity(product, product.variants[0]!)).toEqual(
+    {},
+  );
 });

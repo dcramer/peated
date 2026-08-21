@@ -40,6 +40,31 @@
           }
         },
         {
+          "identifier": {
+            "productId": 740590997
+          },
+          "externalReferenceId": "26084",
+          "defaultOptionsOverrides": {
+            "pricesOverrides": {
+              "basePrice": 59.99
+            },
+            "variationOverrides": {
+              "isSoldOut": false,
+              "productGridMediaItems": [
+                {
+                  "image800pxUrl": "https://d2j6dbq0eux0bg.cloudfront.net/images/115311147/5577358773.png",
+                  "isMain": true
+                }
+              ]
+            }
+          },
+          "name": "1792 FULL PROOF HEALTHY SPIRITS SINGLE BARREL BOURBON 750ML",
+          "seo": {
+            "canonicalUrl": "https://www.healthyspirits.com/products/1792-full-proof-healthy-spirits-single-barrel-bourbon-750ml",
+            "jsonLD": "{\"@context\":\"http://schema.org/\",\"@type\":\"Product\",\"gtin12\":\"080660001159\",\"sku\":\"26084_sku\"}"
+          }
+        },
+        {
           "defaultOptionsOverrides": {
             "pricesOverrides": {
               "basePrice": 899.99

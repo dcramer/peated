@@ -1,6 +1,7 @@
 {
   "products": [
     {
+      "id": 11503750447445,
       "title": "The Speyside Connection",
       "handle": "speyside-connection",
       "body_html": "<p>A North Star vatting of Speyside malts.</p>",
@@ -11,7 +12,9 @@
       ],
       "variants": [
         {
+          "id": 54618069893461,
           "available": true,
+          "barcode": "036602301979",
           "price": "69.99"
         }
       ]

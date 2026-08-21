@@ -4,6 +4,7 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
+import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { requestUrl } from "../../legacy/scraper";
@@ -29,6 +30,15 @@ const CatalogResponseSchema = z.object({
 
 const ProductSchema = z
   .object({
+    externalReferenceId: z.string().trim().min(1).optional(),
+    identifier: z
+      .object({
+        productId: z.union([
+          z.number().int().positive(),
+          z.string().trim().min(1),
+        ]),
+      })
+      .optional(),
     defaultOptionsOverrides: z.object({
       pricesOverrides: z.object({
         basePrice: z.number().positive(),
@@ -48,7 +58,18 @@ const ProductSchema = z
     name: z.string().trim().min(1),
     seo: z.object({
       canonicalUrl: z.string().trim().min(1),
+      jsonLD: z.string().optional(),
     }),
+  })
+  .passthrough();
+
+const StructuredProductSchema = z
+  .object({
+    gtin: z.string().optional(),
+    gtin8: z.string().optional(),
+    gtin12: z.string().optional(),
+    gtin13: z.string().optional(),
+    gtin14: z.string().optional(),
   })
   .passthrough();
 
@@ -96,6 +117,31 @@ function getImageUrl(
     return url.protocol === "https:" ? url.toString() : undefined;
   } catch {
     return;
+  }
+}
+
+function getProductBarcode(jsonLD: string | undefined): string | undefined {
+  if (!jsonLD) return;
+
+  let input: unknown;
+  try {
+    input = JSON.parse(jsonLD);
+  } catch {
+    return;
+  }
+
+  const result = StructuredProductSchema.safeParse(input);
+  if (!result.success) return;
+
+  for (const value of [
+    result.data.gtin,
+    result.data.gtin8,
+    result.data.gtin12,
+    result.data.gtin13,
+    result.data.gtin14,
+  ]) {
+    const barcode = GtinSchema.safeParse(value);
+    if (barcode.success) return barcode.data;
   }
 }
 
@@ -156,7 +202,14 @@ export function parseHealthySpiritsProducts(
     }
 
     const { name } = normalizeBottle({ name: toTitleCase(nameRaw) });
+    const externalProductId =
+      product.identifier?.productId ?? product.externalReferenceId;
+    const barcode = getProductBarcode(product.seo.jsonLD);
     const listing = {
+      ...(externalProductId !== undefined
+        ? { externalProductId: String(externalProductId) }
+        : {}),
+      ...(barcode ? { barcode } : {}),
       currency: "usd" as const,
       imageUrl: getImageUrl(
         product.defaultOptionsOverrides.variationOverrides

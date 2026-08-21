@@ -20,7 +20,9 @@ test("scrapes purchasable whisky bottles and excludes unsupported products", asy
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "109292",
       imageUrl:
         "https://www.thompsonbrosdistillers.com/wp-content/uploads/glen-scotia.png",
       name: "Thompson Bros Glen Scotia Single Malt Scotch Whisky, 2013, 12-year-old, 70CL, 56.7%ABV",

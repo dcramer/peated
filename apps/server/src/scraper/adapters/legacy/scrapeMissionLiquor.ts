@@ -6,6 +6,7 @@ import scrapePrices from "../../legacy/scraper";
 import {
   getShopifyImageUrl,
   getShopifyProductTitle,
+  getShopifyStorePriceIdentity,
   parseShopifyPrice,
   scrapeShopifyProducts,
   ShopifyCatalogSchema,
@@ -123,11 +124,14 @@ export function parseMissionLiquorProducts(input: unknown): StorePrice[] {
       continue;
     }
 
-    const price = parseShopifyPrice(availableVariants[0].price);
+    const variant = availableVariants[0];
+    if (!variant) continue;
+
+    const price = parseShopifyPrice(variant.price);
     if (price === null) {
       logScrapeWarning(SITE, "Invalid product price", {
         rawName: product.title,
-        price: availableVariants[0].price,
+        price: variant.price,
       });
       continue;
     }
@@ -151,6 +155,7 @@ export function parseMissionLiquorProducts(input: unknown): StorePrice[] {
     }
 
     const listing = {
+      ...getShopifyStorePriceIdentity(product, variant),
       name,
       price,
       currency: "usd" as const,

@@ -22,7 +22,9 @@ test("scrapes available full-size whisky and excludes unsupported products", asy
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "7287951261869",
       imageUrl: "https://cdn.shopify.com/s/files/bruichladdich-bere-barley.png",
       name: "Bruichladdich Bere Barley 2013",
       price: 10000,
