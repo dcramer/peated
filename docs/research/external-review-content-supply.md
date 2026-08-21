@@ -140,8 +140,8 @@ not negate those terms.
 
 ## Implemented Product Boundary
 
-The external-review feature now has the required article/review model,
-source policy, governed fetch boundary, and Bottle-page presentation. See
+The external-review feature now has the required article/review model, content
+policy, governed fetch boundary, and Bottle-page presentation. See
 the [external review indexing guide](../features/external-review-indexing.md)
 for the current contract and pilot procedure.
 
@@ -153,8 +153,8 @@ The pilot started with these limits:
 - Reviews had no author, publication date, article title, native score scale,
   summary, source evidence, rights mode, or source-policy version.
 - There was no review-article record separate from a Bottle review.
-- Outbound requests did not use one governed runtime with source policy,
-  request budgets, robots checks, and durable runs.
+- Outbound requests did not use one governed runtime with request budgets,
+  robots checks, and durable runs.
 
 Relevant implementation:
 
@@ -166,7 +166,7 @@ Relevant implementation:
 
 The current model separates:
 
-- a source and its acquisition/display policy;
+- a source and its content-processing/display policy;
 - a review article identified by publisher and canonical URL;
 - zero or more scored or unscored Bottle reviews from that article; and
 - a short generated summary with model provenance and source evidence.

@@ -1,7 +1,7 @@
 ## 1. Runtime Contracts
 
 - [x] 1.1 Create the isolated `apps/server/src/scraper/` module with explicit public exports and an ownership note covering definitions, runs, coordination, sessions, HTTP, robots, and adapters
-- [x] 1.2 Define strict code-owned schemas for sources, traffic targets, exact origins, request policies, cursor registrations, and source authorization hooks
+- [x] 1.2 Define strict code-owned schemas for sources, traffic targets, exact origins, request policies, and cursor registrations
 - [x] 1.3 Define the narrow adapter and sink contracts for request, emit, checkpoint, stable source identity, and remaining-budget access
 - [x] 1.4 Add definition validation tests for shared targets, multiple origins, stricter policies, reviewed exceptions, undeclared origins, and unknown fields
 
@@ -36,7 +36,7 @@
 - [x] 5.2 Implement `ScraperSession` so adapters can only request declared targets, emit validated observations through their registered sink, checkpoint safe progress, and inspect remaining budget
 - [x] 5.3 Add the dedicated `scrapers` BullMQ queue with run-id-only payloads and dispatch rules that treat PostgreSQL as authoritative
 - [x] 5.4 Defer long target waits by persisting `nextAttemptAt` and redispatching the same run instead of sleeping in a worker; keep only short spacing waits in process
-- [x] 5.5 Add a fixture-only adapter and idempotent sink to test complete execution, cursor replay, duplicate queue delivery, budget exhaustion, authorization rechecks, deferral, and recovery
+- [x] 5.5 Add a fixture-only adapter and idempotent sink to test complete execution, cursor replay, duplicate queue delivery, budget exhaustion, deferral, and recovery
 - [x] 5.6 Record only bounded run aggregates and operational deferrals, allowing unexpected terminal failures to reach the worker error boundary without reporting expected rate limits to Sentry
 
 ## 6. Incremental Adapter Migration
@@ -45,7 +45,7 @@
 - [x] 6.2 Migrate one small retailer source through the runtime and compare its request fixtures, parsed observations, item counts, limits, and failure behavior before switching its registration
 - [x] 6.3 Migrate the remaining legacy-helper adapters in reviewable groups based on their shared pagination or provider behavior
 - [x] 6.4 Migrate direct-HTTP adapters and add a repository check preventing raw HTTP clients, queues, database clients, or product persistence imports in runtime-managed adapter directories
-- [x] 6.5 Connect external-review adapters only after their independent source authorization permits fetching, and test that revoked permission blocks resumed runs before network access
+- [x] 6.5 Connect external-review adapters through the same target, request, and robots controls as other sources
 - [x] 6.6 Remove the legacy response-body disk cache and fetch path only after no registered scraper consumes them, then require runtime registration for every scraper adapter
 
 ## 7. Documentation And Verification

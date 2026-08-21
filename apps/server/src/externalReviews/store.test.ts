@@ -115,7 +115,6 @@ describe("storeReviewArticle", () => {
     await fixtures.ExternalReviewSourcePolicy({
       externalSiteId: site.id,
       publicationMode: "automatic",
-      allowFetching: true,
       allowLlmProcessing: true,
       allowScoreDisplay: true,
       allowSummaryDisplay: true,
@@ -149,7 +148,6 @@ describe("storeReviewArticle", () => {
     await fixtures.ExternalReviewSourcePolicy({
       externalSiteId: site.id,
       publicationMode: "automatic",
-      allowFetching: true,
       allowLlmProcessing: true,
       allowScoreDisplay: true,
       allowSummaryDisplay: true,
@@ -193,7 +191,6 @@ describe("storeReviewArticle", () => {
     await fixtures.ExternalReviewSourcePolicy({
       externalSiteId: site.id,
       publicationMode: "review_only",
-      allowFetching: true,
       allowLlmProcessing: true,
       allowScoreDisplay: true,
       allowSummaryDisplay: true,

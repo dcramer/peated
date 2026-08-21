@@ -33,7 +33,6 @@ vi.mock("@peated/server/lib/auditLog", () => ({
 
 const reviewOnlyPolicy = {
   publicationMode: "review_only" as const,
-  allowFetching: true as const,
   allowLlmProcessing: true,
   allowScoreDisplay: true,
   allowSummaryDisplay: true,
@@ -79,7 +78,6 @@ describe("external review source policy routes", () => {
     expect(result).toMatchObject({
       externalSiteId: site.id,
       publicationMode: "disabled",
-      allowFetching: false,
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,
@@ -111,14 +109,12 @@ describe("external review source policy routes", () => {
           site: site.type,
           previous: {
             publicationMode: "disabled",
-            allowFetching: false,
             allowLlmProcessing: false,
             allowScoreDisplay: false,
             allowSummaryDisplay: false,
           },
           next: {
             publicationMode: "review_only",
-            allowFetching: true,
             allowLlmProcessing: true,
             allowScoreDisplay: true,
             allowSummaryDisplay: true,
@@ -147,7 +143,6 @@ describe("external review source policy routes", () => {
 
     expect(result).toMatchObject({
       publicationMode: "disabled",
-      allowFetching: false,
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,
@@ -158,7 +153,6 @@ describe("external review source policy routes", () => {
     });
     expect(persisted).toMatchObject({
       publicationMode: "disabled",
-      allowFetching: false,
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,

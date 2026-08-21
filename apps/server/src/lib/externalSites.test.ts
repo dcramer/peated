@@ -50,7 +50,6 @@ test("syncs code-owned external-site definitions", async () => {
         expect.objectContaining({
           externalSiteId: sites.find((site) => site.type === type)?.id,
           publicationMode: "disabled",
-          allowFetching: false,
           allowLlmProcessing: false,
           allowScoreDisplay: false,
           allowSummaryDisplay: false,

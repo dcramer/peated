@@ -270,7 +270,7 @@ describe("GET /reviews", () => {
 
     await db
       .update(externalReviewSourcePolicies)
-      .set({ allowFetching: false, publicationMode: "disabled" })
+      .set({ publicationMode: "disabled" })
       .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
 
     await expect(

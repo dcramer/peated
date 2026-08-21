@@ -27,12 +27,11 @@ describe("POST /external-sites/:site/trigger", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("triggers job", async ({ fixtures }) => {
+  test("triggers a review job without a publication policy", async ({
+    fixtures,
+  }) => {
     const site = await fixtures.ExternalSiteOrExisting({
       type: "whiskyadvocate",
-    });
-    await fixtures.EnabledExternalReviewSourcePolicy({
-      externalSiteId: site.id,
     });
     const adminUser = await fixtures.User({ admin: true });
 
@@ -47,25 +46,6 @@ describe("POST /external-sites/:site/trigger", () => {
       requestedById: adminUser.id,
     });
     expect(pushJob).toHaveBeenCalledOnce();
-  });
-
-  test("refuses an unapproved review source", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSiteOrExisting({
-      type: "whiskyadvocate",
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
-    const err = await waitError(
-      routerClient.externalSites.triggerJob(
-        { site: site.type },
-        { context: { user: adminUser } },
-      ),
-    );
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: External review source whiskyadvocate does not enable allowFetching.]`,
-    );
-    expect(pushJob).not.toHaveBeenCalled();
   });
 
   test("refuses a disabled scraper before creating durable work", async ({

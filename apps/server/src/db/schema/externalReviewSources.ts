@@ -15,8 +15,7 @@ export const externalReviewPublicationModeEnum = pgEnum(
 );
 
 /**
- * Owns the runtime controls for acquiring and displaying publisher reviews.
- * A robots rule can further restrict fetching but cannot enable a capability.
+ * Owns the runtime controls for processing and displaying publisher reviews.
  */
 export const externalReviewSourcePolicies = pgTable(
   "external_review_source_policy",
@@ -27,7 +26,6 @@ export const externalReviewSourcePolicies = pgTable(
     publicationMode: externalReviewPublicationModeEnum("publication_mode")
       .default("disabled")
       .notNull(),
-    allowFetching: boolean("allow_fetching").default(false).notNull(),
     allowLlmProcessing: boolean("allow_llm_processing")
       .default(false)
       .notNull(),
@@ -42,8 +40,7 @@ export const externalReviewSourcePolicies = pgTable(
     check(
       "external_review_source_policy_disabled_check",
       sql`${table.publicationMode} <> 'disabled' OR (
-        NOT ${table.allowFetching}
-        AND NOT ${table.allowLlmProcessing}
+        NOT ${table.allowLlmProcessing}
         AND NOT ${table.allowScoreDisplay}
         AND NOT ${table.allowSummaryDisplay}
       )`,

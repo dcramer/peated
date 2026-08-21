@@ -7,7 +7,6 @@ describe("external review source policy", () => {
 
     expect(policy).toMatchObject({
       publicationMode: "disabled",
-      allowFetching: false,
       allowLlmProcessing: false,
       allowScoreDisplay: false,
       allowSummaryDisplay: false,
@@ -21,7 +20,6 @@ describe("external review source policy", () => {
 
     expect(policy).toMatchObject({
       publicationMode: "review_only",
-      allowFetching: true,
       allowLlmProcessing: true,
       allowScoreDisplay: true,
       allowSummaryDisplay: true,
@@ -34,7 +32,7 @@ describe("external review source policy", () => {
     await expect(
       db.insert(externalReviewSourcePolicies).values({
         externalSiteId: site.id,
-        allowFetching: true,
+        allowLlmProcessing: true,
       }),
     ).rejects.toThrow(/external_review_source_policy_disabled_check/);
   });
@@ -46,7 +44,6 @@ describe("external review source policy", () => {
       db.insert(externalReviewSourcePolicies).values({
         externalSiteId: site.id,
         publicationMode: "review_only",
-        allowFetching: true,
         allowSummaryDisplay: true,
       }),
     ).rejects.toThrow(/external_review_source_policy_summary_check/);
@@ -60,13 +57,11 @@ describe("external review source policy", () => {
       .values({
         externalSiteId: site.id,
         publicationMode: "review_only",
-        allowFetching: true,
       })
       .returning();
 
     expect(policy).toMatchObject({
       publicationMode: "review_only",
-      allowFetching: true,
     });
   });
 });

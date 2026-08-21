@@ -73,16 +73,8 @@ export function createScraperSession<TCursor, TObservation>({
     remaining = Math.max(0, updated.requestLimit - updated.sliceRequestCount);
   }
 
-  async function authorize() {
-    await source.authorize?.({
-      externalSiteId: run.externalSiteId,
-      externalSiteType: source.externalSiteType,
-    });
-  }
-
   return {
     async request(request: ScraperRequest) {
-      await authorize();
       try {
         await ensureRobotsAllowed({
           runId: run.id,

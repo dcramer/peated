@@ -1,4 +1,3 @@
-import { db } from "@peated/server/db";
 import { z } from "zod";
 import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
 import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
@@ -53,7 +52,6 @@ import {
 import { bottleObservationSink } from "./sinks/bottles";
 import { externalReviewSink } from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
-import { requireExternalReviewSourceCapability } from "./sourcePolicy";
 
 const legacyPriceSources = [
   {
@@ -266,13 +264,6 @@ export const scraperRegistry = createScraperRegistry({
       observationSchema: WhiskyAdvocateObservationSchema,
       adapter: whiskyAdvocateAdapter,
       sink: externalReviewSink,
-      authorize: async ({ externalSiteId, externalSiteType }) => {
-        await requireExternalReviewSourceCapability(
-          db,
-          { id: externalSiteId, type: externalSiteType },
-          "allowFetching",
-        );
-      },
     }),
     defineScraperSource({
       key: "whiskynotes",
@@ -283,13 +274,6 @@ export const scraperRegistry = createScraperRegistry({
       observationSchema: WhiskyNotesObservationSchema,
       adapter: whiskyNotesAdapter,
       sink: externalReviewSink,
-      authorize: async ({ externalSiteId, externalSiteType }) => {
-        await requireExternalReviewSourceCapability(
-          db,
-          { id: externalSiteId, type: externalSiteType },
-          "allowFetching",
-        );
-      },
     }),
   ],
 });

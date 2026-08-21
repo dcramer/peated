@@ -170,7 +170,6 @@ test("runs the bounded WhiskyNotes adapter through the production runtime", asyn
     .update(externalReviewSourcePolicies)
     .set({
       publicationMode: "review_only",
-      allowFetching: true,
       allowLlmProcessing: false,
       allowScoreDisplay: true,
       allowSummaryDisplay: false,

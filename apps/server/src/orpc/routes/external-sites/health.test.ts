@@ -233,7 +233,6 @@ test("health details show review inventory and blocked review policy", async ({
     },
     reviewPolicy: {
       publicationMode: "disabled",
-      allowFetching: false,
     },
   });
 });

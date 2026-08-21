@@ -226,7 +226,7 @@ Every retry MUST reacquire a target permit. The system MUST NOT retry 400, 401,
 The system SHALL evaluate fresh parsed robots rules for the stable Peated user
 agent before requesting public HTML. Robots state SHALL be scoped to an exact
 origin and cached in SQL with a bounded expiry. Robots decisions MUST only
-restrict access and MUST NOT grant source authorization.
+control crawler access. They do not control content processing or display.
 
 #### Scenario: Robots explicitly disallows a path
 
@@ -251,25 +251,7 @@ restrict access and MUST NOT grant source authorization.
 - **WHEN** an origin is explicitly configured as a non-crawler API with
   `not_applicable` robots mode and a code rationale
 - **THEN** the runtime skips robots evaluation while still enforcing every
-  traffic and source authorization rule
-
-### Requirement: Publisher permission remains a separate prerequisite
-
-The scraper runtime MUST allow a source-specific authorization boundary to
-refuse a run before adapter execution, and it MUST NOT treat target registration
-or robots permission as authorization to fetch or use publisher content.
-
-#### Scenario: Review source lacks fetching permission
-
-- **WHEN** a registered review source has a valid target and permissive robots
-  rules but its source policy disallows fetching
-- **THEN** the run stops before adapter or network execution
-
-#### Scenario: Permission is revoked during a queued wait
-
-- **WHEN** a deferred review run becomes eligible after its source permission
-  was revoked
-- **THEN** the runtime rechecks authorization and refuses network access
+  traffic rule
 
 ### Requirement: Scraper execution is isolated from general background work
 

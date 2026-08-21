@@ -49,7 +49,6 @@ export const ExternalReviewPublicationModeSchema = z.enum([
 export const ExternalReviewSourcePolicySchema = z.object({
   externalSiteId: z.number().int().positive(),
   publicationMode: ExternalReviewPublicationModeSchema,
-  allowFetching: z.boolean(),
   allowLlmProcessing: z.boolean(),
   allowScoreDisplay: z.boolean(),
   allowSummaryDisplay: z.boolean(),
@@ -103,7 +102,6 @@ const DisabledExternalReviewSourcePolicyInputSchema = z
 const EnabledExternalReviewSourcePolicyInputSchema = z
   .object({
     publicationMode: z.enum(["review_only", "automatic"]),
-    allowFetching: z.literal(true),
     allowLlmProcessing: z.boolean(),
     allowScoreDisplay: z.boolean(),
     allowSummaryDisplay: z.boolean(),

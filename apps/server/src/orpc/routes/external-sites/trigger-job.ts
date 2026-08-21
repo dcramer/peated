@@ -7,7 +7,6 @@ import {
   ExternalSiteTypeEnum,
 } from "@peated/server/schemas";
 import {
-  ExternalReviewSourcePolicyError,
   ExternalSiteRunActiveError,
   queueManualExternalSiteRun,
   ScraperTargetDisabledError,
@@ -58,9 +57,6 @@ export default procedure
         error instanceof ScraperTargetDisabledError
       ) {
         throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      if (error instanceof ExternalReviewSourcePolicyError) {
-        throw errors.FORBIDDEN({ message: error.message, cause: error });
       }
       throw error;
     }

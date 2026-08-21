@@ -168,7 +168,6 @@ const SourceDefinitionSchema = z
     observationSchema: ZodSchemaSchema,
     adapter: FunctionSchema,
     sink: FunctionSchema,
-    authorize: FunctionSchema.optional(),
   })
   .strict();
 

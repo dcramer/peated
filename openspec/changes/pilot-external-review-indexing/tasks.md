@@ -6,8 +6,8 @@
       fixtures for disabled and review-only policies
 - [x] 1.3 Add moderator-only policy reads and updates with audit logging and
       tests for enablement, revocation, and unauthorized access
-- [x] 1.4 Enforce fetch policy at scheduled jobs, manual jobs, and the review
-      worker immediately before network access
+- [x] 1.4 Keep manual fetching independent from review publication policy and
+      enforce request controls and robots rules in the scraper runtime
 - [x] 1.5 Enforce LLM-processing and review-visibility capabilities when those
       consumers are introduced
 
@@ -88,8 +88,8 @@
       transient-content rule, rollback path, and pilot operating procedure
 - [x] 7.2 Run targeted server tests, web tests, server and web typechecks, lint,
       and formatting for the touched surface
-- [ ] 7.3 Manually QA moderator policy changes, hidden pilot reviews, and
-      Bottle-page referral links without fetching a disabled source
+- [ ] 7.3 Manually QA moderator policy changes, hidden pilot reviews, manual
+      fetching, and Bottle-page referral links
 - [x] 7.4 Validate the OpenSpec change and record remaining source-pilot
       tasks without weakening the disabled-by-default boundary. The second
       publisher and post-deploy manual QA remain.

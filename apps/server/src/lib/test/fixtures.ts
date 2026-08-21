@@ -976,7 +976,6 @@ export const EnabledExternalReviewSourcePolicy = async (
   return await ExternalReviewSourcePolicy(
     {
       publicationMode: "review_only",
-      allowFetching: true,
       allowLlmProcessing: true,
       allowScoreDisplay: true,
       allowSummaryDisplay: true,

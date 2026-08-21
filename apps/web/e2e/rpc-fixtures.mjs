@@ -569,7 +569,6 @@ export const priceSite = {
   reviewPolicy: {
     externalSiteId: 9901,
     publicationMode: "review_only",
-    allowFetching: true,
     allowLlmProcessing: false,
     allowScoreDisplay: true,
     allowSummaryDisplay: false,

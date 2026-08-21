@@ -1,6 +1,11 @@
 ## Context
 
-Scraper target enablement is code-owned and synchronized to SQL. Run admission currently verifies source registration and review-source authorization, but it does not verify target enablement. A worker discovers the disabled target only while acquiring the first request permit. When that first request is a robots refresh, the robots boundary converts the permanent local denial into a transient `robots_unavailable` deferral.
+Scraper target enablement is code-owned and synchronized to SQL. Run admission
+currently verifies source registration, but it does not verify target
+enablement. A worker discovers the disabled target only while acquiring the
+first request permit. When that first request is a robots refresh, the robots
+boundary converts the permanent local denial into a transient
+`robots_unavailable` deferral.
 
 ## Goals / Non-Goals
 

@@ -59,7 +59,6 @@ test("core runtime files do not compose production registry or worker infrastruc
     "robots.ts",
     "runs.ts",
     "session.ts",
-    "sourcePolicy.ts",
     "syncDefinitions.ts",
     "types.ts",
   ];

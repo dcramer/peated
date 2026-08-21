@@ -19,8 +19,6 @@ visible:
 - `runs.ts`, `session.ts`, `http.ts`, `robots.ts`, and `coordinator.ts` own core
   execution without importing production registry or worker infrastructure;
 - `registry.ts` is the production composition root;
-- `sourcePolicy.ts` owns review-source authorization before queueing and before
-  each request;
 - `adapters/legacy/` contains migrated source implementations that still use
   the compatibility bridge in `legacy/`;
 - native adapters use only their injected session;
@@ -41,9 +39,7 @@ It owns source policy, transient content, pilot review, and rollback.
    origin it may use and either enforce robots or record why robots do not
    apply.
 2. Define the source with its external-site type, allowed target keys, strict
-   cursor and observation schemas, request limit, adapter, and sink. Review
-   sources also provide an authorization hook; authorization is checked when a
-   run starts and again before every request.
+   cursor and observation schemas, request limit, adapter, and sink.
 3. Make the adapter use only its injected session. Checkpoint after a page or
    partition is safely emitted, before requesting the next one. A cursor must
    describe the next safe work and remain valid if the prior page is replayed.
@@ -72,8 +68,8 @@ the code-owned definition.
   latest cursor were persisted.
 - `queued` with `nextAttemptAt` means the same run was durably deferred for a
   budget, spacing, quota, lease, or remote cooldown. It is not a failure.
-- `failed` means validation, authorization, robots, configuration, persistence,
-  or an unexpected remote failure was terminal for that run. Stored errors are
+- `failed` means validation, robots, configuration, persistence, or an
+  unexpected remote failure was terminal for that run. Stored errors are
   bounded; detailed unexpected failures belong in Sentry.
 
 `sliceRequestCount` resets when a deferred run is reclaimed. `requestCount`,

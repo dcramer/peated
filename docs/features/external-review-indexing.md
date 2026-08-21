@@ -12,13 +12,11 @@ publisher robots rules and public terms that must be checked before enablement.
 
 ## Source Policy Boundary
 
-Every external review source starts disabled. Missing policy has the same
-effect as disabled policy. Robots rules can restrict a request, but they never
-enable a capability.
+Every external review source starts with its content capabilities disabled.
+Missing policy has the same effect as disabled policy.
 
 The source policy has these independent capabilities:
 
-- `allowFetching` permits public-page requests.
 - `allowLlmProcessing` permits publisher text to enter the summary model.
 - `allowScoreDisplay` permits display of the publisher's native score.
 - `allowSummaryDisplay` permits display of a current Peated summary. This also
@@ -27,13 +25,11 @@ The source policy has these independent capabilities:
 
 The runtime checks source policy at each owning boundary:
 
-| Operation                              | Owning check                                                                    |
-| -------------------------------------- | ------------------------------------------------------------------------------- |
-| Queue a manual or scheduled review run | The scraper lifecycle requires `allowFetching`.                                 |
-| Make each remote request               | The scraper session checks `allowFetching` again, then checks robots rules.     |
-| Send review text to a model            | Summary generation checks `allowLlmProcessing` immediately before model access. |
-| Return a native score or summary       | The review serializer checks the matching display capability.                   |
-| Return a fetched review to the public  | The review must be visible and the source must use `automatic` mode.            |
+| Operation                             | Owning check                                                                    |
+| ------------------------------------- | ------------------------------------------------------------------------------- |
+| Send review text to a model           | Summary generation checks `allowLlmProcessing` immediately before model access. |
+| Return a native score or summary      | The review serializer checks the matching display capability.                   |
+| Return a fetched review to the public | The review must be visible and the source must use `automatic` mode.            |
 
 The moderator policy API accepts `disabled`, `review_only`, and `automatic`.
 The policy update is moderator-only and audit logged. A transition to
@@ -43,6 +39,10 @@ Bottle. Unresolved and retired Bottle assignments remain hidden.
 Article ingestion and policy updates serialize on the source record. A refresh
 can publish a review when it gains its first active Bottle assignment. A refresh
 does not make an already matched review visible after a moderator hides it.
+
+Source policy does not control fetching. An admin can manually run a registered
+scraper when its targets are enabled. The scraper runtime still enforces target
+ownership, request limits, spacing, quotas, cooldowns, and robots rules.
 
 ## Source Adapter Contract
 
@@ -138,15 +138,15 @@ before adding shared adapter behavior.
 
 ## Stop And Roll Back
 
-Set the source policy to `disabled` first. This clears all capabilities. It
-blocks new runs and the next request in an active run. A request already in
-flight can finish. Public fetched reviews disappear, and native scores and
+Set the source policy to `disabled` first. This clears content-processing and
+display capabilities. Public fetched reviews disappear, and native scores and
 summaries are no longer returned. The policy change stays in the audit log.
+It does not block manual fetching.
 
-Do not delete review rows as the first response. Keep them hidden while the
-operator checks the adapter, Bottle matches, and request behavior. Disable the
-code-owned target or remove the adapter registration in a follow-up deployment
-when the adapter itself is unsafe.
+To stop remote requests, disable the code-owned scraper target. Do not delete
+review rows as the first response. Keep them hidden while the operator checks
+the adapter, Bottle matches, and request behavior. Remove the adapter
+registration in a follow-up deployment when the adapter itself is unsafe.
 
 The article/review schema cutover is complete. Do not restore an application
 version that reads the removed legacy review columns. Use an application

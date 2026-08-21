@@ -143,9 +143,6 @@ export default function ScraperReadiness({ site }: { site: Site }) {
                 Publication: {reviewPolicy.publicationMode.replace("_", " ")}
               </div>
             </div>
-            <Status color={reviewPolicy.allowFetching ? "green" : "red"}>
-              Fetching {reviewPolicy.allowFetching ? "allowed" : "blocked"}
-            </Status>
           </div>
           <div className="text-muted mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
             <span>
