@@ -3,9 +3,17 @@ import { load as cheerio } from "cheerio";
 import { vi } from "vitest";
 import type { ScraperObservation, ScraperSession } from "../types";
 import {
+  type WhiskyAdvocateCursor,
   type WhiskyAdvocateObservation,
   whiskyAdvocateAdapter,
+  WhiskyAdvocateCursorSchema,
 } from "./whiskyAdvocate";
+
+test("accepts a cursor stored by the previous adapter", () => {
+  expect(
+    WhiskyAdvocateCursorSchema.parse({ processedIssues: ["Winter 2023"] }),
+  ).toEqual({ processedIssues: ["Winter 2023"] });
+});
 
 test("fetches the latest issue and preserves Bottle identity facts", async () => {
   const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
@@ -29,7 +37,10 @@ test("fetches the latest issue and preserves Bottle identity facts", async () =>
     headers: {},
     body: url.search.includes("custom_rating_issue") ? reviewHtml : issueHtml,
   }));
-  const session: ScraperSession<null, WhiskyAdvocateObservation> = {
+  const session: ScraperSession<
+    WhiskyAdvocateCursor,
+    WhiskyAdvocateObservation
+  > = {
     request,
     emit: async (observation) => {
       observations.push(observation);
@@ -65,7 +76,10 @@ test("fails when the newest issue has no review results", async () => {
     headers: {},
     body: issueHtml,
   }));
-  const session: ScraperSession<null, WhiskyAdvocateObservation> = {
+  const session: ScraperSession<
+    WhiskyAdvocateCursor,
+    WhiskyAdvocateObservation
+  > = {
     request,
     emit: vi.fn(),
     checkpoint: vi.fn(),

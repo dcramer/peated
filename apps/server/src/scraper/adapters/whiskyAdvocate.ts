@@ -9,7 +9,11 @@ import type { ScraperAdapter } from "../types";
 const ORIGIN = "https://whiskyadvocate.com";
 const TARGET = "whiskyadvocate";
 
-export const WhiskyAdvocateCursorSchema = z.null();
+export const WhiskyAdvocateCursorSchema = z
+  .object({ processedIssues: z.array(z.string().min(1)) })
+  .strict();
+
+export type WhiskyAdvocateCursor = z.infer<typeof WhiskyAdvocateCursorSchema>;
 
 export const WhiskyAdvocateObservationSchema = z
   .object({
@@ -108,7 +112,7 @@ export async function parseReviews(
 }
 
 export const whiskyAdvocateAdapter: ScraperAdapter<
-  z.infer<typeof WhiskyAdvocateCursorSchema>,
+  WhiskyAdvocateCursor,
   WhiskyAdvocateObservation
 > = async ({ session }) => {
   const issueListUrl = new URL("/ratings-reviews", ORIGIN);
