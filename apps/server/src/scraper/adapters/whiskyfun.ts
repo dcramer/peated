@@ -8,6 +8,11 @@ import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { ScraperAdapter } from "../types";
+import {
+  currentReviewCursorSchema,
+  processCurrentReviews,
+} from "./currentReviews";
+import { parseDate } from "./dates";
 
 const ORIGIN = "https://www.whiskyfun.com";
 const TARGET = "whiskyfun";
@@ -24,11 +29,7 @@ const WhiskyfunFeedArticleSchema = z
   })
   .strict();
 
-export const WhiskyfunCursorSchema = z
-  .object({
-    processedArticleUrls: z.array(z.url()).max(MAX_FEED_ITEMS),
-  })
-  .strict();
+export const WhiskyfunCursorSchema = currentReviewCursorSchema(MAX_FEED_ITEMS);
 
 export const WhiskyfunObservationSchema = ReviewArticleIngestionSchema;
 
@@ -70,8 +71,8 @@ export function discoverWhiskyfunArticles(
     const rawPublishedAt = normalizeText(
       $(item).find("pubDate").first().text(),
     );
-    const publishedAt = new Date(rawPublishedAt);
-    if (!rawPublishedAt || Number.isNaN(publishedAt.getTime())) {
+    const publishedAt = parseDate(rawPublishedAt);
+    if (!publishedAt) {
       throw new Error("Whiskyfun feed article date is invalid.");
     }
 
@@ -125,7 +126,7 @@ function reviewSourceKey(canonicalUrl: string, heading: string): string {
 export function parseWhiskyfunArticle(
   data: string,
   feedArticle: WhiskyfunFeedArticle,
-): WhiskyfunObservation {
+): WhiskyfunObservation | null {
   const article = WhiskyfunFeedArticleSchema.parse(feedArticle);
   const canonicalUrl = articleUrl(article.canonicalUrl);
   if (!canonicalUrl) throw new Error("Invalid Whiskyfun article URL.");
@@ -136,6 +137,7 @@ export function parseWhiskyfunArticle(
     null;
   const reviews: ReviewArticleObservation["reviews"] = [];
   const reviewTexts: Record<string, string> = {};
+  let hasReviewCandidate = false;
 
   $("td.TextenormalNEW").each((_, element) => {
     const heading = $(element)
@@ -144,6 +146,7 @@ export function parseWhiskyfunArticle(
       .map((candidate) => bottleName($(candidate).text()))
       .find((candidate) => candidate !== null);
     if (!heading) return;
+    hasReviewCandidate = true;
 
     const reviewText = normalizeText($(element).text());
     const reviewScore = score(reviewText);
@@ -162,6 +165,7 @@ export function parseWhiskyfunArticle(
   });
 
   if (reviews.length === 0) {
+    if (!hasReviewCandidate) return null;
     throw new Error("Whiskyfun article contains no scored reviews.");
   }
 
@@ -188,30 +192,12 @@ export const whiskyfunAdapter: ScraperAdapter<
     url: new URL("/whatsnew.xml", ORIGIN),
   });
   const articles = discoverWhiskyfunArticles(feedResponse.body);
-  const currentArticleUrls = new Set(
-    articles.map(({ canonicalUrl }) => canonicalUrl),
-  );
-  const processedArticleUrls = new Set(
-    (cursor?.processedArticleUrls ?? []).filter((url) =>
-      currentArticleUrls.has(url),
-    ),
-  );
-
-  for (const article of articles) {
-    if (processedArticleUrls.has(article.canonicalUrl)) continue;
-    const articleResponse = await session.request({
-      target: TARGET,
-      url: new URL(article.canonicalUrl),
-    });
-    const observation = parseWhiskyfunArticle(articleResponse.body, article);
-    await session.emit({
-      sourceKey: observation.article.canonicalUrl,
-      itemCount: observation.article.reviews.length,
-      value: observation,
-    });
-    processedArticleUrls.add(article.canonicalUrl);
-    await session.checkpoint({
-      processedArticleUrls: [...processedArticleUrls],
-    });
-  }
+  await processCurrentReviews({
+    target: TARGET,
+    articles,
+    articleUrl: (article) => new URL(article.canonicalUrl),
+    cursor,
+    session,
+    parse: (response, article) => parseWhiskyfunArticle(response.body, article),
+  });
 };

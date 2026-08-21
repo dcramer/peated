@@ -62,6 +62,17 @@ A review adapter must:
 6. Use deterministic parser fixtures for discovery, extraction, pagination,
    and multi-bottle articles.
 
+For a bounded current-review list, use the shared current-review lifecycle. It
+removes stale cursor URLs, emits before checkpointing, and checkpoints an item
+that the source parser explicitly identifies as a non-review. A malformed
+review-shaped page must still fail without a checkpoint.
+
+Read each publisher fact from the smallest element that owns it. Do not read a
+container when it can include fallback markup, scripts, captions, or unrelated
+metadata. Prefer structured date attributes and canonical URL components when
+the publisher supplies them. Use the shared date parser after the adapter
+extracts the publisher value and any fallback year.
+
 The adapter emits one strict article observation with:
 
 - canonical URL, title, optional issue, optional publication date, and content

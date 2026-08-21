@@ -6,6 +6,7 @@ import { load as cheerio, type CheerioAPI } from "cheerio";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { ScraperAdapter } from "../types";
+import { parseDate } from "./dates";
 
 const ORIGIN = "https://www.whiskynotes.be";
 const TARGET = "whiskynotes";
@@ -124,9 +125,9 @@ export function parseWhiskyNotesArticle(
     .find("time.entry-date.published")
     .first()
     .attr("datetime");
-  const publishedAt = publishedValue ? new Date(publishedValue) : null;
+  const publishedAt = publishedValue ? parseDate(publishedValue) : null;
   if (!title) throw new Error("WhiskyNotes article title is missing.");
-  if (publishedAt && Number.isNaN(publishedAt.getTime())) {
+  if (publishedValue && !publishedAt) {
     throw new Error("WhiskyNotes article date is invalid.");
   }
 

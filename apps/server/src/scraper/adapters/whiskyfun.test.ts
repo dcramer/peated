@@ -54,6 +54,7 @@ test("extracts scored reviews with stable source keys", async () => {
     html.replaceAll("Dailuaine 5 yo", "Dailuaine   5 yo"),
     article,
   );
+  if (!parsed || !reparsed) throw new Error("Expected scored reviews.");
 
   expect(parsed.article).toMatchObject({
     canonicalUrl: SECOND_URL,
@@ -84,6 +85,70 @@ test("extracts scored reviews with stable source keys", async () => {
   expect(Object.values(parsed.reviewTexts).join(" ")).not.toContain(
     "Unscored introduction",
   );
+});
+
+test("returns no observation for an editorial feed item", () => {
+  expect(
+    parseWhiskyfunArticle(
+      '<table><tr><td class="TextenormalNEW">Publisher anniversary article.</td></tr></table>',
+      {
+        canonicalUrl:
+          "https://www.whiskyfun.com/2026/Publisher-anniversary.html",
+        title: "Publisher anniversary",
+        publishedAt: new Date("2026-08-18T00:00:00.000Z"),
+      },
+    ),
+  ).toBeNull();
+});
+
+test("rejects a review-shaped article without a score", () => {
+  expect(() =>
+    parseWhiskyfunArticle(
+      '<table><tr><td class="TextenormalNEW"><span class="textegrandfoncegras">Example 10 yo (46%, Sample Bottler)</span></td></tr></table>',
+      {
+        canonicalUrl: "https://www.whiskyfun.com/2026/Example-review.html",
+        title: "Example review",
+        publishedAt: new Date("2026-08-18T00:00:00.000Z"),
+      },
+    ),
+  ).toThrow("Whiskyfun article contains no scored reviews.");
+});
+
+test("checkpoints an editorial item and continues to reviews", async () => {
+  const editorialUrl =
+    "https://www.whiskyfun.com/2026/Publisher-anniversary.html";
+  const feed = `<?xml version="1.0"?><rss><channel>
+    <item><title>Publisher anniversary</title><link>${editorialUrl}</link><pubDate>Tue, 18 Aug 2026 00:00:00 GMT</pubDate></item>
+    <item><title>A trio of Dailuaine</title><link>${SECOND_URL}</link><pubDate>Wed, 19 Aug 2026 08:49:00 +0200</pubDate></item>
+  </channel></rss>`;
+  const review = await loadFixture("whiskyfun", "article.html");
+  const emit = vi.fn();
+  const checkpoint = vi.fn();
+  const request = vi.fn(async ({ url }: { url: URL }) => ({
+    url,
+    status: 200,
+    headers: {},
+    body:
+      url.pathname === "/whatsnew.xml"
+        ? feed
+        : url.href === editorialUrl
+          ? '<table><tr><td class="TextenormalNEW">Publisher anniversary article.</td></tr></table>'
+          : review,
+  }));
+  const session: ScraperSession<WhiskyfunCursor, WhiskyfunObservation> = {
+    request,
+    emit,
+    checkpoint,
+    remainingRequests: () => 30,
+  };
+
+  await whiskyfunAdapter({ cursor: null, session });
+
+  expect(emit).toHaveBeenCalledTimes(1);
+  expect(checkpoint.mock.calls.map(([cursor]) => cursor)).toEqual([
+    { processedArticleUrls: [editorialUrl] },
+    { processedArticleUrls: [editorialUrl, SECOND_URL] },
+  ]);
 });
 
 test("resumes without requesting a completed article", async () => {

@@ -6,8 +6,13 @@ import {
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
-import { z } from "zod";
+import type { z } from "zod";
 import type { ScraperAdapter } from "../types";
+import {
+  currentReviewCursorSchema,
+  processCurrentReviews,
+} from "./currentReviews";
+import { parseDate } from "./dates";
 
 // This adapter owns Dramface-specific discovery and parsing. The shared
 // scraper runtime owns every remote request and the shared sink owns storage.
@@ -18,28 +23,8 @@ const ARTICLE_PATH = /^\/all-reviews\/\d{4}\/[^/]+$/;
 const REVIEW_HEADING =
   /^Review(?:\s+\d+\s*\/\s*\d+)?(?:\s*-\s*(?<reviewer>.+))?$/iu;
 const TASTING_HEADING = /^(?:Nose|Palate|Finish|The Dregs)\s*:?$/iu;
-const MONTHS = new Map(
-  [
-    "jan",
-    "feb",
-    "mar",
-    "apr",
-    "may",
-    "jun",
-    "jul",
-    "aug",
-    "sep",
-    "oct",
-    "nov",
-    "dec",
-  ].map((month, index) => [month, index]),
-);
-
-export const DramfaceCursorSchema = z
-  .object({
-    processedArticleUrls: z.array(z.url()).max(MAX_INDEX_ARTICLES),
-  })
-  .strict();
+export const DramfaceCursorSchema =
+  currentReviewCursorSchema(MAX_INDEX_ARTICLES);
 
 export const DramfaceObservationSchema = ReviewArticleIngestionSchema;
 
@@ -75,32 +60,14 @@ export function discoverDramfaceArticles(data: string): URL[] {
   return [...articles.values()].slice(0, MAX_INDEX_ARTICLES);
 }
 
-function publishedAt(value: string): Date {
-  const match =
-    /^(?<day>\d{1,2})\s+(?<month>[A-Z][a-z]{2}),?\s+(?<year>\d{4})$/u.exec(
-      normalizeText(value),
-    );
-  const month = match?.groups?.month
-    ? MONTHS.get(match.groups.month.toLocaleLowerCase("en"))
-    : undefined;
-  const day = match?.groups?.day ? Number(match.groups.day) : Number.NaN;
-  const year = match?.groups?.year ? Number(match.groups.year) : Number.NaN;
-  if (
-    month === undefined ||
-    !Number.isInteger(day) ||
-    !Number.isInteger(year)
-  ) {
-    throw new Error("Dramface article date is invalid.");
-  }
-
-  const date = new Date(Date.UTC(year, month, day));
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month ||
-    date.getUTCDate() !== day
-  ) {
-    throw new Error("Dramface article date is invalid.");
-  }
+function publishedAt(value: string, canonicalUrl: URL): Date {
+  const pathYear = /^\/all-reviews\/(?<year>\d{4})\//u.exec(
+    canonicalUrl.pathname,
+  )?.groups?.year;
+  const date = parseDate(value, {
+    fallbackYear: pathYear ? Number(pathYear) : undefined,
+  });
+  if (!date) throw new Error("Dramface article date is invalid.");
   return date;
 }
 
@@ -158,7 +125,8 @@ export function parseDramfaceArticle(
   const title = normalizeText(article.find(".blog-item-title").first().text());
   const articleReviewerName =
     normalizeText(article.find(".blog-author-name").first().text()) || null;
-  const dateText = article.find("time.dt-published").first().text();
+  const dateElement = article.find("time.dt-published").first();
+  const dateText = dateElement.attr("datetime") ?? dateElement.text();
   if (!title) throw new Error("Dramface article title is missing.");
   if (!dateText) throw new Error("Dramface article date is missing.");
 
@@ -238,7 +206,7 @@ export function parseDramfaceArticle(
       canonicalUrl: canonicalUrl.href,
       title,
       issue: null,
-      publishedAt: publishedAt(dateText),
+      publishedAt: publishedAt(dateText, canonicalUrl),
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       reviews,
     },
@@ -255,28 +223,12 @@ export const dramfaceAdapter: ScraperAdapter<
     url: new URL("/all-reviews", ORIGIN),
   });
   const articleUrls = discoverDramfaceArticles(indexResponse.body);
-  const currentArticleUrls = new Set(articleUrls.map((url) => url.href));
-  const processedArticleUrls = new Set(
-    (cursor?.processedArticleUrls ?? []).filter((url) =>
-      currentArticleUrls.has(url),
-    ),
-  );
-
-  for (const url of articleUrls) {
-    if (processedArticleUrls.has(url.href)) continue;
-    const articleResponse = await session.request({ target: TARGET, url });
-    const observation = parseDramfaceArticle(
-      articleResponse.body,
-      articleResponse.url,
-    );
-    await session.emit({
-      sourceKey: observation.article.canonicalUrl,
-      itemCount: observation.article.reviews.length,
-      value: observation,
-    });
-    processedArticleUrls.add(url.href);
-    await session.checkpoint({
-      processedArticleUrls: [...processedArticleUrls],
-    });
-  }
+  await processCurrentReviews({
+    target: TARGET,
+    articles: articleUrls,
+    articleUrl: (url) => url,
+    cursor,
+    session,
+    parse: (response) => parseDramfaceArticle(response.body, response.url),
+  });
 };

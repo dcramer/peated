@@ -5,8 +5,13 @@ import {
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
-import { z } from "zod";
+import type { z } from "zod";
 import type { ScraperAdapter } from "../types";
+import {
+  currentReviewCursorSchema,
+  processCurrentReviews,
+} from "./currentReviews";
+import { parseDate } from "./dates";
 
 // This adapter owns The Whiskey Reviewer parsing. The shared scraper runtime
 // owns every remote request and the shared review sink owns storage.
@@ -31,11 +36,8 @@ const GRADE_VALUES = {
   F: 0,
 } as const;
 
-export const WhiskeyReviewerCursorSchema = z
-  .object({
-    processedArticleUrls: z.array(z.url()).max(MAX_CURRENT_ARTICLES),
-  })
-  .strict();
+export const WhiskeyReviewerCursorSchema =
+  currentReviewCursorSchema(MAX_CURRENT_ARTICLES);
 
 export const WhiskeyReviewerObservationSchema = ReviewArticleIngestionSchema;
 
@@ -87,19 +89,10 @@ function publishedAt(url: URL): Date | null {
   const year = Number(pathMatch.groups.year);
   const pathMonth = Number(pathMatch.groups.month);
   const month = Number(dateMatch.groups.month);
-  const day = Number(dateMatch.groups.day);
   const shortYear = Number(dateMatch.groups.year);
   if (year % 100 !== shortYear || pathMonth !== month) return null;
 
-  const date = new Date(Date.UTC(year, month - 1, day));
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
-    return null;
-  }
-  return date;
+  return parseDate(`${year}-${dateMatch.groups.month}-${dateMatch.groups.day}`);
 }
 
 function reviewGrade(value: string) {
@@ -219,28 +212,13 @@ export const whiskeyReviewerAdapter: ScraperAdapter<
     url: new URL("/", ORIGIN),
   });
   const articleUrls = discoverWhiskeyReviewerArticles(homepageResponse.body);
-  const currentArticleUrls = new Set(articleUrls.map((url) => url.href));
-  const processedArticleUrls = new Set(
-    (cursor?.processedArticleUrls ?? []).filter((url) =>
-      currentArticleUrls.has(url),
-    ),
-  );
-
-  for (const url of articleUrls) {
-    if (processedArticleUrls.has(url.href)) continue;
-    const articleResponse = await session.request({ target: TARGET, url });
-    const observation = parseWhiskeyReviewerArticle(
-      articleResponse.body,
-      articleResponse.url,
-    );
-    await session.emit({
-      sourceKey: observation.article.canonicalUrl,
-      itemCount: 1,
-      value: observation,
-    });
-    processedArticleUrls.add(url.href);
-    await session.checkpoint({
-      processedArticleUrls: [...processedArticleUrls],
-    });
-  }
+  await processCurrentReviews({
+    target: TARGET,
+    articles: articleUrls,
+    articleUrl: (url) => url,
+    cursor,
+    session,
+    parse: (response) =>
+      parseWhiskeyReviewerArticle(response.body, response.url),
+  });
 };

@@ -11,6 +11,7 @@ import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { ScraperAdapter } from "../types";
+import { parseDate } from "./dates";
 
 const ORIGIN = "https://whiskyadvocate.com";
 const TARGET = "whiskyadvocate";
@@ -67,10 +68,8 @@ export function parseReviewPublishedAt(data: string): Date | null {
   const templateValue = rawValue.match(
     /^\{\{\s*(?<value>.+?)\s*\|\s*iso8601\s*\}\}$/iu,
   )?.groups?.value;
-  const publishedAt = new Date(
-    templateValue ? `${templateValue} UTC` : rawValue,
-  );
-  if (Number.isNaN(publishedAt.getTime())) {
+  const publishedAt = parseDate(templateValue ?? rawValue);
+  if (!publishedAt) {
     throw new Error("Whisky Advocate review date is invalid.");
   }
   return publishedAt;
