@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  externalReviewSourcePolicies,
-  externalSiteRuns,
-  externalSites,
-} from "@peated/server/db/schema";
+import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
 import {
@@ -12,8 +8,6 @@ import {
   type ScraperEnqueue,
 } from "./lifecycle";
 import { scraperRegistry } from "./registry";
-import { executeScraperRun } from "./runs";
-import { ExternalReviewSourcePolicyError } from "./sourcePolicy";
 
 function lifecycle(enqueue: ScraperEnqueue) {
   return createScraperLifecycle({ registry: scraperRegistry, enqueue });
@@ -84,35 +78,11 @@ test("manual run is attributed, dispatched deterministically, and does not move 
   expect(storedSite?.lastRunAt).toBeNull();
 });
 
-test("review runs require the fetching capability before dispatch", async ({
+test("manual review runs do not require a publication policy", async ({
   fixtures,
 }) => {
   const requestedBy = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  const enqueue = vi.fn(async () => undefined);
-
-  await expect(
-    queueManualExternalSiteRun({
-      site,
-      requestedById: requestedBy.id,
-      enqueue,
-    }),
-  ).rejects.toBeInstanceOf(ExternalReviewSourcePolicyError);
-
-  const runs = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.externalSiteId, site.id));
-  expect(runs).toHaveLength(0);
-  expect(enqueue).not.toHaveBeenCalled();
-});
-
-test("enabled review runs are dispatched", async ({ fixtures }) => {
-  const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.EnabledExternalReviewSourcePolicy({
-    externalSiteId: site.id,
-  });
   const enqueue = vi.fn(async () => undefined);
 
   const run = await queueManualExternalSiteRun({
@@ -123,46 +93,6 @@ test("enabled review runs are dispatched", async ({ fixtures }) => {
 
   expect(run.status).toBe("queued");
   expect(enqueue).toHaveBeenCalledOnce();
-});
-
-test("worker rechecks the capability after a review run is queued", async ({
-  fixtures,
-}) => {
-  const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.EnabledExternalReviewSourcePolicy({
-    externalSiteId: site.id,
-  });
-  const run = await queueManualExternalSiteRun({
-    site,
-    requestedById: requestedBy.id,
-    enqueue: async () => undefined,
-  });
-  await db
-    .update(externalReviewSourcePolicies)
-    .set({
-      publicationMode: "disabled",
-      allowFetching: false,
-      allowLlmProcessing: false,
-      allowScoreDisplay: false,
-      allowSummaryDisplay: false,
-    })
-    .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
-  const fetchImpl = vi.fn<typeof fetch>();
-
-  await expect(
-    executeScraperRun(
-      { runId: run.id },
-      { registry: scraperRegistry, fetchImpl },
-    ),
-  ).rejects.toBeInstanceOf(ExternalReviewSourcePolicyError);
-
-  const [storedRun] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  expect(storedRun).toMatchObject({ status: "failed", itemCount: null });
-  expect(fetchImpl).not.toHaveBeenCalled();
 });
 
 test("active run prevents overlap", async ({ fixtures }) => {

@@ -43,11 +43,6 @@ export type ScraperSink<TObservation> = (input: {
   observation: ScraperObservation<TObservation>;
 }) => Promise<void>;
 
-export type ScraperAuthorization = (input: {
-  externalSiteId: number;
-  externalSiteType: ExternalSiteType;
-}) => Promise<void>;
-
 export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   key: string;
   externalSiteType: ExternalSiteType;
@@ -57,7 +52,6 @@ export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   observationSchema: z.ZodType<TObservation>;
   adapter: ScraperAdapter<TCursor, TObservation>;
   sink: ScraperSink<TObservation>;
-  authorize?: ScraperAuthorization;
 };
 
 export type RobotsPolicy =

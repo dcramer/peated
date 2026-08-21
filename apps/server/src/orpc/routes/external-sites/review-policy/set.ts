@@ -30,7 +30,6 @@ function auditFields(
   return policy
     ? {
         publicationMode: policy.publicationMode,
-        allowFetching: policy.allowFetching,
         allowLlmProcessing: policy.allowLlmProcessing,
         allowScoreDisplay: policy.allowScoreDisplay,
         allowSummaryDisplay: policy.allowSummaryDisplay,
@@ -79,7 +78,6 @@ export default procedure
           ? {
               externalSiteId: site.id,
               publicationMode: "disabled" as const,
-              allowFetching: false,
               allowLlmProcessing: false,
               allowScoreDisplay: false,
               allowSummaryDisplay: false,

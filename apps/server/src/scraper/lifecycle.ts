@@ -10,7 +10,6 @@ import {
   findScraperSourceBySiteType,
   requireEnabledScraperTargets,
 } from "./definitions";
-import { requireExternalReviewFetchBeforeQueue } from "./sourcePolicy";
 import type { ScraperRegistry } from "./types";
 
 const STALE_EXTERNAL_SITE_RUN_MS = 10 * 60_000;
@@ -241,8 +240,6 @@ async function queueManualExternalSiteRun({
   registry: ScraperRegistry;
   enqueue: ScraperEnqueue;
 }) {
-  await requireExternalReviewFetchBeforeQueue(db, site);
-
   let run: ExternalSiteRun;
   try {
     run = await insertRun(db, site, "manual", registry, requestedById);
@@ -275,8 +272,6 @@ async function queueScheduledExternalSiteRun(
       ) {
         return null;
       }
-
-      await requireExternalReviewFetchBeforeQueue(tx, site);
 
       const run = await insertRun(tx, site, "scheduled", registry);
       await tx

@@ -74,7 +74,6 @@ export function serializeExternalReviewSourcePolicy(
   return {
     externalSiteId,
     publicationMode: policy?.publicationMode ?? "disabled",
-    allowFetching: policy?.allowFetching ?? false,
     allowLlmProcessing: policy?.allowLlmProcessing ?? false,
     allowScoreDisplay: policy?.allowScoreDisplay ?? false,
     allowSummaryDisplay: policy?.allowSummaryDisplay ?? false,

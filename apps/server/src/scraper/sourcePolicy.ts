@@ -1,11 +1,9 @@
-import { isExternalReviewSiteType } from "@peated/server/constants";
 import type { AnyDatabase } from "@peated/server/db";
 import { externalReviewSourcePolicies } from "@peated/server/db/schema";
 import type { ExternalSiteType } from "@peated/server/types";
 import { eq } from "drizzle-orm";
 
 export type ExternalReviewSourceCapability =
-  | "allowFetching"
   | "allowLlmProcessing"
   | "allowScoreDisplay"
   | "allowSummaryDisplay";
@@ -19,10 +17,7 @@ export class ExternalReviewSourcePolicyError extends Error {
   }
 }
 
-/**
- * This is the runtime capability boundary for publisher content. Callers must
- * still honor robots.txt; robots rules cannot enable a capability.
- */
+/** This is the runtime boundary for processing and displaying publisher content. */
 export async function requireExternalReviewSourceCapability(
   connection: AnyDatabase,
   site: { id: number; type: ExternalSiteType },
@@ -37,17 +32,4 @@ export async function requireExternalReviewSourceCapability(
   if (!policy || policy.publicationMode === "disabled" || !policy[capability]) {
     throw new ExternalReviewSourcePolicyError(site.type, capability);
   }
-}
-
-/** Refuses review-source runs before they create durable queue work. */
-export async function requireExternalReviewFetchBeforeQueue(
-  connection: AnyDatabase,
-  site: { id: number; type: ExternalSiteType },
-) {
-  if (!isExternalReviewSiteType(site.type)) return;
-  await requireExternalReviewSourceCapability(
-    connection,
-    site,
-    "allowFetching",
-  );
 }

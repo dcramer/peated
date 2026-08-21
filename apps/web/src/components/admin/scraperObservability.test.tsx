@@ -47,7 +47,6 @@ const site = {
   reviewPolicy: {
     externalSiteId: 1,
     publicationMode: "disabled",
-    allowFetching: false,
     allowLlmProcessing: false,
     allowScoreDisplay: false,
     allowSummaryDisplay: false,
@@ -94,7 +93,6 @@ describe("scraper observability", () => {
           enabled: true,
         })),
       },
-      reviewPolicy: { ...site.reviewPolicy, allowFetching: true },
     };
 
     expect(getScraperRunAvailability(manualOnlySite)).toBeNull();
@@ -112,7 +110,7 @@ describe("scraper observability", () => {
     expect(html).toContain("Runtime readiness");
     expect(html).toContain("Disabled");
     expect(html).toContain("Robots: Unknown");
-    expect(html).toContain("Fetching blocked");
+    expect(html).toContain("Publication: disabled");
   });
 
   it("shows responsible-request and deferral telemetry", () => {

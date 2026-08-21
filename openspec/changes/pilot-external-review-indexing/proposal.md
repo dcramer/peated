@@ -15,8 +15,8 @@ without republishing the review.
   normalized 0-100 value where current consumers require it.
 - Store a short Peated-generated summary with source and model provenance, but
   do not persist or display full publisher article text or photography.
-- Require an explicit source policy before a source can fetch articles,
-  generate summaries, or publish reviews.
+- Require an explicit source policy before Peated can process article text,
+  display source content, or publish reviews.
 - Add one vertical pilot for up to two publishers, with WhiskyNotes for archive
   ingestion and the existing Whisky Advocate source for a bounded second
   pilot. Keep Dramface as a later multi-bottle candidate.

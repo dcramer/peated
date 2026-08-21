@@ -11,7 +11,6 @@ test("Whisky Advocate observations use article and source identity", async ({
   await fixtures.ExternalReviewSourcePolicy({
     externalSiteId: site.id,
     publicationMode: "review_only",
-    allowFetching: true,
     allowLlmProcessing: true,
     allowScoreDisplay: true,
     allowSummaryDisplay: false,

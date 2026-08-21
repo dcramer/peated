@@ -68,13 +68,12 @@ express article-level refresh or removal correctly.
 
 Add a review-source policy owned by `external_site`. It has a disabled,
 review-only, or automatic publication mode plus independent booleans for
-fetching public pages, processing article text with an LLM, displaying scores,
-and displaying generated summaries.
+processing article text with an LLM, displaying scores, and displaying
+generated summaries.
 
-All new policies default to disabled and no capability. The scheduler and
-manual job boundary both check the same policy before network access. The
-ingestion boundary rechecks display capabilities before making a review
-visible, so a caller cannot bypass policy by directly submitting parsed data.
+All new policies default to disabled and no content capability. The ingestion
+boundary checks display capabilities before making a review visible, so a
+caller cannot bypass policy by directly submitting parsed data.
 Changing a policy is a moderator-only operation and is audit logged.
 
 The moderator API permits automatic mode after the source passes its quality
@@ -82,9 +81,9 @@ gate. The transition publishes staged reviews only when they have an active
 resolved Bottle. Unresolved reviews remain hidden. A general policy-revision
 system is deferred until multiple revisions create a proven need.
 
-The policy records which capabilities Peated has enabled. The fetcher checks
-robots.txt on each run. Robots rules can further restrict crawling but cannot
-enable a stored capability.
+The policy records which content capabilities Peated has enabled. It does not
+control manual fetching. Registered targets, runtime request controls, and
+robots rules own network access.
 
 Alternative considered: keep source controls only in documentation or scraper
 constants. This was rejected because operational jobs need a single explicit
@@ -144,8 +143,8 @@ multi-bottle splitting, and acceptable Bottle-match precision. Automatic mode
 can then publish reviews with resolved active Bottles; unresolved or
 invalid Bottle assignments always remain hidden.
 
-Disabling a source stops fetching immediately and hides source reviews when the
-current policy no longer permits display.
+Disabling a source hides source reviews and blocks content processing when the
+current policy no longer permits it. It does not block manual fetching.
 
 Policy updates and article ingestion serialize on the source record. This keeps
 the publication mode used by an ingestion transaction consistent with a

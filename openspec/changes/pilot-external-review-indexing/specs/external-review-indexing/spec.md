@@ -3,27 +3,28 @@
 ### Requirement: Source policy gates every operation
 
 The system MUST maintain an explicit external-review policy for each source and
-MUST NOT fetch, process with an LLM, display scores, display summaries, or
-publish reviews unless the corresponding capability is enabled.
+MUST NOT process with an LLM, display scores, display summaries, or publish
+reviews unless the corresponding capability is enabled.
 
-#### Scenario: Disabled source is scheduled
+#### Scenario: Disabled source is fetched manually
 
-- **WHEN** a scheduled or manually triggered review job targets a disabled
-  source
-- **THEN** the system refuses network access and records that the source is not
-  enabled for fetching
+- **WHEN** an admin manually runs a registered review scraper with an enabled
+  target and a disabled or missing review policy
+- **THEN** the scraper may fetch within its request and robots controls
+- **AND** ingested reviews remain hidden with content capabilities disabled
 
 #### Scenario: Summary processing is disabled
 
-- **WHEN** a source policy permits article fetching but not LLM processing
+- **WHEN** a source adapter fetches an article but policy does not permit LLM
+  processing
 - **THEN** the system ingests permitted metadata without sending article text
   to a model or publishing a generated summary
 
 #### Scenario: Source is disabled
 
 - **WHEN** a moderator disables a source or removes a display capability
-- **THEN** future fetching stops and public reviews no longer expose the
-  revoked content type
+- **THEN** public reviews no longer expose the revoked content type
+- **AND** manual fetching remains available through the scraper runtime
 
 ### Requirement: Review articles own canonical article identity
 

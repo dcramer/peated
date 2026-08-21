@@ -20,11 +20,7 @@ import { ScraperRequestDeferredError } from "./http";
 import { executeScraperRun } from "./runs";
 import { ScraperRunOwnershipError } from "./session";
 import { syncScraperDefinitions } from "./syncDefinitions";
-import type {
-  ScraperAdapter,
-  ScraperAuthorization,
-  ScraperSink,
-} from "./types";
+import type { ScraperAdapter, ScraperSink } from "./types";
 
 type FixtureCursor = z.infer<typeof FixtureCursorSchema>;
 type FixtureObservation = z.infer<typeof FixtureObservationSchema>;
@@ -44,14 +40,12 @@ async function setupRun({
   requestLimit = 100,
   adapter = fixtureScraperAdapter,
   sink,
-  authorize,
   cursor,
   targetEnabled = true,
 }: {
   requestLimit?: number;
   adapter?: ScraperAdapter<FixtureCursor, FixtureObservation>;
   sink?: ScraperSink<FixtureObservation>;
-  authorize?: ScraperAuthorization;
   cursor?: unknown;
   targetEnabled?: boolean;
 } = {}) {
@@ -88,7 +82,6 @@ async function setupRun({
         observationSchema: FixtureObservationSchema,
         adapter,
         sink: sourceSink,
-        authorize,
       }),
     ],
   });
@@ -474,49 +467,6 @@ test("defers transient traffic coordination failures", async () => {
     status: "queued",
     nextAttemptAt: new Date("2026-08-18T12:15:00Z"),
     error: null,
-  });
-});
-
-test("rechecks source authorization after a queued wait", async () => {
-  let allowed = true;
-  const authorize = vi.fn(async () => {
-    if (!allowed)
-      throw new Error("source capability revoked with private detail");
-  });
-  const adapter: ScraperAdapter<
-    FixtureCursor,
-    FixtureObservation
-  > = async () => {
-    throw new ScraperRequestDeferredError(
-      "target_cooldown",
-      new Date("2026-08-18T12:01:00Z"),
-    );
-  };
-  const { registry, run } = await setupRun({ adapter, authorize });
-  await executeScraperRun(
-    { runId: run.id },
-    { registry, clock: fixedClock(), executionToken: "first" },
-  );
-  allowed = false;
-
-  await expect(
-    executeScraperRun(
-      { runId: run.id },
-      {
-        registry,
-        clock: fixedClock("2026-08-18T12:01:00Z"),
-        executionToken: "second",
-      },
-    ),
-  ).rejects.toThrow(/source capability revoked/);
-  expect(authorize).toHaveBeenCalledTimes(2);
-  const [stored] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  expect(stored).toMatchObject({
-    status: "failed",
-    error: "Unexpected scraper failure. See Sentry for this run.",
   });
 });
 

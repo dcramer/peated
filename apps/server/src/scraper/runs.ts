@@ -294,10 +294,6 @@ export async function executeScraperRun(
       claimed.run.cursor === null
         ? null
         : claimed.source.cursorSchema.parse(claimed.run.cursor);
-    await claimed.source.authorize?.({
-      externalSiteId: claimed.run.externalSiteId,
-      externalSiteType: claimed.source.externalSiteType,
-    });
     const session = createScraperSession({
       run: claimed.run,
       source: claimed.source,

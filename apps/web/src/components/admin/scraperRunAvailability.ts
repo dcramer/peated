@@ -37,12 +37,5 @@ export function getScraperRunAvailability(
     };
   }
 
-  if (site.reviewPolicy?.allowFetching === false) {
-    return {
-      label: "Run unavailable",
-      reason: "Fetching is blocked by review policy.",
-    };
-  }
-
   return null;
 }
