@@ -44,6 +44,7 @@ const migratedSources = [
   "thompsonbros",
   "totalwine",
   "whiskyadvocate",
+  "whiskyfun",
   "whiskynotes",
   "whiskyworld",
   "woodencork",
@@ -90,10 +91,23 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("whiskynotes")?.requestLimit).toBe(30);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.runEvery).toBe(1440);
+  expect(scraperRegistry.targets.get("whiskyfun")).toMatchObject({
+    minimumSpacingMs: 2_500,
+    requestsPerWindow: 25,
+    windowMs: 3_600_000,
+  });
+  expect(scraperRegistry.sources.get("whiskyfun")?.requestLimit).toBe(30);
   expect(scraperRegistry.sources.get("whiskyadvocate")?.observationSchema).toBe(
     scraperRegistry.sources.get("whiskynotes")?.observationSchema,
   );
+  expect(scraperRegistry.sources.get("whiskyfun")?.observationSchema).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
+  );
   expect(scraperRegistry.sources.get("whiskyadvocate")?.sink).toBe(
+    scraperRegistry.sources.get("whiskynotes")?.sink,
+  );
+  expect(scraperRegistry.sources.get("whiskyfun")?.sink).toBe(
     scraperRegistry.sources.get("whiskynotes")?.sink,
   );
 });
