@@ -113,9 +113,9 @@ Use this sequence for each publisher:
 3. Synchronize scraper definitions. In **Admin → Scrapers**, confirm that the
    source is registered, its targets are enabled, and its robots state is safe.
 4. Use the moderator review-policy API to set `review_only` with the exact
-   capability flags.
-5. Trigger one bounded manual run from the source page. Do not enable a
-   schedule for the first sample.
+   capability flags when a hidden sample is needed.
+5. Trigger one bounded manual run or let the registered bounded schedule run.
+   A schedule does not bypass source policy or publish hidden reviews.
 6. Record article, review, extracted-item, matched, and unresolved counts.
    Review the agreed hidden sample for extraction, multi-bottle splitting,
    Bottle matches, and any enabled summaries.
@@ -134,9 +134,15 @@ each stored review and can resume for up to ten worker passes. The adapter keeps
 the complete source Bottle title for classification and reads the category
 before the separate price line. It does not persist review prose.
 
+Whiskyfun runs once per day. It reads at most 20 current RSS items and skips
+clear non-whisky articles before it requests article pages. Requests are at
+least 2.5 seconds apart. The target allows 25 requests per hour, and each worker
+pass stops after 30 requests. The adapter stores explicit feed dates, reviewer
+metadata, native scores, and canonical links. Review prose stays transient.
+
 Enable automatic publication only after the reviewed sample passes the gate.
-Repeat the robots, terms, and review-only process for the second publisher
-before adding shared adapter behavior.
+Use the same source-specific process for each later publisher. Do not add a
+generic crawler only because several sources use RSS or HTML.
 
 ## Stop And Roll Back
 

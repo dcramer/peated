@@ -32,6 +32,7 @@ estimate of current live inventory.
 | Thompson Bros.     | `https://www.thompsonbrosdistillers.com`   | GET WooCommerce JSON pages                                                 | 2 items                                                             |
 | Total Wine         | `https://www.totalwine.com`                | GET HTML, two paginated categories                                         | 112 items on listing fixture; target disabled pending policy review |
 | Whisky Advocate    | `https://whiskyadvocate.com`               | Manual-only GET of the issue index, newest issue, and listed review pages  | 106 issues and 166 reviews in parser fixtures                       |
+| Whiskyfun          | `https://www.whiskyfun.com`                | Daily GET of RSS plus up to 20 current article pages                       | 2 accepted feed items and 2 article reviews in parser fixtures      |
 | The Whisky World   | `https://www.thewhiskyworld.com`           | GET HTML pages                                                             | 5 items                                                             |
 | Wooden Cork        | `https://woodencork.com`                   | GET cursor-style collection pages                                          | 38 items                                                            |
 
@@ -41,8 +42,8 @@ All scheduled and manual external-site runs now dispatch only `RunScraper` with
 a durable run id. Retailer GETs use the runtime-backed legacy request bridge;
 Healthy Spirits, Master of Malt, and ReserveBar use its governed POST support.
 SMWS and SMWSA emit bottle observations through runtime sinks. Whisky Advocate
-uses a review sink and independently rechecks its approved fetch capability
-before every request.
+and Whiskyfun use the shared external-review sink. The runtime enforces robots
+rules before remote requests.
 
 The previous response-body disk cache is removed. Production use of the legacy
 request helper without an active runtime session fails before network access;

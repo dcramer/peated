@@ -18,9 +18,9 @@ import scrapeMissionLiquor from "./adapters/legacy/scrapeMissionLiquor";
 import scrapeNcnean from "./adapters/legacy/scrapeNcnean";
 import scrapeNorthStarSpirits from "./adapters/legacy/scrapeNorthStarSpirits";
 import scrapeReserveBar from "./adapters/legacy/scrapeReserveBar";
+import scrapeSingleCaskNation from "./adapters/legacy/scrapeSingleCaskNation";
 import scrapeSMWS from "./adapters/legacy/scrapeSMWS";
 import scrapeSMWSA from "./adapters/legacy/scrapeSMWSA";
-import scrapeSingleCaskNation from "./adapters/legacy/scrapeSingleCaskNation";
 import scrapeThompsonBros from "./adapters/legacy/scrapeThompsonBros";
 import scrapeTotalWine from "./adapters/legacy/scrapeTotalWine";
 import scrapeWhiskyWorld from "./adapters/legacy/scrapeWhiskyWorld";
@@ -39,6 +39,11 @@ import {
   WhiskyAdvocateCursorSchema,
   WhiskyAdvocateObservationSchema,
 } from "./adapters/whiskyAdvocate";
+import {
+  whiskyfunAdapter,
+  WhiskyfunCursorSchema,
+  WhiskyfunObservationSchema,
+} from "./adapters/whiskyfun";
 import {
   whiskyNotesAdapter,
   WhiskyNotesCursorSchema,
@@ -231,6 +236,17 @@ export const scraperRegistry = createScraperRegistry({
         },
       ],
     }),
+    defineScrapeTarget({
+      key: "whiskyfun",
+      minimumSpacingMs: 2_500,
+      requestsPerWindow: 25,
+      origins: [
+        {
+          origin: "https://www.whiskyfun.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
   ],
   sources: [
     ...legacyPriceSources.map((source) =>
@@ -275,6 +291,16 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: WhiskyNotesCursorSchema,
       observationSchema: WhiskyNotesObservationSchema,
       adapter: whiskyNotesAdapter,
+      sink: externalReviewSink,
+    }),
+    defineScraperSource({
+      key: "whiskyfun",
+      externalSiteType: "whiskyfun",
+      targetKeys: ["whiskyfun"],
+      requestLimit: 30,
+      cursorSchema: WhiskyfunCursorSchema,
+      observationSchema: WhiskyfunObservationSchema,
+      adapter: whiskyfunAdapter,
       sink: externalReviewSink,
     }),
   ],

@@ -86,8 +86,12 @@ podcast transcripts need a separate platform-terms and creator-rights review.
   Sessions frequently contain several reviews on one legacy HTML page.
 - The FAQ says the author is comfortable with some free use of notes and scores
   by commercial entities.
-- Treat the two-decade archive as a later bounded backfill. Start with a small
-  current sample.
+- The current RSS feed supplies canonical article URLs, titles, exact dates,
+  and Bottle names. Article pages supply the reviewer and native 100-point
+  scores.
+- The implemented daily feed checks at most 20 items and uses the governed
+  runtime for article requests. The two-decade archive remains a separate
+  future backfill.
 
 ### Dramface
 
@@ -172,18 +176,19 @@ The current model separates:
 - zero or more scored or unscored Bottle reviews from that article; and
 - a short generated summary with model provenance and source evidence.
 
-Do not design the full generalized pipeline until two source pilots validate
-the content and source-policy model.
+Add later publishers through source-specific adapters. Do not replace them
+with a generalized crawler unless repeated source work proves a smaller shared
+boundary.
 
-## Recommended First Pilot
+## Source Sequence
 
-1. Use WhiskyNotes as the preferred archive pilot because it combines
-   meaningful volume, current cadence, and clear bottle specifications.
-2. Use the existing Whisky Advocate source as the second bounded pilot. Keep
-   Dramface as a later multi-bottle candidate.
-3. Treat Whiskyfun as a later high-volume backfill target.
-4. Do not add Whisky Advocate summaries or a full backfill in the bounded
-   pilot.
+1. WhiskyNotes supplies the first current archive feed.
+2. Whisky Advocate supplies the existing large scored archive and current
+   issue.
+3. Whiskyfun supplies the next daily multi-bottle feed. Keep its historical
+   archive as a later bounded change.
+4. Add Dramface next, then continue through the reviewed public-index
+   candidates until Peated has at least 12 reliable feeds.
 
 The pilot is successful with at least 90% article extraction accuracy on a
 reviewed sample, reliable splitting of multi-bottle articles, measurable
