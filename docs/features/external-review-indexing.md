@@ -157,6 +157,15 @@ into scored reviews. It stores exact timestamps, the published writer, native
 scores, and canonical links. Tasting notes stay transient. Article
 introductions and publisher conclusions are excluded from summary input.
 
+The Whiskey Reviewer runs once per day. It reads only the five links in the
+public homepage Recent Reviews list. It does not request the alphabetical
+archive, category pages, sitemaps, feeds, search, or WordPress APIs. Requests
+are at least five seconds apart. The target allows 10 requests per hour, and
+each worker pass stops after six requests. The adapter stores the writer,
+canonical link, displayed letter grade, and URL date when valid. Only direct
+tasting-note paragraphs stay transient for summary generation. Introductions,
+prices, and publisher conclusions are excluded.
+
 Enable automatic publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a
 generic crawler only because several sources use RSS or HTML.

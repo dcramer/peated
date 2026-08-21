@@ -40,6 +40,11 @@ import {
   StorePriceBatchSchema,
 } from "./adapters/legacyPrice";
 import {
+  whiskeyReviewerAdapter,
+  WhiskeyReviewerCursorSchema,
+  WhiskeyReviewerObservationSchema,
+} from "./adapters/whiskeyReviewer";
+import {
   whiskyAdvocateAdapter,
   WhiskyAdvocateCursorSchema,
   WhiskyAdvocateObservationSchema,
@@ -236,6 +241,17 @@ export const scraperRegistry = createScraperRegistry({
       ],
     }),
     defineScrapeTarget({
+      key: "whiskeyreviewer",
+      minimumSpacingMs: 5_000,
+      requestsPerWindow: 10,
+      origins: [
+        {
+          origin: "https://whiskeyreviewer.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
       key: "whiskyadvocate",
       minimumSpacingMs: 2_500,
       requestsPerWindow: 20,
@@ -311,6 +327,16 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: DramfaceCursorSchema,
       observationSchema: DramfaceObservationSchema,
       adapter: dramfaceAdapter,
+      sink: externalReviewSink,
+    }),
+    defineScraperSource({
+      key: "whiskeyreviewer",
+      externalSiteType: "whiskeyreviewer",
+      targetKeys: ["whiskeyreviewer"],
+      requestLimit: 6,
+      cursorSchema: WhiskeyReviewerCursorSchema,
+      observationSchema: WhiskeyReviewerObservationSchema,
+      adapter: whiskeyReviewerAdapter,
       sink: externalReviewSink,
     }),
     defineScraperSource({

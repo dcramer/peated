@@ -144,6 +144,23 @@ podcast transcripts need a separate platform-terms and creator-rights review.
   excludes article introductions and publisher conclusions from transient
   summary input.
 
+### The Whiskey Reviewer
+
+- Evidence: [homepage and current reviews](https://whiskeyreviewer.com/),
+  [review archive](https://whiskeyreviewer.com/whiskey-reviews/),
+  [privacy policy](https://whiskeyreviewer.com/privacy-policy/), and
+  [robots.txt](https://whiskeyreviewer.com/robots.txt).
+- Rechecked on 2026-08-21. Robots rules block WordPress administration and
+  allow the public homepage and article paths. The public privacy page contains
+  no automated-access or content-reuse restriction. No dedicated terms page is
+  linked from the public site. The footer reserves rights.
+- Current article pages expose a canonical link, writer, Bottle title, and
+  letter grade. Current URLs usually encode the publication date.
+- The implemented daily feed reads only the five links in the homepage Recent
+  Reviews list. It does not use the alphabetical archive, category pages,
+  sitemaps, feeds, search, or WordPress APIs. It excludes introductions, price
+  text, and publisher conclusions from transient summary input.
+
 ### Explicitly Restricted Sources
 
 - [Breaking Bourbon terms](https://www.breakingbourbon.com/site/breaking-bourbon-terms-of-use-agreement)
@@ -209,7 +226,8 @@ boundary.
    archive as a later bounded change.
 4. Dramface supplies the next daily multi-bottle and multi-writer feed.
 5. Words of Whisky supplies the next daily multi-bottle feed.
-6. Continue through the reviewed public-index candidates until Peated has at
+6. The Whiskey Reviewer supplies the next daily American whiskey feed.
+7. Continue through the reviewed public-index candidates until Peated has at
    least 12 reliable feeds.
 
 The pilot is successful with at least 90% article extraction accuracy on a
