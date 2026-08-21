@@ -100,10 +100,13 @@ function reviewSourceKey(
   canonicalUrl: string,
   name: string,
   reviewerName: string | null,
+  discriminator?: string,
 ): string {
+  const parts = [canonicalUrl, name, reviewerName ?? ""];
+  if (discriminator) parts.push(discriminator);
   const digest = createHash("sha256")
     .update(
-      [canonicalUrl, name, reviewerName ?? ""]
+      parts
         .map((value) => normalizeText(value).toLocaleLowerCase("en"))
         .join("\n"),
     )
@@ -160,7 +163,16 @@ export function parseDramfaceArticle(
       .find((value) => value !== null);
     if (!name || !reviewScore) continue;
 
-    const sourceKey = reviewSourceKey(canonicalUrl.href, name, reviewerName);
+    const baseSourceKey = reviewSourceKey(
+      canonicalUrl.href,
+      name,
+      reviewerName,
+    );
+    const sourceKey = reviews.some(
+      (review) => review.sourceKey === baseSourceKey,
+    )
+      ? reviewSourceKey(canonicalUrl.href, name, reviewerName, heading)
+      : baseSourceKey;
     reviews.push({
       sourceKey,
       name,

@@ -1,4 +1,8 @@
-import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
+import {
+  EXTERNAL_SITE_DEFINITIONS,
+  EXTERNAL_SITE_TYPE_LIST,
+  isExternalReviewSiteType,
+} from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewSourcePolicies,
@@ -8,6 +12,7 @@ import {
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
+import { ReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { syncExternalSites } from "@peated/server/lib/externalSites";
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
@@ -16,6 +21,7 @@ import type { ScraperHttpClock } from "./http";
 import { createScraperLifecycle } from "./lifecycle";
 import { scraperRegistry } from "./registry";
 import { executeScraperRun } from "./runs";
+import { externalReviewSink } from "./sinks/externalReviews";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
 const migratedSources = [
@@ -132,42 +138,12 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("wordsofwhisky")?.requestLimit).toBe(25);
-  expect(scraperRegistry.sources.get("whiskyadvocate")?.observationSchema).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
-  );
-  expect(scraperRegistry.sources.get("whiskyfun")?.observationSchema).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
-  );
-  expect(scraperRegistry.sources.get("dramface")?.observationSchema).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
-  );
-  expect(scraperRegistry.sources.get("bourbonculture")?.observationSchema).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
-  );
-  expect(
-    scraperRegistry.sources.get("whiskeyreviewer")?.observationSchema,
-  ).toBe(scraperRegistry.sources.get("whiskynotes")?.observationSchema);
-  expect(scraperRegistry.sources.get("wordsofwhisky")?.observationSchema).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.observationSchema,
-  );
-  expect(scraperRegistry.sources.get("whiskyadvocate")?.sink).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.sink,
-  );
-  expect(scraperRegistry.sources.get("whiskyfun")?.sink).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.sink,
-  );
-  expect(scraperRegistry.sources.get("dramface")?.sink).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.sink,
-  );
-  expect(scraperRegistry.sources.get("bourbonculture")?.sink).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.sink,
-  );
-  expect(scraperRegistry.sources.get("whiskeyreviewer")?.sink).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.sink,
-  );
-  expect(scraperRegistry.sources.get("wordsofwhisky")?.sink).toBe(
-    scraperRegistry.sources.get("whiskynotes")?.sink,
-  );
+  for (const type of EXTERNAL_SITE_TYPE_LIST.filter(isExternalReviewSiteType)) {
+    const source = scraperRegistry.sources.get(type);
+    expect(source, `${type} is not registered`).toBeDefined();
+    expect(source?.observationSchema).toBe(ReviewArticleIngestionSchema);
+    expect(source?.sink).toBe(externalReviewSink);
+  }
 });
 
 test("runs Bruichladdich through the production runtime with fixture parity", async () => {

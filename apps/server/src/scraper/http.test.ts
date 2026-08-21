@@ -35,25 +35,28 @@ function requestScraperUrl(
 
 function clockAt(value = "2026-08-18T12:00:00Z") {
   let now = new Date(value);
+  const sleepSpy = vi.fn(async (milliseconds: number) => {
+    now = new Date(now.getTime() + milliseconds);
+  });
   const clock: ScraperHttpClock = {
     now: () => now,
-    sleep: vi.fn(async (milliseconds: number) => {
-      now = new Date(now.getTime() + milliseconds);
-    }),
+    sleep: sleepSpy,
     random: () => 0,
   };
-  return clock;
+  return { ...clock, sleepSpy };
 }
 
 async function setupRuntime({
   origins = ["https://example.com"],
   requestLimit = 20,
+  minimumSpacingMs,
   maxRetries = 2,
   maxResponseBytes = 10 * 1024 * 1024,
   allowedRequestHeaders = [],
 }: {
   origins?: [string, ...string[]];
   requestLimit?: number;
+  minimumSpacingMs?: number;
   maxRetries?: number;
   maxResponseBytes?: number;
   allowedRequestHeaders?: string[];
@@ -62,6 +65,7 @@ async function setupRuntime({
     targets: [
       defineScrapeTarget({
         key: "operator",
+        minimumSpacingMs,
         maxRetries,
         maxResponseBytes,
         allowedRequestHeaders,
@@ -107,6 +111,31 @@ async function setupRuntime({
   if (!run) throw new Error("Expected run.");
   return { registry, run };
 }
+
+test("waits for the target spacing before the next request", async () => {
+  const { registry, run } = await setupRuntime({ minimumSpacingMs: 5_000 });
+  const clock = clockAt();
+  const fetchImpl = vi
+    .fn<typeof fetch>()
+    .mockImplementation(async () => new Response("catalog"));
+  const input = {
+    runId: run.id,
+    sourceKey: "finedrams",
+    request: {
+      target: "operator",
+      url: new URL("https://example.com/catalog"),
+    },
+    registry,
+    fetchImpl,
+    clock,
+  };
+
+  await requestScraperUrl(input);
+  await requestScraperUrl(input);
+
+  expect(clock.sleepSpy).toHaveBeenCalledWith(5_000);
+  expect(fetchImpl).toHaveBeenCalledTimes(2);
+});
 
 test("sends an identified bounded GET and exposes only safe response headers", async () => {
   const { registry, run } = await setupRuntime();

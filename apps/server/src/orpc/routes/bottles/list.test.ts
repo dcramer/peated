@@ -32,8 +32,12 @@ describe("GET /bottles", () => {
   });
 
   test("treats search text as words, not operators", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle({ name: "Triple Distilled" });
-    await fixtures.Bottle({ name: "Triple Reserve" });
+    const brand = await fixtures.Entity({ name: "Search Test Brand" });
+    const bottle = await fixtures.Bottle({
+      name: "Triple Distilled",
+      brandId: brand.id,
+    });
+    await fixtures.Bottle({ name: "Triple Reserve", brandId: brand.id });
 
     const searches = await Promise.all(
       ["Triple - Distilled", "Triple OR Distilled"].map((query) =>
