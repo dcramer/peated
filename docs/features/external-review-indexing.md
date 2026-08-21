@@ -87,6 +87,49 @@ position is not a stable key. One article can own several reviews.
 All review adapters emit `ReviewArticleIngestionSchema` and use the shared
 review sink. Do not translate a source-specific review shape in the sink.
 
+### Review source acceptance rules
+
+Apply these rules to each review publisher. Shared runtime rules are tested
+once in the scraper module. Each adapter test owns only publisher behavior.
+
+1. Name the exact discovery page or feed and its maximum result count. Exclude
+   archives, search, APIs, feeds, or pagination that are outside the source
+   plan.
+2. Set a request limit and target quota that allow discovery plus at least one
+   article request. A normal run must complete or save cursor progress under
+   those limits.
+3. Test discovery with current publisher markup and unrelated links. The
+   adapter must select only planned review URLs.
+4. Test one normal article. Verify its canonical URL, title, publication date,
+   writer, Bottle name, native score, normalized rating, and permitted summary
+   text.
+5. Test every source shape that can contain several reviews. Include repeated
+   Bottle names or writers when the publisher can show them. Review keys must
+   stay stable and unique without using array position alone.
+6. Use the shared date and rating parsers when they cover the publisher value.
+   Test the publisher's short, full, decimal, or missing values. Do not make the
+   shared observation schema accept invalid output.
+7. Return `null` only for an item that is clearly not a review. A review-shaped
+   page with missing required facts must throw and must not checkpoint.
+8. Test resume behavior. A completed article must not be requested again while
+   it remains in the current discovery window. A failed parse or sink call must
+   remain eligible for replay.
+9. Keep publisher prose transient. Assert that summary input contains only the
+   planned review section and excludes introductions, prices, navigation,
+   conclusions, fallback markup, and scripts.
+10. Before merge, run the registered source through the local scraper runtime
+    against the current public pages. Inspect the terminal status, request
+    count, emitted article and review counts, cursor, and observations. Replace
+    only the sink with an in-memory collector when model or product writes are
+    not part of the check.
+11. After deployment, inspect the first run in Admin → Scrapers and Sentry. A
+    successful parser test is not enough if the run defers without progress or
+    fails after partial ingestion.
+
+The production registry test automatically requires every external site marked
+as review content to use `ReviewArticleIngestionSchema` and the shared review
+sink.
+
 The adapter does not access the database, select a Peated Bottle, decide public
 visibility, call a model, or store records. The sink and external-review
 ingestion boundary own those actions. Unresolved or invalid Bottle matches stay

@@ -65,6 +65,28 @@ this grouping from a registrable domain. Stricter limits need no exception;
 less restrictive spacing, window, or quota requires a reviewed rationale in
 the code-owned definition.
 
+## Source acceptance rules
+
+Every new or changed source must satisfy this contract. Prove a rule at the
+listed owner. Do not repeat a runtime test in every adapter.
+
+| Rule                                                                                                                                                                                            | Owner and proof                                                                                                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The source requests only its declared targets and exact origins.                                                                                                                                | The registry owns the declaration. Definition and boundary tests prove it.                                                                                                   |
+| Discovery is bounded. The adapter does not become a generic crawler.                                                                                                                            | The adapter owns its exact entry points and maximum pages or items. A fixture test proves the bound.                                                                         |
+| Every request uses the injected session. Robots, spacing, quotas, retries, response limits, and `429` cooldowns stay active.                                                                    | The runtime owns request control. Boundary and HTTP tests prove it.                                                                                                          |
+| The configured limits let a run complete or make durable progress. Discovery plus the first work request must fit before a quota or slice boundary. Request spacing must not restart discovery. | The registry owns limits. A registered runtime test proves completion or a cursor advance.                                                                                   |
+| A cursor is strict and describes the next safe work. The adapter emits before it checkpoints. A replay is safe.                                                                                 | The adapter owns progress. Fixture tests prove resume, replay, and failed emit or parse behavior.                                                                            |
+| Observation keys are stable across runs. They are unique within their storage scope.                                                                                                            | The adapter owns source identity. Parser tests prove stable keys, multi-item keys, and known collision cases.                                                                |
+| Parsed output uses the registered strict schema. Product writes happen only in the registered sink.                                                                                             | The session and registry own validation and sink selection. Registry and sink tests prove it.                                                                                |
+| Expected remote deferrals remain non-terminal. Unexpected markup, validation, and persistence failures fail the run.                                                                            | The runtime owns deferrals. The adapter owns the difference between an expected non-item and malformed source data.                                                          |
+| A source change passes deterministic fixtures and one local acceptance run against the current public source.                                                                                   | The source author runs the registered adapter through the local runtime and inspects the run, cursor, request count, and emitted observations. Live checks do not run in CI. |
+| The first production run is checked in Admin → Scrapers and Sentry.                                                                                                                             | The source author confirms status, counts, cursor progress, robots state, and any terminal error.                                                                            |
+
+Keep source-specific facts in the adapter tests and the owning feature or
+research document. Update a fixture when the publisher changes markup. Do not
+weaken a shared schema or runtime rule to accept one malformed page.
+
 ## Run outcomes
 
 - `succeeded` means the adapter returned after validated observations and its
