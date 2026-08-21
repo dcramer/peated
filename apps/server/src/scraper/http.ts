@@ -9,7 +9,6 @@ import { resolveScraperOrigin } from "./definitions";
 import type { ScraperRegistry, ScraperRequest, ScraperResponse } from "./types";
 
 const MAX_REDIRECTS = 5;
-const SHORT_WAIT_THRESHOLD_MS = 2_500;
 const RETRY_BASE_DELAY_MS = 250;
 const MAX_REQUEST_BODY_BYTES = 1024 * 1024;
 const SAFE_REQUEST_HEADERS = new Set([
@@ -221,13 +220,8 @@ async function acquireOrDefer({
     const delay = result.nextEligibleAt
       ? result.nextEligibleAt.getTime() - clock.now().getTime()
       : null;
-    if (
-      result.reason === "target_spacing" &&
-      delay !== null &&
-      delay > 0 &&
-      delay <= SHORT_WAIT_THRESHOLD_MS
-    ) {
-      await clock.sleep(delay);
+    if (result.reason === "target_spacing" && delay !== null) {
+      if (delay > 0) await clock.sleep(delay);
       continue;
     }
     if (
