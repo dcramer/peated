@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  dramfaceAdapter,
+  DramfaceCursorSchema,
+  DramfaceObservationSchema,
+} from "./adapters/dramface";
 import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
 import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
 import scrapeBruichladdich from "./adapters/legacy/scrapeBruichladdich";
@@ -215,6 +220,17 @@ export const scraperRegistry = createScraperRegistry({
       }),
     ),
     defineScrapeTarget({
+      key: "dramface",
+      minimumSpacingMs: 2_500,
+      requestsPerWindow: 25,
+      origins: [
+        {
+          origin: "https://www.dramface.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
       key: "whiskyadvocate",
       minimumSpacingMs: 2_500,
       requestsPerWindow: 20,
@@ -271,6 +287,16 @@ export const scraperRegistry = createScraperRegistry({
         sink: bottleObservationSink,
       }),
     ),
+    defineScraperSource({
+      key: "dramface",
+      externalSiteType: "dramface",
+      targetKeys: ["dramface"],
+      requestLimit: 30,
+      cursorSchema: DramfaceCursorSchema,
+      observationSchema: DramfaceObservationSchema,
+      adapter: dramfaceAdapter,
+      sink: externalReviewSink,
+    }),
     defineScraperSource({
       key: "whiskyadvocate",
       externalSiteType: "whiskyadvocate",
