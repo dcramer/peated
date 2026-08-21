@@ -1,12 +1,13 @@
 {
   "products": [
     {
+      "id": 7287951261869,
       "title": "Bruichladdich Bere Barley 2013",
       "handle": "bruichladdich-bere-barley-2013",
       "product_type": "Unpeated Islay Single Malt Scotch Whisky",
       "vendor": "Bruichladdich Distillery",
       "tags": ["Bruichladdich", "Single Malt"],
-      "variants": [{"available": true, "price": "100.00", "title": "70cl"}],
+      "variants": [{"id": 42022881722541, "available": true, "barcode": "036602301979", "price": "100.00", "title": "70cl"}],
       "images": [{"src": "https://cdn.shopify.com/s/files/bruichladdich-bere-barley.png"}]
     },
     {

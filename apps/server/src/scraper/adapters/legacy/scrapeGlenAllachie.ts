@@ -5,6 +5,7 @@ import scrapePrices from "../../legacy/scraper";
 import {
   getShopifyImageUrl,
   getShopifyProductTitle,
+  getShopifyStorePriceIdentity,
   parseShopifyPrice,
   scrapeShopifyProducts,
   ShopifyCatalogSchema,
@@ -139,6 +140,7 @@ export function parseGlenAllachieProducts(input: unknown): StorePrice[] {
     }
 
     const listing = {
+      ...getShopifyStorePriceIdentity(product, variant),
       name,
       price,
       currency: "gbp" as const,

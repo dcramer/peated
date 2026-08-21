@@ -22,7 +22,9 @@ test("scrapes every supported whisky type and excludes ineligible records", asyn
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "usd",
+      externalProductId: "9031243464902",
       imageUrl: "https://cdn.shopify.com/s/files/rock-town-10.png",
       name: "Single Cask Nation Rock Town 10-year-old",
       price: 9000,

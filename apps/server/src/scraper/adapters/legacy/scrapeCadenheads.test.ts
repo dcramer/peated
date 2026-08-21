@@ -24,7 +24,9 @@ test("scrapes purchasable bottles and excludes unsupported products", async ({
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "21771",
       imageUrl: "https://www.cadenhead.shop/wp-content/uploads/glen-spey.png",
       name: "Cadenhead's Glen Spey-Glenlivet 16-year-old 54.7% abv 70cl Single Malt Whisky",
       price: 7500,

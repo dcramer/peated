@@ -34,6 +34,16 @@ test("parses in-stock bottles from the catalog response", async () => {
           "url": "https://www.healthyspirits.com/products/fuji-japanese-whisky-blend-700ml",
           "volume": 700,
         },
+        {
+          "barcode": "080660001159",
+          "currency": "usd",
+          "externalProductId": "740590997",
+          "imageUrl": "https://d2j6dbq0eux0bg.cloudfront.net/images/115311147/5577358773.png",
+          "name": "1792 Full Proof Healthy Spirits Single Barrel Bourbon",
+          "price": 5999,
+          "url": "https://www.healthyspirits.com/products/1792-full-proof-healthy-spirits-single-barrel-bourbon-750ml",
+          "volume": 750,
+        },
       ]
     `);
 });
@@ -101,7 +111,7 @@ test("follows the catalog total without persisting a dry run", async ({
       ];
     });
 
-  await expect(scrapeHealthySpirits({ dryRun: true })).resolves.toBe(3);
+  await expect(scrapeHealthySpirits({ dryRun: true })).resolves.toBe(4);
   expect(axiosMock.history.post).toHaveLength(2);
   expect(JSON.parse(axiosMock.history.post[0].data)).toMatchObject({
     parentCategoryId: 179389817,

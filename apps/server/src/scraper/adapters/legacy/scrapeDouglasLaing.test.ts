@@ -23,7 +23,9 @@ test("scrapes supported bottles and excludes non-bottle records", async ({
 
   expect(items).toEqual([
     expect.objectContaining({
+      barcode: "036602301979",
       currency: "usd",
+      externalProductId: "6714331496619",
       imageUrl: "https://cdn.shopify.com/s/files/big-peat-football.png",
       name: "Big Peat The World Football Edition 2026",
       price: 6500,

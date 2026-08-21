@@ -1,12 +1,13 @@
 {
   "products": [
     {
+      "id": 4364171083887,
       "title": "E.H. Taylor Small Batch Bottled In Bond Kentucky Straight Bourbon Whiskey 750ml",
       "handle": "eh-taylor-small-batch",
       "product_type": "WHISKEY",
       "tags": ["country-USA", "size-750ML", "varietal-BOURBON"],
       "images": [{ "src": "https://cdn.shopify.com/s/files/eh-taylor.png" }],
-      "variants": [{ "available": true, "price": "49.99" }]
+      "variants": [{ "id": 31235135012975, "available": true, "barcode": "036602301979", "price": "49.99" }]
     },
     {
       "title": "The Macallan Sherry Oak Single Malt Scotch Whisky 12 Year Old 700ml",

@@ -1,3 +1,4 @@
+import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import type {
   ScrapePricesCallback,
@@ -14,7 +15,11 @@ export const ShopifyCatalogSchema = z
 
 export const ShopifyVariantSchema = z
   .object({
+    id: z
+      .union([z.number().int().positive(), z.string().trim().min(1)])
+      .optional(),
     available: z.boolean(),
+    barcode: z.string().trim().min(1).nullish(),
     price: z.string(),
   })
   .passthrough();
@@ -27,12 +32,28 @@ export const ShopifyImageSchema = z
 
 export const ShopifyProductSchema = z
   .object({
+    id: z
+      .union([z.number().int().positive(), z.string().trim().min(1)])
+      .optional(),
     title: z.string().trim().min(1),
     handle: z.string().trim().min(1),
     images: z.array(z.unknown()),
     variants: z.array(ShopifyVariantSchema),
   })
   .passthrough();
+
+export function getShopifyStorePriceIdentity(
+  product: Pick<z.infer<typeof ShopifyProductSchema>, "id">,
+  variant: Pick<z.infer<typeof ShopifyVariantSchema>, "barcode">,
+) {
+  const barcode = GtinSchema.safeParse(variant.barcode);
+  return {
+    ...(product.id !== undefined
+      ? { externalProductId: String(product.id) }
+      : {}),
+    ...(barcode.success ? { barcode: barcode.data } : {}),
+  };
+}
 
 export function getShopifyProductTitle(input: unknown): string | null {
   if (!input || typeof input !== "object" || !("title" in input)) return null;

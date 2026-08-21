@@ -22,7 +22,9 @@ test("scrapes live whisky listings and excludes unsupported products", async ({
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "11503750447445",
       imageUrl: "https://cdn.shopify.com/s/files/speyside-connection.png",
       name: "The Speyside Connection",
       price: 6999,

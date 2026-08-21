@@ -1,13 +1,14 @@
 {
   "products": [
     {
+      "id": 15761596776830,
       "title": "AON 17-163 MADEIRA CASK (SINGLE CASK)",
       "handle": "aon-17-163-madeira-single-cask",
       "body_html": "<p>Unpeated single malt / 57.1% abv / 70cl / natural colour</p>",
       "tags": ["All Products", "Limited Edition Whiskies", "Whiskies"],
       "vendor": "Nc'nean Distillery ",
       "images": [{ "src": "https://cdn.shopify.com/s/files/ncnean-aon.png" }],
-      "variants": [{ "available": true, "price": "94.95", "title": "Default Title" }]
+      "variants": [{ "id": 56862151704958, "available": true, "barcode": "036602301979", "price": "94.95", "title": "Default Title" }]
     },
     {
       "title": "ORGANIC SINGLE MALT SCOTCH WHISKY",

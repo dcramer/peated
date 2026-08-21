@@ -1,6 +1,7 @@
 {
   "products": [
     {
+      "id": 6714331496619,
       "title": "Big Peat The World Football Edition 2026",
       "handle": "big-peat-the-world-football-edition-2026",
       "vendor": "Big Peat",
@@ -13,7 +14,9 @@
       ],
       "variants": [
         {
+          "id": 39952360276139,
           "available": true,
+          "barcode": "036602301979",
           "price": "65.00"
         }
       ]

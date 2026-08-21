@@ -112,6 +112,7 @@ export function parseReserveBarProducts(input: unknown): {
         : product.name;
     const { name } = normalizeBottle({ name: rawName });
     const listing = {
+      externalProductId: product.salsifyGrouping,
       currency: "usd" as const,
       imageUrl: getImageUrl(product.images),
       name,

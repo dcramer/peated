@@ -20,6 +20,7 @@ test("scrapes available bottles and excludes unsupported products", async ({
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
       externalProductId: "6631010533443",
       imageUrl:

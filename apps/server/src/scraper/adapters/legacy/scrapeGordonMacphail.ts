@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
 import {
+  getShopifyStorePriceIdentity,
   parseShopifyPrice,
   scrapeShopifyProducts,
   ShopifyCatalogSchema,
@@ -96,6 +97,7 @@ export function parseGordonMacphailProducts(
 
     const { name } = normalizeBottle({ name: product.title });
     const listing = {
+      ...getShopifyStorePriceIdentity(product, pricedVariant),
       name,
       price: pricedVariant.parsedPrice,
       currency: "gbp" as const,
@@ -105,7 +107,6 @@ export function parseGordonMacphailProducts(
         `/products/${encodeURIComponent(product.handle)}`,
       ),
       imageUrl: product.images[0]?.src ?? null,
-      ...(product.id ? { externalProductId: String(product.id) } : {}),
     };
 
     logScrapedProduct(SITE, listing);

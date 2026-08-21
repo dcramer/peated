@@ -1,6 +1,7 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { getUrl } from "../../legacy/scraper";
@@ -18,6 +19,7 @@ const DramfoolCatalogSchema = z
 
 const DramfoolProductSchema = z
   .object({
+    id: z.string().trim().min(1).optional(),
     title: z.string().trim().min(1),
     fullUrl: z.string().trim().min(1),
     assetUrl: z.string().nullish(),
@@ -35,6 +37,8 @@ const MoneySchema = z
 
 const DramfoolVariantSchema = z
   .object({
+    id: z.string().trim().min(1).optional(),
+    barcode: z.string().trim().min(1).nullish(),
     attributes: z.record(z.string(), z.string()),
     priceMoney: MoneySchema,
     salePriceMoney: MoneySchema.optional(),
@@ -164,7 +168,13 @@ export function parseDramfoolProducts(input: unknown): StorePrice[] {
         ? product.title
         : `Dramfool ${product.title}`;
       const { name } = normalizeBottle({ name: rawName });
+      const externalProductId = variant.id ?? product.id;
+      const barcode = GtinSchema.safeParse(variant.barcode);
       const listing = {
+        ...(externalProductId
+          ? { externalProductId: String(externalProductId) }
+          : {}),
+        ...(barcode.success ? { barcode: barcode.data } : {}),
         name,
         price,
         currency: "gbp" as const,

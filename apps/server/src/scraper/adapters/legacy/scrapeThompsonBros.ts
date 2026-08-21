@@ -5,6 +5,7 @@ import scrapePrices from "../../legacy/scraper";
 import {
   decodeWooCommerceText,
   getWooCommerceProductName,
+  getWooCommerceStorePriceIdentity,
   parseWooCommercePrice,
   scrapeWooCommerceProducts,
   WooCommerceCatalogSchema,
@@ -101,6 +102,7 @@ export function parseThompsonBrosProducts(input: unknown): StorePrice[] {
       : `Thompson Bros ${rawName}`;
     const { name } = normalizeBottle({ name: prefixedName });
     const listing = {
+      ...getWooCommerceStorePriceIdentity(product),
       name,
       price,
       currency: "gbp" as const,

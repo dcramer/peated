@@ -22,7 +22,9 @@ test("scrapes available full-size whisky and excludes unsupported products", asy
 
   expect(items).toEqual([
     {
+      barcode: "036602301979",
       currency: "gbp",
+      externalProductId: "15761596776830",
       imageUrl: "https://cdn.shopify.com/s/files/ncnean-aon.png",
       name: "Nc'nean Aon 17-163 Madeira Cask (Single Cask)",
       price: 9495,
