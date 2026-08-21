@@ -9,7 +9,11 @@ describe("GET /search", () => {
   test("searches across bottles and entities without authentication", async ({
     fixtures,
   }) => {
-    const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
+    const brand = await fixtures.Entity({ name: "Search Fixture Brand" });
+    const bottle = await fixtures.Bottle({
+      name: "Unique Whiskey",
+      brandId: brand.id,
+    });
     const entity = await fixtures.Entity({ name: "Unique Distillery" });
     await fixtures.User({ username: "uniqueuser" });
 
@@ -40,7 +44,11 @@ describe("GET /search", () => {
     fixtures,
     defaults,
   }) => {
-    const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
+    const brand = await fixtures.Entity({ name: "Search Fixture Brand" });
+    const bottle = await fixtures.Bottle({
+      name: "Unique Whiskey",
+      brandId: brand.id,
+    });
     const entity = await fixtures.Entity({ name: "Unique Distillery" });
     const user = await fixtures.User({ username: "uniqueuser" });
 
@@ -67,7 +75,8 @@ describe("GET /search", () => {
   });
 
   test("limits search to specified types", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Unique Whiskey" });
+    const brand = await fixtures.Entity({ name: "Search Fixture Brand" });
+    await fixtures.Bottle({ name: "Unique Whiskey", brandId: brand.id });
     const entity = await fixtures.Entity({ name: "Unique Distillery" });
 
     const { results } = await routerClient.search({

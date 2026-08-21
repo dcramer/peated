@@ -1,4 +1,8 @@
-import { ReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
+import {
+  normalizeReviewRating,
+  ReviewArticleIngestionSchema,
+  ReviewArticleObservationSchema,
+} from "@peated/server/externalReviews/observation";
 
 function observation() {
   return {
@@ -50,4 +54,19 @@ test("rejects duplicate review source keys", () => {
   expect(() => ReviewArticleObservationSchema.parse(input)).toThrow(
     "Review source keys must be unique within an article.",
   );
+});
+
+test("normalizes a native score to an integer percentage", () => {
+  expect(
+    normalizeReviewRating({ value: 7.85, scale: 10, display: "7.85/10" }),
+  ).toBe(79);
+});
+
+test("rejects review text without a matching source key", () => {
+  expect(() =>
+    ReviewArticleIngestionSchema.parse({
+      article: observation(),
+      reviewTexts: { missing: "Review text" },
+    }),
+  ).toThrow("Review text must match a review source key.");
 });

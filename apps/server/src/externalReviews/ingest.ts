@@ -4,7 +4,7 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { ReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
+import { ReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { storeReviewArticle } from "@peated/server/externalReviews/store";
 import { generateExternalReviewSummary } from "@peated/server/externalReviews/summary";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
@@ -13,28 +13,10 @@ import { logError, logTelemetryError } from "@peated/server/lib/log";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = z
-  .object({
-    externalSiteId: z.number().int().positive(),
-    fetchedAt: z.date(),
-    article: ReviewArticleObservationSchema,
-    reviewTexts: z.record(z.string(), z.string()).default({}),
-  })
-  .strict()
-  .superRefine(({ article, reviewTexts }, context) => {
-    const sourceKeys = new Set(
-      article.reviews.map(({ sourceKey }) => sourceKey),
-    );
-    for (const sourceKey of Object.keys(reviewTexts)) {
-      if (!sourceKeys.has(sourceKey)) {
-        context.addIssue({
-          code: "custom",
-          message: "Review text must match a review source key.",
-          path: ["reviewTexts", sourceKey],
-        });
-      }
-    }
-  });
+const InputSchema = ReviewArticleIngestionSchema.safeExtend({
+  externalSiteId: z.number().int().positive(),
+  fetchedAt: z.date(),
+});
 
 /** Resolves each review to a Bottle, then stores the article with hidden reviews. */
 export async function ingestReviewArticle(rawInput: unknown) {

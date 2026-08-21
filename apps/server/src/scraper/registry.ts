@@ -51,10 +51,7 @@ import {
   defineScrapeTarget,
 } from "./definitions";
 import { bottleObservationSink } from "./sinks/bottles";
-import {
-  whiskyAdvocateReviewSink,
-  whiskyNotesReviewSink,
-} from "./sinks/externalReviews";
+import { externalReviewSink } from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
 import { requireExternalReviewSourceCapability } from "./sourcePolicy";
 
@@ -216,6 +213,8 @@ export const scraperRegistry = createScraperRegistry({
     ),
     defineScrapeTarget({
       key: "whiskyadvocate",
+      minimumSpacingMs: 2_500,
+      requestsPerWindow: 10,
       origins: [
         {
           origin: "https://whiskyadvocate.com",
@@ -262,10 +261,11 @@ export const scraperRegistry = createScraperRegistry({
       key: "whiskyadvocate",
       externalSiteType: "whiskyadvocate",
       targetKeys: ["whiskyadvocate"],
+      requestLimit: 2,
       cursorSchema: WhiskyAdvocateCursorSchema,
       observationSchema: WhiskyAdvocateObservationSchema,
       adapter: whiskyAdvocateAdapter,
-      sink: whiskyAdvocateReviewSink,
+      sink: externalReviewSink,
       authorize: async ({ externalSiteId, externalSiteType }) => {
         await requireExternalReviewSourceCapability(
           db,
@@ -282,7 +282,7 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: WhiskyNotesCursorSchema,
       observationSchema: WhiskyNotesObservationSchema,
       adapter: whiskyNotesAdapter,
-      sink: whiskyNotesReviewSink,
+      sink: externalReviewSink,
       authorize: async ({ externalSiteId, externalSiteType }) => {
         await requireExternalReviewSourceCapability(
           db,

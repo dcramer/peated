@@ -56,7 +56,7 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   woodencork: { name: "Wooden Cork", runEvery: 10080 },
   whiskyadvocate: {
     name: "Whisky Advocate",
-    runEvery: 21600,
+    runEvery: null,
     content: "reviews",
   },
   whiskynotes: {

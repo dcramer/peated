@@ -1,5 +1,20 @@
-import { CategoryEnum, NativeScoreSchema } from "@peated/server/schemas";
+import {
+  CategoryEnum,
+  NativeScoreSchema,
+  NormalizedReviewRatingSchema,
+} from "@peated/server/schemas";
 import { z } from "zod";
+
+const MAX_REVIEW_TEXT_LENGTH = 50_000;
+
+export function normalizeReviewRating(
+  rawScore: z.input<typeof NativeScoreSchema>,
+) {
+  const score = NativeScoreSchema.parse(rawScore);
+  return NormalizedReviewRatingSchema.parse(
+    Math.round((score.value * 100) / score.scale),
+  );
+}
 
 export const ReviewArticleReviewSchema = z
   .object({
@@ -8,7 +23,7 @@ export const ReviewArticleReviewSchema = z
     category: CategoryEnum.nullable().default(null),
     reviewerName: z.string().trim().min(1).max(255).nullable().default(null),
     nativeScore: NativeScoreSchema.nullable().default(null),
-    normalizedRating: z.number().int().min(0).max(100).nullable().default(null),
+    normalizedRating: NormalizedReviewRatingSchema.nullable().default(null),
   })
   .strict();
 
@@ -47,4 +62,35 @@ export const ReviewArticleObservationSchema = z
 
 export type ReviewArticleObservation = z.infer<
   typeof ReviewArticleObservationSchema
+>;
+
+/** Shared adapter output. The sink passes this shape to article ingestion. */
+export const ReviewArticleIngestionSchema = z
+  .object({
+    article: ReviewArticleObservationSchema,
+    reviewTexts: z
+      .record(
+        ReviewArticleReviewSchema.shape.sourceKey,
+        z.string().trim().min(1).max(MAX_REVIEW_TEXT_LENGTH),
+      )
+      .default({}),
+  })
+  .strict()
+  .superRefine(({ article, reviewTexts }, context) => {
+    const sourceKeys = new Set(
+      article.reviews.map(({ sourceKey }) => sourceKey),
+    );
+    for (const sourceKey of Object.keys(reviewTexts)) {
+      if (!sourceKeys.has(sourceKey)) {
+        context.addIssue({
+          code: "custom",
+          message: "Review text must match a review source key.",
+          path: ["reviewTexts", sourceKey],
+        });
+      }
+    }
+  });
+
+export type ReviewArticleIngestion = z.infer<
+  typeof ReviewArticleIngestionSchema
 >;

@@ -17,9 +17,9 @@ without republishing the review.
   do not persist or display full publisher article text or photography.
 - Require an explicit source policy before a source can fetch articles,
   generate summaries, or publish reviews.
-- Add one vertical pilot for up to two publishers, with WhiskyNotes
-  preferred for archive ingestion and Dramface preferred for ongoing and
-  multi-bottle ingestion.
+- Add one vertical pilot for up to two publishers, with WhiskyNotes for archive
+  ingestion and the existing Whisky Advocate source for a bounded second
+  pilot. Keep Dramface as a later multi-bottle candidate.
 - Display pilot reviews on Bottle pages with publisher, reviewer, date, native
   score, short attributed summary, and a prominent canonical link.
 - Migrate existing external reviews to the review-article model without
