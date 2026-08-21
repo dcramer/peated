@@ -46,6 +46,13 @@ export function parseDate(
     );
     if (!date) return null;
     if (!isoDate.groups.time) return date;
+
+    const timestamp = new Date(
+      /(?:Z|[+-]\d{2}:?\d{2})$/iu.test(normalized)
+        ? normalized
+        : `${normalized}Z`,
+    );
+    return Number.isNaN(timestamp.getTime()) ? null : timestamp;
   }
 
   const dayFirst =
@@ -75,6 +82,6 @@ export function parseDate(
         );
   }
 
-  const timestamp = new Date(normalized);
-  return Number.isNaN(timestamp.getTime()) ? null : timestamp;
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
