@@ -183,12 +183,19 @@ export const whiskyfunAdapter: ScraperAdapter<
   WhiskyfunCursor,
   WhiskyfunObservation
 > = async ({ cursor, session }) => {
-  const processedArticleUrls = new Set(cursor?.processedArticleUrls ?? []);
   const feedResponse = await session.request({
     target: TARGET,
     url: new URL("/whatsnew.xml", ORIGIN),
   });
   const articles = discoverWhiskyfunArticles(feedResponse.body);
+  const currentArticleUrls = new Set(
+    articles.map(({ canonicalUrl }) => canonicalUrl),
+  );
+  const processedArticleUrls = new Set(
+    (cursor?.processedArticleUrls ?? []).filter((url) =>
+      currentArticleUrls.has(url),
+    ),
+  );
 
   for (const article of articles) {
     if (processedArticleUrls.has(article.canonicalUrl)) continue;

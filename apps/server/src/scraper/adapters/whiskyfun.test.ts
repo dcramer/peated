@@ -127,3 +127,44 @@ test("resumes without requesting a completed article", async () => {
     { processedArticleUrls: [FIRST_URL, SECOND_URL] },
   ]);
 });
+
+test("drops completed URLs that leave the current feed window", async () => {
+  const html = await loadFixture("whiskyfun", "article.html");
+  const priorUrls = Array.from(
+    { length: 20 },
+    (_, index) => `https://www.whiskyfun.com/2026/Prior-${index}.html`,
+  );
+  const currentUrls = [
+    "https://www.whiskyfun.com/2026/New-review.html",
+    ...priorUrls.slice(0, -1),
+  ];
+  const feed = `<?xml version="1.0"?><rss><channel>${currentUrls
+    .map(
+      (url, index) =>
+        `<item><title>Review ${index}</title><link>${url}</link><pubDate>Wed, 19 Aug 2026 08:49:00 +0200</pubDate></item>`,
+    )
+    .join("")}</channel></rss>`;
+  const checkpoint = vi.fn();
+  const request = vi.fn(async ({ url }: { url: URL }) => ({
+    url,
+    status: 200,
+    headers: {},
+    body: url.pathname === "/whatsnew.xml" ? feed : html,
+  }));
+  const session: ScraperSession<WhiskyfunCursor, WhiskyfunObservation> = {
+    request,
+    emit: vi.fn(),
+    checkpoint,
+    remainingRequests: () => 30,
+  };
+
+  await whiskyfunAdapter({
+    cursor: { processedArticleUrls: priorUrls },
+    session,
+  });
+
+  expect(request).toHaveBeenCalledTimes(2);
+  const completedUrls = checkpoint.mock.calls.at(-1)?.[0].processedArticleUrls;
+  expect(completedUrls).toHaveLength(20);
+  expect(new Set(completedUrls)).toEqual(new Set(currentUrls));
+});
