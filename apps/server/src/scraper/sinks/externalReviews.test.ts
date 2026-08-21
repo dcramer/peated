@@ -34,7 +34,7 @@ test("Whisky Advocate observations use article and source identity", async ({
     externalSiteId: site.id,
     observation: {
       ...observation,
-      value: { ...observation.value, rating: 93 },
+      value: { ...observation.value, rating: 93.5 },
     },
   });
 
@@ -48,10 +48,10 @@ test("Whisky Advocate observations use article and source identity", async ({
       articleId: expect.any(Number),
       bottleId: bottle.id,
       name: bottle.fullName,
-      rating: 93,
-      nativeScoreValue: 93,
+      rating: 94,
+      nativeScoreValue: 93.5,
       nativeScoreScale: 100,
-      nativeScoreDisplay: "93/100",
+      nativeScoreDisplay: "93.5/100",
       sourceKey: observation.sourceKey,
       hidden: true,
     },

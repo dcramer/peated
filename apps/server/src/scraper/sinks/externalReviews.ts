@@ -32,7 +32,7 @@ export const whiskyAdvocateReviewSink: ScraperSink<
             scale: 100,
             display: `${rating}/100`,
           },
-          normalizedRating: rating,
+          normalizedRating: Math.round(rating),
         },
       ],
     },
