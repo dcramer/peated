@@ -93,7 +93,7 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   },
   whiskynotes: {
     name: "WhiskyNotes",
-    runEvery: null,
+    runEvery: 1440,
     content: "reviews",
   },
   wordsofwhisky: {

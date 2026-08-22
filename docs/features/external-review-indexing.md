@@ -176,9 +176,12 @@ Use this sequence for each publisher:
 7. Require at least 90% extraction accuracy and acceptable Bottle-match
    precision. Record the result before setting the source to `automatic`.
 
-The WhiskyNotes pilot is manual-only. It checks at most five archive pages and
-20 article links on each page. Requests are at least 2.5 seconds apart. The
-target allows 30 requests per hour. Each worker pass stops after 30 requests.
+WhiskyNotes runs once per day. It checks the current archive page and advances
+at most four historical archive pages. Each page supplies at most 20 article
+links. A new run continues from the last successful run cursor. When the
+archive ends, later runs check only the current page. Requests are at least 2.5
+seconds apart. The target allows 30 requests per hour, and each worker pass
+stops after 30 requests.
 
 The Whisky Advocate pilot is also manual-only. It requests the issue index, the
 newest issue, and each listed review page to collect its explicit publication

@@ -95,6 +95,45 @@ test("manual review runs do not require a publication policy", async ({
   expect(enqueue).toHaveBeenCalledOnce();
 });
 
+test("opted-in source resumes the last successful run cursor", async ({
+  fixtures,
+}) => {
+  const requestedBy = await fixtures.User({ admin: true });
+  const site = await fixtures.ExternalSite({ type: "whiskynotes" });
+  const successfulCursor = {
+    page: 5,
+    processedArticleUrls: ["https://www.whiskynotes.be/2026/world/example/"],
+  };
+  await db.insert(externalSiteRuns).values([
+    {
+      externalSiteId: site.id,
+      trigger: "scheduled",
+      status: "succeeded",
+      cursor: successfulCursor,
+      completedAt: new Date("2026-08-20T00:00:00Z"),
+    },
+    {
+      externalSiteId: site.id,
+      trigger: "scheduled",
+      status: "failed",
+      cursor: { page: 8, processedArticleUrls: [] },
+      completedAt: new Date("2026-08-21T00:00:00Z"),
+    },
+  ]);
+
+  const run = await queueManualExternalSiteRun({
+    site,
+    requestedById: requestedBy.id,
+    enqueue: async () => undefined,
+  });
+
+  expect(run.cursor).toEqual({
+    ...successfulCursor,
+    currentArticleUrls: [],
+    historyComplete: false,
+  });
+});
+
 test("active run prevents overlap", async ({ fixtures }) => {
   const requestedBy = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "decadentdrinks" });

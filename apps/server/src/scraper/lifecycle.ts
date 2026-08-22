@@ -5,7 +5,17 @@ import {
   type ExternalSite,
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
-import { and, asc, eq, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lte,
+  or,
+} from "drizzle-orm";
 import {
   findScraperSourceBySiteType,
   requireEnabledScraperTargets,
@@ -68,6 +78,22 @@ async function insertRun(
     );
   }
   requireEnabledScraperTargets(registry, source);
+  let cursor = null;
+  if (source.resumeFromLastRun) {
+    const [priorRun] = await connection
+      .select({ cursor: externalSiteRuns.cursor })
+      .from(externalSiteRuns)
+      .where(
+        and(
+          eq(externalSiteRuns.externalSiteId, site.id),
+          eq(externalSiteRuns.status, "succeeded"),
+          isNotNull(externalSiteRuns.cursor),
+        ),
+      )
+      .orderBy(desc(externalSiteRuns.completedAt), desc(externalSiteRuns.id))
+      .limit(1);
+    cursor = priorRun ? source.cursorSchema.parse(priorRun.cursor) : null;
+  }
   const [run] = await connection
     .insert(externalSiteRuns)
     .values({
@@ -75,6 +101,7 @@ async function insertRun(
       trigger,
       requestedById,
       requestLimit: source.requestLimit,
+      cursor,
     })
     .returning();
   if (!run) throw new Error("Failed to create external site run.");
