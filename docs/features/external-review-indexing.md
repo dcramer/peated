@@ -247,14 +247,16 @@ Minnick reviewer attribution. Native and normalized scores stay absent. Only
 direct tasting paragraphs stay transient for summary generation; comparisons,
 introductions, prices, related links, and site furniture are excluded.
 
-Whisky Saga runs once per day. It reads only the 20 current article cards on
-the public Scotland category page. It does not request the full sitemap,
-archive pagination, search, query filters, or Squarespace APIs. Requests are at
+Whisky Saga runs once per day. It reads the 20 current article cards on the
+public Scotland category page, then advances one public Older Posts page from
+its last successful cursor. It follows only the publisher's Scotland category
+links with `offset` and `category` parameters. It does not request the full
+sitemap, search, other query filters, or Squarespace APIs. Requests are at
 least 2.5 seconds apart. The target allows 25 requests per hour, and each worker
-pass stops after 21 source requests plus the governed robots request when its
-cache is stale. The adapter stores the exact publication timestamp, author,
-canonical link, and native 100-point score. Only direct nose, taste, palate,
-and finish paragraphs stay transient for summary generation.
+pass stops after 22 requests. The adapter stores the exact publication
+timestamp, author, canonical link, and native 100-point score. Only direct
+nose, taste, palate, and finish paragraphs stay transient for summary
+generation.
 
 The Whisky Study runs once per day. It reads only the 20 article cards on the
 first public Scotch review index page. It does not request older pagination,

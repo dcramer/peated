@@ -5,8 +5,8 @@ import {
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
-import type { z } from "zod";
-import type { ScraperAdapter } from "../types";
+import { z } from "zod";
+import type { ScraperAdapter, ScraperSession } from "../types";
 import { parseArticleMetadata } from "./articleMetadata";
 import {
   currentReviewCursorSchema,
@@ -19,12 +19,22 @@ import { parseDate } from "./dates";
 const ORIGIN = "https://www.whiskysaga.com";
 const TARGET = "whiskysaga";
 const MAX_CURRENT_ARTICLES = 20;
+const MAX_HISTORY_ARTICLES = 20;
 const ARTICLE_PATH = /^\/blog\/[a-z0-9][a-z0-9-]*$/u;
+const HISTORY_OFFSET = /^\d{10,16}$/u;
 const TASTING_PARAGRAPH = /^(?:Nose|Palate|Taste|Finish)\s*:/iu;
 const SCORE = /^Score\s*:?\s*(?<value>\d{1,3}(?:[.,]\d+)?)\s*\/\s*100\s*$/iu;
 
-export const WhiskySagaCursorSchema =
-  currentReviewCursorSchema(MAX_CURRENT_ARTICLES);
+export const WhiskySagaCursorSchema = currentReviewCursorSchema(
+  MAX_CURRENT_ARTICLES,
+).extend({
+  nextHistoryUrl: z.url().nullable().default(null),
+  processedHistoryArticleUrls: z
+    .array(z.url())
+    .max(MAX_HISTORY_ARTICLES)
+    .default([]),
+  historyComplete: z.boolean().default(false),
+});
 
 export const WhiskySagaObservationSchema = ReviewArticleIngestionSchema;
 
@@ -58,6 +68,32 @@ export function discoverWhiskySagaArticles(data: string): URL[] {
   });
 
   return [...articles.values()].slice(0, MAX_CURRENT_ARTICLES);
+}
+
+function historyPageUrl(value: string): URL | null {
+  try {
+    const url = new URL(value, ORIGIN);
+    if (
+      url.origin !== ORIGIN ||
+      url.pathname !== "/blog" ||
+      url.hash ||
+      url.searchParams.size !== 2 ||
+      url.searchParams.get("category") !== "Scotland" ||
+      !HISTORY_OFFSET.test(url.searchParams.get("offset") ?? "")
+    ) {
+      return null;
+    }
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+export function discoverOlderWhiskySagaPage(data: string): URL | null {
+  const $ = cheerio(data);
+  return historyPageUrl(
+    $(".older a[rel='next'][href]").first().attr("href") ?? "",
+  );
 }
 
 function reviewScore(value: string) {
@@ -144,17 +180,91 @@ export const whiskySagaAdapter: ScraperAdapter<
   WhiskySagaCursor,
   WhiskySagaObservation
 > = async ({ cursor, session }) => {
+  let nextCursor = WhiskySagaCursorSchema.parse(
+    cursor ?? { processedArticleUrls: [] },
+  );
   const indexResponse = await session.request({
     target: TARGET,
     url: new URL("/blog/category/Scotland", ORIGIN),
   });
   const articleUrls = discoverWhiskySagaArticles(indexResponse.body);
+  const currentSession: ScraperSession<
+    { processedArticleUrls: string[] },
+    WhiskySagaObservation
+  > = {
+    request: (request) => session.request(request),
+    emit: (observation) => session.emit(observation),
+    remainingRequests: () => session.remainingRequests(),
+    checkpoint: async ({ processedArticleUrls }) => {
+      nextCursor = { ...nextCursor, processedArticleUrls };
+      await session.checkpoint(nextCursor);
+    },
+  };
   await processCurrentReviews({
     target: TARGET,
     articles: articleUrls,
     articleUrl: (url) => url,
-    cursor,
-    session,
+    cursor: nextCursor,
+    session: currentSession,
     parse: (response) => parseWhiskySagaArticle(response.body, response.url),
   });
+
+  if (nextCursor.historyComplete) return;
+
+  if (!nextCursor.nextHistoryUrl) {
+    const olderPage = discoverOlderWhiskySagaPage(indexResponse.body);
+    nextCursor = {
+      ...nextCursor,
+      nextHistoryUrl: olderPage?.href ?? null,
+      processedHistoryArticleUrls: [],
+      historyComplete: olderPage === null,
+    };
+    await session.checkpoint(nextCursor);
+    if (!olderPage) return;
+  }
+
+  const historyUrl = historyPageUrl(nextCursor.nextHistoryUrl ?? "");
+  if (!historyUrl) throw new Error("Invalid Whisky Saga history cursor URL.");
+  const historyResponse = await session.request({
+    target: TARGET,
+    url: historyUrl,
+  });
+  const historyArticles = discoverWhiskySagaArticles(historyResponse.body);
+  if (historyArticles.length === 0) {
+    throw new Error("Whisky Saga history page contains no article cards.");
+  }
+
+  const historyArticleUrls = new Set(historyArticles.map((url) => url.href));
+  const processedHistoryArticleUrls = new Set(
+    nextCursor.processedHistoryArticleUrls.filter((url) =>
+      historyArticleUrls.has(url),
+    ),
+  );
+  for (const url of historyArticles) {
+    if (processedHistoryArticleUrls.has(url.href)) continue;
+    const response = await session.request({ target: TARGET, url });
+    const observation = parseWhiskySagaArticle(response.body, response.url);
+    if (observation) {
+      await session.emit({
+        sourceKey: observation.article.canonicalUrl,
+        itemCount: observation.article.reviews.length,
+        value: observation,
+      });
+    }
+    processedHistoryArticleUrls.add(url.href);
+    nextCursor = {
+      ...nextCursor,
+      processedHistoryArticleUrls: [...processedHistoryArticleUrls],
+    };
+    await session.checkpoint(nextCursor);
+  }
+
+  const olderPage = discoverOlderWhiskySagaPage(historyResponse.body);
+  nextCursor = {
+    ...nextCursor,
+    nextHistoryUrl: olderPage?.href ?? null,
+    processedHistoryArticleUrls: [],
+    historyComplete: olderPage === null,
+  };
+  await session.checkpoint(nextCursor);
 };
