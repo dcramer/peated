@@ -83,6 +83,7 @@ function getImageUrl(
       if (
         url.protocol === "https:" &&
         (url.origin === STORE_ORIGIN ||
+          url.hostname === "images.finedrams.com" ||
           url.hostname === "d1wd5rt8ssn8ry.cloudfront.net")
       ) {
         return url.toString();
