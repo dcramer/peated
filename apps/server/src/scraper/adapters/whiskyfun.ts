@@ -271,7 +271,7 @@ function bottleName(value: string): string | null {
 
 function score(value: string) {
   const match =
-    /\bSGP:\s*\d{3}\s*[-\u2012-\u2015]\s*(\d{1,3})\s+points?\b/iu.exec(value);
+    /\bSGP:\s*\d{3}\s*[:\u2012-\u2015-]\s*(\d{1,3})\s+points?\b/iu.exec(value);
   const nativeValue = match?.[1] ? Number(match[1]) : Number.NaN;
   if (!Number.isFinite(nativeValue) || nativeValue < 0 || nativeValue > 100) {
     return null;
