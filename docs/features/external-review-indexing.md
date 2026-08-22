@@ -192,9 +192,13 @@ the complete source Bottle title for classification and reads the category
 before the separate price line. It does not persist review prose.
 
 Whiskyfun runs once per day. It reads at most 20 current RSS items and skips
-clear non-whisky articles before it requests article pages. Requests are at
-least 2.5 seconds apart. The target allows 25 requests per hour, and each worker
-pass stops after 30 requests. The adapter stores explicit feed dates, reviewer
+clear non-whisky articles before it requests article pages. It then advances
+one historical archive page from its last successful cursor. The first history
+run discovers the newest archive from the homepage. Each later page supplies
+the next older link. Historical articles keep the publisher's daily date anchor
+and date. When the archive ends, later runs check only the current feed.
+Requests are at least 2.5 seconds apart. The target allows 25 requests per hour,
+and each worker pass stops after 30 requests. The adapter stores dates, reviewer
 metadata, native scores, and canonical links. Review prose stays transient.
 
 Dramface runs once per day. It reads at most 20 current links from the public

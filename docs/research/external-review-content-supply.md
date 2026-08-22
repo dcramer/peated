@@ -45,7 +45,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 | Priority   | Source                                                        | Supply opportunity                                                                | robots.txt observation                                                                                     | Terms/reuse observation                                                                                                                           | Recommended mode                              |
 | ---------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
 | P0         | [WhiskyNotes](https://www.whiskynotes.be/)                    | About 6,600 reviews across 4,985 articles; new tasting notes every weekday        | Public article paths allowed; feed, search, downloads, and WordPress internals disallowed                  | No dedicated terms page located                                                                                                                   | `public_index`, daily archive import          |
-| P0         | [Whiskyfun](https://www.whiskyfun.com/)                       | About 22,700 whisky reviews dating to 2002                                        | No `Disallow` rule observed; unusual single `Allow` entry                                                  | No formal terms located; FAQ and disclosure discuss free commercial use                                                                           | `public_index`, later archive candidate       |
+| P0         | [Whiskyfun](https://www.whiskyfun.com/)                       | About 22,800 whisky reviews dating to 2002                                        | No `Disallow` rule observed; unusual single `Allow` entry                                                  | No formal terms located; FAQ and disclosure discuss free commercial use                                                                           | `public_index`, daily archive import          |
 | P0         | [Dramface](https://www.dramface.com/)                         | Reviews most weekdays, multiple writers, frequent multi-bottle articles           | Public pages allowed; Squarespace rules block API, JSON, search, account, and other internal paths         | No dedicated terms page linked in the public footer                                                                                               | `public_index`, ongoing-feed pilot            |
 | P0         | [Whisky Advocate](https://whiskyadvocate.com/ratings-reviews) | Existing Peated source; publisher describes an archive of more than 6,000 reviews | Ratings paths allowed for general crawlers; GPTBot, ChatGPT-User, and CCBot are blocked                    | Privacy policy references general terms, but no public general terms page or review-reuse restriction was located                                 | `public_index`, second bounded pilot          |
 | P0         | [Whisky Saga](https://www.whiskysaga.com/)                    | Active scored reviews; the Scotland category contains more than 2,000 articles    | Public category and article paths allowed; Squarespace APIs, search, filters, and internal formats blocked | Privacy and editorial pages contain no automated-access restriction                                                                               | `public_index`, daily Scotch feed             |
@@ -93,9 +93,12 @@ a separate platform-terms and creator-rights review.
 - The current RSS feed supplies canonical article URLs, titles, exact dates,
   and Bottle names. Article pages supply the reviewer and native 100-point
   scores.
-- The implemented daily feed checks at most 20 items and uses the governed
-  runtime for article requests. The two-decade archive remains a separate
-  future backfill.
+- Archive pages provide stable daily date anchors and links to their older and
+  newer neighbors. One page can contain several daily entries and can mix
+  whisky with other spirits.
+- The daily importer checks at most 20 current RSS items before it advances one
+  older archive page from its last successful cursor. It excludes clear
+  non-whisky sessions and stops older-page requests when the archive ends.
 
 ### Whisky Saga
 
