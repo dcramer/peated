@@ -48,7 +48,7 @@ test("scrapes in-stock single bottles and excludes ineligible cards", async ({
   expect(items).toEqual([
     {
       currency: "eur",
-      imageUrl: "https://d1wd5rt8ssn8ry.cloudfront.net/image/lagavulin.webp",
+      imageUrl: "https://images.finedrams.com/image/lagavulin.webp",
       name: "Lagavulin 12-year-old (2019 Special Release)",
       price: 12880,
       url: "https://www.finedrams.com/lagavulin-12-year-old-cask-strength-2019-special-release-whisky.html",
