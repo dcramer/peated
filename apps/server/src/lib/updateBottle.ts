@@ -186,6 +186,7 @@ type DesiredBottle = Pick<
   | "description"
   | "descriptionSrc"
   | "imageUrl"
+  | "rejectedImageUrls"
   | "tastingNotes"
   | "suggestedTags"
 >;
@@ -476,6 +477,10 @@ function desiredBottleFor({
           ? null
           : "user"
         : bottle.descriptionSrc;
+  const rejectedImageUrls =
+    exactPatch?.image === null && bottle.imageUrl
+      ? Array.from(new Set([...bottle.rejectedImageUrls, bottle.imageUrl]))
+      : bottle.rejectedImageUrls;
 
   return {
     name: identity.name,
@@ -508,6 +513,7 @@ function desiredBottleFor({
     description,
     descriptionSrc,
     imageUrl: exactPatch?.image === null ? null : bottle.imageUrl,
+    rejectedImageUrls,
     tastingNotes: valueOrCurrent(exactPatch?.tastingNotes, bottle.tastingNotes),
     suggestedTags: valueOrCurrent(
       exactPatch?.suggestedTags,
@@ -537,6 +543,7 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "description",
   "descriptionSrc",
   "imageUrl",
+  "rejectedImageUrls",
   "tastingNotes",
   "suggestedTags",
 ];

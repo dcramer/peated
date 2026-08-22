@@ -725,6 +725,7 @@ export async function finalizeBottleAliasAssignment(
           and(
             eq(bottles.id, bottleImageCandidate.bottleId),
             or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
+            sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
           ),
         )
         .returning({ id: bottles.id });
@@ -751,6 +752,7 @@ export async function finalizeBottleAliasAssignment(
                 and(
                   eq(bottles.id, tombstone.newBottleId),
                   or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
+                  sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
                 ),
               )
               .returning({ id: bottles.id });

@@ -126,6 +126,12 @@ That observation stores:
 This keeps exact source detail without forcing new public fields into the normal
 Bottle entry flow.
 
+## Image Promotion
+
+A StorePrice image can fill an empty Bottle image. It cannot use an image link
+that a moderator removed from that Bottle. A different image link can still
+fill the empty image.
+
 ## Candidate Generation
 
 Candidate search presents independently complete Bottles, keyed by `bottleId`.

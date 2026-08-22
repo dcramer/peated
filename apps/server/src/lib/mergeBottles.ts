@@ -822,6 +822,18 @@ export async function mergeBottlesInTransaction(
   }
 
   await tx
+    .update(bottles)
+    .set({
+      rejectedImageUrls: Array.from(
+        new Set([
+          ...destination.rejectedImageUrls,
+          ...source.rejectedImageUrls,
+        ]),
+      ),
+    })
+    .where(eq(bottles.id, destinationBottleId));
+
+  await tx
     .update(bottleTombstones)
     .set({ newBottleId: destinationBottleId })
     .where(eq(bottleTombstones.newBottleId, sourceBottleId));

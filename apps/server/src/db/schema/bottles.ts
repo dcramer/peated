@@ -174,6 +174,11 @@ export const bottles = pgTable(
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     imageUrl: text("image_url"),
+    // A removed image must not return from a StorePrice match.
+    rejectedImageUrls: text("rejected_image_urls")
+      .array()
+      .default(sql`array[]::text[]`)
+      .notNull(),
     tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
     suggestedTags: varchar("suggested_tags", { length: 64 })
       .array()
