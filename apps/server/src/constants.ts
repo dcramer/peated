@@ -86,6 +86,11 @@ export const EXTERNAL_SITE_DEFINITIONS = {
     runEvery: 1440,
     content: "reviews",
   },
+  whiskysaga: {
+    name: "Whisky Saga",
+    runEvery: 1440,
+    content: "reviews",
+  },
   whiskynotes: {
     name: "WhiskyNotes",
     runEvery: null,

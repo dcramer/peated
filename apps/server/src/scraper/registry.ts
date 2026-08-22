@@ -70,6 +70,11 @@ import {
   WhiskyNotesObservationSchema,
 } from "./adapters/whiskyNotes";
 import {
+  whiskySagaAdapter,
+  WhiskySagaCursorSchema,
+  WhiskySagaObservationSchema,
+} from "./adapters/whiskySaga";
+import {
   wordsOfWhiskyAdapter,
   WordsOfWhiskyCursorSchema,
   WordsOfWhiskyObservationSchema,
@@ -317,6 +322,17 @@ export const scraperRegistry = createScraperRegistry({
       ],
     }),
     defineScrapeTarget({
+      key: "whiskysaga",
+      minimumSpacingMs: 2_500,
+      requestsPerWindow: 25,
+      origins: [
+        {
+          origin: "https://www.whiskysaga.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
       key: "wordsofwhisky",
       minimumSpacingMs: 2_500,
       requestsPerWindow: 25,
@@ -421,6 +437,16 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: WhiskyfunCursorSchema,
       observationSchema: WhiskyfunObservationSchema,
       adapter: whiskyfunAdapter,
+      sink: externalReviewSink,
+    }),
+    defineScraperSource({
+      key: "whiskysaga",
+      externalSiteType: "whiskysaga",
+      targetKeys: ["whiskysaga"],
+      requestLimit: 22,
+      cursorSchema: WhiskySagaCursorSchema,
+      observationSchema: WhiskySagaObservationSchema,
+      adapter: whiskySagaAdapter,
       sink: externalReviewSink,
     }),
     defineScraperSource({
