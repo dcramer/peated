@@ -1590,6 +1590,13 @@
       "when": 1787349065163,
       "tag": "0226_unaccent_search",
       "breakpoints": false
+    },
+    {
+      "idx": 227,
+      "version": "7",
+      "when": 1787378459330,
+      "tag": "0227_slow_nova",
+      "breakpoints": false
     }
   ]
 }

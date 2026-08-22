@@ -1,0 +1,1 @@
+ALTER TABLE "review" ADD COLUMN "category" "category";

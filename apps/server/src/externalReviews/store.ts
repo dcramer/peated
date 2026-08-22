@@ -1,15 +1,10 @@
 import { db, type AnyTransaction } from "@peated/server/db";
-import {
-  externalReviewSourcePolicies,
-  externalSites,
-  reviewArticles,
-  reviews,
-  storePrices,
-} from "@peated/server/db/schema";
+import { reviewArticles, reviews, storePrices } from "@peated/server/db/schema";
 import {
   ReviewArticleObservationSchema,
   ReviewArticleReviewSchema,
 } from "@peated/server/externalReviews/observation";
+import { getExternalReviewPublicationModeInTransaction } from "@peated/server/externalReviews/publication";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -75,28 +70,12 @@ export async function storeReviewArticleInTransaction(
     aliasLookupNames?: string[];
   },
 ) {
-  // The source row serializes ingestion with moderator policy updates.
-  const [site] = await tx
-    .select({ id: externalSites.id })
-    .from(externalSites)
-    .where(eq(externalSites.id, input.externalSiteId))
-    .limit(1)
-    .for("share");
-  if (!site) {
-    throw new Error(`External site ${input.externalSiteId} not found.`);
-  }
-
-  const policy =
-    origin === "source"
-      ? await tx.query.externalReviewSourcePolicies.findFirst({
-          columns: { publicationMode: true },
-          where: eq(
-            externalReviewSourcePolicies.externalSiteId,
-            input.externalSiteId,
-          ),
-        })
-      : null;
-  const publishesAutomatically = policy?.publicationMode === "automatic";
+  const publicationMode = await getExternalReviewPublicationModeInTransaction(
+    tx,
+    input.externalSiteId,
+  );
+  const publishesAutomatically =
+    origin === "source" && publicationMode === "automatic";
 
   const articleUpdate =
     origin === "manual"
@@ -223,6 +202,7 @@ export async function storeReviewArticleInTransaction(
       rating: review.normalizedRating,
       ...(origin === "source"
         ? {
+            category: review.category,
             reviewerName: review.reviewerName,
             nativeScoreValue: review.nativeScore?.value ?? null,
             nativeScoreScale: review.nativeScore?.scale ?? null,

@@ -296,6 +296,40 @@ describe("createMissingBottles", () => {
     expect(unchangedReview?.bottleId).toBeNull();
   });
 
+  test("limits queued work to one review article", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const systemUser = await fixtures.User({ admin: true });
+    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
+    const selected = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "Selected Article Review",
+      category: "single_malt",
+      url: "https://example.com/selected-review",
+    });
+    const skipped = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "Other Article Review",
+      url: "https://example.com/other-review",
+    });
+
+    await createMissingBottles({ articleId: selected.articleId });
+
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        extractedIdentity: expect.objectContaining({
+          category: "single_malt",
+        }),
+        reference: expect.objectContaining({ id: selected.id }),
+      }),
+    );
+    expect(
+      await db.query.reviews.findFirst({ where: eq(reviews.id, skipped.id) }),
+    ).toMatchObject({ bottleId: null });
+  });
+
   test("assigns a classifier match to its direct active Bottle", async ({
     fixtures,
   }) => {
@@ -349,6 +383,45 @@ describe("createMissingBottles", () => {
       decision: "match_existing",
       bottleId: bottle.id,
     });
+  });
+
+  test("publishes a newly resolved review in automatic mode", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.ExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+      publicationMode: "automatic",
+      allowLlmProcessing: true,
+      allowScoreDisplay: true,
+      allowSummaryDisplay: true,
+    });
+    const systemUser = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle({ name: "Published Worker Bottle" });
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: null,
+      hidden: true,
+      name: "Published Worker Bottle Review",
+      url: "https://example.com/published-worker-review",
+    });
+    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+        },
+        { candidates: [{ bottleId: bottle.id }] },
+      ),
+    );
+
+    await createMissingBottles({ articleId: review.articleId });
+
+    expect(
+      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).toMatchObject({ bottleId: bottle.id, hidden: false });
   });
 
   test("attempts unresolved Reviews", async ({ fixtures }) => {

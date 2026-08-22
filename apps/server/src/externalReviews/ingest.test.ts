@@ -8,16 +8,16 @@ import { ingestReviewArticle } from "@peated/server/externalReviews/ingest";
 import { asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 
-const resolveBottleMock = vi.hoisted(() => vi.fn());
 const generateSummaryMock = vi.hoisted(() => vi.fn());
 const logTelemetryErrorMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@peated/server/lib/bottleReferenceResolution", () => ({
-  resolveScrapedBottleReferenceTarget: resolveBottleMock,
-}));
+const pushUniqueJobMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@peated/server/externalReviews/summary", () => ({
   generateExternalReviewSummary: generateSummaryMock,
+}));
+
+vi.mock("@peated/server/worker/client", () => ({
+  pushUniqueJob: pushUniqueJobMock,
 }));
 
 vi.mock("@peated/server/lib/log", async (importOriginal) => ({
@@ -25,24 +25,10 @@ vi.mock("@peated/server/lib/log", async (importOriginal) => ({
   logTelemetryError: logTelemetryErrorMock,
 }));
 
-function resolution(bottleId: number | null) {
-  return {
-    assignment:
-      bottleId === null ? null : { kind: "direct_bottle" as const, bottleId },
-    source: bottleId === null ? "unresolved" : "classifier_match",
-    error: null,
-    confidence: null,
-    model: null,
-    rationale: null,
-    classifierEvidence: null,
-    createdBottle: false,
-  };
-}
-
 beforeEach(() => {
-  resolveBottleMock.mockReset();
   generateSummaryMock.mockReset();
   logTelemetryErrorMock.mockReset();
+  pushUniqueJobMock.mockReset();
 });
 
 test("rejects a missing source before Bottle resolution", async () => {
@@ -60,23 +46,18 @@ test("rejects a missing source before Bottle resolution", async () => {
       },
     }),
   ).rejects.toThrow(`External site ${externalSiteId} not found.`);
-  expect(resolveBottleMock).not.toHaveBeenCalled();
+  expect(pushUniqueJobMock).not.toHaveBeenCalled();
 });
 
-test("resolves each review and hides unresolved or invalid assignments", async ({
+test("stores exact aliases and queues model resolution after storage", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   const bottle = await fixtures.Bottle({ name: "Resolved Review Bottle" });
-  const missingBottleId = 2_147_483_647;
   const unresolvedName =
     "Mister Sam Tribute Whiskey (66,9%, OB 2019 (Batch 1), 1200 btl.)";
-  resolveBottleMock
-    .mockResolvedValueOnce(resolution(bottle.id))
-    .mockResolvedValueOnce(resolution(null))
-    .mockResolvedValueOnce(resolution(missingBottleId));
 
-  await ingestReviewArticle({
+  const result = await ingestReviewArticle({
     externalSiteId: site.id,
     fetchedAt: new Date("2026-04-13T12:00:00Z"),
     article: {
@@ -85,22 +66,19 @@ test("resolves each review and hides unresolved or invalid assignments", async (
       contentHash: "sha256:first",
       reviews: [
         { sourceKey: "resolved", name: bottle.fullName },
-        { sourceKey: "unresolved", name: unresolvedName },
-        { sourceKey: "invalid", name: "Missing Review Bottle" },
+        {
+          sourceKey: "unresolved",
+          name: unresolvedName,
+          category: "single_malt",
+        },
       ],
     },
   });
 
-  expect(resolveBottleMock).toHaveBeenCalledTimes(3);
   expect(await db.select().from(reviewArticles)).toHaveLength(1);
   expect(
     await db.select().from(reviews).orderBy(asc(reviews.sourceKey)),
   ).toMatchObject([
-    {
-      sourceKey: "invalid",
-      bottleId: null,
-      hidden: true,
-    },
     {
       sourceKey: "resolved",
       bottleId: bottle.id,
@@ -109,10 +87,16 @@ test("resolves each review and hides unresolved or invalid assignments", async (
     {
       sourceKey: "unresolved",
       name: unresolvedName,
+      category: "single_malt",
       bottleId: null,
       hidden: true,
     },
   ]);
+  expect(pushUniqueJobMock).toHaveBeenCalledWith(
+    "CreateMissingBottles",
+    { articleId: result.articleId },
+    { removeOnComplete: true, removeOnFail: true },
+  );
 });
 
 test("hides an existing review when its resolved Bottle is retired", async ({
@@ -123,7 +107,6 @@ test("hides an existing review when its resolved Bottle is retired", async ({
   const replacement = await fixtures.Bottle({
     name: "Replacement Review Bottle",
   });
-  resolveBottleMock.mockResolvedValue(resolution(bottle.id));
   const input = {
     externalSiteId: site.id,
     fetchedAt: new Date("2026-04-13T12:00:00Z"),
@@ -157,6 +140,36 @@ test("hides an existing review when its resolved Bottle is retired", async ({
   });
 });
 
+test("keeps stored reviews when background dispatch fails", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const queueError = new Error("queue unavailable");
+  pushUniqueJobMock.mockRejectedValue(queueError);
+
+  const result = await ingestReviewArticle({
+    externalSiteId: site.id,
+    fetchedAt: new Date("2026-04-13T12:00:00Z"),
+    article: {
+      canonicalUrl: "https://reviews.example/articles/queued-later",
+      title: "A review queued later",
+      contentHash: "sha256:queued-later",
+      reviews: [{ sourceKey: "queued-later", name: "Unknown Bottle" }],
+    },
+  });
+
+  expect(await db.query.reviews.findFirst()).toMatchObject({
+    articleId: result.articleId,
+    bottleId: null,
+  });
+  expect(logTelemetryErrorMock).toHaveBeenCalledWith(queueError, {
+    extra: {
+      reviewArticleId: result.articleId,
+      externalSiteId: site.id,
+    },
+  });
+});
+
 test("stores a generated summary without storing its source text", async ({
   fixtures,
 }) => {
@@ -164,7 +177,6 @@ test("stores a generated summary without storing its source text", async ({
   const bottle = await fixtures.Bottle({ name: "Summarized Review Bottle" });
   const generatedAt = new Date("2026-04-13T12:01:00Z");
   const sourceText = "Publisher text that must remain transient.";
-  resolveBottleMock.mockResolvedValue(resolution(bottle.id));
   generateSummaryMock.mockResolvedValue({
     text: "The reviewer finds the whisky balanced. They recommend it for its dry finish.",
     contentHash: "sha256:summary",
@@ -204,7 +216,6 @@ test("stores review metadata when summary generation fails", async ({
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   const bottle = await fixtures.Bottle({ name: "Summary Failure Bottle" });
   const sourceText = "Publisher text that must not enter the failure log.";
-  resolveBottleMock.mockResolvedValue(resolution(bottle.id));
   generateSummaryMock.mockRejectedValue(new Error(sourceText));
 
   await ingestReviewArticle({

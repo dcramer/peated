@@ -13,6 +13,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { bottles } from "./bottles";
+import { categoryEnum } from "./enums";
 import { externalSites } from "./externalSites";
 
 export const reviewArticles = pgTable(
@@ -45,6 +46,7 @@ export const reviews = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     name: text("name").notNull(),
+    category: categoryEnum("category"),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
