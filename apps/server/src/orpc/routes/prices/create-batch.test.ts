@@ -331,6 +331,98 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
+  test("converges compatible legacy rows that share a retailer URL", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({ name: "Legacy Price Bottle" });
+    const url = "https://example.com/products/legacy-duplicate";
+    const canonical = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      name: bottle.fullName,
+      url,
+    });
+    const duplicate = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Legacy Duplicate",
+      url,
+    });
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          externalProductId: "retailer-sku-duplicate",
+          name: bottle.fullName,
+          price: 7_500,
+          currency: "usd",
+          volume: 750,
+          url,
+        },
+      ],
+    });
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, canonical.id),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      externalProductId: "retailer-sku-duplicate",
+      hidden: false,
+      price: 7_500,
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, duplicate.id),
+      }),
+    ).toMatchObject({
+      externalProductId: null,
+      hidden: true,
+    });
+  });
+
+  test("does not converge conflicting retailer product IDs", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const url = "https://example.com/products/reused-url";
+    await fixtures.StorePrice({
+      externalProductId: "retailer-sku-1",
+      externalSiteId: site.id,
+      url,
+    });
+    await fixtures.StorePrice({
+      externalProductId: "retailer-sku-2",
+      externalSiteId: site.id,
+      url,
+    });
+
+    await expect(
+      createStorePricesAsPeated({
+        site: site.type,
+        prices: [
+          {
+            externalProductId: "retailer-sku-1",
+            name: "Reused Retailer URL",
+            price: 7_500,
+            currency: "usd",
+            volume: 750,
+            url,
+          },
+        ],
+      }),
+    ).rejects.toThrow("already assigned to another source product");
+
+    const prices = await db.query.storePrices.findMany({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    expect(prices).toHaveLength(2);
+    expect(prices.every((price) => price.hidden === false)).toBe(true);
+  });
+
   test("keeps distinct generic listings instead of merging by title and volume", async ({
     fixtures,
   }) => {
