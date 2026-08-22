@@ -56,6 +56,7 @@ const migratedSources = [
   "whiskyadvocate",
   "whiskyfun",
   "whiskynotes",
+  "whiskysaga",
   "whiskyworld",
   "woodencork",
   "wordsofwhisky",
@@ -139,6 +140,13 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("whiskyfun")?.requestLimit).toBe(30);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskysaga.runEvery).toBe(1440);
+  expect(scraperRegistry.targets.get("whiskysaga")).toMatchObject({
+    minimumSpacingMs: 2_500,
+    requestsPerWindow: 25,
+    windowMs: 3_600_000,
+  });
+  expect(scraperRegistry.sources.get("whiskysaga")?.requestLimit).toBe(22);
   expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("wordsofwhisky")).toMatchObject({
     minimumSpacingMs: 2_500,
