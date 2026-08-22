@@ -14,22 +14,23 @@ import {
 } from "./currentReviews";
 import { parseDate } from "./dates";
 
-// This adapter owns Whisky Saga parsing. The shared scraper runtime owns every
-// remote request and the shared review sink owns storage.
-const ORIGIN = "https://www.whiskysaga.com";
-const TARGET = "whiskysaga";
+// This adapter owns The Whisky Study parsing. The shared scraper runtime owns
+// every remote request and the shared review sink owns storage.
+const ORIGIN = "https://thewhiskystudy.com";
+const TARGET = "whiskystudy";
 const MAX_CURRENT_ARTICLES = 20;
-const ARTICLE_PATH = /^\/blog\/[a-z0-9][a-z0-9-]*$/u;
+const ARTICLE_PATH = /^\/reviews-3\/[a-z0-9][a-z0-9-]*$/u;
 const TASTING_PARAGRAPH = /^(?:Nose|Palate|Taste|Finish)\s*:/iu;
-const SCORE = /^Score\s*:?\s*(?<value>\d{1,3}(?:[.,]\d+)?)\s*\/\s*100\s*$/iu;
+const SCORE =
+  /^Score\s*:\s*(?<value>\d{1,3}(?:[.,]\d+)?)(?:\s*\/\s*100)?\s*$/iu;
 
-export const WhiskySagaCursorSchema =
+export const WhiskyStudyCursorSchema =
   currentReviewCursorSchema(MAX_CURRENT_ARTICLES);
 
-export const WhiskySagaObservationSchema = ReviewArticleIngestionSchema;
+export const WhiskyStudyObservationSchema = ReviewArticleIngestionSchema;
 
-export type WhiskySagaCursor = z.infer<typeof WhiskySagaCursorSchema>;
-export type WhiskySagaObservation = ReviewArticleIngestion;
+export type WhiskyStudyCursor = z.infer<typeof WhiskyStudyCursorSchema>;
+export type WhiskyStudyObservation = ReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -48,7 +49,7 @@ function articleUrl(value: string): URL | null {
   }
 }
 
-export function discoverWhiskySagaArticles(data: string): URL[] {
+export function discoverWhiskyStudyArticles(data: string): URL[] {
   const $ = cheerio(data);
   const articles = new Map<string, URL>();
 
@@ -58,6 +59,11 @@ export function discoverWhiskySagaArticles(data: string): URL[] {
   });
 
   return [...articles.values()].slice(0, MAX_CURRENT_ARTICLES);
+}
+
+function bottleName(title: string): string | null {
+  const name = normalizeText(title.replace(/\s+(?:Shelf\s+)?Review$/iu, ""));
+  return name || null;
 }
 
 function reviewScore(value: string) {
@@ -81,16 +87,16 @@ function reviewScore(value: string) {
 
 function sourceKey(canonicalUrl: string): string {
   const digest = createHash("sha256").update(canonicalUrl).digest("hex");
-  return `whiskysaga:${digest}`;
+  return `whiskystudy:${digest}`;
 }
 
-export function parseWhiskySagaArticle(
+export function parseWhiskyStudyArticle(
   data: string,
   rawCanonicalUrl: URL,
-): WhiskySagaObservation | null {
+): WhiskyStudyObservation | null {
   const $ = cheerio(data);
   const article = $("article.h-entry").first();
-  const paragraphs = article.find(".blog-item-content p").toArray();
+  const paragraphs = article.find("p").toArray();
   const reviewText = normalizeText(
     paragraphs
       .map((element) => normalizeText($(element).text()))
@@ -102,24 +108,29 @@ export function parseWhiskySagaArticle(
   const canonicalUrl = articleUrl(
     $('link[rel="canonical"]').first().attr("href") ?? rawCanonicalUrl.href,
   );
-  if (!canonicalUrl) throw new Error("Invalid Whisky Saga article URL.");
+  if (!canonicalUrl) throw new Error("Invalid The Whisky Study article URL.");
 
   const title = normalizeText(article.find("h1.entry-title").first().text());
+  const name = bottleName(title);
   const metadata = parseArticleMetadata(data);
-  const score = paragraphs
+  const score = article
+    .find("h1,h2,h3,h4,p")
+    .toArray()
     .map((element) => reviewScore($(element).text()))
     .find((value) => value !== null);
   const publishedAt = metadata ? parseDate(metadata.datePublished) : null;
-  if (!title) throw new Error("Whisky Saga article title is missing.");
-  if (!metadata?.author) throw new Error("Whisky Saga reviewer is missing.");
+  if (!title) throw new Error("The Whisky Study article title is missing.");
+  if (!name) throw new Error("The Whisky Study Bottle name is missing.");
+  if (!metadata?.author)
+    throw new Error("The Whisky Study reviewer is missing.");
   if (!publishedAt)
-    throw new Error("Whisky Saga article date is missing or invalid.");
-  if (!score) throw new Error("Whisky Saga score is missing or invalid.");
+    throw new Error("The Whisky Study article date is missing or invalid.");
+  if (!score) throw new Error("The Whisky Study score is missing or invalid.");
 
   const reviewSourceKey = sourceKey(canonicalUrl.href);
   const review = {
     sourceKey: reviewSourceKey,
-    name: title,
+    name,
     category: null,
     reviewerName: metadata.author,
     nativeScore: score.nativeScore,
@@ -127,7 +138,7 @@ export function parseWhiskySagaArticle(
   };
   const contentText = JSON.stringify({ review, reviewText });
 
-  return WhiskySagaObservationSchema.parse({
+  return WhiskyStudyObservationSchema.parse({
     article: {
       canonicalUrl: canonicalUrl.href,
       title,
@@ -140,21 +151,21 @@ export function parseWhiskySagaArticle(
   });
 }
 
-export const whiskySagaAdapter: ScraperAdapter<
-  WhiskySagaCursor,
-  WhiskySagaObservation
+export const whiskyStudyAdapter: ScraperAdapter<
+  WhiskyStudyCursor,
+  WhiskyStudyObservation
 > = async ({ cursor, session }) => {
   const indexResponse = await session.request({
     target: TARGET,
-    url: new URL("/blog/category/Scotland", ORIGIN),
+    url: new URL("/reviews-3", ORIGIN),
   });
-  const articleUrls = discoverWhiskySagaArticles(indexResponse.body);
+  const articleUrls = discoverWhiskyStudyArticles(indexResponse.body);
   await processCurrentReviews({
     target: TARGET,
     articles: articleUrls,
     articleUrl: (url) => url,
     cursor,
     session,
-    parse: (response) => parseWhiskySagaArticle(response.body, response.url),
+    parse: (response) => parseWhiskyStudyArticle(response.body, response.url),
   });
 };

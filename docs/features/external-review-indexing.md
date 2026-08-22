@@ -256,6 +256,15 @@ cache is stale. The adapter stores the exact publication timestamp, author,
 canonical link, and native 100-point score. Only direct nose, taste, palate,
 and finish paragraphs stay transient for summary generation.
 
+The Whisky Study runs once per day. It reads only the 20 article cards on the
+first public Scotch review index page. It does not request older pagination,
+the sitemap, search, query filters, or Squarespace APIs. Requests are at least
+2.5 seconds apart. The target allows 25 requests per hour, and each worker pass
+stops after 21 source requests plus the governed robots request when its cache
+is stale. The adapter stores the exact publication timestamp, author, canonical
+link, and native 100-point score. Only direct nose, taste, palate, and finish
+paragraphs stay transient for summary generation.
+
 Enable automatic publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a
 generic crawler only because several sources use RSS or HTML.
