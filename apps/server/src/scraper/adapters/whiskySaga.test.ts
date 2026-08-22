@@ -2,15 +2,38 @@ import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { vi } from "vitest";
 import type { ScraperSession } from "../types";
 import {
+  discoverOlderWhiskySagaPage,
   discoverWhiskySagaArticles,
   parseWhiskySagaArticle,
   whiskySagaAdapter,
+  WhiskySagaCursorSchema,
   type WhiskySagaCursor,
   type WhiskySagaObservation,
 } from "./whiskySaga";
 
 const FIRST_URL = "https://www.whiskysaga.com/blog/example-scotch";
 const SECOND_URL = "https://www.whiskysaga.com/blog/second-scotch";
+const HISTORY_URL =
+  "https://www.whiskysaga.com/blog?offset=1775418696457&category=Scotland";
+const OLDER_HISTORY_URL =
+  "https://www.whiskysaga.com/blog?offset=1772902711929&category=Scotland";
+const COMPLETED_HISTORY: Pick<
+  WhiskySagaCursor,
+  "nextHistoryUrl" | "processedHistoryArticleUrls" | "historyComplete"
+> = {
+  nextHistoryUrl: null,
+  processedHistoryArticleUrls: [],
+  historyComplete: true,
+};
+
+function historyPage({ older = true }: { older?: boolean } = {}) {
+  return `<main><article class="blog-item"><a href="${FIRST_URL}">Review</a></article></main>
+    ${
+      older
+        ? `<div class="older"><a rel="next" href="${OLDER_HISTORY_URL}">Older Posts</a></div>`
+        : ""
+    }`;
+}
 
 test("discovers only 20 current Scotland article cards", async () => {
   const index = await loadFixture("whiskysaga", "index.html");
@@ -31,6 +54,33 @@ test("discovers only 20 current Scotland article cards", async () => {
   expect(discoverWhiskySagaArticles(expandedIndex).at(-1)?.pathname).toBe(
     "/blog/generated-17",
   );
+});
+
+test("accepts only the public Scotland older-page link", () => {
+  expect(discoverOlderWhiskySagaPage(historyPage())?.href).toBe(
+    OLDER_HISTORY_URL,
+  );
+  expect(
+    discoverOlderWhiskySagaPage(
+      '<div class="older"><a rel="next" href="/blog?offset=1772902711929&category=World">Older</a></div>',
+    ),
+  ).toBeNull();
+  expect(
+    discoverOlderWhiskySagaPage(
+      '<div class="older"><a rel="next" href="/blog?offset=1772902711929&category=Scotland&format=json">Older</a></div>',
+    ),
+  ).toBeNull();
+});
+
+test("accepts the current-only cursor and adds history defaults", () => {
+  expect(
+    WhiskySagaCursorSchema.parse({ processedArticleUrls: [FIRST_URL] }),
+  ).toEqual({
+    processedArticleUrls: [FIRST_URL],
+    nextHistoryUrl: null,
+    processedHistoryArticleUrls: [],
+    historyComplete: false,
+  });
 });
 
 test("extracts source facts and only direct tasting paragraphs", async () => {
@@ -119,7 +169,10 @@ test("resumes without requesting a completed current article", async () => {
   };
 
   await whiskySagaAdapter({
-    cursor: { processedArticleUrls: [FIRST_URL] },
+    cursor: {
+      processedArticleUrls: [FIRST_URL],
+      ...COMPLETED_HISTORY,
+    },
     session,
   });
 
@@ -132,5 +185,86 @@ test("resumes without requesting a completed current article", async () => {
   );
   expect(checkpoint).toHaveBeenCalledWith({
     processedArticleUrls: [FIRST_URL, SECOND_URL],
+    ...COMPLETED_HISTORY,
+  });
+});
+
+test("imports one older Scotland page and advances the history cursor", async () => {
+  const article = await loadFixture("whiskysaga", "review.html");
+  const emit = vi.fn();
+  const checkpoint = vi.fn();
+  const request = vi.fn(async ({ url }: { url: URL }) => ({
+    url,
+    status: 200,
+    headers: {},
+    body:
+      url.pathname === "/blog/category/Scotland"
+        ? `<main></main><div class="older"><a rel="next" href="${HISTORY_URL}">Older Posts</a></div>`
+        : url.href === HISTORY_URL
+          ? historyPage()
+          : article,
+  }));
+  const session: ScraperSession<WhiskySagaCursor, WhiskySagaObservation> = {
+    request,
+    emit,
+    checkpoint,
+    remainingRequests: () => 22,
+  };
+
+  await whiskySagaAdapter({ cursor: null, session });
+
+  expect(request.mock.calls.map(([input]) => input.url.href)).toEqual([
+    "https://www.whiskysaga.com/blog/category/Scotland",
+    HISTORY_URL,
+    FIRST_URL,
+  ]);
+  expect(emit).toHaveBeenCalledWith(
+    expect.objectContaining({ sourceKey: FIRST_URL, itemCount: 1 }),
+  );
+  expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
+    processedArticleUrls: [],
+    nextHistoryUrl: OLDER_HISTORY_URL,
+    processedHistoryArticleUrls: [],
+    historyComplete: false,
+  });
+});
+
+test("resumes within an older page and records the history end", async () => {
+  const checkpoint = vi.fn();
+  const request = vi.fn(async ({ url }: { url: URL }) => ({
+    url,
+    status: 200,
+    headers: {},
+    body:
+      url.pathname === "/blog/category/Scotland"
+        ? "<main></main>"
+        : historyPage({ older: false }),
+  }));
+  const session: ScraperSession<WhiskySagaCursor, WhiskySagaObservation> = {
+    request,
+    emit: vi.fn(),
+    checkpoint,
+    remainingRequests: () => 22,
+  };
+
+  await whiskySagaAdapter({
+    cursor: {
+      processedArticleUrls: [],
+      nextHistoryUrl: HISTORY_URL,
+      processedHistoryArticleUrls: [FIRST_URL],
+      historyComplete: false,
+    },
+    session,
+  });
+
+  expect(request.mock.calls.map(([input]) => input.url.href)).toEqual([
+    "https://www.whiskysaga.com/blog/category/Scotland",
+    HISTORY_URL,
+  ]);
+  expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
+    processedArticleUrls: [],
+    nextHistoryUrl: null,
+    processedHistoryArticleUrls: [],
+    historyComplete: true,
   });
 });

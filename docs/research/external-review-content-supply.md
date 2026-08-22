@@ -107,17 +107,19 @@ a separate platform-terms and creator-rights review.
   [editorial standards](https://www.whiskysaga.com/editorial-standards),
   [privacy policy](https://www.whiskysaga.com/privacy), and
   [robots.txt](https://www.whiskysaga.com/robots.txt).
-- Rechecked on 2026-08-21. Robots allow the public Scotland category and
-  article paths. They block Squarespace APIs, search, query filters, and
-  internal formats. The public privacy and editorial pages contain no
-  automated-access restriction.
+- Rechecked on 2026-08-22. Robots allow the public Scotland category, its
+  `offset` pagination, and article paths. They block Squarespace APIs, search,
+  author, tag, month, view, and internal-format filters. The public privacy and
+  editorial pages contain no automated-access restriction.
 - The Scotland category contains more than 2,000 articles and displays 20
   current posts. Review articles expose an exact timestamp, author, Bottle
   title, direct tasting sections, and a 100-point score.
-- The implemented daily feed reads only the 20 current Scotland article cards.
-  It does not use the full sitemap, archive pagination, search, query filters,
-  or Squarespace APIs. Only direct nose, taste, palate, and finish paragraphs
-  stay transient for summary generation.
+- The daily importer reads the 20 current Scotland article cards and advances
+  one public Older Posts page from its last successful cursor. It follows only
+  the publisher's Scotland category links with `offset` and `category`
+  parameters. It does not use the full sitemap, search, other query filters, or
+  Squarespace APIs. Only direct nose, taste, palate, and finish paragraphs stay
+  transient for summary generation.
 
 ### The Whisky Study
 
