@@ -54,7 +54,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 | P1         | [The Whiskey Wash](https://thewhiskeywash.com/)               | High-cadence reviews and release news                                             | Public articles allowed; administrative, search, feed, and implementation paths restricted         | Terms prohibit unauthorized robots, spiders, scrapers, and derivative works                                                                       | `licensed_only`                               |
 | P1         | [Words of Whisky](https://wordsofwhisky.com/)                 | Active scored reviews, including multi-bottle articles                            | Public pages allowed; WordPress administration restricted                                          | No dedicated terms page located; footer reserves rights                                                                                           | `public_index`                                |
 | P2         | [The Whiskey Reviewer](https://whiskeyreviewer.com/)          | Long-running American and world whiskey review archive                            | Public pages allowed; WordPress administration restricted                                          | No dedicated reuse terms located                                                                                                                  | `public_index`                                |
-| P2         | [Fred Minnick](https://www.fredminnick.com/)                  | Reviews, rankings, and American whiskey news                                      | Public content not disallowed; 30-second crawl delay; calendar implementation paths restricted     | No reuse restriction located                                                                                                                      | `public_index`; enforce 30-second delay       |
+| P2         | [Fred Minnick](https://www.fredminnick.com/)                  | Infrequent current American whiskey reviews among a high-volume news stream       | Public content allowed with a 30-second crawl delay; calendar implementation paths restricted      | No dedicated terms page located; the linked privacy page contains placeholder text                                                                | `public_index`; bounded review feed           |
 | P2         | [Bourbon Culture](https://thebourbonculture.com/)             | Active scored bourbon and American whiskey reviews                                | File defines Cloudflare content-signal semantics but publishes no actual allow/deny signal         | Public privacy page contains no automated-access or content-reuse restriction; no dedicated terms page located                                    | `public_index`, daily feed                    |
 | P3         | [The Scotch Noob](https://scotchnoob.com/)                    | Useful historical backfill through 2023; little current supply                    | Explicitly allows all pages and publishes a sitemap                                                | No dedicated reuse terms located                                                                                                                  | `public_index`, low priority because inactive |
 | Restricted | [Whiskybase](https://www.whiskybase.com/)                     | Millions of community ratings plus bottle identity data                           | robots request returned HTTP 403 during the audit                                                  | Terms prohibit collection, copying, public display, commercial reuse, archiving, and derivative works; copyright and database rights are asserted | `licensed_only`; do not crawl                 |
@@ -177,6 +177,24 @@ podcast transcripts need a separate platform-terms and creator-rights review.
   feeds, search, or WordPress APIs. It excludes introductions and publisher
   conclusions from transient summary input.
 
+### Fred Minnick
+
+- Evidence: [homepage and public sitemap](https://www.fredminnick.com/),
+  [disclosures](https://www.fredminnick.com/elementor-9293/), and
+  [robots.txt](https://www.fredminnick.com/robots.txt).
+- Rechecked on 2026-08-21. Robots allows public posts and sitemaps, requires a
+  30-second crawl delay, and restricts calendar implementation paths. No
+  dedicated terms page was linked or located. The linked privacy page contains
+  placeholder text and states no automated-access or reuse restriction.
+- The public Reviews page is empty. The main RSS feed is limited and usually
+  contains news rather than reviews. Current review articles appear as normal
+  posts and do not publish a stable numeric or letter score.
+- The implemented daily feed reads the sitemap index and only the newest two
+  post sitemaps. It selects at most five single-Bottle review URLs and skips
+  comparisons. It stores explicit dates, canonical links, and Fred Minnick as
+  the reviewer. Native scores stay absent. Only direct tasting paragraphs stay
+  transient for summary generation.
+
 ### Explicitly Restricted Sources
 
 - [Breaking Bourbon terms](https://www.breakingbourbon.com/site/breaking-bourbon-terms-of-use-agreement)
@@ -244,7 +262,8 @@ boundary.
 5. Words of Whisky supplies the next daily multi-bottle feed.
 6. The Whiskey Reviewer supplies the next daily American whiskey feed.
 7. Bourbon Culture supplies the next daily American whiskey feed.
-8. Continue through the reviewed public-index candidates until Peated has at
+8. Fred Minnick supplies a low-cadence daily American whiskey review feed.
+9. Continue through the reviewed public-index candidates until Peated has at
    least 12 reliable feeds.
 
 The pilot is successful with at least 90% article extraction accuracy on a

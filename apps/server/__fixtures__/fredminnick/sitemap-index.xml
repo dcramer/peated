@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://www.fredminnick.com/post-sitemap.xml</loc></sitemap>
+  <sitemap><loc>https://www.fredminnick.com/post-sitemap2.xml</loc></sitemap>
+  <sitemap><loc>https://www.fredminnick.com/post-sitemap3.xml</loc></sitemap>
+  <sitemap><loc>https://other.example/post-sitemap4.xml</loc></sitemap>
+  <sitemap><loc>https://www.fredminnick.com/page-sitemap.xml</loc></sitemap>
+</sitemapindex>

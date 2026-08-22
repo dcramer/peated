@@ -43,12 +43,13 @@ test("syncs code-owned external-site definitions", async () => {
   expect(fineDrams).toMatchObject(EXTERNAL_SITE_DEFINITIONS.finedrams);
 
   const policies = await db.select().from(externalReviewSourcePolicies);
-  expect(policies).toHaveLength(7);
+  expect(policies).toHaveLength(8);
   expect(policies).toEqual(
     expect.arrayContaining(
       [
         "bourbonculture",
         "dramface",
+        "fredminnick",
         "whiskeyreviewer",
         "whiskyadvocate",
         "whiskyfun",
