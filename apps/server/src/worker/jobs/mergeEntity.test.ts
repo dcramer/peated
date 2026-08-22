@@ -9,8 +9,10 @@ import {
   bottleOperations,
   bottles,
   bottleSeries,
+  bottleTombstones,
   changes,
   entities,
+  entityAliases,
   entityTombstones,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -345,6 +347,82 @@ test("merge A into B", async ({ fixtures }) => {
     .from(entityTombstones)
     .where(eq(entityTombstones.entityId, entityA.id));
   expect(tombstone.newEntityId).toEqual(newEntityB.id);
+});
+
+test("merges an SMWS collision while replacing a duplicate distiller", async ({
+  fixtures,
+}) => {
+  const smws = await fixtures.Entity({
+    name: "SMWS",
+    shortName: "SMWS",
+    type: ["brand", "bottler"],
+  });
+  const destination = await fixtures.Entity({
+    name: "Balcones Distilling",
+    shortName: "Balcones",
+    type: ["distiller"],
+  });
+  const source = await fixtures.Entity({
+    name: "Balcones",
+    type: ["distiller"],
+  });
+  const canonicalBottle = await fixtures.Bottle({
+    brandId: smws.id,
+    bottlerId: smws.id,
+    name: "140.17 Bowled over by something beautiful",
+    distillerIds: [destination.id],
+  });
+  const duplicateBottle = await fixtures.Bottle({
+    brandId: smws.id,
+    bottlerId: smws.id,
+    name: "140.17 Bowled over by cinnamon cola",
+    distillerIds: [source.id],
+  });
+  if (duplicateBottle.groupId === null) {
+    throw new Error("Fixture Bottle must belong to a BottleGroup.");
+  }
+  await db
+    .update(bottleGroupDistillers)
+    .set({ distillerId: destination.id })
+    .where(eq(bottleGroupDistillers.groupId, duplicateBottle.groupId));
+  await db
+    .update(entityAliases)
+    .set({ entityId: destination.id })
+    .where(eq(entityAliases.name, source.name));
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db.query.entities.findFirst({ where: eq(entities.id, source.id) }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, duplicateBottle.id),
+    }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, canonicalBottle.id),
+    }),
+  ).toMatchObject({ id: canonicalBottle.id });
+  expect(
+    await db.query.bottleTombstones.findFirst({
+      where: eq(bottleTombstones.bottleId, duplicateBottle.id),
+    }),
+  ).toMatchObject({ newBottleId: canonicalBottle.id });
+  expect(
+    await db.query.entityAliases.findFirst({
+      where: eq(entityAliases.name, source.name),
+    }),
+  ).toMatchObject({ entityId: destination.id });
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, source.id),
+    }),
+  ).toMatchObject({ newEntityId: destination.id });
 });
 
 test("preserves the source when the locked destination is deleted", async ({

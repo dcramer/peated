@@ -14,6 +14,7 @@ import {
   getPeatedSystemActorForDatabase,
   getUserActorForDatabase,
 } from "@peated/server/lib/actors";
+import { findConflictingSmwsBottleId } from "@peated/server/lib/bottleConflicts";
 import {
   getBottleExactIdentity,
   materializeBottleForGroup,
@@ -283,6 +284,25 @@ async function performEntityMerge({
           ),
         ),
       );
+    const driftedDistillerGroupIds = new Set(
+      (
+        await tx
+          .selectDistinct({ id: bottles.groupId })
+          .from(bottles)
+          .innerJoin(
+            bottlesToDistillers,
+            eq(bottlesToDistillers.bottleId, bottles.id),
+          )
+          .where(
+            and(
+              sql`${bottles.groupId} IS NOT NULL`,
+              inArray(bottlesToDistillers.distillerId, fromEntityIds),
+            ),
+          )
+      )
+        .map(({ id }) => id)
+        .filter((id): id is number => id !== null),
+    );
     const affectedGroupIds = Array.from(
       new Set(
         [
@@ -336,6 +356,89 @@ async function performEntityMerge({
         ) {
           seriesInput = { name: series.name, description: series.description };
         }
+      }
+
+      // SMWS cask codes own Bottle identity. Merge an existing code collision
+      // before changing its producer Entity.
+      if (
+        (distillersChange || driftedDistillerGroupIds.has(groupId)) &&
+        !brandChanges
+      ) {
+        const members = await tx
+          .select()
+          .from(bottles)
+          .where(eq(bottles.groupId, groupId))
+          .orderBy(asc(bottles.id));
+        const identityEntityIds = Array.from(
+          new Set(
+            [group.brandId, group.bottlerId].filter(
+              (id): id is number => id !== null,
+            ),
+          ),
+        );
+        const identityEntities = await tx
+          .select({
+            id: entities.id,
+            name: entities.name,
+            shortName: entities.shortName,
+          })
+          .from(entities)
+          .where(inArray(entities.id, identityEntityIds));
+        const brand = identityEntities.find(({ id }) => id === group.brandId);
+        const bottler =
+          group.bottlerId === null
+            ? null
+            : identityEntities.find(({ id }) => id === group.bottlerId);
+        if (!brand || (group.bottlerId !== null && !bottler)) {
+          throw new Error(
+            `BottleGroup ${groupId} has an invalid brand or bottler Entity.`,
+          );
+        }
+
+        for (const member of members) {
+          const duplicateBottleId = await findConflictingSmwsBottleId(
+            tx,
+            {
+              name: member.name,
+              fullName: member.fullName,
+              brand,
+              bottler: bottler ?? null,
+            },
+            { excludeBottleIds: members.map(({ id }) => id) },
+          );
+          if (duplicateBottleId === null) continue;
+          const [destinationOwnedDuplicate] = await tx
+            .select({ id: bottles.id })
+            .from(bottles)
+            .innerJoin(
+              bottleGroupDistillers,
+              eq(bottleGroupDistillers.groupId, bottles.groupId),
+            )
+            .where(
+              and(
+                eq(bottles.id, duplicateBottleId),
+                eq(bottleGroupDistillers.distillerId, toEntityId),
+              ),
+            )
+            .limit(1);
+          // The merge direction only identifies a safe survivor when the
+          // conflicting Bottle already belongs to the destination producer.
+          if (!destinationOwnedDuplicate) continue;
+          bottleMergeManifests.push(
+            await mergeBottlesInTransaction(tx, {
+              sourceBottleId: member.id,
+              destinationBottleId: duplicateBottleId,
+              actorId: actor.id,
+            }),
+          );
+        }
+
+        [group] = await tx
+          .select()
+          .from(bottleGroups)
+          .where(eq(bottleGroups.id, groupId))
+          .limit(1);
+        if (!group) continue;
       }
 
       if (brandChanges) {
