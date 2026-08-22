@@ -49,6 +49,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 | P0         | [Dramface](https://www.dramface.com/)                         | Reviews most weekdays, multiple writers, frequent multi-bottle articles           | Public pages allowed; Squarespace rules block API, JSON, search, account, and other internal paths         | No dedicated terms page linked in the public footer                                                                                               | `public_index`, ongoing-feed pilot            |
 | P0         | [Whisky Advocate](https://whiskyadvocate.com/ratings-reviews) | Existing Peated source; publisher describes an archive of more than 6,000 reviews | Ratings paths allowed for general crawlers; GPTBot, ChatGPT-User, and CCBot are blocked                    | Privacy policy references general terms, but no public general terms page or review-reuse restriction was located                                 | `public_index`, second bounded pilot          |
 | P0         | [Whisky Saga](https://www.whiskysaga.com/)                    | Active scored reviews; the Scotland category contains more than 2,000 articles    | Public category and article paths allowed; Squarespace APIs, search, filters, and internal formats blocked | Privacy and editorial pages contain no automated-access restriction                                                                               | `public_index`, daily Scotch feed             |
+| P1         | [The Whisky Study](https://thewhiskystudy.com/reviews-3)      | Active single-Bottle Scotch reviews with explicit dates and 100-point scores      | Public index and article paths allowed; Squarespace APIs, search, filters, and internal formats blocked    | No dedicated terms or privacy page is linked in the public navigation                                                                             | `public_index`, daily Scotch feed             |
 | P1         | [Whisky Magazine](https://www.whiskymag.com/search/tastings/) | Structured tasting archive spanning more than 200 magazine issues                 | Verification failed because the server reset the automated request                                         | Terms prohibit automated access, aggregation, and commercial reuse without written permission                                                     | `licensed_only`                               |
 | P1         | [Malt](https://malt-review.com/)                              | Large historical review archive with multiple contributors                        | Automated requests returned HTTP 429 during the audit                                                      | No current terms page verified because automated access was rate-limited                                                                          | `do_not_ingest`; do not work around the block |
 | P1         | [Breaking Bourbon](https://www.breakingbourbon.com/)          | Deep American whiskey archive with structured ratings and reviewers               | robots file exposes a sitemap and no reviewed article-path restriction                                     | Terms prohibit robots, spiders, retrieval/indexing applications, and reuse without written consent                                                | `licensed_only`                               |
@@ -111,6 +112,24 @@ a separate platform-terms and creator-rights review.
   It does not use the full sitemap, archive pagination, search, query filters,
   or Squarespace APIs. Only direct nose, taste, palate, and finish paragraphs
   stay transient for summary generation.
+
+### The Whisky Study
+
+- Evidence: [Scotch reviews](https://thewhiskystudy.com/reviews-3),
+  [scoring method](https://thewhiskystudy.com/scoring),
+  [about](https://thewhiskystudy.com/about), and
+  [robots.txt](https://thewhiskystudy.com/robots.txt).
+- Rechecked on 2026-08-21. Robots allow the public Scotch index and article
+  paths. They block Squarespace APIs, search, query filters, and internal
+  formats. No dedicated terms or privacy page is linked in the public
+  navigation.
+- The first Scotch index page displays 20 current posts. Review articles expose
+  an exact timestamp, author, Bottle title, direct tasting sections, and a
+  100-point score.
+- The implemented daily feed reads only those 20 current article cards. It does
+  not follow older pagination or use the sitemap, search, query filters, or
+  Squarespace APIs. Only direct nose, taste, palate, and finish paragraphs stay
+  transient for summary generation.
 
 ### Dramface
 
@@ -283,7 +302,8 @@ boundary.
 7. Bourbon Culture supplies the next daily American whiskey feed.
 8. Fred Minnick supplies a low-cadence daily American whiskey review feed.
 9. Whisky Saga supplies the next daily Scotch review feed.
-10. Continue through the reviewed public-index candidates until Peated has at
+10. The Whisky Study supplies the next daily Scotch review feed.
+11. Continue through the reviewed public-index candidates until Peated has at
     least 12 reliable feeds.
 
 The pilot is successful with at least 90% article extraction accuracy on a
