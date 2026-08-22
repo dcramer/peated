@@ -7,6 +7,7 @@ import {
   externalSites,
   storePriceHistories,
   storePrices,
+  type StorePrice,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
@@ -25,7 +26,7 @@ import {
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 /**
@@ -46,15 +47,17 @@ export type CreateStorePricesInput = z.input<
 
 type ParsedStorePrice = z.output<typeof StorePriceInputSchema>;
 
+type StorePriceIdentity = {
+  externalProductId?: string;
+  externalSiteId: number;
+  url: string;
+};
+
 function getStorePriceIdentityCondition({
   externalProductId,
   externalSiteId,
   url,
-}: {
-  externalProductId?: string;
-  externalSiteId: number;
-  url: string;
-}) {
+}: StorePriceIdentity) {
   const urlCondition = eq(storePrices.url, url);
   return externalProductId
     ? or(
@@ -67,38 +70,87 @@ function getStorePriceIdentityCondition({
     : urlCondition;
 }
 
+function selectStorePrice(
+  rows: StorePrice[],
+  input: StorePriceIdentity,
+): StorePrice {
+  if (rows.some((row) => row.externalSiteId !== input.externalSiteId)) {
+    throw new Error(
+      `Store URL is already assigned to another source (${input.externalSiteId}, ${input.url}).`,
+    );
+  }
+
+  const productIds = new Set(
+    rows.flatMap((row) =>
+      row.externalProductId === null ? [] : [row.externalProductId],
+    ),
+  );
+  if (
+    productIds.size > 1 ||
+    (input.externalProductId &&
+      [...productIds].some((id) => id !== input.externalProductId))
+  ) {
+    throw new Error(
+      `Store URL is already assigned to another source product (${input.externalSiteId}, ${input.url}).`,
+    );
+  }
+
+  const bottleIds = new Set(
+    rows.flatMap((row) => (row.bottleId === null ? [] : [row.bottleId])),
+  );
+  if (bottleIds.size > 1) {
+    throw new Error(
+      `Store product duplicates have conflicting Bottle assignments (${input.externalSiteId}, ${input.externalProductId ?? input.url}).`,
+    );
+  }
+
+  return rows.toSorted((a, b) => {
+    const productIdMatch =
+      Number(b.externalProductId === input.externalProductId) -
+      Number(a.externalProductId === input.externalProductId);
+    if (productIdMatch) return productIdMatch;
+
+    const visible = Number(!b.hidden) - Number(!a.hidden);
+    if (visible) return visible;
+
+    const bottleAssignment =
+      Number(b.bottleId !== null) - Number(a.bottleId !== null);
+    if (bottleAssignment) return bottleAssignment;
+
+    const recency = b.updatedAt.getTime() - a.updatedAt.getTime();
+    return recency || a.id - b.id;
+  })[0];
+}
+
 async function findStorePriceForUpdate(
   tx: AnyTransaction,
-  input: {
-    externalProductId?: string;
-    externalSiteId: number;
-    url: string;
-  },
+  input: StorePriceIdentity,
 ) {
   const rows = await tx
     .select()
     .from(storePrices)
     .where(getStorePriceIdentityCondition(input))
     .for("update");
-  if (rows.length > 1) {
-    throw new Error(
-      `Store product identity resolves to multiple price rows (${input.externalSiteId}, ${input.externalProductId ?? input.url}).`,
-    );
+  if (rows.length === 0) return null;
+
+  const existing = selectStorePrice(rows, input);
+  const duplicateIds = rows
+    .filter((row) => row.id !== existing.id)
+    .map((row) => row.id);
+  if (duplicateIds.length > 0) {
+    // Exact source identity can converge legacy duplicate rows. Conflicting
+    // source products and Bottle assignments fail in selectStorePrice.
+    await tx
+      .update(storePrices)
+      .set({ hidden: true })
+      .where(inArray(storePrices.id, duplicateIds));
   }
-  return rows[0] ?? null;
+  return existing;
 }
 
 async function lockStorePriceIdentity(
   tx: AnyTransaction,
-  {
-    externalProductId,
-    externalSiteId,
-    url,
-  }: {
-    externalProductId?: string;
-    externalSiteId: number;
-    url: string;
-  },
+  { externalProductId, externalSiteId, url }: StorePriceIdentity,
 ) {
   const keys = [
     `store-price-url:${url}`,
