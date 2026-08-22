@@ -48,6 +48,7 @@ export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   externalSiteType: ExternalSiteType;
   targetKeys: readonly [string, ...string[]];
   requestLimit: number;
+  resumeFromLastRun: boolean;
   cursorSchema: z.ZodType<TCursor>;
   observationSchema: z.ZodType<TObservation>;
   adapter: ScraperAdapter<TCursor, TObservation>;

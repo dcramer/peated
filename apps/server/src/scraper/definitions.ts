@@ -164,6 +164,7 @@ const SourceDefinitionSchema = z
       .positive()
       .max(DEFAULT_SCRAPER_REQUEST_POLICY.requestLimit)
       .default(DEFAULT_SCRAPER_REQUEST_POLICY.requestLimit),
+    resumeFromLastRun: z.boolean().default(false),
     cursorSchema: ZodSchemaSchema,
     observationSchema: ZodSchemaSchema,
     adapter: FunctionSchema,
@@ -203,9 +204,10 @@ export function defineScrapeTarget(
 export function defineScraperSource<TCursor, TObservation>(
   input: Omit<
     ScraperSourceDefinition<TCursor, TObservation>,
-    "requestLimit"
+    "requestLimit" | "resumeFromLastRun"
   > & {
     requestLimit?: number;
+    resumeFromLastRun?: boolean;
   },
 ): ScraperSourceDefinition<TCursor, TObservation> {
   return SourceDefinitionSchema.parse(

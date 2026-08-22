@@ -44,7 +44,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 
 | Priority   | Source                                                        | Supply opportunity                                                                | robots.txt observation                                                                                     | Terms/reuse observation                                                                                                                           | Recommended mode                              |
 | ---------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| P0         | [WhiskyNotes](https://www.whiskynotes.be/)                    | About 6,600 reviews across 4,985 articles; new tasting notes every weekday        | Public article paths allowed; feed, search, downloads, and WordPress internals disallowed                  | No dedicated terms page located                                                                                                                   | `public_index`, first archive pilot           |
+| P0         | [WhiskyNotes](https://www.whiskynotes.be/)                    | About 6,600 reviews across 4,985 articles; new tasting notes every weekday        | Public article paths allowed; feed, search, downloads, and WordPress internals disallowed                  | No dedicated terms page located                                                                                                                   | `public_index`, daily archive import          |
 | P0         | [Whiskyfun](https://www.whiskyfun.com/)                       | About 22,700 whisky reviews dating to 2002                                        | No `Disallow` rule observed; unusual single `Allow` entry                                                  | No formal terms located; FAQ and disclosure discuss free commercial use                                                                           | `public_index`, later archive candidate       |
 | P0         | [Dramface](https://www.dramface.com/)                         | Reviews most weekdays, multiple writers, frequent multi-bottle articles           | Public pages allowed; Squarespace rules block API, JSON, search, account, and other internal paths         | No dedicated terms page linked in the public footer                                                                                               | `public_index`, ongoing-feed pilot            |
 | P0         | [Whisky Advocate](https://whiskyadvocate.com/ratings-reviews) | Existing Peated source; publisher describes an archive of more than 6,000 reviews | Ratings paths allowed for general crawlers; GPTBot, ChatGPT-User, and CCBot are blocked                    | Privacy policy references general terms, but no public general terms page or review-reuse restriction was located                                 | `public_index`, second bounded pilot          |
@@ -76,6 +76,9 @@ a separate platform-terms and creator-rights review.
   sections, and score. One document may review several bottles.
 - The feed is explicitly disallowed in robots.txt, so do not treat WordPress
   feed discovery as an ingestion path. Use only allowed article pages.
+- The daily importer checks the current page and advances at most four older
+  archive pages from its last successful cursor. It stops older-page requests
+  when the public archive ends.
 
 ### Whiskyfun
 
@@ -272,7 +275,8 @@ boundary.
 
 ## Source Sequence
 
-1. WhiskyNotes supplies the first current archive feed.
+1. WhiskyNotes supplies the first resumable historical archive import and a
+   daily current feed.
 2. Whisky Advocate supplies the existing large scored archive and current
    issue.
 3. Whiskyfun supplies the next daily multi-bottle feed. Keep its historical

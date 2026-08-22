@@ -41,6 +41,7 @@ test("applies conservative target and run defaults", () => {
     maxRetries: 2,
   });
   expect(definition.requestLimit).toBe(100);
+  expect(definition.resumeFromLastRun).toBe(false);
 });
 
 test("allows sources to share one target and a target to declare several origins", () => {

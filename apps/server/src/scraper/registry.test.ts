@@ -126,13 +126,16 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("whiskyadvocate")?.requestLimit).toBe(30);
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskynotes.runEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskynotes.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskynotes")).toMatchObject({
     minimumSpacingMs: 2_500,
     requestsPerWindow: 30,
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("whiskynotes")?.requestLimit).toBe(30);
+  expect(scraperRegistry.sources.get("whiskynotes")?.resumeFromLastRun).toBe(
+    true,
+  );
   expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskyfun")).toMatchObject({
     minimumSpacingMs: 2_500,

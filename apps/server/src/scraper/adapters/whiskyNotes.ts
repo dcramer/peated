@@ -10,7 +10,7 @@ import { parseDate } from "./dates";
 
 const ORIGIN = "https://www.whiskynotes.be";
 const TARGET = "whiskynotes";
-const MAX_DISCOVERY_PAGES = 5;
+const MAX_HISTORY_PAGES_PER_RUN = 4;
 const MAX_ARTICLES_PER_PAGE = 20;
 const ARTICLE_PATH = /^\/\d{4}\/[^/]+\/[^/]+\/$/;
 const EXCLUDED_CATEGORIES = new Set([
@@ -25,8 +25,10 @@ const EXCLUDED_CATEGORIES = new Set([
 
 export const WhiskyNotesCursorSchema = z
   .object({
-    page: z.number().int().min(1).max(MAX_DISCOVERY_PAGES),
+    page: z.number().int().min(1),
     processedArticleUrls: z.array(z.url()).max(MAX_ARTICLES_PER_PAGE),
+    currentArticleUrls: z.array(z.url()).max(MAX_ARTICLES_PER_PAGE).default([]),
+    historyComplete: z.boolean().default(false),
   })
   .strict();
 
@@ -203,40 +205,92 @@ export const whiskyNotesAdapter: ScraperAdapter<
 > = async ({ cursor, session }) => {
   let page = cursor?.page ?? 1;
   let processedArticleUrls = new Set(cursor?.processedArticleUrls ?? []);
+  let currentArticleUrls = new Set(cursor?.currentArticleUrls ?? []);
+  let historyComplete = cursor?.historyComplete ?? false;
 
-  while (page <= MAX_DISCOVERY_PAGES) {
-    const listingResponse = await session.request({
-      target: TARGET,
-      url: archiveUrl(page),
+  const checkpoint = async () => {
+    await session.checkpoint({
+      page,
+      processedArticleUrls: [...processedArticleUrls],
+      currentArticleUrls: [...currentArticleUrls],
+      historyComplete,
     });
+  };
+
+  const emitArticle = async (discoveredUrl: URL) => {
+    const articleResponse = await session.request({
+      target: TARGET,
+      url: discoveredUrl,
+    });
+    const observation = parseWhiskyNotesArticle(
+      articleResponse.body,
+      articleResponse.url,
+    );
+    await session.emit({
+      sourceKey: observation.article.canonicalUrl,
+      itemCount: observation.article.reviews.length,
+      value: observation,
+    });
+  };
+
+  const currentResponse = await session.request({
+    target: TARGET,
+    url: archiveUrl(1),
+  });
+  const currentUrls = discoverWhiskyNotesArticles(currentResponse.body);
+  if (currentUrls.length === 0) {
+    throw new Error("WhiskyNotes current archive contains no review articles.");
+  }
+  const currentUrlSet = new Set(currentUrls.map((url) => url.href));
+  currentArticleUrls = new Set(
+    [...currentArticleUrls].filter((url) => currentUrlSet.has(url)),
+  );
+
+  for (const discoveredUrl of currentUrls) {
+    const isHistoryPage = page === 1 && !historyComplete;
+    if (
+      currentArticleUrls.has(discoveredUrl.href) ||
+      (isHistoryPage && processedArticleUrls.has(discoveredUrl.href))
+    ) {
+      currentArticleUrls.add(discoveredUrl.href);
+      if (isHistoryPage) processedArticleUrls.add(discoveredUrl.href);
+      continue;
+    }
+    await emitArticle(discoveredUrl);
+    currentArticleUrls.add(discoveredUrl.href);
+    if (isHistoryPage) processedArticleUrls.add(discoveredUrl.href);
+    await checkpoint();
+  }
+  await checkpoint();
+
+  if (historyComplete) return;
+
+  let completedPages = 0;
+  while (completedPages < MAX_HISTORY_PAGES_PER_RUN) {
+    const listingResponse =
+      page === 1
+        ? currentResponse
+        : await session.request({
+            target: TARGET,
+            url: archiveUrl(page),
+          });
     const articleUrls = discoverWhiskyNotesArticles(listingResponse.body);
 
     for (const discoveredUrl of articleUrls) {
       if (processedArticleUrls.has(discoveredUrl.href)) continue;
-      const articleResponse = await session.request({
-        target: TARGET,
-        url: discoveredUrl,
-      });
-      const observation = parseWhiskyNotesArticle(
-        articleResponse.body,
-        articleResponse.url,
-      );
-      await session.emit({
-        sourceKey: observation.article.canonicalUrl,
-        itemCount: observation.article.reviews.length,
-        value: observation,
-      });
+      await emitArticle(discoveredUrl);
       processedArticleUrls.add(discoveredUrl.href);
-      await session.checkpoint({
-        page,
-        processedArticleUrls: [...processedArticleUrls],
-      });
+      await checkpoint();
     }
 
-    if (page === MAX_DISCOVERY_PAGES) return;
-    if (!hasNextArchivePage(cheerio(listingResponse.body))) return;
+    completedPages += 1;
+    if (!hasNextArchivePage(cheerio(listingResponse.body))) {
+      historyComplete = true;
+      await checkpoint();
+      return;
+    }
     page += 1;
     processedArticleUrls = new Set();
-    await session.checkpoint({ page, processedArticleUrls: [] });
+    await checkpoint();
   }
 };

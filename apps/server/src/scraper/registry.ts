@@ -424,6 +424,7 @@ export const scraperRegistry = createScraperRegistry({
       externalSiteType: "whiskynotes",
       targetKeys: ["whiskynotes"],
       requestLimit: 30,
+      resumeFromLastRun: true,
       cursorSchema: WhiskyNotesCursorSchema,
       observationSchema: WhiskyNotesObservationSchema,
       adapter: whiskyNotesAdapter,
