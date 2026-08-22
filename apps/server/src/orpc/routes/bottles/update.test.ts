@@ -158,6 +158,31 @@ describe("PATCH /bottles/{bottle}", () => {
     ).toHaveLength(1);
   });
 
+  test("remembers an image when a moderator removes it", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      imageUrl: "https://example.com/removed.jpg",
+      rejectedImageUrls: ["https://example.com/older-removed.jpg"],
+    });
+
+    await routerClient.bottles.update(
+      { bottle: bottle.id, image: null },
+      { context: { user: mod } },
+    );
+
+    expect(
+      await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+    ).toMatchObject({
+      imageUrl: null,
+      rejectedImageUrls: [
+        "https://example.com/older-removed.jpg",
+        "https://example.com/removed.jpg",
+      ],
+    });
+  });
+
   test("clears an inherited stated age from a singleton group", async ({
     fixtures,
   }) => {

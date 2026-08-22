@@ -50,10 +50,18 @@ describe("exact Bottle merges", () => {
     const source = await fixtures.Bottle({
       name: "Merge Source",
       totalTastings: 99,
+      rejectedImageUrls: [
+        "https://example.com/source-removed.jpg",
+        "https://example.com/shared-removed.jpg",
+      ],
     });
     const destination = await fixtures.Bottle({
       name: "Merge Destination",
       totalTastings: 99,
+      rejectedImageUrls: [
+        "https://example.com/destination-removed.jpg",
+        "https://example.com/shared-removed.jpg",
+      ],
     });
     const sourceGroupId = source.groupId!;
     const destinationGroupId = destination.groupId!;
@@ -323,7 +331,14 @@ describe("exact Bottle merges", () => {
       await db.query.bottles.findFirst({
         where: eq(bottles.id, destination.id),
       }),
-    ).toMatchObject({ totalTastings: 2 });
+    ).toMatchObject({
+      totalTastings: 2,
+      rejectedImageUrls: [
+        "https://example.com/destination-removed.jpg",
+        "https://example.com/shared-removed.jpg",
+        "https://example.com/source-removed.jpg",
+      ],
+    });
     expect(
       await db.query.bottleGroups.findFirst({
         where: eq(bottleGroups.id, destinationGroupId),

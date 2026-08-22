@@ -1,0 +1,1 @@
+ALTER TABLE "bottle" ADD COLUMN "rejected_image_urls" text[] DEFAULT array[]::text[] NOT NULL;

@@ -1933,7 +1933,10 @@ describe("price match queue", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({ imageUrl: null });
+    const bottle = await fixtures.Bottle({
+      imageUrl: null,
+      rejectedImageUrls: ["https://example.com/other-price.jpg"],
+    });
     const site1 = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const site2 = await fixtures.ExternalSiteOrExisting({
       type: "reservebar",
@@ -2060,6 +2063,9 @@ describe("price match queue", () => {
     expect(updatedSiblingPrice?.bottleId).toBeNull();
     expect(updatedReview?.bottleId).toBe(bottle.id);
     expect(updatedBottle?.imageUrl).toBe("https://example.com/price.jpg");
+    expect(updatedBottle?.rejectedImageUrls).toEqual([
+      "https://example.com/other-price.jpg",
+    ]);
     expect(updatedProposal).toMatchObject({
       status: "approved",
       currentBottleId: bottle.id,
@@ -2096,6 +2102,77 @@ describe("price match queue", () => {
         bottleId: bottle.id,
       },
     );
+  });
+
+  test("does not restore an image removed before approval", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const imageUrl = "https://example.com/removed-price.jpg";
+    const bottle = await fixtures.Bottle({ imageUrl });
+    const site = await fixtures.ExternalSite();
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Removed Image Approval",
+      bottleId: null,
+      imageUrl,
+    });
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      name: "Removed Image Approval",
+      bottleId: null,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        suggestedBottleId: bottle.id,
+      })
+      .returning();
+
+    await routerClient.bottles.update(
+      { bottle: bottle.id, image: null },
+      { context: { user } },
+    );
+    await routerClient.prices.matchQueue.resolve(
+      {
+        proposal: proposal.id,
+        action: "match",
+        bottle: bottle.id,
+      },
+      { context: { user } },
+    );
+
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, bottle.id),
+      }),
+    ).toMatchObject({
+      imageUrl: null,
+      rejectedImageUrls: [imageUrl],
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id });
+    expect(
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+    ).toMatchObject({ status: "approved", currentBottleId: bottle.id });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, "Removed Image Approval"),
+      }),
+    ).toMatchObject({ bottleId: bottle.id });
   });
 
   test("records moderation history when approving the current Bottle", async ({
