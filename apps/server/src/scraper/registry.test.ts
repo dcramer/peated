@@ -143,6 +143,9 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("whiskyfun")?.requestLimit).toBe(30);
+  expect(scraperRegistry.sources.get("whiskyfun")?.resumeFromLastRun).toBe(
+    true,
+  );
   expect(EXTERNAL_SITE_DEFINITIONS.whiskysaga.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskysaga")).toMatchObject({
     minimumSpacingMs: 2_500,
