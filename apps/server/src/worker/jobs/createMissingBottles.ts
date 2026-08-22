@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
 import { reviewArticles, reviews } from "@peated/server/db/schema";
+import {
+  getExternalReviewPublicationModeInTransaction,
+  publishResolvedReview,
+} from "@peated/server/externalReviews/publication";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -15,8 +19,16 @@ import {
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, gt, isNull } from "drizzle-orm";
+import { z } from "zod";
 
-export default async function createMissingBottles() {
+const InputSchema = z
+  .object({
+    articleId: z.number().int().positive().optional(),
+  })
+  .strict();
+
+export default async function createMissingBottles(rawInput?: unknown) {
+  const { articleId } = InputSchema.parse(rawInput ?? {});
   const systemActor = await getPeatedSystemActor();
 
   // Advance by id so unresolved reviews are visited once per run instead of
@@ -28,7 +40,15 @@ export default async function createMissingBottles() {
       .select({ article: reviewArticles, review: reviews })
       .from(reviews)
       .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
-      .where(and(isNull(reviews.bottleId), gt(reviews.id, cursor)))
+      .where(
+        and(
+          isNull(reviews.bottleId),
+          gt(reviews.id, cursor),
+          articleId === undefined
+            ? undefined
+            : eq(reviewArticles.id, articleId),
+        ),
+      )
       .orderBy(asc(reviews.id))
       .limit(100);
 
@@ -51,6 +71,8 @@ export default async function createMissingBottles() {
         // Normalized fallback aliases can collapse exact identity detail before
         // the classifier reviews the full reference title.
         aliasLookupNames: [aliasKey, review.name],
+        extractedIdentity:
+          review.category === null ? null : { category: review.category },
         createdByActorId: systemActor.id,
       });
 
@@ -89,6 +111,11 @@ export default async function createMissingBottles() {
       let aliasAssignment;
       try {
         aliasAssignment = await db.transaction(async (tx) => {
+          const publicationMode =
+            await getExternalReviewPublicationModeInTransaction(
+              tx,
+              article.externalSiteId,
+            );
           const assignment = resolution.assignment;
           if (!assignment) {
             throw new Error("Bottle resolution returned no assignment.");
@@ -149,6 +176,10 @@ export default async function createMissingBottles() {
                 issue: article.issue,
               },
             });
+          }
+
+          if (publicationMode === "automatic") {
+            await publishResolvedReview(tx, article.externalSiteId, review.id);
           }
 
           return aliasAssignment;

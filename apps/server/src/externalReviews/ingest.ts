@@ -7,9 +7,9 @@ import { externalSites } from "@peated/server/db/schema";
 import { ReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { storeReviewArticle } from "@peated/server/externalReviews/store";
 import { generateExternalReviewSummary } from "@peated/server/externalReviews/summary";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { resolveScrapedBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
-import { logError, logTelemetryError } from "@peated/server/lib/log";
+import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import { logTelemetryError } from "@peated/server/lib/log";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -18,7 +18,7 @@ const InputSchema = ReviewArticleIngestionSchema.safeExtend({
   fetchedAt: z.date(),
 });
 
-/** Resolves each review to a Bottle, then stores the article with hidden reviews. */
+/** Stores the article before model-based Bottle resolution runs in a worker. */
 export async function ingestReviewArticle(rawInput: unknown) {
   const input = InputSchema.parse(rawInput);
   const site = await db.query.externalSites.findFirst({
@@ -28,34 +28,16 @@ export async function ingestReviewArticle(rawInput: unknown) {
   if (!site)
     throw new Error(`External site ${input.externalSiteId} not found.`);
 
-  const actor = await getPeatedSystemActor();
-  const resolvedReviews = [];
+  const storedReviews = [];
 
   for (const review of input.article.reviews) {
     const rawName = review.name;
     const { name: normalizedName } = normalizeBottle({ name: rawName });
     const aliasKey = normalizeBottleAliasKey(rawName);
-    const resolution = await resolveScrapedBottleReferenceTarget({
-      reference: {
-        externalSiteId: input.externalSiteId,
-        name: rawName,
-        url: input.article.canonicalUrl,
-        imageUrl: null,
-        currentBottleId: null,
-      },
-      aliasLookupNames: [aliasKey, rawName],
-      extractedIdentity:
-        review.category === null ? null : { category: review.category },
-      createdByActorId: actor.id,
-    });
-    if (resolution.error) {
-      logError(resolution.error, {
-        review: {
-          externalSiteId: input.externalSiteId,
-          name: rawName,
-          url: input.article.canonicalUrl,
-        },
-      });
+    let aliasMatch = null;
+    for (const aliasName of new Set([aliasKey, rawName])) {
+      aliasMatch = await findBottleAliasAssignment(aliasName);
+      if (aliasMatch) break;
     }
     let summary = null;
     const sourceText = input.reviewTexts[review.sourceKey];
@@ -80,17 +62,38 @@ export async function ingestReviewArticle(rawInput: unknown) {
         });
       }
     }
-    resolvedReviews.push({
+    storedReviews.push({
       ...review,
-      bottleId: resolution.assignment?.bottleId ?? null,
+      bottleId: aliasMatch?.bottleId ?? null,
       summary,
     });
   }
 
-  return await storeReviewArticle({
+  const result = await storeReviewArticle({
     externalSiteId: input.externalSiteId,
     fetchedAt: input.fetchedAt,
     ...input.article,
-    reviews: resolvedReviews,
+    reviews: storedReviews,
   });
+
+  if (storedReviews.some((review) => review.bottleId === null)) {
+    try {
+      await pushUniqueJob(
+        "CreateMissingBottles",
+        { articleId: result.articleId },
+        { removeOnComplete: true, removeOnFail: true },
+      );
+    } catch (error) {
+      // The stored reviews are durable and a later ingestion or maintenance run
+      // can queue their Bottle resolution again.
+      logTelemetryError(error, {
+        extra: {
+          reviewArticleId: result.articleId,
+          externalSiteId: input.externalSiteId,
+        },
+      });
+    }
+  }
+
+  return result;
 }
