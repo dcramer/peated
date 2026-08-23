@@ -99,22 +99,36 @@ export type PersistedCatalogVerificationResult = z.infer<
   typeof CatalogVerificationResultSchema
 >;
 
-export function shouldRunCatalogVerification(
-  source: CatalogVerificationCreationSource,
-) {
-  return source === "manual_entry" || source === "price_match_automation";
+type CatalogVerificationPolicyInput = {
+  objectType: "bottle" | "entity";
+  source: CatalogVerificationCreationSource;
+};
+
+export function shouldRunCatalogVerification({
+  objectType,
+  source,
+}: CatalogVerificationPolicyInput) {
+  return (
+    source === "manual_entry" ||
+    (objectType === "entity" && source === "price_match_automation")
+  );
 }
 
 export function getCatalogVerificationSkipReason(
-  source: CatalogVerificationCreationSource,
+  input: CatalogVerificationPolicyInput,
 ) {
+  if (shouldRunCatalogVerification(input)) {
+    return null;
+  }
+
+  const { source } = input;
   switch (source) {
     case "bottle_classifier":
       return "Created through the reviewed bottle classifier flow.";
     case "price_match_review":
       return "Created through the moderator-reviewed price match workflow.";
     case "price_match_automation":
-      return null;
+      return "Bottle details were already checked before automatic price matching created it.";
     case "repair_workflow":
       return "Created through a dedicated repair workflow.";
     case "manual_entry":

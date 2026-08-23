@@ -148,9 +148,10 @@ also removes older terminal manual reviews; pending, applying, blocked, stale,
 and failed work remains durable.
 
 Post-user-creation audits run after the Bottle save commits and never delay or
-roll back that save. The job audits every eligible `manual_entry` and
-`price_match_automation` Bottle. Background checks retain their event-key
-receipt for retry safety.
+roll back that save. The job audits every eligible `manual_entry` Bottle.
+`price_match_automation` Bottles skip this audit because price matching already
+checked their Bottle details before creation. Background checks retain their
+event-key receipt for retry safety.
 
 ### BottleGroup Findings
 

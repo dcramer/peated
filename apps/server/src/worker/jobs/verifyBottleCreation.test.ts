@@ -1,14 +1,5 @@
-import {
-  buildBottleClassificationArtifacts,
-  createAuditBottleResult,
-} from "@peated/bottle-classifier/contract";
 import { db } from "@peated/server/db";
-import {
-  bottleChecks,
-  bottleOperations,
-  bottles,
-  changes,
-} from "@peated/server/db/schema";
+import { bottleChecks, changes } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
 import type { JobPayload } from "../types";
@@ -57,81 +48,24 @@ describe("verifyBottleCreation", () => {
     expect(runAudit).not.toHaveBeenCalled();
   });
 
-  test("audits automated price-match Bottles with one review-only check", async ({
+  test("skips a second audit for automated price-match Bottles", async ({
     fixtures,
   }) => {
-    const bottle = await fixtures.Bottle({ edition: null });
-    const { getBottleClassifierContext } =
-      await import("@peated/server/agents/bottleClassifier/contextAdapters");
-    const bottleContext = await getBottleClassifierContext(bottle.id);
-    if (!bottleContext) {
-      throw new Error(`Bottle ${bottle.id} context was not found.`);
-    }
-    const { imageSources: _imageSources, ...contextFields } = bottleContext;
-
-    runAudit.mockResolvedValue({
-      result: createAuditBottleResult({
-        summary: "The edition should be corrected.",
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: bottle.id,
-              patch: { edition: "Audited Edition" },
-            },
-            rationale: "The inspected Bottle has a missing edition.",
-            evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
-          },
-        ],
-        findings: [],
-        artifacts: buildBottleClassificationArtifacts({
-          bottleContexts: [{ ...contextFields, publicImages: [] }],
-        }),
-      }),
-      modelMetadata: null,
-    });
-
-    const input = {
+    const bottle = await fixtures.Bottle();
+    await verifyBottleCreation({
       bottleId: bottle.id,
       creationSource: "price_match_automation" as const,
-    };
-    await verifyBottleCreation(input);
-    await verifyBottleCreation(input);
-
-    expect(runAudit).toHaveBeenCalledTimes(1);
-    expect(runAudit).toHaveBeenCalledWith({
-      bottleId: bottle.id,
-      origin: "post_user_creation",
     });
 
-    const checks = await db
-      .select()
-      .from(bottleChecks)
-      .where(
-        eq(bottleChecks.backgroundEventKey, `bottle_created:${bottle.id}`),
-      );
-    expect(checks).toHaveLength(1);
-    expect(checks[0]).toMatchObject({
-      intent: "audit_bottle",
-      origin: "post_user_creation",
-      bottleId: bottle.id,
-    });
-
-    const operations = await db
-      .select()
-      .from(bottleOperations)
-      .where(eq(bottleOperations.checkId, checks[0]!.id));
-    expect(operations).toHaveLength(1);
-    expect(operations[0]).toMatchObject({
-      status: "pending_review",
-      proposal: { type: "update_bottle" },
-    });
+    expect(runAudit).not.toHaveBeenCalled();
     expect(
-      await db.query.bottles.findFirst({
-        where: eq(bottles.id, bottle.id),
-        columns: { edition: true },
-      }),
-    ).toEqual({ edition: null });
+      await db
+        .select()
+        .from(bottleChecks)
+        .where(
+          eq(bottleChecks.backgroundEventKey, `bottle_created:${bottle.id}`),
+        ),
+    ).toEqual([]);
 
     const bottleChanges = await db
       .select()
@@ -139,11 +73,13 @@ describe("verifyBottleCreation", () => {
       .where(
         and(eq(changes.objectType, "bottle"), eq(changes.objectId, bottle.id)),
       );
-    expect(
-      bottleChanges.some(
-        (change) => change.data?.catalogVerification?.phase === "result",
-      ),
-    ).toBe(false);
+    const verificationChange = bottleChanges.find(
+      (change) => change.data?.catalogVerification?.phase === "result",
+    );
+    expect(verificationChange?.data.catalogVerification).toMatchObject({
+      source: "price_match_automation",
+      status: "skipped",
+    });
   });
 
   test("fails for retry without falling back to the old heuristic conclusion", async ({
