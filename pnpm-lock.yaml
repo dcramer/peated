@@ -593,6 +593,9 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.17)
+      jsdom:
+        specifier: 25.0.1
+        version: 25.0.1(supports-color@8.1.1)
       postcss:
         specifier: ^8.5.18
         version: 8.5.26
