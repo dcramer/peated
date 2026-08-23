@@ -15,6 +15,7 @@ export type IncomingBottleDecisionSourceKind =
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
 
 export interface IncomingBottleDecisionMetadata {
+  aliasScope?: "global_alias" | "none";
   classifierEvidence?: unknown;
   creationSource?: string;
   gtin14?: string;

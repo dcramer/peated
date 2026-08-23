@@ -35,6 +35,7 @@ import {
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
+  fillMissingBottleImage,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
@@ -706,10 +707,11 @@ function getStorePriceBottleRepairDraft(
 function buildStorePriceObservationFacts(
   proposal: Pick<
     StorePriceMatchProposalForReview,
-    "proposalType" | "proposedBottle"
+    "aliasScope" | "proposalType" | "proposedBottle"
   >,
 ) {
   return {
+    aliasScope: proposal.aliasScope ?? "none",
     proposalType: proposal.proposalType,
     proposedBottle: proposal.proposedBottle ?? null,
   };
@@ -954,28 +956,25 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     throw new StorePriceMatchProposalIdentityChangedError(proposalId);
   }
 
-  const aliasResult = await applyApprovedStorePriceMatchProposalInTransaction(
-    tx,
-    {
-      proposal,
-      reviewedById: user.id,
-      allowSystemActor: creationSource === "price_match_automation",
-      decisionLog: {
-        actor: writeActor,
-        decision: createResult ? "create_bottle" : "match_existing",
-        createdBottle: !!createResult,
-        metadata: {
-          creationSource,
-          reusedExistingBottle: !createResult,
-        },
+  const approval = await applyApprovedStorePriceMatchProposalInTransaction(tx, {
+    proposal,
+    reviewedById: user.id,
+    allowSystemActor: creationSource === "price_match_automation",
+    decisionLog: {
+      actor: writeActor,
+      decision: createResult ? "create_bottle" : "match_existing",
+      createdBottle: !!createResult,
+      metadata: {
+        creationSource,
+        reusedExistingBottle: !createResult,
       },
-      bottleId: resolvedBottle.id,
     },
-  );
+    bottleId: resolvedBottle.id,
+  });
 
   return {
     createResult,
-    aliasResult,
+    approval,
     bottle: resolvedBottle,
   };
 }
@@ -1014,9 +1013,7 @@ export async function createBottleFromStorePriceMatchProposal(
       creationSource,
     });
   }
-  await finalizeBottleAliasAssignment(result.aliasResult, {
-    bottle: { id: result.bottle.id },
-  });
+  await finalizeStorePriceApproval(result.approval, result.bottle.id);
 
   return {
     bottle: result.bottle,
@@ -1713,8 +1710,9 @@ async function persistApprovedStorePriceMatchInTransaction(
   // The decision writer is idempotent by source. Always offer a completed
   // moderation decision so legacy or preassigned prices still gain history.
   const metadata: IncomingBottleDecisionMetadata = {
-    proposalType: proposal.proposalType,
     ...decisionLog.metadata,
+    proposalType: proposal.proposalType,
+    aliasScope: proposal.aliasScope ?? "none",
   };
   if (decisionLog.actor.type === "system") {
     metadata.initiatedByUserId = reviewedById;
@@ -1770,22 +1768,25 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     },
   );
 
-  const aliasKey = normalizeBottleAliasKey(proposal.price.name);
-  // Only `global_alias` lets this store title match future listings. Other
-  // approvals still link this listing to the bottle, but keep its title out of
-  // automatic matching. Existing aliases keep their current setting.
-  const mayReuseAlias = proposal.aliasScope === "global_alias";
-  const aliasInput = {
-    bottleId,
-    externalSiteId: proposal.price.externalSiteId,
-    name: aliasKey,
-    backfillNames: [proposal.price.name],
-    volume: proposal.price.volume,
-    ignored: !mayReuseAlias,
-    assignmentSource: "source_approved",
-    assignedByActorId: actor.id,
-  } satisfies Parameters<typeof assignBottleAliasInTransaction>[1];
-  const aliasResult = await assignBottleAliasInTransaction(tx, aliasInput);
+  // A BottleAlias affects other listings and reviews. Create it only when the
+  // proposal explicitly allows that reuse and the moderator accepted the
+  // suggested Bottle. The exact StorePrice assignment below is independent.
+  const shouldAssignAlias =
+    proposal.aliasScope === "global_alias" &&
+    (proposal.proposalType === "create_new" ||
+      proposal.suggestedBottleId === bottleId);
+  const aliasResult = shouldAssignAlias
+    ? await assignBottleAliasInTransaction(tx, {
+        bottleId,
+        externalSiteId: proposal.price.externalSiteId,
+        name: normalizeBottleAliasKey(proposal.price.name),
+        backfillNames: [proposal.price.name],
+        volume: proposal.price.volume,
+        ignored: false,
+        assignmentSource: "source_approved",
+        assignedByActorId: actor.id,
+      })
+    : null;
 
   await persistApprovedStorePriceMatchInTransaction(tx, {
     proposal,
@@ -1797,7 +1798,30 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     },
   });
 
-  return aliasResult;
+  return {
+    aliasResult,
+    bottleImageCandidate:
+      aliasResult === null && proposal.price.imageUrl
+        ? { bottleId, imageUrl: proposal.price.imageUrl }
+        : null,
+  };
+}
+
+async function finalizeStorePriceApproval(
+  approval: Awaited<
+    ReturnType<typeof applyApprovedStorePriceMatchProposalInTransaction>
+  >,
+  bottleId: number,
+) {
+  if (approval.aliasResult) {
+    await finalizeBottleAliasAssignment(approval.aliasResult, {
+      bottle: { id: bottleId },
+    });
+    return;
+  }
+  await fillMissingBottleImage(approval.bottleImageCandidate, {
+    bottle: { id: bottleId },
+  });
 }
 
 export async function applyApprovedStorePriceMatchInTransaction(
@@ -1826,7 +1850,7 @@ export async function applyApprovedStorePriceMatchInTransaction(
   });
 
   return {
-    aliasResult: await applyApprovedStorePriceMatchProposalInTransaction(tx, {
+    approval: await applyApprovedStorePriceMatchProposalInTransaction(tx, {
       proposal,
       reviewedById,
       allowSystemActor,
@@ -1855,7 +1879,7 @@ export async function applyApprovedStorePriceMatch({
   allowSystemActor?: boolean;
   expectedProcessingToken?: string;
 }) {
-  const { aliasResult } = await db.transaction(async (tx) =>
+  const { approval } = await db.transaction(async (tx) =>
     applyApprovedStorePriceMatchInTransaction(tx, {
       proposalId,
       bottleId,
@@ -1866,9 +1890,7 @@ export async function applyApprovedStorePriceMatch({
     }),
   );
 
-  await finalizeBottleAliasAssignment(aliasResult, {
-    bottle: { id: bottleId },
-  });
+  await finalizeStorePriceApproval(approval, bottleId);
 }
 
 /**
@@ -1886,7 +1908,7 @@ export async function applyStorePriceBottleRepairFromProposal({
   actor: IncomingBottleDecisionActor;
   expectedProcessingToken?: string;
 }) {
-  const { updateManifest, aliasResult } = await db.transaction(async (tx) => {
+  const { updateManifest, approval } = await db.transaction(async (tx) => {
     const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
     if (
       preflight.proposalType !== "correction" ||
@@ -1932,8 +1954,9 @@ export async function applyStorePriceBottleRepairFromProposal({
     ) {
       throw new StorePriceMatchProposalIdentityChangedError(proposalId);
     }
-    const approvedAliasResult =
-      await applyApprovedStorePriceMatchProposalInTransaction(tx, {
+    const approval = await applyApprovedStorePriceMatchProposalInTransaction(
+      tx,
+      {
         proposal,
         reviewedById: user.id,
         bottleId: updateManifest.bottle.id,
@@ -1941,19 +1964,16 @@ export async function applyStorePriceBottleRepairFromProposal({
           actor,
           decision: "match_existing",
         },
-      });
+      },
+    );
 
     return {
       updateManifest,
-      aliasResult: approvedAliasResult,
+      approval,
     };
   });
 
-  await finalizeBottleAliasAssignment(aliasResult, {
-    bottle: {
-      id: updateManifest.bottle.id,
-    },
-  });
+  await finalizeStorePriceApproval(approval, updateManifest.bottle.id);
   await finalizeBottleUpdate(updateManifest);
 
   return updateManifest.bottle;

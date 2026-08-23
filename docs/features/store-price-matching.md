@@ -126,6 +126,35 @@ That observation stores:
 This keeps exact source detail without forcing new public fields into the normal
 Bottle entry flow.
 
+## Approval And BottleAlias Safety
+
+An approval always assigns the reviewed `store_price` to the selected Bottle.
+This exact assignment does not require a BottleAlias.
+
+A proposal can also allow the store title to become a reusable BottleAlias.
+The server creates that BottleAlias only when both conditions are true:
+
+- the stored proposal has `aliasScope = global_alias`
+- the moderator accepts the Bottle suggested by that proposal
+
+Missing scope and `aliasScope = none` create no BottleAlias. They also do not
+change an existing BottleAlias with the same name. The approval does not assign
+same-name StorePrices or reviews. A moderator override to a different Bottle
+also creates no BottleAlias, even if the proposal allowed one for its original
+suggestion.
+
+The approved StorePrice image can still fill an empty Bottle image. The server
+uses only that StorePrice image and continues to respect rejected image URLs.
+
+Legacy ignored BottleAlias rows from old source-only approvals can block later
+valid alias assignment. The moderator-only
+`POST /v1/bottle-aliases/repair-source-approvals` API audits these rows without
+changing them by default. The OAuth `cli api` client can call this endpoint
+against production. Execution requires `execute: true` and one or more explicit
+BottleAlias names. The repair only unassigns ignored rows when an approved
+source-only proposal and decision provide matching evidence. Active rows are
+report-only and require manual review.
+
 ## Image Promotion
 
 A StorePrice image can fill an empty Bottle image. It cannot use an image link

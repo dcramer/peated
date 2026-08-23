@@ -1003,6 +1003,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
+        aliasScope: "global_alias",
         extractedLabel: {
           brand: "SMWS",
           bottler: "SMWS",
@@ -1591,6 +1592,7 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 80,
           rationale: "The current bottle identity already matches cleanly.",
+          aliasScope: "global_alias",
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -3232,6 +3234,7 @@ describe("priceMatching", () => {
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
           identityScope: "exact_cask",
+          aliasScope: "global_alias",
           confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
@@ -3346,6 +3349,7 @@ describe("priceMatching", () => {
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
           identityScope: "exact_cask",
+          aliasScope: "global_alias",
           confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
@@ -3451,6 +3455,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 95,
           rationale: "Classifier created the SMWS exact-cask bottle.",
+          aliasScope: "global_alias",
           candidateBottleIds: [],
           proposedBottle: {
             name: "RW6.5 Sauna Smoke",
@@ -4049,6 +4054,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 92,
           rationale: "Web evidence confirms a distinct release.",
+          aliasScope: "global_alias",
           confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: null,
           candidateBottleIds: [],
@@ -6817,9 +6823,7 @@ describe("priceMatching", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    expect(listingAlias).toMatchObject({
-      bottleId: promotedBottle.id,
-    });
+    expect(listingAlias).toBeUndefined();
     expect(updatedPrice).toMatchObject({
       bottleId: promotedBottle.id,
     });
@@ -7060,7 +7064,7 @@ describe("priceMatching", () => {
       suggestedBottleId: suggestedParent.id,
       reviewedById: reviewer.id,
     });
-    expect(alias).toMatchObject({ bottleId: suggestedParent.id });
+    expect(alias).toBeUndefined();
     expect(observation).toMatchObject({
       bottleId: suggestedParent.id,
     });
@@ -7174,6 +7178,7 @@ describe("priceMatching", () => {
         status: "pending_review",
         proposalType: "match_existing",
         aliasScope: "global_alias",
+        suggestedBottleId: bottle.id,
       })
       .returning();
 
@@ -7240,10 +7245,46 @@ describe("priceMatching", () => {
     });
 
     expect(updatedPrice?.bottleId).toBe(bottle.id);
-    expect(listingAlias).toMatchObject({
-      bottleId: bottle.id,
-      ignored: true,
+    expect(listingAlias).toBeUndefined();
+  });
+
+  test("does not create a BottleAlias when a match proposal has no suggested Bottle", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Missing Suggested Bottle",
     });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        aliasScope: "global_alias",
+        suggestedBottleId: null,
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+      }),
+    ).toBeUndefined();
   });
 
   test("treats missing alias scope conservatively and keeps the listing title source-scoped", async ({
@@ -7278,8 +7319,7 @@ describe("priceMatching", () => {
       where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
 
-    expect(listingAlias?.bottleId).toBe(bottle.id);
-    expect(listingAlias?.ignored).toBe(true);
+    expect(listingAlias).toBeUndefined();
   });
 
   test("leaves other aliases reusable when a none-scope listing is approved", async ({
@@ -7334,7 +7374,7 @@ describe("priceMatching", () => {
       name: "Existing Active Alias Listing",
       volume: 750,
     });
-    await fixtures.BottleAlias({
+    const existingAlias = await fixtures.BottleAlias({
       bottleId: bottle.id,
       name: normalizeBottleAliasKey(price.name),
       assignmentSource: "human_approved",
@@ -7366,6 +7406,8 @@ describe("priceMatching", () => {
     expect(listingAlias).toMatchObject({
       bottleId: bottle.id,
       ignored: false,
+      assignmentSource: "human_approved",
+      assignedByActorId: existingAlias.assignedByActorId,
     });
   });
 
@@ -7394,6 +7436,7 @@ describe("priceMatching", () => {
         status: "pending_review",
         proposalType: "match_existing",
         aliasScope: "global_alias",
+        suggestedBottleId: bottle.id,
       })
       .returning();
 
