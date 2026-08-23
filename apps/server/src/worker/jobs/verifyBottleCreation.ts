@@ -35,7 +35,9 @@ export async function verifyBottleCreation(
   const { bottleId, creationSource } =
     VerifyBottleCreationJobArgsSchema.parse(input);
 
-  if (!shouldRunCatalogVerification(creationSource)) {
+  const policyInput = { objectType: "bottle", source: creationSource } as const;
+
+  if (!shouldRunCatalogVerification(policyInput)) {
     const displayName = await getCatalogVerificationDisplayName({
       objectId: bottleId,
       objectType: "bottle",
@@ -47,7 +49,7 @@ export async function verifyBottleCreation(
       result: {
         source: creationSource,
         status: "skipped",
-        reason: getCatalogVerificationSkipReason(creationSource),
+        reason: getCatalogVerificationSkipReason(policyInput),
         findings: [],
       },
     });

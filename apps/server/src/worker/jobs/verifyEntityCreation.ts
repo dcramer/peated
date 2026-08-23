@@ -21,7 +21,9 @@ export default async function ({
     objectType: "entity",
   });
 
-  if (!shouldRunCatalogVerification(creationSource)) {
+  const policyInput = { objectType: "entity", source: creationSource } as const;
+
+  if (!shouldRunCatalogVerification(policyInput)) {
     await recordCatalogVerificationResult({
       displayName,
       objectId: entityId,
@@ -29,7 +31,7 @@ export default async function ({
       result: {
         source: creationSource,
         status: "skipped",
-        reason: getCatalogVerificationSkipReason(creationSource),
+        reason: getCatalogVerificationSkipReason(policyInput),
         findings: [],
       },
     });

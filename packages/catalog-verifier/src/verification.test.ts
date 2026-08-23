@@ -22,24 +22,64 @@ describe("catalog verifier policy", () => {
   });
 
   test("runs verification for manual entries", () => {
-    expect(shouldRunCatalogVerification("manual_entry")).toBe(true);
-    expect(getCatalogVerificationSkipReason("manual_entry")).toBeNull();
+    const input = { objectType: "bottle", source: "manual_entry" } as const;
+
+    expect(shouldRunCatalogVerification(input)).toBe(true);
+    expect(getCatalogVerificationSkipReason(input)).toBeNull();
   });
 
-  test("runs verification for automated price matches", () => {
-    expect(shouldRunCatalogVerification("price_match_automation")).toBe(true);
-    expect(
-      getCatalogVerificationSkipReason("price_match_automation"),
-    ).toBeNull();
+  test("skips automated Bottle audits but checks automated entities", () => {
+    const bottleInput = {
+      objectType: "bottle",
+      source: "price_match_automation",
+    } as const;
+    const entityInput = {
+      objectType: "entity",
+      source: "price_match_automation",
+    } as const;
+
+    expect(shouldRunCatalogVerification(bottleInput)).toBe(false);
+    expect(getCatalogVerificationSkipReason(bottleInput)).toContain(
+      "already checked",
+    );
+    expect(shouldRunCatalogVerification(entityInput)).toBe(true);
+    expect(getCatalogVerificationSkipReason(entityInput)).toBeNull();
   });
 
   test("skips reviewed and repair creation flows", () => {
-    expect(shouldRunCatalogVerification("bottle_classifier")).toBe(false);
-    expect(shouldRunCatalogVerification("price_match_review")).toBe(false);
-    expect(shouldRunCatalogVerification("repair_workflow")).toBe(false);
-    expect(getCatalogVerificationSkipReason("bottle_classifier")).toContain(
-      "classifier",
-    );
+    expect(
+      shouldRunCatalogVerification({
+        objectType: "bottle",
+        source: "bottle_classifier",
+      }),
+    ).toBe(false);
+    expect(
+      shouldRunCatalogVerification({
+        objectType: "bottle",
+        source: "price_match_review",
+      }),
+    ).toBe(false);
+    expect(
+      shouldRunCatalogVerification({
+        objectType: "entity",
+        source: "repair_workflow",
+      }),
+    ).toBe(false);
+    expect(
+      getCatalogVerificationSkipReason({
+        objectType: "bottle",
+        source: "bottle_classifier",
+      }),
+    ).toContain("classifier");
+  });
+
+  test("runs verification for manual entities", () => {
+    expect(
+      shouldRunCatalogVerification({
+        objectType: "entity",
+        source: "manual_entry",
+      }),
+    ).toBe(true);
   });
 
   test("builds parsed creation metadata and results", () => {
