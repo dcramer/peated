@@ -147,11 +147,13 @@ The approved StorePrice image can still fill an empty Bottle image. The server
 uses only that StorePrice image and continues to respect rejected image URLs.
 
 Legacy ignored BottleAlias rows from old source-only approvals can block later
-valid alias assignment. `pnpm cli bottles repair-source-aliases` audits these
-rows without changing them. Execution requires `--execute` and one or more
-explicit BottleAlias names. The repair only unassigns ignored rows when an
-approved source-only proposal and decision provide matching evidence. Active
-rows are report-only and require manual review.
+valid alias assignment. The moderator-only
+`POST /v1/bottle-aliases/repair-source-approvals` API audits these rows without
+changing them by default. The OAuth `cli api` client can call this endpoint
+against production. Execution requires `execute: true` and one or more explicit
+BottleAlias names. The repair only unassigns ignored rows when an approved
+source-only proposal and decision provide matching evidence. Active rows are
+report-only and require manual review.
 
 ## Image Promotion
 
