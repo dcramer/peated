@@ -1,12 +1,16 @@
-import { sendMagicLinkEmail } from "@peated/server/lib/email";
+import { createRouterClient } from "@orpc/server";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
+import {
+  createMagicLinkProcedure,
+  type MagicLinkSender,
+} from "@peated/server/orpc/routes/auth/magic-link/create";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock the sendMagicLinkEmail function
-vi.mock("@peated/server/lib/email", () => ({
-  sendMagicLinkEmail: vi.fn(),
-}));
+const sendMagicLinkEmail = vi.fn<MagicLinkSender>();
+const magicLinkClient = createRouterClient(
+  { create: createMagicLinkProcedure(sendMagicLinkEmail) },
+  { context: { ip: "127.0.0.1", user: null } },
+);
 
 describe("POST /auth/magic-link", () => {
   beforeEach(() => {
@@ -16,12 +20,7 @@ describe("POST /auth/magic-link", () => {
   test("sends magic link for active user", async ({ fixtures }) => {
     const user = await fixtures.User({ active: true });
 
-    const result = await routerClient.auth.magicLink.create(
-      {
-        email: user.email,
-      },
-      { context: { ip: "127.0.0.1" } },
-    );
+    const result = await magicLinkClient.create({ email: user.email });
 
     expect(result).toEqual({});
     expect(sendMagicLinkEmail).toHaveBeenCalledWith({ user });
@@ -36,12 +35,7 @@ describe("POST /auth/magic-link", () => {
     );
 
     const error = await waitError(
-      routerClient.auth.magicLink.create(
-        {
-          email: user.email,
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      magicLinkClient.create({ email: user.email }),
     );
 
     expect(error).toMatchInlineSnapshot(
@@ -51,12 +45,7 @@ describe("POST /auth/magic-link", () => {
 
   test("throws error when user is not found", async ({ fixtures }) => {
     const error = await waitError(
-      routerClient.auth.magicLink.create(
-        {
-          email: "nonexistent@example.com",
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      magicLinkClient.create({ email: "nonexistent@example.com" }),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
@@ -66,12 +55,7 @@ describe("POST /auth/magic-link", () => {
     const user = await fixtures.User({ active: false });
 
     const error = await waitError(
-      routerClient.auth.magicLink.create(
-        {
-          email: user.email,
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      magicLinkClient.create({ email: user.email }),
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
@@ -83,12 +67,9 @@ describe("POST /auth/magic-link", () => {
       email: "User@Example.com",
     });
 
-    const result = await routerClient.auth.magicLink.create(
-      {
-        email: "uSER@eXAMPLE.COM",
-      },
-      { context: { ip: "127.0.0.1" } },
-    );
+    const result = await magicLinkClient.create({
+      email: "uSER@eXAMPLE.COM",
+    });
 
     expect(result).toEqual({});
     expect(sendMagicLinkEmail).toHaveBeenCalledWith({ user });

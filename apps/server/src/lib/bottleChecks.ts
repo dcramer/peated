@@ -11,6 +11,7 @@ import {
   IgnoredBottleClassificationResultSchema,
   type BottleClassificationArtifacts,
   type EvidenceRef,
+  type ProposedOperation,
 } from "@peated/bottle-classifier";
 import { db, type AnyConnection, type AnyDatabase } from "@peated/server/db";
 import {
@@ -90,6 +91,30 @@ type JsonValue =
   | string
   | { [key: string]: JsonValue };
 
+type BottleCheckInputValue =
+  | boolean
+  | BottleCheckInputValue[]
+  | null
+  | number
+  | string
+  | undefined
+  | { [key: string]: BottleCheckInputValue };
+type BottleCheckInputCandidate = {
+  [key: string]: BottleCheckInputValue;
+};
+const BottleCheckInputValueSchema: z.ZodType<BottleCheckInputValue> = z.lazy(
+  () =>
+    z.union([
+      z.string(),
+      z.number().finite(),
+      z.boolean(),
+      z.null(),
+      z.undefined(),
+      z.array(BottleCheckInputValueSchema),
+      z.record(z.string(), BottleCheckInputValueSchema),
+    ]),
+);
+
 const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
   z.union([
     z.string(),
@@ -100,17 +125,20 @@ const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
     z.record(z.string(), JsonValueSchema),
   ]),
 );
+const JsonObjectSchema = z.record(z.string(), JsonValueSchema);
 
 export const BottleCheckCloseReasonSchema = z.enum(
   bottleCheckCloseReasonEnum.enumValues,
 );
 
+export const CloseBottleCheckInputFields = {
+  checkId: PositiveIdSchema,
+  reason: BottleCheckCloseReasonSchema,
+  note: NonEmptyTextSchema.max(2000).optional(),
+} as const;
+
 export const CloseBottleCheckInputSchema = z
-  .object({
-    checkId: PositiveIdSchema,
-    reason: BottleCheckCloseReasonSchema,
-    note: NonEmptyTextSchema.max(2000).optional(),
-  })
+  .object(CloseBottleCheckInputFields)
   .strict();
 
 export const ListActionableBottleChecksInputSchema = z
@@ -147,42 +175,45 @@ const CurrentPersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
   ],
 );
 
-function removeLegacyClassifierOutputFields(output: unknown): unknown {
-  if (!output || typeof output !== "object") return output;
+function removeLegacyClassifierOutputFields(output: JsonValue): JsonValue {
+  const outputObject = JsonObjectSchema.safeParse(output);
+  if (!outputObject.success) return output;
 
-  const decision = (output as Record<string, unknown>).decision;
-  if (!decision || typeof decision !== "object") return output;
+  const decision = JsonObjectSchema.safeParse(outputObject.data.decision);
+  if (!decision.success) return output;
 
   const { identityBasis: _identityBasis, ...decisionWithoutIdentityBasis } =
-    decision as Record<string, unknown>;
+    decision.data;
   let currentDecision = decisionWithoutIdentityBasis;
-  const observation = currentDecision.observation;
-  if (observation && typeof observation === "object") {
+  const observation = JsonObjectSchema.safeParse(currentDecision.observation);
+  if (observation.success) {
     const {
       bottleNumber: _bottleNumber,
       outturn: _outturn,
       market: _market,
       exclusive: _exclusive,
       ...currentObservation
-    } = observation as Record<string, unknown>;
+    } = observation.data;
     currentDecision = {
       ...currentDecision,
       observation: currentObservation,
     };
   }
 
-  const confidenceBasis = currentDecision.confidenceBasis;
-  if (!confidenceBasis || typeof confidenceBasis !== "object") {
-    return { ...output, decision: currentDecision };
+  const confidenceBasis = JsonObjectSchema.safeParse(
+    currentDecision.confidenceBasis,
+  );
+  if (!confidenceBasis.success) {
+    return { ...outputObject.data, decision: currentDecision };
   }
 
   const {
     positiveEvidence: _positiveEvidence,
     toolsUsed: _toolsUsed,
     ...currentConfidenceBasis
-  } = confidenceBasis as Record<string, unknown>;
+  } = confidenceBasis.data;
   return {
-    ...output,
+    ...outputObject.data,
     decision: {
       ...currentDecision,
       confidenceBasis: currentConfidenceBasis,
@@ -194,7 +225,7 @@ function removeLegacyClassifierOutputFields(output: unknown): unknown {
 // current reader before current strict validation; runtime metadata owns actual
 // tool calls.
 export const PersistedReferenceBottleCheckOutputSchema = z.preprocess(
-  removeLegacyClassifierOutputFields,
+  (output) => removeLegacyClassifierOutputFields(JsonValueSchema.parse(output)),
   CurrentPersistedReferenceBottleCheckOutputSchema,
 );
 
@@ -236,6 +267,20 @@ const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
     })
     .strict(),
 ]);
+
+type DeepPartialInput<T> = T extends readonly (infer Item)[]
+  ? DeepPartialInput<Item>[]
+  : T extends object
+    ? { [Key in keyof T]?: DeepPartialInput<T[Key]> }
+    : T;
+type CreateBottleCheckInputCandidate = DeepPartialInput<
+  z.input<typeof CreateBottleCheckInputSchema>
+> & {
+  intent: "audit_bottle" | "resolve_reference";
+  result?: {
+    proposedOperations?: ProposedOperation[];
+  };
+};
 
 function buildPersistedBottleCheckOutput(
   input: z.infer<typeof CreateBottleCheckInputSchema>,
@@ -399,19 +444,19 @@ function getSubject(
 const InlineImageDataUrlPattern =
   /^data:(image\/[a-z0-9.+-]+);base64,([a-z0-9+/]*={0,2})$/i;
 
-function sanitizeBottleCheckValue(value: unknown): JsonValue {
-  if (
-    value === null ||
-    typeof value === "boolean" ||
-    typeof value === "number"
-  ) {
-    return JsonValueSchema.parse(value);
+function sanitizeBottleCheckValue(value: BottleCheckInputValue): JsonValue {
+  const scalar = z
+    .union([z.boolean(), z.number().finite(), z.null()])
+    .safeParse(value);
+  if (scalar.success) {
+    return scalar.data;
   }
 
-  if (typeof value === "string") {
-    const inlineImage = InlineImageDataUrlPattern.exec(value);
+  const text = z.string().safeParse(value);
+  if (text.success) {
+    const inlineImage = InlineImageDataUrlPattern.exec(text.data);
     if (!inlineImage) {
-      return value;
+      return text.data;
     }
 
     const [, mediaType, encodedBytes] = inlineImage;
@@ -426,28 +471,26 @@ function sanitizeBottleCheckValue(value: unknown): JsonValue {
     return value.map(sanitizeBottleCheckValue);
   }
 
-  if (typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value).flatMap(([key, nestedValue]) =>
-        nestedValue === undefined
-          ? []
-          : [[key, sanitizeBottleCheckValue(nestedValue)]],
-      ),
-    );
+  if (value === undefined) {
+    throw new TypeError("Bottle check input contains undefined.");
   }
 
-  throw new TypeError(
-    `Bottle check input contains unsupported ${typeof value}`,
+  const objectValue = z
+    .record(z.string(), BottleCheckInputValueSchema)
+    .parse(value);
+  return Object.fromEntries(
+    Object.entries(objectValue).flatMap(([key, nestedValue]) =>
+      nestedValue === undefined
+        ? []
+        : [[key, sanitizeBottleCheckValue(nestedValue)]],
+    ),
   );
 }
 
 export function sanitizeBottleCheckInput(
-  value: unknown,
+  value: BottleCheckInputCandidate,
 ): Record<string, JsonValue> {
-  if (value === null || Array.isArray(value) || typeof value !== "object") {
-    throw new TypeError("Bottle check input must be an object.");
-  }
-  return sanitizeBottleCheckValue(value) as Record<string, JsonValue>;
+  return JsonObjectSchema.parse(sanitizeBottleCheckValue(value));
 }
 
 async function resolveStorePriceLink({
@@ -518,7 +561,7 @@ async function findCheckByBackgroundEventKey({
 }
 
 export async function createBottleCheck(
-  rawInput: unknown,
+  rawInput: CreateBottleCheckInputCandidate,
   database: AnyDatabase = db,
 ): Promise<CreateBottleCheckResult> {
   const input = CreateBottleCheckInputSchema.parse(rawInput);
@@ -614,10 +657,12 @@ export async function createBottleCheck(
         backgroundEventKey: input.backgroundEventKey,
         schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
         inputSnapshot: sanitizeBottleCheckInput(input.input),
-        output,
-        artifacts,
+        output: JsonObjectSchema.parse(output),
+        artifacts: JsonObjectSchema.parse(artifacts),
         model: input.model,
-        modelMetadata: input.modelMetadata,
+        modelMetadata: input.modelMetadata
+          ? JsonObjectSchema.parse(input.modelMetadata)
+          : input.modelMetadata,
         ...storePriceLink,
         completedAt: new Date(),
       })
@@ -627,9 +672,12 @@ export async function createBottleCheck(
       .returning();
 
     if (!check) {
+      if (!input.backgroundEventKey) {
+        throw new Error("Bottle check conflict is missing its event key.");
+      }
       const existing = await findCheckByBackgroundEventKey({
         database: tx,
-        backgroundEventKey: input.backgroundEventKey as string,
+        backgroundEventKey: input.backgroundEventKey,
       });
       if (!existing) {
         throw new Error(
@@ -680,7 +728,9 @@ export async function createBottleCheck(
   });
 }
 
-function getPersistedCheckFindings(check: BottleCheck): unknown[] | null {
+function getPersistedCheckFindings(
+  check: BottleCheck,
+): z.infer<typeof FindingSchema>[] | null {
   if (!isSupportedBottleCheckSchemaVersion(check) || check.output === null) {
     return null;
   }
@@ -689,7 +739,7 @@ function getPersistedCheckFindings(check: BottleCheck): unknown[] | null {
 }
 
 export async function getCurrentModeratorBottleAudit(
-  rawBottleId: unknown,
+  rawBottleId: number,
   database: AnyDatabase = db,
 ): Promise<BottleCheckWithOperations | null> {
   const bottleId = PositiveIdSchema.parse(rawBottleId);
@@ -771,7 +821,7 @@ export async function deleteTerminalModeratorBottleAudits(
 }
 
 export async function listActionableBottleChecks(
-  rawInput: unknown = {},
+  rawInput: z.input<typeof ListActionableBottleChecksInputSchema> = {},
   database: AnyDatabase = db,
 ): Promise<ActionableBottleCheckList> {
   const input = ListActionableBottleChecksInputSchema.parse(rawInput);
@@ -990,7 +1040,7 @@ export async function getActionableBottleCheckSummary(
 }
 
 export async function getBottleCheckForReview(
-  rawCheckId: unknown,
+  rawCheckId: number,
   database: AnyDatabase = db,
 ): Promise<BottleCheckWithOperations | null> {
   const checkId = PositiveIdSchema.parse(rawCheckId);
@@ -1007,7 +1057,7 @@ export async function getBottleCheckForReview(
 }
 
 export async function closeBottleCheck(
-  rawInput: unknown,
+  rawInput: z.input<typeof CloseBottleCheckInputSchema>,
   user: User | null,
   database: AnyConnection = db,
 ): Promise<BottleCheckWithOperations> {

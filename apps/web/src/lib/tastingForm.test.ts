@@ -18,7 +18,7 @@ const fields: TastingFormFields = {
 
 describe("tasting form submissions", () => {
   it("builds create payloads with one Bottle and image intent", () => {
-    const image = { name: "label.jpg" } as File;
+    const image = new File([], "label.jpg");
     expect(
       buildTastingCreateFormSubmission({
         fields,

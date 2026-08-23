@@ -1,35 +1,30 @@
+// @vitest-environment jsdom
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { constructorMock, toBlobMock } = vi.hoisted(() => ({
-  constructorMock: vi.fn(),
-  toBlobMock: vi.fn(),
-}));
+import { type CreateImageProcessor, toBlob } from "./blobs";
 
-vi.mock("pica", () => ({
-  default: class PicaMock {
-    constructor(options: unknown) {
-      constructorMock(options);
-    }
-
-    toBlob = toBlobMock;
-  },
-}));
-
-import { toBlob } from "./blobs";
+const resizeMock = vi.fn();
+const toBlobMock = vi.fn();
+const createProcessor: CreateImageProcessor = () => ({
+  resize: resizeMock,
+  toBlob: toBlobMock,
+});
 
 beforeEach(() => {
+  resizeMock.mockReset();
+  toBlobMock.mockReset();
   toBlobMock.mockResolvedValue(new Blob(["image"]));
 });
 
 describe("toBlob", () => {
-  it("keeps Pica image processing off its generated web worker", async () => {
-    const canvas = { width: 600, height: 600 } as HTMLCanvasElement;
+  it("encodes images that do not need resizing", async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 600;
+    canvas.height = 600;
 
-    await toBlob(canvas);
+    await toBlob(canvas, createProcessor);
 
-    expect(constructorMock).toHaveBeenCalledWith({
-      features: ["js", "wasm"],
-    });
     expect(toBlobMock).toHaveBeenCalledWith(canvas, "image/webp", 0.9);
   });
 });

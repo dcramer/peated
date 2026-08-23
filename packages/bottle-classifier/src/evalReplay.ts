@@ -1,36 +1,24 @@
 import type { JsonValue } from "vitest-evals/harness";
 import type { ToolRecording } from "vitest-evals/replay";
+import { z } from "zod";
+
+const WebSearchErrorSchema = z.object({ error: z.string() });
+const WebSearchResultSchema = z.object({
+  error: z.string().optional(),
+  errors: z.array(WebSearchErrorSchema).optional(),
+});
 
 function getWebSearchError(result: JsonValue | undefined): string | null {
-  if (
-    result === undefined ||
-    Array.isArray(result) ||
-    typeof result !== "object" ||
-    result === null
-  ) {
+  const parsed = WebSearchResultSchema.safeParse(result);
+  if (!parsed.success) {
     return null;
   }
 
-  if (typeof result.error === "string") {
-    return result.error;
+  if (parsed.data.error) {
+    return parsed.data.error;
   }
 
-  if (!Array.isArray(result.errors)) {
-    return null;
-  }
-
-  for (const item of result.errors) {
-    if (
-      !Array.isArray(item) &&
-      typeof item === "object" &&
-      item !== null &&
-      typeof item.error === "string"
-    ) {
-      return item.error;
-    }
-  }
-
-  return null;
+  return parsed.data.errors?.[0]?.error ?? null;
 }
 
 export function assertSuccessfulWebSearchReplay(

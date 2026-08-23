@@ -21,6 +21,10 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import type {
+  BottleExtractedDetails,
+  ProposedBottle,
+} from "@peated/bottle-classifier/internal/types";
 import {
   CASK_FILLS,
   CASK_SIZE_IDS,
@@ -39,6 +43,23 @@ type TastingNotes = {
   palate: string;
   finish: string;
 };
+
+type PersistedObservationValue =
+  | boolean
+  | null
+  | number
+  | string
+  | PersistedObservationData
+  | PersistedObservationValue[];
+
+interface PersistedObservationData {
+  [key: string]: PersistedObservationValue;
+}
+
+interface StorePriceObservationFacts {
+  proposalType: string;
+  proposedBottle: PersistedObservationData | ProposedBottle | null;
+}
 
 type RatingStats = {
   pass: number;
@@ -428,8 +449,12 @@ export const bottleObservations = pgTable(
       () => externalSites.id,
     ),
     rawText: text("raw_text"),
-    parsedIdentity: jsonb("parsed_identity").$type<Record<string, unknown>>(),
-    facts: jsonb("facts").$type<Record<string, unknown>>(),
+    parsedIdentity: jsonb("parsed_identity").$type<
+      BottleExtractedDetails | PersistedObservationData
+    >(),
+    facts: jsonb("facts").$type<
+      PersistedObservationData | StorePriceObservationFacts
+    >(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" }).references(

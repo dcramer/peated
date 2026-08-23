@@ -5,31 +5,9 @@ import { shouldCaptureORPCClientError } from "./errors";
 /**
  * Safely stringify an object, handling circular references and other serialization issues
  */
-function safeJsonStringify(obj: unknown): string {
+function safeJsonStringify(obj: InterceptableOptions["input"]): string {
   try {
-    const seenObjects = new WeakSet();
-    return JSON.stringify(obj, (key, value) => {
-      // Handle circular references by replacing them with a placeholder
-      if (typeof value === "object" && value !== null) {
-        if (seenObjects.has(value)) {
-          return "[Circular Reference]";
-        }
-        seenObjects.add(value);
-      }
-
-      // Handle functions, symbols, and other non-serializable types
-      if (typeof value === "function") {
-        return "[Function]";
-      }
-      if (typeof value === "symbol") {
-        return "[Symbol]";
-      }
-      if (typeof value === "undefined") {
-        return "[undefined]";
-      }
-
-      return value;
-    });
+    return JSON.stringify(Sentry.normalize(obj, 5));
   } catch (error) {
     // If all else fails, return a safe fallback
     return `[Serialization Error: ${error instanceof Error ? error.message : "Unknown"}]`;

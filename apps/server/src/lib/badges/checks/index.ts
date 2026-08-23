@@ -1,4 +1,5 @@
 import { BadgeCheckSchema } from "@peated/server/schemas/badges";
+import type { BadgeCheck } from "@peated/server/types";
 import { AgeCheck } from "./ageCheck";
 import { BottleCheck } from "./bottleCheck";
 import { CategoryCheck } from "./categoryCheck";
@@ -13,7 +14,7 @@ export type PreparedBadgeCheck = {
 };
 
 /** Parses one stored badge check before binding it to the in-memory evaluator. */
-export function prepareBadgeCheck(input: unknown): PreparedBadgeCheck {
+export function prepareBadgeCheck(input: BadgeCheck): PreparedBadgeCheck {
   const check = BadgeCheckSchema.parse(input);
 
   switch (check.type) {
@@ -39,7 +40,7 @@ export function prepareBadgeCheck(input: unknown): PreparedBadgeCheck {
     }
     case "everyTasting": {
       const impl = new EveryTastingCheck();
-      return { test: (tasting) => impl.test(check.config, tasting) };
+      return { test: (tasting) => impl.test(tasting) };
     }
   }
 }

@@ -28,11 +28,7 @@ export function serializeExternalSite(
 
 export const ExternalSiteSerializer = serializer({
   name: "externalSite",
-  item: (
-    item: ExternalSite,
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ): z.infer<typeof ExternalSiteSchema> => {
+  item: (item: ExternalSite): z.infer<typeof ExternalSiteSchema> => {
     return serializeExternalSite(item);
   },
 });

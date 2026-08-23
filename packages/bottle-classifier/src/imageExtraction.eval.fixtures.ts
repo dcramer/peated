@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import type { BottleExtractedDetails } from "./classifierTypes";
 
 export type ExtractedIdentityField =
   | "brand"
@@ -31,7 +32,7 @@ export type ImageExtractionEvalCase = {
   imagePath: string;
   sourceUrl?: string;
   expected: {
-    fields?: Partial<Record<ExtractedIdentityField, unknown>>;
+    fields?: Partial<Pick<BottleExtractedDetails, ExtractedIdentityField>>;
     text?: TextExpectation[];
     anyText?: AnyTextExpectation[];
     distilleryIncludes?: string[];

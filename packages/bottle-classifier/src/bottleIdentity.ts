@@ -7,6 +7,7 @@
  * reviewed classifier, not in these helpers. New hardcoded phrase rules need
  * verified whisky research and focused tests before being added here.
  */
+import { z } from "zod";
 import { normalizeBottle } from "./normalize";
 
 export type BottleExactIdentityInput = {
@@ -55,11 +56,12 @@ function bottleNameMarketsPattern(
   pattern: RegExp,
 ): boolean {
   return [bottle.name, bottle.fullName].some((name) => {
-    if (typeof name !== "string") {
+    const parsedName = z.string().safeParse(name);
+    if (!parsedName.success) {
       return false;
     }
 
-    return pattern.test(name);
+    return pattern.test(parsedName.data);
   });
 }
 
@@ -223,6 +225,11 @@ export function getResolvedBottleIdentity({
   };
 }
 
+export interface CanonicalBottleName {
+  fullName: string;
+  name: string;
+}
+
 export function formatCanonicalBottleName({
   bottleName,
   bottleFullName,
@@ -235,10 +242,7 @@ export function formatCanonicalBottleName({
   bottleNameTraits?: Partial<BottleNameTraitsInput>;
   bottleStatedAge: number | null;
   exact: BottleExactIdentityInput;
-}): {
-  fullName: string;
-  name: string;
-} {
+}): CanonicalBottleName {
   const resolvedIdentity = getResolvedBottleIdentity({
     bottle: {
       name: bottleName,

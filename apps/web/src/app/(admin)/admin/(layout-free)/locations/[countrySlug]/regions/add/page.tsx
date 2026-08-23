@@ -7,8 +7,8 @@ import { useParams, useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-  const params = useParams();
-  const countrySlug = params.countrySlug as string;
+  const params = useParams<{ countrySlug: string }>();
+  const countrySlug = params.countrySlug;
 
   const orpc = useORPC();
   const regionCreateMutation = useMutation(

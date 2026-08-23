@@ -35,7 +35,7 @@ export default procedure
 
     const [updated] = await db
       .update(users)
-      .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+      .set({ termsAcceptedAt: sql<Date>`NOW()` })
       .where(and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`))
       .returning();
 

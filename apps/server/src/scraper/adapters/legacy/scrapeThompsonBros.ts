@@ -12,6 +12,7 @@ import {
   WooCommerceImageSchema,
   WooCommerceProductSchema,
 } from "../../legacy/woocommerce";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "thompsonbros";
@@ -38,7 +39,7 @@ function getProductUrl(value: string): string | null {
   }
 }
 
-function getImageUrl(value: unknown, rawName: string): string | null {
+function getImageUrl(value: JsonValue, rawName: string): string | null {
   if (value === undefined) return null;
 
   const result = WooCommerceImageSchema.safeParse(value);
@@ -49,7 +50,7 @@ function getImageUrl(value: unknown, rawName: string): string | null {
   return result.data.src;
 }
 
-export function parseThompsonBrosProducts(input: unknown): StorePrice[] {
+export function parseThompsonBrosProducts(input: JsonValue): StorePrice[] {
   const payload = WooCommerceCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

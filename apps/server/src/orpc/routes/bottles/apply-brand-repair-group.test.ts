@@ -54,7 +54,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       name: "Canadian Club Reserve 9-year-old Triple Aged Batch Repair",
     });
     const reserveBatch = await fixtures.BottleGroupMember({
-      groupId: reserveBottle.groupId as number,
+      groupId: reserveBottle.groupId,
       edition: "Batch 2",
     });
     await fixtures.BottleAlias({

@@ -49,46 +49,83 @@ export type BottleClassifierRunMetadata = z.infer<
   typeof BottleClassifierRunMetadataSchema
 >;
 
-function objectProperty(value: unknown, property: string): unknown {
-  return value && typeof value === "object"
-    ? (value as Record<string, unknown>)[property]
-    : undefined;
-}
+const TokenDetailsSchema = z.union([
+  z.record(z.string(), z.number()),
+  z.array(z.record(z.string(), z.number())),
+]);
+const RunUsageSchema = z
+  .object({
+    requests: z.number().optional(),
+    inputTokens: z.number().optional(),
+    outputTokens: z.number().optional(),
+    totalTokens: z.number().optional(),
+    inputTokensDetails: TokenDetailsSchema.optional(),
+    outputTokensDetails: TokenDetailsSchema.optional(),
+  })
+  .passthrough();
+const UsageOwnerSchema = z
+  .object({ usage: RunUsageSchema.optional() })
+  .passthrough();
+const ToolItemSchema = z
+  .object({
+    type: z.string().optional(),
+    name: z.string().optional(),
+    rawItem: z
+      .object({
+        name: z.string().optional(),
+      })
+      .passthrough()
+      .optional(),
+  })
+  .passthrough();
+const RunResultSchema = z
+  .object({
+    state: UsageOwnerSchema.optional(),
+    runContext: UsageOwnerSchema.optional(),
+    usage: RunUsageSchema.optional(),
+    newItems: z.array(ToolItemSchema).optional(),
+  })
+  .passthrough();
+type RunUsage = z.infer<typeof RunUsageSchema>;
+type UsageNumberProperty =
+  | "inputTokens"
+  | "outputTokens"
+  | "requests"
+  | "totalTokens";
+type UsageDetailsProperty = "inputTokensDetails" | "outputTokensDetails";
 
-function numberProperty(value: unknown, property: string): number {
-  const candidate = objectProperty(value, property);
-  return typeof candidate === "number" && Number.isFinite(candidate)
-    ? candidate
-    : 0;
+function numberProperty(
+  usage: RunUsage | undefined,
+  property: UsageNumberProperty,
+): number {
+  const candidate = usage?.[property];
+  const measured = z.number().finite().safeParse(candidate);
+  return measured.success ? measured.data : 0;
 }
 
 function tokenDetail(
-  usage: unknown,
-  detailsProperty: string,
+  usage: RunUsage | undefined,
+  detailsProperty: UsageDetailsProperty,
   keys: string[],
 ): number | undefined {
-  const details = objectProperty(usage, detailsProperty);
+  const details = usage?.[detailsProperty];
   const entries = Array.isArray(details) ? details : details ? [details] : [];
   let measured = false;
   let total = 0;
 
   for (const entry of entries) {
-    const value = keys.reduce<unknown>(
-      (found, key) => found ?? objectProperty(entry, key),
+    const value = keys.reduce<number | undefined>(
+      (found, key) => found ?? entry[key],
       undefined,
     );
-    if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+    const measuredValue = z.number().finite().nonnegative().safeParse(value);
+    if (measuredValue.success) {
       measured = true;
-      total += value;
+      total += measuredValue.data;
     }
   }
 
   return measured ? Math.round(total) : undefined;
-}
-
-function stringProperty(value: unknown, property: string): string | null {
-  const candidate = objectProperty(value, property);
-  return typeof candidate === "string" ? candidate : null;
 }
 
 /**
@@ -104,10 +141,10 @@ export function getBottleClassifierRunMetadata({
   durationMs: number;
   model?: string;
 }): BottleClassifierRunMetadata {
+  const parsedResult = RunResultSchema.safeParse(result);
+  const runResult = parsedResult.success ? parsedResult.data : {};
   const usage =
-    objectProperty(objectProperty(result, "state"), "usage") ??
-    objectProperty(objectProperty(result, "runContext"), "usage") ??
-    objectProperty(result, "usage");
+    runResult.state?.usage ?? runResult.runContext?.usage ?? runResult.usage;
   const measuredCachedInputTokens = tokenDetail(usage, "inputTokensDetails", [
     "cached_tokens",
     "cachedTokens",
@@ -122,54 +159,55 @@ export function getBottleClassifierRunMetadata({
   ]);
   const toolNames: string[] = [];
   let toolCallCount = 0;
-  const newItems = objectProperty(result, "newItems");
+  const newItems = runResult.newItems;
 
   if (Array.isArray(newItems)) {
     for (const item of newItems) {
-      if (stringProperty(item, "type") !== "tool_call_output_item") {
+      if (item.type !== "tool_call_output_item") {
         continue;
       }
 
       toolCallCount += 1;
-      const rawItem = objectProperty(item, "rawItem");
-      const name =
-        stringProperty(rawItem, "name") ?? stringProperty(item, "name");
+      const name = item.rawItem?.name ?? item.name;
       if (name) {
         toolNames.push(name);
       }
     }
   }
 
-  const normalizedUsage = {
+  const normalizedUsage: BottleClassifierRunMetadata["usage"] = {
     requests: numberProperty(usage, "requests"),
     inputTokens: numberProperty(usage, "inputTokens"),
-    ...(measuredCachedInputTokens === undefined
-      ? {}
-      : { cachedInputTokens: measuredCachedInputTokens }),
-    ...(measuredCacheWriteTokens === undefined
-      ? {}
-      : { cacheWriteTokens: measuredCacheWriteTokens }),
     outputTokens: numberProperty(usage, "outputTokens"),
-    ...(measuredReasoningTokens === undefined
-      ? {}
-      : { reasoningTokens: measuredReasoningTokens }),
     totalTokens: numberProperty(usage, "totalTokens"),
   };
+  if (measuredCachedInputTokens !== undefined) {
+    normalizedUsage.cachedInputTokens = measuredCachedInputTokens;
+  }
+  if (measuredCacheWriteTokens !== undefined) {
+    normalizedUsage.cacheWriteTokens = measuredCacheWriteTokens;
+  }
+  if (measuredReasoningTokens !== undefined) {
+    normalizedUsage.reasoningTokens = measuredReasoningTokens;
+  }
 
-  return BottleClassifierRunMetadataSchema.parse({
+  const metadata: BottleClassifierRunMetadata = {
     agentDurationMs: Math.max(0, Math.round(durationMs)),
     usage: normalizedUsage,
     toolCalls: {
       count: toolCallCount,
       names: toolNames,
     },
-    ...(model
-      ? {
-          cost: getRunCostMetadata({
-            model,
-            usage: normalizedUsage,
-          }),
-        }
-      : {}),
-  });
+  };
+  if (model) {
+    const cost = getRunCostMetadata({
+      model,
+      usage: normalizedUsage,
+    });
+    if (cost.scope !== "agent_loop_only") {
+      throw new Error("Agent metadata requires agent-loop cost scope.");
+    }
+    metadata.cost = { ...cost, scope: "agent_loop_only" };
+  }
+  return BottleClassifierRunMetadataSchema.parse(metadata);
 }

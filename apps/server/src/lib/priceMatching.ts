@@ -19,9 +19,13 @@ export {
   applyStorePriceBottleRepairFromProposal,
   canClearIgnoredStorePriceAssignment,
   createBottleFromStorePriceMatchProposal,
+  createStorePriceMatchResolver,
   getStorePriceMatchProposalForReviewInTransaction,
   ignoreInconclusiveStorePriceMatchProposals,
   ignoreStorePriceMatchProposal,
   resolveStorePriceMatchProposal,
   upsertStorePriceMatchProposal,
+  type CreatedBottleFinalizer,
+  type StorePriceMatchResolverOptions,
+  type StorePriceReferenceRunner,
 } from "@peated/server/lib/priceMatchingProposals";

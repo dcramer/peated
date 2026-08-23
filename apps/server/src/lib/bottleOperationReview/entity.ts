@@ -31,6 +31,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import type { z } from "zod";
 import {
   MAX_OPERATION_PREVIEW_IDS,
   PreparedEntityMergeDataSchema,
@@ -157,19 +158,19 @@ async function resolveEntityUpdateInput({
     }));
   }
 
-  const input: EntityUpdateInput = EntityUpdateInputSchema.parse({
-    ...(patch.name !== undefined ? { name } : {}),
-    ...(patch.shortName !== undefined ? { shortName } : {}),
-    ...(patch.roles !== undefined ? { type: sortedRoles(patch.roles) } : {}),
-    ...(patch.website !== undefined ? { website: patch.website } : {}),
-    ...(patch.country !== undefined ? { country: country?.id ?? null } : {}),
-    ...(patch.region !== undefined || patch.country !== undefined
-      ? { region: region?.id ?? null }
-      : {}),
-    ...(patch.yearEstablished !== undefined
-      ? { yearEstablished: patch.yearEstablished }
-      : {}),
-  });
+  const canonicalInput: EntityUpdateInput = {};
+  if (patch.name !== undefined) canonicalInput.name = name;
+  if (patch.shortName !== undefined) canonicalInput.shortName = shortName;
+  if (patch.roles !== undefined) canonicalInput.type = sortedRoles(patch.roles);
+  if (patch.website !== undefined) canonicalInput.website = patch.website;
+  if (patch.country !== undefined) canonicalInput.country = country?.id ?? null;
+  if (patch.region !== undefined || patch.country !== undefined) {
+    canonicalInput.region = region?.id ?? null;
+  }
+  if (patch.yearEstablished !== undefined) {
+    canonicalInput.yearEstablished = patch.yearEstablished;
+  }
+  const input = EntityUpdateInputSchema.parse(canonicalInput);
   return {
     input,
     after: {
@@ -274,6 +275,23 @@ export async function prepareEntityUpdate(
   const relationshipsTouched =
     proposal.input.patch.name !== undefined ||
     proposal.input.patch.shortName !== undefined;
+  const stateToken: z.infer<
+    typeof PreparedEntityUpdateDataSchema
+  >["stateToken"] = {
+    entityId: current.entity.id,
+    fields: tokenFields,
+    referencedCountry: locationTouched ? resolved.referencedCountry : null,
+    referencedRegion: locationTouched ? resolved.referencedRegion : null,
+  };
+  if (relationshipsTouched) {
+    stateToken.relationshipDigest = relationshipDigest(
+      await entityRelationshipState(
+        context.database,
+        [current.entity.id],
+        true,
+      ),
+    );
+  }
 
   return {
     type: proposal.type,
@@ -287,23 +305,7 @@ export async function prepareEntityUpdate(
         impact: await entityImpact(context.database, current.entity.id),
         warnings: [],
       },
-      stateToken: {
-        entityId: current.entity.id,
-        fields: tokenFields,
-        referencedCountry: locationTouched ? resolved.referencedCountry : null,
-        referencedRegion: locationTouched ? resolved.referencedRegion : null,
-        ...(relationshipsTouched
-          ? {
-              relationshipDigest: relationshipDigest(
-                await entityRelationshipState(
-                  context.database,
-                  [current.entity.id],
-                  true,
-                ),
-              ),
-            }
-          : {}),
-      },
+      stateToken,
     }),
     canonicalInput: {
       entityId: proposal.input.entityId,

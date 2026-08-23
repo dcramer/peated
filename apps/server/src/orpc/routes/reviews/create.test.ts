@@ -1,3 +1,6 @@
+import { createRouterClient } from "@orpc/server";
+import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
+import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
@@ -9,51 +12,72 @@ import {
 } from "@peated/server/db/schema";
 import { storeReviewArticle } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import type { ExternalReviewInputSchema } from "@peated/server/lib/createExternalReview";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
+import type { Context } from "@peated/server/orpc/context";
+import {
+  createReviewProcedure,
+  type ReviewClassifier,
+} from "@peated/server/orpc/routes/reviews/create";
 import { and, eq } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { z } from "zod";
 
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
 
-const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
-const pushJobMock = vi.hoisted(() => vi.fn());
-const pushUniqueJobMock = vi.hoisted(() => vi.fn());
+const classifyBottleReferenceMock = vi.fn<ReviewClassifier>();
 
-vi.mock(
-  "@peated/server/agents/bottleClassifier/classifyBottleReference",
-  () => ({
-    classifyBottleReference: classifyBottleReferenceMock,
-  }),
-);
+type MockClassificationDecision = Pick<
+  BottleClassificationDecision,
+  "action"
+> & {
+  candidateBottleIds?: number[];
+  matchedBottleId?: number;
+  proposedBottle?: Extract<
+    BottleClassificationDecision,
+    { action: "create_bottle" }
+  >["proposedBottle"];
+};
 
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: pushJobMock,
-  pushUniqueJob: pushUniqueJobMock,
-}));
+const routerClient = {
+  reviews: {
+    create: (
+      input: z.input<typeof ExternalReviewInputSchema>,
+      options?: { context: Context },
+    ) =>
+      createRouterClient(
+        { create: createReviewProcedure(classifyBottleReferenceMock) },
+        { context: options?.context ?? { user: null } },
+      ).create(input),
+  },
+};
 
 function buildClassification(
-  decision: Record<string, unknown>,
+  decision: MockClassificationDecision,
   candidates: Array<{ bottleId: number }> = [],
 ) {
-  return {
+  return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
-      confidence: 0.92,
       rationale: "test fixture",
       candidateBottleIds: [],
+      identityScope: "product",
+      observation: null,
       ...decision,
     },
     artifacts: {
       extractedIdentity: null,
-      candidates,
+      candidates: candidates.map((candidate) => ({
+        fullName: `Candidate ${candidate.bottleId}`,
+        ...candidate,
+      })),
       searchEvidence: [],
       resolvedEntities: [],
     },
-  };
+  });
 }
 
 function buildCreateBottleDecision({
@@ -125,8 +149,6 @@ describe("POST /reviews", () => {
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({ action: "no_match" }),
     );
-    pushJobMock.mockReset();
-    pushUniqueJobMock.mockReset();
   });
 
   test("requires admin", async ({ fixtures }) => {
@@ -855,6 +877,7 @@ describe("POST /reviews", () => {
     const error = await waitError(() =>
       routerClient.reviews.create(
         {
+          // SAFETY: This test sends an invalid site to the runtime validator.
           site: "not-a-site" as never,
           name: "Invalid Site Review",
           issue: "Default",

@@ -48,6 +48,10 @@ export const UserSchema = z.object({
     .optional()
     .readonly()
     .describe("Timestamp when user accepted the Terms of Service"),
+  notifyComments: z
+    .boolean()
+    .optional()
+    .describe("Whether to notify user of comments on their content"),
   friendStatus: FriendStatusEnum.optional()
     .readonly()
     .describe("Friendship status with the current user"),

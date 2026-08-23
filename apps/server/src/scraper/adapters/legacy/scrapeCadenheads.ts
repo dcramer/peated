@@ -12,6 +12,7 @@ import {
   WooCommercePriceSchema,
   WooCommerceProductSchema,
 } from "../../legacy/woocommerce";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "cadenheads";
@@ -33,10 +34,10 @@ const CadenheadsProductSchema = WooCommerceProductSchema.extend({
             .object({
               name: z.string().trim().min(1),
             })
-            .passthrough(),
+            .catchall(z.json()),
         ),
       })
-      .passthrough(),
+      .catchall(z.json()),
   ),
 });
 
@@ -72,7 +73,7 @@ function extractVolume(
   return match ? parseVolume(match[1], match[2]) : null;
 }
 
-export function parseCadenheadsProducts(input: unknown): StorePrice[] {
+export function parseCadenheadsProducts(input: JsonValue): StorePrice[] {
   const payload = CadenheadsProductsSchema.parse(input);
   const products: StorePrice[] = [];
 

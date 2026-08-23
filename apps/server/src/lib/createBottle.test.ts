@@ -7,6 +7,7 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
+  type User,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { buildClassifierBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
@@ -18,12 +19,17 @@ import {
   createOrReuseBottleInTransaction,
 } from "@peated/server/lib/createBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import * as workerClient from "@peated/server/worker/client";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, eq } from "drizzle-orm";
 import { vi } from "vitest";
+import { z } from "zod";
 
-function contextFor(user: Parameters<typeof getUserActor>[0]) {
-  return { user } as Parameters<typeof createBottle>[0]["context"];
+function contextFor(user: User) {
+  return { user };
+}
+
+interface BottleCreateAttempt {
+  result?: Awaited<ReturnType<typeof createBottleInTransaction>>;
 }
 
 describe("Bottle creation", () => {
@@ -139,7 +145,7 @@ describe("Bottle creation", () => {
       async (jobName, args) => {
         if (jobName !== "OnBottleAliasChange") return;
 
-        const name = (args as { name: string }).name;
+        const { name } = z.object({ name: z.string() }).parse(args);
         const [persistedAlias] = await db
           .select()
           .from(bottleAliases)
@@ -652,9 +658,7 @@ describe("Bottle creation", () => {
       edition: "Retryable",
     };
     const parsedInput = BottleCreateInputSchema.parse(input);
-    const attempt: {
-      result?: Awaited<ReturnType<typeof createBottleInTransaction>>;
-    } = {};
+    const attempt: BottleCreateAttempt = {};
 
     await expect(
       db.transaction(async (tx) => {

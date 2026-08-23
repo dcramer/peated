@@ -1,14 +1,9 @@
-import * as workerClient from "@peated/server/worker/client";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { beforeEach, expect, test, vi } from "vitest";
 import {
   buildTastingStatsRecomputeJob,
   dispatchTastingStatsRecompute,
 } from "./dispatchStatsRecompute";
-
-vi.mock("@peated/server/worker/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof workerClient>()),
-  pushJob: vi.fn().mockResolvedValue(undefined),
-}));
 
 beforeEach(() => {
   vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);

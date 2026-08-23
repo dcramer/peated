@@ -1,5 +1,6 @@
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import config from "../config";
 import type { AnyDatabase } from "../db";
 import { db } from "../db";
@@ -16,10 +17,16 @@ import type { JwtPayload } from "jsonwebtoken";
 import { default as jsonwebtoken } from "jsonwebtoken";
 import { sendVerificationEmail } from "./email";
 const { sign, verify } = jsonwebtoken;
+type JsonWebTokenPayload = Parameters<typeof sign>[0];
+const UserTokenSchema = z.object({ id: z.number().int().positive() });
+const ChallengeTokenSchema = z.object({
+  challenge: z.string().min(1),
+  createdAt: z.string().datetime(),
+});
 
 export const ACCESS_TOKEN_EXPIRES_IN_SECONDS = 7 * 24 * 60 * 60;
 
-export function signPayload(payload: string | object): Promise<string> {
+export function signPayload(payload: JsonWebTokenPayload): Promise<string> {
   return new Promise<string>((res, rej) => {
     sign(payload, config.JWT_SECRET, { expiresIn: "7d" }, (err, token) => {
       if (err) rej(err);
@@ -43,11 +50,12 @@ export function verifyPayload(
         rej("invalid token");
         return;
       }
-      if (!decoded || typeof decoded === "string") {
+      const payload = z.record(z.string(), z.json()).safeParse(decoded);
+      if (!payload.success) {
         rej("invalid token");
         return;
       }
-      res(decoded);
+      res(payload.data);
     });
   });
 }
@@ -68,11 +76,12 @@ export async function getUserFromHeader(
     return null;
   }
 
-  const { id } = (payload ?? {}) as any;
-  if (!id) {
+  const parsedPayload = UserTokenSchema.safeParse(payload);
+  if (!parsedPayload.success) {
     logWarn("Invalid Bearer token", {});
     return null;
   }
+  const { id } = parsedPayload.data;
   const [user] = await db.select().from(users).where(eq(users.id, id));
   if (!user) {
     logWarn("Token user not found", {
@@ -197,17 +206,13 @@ export async function verifyChallenge(
   signedChallenge: string,
   expectedChallenge: string,
 ): Promise<void> {
-  let payload;
+  let payload: z.infer<typeof ChallengeTokenSchema>;
   try {
-    payload = (await verifyPayload(signedChallenge)) as any;
+    payload = ChallengeTokenSchema.parse(await verifyPayload(signedChallenge));
   } catch (err) {
     throw new Error("Challenge signature is invalid or has expired", {
       cause: err,
     });
-  }
-
-  if (!payload?.challenge || !payload?.createdAt) {
-    throw new Error("Challenge is malformed");
   }
 
   // Verify the challenge matches what we expect

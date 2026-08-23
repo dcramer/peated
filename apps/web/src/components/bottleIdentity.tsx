@@ -30,7 +30,8 @@ export type BottleIdentitySource = Pick<
 > & {
   brand: Pick<Bottle["brand"], "id" | "name" | "shortName">;
   series: Pick<NonNullable<Bottle["series"]>, "id" | "name"> | null;
-  group?: Pick<NonNullable<Bottle["group"]>, "name" | "statedAge">;
+  group?: Pick<NonNullable<Bottle["group"]>, "name"> &
+    Partial<Pick<NonNullable<Bottle["group"]>, "statedAge">>;
 };
 
 export function BottleLabel({

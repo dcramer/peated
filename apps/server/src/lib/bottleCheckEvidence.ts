@@ -2,31 +2,28 @@ import {
   AuditBottleInputSchema,
   BottleClassificationArtifactsSchema,
   getBottleCheckSourceEvidencePaths,
-  type BottleReference,
 } from "@peated/bottle-classifier";
 import type { BottleCheck } from "@peated/server/db/schema";
+import { z } from "zod";
+
+const PersistedBottleReferenceSchema = z.object({
+  reference: z.object({
+    id: z.unknown().optional(),
+    externalSiteId: z.unknown().optional(),
+    name: z.unknown().optional(),
+    url: z.unknown().optional(),
+    imageUrl: z.unknown().optional(),
+    currentBottleId: z.unknown().optional(),
+  }),
+});
+type PersistedBottleReferenceFields = z.infer<
+  typeof PersistedBottleReferenceSchema
+>["reference"];
 
 function persistedReferenceFields(
-  inputSnapshot: Record<string, unknown>,
-): Partial<Record<keyof BottleReference, unknown>> {
-  const reference = inputSnapshot.reference;
-  if (
-    reference === null ||
-    typeof reference !== "object" ||
-    Array.isArray(reference)
-  ) {
-    throw new TypeError("Persisted Bottle check reference is invalid.");
-  }
-
-  const fields = reference as Record<string, unknown>;
-  return {
-    id: fields.id,
-    externalSiteId: fields.externalSiteId,
-    name: fields.name,
-    url: fields.url,
-    imageUrl: fields.imageUrl,
-    currentBottleId: fields.currentBottleId,
-  };
+  inputSnapshot: BottleCheck["inputSnapshot"],
+): PersistedBottleReferenceFields {
+  return PersistedBottleReferenceSchema.parse(inputSnapshot).reference;
 }
 
 export function getPersistedBottleCheckSourceEvidencePaths(

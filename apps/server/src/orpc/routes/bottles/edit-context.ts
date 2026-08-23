@@ -7,7 +7,7 @@ import {
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
-import { BottleGroupV1Schema, BottleV1Schema } from "@peated/server/schemas";
+import { BottleGroupV1Fields, BottleV1Schema } from "@peated/server/schemas";
 import { z } from "zod";
 
 const BottleEditChoiceSchema = z
@@ -19,14 +19,14 @@ const BottleEditChoiceSchema = z
 
 const BottleEditSharedContextSchema = z
   .object({
-    name: BottleGroupV1Schema.shape.name,
-    statedAge: BottleGroupV1Schema.shape.statedAge,
+    name: BottleGroupV1Fields.name,
+    statedAge: BottleGroupV1Fields.statedAge,
     brand: BottleEditChoiceSchema,
     distillers: z.array(BottleEditChoiceSchema),
     bottler: BottleEditChoiceSchema.nullable(),
     series: BottleEditChoiceSchema.nullable(),
-    category: BottleGroupV1Schema.shape.category,
-    flavorProfile: BottleGroupV1Schema.shape.flavorProfile,
+    category: BottleGroupV1Fields.category,
+    flavorProfile: BottleGroupV1Fields.flavorProfile,
   })
   .strict();
 

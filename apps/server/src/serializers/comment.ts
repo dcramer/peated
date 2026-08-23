@@ -7,6 +7,10 @@ import { users } from "../db/schema";
 import { type CommentSchema } from "../schemas";
 import { UserSerializer } from "./user";
 
+interface CommentAttrs {
+  createdBy: z.infer<typeof CommentSchema>["createdBy"];
+}
+
 export const CommentSerializer = serializer({
   name: "comment",
   attrs: async (itemList: Comment[], currentUser?: User) => {
@@ -37,11 +41,7 @@ export const CommentSerializer = serializer({
     );
   },
 
-  item: (
-    item: Comment,
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ): z.infer<typeof CommentSchema> => {
+  item: (item: Comment, attrs: CommentAttrs): z.infer<typeof CommentSchema> => {
     return {
       id: item.id,
       comment: item.comment,

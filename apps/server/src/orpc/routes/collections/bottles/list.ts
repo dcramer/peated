@@ -95,7 +95,7 @@ export default procedure
           where: (collections, { and, eq }) =>
             and(
               eq(collections.createdById, user.id),
-              eq(collections.id, input.collection as number),
+              eq(collections.id, z.number().parse(input.collection)),
             ),
         });
 

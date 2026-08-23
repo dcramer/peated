@@ -1,10 +1,21 @@
 import { RunContext } from "@openai/agents";
 import { describe, expect, test } from "vitest";
+import { z } from "zod";
 
 import {
   createBottleProposalCollector,
   createBottleProposalTools,
 } from "./proposeOperations";
+
+const ToolInputSchema = z.json();
+type ToolInput = z.infer<typeof ToolInputSchema>;
+
+type SpoofedOperationCase = {
+  toolName: string;
+  spoofedType: string;
+  input: ToolInput;
+  evidenceRefs: ToolInput[];
+};
 
 function createHarness() {
   const inspectedBottleIds = new Set([10, 11]);
@@ -37,7 +48,7 @@ function createHarness() {
 async function invoke(
   tools: ReturnType<typeof createBottleProposalTools>,
   name: string,
-  input: unknown,
+  input: ToolInput,
 ) {
   const selected = tools.find((candidate) => candidate.name === name);
   if (!selected || selected.type !== "function") {
@@ -88,7 +99,7 @@ describe("Bottle proposal tools", () => {
     });
   });
 
-  test.each([
+  test.each<SpoofedOperationCase>([
     {
       toolName: "propose_update_bottle",
       spoofedType: "merge_bottles",

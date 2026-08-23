@@ -23,6 +23,7 @@ import {
 import { redactByField } from "@logtape/redaction";
 import * as Sentry from "@sentry/node";
 import { AsyncLocalStorage } from "node:async_hooks";
+import { z } from "zod";
 
 const DEFAULT_ROOT_LOG_CATEGORY = ["peated", "server"] as const;
 
@@ -40,9 +41,16 @@ const STDERR_CONSOLE_LEVEL_MAP = {
 let loggingConfigured = false;
 let rootLogCategory: readonly string[] = DEFAULT_ROOT_LOG_CATEGORY;
 
-export type LogContext = Record<string, unknown>;
-export type SentryLogContexts = Record<string, Record<string, unknown>>;
-export type LogAttachments = Record<string, string | Uint8Array>;
+export type LogContext = LogRecord["properties"];
+type LogMessage = LogRecord["message"][number];
+
+export interface SentryLogContexts {
+  [context: string]: LogContext;
+}
+
+export interface LogAttachments {
+  [name: string]: string | Uint8Array;
+}
 
 export interface LogOptions {
   extra?: LogContext;
@@ -71,7 +79,7 @@ function resolveLowestLevel(): LogLevel {
   return process.env.NODE_ENV === "development" ? "debug" : "info";
 }
 
-function safeJsonStringify(value: unknown): string | undefined {
+function safeJsonStringify(value: LogMessage): string | undefined {
   try {
     return JSON.stringify(value);
   } catch {
@@ -87,17 +95,17 @@ function truncate(text: string, maxLength = 1024): string {
   return `${text.slice(0, maxLength - 3)}...`;
 }
 
-function coerceMessage(value: unknown): string {
-  if (typeof value === "string") {
-    return value;
+function coerceMessage(value: LogMessage): string {
+  const text = z.string().safeParse(value);
+  if (text.success) {
+    return text.data;
   }
 
-  if (
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    typeof value === "bigint"
-  ) {
-    return value.toString();
+  const primitive = z
+    .union([z.number(), z.boolean(), z.bigint()])
+    .safeParse(value);
+  if (primitive.success) {
+    return primitive.data.toString();
   }
 
   if (value === null || value === undefined) {
@@ -155,13 +163,13 @@ export function configureLogging(options: LoggingConfig = {}): void {
 
   rootLogCategory = options.rootCategory ?? DEFAULT_ROOT_LOG_CATEGORY;
 
-  const consoleSink = redactByField(
+  const consoleSink: Sink = redactByField(
     getConsoleSink({
       formatter: getJsonLinesFormatter(),
       levelMap: STDERR_CONSOLE_LEVEL_MAP,
     }),
-  ) as Sink;
-  const sentrySink = redactByField(createSentryLogsSink()) as Sink;
+  );
+  const sentrySink: Sink = redactByField(createSentryLogsSink());
 
   configureSync<SinkId, never>({
     reset: getConfig() !== null,
@@ -219,7 +227,7 @@ interface SerializedError {
   cause?: SerializedError;
 }
 
-function serializeError(value: unknown, depth = 0): SerializedError {
+function serializeError(value: LogMessage, depth = 0): SerializedError {
   if (value instanceof Error) {
     const serialized: SerializedError = {
       message: value.message,
@@ -229,7 +237,7 @@ function serializeError(value: unknown, depth = 0): SerializedError {
       serialized.name = value.name;
     }
 
-    if (typeof value.stack === "string") {
+    if (value.stack !== undefined) {
       serialized.stack = value.stack;
     }
 
@@ -301,7 +309,7 @@ function normalizeIssueOptions(
 
 function logWithLevel(
   level: LogLevel,
-  value: unknown,
+  value: LogMessage,
   options?: LogOptions,
   scope: string | readonly string[] = [],
 ): void {
@@ -343,33 +351,36 @@ function logWithLevel(
 }
 
 /** Emit a debug structured log without creating a Sentry issue. */
-export function logDebug(value: unknown, options?: LogOptions): void {
+export function logDebug(value: LogMessage, options?: LogOptions): void {
   logWithLevel("debug", value, options);
 }
 
 /** Emit an informational structured log without creating a Sentry issue. */
-export function logInfo(value: unknown, options?: LogOptions): void {
+export function logInfo(value: LogMessage, options?: LogOptions): void {
   logWithLevel("info", value, options);
 }
 
 /** Emit a warning structured log without creating a Sentry issue. */
-export function logWarn(value: unknown, options?: LogOptions): void {
+export function logWarn(value: LogMessage, options?: LogOptions): void {
   logWithLevel("warning", value, options);
 }
 
 /** Emit an error-level telemetry log without creating a Sentry issue. */
-export function logTelemetryError(value: unknown, options?: LogOptions): void {
+export function logTelemetryError(
+  value: LogMessage,
+  options?: LogOptions,
+): void {
   logWithLevel("error", value, options);
 }
 
 /** Capture an explicit Sentry issue and mirror it as a structured log. */
 export function logError(
-  error: Error | unknown,
+  error: Error | LogMessage,
   contexts?: SentryLogContexts,
   attachments?: LogAttachments,
 ): void;
 export function logError(
-  error: Error | unknown,
+  error: Error | LogMessage,
   options: LogIssueOptions,
 ): void;
 export function logError(
@@ -379,7 +390,7 @@ export function logError(
 ): void;
 export function logError(message: string, options: LogIssueOptions): void;
 export function logError(
-  error: string | Error | unknown,
+  error: string | Error | LogMessage,
   contexts?: SentryLogContexts | LogIssueOptions,
   attachments?: LogAttachments,
 ): string {
@@ -407,8 +418,9 @@ export function logError(
       }
     }
 
-    return typeof error === "string"
-      ? Sentry.captureMessage(error, {
+    const message = z.string().safeParse(error);
+    return message.success
+      ? Sentry.captureMessage(message.data, {
           contexts: options.contexts,
           level: "error",
         })
@@ -418,18 +430,18 @@ export function logError(
         });
   });
 
+  const logExtra: LogContext = { ...(options.extra ?? {}) };
+  if (options.contexts) logExtra.sentryContexts = options.contexts;
+  if (options.attachments && Object.keys(options.attachments).length > 0) {
+    logExtra.attachments = Object.keys(options.attachments);
+  }
+  logExtra.eventId = eventId;
+
   logWithLevel(
     "error",
     error,
     {
-      extra: {
-        ...(options.extra ?? {}),
-        ...(options.contexts ? { sentryContexts: options.contexts } : {}),
-        ...(options.attachments && Object.keys(options.attachments).length > 0
-          ? { attachments: Object.keys(options.attachments) }
-          : {}),
-        eventId,
-      },
+      extra: logExtra,
     },
     ["runtime", "issues"],
   );

@@ -160,7 +160,7 @@ describe("GET /bottles", () => {
   }) => {
     const first = await fixtures.Bottle({ name: "Sibling Batch" });
     const second = await fixtures.BottleGroupMember({
-      groupId: first.groupId as number,
+      groupId: first.groupId,
       edition: "Batch Two",
       releaseYear: 2026,
     });

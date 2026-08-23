@@ -131,7 +131,9 @@ export const ImagePhotoSuitabilitySchema = z
 export const ImageBottleEvidenceConflictSchema = z
   .object({
     field: z.string().trim().min(1),
-    values: z.array(z.unknown()).min(2),
+    values: z
+      .array(z.union([z.string(), z.number(), z.boolean(), z.null()]))
+      .min(2),
     reason: z.string().trim().min(1),
   })
   .strict();

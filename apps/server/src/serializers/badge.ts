@@ -9,19 +9,22 @@ export const BadgeSerializer = serializer({
   name: "badge",
   item: (
     item: Badge,
-    attrs: Record<string, any>,
+    _attrs: Record<never, never>,
     currentUser?: User,
   ): z.infer<typeof BadgeSchema> => {
-    return {
+    const badge: z.infer<typeof BadgeSchema> = {
       id: item.id,
       name: item.name,
       maxLevel: item.maxLevel,
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
-      ...(currentUser?.admin
-        ? { checks: item.checks, tracker: item.tracker, formula: item.formula }
-        : {}),
     };
+    if (currentUser?.admin) {
+      badge.checks = item.checks;
+      badge.tracker = item.tracker;
+      badge.formula = item.formula;
+    }
+    return badge;
   },
 });

@@ -3,16 +3,28 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import * as workerClient from "@peated/server/worker/client";
 import "@peated/server/worker/jobs";
-import reconcileStorePriceMatchProposals from "@peated/server/worker/jobs/reconcileStorePriceMatchProposals";
+import {
+  reconcileStorePriceMatchProposals as reconcileStorePriceMatchProposalsWithServices,
+  type ReconcileStorePriceMatchProposalsServices,
+} from "@peated/server/worker/jobs/reconcileStorePriceMatchProposals";
 import registry from "@peated/server/worker/registry";
 import { eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-}));
+let enqueuePriceResolution: ReturnType<
+  typeof vi.fn<
+    ReconcileStorePriceMatchProposalsServices["enqueuePriceResolution"]
+  >
+>;
+
+function reconcileStorePriceMatchProposals(
+  args?: Parameters<typeof reconcileStorePriceMatchProposalsWithServices>[0],
+) {
+  return reconcileStorePriceMatchProposalsWithServices(args, {
+    enqueuePriceResolution,
+  });
+}
 
 async function agePrice(priceId: number, minutes: number) {
   await db
@@ -25,7 +37,7 @@ async function agePrice(priceId: number, minutes: number) {
 
 describe("reconcileStorePriceMatchProposals", () => {
   beforeEach(() => {
-    vi.mocked(workerClient.pushJob).mockReset();
+    enqueuePriceResolution = vi.fn();
   });
 
   test("queues resolver jobs for unmatched store prices without proposals", async ({
@@ -40,12 +52,7 @@ describe("reconcileStorePriceMatchProposals", () => {
     const result = await reconcileStorePriceMatchProposals();
 
     expect(result).toEqual({ queuedCount: 1 });
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      {
-        priceId: price.id,
-      },
-    );
+    expect(enqueuePriceResolution).toHaveBeenCalledWith(price.id);
   });
 
   test("skips prices that already have proposals", async ({ fixtures }) => {
@@ -64,7 +71,7 @@ describe("reconcileStorePriceMatchProposals", () => {
     const result = await reconcileStorePriceMatchProposals();
 
     expect(result).toEqual({ queuedCount: 0 });
-    expect(workerClient.pushJob).not.toHaveBeenCalled();
+    expect(enqueuePriceResolution).not.toHaveBeenCalled();
   });
 
   test("skips matched and hidden prices", async ({ fixtures }) => {
@@ -84,7 +91,7 @@ describe("reconcileStorePriceMatchProposals", () => {
     const result = await reconcileStorePriceMatchProposals();
 
     expect(result).toEqual({ queuedCount: 0 });
-    expect(workerClient.pushJob).not.toHaveBeenCalled();
+    expect(enqueuePriceResolution).not.toHaveBeenCalled();
   });
 
   test("uses direct Bottle identity to identify unmatched rows", async ({
@@ -105,14 +112,8 @@ describe("reconcileStorePriceMatchProposals", () => {
     const result = await reconcileStorePriceMatchProposals();
 
     expect(result).toEqual({ queuedCount: 1 });
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      { priceId: unresolved.id },
-    );
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      { priceId: direct.id },
-    );
+    expect(enqueuePriceResolution).toHaveBeenCalledWith(unresolved.id);
+    expect(enqueuePriceResolution).not.toHaveBeenCalledWith(direct.id);
   });
 
   test("honors the minimum age guard", async ({ fixtures }) => {
@@ -132,19 +133,9 @@ describe("reconcileStorePriceMatchProposals", () => {
     });
 
     expect(result).toEqual({ queuedCount: 1 });
-    expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      {
-        priceId: oldPrice.id,
-      },
-    );
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      {
-        priceId: freshPrice.id,
-      },
-    );
+    expect(enqueuePriceResolution).toHaveBeenCalledTimes(1);
+    expect(enqueuePriceResolution).toHaveBeenCalledWith(oldPrice.id);
+    expect(enqueuePriceResolution).not.toHaveBeenCalledWith(freshPrice.id);
   });
 
   test("continues queueing prices after a dispatch failure", async ({
@@ -162,28 +153,16 @@ describe("reconcileStorePriceMatchProposals", () => {
     await agePrice(olderPrice.id, 120);
 
     const error = new Error("queue unavailable");
-    vi.mocked(workerClient.pushJob)
+    enqueuePriceResolution
       .mockRejectedValueOnce(error)
       .mockResolvedValueOnce(undefined);
 
     const result = await reconcileStorePriceMatchProposals();
 
     expect(result).toEqual({ queuedCount: 1 });
-    expect(workerClient.pushJob).toHaveBeenCalledTimes(2);
-    expect(workerClient.pushJob).toHaveBeenNthCalledWith(
-      1,
-      "ResolveStorePriceBottle",
-      {
-        priceId: newerPrice.id,
-      },
-    );
-    expect(workerClient.pushJob).toHaveBeenNthCalledWith(
-      2,
-      "ResolveStorePriceBottle",
-      {
-        priceId: olderPrice.id,
-      },
-    );
+    expect(enqueuePriceResolution).toHaveBeenCalledTimes(2);
+    expect(enqueuePriceResolution).toHaveBeenNthCalledWith(1, newerPrice.id);
+    expect(enqueuePriceResolution).toHaveBeenNthCalledWith(2, olderPrice.id);
   });
 
   test("is registered as a worker job", () => {

@@ -16,11 +16,12 @@ export function userToActorContext(
     return undefined;
   }
 
-  return {
+  const actor: ActorContext = {
     type: "user",
     userId: user.id,
-    ...(user.username ? { username: user.username } : {}),
   };
+  if (user.username) actor.username = user.username;
+  return actor;
 }
 
 /** Run code with app-owned actor context available to nested dispatches. */

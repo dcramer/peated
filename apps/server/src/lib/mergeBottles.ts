@@ -35,6 +35,7 @@ import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeB
 import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
+import { z } from "zod";
 
 export class BottleMergeAuthorizationError extends Error {
   constructor() {
@@ -136,16 +137,17 @@ function validateMergeInput(
   }
 }
 
-function postgresConstraint(error: unknown) {
-  let current: unknown = error;
+function postgresConstraint(error: Error) {
+  let current: Error = error;
   for (let depth = 0; depth < 5 && current instanceof Error; depth += 1) {
-    const candidate = current as Error & {
-      code?: string;
-      constraint?: string;
-      cause?: unknown;
-    };
-    if (candidate.code === "23505") return candidate.constraint ?? null;
-    current = candidate.cause;
+    const candidate = z
+      .object({ code: z.string(), constraint: z.string().optional() })
+      .safeParse(current);
+    if (candidate.success && candidate.data.code === "23505") {
+      return candidate.data.constraint ?? null;
+    }
+    if (!(current.cause instanceof Error)) return null;
+    current = current.cause;
   }
   return null;
 }
@@ -300,6 +302,14 @@ async function assertNoTastingCollision(
   }
 }
 
+interface BottleConsumerCounts {
+  [name: string]: number;
+  collectionMembershipsMoved: number;
+  collectionMembershipsCollapsed: number;
+  flightMembershipsMoved: number;
+  flightMembershipsCollapsed: number;
+}
+
 async function repointBottleConsumers(
   tx: AnyTransaction,
   sourceBottleId: number,
@@ -317,7 +327,7 @@ async function repointBottleConsumers(
     destinationBottleId,
   );
 
-  const counts: Record<string, number> = {
+  const counts: BottleConsumerCounts = {
     collectionMembershipsMoved: collectionMemberships.moved,
     collectionMembershipsCollapsed: collectionMemberships.collapsed,
     flightMembershipsMoved: flightMemberships.moved,
@@ -728,7 +738,8 @@ export async function mergeBottlesInTransaction(
     .for("update");
   const canonicalAliasOwnerId = canonicalAlias?.bottleId;
   if (
-    typeof canonicalAliasOwnerId === "number" &&
+    canonicalAliasOwnerId !== undefined &&
+    canonicalAliasOwnerId !== null &&
     !bottleById.has(canonicalAliasOwnerId)
   ) {
     throw new BottleMergeConflictError("identity_conflict");
@@ -744,7 +755,7 @@ export async function mergeBottlesInTransaction(
   } catch (error) {
     if (
       ["tasting_unq", "tasting_legacy_unq"].includes(
-        postgresConstraint(error) ?? "",
+        (error instanceof Error ? postgresConstraint(error) : null) ?? "",
       )
     ) {
       throw new BottleMergeConflictError("consumer_conflict", {
@@ -909,20 +920,29 @@ export async function mergeBottlesInTransaction(
       .from(bottleGroups)
       .where(eq(bottleGroups.id, before.id))
       .limit(1);
+    type BottleGroupMergeChangeData = {
+      updateScope: "exact_merge";
+      sourceBottleId: number;
+      destinationBottleId: number;
+      before: typeof before;
+      after: typeof after | null;
+      replacementGroupId?: number;
+    };
+    const changeData: BottleGroupMergeChangeData = {
+      updateScope: "exact_merge",
+      sourceBottleId,
+      destinationBottleId,
+      before,
+      after: after ?? null,
+    };
+    if (!after) changeData.replacementGroupId = destinationGroupId;
     await tx.insert(changes).values({
       objectType: "bottle_group",
       objectId: before.id,
       actorId,
       displayName: before.fullName,
       type: after ? "update" : "delete",
-      data: {
-        updateScope: "exact_merge",
-        sourceBottleId,
-        destinationBottleId,
-        before,
-        after: after ?? null,
-        ...(after ? {} : { replacementGroupId: destinationGroupId }),
-      },
+      data: changeData,
     });
   }
   await tx.insert(changes).values({

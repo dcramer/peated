@@ -26,6 +26,7 @@ describe("PATCH /flights/:flight", () => {
 
     const error = await waitError(
       routerClient.flights.update(
+        // SAFETY: This test sends the retired targets field to the runtime validator.
         {
           flight: flight.publicId,
           name: "Not allowed",
@@ -264,6 +265,7 @@ describe("PATCH /flights/:flight", () => {
       .where(eq(flightBottles.flightId, flight.id));
 
     const error = await waitError(() =>
+      // SAFETY: This test sends the retired targets field to the runtime validator.
       routerClient.flights.update(
         {
           flight: flight.publicId,
@@ -420,6 +422,7 @@ describe("PATCH /flights/:flight", () => {
 
     const error = await waitError(() =>
       routerClient.flights.update(
+        // SAFETY: This test sends the retired targets field to the runtime validator.
         {
           flight: flight.publicId,
           name: "Should not persist",

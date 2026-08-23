@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import type { ResponseCreateParamsNonStreaming } from "openai/resources/responses/responses";
 import type {
   BottleClassifierDataSource,
   CreateBottleClassifierOptions,
@@ -64,6 +65,7 @@ export function createEvalOpenAIClient() {
 
   Object.defineProperty(client.responses, "create", {
     configurable: true,
+    // SAFETY: The wrapper accepts and forwards the exact original parameters and return value.
     value: instrumentedCreate as typeof client.responses.create,
   });
 
@@ -96,9 +98,8 @@ export async function promptEvalJudgeModel(
   input: string,
   options?: { system?: string },
 ) {
-  const response = await createEvalOpenAIClient().responses.create({
+  const request: ResponseCreateParamsNonStreaming = {
     model: evalJudgeModel,
-    ...(options?.system ? { instructions: options.system } : {}),
     input: [
       {
         role: "user",
@@ -111,7 +112,9 @@ export async function promptEvalJudgeModel(
       },
     ],
     ...getEvalJudgeModelSettings(),
-  });
+  };
+  if (options?.system) request.instructions = options.system;
+  const response = await createEvalOpenAIClient().responses.create(request);
 
   return response.output_text;
 }

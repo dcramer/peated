@@ -12,10 +12,10 @@ describe("GET /bottle-groups/:group", () => {
     await db
       .update(bottleGroups)
       .set({ avgRating: 1.25, totalTastings: 7 })
-      .where(eq(bottleGroups.id, bottle.groupId as number));
+      .where(eq(bottleGroups.id, bottle.groupId));
 
     const result = await routerClient.bottleGroups.details({
-      group: bottle.groupId as number,
+      group: bottle.groupId,
     });
 
     expect(result).toMatchObject({

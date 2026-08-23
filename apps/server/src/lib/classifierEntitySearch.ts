@@ -2,9 +2,12 @@ import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
 import { webSearchQuery } from "@peated/server/lib/search";
+import { EntityTypeEnum } from "@peated/server/schemas/common";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { z } from "zod";
 
 const CONTAINED_MATCH_FETCH_MULTIPLIER = 4;
+const EntityTypesSchema = z.array(EntityTypeEnum);
 
 export type ClassifierEntitySearchArgs = {
   query: string;
@@ -107,7 +110,7 @@ export async function searchClassifierEntities(
       entityId: row.entityId,
       name: row.name,
       shortName: row.shortName,
-      type: row.type as ClassifierEntityResolution["type"],
+      type: EntityTypesSchema.parse(row.type),
       alias: row.alias,
       score: 1,
       source: ["exact"],
@@ -140,7 +143,7 @@ export async function searchClassifierEntities(
       entityId: row.entityId,
       name: row.name,
       shortName: row.shortName,
-      type: row.type as ClassifierEntityResolution["type"],
+      type: EntityTypesSchema.parse(row.type),
       alias: null,
       score: row.score === null ? null : Number(row.score),
       source: ["text"],
@@ -174,7 +177,7 @@ export async function searchClassifierEntities(
       entityId: row.entityId,
       name: row.name,
       shortName: row.shortName,
-      type: row.type as ClassifierEntityResolution["type"],
+      type: EntityTypesSchema.parse(row.type),
       alias: row.alias,
       score: 0.5,
       source: ["prefix"],
@@ -248,7 +251,7 @@ export async function searchClassifierEntities(
       entityId: row.entityId,
       name: row.name,
       shortName: row.shortName,
-      type: row.type as ClassifierEntityResolution["type"],
+      type: EntityTypesSchema.parse(row.type),
       alias: row.alias,
       score,
       source: ["contained"],

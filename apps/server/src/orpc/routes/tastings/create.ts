@@ -153,7 +153,7 @@ export default procedure
           })
           .returning();
       } catch (error) {
-        if (isTastingIdentityConflict(error)) {
+        if (error instanceof Error && isTastingIdentityConflict(error)) {
           throw errors.CONFLICT({
             message: "Tasting already exists.",
             cause: error,

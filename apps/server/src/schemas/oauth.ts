@@ -72,8 +72,10 @@ export const OAuthAuthorizationCodeSchema = z.object({
   state: z.string(),
 });
 
+export const OAuthGrantTypeSchema = z.string().min(1);
+
 export const OAuthTokenRequestSchema = z.object({
-  grant_type: z.string().min(1),
+  grant_type: OAuthGrantTypeSchema,
   code: z.string().min(1),
   client_id: z.string().min(1),
   redirect_uri: z.string().min(1),

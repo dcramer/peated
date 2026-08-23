@@ -39,7 +39,7 @@ export const CollectionBottleSchema = z.object({
     .describe("Whether the current user has tasted this Bottle"),
 });
 
-const collectionBottleStatusInputShape = {
+const collectionBottleStatusFields = {
   status: CollectionBottleStatusSchema.nullish().describe(
     "Optional bottle status for Library entries",
   ),
@@ -52,6 +52,6 @@ export const CollectionBottleInputSchema = z
       .int()
       .positive()
       .describe("Bottle selected for this collection action"),
-    ...collectionBottleStatusInputShape,
+    ...collectionBottleStatusFields,
   })
   .strict();

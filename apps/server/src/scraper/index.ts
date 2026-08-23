@@ -21,10 +21,11 @@ import {
   type ScraperRunExecutionResult,
 } from "./runs";
 import { syncScraperDefinitions } from "./syncDefinitions";
+import type { ScraperRunPayload } from "./types";
 
 const enqueueScraperRun: ScraperEnqueue = async (jobName, args, options) => {
   const { pushJob } = await import("@peated/server/worker/client");
-  return await pushJob(jobName, args, options);
+  await pushJob(jobName, args, options);
 };
 
 const lifecycle = createScraperLifecycle({
@@ -63,7 +64,7 @@ export function redispatchStaleExternalSiteRuns(options?: {
 }
 
 export function executeScraperRun(
-  input: unknown,
+  input: ScraperRunPayload,
 ): Promise<ScraperRunExecutionResult> {
   return executeRun(input, { registry: scraperRegistry });
 }

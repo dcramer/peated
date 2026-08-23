@@ -51,6 +51,7 @@ import { normalizeGtin } from "@peated/server/lib/gtin";
 import {
   recordIncomingBottleDecisionInTransaction,
   type IncomingBottleDecisionActor,
+  type IncomingBottleDecisionMetadata,
   type IncomingBottleDecisionType,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError, logInfo } from "@peated/server/lib/log";
@@ -979,21 +980,24 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   };
 }
 
-export async function createBottleFromStorePriceMatchProposal({
-  proposalId,
-  bottleInput,
-  user,
-  creationSource = "price_match_review",
-  actor,
-  expectedProcessingToken,
-}: {
-  proposalId: number;
-  bottleInput: BottleCreateInput;
-  user: User;
-  creationSource?: CatalogVerificationCreationSource;
-  actor: IncomingBottleDecisionActor;
-  expectedProcessingToken?: string;
-}) {
+export async function createBottleFromStorePriceMatchProposal(
+  {
+    proposalId,
+    bottleInput,
+    user,
+    creationSource = "price_match_review",
+    actor,
+    expectedProcessingToken,
+  }: {
+    proposalId: number;
+    bottleInput: BottleCreateInput;
+    user: User;
+    creationSource?: CatalogVerificationCreationSource;
+    actor: IncomingBottleDecisionActor;
+    expectedProcessingToken?: string;
+  },
+  finalizeBottle: typeof finalizeCreatedBottle = finalizeCreatedBottle,
+) {
   const result = await db.transaction(async (tx) =>
     createBottleFromStorePriceMatchProposalInTransaction(tx, {
       proposalId,
@@ -1006,7 +1010,7 @@ export async function createBottleFromStorePriceMatchProposal({
   );
 
   if (result.createResult) {
-    await finalizeCreatedBottle(result.createResult, {
+    await finalizeBottle(result.createResult, {
       creationSource,
     });
   }
@@ -1159,134 +1163,223 @@ async function resolveApprovedBarcodeStorePriceMatch({
  * Owns full store-price classification persistence: the proposal, attempt, and
  * linked Bottle check commit together before any automated catalog mutation.
  */
-export async function resolveStorePriceMatchProposal(
-  priceId: number,
-  {
-    candidateExpansion = "open",
-    force = false,
-    processingToken,
-    reuseExistingExtraction = false,
-  }: {
-    candidateExpansion?: CandidateExpansionMode;
-    force?: boolean;
-    processingToken?: string;
-    reuseExistingExtraction?: boolean;
-  } = {},
-) {
-  const price = await db.query.storePrices.findFirst({
-    where: eq(storePrices.id, priceId),
-  });
+export type StorePriceMatchResolverOptions = {
+  candidateExpansion?: CandidateExpansionMode;
+  force?: boolean;
+  processingToken?: string;
+  reuseExistingExtraction?: boolean;
+};
 
-  if (!price) {
-    throw new Error(`Unknown price ${priceId}`);
-  }
+export type StorePriceReferenceRunner = typeof runScrapedBottleReference;
+export type CreatedBottleFinalizer = typeof finalizeCreatedBottle;
 
-  const existingProposal = await db.query.storePriceMatchProposals.findFirst({
-    where: eq(storePriceMatchProposals.priceId, price.id),
-  });
-  // The proposal is the durable classification receipt. Automatic scraper and
-  // image redispatches must not spend model work again; explicit retries own
-  // reevaluation through force or a processing lease.
-  if (existingProposal && !force && !processingToken) {
-    logInfo("Skipped automatic store-price classification", {
-      extra: {
-        priceId: price.id,
-        proposalId: existingProposal.id,
-        proposalStatus: existingProposal.status,
-      },
+export function createStorePriceMatchResolver({
+  runReference = runScrapedBottleReference,
+  finalizeBottle = finalizeCreatedBottle,
+}: {
+  runReference?: StorePriceReferenceRunner;
+  finalizeBottle?: CreatedBottleFinalizer;
+} = {}) {
+  return async function resolveStorePriceMatchProposal(
+    priceId: number,
+    {
+      candidateExpansion = "open",
+      force = false,
+      processingToken,
+      reuseExistingExtraction = false,
+    }: StorePriceMatchResolverOptions = {},
+  ) {
+    const price = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, priceId),
     });
-    return existingProposal;
-  }
 
-  if (processingToken) {
-    if (!existingProposal) {
-      throw new Error(
-        `Missing price match proposal for retry processing (${price.id}).`,
-      );
+    if (!price) {
+      throw new Error(`Unknown price ${priceId}`);
     }
 
-    if (
-      existingProposal.processingToken !== processingToken ||
-      !hasActiveStorePriceMatchProposalProcessingLease(existingProposal)
-    ) {
+    const existingProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.priceId, price.id),
+    });
+    // The proposal is the durable classification receipt. Automatic scraper and
+    // image redispatches must not spend model work again; explicit retries own
+    // reevaluation through force or a processing lease.
+    if (existingProposal && !force && !processingToken) {
+      logInfo("Skipped automatic store-price classification", {
+        extra: {
+          priceId: price.id,
+          proposalId: existingProposal.id,
+          proposalStatus: existingProposal.status,
+        },
+      });
       return existingProposal;
     }
 
-    const refreshedLease = await refreshStorePriceMatchProposalProcessingLease({
-      proposalId: existingProposal.id,
-      processingToken,
-    });
+    if (processingToken) {
+      if (!existingProposal) {
+        throw new Error(
+          `Missing price match proposal for retry processing (${price.id}).`,
+        );
+      }
 
-    if (!refreshedLease) {
-      return await reloadStorePriceMatchProposal(existingProposal.id);
+      if (
+        existingProposal.processingToken !== processingToken ||
+        !hasActiveStorePriceMatchProposalProcessingLease(existingProposal)
+      ) {
+        return existingProposal;
+      }
+
+      const refreshedLease =
+        await refreshStorePriceMatchProposalProcessingLease({
+          proposalId: existingProposal.id,
+          processingToken,
+        });
+
+      if (!refreshedLease) {
+        return await reloadStorePriceMatchProposal(existingProposal.id);
+      }
     }
-  }
 
-  let extractedLabel: ExtractedBottleDetails | null = null;
-  let candidates: PriceMatchCandidate[] = [];
-  let searchEvidence: SearchEvidence[] = [];
-  let classificationModelMetadata: BottleReferenceRun["modelMetadata"] = null;
-  try {
-    const approvedBarcodeProposal = await resolveApprovedBarcodeStorePriceMatch(
-      {
+    let extractedLabel: ExtractedBottleDetails | null = null;
+    let candidates: PriceMatchCandidate[] = [];
+    let searchEvidence: SearchEvidence[] = [];
+    let classificationModelMetadata: BottleReferenceRun["modelMetadata"] = null;
+    try {
+      const approvedBarcodeProposal =
+        await resolveApprovedBarcodeStorePriceMatch({
+          price,
+          existingProposal,
+          processingToken,
+        });
+      if (approvedBarcodeProposal) {
+        return approvedBarcodeProposal;
+      }
+
+      // Price matching consumes the generic bottle classifier and only layers
+      // price-specific persistence and automation policy on top of its result.
+      const classificationInput: ClassifyBottleReferenceInput = {
+        reference: {
+          id: price.id,
+          externalSiteId: price.externalSiteId,
+          name: price.name,
+          url: price.url ?? null,
+          imageUrl: price.imageUrl ?? null,
+          currentBottleId: price.bottleId ?? null,
+        },
+      };
+      if (candidateExpansion !== "open") {
+        classificationInput.candidateExpansion = candidateExpansion;
+      }
+      if (price.sourceBottleIdentity) {
+        classificationInput.extractedIdentity =
+          BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity);
+      } else if (reuseExistingExtraction) {
+        classificationInput.extractedIdentity =
+          parseStoredExtractedLabel(existingProposal);
+      }
+
+      const classificationRun = await runReference(classificationInput);
+      const classification = classificationRun.result;
+      classificationModelMetadata = classificationRun.modelMetadata;
+
+      extractedLabel = parseClassifierExtractedLabel(
+        classification.artifacts.extractedIdentity,
+      );
+      candidates = parseClassifierCandidates(
+        classification.artifacts.candidates,
+      );
+      searchEvidence = classification.artifacts.searchEvidence;
+
+      if (isIgnoredBottleClassification(classification)) {
+        const expectedBottleId = price.bottleId;
+        const upsertIgnoredProposal = async (tx: AnyDatabase) =>
+          await upsertStorePriceMatchProposal({
+            price,
+            extractedLabel,
+            candidates,
+            searchEvidence,
+            statusOverride: "ignored",
+            expectedProcessingToken: processingToken,
+            tx,
+          });
+        const ignoredProposal = await db.transaction(async (tx) => {
+          const proposal = await upsertIgnoredProposal(tx);
+          const attempt = await recordStorePriceMatchAttempt({ proposal, tx });
+          await persistStorePriceBottleCheck({
+            attemptId: attempt.id,
+            classificationInput,
+            classification,
+            database: tx,
+            model: proposal.model,
+            modelMetadata: classificationModelMetadata,
+            priceId: price.id,
+          });
+          if (
+            !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
+          ) {
+            return proposal;
+          }
+
+          if (price.bottleId !== null) {
+            await clearIgnoredStorePriceAssignmentInTransaction(tx, {
+              priceId: price.id,
+              expectedBottleId,
+            });
+          }
+
+          return proposal;
+        });
+        return ignoredProposal;
+      }
+
+      const classifierDecision = normalizeClassifierDecisionForPriceMatching(
+        classification.decision,
+        candidates,
+      );
+      const decision = toStorePriceMatchDecision({
         price,
-        existingProposal,
-        processingToken,
-      },
-    );
-    if (approvedBarcodeProposal) {
-      return approvedBarcodeProposal;
-    }
-
-    // Price matching consumes the generic bottle classifier and only layers
-    // price-specific persistence and automation policy on top of its result.
-    const classificationInput: ClassifyBottleReferenceInput = {
-      reference: {
-        id: price.id,
-        externalSiteId: price.externalSiteId,
-        name: price.name,
-        url: price.url ?? null,
-        imageUrl: price.imageUrl ?? null,
-        currentBottleId: price.bottleId ?? null,
-      },
-    };
-    if (candidateExpansion !== "open") {
-      classificationInput.candidateExpansion = candidateExpansion;
-    }
-    if (price.sourceBottleIdentity) {
-      classificationInput.extractedIdentity =
-        BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity);
-    } else if (reuseExistingExtraction) {
-      classificationInput.extractedIdentity =
-        parseStoredExtractedLabel(existingProposal);
-    }
-
-    const classificationRun =
-      await runScrapedBottleReference(classificationInput);
-    const classification = classificationRun.result;
-    classificationModelMetadata = classificationRun.modelMetadata;
-
-    extractedLabel = parseClassifierExtractedLabel(
-      classification.artifacts.extractedIdentity,
-    );
-    candidates = parseClassifierCandidates(classification.artifacts.candidates);
-    searchEvidence = classification.artifacts.searchEvidence;
-
-    if (isIgnoredBottleClassification(classification)) {
-      const expectedBottleId = price.bottleId;
-      const upsertIgnoredProposal = async (tx: AnyDatabase) =>
-        await upsertStorePriceMatchProposal({
+        decision: classifierDecision,
+      });
+      const automationAssessment = getStorePriceMatchAutomationAssessment({
+        action: decision.action,
+        modelConfidence: decision.confidence,
+        price,
+        suggestedBottleId: decision.suggestedBottleId,
+        candidateBottles: candidates,
+        extractedLabel,
+        proposedBottle: decision.proposedBottle,
+        searchEvidence,
+        sourceBottleIdentity: price.sourceBottleIdentity
+          ? BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity)
+          : null,
+        hasUnresolvedRisks:
+          (classification.decision.confidenceBasis?.unresolvedRisks.length ??
+            0) > 0,
+        webEvidenceJudgment:
+          classification.decision.confidenceBasis?.webEvidence ?? null,
+      });
+      const { proposal, attempt } = await db.transaction(async (tx) => {
+        const proposal = await upsertStorePriceMatchProposal({
           price,
           extractedLabel,
           candidates,
+          decision,
+          decisionEvidence: {
+            hasUnresolvedRisks:
+              (classification.decision.confidenceBasis?.unresolvedRisks
+                .length ?? 0) > 0,
+            webEvidence:
+              classification.decision.confidenceBasis?.webEvidence ?? null,
+          },
+          automationAssessment,
           searchEvidence,
-          statusOverride: "ignored",
           expectedProcessingToken: processingToken,
           tx,
         });
-      const ignoredProposal = await db.transaction(async (tx) => {
-        const proposal = await upsertIgnoredProposal(tx);
-        const attempt = await recordStorePriceMatchAttempt({ proposal, tx });
+        const attempt = await recordStorePriceMatchAttempt({
+          proposal,
+          automationAssessment,
+          tx,
+        });
         await persistStorePriceBottleCheck({
           attemptId: attempt.id,
           classificationInput,
@@ -1296,221 +1389,151 @@ export async function resolveStorePriceMatchProposal(
           modelMetadata: classificationModelMetadata,
           priceId: price.id,
         });
-        if (
-          !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
-        ) {
-          return proposal;
-        }
-
-        if (price.bottleId !== null) {
-          await clearIgnoredStorePriceAssignmentInTransaction(tx, {
-            priceId: price.id,
-            expectedBottleId,
-          });
-        }
-
-        return proposal;
+        return { proposal, attempt };
       });
-      return ignoredProposal;
-    }
 
-    const classifierDecision = normalizeClassifierDecisionForPriceMatching(
-      classification.decision,
-      candidates,
-    );
-    const decision = toStorePriceMatchDecision({
-      price,
-      decision: classifierDecision,
-    });
-    const automationAssessment = getStorePriceMatchAutomationAssessment({
-      action: decision.action,
-      modelConfidence: decision.confidence,
-      price,
-      suggestedBottleId: decision.suggestedBottleId,
-      candidateBottles: candidates,
-      extractedLabel,
-      proposedBottle: decision.proposedBottle,
-      searchEvidence,
-      sourceBottleIdentity: price.sourceBottleIdentity
-        ? BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity)
-        : null,
-      hasUnresolvedRisks:
-        (classification.decision.confidenceBasis?.unresolvedRisks.length ?? 0) >
-        0,
-      webEvidenceJudgment:
-        classification.decision.confidenceBasis?.webEvidence ?? null,
-    });
-    const { proposal, attempt } = await db.transaction(async (tx) => {
-      const proposal = await upsertStorePriceMatchProposal({
-        price,
-        extractedLabel,
-        candidates,
+      const shouldAutoCreate = shouldAutoCreateStorePriceMatchProposal({
         decision,
-        decisionEvidence: {
-          hasUnresolvedRisks:
-            (classification.decision.confidenceBasis?.unresolvedRisks.length ??
-              0) > 0,
-          webEvidence:
-            classification.decision.confidenceBasis?.webEvidence ?? null,
-        },
         automationAssessment,
-        searchEvidence,
-        expectedProcessingToken: processingToken,
-        tx,
       });
-      const attempt = await recordStorePriceMatchAttempt({
-        proposal,
-        automationAssessment,
-        tx,
-      });
-      await persistStorePriceBottleCheck({
-        attemptId: attempt.id,
-        classificationInput,
-        classification,
-        database: tx,
-        model: proposal.model,
-        modelMetadata: classificationModelMetadata,
-        priceId: price.id,
-      });
-      return { proposal, attempt };
-    });
 
-    const shouldAutoCreate = shouldAutoCreateStorePriceMatchProposal({
-      decision,
-      automationAssessment,
-    });
-
-    if (proposal.status !== "verified" && !shouldAutoCreate) {
-      return proposal;
-    }
-
-    let automationUser: User | null = null;
-
-    try {
-      automationUser = await getAutomationModeratorUser();
-
-      if (
-        processingToken &&
-        !(await canContinueStorePriceMatchProcessing(
-          proposal.id,
-          processingToken,
-        ))
-      ) {
-        return await reloadStorePriceMatchProposal(proposal.id);
+      if (proposal.status !== "verified" && !shouldAutoCreate) {
+        return proposal;
       }
 
-      if (proposal.status === "verified") {
-        if (!proposal.suggestedBottleId) {
-          throw new Error(
-            `Unable to auto-approve verified price match proposal without a suggested Bottle (${proposal.id}).`,
-          );
+      let automationUser: User | null = null;
+
+      try {
+        automationUser = await getAutomationModeratorUser();
+
+        if (
+          processingToken &&
+          !(await canContinueStorePriceMatchProcessing(
+            proposal.id,
+            processingToken,
+          ))
+        ) {
+          return await reloadStorePriceMatchProposal(proposal.id);
         }
 
-        await applyApprovedStorePriceMatch({
-          proposalId: proposal.id,
-          bottleId: proposal.suggestedBottleId,
-          reviewedById: automationUser.id,
-          actor: await getPeatedSystemActor(),
-          allowSystemActor: true,
-          expectedProcessingToken: processingToken,
+        if (proposal.status === "verified") {
+          if (!proposal.suggestedBottleId) {
+            throw new Error(
+              `Unable to auto-approve verified price match proposal without a suggested Bottle (${proposal.id}).`,
+            );
+          }
+
+          await applyApprovedStorePriceMatch({
+            proposalId: proposal.id,
+            bottleId: proposal.suggestedBottleId,
+            reviewedById: automationUser.id,
+            actor: await getPeatedSystemActor(),
+            allowSystemActor: true,
+            expectedProcessingToken: processingToken,
+          });
+
+          return await reloadStorePriceMatchProposal(proposal.id);
+        }
+
+        const bottleInput = buildStorePriceMatchBottleInput(decision);
+
+        await createBottleFromStorePriceMatchProposal(
+          {
+            proposalId: proposal.id,
+            bottleInput,
+            user: automationUser,
+            creationSource: "price_match_automation",
+            actor: await getPeatedSystemActor(),
+            expectedProcessingToken: processingToken,
+          },
+          finalizeBottle,
+        );
+
+        return await reloadStorePriceMatchProposal(proposal.id);
+      } catch (err) {
+        logError(err, {
+          price: {
+            id: price.id,
+            name: price.name,
+          },
+          proposal: {
+            id: proposal.id,
+          },
         });
 
-        return await reloadStorePriceMatchProposal(proposal.id);
+        const error =
+          err instanceof Error
+            ? err.message
+            : proposal.status === "verified"
+              ? "Unknown auto-approval error"
+              : "Unknown auto-create error";
+        const erroredProposal = await db.transaction(async (tx) => {
+          const updatedProposal = await upsertStorePriceMatchProposal({
+            price,
+            extractedLabel,
+            candidates,
+            decision,
+            automationAssessment,
+            searchEvidence,
+            error,
+            statusOverride: "errored",
+            expectedProcessingToken: processingToken,
+            tx,
+          });
+          await markOwnedStorePriceMatchAttemptFinalInTransaction(tx, {
+            attemptId: attempt.id,
+            proposalId: updatedProposal.id,
+            expectedProcessingToken: processingToken,
+            finalStatus: "errored",
+            reviewedById: automationUser?.id ?? null,
+            error,
+          });
+          return updatedProposal;
+        });
+        return erroredProposal;
       }
-
-      const bottleInput = buildStorePriceMatchBottleInput(decision);
-
-      await createBottleFromStorePriceMatchProposal({
-        proposalId: proposal.id,
-        bottleInput,
-        user: automationUser,
-        creationSource: "price_match_automation",
-        actor: await getPeatedSystemActor(),
-        expectedProcessingToken: processingToken,
-      });
-
-      return await reloadStorePriceMatchProposal(proposal.id);
     } catch (err) {
       logError(err, {
         price: {
           id: price.id,
           name: price.name,
         },
-        proposal: {
-          id: proposal.id,
-        },
       });
 
-      const error =
-        err instanceof Error
-          ? err.message
-          : proposal.status === "verified"
-            ? "Unknown auto-approval error"
-            : "Unknown auto-create error";
-      const erroredProposal = await db.transaction(async (tx) => {
-        const updatedProposal = await upsertStorePriceMatchProposal({
-          price,
-          extractedLabel,
-          candidates,
-          decision,
-          automationAssessment,
-          searchEvidence,
-          error,
-          statusOverride: "errored",
-          expectedProcessingToken: processingToken,
-          tx,
-        });
-        await markOwnedStorePriceMatchAttemptFinalInTransaction(tx, {
-          attemptId: attempt.id,
-          proposalId: updatedProposal.id,
-          expectedProcessingToken: processingToken,
-          finalStatus: "errored",
-          reviewedById: automationUser?.id ?? null,
-          error,
-        });
-        return updatedProposal;
+      const proposal = await upsertStorePriceMatchProposal({
+        price,
+        extractedLabel:
+          err instanceof BottleClassificationError
+            ? parseClassifierExtractedLabel(err.artifacts.extractedIdentity)
+            : extractedLabel,
+        candidates:
+          err instanceof BottleClassificationError
+            ? parseClassifierCandidates(err.artifacts.candidates)
+            : candidates,
+        searchEvidence:
+          err instanceof BottleClassificationError
+            ? err.artifacts.searchEvidence
+            : searchEvidence,
+        error: err instanceof Error ? err.message : "Unknown classifier error",
+        // A retry failure is operational, not a new semantic no-match decision.
+        // Preserve the last completed decision while exposing the failed attempt.
+        preserveExistingDecision: true,
+        expectedProcessingToken: processingToken,
       });
-      return erroredProposal;
+      await recordStorePriceMatchAttempt({ proposal });
+      return proposal;
+    } finally {
+      if (processingToken && existingProposal) {
+        await releaseStorePriceMatchProposalProcessingLease({
+          proposalId: existingProposal.id,
+          processingToken,
+        });
+      }
     }
-  } catch (err) {
-    logError(err, {
-      price: {
-        id: price.id,
-        name: price.name,
-      },
-    });
-
-    const proposal = await upsertStorePriceMatchProposal({
-      price,
-      extractedLabel:
-        err instanceof BottleClassificationError
-          ? parseClassifierExtractedLabel(err.artifacts.extractedIdentity)
-          : extractedLabel,
-      candidates:
-        err instanceof BottleClassificationError
-          ? parseClassifierCandidates(err.artifacts.candidates)
-          : candidates,
-      searchEvidence:
-        err instanceof BottleClassificationError
-          ? err.artifacts.searchEvidence
-          : searchEvidence,
-      error: err instanceof Error ? err.message : "Unknown classifier error",
-      // A retry failure is operational, not a new semantic no-match decision.
-      // Preserve the last completed decision while exposing the failed attempt.
-      preserveExistingDecision: true,
-      expectedProcessingToken: processingToken,
-    });
-    await recordStorePriceMatchAttempt({ proposal });
-    return proposal;
-  } finally {
-    if (processingToken && existingProposal) {
-      await releaseStorePriceMatchProposalProcessingLease({
-        proposalId: existingProposal.id,
-        processingToken,
-      });
-    }
-  }
+  };
 }
+
+export const resolveStorePriceMatchProposal = createStorePriceMatchResolver();
 
 export async function getStorePriceMatchProposalForReviewInTransaction(
   tx: AnyDatabase,
@@ -1660,7 +1683,7 @@ async function persistApprovedStorePriceMatchInTransaction(
       actor: IncomingBottleDecisionActor;
       decision: IncomingBottleDecisionType;
       createdBottle?: boolean;
-      metadata?: Record<string, unknown>;
+      metadata?: IncomingBottleDecisionMetadata;
     };
     bottleId: number;
   },
@@ -1689,6 +1712,13 @@ async function persistApprovedStorePriceMatchInTransaction(
 
   // The decision writer is idempotent by source. Always offer a completed
   // moderation decision so legacy or preassigned prices still gain history.
+  const metadata: IncomingBottleDecisionMetadata = {
+    proposalType: proposal.proposalType,
+    ...decisionLog.metadata,
+  };
+  if (decisionLog.actor.type === "system") {
+    metadata.initiatedByUserId = reviewedById;
+  }
   await recordIncomingBottleDecisionInTransaction(tx, {
     sourceKind: "store_price",
     sourceId: proposal.price.id,
@@ -1703,13 +1733,7 @@ async function persistApprovedStorePriceMatchInTransaction(
     confidence: proposal.confidence,
     model: proposal.model,
     rationale: proposal.rationale,
-    metadata: {
-      proposalType: proposal.proposalType,
-      ...(decisionLog.actor.type === "system"
-        ? { initiatedByUserId: reviewedById }
-        : {}),
-      ...decisionLog.metadata,
-    },
+    metadata,
   });
 }
 
@@ -1732,7 +1756,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
       actor: IncomingBottleDecisionActor;
       decision: IncomingBottleDecisionType;
       createdBottle?: boolean;
-      metadata?: Record<string, unknown>;
+      metadata?: IncomingBottleDecisionMetadata;
     };
     bottleId: number;
   },

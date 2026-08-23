@@ -1,5 +1,6 @@
 import { createServer, type Server, type ServerResponse } from "node:http";
 import { afterEach, describe, expect, it } from "vitest";
+import { z } from "zod";
 
 import { createORPCResponseTraceContext, getLink } from "./link";
 
@@ -97,10 +98,13 @@ async function listen(server: Server) {
   });
 
   const address = server.address();
-  if (!address || typeof address === "string") {
+  const testAddress = z
+    .object({ port: z.number().int().positive() })
+    .safeParse(address);
+  if (!testAddress.success) {
     throw new Error("Unable to bind test server");
   }
-  return `http://127.0.0.1:${address.port}`;
+  return `http://127.0.0.1:${testAddress.data.port}`;
 }
 
 function writeRpcResponse(response: ServerResponse, traceId: string) {

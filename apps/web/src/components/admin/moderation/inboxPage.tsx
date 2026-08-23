@@ -1,5 +1,6 @@
 "use client";
 
+import type { Inputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -38,19 +39,18 @@ export default function InboxPage({
   const queryClient = useQueryClient();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const input = {
+  const category = searchParams.get("category");
+  const query = searchParams.get("query");
+  const input: NonNullable<Inputs["admin"]["moderation"]["listTasks"]> = {
     cursor: Number(searchParams.get("cursor") ?? 1),
     limit: 100,
-    ...(searchParams.get("query") ? { query: searchParams.get("query")! } : {}),
-    ...(searchParams.get("category") === "listing" ||
-    searchParams.get("category") === "catalog"
-      ? { category: searchParams.get("category") as "listing" | "catalog" }
-      : {}),
-    ...(searchParams.get("blocked") === "true" ? { blocked: true } : {}),
-    ...(searchParams.get("inconclusive") === "true"
-      ? { inconclusive: true }
-      : {}),
   };
+  if (query) input.query = query;
+  if (category === "listing" || category === "catalog") {
+    input.category = category;
+  }
+  if (searchParams.get("blocked") === "true") input.blocked = true;
+  if (searchParams.get("inconclusive") === "true") input.inconclusive = true;
   const listOptions = orpc.admin.moderation.listTasks.queryOptions({ input });
   const { data } = useSuspenseQuery(listOptions);
   const ignoreInconclusive = useMutation(

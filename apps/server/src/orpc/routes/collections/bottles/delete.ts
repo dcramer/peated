@@ -15,15 +15,16 @@ import { CollectionBottleInputSchema } from "@peated/server/schemas";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const CollectionBottleDeleteCommonInputSchema = z.object({
+const CollectionBottleDeleteFields = {
   collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
   user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-});
+} as const;
 
-const CollectionBottleDeleteInputSchema =
-  CollectionBottleDeleteCommonInputSchema.extend({
-    bottle: CollectionBottleInputSchema.shape.bottle,
-  }).strict();
+const CollectionBottleDeleteInputSchema = CollectionBottleInputSchema.pick({
+  bottle: true,
+})
+  .safeExtend(CollectionBottleDeleteFields)
+  .strict();
 
 export default procedure
   .use(requireAuth)
@@ -59,7 +60,7 @@ export default procedure
       ? await getReservedCollection(db, context.user.id, reservedCollection)
       : await db.query.collections.findFirst({
           where: (collections, { eq }) =>
-            eq(collections.id, input.collection as number),
+            eq(collections.id, z.number().parse(input.collection)),
         });
 
     if (!collection) {

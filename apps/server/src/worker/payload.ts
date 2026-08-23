@@ -8,17 +8,23 @@
  */
 import { z } from "zod";
 import { getCurrentActorContext } from "../lib/actorContext";
-import { parseJobContext, type JobContext } from "./types";
+import {
+  JobContextSchema,
+  type JobArgs,
+  type JobContext,
+  type JobPayload,
+  type QueuedJobInput,
+} from "./types";
 
 const QueuedJobDataSchema = z
   .object({
-    args: z.unknown().optional(),
-    context: z.unknown().optional(),
+    args: z.record(z.string(), z.json()).optional(),
+    context: JobContextSchema.catch({}).optional().default({}),
   })
   .strict();
 
 export type QueuedJobData = {
-  args?: unknown;
+  args?: JobPayload;
   context: JobContext;
 };
 
@@ -34,7 +40,7 @@ export function buildJobContext(
 
 /** Build the serialized payload handed to the queue. */
 export function buildQueuedJobData(
-  args?: unknown,
+  args?: JobArgs,
   traceContext: JobContext["traceContext"] = {},
 ): QueuedJobData {
   return {
@@ -44,7 +50,9 @@ export function buildQueuedJobData(
 }
 
 /** Parse queued job data, dropping malformed context while preserving job args. */
-export function parseQueuedJobData(input: unknown): QueuedJobData {
+export function parseQueuedJobData(
+  input: QueuedJobInput | null | undefined,
+): QueuedJobData {
   const result = QueuedJobDataSchema.safeParse(input);
   if (!result.success) {
     return {
@@ -54,6 +62,6 @@ export function parseQueuedJobData(input: unknown): QueuedJobData {
 
   return {
     args: result.data.args,
-    context: parseJobContext(result.data.context),
+    context: result.data.context,
   };
 }

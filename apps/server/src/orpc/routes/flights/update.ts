@@ -14,7 +14,7 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { FlightInputSchema, FlightSchema } from "@peated/server/schemas";
+import { FlightInputFields, FlightSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
 import { and, eq } from "drizzle-orm";
@@ -23,10 +23,10 @@ import { z } from "zod";
 const InputSchema = z
   .object({
     flight: z.string(),
-    name: FlightInputSchema.shape.name.optional(),
-    description: FlightInputSchema.shape.description,
+    name: FlightInputFields.name.optional(),
+    description: FlightInputFields.description,
     public: z.boolean().optional(),
-    bottles: FlightInputSchema.shape.bottles,
+    bottles: FlightInputFields.bottles,
   })
   .strict();
 

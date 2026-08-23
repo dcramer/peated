@@ -10,6 +10,7 @@ import { logInfo } from "@peated/server/lib/log";
 import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 const CASK_STRENGTH_SEARCH_TERMS =
   "cask strength barrel strength barrel proof full proof natural strength";
@@ -225,7 +226,18 @@ function buildBottleAliasSearchText({
   return bits.join(" ");
 }
 
-export default async function indexBottleAlias(input: unknown) {
+export type IndexBottleAliasServices = {
+  createEmbedding: (text: string) => Promise<number[]>;
+};
+
+const defaultServices: IndexBottleAliasServices = {
+  createEmbedding: getOpenAIEmbedding,
+};
+
+export async function indexBottleAlias(
+  input: JobPayload,
+  services: IndexBottleAliasServices = defaultServices,
+) {
   const { name } = IndexBottleAliasJobArgsSchema.parse(input);
 
   logInfo("Updating index for bottle alias {name}", {
@@ -257,7 +269,7 @@ export default async function indexBottleAlias(input: unknown) {
     }
     clearedSource = true;
 
-    const embedding = await getOpenAIEmbedding(
+    const embedding = await services.createEmbedding(
       buildBottleAliasSearchText(source),
     );
     const updated = await db
@@ -273,4 +285,8 @@ export default async function indexBottleAlias(input: unknown) {
   throw new Error(
     `Bottle alias search source changed repeatedly while indexing: ${name}`,
   );
+}
+
+export default async function indexBottleAliasJob(input: JobPayload) {
+  return await indexBottleAlias(input);
 }

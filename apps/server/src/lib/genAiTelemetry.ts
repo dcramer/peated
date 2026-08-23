@@ -1,8 +1,9 @@
 import type { StreamedSpanJSON } from "@sentry/core";
+import { z } from "zod";
 
 type SentrySpanJson = {
   op?: string;
-  data?: Record<string, unknown>;
+  data?: StreamedSpanJSON["attributes"];
 };
 
 /**
@@ -36,14 +37,14 @@ export function normalizeStreamedGenAiSpan(
     return span;
   }
 
-  const operation = attributeValue(attributes?.["sentry.op"]);
+  const operation = SpanAttributeValueSchema.parse(attributes?.["sentry.op"]);
   if (operation !== "gen_ai.chat" && operation !== "gen_ai.embeddings") {
     return span;
   }
 
   if (
     attributes["gen_ai.provider.name"] !== undefined ||
-    attributeValue(attributes["gen_ai.system"]) !== "openai"
+    SpanAttributeValueSchema.parse(attributes["gen_ai.system"]) !== "openai"
   ) {
     return span;
   }
@@ -57,8 +58,10 @@ export function normalizeStreamedGenAiSpan(
   };
 }
 
-function attributeValue(value: unknown): unknown {
-  return value && typeof value === "object" && "value" in value
-    ? (value as { value: unknown }).value
-    : value;
-}
+const SpanAttributeValueSchema = z
+  .union([
+    z.string(),
+    z.object({ value: z.string() }).transform(({ value }) => value),
+  ])
+  .optional()
+  .catch(undefined);

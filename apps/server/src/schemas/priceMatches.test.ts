@@ -254,12 +254,11 @@ describe("StorePriceMatchDecisionSchema", () => {
 
 describe("StorePriceMatchQueueItemSchema", () => {
   test("exposes only direct Bottle identities", () => {
-    expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
-      "currentBottle",
-    );
-    expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
-      "suggestedBottle",
-    );
+    const queueItemFields = StorePriceMatchQueueItemSchema.keyof().options;
+    const proposalFields = StorePriceMatchProposalSchema.keyof().options;
+
+    expect(queueItemFields).toContain("currentBottle");
+    expect(queueItemFields).toContain("suggestedBottle");
 
     for (const field of [
       "currentTarget",
@@ -268,7 +267,7 @@ describe("StorePriceMatchQueueItemSchema", () => {
       "suggestedRelease",
       "parentBottle",
     ]) {
-      expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(field);
+      expect(queueItemFields).not.toContain(field);
     }
     for (const field of [
       "currentBottleId",
@@ -281,7 +280,7 @@ describe("StorePriceMatchQueueItemSchema", () => {
       "creationTarget",
       "proposedRelease",
     ]) {
-      expect(StorePriceMatchProposalSchema.shape).not.toHaveProperty(field);
+      expect(proposalFields).not.toContain(field);
     }
   });
 });

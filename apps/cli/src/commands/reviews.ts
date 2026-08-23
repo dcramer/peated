@@ -13,10 +13,9 @@ export function buildReviewNormalizationUpdate(
   name: string,
   bottleId: number | null,
 ): ReviewNormalizationUpdate {
-  return {
-    name,
-    ...(bottleId === null ? {} : { bottleId }),
-  };
+  const update: ReviewNormalizationUpdate = { name };
+  if (bottleId !== null) update.bottleId = bottleId;
+  return update;
 }
 
 const subcommand = program.command("reviews");

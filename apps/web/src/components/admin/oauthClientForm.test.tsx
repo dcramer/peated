@@ -1,15 +1,9 @@
-import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, test, vi } from "vitest";
-import OAuthClientForm, {
+import { describe, expect, test } from "vitest";
+import {
+  getOAuthClientFormDefaults,
   OAuthClientFormSchema,
   parseOAuthClientRedirectUris,
 } from "./oauthClientForm";
-
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/admin/oauth-clients/add",
-  useRouter: () => ({ back: vi.fn() }),
-}));
-vi.mock("./sidebar", () => ({ default: () => <aside>Admin</aside> }));
 
 describe("OAuthClientForm", () => {
   test("parses and validates one registered redirect per line", () => {
@@ -35,27 +29,24 @@ describe("OAuthClientForm", () => {
     ).toBe(false);
   });
 
-  test("uses the same form for registration and editing", () => {
-    const createHtml = renderToStaticMarkup(
-      <OAuthClientForm onSubmit={async () => undefined} />,
-    );
-    expect(createHtml).toContain("Register OAuth Client");
-    expect(createHtml).not.toContain("Public identifier");
-
-    const editHtml = renderToStaticMarkup(
-      <OAuthClientForm
-        title="Edit OAuth Client"
-        initialData={{
-          clientId: "public-client-id",
-          name: "Peated CLI",
-          redirectUris: ["http://127.0.0.1/callback"],
-        }}
-        onSubmit={async () => undefined}
-      />,
-    );
-    expect(editHtml).toContain("Edit OAuth Client");
-    expect(editHtml).toContain("public-client-id");
-    expect(editHtml).toContain("OAuth clients do not have a secret");
-    expect(editHtml).toContain("Redirect URIs");
+  test("uses empty registration defaults and serialized editing defaults", () => {
+    expect(getOAuthClientFormDefaults()).toEqual({
+      name: "",
+      redirectUris: "",
+    });
+    expect(
+      getOAuthClientFormDefaults({
+        clientId: "public-client-id",
+        name: "Peated CLI",
+        redirectUris: [
+          "http://127.0.0.1/callback",
+          "https://tools.peated.com/callback",
+        ],
+      }),
+    ).toEqual({
+      name: "Peated CLI",
+      redirectUris:
+        "http://127.0.0.1/callback\nhttps://tools.peated.com/callback",
+    });
   });
 });

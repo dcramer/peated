@@ -69,18 +69,16 @@ export function mergeBottleCandidate(
     );
   }
 
-  const existingMetadata = existing as Record<
-    (typeof CANDIDATE_METADATA_FIELDS)[number],
-    BottleCandidate[(typeof CANDIDATE_METADATA_FIELDS)[number]]
-  >;
-
   for (const field of CANDIDATE_METADATA_FIELDS) {
-    const existingValue = existingMetadata[field];
-    const candidateValue = candidate[field];
+    fillMissingCandidateField(existing, candidate, field);
+  }
+}
 
-    if (existingValue === null && candidateValue !== null) {
-      existingMetadata[field] = candidateValue;
-    }
+function fillMissingCandidateField<
+  TField extends (typeof CANDIDATE_METADATA_FIELDS)[number],
+>(existing: BottleCandidate, candidate: BottleCandidate, field: TField): void {
+  if (existing[field] === null && candidate[field] !== null) {
+    existing[field] = candidate[field];
   }
 }
 

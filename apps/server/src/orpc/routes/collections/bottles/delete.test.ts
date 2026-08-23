@@ -100,16 +100,15 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
       collectionId: collection.id,
       bottleId: bottle.id,
     });
-    type Input = Parameters<typeof routerClient.collections.bottles.delete>[0];
-
     const error = await waitError(() =>
       routerClient.collections.bottles.delete(
+        // SAFETY: This invalid legacy field exercises the runtime input boundary.
         {
           user: "me",
           collection: collection.id,
           bottle: bottle.id,
           target: 1,
-        } as unknown as Input,
+        } as never,
         { context: { user: defaults.user } },
       ),
     );

@@ -14,6 +14,19 @@ import OperationCard, {
   type BottleOperationReview,
 } from "./operationCard";
 
+const entityProposal = {
+  type: "update_entity",
+  input: {
+    entityId: 42,
+    patch: { name: "Correct Brand" },
+  },
+  rationale: "The label and official producer site support this name.",
+  evidenceRefs: [
+    { kind: "entity", entityId: 42 },
+    { kind: "web_result", url: "https://example.com/evidence" },
+  ],
+} satisfies Extract<BottleOperation["proposal"], { type: "update_entity" }>;
+
 function operation(
   status: BottleOperation["status"],
   overrides: Partial<BottleOperation> = {},
@@ -22,18 +35,7 @@ function operation(
     id: 17,
     checkId: 9,
     excludedFields: [],
-    proposal: {
-      type: "update_entity",
-      input: {
-        entityId: 42,
-        patch: { name: "Correct Brand" },
-      },
-      rationale: "The label and official producer site support this name.",
-      evidenceRefs: [
-        { kind: "entity", entityId: 42 },
-        { kind: "web_result", url: "https://example.com/evidence" },
-      ],
-    },
+    proposal: entityProposal,
     preparationError: null,
     status,
     reviewedById: null,
@@ -50,11 +52,38 @@ function operation(
   };
 }
 
+const baseBottleCheck: BottleCheck = {
+  id: 9,
+  intent: "audit_bottle",
+  origin: "moderator",
+  sourceKind: null,
+  sourceId: null,
+  bottleId: 44,
+  schemaSupported: true,
+  schemaVersion: 2,
+  output: {
+    summary: "The Bottle is supported.",
+    findings: [],
+  },
+  model: null,
+  modelMetadata: null,
+  error: null,
+  storePriceMatchProposalId: null,
+  storePriceMatchAttemptId: null,
+  closedById: null,
+  closeReason: null,
+  closeNote: null,
+  createdAt: "2026-07-30T00:00:00.000Z",
+  completedAt: "2026-07-30T00:00:00.000Z",
+  closedAt: null,
+  operations: [],
+};
+
 const entityReview = {
   id: 17,
   type: "update_entity",
   status: "pending_review",
-  proposal: operation("pending_review").proposal,
+  proposal: entityProposal,
   preview: {
     before: {
       entityId: 42,
@@ -85,7 +114,7 @@ const entityReview = {
     },
     warnings: [{ code: "role_union", message: "Roles will be preserved." }],
   },
-} as BottleOperationReview;
+} satisfies BottleOperationReview;
 
 describe("Bottle Check review components", () => {
   it("renders reference source identity without an audit-origin label", () => {
@@ -95,14 +124,11 @@ describe("Bottle Check review components", () => {
       origin: null,
       sourceKind: "store_price",
       sourceId: "510",
-    } as ComponentProps<typeof BottleCheckSubject>["check"];
+    } satisfies ComponentProps<typeof BottleCheckSubject>["check"] &
+      ComponentProps<typeof BottleCheckOrigin>["check"];
 
     const subject = renderToStaticMarkup(<BottleCheckSubject check={check} />);
-    const origin = renderToStaticMarkup(
-      <BottleCheckOrigin
-        check={check as ComponentProps<typeof BottleCheckOrigin>["check"]}
-      />,
-    );
+    const origin = renderToStaticMarkup(<BottleCheckOrigin check={check} />);
 
     expect(subject).toContain("Incoming listing #510");
     expect(subject).not.toContain("Deleted Bottle");
@@ -113,10 +139,9 @@ describe("Bottle Check review components", () => {
     const check = {
       bottleId: null,
       intent: "audit_bottle",
-      origin: "moderator",
       sourceKind: null,
       sourceId: null,
-    } as ComponentProps<typeof BottleCheckSubject>["check"];
+    } satisfies ComponentProps<typeof BottleCheckSubject>["check"];
 
     expect(
       renderToStaticMarkup(<BottleCheckSubject check={check} />),
@@ -124,14 +149,20 @@ describe("Bottle Check review components", () => {
   });
 
   it("labels closed checks by disposition and preserves unsupported operation counts", () => {
-    const closed = {
+    const closed: BottleCheck = {
+      ...baseBottleCheck,
       closedAt: "2026-07-30T12:00:00.000Z",
       closeReason: "resolved_manually",
-    } as BottleCheck;
-    const unsupported = {
+    };
+    const { output: _output, ...baseUnsupportedCheck } = baseBottleCheck;
+    const unsupported: BottleCheck = {
+      ...baseUnsupportedCheck,
       schemaSupported: false,
+      schemaVersion: 1,
+      canClose: true,
       operationCount: 3,
-    } as BottleCheck;
+      operations: [],
+    };
 
     expect(getBottleCheckState(closed)).toBe("Resolved manually");
     expect(getBottleCheckOperationCount(unsupported)).toBe(3);
@@ -164,43 +195,85 @@ describe("Bottle Check review components", () => {
   });
 
   it("labels Bottle diff fields for moderator review", () => {
+    const proposal = {
+      type: "update_bottle",
+      input: {
+        bottleId: 44,
+        patch: {
+          edition: "Warehouse 1",
+          abv: 52.2,
+          releaseYear: 2022,
+          caskType: "bourbon",
+        },
+      },
+      rationale: "The release details are present on the label.",
+      evidenceRefs: [{ kind: "bottle", bottleId: 44 }],
+    } satisfies Extract<BottleOperation["proposal"], { type: "update_bottle" }>;
     const bottleOperation = {
       ...operation("pending_review"),
-      proposal: {
-        type: "update_bottle",
-        input: {
-          bottleId: 44,
-          patch: {
-            edition: "Warehouse 1",
-            abv: 52.2,
-            releaseYear: 2022,
-            caskType: "bourbon",
-          },
+      proposal,
+    } satisfies BottleOperation;
+    type UpdateBottleReview = Extract<
+      BottleOperationReview,
+      { type: "update_bottle" }
+    >;
+    const bottlePreview: Omit<
+      UpdateBottleReview["preview"]["before"],
+      "exact"
+    > = {
+      bottleId: 44,
+      groupId: 4,
+      fullName: "Example Bottle",
+      shared: {
+        name: "Example Bottle",
+        statedAge: null,
+        seriesId: null,
+        category: "single_malt",
+        brand: {
+          kind: "existing",
+          entityId: 7,
+          name: "Example",
+          shortName: null,
+          roles: ["brand"],
         },
-        rationale: "The release details are present on the label.",
-        evidenceRefs: [{ kind: "bottle", bottleId: 44 }],
+        distillers: [],
+        bottler: null,
       },
-    } as BottleOperation;
+    };
     const review = {
       id: bottleOperation.id,
       type: "update_bottle",
       status: "pending_review",
-      proposal: bottleOperation.proposal,
+      proposal,
       preview: {
         before: {
+          ...bottlePreview,
           exact: {
             edition: null,
+            statedAge: null,
             abv: null,
+            singleCask: null,
+            caskStrength: null,
+            vintageYear: null,
             releaseYear: null,
+            caskSize: null,
             caskType: null,
+            caskFill: null,
           },
         },
         after: {
+          ...bottlePreview,
           exact: {
             edition: "Warehouse 1",
+            statedAge: null,
             abv: 52.2,
+            singleCask: null,
+            caskStrength: null,
+            vintageYear: null,
             releaseYear: 2022,
+            caskSize: null,
             caskType: "bourbon",
+            caskFill: null,
           },
         },
         changedFields: [
@@ -213,7 +286,7 @@ describe("Bottle Check review components", () => {
         entityCreations: [],
         warnings: [],
       },
-    } as unknown as BottleOperationReview;
+    } satisfies BottleOperationReview;
 
     const html = renderToStaticMarkup(
       <OperationCard operation={bottleOperation} review={review} />,
@@ -281,7 +354,7 @@ describe("Bottle Check review components", () => {
               code: "target_not_inspected",
               message: "The target was not inspected.",
             },
-          } as BottleOperationReview
+          } satisfies BottleOperationReview
         }
       />,
     );
@@ -354,32 +427,9 @@ describe("Bottle Check review components", () => {
   });
 
   it("shows clean and finding audit results without per-finding controls", () => {
-    const baseCheck = {
-      id: 9,
-      intent: "audit_bottle",
-      origin: "moderator",
-      sourceKind: null,
-      sourceId: null,
-      bottleId: 44,
-      schemaSupported: true,
-      schemaVersion: 2,
-      output: {
-        summary: "The Bottle is supported.",
-        findings: [],
-      },
-      model: null,
-      modelMetadata: null,
-      error: null,
-      storePriceMatchProposalId: null,
-      storePriceMatchAttemptId: null,
-      closedById: null,
-      closeReason: null,
-      closeNote: null,
-      createdAt: "2026-07-30T00:00:00.000Z",
-      completedAt: "2026-07-30T00:00:00.000Z",
-      closedAt: null,
-      operations: [],
-    } satisfies ComponentProps<typeof CheckResult>["check"];
+    const baseCheck = baseBottleCheck satisfies ComponentProps<
+      typeof CheckResult
+    >["check"];
     const clean = renderToStaticMarkup(<CheckResult check={baseCheck} />);
     const { output: _output, ...safeBaseCheck } = baseCheck;
     const unsupported = renderToStaticMarkup(

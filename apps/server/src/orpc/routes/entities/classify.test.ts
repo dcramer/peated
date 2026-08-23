@@ -1,28 +1,33 @@
+import { createRouterClient } from "@orpc/server";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import type { Context } from "@peated/server/orpc/context";
+import {
+  createEntityClassifyProcedure,
+  type EntityClassifier,
+} from "@peated/server/orpc/routes/entities/classify";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const classifyEntityMock = vi.hoisted(() => vi.fn());
+const classifyEntity = vi.fn<EntityClassifier>();
 
-vi.mock("@peated/server/agents/entityClassifier", () => ({
-  classifyEntity: classifyEntityMock,
-}));
+function createEntityClassifyClient(context: Context) {
+  return createRouterClient(
+    { classify: createEntityClassifyProcedure(classifyEntity) },
+    { context },
+  );
+}
 
 describe("POST /entities/{entity}/classify", () => {
-  afterEach(() => {
-    vi.resetAllMocks();
+  beforeEach(() => {
+    classifyEntity.mockReset();
   });
 
   test("requires moderator access", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
 
     const err = await waitError(
-      routerClient.entities.classify(
-        {
-          entity: 1,
-        },
-        { context: { user } },
-      ),
+      createEntityClassifyClient({ user }).classify({
+        entity: 1,
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -32,12 +37,9 @@ describe("POST /entities/{entity}/classify", () => {
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(
-      routerClient.entities.classify(
-        {
-          entity: 999999,
-        },
-        { context: { user } },
-      ),
+      createEntityClassifyClient({ user }).classify({
+        entity: 999999,
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found.]`);
@@ -67,7 +69,7 @@ describe("POST /entities/{entity}/classify", () => {
       name: "Canadian Club Reserve 9-year-old Triple Aged",
     });
 
-    classifyEntityMock.mockResolvedValue({
+    classifyEntity.mockResolvedValue({
       advice: {
         kind: "brand_assignment_issue",
         summary: "Bottle evidence supports Canadian Club.",
@@ -80,18 +82,15 @@ describe("POST /entities/{entity}/classify", () => {
       },
     });
 
-    const result = await routerClient.entities.classify(
-      {
-        entity: currentBrand.id,
-      },
-      { context: { user } },
-    );
+    const result = await createEntityClassifyClient({ user }).classify({
+      entity: currentBrand.id,
+    });
 
     expect(result.advice).toMatchObject({
       kind: "brand_assignment_issue",
       targetEntityId: canadianClub.id,
     });
-    expect(classifyEntityMock).toHaveBeenCalledWith({
+    expect(classifyEntity).toHaveBeenCalledWith({
       reference: expect.objectContaining({
         entity: expect.objectContaining({
           id: currentBrand.id,

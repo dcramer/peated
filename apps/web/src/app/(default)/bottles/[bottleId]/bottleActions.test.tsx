@@ -1,47 +1,16 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import BottleActions from "./bottleActions";
-
-const useAuthMock = vi.hoisted(() => vi.fn());
-const useORPCMock = vi.hoisted(() => vi.fn());
-const mutateAsyncMock = vi.hoisted(() => vi.fn());
-const routerReplaceMock = vi.hoisted(() => vi.fn());
-const flashMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@peated/web/hooks/useAuth", () => ({
-  default: useAuthMock,
-}));
-vi.mock("@peated/web/lib/orpc/context", () => ({
-  useORPC: useORPCMock,
-}));
-vi.mock("@tanstack/react-query", () => ({
-  useMutation: vi.fn(() => ({
-    isPending: false,
-    mutateAsync: mutateAsyncMock,
-  })),
-}));
-vi.mock("next/navigation", () => ({
-  useRouter: vi.fn(() => ({ replace: routerReplaceMock })),
-}));
-vi.mock("@peated/web/components/flash", () => ({
-  useFlashMessages: vi.fn(() => ({ flash: flashMock })),
-}));
+import { BottleActionMenu } from "./bottleActions";
 
 describe("BottleActions", () => {
-  beforeEach(() => {
-    useAuthMock.mockReturnValue({ user: { admin: true, mod: true } });
-    useORPCMock.mockReturnValue({
-      bottles: {
-        delete: {
-          mutationOptions: () => ({}),
-        },
-      },
-    });
-  });
-
   it("puts the similar Bottle action before moderator maintenance actions", () => {
-    const html = renderToStaticMarkup(<BottleActions bottle={{ id: 42 }} />);
+    const html = renderToStaticMarkup(
+      <BottleActionMenu
+        bottle={{ id: 42 }}
+        user={{ admin: true, mod: true }}
+      />,
+    );
 
     expect(html).toContain('aria-label="More bottle actions"');
     expect(html).toContain('href="/bottles/42/addRelease"');
@@ -61,9 +30,9 @@ describe("BottleActions", () => {
   });
 
   it("shows the similar Bottle action to non-moderators", () => {
-    useAuthMock.mockReturnValue({ user: null });
-
-    const html = renderToStaticMarkup(<BottleActions bottle={{ id: 42 }} />);
+    const html = renderToStaticMarkup(
+      <BottleActionMenu bottle={{ id: 42 }} user={null} />,
+    );
 
     expect(html).toContain('href="/bottles/42/addRelease"');
     expect(html).toContain("Add a similar bottle");
@@ -76,9 +45,12 @@ describe("BottleActions", () => {
   });
 
   it("hides deletion from moderators who are not admins", () => {
-    useAuthMock.mockReturnValue({ user: { admin: false, mod: true } });
-
-    const html = renderToStaticMarkup(<BottleActions bottle={{ id: 42 }} />);
+    const html = renderToStaticMarkup(
+      <BottleActionMenu
+        bottle={{ id: 42 }}
+        user={{ admin: false, mod: true }}
+      />,
+    );
 
     expect(html).toContain("Edit Bottle");
     expect(html).not.toContain("Delete Bottle");

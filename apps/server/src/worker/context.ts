@@ -1,4 +1,4 @@
-import type { Scope } from "@sentry/core";
+import type { Scope, User } from "@sentry/core";
 import type { JobActorContext } from "./types";
 
 /** Apply queued actor attribution to Sentry without using Sentry as storage. */
@@ -14,13 +14,10 @@ export function applyJobActorContextToSentry(
     return;
   }
 
-  scope.setUser({
-    id: String(actor.userId),
-    ...(actor.username ? { username: actor.username } : {}),
-  });
-  scope.setAttributes({
-    "actor.type": actor.type,
-    "actor.user_id": actor.userId,
-    ...(actor.username ? { "actor.username": actor.username } : {}),
-  });
+  const user: User = { id: String(actor.userId) };
+  if (actor.username) user.username = actor.username;
+  scope.setUser(user);
+  scope.setAttribute("actor.type", actor.type);
+  scope.setAttribute("actor.user_id", actor.userId);
+  if (actor.username) scope.setAttribute("actor.username", actor.username);
 }

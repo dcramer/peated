@@ -17,11 +17,11 @@ const SITE = "smws";
 function parseAbv(value: string | number | null | undefined): number | null {
   if (value === null || value === undefined) return null;
 
-  // If it's already a number, return it
-  if (typeof value === "number") return value;
+  const numericValue = z.number().safeParse(value);
+  if (numericValue.success) return numericValue.data;
 
   // Remove % symbol and trim whitespace
-  const cleanValue = value.replace("%", "").trim();
+  const cleanValue = z.string().parse(value).replace("%", "").trim();
 
   // Convert to float
   const floatValue = parseFloat(cleanValue);
@@ -102,12 +102,11 @@ export async function scrapeBottles(
         const flavorProfileRaw = item.categories.find((c) => {
           return c.startsWith("All Whisky/Flavour Profiles/");
         });
-        const flavorProfile = flavorProfileRaw
-          ? parseFlavorProfile(
-              flavorProfileRaw.split(
-                "All Whisky/Flavour Profiles/",
-              )[1] as unknown as string,
-            )
+        const flavorProfileName = flavorProfileRaw
+          ?.split("All Whisky/Flavour Profiles/")
+          .at(1);
+        const flavorProfile = flavorProfileName
+          ? parseFlavorProfile(flavorProfileName)
           : null;
 
         const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({

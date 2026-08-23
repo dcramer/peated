@@ -4,18 +4,25 @@ import {
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
-import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import onBottleAliasChange from "./onBottleAliasChange";
+import type { JobPayload } from "../types";
+import {
+  onBottleAliasChange as onBottleAliasChangeWithServices,
+  type OnBottleAliasChangeServices,
+} from "./onBottleAliasChange";
 
-vi.mock("@peated/server/worker/client", () => ({
-  runJob: vi.fn(),
-}));
+let runAliasIndex: ReturnType<
+  typeof vi.fn<OnBottleAliasChangeServices["runAliasIndex"]>
+>;
+
+function onBottleAliasChange(input: JobPayload) {
+  return onBottleAliasChangeWithServices(input, { runAliasIndex });
+}
 
 describe("onBottleAliasChange", () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    runAliasIndex = vi.fn();
   });
 
   test("replays one active Bottle assignment without overwriting direct consumers", async ({
@@ -69,10 +76,8 @@ describe("onBottleAliasChange", () => {
         where: eq(storePrices.id, assignedPrice.id),
       }),
     ).toMatchObject({ bottleId: otherBottle.id });
-    expect(workerClient.runJob).toHaveBeenCalledTimes(2);
-    expect(workerClient.runJob).toHaveBeenLastCalledWith("IndexBottleAlias", {
-      name: alias.name,
-    });
+    expect(runAliasIndex).toHaveBeenCalledTimes(2);
+    expect(runAliasIndex).toHaveBeenLastCalledWith(alias.name);
   });
 
   test("does not propagate ignored or unbound aliases", async ({
@@ -110,12 +115,8 @@ describe("onBottleAliasChange", () => {
         where: eq(storePrices.id, unboundPrice.id),
       }),
     ).toMatchObject({ bottleId: null });
-    expect(workerClient.runJob).toHaveBeenNthCalledWith(1, "IndexBottleAlias", {
-      name: ignoredAlias.name,
-    });
-    expect(workerClient.runJob).toHaveBeenNthCalledWith(2, "IndexBottleAlias", {
-      name: unboundAlias.name,
-    });
+    expect(runAliasIndex).toHaveBeenNthCalledWith(1, ignoredAlias.name);
+    expect(runAliasIndex).toHaveBeenNthCalledWith(2, unboundAlias.name);
   });
 
   test("does not propagate a retired Bottle assignment", async ({
@@ -143,15 +144,13 @@ describe("onBottleAliasChange", () => {
         where: eq(reviews.id, review.id),
       }),
     ).toMatchObject({ bottleId: null });
-    expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleAlias", {
-      name: alias.name,
-    });
+    expect(runAliasIndex).toHaveBeenCalledWith(alias.name);
   });
 
   test("rejects an unknown alias before scheduling indexing", async () => {
     await expect(
       onBottleAliasChange({ name: "Unknown Bottle Alias" }),
     ).rejects.toThrow("Unknown bottle alias: Unknown Bottle Alias");
-    expect(workerClient.runJob).not.toHaveBeenCalled();
+    expect(runAliasIndex).not.toHaveBeenCalled();
   });
 });

@@ -8,6 +8,7 @@ import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { requestUrl } from "../../legacy/scraper";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "healthyspirits";
@@ -22,7 +23,7 @@ const CatalogResponseSchema = z.object({
   expandedCategories: z.array(
     z.object({
       categoryInfo: z.object({ id: z.number().int() }),
-      products: z.array(z.unknown()),
+      products: z.array(z.json()),
       totalProductsCount: z.number().int().nonnegative(),
     }),
   ),
@@ -61,7 +62,7 @@ const ProductSchema = z
       jsonLD: z.string().optional(),
     }),
   })
-  .passthrough();
+  .catchall(z.json());
 
 const StructuredProductSchema = z
   .object({
@@ -71,11 +72,11 @@ const StructuredProductSchema = z
     gtin13: z.string().optional(),
     gtin14: z.string().optional(),
   })
-  .passthrough();
+  .catchall(z.json());
 
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("name" in input)) return null;
-  return typeof input.name === "string" ? input.name : null;
+function getRawName(input: JsonValue): string | null {
+  const parsed = z.object({ name: z.string() }).safeParse(input);
+  return parsed.success ? parsed.data.name : null;
 }
 
 function extractVolume(name: string): [string, string] | [string] {
@@ -83,7 +84,10 @@ function extractVolume(name: string): [string, string] | [string] {
     /^(.+?)\s+(\d+(?:\.\d+)?\s*(?:ml|l))(?:\s+bottle)?$/i,
   );
   if (!match) return [name];
-  return match.slice(1, 3) as [string, string];
+  const productName = match[1];
+  const volume = match[2];
+  if (!productName || !volume) return [name];
+  return [productName, volume];
 }
 
 function parsePrice(value: number): number | null {
@@ -123,7 +127,7 @@ function getImageUrl(
 function getProductBarcode(jsonLD: string | undefined): string | undefined {
   if (!jsonLD) return;
 
-  let input: unknown;
+  let input: JsonValue;
   try {
     input = JSON.parse(jsonLD);
   } catch {
@@ -145,10 +149,15 @@ function getProductBarcode(jsonLD: string | undefined): string | undefined {
   }
 }
 
+export interface HealthySpiritsProducts {
+  products: StorePrice[];
+  hasNextPage: boolean;
+}
+
 export function parseHealthySpiritsProducts(
-  input: unknown,
+  input: JsonValue,
   offset: number,
-): { products: StorePrice[]; hasNextPage: boolean } {
+): HealthySpiritsProducts {
   const payload = CatalogResponseSchema.parse(input);
   const category = payload.expandedCategories.find(
     ({ categoryInfo }) => categoryInfo.id === WHISKEY_CATEGORY_ID,
@@ -205,11 +214,7 @@ export function parseHealthySpiritsProducts(
     const externalProductId =
       product.identifier?.productId ?? product.externalReferenceId;
     const barcode = getProductBarcode(product.seo.jsonLD);
-    const listing = {
-      ...(externalProductId !== undefined
-        ? { externalProductId: String(externalProductId) }
-        : {}),
-      ...(barcode ? { barcode } : {}),
+    const listing: StorePrice = {
       currency: "usd" as const,
       imageUrl: getImageUrl(
         product.defaultOptionsOverrides.variationOverrides
@@ -220,6 +225,10 @@ export function parseHealthySpiritsProducts(
       url,
       volume,
     };
+    if (externalProductId !== undefined) {
+      listing.externalProductId = String(externalProductId);
+    }
+    if (barcode) listing.barcode = barcode;
 
     logScrapedProduct(SITE, listing);
     products.push(listing);

@@ -12,6 +12,10 @@ type RequestedRoute = {
   search: string;
 };
 
+export type LoadRequestHeaders = () => Promise<Pick<Headers, "get">>;
+
+const loadRequestHeaders: LoadRequestHeaders = headers;
+
 function parseRequestedRoute(value: string): RequestedRoute {
   try {
     if (!value.startsWith("/") || value.startsWith("//")) {
@@ -25,8 +29,8 @@ function parseRequestedRoute(value: string): RequestedRoute {
   }
 }
 
-async function getRequestedRoute() {
-  const reqHeaders = await headers();
+async function getRequestedRoute(loadHeaders: LoadRequestHeaders) {
+  const reqHeaders = await loadHeaders();
   const requestPath = reqHeaders.get("x-peated-request-path");
 
   if (!requestPath) {
@@ -36,14 +40,13 @@ async function getRequestedRoute() {
   return parseRequestedRoute(requestPath);
 }
 
-export async function getCanonicalRouteRedirectPath({
-  canonicalId,
-  collectionPath,
-  currentId,
-}: CanonicalRouteRedirectOptions) {
+export async function getCanonicalRouteRedirectPath(
+  { canonicalId, collectionPath, currentId }: CanonicalRouteRedirectOptions,
+  loadHeaders: LoadRequestHeaders = loadRequestHeaders,
+) {
   const currentPrefix = `${collectionPath}/${currentId}`;
   const canonicalPrefix = `${collectionPath}/${canonicalId}`;
-  const requestedRoute = await getRequestedRoute();
+  const requestedRoute = await getRequestedRoute(loadHeaders);
 
   if (!requestedRoute) {
     return `${canonicalPrefix}/`;
@@ -63,8 +66,9 @@ export async function getCanonicalRouteRedirectPath({
 
 export async function getReleaseFamilyRouteRedirectPath(
   representativeBottleId: number,
+  loadHeaders: LoadRequestHeaders = loadRequestHeaders,
 ) {
-  const requestedRoute = await getRequestedRoute();
+  const requestedRoute = await getRequestedRoute(loadHeaders);
   return getReleaseFamilyHref(
     representativeBottleId,
     requestedRoute?.search ?? "",

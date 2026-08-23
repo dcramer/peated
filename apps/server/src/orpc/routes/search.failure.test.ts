@@ -1,20 +1,20 @@
 import { createRouterClient } from "@orpc/server";
 import waitError from "@peated/server/lib/test/waitError";
-import search from "@peated/server/orpc/routes/search";
+import {
+  createSearchProcedure,
+  type SearchSourceClient,
+} from "@peated/server/orpc/routes/search";
 import { expect, test, vi } from "vitest";
 
-const bottleListMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@peated/server/orpc/router", () => ({
-  routerClient: {
-    bottles: { list: bottleListMock },
-    entities: { list: vi.fn() },
-    users: { list: vi.fn() },
-  },
-}));
+const bottleListMock = vi.fn<SearchSourceClient["searchBottles"]>();
+const sources: SearchSourceClient = {
+  searchBottles: bottleListMock,
+  searchEntities: vi.fn(),
+  searchUsers: vi.fn(),
+};
 
 const searchClient = createRouterClient(
-  { search },
+  { search: createSearchProcedure(sources) },
   { context: { user: null } },
 );
 

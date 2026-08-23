@@ -19,7 +19,7 @@ import {
   rejectBottleOperations,
   retryBottleOperation,
 } from "@peated/server/lib/bottleOperationModeration";
-import * as workerClient from "@peated/server/worker/client";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import mergeEntity from "@peated/server/worker/jobs/mergeEntity";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -68,11 +68,6 @@ async function waitForSessionToBlockOn(
     `Timed out waiting for session ${blockedPid} to block on session ${blockerPid}.`,
   );
 }
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-  pushUniqueJob: vi.fn(),
-}));
 
 function updateEntityProposal(
   entityId: number,
@@ -205,6 +200,7 @@ describe("Bottle operation moderation", () => {
       operations: [
         {
           ...operation,
+          // SAFETY: This test restores a retired proposal shape from stored JSON.
           proposal: {
             legacyOperation: "rename_entity",
             arguments: [entity.id, "Versioned After"],

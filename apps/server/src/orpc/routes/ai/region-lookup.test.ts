@@ -1,27 +1,32 @@
+import { createRouterClient } from "@orpc/server";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
-import * as generateRegionDetailsModule from "@peated/server/worker/jobs/generateRegionDetails";
+import type { Context } from "@peated/server/orpc/context";
+import {
+  createRegionLookupProcedure,
+  type RegionDetailsGenerator,
+} from "@peated/server/orpc/routes/ai/region-lookup";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock the getGeneratedRegionDetails function
-vi.mock("@peated/server/worker/jobs/generateRegionDetails", () => ({
-  default: vi.fn(),
-  getGeneratedRegionDetails: vi.fn(),
-}));
+const generateRegionDetails = vi.fn<RegionDetailsGenerator>();
+
+function createRegionLookupClient(config: { context: Context }) {
+  return createRouterClient(
+    { regionLookup: createRegionLookupProcedure(generateRegionDetails) },
+    config,
+  );
+}
 
 describe("POST /ai/region-lookup", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(
-      generateRegionDetailsModule.getGeneratedRegionDetails,
-    ).mockResolvedValue({
+    generateRegionDetails.mockResolvedValue({
       description: "This is a generated description for a region.",
     });
   });
 
   test("requires authentication", async () => {
     const err = await waitError(() =>
-      routerClient.ai.regionLookup({
+      createRegionLookupClient({ context: { user: null } }).regionLookup({
         country: 1,
       }),
     );
@@ -32,12 +37,9 @@ describe("POST /ai/region-lookup", () => {
     const user = await fixtures.User();
 
     const err = await waitError(() =>
-      routerClient.ai.regionLookup(
-        {
-          country: 1,
-        },
-        { context: { user } },
-      ),
+      createRegionLookupClient({ context: { user } }).regionLookup({
+        country: 1,
+      }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -46,12 +48,9 @@ describe("POST /ai/region-lookup", () => {
     const user = await fixtures.User({ mod: true });
 
     const err = await waitError(() =>
-      routerClient.ai.regionLookup(
-        {
-          country: 999999, // non-existent country
-        },
-        { context: { user } },
-      ),
+      createRegionLookupClient({ context: { user } }).regionLookup({
+        country: 999999, // non-existent country
+      }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Cannot find country]`);
   });
@@ -60,13 +59,12 @@ describe("POST /ai/region-lookup", () => {
     const user = await fixtures.User({ mod: true });
     const country = await fixtures.Country({ name: "Scotland" });
 
-    const result = await routerClient.ai.regionLookup(
-      {
-        country: country.id,
-        name: "Highlands",
-      },
-      { context: { user } },
-    );
+    const result = await createRegionLookupClient({
+      context: { user },
+    }).regionLookup({
+      country: country.id,
+      name: "Highlands",
+    });
 
     expect(result).toMatchInlineSnapshot(`
       {
@@ -74,9 +72,7 @@ describe("POST /ai/region-lookup", () => {
       }
     `);
 
-    expect(
-      generateRegionDetailsModule.getGeneratedRegionDetails,
-    ).toHaveBeenCalledWith({
+    expect(generateRegionDetails).toHaveBeenCalledWith({
       country,
       name: "Highlands",
     });

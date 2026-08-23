@@ -1,5 +1,6 @@
 import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
+import type { JsonValue } from "../types";
 import type {
   ScrapePricesCallback,
   ScrapePricesPageResult,
@@ -9,9 +10,9 @@ import { getUrl } from "./scraper";
 
 export const ShopifyCatalogSchema = z
   .object({
-    products: z.array(z.unknown()),
+    products: z.array(z.json()),
   })
-  .passthrough();
+  .catchall(z.json());
 
 export const ShopifyVariantSchema = z
   .object({
@@ -22,13 +23,13 @@ export const ShopifyVariantSchema = z
     barcode: z.string().trim().min(1).nullish(),
     price: z.string(),
   })
-  .passthrough();
+  .catchall(z.json());
 
 export const ShopifyImageSchema = z
   .object({
     src: z.string().url(),
   })
-  .passthrough();
+  .catchall(z.json());
 
 export const ShopifyProductSchema = z
   .object({
@@ -37,27 +38,26 @@ export const ShopifyProductSchema = z
       .optional(),
     title: z.string().trim().min(1),
     handle: z.string().trim().min(1),
-    images: z.array(z.unknown()),
+    images: z.array(z.json()),
     variants: z.array(ShopifyVariantSchema),
   })
-  .passthrough();
+  .catchall(z.json());
 
 export function getShopifyStorePriceIdentity(
   product: Pick<z.infer<typeof ShopifyProductSchema>, "id">,
   variant: Pick<z.infer<typeof ShopifyVariantSchema>, "barcode">,
 ) {
   const barcode = GtinSchema.safeParse(variant.barcode);
-  return {
-    ...(product.id !== undefined
-      ? { externalProductId: String(product.id) }
-      : {}),
-    ...(barcode.success ? { barcode: barcode.data } : {}),
-  };
+  const identity: Partial<Pick<StorePrice, "externalProductId" | "barcode">> =
+    {};
+  if (product.id !== undefined) identity.externalProductId = String(product.id);
+  if (barcode.success) identity.barcode = barcode.data;
+  return identity;
 }
 
-export function getShopifyProductTitle(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("title" in input)) return null;
-  return typeof input.title === "string" ? input.title : null;
+export function getShopifyProductTitle(input: JsonValue): string | null {
+  const parsed = z.object({ title: z.string() }).safeParse(input);
+  return parsed.success ? parsed.data.title : null;
 }
 
 export function parseShopifyPrice(value: string): number | null {
@@ -71,7 +71,7 @@ export function parseShopifyPrice(value: string): number | null {
 }
 
 export function getShopifyImageUrl(
-  value: unknown,
+  value: JsonValue,
   storeHostnames: string[],
 ): string | null {
   const result = ShopifyImageSchema.safeParse(value);
@@ -89,7 +89,7 @@ export function getShopifyImageUrl(
 export async function scrapeShopifyProducts(
   url: string,
   cb: ScrapePricesCallback,
-  parseProducts: (input: unknown, sourceUrl: string) => StorePrice[],
+  parseProducts: (input: JsonValue, sourceUrl: string) => StorePrice[],
 ): Promise<ScrapePricesPageResult> {
   const data = await getUrl(url);
   const catalog = ShopifyCatalogSchema.parse(JSON.parse(data));

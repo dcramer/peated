@@ -19,6 +19,7 @@ import {
   getBottleExactIdentity,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
+import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
 import {
   EntityMergeOperationExecutionError,
   loadEntityMergeOperation,
@@ -47,6 +48,7 @@ import {
   isOperationEntityMergeJobInput,
 } from "@peated/server/worker/entityMerge";
 import { and, asc, eq, inArray, notInArray, or, sql } from "drizzle-orm";
+import type { JobPayload } from "../types";
 
 function replaceMergedEntityIds(
   ids: readonly number[],
@@ -62,7 +64,7 @@ function replaceMergedEntityIds(
 type EntityRole = (typeof entities.$inferSelect)["type"][number];
 
 function sortedUniqueEntityRoles(roleSets: readonly EntityRole[][]) {
-  return Array.from(new Set(roleSets.flat())).sort() as EntityRole[];
+  return Array.from(new Set<EntityRole>(roleSets.flat())).sort();
 }
 
 function buildOperationResult(
@@ -505,6 +507,12 @@ async function performEntityMerge({
       if (selectedBottleId === null) {
         throw new Error(`BottleGroup ${groupId} has no representative Bottle.`);
       }
+      const input: SystemBottlePatch = {
+        brand: brandChanges ? toEntityId : group.brandId,
+      };
+      if (bottlerChanges) input.bottler = toEntityId;
+      if (distillersChange) input.distillers = nextDistillerIds;
+      if (seriesInput !== undefined) input.series = seriesInput;
       bottleUpdateManifests.push(
         await updateBottleInTransaction(tx, {
           bottleId: selectedBottleId,
@@ -513,12 +521,7 @@ async function performEntityMerge({
             distillerIds: groupDistillers.map(({ distillerId }) => distillerId),
             series: currentSeries,
           }),
-          input: {
-            brand: brandChanges ? toEntityId : group.brandId,
-            ...(bottlerChanges ? { bottler: toEntityId } : {}),
-            ...(distillersChange ? { distillers: nextDistillerIds } : {}),
-            ...(seriesInput !== undefined ? { series: seriesInput } : {}),
-          },
+          input,
           actorId: actor.id,
           creationSource: "repair_workflow",
         }),
@@ -579,6 +582,30 @@ async function performEntityMerge({
         .select({ id: entities.id, name: entities.name })
         .from(entities)
         .where(inArray(entities.id, fromEntityIds));
+      type DestinationEntityMergeChangeData = {
+        operationId: number;
+        updateScope: "entity_merge";
+        sourceEntityIds: number[];
+        destinationRoles: typeof destinationRolesAfter;
+        roleChange?: {
+          before: typeof destinationRolesBefore;
+          after: typeof destinationRolesAfter;
+        };
+        execution: { kind: "worker"; name: "MergeEntity" };
+      };
+      const destinationChangeData: DestinationEntityMergeChangeData = {
+        operationId: operation.operationId,
+        updateScope: "entity_merge",
+        sourceEntityIds: fromEntityIds,
+        destinationRoles: destinationRolesAfter,
+        execution: { kind: "worker", name: "MergeEntity" },
+      };
+      if (destinationRolesChanged) {
+        destinationChangeData.roleChange = {
+          before: destinationRolesBefore,
+          after: destinationRolesAfter,
+        };
+      }
       await tx.insert(changes).values([
         ...sourceEntities.map((sourceEntity) => ({
           objectType: "entity" as const,
@@ -602,24 +629,7 @@ async function performEntityMerge({
           actorId: actor.id,
           displayName: toEntity.name,
           type: "update" as const,
-          data: {
-            operationId: operation.operationId,
-            updateScope: "entity_merge",
-            sourceEntityIds: fromEntityIds,
-            destinationRoles: destinationRolesAfter,
-            ...(destinationRolesChanged
-              ? {
-                  roleChange: {
-                    before: destinationRolesBefore,
-                    after: destinationRolesAfter,
-                  },
-                }
-              : {}),
-            execution: {
-              kind: "worker",
-              name: "MergeEntity",
-            },
-          },
+          data: destinationChangeData,
         },
       ]);
     }
@@ -690,7 +700,7 @@ async function performEntityMerge({
   return completedOperationResult;
 }
 
-export default async function mergeEntity(rawInput: unknown) {
+export default async function mergeEntity(rawInput: JobPayload) {
   const input = EntityMergeJobInputSchema.parse(rawInput);
   if (!isOperationEntityMergeJobInput(input)) {
     return await performEntityMerge({

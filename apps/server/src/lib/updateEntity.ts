@@ -26,25 +26,23 @@ import {
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateBottle";
-import { EntityInputSchema } from "@peated/server/schemas";
+import { EntityInputFields } from "@peated/server/schemas/entities";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { asc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export const EntityUpdateInputSchema = z.object({
-  name: EntityInputSchema.shape.name.optional(),
-  shortName: EntityInputSchema.shape.shortName.removeDefault().optional(),
-  type: EntityInputSchema.shape.type.removeDefault().optional(),
-  description: EntityInputSchema.shape.description.removeDefault().optional(),
-  descriptionSrc: EntityInputSchema.shape.descriptionSrc.optional(),
-  yearEstablished: EntityInputSchema.shape.yearEstablished
-    .removeDefault()
-    .optional(),
-  website: EntityInputSchema.shape.website.removeDefault().optional(),
-  country: EntityInputSchema.shape.country.removeDefault().optional(),
-  region: EntityInputSchema.shape.region.removeDefault().optional(),
-  address: EntityInputSchema.shape.address.removeDefault().optional(),
-  location: EntityInputSchema.shape.location.removeDefault().optional(),
+  name: EntityInputFields.name.optional(),
+  shortName: EntityInputFields.shortName.removeDefault().optional(),
+  type: EntityInputFields.type.removeDefault().optional(),
+  description: EntityInputFields.description.removeDefault().optional(),
+  descriptionSrc: EntityInputFields.descriptionSrc.optional(),
+  yearEstablished: EntityInputFields.yearEstablished.removeDefault().optional(),
+  website: EntityInputFields.website.removeDefault().optional(),
+  country: EntityInputFields.country.removeDefault().optional(),
+  region: EntityInputFields.region.removeDefault().optional(),
+  address: EntityInputFields.address.removeDefault().optional(),
+  location: EntityInputFields.location.removeDefault().optional(),
 });
 
 export type EntityUpdateInput = z.infer<typeof EntityUpdateInputSchema>;
@@ -101,16 +99,10 @@ type EntityUpdateData = Partial<
   >
 >;
 
-function isEntityNameConflict(error: unknown): boolean {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "23505" &&
-    "constraint" in error &&
-    error.constraint === "entity_name_unq"
-  );
-}
+const EntityNameConflictSchema = z.object({
+  code: z.literal("23505"),
+  constraint: z.literal("entity_name_unq"),
+});
 
 export type EntityUpdateFinalizationManifest = {
   entity: Entity;
@@ -175,6 +167,7 @@ export async function updateEntityInTransaction(
     if (
       Object.entries(expectedState.fields).some(
         ([field, expected]) =>
+          // SAFETY: EntityUpdateExpectedState only permits keys from currentFields.
           JSON.stringify(currentFields[field as keyof typeof currentFields]) !==
           JSON.stringify(expected),
       )
@@ -306,7 +299,7 @@ export async function updateEntityInTransaction(
       .where(eq(entities.id, entity.id))
       .returning();
   } catch (error) {
-    if (isEntityNameConflict(error)) {
+    if (EntityNameConflictSchema.safeParse(error).success) {
       throw new EntityUpdateConflictError("Entity with name already exists.", {
         cause: error,
       });

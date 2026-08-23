@@ -13,6 +13,7 @@ import {
   ShopifyProductSchema,
   ShopifyVariantSchema,
 } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "missionliquor";
@@ -32,7 +33,7 @@ const ProductSchema = ShopifyProductSchema.extend({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   product_type: z.string().trim(),
   tags: z.array(z.string()),
-  images: z.array(z.unknown()).min(1),
+  images: z.array(z.json()).min(1),
   variants: z.array(VariantSchema),
 });
 
@@ -75,7 +76,7 @@ function getProductName(title: string): string | null {
   return normalizeBottle({ name: withoutTerminalVolume }).name;
 }
 
-export function parseMissionLiquorProducts(input: unknown): StorePrice[] {
+export function parseMissionLiquorProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

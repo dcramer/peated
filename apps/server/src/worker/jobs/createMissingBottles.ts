@@ -15,11 +15,13 @@ import {
   getIncomingBottleDecisionFromResolutionSource,
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
+  type IncomingBottleDecisionMetadata,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 const InputSchema = z
   .object({
@@ -27,7 +29,16 @@ const InputSchema = z
   })
   .strict();
 
-export default async function createMissingBottles(rawInput?: unknown) {
+export type CreateMissingBottlesServices = {
+  classifyReference: NonNullable<
+    Parameters<typeof resolveScrapedBottleReferenceTarget>[1]
+  >;
+};
+
+export async function createMissingBottles(
+  rawInput?: JobPayload,
+  services?: CreateMissingBottlesServices,
+) {
   const { articleId } = InputSchema.parse(rawInput ?? {});
   const systemActor = await getPeatedSystemActor();
 
@@ -59,22 +70,25 @@ export default async function createMissingBottles(rawInput?: unknown) {
       cursor = review.id;
       const aliasKey = normalizeBottleAliasKey(review.name);
 
-      const resolution = await resolveScrapedBottleReferenceTarget({
-        reference: {
-          id: review.id,
-          externalSiteId: article.externalSiteId,
-          name: review.name,
-          url: article.canonicalUrl,
-          imageUrl: null,
-          currentBottleId: review.bottleId,
+      const resolution = await resolveScrapedBottleReferenceTarget(
+        {
+          reference: {
+            id: review.id,
+            externalSiteId: article.externalSiteId,
+            name: review.name,
+            url: article.canonicalUrl,
+            imageUrl: null,
+            currentBottleId: review.bottleId,
+          },
+          // Normalized fallback aliases can collapse exact identity detail before
+          // the classifier reviews the full reference title.
+          aliasLookupNames: [aliasKey, review.name],
+          extractedIdentity:
+            review.category === null ? null : { category: review.category },
+          createdByActorId: systemActor.id,
         },
-        // Normalized fallback aliases can collapse exact identity detail before
-        // the classifier reviews the full reference title.
-        aliasLookupNames: [aliasKey, review.name],
-        extractedIdentity:
-          review.category === null ? null : { category: review.category },
-        createdByActorId: systemActor.id,
-      });
+        services?.classifyReference,
+      );
 
       const resolvedAssignment = resolution.assignment;
       const bottleId = resolvedAssignment?.bottleId ?? null;
@@ -129,16 +143,19 @@ export default async function createMissingBottles(rawInput?: unknown) {
             );
           }
 
-          const aliasInput = {
+          const aliasInput: Omit<
+            Parameters<typeof assignBottleAliasInTransaction>[1],
+            "bottleId" | "sourceAliasIdentity"
+          > = {
             name: aliasKey,
             backfillNames: [review.name],
             externalSiteId: article.externalSiteId,
-            ...(resolution.source === "exact_alias"
-              ? {}
-              : { assignmentSource: "classifier_approved" as const }),
             assignedByActorId: systemActor.id,
             expectedReview: review,
           };
+          if (resolution.source !== "exact_alias") {
+            aliasInput.assignmentSource = "classifier_approved";
+          }
           const aliasAssignment = await assignBottleAliasInTransaction(tx, {
             bottleId,
             sourceAliasIdentity: resolution.sourceAliasIdentity,
@@ -153,6 +170,13 @@ export default async function createMissingBottles(rawInput?: unknown) {
               decision,
             })
           ) {
+            const metadata: IncomingBottleDecisionMetadata = {
+              resolutionSource: resolution.source,
+              issue: article.issue,
+            };
+            if (resolution.classifierEvidence) {
+              metadata.classifierEvidence = resolution.classifierEvidence;
+            }
             await recordIncomingBottleDecisionInTransaction(tx, {
               sourceKind: "review",
               sourceId: review.id,
@@ -166,15 +190,7 @@ export default async function createMissingBottles(rawInput?: unknown) {
               confidence: resolution.confidence,
               model: resolution.model,
               rationale: resolution.rationale,
-              metadata: {
-                resolutionSource: resolution.source,
-                ...(resolution.classifierEvidence
-                  ? {
-                      classifierEvidence: resolution.classifierEvidence,
-                    }
-                  : {}),
-                issue: article.issue,
-              },
+              metadata,
             });
           }
 
@@ -203,4 +219,8 @@ export default async function createMissingBottles(rawInput?: unknown) {
       });
     }
   }
+}
+
+export default async function createMissingBottlesJob(rawInput?: JobPayload) {
+  return await createMissingBottles(rawInput);
 }

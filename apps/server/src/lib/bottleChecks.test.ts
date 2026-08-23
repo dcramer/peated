@@ -1,4 +1,8 @@
-import type { Finding, ProposedOperation } from "@peated/bottle-classifier";
+import type { BottleClassificationArtifactsSchema } from "@peated/bottle-classifier";
+import {
+  type Finding,
+  type ProposedOperation,
+} from "@peated/bottle-classifier";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
@@ -22,6 +26,7 @@ import {
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+import type { z } from "zod";
 
 function updateBottleProposal(
   bottleId: number,
@@ -58,11 +63,11 @@ function auditCheckInput({
   operations = [],
   summary,
 }: {
-  artifacts?: Record<string, unknown>;
+  artifacts?: z.input<typeof BottleClassificationArtifactsSchema>;
   backgroundEventKey?: string;
   bottleId: number;
   findings?: Finding[];
-  operations?: Array<{ proposal: ProposedOperation } & Record<string, unknown>>;
+  operations?: Array<{ proposal: ProposedOperation }>;
   origin?: "moderator" | "post_user_creation";
   summary: string;
 }) {
@@ -901,8 +906,13 @@ describe("Bottle check persistence", () => {
     });
     const persisted = await getBottleCheckForReview(created.check.id);
     const completed = results.find(
-      ({ status }) => status === "fulfilled",
-    ) as PromiseFulfilledResult<Awaited<ReturnType<typeof closeBottleCheck>>>;
+      (
+        result,
+      ): result is PromiseFulfilledResult<
+        Awaited<ReturnType<typeof closeBottleCheck>>
+      > => result.status === "fulfilled",
+    );
+    if (!completed) throw new Error("Expected one completed close request");
     expect(persisted).toMatchObject({
       closedAt: completed.value.closedAt,
       closedById: completed.value.closedById,

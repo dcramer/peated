@@ -1,4 +1,5 @@
-import type { ProposedOperation } from "@peated/bottle-classifier";
+import type { BottleClassificationArtifactsSchema } from "@peated/bottle-classifier";
+import { type ProposedOperation } from "@peated/bottle-classifier";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
   bottleChecks,
@@ -9,6 +10,7 @@ import {
   type CreateBottleCheckResult,
 } from "@peated/server/lib/bottleChecks";
 import { eq } from "drizzle-orm";
+import type { z } from "zod";
 
 /**
  * Seeds a version 2 check that already owns catalog operations.
@@ -23,7 +25,7 @@ export async function createLegacyStorePriceReviewCheck({
   proposal,
   storePriceAttemptId,
 }: {
-  artifacts: Record<string, unknown>;
+  artifacts: z.input<typeof BottleClassificationArtifactsSchema>;
   bottleId: number;
   database?: AnyDatabase;
   price: { id: number; name: string };

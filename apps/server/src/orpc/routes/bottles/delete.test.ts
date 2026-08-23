@@ -79,7 +79,7 @@ describe("DELETE /bottles/:bottle", () => {
   test("deletes a grouped singleton and its group", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({ name: "Grouped Singleton" });
-    const groupId = bottle.groupId as number;
+    const groupId = bottle.groupId;
     await routerClient.bottles.delete(
       { bottle: bottle.id },
       { context: { user } },
@@ -106,7 +106,7 @@ describe("DELETE /bottles/:bottle", () => {
       brandId: series.brandId,
       seriesId: series.id,
     });
-    const groupId = representative.groupId as number;
+    const groupId = representative.groupId;
     const sibling = await fixtures.BottleGroupMember({
       groupId,
       edition: "Batch 2",

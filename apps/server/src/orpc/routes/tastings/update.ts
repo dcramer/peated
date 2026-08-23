@@ -8,10 +8,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
 import { validateTags } from "@peated/server/orpc/validators/tags";
-import {
-  TastingContentInputSchema,
-  TastingSchema,
-} from "@peated/server/schemas";
+import { TastingSchema, TastingUpdateFields } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
@@ -22,15 +19,7 @@ import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
 const InputSchema = z
   .object({
     tasting: z.coerce.number(),
-    notes: TastingContentInputSchema.shape.notes.removeDefault().optional(),
-    rating: TastingContentInputSchema.shape.rating.removeDefault().optional(),
-    servingStyle: TastingContentInputSchema.shape.servingStyle
-      .removeDefault()
-      .optional(),
-    color: TastingContentInputSchema.shape.color.removeDefault().optional(),
-    friends: TastingContentInputSchema.shape.friends.removeDefault().optional(),
-    tags: TastingContentInputSchema.shape.tags.removeDefault().optional(),
-    image: TastingContentInputSchema.shape.image.optional(),
+    ...TastingUpdateFields,
   })
   .strict();
 
@@ -164,7 +153,7 @@ export default procedure
             )[0]
           : currentTasting;
       } catch (error) {
-        if (isTastingIdentityConflict(error)) {
+        if (error instanceof Error && isTastingIdentityConflict(error)) {
           throw errors.CONFLICT({
             message: "Tasting already exists.",
             cause: error,

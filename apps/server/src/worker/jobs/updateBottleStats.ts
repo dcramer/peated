@@ -2,6 +2,7 @@ import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStats } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 import { queueBottleEntityStats } from "./queueBottleEntityStats";
 
 export const UpdateBottleStatsJobArgsSchema = z
@@ -14,7 +15,9 @@ export type UpdateBottleStatsJobArgs = z.infer<
 >;
 
 /** Recompute one Bottle, its current group, and its Bottle-owned entities. */
-export default async function updateBottleStats(input: unknown): Promise<void> {
+export default async function updateBottleStats(
+  input: JobPayload,
+): Promise<void> {
   const { bottleId } = UpdateBottleStatsJobArgsSchema.parse(input);
 
   try {

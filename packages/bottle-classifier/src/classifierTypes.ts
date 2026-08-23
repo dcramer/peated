@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// SAFETY: Array.map preserves the tuple order and returns each literal id unchanged.
 const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>
   arr.map((s) => s.id) as {
     [K in keyof T]: T[K] extends { id: infer U } ? U : never;
@@ -276,68 +277,177 @@ export const ProposedSeriesChoiceSchema = z
   })
   .strict();
 
-export const ProposedBottleSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1)
-      .describe(
-        "Stable marketed expression relative to the Brand. Omit the Brand prefix and exact traits represented by other fields. When no separate expression is marketed, use the source-supported product or style phrase. Do not repeat the Brand, copy a retailer title, or invent an expression.",
-      ),
-    series: ProposedSeriesChoiceSchema.nullable().default(null),
-    category: CategoryEnum.nullable().default(null),
-    edition: z.string().trim().nullable().default(null),
-    statedAge: z.number().int().min(0).max(100).nullable().default(null),
-    caskStrength: z.boolean().nullable().default(null),
-    singleCask: z.boolean().nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
-    abv: z.number().min(0).max(100).nullable().default(null),
-    vintageYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(CURRENT_YEAR)
-      .nullable()
-      .default(null),
-    releaseYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(CURRENT_YEAR)
-      .nullable()
-      .default(null),
-    brand: ProposedEntityChoiceSchema,
-    distillers: z.array(ProposedEntityChoiceSchema).default([]),
-    bottler: ProposedEntityChoiceSchema.nullable().default(null),
-  })
-  .strict();
+export const ProposedBottleFields = {
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .describe(
+      "Stable marketed expression relative to the Brand. Omit the Brand prefix and exact traits represented by other fields. When no separate expression is marketed, use the source-supported product or style phrase. Do not repeat the Brand, copy a retailer title, or invent an expression.",
+    ),
+  series: ProposedSeriesChoiceSchema.nullable().default(null),
+  category: CategoryEnum.nullable().default(null),
+  edition: z.string().trim().nullable().default(null),
+  statedAge: z.number().int().min(0).max(100).nullable().default(null),
+  caskStrength: z.boolean().nullable().default(null),
+  singleCask: z.boolean().nullable().default(null),
+  caskType: CaskTypeEnum.nullable().default(null),
+  caskSize: CaskSizeEnum.nullable().default(null),
+  caskFill: CaskFillEnum.nullable().default(null),
+  abv: z.number().min(0).max(100).nullable().default(null),
+  vintageYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(CURRENT_YEAR)
+    .nullable()
+    .default(null),
+  releaseYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(CURRENT_YEAR)
+    .nullable()
+    .default(null),
+  brand: ProposedEntityChoiceSchema,
+  distillers: z.array(ProposedEntityChoiceSchema).default([]),
+  bottler: ProposedEntityChoiceSchema.nullable().default(null),
+} as const;
+
+export const ProposedBottleSchema = z.object(ProposedBottleFields).strict();
 
 export const MAX_BOTTLE_CANDIDATES = 25;
 
 export const BottleCandidateSearchInputSchema = z
   .object({
-    query: z.string().trim().nullable().default(null),
-    brand: z.string().trim().nullable().default(null),
-    bottler: z.string().trim().nullable().default(null),
-    expression: z.string().trim().nullable().default(null),
-    series: z.string().trim().nullable().default(null),
-    distillery: z.array(z.string().trim()).default([]),
-    category: z.enum(CATEGORY_LIST).nullable().default(null),
-    stated_age: z.number().nullable().default(null),
-    abv: z.number().nullable().default(null),
-    cask_strength: z.boolean().nullable().default(null),
-    single_cask: z.boolean().nullable().default(null),
-    cask_type: CaskTypeEnum.nullable().default(null),
-    cask_size: CaskSizeEnum.nullable().default(null),
-    cask_fill: CaskFillEnum.nullable().default(null),
-    edition: z.string().trim().nullable().default(null),
-    vintage_year: z.number().int().nullable().default(null),
-    release_year: z.number().int().nullable().default(null),
-    currentBottleId: z.number().nullable().default(null),
-    limit: z.number().int().min(1).max(MAX_BOTTLE_CANDIDATES).default(15),
+    query: z
+      .string()
+      .trim()
+      .nullable()
+      .default(null)
+      .describe(
+        "Bottle search text. Exclude volume, pack-size, gift-set, and price noise.",
+      ),
+    brand: z
+      .string()
+      .trim()
+      .nullable()
+      .default(null)
+      .describe(
+        "Most prominent consumer-facing brand on the label. For independent bottlings, this is usually the bottler label, not the distillery.",
+      ),
+    bottler: z
+      .string()
+      .trim()
+      .nullable()
+      .default(null)
+      .describe(
+        "Named market-facing bottler or release imprint for this product. It may equal the brand or a distillery; leave null when product-specific evidence does not establish the role.",
+      ),
+    expression: z
+      .string()
+      .trim()
+      .nullable()
+      .default(null)
+      .describe(
+        "Core release name after removing brand, age, ABV, and generic style words.",
+      ),
+    series: z
+      .string()
+      .trim()
+      .nullable()
+      .default(null)
+      .describe(
+        "Stable range or family name such as Private Selection or Distillers Edition. Do not use for one-off batch codes.",
+      ),
+    distillery: z
+      .array(z.string().trim())
+      .default([])
+      .describe(
+        "Producing distillery or distilleries when known. Use an empty array when unknown.",
+      ),
+    category: z
+      .enum(CATEGORY_LIST)
+      .nullable()
+      .default(null)
+      .describe(
+        "Normalized whisky category when known. Leave null instead of guessing.",
+      ),
+    stated_age: z
+      .number()
+      .nullable()
+      .default(null)
+      .describe("Age statement in years."),
+    abv: z
+      .number()
+      .nullable()
+      .default(null)
+      .describe(
+        "Alcohol by volume percentage as a number, for example 59.2. If the source gives proof, convert it to ABV first.",
+      ),
+    cask_strength: z
+      .boolean()
+      .nullable()
+      .default(null)
+      .describe(
+        "True only when the reference explicitly says cask strength, barrel strength, barrel proof, full proof, or natural strength.",
+      ),
+    single_cask: z
+      .boolean()
+      .nullable()
+      .default(null)
+      .describe(
+        "True only when the reference explicitly says single cask, single barrel, or a specific cask selection.",
+      ),
+    cask_type: CaskTypeEnum.nullable()
+      .default(null)
+      .describe(
+        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
+      ),
+    cask_size: CaskSizeEnum.nullable()
+      .default(null)
+      .describe(
+        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
+      ),
+    cask_fill: CaskFillEnum.nullable()
+      .default(null)
+      .describe(
+        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
+      ),
+    edition: z
+      .string()
+      .trim()
+      .nullable()
+      .default(null)
+      .describe(
+        "Batch label, store-pick code, release code, or numbered edition.",
+      ),
+    vintage_year: z
+      .number()
+      .int()
+      .nullable()
+      .default(null)
+      .describe("Distillation year when explicitly stated."),
+    release_year: z
+      .number()
+      .int()
+      .nullable()
+      .default(null)
+      .describe("Bottling or release year when explicitly stated."),
+    currentBottleId: z
+      .number()
+      .nullable()
+      .default(null)
+      .describe(
+        "Current assigned bottle id, if the reference is already attached to a bottle.",
+      ),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(MAX_BOTTLE_CANDIDATES)
+      .default(15)
+      .describe("Maximum number of candidates to return."),
   })
   .strict();
 
@@ -463,22 +573,26 @@ const AgentProposedBottleSchema = ProposedBottleSchema.extend({
   abv: z.number().nullable().default(null),
 });
 
+export const BottleClassifierActionSchema = z.enum([
+  "match",
+  "create_bottle",
+  "no_match",
+]);
+
 // Zod preserves this property order in the JSON schema sent to the model.
 // Evidence and rationale must precede the action and its target or draft.
 export const BottleClassifierAgentDecisionSchema = z
   .object({
     confidenceBasis: BottleConfidenceBasisSchema.nullable().default(null),
     rationale: z.string().nullable().default(null),
-    action: z
-      .enum(["match", "create_bottle", "no_match"])
-      .describe(
-        [
-          "Decision action.",
-          "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId.",
-          "create_bottle: no inspected existing Bottle represents the exact marketed product, including plausible malformed candidates; set proposedBottle only, including every marketed release trait needed to identify it.",
-          "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a separate Bottle Review before assignment is safe.",
-        ].join(" "),
-      ),
+    action: BottleClassifierActionSchema.describe(
+      [
+        "Decision action.",
+        "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId.",
+        "create_bottle: no inspected existing Bottle represents the exact marketed product, including plausible malformed candidates; set proposedBottle only, including every marketed release trait needed to identify it.",
+        "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a separate Bottle Review before assignment is safe.",
+      ].join(" "),
+    ),
     identityScope: BottleIdentityScopeEnum.nullable().default(null),
     aliasScope: AliasScopeEnum.nullable().default(null),
     observation: BottleObservationSchema.nullable().default(null),

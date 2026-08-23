@@ -24,7 +24,11 @@ import {
 } from "./http";
 import { ScraperRobotsDeniedError } from "./robots";
 import { createScraperSession, ScraperRunOwnershipError } from "./session";
-import type { ScraperRegistry, ScraperSourceDefinition } from "./types";
+import type {
+  ScraperRegistry,
+  ScraperRunPayload,
+  ScraperSourceDefinition,
+} from "./types";
 
 const RUN_EXECUTION_LEASE_MS = 60 * 60_000;
 const MAX_RUN_EXECUTION_ATTEMPTS = 10;
@@ -49,7 +53,7 @@ export type ScraperRunExecutionResult =
   | { status: "not_ready"; nextAttemptAt: Date }
   | { status: "deferred"; nextAttemptAt: Date };
 
-function safeRunError(error: unknown) {
+function safeRunError(error: Error) {
   if (error instanceof ScraperTargetDisabledError) return error.message;
   if (error instanceof z.ZodError) return "Scraper data failed validation.";
   if (error instanceof ScraperRobotsDeniedError) {
@@ -195,7 +199,7 @@ async function completeRun(claim: ClaimedRun, completedAt: Date) {
   });
 }
 
-async function failRun(claim: ClaimedRun, error: unknown, completedAt: Date) {
+async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
   await db.transaction(async (tx) => {
     const [failed] = await tx
       .update(externalSiteRuns)
@@ -261,7 +265,7 @@ async function deferRun(
 }
 
 export async function executeScraperRun(
-  input: unknown,
+  input: ScraperRunPayload,
   {
     registry,
     fetchImpl = fetch,
@@ -319,7 +323,11 @@ export async function executeScraperRun(
       const nextAttemptAt = await deferRun(claimed, error, clock.now());
       return { status: "deferred", nextAttemptAt };
     }
-    await failRun(claimed, error, clock.now());
+    await failRun(
+      claimed,
+      error instanceof Error ? error : new Error("Unexpected scraper failure."),
+      clock.now(),
+    );
     throw error;
   }
 }

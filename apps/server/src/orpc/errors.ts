@@ -1,6 +1,8 @@
 import { ORPCError } from "@orpc/server";
 
-type ConflictMatch = { id: any } & Record<string, any>;
+interface ConflictMatch {
+  id: number;
+}
 
 export class ConflictError extends ORPCError<
   "CONFLICT",

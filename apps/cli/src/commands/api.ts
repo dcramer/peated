@@ -1,7 +1,11 @@
 import program from "@peated/cli/program";
 import { readFile } from "node:fs/promises";
 import { createInterface } from "node:readline/promises";
-import { requestPeatedApi } from "../api/client";
+import {
+  PeatedApiValueSchema,
+  requestPeatedApi,
+  type PeatedApiValue,
+} from "../api/client";
 import {
   credentialsExpired,
   loadCredentials,
@@ -24,12 +28,14 @@ async function requireCredentials(): Promise<Credentials> {
   return credentials;
 }
 
-async function readInput(path: string | undefined): Promise<unknown> {
+async function readInput(
+  path: string | undefined,
+): Promise<PeatedApiValue | undefined> {
   if (!path) return undefined;
 
   const contents = await readFile(path, "utf8");
   try {
-    return JSON.parse(contents) as unknown;
+    return PeatedApiValueSchema.parse(JSON.parse(contents));
   } catch {
     throw new Error(`Invalid JSON input file: ${path}`);
   }

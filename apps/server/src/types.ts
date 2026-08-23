@@ -169,8 +169,8 @@ export type BottlePreviewResult = {
   releaseYear?: number | null;
 };
 
-// blame theo for this monstrosity
 export const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>
+  // SAFETY: Array.map preserves the tuple order and returns each literal id unchanged.
   arr.map((s) => s.id) as {
     [K in keyof T]: T[K] extends { id: infer U } ? U : never;
   };

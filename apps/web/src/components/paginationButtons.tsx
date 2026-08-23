@@ -5,17 +5,37 @@ import { useSearchParams } from "next/navigation";
 import { buildQueryString } from "../lib/urls";
 import Button from "./button";
 
-export default function PaginationButtons({
-  rel,
-  cursorParam = "cursor",
-  ariaLabel = "Pagination",
-}: {
+type PaginationButtonsProps = {
   rel?: PagingRel | null;
   cursorParam?: string;
   ariaLabel?: string;
-}) {
-  const searchParams = useSearchParams();
+  searchParams?: URLSearchParams;
+};
 
+export default function PaginationButtons(props: PaginationButtonsProps) {
+  if (props.searchParams) {
+    return (
+      <PaginationButtonsContent {...props} searchParams={props.searchParams} />
+    );
+  }
+
+  return <NavigationPaginationButtons {...props} />;
+}
+
+function NavigationPaginationButtons(props: PaginationButtonsProps) {
+  return (
+    <PaginationButtonsContent {...props} searchParams={useSearchParams()} />
+  );
+}
+
+export function PaginationButtonsContent({
+  rel,
+  cursorParam = "cursor",
+  ariaLabel = "Pagination",
+  searchParams,
+}: Omit<PaginationButtonsProps, "searchParams"> & {
+  searchParams: URLSearchParams;
+}) {
   if (!rel || (!rel.prevCursor && !rel.nextCursor)) return null;
 
   return (

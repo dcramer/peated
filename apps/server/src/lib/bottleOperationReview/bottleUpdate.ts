@@ -27,7 +27,7 @@ import {
   bottleUpdateExpectedSharedState,
 } from "@peated/server/lib/updateBottle";
 import { and, asc, count, eq, isNotNull, sql } from "drizzle-orm";
-import type { z } from "zod";
+import { z } from "zod";
 import {
   MAX_OPERATION_PREVIEW_IDS,
   PreparedBottleUpdateDataSchema,
@@ -57,9 +57,11 @@ import {
   type PreparedOperationExecution,
 } from "./shared";
 
+type BottlePatchInput = z.input<typeof BottlePatchSchema>;
+
 type ResolvedEntityChoice = {
   preview: z.infer<typeof EntityChoicePreviewSchema>;
-  canonical: number | Record<string, unknown>;
+  canonical: NonNullable<BottlePatchInput["brand"]>;
   dependency: {
     entityId: number;
     name: string;
@@ -67,6 +69,10 @@ type ResolvedEntityChoice = {
     roles: Entity["type"];
   } | null;
 };
+
+type BottleUpdateStateToken = z.infer<
+  typeof PreparedBottleUpdateDataSchema
+>["stateToken"];
 
 async function resolveEntityChoice({
   choice,
@@ -84,7 +90,7 @@ async function resolveEntityChoice({
       entityId: current.entity.id,
       name: current.entity.name,
       shortName: current.entity.shortName,
-      roles: [...current.entity.type].sort() as Entity["type"],
+      roles: sortedRoles(current.entity.type),
     };
     return {
       preview: existingEntityChoice(current.entity),
@@ -148,8 +154,9 @@ async function resolveEntityChoice({
 }
 
 function resolvedEntityChoiceKey(choice: ResolvedEntityChoice): string {
-  if (typeof choice.canonical === "number") {
-    return `existing:${choice.canonical}`;
+  const existingId = z.number().safeParse(choice.canonical);
+  if (existingId.success) {
+    return `existing:${existingId.data}`;
   }
   return `create:${JSON.stringify(choice.canonical)}`;
 }
@@ -162,14 +169,13 @@ function normalizeResolvedEntityChoices(
       choices.map((choice) => [resolvedEntityChoiceKey(choice), choice]),
     ).values(),
   ).sort((left, right) => {
-    if (
-      typeof left.canonical === "number" &&
-      typeof right.canonical === "number"
-    ) {
-      return left.canonical - right.canonical;
+    const leftId = z.number().safeParse(left.canonical);
+    const rightId = z.number().safeParse(right.canonical);
+    if (leftId.success && rightId.success) {
+      return leftId.data - rightId.data;
     }
-    if (typeof left.canonical === "number") return -1;
-    if (typeof right.canonical === "number") return 1;
+    if (leftId.success) return -1;
+    if (rightId.success) return 1;
     return resolvedEntityChoiceKey(left).localeCompare(
       resolvedEntityChoiceKey(right),
     );
@@ -260,7 +266,7 @@ function relevantBottleUpdateToken({
   }>;
   referencedSeries: BottleSeries[];
   relationshipDigest?: string;
-}) {
+}): BottleUpdateStateToken {
   const patchFields = Object.keys(proposal.input.patch);
   const requestedSharedFields = new Set(
     patchFields.filter((field) =>
@@ -297,6 +303,7 @@ function relevantBottleUpdateToken({
             default:
               return [
                 field,
+                // SAFETY: sharedFields contains only these three direct group fields after the explicit relationship cases above.
                 resource.group[field as "name" | "statedAge" | "category"],
               ];
           }
@@ -311,16 +318,15 @@ function relevantBottleUpdateToken({
     ? Object.fromEntries(
         exactFields.map((field) => [
           field,
+          // SAFETY: exactFields excludes every shared patch field, leaving only BottleExactIdentity keys.
           currentExact[field as keyof typeof currentExact],
         ]),
       )
     : undefined;
 
-  return {
+  const token: BottleUpdateStateToken = {
     bottleId: resource.bottle.id,
     groupId: resource.group.id,
-    ...(shared ? { shared } : {}),
-    ...(exact ? { exact } : {}),
     referencedEntities: Array.from(
       new Map(
         referencedEntities.map((entity) => [entity.entityId, entity]),
@@ -335,8 +341,11 @@ function relevantBottleUpdateToken({
         brandId: series.brandId,
         name: series.name,
       })),
-    ...(relatedMemberships ? { relationshipDigest: relatedMemberships } : {}),
   };
+  if (shared) token.shared = shared;
+  if (exact) token.exact = exact;
+  if (relatedMemberships) token.relationshipDigest = relatedMemberships;
+  return token;
 }
 
 async function requireNoBottleIdentityCollision({
@@ -409,7 +418,7 @@ export async function prepareBottleUpdate(
 
   let brand: ResolvedEntityChoice = {
     preview: before.shared.brand,
-    canonical: resource.group.brandId as number | Record<string, unknown>,
+    canonical: resource.group.brandId,
     dependency: {
       entityId: resource.brand.id,
       name: resource.brand.name,
@@ -528,8 +537,8 @@ export async function prepareBottleUpdate(
         fail("resource_not_found", `BottleSeries ${seriesId} does not exist.`);
       }
       referencedSeries.push(series);
-      const brandId =
-        typeof brand.canonical === "number" ? brand.canonical : null;
+      const parsedBrandId = z.number().safeParse(brand.canonical);
+      const brandId = parsedBrandId.success ? parsedBrandId.data : null;
       if (brandId !== null && series.brandId !== brandId) {
         fail(
           "invalid_current_state",
@@ -552,21 +561,20 @@ export async function prepareBottleUpdate(
     distillers: _distillers,
     ...plainPatch
   } = proposal.input.patch;
-  const canonicalInput: BottlePatch = BottlePatchSchema.parse({
-    ...plainPatch,
-    ...(proposal.input.patch.seriesId !== undefined
-      ? { series: seriesId }
-      : {}),
-    ...(proposal.input.patch.brand !== undefined
-      ? { brand: brand.canonical }
-      : {}),
-    ...(proposal.input.patch.bottler !== undefined
-      ? { bottler: bottler.canonical }
-      : {}),
-    ...(proposal.input.patch.distillers !== undefined
-      ? { distillers: distillers.map(({ canonical }) => canonical) }
-      : {}),
-  });
+  const canonicalPatch: BottlePatchInput = { ...plainPatch };
+  if (proposal.input.patch.seriesId !== undefined) {
+    canonicalPatch.series = seriesId;
+  }
+  if (proposal.input.patch.brand !== undefined) {
+    canonicalPatch.brand = brand.canonical;
+  }
+  if (proposal.input.patch.bottler !== undefined) {
+    canonicalPatch.bottler = bottler.canonical;
+  }
+  if (proposal.input.patch.distillers !== undefined) {
+    canonicalPatch.distillers = distillers.map(({ canonical }) => canonical);
+  }
+  const canonicalInput = BottlePatchSchema.parse(canonicalPatch);
   const storage = bottleStoragePatch(canonicalInput, {
     bottleStatedAge: resource.bottle.statedAge,
     groupStatedAge: resource.group.statedAge,
@@ -729,6 +737,33 @@ export async function prepareBottleUpdate(
       : undefined,
   });
 
+  const canonicalExecution: Extract<
+    PreparedOperationExecution,
+    { type: "update_bottle" }
+  >["canonicalInput"] = {
+    bottleId: proposal.input.bottleId,
+    input: canonicalInput,
+    expectedSelectedBottleState: bottleUpdateExpectedSelectedBottleState(
+      resource.bottle,
+    ),
+  };
+  if (storage.shared) {
+    canonicalExecution.expectedSharedState = bottleUpdateExpectedSharedState({
+      group: resource.group,
+      distillerIds: resource.distillerIds,
+      referencedEntities: stateToken.referencedEntities.map(
+        ({ entityId: id, name, shortName, roles: type }) => ({
+          id,
+          name,
+          shortName,
+          type,
+        }),
+      ),
+      series: resource.series,
+      referencedSeries,
+    });
+  }
+
   return {
     type: proposal.type,
     review: PreparedBottleUpdateDataSchema.parse({
@@ -744,30 +779,6 @@ export async function prepareBottleUpdate(
       },
       stateToken,
     }),
-    canonicalInput: {
-      bottleId: proposal.input.bottleId,
-      input: canonicalInput,
-      expectedSelectedBottleState: bottleUpdateExpectedSelectedBottleState(
-        resource.bottle,
-      ),
-      ...(storage.shared
-        ? {
-            expectedSharedState: bottleUpdateExpectedSharedState({
-              group: resource.group,
-              distillerIds: resource.distillerIds,
-              referencedEntities: stateToken.referencedEntities.map(
-                ({ entityId: id, name, shortName, roles: type }) => ({
-                  id,
-                  name,
-                  shortName,
-                  type,
-                }),
-              ),
-              series: resource.series,
-              referencedSeries,
-            }),
-          }
-        : {}),
-    },
+    canonicalInput: canonicalExecution,
   };
 }

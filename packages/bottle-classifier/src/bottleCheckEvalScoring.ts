@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type {
   BottleOperationEntityChoice,
   EvidenceRef,
@@ -41,14 +42,18 @@ export type BottleCheckGroundingScore = {
   }>;
 };
 
-function canonicalize(value: unknown): unknown {
+const JsonValueSchema = z.json();
+type JsonValue = z.infer<typeof JsonValueSchema>;
+
+function canonicalize(value: JsonValue): JsonValue {
   if (Array.isArray(value)) {
     return value.map(canonicalize);
   }
 
-  if (value !== null && typeof value === "object") {
+  const objectValue = z.record(z.string(), JsonValueSchema).safeParse(value);
+  if (objectValue.success) {
     return Object.fromEntries(
-      Object.entries(value)
+      Object.entries(objectValue.data)
         .sort(([left], [right]) => left.localeCompare(right))
         .map(([key, nestedValue]) => [key, canonicalize(nestedValue)]),
     );
@@ -57,8 +62,8 @@ function canonicalize(value: unknown): unknown {
   return value;
 }
 
-function stableKey(value: unknown): string {
-  return JSON.stringify(canonicalize(value));
+function stableKey<T>(value: T): string {
+  return JSON.stringify(canonicalize(JsonValueSchema.parse(value)));
 }
 
 function scoreExactSet(

@@ -42,7 +42,7 @@ function filenameFromUploadUrl(imageUrl: string): string {
 function isPermanentUploadNamespace(
   namespace: string,
 ): namespace is (typeof PERMANENT_UPLOAD_NAMESPACES)[number] {
-  return (PERMANENT_UPLOAD_NAMESPACES as readonly string[]).includes(namespace);
+  return PERMANENT_UPLOAD_NAMESPACES.some((value) => value === namespace);
 }
 
 function isPendingUploadIdempotencyConflict(err: any) {

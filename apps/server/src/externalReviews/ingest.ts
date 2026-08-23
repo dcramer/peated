@@ -17,9 +17,25 @@ const InputSchema = ReviewArticleIngestionSchema.safeExtend({
   externalSiteId: z.number().int().positive(),
   fetchedAt: z.date(),
 });
+type ReviewArticleIngestionCandidate = Partial<z.input<typeof InputSchema>>;
+
+export interface ReviewIngestionServices {
+  generateSummary: typeof generateExternalReviewSummary;
+  queueMissingBottles: typeof pushUniqueJob;
+  reportError: typeof logTelemetryError;
+}
+
+const reviewIngestionServices: ReviewIngestionServices = {
+  generateSummary: generateExternalReviewSummary,
+  queueMissingBottles: pushUniqueJob,
+  reportError: logTelemetryError,
+};
 
 /** Stores the article before model-based Bottle resolution runs in a worker. */
-export async function ingestReviewArticle(rawInput: unknown) {
+export async function ingestReviewArticle(
+  rawInput: ReviewArticleIngestionCandidate,
+  services: ReviewIngestionServices = reviewIngestionServices,
+) {
   const input = InputSchema.parse(rawInput);
   const site = await db.query.externalSites.findFirst({
     columns: { id: true },
@@ -43,7 +59,7 @@ export async function ingestReviewArticle(rawInput: unknown) {
     const sourceText = input.reviewTexts[review.sourceKey];
     if (sourceText !== undefined) {
       try {
-        summary = await generateExternalReviewSummary({
+        summary = await services.generateSummary({
           externalSiteId: input.externalSiteId,
           sourceKey: review.sourceKey,
           bottleName: normalizedName,
@@ -51,7 +67,7 @@ export async function ingestReviewArticle(rawInput: unknown) {
           contentHash: input.article.contentHash,
         });
       } catch {
-        logTelemetryError("Unable to generate external review summary.", {
+        services.reportError("Unable to generate external review summary.", {
           extra: {
             review: {
               externalSiteId: input.externalSiteId,
@@ -78,7 +94,7 @@ export async function ingestReviewArticle(rawInput: unknown) {
 
   if (storedReviews.some((review) => review.bottleId === null)) {
     try {
-      await pushUniqueJob(
+      await services.queueMissingBottles(
         "CreateMissingBottles",
         { articleId: result.articleId },
         { removeOnComplete: true, removeOnFail: true },
@@ -86,7 +102,7 @@ export async function ingestReviewArticle(rawInput: unknown) {
     } catch (error) {
       // The stored reviews are durable and a later ingestion or maintenance run
       // can queue their Bottle resolution again.
-      logTelemetryError(error, {
+      services.reportError(error, {
         extra: {
           reviewArticleId: result.articleId,
           externalSiteId: input.externalSiteId,

@@ -11,6 +11,11 @@ import {
   type CatalogIdentitySerializerContext,
 } from "./catalogIdentity";
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 function context(
   actor: CatalogIdentitySerializerContext["actor"],
 ): CatalogIdentitySerializerContext {
@@ -50,13 +55,14 @@ describe("catalog identity serializers", () => {
       distillerIds: [distiller.id],
     });
     const actor = await getUserActor(defaults.user);
+    const groupId = requireGroupId(bottle.groupId);
 
     await db
       .update(bottleGroups)
       .set({ totalBottles: 1, representativeBottleId: bottle.id })
-      .where(eq(bottleGroups.id, bottle.groupId as number));
+      .where(eq(bottleGroups.id, groupId));
 
-    const group = await loadGroup(bottle.groupId as number);
+    const group = await loadGroup(groupId);
     const result = await serialize(
       BottleGroupSummarySerializer,
       group,
@@ -78,7 +84,7 @@ describe("catalog identity serializers", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const item = await loadGroup(bottle.groupId as number);
+    const item = await loadGroup(requireGroupId(bottle.groupId));
 
     await expect(serialize(BottleGroupSummarySerializer, item)).rejects.toThrow(
       "requires caller context",

@@ -1,29 +1,27 @@
+import { createRouterClient } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
-import { verifyPayload } from "@peated/server/lib/auth";
-import { verifyPasskeyRegistration } from "@peated/server/lib/passkey";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
+import {
+  createRecoveryPasskeyConfirmProcedure,
+  type RecoveryPasskeyServices,
+} from "@peated/server/orpc/routes/auth/recovery/confirm-passkey";
 import { createHash } from "crypto";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock auth and passkey functions
-vi.mock("@peated/server/lib/auth", async () => {
-  const actual = await vi.importActual("@peated/server/lib/auth");
-  return {
-    ...actual,
-    verifyPayload: vi.fn(),
-  };
-});
-
-vi.mock("@peated/server/lib/passkey", async () => {
-  const actual = await vi.importActual("@peated/server/lib/passkey");
-  return {
-    ...actual,
-    verifyPasskeyRegistration: vi.fn(),
-  };
-});
+const verifyPayload = vi.fn<RecoveryPasskeyServices["verifyToken"]>();
+const verifyPasskeyRegistration =
+  vi.fn<RecoveryPasskeyServices["verifyRegistration"]>();
+const confirmPasskeyClient = createRouterClient(
+  {
+    confirmPasskey: createRecoveryPasskeyConfirmProcedure({
+      verifyRegistration: verifyPasskeyRegistration,
+      verifyToken: verifyPayload,
+    }),
+  },
+  { context: { ip: "127.0.0.1", user: null } },
+);
 
 describe("POST /auth/recovery/passkey/confirm", () => {
   beforeEach(() => {
@@ -49,14 +47,14 @@ describe("POST /auth/recovery/passkey/confirm", () => {
       },
     };
 
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: user.id,
       email: user.email,
       digest,
       createdAt: new Date().toISOString(),
     });
 
-    vi.mocked(verifyPasskeyRegistration).mockResolvedValue({
+    verifyPasskeyRegistration.mockResolvedValue({
       verified: true,
       credential: {
         publicKey: new Uint8Array([1, 2, 3, 4]),
@@ -65,14 +63,11 @@ describe("POST /auth/recovery/passkey/confirm", () => {
       },
     });
 
-    const result = await routerClient.auth.recovery.confirmPasskey(
-      {
-        token: "valid-recovery-token",
-        passkeyResponse: mockResponse,
-        signedChallenge: "signed-challenge",
-      },
-      { context: { ip: "127.0.0.1" } },
-    );
+    const result = await confirmPasskeyClient.confirmPasskey({
+      token: "valid-recovery-token",
+      passkeyResponse: mockResponse,
+      signedChallenge: "signed-challenge",
+    });
 
     expect(result.user.id).toBe(user.id);
     expect(result.user.verified).toBe(true);
@@ -100,7 +95,7 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     const expiredDate = new Date();
     expiredDate.setMinutes(expiredDate.getMinutes() - 11); // 11 minutes ago
 
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: user.id,
       email: user.email,
       digest,
@@ -108,56 +103,50 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey(
-        {
-          token: "expired-token",
-          passkeyResponse: {
-            id: "test-id",
-            rawId: "test-id",
-            type: "public-key" as const,
-            clientExtensionResults: {},
-            response: {
-              clientDataJSON: "mock-client-data",
-              attestationObject: "mock-attestation",
-            },
+      confirmPasskeyClient.confirmPasskey({
+        token: "expired-token",
+        passkeyResponse: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
+          response: {
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
           },
-          signedChallenge: "signed-challenge",
         },
-        { context: { ip: "127.0.0.1" } },
-      ),
+        signedChallenge: "signed-challenge",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Token has expired.]`);
   });
 
   test("rejects invalid token", async ({ fixtures }) => {
-    vi.mocked(verifyPayload).mockRejectedValue(new Error("Invalid token"));
+    verifyPayload.mockRejectedValue(new Error("Invalid token"));
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey(
-        {
-          token: "invalid-token",
-          passkeyResponse: {
-            id: "test-id",
-            rawId: "test-id",
-            type: "public-key" as const,
-            clientExtensionResults: {},
-            response: {
-              clientDataJSON: "mock-client-data",
-              attestationObject: "mock-attestation",
-            },
+      confirmPasskeyClient.confirmPasskey({
+        token: "invalid-token",
+        passkeyResponse: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
+          response: {
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
           },
-          signedChallenge: "signed-challenge",
         },
-        { context: { ip: "127.0.0.1" } },
-      ),
+        signedChallenge: "signed-challenge",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
   });
 
   test("rejects user not found", async ({ fixtures }) => {
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: 99999,
       email: "nonexistent@example.com",
       digest: "mock-digest",
@@ -165,23 +154,20 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey(
-        {
-          token: "valid-token",
-          passkeyResponse: {
-            id: "test-id",
-            rawId: "test-id",
-            type: "public-key" as const,
-            clientExtensionResults: {},
-            response: {
-              clientDataJSON: "mock-client-data",
-              attestationObject: "mock-attestation",
-            },
+      confirmPasskeyClient.confirmPasskey({
+        token: "valid-token",
+        passkeyResponse: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
+          response: {
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
           },
-          signedChallenge: "signed-challenge",
         },
-        { context: { ip: "127.0.0.1" } },
-      ),
+        signedChallenge: "signed-challenge",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid verification token.]`);
@@ -207,14 +193,14 @@ describe("POST /auth/recovery/passkey/confirm", () => {
       },
     };
 
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: user.id,
       email: user.email,
       digest,
       createdAt: new Date().toISOString(),
     });
 
-    vi.mocked(verifyPasskeyRegistration).mockResolvedValue({
+    verifyPasskeyRegistration.mockResolvedValue({
       verified: true,
       credential: {
         publicKey: new Uint8Array([1, 2, 3, 4]),
@@ -224,14 +210,11 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.recovery.confirmPasskey(
-        {
-          token: "valid-token",
-          passkeyResponse: mockResponse,
-          signedChallenge: "signed-challenge",
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      confirmPasskeyClient.confirmPasskey({
+        token: "valid-token",
+        passkeyResponse: mockResponse,
+        signedChallenge: "signed-challenge",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(

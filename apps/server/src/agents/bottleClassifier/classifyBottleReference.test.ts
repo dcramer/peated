@@ -1,24 +1,16 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import {
   classifyBottleReference,
   runBottleReference,
 } from "./classifyBottleReference";
 
-vi.mock("./service", () => ({
-  classifyBottleReference: vi.fn(),
-  runBottleReference: vi.fn(),
-}));
+import type * as classifierService from "./service";
 
 describe("server bottleClassifier wrapper", () => {
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   test("delegates to the composed server service", async () => {
-    const { classifyBottleReference: classifyBottleReferenceInService } =
-      await import("./service");
-
-    vi.mocked(classifyBottleReferenceInService).mockResolvedValue({
+    const classifyBottleReferenceInService =
+      vi.fn<typeof classifierService.classifyBottleReference>();
+    classifyBottleReferenceInService.mockResolvedValue({
       status: "ignored",
       reason: "ignored",
       artifacts: {
@@ -37,15 +29,15 @@ describe("server bottleClassifier wrapper", () => {
       },
     };
 
-    await expect(classifyBottleReference(input)).resolves.toMatchObject({
-      status: "ignored",
-    });
+    await expect(
+      classifyBottleReference(input, classifyBottleReferenceInService),
+    ).resolves.toMatchObject({ status: "ignored" });
     expect(classifyBottleReferenceInService).toHaveBeenCalledWith(input);
   });
 
   test("preserves run metadata from the composed server service", async () => {
-    const { runBottleReference: runBottleReferenceInService } =
-      await import("./service");
+    const runBottleReferenceInService =
+      vi.fn<typeof classifierService.runBottleReference>();
     const run = {
       result: {
         status: "ignored" as const,
@@ -62,10 +54,12 @@ describe("server bottleClassifier wrapper", () => {
       },
       modelMetadata: null,
     };
-    vi.mocked(runBottleReferenceInService).mockResolvedValue(run);
+    runBottleReferenceInService.mockResolvedValue(run);
     const input = { reference: { name: "Wild Turkey Rare Breed Rye" } };
 
-    await expect(runBottleReference(input)).resolves.toBe(run);
+    await expect(
+      runBottleReference(input, runBottleReferenceInService),
+    ).resolves.toBe(run);
     expect(runBottleReferenceInService).toHaveBeenCalledWith(input);
   });
 });

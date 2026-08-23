@@ -6,17 +6,32 @@ import type { PhotoIdentification } from "./helpers";
 import { PhotoMatchCreateState } from "./states";
 
 function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
+  const timestamp = "2026-08-23T00:00:00.000Z";
   return {
     id: 42,
     fullName: "Springbank 12-year-old Cask Strength Batch 24",
     name: "12-year-old Cask Strength Batch 24",
-    group: {
-      id: 7,
-      name: "12-year-old Cask Strength",
-      fullName: "Springbank 12-year-old Cask Strength",
-      statedAge: 12,
+    group: undefined,
+    brand: {
+      id: 1,
+      name: "Springbank",
+      shortName: null,
+      type: ["brand"],
+      description: null,
+      descriptionSrc: null,
+      yearEstablished: null,
+      website: null,
+      country: null,
+      region: null,
+      address: null,
+      location: null,
+      totalTastings: 0,
+      totalBottles: 1,
+      createdAt: timestamp,
+      updatedAt: timestamp,
     },
-    brand: { id: 1, name: "Springbank" },
+    distillers: [],
+    bottler: null,
     series: null,
     edition: "Batch 24",
     category: "single_malt",
@@ -29,13 +44,74 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
     caskFill: null,
     caskType: null,
     caskSize: null,
+    description: null,
+    descriptionSrc: null,
+    imageUrl: null,
+    flavorProfile: null,
+    tastingNotes: null,
+    suggestedTags: [],
+    avgRating: null,
+    ratingStats: {
+      pass: 0,
+      sip: 0,
+      savor: 0,
+      total: 0,
+      avg: null,
+      percentage: { pass: 0, sip: 0, savor: 0 },
+    },
+    totalTastings: 0,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    isFavorite: false,
+    isLibrary: false,
+    hasTasted: false,
     ...overrides,
-  } as Bottle;
+  };
 }
 
-const result = {
-  imageEvidence: { fieldCandidates: {} },
-} as unknown as PhotoIdentification;
+const result: PhotoIdentification = {
+  pendingImage: {
+    id: "pending-test",
+    imageUrl: "https://example.com/test.jpg",
+    expiresAt: "2026-08-23T00:00:00.000Z",
+  },
+  imageEvidence: {
+    sourceImageId: "pending-test",
+    extractors: [
+      {
+        kind: "vision",
+        confidence: 1,
+        textSpans: [],
+        observations: [],
+      },
+    ],
+    fieldCandidates: {},
+    photoSuitability: {
+      isSingleBottlePhoto: true,
+      labelReadable: true,
+      suitableAsTastingImage: true,
+      suitableAsBottleImage: true,
+    },
+    conflicts: [],
+  },
+  classification: {
+    status: "ignored",
+    reason: "Test fixture",
+    artifacts: { candidates: [] },
+  },
+  suggestedNextStep: "manual_search",
+  diagnostics: {
+    extraction: { status: "empty", summary: null },
+    candidates: { count: 0 },
+    classification: {
+      status: "ignored",
+      action: null,
+      confidence: null,
+      reason: "Test fixture",
+    },
+  },
+  createToken: null,
+};
 
 function renderMatchedBottle(bottle: Bottle) {
   return renderToStaticMarkup(

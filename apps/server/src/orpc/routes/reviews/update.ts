@@ -80,12 +80,12 @@ export default procedure
       }
       const { article, review: lockedReview } = locked;
 
+      const update: Partial<typeof reviews.$inferInsert> = {};
+      if (hasBottleUpdate) update.bottleId = nextBottleId;
+      if (hasHiddenUpdate) update.hidden = hidden;
       const [review] = await tx
         .update(reviews)
-        .set({
-          ...(hasBottleUpdate ? { bottleId: nextBottleId } : {}),
-          ...(hasHiddenUpdate ? { hidden } : {}),
-        })
+        .set(update)
         .where(eq(reviews.id, reviewId))
         .returning();
       if (!review) {

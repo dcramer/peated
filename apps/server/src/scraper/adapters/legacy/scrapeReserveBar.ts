@@ -5,6 +5,7 @@ import slugify from "@sindresorhus/slugify";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { requestUrl } from "../../legacy/scraper";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "reservebar";
@@ -27,7 +28,7 @@ const CatalogResponseSchema = z.object({
     currentPage: z.number().int().positive(),
     totalPages: z.number().int().nonnegative(),
   }),
-  products: z.array(z.unknown()),
+  products: z.array(z.json()),
 });
 
 const ProductSchema = z
@@ -50,11 +51,11 @@ const ProductSchema = z
       )
       .min(1),
   })
-  .passthrough();
+  .catchall(z.json());
 
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("name" in input)) return null;
-  return typeof input.name === "string" ? input.name : null;
+function getRawName(input: JsonValue): string | null {
+  const parsed = z.object({ name: z.string() }).safeParse(input);
+  return parsed.success ? parsed.data.name : null;
 }
 
 function parseVolume(size: z.infer<typeof ProductSchema>["sizes"][number]) {
@@ -80,10 +81,12 @@ function getImageUrl(images: string[] | undefined): string | undefined {
   }
 }
 
-export function parseReserveBarProducts(input: unknown): {
+export interface ReserveBarProducts {
   products: StorePrice[];
   hasNextPage: boolean;
-} {
+}
+
+export function parseReserveBarProducts(input: JsonValue): ReserveBarProducts {
   const payload = CatalogResponseSchema.parse(input);
   const products: StorePrice[] = [];
 

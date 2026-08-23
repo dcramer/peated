@@ -117,6 +117,8 @@ function queueItem(overrides: Partial<QueueItem> = {}): QueueItem {
     price: {
       id: 12,
       name: "Springbank 12 Cask Strength Batch 24",
+      externalProductId: null,
+      barcode: null,
       price: 150,
       currency: "usd",
       volume: 750,
@@ -142,7 +144,7 @@ function queueItem(overrides: Partial<QueueItem> = {}): QueueItem {
     webEvidenceChecks: [],
     searchEvidence: [],
     ...overrides,
-  } as QueueItem;
+  } satisfies QueueItem;
 }
 
 describe("formatPriceMatchQueueLlmExport", () => {

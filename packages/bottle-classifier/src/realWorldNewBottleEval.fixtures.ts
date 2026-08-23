@@ -102,9 +102,11 @@ const elijahCraigBarrelProof = buildBottleCandidate({
   source: ["vector"],
 });
 
-const REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES: Partial<
-  Record<string, NewBottleEvalOverride>
-> = {
+interface NewBottleEvalOverrides {
+  [fixtureId: string]: NewBottleEvalOverride | undefined;
+}
+
+const REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES: NewBottleEvalOverrides = {
   "jura-12-brand-distillery": {
     input: {
       extractedIdentity: buildExtractedIdentity({
@@ -230,9 +232,7 @@ function loadFixtureFiles(): RealWorldNewBottleFixture[] {
   return listFixtureFiles(fixtureDir).map((filename) => {
     const rawFixture = JSON.parse(readFileSync(filename, "utf8"));
 
-    return realWorldNewBottleFixtureSchema.parse(
-      rawFixture,
-    ) as RealWorldNewBottleFixture;
+    return realWorldNewBottleFixtureSchema.parse(rawFixture);
   });
 }
 

@@ -91,7 +91,7 @@ export default async ({ regionId }: { regionId: number }) => {
   if (!result) {
     throw new Error(`Failed to generate details for region: ${regionId}`);
   }
-  const data: Record<string, any> = {};
+  const data: Partial<typeof regions.$inferInsert> = {};
   if (
     generateDesc &&
     result.description &&

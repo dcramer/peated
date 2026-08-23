@@ -2,25 +2,23 @@
  * Runtime contracts for Bottle creation and moderator patching. Patch
  * schemas preserve omitted fields so service code can distinguish them from null.
  */
-import { BottleInputSchema } from "@peated/server/schemas";
+import { BottleInputFields } from "@peated/server/schemas";
 import { z } from "zod";
 
 export const MAX_BOTTLE_SUGGESTED_TAGS = 5;
 
-const BottleGroupFieldsSchema = BottleInputSchema.pick({
-  name: true,
-  statedAge: true,
-  series: true,
-  category: true,
-  brand: true,
-  distillers: true,
-  bottler: true,
-  flavorProfile: true,
-})
-  .extend({
-    statedAge: z.number().int().min(0).max(100).nullable().default(null),
-  })
-  .strict();
+const BottleGroupFields = {
+  name: BottleInputFields.name,
+  statedAge: z.number().int().min(0).max(100).nullable().default(null),
+  series: BottleInputFields.series,
+  category: BottleInputFields.category,
+  brand: BottleInputFields.brand,
+  distillers: BottleInputFields.distillers,
+  bottler: BottleInputFields.bottler,
+  flavorProfile: BottleInputFields.flavorProfile,
+} as const;
+
+const BottleGroupFieldsSchema = z.object(BottleGroupFields).strict();
 
 function validateGroupChoiceIds(
   input: Partial<z.infer<typeof BottleGroupFieldsSchema>>,
@@ -30,12 +28,20 @@ function validateGroupChoiceIds(
     choice: number | { id?: number | null } | null | undefined,
     path: (string | number)[],
   ) => {
-    const id = typeof choice === "number" ? choice : choice?.id;
+    const numericChoice = z.number().safeParse(choice);
+    const objectChoice = numericChoice.success
+      ? null
+      : z
+          .object({ id: z.number().nullish() })
+          .nullable()
+          .optional()
+          .parse(choice);
+    const id = numericChoice.success ? numericChoice.data : objectChoice?.id;
     if (id !== null && id !== undefined && (!Number.isInteger(id) || id <= 0)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "ID must be a positive integer.",
-        path: [...path, ...(typeof choice === "number" ? [] : ["id"])],
+        path: [...path, ...(numericChoice.success ? [] : ["id"])],
       });
     }
   };
@@ -48,57 +54,38 @@ function validateGroupChoiceIds(
   );
 }
 
-const ExactBottleInputSchema = BottleInputSchema.pick({
-  edition: true,
-  statedAge: true,
-  abv: true,
-  singleCask: true,
-  caskStrength: true,
-  vintageYear: true,
-  releaseYear: true,
-  caskSize: true,
-  caskType: true,
-  caskFill: true,
-  description: true,
-  descriptionSrc: true,
-  tastingNotes: true,
-})
-  .extend({
-    statedAge: z.number().int().min(0).max(100).nullable().default(null),
-    vintageYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(new Date().getFullYear())
-      .nullable()
-      .default(null),
-    releaseYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(new Date().getFullYear())
-      .nullable()
-      .default(null),
-  })
-  .strict();
+const ExactBottleInputFields = {
+  edition: BottleInputFields.edition,
+  statedAge: BottleGroupFields.statedAge,
+  abv: BottleInputFields.abv,
+  singleCask: BottleInputFields.singleCask,
+  caskStrength: BottleInputFields.caskStrength,
+  vintageYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
+  releaseYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
+  caskSize: BottleInputFields.caskSize,
+  caskType: BottleInputFields.caskType,
+  caskFill: BottleInputFields.caskFill,
+  description: BottleInputFields.description,
+  descriptionSrc: BottleInputFields.descriptionSrc,
+  tastingNotes: BottleInputFields.tastingNotes,
+} as const;
 
-const BottleCreateFieldsSchema = BottleGroupFieldsSchema.omit({
-  statedAge: true,
-})
-  .extend({
-    statedAge: ExactBottleInputSchema.shape.statedAge,
-    edition: ExactBottleInputSchema.shape.edition,
-    abv: ExactBottleInputSchema.shape.abv,
-    singleCask: ExactBottleInputSchema.shape.singleCask,
-    caskStrength: ExactBottleInputSchema.shape.caskStrength,
-    vintageYear: ExactBottleInputSchema.shape.vintageYear,
-    releaseYear: ExactBottleInputSchema.shape.releaseYear,
-    caskSize: ExactBottleInputSchema.shape.caskSize,
-    caskType: ExactBottleInputSchema.shape.caskType,
-    caskFill: ExactBottleInputSchema.shape.caskFill,
-    description: ExactBottleInputSchema.shape.description,
-    descriptionSrc: ExactBottleInputSchema.shape.descriptionSrc,
-    tastingNotes: ExactBottleInputSchema.shape.tastingNotes,
+const BottleCreateFieldsSchema = z
+  .object({
+    ...BottleGroupFields,
+    ...ExactBottleInputFields,
   })
   .strict();
 
@@ -114,31 +101,21 @@ export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;
 
 const BottlePatchFieldsSchema = z
   .object({
-    name: BottleGroupFieldsSchema.shape.name.optional(),
-    series: BottleGroupFieldsSchema.shape.series
+    name: BottleGroupFields.name.optional(),
+    series: BottleGroupFields.series.unwrap().removeDefault().optional(),
+    category: BottleGroupFields.category.removeDefault().optional(),
+    brand: BottleGroupFields.brand.optional(),
+    distillers: BottleGroupFields.distillers
       .unwrap()
       .removeDefault()
       .optional(),
-    category: BottleGroupFieldsSchema.shape.category.removeDefault().optional(),
-    brand: BottleGroupFieldsSchema.shape.brand.optional(),
-    distillers: BottleGroupFieldsSchema.shape.distillers
-      .unwrap()
-      .removeDefault()
-      .optional(),
-    bottler: BottleGroupFieldsSchema.shape.bottler
-      .unwrap()
-      .removeDefault()
-      .optional(),
-    flavorProfile: BottleGroupFieldsSchema.shape.flavorProfile
-      .removeDefault()
-      .optional(),
-    edition: ExactBottleInputSchema.shape.edition.removeDefault().optional(),
+    bottler: BottleGroupFields.bottler.unwrap().removeDefault().optional(),
+    flavorProfile: BottleGroupFields.flavorProfile.removeDefault().optional(),
+    edition: ExactBottleInputFields.edition.removeDefault().optional(),
     statedAge: z.number().int().min(0).max(100).nullable().optional(),
-    abv: ExactBottleInputSchema.shape.abv.unwrap().removeDefault().optional(),
-    singleCask: ExactBottleInputSchema.shape.singleCask
-      .removeDefault()
-      .optional(),
-    caskStrength: ExactBottleInputSchema.shape.caskStrength
+    abv: ExactBottleInputFields.abv.unwrap().removeDefault().optional(),
+    singleCask: ExactBottleInputFields.singleCask.removeDefault().optional(),
+    caskStrength: ExactBottleInputFields.caskStrength
       .removeDefault()
       .optional(),
     vintageYear: z
@@ -155,18 +132,16 @@ const BottlePatchFieldsSchema = z
       .lte(new Date().getFullYear())
       .nullable()
       .optional(),
-    caskSize: ExactBottleInputSchema.shape.caskSize.removeDefault().optional(),
-    caskType: ExactBottleInputSchema.shape.caskType.removeDefault().optional(),
-    caskFill: ExactBottleInputSchema.shape.caskFill.removeDefault().optional(),
-    description: ExactBottleInputSchema.shape.description
-      .removeDefault()
-      .optional(),
-    descriptionSrc: ExactBottleInputSchema.shape.descriptionSrc
+    caskSize: ExactBottleInputFields.caskSize.removeDefault().optional(),
+    caskType: ExactBottleInputFields.caskType.removeDefault().optional(),
+    caskFill: ExactBottleInputFields.caskFill.removeDefault().optional(),
+    description: ExactBottleInputFields.description.removeDefault().optional(),
+    descriptionSrc: ExactBottleInputFields.descriptionSrc
       .unwrap()
       .removeDefault()
       .optional(),
-    image: BottleInputSchema.shape.image.optional(),
-    tastingNotes: BottleInputSchema.shape.tastingNotes.optional(),
+    image: BottleInputFields.image.optional(),
+    tastingNotes: BottleInputFields.tastingNotes.optional(),
     suggestedTags: z
       .array(z.string().max(64))
       .max(MAX_BOTTLE_SUGGESTED_TAGS)

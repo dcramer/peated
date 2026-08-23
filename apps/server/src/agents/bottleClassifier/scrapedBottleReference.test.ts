@@ -1,33 +1,32 @@
-import { afterEach, expect, test, vi } from "vitest";
+import { createIgnoredBottleClassification } from "@peated/bottle-classifier/contract";
+import { expect, test, vi } from "vitest";
 import {
   classifyScrapedBottleReference,
   runScrapedBottleReference,
 } from "./scrapedBottleReference";
 
-vi.mock("./service", () => ({
-  classifyScrapedBottleReference: vi.fn(),
-  runScrapedBottleReference: vi.fn(),
-}));
-
-afterEach(() => {
-  vi.resetAllMocks();
-});
+import type * as classifierService from "./service";
 
 test("keeps scraped classification on the isolated service capability", async () => {
-  const {
-    classifyScrapedBottleReference: classifyInService,
-    runScrapedBottleReference: runInService,
-  } = await import("./service");
+  const classifyInService =
+    vi.fn<typeof classifierService.classifyScrapedBottleReference>();
+  const runInService =
+    vi.fn<typeof classifierService.runScrapedBottleReference>();
   const input = { reference: { name: "Scraped Bottle" } };
-  const classification = { status: "ignored" as const, reason: "ignored" };
+  const classification = createIgnoredBottleClassification({
+    reason: "ignored",
+    artifacts: {},
+  });
   const run = { result: classification, modelMetadata: null };
-  vi.mocked(classifyInService).mockResolvedValue(classification as never);
-  vi.mocked(runInService).mockResolvedValue(run as never);
+  classifyInService.mockResolvedValue(classification);
+  runInService.mockResolvedValue(run);
 
-  await expect(classifyScrapedBottleReference(input)).resolves.toBe(
-    classification,
+  await expect(
+    classifyScrapedBottleReference(input, classifyInService),
+  ).resolves.toBe(classification);
+  await expect(runScrapedBottleReference(input, runInService)).resolves.toBe(
+    run,
   );
-  await expect(runScrapedBottleReference(input)).resolves.toBe(run);
   expect(classifyInService).toHaveBeenCalledWith(input);
   expect(runInService).toHaveBeenCalledWith(input);
 });

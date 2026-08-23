@@ -51,7 +51,7 @@ describe("Bottle statistics recomputation", () => {
       10,
     );
     const groupBefore = await db.query.bottleGroups.findFirst({
-      where: eq(bottleGroups.id, bottle.groupId as number),
+      where: eq(bottleGroups.id, bottle.groupId),
     });
 
     const firstResult = await recomputeBottleStats(bottle.id);
@@ -88,7 +88,7 @@ describe("Bottle statistics recomputation", () => {
     ).resolves.toMatchObject(secondResult);
     expect(
       await db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, bottle.groupId as number),
+        where: eq(bottleGroups.id, bottle.groupId),
       }),
     ).toEqual(groupBefore);
   });

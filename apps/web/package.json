@@ -72,6 +72,7 @@
     "@types/pica": "^9.0.4",
     "@types/react": "^19.2.17",
     "@types/react-dom": "catalog:",
+    "jsdom": "25.0.1",
     "postcss": "^8.5.18",
     "postcss-import": "^16.1.1",
     "postcss-load-config": "^6.0.1",

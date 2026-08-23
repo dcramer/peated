@@ -24,7 +24,7 @@ import { lookup } from "mime-types";
 import { setTimeout } from "node:timers/promises";
 import path from "path";
 import type { ZodIssue } from "zod";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 import config from "./config";
 import { userToActorContext, withActorContext } from "./lib/actorContext";
 import { getUserFromHeader } from "./lib/auth";
@@ -106,7 +106,7 @@ const rpcHandler = new RPCHandler(router, {
         error.code === "BAD_REQUEST" &&
         error.cause instanceof ValidationError
       ) {
-        // If you only use Zod you can safely cast to ZodIssue[]
+        // SAFETY: This handler registers only the Zod schema converter, so every issue is a ZodIssue.
         const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
         logWarn("Input validation failed", {
@@ -127,6 +127,7 @@ const rpcHandler = new RPCHandler(router, {
         error.code === "INTERNAL_SERVER_ERROR" &&
         error.cause instanceof ValidationError
       ) {
+        // SAFETY: This handler registers only the Zod schema converter, so every issue is a ZodIssue.
         const zodError = new ZodError(error.cause.issues as ZodIssue[]);
 
         logError("Output validation failed", {
@@ -146,12 +147,9 @@ const rpcHandler = new RPCHandler(router, {
 const ONE_DAY = 60 * 60 * 24;
 const honoApp = new Hono();
 
-function isMissingUploadError(err: unknown) {
-  if (!err || typeof err !== "object") return false;
-
-  const { code } = err as { code?: unknown };
-  return code === "ENOENT" || code === 404;
-}
+const MissingUploadErrorSchema = z.object({
+  code: z.union([z.literal("ENOENT"), z.literal(404)]),
+});
 
 export const app = honoApp
   .use(sentry(honoApp))
@@ -235,7 +233,7 @@ export const app = honoApp
     try {
       body = await readUploadFile({ filename });
     } catch (err) {
-      if (isMissingUploadError(err)) {
+      if (MissingUploadErrorSchema.safeParse(err).success) {
         return c.notFound();
       }
       throw err;

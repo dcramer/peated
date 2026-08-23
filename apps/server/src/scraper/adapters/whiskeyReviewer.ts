@@ -20,7 +20,11 @@ const TARGET = "whiskeyreviewer";
 const MAX_CURRENT_ARTICLES = 5;
 const ARTICLE_PATH = /^\/(?<year>\d{4})\/(?<month>\d{2})\/[a-z0-9][a-z0-9-]*$/u;
 const TASTING_TEXT = /\b(?:nose|palate|finish)\b/iu;
-const GRADE_VALUES = {
+interface ReviewGradeValues {
+  readonly [grade: string]: number | undefined;
+}
+
+const GRADE_VALUES: ReviewGradeValues = {
   "A+": 100,
   A: 95,
   "A-": 90,
@@ -34,7 +38,7 @@ const GRADE_VALUES = {
   D: 63,
   "D-": 60,
   F: 0,
-} as const;
+};
 
 export const WhiskeyReviewerCursorSchema =
   currentReviewCursorSchema(MAX_CURRENT_ARTICLES);
@@ -100,13 +104,13 @@ function reviewGrade(value: string) {
     /^Rating:\s*(?<grade>A\+|A-|A|B\+|B-|B|C\+|C-|C|D\+|D-|D|F)$/iu.exec(
       normalizeText(value),
     );
-  const grade = match?.groups?.grade?.toLocaleUpperCase("en") as
-    | keyof typeof GRADE_VALUES
-    | undefined;
-  if (!grade || !(grade in GRADE_VALUES)) return null;
+  const grade = match?.groups?.grade?.toLocaleUpperCase("en");
+  if (!grade) return null;
+  const gradeValue = GRADE_VALUES[grade];
+  if (gradeValue === undefined) return null;
 
   const nativeScore = {
-    value: GRADE_VALUES[grade],
+    value: gradeValue,
     scale: 100,
     display: grade,
   };

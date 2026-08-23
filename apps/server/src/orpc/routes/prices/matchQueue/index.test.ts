@@ -21,37 +21,18 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
-import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { ProposedBottleSchema } from "@peated/server/schemas/priceMatches";
-import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { z } from "zod";
 
-const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
-
 function completeProposedBottle(input: z.input<typeof ProposedBottleSchema>) {
   return ProposedBottleSchema.parse(input);
 }
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-  pushUniqueJob: vi.fn(),
-}));
-
-vi.mock("@peated/server/lib/catalogVerification", async () => {
-  const actual = await vi.importActual<typeof catalogVerificationModule>(
-    "@peated/server/lib/catalogVerification",
-  );
-
-  return {
-    ...actual,
-    queueBottleCreationVerification: queueBottleCreationVerificationMock,
-  };
-});
 
 describe("price match queue", () => {
   beforeEach(() => {
@@ -2480,10 +2461,14 @@ describe("price match queue", () => {
     expect(observation).toMatchObject({
       bottleId: result.id,
     });
-    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
-      bottleId: result.id,
-      creationSource: "price_match_review",
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "VerifyBottleCreation",
+      {
+        bottleId: result.id,
+        creationSource: "price_match_review",
+      },
+      { delay: 5000 },
+    );
   });
 
   test("creates one Bottle with release-owned fields", async ({ fixtures }) => {
@@ -2866,6 +2851,7 @@ describe("price match queue", () => {
     ]);
 
     const error = await waitError(
+      // SAFETY: This test calls the old positional form to verify runtime rejection.
       (routerClient.prices.matchQueue.createBottle as any)(
         {
           proposal: proposal.id,
@@ -2940,7 +2926,7 @@ describe("price match queue", () => {
       db.select({ id: bottles.id }).from(bottles),
       db.select({ id: bottleGroups.id }).from(bottleGroups),
     ]);
-    queueBottleCreationVerificationMock.mockClear();
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
 
     const result = await routerClient.prices.matchQueue.createBottle(
       {
@@ -2993,10 +2979,14 @@ describe("price match queue", () => {
     );
     expect(bottlesAfter).toHaveLength(bottlesBefore.length + 1);
     expect(groupsAfter).toHaveLength(groupsBefore.length + 1);
-    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
-      bottleId: result.id,
-      creationSource: "price_match_review",
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "VerifyBottleCreation",
+      {
+        bottleId: result.id,
+        creationSource: "price_match_review",
+      },
+      { delay: 5000 },
+    );
   });
 
   test("reuses an exact duplicate without inheriting its source group", async ({
@@ -3133,6 +3123,7 @@ describe("price match queue", () => {
     ]);
 
     const error = await waitError(
+      // SAFETY: This test calls the old positional form to verify runtime rejection.
       (routerClient.prices.matchQueue.createBottle as any)(
         {
           proposal: proposal.id,

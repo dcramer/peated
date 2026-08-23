@@ -8,7 +8,16 @@ import {
 
 const verifier = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFG";
 
-function query(overrides: Record<string, unknown> = {}) {
+type OAuthQueryOverrides = Partial<{
+  response_type: string | string[];
+  client_id: string | string[];
+  redirect_uri: string | string[];
+  state: string | string[];
+  code_challenge: string | string[];
+  code_challenge_method: string | string[];
+}>;
+
+function query(overrides: OAuthQueryOverrides = {}) {
   return {
     response_type: "code",
     client_id: "peated-cli",

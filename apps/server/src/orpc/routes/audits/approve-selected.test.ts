@@ -330,7 +330,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
     });
     expect(
       await db.query.bottleGroups.findFirst({
-        where: (groups, { eq }) => eq(groups.id, bottle.groupId as number),
+        where: (groups, { eq }) => eq(groups.id, bottle.groupId),
       }),
     ).toMatchObject({ bottlerId: producer.id });
     expect(

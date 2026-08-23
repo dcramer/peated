@@ -8,11 +8,15 @@
  * research and a regression test before they belong here; otherwise leave
  * the value unknown and let the web-enabled classifier decide.
  */
-import { CATEGORY_LIST } from "./classifierTypes";
+import { CATEGORY_LIST, CategoryEnum } from "./classifierTypes";
 
 const ageSuffix = "-year-old";
 
-const NUMBERS: Record<string, string> = {
+interface NumberWords {
+  [word: string]: string | undefined;
+}
+
+const NUMBERS: NumberWords = {
   one: "1",
   two: "2",
   three: "3",
@@ -66,11 +70,8 @@ export function normalizeCategory(
   name: string,
 ): (typeof CATEGORY_LIST)[number] | null {
   const normalizedName = name.toLowerCase();
-  if (
-    CATEGORY_LIST.includes(normalizedName as (typeof CATEGORY_LIST)[number])
-  ) {
-    return normalizedName as (typeof CATEGORY_LIST)[number];
-  }
+  const category = CategoryEnum.safeParse(normalizedName);
+  if (category.success) return category.data;
 
   if (
     normalizedName.startsWith("single malt") ||
@@ -139,13 +140,18 @@ export type NormalizedBottle = {
  * Normalizes explicit age wording and extracts stated age from those phrases.
  * Bare numeric names are preserved even when a structured age is supplied.
  */
+export interface NormalizedBottleAge {
+  name: string;
+  statedAge: number | null;
+}
+
 export function normalizeBottleAge({
   name,
   statedAge = null,
 }: {
   name: string;
   statedAge?: number | null;
-}): { name: string; statedAge: number | null } {
+}): NormalizedBottleAge {
   name = name.replace(AGE_NORM_REGEXP, `$1${ageSuffix}$2`);
   name = name.replace(AGE_EXTRACT_REGEXP, (match, p1) => {
     return convertWordToNumber(p1) + "-year-old";

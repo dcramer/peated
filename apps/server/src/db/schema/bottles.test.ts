@@ -2,16 +2,21 @@ import { eq } from "drizzle-orm";
 import { db } from "../index";
 import { bottleAliases, bottleGroups, bottles } from "./bottles";
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 describe("BottleGroup membership constraints", () => {
   test("accepts a singleton group with its Bottle as representative", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const group = await db.query.bottleGroups.findFirst({
-      where: eq(bottleGroups.id, bottle.groupId as number),
+      where: eq(bottleGroups.id, requireGroupId(bottle.groupId)),
     });
     const members = await db.query.bottles.findMany({
-      where: eq(bottles.groupId, bottle.groupId as number),
+      where: eq(bottles.groupId, requireGroupId(bottle.groupId)),
     });
 
     expect(bottle.groupId).not.toBeNull();
@@ -24,7 +29,7 @@ describe("BottleGroup membership constraints", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const member = await fixtures.BottleGroupMember({
-      groupId: bottle.groupId as number,
+      groupId: requireGroupId(bottle.groupId),
       edition: "Movable Member",
     });
     const destinationBottle = await fixtures.Bottle();
@@ -43,7 +48,7 @@ describe("BottleGroup membership constraints", () => {
   test("rejects a missing BottleGroup membership", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const member = await fixtures.BottleGroupMember({
-      groupId: bottle.groupId as number,
+      groupId: requireGroupId(bottle.groupId),
       edition: "Missing Group Member",
     });
 
@@ -65,7 +70,7 @@ describe("BottleGroup membership constraints", () => {
       db
         .update(bottleGroups)
         .set({ representativeBottleId: otherBottle.id })
-        .where(eq(bottleGroups.id, bottle.groupId as number)),
+        .where(eq(bottleGroups.id, requireGroupId(bottle.groupId))),
     ).rejects.toThrow(/bottle_group_representative_membership_fk/);
   });
 
@@ -77,7 +82,7 @@ describe("BottleGroup membership constraints", () => {
     await db
       .update(bottleGroups)
       .set({ representativeBottleId: bottle.id })
-      .where(eq(bottleGroups.id, bottle.groupId as number));
+      .where(eq(bottleGroups.id, requireGroupId(bottle.groupId)));
 
     await expect(
       db

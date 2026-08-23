@@ -5,9 +5,11 @@ import {
   DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
+import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { z } from "zod";
 
 type Details = Outputs["audits"]["details"];
 export type BottleOperation = Details["audit"]["operations"][number];
@@ -17,6 +19,10 @@ export type BottleOperationReview = NonNullable<
 export type BottleOperationEvidence =
   BottleOperation["proposal"]["evidenceRefs"][number];
 type RejectionReason = Inputs["audits"]["rejectSelected"]["reason"];
+interface PendingRemoval {
+  note?: string;
+  reason: RejectionReason;
+}
 export type ExcludedOperationField = NonNullable<
   Inputs["audits"]["approveSelected"]["operations"][number]["excludedFields"]
 >[number];
@@ -32,7 +38,7 @@ const REJECTION_REASONS: Array<{
   { id: "other", label: "Other" },
 ];
 
-const STATUS_LABELS: Record<BottleOperation["status"], string> = {
+const STATUS_LABELS = {
   blocked: "Blocked",
   pending_review: "Pending review",
   rejected: "Removed",
@@ -40,20 +46,27 @@ const STATUS_LABELS: Record<BottleOperation["status"], string> = {
   applied: "Applied",
   stale: "Stale",
   failed: "Failed",
-};
+} satisfies Record<BottleOperation["status"], string>;
 
-const OPERATION_LABELS: Record<BottleOperation["proposal"]["type"], string> = {
+const OPERATION_LABELS = {
   update_bottle: "Update Bottle",
   merge_bottles: "Merge Bottles",
   update_entity: "Update Entity",
   merge_entities: "Merge Entities",
-};
+} satisfies Record<BottleOperation["proposal"]["type"], string>;
 
-const BOTTLE_FIELD_LABELS: Record<string, string> = {
+interface BottleFieldLabels {
+  [field: string]: string | undefined;
+}
+
+const BOTTLE_FIELD_LABELS: BottleFieldLabels = {
   "exact.edition": "Edition",
   "exact.abv": "ABV",
   "exact.releaseYear": "Release year",
 };
+
+const DisplayValueSchema = z.json();
+type DisplayValue = z.infer<typeof DisplayValueSchema>;
 
 function formatFieldLabel(field: string): string {
   const name = field.split(".").at(-1) ?? field;
@@ -65,29 +78,35 @@ function formatBottleFieldLabel(field: string): string {
   return BOTTLE_FIELD_LABELS[field] ?? formatFieldLabel(field);
 }
 
-function formatValue(value: unknown): string {
+function formatValue(value: DisplayValue | undefined): string {
   if (value === null) return "None";
   if (value === undefined) return "—";
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (typeof value === "number" || typeof value === "string") {
-    return String(value);
-  }
+  const booleanValue = z.boolean().safeParse(value);
+  if (booleanValue.success) return booleanValue.data ? "Yes" : "No";
+  const scalarValue = z.union([z.number(), z.string()]).safeParse(value);
+  if (scalarValue.success) return String(scalarValue.data);
   if (Array.isArray(value)) return value.map(formatValue).join(", ");
-  if (typeof value === "object") {
-    if ("name" in value && typeof value.name === "string") return value.name;
-    if ("entity" in value && typeof value.entity === "object") {
-      const entity = value.entity as { name?: unknown };
-      if (typeof entity.name === "string") return `${entity.name} (new)`;
-    }
-  }
+  const namedValue = z.object({ name: z.string() }).safeParse(value);
+  if (namedValue.success) return namedValue.data.name;
+  const newEntity = z
+    .object({ entity: z.object({ name: z.string() }) })
+    .safeParse(value);
+  if (newEntity.success) return `${newEntity.data.entity.name} (new)`;
   return JSON.stringify(value);
 }
 
-function getPath(value: unknown, path: string): unknown {
-  return path.split(".").reduce<unknown>((current, segment) => {
-    if (typeof current !== "object" || current === null) return undefined;
-    return (current as Record<string, unknown>)[segment];
-  }, value);
+function getPath<T>(value: T, path: string): DisplayValue | undefined {
+  const parsed = DisplayValueSchema.safeParse(value);
+  if (!parsed.success) return undefined;
+
+  return path
+    .split(".")
+    .reduce<DisplayValue | undefined>((current, segment) => {
+      const objectValue = z
+        .record(z.string(), DisplayValueSchema)
+        .safeParse(current);
+      return objectValue.success ? objectValue.data[segment] : undefined;
+    }, parsed.data);
 }
 
 function ImpactList({
@@ -97,10 +116,12 @@ function ImpactList({
   hideSingles?: boolean;
   values: Record<string, number | undefined>;
 }) {
-  const entries = Object.entries(values).filter(
-    (entry): entry is [string, number] =>
-      typeof entry[1] === "number" && entry[1] > (hideSingles ? 1 : 0),
-  );
+  const entries = Object.entries(values).flatMap(([label, value]) => {
+    const count = z.number().safeParse(value);
+    return count.success && count.data > (hideSingles ? 1 : 0)
+      ? [[label, count.data] as const]
+      : [];
+  });
   if (entries.length === 0) return null;
 
   return (
@@ -167,7 +188,10 @@ function FieldDiff({
             ? "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-white"
             : "border-emerald-700 bg-emerald-950/40 text-emerald-200 hover:bg-emerald-900/50"
         }`}
-        onClick={() => onToggleField(field as ExcludedOperationField)}
+        onClick={() => {
+          const parsed = BottleOperationFieldPathSchema.safeParse(field);
+          if (parsed.success) onToggleField(parsed.data);
+        }}
         type="button"
       >
         {excluded ? "Skipped" : "Use"}
@@ -546,7 +570,10 @@ function getEditableFields(
 ): ExcludedOperationField[] {
   const proposal = operation.proposal;
   if (proposal.type === "update_entity") {
-    return Object.keys(proposal.input.patch) as ExcludedOperationField[];
+    return Object.keys(proposal.input.patch).flatMap((field) => {
+      const parsed = BottleOperationFieldPathSchema.safeParse(field);
+      return parsed.success ? [parsed.data] : [];
+    });
   }
   if (proposal.type === "update_bottle") {
     const sharedFields = new Set([
@@ -557,10 +584,11 @@ function getEditableFields(
       "distillers",
       "bottler",
     ]);
-    return Object.keys(proposal.input.patch).map(
-      (field) =>
-        `${sharedFields.has(field) ? "shared" : "exact"}.${field}` as ExcludedOperationField,
-    );
+    return Object.keys(proposal.input.patch).flatMap((field) => {
+      const path = `${sharedFields.has(field) ? "shared" : "exact"}.${field}`;
+      const parsed = BottleOperationFieldPathSchema.safeParse(path);
+      return parsed.success ? [parsed.data] : [];
+    });
   }
   return [];
 }
@@ -602,10 +630,9 @@ export default function OperationCard({
   showDisposition?: boolean;
 }) {
   const [rejecting, setRejecting] = useState(false);
-  const [pendingRemoval, setPendingRemoval] = useState<{
-    note?: string;
-    reason: RejectionReason;
-  } | null>(null);
+  const [pendingRemoval, setPendingRemoval] = useState<PendingRemoval | null>(
+    null,
+  );
   const [savingRemoval, setSavingRemoval] = useState(false);
   const removalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rejectionPanel = useRef<HTMLDivElement | null>(null);
@@ -617,7 +644,7 @@ export default function OperationCard({
   const editableFields = getEditableFields(operation);
   const [excludedFields, setExcludedFields] = useState<
     Set<ExcludedOperationField>
-  >(() => new Set(operation.excludedFields as ExcludedOperationField[]));
+  >(() => new Set(operation.excludedFields));
   const notApprovalReady =
     showDisposition && operation.status === "pending_review" && !approvalReady;
   const canApply =
@@ -679,10 +706,10 @@ export default function OperationCard({
   }
 
   function stageRemoval() {
-    const removal = {
+    const removal: PendingRemoval = {
       reason: rejectionReason,
-      ...(rejectionNote.trim() ? { note: rejectionNote.trim() } : {}),
     };
+    if (rejectionNote.trim()) removal.note = rejectionNote.trim();
     setRejecting(false);
     setPendingRemoval(removal);
     removalTimer.current = setTimeout(async () => {
@@ -865,11 +892,12 @@ export default function OperationCard({
               <select
                 className="mt-1 block w-full rounded border-0 bg-slate-800 px-3 py-2 text-sm"
                 disabled={disabled}
-                onChange={(event) =>
-                  setRejectionReason(
-                    event.currentTarget.value as RejectionReason,
-                  )
-                }
+                onChange={(event) => {
+                  const reason = REJECTION_REASONS.find(
+                    ({ id }) => id === event.currentTarget.value,
+                  );
+                  if (reason) setRejectionReason(reason.id);
+                }}
                 value={rejectionReason}
               >
                 {REJECTION_REASONS.map((reason) => (

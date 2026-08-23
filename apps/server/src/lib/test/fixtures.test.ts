@@ -10,13 +10,19 @@ import {
   reviewArticles,
 } from "../../db/schema";
 
+function requireFixtureId(id: number | null, fixture: string): number {
+  if (id === null) throw new Error(`Missing ${fixture} fixture`);
+  return id;
+}
+
 describe("catalog identity fixtures", () => {
   test("standard consumers reference the Bottle directly", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
+    const groupId = requireFixtureId(bottle.groupId, "BottleGroup");
     const group = await db.query.bottleGroups.findFirst({
-      where: eq(bottleGroups.id, bottle.groupId as number),
+      where: eq(bottleGroups.id, groupId),
     });
 
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
@@ -35,7 +41,10 @@ describe("catalog identity fixtures", () => {
         ),
       }),
       db.query.reviewArticles.findFirst({
-        where: eq(reviewArticles.id, review.articleId as number),
+        where: eq(
+          reviewArticles.id,
+          requireFixtureId(review.articleId, "ReviewArticle"),
+        ),
       }),
     ]);
 
@@ -93,8 +102,9 @@ describe("catalog identity fixtures", () => {
       flavorProfile: "peated",
       distillerIds: [distiller.id],
     });
+    const groupId = requireFixtureId(first.groupId, "BottleGroup");
     const member = await fixtures.BottleGroupMember({
-      groupId: first.groupId as number,
+      groupId,
       edition: "Batch Two",
       releaseYear: 2025,
     });
@@ -102,7 +112,7 @@ describe("catalog identity fixtures", () => {
     const [group, alias, audit, groupDistillers, memberDistillers] =
       await Promise.all([
         db.query.bottleGroups.findFirst({
-          where: eq(bottleGroups.id, first.groupId as number),
+          where: eq(bottleGroups.id, groupId),
         }),
         db.query.bottleAliases.findFirst({
           where: eq(bottleAliases.bottleId, member.id),
@@ -116,7 +126,7 @@ describe("catalog identity fixtures", () => {
         db
           .select()
           .from(bottleGroupDistillers)
-          .where(eq(bottleGroupDistillers.groupId, first.groupId as number)),
+          .where(eq(bottleGroupDistillers.groupId, groupId)),
         db
           .select()
           .from(bottlesToDistillers)

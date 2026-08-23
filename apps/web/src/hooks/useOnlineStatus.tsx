@@ -6,10 +6,8 @@ const OnlineStatusContext = React.createContext(true);
 export const OnlineStatusProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const ssr = typeof navigator === "undefined";
-
   const [onlineStatus, setOnlineStatus] = useState<boolean>(
-    ssr ? true : navigator.onLine,
+    globalThis.navigator?.onLine ?? true,
   );
 
   useEffect(() => {

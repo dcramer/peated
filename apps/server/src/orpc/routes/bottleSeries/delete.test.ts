@@ -10,18 +10,15 @@ import {
 import { createBottle } from "@peated/server/lib/createBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { z } from "zod";
 
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushUniqueJob: vi.fn(),
-}));
 
 beforeEach(() => {
   vi.mocked(workerClient.pushUniqueJob).mockReset();
@@ -242,7 +239,10 @@ describe("DELETE /bottle-series/:series", () => {
     const changedBottleIds = vi
       .mocked(workerClient.pushUniqueJob)
       .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
-      .map(([, payload]) => (payload as { bottleId: number }).bottleId)
+      .map(
+        ([, payload]) =>
+          z.object({ bottleId: z.number() }).parse(payload).bottleId,
+      )
       .sort((left, right) => left - right);
     expect(changedBottleIds).toEqual(
       groupedBottleIds.sort((left, right) => left - right),

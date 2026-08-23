@@ -5,6 +5,7 @@ import {
   externalSites,
   scrapeTargets,
 } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { vi } from "vitest";
 import { z } from "zod";
@@ -16,10 +17,10 @@ import {
 import {
   parseRetryAfter,
   requestScraperUrl as requestScraperUrlImpl,
+  ScraperRequestDeferredError,
   ScraperRequestError,
   type ScraperHttpClock,
   type ScraperHttpStatusError,
-  type ScraperRequestDeferredError,
 } from "./http";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
@@ -61,6 +62,15 @@ async function setupRuntime({
   maxResponseBytes?: number;
   allowedRequestHeaders?: string[];
 } = {}) {
+  const configuredOrigins = origins.map(
+    (origin) =>
+      ({
+        origin,
+        robots: { mode: "enforce" },
+      }) satisfies Parameters<typeof defineScrapeTarget>[0]["origins"][number],
+  );
+  const firstOrigin = configuredOrigins[0];
+  if (!firstOrigin) throw new Error("Expected at least one scrape origin.");
   const registry = createScraperRegistry({
     targets: [
       defineScrapeTarget({
@@ -69,13 +79,7 @@ async function setupRuntime({
         maxRetries,
         maxResponseBytes,
         allowedRequestHeaders,
-        origins: origins.map((origin) => ({
-          origin,
-          robots: { mode: "enforce" as const },
-        })) as [
-          { origin: string; robots: { mode: "enforce" } },
-          ...Array<{ origin: string; robots: { mode: "enforce" } }>,
-        ],
+        origins: [firstOrigin, ...configuredOrigins.slice(1)],
       }),
     ],
     sources: [
@@ -139,19 +143,23 @@ test("waits for the target spacing before the next request", async () => {
 
 test("sends an identified bounded GET and exposes only safe response headers", async () => {
   const { registry, run } = await setupRuntime();
-  const fetchImpl = vi.fn(
-    async (_url: Parameters<typeof fetch>[0], init?: RequestInit) => {
-      expect(new Headers(init?.headers).get("user-agent")).toBe(BOT_USER_AGENT);
-      expect(init).toMatchObject({ method: "GET", redirect: "manual" });
-      return new Response("catalog", {
-        headers: {
-          "content-type": "text/plain",
-          "set-cookie": "secret=value",
-          "x-provider-debug": "private detail",
-        },
-      });
-    },
-  ) as typeof fetch;
+  const fetchImpl = vi
+    .fn<typeof fetch>()
+    .mockImplementation(
+      async (_url: Parameters<typeof fetch>[0], init?: RequestInit) => {
+        expect(new Headers(init?.headers).get("user-agent")).toBe(
+          BOT_USER_AGENT,
+        );
+        expect(init).toMatchObject({ method: "GET", redirect: "manual" });
+        return new Response("catalog", {
+          headers: {
+            "content-type": "text/plain",
+            "set-cookie": "secret=value",
+            "x-provider-debug": "private detail",
+          },
+        });
+      },
+    );
 
   await expect(
     requestScraperUrl({
@@ -338,12 +346,11 @@ test("honors Retry-After as a shared durable deferral", async () => {
       ),
     clock,
   });
-  await expect(request).rejects.toEqual(
-    expect.objectContaining({
-      reason: "rate_limited",
-      nextEligibleAt: new Date("2026-08-18T12:02:00Z"),
-    }) as ScraperRequestDeferredError,
-  );
+  const error = await waitError(request, ScraperRequestDeferredError);
+  expect(error).toMatchObject({
+    reason: "rate_limited",
+    nextEligibleAt: new Date("2026-08-18T12:02:00Z"),
+  });
   const [target] = await db.select().from(scrapeTargets);
   expect(target).toMatchObject({
     blockedUntil: new Date("2026-08-18T12:02:00Z"),
@@ -438,7 +445,7 @@ test("defers a retryable transport failure when the run budget is exhausted", as
     .fn<typeof fetch>()
     .mockRejectedValue(new DOMException("timed out", "TimeoutError"));
 
-  await expect(
+  const error = await waitError(
     requestScraperUrl({
       runId: run.id,
       sourceKey: "finedrams",
@@ -450,12 +457,12 @@ test("defers a retryable transport failure when the run budget is exhausted", as
       fetchImpl,
       clock: clockAt(),
     }),
-  ).rejects.toEqual(
-    expect.objectContaining({
-      reason: "run_budget",
-      nextEligibleAt: null,
-    }) as ScraperRequestDeferredError,
+    ScraperRequestDeferredError,
   );
+  expect(error).toMatchObject({
+    reason: "run_budget",
+    nextEligibleAt: null,
+  });
   expect(fetchImpl).toHaveBeenCalledTimes(1);
 });
 

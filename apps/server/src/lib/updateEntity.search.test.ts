@@ -1,10 +1,6 @@
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { updateEntity } from "@peated/server/lib/updateEntity";
-import * as workerClient from "@peated/server/worker/client";
 import { beforeEach, expect, test, vi } from "vitest";
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushUniqueJob: vi.fn(),
-}));
 
 beforeEach(() => {
   vi.mocked(workerClient.pushUniqueJob).mockReset();
@@ -32,7 +28,9 @@ test("an Entity name change reindexes every related Bottle", async ({
   const indexedBottleIds = vi
     .mocked(workerClient.pushUniqueJob)
     .mock.calls.filter(([job]) => job === "IndexBottleSearchVectors")
-    .map(([, input]) => input.bottleId);
+    .flatMap(([, input]) =>
+      input !== undefined && "bottleId" in input ? [input.bottleId] : [],
+    );
   expect(new Set(indexedBottleIds)).toEqual(
     new Set([brandBottle.id, bottlerBottle.id, distillerBottle.id]),
   );

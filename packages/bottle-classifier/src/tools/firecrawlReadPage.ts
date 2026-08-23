@@ -20,6 +20,8 @@ const FIRECRAWL_READ_TIMEOUT_MS = 30000;
 const MAX_PAGE_EVIDENCE_CHARS = 3000;
 const FIRECRAWL_READ_PAGE_TOOL_DESCRIPTION =
   "Read exact relevant passages from the Bottle Reference source page or one promising public search result when the available excerpt does not expose the identity-critical fact. The result must agree with every confirmed decisive Bottle trait, or differ only on the uncertain trait being resolved; never use a confirmed conflicting sibling as Suggested Change evidence. One focused page-read allowance is reserved independently from search.";
+const FirecrawlPayloadSchema = z.json();
+type FirecrawlPayload = z.infer<typeof FirecrawlPayloadSchema>;
 
 const FirecrawlScrapeResponseSchema = z
   .object({
@@ -46,7 +48,7 @@ const FirecrawlScrapeResponseSchema = z
 export function extractFirecrawlPageEvidence(
   url: string,
   focus: string,
-  payload: unknown,
+  payload: FirecrawlPayload,
 ): BottleSearchEvidence {
   const canonicalUrl = canonicalizeWebEvidenceUrl(url);
   const response = FirecrawlScrapeResponseSchema.parse(payload);
@@ -170,7 +172,11 @@ export async function runFirecrawlReadPage({
       };
     }
 
-    return extractFirecrawlPageEvidence(url, focus, await response.json());
+    return extractFirecrawlPageEvidence(
+      url,
+      focus,
+      FirecrawlPayloadSchema.parse(await response.json()),
+    );
   } catch (error) {
     return {
       error:

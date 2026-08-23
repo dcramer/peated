@@ -93,7 +93,7 @@ export default procedure
               email,
               passwordHash: null,
               verified: !!config.SKIP_EMAIL_VERIFICATION,
-              termsAcceptedAt: sql`NOW()` as unknown as Date,
+              termsAcceptedAt: sql<Date>`NOW()`,
             })
             .returning();
         } catch (err: any) {
@@ -170,7 +170,7 @@ export default procedure
             email,
             passwordHash: generatePasswordHash(password),
             verified: !!config.SKIP_EMAIL_VERIFICATION,
-            termsAcceptedAt: sql`NOW()` as unknown as Date,
+            termsAcceptedAt: sql<Date>`NOW()`,
           })
           .returning();
       } catch (err: any) {

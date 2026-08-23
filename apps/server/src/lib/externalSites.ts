@@ -7,6 +7,7 @@ import {
   externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
+import { ExternalSiteTypeEnum } from "@peated/server/schemas/externalSites";
 import type { ExternalSiteType } from "@peated/server/types";
 
 export class ExternalSiteNotFoundError extends Error {
@@ -22,10 +23,11 @@ export async function syncExternalSites() {
     for (const [type, definition] of Object.entries(
       EXTERNAL_SITE_DEFINITIONS,
     )) {
+      const siteType = ExternalSiteTypeEnum.parse(type);
       const [site] = await tx
         .insert(externalSites)
         .values({
-          type: type as ExternalSiteType,
+          type: siteType,
           name: definition.name,
           runEvery: definition.runEvery,
         })
@@ -38,7 +40,7 @@ export async function syncExternalSites() {
         })
         .returning({ id: externalSites.id });
 
-      if (site && isExternalReviewSiteType(type as ExternalSiteType)) {
+      if (site && isExternalReviewSiteType(siteType)) {
         await tx
           .insert(externalReviewSourcePolicies)
           .values({ externalSiteId: site.id })

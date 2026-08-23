@@ -45,10 +45,12 @@ function getQueueKindFilter(kind: QueueKind): SQL {
   }
 
   if (kind) {
-    return and(
+    const filter = and(
       eq(storePriceMatchProposals.status, "pending_review"),
       eq(storePriceMatchProposals.proposalType, kind),
-    ) as SQL;
+    );
+    if (!filter) throw new Error("Queue kind filter is empty");
+    return filter;
   }
 
   return inArray(storePriceMatchProposals.status, [
@@ -81,11 +83,13 @@ export function getQueueBaseWhere(input: {
   query: string;
   kind: QueueKind;
 }): SQL {
-  return and(
+  const filter = and(
     eq(storePrices.hidden, false),
     getQueueKindFilter(input.kind),
     input.query ? ilike(storePrices.name, `%${input.query}%`) : undefined,
-  ) as SQL;
+  );
+  if (!filter) throw new Error("Queue base filter is empty");
+  return filter;
 }
 
 export function getQueueWhere(input: {
@@ -93,5 +97,10 @@ export function getQueueWhere(input: {
   kind: QueueKind;
   state: QueueState;
 }): SQL {
-  return and(getQueueBaseWhere(input), getQueueStateFilter(input.state)) as SQL;
+  const filter = and(
+    getQueueBaseWhere(input),
+    getQueueStateFilter(input.state),
+  );
+  if (!filter) throw new Error("Queue filter is empty");
+  return filter;
 }

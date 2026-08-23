@@ -5,6 +5,7 @@ import { logError, logWarn } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 if (!config.DISCORD_WEBHOOK) {
   logWarn("DISCORD_WEBHOOK is not configured", {});
@@ -16,7 +17,7 @@ export const NotifyDiscordOnTastingJobArgsSchema = z
   })
   .strict();
 
-export default async function notifyDiscordOnTasting(input: unknown) {
+export default async function notifyDiscordOnTasting(input: JobPayload) {
   const { tastingId } = NotifyDiscordOnTastingJobArgsSchema.parse(input);
 
   if (!config.DISCORD_WEBHOOK) {

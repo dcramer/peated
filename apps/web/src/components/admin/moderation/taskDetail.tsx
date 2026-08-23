@@ -18,6 +18,7 @@ import {
 } from "@tanstack/react-query";
 import { Check, Copy, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
 import BottleSelector from "./bottleSelector";
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
@@ -25,25 +26,26 @@ type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 type QueueItem = Outputs["prices"]["matchQueue"]["details"];
 type RejectionReason = Inputs["audits"]["rejectSelected"]["reason"];
 type CloseReason = Inputs["audits"]["close"]["reason"];
+type ProposedBottleField = NonNullable<
+  QueueItem["proposedBottle"]
+>[keyof NonNullable<QueueItem["proposedBottle"]>];
 
-function errorMessage(error: unknown): string {
+function errorMessage(error: Error): string {
   return error instanceof Error
     ? error.message
     : "The decision could not be saved.";
 }
 
-function formatField(value: unknown): string {
+function formatField(value: ProposedBottleField): string {
   if (value === null || value === undefined || value === "")
     return "Not provided";
   if (Array.isArray(value)) return value.map(formatField).join(", ");
-  if (typeof value === "object") {
-    if ("name" in value && typeof value.name === "string") return value.name;
-    return JSON.stringify(value);
-  }
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (typeof value === "string" || typeof value === "number") {
-    return value.toString();
-  }
+  const namedValue = z.object({ name: z.string() }).safeParse(value);
+  if (namedValue.success) return namedValue.data.name;
+  const booleanValue = z.boolean().safeParse(value);
+  if (booleanValue.success) return booleanValue.data ? "Yes" : "No";
+  const scalarValue = z.union([z.string(), z.number()]).safeParse(value);
+  if (scalarValue.success) return scalarValue.data.toString();
   return JSON.stringify(value);
 }
 
@@ -85,9 +87,12 @@ function ListingTask({
   task,
   onComplete,
 }: {
-  task: Task & { source: { kind: "listing"; proposalId: number } };
+  task: Task;
   onComplete: (message: string) => Promise<void>;
 }) {
+  if (task.source.kind !== "listing") {
+    throw new Error("ListingTask requires a listing source.");
+  }
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { data: item } = useSuspenseQuery(
@@ -114,7 +119,10 @@ function ListingTask({
     repair.isPending ||
     retry.isPending;
 
-  async function finish(action: () => Promise<unknown>, message: string) {
+  async function finish<TResult>(
+    action: () => Promise<TResult>,
+    message: string,
+  ) {
     setError(null);
     try {
       await action();
@@ -123,7 +131,11 @@ function ListingTask({
       });
       await onComplete(message);
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(
+        errorMessage(
+          cause instanceof Error ? cause : new Error("Non-Error thrown"),
+        ),
+      );
     }
   }
 
@@ -149,7 +161,11 @@ function ListingTask({
       window.setTimeout(() => setCopyStatus("idle"), 1800);
     } catch (cause) {
       setCopyStatus("idle");
-      setError(errorMessage(cause));
+      setError(
+        errorMessage(
+          cause instanceof Error ? cause : new Error("Non-Error thrown"),
+        ),
+      );
     }
   }
 
@@ -506,7 +522,11 @@ function AuditTask({
         throw new Error(action?.error ?? "The operation returned no result.");
       await refreshAndComplete("Catalog change approved.");
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(
+        errorMessage(
+          cause instanceof Error ? cause : new Error("Non-Error thrown"),
+        ),
+      );
     }
   }
 
@@ -517,32 +537,42 @@ function AuditTask({
   ) {
     setError(null);
     try {
-      const result = await reject.mutateAsync({
+      const input: Inputs["audits"]["rejectSelected"] = {
         audit: data.audit.id,
         operationIds: [operationId],
         reason,
-        ...(note ? { note } : {}),
-      });
+      };
+      if (note) input.note = note;
+      const result = await reject.mutateAsync(input);
       const action = result.results[0];
       if (!action || action.error)
         throw new Error(action?.error ?? "The operation returned no result.");
       await refreshAndComplete("Suggested change removed.");
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(
+        errorMessage(
+          cause instanceof Error ? cause : new Error("Non-Error thrown"),
+        ),
+      );
     }
   }
 
   async function closeFindings() {
     setError(null);
     try {
-      await close.mutateAsync({
+      const input: Inputs["audits"]["close"] = {
         audit: data.audit.id,
         reason: closeReason,
-        ...(closeNote.trim() ? { note: closeNote.trim() } : {}),
-      });
+      };
+      if (closeNote.trim()) input.note = closeNote.trim();
+      await close.mutateAsync(input);
       await refreshAndComplete("Findings disposition recorded.");
     } catch (cause) {
-      setError(errorMessage(cause));
+      setError(
+        errorMessage(
+          cause instanceof Error ? cause : new Error("Non-Error thrown"),
+        ),
+      );
     }
   }
 
@@ -611,7 +641,11 @@ function AuditTask({
             <select
               className="mt-1 min-h-11 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-white"
               onChange={(event) =>
-                setCloseReason(event.currentTarget.value as CloseReason)
+                setCloseReason(
+                  z
+                    .enum(["dismissed", "resolved_manually"])
+                    .parse(event.currentTarget.value),
+                )
               }
               value={closeReason}
             >
@@ -684,13 +718,6 @@ export default function TaskDetail({
   if (locator.isError || !locator.data) return <UnavailableTask />;
   const task = locator.data.task;
   if (task.source.kind === "listing")
-    return (
-      <ListingTask
-        onComplete={onComplete}
-        task={
-          task as Task & { source: { kind: "listing"; proposalId: number } }
-        }
-      />
-    );
+    return <ListingTask onComplete={onComplete} task={task} />;
   return <AuditTask onComplete={onComplete} task={task} />;
 }

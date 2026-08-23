@@ -12,18 +12,32 @@ import {
 import { eq } from "drizzle-orm";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
-  runModeratorBottleAudit,
-  runPostUserCreationBottleAudit,
+  runModeratorBottleAudit as runModeratorBottleAuditWithService,
+  runPostUserCreationBottleAudit as runPostUserCreationBottleAuditWithService,
 } from "./auditBottle";
 import { classifyBottleReference } from "./index";
-import { runBottleAudit as auditBottleWithServerAdapters } from "./service";
+import type * as classifierService from "./service";
 
-vi.mock("./service", () => {
-  return {
-    runBottleAudit: vi.fn(),
-    classifyBottleReference: vi.fn(),
-  };
-});
+const auditBottleWithServerAdapters =
+  vi.fn<typeof classifierService.runBottleAudit>();
+
+function runModeratorBottleAudit(
+  input: Parameters<typeof runModeratorBottleAuditWithService>[0],
+) {
+  return runModeratorBottleAuditWithService(
+    input,
+    auditBottleWithServerAdapters,
+  );
+}
+
+function runPostUserCreationBottleAudit(
+  input: Parameters<typeof runPostUserCreationBottleAuditWithService>[0],
+) {
+  return runPostUserCreationBottleAuditWithService(
+    input,
+    auditBottleWithServerAdapters,
+  );
+}
 
 async function auditResult({
   bottleId,
@@ -92,7 +106,7 @@ describe("server-owned Bottle audit workflows", () => {
   }) => {
     const bottle = await fixtures.Bottle({ edition: null });
     const uninspectedEntity = await fixtures.Entity();
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    auditBottleWithServerAdapters.mockResolvedValue({
       result: await auditResult({
         bottleId: bottle.id,
         blockedEntityId: uninspectedEntity.id,
@@ -191,7 +205,7 @@ describe("server-owned Bottle audit workflows", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: null });
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    auditBottleWithServerAdapters.mockResolvedValue({
       result: await auditResult({
         bottleId: bottle.id,
         includeFinding: false,
@@ -200,6 +214,7 @@ describe("server-owned Bottle audit workflows", () => {
     });
 
     await expect(
+      // SAFETY: This test sends an invalid audit origin to the runtime validator.
       runModeratorBottleAudit({
         bottleId: bottle.id,
         origin: "post_user_creation",
@@ -227,7 +242,7 @@ describe("server-owned Bottle audit workflows", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    auditBottleWithServerAdapters.mockResolvedValue({
       result: createAuditBottleResult({
         summary: "The Bottle is clean.",
         proposedOperations: [],
@@ -251,7 +266,7 @@ describe("server-owned Bottle audit workflows", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: null });
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValueOnce({
+    auditBottleWithServerAdapters.mockResolvedValueOnce({
       result: await auditResult({
         bottleId: bottle.id,
         includeFinding: false,
@@ -267,7 +282,7 @@ describe("server-owned Bottle audit workflows", () => {
       .update(bottleOperations)
       .set({ status: "applied" })
       .where(eq(bottleOperations.checkId, first.check.id));
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValueOnce({
+    auditBottleWithServerAdapters.mockResolvedValueOnce({
       result: createAuditBottleResult({
         summary: "The Bottle is now clean.",
         proposedOperations: [],
@@ -294,7 +309,7 @@ describe("server-owned Bottle audit workflows", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: null });
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    auditBottleWithServerAdapters.mockResolvedValue({
       result: await auditResult({
         bottleId: bottle.id,
         includeFinding: false,
@@ -327,7 +342,7 @@ describe("server-owned Bottle audit workflows", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: null });
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    auditBottleWithServerAdapters.mockResolvedValue({
       result: await auditResult({ bottleId: bottle.id }),
       modelMetadata: null,
     });
@@ -361,7 +376,7 @@ describe("server-owned Bottle audit workflows", () => {
   }) => {
     const bottle = await fixtures.Bottle({ edition: null });
     const result = await auditResult({ bottleId: bottle.id });
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    auditBottleWithServerAdapters.mockResolvedValue({
       result,
       modelMetadata: null,
     });
@@ -404,7 +419,7 @@ describe("server-owned Bottle audit workflows", () => {
     const auditBarrier = new Promise<void>((resolve) => {
       releaseAudits = resolve;
     });
-    vi.mocked(auditBottleWithServerAdapters).mockImplementation(async () => {
+    auditBottleWithServerAdapters.mockImplementation(async () => {
       auditCalls += 1;
       if (auditCalls === 2) {
         releaseAudits();

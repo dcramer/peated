@@ -24,6 +24,7 @@ import {
   EntityMergeOperationExecutionResultSchema,
   MergeEntitiesDispatchExecutionResultSchema,
   type EntityMergeOperationExecutionResult,
+  type MergeEntitiesDispatchExecutionResult,
 } from "@peated/server/schemas/bottleOperationResults";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
@@ -172,6 +173,10 @@ export async function loadEntityMergeOperation(
   }
 
   let result: EntityMergeOperationExecutionResult | null = null;
+  let persistedResult:
+    | EntityMergeOperationExecutionResult
+    | MergeEntitiesDispatchExecutionResult
+    | null = null;
   if (operation.status === "applied") {
     const parsedResult = EntityMergeOperationExecutionResultSchema.safeParse(
       operation.result,
@@ -184,6 +189,7 @@ export async function loadEntityMergeOperation(
       );
     }
     result = parsedResult.data;
+    persistedResult = parsedResult.data;
   } else if (operation.status === "applying" || operation.result !== null) {
     const parsedDispatch = MergeEntitiesDispatchExecutionResultSchema.safeParse(
       operation.result,
@@ -201,8 +207,8 @@ export async function loadEntityMergeOperation(
         operationId,
       );
     }
+    persistedResult = parsedDispatch.data;
   }
-  const persistedResult = result ?? operation.result;
   if (
     persistedResult !== null &&
     (persistedResult.sourceEntityId !== proposal.data.input.sourceEntityId ||
@@ -323,7 +329,9 @@ export async function revalidateApplyingEntityMergeOperation({
       database,
     });
   } catch (error) {
-    if (!isOperationPreparationFailure(error)) throw error;
+    if (!(error instanceof Error) || !isOperationPreparationFailure(error)) {
+      throw error;
+    }
     await database
       .update(bottleOperations)
       .set({

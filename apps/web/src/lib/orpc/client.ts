@@ -2,19 +2,17 @@ import { createORPCClient } from "@orpc/client";
 import type { RouterClient } from "@orpc/server";
 import type { Router } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
-import { getLink } from "./link";
+import { getLink, type ClientContext } from "./link";
 
-export interface ClientContext {
-  accessToken?: string | null;
-  traceContext?: {
-    sentryTrace?: string | null;
-    baggage?: string | null;
-  };
+export type { ClientContext } from "./link";
+
+export interface BrowserClient {
+  client: RouterClient<Router, ClientContext>;
 }
 
-export function createBrowserClient(context: ClientContext = {}): {
-  client: RouterClient<Router, ClientContext>;
-} {
+export function createBrowserClient(
+  context: ClientContext = {},
+): BrowserClient {
   const client: RouterClient<Router, ClientContext> = createORPCClient(
     getLink({
       apiServer: config.API_SERVER,

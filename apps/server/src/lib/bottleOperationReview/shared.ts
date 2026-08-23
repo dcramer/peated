@@ -112,7 +112,7 @@ export class OperationPreparationFailure extends Error {
   }
 }
 
-export function isOperationPreparationFailure(error: unknown): boolean {
+export function isOperationPreparationFailure(error: Error): boolean {
   return error instanceof OperationPreparationFailure;
 }
 
@@ -128,15 +128,27 @@ export function sortedUnique(values: readonly number[]): number[] {
   return Array.from(new Set(values)).sort((left, right) => left - right);
 }
 
-export function sortedRoles(roles: readonly Entity["type"][number][]) {
-  return Array.from(new Set(roles)).sort() as Entity["type"];
+export function sortedRoles(
+  roles: readonly Entity["type"][number][],
+): Entity["type"] {
+  const sorted = Array.from(new Set(roles)).sort();
+  const first = sorted[0];
+  if (!first) {
+    throw new Error("An Entity must have at least one role.");
+  }
+  return [first, ...sorted.slice(1)];
 }
 
-export function sameValue(left: unknown, right: unknown): boolean {
+type JsonStringifyInput = Parameters<typeof JSON.stringify>[0];
+
+export function sameValue(
+  left: JsonStringifyInput,
+  right: JsonStringifyInput,
+): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
-export function relationshipDigest(value: unknown): string {
+export function relationshipDigest(value: JsonStringifyInput): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 

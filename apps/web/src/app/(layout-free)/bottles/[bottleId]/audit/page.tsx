@@ -13,6 +13,11 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { use, useState, type FormEvent } from "react";
 
+interface AuditRequestInput {
+  bottle: number;
+  note?: string;
+}
+
 export default function AuditBottle(props: {
   params: Promise<{ bottleId: string }>;
 }) {
@@ -41,10 +46,9 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
     event: FormEvent<HTMLFormElement | HTMLButtonElement>,
   ) {
     event.preventDefault();
-    const result = await auditMutation.mutateAsync({
-      bottle: bottle.id,
-      ...(note.trim() ? { note: note.trim() } : {}),
-    });
+    const input: AuditRequestInput = { bottle: bottle.id };
+    if (note.trim()) input.note = note.trim();
+    const result = await auditMutation.mutateAsync(input);
     if (result.status === "needs_review") {
       router.replace(moderationHrefForAudit(result.audit));
       return;

@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { z } from "zod";
 import type { AnyDatabase } from "../db";
 import type { User } from "../db/schema";
 import { follows, users } from "../db/schema";
@@ -30,17 +31,18 @@ export async function getUserFromId(
   // TODO: this isnt ideal, but if we're only going to use this in the API
   // its ok. The rationale here is that numbers are passed as strings from
   // the query string, thus we have to coerce sometimes.
-  if (typeof userId === "number" || Number.isFinite(+userId)) {
+  const parsedUserId = z.coerce.number().finite().safeParse(userId);
+  if (parsedUserId.success) {
     return (
       (await db.query.users.findFirst({
-        where: eq(users.id, Number(userId)),
+        where: eq(users.id, parsedUserId.data),
       })) || null
     );
   }
 
   return (
     (await db.query.users.findFirst({
-      where: eq(users.username, userId),
+      where: eq(users.username, z.string().parse(userId)),
     })) || null
   );
 }

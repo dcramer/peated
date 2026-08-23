@@ -3,6 +3,7 @@
 import type { PolymorphicProps } from "@peated/web/types";
 import { usePathname } from "next/navigation";
 import type { ElementType } from "react";
+import { z } from "zod";
 import classNames from "../lib/classNames";
 
 type Props = {
@@ -57,11 +58,12 @@ export function TabItem<E extends ElementType = typeof defaultElement>({
     "border-transparent text-muted hover:border-muted hover:text-slate-400";
 
   if ("href" in props) {
-    if (controlled && typeof props.href === "string") {
+    const href = z.string().safeParse(props.href);
+    if (controlled && href.success) {
       active =
         match === "prefix"
-          ? pathname === props.href || pathname.startsWith(`${props.href}/`)
-          : pathname === props.href;
+          ? pathname === href.data || pathname.startsWith(`${href.data}/`)
+          : pathname === href.data;
     }
   }
 

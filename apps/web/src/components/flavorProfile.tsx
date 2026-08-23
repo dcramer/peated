@@ -25,11 +25,15 @@ export default function FlavorProfile({
   );
 }
 
-export function classesForProfile(profile: FlavorProfile | string): {
+export interface FlavorProfileClasses {
   bg: string;
   bgHover: string;
   border: string;
-} {
+}
+
+export function classesForProfile(
+  profile: FlavorProfile | string,
+): FlavorProfileClasses {
   switch (profile) {
     case "young_spritely":
       return {

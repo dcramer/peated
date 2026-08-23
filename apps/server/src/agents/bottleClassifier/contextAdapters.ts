@@ -28,6 +28,7 @@ import {
   regions,
   tastings,
   users,
+  type BottleObservation,
 } from "@peated/server/db/schema";
 import { getUploadImageDataUrl } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -99,7 +100,9 @@ export async function getBottleClassifierImageInput(
   return await getUploadImageDataUrl(imageUrl);
 }
 
-function boundedObservationData(value: Record<string, unknown> | null) {
+function boundedObservationData(
+  value: BottleObservation["facts"] | BottleObservation["parsedIdentity"],
+) {
   return value &&
     JSON.stringify(value).length <= MAX_BOTTLE_CONTEXT_OBSERVATION_DATA_LENGTH
     ? value

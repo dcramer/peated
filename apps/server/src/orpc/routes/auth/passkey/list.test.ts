@@ -51,6 +51,7 @@ describe("GET /auth/passkey", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.auth.passkey.list(undefined, {
+        // SAFETY: This test deliberately removes the authenticated user.
         context: { user: null as any },
       }),
     );

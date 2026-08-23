@@ -1,29 +1,7 @@
 import type { User } from "@peated/server/types";
-import { AuthProvider } from "@peated/web/hooks/useAuth";
-import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, test, vi } from "vitest";
-import { ProfileDropdown } from "./profileDropdown";
-
-vi.mock("./userAvatar", () => ({
-  default: () => <span>User avatar</span>,
-}));
-
-vi.mock("@headlessui/react", () => ({
-  Menu: ({
-    children,
-    className,
-  }: {
-    children: (state: { open: boolean }) => ReactNode;
-    className?: string;
-  }) => <div className={className}>{children({ open: true })}</div>,
-  MenuButton: ({ children }: { children: ReactNode }) => (
-    <button>{children}</button>
-  ),
-  MenuItem: ({ children }: { children: ReactNode }) => <>{children}</>,
-  MenuItems: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  Transition: ({ children }: { children: ReactNode }) => <>{children}</>,
-}));
+import { describe, expect, test } from "vitest";
+import { ProfileAdminLinks } from "./profileDropdown";
 
 const moderator = {
   id: 1,
@@ -36,22 +14,14 @@ const admin = { ...moderator, admin: true, mod: false } satisfies User;
 
 describe("ProfileDropdown", () => {
   test("does not show the admin Audits page to moderators", () => {
-    const html = renderToStaticMarkup(
-      <AuthProvider user={moderator}>
-        <ProfileDropdown />
-      </AuthProvider>,
-    );
+    const html = renderToStaticMarkup(<ProfileAdminLinks user={moderator} />);
 
     expect(html).not.toContain("Audits");
     expect(html).not.toContain('href="/admin"');
   });
 
   test("keeps Audits available to administrators", () => {
-    const html = renderToStaticMarkup(
-      <AuthProvider user={admin}>
-        <ProfileDropdown />
-      </AuthProvider>,
-    );
+    const html = renderToStaticMarkup(<ProfileAdminLinks user={admin} />);
 
     expect(html).toContain('href="/admin/moderation/inbox"');
     expect(html).toContain('href="/admin"');

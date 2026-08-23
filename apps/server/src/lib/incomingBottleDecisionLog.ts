@@ -4,6 +4,7 @@ import {
   type Actor,
   type IncomingBottleDecisionLog,
 } from "@peated/server/db/schema";
+import { z } from "zod";
 
 export type IncomingBottleDecisionType = Extract<
   IncomingBottleDecisionLog["decision"],
@@ -12,6 +13,20 @@ export type IncomingBottleDecisionType = Extract<
 export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
+
+export interface IncomingBottleDecisionMetadata {
+  classifierEvidence?: unknown;
+  creationSource?: string;
+  gtin14?: string;
+  initiatedByUserId?: number;
+  issue?: string | null;
+  matchingBasis?: string;
+  proposalType?: string;
+  resolutionSource?: string;
+  reusedExistingBottle?: boolean;
+}
+
+const IncomingBottleDecisionMetadataSchema = z.record(z.string(), z.json());
 
 /** Audit decisions record the Bottle effect, never a classifier verb. */
 export function getIncomingBottleDecisionFromResolutionSource(
@@ -71,7 +86,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     confidence?: number | null;
     model?: string | null;
     rationale?: string | null;
-    metadata?: Record<string, unknown>;
+    metadata?: IncomingBottleDecisionMetadata;
   },
 ) {
   if (actor.type === "user" && !actor.userId) {
@@ -94,7 +109,7 @@ export async function recordIncomingBottleDecisionInTransaction(
       confidence,
       model,
       rationale,
-      metadata,
+      metadata: IncomingBottleDecisionMetadataSchema.parse(metadata),
     })
     .onConflictDoNothing({
       target: [

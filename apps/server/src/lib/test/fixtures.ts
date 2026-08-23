@@ -35,11 +35,11 @@ import {
 } from "@peated/server/db/schema";
 import { generateOAuthClientId } from "@peated/server/lib/oauth";
 import { generatePublicId } from "@peated/server/lib/publicId";
-import { type ExternalSiteType } from "@peated/server/types";
 import slugify from "@sindresorhus/slugify";
 import { eq, inArray, or, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
+import { z } from "zod";
 import {
   EXTERNAL_SITE_TYPE_LIST,
   FLAVOR_PROFILES,
@@ -165,7 +165,7 @@ export const User = async (
       verified: true,
       termsAcceptedAt: new Date(),
       createdAt: new Date(),
-      ...(data as Record<string, any>),
+      ...data,
     })
     .returning();
   if (!result) throw new Error("Unable to create User fixture");
@@ -252,15 +252,15 @@ export const Country = async (
   { ...data }: Partial<dbSchema.NewCountry> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Country> => {
-  if (!data.name) data.name = faker.location.country();
-  if (!data.slug) data.slug = slugify(data.name as string);
+  const name = data.name ?? faker.location.country();
+  const slug = data.slug ?? slugify(name);
   let [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(dbSchema.countries)
       .values({
-        name: "", // cant be asked to fix TS
-        slug: "",
         ...data,
+        name,
+        slug,
       })
       .onConflictDoNothing()
       .returning();
@@ -271,15 +271,13 @@ export const Country = async (
       .from(dbSchema.countries)
       .where(
         or(
-          eq(sql`LOWER(${dbSchema.countries.name})`, data.name.toLowerCase()),
-          eq(sql`LOWER(${dbSchema.countries.slug})`, data.slug),
+          eq(sql`LOWER(${dbSchema.countries.name})`, name.toLowerCase()),
+          eq(sql`LOWER(${dbSchema.countries.slug})`, slug),
         ),
       );
   }
   if (!result)
-    throw new Error(
-      `Unable to create Country fixture: ${data.name} - ${data.slug}`,
-    );
+    throw new Error(`Unable to create Country fixture: ${name} - ${slug}`);
   return result;
 };
 
@@ -287,15 +285,15 @@ export const Region = async (
   { ...data }: Partial<dbSchema.NewRegion> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Region> => {
-  if (!data.name) data.name = faker.location.state();
+  const name = data.name ?? faker.location.state();
   let [result] = await db.transaction(async (tx) => {
     return await tx
       .insert(dbSchema.regions)
       .values({
         countryId: data.countryId || (await Country({}, tx)).id,
-        name: "", // cant be asked to fix TS
-        slug: slugify(data.name as string),
         ...data,
+        name,
+        slug: data.slug ?? slugify(name),
       })
       .onConflictDoNothing()
       .returning();
@@ -304,7 +302,7 @@ export const Region = async (
     [result] = await db
       .select()
       .from(dbSchema.regions)
-      .where(eq(dbSchema.regions.name, data.name));
+      .where(eq(dbSchema.regions.name, name));
   }
   if (!result) throw new Error("Unable to create Region fixture");
   return result;
@@ -314,15 +312,16 @@ export const EntityOrExisting = async (
   { ...data }: Partial<Omit<dbSchema.NewEntity, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Entity> => {
-  if (!data.name)
-    data.name = `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}`;
+  const name =
+    data.name ??
+    `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}`;
 
   const existing = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.name, data.name as string),
+    where: (entities, { eq }) => eq(entities.name, name),
   });
   if (existing) return existing;
 
-  return await Entity(data, db);
+  return await Entity({ ...data, name }, db);
 };
 
 export const Entity = async (
@@ -510,19 +509,18 @@ async function createBottleFixture(
       };
     }
 
-    const brand = (
-      data.brandId
-        ? await tx.query.entities.findFirst({
-            where: (entities, { eq }) =>
-              eq(entities.id, data.brandId as number),
-          })
-        : await Entity(
-            {
-              totalBottles: 1,
-            },
-            tx,
-          )
-    ) as dbSchema.Entity;
+    const brandId = data.brandId;
+    const brand = brandId
+      ? await tx.query.entities.findFirst({
+          where: (entities, { eq }) => eq(entities.id, brandId),
+        })
+      : await Entity(
+          {
+            totalBottles: 1,
+          },
+          tx,
+        );
+    if (!brand) throw new Error("Unable to find Bottle brand fixture");
 
     const baseName = data.name ?? chooseBottleName();
     const materializedGroupFields = existingGroup
@@ -631,6 +629,9 @@ async function createBottleFixture(
     if (!bottle) throw new Error("Unable to create Bottle fixture");
 
     if (!legacy) {
+      if (bottle.groupId === null) {
+        throw new Error("Modern Bottle fixture has no group");
+      }
       await tx
         .update(bottleGroups)
         .set(
@@ -642,7 +643,7 @@ async function createBottleFixture(
               }
             : { representativeBottleId: bottle.id },
         )
-        .where(eq(bottleGroups.id, bottle.groupId as number));
+        .where(eq(bottleGroups.id, bottle.groupId));
     }
 
     if (distillerIds.length) {
@@ -677,11 +678,17 @@ async function createBottleFixture(
 }
 
 /** Creates a complete singleton BottleGroup and Bottle graph. */
+export type GroupedBottleFixture = dbSchema.Bottle & { groupId: number };
+
 export const Bottle = async (
   data: BottleFixtureData = {},
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.Bottle> => {
-  return await createBottleFixture(data, db, { legacy: false });
+): Promise<GroupedBottleFixture> => {
+  const bottle = await createBottleFixture(data, db, { legacy: false });
+  if (bottle.groupId === null) {
+    throw new Error("Grouped Bottle fixture is missing its BottleGroup");
+  }
+  return { ...bottle, groupId: bottle.groupId };
 };
 
 /**
@@ -696,8 +703,15 @@ export const BottleGroupMember = async (
     groupId: number;
   },
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.Bottle> => {
-  return await createBottleFixture(data, db, { legacy: false, groupId });
+): Promise<GroupedBottleFixture> => {
+  const bottle = await createBottleFixture(data, db, {
+    legacy: false,
+    groupId,
+  });
+  if (bottle.groupId === null) {
+    throw new Error("Grouped Bottle fixture is missing its BottleGroup");
+  }
+  return { ...bottle, groupId: bottle.groupId };
 };
 
 /** Creates pre-flattening Bottle data without a group. */
@@ -888,10 +902,7 @@ export const Badge = async (
           },
         },
       ],
-      ...(data as Omit<
-        dbSchema.NewBadge,
-        "name" | "checks" | "tracker" | "formula"
-      >),
+      ...data,
     })
     .returning();
   if (!result) throw new Error("Unable to create Badge fixture");
@@ -907,7 +918,7 @@ export const Event = async (
     .values({
       name: faker.music.songName(),
       dateStart: faker.date.future().toISOString(),
-      ...(data as Omit<dbSchema.NewEvent, "name" | "dateStart">),
+      ...data,
     })
     .returning();
   if (!result) throw new Error("Unable to create Event fixture");
@@ -918,33 +929,34 @@ export const ExternalSiteOrExisting = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
-  if (!data.type) {
+  let type = data.type;
+  if (!type) {
     const existing = await db.query.externalSites.findFirst();
     if (existing) return existing;
 
-    data.type = choose(EXTERNAL_SITE_TYPE_LIST);
+    type = choose(EXTERNAL_SITE_TYPE_LIST);
   }
 
   const existing = await db.query.externalSites.findFirst({
-    where: (externalSites, { eq }) =>
-      eq(externalSites.type, data.type as ExternalSiteType),
+    where: (externalSites, { eq }) => eq(externalSites.type, type),
   });
   if (existing) return existing;
 
-  return await ExternalSite(data, db);
+  return await ExternalSite({ ...data, type }, db);
 };
 
 export const ExternalSite = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
-  if (!data.type) data.type = choose(EXTERNAL_SITE_TYPE_LIST);
+  const type = data.type ?? choose(EXTERNAL_SITE_TYPE_LIST);
 
   const [result] = await db
     .insert(externalSites)
     .values({
       name: faker.company.name(),
-      ...(data as Omit<dbSchema.NewExternalSite, "name">),
+      ...data,
+      type,
     })
     .returning();
   if (!result) throw new Error("Unable to create ExternalSite fixture");
@@ -993,15 +1005,17 @@ export const StorePrice = async (
     const bottleId = await resolveFixtureBottleId(data, tx);
 
     if (!data.name) {
-      const bottle =
-        typeof bottleId === "number"
-          ? await tx.query.bottles.findFirst({
-              where: eq(bottles.id, bottleId),
-              with: { brand: true },
-            })
-          : null;
-      if (typeof bottleId === "number" && !bottle) {
-        throw new Error(`Bottle fixture does not exist (${bottleId})`);
+      const parsedBottleId = z.number().safeParse(bottleId);
+      const bottle = parsedBottleId.success
+        ? await tx.query.bottles.findFirst({
+            where: eq(bottles.id, parsedBottleId.data),
+            with: { brand: true },
+          })
+        : null;
+      if (parsedBottleId.success && !bottle) {
+        throw new Error(
+          `Bottle fixture does not exist (${parsedBottleId.data})`,
+        );
       }
       data.name =
         bottle?.fullName ??
@@ -1023,12 +1037,19 @@ export const StorePrice = async (
 
     if (data.hidden === undefined) data.hidden = false;
 
-    data.bottleId = bottleId;
+    const values: dbSchema.NewStorePrice = {
+      ...data,
+      bottleId,
+      name: data.name,
+      price: data.price,
+      url: data.url,
+      externalSiteId: data.externalSiteId,
+      volume: data.volume,
+      currency: data.currency,
+      hidden: data.hidden,
+    };
 
-    const [price] = await tx
-      .insert(storePrices)
-      .values(data as dbSchema.NewStorePrice)
-      .returning();
+    const [price] = await tx.insert(storePrices).values(values).returning();
 
     if (!price) throw new Error("Unable to create StorePrice fixture");
 
@@ -1090,17 +1111,19 @@ export const Review = async (
 ): Promise<dbSchema.Review> => {
   const [result] = await db.transaction(async (tx) => {
     if (!data.name) {
-      const bottle =
-        typeof data.bottleId === "number"
-          ? await tx.query.bottles.findFirst({
-              where: eq(bottles.id, data.bottleId),
-              with: { brand: true },
-            })
-          : data.bottleId === undefined
-            ? await Bottle({}, tx)
-            : null;
-      if (typeof data.bottleId === "number" && !bottle) {
-        throw new Error(`Bottle fixture does not exist (${data.bottleId})`);
+      const parsedBottleId = z.number().safeParse(data.bottleId);
+      const bottle = parsedBottleId.success
+        ? await tx.query.bottles.findFirst({
+            where: eq(bottles.id, parsedBottleId.data),
+            with: { brand: true },
+          })
+        : data.bottleId === undefined
+          ? await Bottle({}, tx)
+          : null;
+      if (parsedBottleId.success && !bottle) {
+        throw new Error(
+          `Bottle fixture does not exist (${parsedBottleId.data})`,
+        );
       }
       if (data.bottleId === undefined) data.bottleId = bottle?.id;
       data.name =
@@ -1157,7 +1180,7 @@ export const Collection = async (
         name: faker.commerce.product(),
         createdAt: new Date(),
         createdById: data.createdById || (await User({}, tx)).id,
-        ...(data as Omit<dbSchema.NewCollection, "name" | "createdById">),
+        ...data,
       })
       .returning();
   });
@@ -1169,28 +1192,29 @@ export const TagOrExisting = async (
   { ...data }: Partial<Omit<dbSchema.NewTag, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Tag> => {
-  if (!data.name) data.name = faker.word.adjective().toLowerCase();
+  const name = data.name ?? faker.word.adjective().toLowerCase();
 
   const existing = await db.query.tags.findFirst({
-    where: (tags, { eq }) => eq(tags.name, data.name as string),
+    where: (tags, { eq }) => eq(tags.name, name),
   });
   if (existing) return existing;
 
-  return await Tag(data, db);
+  return await Tag({ ...data, name }, db);
 };
 
 export const Tag = async (
   { ...data }: Partial<Omit<dbSchema.NewTag, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Tag> => {
-  if (!data.name) data.name = faker.word.adjective().toLowerCase();
+  const name = data.name ?? faker.word.adjective().toLowerCase();
 
   const [result] = await db
     .insert(dbSchema.tags)
     .values({
       tagCategory: choose(TAG_CATEGORIES),
       flavorProfiles: sample(FLAVOR_PROFILES, random(1, 2)),
-      ...(data as Omit<dbSchema.NewTag, "tagCategory" | "flavorProfiles">),
+      ...data,
+      name,
     })
     .returning();
   if (!result) throw new Error("Unable to create Tag fixture");
@@ -1260,14 +1284,12 @@ export async function BottleSeries(
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.BottleSeries> {
   const result = await db.transaction(async (tx) => {
-    if (!data.brandId) {
-      const brand = await Entity({ type: ["distiller"] }, tx);
-      data.brandId = brand.id;
-    }
+    const brandId =
+      data.brandId ?? (await Entity({ type: ["distiller"] }, tx)).id;
 
     // Get the brand to build fullName
     const brand = await tx.query.entities.findFirst({
-      where: (entities, { eq }) => eq(entities.id, data.brandId as number),
+      where: (entities, { eq }) => eq(entities.id, brandId),
     });
     if (!brand) throw new Error("Unable to find brand");
 
@@ -1278,7 +1300,7 @@ export async function BottleSeries(
       name,
       fullName,
       description: data.description ?? faker.lorem.sentence(),
-      brandId: data.brandId,
+      brandId,
       createdByActorId:
         data.createdByActorId ??
         (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id,

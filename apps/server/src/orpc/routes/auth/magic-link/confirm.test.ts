@@ -1,13 +1,22 @@
-import { createAccessToken, verifyPayload } from "@peated/server/lib/auth";
+import { createRouterClient } from "@orpc/server";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
+import {
+  createMagicLinkConfirmProcedure,
+  type MagicLinkAuthServices,
+} from "@peated/server/orpc/routes/auth/magic-link/confirm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock the auth functions
-vi.mock("@peated/server/lib/auth", () => ({
-  createAccessToken: vi.fn(),
-  verifyPayload: vi.fn(),
-}));
+const createAccessToken = vi.fn<MagicLinkAuthServices["createToken"]>();
+const verifyPayload = vi.fn<MagicLinkAuthServices["verifyToken"]>();
+const confirmClient = createRouterClient(
+  {
+    confirm: createMagicLinkConfirmProcedure({
+      createToken: createAccessToken,
+      verifyToken: verifyPayload,
+    }),
+  },
+  { context: { ip: "127.0.0.1", user: null } },
+);
 
 describe("POST /auth/magic-link/confirm", () => {
   beforeEach(() => {
@@ -18,18 +27,15 @@ describe("POST /auth/magic-link/confirm", () => {
     const user = await fixtures.User({ active: true, verified: false });
     const token = "valid-token";
 
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: user.id,
       email: user.email,
       createdAt: new Date().toISOString(),
     });
 
-    vi.mocked(createAccessToken).mockResolvedValue("mocked-access-token");
+    createAccessToken.mockResolvedValue("mocked-access-token");
 
-    const result = await routerClient.auth.magicLink.confirm(
-      { token },
-      { context: { ip: "127.0.0.1" } },
-    );
+    const result = await confirmClient.confirm({ token });
 
     expect(result.user.id).toBe(user.id);
     expect(result.user.verified).toBe(true);
@@ -42,14 +48,9 @@ describe("POST /auth/magic-link/confirm", () => {
   test("throws error for invalid token", async ({ fixtures }) => {
     const token = "invalid-token";
 
-    vi.mocked(verifyPayload).mockRejectedValue(new Error("Invalid token"));
+    verifyPayload.mockRejectedValue(new Error("Invalid token"));
 
-    const error = await waitError(
-      routerClient.auth.magicLink.confirm(
-        { token },
-        { context: { ip: "127.0.0.1" } },
-      ),
-    );
+    const error = await waitError(confirmClient.confirm({ token }));
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
   });
@@ -61,18 +62,13 @@ describe("POST /auth/magic-link/confirm", () => {
     const expiredDate = new Date();
     expiredDate.setMinutes(expiredDate.getMinutes() - 11); // 11 minutes ago
 
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: user.id,
       email: user.email,
       createdAt: expiredDate.toISOString(),
     });
 
-    const error = await waitError(
-      routerClient.auth.magicLink.confirm(
-        { token },
-        { context: { ip: "127.0.0.1" } },
-      ),
-    );
+    const error = await waitError(confirmClient.confirm({ token }));
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
   });
@@ -81,18 +77,13 @@ describe("POST /auth/magic-link/confirm", () => {
     const user = await fixtures.User({ active: false });
     const token = "valid-token";
 
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: user.id,
       email: user.email,
       createdAt: new Date().toISOString(),
     });
 
-    const error = await waitError(
-      routerClient.auth.magicLink.confirm(
-        { token },
-        { context: { ip: "127.0.0.1" } },
-      ),
-    );
+    const error = await waitError(confirmClient.confirm({ token }));
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
   });
@@ -100,18 +91,13 @@ describe("POST /auth/magic-link/confirm", () => {
   test("throws error for non-existent user", async ({ fixtures }) => {
     const token = "valid-token";
 
-    vi.mocked(verifyPayload).mockResolvedValue({
+    verifyPayload.mockResolvedValue({
       id: "non-existent-id",
       email: "nonexistent@example.com",
       createdAt: new Date().toISOString(),
     });
 
-    const error = await waitError(
-      routerClient.auth.magicLink.confirm(
-        { token },
-        { context: { ip: "127.0.0.1" } },
-      ),
-    );
+    const error = await waitError(confirmClient.confirm({ token }));
 
     expect(error).toMatchInlineSnapshot(`[Error: Invalid magic link token.]`);
   });

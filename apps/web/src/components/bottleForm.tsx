@@ -19,6 +19,11 @@ import {
   notesForProfile,
 } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
+import {
+  BottleInputFields,
+  EntityChoiceSchema,
+  FlavorProfileEnum,
+} from "@peated/server/schemas";
 import type { Entity, FlavorProfile } from "@peated/server/types";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
@@ -44,7 +49,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import type { z } from "zod";
+import { z } from "zod";
 import BooleanField from "./booleanField";
 import Button from "./button";
 import { classesForProfile } from "./flavorProfile";
@@ -81,7 +86,7 @@ const BottleFormSchema = BottleCreateInputSchema;
 type FormSchemaType = CreateFormSchemaType;
 type ChoiceLike = {
   id?: number | null;
-  name?: string | null;
+  name: string;
 };
 export type BottleFormInitialData = Partial<
   Omit<
@@ -135,21 +140,21 @@ function hasMoreDetails(initialData: BottleFormInitialData) {
 const toEntityChoiceValue = (
   value: number | Entity | ChoiceLike | null | undefined,
 ): FormSchemaType["brand"] | FormSchemaType["bottler"] =>
-  toChoiceValue(value) as FormSchemaType["brand"] | FormSchemaType["bottler"];
+  z
+    .union([EntityChoiceSchema, z.null(), z.undefined()])
+    .parse(toChoiceValue(value));
 
 const toSeriesChoiceValue = (
   value: number | ChoiceLike | null | undefined,
-): FormSchemaType["series"] => toChoiceValue(value) as FormSchemaType["series"];
+): FormSchemaType["series"] =>
+  BottleInputFields.series.parse(toChoiceValue(value));
 
 const toDistillerChoiceValues = (
   values: Array<number | Entity | ChoiceLike> | null | undefined,
 ): NonNullable<FormSchemaType["distillers"]> =>
-  (values
-    ?.map((value) => toChoiceValue(value))
-    .filter(
-      (value): value is NonNullable<FormSchemaType["distillers"]>[number] =>
-        value != null,
-    ) as NonNullable<FormSchemaType["distillers"]>) ?? [];
+  z
+    .array(EntityChoiceSchema)
+    .parse(values?.map((value) => toChoiceValue(value)) ?? []);
 
 export default function BottleForm({
   onSubmit,
@@ -215,6 +220,7 @@ export default function BottleForm({
         { image, ...data },
         {
           dirtyFields: new Set(
+            // SAFETY: React Hook Form creates dirtyFields only from this typed form's registered keys.
             Object.keys(dirtyFields) as Array<keyof FormSchemaType>,
           ),
         },
@@ -604,9 +610,8 @@ export default function BottleForm({
                   suggestedOptions={[]}
                   label="Flavor Profile"
                   onRenderOption={(option) => {
-                    const classes = classesForProfile(
-                      option.id as FlavorProfile,
-                    );
+                    const profile = FlavorProfileEnum.parse(option.id);
+                    const classes = classesForProfile(profile);
                     return (
                       <div className="flex flex-col items-start justify-start gap-y-2 text-left">
                         <h4
@@ -615,7 +620,7 @@ export default function BottleForm({
                           {option.name}
                         </h4>
                         <div className="text-muted text-sm font-normal">
-                          {notesForProfile(option.id as FlavorProfile)}
+                          {notesForProfile(profile)}
                         </div>
                       </div>
                     );
@@ -656,7 +661,7 @@ export default function BottleForm({
                     if (result.flavorProfile && !currentValues.flavorProfile) {
                       setValue(
                         "flavorProfile",
-                        result.flavorProfile as FlavorProfile,
+                        FlavorProfileEnum.parse(result.flavorProfile),
                         { shouldDirty: true },
                       );
                     }

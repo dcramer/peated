@@ -8,6 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 export const UpdateRegionStatsJobArgsSchema = z
   .object({
@@ -15,7 +16,7 @@ export const UpdateRegionStatsJobArgsSchema = z
   })
   .strict();
 
-export default async function updateRegionStats(input: unknown) {
+export default async function updateRegionStats(input: JobPayload) {
   const { regionId } = UpdateRegionStatsJobArgsSchema.parse(input);
 
   await db

@@ -5,7 +5,7 @@ import { getBottleMetadataExclusions } from "./bottleIdentity";
 import type { Option } from "./selectField";
 
 type EntityOption = Option & {
-  shortName?: string;
+  shortName?: string | null;
 };
 
 type BottleFormData = {

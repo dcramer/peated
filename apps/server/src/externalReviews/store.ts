@@ -45,6 +45,18 @@ export const ReviewArticleInputSchema =
   });
 
 type SourceReviewArticleInput = z.infer<typeof ReviewArticleInputSchema>;
+type ReviewArticleInputValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Date
+  | ReviewArticleInputValue[]
+  | { [key: string]: ReviewArticleInputValue };
+type ReviewArticleInputCandidate = {
+  [key: string]: ReviewArticleInputValue;
+};
 type ReviewArticleInput = Omit<
   SourceReviewArticleInput,
   "contentHash" | "fetchedAt" | "title"
@@ -150,7 +162,7 @@ export async function storeReviewArticleInTransaction(
         summaryModel: null,
         summaryPromptVersion: null,
         summaryGeneratedAt: null,
-        updatedAt: sql`NOW()`,
+        updatedAt: sql<Date>`NOW()`,
       })
       .where(
         and(
@@ -196,35 +208,33 @@ export async function storeReviewArticleInTransaction(
       : origin === "source"
         ? !(publishesAutomatically && bottleId !== null)
         : false;
-    const values = {
+    const values: Omit<
+      typeof reviews.$inferInsert,
+      "articleId" | "sourceKey" | "updatedAt"
+    > = {
       bottleId,
       name: review.name,
       rating: review.normalizedRating,
-      ...(origin === "source"
-        ? {
-            category: review.category,
-            reviewerName: review.reviewerName,
-            nativeScoreValue: review.nativeScore?.value ?? null,
-            nativeScoreScale: review.nativeScore?.scale ?? null,
-            nativeScoreDisplay: review.nativeScore?.display ?? null,
-          }
-        : {}),
-      ...(review.summary
-        ? {
-            summary: review.summary.text,
-            summaryContentHash: review.summary.contentHash,
-            summaryModel: review.summary.model,
-            summaryPromptVersion: review.summary.promptVersion,
-            summaryGeneratedAt: review.summary.generatedAt,
-          }
-        : {}),
       hidden,
-      updatedAt: sql`NOW()`,
     };
+    if (origin === "source") {
+      values.category = review.category;
+      values.reviewerName = review.reviewerName;
+      values.nativeScoreValue = review.nativeScore?.value ?? null;
+      values.nativeScoreScale = review.nativeScore?.scale ?? null;
+      values.nativeScoreDisplay = review.nativeScore?.display ?? null;
+    }
+    if (review.summary) {
+      values.summary = review.summary.text;
+      values.summaryContentHash = review.summary.contentHash;
+      values.summaryModel = review.summary.model;
+      values.summaryPromptVersion = review.summary.promptVersion;
+      values.summaryGeneratedAt = review.summary.generatedAt;
+    }
     const [stored] = existing
       ? await tx
           .update(reviews)
-          .set(values)
+          .set({ ...values, updatedAt: sql`NOW()` })
           .where(eq(reviews.id, existing.id))
           .returning()
       : await tx
@@ -233,6 +243,7 @@ export async function storeReviewArticleInTransaction(
             articleId: article.id,
             sourceKey: review.sourceKey,
             ...values,
+            updatedAt: sql`NOW()`,
           })
           .returning();
     if (!stored) throw new Error("Unable to store review.");
@@ -250,7 +261,9 @@ export async function storeReviewArticleInTransaction(
  * tasting notes, conclusions, and images. Callers must discard those values
  * before they call this function.
  */
-export async function storeReviewArticle(rawInput: unknown) {
+export async function storeReviewArticle(
+  rawInput: ReviewArticleInputCandidate,
+) {
   const input = ReviewArticleInputSchema.parse(rawInput);
 
   return await db.transaction(async (tx) => {

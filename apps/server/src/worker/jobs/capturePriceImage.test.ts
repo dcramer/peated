@@ -1,34 +1,35 @@
 import { db } from "@peated/server/db";
 import { bottles, storePrices } from "@peated/server/db/schema";
-import * as uploads from "@peated/server/lib/uploads";
-import * as workerClient from "@peated/server/worker/client";
+import type * as uploads from "@peated/server/lib/uploads";
+import { compressAndResizeImage } from "@peated/server/lib/uploads";
+import type * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import capturePriceImage from "./capturePriceImage";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import capturePriceImageWithServices, {
+  type CapturePriceImageServices,
+} from "./capturePriceImage";
 
-vi.mock("@peated/server/lib/uploads", () => ({
-  compressAndResizeImage: vi.fn((stream, filename) => ({
-    stream,
-    filename: `${filename}.webp`,
-  })),
-  storeFile: vi.fn(async () => "/uploads/price-image.webp"),
-}));
+const fetchImage = vi.fn<typeof fetch>();
+const queueResolution = vi.fn<typeof workerClient.pushUniqueJob>();
+const storeImage = vi.fn<typeof uploads.storeFile>();
+const services: CapturePriceImageServices = {
+  compressImage: compressAndResizeImage,
+  fetchImage,
+  queueResolution,
+  storeImage,
+};
 
-vi.mock("@peated/server/worker/client", () => ({
-  pushUniqueJob: vi.fn(),
-}));
+function capturePriceImage(
+  input: Parameters<typeof capturePriceImageWithServices>[0],
+) {
+  return capturePriceImageWithServices(input, undefined, services);
+}
 
 describe("capturePriceImage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => new Response("image-bytes")),
-    );
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
+    fetchImage.mockResolvedValue(new Response("image-bytes"));
+    storeImage.mockResolvedValue("/uploads/price-image.webp");
   });
 
   test("stores the price image without promoting it to the bottle before review", async ({
@@ -52,14 +53,11 @@ describe("capturePriceImage", () => {
       where: eq(bottles.id, bottle.id),
     });
 
-    expect(uploads.storeFile).toHaveBeenCalled();
+    expect(storeImage).toHaveBeenCalled();
     expect(updatedPrice?.imageUrl).toBe("/uploads/price-image.webp");
     expect(updatedBottle?.imageUrl).toBeNull();
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      {
-        priceId: price.id,
-      },
-    );
+    expect(queueResolution).toHaveBeenCalledWith("ResolveStorePriceBottle", {
+      priceId: price.id,
+    });
   });
 });

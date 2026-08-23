@@ -1,6 +1,7 @@
 import { GtinSchema } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
 import { z } from "zod";
+import type { JsonValue } from "../types";
 import type {
   ScrapePricesCallback,
   ScrapePricesPageResult,
@@ -8,7 +9,7 @@ import type {
 } from "./scraper";
 import { getUrl } from "./scraper";
 
-export const WooCommerceCatalogSchema = z.array(z.unknown());
+export const WooCommerceCatalogSchema = z.array(z.json());
 
 export const WooCommercePriceSchema = z
   .object({
@@ -16,13 +17,13 @@ export const WooCommercePriceSchema = z
     currency_code: z.string(),
     currency_minor_unit: z.number().int(),
   })
-  .passthrough();
+  .catchall(z.json());
 
 export const WooCommerceImageSchema = z
   .object({
     src: z.string().url(),
   })
-  .passthrough();
+  .catchall(z.json());
 
 export const WooCommerceProductSchema = z
   .object({
@@ -33,27 +34,26 @@ export const WooCommerceProductSchema = z
     name: z.string().trim().min(1),
     permalink: z.string().trim().min(1),
     prices: WooCommercePriceSchema,
-    images: z.array(z.unknown()),
+    images: z.array(z.json()),
     is_in_stock: z.boolean(),
     is_purchasable: z.boolean(),
   })
-  .passthrough();
+  .catchall(z.json());
 
 export function getWooCommerceStorePriceIdentity(
   product: z.infer<typeof WooCommerceProductSchema>,
 ) {
   const barcode = GtinSchema.safeParse(product.gtin);
-  return {
-    ...(product.id !== undefined
-      ? { externalProductId: String(product.id) }
-      : {}),
-    ...(barcode.success ? { barcode: barcode.data } : {}),
-  };
+  const identity: Partial<Pick<StorePrice, "externalProductId" | "barcode">> =
+    {};
+  if (product.id !== undefined) identity.externalProductId = String(product.id);
+  if (barcode.success) identity.barcode = barcode.data;
+  return identity;
 }
 
-export function getWooCommerceProductName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("name" in input)) return null;
-  return typeof input.name === "string" ? input.name : null;
+export function getWooCommerceProductName(input: JsonValue): string | null {
+  const parsed = z.object({ name: z.string() }).safeParse(input);
+  return parsed.success ? parsed.data.name : null;
 }
 
 export function decodeWooCommerceText(value: string): string {
@@ -71,7 +71,7 @@ export function parseWooCommercePrice(value: string): number | null {
 export async function scrapeWooCommerceProducts(
   url: string,
   cb: ScrapePricesCallback,
-  parseProducts: (input: unknown) => StorePrice[],
+  parseProducts: (input: JsonValue) => StorePrice[],
 ): Promise<ScrapePricesPageResult> {
   const data = await getUrl(url);
   const catalog = WooCommerceCatalogSchema.parse(JSON.parse(data));

@@ -48,7 +48,7 @@ describe("GET /bottles/:bottle", () => {
   test("counts people through direct Bottle identity", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle({ name: "Selected Bottle" });
     const sibling = await fixtures.BottleGroupMember({
-      groupId: bottle.groupId as number,
+      groupId: bottle.groupId,
       edition: "Sibling Edition",
       releaseYear: 2026,
     });

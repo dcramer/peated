@@ -1,4 +1,5 @@
 import {
+  ApproveBottleOperationsInputFields,
   ApproveBottleOperationsInputSchema,
   approveBottleOperations,
 } from "@peated/server/lib/bottleOperationModeration";
@@ -19,7 +20,7 @@ export default procedure
   })
   .input(
     ApproveBottleOperationsInputSchema.omit({ checkId: true }).extend({
-      audit: ApproveBottleOperationsInputSchema.shape.checkId,
+      audit: ApproveBottleOperationsInputFields.checkId,
     }),
   )
   .output(BottleOperationActionResponseSchema)

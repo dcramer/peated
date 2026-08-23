@@ -4,6 +4,7 @@ import {
   flightBottles,
   tastings,
 } from "@peated/server/db/schema";
+import { sql } from "drizzle-orm";
 
 const MISSING_BOTTLE_ID = 9_000_000_000;
 
@@ -55,7 +56,7 @@ describe("direct Bottle consumer constraints", () => {
     await expect(
       db.insert(collectionBottles).values({
         collectionId: collection.id,
-        bottleId: null as unknown as number,
+        bottleId: sql<number>`NULL`,
       }),
     ).rejects.toThrow(/not-null constraint/);
   });
@@ -107,7 +108,7 @@ describe("direct Bottle consumer constraints", () => {
     await expect(
       db.insert(flightBottles).values({
         flightId: flight.id,
-        bottleId: null as unknown as number,
+        bottleId: sql<number>`NULL`,
       }),
     ).rejects.toThrow(/not-null constraint/);
   });
@@ -178,7 +179,7 @@ describe("direct Bottle consumer constraints", () => {
 
     await expect(
       db.insert(tastings).values({
-        bottleId: null as unknown as number,
+        bottleId: sql<number>`NULL`,
         createdById: user.id,
         createdAt: new Date(createdAt.getTime() + 3_000),
       }),

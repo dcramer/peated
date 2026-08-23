@@ -1,24 +1,46 @@
+import { createRouterClient } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { passkeys } from "@peated/server/db/schema";
-import { verifyChallenge } from "@peated/server/lib/auth";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
-import { verifyAuthenticationResponse } from "@simplewebauthn/server";
+import {
+  createPasskeyAuthenticateVerifyProcedure,
+  type PasskeyAuthenticationServices,
+} from "@peated/server/orpc/routes/auth/passkey/authenticate-verify";
+import type { Base64URLString } from "@simplewebauthn/server";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock WebAuthn and auth functions
-vi.mock("@simplewebauthn/server", () => ({
-  verifyAuthenticationResponse: vi.fn(),
-}));
+const verifyChallenge =
+  vi.fn<PasskeyAuthenticationServices["verifyChallenge"]>();
+const verifyAuthenticationResponse =
+  vi.fn<PasskeyAuthenticationServices["verifyResponse"]>();
+const authenticateClient = createRouterClient(
+  {
+    authenticateVerify: createPasskeyAuthenticateVerifyProcedure({
+      verifyChallenge,
+      verifyResponse: verifyAuthenticationResponse,
+    }),
+  },
+  { context: { ip: "127.0.0.1", user: null } },
+);
 
-vi.mock("@peated/server/lib/auth", async () => {
-  const actual = await vi.importActual("@peated/server/lib/auth");
-  return {
-    ...actual,
-    verifyChallenge: vi.fn(),
-  };
-});
+function base64Url(value: string): Base64URLString {
+  if (!/^[A-Za-z0-9_-]+$/.test(value)) {
+    throw new Error("Expected a base64url value");
+  }
+  // SAFETY: The regular expression above enforces the Base64URLString character set.
+  return value as Base64URLString;
+}
+
+type ClientData = {
+  type: string;
+  challenge: string;
+  origin: string;
+};
+
+function clientDataJson(value: ClientData): Base64URLString {
+  return base64Url(Buffer.from(JSON.stringify(value)).toString("base64url"));
+}
 
 describe("POST /auth/passkey/authenticate/verify", () => {
   beforeEach(() => {
@@ -35,24 +57,22 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       type: "public-key" as const,
       clientExtensionResults: {},
       response: {
-        clientDataJSON: Buffer.from(
-          JSON.stringify({
-            type: "webauthn.get",
-            challenge: "test-challenge",
-            origin: "http://localhost:3200",
-          }),
-        ).toString("base64") as any,
+        clientDataJSON: clientDataJson({
+          type: "webauthn.get",
+          challenge: "test-challenge",
+          origin: "http://localhost:3200",
+        }),
         authenticatorData: "mock-auth-data",
         signature: "mock-signature",
       },
     };
 
-    vi.mocked(verifyChallenge).mockResolvedValue();
-    vi.mocked(verifyAuthenticationResponse).mockResolvedValue({
+    verifyChallenge.mockResolvedValue();
+    verifyAuthenticationResponse.mockResolvedValue({
       verified: true,
       authenticationInfo: {
         newCounter: 1,
-        credentialID: passkey.credentialId as any,
+        credentialID: base64Url(passkey.credentialId),
         credentialDeviceType: "singleDevice",
         credentialBackedUp: false,
         userVerified: true,
@@ -61,13 +81,10 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       },
     });
 
-    const result = await routerClient.auth.passkey.authenticateVerify(
-      {
-        response: mockResponse,
-        signedChallenge: "signed-challenge-token",
-      },
-      { context: { ip: "127.0.0.1" } },
-    );
+    const result = await authenticateClient.authenticateVerify({
+      response: mockResponse,
+      signedChallenge: "signed-challenge-token",
+    });
 
     expect(result.user.id).toBe(user.id);
     expect(result.accessToken).toBeDefined();
@@ -90,24 +107,22 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       type: "public-key" as const,
       clientExtensionResults: {},
       response: {
-        clientDataJSON: Buffer.from(
-          JSON.stringify({
-            type: "webauthn.get",
-            challenge: "test-challenge",
-            origin: "http://localhost:3200",
-          }),
-        ).toString("base64") as any,
+        clientDataJSON: clientDataJson({
+          type: "webauthn.get",
+          challenge: "test-challenge",
+          origin: "http://localhost:3200",
+        }),
         authenticatorData: "mock-auth-data",
         signature: "mock-signature",
       },
     };
 
-    vi.mocked(verifyChallenge).mockResolvedValue();
-    vi.mocked(verifyAuthenticationResponse).mockResolvedValue({
+    verifyChallenge.mockResolvedValue();
+    verifyAuthenticationResponse.mockResolvedValue({
       verified: true,
       authenticationInfo: {
         newCounter: 5, // Same as current counter - replay attack!
-        credentialID: passkey.credentialId as any,
+        credentialID: base64Url(passkey.credentialId),
         credentialDeviceType: "singleDevice",
         credentialBackedUp: false,
         userVerified: true,
@@ -117,13 +132,10 @@ describe("POST /auth/passkey/authenticate/verify", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify(
-        {
-          response: mockResponse,
-          signedChallenge: "signed-challenge-token",
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      authenticateClient.authenticateVerify({
+        response: mockResponse,
+        signedChallenge: "signed-challenge-token",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(
@@ -138,28 +150,23 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       type: "public-key" as const,
       clientExtensionResults: {},
       response: {
-        clientDataJSON: Buffer.from(
-          JSON.stringify({
-            type: "webauthn.get",
-            challenge: "test-challenge",
-            origin: "http://localhost:3200",
-          }),
-        ).toString("base64") as any,
+        clientDataJSON: clientDataJson({
+          type: "webauthn.get",
+          challenge: "test-challenge",
+          origin: "http://localhost:3200",
+        }),
         authenticatorData: "mock-auth-data",
         signature: "mock-signature",
       },
     };
 
-    vi.mocked(verifyChallenge).mockResolvedValue();
+    verifyChallenge.mockResolvedValue();
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify(
-        {
-          response: mockResponse,
-          signedChallenge: "signed-challenge-token",
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      authenticateClient.authenticateVerify({
+        response: mockResponse,
+        signedChallenge: "signed-challenge-token",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(
@@ -177,24 +184,22 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       type: "public-key" as const,
       clientExtensionResults: {},
       response: {
-        clientDataJSON: Buffer.from(
-          JSON.stringify({
-            type: "webauthn.get",
-            challenge: "test-challenge",
-            origin: "http://localhost:3200",
-          }),
-        ).toString("base64") as any,
+        clientDataJSON: clientDataJson({
+          type: "webauthn.get",
+          challenge: "test-challenge",
+          origin: "http://localhost:3200",
+        }),
         authenticatorData: "mock-auth-data",
         signature: "mock-signature",
       },
     };
 
-    vi.mocked(verifyChallenge).mockResolvedValue();
-    vi.mocked(verifyAuthenticationResponse).mockResolvedValue({
+    verifyChallenge.mockResolvedValue();
+    verifyAuthenticationResponse.mockResolvedValue({
       verified: true,
       authenticationInfo: {
         newCounter: 1,
-        credentialID: passkey.credentialId as any,
+        credentialID: base64Url(passkey.credentialId),
         credentialDeviceType: "singleDevice",
         credentialBackedUp: false,
         userVerified: true,
@@ -204,13 +209,10 @@ describe("POST /auth/passkey/authenticate/verify", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify(
-        {
-          response: mockResponse,
-          signedChallenge: "signed-challenge-token",
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      authenticateClient.authenticateVerify({
+        response: mockResponse,
+        signedChallenge: "signed-challenge-token",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid credentials.]`);
@@ -226,30 +228,23 @@ describe("POST /auth/passkey/authenticate/verify", () => {
       type: "public-key" as const,
       clientExtensionResults: {},
       response: {
-        clientDataJSON: Buffer.from(
-          JSON.stringify({
-            type: "webauthn.get",
-            challenge: "test-challenge",
-            origin: "http://localhost:3200",
-          }),
-        ).toString("base64") as any,
+        clientDataJSON: clientDataJson({
+          type: "webauthn.get",
+          challenge: "test-challenge",
+          origin: "http://localhost:3200",
+        }),
         authenticatorData: "mock-auth-data",
         signature: "mock-signature",
       },
     };
 
-    vi.mocked(verifyChallenge).mockRejectedValue(
-      new Error("Invalid challenge"),
-    );
+    verifyChallenge.mockRejectedValue(new Error("Invalid challenge"));
 
     const err = await waitError(
-      routerClient.auth.passkey.authenticateVerify(
-        {
-          response: mockResponse,
-          signedChallenge: "invalid-challenge",
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      authenticateClient.authenticateVerify({
+        response: mockResponse,
+        signedChallenge: "invalid-challenge",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid challenge]`);

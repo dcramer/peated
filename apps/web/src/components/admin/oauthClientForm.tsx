@@ -51,6 +51,15 @@ type FormData = z.infer<typeof OAuthClientFormSchema>;
 type OAuthClientInput = z.infer<typeof OAuthClientInputSchema>;
 type OAuthClient = z.infer<typeof OAuthClientSchema>;
 
+export function getOAuthClientFormDefaults(
+  initialData?: Partial<OAuthClient>,
+): FormData {
+  return {
+    name: initialData?.name ?? "",
+    redirectUris: initialData?.redirectUris?.join("\n") ?? "",
+  };
+}
+
 export default function OAuthClientForm({
   onSubmit,
   initialData,
@@ -66,10 +75,7 @@ export default function OAuthClientForm({
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(OAuthClientFormSchema),
-    defaultValues: {
-      name: initialData?.name ?? "",
-      redirectUris: initialData?.redirectUris?.join("\n") ?? "",
-    },
+    defaultValues: getOAuthClientFormDefaults(initialData),
   });
   const [error, setError] = useState<string>();
 

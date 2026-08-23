@@ -9,6 +9,7 @@ import {
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 export const UpdateEntityStatsJobArgsSchema = z
   .object({
@@ -19,7 +20,7 @@ export type UpdateEntityStatsJobArgs = z.infer<
   typeof UpdateEntityStatsJobArgsSchema
 >;
 
-export default async (input: unknown) => {
+export default async (input: JobPayload) => {
   const { entityId } = UpdateEntityStatsJobArgsSchema.parse(input);
   const entity = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, entityId),

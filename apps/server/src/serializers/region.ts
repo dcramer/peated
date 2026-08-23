@@ -6,6 +6,10 @@ import { serialize, serializer } from ".";
 import { db } from "../db";
 import { CountrySerializer } from "./country";
 
+interface RegionAttrs {
+  country: z.infer<typeof RegionSchema>["country"];
+}
+
 export const RegionSerializer = serializer({
   name: "region",
   attrs: async (itemList: Region[], currentUser?: User) => {
@@ -34,11 +38,7 @@ export const RegionSerializer = serializer({
       }),
     );
   },
-  item: (
-    item: Region,
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ): z.infer<typeof RegionSchema> => {
+  item: (item: Region, attrs: RegionAttrs): z.infer<typeof RegionSchema> => {
     return {
       id: item.id,
       name: item.name,

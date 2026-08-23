@@ -29,7 +29,7 @@ export default forwardRef<HTMLAnchorElement, SidebarLinkProps>(
     { children, active, icon, size = "default", as, href, ...props },
     ref,
   ) {
-    const Component = (as ?? defaultElement) as ElementType;
+    const Component = as ?? defaultElement;
     const Icon = icon;
 
     return (

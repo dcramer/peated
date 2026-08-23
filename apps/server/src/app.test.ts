@@ -2,6 +2,7 @@ import config from "@peated/server/config";
 import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { describe, expect, test } from "vitest";
+import { z } from "zod";
 import { app } from "./app";
 
 describe("app trace headers", () => {
@@ -25,9 +26,15 @@ describe("GET /spec.json", () => {
     const response = await app.request("/spec.json");
 
     expect(response.status).toBe(200);
-    const spec = (await response.json()) as {
-      components?: { schemas?: Record<string, unknown> };
-    };
+    const spec = z
+      .object({
+        components: z
+          .object({
+            schemas: z.record(z.string(), z.unknown()).optional(),
+          })
+          .optional(),
+      })
+      .parse(await response.json());
     expect(spec.components?.schemas?.PriceChange).toBeDefined();
     expect(spec.components?.schemas?.BottlePriceChange).toBeUndefined();
   });

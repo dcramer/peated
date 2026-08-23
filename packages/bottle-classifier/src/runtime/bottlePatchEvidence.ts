@@ -17,6 +17,7 @@ const GUARDED_PATCH_FIELDS = [
 ] as const satisfies readonly (keyof BottlePatch)[];
 
 type GuardedPatchField = (typeof GUARDED_PATCH_FIELDS)[number];
+type GuardedPatchValue = BottlePatch[GuardedPatchField];
 
 const EVIDENCE_FIELD_NAMES = {
   name: ["name", "expression"],
@@ -36,7 +37,7 @@ const EVIDENCE_FIELD_NAMES = {
 function currentFieldValue(
   context: BottleContext,
   field: GuardedPatchField,
-): unknown {
+): BottlePatch[GuardedPatchField] {
   switch (field) {
     case "name":
       return context.shared.name;
@@ -58,9 +59,9 @@ function currentFieldValue(
 }
 
 function recordSupportsValue(
-  record: Record<string, unknown> | null,
+  record: BottleContext["observations"][number]["facts"],
   field: GuardedPatchField,
-  value: unknown,
+  value: GuardedPatchValue,
 ) {
   if (!record) return false;
 
@@ -74,7 +75,7 @@ function recordSupportsValue(
 function observationSupportsValue(
   context: BottleContext,
   field: GuardedPatchField,
-  value: unknown,
+  value: GuardedPatchValue,
 ) {
   return context.observations.some(
     ({ parsedIdentity, facts }) =>
@@ -86,17 +87,11 @@ function observationSupportsValue(
 function agreeingImageCount(
   context: BottleContext,
   field: GuardedPatchField,
-  value: unknown,
+  value: GuardedPatchValue,
 ) {
   const sourceImageIds = new Set<string>();
   for (const { labelEvidence } of context.publicImages) {
-    if (
-      recordSupportsValue(
-        labelEvidence.extractedIdentity as Record<string, unknown> | null,
-        field,
-        value,
-      )
-    ) {
+    if (recordSupportsValue(labelEvidence.extractedIdentity, field, value)) {
       sourceImageIds.add(labelEvidence.sourceImageId);
     }
   }

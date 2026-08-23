@@ -76,10 +76,12 @@ function getExternalProductId(url: string): string {
   return match[1];
 }
 
-export function parseWhiskyWorldPage(html: string): {
+export interface WhiskyWorldPage {
   products: StorePrice[];
   hasNextPage: boolean;
-} {
+}
+
+export function parseWhiskyWorldPage(html: string): WhiskyWorldPage {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);

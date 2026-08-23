@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { z } from "zod";
 
 import { PhotoIcon } from "@heroicons/react/20/solid";
 import setRef from "../lib/setRef";
@@ -34,11 +35,8 @@ const fileToDataUrl = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      if (reader.result !== "data:") {
-        resolve(reader.result as string);
-      } else {
-        resolve("");
-      }
+      const result = z.string().safeParse(reader.result);
+      resolve(result.success && result.data !== "data:" ? result.data : "");
     };
     reader.onerror = () => {
       reject(reader.error);
@@ -54,7 +52,7 @@ function fileDataToCanvas(file: File): Promise<HTMLCanvasElement> {
     reader.onloadend = function (e) {
       if (!e.target?.result) return reject(new Error("Unable to read file"));
       const image = new Image();
-      image.src = e.target.result as any;
+      image.src = z.string().parse(e.target.result);
       image.onload = function (ev) {
         const canvas = document.createElement("canvas");
         canvas.width = image.width;

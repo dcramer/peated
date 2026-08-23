@@ -34,7 +34,7 @@ const TastingNotesSchema = z.object({
 });
 
 /** Runtime-owned v1 result for the stable expression shared by Bottles. */
-export const BottleGroupV1Schema = z.object({
+export const BottleGroupV1Fields = {
   schemaVersion: CatalogIdentitySchemaVersion,
   id: z.number().int().positive(),
   fullName: z.string().min(1),
@@ -54,10 +54,12 @@ export const BottleGroupV1Schema = z.object({
   createdByActorId: z.number().int().positive(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-});
+} as const;
+
+export const BottleGroupV1Schema = z.object(BottleGroupV1Fields);
 
 /** Runtime-owned v1 result for one complete Bottle. */
-export const BottleV1Schema = z.object({
+export const BottleV1Fields = {
   schemaVersion: CatalogIdentitySchemaVersion,
   id: z.number().int().positive(),
   groupId: z.number().int().positive(),
@@ -90,7 +92,9 @@ export const BottleV1Schema = z.object({
   createdByActorId: z.number().int().positive(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-});
+} as const;
+
+export const BottleV1Schema = z.object(BottleV1Fields);
 
 export type BottleGroupV1 = z.infer<typeof BottleGroupV1Schema>;
 export type BottleV1 = z.infer<typeof BottleV1Schema>;

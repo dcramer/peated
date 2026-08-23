@@ -77,6 +77,27 @@ export type StorePriceMatchAutomationAssessment = z.infer<
   typeof StorePriceMatchAutomationAssessmentSchema
 >;
 
+type ExistingMatchAssessment = Pick<
+  StorePriceMatchAutomationAssessment,
+  | "automationScore"
+  | "automationBlockers"
+  | "decisiveMatchAttributes"
+  | "structuredMatchRequiresStatedAge"
+  | "plainAgeBottleAutoVerifyEligible"
+  | "differentiatingAttributes"
+  | "webEvidenceChecks"
+>;
+
+type CreateMatchAssessment = Pick<
+  StorePriceMatchAutomationAssessment,
+  | "automationScore"
+  | "automationEligible"
+  | "automationBlockers"
+  | "decisiveMatchAttributes"
+  | "differentiatingAttributes"
+  | "webEvidenceChecks"
+>;
+
 const BLOCKED_AUTO_CREATE_SCORE = 89;
 const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
   "bottler",
@@ -641,7 +662,7 @@ function getExistingMatchAssessment({
   extractedLabel: ExtractedBottleDetails | null;
   searchEvidence: SearchEvidence[];
   webEvidenceJudgment?: WebEvidenceJudgment;
-}) {
+}): ExistingMatchAssessment {
   const target = getSuggestedMatchCandidate({
     suggestedBottleId,
     candidateBottles,
@@ -649,12 +670,12 @@ function getExistingMatchAssessment({
   if (!target) {
     return {
       automationScore: null,
-      decisiveMatchAttributes: [] as MatchAttribute[],
+      decisiveMatchAttributes: [],
       structuredMatchRequiresStatedAge: false,
       plainAgeBottleAutoVerifyEligible: false,
       automationBlockers: ["suggested match candidate was not found"],
-      differentiatingAttributes: [] as MatchAttribute[],
-      webEvidenceChecks: [] as EvidenceCheck[],
+      differentiatingAttributes: [],
+      webEvidenceChecks: [],
     };
   }
 
@@ -716,7 +737,7 @@ function getCreateNewScore({
   sourceBottleIdentity: ExtractedBottleDetails | null;
   hasUnresolvedRisks: boolean;
   webEvidenceJudgment?: WebEvidenceJudgment;
-}) {
+}): CreateMatchAssessment {
   let score = 30;
   const automationBlockers: string[] = [];
 
@@ -857,7 +878,7 @@ function getCreateNewScore({
       automationEligible: !hasBlockers,
       automationBlockers: Array.from(new Set(automationBlockers)),
       differentiatingAttributes,
-      decisiveMatchAttributes: ["name"] as MatchAttribute[],
+      decisiveMatchAttributes: ["name"],
       webEvidenceChecks: evaluatedChecks,
     };
   }

@@ -1,3 +1,7 @@
+import type {
+  CatalogVerificationCreationMetadata,
+  CatalogVerificationResult,
+} from "@peated/catalog-verifier";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -10,10 +14,29 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import type { TSVector } from "../columns/tsvector";
 import { actors } from "./actors";
 import { objectTypeEnum } from "./enums";
 
 export const changeTypeEnum = pgEnum("type", ["add", "update", "delete"]);
+
+type ChangeDataValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Date
+  | TSVector
+  | ChangeDataValue[]
+  | ChangeData;
+
+export interface ChangeData {
+  catalogVerification?:
+    | CatalogVerificationCreationMetadata
+    | CatalogVerificationResult;
+  [key: string]: ChangeDataValue;
+}
 
 export const changes = pgTable(
   "change",
@@ -23,7 +46,7 @@ export const changes = pgTable(
     objectType: objectTypeEnum("object_type").notNull(),
     type: changeTypeEnum("type").default("add").notNull(),
     displayName: text("display_name"),
-    data: jsonb("data").default({}).notNull().$type<Record<string, any>>(),
+    data: jsonb("data").default({}).notNull().$type<ChangeData>(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     actorId: bigint("actor_id", { mode: "number" })
       .references(() => actors.id)

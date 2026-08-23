@@ -18,14 +18,9 @@ import {
   syncBottleAliasConsumersForAliasChange,
 } from "@peated/server/lib/bottleAliases";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import * as workerClient from "@peated/server/worker/client";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { eq, sql } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-  pushUniqueJob: vi.fn(),
-}));
 
 beforeEach(() => {
   vi.mocked(workerClient.pushJob).mockReset();

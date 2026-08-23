@@ -1,9 +1,9 @@
-import { logInfo, logWarn } from "@peated/server/lib/log";
+import { logInfo, logWarn, type LogContext } from "@peated/server/lib/log";
 
 export function logScrapeWarning(
   site: string,
   message: string,
-  extra: Record<string, unknown> = {},
+  extra: LogContext = {},
 ) {
   logWarn(message, {
     extra: {

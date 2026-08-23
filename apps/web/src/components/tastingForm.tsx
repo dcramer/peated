@@ -2,7 +2,7 @@
 
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { TastingSchema } from "@peated/server/schemas";
+import { ServingStyleEnum, type TastingSchema } from "@peated/server/schemas";
 import type { ServingStyle, User } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -249,7 +249,7 @@ export default function TastingForm(
                   return (
                     <ServingStyleIcon
                       size={8}
-                      servingStyle={option.id as ServingStyle}
+                      servingStyle={ServingStyleEnum.parse(option.id)}
                       className="m-2"
                     />
                   );

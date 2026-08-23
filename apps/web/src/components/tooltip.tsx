@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode, RefObject } from "react";
+import type { CSSProperties, ReactNode, RefObject } from "react";
 import { useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import classNames from "../lib/classNames";
@@ -11,7 +11,7 @@ type Props = {
   className?: string;
   contentClassName?: string;
   origin?: "left" | "right" | "center";
-  style?: Record<string, any>;
+  style?: CSSProperties;
 };
 
 export default function Tooltip({
@@ -25,6 +25,7 @@ export default function Tooltip({
   const ref = useRef<HTMLSpanElement>(null);
   const [visible, setVisible] = useState(false);
 
+  // SAFETY: The hook's legacy type omits React 19's nullable ref value.
   useOnClickOutside(ref as RefObject<HTMLElement>, () => setVisible(false));
 
   return (

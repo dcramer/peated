@@ -7,6 +7,10 @@ import { notEmpty } from "../lib/filter";
 import { type EventSchema } from "../schemas";
 import { CountrySerializer } from "./country";
 
+interface EventAttrs {
+  country: z.infer<typeof EventSchema>["country"];
+}
+
 export const EventSerializer = serializer({
   name: "event",
   attrs: async (itemList: Event[], currentUser?: User) => {
@@ -35,11 +39,7 @@ export const EventSerializer = serializer({
       }),
     );
   },
-  item: (
-    item: Event,
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ): z.infer<typeof EventSchema> => {
+  item: (item: Event, attrs: EventAttrs): z.infer<typeof EventSchema> => {
     return {
       id: item.id,
       name: item.name,

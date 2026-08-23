@@ -8,18 +8,13 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const pushUniqueJobMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushUniqueJob: pushUniqueJobMock,
-}));
-
 describe("repairBottleBrandDistilleryAssignments", () => {
   beforeEach(() => {
-    pushUniqueJobMock.mockReset();
+    vi.mocked(workerClient.pushUniqueJob).mockReset();
   });
 
   test("previews one shared BottleGroup repair without mutating members", async ({
@@ -71,7 +66,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     expect(
       await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
     ).toMatchObject({ brandId: fromBrand.id, seriesId: sourceSeries.id });
-    expect(pushUniqueJobMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
   test("previews exact batch identity from BottleGroup authority despite member drift", async ({
@@ -93,7 +88,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       seriesId: sourceSeries.id,
     });
     const second = await fixtures.BottleGroupMember({
-      groupId: first.groupId as number,
+      groupId: first.groupId,
       edition: "Batch 2",
     });
     await db
@@ -124,7 +119,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       }),
       db.select().from(changes).where(inArray(changes.objectId, memberIds)),
     ]);
-    pushUniqueJobMock.mockReset();
+    vi.mocked(workerClient.pushUniqueJob).mockReset();
 
     const result = await repairBottleBrandDistilleryAssignments({
       bottleIds: [second.id],
@@ -169,7 +164,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
         .from(changes)
         .where(inArray(changes.objectId, memberIds)),
     ).toEqual(auditsBefore);
-    expect(pushUniqueJobMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
   test("fans shared brand, distillery, name, and series changes to every Bottle", async ({
@@ -191,7 +186,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       seriesId: sourceSeries.id,
     });
     const second = await fixtures.BottleGroupMember({
-      groupId: first.groupId as number,
+      groupId: first.groupId,
       edition: "Batch 2",
     });
 
@@ -259,10 +254,10 @@ describe("repairBottleBrandDistilleryAssignments", () => {
         creationSource: "repair_workflow",
       }),
     ]);
-    expect(pushUniqueJobMock).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: first.id,
     });
-    expect(pushUniqueJobMock).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: second.id,
     });
   });

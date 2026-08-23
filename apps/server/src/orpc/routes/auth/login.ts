@@ -97,7 +97,7 @@ export default procedure
       }
 
       // Log unexpected errors with minimal context
-      logError(error as Error, {
+      logError(error, {
         extra: {
           name: "auth/login",
         },
@@ -196,7 +196,7 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
     if (!user.termsAcceptedAt && tosAccepted) {
       const [updated] = await db
         .update(users)
-        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .set({ termsAcceptedAt: sql<Date>`NOW()` })
         .where(
           and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
         )
@@ -238,7 +238,7 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
     if (!foundUser.termsAcceptedAt && tosAccepted) {
       const [updated] = await db
         .update(users)
-        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .set({ termsAcceptedAt: sql<Date>`NOW()` })
         .where(
           and(
             eq(users.id, foundUser.id),
@@ -274,7 +274,7 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
       if (tosAccepted) {
         const [updated] = await tx
           .update(users)
-          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+          .set({ termsAcceptedAt: sql<Date>`NOW()` })
           .where(
             and(
               eq(users.id, newUser.id),
@@ -370,7 +370,7 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
     if (!user.termsAcceptedAt && tosAccepted) {
       const [updated] = await db
         .update(users)
-        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .set({ termsAcceptedAt: sql<Date>`NOW()` })
         .where(
           and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
         )
@@ -412,7 +412,7 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
     if (!foundUser.termsAcceptedAt && tosAccepted) {
       const [updated] = await db
         .update(users)
-        .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+        .set({ termsAcceptedAt: sql<Date>`NOW()` })
         .where(
           and(
             eq(users.id, foundUser.id),
@@ -448,7 +448,7 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
       if (tosAccepted) {
         const [updated] = await tx
           .update(users)
-          .set({ termsAcceptedAt: sql`NOW()` as unknown as Date })
+          .set({ termsAcceptedAt: sql<Date>`NOW()` })
           .where(
             and(
               eq(users.id, newUser.id),

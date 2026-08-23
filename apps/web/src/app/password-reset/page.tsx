@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 export default async function PasswordResetRedirect(props: {
-  searchParams: Promise<Record<string, any>>;
+  searchParams: Promise<{ token?: string }>;
 }) {
   const searchParams = await props.searchParams;
   const token = searchParams.token;

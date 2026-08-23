@@ -1,16 +1,18 @@
-import { Runner } from "@openai/agents";
-import type OpenAI from "openai";
+import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import {
   createBottleClassifier,
   prepareBottleClassifierAgentRun,
+  type BottleAgentRunResult,
   type BottleClassifierDataSource,
   type BottleClassifierToolEvent,
   type CreateBottleClassifierOptions,
+  type PreparedBottleClassifierAgentRun,
   type RunBottleClassifierAgentInput,
 } from "./classifierRuntime";
 import type {
   BottleCandidate,
+  BottleCandidateSearchInput,
   BottleClassifierAgentDecisionInput,
   BottleExtractedDetails,
   EntityResolution,
@@ -22,18 +24,13 @@ import {
 } from "./contract";
 import { buildBottleCandidate } from "./evalFixtureBuilders";
 
-type ReasoningResult = {
-  decision: BottleClassifierAgentDecisionInput;
-  artifacts: Parameters<typeof buildBottleClassificationArtifacts>[0];
-};
-
 function nativeAgentResult({
   finalOutput,
   inputTokens,
   outputTokens,
   toolNames = [],
 }: {
-  finalOutput: unknown;
+  finalOutput: object;
   inputTokens: number;
   outputTokens: number;
   toolNames?: string[];
@@ -54,6 +51,13 @@ function nativeAgentResult({
     })),
   };
 }
+
+type ReasoningResult = {
+  decision: BottleClassifierAgentDecisionInput;
+  artifacts: Parameters<typeof buildBottleClassificationArtifacts>[0];
+};
+
+const TEST_OPENAI_CLIENT = new OpenAI({ apiKey: "test" });
 
 function noMatchAgentDecision() {
   return {
@@ -101,7 +105,7 @@ const supportiveWebEvidenceConfidenceBasis = {
 // Real-bottle workflow regressions belong in the fixture-driven eval corpus,
 // not in additional mocked classifier behavior tests here.
 function createTestClassifier({
-  client = {} as OpenAI,
+  client = TEST_OPENAI_CLIENT,
   extractedIdentity = null,
   extractedIdentityFromImage,
   extractedIdentityFromText,
@@ -109,13 +113,14 @@ function createTestClassifier({
   extractFromImageError,
   maxSearchQueries = 2,
   firecrawlApiKey,
-  searchBottles = vi.fn(async () => [] as BottleCandidate[]),
+  searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []),
   searchEntities,
   getBottleCandidateById,
   getBottleContext,
   runBottleClassifierAgent,
   executeWebSearch,
   observeToolEvent,
+  runPreparedBottleClassifierAgent,
 }: {
   client?: OpenAI;
   extractedIdentity?: BottleExtractedDetails | null;
@@ -126,7 +131,9 @@ function createTestClassifier({
   maxSearchQueries?: number;
   firecrawlApiKey?: string;
   searchBottles?: ReturnType<
-    typeof vi.fn<(args: unknown) => Promise<BottleCandidate[]>>
+    typeof vi.fn<
+      (args: BottleCandidateSearchInput) => Promise<BottleCandidate[]>
+    >
   >;
   searchEntities?: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
   getBottleCandidateById?: (
@@ -138,6 +145,9 @@ function createTestClassifier({
   ) => Promise<ReasoningResult>;
   executeWebSearch?: CreateBottleClassifierOptions["executeWebSearch"];
   observeToolEvent?: CreateBottleClassifierOptions["observeToolEvent"];
+  runPreparedBottleClassifierAgent?: (
+    preparedRun: PreparedBottleClassifierAgentRun,
+  ) => Promise<BottleAgentRunResult>;
 }) {
   return {
     classifier: createBottleClassifier({
@@ -172,6 +182,7 @@ function createTestClassifier({
               };
             }
           : undefined,
+        runPreparedBottleClassifierAgent,
       },
     }),
     searchBottles,
@@ -949,7 +960,7 @@ describe("createBottleClassifier", () => {
   test("passes explicit GPT-5 reasoning effort to the semantic agent", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: {} as OpenAI,
+        client: TEST_OPENAI_CLIENT,
         model: "openai/gpt-5.6-luna",
         reasoningEffort: "high",
         maxSearchQueries: 2,
@@ -974,7 +985,7 @@ describe("createBottleClassifier", () => {
   test("exposes Firecrawl search and page reading when configured", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: {} as OpenAI,
+        client: TEST_OPENAI_CLIENT,
         model: "test-model",
         maxSearchQueries: 2,
         firecrawlApiKey: "firecrawl-test-key",
@@ -1000,7 +1011,7 @@ describe("createBottleClassifier", () => {
   test("does not expose a web-search substitute without Firecrawl", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: {} as OpenAI,
+        client: TEST_OPENAI_CLIENT,
         model: "test-model",
         maxSearchQueries: 2,
         adapters: {
@@ -1025,7 +1036,7 @@ describe("createBottleClassifier", () => {
   test("rebuilds search artifacts from batched Firecrawl tool output", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: {} as OpenAI,
+        client: TEST_OPENAI_CLIENT,
         model: "test-model",
         maxSearchQueries: 2,
         adapters: {
@@ -1086,7 +1097,7 @@ describe("createBottleClassifier", () => {
 
   test("auto ignores obvious non-whisky references when extraction fails", async () => {
     const runBottleClassifierAgent = vi.fn();
-    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
     const { classifier } = createTestClassifier({
       extractedIdentity: null,
       searchBottles,
@@ -1110,7 +1121,7 @@ describe("createBottleClassifier", () => {
 
   test("auto ignores packaging-only gift set references when extraction fails", async () => {
     const runBottleClassifierAgent = vi.fn();
-    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
     const { classifier } = createTestClassifier({
       extractedIdentity: null,
       searchBottles,
@@ -1135,7 +1146,7 @@ describe("createBottleClassifier", () => {
 
   test("auto ignores multi-pack listings even when extraction finds a bottle identity", async () => {
     const runBottleClassifierAgent = vi.fn();
-    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
     const { classifier } = createTestClassifier({
       extractedIdentity: buffaloTraceStraightBourbonIdentity,
       searchBottles,
@@ -1162,7 +1173,7 @@ describe("createBottleClassifier", () => {
 
   test("auto ignores bundle listings even when extraction finds a bottle identity", async () => {
     const runBottleClassifierAgent = vi.fn();
-    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
     const { classifier } = createTestClassifier({
       extractedIdentity: buffaloTraceStraightBourbonIdentity,
       searchBottles,
@@ -1189,7 +1200,7 @@ describe("createBottleClassifier", () => {
 
   test("auto ignores damaged-condition listings even when extraction finds a bottle identity", async () => {
     const runBottleClassifierAgent = vi.fn();
-    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
     const { classifier } = createTestClassifier({
       extractedIdentity: blantonsOriginalIdentity,
       searchBottles,
@@ -1423,7 +1434,7 @@ describe("createBottleClassifier", () => {
         fullName: `Candidate Brand ${index} Expression`,
       }),
     );
-    const searchEntities = vi.fn(async () => [] as EntityResolution[]);
+    const searchEntities = vi.fn(async (): Promise<EntityResolution[]> => []);
     const runBottleClassifierAgent = vi.fn(
       async ({ resolvedEntities }): Promise<ReasoningResult> => ({
         decision: {
@@ -1463,28 +1474,7 @@ describe("createBottleClassifier", () => {
   });
 
   test("does not post-backfill web evidence for create decisions when the agent skipped search", async () => {
-    const create = vi.fn().mockResolvedValue({
-      output_text:
-        "Festival Distillery confirms Warehouse Session is a single malt whisky.",
-      output: [
-        {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            sources: [
-              {
-                type: "url",
-                url: "https://www.festivaldistillery.com/warehouse-session",
-              },
-              {
-                type: "url",
-                url: "https://www.whiskyadvocate.com/ratings-reviews/festival-distillery-warehouse-session/",
-              },
-            ],
-          },
-        },
-      ],
-    });
+    const executeWebSearch = vi.fn();
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
@@ -1534,14 +1524,10 @@ describe("createBottleClassifier", () => {
       }),
     );
     const { classifier } = createTestClassifier({
-      client: {
-        responses: {
-          create,
-        },
-      } as unknown as OpenAI,
       extractedIdentity: null,
       maxSearchQueries: 1,
       runBottleClassifierAgent,
+      executeWebSearch,
     });
 
     const result = await classifier.classifyBottleReference({
@@ -1551,7 +1537,7 @@ describe("createBottleClassifier", () => {
       },
     });
 
-    expect(create).not.toHaveBeenCalled();
+    expect(executeWebSearch).not.toHaveBeenCalled();
     expect(result.status).toBe("classified");
     if (result.status !== "classified") return;
     expect(result.artifacts.searchEvidence).toHaveLength(0);
@@ -1965,24 +1951,7 @@ describe("createBottleClassifier", () => {
       cask_fill: "1st_fill",
       edition: null,
     };
-    const create = vi.fn().mockResolvedValue({
-      output_text:
-        "Example Selection uses a first-fill Pedro Ximénez hogshead.",
-      output: [
-        {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            sources: [
-              {
-                type: "url",
-                url: "https://producer.example/products/selection",
-              },
-            ],
-          },
-        },
-      ],
-    });
+    const executeWebSearch = vi.fn();
     const runBottleClassifierAgent = vi.fn(
       async ({ searchEvidence }): Promise<ReasoningResult> => ({
         decision: {
@@ -2003,14 +1972,10 @@ describe("createBottleClassifier", () => {
       }),
     );
     const { classifier } = createTestClassifier({
-      client: {
-        responses: {
-          create,
-        },
-      } as unknown as OpenAI,
       extractedIdentity,
       maxSearchQueries: 1,
       runBottleClassifierAgent,
+      executeWebSearch,
     });
 
     await classifier.classifyBottleReference({
@@ -2021,7 +1986,7 @@ describe("createBottleClassifier", () => {
       initialCandidates: [],
     });
 
-    expect(create).not.toHaveBeenCalled();
+    expect(executeWebSearch).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).toHaveBeenCalledWith(
       expect.objectContaining({
         searchEvidence: [],
@@ -2030,15 +1995,18 @@ describe("createBottleClassifier", () => {
   });
 
   test("reports metadata for one native reference reasoning call", async () => {
-    const runAgent = vi.spyOn(Runner.prototype, "run").mockResolvedValueOnce(
+    const runAgent = vi.fn(async () =>
       nativeAgentResult({
         finalOutput: noMatchAgentDecision(),
         inputTokens: 20,
         outputTokens: 5,
         toolNames: ["search_bottles"],
-      }) as never,
+      }),
     );
-    const { classifier } = createTestClassifier({ maxSearchQueries: 0 });
+    const { classifier } = createTestClassifier({
+      maxSearchQueries: 0,
+      runPreparedBottleClassifierAgent: runAgent,
+    });
 
     try {
       const run = await classifier.runBottleReference({
@@ -2062,7 +2030,7 @@ describe("createBottleClassifier", () => {
         toolCalls: { count: 1, names: ["search_bottles"] },
       });
     } finally {
-      runAgent.mockRestore();
+      expect(runAgent).toHaveBeenCalledOnce();
     }
   });
 

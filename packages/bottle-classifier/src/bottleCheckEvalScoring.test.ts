@@ -469,15 +469,18 @@ describe("Bottle-check eval scoring", () => {
         { kind: "web_result", url: "https://example.com/source" },
       ],
     };
+    const filteredEvidence = expectedOperation.evidenceRefs.filter(
+      testCase.keepEvidence,
+    );
+    const firstEvidence = filteredEvidence[0];
+    if (!firstEvidence) throw new Error("Expected retained operation evidence");
     const actual = {
       artifacts,
       proposedOperations: [
         {
           ...expectedOperation,
-          evidenceRefs: expectedOperation.evidenceRefs.filter(
-            testCase.keepEvidence,
-          ) as ProposedOperation["evidenceRefs"],
-        } as ProposedOperation,
+          evidenceRefs: [firstEvidence, ...filteredEvidence.slice(1)],
+        } satisfies ProposedOperation,
       ],
       findings: [],
     };

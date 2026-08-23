@@ -127,6 +127,9 @@ export default function BottleSelector({
 
   const listItemClasses = `px-3 group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900`;
 
+  const newBottleParams = new URLSearchParams({ name: toTitleCase(query) });
+  if (returnTo) newBottleParams.set("returnTo", returnTo);
+
   return (
     <Modal open={open} onClose={handleClose}>
       <LayoutModal
@@ -222,12 +225,7 @@ export default function BottleSelector({
 
                   <div className="min-w-0 flex-auto">
                     <div className="font-semibold">
-                      <a
-                        href={`/bottles/new?${new URLSearchParams({
-                          name: toTitleCase(query),
-                          ...(returnTo ? { returnTo } : {}),
-                        }).toString()}`}
-                      >
+                      <a href={`/bottles/new?${newBottleParams.toString()}`}>
                         <span className="absolute inset-x-0 -top-px bottom-0" />
                         Can't find what you're looking for?
                       </a>

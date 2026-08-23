@@ -192,9 +192,7 @@ export function createEntityClassifier(
       });
       const advice = finalizeEntityClassification({
         reference,
-        advice: EntityClassificationAdviceSchema.parse(
-          result.finalOutput as EntityClassificationAdvice,
-        ),
+        advice: EntityClassificationAdviceSchema.parse(result.finalOutput),
         artifacts,
       });
 

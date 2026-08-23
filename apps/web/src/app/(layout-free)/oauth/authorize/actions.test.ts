@@ -1,25 +1,15 @@
 import { createS256CodeChallenge } from "@peated/server/lib/oauth";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({
-  authorize: vi.fn(),
-  authorizationDetails: vi.fn(),
-  redirect: vi.fn(),
-}));
+import {
+  approveOAuthAuthorizationWith,
+  denyOAuthAuthorizationWith,
+  type OAuthAuthorizationOperations,
+} from "./authorizationOperations";
 
-vi.mock("@peated/web/lib/orpc/client.server", () => ({
-  createServerClient: async () => ({
-    client: { oauth: { authorize: mocks.authorize } },
-  }),
-  createAnonymousServerClient: async () => ({
-    client: {
-      oauth: { authorizationDetails: mocks.authorizationDetails },
-    },
-  }),
-}));
-vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
-
-import { approveOAuthAuthorization, denyOAuthAuthorization } from "./actions";
+const authorize = vi.fn<OAuthAuthorizationOperations["authorize"]>();
+const validate = vi.fn<OAuthAuthorizationOperations["validate"]>();
+const redirect = vi.fn<OAuthAuthorizationOperations["redirect"]>();
 
 const verifier = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFG";
 
@@ -35,40 +25,48 @@ function authorizationFormData() {
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  authorize.mockReset();
+  validate.mockReset();
+  redirect.mockReset();
 });
 
 describe("OAuth authorization actions", () => {
   test("approves through the authenticated API and preserves state", async () => {
-    mocks.authorize.mockResolvedValue({
+    authorize.mockResolvedValue({
       code: "authorization-code",
       redirectUri: "http://127.0.0.1:45678/callback",
       state: "opaque-state",
     });
 
-    await approveOAuthAuthorization(authorizationFormData());
+    await approveOAuthAuthorizationWith(authorizationFormData(), {
+      authorize,
+      redirect,
+    });
 
-    expect(mocks.authorize).toHaveBeenCalledWith(
+    expect(authorize).toHaveBeenCalledWith(
       expect.objectContaining({
         clientId: "peated-cli",
         state: "opaque-state",
       }),
     );
-    expect(mocks.redirect).toHaveBeenCalledWith(
+    expect(redirect).toHaveBeenCalledWith(
       "http://127.0.0.1:45678/callback?code=authorization-code&state=opaque-state",
     );
   });
 
   test("revalidates before redirecting a denial", async () => {
-    mocks.authorizationDetails.mockResolvedValue({
+    validate.mockResolvedValue({
       clientId: "peated-cli",
       name: "Peated CLI",
     });
 
-    await denyOAuthAuthorization(authorizationFormData());
+    await denyOAuthAuthorizationWith(authorizationFormData(), {
+      validate,
+      redirect,
+    });
 
-    expect(mocks.authorizationDetails).toHaveBeenCalledOnce();
-    expect(mocks.redirect).toHaveBeenCalledWith(
+    expect(validate).toHaveBeenCalledOnce();
+    expect(redirect).toHaveBeenCalledWith(
       "http://127.0.0.1:45678/callback?error=access_denied&state=opaque-state",
     );
   });

@@ -4,7 +4,6 @@ import type { ComponentProps } from "react";
 type Item = {
   name: string;
   count: number;
-  [key: string]: any;
 };
 
 export function DistributionChartSkeleton() {

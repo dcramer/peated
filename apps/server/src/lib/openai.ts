@@ -1,5 +1,5 @@
 import config from "@peated/server/config";
-import { logError } from "@peated/server/lib/log";
+import { logError, type SentryLogContexts } from "@peated/server/lib/log";
 import { createOpenAIClient } from "@peated/server/lib/openaiClient";
 import { startSpan } from "@sentry/node";
 import { zodTextFormat } from "openai/helpers/zod";
@@ -51,7 +51,7 @@ export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   schema: Schema,
   fullSchema?: null,
   model?: string,
-  logContext?: Record<string, Record<string, any>>,
+  logContext?: SentryLogContexts,
 ): Promise<z.infer<Schema> | null>;
 export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
@@ -62,7 +62,7 @@ export async function getStructuredResponse<
   schema: Schema,
   fullSchema: FullSchema,
   model?: string,
-  logContext?: Record<string, Record<string, any>>,
+  logContext?: SentryLogContexts,
 ): Promise<z.infer<FullSchema> | null>;
 export async function getStructuredResponse<
   Schema extends ZodSchema<any>,
@@ -73,14 +73,15 @@ export async function getStructuredResponse<
   schema: Schema,
   fullSchema: FullSchema | null = null,
   model = DEFAULT_MODEL,
-  logContext?: Record<string, Record<string, any>>,
-): Promise<z.infer<FullSchema> | null> {
+  logContext?: SentryLogContexts,
+): Promise<z.infer<Schema> | z.infer<FullSchema> | null> {
   const openai = createOpenAIClient();
 
-  const responseSchema = (fullSchema || schema) as ZodSchema<any>;
-  const input = typeof prompt === "string" ? prompt : prompt;
-  const inputMessages: Message[] =
-    typeof prompt === "string" ? [{ role: "user", content: prompt }] : prompt;
+  const responseSchema = fullSchema ?? schema;
+  const input = prompt;
+  const inputMessages: Message[] = Array.isArray(prompt)
+    ? prompt
+    : [{ role: "user", content: prompt }];
 
   const response = await startSpan(
     buildStructuredResponseSpanContext(pipelineName, model),
@@ -166,7 +167,7 @@ export async function getStructuredResponse<
   }
 
   try {
-    return responseSchema.parse(structuredResponse) as z.infer<FullSchema>;
+    return responseSchema.parse(structuredResponse);
   } catch (err) {
     logError(
       err,

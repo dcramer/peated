@@ -21,6 +21,7 @@ import {
 } from "@logtape/logtape";
 import { redactByField } from "@logtape/redaction";
 import * as Sentry from "@sentry/nextjs";
+import { z } from "zod";
 
 const ROOT_LOG_CATEGORY = ["peated", "web"] as const;
 
@@ -28,10 +29,12 @@ type SinkId = "console" | "sentry";
 
 let loggingConfigured = false;
 
-export type LogContext = Record<string, unknown>;
+export type LogContext = LogRecord["properties"];
+type LogContextValue = LogContext[string];
+type LogMessage = LogRecord["message"][number];
 
 export interface LogOptions {
-  context?: unknown;
+  context?: LogContextValue;
   extra?: LogContext;
 }
 
@@ -49,7 +52,7 @@ function resolveLowestLevel(): LogLevel {
   return process.env.NODE_ENV === "development" ? "debug" : "info";
 }
 
-function safeJsonStringify(value: unknown): string | undefined {
+function safeJsonStringify(value: LogMessage): string | undefined {
   try {
     return JSON.stringify(value);
   } catch {
@@ -65,17 +68,17 @@ function truncate(text: string, maxLength = 1024): string {
   return `${text.slice(0, maxLength - 3)}...`;
 }
 
-function coerceMessage(value: unknown): string {
-  if (typeof value === "string") {
-    return value;
+function coerceMessage(value: LogMessage): string {
+  const text = z.string().safeParse(value);
+  if (text.success) {
+    return text.data;
   }
 
-  if (
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    typeof value === "bigint"
-  ) {
-    return value.toString();
+  const primitive = z
+    .union([z.number(), z.boolean(), z.bigint()])
+    .safeParse(value);
+  if (primitive.success) {
+    return primitive.data.toString();
   }
 
   if (value === null || value === undefined) {
@@ -131,12 +134,12 @@ export function configureLogging(): void {
     return;
   }
 
-  const consoleSink = redactByField(
+  const consoleSink: Sink = redactByField(
     getConsoleSink({
       formatter: getJsonLinesFormatter(),
     }),
-  ) as Sink;
-  const sentrySink = redactByField(createSentryLogsSink()) as Sink;
+  );
+  const sentrySink: Sink = redactByField(createSentryLogsSink());
 
   configureSync<SinkId, never>({
     reset: getConfig() !== null,
@@ -185,7 +188,7 @@ interface SerializedError {
   cause?: SerializedError;
 }
 
-function serializeError(value: unknown, depth = 0): SerializedError {
+function serializeError(value: LogMessage, depth = 0): SerializedError {
   if (value instanceof Error) {
     const serialized: SerializedError = {
       message: value.message,
@@ -195,7 +198,7 @@ function serializeError(value: unknown, depth = 0): SerializedError {
       serialized.name = value.name;
     }
 
-    if (typeof value.stack === "string") {
+    if (value.stack !== undefined) {
       serialized.stack = value.stack;
     }
 
@@ -211,13 +214,20 @@ function serializeError(value: unknown, depth = 0): SerializedError {
 
 // Keep existing context-argument callers working while accepting structured
 // `{context, extra}` options for new LogTape attributes.
-function normalizeLogOptions(contextOrOptions?: unknown | LogOptions) {
+function normalizeLogOptions(contextOrOptions?: LogContextValue | LogOptions) {
+  const structuredOptions = z
+    .object({
+      context: z.string().optional(),
+      extra: z.record(z.string(), z.unknown()).optional(),
+    })
+    .passthrough()
+    .safeParse(contextOrOptions);
   if (
-    contextOrOptions &&
-    typeof contextOrOptions === "object" &&
-    ("context" in contextOrOptions || "extra" in contextOrOptions)
+    structuredOptions.success &&
+    (structuredOptions.data.context !== undefined ||
+      structuredOptions.data.extra !== undefined)
   ) {
-    const options = contextOrOptions as LogOptions & LogContext;
+    const options = structuredOptions.data;
     const extra: LogContext = { ...(options.extra ?? {}) };
 
     for (const [key, value] of Object.entries(options)) {
@@ -263,9 +273,16 @@ function mergeLogProperties(
   return properties;
 }
 
+function buildSentryExtra(options: LogOptions): LogContext | undefined {
+  if (options.context === undefined && !options.extra) return undefined;
+  const extra: LogContext = { ...(options.extra ?? {}) };
+  if (options.context !== undefined) extra.context = options.context;
+  return extra;
+}
+
 function logWithLevel(
   level: LogLevel,
-  value: unknown,
+  value: LogMessage,
   contextOrOptions?: LogContext | LogOptions,
   scope: string | readonly string[] = [],
 ): void {
@@ -304,7 +321,7 @@ function logWithLevel(
 
 /** Emit a debug structured log without creating a Sentry issue. */
 export function logDebug(
-  value: unknown,
+  value: LogMessage,
   contextOrOptions?: LogContext | LogOptions,
 ): void {
   logWithLevel("debug", value, contextOrOptions);
@@ -312,7 +329,7 @@ export function logDebug(
 
 /** Emit an informational structured log without creating a Sentry issue. */
 export function logInfo(
-  value: unknown,
+  value: LogMessage,
   contextOrOptions?: LogContext | LogOptions,
 ): void {
   logWithLevel("info", value, contextOrOptions);
@@ -320,7 +337,7 @@ export function logInfo(
 
 /** Emit a warning structured log without creating a Sentry issue. */
 export function logWarn(
-  value: unknown,
+  value: LogMessage,
   contextOrOptions?: LogContext | LogOptions,
 ): void {
   logWithLevel("warning", value, contextOrOptions);
@@ -328,59 +345,47 @@ export function logWarn(
 
 /** Emit an error-level telemetry log without creating a Sentry issue. */
 export function logTelemetryError(
-  value: unknown,
+  value: LogMessage,
   contextOrOptions?: LogContext | LogOptions,
 ): void {
   logWithLevel("error", value, contextOrOptions);
 }
 
 /** Capture an explicit Sentry issue and mirror it as a structured log. */
-export function logError(error: Error | unknown, context?: unknown): void;
-export function logError(message: string, context?: unknown): void;
+export function logError(
+  error: Error | LogMessage,
+  context?: LogContextValue,
+): void;
+export function logError(message: string, context?: LogContextValue): void;
 export function logError(message: string, options?: LogOptions): void;
 export function logError(
-  error: string | Error | unknown,
-  contextOrOptions?: unknown | LogOptions,
+  error: string | Error | LogMessage,
+  contextOrOptions?: LogContextValue | LogOptions,
 ): string {
   configureLogging();
 
   const options = normalizeLogOptions(contextOrOptions);
-  const eventId =
-    typeof error === "string"
-      ? Sentry.captureMessage(error, {
-          level: "error",
-          extra:
-            options.context !== undefined || options.extra
-              ? {
-                  ...(options.extra ?? {}),
-                  ...(options.context !== undefined
-                    ? { context: options.context }
-                    : {}),
-                }
-              : undefined,
-        })
-      : Sentry.captureException(error, {
-          level: "error",
-          extra:
-            options.context !== undefined || options.extra
-              ? {
-                  ...(options.extra ?? {}),
-                  ...(options.context !== undefined
-                    ? { context: options.context }
-                    : {}),
-                }
-              : undefined,
-        });
+  const sentryExtra = buildSentryExtra(options);
+  const message = z.string().safeParse(error);
+  const eventId = message.success
+    ? Sentry.captureMessage(message.data, {
+        level: "error",
+        extra: sentryExtra,
+      })
+    : Sentry.captureException(error, {
+        level: "error",
+        extra: sentryExtra,
+      });
+
+  const logExtra: LogContext = { ...(options.extra ?? {}) };
+  logExtra.eventId = eventId;
 
   logWithLevel(
     "error",
     error,
     {
       ...options,
-      extra: {
-        ...(options.extra ?? {}),
-        eventId,
-      },
+      extra: logExtra,
     },
     ["runtime", "issues"],
   );

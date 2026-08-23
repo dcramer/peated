@@ -1,10 +1,9 @@
-import type { Bottle } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import BottleHeader from "./bottleHeader";
+import BottleHeader, { type BottleHeaderBottle } from "./bottleHeader";
 
-vi.mock("@peated/web/assets/bottle.svg", () => ({ default: "svg" }));
+const EmptyIcon = () => null;
 
 describe("BottleHeader", () => {
   it("separates the shared label from exact Bottle metadata", () => {
@@ -20,6 +19,7 @@ describe("BottleHeader", () => {
         name: "Lagavulin Distillery",
         shortName: "Lagavulin",
       },
+      series: null,
       distillers: [],
       edition: "Distillers Edition",
       category: "single_malt",
@@ -32,9 +32,11 @@ describe("BottleHeader", () => {
       caskFill: null,
       caskType: null,
       caskSize: null,
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text).toContain("Lagavulin21");
@@ -52,6 +54,7 @@ describe("BottleHeader", () => {
       name: "Distillers Edition - 2025 Release",
       group: { name: "Distillers Edition" },
       brand: { id: 7, name: "Lagavulin", shortName: null },
+      series: null,
       distillers: [],
       edition: "Distillers Edition",
       category: "single_malt",
@@ -64,9 +67,11 @@ describe("BottleHeader", () => {
       caskFill: null,
       caskType: null,
       caskSize: null,
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text.match(/Distillers Edition/g)).toHaveLength(1);
@@ -80,6 +85,7 @@ describe("BottleHeader", () => {
       name: "Double Bourbon Cask 3-year-old",
       group: { name: "Double Bourbon Cask 3-year-old" },
       brand: { id: 7, name: "Pōkeno", shortName: null },
+      series: null,
       distillers: [{ id: 7, name: "Pōkeno" }],
       edition: null,
       category: "single_malt",
@@ -92,9 +98,11 @@ describe("BottleHeader", () => {
       caskFill: null,
       caskType: "bourbon",
       caskSize: null,
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text.match(/Pōkeno/g)).toHaveLength(1);
@@ -113,6 +121,7 @@ describe("BottleHeader", () => {
       name: "Orchard House",
       group: { name: "Orchard House" },
       brand: { id: 7, name: "Compass Box", shortName: null },
+      series: null,
       distillers: [{ id: 8, name: "Clynelish" }],
       edition: null,
       category: "single_malt",
@@ -125,9 +134,11 @@ describe("BottleHeader", () => {
       caskFill: null,
       caskType: null,
       caskSize: null,
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text).toContain("Distilled atClynelish");
@@ -140,6 +151,7 @@ describe("BottleHeader", () => {
       name: "Orchard House",
       group: { name: "Orchard House" },
       brand: { id: 7, name: "Compass Box", shortName: null },
+      series: null,
       distillers: [{ id: 8, name: "Clynelish" }],
       edition: null,
       category: "blend",
@@ -152,9 +164,11 @@ describe("BottleHeader", () => {
       caskFill: null,
       caskType: null,
       caskSize: null,
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text).toContain("DistilleryClynelish");
@@ -168,6 +182,7 @@ describe("BottleHeader", () => {
       name: "Seven Distilleries",
       group: { name: "Seven Distilleries" },
       brand: { id: 7, name: "Compass Box", shortName: null },
+      series: null,
       distillers: [
         { id: 1, name: "Aberlour" },
         { id: 2, name: "Clynelish" },
@@ -188,9 +203,11 @@ describe("BottleHeader", () => {
       caskFill: null,
       caskType: null,
       caskSize: null,
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text).toContain("7 distilleries");
@@ -206,6 +223,7 @@ describe("BottleHeader", () => {
       name: "Single Cask 4-year-old",
       group: { name: "Single Cask 4-year-old" },
       brand: { id: 7, name: "Pōkeno", shortName: null },
+      series: null,
       distillers: [],
       edition: null,
       category: null,
@@ -218,9 +236,11 @@ describe("BottleHeader", () => {
       caskFill: null,
       caskType: null,
       caskSize: null,
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text.match(/Single Cask/g)).toHaveLength(1);
@@ -247,9 +267,11 @@ describe("BottleHeader", () => {
       caskFill: "refill",
       caskType: "bourbon",
       caskSize: "hogshead",
-    } as unknown as Bottle;
+    } satisfies BottleHeaderBottle;
 
-    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const html = renderToStaticMarkup(
+      <BottleHeader bottle={bottle} icon={EmptyIcon} />,
+    );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text).toContain("Decadent Drinks·WhiskylandGlenburgie 38-year-old");

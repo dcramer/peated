@@ -5,23 +5,34 @@ import {
   bottles,
   entities,
 } from "@peated/server/db/schema";
-import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
 import { asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import indexBottleAlias from "./indexBottleAlias";
+import { z } from "zod";
+import type { JobPayload } from "../types";
+import {
+  indexBottleAlias as indexBottleAliasWithServices,
+  type IndexBottleAliasServices,
+} from "./indexBottleAlias";
 
-vi.mock("@peated/server/lib/openaiEmbeddings", () => ({
-  getOpenAIEmbedding: vi.fn(),
-}));
+let createEmbedding: ReturnType<
+  typeof vi.fn<IndexBottleAliasServices["createEmbedding"]>
+>;
+
+function indexBottleAlias(input: JobPayload) {
+  return indexBottleAliasWithServices(input, { createEmbedding });
+}
 
 const EMBEDDING = Array.from({ length: 3072 }, () => 0.125);
 const FRESH_EMBEDDING = Array.from({ length: 3072 }, () => 0.5);
 
-function firstEmbeddingValue(embedding: unknown): number | null {
+function firstEmbeddingValue(
+  embedding: number[] | string | null,
+): number | null {
   if (embedding === null) return null;
   if (Array.isArray(embedding)) return Number(embedding[0]);
-  if (typeof embedding === "string") {
-    return Number(embedding.slice(1).split(",", 1)[0]);
+  const serializedEmbedding = z.string().safeParse(embedding);
+  if (serializedEmbedding.success) {
+    return Number(serializedEmbedding.data.slice(1).split(",", 1)[0]);
   }
   throw new Error("Unexpected pgvector representation.");
 }
@@ -37,7 +48,7 @@ async function getFirstStoredEmbeddingValue(name: string) {
 
 describe("indexBottleAlias", () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    createEmbedding = vi.fn();
   });
 
   test("builds search text from the directly assigned Bottle", async ({
@@ -66,15 +77,15 @@ describe("indexBottleAlias", () => {
       ignored: false,
       embedding: EMBEDDING,
     });
-    vi.mocked(getOpenAIEmbedding).mockImplementation(async () => {
+    createEmbedding.mockImplementation(async () => {
       expect(await getFirstStoredEmbeddingValue(alias.name)).toBeNull();
       return FRESH_EMBEDDING;
     });
 
     await indexBottleAlias({ name: alias.name.toUpperCase() });
 
-    expect(getOpenAIEmbedding).toHaveBeenCalledOnce();
-    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+    expect(createEmbedding).toHaveBeenCalledOnce();
+    expect(createEmbedding).toHaveBeenCalledWith(
       "Direct Bottle Brand Authoritative Alias Aurora Single Malt Solstice 19-year-old oloroso cask strength barrel strength barrel proof full proof natural strength single cask single barrel 1998 vintage 2018 release 57.4% ABV",
     );
     expect(
@@ -122,7 +133,7 @@ describe("indexBottleAlias", () => {
       await indexBottleAlias({ name: alias.name });
     }
 
-    expect(getOpenAIEmbedding).not.toHaveBeenCalled();
+    expect(createEmbedding).not.toHaveBeenCalled();
     expect(
       await db
         .select({
@@ -154,7 +165,7 @@ describe("indexBottleAlias", () => {
       bottleId: originalBottle.id,
       embedding: EMBEDDING,
     });
-    vi.mocked(getOpenAIEmbedding)
+    createEmbedding
       .mockImplementationOnce(async () => {
         await db
           .update(bottleAliases)
@@ -166,7 +177,7 @@ describe("indexBottleAlias", () => {
 
     await indexBottleAlias({ name: alias.name });
 
-    expect(getOpenAIEmbedding).toHaveBeenCalledTimes(2);
+    expect(createEmbedding).toHaveBeenCalledTimes(2);
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, alias.name),
@@ -184,7 +195,7 @@ describe("indexBottleAlias", () => {
       bottleId: bottle.id,
       embedding: null,
     });
-    vi.mocked(getOpenAIEmbedding)
+    createEmbedding
       .mockImplementationOnce(async () => {
         await db
           .update(bottles)
@@ -196,12 +207,12 @@ describe("indexBottleAlias", () => {
 
     await indexBottleAlias({ name: alias.name });
 
-    expect(getOpenAIEmbedding).toHaveBeenCalledTimes(2);
-    expect(getOpenAIEmbedding).toHaveBeenNthCalledWith(
+    expect(createEmbedding).toHaveBeenCalledTimes(2);
+    expect(createEmbedding).toHaveBeenNthCalledWith(
       1,
       expect.stringContaining("Original Edition"),
     );
-    expect(getOpenAIEmbedding).toHaveBeenNthCalledWith(
+    expect(createEmbedding).toHaveBeenNthCalledWith(
       2,
       expect.stringContaining("Revised Edition"),
     );
@@ -221,7 +232,7 @@ describe("indexBottleAlias", () => {
       bottleId: bottle.id,
       embedding: null,
     });
-    vi.mocked(getOpenAIEmbedding)
+    createEmbedding
       .mockImplementationOnce(async () => {
         await db
           .update(entities)
@@ -233,12 +244,12 @@ describe("indexBottleAlias", () => {
 
     await indexBottleAlias({ name: alias.name });
 
-    expect(getOpenAIEmbedding).toHaveBeenCalledTimes(2);
-    expect(getOpenAIEmbedding).toHaveBeenNthCalledWith(
+    expect(createEmbedding).toHaveBeenCalledTimes(2);
+    expect(createEmbedding).toHaveBeenNthCalledWith(
       1,
       expect.stringContaining("Original Search Brand"),
     );
-    expect(getOpenAIEmbedding).toHaveBeenNthCalledWith(
+    expect(createEmbedding).toHaveBeenNthCalledWith(
       2,
       expect.stringContaining("Revised Search Brand"),
     );
@@ -262,7 +273,7 @@ describe("indexBottleAlias", () => {
     const firstEmbedding = new Promise<number[]>((resolve) => {
       resolveFirstEmbedding = resolve;
     });
-    vi.mocked(getOpenAIEmbedding)
+    createEmbedding
       .mockImplementationOnce(async () => {
         signalFirstStarted();
         return firstEmbedding;
@@ -280,12 +291,12 @@ describe("indexBottleAlias", () => {
     resolveFirstEmbedding(EMBEDDING);
     await olderJob;
 
-    expect(getOpenAIEmbedding).toHaveBeenCalledTimes(2);
-    expect(getOpenAIEmbedding).toHaveBeenNthCalledWith(
+    expect(createEmbedding).toHaveBeenCalledTimes(2);
+    expect(createEmbedding).toHaveBeenNthCalledWith(
       1,
       expect.stringContaining("Earlier Edition"),
     );
-    expect(getOpenAIEmbedding).toHaveBeenNthCalledWith(
+    expect(createEmbedding).toHaveBeenNthCalledWith(
       2,
       expect.stringContaining("Newer Edition"),
     );
@@ -302,7 +313,7 @@ describe("indexBottleAlias", () => {
       embedding: EMBEDDING,
     });
     let revision = 0;
-    vi.mocked(getOpenAIEmbedding).mockImplementation(async () => {
+    createEmbedding.mockImplementation(async () => {
       revision += 1;
       await db
         .update(bottles)
@@ -315,7 +326,7 @@ describe("indexBottleAlias", () => {
       `Bottle alias search source changed repeatedly while indexing: ${alias.name}`,
     );
 
-    expect(getOpenAIEmbedding).toHaveBeenCalledTimes(2);
+    expect(createEmbedding).toHaveBeenCalledTimes(2);
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, alias.name),
@@ -333,7 +344,7 @@ describe("indexBottleAlias", () => {
       ignored: false,
       embedding: EMBEDDING,
     });
-    vi.mocked(getOpenAIEmbedding).mockRejectedValue(
+    createEmbedding.mockRejectedValue(
       new Error("Embedding provider unavailable"),
     );
 
@@ -341,7 +352,7 @@ describe("indexBottleAlias", () => {
       "Embedding provider unavailable",
     );
 
-    expect(getOpenAIEmbedding).toHaveBeenCalledOnce();
+    expect(createEmbedding).toHaveBeenCalledOnce();
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, alias.name),
@@ -363,7 +374,7 @@ describe("indexBottleAlias", () => {
       bottleId: bottle.id,
       embedding: EMBEDDING,
     });
-    vi.mocked(getOpenAIEmbedding).mockImplementationOnce(async () => {
+    createEmbedding.mockImplementationOnce(async () => {
       await db.insert(bottleTombstones).values({
         bottleId: bottle.id,
         newBottleId: replacement.id,
@@ -389,7 +400,7 @@ describe("indexBottleAlias", () => {
       bottleId: bottle.id,
       embedding: EMBEDDING,
     });
-    vi.mocked(getOpenAIEmbedding).mockImplementationOnce(async () => {
+    createEmbedding.mockImplementationOnce(async () => {
       await db
         .update(bottleAliases)
         .set({ ignored: true })
@@ -410,6 +421,6 @@ describe("indexBottleAlias", () => {
     await expect(
       indexBottleAlias({ name: "Unknown Alias Name" }),
     ).rejects.toThrow("Unknown bottle alias: Unknown Alias Name");
-    expect(getOpenAIEmbedding).not.toHaveBeenCalled();
+    expect(createEmbedding).not.toHaveBeenCalled();
   });
 });

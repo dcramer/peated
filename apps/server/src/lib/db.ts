@@ -3,12 +3,11 @@ import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier
 import type { InferSelectModel, Table } from "drizzle-orm";
 import { and, eq, getTableColumns, inArray, ne, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
-import { type z } from "zod";
+import { z } from "zod";
 import type { AnyDatabase } from "../db";
 import type { Collection, Entity, EntityType } from "../db/schema";
 import { changes, collections, entities, entityAliases } from "../db/schema";
-import { type EntityInputSchema, type EntitySchema } from "../schemas";
-import { type EntityInput } from "../types";
+import { EntityInputSchema, type EntitySchema } from "../schemas";
 import { getCatalogVerificationCreationMetadata } from "./catalogVerification";
 
 export type UpsertOutcome<T> =
@@ -20,6 +19,18 @@ export type UpsertOutcome<T> =
     }
   | undefined;
 
+const EntityUpsertDataSchema = EntityInputSchema.omit({
+  country: true,
+  region: true,
+}).extend({
+  id: z.number().nullish(),
+  countryId: z.number().nullish(),
+  regionId: z.number().nullish(),
+});
+const EntityInsertDataSchema = EntityUpsertDataSchema.omit({ id: true });
+type EntityUpsertData = z.input<typeof EntityUpsertDataSchema>;
+type EntityUpsertInput = number | EntityUpsertData;
+
 export const reservedCollectionSlugs = ["default", "library"] as const;
 
 export type ReservedCollectionSlug = (typeof reservedCollectionSlugs)[number];
@@ -28,12 +39,7 @@ export type ReservedCollection = Pick<
   "id" | "createdById" | "name"
 >;
 
-export const RESERVED_COLLECTIONS: Record<
-  ReservedCollectionSlug,
-  {
-    name: string;
-  }
-> = {
+export const RESERVED_COLLECTIONS = {
   // `default` is the historical API token for the user-facing Favorites list.
   default: {
     name: "Default",
@@ -41,12 +47,17 @@ export const RESERVED_COLLECTIONS: Record<
   library: {
     name: "Library",
   },
-};
+} satisfies Record<
+  ReservedCollectionSlug,
+  {
+    name: string;
+  }
+>;
 
 export function isReservedCollectionSlug(
-  value: unknown,
+  value: ReservedCollectionSlug | number,
 ): value is ReservedCollectionSlug {
-  return reservedCollectionSlugs.includes(value as ReservedCollectionSlug);
+  return value === "default" || value === "library";
 }
 
 export function coerceToUpsert({
@@ -55,8 +66,8 @@ export function coerceToUpsert({
   ...data
 }:
   | z.infer<typeof EntityInputSchema>
-  | z.infer<typeof EntitySchema>): EntityInput {
-  const rv: EntityInput = { ...data };
+  | z.infer<typeof EntitySchema>): EntityUpsertData {
+  const rv: EntityUpsertData = { ...data };
   if (country instanceof Object) {
     rv.countryId = country.id;
   } else if (country) {
@@ -299,15 +310,39 @@ export const upsertEntity = async ({
   creationSource,
 }: {
   db: AnyDatabase;
-  data: EntityInput;
+  data: EntityUpsertInput;
   createdByActorId: number;
   type?: EntityType;
   creationSource?: CatalogVerificationCreationSource;
 }): Promise<UpsertOutcome<Entity>> => {
   if (!data) return undefined;
 
-  if (typeof data === "number" || data.id) {
-    const entityId = typeof data === "number" ? data : Number(data.id);
+  const numericData = z.number().safeParse(data);
+  if (numericData.success) {
+    const result = await db.query.entities.findFirst({
+      where: (entities, { eq }) => eq(entities.id, numericData.data),
+    });
+
+    if (!result) {
+      return undefined;
+    }
+
+    const merged = await mergeEntityTypeIfNeeded({
+      db,
+      entity: result,
+      type,
+    });
+    return {
+      id: merged.result.id,
+      result: merged.result,
+      created: false,
+      changed: merged.changed,
+    };
+  }
+
+  const entityData = EntityUpsertDataSchema.parse(data);
+  if (entityData.id) {
+    const entityId = Number(entityData.id);
     const result = await db.query.entities.findFirst({
       where: (entities, { eq }) => eq(entities.id, entityId),
     });
@@ -327,17 +362,18 @@ export const upsertEntity = async ({
       created: false,
       changed: merged.changed,
     };
-  } else if (data.id === null) {
-    data.id = undefined;
   }
 
-  data = {
-    ...data,
-    name: normalizeEntityName(data.name),
-  };
+  const normalizedData = EntityInsertDataSchema.parse({
+    ...entityData,
+    name: normalizeEntityName(entityData.name),
+  });
   const actorId = createdByActorId;
 
-  const existingEntity = await findEntityByExactNameOrAlias(db, data.name);
+  const existingEntity = await findEntityByExactNameOrAlias(
+    db,
+    normalizedData.name,
+  );
   if (existingEntity) {
     const merged = await mergeEntityTypeIfNeeded({
       db,
@@ -355,9 +391,9 @@ export const upsertEntity = async ({
   const [result] = await db
     .insert(entities)
     .values({
-      ...data,
+      ...normalizedData,
       type: Array.from(
-        new Set([...(type ? [type] : []), ...(data.type || [])]),
+        new Set([...(type ? [type] : []), ...(normalizedData.type || [])]),
       ),
       createdByActorId: actorId,
     })
@@ -365,20 +401,21 @@ export const upsertEntity = async ({
     .returning();
 
   if (result) {
+    const changeData: typeof result & {
+      catalogVerification?: ReturnType<
+        typeof getCatalogVerificationCreationMetadata
+      >;
+    } = { ...result };
+    if (creationSource) {
+      changeData.catalogVerification =
+        getCatalogVerificationCreationMetadata(creationSource);
+    }
     await db.insert(changes).values({
       objectType: "entity",
       objectId: result.id,
       displayName: result.name,
       type: "add",
-      data: {
-        ...result,
-        ...(creationSource
-          ? {
-              catalogVerification:
-                getCatalogVerificationCreationMetadata(creationSource),
-            }
-          : {}),
-      },
+      data: changeData,
       actorId,
       createdAt: result.createdAt,
     });
@@ -396,7 +433,10 @@ export const upsertEntity = async ({
     };
   }
 
-  const resultConflict = await findEntityByExactNameOrAlias(db, data.name);
+  const resultConflict = await findEntityByExactNameOrAlias(
+    db,
+    normalizedData.name,
+  );
 
   if (resultConflict) {
     const merged = await mergeEntityTypeIfNeeded({
@@ -497,8 +537,8 @@ async function getLegacyDefaultCollection(
   );
 }
 
-export function mapRows<T extends TableConfig>(
-  rows: Record<string, unknown>[],
+export function mapRows<T extends TableConfig, Row extends object>(
+  rows: Row[],
   table: PgTableWithColumns<T>,
 ): InferSelectModel<Table<T>>[] {
   const cols = Object.fromEntries(
@@ -508,6 +548,7 @@ export function mapRows<T extends TableConfig>(
     ]),
   );
 
+  // SAFETY: Table metadata owns the column-to-property mapping and value conversion.
   return rows.map((r) =>
     Object.fromEntries(
       Object.entries(r).map(([k, v]) => {
@@ -518,5 +559,5 @@ export function mapRows<T extends TableConfig>(
         ];
       }),
     ),
-  ) as unknown as InferSelectModel<Table<T>>[];
+  ) as InferSelectModel<Table<T>>[];
 }

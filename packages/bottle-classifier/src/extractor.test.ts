@@ -1,6 +1,8 @@
-import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
-import { createWhiskyLabelExtractor } from "./extractor";
+import {
+  createWhiskyLabelExtractor,
+  type WhiskyLabelClient,
+} from "./extractor";
 
 describe("createWhiskyLabelExtractor", () => {
   test("uses image-specific model settings and returns provider usage", async () => {
@@ -21,8 +23,9 @@ describe("createWhiskyLabelExtractor", () => {
         total_tokens: 1_200,
       },
     });
+    const client = { responses: { create } } satisfies WhiskyLabelClient;
     const extractor = createWhiskyLabelExtractor({
-      client: { responses: { create } } as unknown as OpenAI,
+      client,
       model: "gpt-5.4",
       imageModel: "gpt-5.6-luna",
       imageReasoningEffort: "high",

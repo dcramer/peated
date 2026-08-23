@@ -72,6 +72,12 @@ export const PersistedBottleOperationExecutionResultSchema = z.union([
 export type BottleOperationExecutionResult = z.infer<
   typeof BottleOperationExecutionResultSchema
 >;
+export type MergeEntitiesDispatchExecutionResult = z.infer<
+  typeof MergeEntitiesDispatchExecutionResultSchema
+>;
 export type EntityMergeOperationExecutionResult = z.infer<
   typeof EntityMergeOperationExecutionResultSchema
+>;
+export type PersistedBottleOperationExecutionResult = z.infer<
+  typeof PersistedBottleOperationExecutionResultSchema
 >;

@@ -16,12 +16,9 @@ import {
   parseQueuedJobData,
 } from "./payload";
 import registry from "./registry";
-import { type JobName } from "./types";
+import { type JobArgs, type JobName, type QueuedJobInput } from "./types";
 
-export function generateUniqIdentifier(
-  name: string,
-  args?: Record<string, any>,
-) {
+export function generateUniqIdentifier(name: string, args?: JobArgs) {
   let hash = createHash("md5");
   if (args) {
     for (const item of Object.entries(args).sort(([left], [right]) =>
@@ -33,7 +30,7 @@ export function generateUniqIdentifier(
   return `${name}-${hash.digest("hex")}`;
 }
 
-export async function runJob<T>(jobName: JobName, args?: Record<string, any>) {
+async function runRegisteredJob(jobName: JobName, args?: JobArgs) {
   const activeContext = {};
   propagation.inject(context.active(), activeContext);
 
@@ -42,9 +39,9 @@ export async function runJob<T>(jobName: JobName, args?: Record<string, any>) {
   return await jobFn(args, buildJobContext(activeContext));
 }
 
-export async function pushUniqueJob(
+async function pushUniqueJobToQueue(
   jobName: JobName,
-  args?: any,
+  args?: JobArgs,
   opts?: JobsOptions,
 ) {
   opts = {
@@ -53,12 +50,12 @@ export async function pushUniqueJob(
     jobId: generateUniqIdentifier(jobName, args),
   };
 
-  return await pushJob(jobName, args, opts);
+  return await pushJobToQueue(jobName, args, opts);
 }
 
-export async function pushJob(
+async function pushJobToQueue(
   jobName: JobName,
-  args?: Record<string, any>,
+  args?: JobArgs,
   opts?: JobsOptions,
 ) {
   const queueName = registry.getQueueName(jobName);
@@ -92,6 +89,55 @@ export async function pushJob(
       }
     },
   );
+}
+
+export type WorkerDispatch = {
+  pushJob: typeof pushJobToQueue;
+  pushUniqueJob: typeof pushUniqueJobToQueue;
+  runJob: typeof runRegisteredJob;
+};
+
+const queueDispatch: WorkerDispatch = {
+  pushJob: pushJobToQueue,
+  pushUniqueJob: pushUniqueJobToQueue,
+  runJob: runRegisteredJob,
+};
+let workerDispatch = queueDispatch;
+
+export function configureWorkerDispatch(dispatch: WorkerDispatch) {
+  workerDispatch = dispatch;
+}
+
+export async function runJob(jobName: JobName, args?: JobArgs) {
+  return args === undefined
+    ? await workerDispatch.runJob(jobName)
+    : await workerDispatch.runJob(jobName, args);
+}
+
+export async function pushUniqueJob(
+  jobName: JobName,
+  args?: JobArgs,
+  opts?: JobsOptions,
+) {
+  if (opts !== undefined) {
+    return await workerDispatch.pushUniqueJob(jobName, args, opts);
+  }
+  return args === undefined
+    ? await workerDispatch.pushUniqueJob(jobName)
+    : await workerDispatch.pushUniqueJob(jobName, args);
+}
+
+export async function pushJob(
+  jobName: JobName,
+  args?: JobArgs,
+  opts?: JobsOptions,
+) {
+  if (opts !== undefined) {
+    return await workerDispatch.pushJob(jobName, args, opts);
+  }
+  return args === undefined
+    ? await workerDispatch.pushJob(jobName)
+    : await workerDispatch.pushJob(jobName, args);
 }
 
 let connection: IORedis | null = null;
@@ -143,7 +189,7 @@ export async function runWorker() {
   const connection = await getConnection();
   const defaultQueue = await getQueue("default", connection);
   const scraperQueue = await getQueue("scrapers", connection);
-  const processJob = async (job: { name: string; data: unknown }) => {
+  const processJob = async (job: { name: string; data: QueuedJobInput }) => {
     let jobFn;
     let queuedJob;
     try {

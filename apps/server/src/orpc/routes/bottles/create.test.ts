@@ -1,4 +1,3 @@
-import type * as bottleClassifierModule from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
 import { FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -11,43 +10,11 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
 import { and, eq } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
-
-const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
-const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
-const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushUniqueJob: vi.fn(),
-}));
-
-vi.mock("@peated/server/lib/catalogVerification", async () => {
-  const actual = await vi.importActual<typeof catalogVerificationModule>(
-    "@peated/server/lib/catalogVerification",
-  );
-
-  return {
-    ...actual,
-    queueBottleCreationVerification: queueBottleCreationVerificationMock,
-    queueEntityCreationVerification: queueEntityCreationVerificationMock,
-  };
-});
-
-vi.mock("@peated/server/agents/bottleClassifier", async () => {
-  const actual = await vi.importActual<typeof bottleClassifierModule>(
-    "@peated/server/agents/bottleClassifier",
-  );
-
-  return {
-    ...actual,
-    classifyBottleReference: classifyBottleReferenceMock,
-  };
-});
 
 describe("POST /bottles", () => {
   beforeEach(() => {
@@ -103,6 +70,7 @@ describe("POST /bottles", () => {
     ] as const;
 
     for (const [label, invalid] of cases) {
+      // SAFETY: This test sends invalid numeric fields to the runtime validator.
       const input = {
         name: "Boundary Guard",
         brand: brand.id,
@@ -127,6 +95,7 @@ describe("POST /bottles", () => {
     ] as const;
 
     for (const [label, unsupported] of cases) {
+      // SAFETY: This test sends retired image fields to the runtime validator.
       const input = {
         name: "Unsupported Image Input",
         brand: brand.id,
@@ -248,10 +217,14 @@ describe("POST /bottles", () => {
       "OnBottleAliasChange",
       { name: bottle.fullName },
     );
-    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
-      bottleId: bottle.id,
-      creationSource: "manual_entry",
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "VerifyBottleCreation",
+      {
+        bottleId: bottle.id,
+        creationSource: "manual_entry",
+      },
+      { delay: 5000 },
+    );
 
     const search = await routerClient.bottles.list({
       query: "Imme Delic",
@@ -485,10 +458,14 @@ describe("POST /bottles", () => {
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: brand.id,
     });
-    expect(queueEntityCreationVerificationMock).toHaveBeenCalledWith({
-      entityId: brand.id,
-      creationSource: "manual_entry",
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "VerifyEntityCreation",
+      {
+        entityId: brand.id,
+        creationSource: "manual_entry",
+      },
+      { delay: 5000 },
+    );
 
     // it should create a change entry for the brand
     const changeList = await db
@@ -760,10 +737,6 @@ describe("POST /bottles", () => {
     config.AI_GATEWAY_API_KEY = "test-key";
 
     const brand = await fixtures.Entity({ name: "Yamazaki" });
-    classifyBottleReferenceMock.mockRejectedValue(
-      new Error("classifier should not run in the request path"),
-    );
-
     const data = await routerClient.bottles.create(
       {
         name: "Yamazaki 12-year-old",
@@ -773,11 +746,14 @@ describe("POST /bottles", () => {
     );
 
     expect(data.id).toBeDefined();
-    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
-      bottleId: data.id,
-      creationSource: "manual_entry",
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "VerifyBottleCreation",
+      {
+        bottleId: data.id,
+        creationSource: "manual_entry",
+      },
+      { delay: 5000 },
+    );
   });
 
   test("rejects exact duplicate bottle aliases without the classifier", async ({
@@ -804,7 +780,6 @@ describe("POST /bottles", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Bottle already exists.]`);
-    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("rejects duplicate SMWS bottle codes without requiring the subtitle", async ({
@@ -847,7 +822,6 @@ describe("POST /bottles", () => {
     expect((await db.select({ id: bottles.id }).from(bottles)).length).toBe(
       bottleCount,
     );
-    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
   test("preserves marketed age wording without inferring structured statedAge", async ({

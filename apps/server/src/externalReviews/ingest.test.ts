@@ -4,26 +4,28 @@ import {
   reviewArticles,
   reviews,
 } from "@peated/server/db/schema";
-import { ingestReviewArticle } from "@peated/server/externalReviews/ingest";
+import {
+  ingestReviewArticle as ingestReviewArticleWithServices,
+  type ReviewIngestionServices,
+} from "@peated/server/externalReviews/ingest";
 import { asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 
-const generateSummaryMock = vi.hoisted(() => vi.fn());
-const logTelemetryErrorMock = vi.hoisted(() => vi.fn());
-const pushUniqueJobMock = vi.hoisted(() => vi.fn());
+const generateSummaryMock = vi.fn<ReviewIngestionServices["generateSummary"]>();
+const logTelemetryErrorMock = vi.fn<ReviewIngestionServices["reportError"]>();
+const pushUniqueJobMock =
+  vi.fn<ReviewIngestionServices["queueMissingBottles"]>();
+const services: ReviewIngestionServices = {
+  generateSummary: generateSummaryMock,
+  queueMissingBottles: pushUniqueJobMock,
+  reportError: logTelemetryErrorMock,
+};
 
-vi.mock("@peated/server/externalReviews/summary", () => ({
-  generateExternalReviewSummary: generateSummaryMock,
-}));
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushUniqueJob: pushUniqueJobMock,
-}));
-
-vi.mock("@peated/server/lib/log", async (importOriginal) => ({
-  ...(await importOriginal()),
-  logTelemetryError: logTelemetryErrorMock,
-}));
+function ingestReviewArticle(
+  input: Parameters<typeof ingestReviewArticleWithServices>[0],
+) {
+  return ingestReviewArticleWithServices(input, services);
+}
 
 beforeEach(() => {
   generateSummaryMock.mockReset();

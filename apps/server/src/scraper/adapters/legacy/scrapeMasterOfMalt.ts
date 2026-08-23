@@ -4,6 +4,7 @@ import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { requestUrl } from "../../legacy/scraper";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "masterofmalt";
@@ -31,10 +32,10 @@ const MULTIPRODUCT_PATTERN =
 
 const SearchResponseSchema = z
   .object({
-    hits: z.array(z.unknown()),
+    hits: z.array(z.json()),
     nbHits: z.number().int().nonnegative(),
   })
-  .passthrough();
+  .catchall(z.json());
 
 const ProductSchema = z
   .object({
@@ -50,11 +51,11 @@ const ProductSchema = z
     url: z.string().trim().min(1),
     volume: z.number().positive(),
   })
-  .passthrough();
+  .catchall(z.json());
 
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("name" in input)) return null;
-  return typeof input.name === "string" ? input.name : null;
+function getRawName(input: JsonValue): string | null {
+  const parsed = z.object({ name: z.string() }).safeParse(input);
+  return parsed.success ? parsed.data.name : null;
 }
 
 function parsePrice(value: number): number | null {
@@ -115,7 +116,7 @@ function getPartition(url: string): readonly string[] | null {
   return PRICE_PARTITIONS[page - 1] ?? null;
 }
 
-export function parseMasterOfMaltProducts(input: unknown): StorePrice[] {
+export function parseMasterOfMaltProducts(input: JsonValue): StorePrice[] {
   const payload = SearchResponseSchema.parse(input);
   if (
     payload.nbHits > HITS_PER_PARTITION ||
@@ -182,7 +183,7 @@ export function parseMasterOfMaltProducts(input: unknown): StorePrice[] {
 
     const { name } = normalizeBottle({ name: product.name });
     const barcode = GtinSchema.safeParse(product.upc);
-    const listing = {
+    const listing: StorePrice = {
       externalProductId: product.sku,
       name,
       price,
@@ -190,8 +191,8 @@ export function parseMasterOfMaltProducts(input: unknown): StorePrice[] {
       volume,
       url,
       imageUrl,
-      ...(barcode.success ? { barcode: barcode.data } : {}),
     };
+    if (barcode.success) listing.barcode = barcode.data;
 
     logScrapedProduct(SITE, listing);
     products.push(listing);

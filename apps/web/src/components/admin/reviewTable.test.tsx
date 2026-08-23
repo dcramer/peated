@@ -1,12 +1,8 @@
 import type { Bottle, Entity, Review } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import ReviewTable from "./reviewTable";
-
-vi.mock("next/navigation", () => ({
-  useSearchParams: () => new URLSearchParams(),
-}));
+import { ReviewRows } from "./reviewTable";
 
 const timestamp = "2026-07-22T12:00:00.000Z";
 
@@ -90,7 +86,7 @@ function makeReview(id: number, reviewBottle: Bottle | null): Review {
 describe("ReviewTable", () => {
   it("renders the direct Bottle identity", () => {
     const html = renderToStaticMarkup(
-      <ReviewTable reviewList={[makeReview(1, bottle)]} />,
+      <ReviewRows reviewList={[makeReview(1, bottle)]} />,
     );
 
     expect(html).toContain('href="/bottles/19"');
@@ -99,7 +95,7 @@ describe("ReviewTable", () => {
 
   it("renders unresolved review identity without a catalog link", () => {
     const html = renderToStaticMarkup(
-      <ReviewTable reviewList={[makeReview(3, null)]} />,
+      <ReviewRows reviewList={[makeReview(3, null)]} />,
     );
 
     expect(html).toContain("No Bottle");

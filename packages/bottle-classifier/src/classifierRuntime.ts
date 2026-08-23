@@ -122,16 +122,41 @@ const BottleAuditAgentOutputSchema = z
   })
   .strict();
 
-function stripProviderUnsupportedFormats(value: unknown): unknown {
+const JsonValueSchema = z.json();
+const JsonObjectSchema = z.record(z.string(), JsonValueSchema);
+type JsonValue = z.infer<typeof JsonValueSchema>;
+const AgentOutputJsonSchema = z.discriminatedUnion("additionalProperties", [
+  z
+    .object({
+      type: z.literal("object"),
+      properties: z.record(z.string(), JsonObjectSchema),
+      required: z.array(z.string()),
+      additionalProperties: z.literal(false),
+      description: z.string().optional(),
+    })
+    .passthrough(),
+  z
+    .object({
+      type: z.literal("object"),
+      properties: z.record(z.string(), JsonObjectSchema),
+      required: z.array(z.string()),
+      additionalProperties: z.literal(true),
+      description: z.string().optional(),
+    })
+    .passthrough(),
+]);
+
+function stripProviderUnsupportedFormats(value: JsonValue): JsonValue {
   if (Array.isArray(value)) {
     return value.map(stripProviderUnsupportedFormats);
   }
-  if (value === null || typeof value !== "object") {
+  const objectValue = z.record(z.string(), JsonValueSchema).safeParse(value);
+  if (!objectValue.success) {
     return value;
   }
 
   return Object.fromEntries(
-    Object.entries(value).flatMap(([key, child]) =>
+    Object.entries(objectValue.data).flatMap(([key, child]) =>
       key === "format" ? [] : [[key, stripProviderUnsupportedFormats(child)]],
     ),
   );
@@ -142,15 +167,21 @@ function createAgentOutputType(
   schema: z.ZodObject,
   strict = false,
 ): JsonSchemaDefinition {
+  const generatedSchema = z.toJSONSchema(schema, {
+    target: "draft-7",
+  });
+  // Zod attaches non-JSON Standard Schema metadata to the generated object.
+  // The provider contract owns only its serialized JSON representation.
+  const providerSchema = JsonObjectSchema.parse(
+    JSON.parse(JSON.stringify(generatedSchema)),
+  );
   return {
     type: "json_schema",
     name,
     strict,
-    schema: stripProviderUnsupportedFormats(
-      z.toJSONSchema(schema, {
-        target: "draft-7",
-      }),
-    ) as JsonSchemaDefinition["schema"],
+    schema: AgentOutputJsonSchema.parse(
+      stripProviderUnsupportedFormats(providerSchema),
+    ),
   };
 }
 
@@ -207,6 +238,14 @@ export type RunBottleClassifierAgentInput = {
 
 export type BottleClassifierAdapters = BottleClassifierDataSource;
 
+export type BottleAgentRunResult = {
+  finalOutput?: unknown;
+  newItems?: unknown[];
+  state?: unknown;
+  runContext?: unknown;
+  usage?: unknown;
+};
+
 type BaseCreateBottleClassifierOptions = {
   client: OpenAI;
   model: string;
@@ -229,6 +268,12 @@ type BaseCreateBottleClassifierOptions = {
     runBottleAuditAgent?: (
       input: RunBottleAuditAgentInput,
     ) => Promise<BottleAuditAgentOutput>;
+    runPreparedBottleClassifierAgent?: (
+      preparedRun: PreparedBottleClassifierAgentRun,
+    ) => Promise<BottleAgentRunResult>;
+    runPreparedBottleAuditAgent?: (
+      preparedRun: PreparedBottleAuditAgentRun,
+    ) => Promise<BottleAgentRunResult>;
   };
 };
 
@@ -320,7 +365,9 @@ type BottleAuditAgent = Agent<unknown, typeof BottleAuditAgentOutputType>;
 export type PreparedBottleClassifierAgentRun = {
   agent: BottleClassifierAgent;
   getArtifacts: () => BottleClassificationArtifacts;
-  getAgentResult: (result: unknown) => BottleClassifierAgentResult;
+  getAgentResult: (
+    result: Parameters<typeof getAgentFinalOutput>[0],
+  ) => BottleClassifierAgentResult;
   input: string;
   conversationId: string;
   spanAttributes: AgentSpanAttributes;
@@ -687,7 +734,9 @@ export type PreparedBottleAuditAgentRun = {
   agent: BottleAuditAgent;
   conversationId: string;
   getArtifacts: () => BottleClassificationArtifacts;
-  getOutput: (result: unknown) => BottleAuditAgentOutput;
+  getOutput: (
+    result: Parameters<typeof getAgentFinalOutput>[0],
+  ) => BottleAuditAgentOutput;
   input: string;
   runOptions: NonStreamRunOptions<unknown, BottleAuditAgent>;
   runner: Runner;
@@ -860,7 +909,7 @@ export function createBottleClassifier(
   const extractBottleReferenceIdentity = async (
     reference: Pick<BottleReference, "name" | "imageUrl">,
   ): Promise<BottleExtractedDetails | null> => {
-    let imageExtractionError: unknown = null;
+    let imageExtractionError: Error | null = null;
 
     if (reference.imageUrl) {
       try {
@@ -869,7 +918,8 @@ export function createBottleClassifier(
           return extractedFromImage;
         }
       } catch (error) {
-        imageExtractionError = error;
+        imageExtractionError =
+          error instanceof Error ? error : new Error(String(error));
       }
     }
 
@@ -1004,11 +1054,15 @@ export function createBottleClassifier(
         },
         callback: async () => {
           const startedAt = performance.now();
-          const result = await preparedRun.runner.run(
-            preparedRun.agent,
-            preparedRun.input,
-            preparedRun.runOptions,
-          );
+          const result = options.overrides?.runPreparedBottleClassifierAgent
+            ? await options.overrides.runPreparedBottleClassifierAgent(
+                preparedRun,
+              )
+            : await preparedRun.runner.run(
+                preparedRun.agent,
+                preparedRun.input,
+                preparedRun.runOptions,
+              );
 
           return {
             agentResult: preparedRun.getAgentResult(result),
@@ -1220,11 +1274,13 @@ export function createBottleClassifier(
           },
           callback: async () => {
             const startedAt = performance.now();
-            const result = await preparedRun.runner.run(
-              preparedRun.agent,
-              preparedRun.input,
-              preparedRun.runOptions,
-            );
+            const result = options.overrides?.runPreparedBottleAuditAgent
+              ? await options.overrides.runPreparedBottleAuditAgent(preparedRun)
+              : await preparedRun.runner.run(
+                  preparedRun.agent,
+                  preparedRun.input,
+                  preparedRun.runOptions,
+                );
             const runMetadata = getBottleClassifierRunMetadata({
               result,
               durationMs: performance.now() - startedAt,

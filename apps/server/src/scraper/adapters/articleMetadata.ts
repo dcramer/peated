@@ -10,12 +10,7 @@ const ArticleMetadataSchema = z
   .strict();
 
 type ArticleMetadata = z.infer<typeof ArticleMetadataSchema>;
-
-function objectValue(value: unknown): Record<string, unknown> | null {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : null;
-}
+const JsonLdObjectSchema = z.record(z.string(), z.json());
 
 /** Reads the common article facts that Squarespace publishes as JSON-LD. */
 export function parseArticleMetadata(data: string): ArticleMetadata | null {
@@ -30,15 +25,23 @@ export function parseArticleMetadata(data: string): ArticleMetadata | null {
 
     const values = Array.isArray(parsed) ? parsed : [parsed];
     for (const value of values) {
-      const metadata = objectValue(value);
-      const rawAuthor = metadata?.author;
-      const author =
-        typeof rawAuthor === "string"
-          ? rawAuthor
-          : objectValue(rawAuthor)?.name;
+      const metadataResult = JsonLdObjectSchema.safeParse(value);
+      if (!metadataResult.success) continue;
+      const metadata = metadataResult.data;
+      const authorResult = z
+        .union([z.string(), z.object({ name: z.string() })])
+        .safeParse(metadata.author);
+      const authorText = authorResult.success
+        ? z.string().safeParse(authorResult.data)
+        : null;
+      const author = authorText?.success
+        ? authorText.data
+        : authorResult.success
+          ? z.object({ name: z.string() }).parse(authorResult.data).name
+          : undefined;
       const result = ArticleMetadataSchema.safeParse({
-        type: metadata?.["@type"],
-        datePublished: metadata?.datePublished,
+        type: metadata["@type"],
+        datePublished: metadata.datePublished,
         author,
       });
       if (result.success) return result.data;

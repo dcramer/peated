@@ -1,4 +1,7 @@
-import { BottleSeriesInputSchema } from "@peated/server/schemas";
+import {
+  BottleSeriesInputFields,
+  BottleSeriesInputSchema,
+} from "@peated/server/schemas";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useForm } from "react-hook-form";
@@ -104,14 +107,14 @@ function CreateForm({
             label="Name"
             {...register("name")}
             error={errors.name}
-            helpText={BottleSeriesInputSchema.shape.name.description}
+            helpText={BottleSeriesInputFields.name.description}
             required
           />
           <TextField
             label="Description"
             {...register("description")}
             error={errors.description}
-            helpText={BottleSeriesInputSchema.shape.description.description}
+            helpText={BottleSeriesInputFields.description.description}
           />
         </Fieldset>
       </Form>

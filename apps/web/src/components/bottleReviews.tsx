@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import type { Outputs } from "@peated/server/orpc/router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useORPC } from "../lib/orpc/context";
 import Heading from "./heading";
@@ -22,6 +23,12 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
     }),
   );
 
+  return <BottleReviewList results={results} />;
+}
+
+type ReviewListItem = Outputs["reviews"]["list"]["results"][number];
+
+export function BottleReviewList({ results }: { results: ReviewListItem[] }) {
   const reviews = results.filter((review) => review.site);
   if (!reviews.length) return null;
 

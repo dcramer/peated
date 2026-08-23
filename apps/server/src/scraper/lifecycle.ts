@@ -16,6 +16,7 @@ import {
   lte,
   or,
 } from "drizzle-orm";
+import { z } from "zod";
 import {
   findScraperSourceBySiteType,
   requireEnabledScraperTargets,
@@ -30,7 +31,7 @@ export type ScraperEnqueue = (
   jobName: "RunScraper",
   args: { runId: number },
   options: { jobId: string; removeOnComplete: boolean; removeOnFail: boolean },
-) => Promise<unknown>;
+) => Promise<void>;
 
 export class ExternalSiteRunActiveError extends Error {
   constructor(readonly status: "queued" | "running" | null) {
@@ -42,13 +43,10 @@ export class ExternalSiteRunActiveError extends Error {
   }
 }
 
-function isActiveRunConflict(error: unknown) {
-  const candidate = error as { code?: string; constraint?: string };
-  return (
-    candidate.code === "23505" &&
-    candidate.constraint === "external_site_run_active_unq"
-  );
-}
+const ActiveRunConflictSchema = z.object({
+  code: z.literal("23505"),
+  constraint: z.literal("external_site_run_active_unq"),
+});
 
 async function findActiveRun(siteId: number) {
   const [run] = await db
@@ -108,8 +106,7 @@ async function insertRun(
   return run;
 }
 
-async function translateActiveRunConflict(error: unknown, siteId: number) {
-  if (!isActiveRunConflict(error)) throw error;
+async function throwActiveRunConflict(siteId: number): Promise<never> {
   const activeRun = await findActiveRun(siteId);
   throw new ExternalSiteRunActiveError(
     activeRun?.status === "queued" || activeRun?.status === "running"
@@ -271,8 +268,8 @@ async function queueManualExternalSiteRun({
   try {
     run = await insertRun(db, site, "manual", registry, requestedById);
   } catch (error) {
-    await translateActiveRunConflict(error, site.id);
-    throw error;
+    if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
+    return await throwActiveRunConflict(site.id);
   }
   await dispatchExternalSiteRun(run, site, registry, enqueue);
   return run;
@@ -308,8 +305,8 @@ async function queueScheduledExternalSiteRun(
       return { run, site };
     });
   } catch (error) {
-    await translateActiveRunConflict(error, siteId);
-    throw error;
+    if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
+    return await throwActiveRunConflict(siteId);
   }
 
   if (!result) return null;

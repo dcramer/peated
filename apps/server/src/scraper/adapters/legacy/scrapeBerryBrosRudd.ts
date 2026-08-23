@@ -40,10 +40,15 @@ function getExternalProductId(productUrl: string): string | undefined {
   return match?.[1];
 }
 
+export interface BerryBrosRuddPage {
+  products: StorePrice[];
+  hasSourceProducts: boolean;
+}
+
 export function parseBerryBrosRuddPage(
   html: string,
   sourceUrl: string,
-): { products: StorePrice[]; hasSourceProducts: boolean } {
+): BerryBrosRuddPage {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);
@@ -101,8 +106,7 @@ export function parseBerryBrosRuddPage(
     const url = absoluteUrl(sourceUrl, productUrl);
     const externalProductId = getExternalProductId(url);
     const { name } = normalizeBottle({ name: rawName });
-    const listing = {
-      ...(externalProductId ? { externalProductId } : {}),
+    const listing: StorePrice = {
       name,
       price,
       currency: "gbp" as const,
@@ -110,6 +114,7 @@ export function parseBerryBrosRuddPage(
       url,
       imageUrl: imageUrl ? absoluteUrl(sourceUrl, imageUrl) : null,
     };
+    if (externalProductId) listing.externalProductId = externalProductId;
 
     logScrapedProduct(SITE, listing);
     products.push(listing);

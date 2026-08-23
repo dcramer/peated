@@ -15,8 +15,8 @@ import {
   normalizeBottleAliasKey,
 } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -43,11 +43,6 @@ async function waitForSessionBlockedBy(
   }
   throw new Error("Timed out waiting for expected database lock.");
 }
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-  pushUniqueJob: vi.fn(),
-}));
 
 describe("POST /external-sites/:site/prices", () => {
   beforeEach(() => {
@@ -80,7 +75,11 @@ describe("POST /external-sites/:site/prices", () => {
 
     const error = await waitError(() =>
       routerClient.prices.createBatch(
-        { site: "not-a-site" as never, prices: [] },
+        {
+          // SAFETY: This test sends an invalid site to the runtime validator.
+          site: "not-a-site" as never,
+          prices: [],
+        },
         { context: { user: admin } },
       ),
     );

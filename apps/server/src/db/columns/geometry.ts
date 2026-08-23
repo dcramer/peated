@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
 import wkx from "wkx";
+import { z } from "zod";
 
 type LatLng = [number, number];
 
@@ -51,24 +52,31 @@ export function geometry_point(name: string) {
     },
 
     fromDriver(value: string | GeometryPointGeoJson): LatLng {
-      if (typeof value === "string") {
+      const encodedGeometry = z.string().safeParse(value);
+      if (encodedGeometry.success) {
         const parsed = wkx.Geometry.parse(
-          Buffer.from(value, "hex"),
-        ) as unknown as {
-          x: number;
-          y: number;
-        };
+          Buffer.from(encodedGeometry.data, "hex"),
+        );
+        if (!(parsed instanceof wkx.Point)) {
+          throw new TypeError("Expected point geometry from database.");
+        }
         return [parsed.x, parsed.y];
       }
 
-      return [value.coordinates.lat, value.coordinates.lng];
+      const geometry = z
+        .object({
+          coordinates: z.object({ lat: z.number(), lng: z.number() }),
+        })
+        .parse(value);
+      return [geometry.coordinates.lat, geometry.coordinates.lng];
     },
 
     toDriver(value: GeometryPointType) {
-      if (typeof value === "string") return value;
+      const encodedGeometry = z.string().safeParse(value);
+      if (encodedGeometry.success) return encodedGeometry.data;
       if (Array.isArray(value))
         return sql`ST_SetSRID(ST_MakePoint(${value[0]}, ${value[1]}), 4326)`;
-      return value.mapToDriverValue();
+      return z.instanceof(Point).parse(value).mapToDriverValue();
     },
   })(name);
 }

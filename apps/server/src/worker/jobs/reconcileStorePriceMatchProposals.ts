@@ -12,6 +12,16 @@ type ReconcileStorePriceMatchProposalsArgs = {
   minAgeMinutes?: number;
 };
 
+export type ReconcileStorePriceMatchProposalsServices = {
+  enqueuePriceResolution: (priceId: number) => Promise<void>;
+};
+
+const defaultServices: ReconcileStorePriceMatchProposalsServices = {
+  enqueuePriceResolution: async (priceId) => {
+    await pushJob("ResolveStorePriceBottle", { priceId });
+  },
+};
+
 function clampInteger(value: number, min: number, max: number) {
   return Math.min(Math.max(Math.trunc(value), min), max);
 }
@@ -22,10 +32,13 @@ function clampInteger(value: number, min: number, max: number) {
  * The matcher still owns proposal creation; this job only redispatches eligible
  * visible rows and relies on the proposal table to bound durable duplicates.
  */
-export default async function reconcileStorePriceMatchProposals({
-  limit: inputLimit = 500,
-  minAgeMinutes: inputMinAgeMinutes = 30,
-}: ReconcileStorePriceMatchProposalsArgs = {}) {
+export async function reconcileStorePriceMatchProposals(
+  {
+    limit: inputLimit = 500,
+    minAgeMinutes: inputMinAgeMinutes = 30,
+  }: ReconcileStorePriceMatchProposalsArgs = {},
+  services: ReconcileStorePriceMatchProposalsServices = defaultServices,
+) {
   const limit = clampInteger(inputLimit, 1, 1000);
   const minAgeMinutes = clampInteger(inputMinAgeMinutes, 0, 60 * 24 * 30);
 
@@ -53,9 +66,7 @@ export default async function reconcileStorePriceMatchProposals({
     // Bypass unique enqueue here: stale unique BullMQ ids are one reason these
     // targetless rows can be missing proposals in the first place.
     try {
-      await pushJob("ResolveStorePriceBottle", {
-        priceId: price.id,
-      });
+      await services.enqueuePriceResolution(price.id);
       queuedCount += 1;
     } catch (error) {
       logError(error, {
@@ -77,4 +88,10 @@ export default async function reconcileStorePriceMatchProposals({
   return {
     queuedCount,
   };
+}
+
+export default async function reconcileStorePriceMatchProposalsJob(
+  args: ReconcileStorePriceMatchProposalsArgs = {},
+) {
+  return await reconcileStorePriceMatchProposals(args);
 }

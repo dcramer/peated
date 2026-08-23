@@ -1,4 +1,3 @@
-import type { Bottle } from "@peated/server/types";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -10,11 +9,11 @@ import {
 const bottle = {
   id: 7,
   fullName: "Springbank 12 Batch 24",
-} as Bottle;
+};
 const relatedBottle = {
   id: 8,
   fullName: "Springbank 12 Batch 25",
-} as Bottle;
+};
 
 describe("flight form membership", () => {
   it("carries independently complete Bottle identity by Bottle id", () => {

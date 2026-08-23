@@ -2,7 +2,8 @@
  * Owns classifier span metadata. Tool payloads are bounded before they reach
  * tracing and callers must keep them limited to public catalog/source data.
  */
-import { startSpan } from "@sentry/core";
+import { startSpan as startSentrySpan, type Span } from "@sentry/core";
+import { z } from "zod";
 
 const MAX_ATTRIBUTE_LENGTH = 12_000;
 const OPENAI_PROVIDER = "openai";
@@ -12,7 +13,7 @@ export type AgentSpanAttributes = Record<
   boolean | number | string | string[] | undefined
 >;
 
-function compactJson(value: unknown): string {
+function compactJson(value: Parameters<typeof JSON.stringify>[0]): string {
   const serialized = JSON.stringify(value) ?? String(value);
   if (serialized.length <= MAX_ATTRIBUTE_LENGTH) {
     return serialized;
@@ -21,32 +22,55 @@ function compactJson(value: unknown): string {
   return `${serialized.slice(0, MAX_ATTRIBUTE_LENGTH)}...`;
 }
 
-function objectProperty(value: unknown, property: string): unknown {
-  return value && typeof value === "object"
-    ? (value as Record<string, unknown>)[property]
-    : undefined;
-}
+const TokenDetailsSchema = z.union([
+  z.record(z.string(), z.number()),
+  z.array(z.record(z.string(), z.number())),
+]);
+const AgentUsageSchema = z
+  .object({
+    inputTokens: z.number().optional(),
+    outputTokens: z.number().optional(),
+    inputTokensDetails: TokenDetailsSchema.optional(),
+    outputTokensDetails: TokenDetailsSchema.optional(),
+  })
+  .passthrough();
+const UsageOwnerSchema = z
+  .object({ usage: AgentUsageSchema.optional() })
+  .passthrough();
+const AgentResultSchema = z
+  .object({
+    state: UsageOwnerSchema.optional(),
+    runContext: UsageOwnerSchema.optional(),
+    usage: AgentUsageSchema.optional(),
+  })
+  .passthrough();
+type AgentResultInput = Parameters<typeof AgentResultSchema.safeParse>[0];
+type AgentUsage = z.infer<typeof AgentUsageSchema>;
+type UsageNumberProperty = "inputTokens" | "outputTokens";
+type UsageDetailsProperty = "inputTokensDetails" | "outputTokensDetails";
 
-function measuredNumber(value: unknown, property: string): number | undefined {
-  const candidate = objectProperty(value, property);
-  return typeof candidate === "number" && Number.isFinite(candidate)
-    ? candidate
-    : undefined;
+function measuredNumber(
+  usage: AgentUsage | undefined,
+  property: UsageNumberProperty,
+): number | undefined {
+  const candidate = usage?.[property];
+  const measured = z.number().finite().safeParse(candidate);
+  return measured.success ? measured.data : undefined;
 }
 
 function usageDetailTotal(
-  usage: unknown,
-  detailsProperty: string,
+  usage: AgentUsage | undefined,
+  detailsProperty: UsageDetailsProperty,
   valueProperties: string[],
 ): number | undefined {
-  const details = objectProperty(usage, detailsProperty);
+  const details = usage?.[detailsProperty];
   const entries = Array.isArray(details) ? details : details ? [details] : [];
   let measured = false;
   let total = 0;
 
   for (const entry of entries) {
     for (const property of valueProperties) {
-      const value = measuredNumber(entry, property);
+      const value = entry[property];
       if (value !== undefined) {
         measured = true;
         total += value;
@@ -58,17 +82,20 @@ function usageDetailTotal(
   return measured ? total : undefined;
 }
 
-function getAgentResultUsage(result: unknown): unknown {
+function getAgentResultUsage(result: AgentResultInput): AgentUsage | undefined {
+  const parsed = AgentResultSchema.safeParse(result);
+  if (!parsed.success) return undefined;
+
   return (
-    objectProperty(objectProperty(result, "state"), "usage") ??
-    objectProperty(objectProperty(result, "runContext"), "usage") ??
-    objectProperty(result, "usage")
+    parsed.data.state?.usage ??
+    parsed.data.runContext?.usage ??
+    parsed.data.usage
   );
 }
 
 function setAgentResultAttributes(
   span: { setAttribute: (key: string, value: string | number) => void },
-  result: unknown,
+  result: AgentResultInput,
 ) {
   const usage = getAgentResultUsage(result);
   const attributes = {
@@ -144,6 +171,20 @@ export function buildToolSpanContext({
   };
 }
 
+export type ClassifierSpanContext =
+  | ReturnType<typeof buildAgentSpanContext>
+  | ReturnType<typeof buildToolSpanContext>;
+
+export type ClassifierSpanStarter = <T>(
+  context: ClassifierSpanContext,
+  callback: (span: Span) => Promise<T>,
+) => Promise<T>;
+
+const defaultClassifierSpanStarter: ClassifierSpanStarter = async (
+  context,
+  callback,
+) => await startSentrySpan(context, callback);
+
 /**
  * Wraps a classifier agent run in Sentry's `gen_ai.invoke_agent` span while
  * preserving the caller-owned conversation id.
@@ -153,11 +194,13 @@ export async function startAgentSpan<T>({
   conversationId,
   attributes = {},
   callback,
+  startSpan = defaultClassifierSpanStarter,
 }: {
   name: string;
   conversationId: string;
   attributes?: AgentSpanAttributes;
   callback: () => Promise<T>;
+  startSpan?: ClassifierSpanStarter;
 }): Promise<T> {
   return await startSpan(
     buildAgentSpanContext({ name, conversationId, attributes }),
@@ -175,11 +218,13 @@ export async function startToolSpan<T>({
   description,
   args,
   callback,
+  startSpan = defaultClassifierSpanStarter,
 }: {
   name: string;
   description: string;
   args: unknown;
   callback: () => Promise<T>;
+  startSpan?: ClassifierSpanStarter;
 }): Promise<T> {
   return await startSpan(
     buildToolSpanContext({ name, description, args }),

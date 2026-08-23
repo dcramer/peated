@@ -1,36 +1,24 @@
 import { createS256CodeChallenge } from "@peated/server/lib/oauth";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  createOAuthAuthorizationPage,
+  type OAuthAuthorizationPageServices,
+} from "./page";
 
-const mocks = vi.hoisted(() => ({
-  authorizationDetails: vi.fn(),
-  getSession: vi.fn(),
-  redirectToAuth: vi.fn(),
-}));
-
-vi.mock("@peated/web/lib/orpc/client.server", () => ({
-  createAnonymousServerClient: async () => ({
-    client: {
-      oauth: { authorizationDetails: mocks.authorizationDetails },
-    },
-  }),
-}));
-vi.mock("@peated/web/lib/session.server", () => ({
-  getSession: mocks.getSession,
-}));
-vi.mock("@peated/web/lib/auth", () => ({
-  redirectToAuth: mocks.redirectToAuth,
-}));
-vi.mock("./authorizationForm", () => ({
-  default: () => <div>Authorize actions</div>,
-}));
-vi.mock("@peated/web/components/layoutSplash", () => ({
-  default: ({ children }: { children: React.ReactNode }) => (
-    <main>{children}</main>
-  ),
-}));
-
-import Page from "./page";
+const loadClientDetails =
+  vi.fn<OAuthAuthorizationPageServices["loadClientDetails"]>();
+const loadSessionUser =
+  vi.fn<OAuthAuthorizationPageServices["loadSessionUser"]>();
+const redirectToLogin =
+  vi.fn<OAuthAuthorizationPageServices["redirectToLogin"]>();
+const Page = createOAuthAuthorizationPage({
+  loadClientDetails,
+  loadSessionUser,
+  redirectToLogin,
+  renderForm: () => <div>Authorize actions</div>,
+  renderLayout: (children) => <main>{children}</main>,
+});
 
 const verifier = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFG";
 
@@ -48,7 +36,7 @@ function searchParams(overrides: Record<string, string> = {}) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.authorizationDetails.mockResolvedValue({
+  loadClientDetails.mockResolvedValue({
     clientId: "peated-cli",
     name: "Peated CLI",
   });
@@ -56,17 +44,16 @@ beforeEach(() => {
 
 describe("OAuth authorization page", () => {
   test("preserves a valid request through login", async () => {
-    mocks.getSession.mockResolvedValue({ user: null });
-    mocks.redirectToAuth.mockReturnValue(<div>Login redirect</div>);
+    loadSessionUser.mockResolvedValue(null);
+    redirectToLogin.mockReturnValue(<div>Login redirect</div>);
 
     await Page({ searchParams: searchParams() });
 
-    expect(mocks.redirectToAuth).toHaveBeenCalledWith({
+    expect(redirectToLogin).toHaveBeenCalledWith({
       pathname: "/oauth/authorize",
       searchParams: expect.any(URLSearchParams),
     });
-    const forwarded = mocks.redirectToAuth.mock.calls[0][0]
-      .searchParams as URLSearchParams;
+    const forwarded = redirectToLogin.mock.calls[0][0].searchParams;
     expect(forwarded.get("state")).toBe("opaque-state");
     expect(forwarded.get("redirect_uri")).toBe(
       "http://127.0.0.1:45678/callback",
@@ -74,7 +61,7 @@ describe("OAuth authorization page", () => {
   });
 
   test("renders locally when client or redirect validation fails", async () => {
-    mocks.authorizationDetails.mockRejectedValue(new Error("Bad request"));
+    loadClientDetails.mockRejectedValue(new Error("Bad request"));
 
     const html = renderToStaticMarkup(
       await Page({
@@ -85,14 +72,12 @@ describe("OAuth authorization page", () => {
     );
 
     expect(html).toContain("Invalid authorization request");
-    expect(mocks.redirectToAuth).not.toHaveBeenCalled();
+    expect(redirectToLogin).not.toHaveBeenCalled();
     expect(html).not.toContain("evil.example");
   });
 
   test("shows the validated client and signed-in user", async () => {
-    mocks.getSession.mockResolvedValue({
-      user: { username: "fizz.buzz" },
-    });
+    loadSessionUser.mockResolvedValue({ username: "fizz.buzz" });
 
     const html = renderToStaticMarkup(
       await Page({ searchParams: searchParams() }),

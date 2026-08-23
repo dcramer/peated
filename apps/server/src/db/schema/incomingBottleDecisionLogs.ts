@@ -17,6 +17,18 @@ import { bottles } from "./bottles";
 import { externalSites } from "./externalSites";
 import { storePriceMatchProposals } from "./stores";
 
+type PersistedDecisionMetadataValue =
+  | boolean
+  | null
+  | number
+  | string
+  | PersistedDecisionMetadata
+  | PersistedDecisionMetadataValue[];
+
+interface PersistedDecisionMetadata {
+  [key: string]: PersistedDecisionMetadataValue;
+}
+
 export const incomingBottleDecisionSourceKindEnum = pgEnum(
   "incoming_bottle_decision_source_kind",
   ["review", "store_price"],
@@ -62,7 +74,7 @@ export const incomingBottleDecisionLogs = pgTable(
     model: text("model"),
     rationale: text("rationale"),
     metadata: jsonb("metadata")
-      .$type<Record<string, unknown>>()
+      .$type<PersistedDecisionMetadata>()
       .default(sql`'{}'::jsonb`)
       .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

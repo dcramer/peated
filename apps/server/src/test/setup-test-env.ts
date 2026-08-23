@@ -11,23 +11,19 @@ import { beforeEach, vi } from "vitest";
 import { db, type AnyDatabase } from "../db";
 import "../lib/test/expects";
 import * as fixtures from "../lib/test/fixtures";
+import {
+  installInMemoryWorkerDispatch,
+  resetInMemoryWorkerDispatch,
+} from "../lib/test/workerDispatch";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
 const axiosMock = new MockAdapter(axios);
 
-// vi.mock("axios");
+installInMemoryWorkerDispatch();
 
-// TODO: no fucking clue how to just use my mock module anymore and docs
-// are almost non-existant
-vi.mock("../worker/client", () => {
-  return {
-    pushJob: vi.fn(async () => undefined),
-    pushUniqueJob: vi.fn(async () => undefined),
-    runJob: vi.fn(async () => undefined),
-    gracefulShutdown: vi.fn(async () => undefined),
-    getConnection: vi.fn(async () => null),
-  };
+beforeEach(() => {
+  resetInMemoryWorkerDispatch();
 });
 
 // XXX: doing this causes the module to catch and more or less all mocks to break

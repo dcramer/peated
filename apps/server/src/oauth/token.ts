@@ -3,7 +3,10 @@ import {
   createAccessToken,
 } from "@peated/server/lib/auth";
 import { exchangeOAuthAuthorizationCode } from "@peated/server/lib/oauthAuthorization";
-import { OAuthTokenRequestSchema } from "@peated/server/schemas";
+import {
+  OAuthGrantTypeSchema,
+  OAuthTokenRequestSchema,
+} from "@peated/server/schemas";
 import type { Context } from "hono";
 
 function oauthResponse(
@@ -23,9 +26,7 @@ export async function oauthTokenHandler(context: Context) {
   }
 
   const body = await context.req.parseBody();
-  const grantType = OAuthTokenRequestSchema.shape.grant_type.safeParse(
-    body.grant_type,
-  );
+  const grantType = OAuthGrantTypeSchema.safeParse(body.grant_type);
   if (grantType.success && grantType.data !== "authorization_code") {
     return oauthResponse(context, { error: "unsupported_grant_type" }, 400);
   }

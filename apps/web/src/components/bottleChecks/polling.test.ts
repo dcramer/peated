@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   BOTTLE_CHECK_APPLYING_REFETCH_INTERVAL_MS,
   getBottleCheckRefetchInterval,
+  type ApplyingBottleCheckDetails,
 } from "./polling";
 
 type BottleCheckDetails = Outputs["audits"]["details"];
@@ -13,13 +14,13 @@ function details({
 }: {
   closed?: boolean;
   status: BottleCheckDetails["audit"]["operations"][number]["status"];
-}): BottleCheckDetails {
+}): ApplyingBottleCheckDetails {
   return {
     audit: {
       closedAt: closed ? "2026-07-30T12:00:00.000Z" : null,
       operations: [{ status }],
     },
-  } as unknown as BottleCheckDetails;
+  };
 }
 
 describe("Bottle Check applying polling", () => {

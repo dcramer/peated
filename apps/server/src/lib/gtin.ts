@@ -32,7 +32,7 @@ export function normalizeGtin(input: string): NormalizedGtin {
       "Barcode must contain only digits, spaces, or hyphens.",
     );
   }
-  if (!GTIN_LENGTHS.includes(value.length as (typeof GTIN_LENGTHS)[number])) {
+  if (!GTIN_LENGTHS.some((length) => length === value.length)) {
     throw new InvalidGtinError(
       "Barcode must be a GTIN-8, GTIN-12, GTIN-13, or GTIN-14.",
     );

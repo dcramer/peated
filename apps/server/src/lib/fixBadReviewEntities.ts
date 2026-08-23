@@ -25,11 +25,14 @@ export type FixBadReviewEntitiesResult = {
  * current bottle record. It only reassigns the review when an exact alias or
  * reviewed classifier result returns a replacement Bottle.
  */
-export async function fixBadReviewEntities({
-  user,
-}: {
-  user: User;
-}): Promise<FixBadReviewEntitiesResult> {
+export async function fixBadReviewEntities(
+  {
+    user,
+  }: {
+    user: User;
+  },
+  classify?: NonNullable<Parameters<typeof resolveBottleReferenceTarget>[1]>,
+): Promise<FixBadReviewEntitiesResult> {
   const actor = await getUserActor(user);
   const results = await db
     .select({ article: reviewArticles, bottle: bottles, review: reviews })
@@ -55,20 +58,23 @@ export async function fixBadReviewEntities({
 
     summary.scanned += 1;
 
-    const resolution = await resolveBottleReferenceTarget({
-      reference: {
-        id: review.id,
-        externalSiteId: article.externalSiteId,
-        name: review.name,
-        url: article.canonicalUrl,
-        imageUrl: null,
-        currentBottleId: review.bottleId,
+    const resolution = await resolveBottleReferenceTarget(
+      {
+        reference: {
+          id: review.id,
+          externalSiteId: article.externalSiteId,
+          name: review.name,
+          url: article.canonicalUrl,
+          imageUrl: null,
+          currentBottleId: review.bottleId,
+        },
+        // Normalized fallback aliases can erase exact identity markers before the
+        // classifier sees the real reference title.
+        aliasLookupNames: [review.name],
+        createdByActorId: actor.id,
       },
-      // Normalized fallback aliases can erase exact identity markers before the
-      // classifier sees the real reference title.
-      aliasLookupNames: [review.name],
-      createdByActorId: actor.id,
-    });
+      classify,
+    );
 
     const resolvedAssignment = resolution.assignment;
     const targetBottleId = resolvedAssignment?.bottleId ?? null;

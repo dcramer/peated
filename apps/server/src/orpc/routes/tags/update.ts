@@ -34,7 +34,7 @@ export default procedure
       });
     }
 
-    const data: { [name: string]: any } = {};
+    const data: Partial<typeof tags.$inferInsert> = {};
 
     if (input.tagCategory && input.tagCategory !== tag.tagCategory) {
       data.tagCategory = input.tagCategory;

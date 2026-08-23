@@ -8,8 +8,20 @@ import {
 } from "@peated/server/scraper";
 import { and, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
-export default async function scheduleScrapers() {
-  await redispatchStaleExternalSiteRuns();
+export interface ScraperScheduleLifecycle {
+  queueScheduledExternalSiteRun: typeof queueScheduledExternalSiteRun;
+  redispatchStaleExternalSiteRuns: typeof redispatchStaleExternalSiteRuns;
+}
+
+const scraperScheduleLifecycle: ScraperScheduleLifecycle = {
+  queueScheduledExternalSiteRun,
+  redispatchStaleExternalSiteRuns,
+};
+
+export async function scheduleScrapers(
+  lifecycle: ScraperScheduleLifecycle = scraperScheduleLifecycle,
+) {
+  await lifecycle.redispatchStaleExternalSiteRuns();
 
   const pending = await db
     .select({ id: externalSites.id })
@@ -25,7 +37,7 @@ export default async function scheduleScrapers() {
     );
   for (const site of pending) {
     try {
-      await queueScheduledExternalSiteRun(site.id);
+      await lifecycle.queueScheduledExternalSiteRun(site.id);
     } catch (error) {
       if (
         !(error instanceof ExternalSiteRunActiveError) &&
@@ -35,4 +47,8 @@ export default async function scheduleScrapers() {
       }
     }
   }
+}
+
+export default async function scheduleScrapersJob() {
+  await scheduleScrapers();
 }

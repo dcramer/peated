@@ -52,11 +52,17 @@ import {
 } from "@peated/server/lib/bottleOperationReviewSchemas";
 import { EntityMergeOperationExecutionResultSchema } from "@peated/server/lib/entityMergeOperation";
 import { logError } from "@peated/server/lib/log";
+import type { PersistedBottleOperationExecutionResult } from "@peated/server/schemas/bottleOperationResults";
 import { and, eq, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
+import {
+  BottleOperationFieldPathSchema,
+  type BottleOperationFieldPath,
+} from "../schemas/bottleOperationFields";
 
 const PositiveIdSchema = z.number().int().positive();
+export const BottleOperationCheckIdSchema = PositiveIdSchema;
 const NonEmptyNoteSchema = z.string().trim().min(1).max(2000);
 
 export const BottleOperationRejectionReasonSchema = z.enum(
@@ -74,33 +80,6 @@ export const SelectedBottleOperationIdsSchema = z
   .refine((ids) => new Set(ids).size === ids.length, {
     message: "Operation ids must be unique.",
   });
-
-const BottleOperationFieldPathSchema = z.enum([
-  "shared.name",
-  "shared.statedAge",
-  "shared.seriesId",
-  "shared.category",
-  "shared.brand",
-  "shared.distillers",
-  "shared.bottler",
-  "exact.edition",
-  "exact.statedAge",
-  "exact.abv",
-  "exact.singleCask",
-  "exact.caskStrength",
-  "exact.vintageYear",
-  "exact.releaseYear",
-  "exact.caskSize",
-  "exact.caskType",
-  "exact.caskFill",
-  "name",
-  "shortName",
-  "roles",
-  "website",
-  "country",
-  "region",
-  "yearEstablished",
-]);
 
 const SelectedBottleOperationSchema = z
   .object({
@@ -120,11 +99,13 @@ export const SelectedBottleOperationsSchema = z
     { message: "Operation ids must be unique." },
   );
 
+export const ApproveBottleOperationsInputFields = {
+  checkId: BottleOperationCheckIdSchema,
+  operations: SelectedBottleOperationsSchema,
+} as const;
+
 export const ApproveBottleOperationsInputSchema = z
-  .object({
-    checkId: PositiveIdSchema,
-    operations: SelectedBottleOperationsSchema,
-  })
+  .object(ApproveBottleOperationsInputFields)
   .strict();
 
 export const BottleOperationRejectionInputSchema = z
@@ -146,14 +127,16 @@ export const BottleOperationRejectionInputSchema = z
 
 export const RejectBottleOperationsInputSchema =
   BottleOperationRejectionInputSchema.safeExtend({
-    checkId: PositiveIdSchema,
+    checkId: BottleOperationCheckIdSchema,
   });
 
+export const RetryBottleOperationInputFields = {
+  checkId: BottleOperationCheckIdSchema,
+  operationId: PositiveIdSchema,
+} as const;
+
 export const RetryBottleOperationInputSchema = z
-  .object({
-    checkId: PositiveIdSchema,
-    operationId: PositiveIdSchema,
-  })
+  .object(RetryBottleOperationInputFields)
   .strict();
 
 export const BottleOperationActionResultSchema = z
@@ -178,8 +161,6 @@ type PreparedExecution = {
   status: "applied" | "applying";
   afterCommit: () => Promise<void>;
 };
-
-type BottleOperationFieldPath = z.infer<typeof BottleOperationFieldPathSchema>;
 
 const REJECTABLE_STATUSES = new Set<BottleOperation["status"]>([
   "blocked",
@@ -213,7 +194,7 @@ function assertModerator(user: User | null): asserts user is User {
 
 function actionError(
   operationId: number,
-  error: unknown,
+  error: Error,
 ): BottleOperationActionResult {
   return BottleOperationActionResultSchema.parse({
     operationId,
@@ -356,6 +337,7 @@ function proposalWithoutExcludedFields(
           operation.status,
         );
       }
+      // SAFETY: The membership check above proves that field is a patch key.
       delete patch[field as keyof typeof patch];
     }
     if (Object.keys(patch).length === 0) {
@@ -388,6 +370,7 @@ function proposalWithoutExcludedFields(
         operation.status,
       );
     }
+    // SAFETY: The membership check above proves that name is a patch key.
     delete patch[name as keyof typeof patch];
   }
   if (Object.keys(patch).length === 0) {
@@ -540,7 +523,9 @@ async function prepareAndExecute({
 }): Promise<PreparedExecution | BottleOperationActionResult> {
   const excludedFields =
     requestedExcludedFields ??
-    (operation.excludedFields as BottleOperationFieldPath[]);
+    z
+      .array(BottleOperationFieldPathSchema)
+      .parse(operation.excludedFields ?? []);
   await assertPrimaryStorePriceDecisionTerminal(check, operation, transaction);
 
   let prepared: PreparedOperationExecution;
@@ -572,7 +557,7 @@ async function prepareAndExecute({
         new BottleOperationActionError(error.message, operation.status),
       );
     }
-    if (isOperationPreparationFailure(error)) {
+    if (error instanceof Error && isOperationPreparationFailure(error)) {
       return await markStale(transaction, operation.id);
     }
     throw error;
@@ -633,7 +618,7 @@ async function recordExecutionFailure({
   database,
 }: {
   checkId: number;
-  error: unknown;
+  error: Error;
   moderator: User;
   operationId: number;
   database: AnyConnection;
@@ -686,7 +671,11 @@ async function runAfterCommit({
   try {
     await execution.afterCommit();
     return actionResult(execution.operationId, execution.status);
-  } catch (error) {
+  } catch (cause) {
+    const error =
+      cause instanceof Error
+        ? cause
+        : new Error("Bottle operation approval failed.", { cause });
     logError(error, {
       extra: {
         operationId: execution.operationId,
@@ -754,7 +743,11 @@ async function approveOne({
         transaction,
       });
     });
-  } catch (error) {
+  } catch (cause) {
+    const error =
+      cause instanceof Error
+        ? cause
+        : new Error("Bottle operation approval failed.", { cause });
     if (error instanceof BottleOperationActionError) {
       return actionError(operationId, error);
     }
@@ -776,7 +769,7 @@ async function approveOne({
 }
 
 export async function approveBottleOperations(
-  rawInput: unknown,
+  rawInput: z.input<typeof ApproveBottleOperationsInputSchema>,
   user: User | null,
   database: AnyConnection = db,
 ): Promise<BottleOperationActionResult[]> {
@@ -840,7 +833,11 @@ async function rejectOne({
         .where(eq(bottleOperations.id, operation.id));
       return actionResult(operation.id, "rejected");
     });
-  } catch (error) {
+  } catch (cause) {
+    const error =
+      cause instanceof Error
+        ? cause
+        : new Error("Bottle operation rejection failed.", { cause });
     if (!(error instanceof BottleOperationActionError)) {
       logError(error, {
         extra: { checkId, operationId, phase: "reject_bottle_operation" },
@@ -851,7 +848,7 @@ async function rejectOne({
 }
 
 export async function rejectBottleOperations(
-  rawInput: unknown,
+  rawInput: z.input<typeof RejectBottleOperationsInputSchema>,
   user: User | null,
   database: AnyConnection = db,
 ): Promise<BottleOperationActionResult[]> {
@@ -881,7 +878,7 @@ async function reconcilePriorExecution({
   moderator: User;
   operation: BottleOperation;
   transaction: AnyTransaction;
-}): Promise<Record<string, unknown> | null> {
+}): Promise<PersistedBottleOperationExecutionResult | null> {
   const parsedResult = BottleOperationExecutionResultSchema.safeParse(
     operation.result,
   );
@@ -1050,7 +1047,11 @@ async function retryOne({
         transaction,
       });
     });
-  } catch (error) {
+  } catch (cause) {
+    const error =
+      cause instanceof Error
+        ? cause
+        : new Error("Bottle operation retry failed.", { cause });
     if (!(error instanceof BottleOperationActionError)) {
       logError(error, {
         extra: { checkId, operationId, phase: "retry_bottle_operation" },
@@ -1069,7 +1070,7 @@ async function retryOne({
 }
 
 export async function retryBottleOperation(
-  rawInput: unknown,
+  rawInput: z.input<typeof RetryBottleOperationInputSchema>,
   user: User | null,
   database: AnyConnection = db,
 ): Promise<BottleOperationActionResult> {

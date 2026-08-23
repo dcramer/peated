@@ -1,23 +1,22 @@
-import { getStructuredResponse } from "@peated/server/lib/openai";
-import { routerClient } from "@peated/server/orpc/router";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { createRouterClient } from "@orpc/server";
+import { createBottleLookupProcedure } from "@peated/server/orpc/routes/ai/bottle-lookup";
+import type { BottleDetailsModel } from "@peated/server/worker/jobs/generateBottleDetails";
+import { describe, expect, test, vi } from "vitest";
 
-vi.mock("@peated/server/lib/openai", () => ({
-  getStructuredResponse: vi.fn(),
-}));
+const model = vi.fn<BottleDetailsModel>();
 
 describe("POST /ai/bottle-lookup", () => {
-  beforeEach(() => {
-    vi.mocked(getStructuredResponse).mockReset();
-  });
-
   test("returns only generated tags from the allowed tag list", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
     const smoke = await fixtures.Tag({ name: "smoke" });
     const fruit = await fixtures.Tag({ name: "fruit" });
-    vi.mocked(getStructuredResponse).mockResolvedValue({
+    const bottleLookupClient = createRouterClient(
+      { bottleLookup: createBottleLookupProcedure(model) },
+      { context: { user } },
+    );
+    model.mockResolvedValue({
       description: "Generated description",
       tastingNotes: null,
       category: "single_malt",
@@ -25,10 +24,9 @@ describe("POST /ai/bottle-lookup", () => {
       flavorProfile: "peated",
     });
 
-    const result = await routerClient.ai.bottleLookup(
-      { name: "Generated Tag Example" },
-      { context: { user } },
-    );
+    const result = await bottleLookupClient.bottleLookup({
+      name: "Generated Tag Example",
+    });
 
     expect(result.suggestedTags).toEqual(["smoke", "fruit"]);
   });

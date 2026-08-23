@@ -8,7 +8,10 @@ describe("authorizeWithOAuth", () => {
     let authorizationUrl: URL | undefined;
     const tokenFetch = vi.fn<typeof globalThis.fetch>(async (_url, init) => {
       expect(init?.body).toBeInstanceOf(URLSearchParams);
-      const tokenRequest = init?.body as URLSearchParams;
+      if (!(init?.body instanceof URLSearchParams)) {
+        throw new Error("Expected URL-encoded token parameters");
+      }
+      const tokenRequest = init.body;
       const verifier = tokenRequest.get("code_verifier") ?? "";
       expect(tokenRequest.get("code")).toBe("authorization-code");
       expect(tokenRequest.get("redirect_uri")).toBe(
@@ -40,17 +43,20 @@ describe("authorizeWithOAuth", () => {
         expect(authorizationUrl.searchParams.get("code_challenge_method")).toBe(
           "S256",
         );
-        const invalidCallback = new URL(redirectUri!);
+        if (!redirectUri || !state) {
+          throw new Error("Authorization URL is missing callback state");
+        }
+        const invalidCallback = new URL(redirectUri);
         invalidCallback.search = new URLSearchParams({
           code: "attacker-code",
           state: "wrong-state",
         }).toString();
         expect((await globalThis.fetch(invalidCallback)).status).toBe(400);
 
-        const callback = new URL(redirectUri!);
+        const callback = new URL(redirectUri);
         callback.search = new URLSearchParams({
           code: "authorization-code",
-          state: state!,
+          state,
         }).toString();
         const callbackResponse = await globalThis.fetch(callback);
         expect(callbackResponse.status).toBe(200);
@@ -65,10 +71,10 @@ describe("authorizeWithOAuth", () => {
       expiresAt: "2026-08-19T00:00:00.000Z",
     });
     expect(tokenFetch).toHaveBeenCalledOnce();
-    expect(tokenFetch.mock.calls[0][0]).toBeInstanceOf(URL);
-    expect((tokenFetch.mock.calls[0][0] as URL).href).toBe(
-      "https://api.peated.com/oauth/token",
-    );
+    const tokenUrl = tokenFetch.mock.calls[0][0];
+    expect(tokenUrl).toBeInstanceOf(URL);
+    if (!(tokenUrl instanceof URL)) throw new Error("Expected a token URL");
+    expect(tokenUrl.href).toBe("https://api.peated.com/oauth/token");
   });
 
   test("rejects a denied authorization without exchanging a token", async () => {

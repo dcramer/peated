@@ -1,24 +1,24 @@
-import type { Bottle } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import BottleIdentity, {
+  type BottleIdentitySource,
   getAbsoluteBottleTitle,
   getMetadataExpressedByTitle,
   getRelativeBottleIdentity,
 } from "./bottleIdentity";
 
-function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
+function makeBottle(
+  overrides: Partial<BottleIdentitySource> = {},
+): BottleIdentitySource {
   return {
     id: 42,
     fullName: "Springbank 12 Cask Strength Batch 24",
     name: "12-year-old Cask Strength Batch 24",
     group: {
-      id: 7,
       name: "12-year-old Cask Strength",
-      fullName: "Springbank 12 Cask Strength",
       statedAge: 12,
     },
-    brand: { id: 1, name: "Springbank" },
+    brand: { id: 1, name: "Springbank", shortName: null },
     series: null,
     edition: "Batch 24",
     category: "single_malt",
@@ -32,7 +32,18 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
     caskType: null,
     caskSize: null,
     ...overrides,
-  } as Bottle;
+  };
+}
+
+function makeBrand(id: number, name: string): BottleIdentitySource["brand"] {
+  return { id, name, shortName: null };
+}
+
+function makeSeries(
+  id: number,
+  name: string,
+): NonNullable<BottleIdentitySource["series"]> {
+  return { id, name };
 }
 
 describe("BottleIdentity", () => {
@@ -105,11 +116,8 @@ describe("BottleIdentity", () => {
     const html = renderToStaticMarkup(
       <BottleIdentity
         bottle={makeBottle({
-          brand: { id: 2, name: "Woodford Reserve" } as Bottle["brand"],
-          series: {
-            id: 3,
-            name: "Master's Collection",
-          } as Bottle["series"],
+          brand: makeBrand(2, "Woodford Reserve"),
+          series: makeSeries(3, "Master's Collection"),
           group: {
             ...makeBottle().group!,
             name: "Batch Proof",
@@ -129,11 +137,8 @@ describe("BottleIdentity", () => {
     const html = renderToStaticMarkup(
       <BottleIdentity
         bottle={makeBottle({
-          brand: { id: 2, name: "Woodford Reserve" } as Bottle["brand"],
-          series: {
-            id: 3,
-            name: "Master's Collection",
-          } as Bottle["series"],
+          brand: makeBrand(2, "Woodford Reserve"),
+          series: makeSeries(3, "Master's Collection"),
           group: {
             ...makeBottle().group!,
             name: "Batch Proof",
@@ -154,8 +159,8 @@ describe("BottleIdentity", () => {
     const html = renderToStaticMarkup(
       <BottleIdentity
         bottle={makeBottle({
-          brand: { id: 2, name: "Whiskyland" } as Bottle["brand"],
-          series: { id: 3, name: "Whiskyland" } as Bottle["series"],
+          brand: makeBrand(2, "Whiskyland"),
+          series: makeSeries(3, "Whiskyland"),
           group: {
             ...makeBottle().group!,
             name: "Pittyvaich",
@@ -178,7 +183,6 @@ describe("BottleIdentity", () => {
           group: {
             ...makeBottle().group!,
             name: "Single Cask 4-year-old",
-            fullName: "Springbank Single Cask 4-year-old",
             statedAge: null,
           },
           edition: null,

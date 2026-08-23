@@ -7,6 +7,7 @@ import { runPostUserCreationBottleAudit } from "@peated/server/agents/bottleClas
 import { recordCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
 import { getCatalogVerificationDisplayName } from "@peated/server/lib/catalogVerificationFindings";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 export const VerifyBottleCreationJobArgsSchema = z
   .object({
@@ -19,11 +20,18 @@ export type VerifyBottleCreationJobArgs = z.infer<
   typeof VerifyBottleCreationJobArgsSchema
 >;
 
+export type VerifyBottleCreationServices = {
+  runAudit: NonNullable<Parameters<typeof runPostUserCreationBottleAudit>[1]>;
+};
+
 function getBottleCreationEventKey(bottleId: number) {
   return `bottle_created:${bottleId}`;
 }
 
-export default async function verifyBottleCreation(input: unknown) {
+export async function verifyBottleCreation(
+  input: JobPayload,
+  services?: VerifyBottleCreationServices,
+) {
   const { bottleId, creationSource } =
     VerifyBottleCreationJobArgsSchema.parse(input);
 
@@ -46,8 +54,15 @@ export default async function verifyBottleCreation(input: unknown) {
     return;
   }
 
-  await runPostUserCreationBottleAudit({
-    bottleId,
-    backgroundEventKey: getBottleCreationEventKey(bottleId),
-  });
+  await runPostUserCreationBottleAudit(
+    {
+      bottleId,
+      backgroundEventKey: getBottleCreationEventKey(bottleId),
+    },
+    services?.runAudit,
+  );
+}
+
+export default async function verifyBottleCreationJob(input: JobPayload) {
+  return await verifyBottleCreation(input);
 }

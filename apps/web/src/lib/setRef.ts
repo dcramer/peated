@@ -42,9 +42,10 @@ export default function setRef<T>(
     | undefined,
   value: T | null,
 ): void {
-  if (typeof ref === "function") {
-    ref(value);
-  } else if (ref) {
+  if (!ref) return;
+  if ("current" in ref) {
     ref.current = value;
+    return;
   }
+  ref(value);
 }

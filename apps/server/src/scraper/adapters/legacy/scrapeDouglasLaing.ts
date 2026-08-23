@@ -18,6 +18,7 @@ import {
   ShopifyImageSchema,
   ShopifyProductSchema,
 } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "douglaslaing";
@@ -101,7 +102,7 @@ function buildSourceIdentity({
 }
 
 export function parseDouglasLaingProducts(
-  input: unknown,
+  input: JsonValue,
   sourceUrl: string,
 ): StorePrice[] {
   const payload = DouglasLaingProductsSchema.parse(input);

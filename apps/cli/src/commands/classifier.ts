@@ -4,11 +4,12 @@ import { ClassifyBottleReferenceInputSchema } from "@peated/server/agents/bottle
 import { getBottleCheckRolloutReport } from "@peated/server/lib/bottleCheckRolloutReport";
 import { readFile } from "fs/promises";
 import { basename, extname } from "path";
+import { z } from "zod";
 
 const subcommand = program.command("classifier");
 
 async function readJsonFile(path: string) {
-  return JSON.parse(await readFile(path, "utf8")) as unknown;
+  return z.json().parse(JSON.parse(await readFile(path, "utf8")));
 }
 
 function isUrl(value: string) {

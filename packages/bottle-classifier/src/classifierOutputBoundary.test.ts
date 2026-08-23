@@ -5,8 +5,9 @@ import {
   type JsonSchemaDefinition,
   type Model,
 } from "@openai/agents";
-import type OpenAI from "openai";
+import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
+import { z } from "zod";
 
 import type { BottleContext } from "./bottleContextContract";
 import {
@@ -14,15 +15,19 @@ import {
   prepareBottleClassifierAgentRun,
 } from "./classifierRuntime";
 
-function hasFormatAnnotation(value: unknown): boolean {
+const JsonValueSchema = z.json();
+type JsonValue = z.infer<typeof JsonValueSchema>;
+
+function hasFormatAnnotation(value: JsonValue): boolean {
   if (Array.isArray(value)) {
     return value.some(hasFormatAnnotation);
   }
-  if (value === null || typeof value !== "object") {
+  const objectValue = z.record(z.string(), JsonValueSchema).safeParse(value);
+  if (!objectValue.success) {
     return false;
   }
 
-  return Object.entries(value).some(
+  return Object.entries(objectValue.data).some(
     ([key, child]) => key === "format" || hasFormatAnnotation(child),
   );
 }
@@ -59,7 +64,7 @@ const currentBottleContext: BottleContext = {
 };
 
 const classifierOptions = {
-  client: {} as OpenAI,
+  client: new OpenAI({ apiKey: "test-api-key" }),
   model: "test-model",
   maxSearchQueries: 0,
   adapters: {
@@ -70,12 +75,15 @@ const classifierOptions = {
 async function runWithFakeModel(
   agent: Agent<unknown, JsonSchemaDefinition>,
   input: string,
-  finalOutput: unknown,
+  finalOutput: JsonValue,
 ): Promise<{ outputType: JsonSchemaDefinition; result: unknown }> {
   let outputType: JsonSchemaDefinition | undefined;
   const model: Model = {
     async getResponse(request) {
-      outputType = request.outputType as JsonSchemaDefinition;
+      if (request.outputType === "text") {
+        throw new Error("Expected a JSON schema output type.");
+      }
+      outputType = request.outputType;
       return {
         usage: new Usage(),
         output: [
@@ -248,7 +256,8 @@ describe("classifier output boundary", () => {
       action: "no_match",
     });
 
-    expect((result as { finalOutput: unknown }).finalOutput).toEqual({
+    const runResult = z.object({ finalOutput: z.unknown() }).parse(result);
+    expect(runResult.finalOutput).toEqual({
       action: "no_match",
     });
     expect(prepared.getAgentResult(result)).toMatchObject({

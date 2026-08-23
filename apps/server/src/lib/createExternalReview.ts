@@ -19,6 +19,7 @@ import {
   getIncomingBottleDecisionFromResolutionSource,
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
+  type IncomingBottleDecisionMetadata,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -27,6 +28,7 @@ import {
 } from "@peated/server/lib/resolveActiveBottleIds";
 import { ReviewInputSchema } from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
+import type { z } from "zod";
 
 /**
  * Owns external-review ingestion and Bottle identity assignment. Both API and
@@ -60,9 +62,19 @@ type ExternalReviewContext =
   | { initiatedByUserId: number }
   | { externalSiteId: number; sourceKey: string };
 
+export type ExternalReviewServices = {
+  classifyReference?: NonNullable<
+    Parameters<typeof resolveBottleReferenceTarget>[1]
+  >;
+  classifyScrapedReference?: NonNullable<
+    Parameters<typeof resolveScrapedBottleReferenceTarget>[1]
+  >;
+};
+
 export async function createExternalReview(
-  rawInput: unknown,
+  rawInput: z.input<typeof ExternalReviewInputSchema>,
   context: ExternalReviewContext,
+  services: ExternalReviewServices = {},
 ) {
   const input = ExternalReviewInputSchema.parse(rawInput);
   const initiatedByUserId =
@@ -83,11 +95,7 @@ export async function createExternalReview(
   const rawName = input.name;
   const { name: normalizedName } = normalizeBottle({ name: rawName });
   const aliasKey = normalizeBottleAliasKey(rawName);
-  const resolveReference =
-    initiatedByUserId === undefined
-      ? resolveScrapedBottleReferenceTarget
-      : resolveBottleReferenceTarget;
-  const resolution = await resolveReference({
+  const referenceInput = {
     reference: {
       externalSiteId: site.id,
       name: rawName,
@@ -98,7 +106,17 @@ export async function createExternalReview(
     aliasLookupNames: [aliasKey, rawName],
     extractedIdentity: { category: input.category },
     createdByActorId: systemActor.id,
-  });
+  };
+  const resolution =
+    initiatedByUserId === undefined
+      ? await resolveScrapedBottleReferenceTarget(
+          referenceInput,
+          services.classifyScrapedReference,
+        )
+      : await resolveBottleReferenceTarget(
+          referenceInput,
+          services.classifyReference,
+        );
   if (resolution.error) {
     logError(resolution.error, {
       review: { site: input.site, name: rawName, url: input.url },
@@ -174,6 +192,16 @@ export async function createExternalReview(
           decision,
         })
       ) {
+        const metadata: IncomingBottleDecisionMetadata = {
+          resolutionSource: resolution.source,
+          issue: input.issue,
+        };
+        if (resolution.classifierEvidence) {
+          metadata.classifierEvidence = resolution.classifierEvidence;
+        }
+        if (initiatedByUserId !== undefined) {
+          metadata.initiatedByUserId = initiatedByUserId;
+        }
         await recordIncomingBottleDecisionInTransaction(tx, {
           sourceKind: "review",
           sourceId: review.id,
@@ -187,14 +215,7 @@ export async function createExternalReview(
           confidence: resolution.confidence,
           model: resolution.model,
           rationale: resolution.rationale,
-          metadata: {
-            resolutionSource: resolution.source,
-            ...(resolution.classifierEvidence
-              ? { classifierEvidence: resolution.classifierEvidence }
-              : {}),
-            issue: input.issue,
-            ...(initiatedByUserId === undefined ? {} : { initiatedByUserId }),
-          },
+          metadata,
         });
       }
 

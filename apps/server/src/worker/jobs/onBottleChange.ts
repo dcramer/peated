@@ -1,5 +1,6 @@
 import { pushUniqueJob, runJob } from "@peated/server/worker/client";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 import type { UpdateBottleStatsJobArgs } from "./updateBottleStats";
 
 export const OnBottleChangeJobArgsSchema = z
@@ -29,7 +30,7 @@ export function buildBottleChangeStatsJob(
   };
 }
 
-export default async (input: unknown) => {
+export default async (input: JobPayload) => {
   const { bottleId } = OnBottleChangeJobArgsSchema.parse(input);
 
   await runJob("GenerateBottleDetails", { bottleId });

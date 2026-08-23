@@ -18,14 +18,9 @@ import {
   prepareOperation,
   prepareOperationForExecution,
 } from "@peated/server/lib/bottleOperationReview";
-import * as workerClient from "@peated/server/worker/client";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, desc, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-  pushUniqueJob: vi.fn(),
-}));
 
 function artifacts({
   bottleIds = [],

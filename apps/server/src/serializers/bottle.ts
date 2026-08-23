@@ -221,13 +221,12 @@ export const BottleSerializer = serializer({
   },
 
   item: (item: Bottle, attrs: Attrs): z.infer<typeof BottleSchema> => {
-    return {
+    const bottle: z.infer<typeof BottleSchema> = {
       id: item.id,
 
       // fullName is brand + name
       fullName: item.fullName,
       name: item.name,
-      ...(attrs.group ? { group: attrs.group } : {}),
 
       statedAge: item.statedAge,
 
@@ -269,5 +268,7 @@ export const BottleSerializer = serializer({
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
     };
+    if (attrs.group) bottle.group = attrs.group;
+    return bottle;
   },
 });

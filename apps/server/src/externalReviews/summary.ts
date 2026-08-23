@@ -30,12 +30,55 @@ const InputSchema = z
     contentHash: z.string().trim().min(1).max(128),
   })
   .strict();
+type ExternalReviewSummaryCandidate = Partial<z.input<typeof InputSchema>>;
 
 const ResponseSchema = z
   .object({
     summary: z.string().trim().min(1).max(1_000),
   })
   .strict();
+
+type OpenAIClient = ReturnType<typeof createOpenAIClient>;
+type SummaryRequest = Omit<
+  Parameters<OpenAIClient["responses"]["create"]>[0],
+  "stream"
+> & { stream?: false };
+type SummaryResponse = {
+  id: string;
+  model: string;
+  output_text: string;
+  service_tier?: string | null;
+  usage?: {
+    input_tokens: number;
+    input_tokens_details: { cached_tokens: number };
+    output_tokens: number;
+    output_tokens_details: { reasoning_tokens: number };
+  } | null;
+};
+
+export interface ExternalReviewSummaryServices {
+  createClient: (options: {
+    instrumentWithSentry: false;
+    workload: "scraper";
+  }) => {
+    responses: {
+      create: (request: SummaryRequest) => Promise<SummaryResponse>;
+    };
+  };
+  isConfigured: () => boolean;
+}
+
+const externalReviewSummaryServices: ExternalReviewSummaryServices = {
+  createClient: (options) => {
+    const client = createOpenAIClient(options);
+    return {
+      responses: {
+        create: async (request) => await client.responses.create(request),
+      },
+    };
+  },
+  isConfigured: () => isAIGatewayConfigured("scraper"),
+};
 
 const INSTRUCTIONS = [
   "<mission>",
@@ -114,7 +157,8 @@ function parseSummary(output: string, sourceText: string): string {
 
 /** Generates one summary without storing or logging the publisher text. */
 export async function generateExternalReviewSummary(
-  rawInput: unknown,
+  rawInput: ExternalReviewSummaryCandidate,
+  services: ExternalReviewSummaryServices = externalReviewSummaryServices,
 ): Promise<GeneratedExternalReviewSummary | null> {
   let input: z.infer<typeof InputSchema>;
   try {
@@ -123,7 +167,7 @@ export async function generateExternalReviewSummary(
     throw new ExternalReviewSummaryError();
   }
 
-  if (!isAIGatewayConfigured("scraper")) return null;
+  if (!services.isConfigured()) return null;
 
   // This query owns the LLM capability check immediately before model access.
   const policy = await db.query.externalReviewSourcePolicies.findFirst({
@@ -144,25 +188,27 @@ export async function generateExternalReviewSummary(
       model: config.BOTTLE_CLASSIFIER_MODEL,
       callback: async (reportResponse) => {
         try {
-          const result = await createOpenAIClient({
-            instrumentWithSentry: false,
-            workload: "scraper",
-          }).responses.create({
-            model: config.BOTTLE_CLASSIFIER_MODEL,
-            instructions: INSTRUCTIONS,
-            input: JSON.stringify({
-              bottleName: input.bottleName,
-              reviewText: input.sourceText,
-            }),
-            text: {
-              format: zodTextFormat(
-                ResponseSchema,
-                "external_review_summary_response",
-              ),
-            },
-            max_output_tokens: 500,
-            store: false,
-          });
+          const result = await services
+            .createClient({
+              instrumentWithSentry: false,
+              workload: "scraper",
+            })
+            .responses.create({
+              model: config.BOTTLE_CLASSIFIER_MODEL,
+              instructions: INSTRUCTIONS,
+              input: JSON.stringify({
+                bottleName: input.bottleName,
+                reviewText: input.sourceText,
+              }),
+              text: {
+                format: zodTextFormat(
+                  ResponseSchema,
+                  "external_review_summary_response",
+                ),
+              },
+              max_output_tokens: 500,
+              store: false,
+            });
           reportResponse({
             response: {
               id: result.id,

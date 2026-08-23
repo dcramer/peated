@@ -36,7 +36,7 @@ export default procedure
       });
     }
 
-    const data: { [name: string]: any } = {};
+    const data: Partial<typeof countries.$inferInsert> = {};
 
     if (
       input.description !== undefined &&

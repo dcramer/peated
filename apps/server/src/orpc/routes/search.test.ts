@@ -208,6 +208,7 @@ describe("GET /search", () => {
     const err = await waitError(() =>
       routerClient.search({
         query: "test",
+        // SAFETY: This test sends an invalid result type to the runtime validator.
         include: ["invalidtype" as any],
         limit: 10,
       }),

@@ -1,12 +1,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, test, vi } from "vitest";
-import InboxList, { inboxTaskHref } from "./inboxList";
-
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/admin/moderation/inbox/operation/22",
-  useSearchParams: () => new URLSearchParams("category=catalog&query=brand"),
-}));
+import { describe, expect, test } from "vitest";
+import { InboxListContent, inboxTaskHref } from "./inboxList";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 
@@ -41,7 +36,7 @@ const listingTask = {
 describe("Moderation Inbox list", () => {
   test("renders compact task questions, counts, and selected state", () => {
     const html = renderToStaticMarkup(
-      <InboxList
+      <InboxListContent
         data={{
           results: [listingTask, operationTask],
           counts: {
@@ -53,6 +48,8 @@ describe("Moderation Inbox list", () => {
           },
           rel: { nextCursor: null, prevCursor: null },
         }}
+        pathname="/admin/moderation/inbox/operation/22"
+        searchParams={new URLSearchParams("category=catalog&query=brand")}
         selectedKey="operation:22"
       />,
     );

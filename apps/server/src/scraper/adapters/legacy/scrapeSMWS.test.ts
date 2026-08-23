@@ -1,4 +1,5 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
+import { z } from "zod";
 import { scrapeBottles } from "./scrapeSMWS";
 
 process.env.DISABLE_HTTP_CACHE = "1";
@@ -98,9 +99,20 @@ test("continues when optional SMWS catalog fields are absent", async ({
   axiosMock,
 }) => {
   const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
-  const payload = JSON.parse(await loadFixture("smws", "bottle-list.json")) as {
-    items: Record<string, unknown>[];
-  };
+  const payload = z
+    .object({
+      items: z.array(
+        z
+          .object({
+            cask_no: z.string().nullable().optional(),
+            cask_type: z.string().nullable().optional(),
+            distilleddate: z.string().nullable().optional(),
+          })
+          .passthrough(),
+      ),
+    })
+    .passthrough()
+    .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
 
   payload.items[0].cask_no = null;
   payload.items[1].cask_type = null;
