@@ -59,9 +59,7 @@ function currentFieldValue(
 }
 
 function recordSupportsValue(
-  record:
-    | BottleContext["observations"][number]["facts"]
-     ,
+  record: BottleContext["observations"][number]["facts"],
   field: GuardedPatchField,
   value: GuardedPatchValue,
 ) {
