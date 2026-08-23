@@ -173,3 +173,77 @@ test("requires explicit BottleAlias names before execution", async ({
     repairInvalidSourceBottleAliases({ dryRun: false, user }),
   ).rejects.toThrow("explicit BottleAlias names");
 });
+
+test("continues a broad preview after a page of report-only aliases", async ({
+  fixtures,
+}) => {
+  const user = await fixtures.User({ mod: true });
+  const actor = await getUserActor(user);
+  const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+  const activeBottle = await fixtures.Bottle({ name: "Cursor Active Bottle" });
+  for (const name of ["Cursor Active A", "Cursor Active B"]) {
+    await fixtures.BottleAlias({
+      bottleId: activeBottle.id,
+      name,
+      ignored: false,
+      assignmentSource: "source_approved",
+      assignedByActorId: actor.id,
+    });
+  }
+
+  const repairBottle = await fixtures.Bottle({ name: "Cursor Repair Bottle" });
+  const price = await fixtures.StorePrice({
+    externalSiteId: site.id,
+    name: "Cursor Repair C",
+    bottleId: repairBottle.id,
+  });
+  const [proposal] = await db
+    .insert(storePriceMatchProposals)
+    .values({
+      priceId: price.id,
+      status: "approved",
+      proposalType: "match_existing",
+      aliasScope: "none",
+      currentBottleId: repairBottle.id,
+      suggestedBottleId: repairBottle.id,
+      reviewedById: user.id,
+    })
+    .returning();
+  await db.insert(incomingBottleDecisionLogs).values({
+    sourceKind: "store_price",
+    sourceId: price.id,
+    proposalId: proposal.id,
+    externalSiteId: site.id,
+    name: price.name,
+    decision: "match_existing",
+    actorId: actor.id,
+    bottleId: repairBottle.id,
+  });
+  await fixtures.BottleAlias({
+    bottleId: repairBottle.id,
+    name: price.name,
+    ignored: true,
+    assignmentSource: "source_approved",
+    assignedByActorId: actor.id,
+  });
+
+  const firstPage = await repairInvalidSourceBottleAliases({ limit: 2 });
+  expect(firstPage.items.map(({ aliasName }) => aliasName)).toEqual([
+    "Cursor Active A",
+    "Cursor Active B",
+  ]);
+  expect(firstPage.nextAliasName).toBe("Cursor Active B");
+
+  const secondPage = await repairInvalidSourceBottleAliases({
+    afterAliasName: firstPage.nextAliasName!,
+    limit: 2,
+  });
+  expect(secondPage.items).toEqual([
+    expect.objectContaining({
+      aliasName: price.name,
+      evidenceProposalIds: [proposal.id],
+      status: "planned",
+    }),
+  ]);
+  expect(secondPage.nextAliasName).toBeNull();
+});

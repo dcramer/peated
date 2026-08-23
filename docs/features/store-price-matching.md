@@ -153,7 +153,9 @@ changing them by default. The OAuth `cli api` client can call this endpoint
 against production. Execution requires `execute: true` and one or more explicit
 BottleAlias names. The repair only unassigns ignored rows when an approved
 source-only proposal and decision provide matching evidence. Active rows are
-report-only and require manual review.
+report-only and require manual review. A full audit follows `nextAliasName` with
+the next request's `afterAliasName` so report-only rows cannot hide later repair
+candidates.
 
 ## Image Promotion
 

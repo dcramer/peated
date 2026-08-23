@@ -36,6 +36,7 @@
 - [x] 5.4 Keep missing alias-safety metadata conservative.
 - [x] 5.5 Keep current BottleAlias behavior for explicit reusable approvals when the moderator accepts the suggested Bottle.
 - [x] 5.6 Add a moderator API for preview-first repair of proven ignored BottleAlias rows from old source-only approvals. Require explicit names for execution and leave active rows for manual review.
+- [x] 5.7 Add stable cursor pagination so report-only BottleAlias rows cannot hide later repair candidates.
 
 ## 6. Scraper Reuse
 
