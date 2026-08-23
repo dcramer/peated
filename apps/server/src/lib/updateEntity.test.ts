@@ -28,7 +28,7 @@ describe("updateEntity", () => {
       name: "Storm Cask",
     });
     const groupMember = await fixtures.BottleGroupMember({
-      groupId: bottle.groupId as number,
+      groupId: bottle.groupId,
       edition: "Second Release",
     });
     const moderator = await fixtures.User({

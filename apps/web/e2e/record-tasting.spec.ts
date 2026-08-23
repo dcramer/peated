@@ -1,5 +1,6 @@
 import { expect, type Page, type Request, test } from "@playwright/test";
 import { Buffer } from "node:buffer";
+import { z } from "zod";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
@@ -230,19 +231,31 @@ function waitForTastingCreate(page: Page) {
   );
 }
 
-function getRpcInput(request: Request): Record<string, unknown> {
+type RpcJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | RpcJsonValue[]
+  | RpcJsonObject;
+
+interface RpcJsonObject {
+  [key: string]: RpcJsonValue;
+}
+
+function getRpcInput(request: Request): RpcJsonObject {
   const postData = request.postData();
   if (!postData) {
     throw new Error("Expected the RPC request to contain JSON input.");
   }
 
-  const envelope: unknown = JSON.parse(postData);
+  const envelope: RpcJsonValue = JSON.parse(postData);
   if (!isRecord(envelope) || !isRecord(envelope.json)) {
     throw new Error("Expected the RPC request to use the JSON envelope.");
   }
   return envelope.json;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function isRecord(value: RpcJsonValue): value is RpcJsonObject {
+  return z.record(z.string(), z.json()).safeParse(value).success;
 }

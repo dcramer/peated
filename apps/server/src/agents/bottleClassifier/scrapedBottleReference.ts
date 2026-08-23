@@ -7,12 +7,14 @@ import {
 /** Scraper work uses its configured overrides before application defaults. */
 export async function classifyScrapedBottleReference(
   input: ClassifyBottleReferenceInput,
+  classifyReference: typeof classifyWithServerAdapters = classifyWithServerAdapters,
 ) {
-  return await classifyWithServerAdapters(input);
+  return await classifyReference(input);
 }
 
 export async function runScrapedBottleReference(
   input: ClassifyBottleReferenceInput,
+  runReference: typeof runWithServerAdapters = runWithServerAdapters,
 ) {
-  return await runWithServerAdapters(input);
+  return await runReference(input);
 }

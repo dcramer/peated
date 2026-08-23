@@ -26,6 +26,10 @@ type OpenAICompatibleEnvKey =
   | "OPENAI_MODEL"
   | "OPENAI_REASONING_EFFORT";
 
+type OpenAICompatibleEnv = Readonly<
+  Partial<Record<OpenAICompatibleEnvKey, string | undefined>>
+>;
+
 export type OpenAICompatibleConfig = {
   apiKey: string | undefined;
   baseURL: string;
@@ -50,15 +54,14 @@ function nonEmpty(value: string | undefined): string | undefined {
 }
 
 function envValue(
-  env: object,
+  env: OpenAICompatibleEnv,
   key: OpenAICompatibleEnvKey,
 ): string | undefined {
-  const value = Reflect.get(env, key);
-  return typeof value === "string" ? value : undefined;
+  return env[key];
 }
 
 export function resolveOpenAICompatibleConfig(
-  env: object,
+  env: OpenAICompatibleEnv,
 ): OpenAICompatibleConfig {
   const gatewayApiKey = nonEmpty(envValue(env, "AI_GATEWAY_API_KEY"));
   const isProduction = nonEmpty(envValue(env, "NODE_ENV")) === "production";

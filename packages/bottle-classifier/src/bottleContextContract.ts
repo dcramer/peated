@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   BottleExtractedDetailsSchema,
   EntityTypeEnum,
-  ProposedBottleSchema,
+  ProposedBottleFields,
 } from "./classifierTypes";
 
 export const MAX_BOTTLE_CONTEXT_ALIASES = 12;
@@ -22,8 +22,26 @@ const HttpUrlSchema = z
   .refine((value) => ["http:", "https:"].includes(new URL(value).protocol), {
     message: "Expected an HTTP or HTTPS URL",
   });
+type ObservationValue =
+  | boolean
+  | null
+  | number
+  | ObservationValue[]
+  | string
+  | { [key: string]: ObservationValue };
+const ObservationValueSchema: z.ZodType<ObservationValue, ObservationValue> =
+  z.lazy(() =>
+    z.union([
+      z.string(),
+      z.number().finite(),
+      z.boolean(),
+      z.null(),
+      z.array(ObservationValueSchema),
+      z.record(z.string(), ObservationValueSchema),
+    ]),
+  );
 const BoundedObservationDataSchema = z
-  .record(z.string(), z.unknown())
+  .record(z.string(), ObservationValueSchema)
   .refine(
     (value) =>
       JSON.stringify(value).length <=
@@ -47,31 +65,35 @@ export const BottleContextSeriesRefSchema = z
   })
   .strict();
 
+export const BottleContextSharedFields = {
+  name: ProposedBottleFields.name,
+  statedAge: ProposedBottleFields.statedAge.removeDefault(),
+  series: BottleContextSeriesRefSchema.nullable(),
+  category: ProposedBottleFields.category.removeDefault(),
+  brand: BottleContextEntityRefSchema,
+  distillers: z.array(BottleContextEntityRefSchema),
+  bottler: BottleContextEntityRefSchema.nullable(),
+} as const;
+
 export const BottleContextSharedSchema = z
-  .object({
-    name: ProposedBottleSchema.shape.name,
-    statedAge: ProposedBottleSchema.shape.statedAge.removeDefault(),
-    series: BottleContextSeriesRefSchema.nullable(),
-    category: ProposedBottleSchema.shape.category.removeDefault(),
-    brand: BottleContextEntityRefSchema,
-    distillers: z.array(BottleContextEntityRefSchema),
-    bottler: BottleContextEntityRefSchema.nullable(),
-  })
+  .object(BottleContextSharedFields)
   .strict();
 
+export const BottleContextExactFields = {
+  edition: ProposedBottleFields.edition.removeDefault(),
+  statedAge: ProposedBottleFields.statedAge.removeDefault(),
+  abv: ProposedBottleFields.abv.removeDefault(),
+  singleCask: ProposedBottleFields.singleCask.removeDefault(),
+  caskStrength: ProposedBottleFields.caskStrength.removeDefault(),
+  vintageYear: ProposedBottleFields.vintageYear.removeDefault(),
+  releaseYear: ProposedBottleFields.releaseYear.removeDefault(),
+  caskSize: ProposedBottleFields.caskSize.removeDefault(),
+  caskType: ProposedBottleFields.caskType.removeDefault(),
+  caskFill: ProposedBottleFields.caskFill.removeDefault(),
+} as const;
+
 export const BottleContextExactSchema = z
-  .object({
-    edition: ProposedBottleSchema.shape.edition.removeDefault(),
-    statedAge: ProposedBottleSchema.shape.statedAge.removeDefault(),
-    abv: ProposedBottleSchema.shape.abv.removeDefault(),
-    singleCask: ProposedBottleSchema.shape.singleCask.removeDefault(),
-    caskStrength: ProposedBottleSchema.shape.caskStrength.removeDefault(),
-    vintageYear: ProposedBottleSchema.shape.vintageYear.removeDefault(),
-    releaseYear: ProposedBottleSchema.shape.releaseYear.removeDefault(),
-    caskSize: ProposedBottleSchema.shape.caskSize.removeDefault(),
-    caskType: ProposedBottleSchema.shape.caskType.removeDefault(),
-    caskFill: ProposedBottleSchema.shape.caskFill.removeDefault(),
-  })
+  .object(BottleContextExactFields)
   .strict();
 
 export const BottleContextSiblingSchema = z
@@ -169,22 +191,22 @@ export const EntityContextBottleSampleSchema = z
   })
   .strict();
 
-export const EntityContextSchema = z
-  .object({
-    entityId: PositiveIdSchema,
-    name: NonEmptyTextSchema,
-    shortName: NonEmptyTextSchema.nullable(),
-    roles: z.array(EntityTypeEnum),
-    website: HttpUrlSchema.nullable(),
-    country: NonEmptyTextSchema.nullable(),
-    region: NonEmptyTextSchema.nullable(),
-    yearEstablished: z.number().int().nullable(),
-    aliases: z.array(NonEmptyTextSchema).max(MAX_ENTITY_CONTEXT_ALIASES),
-    relatedBottles: z
-      .array(EntityContextBottleSampleSchema)
-      .max(MAX_ENTITY_CONTEXT_BOTTLES),
-  })
-  .strict();
+export const EntityContextFields = {
+  entityId: PositiveIdSchema,
+  name: NonEmptyTextSchema,
+  shortName: NonEmptyTextSchema.nullable(),
+  roles: z.array(EntityTypeEnum),
+  website: HttpUrlSchema.nullable(),
+  country: NonEmptyTextSchema.nullable(),
+  region: NonEmptyTextSchema.nullable(),
+  yearEstablished: z.number().int().nullable(),
+  aliases: z.array(NonEmptyTextSchema).max(MAX_ENTITY_CONTEXT_ALIASES),
+  relatedBottles: z
+    .array(EntityContextBottleSampleSchema)
+    .max(MAX_ENTITY_CONTEXT_BOTTLES),
+} as const;
+
+export const EntityContextSchema = z.object(EntityContextFields).strict();
 
 export type BottleContextEntityRef = z.infer<
   typeof BottleContextEntityRefSchema

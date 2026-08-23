@@ -5,11 +5,7 @@ import { type Tag, type User } from "../db/schema";
 
 export const TagSerializer = serializer({
   name: "tag",
-  item: (
-    item: Tag,
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ): z.infer<typeof TagSchema> => {
+  item: (item: Tag): z.infer<typeof TagSchema> => {
     return {
       name: item.name,
       synonyms: item.synonyms,

@@ -333,19 +333,15 @@ async function resolveBottleReferenceTargetWithClassifier(
 
 export async function resolveBottleReferenceTarget(
   input: ResolveBottleReferenceTargetInput,
+  classify: typeof classifyBottleReference = classifyBottleReference,
 ) {
-  return await resolveBottleReferenceTargetWithClassifier(
-    input,
-    classifyBottleReference,
-  );
+  return await resolveBottleReferenceTargetWithClassifier(input, classify);
 }
 
 /** External scraper ingestion uses the scraper classifier credential policy. */
 export async function resolveScrapedBottleReferenceTarget(
   input: ResolveBottleReferenceTargetInput,
+  classify: typeof classifyScrapedBottleReference = classifyScrapedBottleReference,
 ) {
-  return await resolveBottleReferenceTargetWithClassifier(
-    input,
-    classifyScrapedBottleReference,
-  );
+  return await resolveBottleReferenceTargetWithClassifier(input, classify);
 }

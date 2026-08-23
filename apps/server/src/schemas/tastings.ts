@@ -17,6 +17,39 @@ import {
 import { PendingUploadSchema } from "./pendingUploads";
 import { UserSchema } from "./users";
 
+const TastingNotesSchema = z
+  .string()
+  .nullable()
+  .default(null)
+  .describe("User's tasting notes and observations");
+const TastingRatingSchema = z
+  .union([
+    z.literal(SIMPLE_RATING_VALUES.PASS),
+    z.literal(SIMPLE_RATING_VALUES.SIP),
+    z.literal(SIMPLE_RATING_VALUES.SAVOR),
+  ])
+  .nullable()
+  .default(null)
+  .describe("Simple rating: -1 (Pass), 1 (Sip), 2 (Savor)");
+const TastingTagsSchema = z
+  .array(z.string())
+  .default([])
+  .describe("Tags associated with this tasting");
+const TastingColorSchema = z
+  .number()
+  .gte(0)
+  .lte(20)
+  .nullable()
+  .default(null)
+  .describe("Color rating on a scale from 0-20");
+const TastingServingStyleSchema = ServingStyleEnum.nullable()
+  .default(null)
+  .describe("How the whisky was served (neat, rocks, etc.)");
+const TastingImageInputSchema = z
+  .null()
+  .optional()
+  .describe("Optional image upload for the tasting");
+
 export const TastingSchema = z.object({
   id: z.number().describe("Unique identifier for the tasting"),
   imageUrl: z
@@ -25,35 +58,12 @@ export const TastingSchema = z.object({
     .default(null)
     .readonly()
     .describe("URL to the tasting's image"),
-  notes: z
-    .string()
-    .nullable()
-    .default(null)
-    .describe("User's tasting notes and observations"),
+  notes: TastingNotesSchema,
   bottle: BottleSchema.describe("Bottle that was tasted"),
-  rating: z
-    .union([
-      z.literal(SIMPLE_RATING_VALUES.PASS),
-      z.literal(SIMPLE_RATING_VALUES.SIP),
-      z.literal(SIMPLE_RATING_VALUES.SAVOR),
-    ])
-    .nullable()
-    .default(null)
-    .describe("Simple rating: -1 (Pass), 1 (Sip), 2 (Savor)"),
-  tags: z
-    .array(z.string())
-    .default([])
-    .describe("Tags associated with this tasting"),
-  color: z
-    .number()
-    .gte(0)
-    .lte(20)
-    .nullable()
-    .default(null)
-    .describe("Color rating on a scale from 0-20"),
-  servingStyle: ServingStyleEnum.nullable()
-    .default(null)
-    .describe("How the whisky was served (neat, rocks, etc.)"),
+  rating: TastingRatingSchema,
+  tags: TastingTagsSchema,
+  color: TastingColorSchema,
+  servingStyle: TastingServingStyleSchema,
   friends: z
     .array(UserSchema)
     .default([])
@@ -103,7 +113,7 @@ export const TastingContentInputSchema = TastingSchema.omit({
   createdAt: zDatetime
     .nullish()
     .describe("Custom creation timestamp for the tasting"),
-  image: z.null().optional().describe("Optional image upload for the tasting"),
+  image: TastingImageInputSchema,
   pendingImageId: z
     .string()
     .trim()
@@ -119,6 +129,16 @@ export const TastingContentInputSchema = TastingSchema.omit({
 export const TastingInputSchema = TastingContentInputSchema.extend({
   bottle: z.number().int().positive().describe("Bottle being tasted"),
 }).strict();
+
+export const TastingUpdateFields = {
+  notes: TastingNotesSchema.removeDefault().optional(),
+  rating: TastingRatingSchema.removeDefault().optional(),
+  servingStyle: TastingServingStyleSchema.removeDefault().optional(),
+  color: TastingColorSchema.removeDefault().optional(),
+  friends: z.array(z.number()).optional(),
+  tags: TastingTagsSchema.removeDefault().optional(),
+  image: TastingImageInputSchema,
+} as const;
 
 export const PhotoIdentificationSuggestedNextStepEnum = z.enum([
   "confirm_match",

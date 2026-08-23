@@ -4,8 +4,12 @@ export type BottleNormalizationExactIdentity = {
   vintageYear: number | null;
 };
 
+interface RomanNumerals {
+  [value: string]: string | undefined;
+}
+
 function normalizeEdition(value: string | null | undefined) {
-  const romanNumerals: Record<string, string> = {
+  const romanNumerals: RomanNumerals = {
     i: "1",
     ii: "2",
     iii: "3",

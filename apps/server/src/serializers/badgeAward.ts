@@ -8,6 +8,10 @@ import type { BadgeAwardSchema } from "../schemas";
 import type { Badge } from "../types";
 import { BadgeSerializer } from "./badge";
 
+interface BadgeAwardAttrs {
+  badge: z.infer<typeof BadgeAwardSchema>["badge"];
+}
+
 export const BadgeAwardSerializer = serializer({
   name: "badgeAward",
   attrs: async (
@@ -47,16 +51,16 @@ export const BadgeAwardSerializer = serializer({
       badge?: Badge;
       prevLevel?: number;
     },
-    attrs: Record<string, any>,
-    currentUser?: User,
+    attrs: BadgeAwardAttrs,
   ): z.infer<typeof BadgeAwardSchema> => {
-    return {
+    const award: z.infer<typeof BadgeAwardSchema> = {
       id: item.id,
       xp: item.xp,
       level: item.level,
       badge: attrs.badge,
       createdAt: item.createdAt.toISOString(),
-      ...(item.prevLevel !== undefined ? { prevLevel: item.prevLevel } : {}),
     };
+    if (item.prevLevel !== undefined) award.prevLevel = item.prevLevel;
+    return award;
   },
 });

@@ -1,4 +1,4 @@
-import { logInfo } from "./log";
+import { logInfo, type LogContext } from "./log";
 
 export enum AuditEvent {
   // Authentication events
@@ -32,7 +32,7 @@ interface AuditLogEntry {
   userId?: number;
   ip?: string;
   userAgent?: string;
-  metadata?: Record<string, any>;
+  metadata?: LogContext;
 }
 
 export function auditLog(entry: AuditLogEntry): void {

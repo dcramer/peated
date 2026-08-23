@@ -756,7 +756,7 @@ async function collectBrandRepairCandidates({
   currentBrandId?: number;
   query?: string;
   targetBrandId?: number;
-}) {
+}): Promise<BrandRepairCandidateInternal[]> {
   const trimmedQuery = query.trim();
   const normalizedQuery = normalizeComparableText(trimmedQuery);
   const candidateBottles = await getCandidateBottles({
@@ -765,7 +765,7 @@ async function collectBrandRepairCandidates({
   });
 
   if (candidateBottles.length === 0) {
-    return [] as BrandRepairCandidateInternal[];
+    return [];
   }
 
   const currentBrandIds = Array.from(
@@ -778,7 +778,7 @@ async function collectBrandRepairCandidates({
   const candidateBottleIds = candidateBottles.map((bottle) => bottle.id);
 
   if (currentBrandIds.length === 0) {
-    return [] as BrandRepairCandidateInternal[];
+    return [];
   }
 
   const [currentBrands, aliasRows, brandRows] = await Promise.all([

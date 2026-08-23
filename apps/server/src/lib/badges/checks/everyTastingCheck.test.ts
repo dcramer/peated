@@ -47,7 +47,6 @@ describe("test", () => {
     const tasting = await createTastingForBadge(fixtures);
 
     const badgeImpl = new EveryTastingCheck();
-    const config = { ignored: true };
-    expect(badgeImpl.test(config, tasting)).toEqual(true);
+    expect(badgeImpl.test(tasting)).toEqual(true);
   });
 });

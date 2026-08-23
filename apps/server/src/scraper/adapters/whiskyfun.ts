@@ -96,7 +96,11 @@ type ArchivePeriod = {
   part: number;
 };
 
-const ARCHIVE_MONTHS: Record<string, number> = {
+interface ArchiveMonths {
+  [name: string]: number;
+}
+
+const ARCHIVE_MONTHS: ArchiveMonths = {
   january: 1,
   february: 2,
   march: 3,

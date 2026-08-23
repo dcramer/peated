@@ -1,18 +1,21 @@
+import type { isDefinedError } from "@orpc/client";
+import { z } from "zod";
+
 export type RegistrationConflictField = "email" | "username";
+type ClientErrorCandidate = Parameters<typeof isDefinedError>[0];
+
+const RegistrationConflictSchema = z.object({
+  code: z.string().optional(),
+  data: z.object({ field: z.enum(["email", "username"]) }),
+  name: z.string().optional(),
+});
 
 export function getRegistrationConflictField(
-  error: unknown,
+  error: ClientErrorCandidate,
 ): RegistrationConflictField | null {
-  if (!error || typeof error !== "object") return null;
-
-  const { code, data, name } = error as {
-    code?: unknown;
-    data?: unknown;
-    name?: unknown;
-  };
-  if (name !== "CONFLICT" && code !== "CONFLICT") return null;
-  if (!data || typeof data !== "object") return null;
-
-  const field = (data as { field?: unknown }).field;
-  return field === "email" || field === "username" ? field : null;
+  const result = RegistrationConflictSchema.safeParse(error);
+  if (!result.success) return null;
+  return result.data.name === "CONFLICT" || result.data.code === "CONFLICT"
+    ? result.data.data.field
+    : null;
 }

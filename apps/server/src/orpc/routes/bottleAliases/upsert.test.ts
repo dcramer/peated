@@ -7,12 +7,10 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
-
-vi.mock("@peated/server/worker/client");
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -179,6 +177,7 @@ describe("PUT /bottle-aliases", () => {
 
     await expect(
       waitError(
+        // SAFETY: This test sends the retired groupId field to the runtime validator.
         routerClient.bottleAliases.upsert(
           { bottle: 2_147_483_647, name: "Missing Bottle Alias" },
           { context: { user } },
@@ -217,6 +216,7 @@ describe("PUT /bottle-aliases", () => {
     await expect(
       waitError(
         routerClient.bottleAliases.upsert(
+          // SAFETY: This test sends the retired groupId field to the runtime validator.
           {
             bottle: bottle.id,
             groupId: bottle.groupId,

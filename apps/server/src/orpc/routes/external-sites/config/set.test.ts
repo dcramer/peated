@@ -9,6 +9,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
   test("requires authentication", async () => {
     const err = await waitError(() =>
       routerClient.externalSites.config.set({
+        // SAFETY: This test sends an invalid site to the runtime validator.
         site: "test" as any,
         key: "test",
         value: "test",
@@ -40,6 +41,7 @@ describe("PUT /external-sites/:site/config/:key", () => {
     const err = await waitError(() =>
       routerClient.externalSites.config.set(
         {
+          // SAFETY: This test sends an unknown site to the runtime validator.
           site: "non-existent-site" as any,
           key: "test",
           value: "test",

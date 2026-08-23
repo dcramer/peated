@@ -21,6 +21,7 @@ export default function ActivityFeed({
   filter: "global" | "friends" | "local";
 }) {
   const orpc = useORPC();
+  let initialPageParam: string | undefined;
   // TanStack's helper currently widens queryFn to skipToken, which is not
   // accepted by the suspense hook's narrower type.
   /* oxlint-disable @tanstack/query/prefer-query-options */
@@ -49,7 +50,7 @@ export default function ActivityFeed({
         results: filterFavoriteActivity(page.results),
       };
     },
-    initialPageParam: undefined as string | undefined,
+    initialPageParam,
     staleTime: Infinity,
     initialData: () => {
       return {
@@ -59,7 +60,7 @@ export default function ActivityFeed({
             results: filterFavoriteActivity(activityList.results),
           },
         ],
-        pageParams: [undefined],
+        pageParams: [initialPageParam],
       };
     },
     getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,

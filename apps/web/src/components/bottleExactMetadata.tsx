@@ -3,6 +3,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { BottleGroupV1, BottleV1 } from "@peated/server/schemas";
 import classNames from "@peated/web/lib/classNames";
 import type { ReactNode } from "react";
+import { z } from "zod";
 
 export type BottleExactMetadataSource = Pick<
   BottleV1,
@@ -87,9 +88,10 @@ export function getBottleExactMetadata(
 
   const seenLabels = new Set<string>();
   return metadata.filter(({ content }) => {
-    if (typeof content !== "string") return true;
+    const text = z.string().safeParse(content);
+    if (!text.success) return true;
 
-    const label = content.trim().toLowerCase();
+    const label = text.data.trim().toLowerCase();
     if (seenLabels.has(label)) return false;
 
     seenLabels.add(label);

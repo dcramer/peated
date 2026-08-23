@@ -139,17 +139,18 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
   const orpc = useORPC();
   const searchParams = useSearchParams();
   const category = searchParams.get("category");
+  const query = searchParams.get("query");
+  const actor = searchParams.get("actor");
+  const outcome = searchParams.get("outcome");
   const input: NonNullable<Inputs["admin"]["moderation"]["listHistory"]> = {
     limit: 100,
-    ...(searchParams.get("query") ? { query: searchParams.get("query")! } : {}),
-    ...(category === "listing" || category === "catalog"
-      ? { category: category as "listing" | "catalog" }
-      : {}),
-    ...(searchParams.get("actor") ? { actor: searchParams.get("actor")! } : {}),
-    ...(searchParams.get("outcome")
-      ? { outcome: searchParams.get("outcome")! }
-      : {}),
   };
+  if (query) input.query = query;
+  if (category === "listing" || category === "catalog") {
+    input.category = category;
+  }
+  if (actor) input.actor = actor;
+  if (outcome) input.outcome = outcome;
   const { data } = useSuspenseQuery(
     orpc.admin.moderation.listHistory.queryOptions({ input }),
   );

@@ -1,4 +1,4 @@
-import * as workerClient from "@peated/server/worker/client";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { beforeEach, expect, test, vi } from "vitest";
 import onBottleChange, { buildBottleChangeStatsJob } from "./onBottleChange";
 

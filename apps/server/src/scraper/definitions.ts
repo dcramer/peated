@@ -140,18 +140,11 @@ const TargetDefinitionSchema = z
   });
 
 const ZodSchemaSchema = z.custom<z.ZodType>(
-  (value) =>
-    typeof value === "object" &&
-    value !== null &&
-    "safeParse" in value &&
-    typeof value.safeParse === "function",
+  (value) => value instanceof z.ZodType,
   "Expected a Zod schema.",
 );
 
-const FunctionSchema = z.custom<(...args: never[]) => unknown>(
-  (value) => typeof value === "function",
-  "Expected a function.",
-);
+const FunctionSchema = z.function();
 
 const SourceDefinitionSchema = z
   .object({
@@ -198,7 +191,7 @@ export function defineScrapeTarget(
       >
     >,
 ): ScrapeTargetDefinition {
-  return TargetDefinitionSchema.parse(input) as ScrapeTargetDefinition;
+  return TargetDefinitionSchema.parse(input);
 }
 
 export function defineScraperSource<TCursor, TObservation>(
@@ -210,9 +203,12 @@ export function defineScraperSource<TCursor, TObservation>(
     resumeFromLastRun?: boolean;
   },
 ): ScraperSourceDefinition<TCursor, TObservation> {
-  return SourceDefinitionSchema.parse(
-    input,
-  ) as unknown as ScraperSourceDefinition<TCursor, TObservation>;
+  const parsed = SourceDefinitionSchema.parse(input);
+  return {
+    ...input,
+    requestLimit: parsed.requestLimit,
+    resumeFromLastRun: parsed.resumeFromLastRun,
+  };
 }
 
 export function createScraperRegistry(input: {

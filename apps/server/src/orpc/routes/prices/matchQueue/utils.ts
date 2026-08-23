@@ -29,6 +29,7 @@ import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
 import { inArray } from "drizzle-orm";
+import { z } from "zod";
 
 type QueueRow = {
   isProcessing?: boolean;
@@ -36,19 +37,28 @@ type QueueRow = {
   price: StorePrice & { externalSite: ExternalSite };
 };
 
-type StructuredAutomationIssue = {
-  code?: unknown;
-  format?: unknown;
-  message?: unknown;
-  path?: unknown;
-};
+const StoredValueSchema = z.json().catch(null);
+type StoredValue = z.infer<typeof StoredValueSchema>;
+
+const AutomationIssuePathSchema = z
+  .union([z.string(), z.array(z.string())])
+  .optional();
+const StructuredAutomationIssueSchema = z.object({
+  code: z.string().optional(),
+  format: z.string().optional(),
+  message: z.string().optional(),
+  path: AutomationIssuePathSchema,
+});
+type StructuredAutomationIssue = z.infer<
+  typeof StructuredAutomationIssueSchema
+>;
 
 /**
  * Stored queue snapshots are untrusted JSON. Only current direct-Bottle
  * candidates are returned to the queue.
  */
 function normalizeStoredPriceMatchCandidates(
-  value: unknown,
+  value: StoredValue,
   proposalId: number,
 ) {
   const candidates = Array.isArray(value) ? value : [];
@@ -77,7 +87,7 @@ function normalizeStoredPriceMatchCandidates(
 }
 
 function normalizeStoredProposedBottle(
-  proposedBottle: unknown,
+  proposedBottle: StoredValue,
 ): ReturnType<typeof ProposedBottleSchema.parse> {
   return normalizeProposedBottleDraft(
     ProposedBottleSchema.parse(proposedBottle),
@@ -99,12 +109,12 @@ function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
   return parsedAssessment.success ? parsedAssessment.data : null;
 }
 
-function humanizeAutomationIssuePath(path: unknown): string | null {
+function humanizeAutomationIssuePath(
+  path: z.infer<typeof AutomationIssuePathSchema>,
+): string | null {
   const rawParts = Array.isArray(path)
-    ? path.filter((segment): segment is string => typeof segment === "string")
-    : typeof path === "string"
-      ? path.split(".").filter(Boolean)
-      : [];
+    ? path
+    : (path?.split(".").filter(Boolean) ?? []);
 
   if (rawParts.length === 0) {
     return null;
@@ -127,10 +137,7 @@ function formatStructuredAutomationIssue(
   issue: StructuredAutomationIssue,
 ): string | null {
   const path = humanizeAutomationIssuePath(issue.path);
-  const message =
-    typeof issue.message === "string" && issue.message.length > 0
-      ? issue.message
-      : null;
+  const message = issue.message?.length ? issue.message : null;
 
   if (issue.code === "invalid_format" && issue.format === "url") {
     return path ? `${path} is invalid` : "URL is invalid";
@@ -150,16 +157,15 @@ function getAutomationBlockersFromError(error: string): string[] {
   }
 
   try {
-    const parsedIssues = JSON.parse(trimmedError);
+    const parsedIssues = StoredValueSchema.parse(JSON.parse(trimmedError));
     if (!Array.isArray(parsedIssues)) {
       return [error];
     }
 
     const formattedIssues = parsedIssues
+      .map((issue) => StructuredAutomationIssueSchema.safeParse(issue))
       .map((issue) =>
-        issue && typeof issue === "object"
-          ? formatStructuredAutomationIssue(issue)
-          : null,
+        issue.success ? formatStructuredAutomationIssue(issue.data) : null,
       )
       .filter((issue): issue is string => !!issue);
 
@@ -240,14 +246,16 @@ export function serializeProposal(
   } = {},
 ) {
   const candidateBottles = normalizeStoredPriceMatchCandidates(
-    proposal.candidateBottles,
+    StoredValueSchema.parse(proposal.candidateBottles),
     proposal.id,
   );
   const extractedLabel = proposal.extractedLabel
     ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
     : null;
   const normalizedProposedBottle = proposal.proposedBottle
-    ? normalizeStoredProposedBottle(proposal.proposedBottle)
+    ? normalizeStoredProposedBottle(
+        StoredValueSchema.parse(proposal.proposedBottle),
+      )
     : null;
   const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
     proposal.searchEvidence,

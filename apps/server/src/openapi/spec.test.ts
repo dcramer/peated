@@ -1,7 +1,7 @@
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import type { z } from "zod";
+import { z } from "zod";
 import router, { type Inputs, type Outputs } from "../orpc/router";
 import {
   type BottleGroupV1,
@@ -29,26 +29,22 @@ async function generateSpec() {
   });
 }
 
+const OpenApiOperationSchema = z.object({ operationId: z.string() });
+
 function getJsonResponseSchema(operation: any) {
   const response = operation?.responses?.[200] ?? operation?.responses?.["200"];
-  return response?.content?.["application/json"]?.schema as any;
+  return response?.content?.["application/json"]?.schema;
 }
 
 function getJsonRequestSchema(operation: any) {
-  return operation?.requestBody?.content?.["application/json"]?.schema as any;
+  return operation?.requestBody?.content?.["application/json"]?.schema;
 }
 
 function getOperationIds(spec: Awaited<ReturnType<typeof generateSpec>>) {
   return Object.values(spec.paths ?? {}).flatMap((path) =>
     Object.values(path ?? {}).flatMap((operation) => {
-      if (
-        typeof operation === "object" &&
-        operation !== null &&
-        "operationId" in operation
-      ) {
-        return [operation.operationId];
-      }
-      return [];
+      const parsed = OpenApiOperationSchema.safeParse(operation);
+      return parsed.success ? [parsed.data.operationId] : [];
     }),
   );
 }
@@ -75,13 +71,19 @@ describe("OpenAPI generation ($ref reuse)", () => {
     ] as const;
 
     for (const path of searchPaths) {
-      const queryParameter = (
-        spec.paths?.[path]?.get?.parameters as any[]
-      )?.find((parameter) => parameter.name === "query");
-
-      expect(queryParameter?.schema?.description).toBe(
-        "Plain-text search; operator syntax is not supported.",
+      const queryParameter = spec.paths?.[path]?.get?.parameters?.find(
+        (parameter) => "name" in parameter && parameter.name === "query",
       );
+
+      const querySchema =
+        queryParameter && "schema" in queryParameter
+          ? queryParameter.schema
+          : undefined;
+      expect(
+        querySchema && "description" in querySchema
+          ? querySchema.description
+          : undefined,
+      ).toBe("Plain-text search; operator syntax is not supported.");
     }
   });
 
@@ -93,29 +95,48 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(spec.components?.schemas?.Cursor).toBeDefined();
 
     // List response uses $ref for items and rel
-    const listResp200: any =
-      (spec.paths?.["/bottles"]?.get?.responses as any)?.[200] ??
-      (spec.paths?.["/bottles"]?.get?.responses as any)?.["200"]; // keys may be stringified
-    const listResponse = listResp200?.content?.["application/json"]
-      ?.schema as any;
-    expectBottleResponse(listResponse?.properties?.results?.items);
-    const relSchema = listResponse?.properties?.rel;
+    const listResp200 =
+      spec.paths?.["/bottles"]?.get?.responses?.[200] ??
+      spec.paths?.["/bottles"]?.get?.responses?.["200"]; // keys may be stringified
+    const listResponse =
+      listResp200 && "content" in listResp200
+        ? listResp200.content?.["application/json"]?.schema
+        : undefined;
+    const listProperties =
+      listResponse && "properties" in listResponse
+        ? listResponse.properties
+        : undefined;
+    const resultsSchema = listProperties?.results;
+    expectBottleResponse(
+      resultsSchema && "items" in resultsSchema
+        ? resultsSchema.items
+        : undefined,
+    );
+    const relSchema = listProperties?.rel;
     // Cursor should be a $ref or inline resolution depending on converter depth; prefer $ref
-    if (relSchema?.$ref) {
+    if (relSchema && "$ref" in relSchema) {
       expect(relSchema.$ref).toEqual("#/components/schemas/Cursor");
     }
 
     // Details response composes Bottle via allOf
-    const detailsResp200: any =
-      (spec.paths?.["/bottles/{bottle}"]?.get?.responses as any)?.[200] ??
-      (spec.paths?.["/bottles/{bottle}"]?.get?.responses as any)?.["200"]; // keys may be stringified
-    const detailsResponse = detailsResp200?.content?.["application/json"]
-      ?.schema as any;
-    const allOf = detailsResponse?.allOf as any[];
+    const detailsResp200 =
+      spec.paths?.["/bottles/{bottle}"]?.get?.responses?.[200] ??
+      spec.paths?.["/bottles/{bottle}"]?.get?.responses?.["200"]; // keys may be stringified
+    const detailsResponse =
+      detailsResp200 && "content" in detailsResp200
+        ? detailsResp200.content?.["application/json"]?.schema
+        : undefined;
+    const allOf =
+      detailsResponse && "allOf" in detailsResponse
+        ? (detailsResponse.allOf ?? [])
+        : [];
     expect(Array.isArray(allOf)).toBe(true);
-    expect(allOf.some((s) => s?.$ref === "#/components/schemas/Bottle")).toBe(
-      true,
-    );
+    expect(
+      allOf.some(
+        (schema) =>
+          "$ref" in schema && schema.$ref === "#/components/schemas/Bottle",
+      ),
+    ).toBe(true);
   });
 
   it("exposes release-free Bottle mutation contracts", async () => {
@@ -149,7 +170,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectBottleResponse(
       getJsonResponseSchema(spec.paths?.["/bottles/{bottle}"]?.patch),
     );
-    const bottleSchema = spec.components?.schemas?.Bottle as any;
+    const bottleSchema = spec.components?.schemas?.Bottle;
     expect(bottleSchema?.properties?.group).toBeDefined();
     expect(bottleSchema?.properties?.targetId).toBeUndefined();
     expect(bottleSchema?.properties?.kind).toBeUndefined();
@@ -198,9 +219,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     ] as const;
 
     for (const [path, method, operationId] of operations) {
-      expect((spec.paths?.[path] as any)?.[method]?.operationId).toBe(
-        operationId,
-      );
+      expect(spec.paths?.[path]?.[method]?.operationId).toBe(operationId);
     }
     expect(
       Object.keys(spec.paths ?? {}).filter((path) =>
@@ -257,10 +276,10 @@ describe("OpenAPI generation ($ref reuse)", () => {
     const spec = await generateSpec();
     const reviewItem = getJsonResponseSchema(spec.paths?.["/reviews"]?.get)
       ?.properties?.results?.items;
-    const storePrice = spec.components?.schemas?.StorePrice as any;
+    const storePrice = spec.components?.schemas?.StorePrice;
     const reviewParameters = spec.paths?.["/reviews"]?.get?.parameters ?? [];
-    const reviewParameterNames = reviewParameters.map(
-      (parameter: any) => parameter.name,
+    const reviewParameterNames = reviewParameters.map((parameter) =>
+      "name" in parameter ? parameter.name : undefined,
     );
 
     for (const schema of [reviewItem, storePrice]) {
@@ -293,9 +312,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     const operationIds = getOperationIds(spec);
 
     for (const [path, method, operationId] of operations) {
-      expect((spec.paths?.[path] as any)?.[method]?.operationId).toBe(
-        operationId,
-      );
+      expect(spec.paths?.[path]?.[method]?.operationId).toBe(operationId);
       expect(operationIds.filter((id) => id === operationId)).toHaveLength(1);
     }
     expect(
@@ -303,9 +320,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
         path.startsWith("/bottle-groups")
           ? Object.values(pathItem ?? {}).filter(
               (operation) =>
-                typeof operation === "object" &&
-                operation !== null &&
-                "operationId" in operation,
+                OpenApiOperationSchema.safeParse(operation).success,
             )
           : [],
       ),

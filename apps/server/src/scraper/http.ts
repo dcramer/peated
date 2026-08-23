@@ -83,11 +83,15 @@ export const scraperSystemClock: ScraperHttpClock = {
   random: Math.random,
 };
 
+interface ScraperRequestHeaders {
+  [name: string]: string;
+}
+
 function safeRequestHeaders(
   input: Readonly<Record<string, string>> | undefined,
   allowedRequestHeaders: readonly string[],
 ) {
-  const headers: Record<string, string> = {
+  const headers: ScraperRequestHeaders = {
     Accept: "text/html,application/json;q=0.9,*/*;q=0.8",
     "User-Agent": BOT_USER_AGENT,
   };
@@ -162,7 +166,7 @@ function transientStatus(status: number) {
   return status === 502 || status === 503 || status === 504;
 }
 
-function transportCategory(error: unknown): ScraperRequestErrorCategory {
+function transportCategory(error: Error): ScraperRequestErrorCategory {
   if (
     error instanceof DOMException &&
     (error.name === "AbortError" || error.name === "TimeoutError")
@@ -328,7 +332,9 @@ export async function requestScraperUrl({
           await clock.sleep(retryDelay(retry, clock.random()));
           continue;
         }
-        throw new ScraperRequestError(transportCategory(error));
+        throw new ScraperRequestError(
+          transportCategory(error instanceof Error ? error : new Error()),
+        );
       }
 
       const retryAfter = parseRetryAfter(

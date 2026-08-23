@@ -1,6 +1,9 @@
 import { tool } from "@openai/agents";
 import type OpenAI from "openai";
-import type { ResponseCreateParamsNonStreaming } from "openai/resources/responses/responses";
+import type {
+  Response,
+  ResponseCreateParamsNonStreaming,
+} from "openai/resources/responses/responses";
 import { z } from "zod";
 import {
   EntityClassificationSearchEvidenceSchema,
@@ -50,20 +53,17 @@ function buildOpenAIWebSearchRequest({
 
 function extractSearchEvidence(
   query: string,
-  response: any,
+  response: Response,
 ): EntityClassificationSearchEvidence {
-  const outputItems: any[] = Array.isArray(response?.output)
-    ? response.output
-    : [];
+  const outputItems = response.output;
   const resultsByUrl = new Map<
     string,
     EntityClassificationSearchEvidence["results"][number]
   >();
 
-  const summary =
-    typeof response?.output_text === "string" && response.output_text.trim()
-      ? response.output_text.trim().slice(0, 700)
-      : null;
+  const summary = response.output_text.trim()
+    ? response.output_text.trim().slice(0, 700)
+    : null;
 
   const mergeResult = ({
     title,
@@ -116,16 +116,15 @@ function extractSearchEvidence(
       continue;
     }
 
-    for (const source of Array.isArray(item.action?.sources)
-      ? item.action.sources
-      : []) {
-      if (source?.type !== "url") {
-        continue;
+    const searchAction = z
+      .object({
+        sources: z.array(z.object({ type: z.literal("url"), url: z.string() })),
+      })
+      .safeParse(item.action);
+    if (searchAction.success) {
+      for (const source of searchAction.data.sources) {
+        mergeResult({ url: source.url });
       }
-
-      mergeResult({
-        url: source.url,
-      });
     }
   }
 

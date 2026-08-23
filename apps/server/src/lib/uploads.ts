@@ -24,6 +24,13 @@ const MODEL_IMAGE_MEDIA_TYPES = new Set([
   "image/webp",
 ]);
 
+function getGcsBucketName(): string {
+  if (!config.GCS_BUCKET_NAME) {
+    throw new Error("GCS_BUCKET_NAME is required when GCS storage is enabled");
+  }
+  return config.GCS_BUCKET_NAME;
+}
+
 function filenameFromUploadUrl(imageUrl: string): string {
   const pathname = new URL(imageUrl, "https://peated.invalid").pathname;
   if (!pathname.startsWith("/uploads/")) {
@@ -123,7 +130,7 @@ export async function copyFile({
       });
 
       if (process.env.USE_GCS_STORAGE) {
-        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketName = getGcsBucketName();
         const bucketPath = config.GCS_BUCKET_PATH
           ? `${config.GCS_BUCKET_PATH}/`
           : "";
@@ -169,7 +176,7 @@ export async function deleteFile({
       });
 
       if (process.env.USE_GCS_STORAGE) {
-        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketName = getGcsBucketName();
         const bucketPath = config.GCS_BUCKET_PATH
           ? `${config.GCS_BUCKET_PATH}/`
           : "";
@@ -207,7 +214,7 @@ export async function readFile({
       });
 
       if (process.env.USE_GCS_STORAGE) {
-        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketName = getGcsBucketName();
         const bucketPath = config.GCS_BUCKET_PATH
           ? `${config.GCS_BUCKET_PATH}/`
           : "";
@@ -264,7 +271,7 @@ export const storeFile = async ({
       });
 
       if (process.env.USE_GCS_STORAGE) {
-        const bucketName = config.GCS_BUCKET_NAME as string;
+        const bucketName = getGcsBucketName();
         const bucketPath = config.GCS_BUCKET_PATH
           ? `${config.GCS_BUCKET_PATH}/`
           : "";

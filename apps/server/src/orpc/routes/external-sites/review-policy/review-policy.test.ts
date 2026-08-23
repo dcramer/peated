@@ -4,32 +4,9 @@ import {
   externalReviewSourcePolicies,
   reviews,
 } from "@peated/server/db/schema";
-import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { asc, eq } from "drizzle-orm";
-
-vi.mock("@peated/server/lib/auditLog", () => ({
-  AuditEvent: {
-    LOGIN_SUCCESS: "auth.login.success",
-    LOGIN_FAILED: "auth.login.failed",
-    LOGOUT: "auth.logout",
-    PASSKEY_REGISTERED: "passkey.registered",
-    PASSKEY_UPDATED: "passkey.updated",
-    PASSKEY_AUTH_SUCCESS: "passkey.auth.success",
-    PASSKEY_AUTH_FAILED: "passkey.auth.failed",
-    PASSKEY_DELETED: "passkey.deleted",
-    RECOVERY_REQUESTED: "recovery.requested",
-    RECOVERY_SUCCESS: "recovery.success",
-    RECOVERY_FAILED: "recovery.failed",
-    RATE_LIMIT_EXCEEDED: "security.rate_limit",
-    INVALID_CHALLENGE: "security.invalid_challenge",
-    REPLAY_ATTACK_DETECTED: "security.replay_attack",
-    EXTERNAL_REVIEW_SOURCE_POLICY_UPDATED:
-      "external_review.source_policy.updated",
-  },
-  auditLog: vi.fn(),
-}));
 
 const reviewOnlyPolicy = {
   publicationMode: "review_only" as const,
@@ -84,9 +61,7 @@ describe("external review source policy routes", () => {
     });
   });
 
-  test("enables capabilities and records an audit event", async ({
-    fixtures,
-  }) => {
+  test("enables source capabilities", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({
       type: "whiskyadvocate",
     });
@@ -101,27 +76,6 @@ describe("external review source policy routes", () => {
       externalSiteId: site.id,
       ...reviewOnlyPolicy,
     });
-    expect(auditLog).toHaveBeenCalledWith(
-      expect.objectContaining({
-        event: AuditEvent.EXTERNAL_REVIEW_SOURCE_POLICY_UPDATED,
-        userId: moderator.id,
-        metadata: {
-          site: site.type,
-          previous: {
-            publicationMode: "disabled",
-            allowLlmProcessing: false,
-            allowScoreDisplay: false,
-            allowSummaryDisplay: false,
-          },
-          next: {
-            publicationMode: "review_only",
-            allowLlmProcessing: true,
-            allowScoreDisplay: true,
-            allowSummaryDisplay: true,
-          },
-        },
-      }),
-    );
   });
 
   test("disabling a source clears its capabilities", async ({ fixtures }) => {

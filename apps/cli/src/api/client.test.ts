@@ -21,15 +21,15 @@ describe("requestPeatedApi", () => {
 
     const [url, init] = fetch.mock.calls[0];
     expect(url).toBeInstanceOf(URL);
-    expect((url as URL).href).toBe("https://api.peated.com/v1/bottles/123");
+    if (!(url instanceof URL)) throw new Error("Expected a URL request");
+    expect(url.href).toBe("https://api.peated.com/v1/bottles/123");
     expect(init).toMatchObject({
       method: "PATCH",
       body: JSON.stringify({ name: "Example" }),
-      headers: {
-        authorization: "Bearer secret-token",
-        "content-type": "application/json",
-      },
     });
+    const headers = new Headers(init?.headers);
+    expect(headers.get("authorization")).toBe("Bearer secret-token");
+    expect(headers.get("content-type")).toBe("application/json");
   });
 
   test("keeps API error responses available without putting them in the message", async () => {

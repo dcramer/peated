@@ -558,17 +558,16 @@ function rejectInvalidExistingMatch({
   });
 }
 
-function sanitizeResolvedEntityChoice(
-  choice: {
-    id: number | null;
-    name: string;
-  },
-  expectedType: "brand" | "distiller" | "bottler",
-  resolvedEntities: Map<number, EntityResolution>,
-): {
+interface ResolvedEntityChoice {
   id: number | null;
   name: string;
-} {
+}
+
+function sanitizeResolvedEntityChoice(
+  choice: ResolvedEntityChoice,
+  expectedType: "brand" | "distiller" | "bottler",
+  resolvedEntities: Map<number, EntityResolution>,
+): ResolvedEntityChoice {
   if (choice.id === null) {
     return choice;
   }

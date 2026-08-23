@@ -63,11 +63,12 @@ async function getEntity(
   input: number | z.input<typeof EntityInputSchema>,
   entityDb: AnyDatabase,
 ) {
-  if (typeof input === "number") {
-    const entity = await getEntityById(input, entityDb);
+  const entityId = z.number().safeParse(input);
+  if (entityId.success) {
+    const entity = await getEntityById(entityId.data, entityDb);
     if (!entity) {
       throw new ORPCError("NOT_FOUND", {
-        message: `Entity not found [id: ${input}]`,
+        message: `Entity not found [id: ${entityId.data}]`,
       });
     }
 

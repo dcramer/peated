@@ -34,16 +34,14 @@ import {
   validatePendingImageForCollectionBottle,
 } from "./imageHelpers";
 
-const CollectionBottleCreateCommonInputSchema = z.object({
+const CollectionBottleCreateFields = {
   collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
   pendingImageId: z.string().trim().min(1).optional(),
   user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-});
+} as const;
 
 const CollectionBottleCreateInputSchema =
-  CollectionBottleCreateCommonInputSchema.extend(
-    CollectionBottleInputSchema.shape,
-  ).strict();
+  CollectionBottleInputSchema.safeExtend(CollectionBottleCreateFields).strict();
 
 export default procedure
   .use(requireAuth)
@@ -79,7 +77,7 @@ export default procedure
         })
       : await db.query.collections.findFirst({
           where: (collections, { eq }) =>
-            eq(collections.id, input.collection as number),
+            eq(collections.id, z.number().parse(input.collection)),
         });
 
     if (!collection) {
@@ -225,12 +223,13 @@ export default procedure
           collectionBottleId: collectionBottle.id,
         });
 
+        const update: Partial<typeof collectionBottles.$inferInsert> = {
+          imageUrl,
+        };
+        if (statusProvided) update.status = input.status ?? null;
         const [updatedCollectionBottle] = await db
           .update(collectionBottles)
-          .set({
-            imageUrl,
-            ...(statusProvided ? { status: input.status ?? null } : {}),
-          })
+          .set(update)
           .where(eq(collectionBottles.id, collectionBottle.id))
           .returning();
 

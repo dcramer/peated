@@ -10,6 +10,7 @@ import { logInfo } from "@peated/server/lib/log";
 import { buildBottleSearchVector } from "@peated/server/lib/search";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 export const IndexBottleSearchVectorsJobArgsSchema = z
   .object({
@@ -17,7 +18,7 @@ export const IndexBottleSearchVectorsJobArgsSchema = z
   })
   .strict();
 
-export default async function indexBottleSearchVectors(input: unknown) {
+export default async function indexBottleSearchVectors(input: JobPayload) {
   const { bottleId } = IndexBottleSearchVectorsJobArgsSchema.parse(input);
 
   const bottle = await db.query.bottles.findFirst({

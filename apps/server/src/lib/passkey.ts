@@ -30,6 +30,9 @@ export const ClientDataJSONSchema = z.object({
   origin: z.string(),
   crossOrigin: z.boolean().optional(),
 });
+export const AuthenticatorTransportsSchema = z.array(
+  z.enum(["ble", "cable", "hybrid", "internal", "nfc", "smart-card", "usb"]),
+);
 
 // Type for credentials to exclude during registration (string-based IDs from our database)
 export interface ExcludeCredential {

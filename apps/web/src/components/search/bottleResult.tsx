@@ -15,7 +15,9 @@ import {
   type PendingImageRouteState,
 } from "@peated/web/lib/addBottle";
 import { getReleaseFamilyHref } from "@peated/web/lib/releaseFamily";
+import type { ElementType } from "react";
 import Join from "../join";
+
 export type BottleResult = {
   type: "bottle";
   ref: Bottle;
@@ -58,11 +60,13 @@ export default function BottleResultRow({
   directToTasting,
   addBottleIntent,
   pendingImage,
+  icon: Icon = BottleIcon,
 }: {
   result: BottleResult;
   directToTasting: boolean;
   addBottleIntent?: AddBottleRouteIntent;
   pendingImage?: PendingImageRouteState | null;
+  icon?: ElementType;
 }) {
   const distillers = getDistinctBottleDistillers(bottle);
   const distillerMetadata = distillers.length ? (
@@ -79,7 +83,7 @@ export default function BottleResultRow({
 
   return (
     <>
-      <BottleIcon className="m-2 hidden h-10 w-auto sm:block" />
+      <Icon className="m-2 hidden h-10 w-auto sm:block" />
 
       <div className="min-w-0 flex-auto">
         <div className="flex items-center space-x-1 font-semibold leading-6">

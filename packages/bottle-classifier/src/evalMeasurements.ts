@@ -1,4 +1,5 @@
 import type { JsonValue, UsageSummary } from "vitest-evals/harness";
+import { z } from "zod";
 import {
   buildEvalModelCallTrace,
   summarizeEvalModelCalls,
@@ -8,6 +9,21 @@ import type { WhiskyLabelExtractionMetadata } from "./extractor";
 import type { OpenAIReasoningEffort } from "./openaiModelSettings";
 import { getModelCostMetadata, getRunCostMetadata } from "./runtime/cost";
 import type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
+
+interface EvalUsageMetadata {
+  [key: string]: JsonValue;
+}
+
+interface EvalTimings {
+  totalMs: number;
+  metadata?: { agentDurationMs: number };
+}
+
+interface EvalMeasurements {
+  usage: UsageSummary | undefined;
+  timings: EvalTimings;
+  traces?: ReturnType<typeof buildEvalModelCallTrace>;
+}
 
 export function buildEvalHarnessMeasurements({
   model,
@@ -30,23 +46,28 @@ export function buildEvalHarnessMeasurements({
   const capturedUsage = modelCalls
     ? summarizeEvalModelCalls(modelCalls)
     : undefined;
-  const measuredUsage =
-    capturedUsage?.inputTokens === undefined
-      ? modelMetadata?.usage
-      : {
-          requests: modelCalls?.length ?? 0,
-          inputTokens: capturedUsage.inputTokens,
-          ...(typeof capturedUsage.metadata?.cachedInputTokens === "number"
-            ? {
-                cachedInputTokens: capturedUsage.metadata.cachedInputTokens,
-              }
-            : {}),
-          ...(typeof capturedUsage.metadata?.cacheWriteTokens === "number"
-            ? { cacheWriteTokens: capturedUsage.metadata.cacheWriteTokens }
-            : {}),
-          outputTokens: capturedUsage.outputTokens ?? 0,
-          totalTokens: capturedUsage.totalTokens ?? 0,
-        };
+  let measuredUsage = modelMetadata?.usage;
+  if (capturedUsage?.inputTokens !== undefined) {
+    const capturedModelUsage: BottleClassifierRunMetadata["usage"] = {
+      requests: modelCalls?.length ?? 0,
+      inputTokens: capturedUsage.inputTokens,
+      outputTokens: capturedUsage.outputTokens ?? 0,
+      totalTokens: capturedUsage.totalTokens ?? 0,
+    };
+    const cachedInputTokens = z
+      .number()
+      .safeParse(capturedUsage.metadata?.cachedInputTokens);
+    if (cachedInputTokens.success) {
+      capturedModelUsage.cachedInputTokens = cachedInputTokens.data;
+    }
+    const cacheWriteTokens = z
+      .number()
+      .safeParse(capturedUsage.metadata?.cacheWriteTokens);
+    if (cacheWriteTokens.success) {
+      capturedModelUsage.cacheWriteTokens = cacheWriteTokens.data;
+    }
+    measuredUsage = capturedModelUsage;
+  }
   const usageScope =
     capturedUsage?.inputTokens === undefined
       ? "agent_loop_only"
@@ -54,57 +75,52 @@ export function buildEvalHarnessMeasurements({
   const costMetadata = measuredUsage
     ? getRunCostMetadata({ model, usage: measuredUsage, scope: usageScope })
     : null;
-  const usage = measuredUsage
-    ? {
-        provider: "openai",
-        model: capturedUsage?.model ?? model,
-        inputTokens: measuredUsage.inputTokens,
-        outputTokens: measuredUsage.outputTokens,
-        ...((capturedUsage?.reasoningTokens ??
-          modelMetadata?.usage.reasoningTokens) === undefined
-          ? {}
-          : {
-              reasoningTokens:
-                capturedUsage?.reasoningTokens ??
-                modelMetadata?.usage.reasoningTokens,
-            }),
-        totalTokens: measuredUsage.totalTokens,
-        toolCalls: modelMetadata?.toolCalls.count ?? 0,
-        metadata: {
-          ...costMetadata,
-          reasoningEffort: reasoningEffort ?? "provider_default",
-          requests: measuredUsage.requests,
-          ...(measuredUsage.cachedInputTokens === undefined
-            ? {}
-            : { cachedInputTokens: measuredUsage.cachedInputTokens }),
-          ...(measuredUsage.cacheWriteTokens === undefined
-            ? {}
-            : { cacheWriteTokens: measuredUsage.cacheWriteTokens }),
-          toolNames: modelMetadata?.toolCalls.names ?? [],
-          ...(capturedUsage?.metadata?.models
-            ? { models: capturedUsage.metadata.models }
-            : {}),
-        } satisfies Record<string, JsonValue>,
-      }
-    : undefined;
+  let usage: UsageSummary | undefined;
+  if (measuredUsage) {
+    const usageMetadata: EvalUsageMetadata = {
+      ...costMetadata,
+      reasoningEffort: reasoningEffort ?? "provider_default",
+      requests: measuredUsage.requests,
+      toolNames: modelMetadata?.toolCalls.names ?? [],
+    };
+    if (measuredUsage.cachedInputTokens !== undefined) {
+      usageMetadata.cachedInputTokens = measuredUsage.cachedInputTokens;
+    }
+    if (measuredUsage.cacheWriteTokens !== undefined) {
+      usageMetadata.cacheWriteTokens = measuredUsage.cacheWriteTokens;
+    }
+    if (capturedUsage?.metadata?.models) {
+      usageMetadata.models = capturedUsage.metadata.models;
+    }
 
-  return {
+    usage = {
+      provider: "openai",
+      model: capturedUsage?.model ?? model,
+      inputTokens: measuredUsage.inputTokens,
+      outputTokens: measuredUsage.outputTokens,
+      totalTokens: measuredUsage.totalTokens,
+      toolCalls: modelMetadata?.toolCalls.count ?? 0,
+      metadata: usageMetadata,
+    };
+    const reasoningTokens =
+      capturedUsage?.reasoningTokens ?? modelMetadata?.usage.reasoningTokens;
+    if (reasoningTokens !== undefined) {
+      usage.reasoningTokens = reasoningTokens;
+    }
+  }
+
+  const timings: EvalTimings = { totalMs };
+  if (modelMetadata) {
+    timings.metadata = { agentDurationMs: modelMetadata.agentDurationMs };
+  }
+  const measurements: EvalMeasurements = {
     usage,
-    timings: {
-      totalMs,
-      ...(modelMetadata
-        ? { metadata: { agentDurationMs: modelMetadata.agentDurationMs } }
-        : {}),
-    },
-    ...(trace && modelCalls
-      ? {
-          traces: buildEvalModelCallTrace({
-            ...trace,
-            modelCalls,
-          }),
-        }
-      : {}),
+    timings,
   };
+  if (trace && modelCalls) {
+    measurements.traces = buildEvalModelCallTrace({ ...trace, modelCalls });
+  }
+  return measurements;
 }
 
 export function buildImageExtractionEvalMeasurements({
@@ -117,16 +133,29 @@ export function buildImageExtractionEvalMeasurements({
   metadata: WhiskyLabelExtractionMetadata;
 }) {
   const usage = metadata.usage;
-  const normalizedUsage = {
+  const normalizedUsage: Pick<
+    BottleClassifierRunMetadata["usage"],
+    "requests" | "inputTokens" | "cachedInputTokens" | "outputTokens"
+  > = {
     requests: usage ? 1 : 0,
     inputTokens: usage?.inputTokens ?? 0,
-    ...(usage ? { cachedInputTokens: usage.cachedInputTokens } : {}),
     outputTokens: usage?.outputTokens ?? 0,
   };
+  if (usage) normalizedUsage.cachedInputTokens = usage.cachedInputTokens;
   const costMetadata = getModelCostMetadata({
     model,
     usage: normalizedUsage,
   });
+
+  const usageMetadata: EvalUsageMetadata = {
+    ...costMetadata,
+    reasoningEffort: reasoningEffort ?? "provider_default",
+    requests: normalizedUsage.requests,
+  };
+  if (usage) {
+    usageMetadata.cachedInputTokens = usage.cachedInputTokens;
+    usageMetadata.reasoningTokens = usage.reasoningTokens;
+  }
 
   return {
     usage: {
@@ -136,17 +165,7 @@ export function buildImageExtractionEvalMeasurements({
       outputTokens: normalizedUsage.outputTokens,
       totalTokens: usage?.totalTokens ?? 0,
       toolCalls: 0,
-      metadata: {
-        ...costMetadata,
-        reasoningEffort: reasoningEffort ?? "provider_default",
-        requests: normalizedUsage.requests,
-        ...(usage
-          ? {
-              cachedInputTokens: usage.cachedInputTokens,
-              reasoningTokens: usage.reasoningTokens,
-            }
-          : {}),
-      } satisfies Record<string, JsonValue>,
+      metadata: usageMetadata,
     },
     timings: {
       totalMs: metadata.durationMs,
@@ -171,10 +190,10 @@ export function formatEvalUsageAnnotation(
         ? "full LLM run"
         : "agent loop only";
   const coverage = metadata?.costCoverage ?? "usage_unavailable";
-  const reasoningEffort =
-    typeof metadata?.reasoningEffort === "string"
-      ? metadata.reasoningEffort
-      : "provider_default";
+  const parsedReasoningEffort = z.string().safeParse(metadata?.reasoningEffort);
+  const reasoningEffort = parsedReasoningEffort.success
+    ? parsedReasoningEffort.data
+    : "provider_default";
   const reasoningSummary = `effort ${reasoningEffort.replace("_", " ")}`;
   if (coverage === "usage_unavailable") {
     return `usage unavailable | ${reasoningSummary} · ${scopeLabel}`;
@@ -183,10 +202,12 @@ export function formatEvalUsageAnnotation(
   const inputTokens = usage?.inputTokens ?? 0;
   const outputTokens = usage?.outputTokens ?? 0;
   const reportedCachedInputTokens = metadata?.cachedInputTokens;
-  const cachedInputTokens =
-    typeof reportedCachedInputTokens === "number"
-      ? Math.min(inputTokens, Math.max(0, reportedCachedInputTokens))
-      : 0;
+  const parsedCachedInputTokens = z
+    .number()
+    .safeParse(reportedCachedInputTokens);
+  const cachedInputTokens = parsedCachedInputTokens.success
+    ? Math.min(inputTokens, Math.max(0, parsedCachedInputTokens.data))
+    : 0;
   const uncachedInputTokens = Math.max(0, inputTokens - cachedInputTokens);
   const comparisonTokens = uncachedInputTokens + outputTokens;
   const tokenSummary = [
@@ -198,8 +219,9 @@ export function formatEvalUsageAnnotation(
       : []),
   ].join(" | ");
 
-  if (typeof estimate === "number") {
-    return `${tokenSummary} | ${reasoningSummary} | est. $${estimate.toFixed(6)} · ${scopeLabel}`;
+  const parsedEstimate = z.number().safeParse(estimate);
+  if (parsedEstimate.success) {
+    return `${tokenSummary} | ${reasoningSummary} | est. $${parsedEstimate.data.toFixed(6)} · ${scopeLabel}`;
   }
 
   return `${tokenSummary} | ${reasoningSummary} | cost unavailable (unsupported model) · ${scopeLabel}`;

@@ -13,10 +13,14 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { materializeBottleForGroup } from "@peated/server/lib/bottleIdentity";
-import { createBottle } from "@peated/server/lib/createBottle";
+import {
+  createBottle,
+  type BottleCreateInput,
+} from "@peated/server/lib/createBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import {
   BottlePatchSchema,
   BottleUpdateAuthorizationError,
@@ -29,13 +33,15 @@ import {
   updateBottle,
   updateBottleInTransaction,
 } from "@peated/server/lib/updateBottle";
-import * as workerClient from "@peated/server/worker/client";
+import type { Context } from "@peated/server/orpc/context";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ZodError } from "zod";
 
-function contextFor(user: User | null) {
-  return { user } as Parameters<typeof updateBottle>[0]["context"];
+function contextFor<TUser extends User | null>(
+  user: TUser,
+): Context & { user: TUser } {
+  return { user };
 }
 
 type GroupMemberExact = Omit<
@@ -49,17 +55,17 @@ async function createGroup({
   exacts,
 }: {
   user: User;
-  stable: Record<string, unknown>;
+  stable: Partial<BottleCreateInput>;
   exacts: GroupMemberExact[];
 }) {
   if (!exacts.length) throw new Error("At least one exact Bottle is required.");
 
   const first = await createBottle({
-    context: contextFor(user) as Parameters<typeof createBottle>[0]["context"],
+    context: contextFor(user),
     input: { ...stable, ...exacts[0] },
   });
   if ("statedAge" in stable) {
-    const statedAge = stable.statedAge as number | null;
+    const statedAge = stable.statedAge ?? null;
     const materialized = materializeBottleForGroup({
       group: { ...first.group, statedAge },
       exact: {
@@ -545,6 +551,7 @@ describe("Bottle updates", () => {
       async (jobName, payload) => {
         if (
           jobName === "OnEntityChange" &&
+          payload !== undefined &&
           "entityId" in payload &&
           payload.entityId === brand.id
         ) {
@@ -653,7 +660,9 @@ describe("Bottle updates", () => {
     const ownerEntityIds = vi
       .mocked(workerClient.pushUniqueJob)
       .mock.calls.flatMap(([jobName, payload]) =>
-        jobName === "OnEntityChange" && "entityId" in payload
+        jobName === "OnEntityChange" &&
+        payload !== undefined &&
+        "entityId" in payload
           ? [payload.entityId]
           : [],
       );
@@ -1695,7 +1704,7 @@ describe("Bottle updates", () => {
       exacts: [{ edition: "One" }, { edition: "Two" }],
     });
     const outsider = await createBottle({
-      context: contextFor(mod) as Parameters<typeof createBottle>[0]["context"],
+      context: contextFor(mod),
       input: {
         name: "Collision Label",
         brand: brand.id,
@@ -1739,7 +1748,7 @@ describe("Bottle updates", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 
     const aliasOwner = await createBottle({
-      context: contextFor(mod) as Parameters<typeof createBottle>[0]["context"],
+      context: contextFor(mod),
       input: {
         name: "Unrelated Alias Owner",
         brand: brand.id,

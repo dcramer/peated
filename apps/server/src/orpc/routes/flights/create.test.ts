@@ -182,7 +182,9 @@ describe("POST /flights", () => {
     const legacyBottle = await fixtures.LegacyBottle();
 
     const error = await waitError(() =>
+      // SAFETY: This test sends the retired targets field to the runtime validator.
       routerClient.flights.create(
+        // SAFETY: This test sends the retired targets field to the runtime validator.
         {
           name: "Invalid Bottle flight",
           bottles: [bottle.id, legacyBottle.id],
@@ -269,6 +271,7 @@ describe("POST /flights", () => {
 
     const error = await waitError(() =>
       routerClient.flights.create(
+        // SAFETY: This test sends the retired targets field to the runtime validator.
         {
           name: "Legacy target flight",
           targets: [bottle.id],

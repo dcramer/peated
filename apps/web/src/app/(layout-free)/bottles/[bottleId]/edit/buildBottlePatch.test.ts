@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import type {
   BottleFormFieldName,
   BottleFormSubmitMeta,
@@ -142,7 +144,9 @@ describe("buildBottlePatch", () => {
 
     expect(
       buildBottlePatch(
-        formValue({ image: {} as HTMLCanvasElement }),
+        formValue({
+          image: document.createElement("canvas"),
+        }),
         submitMeta(),
       ),
     ).toEqual({});

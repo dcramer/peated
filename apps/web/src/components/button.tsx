@@ -129,6 +129,8 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       );
     }
 
+    // SAFETY: The href branch renders the anchor; this branch always renders a button.
+    const buttonRef = ref as ForwardedRef<HTMLButtonElement | null>;
     return (
       <button
         className={classNames(
@@ -145,7 +147,7 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
         )}
         disabled={disabled}
         type={type || "button"}
-        ref={ref as ForwardedRef<HTMLButtonElement | null>}
+        ref={buttonRef}
         {...props}
       >
         {icon}

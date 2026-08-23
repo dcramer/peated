@@ -3,14 +3,21 @@ import { db } from "@peated/server/db";
 import { bottleTombstones } from "@peated/server/db/schema";
 import { afterEach, expect, test, vi } from "vitest";
 import {
+  createBottleCandidateLookup,
   findBottleReferenceCandidates,
   getBottleCandidateById,
   searchBottleCandidates,
+  type BottleEmbeddingCreator,
 } from "./bottleReferenceCandidates";
-import * as openaiEmbeddings from "./openaiEmbeddings";
 
 const originalAIGatewayApiKey = config.AI_GATEWAY_API_KEY;
 const originalScraperAIGatewayApiKey = config.SCRAPER_AI_GATEWAY_API_KEY;
+
+function createEmbeddingSpy() {
+  return vi
+    .fn<BottleEmbeddingCreator>()
+    .mockResolvedValue(new Array<number>(1536).fill(0));
+}
 
 afterEach(() => {
   config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
@@ -126,11 +133,10 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
 
 test("normalizes proof-like ABV before building candidate search evidence", async () => {
   config.AI_GATEWAY_API_KEY = "test-gateway-key";
-  const embeddingSpy = vi
-    .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
-    .mockResolvedValue(new Array<number>(1536).fill(0));
+  const embeddingSpy = createEmbeddingSpy();
+  const lookup = createBottleCandidateLookup(embeddingSpy);
 
-  await searchBottleCandidates({
+  await lookup.searchBottleCandidates({
     query: "Proof Normalization Candidate",
     abv: 118.4,
   });
@@ -143,11 +149,10 @@ test("normalizes proof-like ABV before building candidate search evidence", asyn
 test("uses the scraper credential workload for scraper candidate embeddings", async () => {
   config.AI_GATEWAY_API_KEY = undefined;
   config.SCRAPER_AI_GATEWAY_API_KEY = "scraper-key";
-  const embeddingSpy = vi
-    .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
-    .mockResolvedValue(new Array<number>(1536).fill(0));
+  const embeddingSpy = createEmbeddingSpy();
+  const lookup = createBottleCandidateLookup(embeddingSpy);
 
-  await searchBottleCandidates(
+  await lookup.searchBottleCandidates(
     { query: "Scraped Candidate" },
     { workload: "scraper" },
   );
@@ -159,11 +164,10 @@ test("uses the scraper credential workload for scraper candidate embeddings", as
 
 test("does not inject normalized cask metadata into candidate search evidence", async () => {
   config.AI_GATEWAY_API_KEY = "test-gateway-key";
-  const embeddingSpy = vi
-    .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
-    .mockResolvedValue(new Array<number>(1536).fill(0));
+  const embeddingSpy = createEmbeddingSpy();
+  const lookup = createBottleCandidateLookup(embeddingSpy);
 
-  await searchBottleCandidates({
+  await lookup.searchBottleCandidates({
     query: "Example Distillery Warehouse Selection",
     brand: "Example Distillery",
     expression: "Warehouse Selection",

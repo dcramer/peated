@@ -120,15 +120,18 @@ export function getRunCostMetadata({
 }): RunCostMetadata {
   const metadata = getModelCostMetadata({ model, usage });
   const { estimatedCostUsd, ...sharedMetadata } = metadata;
-  return {
+  const runMetadata: RunCostMetadata = {
     ...sharedMetadata,
     scope,
-    ...(estimatedCostUsd === undefined
-      ? {}
-      : scope === "full_llm_run"
-        ? { estimatedLlmRunCostUsd: estimatedCostUsd }
-        : { estimatedAgentLoopCostUsd: estimatedCostUsd }),
   };
+  if (estimatedCostUsd !== undefined) {
+    if (scope === "full_llm_run") {
+      runMetadata.estimatedLlmRunCostUsd = estimatedCostUsd;
+    } else {
+      runMetadata.estimatedAgentLoopCostUsd = estimatedCostUsd;
+    }
+  }
+  return runMetadata;
 }
 
 export function getModelCostMetadata({

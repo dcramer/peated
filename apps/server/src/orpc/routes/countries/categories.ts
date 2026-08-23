@@ -39,13 +39,15 @@ export default procedure
   .handler(async function ({ input, errors }) {
     let countryId: number;
 
-    if (typeof input.country === "number") {
-      countryId = input.country;
+    const countryNumber = z.number().safeParse(input.country);
+    if (countryNumber.success) {
+      countryId = countryNumber.data;
     } else {
+      const countrySlug = z.string().parse(input.country);
       const [result] = await db
         .select({ id: countries.id })
         .from(countries)
-        .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()))
+        .where(eq(sql`LOWER(${countries.slug})`, countrySlug.toLowerCase()))
         .limit(1);
       if (!result) {
         throw errors.BAD_REQUEST({

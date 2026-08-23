@@ -1,3 +1,4 @@
+import type { BottleClassifierRunMetadata } from "@peated/bottle-classifier";
 import { describe, expect, test } from "vitest";
 import {
   buildBottleCheckRolloutReport,
@@ -148,17 +149,23 @@ describe("buildBottleCheckRolloutReport", () => {
   });
 
   test("reports cache rates only across runs with provider cache detail", () => {
-    const metadata = (cachedInputTokens?: number) => ({
-      agentDurationMs: 100,
-      usage: {
+    const metadata = (
+      cachedInputTokens?: number,
+    ): BottleClassifierRunMetadata => {
+      const usage: BottleClassifierRunMetadata["usage"] = {
         requests: 1,
         inputTokens: 100,
-        ...(cachedInputTokens === undefined ? {} : { cachedInputTokens }),
         outputTokens: 10,
         totalTokens: 110,
-      },
-      toolCalls: { count: 0, names: [] },
-    });
+      };
+      if (cachedInputTokens !== undefined)
+        usage.cachedInputTokens = cachedInputTokens;
+      return {
+        agentDurationMs: 100,
+        usage,
+        toolCalls: { count: 0, names: [] },
+      };
+    };
     const report = buildBottleCheckRolloutReport([
       row({ modelMetadata: metadata(50) }),
       row({ modelMetadata: metadata() }),

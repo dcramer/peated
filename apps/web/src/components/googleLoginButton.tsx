@@ -23,8 +23,8 @@ export default function GoogleLoginButton({
     onSuccess: async (codeResponse) => {
       const data = new FormData();
       data.append("code", codeResponse.code);
-      if (searchParams.get("redirectTo"))
-        data.append("redirectTo", searchParams.get("redirectTo") as string);
+      const redirectTo = searchParams.get("redirectTo");
+      if (redirectTo) data.append("redirectTo", redirectTo);
       await action(data);
 
       setLoading(false);

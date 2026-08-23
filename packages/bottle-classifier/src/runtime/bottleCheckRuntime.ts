@@ -1,5 +1,6 @@
 import type { Runner } from "@openai/agents";
 import type OpenAI from "openai";
+import { z } from "zod";
 import {
   BottleContextSchema,
   EntityContextSchema,
@@ -65,20 +66,38 @@ export type BottleClassifierDataSource = {
   searchEntities?: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
 };
 
+const JsonValueSchema = z.json();
+type JsonValue = z.infer<typeof JsonValueSchema>;
+type ToolOutputInput = Parameters<typeof JsonValueSchema.safeParse>[0];
+const AgentRunResultSchema = z.object({
+  finalOutput: z.unknown().optional(),
+  newItems: z.array(z.unknown()).optional(),
+});
+const RunItemSchema = z.object({
+  type: z.string().optional(),
+  name: z.string().optional(),
+  output: z.unknown().optional(),
+  rawItem: z.unknown().optional(),
+});
+const RawRunItemSchema = z.object({
+  name: z.string().optional(),
+  output: z.unknown().optional(),
+});
+
 export type BottleClassifierToolEvent =
   | {
       type: "tool_call";
       phase: "agent";
       id: string;
       name: string;
-      arguments: unknown;
+      arguments: JsonValue;
     }
   | {
       type: "tool_result";
       phase: "agent";
       toolCallId: string;
       name: string;
-      result: unknown;
+      result: JsonValue;
     };
 
 type BottleClassifierToolObserver = (event: BottleClassifierToolEvent) => void;
@@ -170,39 +189,45 @@ export function buildAgentArtifacts({
   });
 }
 
-function parseJsonIfPossible(value: string): unknown {
+function parseJsonIfPossible(value: string): JsonValue {
   try {
-    return JSON.parse(value);
+    return JsonValueSchema.parse(JSON.parse(value));
   } catch {
     return value;
   }
 }
 
-function getObjectProperty(value: unknown, propertyName: string) {
-  return value && typeof value === "object"
-    ? (value as Record<string, unknown>)[propertyName]
-    : undefined;
+function getObjectProperty(
+  value: JsonValue,
+  propertyName: string,
+): JsonValue | undefined {
+  const objectValue = z.record(z.string(), JsonValueSchema).safeParse(value);
+  return objectValue.success ? objectValue.data[propertyName] : undefined;
 }
 
-function stringProperty(value: unknown, propertyName: string) {
+function stringProperty(value: JsonValue, propertyName: string) {
   const property = getObjectProperty(value, propertyName);
-  return typeof property === "string" ? property : undefined;
+  const text = z.string().safeParse(property);
+  return text.success ? text.data : undefined;
 }
 
-function normalizeToolOutputValue(value: unknown): unknown {
-  if (typeof value === "string") {
-    return parseJsonIfPossible(value);
+function normalizeToolOutputValue(value: ToolOutputInput): JsonValue {
+  const textValue = z.string().safeParse(value);
+  if (textValue.success) {
+    return parseJsonIfPossible(textValue.data);
   }
 
-  if (value && typeof value === "object") {
-    const outputType = stringProperty(value, "type");
-    const text = stringProperty(value, "text");
+  const parsed = JsonValueSchema.safeParse(value);
+  if (parsed.success) {
+    const outputType = stringProperty(parsed.data, "type");
+    const text = stringProperty(parsed.data, "text");
     if (outputType === "text" && text !== undefined) {
       return parseJsonIfPossible(text);
     }
+    return parsed.data;
   }
 
-  return value;
+  return null;
 }
 
 export function observeRunnerTools(
@@ -214,8 +239,10 @@ export function observeRunnerTools(
   }
 
   runner.on("agent_tool_start", (_context, _agent, tool, { toolCall }) => {
+    const normalizedToolCall = normalizeToolOutputValue(toolCall);
     const callId =
-      stringProperty(toolCall, "callId") ?? stringProperty(toolCall, "id");
+      stringProperty(normalizedToolCall, "callId") ??
+      stringProperty(normalizedToolCall, "id");
     if (!callId) {
       return;
     }
@@ -233,8 +260,10 @@ export function observeRunnerTools(
   runner.on(
     "agent_tool_end",
     (_context, _agent, tool, result, { toolCall }) => {
+      const normalizedToolCall = normalizeToolOutputValue(toolCall);
       const callId =
-        stringProperty(toolCall, "callId") ?? stringProperty(toolCall, "id");
+        stringProperty(normalizedToolCall, "callId") ??
+        stringProperty(normalizedToolCall, "id");
       if (!callId) {
         return;
       }
@@ -339,31 +368,39 @@ function mergeToolOutputArtifacts({
 
 export function mergeRunResultToolArtifacts(
   state: BottleClassifierAgentRunState,
-  result: unknown,
+  result: ToolOutputInput,
 ) {
-  const newItems = getObjectProperty(result, "newItems");
-  if (!Array.isArray(newItems)) {
+  const parsedResult = AgentRunResultSchema.safeParse(result);
+  if (!parsedResult.success || !parsedResult.data.newItems) {
     return;
   }
 
-  for (const item of newItems) {
-    if (stringProperty(item, "type") !== "tool_call_output_item") {
+  for (const item of parsedResult.data.newItems) {
+    const parsedItem = RunItemSchema.safeParse(item);
+    if (
+      !parsedItem.success ||
+      parsedItem.data.type !== "tool_call_output_item"
+    ) {
       continue;
     }
 
-    const rawItem = getObjectProperty(item, "rawItem");
+    const rawItem = RawRunItemSchema.safeParse(parsedItem.data.rawItem);
     mergeToolOutputArtifacts({
       state,
-      toolName: stringProperty(rawItem, "name") ?? stringProperty(item, "name"),
-      output:
-        getObjectProperty(item, "output") ??
-        getObjectProperty(rawItem, "output"),
+      toolName: rawItem.success
+        ? (rawItem.data.name ?? parsedItem.data.name)
+        : parsedItem.data.name,
+      output: normalizeToolOutputValue(
+        parsedItem.data.output ??
+          (rawItem.success ? rawItem.data.output : undefined),
+      ),
     });
   }
 }
 
-export function getAgentFinalOutput(result: unknown) {
-  return getObjectProperty(result, "finalOutput");
+export function getAgentFinalOutput(result: ToolOutputInput) {
+  const parsedResult = AgentRunResultSchema.safeParse(result);
+  return parsedResult.success ? parsedResult.data.finalOutput : undefined;
 }
 
 export function createBottleCheckTools({

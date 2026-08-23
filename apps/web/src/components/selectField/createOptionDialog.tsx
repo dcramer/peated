@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "../modal";
 import type { CreateForm, Option } from "./types";
 
-type OnSubmit<T> = (newOption: any) => void;
+type OnSubmit<T> = (newOption: T) => void;
 
 // TODO(dcramer): hitting escape doesnt do what you want here (it does nothing)
 export default function CreateOptionDialog<T extends Option>({
@@ -21,10 +21,10 @@ export default function CreateOptionDialog<T extends Option>({
   onSubmit: OnSubmit<T>;
   render: CreateForm<T>;
 }) {
-  const [newOption, setNewOption] = useState<T>({
+  const [newOption, setNewOption] = useState<Option>({
     id: null,
     name: "",
-  } as T);
+  });
 
   useEffect(() => {
     setNewOption((data) => ({ ...data, name: toTitleCase(query) }));
@@ -33,12 +33,12 @@ export default function CreateOptionDialog<T extends Option>({
   return (
     <Modal open={open} onClose={setOpen}>
       {render({
-        onSubmit: (newOption: any) => {
+        onSubmit: (newOption: T) => {
           onSubmit(newOption);
           setNewOption({
             id: null,
             name: "",
-          } as T);
+          });
           setOpen(false);
         },
         onClose: () => setOpen(false),

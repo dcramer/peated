@@ -5,11 +5,15 @@ export type FlightBottleOption = {
   name: string;
 };
 
-export function getFlightBottleIds(bottles: Bottle[]): number[] {
+export function getFlightBottleIds(
+  bottles: Array<Pick<Bottle, "id">>,
+): number[] {
   return bottles.map((bottle) => bottle.id);
 }
 
-export function bottleToFlightOption(bottle: Bottle): FlightBottleOption {
+export function bottleToFlightOption(
+  bottle: Pick<Bottle, "id" | "fullName">,
+): FlightBottleOption {
   return {
     id: bottle.id,
     name: bottle.fullName,

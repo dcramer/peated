@@ -4,6 +4,7 @@ import { BugAntIcon } from "@heroicons/react/24/outline";
 import type { feedbackIntegration } from "@sentry/nextjs";
 import { getClient } from "@sentry/nextjs";
 import { useCallback, useState } from "react";
+import { z } from "zod";
 import SidebarLink from "./sidebarLink";
 
 export default function FeedbackSidebarLink() {
@@ -20,8 +21,16 @@ export default function FeedbackSidebarLink() {
   const linkRef = useCallback(
     (node: HTMLAnchorElement) => {
       if (!feedback || loaded || !node) return;
-      // TODO: Type this better, and remove the type cast...
-      (feedback as any).attachTo(node, {});
+      const integration = z
+        .object({
+          attachTo: z.function({
+            input: [z.custom<HTMLAnchorElement>(), z.object({})],
+            output: z.void(),
+          }),
+        })
+        .safeParse(feedback);
+      if (!integration.success) return;
+      integration.data.attachTo(node, {});
       setLoaded(true);
     },
     [feedback, loaded],

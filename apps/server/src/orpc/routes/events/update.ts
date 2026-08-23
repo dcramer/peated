@@ -46,12 +46,26 @@ export default procedure
       }
     }
 
-    const data: { [name: string]: any } = {};
-    Object.entries(input).map(([k, v]) => {
-      if (v !== undefined && v !== event[k as keyof Event]) {
-        data[k] = v;
-      }
-    });
+    const data: Partial<typeof events.$inferInsert> = {};
+    if (input.name !== undefined && input.name !== event.name)
+      data.name = input.name;
+    if (input.dateStart !== undefined && input.dateStart !== event.dateStart)
+      data.dateStart = input.dateStart;
+    if (input.dateEnd !== undefined && input.dateEnd !== event.dateEnd)
+      data.dateEnd = input.dateEnd;
+    if (input.repeats !== undefined && input.repeats !== event.repeats)
+      data.repeats = input.repeats;
+    if (input.website !== undefined && input.website !== event.website)
+      data.website = input.website;
+    if (
+      input.description !== undefined &&
+      input.description !== event.description
+    )
+      data.description = input.description;
+    if (input.country !== undefined && input.country !== event.countryId)
+      data.countryId = input.country;
+    if (input.location !== undefined && input.location !== event.location)
+      data.location = input.location;
 
     if (Object.values(data).length === 0) {
       return await serialize(EventSerializer, event, context.user);

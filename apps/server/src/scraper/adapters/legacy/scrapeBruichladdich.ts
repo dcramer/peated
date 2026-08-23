@@ -12,6 +12,7 @@ import {
   ShopifyProductSchema,
   ShopifyVariantSchema,
 } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "bruichladdich";
@@ -42,7 +43,7 @@ const ProductSchema = ShopifyProductSchema.extend({
   product_type: z.string(),
   tags: z.array(z.string()),
   vendor: z.string(),
-  images: z.array(z.unknown()).min(1),
+  images: z.array(z.json()).min(1),
   variants: z.array(VariantSchema),
 });
 
@@ -80,7 +81,7 @@ function getProductName(
   return brand ? normalizeBottle({ name: `${brand} ${title}` }).name : null;
 }
 
-export function parseBruichladdichProducts(input: unknown): StorePrice[] {
+export function parseBruichladdichProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

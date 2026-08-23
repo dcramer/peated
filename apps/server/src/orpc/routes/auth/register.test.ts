@@ -28,7 +28,8 @@ describe("POST /auth/register", () => {
     expect(user.email).toEqual("foo@example.com");
     expect(user.passwordHash).not.toBeNull();
     expect(user.verified).toBe(false);
-    expect(compareSync("example", user.passwordHash as string)).toBeTruthy();
+    if (!user.passwordHash) throw new Error("User has no password hash");
+    expect(compareSync("example", user.passwordHash)).toBeTruthy();
     expect(user.termsAcceptedAt).not.toBeNull();
   });
 

@@ -1,29 +1,10 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
-import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-  pushUniqueJob: vi.fn(),
-}));
-
-vi.mock("@peated/server/lib/catalogVerification", async () => {
-  const actual = await vi.importActual<typeof catalogVerificationModule>(
-    "@peated/server/lib/catalogVerification",
-  );
-
-  return {
-    ...actual,
-    queueEntityCreationVerification: queueEntityCreationVerificationMock,
-  };
-});
 
 describe("POST /entities", () => {
   beforeEach(() => {
@@ -57,10 +38,14 @@ describe("POST /entities", () => {
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: data.id,
     });
-    expect(queueEntityCreationVerificationMock).toHaveBeenCalledWith({
-      entityId: data.id,
-      creationSource: "manual_entry",
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "VerifyEntityCreation",
+      {
+        entityId: data.id,
+        creationSource: "manual_entry",
+      },
+      { delay: 5000 },
+    );
   });
 
   test("updates existing entity with new type", async ({
@@ -91,6 +76,10 @@ describe("POST /entities", () => {
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: entity.id,
     });
-    expect(queueEntityCreationVerificationMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "VerifyEntityCreation",
+      expect.anything(),
+      expect.anything(),
+    );
   });
 });

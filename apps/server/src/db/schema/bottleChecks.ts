@@ -3,8 +3,14 @@ import {
   BottleCheckIntentSchema,
   type AuditBottleOrigin,
   type BottleCheckIntent,
+  type BottleClassificationArtifacts,
   type ProposedOperation,
 } from "@peated/bottle-classifier/contract";
+import type {
+  PreparationError,
+  ReviewOperation,
+} from "@peated/server/lib/bottleOperationReviewSchemas";
+import type { PersistedBottleOperationExecutionResult } from "@peated/server/schemas/bottleOperationResults";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -23,10 +29,29 @@ import { bottles } from "./bottles";
 import { storePriceMatchAttempts, storePriceMatchProposals } from "./stores";
 import { users } from "./users";
 
+type PersistedJsonValue =
+  | boolean
+  | null
+  | number
+  | string
+  | PersistedJsonObject
+  | PersistedJsonValue[];
+
+interface PersistedJsonObject {
+  [key: string]: PersistedJsonValue;
+}
+
+type BottleOperationStateToken = Exclude<
+  ReviewOperation,
+  { status: "blocked" }
+>["stateToken"];
+
+// SAFETY: A Zod enum always exposes at least one option, as required by pgEnum.
 const bottleCheckIntentValues = BottleCheckIntentSchema.options as [
   BottleCheckIntent,
   ...BottleCheckIntent[],
 ];
+// SAFETY: A Zod enum always exposes at least one option, as required by pgEnum.
 const bottleCheckOriginValues = AuditBottleOriginSchema.options as [
   AuditBottleOrigin,
   ...AuditBottleOrigin[],
@@ -84,12 +109,14 @@ export const bottleChecks = pgTable(
     backgroundEventKey: text("background_event_key"),
     schemaVersion: integer("schema_version").notNull(),
     inputSnapshot: jsonb("input_snapshot")
-      .$type<Record<string, unknown>>()
+      .$type<PersistedJsonObject>()
       .notNull(),
-    output: jsonb("output").$type<Record<string, unknown>>(),
-    artifacts: jsonb("artifacts").$type<Record<string, unknown>>(),
+    output: jsonb("output").$type<PersistedJsonObject>(),
+    artifacts: jsonb("artifacts").$type<
+      BottleClassificationArtifacts | PersistedJsonObject
+    >(),
     model: text("model"),
-    modelMetadata: jsonb("model_metadata").$type<Record<string, unknown>>(),
+    modelMetadata: jsonb("model_metadata").$type<PersistedJsonObject>(),
     error: text("error"),
     storePriceMatchProposalId: bigint("store_price_match_proposal_id", {
       mode: "number",
@@ -139,9 +166,12 @@ export const bottleOperations = pgTable(
       .$type<string[]>()
       .default([])
       .notNull(),
-    stateToken: jsonb("state_token").$type<Record<string, unknown>>(),
-    preparationError:
-      jsonb("preparation_error").$type<Record<string, unknown>>(),
+    stateToken: jsonb("state_token").$type<
+      BottleOperationStateToken | PersistedJsonObject
+    >(),
+    preparationError: jsonb("preparation_error").$type<
+      PersistedJsonObject | PreparationError
+    >(),
     status: bottleOperationStatusEnum("status")
       .default("pending_review")
       .notNull(),
@@ -152,7 +182,9 @@ export const bottleOperations = pgTable(
     reviewedAt: timestamp("reviewed_at"),
     rejectionReason: bottleOperationRejectionReasonEnum("rejection_reason"),
     reviewerNote: text("reviewer_note"),
-    result: jsonb("result").$type<Record<string, unknown>>(),
+    result: jsonb("result").$type<
+      PersistedBottleOperationExecutionResult | PersistedJsonObject
+    >(),
     error: text("error"),
     executionStartedAt: timestamp("execution_started_at"),
     executionCompletedAt: timestamp("execution_completed_at"),

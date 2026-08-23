@@ -45,6 +45,11 @@ export type ActivitySourceWindow = {
   secondaryLimit: number;
 };
 
+export interface ComposedActivity {
+  results: ActivityEntry[];
+  hasNext: boolean;
+}
+
 export function encodeActivityCursor({ page, snapshotAt }: ActivityCursor) {
   return `${page}:${snapshotAt.getTime()}`;
 }
@@ -160,7 +165,7 @@ export function composeActivity({
   sourceWindow: ActivitySourceWindow;
   totalPrimary: number;
   totalSecondary: number;
-}): { results: ActivityEntry[]; hasNext: boolean } {
+}): ComposedActivity {
   if (limit === 1) {
     const result = primary.length ? [primary[0]] : secondary.slice(0, 1);
     return {

@@ -7,6 +7,13 @@ import {
   type TestInfo,
 } from "@playwright/test";
 import { Buffer } from "node:buffer";
+import { z } from "zod";
+
+declare global {
+  interface Window {
+    __copiedText?: string;
+  }
+}
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
@@ -1238,8 +1245,7 @@ test.describe("add bottle flow", () => {
         configurable: true,
         value: {
           writeText: async (value: string) => {
-            (window as typeof window & { __copiedText?: string }).__copiedText =
-              value;
+            window.__copiedText = value;
           },
         },
       });
@@ -1247,11 +1253,10 @@ test.describe("add bottle flow", () => {
     await page
       .getByRole("button", { name: "Copy photo identification payload" })
       .click();
-    const copiedPayload = await page.evaluate(
-      () => (window as typeof window & { __copiedText?: string }).__copiedText,
-    );
+    const copiedPayload = await page.evaluate(() => window.__copiedText);
     expect(copiedPayload).toBeDefined();
-    const copied = JSON.parse(copiedPayload!);
+    if (!copiedPayload) throw new Error("Clipboard payload is missing");
+    const copied = JSON.parse(copiedPayload);
     expect(copied.traceId).toBe("55555555555555555555555555555555");
     expect(copied.suggestedNextStep).toBe("manual_search");
     expect(copied.imageEvidence.fieldCandidates).toMatchObject({
@@ -1542,21 +1547,33 @@ function waitForBottleCreate(page: Page) {
   );
 }
 
-function getRpcInput(request: Request): Record<string, unknown> {
+type RpcJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | RpcJsonValue[]
+  | RpcJsonObject;
+
+interface RpcJsonObject {
+  [key: string]: RpcJsonValue;
+}
+
+function getRpcInput(request: Request): RpcJsonObject {
   const postData = request.postData();
   if (!postData) {
     throw new Error("Expected the RPC request to contain JSON input.");
   }
 
-  const envelope: unknown = JSON.parse(postData);
+  const envelope: RpcJsonValue = JSON.parse(postData);
   if (!isRecord(envelope) || !isRecord(envelope.json)) {
     throw new Error("Expected the RPC request to use the JSON envelope.");
   }
   return envelope.json;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function isRecord(value: RpcJsonValue): value is RpcJsonObject {
+  return z.record(z.string(), z.json()).safeParse(value).success;
 }
 
 async function expectFooterBelowAction(action: Locator, footer: Locator) {

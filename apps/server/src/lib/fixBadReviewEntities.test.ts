@@ -1,35 +1,51 @@
+import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
+import type {
+  BottleCandidate,
+  BottleClassificationDecision,
+} from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
-import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
+import { fixBadReviewEntities as fixBadReviewEntitiesWithClassifier } from "@peated/server/lib/fixBadReviewEntities";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
-const pushJobMock = vi.hoisted(() => vi.fn());
-const pushUniqueJobMock = vi.hoisted(() => vi.fn());
+const classifyBottleReferenceMock =
+  vi.fn<
+    NonNullable<Parameters<typeof fixBadReviewEntitiesWithClassifier>[1]>
+  >();
 
-vi.mock(
-  "@peated/server/agents/bottleClassifier/classifyBottleReference",
-  () => ({
-    classifyBottleReference: classifyBottleReferenceMock,
-  }),
-);
+function fixBadReviewEntities(
+  input: Parameters<typeof fixBadReviewEntitiesWithClassifier>[0],
+) {
+  return fixBadReviewEntitiesWithClassifier(input, classifyBottleReferenceMock);
+}
 
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: pushJobMock,
-  pushUniqueJob: pushUniqueJobMock,
-}));
+type MockClassificationDecision = Pick<
+  BottleClassificationDecision,
+  "action"
+> & {
+  candidateBottleIds?: number[];
+  matchedBottleId?: number;
+};
+
+type MockClassificationArtifacts = {
+  candidates?: Array<
+    Partial<BottleCandidate> & Pick<BottleCandidate, "bottleId" | "fullName">
+  >;
+};
 
 function buildClassification(
-  decision: Record<string, unknown>,
-  artifacts: Record<string, unknown> = {},
+  decision: MockClassificationDecision,
+  artifacts: MockClassificationArtifacts = {},
 ) {
-  return {
+  return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
-      confidence: 0.9,
       rationale: "test fixture",
       candidateBottleIds: [],
+      identityScope: "product",
+      observation: null,
       ...decision,
     },
     artifacts: {
@@ -39,14 +55,13 @@ function buildClassification(
       resolvedEntities: [],
       ...artifacts,
     },
-  };
+  });
 }
 
 describe("fixBadReviewEntities", () => {
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
-    pushJobMock.mockReset();
-    pushUniqueJobMock.mockReset();
+    vi.mocked(workerClient.pushUniqueJob).mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({ action: "no_match" }),
     );
@@ -102,7 +117,6 @@ describe("fixBadReviewEntities", () => {
             {
               bottleId: correctBottle.id,
               fullName: correctBottle.fullName,
-              bottleFullName: correctBottle.fullName,
               alias: correctBottle.fullName,
               brand: null,
               bottler: null,
@@ -156,9 +170,12 @@ describe("fixBadReviewEntities", () => {
       where: eq(storePrices.id, sameNamePrice.id),
     });
     expect(siblingPrice?.bottleId).toEqual(correctBottle.id);
-    expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
-      bottleId: correctBottle.id,
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      {
+        bottleId: correctBottle.id,
+      },
+    );
   });
 
   test("reassigns through an exact alias to an active Bottle", async ({
@@ -233,7 +250,6 @@ describe("fixBadReviewEntities", () => {
             {
               bottleId: stagedParent.id,
               fullName: stagedParent.fullName,
-              bottleFullName: stagedParent.fullName,
             },
           ],
         },
@@ -377,7 +393,6 @@ describe("fixBadReviewEntities", () => {
             {
               bottleId: suggestedBottle.id,
               fullName: suggestedBottle.fullName,
-              bottleFullName: suggestedBottle.fullName,
             },
           ],
         },
@@ -432,7 +447,6 @@ describe("fixBadReviewEntities", () => {
             {
               bottleId: suggestedBottle.id,
               fullName: suggestedBottle.fullName,
-              bottleFullName: suggestedBottle.fullName,
             },
           ],
         },

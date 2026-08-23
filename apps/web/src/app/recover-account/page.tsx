@@ -8,12 +8,11 @@ export const metadata: Metadata = {
 };
 
 export default async function PasswordReset(props: {
-  searchParams: Promise<Record<string, any>>;
+  searchParams: Promise<{ email?: string; token?: string }>;
 }) {
   const searchParams = await props.searchParams;
   const token = searchParams.token;
-  const email =
-    typeof searchParams.email === "string" ? searchParams.email : "";
+  const email = searchParams.email ?? "";
 
   return (
     <LayoutSplash>

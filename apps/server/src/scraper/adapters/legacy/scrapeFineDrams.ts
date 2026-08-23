@@ -5,6 +5,12 @@ import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { getUrl } from "../../legacy/scraper";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
+interface VolumeMultipliers {
+  readonly [unit: string]: number | undefined;
+}
+
+const VOLUME_MULTIPLIERS: VolumeMultipliers = { ml: 1, cl: 10, l: 1000 };
+
 const SITE = "finedrams";
 const STORE_ORIGIN = "https://www.finedrams.com";
 const CATALOG_URL = `${STORE_ORIGIN}/whisky`;
@@ -31,9 +37,8 @@ function parseVolume(value: string): number | null {
   if (!match) return null;
 
   const amount = Number.parseFloat(match[1].replace(",", "."));
-  const multiplier = { ml: 1, cl: 10, l: 1000 }[
-    match[2].toLowerCase() as "ml" | "cl" | "l"
-  ];
+  const multiplier = VOLUME_MULTIPLIERS[match[2].toLowerCase()];
+  if (multiplier === undefined) return null;
   const volume = amount * multiplier;
   return Number.isInteger(volume) && ALLOWED_VOLUMES.includes(volume)
     ? volume
@@ -96,10 +101,12 @@ function getImageUrl(
   return null;
 }
 
-export function parseFineDramsPage(html: string): {
+export interface FineDramsPage {
   products: StorePrice[];
   hasSourceProducts: boolean;
-} {
+}
+
+export function parseFineDramsPage(html: string): FineDramsPage {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);

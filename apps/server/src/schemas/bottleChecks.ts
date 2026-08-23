@@ -23,6 +23,7 @@ import {
   ReviewEntityMergeSchema,
   ReviewEntityUpdateSchema,
 } from "@peated/server/lib/bottleOperationReviewSchemas";
+import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
 import { PersistedBottleOperationExecutionResultSchema } from "@peated/server/schemas/bottleOperationResults";
 import { z } from "zod";
 
@@ -33,7 +34,7 @@ export const BottleOperationResponseSchema = z
     id: z.number(),
     checkId: z.number(),
     proposal: ProposedOperationSchema,
-    excludedFields: z.array(z.string()),
+    excludedFields: z.array(BottleOperationFieldPathSchema),
     preparationError: PreparationErrorSchema.nullable(),
     status: BottleOperationStatusSchema,
     reviewedById: z.number().nullable(),

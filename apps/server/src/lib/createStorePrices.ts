@@ -264,7 +264,10 @@ async function persistStorePriceInTransaction({
 }
 
 /** Persists one scraper batch with attribution chosen by the owning boundary. */
-export async function createStorePrices(rawInput: unknown, actorId: number) {
+export async function createStorePrices(
+  rawInput: CreateStorePricesInput,
+  actorId: number,
+) {
   const input = CreateStorePricesInputSchema.parse(rawInput);
   const site = await db.query.externalSites.findFirst({
     where: eq(externalSites.type, input.site),
@@ -392,7 +395,7 @@ export async function createStorePrices(rawInput: unknown, actorId: number) {
 }
 
 /** Trusted worker capability; callers cannot select an arbitrary actor. */
-export async function createStorePricesAsPeated(input: unknown) {
+export async function createStorePricesAsPeated(input: CreateStorePricesInput) {
   const actor = await getPeatedSystemActor();
   await createStorePrices(input, actor.id);
 }

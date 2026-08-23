@@ -2,17 +2,13 @@ import { db } from "@peated/server/db";
 import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
 import { createPostgresClient, waitForSessionBlockedBy } from "./testUtils";
 
 const EMBEDDING = Array.from({ length: 3072 }, () => 0.125);
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-}));
 
 describe("DELETE /bottle-aliases/:alias", () => {
   beforeEach(() => {

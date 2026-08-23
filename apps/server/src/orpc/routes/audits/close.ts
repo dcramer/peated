@@ -2,6 +2,7 @@ import {
   BottleCheckAlreadyClosedError,
   BottleCheckNotClosableError,
   BottleCheckNotFoundError,
+  CloseBottleCheckInputFields,
   CloseBottleCheckInputSchema,
   closeBottleCheck,
 } from "@peated/server/lib/bottleChecks";
@@ -11,7 +12,7 @@ import { BottleCheckResponseSchema } from "@peated/server/schemas/bottleChecks";
 import { serializeBottleCheck } from "@peated/server/serializers/bottleCheck";
 
 const InputSchema = CloseBottleCheckInputSchema.omit({ checkId: true }).extend({
-  audit: CloseBottleCheckInputSchema.shape.checkId,
+  audit: CloseBottleCheckInputFields.checkId,
 });
 
 export default procedure

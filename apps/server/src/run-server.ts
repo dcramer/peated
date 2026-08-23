@@ -3,27 +3,34 @@ import "./sentry";
 
 import { createAdaptorServer } from "@hono/node-server";
 import type { AddressInfo } from "node:net";
+import { z } from "zod";
 import { app } from "./app";
 import config from "./config";
 import { logError, logInfo } from "./lib/log";
 import { flushSentry } from "./sentry";
 
+const AddressInfoSchema = z.object({
+  address: z.string(),
+  port: z.number().int(),
+});
+
 const getServerUrl = (address: AddressInfo | string | null) => {
-  if (!address || typeof address === "string") {
+  if (!address || z.string().safeParse(address).success) {
     return `http://${config.HOST}:${config.PORT}/`;
   }
+  const networkAddress = AddressInfoSchema.parse(address);
 
   const host =
-    address.address === "::" || address.address === "0.0.0.0"
+    networkAddress.address === "::" || networkAddress.address === "0.0.0.0"
       ? "localhost"
-      : address.address;
+      : networkAddress.address;
 
-  return `http://${host}:${address.port}/`;
+  return `http://${host}:${networkAddress.port}/`;
 };
 
 let exiting = false;
 
-const exitWithError = async (message: string, err: unknown) => {
+const exitWithError = async (message: string, err: Error) => {
   if (exiting) return;
   exiting = true;
 
@@ -64,7 +71,13 @@ process.on("uncaughtException", (err) => {
 });
 
 process.on("unhandledRejection", (err) => {
-  void exitWithError("unhandledRejection received", err);
+  const error =
+    err instanceof Error
+      ? err
+      : new Error("Unhandled rejection did not provide an Error.", {
+          cause: err,
+        });
+  void exitWithError("unhandledRejection received", error);
 });
 
 start();

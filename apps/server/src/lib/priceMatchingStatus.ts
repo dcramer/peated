@@ -9,7 +9,7 @@ export const REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES = [
 export const CLOSED_STORE_PRICE_MATCH_PROPOSAL_STATUSES = [
   "approved",
   "ignored",
-] as const as readonly StorePriceMatchProposal["status"][];
+] as const satisfies ReadonlyArray<StorePriceMatchProposal["status"]>;
 
 export function isReviewableStorePriceMatchProposalStatus(
   status: StorePriceMatchProposal["status"],

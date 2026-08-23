@@ -1,4 +1,5 @@
 import { expect, type Request, test, type TestInfo } from "@playwright/test";
+import { z } from "zod";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
@@ -340,23 +341,32 @@ function requireBaseURL(baseURL: string | undefined): string {
   return baseURL;
 }
 
-function getRpcInput(request: Request): Record<string, unknown> {
+type RpcJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | RpcJsonValue[]
+  | RpcJsonObject;
+
+interface RpcJsonObject {
+  [key: string]: RpcJsonValue;
+}
+
+function getRpcInput(request: Request): RpcJsonObject {
   const postData = request.postData();
   if (!postData) {
     throw new Error("Expected the RPC request to contain JSON input.");
   }
 
-  const envelope: unknown = JSON.parse(postData);
+  const envelope: RpcJsonValue = JSON.parse(postData);
   if (!isRecord(envelope) || !isRecord(envelope.json)) {
     throw new Error("Expected the RPC request to use the JSON envelope.");
   }
   return envelope.json;
 }
 
-function getRecord(
-  input: Record<string, unknown>,
-  field: string,
-): Record<string, unknown> {
+function getRecord(input: RpcJsonObject, field: string): RpcJsonObject {
   const value = input[field];
   if (!isRecord(value)) {
     throw new Error(`Expected ${field} to be an object.`);
@@ -364,6 +374,6 @@ function getRecord(
   return value;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function isRecord(value: RpcJsonValue): value is RpcJsonObject {
+  return z.record(z.string(), z.json()).safeParse(value).success;
 }

@@ -31,6 +31,7 @@ import {
 import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
+import type { JobPayload } from "../types";
 
 if (!config.AI_GATEWAY_API_KEY) {
   logWarn("AI_GATEWAY_API_KEY is not configured", {});
@@ -111,22 +112,23 @@ export type GeneratedBottleDetails = z.infer<
   typeof OpenAIBottleDetailsValidationSchema
 >;
 
-export async function getGeneratedBottleDetails(
+export type BottleDetailsModel = (
+  conversationId: string,
+  prompt: string,
   bottle: Partial<Bottle>,
-): Promise<GeneratedBottleDetails | null> {
-  const tagList = (
-    await db.query.tags.findMany({ columns: { name: true } })
-  ).map(({ name }) => name);
-  const conversationId = bottle.id
-    ? `bottle_details:${bottle.id}`
-    : `ai:bottle_lookup:${bottle.fullName ?? bottle.name ?? "draft"}`;
+) => Promise<GeneratedBottleDetails | null>;
 
-  const result = await withSentryConversation(
+const defaultBottleDetailsModel: BottleDetailsModel = async (
+  conversationId,
+  prompt,
+  bottle,
+) =>
+  await withSentryConversation(
     conversationId,
     async () =>
       await getStructuredResponse(
         "generateBottleDetails",
-        generatePrompt(bottle, tagList),
+        prompt,
         OpenAIBottleDetailsSchema,
         OpenAIBottleDetailsValidationSchema,
         undefined,
@@ -137,6 +139,23 @@ export async function getGeneratedBottleDetails(
           },
         },
       ),
+  );
+
+export async function getGeneratedBottleDetails(
+  bottle: Partial<Bottle>,
+  model: BottleDetailsModel = defaultBottleDetailsModel,
+): Promise<GeneratedBottleDetails | null> {
+  const tagList = (
+    await db.query.tags.findMany({ columns: { name: true } })
+  ).map(({ name }) => name);
+  const conversationId = bottle.id
+    ? `bottle_details:${bottle.id}`
+    : `ai:bottle_lookup:${bottle.fullName ?? bottle.name ?? "draft"}`;
+
+  const result = await model(
+    conversationId,
+    generatePrompt(bottle, tagList),
+    bottle,
   );
 
   if (!result) return null;
@@ -151,7 +170,22 @@ export async function getGeneratedBottleDetails(
   };
 }
 
-export default async function generateBottleDetails(rawJobArgs: unknown) {
+export type GenerateBottleDetailsServices = {
+  aiEnabled: boolean;
+  generateDetails: (
+    bottle: Partial<Bottle>,
+  ) => Promise<GeneratedBottleDetails | null>;
+};
+
+const defaultServices: GenerateBottleDetailsServices = {
+  aiEnabled: Boolean(config.AI_GATEWAY_API_KEY),
+  generateDetails: getGeneratedBottleDetails,
+};
+
+export async function generateBottleDetails(
+  rawJobArgs: JobPayload,
+  services: GenerateBottleDetailsServices = defaultServices,
+) {
   const { bottleId } = GenerateBottleDetailsJobArgsSchema.parse(rawJobArgs);
 
   const [owned] = await db
@@ -190,7 +224,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     series: owned.series,
   });
 
-  if (!config.AI_GATEWAY_API_KEY) {
+  if (!services.aiEnabled) {
     return;
   }
 
@@ -208,7 +242,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     return;
   }
 
-  const result = await getGeneratedBottleDetails(bottle);
+  const result = await services.generateDetails(bottle);
 
   if (!result) {
     throw new Error(`Failed to generate details for bottle: ${bottleId}`);
@@ -274,4 +308,8 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     throw error;
   }
   await finalizeBottleUpdate(update);
+}
+
+export default async function generateBottleDetailsJob(rawJobArgs: JobPayload) {
+  return await generateBottleDetails(rawJobArgs);
 }

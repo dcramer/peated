@@ -28,12 +28,12 @@ import {
   mergeBottles,
   mergeBottlesInTransaction,
 } from "@peated/server/lib/mergeBottles";
-import * as workerClient from "@peated/server/worker/client";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 function contextFor(user: User | null) {
-  return { user } as Parameters<typeof mergeBottles>[0]["context"];
+  return { user };
 }
 
 describe("exact Bottle merges", () => {

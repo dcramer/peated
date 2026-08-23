@@ -10,7 +10,7 @@ import PaginationButtons from "./paginationButtons";
 import SearchBar from "./searchBar";
 import SortParam from "./sortParam";
 
-export type Column<T extends Record<string, any>> = {
+export type Column<T extends object> = {
   name: string;
   sort?: string;
   sortDefaultOrder?: "asc" | "desc";
@@ -22,24 +22,12 @@ export type Column<T extends Record<string, any>> = {
   hidden?: boolean;
 };
 
-type Grouper = { id: string | number; name: string } & Record<string, any>;
+interface Grouper {
+  id: string | number;
+  name: string;
+}
 
-export default function Table<
-  T extends Record<string, any>,
-  G extends Grouper = Grouper,
->({
-  items,
-  columns,
-  primaryKey = (item) => String(item.id),
-  url = (item) => null,
-  rel,
-  defaultSort,
-  groupBy,
-  groupTo,
-  groupItem = (item) => item.name,
-  withSearch = false,
-  noHeaders = false,
-}: {
+type TableProps<T extends object, G extends Grouper> = {
   items: T[];
   columns: Column<T>[];
   primaryKey?: (item: T) => string;
@@ -51,8 +39,41 @@ export default function Table<
   groupItem?: (item: G) => ReactNode;
   withSearch?: boolean;
   noHeaders?: boolean;
+  searchParams?: URLSearchParams;
+};
+
+export default function Table<T extends object, G extends Grouper = Grouper>(
+  props: TableProps<T, G>,
+) {
+  if (props.searchParams) {
+    return <TableContent {...props} searchParams={props.searchParams} />;
+  }
+
+  return <NavigationTable {...props} />;
+}
+
+function NavigationTable<T extends object, G extends Grouper>(
+  props: TableProps<T, G>,
+) {
+  return <TableContent {...props} searchParams={useSearchParams()} />;
+}
+
+export function TableContent<T extends object, G extends Grouper = Grouper>({
+  items,
+  columns,
+  primaryKey = defaultPrimaryKey,
+  url = (item) => null,
+  rel,
+  defaultSort,
+  groupBy,
+  groupTo,
+  groupItem = (item) => item.name,
+  withSearch = false,
+  noHeaders = false,
+  searchParams,
+}: Omit<TableProps<T, G>, "searchParams"> & {
+  searchParams: URLSearchParams;
 }) {
-  const searchParams = useSearchParams();
   const currentSort = searchParams.get("sort") ?? defaultSort;
   let lastGroup: G;
 
@@ -149,7 +170,7 @@ export default function Table<
                 {columns.map((col, colN) => {
                   if (col.hidden) return null;
 
-                  const value = col.value ? col.value(item) : item[col.name];
+                  const value = getColumnValue(item, col);
                   const colAlign =
                     (col.align || "default") !== "default"
                       ? col.align
@@ -183,7 +204,17 @@ export default function Table<
           })}
         </tbody>
       </table>
-      <PaginationButtons rel={rel} />
+      <PaginationButtons rel={rel} searchParams={searchParams} />
     </>
   );
+}
+
+function defaultPrimaryKey<T extends object>(item: T): string {
+  const id = Object.entries(item).find(([name]) => name === "id")?.[1];
+  return String(id);
+}
+
+function getColumnValue<T extends object>(item: T, column: Column<T>) {
+  if (column.value) return column.value(item);
+  return Object.entries(item).find(([name]) => name === column.name)?.[1];
 }

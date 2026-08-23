@@ -108,7 +108,10 @@ async function startCallbackServer({
   });
 
   const address = server.address();
-  if (!address || typeof address === "string") {
+  const callbackAddress = z
+    .object({ port: z.number().int().positive() })
+    .safeParse(address);
+  if (!callbackAddress.success) {
     server.close();
     throw new Error("Unable to determine the OAuth callback port.");
   }
@@ -121,7 +124,7 @@ async function startCallbackServer({
   }, timeoutMs);
 
   return {
-    redirectUri: `http://127.0.0.1:${address.port}${OAUTH_CALLBACK_PATH}`,
+    redirectUri: `http://127.0.0.1:${callbackAddress.data.port}${OAUTH_CALLBACK_PATH}`,
     waitForCode: () => code,
     close: async () => {
       clearTimeout(timeout);

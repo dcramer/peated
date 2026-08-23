@@ -7,12 +7,19 @@ export const EVAL_ACTIONS = [
 
 export type EvalAction = (typeof EVAL_ACTIONS)[number];
 
+export interface EvalActionCounts {
+  match: number;
+  create_bottle: number;
+  no_match: number;
+  ignored: number;
+}
+
 export type EvalActionBreakdown = {
   compared: number;
-  matrix: Record<EvalAction, Record<EvalAction, number>>;
+  matrix: Record<EvalAction, EvalActionCounts>;
 };
 
-function emptyActionCounts(): Record<EvalAction, number> {
+function emptyActionCounts(): EvalActionCounts {
   return {
     match: 0,
     create_bottle: 0,

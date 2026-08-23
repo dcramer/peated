@@ -15,7 +15,11 @@ import {
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
-import { logError, logInfo } from "@peated/server/lib/log";
+import {
+  logError,
+  logInfo,
+  type SentryLogContexts,
+} from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   ActiveBottleSelectionError,
@@ -181,12 +185,13 @@ function getAssignmentInsertValues({
 }
 
 function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
-  return {
-    ...(options.assignmentSource !== undefined
-      ? { assignmentSource: options.assignmentSource }
-      : {}),
+  const values: BottleAliasAssignmentValues = {
     assignedByActorId: options.assignedByActorId,
   };
+  if (options.assignmentSource !== undefined) {
+    values.assignmentSource = options.assignmentSource;
+  }
+  return values;
 }
 
 function bottleAliasIdentityMatches(
@@ -605,17 +610,18 @@ export async function assignBottleAliasInTransaction(
 
   const sourceIsCanonicalName =
     sourceAliasIdentity?.name.toLowerCase() === name.toLowerCase();
-  const claim = await claimBottleAliasNameInTransaction(tx, {
+  const claimInput: Parameters<typeof claimBottleAliasNameInTransaction>[1] = {
     name,
     bottleId,
     ignored,
     assignmentSource,
     assignedByActorId,
     reservation: false,
-    ...(sourceAliasIdentity && sourceIsCanonicalName
-      ? { expectedIdentity: sourceAliasIdentity }
-      : {}),
-  });
+  };
+  if (sourceAliasIdentity && sourceIsCanonicalName) {
+    claimInput.expectedIdentity = sourceAliasIdentity;
+  }
+  const claim = await claimBottleAliasNameInTransaction(tx, claimInput);
   if (sourceAliasIdentity && !sourceIsCanonicalName) {
     await lockBottleAliasIdentitySnapshotInTransaction(tx, sourceAliasIdentity);
   }
@@ -714,7 +720,7 @@ export async function finalizeBottleAliasAssignment(
     bottleImageCandidate,
     bottleId,
   }: BottleAliasAssignmentResult,
-  contexts?: Record<string, Record<string, any>>,
+  contexts?: SentryLogContexts,
 ) {
   if (bottleImageCandidate) {
     try {
@@ -802,7 +808,7 @@ export async function finalizeBottleAliasAssignment(
 /** Assigns one direct Bottle identity, then runs post-commit effects. */
 export async function assignBottleAlias(
   params: BottleAliasAssignmentInput,
-  contexts?: Record<string, Record<string, any>>,
+  contexts?: SentryLogContexts,
 ) {
   const result = await db.transaction(async (tx) =>
     assignBottleAliasInTransaction(tx, params),

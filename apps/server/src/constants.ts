@@ -111,9 +111,13 @@ export const EXTERNAL_SITE_DEFINITIONS = {
 
 type ExternalSiteDefinitionType = keyof typeof EXTERNAL_SITE_DEFINITIONS;
 
-export const EXTERNAL_SITE_TYPE_LIST = Object.keys(
-  EXTERNAL_SITE_DEFINITIONS,
-) as [ExternalSiteDefinitionType, ...ExternalSiteDefinitionType[]];
+const externalSiteTypes = Object.keys(EXTERNAL_SITE_DEFINITIONS);
+export const EXTERNAL_SITE_TYPE_LIST =
+  // SAFETY: Object.keys returns the keys of this non-empty, code-owned object.
+  externalSiteTypes as [
+    ExternalSiteDefinitionType,
+    ...ExternalSiteDefinitionType[],
+  ];
 
 export function isExternalReviewSiteType(type: ExternalSiteDefinitionType) {
   const definition = EXTERNAL_SITE_DEFINITIONS[type];
@@ -196,7 +200,7 @@ export const COLOR_SCALE = [
   [20, "Black Bowmore", "#3b1d12"],
 ] as const;
 
-// blame theo for this monstrosity
+// SAFETY: Array.map preserves the tuple order and returns each literal id unchanged.
 const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>
   arr.map((s) => s.id) as {
     [K in keyof T]: T[K] extends { id: infer U } ? U : never;

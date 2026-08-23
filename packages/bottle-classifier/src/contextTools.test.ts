@@ -1,6 +1,7 @@
 import { RunContext } from "@openai/agents";
-import type OpenAI from "openai";
+import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
+import { z } from "zod";
 
 import type {
   BottleContext,
@@ -16,10 +17,14 @@ type PreparedRun =
   | Awaited<ReturnType<typeof prepareBottleClassifierAgentRun>>
   | ReturnType<typeof prepareBottleAuditAgentRun>;
 
+type ToolInput = z.infer<typeof ToolInputSchema>;
+const ToolInputSchema = z.json();
+const testClient = new OpenAI({ apiKey: "test-key" });
+
 async function invokePreparedTool(
   prepared: PreparedRun,
   name: string,
-  input: unknown,
+  input: ToolInput,
 ) {
   const selected = prepared.agent.tools.find((tool) => tool.name === name);
   if (!selected || selected.type !== "function") {
@@ -87,7 +92,7 @@ describe("Bottle-check context tools", () => {
     const currentBottleContext = bottleContext();
     const prepared = prepareBottleAuditAgentRun(
       {
-        client: {} as OpenAI,
+        client: testClient,
         model: "test-model",
         maxSearchQueries: 0,
         adapters: {
@@ -159,7 +164,7 @@ describe("Bottle-check context tools", () => {
     const unrelatedWebUrl = "https://example.com/laphroaig";
     const prepared = prepareBottleAuditAgentRun(
       {
-        client: {} as OpenAI,
+        client: testClient,
         model: "test-model",
         maxSearchQueries: 1,
         firecrawlApiKey: "firecrawl-test-key",
@@ -226,13 +231,13 @@ describe("Bottle-check context tools", () => {
   test("offers bounded reference context without catalog-change tools", async () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
-        client: {} as OpenAI,
+        client: testClient,
         model: "test-model",
         maxSearchQueries: 0,
         adapters: {
           searchBottles: vi.fn(async () => []),
           getBottleContext: vi.fn(
-            async () => null as BottleContextSource | null,
+            async (): Promise<BottleContextSource | null> => null,
           ),
           getEntityContext: vi.fn(async () => null),
         },
@@ -310,7 +315,7 @@ describe("Bottle-check context tools", () => {
   test("omits context tools when their adapters are not configured", async () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
-        client: {} as OpenAI,
+        client: testClient,
         model: "test-model",
         maxSearchQueries: 0,
         adapters: {
@@ -344,7 +349,7 @@ describe("Bottle-check context tools", () => {
     ]);
     const prepared = await prepareBottleClassifierAgentRun(
       {
-        client: {} as OpenAI,
+        client: testClient,
         model: "test-model",
         maxSearchQueries: 2,
         adapters: {
@@ -400,7 +405,7 @@ describe("Bottle-check context tools", () => {
     const events: string[] = [];
     const prepared = prepareBottleAuditAgentRun(
       {
-        client: {} as OpenAI,
+        client: testClient,
         model: "test-model",
         maxSearchQueries: 2,
         firecrawlApiKey: "firecrawl-test-key",

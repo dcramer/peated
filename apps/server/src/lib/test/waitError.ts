@@ -20,32 +20,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // https://github.com/trpc/trpc/blob/67c093749590628118cbb68e8de52c15e4a7b126/packages/tests/server/___testHelpers.ts#L148C23-L177
-type Constructor<T extends object = object> = new (...args: any[]) => T;
+import { z } from "zod";
 
-export default async function waitError<TError extends Error = Error>(
+type ErrorConstructor<TError extends Error> = new (...args: never[]) => TError;
+
+export default function waitError<TResult>(
+  fnOrPromise: Promise<TResult> | (() => TResult | Promise<TResult>),
+): Promise<Error>;
+export default function waitError<TResult, TError extends Error>(
+  fnOrPromise: Promise<TResult> | (() => TResult | Promise<TResult>),
+  errorConstructor: ErrorConstructor<TError>,
+): Promise<TError>;
+export default async function waitError<TResult>(
   /**
    * Function callback or promise that you expect will throw
    */
-  fnOrPromise: Promise<unknown> | (() => unknown),
+  fnOrPromise: Promise<TResult> | (() => TResult | Promise<TResult>),
   /**
    * Force error constructor to be of specific type
    * @default Error
    **/
-  errorConstructor?: Constructor<TError>,
-): Promise<TError> {
+  errorConstructor?: ErrorConstructor<Error>,
+): Promise<Error> {
   let res;
   try {
-    if (typeof fnOrPromise === "function") {
-      res = await fnOrPromise();
+    const callback = z
+      .custom<
+        () => TResult | Promise<TResult>
+      >((value) => value instanceof Function)
+      .safeParse(fnOrPromise);
+    if (callback.success) {
+      res = await callback.data();
     } else {
       res = await fnOrPromise;
     }
   } catch (cause) {
-    expect(cause).toBeInstanceOf(Error);
-    if (errorConstructor) {
-      expect((cause as Error).name).toBe(errorConstructor.name);
+    if (!(cause instanceof Error)) {
+      throw new Error("Expected an Error to be thrown.", { cause });
     }
-    return cause as TError;
+    const causeName = cause.name;
+    if (errorConstructor && !(cause instanceof errorConstructor)) {
+      throw new Error(
+        `Expected ${errorConstructor.name}, but received ${causeName}.`,
+        { cause },
+      );
+    }
+    return cause;
   }
 
   // eslint-disable-next-line no-console

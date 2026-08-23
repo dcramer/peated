@@ -11,11 +11,11 @@ export type JobQueueName = "default" | "scrapers";
  * Keeps queue failure semantics and telemetry aligned: handler errors escape to
  * BullMQ, while a Sentry flush is attempted after successful and failed runs.
  */
-function instrumentedJob(
+function instrumentedJob<TResult>(
   jobName: string,
-  jobFn: JobFunction,
+  jobFn: JobFunction<TResult>,
   queueName: JobQueueName,
-) {
+): JobFunction {
   const wrappedJob: JobFunction = async function wrappedJob(
     params,
     context = {},
@@ -114,9 +114,9 @@ class Registry {
   private jobs: Record<string, { fn: JobFunction; queueName: JobQueueName }> =
     {};
 
-  add(
+  add<TResult>(
     name: string,
-    fn: JobFunction,
+    fn: JobFunction<TResult>,
     { queueName = "default" }: { queueName?: JobQueueName } = {},
   ) {
     this.jobs[name] = {
@@ -127,7 +127,7 @@ class Registry {
 
   get(name: string) {
     const rv = this.jobs[name];
-    if (typeof rv === "undefined") {
+    if (rv === undefined) {
       throw new Error(`Unknown job: ${name}`);
     }
     return rv.fn;
@@ -135,7 +135,7 @@ class Registry {
 
   getQueueName(name: string) {
     const rv = this.jobs[name];
-    if (typeof rv === "undefined") {
+    if (rv === undefined) {
       throw new Error(`Unknown job: ${name}`);
     }
     return rv.queueName;

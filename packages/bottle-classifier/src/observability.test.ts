@@ -1,19 +1,25 @@
+import type { Span } from "@sentry/core";
 import * as Sentry from "@sentry/core";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import {
   buildAgentSpanContext,
   buildToolSpanContext,
+  type ClassifierSpanContext,
+  type ClassifierSpanStarter,
   startAgentSpan,
   startToolSpan,
 } from "./observability";
 
-vi.mock("@sentry/core", { spy: true });
+function captureSpans(span: Span) {
+  const contexts: ClassifierSpanContext[] = [];
+  const startSpan: ClassifierSpanStarter = async (context, callback) => {
+    contexts.push(context);
+    return await callback(span);
+  };
+  return { contexts, startSpan };
+}
 
 describe("observability span contexts", () => {
-  beforeEach(() => {
-    vi.mocked(Sentry.startSpan).mockClear();
-  });
-
   test("builds agent invocation span metadata with the shared conversation id", () => {
     expect(
       buildAgentSpanContext({
@@ -60,6 +66,9 @@ describe("observability span contexts", () => {
   });
 
   test("wraps agent runs in a Sentry agent invocation span", async () => {
+    const capture = captureSpans(
+      Sentry.startInactiveSpan({ name: "test agent span" }),
+    );
     await expect(
       startAgentSpan({
         name: "Bottle Classifier",
@@ -68,10 +77,11 @@ describe("observability span contexts", () => {
           "bottle_classifier.reference_id": "123",
         },
         callback: async () => "done",
+        startSpan: capture.startSpan,
       }),
     ).resolves.toBe("done");
 
-    expect(Sentry.startSpan).toHaveBeenCalledWith(
+    expect(capture.contexts).toEqual([
       expect.objectContaining({
         op: "gen_ai.invoke_agent",
         name: "invoke_agent Bottle Classifier",
@@ -80,18 +90,13 @@ describe("observability span contexts", () => {
           "bottle_classifier.reference_id": "123",
         }),
       }),
-      expect.any(Function),
-    );
+    ]);
   });
 
   test("records aggregate agent token usage on the invocation span", async () => {
-    const setAttribute = vi.fn();
-    vi.mocked(Sentry.startSpan).mockImplementationOnce(
-      async (_context, callback) =>
-        await callback({ setAttribute } as unknown as Parameters<
-          typeof callback
-        >[0]),
-    );
+    const span = Sentry.startInactiveSpan({ name: "test agent span" });
+    const setAttribute = vi.spyOn(span, "setAttribute");
+    const capture = captureSpans(span);
 
     await startAgentSpan({
       name: "Bottle Classifier",
@@ -107,6 +112,7 @@ describe("observability span contexts", () => {
           },
         },
       }),
+      startSpan: capture.startSpan,
     });
 
     expect(setAttribute).toHaveBeenCalledWith("gen_ai.usage.input_tokens", 100);
@@ -122,13 +128,9 @@ describe("observability span contexts", () => {
   });
 
   test("records tool results on the Sentry tool span", async () => {
-    const setAttribute = vi.fn();
-    vi.mocked(Sentry.startSpan).mockImplementationOnce(
-      async (_context, callback) =>
-        await callback({
-          setAttribute,
-        } as unknown as Parameters<typeof callback>[0]),
-    );
+    const span = Sentry.startInactiveSpan({ name: "test tool span" });
+    const setAttribute = vi.spyOn(span, "setAttribute");
+    const capture = captureSpans(span);
 
     await expect(
       startToolSpan({
@@ -140,6 +142,7 @@ describe("observability span contexts", () => {
         callback: async () => ({
           results: [{ bottleId: 1 }],
         }),
+        startSpan: capture.startSpan,
       }),
     ).resolves.toEqual({
       results: [{ bottleId: 1 }],

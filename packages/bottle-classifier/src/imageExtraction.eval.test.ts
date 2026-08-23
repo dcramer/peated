@@ -3,6 +3,7 @@ import path from "node:path";
 import { expect } from "vitest";
 import { createHarness, describeEval } from "vitest-evals";
 import { toJsonValue, type JsonValue } from "vitest-evals/harness";
+import { z } from "zod";
 import {
   BottleExtractedDetailsSchema,
   type BottleExtractedDetails,
@@ -25,6 +26,21 @@ import {
   type ImageExtractionEvalCase,
 } from "./imageExtraction.eval.fixtures";
 
+const EXTRACTED_IDENTITY_FIELDS: ExtractedIdentityField[] = [
+  "brand",
+  "bottler",
+  "expression",
+  "series",
+  "category",
+  "stated_age",
+  "abv",
+  "release_year",
+  "vintage_year",
+  "cask_strength",
+  "single_cask",
+  "edition",
+];
+
 function imageFileToDataUrl(filename: string) {
   const ext = path.extname(filename).toLowerCase();
   const mimeType =
@@ -37,7 +53,9 @@ function imageFileToDataUrl(filename: string) {
   return `data:${mimeType};base64,${data}`;
 }
 
-function normalizeEvalText(value: unknown): string {
+type ExtractedIdentityValue = BottleExtractedDetails[ExtractedIdentityField];
+
+function normalizeEvalText(value: ExtractedIdentityValue): string {
   return String(value ?? "")
     .toLowerCase()
     .replace(/²/g, "2")
@@ -57,24 +75,30 @@ function getFieldValue(
 function expectFieldValue(
   extractedIdentity: BottleExtractedDetails,
   field: ExtractedIdentityField,
-  expectedValue: unknown,
+  expectedValue: ExtractedIdentityValue,
 ) {
   const actual = getFieldValue(extractedIdentity, field);
+  const expectedNumber = z.number().safeParse(expectedValue);
 
-  if (typeof expectedValue === "number") {
-    expect(actual).toBeTypeOf("number");
-    expect(actual as number).toBeCloseTo(expectedValue, 1);
+  if (expectedNumber.success) {
+    expect(z.number().parse(actual)).toBeCloseTo(expectedNumber.data, 1);
     return;
   }
 
   expect(actual).toEqual(expectedValue);
 }
 
-function expectTextIncludes(actual: unknown, requiredText: string) {
+function expectTextIncludes(
+  actual: ExtractedIdentityValue,
+  requiredText: string,
+) {
   expect(normalizeEvalText(actual)).toContain(normalizeEvalText(requiredText));
 }
 
-function expectTextExcludes(actual: unknown, excludedText: string) {
+function expectTextExcludes(
+  actual: ExtractedIdentityValue,
+  excludedText: string,
+) {
   expect(normalizeEvalText(actual)).not.toContain(
     normalizeEvalText(excludedText),
   );
@@ -84,14 +108,11 @@ function assertExtractionExpectation(
   testCase: ImageExtractionEvalCase,
   extractedIdentity: BottleExtractedDetails,
 ) {
-  for (const [field, expectedValue] of Object.entries(
-    testCase.expected.fields ?? {},
-  )) {
-    expectFieldValue(
-      extractedIdentity,
-      field as ExtractedIdentityField,
-      expectedValue,
-    );
+  for (const field of EXTRACTED_IDENTITY_FIELDS) {
+    const expectedValue = testCase.expected.fields?.[field];
+    if (expectedValue !== undefined) {
+      expectFieldValue(extractedIdentity, field, expectedValue);
+    }
   }
 
   for (const textExpectation of testCase.expected.text ?? []) {

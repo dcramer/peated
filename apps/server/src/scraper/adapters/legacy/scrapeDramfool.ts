@@ -5,6 +5,7 @@ import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { getUrl } from "../../legacy/scraper";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "dramfool";
@@ -13,9 +14,9 @@ const CATALOG_URL = `${STORE_ORIGIN}/shop?format=json`;
 
 const DramfoolCatalogSchema = z
   .object({
-    items: z.array(z.unknown()),
+    items: z.array(z.json()),
   })
-  .passthrough();
+  .catchall(z.json());
 
 const DramfoolProductSchema = z
   .object({
@@ -24,16 +25,16 @@ const DramfoolProductSchema = z
     fullUrl: z.string().trim().min(1),
     assetUrl: z.string().nullish(),
     productType: z.number().int(),
-    variants: z.array(z.unknown()),
+    variants: z.array(z.json()),
   })
-  .passthrough();
+  .catchall(z.json());
 
 const MoneySchema = z
   .object({
     currency: z.string(),
     value: z.string(),
   })
-  .passthrough();
+  .catchall(z.json());
 
 const DramfoolVariantSchema = z
   .object({
@@ -46,11 +47,11 @@ const DramfoolVariantSchema = z
     unlimited: z.boolean(),
     qtyInStock: z.number(),
   })
-  .passthrough();
+  .catchall(z.json());
 
-function getRawName(input: unknown): string | null {
-  if (!input || typeof input !== "object" || !("title" in input)) return null;
-  return typeof input.title === "string" ? input.title : null;
+function getRawName(input: JsonValue): string | null {
+  const parsed = z.object({ title: z.string() }).safeParse(input);
+  return parsed.success ? parsed.data.title : null;
 }
 
 function parsePrice(value: string): number | null {
@@ -96,7 +97,7 @@ function getImageUrl(value: string | null | undefined): string | null {
   return z.string().url().safeParse(value).success ? value : null;
 }
 
-export function parseDramfoolProducts(input: unknown): StorePrice[] {
+export function parseDramfoolProducts(input: JsonValue): StorePrice[] {
   const payload = DramfoolCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 
@@ -170,11 +171,7 @@ export function parseDramfoolProducts(input: unknown): StorePrice[] {
       const { name } = normalizeBottle({ name: rawName });
       const externalProductId = variant.id ?? product.id;
       const barcode = GtinSchema.safeParse(variant.barcode);
-      const listing = {
-        ...(externalProductId
-          ? { externalProductId: String(externalProductId) }
-          : {}),
-        ...(barcode.success ? { barcode: barcode.data } : {}),
+      const listing: StorePrice = {
         name,
         price,
         currency: "gbp" as const,
@@ -182,6 +179,10 @@ export function parseDramfoolProducts(input: unknown): StorePrice[] {
         url: productUrl,
         imageUrl,
       };
+      if (externalProductId) {
+        listing.externalProductId = String(externalProductId);
+      }
+      if (barcode.success) listing.barcode = barcode.data;
 
       logScrapedProduct(SITE, listing);
       products.push(listing);

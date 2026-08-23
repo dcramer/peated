@@ -20,9 +20,20 @@ import { mergeCreateBottleInitialData } from "./createBottleInitialData";
 
 type ReturnAction = "addBottle" | "library" | "tasting" | "view";
 
-function getNameChoice(value: string | null, id?: number | null) {
+interface NameChoice {
+  id?: number;
+  name: string;
+}
+
+function getNameChoice(
+  value: string | null,
+  id?: number | null,
+): NameChoice | undefined {
   const name = value?.trim();
-  return name ? { ...(id ? { id } : {}), name } : undefined;
+  if (!name) return undefined;
+  const choice: NameChoice = { name };
+  if (id) choice.id = id;
+  return choice;
 }
 
 function getReturnAction(value: string | null): ReturnAction | null {
@@ -100,33 +111,34 @@ function CreateBottleForm() {
   );
   const [loading, setLoading] = useState<boolean>(needsToLoad);
 
-  const [initialData, setInitialData] = useState<BottleFormInitialData>({
-    name,
-    ...(pendingImageUrl ? { imageUrl: pendingImageUrl } : {}),
-    ...(brandName ? { brand: brandName } : {}),
-    ...(prefill.distillers?.length
-      ? { distillers: prefill.distillers }
-      : distillerName
-        ? { distillers: [distillerName] }
-        : {}),
-    ...(bottlerName ? { bottler: bottlerName } : {}),
-    ...(seriesName ? { series: seriesName } : {}),
-    ...(category ? { category } : {}),
-    ...(statedAge !== null ? { statedAge } : {}),
-    ...(abv !== null ? { abv } : {}),
-    ...(edition ? { edition } : {}),
-    ...(vintageYear !== null ? { vintageYear } : {}),
-    ...(releaseYear !== null ? { releaseYear } : {}),
-    ...(prefill.caskStrength !== null && prefill.caskStrength !== undefined
-      ? { caskStrength: prefill.caskStrength }
-      : {}),
-    ...(prefill.singleCask !== null && prefill.singleCask !== undefined
-      ? { singleCask: prefill.singleCask }
-      : {}),
-    ...(prefill.caskType ? { caskType: prefill.caskType } : {}),
-    ...(prefill.caskSize ? { caskSize: prefill.caskSize } : {}),
-    ...(prefill.caskFill ? { caskFill: prefill.caskFill } : {}),
-  });
+  const initialFormData: BottleFormInitialData = { name };
+  if (pendingImageUrl) initialFormData.imageUrl = pendingImageUrl;
+  if (brandName) initialFormData.brand = brandName;
+  if (prefill.distillers?.length) {
+    initialFormData.distillers = prefill.distillers;
+  } else if (distillerName) {
+    initialFormData.distillers = [distillerName];
+  }
+  if (bottlerName) initialFormData.bottler = bottlerName;
+  if (seriesName) initialFormData.series = seriesName;
+  if (category) initialFormData.category = category;
+  if (statedAge !== null) initialFormData.statedAge = statedAge;
+  if (abv !== null) initialFormData.abv = abv;
+  if (edition) initialFormData.edition = edition;
+  if (vintageYear !== null) initialFormData.vintageYear = vintageYear;
+  if (releaseYear !== null) initialFormData.releaseYear = releaseYear;
+  if (prefill.caskStrength !== null && prefill.caskStrength !== undefined) {
+    initialFormData.caskStrength = prefill.caskStrength;
+  }
+  if (prefill.singleCask !== null && prefill.singleCask !== undefined) {
+    initialFormData.singleCask = prefill.singleCask;
+  }
+  if (prefill.caskType) initialFormData.caskType = prefill.caskType;
+  if (prefill.caskSize) initialFormData.caskSize = prefill.caskSize;
+  if (prefill.caskFill) initialFormData.caskFill = prefill.caskFill;
+
+  const [initialData, setInitialData] =
+    useState<BottleFormInitialData>(initialFormData);
 
   const distillerQuery = useQuery({
     ...orpc.entities.details.queryOptions({

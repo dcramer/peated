@@ -1,6 +1,11 @@
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 describe("GET /bottle-groups/:group/bottles", () => {
   test("lists independently complete exact Bottles with search, sort, and pagination", async ({
     fixtures,
@@ -11,26 +16,27 @@ describe("GET /bottle-groups/:group/bottles", () => {
       releaseYear: 2020,
       abv: 46,
     });
+    const groupId = requireGroupId(first.groupId);
     const second = await fixtures.BottleGroupMember({
-      groupId: first.groupId as number,
+      groupId,
       edition: "Batch Azure",
       releaseYear: 2025,
       abv: 52.4,
     });
 
     const firstPage = await routerClient.bottleGroups.bottles({
-      group: first.groupId as number,
+      group: groupId,
       limit: 1,
       sort: "-releaseYear",
     });
     const secondPage = await routerClient.bottleGroups.bottles({
-      group: first.groupId as number,
+      group: groupId,
       cursor: 2,
       limit: 1,
       sort: "-releaseYear",
     });
     const search = await routerClient.bottleGroups.bottles({
-      group: first.groupId as number,
+      group: groupId,
       query: "Azure",
       sort: "name",
     });

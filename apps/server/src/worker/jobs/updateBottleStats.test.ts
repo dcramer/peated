@@ -5,7 +5,7 @@ import {
   bottleGroups,
   bottles,
 } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { eq } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
 import updateBottleStats from "./updateBottleStats";

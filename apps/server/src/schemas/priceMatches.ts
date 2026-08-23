@@ -100,7 +100,7 @@ export const PriceMatchEvidenceCheckSchema = z.object({
 });
 export const BottleEvidenceCheckSchema = PriceMatchEvidenceCheckSchema;
 
-export const StorePriceMatchAutomationAssessmentSchema = z.object({
+export const StorePriceMatchAutomationAssessmentFields = {
   modelConfidence: z.number().nullable(),
   automationScore: z.number().nullable(),
   automationEligible: z.boolean().default(false),
@@ -110,7 +110,15 @@ export const StorePriceMatchAutomationAssessmentSchema = z.object({
   plainAgeBottleAutoVerifyEligible: z.boolean().default(false),
   differentiatingAttributes: z.array(PriceMatchAttributeEnum).default([]),
   webEvidenceChecks: z.array(PriceMatchEvidenceCheckSchema).default([]),
-});
+} as const;
+
+export const StorePriceMatchAutomationAssessmentSchema = z.object(
+  StorePriceMatchAutomationAssessmentFields,
+);
+
+export type StorePriceMatchAutomationAssessment = z.infer<
+  typeof StorePriceMatchAutomationAssessmentSchema
+>;
 
 export const StorePriceMatchProposalStatusEnum = z.enum([
   "verified",
@@ -216,23 +224,20 @@ export const StorePriceMatchProposalSchema = z.object({
   status: StorePriceMatchProposalStatusEnum,
   proposalType: StorePriceMatchProposalTypeEnum,
   confidence: z.number().nullable(),
-  modelConfidence:
-    StorePriceMatchAutomationAssessmentSchema.shape.modelConfidence,
-  automationScore:
-    StorePriceMatchAutomationAssessmentSchema.shape.automationScore,
+  modelConfidence: StorePriceMatchAutomationAssessmentFields.modelConfidence,
+  automationScore: StorePriceMatchAutomationAssessmentFields.automationScore,
   automationEligible:
-    StorePriceMatchAutomationAssessmentSchema.shape.automationEligible,
+    StorePriceMatchAutomationAssessmentFields.automationEligible,
   automationBlockers:
-    StorePriceMatchAutomationAssessmentSchema.shape.automationBlockers,
+    StorePriceMatchAutomationAssessmentFields.automationBlockers,
   decisiveMatchAttributes:
-    StorePriceMatchAutomationAssessmentSchema.shape.decisiveMatchAttributes,
+    StorePriceMatchAutomationAssessmentFields.decisiveMatchAttributes,
   plainAgeBottleAutoVerifyEligible:
-    StorePriceMatchAutomationAssessmentSchema.shape
-      .plainAgeBottleAutoVerifyEligible,
+    StorePriceMatchAutomationAssessmentFields.plainAgeBottleAutoVerifyEligible,
   differentiatingAttributes:
-    StorePriceMatchAutomationAssessmentSchema.shape.differentiatingAttributes,
+    StorePriceMatchAutomationAssessmentFields.differentiatingAttributes,
   webEvidenceChecks:
-    StorePriceMatchAutomationAssessmentSchema.shape.webEvidenceChecks,
+    StorePriceMatchAutomationAssessmentFields.webEvidenceChecks,
   candidateBottles: z.array(PriceMatchCandidateSchema),
   extractedLabel: ExtractedBottleDetailsSchema.nullable(),
   proposedBottle: ProposedBottleSchema.nullable(),

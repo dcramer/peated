@@ -81,11 +81,13 @@ const loadDefaultEntities = async () => {
       type: ["brand", "bottler"],
       shortName: "SMWS",
     },
-    ...Fixtures.distilleryNames.map((name) => ({
-      name,
-      type: ["brand", "distiller"] as EntityType[],
-      shortName: null,
-    })),
+    ...Fixtures.distilleryNames.map(
+      (name): Pick<Entity, "name" | "type" | "shortName"> => ({
+        name,
+        type: ["brand", "distiller"],
+        shortName: null,
+      }),
+    ),
   ];
 
   const majorCountries = await db.query.countries.findMany({

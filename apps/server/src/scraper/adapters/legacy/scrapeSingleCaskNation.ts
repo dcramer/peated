@@ -11,6 +11,7 @@ import {
   ShopifyImageSchema,
   ShopifyProductSchema,
 } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct } from "./scrapeLogging";
 
 const SITE = "singlecasknation";
@@ -35,7 +36,7 @@ const SingleCaskNationProductsSchema = ShopifyCatalogSchema.extend({
 });
 
 export function parseSingleCaskNationProducts(
-  input: unknown,
+  input: JsonValue,
   sourceUrl: string,
 ): StorePrice[] {
   const payload = SingleCaskNationProductsSchema.parse(input);

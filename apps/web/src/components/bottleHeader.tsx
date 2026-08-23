@@ -9,19 +9,27 @@ import {
   getBottleIdentitySeriesName,
   getBottleMetadataExclusions,
   getDistinctBottleDistillers,
+  type BottleIdentitySource,
 } from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
+import type { ElementType } from "react";
 import { Distillers } from "./bottleMetadata";
 import PageHeader from "./pageHeader";
+
+export type BottleHeaderBottle = BottleIdentitySource & {
+  distillers: Array<Pick<Bottle["distillers"][number], "id" | "name">>;
+};
 
 export default function BottleHeader({
   bottle,
   href,
   compact,
+  icon = BottleIcon,
 }: {
-  bottle: Bottle;
+  bottle: BottleHeaderBottle;
   href?: string;
   compact?: boolean;
+  icon?: ElementType;
 }) {
   const label = getAbsoluteBottleLabel(bottle);
   const expressionName = getAbsoluteBottleTitle(bottle);
@@ -44,7 +52,7 @@ export default function BottleHeader({
 
   return (
     <PageHeader
-      icon={BottleIcon}
+      icon={icon}
       compact={compact}
       title={
         <div className="flex flex-wrap items-center gap-2">

@@ -26,18 +26,15 @@ BigInt.prototype.toJSON = function (): string {
 };
 
 function createPool(): NodePgPool {
-  return new Pool({
-    ...getPostgresConnectionConfig(),
+  const poolConfig = getPostgresConnectionConfig();
+  if (config.ENV === "test") {
     // Vitest can re-evaluate modules across suites. Reusing one low-concurrency
     // pool in test mode avoids exhausting local Postgres clients.
-    ...(config.ENV === "test"
-      ? {
-          application_name: TEST_DB_APPLICATION_NAME,
-          max: 1,
-          idleTimeoutMillis: 0,
-        }
-      : {}),
-  });
+    poolConfig.application_name = TEST_DB_APPLICATION_NAME;
+    poolConfig.max = 1;
+    poolConfig.idleTimeoutMillis = 0;
+  }
+  return new Pool(poolConfig);
 }
 
 export const pool = globalThis.__peatedPgPool ?? createPool();

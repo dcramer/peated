@@ -1,12 +1,12 @@
 const TASTING_IMAGE_UPLOAD_TIMEOUT_MS = 90_000;
 
-export async function uploadTastingImageAfterSave({
+export async function uploadTastingImageAfterSave<TResult>({
   prepare,
   upload,
   timeoutMs = TASTING_IMAGE_UPLOAD_TIMEOUT_MS,
 }: {
   prepare: () => Promise<Blob>;
-  upload: (file: Blob) => Promise<unknown>;
+  upload: (file: Blob) => Promise<TResult>;
   timeoutMs?: number;
 }): Promise<void> {
   let timeout: ReturnType<typeof setTimeout> | undefined;

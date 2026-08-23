@@ -12,6 +12,28 @@ const ResponseSchema = z.object({
   rawLabelText: z.string().trim().min(1).max(4000).nullable().default(null),
 });
 
+interface WhiskyLabelProviderResponse {
+  id: string;
+  model: string;
+  output_text: string;
+  service_tier?: string | null;
+  usage?: {
+    input_tokens: number;
+    input_tokens_details: { cached_tokens: number };
+    output_tokens: number;
+    output_tokens_details: { reasoning_tokens: number };
+    total_tokens: number;
+  } | null;
+}
+
+export interface WhiskyLabelClient {
+  responses: {
+    create(
+      input: Parameters<OpenAI["responses"]["create"]>[0],
+    ): PromiseLike<WhiskyLabelProviderResponse>;
+  };
+}
+
 export type WhiskyLabelExtractionMetadata = {
   durationMs: number;
   response: {
@@ -39,7 +61,7 @@ export function createWhiskyLabelExtractor({
   imageReasoningEffort = reasoningEffort,
   onImageExtractionMetadata,
 }: {
-  client: OpenAI;
+  client: WhiskyLabelClient;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageModel?: string;
@@ -80,7 +102,7 @@ export async function extractFromImage({
   imageUrlOrBase64,
   onMetadata,
 }: {
-  client: OpenAI;
+  client: WhiskyLabelClient;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageUrlOrBase64: string;
@@ -104,7 +126,7 @@ export async function extractFromImageWithMetadata({
   imageUrlOrBase64,
   onMetadata,
 }: {
-  client: OpenAI;
+  client: WhiskyLabelClient;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageUrlOrBase64: string;
@@ -172,7 +194,7 @@ export async function extractFromText({
   reasoningEffort,
   label,
 }: {
-  client: OpenAI;
+  client: WhiskyLabelClient;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   label: string;

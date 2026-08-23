@@ -1,4 +1,14 @@
-import type * as BottleClassifierModule from "@peated/server/agents/bottleClassifier";
+import type { BottleContext, EntityContext } from "@peated/bottle-classifier";
+import {
+  BottleClassificationError,
+  BottleClassificationResultSchema,
+  type BottleCandidate,
+  type BottleClassificationDecision,
+  type BottleExtractedDetails,
+  type BottleObservation,
+  type BottleSearchEvidence,
+  type EntityResolution,
+} from "@peated/server/agents/bottleClassifier";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
@@ -20,11 +30,12 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import {
-  findBottleReferenceCandidates,
+  createBottleCandidateLookup,
   getBottleCandidateById,
-  searchBottleCandidates,
+  type BottleCandidateQueryRunner,
+  type BottleEmbeddingCreator,
 } from "@peated/server/lib/bottleReferenceCandidates";
-import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
+import { finalizeCreatedBottle } from "@peated/server/lib/createBottle";
 import { buildBottleCreateInput } from "@peated/server/lib/flatBottleInput";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
@@ -32,19 +43,48 @@ import {
   applyStorePriceBottleRepairFromProposal,
   canClearIgnoredStorePriceAssignment,
   createBottleFromStorePriceMatchProposal,
+  createStorePriceMatchResolver,
   ignoreStorePriceMatchProposal,
-  resolveStorePriceMatchProposal,
   StorePriceMatchProposalIdentityChangedError,
   upsertStorePriceMatchProposal,
+  type CreatedBottleFinalizer,
+  type StorePriceReferenceRunner,
 } from "@peated/server/lib/priceMatching";
 import type * as Fixtures from "@peated/server/lib/test/fixtures";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, sql } from "drizzle-orm";
 import pg from "pg";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { z } from "zod";
 
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
+
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
+const classifyBottleReference =
+  vi.fn<
+    (
+      input: Parameters<StorePriceReferenceRunner>[0],
+    ) => Promise<Awaited<ReturnType<StorePriceReferenceRunner>>["result"]>
+  >();
+const runScrapedBottleReference = vi.fn<StorePriceReferenceRunner>();
+const finalizeBottle = vi.fn<CreatedBottleFinalizer>();
+const resolveStorePriceMatchProposal = createStorePriceMatchResolver({
+  runReference: runScrapedBottleReference,
+  finalizeBottle,
+});
+const getOpenAIEmbedding = vi.fn<BottleEmbeddingCreator>();
+const { findBottleReferenceCandidates, searchBottleCandidates } =
+  createBottleCandidateLookup(getOpenAIEmbedding);
+
+function createCandidateSearch(runQuery: BottleCandidateQueryRunner) {
+  return createBottleCandidateLookup(getOpenAIEmbedding, runQuery)
+    .searchBottleCandidates;
+}
 
 async function waitForSessionBlockedBy(
   observer: NodePgClient,
@@ -67,81 +107,9 @@ async function waitForSessionBlockedBy(
   throw new Error("Timed out waiting for ignored StorePrice identity lock.");
 }
 
-const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
-const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@peated/server/agents/whisky/labelExtractor", () => ({
-  extractFromImage: vi.fn(),
-  extractFromText: vi.fn(),
-}));
-
-vi.mock("@peated/server/agents/bottleClassifier", async (importOriginal) => {
-  const actual = await importOriginal<typeof BottleClassifierModule>();
-  return {
-    ...actual,
-    classifyBottleReference: vi.fn(),
-    runBottleReference: vi.fn(),
-    isIgnoredBottleClassification: (classification: { status: string }) =>
-      classification.status === "ignored",
-    BottleClassificationError: class BottleClassificationError extends Error {
-      artifacts: {
-        searchEvidence: unknown[];
-        candidates: unknown[];
-        extractedIdentity: unknown | null;
-      };
-
-      constructor(
-        message: string,
-        artifacts: {
-          searchEvidence?: unknown[];
-          candidates?: unknown[];
-          extractedIdentity?: unknown | null;
-        } = {},
-      ) {
-        super(message);
-        this.name = "BottleClassificationError";
-        this.artifacts = {
-          searchEvidence: artifacts.searchEvidence ?? [],
-          candidates: artifacts.candidates ?? [],
-          extractedIdentity: artifacts.extractedIdentity ?? null,
-        };
-      }
-    },
-  };
-});
-
-vi.mock(
-  "@peated/server/agents/bottleClassifier/scrapedBottleReference",
-  () => ({
-    runScrapedBottleReference: vi.fn(),
-  }),
-);
-
-vi.mock("@peated/server/lib/openaiEmbeddings", async () => {
-  const actual = await vi.importActual("@peated/server/lib/openaiEmbeddings");
-  return {
-    ...actual,
-    getOpenAIEmbedding: vi.fn(),
-  };
-});
-
-vi.mock("@peated/server/lib/catalogVerification", async () => {
-  const actual = await vi.importActual<typeof CatalogVerificationModule>(
-    "@peated/server/lib/catalogVerification",
-  );
-  return {
-    ...actual,
-    queueBottleCreationVerification: queueBottleCreationVerificationMock,
-    queueEntityCreationVerification: queueEntityCreationVerificationMock,
-  };
-});
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
-  pushUniqueJob: vi.fn(),
-}));
-
-const supportiveWebEvidenceConfidenceBasis = {
+const supportiveWebEvidenceConfidenceBasis: NonNullable<
+  BottleClassificationDecision["confidenceBasis"]
+> = {
   unresolvedRisks: [],
   webEvidence: "supportive",
 };
@@ -150,31 +118,82 @@ const supportiveWebEvidenceConfidenceBasis = {
 // confidence score. Supportive web evidence (with no unresolved risks) is the
 // anchor that auto-verifies an unmatched existing bottle match; it replaces the
 // retired `band: "auto_verification"` signal.
-const autoVerificationConfidenceBasis = {
+const autoVerificationConfidenceBasis: NonNullable<
+  BottleClassificationDecision["confidenceBasis"]
+> = {
   unresolvedRisks: [],
   webEvidence: "supportive",
 };
 
+type ProposedBottleFixture = Partial<
+  NonNullable<
+    Extract<
+      BottleClassificationDecision,
+      { action: "create_bottle" }
+    >["proposedBottle"]
+  >
+> &
+  Pick<
+    NonNullable<
+      Extract<
+        BottleClassificationDecision,
+        { action: "create_bottle" }
+      >["proposedBottle"]
+    >,
+    "brand" | "distillers" | "name"
+  >;
+
+type MockBottleClassifierDecision = {
+  action:
+    | "correction"
+    | "create_bottle"
+    | "create_new"
+    | "match"
+    | "match_existing"
+    | "no_match";
+  aliasScope?: BottleClassificationDecision["aliasScope"];
+  candidateBottleIds?: number[];
+  confidence?: number | null;
+  confidenceBasis?: BottleClassificationDecision["confidenceBasis"];
+  identityScope?: BottleClassificationDecision["identityScope"];
+  matchedBottleId?: number | null;
+  observation?: BottleObservation | null;
+  proposedBottle?: ProposedBottleFixture | null;
+  rationale?: string | null;
+  suggestedBottleId?: number | null;
+};
+
+type MockBottleCandidate = Partial<BottleCandidate> &
+  Pick<BottleCandidate, "bottleId" | "fullName">;
+type MockEntityResolution = Partial<EntityResolution> &
+  Pick<EntityResolution, "entityId" | "name">;
+type MockBottleSearchEvidence = Partial<BottleSearchEvidence> &
+  Pick<BottleSearchEvidence, "query">;
+
+type MockBottleReferenceClassification = {
+  bottleContexts?: BottleContext[];
+  candidateBottles?: MockBottleCandidate[];
+  decision?: MockBottleClassifierDecision | null;
+  entityContexts?: EntityContext[];
+  extractedLabel?: Partial<BottleExtractedDetails> | null;
+  ignored?: boolean;
+  ignoreReason?: string;
+  resolvedEntities?: MockEntityResolution[];
+  searchEvidence?: MockBottleSearchEvidence[];
+  status?: "classified" | "ignored";
+};
+
 function buildMockBottleReferenceClassification(
-  overrides: Record<string, unknown>,
+  overrides: MockBottleReferenceClassification,
 ) {
   const status =
     overrides.status === "ignored" || overrides.ignored === true
       ? "ignored"
       : "classified";
-  const rawDecision =
-    overrides.decision && typeof overrides.decision === "object"
-      ? (overrides.decision as {
-          action?: string;
-          confidence?: number | null;
-        })
-      : null;
-  const decision =
-    rawDecision && typeof rawDecision.action === "string"
-      ? normalizeMockBottleClassifierDecision(
-          rawDecision as Record<string, any>,
-        )
-      : rawDecision;
+  const rawDecision = overrides.decision ?? null;
+  const decision = rawDecision
+    ? normalizeMockBottleClassifierDecision(rawDecision)
+    : null;
   const {
     decision: _decision,
     extractedLabel,
@@ -187,15 +206,15 @@ function buildMockBottleReferenceClassification(
     ignoreReason,
     ...restOverrides
   } = overrides;
+  const parsedIgnoreReason = z.string().min(1).safeParse(ignoreReason);
 
-  return {
+  return BottleClassificationResultSchema.parse({
     status,
     ...(status === "ignored"
       ? {
-          reason:
-            typeof ignoreReason === "string" && ignoreReason.length > 0
-              ? ignoreReason
-              : "ignored",
+          reason: parsedIgnoreReason.success
+            ? parsedIgnoreReason.data
+            : "ignored",
         }
       : {
           decision,
@@ -209,7 +228,7 @@ function buildMockBottleReferenceClassification(
       entityContexts: Array.isArray(entityContexts) ? entityContexts : [],
     },
     ...restOverrides,
-  } as any;
+  });
 }
 
 async function inspectedBottleContext(bottleId: number) {
@@ -224,21 +243,26 @@ async function countBottles() {
   return rows.length;
 }
 
-function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
+function normalizeMockBottleClassifierDecision(
+  decision: MockBottleClassifierDecision,
+) {
   const action =
     decision.action === "match_existing" || decision.action === "correction"
       ? "match"
       : decision.action === "create_new"
         ? "create_bottle"
         : decision.action;
-  const base = {
+  const commonDecision = {
     rationale: decision.rationale ?? null,
     candidateBottleIds: decision.candidateBottleIds ?? [],
     identityScope: decision.identityScope ?? "product",
-    aliasScope: decision.aliasScope,
     observation: decision.observation ?? null,
     confidenceBasis: decision.confidenceBasis ?? null,
   };
+  const base =
+    decision.aliasScope === undefined
+      ? commonDecision
+      : { ...commonDecision, aliasScope: decision.aliasScope };
 
   if (action === "match") {
     return {
@@ -275,16 +299,11 @@ describe("priceMatching", () => {
 
   beforeEach(async () => {
     vi.resetAllMocks();
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    const { runScrapedBottleReference } =
-      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
-    vi.mocked(runScrapedBottleReference).mockImplementation(
-      async (...args) => ({
-        result: await vi.mocked(classifyBottleReference)(...args),
-        modelMetadata: null,
-      }),
-    );
+    runScrapedBottleReference.mockImplementation(async (input) => ({
+      result: await classifyBottleReference(input),
+      modelMetadata: null,
+    }));
+    finalizeBottle.mockImplementation(finalizeCreatedBottle);
     config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   });
 
@@ -315,8 +334,6 @@ describe("priceMatching", () => {
       name: "Generic Retailer Listing",
       volume: 750,
     });
-    const { runScrapedBottleReference } =
-      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
@@ -356,9 +373,7 @@ describe("priceMatching", () => {
       name: "Unresolved Retailer Listing",
       volume: 750,
     });
-    const { runScrapedBottleReference } =
-      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
-    vi.mocked(runScrapedBottleReference).mockResolvedValueOnce({
+    runScrapedBottleReference.mockResolvedValueOnce({
       result: buildMockBottleReferenceClassification({
         decision: {
           action: "no_match",
@@ -380,7 +395,7 @@ describe("priceMatching", () => {
       volume: 750,
       createdByActorId: actor.id,
     });
-    vi.mocked(runScrapedBottleReference).mockClear();
+    runScrapedBottleReference.mockClear();
 
     const approved = await resolveStorePriceMatchProposal(price.id, {
       force: true,
@@ -399,10 +414,6 @@ describe("priceMatching", () => {
   test("passes normalized source identity to the classifier", async ({
     fixtures,
   }) => {
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    const { runScrapedBottleReference } =
-      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
     const sourceIdentity = {
       brand: "The Gauldrons",
       bottler: null,
@@ -427,7 +438,7 @@ describe("priceMatching", () => {
       imageUrl: "/media/the-gauldrons-eclipse.png",
       sourceBottleIdentity: sourceIdentity,
     });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "no_match",
@@ -457,8 +468,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const sourceIdentity = {
       brand: "The Gauldrons",
       bottler: null,
@@ -483,7 +492,7 @@ describe("priceMatching", () => {
       imageUrl: null,
       sourceBottleIdentity: sourceIdentity,
     });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -548,11 +557,7 @@ describe("priceMatching", () => {
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = "test-gateway-key";
-    const { getOpenAIEmbedding } =
-      await import("@peated/server/lib/openaiEmbeddings");
-    vi.mocked(getOpenAIEmbedding).mockRejectedValue(
-      new Error("Embeddings unavailable"),
-    );
+    getOpenAIEmbedding.mockRejectedValue(new Error("Embeddings unavailable"));
 
     const bottle = await fixtures.Bottle();
     await fixtures.BottleAlias({
@@ -1294,24 +1299,21 @@ describe("priceMatching", () => {
   test("normalizes string bottle ids returned from raw candidate queries", async () => {
     config.AI_GATEWAY_API_KEY = "test-gateway-key";
 
-    const { getOpenAIEmbedding } =
-      await import("@peated/server/lib/openaiEmbeddings");
-    vi.mocked(getOpenAIEmbedding).mockResolvedValue([0.1, 0.2, 0.3]);
+    getOpenAIEmbedding.mockResolvedValue([0.1, 0.2, 0.3]);
 
-    const executeSpy = vi.spyOn(db, "execute") as any;
-    executeSpy.mockImplementation(async () => ({
-      rows: [
-        {
-          bottleId: "123",
-          alias: "Synthetic Candidate",
-          fullName: "Synthetic Candidate",
-          brand: "Synthetic Brand",
-          score: "0.91",
-        },
-      ],
-    }));
+    const runQuery = vi.fn<BottleCandidateQueryRunner>();
+    runQuery.mockResolvedValue([
+      {
+        bottleId: "123",
+        alias: "Synthetic Candidate",
+        fullName: "Synthetic Candidate",
+        brand: "Synthetic Brand",
+        score: "0.91",
+      },
+    ]);
+    const searchCandidates = createCandidateSearch(runQuery);
 
-    const candidates = await searchBottleCandidates({
+    const candidates = await searchCandidates({
       query: "Synthetic Candidate",
       brand: null,
       expression: null,
@@ -1343,10 +1345,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -1354,25 +1352,7 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Confidence Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Confidence Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -1427,10 +1407,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const tomatin = await fixtures.Entity({
       name: "Tomatin",
       type: ["brand", "distiller"],
@@ -1463,25 +1439,7 @@ describe("priceMatching", () => {
       url: "https://www.totalwine.com/example",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Tomatin",
-      bottler: null,
-      expression: null,
-      series: null,
-      distillery: ["Tomatin"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -1607,10 +1565,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Example Distillery",
       type: ["brand", "distiller"],
@@ -1631,25 +1585,7 @@ describe("priceMatching", () => {
       url: "https://totalwine.com/example",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Example Distillery",
-      bottler: null,
-      expression: "Port Cask",
-      series: null,
-      distillery: ["Example Distillery"],
-      category: "single_malt",
-      stated_age: 10,
-      abv: 58.4,
-      release_year: null,
-      vintage_year: null,
-      cask_type: "tawny_port",
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -1730,10 +1666,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -1741,25 +1673,7 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Confidence Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Confidence Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -1843,8 +1757,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle({
       name: "Cold Brew",
       fullName: "Jameson Cold Brew",
@@ -1857,7 +1769,7 @@ describe("priceMatching", () => {
       url: "https://woodencork.com/collections/whiskey/products/jameson-cold-brew?utm=peated",
     });
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: null,
         decision: {
@@ -1919,10 +1831,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Wild Turkey",
       type: ["brand", "distiller"],
@@ -1941,25 +1849,7 @@ describe("priceMatching", () => {
       url: "https://shop.example/wild-turkey-rare-breed-rye",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Wild Turkey",
-      bottler: null,
-      expression: "Rare Breed",
-      series: null,
-      distillery: ["Wild Turkey"],
-      category: "rye",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "no_match",
@@ -2032,10 +1922,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Wild Turkey",
       type: ["brand", "distiller"],
@@ -2054,25 +1940,7 @@ describe("priceMatching", () => {
       url: "https://shop.example/wild-turkey-rare-breed-rye",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Wild Turkey",
-      bottler: null,
-      expression: "Rare Breed",
-      series: null,
-      distillery: ["Wild Turkey"],
-      category: "rye",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -2159,10 +2027,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Glenlivet",
       type: ["brand", "distiller"],
@@ -2179,25 +2043,7 @@ describe("priceMatching", () => {
       url: "https://www.reservebar.com/products/the-glenlivet-caribbean-reserve/GROUPING-1419170.html",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "The Glenlivet",
-      bottler: null,
-      expression: "Caribbean Reserve",
-      series: null,
-      distillery: ["The Glenlivet"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "The Glenlivet",
@@ -2302,10 +2148,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Example Heritage",
       type: ["brand"],
@@ -2325,25 +2167,7 @@ describe("priceMatching", () => {
       url: "https://example.com/table-whiskey",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Example Heritage",
-      bottler: null,
-      expression: "Table Whiskey",
-      series: null,
-      distillery: [],
-      category: null,
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "Example Heritage",
@@ -2439,10 +2263,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -2451,25 +2271,7 @@ describe("priceMatching", () => {
       url: "https://shop.example/ardbeg-uigeadail",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Ardbeg",
-      bottler: null,
-      expression: "Uigeadail",
-      series: null,
-      distillery: ["Ardbeg"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -2520,35 +2322,13 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Local Only Create Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Local Only Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Local Only Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -2601,10 +2381,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "The Whistler",
       type: ["brand", "bottler"],
@@ -2622,25 +2398,7 @@ describe("priceMatching", () => {
       url: "https://shop.example/the-whistler-bodega-cask",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "The Whistler",
-      bottler: null,
-      expression: "Bodega Cask",
-      series: null,
-      distillery: ["Boann Distillery"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_bottle",
@@ -2776,10 +2534,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const correctBrand = await fixtures.Entity({
       type: ["brand"],
       name: "The Whistler",
@@ -2802,25 +2556,7 @@ describe("priceMatching", () => {
       url: "https://shop.example/the-whistler-bodega-cask",
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "The Whistler",
-      bottler: null,
-      expression: "Bodega Cask",
-      series: null,
-      distillery: ["Boann Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "no_match",
@@ -3074,7 +2810,7 @@ describe("priceMatching", () => {
       statedAge: 10,
     });
     const sibling = await fixtures.BottleGroupMember({
-      groupId: selectedBottle.groupId as number,
+      groupId: requireGroupId(selectedBottle.groupId),
       edition: "Sibling Edition",
     });
     const price = await fixtures.StorePrice({
@@ -3138,35 +2874,13 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Normalized Draft Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Normalized Brand",
-      bottler: null,
-      expression: "8 Year",
-      series: null,
-      distillery: ["Normalized Distillery"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -3228,35 +2942,13 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Spirit Category Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Spirit Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Spirit Distillery"],
-      category: "spirit",
-      stated_age: 12,
-      abv: null,
-      release_year: 2024,
-      vintage_year: 2010,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: "Batch 1",
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "Spirit Brand",
@@ -3354,35 +3046,13 @@ describe("priceMatching", () => {
   test("does not auto-create from empty web evidence", async ({ fixtures }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Empty Evidence Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Evidence Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Evidence Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -3443,15 +3113,13 @@ describe("priceMatching", () => {
   test("auto ignores clearly non-whisky listings", async ({ fixtures }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Tito's Handmade Vodka",
       imageUrl: null,
     });
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason:
@@ -3472,18 +3140,13 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Skrewball Peanut Butter Whiskey",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue(null);
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "no_match",
@@ -3544,11 +3207,7 @@ describe("priceMatching", () => {
       url: "https://smws.example/rw6-5-existing",
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "The Scotch Malt Whisky Society",
@@ -3612,7 +3271,7 @@ describe("priceMatching", () => {
     const listingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
-    expect(extractFromText).not.toHaveBeenCalled();
+
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
@@ -3662,11 +3321,7 @@ describe("priceMatching", () => {
       url: "https://smws.example/rw6-5-existing-current",
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "The Scotch Malt Whisky Society",
@@ -3731,7 +3386,6 @@ describe("priceMatching", () => {
       where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
 
-    expect(extractFromText).not.toHaveBeenCalled();
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
@@ -3773,11 +3427,7 @@ describe("priceMatching", () => {
       url: "https://smws.example/rw6-5-new",
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "The Scotch Malt Whisky Society",
@@ -3873,7 +3523,6 @@ describe("priceMatching", () => {
       .from(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, proposal.suggestedBottleId!));
 
-    expect(extractFromText).not.toHaveBeenCalled();
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
@@ -3955,11 +3604,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "The Scotch Malt Whisky Society",
@@ -4027,7 +3672,6 @@ describe("priceMatching", () => {
       where: eq(storePrices.id, price.id),
     });
 
-    expect(extractFromText).not.toHaveBeenCalled();
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
@@ -4089,9 +3733,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "The Scotch Malt Whisky Society",
@@ -4260,11 +3902,7 @@ describe("priceMatching", () => {
       url: "https://smws.example/rw6-5-name-invariant",
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         extractedLabel: {
           brand: "SMWS",
@@ -4373,7 +4011,6 @@ describe("priceMatching", () => {
       where: eq(storePrices.id, price.id),
     });
 
-    expect(extractFromText).not.toHaveBeenCalled();
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
@@ -4400,37 +4037,13 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    const { queueBottleCreationVerification } =
-      await import("@peated/server/lib/catalogVerification");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Auto Create Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Auto Brand",
-      bottler: null,
-      expression: "Web Reserve",
-      series: null,
-      distillery: ["Auto Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -4560,10 +4173,12 @@ describe("priceMatching", () => {
       createdRelease: false,
       confidence: null,
     });
-    expect(queueBottleCreationVerification).toHaveBeenCalledWith({
-      bottleId: proposal.suggestedBottleId,
-      creationSource: "price_match_automation",
-    });
+    expect(finalizeBottle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bottle: expect.objectContaining({ id: proposal.suggestedBottleId }),
+      }),
+      { creationSource: "price_match_automation" },
+    );
   });
 
   test("auto creates high-confidence bottles while a retry lease is active", async ({
@@ -4577,10 +4192,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Retry Auto Create Candidate",
@@ -4598,25 +4209,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Retry Auto Brand",
-      bottler: null,
-      expression: "Lease Reserve",
-      series: null,
-      distillery: ["Retry Auto Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -4720,8 +4313,6 @@ describe("priceMatching", () => {
       mod: true,
     });
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Aberfeldy",
       type: ["brand"],
@@ -4749,7 +4340,7 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -4834,35 +4425,13 @@ describe("priceMatching", () => {
     });
 
     const currentBottle = await fixtures.Bottle();
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: currentBottle.id,
       name: "Replacement Create Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Replacement Brand",
-      bottler: null,
-      expression: "Fresh Release",
-      series: null,
-      distillery: ["Replacement Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -4973,10 +4542,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference, BottleClassificationError } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     await fixtures.BottleAlias({
       bottleId: bottle.id,
@@ -5012,7 +4577,7 @@ describe("priceMatching", () => {
       },
     ];
 
-    vi.mocked(classifyBottleReference).mockRejectedValue(
+    classifyBottleReference.mockRejectedValue(
       new BottleClassificationError("Classifier blew up", {
         extractedIdentity: {
           brand: "Failure Brand",
@@ -5035,25 +4600,6 @@ describe("priceMatching", () => {
         candidates: candidateBottles,
       }),
     );
-
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Failure Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Failure Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
@@ -5079,8 +4625,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       name: "Retry Failure Candidate",
@@ -5100,7 +4644,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    vi.mocked(classifyBottleReference).mockRejectedValue(
+    classifyBottleReference.mockRejectedValue(
       new Error("Team budget exceeded"),
     );
 
@@ -5141,14 +4685,13 @@ describe("priceMatching", () => {
   test("includes decision-relevant structured bottle fields in candidate search text", async () => {
     config.AI_GATEWAY_API_KEY = "test-gateway-key";
 
-    const { getOpenAIEmbedding } =
-      await import("@peated/server/lib/openaiEmbeddings");
-    vi.mocked(getOpenAIEmbedding).mockResolvedValue([0.1, 0.2, 0.3]);
+    getOpenAIEmbedding.mockResolvedValue([0.1, 0.2, 0.3]);
 
-    const executeSpy = vi.spyOn(db, "execute") as any;
-    executeSpy.mockResolvedValue({ rows: [] });
+    const runQuery = vi.fn<BottleCandidateQueryRunner>();
+    runQuery.mockResolvedValue([]);
+    const searchCandidates = createCandidateSearch(runQuery);
 
-    await searchBottleCandidates({
+    await searchCandidates({
       query: "Springbank Local Barley",
       brand: "Springbank",
       bottler: "Campbeltown Merchant",
@@ -5199,45 +4742,44 @@ describe("priceMatching", () => {
   test("re-ranks local candidates using structured bottle fields", async () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const executeSpy = vi.spyOn(db, "execute") as any;
-    executeSpy
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            bottleId: 1,
-            fullName: "Shibui Pure Malt",
-            brand: "Shibui",
-            category: "single_malt",
-            statedAge: 12,
-            edition: "Batch 1",
-            caskStrength: null,
-            singleCask: null,
-            abv: 46,
-            vintageYear: 2010,
-            releaseYear: 2024,
-            caskType: "bourbon",
-            score: 0.82,
-          },
-          {
-            bottleId: 2,
-            fullName: "Shibui Pure Malt Single Cask",
-            brand: "Shibui",
-            category: "single_malt",
-            statedAge: 12,
-            edition: "Batch 1",
-            caskStrength: true,
-            singleCask: true,
-            abv: 59.2,
-            vintageYear: 2010,
-            releaseYear: 2024,
-            caskType: "bourbon",
-            score: 0.8,
-          },
-        ],
-      })
-      .mockResolvedValueOnce({ rows: [] });
+    const runQuery = vi.fn<BottleCandidateQueryRunner>();
+    runQuery
+      .mockResolvedValueOnce([
+        {
+          bottleId: 1,
+          fullName: "Shibui Pure Malt",
+          brand: "Shibui",
+          category: "single_malt",
+          statedAge: 12,
+          edition: "Batch 1",
+          caskStrength: null,
+          singleCask: null,
+          abv: 46,
+          vintageYear: 2010,
+          releaseYear: 2024,
+          caskType: "bourbon",
+          score: 0.82,
+        },
+        {
+          bottleId: 2,
+          fullName: "Shibui Pure Malt Single Cask",
+          brand: "Shibui",
+          category: "single_malt",
+          statedAge: 12,
+          edition: "Batch 1",
+          caskStrength: true,
+          singleCask: true,
+          abv: 59.2,
+          vintageYear: 2010,
+          releaseYear: 2024,
+          caskType: "bourbon",
+          score: 0.8,
+        },
+      ])
+      .mockResolvedValueOnce([]);
+    const searchCandidates = createCandidateSearch(runQuery);
 
-    const candidates = await searchBottleCandidates({
+    const candidates = await searchCandidates({
       query: "Shibui Pure Malt Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",
@@ -5268,15 +4810,13 @@ describe("priceMatching", () => {
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = "test-gateway-key";
-    const { getOpenAIEmbedding } =
-      await import("@peated/server/lib/openaiEmbeddings");
     const queryEmbedding = [1, ...Array.from({ length: 3071 }, () => 0)];
     const embeddingWithCosineSimilarity = (similarity: number) => [
       similarity,
       Math.sqrt(1 - similarity ** 2),
       ...Array.from({ length: 3070 }, () => 0),
     ];
-    vi.mocked(getOpenAIEmbedding).mockResolvedValue(queryEmbedding);
+    getOpenAIEmbedding.mockResolvedValue(queryEmbedding);
 
     const brand = await fixtures.Entity({ name: "Age Ranking Evidence" });
     const mismatched = await fixtures.Bottle({
@@ -5647,45 +5187,44 @@ describe("priceMatching", () => {
   test("does not treat edition substring collisions as matching evidence", async () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const executeSpy = vi.spyOn(db, "execute") as any;
-    executeSpy
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            bottleId: 1,
-            fullName: "Shibui Pure Malt Batch 10",
-            brand: "Shibui",
-            category: "single_malt",
-            statedAge: 12,
-            edition: "Batch 10",
-            caskStrength: null,
-            singleCask: null,
-            abv: 46,
-            vintageYear: null,
-            releaseYear: 2024,
-            caskType: null,
-            score: 0.82,
-          },
-          {
-            bottleId: 2,
-            fullName: "Shibui Pure Malt Batch 1",
-            brand: "Shibui",
-            category: "single_malt",
-            statedAge: 12,
-            edition: "Batch 1",
-            caskStrength: null,
-            singleCask: null,
-            abv: 46,
-            vintageYear: null,
-            releaseYear: 2024,
-            caskType: null,
-            score: 0.8,
-          },
-        ],
-      })
-      .mockResolvedValueOnce({ rows: [] });
+    const runQuery = vi.fn<BottleCandidateQueryRunner>();
+    runQuery
+      .mockResolvedValueOnce([
+        {
+          bottleId: 1,
+          fullName: "Shibui Pure Malt Batch 10",
+          brand: "Shibui",
+          category: "single_malt",
+          statedAge: 12,
+          edition: "Batch 10",
+          caskStrength: null,
+          singleCask: null,
+          abv: 46,
+          vintageYear: null,
+          releaseYear: 2024,
+          caskType: null,
+          score: 0.82,
+        },
+        {
+          bottleId: 2,
+          fullName: "Shibui Pure Malt Batch 1",
+          brand: "Shibui",
+          category: "single_malt",
+          statedAge: 12,
+          edition: "Batch 1",
+          caskStrength: null,
+          singleCask: null,
+          abv: 46,
+          vintageYear: null,
+          releaseYear: 2024,
+          caskType: null,
+          score: 0.8,
+        },
+      ])
+      .mockResolvedValueOnce([]);
+    const searchCandidates = createCandidateSearch(runQuery);
 
-    const candidates = await searchBottleCandidates({
+    const candidates = await searchCandidates({
       query: "Shibui Pure Malt Batch 1 Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",
@@ -5713,35 +5252,32 @@ describe("priceMatching", () => {
   test("ranks same-brand local candidates ahead of cross-brand options", async () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const executeSpy = vi.spyOn(db, "execute") as any;
-    executeSpy
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            bottleId: 1,
-            fullName: "Shibui Pure Malt",
-            brand: "Shibui",
-            score: 0.82,
-          },
-          {
-            bottleId: 2,
-            fullName: "Ichiro's Malt & Grain Single Cask",
-            brand: "Ichiro's",
-            score: 0.81,
-          },
-        ],
-      })
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            bottleId: 1,
-            fullName: "Shibui Pure Malt",
-            brand: "Shibui",
-          },
-        ],
-      });
+    const runQuery = vi.fn<BottleCandidateQueryRunner>();
+    runQuery
+      .mockResolvedValueOnce([
+        {
+          bottleId: 1,
+          fullName: "Shibui Pure Malt",
+          brand: "Shibui",
+          score: 0.82,
+        },
+        {
+          bottleId: 2,
+          fullName: "Ichiro's Malt & Grain Single Cask",
+          brand: "Ichiro's",
+          score: 0.81,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          bottleId: 1,
+          fullName: "Shibui Pure Malt",
+          brand: "Shibui",
+        },
+      ]);
+    const searchCandidates = createCandidateSearch(runQuery);
 
-    const candidates = await searchBottleCandidates({
+    const candidates = await searchCandidates({
       query: "Shibui Pure Malt Whisky 750ml",
       brand: "Shibui",
       expression: "Pure Malt",
@@ -5776,15 +5312,13 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Presearch Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(classifyBottleReference).mockRejectedValue(
+    classifyBottleReference.mockRejectedValue(
       new Error("Classifier blew up before refining candidates"),
     );
 
@@ -5816,10 +5350,8 @@ describe("priceMatching", () => {
       name: "Attempt Candidate",
       imageUrl: null,
     });
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -5945,9 +5477,6 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-
     const result = await resolveStorePriceMatchProposal(price.id);
 
     expect(classifyBottleReference).not.toHaveBeenCalled();
@@ -5959,9 +5488,6 @@ describe("priceMatching", () => {
   test("does not reevaluate reviewable proposals during automatic resolution", async ({
     fixtures,
   }) => {
-    const { classifyBottleReference, runBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-
     for (const status of ["verified", "pending_review", "errored"] as const) {
       const price = await fixtures.StorePrice({
         name: `Already Classified ${status}`,
@@ -5980,7 +5506,7 @@ describe("priceMatching", () => {
       expect(result).toEqual(proposal);
     }
 
-    expect(runBottleReference).not.toHaveBeenCalled();
+    expect(runScrapedBottleReference).not.toHaveBeenCalled();
     expect(classifyBottleReference).not.toHaveBeenCalled();
   });
 
@@ -6006,30 +5532,7 @@ describe("priceMatching", () => {
       reviewedAt: new Date("2026-03-10T13:00:00.000Z"),
     });
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Retry Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Retry Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -6097,35 +5600,13 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Draft Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Draft Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Draft Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -6213,10 +5694,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const brand = await fixtures.Entity({
       name: "Canonical Brand",
       shortName: "Brand Short",
@@ -6245,25 +5722,7 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Canonical Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Canonical Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "create_new",
@@ -6370,35 +5829,13 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       name: "Unknown Suggested Candidate",
       imageUrl: null,
     });
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Unknown Brand",
-      bottler: null,
-      expression: "Reserve",
-      series: null,
-      distillery: ["Unknown Distillery"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match_existing",
@@ -6456,10 +5893,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { extractFromText } =
-      await import("@peated/server/agents/whisky/labelExtractor");
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       name: "Retry Lease Candidate",
       imageUrl: null,
@@ -6476,25 +5909,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    vi.mocked(extractFromText).mockResolvedValue({
-      brand: "Retry Brand",
-      bottler: null,
-      expression: "Retry Lease Candidate",
-      series: null,
-      distillery: null,
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "no_match",
@@ -6532,8 +5947,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       name: "Requeue Candidate",
       imageUrl: null,
@@ -6550,7 +5963,7 @@ describe("priceMatching", () => {
       reviewedAt: new Date("2026-03-01T00:30:00.000Z"),
     });
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "no_match",
@@ -6614,8 +6027,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: bottle.id,
@@ -6634,7 +6045,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason:
@@ -6671,8 +6082,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: bottle.id,
@@ -6692,7 +6101,7 @@ describe("priceMatching", () => {
       .returning();
     const replacementExpiry = new Date(Date.now() + 20 * 60_000);
 
-    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+    classifyBottleReference.mockImplementationOnce(async () => {
       await db
         .update(storePriceMatchProposals)
         .set({
@@ -6744,8 +6153,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Unresolved Expression Gift Bundle",
@@ -6757,7 +6164,7 @@ describe("priceMatching", () => {
       .set({ updatedAt: evidenceUpdatedAt })
       .where(eq(storePrices.id, price.id));
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason:
@@ -6785,8 +6192,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: bottle.id,
@@ -6798,7 +6203,7 @@ describe("priceMatching", () => {
       newBottleId: null,
     });
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason:
@@ -6834,8 +6239,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: bottle.id,
@@ -6851,7 +6254,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason:
@@ -6917,8 +6320,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const originalBottle = await fixtures.Bottle();
     const replacementBottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
@@ -6927,7 +6328,7 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+    classifyBottleReference.mockImplementationOnce(async () => {
       await db
         .update(storePrices)
         .set({ bottleId: replacementBottle.id })
@@ -6956,8 +6357,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const originalBottle = await fixtures.Bottle();
     const replacementBottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
@@ -6966,7 +6365,7 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+    classifyBottleReference.mockImplementationOnce(async () => {
       await db
         .update(storePrices)
         .set({
@@ -7007,8 +6406,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const originalBottle = await fixtures.Bottle();
     const replacementBottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
@@ -7017,7 +6414,7 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
 
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason:
@@ -7101,8 +6498,6 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const originalBottle = await fixtures.Bottle();
     const replacementBottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
@@ -7119,7 +6514,7 @@ describe("priceMatching", () => {
       })
       .returning();
 
-    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+    classifyBottleReference.mockImplementationOnce(async () => {
       await db
         .update(storePrices)
         .set({
@@ -8022,8 +7417,6 @@ describe("priceMatching", () => {
   });
 
   test("persists a linked Bottle check by default", async ({ fixtures }) => {
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -8031,8 +7424,8 @@ describe("priceMatching", () => {
       imageUrl: null,
     });
     const candidate = await getBottleCandidateById(bottle.id);
-    expect(candidate).not.toBeNull();
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    if (!candidate) throw new Error("Expected Bottle candidate fixture.");
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match",
@@ -8072,10 +7465,6 @@ describe("priceMatching", () => {
   test("links every classified full retry to an immutable identity check", async ({
     fixtures,
   }) => {
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
-    const { runScrapedBottleReference } =
-      await import("@peated/server/agents/bottleClassifier/scrapedBottleReference");
     const sourceBottle = await fixtures.Bottle({ name: "Duplicate Source" });
     const destinationBottle = await fixtures.Bottle({
       name: "Canonical Destination",
@@ -8089,13 +7478,14 @@ describe("priceMatching", () => {
     const destinationCandidate = await getBottleCandidateById(
       destinationBottle.id,
     );
-    expect(sourceCandidate).not.toBeNull();
-    expect(destinationCandidate).not.toBeNull();
+    if (!sourceCandidate || !destinationCandidate) {
+      throw new Error("Expected source and destination Bottle candidates.");
+    }
     const sourceContext = await inspectedBottleContext(sourceBottle.id);
     const destinationContext = await inspectedBottleContext(
       destinationBottle.id,
     );
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
           action: "match",
@@ -8122,12 +7512,10 @@ describe("priceMatching", () => {
         names: ["search_bottles", "get_bottle_context"],
       },
     };
-    vi.mocked(runScrapedBottleReference).mockImplementation(
-      async (...args) => ({
-        result: await vi.mocked(classifyBottleReference)(...args),
-        modelMetadata,
-      }),
-    );
+    runScrapedBottleReference.mockImplementation(async (input) => ({
+      result: await classifyBottleReference(input),
+      modelMetadata,
+    }));
 
     const firstProposal = await resolveStorePriceMatchProposal(price.id);
     const secondProposal = await resolveStorePriceMatchProposal(price.id, {
@@ -8187,15 +7575,13 @@ describe("priceMatching", () => {
   test("links ignored results to their attempt without changing ignored behavior", async ({
     fixtures,
   }) => {
-    const { classifyBottleReference } =
-      await import("@peated/server/agents/bottleClassifier");
     const assignedBottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: assignedBottle.id,
       name: "Ignored Shadow Bundle",
       imageUrl: null,
     });
-    vi.mocked(classifyBottleReference).mockResolvedValue(
+    classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         status: "ignored",
         ignoreReason: "The source is a multi-bottle bundle.",

@@ -58,13 +58,13 @@ export default function ErrorPage({
           : "It looks like your network is offline.";
     } else if (
       (typedError instanceof ORPCError && typedError.status === 404) ||
-      (typedError as any).message === "NOT_FOUND"
+      typedError.message === "NOT_FOUND"
     ) {
       title = title ?? "Not Found";
       subtitle = subtitle ?? "We couldn't find the page you were looking for.";
     } else if (
       (typedError instanceof ORPCError && typedError.status === 401) ||
-      (typedError as any).message === "UNAUTHORIZED"
+      typedError.message === "UNAUTHORIZED"
     ) {
       title = title ?? "Identify Yourself";
       subtitle =

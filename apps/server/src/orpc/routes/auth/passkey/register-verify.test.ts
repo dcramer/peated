@@ -1,19 +1,27 @@
+import { createRouterClient } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { passkeys } from "@peated/server/db/schema";
-import { verifyPasskeyRegistration } from "@peated/server/lib/passkey";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
+import type { Context } from "@peated/server/orpc/context";
+import {
+  createPasskeyRegisterVerifyProcedure,
+  type PasskeyRegistrationVerifier,
+} from "@peated/server/orpc/routes/auth/passkey/register-verify";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock passkey verification
-vi.mock("@peated/server/lib/passkey", async () => {
-  const actual = await vi.importActual("@peated/server/lib/passkey");
-  return {
-    ...actual,
-    verifyPasskeyRegistration: vi.fn(),
-  };
-});
+const verifyPasskeyRegistration = vi.fn<PasskeyRegistrationVerifier>();
+
+function createRegisterClient(context: Context) {
+  return createRouterClient(
+    {
+      registerVerify: createPasskeyRegisterVerifyProcedure(
+        verifyPasskeyRegistration,
+      ),
+    },
+    { context },
+  );
+}
 
 describe("POST /auth/passkey/register/verify", () => {
   beforeEach(() => {
@@ -22,22 +30,19 @@ describe("POST /auth/passkey/register/verify", () => {
 
   test("requires authentication", async () => {
     const err = await waitError(
-      routerClient.auth.passkey.registerVerify(
-        {
+      createRegisterClient({ user: null, ip: "127.0.0.1" }).registerVerify({
+        response: {
+          id: "test-id",
+          rawId: "test-id",
+          type: "public-key" as const,
+          clientExtensionResults: {},
           response: {
-            id: "test-id",
-            rawId: "test-id",
-            type: "public-key" as const,
-            clientExtensionResults: {},
-            response: {
-              clientDataJSON: "mock-client-data",
-              attestationObject: "mock-attestation",
-            },
+            clientDataJSON: "mock-client-data",
+            attestationObject: "mock-attestation",
           },
-          signedChallenge: "test",
         },
-        { context: { ip: "127.0.0.1" } },
-      ),
+        signedChallenge: "test",
+      }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
@@ -56,7 +61,7 @@ describe("POST /auth/passkey/register/verify", () => {
       },
     };
 
-    vi.mocked(verifyPasskeyRegistration).mockResolvedValue({
+    verifyPasskeyRegistration.mockResolvedValue({
       verified: true,
       credential: {
         publicKey: new Uint8Array([1, 2, 3, 4]),
@@ -65,14 +70,11 @@ describe("POST /auth/passkey/register/verify", () => {
       },
     });
 
-    const result = await routerClient.auth.passkey.registerVerify(
-      {
-        response: mockResponse,
-        signedChallenge: "signed-challenge",
-        nickname: "My Phone",
-      },
-      { context: { user } },
-    );
+    const result = await createRegisterClient({ user }).registerVerify({
+      response: mockResponse,
+      signedChallenge: "signed-challenge",
+      nickname: "My Phone",
+    });
 
     expect(result.verified).toBe(true);
 
@@ -101,7 +103,7 @@ describe("POST /auth/passkey/register/verify", () => {
       },
     };
 
-    vi.mocked(verifyPasskeyRegistration).mockResolvedValue({
+    verifyPasskeyRegistration.mockResolvedValue({
       verified: true,
       credential: {
         publicKey: new Uint8Array([1, 2, 3, 4]),
@@ -110,13 +112,10 @@ describe("POST /auth/passkey/register/verify", () => {
       },
     });
 
-    const result = await routerClient.auth.passkey.registerVerify(
-      {
-        response: mockResponse,
-        signedChallenge: "signed-challenge",
-      },
-      { context: { user } },
-    );
+    const result = await createRegisterClient({ user }).registerVerify({
+      response: mockResponse,
+      signedChallenge: "signed-challenge",
+    });
 
     expect(result.verified).toBe(true);
 
@@ -143,7 +142,7 @@ describe("POST /auth/passkey/register/verify", () => {
       },
     };
 
-    vi.mocked(verifyPasskeyRegistration).mockResolvedValue({
+    verifyPasskeyRegistration.mockResolvedValue({
       verified: true,
       credential: {
         publicKey: new Uint8Array([1, 2, 3, 4]),
@@ -153,13 +152,10 @@ describe("POST /auth/passkey/register/verify", () => {
     });
 
     const err = await waitError(
-      routerClient.auth.passkey.registerVerify(
-        {
-          response: mockResponse,
-          signedChallenge: "signed-challenge",
-        },
-        { context: { user } },
-      ),
+      createRegisterClient({ user }).registerVerify({
+        response: mockResponse,
+        signedChallenge: "signed-challenge",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(
@@ -181,18 +177,15 @@ describe("POST /auth/passkey/register/verify", () => {
       },
     };
 
-    vi.mocked(verifyPasskeyRegistration).mockRejectedValue(
+    verifyPasskeyRegistration.mockRejectedValue(
       new Error("Invalid attestation"),
     );
 
     const err = await waitError(
-      routerClient.auth.passkey.registerVerify(
-        {
-          response: mockResponse,
-          signedChallenge: "signed-challenge",
-        },
-        { context: { user } },
-      ),
+      createRegisterClient({ user }).registerVerify({
+        response: mockResponse,
+        signedChallenge: "signed-challenge",
+      }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Invalid attestation]`);

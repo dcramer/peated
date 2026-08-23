@@ -59,6 +59,7 @@ export type {
 export {
   BottleContextAliasSchema,
   BottleContextEntityRefSchema,
+  BottleContextExactFields,
   BottleContextExactSchema,
   BottleContextImageSourceSchema,
   BottleContextLabelEvidenceSchema,
@@ -66,10 +67,12 @@ export {
   BottleContextPublicImageSchema,
   BottleContextSchema,
   BottleContextSeriesRefSchema,
+  BottleContextSharedFields,
   BottleContextSharedSchema,
   BottleContextSiblingSchema,
   BottleContextSourceSchema,
   EntityContextBottleSampleSchema,
+  EntityContextFields,
   EntityContextSchema,
   MAX_BOTTLE_CONTEXT_ALIASES,
   MAX_BOTTLE_CONTEXT_IMAGES,
@@ -124,16 +127,12 @@ export type {
   ImageTextSpan,
 } from "./imageEvidence";
 
-function normalizeHttpUrl(value: unknown) {
+function normalizeHttpUrl(value: string | null | undefined) {
   if (value === undefined) {
     return undefined;
   }
 
   if (value === null) {
-    return null;
-  }
-
-  if (typeof value !== "string") {
     return null;
   }
 
@@ -157,24 +156,28 @@ const DataImageUrlSchema = z
   .string()
   .regex(/^data:image\/(?:gif|jpe?g|png|webp);base64,[a-z0-9+/]+={0,2}$/i);
 
-const BottleReferenceUrlSchema = z.preprocess(
-  normalizeHttpUrl,
-  z.string().url().nullable().optional(),
-);
+const RawReferenceUrlSchema = z
+  .union([z.string(), z.null(), z.undefined()])
+  .catch(null);
 
-const BottleReferenceImageUrlSchema = z.preprocess(
+const BottleReferenceUrlSchema = RawReferenceUrlSchema.transform(
+  normalizeHttpUrl,
+).pipe(z.string().url().nullable().optional());
+
+const BottleReferenceImageUrlSchema = RawReferenceUrlSchema.transform(
   (value) => {
-    if (typeof value === "string") {
-      const trimmedValue = value.trim();
-      if (DataImageUrlSchema.safeParse(trimmedValue).success) {
-        return trimmedValue;
-      }
+    if (value === null || value === undefined) {
+      return value;
+    }
+
+    const trimmedValue = value.trim();
+    if (DataImageUrlSchema.safeParse(trimmedValue).success) {
+      return trimmedValue;
     }
 
     return normalizeHttpUrl(value);
   },
-  z.union([z.string().url(), DataImageUrlSchema]).nullable().optional(),
-);
+).pipe(z.union([z.string().url(), DataImageUrlSchema]).nullable().optional());
 
 export const BottleReferenceSchema = z
   .object({
@@ -232,7 +235,14 @@ type BottleCheckEvidenceSource =
   | {
       intent: "resolve_reference";
       input: {
-        reference: Partial<Record<keyof BottleReference, unknown>>;
+        reference: {
+          id?: unknown;
+          externalSiteId?: unknown;
+          name?: unknown;
+          url?: unknown;
+          imageUrl?: unknown;
+          currentBottleId?: unknown;
+        };
       };
       artifacts: BottleClassificationArtifacts;
     };

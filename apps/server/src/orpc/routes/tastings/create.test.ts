@@ -5,15 +5,10 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-vi.mock("@peated/server/worker/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof workerClient>()),
-  pushJob: vi.fn().mockResolvedValue(undefined),
-}));
 
 const STATS_JOB_OPTIONS = {
   delay: 5000,

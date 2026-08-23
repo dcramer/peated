@@ -61,12 +61,11 @@ export default function FlightForm({
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
       const selectedBottleIds = bottlesValue.map(({ id }) => id);
-      await onSubmit({
-        ...data,
-        ...(flightMembershipChanged(initialBottleIds, selectedBottleIds)
-          ? { bottles: selectedBottleIds }
-          : {}),
-      });
+      const submission: FormSchemaType = { ...data };
+      if (flightMembershipChanged(initialBottleIds, selectedBottleIds)) {
+        submission.bottles = selectedBottleIds;
+      }
+      await onSubmit(submission);
     } catch (err) {
       setError(getFormErrorMessage(err));
     }

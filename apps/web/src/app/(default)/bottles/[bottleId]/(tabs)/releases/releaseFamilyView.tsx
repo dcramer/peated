@@ -2,7 +2,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import BottleIdentity from "@peated/web/components/bottleIdentity";
 import BottleRatingSummary from "@peated/web/components/bottleRatingSummary";
 import PaginationButtons from "@peated/web/components/paginationButtons";
-import { Suspense } from "react";
+import { type ReactNode, Suspense } from "react";
 
 type BottleGroupBottleList = Outputs["bottleGroups"]["bottles"];
 
@@ -12,6 +12,31 @@ export default function ReleaseFamilyView({
 }: {
   bottleList: BottleGroupBottleList;
   currentBottleId: number;
+}) {
+  return (
+    <ReleaseFamilyContent
+      bottleList={bottleList}
+      currentBottleId={currentBottleId}
+      pagination={
+        <Suspense>
+          <PaginationButtons
+            rel={bottleList.rel}
+            ariaLabel="Release pagination"
+          />
+        </Suspense>
+      }
+    />
+  );
+}
+
+export function ReleaseFamilyContent({
+  bottleList,
+  currentBottleId,
+  pagination,
+}: {
+  bottleList: BottleGroupBottleList;
+  currentBottleId: number;
+  pagination?: ReactNode;
 }) {
   return (
     <div className="mt-6 px-3 lg:px-0">
@@ -57,12 +82,7 @@ export default function ReleaseFamilyView({
           </p>
         )}
 
-        <Suspense>
-          <PaginationButtons
-            rel={bottleList.rel}
-            ariaLabel="Release pagination"
-          />
-        </Suspense>
+        {pagination}
       </section>
     </div>
   );

@@ -324,7 +324,7 @@ describe("GET /users/:user/regions", () => {
     });
     const parent = await fixtures.Bottle({ brandId: parentBrand.id });
     const promoted = await fixtures.BottleGroupMember({
-      groupId: parent.groupId as number,
+      groupId: parent.groupId,
       edition: "Promoted Edition",
     });
     await db

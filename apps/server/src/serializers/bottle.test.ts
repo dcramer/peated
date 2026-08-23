@@ -280,7 +280,7 @@ describe("BottleSerializer", () => {
     await db
       .update(bottleGroups)
       .set({ totalBottles: 2 })
-      .where(eq(bottleGroups.id, first.groupId as number));
+      .where(eq(bottleGroups.id, first.groupId));
 
     const [firstResult, secondResult] = await serialize(
       BottleSerializer,

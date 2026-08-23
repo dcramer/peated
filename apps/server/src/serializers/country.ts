@@ -5,11 +5,7 @@ import { type Country, type User } from "../db/schema";
 
 export const CountrySerializer = serializer({
   name: "country",
-  item: (
-    item: Country,
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ): z.infer<typeof CountrySchema> => {
+  item: (item: Country): z.infer<typeof CountrySchema> => {
     return {
       id: item.id,
       name: item.name,

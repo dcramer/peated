@@ -6,6 +6,7 @@ import {
 import { z } from "zod";
 
 const MAX_REVIEW_TEXT_LENGTH = 50_000;
+const ReviewSourceKeySchema = z.string().trim().min(1).max(255);
 
 export function normalizeReviewRating(
   rawScore: z.input<typeof NativeScoreSchema>,
@@ -18,7 +19,7 @@ export function normalizeReviewRating(
 
 export const ReviewArticleReviewSchema = z
   .object({
-    sourceKey: z.string().trim().min(1).max(255),
+    sourceKey: ReviewSourceKeySchema,
     name: z.string().trim().min(1).max(500),
     category: CategoryEnum.nullable().default(null),
     reviewerName: z.string().trim().min(1).max(255).nullable().default(null),
@@ -70,7 +71,7 @@ export const ReviewArticleIngestionSchema = z
     article: ReviewArticleObservationSchema,
     reviewTexts: z
       .record(
-        ReviewArticleReviewSchema.shape.sourceKey,
+        ReviewSourceKeySchema,
         z.string().trim().min(1).max(MAX_REVIEW_TEXT_LENGTH),
       )
       .default({}),

@@ -1,4 +1,5 @@
 import {
+  ModeratorBottleAuditInputFields,
   ModeratorBottleAuditInputSchema,
   runModeratorBottleAudit,
 } from "@peated/server/agents/bottleClassifier/auditBottle";
@@ -10,28 +11,39 @@ import { serializeBottleCheck } from "@peated/server/serializers/bottleCheck";
 const InputSchema = ModeratorBottleAuditInputSchema.omit({
   bottleId: true,
 }).extend({
-  bottle: ModeratorBottleAuditInputSchema.shape.bottleId,
+  bottle: ModeratorBottleAuditInputFields.bottleId,
 });
 
-export default procedure
-  .use(requireMod)
-  .route({
-    method: "POST",
-    path: "/audits",
-    summary: "Create an audit for an existing Bottle",
-    spec: (spec) => ({ ...spec, operationId: "createAudit" }),
-  })
-  .input(InputSchema)
-  .output(ModeratorBottleAuditResponseSchema)
-  .handler(async ({ input }) => {
-    const result = await runModeratorBottleAudit({
-      bottleId: input.bottle,
-      note: input.note,
+export type AuditBottleRunner = NonNullable<
+  Parameters<typeof runModeratorBottleAudit>[1]
+>;
+
+export function createAuditProcedure(runAudit?: AuditBottleRunner) {
+  return procedure
+    .use(requireMod)
+    .route({
+      method: "POST",
+      path: "/audits",
+      summary: "Create an audit for an existing Bottle",
+      spec: (spec) => ({ ...spec, operationId: "createAudit" }),
+    })
+    .input(InputSchema)
+    .output(ModeratorBottleAuditResponseSchema)
+    .handler(async ({ input }) => {
+      const result = await runModeratorBottleAudit(
+        {
+          bottleId: input.bottle,
+          note: input.note,
+        },
+        runAudit,
+      );
+      return result.status === "clean"
+        ? result
+        : {
+            status: result.status,
+            audit: serializeBottleCheck(result.check),
+          };
     });
-    return result.status === "clean"
-      ? result
-      : {
-          status: result.status,
-          audit: serializeBottleCheck(result.check),
-        };
-  });
+}
+
+export default createAuditProcedure();

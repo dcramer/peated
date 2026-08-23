@@ -2,7 +2,7 @@ import { os } from "@orpc/server";
 import sentryMiddleware from "@peated/orpc/server/middleware";
 import type { User } from "../db/schema";
 
-interface ErrorShape {
+interface ErrorContract {
   // the message should always be a punctuated sentence
   message: string;
   // internal error code if needed
@@ -20,10 +20,10 @@ export const base = os
     userAgent?: string;
   }>()
   /**
-   * All errors should adhere to the ErrorShape interface
+   * All errors must follow the ErrorContract interface.
    */
   .errors({
-    // [string: code]: ErrorShape
+    // [string: code]: ErrorContract
     UNAUTHORIZED: {
       message: "Unauthorized.",
       statusCode: 401,

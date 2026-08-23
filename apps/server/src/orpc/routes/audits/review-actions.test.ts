@@ -86,6 +86,7 @@ describe("Audit review action routes", () => {
     await db
       .update(bottleOperations)
       .set({
+        // SAFETY: This test stores a retired proposal shape to exercise version handling.
         proposal: {
           legacyOperation: "rename_entity",
           arguments: [created.entity.id, "Legacy Entity Corrected"],

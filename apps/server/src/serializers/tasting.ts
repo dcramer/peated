@@ -1,5 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { type z } from "zod";
+import { z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
@@ -159,7 +159,10 @@ export const TastingSerializer = serializer({
       notes: item.notes,
       tags: item.tags || [],
       color: item.color,
-      rating: item.rating as -1 | 1 | 2 | null,
+      rating: z
+        .union([z.literal(-1), z.literal(1), z.literal(2)])
+        .nullable()
+        .parse(item.rating),
       servingStyle: item.servingStyle,
       friends: attrs.friends,
 

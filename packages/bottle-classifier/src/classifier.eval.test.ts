@@ -11,6 +11,7 @@ import {
   type TranscriptEvent,
 } from "vitest-evals/harness";
 import { executeWithReplay } from "vitest-evals/replay";
+import { z } from "zod";
 import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import {
   scoreBottleCheckGrounding,
@@ -133,7 +134,9 @@ function collectKnownCandidates(
 function buildSearchBottlesAdapter(
   testCase: Pick<SearchFixtureCase, "searchResponses">,
 ) {
-  return async (args: Record<string, unknown>) => {
+  return async (
+    args: Parameters<BottleClassifierDataSource["searchBottles"]>[0],
+  ) => {
     const haystack = JSON.stringify(args).toLowerCase();
     const matchedResponse = (testCase.searchResponses ?? []).find((response) =>
       response.when.every((term) => haystack.includes(term.toLowerCase())),
@@ -214,8 +217,9 @@ function getDerivedSuggestedNextStep(
   }
 }
 
-function deepContainsSubset(actual: unknown, expected: unknown): boolean {
-  if (expected === null || typeof expected !== "object") {
+function deepContainsSubset(actual: JsonValue, expected: JsonValue): boolean {
+  const expectedObject = z.record(z.string(), z.json()).safeParse(expected);
+  if (!expectedObject.success && !Array.isArray(expected)) {
     return Object.is(actual, expected);
   }
 
@@ -229,13 +233,16 @@ function deepContainsSubset(actual: unknown, expected: unknown): boolean {
     );
   }
 
-  if (!actual || typeof actual !== "object") {
+  const actualObject = z.record(z.string(), z.json()).safeParse(actual);
+  if (!actualObject.success || !expectedObject.success) {
     return false;
   }
 
-  return Object.entries(expected).every(([key, value]) =>
-    deepContainsSubset((actual as Record<string, unknown>)[key], value),
-  );
+  const actualEntries = Object.entries(actualObject.data);
+  return Object.entries(expectedObject.data).every(([key, value]) => {
+    const actualEntry = actualEntries.find(([actualKey]) => actualKey === key);
+    return actualEntry ? deepContainsSubset(actualEntry[1], value) : false;
+  });
 }
 
 function evalTextContainsStatedAge(value: string, statedAge: number): boolean {
@@ -379,22 +386,22 @@ function formatNormalizationBottleActual(
   });
 }
 
-type ShapeVerdict = {
+type EvaluationVerdict = {
   score: 0 | 1;
   failures: string[];
 };
 
-function getShapeVerdict(failures: string[]): ShapeVerdict {
+function getEvaluationVerdict(failures: string[]): EvaluationVerdict {
   return {
     score: failures.length === 0 ? 1 : 0,
     failures,
   };
 }
 
-function evaluateDecisionShape(
+function evaluateDecisionContract(
   testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
-): ShapeVerdict {
+): EvaluationVerdict {
   const expected = testCase.expected;
   const failures: string[] = [];
 
@@ -402,15 +409,15 @@ function evaluateDecisionShape(
     failures.push(
       `status expected ${expected.status} but got ${result.status}`,
     );
-    return getShapeVerdict(failures);
+    return getEvaluationVerdict(failures);
   }
 
   if (expected.status !== "classified") {
-    return getShapeVerdict(failures);
+    return getEvaluationVerdict(failures);
   }
 
   if (result.status !== "classified") {
-    return getShapeVerdict(failures);
+    return getEvaluationVerdict(failures);
   }
 
   if (expected.action === undefined) {
@@ -475,7 +482,10 @@ function evaluateDecisionShape(
 
   if (
     expected.proposedBottle !== undefined &&
-    !deepContainsSubset(result.decision.proposedBottle, expected.proposedBottle)
+    !deepContainsSubset(
+      result.decision.proposedBottle,
+      z.json().parse(expected.proposedBottle),
+    )
   ) {
     failures.push("proposedBottle missing expected fields");
   }
@@ -558,13 +568,13 @@ function evaluateDecisionShape(
     }
   }
 
-  return getShapeVerdict(failures);
+  return getEvaluationVerdict(failures);
 }
 
-function evaluateNormalizationShape(
+function evaluateNormalizationContract(
   testCase: RealWorldNewBottleEvalCase,
   result: BottleClassificationResult,
-): ShapeVerdict {
+): EvaluationVerdict {
   const expectation = testCase.expected;
   const failures: string[] = [];
   const classifierExpectations = expectation.classifierExpectations ?? [
@@ -579,12 +589,12 @@ function evaluateNormalizationShape(
       failures.push("review_required expected ignored or no_match");
     }
 
-    return getShapeVerdict(failures);
+    return getEvaluationVerdict(failures);
   }
 
   if (result.status !== "classified") {
     failures.push(`status expected classified but got ${result.status}`);
-    return getShapeVerdict(failures);
+    return getEvaluationVerdict(failures);
   }
 
   const actualBottle = formatNormalizationBottleActual(result);
@@ -628,7 +638,7 @@ function evaluateNormalizationShape(
       );
     }
 
-    return getShapeVerdict(failures);
+    return getEvaluationVerdict(failures);
   }
 
   const exactIdentityOptions =
@@ -653,7 +663,7 @@ function evaluateNormalizationShape(
       );
     }
 
-    return getShapeVerdict(failures);
+    return getEvaluationVerdict(failures);
   }
 
   if (result.decision.identityScope !== "product") {
@@ -662,11 +672,11 @@ function evaluateNormalizationShape(
     );
   }
 
-  return getShapeVerdict(failures);
+  return getEvaluationVerdict(failures);
 }
 
 function parseClassificationRunOutput(
-  output: unknown,
+  output: JsonValue,
 ): BottleClassificationResult {
   return BottleClassificationResultSchema.parse(output);
 }
@@ -699,26 +709,21 @@ function buildClassifierAdapters(
       auditEntityContext(entity),
     ]),
   );
-  return {
-    ...baseDataSource,
-    ...(inspectedBottleIdSet.size > 0
-      ? {
-          getBottleContext: async (bottleId: number) => {
-            return (
-              testCase.testCase.context.bottleContexts?.find(
-                (context) => context.bottleId === bottleId,
-              ) ?? null
-            );
-          },
-        }
-      : {}),
-    ...(entityContexts.size > 0
-      ? {
-          getEntityContext: async (entityId: number) =>
-            entityContexts.get(entityId) ?? null,
-        }
-      : {}),
-  };
+  const dataSource: BottleClassifierDataSource = { ...baseDataSource };
+  if (inspectedBottleIdSet.size > 0) {
+    dataSource.getBottleContext = async (bottleId: number) => {
+      return (
+        testCase.testCase.context.bottleContexts?.find(
+          (context) => context.bottleId === bottleId,
+        ) ?? null
+      );
+    };
+  }
+  if (entityContexts.size > 0) {
+    dataSource.getEntityContext = async (entityId: number) =>
+      entityContexts.get(entityId) ?? null;
+  }
+  return dataSource;
 }
 
 function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
@@ -745,15 +750,17 @@ function createEvalRuntime() {
     observeToolEvent: (event: BottleClassifierToolEvent) => {
       if (event.type === "tool_call") {
         const args = toJsonValue(event.arguments);
-        toolEvents.push({
+        const transcriptEvent: TranscriptEvent = {
           type: "tool_call",
           id: event.id,
           name: event.name,
           metadata: { phase: event.phase },
-          ...(args && typeof args === "object" && !Array.isArray(args)
-            ? { arguments: args }
-            : {}),
-        });
+        };
+        const parsedArgs = z.record(z.string(), z.json()).safeParse(args);
+        if (parsedArgs.success) {
+          transcriptEvent.arguments = parsedArgs.data;
+        }
+        toolEvents.push(transcriptEvent);
         return;
       }
 
@@ -921,7 +928,7 @@ type AuditJudgeContext = JudgeContext<
 
 function scoreAuditSemanticOutput(
   input: AuditBottleEvalFixture,
-  output: unknown,
+  output: JsonValue,
 ) {
   return scoreBottleCheckSemanticOutput(
     input.expected,
@@ -976,8 +983,8 @@ const ClassifierExpectationJudge = createJudge<ClassifierJudgeContext>(
     const result = parseClassificationRunOutput(run.output);
     const verdict =
       input.kind === "new_bottle_fixture"
-        ? evaluateNormalizationShape(input.testCase, result)
-        : evaluateDecisionShape(input.testCase, result);
+        ? evaluateNormalizationContract(input.testCase, result)
+        : evaluateDecisionContract(input.testCase, result);
     const expectedAction = getExpectedEvalAction(input);
     const actualAction = getActualEvalAction(result);
 

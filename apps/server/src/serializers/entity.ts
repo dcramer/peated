@@ -8,6 +8,11 @@ import { type EntitySchema } from "../schemas";
 import { CountrySerializer } from "./country";
 import { RegionSerializer } from "./region";
 
+interface EntityAttrs {
+  country: z.infer<typeof EntitySchema>["country"];
+  region: z.infer<typeof EntitySchema>["region"];
+}
+
 export const EntitySerializer = serializer({
   name: "entity",
   attrs: async (itemList: Entity[], currentUser?: User) => {
@@ -52,11 +57,7 @@ export const EntitySerializer = serializer({
       }),
     );
   },
-  item: (
-    item: Entity,
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ): z.infer<typeof EntitySchema> => {
+  item: (item: Entity, attrs: EntityAttrs): z.infer<typeof EntitySchema> => {
     return {
       id: item.id,
       name: item.name,

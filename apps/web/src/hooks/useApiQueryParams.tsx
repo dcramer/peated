@@ -1,13 +1,19 @@
 import { useSearchParams } from "next/navigation";
 
+type QueryParamValue = boolean | null | number | string | undefined;
+
+interface QueryParams {
+  [key: string]: QueryParamValue;
+}
+
 export default function useApiQueryParams({
   defaults = {},
   numericFields = ["cursor", "limit"],
   overrides = {},
 }: {
-  defaults?: Record<string, any>;
+  defaults?: QueryParams;
   numericFields?: string[];
-  overrides?: Record<string, any>;
+  overrides?: QueryParams;
 }) {
   const searchParams = useSearchParams();
 

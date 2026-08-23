@@ -1,20 +1,28 @@
 import config from "@peated/server/config";
 import {
   EXTERNAL_REVIEW_SUMMARY_PROMPT_VERSION,
+  type ExternalReviewSummaryServices,
   generateExternalReviewSummary,
 } from "@peated/server/externalReviews/summary";
-import { beforeEach, expect, test, vi } from "vitest";
+import { expect, test, vi } from "vitest";
 
-const openAIMocks = vi.hoisted(() => ({
-  createClient: vi.fn(),
-  isConfigured: vi.fn(),
-  responsesCreate: vi.fn(),
-}));
-
-vi.mock("@peated/server/lib/openaiClient", () => ({
-  createOpenAIClient: openAIMocks.createClient,
-  isAIGatewayConfigured: openAIMocks.isConfigured,
-}));
+function summaryServices() {
+  const create =
+    vi.fn<
+      ReturnType<
+        ExternalReviewSummaryServices["createClient"]
+      >["responses"]["create"]
+    >();
+  const createClient = vi.fn<ExternalReviewSummaryServices["createClient"]>(
+    () => ({ responses: { create } }),
+  );
+  const isConfigured = vi.fn(() => true);
+  return {
+    create,
+    createClient,
+    services: { createClient, isConfigured },
+  };
+}
 
 function response(summary: string) {
   return {
@@ -41,19 +49,10 @@ function input(externalSiteId: number, sourceText: string) {
   };
 }
 
-beforeEach(() => {
-  openAIMocks.createClient.mockReset();
-  openAIMocks.isConfigured.mockReset();
-  openAIMocks.responsesCreate.mockReset();
-  openAIMocks.isConfigured.mockReturnValue(true);
-  openAIMocks.createClient.mockReturnValue({
-    responses: { create: openAIMocks.responsesCreate },
-  });
-});
-
 test("skips the model when the source does not permit LLM processing", async ({
   fixtures,
 }) => {
+  const { create, services } = summaryServices();
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
@@ -62,21 +61,22 @@ test("skips the model when the source does not permit LLM processing", async ({
   });
 
   await expect(
-    generateExternalReviewSummary(input(site.id, "A useful review.")),
+    generateExternalReviewSummary(input(site.id, "A useful review."), services),
   ).resolves.toBeNull();
-  expect(openAIMocks.responsesCreate).not.toHaveBeenCalled();
+  expect(create).not.toHaveBeenCalled();
 });
 
 test("generates a short summary with provenance and no provider storage", async ({
   fixtures,
 }) => {
+  const { create, createClient, services } = summaryServices();
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
   });
   const sourceText =
     "The reviewer finds citrus and light smoke before a dry, balanced finish.";
-  openAIMocks.responsesCreate.mockResolvedValue(
+  create.mockResolvedValue(
     response(
       "The reviewer describes a bright whisky with measured smoke. They find the finish dry and balanced.",
     ),
@@ -84,6 +84,7 @@ test("generates a short summary with provenance and no provider storage", async 
 
   const result = await generateExternalReviewSummary(
     input(site.id, sourceText),
+    services,
   );
 
   expect(result).toMatchObject({
@@ -93,11 +94,11 @@ test("generates a short summary with provenance and no provider storage", async 
     promptVersion: EXTERNAL_REVIEW_SUMMARY_PROMPT_VERSION,
     generatedAt: expect.any(Date),
   });
-  expect(openAIMocks.createClient).toHaveBeenCalledWith({
+  expect(createClient).toHaveBeenCalledWith({
     instrumentWithSentry: false,
     workload: "scraper",
   });
-  expect(openAIMocks.responsesCreate).toHaveBeenCalledWith(
+  expect(create).toHaveBeenCalledWith(
     expect.objectContaining({
       model: config.BOTTLE_CLASSIFIER_MODEL,
       store: false,
@@ -110,17 +111,17 @@ test("generates a short summary with provenance and no provider storage", async 
 test("rejects output that does not contain two or three sentences", async ({
   fixtures,
 }) => {
+  const { create, services } = summaryServices();
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
   });
   const sourceText = "This source text must not appear in an error.";
-  openAIMocks.responsesCreate.mockResolvedValue(
-    response("The reviewer likes this whisky."),
-  );
+  create.mockResolvedValue(response("The reviewer likes this whisky."));
 
   const error = await generateExternalReviewSummary(
     input(site.id, sourceText),
+    services,
   ).catch((caught) => caught);
 
   expect(error).toMatchObject({
@@ -133,6 +134,7 @@ test("rejects output that does not contain two or three sentences", async ({
 test("rejects a long phrase copied from the publisher text", async ({
   fixtures,
 }) => {
+  const { create, services } = summaryServices();
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   await fixtures.EnabledExternalReviewSourcePolicy({
     externalSiteId: site.id,
@@ -140,11 +142,11 @@ test("rejects a long phrase copied from the publisher text", async ({
   const copiedPhrase =
     "the whisky opens with bright citrus soft smoke toasted grain and gentle spice";
   const sourceText = `${copiedPhrase} before a dry finish.`;
-  openAIMocks.responsesCreate.mockResolvedValue(
+  create.mockResolvedValue(
     response(`The reviewer says ${copiedPhrase}. They also note a dry finish.`),
   );
 
   await expect(
-    generateExternalReviewSummary(input(site.id, sourceText)),
+    generateExternalReviewSummary(input(site.id, sourceText), services),
   ).rejects.toThrow("External review summary generation failed.");
 });

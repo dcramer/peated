@@ -1,9 +1,11 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type {
   GenAiOperationName,
+  JsonValue,
   SimpleTraceRecord,
   UsageSummary,
 } from "vitest-evals/harness";
+import { z } from "zod";
 
 export type EvalModelCall = {
   operationName: "chat";
@@ -26,24 +28,64 @@ export type EvalModelCallStore = {
   calls: EvalModelCall[];
 };
 
+interface TraceAttributes {
+  [key: string]: JsonValue | undefined;
+}
+
 const evalModelCallStorage = new AsyncLocalStorage<EvalModelCallStore>();
 let nextEvalTraceId = 0;
 
-function objectProperty(value: unknown, property: string): unknown {
-  return value && typeof value === "object"
-    ? (value as Record<string, unknown>)[property]
-    : undefined;
-}
+const UsageDetailsSchema = z.record(z.string(), z.number());
+const EvalUsageSchema = z
+  .object({
+    input_tokens: z.number().optional(),
+    inputTokens: z.number().optional(),
+    output_tokens: z.number().optional(),
+    outputTokens: z.number().optional(),
+    total_tokens: z.number().optional(),
+    totalTokens: z.number().optional(),
+    input_tokens_details: UsageDetailsSchema.optional(),
+    inputTokensDetails: UsageDetailsSchema.optional(),
+    output_tokens_details: UsageDetailsSchema.optional(),
+    outputTokensDetails: UsageDetailsSchema.optional(),
+  })
+  .passthrough();
+const EvalRequestSchema = z.object({ model: z.string().min(1) }).passthrough();
+const EvalResponseSchema = z
+  .object({
+    id: z.string().min(1).optional(),
+    model: z.string().min(1).optional(),
+    usage: EvalUsageSchema.optional(),
+  })
+  .passthrough();
+type EvalUsage = z.infer<typeof EvalUsageSchema>;
+type UsageProperty =
+  | "input_tokens"
+  | "inputTokens"
+  | "output_tokens"
+  | "outputTokens"
+  | "total_tokens"
+  | "totalTokens";
+type UsageDetailsProperty =
+  | "input_tokens_details"
+  | "inputTokensDetails"
+  | "output_tokens_details"
+  | "outputTokensDetails";
 
-function finiteNonnegativeNumber(value: unknown): number | undefined {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0
+function finiteNonnegativeNumber(
+  value: number | undefined,
+): number | undefined {
+  return value !== undefined && Number.isFinite(value) && value >= 0
     ? Math.round(value)
     : undefined;
 }
 
-function usageNumber(usage: unknown, ...properties: string[]): number {
+function usageNumber(
+  usage: EvalUsage | undefined,
+  ...properties: UsageProperty[]
+): number {
   for (const property of properties) {
-    const measured = finiteNonnegativeNumber(objectProperty(usage, property));
+    const measured = finiteNonnegativeNumber(usage?.[property]);
     if (measured !== undefined) {
       return measured;
     }
@@ -53,16 +95,14 @@ function usageNumber(usage: unknown, ...properties: string[]): number {
 }
 
 function usageDetailNumber(
-  usage: unknown,
-  detailProperties: string[],
+  usage: EvalUsage | undefined,
+  detailProperties: UsageDetailsProperty[],
   valueProperties: string[],
 ): number | undefined {
   for (const detailProperty of detailProperties) {
-    const details = objectProperty(usage, detailProperty);
+    const details = usage?.[detailProperty];
     for (const valueProperty of valueProperties) {
-      const measured = finiteNonnegativeNumber(
-        objectProperty(details, valueProperty),
-      );
+      const measured = finiteNonnegativeNumber(details?.[valueProperty]);
       if (measured !== undefined) {
         return measured;
       }
@@ -84,75 +124,59 @@ export function getEvalModelCall({
   startedAt: Date;
   finishedAt?: Date;
 }): EvalModelCall | null {
-  const requestModel = objectProperty(request, "model");
-  if (typeof requestModel !== "string" || requestModel.length === 0) {
-    return null;
-  }
-
-  const responseModel = objectProperty(response, "model");
-  const usage = objectProperty(response, "usage");
+  const parsedRequest = EvalRequestSchema.safeParse(request);
+  if (!parsedRequest.success) return null;
+  const parsedResponse = EvalResponseSchema.safeParse(response);
+  const requestModel = parsedRequest.data.model;
+  const responseModel = parsedResponse.success
+    ? parsedResponse.data.model
+    : undefined;
+  const usage = parsedResponse.success ? parsedResponse.data.usage : undefined;
   const inputTokens = usageNumber(usage, "input_tokens", "inputTokens");
   const outputTokens = usageNumber(usage, "output_tokens", "outputTokens");
   const totalTokens = usageNumber(usage, "total_tokens", "totalTokens");
-  const responseId = objectProperty(response, "id");
+  const responseId = parsedResponse.success
+    ? parsedResponse.data.id
+    : undefined;
+  const cachedInputTokens = usageDetailNumber(
+    usage,
+    ["input_tokens_details", "inputTokensDetails"],
+    ["cached_tokens", "cachedTokens"],
+  );
+  const cacheWriteTokens = usageDetailNumber(
+    usage,
+    ["input_tokens_details", "inputTokensDetails"],
+    ["cache_write_tokens", "cacheWriteTokens"],
+  );
+  const reasoningTokens = usageDetailNumber(
+    usage,
+    ["output_tokens_details", "outputTokensDetails"],
+    ["reasoning_tokens", "reasoningTokens"],
+  );
 
-  return {
+  const modelCall: EvalModelCall = {
     operationName: "chat",
     providerName: "openai",
     requestModel,
-    responseModel:
-      typeof responseModel === "string" && responseModel.length > 0
-        ? responseModel
-        : requestModel,
-    ...(typeof responseId === "string" && responseId.length > 0
-      ? { responseId }
-      : {}),
+    responseModel: responseModel ?? requestModel,
     inputTokens,
-    ...(usageDetailNumber(
-      usage,
-      ["input_tokens_details", "inputTokensDetails"],
-      ["cached_tokens", "cachedTokens"],
-    ) === undefined
-      ? {}
-      : {
-          cachedInputTokens: usageDetailNumber(
-            usage,
-            ["input_tokens_details", "inputTokensDetails"],
-            ["cached_tokens", "cachedTokens"],
-          ),
-        }),
-    ...(usageDetailNumber(
-      usage,
-      ["input_tokens_details", "inputTokensDetails"],
-      ["cache_write_tokens", "cacheWriteTokens"],
-    ) === undefined
-      ? {}
-      : {
-          cacheWriteTokens: usageDetailNumber(
-            usage,
-            ["input_tokens_details", "inputTokensDetails"],
-            ["cache_write_tokens", "cacheWriteTokens"],
-          ),
-        }),
     outputTokens,
-    ...(usageDetailNumber(
-      usage,
-      ["output_tokens_details", "outputTokensDetails"],
-      ["reasoning_tokens", "reasoningTokens"],
-    ) === undefined
-      ? {}
-      : {
-          reasoningTokens: usageDetailNumber(
-            usage,
-            ["output_tokens_details", "outputTokensDetails"],
-            ["reasoning_tokens", "reasoningTokens"],
-          ),
-        }),
     totalTokens: totalTokens || inputTokens + outputTokens,
     startedAt: startedAt.toISOString(),
     finishedAt: finishedAt.toISOString(),
     durationMs: Math.max(0, finishedAt.getTime() - startedAt.getTime()),
   };
+  if (responseId) modelCall.responseId = responseId;
+  if (cachedInputTokens !== undefined) {
+    modelCall.cachedInputTokens = cachedInputTokens;
+  }
+  if (cacheWriteTokens !== undefined) {
+    modelCall.cacheWriteTokens = cacheWriteTokens;
+  }
+  if (reasoningTokens !== undefined) {
+    modelCall.reasoningTokens = reasoningTokens;
+  }
+  return modelCall;
 }
 
 /** Records an OpenAI response when an eval model-call capture is active. */
@@ -210,9 +234,20 @@ export function summarizeEvalModelCalls(
     0,
   );
 
-  return {
+  const metadata: NonNullable<UsageSummary["metadata"]> = {
+    scope: "full_llm_run",
+    requests: modelCalls.length,
+    models: Array.from(models),
+  };
+  if (modelCalls.some((call) => call.cachedInputTokens !== undefined)) {
+    metadata.cachedInputTokens = cachedInputTokens;
+  }
+  if (modelCalls.some((call) => call.cacheWriteTokens !== undefined)) {
+    metadata.cacheWriteTokens = cacheWriteTokens;
+  }
+
+  const summary: UsageSummary = {
     provider: "openai",
-    ...(models.size === 1 ? { model: modelCalls[0]?.responseModel } : {}),
     inputTokens: modelCalls.reduce(
       (total, call) => total + call.inputTokens,
       0,
@@ -221,25 +256,17 @@ export function summarizeEvalModelCalls(
       (total, call) => total + call.outputTokens,
       0,
     ),
-    ...(modelCalls.some((call) => call.reasoningTokens !== undefined)
-      ? { reasoningTokens }
-      : {}),
     totalTokens: modelCalls.reduce(
       (total, call) => total + call.totalTokens,
       0,
     ),
-    metadata: {
-      scope: "full_llm_run",
-      requests: modelCalls.length,
-      ...(modelCalls.some((call) => call.cachedInputTokens !== undefined)
-        ? { cachedInputTokens }
-        : {}),
-      ...(modelCalls.some((call) => call.cacheWriteTokens !== undefined)
-        ? { cacheWriteTokens }
-        : {}),
-      models: Array.from(models),
-    },
+    metadata,
   };
+  if (models.size === 1) summary.model = modelCalls[0]?.responseModel;
+  if (modelCalls.some((call) => call.reasoningTokens !== undefined)) {
+    summary.reasoningTokens = reasoningTokens;
+  }
+  return summary;
 }
 
 function usageAttributes(usage: UsageSummary) {
@@ -282,6 +309,21 @@ export function buildEvalModelCallTrace({
   );
   const requestModels = new Set(modelCalls.map((call) => call.requestModel));
   const responseModels = new Set(modelCalls.map((call) => call.responseModel));
+  const rootAttributes: TraceAttributes = {
+    "gen_ai.operation.name": operationName,
+    ...usageAttributes(usage),
+  };
+  if (operationName === "invoke_agent") {
+    rootAttributes["gen_ai.agent.name"] = name;
+  } else {
+    rootAttributes["gen_ai.workflow.name"] = name;
+  }
+  if (requestModels.size === 1) {
+    rootAttributes["gen_ai.request.model"] = modelCalls[0]?.requestModel;
+  }
+  if (responseModels.size === 1) {
+    rootAttributes["gen_ai.response.model"] = modelCalls[0]?.responseModel;
+  }
 
   return [
     {
@@ -301,19 +343,7 @@ export function buildEvalModelCallTrace({
           finishedAt,
           durationMs,
           status: "ok",
-          attributes: {
-            "gen_ai.operation.name": operationName,
-            ...(operationName === "invoke_agent"
-              ? { "gen_ai.agent.name": name }
-              : { "gen_ai.workflow.name": name }),
-            ...usageAttributes(usage),
-            ...(requestModels.size === 1
-              ? { "gen_ai.request.model": modelCalls[0]?.requestModel }
-              : {}),
-            ...(responseModels.size === 1
-              ? { "gen_ai.response.model": modelCalls[0]?.responseModel }
-              : {}),
-          },
+          attributes: rootAttributes,
         },
         ...modelCalls.map((call, index) => ({
           id: `${traceId}:model:${index + 1}`,

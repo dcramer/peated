@@ -77,34 +77,37 @@ type Props<T extends Option> = BaseProps &
 
 export type { Option };
 
-export default function SelectField<T extends Option>({
-  name,
-  helpText,
-  label,
-  required,
-  className,
-  multiple,
-  targetOptions = 5,
-  suggestedOptions,
-  simple = false,
-  emptyListItem,
-  canCreate,
-  createForm,
-  placeholder,
-  onQuery,
-  onResults,
-  options = [],
-  onRenderOption,
-  onRenderChip,
-  onChange,
-  noDialog = false,
-  noSort = false,
-  error,
-  disabled = false,
-  readOnly = false,
-  rememberValues = true,
-  ...props
-}: Props<T>) {
+export default function SelectField<T extends Option>(selectProps: Props<T>) {
+  const {
+    name,
+    helpText,
+    label,
+    required,
+    className,
+    multiple,
+    targetOptions: targetOptionsProp = 5,
+    suggestedOptions: suggestedOptionsProp,
+    simple = false,
+    emptyListItem,
+    canCreate,
+    createForm,
+    placeholder,
+    onQuery,
+    onResults,
+    options = [],
+    onRenderOption,
+    onRenderChip,
+    onChange,
+    noDialog = false,
+    noSort = false,
+    error,
+    disabled = false,
+    readOnly = false,
+    rememberValues = true,
+    ...props
+  } = selectProps;
+  let targetOptions = targetOptionsProp;
+  let suggestedOptions = suggestedOptionsProp;
   const initialValue = Array.isArray(props.value)
     ? props.value
     : props.value
@@ -155,11 +158,10 @@ export default function SelectField<T extends Option>({
 
   /* oxlint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    if (!onChange) return;
-    if (multiple) {
-      (onChange as (value: T[]) => void)(value);
+    if (selectProps.multiple) {
+      selectProps.onChange?.(value);
     } else {
-      (onChange as (value: T) => void)(value[0]);
+      selectProps.onChange?.(value[0]);
     }
   }, [JSON.stringify(value)]);
   /* oxlint-enable react-hooks/exhaustive-deps */

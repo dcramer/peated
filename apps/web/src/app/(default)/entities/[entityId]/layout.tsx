@@ -41,7 +41,7 @@ export async function generateMetadata(props: {
 }
 
 export default async function Layout(props: {
-  params: Promise<Record<string, any>>;
+  params: Promise<{ entityId: string }>;
   children: ReactNode;
 }) {
   const params = await props.params;

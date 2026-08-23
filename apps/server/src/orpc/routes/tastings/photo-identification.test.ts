@@ -1,3 +1,8 @@
+import { createRouterClient } from "@orpc/server";
+import type {
+  BottleClassificationArtifactsSchema,
+  BottleClassificationDecisionSchema,
+} from "@peated/server/agents/bottleClassifier";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import { BottleClassificationResultSchema } from "@peated/server/agents/bottleClassifier/contract";
 import config from "@peated/server/config";
@@ -11,46 +16,112 @@ import {
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
-import type * as pendingUploadsModule from "@peated/server/lib/pendingUploads";
-import type * as photoIdentificationModule from "@peated/server/lib/photoIdentification";
+import {
+  copyPendingImageToBottle,
+  createPendingImageUpload,
+} from "@peated/server/lib/pendingUploads";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
-import { routerClient } from "@peated/server/orpc/router";
-import * as Sentry from "@sentry/node";
+import {
+  createPhotoIdentificationProcedure,
+  identifyPendingImage,
+  type IdentifyPendingImageServices,
+  type PhotoIdentificationProcedureServices,
+  type PhotoIdentificationSpan,
+  type PhotoIdentificationStartSpan,
+} from "@peated/server/orpc/routes/tastings/photo-identification";
+import { createPhotoIdentificationCreateProcedure } from "@peated/server/orpc/routes/tastings/photo-identification-create";
+import type { PhotoIdentificationInputSchema } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
+import type { z } from "zod";
 
-const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
-const runBottleReferenceMock = vi.hoisted(() => vi.fn());
-const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
-const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
-const sentrySpanSetAttributeMock = vi.hoisted(() => vi.fn());
-const sentrySpanSetAttributesMock = vi.hoisted(() => vi.fn());
+type RunReference = IdentifyPendingImageServices["runReference"];
+const classifyBottleReferenceMock =
+  vi.fn<
+    (
+      input: Parameters<RunReference>[0],
+    ) => Promise<Awaited<ReturnType<RunReference>>["result"]>
+  >();
+const runBottleReferenceMock = vi.fn<RunReference>();
+const extractPhotoBottleEvidenceMock =
+  vi.fn<IdentifyPendingImageServices["extractEvidence"]>();
+const copyPendingImageToBottleMock = vi.fn<typeof copyPendingImageToBottle>();
+const sentrySpanSetAttributeMock = vi.fn();
+const startSpanCallMock = vi.fn();
+const photoIdentificationSpan: PhotoIdentificationSpan = {
+  setAttribute(key, value) {
+    sentrySpanSetAttributeMock(key, value);
+  },
+};
+const startSpan: PhotoIdentificationStartSpan = async (context, callback) => {
+  startSpanCallMock(context, callback);
+  return await callback(photoIdentificationSpan);
+};
 const originalAIGatewayApiKey = config.AI_GATEWAY_API_KEY;
 
-vi.mock("@sentry/node", { spy: true });
-vi.mock(
-  "@peated/server/agents/bottleClassifier/classifyBottleReference",
-  () => ({
-    classifyBottleReference: classifyBottleReferenceMock,
-    runBottleReference: runBottleReferenceMock,
-  }),
-);
-vi.mock("@peated/server/lib/photoIdentification", async (importOriginal) => ({
-  ...(await importOriginal<typeof photoIdentificationModule>()),
-  extractPhotoBottleEvidence: extractPhotoBottleEvidenceMock,
-}));
-vi.mock("@peated/server/lib/pendingUploads", async (importOriginal) => {
-  const actual = await importOriginal<typeof pendingUploadsModule>();
-  copyPendingImageToBottleMock.mockImplementation(
-    actual.copyPendingImageToBottle,
-  );
-  return {
-    ...actual,
-    copyPendingImageToBottle: copyPendingImageToBottleMock,
-  };
+type ClassificationDecisionInput = z.input<
+  typeof BottleClassificationDecisionSchema
+>;
+type CreateDecisionInput = Extract<
+  ClassificationDecisionInput,
+  { action: "create_bottle" }
+>;
+type MockClassificationDecision = {
+  action: ClassificationDecisionInput["action"];
+  rationale?: ClassificationDecisionInput["rationale"];
+  candidateBottleIds?: ClassificationDecisionInput["candidateBottleIds"];
+  identityScope?: ClassificationDecisionInput["identityScope"];
+  aliasScope?: ClassificationDecisionInput["aliasScope"];
+  observation?: ClassificationDecisionInput["observation"];
+  confidenceBasis?: ClassificationDecisionInput["confidenceBasis"];
+  matchedBottleId?: number | null;
+  proposedBottle?: CreateDecisionInput["proposedBottle"];
+};
+type MockCreateBottleDecision = Omit<
+  MockClassificationDecision,
+  "action" | "proposedBottle"
+> & {
+  action: "create_bottle";
+  proposedBottle: CreateDecisionInput["proposedBottle"];
+};
+
+const identifyImage: PhotoIdentificationProcedureServices["identifyImage"] = (
+  input,
+) =>
+  identifyPendingImage(input, {
+    extractEvidence: extractPhotoBottleEvidenceMock,
+    runReference: runBottleReferenceMock,
+    startSpan,
+  });
+const photoIdentificationProcedure = createPhotoIdentificationProcedure({
+  createPendingImage: createPendingImageUpload,
+  identifyImage,
 });
+const photoIdentificationCreateProcedure =
+  createPhotoIdentificationCreateProcedure(copyPendingImageToBottleMock);
+
+const routerClient = {
+  tastings: {
+    photoIdentification: (
+      input: z.input<typeof PhotoIdentificationInputSchema>,
+      options?: { context: Context },
+    ) =>
+      createRouterClient(
+        { photoIdentification: photoIdentificationProcedure },
+        { context: options?.context ?? { user: null } },
+      ).photoIdentification(input),
+    photoIdentificationCreate: (
+      input: { createToken: string },
+      options?: { context: Context },
+    ) =>
+      createRouterClient(
+        { photoIdentificationCreate: photoIdentificationCreateProcedure },
+        { context: options?.context ?? { user: null } },
+      ).photoIdentificationCreate(input),
+  },
+};
 function buildImageEvidence(
   sourceImageId: string,
   photoSuitability: Partial<{
@@ -95,8 +166,8 @@ function buildImageEvidence(
 }
 
 function buildClassification(
-  decision: Record<string, unknown>,
-  artifacts: Record<string, unknown> = {},
+  decision: MockClassificationDecision,
+  artifacts: z.input<typeof BottleClassificationArtifactsSchema> = {},
 ) {
   return BottleClassificationResultSchema.parse({
     status: "classified" as const,
@@ -142,7 +213,7 @@ function buildCreateBottleDecision({
       | "weak"
       | "conflicting";
   };
-}) {
+}): MockCreateBottleDecision {
   return {
     action: "create_bottle",
     rationale: "Reliable photo evidence supports creating the bottle.",
@@ -190,10 +261,10 @@ async function identifyCreateProposal({
   fixtures: { SampleSquareImage: () => Promise<Blob> };
   user: NonNullable<Context["user"]>;
   idempotencyKey: string;
-  decision: Record<string, unknown>;
+  decision: MockClassificationDecision;
   candidates?: Array<{
     bottleId: number;
-    fullName?: string;
+    fullName: string;
   }>;
   suitableAsBottleImage?: boolean;
 }) {
@@ -210,6 +281,9 @@ async function identifyCreateProposal({
         abv: null,
         vintage_year: null,
         release_year: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
         cask_strength: null,
         single_cask: null,
         edition: null,
@@ -270,21 +344,14 @@ describe("POST /tastings/photo-identification", () => {
       modelMetadata: null,
     }));
     extractPhotoBottleEvidenceMock.mockReset();
-    copyPendingImageToBottleMock.mockClear();
+    copyPendingImageToBottleMock.mockReset();
+    copyPendingImageToBottleMock.mockImplementation(copyPendingImageToBottle);
+    startSpanCallMock.mockReset();
     sentrySpanSetAttributeMock.mockClear();
-    sentrySpanSetAttributesMock.mockClear();
-    vi.mocked(Sentry.startSpan).mockImplementation(
-      async (_context, callback) =>
-        await callback({
-          setAttribute: sentrySpanSetAttributeMock,
-          setAttributes: sentrySpanSetAttributesMock,
-        } as unknown as Parameters<typeof callback>[0]),
-    );
   });
 
   afterEach(() => {
     config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
-    vi.mocked(Sentry.startSpan).mockReset();
   });
 
   test("requires authentication", async ({ fixtures }) => {
@@ -399,7 +466,7 @@ describe("POST /tastings/photo-identification", () => {
         conversationId: `photo_identification:${response.pendingImage.id}`,
       }),
     );
-    expect(Sentry.startSpan).toHaveBeenCalledWith(
+    expect(startSpanCallMock).toHaveBeenCalledWith(
       expect.objectContaining({
         op: "gen_ai.invoke_workflow",
         name: "invoke_workflow Photo Identification",
@@ -536,6 +603,9 @@ describe("POST /tastings/photo-identification", () => {
           abv: null,
           vintage_year: null,
           release_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -601,6 +671,9 @@ describe("POST /tastings/photo-identification", () => {
           abv: 54.2,
           vintage_year: null,
           release_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -861,7 +934,7 @@ describe("POST /tastings/photo-identification", () => {
         webEvidence: "supportive",
       },
     });
-    const proposedBottle = {
+    const proposedBottle: CreateDecisionInput["proposedBottle"] = {
       ...baseDecision.proposedBottle,
       series: { id: 77, name: "Hedonism" },
       category: "blend",

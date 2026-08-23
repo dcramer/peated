@@ -6,19 +6,17 @@ export function arraysEqual<T>(one: T[], two: T[]) {
   return true;
 }
 
-export function objectsShallowEqual(
-  object1: Record<any, any>,
-  object2: Record<any, any>,
-) {
-  const keys1 = Object.keys(object1);
-  const keys2 = Object.keys(object2);
+export function objectsShallowEqual<T extends object>(object1: T, object2: T) {
+  const entries1 = Object.entries(object1);
+  const entries2 = Object.entries(object2);
 
-  if (keys1.length !== keys2.length) {
+  if (entries1.length !== entries2.length) {
     return false;
   }
 
-  for (const key of keys1) {
-    if (object1[key] !== object2[key]) {
+  const values2 = new Map(entries2);
+  for (const [key, value] of entries1) {
+    if (value !== values2.get(key)) {
       return false;
     }
   }

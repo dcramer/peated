@@ -140,11 +140,15 @@ type ExactBottleCreateInput = Pick<
   | "tastingNotes"
 >;
 
-/** The server owns storage scope. New singleton groups have no shared age. */
-function splitBottleCreateInput(input: BottleCreateInput): {
+interface SplitBottleCreateInput {
   group: BottleGroupCreateInput;
   exact: ExactBottleCreateInput;
-} {
+}
+
+/** The server owns storage scope. New singleton groups have no shared age. */
+function splitBottleCreateInput(
+  input: BottleCreateInput,
+): SplitBottleCreateInput {
   const {
     name,
     series,
@@ -190,7 +194,7 @@ async function prepareBottleCreateInTransaction(
   },
 ): Promise<PreparedBottleCreate> {
   const actorId = createdByActorId;
-  const bottleData: BottlePreviewResult & Record<string, any> =
+  const bottleData: BottlePreviewResult & Partial<typeof bottles.$inferInsert> =
     await bottleNormalize({ input, entityDb: tx });
   if (bottleIdentity) {
     // Explicit exact input overrides traits inferred from the group name.
@@ -792,6 +796,9 @@ export async function finalizeCreatedBottle(
 }
 
 export type CreateBottleResult = Pick<BottleCreateResult, "bottle" | "group">;
+type BottleCreateInputCandidate = Partial<
+  z.input<typeof BottleCreateInputSchema>
+>;
 
 /** Actor resolution stays outside this transaction and post-commit boundary. */
 async function createBottleForActor({
@@ -801,7 +808,7 @@ async function createBottleForActor({
 }: {
   actorId: number;
   creationSource: CatalogVerificationCreationSource;
-  input: unknown;
+  input: BottleCreateInputCandidate;
 }): Promise<CreateBottleResult> {
   const input = BottleCreateInputSchema.parse(rawInput);
   const result = await db.transaction(async (tx) =>
@@ -826,7 +833,7 @@ export async function createBottle({
   context,
 }: {
   creationSource?: CatalogVerificationCreationSource;
-  input: unknown;
+  input: BottleCreateInputCandidate;
   context: Context & { user: User };
 }): Promise<CreateBottleResult> {
   const actor = await getUserActor(context.user);
@@ -835,7 +842,7 @@ export async function createBottle({
 
 /** Trusted scraper capability; automated creation is always Peated-owned. */
 export async function createBottleAsPeated(
-  input: unknown,
+  input: BottleCreateInputCandidate,
 ): Promise<CreateBottleResult> {
   const actor = await getPeatedSystemActor();
   return createBottleForActor({

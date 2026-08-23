@@ -1,4 +1,6 @@
+import { RunContext } from "@openai/agents";
 import { describe, expect, test, vi } from "vitest";
+import { z } from "zod";
 import {
   createFirecrawlReadPageTool,
   extractFirecrawlPageEvidence,
@@ -14,6 +16,17 @@ import {
   createBottleWebSearchBudget,
   type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
+
+const runContext = new RunContext();
+const FirecrawlSearchRequestSchema = z.object({
+  query: z.string(),
+  limit: z.number(),
+  sources: z.array(z.string()),
+});
+const FirecrawlScrapeRequestSchema = z.object({
+  formats: z.array(z.object({ type: z.string(), query: z.string() })),
+  proxy: z.string(),
+});
 
 describe("bottleClassifier web search tool", () => {
   test("removes tracking parameters from collected evidence URLs", () => {
@@ -106,9 +119,9 @@ describe("bottleClassifier web search tool", () => {
           body: expect.stringContaining("example distillery private cask"),
         }),
       );
-      const searchBody = JSON.parse(
-        String(fetch.mock.calls[0]?.[1]?.body),
-      ) as Record<string, unknown>;
+      const searchBody = FirecrawlSearchRequestSchema.parse(
+        JSON.parse(String(fetch.mock.calls[0]?.[1]?.body)),
+      );
       expect(searchBody).toEqual({
         query: "example distillery private cask",
         limit: 5,
@@ -151,7 +164,7 @@ describe("bottleClassifier web search tool", () => {
     });
 
     await tool.invoke(
-      {} as never,
+      runContext,
       JSON.stringify({
         queries: ["laphroaig cairdeas 2022 warehouse 1"],
       }),
@@ -188,8 +201,8 @@ describe("bottleClassifier web search tool", () => {
       queries: ["laphroaig cairdeas 2022 warehouse 1"],
     });
 
-    await tool.invoke({} as never, args);
-    await expect(tool.invoke({} as never, args)).resolves.toEqual({
+    await tool.invoke(runContext, args);
+    await expect(tool.invoke(runContext, args)).resolves.toEqual({
       error: "Web search budget exhausted after 1 query",
     });
     expect(executeWebSearch).toHaveBeenCalledOnce();
@@ -221,14 +234,14 @@ describe("bottleClassifier web search tool", () => {
       });
 
       await tool.invoke(
-        {} as never,
+        runContext,
         JSON.stringify({ queries: ["laphroaig cairdeas warehouse 1"] }),
       );
 
       expect(fetch).toHaveBeenCalledOnce();
       await expect(
         tool.invoke(
-          {} as never,
+          runContext,
           JSON.stringify({
             queries: ["laphroaig cairdeas warehouse 1 again"],
           }),
@@ -245,10 +258,10 @@ describe("bottleClassifier web search tool", () => {
     const fetch = vi
       .fn()
       .mockImplementation(async (_url, init: RequestInit) => {
-        if (typeof init.body !== "string") {
-          throw new TypeError("Expected a JSON request body");
-        }
-        const body = JSON.parse(init.body) as { query: string };
+        const requestBody = z.string().parse(init.body);
+        const body = z
+          .object({ query: z.string() })
+          .parse(JSON.parse(requestBody));
         return {
           ok: true,
           json: async () => ({
@@ -273,7 +286,7 @@ describe("bottleClassifier web search tool", () => {
         budget: createBottleWebSearchBudget(2),
       });
       const result = await tool.invoke(
-        {} as never,
+        runContext,
         JSON.stringify({
           queries: ["example cask 71", "example single cask 2019"],
         }),
@@ -324,10 +337,9 @@ describe("bottleClassifier web search tool", () => {
           body: expect.stringContaining(pageUrl),
         }),
       );
-      const scrapeBody = JSON.parse(String(fetch.mock.calls[0]?.[1]?.body)) as {
-        formats: Array<{ type: string; query: string }>;
-        proxy: string;
-      };
+      const scrapeBody = FirecrawlScrapeRequestSchema.parse(
+        JSON.parse(String(fetch.mock.calls[0]?.[1]?.body)),
+      );
       expect(scrapeBody.formats).toEqual([
         {
           type: "highlights",
@@ -367,7 +379,7 @@ describe("bottleClassifier web search tool", () => {
     });
 
     await tool.invoke(
-      {} as never,
+      runContext,
       JSON.stringify({ url: pageUrl, focus: "exact edition" }),
     );
 
@@ -406,12 +418,12 @@ describe("bottleClassifier web search tool", () => {
     });
 
     await searchTool.invoke(
-      {} as never,
+      runContext,
       JSON.stringify({ queries: ["the gauldrons eclipse 52.9"] }),
     );
     await expect(
       readTool.invoke(
-        {} as never,
+        runContext,
         JSON.stringify({
           url: "https://www.douglaslaing.com/products/the-gauldrons-eclipse",
           focus: "ABV",
@@ -420,7 +432,7 @@ describe("bottleClassifier web search tool", () => {
     ).resolves.toMatchObject({ summary: "The bottle is 52.9% ABV." });
     await expect(
       readTool.invoke(
-        {} as never,
+        runContext,
         JSON.stringify({
           url: "https://example.com/second-page",
           focus: "release year",

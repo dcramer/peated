@@ -1,6 +1,5 @@
-import type serverConfig from "@peated/server/config";
 import { db } from "@peated/server/db";
-import type { User } from "@peated/server/db/schema";
+import type { Bottle, User } from "@peated/server/db/schema";
 import {
   bottleGroups,
   bottles,
@@ -8,35 +7,31 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { createBottle } from "@peated/server/lib/createBottle";
-import { getStructuredResponse } from "@peated/server/lib/openai";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { updateBottle } from "@peated/server/lib/updateBottle";
-import * as workerClient from "@peated/server/worker/client";
+import type { JobPayload } from "@peated/server/worker/types";
 import { and, asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
-import generateBottleDetails, {
+import {
+  type BottleDetailsModel,
+  generateBottleDetails as generateBottleDetailsWithServices,
   type GeneratedBottleDetails,
   getGeneratedBottleDetails,
 } from "./generateBottleDetails";
 
-vi.mock("@peated/server/config", async (importOriginal) => {
-  const actual = await importOriginal<{ default: typeof serverConfig }>();
-  return {
-    default: {
-      ...actual.default,
-      AI_GATEWAY_API_KEY: "test-api-key",
-    },
-  };
-});
+let bottleDetailsModel: ReturnType<typeof vi.fn<BottleDetailsModel>>;
 
-vi.mock("@peated/server/lib/openai", () => ({
-  getStructuredResponse: vi.fn(),
-}));
+function generateBottleDetails(rawJobArgs: JobPayload) {
+  return generateBottleDetailsWithServices(rawJobArgs, {
+    aiEnabled: true,
+    generateDetails: async (bottle: Partial<Bottle>) =>
+      await getGeneratedBottleDetails(bottle, bottleDetailsModel),
+  });
+}
 
 function contextFor(user: User) {
-  return {
-    user,
-  } as Parameters<typeof createBottle>[0]["context"];
+  return { user };
 }
 
 function generatedDetails(): GeneratedBottleDetails {
@@ -55,9 +50,7 @@ function generatedDetails(): GeneratedBottleDetails {
 
 function deferModelResult() {
   const deferred = Promise.withResolvers<GeneratedBottleDetails | null>();
-  vi.mocked(getStructuredResponse).mockImplementation(
-    async () => await deferred.promise,
-  );
+  bottleDetailsModel.mockImplementation(async () => await deferred.promise);
   return deferred;
 }
 
@@ -90,7 +83,7 @@ async function createTwoMemberGroup(user: User, brandId: number) {
 }
 
 beforeEach(() => {
-  vi.mocked(getStructuredResponse).mockReset();
+  bottleDetailsModel = vi.fn();
   vi.mocked(workerClient.pushUniqueJob).mockClear();
 });
 
@@ -100,7 +93,7 @@ test("normalizes generated tags to the catalog and storage limit", async ({
   for (const name of ["smoke", "fruit", "oak", "vanilla", "citrus", "malt"]) {
     await fixtures.Tag({ name });
   }
-  vi.mocked(getStructuredResponse).mockResolvedValue({
+  bottleDetailsModel.mockResolvedValue({
     ...generatedDetails(),
     suggestedTags: [
       "smoke",
@@ -115,20 +108,26 @@ test("normalizes generated tags to the catalog and storage limit", async ({
   });
 
   await expect(
-    getGeneratedBottleDetails({ id: 1, fullName: "Generated Tag Example" }),
+    getGeneratedBottleDetails(
+      { id: 1, fullName: "Generated Tag Example" },
+      bottleDetailsModel,
+    ),
   ).resolves.toMatchObject({
     suggestedTags: ["smoke", "fruit", "oak", "vanilla", "citrus"],
   });
 });
 
 test("returns no generated tags when the catalog is empty", async () => {
-  vi.mocked(getStructuredResponse).mockResolvedValue({
+  bottleDetailsModel.mockResolvedValue({
     ...generatedDetails(),
     suggestedTags: ["unsupported"],
   });
 
   await expect(
-    getGeneratedBottleDetails({ id: 1, fullName: "Generated Tag Example" }),
+    getGeneratedBottleDetails(
+      { id: 1, fullName: "Generated Tag Example" },
+      bottleDetailsModel,
+    ),
   ).resolves.toMatchObject({ suggestedTags: [] });
 });
 
@@ -140,7 +139,7 @@ test("rejects an unassigned Bottle before invoking AI", async ({
   await expect(generateBottleDetails({ bottleId: bottle.id })).rejects.toThrow(
     `Bottle ${bottle.id} does not belong to an active BottleGroup.`,
   );
-  expect(getStructuredResponse).not.toHaveBeenCalled();
+  expect(bottleDetailsModel).not.toHaveBeenCalled();
 });
 
 test("rejects a Bottle tombstone before invoking AI", async ({ fixtures }) => {
@@ -156,7 +155,7 @@ test("rejects a Bottle tombstone before invoking AI", async ({ fixtures }) => {
   ).rejects.toThrow(
     `Bottle ${retiredBottle.id} does not belong to an active BottleGroup.`,
   );
-  expect(getStructuredResponse).not.toHaveBeenCalled();
+  expect(bottleDetailsModel).not.toHaveBeenCalled();
 });
 
 test("fans out generated details and keeps exact content selected-only", async ({
@@ -170,7 +169,7 @@ test("fans out generated details and keeps exact content selected-only", async (
     defaults.user,
     brand.id,
   );
-  vi.mocked(getStructuredResponse).mockResolvedValue({
+  bottleDetailsModel.mockResolvedValue({
     description: "Generated description",
     tastingNotes: {
       nose: "Generated nose",
@@ -267,7 +266,7 @@ test("preserves a concurrent moderator exact-content edit", async ({
   const { source } = await createTwoMemberGroup(defaults.user, brand.id);
   const deferred = deferModelResult();
   const work = generateBottleDetails({ bottleId: source.bottle.id });
-  await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
+  await vi.waitFor(() => expect(bottleDetailsModel).toHaveBeenCalledOnce());
 
   await updateBottle({
     bottleId: source.bottle.id,
@@ -320,7 +319,7 @@ test("discards generated work planned from stale exact identity", async ({
   const { source } = await createTwoMemberGroup(defaults.user, brand.id);
   const deferred = deferModelResult();
   const work = generateBottleDetails({ bottleId: source.bottle.id });
-  await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
+  await vi.waitFor(() => expect(bottleDetailsModel).toHaveBeenCalledOnce());
 
   await updateBottle({
     bottleId: source.bottle.id,
@@ -377,7 +376,7 @@ test("preserves a concurrent moderator shared-flavor edit", async ({
   );
   const deferred = deferModelResult();
   const work = generateBottleDetails({ bottleId: source.bottle.id });
-  await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
+  await vi.waitFor(() => expect(bottleDetailsModel).toHaveBeenCalledOnce());
 
   await updateBottle({
     bottleId: source.bottle.id,
@@ -418,7 +417,7 @@ test("discards generated work planned from stale shared authority", async ({
   const { source } = await createTwoMemberGroup(defaults.user, brand.id);
   const deferred = deferModelResult();
   const work = generateBottleDetails({ bottleId: source.bottle.id });
-  await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
+  await vi.waitFor(() => expect(bottleDetailsModel).toHaveBeenCalledOnce());
 
   await db
     .update(bottleGroups)
@@ -466,7 +465,7 @@ test("does not fan out after the selected Bottle moves groups", async ({
   });
   const deferred = deferModelResult();
   const work = generateBottleDetails({ bottleId: source.bottle.id });
-  await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
+  await vi.waitFor(() => expect(bottleDetailsModel).toHaveBeenCalledOnce());
 
   await db
     .update(bottleGroups)
@@ -557,5 +556,5 @@ test("rejects invalid shared authority before invoking AI", async ({
       .where(and(eq(changes.objectType, "bottle"), eq(changes.type, "update"))),
   ).toEqual([]);
   expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
-  expect(getStructuredResponse).not.toHaveBeenCalled();
+  expect(bottleDetailsModel).not.toHaveBeenCalled();
 });

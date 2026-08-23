@@ -1,10 +1,10 @@
 import { db } from "@peated/server/db";
 import { externalSiteRuns } from "@peated/server/db/schema";
-import { pushJob } from "@peated/server/worker/client";
+import { createScraperLifecycle } from "@peated/server/scraper/lifecycle";
+import { scraperRegistry } from "@peated/server/scraper/registry";
 import { asc } from "drizzle-orm";
-import scheduleScrapers from "./scheduleScrapers";
-
-vi.mock("@peated/server/worker/client");
+import { vi } from "vitest";
+import { scheduleScrapers } from "./scheduleScrapers";
 
 test("skips disabled targets and schedules other due scrapers", async ({
   fixtures,
@@ -19,8 +19,11 @@ test("skips disabled targets and schedules other due scrapers", async ({
     runEvery: 60,
     nextRunAt: null,
   });
+  const enqueue = vi.fn(async () => undefined);
 
-  await scheduleScrapers();
+  await scheduleScrapers(
+    createScraperLifecycle({ registry: scraperRegistry, enqueue }),
+  );
 
   const runs = await db
     .select()
@@ -33,5 +36,5 @@ test("skips disabled targets and schedules other due scrapers", async ({
     trigger: "scheduled",
   });
   expect(runs[0]?.externalSiteId).not.toBe(disabledSite.id);
-  expect(pushJob).toHaveBeenCalledOnce();
+  expect(enqueue).toHaveBeenCalledOnce();
 });

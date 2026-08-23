@@ -228,6 +228,7 @@ describe("pending uploads", () => {
       createPendingImageUpload({
         file: await fixtures.SampleSquareImage(),
         createdById: defaults.user.id,
+        // SAFETY: This test sends an invalid purpose to the runtime validator.
         purpose: "invalid_purpose" as any,
         onProcess: (stream, filename) => {
           storedFilename = `${filename}.jpg`;

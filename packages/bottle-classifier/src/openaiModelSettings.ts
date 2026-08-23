@@ -1,4 +1,5 @@
 import type { ModelSettings } from "@openai/agents";
+import { z } from "zod";
 
 export const DEFAULT_BOTTLE_CLASSIFIER_MODEL = "gpt-5.6-terra";
 export const DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT = "medium";
@@ -21,6 +22,7 @@ export const OPENAI_REASONING_EFFORTS = [
 ] as const satisfies readonly OpenAISdkReasoningEffort[];
 
 export type OpenAIReasoningEffort = (typeof OPENAI_REASONING_EFFORTS)[number];
+const OpenAIReasoningEffortSchema = z.enum(OPENAI_REASONING_EFFORTS);
 
 export function parseOpenAIReasoningEffort(
   value: string | undefined,
@@ -31,37 +33,36 @@ export function parseOpenAIReasoningEffort(
     return undefined;
   }
 
-  if (
-    OPENAI_REASONING_EFFORTS.includes(
-      normalized as (typeof OPENAI_REASONING_EFFORTS)[number],
-    )
-  ) {
-    return normalized as OpenAIReasoningEffort;
-  }
+  const effort = OpenAIReasoningEffortSchema.safeParse(normalized);
+  if (effort.success) return effort.data;
 
   throw new Error(
     `${settingName} must be one of: ${OPENAI_REASONING_EFFORTS.join(", ")}`,
   );
 }
 
+export interface StableOpenAISettings {
+  temperature?: number;
+  reasoning?: { effort: OpenAIReasoningEffort };
+}
+
 export function getStableOpenAISettings(
   model: string,
   reasoningEffort?: OpenAIReasoningEffort,
-): {
-  temperature?: number;
-  reasoning?: { effort: OpenAIReasoningEffort };
-} {
+): StableOpenAISettings {
   const modelName = model.toLowerCase().split("/").at(-1) ?? model;
   const resolvedReasoningEffort = resolveOpenAIReasoningEffort(
     model,
     reasoningEffort,
   );
-  return {
-    ...(modelName.startsWith("gpt-5") ? {} : { temperature: 0 }),
-    ...(resolvedReasoningEffort
-      ? { reasoning: { effort: resolvedReasoningEffort } }
-      : {}),
-  };
+  const settings: StableOpenAISettings = {};
+  if (!modelName.startsWith("gpt-5")) {
+    settings.temperature = 0;
+  }
+  if (resolvedReasoningEffort) {
+    settings.reasoning = { effort: resolvedReasoningEffort };
+  }
+  return settings;
 }
 
 export function resolveOpenAIReasoningEffort(

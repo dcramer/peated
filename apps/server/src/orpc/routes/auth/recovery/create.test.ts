@@ -1,13 +1,17 @@
-import { sendPasswordResetEmail } from "@peated/server/lib/email";
+import { createRouterClient } from "@orpc/server";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
+import { createAuthRateLimit } from "@peated/server/orpc/middleware/rateLimit";
+import {
+  createRecoveryProcedure,
+  type PasswordResetEmailSender,
+} from "@peated/server/orpc/routes/auth/recovery/create";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-// Mock the sendPasswordResetEmail function
-vi.mock("@peated/server/lib/email", () => ({
-  sendPasswordResetEmail: vi.fn(),
-}));
+const sendPasswordResetEmail = vi.fn<PasswordResetEmailSender>();
+const recoveryClient = createRouterClient(
+  { create: createRecoveryProcedure(sendPasswordResetEmail) },
+  { context: { ip: "127.0.0.1", user: null } },
+);
 
 describe("POST /auth/password-reset", () => {
   beforeEach(() => {
@@ -19,12 +23,7 @@ describe("POST /auth/password-reset", () => {
   }) => {
     const user = await fixtures.User();
 
-    await routerClient.auth.recovery.create(
-      {
-        email: user.email,
-      },
-      { context: { ip: "127.0.0.1" } },
-    );
+    await recoveryClient.create({ email: user.email });
 
     expect(sendPasswordResetEmail).toHaveBeenCalledTimes(1);
     expect(sendPasswordResetEmail).toHaveBeenCalledWith({ user });
@@ -34,12 +33,7 @@ describe("POST /auth/password-reset", () => {
     const nonExistentEmail = "nonexistent@example.com";
 
     // Should return success even for non-existent users (prevents user enumeration)
-    await routerClient.auth.recovery.create(
-      {
-        email: nonExistentEmail,
-      },
-      { context: { ip: "127.0.0.1" } },
-    );
+    await recoveryClient.create({ email: nonExistentEmail });
 
     // Email should not be sent for non-existent user
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
@@ -48,31 +42,25 @@ describe("POST /auth/password-reset", () => {
   test("throws error for invalid email format", async () => {
     const invalidEmail = "invalid-email";
 
-    const err = await waitError(
-      routerClient.auth.recovery.create(
-        {
-          email: invalidEmail,
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
-    );
+    const err = await waitError(recoveryClient.create({ email: invalidEmail }));
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
   test("enforces auth rate limits when Redis reports the request is over quota", async () => {
-    vi.mocked(workerClient.getConnection).mockResolvedValue({
-      eval: vi.fn(async () => 16),
-    } as any);
+    const overLimitClient = createRouterClient(
+      {
+        create: createRecoveryProcedure(
+          sendPasswordResetEmail,
+          createAuthRateLimit(async () => 16),
+        ),
+      },
+      { context: { ip: "127.0.0.1", user: null } },
+    );
 
     const err = await waitError(
-      routerClient.auth.recovery.create(
-        {
-          email: "nonexistent@example.com",
-        },
-        { context: { ip: "127.0.0.1" } },
-      ),
+      overLimitClient.create({ email: "nonexistent@example.com" }),
     );
 
     expect(err).toMatchInlineSnapshot(

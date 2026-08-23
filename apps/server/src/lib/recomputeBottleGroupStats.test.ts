@@ -15,6 +15,11 @@ import {
   recomputeBottleGroupStatsInTransaction,
 } from "./recomputeBottleGroupStats";
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 async function createMember(source: Bottle, name: string) {
   const [bottle] = await db
     .insert(bottles)
@@ -79,10 +84,10 @@ describe("BottleGroup statistics recomputation", () => {
     );
 
     const firstResult = await db.transaction((tx) =>
-      recomputeBottleGroupStatsInTransaction(tx, first.groupId as number),
+      recomputeBottleGroupStatsInTransaction(tx, requireGroupId(first.groupId)),
     );
     const secondResult = await recomputeBottleGroupStats(
-      first.groupId as number,
+      requireGroupId(first.groupId),
     );
 
     const expectedAverage =
@@ -132,7 +137,7 @@ describe("BottleGroup statistics recomputation", () => {
     );
 
     await expect(
-      recomputeBottleGroupStats(active.groupId as number),
+      recomputeBottleGroupStats(requireGroupId(active.groupId)),
     ).resolves.toMatchObject({
       totalBottles: 1,
       totalTastings: 1,
@@ -158,17 +163,17 @@ describe("BottleGroup statistics recomputation", () => {
       newBottleId: destination.id,
     });
     const before = await db.query.bottleGroups.findFirst({
-      where: eq(bottleGroups.id, onlyMember.groupId as number),
+      where: eq(bottleGroups.id, requireGroupId(onlyMember.groupId)),
     });
     await expect(
-      recomputeBottleGroupStats(onlyMember.groupId as number),
+      recomputeBottleGroupStats(requireGroupId(onlyMember.groupId)),
     ).rejects.toMatchObject({
       code: "invalid_catalog_graph",
       groupId: onlyMember.groupId,
     });
     await expect(
       db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, onlyMember.groupId as number),
+        where: eq(bottleGroups.id, requireGroupId(onlyMember.groupId)),
       }),
     ).resolves.toEqual(before);
   });

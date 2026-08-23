@@ -7,12 +7,24 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
+import type { User } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import classNames from "@peated/web/lib/classNames";
 import { Fragment, useRef } from "react";
 import LogoutButton from "./logoutButton";
 import UserAvatar from "./userAvatar";
+
+export function ProfileAdminLinks({ user }: { user: User }) {
+  if (!user.admin) return null;
+
+  return (
+    <div>
+      <Link href="/admin/moderation/inbox">Moderation</Link>
+      <Link href="/admin">Admin</Link>
+    </div>
+  );
+}
 
 export function ProfileDropdown() {
   const { user } = useAuth();
@@ -65,16 +77,7 @@ export function ProfileDropdown() {
                   <LogoutButton />
                 </MenuItem>
               </div>
-              {user.admin ? (
-                <div>
-                  <MenuItem>
-                    <Link href="/admin/moderation/inbox">Moderation</Link>
-                  </MenuItem>
-                  <MenuItem>
-                    <Link href={`/admin`}>Admin</Link>
-                  </MenuItem>
-                </div>
-              ) : null}
+              <ProfileAdminLinks user={user} />
             </MenuItems>
           </Transition>
         </>

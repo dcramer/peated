@@ -8,6 +8,7 @@ import {
 import { eq } from "drizzle-orm";
 import {
   acquireScrapePermit as acquireScrapePermitImpl,
+  type CoordinatorDatabase,
   recordScrapeRateLimit,
   releaseScrapePermit,
   ScraperCoordinationError,
@@ -310,7 +311,7 @@ test("fails closed for undeclared targets and coordination errors", async () => 
     transaction: async () => {
       throw new Error("database unavailable");
     },
-  } as unknown as typeof db;
+  } satisfies CoordinatorDatabase;
   await expect(
     acquireScrapePermit({
       runId: run.id,

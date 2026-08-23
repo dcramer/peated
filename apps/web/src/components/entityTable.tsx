@@ -67,7 +67,7 @@ export default function EntityTable({
                 className: "sm:w-[10%]",
                 sortDefaultOrder: "desc",
               },
-            ] as Column<Entity>[])
+            ] satisfies Column<Entity>[])
           : []),
         ...(withLocations
           ? ([
@@ -100,7 +100,7 @@ export default function EntityTable({
                 className: "sm:w-[30%]",
                 sortDefaultOrder: "desc",
               },
-            ] as Column<Entity>[])
+            ] satisfies Column<Entity>[])
           : []),
       ]}
       {...props}

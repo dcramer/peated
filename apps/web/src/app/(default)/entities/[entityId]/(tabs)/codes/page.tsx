@@ -86,7 +86,7 @@ export default function Page(props: { params: Promise<{ entityId: string }> }) {
         while (i < 1000) {
           i++;
           distillerName = SMWS_DISTILLERY_CODES[`${catCode}${i}`];
-          if (typeof distillerName === "undefined") {
+          if (distillerName === undefined) {
             break;
           }
 

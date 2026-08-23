@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { z } from "zod";
 import { base } from "..";
 import { logError } from "../../lib/log";
 import { getConnection } from "../../worker/client";
@@ -10,12 +11,35 @@ interface RateLimitOptions {
   keyPrefix?: string; // Optional prefix for the rate limit key
 }
 
+export type RateLimitCounter = (
+  key: string,
+  windowMs: number,
+) => Promise<number>;
+
+async function incrementRateLimitCounter(key: string, windowMs: number) {
+  const redis = await getConnection();
+  const result = await redis.eval(
+    `
+      local count = redis.call('INCR', KEYS[1])
+      if count == 1 then
+        redis.call('PEXPIRE', KEYS[1], ARGV[1])
+      end
+      return count
+    `,
+    1,
+    key,
+    windowMs,
+  );
+  return z.coerce.number().finite().parse(result);
+}
+
 /**
  * Builds reusable rate-limit middleware while preserving any route-specific
  * context narrowing applied before this middleware runs.
  */
 export function createRateLimit<TContext extends Context = Context>(
   options: RateLimitOptions,
+  incrementCounter: RateLimitCounter = incrementRateLimitCounter,
 ) {
   const { windowMs, maxRequests, keyPrefix = "rl" } = options;
 
@@ -35,23 +59,7 @@ export function createRateLimit<TContext extends Context = Context>(
       const key = `${keyPrefix}:${identifier}`;
 
       try {
-        const redis = await getConnection();
-        if (!redis) {
-          // Rate limiting is defense in depth. If Redis is unavailable or
-          // intentionally stubbed in tests, do not turn the route into a 500.
-          return next({ context });
-        }
-
-        // Atomically increment and set expiration if this is the first request.
-        // This Lua script prevents race conditions.
-        const lua = `
-          local count = redis.call('INCR', KEYS[1])
-          if count == 1 then
-            redis.call('PEXPIRE', KEYS[1], ARGV[1])
-          end
-          return count
-        `;
-        const count = (await redis.eval(lua, 1, key, windowMs)) as number;
+        const count = await incrementCounter(key, windowMs);
 
         if (count > maxRequests) {
           throw errors.FORBIDDEN({
@@ -77,11 +85,20 @@ export function createRateLimit<TContext extends Context = Context>(
 }
 
 // Preset rate limiters for auth endpoints
-export const authRateLimit = createRateLimit({
-  windowMs: 60 * 60 * 1000, // 60 minutes
-  maxRequests: 15, // 15 attempts per hour
-  keyPrefix: "auth",
-});
+export function createAuthRateLimit(
+  incrementCounter: RateLimitCounter = incrementRateLimitCounter,
+) {
+  return createRateLimit(
+    {
+      windowMs: 60 * 60 * 1000, // 60 minutes
+      maxRequests: 15, // 15 attempts per hour
+      keyPrefix: "auth",
+    },
+    incrementCounter,
+  );
+}
+
+export const authRateLimit = createAuthRateLimit();
 
 export const strictAuthRateLimit = createRateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour

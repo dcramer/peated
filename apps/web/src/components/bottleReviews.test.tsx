@@ -1,27 +1,8 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import BottleReviews from "./bottleReviews";
-
-const mocks = vi.hoisted(() => ({
-  queryOptions: vi.fn((options) => options),
-  useSuspenseQuery: vi.fn(),
-}));
-
-vi.mock("@tanstack/react-query", () => ({
-  useSuspenseQuery: mocks.useSuspenseQuery,
-}));
-
-vi.mock("../lib/orpc/context", () => ({
-  useORPC: () => ({
-    reviews: {
-      list: {
-        queryOptions: mocks.queryOptions,
-      },
-    },
-  }),
-}));
+import { BottleReviewList } from "./bottleReviews";
 
 type ReviewListItem = Outputs["reviews"]["list"]["results"][number];
 
@@ -60,36 +41,24 @@ function makeReview(overrides: Partial<ReviewListItem> = {}): ReviewListItem {
 }
 
 describe("BottleReviews", () => {
-  beforeEach(() => {
-    mocks.queryOptions.mockClear();
-    mocks.useSuspenseQuery.mockReset();
-  });
-
   it("renders complete reviews from multiple publishers", () => {
-    mocks.useSuspenseQuery.mockReturnValue({
-      data: {
-        results: [
-          makeReview(),
-          makeReview({
-            id: 2,
-            site: {
-              ...makeReview().site!,
-              id: 3,
-              name: "Dramface",
-            },
-            reviewerName: "B. Critic",
-            nativeScore: { value: 8, scale: 10, display: "8/10" },
-            summary: "Rich fruit and oak lead into a dry finish.",
-          }),
-        ],
-      },
-    });
+    const results = [
+      makeReview(),
+      makeReview({
+        id: 2,
+        site: {
+          ...makeReview().site!,
+          id: 3,
+          name: "Dramface",
+        },
+        reviewerName: "B. Critic",
+        nativeScore: { value: 8, scale: 10, display: "8/10" },
+        summary: "Rich fruit and oak lead into a dry finish.",
+      }),
+    ];
 
-    const html = renderToStaticMarkup(<BottleReviews bottleId={42} />);
+    const html = renderToStaticMarkup(<BottleReviewList results={results} />);
 
-    expect(mocks.queryOptions).toHaveBeenCalledWith({
-      input: { bottle: 42 },
-    });
     expect(html).toContain("The Critics");
     expect(html).toContain("Whisky Advocate");
     expect(html).toContain("Dramface");
@@ -103,29 +72,21 @@ describe("BottleReviews", () => {
   });
 
   it("renders no empty review section when the Bottle has no reviews", () => {
-    mocks.useSuspenseQuery.mockReturnValue({
-      data: { results: [] },
-    });
-
-    expect(renderToStaticMarkup(<BottleReviews bottleId={42} />)).toBe("");
+    expect(renderToStaticMarkup(<BottleReviewList results={[]} />)).toBe("");
   });
 
   it("omits missing metadata and normalized compatibility ratings", () => {
-    mocks.useSuspenseQuery.mockReturnValue({
-      data: {
-        results: [
-          makeReview({
-            reviewerName: null,
-            article: { title: null, publishedAt: null },
-            nativeScore: null,
-            summary: null,
-          }),
-          makeReview({ id: 2, site: undefined }),
-        ],
-      },
-    });
+    const results = [
+      makeReview({
+        reviewerName: null,
+        article: { title: null, publishedAt: null },
+        nativeScore: null,
+        summary: null,
+      }),
+      makeReview({ id: 2, site: undefined }),
+    ];
 
-    const html = renderToStaticMarkup(<BottleReviews bottleId={42} />);
+    const html = renderToStaticMarkup(<BottleReviewList results={results} />);
 
     expect(html).toContain("Whisky Advocate");
     expect(html).toContain("Read the full review on Whisky Advocate");

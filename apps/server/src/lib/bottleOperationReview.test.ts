@@ -1,3 +1,4 @@
+import type { BottleContext } from "@peated/bottle-classifier";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import { db } from "@peated/server/db";
 import {
@@ -15,6 +16,11 @@ import {
 } from "@peated/server/lib/bottleOperationReview";
 import { eq } from "drizzle-orm";
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 function artifacts({
   bottleIds = [],
   entities: inspectedEntities = [],
@@ -28,7 +34,7 @@ function artifacts({
   candidateBottleIds?: number[];
   resolvedEntities?: Array<{ id: number; name: string }>;
   urls?: string[];
-  bottleContexts?: Record<string, unknown>[];
+  bottleContexts?: BottleContext[];
 }) {
   const inspectedBottleContexts = bottleIds.map((bottleId) => ({
     bottleId,
@@ -113,7 +119,7 @@ describe("Bottle operation review preparation", () => {
       name: "Original Expression",
     });
     const groupMember = await fixtures.BottleGroupMember({
-      groupId: bottleToUpdate.groupId as number,
+      groupId: requireGroupId(bottleToUpdate.groupId),
       edition: "Second Batch",
     });
     const mergeSource = await fixtures.Bottle({ name: "Merge Source" });
@@ -1054,7 +1060,7 @@ describe("Bottle operation review preparation", () => {
   }) => {
     const firstBottle = await fixtures.Bottle({ name: "Sibling Conflict" });
     const sibling = await fixtures.BottleGroupMember({
-      groupId: firstBottle.groupId as number,
+      groupId: requireGroupId(firstBottle.groupId),
       edition: "Sibling",
     });
     const sourceEntity = await fixtures.Entity({
@@ -1503,7 +1509,7 @@ describe("Bottle operation review preparation", () => {
     await db
       .update(bottleGroups)
       .set({ statedAge: 12 })
-      .where(eq(bottleGroups.id, bottle.groupId as number));
+      .where(eq(bottleGroups.id, requireGroupId(bottle.groupId)));
     const after = await prepareOperation({ operation, ...context });
 
     expect(before.status).toBe("pending_review");
@@ -1527,14 +1533,14 @@ describe("Bottle operation review preparation", () => {
       statedAge: null,
     });
     const override = await fixtures.BottleGroupMember({
-      groupId: inherited.groupId as number,
+      groupId: requireGroupId(inherited.groupId),
       edition: "Override",
       statedAge: 14,
     });
     await db
       .update(bottleGroups)
       .set({ statedAge: 12 })
-      .where(eq(bottleGroups.id, inherited.groupId as number));
+      .where(eq(bottleGroups.id, requireGroupId(inherited.groupId)));
     await db
       .update(bottles)
       .set({ statedAge: 12 })
@@ -1617,7 +1623,7 @@ describe("Bottle operation review preparation", () => {
       ...bottleContextInput,
     });
     await fixtures.BottleGroupMember({
-      groupId: bottle.groupId as number,
+      groupId: requireGroupId(bottle.groupId),
       edition: "New Member",
     });
     const afterGroupDrift = await prepareOperation({

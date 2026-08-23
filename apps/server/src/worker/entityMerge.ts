@@ -1,5 +1,6 @@
 import { pushJob } from "@peated/server/worker/client";
 import { z } from "zod";
+import type { JobPayload } from "./types";
 
 const PositiveIdSchema = z.number().int().positive();
 
@@ -37,7 +38,7 @@ export function isOperationEntityMergeJobInput(
  * Dispatches one operation-backed Entity merge. The operation row, not queue
  * payload duplication, remains authoritative for merge direction and state.
  */
-export async function dispatchEntityMergeOperation(rawInput: unknown) {
+export async function dispatchEntityMergeOperation(rawInput: JobPayload) {
   const input = OperationEntityMergeJobInputSchema.parse(rawInput);
   return await pushJob("MergeEntity", input, {
     jobId: `MergeEntity-operation-${input.operationId}`,

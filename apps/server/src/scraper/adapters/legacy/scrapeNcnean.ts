@@ -12,6 +12,7 @@ import {
   ShopifyProductSchema,
   ShopifyVariantSchema,
 } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "ncnean";
@@ -32,7 +33,7 @@ const ProductSchema = ShopifyProductSchema.extend({
   body_html: z.string(),
   tags: z.array(z.string()),
   vendor: z.string(),
-  images: z.array(z.unknown()).min(1),
+  images: z.array(z.json()).min(1),
   variants: z.array(VariantSchema),
 });
 
@@ -99,7 +100,7 @@ function getProductName(title: string, vendor: string): string | null {
   return normalizeBottle({ name: publishedName }).name;
 }
 
-export function parseNcneanProducts(input: unknown): StorePrice[] {
+export function parseNcneanProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

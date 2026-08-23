@@ -14,7 +14,7 @@ export function formatBottleName({
   name?: string | null | undefined;
   edition?: string | null | undefined;
   statedAge?: number | null | undefined;
-} & Record<string, any>) {
+}) {
   const bits = [name, edition].filter(Boolean);
   return bits.join(" - ");
 }

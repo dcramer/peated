@@ -19,10 +19,9 @@ export function buildStorePriceNormalizationUpdate(
   name: string,
   bottleId: number | null,
 ): StorePriceNormalizationUpdate {
-  return {
-    name,
-    ...(bottleId === null ? {} : { bottleId }),
-  };
+  const update: StorePriceNormalizationUpdate = { name };
+  if (bottleId !== null) update.bottleId = bottleId;
+  return update;
 }
 
 const subcommand = program.command("prices");

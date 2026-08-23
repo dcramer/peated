@@ -313,9 +313,11 @@ describe("GET /reviews", () => {
   });
 
   test("rejects removed target and release filters", async () => {
+    // SAFETY: These calls intentionally send removed fields to the runtime validator.
     await expect(
       waitError(() => routerClient.reviews.list({ target: 1 } as never)),
     ).resolves.toMatchObject({ message: "Input validation failed" });
+    // SAFETY: This call intentionally sends a removed field to the runtime validator.
     await expect(
       waitError(() => routerClient.reviews.list({ release: 1 } as never)),
     ).resolves.toMatchObject({ message: "Input validation failed" });

@@ -13,9 +13,9 @@ describe("resolveOpenAICompatibleConfig", () => {
   });
 
   it("accepts typed environment objects without declared gateway keys", () => {
-    const env: Readonly<{ NODE_ENV: "test" }> = {
+    const env = {
       NODE_ENV: "test",
-    };
+    } satisfies Readonly<{ NODE_ENV: "test" }>;
 
     expect(resolveOpenAICompatibleConfig(env)).toMatchObject({
       apiKey: undefined,

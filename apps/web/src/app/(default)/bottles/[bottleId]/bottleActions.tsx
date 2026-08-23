@@ -40,6 +40,27 @@ export default function BottleActions({
   };
 
   return (
+    <BottleActionMenu
+      bottle={bottle}
+      user={user}
+      deleteBottle={deleteBottle}
+      deletePending={deleteBottleMutation.isPending}
+    />
+  );
+}
+
+export function BottleActionMenu({
+  bottle,
+  user,
+  deleteBottle = async () => undefined,
+  deletePending = false,
+}: {
+  bottle: Pick<Bottle, "id">;
+  user: { admin?: boolean; mod?: boolean } | null;
+  deleteBottle?: () => Promise<void>;
+  deletePending?: boolean;
+}) {
+  return (
     <Menu as="div" className="menu">
       <MenuButton as={Button} aria-label="More bottle actions">
         <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
@@ -71,7 +92,7 @@ export default function BottleActions({
           <MenuItem
             as={ConfirmationButton}
             onContinue={deleteBottle}
-            disabled={deleteBottleMutation.isPending}
+            disabled={deletePending}
             confirmationTitle="Delete Bottle"
             confirmationMessage="Permanently delete this Bottle? This cannot be undone."
             continueLabel="Delete Bottle"

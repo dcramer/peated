@@ -1,9 +1,9 @@
 import { ORPCError } from "@orpc/server";
 import type { Entity } from "@peated/server/db/schema";
 import { bottleSeries, changes } from "@peated/server/db/schema";
-import type { BottleSeriesInputSchema } from "@peated/server/schemas";
+import { BottleSeriesInputSchema } from "@peated/server/schemas";
 import { eq, sql } from "drizzle-orm";
-import type { z } from "zod";
+import { z } from "zod";
 import type { AnyTransaction } from "../db";
 
 /**
@@ -27,20 +27,24 @@ export async function processSeries({
   if (!series) return [null, false];
 
   // If series is a number, it's an existing series ID
-  if (typeof series === "number") {
+  const seriesId = z.number().safeParse(series);
+  if (seriesId.success) {
     const existingSeries = await tx.query.bottleSeries.findFirst({
-      where: eq(bottleSeries.id, series),
+      where: eq(bottleSeries.id, seriesId.data),
     });
     if (!existingSeries) {
       throw new ORPCError("NOT_FOUND", {
         message: "Series not found.",
       });
     }
-    return [series, false];
+    return [seriesId.data, false];
   }
 
   // Handle series object input
-  const fullName = `${brand.name} ${series.name}`;
+  const seriesDraft = BottleSeriesInputSchema.omit({ brand: true }).parse(
+    series,
+  );
+  const fullName = `${brand.name} ${seriesDraft.name}`;
 
   // Check for existing series
   const [existingSeries] = await tx
@@ -59,8 +63,8 @@ export async function processSeries({
   const [newSeries] = await tx
     .insert(bottleSeries)
     .values({
-      name: series.name,
-      description: series.description,
+      name: seriesDraft.name,
+      description: seriesDraft.description,
       fullName,
       brandId: brand.id,
       numReleases: 1,

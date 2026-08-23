@@ -14,6 +14,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { use, useState, type FormEvent } from "react";
+import { z } from "zod";
 
 export default function EntityAliases(props: {
   params: Promise<{ entityId: string }>;
@@ -69,9 +70,12 @@ export default function EntityAliases(props: {
             name="alias"
             label="Alias"
             value={aliasName}
-            onChange={(event) =>
-              setAliasName((event.target as HTMLInputElement).value)
-            }
+            onChange={(event) => {
+              const target = z
+                .object({ value: z.string() })
+                .safeParse(event.currentTarget);
+              if (target.success) setAliasName(target.data.value);
+            }}
             error={error ? { message: error } : undefined}
             className="flex-1"
           />

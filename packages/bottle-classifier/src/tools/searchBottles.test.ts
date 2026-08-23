@@ -2,7 +2,10 @@ import { RunContext } from "@openai/agents";
 import { describe, expect, test, vi } from "vitest";
 
 import type { BottleCandidate } from "../classifierTypes";
-import { createSearchBottlesTool } from "./searchBottles";
+import {
+  createSearchBottlesTool,
+  SearchBottlesResultSchema,
+} from "./searchBottles";
 
 const candidate: BottleCandidate = {
   bottleId: 45146,
@@ -37,9 +40,7 @@ describe("search_bottles tool", () => {
       new RunContext(),
       JSON.stringify({ query: "Laphroaig Cairdeas 2022" }),
     );
-    const agentEvidence = result as unknown as {
-      results: Array<Record<string, unknown>>;
-    };
+    const agentEvidence = SearchBottlesResultSchema.parse(result);
 
     expect(onResults).toHaveBeenCalledWith([candidate]);
     expect(agentEvidence).toMatchObject({

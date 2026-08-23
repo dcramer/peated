@@ -1,8 +1,18 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 type Audit = Outputs["audits"]["details"]["audit"];
+type AuditOperation = Pick<Audit["operations"][number], "id" | "status">;
+type ModerationAudit =
+  | { schemaSupported: false }
+  | {
+      schemaSupported: true;
+      id: number;
+      operations: AuditOperation[];
+      closedAt: string | null;
+      output: { findings: unknown[] };
+    };
 
-export function moderationHrefForAudit(audit: Audit): string {
+export function moderationHrefForAudit(audit: ModerationAudit): string {
   if (!audit.schemaSupported) return "/admin/moderation/automation";
 
   const decision = audit.operations.find(({ status }) =>

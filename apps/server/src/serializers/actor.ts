@@ -21,9 +21,7 @@ export const ActorSerializer = serializer({
   ): Promise<Record<number, ActorAttrs>> => {
     const userIds = Array.from(
       new Set(
-        itemList
-          .filter((item) => Boolean(item.userId))
-          .map((item) => item.userId as number),
+        itemList.flatMap((item) => (item.userId === null ? [] : [item.userId])),
       ),
     );
 

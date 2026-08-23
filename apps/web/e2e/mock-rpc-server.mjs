@@ -1,4 +1,5 @@
 import http from "node:http";
+import { z } from "zod";
 
 import { createBottleCheckMock } from "./mock-rpc/bottle-checks.mjs";
 import {
@@ -51,6 +52,13 @@ import {
   testUser,
   unifiedBottleEditContext,
 } from "./rpc-fixtures.mjs";
+
+const JsonObjectSchema = z.record(z.string(), z.json());
+const isJsonObject = (value) => JsonObjectSchema.safeParse(value).success;
+const isNumber = (value) => z.number().safeParse(value).success;
+const isBoolean = (value) => z.boolean().safeParse(value).success;
+const isString = (value) => z.string().safeParse(value).success;
+const isNonEmptyString = (value) => z.string().min(1).safeParse(value).success;
 
 const host = "127.0.0.1";
 const port = Number(process.env.PLAYWRIGHT_API_PORT ?? 4999);
@@ -298,7 +306,7 @@ async function handleRpcRequest({ request, response, url }) {
       const expectedBrand =
         input?.brand === testBrand.id ||
         (input?.brand &&
-          typeof input.brand === "object" &&
+          isJsonObject(input.brand) &&
           input.brand.name === testBrand.name);
       if (input?.name !== createdBottleName || !expectedBrand) {
         sendRpcError(response, "Unexpected bottle create payload");
@@ -446,7 +454,7 @@ async function handleRpcRequest({ request, response, url }) {
       const expectedBrand =
         input?.independentBottle?.brand === testBrand.id ||
         (input?.independentBottle?.brand &&
-          typeof input.independentBottle.brand === "object" &&
+          isJsonObject(input.independentBottle.brand) &&
           input.independentBottle.brand.name === testBrand.name);
       if (
         input?.proposal !== 9901 ||
@@ -585,7 +593,7 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      if (typeof input?.bottle !== "number") {
+      if (!isNumber(input?.bottle)) {
         sendRpcError(response, "Unexpected bottle details payload");
         return true;
       }
@@ -639,7 +647,7 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     case "tastings/create": {
       if (
-        typeof input?.bottle !== "number" ||
+        !isNumber(input?.bottle) ||
         input?.target !== undefined ||
         input?.release !== undefined ||
         input?.rating !== 2 ||
@@ -680,7 +688,7 @@ async function handleRpcRequest({ request, response, url }) {
       if (
         input?.target !== undefined ||
         input?.release !== undefined ||
-        (input?.bottle !== undefined && typeof input.bottle !== "number")
+        (input?.bottle !== undefined && !isNumber(input.bottle))
       ) {
         sendRpcError(response, "Unexpected direct-Bottle Tasting list payload");
         return true;
@@ -935,7 +943,7 @@ async function handleRpcRequest({ request, response, url }) {
       if (
         !token.includes("profile-role-update") ||
         input?.user !== testUser.id ||
-        typeof input?.mod !== "boolean"
+        !isBoolean(input?.mod)
       ) {
         sendRpcError(response, "Unexpected user update payload");
         return true;
@@ -1013,7 +1021,7 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, {});
       return true;
     case "bottles/tags":
-      if (typeof input?.bottle !== "number") {
+      if (!isNumber(input?.bottle)) {
         sendRpcError(response, "Unexpected bottle tags payload");
         return true;
       }
@@ -1027,7 +1035,7 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, emptyList);
       return true;
     case "reviews/list":
-      if (input?.bottle !== undefined && typeof input.bottle !== "number") {
+      if (input?.bottle !== undefined && !isNumber(input.bottle)) {
         sendRpcError(response, "Unexpected reviews list payload");
         return true;
       }
@@ -1085,7 +1093,7 @@ function createPendingUpload(request, input) {
   if (purpose !== "photo_tasting_entry") {
     throw new Error("Unexpected pending upload purpose");
   }
-  if (typeof input?.idempotencyKey !== "string" || !input.idempotencyKey) {
+  if (!isNonEmptyString(input?.idempotencyKey)) {
     throw new Error("Expected pending upload idempotency key");
   }
 
@@ -1133,7 +1141,7 @@ function mutateCollectionBottle(request, input, action) {
     throw new Error("Unexpected collection pending image payload");
   }
   if (
-    typeof input?.bottle !== "number" ||
+    !isNumber(input?.bottle) ||
     input?.target !== undefined ||
     input?.release !== undefined
   ) {
@@ -1190,7 +1198,7 @@ function findCollectionBottleEntry(request, input) {
   if (input?.collection !== "library") {
     throw new Error("Unexpected collection image collection payload");
   }
-  if (typeof input?.collectionBottle !== "number") {
+  if (!isNumber(input?.collectionBottle)) {
     throw new Error("Unexpected collection image entry payload");
   }
 
@@ -1561,7 +1569,7 @@ function isExpectedDirectBottleQueueCreateInput(input) {
   const bottle = input.independentBottle;
   const brandIsCanonical =
     bottle?.brand === testBrand.id ||
-    (typeof bottle?.brand === "object" &&
+    (isJsonObject(bottle?.brand) &&
       bottle.brand?.id === testBrand.id &&
       bottle.brand?.name === testBrand.name);
 
@@ -1595,7 +1603,7 @@ function isExpectedDirectBottleQueueCreateInput(input) {
 function isExpectedOrdinaryExactBottleCreateInput(input) {
   const brandIsCanonical =
     input?.brand === testBrand.id ||
-    (typeof input?.brand === "object" &&
+    (isJsonObject(input?.brand) &&
       input.brand?.id === testBrand.id &&
       input.brand?.name === testBrand.name);
 
@@ -2100,17 +2108,11 @@ async function readRpcInput(request, url) {
   }
 
   const contentType = request.headers["content-type"] ?? "";
-  if (
-    typeof contentType === "string" &&
-    contentType.includes("multipart/form-data")
-  ) {
+  if (isString(contentType) && contentType.includes("multipart/form-data")) {
     return await readMultipartRpcInput(request, contentType);
   }
 
-  if (
-    typeof contentType === "string" &&
-    !contentType.includes("application/json")
-  ) {
+  if (isString(contentType) && !contentType.includes("application/json")) {
     request.resume();
     return {};
   }
@@ -2150,10 +2152,9 @@ async function readMultipartRpcInput(request, contentType) {
     }
   }
 
-  return {
-    ...(data && typeof data === "object" ? data : {}),
-    __mockHasUploadFile: hasUploadFile,
-  };
+  const result = isJsonObject(data) ? { ...data } : {};
+  result.__mockHasUploadFile = hasUploadFile;
+  return result;
 }
 
 function readBody(request, encoding = "utf8") {
@@ -2173,13 +2174,12 @@ function delay(ms) {
 }
 
 function sendRpcResponse(response, data, sentryTraceId = null) {
-  response
-    .writeHead(200, {
-      ...corsHeaders,
-      "Content-Type": "application/json",
-      ...(sentryTraceId ? { "x-sentry-trace-id": sentryTraceId } : {}),
-    })
-    .end(JSON.stringify({ json: data }));
+  const headers = {
+    ...corsHeaders,
+    "Content-Type": "application/json",
+  };
+  if (sentryTraceId) headers["x-sentry-trace-id"] = sentryTraceId;
+  response.writeHead(200, headers).end(JSON.stringify({ json: data }));
 }
 
 function sendRpcError(response, message) {

@@ -34,12 +34,14 @@ function listingQuestion(proposalType: string): string {
   }
 }
 
-function operationCopy(
-  proposal: (typeof bottleOperations.$inferSelect)["proposal"],
-): {
+interface OperationCopy {
   question: string;
   title: string;
-} {
+}
+
+function operationCopy(
+  proposal: (typeof bottleOperations.$inferSelect)["proposal"],
+): OperationCopy {
   switch (proposal.type) {
     case "update_bottle":
       return {

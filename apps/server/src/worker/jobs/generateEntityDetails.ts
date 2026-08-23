@@ -61,26 +61,23 @@ function generatePrompt(entity: InputEntity) {
   return sections.filter(Boolean).join("\n\n");
 }
 
+const EntityEstablishedYearSchema = z
+  .preprocess((value) => {
+    const text = z.string().trim().min(1).safeParse(value);
+    return text.success ? Number.parseInt(text.data, 10) : value;
+  }, z.number().nullable())
+  .default(null);
+
 export const OpenAIEntityDetailsSchema = z.object({
   description: z.string().nullable().default(null),
-  yearEstablished: z
-    .preprocess(
-      (val) => (typeof val === "string" && val ? parseInt(val, 10) : val),
-      z.number().nullable(),
-    )
-    .default(null),
+  yearEstablished: EntityEstablishedYearSchema,
   website: z.string().trim().nullable().default(null),
   type: z.array(z.string()).default([]),
 });
 
 export const OpenAIEntityDetailsValidationSchema = z.object({
   description: z.string().nullable().default(null),
-  yearEstablished: z
-    .preprocess(
-      (val) => (typeof val === "string" && val ? parseInt(val, 10) : val),
-      z.number().nullable(),
-    )
-    .default(null),
+  yearEstablished: EntityEstablishedYearSchema,
   website: z.string().trim().nullable().default(null),
   type: z.array(EntityTypeEnum).default([]),
 });
@@ -149,7 +146,7 @@ export default async ({
   if (!result) {
     throw new Error(`Failed to generate details for entity: ${entityId}`);
   }
-  const data: Record<string, any> = {};
+  const data: Partial<typeof entities.$inferInsert> = {};
   if (
     generateDesc &&
     result.description &&

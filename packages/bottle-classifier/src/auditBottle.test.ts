@@ -1,5 +1,4 @@
-import { Runner } from "@openai/agents";
-import type OpenAI from "openai";
+import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 
 import type {
@@ -14,6 +13,8 @@ import {
 import type { BottleCandidate } from "./classifierTypes";
 import { buildBottleClassificationArtifacts } from "./contract";
 import { BottleClassificationError } from "./error";
+
+const testClient = new OpenAI({ apiKey: "test-key" });
 
 function buildAuditedBottleContext(): BottleContextSource {
   return {
@@ -92,7 +93,7 @@ describe("auditBottle", () => {
       async (url: string) =>
         `data:image/webp;base64,${Buffer.from(url).toString("base64")}`,
     );
-    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
     const extractFromImage = vi.fn(async () => ({
       brand: "Laphroaig",
       bottler: null,
@@ -178,7 +179,7 @@ describe("auditBottle", () => {
       },
     );
     const classifier = createBottleClassifier({
-      client: {} as OpenAI,
+      client: testClient,
       model: "test-model",
       maxSearchQueries: 2,
       adapters: {
@@ -280,7 +281,7 @@ describe("auditBottle", () => {
 
   test("requires the read-only Bottle preload capability", async () => {
     const classifier = createBottleClassifier({
-      client: {} as OpenAI,
+      client: testClient,
       model: "test-model",
       maxSearchQueries: 2,
       adapters: {
@@ -324,7 +325,7 @@ describe("auditBottle", () => {
       },
     );
     const classifier = createBottleClassifier({
-      client: {} as OpenAI,
+      client: testClient,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {
@@ -370,7 +371,7 @@ describe("auditBottle", () => {
       observations: relatedBottleSource.observations,
       publicImages: [],
     };
-    const runAgent = vi.spyOn(Runner.prototype, "run").mockResolvedValueOnce({
+    const runAgent = vi.fn(async () => ({
       finalOutput: {
         summary: "The audit returned an unsupported finding citation.",
         findings: [
@@ -395,14 +396,17 @@ describe("auditBottle", () => {
           },
         },
       ],
-    } as never);
+    }));
     const classifier = createBottleClassifier({
-      client: {} as OpenAI,
+      client: testClient,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {
         searchBottles: vi.fn(async () => []),
         getBottleContext: vi.fn(async () => currentBottle),
+      },
+      overrides: {
+        runPreparedBottleAuditAgent: runAgent,
       },
     });
 
@@ -425,14 +429,12 @@ describe("auditBottle", () => {
           ]),
         },
       });
-    } finally {
-      runAgent.mockRestore();
     }
   });
 
   test("accepts any supported audit proposal type", async () => {
     const classifier = createBottleClassifier({
-      client: {} as OpenAI,
+      client: testClient,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {
@@ -470,7 +472,7 @@ describe("auditBottle", () => {
 
   test("keeps catalog review output out of Reference Classification", async () => {
     const classifier = createBottleClassifier({
-      client: {} as OpenAI,
+      client: testClient,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {

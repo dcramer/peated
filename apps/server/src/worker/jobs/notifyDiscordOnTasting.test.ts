@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import { bottleGroups, bottleTombstones } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
+import { z } from "zod";
 import notifyDiscordOnTasting from "./notifyDiscordOnTasting";
 
 const originalDiscordWebhook = config.DISCORD_WEBHOOK;
@@ -30,11 +31,25 @@ type DiscordEmbed = {
 
 async function sentEmbed(): Promise<DiscordEmbed> {
   expect(fetchMock).toHaveBeenCalledOnce();
-  const init = fetchMock.mock.calls[0]?.[1] as RequestInit | undefined;
-  if (typeof init?.body !== "string") {
-    throw new Error("Discord webhook body was not serialized");
-  }
-  const payload = JSON.parse(init.body) as { embeds: DiscordEmbed[] };
+  const init = z
+    .object({ body: z.string() })
+    .parse(fetchMock.mock.calls[0]?.[1]);
+  const payload = z
+    .object({
+      embeds: z.array(
+        z.object({
+          title: z.string(),
+          fields: z.array(
+            z.object({
+              name: z.string(),
+              value: z.string(),
+              inline: z.boolean(),
+            }),
+          ),
+        }),
+      ),
+    })
+    .parse(JSON.parse(init.body));
   const embed = payload.embeds[0];
   if (!embed) throw new Error("Discord webhook did not contain an embed");
   return embed;
@@ -46,7 +61,7 @@ test("uses the referenced Bottle label", async ({ fixtures }) => {
   await db
     .update(bottleGroups)
     .set({ fullName: groupLabel })
-    .where(eq(bottleGroups.id, bottle.groupId as number));
+    .where(eq(bottleGroups.id, bottle.groupId));
   const tasting = await fixtures.Tasting({ bottleId: bottle.id });
 
   await notifyDiscordOnTasting({ tastingId: tasting.id });

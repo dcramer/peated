@@ -12,6 +12,11 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, desc, eq, inArray } from "drizzle-orm";
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 describe("PATCH /entities/:entity", () => {
   test("requires authentication", async () => {
     const err = await waitError(
@@ -237,14 +242,16 @@ describe("PATCH /entities/:entity", () => {
       brandId: entity.id,
       name: "Core",
     });
+    const firstGroupId = requireGroupId(first.groupId);
     const second = await fixtures.BottleGroupMember({
-      groupId: first.groupId as number,
+      groupId: firstGroupId,
       edition: "Batch Two",
     });
     const otherGroup = await fixtures.Bottle({
       brandId: entity.id,
       name: "Reserve",
     });
+    const otherGroupId = requireGroupId(otherGroup.groupId);
     const distillerOnlyBottle = await fixtures.Bottle({
       distillerIds: [entity.id],
     });
@@ -312,12 +319,7 @@ describe("PATCH /entities/:entity", () => {
     const groups = await db
       .select()
       .from(bottleGroups)
-      .where(
-        inArray(bottleGroups.id, [
-          first.groupId as number,
-          otherGroup.groupId as number,
-        ]),
-      );
+      .where(inArray(bottleGroups.id, [firstGroupId, otherGroupId]));
     expect(groups.map(({ fullName }) => fullName)).toEqual(
       expect.arrayContaining(["New Foo Core", "New Foo Reserve"]),
     );

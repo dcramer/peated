@@ -1,8 +1,10 @@
 "use server";
 
 import { safe } from "@orpc/client";
+import type { Inputs } from "@peated/server/orpc/router";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 import { getSafeRedirect } from "./auth";
 import { logInfo, logTelemetryError } from "./log";
 import { getRegistrationConflictField } from "./registration";
@@ -11,6 +13,19 @@ import { getSession } from "./session.server";
 
 const SESSION_REFRESH = 60 * 60; // 1 hour
 const INTERNAL_SERVER_ERROR = "Internal server error.";
+
+function getFormString(formData: FormData, name: string): string {
+  const value = z.string().safeParse(formData.get(name));
+  return value.success ? value.data : "";
+}
+
+function getOptionalFormString(
+  formData: FormData,
+  name: string,
+): string | null {
+  const value = z.string().safeParse(formData.get(name));
+  return value.success ? value.data : null;
+}
 
 export async function logoutForm(
   prevState: void | undefined,
@@ -25,7 +40,7 @@ export async function logout(formData?: FormData) {
   "use server";
 
   const redirectTo = getSafeRedirect(
-    formData ? ((formData.get("redirectTo") || "/") as string) : null,
+    formData ? getFormString(formData, "redirectTo") || "/" : null,
   );
 
   const session = await getSession();
@@ -58,13 +73,13 @@ export async function authenticate(
   // const redirectTo = url.searchParams.get("redirectTo");
   // const form = await request.formData();
 
-  const email = (formData.get("email") || "") as string;
-  const password = (formData.get("password") || "") as string;
-  const code = formData.get("code") as string;
-  const passkeyResponse = formData.get("passkeyResponse") as string | null;
-  const signedChallenge = formData.get("signedChallenge") as string | null;
+  const email = getFormString(formData, "email");
+  const password = getFormString(formData, "password");
+  const code = getFormString(formData, "code");
+  const passkeyResponse = getOptionalFormString(formData, "passkeyResponse");
+  const signedChallenge = getOptionalFormString(formData, "signedChallenge");
   const redirectTo = getSafeRedirect(
-    (formData.get("redirectTo") || "/") as string,
+    getFormString(formData, "redirectTo") || "/",
   );
 
   const { client } = await createServerClient();
@@ -129,38 +144,38 @@ export async function register(formData: FormData) {
 
   const session = await getSession();
 
-  const email = (formData.get("email") || "") as string;
-  const password = (formData.get("password") || "") as string;
-  const username = formData.get("username") as string;
-  const passkeyResponse = formData.get("passkeyResponse") as string | null;
-  const signedChallenge = formData.get("signedChallenge") as string | null;
+  const email = getFormString(formData, "email");
+  const password = getFormString(formData, "password");
+  const username = getFormString(formData, "username");
+  const passkeyResponse = getOptionalFormString(formData, "passkeyResponse");
+  const signedChallenge = getOptionalFormString(formData, "signedChallenge");
   const tosAccepted = Boolean(formData.get("tosAccepted"));
 
   const { client } = await createServerClient();
 
+  const input: Inputs["auth"]["register"] = {
+    email,
+    password,
+    username,
+    tosAccepted,
+  };
+  if (passkeyResponse && signedChallenge) {
+    input.passkeyResponse = JSON.parse(passkeyResponse);
+    input.signedChallenge = signedChallenge;
+  }
   const result = await safeClientCall(
-    client.auth.register({
-      email,
-      password,
-      username,
-      ...(passkeyResponse && signedChallenge
-        ? {
-            passkeyResponse: JSON.parse(passkeyResponse),
-            signedChallenge,
-          }
-        : {}),
-      tosAccepted,
-    }),
+    client.auth.register(input),
     INTERNAL_SERVER_ERROR,
   );
 
   if (!result.ok) {
     const conflictField = getRegistrationConflictField(result.error);
-    return {
+    const failure: GenericResult & { conflictField?: typeof conflictField } = {
       ok: false,
       error: result.errorMessage,
-      ...(conflictField ? { conflictField } : {}),
     };
+    if (conflictField) failure.conflictField = conflictField;
+    return failure;
   }
 
   await saveAuthSession(session, result.data);
@@ -204,13 +219,13 @@ export async function acceptTosForm(
   "use server";
 
   const redirectTo = getSafeRedirect(
-    (formData.get("redirectTo") || "/") as string,
+    getFormString(formData, "redirectTo") || "/",
   );
 
   return await acceptTos(redirectTo);
 }
 
-export async function acceptTos(redirectTo?: string) {
+export async function acceptTos(redirectTo?: string): Promise<GenericResult> {
   "use server";
 
   const session = await getSession();
@@ -223,7 +238,7 @@ export async function acceptTos(redirectTo?: string) {
   );
 
   if (!result.ok) {
-    return { ok: false, error: result.errorMessage } as GenericResult;
+    return { ok: false, error: result.errorMessage };
   }
 
   await saveAuthSession(session, {
@@ -234,7 +249,7 @@ export async function acceptTos(redirectTo?: string) {
     redirect(redirectTo);
   }
 
-  return { ok: true } as GenericResult;
+  return { ok: true };
 }
 
 export async function passwordResetForm(
@@ -243,7 +258,7 @@ export async function passwordResetForm(
 ) {
   "use server";
 
-  const email = (formData.get("email") || "") as string;
+  const email = getFormString(formData, "email");
 
   const { client } = await createServerClient();
 
@@ -265,8 +280,8 @@ export async function passwordResetConfirmForm(
 ) {
   "use server";
 
-  const token = (formData.get("token") || "") as string;
-  const password = (formData.get("password") || "") as string;
+  const token = getFormString(formData, "token");
+  const password = getFormString(formData, "password");
 
   const session = await getSession();
   const { client } = await createServerClient();
@@ -291,9 +306,9 @@ export async function passwordResetConfirmPasskeyForm(
 ) {
   "use server";
 
-  const token = (formData.get("token") || "") as string;
-  const passkeyResponse = formData.get("passkeyResponse") as string;
-  const signedChallenge = formData.get("signedChallenge") as string;
+  const token = getFormString(formData, "token");
+  const passkeyResponse = getFormString(formData, "passkeyResponse");
+  const signedChallenge = getFormString(formData, "signedChallenge");
 
   const session = await getSession();
   const { client } = await createServerClient();

@@ -11,7 +11,7 @@ const LEASE_TIMEOUT_PADDING_MS = 5_000;
 const INITIAL_RATE_LIMIT_COOLDOWN_MS = 60_000;
 const MAX_RATE_LIMIT_COOLDOWN_MS = 6 * 60 * 60_000;
 
-type CoordinatorDatabase = Pick<AnyConnection, "transaction">;
+export type CoordinatorDatabase = Pick<AnyConnection, "transaction">;
 
 export type PermitDenialReason =
   | "target_not_found"
@@ -236,14 +236,15 @@ export async function releaseScrapePermit({
 }): Promise<boolean> {
   try {
     return await database.transaction(async (tx) => {
+      const update: Partial<typeof scrapeTargets.$inferInsert> = {
+        leaseToken: null,
+        leaseExpiresAt: null,
+        updatedAt: now,
+      };
+      if (resetRateLimitStreak) update.rateLimitStreak = 0;
       const [released] = await tx
         .update(scrapeTargets)
-        .set({
-          leaseToken: null,
-          leaseExpiresAt: null,
-          ...(resetRateLimitStreak ? { rateLimitStreak: 0 } : {}),
-          updatedAt: now,
-        })
+        .set(update)
         .where(
           and(
             eq(scrapeTargets.key, targetKey),
@@ -299,16 +300,18 @@ export async function recordScrapeRateLimit({
       const blockedUntil =
         laterDate(target.blockedUntil, candidate) ?? candidate;
 
+      const update: Partial<typeof scrapeTargets.$inferInsert> = {
+        blockedUntil,
+        rateLimitStreak,
+        updatedAt: now,
+      };
+      if (target.leaseToken === token) {
+        update.leaseToken = null;
+        update.leaseExpiresAt = null;
+      }
       await tx
         .update(scrapeTargets)
-        .set({
-          blockedUntil,
-          rateLimitStreak,
-          ...(target.leaseToken === token
-            ? { leaseToken: null, leaseExpiresAt: null }
-            : {}),
-          updatedAt: now,
-        })
+        .set(update)
         .where(eq(scrapeTargets.key, targetKey));
       await tx
         .update(externalSiteRuns)

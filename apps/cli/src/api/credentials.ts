@@ -12,6 +12,10 @@ const CredentialsSchema = z
   })
   .strict();
 
+function isMissingFileError(error: Error): boolean {
+  return "code" in error && error.code === "ENOENT";
+}
+
 export type Credentials = z.infer<typeof CredentialsSchema>;
 
 export function credentialsPath(env: NodeJS.ProcessEnv = process.env): string {
@@ -26,7 +30,7 @@ export async function loadCredentials(
   try {
     contents = await readFile(path, "utf8");
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    if (error instanceof Error && isMissingFileError(error)) return null;
     throw error;
   }
 
@@ -67,7 +71,7 @@ export async function deleteCredentials(
     await rm(path);
     return true;
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return false;
+    if (error instanceof Error && isMissingFileError(error)) return false;
     throw error;
   }
 }

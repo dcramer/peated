@@ -34,6 +34,17 @@ const CatalogImageWarningSchema = z.object({
 });
 type CatalogImageWarning = z.infer<typeof CatalogImageWarningSchema>;
 
+const PhotoIdentificationCreateOutputSchema = z.object({
+  bottle: BottleSchema,
+  warnings: z
+    .array(CatalogImageWarningSchema)
+    .optional()
+    .describe("Non-fatal warnings for side effects after Bottle creation"),
+});
+type PhotoIdentificationCreateOutput = z.infer<
+  typeof PhotoIdentificationCreateOutputSchema
+>;
+
 type CreateDecisionResult = Awaited<
   ReturnType<typeof applyClassifierCreateDecision>
 >;
@@ -71,7 +82,7 @@ function shouldPromoteCatalogImage({
 }
 
 function logCatalogImageApprovalError(
-  err: unknown,
+  err: Error,
   {
     pendingImageId,
     userId,
@@ -101,12 +112,14 @@ async function applyCatalogImageApproval({
   userId,
   decision,
   result,
+  copyImage,
 }: {
   promote: boolean;
   pendingImageId: string;
   userId: number;
   decision: CreateDecision;
   result: CreateDecisionResult;
+  copyImage: typeof copyPendingImageToBottle;
 }): Promise<CatalogImageWarning | undefined> {
   if (!promote) {
     return undefined;
@@ -122,7 +135,7 @@ async function applyCatalogImageApproval({
       return undefined;
     }
 
-    const imageUrl = await copyPendingImageToBottle({
+    const imageUrl = await copyImage({
       id: pendingImageId,
       userId,
       purpose: "photo_tasting_entry",
@@ -148,8 +161,12 @@ async function applyCatalogImageApproval({
     }
 
     return undefined;
-  } catch (err) {
-    logCatalogImageApprovalError(err, {
+  } catch (cause) {
+    const error =
+      cause instanceof Error
+        ? cause
+        : new Error("Catalog image approval failed.", { cause });
+    logCatalogImageApprovalError(error, {
       pendingImageId,
       userId,
       decision,
@@ -160,129 +177,136 @@ async function applyCatalogImageApproval({
   }
 }
 
-export default procedure
-  .use(requireAuth)
-  .use(requireVerified)
-  .use(requireTosAccepted)
-  .route({
-    method: "POST",
-    path: "/tastings/photo-identification-create",
-    summary: "Create Bottle from photo identification",
-    description:
-      "Create a Bottle from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
-    operationId: "createTastingBottleFromPhotoIdentification",
-  })
-  .input(
-    z.object({
-      createToken: z.string().trim().min(1),
-    }),
-  )
-  .output(
-    z.object({
-      bottle: BottleSchema,
-      warnings: z
-        .array(CatalogImageWarningSchema)
-        .optional()
-        .describe("Non-fatal warnings for side effects after Bottle creation"),
-    }),
-  )
-  .handler(async function ({ input, context, errors }) {
-    const user = context.user;
-    if (!user) {
-      throw errors.UNAUTHORIZED();
-    }
+export function createPhotoIdentificationCreateProcedure(
+  copyImage: typeof copyPendingImageToBottle = copyPendingImageToBottle,
+) {
+  return procedure
+    .use(requireAuth)
+    .use(requireVerified)
+    .use(requireTosAccepted)
+    .route({
+      method: "POST",
+      path: "/tastings/photo-identification-create",
+      summary: "Create Bottle from photo identification",
+      description:
+        "Create a Bottle from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
+      operationId: "createTastingBottleFromPhotoIdentification",
+    })
+    .input(
+      z.object({
+        createToken: z.string().trim().min(1),
+      }),
+    )
+    .output(PhotoIdentificationCreateOutputSchema)
+    .handler(async function ({ input, context, errors }) {
+      const user = context.user;
+      if (!user) {
+        throw errors.UNAUTHORIZED();
+      }
 
-    let createTokenPayload: Awaited<
-      ReturnType<typeof verifyPhotoIdentificationCreateToken>
-    >;
-    try {
-      createTokenPayload = await verifyPhotoIdentificationCreateToken(
-        input.createToken,
-      );
-    } catch (err) {
-      throw errors.BAD_REQUEST({
-        message: "Photo identification create proposal is no longer valid.",
-        cause: err,
-      });
-    }
-
-    if (createTokenPayload.userId !== user.id) {
-      throw errors.BAD_REQUEST({
-        message: "Photo identification create proposal is no longer valid.",
-      });
-    }
-
-    let pendingImage;
-    try {
-      pendingImage = await getUsablePendingUpload({
-        id: createTokenPayload.pendingImageId,
-        userId: user.id,
-      });
-    } catch (err) {
-      if (err instanceof PendingUploadError) {
+      let createTokenPayload: Awaited<
+        ReturnType<typeof verifyPhotoIdentificationCreateToken>
+      >;
+      try {
+        createTokenPayload = await verifyPhotoIdentificationCreateToken(
+          input.createToken,
+        );
+      } catch (err) {
         throw errors.BAD_REQUEST({
-          message: err.message || "Pending photo is no longer available.",
+          message: "Photo identification create proposal is no longer valid.",
+          cause: err,
         });
       }
-      throw err;
-    }
-    const { decision, photoSuitability } = createTokenPayload;
-    if (decision.action !== "create_bottle") {
-      throw errors.BAD_REQUEST({
-        message: "Photo identification result is not a create proposal.",
-      });
-    }
-    if (!isPhotoIdentificationCreateDecisionAutoCreatable(decision)) {
-      throw errors.BAD_REQUEST({
-        message:
-          "Photo identification result needs review before creating a bottle.",
-      });
-    }
-    const actor = await getUserActor(user);
 
-    let result: CreateDecisionResult;
-    try {
-      result = await applyClassifierCreateDecision({
-        createdByActorId: actor.id,
+      if (createTokenPayload.userId !== user.id) {
+        throw errors.BAD_REQUEST({
+          message: "Photo identification create proposal is no longer valid.",
+        });
+      }
+
+      let pendingImage;
+      try {
+        pendingImage = await getUsablePendingUpload({
+          id: createTokenPayload.pendingImageId,
+          userId: user.id,
+        });
+      } catch (err) {
+        if (err instanceof PendingUploadError) {
+          throw errors.BAD_REQUEST({
+            message: err.message || "Pending photo is no longer available.",
+          });
+        }
+        throw err;
+      }
+      const { decision, photoSuitability } = createTokenPayload;
+      if (decision.action !== "create_bottle") {
+        throw errors.BAD_REQUEST({
+          message: "Photo identification result is not a create proposal.",
+        });
+      }
+      if (!isPhotoIdentificationCreateDecisionAutoCreatable(decision)) {
+        throw errors.BAD_REQUEST({
+          message:
+            "Photo identification result needs review before creating a bottle.",
+        });
+      }
+      const actor = await getUserActor(user);
+
+      let result: CreateDecisionResult;
+      try {
+        result = await applyClassifierCreateDecision({
+          createdByActorId: actor.id,
+          decision,
+        });
+      } catch (err) {
+        if (err instanceof BottleAlreadyExistsError) {
+          throw errors.CONFLICT({
+            message: err.message,
+            data: {
+              bottle: err.bottleId,
+            },
+          });
+        }
+
+        throw err;
+      }
+
+      const warning = await applyCatalogImageApproval({
+        promote: shouldPromoteCatalogImage({
+          result,
+          photoSuitability,
+          pendingPurpose: pendingImage.purpose,
+        }),
+        pendingImageId: pendingImage.id,
+        userId: user.id,
         decision,
+        result,
+        copyImage,
       });
-    } catch (err) {
-      if (err instanceof BottleAlreadyExistsError) {
-        throw errors.CONFLICT({
-          message: err.message,
-          data: {
-            bottle: err.bottleId,
-          },
+
+      const bottle = await db.query.bottles.findFirst({
+        where: (bottles, { eq }) => eq(bottles.id, result.bottleId),
+      });
+      if (!bottle) {
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "Created Bottle could not be loaded.",
         });
       }
-
-      throw err;
-    }
-
-    const warning = await applyCatalogImageApproval({
-      promote: shouldPromoteCatalogImage({
-        result,
-        photoSuitability,
-        pendingPurpose: pendingImage.purpose,
-      }),
-      pendingImageId: pendingImage.id,
-      userId: user.id,
-      decision,
-      result,
+      const serializedBottle = await serialize(
+        BottleSerializer,
+        bottle,
+        user,
+        [],
+        {
+          includeGroupSummary: true,
+        },
+      );
+      const response: PhotoIdentificationCreateOutput = {
+        bottle: serializedBottle,
+      };
+      if (warning) response.warnings = [warning];
+      return response;
     });
+}
 
-    const bottle = await db.query.bottles.findFirst({
-      where: (bottles, { eq }) => eq(bottles.id, result.bottleId),
-    });
-    if (!bottle) {
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Created Bottle could not be loaded.",
-      });
-    }
-    return {
-      bottle: await serialize(BottleSerializer, bottle, user, [], {
-        includeGroupSummary: true,
-      }),
-      ...(warning ? { warnings: [warning] } : {}),
-    };
-  });
+export default createPhotoIdentificationCreateProcedure();

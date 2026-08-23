@@ -1,6 +1,6 @@
 import { TastingContentInputSchema } from "@peated/server/schemas";
 import type { SuggestedTag, Tag } from "@peated/server/types";
-import type { z } from "zod";
+import { z } from "zod";
 
 export const TastingFormFieldsSchema = TastingContentInputSchema.pick({
   rating: true,
@@ -62,17 +62,23 @@ export function buildTastingTagOptions(
   const options = new Map<string, TastingTagOptionData>();
 
   for (const suggestion of suggestions) {
-    const tag = typeof suggestion === "string" ? undefined : suggestion.tag;
-    const id =
-      typeof suggestion === "string" ? suggestion : suggestion.tag.name;
+    if (isTastingTagName(suggestion)) {
+      const existing = options.get(suggestion);
+      options.set(suggestion, {
+        id: suggestion,
+        count: existing?.count ?? 0,
+        tag: existing?.tag,
+      });
+      continue;
+    }
+
+    const { count, tag } = suggestion;
+    const id = tag.name;
     const existing = options.get(id);
     options.set(id, {
       id,
-      count:
-        typeof suggestion === "string"
-          ? (existing?.count ?? 0)
-          : suggestion.count,
-      tag: tag ?? existing?.tag,
+      count,
+      tag,
     });
   }
 
@@ -83,6 +89,12 @@ export function buildTastingTagOptions(
   }
 
   return [...options.values()];
+}
+
+function isTastingTagName(
+  suggestion: TastingTagSuggestion,
+): suggestion is string {
+  return z.string().safeParse(suggestion).success;
 }
 
 export function filterTastingTagOptions<T extends TastingTagOptionData>(

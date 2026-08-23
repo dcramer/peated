@@ -3,7 +3,9 @@ import {
   type OAuthAuthorizationRequest,
 } from "@peated/server/schemas";
 
-export function parseOAuthAuthorizationQuery(input: unknown) {
+export function parseOAuthAuthorizationQuery(
+  input: Record<string, FormDataEntryValue | string[] | null | undefined>,
+) {
   return OAuthAuthorizationQuerySchema.safeParse(input);
 }
 

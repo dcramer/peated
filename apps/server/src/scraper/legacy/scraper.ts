@@ -26,7 +26,7 @@ import type {
 import type { ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
-import type { z } from "zod";
+import { z } from "zod";
 import { emitLegacyBottleObservation } from "./bottleContext";
 import {
   beginLegacyPricePagination,
@@ -89,7 +89,8 @@ export async function requestUrl(
         ...headers,
       },
     }));
-    if (typeof data !== "string") data = JSON.stringify(data);
+    const textData = z.string().safeParse(data);
+    data = textData.success ? textData.data : JSON.stringify(data);
   } catch (err: any) {
     status = err?.response?.status;
     if (status !== 404) {

@@ -1,23 +1,31 @@
+import { createRouterClient } from "@orpc/server";
 import {
   buildBottleClassificationArtifacts,
   createAuditBottleResult,
 } from "@peated/bottle-classifier/contract";
-import { runBottleAudit as auditBottleWithServerAdapters } from "@peated/server/agents/bottleClassifier/service";
 import { db } from "@peated/server/db";
 import { bottleChecks } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
+import type { Context } from "@peated/server/orpc/context";
+import {
+  createAuditProcedure,
+  type AuditBottleRunner,
+} from "@peated/server/orpc/routes/audits/create";
 import { eq } from "drizzle-orm";
-import { afterEach, expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 
-vi.mock("@peated/server/agents/bottleClassifier/service", () => ({
-  runBottleAudit: vi.fn(),
-  classifyBottleReference: vi.fn(),
-}));
+const auditBottle = vi.fn<AuditBottleRunner>();
 
-afterEach(() => {
-  vi.resetAllMocks();
+beforeEach(() => {
+  auditBottle.mockReset();
 });
+
+function createAuditClient(context: Context) {
+  return createRouterClient(
+    { create: createAuditProcedure(auditBottle) },
+    { context },
+  );
+}
 
 function cleanAuditResult() {
   return createAuditBottleResult({
@@ -58,11 +66,11 @@ test("Bottle audit requires moderator access", async ({ fixtures }) => {
   const user = await fixtures.User({ mod: false, admin: false });
 
   const error = await waitError(
-    routerClient.audits.create({ bottle: bottle.id }, { context: { user } }),
+    createAuditClient({ user }).create({ bottle: bottle.id }),
   );
 
   expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-  expect(auditBottleWithServerAdapters).not.toHaveBeenCalled();
+  expect(auditBottle).not.toHaveBeenCalled();
 });
 
 test("clean Bottle audit returns a transient result without persistence", async ({
@@ -70,21 +78,21 @@ test("clean Bottle audit returns a transient result without persistence", async 
 }) => {
   const bottle = await fixtures.Bottle();
   const moderator = await fixtures.User({ mod: true });
-  vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+  auditBottle.mockResolvedValue({
     result: cleanAuditResult(),
     modelMetadata: null,
   });
 
-  const result = await routerClient.audits.create(
-    { bottle: bottle.id, note: "Confirm the label." },
-    { context: { user: moderator } },
-  );
+  const result = await createAuditClient({ user: moderator }).create({
+    bottle: bottle.id,
+    note: "Confirm the label.",
+  });
 
   expect(result).toEqual({
     status: "clean",
     summary: "The Bottle identity and catalog fields are supported.",
   });
-  expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
+  expect(auditBottle).toHaveBeenCalledWith({
     bottleId: bottle.id,
     origin: "moderator",
     note: "Confirm the label.",
@@ -101,19 +109,14 @@ test("actionable Bottle audit persists one current review", async ({
 }) => {
   const bottle = await fixtures.Bottle();
   const moderator = await fixtures.User({ mod: true });
-  vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+  auditBottle.mockResolvedValue({
     result: await findingAuditResult(bottle.id),
     modelMetadata: null,
   });
 
-  const first = await routerClient.audits.create(
-    { bottle: bottle.id },
-    { context: { user: moderator } },
-  );
-  const second = await routerClient.audits.create(
-    { bottle: bottle.id },
-    { context: { user: moderator } },
-  );
+  const client = createAuditClient({ user: moderator });
+  const first = await client.create({ bottle: bottle.id });
+  const second = await client.create({ bottle: bottle.id });
 
   expect(first).toMatchObject({
     status: "needs_review",
@@ -130,7 +133,7 @@ test("actionable Bottle audit persists one current review", async ({
     status: "needs_review",
     audit: { id: first.status === "needs_review" ? first.audit.id : -1 },
   });
-  expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(1);
+  expect(auditBottle).toHaveBeenCalledTimes(1);
   expect(
     await db.query.bottleChecks.findMany({
       where: eq(bottleChecks.bottleId, bottle.id),

@@ -1,3 +1,5 @@
+import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
+import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -7,66 +9,70 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
+import {
+  createMissingBottles as createMissingBottlesWithServices,
+  type CreateMissingBottlesServices,
+} from "@peated/server/worker/jobs/createMissingBottles";
+import type { JobPayload } from "@peated/server/worker/types";
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
-const pushJobMock = vi.hoisted(() => vi.fn());
-const pushUniqueJobMock = vi.hoisted(() => vi.fn());
-const getAutomationModeratorUserMock = vi.hoisted(() => vi.fn());
+const classifyBottleReferenceMock =
+  vi.fn<CreateMissingBottlesServices["classifyReference"]>();
 
-vi.mock(
-  "@peated/server/agents/bottleClassifier/classifyBottleReference",
-  () => ({
-    classifyBottleReference: classifyBottleReferenceMock,
-  }),
-);
+type MockClassificationDecision = Pick<
+  BottleClassificationDecision,
+  "action"
+> & {
+  candidateBottleIds?: number[];
+  matchedBottleId?: number;
+  proposedBottle?: Extract<
+    BottleClassificationDecision,
+    { action: "create_bottle" }
+  >["proposedBottle"];
+};
 
-vi.mock(
-  "@peated/server/agents/bottleClassifier/scrapedBottleReference",
-  () => ({
-    classifyScrapedBottleReference: classifyBottleReferenceMock,
-  }),
-);
+type MockClassificationArtifacts = {
+  candidates?: Array<{ bottleId: number }>;
+};
 
-vi.mock("@peated/server/worker/client", () => ({
-  pushJob: pushJobMock,
-  pushUniqueJob: pushUniqueJobMock,
-}));
-
-vi.mock("@peated/server/lib/systemUser", () => ({
-  getAutomationModeratorUser: getAutomationModeratorUserMock,
-}));
+function createMissingBottles(rawInput?: JobPayload) {
+  return createMissingBottlesWithServices(rawInput, {
+    classifyReference: classifyBottleReferenceMock,
+  });
+}
 
 function buildClassification(
-  decision: Record<string, unknown>,
-  artifacts: Record<string, unknown> = {},
+  decision: MockClassificationDecision,
+  artifacts: MockClassificationArtifacts = {},
 ) {
-  return {
+  return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
-      confidence: 0.9,
       rationale: "test fixture",
       candidateBottleIds: [],
+      identityScope: "product",
+      observation: null,
       ...decision,
     },
     artifacts: {
       extractedIdentity: null,
-      candidates: [],
+      candidates:
+        artifacts.candidates?.map((candidate) => ({
+          fullName: `Candidate ${candidate.bottleId}`,
+          ...candidate,
+        })) ?? [],
       searchEvidence: [],
       resolvedEntities: [],
-      ...artifacts,
     },
-  };
+  });
 }
 
 describe("createMissingBottles", () => {
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
-    pushJobMock.mockReset();
-    pushUniqueJobMock.mockReset();
-    getAutomationModeratorUserMock.mockReset();
+    vi.mocked(workerClient.pushUniqueJob).mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({ action: "no_match" }),
     );
@@ -78,12 +84,7 @@ describe("createMissingBottles", () => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
     const issue = "Default";
     const url = "https://example.com/review";
-    const systemUser = await fixtures.User({
-      admin: true,
-      username: "dcramer",
-    });
     const systemActor = await getPeatedSystemActor();
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
@@ -130,9 +131,11 @@ describe("createMissingBottles", () => {
       where: eq(reviews.id, review.id),
     });
     expect(updatedReview?.bottleId).toBeTruthy();
+    if (!updatedReview?.bottleId) throw new Error("Review has no Bottle");
+    const bottleId = updatedReview.bottleId;
 
     const bottle = await db.query.bottles.findFirst({
-      where: (table, { eq }) => eq(table.id, updatedReview!.bottleId as number),
+      where: (table, { eq }) => eq(table.id, bottleId),
     });
     expect(bottle?.fullName).toEqual("Springbank Bottle Name");
 
@@ -172,7 +175,7 @@ describe("createMissingBottles", () => {
       metadata: expect.objectContaining({
         classifierEvidence: {
           action: "create_bottle",
-          identityScope: null,
+          identityScope: "product",
           observation: null,
           confidenceBasis: null,
         },
@@ -181,16 +184,18 @@ describe("createMissingBottles", () => {
       }),
     });
 
-    expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
-      bottleId: updatedReview?.bottleId,
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      {
+        bottleId: updatedReview?.bottleId,
+      },
+    );
   });
 
   test("audits safe canonical create reuse as an existing Bottle match", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const systemUser = await fixtures.User({ admin: true });
     const brand = await fixtures.Entity({ name: "Worker Existing Brand" });
     const issue = "Canonical reuse";
     const bottle = await fixtures.Bottle({
@@ -213,7 +218,6 @@ describe("createMissingBottles", () => {
       issue,
       url: "https://example.com/worker-safe-canonical-reuse",
     });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({
         action: "create_bottle",
@@ -261,7 +265,7 @@ describe("createMissingBottles", () => {
       metadata: expect.objectContaining({
         classifierEvidence: {
           action: "create_bottle",
-          identityScope: null,
+          identityScope: "product",
           observation: null,
           confidenceBasis: null,
         },
@@ -273,11 +277,6 @@ describe("createMissingBottles", () => {
 
   test("only visits unresolved reviews once per run", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const systemUser = await fixtures.User({
-      admin: true,
-      username: "dcramer",
-    });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
@@ -298,8 +297,6 @@ describe("createMissingBottles", () => {
 
   test("limits queued work to one review article", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const systemUser = await fixtures.User({ admin: true });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     const selected = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
@@ -334,7 +331,6 @@ describe("createMissingBottles", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const systemUser = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
       name: "Worker Direct Bottle",
     });
@@ -345,7 +341,6 @@ describe("createMissingBottles", () => {
       issue: "Default",
       url: "https://example.com/worker-direct-bottle-review",
     });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
@@ -396,7 +391,6 @@ describe("createMissingBottles", () => {
       allowScoreDisplay: true,
       allowSummaryDisplay: true,
     });
-    const systemUser = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({ name: "Published Worker Bottle" });
     const review = await fixtures.Review({
       externalSiteId: site.id,
@@ -405,7 +399,6 @@ describe("createMissingBottles", () => {
       name: "Published Worker Bottle Review",
       url: "https://example.com/published-worker-review",
     });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
@@ -426,7 +419,6 @@ describe("createMissingBottles", () => {
 
   test("attempts unresolved Reviews", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const systemUser = await fixtures.User({ admin: true });
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
@@ -434,7 +426,6 @@ describe("createMissingBottles", () => {
       issue: "Default",
       url: "https://example.com/generic-review",
     });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
 
     await createMissingBottles();
 
@@ -450,7 +441,6 @@ describe("createMissingBottles", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const systemUser = await fixtures.User({ admin: true });
     const suggestedBottle = await fixtures.Bottle({
       name: "Suggested Worker Bottle",
     });
@@ -464,7 +454,6 @@ describe("createMissingBottles", () => {
       issue: "Default",
       url: "https://example.com/concurrent-worker-review",
     });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     classifyBottleReferenceMock.mockImplementationOnce(async () => {
       await db
         .update(reviews)

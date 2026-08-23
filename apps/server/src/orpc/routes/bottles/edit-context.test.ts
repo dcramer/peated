@@ -7,7 +7,10 @@ import {
   bottlesToDistillers,
 } from "@peated/server/db/schema";
 import { materializeBottleForGroup } from "@peated/server/lib/bottleIdentity";
-import { createBottle } from "@peated/server/lib/createBottle";
+import {
+  createBottle,
+  type BottleCreateInput,
+} from "@peated/server/lib/createBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -20,7 +23,7 @@ type GroupMemberExact = Omit<
 
 async function createGroup(
   user: User,
-  stable: Record<string, unknown>,
+  stable: Partial<BottleCreateInput>,
   exacts: GroupMemberExact[],
 ) {
   const first = await createBottle({
@@ -28,7 +31,7 @@ async function createGroup(
     input: { ...stable, ...exacts[0] },
   });
   if ("statedAge" in stable) {
-    const statedAge = stable.statedAge as number | null;
+    const statedAge = stable.statedAge ?? null;
     const materialized = materializeBottleForGroup({
       group: { ...first.group, statedAge },
       exact: {

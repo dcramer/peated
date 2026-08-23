@@ -1,11 +1,9 @@
 import { db } from "@peated/server/db";
 import { externalSiteRuns } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import { pushJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
-
-vi.mock("@peated/server/worker/client");
 
 describe("POST /external-sites/:site/trigger", () => {
   beforeEach(() => {

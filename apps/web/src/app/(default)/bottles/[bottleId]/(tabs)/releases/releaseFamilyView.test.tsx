@@ -1,25 +1,9 @@
 import type { BottleGroupV1 } from "@peated/server/schemas";
 import type { Bottle, Entity } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import ReleaseFamilyView from "./releaseFamilyView";
-
-vi.mock("@peated/web/components/paginationButtons", () => ({
-  default: ({
-    rel,
-    cursorParam,
-    ariaLabel = "Pagination",
-  }: {
-    rel: { nextCursor: number | null; prevCursor: number | null };
-    cursorParam?: string;
-    ariaLabel?: string;
-  }) => (
-    <nav aria-label={ariaLabel}>
-      {cursorParam ?? "cursor"} next page: {rel.nextCursor}
-    </nav>
-  ),
-}));
+import { ReleaseFamilyContent } from "./releaseFamilyView";
 
 const timestamp = "2026-07-22T12:00:00.000Z";
 const ratingStats = {
@@ -118,12 +102,15 @@ const bottle = {
 describe("ReleaseFamilyView", () => {
   it("presents releases without group activity or management actions", () => {
     const html = renderToStaticMarkup(
-      <ReleaseFamilyView
+      <ReleaseFamilyContent
         bottleList={{
           results: [bottle],
           rel: { prevCursor: null, nextCursor: 2 },
         }}
         currentBottleId={bottle.id}
+        pagination={
+          <nav aria-label="Release pagination">cursor next page: 2</nav>
+        }
       />,
     );
 
@@ -160,7 +147,7 @@ describe("ReleaseFamilyView", () => {
 
   it("describes an empty result as an empty release list", () => {
     const html = renderToStaticMarkup(
-      <ReleaseFamilyView
+      <ReleaseFamilyContent
         bottleList={{
           results: [],
           rel: { prevCursor: null, nextCursor: null },

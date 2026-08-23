@@ -12,6 +12,7 @@ import {
   ShopifyProductSchema,
   ShopifyVariantSchema,
 } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "glenallachie";
@@ -33,8 +34,8 @@ const GlenAllachieProductSchema = ShopifyProductSchema.extend({
   body_html: z.string(),
   product_type: z.string(),
   tags: z.array(z.string()),
-  images: z.array(z.unknown()),
-  variants: z.array(z.unknown()),
+  images: z.array(z.json()),
+  variants: z.array(z.json()),
 });
 
 const GlenAllachieVariantSchema = ShopifyVariantSchema;
@@ -68,7 +69,7 @@ function getProductName(title: string, tags: string[]): string | null {
   return null;
 }
 
-export function parseGlenAllachieProducts(input: unknown): StorePrice[] {
+export function parseGlenAllachieProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

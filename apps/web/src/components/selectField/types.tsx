@@ -1,13 +1,15 @@
 import type { ReactNode } from "react";
 
 export type Option = {
+  description?: string | null;
   id?: string | number | null;
   name: string;
-} & Record<string, any>;
+  shortName?: string | null;
+};
 
 export type CreateFormOptions<T extends Option> = {
-  data: T;
-  onSubmit: (newOption: any) => void;
+  data: Option;
+  onSubmit: (newOption: T) => void;
   onClose: () => void;
 };
 

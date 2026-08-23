@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page(props: {
-  searchParams: Promise<Record<string, any>>;
+  searchParams: Promise<{ q?: string }>;
 }) {
   const searchParams = await props.searchParams;
   const query = searchParams.q ?? "";

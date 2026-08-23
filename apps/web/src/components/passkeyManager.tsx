@@ -42,11 +42,7 @@ export default function PasskeyManager() {
 
   const handleAddPasskey = async () => {
     // Check for WebAuthn support
-    if (
-      typeof window === "undefined" ||
-      !window.PublicKeyCredential ||
-      typeof window.PublicKeyCredential !== "function"
-    ) {
+    if (!globalThis.PublicKeyCredential) {
       router.push("/browser-not-supported");
       return;
     }

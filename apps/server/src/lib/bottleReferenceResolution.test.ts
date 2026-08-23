@@ -1,54 +1,103 @@
+import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
+import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import { bottleTombstones, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   lockBottleReferenceResolutionAssignmentInTransaction,
-  resolveBottleReferenceTarget,
-  resolveScrapedBottleReferenceTarget,
+  resolveBottleReferenceTarget as resolveBottleReferenceTargetWithClassifier,
+  resolveScrapedBottleReferenceTarget as resolveScrapedBottleReferenceTargetWithClassifier,
   type BottleReferenceResolution,
 } from "@peated/server/lib/bottleReferenceResolution";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
-const classifyScrapedBottleReferenceMock = vi.hoisted(() => vi.fn());
+type BottleReferenceClassifier = NonNullable<
+  Parameters<typeof resolveBottleReferenceTargetWithClassifier>[1]
+>;
 
-vi.mock(
-  "@peated/server/agents/bottleClassifier/classifyBottleReference",
-  () => ({
-    classifyBottleReference: classifyBottleReferenceMock,
-  }),
-);
+const classifyBottleReferenceMock = vi.fn<BottleReferenceClassifier>();
+const classifyScrapedBottleReferenceMock = vi.fn<BottleReferenceClassifier>();
 
-vi.mock(
-  "@peated/server/agents/bottleClassifier/scrapedBottleReference",
-  () => ({
-    classifyScrapedBottleReference: classifyScrapedBottleReferenceMock,
-  }),
-);
+type MockClassificationDecision = Pick<
+  BottleClassificationDecision,
+  "action"
+> & {
+  candidateBottleIds?: number[];
+  confidenceBasis?: BottleClassificationDecision["confidenceBasis"];
+  identityScope?: BottleClassificationDecision["identityScope"];
+  matchedBottleId?: number | null;
+  observation?: Partial<
+    NonNullable<BottleClassificationDecision["observation"]>
+  > | null;
+  rationale?: string | null;
+  proposedBottle?: Partial<
+    NonNullable<
+      Extract<
+        BottleClassificationDecision,
+        { action: "create_bottle" }
+      >["proposedBottle"]
+    >
+  > &
+    Pick<
+      NonNullable<
+        Extract<
+          BottleClassificationDecision,
+          { action: "create_bottle" }
+        >["proposedBottle"]
+      >,
+      "brand" | "distillers" | "name"
+    >;
+};
+
+function resolveBottleReferenceTarget(
+  input: Parameters<typeof resolveBottleReferenceTargetWithClassifier>[0],
+) {
+  return resolveBottleReferenceTargetWithClassifier(
+    input,
+    classifyBottleReferenceMock,
+  );
+}
+
+function resolveScrapedBottleReferenceTarget(
+  input: Parameters<
+    typeof resolveScrapedBottleReferenceTargetWithClassifier
+  >[0],
+) {
+  return resolveScrapedBottleReferenceTargetWithClassifier(
+    input,
+    classifyScrapedBottleReferenceMock,
+  );
+}
 
 function buildClassification(
-  decision: Record<string, unknown>,
+  decision: MockClassificationDecision,
   candidates: Array<{ bottleId: number }> = [],
 ) {
-  return {
+  return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
-      confidence: 0.75,
       rationale: "test fixture",
       candidateBottleIds: [],
+      identityScope: "product",
+      observation: null,
       ...decision,
     },
     artifacts: {
       extractedIdentity: null,
-      candidates,
+      candidates: candidates.map((candidate) => ({
+        fullName: `Candidate ${candidate.bottleId}`,
+        ...candidate,
+      })),
       searchEvidence: [],
       resolvedEntities: [],
     },
-  };
+  });
 }
 
-function buildSmwsProposedBottle() {
+function buildSmwsProposedBottle(): NonNullable<
+  MockClassificationDecision["proposedBottle"]
+> {
   return {
     name: "35.331",
     series: null,
@@ -423,7 +472,6 @@ describe("resolveBottleReferenceTarget", () => {
         observation: null,
         confidenceBasis: null,
         matchedBottleId: null,
-        matchedReleaseId: null,
         proposedBottle: {
           name: "Independent Expression",
           series: null,
@@ -528,13 +576,11 @@ describe("resolveBottleReferenceTarget", () => {
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({
         action: "create_bottle",
-        confidence: 100,
         identityScope: "exact_cask",
         observation: {
           caskNumber: "35.331",
         },
         matchedBottleId: null,
-        matchedReleaseId: null,
         proposedBottle: buildSmwsProposedBottle(),
       }),
     );

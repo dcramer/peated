@@ -7,6 +7,7 @@ import {
   deleteTerminalModeratorBottleAudits,
   getCurrentModeratorBottleAudit,
   type BottleCheckWithOperations,
+  type CreateBottleCheckInput,
   type CreateBottleCheckResult,
 } from "@peated/server/lib/bottleChecks";
 import { eq } from "drizzle-orm";
@@ -16,11 +17,13 @@ import { runBottleAudit as auditBottleWithServerAdapters } from "./service";
 const PositiveIdSchema = z.number().int().positive();
 const NonEmptyTextSchema = z.string().trim().min(1);
 
+export const ModeratorBottleAuditInputFields = {
+  bottleId: PositiveIdSchema,
+  note: NonEmptyTextSchema.optional(),
+} as const;
+
 export const ModeratorBottleAuditInputSchema = z
-  .object({
-    bottleId: PositiveIdSchema,
-    note: NonEmptyTextSchema.optional(),
-  })
+  .object(ModeratorBottleAuditInputFields)
   .strict();
 
 const PostUserCreationBottleAuditInputSchema =
@@ -42,24 +45,28 @@ export type ModeratorBottleAuditResult =
 async function runAndPersistBottleAudit({
   input,
   backgroundEventKey,
+  runAudit,
 }: {
   input: AuditBottleInput;
   backgroundEventKey?: string;
+  runAudit: typeof auditBottleWithServerAdapters;
 }): Promise<CreateBottleCheckResult> {
-  const { result, modelMetadata } = await auditBottleWithServerAdapters(input);
+  const { result, modelMetadata } = await runAudit(input);
 
-  return await createBottleCheck({
+  const checkInput: CreateBottleCheckInput = {
     intent: "audit_bottle",
     input,
     result,
     model: config.BOTTLE_CLASSIFIER_MODEL,
     modelMetadata,
-    ...(backgroundEventKey ? { backgroundEventKey } : {}),
-  });
+  };
+  if (backgroundEventKey) checkInput.backgroundEventKey = backgroundEventKey;
+  return await createBottleCheck(checkInput);
 }
 
 export async function runModeratorBottleAudit(
   rawInput: ModeratorBottleAuditInput,
+  runAudit: typeof auditBottleWithServerAdapters = auditBottleWithServerAdapters,
 ): Promise<ModeratorBottleAuditResult> {
   const input = ModeratorBottleAuditInputSchema.parse(rawInput);
   const existing = await getCurrentModeratorBottleAudit(input.bottleId);
@@ -70,10 +77,9 @@ export async function runModeratorBottleAudit(
   const auditInput: AuditBottleInput = {
     bottleId: input.bottleId,
     origin: "moderator",
-    ...(input.note ? { note: input.note } : {}),
   };
-  const { result, modelMetadata } =
-    await auditBottleWithServerAdapters(auditInput);
+  if (input.note) auditInput.note = input.note;
+  const { result, modelMetadata } = await runAudit(auditInput);
   if (result.proposedOperations.length === 0 && result.findings.length === 0) {
     await deleteTerminalModeratorBottleAudits({
       bottleId: input.bottleId,
@@ -103,6 +109,7 @@ export async function runModeratorBottleAudit(
 
 export async function runPostUserCreationBottleAudit(
   rawInput: PostUserCreationBottleAuditInput,
+  runAudit: typeof auditBottleWithServerAdapters = auditBottleWithServerAdapters,
 ): Promise<CreateBottleCheckResult> {
   const input = PostUserCreationBottleAuditInputSchema.parse(rawInput);
   const existing = await db.query.bottleChecks.findFirst({
@@ -122,12 +129,14 @@ export async function runPostUserCreationBottleAudit(
     return { check: existing, created: false };
   }
 
+  const auditInput: AuditBottleInput = {
+    bottleId: input.bottleId,
+    origin: "post_user_creation",
+  };
+  if (input.note) auditInput.note = input.note;
   return await runAndPersistBottleAudit({
-    input: {
-      bottleId: input.bottleId,
-      origin: "post_user_creation",
-      ...(input.note ? { note: input.note } : {}),
-    },
+    input: auditInput,
     backgroundEventKey: input.backgroundEventKey,
+    runAudit,
   });
 }

@@ -1,10 +1,10 @@
 import type { Bottle, Entity } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import BottleResultRow from "./bottleResult";
 
-vi.mock("@peated/web/assets/bottle.svg", () => ({ default: "svg" }));
+const EmptyIcon = () => null;
 
 const timestamp = "2026-07-22T12:00:00.000Z";
 
@@ -105,6 +105,7 @@ describe("BottleResultRow", () => {
       <BottleResultRow
         result={{ type: "bottle", ref: exactBottle }}
         directToTasting={false}
+        icon={EmptyIcon}
       />,
     );
     const text = html.replace(/<[^>]*>/g, "");
@@ -151,6 +152,7 @@ describe("BottleResultRow", () => {
       <BottleResultRow
         result={{ type: "bottle", ref: bottle }}
         directToTasting={false}
+        icon={EmptyIcon}
       />,
     );
 

@@ -1,4 +1,10 @@
 import type { BottleExtractedDetails } from "@peated/bottle-classifier/contract";
+import type {
+  BottleCandidate,
+  BottleSearchEvidence,
+  ProposedBottle,
+} from "@peated/bottle-classifier/internal/types";
+import type { StorePriceMatchAutomationAssessment } from "@peated/server/schemas/priceMatches";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
@@ -19,6 +25,18 @@ import {
 import { bottles } from "./bottles";
 import { externalSites } from "./externalSites";
 import { users } from "./users";
+
+type PersistedJsonValue =
+  | boolean
+  | null
+  | number
+  | string
+  | PersistedJsonValue[]
+  | PersistedJsonObject;
+
+interface PersistedJsonObject {
+  [key: string]: PersistedJsonValue;
+}
 
 export const currencyEnum = pgEnum("currency", ["usd", "gbp", "eur"]);
 export const storePriceMatchProposalStatusEnum = pgEnum(
@@ -180,19 +198,23 @@ export const storePriceMatchProposals = pgTable(
     // a reusable alias. Enforced at alias-write time in priceMatchingProposals.
     aliasScope: text("alias_scope").$type<"global_alias" | "none">(),
     candidateBottles: jsonb("candidate_bottles")
-      .$type<Record<string, unknown>[]>()
+      .$type<Array<BottleCandidate | PersistedJsonObject>>()
       .default(sql`'[]'::jsonb`)
       .notNull(),
-    extractedLabel: jsonb("extracted_label").$type<Record<string, unknown>>(),
-    proposedBottle: jsonb("proposed_bottle").$type<Record<string, unknown>>(),
+    extractedLabel: jsonb("extracted_label").$type<
+      BottleExtractedDetails | PersistedJsonObject
+    >(),
+    proposedBottle: jsonb("proposed_bottle").$type<
+      PersistedJsonObject | ProposedBottle
+    >(),
     legacyProposedRelease:
-      jsonb("proposed_release").$type<Record<string, unknown>>(),
+      jsonb("proposed_release").$type<PersistedJsonObject>(),
     searchEvidence: jsonb("search_evidence")
-      .$type<Record<string, unknown>[]>()
+      .$type<Array<BottleSearchEvidence | PersistedJsonObject>>()
       .default(sql`'[]'::jsonb`)
       .notNull(),
     automationAssessment: jsonb("automation_assessment").$type<
-      Record<string, unknown>
+      PersistedJsonObject | StorePriceMatchAutomationAssessment
     >(),
     rationale: text("rationale"),
     model: text("model"),

@@ -7,6 +7,11 @@ import {
   loadBottleGroup,
 } from "./bottleGroupReads";
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 describe("BottleGroup reads", () => {
   test("lists independently complete Bottles by their direct aliases", async ({
     fixtures,
@@ -15,8 +20,9 @@ describe("BottleGroup reads", () => {
       name: "Independent Batch",
       releaseYear: 2020,
     });
+    const groupId = requireGroupId(source.groupId);
     const related = await fixtures.BottleGroupMember({
-      groupId: source.groupId as number,
+      groupId,
       edition: "Batch Two",
       releaseYear: 2024,
     });
@@ -27,7 +33,7 @@ describe("BottleGroup reads", () => {
       assignedByActorId: source.createdByActorId,
     });
 
-    const members = await listBottleGroupBottles(source.groupId as number, {
+    const members = await listBottleGroupBottles(groupId, {
       query: "Alternate exact",
       cursor: 1,
       limit: 25,
@@ -48,10 +54,9 @@ describe("BottleGroup reads", () => {
     );
 
     const bottle = await fixtures.Bottle();
+    const groupId = requireGroupId(bottle.groupId);
 
-    await expect(
-      loadBottleGroup(bottle.groupId as number),
-    ).resolves.toMatchObject({
+    await expect(loadBottleGroup(groupId)).resolves.toMatchObject({
       id: bottle.groupId,
       representativeBottleId: bottle.id,
     });
@@ -61,10 +66,11 @@ describe("BottleGroup reads", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
+    const groupId = requireGroupId(bottle.groupId);
     await db.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
 
     await expect(
-      listBottleGroupBottles(bottle.groupId as number, {
+      listBottleGroupBottles(groupId, {
         query: "",
         cursor: 1,
         limit: 25,

@@ -10,16 +10,15 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { materializeBottleForGroup } from "@peated/server/lib/bottleIdentity";
-import { createBottle } from "@peated/server/lib/createBottle";
+import {
+  createBottle,
+  type BottleCreateInput,
+} from "@peated/server/lib/createBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { vi } from "vitest";
-
-vi.mock("@peated/server/worker/client", () => ({
-  pushUniqueJob: vi.fn(),
-}));
 
 type GroupMemberExact = Omit<
   Parameters<typeof testFixtures.BottleGroupMember>[0],
@@ -28,7 +27,7 @@ type GroupMemberExact = Omit<
 
 async function createGroup(
   user: User,
-  stable: Record<string, unknown>,
+  stable: Partial<BottleCreateInput>,
   exacts: GroupMemberExact[],
 ) {
   const first = await createBottle({
@@ -36,7 +35,7 @@ async function createGroup(
     input: { ...stable, ...exacts[0] },
   });
   if ("statedAge" in stable) {
-    const statedAge = stable.statedAge as number | null;
+    const statedAge = stable.statedAge ?? null;
     const materialized = materializeBottleForGroup({
       group: { ...first.group, statedAge },
       exact: {
@@ -107,6 +106,7 @@ describe("PATCH /bottles/{bottle}", () => {
     ]) {
       const error = await waitError(
         routerClient.bottles.update(
+          // SAFETY: This test sends the retired nested input to the runtime validator.
           oldInput as Parameters<typeof routerClient.bottles.update>[0],
           { context: { user: mod } },
         ),

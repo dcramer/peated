@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
+import { z } from "zod";
 
 type TSVectorWeight = "A" | "B" | "C" | "D";
 
@@ -27,14 +28,15 @@ export function tsvector<TData extends TSVectorType = string>(name: string) {
     },
 
     toDriver(value: TData) {
-      if (typeof value === "string")
-        return sql`to_tsvector('english', unaccent(${value}))`;
+      const textValue = z.string().safeParse(value);
+      if (textValue.success)
+        return sql`to_tsvector('english', unaccent(${textValue.data}))`;
       else if (Array.isArray(value))
         return sql.join(
           value.map((v) => v.mapToDriverValue()),
           sql` || ' ' || `,
         );
-      return value.mapToDriverValue();
+      return z.instanceof(TSVector).parse(value).mapToDriverValue();
     },
   })(name);
 }

@@ -1,6 +1,16 @@
 import type { ExternalSiteType } from "@peated/server/types";
 import type { z } from "zod";
 
+export type JsonValue =
+  | boolean
+  | JsonValue[]
+  | null
+  | number
+  | string
+  | { [key: string]: JsonValue };
+
+export type ScraperRunPayload = JsonValue | undefined;
+
 export type ScraperRequest = {
   target: string;
   url: URL;

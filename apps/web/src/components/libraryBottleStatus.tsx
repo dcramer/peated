@@ -13,15 +13,7 @@ export type CollectionBottleStatus =
 
 export type CollectionBottleStatusValue = CollectionBottleStatus | null;
 
-export const COLLECTION_BOTTLE_STATUS_META: Record<
-  CollectionBottleStatus,
-  {
-    label: string;
-    chipClassName: string;
-    selectedClassName: string;
-    labelClassName: string;
-  }
-> = {
+export const COLLECTION_BOTTLE_STATUS_META = {
   sealed: {
     label: "Sealed",
     chipClassName:
@@ -41,7 +33,15 @@ export const COLLECTION_BOTTLE_STATUS_META: Record<
     selectedClassName: "border-slate-400 bg-slate-200 text-slate-950",
     labelClassName: "border-slate-700 bg-slate-900 text-slate-300",
   },
-};
+} satisfies Record<
+  CollectionBottleStatus,
+  {
+    label: string;
+    chipClassName: string;
+    selectedClassName: string;
+    labelClassName: string;
+  }
+>;
 
 export function getCollectionBottleStatusLabel(
   status: CollectionBottleStatusValue | undefined,

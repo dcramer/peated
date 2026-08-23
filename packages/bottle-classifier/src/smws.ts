@@ -1,5 +1,5 @@
 import type { CaskFill, CaskSize, CaskType, Category } from "./classifierTypes";
-import { CASK_SIZE_IDS, CASK_TYPE_IDS } from "./classifierTypes";
+import { CaskSizeEnum, CaskTypeEnum } from "./classifierTypes";
 import { getExactCaskCodeAnchor } from "./exactCask";
 import { escapeRegExp } from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
@@ -21,11 +21,15 @@ const FLAVOR_PROFILES = [
 
 export type FlavorProfile = (typeof FLAVOR_PROFILES)[number];
 
+interface SmwsDistilleryCodes {
+  [code: string]: string;
+}
+
 // External SMWS code data, not general whisky taxonomy inference. Keep changes
 // backed by a cited source and tests until this moves into an editable database.
 // SMWS code format: https://unfiltered.smws.com/uk/welcome-magazine/smws-101.html
 // Source: https://www.whiskysaga.com/smws-codes
-export const SMWS_DISTILLERY_CODES: Record<string, string> = {
+export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   // Single Malt
   1: "Glenfarclas",
   2: "Glenlivet",
@@ -501,17 +505,15 @@ function parseType(value: string): CaskType | null {
     .replace("px", "pedro_ximenez")
     .replace(/\s+/g, "_");
 
-  return CASK_TYPE_IDS.includes(normalizedType as CaskType)
-    ? (normalizedType as CaskType)
-    : null;
+  const result = CaskTypeEnum.safeParse(normalizedType);
+  return result.success ? result.data : null;
 }
 
 function parseSize(value: string): CaskSize | null {
   const normalizedSize = value.toLowerCase();
 
-  return CASK_SIZE_IDS.includes(normalizedSize as CaskSize)
-    ? (normalizedSize as CaskSize)
-    : null;
+  const result = CaskSizeEnum.safeParse(normalizedSize);
+  return result.success ? result.data : null;
 }
 
 export function parseCaskType(

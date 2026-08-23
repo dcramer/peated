@@ -11,7 +11,7 @@ export default function useAutofocus<ElementType extends HTMLElement>(
     }
     if (!shouldFocus) return;
     const node = ref.current;
-    if (node && typeof node.focus === "function") {
+    if (node) {
       node.focus();
     }
   }, [ref, condition]);

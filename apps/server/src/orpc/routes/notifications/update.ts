@@ -51,7 +51,7 @@ export default procedure
       });
     }
 
-    const data: { [name: string]: any } = {};
+    const data: Partial<typeof notifications.$inferInsert> = {};
     if (read !== undefined) {
       data.read = read;
     }

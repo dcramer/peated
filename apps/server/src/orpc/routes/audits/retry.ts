@@ -1,6 +1,6 @@
 import {
   BottleOperationActionResultSchema,
-  RetryBottleOperationInputSchema,
+  RetryBottleOperationInputFields,
   retryBottleOperation,
 } from "@peated/server/lib/bottleOperationModeration";
 import { procedure } from "@peated/server/orpc";
@@ -21,8 +21,8 @@ export default procedure
   .input(
     z
       .object({
-        audit: RetryBottleOperationInputSchema.shape.checkId,
-        operation: RetryBottleOperationInputSchema.shape.operationId,
+        audit: RetryBottleOperationInputFields.checkId,
+        operation: RetryBottleOperationInputFields.operationId,
       })
       .strict(),
   )

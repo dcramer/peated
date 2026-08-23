@@ -651,16 +651,18 @@ function titleSupportsAnyCandidateName({
   );
 }
 
+interface ExistingMatchSupportChecks {
+  checks: EvidenceCheck[];
+  differentiatingAttributes: MatchAttribute[];
+}
+
 function buildExistingMatchSupportChecks({
   target,
   extractedLabel,
 }: {
   target: BottleCandidate;
   extractedLabel: BottleExtractedDetails | null;
-}): {
-  checks: EvidenceCheck[];
-  differentiatingAttributes: MatchAttribute[];
-} {
+}): ExistingMatchSupportChecks {
   const checks: EvidenceCheck[] = [];
   const differentiatingAttributes = new Set<MatchAttribute>();
   const label = extractedLabel;

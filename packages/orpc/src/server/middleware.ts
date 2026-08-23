@@ -5,9 +5,10 @@ type Options = {
   captureInputs?: boolean;
 };
 
-export function shouldCaptureORPCServerError(error: unknown): boolean {
+export function shouldCaptureORPCServerError(error: Error): boolean {
   if (!(error instanceof ORPCError)) return true;
-  return typeof error.status !== "number" || error.status >= 500;
+  const status = Number(error.status);
+  return !Number.isFinite(status) || status >= 500;
 }
 
 /**
@@ -56,7 +57,11 @@ const sentryMiddleware = (options: Options = {}) =>
             code: 2,
           });
 
-          if (shouldCaptureORPCServerError(error)) {
+          if (
+            shouldCaptureORPCServerError(
+              error instanceof Error ? error : new Error("Non-Error thrown"),
+            )
+          ) {
             // Log error to console for development/debugging
             console.error(
               `[ORPC Error] ${path.join("/")}:`,

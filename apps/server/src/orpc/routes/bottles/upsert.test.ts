@@ -46,6 +46,7 @@ describe("PUT /bottles", () => {
   }) => {
     const modUser = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity();
+    // SAFETY: This test sends a retired image field to the runtime validator.
     const input = {
       name: "Unsupported Image Input",
       brand: brand.id,
@@ -113,7 +114,7 @@ describe("PUT /bottles", () => {
       description: "Selected description before update.",
     });
     const siblingTarget = await fixtures.BottleGroupMember({
-      groupId: selected.groupId as number,
+      groupId: selected.groupId,
       edition: "Batch 2",
       description: "Sibling description stays exact.",
     });

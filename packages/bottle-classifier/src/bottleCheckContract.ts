@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EntityTypeEnum, ProposedBottleSchema } from "./classifierTypes";
+import { EntityTypeEnum, ProposedBottleFields } from "./classifierTypes";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const PositiveIdSchema = z.number().int().positive();
@@ -12,8 +12,8 @@ const WebUrlSchema = z
     message: "Expected an HTTP or HTTPS URL",
   });
 
-function requireAtLeastOneField(
-  value: Record<string, unknown>,
+function requireAtLeastOneField<T extends object>(
+  value: T,
   context: z.RefinementCtx,
 ) {
   if (Object.keys(value).length === 0) {
@@ -116,9 +116,9 @@ export const BottleOperationEntityChoiceSchema = z.union([
 
 export const BottlePatchSchema = z
   .object({
-    name: ProposedBottleSchema.shape.name.optional(),
-    statedAge: ProposedBottleSchema.shape.statedAge.removeDefault().optional(),
-    category: ProposedBottleSchema.shape.category.removeDefault().optional(),
+    name: ProposedBottleFields.name.optional(),
+    statedAge: ProposedBottleFields.statedAge.removeDefault().optional(),
+    category: ProposedBottleFields.category.removeDefault().optional(),
     seriesId: PositiveIdSchema.nullable().optional(),
     brand: BottleOperationEntityChoiceSchema.optional(),
     distillers: z.array(BottleOperationEntityChoiceSchema).optional(),
@@ -127,31 +127,25 @@ export const BottlePatchSchema = z
       .describe(
         "Market-facing bottler or release imprint. Clear an existing value only when product evidence shows it is wrong; omission or matching the Brand or a distiller is not enough.",
       ),
-    edition: ProposedBottleSchema.shape.edition.removeDefault().optional(),
-    abv: ProposedBottleSchema.shape.abv
+    edition: ProposedBottleFields.edition.removeDefault().optional(),
+    abv: ProposedBottleFields.abv
       .removeDefault()
       .optional()
       .describe(
         "ABV for this Bottle. Change an existing value only with evidence for the same Bottle, not another batch or release.",
       ),
-    singleCask: ProposedBottleSchema.shape.singleCask
-      .removeDefault()
-      .optional(),
-    caskStrength: ProposedBottleSchema.shape.caskStrength
+    singleCask: ProposedBottleFields.singleCask.removeDefault().optional(),
+    caskStrength: ProposedBottleFields.caskStrength
       .removeDefault()
       .optional()
       .describe(
         "Whether this Bottle is marketed as cask strength, barrel proof, or barrel strength. A stored `null` may be filled from product evidence.",
       ),
-    vintageYear: ProposedBottleSchema.shape.vintageYear
-      .removeDefault()
-      .optional(),
-    releaseYear: ProposedBottleSchema.shape.releaseYear
-      .removeDefault()
-      .optional(),
-    caskSize: ProposedBottleSchema.shape.caskSize.removeDefault().optional(),
-    caskType: ProposedBottleSchema.shape.caskType.removeDefault().optional(),
-    caskFill: ProposedBottleSchema.shape.caskFill.removeDefault().optional(),
+    vintageYear: ProposedBottleFields.vintageYear.removeDefault().optional(),
+    releaseYear: ProposedBottleFields.releaseYear.removeDefault().optional(),
+    caskSize: ProposedBottleFields.caskSize.removeDefault().optional(),
+    caskType: ProposedBottleFields.caskType.removeDefault().optional(),
+    caskFill: ProposedBottleFields.caskFill.removeDefault().optional(),
   })
   .strict()
   .superRefine(requireAtLeastOneField);
@@ -169,7 +163,7 @@ export const EntityIdentityPatchSchema = z
   .strict()
   .superRefine(requireAtLeastOneField);
 
-const ProposedOperationEnvelope = {
+export const ProposedOperationEnvelopeFields = {
   rationale: NonEmptyTextSchema,
   evidenceRefs: z.array(EvidenceRefSchema).nonempty(),
 } as const;
@@ -181,69 +175,77 @@ export const ProposedOperationTypeSchema = z.enum([
   "merge_entities",
 ]);
 
+export const UpdateBottleOperationInputSchema = z
+  .object({
+    bottleId: PositiveIdSchema,
+    patch: BottlePatchSchema,
+  })
+  .strict();
+
 export const UpdateBottleOperationSchema = z
   .object({
     type: z.literal(ProposedOperationTypeSchema.enum.update_bottle),
-    input: z
-      .object({
-        bottleId: PositiveIdSchema,
-        patch: BottlePatchSchema,
-      })
-      .strict(),
-    ...ProposedOperationEnvelope,
+    input: UpdateBottleOperationInputSchema,
+    ...ProposedOperationEnvelopeFields,
   })
   .strict();
+
+export const MergeBottlesOperationInputSchema = z
+  .object({
+    sourceBottleId: PositiveIdSchema,
+    destinationBottleId: PositiveIdSchema,
+  })
+  .strict()
+  .refine(
+    ({ sourceBottleId, destinationBottleId }) =>
+      sourceBottleId !== destinationBottleId,
+    {
+      message: "Source and destination Bottles must be different",
+    },
+  );
 
 export const MergeBottlesOperationSchema = z
   .object({
     type: z.literal(ProposedOperationTypeSchema.enum.merge_bottles),
-    input: z
-      .object({
-        sourceBottleId: PositiveIdSchema,
-        destinationBottleId: PositiveIdSchema,
-      })
-      .strict()
-      .refine(
-        ({ sourceBottleId, destinationBottleId }) =>
-          sourceBottleId !== destinationBottleId,
-        {
-          message: "Source and destination Bottles must be different",
-        },
-      ),
-    ...ProposedOperationEnvelope,
+    input: MergeBottlesOperationInputSchema,
+    ...ProposedOperationEnvelopeFields,
+  })
+  .strict();
+
+export const UpdateEntityOperationInputSchema = z
+  .object({
+    entityId: PositiveIdSchema,
+    patch: EntityIdentityPatchSchema,
   })
   .strict();
 
 export const UpdateEntityOperationSchema = z
   .object({
     type: z.literal(ProposedOperationTypeSchema.enum.update_entity),
-    input: z
-      .object({
-        entityId: PositiveIdSchema,
-        patch: EntityIdentityPatchSchema,
-      })
-      .strict(),
-    ...ProposedOperationEnvelope,
+    input: UpdateEntityOperationInputSchema,
+    ...ProposedOperationEnvelopeFields,
   })
   .strict();
+
+export const MergeEntitiesOperationInputSchema = z
+  .object({
+    sourceEntityId: PositiveIdSchema,
+    destinationEntityId: PositiveIdSchema,
+  })
+  .strict()
+  .refine(
+    ({ sourceEntityId, destinationEntityId }) =>
+      sourceEntityId !== destinationEntityId,
+    {
+      message: "Source and destination Entities must be different",
+    },
+  );
 
 export const MergeEntitiesOperationSchema = z
   .object({
     type: z.literal(ProposedOperationTypeSchema.enum.merge_entities),
-    input: z
-      .object({
-        sourceEntityId: PositiveIdSchema,
-        destinationEntityId: PositiveIdSchema,
-      })
-      .strict()
-      .refine(
-        ({ sourceEntityId, destinationEntityId }) =>
-          sourceEntityId !== destinationEntityId,
-        {
-          message: "Source and destination Entities must be different",
-        },
-      ),
-    ...ProposedOperationEnvelope,
+    input: MergeEntitiesOperationInputSchema,
+    ...ProposedOperationEnvelopeFields,
   })
   .strict();
 

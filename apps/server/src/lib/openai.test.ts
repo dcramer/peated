@@ -8,6 +8,28 @@ import { OpenAIRegionDetailsSchema } from "../worker/jobs/generateRegionDetails"
 import { MAX_BOTTLE_SUGGESTED_TAGS } from "./bottleSchemas";
 import { buildStructuredResponseSpanContext } from "./openai";
 
+const EntityJsonSchemaContract = z.object({
+  properties: z
+    .object({
+      website: z
+        .object({
+          anyOf: z
+            .array(z.object({ format: z.string().optional() }))
+            .optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+});
+
+const BottleJsonSchemaContract = z.object({
+  properties: z
+    .object({
+      suggestedTags: z.object({ maxItems: z.number().optional() }).optional(),
+    })
+    .optional(),
+});
+
 test("uses GenAI workflow semantics for structured responses", () => {
   expect(
     buildStructuredResponseSpanContext(
@@ -50,15 +72,9 @@ describe("openai structured output schemas", () => {
   });
 
   test("does not emit unsupported uri formats for generated entity websites", () => {
-    const jsonSchema = z.toJSONSchema(
-      OpenAIEntityDetailsValidationSchema,
-    ) as unknown as {
-      properties?: {
-        website?: {
-          anyOf?: Array<{ format?: string }>;
-        };
-      };
-    };
+    const jsonSchema = EntityJsonSchemaContract.parse(
+      z.toJSONSchema(OpenAIEntityDetailsValidationSchema),
+    );
 
     expect(
       jsonSchema.properties?.website?.anyOf?.some(
@@ -68,13 +84,9 @@ describe("openai structured output schemas", () => {
   });
 
   test("limits generated bottle tags to the storage contract", () => {
-    const jsonSchema = z.toJSONSchema(
-      OpenAIBottleDetailsValidationSchema,
-    ) as unknown as {
-      properties?: {
-        suggestedTags?: { maxItems?: number };
-      };
-    };
+    const jsonSchema = BottleJsonSchemaContract.parse(
+      z.toJSONSchema(OpenAIBottleDetailsValidationSchema),
+    );
 
     expect(jsonSchema.properties?.suggestedTags?.maxItems).toBe(
       MAX_BOTTLE_SUGGESTED_TAGS,

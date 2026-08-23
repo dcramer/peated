@@ -3,10 +3,15 @@ import { z } from "zod";
 
 import {
   DEFAULT_MAX_PROPOSED_OPERATIONS,
+  MergeBottlesOperationInputSchema,
   MergeBottlesOperationSchema,
+  MergeEntitiesOperationInputSchema,
   MergeEntitiesOperationSchema,
+  ProposedOperationEnvelopeFields,
   ProposedOperationSchema,
+  UpdateBottleOperationInputSchema,
   UpdateBottleOperationSchema,
+  UpdateEntityOperationInputSchema,
   UpdateEntityOperationSchema,
   type BottlePatch,
   type EvidenceRef,
@@ -15,21 +20,14 @@ import {
 import { getExactCaskCodeAnchor } from "../exactCask";
 import { isSmwsIdentityAnchor } from "../smwsPolicy";
 
-const ProposalEnvelopeArgsShape = {
-  rationale: UpdateBottleOperationSchema.shape.rationale,
-  evidenceRefs: UpdateBottleOperationSchema.shape.evidenceRefs,
-};
-
 const UpdateBottleProposalArgsSchema =
-  UpdateBottleOperationSchema.shape.input.safeExtend(ProposalEnvelopeArgsShape);
+  UpdateBottleOperationInputSchema.safeExtend(ProposedOperationEnvelopeFields);
 const MergeBottlesProposalArgsSchema =
-  MergeBottlesOperationSchema.shape.input.safeExtend(ProposalEnvelopeArgsShape);
+  MergeBottlesOperationInputSchema.safeExtend(ProposedOperationEnvelopeFields);
 const UpdateEntityProposalArgsSchema =
-  UpdateEntityOperationSchema.shape.input.safeExtend(ProposalEnvelopeArgsShape);
+  UpdateEntityOperationInputSchema.safeExtend(ProposedOperationEnvelopeFields);
 const MergeEntitiesProposalArgsSchema =
-  MergeEntitiesOperationSchema.shape.input.safeExtend(
-    ProposalEnvelopeArgsShape,
-  );
+  MergeEntitiesOperationInputSchema.safeExtend(ProposedOperationEnvelopeFields);
 
 type ProposalCollectionContext = {
   hasBottleEvidence: (bottleId: number) => boolean;
@@ -53,11 +51,20 @@ type ProposalRecordResult =
   | { status: "recorded"; proposalIndex: number }
   | { status: "rejected"; reason: string };
 
+type ProposedOperationCandidate = {
+  type: ProposedOperation["type"];
+  input?: Record<string, ToolCallPayload>;
+  rationale?: ToolCallPayload;
+  evidenceRefs?: ToolCallPayload;
+};
+
 const OPTIONAL_CASK_METADATA_FIELDS = new Set([
   "caskType",
   "caskSize",
   "caskFill",
 ]);
+const ToolCallPayloadSchema = z.json();
+type ToolCallPayload = z.infer<typeof ToolCallPayloadSchema>;
 
 export type BottleProposalCollector = {
   getProposals: () => ProposedOperation[];
@@ -67,7 +74,7 @@ export type BottleProposalCollector = {
   getUninspectedEvidence: (
     evidenceRefs: readonly EvidenceRef[],
   ) => EvidenceRef | null;
-  record: (proposal: unknown) => ProposalRecordResult;
+  record: (proposal: ProposedOperationCandidate) => ProposalRecordResult;
 };
 
 function evidenceWasCollected(
@@ -336,17 +343,44 @@ export function createBottleProposalCollector({
   };
 }
 
+const ToolJsonSchema = z
+  .object({
+    type: z.literal("object"),
+    properties: z.record(z.string(), z.looseObject({})).default({}),
+    required: z.array(z.string()).default([]),
+    description: z.string().optional(),
+  })
+  .loose();
+
 function nonStrictJsonSchema(schema: z.ZodType) {
-  return z.toJSONSchema(schema, { target: "draft-7" }) as never;
+  const additionalProperties: true = true;
+  const jsonSchema = ToolJsonSchema.parse(
+    z.toJSONSchema(schema, { target: "draft-7" }),
+  );
+  return {
+    ...jsonSchema,
+    additionalProperties,
+  };
 }
 
-function toStoredOperation(type: ProposedOperation["type"], args: unknown) {
-  if (args === null || typeof args !== "object") {
-    return { type };
-  }
+const StoredOperationArgsSchema = z
+  .object({
+    rationale: z.json().optional(),
+    evidenceRefs: z.json().optional(),
+  })
+  .catchall(z.json());
 
-  const { rationale, evidenceRefs, ...input } = args as Record<string, unknown>;
-  return { type, input, rationale, evidenceRefs };
+function toStoredOperation(
+  type: ProposedOperation["type"],
+  args: ToolCallPayload,
+): ProposedOperationCandidate {
+  const parsedArgs = StoredOperationArgsSchema.safeParse(args);
+  if (!parsedArgs.success) return { type };
+  const { rationale, evidenceRefs, ...input } = parsedArgs.data;
+  const operation: ProposedOperationCandidate = { type, input };
+  if (rationale !== undefined) operation.rationale = rationale;
+  if (evidenceRefs !== undefined) operation.evidenceRefs = evidenceRefs;
+  return operation;
 }
 
 const PROPOSAL_RESULT_DESCRIPTION =
@@ -366,7 +400,9 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
       parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
       strict: false,
       execute: (args) =>
-        collector.record(toStoredOperation("update_bottle", args)),
+        collector.record(
+          toStoredOperation("update_bottle", ToolCallPayloadSchema.parse(args)),
+        ),
     }),
     tool({
       name: "propose_merge_bottles",
@@ -385,7 +421,9 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
       parameters: nonStrictJsonSchema(UpdateEntityProposalArgsSchema),
       strict: false,
       execute: (args) =>
-        collector.record(toStoredOperation("update_entity", args)),
+        collector.record(
+          toStoredOperation("update_entity", ToolCallPayloadSchema.parse(args)),
+        ),
     }),
     tool({
       name: "propose_merge_entities",

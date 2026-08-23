@@ -16,7 +16,7 @@ const detailUrls = {
 } as const;
 
 async function mockFirstPage(axiosMock: {
-  onGet: (url: string) => { reply: (status: number, body: string) => unknown };
+  onGet: (url: string) => { reply: (status: number, body: string) => void };
 }) {
   const fixtures = await Promise.all([
     loadFixture("edradour", "bottle-list.html"),

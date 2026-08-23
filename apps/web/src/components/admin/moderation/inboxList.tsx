@@ -11,6 +11,14 @@ import { useState } from "react";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 
+type InboxListProps = {
+  data: Outputs["admin"]["moderation"]["listTasks"];
+  selectedKey?: string;
+  onIgnoreInconclusive?: () => Promise<void>;
+  ignoreInconclusivePending?: boolean;
+  bulkError?: string | null;
+};
+
 function ageLabel(value: string): string {
   const minutes = Math.max(
     1,
@@ -31,21 +39,28 @@ export function inboxTaskHref(
   return query ? `${href}?${query}` : href;
 }
 
-export default function InboxList({
+export default function InboxList(props: InboxListProps) {
+  return (
+    <InboxListContent
+      {...props}
+      pathname={usePathname()}
+      searchParams={useSearchParams()}
+    />
+  );
+}
+
+export function InboxListContent({
   data,
   selectedKey,
   onIgnoreInconclusive,
   ignoreInconclusivePending = false,
   bulkError,
-}: {
-  data: Outputs["admin"]["moderation"]["listTasks"];
-  selectedKey?: string;
-  onIgnoreInconclusive?: () => Promise<void>;
-  ignoreInconclusivePending?: boolean;
-  bulkError?: string | null;
+  pathname,
+  searchParams,
+}: InboxListProps & {
+  pathname: string;
+  searchParams: URLSearchParams;
 }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const category = searchParams.get("category");
   const blocked = searchParams.get("blocked") === "true";
   const inconclusive = searchParams.get("inconclusive") === "true";

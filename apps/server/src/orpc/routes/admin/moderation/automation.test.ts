@@ -1,3 +1,4 @@
+import { createRouterClient } from "@orpc/server";
 import { db } from "@peated/server/db";
 import {
   bottleChecks,
@@ -6,22 +7,23 @@ import {
 } from "@peated/server/db/schema";
 import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
 import { routerClient } from "@peated/server/orpc/router";
-import * as workerClient from "@peated/server/worker/client";
+import {
+  createModerationAutomationProcedure,
+  type ModerationQueueCountLoader,
+} from "@peated/server/orpc/routes/admin/moderation/automation";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-vi.mock("@peated/server/worker/client", () => ({ getQueue: vi.fn() }));
+const getQueueCounts = vi.fn<ModerationQueueCountLoader>();
 
 describe("admin moderation automation", () => {
   beforeEach(() => {
-    vi.resetAllMocks();
-    vi.mocked(workerClient.getQueue).mockResolvedValue({
-      getJobCounts: vi.fn().mockResolvedValue({
-        wait: 3,
-        active: 2,
-        completed: 20,
-        failed: 1,
-      }),
-    } as never);
+    getQueueCounts.mockReset();
+    getQueueCounts.mockResolvedValue({
+      wait: 3,
+      active: 2,
+      completed: 20,
+      failed: 1,
+    });
   });
 
   test("keeps operational failures out of Inbox and exposes recovery locators", async ({
@@ -74,9 +76,11 @@ describe("admin moderation automation", () => {
       expect.objectContaining({ key: `operation:${operation!.id}` }),
     );
 
-    const result = await routerClient.admin.moderation.automation(undefined, {
-      context: { user: admin },
-    });
+    const automationClient = createRouterClient(
+      { automation: createModerationAutomationProcedure(getQueueCounts) },
+      { context: { user: admin } },
+    );
+    const result = await automationClient.automation();
     expect(result.counts).toMatchObject({
       processing: 2,
       waiting: 3,
@@ -94,7 +98,7 @@ describe("admin moderation automation", () => {
         }),
       ]),
     );
-    expect(workerClient.getQueue).toHaveBeenCalledWith("default");
+    expect(getQueueCounts).toHaveBeenCalledOnce();
   });
 
   test("counts retry health beyond the ten most recent runs", async ({
@@ -129,9 +133,11 @@ describe("admin moderation automation", () => {
       })),
     );
 
-    const result = await routerClient.admin.moderation.automation(undefined, {
-      context: { user: admin },
-    });
+    const automationClient = createRouterClient(
+      { automation: createModerationAutomationProcedure(getQueueCounts) },
+      { context: { user: admin } },
+    );
+    const result = await automationClient.automation();
 
     expect(result.counts).toMatchObject({
       processing: 3,

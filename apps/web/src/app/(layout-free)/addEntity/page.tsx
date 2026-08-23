@@ -1,6 +1,6 @@
 "use client";
 
-import { type EntityType } from "@peated/server/types";
+import { EntityTypeEnum } from "@peated/server/schemas";
 import EntityForm from "@peated/web/components/entityForm";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -20,7 +20,10 @@ function AddEntityForm() {
   const orpc = useORPC();
 
   const searchParams = useSearchParams();
-  const type = searchParams.getAll("type") as EntityType[];
+  const type = searchParams.getAll("type").flatMap((value) => {
+    const parsed = EntityTypeEnum.safeParse(value);
+    return parsed.success ? [parsed.data] : [];
+  });
 
   const entityCreateMutation = useMutation(
     orpc.entities.create.mutationOptions(),

@@ -10,6 +10,10 @@ import { UserSerializer } from "@peated/server/serializers/user";
 import { and, desc, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 
+interface BadgeAwardUserAttrs {
+  user: z.infer<typeof UserSchema>;
+}
+
 export const Serializer = serializer({
   name: "badgeAwardUser",
   attrs: async (
@@ -35,11 +39,7 @@ export const Serializer = serializer({
       }),
     );
   },
-  item: (
-    item: BadgeAward & { user: User },
-    attrs: Record<string, any>,
-    currentUser?: User,
-  ) => {
+  item: (item: BadgeAward & { user: User }, attrs: BadgeAwardUserAttrs) => {
     return {
       id: item.id,
       xp: item.xp,

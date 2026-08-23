@@ -5,7 +5,7 @@ import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
 import {
-  BottleSeriesInputSchema,
+  BottleSeriesInputFields,
   BottleSeriesSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -16,10 +16,8 @@ import { z } from "zod";
 
 const InputSchema = z.object({
   series: z.coerce.number(),
-  name: BottleSeriesInputSchema.shape.name.optional(),
-  description: BottleSeriesInputSchema.shape.description
-    .removeDefault()
-    .optional(),
+  name: BottleSeriesInputFields.name.optional(),
+  description: BottleSeriesInputFields.description.removeDefault().optional(),
 });
 
 export default procedure

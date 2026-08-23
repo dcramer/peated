@@ -5,10 +5,12 @@ import {
   stripDuplicateBrandPrefixFromBottleName,
 } from "./normalize";
 
-function extractExplicitAbvFromBottleName(name: string): {
+interface BottleNameWithAbv {
   name: string;
   abv: number | null;
-} {
+}
+
+function extractExplicitAbvFromBottleName(name: string): BottleNameWithAbv {
   let abv: number | null = null;
   // Keep ABV out of canonical names, but do not strip arbitrary low percentages.
   const captureAbv = (value: string, requiresPlausibleRange = false) => {

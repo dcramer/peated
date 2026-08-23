@@ -12,6 +12,7 @@ import {
   ShopifyImageSchema,
   ShopifyProductSchema,
 } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "gordonmacphail";
@@ -64,7 +65,7 @@ function isExplicitlyNonWhisky(title: string, bodyHtml: string | null) {
 }
 
 export function parseGordonMacphailProducts(
-  input: unknown,
+  input: JsonValue,
   sourceUrl: string,
 ): StorePrice[] {
   const payload = GordonMacphailProductsSchema.parse(input);

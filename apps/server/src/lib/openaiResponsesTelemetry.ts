@@ -33,7 +33,7 @@ export function buildOpenAIResponsesRequestAttributes({
 }): Attributes {
   const endpoint = new URL(baseURL);
 
-  return {
+  const attributes: Attributes = {
     "gen_ai.operation.name": "chat",
     "gen_ai.provider.name": "openai",
     "gen_ai.request.model": model,
@@ -43,37 +43,38 @@ export function buildOpenAIResponsesRequestAttributes({
     "openai.api.type": "responses",
     "server.address": endpoint.hostname,
     "sentry.op": "gen_ai.chat",
-    ...(endpoint.port ? { "server.port": Number(endpoint.port) } : {}),
   };
+  if (endpoint.port) attributes["server.port"] = Number(endpoint.port);
+  return attributes;
 }
 
 export function buildOpenAIResponsesResponseAttributes({
   response,
   usage,
 }: OpenAIResponsesTelemetry): Attributes {
-  return {
+  const attributes: Attributes = {
     "gen_ai.response.id": response.id,
     "gen_ai.response.model": response.model,
-    ...(response.serviceTier
-      ? { "openai.response.service_tier": response.serviceTier }
-      : {}),
-    ...(usage
-      ? {
-          "gen_ai.usage.input_tokens": usage.inputTokens,
-          "gen_ai.usage.cache_read.input_tokens": usage.cachedInputTokens,
-          "gen_ai.usage.output_tokens": usage.outputTokens,
-          "gen_ai.usage.reasoning.output_tokens": usage.reasoningTokens,
-        }
-      : {}),
   };
+  if (response.serviceTier) {
+    attributes["openai.response.service_tier"] = response.serviceTier;
+  }
+  if (usage) {
+    attributes["gen_ai.usage.input_tokens"] = usage.inputTokens;
+    attributes["gen_ai.usage.cache_read.input_tokens"] =
+      usage.cachedInputTokens;
+    attributes["gen_ai.usage.output_tokens"] = usage.outputTokens;
+    attributes["gen_ai.usage.reasoning.output_tokens"] = usage.reasoningTokens;
+  }
+  return attributes;
 }
 
 function recordResponse(span: Span, metadata: OpenAIResponsesTelemetry) {
   span.setAttributes(buildOpenAIResponsesResponseAttributes(metadata));
 }
 
-function getErrorType(error: unknown): string {
-  return error instanceof Error ? error.constructor.name : typeof error;
+function getErrorType(error: Error): string {
+  return error.constructor.name;
 }
 
 /**
@@ -107,13 +108,15 @@ export async function instrumentOpenAIResponsesCall<T>({
     async (span) => {
       try {
         return await callback((metadata) => recordResponse(span, metadata));
-      } catch (error) {
+      } catch (cause) {
+        const error =
+          cause instanceof Error
+            ? cause
+            : new Error("OpenAI Responses call failed.", { cause });
         span.setAttribute("error.type", getErrorType(error));
         span.setStatus({ code: SpanStatusCode.ERROR });
-        if (error instanceof Error) {
-          span.recordException(error);
-        }
-        throw error;
+        span.recordException(error);
+        throw cause;
       } finally {
         span.end();
       }

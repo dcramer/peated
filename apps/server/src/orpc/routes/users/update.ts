@@ -45,7 +45,7 @@ export default procedure
       });
     }
 
-    const data: { [name: string]: any } = {};
+    const data: Partial<typeof users.$inferInsert> = {};
 
     if (input.username !== undefined && input.username !== user.username) {
       data.username = input.username;

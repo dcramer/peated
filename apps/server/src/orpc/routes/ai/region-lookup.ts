@@ -13,37 +13,45 @@ const OutputSchema = z.object({
   description: z.string().nullish(),
 });
 
-export default procedure
-  .use(requireMod)
-  .route({
-    method: "POST",
-    path: "/ai/region-lookup",
-    summary: "AI region lookup",
-    description:
-      "Use AI to generate region details and descriptions for a specific country. Requires moderator privileges",
-    operationId: "aiRegionLookup",
-  })
-  .input(InputSchema)
-  .output(OutputSchema)
-  .handler(async function ({ input, context, errors }) {
-    const country = input.country
-      ? await db.query.countries.findFirst({
-          where: (table, { eq }) => eq(table.id, input.country),
-        })
-      : null;
+export type RegionDetailsGenerator = typeof getGeneratedRegionDetails;
 
-    if (!country) {
-      throw errors.BAD_REQUEST({
-        message: "Cannot find country",
+export function createRegionLookupProcedure(
+  generateDetails: RegionDetailsGenerator = getGeneratedRegionDetails,
+) {
+  return procedure
+    .use(requireMod)
+    .route({
+      method: "POST",
+      path: "/ai/region-lookup",
+      summary: "AI region lookup",
+      description:
+        "Use AI to generate region details and descriptions for a specific country. Requires moderator privileges",
+      operationId: "aiRegionLookup",
+    })
+    .input(InputSchema)
+    .output(OutputSchema)
+    .handler(async function ({ input, context, errors }) {
+      const country = input.country
+        ? await db.query.countries.findFirst({
+            where: (table, { eq }) => eq(table.id, input.country),
+          })
+        : null;
+
+      if (!country) {
+        throw errors.BAD_REQUEST({
+          message: "Cannot find country",
+        });
+      }
+
+      const result = await generateDetails({
+        ...input,
+        country,
       });
-    }
 
-    const result = await getGeneratedRegionDetails({
-      ...input,
-      country,
+      return {
+        description: result?.description,
+      };
     });
+}
 
-    return {
-      description: result?.description,
-    };
-  });
+export default createRegionLookupProcedure();

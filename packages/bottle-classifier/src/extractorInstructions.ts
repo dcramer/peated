@@ -1,4 +1,5 @@
 import { BOTTLE_SCHEMA_RULES } from "./bottleSchemaGuidance";
+import type { BottleExtractedDetails } from "./classifierTypes";
 
 type WhiskyLabelComponent = {
   id: string;
@@ -15,7 +16,7 @@ type RetailerLabelExample = {
 
 type ExtractionExample = {
   input: string;
-  output: Record<string, unknown> | null;
+  output: Partial<BottleExtractedDetails> | null;
 };
 
 const CATEGORY_VALUES = [

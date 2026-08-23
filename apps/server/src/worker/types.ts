@@ -33,6 +33,22 @@ export type JobName =
   | "VerifyBottleCreation"
   | "VerifyEntityCreation";
 
+export type JobPayloadValue =
+  | boolean
+  | JobPayloadValue[]
+  | null
+  | number
+  | string
+  | { [key: string]: JobPayloadValue | undefined };
+
+export type JobPayload =
+  | { [key: string]: JobPayloadValue | undefined }
+  | undefined;
+
+export type QueuedJobInput = {
+  [key: string]: JobPayloadValue | undefined;
+};
+
 const TraceContextSchema = z
   .object({
     "sentry-trace": z.string().optional(),
@@ -46,7 +62,7 @@ const JobActorContextSchema = z.object({
   username: z.string().optional(),
 });
 
-const JobContextSchema = z
+export const JobContextSchema = z
   .object({
     traceContext: TraceContextSchema.optional(),
     actor: JobActorContextSchema.optional(),
@@ -57,12 +73,14 @@ export type JobActorContext = z.infer<typeof JobActorContextSchema>;
 export type JobContext = z.infer<typeof JobContextSchema>;
 
 /** Parse queued job context, dropping malformed trace or actor attribution. */
-export function parseJobContext(input: unknown): JobContext {
+export function parseJobContext(input: JobPayload | null): JobContext {
   const result = JobContextSchema.safeParse(input);
   return result.success ? result.data : {};
 }
 
-export type JobFunction = (
+export type JobFunction<TResult = void> = (
   args?: any,
   context?: JobContext,
-) => Promise<unknown>;
+) => Promise<TResult>;
+
+export type JobArgs = JobPayload;

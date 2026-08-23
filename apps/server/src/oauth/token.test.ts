@@ -3,6 +3,7 @@ import { createS256CodeChallenge } from "@peated/server/lib/oauth";
 import { issueOAuthAuthorizationCode } from "@peated/server/lib/oauthAuthorization";
 import type * as FixtureModule from "@peated/server/lib/test/fixtures";
 import { describe, expect, test } from "vitest";
+import { z } from "zod";
 
 const verifier = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFG";
 type Fixtures = typeof FixtureModule;
@@ -52,11 +53,13 @@ describe("POST /oauth/token", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(response.headers.get("pragma")).toBe("no-cache");
-    const token = (await response.json()) as {
-      access_token: string;
-      token_type: string;
-      expires_in: number;
-    };
+    const token = z
+      .object({
+        access_token: z.string(),
+        token_type: z.string(),
+        expires_in: z.number(),
+      })
+      .parse(await response.json());
     expect(token.token_type).toBe("Bearer");
     expect(token.expires_in).toBe(604800);
 

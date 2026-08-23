@@ -108,7 +108,7 @@ describe("notifyComment", () => {
     await db
       .update(bottleGroups)
       .set({ fullName: groupLabel })
-      .where(eq(bottleGroups.id, bottle.groupId as number));
+      .where(eq(bottleGroups.id, bottle.groupId));
     const tasting = await fixtures.Tasting({
       bottleId: bottle.id,
       createdById: author.id,

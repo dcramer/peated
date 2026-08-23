@@ -26,13 +26,17 @@ describe("verifyEntityCreation", () => {
     const verificationChange = entityChanges.find(
       (change) => change.data?.catalogVerification?.phase === "result",
     );
+    const catalogVerification = verificationChange?.data.catalogVerification;
+    if (catalogVerification?.phase !== "result") {
+      throw new Error("Expected a catalog verification result change.");
+    }
 
-    expect(verificationChange?.data.catalogVerification).toMatchObject({
+    expect(catalogVerification).toMatchObject({
       source: "price_match_automation",
       status: "flagged",
     });
     expect(
-      verificationChange?.data.catalogVerification.findings.map(
+      catalogVerification.findings.map(
         (finding: { kind: string }) => finding.kind,
       ),
     ).toContain("entity_audit_candidate");

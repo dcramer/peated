@@ -16,8 +16,8 @@ import {
   entityTombstones,
   storePriceMatchAttempts,
   storePriceMatchProposals,
+  type User,
 } from "@peated/server/db/schema";
-import type { getUserActor } from "@peated/server/lib/actors";
 import {
   BOTTLE_CHECK_SCHEMA_VERSION,
   createBottleCheck,
@@ -26,7 +26,8 @@ import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createBottle } from "@peated/server/lib/createBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
 import { createLegacyStorePriceReviewCheck } from "@peated/server/lib/test/legacyBottleChecks";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import type { Context } from "@peated/server/orpc/context";
 import { and, eq, inArray } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, expect, vi } from "vitest";
@@ -56,13 +57,13 @@ async function waitForSessionBlockedBy(
   throw new Error("Timed out waiting for Entity merge lock.");
 }
 
-async function deleteDestinationWhileMergeWaits(
+async function deleteDestinationWhileMergeWaits<TResult>(
   destinationEntityId: number,
-  runMerge: () => Promise<unknown>,
+  runMerge: () => Promise<TResult>,
 ): Promise<void> {
   const blocker = new Client(getPostgresConnectionConfig());
   let committed = false;
-  let mergeRun: Promise<unknown> | undefined;
+  let mergeRun: Promise<TResult> | undefined;
 
   await blocker.connect();
   try {
@@ -90,8 +91,13 @@ async function deleteDestinationWhileMergeWaits(
   }
 }
 
-function contextFor(user: Parameters<typeof getUserActor>[0]) {
-  return { user } as Parameters<typeof createBottle>[0]["context"];
+function contextFor(user: User) {
+  return { user } satisfies Context & { user: NonNullable<Context["user"]> };
+}
+
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
 }
 
 beforeEach(async ({ fixtures }) => {
@@ -666,8 +672,9 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
     brandId: sourceEntity.id,
     name: "Annual",
   });
+  const sourceGroupId = requireGroupId(source.groupId);
   const sourceBatch = await fixtures.BottleGroupMember({
-    groupId: source.groupId as number,
+    groupId: sourceGroupId,
     edition: "Batch 2",
   });
   const destinationBatch = await createBottle({
@@ -729,8 +736,9 @@ test("fans merged shared entity roles through every BottleGroup member", async (
     name: "Expression",
     seriesId: sourceSeries.id,
   });
+  const firstGroupId = requireGroupId(first.groupId);
   const second = await fixtures.BottleGroupMember({
-    groupId: first.groupId as number,
+    groupId: firstGroupId,
     edition: "Batch 2",
   });
 
@@ -741,7 +749,7 @@ test("fans merged shared entity roles through every BottleGroup member", async (
 
   expect(
     await db.query.bottleGroups.findFirst({
-      where: eq(bottleGroups.id, first.groupId!),
+      where: eq(bottleGroups.id, firstGroupId),
     }),
   ).toMatchObject({
     brandId: destinationEntity.id,

@@ -17,6 +17,7 @@ import {
   getBottleExactIdentity,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
+import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -148,9 +149,9 @@ export async function repairBottleBrandDistilleryAssignments({
       ),
     )
     .orderBy(asc(bottles.id));
-  const candidates = (
-    limit ? await candidateQuery.limit(limit) : await candidateQuery
-  ) as CandidateBottle[];
+  const candidates: CandidateBottle[] = limit
+    ? await candidateQuery.limit(limit)
+    : await candidateQuery;
 
   const items: RepairBottleBrandDistilleryAssignmentItem[] = [];
   const groupedCandidates = new Map<number, CandidateBottle[]>();
@@ -303,6 +304,18 @@ export async function repairBottleBrandDistilleryAssignments({
           throw new Error(`Repair user ${user!.id} no longer exists.`);
         }
         const actor = await getUserActorByIdForDatabase(tx, persistedUser.id);
+        const input: SystemBottlePatch = { brand: toBrand.id };
+        if (shouldAddDistillery) {
+          input.distillers = Array.from(
+            new Set([...distillerIds, distilleryId!]),
+          ).sort((left, right) => left - right);
+        }
+        if (currentSeries && currentSeries.brandId !== toBrand.id) {
+          input.series = targetSeries?.id ?? {
+            name: currentSeries.name,
+            description: currentSeries.description,
+          };
+        }
         return updateBottleInTransaction(tx, {
           bottleId: selectedBottle.id,
           expectedSharedState: bottleUpdateExpectedSharedState({
@@ -311,24 +324,7 @@ export async function repairBottleBrandDistilleryAssignments({
             referencedSeries: targetSeries ? [targetSeries] : [],
             series: currentSeries,
           }),
-          input: {
-            brand: toBrand.id,
-            ...(shouldAddDistillery
-              ? {
-                  distillers: Array.from(
-                    new Set([...distillerIds, distilleryId!]),
-                  ).sort((left, right) => left - right),
-                }
-              : {}),
-            ...(currentSeries && currentSeries.brandId !== toBrand.id
-              ? {
-                  series: targetSeries?.id ?? {
-                    name: currentSeries.name,
-                    description: currentSeries.description,
-                  },
-                }
-              : {}),
-          },
+          input,
           actorId: actor.id,
           creationSource: "repair_workflow",
         });

@@ -12,6 +12,15 @@ export default function ReviewTable({
 }) {
   return (
     <>
+      <ReviewRows reviewList={reviewList} />
+      <PaginationButtons rel={rel} />
+    </>
+  );
+}
+
+export function ReviewRows({ reviewList }: { reviewList: Review[] }) {
+  return (
+    <>
       <table className="min-w-full">
         <colgroup>
           <col className="min-w-full sm:w-1/2" />
@@ -62,7 +71,6 @@ export default function ReviewTable({
           })}
         </tbody>
       </table>
-      <PaginationButtons rel={rel} />
     </>
   );
 }

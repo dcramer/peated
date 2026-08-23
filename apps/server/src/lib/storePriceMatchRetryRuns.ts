@@ -48,16 +48,20 @@ export type SerializedStorePriceMatchRetryRun = {
 
 type ResolveStorePriceMatchProposal = typeof resolveStorePriceMatchProposal;
 
+interface RetryRunModeOptions {
+  candidateExpansion: CandidateExpansionMode;
+  reuseExistingExtraction: boolean;
+}
+
 function isTerminalRetryRunStatus(status: StorePriceMatchRetryRun["status"]) {
-  return STORE_PRICE_MATCH_RETRY_RUN_TERMINAL_STATUSES.includes(
-    status as (typeof STORE_PRICE_MATCH_RETRY_RUN_TERMINAL_STATUSES)[number],
+  return STORE_PRICE_MATCH_RETRY_RUN_TERMINAL_STATUSES.some(
+    (terminalStatus) => terminalStatus === status,
   );
 }
 
-function getRetryRunModeOptions(mode: StorePriceMatchRetryRunMode): {
-  candidateExpansion: CandidateExpansionMode;
-  reuseExistingExtraction: boolean;
-} {
+function getRetryRunModeOptions(
+  mode: StorePriceMatchRetryRunMode,
+): RetryRunModeOptions {
   if (mode === "no_web") {
     return {
       candidateExpansion: "initial_only",
@@ -166,7 +170,8 @@ async function claimRetryRunItems({
 
     const itemIds = pendingItems.map((item) => item.id);
     if (!itemIds.length) {
-      return [] as StorePriceMatchRetryRunItem[];
+      const noItems: StorePriceMatchRetryRunItem[] = [];
+      return noItems;
     }
 
     return await tx

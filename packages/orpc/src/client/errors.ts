@@ -1,13 +1,15 @@
 import { isDefinedError, type ORPCError } from "@orpc/client";
 
+type ClientErrorCandidate = Parameters<typeof isDefinedError>[0];
+
 export function isORPCClientError(
-  error: unknown,
+  error: ClientErrorCandidate,
 ): error is ORPCError<any, any> {
   return isDefinedError(error);
 }
 
 export function isORPCNotFoundError(
-  error: unknown,
+  error: ClientErrorCandidate,
 ): error is ORPCError<any, any> {
   return (
     isORPCClientError(error) &&
@@ -15,10 +17,13 @@ export function isORPCNotFoundError(
   );
 }
 
-export function shouldCaptureORPCClientError(error: unknown): boolean {
+export function shouldCaptureORPCClientError(
+  error: ClientErrorCandidate,
+): boolean {
   if (!isORPCClientError(error)) {
     return true;
   }
 
-  return typeof error.status !== "number" || error.status >= 500;
+  const status = Number(error.status);
+  return !Number.isFinite(status) || status >= 500;
 }

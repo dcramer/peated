@@ -4,31 +4,39 @@ import {
   BottleCandidateSchema,
   BottleCandidateSearchInputSchema,
   BottleClassificationDecisionSchema,
+  BottleClassifierActionSchema,
   BottleClassifierAgentDecisionSchema,
   BottleExtractedDetailsSchema,
   MAX_BOTTLE_CANDIDATES,
+  ProposedBottleFields,
   ProposedBottleSchema,
 } from "./classifierTypes";
 
+const AgentDecisionJsonSchema = z
+  .object({
+    type: z.string().optional(),
+    properties: z.record(z.string(), z.unknown()).optional(),
+    required: z.array(z.string()).optional(),
+    anyOf: z.array(z.unknown()).optional(),
+    oneOf: z.array(z.unknown()).optional(),
+    additionalProperties: z.boolean().optional(),
+  })
+  .passthrough();
+
 describe("BottleClassifierAgentDecisionSchema", () => {
   test("defines proposed Bottle names at the field boundary", () => {
-    expect(ProposedBottleSchema.shape.name.description).toContain(
+    expect(ProposedBottleFields.name.description).toContain(
       "Stable marketed expression relative to the Brand",
     );
-    expect(ProposedBottleSchema.shape.name.description).toContain(
+    expect(ProposedBottleFields.name.description).toContain(
       "When no separate expression is marketed, use the source-supported product or style phrase",
     );
   });
 
   test("uses a flat structured-output schema at the root", () => {
-    const jsonSchema = z.toJSONSchema(BottleClassifierAgentDecisionSchema) as {
-      type?: string;
-      properties?: Record<string, unknown>;
-      required?: string[];
-      anyOf?: unknown[];
-      oneOf?: unknown[];
-      additionalProperties?: boolean;
-    };
+    const jsonSchema = AgentDecisionJsonSchema.parse(
+      z.toJSONSchema(BottleClassifierAgentDecisionSchema),
+    );
 
     expect(jsonSchema.type).toBe("object");
     expect(jsonSchema.additionalProperties).toBe(false);
@@ -43,9 +51,9 @@ describe("BottleClassifierAgentDecisionSchema", () => {
   });
 
   test("asks for evidence and rationale before the decision", () => {
-    const jsonSchema = z.toJSONSchema(BottleClassifierAgentDecisionSchema) as {
-      properties?: Record<string, unknown>;
-    };
+    const jsonSchema = AgentDecisionJsonSchema.parse(
+      z.toJSONSchema(BottleClassifierAgentDecisionSchema),
+    );
     const fields = Object.keys(jsonSchema.properties ?? {});
 
     expect(fields.slice(0, 3)).toEqual([
@@ -62,9 +70,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
   });
 
   test("exposes only the three identity results", () => {
-    const actionSchema = BottleClassifierAgentDecisionSchema.shape.action;
-
-    expect(actionSchema.options).toEqual([
+    expect(BottleClassifierActionSchema.options).toEqual([
       "match",
       "create_bottle",
       "no_match",

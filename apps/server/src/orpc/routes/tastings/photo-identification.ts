@@ -38,7 +38,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import * as Sentry from "@sentry/node";
-import type { z } from "zod";
+import { z } from "zod";
 
 type AuthenticatedContext = Context & {
   user: NonNullable<Context["user"]>;
@@ -55,8 +55,33 @@ type PhotoIdentificationAttributeValue =
   | string
   | string[]
   | number[];
-type SentrySpanLike = {
+interface PhotoIdentificationAttributes {
+  [name: string]: PhotoIdentificationAttributeValue;
+}
+export type PhotoIdentificationSpan = {
   setAttribute: (key: string, value: PhotoIdentificationAttributeValue) => void;
+};
+
+export type PhotoIdentificationStartSpan = <Result>(
+  context: Parameters<typeof Sentry.startSpan>[0],
+  callback: (span: PhotoIdentificationSpan) => Promise<Result>,
+) => Promise<Result>;
+
+export type IdentifyPendingImageServices = {
+  extractEvidence: typeof extractPhotoBottleEvidence;
+  runReference: typeof runBottleReference;
+  startSpan: PhotoIdentificationStartSpan;
+};
+
+const identifyPendingImageServices: IdentifyPendingImageServices = {
+  extractEvidence: extractPhotoBottleEvidence,
+  runReference: runBottleReference,
+  startSpan: (context, callback) => Sentry.startSpan(context, callback),
+};
+
+export type PhotoIdentificationProcedureServices = {
+  createPendingImage: typeof createPendingImageUpload;
+  identifyImage: typeof identifyPendingImage;
 };
 
 const PHOTO_IDENTIFICATION_LOG_MESSAGE =
@@ -301,7 +326,10 @@ function getClassificationLogAttributes(
   const candidates = classification.artifacts.candidates;
   const candidateBottleIds = classification.artifacts.candidates
     .map((candidate) => candidate.bottleId)
-    .filter((id): id is number => typeof id === "number");
+    .flatMap((id) => {
+      const parsed = z.number().safeParse(id);
+      return parsed.success ? [parsed.data] : [];
+    });
   const candidateNames = classification.artifacts.candidates
     .map((candidate) => candidate.fullName)
     .filter(Boolean)
@@ -320,14 +348,13 @@ function getClassificationLogAttributes(
       edition: candidate.edition,
     }),
   );
-  const attrs: Record<string, string | number | boolean | string[] | number[]> =
-    {
-      [`${prefix}.status`]: classification.status,
-      [`${prefix}.candidate_count`]: candidates.length,
-      [`${prefix}.candidate_bottle_ids`]: candidateBottleIds,
-      [`${prefix}.candidate_names`]: candidateNames,
-      [`${prefix}.candidate_identity`]: candidateIdentity,
-    };
+  const attrs: PhotoIdentificationAttributes = {
+    [`${prefix}.status`]: classification.status,
+    [`${prefix}.candidate_count`]: candidates.length,
+    [`${prefix}.candidate_bottle_ids`]: candidateBottleIds,
+    [`${prefix}.candidate_names`]: candidateNames,
+    [`${prefix}.candidate_identity`]: candidateIdentity,
+  };
 
   if (classification.status === "ignored") {
     attrs[`${prefix}.reason`] = classification.reason;
@@ -421,8 +448,8 @@ function getSearchResultDomain({
 }
 
 function setSpanAttributes(
-  span: SentrySpanLike,
-  attrs: Record<string, PhotoIdentificationAttributeValue>,
+  span: PhotoIdentificationSpan,
+  attrs: PhotoIdentificationAttributes,
 ) {
   for (const [key, value] of Object.entries(attrs)) {
     span.setAttribute(key, value);
@@ -456,36 +483,35 @@ function logPhotoIdentificationOutcome({
   diagnostics: z.infer<typeof PhotoIdentificationDiagnosticsSchema>;
   suggestedNextStep: z.infer<typeof PhotoIdentificationSuggestedNextStepEnum>;
 }) {
-  const attrs: Record<string, string | number | boolean | string[] | number[]> =
-    {
-      "photo_identification.user_id": context.user.id,
-      "photo_identification.pending_image_id": pendingImage.id,
-      "photo_identification.idempotency_key": idempotencyKey,
-      "photo_identification.outcome": "completed",
-      "photo_identification.file_size": file.size,
-      "photo_identification.file_type": file.type || "unknown",
-      "photo_identification.reference_name": referenceName,
-      "photo_identification.suggested_next_step": suggestedNextStep,
-      "photo_identification.extraction_status": diagnostics.extraction.status,
-      "photo_identification.candidate_count": diagnostics.candidates.count,
-      "photo_identification.is_single_bottle_photo":
-        imageEvidence.photoSuitability.isSingleBottlePhoto,
-      "photo_identification.label_readable":
-        imageEvidence.photoSuitability.labelReadable,
-      "photo_identification.suitable_as_tasting_image":
-        imageEvidence.photoSuitability.suitableAsTastingImage,
-      "photo_identification.suitable_as_bottle_image":
-        imageEvidence.photoSuitability.suitableAsBottleImage,
-      ...getClassificationLogAttributes(
-        "photo_identification.final",
-        classification,
-        modelMetadata,
-      ),
-      ...getSearchEvidenceLogAttributes(
-        "photo_identification.final",
-        classification,
-      ),
-    };
+  const attrs: PhotoIdentificationAttributes = {
+    "photo_identification.user_id": context.user.id,
+    "photo_identification.pending_image_id": pendingImage.id,
+    "photo_identification.idempotency_key": idempotencyKey,
+    "photo_identification.outcome": "completed",
+    "photo_identification.file_size": file.size,
+    "photo_identification.file_type": file.type || "unknown",
+    "photo_identification.reference_name": referenceName,
+    "photo_identification.suggested_next_step": suggestedNextStep,
+    "photo_identification.extraction_status": diagnostics.extraction.status,
+    "photo_identification.candidate_count": diagnostics.candidates.count,
+    "photo_identification.is_single_bottle_photo":
+      imageEvidence.photoSuitability.isSingleBottlePhoto,
+    "photo_identification.label_readable":
+      imageEvidence.photoSuitability.labelReadable,
+    "photo_identification.suitable_as_tasting_image":
+      imageEvidence.photoSuitability.suitableAsTastingImage,
+    "photo_identification.suitable_as_bottle_image":
+      imageEvidence.photoSuitability.suitableAsBottleImage,
+    ...getClassificationLogAttributes(
+      "photo_identification.final",
+      classification,
+      modelMetadata,
+    ),
+    ...getSearchEvidenceLogAttributes(
+      "photo_identification.final",
+      classification,
+    ),
+  };
 
   if (diagnostics.extraction.summary) {
     attrs["photo_identification.extraction_summary"] =
@@ -551,7 +577,7 @@ function logPhotoIdentificationFailure({
     "photo_identification.outcome": "failed",
     "photo_identification.file_size": failureContext.fileSize,
     "photo_identification.file_type": failureContext.fileType,
-    "photo_identification.error_name": error?.name ?? typeof err,
+    "photo_identification.error_name": error?.name ?? "NonErrorThrown",
     "photo_identification.error_message":
       error?.message ?? "Unknown photo identification failure.",
   });
@@ -567,14 +593,17 @@ function logPhotoIdentificationFailure({
  *
  * This is the shared Photo Identification workflow span boundary for all callers.
  */
-export async function identifyPendingImage({
-  pendingImage,
-}: {
-  pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
-}) {
+export async function identifyPendingImage(
+  {
+    pendingImage,
+  }: {
+    pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
+  },
+  services: IdentifyPendingImageServices = identifyPendingImageServices,
+) {
   const conversationId = `photo_identification:${pendingImage.id}`;
 
-  return await Sentry.startSpan(
+  return await services.startSpan(
     {
       op: "gen_ai.invoke_workflow",
       name: "invoke_workflow Photo Identification",
@@ -593,7 +622,7 @@ export async function identifyPendingImage({
     },
     async (span) => {
       const { extractedIdentity, imageEvidence } =
-        await extractPhotoBottleEvidence({
+        await services.extractEvidence({
           pendingUpload: pendingImage,
         });
 
@@ -636,7 +665,7 @@ export async function identifyPendingImage({
             }),
             modelMetadata: null,
           }
-        : await runBottleReference(classificationInput);
+        : await services.runReference(classificationInput);
       const classification = classificationRun.result;
       const referenceName = classificationInput.reference.name;
       const diagnostics = buildPhotoIdentificationDiagnostics({
@@ -676,125 +705,139 @@ export async function identifyPendingImage({
   );
 }
 
-export default procedure
-  .use(requireAuth)
-  .use(requireTosAccepted)
-  .use(photoIdentificationRateLimit)
-  .route({
-    method: "POST",
-    path: "/tastings/photo-identification",
-    summary: "Identify tasting bottle from photo",
-    description:
-      "Upload a temporary bottle photo, extract label evidence, and classify the likely bottle without creating a tasting.",
-    operationId: "identifyTastingBottleFromPhoto",
-  })
-  .input(PhotoIdentificationInputSchema)
-  .output(PhotoIdentificationSchema)
-  .handler(async function ({ input, context, errors }) {
-    const { file, idempotencyKey } = input;
+const photoIdentificationProcedureServices: PhotoIdentificationProcedureServices =
+  {
+    createPendingImage: createPendingImageUpload,
+    identifyImage: identifyPendingImage,
+  };
 
-    if (file.size > MAX_FILESIZE) {
-      logPhotoIdentificationRejected({
+export function createPhotoIdentificationProcedure(
+  services: PhotoIdentificationProcedureServices = photoIdentificationProcedureServices,
+) {
+  return procedure
+    .use(requireAuth)
+    .use(requireTosAccepted)
+    .use(photoIdentificationRateLimit)
+    .route({
+      method: "POST",
+      path: "/tastings/photo-identification",
+      summary: "Identify tasting bottle from photo",
+      description:
+        "Upload a temporary bottle photo, extract label evidence, and classify the likely bottle without creating a tasting.",
+      operationId: "identifyTastingBottleFromPhoto",
+    })
+    .input(PhotoIdentificationInputSchema)
+    .output(PhotoIdentificationSchema)
+    .handler(async function ({ input, context, errors }) {
+      const { file, idempotencyKey } = input;
+
+      if (file.size > MAX_FILESIZE) {
+        logPhotoIdentificationRejected({
+          context,
+          idempotencyKey,
+          file,
+          outcome: "rejected",
+          reason: `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`,
+        });
+        throw errors.PAYLOAD_TOO_LARGE({
+          message: `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`,
+        });
+      }
+
+      let pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
+      try {
+        pendingImage = await services.createPendingImage({
+          file,
+          purpose: "photo_tasting_entry",
+          idempotencyKey,
+          createdById: context.user.id,
+          onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+        });
+      } catch (err) {
+        const error = err instanceof Error ? err : null;
+        logPhotoIdentificationRejected({
+          context,
+          idempotencyKey,
+          file,
+          outcome: "failed",
+          reason:
+            error?.message ??
+            "Unable to create pending image for photo identification.",
+        });
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "Unable to process bottle photo.",
+          cause: err,
+        });
+      }
+
+      let identification: Awaited<ReturnType<typeof identifyPendingImage>>;
+      try {
+        identification = await services.identifyImage({
+          pendingImage,
+        });
+      } catch (err) {
+        logPhotoIdentificationFailure({
+          context,
+          pendingImage,
+          idempotencyKey,
+          file,
+          err,
+        });
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "Unable to identify bottle from photo.",
+          cause: err,
+        });
+      }
+
+      const {
+        imageEvidence,
+        classification,
+        modelMetadata,
+        referenceName,
+        diagnostics,
+        suggestedNextStep,
+      } = identification;
+      logPhotoIdentificationOutcome({
         context,
-        idempotencyKey,
-        file,
-        outcome: "rejected",
-        reason: `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`,
-      });
-      throw errors.PAYLOAD_TOO_LARGE({
-        message: `File exceeded maximum upload size of ${humanizeBytes(MAX_FILESIZE)}.`,
-      });
-    }
-
-    let pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
-    try {
-      pendingImage = await createPendingImageUpload({
-        file,
-        purpose: "photo_tasting_entry",
-        idempotencyKey,
-        createdById: context.user.id,
-        onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
-      });
-    } catch (err) {
-      const error = err instanceof Error ? err : null;
-      logPhotoIdentificationRejected({
-        context,
-        idempotencyKey,
-        file,
-        outcome: "failed",
-        reason:
-          error?.message ??
-          "Unable to create pending image for photo identification.",
-      });
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Unable to process bottle photo.",
-        cause: err,
-      });
-    }
-
-    let identification: Awaited<ReturnType<typeof identifyPendingImage>>;
-    try {
-      identification = await identifyPendingImage({
         pendingImage,
-      });
-    } catch (err) {
-      logPhotoIdentificationFailure({
-        context,
-        pendingImage,
         idempotencyKey,
         file,
-        err,
+        referenceName,
+        imageEvidence,
+        classification,
+        modelMetadata,
+        diagnostics,
+        suggestedNextStep,
       });
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Unable to identify bottle from photo.",
-        cause: err,
-      });
-    }
+      const createToken =
+        classification.status === "classified" &&
+        suggestedNextStep === "confirm_create" &&
+        isPhotoIdentificationCreateDecisionAutoCreatable(
+          classification.decision,
+        )
+          ? await signPhotoIdentificationCreateToken({
+              type: "photo_identification_create",
+              userId: context.user.id,
+              pendingImageId: pendingImage.id,
+              decision: classification.decision,
+              photoSuitability: imageEvidence.photoSuitability,
+            })
+          : null;
 
-    const {
-      imageEvidence,
-      classification,
-      modelMetadata,
-      referenceName,
-      diagnostics,
-      suggestedNextStep,
-    } = identification;
-    logPhotoIdentificationOutcome({
-      context,
-      pendingImage,
-      idempotencyKey,
-      file,
-      referenceName,
-      imageEvidence,
-      classification,
-      modelMetadata,
-      diagnostics,
-      suggestedNextStep,
+      return {
+        pendingImage: {
+          id: pendingImage.id,
+          imageUrl: absoluteUrl(config.API_SERVER, pendingImage.imageUrl),
+          expiresAt: pendingImage.expiresAt.toISOString(),
+        },
+        imageEvidence,
+        classification:
+          await serializePhotoIdentificationClassification(classification),
+        suggestedNextStep,
+        diagnostics,
+        createToken,
+      };
     });
-    const createToken =
-      classification.status === "classified" &&
-      suggestedNextStep === "confirm_create" &&
-      isPhotoIdentificationCreateDecisionAutoCreatable(classification.decision)
-        ? await signPhotoIdentificationCreateToken({
-            type: "photo_identification_create",
-            userId: context.user.id,
-            pendingImageId: pendingImage.id,
-            decision: classification.decision,
-            photoSuitability: imageEvidence.photoSuitability,
-          })
-        : null;
+}
 
-    return {
-      pendingImage: {
-        id: pendingImage.id,
-        imageUrl: absoluteUrl(config.API_SERVER, pendingImage.imageUrl),
-        expiresAt: pendingImage.expiresAt.toISOString(),
-      },
-      imageEvidence,
-      classification:
-        await serializePhotoIdentificationClassification(classification),
-      suggestedNextStep,
-      diagnostics,
-      createToken,
-    };
-  });
+export default createPhotoIdentificationProcedure();

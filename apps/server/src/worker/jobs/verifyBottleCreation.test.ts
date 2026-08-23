@@ -2,7 +2,6 @@ import {
   buildBottleClassificationArtifacts,
   createAuditBottleResult,
 } from "@peated/bottle-classifier/contract";
-import { runBottleAudit as auditBottleWithServerAdapters } from "@peated/server/agents/bottleClassifier/service";
 import { db } from "@peated/server/db";
 import {
   bottleChecks,
@@ -11,19 +10,24 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
-import { afterEach, vi } from "vitest";
-import verifyBottleCreation from "./verifyBottleCreation";
+import { beforeEach, vi } from "vitest";
+import type { JobPayload } from "../types";
+import {
+  verifyBottleCreation as verifyBottleCreationWithServices,
+  type VerifyBottleCreationServices,
+} from "./verifyBottleCreation";
 
-vi.mock("@peated/server/agents/bottleClassifier/service", () => {
-  return {
-    runBottleAudit: vi.fn(),
-    classifyBottleReference: vi.fn(),
-  };
-});
+let runAudit: ReturnType<
+  typeof vi.fn<VerifyBottleCreationServices["runAudit"]>
+>;
+
+function verifyBottleCreation(input: JobPayload) {
+  return verifyBottleCreationWithServices(input, { runAudit });
+}
 
 describe("verifyBottleCreation", () => {
-  afterEach(() => {
-    vi.resetAllMocks();
+  beforeEach(() => {
+    runAudit = vi.fn();
   });
 
   test("records skipped results for trusted creation flows", async ({
@@ -50,7 +54,7 @@ describe("verifyBottleCreation", () => {
       source: "price_match_review",
       status: "skipped",
     });
-    expect(auditBottleWithServerAdapters).not.toHaveBeenCalled();
+    expect(runAudit).not.toHaveBeenCalled();
   });
 
   test("audits automated price-match Bottles with one review-only check", async ({
@@ -65,7 +69,7 @@ describe("verifyBottleCreation", () => {
     }
     const { imageSources: _imageSources, ...contextFields } = bottleContext;
 
-    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    runAudit.mockResolvedValue({
       result: createAuditBottleResult({
         summary: "The edition should be corrected.",
         proposedOperations: [
@@ -94,8 +98,8 @@ describe("verifyBottleCreation", () => {
     await verifyBottleCreation(input);
     await verifyBottleCreation(input);
 
-    expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(1);
-    expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
+    expect(runAudit).toHaveBeenCalledTimes(1);
+    expect(runAudit).toHaveBeenCalledWith({
       bottleId: bottle.id,
       origin: "post_user_creation",
     });
@@ -146,9 +150,7 @@ describe("verifyBottleCreation", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    vi.mocked(auditBottleWithServerAdapters).mockRejectedValue(
-      new Error("classifier unavailable"),
-    );
+    runAudit.mockRejectedValue(new Error("classifier unavailable"));
 
     await expect(
       verifyBottleCreation({

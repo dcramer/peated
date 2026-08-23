@@ -155,15 +155,14 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
   });
 
   test("rejects the removed target filter", async ({ defaults, fixtures }) => {
-    type Input = Parameters<typeof routerClient.collections.bottles.list>[0];
-
     const error = await waitError(() =>
       routerClient.collections.bottles.list(
+        // SAFETY: This invalid legacy field exercises the runtime input boundary.
         {
           user: "me",
           collection: "library",
           target: 1,
-        } as unknown as Input,
+        } as never,
         { context: { user: defaults.user } },
       ),
     );

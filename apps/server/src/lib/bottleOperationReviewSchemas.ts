@@ -1,7 +1,7 @@
 import {
   BottleContextExactSchema,
-  BottleContextSharedSchema,
-  EntityContextSchema,
+  BottleContextSharedFields,
+  EntityContextFields,
   MergeBottlesOperationSchema,
   MergeEntitiesOperationSchema,
   ProposedEntityDraftSchema,
@@ -88,7 +88,7 @@ export const ExistingEntityPreviewSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: EntityPreviewShortNameSchema,
-    roles: EntityContextSchema.shape.roles,
+    roles: EntityContextFields.roles,
   })
   .strict();
 
@@ -107,10 +107,10 @@ export const EntityChoicePreviewSchema = z.discriminatedUnion("kind", [
 
 export const BottleSharedPreviewStateSchema = z
   .object({
-    name: BottleContextSharedSchema.shape.name,
-    statedAge: BottleContextSharedSchema.shape.statedAge,
+    name: BottleContextSharedFields.name,
+    statedAge: BottleContextSharedFields.statedAge,
     seriesId: PositiveIdSchema.nullable(),
-    category: BottleContextSharedSchema.shape.category,
+    category: BottleContextSharedFields.category,
     brand: EntityChoicePreviewSchema,
     distillers: z.array(EntityChoicePreviewSchema),
     bottler: EntityChoicePreviewSchema.nullable(),
@@ -132,10 +132,10 @@ export const EntityPreviewStateSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: EntityPreviewShortNameSchema,
-    roles: EntityContextSchema.shape.roles,
-    website: EntityContextSchema.shape.website,
+    roles: EntityContextFields.roles,
+    website: EntityContextFields.website,
     location: EntityLocationSchema,
-    yearEstablished: EntityContextSchema.shape.yearEstablished,
+    yearEstablished: EntityContextFields.yearEstablished,
   })
   .strict();
 
@@ -260,7 +260,7 @@ const EntityDependencyStateSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: RawEntityShortNameSchema,
-    roles: EntityContextSchema.shape.roles,
+    roles: EntityContextFields.roles,
   })
   .strict();
 
@@ -276,10 +276,10 @@ const RelationshipDigestSchema = z.string().regex(/^[a-f0-9]{64}$/);
 
 const BottleSharedStateTokenFieldsSchema = z
   .object({
-    name: BottleContextSharedSchema.shape.name.optional(),
-    statedAge: BottleContextSharedSchema.shape.statedAge.optional(),
+    name: BottleContextSharedFields.name.optional(),
+    statedAge: BottleContextSharedFields.statedAge.optional(),
     seriesId: PositiveIdSchema.nullable().optional(),
-    category: BottleContextSharedSchema.shape.category.optional(),
+    category: BottleContextSharedFields.category.optional(),
     brandId: PositiveIdSchema.optional(),
     distillerIds: z.array(PositiveIdSchema).optional(),
     bottlerId: PositiveIdSchema.nullable().optional(),
@@ -305,10 +305,10 @@ const BottleMergeIdentityStateSchema = z
     fullName: NonEmptyTextSchema,
     shared: z
       .object({
-        name: BottleContextSharedSchema.shape.name,
-        statedAge: BottleContextSharedSchema.shape.statedAge,
+        name: BottleContextSharedFields.name,
+        statedAge: BottleContextSharedFields.statedAge,
         seriesId: PositiveIdSchema.nullable(),
-        category: BottleContextSharedSchema.shape.category,
+        category: BottleContextSharedFields.category,
         brandId: PositiveIdSchema,
         distillerIds: z.array(PositiveIdSchema),
         bottlerId: PositiveIdSchema.nullable(),
@@ -332,11 +332,11 @@ const EntityPatchStateTokenSchema = z
   .object({
     name: NonEmptyTextSchema.optional(),
     shortName: RawEntityShortNameSchema.optional(),
-    roles: EntityContextSchema.shape.roles.optional(),
-    website: EntityContextSchema.shape.website.optional(),
+    roles: EntityContextFields.roles.optional(),
+    website: EntityContextFields.website.optional(),
     countryId: PositiveIdSchema.nullable().optional(),
     regionId: PositiveIdSchema.nullable().optional(),
-    yearEstablished: EntityContextSchema.shape.yearEstablished.optional(),
+    yearEstablished: EntityContextFields.yearEstablished.optional(),
   })
   .strict();
 
@@ -365,17 +365,17 @@ const EntityMergeIdentityStateSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: RawEntityShortNameSchema,
-    roles: EntityContextSchema.shape.roles,
+    roles: EntityContextFields.roles,
     aliasDigest: RelationshipDigestSchema,
     tombstoneDestinationEntityId: PositiveIdSchema.nullable(),
   })
   .strict();
 
 const EntityMergeSourceStateSchema = EntityMergeIdentityStateSchema.extend({
-  website: EntityContextSchema.shape.website,
+  website: EntityContextFields.website,
   countryId: PositiveIdSchema.nullable(),
   regionId: PositiveIdSchema.nullable(),
-  yearEstablished: EntityContextSchema.shape.yearEstablished,
+  yearEstablished: EntityContextFields.yearEstablished,
 }).strict();
 
 export const EntityMergeStateTokenSchema = z

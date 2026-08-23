@@ -33,7 +33,7 @@ import {
   type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
 import { webSearchQuery } from "@peated/server/lib/search";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
 import { getOpenAIEmbedding } from "./openaiEmbeddings";
@@ -43,7 +43,7 @@ const TEXT_CANDIDATE_LIMIT = 10;
 const BRAND_CANDIDATE_LIMIT = 5;
 
 type BottleReferenceIdentity = BottleExtractedDetails;
-type RawBottleCandidateRow = {
+export type BottleCandidateQueryRow = {
   bottleId: number | string;
   alias?: string | null;
   fullName: string;
@@ -63,6 +63,15 @@ type RawBottleCandidateRow = {
   caskSize?: string | null;
   caskFill?: string | null;
   score?: number | string | null;
+};
+
+export type BottleCandidateQueryRunner = (
+  query: SQL,
+) => Promise<BottleCandidateQueryRow[]>;
+
+const runBottleCandidateQuery: BottleCandidateQueryRunner = async (query) => {
+  const result = await db.execute<BottleCandidateQueryRow>(query);
+  return result.rows;
 };
 
 function normalizeMatchCategory<T extends BottleCandidate["category"]>(
@@ -272,18 +281,16 @@ export function mergeBottleCandidate(
     );
   }
 
-  const existingMetadata = existing as Record<
-    (typeof CANDIDATE_METADATA_FIELDS)[number],
-    BottleCandidate[(typeof CANDIDATE_METADATA_FIELDS)[number]]
-  >;
-
   for (const field of CANDIDATE_METADATA_FIELDS) {
-    const existingValue = existingMetadata[field];
-    const candidateValue = candidate[field];
+    fillMissingCandidateField(existing, candidate, field);
+  }
+}
 
-    if (existingValue === null && candidateValue !== null) {
-      existingMetadata[field] = candidateValue;
-    }
+function fillMissingCandidateField<
+  TField extends (typeof CANDIDATE_METADATA_FIELDS)[number],
+>(existing: BottleCandidate, candidate: BottleCandidate, field: TField): void {
+  if (existing[field] === null && candidate[field] !== null) {
+    existing[field] = candidate[field];
   }
 }
 
@@ -296,7 +303,7 @@ function parseNullableNumber(value: number | string | null | undefined) {
 }
 
 function buildBottleCandidate(
-  row: RawBottleCandidateRow,
+  row: BottleCandidateQueryRow,
   source: string,
 ): BottleCandidate {
   return BottleCandidateSchema.parse({
@@ -607,7 +614,7 @@ type CandidateBottleSiblingRow = {
 };
 
 function getPopulatedBottleTraitFields(
-  row: Partial<Record<BottleCandidateTraitField, unknown>>,
+  row: Partial<Pick<BottleCandidate, BottleCandidateTraitField>>,
   {
     includeStatedAge = true,
   }: {
@@ -869,6 +876,8 @@ async function runCandidateLookupSafely<T>(
 async function getVectorCandidates(
   queryText: string,
   workload: AIGatewayWorkload,
+  createEmbedding: BottleEmbeddingCreator,
+  runQuery: BottleCandidateQueryRunner,
 ): Promise<BottleCandidate[]> {
   if (!isAIGatewayConfigured(workload) || !queryText.trim()) {
     return [];
@@ -876,28 +885,11 @@ async function getVectorCandidates(
 
   const embedding =
     workload === "scraper"
-      ? await getOpenAIEmbedding(queryText, { workload })
-      : await getOpenAIEmbedding(queryText);
+      ? await createEmbedding(queryText, { workload })
+      : await createEmbedding(queryText);
   const vector = sql.raw(`'[${embedding.join(",")}]'::vector`);
 
-  const result = await db.execute<{
-    bottleId: number;
-    alias: string | null;
-    fullName: string;
-    brand: string | null;
-    category: BottleCandidate["category"];
-    statedAge: number | null;
-    edition: string | null;
-    caskStrength: boolean | null;
-    singleCask: boolean | null;
-    abv: number | null;
-    vintageYear: number | null;
-    releaseYear: number | null;
-    caskType: string | null;
-    caskSize: string | null;
-    caskFill: string | null;
-    score: number | null;
-  }>(sql`
+  const rows = await runQuery(sql`
     SELECT
       ${bottleAliases.bottleId} AS "bottleId",
       ${bottleAliases.name} AS alias,
@@ -929,34 +921,19 @@ async function getVectorCandidates(
     LIMIT ${VECTOR_CANDIDATE_LIMIT}
   `);
 
-  return result.rows.map((row) => buildBottleCandidate(row, "vector"));
+  return rows.map((row) => buildBottleCandidate(row, "vector"));
 }
 
 async function getTextCandidates(
   queryText: string,
+  runQuery: BottleCandidateQueryRunner,
 ): Promise<BottleCandidate[]> {
   if (!queryText.trim()) {
     return [];
   }
   const textQuery = webSearchQuery(queryText);
 
-  const result = await db.execute<{
-    bottleId: number;
-    fullName: string;
-    brand: string | null;
-    category: BottleCandidate["category"];
-    statedAge: number | null;
-    edition: string | null;
-    caskStrength: boolean | null;
-    singleCask: boolean | null;
-    abv: number | null;
-    vintageYear: number | null;
-    releaseYear: number | null;
-    caskType: string | null;
-    caskSize: string | null;
-    caskFill: string | null;
-    score: number | null;
-  }>(sql`
+  const rows = await runQuery(sql`
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
@@ -985,12 +962,13 @@ async function getTextCandidates(
     LIMIT ${TEXT_CANDIDATE_LIMIT}
   `);
 
-  return result.rows.map((row) => buildBottleCandidate(row, "text"));
+  return rows.map((row) => buildBottleCandidate(row, "text"));
 }
 
 async function getBrandCandidates(
   normalizedName: string,
   extractedLabel: BottleReferenceIdentity | null,
+  runQuery: BottleCandidateQueryRunner,
 ): Promise<BottleCandidate[]> {
   if (!extractedLabel?.brand && !extractedLabel?.bottler) {
     return [];
@@ -1019,22 +997,7 @@ async function getBrandCandidates(
         ${comparableExpressionClause}
       )`;
 
-  const result = await db.execute<{
-    bottleId: number;
-    fullName: string;
-    brand: string | null;
-    category: BottleCandidate["category"];
-    statedAge: number | null;
-    edition: string | null;
-    caskStrength: boolean | null;
-    singleCask: boolean | null;
-    abv: number | null;
-    vintageYear: number | null;
-    releaseYear: number | null;
-    caskType: string | null;
-    caskSize: string | null;
-    caskFill: string | null;
-  }>(sql`
+  const rows = await runQuery(sql`
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
@@ -1065,7 +1028,7 @@ async function getBrandCandidates(
     LIMIT ${BRAND_CANDIDATE_LIMIT}
   `);
 
-  return result.rows.map((row) => buildBottleCandidate(row, "brand"));
+  return rows.map((row) => buildBottleCandidate(row, "brand"));
 }
 
 async function getOrdinaryBottleCandidateById(
@@ -1270,15 +1233,17 @@ async function getExactBottleCandidateByNames(
   return null;
 }
 
-export async function findBottleReferenceCandidates(
+async function findBottleReferenceCandidatesWithEmbedding(
   reference: {
     name: string;
     bottleId?: number | null;
   },
   extractedLabel: BottleExtractedDetails | null,
   { workload = "application" }: { workload?: AIGatewayWorkload } = {},
+  createEmbedding: BottleEmbeddingCreator,
+  runQuery: BottleCandidateQueryRunner,
 ) {
-  return await searchBottleCandidates(
+  return await searchBottleCandidatesWithEmbedding(
     {
       query: reference.name,
       brand: extractedLabel?.brand ?? null,
@@ -1300,12 +1265,16 @@ export async function findBottleReferenceCandidates(
       currentBottleId: reference.bottleId ?? null,
     },
     { workload },
+    createEmbedding,
+    runQuery,
   );
 }
 
-export async function searchBottleCandidates(
+async function searchBottleCandidatesWithEmbedding(
   rawInput: BottleCandidateSearchInputRequest,
   { workload = "application" }: { workload?: AIGatewayWorkload } = {},
+  createEmbedding: BottleEmbeddingCreator,
+  runQuery: BottleCandidateQueryRunner,
 ) {
   const input = normalizePotentialProofLikeAbvFields(
     BottleCandidateSearchInputSchema.parse(rawInput),
@@ -1324,6 +1293,8 @@ export async function searchBottleCandidates(
   const queryText = buildQueryText(normalizedName, extractedLabel);
   const candidates = new Map<number, BottleCandidate>();
 
+  const noCandidates: BottleCandidate[] = [];
+  const noExactCandidate: BottleCandidate | null = null;
   const [
     currentCandidate,
     vectorCandidates,
@@ -1342,25 +1313,32 @@ export async function searchBottleCandidates(
     runCandidateLookupSafely(
       "vector",
       searchName,
-      [] as BottleCandidate[],
-      async () => await getVectorCandidates(queryText, workload),
+      noCandidates,
+      async () =>
+        await getVectorCandidates(
+          queryText,
+          workload,
+          createEmbedding,
+          runQuery,
+        ),
     ),
     runCandidateLookupSafely(
       "text",
       searchName,
-      [] as BottleCandidate[],
-      async () => await getTextCandidates(queryText),
+      noCandidates,
+      async () => await getTextCandidates(queryText, runQuery),
     ),
     runCandidateLookupSafely(
       "brand",
       searchName,
-      [] as BottleCandidate[],
-      async () => await getBrandCandidates(normalizedName, extractedLabel),
+      noCandidates,
+      async () =>
+        await getBrandCandidates(normalizedName, extractedLabel, runQuery),
     ),
     runCandidateLookupSafely(
       "exact",
       searchName,
-      null as BottleCandidate | null,
+      noExactCandidate,
       async () => await getExactBottleCandidateByNames(exactSearchNames),
     ),
   ]);
@@ -1393,3 +1371,42 @@ export async function searchBottleCandidates(
     )
     .slice(0, input.limit);
 }
+
+export type BottleEmbeddingCreator = typeof getOpenAIEmbedding;
+
+export function createBottleCandidateLookup(
+  createEmbedding: BottleEmbeddingCreator = getOpenAIEmbedding,
+  runQuery: BottleCandidateQueryRunner = runBottleCandidateQuery,
+) {
+  return {
+    findBottleReferenceCandidates: (
+      reference: { name: string; bottleId?: number | null },
+      extractedLabel: BottleExtractedDetails | null,
+      options: { workload?: AIGatewayWorkload } = {},
+    ) =>
+      findBottleReferenceCandidatesWithEmbedding(
+        reference,
+        extractedLabel,
+        options,
+        createEmbedding,
+        runQuery,
+      ),
+    searchBottleCandidates: (
+      input: BottleCandidateSearchInputRequest,
+      options: { workload?: AIGatewayWorkload } = {},
+    ) =>
+      searchBottleCandidatesWithEmbedding(
+        input,
+        options,
+        createEmbedding,
+        runQuery,
+      ),
+  };
+}
+
+const bottleCandidateLookup = createBottleCandidateLookup();
+
+export const findBottleReferenceCandidates =
+  bottleCandidateLookup.findBottleReferenceCandidates;
+export const searchBottleCandidates =
+  bottleCandidateLookup.searchBottleCandidates;

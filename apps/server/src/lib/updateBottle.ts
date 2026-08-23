@@ -50,8 +50,10 @@ import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
+import { EntityChoiceInputSchema } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
+import { z } from "zod";
 
 export { BottlePatchSchema } from "@peated/server/lib/bottleSchemas";
 export type { BottlePatch } from "@peated/server/lib/bottleSchemas";
@@ -258,9 +260,26 @@ export type BottleUpdateExpectedSelectedBottleState = Pick<
 export function bottleUpdateExpectedSelectedBottleState(
   bottle: Bottle,
 ): BottleUpdateExpectedSelectedBottleState {
-  return Object.fromEntries(
-    expectedSelectedBottleKeys.map((key) => [key, bottle[key]]),
-  ) as BottleUpdateExpectedSelectedBottleState;
+  return {
+    groupId: bottle.groupId,
+    fullName: bottle.fullName,
+    statedAge: bottle.statedAge,
+    category: bottle.category,
+    flavorProfile: bottle.flavorProfile,
+    description: bottle.description,
+    descriptionSrc: bottle.descriptionSrc,
+    tastingNotes: bottle.tastingNotes,
+    suggestedTags: bottle.suggestedTags,
+  };
+}
+
+function sortedEntityRoles(roles: Entity["type"]): Entity["type"] {
+  const sorted = [...roles].sort();
+  const first = sorted[0];
+  if (!first) {
+    throw new Error("An Entity must have at least one role.");
+  }
+  return [first, ...sorted.slice(1)];
 }
 
 /** Captures the shared authority a maintenance caller used to plan an edit. */
@@ -278,16 +297,25 @@ export function bottleUpdateExpectedSharedState({
   series: BottleSeries | null;
 }): BottleUpdateExpectedSharedState {
   return {
-    group: Object.fromEntries(
-      expectedGroupKeys.map((key) => [key, group[key]]),
-    ) as BottleUpdateExpectedSharedState["group"],
+    group: {
+      id: group.id,
+      name: group.name,
+      fullName: group.fullName,
+      statedAge: group.statedAge,
+      brandId: group.brandId,
+      bottlerId: group.bottlerId,
+      seriesId: group.seriesId,
+      category: group.category,
+      flavorProfile: group.flavorProfile,
+      representativeBottleId: group.representativeBottleId,
+    },
     distillerIds: [...distillerIds].sort((left, right) => left - right),
     referencedEntities: referencedEntities
       .map(({ id, name, shortName, type }) => ({
         id,
         name,
         shortName,
-        type: [...type].sort() as Entity["type"],
+        type: sortedEntityRoles(type),
       }))
       .sort((left, right) => left.id - right.id),
     series: series
@@ -309,7 +337,7 @@ export function bottleUpdateExpectedSharedState({
   };
 }
 
-function hasFields(value: object | undefined): boolean {
+function hasFields<T extends object>(value: T | undefined): boolean {
   return value !== undefined && Object.keys(value).length > 0;
 }
 
@@ -369,23 +397,31 @@ export function bottleStoragePatch(
   if ("tastingNotes" in input) exact.tastingNotes = input.tastingNotes;
   if ("suggestedTags" in input) exact.suggestedTags = input.suggestedTags;
 
-  return {
-    ...(hasFields(shared) ? { shared } : {}),
-    ...(hasFields(exact) ? { exact } : {}),
-  };
+  const storage: BottleStoragePatch = {};
+  if (hasFields(shared)) storage.shared = shared;
+  if (hasFields(exact)) storage.exact = exact;
+  return storage;
 }
 
-function existingEntityChoiceId(choice: unknown): number | null {
-  if (typeof choice === "number") return choice;
-  if (
-    choice !== null &&
-    typeof choice === "object" &&
-    "id" in choice &&
-    typeof choice.id === "number"
-  ) {
-    return choice.id;
-  }
-  return null;
+type ExistingEntityChoice =
+  | SystemBottlePatch["brand"]
+  | SystemBottlePatch["bottler"]
+  | NonNullable<SystemBottlePatch["distillers"]>[number];
+
+function existingEntityChoiceId(choice: ExistingEntityChoice): number | null {
+  const numericChoice = z.number().safeParse(choice);
+  if (numericChoice.success) return numericChoice.data;
+  const objectChoice = z.object({ id: z.number() }).safeParse(choice);
+  return objectChoice.success ? objectChoice.data.id : null;
+}
+
+function numericEntityChoiceId(choice: ExistingEntityChoice): number | null {
+  const numericChoice = z.number().safeParse(choice);
+  return numericChoice.success ? numericChoice.data : null;
+}
+
+function entityDraftChoice(choice: ExistingEntityChoice) {
+  return EntityChoiceInputSchema.parse(choice);
 }
 
 function existingEntityIdsForUpdate(input: SystemBottlePatch): number[] {
@@ -549,10 +585,10 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
 ];
 
 function bottleDiff(bottle: DesiredBottle, desired: DesiredBottle) {
-  const data: Record<string, unknown> = {};
+  const data: Partial<DesiredBottle> = {};
   for (const key of desiredBottleKeys) {
     if (JSON.stringify(bottle[key]) !== JSON.stringify(desired[key])) {
-      data[key] = desired[key];
+      Object.assign(data, { [key]: desired[key] });
     }
   }
   return data;
@@ -629,8 +665,9 @@ async function resolveStableState(
     newEntityIds: Set<number>;
   },
 ): Promise<StableState> {
+  const numericBrandId = numericEntityChoiceId(patch?.brand);
   let numericBrand =
-    typeof patch?.brand === "number" ? await loadEntity(tx, patch.brand) : null;
+    numericBrandId === null ? null : await loadEntity(tx, numericBrandId);
   if (numericBrand) {
     numericBrand = await addEntityRoleIfNeeded({
       tx,
@@ -642,10 +679,9 @@ async function resolveStableState(
     });
   }
 
+  const numericBottlerId = numericEntityChoiceId(patch?.bottler);
   let numericBottler =
-    typeof patch?.bottler === "number"
-      ? await loadEntity(tx, patch.bottler)
-      : null;
+    numericBottlerId === null ? null : await loadEntity(tx, numericBottlerId);
   if (numericBottler) {
     numericBottler = await addEntityRoleIfNeeded({
       tx,
@@ -659,25 +695,26 @@ async function resolveStableState(
 
   const numericDistillers = new Map<number, Entity>();
   for (const choice of patch?.distillers ?? []) {
-    if (typeof choice !== "number" || numericDistillers.has(choice)) continue;
+    const choiceId = numericEntityChoiceId(choice);
+    if (choiceId === null || numericDistillers.has(choiceId)) continue;
     const distiller = await addEntityRoleIfNeeded({
       tx,
-      entity: await loadEntity(tx, choice),
+      entity: await loadEntity(tx, choiceId),
       role: "distiller",
       actorId,
       creationSource,
       changedEntityIds,
     });
-    numericDistillers.set(choice, distiller);
+    numericDistillers.set(choiceId, distiller);
   }
 
   let brand: Entity;
   if (numericBrand) {
     brand = numericBrand;
-  } else if (patch?.brand !== undefined && typeof patch.brand !== "number") {
+  } else if (patch?.brand !== undefined && numericBrandId === null) {
     const result = await upsertEntity({
       db: tx,
-      data: coerceToUpsert(patch.brand),
+      data: coerceToUpsert(entityDraftChoice(patch.brand)),
       creationSource,
       createdByActorId: actorId,
       type: "brand",
@@ -697,13 +734,10 @@ async function resolveStableState(
     bottler = null;
   } else if (numericBottler) {
     bottler = numericBottler;
-  } else if (
-    patch?.bottler !== undefined &&
-    typeof patch.bottler !== "number"
-  ) {
+  } else if (patch?.bottler !== undefined && numericBottlerId === null) {
     const result = await upsertEntity({
       db: tx,
-      data: coerceToUpsert(patch.bottler),
+      data: coerceToUpsert(entityDraftChoice(patch.bottler)),
       creationSource,
       createdByActorId: actorId,
       type: "bottler",
@@ -724,13 +758,14 @@ async function resolveStableState(
     distillerIds.push(...currentDistillerIds);
   } else {
     for (const choice of patch.distillers) {
-      if (typeof choice === "number") {
-        distillerIds.push(numericDistillers.get(choice)!.id);
+      const choiceId = numericEntityChoiceId(choice);
+      if (choiceId !== null) {
+        distillerIds.push(numericDistillers.get(choiceId)!.id);
         continue;
       }
       const result = await upsertEntity({
         db: tx,
-        data: coerceToUpsert(choice),
+        data: coerceToUpsert(entityDraftChoice(choice)),
         creationSource,
         createdByActorId: actorId,
         type: "distiller",

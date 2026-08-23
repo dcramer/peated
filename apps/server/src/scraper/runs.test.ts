@@ -24,6 +24,10 @@ import type { ScraperAdapter, ScraperSink } from "./types";
 
 type FixtureCursor = z.infer<typeof FixtureCursorSchema>;
 type FixtureObservation = z.infer<typeof FixtureObservationSchema>;
+type FixturePage = {
+  items: FixtureObservation[];
+  nextPage: number | null;
+};
 
 function fixedClock(value = "2026-08-18T12:00:00Z"): ScraperHttpClock {
   let now = new Date(value);
@@ -104,7 +108,7 @@ async function setupRun({
   return { registry, run, observations };
 }
 
-function pageFetch(pages: Record<number, object>) {
+function pageFetch(pages: { [page: number]: FixturePage }) {
   return vi.fn<typeof fetch>(async (input) => {
     const url = new URL(input instanceof Request ? input.url : input);
     const page = Number(url.searchParams.get("page"));

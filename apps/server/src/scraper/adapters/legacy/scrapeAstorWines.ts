@@ -5,7 +5,7 @@ import {
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
-import type { ScrapePricesCallback } from "../../legacy/scraper";
+import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { getUrl, parsePrice } from "../../legacy/scraper";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
@@ -57,17 +57,16 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 
     logScrapedProduct(SITE, { name, price });
 
-    promises.push(
-      cb({
-        name,
-        price,
-        currency: "usd",
-        volume,
-        url: absoluteProductUrl,
-        imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
-        ...(externalProductId ? { externalProductId } : {}),
-      }),
-    );
+    const listing: StorePrice = {
+      name,
+      price,
+      currency: "usd",
+      volume,
+      url: absoluteProductUrl,
+      imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
+    };
+    if (externalProductId) listing.externalProductId = externalProductId;
+    promises.push(cb(listing));
   });
 
   await Promise.all(promises);

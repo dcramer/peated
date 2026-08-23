@@ -394,7 +394,7 @@ describe("GET /users/:user/library/stats", () => {
       distillerIds: [parentDistiller.id],
     });
     const promoted = await fixtures.BottleGroupMember({
-      groupId: parent.groupId as number,
+      groupId: parent.groupId,
       statedAge: 21,
     });
     await db.insert(collectionBottles).values({

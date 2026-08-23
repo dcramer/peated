@@ -1,5 +1,5 @@
 import { procedure } from "@peated/server/orpc";
-import { routerClient } from "@peated/server/orpc/router";
+import type { Context } from "@peated/server/orpc/context";
 import { BottleSchema, EntitySchema, UserSchema } from "@peated/server/schemas";
 import type { Bottle, Entity, User } from "@peated/server/types";
 import { z } from "zod";
@@ -20,6 +20,51 @@ export type UserResult = {
 };
 
 export type Result = BottleResult | UserResult | EntityResult;
+
+export type SearchSourceClient = {
+  searchBottles: (
+    query: string,
+    limit: number,
+    context: Context,
+  ) => Promise<Bottle[]>;
+  searchEntities: (
+    query: string,
+    limit: number,
+    context: Context,
+  ) => Promise<Entity[]>;
+  searchUsers: (
+    query: string,
+    limit: number,
+    context: Context,
+  ) => Promise<User[]>;
+};
+
+const defaultSources: SearchSourceClient = {
+  searchBottles: async (query, limit, context) => {
+    const { routerClient } = await import("@peated/server/orpc/router");
+    const data = await routerClient.bottles.list(
+      { query, cursor: 1, limit, sort: "rank" },
+      { context },
+    );
+    return data.results;
+  },
+  searchEntities: async (query, limit, context) => {
+    const { routerClient } = await import("@peated/server/orpc/router");
+    const data = await routerClient.entities.list(
+      { query, cursor: 1, limit, sort: "rank" },
+      { context },
+    );
+    return data.results;
+  },
+  searchUsers: async (query, limit, context) => {
+    const { routerClient } = await import("@peated/server/orpc/router");
+    const data = await routerClient.users.list(
+      { query, cursor: 1, limit, sort: "name" },
+      { context },
+    );
+    return data.results;
+  },
+};
 
 const INCLUDE_LIST = ["bottles", "entities", "users"] as const;
 
@@ -76,110 +121,90 @@ export function blendResults(
   return results;
 }
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/search",
-    summary: "Global search",
-    description:
-      "Search across bottles, entities, and users with configurable result types and limits",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "search",
-    }),
-  })
-  .input(
-    z.object({
-      query: z.coerce
-        .string()
-        .describe("Plain-text search; operator syntax is not supported."),
-      include: z.array(z.enum(INCLUDE_LIST)).default([...INCLUDE_LIST]),
-      limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
-  )
-  .output(
-    z.object({
-      query: z.string(),
-      results: z.array(
-        z.union([
-          z.object({
-            type: z.literal("bottle"),
-            ref: BottleSchema,
-          }),
-          z.object({
-            type: z.literal("entity"),
-            ref: EntitySchema,
-          }),
-          z.object({
-            type: z.literal("user"),
-            ref: UserSchema,
-          }),
-        ]),
-      ),
-    }),
-  )
-  .handler(async function ({ input, context }) {
-    const { query, include, limit } = input;
-    const promises: Promise<Result[]>[] = [];
+export function createSearchProcedure(sources: SearchSourceClient) {
+  return procedure
+    .route({
+      method: "GET",
+      path: "/search",
+      summary: "Global search",
+      description:
+        "Search across bottles, entities, and users with configurable result types and limits",
+      spec: (spec) => ({
+        ...spec,
+        operationId: "search",
+      }),
+    })
+    .input(
+      z.object({
+        query: z.coerce
+          .string()
+          .describe("Plain-text search; operator syntax is not supported."),
+        include: z.array(z.enum(INCLUDE_LIST)).default([...INCLUDE_LIST]),
+        limit: z.coerce.number().gte(1).lte(100).default(25),
+      }),
+    )
+    .output(
+      z.object({
+        query: z.string(),
+        results: z.array(
+          z.union([
+            z.object({
+              type: z.literal("bottle"),
+              ref: BottleSchema,
+            }),
+            z.object({
+              type: z.literal("entity"),
+              ref: EntitySchema,
+            }),
+            z.object({
+              type: z.literal("user"),
+              ref: UserSchema,
+            }),
+          ]),
+        ),
+      }),
+    )
+    .handler(async function ({ input, context }) {
+      const { query, include, limit } = input;
+      const promises: Promise<Result[]>[] = [];
 
-    if (include.includes("bottles")) {
-      promises.push(
-        routerClient.bottles
-          .list(
-            {
-              query,
-              cursor: 1,
-              limit,
-              sort: "rank",
-            },
-            { context },
-          )
-          .then((data) =>
-            data.results.map((ref) => ({ type: "bottle" as const, ref })),
-          ),
-      );
-    }
+      if (include.includes("bottles")) {
+        promises.push(
+          sources
+            .searchBottles(query, limit, context)
+            .then((results) =>
+              results.map((ref) => ({ type: "bottle" as const, ref })),
+            ),
+        );
+      }
 
-    if (include.includes("users") && context.user) {
-      promises.push(
-        routerClient.users
-          .list(
-            {
-              query,
-              cursor: 1,
-              sort: "name",
-              limit,
-            },
-            { context },
-          )
-          .then((data) =>
-            data.results.map((ref) => ({ type: "user" as const, ref })),
-          ),
-      );
-    }
+      if (include.includes("users") && context.user) {
+        promises.push(
+          sources
+            .searchUsers(query, limit, context)
+            .then((results) =>
+              results.map((ref) => ({ type: "user" as const, ref })),
+            ),
+        );
+      }
 
-    if (include.includes("entities")) {
-      promises.push(
-        routerClient.entities
-          .list(
-            {
-              query,
-              cursor: 1,
-              limit,
-              sort: "rank",
-            },
-            { context },
-          )
-          .then((data) =>
-            data.results.map((ref) => ({ type: "entity" as const, ref })),
-          ),
-      );
-    }
+      if (include.includes("entities")) {
+        promises.push(
+          sources
+            .searchEntities(query, limit, context)
+            .then((results) =>
+              results.map((ref) => ({ type: "entity" as const, ref })),
+            ),
+        );
+      }
 
-    const results = await Promise.all(promises);
+      const results = await Promise.all(promises);
 
-    return {
-      query,
-      results: blendResults(query, results, limit),
-    };
-  });
+      return {
+        query,
+        results: blendResults(query, results, limit),
+      };
+    });
+}
+
+export default createSearchProcedure(defaultSources);

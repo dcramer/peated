@@ -6,10 +6,14 @@ import {
 
 export async function classifyBottleReference(
   input: ClassifyBottleReferenceInput,
+  classifyReference: typeof classifyBottleReferenceWithServerAdapters = classifyBottleReferenceWithServerAdapters,
 ) {
-  return await classifyBottleReferenceWithServerAdapters(input);
+  return await classifyReference(input);
 }
 
-export async function runBottleReference(input: ClassifyBottleReferenceInput) {
-  return await runBottleReferenceWithServerAdapters(input);
+export async function runBottleReference(
+  input: ClassifyBottleReferenceInput,
+  runReference: typeof runBottleReferenceWithServerAdapters = runBottleReferenceWithServerAdapters,
+) {
+  return await runReference(input);
 }

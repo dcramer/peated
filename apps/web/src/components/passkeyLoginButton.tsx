@@ -26,11 +26,7 @@ export default function PasskeyLoginButton({
 
   const handlePasskeyLogin = async () => {
     // Check for WebAuthn support
-    if (
-      typeof window === "undefined" ||
-      !window.PublicKeyCredential ||
-      typeof window.PublicKeyCredential !== "function"
-    ) {
+    if (!globalThis.PublicKeyCredential) {
       router.push("/browser-not-supported");
       return;
     }
@@ -50,9 +46,8 @@ export default function PasskeyLoginButton({
       const formData = new FormData();
       formData.append("passkeyResponse", JSON.stringify(response));
       formData.append("signedChallenge", signedChallenge);
-      if (searchParams.get("redirectTo")) {
-        formData.append("redirectTo", searchParams.get("redirectTo") as string);
-      }
+      const redirectTo = searchParams.get("redirectTo");
+      if (redirectTo) formData.append("redirectTo", redirectTo);
 
       const result = await action(formData);
 
