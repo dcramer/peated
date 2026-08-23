@@ -214,6 +214,53 @@ describe("price match queue", () => {
     expect(queueItem).not.toHaveProperty("proposedRelease");
   });
 
+  test("serializes Entity locations in relational Bottle queries", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottler = await fixtures.Entity({
+      type: ["bottler"],
+      location: [56.1, -3.2],
+    });
+    const bottle = await fixtures.Bottle({ bottlerId: bottler.id });
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Relational Geometry Candidate",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "correction",
+        currentBottleId: bottle.id,
+      })
+      .returning();
+
+    const list = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+    const details = await routerClient.prices.matchQueue.details(
+      { proposal: proposal.id },
+      { context: { user } },
+    );
+
+    expect(list.results).toHaveLength(1);
+    expect(list.results[0]).toMatchObject({
+      id: proposal.id,
+      currentBottle: {
+        bottler: { id: bottler.id, location: [56.1, -3.2] },
+      },
+    });
+    expect(details).toMatchObject({
+      id: proposal.id,
+      currentBottle: {
+        bottler: { id: bottler.id, location: [56.1, -3.2] },
+      },
+    });
+  });
+
   test("keeps a pending primary decision in Incoming Listings only", async ({
     fixtures,
   }) => {

@@ -9,11 +9,36 @@ type GeometryPointType = Point | LatLng | string;
 
 type GeometryPointGeoJson = {
   type: "Point";
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
+  coordinates: LatLng;
 };
+
+type GeometryPointJsonValue = {
+  type?: string;
+  coordinates?: number[] | { lat?: number; lng?: number };
+};
+
+const CoordinatesSchema = z.tuple([z.number(), z.number()]);
+const GeometryPointGeoJsonSchema = z
+  .object({
+    type: z.literal("Point"),
+    coordinates: CoordinatesSchema,
+  })
+  .strict();
+
+export function parseGeometryPoint(
+  value: string | GeometryPointJsonValue,
+): LatLng {
+  const encodedGeometry = z.string().safeParse(value);
+  if (encodedGeometry.success) {
+    const parsed = wkx.Geometry.parse(Buffer.from(encodedGeometry.data, "hex"));
+    if (!(parsed instanceof wkx.Point)) {
+      throw new TypeError("Expected point geometry from database.");
+    }
+    return CoordinatesSchema.parse([parsed.x, parsed.y]);
+  }
+
+  return GeometryPointGeoJsonSchema.parse(value).coordinates;
+}
 
 export class Point {
   lat: number;
@@ -52,23 +77,7 @@ export function geometry_point(name: string) {
     },
 
     fromDriver(value: string | GeometryPointGeoJson): LatLng {
-      const encodedGeometry = z.string().safeParse(value);
-      if (encodedGeometry.success) {
-        const parsed = wkx.Geometry.parse(
-          Buffer.from(encodedGeometry.data, "hex"),
-        );
-        if (!(parsed instanceof wkx.Point)) {
-          throw new TypeError("Expected point geometry from database.");
-        }
-        return [parsed.x, parsed.y];
-      }
-
-      const geometry = z
-        .object({
-          coordinates: z.object({ lat: z.number(), lng: z.number() }),
-        })
-        .parse(value);
-      return [geometry.coordinates.lat, geometry.coordinates.lng];
+      return parseGeometryPoint(value);
     },
 
     toDriver(value: GeometryPointType) {
