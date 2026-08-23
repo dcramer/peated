@@ -81,6 +81,7 @@ describe("POST /bottle-aliases/repair-source-approvals", () => {
           status: "planned",
         },
       ],
+      nextAliasName: null,
       summary: { applied: 0, planned: 1, reviewRequired: 0, total: 1 },
     });
     expect(
@@ -128,5 +129,55 @@ describe("POST /bottle-aliases/repair-source-approvals", () => {
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  });
+
+  test("rejects a preview cursor combined with explicit names", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+
+    const error = await waitError(
+      routerClient.bottleAliases.repairSourceApprovals(
+        { afterAliasName: "Cursor", aliasNames: ["Named Alias"] },
+        { context: { user } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  });
+
+  test("continues a broad preview from the returned alias cursor", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const actor = await getUserActor(user);
+    const bottle = await fixtures.Bottle({ name: "API Cursor Bottle" });
+    for (const name of ["API Cursor A", "API Cursor B"]) {
+      await fixtures.BottleAlias({
+        bottleId: bottle.id,
+        name,
+        ignored: false,
+        assignmentSource: "source_approved",
+        assignedByActorId: actor.id,
+      });
+    }
+
+    const firstPage = await routerClient.bottleAliases.repairSourceApprovals(
+      { limit: 1 },
+      { context: { user } },
+    );
+    expect(firstPage.items.map(({ aliasName }) => aliasName)).toEqual([
+      "API Cursor A",
+    ]);
+    expect(firstPage.nextAliasName).toBe("API Cursor A");
+
+    const secondPage = await routerClient.bottleAliases.repairSourceApprovals(
+      { afterAliasName: firstPage.nextAliasName!, limit: 1 },
+      { context: { user } },
+    );
+    expect(secondPage.items.map(({ aliasName }) => aliasName)).toEqual([
+      "API Cursor B",
+    ]);
+    expect(secondPage.nextAliasName).toBeNull();
   });
 });

@@ -5,6 +5,7 @@ import { z } from "zod";
 
 const InputSchema = z
   .object({
+    afterAliasName: z.string().trim().min(1).optional(),
     aliasNames: z.array(z.string().trim().min(1)).max(100).default([]),
     execute: z.boolean().default(false),
     limit: z.number().int().gte(1).lte(100).default(100),
@@ -16,6 +17,13 @@ const InputSchema = z
         code: "custom",
         message: "Execution requires one or more explicit BottleAlias names.",
         path: ["aliasNames"],
+      });
+    }
+    if (input.afterAliasName && input.aliasNames.length > 0) {
+      context.addIssue({
+        code: "custom",
+        message: "A preview cursor cannot be combined with explicit names.",
+        path: ["afterAliasName"],
       });
     }
   });
@@ -52,6 +60,7 @@ export default procedure
           status: RepairStatusSchema,
         }),
       ),
+      nextAliasName: z.string().nullable(),
       summary: z.object({
         applied: z.number(),
         failed: z.number(),
@@ -63,6 +72,7 @@ export default procedure
   )
   .handler(async ({ input, context }) => {
     const result = await repairInvalidSourceBottleAliases({
+      afterAliasName: input.afterAliasName,
       aliasNames: input.aliasNames,
       dryRun: !input.execute,
       limit: input.limit,
@@ -71,6 +81,7 @@ export default procedure
 
     return {
       items: result.items,
+      nextAliasName: result.nextAliasName,
       summary: {
         applied: result.summary.applied,
         failed: result.summary.failed,

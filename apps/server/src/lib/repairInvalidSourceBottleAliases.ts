@@ -11,7 +11,17 @@ import {
 import { getUserActorByIdForDatabase } from "@peated/server/lib/actors";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { and, asc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  gt,
+  inArray,
+  isNotNull,
+  isNull,
+  or,
+  sql,
+} from "drizzle-orm";
 
 type RepairStatus = "applied" | "failed" | "planned" | "review_required";
 
@@ -25,10 +35,12 @@ export type InvalidSourceBottleAliasRepairItem = {
 
 export type InvalidSourceBottleAliasRepairResult = {
   items: InvalidSourceBottleAliasRepairItem[];
+  nextAliasName: string | null;
   summary: Record<RepairStatus | "total", number>;
 };
 
 type RepairOptions = {
+  afterAliasName?: string;
   aliasNames?: string[];
   db?: AnyDatabase;
   dryRun?: boolean;
@@ -136,6 +148,7 @@ function buildSummary(items: InvalidSourceBottleAliasRepairItem[]) {
  * matching approved proposal evidence.
  */
 export async function repairInvalidSourceBottleAliases({
+  afterAliasName,
   aliasNames = [],
   db = defaultDb,
   dryRun = true,
@@ -168,6 +181,8 @@ export async function repairInvalidSourceBottleAliases({
       aliasNames.map((name) => name.trim().toLowerCase()).filter(Boolean),
     ),
   );
+  const normalizedCursor = afterAliasName?.trim().toLowerCase() || null;
+  const isNamedRequest = requestedNames.length > 0;
   const rows = await db
     .select({
       name: bottleAliases.name,
@@ -182,16 +197,26 @@ export async function repairInvalidSourceBottleAliases({
     .where(
       and(
         isNotNull(bottleAliases.bottleId),
-        requestedNames.length
+        isNamedRequest
           ? inArray(sql`LOWER(${bottleAliases.name})`, requestedNames)
-          : eq(bottleAliases.assignmentSource, "source_approved"),
+          : and(
+              eq(bottleAliases.assignmentSource, "source_approved"),
+              normalizedCursor
+                ? gt(sql`LOWER(${bottleAliases.name})`, normalizedCursor)
+                : undefined,
+            ),
       ),
     )
-    .orderBy(asc(bottleAliases.name))
-    .limit(requestedNames.length || limit);
-  const candidates: Candidate[] = rows.flatMap((row) =>
+    .orderBy(asc(sql`LOWER(${bottleAliases.name})`))
+    .limit(isNamedRequest ? requestedNames.length : limit + 1);
+  const pageRows = isNamedRequest ? rows : rows.slice(0, limit);
+  const candidates: Candidate[] = pageRows.flatMap((row) =>
     row.bottleId === null ? [] : [{ ...row, bottleId: row.bottleId }],
   );
+  const nextAliasName =
+    !isNamedRequest && rows.length > limit
+      ? (pageRows.at(-1)?.name ?? null)
+      : null;
   const items: InvalidSourceBottleAliasRepairItem[] = [];
 
   for (const candidate of candidates) {
@@ -318,5 +343,5 @@ export async function repairInvalidSourceBottleAliases({
     }
   }
 
-  return { items, summary: buildSummary(items) };
+  return { items, nextAliasName, summary: buildSummary(items) };
 }
