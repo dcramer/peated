@@ -156,7 +156,7 @@ export type BottleAliasAssignmentOptions = Pick<
   "assignmentSource" | "assignedByActorId"
 >;
 
-type BottleImageCandidate = {
+export type BottleImageCandidate = {
   bottleId: number;
   imageUrl: string;
 };
@@ -722,73 +722,7 @@ export async function finalizeBottleAliasAssignment(
   }: BottleAliasAssignmentResult,
   contexts?: SentryLogContexts,
 ) {
-  if (bottleImageCandidate) {
-    try {
-      const [updatedOriginal] = await db
-        .update(bottles)
-        .set({ imageUrl: bottleImageCandidate.imageUrl })
-        .where(
-          and(
-            eq(bottles.id, bottleImageCandidate.bottleId),
-            or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
-            sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
-          ),
-        )
-        .returning({ id: bottles.id });
-      if (!updatedOriginal) {
-        const original = await db.query.bottles.findFirst({
-          where: eq(bottles.id, bottleImageCandidate.bottleId),
-          columns: { id: true },
-        });
-        if (!original) {
-          const tombstone = await db.query.bottleTombstones.findFirst({
-            where: eq(bottleTombstones.bottleId, bottleImageCandidate.bottleId),
-            columns: { newBottleId: true },
-          });
-          if (!tombstone) {
-            recordUnresolvedBottleImageCandidate(
-              bottleImageCandidate,
-              "missing_tombstone",
-            );
-          } else if (tombstone.newBottleId) {
-            const [updatedReplacement] = await db
-              .update(bottles)
-              .set({ imageUrl: bottleImageCandidate.imageUrl })
-              .where(
-                and(
-                  eq(bottles.id, tombstone.newBottleId),
-                  or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
-                  sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
-                ),
-              )
-              .returning({ id: bottles.id });
-            if (!updatedReplacement) {
-              const replacement = await db.query.bottles.findFirst({
-                where: eq(bottles.id, tombstone.newBottleId),
-                columns: { id: true },
-              });
-              if (!replacement) {
-                recordUnresolvedBottleImageCandidate(
-                  bottleImageCandidate,
-                  "missing_replacement_bottle",
-                );
-              }
-            }
-          } else {
-            recordUnresolvedBottleImageCandidate(
-              bottleImageCandidate,
-              "missing_replacement_mapping",
-            );
-          }
-        }
-      }
-    } catch (err) {
-      logError(err, {
-        ...contexts,
-        bottleImageCandidate,
-      });
-    }
-  }
+  await fillMissingBottleImage(bottleImageCandidate, contexts);
 
   if (aliasChanged) {
     try {
@@ -802,6 +736,83 @@ export async function finalizeBottleAliasAssignment(
     await pushUniqueJob("IndexBottleSearchVectors", { bottleId });
   } catch (err) {
     logError(err, contexts);
+  }
+}
+
+/** Fills only a missing Bottle image and respects rejected image URLs. */
+export async function fillMissingBottleImage(
+  bottleImageCandidate: BottleImageCandidate | null,
+  contexts?: SentryLogContexts,
+) {
+  if (!bottleImageCandidate) return;
+
+  try {
+    const [updatedOriginal] = await db
+      .update(bottles)
+      .set({ imageUrl: bottleImageCandidate.imageUrl })
+      .where(
+        and(
+          eq(bottles.id, bottleImageCandidate.bottleId),
+          or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
+          sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
+        ),
+      )
+      .returning({ id: bottles.id });
+    if (updatedOriginal) return;
+
+    const original = await db.query.bottles.findFirst({
+      where: eq(bottles.id, bottleImageCandidate.bottleId),
+      columns: { id: true },
+    });
+    if (original) return;
+
+    const tombstone = await db.query.bottleTombstones.findFirst({
+      where: eq(bottleTombstones.bottleId, bottleImageCandidate.bottleId),
+      columns: { newBottleId: true },
+    });
+    if (!tombstone) {
+      recordUnresolvedBottleImageCandidate(
+        bottleImageCandidate,
+        "missing_tombstone",
+      );
+      return;
+    }
+    if (!tombstone.newBottleId) {
+      recordUnresolvedBottleImageCandidate(
+        bottleImageCandidate,
+        "missing_replacement_mapping",
+      );
+      return;
+    }
+
+    const [updatedReplacement] = await db
+      .update(bottles)
+      .set({ imageUrl: bottleImageCandidate.imageUrl })
+      .where(
+        and(
+          eq(bottles.id, tombstone.newBottleId),
+          or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
+          sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
+        ),
+      )
+      .returning({ id: bottles.id });
+    if (updatedReplacement) return;
+
+    const replacement = await db.query.bottles.findFirst({
+      where: eq(bottles.id, tombstone.newBottleId),
+      columns: { id: true },
+    });
+    if (!replacement) {
+      recordUnresolvedBottleImageCandidate(
+        bottleImageCandidate,
+        "missing_replacement_bottle",
+      );
+    }
+  } catch (err) {
+    logError(err, {
+      ...contexts,
+      bottleImageCandidate,
+    });
   }
 }
 

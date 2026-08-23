@@ -74,7 +74,18 @@ Alternative considered: Create bottle aliases with an `externalSiteId` and rely 
 
 Implementation note: if a title is marked generic or source-scoped, no code path should call the existing global alias assignment helper for that title. A future source-scoped lookup mechanism must be separate from `bottle_alias` unless `bottle_alias` itself gains enforceable source scoping across lookup, assignment, and alias-change jobs.
 
-### Decision: Persist source-scoped verification as durable source identity
+### Decision: Keep the MVP on existing StorePrice evidence
+
+For the MVP, the approved `store_price.bottleId` is the durable identity for
+that exact row. `bottle_observation` and the incoming decision log preserve the
+source evidence and moderation history. The approval does not create a
+BottleAlias when `aliasScope` is `none` or missing.
+
+This does not let a future StorePrice row reuse the decision. Reuse by a future
+row requires a stable source key and remains deferred. The MVP adds no table and
+does not use a display title as that key.
+
+### Future decision: Persist reusable source identity
 
 Use existing `bottle_observation` only if it can support lookup semantics safely. Otherwise add a purpose-built table, likely keyed by:
 

@@ -24,17 +24,18 @@
 
 ## 4. Source-Scoped Persistence
 
-- [ ] 4.1 Decide whether `bottle_observation` can safely store reusable source-scoped verification or whether a new indexed table is required.
+- [x] 4.1 Keep the MVP on existing tables: the exact `store_price.bottleId` is durable identity, while observations and decision logs preserve evidence. Defer reuse by a future source row.
 - [ ] 4.2 Implement the selected persistence model with source keys for external site, internal store listing id when available, product id or canonical URL, optional SKU/fingerprint, target bottle/release, scope, evidence hash, confidence, and actor.
 - [ ] 4.3 Add migration and database tests for source-scoped lookup and non-reuse by display title alone.
 
 ## 5. Approval And Alias Safety
 
-- [ ] 5.1 Update store-price approval flow to skip global bottle alias assignment when alias scope is `none` or the title is classified as generic/underspecified.
-- [ ] 5.2 Preserve exact source evidence and source-scope metadata in observations or the new source identity table.
-- [ ] 5.3 Add integration tests proving source-scoped approval assigns the exact store price, creates no `bottle_alias` row for the generic label, and does not update unrelated future listings with the same generic title.
-- [ ] 5.4 Make new classifier decisions default to no global alias when alias-safety metadata is missing.
-- [ ] 5.5 Ensure current global alias behavior remains unchanged for explicit reusable canonical identity approvals.
+- [x] 5.1 Update store-price approval flow to skip BottleAlias assignment when alias scope is `none` or missing.
+- [x] 5.2 Preserve exact source evidence and source-scope metadata in observations and decision logs.
+- [x] 5.3 Add integration tests proving source-only approval assigns the exact StorePrice, creates no BottleAlias, and does not update unrelated same-name listings or reviews.
+- [x] 5.4 Keep missing alias-safety metadata conservative.
+- [x] 5.5 Keep current BottleAlias behavior for explicit reusable approvals when the moderator accepts the suggested Bottle.
+- [x] 5.6 Add a preview-first repair for proven ignored BottleAlias rows from old source-only approvals. Require explicit names for execution and leave active rows for manual review.
 
 ## 6. Scraper Reuse
 
@@ -50,7 +51,7 @@
 
 ## 8. Documentation And Validation
 
-- [ ] 8.1 Update `docs/features/store-price-matching.md` with source-scoped listing identity and alias-safety behavior.
+- [x] 8.1 Update `docs/features/store-price-matching.md` with source-scoped listing identity and BottleAlias safety behavior.
 - [ ] 8.2 Update `docs/architecture/bottle-classifier.md` with the classifier alias-safety contract.
-- [ ] 8.3 Run targeted server tests, classifier tests/evals, lint, and typecheck for touched surfaces.
+- [x] 8.3 Run the full server test suite, repo typecheck, and repo lint for the touched approval, BottleAlias, CLI, and documentation surfaces. Classifier eval behavior did not change.
 - [ ] 8.4 Capture any remaining open questions before enabling broad automation.

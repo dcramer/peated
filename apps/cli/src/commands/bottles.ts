@@ -10,6 +10,7 @@ import {
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
+import { repairInvalidSourceBottleAliases } from "@peated/server/lib/repairInvalidSourceBottleAliases";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
@@ -270,6 +271,60 @@ subcommand
     if (options.execute && result.summary.failed > 0) {
       throw new Error(
         `${result.summary.failed} bottle repair(s) failed during execution.`,
+      );
+    }
+  });
+
+subcommand
+  .command("repair-source-aliases")
+  .description(
+    "Preview or unassign invalid BottleAlias rows from source-only price approvals",
+  )
+  .option(
+    "--limit <number>",
+    "Maximum number of BottleAlias rows to scan",
+    "100",
+  )
+  .option("--execute", "Apply repairs to the explicitly named BottleAlias rows")
+  .argument("[aliasNames...]")
+  .action(async (aliasNames: string[], options) => {
+    const limit = Number.parseInt(options.limit, 10);
+    if (!Number.isSafeInteger(limit) || limit <= 0) {
+      throw new Error(`Invalid limit: ${options.limit}`);
+    }
+    if (options.execute && aliasNames.length === 0) {
+      throw new Error(
+        "--execute requires one or more explicit BottleAlias names.",
+      );
+    }
+
+    const result = await repairInvalidSourceBottleAliases({
+      aliasNames,
+      dryRun: !options.execute,
+      limit,
+      user: options.execute ? await getAutomationModeratorUser() : undefined,
+    });
+    console.log(
+      `${options.execute ? "Processed" : "Previewed"} BottleAlias rows: ${result.summary.total}`,
+    );
+    console.log(
+      `planned=${result.summary.planned} applied=${result.summary.applied} reviewRequired=${result.summary.review_required} failed=${result.summary.failed}`,
+    );
+    for (const item of result.items) {
+      const evidence = item.evidenceProposalIds.length
+        ? ` proposals=${item.evidenceProposalIds.join(",")}`
+        : "";
+      console.log(
+        `[${item.status}] ${item.aliasName} bottle=${item.bottleId ?? "none"}${evidence}`,
+      );
+      console.log(`  ${item.message}`);
+    }
+    if (
+      options.execute &&
+      result.summary.failed + result.summary.review_required > 0
+    ) {
+      throw new Error(
+        `${result.summary.failed + result.summary.review_required} requested BottleAlias repair(s) were not applied.`,
       );
     }
   });
