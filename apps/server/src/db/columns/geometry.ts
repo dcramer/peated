@@ -15,15 +15,14 @@ type GeometryPointGeoJson = {
 type GeometryPointJsonValue = {
   type?: string;
   coordinates?: number[] | { lat?: number; lng?: number };
+  crs?: unknown;
 };
 
 const CoordinatesSchema = z.tuple([z.number(), z.number()]);
-const GeometryPointGeoJsonSchema = z
-  .object({
-    type: z.literal("Point"),
-    coordinates: CoordinatesSchema,
-  })
-  .strict();
+const GeometryPointGeoJsonSchema = z.object({
+  type: z.literal("Point"),
+  coordinates: CoordinatesSchema,
+});
 
 export function parseGeometryPoint(
   value: string | GeometryPointJsonValue,
