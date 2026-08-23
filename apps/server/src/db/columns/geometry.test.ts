@@ -13,6 +13,10 @@ describe("parseGeometryPoint", () => {
       parseGeometryPoint({
         type: "Point",
         coordinates: [56.1, -3.2],
+        crs: {
+          type: "name",
+          properties: { name: "EPSG:4326" },
+        },
       }),
     ).toEqual([56.1, -3.2]);
   });
