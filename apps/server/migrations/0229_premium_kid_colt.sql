@@ -1,0 +1,1 @@
+ALTER TABLE "store_price" ADD COLUMN "source_fingerprint" text;

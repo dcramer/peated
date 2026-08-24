@@ -126,6 +126,30 @@ That observation stores:
 This keeps exact source detail without forcing new public fields into the normal
 Bottle entry flow.
 
+## Repeated Source Listings
+
+`StorePrice` owns the durable decision for one source item. Ingestion identifies
+that item by `externalSiteId` plus the source's strongest `externalProductId`.
+Each scraper maps its product id, variant id, SKU, or grouping id into that one
+field. Canonical product URL is the fallback when the source exposes no stable
+identifier. Display title is never a source identity key.
+
+The row stores a fingerprint of Bottle-relevant evidence: normalized title,
+volume, barcode claim, structured source identity, and an optional source-owned
+version. Price, image, and URL changes do not affect this fingerprint.
+
+- An unchanged fingerprint preserves the row's exact `bottleId` and skips
+  generic classification.
+- A changed fingerprint keeps the same source row but clears an assignment that
+  current deterministic evidence cannot establish, then queues normal
+  classification.
+- A legacy row with no fingerprint keeps its reviewed assignment while the
+  first repeated scrape establishes a baseline.
+- Another store or another source product id never inherits the assignment.
+
+Time-based revalidation is deferred. Identity changes are the MVP invalidation
+boundary.
+
 ## Approval And BottleAlias Safety
 
 An approval always assigns the reviewed `store_price` to the selected Bottle.

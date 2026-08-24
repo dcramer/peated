@@ -59,6 +59,15 @@ export const StorePriceInputSchema = z.object({
     .describe(
       "Stable product or variant identifier assigned by the store; omission preserves an existing value",
     ),
+  sourceFingerprint: z
+    .string()
+    .trim()
+    .min(1)
+    .max(255)
+    .optional()
+    .describe(
+      "Optional source-owned version for Bottle-relevant product identity; sources that provide it must do so consistently",
+    ),
   name: z
     .string()
     .trim()
