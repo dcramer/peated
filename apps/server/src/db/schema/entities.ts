@@ -94,7 +94,7 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
     references: [countries.id],
   }),
   region: one(regions, {
-    fields: [entities.countryId],
+    fields: [entities.regionId],
     references: [regions.id],
   }),
   createdByActor: one(actors, {

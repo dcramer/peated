@@ -2,7 +2,9 @@ import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Entity, User } from "@peated/server/db/schema";
 import {
+  bottleGroupDistillers,
   bottleGroups,
+  bottleSeries,
   bottles,
   bottlesToDistillers,
   changes,
@@ -124,6 +126,75 @@ export type EntityUpdateExpectedState = {
   referencedCountry: { id: number; name: string } | null;
   referencedRegion: { id: number; countryId: number; name: string } | null;
 };
+
+async function assertRemovedRolesAreUnreferenced(
+  transaction: AnyTransaction,
+  entity: Entity,
+  nextRoles: Entity["type"],
+) {
+  const removesRole = (role: Entity["type"][number]) =>
+    entity.type.includes(role) && !nextRoles.includes(role);
+  const hasReference = async (
+    table:
+      | typeof bottles
+      | typeof bottleGroups
+      | typeof bottleSeries
+      | typeof bottlesToDistillers
+      | typeof bottleGroupDistillers,
+    field:
+      | typeof bottles.brandId
+      | typeof bottles.bottlerId
+      | typeof bottleGroups.brandId
+      | typeof bottleGroups.bottlerId
+      | typeof bottleSeries.brandId
+      | typeof bottlesToDistillers.distillerId
+      | typeof bottleGroupDistillers.distillerId,
+  ) =>
+    Boolean(
+      (
+        await transaction
+          .select({ id: sql`1` })
+          .from(table)
+          .where(eq(field, entity.id))
+          .limit(1)
+      )[0],
+    );
+
+  if (
+    removesRole("brand") &&
+    ((await hasReference(bottles, bottles.brandId)) ||
+      (await hasReference(bottleGroups, bottleGroups.brandId)) ||
+      (await hasReference(bottleSeries, bottleSeries.brandId)))
+  ) {
+    throw new EntityUpdateConflictError(
+      "Cannot remove the brand role while the Entity is referenced as a brand.",
+    );
+  }
+  if (
+    removesRole("bottler") &&
+    ((await hasReference(bottles, bottles.bottlerId)) ||
+      (await hasReference(bottleGroups, bottleGroups.bottlerId)))
+  ) {
+    throw new EntityUpdateConflictError(
+      "Cannot remove the bottler role while the Entity is referenced as a bottler.",
+    );
+  }
+  if (
+    removesRole("distiller") &&
+    ((await hasReference(
+      bottlesToDistillers,
+      bottlesToDistillers.distillerId,
+    )) ||
+      (await hasReference(
+        bottleGroupDistillers,
+        bottleGroupDistillers.distillerId,
+      )))
+  ) {
+    throw new EntityUpdateConflictError(
+      "Cannot remove the distiller role while the Entity is referenced as a distiller.",
+    );
+  }
+}
 
 /**
  * Applies the durable part of an Entity update inside a caller-owned
@@ -257,6 +328,7 @@ export async function updateEntityInTransaction(
   }
 
   if (input.type !== undefined && !arraysEqual(input.type, entity.type)) {
+    await assertRemovedRolesAreUnreferenced(transaction, entity, input.type);
     data.type = input.type;
   }
   if (

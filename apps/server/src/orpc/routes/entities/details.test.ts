@@ -14,6 +14,17 @@ describe("GET /entities/:entity", () => {
     expect("createdBy" in data).toBe(false);
   });
 
+  test("returns the Entity update timestamp", async ({ fixtures }) => {
+    const createdAt = new Date("2020-01-01T00:00:00.000Z");
+    const updatedAt = new Date("2025-06-01T00:00:00.000Z");
+    const entity = await fixtures.Entity({ createdAt, updatedAt });
+
+    const data = await routerClient.entities.details({ entity: entity.id });
+
+    expect(data.createdAt).toBe(createdAt.toISOString());
+    expect(data.updatedAt).toBe(updatedAt.toISOString());
+  });
+
   test("errors on invalid entity", async () => {
     const err = await waitError(
       routerClient.entities.details({
