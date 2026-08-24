@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import { bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { expect, test } from "vitest";
+import { mergeBottlesInTransaction } from "./mergeBottles";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -59,4 +60,30 @@ test("rejects every inactive Bottle state", async ({ fixtures }) => {
       bottleId: scenario.bottleId,
     });
   }
+});
+
+test("returns the replacement for a merged Bottle whose source row was deleted", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Bottle({ name: "Retired Source" });
+  const destination = await fixtures.Bottle({ name: "Active Destination" });
+
+  await db.transaction((tx) =>
+    mergeBottlesInTransaction(tx, {
+      sourceBottleId: source.id,
+      destinationBottleId: destination.id,
+      actorId: source.createdByActorId,
+    }),
+  );
+
+  const error = await waitError(() =>
+    db.transaction((tx) => resolveActiveBottleIds(tx, [source.id])),
+  );
+
+  expect(error).toBeInstanceOf(ActiveBottleSelectionError);
+  expect(error).toMatchObject({
+    reason: "bottle_retired",
+    bottleId: source.id,
+    replacementBottleId: destination.id,
+  });
 });

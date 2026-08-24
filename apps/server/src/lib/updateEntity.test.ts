@@ -151,4 +151,56 @@ describe("updateEntity", () => {
       }),
     ).rejects.toBeInstanceOf(EntityUpdateAuthorizationError);
   });
+
+  test("rejects removing Entity roles that active Bottle identity references", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "All Roles",
+      type: ["brand", "bottler", "distiller"],
+    });
+    await fixtures.Bottle({
+      brandId: entity.id,
+      bottlerId: entity.id,
+      distillerIds: [entity.id],
+    });
+    const moderator = await fixtures.User({ mod: true });
+    const scenarios = [
+      {
+        role: "brand" as const,
+        message:
+          "Cannot remove the brand role while the Entity is referenced as a brand.",
+      },
+      {
+        role: "bottler" as const,
+        message:
+          "Cannot remove the bottler role while the Entity is referenced as a bottler.",
+      },
+      {
+        role: "distiller" as const,
+        message:
+          "Cannot remove the distiller role while the Entity is referenced as a distiller.",
+      },
+    ];
+
+    for (const { role, message } of scenarios) {
+      await expect(
+        updateEntity({
+          entityId: entity.id,
+          input: {
+            type: entity.type.filter((candidate) => candidate !== role),
+          },
+          user: moderator,
+        }),
+      ).rejects.toMatchObject({
+        name: EntityUpdateConflictError.name,
+        message,
+      });
+    }
+
+    const unchanged = await db.query.entities.findFirst({
+      where: eq(entities.id, entity.id),
+    });
+    expect(unchanged?.type).toEqual(entity.type);
+  });
 });
