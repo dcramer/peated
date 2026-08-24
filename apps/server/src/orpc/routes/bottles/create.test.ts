@@ -212,6 +212,7 @@ describe("POST /bottles", () => {
     expect(distillers.length).toBe(0);
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: bottle.id,
+      generateDetails: true,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "OnBottleAliasChange",
