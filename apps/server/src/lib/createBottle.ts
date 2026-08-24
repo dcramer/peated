@@ -718,7 +718,10 @@ export async function finalizeCreatedBottle(
   } = {},
 ) {
   try {
-    await pushUniqueJob("OnBottleChange", { bottleId: bottle.id });
+    await pushUniqueJob("OnBottleChange", {
+      bottleId: bottle.id,
+      generateDetails: true,
+    });
   } catch (err) {
     logError(err, {
       bottle: {

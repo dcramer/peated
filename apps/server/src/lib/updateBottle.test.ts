@@ -1049,6 +1049,104 @@ describe("Bottle updates", () => {
     expect((await loadGroupMembers(groupBefore.id))[1]).toEqual(siblingBefore);
   });
 
+  test("clears generated content for Bottle changes but not cask details", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Generated Content Brand" });
+    const originalNotes = {
+      nose: "Original nose",
+      palate: "Original palate",
+      finish: "Original finish",
+    };
+    const updatedNotes = {
+      nose: "Moderator nose",
+      palate: "Moderator palate",
+      finish: "Moderator finish",
+    };
+    const { first } = await createGroup({
+      user: mod,
+      stable: { name: "Generated Content", brand: brand.id },
+      exacts: [
+        {
+          abv: 46,
+          description: "Generated description",
+          descriptionSrc: "generated",
+          tastingNotes: originalNotes,
+        },
+      ],
+    });
+    await db
+      .update(bottles)
+      .set({ suggestedTags: ["smoke", "fruit"] })
+      .where(eq(bottles.id, first.bottle.id));
+
+    const contentResult = await updateBottle({
+      bottleId: first.bottle.id,
+      input: { tastingNotes: updatedNotes },
+      context: contextFor(mod),
+    });
+    expect(contentResult.bottle).toMatchObject({
+      description: "Generated description",
+      descriptionSrc: "generated",
+      suggestedTags: ["smoke", "fruit"],
+      tastingNotes: updatedNotes,
+    });
+
+    const caskResult = await updateBottle({
+      bottleId: first.bottle.id,
+      input: {
+        caskType: "bourbon",
+        caskSize: "barrel",
+        caskFill: "1st_fill",
+      },
+      context: contextFor(mod),
+    });
+    expect(caskResult.bottle).toMatchObject({
+      caskType: "bourbon",
+      caskSize: "barrel",
+      caskFill: "1st_fill",
+      description: "Generated description",
+      descriptionSrc: "generated",
+      suggestedTags: ["smoke", "fruit"],
+      tastingNotes: updatedNotes,
+    });
+
+    const identityResult = await updateBottle({
+      bottleId: first.bottle.id,
+      input: { abv: 48 },
+      context: contextFor(mod),
+    });
+    expect(identityResult.bottle).toMatchObject({
+      abv: 48,
+      description: null,
+      descriptionSrc: null,
+      suggestedTags: [],
+      tastingNotes: updatedNotes,
+    });
+
+    await db
+      .update(bottles)
+      .set({
+        description: "Moderator description",
+        descriptionSrc: "user",
+        suggestedTags: ["oak"],
+      })
+      .where(eq(bottles.id, first.bottle.id));
+    const moderatorContentResult = await updateBottle({
+      bottleId: first.bottle.id,
+      input: { abv: 50 },
+      context: contextFor(mod),
+    });
+    expect(moderatorContentResult.bottle).toMatchObject({
+      abv: 50,
+      description: "Moderator description",
+      descriptionSrc: "user",
+      suggestedTags: [],
+      tastingNotes: updatedNotes,
+    });
+  });
+
   test("updates direct Bottle identity and owns aliases directly", async ({
     fixtures,
   }) => {

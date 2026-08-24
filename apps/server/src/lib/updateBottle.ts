@@ -445,6 +445,20 @@ const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
   "caskFill",
 ];
 
+const generatedDetailsIdentityKeys = [
+  "statedAge",
+  "brandId",
+  "bottlerId",
+  "seriesId",
+  "category",
+  "edition",
+  "abv",
+  "singleCask",
+  "caskStrength",
+  "vintageYear",
+  "releaseYear",
+] as const satisfies ReadonlyArray<keyof DesiredBottle>;
+
 function hasExactIdentityFields(patch: ExactPatch | undefined): boolean {
   return patch !== undefined && exactIdentityKeys.some((key) => key in patch);
 }
@@ -453,6 +467,29 @@ function sameValues(left: readonly number[], right: readonly number[]) {
   return (
     left.length === right.length &&
     left.every((value, index) => value === right[index])
+  );
+}
+
+function generatedDetailsIdentityChanged({
+  bottle,
+  desired,
+  includeNameChange,
+  currentDistillerIds,
+  desiredDistillerIds,
+}: {
+  bottle: Bottle;
+  desired: DesiredBottle;
+  includeNameChange: boolean;
+  currentDistillerIds: readonly number[];
+  desiredDistillerIds: readonly number[];
+}) {
+  return (
+    (includeNameChange &&
+      (bottle.name !== desired.name || bottle.fullName !== desired.fullName)) ||
+    generatedDetailsIdentityKeys.some(
+      (key) => JSON.stringify(bottle[key]) !== JSON.stringify(desired[key]),
+    ) ||
+    !sameValues(currentDistillerIds, desiredDistillerIds)
   );
 }
 
@@ -1069,6 +1106,7 @@ export async function updateBottleInTransaction(
     expectedSharedState,
     actorId,
     creationSource,
+    invalidateGeneratedDetails = true,
   }: {
     bottleId: number;
     input: SystemBottlePatch;
@@ -1076,6 +1114,7 @@ export async function updateBottleInTransaction(
     expectedSharedState?: BottleUpdateExpectedSharedState;
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
+    invalidateGeneratedDetails?: boolean;
   },
 ): Promise<BottleUpdateFinalizationManifest> {
   const expectedReferencedEntityIds =
@@ -1326,6 +1365,51 @@ export async function updateBottleInTransaction(
     ? members
     : members.filter(({ id }) => id === bottleId);
   const affectedIds = affectedMembers.map(({ id }) => id).sort((a, b) => a - b);
+
+  if (invalidateGeneratedDetails) {
+    for (const member of affectedMembers) {
+      const desired = desiredByBottleId.get(member.id)!;
+      if (
+        !generatedDetailsIdentityChanged({
+          bottle: member,
+          desired,
+          includeNameChange: sharedIntent,
+          currentDistillerIds: bottleDistillers.get(member.id) ?? [],
+          desiredDistillerIds: sharedChanged
+            ? stable.distillerIds
+            : (bottleDistillers.get(member.id) ?? []),
+        })
+      ) {
+        continue;
+      }
+
+      const selectedExactPatch =
+        exactIntent && member.id === bottleId ? storage.exact : undefined;
+      const descriptionWasExplicitlyPatched =
+        selectedExactPatch !== undefined &&
+        ("description" in selectedExactPatch ||
+          "descriptionSrc" in selectedExactPatch);
+      const suggestedTagsWereExplicitlyPatched =
+        selectedExactPatch !== undefined &&
+        "suggestedTags" in selectedExactPatch;
+
+      const invalidated = { ...desired };
+      if (
+        member.descriptionSrc === "generated" &&
+        !descriptionWasExplicitlyPatched
+      ) {
+        invalidated.description = null;
+        invalidated.descriptionSrc = null;
+      }
+      if (
+        !suggestedTagsWereExplicitlyPatched &&
+        member.suggestedTags.length > 0
+      ) {
+        invalidated.suggestedTags = [];
+      }
+      desiredByBottleId.set(member.id, invalidated);
+    }
+  }
 
   const currentBrand =
     stable.brandId === group.brandId

@@ -22,9 +22,10 @@ test("dispatches derived work for the supplied Bottle", async ({
 
   await onBottleChange({ bottleId: bottle.id });
 
-  expect(workerClient.runJob).toHaveBeenCalledWith("GenerateBottleDetails", {
-    bottleId: bottle.id,
-  });
+  expect(workerClient.runJob).not.toHaveBeenCalledWith(
+    "GenerateBottleDetails",
+    expect.anything(),
+  );
   expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearchVectors", {
     bottleId: bottle.id,
   });
@@ -35,6 +36,25 @@ test("dispatches derived work for the supplied Bottle", async ({
   );
 });
 
+test("generates details only when explicitly requested", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+
+  await onBottleChange({ bottleId: bottle.id, generateDetails: true });
+
+  expect(workerClient.runJob).toHaveBeenNthCalledWith(
+    1,
+    "GenerateBottleDetails",
+    { bottleId: bottle.id },
+  );
+  expect(workerClient.runJob).toHaveBeenNthCalledWith(
+    2,
+    "IndexBottleSearchVectors",
+    { bottleId: bottle.id },
+  );
+});
+
 test.each([
   undefined,
   {},
@@ -42,6 +62,7 @@ test.each([
   { bottleId: -1 },
   { bottleId: 1.5 },
   { bottleId: "1" },
+  { bottleId: 1, generateDetails: "true" },
   { bottleId: 1, unexpected: true },
   { legacyId: 1 },
 ])("rejects malformed job input %#", async (input) => {

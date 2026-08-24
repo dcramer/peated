@@ -355,6 +355,53 @@ test("merge A into B", async ({ fixtures }) => {
   expect(tombstone.newEntityId).toEqual(newEntityB.id);
 });
 
+test("preserves generated Bottle content during an equivalent Entity merge", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({
+    name: "Legacy Bottler Name",
+    type: ["bottler"],
+  });
+  const destination = await fixtures.Entity({
+    name: "Canonical Bottler Name",
+    type: ["bottler"],
+  });
+  const bottle = await fixtures.Bottle({ bottlerId: source.id });
+  const tastingNotes = {
+    nose: "Preserved nose",
+    palate: "Preserved palate",
+    finish: "Preserved finish",
+  };
+  await db
+    .update(bottles)
+    .set({
+      description: "Preserved generated description",
+      descriptionSrc: "generated",
+      suggestedTags: ["smoke"],
+      tastingNotes,
+    })
+    .where(eq(bottles.id, bottle.id));
+  vi.mocked(pushUniqueJob).mockClear();
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+  ).toMatchObject({
+    bottlerId: destination.id,
+    description: "Preserved generated description",
+    descriptionSrc: "generated",
+    suggestedTags: ["smoke"],
+    tastingNotes,
+  });
+  expect(pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    bottleId: bottle.id,
+  });
+});
+
 test("merges an SMWS collision while replacing a duplicate distiller", async ({
   fixtures,
 }) => {

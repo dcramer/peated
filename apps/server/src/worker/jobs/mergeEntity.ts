@@ -524,6 +524,9 @@ async function performEntityMerge({
           input,
           actorId: actor.id,
           creationSource: "repair_workflow",
+          // An Entity merge changes the record ID, not the Bottle itself.
+          // Keep the Bottle's existing generated content.
+          invalidateGeneratedDetails: false,
         }),
       );
     }
