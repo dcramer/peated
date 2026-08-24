@@ -153,6 +153,8 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
         brand: "Compass Box",
         bottler: "Compass Box",
         expression: "Spice Tree Extravaganza",
+        // The adjacent bottle shows 49.3%. It is not the central product's ABV.
+        abv: null,
         edition: "Limited Edition",
       },
     },
@@ -304,6 +306,30 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
           includes: ["Distillery No. 1"],
         },
       ],
+    },
+  },
+  {
+    id: "image-extraction-production-miss-john-crabbie-virgin-oak-peated-abv",
+    name: "John Crabbie Virgin Oak Peated production ABV miss",
+    imagePath: assetPath("john-crabbie-virgin-oak-peated.webp"),
+    sourceUrl:
+      "https://www.masterofmalt.com/whiskies/bonnington/john-crabbie-virgin-oak-peated-whisky/",
+    expected: {
+      fields: {
+        abv: 40,
+      },
+    },
+  },
+  {
+    id: "image-extraction-production-miss-beauchamp-single-malt-abv",
+    name: "Beauchamp Single Malt production ABV miss",
+    imagePath: assetPath("beauchamp-single-malt.webp"),
+    sourceUrl:
+      "https://www.masterofmalt.com/whiskies/beauchamp-distillery/beauchamp-single-malt-whisky/",
+    expected: {
+      fields: {
+        abv: 46,
+      },
     },
   },
 ];
