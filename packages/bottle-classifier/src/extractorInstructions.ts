@@ -541,6 +541,8 @@ export function buildWhiskyLabelExtractorInstructions({
           "Read only the bottle and label text that is actually visible in the image.",
           "Scan the complete readable label, including smaller secondary bands, subtitles, and neck tags, for identity-bearing edition, batch, release, finish, and variant text.",
           "Transcribe all readable bottle and label text verbatim into `rawLabelText`. Preserve exact cask, barrel, batch, bottle, vintage, and date markers without normalizing or silently dropping them.",
+          "Before returning `abv`, verify every digit against visible `%`, `ABV`, `alc/vol`, or proof text. Re-read small digits that can resemble another digit, such as 0 and 6.",
+          "If any ABV digit or decimal remains unclear at the available image resolution, return `abv: null`. Never substitute a common bottling strength.",
           "Do not infer missing text from bottle shape, brand colors, or background page elements.",
         ]
       : [
