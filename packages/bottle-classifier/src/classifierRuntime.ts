@@ -906,16 +906,19 @@ export function createBottleClassifier(
       ? await options.overrides.extractFromText(label)
       : await extractor.extractFromText(label);
 
-  const extractBottleReferenceIdentity = async (
+  const extractBottleReferenceIdentityWithSource = async (
     reference: Pick<BottleReference, "name" | "imageUrl">,
-  ): Promise<BottleExtractedDetails | null> => {
+  ): Promise<{
+    identity: BottleExtractedDetails | null;
+    source: "image" | "text";
+  }> => {
     let imageExtractionError: Error | null = null;
 
     if (reference.imageUrl) {
       try {
         const extractedFromImage = await extractFromImage(reference.imageUrl);
         if (extractedFromImage) {
-          return extractedFromImage;
+          return { identity: extractedFromImage, source: "image" };
         }
       } catch (error) {
         imageExtractionError =
@@ -924,7 +927,10 @@ export function createBottleClassifier(
     }
 
     try {
-      return await extractFromText(reference.name);
+      return {
+        identity: await extractFromText(reference.name),
+        source: "text",
+      };
     } catch (error) {
       if (imageExtractionError) {
         throw imageExtractionError;
@@ -932,6 +938,11 @@ export function createBottleClassifier(
       throw error;
     }
   };
+
+  const extractBottleReferenceIdentity = async (
+    reference: Pick<BottleReference, "name" | "imageUrl">,
+  ): Promise<BottleExtractedDetails | null> =>
+    (await extractBottleReferenceIdentityWithSource(reference)).identity;
 
   const resolveInitialCandidates = async ({
     reference,
@@ -963,29 +974,43 @@ export function createBottleClassifier(
   const prepareBottleReferenceEvidence = async ({
     reference,
     extractedIdentity: suppliedExtractedIdentity,
+    extractedIdentitySource: suppliedExtractedIdentitySource,
     imageEvidence,
     initialCandidates,
     candidateExpansion,
     allowAutoIgnore = true,
   }: Pick<
     ClassifyBottleReferenceInput,
-    "reference" | "extractedIdentity" | "imageEvidence" | "initialCandidates"
+    | "reference"
+    | "extractedIdentity"
+    | "extractedIdentitySource"
+    | "imageEvidence"
+    | "initialCandidates"
   > & {
     candidateExpansion: CandidateExpansionMode;
     allowAutoIgnore?: boolean;
   }) => {
     const deterministicIdentitySeed = getDeterministicIdentitySeed(reference);
-    const rawExtractedIdentity =
+    // Supplied identities come from reviewed adapters unless the caller marks
+    // reused model extraction explicitly.
+    const extractedReference =
       suppliedExtractedIdentity !== undefined
-        ? suppliedExtractedIdentity
-        : (deterministicIdentitySeed ??
-          (await extractBottleReferenceIdentity(reference)));
+        ? {
+            identity: suppliedExtractedIdentity,
+            source: suppliedExtractedIdentitySource ?? "structured",
+          }
+        : deterministicIdentitySeed
+          ? { identity: deterministicIdentitySeed, source: "text" as const }
+          : await extractBottleReferenceIdentityWithSource(reference);
+    const rawExtractedIdentity = extractedReference.identity;
+    const extractedIdentitySource = extractedReference.source;
     const extractedIdentity = applyDeterministicIdentitySeed({
       reference,
       extractedIdentity: rawExtractedIdentity,
     });
     let preparedArtifacts = buildBottleClassificationArtifacts({
       extractedIdentity,
+      extractedIdentitySource,
       imageEvidence: imageEvidence ?? null,
     });
     const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
@@ -1339,6 +1364,7 @@ export function createBottleClassifier(
       const preparedEvidence = await prepareBottleReferenceEvidence({
         reference: parsedInput.reference,
         extractedIdentity: parsedInput.extractedIdentity,
+        extractedIdentitySource: parsedInput.extractedIdentitySource,
         imageEvidence: parsedInput.imageEvidence,
         initialCandidates: parsedInput.initialCandidates,
         candidateExpansion: parsedInput.candidateExpansion,
@@ -1368,9 +1394,17 @@ export function createBottleClassifier(
         identityAnchor: preparedEvidence.deterministicDecision,
         webSearchBudget: preparedEvidence.webSearchBudget,
       });
+      const agentResult = {
+        ...agentRun.agentResult,
+        // Extraction provenance is runtime-owned. Agent output cannot replace it.
+        artifacts: buildBottleClassificationArtifacts({
+          ...agentRun.agentResult.artifacts,
+          extractedIdentitySource: artifacts.extractedIdentitySource,
+        }),
+      };
       const finalized = await finalizeBottleClassifierAgentResult({
         reference: parsedInput.reference,
-        agentResult: agentRun.agentResult,
+        agentResult,
       });
       artifacts = finalized.artifacts;
 

@@ -260,6 +260,73 @@ function classifyStructuredExactName({
   });
 }
 
+function buildAbvMatchInput({
+  brand = "Example",
+  candidateAbv,
+  extractedAbv,
+  source,
+  webEvidence = "not_needed",
+}: {
+  brand?: string;
+  candidateAbv: number;
+  extractedAbv: number;
+  source: "image" | "structured";
+  webEvidence?: "supportive" | "conflicting" | "not_needed";
+}) {
+  const targetCandidate: BottleCandidate = {
+    ...existingPrivateCask,
+    bottleId: 9901,
+    fullName: `${brand} Single Malt`,
+    brand,
+    singleCask: null,
+    abv: candidateAbv,
+  };
+
+  return {
+    reference: {
+      name: `${brand} Single Malt`,
+      imageUrl:
+        source === "image" ? "https://example.com/bottle.jpg" : undefined,
+    },
+    decision: {
+      action: "match" as const,
+      rationale: "The Bottle identity matches the candidate.",
+      candidateBottleIds: [targetCandidate.bottleId],
+      identityScope: "product" as const,
+      aliasScope: "none" as const,
+      observation: null,
+      confidenceBasis: {
+        unresolvedRisks: [],
+        webEvidence,
+      },
+      matchedBottleId: targetCandidate.bottleId,
+      proposedBottle: null,
+    },
+    artifacts: buildBottleClassificationArtifacts({
+      candidates: [targetCandidate],
+      extractedIdentitySource: source,
+      extractedIdentity: {
+        brand,
+        bottler: null,
+        expression: "Single Malt",
+        series: null,
+        distillery: [],
+        category: "single_malt",
+        stated_age: null,
+        abv: extractedAbv,
+        release_year: null,
+        vintage_year: null,
+        cask_strength: null,
+        single_cask: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        edition: null,
+      },
+    }),
+  };
+}
+
 describe("finalizeBottleReferenceClassification", () => {
   test("rejects a proposed series that repeats the Brand", () => {
     const result = finalizeBottleReferenceClassification({
@@ -1373,6 +1440,95 @@ describe("finalizeBottleReferenceClassification", () => {
         artifacts,
       }),
     ).toMatchObject({ action: "no_match", matchedBottleId: null });
+  });
+
+  test.each([
+    ["John Crabbie", 46, 40],
+    ["Beauchamp", 40, 46],
+  ])(
+    "routes an image-only ABV conflict to review: %s",
+    (brand, extractedAbv, candidateAbv) => {
+      const result = finalizeBottleReferenceClassification(
+        buildAbvMatchInput({
+          brand,
+          extractedAbv,
+          candidateAbv,
+          source: "image",
+        }),
+      );
+
+      expect(result).toMatchObject({
+        action: "match",
+        matchedBottleId: 9901,
+        confidenceBasis: {
+          unresolvedRisks: [
+            {
+              category: "trait_conflict",
+              note: "Image-extracted ABV conflicts with the matched Bottle and needs review.",
+            },
+          ],
+          webEvidence: "not_needed",
+        },
+      });
+    },
+  );
+
+  test("keeps a structured ABV conflict as a hard failure", () => {
+    expect(
+      finalizeBottleReferenceClassification(
+        buildAbvMatchInput({
+          extractedAbv: 46,
+          candidateAbv: 40,
+          source: "structured",
+        }),
+      ),
+    ).toMatchObject({ action: "no_match", matchedBottleId: null });
+  });
+
+  test("keeps a matching image-derived ABV without adding a risk", () => {
+    const result = finalizeBottleReferenceClassification(
+      buildAbvMatchInput({
+        extractedAbv: 46,
+        candidateAbv: 46,
+        source: "image",
+      }),
+    );
+
+    expect(result).toMatchObject({
+      action: "match",
+      matchedBottleId: 9901,
+      confidenceBasis: { unresolvedRisks: [] },
+    });
+  });
+
+  test("accepts independent web evidence that supports the candidate ABV", () => {
+    const result = finalizeBottleReferenceClassification(
+      buildAbvMatchInput({
+        extractedAbv: 46,
+        candidateAbv: 40,
+        source: "image",
+        webEvidence: "supportive",
+      }),
+    );
+
+    expect(result).toMatchObject({
+      action: "match",
+      matchedBottleId: 9901,
+      confidenceBasis: { unresolvedRisks: [] },
+    });
+  });
+
+  test("rejects a candidate when web evidence supports the image ABV conflict", () => {
+    const result = finalizeBottleReferenceClassification(
+      buildAbvMatchInput({
+        extractedAbv: 46,
+        candidateAbv: 40,
+        source: "image",
+        webEvidence: "conflicting",
+      }),
+    );
+
+    expect(result).toMatchObject({ action: "no_match", matchedBottleId: null });
   });
 
   test("keeps the extracted SMWS title in exact-cask create proposals", () => {

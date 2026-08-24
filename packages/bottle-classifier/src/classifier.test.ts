@@ -2055,6 +2055,30 @@ describe("createBottleClassifier", () => {
     expect(run.modelMetadata).toBeNull();
   });
 
+  test("records image extraction provenance in classification artifacts", async () => {
+    const { classifier } = createTestClassifier({
+      extractedIdentityFromImage: wildTurkeyRareBreedRyeIdentity,
+      runBottleClassifierAgent: async ({ extractedIdentity }) => ({
+        decision: noMatchAgentDecision(),
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "Wild Turkey Rare Breed Rye",
+        imageUrl: "https://example.com/wild-turkey.png",
+      },
+    });
+
+    expect(result.artifacts.extractedIdentitySource).toBe("image");
+  });
+
   test("falls back to text extraction when image extraction returns null", async () => {
     const runBottleClassifierAgent = vi.fn(
       async ({ extractedIdentity }): Promise<ReasoningResult> => ({
@@ -2139,6 +2163,7 @@ describe("createBottleClassifier", () => {
       brand: "Springbank",
       stated_age: 10,
     });
+    expect(result.artifacts.extractedIdentitySource).toBe("text");
     expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
   });
 
@@ -2201,6 +2226,7 @@ describe("createBottleClassifier", () => {
       brand: "Ardbeg",
       expression: "Uigeadail",
     });
+    expect(result.artifacts.extractedIdentitySource).toBe("text");
     expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
   });
 

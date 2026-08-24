@@ -366,6 +366,11 @@ If behavior depends on brand context, marketed family meaning, source quality,
 or whether a fact is canonical versus observational, it belongs to the agent and
 review policy.
 
+An ABV conflict from image extraction alone is not a hard contradiction. Keep
+the agent's Match and add a trait-conflict risk so automated consumers require
+review. Supportive independent web evidence clears that risk. Conflicting web
+evidence or a structured source ABV conflict remains a hard contradiction.
+
 ### SMWS Deterministic Exception
 
 SMWS is the narrow whisky-domain exception because its cask-code syntax is a

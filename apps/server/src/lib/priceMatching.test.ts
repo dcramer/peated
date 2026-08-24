@@ -454,7 +454,10 @@ describe("priceMatching", () => {
     await resolveStorePriceMatchProposal(price.id);
 
     expect(runScrapedBottleReference).toHaveBeenCalledWith(
-      expect.objectContaining({ extractedIdentity: sourceIdentity }),
+      expect.objectContaining({
+        extractedIdentity: sourceIdentity,
+        extractedIdentitySource: "structured",
+      }),
     );
   });
 

@@ -15,6 +15,7 @@ describe("server bottleClassifier wrapper", () => {
       reason: "ignored",
       artifacts: {
         extractedIdentity: null,
+        extractedIdentitySource: null,
         candidates: [],
         searchEvidence: [],
         resolvedEntities: [],
@@ -44,6 +45,7 @@ describe("server bottleClassifier wrapper", () => {
         reason: "ignored",
         artifacts: {
           extractedIdentity: null,
+          extractedIdentitySource: null,
           imageEvidence: null,
           candidates: [],
           searchEvidence: [],
