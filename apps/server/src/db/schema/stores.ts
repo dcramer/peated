@@ -90,7 +90,7 @@ export const storePrices = pgTable(
     ),
     // Retained compatibility field for safe migrations; do not use in new logic.
     legacyReleaseId: bigint("release_id", { mode: "number" }),
-    hidden: boolean("hidden").default(false),
+    hidden: boolean("hidden").default(false).notNull(),
     price: integer("price").notNull(),
     currency: currencyEnum("currency").notNull(),
     volume: integer("volume").notNull(),
