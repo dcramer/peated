@@ -446,8 +446,6 @@ const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
 ];
 
 const generatedDetailsIdentityKeys = [
-  "name",
-  "fullName",
   "statedAge",
   "brandId",
   "bottlerId",
@@ -459,9 +457,6 @@ const generatedDetailsIdentityKeys = [
   "caskStrength",
   "vintageYear",
   "releaseYear",
-  "caskSize",
-  "caskType",
-  "caskFill",
 ] as const satisfies ReadonlyArray<keyof DesiredBottle>;
 
 function hasExactIdentityFields(patch: ExactPatch | undefined): boolean {
@@ -478,18 +473,23 @@ function sameValues(left: readonly number[], right: readonly number[]) {
 function generatedDetailsIdentityChanged({
   bottle,
   desired,
+  includeNameChange,
   currentDistillerIds,
   desiredDistillerIds,
 }: {
   bottle: Bottle;
   desired: DesiredBottle;
+  includeNameChange: boolean;
   currentDistillerIds: readonly number[];
   desiredDistillerIds: readonly number[];
 }) {
   return (
+    (includeNameChange &&
+      (bottle.name !== desired.name || bottle.fullName !== desired.fullName)) ||
     generatedDetailsIdentityKeys.some(
       (key) => JSON.stringify(bottle[key]) !== JSON.stringify(desired[key]),
-    ) || !sameValues(currentDistillerIds, desiredDistillerIds)
+    ) ||
+    !sameValues(currentDistillerIds, desiredDistillerIds)
   );
 }
 
@@ -1373,6 +1373,7 @@ export async function updateBottleInTransaction(
         !generatedDetailsIdentityChanged({
           bottle: member,
           desired,
+          includeNameChange: sharedIntent,
           currentDistillerIds: bottleDistillers.get(member.id) ?? [],
           desiredDistillerIds: sharedChanged
             ? stable.distillerIds

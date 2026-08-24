@@ -1049,7 +1049,7 @@ describe("Bottle updates", () => {
     expect((await loadGroupMembers(groupBefore.id))[1]).toEqual(siblingBefore);
   });
 
-  test("invalidates only generated content after a semantic identity change", async ({
+  test("clears generated content for Bottle changes but not cask details", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -1087,6 +1087,25 @@ describe("Bottle updates", () => {
       context: contextFor(mod),
     });
     expect(contentResult.bottle).toMatchObject({
+      description: "Generated description",
+      descriptionSrc: "generated",
+      suggestedTags: ["smoke", "fruit"],
+      tastingNotes: updatedNotes,
+    });
+
+    const caskResult = await updateBottle({
+      bottleId: first.bottle.id,
+      input: {
+        caskType: "bourbon",
+        caskSize: "barrel",
+        caskFill: "1st_fill",
+      },
+      context: contextFor(mod),
+    });
+    expect(caskResult.bottle).toMatchObject({
+      caskType: "bourbon",
+      caskSize: "barrel",
+      caskFill: "1st_fill",
       description: "Generated description",
       descriptionSrc: "generated",
       suggestedTags: ["smoke", "fruit"],
