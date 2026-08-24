@@ -10,9 +10,8 @@ The central invariant is alias safety: a generic listing title MUST NOT become a
 
 - Add explicit alias-safety metadata for store-price classification outcomes.
 - Let the classifier say whether the observed listing title is safe as a reusable global alias, without categorizing every reason it is unsafe.
-- Add persistence semantics for source-scoped listing assignments so an exact source item can be matched while forbidding global alias creation from generic listing names.
-- Extend automation policy so source-scoped assignments can be trusted only when the exact source evidence is concrete, while generic creates remain review-only or no-match.
-- Add production-miss and curated eval coverage for generic-title cases, including negative coverage that prevents broad parent creation from family evidence alone.
+- Preserve a stable retailer product identity on each StorePrice so repeated scrapes update the same exact-or-unresolved row instead of matching by display title.
+- Preserve an identity fingerprint separately from price and presentation data. Reuse the row's approved Bottle only while that identity fingerprint remains unchanged.
 - Preserve deterministic policy: code may validate concrete enum values and impossible states, but alias eligibility remains a classifier/review-policy decision.
 
 ## Capabilities
@@ -29,6 +28,6 @@ The central invariant is alias safety: a generic listing title MUST NOT become a
 
 - `packages/bottle-classifier`: decision schema, prompts/instructions, review policy, eval fixture schema, production-miss fixtures, and replay recordings.
 - `apps/server/src/lib/priceMatching*`: proposal mapping, automation assessment, approval application, alias assignment behavior, and observation metadata.
-- Existing `store_price`, `bottle_observation`, proposal, and decision-log rows carry the MVP assignment and evidence. Reuse by a future source row is deferred and may require separate schema work later.
+- Existing `store_price`, `bottle_observation`, proposal, and decision-log rows carry the MVP assignment and evidence. Repeated scrapes reuse the same StorePrice row; this change adds no second identity mapping table.
 - `docs/features/store-price-matching.md` and `docs/architecture/bottle-classifier.md`: document the distinction between reusable global aliases and source-specific listing identity.
 - Scraper ingestion paths that create `store_price` rows: future matching should be able to use stable source identifiers, URL/product ids, and source fingerprints without globalizing generic titles.

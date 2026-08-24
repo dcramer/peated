@@ -330,6 +330,157 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
+  test("reuses an exact Bottle assignment for unchanged source identity", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({ name: "Verified Source Bottle" });
+    const listing = {
+      externalProductId: "stable-product-123",
+      sourceFingerprint: "catalog-version-1",
+      barcode: "036602301979",
+      sourceBottleIdentity: {
+        expression: "Verified Source Expression",
+        abv: 46,
+      },
+      name: "Generic Retailer Whisky",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 750,
+      url: "https://example.com/products/stable-product",
+    };
+
+    await createStorePricesAsPeated({ site: site.type, prices: [listing] });
+    const initial = await db.query.storePrices.findFirst({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    await db
+      .update(storePrices)
+      .set({ bottleId: bottle.id })
+      .where(eq(storePrices.id, initial!.id));
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          ...listing,
+          barcode: undefined,
+          sourceBottleIdentity: undefined,
+          price: 7_500,
+          url: "https://example.com/products/stable-product-new-slug",
+        },
+      ],
+    });
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject({
+      id: initial!.id,
+      bottleId: bottle.id,
+      price: 7_500,
+      sourceFingerprint: initial!.sourceFingerprint,
+    });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
+  });
+
+  test("clears an exact assignment when source identity changes", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({ name: "Previous Source Bottle" });
+    const listing = {
+      externalProductId: "repurposed-product-123",
+      sourceFingerprint: "catalog-version-1",
+      name: "Generic Retailer Whisky",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 750,
+      url: "https://example.com/products/repurposed-product",
+    };
+
+    await createStorePricesAsPeated({ site: site.type, prices: [listing] });
+    const initial = await db.query.storePrices.findFirst({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    await db
+      .update(storePrices)
+      .set({ bottleId: bottle.id })
+      .where(eq(storePrices.id, initial!.id));
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [{ ...listing, sourceFingerprint: "catalog-version-2" }],
+    });
+
+    const updated = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, initial!.id),
+    });
+    expect(updated).toMatchObject({
+      bottleId: null,
+      externalProductId: listing.externalProductId,
+    });
+    expect(updated!.sourceFingerprint).not.toBe(initial!.sourceFingerprint);
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: initial!.id },
+    );
+  });
+
+  test("scopes the same external product id to each store", async ({
+    fixtures,
+  }) => {
+    const firstSite = await fixtures.ExternalSiteOrExisting({
+      type: "totalwine",
+    });
+    const secondSite = await fixtures.ExternalSiteOrExisting({
+      type: "healthyspirits",
+    });
+    const bottle = await fixtures.Bottle({ name: "First Store Bottle" });
+    const common = {
+      externalProductId: "shared-product-id",
+      sourceFingerprint: "catalog-version-1",
+      name: "Generic Retailer Whisky",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 750,
+    };
+
+    await createStorePricesAsPeated({
+      site: firstSite.type,
+      prices: [{ ...common, url: "https://example.com/first-store/product" }],
+    });
+    const firstPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.externalSiteId, firstSite.id),
+    });
+    await db
+      .update(storePrices)
+      .set({ bottleId: bottle.id })
+      .where(eq(storePrices.id, firstPrice!.id));
+
+    await createStorePricesAsPeated({
+      site: secondSite.type,
+      prices: [{ ...common, url: "https://example.com/second-store/product" }],
+    });
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, firstSite.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, secondSite.id),
+      }),
+    ).toMatchObject({ bottleId: null });
+  });
+
   test("converges compatible legacy rows that share a retailer URL", async ({
     fixtures,
   }) => {
@@ -810,7 +961,7 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
-  test("an unresolved retry preserves a durable Bottle and queues resolution", async ({
+  test("a legacy retry preserves a durable Bottle and establishes its fingerprint", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -849,10 +1000,11 @@ describe("POST /external-sites/:site/prices", () => {
     ).toMatchObject({
       bottleId: bottle.id,
       price: 6_999,
+      sourceFingerprint: expect.any(String),
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      { priceId: existing.id },
+      expect.anything(),
     );
   });
 

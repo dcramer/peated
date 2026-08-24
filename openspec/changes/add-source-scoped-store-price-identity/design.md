@@ -38,10 +38,10 @@ The George Dickel case is the negative example. Public evidence shows George Dic
 
 - Make alias safety the hard boundary: generic listing titles must never become reusable aliases.
 - Represent source-specific listing identity separately from reusable canonical product identity.
-- Allow exact source evidence to auto-assign a store price to an existing bottle/release without creating a global alias from a generic title.
+- Preserve an approved exact Bottle assignment when the same source item is scraped again with unchanged identity evidence.
 - Keep broad create decisions blocked when evidence supports only a family or sibling set, not a reusable Peated bottle identity.
 - Support future scraper listings by keying source-scoped verification to stable source identifiers, such as internal store listing ids, product ids, canonical URLs, SKUs, or source fingerprints rather than display names alone.
-- Add evals that cover both positive source-specific assignment and negative generic-title broad-create prevention.
+- Keep the classifier contract at exact Bottle match, exact Bottle create, or no safe match.
 - Keep deterministic code limited to concrete validation, persistence scopes, and impossible-state blockers.
 
 **Non-Goals:**
@@ -81,34 +81,25 @@ that exact row. `bottle_observation` and the incoming decision log preserve the
 source evidence and moderation history. The approval does not create a
 BottleAlias when `aliasScope` is `none` or missing.
 
-This does not let a future StorePrice row reuse the decision. Reuse by a future
-row requires a stable source key and remains deferred. The MVP adds no table and
-does not use a display title as that key.
+Repeated scrapes locate that row by the external site plus its strongest stable
+source product identifier, with canonical URL as the fallback. The row stores a
+fingerprint of Bottle-relevant source evidence. An unchanged fingerprint keeps
+the approved exact Bottle assignment without calling the classifier again. A
+changed fingerprint clears an assignment that cannot be established again by a
+current deterministic match and queues normal classification. A missing legacy
+fingerprint establishes the first baseline without invalidating an existing
+reviewed assignment.
 
-### Future decision: Persist reusable source identity
-
-Use existing `bottle_observation` only if it can support lookup semantics safely. Otherwise add a purpose-built table, likely keyed by:
-
-- `externalSiteId`
-- internal store listing id when a scraper can provide one
-- source product identifier when available
-- canonicalized source URL or URL fingerprint
-- optional listing name fingerprint
-- matched `bottleId` / `releaseId`
-- `aliasScope`, evidence summary/hash, model, confidence, reviewed/verified actor
-
-Rationale: future scraper listings need to verify brand-new rows from stable source identity, not from generic display text. An internal store listing id is often the strongest source-scoped key because it can distinguish two same-title products from the same site. Observations preserve evidence, but they do not currently define reusable source-scoped matching behavior.
-
-Alternative considered: Store all metadata only in `store_price_match_proposal`. Rejected because proposals are per-price and retryable; scraper matching needs durable source identity across future listing rows.
+This MVP adds no reusable verification table. A new StorePrice row never
+inherits identity from another row, and display title is never a source key.
 
 ### Decision: Ingestion identity should prefer source keys over title keys
 
-Extend scraper output and `StorePriceInputSchema` with source identity fields such as:
-
-- `sourceProductId`
-- `sourceVariantId`
-- `sourceSku`
-- `sourceFingerprint`
+Use one `externalProductId` field for the strongest stable identifier exposed
+by each source, whether that source calls it a product id, variant id, SKU, or
+grouping id. Also accept an optional `sourceFingerprint` when a source exposes a
+stable identity version. The server derives a conservative fingerprint from
+Bottle-relevant listing evidence when the source omits one.
 
 When at least one stable source key is present, ingestion SHALL use that source key plus `externalSiteId` as the primary identity for upsert/dedupe. The existing `(externalSiteId, lower(name), volume)` behavior can remain only as a fallback for sources without stable ids.
 
@@ -132,22 +123,12 @@ Deterministic code MUST NOT infer source specificity from brand strings, title s
 
 Rationale: The user's policy is to trust the agent as much as safely possible, while reserving determinism for 100% concrete rules.
 
-### Decision: Automation gates split create safety from assignment safety
+### Decision: Do not change classifier actions or automation thresholds
 
-Existing-match or correction assignment can become automation-eligible when:
-
-- the target bottle/release is a known candidate
-- classifier confidence clears the existing-match threshold
-- deterministic blockers are empty
-- exact source evidence exists and `aliasScope = none`
-
-Create-new automation remains stricter:
-
-- `aliasScope` must be `global_alias` or a valid exact-cask bottle identity must be supported by concrete source evidence
-- required canonical traits must be externally validated or otherwise concretely supported
-- generic or underspecified listing identity blocks auto-create
-
-Rationale: assigning one listing is lower blast radius than creating a reusable bottle or alias.
+The classifier continues to return `match`, `create_bottle`, or `no_match`.
+Source-key reuse is a persistence decision for the same StorePrice row, not a
+new classifier action or a new way to infer Bottle identity. Existing create
+and verification gates remain unchanged.
 
 ### Decision: Evals encode behavior, not the same bottle-specific tweak
 
@@ -172,19 +153,16 @@ Rationale: This avoids overfitting to the exact miss while still preserving the 
 ## Migration Plan
 
 1. Extend classifier and server schemas with alias-safety metadata, defaulting legacy decisions to conservative behavior.
-2. Extend scraper output, input schemas, and ingestion persistence to carry stable source ids where available.
-3. Add source-scoped persistence, either through safe `bottle_observation` extensions or a new source identity table.
+2. Extend scraper output, input schemas, and StorePrice persistence to carry one stable source product id and an identity fingerprint.
+3. Reuse the exact assignment only on the same StorePrice row while its identity fingerprint is unchanged.
 4. Update approval flow to skip global alias assignment when `aliasScope = none`.
 5. Update ingestion/matching to consult source-scoped verification only by stable source identity, never by display title alone.
-6. Add eval schema expectations and fixtures before enabling automation gates.
-7. Enable automation only after targeted tests and evals pass.
+6. Keep classifier behavior and automation thresholds unchanged.
 
 Rollback strategy: keep the new metadata ignored by automation behind conservative defaults. If source-scoped matching causes issues, disable lookup/automation while preserving observations for review.
 
 ## Open Questions
 
 - Which scraper fields are reliably available across sites: internal store listing id, product id, canonical URL, SKU, page hash, image URL, or another stable source key?
-- Should source-scoped verification live in `bottle_observation` facts or a new table with first-class lookup indexes?
-- Should source-scoped assignment be visible in the admin queue as a distinct proposal subtype or only as proposal metadata?
-- How long should source-scoped verification remain reusable before requiring revalidation?
-- Do we need source-scoped aliases for user reviews as well, or only store-price scraper rows?
+- Should a later change add time-based revalidation in addition to identity-fingerprint changes?
+- Do user reviews need their own source-key persistence, independent of StorePrice identity?

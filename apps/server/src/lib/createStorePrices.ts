@@ -27,6 +27,7 @@ import {
 } from "@peated/server/schemas";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { createHash } from "node:crypto";
 import { z } from "zod";
 
 /**
@@ -52,6 +53,51 @@ type StorePriceIdentity = {
   externalSiteId: number;
   url: string;
 };
+
+function getSourceFingerprint({
+  sourceVersion,
+  normalizedName,
+  volume,
+  normalizedBarcode,
+  sourceBottleIdentity,
+}: {
+  sourceVersion: string | null;
+  normalizedName: string;
+  volume: number;
+  normalizedBarcode: string | null;
+  sourceBottleIdentity: ParsedStorePrice["sourceBottleIdentity"] | null;
+}) {
+  // Price, image, and URL changes do not change Bottle identity. A source may
+  // add its own version, but it cannot hide changes in the observed facts.
+  const identityEvidence = sourceBottleIdentity
+    ? [
+        sourceBottleIdentity.brand,
+        sourceBottleIdentity.bottler,
+        sourceBottleIdentity.expression,
+        sourceBottleIdentity.series,
+        sourceBottleIdentity.distillery,
+        sourceBottleIdentity.category,
+        sourceBottleIdentity.stated_age,
+        sourceBottleIdentity.abv,
+        sourceBottleIdentity.release_year,
+        sourceBottleIdentity.vintage_year,
+        sourceBottleIdentity.cask_strength,
+        sourceBottleIdentity.single_cask,
+        sourceBottleIdentity.cask_type,
+        sourceBottleIdentity.cask_size,
+        sourceBottleIdentity.cask_fill,
+        sourceBottleIdentity.edition,
+      ]
+    : null;
+  const evidence = JSON.stringify([
+    sourceVersion,
+    normalizeBottleAliasKey(normalizedName),
+    volume,
+    normalizedBarcode,
+    identityEvidence,
+  ]);
+  return createHash("sha256").update(evidence).digest("hex");
+}
 
 function getStorePriceIdentityCondition({
   externalProductId,
@@ -189,6 +235,13 @@ async function persistStorePriceInTransaction({
   // the locks prevents two simultaneous URL/id changes from deadlocking.
   await lockStorePriceIdentity(tx, identity);
   let existing = await findStorePriceForUpdate(tx, identity);
+  let sourceFingerprint = getSourceFingerprint({
+    sourceVersion: input.sourceFingerprint ?? null,
+    normalizedName: name,
+    volume: input.volume,
+    normalizedBarcode: normalizedBarcode?.gtin14 ?? null,
+    sourceBottleIdentity: input.sourceBottleIdentity ?? null,
+  });
   if (!existing) {
     const [created] = await tx
       .insert(storePrices)
@@ -196,6 +249,7 @@ async function persistStorePriceInTransaction({
         bottleId,
         externalSiteId,
         externalProductId: input.externalProductId ?? null,
+        sourceFingerprint,
         name,
         volume: input.volume,
         price: input.price,
@@ -206,7 +260,7 @@ async function persistStorePriceInTransaction({
       })
       .onConflictDoNothing()
       .returning();
-    if (created) return created;
+    if (created) return { price: created, sourceIdentityReused: false };
 
     existing = await findStorePriceForUpdate(tx, identity);
     if (!existing) {
@@ -227,9 +281,27 @@ async function persistStorePriceInTransaction({
     );
   }
 
-  const persistedBottleId =
-    bottleId !== null &&
-    (existing.bottleId === null || existing.bottleId === bottleId)
+  sourceFingerprint = getSourceFingerprint({
+    sourceVersion: input.sourceFingerprint ?? null,
+    normalizedName: name,
+    volume: input.volume,
+    normalizedBarcode:
+      input.barcode === undefined
+        ? (existing.barcode?.padStart(14, "0") ?? null)
+        : (normalizedBarcode?.gtin14 ?? null),
+    sourceBottleIdentity:
+      input.sourceBottleIdentity ?? existing.sourceBottleIdentity,
+  });
+
+  const identityChanged =
+    existing.sourceFingerprint !== null &&
+    existing.sourceFingerprint !== sourceFingerprint;
+  const sourceIdentityReused =
+    !identityChanged && existing.bottleId !== null && bottleId === null;
+  const persistedBottleId = identityChanged
+    ? bottleId
+    : bottleId !== null &&
+        (existing.bottleId === null || existing.bottleId === bottleId)
       ? bottleId
       : existing.bottleId;
   const barcodeUpdate =
@@ -242,7 +314,9 @@ async function persistStorePriceInTransaction({
     .update(storePrices)
     .set({
       bottleId: persistedBottleId,
+      legacyReleaseId: identityChanged ? null : existing.legacyReleaseId,
       externalProductId: input.externalProductId ?? existing.externalProductId,
+      sourceFingerprint,
       name,
       volume: input.volume,
       price: input.price,
@@ -260,7 +334,7 @@ async function persistStorePriceInTransaction({
       `Store price changed while it was being saved (${existing.id}).`,
     );
   }
-  return updated;
+  return { price: updated, sourceIdentityReused };
 }
 
 /** Persists one scraper batch with attribution chosen by the owning boundary. */
@@ -325,24 +399,28 @@ export async function createStorePrices(
             normalizedBarcode,
             bottleId,
           });
-          const priceId = persisted.id;
-          const persistedBottleId = persisted.bottleId;
+          const priceId = persisted.price.id;
+          const persistedBottleId = persisted.price.bottleId;
           const hasDirectMatch =
-            bottleId !== null && persistedBottleId === bottleId;
+            persisted.sourceIdentityReused ||
+            (bottleId !== null && persistedBottleId === bottleId);
           const hasAliasMatch =
-            hasDirectMatch && bottleMatch.source === "alias";
-          const aliasAssignment = hasAliasMatch
-            ? await assignBottleAliasInTransaction(tx, {
-                name: aliasKey,
-                backfillNames: [name, sp.name],
-                externalSiteId: site.id,
-                volume: sp.volume,
-                assignmentSource: "source_approved",
-                assignedByActorId: actorId,
-                bottleId,
-                sourceAliasIdentity: match?.alias,
-              })
-            : null;
+            !persisted.sourceIdentityReused &&
+            hasDirectMatch &&
+            bottleMatch.source === "alias";
+          const aliasAssignment =
+            bottleId !== null && hasAliasMatch
+              ? await assignBottleAliasInTransaction(tx, {
+                  name: aliasKey,
+                  backfillNames: [name, sp.name],
+                  externalSiteId: site.id,
+                  volume: sp.volume,
+                  assignmentSource: "source_approved",
+                  assignedByActorId: actorId,
+                  bottleId,
+                  sourceAliasIdentity: match?.alias,
+                })
+              : null;
 
           await tx
             .insert(storePriceHistories)
@@ -358,9 +436,13 @@ export async function createStorePrices(
           return {
             price: {
               id: priceId,
-              imageUrl: persisted.imageUrl,
+              imageUrl: persisted.price.imageUrl,
               hasDirectMatch,
-              directMatchSource: hasDirectMatch ? bottleMatch.source : null,
+              directMatchSource: persisted.sourceIdentityReused
+                ? "source"
+                : hasDirectMatch
+                  ? bottleMatch.source
+                  : null,
             },
             aliasAssignment,
           };

@@ -52,24 +52,29 @@ The price-matching approval flow SHALL support assigning an exact store listing 
 - **WHEN** a later listing has the same generic display title but lacks the same stable source identifier, URL, SKU, or source fingerprint
 - **THEN** the system SHALL NOT reuse the previous source-scoped assignment by title alone.
 
-### Requirement: Source-scoped verification is reusable only by stable source identity
+### Requirement: Exact assignment is reusable only on the same stable source item
 
-The system SHALL persist source-scoped verification in a durable form that can be reused for future scraper listings only when the new row matches stable source identity scoped to the external site and source-key type, such as an internal store listing id, source product id, canonical URL, SKU, or accepted fingerprint, not merely display text.
+The system SHALL update the same StorePrice row when a repeated scrape matches a stable source product identity scoped to its external site, and SHALL preserve that row's exact Bottle assignment only while Bottle-relevant source evidence is unchanged.
 
 #### Scenario: New scraper row matches verified source identity
 
-- **WHEN** a brand-new scraper row carries the same verified external site, source-key type, and source-key value as a prior source-scoped verification
-- **THEN** the system SHALL be able to assign the same bottle/release without running generic title alias matching.
+- **WHEN** a scrape carries the same external site and stable source product identifier as an existing StorePrice and its identity fingerprint is unchanged
+- **THEN** ingestion SHALL update that StorePrice and preserve its exact Bottle assignment without running generic classifier matching.
+
+#### Scenario: Existing source item changes identity
+
+- **WHEN** a scrape carries the same source item key but its Bottle-relevant identity fingerprint changed
+- **THEN** ingestion SHALL clear an assignment that current deterministic evidence cannot establish and queue normal classification.
 
 #### Scenario: Same source key value appears at another store
 
-- **WHEN** another store has the same SKU, UPC, product id string, or source-key value
-- **THEN** the system SHALL NOT reuse a source-scoped verification unless the external site and key type also match the verified source identity.
+- **WHEN** another store has the same product id string
+- **THEN** the system SHALL NOT reuse the first store's StorePrice or Bottle assignment.
 
 #### Scenario: Source identity is insufficient
 
-- **WHEN** a scraper row has only a generic display title and no stable verified source identity
-- **THEN** the system SHALL fall back to normal classifier review and MUST NOT use a source-scoped verification from another source item.
+- **WHEN** a scraper row has only a generic display title and no stable source product id or canonical URL
+- **THEN** the system SHALL fall back to normal classifier review and MUST NOT reuse another StorePrice by title.
 
 ### Requirement: Ingestion preserves stable source ids
 
@@ -103,20 +108,6 @@ New classifier decisions SHALL NOT create or update reusable bottle aliases unle
 
 - **WHEN** a new classifier decision explicitly marks the listing label as eligible for global alias storage
 - **THEN** approval MAY use the existing global alias path if all other match/create requirements pass.
-
-### Requirement: Automation respects source scope
-
-Automation SHALL distinguish low-blast-radius source-scoped assignment from high-blast-radius reusable create or alias behavior.
-
-#### Scenario: Source-scoped existing match can verify
-
-- **WHEN** the classifier returns a high-confidence existing match with exact source-specific evidence, no deterministic blockers, and no global alias eligibility
-- **THEN** automation MAY verify the assignment while preserving source-scoped alias behavior.
-
-#### Scenario: Generic create remains blocked
-
-- **WHEN** the classifier proposes creating a bottle from a generic or underspecified listing identity
-- **THEN** automation SHALL block auto-create even if web evidence supports the broader product family.
 
 ### Requirement: Evals cover source specificity and alias safety
 

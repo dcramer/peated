@@ -76,6 +76,7 @@ export const storePrices = pgTable(
       .references(() => externalSites.id)
       .notNull(),
     externalProductId: text("external_product_id"),
+    sourceFingerprint: text("source_fingerprint"),
     name: text("name").notNull(),
     imageUrl: text("image_url"),
     barcode: varchar("barcode", { length: 14 }),
