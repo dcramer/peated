@@ -7,7 +7,7 @@ export function mergeBottleCandidateFamilyContext(
   candidate: BottleCandidateFamilyContext,
 ): BottleCandidateFamilyContext {
   if (!existing) {
-    return candidate;
+    return candidate ?? null;
   }
   if (!candidate) {
     return existing;
