@@ -14,7 +14,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
 // Compose details as Bottle schema + extra fields to allow OpenAPI $ref via allOf
@@ -69,7 +69,9 @@ export default procedure
     const [lastPrice] = await db
       .select()
       .from(storePrices)
-      .where(eq(storePrices.bottleId, bottle.id))
+      .where(
+        and(eq(storePrices.bottleId, bottle.id), eq(storePrices.hidden, false)),
+      )
       .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
       .limit(1);
 

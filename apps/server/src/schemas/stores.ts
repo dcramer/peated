@@ -21,7 +21,11 @@ export const StorePriceSchema = z.object({
     .nullable()
     .readonly()
     .describe("GTIN barcode claimed by the store"),
-  price: z.number().describe("Current price of the listing"),
+  price: z
+    .number()
+    .describe(
+      "Current listing price in the currency's smallest unit (for example, cents)",
+    ),
   currency: CurrencyEnum.describe("Currency of the price"),
   url: z.string().describe("URL to the product page"),
   volume: z.number().describe("Listed volume in milliliters"),
@@ -73,7 +77,11 @@ export const StorePriceInputSchema = z.object({
     .trim()
     .min(1, "Required")
     .describe("Name of the product as listed by the store"),
-  price: z.number().describe("Current price of the listing"),
+  price: z
+    .number()
+    .describe(
+      "Current listing price in the currency's smallest unit (for example, cents)",
+    ),
   currency: CurrencyEnum.describe("Currency of the price"),
   volume: z
     .number()

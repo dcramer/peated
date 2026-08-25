@@ -67,4 +67,73 @@ describe("GET /bottles/:bottle/price-history", () => {
 
     expect(results.map(({ avgPrice }) => avgPrice)).toEqual([20]);
   });
+
+  test("rounds after calculating the precise per-milliliter price", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Fractional per-milliliter history",
+      price: 12_450,
+      volume: 750,
+    });
+
+    const { results } = await routerClient.bottles.prices.history({
+      bottle: bottle.id,
+    });
+
+    expect(results.map(({ avgPrice }) => avgPrice)).toEqual([17]);
+  });
+
+  test("filters by the currency recorded on each history row", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      currency: "usd",
+      name: "Listing with mixed-currency history",
+    });
+    await fixtures.StorePriceHistory({
+      priceId: price.id,
+      currency: "eur",
+      date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      price: 15_000,
+    });
+
+    const { results } = await routerClient.bottles.prices.history({
+      bottle: bottle.id,
+      currency: "eur",
+    });
+
+    expect(results).toHaveLength(1);
+    expect(results[0].avgPrice).toBe(20);
+  });
+
+  test("excludes hidden and older-than-one-year history", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const visiblePrice = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Visible current history",
+    });
+    await fixtures.StorePriceHistory({
+      priceId: visiblePrice.id,
+      date: "2020-01-01",
+    });
+    await fixtures.StorePrice({
+      bottleId: bottle.id,
+      hidden: true,
+      name: "Hidden current history",
+    });
+
+    const { results } = await routerClient.bottles.prices.history({
+      bottle: bottle.id,
+    });
+
+    expect(results).toHaveLength(1);
+    expect(results[0].date).not.toBe("2020-01-01");
+  });
 });

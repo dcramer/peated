@@ -15,7 +15,7 @@ export default procedure
     path: "/bottles/{bottle}/price-history",
     summary: "Get bottle price history",
     description:
-      "Retrieve historical price data for a bottle including average, minimum, and maximum prices over time",
+      "Retrieve one year of historical prices normalized by listed volume. Values use the currency's smallest unit per milliliter (for example, cents per mL)",
     spec: (spec) => ({
       ...spec,
       operationId: "getBottlePriceHistory",
@@ -32,9 +32,21 @@ export default procedure
       results: z.array(
         z.object({
           date: z.string(),
-          avgPrice: z.number(),
-          minPrice: z.number(),
-          maxPrice: z.number(),
+          avgPrice: z
+            .number()
+            .describe(
+              "Average price in the currency's smallest unit per milliliter",
+            ),
+          minPrice: z
+            .number()
+            .describe(
+              "Minimum price in the currency's smallest unit per milliliter",
+            ),
+          maxPrice: z
+            .number()
+            .describe(
+              "Maximum price in the currency's smallest unit per milliliter",
+            ),
         }),
       ),
     }),
@@ -53,16 +65,17 @@ export default procedure
 
     const baseWhere = [
       eq(storePrices.bottleId, bottle.id),
-      eq(storePrices.currency, input.currency),
-      sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
+      eq(storePrices.hidden, false),
+      eq(storePriceHistories.currency, input.currency),
+      sql`${storePriceHistories.date} >= CURRENT_DATE - interval '1 year'`,
     ];
 
     const results = await db
       .select({
         date: storePriceHistories.date,
-        avgPrice: sql<string>`ROUND(AVG(${storePriceHistories.price} / ${storePriceHistories.volume}))`,
-        minPrice: sql<string>`ROUND(MIN(${storePriceHistories.price} / ${storePriceHistories.volume}))`,
-        maxPrice: sql<string>`ROUND(MAX(${storePriceHistories.price} / ${storePriceHistories.volume}))`,
+        avgPrice: sql<string>`ROUND(AVG(${storePriceHistories.price}::numeric / NULLIF(${storePriceHistories.volume}, 0)))`,
+        minPrice: sql<string>`ROUND(MIN(${storePriceHistories.price}::numeric / NULLIF(${storePriceHistories.volume}, 0)))`,
+        maxPrice: sql<string>`ROUND(MAX(${storePriceHistories.price}::numeric / NULLIF(${storePriceHistories.volume}, 0)))`,
       })
       .from(storePriceHistories)
       .innerJoin(storePrices, eq(storePriceHistories.priceId, storePrices.id))

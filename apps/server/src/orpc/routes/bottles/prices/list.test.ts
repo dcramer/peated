@@ -116,4 +116,23 @@ describe("GET /bottles/:bottle/prices", () => {
 
     expect(result.results.map(({ id }) => id)).toEqual([current.id]);
   });
+
+  test("reports validity using the same seven-day window as filtering", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const current = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Two-day-old listing",
+      updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    });
+
+    const result = await routerClient.bottles.prices.list({
+      bottle: bottle.id,
+      onlyValid: true,
+    });
+
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({ id: current.id, isValid: true });
+  });
 });
