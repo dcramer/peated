@@ -1675,6 +1675,48 @@ describe("price match queue", () => {
     ]);
   });
 
+  test("filters queue items and counts by site", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const missionLiquor = await fixtures.ExternalSiteOrExisting({
+      type: "missionliquor",
+    });
+    const whiskyWorld = await fixtures.ExternalSiteOrExisting({
+      type: "whiskyworld",
+    });
+    const [missionPrice, whiskyWorldPrice] = await Promise.all([
+      fixtures.StorePrice({ externalSiteId: missionLiquor.id }),
+      fixtures.StorePrice({ externalSiteId: whiskyWorld.id }),
+    ]);
+    const [missionProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values([
+        {
+          priceId: missionPrice.id,
+          status: "errored",
+          proposalType: "no_match",
+        },
+        {
+          priceId: whiskyWorldPrice.id,
+          status: "errored",
+          proposalType: "no_match",
+        },
+      ])
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.list(
+      { kind: "errored", site: "missionliquor" },
+      { context: { user } },
+    );
+
+    expect(result.results.map((item) => item.id)).toEqual([
+      missionProposal!.id,
+    ]);
+    expect(result.stats).toEqual({
+      actionableCount: 1,
+      processingCount: 0,
+    });
+  });
+
   test("sorts queue items by queue age when requested", async ({
     fixtures,
   }) => {
@@ -3668,6 +3710,9 @@ describe("price match queue", () => {
   }) => {
     const user = await fixtures.User({ mod: true });
     const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    const otherSite = await fixtures.ExternalSiteOrExisting({
+      type: "totalwine",
+    });
     const [firstPrice, secondPrice, ignoredPrice] = await Promise.all([
       fixtures.StorePrice({
         externalSiteId: site.id,
@@ -3678,8 +3723,8 @@ describe("price match queue", () => {
         name: "SMWS Retry Two",
       }),
       fixtures.StorePrice({
-        externalSiteId: site.id,
-        name: "Different Search Result",
+        externalSiteId: otherSite.id,
+        name: "SMWS Retry Other Site",
       }),
     ]);
 
@@ -3706,7 +3751,7 @@ describe("price match queue", () => {
     });
 
     const result = await routerClient.prices.matchQueue.retryAll(
-      { query: "SMWS Retry" },
+      { query: "SMWS Retry", site: "smws" },
       { context: { user } },
     );
     const runItems = await db
@@ -3722,13 +3767,13 @@ describe("price match queue", () => {
       processedCount: 0,
       progress: 0,
       query: "SMWS Retry",
+      site: "smws",
       status: "pending",
     });
     expect(runItems).toHaveLength(2);
-    expect(runItems.map((item) => item.proposalId).sort()).toEqual([
-      firstProposal.id,
-      secondProposal.id,
-    ]);
+    expect(
+      runItems.map((item) => item.proposalId).sort((a, b) => a - b),
+    ).toEqual([firstProposal.id, secondProposal.id]);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ProcessStorePriceMatchRetryRun",
       {

@@ -40,6 +40,7 @@ export type SerializedStorePriceMatchRetryRun = {
   query: string;
   resolvedCount: number;
   reviewableCount: number;
+  site: StorePriceMatchRetryRun["site"];
   skippedCount: number;
   startedAt: string | null;
   status: StorePriceMatchRetryRun["status"];
@@ -118,6 +119,7 @@ export function serializeStorePriceMatchRetryRun(
     query: run.query,
     resolvedCount: run.resolvedCount,
     reviewableCount: run.reviewableCount,
+    site: run.site,
     skippedCount: run.skippedCount,
     startedAt: run.startedAt ? run.startedAt.toISOString() : null,
     status: run.status,

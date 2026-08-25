@@ -1,0 +1,1 @@
+ALTER TABLE "store_price_match_retry_run" ADD COLUMN "site" text;

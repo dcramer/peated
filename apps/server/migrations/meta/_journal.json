@@ -1618,6 +1618,13 @@
       "when": 1787601947992,
       "tag": "0230_thick_ricochet",
       "breakpoints": false
+    },
+    {
+      "idx": 231,
+      "version": "7",
+      "when": 1787616809843,
+      "tag": "0231_lumpy_sleeper",
+      "breakpoints": false
     }
   ]
 }

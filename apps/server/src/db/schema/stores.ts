@@ -23,7 +23,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { bottles } from "./bottles";
-import { externalSites } from "./externalSites";
+import { externalSites, type ExternalSite } from "./externalSites";
 import { users } from "./users";
 
 type PersistedJsonValue =
@@ -379,6 +379,7 @@ export const storePriceMatchRetryRuns = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     query: text("query").default("").notNull(),
+    site: text("site").$type<ExternalSite["type"]>(),
     kind: storePriceMatchRetryRunKindEnum("kind"),
     mode: storePriceMatchRetryRunModeEnum("mode").default("no_web").notNull(),
     status: storePriceMatchRetryRunStatusEnum("status")

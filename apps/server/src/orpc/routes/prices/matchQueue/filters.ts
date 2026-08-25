@@ -1,7 +1,9 @@
 import {
+  externalSites,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import { ExternalSiteTypeEnum } from "@peated/server/schemas";
 import { and, eq, ilike, inArray, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
@@ -18,10 +20,13 @@ export const QueueSortSchema = z
   .enum(["priority", "created", "-created"])
   .default("priority");
 
+export const QueueSiteSchema = ExternalSiteTypeEnum.optional();
+
 export const QueueListInputSchema = z
   .object({
     query: z.string().default(""),
     kind: QueueKindSchema,
+    site: QueueSiteSchema,
     state: QueueStateSchema,
     sort: QueueSortSchema,
     cursor: z.coerce.number().gte(1).default(1),
@@ -82,10 +87,12 @@ export function getQueueStateFilter(state: QueueState): SQL {
 export function getQueueBaseWhere(input: {
   query: string;
   kind: QueueKind;
+  site?: z.infer<typeof QueueSiteSchema>;
 }): SQL {
   const filter = and(
     eq(storePrices.hidden, false),
     getQueueKindFilter(input.kind),
+    input.site ? eq(externalSites.type, input.site) : undefined,
     input.query ? ilike(storePrices.name, `%${input.query}%`) : undefined,
   );
   if (!filter) throw new Error("Queue base filter is empty");
@@ -95,6 +102,7 @@ export function getQueueBaseWhere(input: {
 export function getQueueWhere(input: {
   query: string;
   kind: QueueKind;
+  site?: z.infer<typeof QueueSiteSchema>;
   state: QueueState;
 }): SQL {
   const filter = and(

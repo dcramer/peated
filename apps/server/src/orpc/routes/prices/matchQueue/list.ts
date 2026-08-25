@@ -43,6 +43,10 @@ export default procedure
         storePrices,
         eq(storePrices.id, storePriceMatchProposals.priceId),
       )
+      .innerJoin(
+        externalSites,
+        eq(externalSites.id, storePrices.externalSiteId),
+      )
       .where(baseWhere);
     const orderBy =
       input.sort === "created"

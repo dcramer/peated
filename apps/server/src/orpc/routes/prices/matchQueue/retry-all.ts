@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  externalSites,
   storePriceMatchProposals,
   storePriceMatchRetryRunItems,
   storePriceMatchRetryRuns,
@@ -13,7 +14,7 @@ import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { and, asc, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-import { QueueKindSchema, getQueueWhere } from "./filters";
+import { QueueKindSchema, QueueSiteSchema, getQueueWhere } from "./filters";
 import { PriceMatchRetryRunSchema } from "./retry-run-schema";
 
 const RETRY_RUN_SNAPSHOT_BATCH_SIZE = 500;
@@ -23,6 +24,7 @@ const InputSchema = z
   .object({
     query: z.string().default(""),
     kind: QueueKindSchema,
+    site: QueueSiteSchema,
     mode: z.enum(["no_web", "full"]).default("no_web"),
   })
   .default({
@@ -75,6 +77,10 @@ export default procedure
           storePrices,
           eq(storePrices.id, storePriceMatchProposals.priceId),
         )
+        .innerJoin(
+          externalSites,
+          eq(externalSites.id, storePrices.externalSiteId),
+        )
         .where(actionableWhere);
       const matchedCount = countRow?.matchedCount ?? 0;
       const maxProposalId = countRow?.maxProposalId ?? null;
@@ -88,6 +94,7 @@ export default procedure
           matchedCount,
           mode: input.mode,
           query: input.query,
+          site: input.site ?? null,
           status: matchedCount === 0 ? "completed" : "pending",
         })
         .returning();
@@ -112,6 +119,10 @@ export default procedure
           .innerJoin(
             storePrices,
             eq(storePrices.id, storePriceMatchProposals.priceId),
+          )
+          .innerJoin(
+            externalSites,
+            eq(externalSites.id, storePrices.externalSiteId),
           )
           .where(
             and(
