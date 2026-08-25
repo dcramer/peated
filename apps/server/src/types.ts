@@ -21,6 +21,7 @@ import type {
   CountrySchema,
   CurrencyEnum,
   EntityInputSchema,
+  EntityKindEnum,
   EntitySchema,
   EntityTypeEnum,
   EventSchema,
@@ -63,6 +64,7 @@ export type BadgeTracker = z.infer<typeof BadgeTrackerEnum>;
 export type BadgeFormula = z.infer<typeof BadgeFormulaEnum>;
 
 export type EntityType = z.infer<typeof EntityTypeEnum>;
+export type EntityKind = z.infer<typeof EntityKindEnum>;
 export type ObjectType = z.infer<typeof ObjectTypeEnum>;
 export type FollowStatus = z.infer<typeof FollowStatusEnum>;
 export type FriendStatus = z.infer<typeof FriendStatusEnum>;

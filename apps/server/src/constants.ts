@@ -126,6 +126,14 @@ export function isExternalReviewSiteType(type: ExternalSiteDefinitionType) {
 
 export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 
+export const ENTITY_KIND_LIST = [
+  "brand",
+  "distillery",
+  "bottler",
+  "blender",
+  "company",
+] as const;
+
 export const BADGE_FORMULA_LIST = ["default", "linear", "fibonacci"] as const;
 
 export const BADGE_CHECK_TYPE_LIST = [

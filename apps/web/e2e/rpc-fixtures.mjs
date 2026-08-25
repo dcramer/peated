@@ -95,6 +95,8 @@ export const testBrand = {
   name: "Lagavulin",
   shortName: null,
   type: ["brand", "distiller"],
+  kind: null,
+  ownerId: null,
   description: null,
   descriptionSrc: null,
   yearEstablished: null,

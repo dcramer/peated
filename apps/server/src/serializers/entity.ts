@@ -65,6 +65,8 @@ export const EntitySerializer = serializer({
       name: item.name,
       shortName: item.shortName,
       type: item.type,
+      kind: item.kind,
+      ownerId: item.ownerId,
       description: item.description,
       yearEstablished: item.yearEstablished,
       website: item.website,

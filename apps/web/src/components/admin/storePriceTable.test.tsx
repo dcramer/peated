@@ -12,6 +12,8 @@ const brand = {
   name: "Springbank",
   shortName: null,
   type: ["brand"],
+  kind: null,
+  ownerId: null,
   description: null,
   descriptionSrc: null,
   yearEstablished: null,

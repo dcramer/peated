@@ -12,6 +12,8 @@ function makeCollectionBottle(): CollectionBottle {
     name: "Compass Box",
     shortName: null,
     type: ["brand" as const],
+    kind: null,
+    ownerId: null,
     description: null,
     descriptionSrc: null,
     yearEstablished: null,

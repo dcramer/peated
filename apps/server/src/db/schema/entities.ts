@@ -1,3 +1,4 @@
+import { ENTITY_KIND_LIST } from "@peated/server/constants";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
@@ -20,12 +21,15 @@ import { contentSourceEnum } from "./enums";
 import { regions } from "./regions";
 
 export type EntityType = "brand" | "distiller" | "bottler";
+export type EntityKind = (typeof ENTITY_KIND_LIST)[number];
 
 export const entityTypeEnum = pgEnum("entity_type", [
   "brand",
   "distiller",
   "bottler",
 ]);
+
+export const entityKindEnum = pgEnum("entity_kind", ENTITY_KIND_LIST);
 
 export const entities = pgTable(
   "entity",
@@ -35,7 +39,7 @@ export const entities = pgTable(
     name: text("name").notNull(),
     shortName: text("short_name"),
 
-    parentId: bigint("parent_id", { mode: "number" }),
+    ownerId: bigint("owner_id", { mode: "number" }),
 
     searchVector: tsvector("search_vector"),
 
@@ -51,6 +55,7 @@ export const entities = pgTable(
     location: geometry_point("location"),
 
     type: entityTypeEnum("type").array().notNull(),
+    kind: entityKindEnum("kind"),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
@@ -75,10 +80,14 @@ export const entities = pgTable(
   (table) => [
     uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
     foreignKey({
-      name: "entity_parent_fk",
-      columns: [table.parentId],
+      name: "entity_owner_fk",
+      columns: [table.ownerId],
       foreignColumns: [table.id],
-    }),
+    })
+      .onDelete("set null")
+      .onUpdate("set null"),
+    index("entity_kind_idx").on(table.kind),
+    index("entity_owner_idx").on(table.ownerId),
     index("entity_search_idx").using("gin", table.searchVector),
     index("entity_country_by_idx").on(table.countryId),
     index("entity_region_idx").on(table.regionId),
@@ -89,6 +98,12 @@ export const entities = pgTable(
 export const entitiesRelations = relations(entities, ({ one, many }) => ({
   distillersToBottles: many(bottlesToDistillers),
   brandsToBottles: many(bottles),
+  owner: one(entities, {
+    relationName: "entityOwner",
+    fields: [entities.ownerId],
+    references: [entities.id],
+  }),
+  ownedEntities: many(entities, { relationName: "entityOwner" }),
   country: one(countries, {
     fields: [entities.countryId],
     references: [countries.id],

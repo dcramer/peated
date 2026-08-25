@@ -104,6 +104,72 @@ beforeEach(async ({ fixtures }) => {
   await fixtures.User({ admin: true, username: "dcramer" });
 });
 
+test("preserves current ownership and repoints owned Entities", async ({
+  fixtures,
+}) => {
+  const owner = await fixtures.Entity({ kind: "company" });
+  const source = await fixtures.Entity({ ownerId: owner.id });
+  const destination = await fixtures.Entity();
+  const owned = await fixtures.Entity({ ownerId: source.id });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db.query.entities.findFirst({
+      where: eq(entities.id, destination.id),
+    }),
+  ).toMatchObject({ ownerId: owner.id });
+  expect(
+    await db.query.entities.findFirst({ where: eq(entities.id, owned.id) }),
+  ).toMatchObject({ ownerId: destination.id });
+});
+
+test("rejects a merge with conflicting current owners", async ({
+  fixtures,
+}) => {
+  const firstOwner = await fixtures.Entity({ kind: "company" });
+  const secondOwner = await fixtures.Entity({ kind: "company" });
+  const source = await fixtures.Entity({ ownerId: firstOwner.id });
+  const destination = await fixtures.Entity({ ownerId: secondOwner.id });
+
+  await expect(
+    mergeEntity({
+      fromEntityIds: [source.id],
+      toEntityId: destination.id,
+    }),
+  ).rejects.toThrow("Cannot merge Entities with different current owners.");
+
+  expect(
+    await db.query.entities.findFirst({ where: eq(entities.id, source.id) }),
+  ).toMatchObject({ ownerId: firstOwner.id });
+  expect(
+    await db.query.entities.findFirst({
+      where: eq(entities.id, destination.id),
+    }),
+  ).toMatchObject({ ownerId: secondOwner.id });
+});
+
+test("removes ownership that would become self ownership after a merge", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity();
+  const destination = await fixtures.Entity({ ownerId: source.id });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db.query.entities.findFirst({
+      where: eq(entities.id, destination.id),
+    }),
+  ).toMatchObject({ ownerId: null });
+});
+
 async function createApplyingEntityMergeOperation({
   approvingModeratorId,
   bottleId,
