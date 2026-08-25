@@ -1,4 +1,4 @@
-import "@fontsource/raleway/index.css";
+import "@fontsource-variable/libre-franklin";
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import "@peated/web/styles/index.css";

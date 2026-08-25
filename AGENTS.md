@@ -1,5 +1,13 @@
 # Agent Instructions
 
+## Product Direction
+
+- Peated's primary goal is to be the source of whisky information.
+- Aggregate and connect bottle data, producer data, independent reviews,
+  community tastings, and other useful whisky information.
+- Do not frame Peated as only a tasting tracker, review site, or bottle
+  database.
+
 ## Core Principles
 
 - Write for normal humans. Use concise

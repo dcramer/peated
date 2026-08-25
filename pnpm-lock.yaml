@@ -6,9 +6,9 @@ settings:
 
 catalogs:
   default:
-    '@fontsource/raleway':
-      specifier: ^5.0.19
-      version: 5.0.19
+    '@fontsource-variable/libre-franklin':
+      specifier: ^5.3.0
+      version: 5.3.0
     '@logtape/hono':
       specifier: 2.2.3
       version: 2.2.3
@@ -439,9 +439,9 @@ importers:
 
   apps/web:
     dependencies:
-      '@fontsource/raleway':
+      '@fontsource-variable/libre-franklin':
         specifier: 'catalog:'
-        version: 5.0.19
+        version: 5.3.0
       '@headlessui/react':
         specifier: ^2.2.10
         version: 2.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -2243,8 +2243,8 @@ packages:
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
-  '@fontsource/raleway@5.0.19':
-    resolution: {integrity: sha512-S4fAg/Kmvkw5g6Z2eoxGijeYcopsfQIla+iXbOYZsIUaFHcS49l/qBNO3MWZ8iJ+PCFulz9juv2OjPPvMW43oA==}
+  '@fontsource-variable/libre-franklin@5.3.0':
+    resolution: {integrity: sha512-PEQemCKVRtkLZJNpfvR4wG7x87c8iG05XJuEaX59ogMcAQpdtCZz/NXZUrXLJyvyx3/HD70W4LUppWLBdEdU2g==}
 
   '@google-cloud/paginator@5.0.2':
     resolution: {integrity: sha512-DJS3s0OVH4zFDB1PzjxAsHqJT6sKVbRwwML0ZBP9PbU7Yebtu/7SWMRzvO2J3nUi9pRNITCfu4LJeooM2w4pjg==}
@@ -11493,7 +11493,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
-  '@fontsource/raleway@5.0.19': {}
+  '@fontsource-variable/libre-franklin@5.3.0': {}
 
   '@google-cloud/paginator@5.0.2':
     dependencies:

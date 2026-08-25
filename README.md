@@ -1,6 +1,8 @@
 # Peated
 
-The application that powers peated.com.
+Peated's primary goal is to be the source of whisky information. It brings
+together bottle and producer data, independent reviews, community tastings, and
+other useful whisky records.
 
 For more details, take a look at <https://peated.com/about>
 

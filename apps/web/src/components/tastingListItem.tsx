@@ -60,7 +60,7 @@ function ImageWithSkeleton({
 
 function ImageSkeleton() {
   return (
-    <div className="mb-4 flex h-[250px] w-full animate-pulse items-center justify-center rounded">
+    <div className="mb-4 flex h-[var(--tasting-image-height,250px)] w-full animate-pulse items-center justify-center rounded">
       <svg
         className="h-10 w-10 text-slate-800"
         aria-hidden="true"
@@ -120,7 +120,7 @@ export function TastingContent({
       )}
 
       {!!tasting.imageUrl && (
-        <div className="flex max-h-[250px] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mr-4">
+        <div className="flex max-h-[var(--tasting-image-height,250px)] min-w-full items-center justify-center overflow-hidden bg-slate-950 sm:mr-4">
           <ImageWithSkeleton
             src={tasting.imageUrl}
             className="h-full cursor-pointer"
@@ -325,7 +325,7 @@ export default function TastingListItem(props: TastingContentProps) {
   const { tasting } = props;
 
   return (
-    <li className="-mt-1 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
+    <li className="-mt-1 overflow-hidden border border-slate-800 bg-slate-950/70">
       <article className="flex flex-col gap-y-4">
         <div className="flex items-center space-x-4 px-3 pt-3 lg:px-5 lg:pt-5">
           <UserAvatar size={32} user={tasting.createdBy} />

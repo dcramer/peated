@@ -33,7 +33,7 @@ export default {
       }),
 
       fontFamily: {
-        sans: ["Raleway", ...defaultTheme.fontFamily.sans],
+        sans: ["Libre Franklin Variable", ...defaultTheme.fontFamily.sans],
       },
 
       typography: {

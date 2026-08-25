@@ -15,8 +15,9 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike, isNull, or } from "drizzle-orm";
+import { and, asc, eq, ilike, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { publicReviewVisibility } from "./publicVisibility";
 
 const InputSchema = z
   .object({
@@ -57,7 +58,7 @@ export default procedure
     // reviews. Moderator queries include them for review and matching.
     const baseWhere: (SQL<unknown> | undefined)[] = requiresModerator
       ? []
-      : [eq(reviews.hidden, false)];
+      : publicReviewVisibility();
     const identityWhere: SQL<unknown>[] = [];
 
     if (input.site) {
@@ -71,17 +72,6 @@ export default procedure
         });
       }
       baseWhere.push(eq(reviewArticles.externalSiteId, site.id));
-    }
-
-    if (hasPublicScope) {
-      // No-fetch migration articles have no content hash and preserve their
-      // legacy visibility. Newly fetched articles require automatic mode.
-      baseWhere.push(
-        or(
-          isNull(reviewArticles.contentHash),
-          eq(externalReviewSourcePolicies.publicationMode, "automatic"),
-        ),
-      );
     }
 
     if (requiresModerator && !context.user?.admin && !context.user?.mod) {

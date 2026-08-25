@@ -1,6 +1,7 @@
 "use client";
 
 import BottleTable from "@peated/web/components/bottleTable";
+import CatalogPageHeader from "@peated/web/components/catalogPageHeader";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -34,6 +35,11 @@ export default function BottleList() {
 
   return (
     <>
+      <CatalogPageHeader
+        title="Bottles"
+        actionHref="/bottles/new?returnTo=%2Fbottles"
+        actionLabel="Create bottle"
+      />
       {bottleList.results.length > 0 ? (
         <BottleTable
           bottleList={bottleList.results}

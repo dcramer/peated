@@ -1,5 +1,6 @@
 "use client";
 
+import CatalogPageHeader from "@peated/web/components/catalogPageHeader";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import EntityTable from "@peated/web/components/entityTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -25,6 +26,11 @@ export default function Page() {
 
   return (
     <>
+      <CatalogPageHeader
+        title="Brands"
+        actionHref="/addEntity?type=brand"
+        actionLabel="Add brand"
+      />
       {entityList.results.length > 0 ? (
         <EntityTable
           entityList={entityList.results}

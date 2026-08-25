@@ -127,7 +127,7 @@ export default procedure
           INNER JOIN ${users}
             ON ${users.id} = ${collections.createdById}
           WHERE ${userCondition}
-            AND ${collectionBottles.createdAt} <= ${activityCursor.snapshotAt}
+            AND ${lte(collectionBottles.createdAt, activityCursor.snapshotAt)}
           GROUP BY ${users.id}, ${collections.id}, DATE_TRUNC('day', ${collectionBottles.createdAt})
         ) activity_groups
       `),

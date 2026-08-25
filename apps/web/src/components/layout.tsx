@@ -1,70 +1,68 @@
 import { Suspense, type ReactNode } from "react";
 import classNames from "../lib/classNames";
-import AppFooter from "./appFooter";
 import AppHeader from "./appHeader";
-import Footer from "./footer";
+import CatalogSidebarSkeleton from "./catalogSidebarSkeleton";
 import Header from "./header";
-import RightSidebarSkeleton from "./rightSidebarSkeleton";
-import Sidebar from "./sidebar";
 
 export default function Layout({
   children,
   header,
   footer,
   sidebar,
-  rightSidebar,
+  leftSidebar,
   noMargin,
 }: {
   children: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
   sidebar?: ReactNode;
-  rightSidebar?: ReactNode;
+  leftSidebar?: ReactNode;
   noMargin?: boolean;
 }) {
+  const hasSidebar = sidebar !== undefined && sidebar !== null;
+
   return (
     <>
       {header !== undefined ? (
         header
       ) : (
-        <Header>
+        <Header sidebarOffset={hasSidebar} wide={!hasSidebar && !!leftSidebar}>
           <Suspense>
-            <AppHeader />
+            <AppHeader showNavigation={!hasSidebar} />
           </Suspense>
         </Header>
       )}
 
-      {sidebar ?? (
-        <Suspense>
-          <Sidebar />
-        </Suspense>
-      )}
+      {sidebar ?? null}
 
-      <div className="flex">
-        <main className="w-full max-w-7xl flex-auto lg:pl-60">
+      <div
+        className={classNames(
+          "flex",
+          !hasSidebar && "mx-auto w-full",
+          !hasSidebar && (leftSidebar ? "max-w-[104rem]" : "max-w-7xl"),
+        )}
+      >
+        {leftSidebar ? (
+          <aside className="hidden shrink-0 bg-slate-950 xl:block xl:w-64">
+            <Suspense fallback={<CatalogSidebarSkeleton />}>
+              {leftSidebar}
+            </Suspense>
+          </aside>
+        ) : null}
+
+        <main
+          className={classNames(
+            "w-full max-w-7xl flex-auto",
+            hasSidebar && "lg:pl-60",
+          )}
+        >
           <div className={classNames("mx-auto", noMargin ? "" : "py-4 lg:p-8")}>
             {children}
           </div>
         </main>
-
-        {rightSidebar ? (
-          <div className="hidden lg:z-20 lg:w-96 lg:flex-col xl:flex">
-            <Suspense fallback={<RightSidebarSkeleton />}>
-              {rightSidebar}
-            </Suspense>
-          </div>
-        ) : null}
       </div>
 
-      {footer !== undefined ? (
-        footer
-      ) : (
-        <Footer mobileOnly>
-          <Suspense>
-            <AppFooter />
-          </Suspense>
-        </Footer>
-      )}
+      {footer ?? null}
     </>
   );
 }

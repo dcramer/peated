@@ -6,8 +6,8 @@ import BottlesLoading from "../app/(bottles-sidebar)/bottles/loading";
 import BottlersLoading from "../app/(entities-sidebar)/bottlers/loading";
 import BrandsLoading from "../app/(entities-sidebar)/brands/loading";
 import DistillersLoading from "../app/(entities-sidebar)/distillers/loading";
+import CatalogSidebarSkeleton from "./catalogSidebarSkeleton";
 import DefaultLoading from "./defaultLoading";
-import RightSidebarSkeleton from "./rightSidebarSkeleton";
 import Spinner from "./spinner";
 
 function countOccurrences(value: string, pattern: string) {
@@ -87,12 +87,11 @@ describe("loading fallbacks", () => {
     expect(html).not.toContain(" hidden ");
   });
 
-  it("renders the right sidebar fallback as decorative reserved structure", () => {
-    const html = renderToStaticMarkup(createElement(RightSidebarSkeleton));
+  it("renders the catalog sidebar fallback as decorative reserved structure", () => {
+    const html = renderToStaticMarkup(createElement(CatalogSidebarSkeleton));
 
     expect(html).toContain('aria-hidden="true"');
-    expect(html).toContain("bg-highlight h-10");
-    expect(countOccurrences(html, "h-8 animate-pulse")).toBe(12);
+    expect(countOccurrences(html, "mt-2 h-9 animate-pulse")).toBe(3);
     expect(html).not.toContain('role="status"');
   });
 });

@@ -1,18 +1,15 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import type { ActivityTastingSessionEntry } from "@peated/server/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { profileActivityQueryKeys } from "../lib/activityQueryKeys";
 import { useORPC } from "../lib/orpc/context";
+import CarouselControls from "./carouselControls";
 import Link from "./link";
 import TastingListItem, { TastingContent } from "./tastingListItem";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
-
-const carouselButtonClassName =
-  "inline-flex h-10 w-10 items-center justify-center border border-slate-700 bg-slate-900 text-white transition-colors hover:bg-slate-800 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated disabled:cursor-default disabled:text-slate-600";
 
 export default function TastingSessionListItem({
   session,
@@ -71,7 +68,7 @@ export default function TastingSessionListItem({
   };
 
   return (
-    <li className="-mt-1 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
+    <li className="-mt-1 overflow-hidden border border-slate-800 bg-slate-950/70">
       <section
         aria-label={`${session.createdBy.username}'s tasting session`}
         aria-roledescription="carousel"
@@ -95,40 +92,18 @@ export default function TastingSessionListItem({
             </div>
           </div>
 
-          <div
-            className="flex shrink-0 items-center"
-            role="group"
-            aria-label="Choose tasting"
-          >
-            <button
-              type="button"
-              className={`${carouselButtonClassName} rounded-l-full`}
-              aria-label="Previous tasting"
-              disabled={!showPrevious}
-              onClick={() => move(-1)}
-            >
-              <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <div
-              className="flex h-10 min-w-12 items-center justify-center border-y border-slate-700 bg-slate-900 px-2 text-xs font-semibold tabular-nums text-white"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <span className="sr-only">
-                Showing {activeTasting.bottle.fullName}, tasting
-              </span>{" "}
-              {currentIndex + 1}/{visibleTastings.length}
-            </div>
-            <button
-              type="button"
-              className={`${carouselButtonClassName} rounded-r-full`}
-              aria-label="Next tasting"
-              disabled={!showNext}
-              onClick={() => move(1)}
-            >
-              <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
+          <CarouselControls
+            currentIndex={currentIndex}
+            total={visibleTastings.length}
+            previousLabel="Previous tasting"
+            nextLabel="Next tasting"
+            previousDisabled={!showPrevious}
+            nextDisabled={!showNext}
+            label="Choose tasting"
+            counterLabel={`Showing ${activeTasting.bottle.fullName}, tasting`}
+            onPrevious={() => move(-1)}
+            onNext={() => move(1)}
+          />
         </div>
 
         <div

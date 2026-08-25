@@ -25,7 +25,7 @@ catalog:
   dotenv-cli: ^7.4.4
   drizzle-kit: ^0.30.6
   drizzle-orm: ^0.39.3
-  "@fontsource/raleway": ^5.0.19
+  '@fontsource-variable/libre-franklin': ^5.3.0
   jsx-email: ^1.10.11
   pg: ^8.20.0
   prettier: ^3.8.1

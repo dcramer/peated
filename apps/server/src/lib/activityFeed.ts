@@ -235,7 +235,7 @@ function markedTastingsSql({
       FROM ${tastings}
       INNER JOIN ${users} ON ${users.id} = ${tastings.createdById}
       WHERE ${userCondition}
-        AND ${tastings.createdAt} <= ${snapshotAt}
+        AND ${lte(tastings.createdAt, snapshotAt)}
     ) ordered_tastings
   `;
 }

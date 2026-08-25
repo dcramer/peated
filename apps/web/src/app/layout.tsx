@@ -1,4 +1,4 @@
-import "@fontsource/raleway/index.css";
+import "@fontsource-variable/libre-franklin";
 import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
 import { getSession } from "@peated/web/lib/session.server";

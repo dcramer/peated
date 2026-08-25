@@ -6,6 +6,7 @@ import type {
   Entity,
   EntityType,
   ExternalSite,
+  User,
 } from "@peated/server/db/schema";
 import {
   bottles,
@@ -301,6 +302,76 @@ const loadDefaultBottles = async (
     }
     console.log(`Bottle ${bottle.fullName} created.`);
   }
+
+  return results;
+};
+
+const loadDefaultActivity = async ({
+  bottleList,
+  tastingCount,
+}: {
+  bottleList: Bottle[];
+  tastingCount: number;
+}) => {
+  if (!bottleList.length || tastingCount < 1) return;
+
+  const activityUsers: User[] = [];
+  for (const username of ["maltmary", "caskchaser", "dramfinder"]) {
+    const existing = await db.query.users.findFirst({
+      where: eq(users.username, username),
+    });
+    activityUsers.push(
+      existing ??
+        (await Fixtures.User({
+          username,
+          email: `${username}@example.com`,
+          private: false,
+        })),
+    );
+  }
+
+  const now = new Date();
+  for (let i = 0; i < tastingCount; i++) {
+    const sessionTasting = i < 3;
+    const createdAt = new Date(
+      now.getTime() -
+        (sessionTasting
+          ? i * 35 * 60 * 1000
+          : (i - 1) * 2 * 24 * 60 * 60 * 1000),
+    );
+    const createdBy = sessionTasting
+      ? activityUsers[0]
+      : activityUsers[(i - 2) % activityUsers.length];
+    const bottle = bottleList[i % bottleList.length];
+    const imageUrl =
+      i % 2 === 0
+        ? await storeFile({
+            data: await pickTastingImage(),
+            namespace: "tastings",
+            urlPrefix: "/uploads",
+            onProcess: (...args) =>
+              compressAndResizeImage(...args, undefined, 1024),
+          })
+        : null;
+    const tasting = await Fixtures.Tasting({
+      bottleId: bottle.id,
+      createdAt,
+      createdById: createdBy.id,
+      imageUrl,
+    });
+
+    if (i === 0 || i === 5) {
+      await db
+        .insert(collectionBottles)
+        .values({
+          collectionId: (await getDefaultCollection(db, createdBy.id))!.id,
+          bottleId: tasting.bottleId,
+          createdAt,
+        })
+        .onConflictDoNothing();
+    }
+    console.log(`tasting ${tasting.id} created.`);
+  }
 };
 
 const loadIdentityBottleVariants = async () => {
@@ -496,7 +567,7 @@ subcommand
     "--tastings <number>",
     "number of tastings",
     (v: string) => Number(v),
-    5,
+    12,
   )
   .action(async (email, options) => {
     // load some realistic entities
@@ -505,34 +576,10 @@ subcommand
     const bottleList = await loadDefaultBottles(entityList, siteList);
     await loadIdentityBottleVariants();
 
-    for (let i = 0; i < options.tastings; i++) {
-      const imageUrl =
-        random(1, 2) === 1
-          ? await storeFile({
-              data: await pickTastingImage(),
-              namespace: `tastings`,
-              urlPrefix: "/uploads",
-              onProcess: (...args) =>
-                compressAndResizeImage(...args, undefined, 1024),
-            })
-          : null;
-
-      const tasting = await Fixtures.Tasting({
-        imageUrl,
-        bottleId: (
-          await db
-            .select()
-            .from(bottles)
-            .orderBy(sql`RANDOM()`)
-            .limit(1)
-        )[0].id,
-      });
-      await db.insert(collectionBottles).values({
-        collectionId: (await getDefaultCollection(db, tasting.createdById))!.id,
-        bottleId: tasting.bottleId,
-      });
-      console.log(`tasting ${tasting.id} created.`);
-    }
+    await loadDefaultActivity({
+      bottleList,
+      tastingCount: options.tastings,
+    });
 
     if (email) {
       const [{ id: toUserId }] = await db

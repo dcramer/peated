@@ -1,38 +1,21 @@
 "use client";
 
-import {
-  CASK_TYPES,
-  CATEGORY_LIST,
-  FLAVOR_PROFILES,
-} from "@peated/server/constants";
-import {
-  formatCategoryName,
-  formatFlavorProfile,
-} from "@peated/server/lib/format";
+import { CASK_TYPES, CATEGORY_LIST } from "@peated/server/constants";
+import { formatCategoryName } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
-import Button from "@peated/web/components/button";
 import FilterSidebarSection from "@peated/web/components/filterListSection";
 import { useSearchParams } from "next/navigation";
 
 export default function BottleListSidebar() {
   const searchParams = useSearchParams();
   return (
-    <div className="mt-8 flex flex-col overflow-y-auto bg-slate-950 px-6 py-4">
-      <ul role="list" className="flex flex-auto flex-col gap-y-7">
-        <li>
-          <Button
-            href={`/bottles/new?${new URLSearchParams({
-              returnTo: "/bottles",
-            }).toString()}`}
-            fullWidth
-            color="highlight"
-          >
-            Create Bottle
-          </Button>
-        </li>
+    <div className="sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto px-5 py-8">
+      <h2 className="text-sm font-semibold text-white">Filter bottles</h2>
+      <ul role="list" className="mt-6 flex flex-col gap-y-5">
         <FilterSidebarSection
           name="minRating"
           title="Rating"
+          allLabel="All bottles"
           options={[
             ["2", "Savor"],
             ["1", "Sip or Better"],
@@ -42,11 +25,6 @@ export default function BottleListSidebar() {
         <FilterSidebarSection
           name="category"
           options={CATEGORY_LIST.map((k) => [k, formatCategoryName(k)])}
-        />
-        <FilterSidebarSection
-          name="flavorProfile"
-          title="Flavor Profile"
-          options={FLAVOR_PROFILES.map((k) => [k, formatFlavorProfile(k)])}
         />
         <FilterSidebarSection
           title="Cask"
