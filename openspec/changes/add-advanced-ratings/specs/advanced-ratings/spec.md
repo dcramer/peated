@@ -62,10 +62,15 @@ The system SHALL persist each user's preferred tasting rating system as Simple o
 - **WHEN** a user saves Advanced as their preferred rating system and opens a new tasting form on another device
 - **THEN** the form defaults to the 100-point input
 
-#### Scenario: Existing tasting controls edit mode
+#### Scenario: Account preference controls edit mode
 
 - **WHEN** an Advanced-preferring user edits a tasting that already has a simple rating
-- **THEN** the form initially displays the simple rating input and existing value
+- **THEN** the form displays the 100-point input and does not offer a system selector
+
+#### Scenario: Hidden existing rating is preserved
+
+- **WHEN** a user saves an existing tasting without entering a rating in the system selected in their profile
+- **THEN** the tasting keeps its existing rating value
 
 ### Requirement: Independent community aggregates
 
@@ -130,7 +135,7 @@ The system SHALL provide a public ratings page describing Pass/Sip/Savor, every 
 
 #### Scenario: Form links to methodology
 
-- **WHEN** a user selects the Advanced input in a tasting form
+- **WHEN** an Advanced-preferring user opens a tasting form
 - **THEN** the form presents compact score-band guidance and a link to the public ratings page
 
 ### Requirement: Discoverable advanced score data

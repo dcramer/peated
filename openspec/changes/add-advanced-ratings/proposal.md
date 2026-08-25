@@ -6,7 +6,7 @@ Peated's Pass/Sip/Savor rating is intentionally approachable, but experienced us
 
 - Add an optional integer 0-100 score to user tastings as an alternative to Pass/Sip/Savor.
 - Publish one Peated scoring rubric with stable score bands and guidance that applies to every community advanced rating.
-- Add a persisted user preference that chooses the default rating input for new tastings while allowing an explicit choice in the tasting workflow.
+- Add a saved user preference that chooses the rating system for tasting forms.
 - Store, aggregate, sort, filter, and display advanced community scores independently from simple ratings and external critic scores.
 - Scope advanced aggregates to exact Bottles and their BottleGroups so release-sensitive evaluations remain visible alongside family-level context.
 - Add a public ratings-methodology page, inline scoring guidance, and explicit OpenAPI descriptions.
