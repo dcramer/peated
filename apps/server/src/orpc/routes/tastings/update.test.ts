@@ -59,6 +59,52 @@ describe("PATCH /tastings/{tasting}", () => {
     );
   });
 
+  test("replaces a simple rating with an advanced score", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: defaults.user.id,
+      rating: 2,
+    });
+
+    const result = await routerClient.tastings.update(
+      { tasting: tasting.id, score: 88 },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result).toMatchObject({ rating: null, score: 88 });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
+      {
+        delay: 5000,
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    );
+  });
+
+  test("clears an advanced score without creating a simple rating", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const tasting = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      rating: null,
+      score: 88,
+    });
+
+    const result = await routerClient.tastings.update(
+      { tasting: tasting.id, score: null },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result).toMatchObject({ rating: null, score: null });
+  });
+
   test("updates tag accounting on the direct Bottle", async ({
     defaults,
     fixtures,

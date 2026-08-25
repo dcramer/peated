@@ -45,11 +45,13 @@ const SORT_OPTIONS = [
   "name",
   "age",
   "rating",
+  "score",
   "tastings",
   "-created",
   "-name",
   "-age",
   "-rating",
+  "-score",
   "-tastings",
 ] as const;
 
@@ -83,6 +85,7 @@ export default procedure
       age: z.coerce.number().nullish(),
       caskType: CaskTypeEnum.nullish(),
       minRating: z.coerce.number().min(-1).max(2).nullish(),
+      minScore: z.coerce.number().int().min(0).max(100).nullish(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
@@ -181,6 +184,14 @@ export default procedure
         ),
       );
     }
+    if (rest.minScore !== null && rest.minScore !== undefined) {
+      where.push(
+        and(
+          sql`${bottles.avgScore} IS NOT NULL`,
+          sql`${bottles.avgScore} >= ${rest.minScore}`,
+        ),
+      );
+    }
 
     if (rest.flight) {
       const [flight] = await db
@@ -247,6 +258,12 @@ export default procedure
         break;
       case "-rating":
         orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
+        break;
+      case "score":
+        orderBy = sql`${bottles.avgScore} ASC NULLS LAST`;
+        break;
+      case "-score":
+        orderBy = sql`${bottles.avgScore} DESC NULLS LAST`;
         break;
       case "-tastings":
       default:

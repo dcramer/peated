@@ -1,3 +1,4 @@
+import { RATING_SYSTEMS } from "@peated/server/constants";
 import { sql } from "drizzle-orm";
 import {
   bigserial,
@@ -25,6 +26,12 @@ export const users = pgTable(
     mod: boolean("mod").default(false).notNull(),
 
     notifyComments: boolean("notify_comments").default(true),
+    ratingSystem: varchar("rating_system", {
+      length: 16,
+      enum: RATING_SYSTEMS,
+    })
+      .default("simple")
+      .notNull(),
 
     termsAcceptedAt: timestamp("terms_accepted_at"),
 

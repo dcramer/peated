@@ -40,10 +40,12 @@ async function createTasting(
   createdById: number,
   rating: number | null,
   sequence: number,
+  score: number | null = null,
 ) {
   await db.insert(tastings).values({
     bottleId,
     rating,
+    score,
     createdById,
     createdAt: new Date(Date.UTC(2026, 0, 1, 0, 0, sequence)),
   });
@@ -82,6 +84,9 @@ describe("BottleGroup statistics recomputation", () => {
       SIMPLE_RATING_VALUES.SAVOR,
       4,
     );
+    await createTasting(first.id, defaults.user.id, null, 5, 84);
+    await createTasting(second.id, defaults.user.id, null, 6, 88);
+    await createTasting(unrelated.id, defaults.user.id, null, 7, 99);
 
     const firstResult = await db.transaction((tx) =>
       recomputeBottleGroupStatsInTransaction(tx, requireGroupId(first.groupId)),
@@ -98,8 +103,10 @@ describe("BottleGroup statistics recomputation", () => {
     expect(firstResult).toMatchObject({
       id: first.groupId,
       totalBottles: 2,
-      totalTastings: 3,
+      totalTastings: 5,
       avgRating: expectedAverage,
+      avgScore: 86,
+      totalScores: 2,
       ratingStats: {
         pass: 1,
         sip: 1,
@@ -113,6 +120,8 @@ describe("BottleGroup statistics recomputation", () => {
       totalBottles: firstResult.totalBottles,
       totalTastings: firstResult.totalTastings,
       avgRating: firstResult.avgRating,
+      avgScore: firstResult.avgScore,
+      totalScores: firstResult.totalScores,
       ratingStats: firstResult.ratingStats,
     });
   });
@@ -142,6 +151,8 @@ describe("BottleGroup statistics recomputation", () => {
       totalBottles: 1,
       totalTastings: 1,
       avgRating: null,
+      avgScore: null,
+      totalScores: 0,
       ratingStats: {
         total: 0,
         percentage: { pass: 0, sip: 0, savor: 0 },

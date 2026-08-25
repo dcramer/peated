@@ -62,6 +62,7 @@ export const UserSerializer = serializer({
       user.admin = item.admin;
       user.mod = item.admin || item.mod;
       user.notifyComments = item.notifyComments ?? false;
+      user.ratingSystem = item.ratingSystem;
       user.termsAcceptedAt = item.termsAcceptedAt?.toISOString();
     }
     return user;

@@ -707,6 +707,32 @@ describe("GET /bottles", () => {
     expect(results[2].id).toBe(bottle3.id); // null last
   });
 
+  test("sorts bottles by advanced score with nulls last", async ({
+    fixtures,
+  }) => {
+    const high = await fixtures.Bottle({ name: "High", avgScore: 92 });
+    const low = await fixtures.Bottle({ name: "Low", avgScore: 82 });
+    const unscored = await fixtures.Bottle({ name: "Unscored" });
+
+    const { results } = await routerClient.bottles.list({ sort: "-score" });
+
+    expect(results.map((bottle) => bottle.id)).toEqual([
+      high.id,
+      low.id,
+      unscored.id,
+    ]);
+  });
+
+  test("filters bottles by minimum advanced score", async ({ fixtures }) => {
+    const included = await fixtures.Bottle({ avgScore: 88 });
+    await fixtures.Bottle({ avgScore: 84 });
+    await fixtures.Bottle();
+
+    const { results } = await routerClient.bottles.list({ minScore: 85 });
+
+    expect(results.map((bottle) => bottle.id)).toEqual([included.id]);
+  });
+
   test("sorts bottles by rank with query", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ name: "Ranking Fixture Brand" });
     const bottle1 = await fixtures.Bottle({

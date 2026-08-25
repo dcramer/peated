@@ -4,12 +4,18 @@ import { z } from "zod";
 
 export const TastingFormFieldsSchema = TastingContentInputSchema.pick({
   rating: true,
+  score: true,
   notes: true,
   tags: true,
   color: true,
   servingStyle: true,
   friends: true,
-}).strict();
+})
+  .strict()
+  .refine((data) => data.rating === null || data.score === null, {
+    message: "Cannot provide both a simple rating and an advanced score",
+    path: ["score"],
+  });
 
 export type TastingFormFields = z.infer<typeof TastingFormFieldsSchema>;
 export type TastingFormImage = HTMLCanvasElement | File | null | undefined;

@@ -1,9 +1,13 @@
 "use client";
 
-import { SERVING_STYLE_LIST } from "@peated/server/constants";
+import {
+  SERVING_STYLE_LIST,
+  type RatingSystem,
+} from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { ServingStyleEnum, type TastingSchema } from "@peated/server/schemas";
 import type { ServingStyle, User } from "@peated/server/types";
+import AdvancedRatingInput from "@peated/web/components/advancedRatingInput";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
@@ -12,8 +16,10 @@ import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import SimpleRatingInput from "@peated/web/components/simpleRatingInput";
 import TextAreaField from "@peated/web/components/textAreaField";
+import useAuth from "@peated/web/hooks/useAuth";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getInitialRatingSystem } from "@peated/web/lib/ratings";
 import {
   buildTastingCreateFormSubmission,
   buildTastingEditFormSubmission,
@@ -34,6 +40,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import ColorField from "./colorField";
 import Form from "./form";
+import RatingSystemPicker from "./ratingSystemPicker";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
 import TastingBottleIdentity from "./tastingBottleIdentity";
@@ -84,12 +91,14 @@ export default function TastingForm(
   const {
     control,
     register,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TastingFormFields>({
     resolver: zodResolver(TastingFormFieldsSchema),
     defaultValues: {
       rating: initialData.rating,
+      score: initialData.score,
       notes: initialData.notes,
       tags: initialData.tags,
       color: initialData.color,
@@ -98,7 +107,16 @@ export default function TastingForm(
     },
   });
 
+  const { user } = useAuth();
+  const initialRatingSystem: RatingSystem = getInitialRatingSystem({
+    rating: initialData.rating,
+    score: initialData.score,
+    preference: user?.ratingSystem,
+  });
+
   const [error, setError] = useState<string | undefined>();
+  const [ratingSystem, setRatingSystem] =
+    useState<RatingSystem>(initialRatingSystem);
   const [image, setImage] = useState<TastingFormImage>();
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
@@ -154,18 +172,53 @@ export default function TastingForm(
         isSubmitting={isSubmitting}
       >
         <Fieldset>
-          <Controller
-            name="rating"
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <SimpleRatingInput
-                {...field}
-                onChange={onChange}
-                error={errors.rating}
-                label="How was it?"
-              />
-            )}
-          />
+          <div className="px-4 pt-4">
+            <div className="mb-2 text-sm font-medium">How was it?</div>
+            <RatingSystemPicker
+              value={ratingSystem}
+              onChange={(nextSystem) => {
+                setRatingSystem(nextSystem);
+                if (nextSystem === "advanced") {
+                  setValue("rating", null, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                } else {
+                  setValue("score", null, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                }
+              }}
+            />
+          </div>
+
+          {ratingSystem === "simple" ? (
+            <Controller
+              name="rating"
+              control={control}
+              render={({ field: { onChange, ...field } }) => (
+                <SimpleRatingInput
+                  {...field}
+                  onChange={onChange}
+                  error={errors.rating}
+                  label="Simple rating"
+                />
+              )}
+            />
+          ) : (
+            <Controller
+              name="score"
+              control={control}
+              render={({ field: { onChange, ...field } }) => (
+                <AdvancedRatingInput
+                  {...field}
+                  onChange={onChange}
+                  error={errors.score}
+                />
+              )}
+            />
+          )}
 
           <Controller
             name="tags"

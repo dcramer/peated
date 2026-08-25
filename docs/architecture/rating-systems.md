@@ -2,149 +2,175 @@
 
 ## Overview
 
-Peated uses the Pass/Sip/Savor rating system for current tastings. Historical
-five-star values remain in `tasting.ratingLegacy`; `tasting.rating` stores the
-current simple value.
+Peated keeps three rating populations separate because they answer different
+questions and follow different ownership rules.
 
-Rating identity follows the
-[Whisky Identity Model](./whisky-identity-model.md): every tasting references
-one independently complete Bottle. BottleGroup is an aggregate scope, never a
-tasting target.
+| Population                | Storage          | Meaning                              | Aggregate                       |
+| ------------------------- | ---------------- | ------------------------------------ | ------------------------------- |
+| Simple community ratings  | `tasting.rating` | Pass, Sip, or Savor                  | Distribution and simple average |
+| Advanced community scores | `tasting.score`  | Peated's uniform 0-100 rubric        | Arithmetic mean and score count |
+| External critic reviews   | `review.rating`  | Score owned by the named publication | No Peated community aggregate   |
 
-## Values
+Historical five-star tasting data remains in `tasting.rating_legacy`. It is
+preserved for provenance and does not contribute to current aggregates.
 
-| Value  | Label     | Meaning                         |
-| ------ | --------- | ------------------------------- |
-| `-1`   | Pass      | Would not drink again           |
-| `1`    | Sip       | Enjoyable; would have sometimes |
-| `2`    | Savor     | Excellent; would seek out       |
-| `null` | No rating | Tasting recorded without rating |
+## Tasting Data Model
 
-The database stores the value as a `smallint`. API schemas accept only `-1`,
-`1`, `2`, or `null`.
-
-## User-Facing Behavior
-
-- The tasting form lets the user choose Pass, Sip, Savor, or no rating.
-- Rating controls expose text labels and selected state without relying on
-  emoji or color. Keyboard and screen-reader users must be able to choose or
-  clear a rating.
-- Bottle pages show statistics owned by that Bottle. Related-release pages may
-  separately show a group summary derived from current member activity.
-- Current product copy must not present the historical five-star value as a
-  second available rating system.
-
-## Identity And Persistence
-
-- `tasting.bottleId` is the authoritative, non-null catalog identity.
-- Live tasting inputs and outputs use Bottle identity only.
-- BottleGroup ids and representative Bottles are never substitutes for an
-  unknown Bottle.
-- `tasting.releaseId` remains temporarily as historical migration evidence.
-  Live reads, writes, and aggregate calculations do not use it.
-- No generic tasting or direct BottleGroup activity exists.
-
-Legacy parent-only tastings remain on the retained general Bottle during the
-catalog migration. Release-specific tastings move to the independently complete
-Bottle recorded by the durable release-promotion mapping.
-
-## Stored Aggregates
-
-Bottle and BottleGroup rows store the same derived fields:
-
-```ts
-type RatingStats = {
-  pass: number;
-  sip: number;
-  savor: number;
-  total: number;
-  avg: number | null;
-  percentage: {
-    pass: number;
-    sip: number;
-    savor: number;
-  };
-};
+```typescript
+rating: smallint("rating"); // -1, 1, 2, or null
+score: smallint("score"); // integer 0-100 or null
+ratingLegacy: doublePrecision("rating_legacy"); // historical 0-5 value
 ```
 
-- `totalTastings` counts rated and unrated tastings.
-- `ratingStats.total`, category counts, percentages, and `avgRating` use rated
-  tastings only.
-- An empty aggregate has zero counts and percentages and a null average.
+Database constraints enforce:
 
-These database fields are the canonical materialized aggregates. Do not add an
-independently computed cache or sum stored Bottle totals to produce a group
-total.
+- `score` is null or an integer from 0 through 100.
+- `rating` and `score` cannot both be non-null.
+- A tasting may have either system or no rating.
 
-## Recalculation
+The API exposes `rating` and `score` as separate nullable fields. Create
+requests containing both values are rejected. On update, submitting a non-null
+value for one system clears the other, making a system change an explicit
+replacement. Clearing one value never invents a value in the other system.
 
-One shared calculator queries raw tasting rows by validated Bottle ids.
+There is no automatic conversion among simple, advanced, or legacy values.
 
-### Bottle
+## Simple Ratings
 
-`recomputeBottleStats(bottleId)`:
+| Value | Label | Meaning                      |
+| ----- | ----- | ---------------------------- |
+| `-1`  | Pass  | Not my thing                 |
+| `1`   | Sip   | Enjoyable; would drink again |
+| `2`   | Savor | Amazing; would seek out      |
 
-1. rejects missing, retired, unmigrated, or invalid graph state;
-2. selects raw tastings whose `bottleId` is exactly the requested Bottle;
-3. overwrites that Bottle's stored aggregate fields.
+Bottle `avgRating` and `ratingStats` use only non-null simple ratings.
 
-Sibling Bottles and group totals do not contribute.
+## Advanced Ratings
 
-### BottleGroup
+Advanced ratings are whole-number evaluations of the whisky in the glass. They
+exclude price, rarity, packaging, and reputation.
 
-`recomputeBottleGroupStats(groupId)`:
+| Range  | Band            |
+| ------ | --------------- |
+| 95-100 | Extraordinary   |
+| 90-94  | Exceptional     |
+| 85-89  | Very good       |
+| 80-84  | Good            |
+| 75-79  | Fair            |
+| 0-74   | Not recommended |
 
-1. rejects missing groups;
-2. loads the group's active, non-retired member Bottle ids;
-3. queries raw tastings across those Bottle ids once;
-4. overwrites the group's aggregate fields and active `totalBottles`.
+The scoring method is anchored and holistic:
 
-The calculation does not read direct group activity, select a representative,
-or add already materialized Bottle totals.
+1. Taste before choosing a number.
+2. Start at 80, which means a good, enjoyable whisky with no major problem.
+3. Move the score up for clear flavors, balance, depth, texture, and a lasting
+   finish. Move it down for off flavors, rough alcohol, thin texture, poor
+   balance, or a weak finish.
+4. Choose the exact point within the resulting band. The bottom means the
+   whisky just fits, the middle means it clearly fits, and the top means it
+   nearly reaches the next band.
 
-## Write And Worker Flow
+The score is a judgment of the whisky as a whole. Peated does not require or
+add together nose, palate, finish, or balance subscores.
 
-Tasting creation and deletion queue `UpdateBottleStats` after the database
-mutation commits. A rating-changing update does the same. Queue publication
-failure is logged without rolling back the committed tasting.
+`ADVANCED_RATING_BANDS` and `getAdvancedRatingBand()` in the server constants
+are the canonical programmatic definition. Web inputs, community displays, and
+permitted native 100-point critic scores use that helper rather than duplicating
+thresholds.
 
-`UpdateBottleStats` carries only `bottleId` and recomputes:
+Individual scores display as integers. Community averages display to one
+decimal with the number of scores. A one-point difference communicates a
+personal comparative judgment, not objective measurement.
 
-1. the Bottle;
-2. its current BottleGroup;
-3. Bottle-owned entity statistics.
+## User Preference
 
-There is no separate group-stats queue path. Transactions that change group
-membership recompute affected groups before commit; ordinary tasting activity
-converges through the idempotent Bottle job.
+`user.rating_system` stores `simple` or `advanced` and defaults to `simple`.
+The preference is private account data and chooses the initial control for a
+new tasting. An existing tasting's stored rating takes precedence while
+editing, so changing the preference never changes historical entries.
 
-## Legacy Rating Migration
+The preference affects input behavior only. It does not hide either community
+aggregate from bottle pages.
 
-The simple-rating migration preserved the previous five-star value in
-`ratingLegacy` and converted the active rating:
+## Materialized Aggregates
 
-- `rating <= 2.0` became Pass;
-- `2.0 < rating <= 4.0` became Sip;
-- `rating > 4.0` became Savor.
+Both `bottle` and `bottle_group` store:
 
-New writes do not maintain a second five-star rating system.
+```typescript
+avgScore: doublePrecision("avg_score");
+totalScores: bigint("total_scores", { mode: "number" });
+```
 
-## Performance
+Each Bottle aggregate includes only tastings assigned to that exact marketed
+release. Its BottleGroup aggregate derives from raw tastings assigned to every
+active member Bottle, counted once. The group owns no direct tastings.
 
-- Keep the `tasting.bottleId` index for direct Bottle and member-set scans.
-- Add rated-value indexes only when query evidence justifies them.
-- Keep recomputation idempotent so delayed or retried jobs converge on raw
-  activity.
-- Read replicas may serve analytics but must not own alternate aggregate logic.
+`totalTastings` counts all tasting records, including records with no rating.
+`totalScores` counts only non-null advanced scores. `avgScore` is the arithmetic
+mean of those scores and is null when the count is zero.
 
-## Required Tests
+Tasting create, update, and delete routes persist the tasting first and then
+enqueue `UpdateBottleStats`. That worker is the authoritative path: it
+recomputes the exact Bottle, its current BottleGroup, and related entity stats
+from current tasting rows. Dispatch failures are logged without rolling back an
+already durable tasting.
 
-Database-backed tests should prove:
+## Sorting and Filtering
 
-- a Bottle aggregate includes only its direct tastings;
-- a group aggregate includes raw activity for each active member once;
-- unrelated and retired-member activity is excluded;
-- unrated tastings affect `totalTastings` but not rated statistics;
-- invalid Bottle/group graph state does not partially update aggregates;
-- workers carry direct Bottle or aggregate-owner group ids; and
-- rerunning recomputation produces the same derived result.
+Bottle list API consumers can use:
+
+- `sort=score` for ascending advanced community average.
+- `sort=-score` for descending advanced community average.
+- `minScore=<0-100>` to require a minimum advanced average.
+
+Unscored bottles sort last. Simple rating sort and filter parameters continue
+to use `avgRating`; no parameter silently falls back to the other system.
+
+The initial release does not apply Bayesian ranking, outlier trimming, reviewer
+weighting, or a minimum-count promotion threshold. Interfaces must show the
+score count so users can judge a sparse average. A future top-rated feature
+must define its own minimum-count and confidence policy.
+
+## External Critic Reviews
+
+External review scores remain in the `review` table and retain their source
+name and URL. When source policy permits display and the publication's native
+scale is 100 points, Peated may add its standard band label. The named
+publication still owns its tasting methodology.
+
+External reviews never contribute to `avgScore`, `totalScores`, `avgRating`, or
+`ratingStats`. UI copy must keep “Peated Community Score,” simple community
+ratings, and “The Critics” visibly distinct.
+
+## Public Methodology and Structured Data
+
+The static `/about/ratings` page is the public source of truth for both community
+systems. Advanced inputs and community summaries link to it. OpenAPI field
+descriptions state the numeric range and separation invariant.
+
+Schema.org aggregate rating data is emitted only for advanced community scores,
+with `bestRating: 100`, `worstRating: 0`, and `reviewCount: totalScores`.
+Pass/Sip/Savor values must not be exposed as an unlabeled conventional numeric
+aggregate.
+
+## Migration and Rollback
+
+The advanced schema migration is additive. Existing simple and legacy ratings
+are not rewritten. New users and existing users receive the `simple` default.
+
+Application rollback can hide the advanced inputs while leaving score columns
+intact. This preserves any scores created after launch and avoids a destructive
+down migration.
+
+## Verification Expectations
+
+Changes to ratings should cover:
+
+- Integer and range validation, including valid score `0`.
+- Database and API prevention of dual ratings.
+- Replacing and clearing each system.
+- Preference persistence and existing-tasting precedence.
+- Exact Bottle and BottleGroup aggregate scope.
+- Separation from simple, legacy, and critic data.
+- Null-last score sorting and minimum-score filtering.
+- Accessible input constraints, band copy, and public methodology links.

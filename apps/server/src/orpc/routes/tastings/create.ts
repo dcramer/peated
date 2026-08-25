@@ -79,7 +79,8 @@ export default procedure
 
     const data: Omit<NewTasting, "bottleId"> = {
       notes: input.notes || null,
-      rating: input.rating || null,
+      rating: input.rating ?? null,
+      score: input.score ?? null,
       servingStyle: input.servingStyle || null,
       color: input.color || null,
       tags: input.tags ? await validateTags(input.tags) : [],

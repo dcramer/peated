@@ -32,6 +32,14 @@ const TastingRatingSchema = z
   .nullable()
   .default(null)
   .describe("Simple rating: -1 (Pass), 1 (Sip), 2 (Savor)");
+const TastingScoreSchema = z
+  .number()
+  .int()
+  .min(0)
+  .max(100)
+  .nullable()
+  .default(null)
+  .describe("Advanced whole-number whisky score from 0 through 100");
 const TastingTagsSchema = z
   .array(z.string())
   .default([])
@@ -62,6 +70,7 @@ export const TastingSchema = z.object({
   notes: TastingNotesSchema,
   bottle: BottleSchema.describe("Bottle that was tasted"),
   rating: TastingRatingSchema,
+  score: TastingScoreSchema,
   tags: TastingTagsSchema,
   color: TastingColorSchema,
   servingStyle: TastingServingStyleSchema,
@@ -129,11 +138,17 @@ export const TastingContentInputSchema = TastingSchema.omit({
 
 export const TastingInputSchema = TastingContentInputSchema.extend({
   bottle: z.number().int().positive().describe("Bottle being tasted"),
-}).strict();
+})
+  .strict()
+  .refine((data) => data.rating === null || data.score === null, {
+    message: "Cannot provide both a simple rating and an advanced score",
+    path: ["score"],
+  });
 
 export const TastingUpdateFields = {
   notes: TastingNotesSchema.removeDefault().optional(),
   rating: TastingRatingSchema.removeDefault().optional(),
+  score: TastingScoreSchema.removeDefault().optional(),
   servingStyle: TastingServingStyleSchema.removeDefault().optional(),
   color: TastingColorSchema.removeDefault().optional(),
   friends: z.array(z.number()).optional(),

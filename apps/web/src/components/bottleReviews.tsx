@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { getAdvancedRatingBand } from "@peated/server/constants";
 import type { Outputs } from "@peated/server/orpc/router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useORPC } from "../lib/orpc/context";
@@ -38,6 +39,10 @@ export function BottleReviewList({ results }: { results: ReviewListItem[] }) {
       <ul className="mb-4 divide-y divide-slate-800">
         {reviews.map((review) => {
           const site = review.site!;
+          const nativeBand =
+            review.nativeScore?.scale === 100
+              ? getAdvancedRatingBand(review.nativeScore.value)
+              : null;
           return (
             <li key={review.id} className="py-4 first:pt-2">
               <div className="flex items-start justify-between gap-4">
@@ -62,6 +67,12 @@ export function BottleReviewList({ results }: { results: ReviewListItem[] }) {
                 {review.nativeScore ? (
                   <span className="shrink-0 font-semibold">
                     {review.nativeScore.display}
+                    {nativeBand ? (
+                      <span className="text-muted font-normal">
+                        {" "}
+                        · {nativeBand.label}
+                      </span>
+                    ) : null}
                   </span>
                 ) : null}
               </div>

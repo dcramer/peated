@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  check,
   doublePrecision,
   index,
   integer,
@@ -45,6 +46,7 @@ export const tastings = pgTable(
     color: integer("color"),
     ratingLegacy: doublePrecision("rating_legacy"),
     rating: smallint("rating"),
+    score: smallint("score"),
     imageUrl: text("image_url"),
     notes: text("notes"),
     servingStyle: servingStyleEnum("serving_style"),
@@ -74,6 +76,14 @@ export const tastings = pgTable(
     index("tasting_release_idx").on(table.legacyReleaseId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
+    check(
+      "tasting_score_check",
+      sql`${table.score} IS NULL OR (${table.score} >= 0 AND ${table.score} <= 100)`,
+    ),
+    check(
+      "tasting_rating_system_check",
+      sql`${table.rating} IS NULL OR ${table.score} IS NULL`,
+    ),
   ],
 );
 

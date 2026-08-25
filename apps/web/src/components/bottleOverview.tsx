@@ -4,6 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
 import { Suspense } from "react";
+import AdvancedRatingDisplay from "./advancedRatingDisplay";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution from "./bottleTagDistribution";
 import CaskDetails from "./caskDetails";
@@ -37,6 +38,24 @@ export default function BottleOverview({
               <div className="my-6">
                 <SimpleRatingStats stats={bottle.ratingStats} />
               </div>
+            )}
+            {bottle.avgScore !== null && bottle.totalScores > 0 && (
+              <section className="my-6">
+                <Heading as="h3">Peated Community Score</Heading>
+                <div className="text-lg">
+                  <AdvancedRatingDisplay
+                    score={bottle.avgScore}
+                    count={bottle.totalScores}
+                    aggregate
+                  />
+                </div>
+                <Link
+                  href="/about/ratings"
+                  className="text-muted text-sm underline"
+                >
+                  How ratings work
+                </Link>
+              </section>
             )}
             <div className="my-6">
               <BottleTagDistribution bottleId={bottle.id} />

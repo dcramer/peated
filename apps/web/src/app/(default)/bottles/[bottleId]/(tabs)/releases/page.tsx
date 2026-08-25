@@ -75,6 +75,7 @@ export default async function ReleaseFamilyPage(props: {
     <ReleaseFamilyView
       bottleList={bottleList}
       currentBottleId={anchorBottleId}
+      group={group}
     />
   );
 }

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RATING_SYSTEMS } from "../constants";
 import { FriendStatusEnum } from "./shared";
 
 export const UserSchema = z.object({
@@ -19,6 +20,10 @@ export const UserSchema = z.object({
     .boolean()
     .default(false)
     .describe("Whether the user's profile is private"),
+  ratingSystem: z
+    .enum(RATING_SYSTEMS)
+    .optional()
+    .describe("Preferred rating input for new tastings"),
 
   email: z.string().email().optional().describe("User's email address"),
   verified: z

@@ -19,10 +19,12 @@ async function createTasting(
   createdById: number,
   rating: number | null,
   sequence: number,
+  score: number | null = null,
 ) {
   await db.insert(tastings).values({
     bottleId,
     rating,
+    score,
     createdById,
     createdAt: new Date(Date.UTC(2026, 0, 2, 0, 0, sequence)),
   });
@@ -44,12 +46,15 @@ describe("Bottle statistics recomputation", () => {
     ].entries()) {
       await createTasting(bottle.id, defaults.user.id, rating, sequence);
     }
+    await createTasting(bottle.id, defaults.user.id, null, 4, 84);
+    await createTasting(bottle.id, defaults.user.id, null, 5, 88);
     await createTasting(
       unrelated.id,
       defaults.user.id,
       SIMPLE_RATING_VALUES.SAVOR,
       10,
     );
+    await createTasting(unrelated.id, defaults.user.id, null, 11, 99);
     const groupBefore = await db.query.bottleGroups.findFirst({
       where: eq(bottleGroups.id, bottle.groupId),
     });
@@ -67,8 +72,10 @@ describe("Bottle statistics recomputation", () => {
     expect(firstResult).toMatchObject({
       id: bottle.id,
       groupId: bottle.groupId,
-      totalTastings: 4,
+      totalTastings: 6,
       avgRating: expectedAverage,
+      avgScore: 86,
+      totalScores: 2,
       ratingStats: {
         pass: 1,
         sip: 1,
@@ -81,6 +88,8 @@ describe("Bottle statistics recomputation", () => {
     expect(secondResult).toMatchObject({
       totalTastings: firstResult.totalTastings,
       avgRating: firstResult.avgRating,
+      avgScore: firstResult.avgScore,
+      totalScores: firstResult.totalScores,
       ratingStats: firstResult.ratingStats,
     });
     await expect(
@@ -102,6 +111,8 @@ describe("Bottle statistics recomputation", () => {
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
       totalTastings: 0,
       avgRating: null,
+      avgScore: null,
+      totalScores: 0,
       ratingStats: {
         pass: 0,
         sip: 0,
@@ -118,6 +129,8 @@ describe("Bottle statistics recomputation", () => {
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
       totalTastings: 2,
       avgRating: null,
+      avgScore: null,
+      totalScores: 0,
       ratingStats: {
         pass: 0,
         sip: 0,

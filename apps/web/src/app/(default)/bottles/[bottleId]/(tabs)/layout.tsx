@@ -57,13 +57,16 @@ export default async function Layout(props: {
       "@type": "Brand",
       name: bottle.brand?.name,
     },
-    aggregateRating: bottle.totalTastings
-      ? {
-          "@type": "AggregateRating",
-          ratingValue: bottle.avgRating ?? 0,
-          reviewCount: bottle.totalTastings,
-        }
-      : undefined,
+    aggregateRating:
+      bottle.totalScores > 0 && bottle.avgScore !== null
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: bottle.avgScore,
+            bestRating: 100,
+            worstRating: 0,
+            reviewCount: bottle.totalScores,
+          }
+        : undefined,
     offers: bottle.lastPrice
       ? {
           "@type": "AggregateOffer",
