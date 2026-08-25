@@ -16,7 +16,7 @@ export default procedure
     path: "/bottle-barcodes",
     summary: "Add a Bottle barcode",
     description:
-      "Assign an approved product barcode to a Bottle. Requires moderator privileges",
+      "Add a product barcode to a Bottle. Requires moderator privileges",
     operationId: "upsertBottleBarcode",
   })
   .input(

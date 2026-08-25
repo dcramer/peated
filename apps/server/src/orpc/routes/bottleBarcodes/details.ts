@@ -14,7 +14,7 @@ export default procedure
     method: "GET",
     path: "/bottle-barcodes/{barcode}",
     summary: "Look up a Bottle by barcode",
-    description: "Find the Bottle assigned to an approved product barcode",
+    description: "Find the Bottle that has this product barcode",
     operationId: "getBottleBarcode",
   })
   .input(z.object({ barcode: GtinSchema }).strict())

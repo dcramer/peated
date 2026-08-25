@@ -11,7 +11,7 @@ export default procedure
     method: "GET",
     path: "/bottle-barcodes",
     summary: "List bottle barcodes",
-    description: "List approved product barcodes assigned to a Bottle",
+    description: "List product barcodes for a Bottle",
     operationId: "listBottleBarcodes",
   })
   .input(z.object({ bottle: z.coerce.number() }).strict())

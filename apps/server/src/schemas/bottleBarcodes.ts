@@ -17,7 +17,7 @@ export const GtinSchema = z
       return z.NEVER;
     }
   })
-  .describe("A valid GTIN-8, GTIN-12, GTIN-13, or GTIN-14 barcode");
+  .describe("Product barcode number (GTIN-8, GTIN-12, GTIN-13, or GTIN-14)");
 
 export const BottleBarcodeSchema = z.object({
   id: z.number().readonly().describe("Unique identifier for this barcode"),

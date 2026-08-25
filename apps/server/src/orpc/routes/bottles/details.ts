@@ -26,7 +26,7 @@ const OutputSchema = z.intersection(
     barcodes: z
       .array(BottleBarcodeSchema.pick({ value: true, volume: true }))
       .readonly()
-      .describe("Approved product barcodes assigned to this Bottle"),
+      .describe("Product barcodes for this Bottle"),
     people: z.number(),
     lastPrice: StorePriceSchema.nullable(),
   }),

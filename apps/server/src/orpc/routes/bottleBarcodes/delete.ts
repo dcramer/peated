@@ -14,7 +14,7 @@ export default procedure
     path: "/bottle-barcodes/{barcode}",
     summary: "Delete a Bottle barcode",
     description:
-      "Remove an approved product barcode from a Bottle. Requires moderator privileges",
+      "Remove a product barcode from a Bottle. Requires moderator privileges",
     operationId: "deleteBottleBarcode",
   })
   .input(z.object({ barcode: GtinSchema }).strict())
