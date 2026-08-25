@@ -270,7 +270,7 @@ function buildAbvMatchInput({
   brand?: string;
   candidateAbv: number;
   extractedAbv: number;
-  source: "image" | "structured";
+  source: "image" | "text" | "structured" | null;
   webEvidence?: "supportive" | "conflicting" | "not_needed";
 }) {
   const targetCandidate: BottleCandidate = {
@@ -1473,18 +1473,6 @@ describe("finalizeBottleReferenceClassification", () => {
     },
   );
 
-  test("keeps a structured ABV conflict as a hard failure", () => {
-    expect(
-      finalizeBottleReferenceClassification(
-        buildAbvMatchInput({
-          extractedAbv: 46,
-          candidateAbv: 40,
-          source: "structured",
-        }),
-      ),
-    ).toMatchObject({ action: "no_match", matchedBottleId: null });
-  });
-
   test("keeps a matching image-derived ABV without adding a risk", () => {
     const result = finalizeBottleReferenceClassification(
       buildAbvMatchInput({
@@ -1501,7 +1489,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("accepts independent web evidence that supports the candidate ABV", () => {
+  test("keeps an image ABV conflict in review with supportive web evidence", () => {
     const result = finalizeBottleReferenceClassification(
       buildAbvMatchInput({
         extractedAbv: 46,
@@ -1514,9 +1502,31 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result).toMatchObject({
       action: "match",
       matchedBottleId: 9901,
-      confidenceBasis: { unresolvedRisks: [] },
+      confidenceBasis: {
+        unresolvedRisks: [
+          {
+            category: "trait_conflict",
+            note: "Image-extracted ABV conflicts with the matched Bottle and needs review.",
+          },
+        ],
+      },
     });
   });
+
+  test.each(["text", "structured", null] as const)(
+    "keeps a %s-source ABV conflict as a hard failure",
+    (source) => {
+      expect(
+        finalizeBottleReferenceClassification(
+          buildAbvMatchInput({
+            extractedAbv: 46,
+            candidateAbv: 40,
+            source,
+          }),
+        ),
+      ).toMatchObject({ action: "no_match", matchedBottleId: null });
+    },
+  );
 
   test("rejects a candidate when web evidence supports the image ABV conflict", () => {
     const result = finalizeBottleReferenceClassification(

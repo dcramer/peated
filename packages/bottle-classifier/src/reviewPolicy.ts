@@ -566,11 +566,10 @@ function rejectInvalidExistingMatch({
   const hasImageAbvConflict =
     artifacts.extractedIdentitySource === "image" &&
     identityConflicts.includes("abv");
-  // One image read cannot erase a Match. Independent evidence decides whether
-  // the conflict is resolved or remains unsafe.
+  // One image read cannot erase a Match. The conflict still needs review until
+  // the runtime carries independent evidence for this exact field and value.
   const imageAbvNeedsReview =
     hasImageAbvConflict &&
-    decision.confidenceBasis?.webEvidence !== "supportive" &&
     decision.confidenceBasis?.webEvidence !== "conflicting";
   const hardIdentityConflicts =
     hasImageAbvConflict &&

@@ -1273,9 +1273,6 @@ export function createStorePriceMatchResolver({
       } else if (reuseExistingExtraction) {
         classificationInput.extractedIdentity =
           parseStoredExtractedLabel(existingProposal);
-        classificationInput.extractedIdentitySource = price.imageUrl
-          ? "image"
-          : "text";
       }
 
       const classificationRun = await runReference(classificationInput);

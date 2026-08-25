@@ -991,19 +991,18 @@ export function createBottleClassifier(
     allowAutoIgnore?: boolean;
   }) => {
     const deterministicIdentitySeed = getDeterministicIdentitySeed(reference);
-    // Supplied identities come from reviewed adapters unless the caller marks
-    // reused model extraction explicitly.
     const extractedReference =
       suppliedExtractedIdentity !== undefined
         ? {
             identity: suppliedExtractedIdentity,
-            source: suppliedExtractedIdentitySource ?? "structured",
+            source: suppliedExtractedIdentitySource ?? null,
           }
         : deterministicIdentitySeed
           ? { identity: deterministicIdentitySeed, source: "text" as const }
           : await extractBottleReferenceIdentityWithSource(reference);
     const rawExtractedIdentity = extractedReference.identity;
-    const extractedIdentitySource = extractedReference.source;
+    const extractedIdentitySource: "image" | "text" | "structured" | null =
+      extractedReference.source;
     const extractedIdentity = applyDeterministicIdentitySeed({
       reference,
       extractedIdentity: rawExtractedIdentity,

@@ -219,7 +219,9 @@ export const ClassifyBottleReferenceInputSchema = z
     extractedIdentitySource: z
       .enum(["image", "text", "structured"])
       .optional()
-      .describe("Origin of a supplied extracted identity."),
+      .describe(
+        "Known origin of a supplied extracted identity. Omit when unknown.",
+      ),
     imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     initialCandidates: z.array(BottleCandidateSchema).optional(),
     candidateExpansion: CandidateExpansionModeSchema.default("open"),
@@ -326,7 +328,7 @@ export type ClassifyBottleReferenceInput = {
   reference: BottleReference;
   conversationId?: string;
   extractedIdentity?: null | z.infer<typeof BottleExtractedDetailsSchema>;
-  /** Origin of a supplied extracted identity. Defaults to structured. */
+  /** Known origin of a supplied extracted identity. Omit when unknown. */
   extractedIdentitySource?: "image" | "text" | "structured";
   imageEvidence?: null | z.infer<typeof ImageBottleEvidenceSchema>;
   initialCandidates?: z.infer<typeof BottleCandidateSchema>[];

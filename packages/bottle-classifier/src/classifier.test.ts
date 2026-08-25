@@ -2079,6 +2079,27 @@ describe("createBottleClassifier", () => {
     expect(result.artifacts.extractedIdentitySource).toBe("image");
   });
 
+  test("keeps supplied extraction provenance unknown when omitted", async () => {
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent: async ({ extractedIdentity }) => ({
+        decision: noMatchAgentDecision(),
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Wild Turkey Rare Breed Rye" },
+      extractedIdentity: wildTurkeyRareBreedRyeIdentity,
+    });
+
+    expect(result.artifacts.extractedIdentitySource).toBeNull();
+  });
+
   test("falls back to text extraction when image extraction returns null", async () => {
     const runBottleClassifierAgent = vi.fn(
       async ({ extractedIdentity }): Promise<ReasoningResult> => ({
