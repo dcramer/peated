@@ -195,7 +195,7 @@ export default function BottleOverview({
               {bottle.maltPhenolPpm !== null &&
                 bottle.maltPhenolPpm !== undefined && (
                   <>
-                    <DefinitionList.Term>Peat Level</DefinitionList.Term>
+                    <DefinitionList.Term>PPM</DefinitionList.Term>
                     <DefinitionList.Details>
                       {bottle.maltPhenolPpm} PPM
                     </DefinitionList.Details>

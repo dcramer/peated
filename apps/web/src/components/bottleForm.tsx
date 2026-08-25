@@ -641,10 +641,9 @@ export default function BottleForm({
               })}
               error={errors.maltPhenolPpm}
               type="number"
-              label="Peat Level"
+              label="PPM"
               placeholder="e.g. 101.4"
               helpText="The phenol level of the malted barley, as stated by the producer for this bottle."
-              suffixLabel="PPM"
               step="0.1"
               min="0"
             />
