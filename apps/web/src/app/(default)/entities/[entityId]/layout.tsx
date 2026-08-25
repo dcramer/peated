@@ -113,7 +113,7 @@ export default async function Layout(props: {
                 Create Bottle
               </Button>
 
-              <ShareButton title={entity.name} url={`/entities/${entity.id}`} />
+              <ShareButton title={entity.name} url={`/${entity.peatedId}`} />
 
               <ModActions entity={entity} />
             </div>

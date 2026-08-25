@@ -1,3 +1,4 @@
+import { resolvePeatedIdRoute } from "@peated/web/lib/peatedIdRoutes";
 import { type NextRequest, NextResponse } from "next/server";
 
 const PRIVATE_CACHE_CONTROL =
@@ -10,9 +11,23 @@ export function proxy(request: NextRequest) {
     "x-peated-request-path",
     `${request.nextUrl.pathname}${request.nextUrl.search}`,
   );
-  const response = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
+  const resolution = resolvePeatedIdRoute(request.nextUrl.pathname);
+  let response: NextResponse;
+
+  if (resolution) {
+    const destination = request.nextUrl.clone();
+    destination.pathname = resolution.pathname;
+    response =
+      resolution.action === "redirect"
+        ? NextResponse.redirect(destination, 308)
+        : NextResponse.rewrite(destination, {
+            request: { headers: requestHeaders },
+          });
+  } else {
+    response = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+  }
 
   if (request.cookies.has("_session")) {
     response.headers.set("Cache-Control", PRIVATE_CACHE_CONTROL);

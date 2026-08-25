@@ -8,6 +8,7 @@ import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import { db, type AnyDatabase } from "@peated/server/db";
 import { entities, entityTombstones } from "@peated/server/db/schema";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
+import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import {
@@ -41,6 +42,7 @@ async function getEntityById(entityId: number, entityDb: AnyDatabase) {
 
   return EntitySchema.parse({
     id: entity.id,
+    peatedId: formatPeatedId("entity", entity.id),
     name: entity.name,
     shortName: entity.shortName,
     type: entity.type,
@@ -86,6 +88,7 @@ async function getEntity(
 
   return EntitySchema.parse({
     id: existingEntity.id,
+    peatedId: formatPeatedId("entity", existingEntity.id),
     name: existingEntity.name,
     shortName: existingEntity.shortName,
     type: existingEntity.type,

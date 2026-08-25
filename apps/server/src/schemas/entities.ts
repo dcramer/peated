@@ -1,3 +1,4 @@
+import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 
 import { ContentSourceEnum, EntityTypeEnum } from "./common";
@@ -53,6 +54,12 @@ const EntityLocationSchema = PointSchema.nullable()
 
 export const EntitySchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the entity"),
+  peatedId: z
+    .string()
+    .regex(/^E\d{6,}$/)
+    .refine((value) => isCanonicalPeatedId(value, "entity"))
+    .readonly()
+    .describe("Permanent Peated ID for the entity"),
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
   type: EntityTypesSchema,

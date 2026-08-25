@@ -91,6 +91,7 @@ export const testAccessToken = "peated-playwright-access-token";
 
 export const testBrand = {
   id: 9201,
+  peatedId: "E009201",
   name: "Lagavulin",
   shortName: null,
   type: ["brand", "distiller"],
@@ -130,6 +131,7 @@ export function buildBottle({
 } = {}) {
   return {
     id,
+    peatedId: `B${String(id).padStart(6, "0")}`,
     fullName: `${brand.name} ${name}`,
     name,
     series: null,
@@ -261,6 +263,7 @@ export const unifiedBottleEditContext = {
 export const exactMatchedBottle = {
   ...existingBottle,
   id: exactMatchedBottleId,
+  peatedId: `B${String(exactMatchedBottleId).padStart(6, "0")}`,
   fullName: `${existingBottle.fullName} Distillers Edition`,
   name: "Distillers Edition",
   edition: "Distillers Edition",

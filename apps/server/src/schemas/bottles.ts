@@ -1,3 +1,4 @@
+import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 import { BottleSeriesInputSchema, BottleSeriesSchema } from "./bottleSeries";
 import { BottleGroupV1Schema } from "./catalogIdentity";
@@ -104,6 +105,12 @@ const BottleTastingNotesSchema = z
 
 export const BottleSchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the bottle"),
+  peatedId: z
+    .string()
+    .regex(/^B\d{6,}$/)
+    .refine((value) => isCanonicalPeatedId(value, "bottle"))
+    .readonly()
+    .describe("Permanent Peated ID for the bottle"),
   fullName: z
     .string()
     .readonly()

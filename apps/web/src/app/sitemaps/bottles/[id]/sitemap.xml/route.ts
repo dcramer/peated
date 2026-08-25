@@ -32,7 +32,7 @@ export async function GET(
 
     pages.push(
       ...results.map((bottle) => ({
-        url: `/bottles/${bottle.id}`,
+        url: `/${bottle.peatedId}`,
         lastModified: bottle.updatedAt,
       })),
     );

@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleTombstones } from "@peated/server/db/schema";
+import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -13,6 +14,7 @@ describe("GET /bottles/:bottle", () => {
     });
     expect(data.id).toEqual(bottle.id);
     expect(data.group?.id).toEqual(bottle.groupId);
+    expect(data.peatedId).toEqual(formatPeatedId("bottle", bottle.id));
     expect("createdBy" in data).toBe(false);
   });
 

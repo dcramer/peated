@@ -8,6 +8,7 @@ const timestamp = "2026-07-22T12:00:00.000Z";
 
 const brand = {
   id: 7,
+  peatedId: "E000007",
   name: "Springbank",
   shortName: null,
   type: ["brand"],
@@ -27,6 +28,7 @@ const brand = {
 
 const bottle = {
   id: 19,
+  peatedId: "B000019",
   fullName: "Springbank 12 Cask Strength Batch 24",
   name: "12 Cask Strength Batch 24",
   series: null,

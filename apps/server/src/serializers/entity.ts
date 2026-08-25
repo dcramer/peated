@@ -4,6 +4,7 @@ import { serialize, serializer } from ".";
 import { db } from "../db";
 import { countries, regions, type Entity, type User } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { formatPeatedId } from "../lib/peatedId";
 import { type EntitySchema } from "../schemas";
 import { CountrySerializer } from "./country";
 import { RegionSerializer } from "./region";
@@ -60,6 +61,7 @@ export const EntitySerializer = serializer({
   item: (item: Entity, attrs: EntityAttrs): z.infer<typeof EntitySchema> => {
     return {
       id: item.id,
+      peatedId: formatPeatedId("entity", item.id),
       name: item.name,
       shortName: item.shortName,
       type: item.type,

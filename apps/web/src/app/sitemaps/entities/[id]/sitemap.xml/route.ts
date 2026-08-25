@@ -30,7 +30,7 @@ export async function GET(
 
     pages.push(
       ...results.map((entity) => ({
-        url: `/entities/${entity.id}`,
+        url: `/${entity.peatedId}`,
         lastModified: entity.updatedAt,
       })),
     );
