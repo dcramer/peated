@@ -20,11 +20,21 @@ export const GtinSchema = z
   .describe("A valid GTIN-8, GTIN-12, GTIN-13, or GTIN-14 barcode");
 
 export const BottleBarcodeSchema = z.object({
-  id: z.number().readonly(),
-  bottle: z.number().readonly(),
-  value: z.string().readonly(),
-  volume: z.number().int().positive().nullable().readonly(),
-  createdAt: z.string().datetime().readonly(),
+  id: z.number().readonly().describe("Unique identifier for this barcode"),
+  bottle: z.number().readonly().describe("Bottle assigned to this barcode"),
+  value: GtinSchema.readonly().describe("Product barcode number"),
+  volume: z
+    .number()
+    .int()
+    .positive()
+    .nullable()
+    .readonly()
+    .describe("Package size in milliliters, when known"),
+  createdAt: z
+    .string()
+    .datetime()
+    .readonly()
+    .describe("Time when this barcode was assigned"),
 });
 
 export const BottleBarcodeLookupSchema = z.object({

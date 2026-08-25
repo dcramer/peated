@@ -14,9 +14,9 @@ export default procedure
   .route({
     method: "PUT",
     path: "/bottle-barcodes",
-    summary: "Add bottle barcode",
+    summary: "Add a Bottle barcode",
     description:
-      "Assign a canonical GTIN barcode to an exact Bottle. Requires moderator privileges",
+      "Assign an approved product barcode to a Bottle. Requires moderator privileges",
     operationId: "upsertBottleBarcode",
   })
   .input(

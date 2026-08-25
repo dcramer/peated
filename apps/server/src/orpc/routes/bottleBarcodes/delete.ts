@@ -12,9 +12,9 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/bottle-barcodes/{barcode}",
-    summary: "Delete bottle barcode",
+    summary: "Delete a Bottle barcode",
     description:
-      "Remove a canonical GTIN barcode mapping. Requires moderator privileges",
+      "Remove an approved product barcode from a Bottle. Requires moderator privileges",
     operationId: "deleteBottleBarcode",
   })
   .input(z.object({ barcode: GtinSchema }).strict())

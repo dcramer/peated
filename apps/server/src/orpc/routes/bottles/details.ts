@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleBarcodes,
   bottleTombstones,
   bottles,
   storePrices,
@@ -7,6 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import {
+  BottleBarcodeSchema,
   BottleSchema,
   StorePriceSchema,
   detailsResponse,
@@ -14,13 +16,17 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
 // Compose details as Bottle schema + extra fields to allow OpenAPI $ref via allOf
 const OutputSchema = z.intersection(
   BottleSchema,
   z.object({
+    barcodes: z
+      .array(BottleBarcodeSchema.pick({ value: true, volume: true }))
+      .readonly()
+      .describe("Approved product barcodes assigned to this Bottle"),
     people: z.number(),
     lastPrice: StorePriceSchema.nullable(),
   }),
@@ -32,7 +38,7 @@ export default procedure
     path: "/bottles/{bottle}",
     summary: "Get bottle details",
     description:
-      "Retrieve detailed information about a specific bottle including pricing and tasting statistics",
+      "Retrieve Bottle details, including product barcodes, pricing, and tasting statistics",
     spec: (spec) => ({
       ...spec,
       operationId: "getBottle",
@@ -66,26 +72,37 @@ export default procedure
       }
     }
 
-    const [lastPrice] = await db
-      .select()
-      .from(storePrices)
-      .where(
-        and(eq(storePrices.bottleId, bottle.id), eq(storePrices.hidden, false)),
-      )
-      .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
-      .limit(1);
-
-    const [{ count: totalPeople }] = await db
-      .select({
-        count: sql<string>`COUNT(DISTINCT ${tastings.createdById})`,
-      })
-      .from(tastings)
-      .where(eq(tastings.bottleId, bottle.id));
+    const [[lastPrice], [{ count: totalPeople }], barcodeList] =
+      await Promise.all([
+        db
+          .select()
+          .from(storePrices)
+          .where(
+            and(
+              eq(storePrices.bottleId, bottle.id),
+              eq(storePrices.hidden, false),
+            ),
+          )
+          .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
+          .limit(1),
+        db
+          .select({
+            count: sql<string>`COUNT(DISTINCT ${tastings.createdById})`,
+          })
+          .from(tastings)
+          .where(eq(tastings.bottleId, bottle.id)),
+        db
+          .select()
+          .from(bottleBarcodes)
+          .where(eq(bottleBarcodes.bottleId, bottle.id))
+          .orderBy(asc(bottleBarcodes.value), asc(bottleBarcodes.id)),
+      ]);
 
     return {
       ...(await serialize(BottleSerializer, bottle, context.user, [], {
         includeGroupSummary: true,
       })),
+      barcodes: barcodeList.map(({ value, volume }) => ({ value, volume })),
       people: Number(totalPeople),
       lastPrice: lastPrice
         ? await serialize(StorePriceSerializer, lastPrice, context.user)
