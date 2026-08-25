@@ -46,10 +46,19 @@ An 80 means good; it is not a school grade. Scores of 90 and above should be
 rare, and 95 and above should represent extraordinary experiences. One point
 can express a small personal preference, but it is not scientific precision.
 
-Users score the whisky and their experience of it, including aroma, flavor,
-texture, balance, complexity, and finish. Price, rarity, packaging, and
-reputation are excluded so a score remains useful when market circumstances
-change.
+To choose a score, taste first and use 80 as the starting point for a good,
+enjoyable whisky with no major problem. Move up for clear flavors, balance,
+depth, a pleasant texture, and a finish that lasts. Move down for off flavors,
+rough alcohol, thin texture, poor balance, or a finish that fades quickly.
+
+Once the whisky is in a band, use the bottom when it just fits, the middle when
+it clearly fits, and the top when it nearly reaches the next band. For example,
+85 just enters Very good, 87 is clearly Very good, and 89 nearly reaches
+Exceptional. This is one judgment of the whole whisky, not a sum of required
+subscores.
+
+Price, rarity, packaging, and reputation are excluded so a score remains useful
+when market circumstances change.
 
 ## Recording and Editing
 

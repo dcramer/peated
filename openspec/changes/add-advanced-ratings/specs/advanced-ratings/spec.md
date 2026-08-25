@@ -2,7 +2,7 @@
 
 ### Requirement: Uniform 100-point rubric
 
-The system SHALL accept whole-number community scores from 0 through 100 and SHALL interpret them using the Peated bands 95-100 Extraordinary, 90-94 Exceptional, 85-89 Very good, 80-84 Good, 75-79 Fair, and 0-74 Not recommended.
+The system SHALL accept whole-number community scores from 0 through 100 and SHALL interpret them using the Peated bands 95-100 Extraordinary, 90-94 Exceptional, 85-89 Very good, 80-84 Good, 75-79 Fair, and 0-74 Not recommended. The published method SHALL tell users to start at 80 for a good whisky, adjust a single whole-whisky score for its strengths and flaws, and choose the bottom, middle, or top of the resulting band without requiring subscores.
 
 #### Scenario: User evaluates a score
 
@@ -18,6 +18,11 @@ The system SHALL accept whole-number community scores from 0 through 100 and SHA
 
 - **WHEN** a client submits an advanced score below 0 or above 100
 - **THEN** the system rejects the input
+
+#### Scenario: User chooses an exact score
+
+- **WHEN** a user follows the Peated method for a whisky that clearly fits Very good but is not close to Exceptional
+- **THEN** the guidance leads them toward the middle of the 85-89 band without requiring category arithmetic
 
 ### Requirement: Alternative tasting rating systems
 
@@ -121,7 +126,7 @@ The system SHALL provide a public ratings page describing Pass/Sip/Savor, every 
 #### Scenario: User requests scoring guidance
 
 - **WHEN** a visitor opens the public ratings page
-- **THEN** the visitor can determine what an 80, 85, 90, and 95 mean and what factors the score excludes
+- **THEN** the visitor can determine what an 80, 85, 90, and 95 mean, how to choose and adjust a score, and what factors the score excludes
 
 #### Scenario: Form links to methodology
 

@@ -23,8 +23,10 @@
 - [x] 3.5 Apply the uniform Peated score-band presentation to permitted native 100-point critic scores without combining aggregates
 - [x] 3.6 Add a static public ratings-methodology page and link it from advanced rating inputs and relevant summaries
 - [x] 3.7 Add focused web tests and manually verify the changed tasting workflow at desktop and mobile widths
+- [x] 3.8 Add a practical anchored walkthrough for choosing and adjusting an exact score
 
 ## 4. Documentation and Verification
 
 - [x] 4.1 Rewrite internal rating architecture and feature docs to match implemented coexistence behavior and add any new docs to AGENTS.md
 - [x] 4.2 Run targeted formatting, lint, server/web typechecks, and relevant test suites; resolve all failures
+- [x] 4.3 Re-run focused tests and desktop/mobile visual QA for the scoring walkthrough

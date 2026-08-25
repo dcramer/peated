@@ -59,6 +59,20 @@ exclude price, rarity, packaging, and reputation.
 | 75-79  | Fair            |
 | 0-74   | Not recommended |
 
+The scoring method is anchored and holistic:
+
+1. Taste before choosing a number.
+2. Start at 80, which means a good, enjoyable whisky with no major problem.
+3. Move the score up for clear flavors, balance, depth, texture, and a lasting
+   finish. Move it down for off flavors, rough alcohol, thin texture, poor
+   balance, or a weak finish.
+4. Choose the exact point within the resulting band. The bottom means the
+   whisky just fits, the middle means it clearly fits, and the top means it
+   nearly reaches the next band.
+
+The score is a judgment of the whisky as a whole. Peated does not require or
+add together nose, palate, finish, or balance subscores.
+
 `ADVANCED_RATING_BANDS` and `getAdvancedRatingBand()` in the server constants
 are the canonical programmatic definition. Web inputs, community displays, and
 permitted native 100-point critic scores use that helper rather than duplicating

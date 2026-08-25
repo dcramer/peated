@@ -34,9 +34,9 @@ export default function AdvancedRatingInput({
       error={error}
       helpText={
         <>
-          Score the whisky in the glass, excluding price, rarity, packaging, and
-          reputation. One point is personal comparative precision, not an
-          objective measurement.{" "}
+          Start at 80 for a good whisky, then move up or down for flavor,
+          balance, texture, and finish. Leave out price, rarity, packaging, and
+          reputation.{" "}
           <Link href="/about/ratings" className="underline">
             How ratings work
           </Link>

@@ -53,6 +53,8 @@ Peated uses whole-number scores and these bands everywhere it interprets a 100-p
 
 The score evaluates the whisky in the glass and the user's experience of it, excluding price, rarity, packaging, and reputation. A one-point difference is personal comparative precision, not objective measurement. Community aggregate scores display one decimal and a score count.
 
+Users taste first, start at 80 as the anchor for a good whisky with no major problem, and move a single whole-whisky score up or down for flavor, balance, texture, depth, finish, and any flaws. After finding the appropriate band, its bottom means the whisky just fits, its middle means it clearly fits, and its top means it nearly reaches the next band. This is a repeatable comparison method, not a formula, and does not require category subscores.
+
 The same band labels and visual helper can categorize a permitted native critic score when its source scale is 100 points. External reviews remain source-attributed, and Peated never exposes a normalized compatibility value as though it were the publication's methodology.
 
 Alternative considered: adopting one publisher's terminology verbatim. A Peated-owned rubric avoids implying that a third party controls community scoring while remaining compatible with familiar whisky conventions.
@@ -71,7 +73,7 @@ Tasting entries display either Pass/Sip/Savor or an integer score. Exact-Bottle 
 
 ### Make methodology a product surface
 
-Add a static public `/about/ratings` page covering both systems, the advanced bands, what is and is not evaluated, aggregation, and the distinction from critic reviews. The advanced input shows compact band guidance and links to this page. OpenAPI descriptions state ranges, exclusivity, and aggregate meaning. Internal rating docs are rewritten to match the implemented model rather than retaining speculative migration examples.
+Add a static public `/about/ratings` page covering both systems, a practical anchored scoring walkthrough, the advanced bands, what is and is not evaluated, aggregation, and the distinction from critic reviews. The advanced input shows compact guidance and links to this page. OpenAPI descriptions state ranges, exclusivity, and aggregate meaning. Internal rating docs are rewritten to match the implemented model rather than retaining speculative migration examples.
 
 ## Risks / Trade-offs
 
