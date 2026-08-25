@@ -10,7 +10,7 @@ const timestamp = "2026-07-22T12:00:00.000Z";
 
 const distiller = {
   id: 7,
-  peatedId: "E000007",
+  peatedId: "E0007",
   name: "Lagavulin",
   shortName: null,
   type: ["brand", "distiller"],
@@ -59,7 +59,7 @@ const group = {
 
 const exactBottle = {
   id: 42,
-  peatedId: "B000042",
+  peatedId: "B0042",
   fullName: "Lagavulin 16-year-old Distillers Edition",
   name: "16-year-old",
   group,

@@ -5,8 +5,8 @@ Bottle and entity links currently expose untyped database numbers inside resourc
 ## What Changes
 
 - Introduce permanent Peated IDs for externally referenced bottles and entities.
-- Format bottle IDs as `B` plus at least six digits and entity IDs as `E` plus at least six digits, using each record's existing numeric ID.
-- Serve permanent short URLs such as `https://peated.com/B000123` and `https://peated.com/E000123`.
+- Format bottle IDs as `B` plus at least four digits and entity IDs as `E` plus at least four digits, using each record's existing numeric ID.
+- Serve permanent short URLs such as `https://peated.com/B0123` and `https://peated.com/E0123`.
 - Show the Peated ID on bottle and entity pages with a copyable link.
 - Expose Peated IDs in API responses and recognize exact Peated IDs in global search.
 - Preserve existing bottle and entity detail URLs as compatibility redirects.

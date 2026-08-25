@@ -9,13 +9,13 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
   const timestamp = "2026-08-23T00:00:00.000Z";
   return {
     id: 42,
-    peatedId: "B000042",
+    peatedId: "B0042",
     fullName: "Springbank 12-year-old Cask Strength Batch 24",
     name: "12-year-old Cask Strength Batch 24",
     group: undefined,
     brand: {
       id: 1,
-      peatedId: "E000001",
+      peatedId: "E0001",
       name: "Springbank",
       shortName: null,
       type: ["brand"],

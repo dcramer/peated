@@ -8,7 +8,7 @@ function makeCollectionBottle(): CollectionBottle {
   const timestamp = "2026-08-23T00:00:00.000Z";
   const brand = {
     id: 2,
-    peatedId: "E000002",
+    peatedId: "E0002",
     name: "Compass Box",
     shortName: null,
     type: ["brand" as const],
@@ -31,7 +31,7 @@ function makeCollectionBottle(): CollectionBottle {
     status: null,
     bottle: {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Compass Box No Name No. 1",
       name: "No Name No. 1",
       brand,
@@ -130,7 +130,7 @@ describe("BottleTable", () => {
     const brand = {
       ...collectionBottle.bottle.brand,
       id: 3,
-      peatedId: "E000003",
+      peatedId: "E0003",
       name: "Woodford Reserve",
     };
     const bottle = {

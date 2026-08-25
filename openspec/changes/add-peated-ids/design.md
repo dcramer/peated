@@ -2,14 +2,14 @@
 
 Bottles and entities already use stable auto-incrementing numeric primary keys. Those numbers appear in API responses and resource-specific URLs such as `/bottles/123` and `/entities/123`. The type-specific paths prevent ambiguity, but the references are not compact or recognizable outside a URL.
 
-Peated IDs provide a human-facing public reference without replacing the numeric keys used by the database and existing API inputs. The complete value is unique because its prefix identifies the object type. A bottle and entity may both have numeric ID `123` while their Peated IDs remain distinct as `B000123` and `E000123`.
+Peated IDs provide a human-facing public reference without replacing the numeric keys used by the database and existing API inputs. The complete value is unique because its prefix identifies the object type. A bottle and entity may both have numeric ID `123` while their Peated IDs remain distinct as `B0123` and `E0123`.
 
 ## Goals / Non-Goals
 
 **Goals:**
 
 - Give every bottle and entity a permanent, compact Peated ID.
-- Make `https://peated.com/B000123` and `https://peated.com/E000123` stable public URLs.
+- Make `https://peated.com/B0123` and `https://peated.com/E0123` stable public URLs.
 - Keep IDs easy to read, type, copy, paste, and search.
 - Preserve current numeric database relationships and API compatibility.
 - Keep old and merged-object links resolving to the current object.
@@ -26,7 +26,7 @@ Peated IDs provide a human-facing public reference without replacing the numeric
 
 ### Derive Peated IDs from existing numeric IDs
 
-The formatted value is `B` plus `bottle.id` or `E` plus `entity.id`. The numeric part uses leading zeroes until it contains six digits. Larger numbers keep their full length. No new sequence or database column is needed. The prefix makes the complete reference unique across supported object types, even when their numeric portions match.
+The formatted value is `B` plus `bottle.id` or `E` plus `entity.id`. The numeric part uses leading zeroes until it contains four digits. Larger numbers keep their full length. No new sequence or database column is needed. The prefix makes the complete reference unique across supported object types, even when their numeric portions match.
 
 Alternative considered: allocate numbers from a new shared sequence. This adds schema and creation-path complexity without improving the uniqueness or usability of the complete prefixed value.
 
@@ -36,7 +36,7 @@ Documentation will call the value a Peated ID. Page headers will use the compact
 
 ### Reserve prefixed numeric IDs at the root URL
 
-The web layer will recognize root paths matching the supported Peated ID forms and internally route them through the existing bottle and entity pages. This preserves their layouts and behavior while keeping the short URL visible. Input is case-insensitive and may omit leading zeroes. Non-canonical forms redirect to uppercase IDs with at least six digits.
+The web layer will recognize root paths matching the supported Peated ID forms and internally route them through the existing bottle and entity pages. This preserves their layouts and behavior while keeping the short URL visible. Input is case-insensitive and may omit leading zeroes. Non-canonical forms redirect to uppercase IDs with at least four digits.
 
 Exact legacy detail paths `/bottles/<number>` and `/entities/<number>` redirect permanently to their Peated ID URLs. Collection and nested workflow routes retain their existing paths.
 

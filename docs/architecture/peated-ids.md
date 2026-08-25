@@ -4,19 +4,19 @@ Peated IDs are short, permanent references for public catalog objects. They are 
 
 ## Supported Objects
 
-| Object | Format               | Example   | Permanent URL                |
-| ------ | -------------------- | --------- | ---------------------------- |
-| Bottle | `B` plus six+ digits | `B000123` | `https://peated.com/B000123` |
-| Entity | `E` plus six+ digits | `E000123` | `https://peated.com/E000123` |
+| Object | Format                | Example | Permanent URL              |
+| ------ | --------------------- | ------- | -------------------------- |
+| Bottle | `B` plus four+ digits | `B0123` | `https://peated.com/B0123` |
+| Entity | `E` plus four+ digits | `E0123` | `https://peated.com/E0123` |
 
-The number is the object's existing positive database ID. Numbers shorter than six digits use leading zeroes. The prefix identifies the type, so `B000123` and `E000123` are different Peated IDs.
+The number is the object's existing positive database ID. Numbers shorter than four digits use leading zeroes. The prefix identifies the type, so `B0123` and `E0123` are different Peated IDs.
 
-Peated IDs are serialized in uppercase with at least six digits. Input and search are case-insensitive and accept omitted leading zeroes, so `b123` is normalized to `B000123`.
+Peated IDs are serialized in uppercase with at least four digits. Input and search are case-insensitive and accept omitted leading zeroes, so `b123` is normalized to `B0123`.
 
 ## Public Behavior
 
-- Root URLs such as `/B000123` and `/E000123` are the permanent public links.
-- Short forms such as `/B123` redirect permanently to the canonical six-digit form.
+- Root URLs such as `/B0123` and `/E0123` are the permanent public links.
+- Short forms such as `/B123` redirect permanently to the canonical four-digit form.
 - Exact legacy detail URLs such as `/bottles/123` and `/entities/123` redirect permanently to the corresponding Peated ID URL.
 - Nested routes keep their existing paths.
 - Bottle and entity API responses include `peatedId` alongside the existing numeric `id`.

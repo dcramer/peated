@@ -9,7 +9,7 @@ describe("BottleHeader", () => {
   it("separates the shared label from exact Bottle metadata", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Lagavulin 21 - Distillers Edition - 2025 Release - 55.1% ABV",
       name: "21 - Distillers Edition - 2025 Release - 55.1% ABV",
       group: {
@@ -51,7 +51,7 @@ describe("BottleHeader", () => {
   it("does not repeat an edition already expressed by the title", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Lagavulin Distillers Edition - 2025 Release",
       name: "Distillers Edition - 2025 Release",
       group: { name: "Distillers Edition" },
@@ -83,7 +83,7 @@ describe("BottleHeader", () => {
   it("keeps repeated identity fields out of a single-cask header", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Pōkeno Double Bourbon Cask 3-year-old",
       name: "Double Bourbon Cask 3-year-old",
       group: { name: "Double Bourbon Cask 3-year-old" },
@@ -120,7 +120,7 @@ describe("BottleHeader", () => {
   it("uses production wording for a non-blend distiller", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Compass Box Orchard House",
       name: "Orchard House",
       group: { name: "Orchard House" },
@@ -151,7 +151,7 @@ describe("BottleHeader", () => {
   it("uses provenance wording for a blend with one known distillery", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Compass Box Orchard House",
       name: "Orchard House",
       group: { name: "Orchard House" },
@@ -183,7 +183,7 @@ describe("BottleHeader", () => {
   it("shows every distiller name in the multi-distiller tooltip", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Compass Box Seven Distilleries",
       name: "Seven Distilleries",
       group: { name: "Seven Distilleries" },
@@ -225,7 +225,7 @@ describe("BottleHeader", () => {
   it("does not add a chip when Single Cask is already in the title", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Pōkeno Single Cask 4-year-old",
       name: "Single Cask 4-year-old",
       group: { name: "Single Cask 4-year-old" },
@@ -257,7 +257,7 @@ describe("BottleHeader", () => {
   it("promotes a nonduplicative series into the header context", () => {
     const bottle = {
       id: 42,
-      peatedId: "B000042",
+      peatedId: "B0042",
       fullName: "Decadent Drinks Glenburgie 38-year-old - Chapter Thirty Two",
       name: "Glenburgie 38-year-old - Chapter Thirty Two",
       group: { name: "Glenburgie 38-year-old" },

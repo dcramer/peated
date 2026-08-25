@@ -107,7 +107,7 @@ export const BottleSchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the bottle"),
   peatedId: z
     .string()
-    .regex(/^B\d{6,}$/)
+    .regex(/^B\d{4,}$/)
     .refine((value) => isCanonicalPeatedId(value, "bottle"))
     .readonly()
     .describe("Permanent Peated ID for the bottle"),

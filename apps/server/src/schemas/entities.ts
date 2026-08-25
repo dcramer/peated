@@ -56,7 +56,7 @@ export const EntitySchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the entity"),
   peatedId: z
     .string()
-    .regex(/^E\d{6,}$/)
+    .regex(/^E\d{4,}$/)
     .refine((value) => isCanonicalPeatedId(value, "entity"))
     .readonly()
     .describe("Permanent Peated ID for the entity"),

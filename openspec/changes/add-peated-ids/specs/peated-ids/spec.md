@@ -2,22 +2,22 @@
 
 ### Requirement: Bottles and entities have permanent Peated IDs
 
-The system SHALL expose a Peated ID for every bottle and entity by combining its object prefix with its existing positive numeric ID and adding leading zeroes until the numeric part has at least six digits.
+The system SHALL expose a Peated ID for every bottle and entity by combining its object prefix with its existing positive numeric ID and adding leading zeroes until the numeric part has at least four digits.
 
 #### Scenario: Bottle Peated ID
 
 - **WHEN** a bottle has numeric ID `123`
-- **THEN** its Peated ID is `B000123`
+- **THEN** its Peated ID is `B0123`
 
 #### Scenario: Entity Peated ID
 
 - **WHEN** an entity has numeric ID `123`
-- **THEN** its Peated ID is `E000123`
+- **THEN** its Peated ID is `E0123`
 
 #### Scenario: Matching numeric portions remain distinct
 
 - **WHEN** a bottle and an entity both have numeric ID `123`
-- **THEN** `B000123` identifies the bottle and `E000123` identifies the entity without ambiguity
+- **THEN** `B0123` identifies the bottle and `E0123` identifies the entity without ambiguity
 
 ### Requirement: Peated IDs have permanent short URLs
 
@@ -25,23 +25,23 @@ The system SHALL resolve bottle and entity Peated IDs from root-level URLs while
 
 #### Scenario: Bottle short URL
 
-- **WHEN** a visitor opens `/B000123`
+- **WHEN** a visitor opens `/B0123`
 - **THEN** the system displays bottle `123` using the normal bottle page and layout
 
 #### Scenario: Entity short URL
 
-- **WHEN** a visitor opens `/E000123`
+- **WHEN** a visitor opens `/E0123`
 - **THEN** the system displays entity `123` using the normal entity page and layout
 
 #### Scenario: Lowercase URL
 
 - **WHEN** a visitor opens `/b123`
-- **THEN** the system permanently redirects to `/B000123`
+- **THEN** the system permanently redirects to `/B0123`
 
 #### Scenario: Unpadded URL
 
 - **WHEN** a visitor opens `/B123`
-- **THEN** the system permanently redirects to `/B000123`
+- **THEN** the system permanently redirects to `/B0123`
 
 #### Scenario: Unsupported root path
 
@@ -55,12 +55,12 @@ The system SHALL preserve existing numeric bottle and entity detail links by red
 #### Scenario: Existing bottle URL
 
 - **WHEN** a visitor opens `/bottles/123`
-- **THEN** the system permanently redirects to `/B000123`
+- **THEN** the system permanently redirects to `/B0123`
 
 #### Scenario: Existing entity URL
 
 - **WHEN** a visitor opens `/entities/123`
-- **THEN** the system permanently redirects to `/E000123`
+- **THEN** the system permanently redirects to `/E0123`
 
 #### Scenario: Nested route
 
@@ -74,12 +74,12 @@ The system SHALL include a readonly `peatedId` string in serialized bottle and e
 #### Scenario: Serialized bottle
 
 - **WHEN** bottle `123` is returned by the API
-- **THEN** the response includes `id: 123` and `peatedId: "B000123"`
+- **THEN** the response includes `id: 123` and `peatedId: "B0123"`
 
 #### Scenario: Serialized entity
 
 - **WHEN** entity `123` is returned by the API
-- **THEN** the response includes `id: 123` and `peatedId: "E000123"`
+- **THEN** the response includes `id: 123` and `peatedId: "E0123"`
 
 ### Requirement: Global search recognizes Peated IDs
 
@@ -87,7 +87,7 @@ The system SHALL recognize an exact Peated ID query case-insensitively and retur
 
 #### Scenario: Search for bottle Peated ID
 
-- **WHEN** global search receives `B000123` or `B123` and bottle results are included
+- **WHEN** global search receives `B0123` or `B123` and bottle results are included
 - **THEN** bottle `123` is returned as the exact result
 
 #### Scenario: Search for lowercase entity Peated ID
@@ -97,7 +97,7 @@ The system SHALL recognize an exact Peated ID query case-insensitively and retur
 
 #### Scenario: Excluded result type
 
-- **WHEN** global search receives `B000123` and bottle results are excluded
+- **WHEN** global search receives `B0123` and bottle results are excluded
 - **THEN** bottle `123` is not returned
 
 ### Requirement: Peated IDs are visible and copyable
@@ -120,10 +120,10 @@ The system SHALL resolve a Peated ID for a merged bottle or entity through the e
 
 #### Scenario: Merged bottle
 
-- **WHEN** `B000123` identifies a bottle that was merged into bottle `456`
-- **THEN** the visitor is redirected to `B000456`
+- **WHEN** `B0123` identifies a bottle that was merged into bottle `456`
+- **THEN** the visitor is redirected to `B0456`
 
 #### Scenario: Merged entity
 
-- **WHEN** `E000123` identifies an entity that was merged into entity `456`
-- **THEN** the visitor is redirected to `E000456`
+- **WHEN** `E0123` identifies an entity that was merged into entity `456`
+- **THEN** the visitor is redirected to `E0456`

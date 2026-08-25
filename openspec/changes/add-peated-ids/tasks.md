@@ -6,7 +6,7 @@
 ## 2. API
 
 - [x] 2.1 Add readonly `peatedId` fields to bottle and entity response schemas.
-- [x] 2.2 Serialize bottle and entity Peated IDs with their type prefix and at least six numeric digits.
+- [x] 2.2 Serialize bottle and entity Peated IDs with their type prefix and at least four numeric digits.
 - [x] 2.3 Recognize exact, case-insensitive Peated IDs in global search while respecting included result types and tombstones.
 - [x] 2.4 Add route coverage for serialized Peated IDs and exact Peated ID search.
 

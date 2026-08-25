@@ -12,7 +12,7 @@ export type ParsedPeatedId = {
 };
 
 const PEATED_ID_PATTERN = /^([BE])(\d+)$/i;
-const MINIMUM_DIGITS = 6;
+const MINIMUM_DIGITS = 4;
 
 export function formatPeatedId(type: PeatedIdType, id: number): string {
   if (!Number.isSafeInteger(id) || id < 1) {
