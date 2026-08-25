@@ -23,12 +23,14 @@ export const StorePriceSchema = z.object({
     .describe("GTIN barcode claimed by the store"),
   price: z
     .number()
+    .int()
+    .positive()
     .describe(
       "Current listing price in the currency's smallest unit (for example, cents)",
     ),
   currency: CurrencyEnum.describe("Currency of the price"),
   url: z.string().describe("URL to the product page"),
-  volume: z.number().describe("Listed volume in milliliters"),
+  volume: z.number().int().positive().describe("Listed volume in milliliters"),
   site: ExternalSiteSchema.optional().describe(
     "External site where this price is listed",
   ),
@@ -79,12 +81,15 @@ export const StorePriceInputSchema = z.object({
     .describe("Name of the product as listed by the store"),
   price: z
     .number()
+    .int()
+    .positive()
     .describe(
       "Current listing price in the currency's smallest unit (for example, cents)",
     ),
   currency: CurrencyEnum.describe("Currency of the price"),
   volume: z
     .number()
+    .int()
     .refine((val) => ALLOWED_VOLUMES.includes(val), {
       message: `Volume must be one of: ${ALLOWED_VOLUMES.join(", ")}`,
     })

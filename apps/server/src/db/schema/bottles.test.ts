@@ -1,6 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "../index";
-import { bottleAliases, bottleGroups, bottles } from "./bottles";
+import {
+  bottleAliases,
+  bottleBarcodes,
+  bottleGroups,
+  bottles,
+} from "./bottles";
 
 function requireGroupId(groupId: number | null): number {
   if (groupId === null) throw new Error("Missing BottleGroup fixture");
@@ -94,5 +99,41 @@ describe("BottleGroup membership constraints", () => {
     await expect(
       db.delete(bottles).where(eq(bottles.id, bottle.id)),
     ).rejects.toThrow(/bottle_group_representative_membership_fk/);
+  });
+});
+
+describe("Bottle fact constraints", () => {
+  test("rejects invalid ABV and years", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+
+    await expect(
+      db.update(bottles).set({ abv: 101 }).where(eq(bottles.id, bottle.id)),
+    ).rejects.toThrow(/bottle_abv_check/);
+    await expect(
+      db
+        .update(bottles)
+        .set({ vintageYear: 1799 })
+        .where(eq(bottles.id, bottle.id)),
+    ).rejects.toThrow(/bottle_vintage_year_check/);
+    await expect(
+      db
+        .update(bottles)
+        .set({ releaseYear: 1799 })
+        .where(eq(bottles.id, bottle.id)),
+    ).rejects.toThrow(/bottle_release_year_check/);
+  });
+
+  test("rejects a non-positive barcode volume", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+
+    await expect(
+      db.insert(bottleBarcodes).values({
+        bottleId: bottle.id,
+        value: "036602301979",
+        gtin14: "00036602301979",
+        volume: 0,
+        createdByActorId: bottle.createdByActorId,
+      }),
+    ).rejects.toThrow(/bottle_barcode_volume_check/);
   });
 });

@@ -243,6 +243,18 @@ export const bottles = pgTable(
       "bottle_stated_age_check",
       sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
     ),
+    check(
+      "bottle_abv_check",
+      sql`${table.abv} IS NULL OR (${table.abv} >= 0 AND ${table.abv} <= 100)`,
+    ),
+    check(
+      "bottle_vintage_year_check",
+      sql`${table.vintageYear} IS NULL OR ${table.vintageYear} >= 1800`,
+    ),
+    check(
+      "bottle_release_year_check",
+      sql`${table.releaseYear} IS NULL OR ${table.releaseYear} >= 1800`,
+    ),
   ],
 );
 
@@ -533,6 +545,10 @@ export const bottleBarcodes = pgTable(
       sql`${table.value} ~ '^[0-9]+$' AND char_length(${table.value}) IN (8, 12, 13, 14)`,
     ),
     check("bottle_barcode_gtin14_check", sql`${table.gtin14} ~ '^[0-9]{14}$'`),
+    check(
+      "bottle_barcode_volume_check",
+      sql`${table.volume} IS NULL OR ${table.volume} > 0`,
+    ),
   ],
 );
 

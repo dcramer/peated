@@ -114,6 +114,8 @@ export const storePrices = pgTable(
       "store_price_barcode_check",
       sql`${table.barcode} IS NULL OR (${table.barcode} ~ '^[0-9]+$' AND char_length(${table.barcode}) IN (8, 12, 13, 14))`,
     ),
+    check("store_price_price_check", sql`${table.price} > 0`),
+    check("store_price_volume_check", sql`${table.volume} > 0`),
   ],
 );
 
@@ -149,6 +151,8 @@ export const storePriceHistories = pgTable(
       table.volume,
       table.date,
     ),
+    check("store_price_history_price_check", sql`${table.price} > 0`),
+    check("store_price_history_volume_check", sql`${table.volume} > 0`),
   ],
 );
 
