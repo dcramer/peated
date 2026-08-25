@@ -77,6 +77,7 @@ exact identity and additionally owns:
 - release and vintage years;
 - effective stated age;
 - ABV, single-cask, and cask-strength flags;
+- a confirmed no-age-statement fact;
 - natural-color and non-chill-filtered facts;
 - optional cask size, type, and fill when explicitly supplied;
 - exact aliases, content, images, activity, and statistics.

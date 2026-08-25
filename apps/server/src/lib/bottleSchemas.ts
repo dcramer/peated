@@ -57,6 +57,7 @@ function validateGroupChoiceIds(
 const ExactBottleInputFields = {
   edition: BottleInputFields.edition,
   statedAge: BottleGroupFields.statedAge,
+  noAgeStatement: BottleInputFields.noAgeStatement,
   abv: BottleInputFields.abv,
   singleCask: BottleInputFields.singleCask,
   caskStrength: BottleInputFields.caskStrength,
@@ -91,13 +92,30 @@ const BottleCreateFieldsSchema = z
   })
   .strict();
 
+function validateBottleInput(
+  input: Partial<z.infer<typeof BottleCreateFieldsSchema>>,
+  ctx: z.RefinementCtx,
+) {
+  validateGroupChoiceIds(input, ctx);
+  if (
+    input.statedAge !== null &&
+    input.statedAge !== undefined &&
+    input.noAgeStatement === true
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Age cannot be set when No age statement is selected.",
+      path: ["noAgeStatement"],
+    });
+  }
+}
+
 /**
  * Flat Bottle creation is the only creation contract. The service owns which
  * fields are stored as BottleGroup authority and which fields stay exact.
  */
-export const BottleCreateInputSchema = BottleCreateFieldsSchema.superRefine(
-  validateGroupChoiceIds,
-);
+export const BottleCreateInputSchema =
+  BottleCreateFieldsSchema.superRefine(validateBottleInput);
 
 export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;
 
@@ -115,6 +133,9 @@ const BottlePatchFieldsSchema = z
     flavorProfile: BottleGroupFields.flavorProfile.removeDefault().optional(),
     edition: ExactBottleInputFields.edition.removeDefault().optional(),
     statedAge: z.number().int().min(0).max(100).nullable().optional(),
+    noAgeStatement: ExactBottleInputFields.noAgeStatement
+      .removeDefault()
+      .optional(),
     abv: ExactBottleInputFields.abv.unwrap().removeDefault().optional(),
     singleCask: ExactBottleInputFields.singleCask.removeDefault().optional(),
     caskStrength: ExactBottleInputFields.caskStrength
@@ -163,7 +184,7 @@ const BottlePatchFieldsSchema = z
  */
 export const BottlePatchSchema = BottlePatchFieldsSchema.omit({
   suggestedTags: true,
-}).superRefine(validateGroupChoiceIds);
+}).superRefine(validateBottleInput);
 
 export type BottlePatch = z.infer<typeof BottlePatchSchema>;
 
@@ -171,8 +192,7 @@ export type BottlePatch = z.infer<typeof BottlePatchSchema>;
  * Internal update contract for system-owned exact content such as generated
  * tags. Public moderator input remains limited to user-editable fields.
  */
-export const SystemBottlePatchSchema = BottlePatchFieldsSchema.superRefine(
-  validateGroupChoiceIds,
-);
+export const SystemBottlePatchSchema =
+  BottlePatchFieldsSchema.superRefine(validateBottleInput);
 
 export type SystemBottlePatch = z.infer<typeof SystemBottlePatchSchema>;

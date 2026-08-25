@@ -160,6 +160,7 @@ export type BottlePreviewResult = {
   distillers?: FreeformEntity[] | null;
   edition?: string | null;
   statedAge?: number | null;
+  noAgeStatement?: boolean | null;
   abv?: number | null;
   flavorProfile?: FlavorProfile | null;
   caskSize?: CaskSize | null;

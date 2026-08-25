@@ -47,6 +47,7 @@ const bottle = BottleV1Schema.parse({
   flavorProfile: "peated",
   edition: "Batch 1",
   statedAge: null,
+  noAgeStatement: null,
   abv: 54.2,
   singleCask: false,
   caskStrength: true,

@@ -26,6 +26,7 @@ function formValue(
     caskStrength: true,
     naturalColor: null,
     nonChillFiltered: null,
+    noAgeStatement: null,
     vintageYear: null,
     releaseYear: 2024,
     caskSize: null,
@@ -70,6 +71,15 @@ describe("buildBottlePatch", () => {
     ).toEqual({ statedAge: null });
   });
 
+  test("submits a confirmed no-age-statement fact", () => {
+    expect(
+      buildBottlePatch(
+        formValue({ statedAge: null, noAgeStatement: true }),
+        submitMeta("statedAge", "noAgeStatement"),
+      ),
+    ).toEqual({ statedAge: null, noAgeStatement: true });
+  });
+
   test("combines expression and Bottle fields in one patch", () => {
     expect(
       buildBottlePatch(formValue(), submitMeta("name", "statedAge")),
@@ -99,6 +109,7 @@ describe("buildBottlePatch", () => {
         submitMeta(
           "name",
           "statedAge",
+          "noAgeStatement",
           "series",
           "category",
           "brand",
@@ -123,6 +134,7 @@ describe("buildBottlePatch", () => {
     ).toEqual({
       name: "Springbank 12 Cask Strength",
       statedAge: 12,
+      noAgeStatement: null,
       series: 3,
       category: "single_malt",
       brand: 4,

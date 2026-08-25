@@ -35,6 +35,11 @@ const BottleStatedAgeSchema = z
   .nullable()
   .default(null)
   .describe("Effective stated age for this exact Bottle, in years");
+const BottleNoAgeStatementSchema = z
+  .boolean()
+  .nullable()
+  .default(null)
+  .describe("Whether the label was confirmed to have no age statement");
 const BottleCaskStrengthSchema = z
   .boolean()
   .nullable()
@@ -138,6 +143,7 @@ export const BottleSchema = z.object({
 
   edition: BottleEditionSchema,
   statedAge: BottleStatedAgeSchema,
+  noAgeStatement: BottleNoAgeStatementSchema,
   caskStrength: BottleCaskStrengthSchema,
   singleCask: BottleSingleCaskSchema,
   naturalColor: BottleNaturalColorSchema,
@@ -284,6 +290,7 @@ export const BottleInputFields = {
   category: BottleCategorySchema,
   edition: BottleEditionSchema,
   statedAge: BottleStatedAgeSchema,
+  noAgeStatement: BottleNoAgeStatementSchema,
   caskStrength: BottleCaskStrengthSchema,
   singleCask: BottleSingleCaskSchema,
   naturalColor: BottleNaturalColorSchema,

@@ -75,6 +75,7 @@ export const BottleV1Fields = {
   flavorProfile: FlavorProfileEnum.nullable(),
   edition: z.string().nullable(),
   statedAge: z.number().int().min(0).max(100).nullable(),
+  noAgeStatement: z.boolean().nullable(),
   abv: z.number().min(0).max(100).nullable(),
   singleCask: z.boolean().nullable(),
   caskStrength: z.boolean().nullable(),

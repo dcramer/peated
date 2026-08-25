@@ -78,6 +78,7 @@ function makeCollectionBottle(): CollectionBottle {
       caskStrength: false,
       naturalColor: null,
       nonChillFiltered: null,
+      noAgeStatement: true,
       caskFill: null,
       caskType: null,
       caskSize: null,
@@ -147,6 +148,21 @@ describe("BottleTable", () => {
     expect(html).toContain(">NAS</span>");
     expect(html).toContain('class="sm:hidden"');
     expect(html).toContain('class="hidden sm:block"');
+  });
+
+  it("leaves an unknown age unlabeled", () => {
+    const collectionBottle = makeCollectionBottle();
+    collectionBottle.bottle.noAgeStatement = null;
+    const html = renderToStaticMarkup(
+      <BottleTable
+        bottleList={[collectionBottle]}
+        noHeaders
+        searchParams={new URLSearchParams()}
+      />,
+    );
+
+    expect(html).not.toContain("No age statement");
+    expect(html).not.toContain(">NAS</span>");
   });
 
   it("groups by the Bottle while retaining its nonduplicative Series", () => {

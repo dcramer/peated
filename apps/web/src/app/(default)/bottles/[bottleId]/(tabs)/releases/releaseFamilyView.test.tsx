@@ -77,6 +77,7 @@ const bottle = {
   caskStrength: true,
   naturalColor: true,
   nonChillFiltered: true,
+  noAgeStatement: null,
   vintageYear: 2004,
   releaseYear: 2025,
   caskSize: "hogshead",

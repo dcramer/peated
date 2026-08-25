@@ -231,6 +231,7 @@ export const BottleSerializer = serializer({
       name: item.name,
 
       statedAge: item.statedAge,
+      noAgeStatement: item.noAgeStatement,
 
       category: item.category,
       description: item.description,

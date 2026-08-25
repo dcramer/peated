@@ -9,6 +9,7 @@ const exactBottle = {
   category: "single_malt",
   edition: "2025 Release",
   statedAge: 21,
+  noAgeStatement: null,
   abv: 55.1,
   vintageYear: 2004,
   releaseYear: 2025,
@@ -67,6 +68,7 @@ describe("BottleExactMetadata", () => {
           category: null,
           edition: null,
           statedAge: null,
+          noAgeStatement: true,
           abv: null,
           vintageYear: null,
           releaseYear: null,
@@ -80,6 +82,30 @@ describe("BottleExactMetadata", () => {
     );
 
     expect(html.replace(/<[^>]*>/g, "")).toBe("No age statement");
+  });
+
+  it("does not label an unknown age as NAS", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata
+        bottle={{
+          ...exactBottle,
+          category: null,
+          edition: null,
+          statedAge: null,
+          noAgeStatement: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          singleCask: null,
+          caskStrength: null,
+          caskFill: null,
+          caskType: null,
+          caskSize: null,
+        }}
+      />,
+    );
+
+    expect(html).toBe("");
   });
 
   it("summarizes only the highest-value release identifiers", () => {
@@ -132,6 +158,7 @@ describe("BottleExactMetadata", () => {
           ...exactBottle,
           edition: null,
           statedAge: null,
+          noAgeStatement: true,
           vintageYear: null,
           releaseYear: null,
           group: { statedAge: null },

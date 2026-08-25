@@ -86,7 +86,9 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
       initialData={{
         ...context.shared,
         ...context.exact,
-        statedAge: context.exact.statedAge ?? context.shared.statedAge,
+        statedAge: context.exact.noAgeStatement
+          ? null
+          : (context.exact.statedAge ?? context.shared.statedAge),
       }}
       title="Edit Bottle"
       saveLabel="Save Changes"

@@ -19,6 +19,7 @@ export type BottleExactMetadataSource = Pick<
   | "caskSize"
 > & {
   edition?: BottleV1["edition"];
+  noAgeStatement?: BottleV1["noAgeStatement"];
   group?: Partial<Pick<BottleGroupV1, "statedAge">>;
 };
 
@@ -53,13 +54,11 @@ export function getBottleExactMetadata(
       content: formatCategoryName(bottle.category),
     });
   }
-  metadata.push({
-    key: "age",
-    content:
-      bottle.statedAge === null
-        ? "No age statement"
-        : `${bottle.statedAge} years`,
-  });
+  if (bottle.statedAge !== null) {
+    metadata.push({ key: "age", content: `${bottle.statedAge} years` });
+  } else if (bottle.noAgeStatement === true) {
+    metadata.push({ key: "age", content: "No age statement" });
+  }
   if (bottle.abv !== null) {
     metadata.push({ key: "abv", content: `${bottle.abv.toFixed(1)}% ABV` });
   }
@@ -122,9 +121,12 @@ function getBottleReleaseSummary(
   if (bottle.edition) {
     metadata.push({ key: "edition", content: bottle.edition });
   }
-  if (bottle.statedAge === null) {
+  if (bottle.noAgeStatement === true) {
     metadata.push({ key: "age", content: "No age statement" });
-  } else if (bottle.statedAge !== bottle.group.statedAge) {
+  } else if (
+    bottle.statedAge !== null &&
+    bottle.statedAge !== bottle.group.statedAge
+  ) {
     metadata.push({ key: "age", content: `${bottle.statedAge} years` });
   }
   if (bottle.abv !== null) {

@@ -13,6 +13,9 @@ export function buildBottlePatch(
 
   if (dirtyFields.has("name")) patch.name = value.name;
   if (dirtyFields.has("statedAge")) patch.statedAge = value.statedAge;
+  if (dirtyFields.has("noAgeStatement")) {
+    patch.noAgeStatement = value.noAgeStatement;
+  }
   if (dirtyFields.has("series")) patch.series = value.series;
   if (dirtyFields.has("category")) patch.category = value.category;
   if (dirtyFields.has("brand")) patch.brand = value.brand;

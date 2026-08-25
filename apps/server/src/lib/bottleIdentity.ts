@@ -24,7 +24,9 @@ export type BottleExactIdentity = Pick<
   | "caskType"
   | "caskSize"
   | "caskFill"
->;
+> & {
+  noAgeStatement?: Bottle["noAgeStatement"];
+};
 
 export type BottleExactIdentityPatch = Partial<BottleExactIdentity>;
 
@@ -85,6 +87,10 @@ export function getBottleExactIdentity({
       bottleStatedAge: valueOrCurrent(exactPatch?.statedAge, bottle.statedAge),
       stableStatedAge: sourceGroupStatedAge,
     }),
+    noAgeStatement: valueOrCurrent(
+      exactPatch?.noAgeStatement,
+      bottle.noAgeStatement,
+    ),
     releaseYear: valueOrCurrent(exactPatch?.releaseYear, bottle.releaseYear),
     vintageYear: valueOrCurrent(exactPatch?.vintageYear, bottle.vintageYear),
     abv: valueOrCurrent(exactPatch?.abv, bottle.abv),
@@ -137,10 +143,13 @@ export function materializeBottleIdentity({
   stable: StableBottleIdentity;
   exact: BottleExactIdentity;
 }): MaterializedBottleIdentity {
-  const exactStatedAge = getBottleExactStatedAge({
-    bottleStatedAge: exact.statedAge,
-    stableStatedAge: stable.statedAge,
-  });
+  const hasNoAgeStatement = exact.noAgeStatement === true;
+  const exactStatedAge = hasNoAgeStatement
+    ? null
+    : getBottleExactStatedAge({
+        bottleStatedAge: exact.statedAge,
+        stableStatedAge: stable.statedAge,
+      });
   const identity = formatExactCaskIdentity({
     ...formatCanonicalBottleName({
       bottleName: stable.name,
@@ -149,7 +158,7 @@ export function materializeBottleIdentity({
         caskStrength: exact.caskStrength,
         singleCask: exact.singleCask,
       },
-      bottleStatedAge: stable.statedAge,
+      bottleStatedAge: hasNoAgeStatement ? null : stable.statedAge,
       exact: {
         ...exact,
         statedAge: exactStatedAge,
@@ -162,7 +171,7 @@ export function materializeBottleIdentity({
 
   return {
     ...identity,
-    statedAge: exactStatedAge ?? stable.statedAge,
+    statedAge: hasNoAgeStatement ? null : (exactStatedAge ?? stable.statedAge),
   };
 }
 

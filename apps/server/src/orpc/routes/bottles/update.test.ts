@@ -264,6 +264,40 @@ describe("PATCH /bottles/{bottle}", () => {
     ).toEqual(groupBefore);
   });
 
+  test("keeps confirmed NAS separate from an unknown age", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "NAS Update Brand" });
+    const { first, members } = await createGroup(
+      mod,
+      { name: "NAS Update", statedAge: 12, brand: brand.id },
+      [{ edition: "NAS Batch" }, { edition: "Aged Batch" }],
+    );
+
+    const nas = await routerClient.bottles.update(
+      { bottle: first.bottle.id, noAgeStatement: true },
+      { context: { user: mod } },
+    );
+
+    expect(nas).toMatchObject({
+      statedAge: null,
+      noAgeStatement: true,
+      group: { id: first.group.id, statedAge: 12 },
+    });
+    expect((await loadMembers(first.group.id))[1]).toEqual(members[1].bottle);
+
+    const aged = await routerClient.bottles.update(
+      { bottle: first.bottle.id, statedAge: 14 },
+      { context: { user: mod } },
+    );
+    expect(aged).toMatchObject({
+      statedAge: 14,
+      noAgeStatement: null,
+      group: { id: first.group.id, statedAge: 12 },
+    });
+  });
+
   test("fans shared edits out durably and maps a mixed selected edit", async ({
     fixtures,
   }) => {

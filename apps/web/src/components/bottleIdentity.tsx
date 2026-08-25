@@ -28,6 +28,7 @@ export type BottleIdentitySource = Pick<
   | "caskType"
   | "caskSize"
 > & {
+  noAgeStatement?: Bottle["noAgeStatement"];
   brand: Pick<Bottle["brand"], "id" | "name" | "shortName">;
   series: Pick<NonNullable<Bottle["series"]>, "id" | "name"> | null;
   group?: Pick<NonNullable<Bottle["group"]>, "name"> &
@@ -158,6 +159,7 @@ export function getMetadataExpressedByTitle(
     BottleIdentitySource,
     | "edition"
     | "statedAge"
+    | "noAgeStatement"
     | "abv"
     | "vintageYear"
     | "releaseYear"
@@ -186,7 +188,7 @@ export function getMetadataExpressedByTitle(
   ) {
     duplicates.push("age");
   } else if (
-    bottle.statedAge === null &&
+    bottle.noAgeStatement === true &&
     (normalizedTitle.includes("no age statement") ||
       /\bnas\b/.test(normalizedTitle))
   ) {

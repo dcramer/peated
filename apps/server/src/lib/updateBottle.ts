@@ -76,6 +76,7 @@ type ExactPatch = Partial<
     SystemBottlePatch,
     | "edition"
     | "statedAge"
+    | "noAgeStatement"
     | "abv"
     | "singleCask"
     | "caskStrength"
@@ -173,6 +174,7 @@ type DesiredBottle = Pick<
   | "name"
   | "fullName"
   | "statedAge"
+  | "noAgeStatement"
   | "brandId"
   | "bottlerId"
   | "seriesId"
@@ -247,6 +249,7 @@ const expectedSelectedBottleKeys = [
   "groupId",
   "fullName",
   "statedAge",
+  "noAgeStatement",
   "category",
   "flavorProfile",
   "description",
@@ -270,6 +273,7 @@ export function bottleUpdateExpectedSelectedBottleState(
     groupId: bottle.groupId,
     fullName: bottle.fullName,
     statedAge: bottle.statedAge,
+    noAgeStatement: bottle.noAgeStatement,
     category: bottle.category,
     flavorProfile: bottle.flavorProfile,
     description: bottle.description,
@@ -390,6 +394,12 @@ export function bottleStoragePatch(
     } else {
       exact.statedAge = input.statedAge;
     }
+    if (input.statedAge !== null && !("noAgeStatement" in input)) {
+      exact.noAgeStatement = null;
+    }
+  }
+  if ("noAgeStatement" in input) {
+    exact.noAgeStatement = input.noAgeStatement;
   }
   if ("abv" in input) exact.abv = input.abv;
   if ("singleCask" in input) exact.singleCask = input.singleCask;
@@ -447,6 +457,7 @@ function existingEntityIdsForUpdate(input: SystemBottlePatch): number[] {
 const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
   "edition",
   "statedAge",
+  "noAgeStatement",
   "releaseYear",
   "vintageYear",
   "abv",
@@ -459,6 +470,7 @@ const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
 
 const generatedDetailsIdentityKeys = [
   "statedAge",
+  "noAgeStatement",
   "brandId",
   "bottlerId",
   "seriesId",
@@ -571,6 +583,10 @@ function desiredBottleFor({
     name: identity.name,
     fullName: identity.fullName,
     statedAge: identity.statedAge,
+    noAgeStatement: valueOrCurrent(
+      exactPatch?.noAgeStatement,
+      bottle.noAgeStatement,
+    ),
     brandId: materializeSharedFields
       ? sharedMaterialization.brandId
       : bottle.brandId,
@@ -616,6 +632,7 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "name",
   "fullName",
   "statedAge",
+  "noAgeStatement",
   "brandId",
   "bottlerId",
   "seriesId",

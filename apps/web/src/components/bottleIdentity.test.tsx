@@ -207,6 +207,7 @@ describe("BottleIdentity", () => {
         group: { name, statedAge: null },
         edition: null,
         statedAge: null,
+        noAgeStatement: true,
       });
       const html = renderToStaticMarkup(<BottleIdentity bottle={bottle} />);
       const text = html.replace(/<[^>]*>/g, "");

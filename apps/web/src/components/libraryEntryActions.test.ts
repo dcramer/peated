@@ -92,6 +92,7 @@ function makeCollectionBottle(id: number): CollectionBottle {
       singleCask: null,
       naturalColor: null,
       nonChillFiltered: null,
+      noAgeStatement: null,
       abv: null,
       vintageYear: null,
       releaseYear: null,

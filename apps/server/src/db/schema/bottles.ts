@@ -163,6 +163,8 @@ export const bottles = pgTable(
 
     // Effective stated age for this exact marketed Bottle.
     statedAge: smallint("stated_age"),
+    // True only when the label was confirmed to have no age statement.
+    noAgeStatement: boolean("no_age_statement"),
 
     // a NULL series represents a "core bottling"
     seriesId: bigint("series_id", { mode: "number" }).references(
@@ -244,6 +246,10 @@ export const bottles = pgTable(
     check(
       "bottle_stated_age_check",
       sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
+    ),
+    check(
+      "bottle_age_statement_check",
+      sql`${table.statedAge} IS NULL OR ${table.noAgeStatement} IS NOT TRUE`,
     ),
     check(
       "bottle_abv_check",

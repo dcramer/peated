@@ -1,5 +1,5 @@
 {
-  "id": "97d8f259-71bb-4ad4-9a08-53a90fea1eba",
+  "id": "c47802e5-4880-4d6c-9184-098c2de7b6b2",
   "prevId": "da58f257-6f16-4219-b0e2-d8f5512be673",
   "version": "7",
   "dialect": "postgresql",
@@ -2531,6 +2531,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "no_age_statement": {
+          "name": "no_age_statement",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
         "series_id": {
           "name": "series_id",
           "type": "bigint",
@@ -2925,6 +2931,10 @@
         "bottle_stated_age_check": {
           "name": "bottle_stated_age_check",
           "value": "\"bottle\".\"stated_age\" IS NULL OR (\"bottle\".\"stated_age\" >= 0 AND \"bottle\".\"stated_age\" <= 100)"
+        },
+        "bottle_age_statement_check": {
+          "name": "bottle_age_statement_check",
+          "value": "\"bottle\".\"stated_age\" IS NULL OR \"bottle\".\"no_age_statement\" IS NOT TRUE"
         },
         "bottle_abv_check": {
           "name": "bottle_abv_check",

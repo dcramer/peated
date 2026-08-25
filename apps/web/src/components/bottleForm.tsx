@@ -86,6 +86,11 @@ type BooleanChoice = {
   name: string;
 };
 
+const noAgeStatementChoices: BooleanChoice[] = [
+  { id: "unknown", name: "Not known" },
+  { id: "yes", name: "No age statement" },
+];
+
 const colorChoices: BooleanChoice[] = [
   { id: "unknown", name: "Not stated" },
   { id: "yes", name: "Natural color" },
@@ -284,6 +289,7 @@ export default function BottleForm({
     name: watch("name"),
     category: watch("category"),
     statedAge: watch("statedAge"),
+    noAgeStatement: watch("noAgeStatement"),
     edition: watch("edition"),
     releaseYear: watch("releaseYear"),
     vintageYear: watch("vintageYear"),
@@ -407,6 +413,33 @@ export default function BottleForm({
             placeholder="e.g. 12"
             helpText="The age shown on the bottle's label."
             suffixLabel="years"
+            disabled={watch("noAgeStatement") === true}
+          />
+
+          <Controller
+            name="noAgeStatement"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.noAgeStatement}
+                label="Age information"
+                helpText="Choose No age statement only when you confirmed that the label does not show an age."
+                simple
+                options={noAgeStatementChoices}
+                onChange={(choice) => {
+                  const noAgeStatement = booleanChoiceValue(choice);
+                  onChange(noAgeStatement);
+                  if (noAgeStatement) {
+                    setValue("statedAge", null, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }
+                }}
+                value={booleanChoice(noAgeStatementChoices, value)}
+              />
+            )}
           />
 
           <TextField

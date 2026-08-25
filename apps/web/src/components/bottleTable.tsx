@@ -177,20 +177,20 @@ export default function BottleTable({
               {
                 name: "age",
                 value: (item: BottleRow) => {
-                  const { statedAge } = item.bottle;
+                  const { statedAge, noAgeStatement } = item.bottle;
                   return statedAge !== null ? (
                     <Link
                       className="hover:underline"
                       href={`/bottles/?age=${statedAge}`}
                     >{`${statedAge} years`}</Link>
-                  ) : (
+                  ) : noAgeStatement === true ? (
                     <span
                       aria-label="No age statement"
                       title="No age statement"
                     >
                       NAS
                     </span>
-                  );
+                  ) : null;
                 },
                 className: "sm:w-24",
                 sortDefaultOrder: "desc" as const,

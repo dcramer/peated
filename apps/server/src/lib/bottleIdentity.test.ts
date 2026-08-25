@@ -7,6 +7,7 @@ import {
 const exactIdentity = {
   edition: null,
   statedAge: null,
+  noAgeStatement: null,
   releaseYear: null,
   vintageYear: null,
   abv: null,
@@ -50,6 +51,23 @@ test.each([
     name: expectedName,
     fullName: `Example Brand ${expectedName}`,
     statedAge: expectedStatedAge,
+  });
+});
+
+test("keeps a confirmed NAS Bottle separate from an inherited group age", () => {
+  expect(
+    materializeBottleIdentity({
+      stable: {
+        name: "Old Malt",
+        fullName: "Example Brand Old Malt",
+        statedAge: 12,
+      },
+      exact: { ...exactIdentity, noAgeStatement: true },
+    }),
+  ).toEqual({
+    name: "Old Malt",
+    fullName: "Example Brand Old Malt",
+    statedAge: null,
   });
 });
 

@@ -62,6 +62,7 @@ describe("POST /bottles", () => {
     const brand = await fixtures.Entity();
     const cases = [
       ["fractional age", { statedAge: 12.5 }],
+      ["conflicting age statement", { statedAge: 12, noAgeStatement: true }],
       ["fractional vintage year", { vintageYear: 2010.5 }],
       ["nonpositive brand id", { brand: 0 }],
       ["nonpositive bottler id", { bottler: -1 }],
@@ -181,6 +182,7 @@ describe("POST /bottles", () => {
       category: null,
       flavorProfile: null,
       statedAge: null,
+      noAgeStatement: null,
       edition: null,
       abv: null,
       vintageYear: null,
@@ -232,6 +234,31 @@ describe("POST /bottles", () => {
       sort: "rank",
     });
     expect(search.results.map(({ id }) => id)).toContain(bottle.id);
+  });
+
+  test("stores a confirmed no-age-statement fact", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const brand = await fixtures.Entity({ name: "NAS Brand" });
+    const data = await routerClient.bottles.create(
+      {
+        name: "NAS Release",
+        brand: brand.id,
+        noAgeStatement: true,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      statedAge: null,
+      noAgeStatement: true,
+    });
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, data.id),
+      }),
+    ).toMatchObject({ statedAge: null, noAgeStatement: true });
   });
 
   test("rejects a bottle name that duplicates its brand", async ({
