@@ -109,4 +109,23 @@ describe("GET /bottles/:bottle", () => {
     expect(data.lastPrice?.id).toBe(directPrice.id);
     expect(data.lastPrice?.bottle?.id).toBe(bottle.id);
   });
+
+  test("does not expose hidden prices as lastPrice", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const visiblePrice = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Visible detail price",
+      updatedAt: new Date(Date.now() - 2_000),
+    });
+    await fixtures.StorePrice({
+      bottleId: bottle.id,
+      hidden: true,
+      name: "Hidden newer detail price",
+      updatedAt: new Date(Date.now() - 1_000),
+    });
+
+    const data = await routerClient.bottles.details({ bottle: bottle.id });
+
+    expect(data.lastPrice?.id).toBe(visiblePrice.id);
+  });
 });

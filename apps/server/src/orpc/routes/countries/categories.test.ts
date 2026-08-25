@@ -126,8 +126,14 @@ describe("GET /countries/categories", () => {
   test("counts active Bottles directly and ignores legacy ungrouped identity", async ({
     fixtures,
   }) => {
-    const country = await fixtures.Country();
-    const otherCountry = await fixtures.Country();
+    const country = await fixtures.Country({
+      name: "Target Country",
+      slug: "target-country",
+    });
+    const otherCountry = await fixtures.Country({
+      name: "Other Country",
+      slug: "other-country",
+    });
     const countryDistiller = await fixtures.Entity({
       countryId: country.id,
       type: ["distiller"],
@@ -203,8 +209,14 @@ describe("GET /countries/categories", () => {
   test("counts each Bottle once and orders nullable category buckets", async ({
     fixtures,
   }) => {
-    const country = await fixtures.Country();
-    const otherCountry = await fixtures.Country();
+    const country = await fixtures.Country({
+      name: "Target Country",
+      slug: "target-country",
+    });
+    const otherCountry = await fixtures.Country({
+      name: "Other Country",
+      slug: "other-country",
+    });
     const firstDistiller = await fixtures.Entity({
       countryId: country.id,
       type: ["distiller"],

@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles, externalSites, storePrices } from "@peated/server/db/schema";
+import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import { procedure } from "@peated/server/orpc";
 import { ExternalSiteSchema, StorePriceSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -60,7 +61,7 @@ export default procedure
     ];
 
     if (input.onlyValid) {
-      baseWhere.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
+      baseWhere.push(currentStorePriceCondition());
     }
 
     const results = await db
@@ -74,10 +75,7 @@ export default procedure
         eq(storePrices.externalSiteId, externalSites.id),
       )
       .where(and(...baseWhere))
-      .orderBy(
-        desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
-        asc(storePrices.name),
-      );
+      .orderBy(desc(currentStorePriceCondition()), asc(storePrices.name));
 
     return {
       results: await serialize(
