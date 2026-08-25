@@ -71,7 +71,7 @@ Tasting entries display either Pass/Sip/Savor or an integer score. Exact-Bottle 
 
 ### Make methodology a product surface
 
-Add a static public `/ratings` page covering both systems, the advanced bands, what is and is not evaluated, aggregation, and the distinction from critic reviews. The advanced input shows compact band guidance and links to this page. OpenAPI descriptions state ranges, exclusivity, and aggregate meaning. Internal rating docs are rewritten to match the implemented model rather than retaining speculative migration examples.
+Add a static public `/about/ratings` page covering both systems, the advanced bands, what is and is not evaluated, aggregation, and the distinction from critic reviews. The advanced input shows compact band guidance and links to this page. OpenAPI descriptions state ranges, exclusivity, and aggregate meaning. Internal rating docs are rewritten to match the implemented model rather than retaining speculative migration examples.
 
 ## Risks / Trade-offs
 

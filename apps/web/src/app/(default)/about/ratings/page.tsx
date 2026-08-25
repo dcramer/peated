@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "How Ratings Work",
+  title: "Whisky Rating Guide",
   description:
     "A simple guide to Pass, Sip, Savor and Peated's 100-point whisky scores.",
 };

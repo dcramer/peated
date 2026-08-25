@@ -130,7 +130,7 @@ ratings, and “The Critics” visibly distinct.
 
 ## Public Methodology and Structured Data
 
-The static `/ratings` page is the public source of truth for both community
+The static `/about/ratings` page is the public source of truth for both community
 systems. Advanced inputs and community summaries link to it. OpenAPI field
 descriptions state the numeric range and separation invariant.
 

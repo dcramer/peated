@@ -90,7 +90,7 @@ ratings.
 
 ## Public Explanation
 
-The user-facing methodology lives at `/ratings`. Advanced form guidance and
+The user-facing methodology lives at `/about/ratings`. Advanced form guidance and
 community score summaries link to that page so the scale is available at the
 moment a user assigns or interprets a score.
 

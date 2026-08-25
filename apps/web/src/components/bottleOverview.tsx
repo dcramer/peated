@@ -49,7 +49,10 @@ export default function BottleOverview({
                     aggregate
                   />
                 </div>
-                <Link href="/ratings" className="text-muted text-sm underline">
+                <Link
+                  href="/about/ratings"
+                  className="text-muted text-sm underline"
+                >
                   How ratings work
                 </Link>
               </section>

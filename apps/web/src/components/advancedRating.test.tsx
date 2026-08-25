@@ -29,7 +29,7 @@ describe("advanced rating components", () => {
     expect(html).toContain('min="0"');
     expect(html).toContain('max="100"');
     expect(html).toContain("Very good");
-    expect(html).toContain('href="/ratings"');
+    expect(html).toContain('href="/about/ratings"');
   });
 
   test("marks the selected rating system", () => {

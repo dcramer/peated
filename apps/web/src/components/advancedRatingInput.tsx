@@ -37,7 +37,7 @@ export default function AdvancedRatingInput({
           Score the whisky in the glass, excluding price, rarity, packaging, and
           reputation. One point is personal comparative precision, not an
           objective measurement.{" "}
-          <Link href="/ratings" className="underline">
+          <Link href="/about/ratings" className="underline">
             How ratings work
           </Link>
         </>
