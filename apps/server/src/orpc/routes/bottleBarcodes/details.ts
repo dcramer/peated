@@ -13,8 +13,8 @@ export default procedure
   .route({
     method: "GET",
     path: "/bottle-barcodes/{barcode}",
-    summary: "Look up bottle by barcode",
-    description: "Resolve a canonical GTIN barcode to an exact Bottle",
+    summary: "Look up a Bottle by barcode",
+    description: "Find the Bottle that has this product barcode",
     operationId: "getBottleBarcode",
   })
   .input(z.object({ barcode: GtinSchema }).strict())

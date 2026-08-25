@@ -175,6 +175,7 @@ export function buildBottle({
     totalTastings,
     people,
     lastPrice: null,
+    barcodes: [],
     createdBy: null,
     createdAt: timestamp,
     updatedAt: timestamp,

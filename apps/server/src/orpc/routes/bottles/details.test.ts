@@ -30,6 +30,26 @@ describe("GET /bottles/:bottle", () => {
     expect("displayImageUrl" in data).toBe(false);
   });
 
+  test("includes approved product barcodes", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const moderator = await fixtures.User({ mod: true });
+    await routerClient.bottleBarcodes.upsert(
+      { bottle: bottle.id, barcode: "96385074", volume: 700 },
+      { context: { user: moderator } },
+    );
+    await routerClient.bottleBarcodes.upsert(
+      { bottle: bottle.id, barcode: "4006381333931" },
+      { context: { user: moderator } },
+    );
+
+    const data = await routerClient.bottles.details({ bottle: bottle.id });
+
+    expect(data.barcodes).toEqual([
+      expect.objectContaining({ value: "4006381333931", volume: null }),
+      expect.objectContaining({ value: "96385074", volume: 700 }),
+    ]);
+  });
+
   test("errors on invalid bottle", async () => {
     const err = await waitError(routerClient.bottles.details({ bottle: 1 }));
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);

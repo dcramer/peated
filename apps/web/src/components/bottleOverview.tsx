@@ -5,6 +5,7 @@ import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
 import { Suspense } from "react";
 import AdvancedRatingDisplay from "./advancedRatingDisplay";
+import BottleBarcodes from "./bottleBarcodes";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution from "./bottleTagDistribution";
 import CaskDetails from "./caskDetails";
@@ -200,6 +201,7 @@ export default function BottleOverview({
                 </>
               )}
             </DefinitionList>
+            <BottleBarcodes bottleId={bottle.id} barcodes={bottle.barcodes} />
           </div>
           <div className="hidden w-64 lg:block">
             {bottle.imageUrl ? (
