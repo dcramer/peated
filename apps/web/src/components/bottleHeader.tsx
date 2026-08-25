@@ -15,8 +15,10 @@ import Link from "@peated/web/components/link";
 import type { ElementType } from "react";
 import { Distillers } from "./bottleMetadata";
 import PageHeader from "./pageHeader";
+import PeatedId from "./peatedId";
 
 export type BottleHeaderBottle = BottleIdentitySource & {
+  peatedId: string;
   distillers: Array<Pick<Bottle["distillers"][number], "id" | "name">>;
 };
 
@@ -91,23 +93,26 @@ export default function BottleHeader({
         </div>
       }
       titleExtra={
-        hasIdentityDetails ? (
-          <div className="flex max-w-full flex-col items-center lg:items-start">
-            <BottleExactMetadata
-              bottle={bottle}
-              exclude={metadataKeys}
-              className="justify-center lg:justify-start"
-            />
-            {distinctDistillers.length ? (
-              <div className="text-muted mt-1 text-sm">
-                <Distillers
-                  distillers={distinctDistillers}
-                  isBlend={bottle.category === "blend"}
-                />
-              </div>
-            ) : null}
-          </div>
-        ) : null
+        <div className="flex max-w-full flex-col items-center gap-1 lg:items-start">
+          <PeatedId value={bottle.peatedId} />
+          {hasIdentityDetails ? (
+            <>
+              <BottleExactMetadata
+                bottle={bottle}
+                exclude={metadataKeys}
+                className="justify-center lg:justify-start"
+              />
+              {distinctDistillers.length ? (
+                <div className="text-muted mt-1 text-sm">
+                  <Distillers
+                    distillers={distinctDistillers}
+                    isBlend={bottle.category === "blend"}
+                  />
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </div>
       }
     />
   );

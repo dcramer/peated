@@ -1,7 +1,19 @@
+import { db } from "@peated/server/db";
+import {
+  bottleTombstones,
+  bottles,
+  entities,
+  entityTombstones,
+} from "@peated/server/db/schema";
+import { parsePeatedId } from "@peated/server/lib/peatedId";
 import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import { BottleSchema, EntitySchema, UserSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { EntitySerializer } from "@peated/server/serializers/entity";
 import type { Bottle, Entity, User } from "@peated/server/types";
+import { eq, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
 
 export type BottleResult = {
@@ -121,6 +133,30 @@ export function blendResults(
   return results;
 }
 
+async function findBottleById(id: number, context: Context) {
+  let [bottle] = await db.select().from(bottles).where(eq(bottles.id, id));
+  if (!bottle) {
+    [bottle] = await db
+      .select({ ...getTableColumns(bottles) })
+      .from(bottleTombstones)
+      .innerJoin(bottles, eq(bottleTombstones.newBottleId, bottles.id))
+      .where(eq(bottleTombstones.bottleId, id));
+  }
+  return bottle ? serialize(BottleSerializer, bottle, context.user) : null;
+}
+
+async function findEntityById(id: number, context: Context) {
+  let [entity] = await db.select().from(entities).where(eq(entities.id, id));
+  if (!entity) {
+    [entity] = await db
+      .select({ ...getTableColumns(entities) })
+      .from(entityTombstones)
+      .innerJoin(entities, eq(entityTombstones.newEntityId, entities.id))
+      .where(eq(entityTombstones.entityId, id));
+  }
+  return entity ? serialize(EntitySerializer, entity, context.user) : null;
+}
+
 export function createSearchProcedure(sources: SearchSourceClient) {
   return procedure
     .route({
@@ -164,8 +200,27 @@ export function createSearchProcedure(sources: SearchSourceClient) {
         ),
       }),
     )
-    .handler(async function ({ input, context }) {
+    .handler(async function ({
+      input,
+      context,
+    }): Promise<{ query: string; results: Result[] }> {
       const { query, include, limit } = input;
+      const peatedId = parsePeatedId(query);
+
+      if (peatedId) {
+        if (peatedId.type === "bottle" && include.includes("bottles")) {
+          const ref = await findBottleById(peatedId.id, context);
+          return { query, results: ref ? [{ type: "bottle", ref }] : [] };
+        }
+
+        if (peatedId.type === "entity" && include.includes("entities")) {
+          const ref = await findEntityById(peatedId.id, context);
+          return { query, results: ref ? [{ type: "entity", ref }] : [] };
+        }
+
+        return { query, results: [] };
+      }
+
       const promises: Promise<Result[]>[] = [];
 
       if (include.includes("bottles")) {

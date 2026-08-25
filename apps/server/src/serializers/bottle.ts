@@ -15,6 +15,7 @@ import {
 } from "../db/schema";
 import { getReservedCollection, type ReservedCollectionSlug } from "../lib/db";
 import { notEmpty } from "../lib/filter";
+import { formatPeatedId } from "../lib/peatedId";
 import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
 import type { BottleGroupV1 } from "../schemas/catalogIdentity";
@@ -223,6 +224,7 @@ export const BottleSerializer = serializer({
   item: (item: Bottle, attrs: Attrs): z.infer<typeof BottleSchema> => {
     const bottle: z.infer<typeof BottleSchema> = {
       id: item.id,
+      peatedId: formatPeatedId("bottle", item.id),
 
       // fullName is brand + name
       fullName: item.fullName,

@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { entityTombstones } from "@peated/server/db/schema";
+import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
@@ -11,6 +12,7 @@ describe("GET /entities/:entity", () => {
       entity: brand.id,
     });
     expect(data.id).toEqual(brand.id);
+    expect(data.peatedId).toEqual(formatPeatedId("entity", brand.id));
     expect("createdBy" in data).toBe(false);
   });
 

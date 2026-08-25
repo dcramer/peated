@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
-import { bottleAliases } from "@peated/server/db/schema";
+import { bottleAliases, bottleTombstones } from "@peated/server/db/schema";
+import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -155,6 +156,81 @@ describe("GET /search", () => {
 
     expect(results[0].type).toBe("bottle");
     expect(results[0].ref.id).toBe(exactMatch.id);
+  });
+
+  test("finds a bottle by Peated ID", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+
+    const { results } = await routerClient.search({
+      query: formatPeatedId("bottle", bottle.id),
+      limit: 10,
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        type: "bottle",
+        ref: expect.objectContaining({
+          id: bottle.id,
+          peatedId: formatPeatedId("bottle", bottle.id),
+        }),
+      }),
+    ]);
+  });
+
+  test("finds an entity by lowercase Peated ID", async ({ fixtures }) => {
+    const entity = await fixtures.Entity();
+
+    const { results } = await routerClient.search({
+      query: `e${entity.id}`,
+      limit: 10,
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        type: "entity",
+        ref: expect.objectContaining({
+          id: entity.id,
+          peatedId: formatPeatedId("entity", entity.id),
+        }),
+      }),
+    ]);
+  });
+
+  test("respects included types for Peated ID lookup", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+
+    const { results } = await routerClient.search({
+      query: `B${bottle.id}`,
+      include: ["entities"],
+      limit: 10,
+    });
+
+    expect(results).toEqual([]);
+  });
+
+  test("resolves a merged Peated ID to the surviving bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await db.insert(bottleTombstones).values({
+      bottleId: 999,
+      newBottleId: bottle.id,
+    });
+
+    const { results } = await routerClient.search({
+      query: "B999",
+      limit: 10,
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        type: "bottle",
+        ref: expect.objectContaining({
+          id: bottle.id,
+          peatedId: formatPeatedId("bottle", bottle.id),
+        }),
+      }),
+    ]);
   });
 
   test("returns empty results with no query", async () => {

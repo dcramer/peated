@@ -4,6 +4,7 @@ import Link from "@peated/web/components/link";
 import { getEntityTypeSearchUrl } from "../lib/urls";
 import Chip from "./chip";
 import PageHeader from "./pageHeader";
+import PeatedId from "./peatedId";
 
 export default function EntityHeader({
   entity,
@@ -17,30 +18,33 @@ export default function EntityHeader({
       icon={EntityIcon}
       title={entity.name}
       titleExtra={
-        <div className="text-muted max-w-full text-center lg:text-left">
-          {!!entity.country && (
-            <>
-              Located in{" "}
-              <Link
-                href={`/locations/${entity.country.slug}`}
-                className="truncate hover:underline"
-              >
-                {entity.country.name}
-              </Link>
-            </>
-          )}
-          {!!entity.country && !!entity.region && (
-            <span>
-              {" "}
-              &middot;{" "}
-              <Link
-                href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
-                className="truncate hover:underline"
-              >
-                {entity.region.name}
-              </Link>
-            </span>
-          )}
+        <div className="flex max-w-full flex-col items-center lg:items-start">
+          <PeatedId value={entity.peatedId} />
+          <div className="text-muted max-w-full text-center lg:text-left">
+            {!!entity.country && (
+              <>
+                Located in{" "}
+                <Link
+                  href={`/locations/${entity.country.slug}`}
+                  className="truncate hover:underline"
+                >
+                  {entity.country.name}
+                </Link>
+              </>
+            )}
+            {!!entity.country && !!entity.region && (
+              <span>
+                {" "}
+                &middot;{" "}
+                <Link
+                  href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
+                  className="truncate hover:underline"
+                >
+                  {entity.region.name}
+                </Link>
+              </span>
+            )}
+          </div>
         </div>
       }
       metadata={

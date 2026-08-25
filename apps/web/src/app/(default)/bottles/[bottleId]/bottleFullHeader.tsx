@@ -38,7 +38,7 @@ export default function BottleFullHeader({
             <PeatedGlyph className="h-4 w-4" /> Log Tasting
           </Button>
 
-          <ShareButton title={bottleIdentity} url={`/bottles/${bottle.id}`} />
+          <ShareButton title={bottleIdentity} url={`/${bottle.peatedId}`} />
 
           <BottleActions bottle={bottle} />
         </div>

@@ -81,6 +81,7 @@ function makeCollectionBottle(id: number): CollectionBottle {
     status: "sealed",
     bottle: {
       id: id + 100,
+      peatedId: `B${String(id + 100).padStart(4, "0")}`,
       fullName: `Bottle ${id}`,
       name: `Bottle ${id}`,
       series: null,
@@ -97,6 +98,7 @@ function makeCollectionBottle(id: number): CollectionBottle {
       caskFill: null,
       brand: {
         id: 1,
+        peatedId: "E0001",
         name: "Test Brand",
         shortName: null,
         type: ["brand"],

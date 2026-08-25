@@ -41,6 +41,7 @@ const group = {
 
 const brand = {
   id: group.brandId,
+  peatedId: "E0007",
   name: "Lagavulin",
   shortName: null,
   type: ["brand", "distiller"],
@@ -60,6 +61,7 @@ const brand = {
 
 const bottle = {
   id: 42,
+  peatedId: "B0042",
   fullName: "Lagavulin 21 Cask 42",
   name: "21-year-old",
   group,

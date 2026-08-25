@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { bottlePeatedIdPath } from "./assertions";
 import {
   destinationBottleGroup,
   exactMatchedBottleId,
@@ -46,9 +47,8 @@ test.describe("Bottle page redirects", () => {
   test("renders not found for a missing Bottle without redirecting", async ({
     page,
   }) => {
-    const missingPath = `/bottles/${missingBottleId}`;
-    await page.goto(missingPath);
-    await expect(page).toHaveURL(missingPath);
+    await page.goto(`/bottles/${missingBottleId}`);
+    await expect(page).toHaveURL(bottlePeatedIdPath(missingBottleId));
     await expect(
       page.getByRole("heading", { name: "Not Found" }),
     ).toBeVisible();

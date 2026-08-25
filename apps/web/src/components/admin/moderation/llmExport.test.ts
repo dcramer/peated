@@ -9,6 +9,7 @@ type QueueBottle = NonNullable<QueueItem["suggestedBottle"]>;
 const timestamp = "2026-07-21T00:00:00.000Z";
 const brand = {
   id: 1,
+  peatedId: "E0001",
   name: "Springbank",
   shortName: null,
   type: ["brand"],
@@ -28,6 +29,7 @@ const brand = {
 
 const suggestedBottle = {
   id: 19,
+  peatedId: "B0019",
   fullName: "Springbank 12 Cask Strength Batch 24",
   name: "12 Cask Strength Batch 24",
   brand,
