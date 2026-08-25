@@ -258,7 +258,7 @@ async function identifyCreateProposal({
   candidates = [],
   suitableAsBottleImage = true,
 }: {
-  fixtures: { SampleSquareImage: () => Promise<Blob> };
+  fixtures: { SampleSquareImage: () => Promise<File> };
   user: NonNullable<Context["user"]>;
   idempotencyKey: string;
   decision: MockClassificationDecision;
@@ -565,7 +565,9 @@ describe("POST /tastings/photo-identification", () => {
     const err = await waitError(
       routerClient.tastings.photoIdentification(
         {
-          file: new Blob([new Uint8Array(MAX_FILESIZE + 1)]),
+          file: new File([new Uint8Array(MAX_FILESIZE + 1)], "oversized.jpg", {
+            type: "image/jpeg",
+          }),
           idempotencyKey: "photo-identification-oversized",
         },
         {

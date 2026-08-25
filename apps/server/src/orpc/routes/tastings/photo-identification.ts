@@ -725,6 +725,23 @@ export function createPhotoIdentificationProcedure(
       description:
         "Upload a temporary bottle photo, extract label evidence, and classify the likely bottle without creating a tasting.",
       operationId: "identifyTastingBottleFromPhoto",
+      // Advertise one request format so generated clients send a file upload.
+      spec: (spec) => {
+        const multipart =
+          spec.requestBody && "content" in spec.requestBody
+            ? spec.requestBody.content?.["multipart/form-data"]
+            : undefined;
+
+        return multipart
+          ? {
+              ...spec,
+              requestBody: {
+                ...spec.requestBody,
+                content: { "multipart/form-data": multipart },
+              },
+            }
+          : spec;
+      },
     })
     .input(PhotoIdentificationInputSchema)
     .output(PhotoIdentificationSchema)

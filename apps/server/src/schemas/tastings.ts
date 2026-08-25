@@ -1,3 +1,4 @@
+import { JSON_SCHEMA_INPUT_REGISTRY } from "@orpc/zod/zod4";
 import {
   BottleCandidateSchema,
   ImageBottleEvidenceSchema,
@@ -146,8 +147,17 @@ export const PhotoIdentificationSuggestedNextStepEnum = z.enum([
   "manual_search",
 ]);
 
+const PhotoIdentificationFileSchema = z
+  .file()
+  .describe("Bottle label image to identify");
+
+JSON_SCHEMA_INPUT_REGISTRY.add(PhotoIdentificationFileSchema, {
+  format: "binary",
+  contentMediaType: "image/*",
+});
+
 export const PhotoIdentificationInputSchema = z.object({
-  file: z.instanceof(Blob).describe("Bottle label image to identify"),
+  file: PhotoIdentificationFileSchema,
   idempotencyKey: z
     .string()
     .trim()

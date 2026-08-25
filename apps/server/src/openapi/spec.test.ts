@@ -484,6 +484,30 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<number>();
   });
 
+  it("publishes the photo-identification multipart upload contract", async () => {
+    const spec = await generateSpec();
+    const operation = spec.paths?.["/tastings/photo-identification"]?.post;
+    const requestBody = operation?.requestBody;
+    const content =
+      requestBody && "content" in requestBody ? requestBody.content : undefined;
+    const request = content?.["multipart/form-data"]?.schema;
+
+    expect(content?.["application/json"]).toBeUndefined();
+    expect(request).toBeDefined();
+    expect(request).toMatchObject({
+      type: "object",
+      required: expect.arrayContaining(["file", "idempotencyKey"]),
+      properties: {
+        file: expect.objectContaining({
+          type: "string",
+          format: "binary",
+          contentMediaType: "image/*",
+        }),
+        idempotencyKey: expect.objectContaining({ type: "string" }),
+      },
+    });
+  });
+
   it("publishes direct Bottle mutation contracts", async () => {
     const spec = await generateSpec();
     const mergeOperation = spec.paths?.["/bottles/{bottle}/merge"]?.post;
