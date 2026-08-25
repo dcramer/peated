@@ -10,7 +10,7 @@ The change crosses persistence, public API contracts, aggregate maintenance, acc
 
 - Give any user an optional, precise 0-100 integer score using a uniform Peated rubric.
 - Preserve Pass/Sip/Savor as the default and keep every rating population independently understandable.
-- Make the selected default rating system follow a signed-in user across devices.
+- Make the selected rating system follow a signed-in user across devices.
 - Maintain accurate arithmetic-mean score aggregates for both exact Bottles and their BottleGroups.
 - Explain the scoring bands and evaluation principles consistently in the form, public site, API, and internal docs.
 
@@ -34,9 +34,9 @@ Alternative considered: a polymorphic JSON rating object. This would make the di
 
 ### Persist a default system on the user
 
-Add `ratingSystem` with values `simple` and `advanced`, defaulting to `simple`. It is private account data exposed when the serialized user is the current user or visible to a moderator under existing serializer rules. New tasting forms initialize from the preference. Existing tastings initialize from whichever stored rating is present, so changing the preference never changes old data.
+Add `ratingSystem` with values `simple` and `advanced`, defaulting to `simple`. It is private account data exposed when the serialized user is the current user or visible to a moderator under existing serializer rules. Every tasting form uses this preference, including forms for existing tastings. The user changes the system only in profile settings.
 
-The tasting form includes an explicit Simple/100-point control. Choosing a different control clears the unsaved value from the other system. This preference controls input behavior, not which aggregate other people see.
+Entering a rating in the shown system clears a saved rating from the other system. Saving without entering a new rating keeps the saved rating, even when the profile setting hides that system. This setting controls the form, not which community totals other people see.
 
 Alternative considered: local storage. A server-side preference is consistent across devices and available during authenticated data loading.
 
@@ -79,8 +79,8 @@ Add a static public `/about/ratings` page covering both systems, a practical anc
 
 - **Sparse advanced ratings can produce volatile averages** → Always display the count; do not promote a score as a ranking signal without a later explicit minimum-count policy.
 - **Users may treat one-point differences as objective precision** → Public and inline guidance describe scores as personal comparative judgments.
-- **Two rating controls can add form complexity** → Keep simple as the default and show only the selected input.
-- **Changing systems while editing can accidentally discard a value** → Existing data determines the initial control, and the switch is explicit before save.
+- **Two rating systems can add form complexity** → Show only the input selected in profile settings.
+- **A profile change can hide a saved tasting rating while editing** → Keep the saved rating until the user enters a new rating in the shown system.
 - **External critic bands are not perfectly uniform** → Apply labels only to permitted native 100-point scores, preserve source attribution, and describe the label as Peated's display interpretation.
 - **Materialized aggregates can drift** → Retain deterministic exact-Bottle and BottleGroup recomputation from raw tasting rows.
 

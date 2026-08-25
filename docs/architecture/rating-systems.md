@@ -85,9 +85,13 @@ personal comparative judgment, not objective measurement.
 ## User Preference
 
 `user.rating_system` stores `simple` or `advanced` and defaults to `simple`.
-The preference is private account data and chooses the initial control for a
-new tasting. An existing tasting's stored rating takes precedence while
-editing, so changing the preference never changes historical entries.
+The preference is private account data and chooses the control for every
+tasting form. Users change the system only in profile settings. Tasting forms
+do not include a system selector.
+
+When the profile setting differs from an existing tasting's rating system, the
+form keeps the saved rating until the user enters a rating in the shown system.
+The new rating replaces the saved rating. Peated does not convert it.
 
 The preference affects input behavior only. It does not hide either community
 aggregate from bottle pages.

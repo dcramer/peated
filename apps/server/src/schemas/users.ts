@@ -23,7 +23,7 @@ export const UserSchema = z.object({
   ratingSystem: z
     .enum(RATING_SYSTEMS)
     .optional()
-    .describe("Preferred rating input for new tastings"),
+    .describe("Rating system used on tasting forms"),
 
   email: z.string().email().optional().describe("User's email address"),
   verified: z

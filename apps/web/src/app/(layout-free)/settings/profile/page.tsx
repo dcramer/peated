@@ -158,12 +158,9 @@ function ProfileSettingsForm() {
             control={control}
             render={({ field }) => (
               <div className="px-4 py-4">
-                <div className="mb-1 text-sm font-medium">
-                  Default rating system
-                </div>
+                <div className="mb-1 text-sm font-medium">Rating system</div>
                 <div className="text-muted mb-3 text-sm">
-                  Choose which rating input appears for new tastings. Existing
-                  tastings keep their original system.
+                  Choose which rating system tasting forms use.
                 </div>
                 <RatingSystemPicker
                   value={field.value ?? "simple"}

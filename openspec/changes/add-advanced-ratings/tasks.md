@@ -17,13 +17,14 @@
 ## 3. Web Experience
 
 - [x] 3.1 Add shared 100-point score display and input components with compact band guidance and accessible behavior
-- [x] 3.2 Add Simple/100-point selection to the shared tasting form with preference and existing-tasting initialization
+- [x] 3.2 Show the profile-selected Simple or 100-point system in the shared tasting form
 - [x] 3.3 Add the rating-system preference to account settings
 - [x] 3.4 Display advanced scores on tastings and separate community score summaries on exact-Bottle and release-family pages
 - [x] 3.5 Apply the uniform Peated score-band presentation to permitted native 100-point critic scores without combining aggregates
 - [x] 3.6 Add a static public ratings-methodology page and link it from advanced rating inputs and relevant summaries
 - [x] 3.7 Add focused web tests and manually verify the changed tasting workflow at desktop and mobile widths
 - [x] 3.8 Add a practical anchored walkthrough for choosing and adjusting an exact score
+- [x] 3.9 Make profile settings the only rating-system selector and use that preference on every tasting form
 
 ## 4. Documentation and Verification
 

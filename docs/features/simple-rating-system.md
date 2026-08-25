@@ -8,8 +8,8 @@ Peated offers two separate ways to rate a tasting:
 - **100-point**: A whole-number score for tasters who want more precision.
 
 Simple remains the default. Users can choose 100-point ratings as their account
-default or switch systems explicitly while recording a tasting. A tasting can
-use one system or neither, but never both.
+preference. Tasting forms always show the preferred system and do not include a
+system selector. A tasting can use one system or neither, but never both.
 
 ## Pass, Sip, or Savor
 
@@ -63,11 +63,12 @@ when market circumstances change.
 ## Recording and Editing
 
 New accounts default to Simple. The Ratings section of account settings can
-change the default to 100-point.
+change the preferred system to 100-point.
 
-When editing a tasting, Peated opens the system already stored on that tasting,
-even if the user's current account preference differs. Switching systems before
-saving replaces the previous value; Peated never guesses a conversion.
+When editing a tasting, Peated opens the system selected in profile settings.
+If the tasting uses the other system, Peated keeps its rating until the user
+enters a new rating. The new rating replaces the previous rating. Peated never
+converts between systems.
 
 A user can clear a rating entirely. Notes, flavor tags, serving style, and other
 tasting context do not require a rating.
