@@ -1269,6 +1269,7 @@ export function createStorePriceMatchResolver({
       if (price.sourceBottleIdentity) {
         classificationInput.extractedIdentity =
           BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity);
+        classificationInput.extractedIdentitySource = "structured";
       } else if (reuseExistingExtraction) {
         classificationInput.extractedIdentity =
           parseStoredExtractedLabel(existingProposal);

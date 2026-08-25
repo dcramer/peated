@@ -193,6 +193,11 @@ export const BottleReferenceSchema = z
 export const BottleClassificationArtifactsSchema = z
   .object({
     extractedIdentity: BottleExtractedDetailsSchema.nullable().default(null),
+    extractedIdentitySource: z
+      .enum(["image", "text", "structured"])
+      .nullable()
+      .default(null)
+      .describe("Origin of the complete extracted identity."),
     // Direct artifact fixtures may omit image evidence; the builder normalizes
     // that compatibility path to null for runtime consumers.
     imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
@@ -211,6 +216,12 @@ export const ClassifyBottleReferenceInputSchema = z
     reference: BottleReferenceSchema,
     conversationId: z.string().trim().min(1).optional(),
     extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
+    extractedIdentitySource: z
+      .enum(["image", "text", "structured"])
+      .optional()
+      .describe(
+        "Known origin of a supplied extracted identity. Omit when unknown.",
+      ),
     imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     initialCandidates: z.array(BottleCandidateSchema).optional(),
     candidateExpansion: CandidateExpansionModeSchema.default("open"),
@@ -317,6 +328,8 @@ export type ClassifyBottleReferenceInput = {
   reference: BottleReference;
   conversationId?: string;
   extractedIdentity?: null | z.infer<typeof BottleExtractedDetailsSchema>;
+  /** Known origin of a supplied extracted identity. Omit when unknown. */
+  extractedIdentitySource?: "image" | "text" | "structured";
   imageEvidence?: null | z.infer<typeof ImageBottleEvidenceSchema>;
   initialCandidates?: z.infer<typeof BottleCandidateSchema>[];
   candidateExpansion?: CandidateExpansionMode;
@@ -337,6 +350,7 @@ export function buildBottleClassificationArtifacts(
 ): BottleClassificationArtifacts {
   return BottleClassificationArtifactsSchema.parse({
     extractedIdentity: null,
+    extractedIdentitySource: null,
     imageEvidence: null,
     candidates: [],
     searchEvidence: [],

@@ -498,6 +498,39 @@ function createNoMatchDecision({
   });
 }
 
+const IMAGE_ABV_CONFLICT_RISK_NOTE =
+  "Image-extracted ABV conflicts with the matched Bottle and needs review.";
+
+function addImageAbvConflictRisk(
+  decision: BottleClassificationDecision,
+): BottleClassificationDecision {
+  const confidenceBasis = decision.confidenceBasis ?? {
+    unresolvedRisks: [],
+    webEvidence: "not_used" as const,
+  };
+  if (
+    confidenceBasis.unresolvedRisks.some(
+      ({ note }) => note === IMAGE_ABV_CONFLICT_RISK_NOTE,
+    )
+  ) {
+    return decision;
+  }
+
+  return {
+    ...decision,
+    confidenceBasis: {
+      ...confidenceBasis,
+      unresolvedRisks: [
+        ...confidenceBasis.unresolvedRisks,
+        {
+          category: "trait_conflict",
+          note: IMAGE_ABV_CONFLICT_RISK_NOTE,
+        },
+      ],
+    },
+  };
+}
+
 function rejectInvalidExistingMatch({
   reference,
   decision,
@@ -530,17 +563,30 @@ function rejectInvalidExistingMatch({
     targetCandidate: target,
     extractedLabel: artifacts.extractedIdentity,
   });
+  const hasImageAbvConflict =
+    artifacts.extractedIdentitySource === "image" &&
+    identityConflicts.includes("abv");
+  // One image read cannot erase a Match. The conflict still needs review until
+  // the runtime carries independent evidence for this exact field and value.
+  const imageAbvNeedsReview =
+    hasImageAbvConflict &&
+    decision.confidenceBasis?.webEvidence !== "conflicting";
+  const hardIdentityConflicts =
+    hasImageAbvConflict &&
+    decision.confidenceBasis?.webEvidence !== "conflicting"
+      ? identityConflicts.filter((field) => field !== "abv")
+      : identityConflicts;
 
   const smwsCode = getSmwsCodeAnchor({ reference, decision, artifacts });
   const materialIdentityConflicts =
     smwsCode &&
     candidateLooksSmws(target) &&
     candidateHasExactCaskCodeAnchor(target, smwsCode)
-      ? identityConflicts.filter((field) => field !== "brand")
-      : identityConflicts;
+      ? hardIdentityConflicts.filter((field) => field !== "brand")
+      : hardIdentityConflicts;
 
   if (!materialIdentityConflicts.length) {
-    return decision;
+    return imageAbvNeedsReview ? addImageAbvConflictRisk(decision) : decision;
   }
 
   const downgradedRationale = appendRationale(

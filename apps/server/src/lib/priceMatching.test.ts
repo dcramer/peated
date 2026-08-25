@@ -454,8 +454,62 @@ describe("priceMatching", () => {
     await resolveStorePriceMatchProposal(price.id);
 
     expect(runScrapedBottleReference).toHaveBeenCalledWith(
-      expect.objectContaining({ extractedIdentity: sourceIdentity }),
+      expect.objectContaining({
+        extractedIdentity: sourceIdentity,
+        extractedIdentitySource: "structured",
+      }),
     );
+  });
+
+  test("does not guess the source of a reused extraction", async ({
+    fixtures,
+  }) => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Example",
+      bottler: null,
+      expression: "Single Malt",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: null,
+      abv: 46,
+      release_year: null,
+      vintage_year: null,
+      cask_strength: null,
+      single_cask: null,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+      edition: null,
+    };
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Example Single Malt",
+      imageUrl: "/media/example.png",
+    });
+    classifyBottleReference.mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "no_match",
+          rationale: "No safe local match.",
+          candidateBottleIds: [],
+          matchedBottleId: null,
+          proposedBottle: null,
+        },
+        extractedLabel: extractedIdentity,
+      }),
+    );
+
+    await resolveStorePriceMatchProposal(price.id);
+    runScrapedBottleReference.mockClear();
+    await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+      reuseExistingExtraction: true,
+    });
+
+    const retryInput = runScrapedBottleReference.mock.calls[0]?.[0];
+    expect(retryInput).toMatchObject({ extractedIdentity });
+    expect(retryInput).not.toHaveProperty("extractedIdentitySource");
   });
 
   test("auto creates a Bottle from complete structured scraper facts without web evidence", async ({
