@@ -29,6 +29,7 @@ export default function PeatedId({ value }: { value: string }) {
               new URL(pathname, window.location.origin).toString(),
             );
             setCopied(true);
+            window.setTimeout(() => setCopied(false), 1800);
           } catch {
             setCopied(false);
           }
