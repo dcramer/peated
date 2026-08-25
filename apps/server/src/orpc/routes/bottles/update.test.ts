@@ -240,6 +240,7 @@ describe("PATCH /bottles/{bottle}", () => {
         abv: 52,
         naturalColor: true,
         nonChillFiltered: false,
+        maltPhenolPpm: 101.4,
         description: "Selected content",
       },
       { context: { user: mod } },
@@ -254,6 +255,7 @@ describe("PATCH /bottles/{bottle}", () => {
       abv: 52,
       naturalColor: true,
       nonChillFiltered: false,
+      maltPhenolPpm: 101.4,
       description: "Selected content",
     });
     expect((await loadMembers(groupBefore.id))[1]).toEqual(siblingBefore);

@@ -445,6 +445,7 @@ type BottleGroupMemberFixtureData = Partial<
     | "caskStrength"
     | "naturalColor"
     | "nonChillFiltered"
+    | "maltPhenolPpm"
     | "vintageYear"
     | "releaseYear"
     | "caskSize"

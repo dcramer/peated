@@ -133,6 +133,7 @@ type ExactBottleCreateInput = Pick<
   | "caskStrength"
   | "naturalColor"
   | "nonChillFiltered"
+  | "maltPhenolPpm"
   | "vintageYear"
   | "releaseYear"
   | "caskSize"

@@ -46,6 +46,7 @@ const suggestedBottle = {
   singleCask: false,
   naturalColor: null,
   nonChillFiltered: null,
+  maltPhenolPpm: null,
   noAgeStatement: null,
   vintageYear: null,
   releaseYear: 2024,

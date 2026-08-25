@@ -37,6 +37,9 @@ export function buildBottlePatch(
   if (dirtyFields.has("nonChillFiltered")) {
     patch.nonChillFiltered = value.nonChillFiltered;
   }
+  if (dirtyFields.has("maltPhenolPpm")) {
+    patch.maltPhenolPpm = value.maltPhenolPpm;
+  }
   if (dirtyFields.has("vintageYear")) patch.vintageYear = value.vintageYear;
   if (dirtyFields.has("releaseYear")) patch.releaseYear = value.releaseYear;
   if (dirtyFields.has("caskSize")) patch.caskSize = value.caskSize;

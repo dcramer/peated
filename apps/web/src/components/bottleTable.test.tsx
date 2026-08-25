@@ -78,6 +78,7 @@ function makeCollectionBottle(): CollectionBottle {
       caskStrength: false,
       naturalColor: null,
       nonChillFiltered: null,
+      maltPhenolPpm: null,
       noAgeStatement: true,
       caskFill: null,
       caskType: null,

@@ -192,6 +192,15 @@ export default function BottleOverview({
                     </DefinitionList.Details>
                   </>
                 )}
+              {bottle.maltPhenolPpm !== null &&
+                bottle.maltPhenolPpm !== undefined && (
+                  <>
+                    <DefinitionList.Term>Peat Level</DefinitionList.Term>
+                    <DefinitionList.Details>
+                      {bottle.maltPhenolPpm} PPM
+                    </DefinitionList.Details>
+                  </>
+                )}
               {(bottle.caskFill || bottle.caskSize || bottle.caskType) && (
                 <>
                   <DefinitionList.Term>Cask Details</DefinitionList.Term>

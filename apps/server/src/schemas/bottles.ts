@@ -60,6 +60,14 @@ const BottleNonChillFilteredSchema = z
   .nullable()
   .default(null)
   .describe("Whether the whisky was bottled without chill filtration");
+const BottleMaltPhenolPpmSchema = z
+  .number()
+  .min(0)
+  .nullable()
+  .default(null)
+  .describe(
+    "Producer-stated phenol level of the malted barley, in parts per million",
+  );
 const BottleAbvSchema = z
   .number()
   .min(0)
@@ -148,6 +156,7 @@ export const BottleSchema = z.object({
   singleCask: BottleSingleCaskSchema,
   naturalColor: BottleNaturalColorSchema,
   nonChillFiltered: BottleNonChillFilteredSchema,
+  maltPhenolPpm: BottleMaltPhenolPpmSchema,
   abv: BottleAbvSchema,
 
   vintageYear: BottleVintageYearSchema,
@@ -295,6 +304,7 @@ export const BottleInputFields = {
   singleCask: BottleSingleCaskSchema,
   naturalColor: BottleNaturalColorSchema,
   nonChillFiltered: BottleNonChillFilteredSchema,
+  maltPhenolPpm: BottleMaltPhenolPpmSchema,
   abv: BottleInputAbvSchema,
   vintageYear: BottleVintageYearSchema,
   releaseYear: BottleReleaseYearSchema,

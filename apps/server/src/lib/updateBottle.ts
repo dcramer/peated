@@ -82,6 +82,7 @@ type ExactPatch = Partial<
     | "caskStrength"
     | "naturalColor"
     | "nonChillFiltered"
+    | "maltPhenolPpm"
     | "vintageYear"
     | "releaseYear"
     | "caskSize"
@@ -186,6 +187,7 @@ type DesiredBottle = Pick<
   | "caskStrength"
   | "naturalColor"
   | "nonChillFiltered"
+  | "maltPhenolPpm"
   | "vintageYear"
   | "releaseYear"
   | "caskSize"
@@ -256,6 +258,7 @@ const expectedSelectedBottleKeys = [
   "descriptionSrc",
   "naturalColor",
   "nonChillFiltered",
+  "maltPhenolPpm",
   "tastingNotes",
   "suggestedTags",
 ] as const satisfies ReadonlyArray<keyof Bottle>;
@@ -280,6 +283,7 @@ export function bottleUpdateExpectedSelectedBottleState(
     descriptionSrc: bottle.descriptionSrc,
     naturalColor: bottle.naturalColor,
     nonChillFiltered: bottle.nonChillFiltered,
+    maltPhenolPpm: bottle.maltPhenolPpm,
     tastingNotes: bottle.tastingNotes,
     suggestedTags: bottle.suggestedTags,
   };
@@ -408,6 +412,7 @@ export function bottleStoragePatch(
   if ("nonChillFiltered" in input) {
     exact.nonChillFiltered = input.nonChillFiltered;
   }
+  if ("maltPhenolPpm" in input) exact.maltPhenolPpm = input.maltPhenolPpm;
   if ("vintageYear" in input) exact.vintageYear = input.vintageYear;
   if ("releaseYear" in input) exact.releaseYear = input.releaseYear;
   if ("caskSize" in input) exact.caskSize = input.caskSize;
@@ -611,6 +616,10 @@ function desiredBottleFor({
       exactPatch?.nonChillFiltered,
       bottle.nonChillFiltered,
     ),
+    maltPhenolPpm: valueOrCurrent(
+      exactPatch?.maltPhenolPpm,
+      bottle.maltPhenolPpm,
+    ),
     vintageYear: exact.vintageYear,
     releaseYear: exact.releaseYear,
     caskSize: exact.caskSize,
@@ -644,6 +653,7 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "caskStrength",
   "naturalColor",
   "nonChillFiltered",
+  "maltPhenolPpm",
   "vintageYear",
   "releaseYear",
   "caskSize",

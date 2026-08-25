@@ -170,6 +170,7 @@ export type BottlePreviewResult = {
   singleCask?: boolean | null;
   naturalColor?: boolean | null;
   nonChillFiltered?: boolean | null;
+  maltPhenolPpm?: number | null;
   vintageYear?: number | null;
   releaseYear?: number | null;
 };

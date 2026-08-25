@@ -41,6 +41,7 @@ const bottle = {
   singleCask: false,
   naturalColor: null,
   nonChillFiltered: null,
+  maltPhenolPpm: null,
   noAgeStatement: null,
   abv: 56.2,
   vintageYear: null,

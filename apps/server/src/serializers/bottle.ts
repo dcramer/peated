@@ -243,6 +243,7 @@ export const BottleSerializer = serializer({
       singleCask: item.singleCask,
       naturalColor: item.naturalColor,
       nonChillFiltered: item.nonChillFiltered,
+      maltPhenolPpm: item.maltPhenolPpm,
       abv: item.abv,
 
       vintageYear: item.vintageYear,

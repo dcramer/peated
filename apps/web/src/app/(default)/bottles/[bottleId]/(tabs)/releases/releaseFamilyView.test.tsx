@@ -77,6 +77,7 @@ const bottle = {
   caskStrength: true,
   naturalColor: true,
   nonChillFiltered: true,
+  maltPhenolPpm: 101.4,
   noAgeStatement: null,
   vintageYear: 2004,
   releaseYear: 2025,

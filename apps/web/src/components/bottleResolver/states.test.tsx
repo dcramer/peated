@@ -47,6 +47,7 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
     caskStrength: true,
     naturalColor: null,
     nonChillFiltered: null,
+    maltPhenolPpm: null,
     noAgeStatement: null,
     caskFill: null,
     caskType: null,

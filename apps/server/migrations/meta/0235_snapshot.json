@@ -1,5 +1,5 @@
 {
-  "id": "c47802e5-4880-4d6c-9184-098c2de7b6b2",
+  "id": "bd9df57d-9861-492b-accc-988208476058",
   "prevId": "da58f257-6f16-4219-b0e2-d8f5512be673",
   "version": "7",
   "dialect": "postgresql",
@@ -2611,6 +2611,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "malt_phenol_ppm": {
+          "name": "malt_phenol_ppm",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
         "vintage_year": {
           "name": "vintage_year",
           "type": "smallint",
@@ -2939,6 +2945,10 @@
         "bottle_abv_check": {
           "name": "bottle_abv_check",
           "value": "\"bottle\".\"abv\" IS NULL OR (\"bottle\".\"abv\" >= 0 AND \"bottle\".\"abv\" <= 100)"
+        },
+        "bottle_malt_phenol_ppm_check": {
+          "name": "bottle_malt_phenol_ppm_check",
+          "value": "\"bottle\".\"malt_phenol_ppm\" IS NULL OR \"bottle\".\"malt_phenol_ppm\" >= 0"
         },
         "bottle_vintage_year_check": {
           "name": "bottle_vintage_year_check",

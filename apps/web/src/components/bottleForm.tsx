@@ -156,6 +156,7 @@ const moreDetailFields = [
   "caskStrength",
   "naturalColor",
   "nonChillFiltered",
+  "maltPhenolPpm",
   "caskFill",
   "caskType",
   "caskSize",
@@ -632,6 +633,20 @@ export default function BottleForm({
                   value={booleanChoice(filtrationChoices, value)}
                 />
               )}
+            />
+
+            <TextField
+              {...register("maltPhenolPpm", {
+                setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+              })}
+              error={errors.maltPhenolPpm}
+              type="number"
+              label="Peat Level"
+              placeholder="e.g. 101.4"
+              helpText="The phenol level of the malted barley, as stated by the producer for this bottle."
+              suffixLabel="PPM"
+              step="0.1"
+              min="0"
             />
 
             <Controller

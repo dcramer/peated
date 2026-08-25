@@ -63,6 +63,7 @@ const ExactBottleInputFields = {
   caskStrength: BottleInputFields.caskStrength,
   naturalColor: BottleInputFields.naturalColor,
   nonChillFiltered: BottleInputFields.nonChillFiltered,
+  maltPhenolPpm: BottleInputFields.maltPhenolPpm,
   vintageYear: z
     .number()
     .int()
@@ -145,6 +146,9 @@ const BottlePatchFieldsSchema = z
       .removeDefault()
       .optional(),
     nonChillFiltered: ExactBottleInputFields.nonChillFiltered
+      .removeDefault()
+      .optional(),
+    maltPhenolPpm: ExactBottleInputFields.maltPhenolPpm
       .removeDefault()
       .optional(),
     vintageYear: z
