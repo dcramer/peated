@@ -6,7 +6,7 @@ import {
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { CurrencyEnum } from "@peated/server/schemas";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -67,6 +67,7 @@ export default procedure
       eq(storePrices.bottleId, bottle.id),
       eq(storePrices.hidden, false),
       eq(storePriceHistories.currency, input.currency),
+      gt(storePriceHistories.volume, 0),
       sql`${storePriceHistories.date} >= CURRENT_DATE - interval '1 year'`,
     ];
 

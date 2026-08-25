@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { storePrices } from "@peated/server/db/schema";
+import { storePriceHistories, storePrices } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
@@ -84,6 +84,24 @@ describe("GET /bottles/:bottle/price-history", () => {
     });
 
     expect(results.map(({ avgPrice }) => avgPrice)).toEqual([17]);
+  });
+
+  test("excludes history with an invalid volume", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Invalid volume history",
+    });
+    await db
+      .update(storePriceHistories)
+      .set({ volume: 0 })
+      .where(eq(storePriceHistories.priceId, price.id));
+
+    const { results } = await routerClient.bottles.prices.history({
+      bottle: bottle.id,
+    });
+
+    expect(results).toEqual([]);
   });
 
   test("filters by the currency recorded on each history row", async ({
