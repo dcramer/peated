@@ -83,6 +83,16 @@ export default procedure
 
     const user = context.user;
     const result = await db.transaction(async (tx) => {
+      if (data.ownerId !== null && data.ownerId !== undefined) {
+        const owner = await tx.query.entities.findFirst({
+          where: eq(entities.id, data.ownerId),
+          columns: { id: true },
+        });
+        if (!owner) {
+          throw errors.NOT_FOUND({ message: "Owner not found." });
+        }
+      }
+
       const actorId = (await getUserActorForDatabase(tx, user)).id;
       const entityData: NewEntity = {
         ...data,

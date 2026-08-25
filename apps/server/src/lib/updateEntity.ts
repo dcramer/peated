@@ -4,8 +4,8 @@ import type { Entity, User } from "@peated/server/db/schema";
 import {
   bottleGroupDistillers,
   bottleGroups,
-  bottleSeries,
   bottles,
+  bottleSeries,
   bottlesToDistillers,
   changes,
   countries,
@@ -18,6 +18,11 @@ import {
   DuplicateEntityAliasError,
   upsertEntityAliases,
 } from "@peated/server/lib/db";
+import {
+  assertValidEntityOwner,
+  EntityOwnerNotFoundError,
+  EntityOwnershipConflictError,
+} from "@peated/server/lib/entityOwnership";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -37,6 +42,8 @@ export const EntityUpdateInputSchema = z.object({
   name: EntityInputFields.name.optional(),
   shortName: EntityInputFields.shortName.removeDefault().optional(),
   type: EntityInputFields.type.removeDefault().optional(),
+  kind: EntityInputFields.kind.removeDefault().optional(),
+  ownerId: EntityInputFields.ownerId.removeDefault().optional(),
   description: EntityInputFields.description.removeDefault().optional(),
   descriptionSrc: EntityInputFields.descriptionSrc.optional(),
   yearEstablished: EntityInputFields.yearEstablished.removeDefault().optional(),
@@ -57,7 +64,7 @@ export class EntityUpdateAuthorizationError extends Error {
 }
 
 export class EntityUpdateNotFoundError extends Error {
-  constructor(readonly resource: "Entity" | "Country" | "Region") {
+  constructor(readonly resource: "Entity" | "Country" | "Region" | "Owner") {
     super(`${resource} not found.`);
     this.name = "EntityUpdateNotFoundError";
   }
@@ -90,6 +97,8 @@ type EntityUpdateData = Partial<
     | "name"
     | "shortName"
     | "type"
+    | "kind"
+    | "ownerId"
     | "description"
     | "descriptionSrc"
     | "yearEstablished"
@@ -118,6 +127,8 @@ export type EntityUpdateExpectedState = {
     name?: string;
     shortName?: string | null;
     roles?: Entity["type"];
+    kind?: Entity["kind"];
+    ownerId?: Entity["ownerId"];
     website?: string | null;
     countryId?: number | null;
     regionId?: number | null;
@@ -230,6 +241,8 @@ export async function updateEntityInTransaction(
       name: entity.name,
       shortName: entity.shortName,
       roles: [...entity.type].sort(),
+      kind: entity.kind,
+      ownerId: entity.ownerId,
       website: entity.website,
       countryId: entity.countryId,
       regionId: entity.regionId,
@@ -330,6 +343,26 @@ export async function updateEntityInTransaction(
   if (input.type !== undefined && !arraysEqual(input.type, entity.type)) {
     await assertRemovedRolesAreUnreferenced(transaction, entity, input.type);
     data.type = input.type;
+  }
+  if (input.kind !== undefined && input.kind !== entity.kind) {
+    data.kind = input.kind;
+  }
+  if (input.ownerId !== undefined && input.ownerId !== entity.ownerId) {
+    try {
+      await assertValidEntityOwner(transaction, {
+        entityId: entity.id,
+        ownerId: input.ownerId,
+      });
+    } catch (error) {
+      if (error instanceof EntityOwnerNotFoundError) {
+        throw new EntityUpdateNotFoundError("Owner");
+      }
+      if (error instanceof EntityOwnershipConflictError) {
+        throw new EntityUpdateConflictError(error.message, { cause: error });
+      }
+      throw error;
+    }
+    data.ownerId = input.ownerId;
   }
   if (
     input.description !== undefined &&

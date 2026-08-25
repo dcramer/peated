@@ -48,6 +48,48 @@ describe("POST /entities", () => {
     );
   });
 
+  test("creates an entity with a kind and current owner", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const owner = await fixtures.Entity({ kind: "company" });
+
+    const data = await routerClient.entities.create(
+      {
+        name: "Lagavulin",
+        kind: "distillery",
+        ownerId: owner.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      kind: "distillery",
+      ownerId: owner.id,
+    });
+    expect(
+      await db.query.entities.findFirst({ where: eq(entities.id, data.id) }),
+    ).toMatchObject({
+      kind: "distillery",
+      ownerId: owner.id,
+    });
+  });
+
+  test("rejects an unknown current owner", async ({ defaults }) => {
+    const err = await waitError(
+      routerClient.entities.create(
+        {
+          name: "Lagavulin",
+          kind: "distillery",
+          ownerId: 999999,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err.message).toBe("Owner not found.");
+  });
+
   test("updates existing entity with new type", async ({
     fixtures,
     defaults,

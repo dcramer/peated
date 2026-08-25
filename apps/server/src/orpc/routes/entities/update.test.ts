@@ -231,6 +231,111 @@ describe("PATCH /entities/:entity", () => {
     expect(newEntity.type).toEqual(["distiller"]);
   });
 
+  test("can change kind and current owner", async ({ fixtures }) => {
+    const owner = await fixtures.Entity({ kind: "company" });
+    const entity = await fixtures.Entity();
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.entities.update(
+      {
+        entity: entity.id,
+        kind: "distillery",
+        ownerId: owner.id,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data).toMatchObject({
+      kind: "distillery",
+      ownerId: owner.id,
+    });
+    expect(
+      await db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
+    ).toMatchObject({
+      kind: "distillery",
+      ownerId: owner.id,
+    });
+
+    const [change] = await db
+      .select()
+      .from(changes)
+      .where(eq(changes.objectId, entity.id))
+      .orderBy(desc(changes.id))
+      .limit(1);
+    expect(change.data).toEqual({
+      kind: "distillery",
+      ownerId: owner.id,
+    });
+  });
+
+  test("allows a current owner chain", async ({ fixtures }) => {
+    const company = await fixtures.Entity({ kind: "company" });
+    const subsidiary = await fixtures.Entity({
+      kind: "company",
+      ownerId: company.id,
+    });
+    const brand = await fixtures.Entity({ kind: "brand" });
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.entities.update(
+      { entity: brand.id, ownerId: subsidiary.id },
+      { context: { user: modUser } },
+    );
+
+    expect(data.ownerId).toBe(subsidiary.id);
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, subsidiary.id),
+      }),
+    ).toMatchObject({ ownerId: company.id });
+  });
+
+  test("rejects self ownership", async ({ fixtures }) => {
+    const entity = await fixtures.Entity();
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.entities.update(
+        { entity: entity.id, ownerId: entity.id },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(err.message).toBe("An Entity cannot own itself.");
+  });
+
+  test("rejects an ownership loop", async ({ fixtures }) => {
+    const owner = await fixtures.Entity();
+    const owned = await fixtures.Entity({ ownerId: owner.id });
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.entities.update(
+        { entity: owner.id, ownerId: owned.id },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(err.message).toBe("The owner would create an ownership loop.");
+    expect(
+      await db.query.entities.findFirst({ where: eq(entities.id, owner.id) }),
+    ).toMatchObject({ ownerId: null });
+  });
+
+  test("rejects an unknown current owner", async ({ fixtures }) => {
+    const entity = await fixtures.Entity();
+    const modUser = await fixtures.User({ mod: true });
+
+    const err = await waitError(
+      routerClient.entities.update(
+        { entity: entity.id, ownerId: 999999 },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(err.message).toBe("Owner not found.");
+  });
+
   test("brand name change rematerializes each group once while preserving exact identity", async ({
     fixtures,
   }) => {

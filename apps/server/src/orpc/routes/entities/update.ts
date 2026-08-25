@@ -24,7 +24,7 @@ export default procedure
     path: "/entities/{entity}",
     summary: "Update entity",
     description:
-      "Update entity information including name, location, type, and description. Automatically updates related bottles and aliases. Requires moderator privileges",
+      "Update entity information including name, kind, owner, location, and description. Automatically updates related bottles and aliases. Requires moderator privileges",
     operationId: "updateEntity",
   })
   .input(InputSchema)

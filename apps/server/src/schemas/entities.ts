@@ -1,7 +1,7 @@
 import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 
-import { ContentSourceEnum, EntityTypeEnum } from "./common";
+import { ContentSourceEnum, EntityKindEnum, EntityTypeEnum } from "./common";
 import { CountrySchema } from "./countries";
 import { RegionSchema } from "./regions";
 import { PointSchema } from "./shared";
@@ -21,6 +21,14 @@ const EntityTypesSchema = z
   .array(EntityTypeEnum)
   .default([])
   .describe("Types that classify this entity (e.g., brand, distillery)");
+const EntityKindSchema = EntityKindEnum.nullable()
+  .default(null)
+  .describe("Best short description of what this entity is");
+const EntityOwnerIdSchema = z
+  .number()
+  .nullable()
+  .default(null)
+  .describe("ID of the entity's current owner");
 const EntityDescriptionSchema = z
   .string()
   .nullish()
@@ -63,6 +71,8 @@ export const EntitySchema = z.object({
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
   type: EntityTypesSchema,
+  kind: EntityKindSchema,
+  ownerId: EntityOwnerIdSchema,
   description: EntityDescriptionSchema,
   descriptionSrc: EntityDescriptionSourceSchema,
   yearEstablished: EntityYearEstablishedSchema,
@@ -101,6 +111,8 @@ export const EntityInputFields = {
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
   type: EntityTypesSchema,
+  kind: EntityKindSchema,
+  ownerId: EntityOwnerIdSchema,
   description: EntityDescriptionSchema,
   descriptionSrc: EntityDescriptionSourceSchema,
   yearEstablished: EntityYearEstablishedSchema,

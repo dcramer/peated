@@ -19,6 +19,8 @@ function buildBottleEntityInput(
     choice.id ?? {
       name: choice.name,
       type: [entityType],
+      kind: null,
+      ownerId: null,
       description: null,
       shortName: null,
       location: null,

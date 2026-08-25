@@ -28,6 +28,10 @@ import {
   revalidateApplyingEntityMergeOperation,
   type LoadedEntityMergeOperation,
 } from "@peated/server/lib/entityMergeOperation";
+import {
+  assertValidEntityOwner,
+  EntityOwnershipConflictError,
+} from "@peated/server/lib/entityOwnership";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
@@ -62,6 +66,9 @@ function replaceMergedEntityIds(
 }
 
 type EntityRole = (typeof entities.$inferSelect)["type"][number];
+type EntityDestinationUpdate = Partial<
+  Pick<typeof entities.$inferInsert, "type" | "ownerId">
+>;
 
 function sortedUniqueEntityRoles(roleSets: readonly EntityRole[][]) {
   return Array.from(new Set<EntityRole>(roleSets.flat())).sort();
@@ -236,12 +243,48 @@ async function performEntityMerge({
       destinationRolesBefore.some(
         (role, index) => role !== destinationRolesAfter[index],
       );
-    if (destinationRolesChanged) {
+
+    const mergedEntityIds = new Set([toEntityId, ...fromEntityIds]);
+    const externalOwnerIds = new Set(
+      mergeEntityRows
+        .map(({ ownerId }) => ownerId)
+        .filter(
+          (ownerId): ownerId is number =>
+            ownerId !== null && !mergedEntityIds.has(ownerId),
+        ),
+    );
+    if (externalOwnerIds.size > 1) {
+      throw new EntityOwnershipConflictError(
+        "Cannot merge Entities with different current owners.",
+      );
+    }
+    const destinationOwnerId = externalOwnerIds.values().next().value ?? null;
+    const destinationOwnerChanged = toEntity.ownerId !== destinationOwnerId;
+    if (destinationRolesChanged || destinationOwnerChanged) {
+      const destinationUpdate: EntityDestinationUpdate = {};
+      if (destinationRolesChanged)
+        destinationUpdate.type = destinationRolesAfter;
+      if (destinationOwnerChanged)
+        destinationUpdate.ownerId = destinationOwnerId;
       await tx
         .update(entities)
-        .set({ type: destinationRolesAfter })
+        .set(destinationUpdate)
         .where(eq(entities.id, toEntityId));
     }
+
+    await tx
+      .update(entities)
+      .set({ ownerId: toEntityId })
+      .where(
+        and(
+          inArray(entities.ownerId, fromEntityIds),
+          notInArray(entities.id, [toEntityId, ...fromEntityIds]),
+        ),
+      );
+    await assertValidEntityOwner(tx, {
+      entityId: toEntityId,
+      ownerId: destinationOwnerId,
+    });
 
     const sourceSeriesRows = await tx
       .select()

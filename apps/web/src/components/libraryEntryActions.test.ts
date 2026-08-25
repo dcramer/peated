@@ -102,6 +102,8 @@ function makeCollectionBottle(id: number): CollectionBottle {
         name: "Test Brand",
         shortName: null,
         type: ["brand"],
+        kind: null,
+        ownerId: null,
         description: null,
         descriptionSrc: null,
         yearEstablished: null,

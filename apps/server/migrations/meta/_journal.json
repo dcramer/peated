@@ -1639,6 +1639,13 @@
       "when": 1787685535126,
       "tag": "0233_yielding_betty_ross",
       "breakpoints": false
+    },
+    {
+      "idx": 234,
+      "version": "7",
+      "when": 1787689596396,
+      "tag": "0234_black_living_lightning",
+      "breakpoints": false
     }
   ]
 }
