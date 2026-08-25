@@ -424,7 +424,7 @@ export default function BottleForm({
                 {...field}
                 error={errors.noAgeStatement}
                 label="Age information"
-                helpText="Choose No age statement only when you confirmed that the label does not show an age."
+                helpText="Choose No age statement only when the bottle label does not show an age."
                 simple
                 options={noAgeStatementChoices}
                 onChange={(choice) => {

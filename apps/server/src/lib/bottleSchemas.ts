@@ -104,7 +104,7 @@ function validateBottleInput(
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Age cannot be set when No age statement is selected.",
+      message: "Choose an age or No age statement, not both.",
       path: ["noAgeStatement"],
     });
   }
