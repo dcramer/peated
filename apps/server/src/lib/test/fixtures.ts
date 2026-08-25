@@ -442,6 +442,8 @@ type BottleGroupMemberFixtureData = Partial<
     | "abv"
     | "singleCask"
     | "caskStrength"
+    | "naturalColor"
+    | "nonChillFiltered"
     | "vintageYear"
     | "releaseYear"
     | "caskSize"

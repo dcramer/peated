@@ -130,6 +130,8 @@ type ExactBottleCreateInput = Pick<
   | "abv"
   | "singleCask"
   | "caskStrength"
+  | "naturalColor"
+  | "nonChillFiltered"
   | "vintageYear"
   | "releaseYear"
   | "caskSize"

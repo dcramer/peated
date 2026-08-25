@@ -185,6 +185,8 @@ export const bottles = pgTable(
     abv: doublePrecision("abv"),
     singleCask: boolean("single_cask"),
     caskStrength: boolean("cask_strength"),
+    naturalColor: boolean("natural_color"),
+    nonChillFiltered: boolean("non_chill_filtered"),
     vintageYear: smallint("vintage_year"),
     releaseYear: smallint("release_year"),
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),

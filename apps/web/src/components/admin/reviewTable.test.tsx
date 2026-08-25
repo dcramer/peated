@@ -39,6 +39,8 @@ const bottle = {
   statedAge: 12,
   caskStrength: true,
   singleCask: false,
+  naturalColor: null,
+  nonChillFiltered: null,
   abv: 56.2,
   vintageYear: null,
   releaseYear: 2024,

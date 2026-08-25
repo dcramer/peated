@@ -167,6 +167,8 @@ export type BottlePreviewResult = {
   caskFill?: CaskFill | null;
   caskStrength?: boolean | null;
   singleCask?: boolean | null;
+  naturalColor?: boolean | null;
+  nonChillFiltered?: boolean | null;
   vintageYear?: number | null;
   releaseYear?: number | null;
 };

@@ -82,6 +82,20 @@ describe("TastingBottleIdentity", () => {
     expect(html).toContain('data-bottle-status="tasted"');
   });
 
+  it("calls out a missing age statement in the panel", () => {
+    const html = renderToStaticMarkup(
+      <TastingBottleIdentity
+        bottle={{
+          ...bottle,
+          statedAge: null,
+          group: { name: "Offerman Edition", statedAge: null },
+        }}
+      />,
+    );
+
+    expect(html.replace(/<[^>]*>/g, "")).toContain("No age statement");
+  });
+
   it("does not repeat Single Cask when the clean name already includes it", () => {
     const html = renderToStaticMarkup(
       <TastingBottleIdentity

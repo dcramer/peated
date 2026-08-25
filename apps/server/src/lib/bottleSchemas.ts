@@ -60,6 +60,8 @@ const ExactBottleInputFields = {
   abv: BottleInputFields.abv,
   singleCask: BottleInputFields.singleCask,
   caskStrength: BottleInputFields.caskStrength,
+  naturalColor: BottleInputFields.naturalColor,
+  nonChillFiltered: BottleInputFields.nonChillFiltered,
   vintageYear: z
     .number()
     .int()
@@ -116,6 +118,12 @@ const BottlePatchFieldsSchema = z
     abv: ExactBottleInputFields.abv.unwrap().removeDefault().optional(),
     singleCask: ExactBottleInputFields.singleCask.removeDefault().optional(),
     caskStrength: ExactBottleInputFields.caskStrength
+      .removeDefault()
+      .optional(),
+    naturalColor: ExactBottleInputFields.naturalColor
+      .removeDefault()
+      .optional(),
+    nonChillFiltered: ExactBottleInputFields.nonChillFiltered
       .removeDefault()
       .optional(),
     vintageYear: z

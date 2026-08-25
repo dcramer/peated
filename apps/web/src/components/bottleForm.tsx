@@ -81,6 +81,37 @@ const caskTypeList = CASK_TYPES.map(({ id }) => ({
   name: toTitleCase(id),
 }));
 
+type BooleanChoice = {
+  id: "unknown" | "yes" | "no";
+  name: string;
+};
+
+const colorChoices: BooleanChoice[] = [
+  { id: "unknown", name: "Not stated" },
+  { id: "yes", name: "Natural color" },
+  { id: "no", name: "Added coloring" },
+];
+
+const filtrationChoices: BooleanChoice[] = [
+  { id: "unknown", name: "Not stated" },
+  { id: "yes", name: "Non-chill-filtered" },
+  { id: "no", name: "Chill-filtered" },
+];
+
+function booleanChoice(
+  choices: BooleanChoice[],
+  value: boolean | null | undefined,
+) {
+  const id = value === true ? "yes" : value === false ? "no" : "unknown";
+  return choices.find((choice) => choice.id === id) ?? choices[0];
+}
+
+function booleanChoiceValue(choice: BooleanChoice | undefined) {
+  if (choice?.id === "yes") return true;
+  if (choice?.id === "no") return false;
+  return null;
+}
+
 type CreateFormSchemaType = z.infer<typeof BottleCreateInputSchema>;
 const BottleFormSchema = BottleCreateInputSchema;
 type FormSchemaType = CreateFormSchemaType;
@@ -118,6 +149,8 @@ const moreDetailFields = [
   "series",
   "singleCask",
   "caskStrength",
+  "naturalColor",
+  "nonChillFiltered",
   "caskFill",
   "caskType",
   "caskSize",
@@ -534,6 +567,38 @@ export default function BottleForm({
               label="Cask Strength"
               helpText="Shown as cask strength on the label."
               name="caskStrength"
+            />
+
+            <Controller
+              name="naturalColor"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  label="Color"
+                  helpText="Use what the bottle or producer states."
+                  simple
+                  options={colorChoices}
+                  onChange={(choice) => onChange(booleanChoiceValue(choice))}
+                  value={booleanChoice(colorChoices, value)}
+                />
+              )}
+            />
+
+            <Controller
+              name="nonChillFiltered"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  label="Filtration"
+                  helpText="Use what the bottle or producer states."
+                  simple
+                  options={filtrationChoices}
+                  onChange={(choice) => onChange(booleanChoiceValue(choice))}
+                  value={booleanChoice(filtrationChoices, value)}
+                />
+              )}
             />
 
             <Controller

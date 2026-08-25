@@ -33,10 +33,11 @@ export default function TastingBottleIdentity({
     bottle,
     `${displayName} ${exactBottleLabel ?? ""}`,
   );
-  const standaloneAge =
-    bottle.statedAge && !metadataExclude.has("age")
-      ? `Aged ${bottle.statedAge} years`
-      : null;
+  const standaloneAge = metadataExclude.has("age")
+    ? null
+    : bottle.statedAge === null
+      ? "No age statement"
+      : `Aged ${bottle.statedAge} years`;
 
   if (variant === "inline") {
     return (

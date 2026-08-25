@@ -45,6 +45,8 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
     releaseYear: 2023,
     singleCask: false,
     caskStrength: true,
+    naturalColor: null,
+    nonChillFiltered: null,
     caskFill: null,
     caskType: null,
     caskSize: null,

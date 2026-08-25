@@ -198,6 +198,27 @@ describe("BottleIdentity", () => {
     expect(html).not.toContain(">Single cask<");
   });
 
+  it.each(["No Age Statement", "NAS"])(
+    "does not repeat %s when it is already in the title",
+    (name) => {
+      const bottle = makeBottle({
+        name,
+        fullName: `Springbank ${name}`,
+        group: { name, statedAge: null },
+        edition: null,
+        statedAge: null,
+      });
+      const html = renderToStaticMarkup(<BottleIdentity bottle={bottle} />);
+      const text = html.replace(/<[^>]*>/g, "");
+
+      expect(getMetadataExpressedByTitle(bottle, name)).toContain("age");
+      expect(text.match(/No age statement/gi) ?? []).toHaveLength(
+        name === "No Age Statement" ? 1 : 0,
+      );
+      expect(text.match(/NAS/g) ?? []).toHaveLength(name === "NAS" ? 1 : 0);
+    },
+  );
+
   it("moves canonical metadata out of ungrouped Library headlines", () => {
     const bottle = makeBottle({
       name: "Whiskyland - Chapter Thirty Three - 52-year-old - 2026 Release - 1973 Vintage - 53.2% ABV",

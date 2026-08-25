@@ -79,6 +79,8 @@ type ExactPatch = Partial<
     | "abv"
     | "singleCask"
     | "caskStrength"
+    | "naturalColor"
+    | "nonChillFiltered"
     | "vintageYear"
     | "releaseYear"
     | "caskSize"
@@ -180,6 +182,8 @@ type DesiredBottle = Pick<
   | "abv"
   | "singleCask"
   | "caskStrength"
+  | "naturalColor"
+  | "nonChillFiltered"
   | "vintageYear"
   | "releaseYear"
   | "caskSize"
@@ -247,6 +251,8 @@ const expectedSelectedBottleKeys = [
   "flavorProfile",
   "description",
   "descriptionSrc",
+  "naturalColor",
+  "nonChillFiltered",
   "tastingNotes",
   "suggestedTags",
 ] as const satisfies ReadonlyArray<keyof Bottle>;
@@ -268,6 +274,8 @@ export function bottleUpdateExpectedSelectedBottleState(
     flavorProfile: bottle.flavorProfile,
     description: bottle.description,
     descriptionSrc: bottle.descriptionSrc,
+    naturalColor: bottle.naturalColor,
+    nonChillFiltered: bottle.nonChillFiltered,
     tastingNotes: bottle.tastingNotes,
     suggestedTags: bottle.suggestedTags,
   };
@@ -386,6 +394,10 @@ export function bottleStoragePatch(
   if ("abv" in input) exact.abv = input.abv;
   if ("singleCask" in input) exact.singleCask = input.singleCask;
   if ("caskStrength" in input) exact.caskStrength = input.caskStrength;
+  if ("naturalColor" in input) exact.naturalColor = input.naturalColor;
+  if ("nonChillFiltered" in input) {
+    exact.nonChillFiltered = input.nonChillFiltered;
+  }
   if ("vintageYear" in input) exact.vintageYear = input.vintageYear;
   if ("releaseYear" in input) exact.releaseYear = input.releaseYear;
   if ("caskSize" in input) exact.caskSize = input.caskSize;
@@ -578,6 +590,11 @@ function desiredBottleFor({
     abv: exact.abv,
     singleCask: exact.singleCask,
     caskStrength: exact.caskStrength,
+    naturalColor: valueOrCurrent(exactPatch?.naturalColor, bottle.naturalColor),
+    nonChillFiltered: valueOrCurrent(
+      exactPatch?.nonChillFiltered,
+      bottle.nonChillFiltered,
+    ),
     vintageYear: exact.vintageYear,
     releaseYear: exact.releaseYear,
     caskSize: exact.caskSize,
@@ -608,6 +625,8 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "abv",
   "singleCask",
   "caskStrength",
+  "naturalColor",
+  "nonChillFiltered",
   "vintageYear",
   "releaseYear",
   "caskSize",

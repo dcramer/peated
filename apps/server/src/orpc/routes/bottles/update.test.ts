@@ -238,6 +238,8 @@ describe("PATCH /bottles/{bottle}", () => {
         statedAge: 14,
         releaseYear: 2026,
         abv: 52,
+        naturalColor: true,
+        nonChillFiltered: false,
         description: "Selected content",
       },
       { context: { user: mod } },
@@ -250,6 +252,8 @@ describe("PATCH /bottles/{bottle}", () => {
       statedAge: 14,
       releaseYear: 2026,
       abv: 52,
+      naturalColor: true,
+      nonChillFiltered: false,
       description: "Selected content",
     });
     expect((await loadMembers(groupBefore.id))[1]).toEqual(siblingBefore);

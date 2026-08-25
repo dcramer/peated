@@ -75,6 +75,8 @@ const bottle = {
   abv: 55.1,
   singleCask: true,
   caskStrength: true,
+  naturalColor: true,
+  nonChillFiltered: true,
   vintageYear: 2004,
   releaseYear: 2025,
   caskSize: "hogshead",

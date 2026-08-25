@@ -45,6 +45,16 @@ const BottleSingleCaskSchema = z
   .nullable()
   .default(null)
   .describe("Whether the whisky comes from a single cask");
+const BottleNaturalColorSchema = z
+  .boolean()
+  .nullable()
+  .default(null)
+  .describe("Whether the whisky has no added coloring");
+const BottleNonChillFilteredSchema = z
+  .boolean()
+  .nullable()
+  .default(null)
+  .describe("Whether the whisky was bottled without chill filtration");
 const BottleAbvSchema = z
   .number()
   .min(0)
@@ -130,6 +140,8 @@ export const BottleSchema = z.object({
   statedAge: BottleStatedAgeSchema,
   caskStrength: BottleCaskStrengthSchema,
   singleCask: BottleSingleCaskSchema,
+  naturalColor: BottleNaturalColorSchema,
+  nonChillFiltered: BottleNonChillFilteredSchema,
   abv: BottleAbvSchema,
 
   vintageYear: BottleVintageYearSchema,
@@ -274,6 +286,8 @@ export const BottleInputFields = {
   statedAge: BottleStatedAgeSchema,
   caskStrength: BottleCaskStrengthSchema,
   singleCask: BottleSingleCaskSchema,
+  naturalColor: BottleNaturalColorSchema,
+  nonChillFiltered: BottleNonChillFilteredSchema,
   abv: BottleInputAbvSchema,
   vintageYear: BottleVintageYearSchema,
   releaseYear: BottleReleaseYearSchema,

@@ -44,6 +44,8 @@ const suggestedBottle = {
   abv: 57.8,
   caskStrength: true,
   singleCask: false,
+  naturalColor: null,
+  nonChillFiltered: null,
   vintageYear: null,
   releaseYear: 2024,
   caskType: null,

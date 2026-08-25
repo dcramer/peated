@@ -50,6 +50,8 @@ const bottle = BottleV1Schema.parse({
   abv: 54.2,
   singleCask: false,
   caskStrength: true,
+  naturalColor: true,
+  nonChillFiltered: true,
   vintageYear: null,
   releaseYear: 2026,
   caskSize: null,

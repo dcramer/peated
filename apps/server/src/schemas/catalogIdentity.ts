@@ -78,6 +78,8 @@ export const BottleV1Fields = {
   abv: z.number().min(0).max(100).nullable(),
   singleCask: z.boolean().nullable(),
   caskStrength: z.boolean().nullable(),
+  naturalColor: z.boolean().nullable(),
+  nonChillFiltered: z.boolean().nullable(),
   vintageYear: z.number().int().gte(1800).nullable(),
   releaseYear: z.number().int().gte(1800).nullable(),
   caskSize: CaskSizeEnum.nullable(),

@@ -76,6 +76,8 @@ function makeCollectionBottle(): CollectionBottle {
       releaseYear: null,
       singleCask: false,
       caskStrength: false,
+      naturalColor: null,
+      nonChillFiltered: null,
       caskFill: null,
       caskType: null,
       caskSize: null,
@@ -129,6 +131,22 @@ describe("BottleTable", () => {
     expect(namePosition).toBeGreaterThan(-1);
     expect(statusPosition).toBeGreaterThan(namePosition);
     expect(metadataPosition).toBeGreaterThan(statusPosition);
+    expect(html).toContain("No age statement");
+  });
+
+  it("labels NAS bottles in the Age column", () => {
+    const html = renderToStaticMarkup(
+      <BottleTable
+        bottleList={[makeCollectionBottle()]}
+        noHeaders
+        searchParams={new URLSearchParams()}
+      />,
+    );
+
+    expect(html).toContain('aria-label="No age statement"');
+    expect(html).toContain(">NAS</span>");
+    expect(html).toContain('class="sm:hidden"');
+    expect(html).toContain('class="hidden sm:block"');
   });
 
   it("groups by the Bottle while retaining its nonduplicative Series", () => {
