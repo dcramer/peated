@@ -146,7 +146,12 @@ beforeEach(async (ctx) => {
     const oJobs = await import("../worker/client");
     const redis = await oJobs.getConnection();
     if (redis) {
-      const rateLimitPrefixes = ["rl:*", "auth:*", "auth-strict:*"];
+      const rateLimitPrefixes = [
+        "rl:*",
+        "auth:*",
+        "auth-strict:*",
+        "photo-identification:*",
+      ];
       for (const prefix of rateLimitPrefixes) {
         const keys = await redis.keys(prefix);
         if (keys.length > 0) {

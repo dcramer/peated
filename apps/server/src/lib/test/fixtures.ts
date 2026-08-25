@@ -1272,7 +1272,11 @@ export const AuthenticatedHeaders = async (
 };
 
 export const SampleSquareImage = async () => {
-  return new Blob([await readFile(await SampleSquareImagePath())]);
+  return new File(
+    [await readFile(await SampleSquareImagePath())],
+    "sample-square-image.jpg",
+    { type: "image/jpeg" },
+  );
 };
 
 export const SampleSquareImagePath = async () => {
