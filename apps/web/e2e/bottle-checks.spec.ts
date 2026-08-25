@@ -1,6 +1,6 @@
 import { expect, test, type TestInfo } from "@playwright/test";
 
-import { expectNoHorizontalOverflow } from "./assertions";
+import { bottlePeatedIdPath, expectNoHorizontalOverflow } from "./assertions";
 import {
   existingBottle,
   existingBottleId,
@@ -122,7 +122,7 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
   await expectNoHorizontalOverflow(page);
 
   await page.getByRole("button", { name: "Return to Bottle" }).click();
-  await expect(page).toHaveURL(`/bottles/${existingBottleId}`);
+  await expect(page).toHaveURL(bottlePeatedIdPath(existingBottleId));
 });
 
 test("opens an actionable admin audit in its focused Moderation task", async ({

@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-import { expectNoHorizontalOverflow } from "./assertions";
+import { bottlePeatedIdPath, expectNoHorizontalOverflow } from "./assertions";
 import {
   addAnotherReleaseSourceBottle,
   createdBottleId,
@@ -201,7 +201,7 @@ test.describe("create bottle", () => {
     );
     await submitCreateBottle(page);
 
-    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(createdBottleId));
     await expect(
       page.getByRole("heading", {
         name: `${testBrand.name} ${createdBottleName}`,
@@ -454,7 +454,7 @@ test.describe("create bottle", () => {
     expect(createInput).not.toHaveProperty("sourceBottleId");
     expect(createInput).not.toHaveProperty("release");
     expect(createInput).not.toHaveProperty("releaseId");
-    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(createdBottleId));
     await expectNoHorizontalOverflow(page);
   });
 
@@ -878,7 +878,7 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:suitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
-    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(createdBottleId));
     await expect(
       page.getByRole("heading", {
         name: `${testBrand.name} ${createdBottleName}`,
@@ -906,7 +906,7 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:suitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
-    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(createdBottleId));
     await expect(
       page.getByRole("heading", {
         name: `${testBrand.name} ${createdBottleName}`,
@@ -947,7 +947,7 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
-    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(createdBottleId));
     await expect(
       page.getByRole("heading", {
         name: `${testBrand.name} ${createdBottleName}`,
@@ -978,7 +978,7 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:unsuitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
-    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(createdBottleId));
     await expect(
       page.getByRole("heading", {
         name: `${testBrand.name} ${createdBottleName}`,
@@ -1005,7 +1005,7 @@ test.describe("add bottle flow", () => {
         "The bottle was created, but the public image was not saved.",
       ),
     ).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(createdBottleId));
     await expect(
       page.getByRole("heading", {
         name: `${testBrand.name} ${createdBottleName}`,
@@ -1141,7 +1141,7 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
-    await expect(page).toHaveURL(new RegExp(`/bottles/${existingBottle.id}$`));
+    await expect(page).toHaveURL(bottlePeatedIdPath(existingBottle.id));
     await expect(
       page.getByRole("heading", {
         name: `${testBrand.name} ${destinationBottleGroup.name}`,

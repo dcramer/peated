@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { bottlePeatedIdPath } from "./assertions";
 import {
   firstStorePriceName,
   priceChangeFirstBottle,
@@ -35,7 +36,7 @@ test.describe("Bottle prices", () => {
       })
       .click();
 
-    await expect(page).toHaveURL(`/bottles/${priceChangeFirstBottle.id}`);
+    await expect(page).toHaveURL(bottlePeatedIdPath(priceChangeFirstBottle.id));
   });
 
   test("links resolved admin prices while leaving unresolved prices unlinked", async ({
@@ -58,7 +59,7 @@ test.describe("Bottle prices", () => {
         exact: true,
       })
       .click();
-    await expect(page).toHaveURL(`/bottles/${priceChangeFirstBottle.id}`);
+    await expect(page).toHaveURL(bottlePeatedIdPath(priceChangeFirstBottle.id));
 
     await page.goto(`/admin/sites/${priceSite.type}`, { waitUntil: "commit" });
 

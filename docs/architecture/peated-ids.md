@@ -26,6 +26,6 @@ Peated IDs are serialized in uppercase with at least four digits. Input and sear
 
 ## Scope
 
-Peated IDs are for objects people or integrations need to reference directly. They do not apply to bottle groups, flights, tastings, prices, aliases, observations, join rows, or other internal records unless those objects later gain a clear external-reference requirement.
+Peated IDs are for objects people or integrations need to reference directly. They do not apply to BottleGroups, flights, tastings, prices, aliases, observations, join rows, or other internal records unless those objects later gain a clear external-reference requirement.
 
 Peated IDs do not replace numeric database primary keys, foreign keys, or existing numeric mutation inputs. They are a stable public identity layered on top of the existing data model.
