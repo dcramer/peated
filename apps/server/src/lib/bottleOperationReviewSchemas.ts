@@ -16,6 +16,11 @@ export const MAX_OPERATION_PREVIEW_IDS = 20;
 
 const PositiveIdSchema = z.number().int().positive();
 const NonEmptyTextSchema = z.string().trim().min(1);
+// Bottle review state includes the server-owned no-age-statement fact. Keep it
+// optional so reviews stored before this field was added remain readable.
+const BottleReviewExactStateSchema = BottleContextExactSchema.extend({
+  noAgeStatement: z.boolean().nullable().optional(),
+}).strict();
 // Previews canonicalize legacy blanks for reviewers; state tokens retain raw
 // database values for exact staleness comparisons.
 const EntityPreviewShortNameSchema = z
@@ -123,7 +128,7 @@ export const BottlePreviewStateSchema = z
     groupId: PositiveIdSchema,
     fullName: NonEmptyTextSchema,
     shared: BottleSharedPreviewStateSchema,
-    exact: BottleContextExactSchema,
+    exact: BottleReviewExactStateSchema,
   })
   .strict();
 
@@ -291,7 +296,7 @@ export const BottleUpdateStateTokenSchema = z
     bottleId: PositiveIdSchema,
     groupId: PositiveIdSchema,
     shared: BottleSharedStateTokenFieldsSchema.optional(),
-    exact: BottleContextExactSchema.partial().optional(),
+    exact: BottleReviewExactStateSchema.partial().optional(),
     referencedEntities: z.array(EntityDependencyStateSchema),
     referencedSeries: z.array(SeriesDependencyStateSchema),
     relationshipDigest: RelationshipDigestSchema.optional(),
@@ -314,7 +319,7 @@ const BottleMergeIdentityStateSchema = z
         bottlerId: PositiveIdSchema.nullable(),
       })
       .strict(),
-    exact: BottleContextExactSchema,
+    exact: BottleReviewExactStateSchema,
     aliasDigest: RelationshipDigestSchema,
     tombstoneDestinationBottleId: PositiveIdSchema.nullable(),
   })
