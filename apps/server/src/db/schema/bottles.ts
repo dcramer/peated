@@ -206,6 +206,10 @@ export const bottles = pgTable(
       .default(sql`array[]::varchar[]`)
       .notNull(),
     avgRating: doublePrecision("avg_rating"),
+    avgScore: doublePrecision("avg_score"),
+    totalScores: bigint("total_scores", { mode: "number" })
+      .default(0)
+      .notNull(),
     ratingStats: jsonb("rating_stats")
       .default(DEFAULT_RATING_STATS)
       .notNull()
@@ -272,6 +276,10 @@ export const bottleGroups = pgTable(
       mode: "number",
     }),
     avgRating: doublePrecision("avg_rating"),
+    avgScore: doublePrecision("avg_score"),
+    totalScores: bigint("total_scores", { mode: "number" })
+      .default(0)
+      .notNull(),
     ratingStats: jsonb("rating_stats")
       .default(DEFAULT_RATING_STATS)
       .notNull()

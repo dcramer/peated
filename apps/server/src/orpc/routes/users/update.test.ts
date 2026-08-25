@@ -49,6 +49,24 @@ describe("PATCH /users/:user", () => {
     expect(user?.username).toEqual("joeblow");
   });
 
+  test("can change preferred rating system", async ({ defaults }) => {
+    const data = await routerClient.users.update(
+      {
+        user: defaults.user.id,
+        ratingSystem: "advanced",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.ratingSystem).toBe("advanced");
+
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, defaults.user.id));
+    expect(user.ratingSystem).toBe("advanced");
+  });
+
   test("can change mod as admin", async ({ defaults, fixtures }) => {
     const adminUser = await fixtures.User({ admin: true });
 

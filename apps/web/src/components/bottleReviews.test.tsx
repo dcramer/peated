@@ -75,6 +75,21 @@ describe("BottleReviews", () => {
     expect(renderToStaticMarkup(<BottleReviewList results={[]} />)).toBe("");
   });
 
+  it("adds the shared band label to a native 100-point critic score", () => {
+    const html = renderToStaticMarkup(
+      <BottleReviewList
+        results={[
+          makeReview({
+            nativeScore: { value: 92, scale: 100, display: "92/100" },
+          }),
+        ]}
+      />,
+    );
+
+    expect(html).toContain("92/100");
+    expect(html).toContain("Exceptional");
+  });
+
   it("omits missing metadata and normalized compatibility ratings", () => {
     const results = [
       makeReview({

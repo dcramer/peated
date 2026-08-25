@@ -65,6 +65,12 @@ export default async function notifyDiscordOnTasting(input: JobPayload) {
       value: `${tasting.rating}`,
       inline: true,
     });
+  if (tasting.score !== null)
+    fields.push({
+      name: "Score",
+      value: `${tasting.score} points`,
+      inline: true,
+    });
 
   if (tasting.tags)
     fields.push({

@@ -6,7 +6,7 @@ import { inArray, sql } from "drizzle-orm";
 
 export type BottleActivityStats = Pick<
   Bottle,
-  "totalTastings" | "avgRating" | "ratingStats"
+  "totalTastings" | "avgRating" | "avgScore" | "totalScores" | "ratingStats"
 >;
 
 type RawBottleActivityStats = {
@@ -16,6 +16,8 @@ type RawBottleActivityStats = {
   total: number | string;
   totalTastings: number | string;
   avg: number | string | null;
+  scoreAvg: number | string | null;
+  scoreTotal: number | string;
 };
 
 export class BottleActivityStatsAggregationError extends Error {
@@ -57,7 +59,9 @@ export async function aggregateBottleActivityStatsInTransaction(
       COUNT(*) FILTER (WHERE ${tastings.rating} = ${SIMPLE_RATING_VALUES.SIP}) AS "sip",
       COUNT(*) FILTER (WHERE ${tastings.rating} = ${SIMPLE_RATING_VALUES.SAVOR}) AS "savor",
       COUNT(${tastings.rating}) AS "total",
-      AVG(${tastings.rating}) AS "avg"
+      AVG(${tastings.rating}) AS "avg",
+      COUNT(${tastings.score}) AS "scoreTotal",
+      AVG(${tastings.score}) AS "scoreAvg"
     FROM ${tastings}
     WHERE ${inArray(tastings.bottleId, bottleIds)}
   `);
@@ -72,6 +76,8 @@ export async function aggregateBottleActivityStatsInTransaction(
   return {
     totalTastings: requiredCount(raw.totalTastings),
     avgRating: avg,
+    avgScore: requiredAverage(raw.scoreAvg),
+    totalScores: requiredCount(raw.scoreTotal),
     ratingStats: {
       pass,
       sip,

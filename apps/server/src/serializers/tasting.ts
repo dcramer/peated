@@ -163,6 +163,7 @@ export const TastingSerializer = serializer({
         .union([z.literal(-1), z.literal(1), z.literal(2)])
         .nullable()
         .parse(item.rating),
+      score: item.score,
       servingStyle: item.servingStyle,
       friends: attrs.friends,
 

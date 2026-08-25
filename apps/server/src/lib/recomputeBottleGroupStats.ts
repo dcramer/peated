@@ -28,6 +28,8 @@ export type BottleGroupStatsResult = Pick<
   | "totalBottles"
   | "totalTastings"
   | "avgRating"
+  | "avgScore"
+  | "totalScores"
   | "ratingStats"
   | "updatedAt"
 >;
@@ -90,6 +92,8 @@ export async function recomputeBottleGroupStatsInTransaction(
       totalBottles: bottleGroups.totalBottles,
       totalTastings: bottleGroups.totalTastings,
       avgRating: bottleGroups.avgRating,
+      avgScore: bottleGroups.avgScore,
+      totalScores: bottleGroups.totalScores,
       ratingStats: bottleGroups.ratingStats,
       updatedAt: bottleGroups.updatedAt,
     });

@@ -17,6 +17,7 @@ import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";
 import classNames from "../lib/classNames";
 import { useORPC } from "../lib/orpc/context";
+import AdvancedRatingDisplay from "./advancedRatingDisplay";
 import BadgeImage from "./badgeImage";
 import Button from "./button";
 import Counter from "./counter";
@@ -144,6 +145,7 @@ export function TastingContent({
       {(tasting.servingStyle ||
         tasting.color ||
         tasting.rating ||
+        tasting.score !== null ||
         tasting.tags.length > 0) && (
         <div className="text-muted px-3 text-sm sm:px-5">
           <DefinitionList className="grid-cols mb-0 grid grid-cols-2 gap-y-2 sm:grid-cols-2 [&>div>dd]:mb-0">
@@ -156,6 +158,14 @@ export function TastingContent({
                     size="small"
                     showLabel
                   />
+                </DefinitionList.Details>
+              </div>
+            )}
+            {tasting.score !== null && (
+              <div>
+                <DefinitionList.Term>Score</DefinitionList.Term>
+                <DefinitionList.Details>
+                  <AdvancedRatingDisplay score={tasting.score} />
                 </DefinitionList.Details>
               </div>
             )}

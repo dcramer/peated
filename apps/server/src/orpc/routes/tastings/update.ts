@@ -21,13 +21,18 @@ const InputSchema = z
     tasting: z.coerce.number(),
     ...TastingUpdateFields,
   })
-  .strict();
+  .strict()
+  .refine((data) => data.rating == null || data.score == null, {
+    message: "Cannot provide both a simple rating and an advanced score",
+    path: ["score"],
+  });
 
 type TastingUpdate = Partial<
   Pick<
     NewTasting,
     | "notes"
     | "rating"
+    | "score"
     | "servingStyle"
     | "color"
     | "friends"
@@ -71,6 +76,11 @@ export default procedure
     }
     if (input.rating !== undefined && input.rating !== tasting.rating) {
       tastingData.rating = input.rating;
+      if (input.rating !== null) tastingData.score = null;
+    }
+    if (input.score !== undefined && input.score !== tasting.score) {
+      tastingData.score = input.score;
+      if (input.score !== null) tastingData.rating = null;
     }
     if (
       input.servingStyle !== undefined &&
@@ -119,7 +129,8 @@ export default procedure
       tastingData.imageUrl = null;
     }
 
-    const ratingChanged = tastingData.rating !== undefined;
+    const ratingChanged =
+      tastingData.rating !== undefined || tastingData.score !== undefined;
     const updated = await db.transaction(async (tx) => {
       // Mutation and dispatch use the Bottle reference current after locking.
       const [currentTasting] = await tx

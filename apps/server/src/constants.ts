@@ -298,3 +298,25 @@ export const SIMPLE_RATING_DESCRIPTIONS = {
 
 export type SimpleRatingValue =
   (typeof SIMPLE_RATING_VALUES)[keyof typeof SIMPLE_RATING_VALUES];
+
+export const RATING_SYSTEMS = ["simple", "advanced"] as const;
+export type RatingSystem = (typeof RATING_SYSTEMS)[number];
+
+export const ADVANCED_RATING_BANDS = [
+  { min: 95, max: 100, label: "Extraordinary" },
+  { min: 90, max: 94, label: "Exceptional" },
+  { min: 85, max: 89, label: "Very good" },
+  { min: 80, max: 84, label: "Good" },
+  { min: 75, max: 79, label: "Fair" },
+  { min: 0, max: 74, label: "Not recommended" },
+] as const;
+
+export type AdvancedRatingBand = (typeof ADVANCED_RATING_BANDS)[number];
+
+export function getAdvancedRatingBand(
+  score: number,
+): AdvancedRatingBand | undefined {
+  return ADVANCED_RATING_BANDS.find(
+    (band) => score >= band.min && score <= band.max,
+  );
+}

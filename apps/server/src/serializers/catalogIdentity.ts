@@ -53,6 +53,8 @@ export const BottleGroupSummarySerializer = serializer({
       representativeBottleId: item.representativeBottleId,
       flavorProfile: item.flavorProfile,
       avgRating: item.avgRating,
+      avgScore: item.avgScore,
+      totalScores: item.totalScores,
       ratingStats: item.ratingStats,
       totalTastings: item.totalTastings,
       totalBottles: item.totalBottles,

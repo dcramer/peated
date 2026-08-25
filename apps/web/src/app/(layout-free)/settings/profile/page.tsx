@@ -11,6 +11,7 @@ import ImageField from "@peated/web/components/imageField";
 import Legend from "@peated/web/components/legend";
 import PendingTosAlert from "@peated/web/components/pendingTosAlert";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
+import RatingSystemPicker from "@peated/web/components/ratingSystemPicker";
 import TextField from "@peated/web/components/textField";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
@@ -22,7 +23,7 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof UserInputSchema>;
@@ -147,6 +148,29 @@ function ProfileSettingsForm() {
             label="Private"
             helpText="Limit visibility of your activity to friends-only."
             name="private"
+          />
+        </Fieldset>
+
+        <Fieldset>
+          <Legend title="Ratings" />
+          <Controller
+            name="ratingSystem"
+            control={control}
+            render={({ field }) => (
+              <div className="px-4 py-4">
+                <div className="mb-1 text-sm font-medium">
+                  Default rating system
+                </div>
+                <div className="text-muted mb-3 text-sm">
+                  Choose which rating input appears for new tastings. Existing
+                  tastings keep their original system.
+                </div>
+                <RatingSystemPicker
+                  value={field.value ?? "simple"}
+                  onChange={field.onChange}
+                />
+              </div>
+            )}
           />
         </Fieldset>
 

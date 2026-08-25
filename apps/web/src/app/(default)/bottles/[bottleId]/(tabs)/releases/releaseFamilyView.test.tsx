@@ -29,6 +29,8 @@ const group = {
   representativeBottleId: 999,
   flavorProfile: "peated",
   avgRating: 1.25,
+  avgScore: 87,
+  totalScores: 11,
   ratingStats,
   totalTastings: 12,
   totalBottles: 2,
@@ -83,6 +85,8 @@ const bottle = {
   tastingNotes: null,
   suggestedTags: [],
   avgRating: 2,
+  avgScore: 91,
+  totalScores: 3,
   ratingStats: {
     pass: 0,
     sip: 0,

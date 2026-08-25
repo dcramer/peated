@@ -49,22 +49,28 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
     bottleId: bottle.id,
     rating: SIMPLE_RATING_VALUES.SIP,
   });
+  await fixtures.Tasting({ bottleId: bottle.id, rating: null, score: 84 });
+  await fixtures.Tasting({ bottleId: bottle.id, rating: null, score: 88 });
 
   await updateBottleStats({ bottleId: bottle.id });
 
   await expect(
     db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
   ).resolves.toMatchObject({
-    totalTastings: 1,
+    totalTastings: 3,
     avgRating: SIMPLE_RATING_VALUES.SIP,
+    avgScore: 86,
+    totalScores: 2,
   });
   await expect(
     db.query.bottleGroups.findFirst({
       where: eq(bottleGroups.id, groupId),
     }),
   ).resolves.toMatchObject({
-    totalTastings: 1,
+    totalTastings: 3,
     avgRating: SIMPLE_RATING_VALUES.SIP,
+    avgScore: 86,
+    totalScores: 2,
   });
 
   expect(pushJob).toHaveBeenCalledTimes(3);

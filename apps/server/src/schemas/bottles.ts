@@ -161,6 +161,18 @@ export const BottleSchema = z.object({
     .describe(
       "Average rating from simple rating system (-1=Pass, 1=Sip, 2=Savor)",
     ),
+  avgScore: z
+    .number()
+    .gte(0)
+    .lte(100)
+    .nullable()
+    .readonly()
+    .describe("Average 100-point community score for this exact bottle"),
+  totalScores: z
+    .number()
+    .gte(0)
+    .readonly()
+    .describe("Number of 100-point community scores for this exact bottle"),
   ratingStats: z
     .object({
       pass: z.number().describe("Number of Pass (-1) ratings"),

@@ -27,6 +27,8 @@ export type BottleStatsResult = Omit<
     | "groupId"
     | "totalTastings"
     | "avgRating"
+    | "avgScore"
+    | "totalScores"
     | "ratingStats"
     | "updatedAt"
   >,
@@ -75,6 +77,8 @@ export async function recomputeBottleStatsInTransaction(
       groupId: bottles.groupId,
       totalTastings: bottles.totalTastings,
       avgRating: bottles.avgRating,
+      avgScore: bottles.avgScore,
+      totalScores: bottles.totalScores,
       ratingStats: bottles.ratingStats,
       updatedAt: bottles.updatedAt,
     });

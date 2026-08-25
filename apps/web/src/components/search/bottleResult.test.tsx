@@ -41,6 +41,8 @@ const group = {
   representativeBottleId: 42,
   flavorProfile: "peated",
   avgRating: null,
+  avgScore: null,
+  totalScores: 0,
   ratingStats: {
     pass: 0,
     sip: 0,
@@ -83,6 +85,8 @@ const exactBottle = {
   tastingNotes: null,
   suggestedTags: [],
   avgRating: null,
+  avgScore: null,
+  totalScores: 0,
   ratingStats: {
     pass: 0,
     sip: 0,
