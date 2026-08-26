@@ -86,27 +86,61 @@ export default function SearchPanel({
       const isUserQuery =
         (searchType === "users" || query.indexOf("@") !== -1) && user;
 
-      const include: ("bottles" | "entities" | "users")[] = [];
+      const scopes: (
+        | "bottles"
+        | "distillers"
+        | "brands"
+        | "bottlers"
+        | "members"
+      )[] = [];
       if (directToTasting || addBottleIntent || !isUserQuery)
-        include.push("bottles");
+        scopes.push("bottles");
       if (
         !directToTasting &&
         !addBottleIntent &&
         user &&
         (isUserQuery || query)
       )
-        include.push("users");
-      if (!directToTasting && !addBottleIntent) include.push("entities");
+        scopes.push("members");
+      if (!directToTasting && !addBottleIntent) {
+        scopes.push("distillers", "brands", "bottlers");
+      }
 
       try {
-        const { results } = await orpc.search.call({
+        const data = await orpc.search.call({
           query,
           limit: maxResults,
-          include,
+          scopes,
         });
         if (latestRequest.current !== requestId) return;
 
-        setResults(results);
+        const results: Result[] = data.exact
+          ? [data.exact]
+          : data.groups.flatMap((group): Result[] => {
+              switch (group.type) {
+                case "bottles":
+                  return group.results.map((ref) => ({ type: "bottle", ref }));
+                case "distillers":
+                case "brands":
+                case "bottlers":
+                  return group.results.map((ref) => ({ type: "entity", ref }));
+                case "members":
+                  return group.results.map(({ member: ref }) => ({
+                    type: "user",
+                    ref,
+                  }));
+                case "regions":
+                  return [];
+              }
+            });
+        setResults([
+          ...new Map(
+            results.map((result) => [
+              `${result.type}:${result.ref.id}`,
+              result,
+            ]),
+          ).values(),
+        ]);
         setState("ready");
         setInitialState("ready");
       } catch {

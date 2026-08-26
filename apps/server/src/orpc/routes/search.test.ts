@@ -1,295 +1,314 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, bottleTombstones } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleTombstones,
+  entityTombstones,
+} from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /search", () => {
-  test("searches across bottles and entities without authentication", async ({
+  test("returns independently capped groups with exact totals", async ({
     fixtures,
   }) => {
-    const brand = await fixtures.Entity({ name: "Search Fixture Brand" });
-    const bottle = await fixtures.Bottle({
-      name: "Unique Whiskey",
-      brandId: brand.id,
-    });
-    const entity = await fixtures.Entity({ name: "Unique Distillery" });
-    await fixtures.User({ username: "uniqueuser" });
-
-    const { results } = await routerClient.search({
-      query: "unique",
-      include: ["bottles", "entities"],
-      limit: 10,
-    });
-
-    expect(results.length).toBe(2);
-    expect(
-      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id),
-    ).toBeTruthy();
-    expect(
-      results.some(
-        (r) =>
-          r.type === "bottle" &&
-          r.ref.id === bottle.id &&
-          r.ref.group?.id === bottle.groupId,
+    const bottles = await Promise.all(
+      ["One", "Two", "Three", "Four"].map((suffix) =>
+        fixtures.Bottle({ name: `Contractneedle Bottle ${suffix}` }),
       ),
-    ).toBeTruthy();
-    expect(
-      results.some((r) => r.type === "entity" && r.ref.id === entity.id),
-    ).toBeTruthy();
-  });
-
-  test("searches across bottles, entities, and users with authentication", async ({
-    fixtures,
-    defaults,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Search Fixture Brand" });
-    const bottle = await fixtures.Bottle({
-      name: "Unique Whiskey",
-      brandId: brand.id,
-    });
-    const entity = await fixtures.Entity({ name: "Unique Distillery" });
-    const user = await fixtures.User({ username: "uniqueuser" });
-
-    const { results } = await routerClient.search(
-      {
-        query: "unique",
-        limit: 10,
-      },
-      {
-        context: { user: defaults.user },
-      },
     );
-
-    expect(results.length).toBe(3);
-    expect(
-      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id),
-    ).toBeTruthy();
-    expect(
-      results.some((r) => r.type === "entity" && r.ref.id === entity.id),
-    ).toBeTruthy();
-    expect(
-      results.some((r) => r.type === "user" && r.ref.id === user.id),
-    ).toBeTruthy();
-  });
-
-  test("limits search to specified types", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Search Fixture Brand" });
-    await fixtures.Bottle({ name: "Unique Whiskey", brandId: brand.id });
-    const entity = await fixtures.Entity({ name: "Unique Distillery" });
-
-    const { results } = await routerClient.search({
-      query: "unique",
-      include: ["entities"],
-      limit: 10,
+    const distiller = await fixtures.Entity({
+      name: "Contractneedle Distiller",
+      type: ["distiller"],
+    });
+    const brand = await fixtures.Entity({
+      name: "Contractneedle Brand",
+      type: ["brand"],
+    });
+    const bottler = await fixtures.Entity({
+      name: "Contractneedle Bottler",
+      type: ["bottler"],
+    });
+    const region = await fixtures.Region({
+      name: "Contractneedle Region",
+      totalBottles: 8,
     });
 
-    expect(results.length).toBe(1);
-    expect(results[0].type).toBe("entity");
-    expect(results[0].ref.id).toBe(entity.id);
-  });
-
-  test("respects the limit parameter", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Unique Whiskey 1" });
-    await fixtures.Bottle({ name: "Unique Whiskey 2" });
-    await fixtures.Bottle({ name: "Unique Whiskey 3" });
-
-    const { results } = await routerClient.search({
-      query: "unique",
+    const data = await routerClient.search({
+      query: "contractneedle",
+      scopes: ["regions", "brands", "bottles", "bottlers", "distillers"],
       limit: 2,
     });
 
-    expect(results.length).toBe(2);
+    expect(data.groups.map(({ type }) => type)).toEqual([
+      "bottles",
+      "distillers",
+      "brands",
+      "bottlers",
+      "regions",
+    ]);
+    expect(data.groups).toMatchObject([
+      {
+        type: "bottles",
+        total: 4,
+        results: [{ id: bottles[0]!.id }, { id: bottles[1]!.id }],
+      },
+      { type: "distillers", total: 1, results: [{ id: distiller.id }] },
+      { type: "brands", total: 1, results: [{ id: brand.id }] },
+      { type: "bottlers", total: 1, results: [{ id: bottler.id }] },
+      { type: "regions", total: 1, results: [{ id: region.id }] },
+    ]);
   });
 
-  test("blends result types within the limit", async ({
+  test("applies entity scopes before their result limits", async ({
     fixtures,
-    defaults,
   }) => {
-    const brand = await fixtures.Entity({ name: "Blend Fixture Brand" });
     await Promise.all(
       ["One", "Two", "Three"].map((suffix) =>
-        fixtures.Bottle({
-          name: `Blend Release ${suffix}`,
-          brandId: brand.id,
+        fixtures.Entity({
+          name: `Scopedneedle Brand ${suffix}`,
+          type: ["brand"],
         }),
       ),
     );
-    await fixtures.Entity({ name: "Blend Fixture Entity" });
-    await fixtures.User({ username: "blend-fixture-user" });
+    const distiller = await fixtures.Entity({
+      name: "Scopedneedle Distiller",
+      type: ["distiller"],
+    });
 
-    const { results } = await routerClient.search(
-      { query: "blend", limit: 3 },
+    const data = await routerClient.search({
+      query: "scopedneedle",
+      scopes: ["distillers"],
+      limit: 1,
+    });
+
+    expect(data.groups).toMatchObject([
+      { type: "distillers", total: 1, results: [{ id: distiller.id }] },
+    ]);
+  });
+
+  test("returns searchable scope totals", async ({ fixtures }) => {
+    await fixtures.Bottle({ name: "Population Bottle" });
+    await fixtures.Entity({
+      name: "Population Bottler",
+      type: ["bottler"],
+    });
+
+    const data = await routerClient.search({
+      query: "no-population-match",
+      scopes: ["bottles", "bottlers"],
+    });
+
+    expect(data.scopeTotals.bottles).toBeGreaterThanOrEqual(1);
+    expect(data.scopeTotals.bottlers).toBeGreaterThanOrEqual(1);
+    expect(data.scopeTotals.members).toBeUndefined();
+  });
+
+  test("keeps member search authenticated and hides unsearchable profiles", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const publicMember = await fixtures.User({
+      username: "memberneedle-public",
+    });
+    const privateMember = await fixtures.User({
+      username: "memberneedle-private",
+      private: true,
+    });
+    await fixtures.Tasting({ createdById: publicMember.id });
+    await fixtures.Tasting({ createdById: publicMember.id });
+    await fixtures.Tasting({ createdById: privateMember.id });
+
+    const [anonymous, authenticated] = await Promise.all([
+      routerClient.search({ query: "memberneedle", scopes: ["members"] }),
+      routerClient.search(
+        { query: "memberneedle", scopes: ["members"] },
+        { context: { user: defaults.user } },
+      ),
+    ]);
+
+    expect(anonymous.groups).toEqual([]);
+    expect(anonymous.scopeTotals.members).toBeUndefined();
+    expect(authenticated.groups).toMatchObject([
+      {
+        type: "members",
+        total: 1,
+        results: [{ member: { id: publicMember.id }, totalTastings: 2 }],
+      },
+    ]);
+  });
+
+  test("includes followed private members without exposing their tasting count", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const privateMember = await fixtures.User({
+      username: "followedneedle-private",
+      private: true,
+    });
+    await fixtures.Follow({
+      fromUserId: defaults.user.id,
+      toUserId: privateMember.id,
+      status: "following",
+    });
+    await fixtures.Tasting({ createdById: privateMember.id });
+
+    const data = await routerClient.search(
+      { query: "followedneedle", scopes: ["members"] },
       { context: { user: defaults.user } },
     );
 
-    expect(results.map(({ type }) => type)).toEqual([
-      "bottle",
-      "user",
-      "entity",
+    expect(data.groups).toMatchObject([
+      {
+        type: "members",
+        total: 1,
+        results: [{ member: { id: privateMember.id }, totalTastings: 0 }],
+      },
     ]);
   });
 
-  test("defaults the limit when omitted", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle({ name: "Unique Whiskey" });
+  test("ranks exact, name-prefix, and any-word-prefix matches in order", async ({
+    fixtures,
+  }) => {
+    const word = await fixtures.Bottle({ name: "House Rankneedle" });
+    const prefix = await fixtures.Bottle({ name: "Rankneedle Extra" });
+    const exact = await fixtures.Bottle({ name: "Rankneedle" });
 
-    const { results } = await routerClient.search({
-      query: "unique",
-    });
-
-    expect(results.length).toBeGreaterThanOrEqual(1);
-    expect(
-      results.some((r) => r.type === "bottle" && r.ref.id === bottle.id),
-    ).toBeTruthy();
-  });
-
-  test("sorts exact matches first", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Lagavulin 16" });
-    const exactMatch = await fixtures.Bottle({ name: "Lagavulin" });
-
-    const { results } = await routerClient.search({
-      query: "Lagavulin",
+    const data = await routerClient.search({
+      query: "rankneedle",
+      scopes: ["bottles"],
       limit: 10,
     });
+    const group = data.groups[0];
 
-    expect(results[0].type).toBe("bottle");
-    expect(results[0].ref.id).toBe(exactMatch.id);
-  });
-
-  test("finds a bottle by Peated ID", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle();
-
-    const { results } = await routerClient.search({
-      query: formatPeatedId("bottle", bottle.id),
-      limit: 10,
-    });
-
-    expect(results).toEqual([
-      expect.objectContaining({
-        type: "bottle",
-        ref: expect.objectContaining({
-          id: bottle.id,
-          peatedId: formatPeatedId("bottle", bottle.id),
-        }),
-      }),
+    expect(group?.type).toBe("bottles");
+    if (group?.type !== "bottles") throw new Error("Expected Bottles group");
+    expect(group.results.map(({ id }) => id)).toEqual([
+      exact.id,
+      prefix.id,
+      word.id,
     ]);
   });
 
-  test("finds an entity by lowercase Peated ID", async ({ fixtures }) => {
-    const entity = await fixtures.Entity();
-
-    const { results } = await routerClient.search({
-      query: `e${entity.id}`,
-      limit: 10,
+  test("uses community rating count only to break equal text matches", async ({
+    fixtures,
+  }) => {
+    const lessRated = await fixtures.Bottle({
+      name: "Tienneedle Alpha",
+      totalScores: 1,
+    });
+    const moreRated = await fixtures.Bottle({
+      name: "Tienneedle Beta",
+      totalScores: 5,
     });
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        type: "entity",
-        ref: expect.objectContaining({
-          id: entity.id,
-          peatedId: formatPeatedId("entity", entity.id),
-        }),
-      }),
+    const data = await routerClient.search({
+      query: "tienneedle",
+      scopes: ["bottles"],
+      limit: 10,
+    });
+    const group = data.groups[0];
+
+    if (group?.type !== "bottles") throw new Error("Expected Bottles group");
+    expect(group.results.map(({ id }) => id)).toEqual([
+      moreRated.id,
+      lessRated.id,
     ]);
   });
 
-  test("respects included types for Peated ID lookup", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle();
+  test("returns server-ranked nearest matches for a settled miss", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Laphroaig" });
 
-    const { results } = await routerClient.search({
-      query: `B${bottle.id}`,
-      include: ["entities"],
-      limit: 10,
+    const data = await routerClient.search({
+      query: "Laphroaigg",
+      scopes: ["bottles"],
     });
 
-    expect(results).toEqual([]);
+    expect(data.groups).toMatchObject([
+      { type: "bottles", total: 0, results: [] },
+    ]);
+    expect(data.nearest).toMatchObject([
+      { type: "bottles", result: { id: bottle.id } },
+    ]);
   });
 
-  test("resolves a merged Peated ID to the surviving bottle", async ({
+  test("resolves Bottle and Entity Peated ID tombstones directly", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
+    const entity = await fixtures.Entity({ type: ["distiller"] });
     await db.insert(bottleTombstones).values({
-      bottleId: 999,
+      bottleId: 9001,
       newBottleId: bottle.id,
     });
-
-    const { results } = await routerClient.search({
-      query: "B999",
-      limit: 10,
+    await db.insert(entityTombstones).values({
+      entityId: 9002,
+      newEntityId: entity.id,
     });
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        type: "bottle",
-        ref: expect.objectContaining({
-          id: bottle.id,
-          peatedId: formatPeatedId("bottle", bottle.id),
-        }),
+    const [bottleData, entityData] = await Promise.all([
+      routerClient.search({
+        query: formatPeatedId("bottle", 9001),
+        scopes: ["bottles"],
+      }),
+      routerClient.search({
+        query: formatPeatedId("entity", 9002),
+        scopes: ["distillers"],
       }),
     ]);
-  });
 
-  test("returns empty results with no query", async () => {
-    const { results } = await routerClient.search({
-      query: "",
-      limit: 10,
+    expect(bottleData.groups).toEqual([]);
+    expect(bottleData.exact).toMatchObject({
+      type: "bottle",
+      ref: { id: bottle.id, peatedId: formatPeatedId("bottle", bottle.id) },
     });
-
-    expect(results).toHaveLength(0);
-  });
-
-  test("returns empty results with no matches", async () => {
-    const { results } = await routerClient.search({
-      query: "nonexistentitem",
-      limit: 10,
+    expect(entityData.exact).toMatchObject({
+      type: "entity",
+      ref: { id: entity.id, peatedId: formatPeatedId("entity", entity.id) },
     });
-
-    expect(results).toHaveLength(0);
   });
 
-  test("searches only active Bottles and directly assigned aliases", async ({
+  test("searches active Bottles and directly assigned aliases", async ({
     fixtures,
   }) => {
-    const bottle = await fixtures.Bottle({ name: "Canonical Search Bottle" });
     const retainedBottle = await fixtures.Bottle({ name: "Retained Pair" });
     await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
     await db.insert(bottleAliases).values({
       bottleId: retainedBottle.id,
       name: "Authoritative Search Alias",
-      assignedByActorId: bottle.createdByActorId,
+      assignedByActorId: retainedBottle.createdByActorId,
     });
 
     const [aliasSearch, legacySearch] = await Promise.all([
       routerClient.search({
         query: "Authoritative Search Alias",
-        include: ["bottles"],
+        scopes: ["bottles"],
       }),
       routerClient.search({
         query: "Legacy Search Orphan",
-        include: ["bottles"],
+        scopes: ["bottles"],
       }),
     ]);
 
-    expect(aliasSearch.results).toMatchObject([
-      { type: "bottle", ref: { id: retainedBottle.id } },
+    expect(aliasSearch.groups).toMatchObject([
+      { type: "bottles", total: 1, results: [{ id: retainedBottle.id }] },
     ]);
-    expect(legacySearch.results).toHaveLength(0);
+    expect(legacySearch.groups).toMatchObject([
+      { type: "bottles", total: 0, results: [] },
+    ]);
   });
 
-  test("throws error for invalid include parameter", async () => {
-    const err = await waitError(() =>
+  test("rejects unknown scopes", async () => {
+    const error = await waitError(() =>
       routerClient.search({
         query: "test",
-        // SAFETY: This test sends an invalid result type to the runtime validator.
-        include: ["invalidtype" as any],
-        limit: 10,
+        // SAFETY: This test sends an invalid scope to the runtime validator.
+        scopes: ["unknown" as any],
       }),
     );
-    expect(err).toBeDefined();
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 });
