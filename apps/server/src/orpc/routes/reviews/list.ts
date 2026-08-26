@@ -15,8 +15,11 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, ilike, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNotNull, isNull, or } from "drizzle-orm";
 import { z } from "zod";
+
+const DEFAULT_SORT = "recent";
+const SORT_OPTIONS = ["recent", "name"] as const;
 
 const InputSchema = z
   .object({
@@ -24,12 +27,14 @@ const InputSchema = z
     bottle: z.coerce.number().gte(1).optional(),
     query: z.string().default(""),
     onlyUnknown: z.coerce.boolean().optional(),
+    sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     cursor: z.coerce.number().gte(1).default(1),
     limit: z.coerce.number().gte(1).lte(100).default(100),
   })
   .strict()
   .default({
     query: "",
+    sort: DEFAULT_SORT,
     cursor: 1,
     limit: 100,
   });
@@ -40,21 +45,21 @@ export default procedure
     path: "/reviews",
     summary: "List reviews",
     description:
-      "Retrieve reviews with filtering by site, bottle, and unknown status. Requires moderator privileges for full access",
+      "Retrieve reviews with filtering by site, Bottle, recent publication, and unknown status. Requires moderator privileges for full access",
     operationId: "listReviews",
   })
   .input(InputSchema)
   // TODO(response-envelope): use helper to enable later switch to { data, meta }
   .output(listResponse(ReviewSchema))
   .handler(async function ({
-    input: { cursor, query, limit, ...input },
+    input: { cursor, query, limit, sort, ...input },
     context,
     errors,
   }) {
-    const hasPublicScope = input.bottle !== undefined;
+    const hasPublicScope = input.bottle !== undefined || sort === "recent";
     const requiresModerator = input.onlyUnknown || !hasPublicScope;
-    // This route owns review visibility. Public Bottle queries exclude staged
-    // reviews. Moderator queries include them for review and matching.
+    // This route owns review visibility. Public Bottle and recent queries
+    // exclude staged reviews. Moderator queries include them for review and matching.
     const baseWhere: (SQL<unknown> | undefined)[] = requiresModerator
       ? []
       : [eq(reviews.hidden, false)];
@@ -81,6 +86,13 @@ export default procedure
           isNull(reviewArticles.contentHash),
           eq(externalReviewSourcePolicies.publicationMode, "automatic"),
         ),
+      );
+    }
+
+    if (sort === "recent") {
+      baseWhere.push(
+        isNotNull(reviews.bottleId),
+        isNotNull(reviewArticles.publishedAt),
       );
     }
 
@@ -122,7 +134,11 @@ export default procedure
       .where(and(...baseWhere, ...identityWhere))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(reviews.name));
+      .orderBy(
+        ...(sort === "recent"
+          ? [desc(reviewArticles.publishedAt), desc(reviews.id)]
+          : [asc(reviews.name), asc(reviews.id)]),
+      );
     const results = rows.map(({ review }) => review);
 
     return {
@@ -130,7 +146,7 @@ export default procedure
         ReviewSerializer,
         results.slice(0, limit),
         context.user,
-        input.site ? ["site"] : [],
+        input.site && sort !== "recent" ? ["site"] : [],
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

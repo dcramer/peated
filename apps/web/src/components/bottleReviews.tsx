@@ -20,6 +20,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
     orpc.reviews.list.queryOptions({
       input: {
         bottle: bottleId,
+        sort: "name",
       },
     }),
   );

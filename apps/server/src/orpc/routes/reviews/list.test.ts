@@ -17,7 +17,7 @@ describe("GET /reviews", () => {
     await fixtures.Review({ externalSiteId: site.id });
 
     const { results } = await routerClient.reviews.list(
-      {},
+      { sort: "name" },
       { context: { user } },
     );
 
@@ -46,7 +46,10 @@ describe("GET /reviews", () => {
       .select({ count: sql<number>`COUNT(*)::int` })
       .from(actors);
 
-    await routerClient.reviews.list({}, { context: { user: currentUser } });
+    await routerClient.reviews.list(
+      { sort: "name" },
+      { context: { user: currentUser } },
+    );
 
     const [{ count: after }] = await db
       .select({ count: sql<number>`COUNT(*)::int` })
@@ -63,7 +66,7 @@ describe("GET /reviews", () => {
     const user = await fixtures.User();
 
     const err = await waitError(
-      routerClient.reviews.list({}, { context: { user } }),
+      routerClient.reviews.list({ sort: "name" }, { context: { user } }),
     );
     expect(err).toMatchInlineSnapshot(
       `[Error: Must be a moderator to list all reviews.]`,
@@ -85,6 +88,7 @@ describe("GET /reviews", () => {
     const { results } = await routerClient.reviews.list(
       {
         site: astorwine.type,
+        sort: "name",
       },
       { context: { user } },
     );
@@ -106,15 +110,157 @@ describe("GET /reviews", () => {
     });
 
     const moderatorResults = await routerClient.reviews.list(
-      { site: site.type },
+      { site: site.type, sort: "name" },
       { context: { user } },
     );
     const publicResults = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
 
     expect(moderatorResults.results.map(({ id }) => id)).toContain(review.id);
     expect(publicResults.results.map(({ id }) => id)).not.toContain(review.id);
+  });
+
+  test("lists recent public reviews by publication date", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({
+      imageUrl: "/media/springbank-12.jpg",
+      releaseYear: 2026,
+      statedAge: 12,
+    });
+    const site = await fixtures.ExternalSite({
+      name: "Whisky Advocate",
+      type: "whiskyadvocate",
+    });
+    await fixtures.EnabledExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+      publicationMode: "automatic",
+    });
+    const older = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      url: "https://example.com/older-review",
+    });
+    const firstAtLatestDate = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      url: "https://example.com/first-latest-review",
+    });
+    const latest = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      url: "https://example.com/latest-review",
+      rating: 84,
+      reviewerName: "A. Critic",
+      nativeScoreValue: 8.4,
+      nativeScoreScale: 10,
+      nativeScoreDisplay: "8.4/10",
+      summary: "A balanced whisky with coastal smoke and a long finish.",
+      summaryContentHash: "latest-content",
+      summaryModel: "summary-model",
+      summaryPromptVersion: "v1",
+      summaryGeneratedAt: new Date("2026-08-24T00:00:00.000Z"),
+    });
+    await Promise.all([
+      db
+        .update(reviewArticles)
+        .set({
+          contentHash: "older-content",
+          publishedAt: new Date("2026-08-22T00:00:00.000Z"),
+        })
+        .where(eq(reviewArticles.id, older.articleId!)),
+      db
+        .update(reviewArticles)
+        .set({
+          contentHash: "first-latest-content",
+          publishedAt: new Date("2026-08-23T00:00:00.000Z"),
+        })
+        .where(eq(reviewArticles.id, firstAtLatestDate.articleId!)),
+      db
+        .update(reviewArticles)
+        .set({
+          title: "Springbank 12 Year Old Cask Strength review",
+          contentHash: "latest-content",
+          publishedAt: new Date("2026-08-23T00:00:00.000Z"),
+        })
+        .where(eq(reviewArticles.id, latest.articleId!)),
+    ]);
+
+    const hidden = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      hidden: true,
+    });
+    const unresolved = await fixtures.Review({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Unresolved review",
+    });
+    const unpublished = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+    });
+    const reviewOnlySite = await fixtures.ExternalSite({ type: "dramface" });
+    await fixtures.EnabledExternalReviewSourcePolicy({
+      externalSiteId: reviewOnlySite.id,
+    });
+    const reviewOnly = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: reviewOnlySite.id,
+    });
+    await Promise.all(
+      [hidden, unresolved, reviewOnly].map((review) =>
+        db
+          .update(reviewArticles)
+          .set({
+            contentHash: `content-${review.id}`,
+            publishedAt: new Date("2026-08-24T00:00:00.000Z"),
+          })
+          .where(eq(reviewArticles.id, review.articleId!)),
+      ),
+    );
+    await db
+      .update(reviewArticles)
+      .set({ contentHash: `content-${unpublished.id}` })
+      .where(eq(reviewArticles.id, unpublished.articleId!));
+
+    const firstPage = await routerClient.reviews.list({
+      limit: 2,
+    });
+    const secondPage = await routerClient.reviews.list({
+      sort: "recent",
+      cursor: 2,
+      limit: 2,
+    });
+
+    expect(firstPage.results.map(({ id }) => id)).toEqual([
+      latest.id,
+      firstAtLatestDate.id,
+    ]);
+    expect(firstPage.results[0]).toMatchObject({
+      url: "https://example.com/latest-review",
+      rating: 84,
+      site: { id: site.id, name: "Whisky Advocate" },
+      reviewerName: "A. Critic",
+      article: {
+        title: "Springbank 12 Year Old Cask Strength review",
+        publishedAt: "2026-08-23T00:00:00.000Z",
+      },
+      nativeScore: { value: 8.4, scale: 10, display: "8.4/10" },
+      summary: "A balanced whisky with coastal smoke and a long finish.",
+      bottle: {
+        id: bottle.id,
+        fullName: bottle.fullName,
+        imageUrl: expect.stringContaining("/media/springbank-12.jpg"),
+        releaseYear: 2026,
+        statedAge: 12,
+      },
+    });
+    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(secondPage.results.map(({ id }) => id)).toEqual([older.id]);
+    expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
   });
 
   test("uses article-owned source and URL metadata", async ({ fixtures }) => {
@@ -128,15 +274,15 @@ describe("GET /reviews", () => {
       url: "https://example.com/article-owned-review",
     });
     const articleResults = await routerClient.reviews.list(
-      { site: articleSite.type },
+      { site: articleSite.type, sort: "name" },
       { context: { user } },
     );
     const otherResults = await routerClient.reviews.list(
-      { site: otherSite.type },
+      { site: otherSite.type, sort: "name" },
       { context: { user } },
     );
     const allResults = await routerClient.reviews.list(
-      {},
+      { sort: "name" },
       { context: { user } },
     );
 
@@ -190,6 +336,7 @@ describe("GET /reviews", () => {
 
     const { results } = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
 
     expect(results).toMatchObject([
@@ -220,6 +367,7 @@ describe("GET /reviews", () => {
 
     const { results } = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
 
     expect(results.map(({ id }) => id)).toContain(review.id);
@@ -263,6 +411,7 @@ describe("GET /reviews", () => {
 
     const contentRevoked = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
     expect(contentRevoked.results).toMatchObject([
       { id: review.id, nativeScore: null, summary: null },
@@ -274,7 +423,7 @@ describe("GET /reviews", () => {
       .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
 
     await expect(
-      routerClient.reviews.list({ bottle: bottle.id }),
+      routerClient.reviews.list({ bottle: bottle.id, sort: "name" }),
     ).resolves.toMatchObject({ results: [] });
   });
 
@@ -298,7 +447,10 @@ describe("GET /reviews", () => {
       issue: "Other Bottle review",
     });
 
-    const { results } = await routerClient.reviews.list({ bottle: bottle.id });
+    const { results } = await routerClient.reviews.list({
+      bottle: bottle.id,
+      sort: "name",
+    });
 
     expect(results.map(({ id }) => id)).toEqual(
       expect.arrayContaining([firstDirect.id, secondDirect.id]),
@@ -345,15 +497,18 @@ describe("GET /reviews", () => {
 
     const firstPage = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
       limit: 1,
     });
     const secondPage = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
       cursor: 2,
       limit: 1,
     });
     const thirdPage = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
       cursor: 3,
       limit: 1,
     });
@@ -371,7 +526,7 @@ describe("GET /reviews", () => {
 
   test("preserves empty Bottle-filter misses", async () => {
     await expect(
-      routerClient.reviews.list({ bottle: 999_999 }),
+      routerClient.reviews.list({ bottle: 999_999, sort: "name" }),
     ).resolves.toMatchObject({ results: [] });
   });
 
@@ -397,11 +552,11 @@ describe("GET /reviews", () => {
     });
 
     const unknownResults = await routerClient.reviews.list(
-      { onlyUnknown: true },
+      { onlyUnknown: true, sort: "name" },
       { context: { user } },
     );
     const allResults = await routerClient.reviews.list(
-      {},
+      { sort: "name" },
       { context: { user } },
     );
 
@@ -433,6 +588,7 @@ describe("GET /reviews", () => {
       routerClient.reviews.list({
         bottle: bottle.id,
         onlyUnknown: true,
+        sort: "name",
       }),
     );
     expect(err).toMatchInlineSnapshot(
@@ -448,6 +604,7 @@ describe("GET /reviews", () => {
       routerClient.reviews.list(
         {
           site: site.type,
+          sort: "name",
         },
         { context: { user } },
       ),
