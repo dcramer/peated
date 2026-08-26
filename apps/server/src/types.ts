@@ -160,6 +160,7 @@ export type BottlePreviewResult = {
   distillers?: FreeformEntity[] | null;
   edition?: string | null;
   statedAge?: number | null;
+  noAgeStatement?: boolean | null;
   abv?: number | null;
   flavorProfile?: FlavorProfile | null;
   caskSize?: CaskSize | null;
@@ -167,6 +168,9 @@ export type BottlePreviewResult = {
   caskFill?: CaskFill | null;
   caskStrength?: boolean | null;
   singleCask?: boolean | null;
+  naturalColor?: boolean | null;
+  nonChillFiltered?: boolean | null;
+  maltPhenolPpm?: number | null;
   vintageYear?: number | null;
   releaseYear?: number | null;
 };

@@ -438,10 +438,14 @@ type BottleGroupMemberFixtureData = Partial<
   Pick<
     dbSchema.NewBottle,
     | "statedAge"
+    | "noAgeStatement"
     | "edition"
     | "abv"
     | "singleCask"
     | "caskStrength"
+    | "naturalColor"
+    | "nonChillFiltered"
+    | "maltPhenolPpm"
     | "vintageYear"
     | "releaseYear"
     | "caskSize"

@@ -8,7 +8,11 @@ import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { formQueryOptions } from "@peated/web/lib/orpc/query";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { buildBottlePatch } from "./buildBottlePatch";
 
@@ -26,6 +30,7 @@ export default function Page(props: { params: Promise<{ bottleId: string }> }) {
 
 function BottleEditForm({ bottleId }: { bottleId: string }) {
   const orpc = useORPC();
+  const queryClient = useQueryClient();
   const { data: context } = useSuspenseQuery(
     formQueryOptions(
       orpc.bottles.editContext.queryOptions({
@@ -69,12 +74,21 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
           }
         }
 
+        await queryClient.invalidateQueries({
+          queryKey: orpc.bottles.details.key({
+            input: { bottle: context.bottleId },
+            type: "query",
+          }),
+          refetchType: "all",
+        });
         router.push(`/bottles/${bottleId}`);
       }}
       initialData={{
         ...context.shared,
         ...context.exact,
-        statedAge: context.exact.statedAge ?? context.shared.statedAge,
+        statedAge: context.exact.noAgeStatement
+          ? null
+          : (context.exact.statedAge ?? context.shared.statedAge),
       }}
       title="Edit Bottle"
       saveLabel="Save Changes"

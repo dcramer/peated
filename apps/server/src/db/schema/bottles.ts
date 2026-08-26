@@ -163,6 +163,8 @@ export const bottles = pgTable(
 
     // Effective stated age for this exact marketed Bottle.
     statedAge: smallint("stated_age"),
+    // True only when the label was confirmed to have no age statement.
+    noAgeStatement: boolean("no_age_statement"),
 
     // a NULL series represents a "core bottling"
     seriesId: bigint("series_id", { mode: "number" }).references(
@@ -185,6 +187,9 @@ export const bottles = pgTable(
     abv: doublePrecision("abv"),
     singleCask: boolean("single_cask"),
     caskStrength: boolean("cask_strength"),
+    naturalColor: boolean("natural_color"),
+    nonChillFiltered: boolean("non_chill_filtered"),
+    maltPhenolPpm: doublePrecision("malt_phenol_ppm"),
     vintageYear: smallint("vintage_year"),
     releaseYear: smallint("release_year"),
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
@@ -244,8 +249,16 @@ export const bottles = pgTable(
       sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
     ),
     check(
+      "bottle_age_statement_check",
+      sql`${table.statedAge} IS NULL OR ${table.noAgeStatement} IS NOT TRUE`,
+    ),
+    check(
       "bottle_abv_check",
       sql`${table.abv} IS NULL OR (${table.abv} >= 0 AND ${table.abv} <= 100)`,
+    ),
+    check(
+      "bottle_malt_phenol_ppm_check",
+      sql`${table.maltPhenolPpm} IS NULL OR ${table.maltPhenolPpm} >= 0`,
     ),
     check(
       "bottle_vintage_year_check",

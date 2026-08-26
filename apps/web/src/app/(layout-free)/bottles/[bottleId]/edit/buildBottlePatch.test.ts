@@ -24,6 +24,10 @@ function formValue(
     abv: 57.2,
     singleCask: false,
     caskStrength: true,
+    naturalColor: null,
+    nonChillFiltered: null,
+    maltPhenolPpm: null,
+    noAgeStatement: null,
     vintageYear: null,
     releaseYear: 2024,
     caskSize: null,
@@ -68,6 +72,15 @@ describe("buildBottlePatch", () => {
     ).toEqual({ statedAge: null });
   });
 
+  test("submits a confirmed no-age-statement fact", () => {
+    expect(
+      buildBottlePatch(
+        formValue({ statedAge: null, noAgeStatement: true }),
+        submitMeta("statedAge", "noAgeStatement"),
+      ),
+    ).toEqual({ statedAge: null, noAgeStatement: true });
+  });
+
   test("combines expression and Bottle fields in one patch", () => {
     expect(
       buildBottlePatch(formValue(), submitMeta("name", "statedAge")),
@@ -87,6 +100,9 @@ describe("buildBottlePatch", () => {
           bottler: 7,
           flavorProfile: "deep_rich_dried_fruit",
           singleCask: true,
+          naturalColor: true,
+          nonChillFiltered: false,
+          maltPhenolPpm: 101.4,
           vintageYear: 2012,
           caskSize: "hogshead",
           caskType: "oloroso",
@@ -95,6 +111,7 @@ describe("buildBottlePatch", () => {
         submitMeta(
           "name",
           "statedAge",
+          "noAgeStatement",
           "series",
           "category",
           "brand",
@@ -105,6 +122,9 @@ describe("buildBottlePatch", () => {
           "abv",
           "singleCask",
           "caskStrength",
+          "naturalColor",
+          "nonChillFiltered",
+          "maltPhenolPpm",
           "vintageYear",
           "releaseYear",
           "caskSize",
@@ -117,6 +137,7 @@ describe("buildBottlePatch", () => {
     ).toEqual({
       name: "Springbank 12 Cask Strength",
       statedAge: 12,
+      noAgeStatement: null,
       series: 3,
       category: "single_malt",
       brand: 4,
@@ -127,6 +148,9 @@ describe("buildBottlePatch", () => {
       abv: 57.2,
       singleCask: true,
       caskStrength: true,
+      naturalColor: true,
+      nonChillFiltered: false,
+      maltPhenolPpm: 101.4,
       vintageYear: 2012,
       releaseYear: 2024,
       caskSize: "hogshead",

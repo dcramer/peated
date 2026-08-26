@@ -76,9 +76,13 @@ type ExactPatch = Partial<
     SystemBottlePatch,
     | "edition"
     | "statedAge"
+    | "noAgeStatement"
     | "abv"
     | "singleCask"
     | "caskStrength"
+    | "naturalColor"
+    | "nonChillFiltered"
+    | "maltPhenolPpm"
     | "vintageYear"
     | "releaseYear"
     | "caskSize"
@@ -171,6 +175,7 @@ type DesiredBottle = Pick<
   | "name"
   | "fullName"
   | "statedAge"
+  | "noAgeStatement"
   | "brandId"
   | "bottlerId"
   | "seriesId"
@@ -180,6 +185,9 @@ type DesiredBottle = Pick<
   | "abv"
   | "singleCask"
   | "caskStrength"
+  | "naturalColor"
+  | "nonChillFiltered"
+  | "maltPhenolPpm"
   | "vintageYear"
   | "releaseYear"
   | "caskSize"
@@ -243,10 +251,14 @@ const expectedSelectedBottleKeys = [
   "groupId",
   "fullName",
   "statedAge",
+  "noAgeStatement",
   "category",
   "flavorProfile",
   "description",
   "descriptionSrc",
+  "naturalColor",
+  "nonChillFiltered",
+  "maltPhenolPpm",
   "tastingNotes",
   "suggestedTags",
 ] as const satisfies ReadonlyArray<keyof Bottle>;
@@ -264,10 +276,14 @@ export function bottleUpdateExpectedSelectedBottleState(
     groupId: bottle.groupId,
     fullName: bottle.fullName,
     statedAge: bottle.statedAge,
+    noAgeStatement: bottle.noAgeStatement,
     category: bottle.category,
     flavorProfile: bottle.flavorProfile,
     description: bottle.description,
     descriptionSrc: bottle.descriptionSrc,
+    naturalColor: bottle.naturalColor,
+    nonChillFiltered: bottle.nonChillFiltered,
+    maltPhenolPpm: bottle.maltPhenolPpm,
     tastingNotes: bottle.tastingNotes,
     suggestedTags: bottle.suggestedTags,
   };
@@ -382,10 +398,21 @@ export function bottleStoragePatch(
     } else {
       exact.statedAge = input.statedAge;
     }
+    if (input.statedAge !== null && !("noAgeStatement" in input)) {
+      exact.noAgeStatement = null;
+    }
+  }
+  if ("noAgeStatement" in input) {
+    exact.noAgeStatement = input.noAgeStatement;
   }
   if ("abv" in input) exact.abv = input.abv;
   if ("singleCask" in input) exact.singleCask = input.singleCask;
   if ("caskStrength" in input) exact.caskStrength = input.caskStrength;
+  if ("naturalColor" in input) exact.naturalColor = input.naturalColor;
+  if ("nonChillFiltered" in input) {
+    exact.nonChillFiltered = input.nonChillFiltered;
+  }
+  if ("maltPhenolPpm" in input) exact.maltPhenolPpm = input.maltPhenolPpm;
   if ("vintageYear" in input) exact.vintageYear = input.vintageYear;
   if ("releaseYear" in input) exact.releaseYear = input.releaseYear;
   if ("caskSize" in input) exact.caskSize = input.caskSize;
@@ -435,6 +462,7 @@ function existingEntityIdsForUpdate(input: SystemBottlePatch): number[] {
 const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
   "edition",
   "statedAge",
+  "noAgeStatement",
   "releaseYear",
   "vintageYear",
   "abv",
@@ -447,6 +475,7 @@ const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
 
 const generatedDetailsIdentityKeys = [
   "statedAge",
+  "noAgeStatement",
   "brandId",
   "bottlerId",
   "seriesId",
@@ -559,6 +588,10 @@ function desiredBottleFor({
     name: identity.name,
     fullName: identity.fullName,
     statedAge: identity.statedAge,
+    noAgeStatement: valueOrCurrent(
+      exactPatch?.noAgeStatement,
+      bottle.noAgeStatement,
+    ),
     brandId: materializeSharedFields
       ? sharedMaterialization.brandId
       : bottle.brandId,
@@ -578,6 +611,15 @@ function desiredBottleFor({
     abv: exact.abv,
     singleCask: exact.singleCask,
     caskStrength: exact.caskStrength,
+    naturalColor: valueOrCurrent(exactPatch?.naturalColor, bottle.naturalColor),
+    nonChillFiltered: valueOrCurrent(
+      exactPatch?.nonChillFiltered,
+      bottle.nonChillFiltered,
+    ),
+    maltPhenolPpm: valueOrCurrent(
+      exactPatch?.maltPhenolPpm,
+      bottle.maltPhenolPpm,
+    ),
     vintageYear: exact.vintageYear,
     releaseYear: exact.releaseYear,
     caskSize: exact.caskSize,
@@ -599,6 +641,7 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "name",
   "fullName",
   "statedAge",
+  "noAgeStatement",
   "brandId",
   "bottlerId",
   "seriesId",
@@ -608,6 +651,9 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "abv",
   "singleCask",
   "caskStrength",
+  "naturalColor",
+  "nonChillFiltered",
+  "maltPhenolPpm",
   "vintageYear",
   "releaseYear",
   "caskSize",

@@ -23,6 +23,7 @@ const bottle = {
   edition: "2025 Release",
   category: "single_malt",
   statedAge: 21,
+  noAgeStatement: null,
   abv: 55.1,
   vintageYear: 2004,
   releaseYear: 2025,
@@ -80,6 +81,36 @@ describe("TastingBottleIdentity", () => {
     expect(text).not.toContain("55.1% ABV");
     expect(html).toContain('data-bottle-status="library"');
     expect(html).toContain('data-bottle-status="tasted"');
+  });
+
+  it("calls out a missing age statement in the panel", () => {
+    const html = renderToStaticMarkup(
+      <TastingBottleIdentity
+        bottle={{
+          ...bottle,
+          statedAge: null,
+          noAgeStatement: true,
+          group: { name: "Offerman Edition", statedAge: null },
+        }}
+      />,
+    );
+
+    expect(html.replace(/<[^>]*>/g, "")).toContain("No age statement");
+  });
+
+  it("does not label an unknown age as NAS", () => {
+    const html = renderToStaticMarkup(
+      <TastingBottleIdentity
+        bottle={{
+          ...bottle,
+          statedAge: null,
+          noAgeStatement: null,
+          group: { name: "Offerman Edition", statedAge: null },
+        }}
+      />,
+    );
+
+    expect(html.replace(/<[^>]*>/g, "")).not.toContain("No age statement");
   });
 
   it("does not repeat Single Cask when the clean name already includes it", () => {

@@ -231,6 +231,7 @@ export const BottleSerializer = serializer({
       name: item.name,
 
       statedAge: item.statedAge,
+      noAgeStatement: item.noAgeStatement,
 
       category: item.category,
       description: item.description,
@@ -240,6 +241,9 @@ export const BottleSerializer = serializer({
       edition: item.edition,
       caskStrength: item.caskStrength,
       singleCask: item.singleCask,
+      naturalColor: item.naturalColor,
+      nonChillFiltered: item.nonChillFiltered,
+      maltPhenolPpm: item.maltPhenolPpm,
       abv: item.abv,
 
       vintageYear: item.vintageYear,

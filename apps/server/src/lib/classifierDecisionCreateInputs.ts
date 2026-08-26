@@ -61,6 +61,10 @@ export function buildBottleInputFromProposedBottle(
     descriptionSrc: null,
     imageUrl: null,
     flavorProfile: null,
+    naturalColor: null,
+    nonChillFiltered: null,
+    maltPhenolPpm: null,
+    noAgeStatement: null,
   };
 }
 

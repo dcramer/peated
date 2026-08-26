@@ -62,6 +62,8 @@ describe("POST /bottles", () => {
     const brand = await fixtures.Entity();
     const cases = [
       ["fractional age", { statedAge: 12.5 }],
+      ["conflicting age statement", { statedAge: 12, noAgeStatement: true }],
+      ["negative malt phenol PPM", { maltPhenolPpm: -0.1 }],
       ["fractional vintage year", { vintageYear: 2010.5 }],
       ["nonpositive brand id", { brand: 0 }],
       ["nonpositive bottler id", { bottler: -1 }],
@@ -181,6 +183,7 @@ describe("POST /bottles", () => {
       category: null,
       flavorProfile: null,
       statedAge: null,
+      noAgeStatement: null,
       edition: null,
       abv: null,
       vintageYear: null,
@@ -234,6 +237,31 @@ describe("POST /bottles", () => {
     expect(search.results.map(({ id }) => id)).toContain(bottle.id);
   });
 
+  test("stores a confirmed no-age-statement fact", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const brand = await fixtures.Entity({ name: "NAS Brand" });
+    const data = await routerClient.bottles.create(
+      {
+        name: "NAS Release",
+        brand: brand.id,
+        noAgeStatement: true,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      statedAge: null,
+      noAgeStatement: true,
+    });
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, data.id),
+      }),
+    ).toMatchObject({ statedAge: null, noAgeStatement: true });
+  });
+
   test("rejects a bottle name that duplicates its brand", async ({
     fixtures,
     defaults,
@@ -275,6 +303,9 @@ describe("POST /bottles", () => {
         abv: 57.1,
         singleCask: true,
         caskStrength: true,
+        naturalColor: true,
+        nonChillFiltered: false,
+        maltPhenolPpm: 101.4,
         vintageYear: 2010,
         releaseYear: 2024,
         caskSize: "hogshead",
@@ -315,6 +346,9 @@ describe("POST /bottles", () => {
       abv: 57.1,
       singleCask: true,
       caskStrength: true,
+      naturalColor: true,
+      nonChillFiltered: false,
+      maltPhenolPpm: 101.4,
       vintageYear: 2010,
       releaseYear: 2024,
       caskSize: "hogshead",
@@ -337,6 +371,9 @@ describe("POST /bottles", () => {
       abv: bottle.abv,
       singleCask: bottle.singleCask,
       caskStrength: bottle.caskStrength,
+      naturalColor: bottle.naturalColor,
+      nonChillFiltered: bottle.nonChillFiltered,
+      maltPhenolPpm: bottle.maltPhenolPpm,
       vintageYear: bottle.vintageYear,
       releaseYear: bottle.releaseYear,
       caskSize: bottle.caskSize,

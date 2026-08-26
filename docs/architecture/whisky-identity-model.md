@@ -77,11 +77,18 @@ exact identity and additionally owns:
 - release and vintage years;
 - effective stated age;
 - ABV, single-cask, and cask-strength flags;
+- a confirmed no-age-statement fact;
+- natural-color and non-chill-filtered facts;
+- the producer-stated phenol level of the malted barley, in PPM;
 - optional cask size, type, and fill when explicitly supplied;
 - exact aliases, content, images, activity, and statistics.
 
 This duplication is intentional. BottleGroup is the authority for shared
 edits, while Bottle remains the authority for exact reads.
+
+`maltPhenolPpm` is the producer-stated phenol level of the malted barley used
+for that release. It is not a measurement of the finished whisky and does not
+affect Bottle identity, matching, or grouping.
 
 `bottler` is the market-facing bottler or release imprint named for the product.
 It may point to the same Entity as `brand` or a producing distillery; a separate

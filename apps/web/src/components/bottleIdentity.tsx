@@ -28,6 +28,7 @@ export type BottleIdentitySource = Pick<
   | "caskType"
   | "caskSize"
 > & {
+  noAgeStatement?: Bottle["noAgeStatement"];
   brand: Pick<Bottle["brand"], "id" | "name" | "shortName">;
   series: Pick<NonNullable<Bottle["series"]>, "id" | "name"> | null;
   group?: Pick<NonNullable<Bottle["group"]>, "name"> &
@@ -158,6 +159,7 @@ export function getMetadataExpressedByTitle(
     BottleIdentitySource,
     | "edition"
     | "statedAge"
+    | "noAgeStatement"
     | "abv"
     | "vintageYear"
     | "releaseYear"
@@ -183,6 +185,12 @@ export function getMetadataExpressedByTitle(
     bottle.statedAge !== null &&
     normalizedTitle.includes(String(bottle.statedAge)) &&
     normalizedTitle.includes("year")
+  ) {
+    duplicates.push("age");
+  } else if (
+    bottle.noAgeStatement === true &&
+    (normalizedTitle.includes("no age statement") ||
+      /\bnas\b/.test(normalizedTitle))
   ) {
     duplicates.push("age");
   }
@@ -332,6 +340,7 @@ export default function BottleIdentity({
   linkClassName,
   showBrand = true,
   showReleaseYear = false,
+  hideAgeOnDesktop = false,
 }: {
   bottle: BottleIdentitySource;
   mode?: "absolute" | "relative";
@@ -344,6 +353,7 @@ export default function BottleIdentity({
   linkClassName?: string;
   showBrand?: boolean;
   showReleaseYear?: boolean;
+  hideAgeOnDesktop?: boolean;
 }) {
   const relativeIdentity = getRelativeBottleIdentity(bottle);
   const isAbsolute = mode === "absolute";
@@ -419,11 +429,30 @@ export default function BottleIdentity({
           />
         ) : null}
       </div>
-      <BottleExactMetadata
-        bottle={bottle}
-        variant={metadataVariant}
-        exclude={[...metadataExclude]}
-      />
+      {hideAgeOnDesktop ? (
+        <>
+          <div className="sm:hidden">
+            <BottleExactMetadata
+              bottle={bottle}
+              variant={metadataVariant}
+              exclude={[...metadataExclude]}
+            />
+          </div>
+          <div className="hidden sm:block">
+            <BottleExactMetadata
+              bottle={bottle}
+              variant={metadataVariant}
+              exclude={[...metadataExclude, "age"]}
+            />
+          </div>
+        </>
+      ) : (
+        <BottleExactMetadata
+          bottle={bottle}
+          variant={metadataVariant}
+          exclude={[...metadataExclude]}
+        />
+      )}
     </div>
   );
 }

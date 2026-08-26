@@ -81,6 +81,42 @@ const caskTypeList = CASK_TYPES.map(({ id }) => ({
   name: toTitleCase(id),
 }));
 
+type BooleanChoice = {
+  id: "unknown" | "yes" | "no";
+  name: string;
+};
+
+const noAgeStatementChoices: BooleanChoice[] = [
+  { id: "unknown", name: "Not known" },
+  { id: "yes", name: "No age statement" },
+];
+
+const colorChoices: BooleanChoice[] = [
+  { id: "unknown", name: "Not stated" },
+  { id: "yes", name: "Natural color" },
+  { id: "no", name: "Added coloring" },
+];
+
+const filtrationChoices: BooleanChoice[] = [
+  { id: "unknown", name: "Not stated" },
+  { id: "yes", name: "Non-chill-filtered" },
+  { id: "no", name: "Chill-filtered" },
+];
+
+function booleanChoice(
+  choices: BooleanChoice[],
+  value: boolean | null | undefined,
+) {
+  const id = value === true ? "yes" : value === false ? "no" : "unknown";
+  return choices.find((choice) => choice.id === id) ?? choices[0];
+}
+
+function booleanChoiceValue(choice: BooleanChoice | undefined) {
+  if (choice?.id === "yes") return true;
+  if (choice?.id === "no") return false;
+  return null;
+}
+
 type CreateFormSchemaType = z.infer<typeof BottleCreateInputSchema>;
 const BottleFormSchema = BottleCreateInputSchema;
 type FormSchemaType = CreateFormSchemaType;
@@ -118,6 +154,9 @@ const moreDetailFields = [
   "series",
   "singleCask",
   "caskStrength",
+  "naturalColor",
+  "nonChillFiltered",
+  "maltPhenolPpm",
   "caskFill",
   "caskType",
   "caskSize",
@@ -251,6 +290,7 @@ export default function BottleForm({
     name: watch("name"),
     category: watch("category"),
     statedAge: watch("statedAge"),
+    noAgeStatement: watch("noAgeStatement"),
     edition: watch("edition"),
     releaseYear: watch("releaseYear"),
     vintageYear: watch("vintageYear"),
@@ -374,6 +414,33 @@ export default function BottleForm({
             placeholder="e.g. 12"
             helpText="The age shown on the bottle's label."
             suffixLabel="years"
+            disabled={watch("noAgeStatement") === true}
+          />
+
+          <Controller
+            name="noAgeStatement"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.noAgeStatement}
+                label="Age information"
+                helpText="Choose No age statement only when the bottle label does not show an age."
+                simple
+                options={noAgeStatementChoices}
+                onChange={(choice) => {
+                  const noAgeStatement = booleanChoiceValue(choice);
+                  onChange(noAgeStatement);
+                  if (noAgeStatement) {
+                    setValue("statedAge", null, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }
+                }}
+                value={booleanChoice(noAgeStatementChoices, value)}
+              />
+            )}
           />
 
           <TextField
@@ -534,6 +601,51 @@ export default function BottleForm({
               label="Cask Strength"
               helpText="Shown as cask strength on the label."
               name="caskStrength"
+            />
+
+            <Controller
+              name="naturalColor"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  label="Color"
+                  helpText="Use what the bottle or producer states."
+                  simple
+                  options={colorChoices}
+                  onChange={(choice) => onChange(booleanChoiceValue(choice))}
+                  value={booleanChoice(colorChoices, value)}
+                />
+              )}
+            />
+
+            <Controller
+              name="nonChillFiltered"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  label="Filtration"
+                  helpText="Use what the bottle or producer states."
+                  simple
+                  options={filtrationChoices}
+                  onChange={(choice) => onChange(booleanChoiceValue(choice))}
+                  value={booleanChoice(filtrationChoices, value)}
+                />
+              )}
+            />
+
+            <TextField
+              {...register("maltPhenolPpm", {
+                setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+              })}
+              error={errors.maltPhenolPpm}
+              type="number"
+              label="PPM"
+              placeholder="e.g. 101.4"
+              helpText="The phenol level of the malted barley, as stated by the producer for this bottle."
+              step="0.1"
+              min="0"
             />
 
             <Controller

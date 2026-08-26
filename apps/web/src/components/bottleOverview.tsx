@@ -172,6 +172,35 @@ export default function BottleOverview({
                     </DefinitionList.Details>
                   </>
                 )}
+              {bottle.naturalColor !== null &&
+                bottle.naturalColor !== undefined && (
+                  <>
+                    <DefinitionList.Term>Color</DefinitionList.Term>
+                    <DefinitionList.Details>
+                      {bottle.naturalColor ? "Natural" : "Added coloring"}
+                    </DefinitionList.Details>
+                  </>
+                )}
+              {bottle.nonChillFiltered !== null &&
+                bottle.nonChillFiltered !== undefined && (
+                  <>
+                    <DefinitionList.Term>Filtration</DefinitionList.Term>
+                    <DefinitionList.Details>
+                      {bottle.nonChillFiltered
+                        ? "Non-chill-filtered"
+                        : "Chill-filtered"}
+                    </DefinitionList.Details>
+                  </>
+                )}
+              {bottle.maltPhenolPpm !== null &&
+                bottle.maltPhenolPpm !== undefined && (
+                  <>
+                    <DefinitionList.Term>PPM</DefinitionList.Term>
+                    <DefinitionList.Details>
+                      {bottle.maltPhenolPpm} PPM
+                    </DefinitionList.Details>
+                  </>
+                )}
               {(bottle.caskFill || bottle.caskSize || bottle.caskType) && (
                 <>
                   <DefinitionList.Term>Cask Details</DefinitionList.Term>

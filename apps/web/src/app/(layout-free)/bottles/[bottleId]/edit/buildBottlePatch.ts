@@ -13,6 +13,9 @@ export function buildBottlePatch(
 
   if (dirtyFields.has("name")) patch.name = value.name;
   if (dirtyFields.has("statedAge")) patch.statedAge = value.statedAge;
+  if (dirtyFields.has("noAgeStatement")) {
+    patch.noAgeStatement = value.noAgeStatement;
+  }
   if (dirtyFields.has("series")) patch.series = value.series;
   if (dirtyFields.has("category")) patch.category = value.category;
   if (dirtyFields.has("brand")) patch.brand = value.brand;
@@ -27,6 +30,15 @@ export function buildBottlePatch(
   if (dirtyFields.has("singleCask")) patch.singleCask = value.singleCask;
   if (dirtyFields.has("caskStrength")) {
     patch.caskStrength = value.caskStrength;
+  }
+  if (dirtyFields.has("naturalColor")) {
+    patch.naturalColor = value.naturalColor;
+  }
+  if (dirtyFields.has("nonChillFiltered")) {
+    patch.nonChillFiltered = value.nonChillFiltered;
+  }
+  if (dirtyFields.has("maltPhenolPpm")) {
+    patch.maltPhenolPpm = value.maltPhenolPpm;
   }
   if (dirtyFields.has("vintageYear")) patch.vintageYear = value.vintageYear;
   if (dirtyFields.has("releaseYear")) patch.releaseYear = value.releaseYear;

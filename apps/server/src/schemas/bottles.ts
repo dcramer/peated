@@ -35,6 +35,11 @@ const BottleStatedAgeSchema = z
   .nullable()
   .default(null)
   .describe("Effective stated age for this exact Bottle, in years");
+const BottleNoAgeStatementSchema = z
+  .boolean()
+  .nullable()
+  .default(null)
+  .describe("Whether the label was confirmed to have no age statement");
 const BottleCaskStrengthSchema = z
   .boolean()
   .nullable()
@@ -45,6 +50,24 @@ const BottleSingleCaskSchema = z
   .nullable()
   .default(null)
   .describe("Whether the whisky comes from a single cask");
+const BottleNaturalColorSchema = z
+  .boolean()
+  .nullable()
+  .default(null)
+  .describe("Whether the whisky has no added coloring");
+const BottleNonChillFilteredSchema = z
+  .boolean()
+  .nullable()
+  .default(null)
+  .describe("Whether the whisky was bottled without chill filtration");
+const BottleMaltPhenolPpmSchema = z
+  .number()
+  .min(0)
+  .nullable()
+  .default(null)
+  .describe(
+    "Producer-stated phenol level of the malted barley, in parts per million",
+  );
 const BottleAbvSchema = z
   .number()
   .min(0)
@@ -128,8 +151,12 @@ export const BottleSchema = z.object({
 
   edition: BottleEditionSchema,
   statedAge: BottleStatedAgeSchema,
+  noAgeStatement: BottleNoAgeStatementSchema,
   caskStrength: BottleCaskStrengthSchema,
   singleCask: BottleSingleCaskSchema,
+  naturalColor: BottleNaturalColorSchema,
+  nonChillFiltered: BottleNonChillFilteredSchema,
+  maltPhenolPpm: BottleMaltPhenolPpmSchema,
   abv: BottleAbvSchema,
 
   vintageYear: BottleVintageYearSchema,
@@ -272,8 +299,12 @@ export const BottleInputFields = {
   category: BottleCategorySchema,
   edition: BottleEditionSchema,
   statedAge: BottleStatedAgeSchema,
+  noAgeStatement: BottleNoAgeStatementSchema,
   caskStrength: BottleCaskStrengthSchema,
   singleCask: BottleSingleCaskSchema,
+  naturalColor: BottleNaturalColorSchema,
+  nonChillFiltered: BottleNonChillFilteredSchema,
+  maltPhenolPpm: BottleMaltPhenolPpmSchema,
   abv: BottleInputAbvSchema,
   vintageYear: BottleVintageYearSchema,
   releaseYear: BottleReleaseYearSchema,

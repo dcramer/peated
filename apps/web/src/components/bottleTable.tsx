@@ -114,6 +114,7 @@ export default function BottleTable({
                     metadataVariant={compactIdentity ? "summary" : "full"}
                     showBrand={!groupBy}
                     trailingContent={statusIndicators}
+                    hideAgeOnDesktop={showBottleStats}
                   />
                   {collectionMeta ? (
                     <div className="text-muted mt-1 flex min-w-0 flex-wrap items-center gap-x-1 text-sm">
@@ -176,12 +177,19 @@ export default function BottleTable({
               {
                 name: "age",
                 value: (item: BottleRow) => {
-                  const { statedAge } = item.bottle;
-                  return statedAge ? (
+                  const { statedAge, noAgeStatement } = item.bottle;
+                  return statedAge !== null ? (
                     <Link
                       className="hover:underline"
                       href={`/bottles/?age=${statedAge}`}
                     >{`${statedAge} years`}</Link>
+                  ) : noAgeStatement === true ? (
+                    <span
+                      aria-label="No age statement"
+                      title="No age statement"
+                    >
+                      NAS
+                    </span>
                   ) : null;
                 },
                 className: "sm:w-24",

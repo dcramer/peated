@@ -127,9 +127,13 @@ type ExactBottleCreateInput = Pick<
   BottleCreateInput,
   | "edition"
   | "statedAge"
+  | "noAgeStatement"
   | "abv"
   | "singleCask"
   | "caskStrength"
+  | "naturalColor"
+  | "nonChillFiltered"
+  | "maltPhenolPpm"
   | "vintageYear"
   | "releaseYear"
   | "caskSize"
@@ -329,6 +333,7 @@ async function prepareBottleCreateInTransaction(
         exact: {
           edition: bottleData.edition ?? null,
           statedAge: bottleData.statedAge ?? null,
+          noAgeStatement: bottleData.noAgeStatement ?? null,
           releaseYear: bottleData.releaseYear ?? null,
           vintageYear: bottleData.vintageYear ?? null,
           abv: bottleData.abv ?? null,

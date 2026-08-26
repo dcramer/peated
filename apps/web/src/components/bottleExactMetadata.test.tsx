@@ -9,6 +9,7 @@ const exactBottle = {
   category: "single_malt",
   edition: "2025 Release",
   statedAge: 21,
+  noAgeStatement: null,
   abv: 55.1,
   vintageYear: 2004,
   releaseYear: 2025,
@@ -60,13 +61,38 @@ describe("BottleExactMetadata", () => {
     }
   });
 
-  it("omits absent optional metadata without empty separators", () => {
+  it("calls out bottles with no age statement", () => {
     const html = renderToStaticMarkup(
       <BottleExactMetadata
         bottle={{
           category: null,
           edition: null,
           statedAge: null,
+          noAgeStatement: true,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          singleCask: null,
+          caskStrength: null,
+          caskFill: null,
+          caskType: null,
+          caskSize: null,
+        }}
+      />,
+    );
+
+    expect(html.replace(/<[^>]*>/g, "")).toBe("No age statement");
+  });
+
+  it("does not label an unknown age as NAS", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata
+        bottle={{
+          ...exactBottle,
+          category: null,
+          edition: null,
+          statedAge: null,
+          noAgeStatement: null,
           abv: null,
           vintageYear: null,
           releaseYear: null,
@@ -123,6 +149,25 @@ describe("BottleExactMetadata", () => {
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text).toBe("55.1% ABV");
+  });
+
+  it("keeps no age statement visible in release summaries", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata
+        bottle={{
+          ...exactBottle,
+          edition: null,
+          statedAge: null,
+          noAgeStatement: true,
+          vintageYear: null,
+          releaseYear: null,
+          group: { statedAge: null },
+        }}
+        variant="summary"
+      />,
+    );
+
+    expect(html.replace(/<[^>]*>/g, "")).toBe("No age statement·55.1% ABV");
   });
 
   it("omits a release summary when the full Bottle name is already shown", () => {
