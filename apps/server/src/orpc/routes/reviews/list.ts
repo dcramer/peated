@@ -18,23 +18,23 @@ import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, isNotNull, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 
+const DEFAULT_SORT = "recent";
+const SORT_OPTIONS = ["recent", "name"] as const;
+
 const InputSchema = z
   .object({
     site: ExternalSiteTypeEnum.optional(),
     bottle: z.coerce.number().gte(1).optional(),
-    recent: z.coerce
-      .boolean()
-      .default(false)
-      .describe("Return public reviews ordered by publication date"),
     query: z.string().default(""),
     onlyUnknown: z.coerce.boolean().optional(),
+    sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     cursor: z.coerce.number().gte(1).default(1),
     limit: z.coerce.number().gte(1).lte(100).default(100),
   })
   .strict()
   .default({
     query: "",
-    recent: false,
+    sort: DEFAULT_SORT,
     cursor: 1,
     limit: 100,
   });
@@ -52,11 +52,11 @@ export default procedure
   // TODO(response-envelope): use helper to enable later switch to { data, meta }
   .output(listResponse(ReviewSchema))
   .handler(async function ({
-    input: { cursor, query, limit, ...input },
+    input: { cursor, query, limit, sort, ...input },
     context,
     errors,
   }) {
-    const hasPublicScope = input.bottle !== undefined || input.recent;
+    const hasPublicScope = input.bottle !== undefined || sort === "recent";
     const requiresModerator = input.onlyUnknown || !hasPublicScope;
     // This route owns review visibility. Public Bottle and recent queries
     // exclude staged reviews. Moderator queries include them for review and matching.
@@ -89,7 +89,7 @@ export default procedure
       );
     }
 
-    if (input.recent) {
+    if (sort === "recent") {
       baseWhere.push(
         isNotNull(reviews.bottleId),
         isNotNull(reviewArticles.publishedAt),
@@ -135,7 +135,7 @@ export default procedure
       .limit(limit + 1)
       .offset(offset)
       .orderBy(
-        ...(input.recent
+        ...(sort === "recent"
           ? [desc(reviewArticles.publishedAt), desc(reviews.id)]
           : [asc(reviews.name), asc(reviews.id)]),
       );
@@ -146,7 +146,7 @@ export default procedure
         ReviewSerializer,
         results.slice(0, limit),
         context.user,
-        input.site && !input.recent ? ["site"] : [],
+        input.site && sort !== "recent" ? ["site"] : [],
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

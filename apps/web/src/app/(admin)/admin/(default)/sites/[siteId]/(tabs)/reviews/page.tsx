@@ -16,6 +16,9 @@ export default function Page(props: {
   const { siteId } = params;
 
   const queryParams = useApiQueryParams({
+    defaults: {
+      sort: "name",
+    },
     overrides: {
       site: siteId,
     },

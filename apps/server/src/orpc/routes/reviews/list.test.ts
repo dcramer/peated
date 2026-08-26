@@ -17,7 +17,7 @@ describe("GET /reviews", () => {
     await fixtures.Review({ externalSiteId: site.id });
 
     const { results } = await routerClient.reviews.list(
-      {},
+      { sort: "name" },
       { context: { user } },
     );
 
@@ -46,7 +46,10 @@ describe("GET /reviews", () => {
       .select({ count: sql<number>`COUNT(*)::int` })
       .from(actors);
 
-    await routerClient.reviews.list({}, { context: { user: currentUser } });
+    await routerClient.reviews.list(
+      { sort: "name" },
+      { context: { user: currentUser } },
+    );
 
     const [{ count: after }] = await db
       .select({ count: sql<number>`COUNT(*)::int` })
@@ -63,7 +66,7 @@ describe("GET /reviews", () => {
     const user = await fixtures.User();
 
     const err = await waitError(
-      routerClient.reviews.list({}, { context: { user } }),
+      routerClient.reviews.list({ sort: "name" }, { context: { user } }),
     );
     expect(err).toMatchInlineSnapshot(
       `[Error: Must be a moderator to list all reviews.]`,
@@ -85,6 +88,7 @@ describe("GET /reviews", () => {
     const { results } = await routerClient.reviews.list(
       {
         site: astorwine.type,
+        sort: "name",
       },
       { context: { user } },
     );
@@ -106,11 +110,12 @@ describe("GET /reviews", () => {
     });
 
     const moderatorResults = await routerClient.reviews.list(
-      { site: site.type },
+      { site: site.type, sort: "name" },
       { context: { user } },
     );
     const publicResults = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
 
     expect(moderatorResults.results.map(({ id }) => id)).toContain(review.id);
@@ -222,11 +227,10 @@ describe("GET /reviews", () => {
       .where(eq(reviewArticles.id, unpublished.articleId!));
 
     const firstPage = await routerClient.reviews.list({
-      recent: true,
       limit: 2,
     });
     const secondPage = await routerClient.reviews.list({
-      recent: true,
+      sort: "recent",
       cursor: 2,
       limit: 2,
     });
@@ -270,15 +274,15 @@ describe("GET /reviews", () => {
       url: "https://example.com/article-owned-review",
     });
     const articleResults = await routerClient.reviews.list(
-      { site: articleSite.type },
+      { site: articleSite.type, sort: "name" },
       { context: { user } },
     );
     const otherResults = await routerClient.reviews.list(
-      { site: otherSite.type },
+      { site: otherSite.type, sort: "name" },
       { context: { user } },
     );
     const allResults = await routerClient.reviews.list(
-      {},
+      { sort: "name" },
       { context: { user } },
     );
 
@@ -332,6 +336,7 @@ describe("GET /reviews", () => {
 
     const { results } = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
 
     expect(results).toMatchObject([
@@ -362,6 +367,7 @@ describe("GET /reviews", () => {
 
     const { results } = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
 
     expect(results.map(({ id }) => id)).toContain(review.id);
@@ -405,6 +411,7 @@ describe("GET /reviews", () => {
 
     const contentRevoked = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
     });
     expect(contentRevoked.results).toMatchObject([
       { id: review.id, nativeScore: null, summary: null },
@@ -416,7 +423,7 @@ describe("GET /reviews", () => {
       .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
 
     await expect(
-      routerClient.reviews.list({ bottle: bottle.id }),
+      routerClient.reviews.list({ bottle: bottle.id, sort: "name" }),
     ).resolves.toMatchObject({ results: [] });
   });
 
@@ -440,7 +447,10 @@ describe("GET /reviews", () => {
       issue: "Other Bottle review",
     });
 
-    const { results } = await routerClient.reviews.list({ bottle: bottle.id });
+    const { results } = await routerClient.reviews.list({
+      bottle: bottle.id,
+      sort: "name",
+    });
 
     expect(results.map(({ id }) => id)).toEqual(
       expect.arrayContaining([firstDirect.id, secondDirect.id]),
@@ -487,15 +497,18 @@ describe("GET /reviews", () => {
 
     const firstPage = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
       limit: 1,
     });
     const secondPage = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
       cursor: 2,
       limit: 1,
     });
     const thirdPage = await routerClient.reviews.list({
       bottle: bottle.id,
+      sort: "name",
       cursor: 3,
       limit: 1,
     });
@@ -513,7 +526,7 @@ describe("GET /reviews", () => {
 
   test("preserves empty Bottle-filter misses", async () => {
     await expect(
-      routerClient.reviews.list({ bottle: 999_999 }),
+      routerClient.reviews.list({ bottle: 999_999, sort: "name" }),
     ).resolves.toMatchObject({ results: [] });
   });
 
@@ -539,11 +552,11 @@ describe("GET /reviews", () => {
     });
 
     const unknownResults = await routerClient.reviews.list(
-      { onlyUnknown: true },
+      { onlyUnknown: true, sort: "name" },
       { context: { user } },
     );
     const allResults = await routerClient.reviews.list(
-      {},
+      { sort: "name" },
       { context: { user } },
     );
 
@@ -575,6 +588,7 @@ describe("GET /reviews", () => {
       routerClient.reviews.list({
         bottle: bottle.id,
         onlyUnknown: true,
+        sort: "name",
       }),
     );
     expect(err).toMatchInlineSnapshot(
@@ -590,6 +604,7 @@ describe("GET /reviews", () => {
       routerClient.reviews.list(
         {
           site: site.type,
+          sort: "name",
         },
         { context: { user } },
       ),
