@@ -33,7 +33,7 @@ export default contract
     path: "/bottles",
     summary: "List bottles",
     description:
-      "Search and filter bottles, including releases from distillers the current user follows",
+      "Find bottles, including releases from distillers the signed-in user follows",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottles",
@@ -44,7 +44,7 @@ export default contract
       query: z.coerce
         .string()
         .default("")
-        .describe("Plain-text search; operator syntax is not supported."),
+        .describe("Search text only. Search operators are not supported."),
       brand: z.coerce.number().nullish(),
       distiller: z.coerce.number().nullish(),
       bottler: z.coerce.number().nullish(),
@@ -63,6 +63,6 @@ export default contract
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     }),
   )
-  // TODO(response-envelope): switch to { data, meta } by changing
-  // listResponse() implementation once we migrate envelopes globally.
+  // TODO(response-envelope): Return { data, meta } when all list routes use the
+  // same wrapper.
   .output(OutputSchema);

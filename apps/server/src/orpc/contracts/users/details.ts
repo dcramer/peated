@@ -8,7 +8,7 @@ export default contract
     path: "/users/{user}",
     summary: "Get user details",
     description:
-      "Retrieve user profile information including statistics for tastings, bottles, and contributions",
+      "Get a user profile and counts for tastings, bottles, and contributions",
     operationId: "getUser",
   })
   .input(
@@ -16,7 +16,8 @@ export default contract
       user: z.union([z.coerce.number(), z.literal("me"), z.string()]),
     }),
   )
-  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover.
+  // TODO(response-envelope): Return { data: ... } when all detail routes use the
+  // same wrapper.
   .output(
     detailsResponse(
       UserSchema.extend({

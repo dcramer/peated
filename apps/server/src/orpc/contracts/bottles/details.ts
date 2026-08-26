@@ -25,13 +25,13 @@ export default contract
     path: "/bottles/{bottle}",
     summary: "Get bottle details",
     description:
-      "Retrieve Bottle details, including product barcodes, pricing, and tasting statistics",
+      "Get bottle details, including barcodes, prices, and tasting counts",
     spec: (spec) => ({
       ...spec,
       operationId: "getBottle",
     }),
   })
   .input(z.object({ bottle: z.coerce.number() }))
-  // TODO(response-envelope): switch to wrapping the details payload as
-  // { data: ... } by updating detailsResponse() when we migrate envelopes.
+  // TODO(response-envelope): Return { data: ... } when all detail routes use the
+  // same wrapper.
   .output(detailsResponse(OutputSchema));

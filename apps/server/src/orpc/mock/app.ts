@@ -46,7 +46,7 @@ export const mockApp = new Hono()
     return c.json(
       {
         code: "NOT_FOUND",
-        message: "This route does not have mock data.",
+        message: "The mock API does not support this route.",
       },
       404,
     );

@@ -4,14 +4,14 @@ This document defines conventions for implementing API endpoints with `@orpc/ser
 
 ## 1. Directory Layout and Imports
 
-| Path                               | Purpose                                         |
-| ---------------------------------- | ----------------------------------------------- |
-| `apps/server/src/orpc/contracts`   | Pure contracts shared by multiple handlers      |
-| `apps/server/src/orpc/routes`      | Production handlers                             |
-| `apps/server/src/orpc/mock/routes` | Stateless mock handlers for supported contracts |
-| `apps/server/src/orpc/middleware`  | Shared middleware such as `requireAuth`         |
-| `apps/server/src/schemas`          | Zod schemas                                     |
-| `apps/server/src/serializers`      | Serialization helpers                           |
+| Path                               | Purpose                                        |
+| ---------------------------------- | ---------------------------------------------- |
+| `apps/server/src/orpc/contracts`   | Definitions used by the real and mock handlers |
+| `apps/server/src/orpc/routes`      | Handlers for the real API                      |
+| `apps/server/src/orpc/mock/routes` | Handlers that return fixed local data          |
+| `apps/server/src/orpc/middleware`  | Shared middleware such as `requireAuth`        |
+| `apps/server/src/schemas`          | Shared request and response schemas            |
+| `apps/server/src/serializers`      | Serialization helpers                          |
 
 ### Import Policy
 
@@ -58,11 +58,18 @@ export default base.tag("tastings").router({
 
 Top-level `routes/index.ts` composes routers eagerly. Do not use lazy imports.
 
-## 3. Procedure Definition Pattern
+## 3. Route Definitions and Handlers
 
-Most routes define their contract and handler in one procedure. Use the shared
-contract pattern when an operation also has a mock handler. Keep shared
-contracts free of database, configuration, SDK, and handler imports.
+A contract defines how callers use an endpoint: its HTTP method and path,
+request, response, and possible errors. It does not contain handler logic.
+
+Most routes define their request, response, and handler in one file. If an
+endpoint also has a mock handler, move the shared request and response
+definition to `orpc/contracts`. Both handlers must use that contract.
+
+A contract file can import schemas and constants. It must not import database,
+configuration, external service, or handler code. This keeps the mock API
+independent of the real API.
 
 ```ts
 // contracts/bottles/list.ts
@@ -80,14 +87,15 @@ export default implement(bottleListContract)
   });
 ```
 
-The mock API composes its supported contracts into one tree. Mock handlers use
-paths from one implementer, such as `mockOS.bottles.list`. Assemble the final
-mock router with `mockOS.router(...)`. This checks route names, nesting, input,
-output, and errors. Routes outside that tree return 404 from the mock server.
+List supported mock contracts in the same structure as the API. Create each
+mock handler from its `mockOS` path, such as `mockOS.bottles.list`, and create
+the router with `mockOS.router(...)`. TypeScript then checks route names,
+grouping, requests, responses, and errors.
 
-Do not import production handlers from mock code.
+Routes not listed in the mock contract return `404`. Mock code must not import
+real API handlers.
 
-### Implementation-First Routes
+### Routes Without a Shared Contract
 
 Chain route definitions in this order:
 

@@ -111,7 +111,7 @@ export default contract
     path: "/search",
     summary: "Global search",
     description:
-      "Search each catalog and member type with separate results and exact counts",
+      "Search bottles, brands, distilleries, bottlers, regions, and members",
     spec: (spec) => ({ ...spec, operationId: "search" }),
   })
   .input(
@@ -119,7 +119,7 @@ export default contract
       .object({
         query: z.coerce
           .string()
-          .describe("Plain-text search; operator syntax is not supported."),
+          .describe("Search text only. Search operators are not supported."),
         scopes: z
           .array(z.enum(SEARCH_SCOPE_LIST))
           .default([...SEARCH_SCOPE_LIST]),

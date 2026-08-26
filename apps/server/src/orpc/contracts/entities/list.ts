@@ -22,7 +22,7 @@ const InputSchema = z
     query: z
       .string()
       .default("")
-      .describe("Plain-text search; operator syntax is not supported."),
+      .describe("Search text only. Search operators are not supported."),
     name: z.string().nullish(),
     country: z.coerce.string().nullish().describe("Country slug or id"),
     region: z.coerce.string().nullish().describe("Region slug or id"),
@@ -52,7 +52,7 @@ export default contract
     path: "/entities",
     summary: "List entities",
     description:
-      "Search and filter entities (brands, distilleries, bottlers) with advanced filtering by location, type, and search context",
+      "Find brands, distilleries, and bottlers by name, location, or type",
     operationId: "listEntities",
   })
   .input(InputSchema)

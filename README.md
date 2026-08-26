@@ -48,16 +48,16 @@ cp .env.example .env.local
 `.env.local` is ignored and is copied into Codex-managed worktrees through
 `.worktreeinclude`.
 
-For UI development without Postgres, Redis, or seeded data, run:
+To work on the UI without Postgres, Redis, or sample data, run:
 
 ```bash
 pnpm dev:mock
 ```
 
-This starts the web app with a mock API that uses fixed data. It does not need
-Postgres or Redis. Open `http://localhost:3200`. You can sign in with any valid
-email address and any password. Routes without mock data return `404` so you
-can see which routes still need support.
+This starts the web app with a local API that returns fixed examples. It does
+not need Postgres or Redis. Open `http://localhost:3200`. You can sign in with
+any valid email address and any password. If the UI calls an unsupported API
+route, that request returns `404`.
 
 For the Codex local environment setup script, use:
 

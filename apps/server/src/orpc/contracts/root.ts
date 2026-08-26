@@ -6,7 +6,7 @@ export default contract
     method: "GET",
     path: "/",
     summary: "API root",
-    description: "Get basic API information including version",
+    description: "Get the API version",
     spec: (spec) => ({
       ...spec,
       operationId: "getRoot",

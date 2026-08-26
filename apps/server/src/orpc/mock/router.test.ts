@@ -17,7 +17,7 @@ const authenticatedClient = createRouterClient(mockRouter, {
 });
 
 describe("mock oRPC router", () => {
-  it("returns fixture data from supported routes", async () => {
+  it("returns fixed data from supported routes", async () => {
     await expect(anonymousClient.root()).resolves.toEqual({ version: "mock" });
 
     await expect(anonymousClient.activity.list({})).resolves.toEqual({

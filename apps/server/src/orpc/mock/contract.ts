@@ -8,7 +8,7 @@ import root from "@peated/server/orpc/contracts/root";
 import search from "@peated/server/orpc/contracts/search";
 import userDetails from "@peated/server/orpc/contracts/users/details";
 
-// This tree defines the routes that the stateless mock API supports.
+// The mock API supports only the routes listed here.
 export const mockContract = {
   root,
   search,

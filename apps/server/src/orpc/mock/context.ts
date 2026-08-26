@@ -1,6 +1,6 @@
 import type { MockOutputs } from "./contract";
 
-// Use this context whenever production behavior depends on the signed-in user.
+// Mock handlers use this user to match signed-in and signed-out API responses.
 export type MockContext = {
   user: MockOutputs["auth"]["login"]["user"] | null;
 };

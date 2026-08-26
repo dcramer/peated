@@ -8,7 +8,7 @@ export default contract
     path: "/auth/login",
     summary: "User login",
     description:
-      "Authenticate user with email/password, Google OAuth code, or Google ID token",
+      "Sign in with email and password, a Google OAuth code, or a Google ID token",
     spec: (spec) => ({
       ...spec,
       operationId: "login",
@@ -25,14 +25,14 @@ export default contract
             .describe("User email address"),
           password: z.string().describe("User password"),
         })
-        .describe("Basic authentication"),
+        .describe("Email and password"),
       z
         .object({
           code: z.string().describe("Google OAuth authorization code"),
           tosAccepted: z
             .boolean()
             .optional()
-            .describe("User accepted Terms of Service"),
+            .describe("Whether the user accepted the Terms of Service"),
         })
         .describe("Google OAuth (code)"),
       z
@@ -41,7 +41,7 @@ export default contract
           tosAccepted: z
             .boolean()
             .optional()
-            .describe("User accepted Terms of Service"),
+            .describe("Whether the user accepted the Terms of Service"),
         })
         .describe("Google OAuth (idToken)"),
     ]),

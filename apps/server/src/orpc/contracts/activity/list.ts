@@ -8,8 +8,7 @@ export default contract
     method: "GET",
     path: "/activity",
     summary: "List activity",
-    description:
-      "Retrieve mixed activity with tastings and grouped collection additions",
+    description: "Get recent tastings and grouped collection additions",
     operationId: "listActivity",
   })
   .input(
