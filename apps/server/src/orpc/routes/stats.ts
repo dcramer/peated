@@ -26,6 +26,11 @@ export default procedure
       totalTastings: z.number(),
       totalBottles: z.number(),
       totalEntities: z.number(),
+      totalBrands: z.number(),
+      totalDistilleries: z.number(),
+      totalBottlers: z.number(),
+      totalBlenders: z.number(),
+      totalCompanies: z.number(),
     }),
   )
   .handler(async function () {
@@ -47,15 +52,25 @@ export default procedure
         ),
       );
 
-    const [{ totalEntities }] = await db
+    const [entityTotals] = await db
       .select({
         totalEntities: sql<string>`COUNT(${entities.id})`,
+        totalBrands: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'brand')`,
+        totalDistilleries: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'distillery')`,
+        totalBottlers: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'bottler')`,
+        totalBlenders: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'blender')`,
+        totalCompanies: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'company')`,
       })
       .from(entities);
 
     return {
       totalTastings: Number(totalTastings),
       totalBottles: Number(totalBottles),
-      totalEntities: Number(totalEntities),
+      totalEntities: Number(entityTotals.totalEntities),
+      totalBrands: Number(entityTotals.totalBrands),
+      totalDistilleries: Number(entityTotals.totalDistilleries),
+      totalBottlers: Number(entityTotals.totalBottlers),
+      totalBlenders: Number(entityTotals.totalBlenders),
+      totalCompanies: Number(entityTotals.totalCompanies),
     };
   });
