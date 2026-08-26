@@ -30,6 +30,16 @@ describe("GET /search", () => {
       name: "Contractneedle Bottler",
       type: ["bottler"],
     });
+    const blender = await fixtures.Entity({
+      name: "Contractneedle Blender",
+      type: [],
+      kind: "blender",
+    });
+    const company = await fixtures.Entity({
+      name: "Contractneedle Company",
+      type: [],
+      kind: "company",
+    });
     const region = await fixtures.Region({
       name: "Contractneedle Region",
       totalBottles: 8,
@@ -37,7 +47,15 @@ describe("GET /search", () => {
 
     const data = await routerClient.search({
       query: "contractneedle",
-      scopes: ["regions", "brands", "bottles", "bottlers", "distillers"],
+      scopes: [
+        "regions",
+        "companies",
+        "brands",
+        "bottles",
+        "blenders",
+        "bottlers",
+        "distillers",
+      ],
       limit: 2,
     });
 
@@ -46,6 +64,8 @@ describe("GET /search", () => {
       "distillers",
       "brands",
       "bottlers",
+      "blenders",
+      "companies",
       "regions",
     ]);
     expect(data.groups).toMatchObject([
@@ -57,6 +77,8 @@ describe("GET /search", () => {
       { type: "distillers", total: 1, results: [{ id: distiller.id }] },
       { type: "brands", total: 1, results: [{ id: brand.id }] },
       { type: "bottlers", total: 1, results: [{ id: bottler.id }] },
+      { type: "blenders", total: 1, results: [{ id: blender.id }] },
+      { type: "companies", total: 1, results: [{ id: company.id }] },
       { type: "regions", total: 1, results: [{ id: region.id }] },
     ]);
   });
@@ -94,14 +116,26 @@ describe("GET /search", () => {
       name: "Population Bottler",
       type: ["bottler"],
     });
+    await fixtures.Entity({
+      name: "Population Blender",
+      type: [],
+      kind: "blender",
+    });
+    await fixtures.Entity({
+      name: "Population Company",
+      type: [],
+      kind: "company",
+    });
 
     const data = await routerClient.search({
       query: "no-population-match",
-      scopes: ["bottles", "bottlers"],
+      scopes: ["bottles", "bottlers", "blenders", "companies"],
     });
 
     expect(data.scopeTotals.bottles).toBeGreaterThanOrEqual(1);
     expect(data.scopeTotals.bottlers).toBeGreaterThanOrEqual(1);
+    expect(data.scopeTotals.blenders).toBeGreaterThanOrEqual(1);
+    expect(data.scopeTotals.companies).toBeGreaterThanOrEqual(1);
     expect(data.scopeTotals.members).toBeUndefined();
   });
 
@@ -239,7 +273,7 @@ describe("GET /search", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const entity = await fixtures.Entity({ type: ["distiller"] });
+    const entity = await fixtures.Entity({ type: [], kind: "company" });
     await db.insert(bottleTombstones).values({
       bottleId: 9001,
       newBottleId: bottle.id,
@@ -256,7 +290,7 @@ describe("GET /search", () => {
       }),
       routerClient.search({
         query: formatPeatedId("entity", 9002),
-        scopes: ["distillers"],
+        scopes: ["companies"],
       }),
     ]);
 

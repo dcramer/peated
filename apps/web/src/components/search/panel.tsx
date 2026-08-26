@@ -91,6 +91,8 @@ export default function SearchPanel({
         | "distillers"
         | "brands"
         | "bottlers"
+        | "blenders"
+        | "companies"
         | "members"
       )[] = [];
       if (directToTasting || addBottleIntent || !isUserQuery)
@@ -103,7 +105,13 @@ export default function SearchPanel({
       )
         scopes.push("members");
       if (!directToTasting && !addBottleIntent) {
-        scopes.push("distillers", "brands", "bottlers");
+        scopes.push(
+          "distillers",
+          "brands",
+          "bottlers",
+          "blenders",
+          "companies",
+        );
       }
 
       try {
@@ -123,6 +131,8 @@ export default function SearchPanel({
                 case "distillers":
                 case "brands":
                 case "bottlers":
+                case "blenders":
+                case "companies":
                   return group.results.map((ref) => ({ type: "entity", ref }));
                 case "members":
                   return group.results.map(({ member: ref }) => ({

@@ -51,13 +51,26 @@ const SEARCH_SCOPE_LIST = [
   "distillers",
   "brands",
   "bottlers",
+  "blenders",
+  "companies",
   "regions",
   "members",
 ] as const;
 
 type SearchScope = (typeof SEARCH_SCOPE_LIST)[number];
-type EntityScope = "distillers" | "brands" | "bottlers";
-const ENTITY_SCOPE_LIST = ["distillers", "brands", "bottlers"] as const;
+type EntityScope =
+  | "distillers"
+  | "brands"
+  | "bottlers"
+  | "blenders"
+  | "companies";
+const ENTITY_SCOPE_LIST = [
+  "distillers",
+  "brands",
+  "bottlers",
+  "blenders",
+  "companies",
+] as const;
 
 const ENTITY_TYPE_BY_SCOPE = {
   distillers: "distiller",
@@ -92,6 +105,16 @@ const GroupSchema = z.discriminatedUnion("type", [
     results: z.array(EntitySchema),
   }),
   z.object({
+    type: z.literal("blenders"),
+    total: z.number().int().nonnegative(),
+    results: z.array(EntitySchema),
+  }),
+  z.object({
+    type: z.literal("companies"),
+    total: z.number().int().nonnegative(),
+    results: z.array(EntitySchema),
+  }),
+  z.object({
     type: z.literal("regions"),
     total: z.number().int().nonnegative(),
     results: z.array(RegionSchema),
@@ -115,6 +138,8 @@ const NearestSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("distillers"), result: EntitySchema }),
   z.object({ type: z.literal("brands"), result: EntitySchema }),
   z.object({ type: z.literal("bottlers"), result: EntitySchema }),
+  z.object({ type: z.literal("blenders"), result: EntitySchema }),
+  z.object({ type: z.literal("companies"), result: EntitySchema }),
   z.object({ type: z.literal("regions"), result: RegionSchema }),
   z.object({ type: z.literal("members"), result: MemberResultSchema }),
 ]);
@@ -124,6 +149,8 @@ const ScopeTotalsSchema = z.object({
   distillers: z.number().int().nonnegative(),
   brands: z.number().int().nonnegative(),
   bottlers: z.number().int().nonnegative(),
+  blenders: z.number().int().nonnegative(),
+  companies: z.number().int().nonnegative(),
   regions: z.number().int().nonnegative(),
   members: z.number().int().nonnegative().optional(),
 });
@@ -333,6 +360,19 @@ function entityRatingCount() {
   )`;
 }
 
+function entityScopeWhere(scope: EntityScope) {
+  switch (scope) {
+    case "blenders":
+      return eq(entities.kind, "blender");
+    case "companies":
+      return eq(entities.kind, "company");
+    case "distillers":
+    case "brands":
+    case "bottlers":
+      return sql`${ENTITY_TYPE_BY_SCOPE[scope]} = ANY(${entities.type})`;
+  }
+}
+
 async function countRows(
   database: AnyDatabase,
   table: typeof bottles | typeof entities | typeof regions | typeof users,
@@ -393,7 +433,7 @@ async function searchEntities(
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
   const where = and(
-    sql`${ENTITY_TYPE_BY_SCOPE[scope]} = ANY(${entities.type})`,
+    entityScopeWhere(scope),
     or(
       sql`${entities.searchVector} @@ ${textQuery}`,
       sql`${entities.searchVector} @@ ${prefixQuery}`,
@@ -484,17 +524,15 @@ async function getScopeTotals(
     distillers: await countRows(
       database,
       entities,
-      sql`${ENTITY_TYPE_BY_SCOPE.distillers} = ANY(${entities.type})`,
+      entityScopeWhere("distillers"),
     ),
-    brands: await countRows(
+    brands: await countRows(database, entities, entityScopeWhere("brands")),
+    bottlers: await countRows(database, entities, entityScopeWhere("bottlers")),
+    blenders: await countRows(database, entities, entityScopeWhere("blenders")),
+    companies: await countRows(
       database,
       entities,
-      sql`${ENTITY_TYPE_BY_SCOPE.brands} = ANY(${entities.type})`,
-    ),
-    bottlers: await countRows(
-      database,
-      entities,
-      sql`${ENTITY_TYPE_BY_SCOPE.bottlers} = ANY(${entities.type})`,
+      entityScopeWhere("companies"),
     ),
     regions: await countRows(database, regions, undefined),
   };
@@ -510,10 +548,21 @@ async function getScopeTotals(
 
 function entityMatchesScopes(entity: Entity, scopes: SearchScope[]) {
   return ENTITY_SCOPE_LIST.some(
-    (scope) =>
-      scopes.includes(scope) &&
-      entity.type.includes(ENTITY_TYPE_BY_SCOPE[scope]),
+    (scope) => scopes.includes(scope) && entityMatchesScope(entity, scope),
   );
+}
+
+function entityMatchesScope(entity: Entity, scope: EntityScope) {
+  switch (scope) {
+    case "blenders":
+      return entity.kind === "blender";
+    case "companies":
+      return entity.kind === "company";
+    case "distillers":
+    case "brands":
+    case "bottlers":
+      return entity.type.includes(ENTITY_TYPE_BY_SCOPE[scope]);
+  }
 }
 
 async function findExact(
@@ -572,6 +621,8 @@ async function searchGroup(
     case "distillers":
     case "brands":
     case "bottlers":
+    case "blenders":
+    case "companies":
       return {
         type: scope,
         ...(await searchEntities(database, scope, query, limit)),
@@ -648,6 +699,8 @@ async function findNearest(
       case "distillers":
       case "brands":
       case "bottlers":
+      case "blenders":
+      case "companies":
         for (const result of group.results) {
           const key = `entities:${result.id}`;
           if (seen.has(key)) continue;
@@ -768,6 +821,8 @@ async function serializeGroup(group: GroupRows, context: Context) {
     case "distillers":
     case "brands":
     case "bottlers":
+    case "blenders":
+    case "companies":
       return {
         ...group,
         results: await serialize(EntitySerializer, group.results, context.user),
@@ -804,6 +859,8 @@ async function serializeNearest(row: NearestRow, context: Context) {
     case "distillers":
     case "brands":
     case "bottlers":
+    case "blenders":
+    case "companies":
       return {
         type: row.type,
         result: await serialize(EntitySerializer, row.result, context.user),
