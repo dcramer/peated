@@ -267,6 +267,7 @@ export const unifiedBottleEditContext = {
     vintageYear: 2004,
     bottlingYear: null,
     releaseYear: 2023,
+    releaseDate: null,
     caskSize: "hogshead",
     caskType: "oloroso",
     caskFill: "1st_fill",
