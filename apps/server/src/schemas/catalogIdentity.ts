@@ -85,6 +85,7 @@ export const BottleV1Fields = {
   vintageYear: z.number().int().gte(1800).nullable(),
   bottlingYear: z.number().int().gte(1800).nullable().optional(),
   releaseYear: z.number().int().gte(1800).nullable(),
+  releaseDate: z.string().date().nullable(),
   caskSize: CaskSizeEnum.nullable(),
   caskType: CaskTypeEnum.nullable(),
   caskFill: CaskFillEnum.nullable(),

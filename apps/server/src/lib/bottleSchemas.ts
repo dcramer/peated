@@ -4,6 +4,7 @@
  */
 import { BottleInputFields } from "@peated/server/schemas";
 import { z } from "zod";
+import { releaseYearFromDate } from "./bottleRelease";
 
 export const MAX_BOTTLE_SUGGESTED_TAGS = 5;
 
@@ -85,6 +86,7 @@ const ExactBottleInputFields = {
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
+  releaseDate: BottleInputFields.releaseDate,
   caskSize: BottleInputFields.caskSize,
   caskType: BottleInputFields.caskType,
   caskFill: BottleInputFields.caskFill,
@@ -114,6 +116,19 @@ function validateBottleInput(
       code: z.ZodIssueCode.custom,
       message: "Choose an age or No age statement, not both.",
       path: ["noAgeStatement"],
+    });
+  }
+  if (
+    input.releaseDate !== null &&
+    input.releaseDate !== undefined &&
+    input.releaseYear !== null &&
+    input.releaseYear !== undefined &&
+    input.releaseYear !== releaseYearFromDate(input.releaseDate)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Release year must match release date.",
+      path: ["releaseYear"],
     });
   }
 }
@@ -179,6 +194,7 @@ const BottlePatchFieldsSchema = z
       .lte(new Date().getFullYear())
       .nullable()
       .optional(),
+    releaseDate: ExactBottleInputFields.releaseDate.removeDefault().optional(),
     caskSize: ExactBottleInputFields.caskSize.removeDefault().optional(),
     caskType: ExactBottleInputFields.caskType.removeDefault().optional(),
     caskFill: ExactBottleInputFields.caskFill.removeDefault().optional(),

@@ -56,6 +56,7 @@ import {
   getSmwsCodeForBottleIdentity,
 } from "./bottleConflicts";
 import { materializeBottleIdentity } from "./bottleIdentity";
+import { releaseYearFromDate } from "./bottleRelease";
 import {
   BottleCreateInputSchema,
   type BottleCreateInput,
@@ -142,6 +143,7 @@ type ExactBottleCreateInput = Pick<
   | "vintageYear"
   | "bottlingYear"
   | "releaseYear"
+  | "releaseDate"
   | "caskSize"
   | "caskType"
   | "caskFill"
@@ -209,6 +211,9 @@ async function prepareBottleCreateInTransaction(
   if (bottleIdentity) {
     // Explicit exact input overrides traits inferred from the group name.
     Object.assign(bottleData, bottleIdentity.exactNormalizedFields);
+  }
+  if (bottleData.releaseDate) {
+    bottleData.releaseYear = releaseYearFromDate(bottleData.releaseDate);
   }
 
   if (input.description !== undefined) {

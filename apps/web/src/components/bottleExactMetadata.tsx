@@ -19,6 +19,7 @@ export type BottleExactMetadataSource = Pick<
   | "caskSize"
 > & {
   bottlingYear?: BottleV1["bottlingYear"];
+  releaseDate?: BottleV1["releaseDate"];
   edition?: BottleV1["edition"];
   noAgeStatement?: BottleV1["noAgeStatement"];
   group?: Partial<Pick<BottleGroupV1, "statedAge">>;
@@ -76,7 +77,12 @@ export function getBottleExactMetadata(
       content: `Bottled ${bottle.bottlingYear}`,
     });
   }
-  if (bottle.releaseYear !== null) {
+  if (bottle.releaseDate) {
+    metadata.push({
+      key: "release",
+      content: `Released ${bottle.releaseDate}`,
+    });
+  } else if (bottle.releaseYear !== null) {
     metadata.push({
       key: "release",
       content: `${bottle.releaseYear} release`,
@@ -164,7 +170,9 @@ function getBottleReleaseSummary(
   ) {
     metadata.push({
       key: "release",
-      content: `${bottle.releaseYear} release`,
+      content: bottle.releaseDate
+        ? `Released ${bottle.releaseDate}`
+        : `${bottle.releaseYear} release`,
     });
   }
 

@@ -45,6 +45,7 @@ export function buildBottleInputFromProposedBottle(
   return {
     ...proposedBottle,
     bottlingYear: proposedBottle.bottlingYear ?? null,
+    releaseDate: null,
     series: proposedBottle.series
       ? (proposedBottle.series.id ?? {
           name: proposedBottle.series.name,

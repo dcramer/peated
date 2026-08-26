@@ -121,6 +121,7 @@ describe("GET /bottles/{bottle}/edit-context", () => {
           maltPhenolPpm: 101.4,
           bottlingYear: 2024,
           releaseYear: 2025,
+          releaseDate: "2025-06-01",
           description: "Selected Bottle content",
         },
         { edition: "Batch 2", statedAge: 14, abv: 48 },
@@ -186,6 +187,7 @@ describe("GET /bottles/{bottle}/edit-context", () => {
         maltPhenolPpm: 101.4,
         bottlingYear: 2024,
         releaseYear: 2025,
+        releaseDate: "2025-06-01",
         description: "Selected Bottle content",
       },
     });

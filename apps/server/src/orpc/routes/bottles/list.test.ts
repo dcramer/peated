@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleTombstones,
+  entityFollows,
   flightBottles,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -420,6 +421,7 @@ describe("GET /bottles", () => {
 
     expect(result).toEqual({
       results: [],
+      followedDistillerCount: null,
       rel: {
         nextCursor: null,
         prevCursor: null,
@@ -623,6 +625,110 @@ describe("GET /bottles", () => {
     expect(results.length).toBe(2);
     expect(results[0].id).toBe(bottle2.id); // Created last, shown first
     expect(results[1].id).toBe(bottle1.id);
+  });
+
+  test("requires authentication for followed entity releases", async () => {
+    const err = await waitError(() =>
+      routerClient.bottles.list({ filter: "following" }),
+    );
+
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+
+  test("returns an empty followed-distillery feed", async ({ defaults }) => {
+    const response = await routerClient.bottles.list(
+      { filter: "following", sort: "-release" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.results).toEqual([]);
+    expect(response.followedDistillerCount).toBe(0);
+  });
+
+  test("lists recent releases from followed distillers", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const distiller = await fixtures.Entity({ type: ["distiller"] });
+    const followedBrand = await fixtures.Entity({ type: ["brand"] });
+    await db.insert(entityFollows).values([
+      {
+        userId: defaults.user.id,
+        entityId: distiller.id,
+      },
+      {
+        userId: defaults.user.id,
+        entityId: followedBrand.id,
+      },
+    ]);
+    const exactLaterThisYear = await fixtures.Bottle({
+      name: "Exact Later This Year",
+      distillerIds: [distiller.id],
+      releaseYear: 2026,
+      releaseDate: "2026-08-01",
+      createdAt: new Date("2025-01-01T00:00:00.000Z"),
+    });
+    const exactEarlierThisYear = await fixtures.Bottle({
+      name: "Exact Earlier This Year",
+      distillerIds: [distiller.id],
+      releaseYear: 2026,
+      releaseDate: "2026-02-01",
+      createdAt: new Date("2026-08-15T00:00:00.000Z"),
+    });
+    const yearOnlyThisYear = await fixtures.Bottle({
+      name: "Year Only This Year",
+      distillerIds: [distiller.id],
+      releaseYear: 2026,
+      createdAt: new Date("2026-07-01T00:00:00.000Z"),
+    });
+    const addedThisYear = await fixtures.Bottle({
+      name: "Added This Year",
+      distillerIds: [distiller.id],
+      createdAt: new Date("2026-09-01T00:00:00.000Z"),
+    });
+    const knownLastYear = await fixtures.Bottle({
+      name: "Known Last Year",
+      distillerIds: [distiller.id],
+      releaseYear: 2025,
+      createdAt: new Date("2026-08-15T00:00:00.000Z"),
+    });
+    const addedLastYear = await fixtures.Bottle({
+      name: "Added Last Year",
+      distillerIds: [distiller.id],
+      createdAt: new Date("2025-12-01T00:00:00.000Z"),
+    });
+    await fixtures.Bottle({
+      name: "Followed Brand Release",
+      brandId: followedBrand.id,
+      releaseYear: 2026,
+    });
+    await fixtures.Bottle({ name: "Unrelated Release", releaseYear: 2026 });
+
+    const { followedDistillerCount, results } = await routerClient.bottles.list(
+      {
+        filter: "following",
+        limit: 10,
+        sort: "-release",
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(results.map(({ id }) => id)).toEqual([
+      exactLaterThisYear.id,
+      exactEarlierThisYear.id,
+      yearOnlyThisYear.id,
+      addedThisYear.id,
+      knownLastYear.id,
+      addedLastYear.id,
+    ]);
+    expect(followedDistillerCount).toBe(1);
+    expect(
+      results.map(({ followedDistillers }) =>
+        followedDistillers?.map(({ id }) => id),
+      ),
+    ).toEqual(results.map(() => [distiller.id]));
   });
 
   test("sorts bottles by tastings ascending", async ({ fixtures }) => {

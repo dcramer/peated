@@ -1,0 +1,3 @@
+ALTER TABLE "bottle" ADD COLUMN "release_date" date;
+CREATE INDEX "bottle_release_sort_idx" ON "bottle" USING btree (COALESCE("release_year", EXTRACT(YEAR FROM "created_at")) DESC,("release_year" IS NULL) ASC,"release_date" DESC NULLS LAST,"created_at" DESC NULLS LAST,"id");
+ALTER TABLE "bottle" ADD CONSTRAINT "bottle_release_date_year_check" CHECK ("bottle"."release_date" IS NULL OR ("bottle"."release_year" IS NOT NULL AND "bottle"."release_date" >= DATE '1800-01-01' AND "bottle"."release_year" = EXTRACT(YEAR FROM "bottle"."release_date")));

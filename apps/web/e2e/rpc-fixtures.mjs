@@ -150,6 +150,7 @@ export function buildBottle({
     vintageYear: null,
     bottlingYear: null,
     releaseYear: null,
+    releaseDate: null,
     caskType: null,
     caskSize: null,
     caskFill: null,

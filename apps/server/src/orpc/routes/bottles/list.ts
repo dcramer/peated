@@ -6,6 +6,7 @@ import {
   bottlesToDistillers,
   bottleTombstones,
   entities,
+  entityFollows,
   flightBottles,
   flights,
   tastings,
@@ -38,6 +39,10 @@ import { z } from "zod";
 
 const DEFAULT_SORT = "-tastings";
 
+const OutputSchema = listResponse(BottleSchema).extend({
+  followedDistillerCount: z.number().int().nonnegative().nullable(),
+});
+
 const SORT_OPTIONS = [
   "rank",
   "brand",
@@ -51,6 +56,7 @@ const SORT_OPTIONS = [
   "-name",
   "-age",
   "-rating",
+  "-release",
   "-score",
   "-tastings",
 ] as const;
@@ -61,7 +67,7 @@ export default procedure
     path: "/bottles",
     summary: "List bottles",
     description:
-      "Search and filter bottles with pagination support. Supports filtering by brand, distillery, category, age, and more",
+      "Search and filter bottles, including releases from distillers the current user follows",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottles",
@@ -88,14 +94,15 @@ export default procedure
       minScore: z.coerce.number().int().min(0).max(100).nullish(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
+      filter: z.enum(["all", "following"]).default("all"),
       sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     }),
   )
   // TODO(response-envelope): switch to { data, meta } by changing
   // listResponse() implementation once we migrate envelopes globally.
-  .output(listResponse(BottleSchema))
+  .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {
-    const { query, cursor, limit, ...rest } = input;
+    const { query, cursor, limit, filter, ...rest } = input;
     const offset = (cursor - 1) * limit;
     const textQuery = plainTextSearchQuery(query);
     const prefixQuery = prefixTextSearchQuery(query);
@@ -118,10 +125,41 @@ export default procedure
       : [];
 
     const where: (SQL<unknown> | undefined)[] = [];
+    let followedDistillerIds: number[] | null = null;
     where.push(isNotNull(bottles.groupId));
     where.push(
       sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
     );
+
+    if (filter === "following") {
+      if (!context.user) {
+        throw errors.UNAUTHORIZED();
+      }
+      followedDistillerIds = (
+        await db
+          .select({ entityId: entityFollows.entityId })
+          .from(entityFollows)
+          .innerJoin(entities, eq(entities.id, entityFollows.entityId))
+          .where(
+            and(
+              eq(entityFollows.userId, context.user.id),
+              sql`'distiller' = ANY(${entities.type})`,
+            ),
+          )
+      ).map(({ entityId }) => entityId);
+      where.push(
+        followedDistillerIds.length
+          ? sql`EXISTS(
+              SELECT FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+                AND ${inArray(
+                  bottlesToDistillers.distillerId,
+                  followedDistillerIds,
+                )}
+            )`
+          : sql`FALSE`,
+      );
+    }
 
     if (query) {
       where.push(
@@ -201,6 +239,7 @@ export default procedure
       if (!flight) {
         return {
           results: [],
+          followedDistillerCount: followedDistillerIds?.length ?? null,
           rel: {
             nextCursor: null,
             prevCursor: null,
@@ -259,6 +298,14 @@ export default procedure
       case "-rating":
         orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
         break;
+      case "-release":
+        orderBy = sql`
+          COALESCE(${bottles.releaseYear}, EXTRACT(YEAR FROM ${bottles.createdAt})) DESC,
+          ${bottles.releaseYear} IS NULL ASC,
+          ${bottles.releaseDate} DESC NULLS LAST,
+          ${bottles.createdAt} DESC NULLS LAST
+        `;
+        break;
       case "score":
         orderBy = sql`${bottles.avgScore} ASC NULLS LAST`;
         break;
@@ -296,8 +343,15 @@ export default procedure
         results.slice(0, limit),
         context.user,
         ["description", "tastingNotes"],
-        { includeGroupSummary: true },
+        {
+          includeGroupSummary: true,
+          followedDistillerIds:
+            followedDistillerIds === null
+              ? undefined
+              : new Set(followedDistillerIds),
+        },
       ),
+      followedDistillerCount: followedDistillerIds?.length ?? null,
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
         prevCursor: cursor > 1 ? cursor - 1 : null,

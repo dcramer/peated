@@ -56,6 +56,7 @@ const bottle = BottleV1Schema.parse({
   maltPhenolPpm: 101.4,
   vintageYear: null,
   releaseYear: 2026,
+  releaseDate: "2026-07-01",
   caskSize: null,
   caskType: null,
   caskFill: null,

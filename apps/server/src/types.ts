@@ -173,6 +173,7 @@ export type BottlePreviewResult = {
   maltPhenolPpm?: number | null;
   vintageYear?: number | null;
   releaseYear?: number | null;
+  releaseDate?: string | null;
 };
 
 export const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>

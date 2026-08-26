@@ -30,12 +30,14 @@ type Attrs = {
   group?: BottleGroupV1;
   brand: ReturnType<(typeof EntitySerializer)["item"]>;
   distillers: ReturnType<(typeof EntitySerializer)["item"]>[];
+  followedDistillers?: ReturnType<(typeof EntitySerializer)["item"]>[];
   bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
   series: ReturnType<(typeof BottleSeriesSerializer)["item"]> | null;
 };
 
 export type BottleSerializerContext = {
   includeGroupSummary?: boolean;
+  followedDistillerIds?: ReadonlySet<number>;
 };
 
 export const BottleSerializer = serializer({
@@ -201,6 +203,7 @@ export const BottleSerializer = serializer({
             ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
           )
         : new Set();
+    const followedDistillerIds = context?.followedDistillerIds;
 
     return Object.fromEntries(
       itemList.map((item) => {
@@ -213,6 +216,13 @@ export const BottleSerializer = serializer({
             group: groupByBottleId.get(item.id),
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],
+            followedDistillers: followedDistillerIds
+              ? (distillersByBottleId[item.id] || []).filter(
+                  (distiller) =>
+                    followedDistillerIds.has(distiller.id) &&
+                    distiller.type.includes("distiller"),
+                )
+              : undefined,
             bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
             series: item.seriesId ? seriesById[item.seriesId] : null,
           },
@@ -249,6 +259,7 @@ export const BottleSerializer = serializer({
       vintageYear: item.vintageYear,
       bottlingYear: item.bottlingYear,
       releaseYear: item.releaseYear,
+      releaseDate: item.releaseDate,
 
       caskType: item.caskType,
       caskFill: item.caskFill,
@@ -277,6 +288,9 @@ export const BottleSerializer = serializer({
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
     };
+    if (attrs.followedDistillers) {
+      bottle.followedDistillers = attrs.followedDistillers;
+    }
     if (attrs.group) bottle.group = attrs.group;
     return bottle;
   },

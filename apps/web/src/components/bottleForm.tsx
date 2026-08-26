@@ -152,6 +152,7 @@ const moreDetailFields = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
+  "releaseDate",
   "series",
   "singleCask",
   "caskStrength",
@@ -296,6 +297,7 @@ export default function BottleForm({
     vintageYear: watch("vintageYear"),
     bottlingYear: watch("bottlingYear"),
     releaseYear: watch("releaseYear"),
+    releaseDate: watch("releaseDate"),
     abv: watch("abv"),
     singleCask: watch("singleCask"),
     caskStrength: watch("caskStrength"),
@@ -600,6 +602,14 @@ export default function BottleForm({
               label="Release Year"
               placeholder="e.g. 2024"
               helpText="The year this release became available."
+            />
+
+            <TextField
+              {...register("releaseDate")}
+              error={errors.releaseDate}
+              type="date"
+              label="Exact Release Date"
+              helpText="The exact date this release became available, when known."
             />
 
             <BooleanField

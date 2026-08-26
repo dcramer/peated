@@ -45,6 +45,18 @@ describe("BottleExactMetadata", () => {
     expect(html.replace(/<[^>]*>/g, "")).toContain("Bottled 2020");
   });
 
+  it("shows an exact release date instead of its year", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata
+        bottle={{ ...exactBottle, releaseDate: "2025-09-15" }}
+      />,
+    );
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text).toContain("Released 2025-09-15");
+    expect(text).not.toContain("2025 release");
+  });
+
   it("renders an edition summary without duplicate keys", () => {
     const consoleError = vi
       .spyOn(console, "error")

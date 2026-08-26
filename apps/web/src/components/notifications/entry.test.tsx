@@ -48,6 +48,7 @@ const bottle = {
   vintageYear: null,
   bottlingYear: null,
   releaseYear: 2026,
+  releaseDate: null,
   caskType: null,
   caskSize: null,
   caskFill: null,
