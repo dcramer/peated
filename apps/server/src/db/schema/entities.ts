@@ -17,6 +17,7 @@ import { bottles, bottlesToDistillers, countries } from ".";
 import { tsvector } from "../columns";
 import { geometry_point } from "../columns/geometry";
 import { actors } from "./actors";
+import { entityEvents } from "./entityEvents";
 import { contentSourceEnum } from "./enums";
 import { regions } from "./regions";
 
@@ -115,6 +116,10 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
   createdByActor: one(actors, {
     fields: [entities.createdByActorId],
     references: [actors.id],
+  }),
+  events: many(entityEvents, { relationName: "entityEvents" }),
+  acquisitionEvents: many(entityEvents, {
+    relationName: "entityEventNewOwner",
   }),
 }));
 
