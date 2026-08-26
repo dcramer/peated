@@ -10,6 +10,7 @@
     "build:server": "pnpm build --filter='./apps/server'",
     "build:web": "pnpm build --filter='./apps/web'",
     "dev": "dotenv -e .env.local -- turbo dev",
+    "dev:mock": "dotenv -e .env.local -- turbo dev:mock --filter=./apps/server --filter=./apps/web",
     "dev:web": "dotenv -e .env.local -- turbo dev --filter=\"./apps/web\"",
     "dev:server": "dotenv -e .env.local -- turbo dev --filter=\"./apps/server\"",
     "dev:server:api": "dotenv -e .env.local -- pnpm --filter='./apps/server' dev:api",
