@@ -11,3 +11,7 @@ rule:
         has:
           pattern: $CHAIN.output($SCHEMA)
           stopBy: end
+    - not:
+        has:
+          pattern: implement($CONTRACT)
+          stopBy: end
