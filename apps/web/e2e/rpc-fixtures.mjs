@@ -264,6 +264,7 @@ export const unifiedBottleEditContext = {
     maltPhenolPpm: 101.4,
     noAgeStatement: null,
     vintageYear: 2004,
+    bottlingYear: null,
     releaseYear: 2023,
     caskSize: "hogshead",
     caskType: "oloroso",

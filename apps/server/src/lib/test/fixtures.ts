@@ -447,6 +447,7 @@ type BottleGroupMemberFixtureData = Partial<
     | "nonChillFiltered"
     | "maltPhenolPpm"
     | "vintageYear"
+    | "bottlingYear"
     | "releaseYear"
     | "caskSize"
     | "caskType"
@@ -535,6 +536,7 @@ async function createBottleFixture(
             statedAge: data.statedAge ?? null,
             releaseYear: data.releaseYear ?? null,
             vintageYear: data.vintageYear ?? null,
+            bottlingYear: data.bottlingYear ?? null,
             abv: data.abv ?? null,
             singleCask: data.singleCask ?? null,
             caskStrength: data.caskStrength ?? null,

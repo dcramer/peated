@@ -41,6 +41,7 @@ const BottleEditExactContextSchema = BottleV1Schema.pick({
   nonChillFiltered: true,
   maltPhenolPpm: true,
   vintageYear: true,
+  bottlingYear: true,
   releaseYear: true,
   caskSize: true,
   caskType: true,
