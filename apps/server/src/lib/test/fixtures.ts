@@ -395,6 +395,28 @@ export const EntityAlias = async (
   return result;
 };
 
+export const EntityEvent = async (
+  { ...data }: Partial<Omit<dbSchema.NewEntityEvent, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.EntityEvent> => {
+  const entityId = data.entityId ?? (await Entity({}, db)).id;
+  const createdByActorId =
+    data.createdByActorId ??
+    (await getUserActorByIdForDatabase(db, (await User({}, db)).id)).id;
+  const [result] = await db
+    .insert(dbSchema.entityEvents)
+    .values({
+      entityId,
+      kind: "closed",
+      date: "1983",
+      ...data,
+      createdByActorId,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create EntityEvent fixture");
+  return result;
+};
+
 /** Creates a BottleGroup within the caller's transaction. */
 const createBottleGroupFixture = async (
   {

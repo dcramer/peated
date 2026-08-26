@@ -7,6 +7,7 @@ import classify from "./classify";
 import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
+import events from "./events";
 import list from "./list";
 import merge from "./merge";
 import update from "./update";
@@ -23,4 +24,5 @@ export default base.tag("entities").router({
   merge,
   aliases,
   categories,
+  events,
 });

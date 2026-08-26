@@ -13,6 +13,7 @@ import {
   changes,
   entities,
   entityAliases,
+  entityEvents,
   entityTombstones,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -125,6 +126,44 @@ test("preserves current ownership and repoints owned Entities", async ({
   expect(
     await db.query.entities.findFirst({ where: eq(entities.id, owned.id) }),
   ).toMatchObject({ ownerId: destination.id });
+});
+
+test("repoints history when Entities merge", async ({ fixtures }) => {
+  const source = await fixtures.Entity();
+  const destination = await fixtures.Entity();
+  const subject = await fixtures.Entity();
+  const subjectEvent = await fixtures.EntityEvent({ entityId: source.id });
+  const ownerEvent = await fixtures.EntityEvent({
+    entityId: subject.id,
+    kind: "acquired",
+    newOwnerId: source.id,
+  });
+  const duplicateEvent = await fixtures.EntityEvent({
+    entityId: source.id,
+    kind: "acquired",
+    newOwnerId: destination.id,
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db.query.entityEvents.findFirst({
+      where: eq(entityEvents.id, subjectEvent.id),
+    }),
+  ).toMatchObject({ entityId: destination.id });
+  expect(
+    await db.query.entityEvents.findFirst({
+      where: eq(entityEvents.id, ownerEvent.id),
+    }),
+  ).toMatchObject({ newOwnerId: destination.id });
+  expect(
+    await db.query.entityEvents.findFirst({
+      where: eq(entityEvents.id, duplicateEvent.id),
+    }),
+  ).toBeUndefined();
 });
 
 test("rejects a merge with conflicting current owners", async ({

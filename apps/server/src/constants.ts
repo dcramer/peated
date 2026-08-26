@@ -134,6 +134,15 @@ export const ENTITY_KIND_LIST = [
   "company",
 ] as const;
 
+export const ENTITY_EVENT_KIND_LIST = [
+  "generic",
+  "opened",
+  "closed",
+  "mothballed",
+  "reopened",
+  "acquired",
+] as const;
+
 export const BADGE_FORMULA_LIST = ["default", "linear", "fibonacci"] as const;
 
 export const BADGE_CHECK_TYPE_LIST = [

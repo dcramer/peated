@@ -8,6 +8,7 @@ import {
   changes,
   entities,
   entityAliases,
+  entityEvents,
   entityTombstones,
 } from "@peated/server/db/schema";
 import {
@@ -578,6 +579,25 @@ async function performEntityMerge({
       .update(entityAliases)
       .set({ entityId: toEntity.id })
       .where(inArray(entityAliases.entityId, fromEntityIds));
+
+    const mergedEntityIdList = Array.from(mergedEntityIds);
+    // Remove acquisitions that would say an owner acquired itself.
+    await tx
+      .delete(entityEvents)
+      .where(
+        and(
+          inArray(entityEvents.entityId, mergedEntityIdList),
+          inArray(entityEvents.newOwnerId, mergedEntityIdList),
+        ),
+      );
+    await tx
+      .update(entityEvents)
+      .set({ entityId: toEntity.id })
+      .where(inArray(entityEvents.entityId, fromEntityIds));
+    await tx
+      .update(entityEvents)
+      .set({ newOwnerId: toEntity.id })
+      .where(inArray(entityEvents.newOwnerId, fromEntityIds));
 
     for (const sourceSeries of sourceSeriesRows) {
       const targetFullName = `${toEntity.name} ${sourceSeries.name}`;
