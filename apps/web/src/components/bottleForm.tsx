@@ -653,7 +653,7 @@ export default function BottleForm({
 
             <TextAreaField
               {...register("maturation", {
-                setValueAs: (value) => value.trim() || null,
+                setValueAs: (value) => value?.trim() || null,
               })}
               error={errors.maturation}
               label="Maturation"
@@ -664,7 +664,7 @@ export default function BottleForm({
 
             <TextField
               {...register("caskNumber", {
-                setValueAs: (value) => value.trim() || null,
+                setValueAs: (value) => value?.trim() || null,
               })}
               error={errors.caskNumber}
               type="text"
