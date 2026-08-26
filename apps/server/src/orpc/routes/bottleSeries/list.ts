@@ -23,7 +23,7 @@ export default procedure
       query: z.coerce
         .string()
         .default("")
-        .describe("Plain-text search; operator syntax is not supported."),
+        .describe("Search text only. Search operators are not supported."),
       brand: z.coerce.number(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
