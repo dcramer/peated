@@ -724,11 +724,6 @@ describe("GET /bottles", () => {
       addedLastYear.id,
     ]);
     expect(followedDistillerCount).toBe(1);
-    expect(
-      results.map(({ followedDistillers }) =>
-        followedDistillers?.map(({ id }) => id),
-      ),
-    ).toEqual(results.map(() => [distiller.id]));
   });
 
   test("sorts bottles by tastings ascending", async ({ fixtures }) => {

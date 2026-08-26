@@ -343,13 +343,7 @@ export default procedure
         results.slice(0, limit),
         context.user,
         ["description", "tastingNotes"],
-        {
-          includeGroupSummary: true,
-          followedDistillerIds:
-            followedDistillerIds === null
-              ? undefined
-              : new Set(followedDistillerIds),
-        },
+        { includeGroupSummary: true },
       ),
       followedDistillerCount: followedDistillerIds?.length ?? null,
       rel: {

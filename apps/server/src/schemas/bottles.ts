@@ -194,10 +194,6 @@ export const BottleSchema = z.object({
     .array(EntitySchema)
     .default([])
     .describe("List of distilleries that produced this whisky"),
-  followedDistillers: z
-    .array(EntitySchema)
-    .optional()
-    .describe("Followed distilleries that matched this Bottle"),
   bottler: EntitySchema.nullable()
     .default(null)
     .describe("Evidenced bottling company, which may also be the brand"),
