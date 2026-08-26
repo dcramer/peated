@@ -41,6 +41,9 @@ export function buildBottlePatch(
     patch.maltPhenolPpm = value.maltPhenolPpm;
   }
   if (dirtyFields.has("vintageYear")) patch.vintageYear = value.vintageYear;
+  if (dirtyFields.has("bottlingYear")) {
+    patch.bottlingYear = value.bottlingYear;
+  }
   if (dirtyFields.has("releaseYear")) patch.releaseYear = value.releaseYear;
   if (dirtyFields.has("caskSize")) patch.caskSize = value.caskSize;
   if (dirtyFields.has("caskType")) patch.caskType = value.caskType;

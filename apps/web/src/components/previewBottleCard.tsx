@@ -28,6 +28,7 @@ export const PreviewBottleCard = ({
     statedAge: data.statedAge ?? null,
     abv: data.abv ?? null,
     vintageYear: data.vintageYear ?? null,
+    bottlingYear: data.bottlingYear ?? null,
     releaseYear: data.releaseYear ?? null,
     singleCask: data.singleCask ?? null,
     caskStrength: data.caskStrength ?? null,

@@ -89,8 +89,8 @@ function normalizeStoredPriceMatchCandidates(
 function normalizeStoredProposedBottle(
   proposedBottle: StoredValue,
 ): ReturnType<typeof ProposedBottleSchema.parse> {
-  return normalizeProposedBottleDraft(
-    ProposedBottleSchema.parse(proposedBottle),
+  return ProposedBottleSchema.parse(
+    normalizeProposedBottleDraft(ProposedBottleSchema.parse(proposedBottle)),
   );
 }
 

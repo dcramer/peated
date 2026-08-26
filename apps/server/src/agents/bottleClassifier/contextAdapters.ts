@@ -42,6 +42,7 @@ function exactBottleContext(
     singleCask: boolean | null;
     caskStrength: boolean | null;
     vintageYear: number | null;
+    bottlingYear: number | null;
     releaseYear: number | null;
     caskSize: BottleContextExact["caskSize"];
     caskType: BottleContextExact["caskType"];
@@ -56,6 +57,7 @@ function exactBottleContext(
     singleCask: bottle.singleCask,
     caskStrength: bottle.caskStrength,
     vintageYear: bottle.vintageYear,
+    bottlingYear: bottle.bottlingYear,
     releaseYear: bottle.releaseYear,
     caskSize: bottle.caskSize,
     caskType: bottle.caskType,
@@ -196,6 +198,7 @@ export async function getBottleClassifierContext(
               singleCask: bottles.singleCask,
               caskStrength: bottles.caskStrength,
               vintageYear: bottles.vintageYear,
+              bottlingYear: bottles.bottlingYear,
               releaseYear: bottles.releaseYear,
               caskSize: bottles.caskSize,
               caskType: bottles.caskType,

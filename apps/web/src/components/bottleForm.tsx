@@ -149,8 +149,9 @@ export type BottleFormSubmitMeta = {
 
 const moreDetailFields = [
   "edition",
-  "releaseYear",
   "vintageYear",
+  "bottlingYear",
+  "releaseYear",
   "series",
   "singleCask",
   "caskStrength",
@@ -292,8 +293,9 @@ export default function BottleForm({
     statedAge: watch("statedAge"),
     noAgeStatement: watch("noAgeStatement"),
     edition: watch("edition"),
-    releaseYear: watch("releaseYear"),
     vintageYear: watch("vintageYear"),
+    bottlingYear: watch("bottlingYear"),
+    releaseYear: watch("releaseYear"),
     abv: watch("abv"),
     singleCask: watch("singleCask"),
     caskStrength: watch("caskStrength"),
@@ -568,17 +570,6 @@ export default function BottleForm({
             />
 
             <TextField
-              {...register("releaseYear", {
-                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-              })}
-              error={errors.releaseYear}
-              type="number"
-              label="Release Year"
-              placeholder="e.g. 2024"
-              helpText="The year this bottle was released."
-            />
-
-            <TextField
               {...register("vintageYear", {
                 setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
               })}
@@ -587,6 +578,28 @@ export default function BottleForm({
               label="Distillation Year"
               placeholder="e.g. 1986"
               helpText="The year the spirit was distilled."
+            />
+
+            <TextField
+              {...register("bottlingYear", {
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              })}
+              error={errors.bottlingYear}
+              type="number"
+              label="Bottling Year"
+              placeholder="e.g. 2023"
+              helpText="The year the whisky was bottled."
+            />
+
+            <TextField
+              {...register("releaseYear", {
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              })}
+              error={errors.releaseYear}
+              type="number"
+              label="Release Year"
+              placeholder="e.g. 2024"
+              helpText="The year this release became available."
             />
 
             <BooleanField

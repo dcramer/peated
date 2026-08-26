@@ -14,6 +14,7 @@ const CANDIDATE_METADATA_FIELDS = [
   "caskFill",
   "abv",
   "vintageYear",
+  "bottlingYear",
   "releaseYear",
 ] as const satisfies ReadonlyArray<keyof BottleCandidate>;
 

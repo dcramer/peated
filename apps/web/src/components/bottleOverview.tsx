@@ -221,6 +221,14 @@ export default function BottleOverview({
                   </DefinitionList.Details>
                 </>
               )}
+              {!!bottle.bottlingYear && (
+                <>
+                  <DefinitionList.Term>Bottling Year</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.bottlingYear}
+                  </DefinitionList.Details>
+                </>
+              )}
               {!!bottle.releaseYear && (
                 <>
                   <DefinitionList.Term>Release Year</DefinitionList.Term>

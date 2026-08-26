@@ -99,6 +99,7 @@ const CANDIDATE_METADATA_FIELDS = [
   "singleCask",
   "abv",
   "vintageYear",
+  "bottlingYear",
   "releaseYear",
   "caskType",
   "caskSize",
@@ -902,6 +903,7 @@ async function getVectorCandidates(
       ${bottles.singleCask} AS "singleCask",
       ${bottles.abv} AS abv,
       ${bottles.vintageYear} AS "vintageYear",
+      ${bottles.bottlingYear} AS "bottlingYear",
       ${bottles.releaseYear} AS "releaseYear",
       ${bottles.caskType} AS "caskType",
       ${bottles.caskSize} AS "caskSize",
@@ -945,6 +947,7 @@ async function getTextCandidates(
       ${bottles.singleCask} AS "singleCask",
       ${bottles.abv} AS abv,
       ${bottles.vintageYear} AS "vintageYear",
+      ${bottles.bottlingYear} AS "bottlingYear",
       ${bottles.releaseYear} AS "releaseYear",
       ${bottles.caskType} AS "caskType",
       ${bottles.caskSize} AS "caskSize",
@@ -1009,6 +1012,7 @@ async function getBrandCandidates(
       , ${bottles.singleCask} AS "singleCask"
       , ${bottles.abv} AS abv
       , ${bottles.vintageYear} AS "vintageYear"
+      , ${bottles.bottlingYear} AS "bottlingYear"
       , ${bottles.releaseYear} AS "releaseYear"
       , ${bottles.caskType} AS "caskType"
       , ${bottles.caskSize} AS "caskSize"

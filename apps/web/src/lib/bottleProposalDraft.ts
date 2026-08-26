@@ -12,6 +12,7 @@ type ExactField =
   | "singleCask"
   | "caskStrength"
   | "vintageYear"
+  | "bottlingYear"
   | "releaseYear"
   | "caskSize"
   | "caskType"
@@ -74,6 +75,7 @@ function mergeExactFields(
     singleCask: mergeExactField("singleCask", input),
     caskStrength: mergeExactField("caskStrength", input),
     vintageYear: mergeExactField("vintageYear", input),
+    bottlingYear: mergeExactField("bottlingYear", input),
     releaseYear: mergeExactField("releaseYear", input),
     caskSize: mergeExactField("caskSize", input),
     caskType: mergeExactField("caskType", input),

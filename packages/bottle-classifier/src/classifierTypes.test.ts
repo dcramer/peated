@@ -274,6 +274,24 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     });
   });
 
+  test("treats an omitted bottling year as unknown at classifier boundaries", () => {
+    expect(
+      BottleExtractedDetailsSchema.parse({}).bottling_year,
+    ).toBeUndefined();
+    expect(
+      BottleCandidateSchema.parse({
+        bottleId: 1,
+        fullName: "Example",
+      }).bottlingYear,
+    ).toBeUndefined();
+    expect(
+      ProposedBottleSchema.parse({
+        name: "Example",
+        brand: { id: null, name: "Example" },
+      }).bottlingYear,
+    ).toBeUndefined();
+  });
+
   test.each([
     "identityBasis",
     "matchedReleaseId",

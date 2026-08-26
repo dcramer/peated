@@ -46,6 +46,7 @@ export function EvidencePills({
     ["ABV", getFieldValue(result, "abv")],
     ["Edition", getFieldValue(result, "edition")],
     ["Vintage", getFieldValue(result, "vintageYear")],
+    ["Bottled", getFieldValue(result, "bottlingYear")],
     ["Release", getFieldValue(result, "releaseYear")],
     ["Cask", getFieldValue(result, "caskNumber")],
     ["Cask Strength", getFieldValue(result, "caskStrength")],

@@ -167,6 +167,13 @@ export const ProposedBottleSchema = z.object({
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
+  bottlingYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
   releaseYear: z
     .number()
     .int()

@@ -46,6 +46,7 @@ const bottle = {
   noAgeStatement: null,
   abv: 56.2,
   vintageYear: null,
+  bottlingYear: null,
   releaseYear: 2026,
   caskType: null,
   caskSize: null,

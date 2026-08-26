@@ -219,6 +219,7 @@ const PhotoIdentificationProposedBottleSchema = z.object({
   caskSize: CaskSizeEnum.nullable(),
   caskFill: CaskFillEnum.nullable(),
   vintageYear: z.number().nullable(),
+  bottlingYear: z.number().nullable().optional(),
   releaseYear: z.number().nullable(),
   brand: z.object({
     id: z.number().int().nullable(),

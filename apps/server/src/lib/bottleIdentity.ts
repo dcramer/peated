@@ -25,6 +25,7 @@ export type BottleExactIdentity = Pick<
   | "caskSize"
   | "caskFill"
 > & {
+  bottlingYear?: Bottle["bottlingYear"];
   noAgeStatement?: Bottle["noAgeStatement"];
 };
 
@@ -91,6 +92,7 @@ export function getBottleExactIdentity({
       exactPatch?.noAgeStatement,
       bottle.noAgeStatement,
     ),
+    bottlingYear: valueOrCurrent(exactPatch?.bottlingYear, bottle.bottlingYear),
     releaseYear: valueOrCurrent(exactPatch?.releaseYear, bottle.releaseYear),
     vintageYear: valueOrCurrent(exactPatch?.vintageYear, bottle.vintageYear),
     abv: valueOrCurrent(exactPatch?.abv, bottle.abv),

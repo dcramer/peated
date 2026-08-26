@@ -28,13 +28,13 @@ Every marketed version is one independently complete Bottle. Its canonical
 identity combines:
 
 - a stable marketed expression, stored in the Bottle name; and
-- structured exact-Bottle fields such as edition, release year, vintage year,
-  effective stated age, ABV, single-cask/cask-strength flags, and cask traits.
+- Bottle fields such as edition, distillation year, bottling year, release year,
+  effective stated age, ABV, single-cask/cask-strength flags, and cask details.
 
-Canonical creation materializes those values into the complete Bottle display
-identity. Source facts that describe only the observed listing or physical unit,
-such as a retailer selector, bottle number, or outturn, remain observations and
-do not become canonical identity without reviewed evidence.
+Bottle creation uses those values in the complete Bottle name. Facts that
+describe only the source listing or physical bottle, such as a retailer
+selector, bottle number, or outturn, remain observations until reviewed evidence
+shows that they identify the marketed Bottle.
 
 Independent creation starts in a singleton BottleGroup. Deterministic legacy
 migration groups retained parents with their promoted release Bottles.
@@ -45,8 +45,8 @@ group key. Automatic regrouping is a separate future capability.
 
 - Do not decide whether a token belongs in the stable expression, a structured
   exact-Bottle field, or observation-only evidence.
-- Do not infer age, vintage year, release year, edition, batch, cask, brand,
-  bottler, or distillery from surrounding metadata.
+- Do not infer age, distillation year, bottling year, release year, edition,
+  batch, cask, brand, bottler, or distillery from nearby text alone.
 - Do not strip retailer-specific detail if doing so could change which exact
   Bottle the text references.
 - Do not assign or merge BottleGroups.
@@ -76,7 +76,7 @@ An allowed transformation should pass this test:
 Deterministic normalization must not:
 
 - rewrite a bare number as an age statement
-- decide that a bare year is vintage year or release year
+- decide that a bare year is a distillation, bottling, or release year
 - decide that batch, cask, barrel, store-pick, exclusive, or edition wording is
   stable identity, structured exact identity, or observation-only evidence
 - remove batch, cask, barrel, store-pick, ABV, edition, vintage, or release-year
@@ -119,9 +119,9 @@ when product evidence requires it. Normalization only preserves the evidence.
 
 `Lagavulin Distillers Edition 2011 Release` must preserve the year wording.
 
-Reviewed identity decides whether `2011` is a release year, vintage year, stable
-expression text, or ambiguous evidence. Normalization only keeps the text
-comparable.
+Reviewed identity decides whether `2011` is a distillation, bottling, or release
+year, stable expression text, or ambiguous evidence. Normalization only keeps
+the text comparable.
 
 ### Retailer Detail
 
@@ -150,7 +150,7 @@ Deterministic normalization tests should cover:
 
 - explicit age wording normalization
 - bare numbers that are not age statements
-- bare years that are not automatically vintage or release years
+- bare years that are not automatically distillation, bottling, or release years
 - batch and cask tokens that remain present
 - store-pick and exclusive wording that remains present
 - alias lookup/write consistency for whichever key a workflow accepts

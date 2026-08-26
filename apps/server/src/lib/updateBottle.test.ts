@@ -965,6 +965,7 @@ describe("Bottle updates", () => {
       input: {
         edition: "Batch 3",
         statedAge: 14,
+        bottlingYear: 2024,
         releaseYear: 2025,
         abv: 50,
         caskStrength: true,
@@ -981,6 +982,7 @@ describe("Bottle updates", () => {
           "Exact Update Brand Core - Batch 3 - 14-year-old - 2025 Release - 50.0% ABV - Cask Strength",
         edition: "Batch 3",
         statedAge: 14,
+        bottlingYear: 2024,
         releaseYear: 2025,
         abv: 50,
         caskStrength: true,
@@ -995,6 +997,7 @@ describe("Bottle updates", () => {
       fullName: identityResult.bottle.fullName,
       statedAge: identityResult.bottle.statedAge,
       edition: identityResult.bottle.edition,
+      bottlingYear: identityResult.bottle.bottlingYear,
       releaseYear: identityResult.bottle.releaseYear,
       abv: identityResult.bottle.abv,
       caskStrength: identityResult.bottle.caskStrength,

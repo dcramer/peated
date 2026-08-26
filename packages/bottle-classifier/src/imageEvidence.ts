@@ -107,6 +107,7 @@ export const ImageBottleFieldCandidatesSchema = z
     statedAge: EvidenceAgeFieldSchema.optional(),
     abv: EvidenceAbvFieldSchema.optional(),
     vintageYear: EvidenceYearFieldSchema.optional(),
+    bottlingYear: EvidenceYearFieldSchema.optional(),
     releaseYear: EvidenceYearFieldSchema.optional(),
     edition: EvidenceStringFieldSchema.optional(),
     caskNumber: EvidenceStringFieldSchema.optional(),

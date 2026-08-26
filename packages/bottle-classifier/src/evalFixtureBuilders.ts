@@ -23,6 +23,7 @@ export function buildBottleCandidate(
     caskFill: null,
     abv: null,
     vintageYear: null,
+    bottlingYear: null,
     releaseYear: null,
     score: null,
     source: [],

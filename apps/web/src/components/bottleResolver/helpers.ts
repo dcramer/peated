@@ -151,6 +151,9 @@ export function getCreateBottlePrefill(
     vintageYear:
       proposedBottle?.vintageYear ??
       getRawNumberFieldValue(result, "vintageYear"),
+    bottlingYear:
+      proposedBottle?.bottlingYear ??
+      getRawNumberFieldValue(result, "bottlingYear"),
     releaseYear:
       proposedBottle?.releaseYear ??
       getRawNumberFieldValue(result, "releaseYear"),
@@ -174,6 +177,7 @@ function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
     getFieldValue(result, "abv") ||
     getFieldValue(result, "edition") ||
     getFieldValue(result, "vintageYear") ||
+    getFieldValue(result, "bottlingYear") ||
     getFieldValue(result, "releaseYear") ||
     getFieldValue(result, "caskNumber"),
   );

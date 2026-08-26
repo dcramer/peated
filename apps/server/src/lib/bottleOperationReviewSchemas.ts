@@ -163,6 +163,7 @@ export const BottleUpdatePreviewSchema = z
         "exact.singleCask",
         "exact.caskStrength",
         "exact.vintageYear",
+        "exact.bottlingYear",
         "exact.releaseYear",
         "exact.caskSize",
         "exact.caskType",

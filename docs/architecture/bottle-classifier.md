@@ -42,12 +42,12 @@ It returns either `ignored` with a reason, or `classified` with:
 Decision actions are `match`, `create_bottle`, and `no_match`. The decision stays
 `no_match` until the current Bottle is safe for assignment. Catalog corrections
 belong to a separate Bottle audit and never accompany the reference result.
-`create_bottle` proposes one complete observed marketed Bottle: a stable
-expression in `proposedBottle.name` plus required exact fields, including edition,
-vintage year, release year, exact age, ABV, and cask flags. Canonical
-downstream materialization combines those values without duplicating exact
-markers in the stable name, creates the independently correct Bottle, and
-manages grouping automatically. The classifier never selects a BottleGroup.
+`create_bottle` proposes one complete Bottle. It stores the stable
+expression in `proposedBottle.name` and supplies supported Bottle fields such as
+edition, distillation year, bottling year, release year, stated age, and ABV.
+The server uses those values to build the complete Bottle name without repeats,
+create the Bottle, and manage grouping. The classifier never selects a
+BottleGroup.
 
 `caskType`, `caskSize`, and `caskFill` are soft-deprecated classifier metadata.
 Schemas, stored context, replay data, and explicit supplied values remain
@@ -244,6 +244,9 @@ for that complete Bottle.
   component's age, year, or strength. Preserve complete marketed edition
   descriptors, but keep non-marketed production lot codes out of Bottle
   identity.
+- Treat bottling year as an optional Bottle detail. A different bottling year
+  alone does not prove that it is a different release or block an otherwise
+  clear match.
 - Reuse Entities by their established catalog role. Exact or shorter name
   overlap does not override local evidence that distinguishes a Brand from its
   producing distillery.

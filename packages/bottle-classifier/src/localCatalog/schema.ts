@@ -39,6 +39,7 @@ const LocalCatalogBottleSchema = z
     caskFill: CaskFillEnum.nullable().default(null),
     abv: z.number().min(0).max(100).nullable().default(null),
     vintageYear: z.number().int().gte(1800).nullable().default(null),
+    bottlingYear: z.number().int().gte(1800).nullable().optional(),
     releaseYear: z.number().int().gte(1800).nullable().default(null),
   })
   .strict();

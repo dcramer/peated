@@ -10,6 +10,7 @@ const GUARDED_PATCH_FIELDS = [
   "singleCask",
   "caskStrength",
   "vintageYear",
+  "bottlingYear",
   "releaseYear",
   "caskSize",
   "caskType",
@@ -28,6 +29,7 @@ const EVIDENCE_FIELD_NAMES = {
   singleCask: ["singleCask", "single_cask"],
   caskStrength: ["caskStrength", "cask_strength"],
   vintageYear: ["vintageYear", "vintage_year"],
+  bottlingYear: ["bottlingYear", "bottling_year"],
   releaseYear: ["releaseYear", "release_year"],
   caskSize: ["caskSize", "cask_size"],
   caskType: ["caskType", "cask_type"],
@@ -50,6 +52,7 @@ function currentFieldValue(
     case "singleCask":
     case "caskStrength":
     case "vintageYear":
+    case "bottlingYear":
     case "releaseYear":
     case "caskSize":
     case "caskType":

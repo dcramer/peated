@@ -71,6 +71,13 @@ const ExactBottleInputFields = {
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
+  bottlingYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(new Date().getFullYear())
+    .nullable()
+    .default(null),
   releaseYear: z
     .number()
     .int()
@@ -152,6 +159,13 @@ const BottlePatchFieldsSchema = z
       .removeDefault()
       .optional(),
     vintageYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(new Date().getFullYear())
+      .nullable()
+      .optional(),
+    bottlingYear: z
       .number()
       .int()
       .gte(1800)
