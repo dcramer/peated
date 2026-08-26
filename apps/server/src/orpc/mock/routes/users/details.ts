@@ -1,6 +1,9 @@
 import { implement } from "@orpc/server";
 import type { MockContext } from "@peated/server/orpc/mock/context";
-import { mockUserDetails } from "@peated/server/orpc/mock/fixtures";
+import {
+  mockUserDetails,
+  mockUserDetailsFor,
+} from "@peated/server/orpc/mock/fixtures";
 import details from "@peated/server/orpc/routes/users/details";
 
 export default implement(details)
@@ -19,5 +22,5 @@ export default implement(details)
       throw errors.NOT_FOUND({ message: "Mock user not found." });
     }
 
-    return mockUserDetails;
+    return mockUserDetailsFor(context.user);
   });

@@ -1,5 +1,10 @@
 import { createRouterClient } from "@orpc/server";
-import { mockAccessToken, mockBottle, mockUser } from "./fixtures";
+import {
+  mockAccessToken,
+  mockBottle,
+  mockPublicUserDetails,
+  mockUser,
+} from "./fixtures";
 import { mockRouter } from "./router";
 
 const anonymousClient = createRouterClient(mockRouter, {
@@ -53,6 +58,50 @@ describe("mock oRPC router", () => {
       query: mockUser.username,
       results: [{ type: "user", ref: mockUser }],
     });
+  });
+
+  it("returns viewer-specific bottle data", async () => {
+    const anonymousBottle = await anonymousClient.bottles.details({
+      bottle: mockBottle.id,
+    });
+    expect(anonymousBottle).toMatchObject({
+      isFavorite: false,
+      isLibrary: false,
+      hasTasted: false,
+    });
+
+    const authenticatedBottle = await authenticatedClient.bottles.details({
+      bottle: mockBottle.id,
+    });
+    expect(authenticatedBottle).toMatchObject({
+      isFavorite: true,
+      isLibrary: true,
+      hasTasted: true,
+    });
+  });
+
+  it("requires sign-in for followed bottles", async () => {
+    await expect(
+      anonymousClient.bottles.list({ filter: "following" }),
+    ).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
+
+    await expect(
+      authenticatedClient.bottles.list({ filter: "following" }),
+    ).resolves.toMatchObject({
+      followedDistillerCount: 1,
+    });
+  });
+
+  it("keeps self-only user fields out of public profiles", async () => {
+    await expect(
+      anonymousClient.users.details({ user: mockUser.username }),
+    ).resolves.toEqual(mockPublicUserDetails);
+
+    await expect(
+      authenticatedClient.users.details({ user: "me" }),
+    ).resolves.toEqual(expect.objectContaining({ email: mockUser.email }));
   });
 
   it("returns the route's not-found error for unknown records", async () => {

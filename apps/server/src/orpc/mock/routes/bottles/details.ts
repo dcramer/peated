@@ -1,11 +1,17 @@
 import { implement } from "@orpc/server";
-import { mockBottleDetails } from "@peated/server/orpc/mock/fixtures";
+import type { MockContext } from "@peated/server/orpc/mock/context";
+import {
+  mockBottleDetails,
+  mockBottleDetailsFor,
+} from "@peated/server/orpc/mock/fixtures";
 import details from "@peated/server/orpc/routes/bottles/details";
 
-export default implement(details).handler(async ({ input, errors }) => {
-  if (input.bottle !== mockBottleDetails.id) {
-    throw errors.NOT_FOUND({ message: "Mock bottle not found." });
-  }
+export default implement(details)
+  .$context<MockContext>()
+  .handler(async ({ input, context, errors }) => {
+    if (input.bottle !== mockBottleDetails.id) {
+      throw errors.NOT_FOUND({ message: "Mock bottle not found." });
+    }
 
-  return mockBottleDetails;
-});
+    return mockBottleDetailsFor(context.user);
+  });

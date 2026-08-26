@@ -2,7 +2,7 @@ import { implement } from "@orpc/server";
 import type { MockContext } from "@peated/server/orpc/mock/context";
 import {
   includesQuery,
-  mockBottle,
+  mockBottleFor,
   mockEntity,
   mockUser,
 } from "@peated/server/orpc/mock/fixtures";
@@ -13,12 +13,13 @@ export default implement(search)
   .$context<MockContext>()
   .handler(async ({ input, context }) => {
     const results: Outputs["search"]["results"] = [];
+    const bottle = mockBottleFor(context.user);
 
     if (
       input.include.includes("bottles") &&
-      includesQuery(input.query, mockBottle.fullName, mockBottle.name)
+      includesQuery(input.query, bottle.fullName, bottle.name)
     ) {
-      results.push({ type: "bottle", ref: mockBottle });
+      results.push({ type: "bottle", ref: bottle });
     }
     if (
       input.include.includes("entities") &&

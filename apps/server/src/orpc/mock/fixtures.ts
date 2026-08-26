@@ -39,6 +39,23 @@ export const mockUserDetails = {
   },
 } satisfies Outputs["users"]["details"];
 
+export const mockPublicUser = {
+  id: mockUser.id,
+  username: mockUser.username,
+  pictureUrl: mockUser.pictureUrl,
+  private: mockUser.private,
+  friendStatus: mockUser.friendStatus,
+} satisfies User;
+
+export const mockPublicUserDetails = {
+  ...mockPublicUser,
+  stats: mockUserDetails.stats,
+} satisfies Outputs["users"]["details"];
+
+export function mockUserDetailsFor(user: User | null) {
+  return user ? mockUserDetails : mockPublicUserDetails;
+}
+
 export const mockEntity = {
   id: 9201,
   peatedId: "E9201",
@@ -115,10 +132,21 @@ export const mockBottle = {
   totalTastings: 120,
   createdAt: timestamp,
   updatedAt: timestamp,
-  isFavorite: true,
-  isLibrary: true,
-  hasTasted: true,
+  isFavorite: false,
+  isLibrary: false,
+  hasTasted: false,
 } satisfies Bottle;
+
+export function mockBottleFor(user: User | null): Bottle {
+  return user
+    ? {
+        ...mockBottle,
+        isFavorite: true,
+        isLibrary: true,
+        hasTasted: true,
+      }
+    : mockBottle;
+}
 
 export const mockBottleDetails = {
   ...mockBottle,
@@ -126,6 +154,15 @@ export const mockBottleDetails = {
   people: 96,
   lastPrice: null,
 } satisfies Outputs["bottles"]["details"];
+
+export function mockBottleDetailsFor(
+  user: User | null,
+): Outputs["bottles"]["details"] {
+  return {
+    ...mockBottleDetails,
+    ...mockBottleFor(user),
+  };
+}
 
 export const noMorePages = {
   nextCursor: null,
