@@ -10,6 +10,8 @@ field ownership, grouping, and merge semantics.
   returns one independently complete Bottle.
 - A submitted stated age belongs to the new Bottle. The singleton BottleGroup
   starts without a shared age. A reviewed shared edit can establish one later.
+- An exact release date sets the release year. A year can exist without an
+  exact date. The server rejects conflicting values.
 - Creation atomically creates a singleton BottleGroup. Users do not select,
   name, or submit authority for a group.
 - Deterministic alias duplicate checks remain in the request path. Slow catalog

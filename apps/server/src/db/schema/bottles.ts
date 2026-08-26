@@ -5,6 +5,7 @@ import {
   bigserial,
   boolean,
   check,
+  date,
   doublePrecision,
   foreignKey,
   index,
@@ -193,6 +194,7 @@ export const bottles = pgTable(
     vintageYear: smallint("vintage_year"),
     bottlingYear: smallint("bottling_year"),
     releaseYear: smallint("release_year"),
+    releaseDate: date("release_date"),
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
@@ -245,6 +247,14 @@ export const bottles = pgTable(
     index("bottle_created_by_actor_idx").on(table.createdByActorId),
     index("bottle_category_idx").on(table.category),
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
+    index("bottle_release_sort_idx").using(
+      "btree",
+      sql`COALESCE(${table.releaseYear}, EXTRACT(YEAR FROM ${table.createdAt})) DESC`,
+      sql`(${table.releaseYear} IS NULL) ASC`,
+      table.releaseDate.desc().nullsLast(),
+      table.createdAt.desc(),
+      table.id.asc(),
+    ),
     check(
       "bottle_stated_age_check",
       sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
@@ -272,6 +282,10 @@ export const bottles = pgTable(
     check(
       "bottle_release_year_check",
       sql`${table.releaseYear} IS NULL OR ${table.releaseYear} >= 1800`,
+    ),
+    check(
+      "bottle_release_date_year_check",
+      sql`${table.releaseDate} IS NULL OR (${table.releaseYear} IS NOT NULL AND ${table.releaseDate} >= DATE '1800-01-01' AND ${table.releaseYear} = EXTRACT(YEAR FROM ${table.releaseDate}))`,
     ),
   ],
 );

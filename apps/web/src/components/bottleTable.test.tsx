@@ -75,6 +75,7 @@ function makeCollectionBottle(): CollectionBottle {
       vintageYear: null,
       bottlingYear: null,
       releaseYear: null,
+      releaseDate: null,
       singleCask: false,
       caskStrength: false,
       naturalColor: null,

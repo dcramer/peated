@@ -139,6 +139,7 @@ test.describe("create bottle", () => {
       edition: "Founder's Cask",
       abv: 58.7,
       releaseYear: 2025,
+      releaseDate: null,
       vintageYear: 2009,
       singleCask: true,
       caskStrength: true,

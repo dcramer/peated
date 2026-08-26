@@ -183,7 +183,9 @@ authority.
   lot code is not an edition when the producer sells one ongoing product
   without batch-specific marketing.
 - `vintageYear` is the distillation year. `bottlingYear` is the year the whisky
-  was bottled. `releaseYear` is the year the marketed release became available.
+  was bottled. `releaseYear` is the known year the marketed release became
+  available. `releaseDate` is the exact date, when the evidence gives one. An
+  exact date sets the release year. Year-only evidence must not use a fake date.
   A bare year is ambiguous until source evidence gives it meaning.
 - A different `bottlingYear` does not prove that it is a different Bottle.
   Create a separate Bottle for that year only when the producer markets the

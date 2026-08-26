@@ -127,6 +127,12 @@ describe("Bottle fact constraints", () => {
         .set({ releaseYear: 1799 })
         .where(eq(bottles.id, bottle.id)),
     ).rejects.toThrow(/bottle_release_year_check/);
+    await expect(
+      db
+        .update(bottles)
+        .set({ releaseYear: 2025, releaseDate: "2024-01-01" })
+        .where(eq(bottles.id, bottle.id)),
+    ).rejects.toThrow(/bottle_release_date_year_check/);
   });
 
   test("rejects a non-positive barcode volume", async ({ fixtures }) => {

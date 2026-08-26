@@ -471,6 +471,7 @@ type BottleGroupMemberFixtureData = Partial<
     | "vintageYear"
     | "bottlingYear"
     | "releaseYear"
+    | "releaseDate"
     | "caskSize"
     | "caskType"
     | "caskFill"

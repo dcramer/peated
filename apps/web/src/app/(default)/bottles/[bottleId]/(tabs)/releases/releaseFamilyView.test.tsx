@@ -82,6 +82,7 @@ const bottle = {
   vintageYear: 2004,
   bottlingYear: null,
   releaseYear: 2025,
+  releaseDate: null,
   caskSize: "hogshead",
   caskType: "oloroso",
   caskFill: "1st_fill",

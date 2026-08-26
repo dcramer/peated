@@ -237,6 +237,7 @@ describe("PATCH /bottles/{bottle}", () => {
         edition: "Batch 3",
         statedAge: 14,
         releaseYear: 2026,
+        releaseDate: "2026-04-15",
         abv: 52,
         naturalColor: true,
         nonChillFiltered: false,
@@ -252,6 +253,7 @@ describe("PATCH /bottles/{bottle}", () => {
       edition: "Batch 3",
       statedAge: 14,
       releaseYear: 2026,
+      releaseDate: "2026-04-15",
       abv: 52,
       naturalColor: true,
       nonChillFiltered: false,
@@ -264,6 +266,46 @@ describe("PATCH /bottles/{bottle}", () => {
         where: eq(bottleGroups.id, groupBefore.id),
       }),
     ).toEqual(groupBefore);
+  });
+
+  test("derives the release year from an exact release date", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ releaseYear: 2024 });
+
+    const result = await routerClient.bottles.update(
+      { bottle: bottle.id, releaseDate: "2025-03-12" },
+      { context: { user: mod } },
+    );
+
+    expect(result).toMatchObject({
+      releaseYear: 2025,
+      releaseDate: "2025-03-12",
+    });
+  });
+
+  test("rejects a release year that conflicts with the exact date", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({
+      releaseYear: 2025,
+      releaseDate: "2025-03-12",
+    });
+
+    const error = await waitError(
+      routerClient.bottles.update(
+        { bottle: bottle.id, releaseYear: 2024 },
+        { context: { user: mod } },
+      ),
+    );
+
+    expect(error).toMatchObject({
+      message:
+        "Release year must match release date. Update or clear release date.",
+      status: 400,
+    });
   });
 
   test("keeps confirmed NAS separate from an unknown age", async ({

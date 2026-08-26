@@ -98,6 +98,7 @@ function makeCollectionBottle(id: number): CollectionBottle {
       vintageYear: null,
       bottlingYear: null,
       releaseYear: null,
+      releaseDate: null,
       caskType: null,
       caskSize: null,
       caskFill: null,

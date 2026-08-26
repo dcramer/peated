@@ -229,14 +229,21 @@ export default function BottleOverview({
                   </DefinitionList.Details>
                 </>
               )}
-              {!!bottle.releaseYear && (
+              {bottle.releaseDate ? (
+                <>
+                  <DefinitionList.Term>Release Date</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.releaseDate}
+                  </DefinitionList.Details>
+                </>
+              ) : bottle.releaseYear ? (
                 <>
                   <DefinitionList.Term>Release Year</DefinitionList.Term>
                   <DefinitionList.Details>
                     {bottle.releaseYear}
                   </DefinitionList.Details>
                 </>
-              )}
+              ) : null}
             </DefinitionList>
             <BottleBarcodes bottleId={bottle.id} barcodes={bottle.barcodes} />
           </div>

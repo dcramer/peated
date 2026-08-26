@@ -25,6 +25,7 @@ export function buildBottleCreateInput(input: FlatBottleInput) {
     vintageYear: input.vintageYear,
     bottlingYear: input.bottlingYear,
     releaseYear: input.releaseYear,
+    releaseDate: input.releaseDate,
     caskSize: input.caskSize,
     caskType: input.caskType,
     caskFill: input.caskFill,

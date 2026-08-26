@@ -201,7 +201,6 @@ export const BottleSerializer = serializer({
             ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
           )
         : new Set();
-
     return Object.fromEntries(
       itemList.map((item) => {
         return [
@@ -249,6 +248,7 @@ export const BottleSerializer = serializer({
       vintageYear: item.vintageYear,
       bottlingYear: item.bottlingYear,
       releaseYear: item.releaseYear,
+      releaseDate: item.releaseDate,
 
       caskType: item.caskType,
       caskFill: item.caskFill,
