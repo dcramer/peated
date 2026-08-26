@@ -20,6 +20,26 @@ describe("GET /stats", () => {
     expect(data.totalEntities).toBe(Number(totalEntities));
   });
 
+  test("returns entity totals by kind", async ({ fixtures }) => {
+    await fixtures.Entity({ name: "Stats Brand", kind: "brand" });
+    await fixtures.Entity({ name: "Stats Distillery", kind: "distillery" });
+    await fixtures.Entity({ name: "Stats Bottler", kind: "bottler" });
+    await fixtures.Entity({ name: "Stats Blender", kind: "blender" });
+    await fixtures.Entity({ name: "Stats Company", kind: "company" });
+    await fixtures.Entity({ name: "Stats Unclassified", kind: null });
+
+    const data = await routerClient.stats();
+
+    expect(data).toMatchObject({
+      totalEntities: 6,
+      totalBrands: 1,
+      totalDistilleries: 1,
+      totalBottlers: 1,
+      totalBlenders: 1,
+      totalCompanies: 1,
+    });
+  });
+
   test("counts each active independently complete Bottle", async ({
     fixtures,
   }) => {
