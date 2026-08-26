@@ -250,9 +250,9 @@ export const BottleSerializer = serializer({
       releaseYear: item.releaseYear,
       releaseDate: item.releaseDate,
 
-      caskType: item.caskType,
-      caskFill: item.caskFill,
-      caskSize: item.caskSize,
+      maturation: item.maturation,
+      caskNumber: item.caskNumber,
+      outturn: item.outturn,
 
       brand: attrs.brand,
       distillers: attrs.distillers,

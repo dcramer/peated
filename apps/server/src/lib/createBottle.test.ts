@@ -214,9 +214,9 @@ describe("Bottle creation", () => {
       statedAge: 12,
       caskStrength: null,
       singleCask: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
+      maturation: null,
+      caskNumber: null,
+      outturn: null,
       abv: null,
       vintageYear: null,
       releaseYear: null,
@@ -300,58 +300,33 @@ describe("Bottle creation", () => {
     });
   });
 
-  test("materializes each exact cask identity field for an independent Bottle", async ({
+  test("stores producer-stated cask details on an independent Bottle", async ({
     defaults,
     fixtures,
   }) => {
     const context = contextFor(defaults.user);
     const brand = await fixtures.Entity({ name: "Exact Cask Identity Brand" });
-    const variants = [
-      {
-        exactCask: {
-          caskType: "oloroso" as const,
-          caskSize: "hogshead" as const,
-          caskFill: "refill" as const,
-        },
-        nameSuffix: "Oloroso Cask - Hogshead - Refill",
+    const result = await createBottle({
+      context,
+      input: {
+        name: "Exact Cask Expression",
+        brand: brand.id,
+        edition: "Cask Selection",
+        maturation: "Refill Oloroso hogshead",
+        caskNumber: "#1234",
+        outturn: 240,
       },
-      {
-        exactCask: {
-          caskType: "bourbon" as const,
-          caskSize: "butt" as const,
-          caskFill: "refill" as const,
-        },
-        nameSuffix: "Bourbon Cask - Butt - Refill",
-      },
-      {
-        exactCask: {
-          caskType: "bourbon" as const,
-          caskSize: "hogshead" as const,
-          caskFill: "1st_fill" as const,
-        },
-        nameSuffix: "Bourbon Cask - Hogshead - 1st Fill",
-      },
-    ];
-
-    for (const { exactCask, nameSuffix } of variants) {
-      const result = await createBottle({
-        context,
-        input: {
-          name: "Exact Cask Expression",
-          brand: brand.id,
-          edition: "Cask Selection",
-          ...exactCask,
-        },
-      });
-      expect(result.bottle).toMatchObject({
-        ...exactCask,
-        name: `Exact Cask Expression - Cask Selection - ${nameSuffix}`,
-      });
-      expect(result.group).toMatchObject({
-        representativeBottleId: result.bottle.id,
-        totalBottles: 1,
-      });
-    }
+    });
+    expect(result.bottle).toMatchObject({
+      maturation: "Refill Oloroso hogshead",
+      caskNumber: "#1234",
+      outturn: 240,
+      name: "Exact Cask Expression - Cask Selection",
+    });
+    expect(result.group).toMatchObject({
+      representativeBottleId: result.bottle.id,
+      totalBottles: 1,
+    });
   });
 
   test.each([

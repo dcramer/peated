@@ -46,7 +46,7 @@ describe("indexBottleSearchVectors", () => {
       releaseYear: 2018,
       singleCask: true,
       caskStrength: true,
-      caskType: "oloroso",
+      maturation: "Oloroso hogshead",
     });
     const unrelatedBottle = await fixtures.Bottle({
       name: "Unrelated Expression",

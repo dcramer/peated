@@ -2,12 +2,7 @@ import { BottleCandidateSchema as ClassifierBottleCandidateSchema } from "@peate
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
 import { BottleSchema } from "./bottles";
-import {
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
-  CategoryEnum,
-} from "./common";
+import { CategoryEnum } from "./common";
 import { ExternalSiteSchema } from "./externalSites";
 import { CursorSchema } from "./shared";
 import { StorePriceSchema } from "./stores";
@@ -25,9 +20,9 @@ export const ExtractedBottleDetailsSchema = z.object({
   abv: z.number().nullable().default(null),
   release_year: z.number().nullable().default(null),
   vintage_year: z.number().nullable().default(null),
-  cask_type: z.string().nullable().default(null),
-  cask_size: CaskSizeEnum.nullable().default(null),
-  cask_fill: CaskFillEnum.nullable().default(null),
+  maturation: z.string().trim().nullable().default(null),
+  cask_number: z.string().trim().nullable().default(null),
+  outturn: z.number().int().positive().nullable().default(null),
   cask_strength: z.boolean().nullable().default(null),
   single_cask: z.boolean().nullable().default(null),
   edition: z.string().nullable().default(null),
@@ -67,9 +62,9 @@ export const PriceMatchAttributeEnum = z.enum([
   "category",
   "statedAge",
   "edition",
-  "caskType",
-  "caskSize",
-  "caskFill",
+  "maturation",
+  "caskNumber",
+  "outturn",
   "caskStrength",
   "singleCask",
   "abv",
@@ -181,9 +176,9 @@ export const ProposedBottleSchema = z.object({
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
+  maturation: z.string().trim().nullable().default(null),
+  caskNumber: z.string().trim().nullable().default(null),
+  outturn: z.number().int().positive().nullable().default(null),
   brand: ProposedEntityChoiceSchema,
   distillers: z.array(ProposedEntityChoiceSchema).default([]),
   bottler: ProposedEntityChoiceSchema.nullable().default(null),

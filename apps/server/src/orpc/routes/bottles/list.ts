@@ -16,11 +16,7 @@ import {
   prefixTextSearchQuery,
 } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
-import {
-  BottleSchema,
-  CaskTypeEnum,
-  listResponse,
-} from "@peated/server/schemas";
+import { BottleSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { SQL } from "drizzle-orm";
@@ -89,7 +85,6 @@ export default procedure
       flight: z.string().nullish(),
       category: z.enum(CATEGORY_LIST).nullish(),
       age: z.coerce.number().nullish(),
-      caskType: CaskTypeEnum.nullish(),
       minRating: z.coerce.number().min(-1).max(2).nullish(),
       minScore: z.coerce.number().int().min(0).max(100).nullish(),
       cursor: z.coerce.number().gte(1).default(1),
@@ -203,9 +198,6 @@ export default procedure
     }
     if (rest.age) {
       where.push(eq(bottles.statedAge, rest.age));
-    }
-    if (rest.caskType) {
-      where.push(eq(bottles.caskType, rest.caskType));
     }
     if (rest.tag) {
       where.push(

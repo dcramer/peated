@@ -472,9 +472,9 @@ type BottleGroupMemberFixtureData = Partial<
     | "bottlingYear"
     | "releaseYear"
     | "releaseDate"
-    | "caskSize"
-    | "caskType"
-    | "caskFill"
+    | "caskNumber"
+    | "maturation"
+    | "outturn"
     | "description"
     | "descriptionSrc"
     | "imageUrl"
@@ -563,9 +563,9 @@ async function createBottleFixture(
             abv: data.abv ?? null,
             singleCask: data.singleCask ?? null,
             caskStrength: data.caskStrength ?? null,
-            caskType: data.caskType ?? null,
-            caskSize: data.caskSize ?? null,
-            caskFill: data.caskFill ?? null,
+            maturation: data.maturation ?? null,
+            caskNumber: data.caskNumber ?? null,
+            outturn: data.outturn ?? null,
           },
         })
       : null;

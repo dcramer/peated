@@ -45,14 +45,6 @@ function formatSearchAbv(abv: number | null | undefined) {
   return `${abv.toFixed(1)}% ABV`;
 }
 
-function formatSearchEnum(value: string | null | undefined) {
-  if (!value) {
-    return null;
-  }
-
-  return value.replace(/_/g, " ");
-}
-
 export function buildEntitySearchVector(
   entity: NewEntity,
   aliasList?: { name: string }[],
@@ -87,8 +79,8 @@ export function buildBottleSearchVector(
   if (bottle.edition) values.push(new TSVector(bottle.edition, "A"));
   if (bottle.statedAge)
     values.push(new TSVector(`${bottle.statedAge}-year-old`, "B"));
-  if (bottle.caskType)
-    values.push(new TSVector(formatSearchEnum(bottle.caskType)!, "B"));
+  if (bottle.maturation) values.push(new TSVector(bottle.maturation, "B"));
+  if (bottle.caskNumber) values.push(new TSVector(bottle.caskNumber, "A"));
   if (bottle.caskStrength)
     values.push(new TSVector(CASK_STRENGTH_SEARCH_TERMS, "B"));
   if (bottle.singleCask)

@@ -44,9 +44,9 @@ function exactBottleContext(
     vintageYear: number | null;
     bottlingYear: number | null;
     releaseYear: number | null;
-    caskSize: BottleContextExact["caskSize"];
-    caskType: BottleContextExact["caskType"];
-    caskFill: BottleContextExact["caskFill"];
+    caskNumber: BottleContextExact["caskNumber"];
+    maturation: BottleContextExact["maturation"];
+    outturn: BottleContextExact["outturn"];
   },
   sharedStatedAge: number | null,
 ): BottleContextExact {
@@ -59,9 +59,9 @@ function exactBottleContext(
     vintageYear: bottle.vintageYear,
     bottlingYear: bottle.bottlingYear,
     releaseYear: bottle.releaseYear,
-    caskSize: bottle.caskSize,
-    caskType: bottle.caskType,
-    caskFill: bottle.caskFill,
+    caskNumber: bottle.caskNumber,
+    maturation: bottle.maturation,
+    outturn: bottle.outturn,
   };
 }
 
@@ -200,9 +200,9 @@ export async function getBottleClassifierContext(
               vintageYear: bottles.vintageYear,
               bottlingYear: bottles.bottlingYear,
               releaseYear: bottles.releaseYear,
-              caskSize: bottles.caskSize,
-              caskType: bottles.caskType,
-              caskFill: bottles.caskFill,
+              caskNumber: bottles.caskNumber,
+              maturation: bottles.maturation,
+              outturn: bottles.outturn,
             })
             .from(bottles)
             .where(

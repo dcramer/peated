@@ -20,9 +20,9 @@
       "abv": 46,
       "release_year": null,
       "vintage_year": null,
-      "cask_type": null,
-      "cask_size": null,
-      "cask_fill": null,
+      "maturation": null,
+      "cask_number": null,
+      "outturn": null,
       "cask_strength": null,
       "single_cask": null,
       "edition": "Chapter Twenty Six"

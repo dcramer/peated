@@ -20,8 +20,8 @@
       "vintage_year": null,
       "cask_strength": true,
       "single_cask": true,
-      "cask_type": "oak",
-      "cask_size": "barrel",
+      "maturation": "oak",
+      "cask_number": null,
       "edition": "Barrel No. 4769"
     },
     "imageEvidence": {

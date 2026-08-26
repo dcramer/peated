@@ -19,9 +19,9 @@ export type BottleExactIdentityInput = {
   abv: number | null;
   singleCask: boolean | null;
   caskStrength: boolean | null;
-  caskType?: string | null;
-  caskSize?: string | null;
-  caskFill?: string | null;
+  maturation?: string | null;
+  caskNumber?: string | null;
+  outturn?: number | null;
 };
 
 type BottleNameTraitsInput = Omit<BottleExactIdentityInput, "statedAge">;
@@ -42,9 +42,6 @@ const BOTTLE_EXACT_IDENTITY_FIELDS = [
   "abv",
   "singleCask",
   "caskStrength",
-  "caskType",
-  "caskSize",
-  "caskFill",
 ] as const satisfies ReadonlyArray<keyof BottleExactIdentityInput>;
 
 const BOTTLE_NAME_TRAIT_FIELDS = [
@@ -221,9 +218,9 @@ export function getResolvedBottleIdentity({
     abv: exact.abv ?? null,
     singleCask: exact.singleCask ?? null,
     caskStrength: exact.caskStrength ?? null,
-    caskType: exact.caskType ?? null,
-    caskSize: exact.caskSize ?? null,
-    caskFill: exact.caskFill ?? null,
+    maturation: exact.maturation ?? null,
+    caskNumber: exact.caskNumber ?? null,
+    outturn: exact.outturn ?? null,
   };
 }
 

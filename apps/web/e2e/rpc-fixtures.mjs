@@ -151,9 +151,9 @@ export function buildBottle({
     bottlingYear: null,
     releaseYear: null,
     releaseDate: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
+    maturation: null,
+    caskNumber: null,
+    outturn: null,
     brand,
     distillers: [brand],
     bottler: null,
@@ -218,9 +218,9 @@ export const exactSearchBottle = {
   releaseYear: 2025,
   singleCask: true,
   caskStrength: true,
-  caskFill: "1st_fill",
-  caskType: "oloroso",
-  caskSize: "hogshead",
+  outturn: 240,
+  maturation: "Oloroso hogshead",
+  caskNumber: "#5678",
 };
 
 export const anotherReleaseSourceBottle = {
@@ -268,9 +268,9 @@ export const unifiedBottleEditContext = {
     bottlingYear: null,
     releaseYear: 2023,
     releaseDate: null,
-    caskSize: "hogshead",
-    caskType: "oloroso",
-    caskFill: "1st_fill",
+    caskNumber: "#5678",
+    maturation: "Oloroso hogshead",
+    outturn: 240,
     description: "A fixture exact Bottle description.",
     descriptionSrc: null,
     imageUrl: null,
@@ -290,9 +290,9 @@ export const exactMatchedBottle = {
   singleCask: null,
   vintageYear: null,
   releaseYear: 2024,
-  caskType: null,
-  caskSize: null,
-  caskFill: null,
+  maturation: null,
+  caskNumber: null,
+  outturn: null,
   suggestedTags: [],
   avgRating: null,
   avgScore: null,
@@ -312,11 +312,11 @@ export const exactMatchedBottle = {
 /**
  * @typedef {Omit<FixtureBottle,
  *   "edition" | "statedAge" | "abv" | "singleCask" | "caskStrength" |
- *   "vintageYear" | "releaseYear" | "caskSize" | "caskType" | "caskFill" |
+ *   "vintageYear" | "releaseYear" | "caskNumber" | "maturation" | "outturn" |
  *   "imageUrl"
  * > & Pick<BottleV1,
  *   "edition" | "statedAge" | "abv" | "singleCask" | "caskStrength" |
- *   "vintageYear" | "releaseYear" | "caskSize" | "caskType" | "caskFill" |
+ *   "vintageYear" | "releaseYear" | "caskNumber" | "maturation" | "outturn" |
  *   "imageUrl"
  * >} CatalogFixtureBottle
  */
@@ -379,7 +379,7 @@ const homeBottleWithoutGroup = {
   abv: 55.8,
   singleCask: true,
   caskStrength: true,
-  caskType: "pedro_ximenez",
+  maturation: "Pedro Ximenez hogshead",
   imageUrl: "http://127.0.0.1:4999/uploads/home-bottle.png",
 };
 
@@ -424,9 +424,9 @@ export const bottleGroupRepresentative = {
   releaseYear: 2022,
   singleCask: true,
   caskStrength: true,
-  caskFill: "1st_fill",
-  caskType: "oloroso",
-  caskSize: "hogshead",
+  outturn: 240,
+  maturation: "Oloroso hogshead",
+  caskNumber: "#5678",
 };
 
 /** @type {CatalogFixtureBottle} */

@@ -346,25 +346,6 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
-  test("lists bottles with cask type filter", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Bourbon Cask",
-      caskType: "bourbon",
-    });
-    await fixtures.Bottle({
-      name: "Sherry Cask",
-      caskType: "oloroso",
-    });
-    await fixtures.Bottle({ name: "No Cask Type" });
-
-    const { results } = await routerClient.bottles.list({
-      caskType: "bourbon",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
-  });
-
   test("filters tags by direct Bottle identity", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
     const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });

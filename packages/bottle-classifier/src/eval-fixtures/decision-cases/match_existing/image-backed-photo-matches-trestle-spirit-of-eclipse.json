@@ -100,9 +100,9 @@
           "caskStrength": null,
           "vintageYear": null,
           "releaseYear": 2011,
-          "caskSize": null,
-          "caskType": null,
-          "caskFill": null
+          "caskNumber": null,
+          "maturation": null,
+          "outturn": null
         },
         "siblings": [],
         "aliases": [],

@@ -144,9 +144,9 @@ type ExactBottleCreateInput = Pick<
   | "bottlingYear"
   | "releaseYear"
   | "releaseDate"
-  | "caskSize"
-  | "caskType"
-  | "caskFill"
+  | "maturation"
+  | "caskNumber"
+  | "outturn"
   | "description"
   | "descriptionSrc"
   | "tastingNotes"
@@ -351,9 +351,9 @@ async function prepareBottleCreateInTransaction(
           abv: bottleData.abv ?? null,
           singleCask: bottleData.singleCask ?? null,
           caskStrength: bottleData.caskStrength ?? null,
-          caskType: bottleData.caskType ?? null,
-          caskSize: bottleData.caskSize ?? null,
-          caskFill: bottleData.caskFill ?? null,
+          maturation: bottleData.maturation ?? null,
+          caskNumber: bottleData.caskNumber ?? null,
+          outturn: bottleData.outturn ?? null,
         },
       })
     : null;

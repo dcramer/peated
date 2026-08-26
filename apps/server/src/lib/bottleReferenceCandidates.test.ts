@@ -33,9 +33,9 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
     name: "Warehouse Selection",
     edition: "Batch 1",
     releaseYear: 2024,
-    caskType: "bourbon",
-    caskSize: "barrel",
-    caskFill: "1st_fill",
+    maturation: "Bourbon barrel",
+    caskNumber: "#1234",
+    outturn: 240,
   });
   if (bottle.groupId === null) {
     throw new Error("Expected Bottle fixture to belong to a BottleGroup.");
@@ -45,9 +45,9 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
     groupId: bottle.groupId,
     edition: "Batch 2",
     releaseYear: 2025,
-    caskType: "oloroso",
-    caskSize: "butt",
-    caskFill: "2nd_fill",
+    maturation: "Oloroso hogshead",
+    caskNumber: "#9012",
+    outturn: 200,
   });
   const retiredSibling = await fixtures.BottleGroupMember({
     groupId: bottle.groupId,
@@ -65,9 +65,9 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
     fullName: bottle.fullName,
     edition: "Batch 1",
     releaseYear: 2024,
-    caskType: "bourbon",
-    caskSize: "barrel",
-    caskFill: "1st_fill",
+    maturation: "Bourbon barrel",
+    caskNumber: "#1234",
+    outturn: 240,
     familyContext: {
       siblingBottles: [
         expect.objectContaining({
@@ -76,13 +76,13 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
           edition: "Batch 2",
           releaseYear: 2025,
           traitFields: expect.not.arrayContaining([
-            "caskType",
-            "caskSize",
-            "caskFill",
+            "maturation",
+            "caskNumber",
+            "outturn",
           ]),
-          caskType: "oloroso",
-          caskSize: "butt",
-          caskFill: "2nd_fill",
+          maturation: "Oloroso hogshead",
+          caskNumber: "#9012",
+          outturn: 200,
         }),
       ],
     },
@@ -110,9 +110,9 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
       abv: null,
       release_year: 2024,
       vintage_year: null,
-      cask_type: "bourbon",
-      cask_size: "barrel",
-      cask_fill: "1st_fill",
+      maturation: "Bourbon barrel",
+      cask_number: "#1234",
+      outturn: 240,
       cask_strength: null,
       single_cask: null,
       edition: "Batch 1",
@@ -123,9 +123,9 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
     expect.arrayContaining([
       expect.objectContaining({
         bottleId: bottle.id,
-        caskType: "bourbon",
-        caskSize: "barrel",
-        caskFill: "1st_fill",
+        maturation: "Bourbon barrel",
+        caskNumber: "#1234",
+        outturn: 240,
       }),
     ]),
   );
@@ -162,7 +162,7 @@ test("uses the scraper credential workload for scraper candidate embeddings", as
   });
 });
 
-test("does not inject normalized cask metadata into candidate search evidence", async () => {
+test("includes maturation and cask number in candidate search evidence", async () => {
   config.AI_GATEWAY_API_KEY = "test-gateway-key";
   const embeddingSpy = createEmbeddingSpy();
   const lookup = createBottleCandidateLookup(embeddingSpy);
@@ -171,12 +171,13 @@ test("does not inject normalized cask metadata into candidate search evidence", 
     query: "Example Distillery Warehouse Selection",
     brand: "Example Distillery",
     expression: "Warehouse Selection",
-    cask_type: "tawny_port",
-    cask_size: "butt",
-    cask_fill: "2nd_fill",
+    maturation: "Tawny port butt",
+    cask_number: "#1234",
+    outturn: 240,
   });
 
   const queryText = embeddingSpy.mock.calls[0]?.[0];
   expect(queryText).toContain("Warehouse Selection");
-  expect(queryText).not.toMatch(/tawny|port|butt|fill/i);
+  expect(queryText).toContain("Tawny port butt");
+  expect(queryText).toContain("#1234");
 });

@@ -1,12 +1,5 @@
 import { z } from "zod";
-import {
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
-  CategoryEnum,
-  ContentSourceEnum,
-  FlavorProfileEnum,
-} from "./common";
+import { CategoryEnum, ContentSourceEnum, FlavorProfileEnum } from "./common";
 
 export const CATALOG_IDENTITY_SCHEMA_VERSION = 1 as const;
 
@@ -86,9 +79,9 @@ export const BottleV1Fields = {
   bottlingYear: z.number().int().gte(1800).nullable().optional(),
   releaseYear: z.number().int().gte(1800).nullable(),
   releaseDate: z.string().date().nullable(),
-  caskSize: CaskSizeEnum.nullable(),
-  caskType: CaskTypeEnum.nullable(),
-  caskFill: CaskFillEnum.nullable(),
+  maturation: z.string().nullable(),
+  caskNumber: z.string().nullable(),
+  outturn: z.number().int().positive().nullable(),
   description: z.string().nullable(),
   descriptionSrc: ContentSourceEnum.nullable(),
   imageUrl: z.string().url().nullable(),

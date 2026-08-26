@@ -24,9 +24,9 @@ const shieldaigCatalog = LocalCatalogSchema.parse({
       category: "single_malt",
       statedAge: 30,
       releaseYear: 2024,
-      caskType: "oloroso",
-      caskSize: "hogshead",
-      caskFill: "1st_fill",
+      maturation: "Oloroso hogshead",
+      caskNumber: "#1234",
+      outturn: 240,
     },
   ],
   aliases: [{ name: "Shieldaig Speyside", bottleId: 44175 }],
@@ -76,7 +76,7 @@ describe("local catalog data source", () => {
     }
   });
 
-  test("preserves canonical structured cask fields on catalog rows", () => {
+  test("preserves producer-stated cask details on catalog rows", () => {
     const result = LocalCatalogSchema.parse({
       entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
       bottles: [
@@ -84,21 +84,21 @@ describe("local catalog data source", () => {
           id: 1,
           name: "Speyside",
           brandId: 1,
-          caskType: "oloroso",
-          caskSize: "hogshead",
-          caskFill: "1st_fill",
+          maturation: "Oloroso hogshead",
+          caskNumber: "#1234",
+          outturn: 240,
         },
       ],
     });
 
     expect(result.bottles[0]).toMatchObject({
-      caskType: "oloroso",
-      caskSize: "hogshead",
-      caskFill: "1st_fill",
+      maturation: "Oloroso hogshead",
+      caskNumber: "#1234",
+      outturn: 240,
     });
   });
 
-  test("keeps optional cask metadata out of local candidate scores", async () => {
+  test("keeps cask details out of local text scores", async () => {
     const dataSource = createLocalCatalogDataSource(
       LocalCatalogSchema.parse({
         entities: [{ id: 1, name: "Example", type: ["brand"] }],
@@ -107,17 +107,17 @@ describe("local catalog data source", () => {
             id: 1,
             name: "Oloroso Cask",
             brandId: 1,
-            caskType: "oloroso",
-            caskSize: "hogshead",
-            caskFill: "1st_fill",
+            maturation: "Oloroso hogshead",
+            caskNumber: "#1234",
+            outturn: 240,
           },
           {
             id: 2,
             name: "Bourbon Cask",
             brandId: 1,
-            caskType: "bourbon",
-            caskSize: "barrel",
-            caskFill: "refill",
+            maturation: "First-fill bourbon barrel",
+            caskNumber: "#5678",
+            outturn: 180,
           },
         ],
         aliases: [],
@@ -130,9 +130,9 @@ describe("local catalog data source", () => {
     const withCaskMetadata = await dataSource.searchBottles(
       BottleCandidateSearchInputSchema.parse({
         brand: "Example",
-        cask_type: "oloroso",
-        cask_size: "hogshead",
-        cask_fill: "1st_fill",
+        maturation: "Oloroso hogshead",
+        cask_number: "#1234",
+        outturn: 240,
       }),
     );
 
@@ -142,9 +142,9 @@ describe("local catalog data source", () => {
       expect.objectContaining({
         bottleId: 1,
         score: 0.4,
-        caskType: "oloroso",
-        caskSize: "hogshead",
-        caskFill: "1st_fill",
+        maturation: "Oloroso hogshead",
+        caskNumber: "#1234",
+        outturn: 240,
       }),
     ]);
   });
@@ -169,9 +169,9 @@ describe("local catalog data source", () => {
         vintage_year: null,
         cask_strength: null,
         single_cask: null,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
+        maturation: null,
+        cask_number: null,
+        outturn: null,
         edition: null,
       },
     });
@@ -189,7 +189,7 @@ describe("local catalog data source", () => {
             fullName: "Shieldaig Speyside 30-year-old",
             statedAge: 30,
             releaseYear: 2024,
-            traitFields: ["statedAge", "releaseYear"],
+            traitFields: ["statedAge", "releaseYear", "caskNumber"],
           },
         ],
       },

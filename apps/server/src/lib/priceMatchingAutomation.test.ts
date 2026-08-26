@@ -24,9 +24,9 @@ function buildExtractedLabel(
     abv: 58.4,
     release_year: null,
     vintage_year: null,
-    cask_type: "tawny_port",
-    cask_size: null,
-    cask_fill: null,
+    maturation: "Tawny port butt",
+    cask_number: null,
+    outturn: null,
     cask_strength: null,
     single_cask: null,
     edition: null,
@@ -53,9 +53,9 @@ function buildCandidate(
     abv: 58.4,
     vintageYear: null,
     releaseYear: null,
-    caskType: "tawny_port",
-    caskSize: null,
-    caskFill: null,
+    maturation: "Tawny port butt",
+    caskNumber: null,
+    outturn: null,
     score: 0.91,
     source: ["current", "vector"],
     ...overrides,
@@ -76,9 +76,9 @@ function buildProposedBottle(
     abv: 58.4,
     vintageYear: null,
     releaseYear: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
+    maturation: null,
+    caskNumber: null,
+    outturn: null,
     brand: { id: null, name: "Example Distillery" },
     distillers: [{ id: null, name: "Example Distillery" }],
     bottler: null,
@@ -182,7 +182,7 @@ describe("priceMatchingAutomation", () => {
     expect(assessment.decisiveMatchAttributes).toContain("statedAge");
   });
 
-  test("does not use normalized cask metadata as automation evidence", () => {
+  test("does not use maturation or outturn as automation evidence", () => {
     const proposedBottle = {
       name: "Port Cask",
       series: null,
@@ -194,9 +194,9 @@ describe("priceMatchingAutomation", () => {
       abv: 58.4,
       vintageYear: null,
       releaseYear: null,
-      caskType: "tawny_port" as const,
-      caskSize: "butt" as const,
-      caskFill: "2nd_fill" as const,
+      maturation: "Tawny port butt" as const,
+      caskNumber: null,
+      outturn: 200 as const,
       brand: { id: null, name: "Example Distillery" },
       distillers: [{ id: null, name: "Example Distillery" }],
       bottler: null,
@@ -214,9 +214,9 @@ describe("priceMatchingAutomation", () => {
       searchEvidence: [],
       candidateBottles: [
         buildCandidate({
-          caskType: "bourbon",
-          caskSize: "barrel",
-          caskFill: "1st_fill",
+          maturation: "Bourbon barrel",
+          caskNumber: null,
+          outturn: 240,
         }),
       ],
     };
@@ -229,9 +229,8 @@ describe("priceMatchingAutomation", () => {
       ...input,
       proposedBottle: {
         ...proposedBottle,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        outturn: null,
       },
     });
 
@@ -245,7 +244,7 @@ describe("priceMatchingAutomation", () => {
       withoutCaskMetadata.webEvidenceChecks,
     );
     expect(withCaskMetadata.decisiveMatchAttributes).not.toEqual(
-      expect.arrayContaining(["caskType", "caskSize", "caskFill"]),
+      expect.arrayContaining(["maturation", "outturn"]),
     );
   });
 
@@ -266,7 +265,7 @@ describe("priceMatchingAutomation", () => {
         category: "single_malt",
         stated_age: 10,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: null,
       searchEvidence: [],
@@ -280,7 +279,7 @@ describe("priceMatchingAutomation", () => {
           category: "single_malt",
           statedAge: 10,
           abv: null,
-          caskType: null,
+          maturation: null,
         }),
       ],
     });
@@ -306,7 +305,7 @@ describe("priceMatchingAutomation", () => {
         category: "single_malt",
         stated_age: 12,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: null,
       searchEvidence: [],
@@ -320,7 +319,7 @@ describe("priceMatchingAutomation", () => {
           category: "single_malt",
           statedAge: 12,
           abv: null,
-          caskType: null,
+          maturation: null,
           source: ["text", "brand"],
         }),
       ],
@@ -357,7 +356,7 @@ describe("priceMatchingAutomation", () => {
         category: "rye",
         stated_age: null,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: null,
       searchEvidence: [],
@@ -371,7 +370,7 @@ describe("priceMatchingAutomation", () => {
           statedAge: null,
           caskStrength: true,
           abv: null,
-          caskType: null,
+          maturation: null,
           source: ["text", "brand"],
         }),
       ],
@@ -407,7 +406,7 @@ describe("priceMatchingAutomation", () => {
         category: "single_grain",
         stated_age: null,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: null,
       searchEvidence: [],
@@ -420,7 +419,7 @@ describe("priceMatchingAutomation", () => {
           category: "spirit",
           statedAge: null,
           abv: null,
-          caskType: null,
+          maturation: null,
           source: ["brand", "exact"],
         }),
       ],
@@ -456,7 +455,7 @@ describe("priceMatchingAutomation", () => {
         category: null,
         stated_age: null,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: {
         name: "Table Whiskey",
@@ -480,9 +479,9 @@ describe("priceMatchingAutomation", () => {
         singleCask: null,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
       },
       searchEvidence: [],
       candidateBottles: [
@@ -495,7 +494,7 @@ describe("priceMatchingAutomation", () => {
           category: "spirit",
           statedAge: null,
           abv: null,
-          caskType: null,
+          maturation: null,
           source: ["exact"],
         }),
       ],
@@ -536,7 +535,7 @@ describe("priceMatchingAutomation", () => {
         category: null,
         stated_age: null,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: {
         name: "Table Whiskey",
@@ -560,9 +559,9 @@ describe("priceMatchingAutomation", () => {
         singleCask: null,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
       },
       searchEvidence: [],
       candidateBottles: [
@@ -575,7 +574,7 @@ describe("priceMatchingAutomation", () => {
           category: "spirit",
           statedAge: null,
           abv: null,
-          caskType: null,
+          maturation: null,
           source: ["exact"],
         }),
       ],
@@ -611,7 +610,7 @@ describe("priceMatchingAutomation", () => {
         category: null,
         stated_age: null,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: {
         name: "Table Whiskey",
@@ -630,9 +629,9 @@ describe("priceMatchingAutomation", () => {
         singleCask: null,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
       },
       searchEvidence: [],
       candidateBottles: [
@@ -645,7 +644,7 @@ describe("priceMatchingAutomation", () => {
           category: "spirit",
           statedAge: null,
           abv: null,
-          caskType: null,
+          maturation: null,
           source: ["exact"],
         }),
       ],
@@ -682,7 +681,7 @@ describe("priceMatchingAutomation", () => {
         category: null,
         stated_age: null,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: null,
       searchEvidence: [],
@@ -712,7 +711,7 @@ describe("priceMatchingAutomation", () => {
       category: "single_malt",
       stated_age: null,
       abv: null,
-      cask_type: null,
+      maturation: null,
     });
     const target = buildCandidate({
       bottleId: 1760,
@@ -723,7 +722,7 @@ describe("priceMatchingAutomation", () => {
       category: "single_malt",
       statedAge: null,
       abv: null,
-      caskType: null,
+      maturation: null,
       score: 1,
       source: ["text"],
     });
@@ -811,7 +810,7 @@ describe("priceMatchingAutomation", () => {
         category: null,
         stated_age: 25,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: null,
       searchEvidence: [],
@@ -825,7 +824,7 @@ describe("priceMatchingAutomation", () => {
           category: "single_malt",
           statedAge: 25,
           abv: null,
-          caskType: null,
+          maturation: null,
         }),
         buildCandidate({
           bottleId: 1563,
@@ -836,7 +835,7 @@ describe("priceMatchingAutomation", () => {
           category: "single_malt",
           statedAge: 25,
           abv: null,
-          caskType: null,
+          maturation: null,
           score: 1,
           source: ["text"],
         }),
@@ -880,9 +879,9 @@ describe("priceMatchingAutomation", () => {
         abv: 58.4,
         vintageYear: null,
         releaseYear: null,
-        caskType: "tawny_port",
-        caskSize: null,
-        caskFill: null,
+        maturation: "Tawny port butt",
+        caskNumber: null,
+        outturn: null,
         brand: {
           id: null,
           name: "Example Distillery",
@@ -918,7 +917,7 @@ describe("priceMatchingAutomation", () => {
           bottleId: 9,
           fullName: "Example Distillery 10 Year",
           abv: 46,
-          caskType: null,
+          maturation: null,
           score: 0.87,
           source: ["vector"],
         }),
@@ -942,9 +941,9 @@ describe("priceMatchingAutomation", () => {
     expect(
       assessment.webEvidenceChecks.some(
         (check) =>
-          check.attribute === "caskType" ||
-          check.attribute === "caskSize" ||
-          check.attribute === "caskFill",
+          check.attribute === "maturation" ||
+          check.attribute === "caskNumber" ||
+          check.attribute === "outturn",
       ),
     ).toBe(false);
   });
@@ -971,9 +970,9 @@ describe("priceMatchingAutomation", () => {
         abv: 58.4,
         vintageYear: null,
         releaseYear: null,
-        caskType: "tawny_port",
-        caskSize: null,
-        caskFill: null,
+        maturation: "Tawny port butt",
+        caskNumber: null,
+        outturn: null,
         brand: {
           id: null,
           name: "Example Distillery",
@@ -1009,7 +1008,7 @@ describe("priceMatchingAutomation", () => {
           bottleId: 9,
           fullName: "Example Distillery 10 Year",
           abv: 46,
-          caskType: null,
+          maturation: null,
           score: 0.87,
           source: ["vector"],
         }),
@@ -1044,7 +1043,7 @@ describe("priceMatchingAutomation", () => {
         distillery: [],
         stated_age: null,
         abv: 48,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: buildProposedBottle({
         name: "Pedro Ximénez Select Cask",
@@ -1078,7 +1077,7 @@ describe("priceMatchingAutomation", () => {
           distillery: [],
           statedAge: null,
           abv: 46,
-          caskType: null,
+          maturation: null,
         }),
       ],
       webEvidenceJudgment: "supportive",
@@ -1111,7 +1110,7 @@ describe("priceMatchingAutomation", () => {
         category: "bourbon",
         stated_age: 12,
         abv: 50,
-        cask_type: null,
+        maturation: null,
         single_cask: true,
       }),
       proposedBottle: {
@@ -1125,9 +1124,9 @@ describe("priceMatchingAutomation", () => {
         abv: 50,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
         brand: {
           id: null,
           name: "Example Distillery",
@@ -1165,7 +1164,7 @@ describe("priceMatchingAutomation", () => {
           statedAge: 12,
           singleCask: true,
           abv: null,
-          caskType: null,
+          maturation: null,
           source: ["brand", "text"],
         }),
       ],
@@ -1194,7 +1193,7 @@ describe("priceMatchingAutomation", () => {
       suggestedBottleId: null,
       extractedLabel: buildExtractedLabel({
         abv: 35,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: {
         name: "10-year-old",
@@ -1207,9 +1206,9 @@ describe("priceMatchingAutomation", () => {
         abv: 35,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
         brand: {
           id: null,
           name: "Example Distillery",
@@ -1244,7 +1243,7 @@ describe("priceMatchingAutomation", () => {
           bottleId: 9,
           fullName: "Example Distillery 10 Year",
           abv: null,
-          caskType: null,
+          maturation: null,
           score: 0.87,
           source: ["vector"],
         }),
@@ -1277,7 +1276,7 @@ describe("priceMatchingAutomation", () => {
         category: "rye",
         stated_age: 10,
         abv: 35,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: {
         name: "Rye 10-year-old",
@@ -1290,9 +1289,9 @@ describe("priceMatchingAutomation", () => {
         abv: 35,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
         brand: {
           id: null,
           name: "Example Canadian",
@@ -1332,7 +1331,7 @@ describe("priceMatchingAutomation", () => {
           category: "rye",
           statedAge: 10,
           abv: null,
-          caskType: null,
+          maturation: null,
           score: 0.87,
           source: ["vector"],
         }),
@@ -1361,7 +1360,7 @@ describe("priceMatchingAutomation", () => {
       extractedLabel: buildExtractedLabel({
         abv: 45,
         cask_strength: true,
-        cask_type: null,
+        maturation: null,
       }),
       proposedBottle: {
         name: "Barrel Proof",
@@ -1374,9 +1373,9 @@ describe("priceMatchingAutomation", () => {
         abv: 45,
         vintageYear: null,
         releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
         brand: {
           id: null,
           name: "Example Distillery",
@@ -1413,7 +1412,7 @@ describe("priceMatchingAutomation", () => {
           fullName: "Example Distillery 10 Year",
           abv: null,
           caskStrength: null,
-          caskType: null,
+          maturation: null,
           score: 0.87,
           source: ["vector"],
         }),
@@ -1441,7 +1440,7 @@ describe("priceMatchingAutomation", () => {
         distillery: ["Wild Turkey"],
         category: "rye",
         statedAge: null,
-        caskType: null,
+        maturation: null,
         caskStrength: true,
       }),
       extractedLabel: buildExtractedLabel({
@@ -1451,7 +1450,7 @@ describe("priceMatchingAutomation", () => {
         category: "rye",
         stated_age: null,
         abv: null,
-        cask_type: null,
+        maturation: null,
       }),
       searchEvidence: [
         {
@@ -1495,7 +1494,7 @@ describe("priceMatchingAutomation", () => {
         distillery: ["Glenmorangie"],
         statedAge: 14,
         edition: "4th Edition",
-        caskType: null,
+        maturation: null,
         abv: 46,
       }),
       extractedLabel: buildExtractedLabel({
@@ -1505,7 +1504,7 @@ describe("priceMatchingAutomation", () => {
         category: "single_malt",
         stated_age: 14,
         abv: null,
-        cask_type: null,
+        maturation: null,
         edition: null,
       }),
       searchEvidence: [

@@ -3,14 +3,7 @@ import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 import { BottleSeriesInputSchema, BottleSeriesSchema } from "./bottleSeries";
 import { BottleGroupV1Schema } from "./catalogIdentity";
-import {
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
-  CategoryEnum,
-  ContentSourceEnum,
-  FlavorProfileEnum,
-} from "./common";
+import { CategoryEnum, ContentSourceEnum, FlavorProfileEnum } from "./common";
 import { EntityInputSchema, EntitySchema } from "./entities";
 
 const BottleNameSchema = z
@@ -110,15 +103,29 @@ const BottleReleaseDateSchema = z
   .nullable()
   .default(null)
   .describe("Exact date this release became available, when known");
-const BottleCaskTypeSchema = CaskTypeEnum.nullable()
+const BottleMaturationSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(1000)
+  .nullable()
   .default(null)
-  .describe("Type of cask used for maturation");
-const BottleCaskSizeSchema = CaskSizeEnum.nullable()
+  .describe("Producer-stated cask or maturation details");
+const BottleCaskNumberSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(255)
+  .nullable()
   .default(null)
-  .describe("Size of the cask used for maturation");
-const BottleCaskFillSchema = CaskFillEnum.nullable()
+  .describe("Marketed cask or barrel identifier");
+const BottleOutturnSchema = z
+  .number()
+  .int()
+  .positive()
+  .nullable()
   .default(null)
-  .describe("Fill number of the cask (1st fill, refill, etc.)");
+  .describe("Producer-stated total number of bottles in the release");
 const BottleDescriptionSchema = z
   .string()
   .nullable()
@@ -185,9 +192,9 @@ export const BottleSchema = z.object({
   releaseYear: BottleReleaseYearSchema,
   releaseDate: BottleReleaseDateSchema,
 
-  caskType: BottleCaskTypeSchema,
-  caskSize: BottleCaskSizeSchema,
-  caskFill: BottleCaskFillSchema,
+  maturation: BottleMaturationSchema,
+  caskNumber: BottleCaskNumberSchema,
+  outturn: BottleOutturnSchema,
 
   brand: EntitySchema.describe("The brand that produces this bottle"),
   distillers: z
@@ -333,9 +340,9 @@ export const BottleInputFields = {
   bottlingYear: BottleBottlingYearSchema,
   releaseYear: BottleReleaseYearSchema,
   releaseDate: BottleReleaseDateSchema,
-  caskType: BottleCaskTypeSchema,
-  caskSize: BottleCaskSizeSchema,
-  caskFill: BottleCaskFillSchema,
+  maturation: BottleMaturationSchema,
+  caskNumber: BottleCaskNumberSchema,
+  outturn: BottleOutturnSchema,
   brand: BrandChoice,
   distillers: z.array(EntityChoiceSchema).default([]).optional(),
   bottler: EntityChoiceSchema.nullable().default(null).optional(),

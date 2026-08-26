@@ -28,9 +28,9 @@ function makeBottle(
     releaseYear: 2023,
     singleCask: false,
     caskStrength: true,
-    caskFill: null,
-    caskType: null,
-    caskSize: null,
+    outturn: null,
+    maturation: null,
+    caskNumber: null,
     ...overrides,
   };
 }
@@ -263,21 +263,6 @@ describe("BottleIdentity", () => {
         }),
       ),
     ).toBe("Glenrothes - Individual Cask Release");
-  });
-
-  it("keeps cask details when a title only expresses part of the cask", () => {
-    const bottle = makeBottle({
-      caskFill: "1st_fill",
-      caskType: "bourbon",
-      caskSize: "hogshead",
-    });
-
-    expect(getMetadataExpressedByTitle(bottle, "Bourbon Cask")).not.toContain(
-      "cask-details",
-    );
-    expect(
-      getMetadataExpressedByTitle(bottle, "1st Fill Bourbon Hogshead Cask"),
-    ).toContain("cask-details");
   });
 
   it("keeps metadata-only names as the absolute headline", () => {

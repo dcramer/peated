@@ -1,6 +1,5 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import {
-  parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/bottle-classifier/smws";
@@ -120,11 +119,6 @@ export async function scrapeBottles(
 
         const abv = parseAbv(item.abv);
 
-        const [caskFill, caskType, caskSize] = item.cask_type
-          ? parseCaskType(item.cask_type)
-          : [null, null, null];
-        // "2nd fill ex-bourbon hogshead"
-
         await cb(
           {
             name,
@@ -145,9 +139,8 @@ export async function scrapeBottles(
               },
             ],
             flavorProfile,
-            caskFill,
-            caskSize,
-            caskType,
+            maturation: item.cask_type?.trim() || null,
+            caskNumber,
             singleCask: true,
           },
           {

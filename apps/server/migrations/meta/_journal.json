@@ -1681,6 +1681,13 @@
       "when": 1787768561725,
       "tag": "0239_naive_lenny_balinger",
       "breakpoints": false
+    },
+    {
+      "idx": 240,
+      "version": "7",
+      "when": 1787773130121,
+      "tag": "0240_parallel_stature",
+      "breakpoints": false
     }
   ]
 }

@@ -137,9 +137,9 @@
           "caskStrength": true,
           "vintageYear": null,
           "releaseYear": 2026,
-          "caskSize": null,
-          "caskType": null,
-          "caskFill": null
+          "caskNumber": null,
+          "maturation": null,
+          "outturn": null
         },
         "siblings": [],
         "aliases": [

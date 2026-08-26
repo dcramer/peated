@@ -1,8 +1,3 @@
-import {
-  type CaskFill,
-  type CaskSize,
-  type CaskType,
-} from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ComponentPropsWithoutRef } from "react";
 import Join from "./join";
@@ -20,9 +15,6 @@ type Props = {
       name: string;
     };
     distillers?: Distiller[];
-    caskFill?: CaskFill | null;
-    caskSize?: CaskSize | null;
-    caskType?: CaskType | null;
     flavorProfile?: string | undefined | null;
   };
 } & ComponentPropsWithoutRef<"p">;

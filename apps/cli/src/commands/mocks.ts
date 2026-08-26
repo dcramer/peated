@@ -378,9 +378,9 @@ const loadIdentityBottleVariants = async () => {
     abv: 46.7,
     singleCask: true,
     caskStrength: true,
-    caskFill: "refill",
-    caskType: "bourbon",
-    caskSize: "hogshead",
+    outturn: 180,
+    maturation: "Bourbon barrel",
+    caskNumber: "#5678",
   });
 
   const springbank = await ensureBrand("Springbank", ["brand", "distiller"]);

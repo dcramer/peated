@@ -195,7 +195,7 @@ describe("Bottle proposal tools", () => {
     expect(collector.getProposals()).toEqual([]);
   });
 
-  test("rejects cask-metadata-only Bottle updates but keeps mixed updates compatible", async () => {
+  test("records producer-stated cask details", async () => {
     const { collector, tools } = createHarness();
     const evidenceRefs = [{ kind: "bottle" as const, bottleId: 10 }];
 
@@ -203,24 +203,11 @@ describe("Bottle proposal tools", () => {
       await invoke(tools, "propose_update_bottle", {
         bottleId: 10,
         patch: {
-          caskType: "oloroso",
-          caskSize: "hogshead",
-          caskFill: "1st_fill",
+          maturation: "Oloroso hogshead",
+          caskNumber: "#1234",
+          outturn: 240,
         },
-        rationale: "Fill optional cask metadata.",
-        evidenceRefs,
-      }),
-    ).toEqual({
-      status: "rejected",
-      reason:
-        "Bottle updates cannot change only optional cask type, size, or fill metadata.",
-    });
-
-    expect(
-      await invoke(tools, "propose_update_bottle", {
-        bottleId: 10,
-        patch: { abv: 46, caskType: "oloroso" },
-        rationale: "Correct the ABV while preserving supplied cask metadata.",
+        rationale: "Copy producer-stated cask details.",
         evidenceRefs,
       }),
     ).toMatchObject({ status: "recorded", proposalIndex: 0 });
@@ -228,7 +215,11 @@ describe("Bottle proposal tools", () => {
       expect.objectContaining({
         input: {
           bottleId: 10,
-          patch: { abv: 46, caskType: "oloroso" },
+          patch: {
+            maturation: "Oloroso hogshead",
+            caskNumber: "#1234",
+            outturn: 240,
+          },
         },
       }),
     ]);

@@ -1,5 +1,4 @@
 import { formatCategoryName } from "@peated/server/lib/format";
-import { toTitleCase } from "@peated/server/lib/strings";
 import type { BottleGroupV1, BottleV1 } from "@peated/server/schemas";
 import classNames from "@peated/web/lib/classNames";
 import type { ReactNode } from "react";
@@ -14,9 +13,9 @@ export type BottleExactMetadataSource = Pick<
   | "releaseYear"
   | "singleCask"
   | "caskStrength"
-  | "caskFill"
-  | "caskType"
-  | "caskSize"
+  | "maturation"
+  | "caskNumber"
+  | "outturn"
 > & {
   bottlingYear?: BottleV1["bottlingYear"];
   releaseDate?: BottleV1["releaseDate"];
@@ -35,7 +34,9 @@ export type BottleExactMetadataKey =
   | "release"
   | "single-cask"
   | "cask-strength"
-  | "cask-details";
+  | "maturation"
+  | "cask-number"
+  | "outturn";
 
 type MetadataItem = {
   key: BottleExactMetadataKey;
@@ -95,12 +96,20 @@ export function getBottleExactMetadata(
     metadata.push({ key: "cask-strength", content: "Cask strength" });
   }
 
-  const caskDetails = [bottle.caskFill, bottle.caskType, bottle.caskSize]
-    .filter((value): value is NonNullable<typeof value> => value !== null)
-    .map(toTitleCase)
-    .join(" ");
-  if (caskDetails) {
-    metadata.push({ key: "cask-details", content: `${caskDetails} cask` });
+  if (bottle.maturation) {
+    metadata.push({ key: "maturation", content: bottle.maturation });
+  }
+  if (bottle.caskNumber) {
+    metadata.push({
+      key: "cask-number",
+      content: `Cask ${bottle.caskNumber}`,
+    });
+  }
+  if (bottle.outturn !== null) {
+    metadata.push({
+      key: "outturn",
+      content: `${bottle.outturn} bottles`,
+    });
   }
 
   const seenLabels = new Set<string>();

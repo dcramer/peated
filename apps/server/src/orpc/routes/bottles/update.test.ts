@@ -46,9 +46,9 @@ async function createGroup(
         abv: first.bottle.abv,
         singleCask: first.bottle.singleCask,
         caskStrength: first.bottle.caskStrength,
-        caskType: first.bottle.caskType,
-        caskSize: first.bottle.caskSize,
-        caskFill: first.bottle.caskFill,
+        maturation: first.bottle.maturation,
+        caskNumber: first.bottle.caskNumber,
+        outturn: first.bottle.outturn,
       },
     });
     await db

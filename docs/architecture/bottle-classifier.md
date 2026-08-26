@@ -49,14 +49,11 @@ The server uses those values to build the complete Bottle name without repeats,
 create the Bottle, and manage grouping. The classifier never selects a
 BottleGroup.
 
-`caskType`, `caskSize`, and `caskFill` are soft-deprecated classifier metadata.
-Schemas, stored context, replay data, and explicit supplied values remain
-compatible. Once candidates are retrieved, the classifier does not use them as
-explicit identity constraints or deterministic score adjustments and does not
-investigate, reject, create, suggest a change, or gate automation solely on those three
-fields.
-Marketed finish wording in the Bottle name or edition, exact cask or barrel
-codes, `singleCask`, and `caskStrength` remain identity evidence.
+`maturation` stores the producer's wording without splitting it into cask type,
+size, or fill. `caskNumber` stores a marketed cask or barrel identifier.
+`outturn` stores the producer-stated bottle count. Maturation and outturn do not
+decide identity. A marketed cask identifier, `singleCask`, and `caskStrength`
+can remain identity evidence.
 
 `bottler` is the market-facing bottler or release imprint named for the product.
 One Entity may be both Brand and bottler, or both distiller and bottler; a
@@ -551,9 +548,8 @@ calibrate; instead evals assert the code-derived automation tier
 (`expectedTier: auto | review`) computed deterministically from the decision by
 `deriveAutomationTier`, and that derivation is covered by unit tests rather than
 model-scored confidence. Encoded expected fields are required. Creation fixtures
-do not encode `caskType`, `caskSize`, or `caskFill` as classifier requirements.
-Missing unencoded optional enrichment can be tolerated; wrong required identity
-fields should fail.
+encode only the fields needed for the case. Missing unencoded optional details
+can be tolerated; wrong required identity fields should fail.
 Reference fixtures exercise the identity agent. Audit fixtures exercise the
 catalog review agent and its four Suggested Change tools. On a replay cache hit the eval
 harness does not invoke the underlying web tool, so replay does not consume the

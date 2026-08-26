@@ -61,9 +61,9 @@ test.describe("unified Bottle workflows", () => {
     expect(independentBottle.caskStrength).toBe(true);
     expect(independentBottle.vintageYear).toBe(2008);
     expect(independentBottle.releaseYear).toBe(2025);
-    expect(independentBottle.caskType).toBe("oloroso");
-    expect(independentBottle.caskFill).toBe("1st_fill");
-    expect(independentBottle.caskSize).toBe("hogshead");
+    expect(independentBottle.maturation).toBe("Oloroso hogshead");
+    expect(independentBottle.outturn).toBe(240);
+    expect(independentBottle.caskNumber).toBe("#5678");
     expect(independentBottle.description).toBeNull();
     expect(independentBottle.descriptionSrc).toBeNull();
     expect(independentBottle.tastingNotes).toBeUndefined();

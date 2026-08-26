@@ -30,9 +30,9 @@ describe("BottleHeader", () => {
       releaseYear: 2025,
       singleCask: null,
       caskStrength: true,
-      caskFill: null,
-      caskType: null,
-      caskSize: null,
+      outturn: null,
+      maturation: null,
+      caskNumber: null,
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(
@@ -66,9 +66,9 @@ describe("BottleHeader", () => {
       releaseYear: 2025,
       singleCask: null,
       caskStrength: null,
-      caskFill: null,
-      caskType: null,
-      caskSize: null,
+      outturn: null,
+      maturation: null,
+      caskNumber: null,
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(
@@ -98,9 +98,9 @@ describe("BottleHeader", () => {
       releaseYear: null,
       singleCask: true,
       caskStrength: true,
-      caskFill: null,
-      caskType: "bourbon",
-      caskSize: null,
+      outturn: null,
+      maturation: "Bourbon barrel",
+      caskNumber: null,
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(
@@ -135,9 +135,9 @@ describe("BottleHeader", () => {
       releaseYear: null,
       singleCask: false,
       caskStrength: false,
-      caskFill: null,
-      caskType: null,
-      caskSize: null,
+      outturn: null,
+      maturation: null,
+      caskNumber: null,
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(
@@ -166,9 +166,9 @@ describe("BottleHeader", () => {
       releaseYear: null,
       singleCask: false,
       caskStrength: false,
-      caskFill: null,
-      caskType: null,
-      caskSize: null,
+      outturn: null,
+      maturation: null,
+      caskNumber: null,
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(
@@ -206,9 +206,9 @@ describe("BottleHeader", () => {
       releaseYear: null,
       singleCask: false,
       caskStrength: false,
-      caskFill: null,
-      caskType: null,
-      caskSize: null,
+      outturn: null,
+      maturation: null,
+      caskNumber: null,
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(
@@ -240,9 +240,9 @@ describe("BottleHeader", () => {
       releaseYear: null,
       singleCask: true,
       caskStrength: false,
-      caskFill: null,
-      caskType: null,
-      caskSize: null,
+      outturn: null,
+      maturation: null,
+      caskNumber: null,
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(
@@ -272,9 +272,9 @@ describe("BottleHeader", () => {
       releaseYear: 2026,
       singleCask: true,
       caskStrength: true,
-      caskFill: "refill",
-      caskType: "bourbon",
-      caskSize: "hogshead",
+      outturn: 180,
+      maturation: "Bourbon barrel",
+      caskNumber: "#5678",
     } satisfies BottleHeaderBottle;
 
     const html = renderToStaticMarkup(

@@ -56,9 +56,9 @@ function serializeBottleIdentity(value: BottleLike | null) {
     vintageYear: value.vintageYear,
     bottlingYear: value.bottlingYear,
     releaseYear: value.releaseYear,
-    caskType: value.caskType,
-    caskSize: value.caskSize,
-    caskFill: value.caskFill,
+    maturation: value.maturation,
+    caskNumber: value.caskNumber,
+    outturn: value.outturn,
     imageUrl: value.imageUrl,
   };
 }
@@ -84,9 +84,9 @@ function serializeProposedBottle(value: ProposedBottleLike | null) {
     vintageYear: value.vintageYear,
     bottlingYear: value.bottlingYear,
     releaseYear: value.releaseYear,
-    caskType: value.caskType,
-    caskSize: value.caskSize,
-    caskFill: value.caskFill,
+    maturation: value.maturation,
+    caskNumber: value.caskNumber,
+    outturn: value.outturn,
   };
 }
 
@@ -162,9 +162,9 @@ export function formatPriceMatchQueueLlmExport(item: QueueItem) {
           vintageYear: candidate.vintageYear,
           bottlingYear: candidate.bottlingYear,
           releaseYear: candidate.releaseYear,
-          caskType: candidate.caskType,
-          caskSize: candidate.caskSize,
-          caskFill: candidate.caskFill,
+          maturation: candidate.maturation,
+          caskNumber: candidate.caskNumber,
+          outturn: candidate.outturn,
           score: candidate.score,
           source: candidate.source,
         })),

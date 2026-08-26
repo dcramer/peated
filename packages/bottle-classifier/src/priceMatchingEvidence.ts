@@ -363,6 +363,7 @@ function extractedLabelLooksLikePlainAgeStatement(
     !extractedLabel.expression &&
     !extractedLabel.series &&
     !extractedLabel.edition &&
+    !extractedLabel.cask_number &&
     extractedLabel.release_year === null &&
     extractedLabel.vintage_year === null &&
     extractedLabel.cask_strength === null &&
@@ -378,6 +379,7 @@ function bottleCandidateIsPlainAgeAutoVerificationTarget(
     target.abv === null &&
     target.caskStrength !== true &&
     target.singleCask !== true &&
+    target.caskNumber === null &&
     targetLooksLikePlainAgeStatementBottle(target)
   );
 }
@@ -395,6 +397,7 @@ function extractedLabelCarriesUnsupportedSpecificity({
 
   return (
     Boolean(extractedLabel.edition && !target.edition) ||
+    Boolean(extractedLabel.cask_number && !target.caskNumber) ||
     (extractedLabel.cask_strength === true && target.caskStrength === null) ||
     (extractedLabel.single_cask === true && target.singleCask === null) ||
     (extractedLabel.abv !== null && target.abv === null) ||
@@ -714,6 +717,13 @@ function buildExistingMatchSupportChecks({
   }
 
   if (
+    label?.cask_number &&
+    textsOverlap(target.caskNumber, label.cask_number)
+  ) {
+    addCheckIfPresent(checks, "caskNumber", label.cask_number, false);
+  }
+
+  if (
     label &&
     label.cask_strength !== null &&
     target.caskStrength === label.cask_strength
@@ -779,6 +789,11 @@ function buildExistingMatchSupportChecks({
   if (!extractedLabel?.edition && target.edition) {
     addCheckIfPresent(checks, "edition", target.edition, true);
     differentiatingAttributes.add("edition");
+  }
+
+  if (!extractedLabel?.cask_number && target.caskNumber) {
+    addCheckIfPresent(checks, "caskNumber", target.caskNumber, true);
+    differentiatingAttributes.add("caskNumber");
   }
 
   if (extractedLabel?.cask_strength === null && target.caskStrength) {
@@ -1055,6 +1070,7 @@ export function evaluateExistingMatchWebEvidence({
   const requiredSpecificityAttributes = differentiatingAttributes.filter(
     (attribute) =>
       attribute === "edition" ||
+      attribute === "caskNumber" ||
       attribute === "releaseYear" ||
       attribute === "vintageYear",
   );
@@ -1154,6 +1170,14 @@ export function getExistingMatchIdentityConflicts({
     !textsOverlap(target.edition, extractedLabel.edition)
   ) {
     conflicts.push("candidate edition conflicts with extracted label");
+  }
+
+  if (
+    extractedLabel.cask_number &&
+    target.caskNumber &&
+    !textsOverlap(target.caskNumber, extractedLabel.cask_number)
+  ) {
+    conflicts.push("candidate cask number conflicts with extracted label");
   }
 
   if (

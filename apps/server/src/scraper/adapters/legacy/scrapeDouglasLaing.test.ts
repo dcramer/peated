@@ -118,7 +118,7 @@ test("does not promote a disagreeing vendor or routine cask tag to identity", ()
     expression: "Independent Label Reserve",
     category: "single_malt",
     abv: 46,
-    cask_type: null,
+    maturation: null,
   });
 });
 

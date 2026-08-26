@@ -72,9 +72,9 @@ function getSiblingBottleContext({
       abv: sibling.abv,
       singleCask: sibling.singleCask,
       caskStrength: sibling.caskStrength,
-      caskType: sibling.caskType,
-      caskSize: sibling.caskSize,
-      caskFill: sibling.caskFill,
+      maturation: sibling.maturation,
+      caskNumber: sibling.caskNumber,
+      outturn: sibling.outturn,
     }));
 }
 
@@ -109,9 +109,9 @@ export function buildBottleCandidateFromCatalog({
     statedAge: bottle.statedAge,
     edition: bottle.edition,
     caskStrength: bottle.caskStrength,
-    caskType: bottle.caskType,
-    caskSize: bottle.caskSize,
-    caskFill: bottle.caskFill,
+    maturation: bottle.maturation,
+    caskNumber: bottle.caskNumber,
+    outturn: bottle.outturn,
     singleCask: bottle.singleCask,
     abv: bottle.abv,
     vintageYear: bottle.vintageYear,

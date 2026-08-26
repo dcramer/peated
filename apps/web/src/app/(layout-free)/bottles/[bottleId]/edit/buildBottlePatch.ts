@@ -46,9 +46,9 @@ export function buildBottlePatch(
   }
   if (dirtyFields.has("releaseYear")) patch.releaseYear = value.releaseYear;
   if (dirtyFields.has("releaseDate")) patch.releaseDate = value.releaseDate;
-  if (dirtyFields.has("caskSize")) patch.caskSize = value.caskSize;
-  if (dirtyFields.has("caskType")) patch.caskType = value.caskType;
-  if (dirtyFields.has("caskFill")) patch.caskFill = value.caskFill;
+  if (dirtyFields.has("caskNumber")) patch.caskNumber = value.caskNumber;
+  if (dirtyFields.has("maturation")) patch.maturation = value.maturation;
+  if (dirtyFields.has("outturn")) patch.outturn = value.outturn;
   if (dirtyFields.has("description")) {
     patch.description = value.description;
     patch.descriptionSrc = value.descriptionSrc ?? null;

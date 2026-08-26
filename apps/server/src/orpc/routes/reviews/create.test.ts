@@ -100,9 +100,9 @@ function buildCreateBottleDecision({
       abv: null,
       vintageYear: null,
       releaseYear: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
+      maturation: null,
+      caskNumber: null,
+      outturn: null,
       brand: {
         id: null,
         name: brandName,

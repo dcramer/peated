@@ -8,7 +8,6 @@ import AdvancedRatingDisplay from "./advancedRatingDisplay";
 import BottleBarcodes from "./bottleBarcodes";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution from "./bottleTagDistribution";
-import CaskDetails from "./caskDetails";
 import DefinitionList from "./definitionList";
 import Heading from "./heading";
 import Markdown from "./markdown";
@@ -201,15 +200,27 @@ export default function BottleOverview({
                     </DefinitionList.Details>
                   </>
                 )}
-              {(bottle.caskFill || bottle.caskSize || bottle.caskType) && (
+              {bottle.maturation && (
                 <>
-                  <DefinitionList.Term>Cask Details</DefinitionList.Term>
+                  <DefinitionList.Term>Maturation</DefinitionList.Term>
                   <DefinitionList.Details>
-                    <CaskDetails
-                      caskFill={bottle.caskFill}
-                      caskSize={bottle.caskSize}
-                      caskType={bottle.caskType}
-                    />
+                    {bottle.maturation}
+                  </DefinitionList.Details>
+                </>
+              )}
+              {bottle.caskNumber && (
+                <>
+                  <DefinitionList.Term>Cask Number</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.caskNumber}
+                  </DefinitionList.Details>
+                </>
+              )}
+              {bottle.outturn !== null && (
+                <>
+                  <DefinitionList.Term>Outturn</DefinitionList.Term>
+                  <DefinitionList.Details>
+                    {bottle.outturn} bottles
                   </DefinitionList.Details>
                 </>
               )}

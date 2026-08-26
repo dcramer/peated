@@ -144,9 +144,9 @@ export const BottlePatchSchema = z
     vintageYear: ProposedBottleFields.vintageYear.removeDefault().optional(),
     bottlingYear: ProposedBottleFields.bottlingYear,
     releaseYear: ProposedBottleFields.releaseYear.removeDefault().optional(),
-    caskSize: ProposedBottleFields.caskSize.removeDefault().optional(),
-    caskType: ProposedBottleFields.caskType.removeDefault().optional(),
-    caskFill: ProposedBottleFields.caskFill.removeDefault().optional(),
+    maturation: ProposedBottleFields.maturation.removeDefault().optional(),
+    caskNumber: ProposedBottleFields.caskNumber.removeDefault().optional(),
+    outturn: ProposedBottleFields.outturn.removeDefault().optional(),
   })
   .strict()
   .superRefine(requireAtLeastOneField);

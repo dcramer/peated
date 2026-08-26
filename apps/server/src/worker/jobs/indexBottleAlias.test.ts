@@ -64,7 +64,7 @@ describe("indexBottleAlias", () => {
       category: "single_malt",
       edition: "Solstice",
       statedAge: 19,
-      caskType: "oloroso",
+      maturation: "Oloroso hogshead",
       caskStrength: true,
       singleCask: true,
       vintageYear: 1998,

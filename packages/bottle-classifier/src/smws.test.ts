@@ -2,7 +2,6 @@ import { describe, expect, test } from "vitest";
 import {
   composeExactCaskCodeFromComponents,
   getCategoryFromCask,
-  parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
   parseReferenceName,
@@ -24,19 +23,6 @@ describe("smws", () => {
   test("maps SMWS flavor profile labels to canonical ids", () => {
     expect(parseFlavorProfile("Juicy Oak & Vanilla")).toBe("juicy_oak_vanilla");
     expect(parseFlavorProfile("Unknown Profile")).toBeNull();
-  });
-
-  test("parses SMWS cask details from retailer wording", () => {
-    expect(parseCaskType("2nd fill ex-bourbon hogshead")).toEqual([
-      "2nd_fill",
-      "bourbon",
-      "hogshead",
-    ]);
-    expect(parseCaskType("refill rum barrel")).toEqual([
-      "refill",
-      null,
-      "barrel",
-    ]);
   });
 
   test("maps SMWS cask codes to categories", () => {

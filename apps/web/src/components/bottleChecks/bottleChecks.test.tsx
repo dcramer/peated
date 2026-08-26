@@ -203,7 +203,7 @@ describe("Bottle Check review components", () => {
           edition: "Warehouse 1",
           abv: 52.2,
           releaseYear: 2022,
-          caskType: "bourbon",
+          maturation: "Bourbon barrel",
         },
       },
       rationale: "The release details are present on the label.",
@@ -256,9 +256,9 @@ describe("Bottle Check review components", () => {
             caskStrength: null,
             vintageYear: null,
             releaseYear: null,
-            caskSize: null,
-            caskType: null,
-            caskFill: null,
+            caskNumber: null,
+            maturation: null,
+            outturn: null,
           },
         },
         after: {
@@ -271,16 +271,16 @@ describe("Bottle Check review components", () => {
             caskStrength: null,
             vintageYear: null,
             releaseYear: 2022,
-            caskSize: null,
-            caskType: "bourbon",
-            caskFill: null,
+            caskNumber: null,
+            maturation: "Bourbon barrel",
+            outturn: null,
           },
         },
         changedFields: [
           "exact.edition",
           "exact.abv",
           "exact.releaseYear",
-          "exact.caskType",
+          "exact.maturation",
         ],
         affectedBottles: { total: 1, sampleIds: [44], truncated: false },
         entityCreations: [],
@@ -295,7 +295,7 @@ describe("Bottle Check review components", () => {
     expect(html).toContain(">Edition</span>");
     expect(html).toContain(">ABV</span>");
     expect(html).toContain(">Release year</span>");
-    expect(html).toContain(">Cask type</span>");
+    expect(html).toContain(">Maturation</span>");
     expect(html).toContain('aria-label="Exclude Edition"');
     expect(html).not.toContain("exact.edition");
   });

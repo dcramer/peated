@@ -32,9 +32,9 @@ export const PreviewBottleCard = ({
     releaseYear: data.releaseYear ?? null,
     singleCask: data.singleCask ?? null,
     caskStrength: data.caskStrength ?? null,
-    caskFill: data.caskFill ?? null,
-    caskType: data.caskType ?? null,
-    caskSize: data.caskSize ?? null,
+    outturn: data.outturn ?? null,
+    maturation: data.maturation ?? null,
+    caskNumber: data.caskNumber ?? null,
   };
   const metadataExclude = getBottleMetadataExclusions(
     exactBottle,

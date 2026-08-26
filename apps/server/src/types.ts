@@ -10,9 +10,6 @@ import type {
   BadgeSchema,
   BadgeTrackerEnum,
   BottleSchema,
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
   CategoryEnum,
   ChangeSchema,
   CollectionBottleSchema,
@@ -54,10 +51,6 @@ export type ServingStyle = z.infer<typeof ServingStyleEnum>;
 export type FlavorProfile = z.infer<typeof FlavorProfileEnum>;
 export type TagCategory = z.infer<typeof TagCategoryEnum>;
 export type Currency = z.infer<typeof CurrencyEnum>;
-export type CaskType = z.infer<typeof CaskTypeEnum>;
-export type CaskSize = z.infer<typeof CaskSizeEnum>;
-export type CaskFill = z.infer<typeof CaskFillEnum>;
-
 export type ExternalSiteType = z.infer<typeof ExternalSiteTypeEnum>;
 export type BadgeCheckType = z.infer<typeof BadgeCheckTypeEnum>;
 export type BadgeTracker = z.infer<typeof BadgeTrackerEnum>;
@@ -163,9 +156,9 @@ export type BottlePreviewResult = {
   noAgeStatement?: boolean | null;
   abv?: number | null;
   flavorProfile?: FlavorProfile | null;
-  caskSize?: CaskSize | null;
-  caskType?: CaskType | null;
-  caskFill?: CaskFill | null;
+  maturation?: string | null;
+  caskNumber?: string | null;
+  outturn?: number | null;
   caskStrength?: boolean | null;
   singleCask?: boolean | null;
   naturalColor?: boolean | null;

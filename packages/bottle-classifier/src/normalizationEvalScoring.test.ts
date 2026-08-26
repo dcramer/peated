@@ -3,35 +3,34 @@ import { describe, expect, test } from "vitest";
 import { exactBottleIdentityMatches } from "./normalizationEvalScoring";
 
 describe("Bottle normalization eval scoring", () => {
-  test("ignores compatibility cask metadata while retaining exact edition and year checks", () => {
-    const actualWithCompatibilityMetadata = {
+  test("ignores maturation and outturn while retaining edition and year checks", () => {
+    const actualWithCaskDetails = {
       edition: "Volume V Release",
       releaseYear: 2024,
       vintageYear: 2012,
-      caskType: "bourbon",
-      caskSize: "barrel",
-      caskFill: "refill",
+      maturation: "Bourbon barrel",
+      outturn: 180,
     };
 
     expect(
-      exactBottleIdentityMatches(actualWithCompatibilityMetadata, {
+      exactBottleIdentityMatches(actualWithCaskDetails, {
         edition: "Volume 5",
         releaseYear: 2024,
         vintageYear: 2012,
       }),
     ).toBe(true);
     expect(
-      exactBottleIdentityMatches(actualWithCompatibilityMetadata, {
+      exactBottleIdentityMatches(actualWithCaskDetails, {
         edition: "Volume 6",
       }),
     ).toBe(false);
     expect(
-      exactBottleIdentityMatches(actualWithCompatibilityMetadata, {
+      exactBottleIdentityMatches(actualWithCaskDetails, {
         releaseYear: 2023,
       }),
     ).toBe(false);
     expect(
-      exactBottleIdentityMatches(actualWithCompatibilityMetadata, {
+      exactBottleIdentityMatches(actualWithCaskDetails, {
         vintageYear: 2011,
       }),
     ).toBe(false);

@@ -27,9 +27,9 @@ function bottleIdentity({
     releaseYear: null,
     singleCask: false,
     caskStrength: true,
-    caskFill: null,
-    caskType: null,
-    caskSize: null,
+    outturn: null,
+    maturation: null,
+    caskNumber: null,
   };
 }
 

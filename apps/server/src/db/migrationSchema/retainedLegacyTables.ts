@@ -17,11 +17,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import {
-  CASK_FILLS,
-  CASK_SIZE_IDS,
-  CASK_TYPE_IDS,
-} from "@peated/server/constants";
 import { tsvector } from "../columns";
 import { actors } from "../schema/actors";
 import { bottles } from "../schema/bottles";
@@ -59,9 +54,9 @@ export const migrationBottleReleases = pgTable(
     singleCask: boolean("single_cask"),
     caskStrength: boolean("cask_strength"),
     statedAge: smallint("stated_age"),
-    caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
-    caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
-    caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
+    caskSize: varchar("cask_size", { length: 255 }),
+    caskType: varchar("cask_type", { length: 255 }),
+    caskFill: varchar("cask_fill", { length: 255 }),
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     imageUrl: text("image_url"),

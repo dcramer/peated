@@ -26,9 +26,9 @@
         "abv": null,
         "vintageYear": 2022,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.9161166587637639,
         "source": ["vector"]
       },
@@ -48,9 +48,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.8421260615483389,
         "source": ["vector"]
       },
@@ -70,9 +70,9 @@
         "abv": 52.2,
         "vintageYear": null,
         "releaseYear": 2022,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.8161766030188243,
         "source": ["vector"]
       },
@@ -92,9 +92,9 @@
         "abv": null,
         "vintageYear": 2023,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.815741803378666,
         "source": ["vector"]
       },
@@ -114,9 +114,9 @@
         "abv": null,
         "vintageYear": 2006,
         "releaseYear": 2022,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6850777132655053,
         "source": ["vector"]
       },
@@ -136,9 +136,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6823751657349237,
         "source": ["vector"]
       },
@@ -158,9 +158,9 @@
         "abv": null,
         "vintageYear": 2005,
         "releaseYear": 2021,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6747838302936252,
         "source": ["vector"]
       },
@@ -180,9 +180,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": 2023,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.669947682992906,
         "source": ["vector"]
       },
@@ -202,9 +202,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6665127008892554,
         "source": ["vector"]
       },
@@ -224,9 +224,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.662694498732772,
         "source": ["vector"]
       },
@@ -246,9 +246,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6621918625343984,
         "source": ["vector"]
       },
@@ -268,9 +268,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6584824391333935,
         "source": ["vector"]
       },
@@ -290,9 +290,9 @@
         "abv": 58.3,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": "oak",
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": "oak",
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6409344334563826,
         "source": ["vector"]
       },
@@ -312,9 +312,9 @@
         "abv": null,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.637908363557821,
         "source": ["vector"]
       },
@@ -334,9 +334,9 @@
         "abv": 60.4,
         "vintageYear": null,
         "releaseYear": null,
-        "caskType": "pedro_ximenez",
-        "caskSize": "hogshead",
-        "caskFill": null,
+        "maturation": "pedro ximenez",
+        "caskNumber": null,
+        "outturn": null,
         "score": 0.6365150780542769,
         "source": ["vector"]
       }
@@ -377,9 +377,9 @@
           "caskStrength": null,
           "vintageYear": 2022,
           "releaseYear": null,
-          "caskSize": null,
-          "caskType": null,
-          "caskFill": null
+          "caskNumber": null,
+          "maturation": null,
+          "outturn": null
         },
         "siblings": [
           {
@@ -393,9 +393,9 @@
               "caskStrength": null,
               "vintageYear": null,
               "releaseYear": null,
-              "caskSize": null,
-              "caskType": null,
-              "caskFill": null
+              "caskNumber": null,
+              "maturation": null,
+              "outturn": null
             }
           }
         ],
@@ -440,9 +440,9 @@
           "caskStrength": null,
           "vintageYear": null,
           "releaseYear": 2022,
-          "caskSize": null,
-          "caskType": null,
-          "caskFill": null
+          "caskNumber": null,
+          "maturation": null,
+          "outturn": null
         },
         "siblings": [
           {
@@ -456,9 +456,9 @@
               "caskStrength": null,
               "vintageYear": null,
               "releaseYear": null,
-              "caskSize": null,
-              "caskType": null,
-              "caskFill": null
+              "caskNumber": null,
+              "maturation": null,
+              "outturn": null
             }
           }
         ],
@@ -502,9 +502,9 @@
           "caskStrength": null,
           "vintageYear": null,
           "releaseYear": null,
-          "caskSize": null,
-          "caskType": null,
-          "caskFill": null
+          "caskNumber": null,
+          "maturation": null,
+          "outturn": null
         },
         "siblings": [
           {
@@ -518,9 +518,9 @@
               "caskStrength": null,
               "vintageYear": null,
               "releaseYear": 2022,
-              "caskSize": null,
-              "caskType": null,
-              "caskFill": null
+              "caskNumber": null,
+              "maturation": null,
+              "outturn": null
             }
           }
         ],

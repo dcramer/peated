@@ -13,9 +13,9 @@ const exactIdentity = {
   abv: null,
   singleCask: null,
   caskStrength: null,
-  caskType: null,
-  caskSize: null,
-  caskFill: null,
+  maturation: null,
+  caskNumber: null,
+  outturn: null,
 };
 
 test.each([
