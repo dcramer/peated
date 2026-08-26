@@ -106,7 +106,12 @@ type PreparedBottleCreate = {
 type BottleIdentityPreparation = {
   exactNormalizedFields: Pick<
     BottleCreateInput,
-    "statedAge" | "vintageYear" | "releaseYear" | "singleCask" | "caskStrength"
+    | "statedAge"
+    | "vintageYear"
+    | "bottlingYear"
+    | "releaseYear"
+    | "singleCask"
+    | "caskStrength"
   >;
   groupName: string;
   groupStatedAge: number | null;
@@ -135,6 +140,7 @@ type ExactBottleCreateInput = Pick<
   | "nonChillFiltered"
   | "maltPhenolPpm"
   | "vintageYear"
+  | "bottlingYear"
   | "releaseYear"
   | "caskSize"
   | "caskType"
@@ -334,6 +340,7 @@ async function prepareBottleCreateInTransaction(
           edition: bottleData.edition ?? null,
           statedAge: bottleData.statedAge ?? null,
           noAgeStatement: bottleData.noAgeStatement ?? null,
+          bottlingYear: bottleData.bottlingYear ?? null,
           releaseYear: bottleData.releaseYear ?? null,
           vintageYear: bottleData.vintageYear ?? null,
           abv: bottleData.abv ?? null,
@@ -594,6 +601,7 @@ export async function createBottleInTransaction(
       exactNormalizedFields: {
         statedAge: exact.statedAge,
         vintageYear: exact.vintageYear,
+        bottlingYear: exact.bottlingYear,
         releaseYear: exact.releaseYear,
         singleCask: exact.singleCask,
         caskStrength: exact.caskStrength,

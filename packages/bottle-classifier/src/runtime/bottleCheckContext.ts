@@ -52,6 +52,7 @@ export function bottleContextToCandidate(
     caskFill: context.exact.caskFill,
     abv: context.exact.abv,
     vintageYear: context.exact.vintageYear,
+    bottlingYear: context.exact.bottlingYear,
     releaseYear: context.exact.releaseYear,
     score: 1,
     source: ["context"],

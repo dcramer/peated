@@ -11,6 +11,7 @@ export type ExtractedIdentityField =
   | "abv"
   | "release_year"
   | "vintage_year"
+  | "bottling_year"
   | "cask_strength"
   | "single_cask"
   | "edition";

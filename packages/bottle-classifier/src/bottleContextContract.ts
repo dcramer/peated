@@ -86,6 +86,7 @@ export const BottleContextExactFields = {
   singleCask: ProposedBottleFields.singleCask.removeDefault(),
   caskStrength: ProposedBottleFields.caskStrength.removeDefault(),
   vintageYear: ProposedBottleFields.vintageYear.removeDefault(),
+  bottlingYear: ProposedBottleFields.bottlingYear,
   releaseYear: ProposedBottleFields.releaseYear.removeDefault(),
   caskSize: ProposedBottleFields.caskSize.removeDefault(),
   caskType: ProposedBottleFields.caskType.removeDefault(),

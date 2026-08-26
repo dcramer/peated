@@ -238,6 +238,7 @@ async function serializePhotoIdentificationClassification(
           caskSize: decision.proposedBottle.caskSize,
           caskFill: decision.proposedBottle.caskFill,
           vintageYear: decision.proposedBottle.vintageYear,
+          bottlingYear: decision.proposedBottle.bottlingYear ?? null,
           releaseYear: decision.proposedBottle.releaseYear,
           brand: {
             id: decision.proposedBottle.brand.id,
@@ -344,6 +345,7 @@ function getClassificationLogAttributes(
       statedAge: candidate.statedAge,
       abv: candidate.abv,
       vintageYear: candidate.vintageYear,
+      bottlingYear: candidate.bottlingYear,
       releaseYear: candidate.releaseYear,
       edition: candidate.edition,
     }),
@@ -397,6 +399,7 @@ function getImageEvidenceFieldAttributes(
     "statedAge",
     "abv",
     "vintageYear",
+    "bottlingYear",
     "releaseYear",
     "edition",
   ] as const) {

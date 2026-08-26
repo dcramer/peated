@@ -62,6 +62,7 @@ interface BottleFieldLabels {
 const BOTTLE_FIELD_LABELS: BottleFieldLabels = {
   "exact.edition": "Edition",
   "exact.abv": "ABV",
+  "exact.bottlingYear": "Bottling year",
   "exact.releaseYear": "Release year",
 };
 

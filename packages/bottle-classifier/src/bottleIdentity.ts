@@ -13,6 +13,7 @@ import { normalizeBottle } from "./normalize";
 export type BottleExactIdentityInput = {
   edition: string | null;
   statedAge: number | null;
+  bottlingYear?: number | null;
   releaseYear: number | null;
   vintageYear: number | null;
   abv: number | null;
@@ -214,6 +215,7 @@ export function getResolvedBottleIdentity({
     statedAge: statedAgeConflicts
       ? (exact.statedAge ?? null)
       : (bottle.statedAge ?? exact.statedAge ?? null),
+    bottlingYear: exact.bottlingYear ?? null,
     releaseYear: exact.releaseYear ?? null,
     vintageYear: exact.vintageYear ?? null,
     abv: exact.abv ?? null,

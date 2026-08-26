@@ -34,6 +34,7 @@ export const CreateBottlePrefillSchema = z.object({
   abv: z.number().min(0).max(100).nullish(),
   edition: z.string().trim().min(1).nullish(),
   vintageYear: z.number().int().gte(1800).nullish(),
+  bottlingYear: z.number().int().gte(1800).nullish(),
   releaseYear: z.number().int().gte(1800).nullish(),
   caskStrength: z.boolean().nullish(),
   singleCask: z.boolean().nullish(),
@@ -135,6 +136,11 @@ export function parseCreateBottlePrefill(
       min: 1800,
       max: currentYear,
     }),
+    bottlingYear: parseNumberParam(searchParams.get("bottlingYear"), {
+      integer: true,
+      min: 1800,
+      max: currentYear,
+    }),
     releaseYear: parseNumberParam(searchParams.get("releaseYear"), {
       integer: true,
       min: 1800,
@@ -218,6 +224,12 @@ export function getCreateBottleHref({
     parsedPrefill.vintageYear !== undefined
   ) {
     params.set("vintageYear", String(parsedPrefill.vintageYear));
+  }
+  if (
+    parsedPrefill.bottlingYear !== null &&
+    parsedPrefill.bottlingYear !== undefined
+  ) {
+    params.set("bottlingYear", String(parsedPrefill.bottlingYear));
   }
   if (
     parsedPrefill.releaseYear !== null &&

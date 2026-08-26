@@ -62,6 +62,7 @@ describe("bottleIdentity", () => {
         statedAge: 16,
         releaseYear: 2011,
         vintageYear: null,
+        bottlingYear: 2010,
         abv: 43,
         singleCask: null,
         caskStrength: null,
@@ -69,6 +70,7 @@ describe("bottleIdentity", () => {
     });
 
     expect(resolved.statedAge).toBe(16);
+    expect(resolved.bottlingYear).toBe(2010);
     expect(
       formatCanonicalBottleName({
         bottleName: "Lagavulin Distillers Edition",

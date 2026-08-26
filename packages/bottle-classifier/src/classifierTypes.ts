@@ -81,6 +81,7 @@ export const BOTTLE_EXACT_TRAIT_FIELDS = [
   "statedAge",
   "releaseYear",
   "vintageYear",
+  "bottlingYear",
   "abv",
   "singleCask",
   "caskStrength",
@@ -122,6 +123,13 @@ const BottleCandidateSiblingSchema = z
       .lte(CURRENT_YEAR)
       .nullable()
       .default(null),
+    bottlingYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .optional(),
     abv: z.number().min(0).max(100).nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
@@ -154,6 +162,9 @@ export const BottleExtractedDetailsSchema = z
     abv: z.number().nullable().default(null),
     release_year: z.number().nullable().default(null),
     vintage_year: z.number().nullable().default(null),
+    // Model and replay data can omit fields added later. Omission and null both
+    // mean that the value is unknown; server inputs store unknown values as null.
+    bottling_year: z.number().nullable().optional(),
     cask_strength: z.boolean().nullable().default(null),
     single_cask: z.boolean().nullable().default(null),
     cask_type: CaskTypeEnum.nullable().default(null),
@@ -188,6 +199,13 @@ export const BottleCandidateSchema = z
       .lte(CURRENT_YEAR)
       .nullable()
       .default(null),
+    bottlingYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(CURRENT_YEAR)
+      .nullable()
+      .optional(),
     releaseYear: z
       .number()
       .int()
@@ -302,6 +320,13 @@ export const ProposedBottleFields = {
     .lte(CURRENT_YEAR)
     .nullable()
     .default(null),
+  bottlingYear: z
+    .number()
+    .int()
+    .gte(1800)
+    .lte(CURRENT_YEAR)
+    .nullable()
+    .optional(),
   releaseYear: z
     .number()
     .int()
@@ -433,7 +458,7 @@ export const BottleCandidateSearchInputSchema = z
       .int()
       .nullable()
       .default(null)
-      .describe("Bottling or release year when explicitly stated."),
+      .describe("Marketed release year when explicitly stated."),
     currentBottleId: z
       .number()
       .nullable()

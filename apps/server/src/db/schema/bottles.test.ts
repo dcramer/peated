@@ -118,6 +118,12 @@ describe("Bottle fact constraints", () => {
     await expect(
       db
         .update(bottles)
+        .set({ bottlingYear: 1799 })
+        .where(eq(bottles.id, bottle.id)),
+    ).rejects.toThrow(/bottle_bottling_year_check/);
+    await expect(
+      db
+        .update(bottles)
         .set({ releaseYear: 1799 })
         .where(eq(bottles.id, bottle.id)),
     ).rejects.toThrow(/bottle_release_year_check/);

@@ -80,6 +80,7 @@ const bottle = {
   maltPhenolPpm: 101.4,
   noAgeStatement: null,
   vintageYear: 2004,
+  bottlingYear: null,
   releaseYear: 2025,
   caskSize: "hogshead",
   caskType: "oloroso",

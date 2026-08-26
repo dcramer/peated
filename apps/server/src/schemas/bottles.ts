@@ -81,14 +81,21 @@ const BottleVintageYearSchema = z
   .lte(new Date().getFullYear())
   .nullable()
   .default(null)
-  .describe("Distillation year for this exact marketed Bottle");
+  .describe("Year this whisky was distilled");
+const BottleBottlingYearSchema = z
+  .number()
+  .gte(1800)
+  .lte(new Date().getFullYear())
+  .nullable()
+  .default(null)
+  .describe("Year this whisky was bottled");
 const BottleReleaseYearSchema = z
   .number()
   .gte(1800)
   .lte(new Date().getFullYear())
   .nullable()
   .default(null)
-  .describe("Release year for this exact marketed Bottle");
+  .describe("Year this release became available");
 const BottleCaskTypeSchema = CaskTypeEnum.nullable()
   .default(null)
   .describe("Type of cask used for maturation");
@@ -160,6 +167,7 @@ export const BottleSchema = z.object({
   abv: BottleAbvSchema,
 
   vintageYear: BottleVintageYearSchema,
+  bottlingYear: BottleBottlingYearSchema,
   releaseYear: BottleReleaseYearSchema,
 
   caskType: BottleCaskTypeSchema,
@@ -307,6 +315,7 @@ export const BottleInputFields = {
   maltPhenolPpm: BottleMaltPhenolPpmSchema,
   abv: BottleInputAbvSchema,
   vintageYear: BottleVintageYearSchema,
+  bottlingYear: BottleBottlingYearSchema,
   releaseYear: BottleReleaseYearSchema,
   caskType: BottleCaskTypeSchema,
   caskSize: BottleCaskSizeSchema,

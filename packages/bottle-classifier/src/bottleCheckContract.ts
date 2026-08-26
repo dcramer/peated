@@ -142,6 +142,7 @@ export const BottlePatchSchema = z
         "Whether this Bottle is marketed as cask strength, barrel proof, or barrel strength. A stored `null` may be filled from product evidence.",
       ),
     vintageYear: ProposedBottleFields.vintageYear.removeDefault().optional(),
+    bottlingYear: ProposedBottleFields.bottlingYear,
     releaseYear: ProposedBottleFields.releaseYear.removeDefault().optional(),
     caskSize: ProposedBottleFields.caskSize.removeDefault().optional(),
     caskType: ProposedBottleFields.caskType.removeDefault().optional(),

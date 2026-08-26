@@ -73,6 +73,7 @@ function makeCollectionBottle(): CollectionBottle {
       statedAge: null,
       abv: 48.9,
       vintageYear: null,
+      bottlingYear: null,
       releaseYear: null,
       singleCask: false,
       caskStrength: false,

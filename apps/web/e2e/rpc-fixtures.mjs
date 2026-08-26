@@ -148,6 +148,7 @@ export function buildBottle({
     noAgeStatement: null,
     abv: null,
     vintageYear: null,
+    bottlingYear: null,
     releaseYear: null,
     caskType: null,
     caskSize: null,

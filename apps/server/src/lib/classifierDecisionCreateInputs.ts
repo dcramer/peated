@@ -44,6 +44,7 @@ export function buildBottleInputFromProposedBottle(
 ): RouteBottleInput {
   return {
     ...proposedBottle,
+    bottlingYear: proposedBottle.bottlingYear ?? null,
     series: proposedBottle.series
       ? (proposedBottle.series.id ?? {
           name: proposedBottle.series.name,

@@ -161,6 +161,7 @@ export default procedure
             nonChillFiltered: bottle.nonChillFiltered,
             maltPhenolPpm: bottle.maltPhenolPpm,
             vintageYear: bottle.vintageYear,
+            bottlingYear: bottle.bottlingYear,
             releaseYear: bottle.releaseYear,
             caskSize: bottle.caskSize,
             caskType: bottle.caskType,

@@ -71,6 +71,9 @@ export function buildPhotoEvidenceFromExtractedIdentity({
     extractedIdentity?.vintage_year
       ? `${extractedIdentity.vintage_year} vintage`
       : null,
+    extractedIdentity?.bottling_year
+      ? `bottled ${extractedIdentity.bottling_year}`
+      : null,
     extractedIdentity?.release_year
       ? `${extractedIdentity.release_year} release`
       : null,
@@ -106,6 +109,7 @@ export function buildPhotoEvidenceFromExtractedIdentity({
       statedAge: maybeField(extractedIdentity?.stated_age),
       abv: maybeField(extractedIdentity?.abv),
       vintageYear: maybeField(extractedIdentity?.vintage_year),
+      bottlingYear: maybeField(extractedIdentity?.bottling_year),
       releaseYear: maybeField(extractedIdentity?.release_year),
       edition: maybeField(extractedIdentity?.edition),
       caskStrength: maybeField(extractedIdentity?.cask_strength),

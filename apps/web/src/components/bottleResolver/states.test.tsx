@@ -42,6 +42,7 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
     statedAge: 12,
     abv: 57.2,
     vintageYear: null,
+    bottlingYear: null,
     releaseYear: 2023,
     singleCask: false,
     caskStrength: true,

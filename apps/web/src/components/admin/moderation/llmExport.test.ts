@@ -49,6 +49,7 @@ const suggestedBottle = {
   maltPhenolPpm: null,
   noAgeStatement: null,
   vintageYear: null,
+  bottlingYear: null,
   releaseYear: 2024,
   caskType: null,
   caskSize: null,

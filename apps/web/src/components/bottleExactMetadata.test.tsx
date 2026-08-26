@@ -12,6 +12,7 @@ const exactBottle = {
   noAgeStatement: null,
   abv: 55.1,
   vintageYear: 2004,
+  bottlingYear: null,
   releaseYear: 2025,
   singleCask: true,
   caskStrength: true,
@@ -34,6 +35,14 @@ describe("BottleExactMetadata", () => {
     expect(html.match(/class="inline-flex whitespace-nowrap"/g)).toHaveLength(
       8,
     );
+  });
+
+  it("shows a bottling year as Bottle details", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata bottle={{ ...exactBottle, bottlingYear: 2020 }} />,
+    );
+
+    expect(html.replace(/<[^>]*>/g, "")).toContain("Bottled 2020");
   });
 
   it("renders an edition summary without duplicate keys", () => {

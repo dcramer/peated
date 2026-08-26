@@ -235,6 +235,7 @@ function collectChangedBottleFields(
     "singleCask",
     "caskStrength",
     "vintageYear",
+    "bottlingYear",
     "releaseYear",
     "caskSize",
     "caskType",

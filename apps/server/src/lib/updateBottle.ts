@@ -84,6 +84,7 @@ type ExactPatch = Partial<
     | "nonChillFiltered"
     | "maltPhenolPpm"
     | "vintageYear"
+    | "bottlingYear"
     | "releaseYear"
     | "caskSize"
     | "caskType"
@@ -189,6 +190,7 @@ type DesiredBottle = Pick<
   | "nonChillFiltered"
   | "maltPhenolPpm"
   | "vintageYear"
+  | "bottlingYear"
   | "releaseYear"
   | "caskSize"
   | "caskType"
@@ -414,6 +416,7 @@ export function bottleStoragePatch(
   }
   if ("maltPhenolPpm" in input) exact.maltPhenolPpm = input.maltPhenolPpm;
   if ("vintageYear" in input) exact.vintageYear = input.vintageYear;
+  if ("bottlingYear" in input) exact.bottlingYear = input.bottlingYear;
   if ("releaseYear" in input) exact.releaseYear = input.releaseYear;
   if ("caskSize" in input) exact.caskSize = input.caskSize;
   if ("caskType" in input) exact.caskType = input.caskType;
@@ -463,6 +466,7 @@ const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
   "edition",
   "statedAge",
   "noAgeStatement",
+  "bottlingYear",
   "releaseYear",
   "vintageYear",
   "abv",
@@ -485,6 +489,7 @@ const generatedDetailsIdentityKeys = [
   "singleCask",
   "caskStrength",
   "vintageYear",
+  "bottlingYear",
   "releaseYear",
 ] as const satisfies ReadonlyArray<keyof DesiredBottle>;
 
@@ -621,6 +626,7 @@ function desiredBottleFor({
       bottle.maltPhenolPpm,
     ),
     vintageYear: exact.vintageYear,
+    bottlingYear: exact.bottlingYear ?? null,
     releaseYear: exact.releaseYear,
     caskSize: exact.caskSize,
     caskType: exact.caskType,
@@ -655,6 +661,7 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "nonChillFiltered",
   "maltPhenolPpm",
   "vintageYear",
+  "bottlingYear",
   "releaseYear",
   "caskSize",
   "caskType",

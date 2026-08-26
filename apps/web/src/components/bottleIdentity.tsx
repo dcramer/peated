@@ -28,6 +28,7 @@ export type BottleIdentitySource = Pick<
   | "caskType"
   | "caskSize"
 > & {
+  bottlingYear?: Bottle["bottlingYear"];
   noAgeStatement?: Bottle["noAgeStatement"];
   brand: Pick<Bottle["brand"], "id" | "name" | "shortName">;
   series: Pick<NonNullable<Bottle["series"]>, "id" | "name"> | null;
@@ -132,6 +133,13 @@ function getEditionMetadataDuplicates(
     duplicates.push("vintage");
   }
   if (
+    bottle.bottlingYear != null &&
+    edition.includes(String(bottle.bottlingYear)) &&
+    edition.includes("bottled")
+  ) {
+    duplicates.push("bottling");
+  }
+  if (
     bottle.releaseYear !== null &&
     edition.includes(String(bottle.releaseYear)) &&
     edition.includes("release")
@@ -162,6 +170,7 @@ export function getMetadataExpressedByTitle(
     | "noAgeStatement"
     | "abv"
     | "vintageYear"
+    | "bottlingYear"
     | "releaseYear"
     | "singleCask"
     | "caskStrength"
@@ -207,6 +216,13 @@ export function getMetadataExpressedByTitle(
     normalizedTitle.includes("vintage")
   ) {
     duplicates.push("vintage");
+  }
+  if (
+    bottle.bottlingYear != null &&
+    normalizedTitle.includes(String(bottle.bottlingYear)) &&
+    normalizedTitle.includes("bottled")
+  ) {
+    duplicates.push("bottling");
   }
   if (
     bottle.releaseYear !== null &&

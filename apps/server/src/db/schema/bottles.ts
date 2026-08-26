@@ -191,6 +191,7 @@ export const bottles = pgTable(
     nonChillFiltered: boolean("non_chill_filtered"),
     maltPhenolPpm: doublePrecision("malt_phenol_ppm"),
     vintageYear: smallint("vintage_year"),
+    bottlingYear: smallint("bottling_year"),
     releaseYear: smallint("release_year"),
     caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
@@ -263,6 +264,10 @@ export const bottles = pgTable(
     check(
       "bottle_vintage_year_check",
       sql`${table.vintageYear} IS NULL OR ${table.vintageYear} >= 1800`,
+    ),
+    check(
+      "bottle_bottling_year_check",
+      sql`${table.bottlingYear} IS NULL OR ${table.bottlingYear} >= 1800`,
     ),
     check(
       "bottle_release_year_check",

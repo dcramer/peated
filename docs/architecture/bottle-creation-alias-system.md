@@ -63,10 +63,11 @@ unresolved.
 ### Stable And Exact Bottle Fields
 
 The Bottle name stores the stable marketed expression relative to its brand.
-Structured exact-Bottle fields store edition, release year, vintage year,
-effective stated age, ABV, single-cask and cask-strength flags, and canonical
-cask traits. Canonical creation materializes those values into the Bottle's
-complete display name without duplicating exact markers.
+Bottle fields store edition, distillation year, bottling year, release year,
+effective stated age, ABV, single-cask and cask-strength flags, and cask
+details. Bottle creation includes fields that identify the release in its
+complete display name without repeating them. Bottling year is only a detail
+unless the producer markets that bottling as a separate release.
 
 A Bottle is the durable exact record. Shared BottleGroup values are copied into
 every member Bottle so exact reads remain independently correct. A shared group

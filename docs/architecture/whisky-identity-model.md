@@ -74,7 +74,7 @@ exact identity and additionally owns:
 
 - its complete marketed `name` and `fullName`;
 - edition or batch;
-- release and vintage years;
+- distillation, bottling, and release years;
 - effective stated age;
 - ABV, single-cask, and cask-strength flags;
 - a confirmed no-age-statement fact;
@@ -182,11 +182,13 @@ authority.
   `2024 Release`, or `S2B13`. Preserve its descriptor words. A printed batch or
   lot code is not an edition when the producer sells one ongoing product
   without batch-specific marketing.
-- `vintageYear` is the distillation year. `releaseYear` is the bottling or
-  marketed release year. A bare year is ambiguous until source evidence gives
-  it meaning.
-- Do not infer `statedAge` from vintage and release years unless the source
-  states the age.
+- `vintageYear` is the distillation year. `bottlingYear` is the year the whisky
+  was bottled. `releaseYear` is the year the marketed release became available.
+  A bare year is ambiguous until source evidence gives it meaning.
+- A different `bottlingYear` does not prove that it is a different Bottle.
+  Create a separate Bottle for that year only when the producer markets the
+  bottling as a separate release.
+- Do not infer `statedAge` from year fields unless the source states the age.
 
 Brand identity is not a longest-prefix match. Distillery, bottler, owner,
 importer, and parent-company names may appear in source text without becoming
