@@ -4761,8 +4761,8 @@ describe("priceMatching", () => {
       category: "single_malt",
       stated_age: null,
       abv: 59.2,
-      maturation: null,
-      cask_number: "port_pipe",
+      maturation: "Port pipe",
+      cask_number: "#1234",
       outturn: 240,
       cask_strength: true,
       single_cask: true,
@@ -4785,11 +4785,11 @@ describe("priceMatching", () => {
     expect(getOpenAIEmbedding).toHaveBeenCalledWith(
       expect.stringContaining("Campbeltown Merchant"),
     );
-    expect(getOpenAIEmbedding).not.toHaveBeenCalledWith(
-      expect.stringContaining("port_pipe"),
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("Port pipe"),
     );
-    expect(getOpenAIEmbedding).not.toHaveBeenCalledWith(
-      expect.stringContaining("1st_fill"),
+    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+      expect.stringContaining("#1234"),
     );
     expect(getOpenAIEmbedding).toHaveBeenCalledWith(
       expect.stringContaining("cask strength"),
