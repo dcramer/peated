@@ -9,6 +9,7 @@ import {
   entities,
   entityAliases,
   entityEvents,
+  entityFollows,
   entityTombstones,
 } from "@peated/server/db/schema";
 import {
@@ -579,6 +580,23 @@ async function performEntityMerge({
       .update(entityAliases)
       .set({ entityId: toEntity.id })
       .where(inArray(entityAliases.entityId, fromEntityIds));
+
+    // An Entity merge keeps each user's follow on the surviving Entity.
+    await tx
+      .insert(entityFollows)
+      .select(
+        tx
+          .select({
+            userId: entityFollows.userId,
+            entityId: sql<number>`${toEntity.id}`.as("entity_id"),
+            createdAt: entityFollows.createdAt,
+          })
+          .from(entityFollows)
+          .where(inArray(entityFollows.entityId, fromEntityIds)),
+      )
+      .onConflictDoNothing({
+        target: [entityFollows.userId, entityFollows.entityId],
+      });
 
     const mergedEntityIdList = Array.from(mergedEntityIds);
     // Remove acquisitions that would say an owner acquired itself.
