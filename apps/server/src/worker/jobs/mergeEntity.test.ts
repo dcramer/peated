@@ -14,6 +14,7 @@ import {
   entities,
   entityAliases,
   entityEvents,
+  entityFollows,
   entityTombstones,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -705,6 +706,35 @@ test("merge A from B", async ({ fixtures }) => {
     .from(entityTombstones)
     .where(eq(entityTombstones.entityId, entityB.id));
   expect(tombstone.newEntityId).toEqual(newEntityA.id);
+});
+
+test("moves followers to the destination Entity", async ({ fixtures }) => {
+  const source = await fixtures.Entity();
+  const destination = await fixtures.Entity();
+  const sourceFollower = await fixtures.User();
+  const sharedFollower = await fixtures.User();
+  await db.insert(entityFollows).values([
+    { userId: sourceFollower.id, entityId: source.id },
+    { userId: sharedFollower.id, entityId: source.id },
+    { userId: sharedFollower.id, entityId: destination.id },
+  ]);
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const follows = await db
+    .select({
+      userId: entityFollows.userId,
+      entityId: entityFollows.entityId,
+    })
+    .from(entityFollows)
+    .orderBy(entityFollows.userId);
+  expect(follows).toEqual([
+    { userId: sourceFollower.id, entityId: destination.id },
+    { userId: sharedFollower.id, entityId: destination.id },
+  ]);
 });
 
 test("preserves the disjoint Entity role union shown in the merge preview", async ({

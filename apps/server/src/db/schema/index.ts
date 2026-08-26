@@ -8,6 +8,7 @@ export * from "./comments";
 export * from "./countries";
 export * from "./entities";
 export * from "./entityEvents";
+export * from "./entityFollows";
 export * from "./enums";
 export * from "./events";
 export * from "./externalReviewSources";
