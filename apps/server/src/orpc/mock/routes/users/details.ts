@@ -1,16 +1,23 @@
 import { implement } from "@orpc/server";
+import type { MockContext } from "@peated/server/orpc/mock/context";
 import { mockUserDetails } from "@peated/server/orpc/mock/fixtures";
 import details from "@peated/server/orpc/routes/users/details";
 
-export default implement(details).handler(async ({ input, errors }) => {
-  const matches =
-    input.user === "me" ||
-    input.user === mockUserDetails.id ||
-    input.user === mockUserDetails.username;
+export default implement(details)
+  .$context<MockContext>()
+  .handler(async ({ input, context, errors }) => {
+    if (input.user === "me" && !context.user) {
+      throw errors.UNAUTHORIZED();
+    }
 
-  if (!matches) {
-    throw errors.NOT_FOUND({ message: "Mock user not found." });
-  }
+    const matches =
+      input.user === "me" ||
+      input.user === mockUserDetails.id ||
+      input.user === mockUserDetails.username;
 
-  return mockUserDetails;
-});
+    if (!matches) {
+      throw errors.NOT_FOUND({ message: "Mock user not found." });
+    }
+
+    return mockUserDetails;
+  });

@@ -1,27 +1,32 @@
 import { createRouterClient } from "@orpc/server";
-import { mockBottle, mockUser } from "./fixtures";
+import { mockAccessToken, mockBottle, mockUser } from "./fixtures";
 import { mockRouter } from "./router";
 
-const client = createRouterClient(mockRouter, { context: {} });
+const anonymousClient = createRouterClient(mockRouter, {
+  context: { user: null },
+});
+const authenticatedClient = createRouterClient(mockRouter, {
+  context: { user: mockUser },
+});
 
 describe("mock oRPC router", () => {
   it("returns fixture data from supported routes", async () => {
-    await expect(client.root()).resolves.toEqual({ version: "mock" });
+    await expect(anonymousClient.root()).resolves.toEqual({ version: "mock" });
 
-    await expect(client.activity.list({})).resolves.toEqual({
+    await expect(anonymousClient.activity.list({})).resolves.toEqual({
       results: [],
       rel: { nextCursor: null, prevCursor: null },
     });
 
-    const bottles = await client.bottles.list({ query: "Lagavulin" });
+    const bottles = await anonymousClient.bottles.list({ query: "Lagavulin" });
     expect(bottles.results).toEqual([mockBottle]);
 
-    const user = await client.users.details({ user: "me" });
+    const user = await authenticatedClient.users.details({ user: "me" });
     expect(user.id).toBe(mockUser.id);
   });
 
   it("returns no results when the fixed data does not match", async () => {
-    const results = await client.search({
+    const results = await anonymousClient.search({
       query: "Ardbeg",
       include: ["bottles", "entities", "users"],
     });
@@ -29,9 +34,30 @@ describe("mock oRPC router", () => {
     expect(results).toEqual({ query: "Ardbeg", results: [] });
   });
 
+  it("shows user search results only after sign-in", async () => {
+    await expect(
+      anonymousClient.search({
+        query: mockUser.username,
+        include: ["users"],
+      }),
+    ).resolves.toEqual({
+      query: mockUser.username,
+      results: [],
+    });
+    await expect(
+      authenticatedClient.search({
+        query: mockUser.username,
+        include: ["users"],
+      }),
+    ).resolves.toEqual({
+      query: mockUser.username,
+      results: [{ type: "user", ref: mockUser }],
+    });
+  });
+
   it("returns the route's not-found error for unknown records", async () => {
     await expect(
-      client.bottles.details({ bottle: 9999 }),
+      anonymousClient.bottles.details({ bottle: 9999 }),
     ).rejects.toMatchObject({
       code: "NOT_FOUND",
       message: "Mock bottle not found.",
@@ -39,14 +65,14 @@ describe("mock oRPC router", () => {
   });
 
   it("signs in without saving anything", async () => {
-    const result = await client.auth.login({
+    const result = await anonymousClient.auth.login({
       email: "qa@example.com",
       password: "anything",
     });
 
     expect(result).toEqual({
       user: mockUser,
-      accessToken: "peated-mock-access-token",
+      accessToken: mockAccessToken,
     });
   });
 });

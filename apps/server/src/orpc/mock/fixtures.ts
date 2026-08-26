@@ -6,6 +6,8 @@ type User = Outputs["auth"]["login"]["user"];
 
 const timestamp = "2026-08-26T12:00:00.000Z";
 
+export const mockAccessToken = "peated-mock-access-token";
+
 export const mockUser = {
   id: 9101,
   username: "mock-user",
