@@ -1,14 +1,11 @@
-import { implement } from "@orpc/server";
-import type { MockContext } from "@peated/server/orpc/mock/context";
 import {
   mockUserDetails,
   mockUserDetailsFor,
 } from "@peated/server/orpc/mock/fixtures";
-import details from "@peated/server/orpc/routes/users/details";
+import { mockOS } from "@peated/server/orpc/mock/implementer";
 
-export default implement(details)
-  .$context<MockContext>()
-  .handler(async ({ input, context, errors }) => {
+export default mockOS.users.details.handler(
+  async ({ input, context, errors }) => {
     if (input.user === "me" && !context.user) {
       throw errors.UNAUTHORIZED();
     }
@@ -23,4 +20,5 @@ export default implement(details)
     }
 
     return mockUserDetailsFor(context.user);
-  });
+  },
+);

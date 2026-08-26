@@ -1,15 +1,12 @@
-import { implement } from "@orpc/server";
-import type { MockContext } from "@peated/server/orpc/mock/context";
 import {
   includesQuery,
   mockBottleFor,
   noMorePages,
 } from "@peated/server/orpc/mock/fixtures";
-import list from "@peated/server/orpc/routes/bottles/list";
+import { mockOS } from "@peated/server/orpc/mock/implementer";
 
-export default implement(list)
-  .$context<MockContext>()
-  .handler(async ({ input, context, errors }) => {
+export default mockOS.bottles.list.handler(
+  async ({ input, context, errors }) => {
     if (input.filter === "following" && !context.user) {
       throw errors.UNAUTHORIZED();
     }
@@ -22,4 +19,5 @@ export default implement(list)
       rel: noMorePages,
       followedDistillerCount: input.filter === "following" ? 1 : null,
     };
-  });
+  },
+);

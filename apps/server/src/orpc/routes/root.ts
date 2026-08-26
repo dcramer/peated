@@ -1,23 +1,12 @@
+import { implement } from "@orpc/server";
+import sentryMiddleware from "@peated/orpc/server/middleware";
 import config from "@peated/server/config";
-import { procedure } from "@peated/server/orpc";
-import { z } from "zod";
+import type { Context } from "@peated/server/orpc/context";
+import rootContract from "@peated/server/orpc/contracts/root";
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/",
-    summary: "API root",
-    description: "Get basic API information including version",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "getRoot",
-    }),
-  })
-  .output(
-    z.object({
-      version: z.string(),
-    }),
-  )
+export default implement(rootContract)
+  .$context<Context>()
+  .use(sentryMiddleware())
   .handler(async function () {
     return {
       version: config.VERSION,

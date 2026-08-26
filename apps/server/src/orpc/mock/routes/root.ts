@@ -1,6 +1,5 @@
-import { implement } from "@orpc/server";
-import root from "@peated/server/orpc/routes/root";
+import { mockOS } from "@peated/server/orpc/mock/implementer";
 
-export default implement(root).handler(async () => ({
+export default mockOS.root.handler(async () => ({
   version: "mock",
 }));

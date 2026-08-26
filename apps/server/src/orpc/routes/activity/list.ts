@@ -1,3 +1,5 @@
+import { implement } from "@orpc/server";
+import sentryMiddleware from "@peated/orpc/server/middleware";
 import { db } from "@peated/server/db";
 import {
   collectionBottles,
@@ -17,11 +19,10 @@ import {
   serializeTastingSessionEntries,
   type CollectionAddGroup,
 } from "@peated/server/lib/activityFeed";
-import { procedure } from "@peated/server/orpc";
-import { ActivityListResponseSchema } from "@peated/server/schemas";
+import type { Context } from "@peated/server/orpc/context";
+import activityListContract from "@peated/server/orpc/contracts/activity/list";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq, lte, or, sql } from "drizzle-orm";
-import { z } from "zod";
 
 // Main activity is read-time composition over authoritative source tables. The
 // route owns visibility filtering; shared helpers own entry shaping/throttling.
@@ -69,34 +70,9 @@ function visibleActivityUserCondition({
   return or(...visibleUsers)!;
 }
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/activity",
-    summary: "List activity",
-    description:
-      "Retrieve mixed activity with tastings and grouped collection additions",
-    operationId: "listActivity",
-  })
-  .input(
-    z
-      .object({
-        filter: z.enum(["global", "friends", "local"]).default("global"),
-        cursor: z
-          .string()
-          .max(64)
-          .refine((value) => parseActivityCursor(value) !== null, {
-            message: "Invalid activity cursor.",
-          })
-          .optional(),
-        limit: z.coerce.number().gte(1).lte(100).default(10),
-      })
-      .default({
-        filter: "global",
-        limit: 10,
-      }),
-  )
-  .output(ActivityListResponseSchema)
+export default implement(activityListContract)
+  .$context<Context>()
+  .use(sentryMiddleware())
   .handler(async function ({ input, context, errors }) {
     if (input.filter === "friends" && !context.user) {
       throw errors.UNAUTHORIZED();

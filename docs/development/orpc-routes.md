@@ -4,12 +4,14 @@ This document defines conventions for implementing API endpoints with `@orpc/ser
 
 ## 1. Directory Layout and Imports
 
-| Path                              | Purpose                                      |
-| --------------------------------- | -------------------------------------------- |
-| `apps/server/src/orpc/routes`     | Single source of truth for route definitions |
-| `apps/server/src/orpc/middleware` | Shared middleware such as `requireAuth`      |
-| `apps/server/src/schemas`         | Zod schemas                                  |
-| `apps/server/src/serializers`     | Serialization helpers                        |
+| Path                               | Purpose                                         |
+| ---------------------------------- | ----------------------------------------------- |
+| `apps/server/src/orpc/contracts`   | Pure contracts shared by multiple handlers      |
+| `apps/server/src/orpc/routes`      | Production handlers                             |
+| `apps/server/src/orpc/mock/routes` | Stateless mock handlers for supported contracts |
+| `apps/server/src/orpc/middleware`  | Shared middleware such as `requireAuth`         |
+| `apps/server/src/schemas`          | Zod schemas                                     |
+| `apps/server/src/serializers`      | Serialization helpers                           |
 
 ### Import Policy
 
@@ -57,6 +59,35 @@ export default base.tag("tastings").router({
 Top-level `routes/index.ts` composes routers eagerly. Do not use lazy imports.
 
 ## 3. Procedure Definition Pattern
+
+Most routes define their contract and handler in one procedure. Use the shared
+contract pattern when an operation also has a mock handler. Keep shared
+contracts free of database, configuration, SDK, and handler imports.
+
+```ts
+// contracts/bottles/list.ts
+export default contract
+  .route({ method: "GET", path: "/bottles" })
+  .input(BottleListInputSchema)
+  .output(BottleListOutputSchema);
+
+// routes/bottles/list.ts
+export default implement(bottleListContract)
+  .$context<Context>()
+  .use(sentryMiddleware())
+  .handler(async ({ input, context }) => {
+    // Production behavior.
+  });
+```
+
+The mock API composes its supported contracts into one tree. Mock handlers use
+paths from one implementer, such as `mockOS.bottles.list`. Assemble the final
+mock router with `mockOS.router(...)`. This checks route names, nesting, input,
+output, and errors. Routes outside that tree return 404 from the mock server.
+
+Do not import production handlers from mock code.
+
+### Implementation-First Routes
 
 Chain route definitions in this order:
 

@@ -1,3 +1,5 @@
+import { implement } from "@orpc/server";
+import sentryMiddleware from "@peated/orpc/server/middleware";
 import { db } from "@peated/server/db";
 import {
   bottleBarcodes,
@@ -6,48 +8,16 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
-import { procedure } from "@peated/server/orpc";
-import {
-  BottleBarcodeSchema,
-  BottleSchema,
-  StorePriceSchema,
-  detailsResponse,
-} from "@peated/server/schemas";
+import type { Context } from "@peated/server/orpc/context";
+import bottleDetailsContract from "@peated/server/orpc/contracts/bottles/details";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
 import { and, asc, desc, eq, getTableColumns, sql } from "drizzle-orm";
-import { z } from "zod";
 
-// Compose details as Bottle schema + extra fields to allow OpenAPI $ref via allOf
-const OutputSchema = z.intersection(
-  BottleSchema,
-  z.object({
-    barcodes: z
-      .array(BottleBarcodeSchema.pick({ value: true, volume: true }))
-      .readonly()
-      .describe("Product barcodes for this Bottle"),
-    people: z.number(),
-    lastPrice: StorePriceSchema.nullable(),
-  }),
-);
-
-export default procedure
-  .route({
-    method: "GET",
-    path: "/bottles/{bottle}",
-    summary: "Get bottle details",
-    description:
-      "Retrieve Bottle details, including product barcodes, pricing, and tasting statistics",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "getBottle",
-    }),
-  })
-  .input(z.object({ bottle: z.coerce.number() }))
-  // TODO(response-envelope): switch to wrapping the details payload as
-  // { data: ... } by updating detailsResponse() when we migrate envelopes.
-  .output(detailsResponse(OutputSchema))
+export default implement(bottleDetailsContract)
+  .$context<Context>()
+  .use(sentryMiddleware())
   .handler(async function ({ input, context, errors }) {
     const { bottle: bottleId } = input;
 

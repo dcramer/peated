@@ -1,8 +1,8 @@
-import type { Outputs } from "@peated/server/orpc/router";
+import type { MockOutputs } from "./contract";
 
-type Bottle = Outputs["bottles"]["list"]["results"][number];
-type Entity = Outputs["entities"]["list"]["results"][number];
-type User = Outputs["auth"]["login"]["user"];
+type Bottle = MockOutputs["bottles"]["list"]["results"][number];
+type Entity = MockOutputs["entities"]["list"]["results"][number];
+type User = MockOutputs["auth"]["login"]["user"];
 
 const timestamp = "2026-08-26T12:00:00.000Z";
 
@@ -37,7 +37,7 @@ export const mockUserDetails = {
     },
     contributions: 7,
   },
-} satisfies Outputs["users"]["details"];
+} satisfies MockOutputs["users"]["details"];
 
 export const mockPublicUser = {
   id: mockUser.id,
@@ -50,7 +50,7 @@ export const mockPublicUser = {
 export const mockPublicUserDetails = {
   ...mockPublicUser,
   stats: mockUserDetails.stats,
-} satisfies Outputs["users"]["details"];
+} satisfies MockOutputs["users"]["details"];
 
 export function mockUserDetailsFor(user: User | null) {
   return user ? mockUserDetails : mockPublicUserDetails;
@@ -153,11 +153,11 @@ export const mockBottleDetails = {
   barcodes: [{ value: "5000281016290", volume: 700 }],
   people: 96,
   lastPrice: null,
-} satisfies Outputs["bottles"]["details"];
+} satisfies MockOutputs["bottles"]["details"];
 
 export function mockBottleDetailsFor(
   user: User | null,
-): Outputs["bottles"]["details"] {
+): MockOutputs["bottles"]["details"] {
   return {
     ...mockBottleDetails,
     ...mockBottleFor(user),

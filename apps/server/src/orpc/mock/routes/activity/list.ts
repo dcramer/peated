@@ -1,7 +1,6 @@
-import { implement } from "@orpc/server";
-import list from "@peated/server/orpc/routes/activity/list";
+import { mockOS } from "@peated/server/orpc/mock/implementer";
 
-export default implement(list).handler(async () => ({
+export default mockOS.activity.list.handler(async () => ({
   results: [],
   rel: {
     nextCursor: null,

@@ -1,8 +1,7 @@
-import { implement } from "@orpc/server";
 import { mockAccessToken, mockUser } from "@peated/server/orpc/mock/fixtures";
-import login from "@peated/server/orpc/routes/auth/login";
+import { mockOS } from "@peated/server/orpc/mock/implementer";
 
-export default implement(login).handler(async () => ({
+export default mockOS.auth.login.handler(async () => ({
   user: mockUser,
   accessToken: mockAccessToken,
 }));

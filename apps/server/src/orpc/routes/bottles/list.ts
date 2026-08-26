@@ -1,4 +1,5 @@
-import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
+import { implement } from "@orpc/server";
+import sentryMiddleware from "@peated/orpc/server/middleware";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -15,8 +16,8 @@ import {
   plainTextSearchQuery,
   prefixTextSearchQuery,
 } from "@peated/server/lib/search";
-import { procedure } from "@peated/server/orpc";
-import { BottleSchema, listResponse } from "@peated/server/schemas";
+import type { Context } from "@peated/server/orpc/context";
+import bottleListContract from "@peated/server/orpc/contracts/bottles/list";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { SQL } from "drizzle-orm";
@@ -31,71 +32,10 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import { z } from "zod";
 
-const DEFAULT_SORT = "-tastings";
-
-const OutputSchema = listResponse(BottleSchema).extend({
-  followedDistillerCount: z.number().int().nonnegative().nullable(),
-});
-
-const SORT_OPTIONS = [
-  "rank",
-  "brand",
-  "created",
-  "name",
-  "age",
-  "rating",
-  "score",
-  "tastings",
-  "-created",
-  "-name",
-  "-age",
-  "-rating",
-  "-release",
-  "-score",
-  "-tastings",
-] as const;
-
-export default procedure
-  .route({
-    method: "GET",
-    path: "/bottles",
-    summary: "List bottles",
-    description:
-      "Search and filter bottles, including releases from distillers the current user follows",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "listBottles",
-    }),
-  })
-  .input(
-    z.object({
-      query: z.coerce
-        .string()
-        .default("")
-        .describe("Plain-text search; operator syntax is not supported."),
-      brand: z.coerce.number().nullish(),
-      distiller: z.coerce.number().nullish(),
-      bottler: z.coerce.number().nullish(),
-      entity: z.coerce.number().nullish(),
-      series: z.coerce.number().nullish(),
-      tag: z.string().nullish(),
-      flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
-      flight: z.string().nullish(),
-      category: z.enum(CATEGORY_LIST).nullish(),
-      age: z.coerce.number().nullish(),
-      minRating: z.coerce.number().min(-1).max(2).nullish(),
-      minScore: z.coerce.number().int().min(0).max(100).nullish(),
-      cursor: z.coerce.number().gte(1).default(1),
-      limit: z.coerce.number().gte(1).lte(100).default(25),
-      filter: z.enum(["all", "following"]).default("all"),
-      sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
-    }),
-  )
-  // TODO(response-envelope): switch to { data, meta } by changing
-  // listResponse() implementation once we migrate envelopes globally.
-  .output(OutputSchema)
+export default implement(bottleListContract)
+  .$context<Context>()
+  .use(sentryMiddleware())
   .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, filter, ...rest } = input;
     const offset = (cursor - 1) * limit;

@@ -1,3 +1,4 @@
+import { mockOS } from "./implementer";
 import activityList from "./routes/activity/list";
 import login from "./routes/auth/login";
 import bottleDetails from "./routes/bottles/details";
@@ -8,7 +9,7 @@ import search from "./routes/search";
 import userDetails from "./routes/users/details";
 
 // Requests for routes not listed here return 404 from the mock server.
-export const mockRouter = {
+export const mockRouter = mockOS.router({
   root,
   search,
   activity: {
@@ -27,4 +28,4 @@ export const mockRouter = {
   users: {
     details: userDetails,
   },
-};
+});

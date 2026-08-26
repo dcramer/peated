@@ -13,14 +13,15 @@ import type {
 } from "@peated/server/types";
 import { and, desc, eq, gte, inArray, lte, sql, type SQL } from "drizzle-orm";
 
+export {
+  encodeActivityCursor,
+  parseActivityCursor,
+  type ActivityCursor,
+} from "./activityCursor";
+
 export const COLLECTION_PREVIEW_LIMIT = 4;
 export const SECONDARY_ENTRY_LIMIT_WITH_PRIMARY = 2;
 export const TASTING_SESSION_INACTIVITY_HOURS = 3;
-
-export type ActivityCursor = {
-  page: number;
-  snapshotAt: Date;
-};
 
 export type TastingSessionGroup = {
   id: number;
@@ -48,29 +49,6 @@ export type ActivitySourceWindow = {
 export interface ComposedActivity {
   results: ActivityEntry[];
   hasNext: boolean;
-}
-
-export function encodeActivityCursor({ page, snapshotAt }: ActivityCursor) {
-  return `${page}:${snapshotAt.getTime()}`;
-}
-
-export function parseActivityCursor(value: string): ActivityCursor | null {
-  const match = /^(\d+):(\d+)$/.exec(value);
-  if (!match) return null;
-
-  const page = Number(match[1]);
-  const timestamp = Number(match[2]);
-  const snapshotAt = new Date(timestamp);
-  if (
-    !Number.isSafeInteger(page) ||
-    page < 1 ||
-    !Number.isSafeInteger(timestamp) ||
-    Number.isNaN(snapshotAt.getTime())
-  ) {
-    return null;
-  }
-
-  return { page, snapshotAt };
 }
 
 /** Coerces database date bucket values into UTC activity timestamps. */

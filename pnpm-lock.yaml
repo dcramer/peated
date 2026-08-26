@@ -24,6 +24,9 @@ catalogs:
     '@orpc/client':
       specifier: 1.15.0
       version: 1.15.0
+    '@orpc/contract':
+      specifier: 1.15.0
+      version: 1.15.0
     '@orpc/openapi':
       specifier: 1.15.0
       version: 1.15.0
@@ -273,6 +276,9 @@ importers:
       '@opentelemetry/api':
         specifier: 'catalog:'
         version: 1.9.1
+      '@orpc/contract':
+        specifier: 'catalog:'
+        version: 1.15.0(@opentelemetry/api@1.9.1)
       '@orpc/openapi':
         specifier: 'catalog:'
         version: 1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3)
@@ -9949,7 +9955,6 @@ snapshots:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
-    optional: true
 
   '@ast-grep/cli-darwin-arm64@0.45.1':
     optional: true
@@ -11124,14 +11129,12 @@ snapshots:
       '@jridgewell/trace-mapping': 0.3.9
     optional: true
 
-  '@csstools/color-helpers@5.1.0':
-    optional: true
+  '@csstools/color-helpers@5.1.0': {}
 
   '@csstools/css-calc@2.1.4(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)':
     dependencies:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
-    optional: true
 
   '@csstools/css-color-parser@3.1.0(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)':
     dependencies:
@@ -11139,15 +11142,12 @@ snapshots:
       '@csstools/css-calc': 2.1.4(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
-    optional: true
 
   '@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4)':
     dependencies:
       '@csstools/css-tokenizer': 3.0.4
-    optional: true
 
-  '@csstools/css-tokenizer@3.0.4':
-    optional: true
+  '@csstools/css-tokenizer@3.0.4': {}
 
   '@dot/log@0.1.5':
     dependencies:
@@ -15089,7 +15089,6 @@ snapshots:
     dependencies:
       '@asamuzakjp/css-color': 3.2.0
       rrweb-cssom: 0.8.0
-    optional: true
 
   csstype@3.2.3: {}
 
@@ -15152,8 +15151,7 @@ snapshots:
 
   decimal.js@10.4.3: {}
 
-  decimal.js@10.6.0:
-    optional: true
+  decimal.js@10.6.0: {}
 
   decode-uri-component@0.2.2: {}
 
@@ -16724,7 +16722,6 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
-    optional: true
 
   jsesc@0.5.0: {}
 
@@ -17400,8 +17397,7 @@ snapshots:
 
   nwsapi@2.2.10: {}
 
-  nwsapi@2.2.24:
-    optional: true
+  nwsapi@2.2.24: {}
 
   object-assign@4.1.1: {}
 
@@ -18469,8 +18465,7 @@ snapshots:
 
   rrweb-cssom@0.7.1: {}
 
-  rrweb-cssom@0.8.0:
-    optional: true
+  rrweb-cssom@0.8.0: {}
 
   run-parallel@1.2.0:
     dependencies:
@@ -19131,13 +19126,11 @@ snapshots:
 
   titleize@4.0.0: {}
 
-  tldts-core@6.1.86:
-    optional: true
+  tldts-core@6.1.86: {}
 
   tldts@6.1.86:
     dependencies:
       tldts-core: 6.1.86
-    optional: true
 
   to-fast-properties@2.0.0: {}
 
@@ -19162,7 +19155,6 @@ snapshots:
   tough-cookie@5.1.2:
     dependencies:
       tldts: 6.1.86
-    optional: true
 
   tr46@0.0.3: {}
 
