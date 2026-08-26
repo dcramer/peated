@@ -605,7 +605,9 @@ export default function BottleForm({
             />
 
             <TextField
-              {...register("releaseDate")}
+              {...register("releaseDate", {
+                setValueAs: (v) => (v === "" || !v ? null : v),
+              })}
               error={errors.releaseDate}
               type="date"
               label="Exact Release Date"
