@@ -22,7 +22,14 @@ test("search settles after one request", async ({ page }) => {
     json: {
       query: "playwright search",
       limit: 50,
-      include: ["bottles", "entities"],
+      scopes: [
+        "bottles",
+        "distillers",
+        "brands",
+        "bottlers",
+        "blenders",
+        "companies",
+      ],
     },
   });
 });

@@ -1,6 +1,5 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
 import ListItem from "../listItem";
@@ -9,6 +8,7 @@ import {
   type CreateBottleReturnAction,
   getCreateBottleHref,
 } from "./createBottleHref";
+import type { Result } from "./result";
 import ResultRow from "./result";
 
 export default function SearchResults({
@@ -22,7 +22,7 @@ export default function SearchResults({
   pendingImage,
 }: {
   query: string;
-  results: Outputs["search"]["results"];
+  results: Result[];
   canSuggestAdd?: boolean;
   failed?: boolean;
   directToTasting?: boolean;

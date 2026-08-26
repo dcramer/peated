@@ -221,37 +221,51 @@ async function handleRpcRequest({ request, response, url }) {
       const bottleGroupWorkflow = getAccessToken(request).includes(
         "bottle-group-workflows",
       );
-      const expectedIncludes = bottleGroupWorkflow
-        ? ["bottles", "users", "entities"]
+      const entityScopes = [
+        "distillers",
+        "brands",
+        "bottlers",
+        "blenders",
+        "companies",
+      ];
+      const expectedScopes = bottleGroupWorkflow
+        ? ["bottles", "members", ...entityScopes]
         : input?.query === "playwright search"
-          ? ["bottles", "entities"]
+          ? ["bottles", ...entityScopes]
           : ["bottles"];
       if (
-        !Array.isArray(input?.include) ||
-        input.include.length !== expectedIncludes.length ||
-        !expectedIncludes.every(
-          (include, index) => input.include[index] === include,
-        )
+        !Array.isArray(input?.scopes) ||
+        input.scopes.length !== expectedScopes.length ||
+        !expectedScopes.every((scope, index) => input.scopes[index] === scope)
       ) {
         sendRpcError(response, "Expected bottle search");
         return true;
       }
 
+      const bottle = withCollectionStatus(
+        request,
+        bottleGroupWorkflow
+          ? groupedBottleDetails
+          : getAccessToken(request).includes("search-route")
+            ? exactSearchBottle
+            : existingBottle,
+      );
+      const scopeTotals = {
+        bottles: 1,
+        distillers: 0,
+        brands: 0,
+        bottlers: 0,
+        blenders: 0,
+        companies: 0,
+        regions: 0,
+      };
+      if (getAccessToken(request)) scopeTotals.members = 0;
       sendRpcResponse(response, {
         query: input.query ?? "",
-        results: [
-          {
-            type: "bottle",
-            ref: withCollectionStatus(
-              request,
-              bottleGroupWorkflow
-                ? groupedBottleDetails
-                : getAccessToken(request).includes("search-route")
-                  ? exactSearchBottle
-                  : existingBottle,
-            ),
-          },
-        ],
+        exact: null,
+        groups: [{ type: "bottles", total: 1, results: [bottle] }],
+        scopeTotals,
+        nearest: [],
       });
       return true;
     }
