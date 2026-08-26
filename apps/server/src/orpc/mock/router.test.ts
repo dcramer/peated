@@ -2,8 +2,10 @@ import { createRouterClient } from "@orpc/server";
 import {
   mockAccessToken,
   mockBottle,
+  mockEntity,
   mockPublicUserDetails,
   mockUser,
+  mockUserDetails,
 } from "./fixtures";
 import { mockRouter } from "./router";
 
@@ -26,6 +28,16 @@ describe("mock oRPC router", () => {
     const bottles = await anonymousClient.bottles.list({ query: "Lagavulin" });
     expect(bottles.results).toEqual([mockBottle]);
 
+    const search = await anonymousClient.search({
+      query: "Lagavulin",
+      scopes: ["bottles", "distillers"],
+    });
+    expect(search.exact).toEqual({ type: "entity", ref: mockEntity });
+    expect(search.groups).toMatchObject([
+      { type: "bottles", total: 1, results: [mockBottle] },
+      { type: "distillers", total: 1, results: [mockEntity] },
+    ]);
+
     const user = await authenticatedClient.users.details({ user: "me" });
     expect(user.id).toBe(mockUser.id);
   });
@@ -33,30 +45,58 @@ describe("mock oRPC router", () => {
   it("returns no results when the fixed data does not match", async () => {
     const results = await anonymousClient.search({
       query: "Ardbeg",
-      include: ["bottles", "entities", "users"],
+      scopes: ["bottles", "distillers", "members"],
     });
 
-    expect(results).toEqual({ query: "Ardbeg", results: [] });
+    expect(results).toEqual({
+      query: "Ardbeg",
+      exact: null,
+      groups: [
+        { type: "bottles", total: 0, results: [] },
+        { type: "distillers", total: 0, results: [] },
+      ],
+      scopeTotals: {
+        bottles: 1,
+        distillers: 1,
+        brands: 1,
+        bottlers: 0,
+        blenders: 0,
+        companies: 0,
+        regions: 0,
+      },
+      nearest: [],
+    });
   });
 
-  it("shows user search results only after sign-in", async () => {
-    await expect(
-      anonymousClient.search({
-        query: mockUser.username,
-        include: ["users"],
-      }),
-    ).resolves.toEqual({
+  it("shows member search results only after sign-in", async () => {
+    const anonymousResults = await anonymousClient.search({
       query: mockUser.username,
-      results: [],
+      scopes: ["members"],
     });
+    expect(anonymousResults.groups).toEqual([]);
+    expect(anonymousResults.scopeTotals.members).toBeUndefined();
+
     await expect(
       authenticatedClient.search({
         query: mockUser.username,
-        include: ["users"],
+        scopes: ["members"],
       }),
-    ).resolves.toEqual({
-      query: mockUser.username,
-      results: [{ type: "user", ref: mockUser }],
+    ).resolves.toMatchObject({
+      groups: [
+        {
+          type: "members",
+          total: 1,
+          results: [
+            {
+              member: mockUser,
+              totalTastings: mockUserDetails.stats.tastings,
+            },
+          ],
+        },
+      ],
+      scopeTotals: {
+        members: 1,
+      },
     });
   });
 
