@@ -133,9 +133,9 @@ function CreateBottleForm() {
   if (prefill.singleCask !== null && prefill.singleCask !== undefined) {
     initialFormData.singleCask = prefill.singleCask;
   }
-  if (prefill.caskType) initialFormData.caskType = prefill.caskType;
-  if (prefill.caskSize) initialFormData.caskSize = prefill.caskSize;
-  if (prefill.caskFill) initialFormData.caskFill = prefill.caskFill;
+  if (prefill.maturation) initialFormData.maturation = prefill.maturation;
+  if (prefill.caskNumber) initialFormData.caskNumber = prefill.caskNumber;
+  if (prefill.outturn) initialFormData.outturn = prefill.outturn;
 
   const [initialData, setInitialData] =
     useState<BottleFormInitialData>(initialFormData);

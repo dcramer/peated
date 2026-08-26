@@ -16,9 +16,9 @@ const exactBottle = {
   releaseYear: 2025,
   singleCask: true,
   caskStrength: true,
-  caskFill: "1st_fill",
-  caskType: "oloroso",
-  caskSize: "hogshead",
+  outturn: 240,
+  maturation: "First-fill Oloroso hogshead",
+  caskNumber: "#1234",
 } satisfies BottleExactMetadataSource;
 
 describe("BottleExactMetadata", () => {
@@ -30,10 +30,10 @@ describe("BottleExactMetadata", () => {
 
     expect(html).toContain("flex-wrap");
     expect(text).toBe(
-      "2025 Release·Single Malt·21 years·55.1% ABV·2004 vintage·Single cask·Cask strength·1st Fill Oloroso Hogshead cask",
+      "2025 Release·Single Malt·21 years·55.1% ABV·2004 vintage·Single cask·Cask strength·First-fill Oloroso hogshead·Cask #1234·240 bottles",
     );
     expect(html.match(/class="inline-flex whitespace-nowrap"/g)).toHaveLength(
-      8,
+      10,
     );
   });
 
@@ -95,9 +95,9 @@ describe("BottleExactMetadata", () => {
           releaseYear: null,
           singleCask: null,
           caskStrength: null,
-          caskFill: null,
-          caskType: null,
-          caskSize: null,
+          outturn: null,
+          maturation: null,
+          caskNumber: null,
         }}
       />,
     );
@@ -119,9 +119,9 @@ describe("BottleExactMetadata", () => {
           releaseYear: null,
           singleCask: null,
           caskStrength: null,
-          caskFill: null,
-          caskType: null,
-          caskSize: null,
+          outturn: null,
+          maturation: null,
+          caskNumber: null,
         }}
       />,
     );
@@ -151,7 +151,7 @@ describe("BottleExactMetadata", () => {
     expect(text).not.toContain("Single Malt");
   });
 
-  it("uses ABV without promoting generic cask details", () => {
+  it("uses ABV without promoting maturation details", () => {
     const html = renderToStaticMarkup(
       <BottleExactMetadata
         bottle={{
@@ -160,8 +160,8 @@ describe("BottleExactMetadata", () => {
           statedAge: 4,
           vintageYear: null,
           releaseYear: null,
-          caskType: "pedro_ximenez",
-          caskSize: null,
+          maturation: "Pedro Ximenez hogshead",
+          caskNumber: null,
           group: { statedAge: 4 },
         }}
         variant="summary"

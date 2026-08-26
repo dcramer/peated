@@ -87,9 +87,9 @@ const ExactBottleInputFields = {
     .nullable()
     .default(null),
   releaseDate: BottleInputFields.releaseDate,
-  caskSize: BottleInputFields.caskSize,
-  caskType: BottleInputFields.caskType,
-  caskFill: BottleInputFields.caskFill,
+  maturation: BottleInputFields.maturation,
+  caskNumber: BottleInputFields.caskNumber,
+  outturn: BottleInputFields.outturn,
   description: BottleInputFields.description,
   descriptionSrc: BottleInputFields.descriptionSrc,
   tastingNotes: BottleInputFields.tastingNotes,
@@ -195,9 +195,9 @@ const BottlePatchFieldsSchema = z
       .nullable()
       .optional(),
     releaseDate: ExactBottleInputFields.releaseDate.removeDefault().optional(),
-    caskSize: ExactBottleInputFields.caskSize.removeDefault().optional(),
-    caskType: ExactBottleInputFields.caskType.removeDefault().optional(),
-    caskFill: ExactBottleInputFields.caskFill.removeDefault().optional(),
+    maturation: ExactBottleInputFields.maturation.removeDefault().optional(),
+    caskNumber: ExactBottleInputFields.caskNumber.removeDefault().optional(),
+    outturn: ExactBottleInputFields.outturn.removeDefault().optional(),
     description: ExactBottleInputFields.description.removeDefault().optional(),
     descriptionSrc: ExactBottleInputFields.descriptionSrc
       .unwrap()

@@ -109,9 +109,9 @@ test.describe("create bottle", () => {
     await expect(
       page.getByText("Cask Strength", { exact: true }),
     ).toBeVisible();
-    await expect(page.getByText("Cask Fill", { exact: true })).toBeVisible();
-    await expect(page.getByText("Cask Type", { exact: true })).toBeVisible();
-    await expect(page.getByText("Cask Size", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Maturation")).toBeVisible();
+    await expect(page.getByLabel("Cask Number")).toBeVisible();
+    await expect(page.getByLabel("Outturn")).toBeVisible();
     await expect(page.getByLabel("Bottle Group")).toHaveCount(0);
     await expect(page.getByLabel("Source Bottle")).toHaveCount(0);
 
@@ -126,9 +126,9 @@ test.describe("create bottle", () => {
     await page.getByLabel("Distillation Year").fill("2009");
     await toggleBottleBoolean(page, "Single Cask");
     await toggleBottleBoolean(page, "Cask Strength");
-    await selectSimpleBottleField(page, "Cask Fill", "1st Fill");
-    await selectSimpleBottleField(page, "Cask Type", "Oloroso");
-    await selectSimpleBottleField(page, "Cask Size", "Hogshead");
+    await page.getByLabel("Maturation").fill("Oloroso hogshead");
+    await page.getByLabel("Cask Number").fill("#5678");
+    await page.getByLabel("Outturn").fill("240");
 
     const createRequestPromise = waitForBottleCreate(page);
     await page.getByRole("button", { name: "Add Bottle" }).click();
@@ -143,9 +143,9 @@ test.describe("create bottle", () => {
       vintageYear: 2009,
       singleCask: true,
       caskStrength: true,
-      caskFill: "1st_fill",
-      caskType: "oloroso",
-      caskSize: "hogshead",
+      outturn: 240,
+      maturation: "Oloroso hogshead",
+      caskNumber: "#5678",
     });
     for (const authorityField of [
       "group",
@@ -1498,15 +1498,6 @@ async function toggleBottleBoolean(page: Page, label: string) {
     .locator("..")
     .locator("..");
   await field.getByRole("switch").click();
-}
-
-async function selectSimpleBottleField(
-  page: Page,
-  label: string,
-  option: string,
-) {
-  await page.getByText(label, { exact: true }).click();
-  await page.getByRole("button", { name: option, exact: true }).last().click();
 }
 
 async function uploadLabel(page: Page) {

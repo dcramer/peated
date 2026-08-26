@@ -38,7 +38,8 @@ type BottleAliasSearchSource = {
     | "category"
     | "edition"
     | "statedAge"
-    | "caskType"
+    | "maturation"
+    | "caskNumber"
     | "caskStrength"
     | "singleCask"
     | "vintageYear"
@@ -54,14 +55,6 @@ function formatSearchAbv(abv: number | null | undefined) {
   }
 
   return `${abv.toFixed(1)}% ABV`;
-}
-
-function formatSearchEnum(value: string | null | undefined) {
-  if (!value) {
-    return null;
-  }
-
-  return value.replace(/_/g, " ");
 }
 
 function aliasSnapshotWhere(alias: {
@@ -90,7 +83,8 @@ function bottleSearchSourceWhere(source: BottleAliasSearchSource) {
       AND ${bottles.category} IS NOT DISTINCT FROM ${source.bottle.category}
       AND ${bottles.edition} IS NOT DISTINCT FROM ${source.bottle.edition}
       AND ${bottles.statedAge} IS NOT DISTINCT FROM ${source.bottle.statedAge}
-      AND ${bottles.caskType} IS NOT DISTINCT FROM ${source.bottle.caskType}
+      AND ${bottles.maturation} IS NOT DISTINCT FROM ${source.bottle.maturation}
+      AND ${bottles.caskNumber} IS NOT DISTINCT FROM ${source.bottle.caskNumber}
       AND ${bottles.caskStrength} IS NOT DISTINCT FROM ${source.bottle.caskStrength}
       AND ${bottles.singleCask} IS NOT DISTINCT FROM ${source.bottle.singleCask}
       AND ${bottles.vintageYear} IS NOT DISTINCT FROM ${source.bottle.vintageYear}
@@ -165,7 +159,8 @@ async function loadActiveBottleAliasSearchSource(
         category: bottles.category,
         edition: bottles.edition,
         statedAge: bottles.statedAge,
-        caskType: bottles.caskType,
+        maturation: bottles.maturation,
+        caskNumber: bottles.caskNumber,
         caskStrength: bottles.caskStrength,
         singleCask: bottles.singleCask,
         vintageYear: bottles.vintageYear,
@@ -215,7 +210,8 @@ function buildBottleAliasSearchText({
   if (bottle.category) bits.push(formatCategoryName(bottle.category));
   if (bottle.edition) bits.push(bottle.edition);
   if (bottle.statedAge) bits.push(`${bottle.statedAge}-year-old`);
-  if (bottle.caskType) bits.push(formatSearchEnum(bottle.caskType)!);
+  if (bottle.maturation) bits.push(bottle.maturation);
+  if (bottle.caskNumber) bits.push(bottle.caskNumber);
   if (bottle.caskStrength) bits.push(CASK_STRENGTH_SEARCH_TERMS);
   if (bottle.singleCask) bits.push(SINGLE_CASK_SEARCH_TERMS);
   if (bottle.vintageYear) bits.push(`${bottle.vintageYear} vintage`);

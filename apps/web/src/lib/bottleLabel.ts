@@ -1,5 +1,3 @@
-import { toTitleCase } from "@peated/server/lib/strings";
-
 type BottleLabelSource = {
   name: string;
   edition?: string | null;
@@ -9,9 +7,6 @@ type BottleLabelSource = {
   abv?: number | null;
   singleCask?: boolean | null;
   caskStrength?: boolean | null;
-  caskFill?: string | null;
-  caskType?: string | null;
-  caskSize?: string | null;
   brand: {
     name: string;
     shortName?: string | null;
@@ -47,13 +42,6 @@ export function getBottleExpressionName(bottle: BottleLabelSource) {
         : undefined,
       bottle.singleCask ? "Single Cask" : undefined,
       bottle.caskStrength ? "Cask Strength" : undefined,
-      bottle.caskType ? `${toTitleCase(bottle.caskType)} Cask` : undefined,
-      bottle.caskSize ? toTitleCase(bottle.caskSize) : undefined,
-      bottle.caskFill
-        ? bottle.caskFill === "other"
-          ? "Other Fill"
-          : toTitleCase(bottle.caskFill)
-        : undefined,
     ]
       .filter((value): value is string => value !== undefined)
       .map((value) => value.toLocaleLowerCase()),

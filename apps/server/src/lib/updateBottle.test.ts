@@ -76,9 +76,9 @@ async function createGroup({
         abv: first.bottle.abv,
         singleCask: first.bottle.singleCask,
         caskStrength: first.bottle.caskStrength,
-        caskType: first.bottle.caskType,
-        caskSize: first.bottle.caskSize,
-        caskFill: first.bottle.caskFill,
+        maturation: first.bottle.maturation,
+        caskNumber: first.bottle.caskNumber,
+        outturn: first.bottle.outturn,
       },
     });
     await db
@@ -1099,16 +1099,16 @@ describe("Bottle updates", () => {
     const caskResult = await updateBottle({
       bottleId: first.bottle.id,
       input: {
-        caskType: "bourbon",
-        caskSize: "barrel",
-        caskFill: "1st_fill",
+        maturation: "Bourbon barrel",
+        caskNumber: "#1234",
+        outturn: 240,
       },
       context: contextFor(mod),
     });
     expect(caskResult.bottle).toMatchObject({
-      caskType: "bourbon",
-      caskSize: "barrel",
-      caskFill: "1st_fill",
+      maturation: "Bourbon barrel",
+      caskNumber: "#1234",
+      outturn: 240,
       description: "Generated description",
       descriptionSrc: "generated",
       suggestedTags: ["smoke", "fruit"],

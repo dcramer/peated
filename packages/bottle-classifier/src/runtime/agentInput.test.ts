@@ -21,9 +21,9 @@ function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
     edition: null,
     caskStrength: null,
     singleCask: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
+    maturation: null,
+    caskNumber: null,
+    outturn: null,
     abv: null,
     vintageYear: null,
     releaseYear: null,
@@ -55,9 +55,9 @@ function buildBottleContext(): BottleContext {
       caskStrength: true,
       vintageYear: null,
       releaseYear: 2022,
-      caskSize: null,
-      caskType: null,
-      caskFill: null,
+      caskNumber: null,
+      maturation: null,
+      outturn: null,
     },
     siblings: [],
     aliases: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
@@ -67,7 +67,7 @@ function buildBottleContext(): BottleContext {
 }
 
 describe("buildAgentInput", () => {
-  test("omits optional cask metadata from the default search without dropping cask flags", () => {
+  test("searches by cask number without using maturation or outturn", () => {
     expect(
       buildDefaultBottleSearchInput({
         reference: { name: "Example Distillery Reserve" },
@@ -84,18 +84,18 @@ describe("buildAgentInput", () => {
           vintage_year: null,
           cask_strength: true,
           single_cask: true,
-          cask_type: "oloroso",
-          cask_size: "hogshead",
-          cask_fill: "1st_fill",
+          maturation: "Oloroso hogshead",
+          cask_number: "#1234",
+          outturn: 240,
           edition: null,
         },
       }),
     ).toMatchObject({
       cask_strength: true,
       single_cask: true,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
+      maturation: null,
+      cask_number: "#1234",
+      outturn: null,
     });
   });
 
@@ -125,9 +125,9 @@ describe("buildAgentInput", () => {
                   abv: null,
                   caskStrength: null,
                   singleCask: null,
-                  caskType: null,
-                  caskSize: null,
-                  caskFill: null,
+                  maturation: null,
+                  caskNumber: null,
+                  outturn: null,
                 },
               ],
             },
@@ -170,9 +170,9 @@ describe("buildAgentInput", () => {
           abv: null,
           caskStrength: null,
           singleCask: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
+          maturation: null,
+          caskNumber: null,
+          outturn: null,
         },
       ],
     });
@@ -198,9 +198,9 @@ describe("buildAgentInput", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
-          cask_type: null,
-          cask_size: null,
-          cask_fill: null,
+          maturation: null,
+          cask_number: null,
+          outturn: null,
           edition: null,
         },
         imageEvidence: {

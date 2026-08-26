@@ -57,9 +57,9 @@ function buildPhotoResult(): PhotoIdentification {
           abv: 48,
           caskStrength: null,
           singleCask: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
+          maturation: null,
+          caskNumber: null,
+          outturn: null,
           vintageYear: null,
           releaseYear: 2024,
           brand: {

@@ -29,9 +29,7 @@ test("bottle list", async ({ axiosMock }) => {
         "brand": {
           "name": "The Scotch Malt Whisky Society",
         },
-        "caskFill": null,
-        "caskSize": null,
-        "caskType": null,
+        "caskNumber": "RW3.6",
         "category": "rye",
         "distillers": [
           {
@@ -39,6 +37,7 @@ test("bottle list", async ({ axiosMock }) => {
           },
         ],
         "flavorProfile": null,
+        "maturation": "American Rye Whisky",
         "name": "RW3.6 Truly a flavour bomb",
         "releaseYear": 2023,
         "singleCask": true,
@@ -66,9 +65,7 @@ test("bottle list", async ({ axiosMock }) => {
         "brand": {
           "name": "The Scotch Malt Whisky Society",
         },
-        "caskFill": "2nd_fill",
-        "caskSize": "hogshead",
-        "caskType": "bourbon",
+        "caskNumber": "3.350",
         "category": "single_malt",
         "distillers": [
           {
@@ -76,6 +73,7 @@ test("bottle list", async ({ axiosMock }) => {
           },
         ],
         "flavorProfile": "lightly_peated",
+        "maturation": "2nd fill ex-bourbon hogshead",
         "name": "3.350 Gladrags of yesteryear",
         "releaseYear": 2023,
         "singleCask": true,
@@ -127,9 +125,8 @@ test("continues when optional SMWS catalog fields are absent", async ({
   expect(items).toHaveLength(127);
   expect(items[0][0]).toMatchObject({
     name: "3.350 Gladrags of yesteryear",
-    caskFill: null,
-    caskType: null,
-    caskSize: null,
+    maturation: null,
+    caskNumber: "3.350",
   });
   expect(items[1][0].name).toBe("4.303 A nocturne sipper");
 });

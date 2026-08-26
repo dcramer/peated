@@ -88,9 +88,9 @@ type ExactPatch = Partial<
     | "bottlingYear"
     | "releaseYear"
     | "releaseDate"
-    | "caskSize"
-    | "caskType"
-    | "caskFill"
+    | "maturation"
+    | "caskNumber"
+    | "outturn"
     | "description"
     | "descriptionSrc"
     | "image"
@@ -195,9 +195,9 @@ type DesiredBottle = Pick<
   | "bottlingYear"
   | "releaseYear"
   | "releaseDate"
-  | "caskSize"
-  | "caskType"
-  | "caskFill"
+  | "maturation"
+  | "caskNumber"
+  | "outturn"
   | "description"
   | "descriptionSrc"
   | "imageUrl"
@@ -422,9 +422,9 @@ export function bottleStoragePatch(
   if ("bottlingYear" in input) exact.bottlingYear = input.bottlingYear;
   if ("releaseYear" in input) exact.releaseYear = input.releaseYear;
   if ("releaseDate" in input) exact.releaseDate = input.releaseDate;
-  if ("caskSize" in input) exact.caskSize = input.caskSize;
-  if ("caskType" in input) exact.caskType = input.caskType;
-  if ("caskFill" in input) exact.caskFill = input.caskFill;
+  if ("maturation" in input) exact.maturation = input.maturation;
+  if ("caskNumber" in input) exact.caskNumber = input.caskNumber;
+  if ("outturn" in input) exact.outturn = input.outturn;
   if ("description" in input) exact.description = input.description;
   if ("descriptionSrc" in input) exact.descriptionSrc = input.descriptionSrc;
   if ("image" in input) exact.image = input.image;
@@ -476,9 +476,9 @@ const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
   "abv",
   "singleCask",
   "caskStrength",
-  "caskType",
-  "caskSize",
-  "caskFill",
+  "maturation",
+  "caskNumber",
+  "outturn",
 ];
 
 const generatedDetailsIdentityKeys = [
@@ -671,9 +671,9 @@ function desiredBottleFor({
     bottlingYear: exact.bottlingYear ?? null,
     releaseYear: release.releaseYear,
     releaseDate: release.releaseDate,
-    caskSize: exact.caskSize,
-    caskType: exact.caskType,
-    caskFill: exact.caskFill,
+    maturation: exact.maturation,
+    caskNumber: exact.caskNumber,
+    outturn: exact.outturn,
     description,
     descriptionSrc,
     imageUrl: exactPatch?.image === null ? null : bottle.imageUrl,
@@ -707,9 +707,9 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "bottlingYear",
   "releaseYear",
   "releaseDate",
-  "caskSize",
-  "caskType",
-  "caskFill",
+  "maturation",
+  "caskNumber",
+  "outturn",
   "description",
   "descriptionSrc",
   "imageUrl",

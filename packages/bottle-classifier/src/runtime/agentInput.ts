@@ -144,8 +144,7 @@ export function buildDefaultBottleSearchInput({
   /**
    * This is the cheap local-search seed used before the model asks for any
    * follow-up retrieval. It should stay conservative: only pass through fields
-   * intended as identity constraints, while compatibility-only cask metadata
-   * remains available in extracted context.
+   * intended as identity constraints.
    */
   return BottleCandidateSearchInputSchema.parse({
     query: reference.name,
@@ -159,9 +158,9 @@ export function buildDefaultBottleSearchInput({
     abv: extractedIdentity?.abv ?? null,
     cask_strength: extractedIdentity?.cask_strength ?? null,
     single_cask: extractedIdentity?.single_cask ?? null,
-    cask_type: null,
-    cask_size: null,
-    cask_fill: null,
+    maturation: null,
+    cask_number: extractedIdentity?.cask_number ?? null,
+    outturn: null,
     edition: extractedIdentity?.edition ?? null,
     vintage_year: extractedIdentity?.vintage_year ?? null,
     release_year: extractedIdentity?.release_year ?? null,

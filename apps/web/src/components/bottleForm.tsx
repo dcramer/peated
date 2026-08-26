@@ -5,20 +5,13 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/20/solid";
-import {
-  CASK_FILLS,
-  CASK_SIZES,
-  CASK_TYPES,
-  CATEGORY_LIST,
-  FLAVOR_PROFILES,
-} from "@peated/server/constants";
+import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
   formatCategoryName,
   formatFlavorProfile,
   notesForProfile,
 } from "@peated/server/lib/format";
-import { toTitleCase } from "@peated/server/lib/strings";
 import {
   BottleInputFields,
   EntityChoiceSchema,
@@ -64,21 +57,6 @@ const categoryList = CATEGORY_LIST.map((c) => ({
 const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
   id: c,
   name: formatFlavorProfile(c),
-}));
-
-const caskFillList = CASK_FILLS.map((id) => ({
-  id,
-  name: toTitleCase(id),
-}));
-
-const caskSizeList = CASK_SIZES.map(({ id }) => ({
-  id,
-  name: toTitleCase(id),
-}));
-
-const caskTypeList = CASK_TYPES.map(({ id }) => ({
-  id,
-  name: toTitleCase(id),
 }));
 
 type BooleanChoice = {
@@ -159,9 +137,9 @@ const moreDetailFields = [
   "naturalColor",
   "nonChillFiltered",
   "maltPhenolPpm",
-  "caskFill",
-  "caskType",
-  "caskSize",
+  "maturation",
+  "caskNumber",
+  "outturn",
   "flavorProfile",
   "description",
 ] as const satisfies ReadonlyArray<BottleFormFieldName>;
@@ -301,9 +279,9 @@ export default function BottleForm({
     abv: watch("abv"),
     singleCask: watch("singleCask"),
     caskStrength: watch("caskStrength"),
-    caskFill: watch("caskFill"),
-    caskType: watch("caskType"),
-    caskSize: watch("caskSize"),
+    maturation: watch("maturation"),
+    caskNumber: watch("caskNumber"),
+    outturn: watch("outturn"),
     distillers: distillersValue,
     brand: brandValue,
     series: seriesValue,
@@ -673,67 +651,39 @@ export default function BottleForm({
               min="0"
             />
 
-            <Controller
-              name="caskFill"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.caskFill}
-                  label="Cask Fill"
-                  placeholder="e.g. 1st Fill"
-                  simple
-                  options={caskFillList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? caskFillList.find((item) => item.id === value)
-                      : undefined
-                  }
-                />
-              )}
+            <TextAreaField
+              {...register("maturation", {
+                setValueAs: (value) => value?.trim() || null,
+              })}
+              error={errors.maturation}
+              label="Maturation"
+              helpText="Copy the producer's cask or maturation wording."
+              placeholder="e.g. 2nd fill ex-bourbon hogshead"
+              rows={3}
             />
 
-            <Controller
-              name="caskType"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.caskType}
-                  label="Cask Type"
-                  placeholder="e.g. Bourbon"
-                  simple
-                  options={caskTypeList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? caskTypeList.find((item) => item.id === value)
-                      : undefined
-                  }
-                />
-              )}
+            <TextField
+              {...register("caskNumber", {
+                setValueAs: (value) => value?.trim() || null,
+              })}
+              error={errors.caskNumber}
+              type="text"
+              label="Cask Number"
+              helpText="The cask or barrel number shown by the producer."
+              placeholder="e.g. 35.401"
             />
 
-            <Controller
-              name="caskSize"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.caskSize}
-                  label="Cask Size"
-                  placeholder="e.g. Hogshead"
-                  simple
-                  options={caskSizeList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? caskSizeList.find((item) => item.id === value)
-                      : undefined
-                  }
-                />
-              )}
+            <TextField
+              {...register("outturn", {
+                setValueAs: (value) =>
+                  value === "" || !value ? null : parseInt(value, 10),
+              })}
+              error={errors.outturn}
+              type="number"
+              label="Outturn"
+              helpText="The total number of bottles in this release."
+              placeholder="e.g. 240"
+              min="1"
             />
 
             <Controller

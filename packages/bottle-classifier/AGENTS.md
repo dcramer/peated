@@ -53,9 +53,10 @@ Before changing classifier behavior, read:
   Automatic verification needs corroboration or a closed-form identity anchor.
 - Judge source quality from content, independence, specificity, and
   corroboration. Do not add domain allowlists or brand-specific prompt tutoring.
-- `caskType`, `caskSize`, and `caskFill` are nullable compatibility metadata and
-  never decide identity by themselves. Marketed finish wording, exact cask
-  codes, `singleCask`, and `caskStrength` remain identity-critical.
+- Copy producer wording into `maturation`. Store a marketed cask identifier in
+  `caskNumber` and the stated bottle count in `outturn`. Do not split
+  maturation into a cask taxonomy. Only a marketed cask identifier can decide
+  identity by itself.
 
 ## Prompts and Evals
 

@@ -1,6 +1,5 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import {
-  parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
 } from "@peated/bottle-classifier/smws";
@@ -94,9 +93,8 @@ export async function scrapeBottles(
     const flavorProfile = flavorSpec ? parseFlavorProfile(flavorSpec[1]) : null;
 
     const caskSpec = specList.find(([name]) => name === "Cask:");
-    const [caskFill, caskType, caskSize] = caskSpec
-      ? parseCaskType(caskSpec[1])
-      : [null, null, null];
+    const maturation = caskSpec?.[1] || null;
+    const caskNumber = itemType.replace(/^Cask No\.\s*/i, "").trim();
 
     const details = parseDetailsFromName(`${itemType} ${caskName}`);
     if (!details?.distiller) {
@@ -143,9 +141,8 @@ export async function scrapeBottles(
         },
         distillers: [{ name: details.distiller }],
         flavorProfile,
-        caskFill,
-        caskType,
-        caskSize,
+        maturation,
+        caskNumber,
         singleCask: true,
       },
       price

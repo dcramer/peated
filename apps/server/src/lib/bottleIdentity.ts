@@ -1,6 +1,5 @@
 import { formatCanonicalBottleName } from "@peated/bottle-classifier/bottleIdentity";
 import type { Bottle, BottleGroup } from "@peated/server/db/schema";
-import { toTitleCase } from "@peated/server/lib/strings";
 
 type StableBottleIdentity = Pick<
   BottleGroup,
@@ -21,9 +20,9 @@ export type BottleExactIdentity = Pick<
   | "abv"
   | "singleCask"
   | "caskStrength"
-  | "caskType"
-  | "caskSize"
-  | "caskFill"
+  | "maturation"
+  | "caskNumber"
+  | "outturn"
 > & {
   bottlingYear?: Bottle["bottlingYear"];
   noAgeStatement?: Bottle["noAgeStatement"];
@@ -98,42 +97,9 @@ export function getBottleExactIdentity({
     abv: valueOrCurrent(exactPatch?.abv, bottle.abv),
     singleCask: valueOrCurrent(exactPatch?.singleCask, bottle.singleCask),
     caskStrength: valueOrCurrent(exactPatch?.caskStrength, bottle.caskStrength),
-    caskType: valueOrCurrent(exactPatch?.caskType, bottle.caskType),
-    caskSize: valueOrCurrent(exactPatch?.caskSize, bottle.caskSize),
-    caskFill: valueOrCurrent(exactPatch?.caskFill, bottle.caskFill),
-  };
-}
-
-function formatExactCaskIdentity({
-  fullName,
-  name,
-  caskType,
-  caskSize,
-  caskFill,
-}: {
-  fullName: string;
-  name: string;
-  caskType: string | null | undefined;
-  caskSize: string | null | undefined;
-  caskFill: string | null | undefined;
-}) {
-  const caskBits = [
-    caskType ? `${toTitleCase(caskType)} Cask` : null,
-    caskSize ? toTitleCase(caskSize) : null,
-    caskFill
-      ? caskFill === "other"
-        ? "Other Fill"
-        : toTitleCase(caskFill)
-      : null,
-  ].filter((value): value is string => value !== null);
-
-  if (!caskBits.length) {
-    return { fullName, name };
-  }
-
-  return {
-    fullName: [fullName, ...caskBits].join(" - "),
-    name: [name, ...caskBits].join(" - "),
+    maturation: valueOrCurrent(exactPatch?.maturation, bottle.maturation),
+    caskNumber: valueOrCurrent(exactPatch?.caskNumber, bottle.caskNumber),
+    outturn: valueOrCurrent(exactPatch?.outturn, bottle.outturn),
   };
 }
 
@@ -152,23 +118,18 @@ export function materializeBottleIdentity({
         bottleStatedAge: exact.statedAge,
         stableStatedAge: stable.statedAge,
       });
-  const identity = formatExactCaskIdentity({
-    ...formatCanonicalBottleName({
-      bottleName: stable.name,
-      bottleFullName: stable.fullName,
-      bottleNameTraits: {
-        caskStrength: exact.caskStrength,
-        singleCask: exact.singleCask,
-      },
-      bottleStatedAge: hasNoAgeStatement ? null : stable.statedAge,
-      exact: {
-        ...exact,
-        statedAge: exactStatedAge,
-      },
-    }),
-    caskType: exact.caskType,
-    caskSize: exact.caskSize,
-    caskFill: exact.caskFill,
+  const identity = formatCanonicalBottleName({
+    bottleName: stable.name,
+    bottleFullName: stable.fullName,
+    bottleNameTraits: {
+      caskStrength: exact.caskStrength,
+      singleCask: exact.singleCask,
+    },
+    bottleStatedAge: hasNoAgeStatement ? null : stable.statedAge,
+    exact: {
+      ...exact,
+      statedAge: exactStatedAge,
+    },
   });
 
   return {

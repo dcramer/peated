@@ -26,11 +26,6 @@ import type {
   BottleExtractedDetails,
   ProposedBottle,
 } from "@peated/bottle-classifier/internal/types";
-import {
-  CASK_FILLS,
-  CASK_SIZE_IDS,
-  CASK_TYPE_IDS,
-} from "@peated/server/constants";
 import { tsvector } from "../columns";
 import { vector } from "../columns/vector";
 import { actors } from "./actors";
@@ -195,9 +190,9 @@ export const bottles = pgTable(
     bottlingYear: smallint("bottling_year"),
     releaseYear: smallint("release_year"),
     releaseDate: date("release_date"),
-    caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
-    caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
-    caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
+    maturation: text("maturation"),
+    caskNumber: varchar("cask_number", { length: 255 }),
+    outturn: integer("outturn"),
 
     // Exact content and aggregate state.
     description: text("description"),

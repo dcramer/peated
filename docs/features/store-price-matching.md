@@ -213,9 +213,9 @@ The extractor returns a whisky-specific identity object:
 - `abv`
 - `release_year`
 - `vintage_year`
-- `cask_type`
-- `cask_size`
-- `cask_fill`
+- `maturation`
+- `cask_number`
+- `outturn`
 - `cask_strength`
 - `single_cask`
 - `edition`

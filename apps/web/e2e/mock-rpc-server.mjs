@@ -274,9 +274,9 @@ async function handleRpcRequest({ request, response, url }) {
           vintageYear: 2009,
           singleCask: true,
           caskStrength: true,
-          caskFill: "1st_fill",
-          caskType: "oloroso",
-          caskSize: "hogshead",
+          outturn: 240,
+          maturation: "Oloroso hogshead",
+          caskNumber: "#5678",
         };
         sendRpcResponse(response, bottle);
         return true;
@@ -1512,9 +1512,9 @@ function buildDirectBottleQueueProposal() {
       singleCask: true,
       vintageYear: 2008,
       releaseYear: 2025,
-      caskType: "oloroso",
-      caskSize: "hogshead",
-      caskFill: "1st_fill",
+      maturation: "Oloroso hogshead",
+      caskNumber: "#5678",
+      outturn: 240,
     },
     price: {
       ...proposal.price,
@@ -1583,9 +1583,9 @@ function isExpectedDirectBottleQueueCreateInput(input) {
     bottle?.caskStrength === true &&
     bottle?.vintageYear === 2008 &&
     bottle?.releaseYear === 2025 &&
-    bottle?.caskType === "oloroso" &&
-    bottle?.caskFill === "1st_fill" &&
-    bottle?.caskSize === "hogshead" &&
+    bottle?.maturation === "Oloroso hogshead" &&
+    bottle?.outturn === 240 &&
+    bottle?.caskNumber === "#5678" &&
     bottle?.description === null &&
     bottle?.descriptionSrc === null &&
     bottle?.tastingNotes == null &&
@@ -1616,9 +1616,9 @@ function isExpectedOrdinaryExactBottleCreateInput(input) {
     input?.vintageYear === 2009 &&
     input?.singleCask === true &&
     input?.caskStrength === true &&
-    input?.caskFill === "1st_fill" &&
-    input?.caskType === "oloroso" &&
-    input?.caskSize === "hogshead"
+    input?.outturn === 240 &&
+    input?.maturation === "Oloroso hogshead" &&
+    input?.caskNumber === "#5678"
   );
 }
 
@@ -1649,9 +1649,9 @@ function buildDirectBottleProposal() {
       abv: null,
       vintageYear: null,
       releaseYear: 2026,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
+      maturation: null,
+      caskNumber: null,
+      outturn: null,
       brand: { id: testBrand.id, name: testBrand.name },
       distillers: [{ id: testBrand.id, name: testBrand.name }],
       bottler: null,

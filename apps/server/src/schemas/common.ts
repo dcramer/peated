@@ -1,8 +1,5 @@
 import { z } from "zod";
 import {
-  CASK_FILLS,
-  CASK_SIZE_IDS,
-  CASK_TYPE_IDS,
   CATEGORY_LIST,
   CURRENCY_LIST,
   ENTITY_KIND_LIST,
@@ -39,12 +36,6 @@ export const zDatetime = z
 export const ContentSourceEnum = z.enum(["generated", "user"]);
 
 export const CurrencyEnum = z.enum(CURRENCY_LIST);
-
-export const CaskFillEnum = z.enum(CASK_FILLS);
-
-export const CaskTypeEnum = z.enum(CASK_TYPE_IDS);
-
-export const CaskSizeEnum = z.enum(CASK_SIZE_IDS);
 
 export const CategoryEnum = z.enum(CATEGORY_LIST);
 

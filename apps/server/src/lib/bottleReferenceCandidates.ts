@@ -59,9 +59,9 @@ export type BottleCandidateQueryRow = {
   abv?: number | string | null;
   vintageYear?: number | string | null;
   releaseYear?: number | string | null;
-  caskType?: string | null;
-  caskSize?: string | null;
-  caskFill?: string | null;
+  maturation?: string | null;
+  caskNumber?: string | null;
+  outturn?: number | string | null;
   score?: number | string | null;
 };
 
@@ -101,9 +101,9 @@ const CANDIDATE_METADATA_FIELDS = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
-  "caskType",
-  "caskSize",
-  "caskFill",
+  "maturation",
+  "caskNumber",
+  "outturn",
 ] as const satisfies ReadonlyArray<keyof BottleCandidate>;
 
 const CANDIDATE_SIBLING_LIMIT = 8;
@@ -155,9 +155,9 @@ function buildSearchLabel(
     abv: input.abv,
     release_year: input.release_year,
     vintage_year: input.vintage_year,
-    cask_type: input.cask_type,
-    cask_size: input.cask_size,
-    cask_fill: input.cask_fill,
+    maturation: input.maturation,
+    cask_number: input.cask_number,
+    outturn: input.outturn,
     cask_strength: input.cask_strength,
     single_cask: input.single_cask,
     edition: input.edition,
@@ -171,6 +171,8 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     input.expression,
     input.series,
     input.edition,
+    input.cask_number,
+    input.maturation,
     input.stated_age ? `${input.stated_age}` : null,
     formatSearchAbv(input.abv),
     input.cask_strength ? "cask strength" : null,
@@ -185,6 +187,7 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     input.expression ||
     input.series ||
     input.edition ||
+    input.cask_number ||
     input.stated_age ||
     input.vintage_year ||
     input.release_year ||
@@ -323,9 +326,9 @@ function buildBottleCandidate(
     abv: normalizePotentialProofToAbv(parseNullableNumber(row.abv)),
     vintageYear: parseNullableNumber(row.vintageYear),
     releaseYear: parseNullableNumber(row.releaseYear),
-    caskType: row.caskType ?? null,
-    caskSize: row.caskSize ?? null,
-    caskFill: row.caskFill ?? null,
+    maturation: row.maturation ?? null,
+    caskNumber: row.caskNumber ?? null,
+    outturn: parseNullableNumber(row.outturn),
     score:
       row.score === undefined || row.score === null ? null : Number(row.score),
     source: [source],
@@ -593,9 +596,9 @@ type CandidateBottleMetadataRow = {
   abv: number | null;
   vintageYear: number | null;
   releaseYear: number | null;
-  caskType: BottleCandidate["caskType"];
-  caskSize: BottleCandidate["caskSize"];
-  caskFill: BottleCandidate["caskFill"];
+  maturation: BottleCandidate["maturation"];
+  caskNumber: BottleCandidate["caskNumber"];
+  outturn: BottleCandidate["outturn"];
 };
 
 type CandidateBottleSiblingRow = {
@@ -609,9 +612,9 @@ type CandidateBottleSiblingRow = {
   abv: number | null;
   vintageYear: number | null;
   releaseYear: number | null;
-  caskType: BottleCandidate["caskType"];
-  caskSize: BottleCandidate["caskSize"];
-  caskFill: BottleCandidate["caskFill"];
+  maturation: BottleCandidate["maturation"];
+  caskNumber: BottleCandidate["caskNumber"];
+  outturn: BottleCandidate["outturn"];
 };
 
 function getPopulatedBottleTraitFields(
@@ -687,9 +690,9 @@ function buildBottleSiblingContext(
           abv: sibling.abv,
           singleCask: sibling.singleCask,
           caskStrength: sibling.caskStrength,
-          caskType: sibling.caskType,
-          caskSize: sibling.caskSize,
-          caskFill: sibling.caskFill,
+          maturation: sibling.maturation,
+          caskNumber: sibling.caskNumber,
+          outturn: sibling.outturn,
         })),
     );
   }
@@ -725,9 +728,9 @@ async function enrichBottleCandidates(
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
       releaseYear: bottles.releaseYear,
-      caskType: bottles.caskType,
-      caskSize: bottles.caskSize,
-      caskFill: bottles.caskFill,
+      maturation: bottles.maturation,
+      caskNumber: bottles.caskNumber,
+      outturn: bottles.outturn,
     })
     .from(bottles)
     .innerJoin(brandEntity, eq(brandEntity.id, bottles.brandId))
@@ -760,9 +763,9 @@ async function enrichBottleCandidates(
             abv: bottles.abv,
             vintageYear: bottles.vintageYear,
             releaseYear: bottles.releaseYear,
-            caskType: bottles.caskType,
-            caskSize: bottles.caskSize,
-            caskFill: bottles.caskFill,
+            maturation: bottles.maturation,
+            caskNumber: bottles.caskNumber,
+            outturn: bottles.outturn,
           })
           .from(bottles)
           .where(
@@ -839,9 +842,9 @@ async function enrichBottleCandidates(
     candidate.abv ??= bottleMetadata.abv;
     candidate.vintageYear ??= bottleMetadata.vintageYear;
     candidate.releaseYear ??= bottleMetadata.releaseYear;
-    candidate.caskType ??= bottleMetadata.caskType;
-    candidate.caskSize ??= bottleMetadata.caskSize;
-    candidate.caskFill ??= bottleMetadata.caskFill;
+    candidate.maturation ??= bottleMetadata.maturation;
+    candidate.caskNumber ??= bottleMetadata.caskNumber;
+    candidate.outturn ??= bottleMetadata.outturn;
     candidate.familyContext = mergeBottleCandidateFamilyContext(
       candidate.familyContext,
       familyContext,
@@ -905,9 +908,9 @@ async function getVectorCandidates(
       ${bottles.vintageYear} AS "vintageYear",
       ${bottles.bottlingYear} AS "bottlingYear",
       ${bottles.releaseYear} AS "releaseYear",
-      ${bottles.caskType} AS "caskType",
-      ${bottles.caskSize} AS "caskSize",
-      ${bottles.caskFill} AS "caskFill",
+      ${bottles.maturation} AS "maturation",
+      ${bottles.caskNumber} AS "caskNumber",
+      ${bottles.outturn} AS "outturn",
       1 - (${bottleAliases.embedding} <=> ${vector}) AS score
     FROM ${bottleAliases}
     INNER JOIN ${bottles}
@@ -949,9 +952,9 @@ async function getTextCandidates(
       ${bottles.vintageYear} AS "vintageYear",
       ${bottles.bottlingYear} AS "bottlingYear",
       ${bottles.releaseYear} AS "releaseYear",
-      ${bottles.caskType} AS "caskType",
-      ${bottles.caskSize} AS "caskSize",
-      ${bottles.caskFill} AS "caskFill",
+      ${bottles.maturation} AS "maturation",
+      ${bottles.caskNumber} AS "caskNumber",
+      ${bottles.outturn} AS "outturn",
       ts_rank(${bottles.searchVector}, ${textQuery}) AS score
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
@@ -1014,9 +1017,9 @@ async function getBrandCandidates(
       , ${bottles.vintageYear} AS "vintageYear"
       , ${bottles.bottlingYear} AS "bottlingYear"
       , ${bottles.releaseYear} AS "releaseYear"
-      , ${bottles.caskType} AS "caskType"
-      , ${bottles.caskSize} AS "caskSize"
-      , ${bottles.caskFill} AS "caskFill"
+      , ${bottles.maturation} AS "maturation"
+      , ${bottles.caskNumber} AS "caskNumber"
+      , ${bottles.outturn} AS "outturn"
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
     WHERE (
@@ -1052,9 +1055,9 @@ async function getOrdinaryBottleCandidateById(
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
       releaseYear: bottles.releaseYear,
-      caskType: bottles.caskType,
-      caskSize: bottles.caskSize,
-      caskFill: bottles.caskFill,
+      maturation: bottles.maturation,
+      caskNumber: bottles.caskNumber,
+      outturn: bottles.outturn,
     })
     .from(bottles)
     .innerJoin(entities, eq(entities.id, bottles.brandId))
@@ -1083,9 +1086,9 @@ async function getOrdinaryBottleCandidateById(
       abv: result.abv,
       vintageYear: result.vintageYear,
       releaseYear: result.releaseYear,
-      caskType: result.caskType,
-      caskSize: result.caskSize,
-      caskFill: result.caskFill,
+      maturation: result.maturation,
+      caskNumber: result.caskNumber,
+      outturn: result.outturn,
       score: 1,
     },
     "current",
@@ -1120,9 +1123,9 @@ async function getExactBottleCandidate(
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
       releaseYear: bottles.releaseYear,
-      caskType: bottles.caskType,
-      caskSize: bottles.caskSize,
-      caskFill: bottles.caskFill,
+      maturation: bottles.maturation,
+      caskNumber: bottles.caskNumber,
+      outturn: bottles.outturn,
     })
     .from(bottleAliases)
     .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
@@ -1152,9 +1155,9 @@ async function getExactBottleCandidate(
         abv: exactMatch.abv,
         vintageYear: exactMatch.vintageYear,
         releaseYear: exactMatch.releaseYear,
-        caskType: exactMatch.caskType,
-        caskSize: exactMatch.caskSize,
-        caskFill: exactMatch.caskFill,
+        maturation: exactMatch.maturation,
+        caskNumber: exactMatch.caskNumber,
+        outturn: exactMatch.outturn,
         score: 1,
       },
       "exact",
@@ -1179,9 +1182,9 @@ async function getExactBottleCandidate(
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
       releaseYear: bottles.releaseYear,
-      caskType: bottles.caskType,
-      caskSize: bottles.caskSize,
-      caskFill: bottles.caskFill,
+      maturation: bottles.maturation,
+      caskNumber: bottles.caskNumber,
+      outturn: bottles.outturn,
     })
     .from(bottleAliases)
     .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
@@ -1215,9 +1218,9 @@ async function getExactBottleCandidate(
       abv: comparableMatch.abv,
       vintageYear: comparableMatch.vintageYear,
       releaseYear: comparableMatch.releaseYear,
-      caskType: comparableMatch.caskType,
-      caskSize: comparableMatch.caskSize,
-      caskFill: comparableMatch.caskFill,
+      maturation: comparableMatch.maturation,
+      caskNumber: comparableMatch.caskNumber,
+      outturn: comparableMatch.outturn,
       score: 1,
     },
     "exact",
@@ -1258,9 +1261,9 @@ async function findBottleReferenceCandidatesWithEmbedding(
       category: normalizeMatchCategory(extractedLabel?.category ?? null),
       stated_age: extractedLabel?.stated_age ?? null,
       abv: extractedLabel?.abv ?? null,
-      cask_type: extractedLabel?.cask_type ?? null,
-      cask_size: extractedLabel?.cask_size ?? null,
-      cask_fill: extractedLabel?.cask_fill ?? null,
+      maturation: extractedLabel?.maturation ?? null,
+      cask_number: extractedLabel?.cask_number ?? null,
+      outturn: extractedLabel?.outturn ?? null,
       cask_strength: extractedLabel?.cask_strength ?? null,
       single_cask: extractedLabel?.single_cask ?? null,
       edition: extractedLabel?.edition ?? null,

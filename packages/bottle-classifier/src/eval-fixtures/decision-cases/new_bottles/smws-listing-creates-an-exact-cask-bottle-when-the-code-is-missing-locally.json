@@ -19,9 +19,9 @@
       "vintage_year": null,
       "cask_strength": null,
       "single_cask": true,
-      "cask_type": null,
-      "cask_size": "barrel",
-      "cask_fill": "1st_fill",
+      "maturation": null,
+      "cask_number": null,
+      "outturn": null,
       "edition": null
     }
   },

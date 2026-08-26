@@ -256,12 +256,11 @@ function buildBottleRepairInput(
   if (proposedBottle.releaseYear !== null) {
     patch.releaseYear = proposedBottle.releaseYear;
   }
-  if (proposedBottle.caskType !== null)
-    patch.caskType = proposedBottle.caskType;
-  if (proposedBottle.caskSize !== null)
-    patch.caskSize = proposedBottle.caskSize;
-  if (proposedBottle.caskFill !== null)
-    patch.caskFill = proposedBottle.caskFill;
+  if (proposedBottle.maturation !== null)
+    patch.maturation = proposedBottle.maturation;
+  if (proposedBottle.caskNumber !== null)
+    patch.caskNumber = proposedBottle.caskNumber;
+  if (proposedBottle.outturn !== null) patch.outturn = proposedBottle.outturn;
 
   return patch;
 }

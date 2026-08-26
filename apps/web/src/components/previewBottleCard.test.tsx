@@ -19,9 +19,9 @@ describe("PreviewBottleCard", () => {
           abv: 57.2,
           singleCask: true,
           caskStrength: true,
-          caskFill: "1st_fill",
-          caskType: "oloroso",
-          caskSize: "hogshead",
+          outturn: 240,
+          maturation: "Oloroso hogshead",
+          caskNumber: "#5678",
         }}
       />,
     );

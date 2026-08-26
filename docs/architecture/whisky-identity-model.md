@@ -100,22 +100,19 @@ another role or because a source omits it. Remove it only when product evidence
 shows the assignment is wrong. Leave `bottler` null when classifying a product
 whose evidence does not establish the role.
 
-Observation-only facts by default include exact cask or barrel number, bottle
-number, outturn, non-marketed production lot codes, retailer-exclusive wording,
-label notes, and unmodeled maturation details. Promote one of these facts into
-Bottle identity only when it is part of the marketed release or is needed for
-recurring canonical disambiguation.
+Observation-only facts by default include bottle number, non-marketed
+production lot codes, retailer-exclusive wording, and label notes. Store a
+producer-stated cask identifier, maturation statement, or outturn on the Bottle.
+Use the cask identifier for identity only when it is part of the marketed
+release.
 
 A fact about one component of a blend does not become a field on the complete
 Bottle. Set the Bottle's age, year, ABV, or other exact trait only when evidence
 states that trait for the marketed blend itself.
 
-`caskType`, `caskSize`, and `caskFill` remain nullable storage fields for
-compatibility but are soft-deprecated for automated identity decisions. Preserve
-explicit values without requiring or researching them, and do not select,
-reject, create, repair, or gate automation solely on differences in those
-fields. This does not deprecate marketed finish wording in `name` or `edition`,
-exact cask or barrel codes, `singleCask`, or `caskStrength`.
+`maturation` is free text copied from the producer. Do not split it into a cask
+taxonomy. `caskNumber` and `outturn` hold the marketed identifier and stated
+bottle count. Do not infer any of these fields.
 
 ## Shared And Exact Edits
 

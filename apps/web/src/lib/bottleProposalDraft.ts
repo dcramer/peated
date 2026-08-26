@@ -14,9 +14,9 @@ type ExactField =
   | "vintageYear"
   | "bottlingYear"
   | "releaseYear"
-  | "caskSize"
-  | "caskType"
-  | "caskFill"
+  | "caskNumber"
+  | "maturation"
+  | "outturn"
   | "tastingNotes";
 
 type StableField =
@@ -77,9 +77,9 @@ function mergeExactFields(
     vintageYear: mergeExactField("vintageYear", input),
     bottlingYear: mergeExactField("bottlingYear", input),
     releaseYear: mergeExactField("releaseYear", input),
-    caskSize: mergeExactField("caskSize", input),
-    caskType: mergeExactField("caskType", input),
-    caskFill: mergeExactField("caskFill", input),
+    caskNumber: mergeExactField("caskNumber", input),
+    maturation: mergeExactField("maturation", input),
+    outturn: mergeExactField("outturn", input),
     tastingNotes: mergeExactField("tastingNotes", input),
   };
 }

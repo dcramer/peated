@@ -284,9 +284,9 @@ describe("eval fixture validation", () => {
 
     for (const fixture of [matchFixture, requiredChangeFixture]) {
       const encodedExpectations = JSON.stringify(fixture.expected);
-      expect(encodedExpectations).not.toContain("caskType");
-      expect(encodedExpectations).not.toContain("caskSize");
-      expect(encodedExpectations).not.toContain("caskFill");
+      expect(encodedExpectations).not.toContain("maturation");
+      expect(encodedExpectations).not.toContain("caskNumber");
+      expect(encodedExpectations).not.toContain("outturn");
     }
   });
 
@@ -605,7 +605,7 @@ describe("eval fixture validation", () => {
     }
   });
 
-  test("keeps compatibility cask metadata out of exact identity expectations", () => {
+  test("keeps storage-only cask details out of normalization expectations", () => {
     const fixture = {
       id: "canonical-cask-traits",
       referenceName: "Example First Fill Oloroso Hogshead",
@@ -616,9 +616,8 @@ describe("eval fixture validation", () => {
         handlingStrategy: "classifier_required",
         classifierExpectation: "bottle",
         exactBottleIdentity: {
-          caskType: "oloroso",
-          caskSize: "hogshead",
-          caskFill: "1st_fill",
+          maturation: "Oloroso hogshead",
+          outturn: 240,
         },
       },
     };

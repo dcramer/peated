@@ -58,11 +58,6 @@ type ProposedOperationCandidate = {
   evidenceRefs?: ToolCallPayload;
 };
 
-const OPTIONAL_CASK_METADATA_FIELDS = new Set([
-  "caskType",
-  "caskSize",
-  "caskFill",
-]);
 const ToolCallPayloadSchema = z.json();
 type ToolCallPayload = z.infer<typeof ToolCallPayloadSchema>;
 
@@ -190,18 +185,6 @@ function evidenceMatches(left: EvidenceRef, right: EvidenceRef) {
   }
 }
 
-function changesOnlyOptionalCaskMetadata(proposal: ProposedOperation) {
-  if (proposal.type !== "update_bottle") {
-    return false;
-  }
-
-  const exactFields = Object.keys(proposal.input.patch);
-  return (
-    exactFields.length > 0 &&
-    exactFields.every((field) => OPTIONAL_CASK_METADATA_FIELDS.has(field))
-  );
-}
-
 function getSmwsEditionError(
   proposal: ProposedOperation,
   context: ProposalCollectionContext,
@@ -266,14 +249,6 @@ export function createBottleProposalCollector({
       }
 
       const proposal = parsed.data;
-      if (changesOnlyOptionalCaskMetadata(proposal)) {
-        return {
-          status: "rejected",
-          reason:
-            "Bottle updates cannot change only optional cask type, size, or fill metadata.",
-        };
-      }
-
       const smwsEditionError = getSmwsEditionError(proposal, context);
       if (smwsEditionError) {
         return { status: "rejected", reason: smwsEditionError };

@@ -33,9 +33,9 @@ function buildExtractedLabel(
     vintage_year: null,
     cask_strength: null,
     single_cask: null,
-    cask_type: null,
-    cask_size: null,
-    cask_fill: null,
+    maturation: null,
+    cask_number: null,
+    outturn: null,
     edition: null,
     ...overrides,
   };
@@ -56,9 +56,9 @@ function buildBottleCandidate(
     edition: null,
     caskStrength: null,
     singleCask: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
+    maturation: null,
+    caskNumber: null,
+    outturn: null,
     abv: null,
     vintageYear: null,
     releaseYear: null,
@@ -96,7 +96,7 @@ describe("priceMatchingEvidence", () => {
     expect(getAbvSupportLevel("Bottled at 44%", 43.5)).toBe("none");
   });
 
-  test("ignores optional cask metadata but keeps cask flags decisive for plain-age verification", () => {
+  test("keeps maturation and outturn out of plain-age checks", () => {
     const target = buildBottleCandidate({
       bottleId: 1,
       fullName: "Example Distillery 10-year-old",
@@ -118,9 +118,8 @@ describe("priceMatchingEvidence", () => {
     expect(isPlainAgeBottleMatchEligibleForVerification(input)).toBe(true);
 
     for (const caskSpecificLabel of [
-      { cask_type: "pedro_ximenez" as const },
-      { cask_size: "butt" as const },
-      { cask_fill: "2nd_fill" as const },
+      { maturation: "Pedro Ximenez butt" as const },
+      { outturn: 200 as const },
     ]) {
       expect(
         isPlainAgeBottleMatchEligibleForVerification({
@@ -134,9 +133,8 @@ describe("priceMatchingEvidence", () => {
     }
 
     for (const caskSpecificTarget of [
-      { caskType: "pedro_ximenez" as const },
-      { caskSize: "butt" as const },
-      { caskFill: "2nd_fill" as const },
+      { maturation: "Pedro Ximenez butt" as const },
+      { outturn: 200 as const },
     ]) {
       const candidate = {
         ...target,
@@ -152,6 +150,7 @@ describe("priceMatchingEvidence", () => {
     }
 
     for (const decisiveLabel of [
+      { cask_number: "#1234" as const },
       { cask_strength: true as const },
       { single_cask: true as const },
     ]) {
@@ -167,6 +166,7 @@ describe("priceMatchingEvidence", () => {
     }
 
     for (const decisiveTarget of [
+      { caskNumber: "#1234" as const },
       { caskStrength: true as const },
       { singleCask: true as const },
     ]) {
@@ -181,16 +181,16 @@ describe("priceMatchingEvidence", () => {
     }
   });
 
-  test("does not report optional cask metadata conflicts while retaining cask flag conflicts", () => {
+  test("reports cask number and cask flag conflicts", () => {
     expect(
       getExistingMatchIdentityConflicts({
         target: buildBottleCandidate({
           bottleId: 4,
           fullName: "Example Distillery Reserve",
           brand: "Example Distillery",
-          caskType: "bourbon",
-          caskSize: "barrel",
-          caskFill: "refill",
+          maturation: "Bourbon barrel",
+          caskNumber: "#1234",
+          outturn: 180,
           caskStrength: true,
           singleCask: false,
         }),
@@ -198,14 +198,15 @@ describe("priceMatchingEvidence", () => {
           expression: "Reserve",
           stated_age: null,
           abv: null,
-          cask_type: "oloroso",
-          cask_size: "hogshead",
-          cask_fill: "1st_fill",
+          maturation: "Oloroso hogshead",
+          cask_number: "#5678",
+          outturn: 240,
           cask_strength: false,
           single_cask: true,
         }),
       }),
     ).toEqual([
+      "candidate cask number conflicts with extracted label",
       "candidate cask-strength flag conflicts with extracted label",
       "candidate single-cask flag conflicts with extracted label",
     ]);

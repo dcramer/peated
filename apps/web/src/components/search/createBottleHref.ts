@@ -1,10 +1,5 @@
 import { toTitleCase } from "@peated/server/lib/strings";
-import {
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
-  CategoryEnum,
-} from "@peated/server/schemas";
+import { CategoryEnum } from "@peated/server/schemas";
 import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
 import { z } from "zod";
 
@@ -38,9 +33,9 @@ export const CreateBottlePrefillSchema = z.object({
   releaseYear: z.number().int().gte(1800).nullish(),
   caskStrength: z.boolean().nullish(),
   singleCask: z.boolean().nullish(),
-  caskType: CaskTypeEnum.nullish(),
-  caskSize: CaskSizeEnum.nullish(),
-  caskFill: CaskFillEnum.nullish(),
+  maturation: z.string().trim().min(1).max(1000).nullish(),
+  caskNumber: z.string().trim().min(1).max(255).nullish(),
+  outturn: z.number().int().positive().nullish(),
 });
 
 export type CreateBottlePrefill = z.infer<typeof CreateBottlePrefillSchema>;
@@ -90,9 +85,6 @@ export function parseCreateBottlePrefill(
 ): CreateBottlePrefill {
   const currentYear = new Date().getFullYear();
   const category = CategoryEnum.safeParse(searchParams.get("category"));
-  const caskType = CaskTypeEnum.safeParse(searchParams.get("caskType"));
-  const caskSize = CaskSizeEnum.safeParse(searchParams.get("caskSize"));
-  const caskFill = CaskFillEnum.safeParse(searchParams.get("caskFill"));
 
   return CreateBottlePrefillSchema.parse({
     brandId: parseNumberParam(searchParams.get("brand"), {
@@ -148,9 +140,13 @@ export function parseCreateBottlePrefill(
     }),
     caskStrength: parseBooleanParam(searchParams.get("caskStrength")),
     singleCask: parseBooleanParam(searchParams.get("singleCask")),
-    caskType: caskType.success ? caskType.data : null,
-    caskSize: caskSize.success ? caskSize.data : null,
-    caskFill: caskFill.success ? caskFill.data : null,
+    maturation: searchParams.get("maturation")?.trim() || null,
+    caskNumber: searchParams.get("caskNumber")?.trim() || null,
+    outturn: parseNumberParam(searchParams.get("outturn"), {
+      integer: true,
+      min: 1,
+      max: Number.MAX_SAFE_INTEGER,
+    }),
   });
 }
 
@@ -243,9 +239,15 @@ export function getCreateBottleHref({
   if (parsedPrefill.singleCask != null) {
     params.set("singleCask", String(parsedPrefill.singleCask));
   }
-  if (parsedPrefill.caskType) params.set("caskType", parsedPrefill.caskType);
-  if (parsedPrefill.caskSize) params.set("caskSize", parsedPrefill.caskSize);
-  if (parsedPrefill.caskFill) params.set("caskFill", parsedPrefill.caskFill);
+  if (parsedPrefill.maturation) {
+    params.set("maturation", parsedPrefill.maturation);
+  }
+  if (parsedPrefill.caskNumber) {
+    params.set("caskNumber", parsedPrefill.caskNumber);
+  }
+  if (parsedPrefill.outturn != null) {
+    params.set("outturn", String(parsedPrefill.outturn));
+  }
   if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
   if (pendingImage?.imageUrl) {
     params.set("pendingImageUrl", pendingImage.imageUrl);

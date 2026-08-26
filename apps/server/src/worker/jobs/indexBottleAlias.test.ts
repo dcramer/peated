@@ -64,7 +64,7 @@ describe("indexBottleAlias", () => {
       category: "single_malt",
       edition: "Solstice",
       statedAge: 19,
-      caskType: "oloroso",
+      maturation: "Oloroso hogshead",
       caskStrength: true,
       singleCask: true,
       vintageYear: 1998,
@@ -86,7 +86,7 @@ describe("indexBottleAlias", () => {
 
     expect(createEmbedding).toHaveBeenCalledOnce();
     expect(createEmbedding).toHaveBeenCalledWith(
-      "Direct Bottle Brand Authoritative Alias Aurora Single Malt Solstice 19-year-old oloroso cask strength barrel strength barrel proof full proof natural strength single cask single barrel 1998 vintage 2018 release 57.4% ABV",
+      "Direct Bottle Brand Authoritative Alias Aurora Single Malt Solstice 19-year-old Oloroso hogshead cask strength barrel strength barrel proof full proof natural strength single cask single barrel 1998 vintage 2018 release 57.4% ABV",
     );
     expect(
       await db.query.bottleAliases.findFirst({

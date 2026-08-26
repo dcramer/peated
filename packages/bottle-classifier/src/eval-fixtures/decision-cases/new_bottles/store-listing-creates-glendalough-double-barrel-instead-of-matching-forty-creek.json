@@ -24,9 +24,9 @@
         "edition": null,
         "caskStrength": null,
         "singleCask": null,
-        "caskType": null,
-        "caskSize": null,
-        "caskFill": null,
+        "maturation": null,
+        "caskNumber": null,
+        "outturn": null,
         "abv": null,
         "vintageYear": null,
         "releaseYear": null

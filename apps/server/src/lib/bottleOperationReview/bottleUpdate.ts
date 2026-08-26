@@ -237,9 +237,9 @@ function collectChangedBottleFields(
     "vintageYear",
     "bottlingYear",
     "releaseYear",
-    "caskSize",
-    "caskType",
-    "caskFill",
+    "caskNumber",
+    "maturation",
+    "outturn",
   ] as const) {
     if (!sameValue(before.exact[field], after.exact[field])) {
       changedFields.push(`exact.${field}`);

@@ -64,9 +64,9 @@ describe("getCreateBottleHref", () => {
       releaseYear: 2023,
       caskStrength: false,
       singleCask: false,
-      caskType: "bourbon" as const,
-      caskSize: "barrel" as const,
-      caskFill: "1st_fill" as const,
+      maturation: "Bourbon barrel" as const,
+      caskNumber: "#1234" as const,
+      outturn: 240 as const,
     };
     const href = getCreateBottleHref({ query: "Hedonism²", prefill });
     const url = new URL(href, "https://peated.test");

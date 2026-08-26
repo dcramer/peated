@@ -24,9 +24,9 @@ const exact = {
   caskStrength: null,
   vintageYear: null,
   releaseYear: null,
-  caskSize: null,
-  caskType: null,
-  caskFill: null,
+  caskNumber: null,
+  maturation: null,
+  outturn: null,
 };
 
 function bottleSource(): BottleContextSource {

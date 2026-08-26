@@ -1,11 +1,5 @@
 import { z } from "zod";
 
-// SAFETY: Array.map preserves the tuple order and returns each literal id unchanged.
-const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>
-  arr.map((s) => s.id) as {
-    [K in keyof T]: T[K] extends { id: infer U } ? U : never;
-  };
-
 export const CATEGORY_LIST = [
   "blend",
   "bourbon",
@@ -20,61 +14,27 @@ export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
 
 export const ALIAS_SCOPES = ["global_alias", "none"] as const;
 
-export const CASK_FILLS = ["1st_fill", "2nd_fill", "refill", "other"] as const;
-
-export const CASK_TYPES = [
-  { id: "bourbon", category: "whisky" },
-  { id: "amontilado", category: "sherry" },
-  { id: "fino", category: "sherry" },
-  { id: "manzanilla", category: "sherry" },
-  { id: "oloroso", category: "sherry" },
-  { id: "palo_cortado", category: "sherry" },
-  { id: "pedro_ximenez", category: "sherry", shortName: "px" },
-  { id: "liqueur_muscat", category: "fortified_wine" },
-  { id: "madeira", category: "fortified_wine" },
-  { id: "marsala", category: "fortified_wine" },
-  { id: "tawny_port", category: "fortified_wine" },
-  { id: "ruby_port", category: "fortified_wine" },
-  { id: "rose_port", category: "fortified_wine" },
-  { id: "white_port", category: "fortified_wine" },
-  { id: "amarone", category: "wine" },
-  { id: "barolo", category: "wine" },
-  { id: "bordeaux", category: "wine" },
-  { id: "burgundy", category: "wine" },
-  { id: "chardonnay", category: "wine" },
-  { id: "muscat", category: "wine" },
-  { id: "sauternes", category: "wine" },
-  { id: "tokaji", category: "wine" },
-  { id: "rum_white", category: "rum" },
-  { id: "rum_dark", category: "rum" },
-  { id: "cognac", category: "cognac" },
-  { id: "oak", category: "wood" },
-  { id: "other", category: "other" },
-] as const;
-
-export const CASK_TYPE_IDS = createTuple(CASK_TYPES);
-
-export const CASK_SIZES = [
-  { id: "quarter_cask", size: [45, 50] },
-  { id: "barrel", size: [190, 200] },
-  { id: "hogshead", size: [225, 250] },
-  { id: "barrique", size: [225, 300] },
-  { id: "puncheon", size: [450, 500] },
-  { id: "butt", size: [475, 500] },
-  { id: "port_pipe", size: [550, 650] },
-  { id: "madeira_drum", size: [600, 650] },
-] as const;
-
-export const CASK_SIZE_IDS = createTuple(CASK_SIZES);
-
-export const CaskFillEnum = z.enum(CASK_FILLS);
-export const CaskTypeEnum = z.enum(CASK_TYPE_IDS);
-export const CaskSizeEnum = z.enum(CASK_SIZE_IDS);
 export const CategoryEnum = z.enum(CATEGORY_LIST);
 export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
 export const AliasScopeEnum = z.enum(ALIAS_SCOPES);
 
 const CURRENT_YEAR = new Date().getFullYear();
+
+const MaturationSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(1000)
+  .nullable()
+  .default(null);
+const CaskNumberSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(255)
+  .nullable()
+  .default(null);
+const OutturnSchema = z.number().int().positive().nullable().default(null);
 
 export const BOTTLE_EXACT_TRAIT_FIELDS = [
   "edition",
@@ -85,9 +45,9 @@ export const BOTTLE_EXACT_TRAIT_FIELDS = [
   "abv",
   "singleCask",
   "caskStrength",
-  "caskType",
-  "caskSize",
-  "caskFill",
+  "maturation",
+  "caskNumber",
+  "outturn",
 ] as const;
 
 export const BOTTLE_DECISION_TRAIT_FIELDS = [
@@ -98,6 +58,7 @@ export const BOTTLE_DECISION_TRAIT_FIELDS = [
   "abv",
   "singleCask",
   "caskStrength",
+  "caskNumber",
 ] as const satisfies ReadonlyArray<(typeof BOTTLE_EXACT_TRAIT_FIELDS)[number]>;
 
 const BottleExactTraitFieldEnum = z.enum(BOTTLE_EXACT_TRAIT_FIELDS);
@@ -133,9 +94,9 @@ const BottleCandidateSiblingSchema = z
     abv: z.number().min(0).max(100).nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
+    maturation: MaturationSchema,
+    caskNumber: CaskNumberSchema,
+    outturn: OutturnSchema,
   })
   .strict();
 
@@ -167,9 +128,9 @@ export const BottleExtractedDetailsSchema = z
     bottling_year: z.number().nullable().optional(),
     cask_strength: z.boolean().nullable().default(null),
     single_cask: z.boolean().nullable().default(null),
-    cask_type: CaskTypeEnum.nullable().default(null),
-    cask_size: CaskSizeEnum.nullable().default(null),
-    cask_fill: CaskFillEnum.nullable().default(null),
+    maturation: MaturationSchema,
+    cask_number: CaskNumberSchema,
+    outturn: OutturnSchema,
     edition: z.string().nullable().default(null),
   })
   .strict();
@@ -188,9 +149,9 @@ export const BottleCandidateSchema = z
     edition: z.string().trim().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
+    maturation: MaturationSchema,
+    caskNumber: CaskNumberSchema,
+    outturn: OutturnSchema,
     abv: z.number().min(0).max(100).nullable().default(null),
     vintageYear: z
       .number()
@@ -265,9 +226,9 @@ export const BottleEvidenceCheckSchema = z
       "edition",
       "caskStrength",
       "singleCask",
-      "caskType",
-      "caskSize",
-      "caskFill",
+      "maturation",
+      "caskNumber",
+      "outturn",
       "abv",
       "vintageYear",
       "releaseYear",
@@ -309,9 +270,9 @@ export const ProposedBottleFields = {
   statedAge: z.number().int().min(0).max(100).nullable().default(null),
   caskStrength: z.boolean().nullable().default(null),
   singleCask: z.boolean().nullable().default(null),
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
+  maturation: MaturationSchema,
+  caskNumber: CaskNumberSchema,
+  outturn: OutturnSchema,
   abv: z.number().min(0).max(100).nullable().default(null),
   vintageYear: z
     .number()
@@ -424,21 +385,15 @@ export const BottleCandidateSearchInputSchema = z
       .describe(
         "True only when the reference explicitly says single cask, single barrel, or a specific cask selection.",
       ),
-    cask_type: CaskTypeEnum.nullable()
-      .default(null)
-      .describe(
-        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
-      ),
-    cask_size: CaskSizeEnum.nullable()
-      .default(null)
-      .describe(
-        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
-      ),
-    cask_fill: CaskFillEnum.nullable()
-      .default(null)
-      .describe(
-        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
-      ),
+    maturation: MaturationSchema.describe(
+      "Producer-stated cask or maturation details. Preserve the source wording and leave null when it is not stated.",
+    ),
+    cask_number: CaskNumberSchema.describe(
+      "Marketed cask or barrel identifier. Preserve punctuation and leave null when it is not stated.",
+    ),
+    outturn: OutturnSchema.describe(
+      "Producer-stated total number of bottles in the release.",
+    ),
     edition: z
       .string()
       .trim()
@@ -671,9 +626,6 @@ export type BottleEvidenceSourceTier = z.infer<
   typeof BottleEvidenceSourceTierEnum
 >;
 export type BottleEvidenceCheck = z.infer<typeof BottleEvidenceCheckSchema>;
-export type CaskFill = z.infer<typeof CaskFillEnum>;
-export type CaskSize = z.infer<typeof CaskSizeEnum>;
-export type CaskType = z.infer<typeof CaskTypeEnum>;
 export type Category = z.infer<typeof CategoryEnum>;
 export type BottleCandidate = z.infer<typeof BottleCandidateSchema>;
 export type BottleSearchEvidence = z.infer<typeof BottleSearchEvidenceSchema>;

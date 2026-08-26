@@ -255,9 +255,9 @@ export function createBottleCheckMock({
       caskStrength: null,
       vintageYear: null,
       releaseYear: null,
-      caskSize: null,
-      caskType: null,
-      caskFill: null,
+      caskNumber: null,
+      maturation: null,
+      outturn: null,
     };
     const brand = {
       kind: "existing",

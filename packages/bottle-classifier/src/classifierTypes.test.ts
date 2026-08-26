@@ -226,51 +226,51 @@ describe("BottleClassifierAgentDecisionSchema", () => {
   test("preserves structured cask fields at classifier boundaries", () => {
     expect(
       BottleExtractedDetailsSchema.parse({
-        cask_type: "oloroso",
-        cask_size: "hogshead",
-        cask_fill: "1st_fill",
+        maturation: "Oloroso hogshead",
+        cask_number: "#5678",
+        outturn: 240,
       }),
     ).toMatchObject({
-      cask_type: "oloroso",
-      cask_size: "hogshead",
-      cask_fill: "1st_fill",
+      maturation: "Oloroso hogshead",
+      cask_number: "#5678",
+      outturn: 240,
     });
     expect(
       BottleCandidateSchema.parse({
         bottleId: 1,
         fullName: "Example",
-        caskType: "oloroso",
-        caskSize: "hogshead",
-        caskFill: "1st_fill",
+        maturation: "Oloroso hogshead",
+        caskNumber: "#5678",
+        outturn: 240,
       }),
     ).toMatchObject({
-      caskType: "oloroso",
-      caskSize: "hogshead",
-      caskFill: "1st_fill",
+      maturation: "Oloroso hogshead",
+      caskNumber: "#5678",
+      outturn: 240,
     });
     expect(
       BottleCandidateSearchInputSchema.parse({
-        cask_type: "oloroso",
-        cask_size: "hogshead",
-        cask_fill: "1st_fill",
+        maturation: "Oloroso hogshead",
+        cask_number: "#5678",
+        outturn: 240,
       }),
     ).toMatchObject({
-      cask_type: "oloroso",
-      cask_size: "hogshead",
-      cask_fill: "1st_fill",
+      maturation: "Oloroso hogshead",
+      cask_number: "#5678",
+      outturn: 240,
     });
     expect(
       ProposedBottleSchema.parse({
         name: "Example",
         brand: { id: null, name: "Example" },
-        caskType: "oloroso",
-        caskSize: "hogshead",
-        caskFill: "1st_fill",
+        maturation: "Oloroso hogshead",
+        caskNumber: "#5678",
+        outturn: 240,
       }),
     ).toMatchObject({
-      caskType: "oloroso",
-      caskSize: "hogshead",
-      caskFill: "1st_fill",
+      maturation: "Oloroso hogshead",
+      caskNumber: "#5678",
+      outturn: 240,
     });
   });
 

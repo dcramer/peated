@@ -312,9 +312,10 @@ describe("POST /bottles", () => {
         maltPhenolPpm: 101.4,
         vintageYear: 2010,
         releaseDate: "2024-09-15",
-        caskSize: "hogshead",
-        caskType: "bourbon",
-        caskFill: "1st_fill",
+        releaseYear: 2024,
+        caskNumber: "#1234",
+        maturation: "First-fill bourbon barrel",
+        outturn: 240,
         description: "A complete Bottle description.",
         descriptionSrc: "user",
       },
@@ -340,7 +341,7 @@ describe("POST /bottles", () => {
       .where(eq(bottles.id, data.id));
     expect(bottle).toMatchObject({
       groupId: data.group!.id,
-      name: "Delicious Wood - Batch 7 - 12-year-old - 2024 Release - 2010 Vintage - 57.1% ABV - Single Cask - Cask Strength - Bourbon Cask - Hogshead - 1st Fill",
+      name: "Delicious Wood - Batch 7 - 12-year-old - 2024 Release - 2010 Vintage - 57.1% ABV - Single Cask - Cask Strength",
       brandId: brand.id,
       bottlerId: distiller.id,
       category: "single_malt",
@@ -356,9 +357,9 @@ describe("POST /bottles", () => {
       vintageYear: 2010,
       releaseYear: 2024,
       releaseDate: "2024-09-15",
-      caskSize: "hogshead",
-      caskType: "bourbon",
-      caskFill: "1st_fill",
+      caskNumber: "#1234",
+      maturation: "First-fill bourbon barrel",
+      outturn: 240,
       description: "A complete Bottle description.",
       descriptionSrc: "user",
     });
@@ -382,9 +383,9 @@ describe("POST /bottles", () => {
       vintageYear: bottle.vintageYear,
       releaseYear: bottle.releaseYear,
       releaseDate: bottle.releaseDate,
-      caskSize: bottle.caskSize,
-      caskType: bottle.caskType,
-      caskFill: bottle.caskFill,
+      caskNumber: bottle.caskNumber,
+      maturation: bottle.maturation,
+      outturn: bottle.outturn,
       description: bottle.description,
     });
     expect(bottle.createdByActorId).toBe(

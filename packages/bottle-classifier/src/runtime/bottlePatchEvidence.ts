@@ -12,9 +12,9 @@ const GUARDED_PATCH_FIELDS = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
-  "caskSize",
-  "caskType",
-  "caskFill",
+  "maturation",
+  "caskNumber",
+  "outturn",
 ] as const satisfies readonly (keyof BottlePatch)[];
 
 type GuardedPatchField = (typeof GUARDED_PATCH_FIELDS)[number];
@@ -31,9 +31,9 @@ const EVIDENCE_FIELD_NAMES = {
   vintageYear: ["vintageYear", "vintage_year"],
   bottlingYear: ["bottlingYear", "bottling_year"],
   releaseYear: ["releaseYear", "release_year"],
-  caskSize: ["caskSize", "cask_size"],
-  caskType: ["caskType", "cask_type"],
-  caskFill: ["caskFill", "cask_fill"],
+  maturation: ["maturation"],
+  caskNumber: ["caskNumber", "cask_number"],
+  outturn: ["outturn"],
 } as const satisfies Record<GuardedPatchField, readonly string[]>;
 
 function currentFieldValue(
@@ -54,9 +54,9 @@ function currentFieldValue(
     case "vintageYear":
     case "bottlingYear":
     case "releaseYear":
-    case "caskSize":
-    case "caskType":
-    case "caskFill":
+    case "maturation":
+    case "caskNumber":
+    case "outturn":
       return context.exact[field];
   }
 }

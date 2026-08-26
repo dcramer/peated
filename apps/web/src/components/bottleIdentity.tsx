@@ -1,4 +1,3 @@
-import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import {
@@ -24,9 +23,9 @@ export type BottleIdentitySource = Pick<
   | "releaseYear"
   | "singleCask"
   | "caskStrength"
-  | "caskFill"
-  | "caskType"
-  | "caskSize"
+  | "maturation"
+  | "caskNumber"
+  | "outturn"
 > & {
   bottlingYear?: Bottle["bottlingYear"];
   noAgeStatement?: Bottle["noAgeStatement"];
@@ -174,9 +173,9 @@ export function getMetadataExpressedByTitle(
     | "releaseYear"
     | "singleCask"
     | "caskStrength"
-    | "caskFill"
-    | "caskType"
-    | "caskSize"
+    | "maturation"
+    | "caskNumber"
+    | "outturn"
   >,
   title: string,
 ): BottleExactMetadataKey[] {
@@ -237,19 +236,6 @@ export function getMetadataExpressedByTitle(
   if (bottle.caskStrength && normalizedTitle.includes("cask strength")) {
     duplicates.push("cask-strength");
   }
-  const caskDetails = [
-    bottle.caskFill,
-    bottle.caskType,
-    bottle.caskSize,
-  ].filter((value): value is NonNullable<typeof value> => value !== null);
-  if (
-    caskDetails.length > 0 &&
-    caskDetails.every((value) =>
-      normalizedTitle.includes(toTitleCase(value).toLocaleLowerCase()),
-    )
-  ) {
-    duplicates.push("cask-details");
-  }
   return duplicates;
 }
 
@@ -263,7 +249,6 @@ export function getBottleMetadataExclusions(
 
   exclusions.add("single-cask");
   exclusions.add("cask-strength");
-  exclusions.add("cask-details");
   exclusions.add("category");
 
   if (bottle.edition) {

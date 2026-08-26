@@ -1,11 +1,5 @@
 import { z } from "zod";
-import {
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
-  CategoryEnum,
-  EntityTypeEnum,
-} from "../classifierTypes";
+import { CategoryEnum, EntityTypeEnum } from "../classifierTypes";
 
 const LocalCatalogEntitySchema = z
   .object({
@@ -34,9 +28,9 @@ const LocalCatalogBottleSchema = z
     edition: z.string().trim().min(1).nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
-    caskType: CaskTypeEnum.nullable().default(null),
-    caskSize: CaskSizeEnum.nullable().default(null),
-    caskFill: CaskFillEnum.nullable().default(null),
+    maturation: z.string().trim().min(1).nullable().default(null),
+    caskNumber: z.string().trim().min(1).nullable().default(null),
+    outturn: z.number().int().positive().nullable().default(null),
     abv: z.number().min(0).max(100).nullable().default(null),
     vintageYear: z.number().int().gte(1800).nullable().default(null),
     bottlingYear: z.number().int().gte(1800).nullable().optional(),

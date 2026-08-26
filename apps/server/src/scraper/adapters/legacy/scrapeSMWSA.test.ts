@@ -25,9 +25,7 @@ test("bottle list", async ({ axiosMock }) => {
         "brand": {
           "name": "The Scotch Malt Whisky Society",
         },
-        "caskFill": null,
-        "caskSize": "barrel",
-        "caskType": "oak",
+        "caskNumber": "41.176",
         "category": "single_malt",
         "distillers": [
           {
@@ -35,6 +33,7 @@ test("bottle list", async ({ axiosMock }) => {
           },
         ],
         "flavorProfile": "juicy_oak_vanilla",
+        "maturation": "First-fill Chinkapin oak barrel, HTMC",
         "name": "41.176 Baristaliscious",
         "releaseYear": null,
         "singleCask": true,
@@ -60,9 +59,7 @@ test("bottle list", async ({ axiosMock }) => {
         "brand": {
           "name": "The Scotch Malt Whisky Society",
         },
-        "caskFill": null,
-        "caskSize": "barrique",
-        "caskType": null,
+        "caskNumber": "94.45",
         "category": "single_malt",
         "distillers": [
           {
@@ -70,6 +67,7 @@ test("bottle list", async ({ axiosMock }) => {
           },
         ],
         "flavorProfile": "deep_rich_dried_fruit",
+        "maturation": "First-fill Pedro Ximenez ex-Bodega Barrique",
         "name": "94.45 Sultans of Swig",
         "releaseYear": null,
         "singleCask": true,

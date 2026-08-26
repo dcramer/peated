@@ -99,9 +99,9 @@ function makeCollectionBottle(id: number): CollectionBottle {
       bottlingYear: null,
       releaseYear: null,
       releaseDate: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
+      maturation: null,
+      caskNumber: null,
+      outturn: null,
       brand: {
         id: 1,
         peatedId: "E0001",

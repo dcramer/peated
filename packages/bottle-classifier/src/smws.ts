@@ -1,5 +1,4 @@
-import type { CaskFill, CaskSize, CaskType, Category } from "./classifierTypes";
-import { CaskSizeEnum, CaskTypeEnum } from "./classifierTypes";
+import type { Category } from "./classifierTypes";
 import { getExactCaskCodeAnchor } from "./exactCask";
 import { escapeRegExp } from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
@@ -477,60 +476,4 @@ export function parseFlavorProfile(name: string): FlavorProfile | null {
       console.error(`Unknown flavor profile: ${name}`);
       return null;
   }
-}
-
-function parseFill(value: string): CaskFill | null {
-  if (!value) return null;
-
-  value = value.toLowerCase();
-  switch (value) {
-    case "new":
-    case "1st fill":
-    case "first fill":
-      return "1st_fill";
-    case "2nd fill":
-    case "second fill":
-      return "2nd_fill";
-    case "refill":
-      return "refill";
-    default:
-      return null;
-  }
-}
-
-function parseType(value: string): CaskType | null {
-  if (!value) return null;
-  const normalizedType = value
-    .toLowerCase()
-    .replace("px", "pedro_ximenez")
-    .replace(/\s+/g, "_");
-
-  const result = CaskTypeEnum.safeParse(normalizedType);
-  return result.success ? result.data : null;
-}
-
-function parseSize(value: string): CaskSize | null {
-  const normalizedSize = value.toLowerCase();
-
-  const result = CaskSizeEnum.safeParse(normalizedSize);
-  return result.success ? result.data : null;
-}
-
-export function parseCaskType(
-  caskType: string,
-): [CaskFill | null, CaskType | null, CaskSize | null] {
-  const caskFillMatch = caskType.match(
-    /(new|first fill|second fill|1st fill|2nd fill|refill)/i,
-  );
-  const caskTypeMatch = caskType.match(
-    /(bourbon|oloroso|oak|px|rum|armagnac)/i,
-  );
-  const caskSizeMatch = caskType.match(/(barrique|barrel|hogshead|butt)/i);
-
-  // new = 1st fill
-  return [
-    caskFillMatch ? parseFill(caskFillMatch[1]) : null,
-    caskTypeMatch ? parseType(caskTypeMatch[1]) : null,
-    caskSizeMatch ? parseSize(caskSizeMatch[1]) : null,
-  ];
 }

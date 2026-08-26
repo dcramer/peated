@@ -55,9 +55,9 @@ function bottleContext(): BottleContext {
       caskStrength: true,
       vintageYear: null,
       releaseYear: 2022,
-      caskSize: null,
-      caskType: null,
-      caskFill: null,
+      caskNumber: null,
+      maturation: null,
+      outturn: null,
     },
     siblings: [],
     aliases: [],
@@ -88,7 +88,7 @@ function entityContext(): EntityContext {
 }
 
 describe("Bottle-check context tools", () => {
-  test("does not return cask-metadata-only proposals from an audit run", async () => {
+  test("returns a supported maturation proposal from an audit run", async () => {
     const currentBottleContext = bottleContext();
     const prepared = prepareBottleAuditAgentRun(
       {
@@ -113,19 +113,26 @@ describe("Bottle-check context tools", () => {
     expect(
       await invokePreparedTool(prepared, "propose_update_bottle", {
         bottleId: currentBottleContext.bottleId,
-        patch: { caskType: "oloroso" },
-        rationale: "Fill optional cask metadata.",
+        patch: { maturation: "Oloroso hogshead" },
+        rationale: "Copy the producer's maturation statement.",
         evidenceRefs: [
           { kind: "bottle", bottleId: currentBottleContext.bottleId },
         ],
       }),
-    ).toMatchObject({ status: "rejected" });
+    ).toMatchObject({ status: "recorded" });
 
     expect(
       prepared.getOutput({
         finalOutput: { summary: "No material Bottle repair is needed." },
       }).proposedOperations,
-    ).toEqual([]);
+    ).toEqual([
+      expect.objectContaining({
+        input: {
+          bottleId: currentBottleContext.bottleId,
+          patch: { maturation: "Oloroso hogshead" },
+        },
+      }),
+    ]);
   });
 
   test("does not let unrelated web evidence or one label extraction overwrite populated Bottle fields", async () => {
@@ -151,9 +158,9 @@ describe("Bottle-check context tools", () => {
               vintage_year: null,
               cask_strength: true,
               single_cask: false,
-              cask_type: null,
-              cask_size: null,
-              cask_fill: null,
+              maturation: null,
+              cask_number: null,
+              outturn: null,
               edition: "Cask 7445",
             },
             rawLabelText: "CASK 7445 56.4% ABV",
