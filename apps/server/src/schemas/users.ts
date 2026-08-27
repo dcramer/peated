@@ -80,3 +80,25 @@ export const UserInputSchema = UserSchema.omit({
     .optional()
     .describe("Whether to notify user of comments on their content"),
 });
+
+export const AgeStatsSchema = z.object({
+  knownCount: z.number(),
+  median: z.number().nullable(),
+  oldest: z.number().nullable(),
+  buckets: z.array(
+    z.object({
+      id: z.enum([
+        "under10",
+        "from10To12",
+        "from13To17",
+        "from18To24",
+        "atLeast25",
+        "unstated",
+      ]),
+      label: z.string(),
+      count: z.number(),
+    }),
+  ),
+});
+
+export type AgeStats = z.infer<typeof AgeStatsSchema>;
