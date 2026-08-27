@@ -78,7 +78,7 @@ The web workspace SHALL provide Storybook as a design-system catalog that render
 #### Scenario: Product route composes catalog components
 
 - **WHEN** a product route assembles reviewed components into a complete page
-- **THEN** Storybook documents the reusable components and bounded sections without duplicating the complete route
+- **THEN** Storybook documents the reusable component contracts while route-specific sections and the complete composition remain in the application
 
 #### Scenario: Reviewer compares color schemes
 
@@ -132,12 +132,22 @@ page composition and its live product adapter are ready to replace it together.
 #### Scenario: A page composition is under review
 
 - **WHEN** a route's new StyleX components are not yet approved or connected to live behavior
-- **THEN** Storybook renders those real components and the public route keeps its current layout
+- **THEN** Storybook renders the reusable component contracts, the route composition is reviewed in the application, and the public route keeps its current layout
 
 #### Scenario: A route is ready to migrate
 
 - **WHEN** the new composition, live data, authentication, navigation, and mutations are ready
 - **THEN** the route moves to the new application layout without changing its public URL or mixing legacy and new page content
+
+#### Scenario: An anonymous visitor opens the homepage
+
+- **WHEN** the visitor has no session
+- **THEN** public homepage data is fetched through the anonymous server client and hydrated into the matching client queries, the route remains request-time rendered, and the header shows database navigation without duplicating the hero search
+
+#### Scenario: A member opens the homepage
+
+- **WHEN** the visitor has a session
+- **THEN** member activity and personalized homepage data remain client-owned and the application header keeps its global search
 
 ### Requirement: Responsive application header
 

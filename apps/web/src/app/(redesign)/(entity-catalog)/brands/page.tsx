@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function BrandListPage() {
-  return <EntityCatalogPageClient type="brand" />;
+  return <EntityCatalogPageClient kind="brand" />;
 }

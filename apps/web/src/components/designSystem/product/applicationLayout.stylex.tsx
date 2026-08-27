@@ -1,5 +1,6 @@
 "use client";
 
+import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { CircleUserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -46,10 +47,17 @@ function AccountVisual({
   return <CircleUserRound aria-hidden="true" size={19} />;
 }
 
-export function ApplicationLayout({ children }: { children: ReactNode }) {
+export function ApplicationLayout({
+  children,
+  initialStats,
+}: {
+  children: ReactNode;
+  initialStats?: Outputs["stats"];
+}) {
   const pathname = usePathname();
   const { user } = useAuth();
   const [logoutPending, startLogout] = useTransition();
+  const isPublicHome = pathname === "/" && !user;
   const personalItems = user
     ? [
         {
@@ -74,7 +82,7 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
 
   return (
     <PageFrame
-      footer={<ApplicationFooter />}
+      footer={<ApplicationFooter stats={initialStats} />}
       header={
         <ApplicationHeader
           account={
@@ -109,9 +117,14 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
           }
           currentHref={pathname}
           databaseItems={databaseItems}
+          navigationPlacement={isPublicHome ? "inline" : "separate"}
           personalItems={personalItems}
-          search={pathname === "/search" ? undefined : <Search />}
-          showNavigation={Boolean(user)}
+          search={
+            pathname === "/search" || isPublicHome ? undefined : (
+              <Search scopeValues={user ? undefined : ["all"]} />
+            )
+          }
+          showNavigation={Boolean(user) || isPublicHome}
         />
       }
     >

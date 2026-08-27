@@ -43,7 +43,7 @@ export function HomeCriticReviews() {
         heading="Critic reviews are unavailable"
         onRetry={() => void reviews.refetch()}
       >
-        We could not load the latest critic reviews. Try again.
+        We couldn't load the latest critic reviews. Try again.
       </SectionError>
     );
   }

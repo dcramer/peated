@@ -12,7 +12,7 @@ import {
 } from "./authentication.stylex";
 
 const meta = {
-  title: "Patterns/Authentication/Panel",
+  title: "Components/Forms/Authentication Panel",
   component: AuthenticationPanel,
   args: {
     children: null,

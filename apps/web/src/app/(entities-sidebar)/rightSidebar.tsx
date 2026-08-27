@@ -1,0 +1,46 @@
+"use client";
+
+import { toTitleCase } from "@peated/server/lib/strings";
+import type { EntityKind } from "@peated/server/types";
+import Button from "@peated/web/components/button";
+import FilterSidebarSection from "@peated/web/components/filterListSection";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+
+export default function EntityListSidebar({ kind }: { kind: EntityKind }) {
+  const searchParams = useSearchParams();
+  const orpc = useORPC();
+
+  const { data } = useSuspenseQuery(
+    orpc.countries.list.queryOptions({
+      input: {
+        onlyMajor: true,
+        sort: "-bottles",
+      },
+    }),
+  );
+
+  return (
+    <div className="mt-8 flex flex-col overflow-y-auto bg-slate-950 px-6 py-4">
+      <ul role="list" className="flex flex-auto flex-col gap-y-7">
+        <li>
+          <Button href={`/addEntity?kind=${kind}`} fullWidth color="highlight">
+            Add {toTitleCase(kind)}
+          </Button>
+        </li>
+
+        <FilterSidebarSection
+          name="country"
+          options={data.results.map((country) => [
+            `${country.id}`,
+            country.name,
+          ])}
+        />
+        {searchParams.get("region") ? (
+          <FilterSidebarSection name="region" />
+        ) : null}
+      </ul>
+    </div>
+  );
+}

@@ -41,6 +41,7 @@ export type ApplicationHeaderProps = {
   currentHref: string;
   databaseItems: readonly [HeaderNavigationItem, ...HeaderNavigationItem[]];
   defaultSearchOpen?: boolean;
+  navigationPlacement?: "inline" | "separate";
   personalItems: readonly HeaderNavigationItem[];
   search?: ReactNode;
   showNavigation?: boolean;
@@ -57,6 +58,7 @@ export function ApplicationHeader({
   currentHref,
   databaseItems,
   defaultSearchOpen = false,
+  navigationPlacement = "separate",
   personalItems,
   search,
   showNavigation = true,
@@ -92,6 +94,7 @@ export function ApplicationHeader({
             styles.primaryRow,
             searchOpen && styles.primaryRowSearchOpen,
             !hasSearch && styles.primaryRowWithoutSearch,
+            navigationPlacement === "inline" && styles.primaryRowWithInlineNav,
           )}
         >
           <div
@@ -124,6 +127,16 @@ export function ApplicationHeader({
           >
             {brand}
           </a>
+          {showNavigation && navigationPlacement === "inline" ? (
+            <div {...stylex.props(styles.inlineNavigation)}>
+              <NavigationTabs
+                ariaLabel="Peated"
+                currentHref={currentHref}
+                items={databaseItems}
+                personalItems={personalItems}
+              />
+            </div>
+          ) : null}
           {hasSearch ? (
             <div
               ref={searchRef}
@@ -199,7 +212,7 @@ export function ApplicationHeader({
             </button>
           ) : null}
         </div>
-        {showNavigation ? (
+        {showNavigation && navigationPlacement === "separate" ? (
           <div {...stylex.props(styles.navigationRow)}>
             <NavigationTabs
               ariaLabel="Peated"
@@ -446,6 +459,9 @@ const styles = stylex.create({
       gridTemplateColumns: "auto minmax(0, 1fr) auto",
     },
   },
+  primaryRowWithInlineNav: {
+    gridTemplateColumns: "auto minmax(0, 1fr) auto",
+  },
   mobileMenu: {
     display: "none",
     [MOBILE]: {
@@ -607,6 +623,17 @@ const styles = stylex.create({
     borderTopWidth: "1px",
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
+    [MOBILE]: {
+      display: "none",
+    },
+    "::-webkit-scrollbar": {
+      display: "none",
+    },
+  },
+  inlineNavigation: {
+    minWidth: 0,
+    overflowX: "auto",
+    scrollbarWidth: "none",
     [MOBILE]: {
       display: "none",
     },

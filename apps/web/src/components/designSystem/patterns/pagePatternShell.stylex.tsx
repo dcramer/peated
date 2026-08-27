@@ -167,14 +167,25 @@ export function PageFrame({
 export function PageColumns({
   children,
   rail,
+  railBehavior = "hide",
 }: {
   children: ReactNode;
   rail?: ReactNode;
+  railBehavior?: "hide" | "stack";
 }) {
   return (
     <div {...stylex.props(styles.columns, !rail && styles.singleColumn)}>
       <div {...stylex.props(styles.mainColumn)}>{children}</div>
-      {rail ? <aside {...stylex.props(styles.rail)}>{rail}</aside> : null}
+      {rail ? (
+        <aside
+          {...stylex.props(
+            styles.rail,
+            railBehavior === "stack" && styles.stackedRail,
+          )}
+        >
+          {rail}
+        </aside>
+      ) : null}
     </div>
   );
 }
@@ -449,6 +460,11 @@ const styles = stylex.create({
     rowGap: space.x8,
     [NARROW]: {
       display: "none",
+    },
+  },
+  stackedRail: {
+    [NARROW]: {
+      display: "flex",
     },
   },
   pageHeader: {

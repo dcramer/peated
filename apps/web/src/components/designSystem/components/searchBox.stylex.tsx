@@ -22,6 +22,7 @@ export type SearchBoxProps = Pick<
   autoFocus?: boolean;
   defaultOpen?: boolean;
   disabled?: boolean;
+  fluid?: boolean;
   groups: readonly SearchResultGroup[];
   onClose?: () => void;
   onQueryChange: (query: string) => void;
@@ -42,6 +43,7 @@ export function SearchBox({
   defaultOpen = false,
   disabled = false,
   emptyText,
+  fluid = false,
   groups,
   onClose,
   onQueryChange,
@@ -169,7 +171,11 @@ export function SearchBox({
   return (
     <div
       ref={rootRef}
-      {...stylex.props(styles.root, placement === "page" && styles.pageRoot)}
+      {...stylex.props(
+        styles.root,
+        fluid && styles.fluidRoot,
+        placement === "page" && styles.pageRoot,
+      )}
     >
       <div
         {...stylex.props(
@@ -262,6 +268,9 @@ const styles = stylex.create({
   pageRoot: {
     height: "auto",
     maxWidth: "880px",
+  },
+  fluidRoot: {
+    maxWidth: "none",
   },
   surface: {
     width: "100%",

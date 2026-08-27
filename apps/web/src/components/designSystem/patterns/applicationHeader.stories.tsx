@@ -29,9 +29,11 @@ const scopes = [
 ] as const;
 
 function HeaderExample({
+  publicHome = false,
   searchOpen = false,
   signedIn = true,
 }: {
+  publicHome?: boolean;
   searchOpen?: boolean;
   signedIn?: boolean;
 }) {
@@ -71,9 +73,10 @@ function HeaderExample({
       currentHref="/bottles"
       databaseItems={databaseItems}
       defaultSearchOpen={searchOpen}
+      navigationPlacement={publicHome ? "inline" : "separate"}
       personalItems={signedIn ? personalItems : []}
       search={
-        searchOpen ? (
+        publicHome ? undefined : searchOpen ? (
           <SearchBox
             contribution={{
               description: "Not here?",
@@ -100,13 +103,13 @@ function HeaderExample({
           />
         )
       }
-      showNavigation={signedIn}
+      showNavigation={signedIn || publicHome}
     />
   );
 }
 
 const meta = {
-  title: "Patterns/Application Header",
+  title: "Components/Navigation/Application Header",
   component: ApplicationHeader,
   args: {
     account: null,
@@ -125,7 +128,7 @@ type Story = StoryObj<typeof meta>;
 export const SignedIn: Story = { render: () => <HeaderExample /> };
 
 export const SignedOut: Story = {
-  render: () => <HeaderExample signedIn={false} />,
+  render: () => <HeaderExample publicHome signedIn={false} />,
 };
 
 export const SearchOpen: Story = {

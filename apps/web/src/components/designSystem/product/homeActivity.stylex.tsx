@@ -246,7 +246,7 @@ export function HomeActivity({
         heading="Activity is unavailable"
         onRetry={() => void refetch()}
       >
-        We could not load the latest activity. Try again.
+        We couldn't load recent tastings and library updates. Try again.
       </SectionError>
     );
   }
@@ -262,7 +262,7 @@ export function HomeActivity({
           }
           heading="No activity from friends yet"
         >
-          Follow people to see their tastings and collection updates here.
+          Follow people to see their tastings and library updates here.
         </EmptyState>
       );
     }
@@ -278,9 +278,9 @@ export function HomeActivity({
             Log a tasting
           </ButtonLink>
         }
-        heading="What are you drinking?"
+        heading="No recent activity"
       >
-        Record your first tasting note to start your activity history.
+        No one has recorded a tasting or updated a library recently.
       </EmptyState>
     );
   }

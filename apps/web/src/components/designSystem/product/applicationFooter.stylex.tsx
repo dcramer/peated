@@ -1,8 +1,5 @@
-"use client";
+import type { Outputs } from "@peated/server/orpc/router";
 
-import { useQuery } from "@tanstack/react-query";
-
-import { useORPC } from "../../../lib/orpc/context";
 import { SiteFooter, type SiteFooterProps } from "../components";
 
 const groups = [
@@ -49,15 +46,16 @@ function formatCount(value: number, noun: string) {
   return `${value.toLocaleString("en-US")} ${noun}`;
 }
 
-/** Connects the shared footer to platform facts without putting data access in it. */
-export function ApplicationFooter() {
-  const orpc = useORPC();
-  const stats = useQuery(orpc.stats.queryOptions());
-  const coverage = stats.data
+/** Renders the server-supplied platform snapshot without owning data access. */
+export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
+  const coverage = stats
     ? [
-        formatCount(stats.data.totalBottles, "bottles"),
-        formatCount(stats.data.totalEntities, "brands, distillers & bottlers"),
-        formatCount(stats.data.totalTastings, "tastings"),
+        formatCount(stats.totalBottles, "bottles"),
+        formatCount(stats.totalDistilleries, "distilleries"),
+        formatCount(stats.totalBrands, "brands"),
+        formatCount(stats.totalBottlers, "bottlers"),
+        formatCount(stats.totalBlenders, "blenders"),
+        formatCount(stats.totalTastings, "tastings"),
       ].join(" · ")
     : undefined;
 
@@ -65,7 +63,7 @@ export function ApplicationFooter() {
     <SiteFooter
       coverage={coverage}
       groups={groups}
-      provenance="Community-edited · corrections welcome"
+      provenance="Edited by members · corrections welcome"
       referenceLinks={[
         {
           href: "/entities/4263/codes",
@@ -73,7 +71,7 @@ export function ApplicationFooter() {
         },
       ]}
       responsibility="Drink responsibly"
-      statement="A record of every whisky bottling, what the critics said, and what the people who drank it said."
+      statement="A record of whisky bottlings, critic scores, and tasting notes from the people who drank them."
     />
   );
 }

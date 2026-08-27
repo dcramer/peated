@@ -91,7 +91,7 @@
 - [ ] 6.5 Decide and implement the admin styling boundary
 - [ ] 6.6 Remove styling dependencies and compatibility code with no remaining consumers
 - [ ] 6.7 Run full web validation and final desktop and mobile visual QA
-- [x] 6.8 Review the reusable homepage components and bounded sections in Storybook, then connect them through thin product adapters
+- [x] 6.8 Review the shared components used by the homepage in Storybook, then connect the homepage through thin product adapters
 - [x] 6.9 Compose and cut over `/` and its complete application layout together without duplicating the full page in Storybook or changing its public URL
 - [x] 6.10 Migrate login and registration with one shared authentication layout, existing authentication behavior, and focused component stories
 - [x] 6.11 Migrate recovery, verification, terms, browser-support, and OAuth consent states onto the shared authentication layout
@@ -109,7 +109,7 @@
 - [x] 6.23 Remove community-score and community-verdict filtering from the bottle catalog and its Storybook pattern
 - [x] 6.24 Migrate distiller, brand, and bottler catalogs with one shared route client, URL-owned filters, cursor pagination, and bounded Storybook states
 - [x] 6.25 Migrate the entity overview route with route-owned behavior, kind-specific presentation, live details, bottle-list-backed rows and empty states, a reusable entity header, and bounded Storybook states
-- [ ] 6.26 Replace the migrated entity catalogs' legacy type filter with the API-owned kind filter after issue #773 lands
+- [x] 6.26 Replace the migrated entity catalogs' legacy type filter with the API-owned kind filter after issue #773 lands
 - [x] 6.27 Migrate the entity route frame, bottle list, tasting list, and SMWS codes sections with live API state, responsive StyleX composition, and reusable Storybook-owned components
 - [x] 6.28 Migrate the public member profile with API-owned summary, rating, tasting, region, privacy, and action state plus reusable profile-header stories
 - [x] 6.29 Complete the member profile route family with one nested frame, API-owned Library filters and owner actions, Activity records, cursor navigation, and bounded Storybook patterns

@@ -4,7 +4,7 @@ import { Button, RowMenu } from "../components";
 import { EntityPageHeader } from "./entityPageHeader.stylex";
 
 const meta = {
-  title: "Patterns/Entities/Header",
+  title: "Components/Entities/Entity Header",
   component: EntityPageHeader,
   decorators: [
     (Story) => (

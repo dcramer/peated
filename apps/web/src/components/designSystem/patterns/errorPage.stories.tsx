@@ -132,7 +132,7 @@ function OfflineState() {
 }
 
 const meta = {
-  title: "Patterns/Error Pages",
+  title: "Components/Feedback/Error Page",
   component: ErrorPage,
   args: {
     children: null,

@@ -6,18 +6,24 @@ import type {
   SearchResultGroup,
   SearchResultItem,
 } from "@peated/web/components/designSystem/components";
-import { SearchBox } from "@peated/web/components/designSystem/components";
+import {
+  Button,
+  SearchBox,
+} from "@peated/web/components/designSystem/components";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import * as stylex from "@stylexjs/stylex";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
+import { space } from "../../../styles/tokens.stylex";
+
 const searchScopes = [
   { label: "Everything", value: "all" },
   { label: "Bottles", value: "bottles" },
-  { label: "Distillers", value: "distillers" },
+  { label: "Distillers", value: "distilleries" },
   { label: "Brands", value: "brands" },
   { label: "Bottlers", value: "bottlers" },
   { label: "Members", value: "members" },
@@ -25,7 +31,7 @@ const searchScopes = [
 
 const allApiScopes = [
   "bottles",
-  "distillers",
+  "distilleries",
   "brands",
   "bottlers",
   "blenders",
@@ -44,7 +50,7 @@ type BottleSearchResult = Extract<
 >["results"][number];
 type EntitySearchResult = Extract<
   SearchGroup,
-  { type: "distillers" }
+  { type: "distilleries" }
 >["results"][number];
 type RegionSearchResult = Extract<
   SearchGroup,
@@ -68,6 +74,7 @@ export type SearchProps = {
   placement?: "overlay" | "page";
   scopeValues?: readonly SearchScope[];
   showBottleMeasures?: boolean;
+  submitLabel?: string;
 };
 
 const SEARCH_DEBOUNCE_MS = 140;
@@ -196,7 +203,7 @@ function getGroupLabel(type: SearchGroup["type"]) {
   switch (type) {
     case "bottles":
       return "Bottles";
-    case "distillers":
+    case "distilleries":
       return "Distillers";
     case "brands":
       return "Brands";
@@ -229,7 +236,7 @@ function groupItems(
   switch (group.type) {
     case "bottles":
       return group.results.map((bottle) => bottleItem(bottle, bottleOptions));
-    case "distillers":
+    case "distilleries":
     case "brands":
     case "bottlers":
     case "blenders":
@@ -298,7 +305,7 @@ function nearestItem(nearest: SearchNearest, bottleOptions: BottleItemOptions) {
   switch (nearest.type) {
     case "bottles":
       return bottleItem(nearest.result, bottleOptions);
-    case "distillers":
+    case "distilleries":
     case "brands":
     case "bottlers":
     case "blenders":
@@ -335,6 +342,7 @@ export function Search({
   placement = "overlay",
   scopeValues,
   showBottleMeasures = true,
+  submitLabel,
 }: SearchProps = {}) {
   const { user } = useAuth();
   const orpc = useORPC();
@@ -465,7 +473,16 @@ export function Search({
     void debouncedSearch(nextQuery, effectiveScope);
   }
 
-  return (
+  function submitSearch(value: string) {
+    const trimmedValue = value.trim();
+    if (onSubmit) {
+      onSubmit(trimmedValue);
+      return;
+    }
+    router.push(`/search?q=${encodeURIComponent(trimmedValue)}`);
+  }
+
+  const searchBox = (
     <SearchBox
       autoFocus={autoFocus}
       contribution={
@@ -482,6 +499,7 @@ export function Search({
       }
       defaultOpen={defaultOpen || placement === "page"}
       emptyText={emptyText}
+      fluid={Boolean(submitLabel)}
       groups={groups}
       onQueryChange={updateQuery}
       onRetry={() => void runSearch(query, effectiveScope)}
@@ -492,14 +510,7 @@ export function Search({
         setScope(nextScope);
         void runSearch(query, nextScope);
       }}
-      onSubmit={(value) => {
-        const trimmedValue = value.trim();
-        if (onSubmit) {
-          onSubmit(trimmedValue);
-          return;
-        }
-        router.push(`/search?q=${encodeURIComponent(trimmedValue)}`);
-      }}
+      onSubmit={submitSearch}
       placement={placement}
       placeholder="bottles, distillers, brands…"
       query={query}
@@ -513,4 +524,33 @@ export function Search({
       }
     />
   );
+
+  if (!submitLabel) return searchBox;
+
+  return (
+    <div {...stylex.props(styles.searchWithSubmit)}>
+      <div {...stylex.props(styles.searchControl)}>{searchBox}</div>
+      <Button
+        disabled={!query.trim()}
+        onClick={() => submitSearch(query)}
+        size="md"
+        variant="accent"
+      >
+        {submitLabel}
+      </Button>
+    </div>
+  );
 }
+
+const styles = stylex.create({
+  searchWithSubmit: {
+    display: "flex",
+    width: "100%",
+    alignItems: "flex-start",
+    gap: space.x2,
+  },
+  searchControl: {
+    minWidth: 0,
+    flex: 1,
+  },
+});

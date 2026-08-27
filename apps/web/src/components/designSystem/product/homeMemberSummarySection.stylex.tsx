@@ -35,7 +35,7 @@ export function HomeMemberSummarySection() {
           void tastingStats.refetch();
         }}
       >
-        We could not load your tasting summary. Try again.
+        We couldn't load your record. Try again.
       </SectionError>
     );
   }
@@ -43,7 +43,7 @@ export function HomeMemberSummarySection() {
   return (
     <HomeMemberSummary
       facts={[
-        { label: "On the shelf", value: details.data.stats.library.total },
+        { label: "In your library", value: details.data.stats.library.total },
         { label: "Bottles tasted", value: tastingStats.data.uniqueBottles },
         { label: "Contributions", value: details.data.stats.contributions },
       ]}

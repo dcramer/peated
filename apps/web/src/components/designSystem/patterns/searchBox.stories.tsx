@@ -17,7 +17,7 @@ const scopes = [
 ] as const;
 
 const meta = {
-  title: "Patterns/Search",
+  title: "Components/Search/Search Box",
   component: SearchBox,
   args: {
     contribution: {

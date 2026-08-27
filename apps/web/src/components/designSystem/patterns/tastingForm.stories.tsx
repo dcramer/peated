@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { TastingFormPattern } from "./tastingForm.stylex";
 
 const meta = {
-  title: "Patterns/Tasting Form",
+  title: "Components/Forms/Tasting Form",
   component: TastingFormPattern,
   args: {
     initialGrain: "band",

@@ -1,7 +1,7 @@
 "use client";
 
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { Entity, EntityType } from "@peated/server/types";
+import type { Entity, EntityKind } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -24,25 +24,30 @@ const sortOptions = [
   { label: "Recently added", value: "-created" },
 ] as const;
 
+type CatalogKind = Extract<EntityKind, "bottler" | "brand" | "distillery">;
+
 const catalogConfig = {
   bottler: { noun: "bottler", title: "Bottlers" },
   brand: { noun: "brand", title: "Brands" },
-  distiller: { noun: "distiller", title: "Distillers" },
-} satisfies Record<EntityType, { noun: string; title: string }>;
+  distillery: { noun: "distiller", title: "Distillers" },
+} satisfies Record<CatalogKind, { noun: string; title: string }>;
 
-export function EntityCatalogPageClient({ type }: { type: EntityType }) {
-  const config = catalogConfig[type];
+export function EntityCatalogPageClient({ kind }: { kind: CatalogKind }) {
+  const config = catalogConfig[kind];
   const orpc = useORPC();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
-    overrides: { type },
   });
-  const { data: entityList } = useSuspenseQuery(
-    orpc.entities.list.queryOptions({ input: queryParams }),
-  );
+  const listQueryOptions =
+    kind === "distillery"
+      ? orpc.distilleries.list.queryOptions({ input: queryParams })
+      : kind === "brand"
+        ? orpc.brands.list.queryOptions({ input: queryParams })
+        : orpc.bottlers.list.queryOptions({ input: queryParams });
+  const { data: entityList } = useSuspenseQuery(listQueryOptions);
   const { data: countryList } = useSuspenseQuery(
     orpc.countries.list.queryOptions({
       input: { onlyMajor: true, sort: "-bottles" },
@@ -75,7 +80,7 @@ export function EntityCatalogPageClient({ type }: { type: EntityType }) {
     router.push(buildHref(pathname, nextParams));
   }
 
-  const addHref = `/addEntity?type=${type}`;
+  const addHref = `/addEntity?kind=${kind}`;
   const items = entityList.results.map(toCatalogItem);
 
   return (
@@ -135,7 +140,7 @@ function toCatalogItem(entity: Entity): EntityCatalogItem {
     .join(", ");
   const metadata = [
     entity.peatedId,
-    entity.kind ? toTitleCase(entity.kind) : null,
+    toTitleCase(entity.kind),
     location || null,
   ].filter((value): value is string => value !== null);
 

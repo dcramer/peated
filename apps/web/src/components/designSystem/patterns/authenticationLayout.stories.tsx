@@ -113,7 +113,7 @@ function RegistrationShell() {
 }
 
 const meta = {
-  title: "Patterns/Authentication/Layout",
+  title: "Components/Layout/Authentication Layout",
   component: AuthenticationLayout,
   args: {
     children: null,

@@ -3,11 +3,8 @@ import type { ReactNode } from "react";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
 import { SectionHeading } from "../components";
-import { type SummaryStripCells } from "../components/summaryStrip.stylex";
 import { PublicHomeIntro } from "./homeSections.stylex";
 import { PageColumns } from "./pagePatternShell.stylex";
-
-const NARROW = "@media (max-width: 759px)";
 
 export type SignedInHomePageProps = {
   activity: ReactNode;
@@ -21,12 +18,9 @@ export type SignedInHomePageProps = {
 };
 
 export type SignedOutHomePageProps = {
+  content: ReactNode;
   description: ReactNode;
-  eyebrow?: ReactNode;
-  facts?: SummaryStripCells;
-  overview?: ReactNode;
-  primaryAction: ReactNode;
-  secondaryAction: ReactNode;
+  search: ReactNode;
   signedIn: false;
   title: ReactNode;
 };
@@ -40,13 +34,12 @@ export function HomePage(props: HomePageProps) {
       <>
         <PublicHomeIntro
           description={props.description}
-          eyebrow={props.eyebrow}
-          facts={props.facts}
-          primaryAction={props.primaryAction}
-          secondaryAction={props.secondaryAction}
+          search={props.search}
           title={props.title}
         />
-        {props.overview}
+        <div {...stylex.props(styles.publicContent)}>
+          <div {...stylex.props(styles.publicMain)}>{props.content}</div>
+        </div>
       </>
     );
   }
@@ -61,9 +54,12 @@ export function HomePage(props: HomePageProps) {
         >
           <div {...stylex.props(styles.feedHeading)}>
             <div id="home-feed-heading">
-              <SectionHeading>Feed</SectionHeading>
+              <SectionHeading>Activity</SectionHeading>
             </div>
-            <div aria-label="Activity feed" {...stylex.props(styles.feedTabs)}>
+            <div
+              aria-label="Activity filter"
+              {...stylex.props(styles.feedTabs)}
+            >
               {props.feeds.map((feed) => {
                 const selected = feed.value === props.currentFeed;
                 return (
@@ -96,6 +92,15 @@ export function HomePage(props: HomePageProps) {
 }
 
 const styles = stylex.create({
+  publicContent: {
+    paddingBottom: space.x12,
+  },
+  publicMain: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x12,
+  },
   signedInMain: {
     display: "flex",
     minWidth: 0,

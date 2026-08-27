@@ -43,7 +43,7 @@ export function HomeMemberSummary({
             {totalTastings.toLocaleString("en-US")}
           </strong>
           <span {...stylex.props(styles.recordTotalLabel)}>
-            tastings you have recorded
+            tastings you've recorded
           </span>
         </div>
         <div {...stylex.props(styles.recordDistribution)}>

@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function DistillerListPage() {
-  return <EntityCatalogPageClient type="distiller" />;
+  return <EntityCatalogPageClient kind="distillery" />;
 }

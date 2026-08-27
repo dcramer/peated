@@ -29,7 +29,10 @@ export function HomeFollowedReleases() {
   if (releases.isPending) {
     return (
       <HomeSectionLoading>
-        <LoadingList label="Loading followed releases" rows={3} />
+        <LoadingList
+          label="Loading new releases from distillers you follow"
+          rows={3}
+        />
       </HomeSectionLoading>
     );
   }
@@ -40,7 +43,7 @@ export function HomeFollowedReleases() {
         heading="New releases are unavailable"
         onRetry={() => void releases.refetch()}
       >
-        We could not load releases from the distillers you follow. Try again.
+        We couldn't load releases from the distillers you follow. Try again.
       </SectionError>
     );
   }
