@@ -7,6 +7,7 @@ import {
 } from "@openai/agents";
 import { randomUUID } from "node:crypto";
 import type OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { normalizePotentialProofLikeDecision } from "./abv";
 import type { BottleContext, EntityContext } from "./bottleContextContract";
@@ -165,11 +166,10 @@ function stripProviderUnsupportedFormats(value: JsonValue): JsonValue {
 function createAgentOutputType(
   name: string,
   schema: z.ZodObject,
-  strict = false,
 ): JsonSchemaDefinition {
-  const generatedSchema = z.toJSONSchema(schema, {
-    target: "draft-7",
-  });
+  // The OpenAI helper makes nullable optional fields required on the wire and
+  // rejects optional non-nullable fields before the provider request.
+  const generatedSchema = zodTextFormat(schema, name).schema;
   // Zod attaches non-JSON Standard Schema metadata to the generated object.
   // The provider contract owns only its serialized JSON representation.
   const providerSchema = JsonObjectSchema.parse(
@@ -178,7 +178,7 @@ function createAgentOutputType(
   return {
     type: "json_schema",
     name,
-    strict,
+    strict: true,
     schema: AgentOutputJsonSchema.parse(
       stripProviderUnsupportedFormats(providerSchema),
     ),
@@ -188,13 +188,11 @@ function createAgentOutputType(
 const BottleReferenceAgentOutputType = createAgentOutputType(
   "bottle_reference_output",
   BottleReferenceAgentOutputSchema,
-  true,
 );
 
 const BottleAuditAgentOutputType = createAgentOutputType(
   "bottle_audit_output",
   BottleAuditAgentOutputSchema,
-  true,
 );
 
 export type BottleAuditAgentOutput = z.infer<

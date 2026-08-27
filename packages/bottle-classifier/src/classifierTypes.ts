@@ -549,10 +549,6 @@ export const BottleClassificationDecisionSchema = z.discriminatedUnion(
   [MatchDecisionSchema, CreateBottleDecisionSchema, NoMatchDecisionSchema],
 );
 
-const AgentProposedBottleSchema = ProposedBottleSchema.extend({
-  abv: z.number().nullable().default(null),
-});
-
 export const BottleClassifierActionSchema = z.enum([
   "match",
   "create_bottle",
@@ -581,7 +577,7 @@ export const BottleClassifierAgentDecisionSchema = z
       .max(MAX_BOTTLE_CANDIDATES)
       .default([]),
     matchedBottleId: z.number().int().nullable().default(null),
-    proposedBottle: AgentProposedBottleSchema.nullable()
+    proposedBottle: ProposedBottleSchema.nullable()
       .default(null)
       .describe(
         "Required for create_bottle. A create draft describes one independently complete Bottle, including every supported marketed release trait; unknown optional fields may remain null.",

@@ -158,6 +158,22 @@ describe("classifier output boundary", () => {
     );
     expect(outputType.schema.properties).not.toHaveProperty("identityBasis");
     expect(outputType.schema.properties).not.toHaveProperty("findings");
+    expect(outputType.schema).toMatchObject({
+      properties: {
+        proposedBottle: {
+          anyOf: expect.arrayContaining([
+            expect.objectContaining({
+              type: "object",
+              properties: expect.objectContaining({
+                bottlingYear: expect.any(Object),
+              }),
+              required: expect.arrayContaining(["bottlingYear"]),
+              additionalProperties: false,
+            }),
+          ]),
+        },
+      },
+    });
     expect(hasFormatAnnotation(outputType.schema)).toBe(false);
     expect(prepared.agent.tools.map((tool) => tool.name)).not.toEqual(
       expect.arrayContaining([
