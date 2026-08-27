@@ -10,7 +10,9 @@ import bottleList from "./routes/bottles/list";
 import bottlePriceList from "./routes/bottles/prices/list";
 import bottleTags from "./routes/bottles/tags";
 import changeList from "./routes/changes/list";
+import collectionBottleDelete from "./routes/collections/bottles/delete";
 import collectionBottleList from "./routes/collections/bottles/list";
+import collectionBottleUpdate from "./routes/collections/bottles/update";
 import commentList from "./routes/comments/list";
 import countryDetails from "./routes/countries/details";
 import countryList from "./routes/countries/list";
@@ -77,7 +79,9 @@ export const mockRouter = mockOS.router({
   },
   collections: {
     bottles: {
+      delete: collectionBottleDelete,
       list: collectionBottleList,
+      update: collectionBottleUpdate,
     },
   },
   countries: {

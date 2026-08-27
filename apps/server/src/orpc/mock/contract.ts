@@ -10,7 +10,9 @@ import bottleList from "@peated/server/orpc/contracts/bottles/list";
 import bottlePriceList from "@peated/server/orpc/contracts/bottles/prices/list";
 import bottleTags from "@peated/server/orpc/contracts/bottles/tags";
 import changeList from "@peated/server/orpc/contracts/changes/list";
+import collectionBottleDelete from "@peated/server/orpc/contracts/collections/bottles/delete";
 import collectionBottleList from "@peated/server/orpc/contracts/collections/bottles/list";
+import collectionBottleUpdate from "@peated/server/orpc/contracts/collections/bottles/update";
 import commentList from "@peated/server/orpc/contracts/comments/list";
 import countryDetails from "@peated/server/orpc/contracts/countries/details";
 import countryList from "@peated/server/orpc/contracts/countries/list";
@@ -77,7 +79,9 @@ export const mockContract = {
   },
   collections: {
     bottles: {
+      delete: collectionBottleDelete,
       list: collectionBottleList,
+      update: collectionBottleUpdate,
     },
   },
   countries: {
