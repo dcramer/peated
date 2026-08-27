@@ -76,6 +76,7 @@ export default implement(entityCatalogContract).handler(async function ({
         id: entities.id,
         name: entities.name,
         shortName: entities.shortName,
+        kind: entities.kind,
         count: sql<string>`COUNT(DISTINCT ${bottles.id})`,
       })
       .from(bottles)
@@ -89,6 +90,7 @@ export default implement(entityCatalogContract).handler(async function ({
         id: entities.id,
         name: entities.name,
         shortName: entities.shortName,
+        kind: entities.kind,
         count: sql<string>`COUNT(DISTINCT ${bottles.id})`,
       })
       .from(bottles)
@@ -102,6 +104,7 @@ export default implement(entityCatalogContract).handler(async function ({
         id: entities.id,
         name: entities.name,
         shortName: entities.shortName,
+        kind: entities.kind,
         count: sql<string>`COUNT(DISTINCT ${bottles.id})`,
       })
       .from(bottles)

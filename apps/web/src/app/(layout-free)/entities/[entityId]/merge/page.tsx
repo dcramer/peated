@@ -12,6 +12,7 @@ import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
   useMutation,
@@ -86,7 +87,7 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
               Performing merge asynchronously. Updates may take a few minutes.
             </div>,
           );
-          router.push(`/entities/${newEntity.id}`);
+          router.push(getEntityUrl(newEntity));
         },
       },
     );

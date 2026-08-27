@@ -1,4 +1,4 @@
-import { CategoryEnum } from "@peated/server/schemas";
+import { CategoryEnum, EntityKindEnum } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
 
@@ -6,6 +6,7 @@ const RelatedEntitySchema = z.object({
   id: z.number(),
   name: z.string(),
   shortName: z.string().nullable(),
+  kind: EntityKindEnum.nullable(),
   count: z.number(),
 });
 

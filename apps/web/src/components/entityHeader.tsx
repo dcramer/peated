@@ -1,7 +1,7 @@
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/assets/entity.svg";
 import Link from "@peated/web/components/link";
-import { getEntityTypeSearchUrl } from "../lib/urls";
+import { getEntityTypeSearchUrl, getEntityUrl } from "../lib/urls";
 import Chip from "./chip";
 import PageHeader from "./pageHeader";
 import PeatedId from "./peatedId";
@@ -19,7 +19,7 @@ export default function EntityHeader({
       title={entity.name}
       titleExtra={
         <div className="flex max-w-full flex-col items-center lg:items-start">
-          <PeatedId value={entity.peatedId} />
+          <PeatedId value={entity.peatedId} href={getEntityUrl(entity)} />
           <div className="text-muted max-w-full text-center lg:text-left">
             {!!entity.country && (
               <>

@@ -1,7 +1,7 @@
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { getEntityPage } from "@peated/web/lib/entityPage.server";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { type ReactNode } from "react";
 
 export default async function Layout(props: {
@@ -14,15 +14,8 @@ export default async function Layout(props: {
 
   const { children } = props;
 
-  const { client } = await getAnonymousServerClient();
-
-  const entity = await resolveOrNotFound(
-    client.entities.details({
-      entity: Number(entityId),
-    }),
-  );
-
-  const baseUrl = `/entities/${entity.id}`;
+  const entity = await getEntityPage(Number(entityId));
+  const baseUrl = getEntityUrl(entity);
 
   return (
     <>

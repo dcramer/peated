@@ -9,11 +9,12 @@ import {
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import Join from "./join";
 
 export type TastingBottleIdentitySource = BottleIdentitySource &
   Pick<Bottle, "isLibrary" | "hasTasted"> & {
-    distillers: Pick<Bottle["distillers"][number], "id" | "name">[];
+    distillers: Pick<Bottle["distillers"][number], "id" | "kind" | "name">[];
   };
 
 export default function TastingBottleIdentity({
@@ -86,7 +87,7 @@ export default function TastingBottleIdentity({
               {distinctDistillers.map((distiller) => (
                 <Link
                   key={distiller.id}
-                  href={`/entities/${distiller.id}`}
+                  href={getEntityUrl(distiller)}
                   className="hover:underline"
                 >
                   {distiller.name}

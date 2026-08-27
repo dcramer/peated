@@ -8,6 +8,7 @@ import ConfirmationButton from "@peated/web/components/confirmationButton";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -21,6 +22,8 @@ export default function ModActions({ entity }: { entity: Entity }) {
   );
 
   if (!user?.mod) return null;
+
+  const entityUrl = getEntityUrl(entity);
 
   const deleteEntity = async () => {
     // TODO: show confirmation message
@@ -39,13 +42,13 @@ export default function ModActions({ entity }: { entity: Entity }) {
         className="absolute right-0 z-40 mt-2 w-32 origin-top-right"
         unmount={false}
       >
-        <MenuItem as={Link} href={`/entities/${entity.id}/aliases`}>
+        <MenuItem as={Link} href={`${entityUrl}/aliases`}>
           View Aliases
         </MenuItem>
-        <MenuItem as={Link} href={`/entities/${entity.id}/edit`}>
+        <MenuItem as={Link} href={`${entityUrl}/edit`}>
           Edit Entity
         </MenuItem>
-        <MenuItem as={Link} href={`/entities/${entity.id}/merge`}>
+        <MenuItem as={Link} href={`${entityUrl}/merge`}>
           Merge Entity
         </MenuItem>
         {user.admin && (

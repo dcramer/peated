@@ -5,6 +5,7 @@ import {
   getBottleExpressionName,
 } from "@peated/web/lib/bottleLabel";
 import classNames from "@peated/web/lib/classNames";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import type { MouseEventHandler, ReactNode } from "react";
 import BottleExactMetadata, {
   type BottleExactMetadataKey,
@@ -29,7 +30,7 @@ export type BottleIdentitySource = Pick<
 > & {
   bottlingYear?: Bottle["bottlingYear"];
   noAgeStatement?: Bottle["noAgeStatement"];
-  brand: Pick<Bottle["brand"], "id" | "name" | "shortName">;
+  brand: Pick<Bottle["brand"], "id" | "kind" | "name" | "shortName">;
   series: Pick<NonNullable<Bottle["series"]>, "id" | "name"> | null;
   group?: Pick<NonNullable<Bottle["group"]>, "name"> &
     Partial<Pick<NonNullable<Bottle["group"]>, "statedAge">>;
@@ -104,7 +105,7 @@ export function getDistinctBottleDistillers({
   distillers,
 }: {
   brand: Pick<Bottle["brand"], "name" | "shortName">;
-  distillers: Pick<Bottle["distillers"][number], "id" | "name">[];
+  distillers: Pick<Bottle["distillers"][number], "id" | "kind" | "name">[];
 }) {
   const brandNames = new Set(
     [brand.name, brand.shortName]
@@ -389,7 +390,7 @@ export default function BottleIdentity({
         <div className="text-muted flex min-w-0 items-center gap-1.5 truncate text-xs font-medium uppercase tracking-wide">
           {showBrand ? (
             <Link
-              href={`/entities/${bottle.brand.id}`}
+              href={getEntityUrl(bottle.brand)}
               className="truncate hover:underline"
             >
               {bottle.brand.shortName || bottle.brand.name}

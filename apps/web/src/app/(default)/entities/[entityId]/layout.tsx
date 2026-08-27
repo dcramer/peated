@@ -1,11 +1,9 @@
 import Button from "@peated/web/components/button";
 import EntityHeader from "@peated/web/components/entityHeader";
 import ShareButton from "@peated/web/components/shareButton";
+import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { summarize } from "@peated/web/lib/markdown";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { getCanonicalRouteRedirectPath } from "@peated/web/lib/tombstoneRedirect";
-import { redirect } from "next/navigation";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { type ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
 import ModActions from "./modActions";
@@ -17,13 +15,7 @@ export async function generateMetadata(props: {
 
   const { entityId } = params;
 
-  const { client } = await getAnonymousServerClient();
-
-  const entity = await resolveOrNotFound(
-    client.entities.details({
-      entity: Number(entityId),
-    }),
-  );
+  const entity = await getEntityPage(Number(entityId));
 
   const description = summarize(entity.description || "", 200);
 
@@ -48,32 +40,16 @@ export default async function Layout(props: {
 
   const { children } = props;
 
-  const { client } = await getAnonymousServerClient();
-
   const entityId = Number(params.entityId);
-  const entity = await resolveOrNotFound(
-    client.entities.details({
-      entity: entityId,
-    }),
-  );
-
-  // tombstone path - redirect to the absolute url to ensure search engines dont get mad
-  if (entity.id !== entityId) {
-    return redirect(
-      await getCanonicalRouteRedirectPath({
-        currentId: entityId,
-        canonicalId: entity.id,
-        collectionPath: "/entities",
-      }),
-    );
-  }
+  const entity = await getEntityPage(entityId);
+  const entityUrl = getEntityUrl(entity);
 
   const jsonLd: WithContext<Organization> = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: entity.name,
     description: entity.description ?? undefined,
-    // url: `/entities/${entity.id}`,
+    url: entityUrl,
     address: entity.country
       ? [
           {
@@ -85,7 +61,7 @@ export default async function Layout(props: {
       : [],
   };
   const createBottleParams = new URLSearchParams({
-    returnTo: `/entities/${entityId}`,
+    returnTo: entityUrl,
   });
   if (entity.type.includes("brand"))
     createBottleParams.set("brand", `${entity.id}`);
@@ -113,7 +89,7 @@ export default async function Layout(props: {
                 Create Bottle
               </Button>
 
-              <ShareButton title={entity.name} url={`/${entity.peatedId}`} />
+              <ShareButton title={entity.name} url={entityUrl} />
 
               <ModActions entity={entity} />
             </div>

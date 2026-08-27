@@ -18,7 +18,7 @@ function makeBottle(
       name: "12-year-old Cask Strength",
       statedAge: 12,
     },
-    brand: { id: 1, name: "Springbank", shortName: null },
+    brand: { id: 1, kind: "distillery", name: "Springbank", shortName: null },
     series: null,
     edition: "Batch 24",
     category: "single_malt",
@@ -36,7 +36,7 @@ function makeBottle(
 }
 
 function makeBrand(id: number, name: string): BottleIdentitySource["brand"] {
-  return { id, name, shortName: null };
+  return { id, kind: "brand", name, shortName: null };
 }
 
 function makeSeries(

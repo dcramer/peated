@@ -93,7 +93,7 @@ export default async function Layout({
             <ActivityRailSection title="Quick Links">
               <div className="text-muted px-3 text-sm">
                 <Link
-                  href="/entities/4263/codes"
+                  href="/bottlers/4263/codes"
                   className="text-inherit hover:underline"
                 >
                   SMWS Distillery Codes

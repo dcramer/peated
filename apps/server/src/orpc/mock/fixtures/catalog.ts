@@ -76,6 +76,7 @@ export function mockEntityCatalogFor(
         id: value.id,
         name: value.name,
         shortName: value.shortName,
+        kind: value.kind,
         count: relatedBottles.filter(
           (bottle) =>
             bottle.brand.id === value.id ||

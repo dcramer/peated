@@ -88,7 +88,8 @@ Be careful with layout-level route config:
 The first shared-cache targets are:
 
 - `/bottles/[bottleId]` and nested public bottle tabs.
-- `/entities/[entityId]` and nested public entity tabs.
+- Primary-kind Entity routes such as `/distillers/[entityId]` and their nested
+  public tabs.
 - Sitemap route handlers at `/sitemap.xml` and under `/sitemaps/*`.
 
 Bottle and entity detail pages should use dynamic SSR and anonymous server data

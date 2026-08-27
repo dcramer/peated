@@ -62,20 +62,45 @@ describe("GET /entities/:entity/catalog", () => {
       ],
       related: {
         brands: [
-          { id: alphaBrand.id, name: "Alpha Brand", shortName: null, count: 1 },
-          { id: betaBrand.id, name: "Beta Brand", shortName: null, count: 1 },
+          {
+            id: alphaBrand.id,
+            name: "Alpha Brand",
+            shortName: null,
+            kind: null,
+            count: 1,
+          },
+          {
+            id: betaBrand.id,
+            name: "Beta Brand",
+            shortName: null,
+            kind: null,
+            count: 1,
+          },
         ],
         bottlers: [
           {
             id: outsideBottler.id,
             name: "Outside Bottler",
             shortName: null,
+            kind: null,
             count: 1,
           },
         ],
         distillers: [
-          { id: sourceA.id, name: "Source A", shortName: null, count: 1 },
-          { id: sourceB.id, name: "Source B", shortName: null, count: 1 },
+          {
+            id: sourceA.id,
+            name: "Source A",
+            shortName: null,
+            kind: null,
+            count: 1,
+          },
+          {
+            id: sourceB.id,
+            name: "Source B",
+            shortName: null,
+            kind: null,
+            count: 1,
+          },
         ],
       },
       notableBottles: [

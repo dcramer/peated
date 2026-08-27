@@ -6,6 +6,7 @@ import type { Entity } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import SimpleRatingIndicator from "@peated/web/components/simpleRatingIndicator";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
@@ -169,7 +170,7 @@ export default function EntityCatalogOverview({ entity }: { entity: Entity }) {
                 id: item.id,
                 label: item.shortName || item.name,
                 count: item.count,
-                href: `/entities/${item.id}`,
+                href: getEntityUrl(item),
               }))}
               maxCount={Math.max(
                 ...relatedView.items.map((item) => item.count),
@@ -188,7 +189,7 @@ export default function EntityCatalogOverview({ entity }: { entity: Entity }) {
                 : "Catalog bottles"}
             </h3>
             <Link
-              href={`/entities/${entity.id}/bottles?sort=-tastings`}
+              href={`${getEntityUrl(entity)}/bottles?sort=-tastings`}
               className="text-highlight text-sm hover:underline"
             >
               View all

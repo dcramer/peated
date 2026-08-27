@@ -1,5 +1,6 @@
 import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
+import { getBottleUrl } from "@peated/web/lib/urls";
 
 const SITEMAP_CACHE_CONTROL =
   "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
@@ -32,7 +33,7 @@ export async function GET(
 
     pages.push(
       ...results.map((bottle) => ({
-        url: `/${bottle.peatedId}`,
+        url: getBottleUrl(bottle),
         lastModified: bottle.updatedAt,
       })),
     );

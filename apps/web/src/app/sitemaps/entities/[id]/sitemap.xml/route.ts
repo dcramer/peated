@@ -1,5 +1,6 @@
 import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 const SITEMAP_CACHE_CONTROL =
   "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
@@ -30,7 +31,7 @@ export async function GET(
 
     pages.push(
       ...results.map((entity) => ({
-        url: `/${entity.peatedId}`,
+        url: getEntityUrl(entity),
         lastModified: entity.updatedAt,
       })),
     );

@@ -1,6 +1,5 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { type ReactNode } from "react";
 
 export async function generateMetadata(props: {
@@ -10,11 +9,7 @@ export async function generateMetadata(props: {
 
   const { entityId } = params;
 
-  const { client } = await getAnonymousServerClient();
-
-  const entity = await resolveOrNotFound(
-    client.entities.details({ entity: Number(entityId) }),
-  );
+  const entity = await getEntityPage(Number(entityId));
 
   return {
     title: `Other Names for ${entity.name}`,

@@ -4,6 +4,7 @@ import { use } from "react";
 import BottleTable from "@peated/web/components/bottleTable";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export default function EntityTastings(props: {
@@ -48,7 +49,7 @@ export default function EntityTastings(props: {
         rel={bottleList.rel}
         groupBy={(item) => item.brand}
         groupItem={(item) => item.shortName || item.name}
-        groupTo={(group) => `/entities/${group.id}`}
+        groupTo={(group) => getEntityUrl(group)}
         withSearch
       />
     </>

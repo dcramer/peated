@@ -8,7 +8,7 @@ export const revalidate = 86400;
 export async function GET() {
   const pagesSitemapXML = await buildPagesSitemap([
     { url: "/about" },
-    { url: "/entities/4263/codes" },
+    { url: "/bottlers/4263/codes" },
   ]);
 
   return new Response(pagesSitemapXML, {

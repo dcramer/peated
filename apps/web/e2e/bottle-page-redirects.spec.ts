@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { bottlePeatedIdPath } from "./assertions";
+import { bottlePath } from "./assertions";
 import {
   destinationBottleGroup,
   exactMatchedBottleId,
@@ -48,7 +48,7 @@ test.describe("Bottle page redirects", () => {
     page,
   }) => {
     await page.goto(`/bottles/${missingBottleId}`);
-    await expect(page).toHaveURL(bottlePeatedIdPath(missingBottleId));
+    await expect(page).toHaveURL(bottlePath(missingBottleId));
     await expect(
       page.getByRole("heading", { name: "Not Found" }),
     ).toBeVisible();

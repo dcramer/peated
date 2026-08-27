@@ -12,6 +12,7 @@ import {
   type BottleIdentitySource,
 } from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import type { ElementType } from "react";
 import { Distillers } from "./bottleMetadata";
 import PageHeader from "./pageHeader";
@@ -19,7 +20,7 @@ import PeatedId from "./peatedId";
 
 export type BottleHeaderBottle = BottleIdentitySource & {
   peatedId: string;
-  distillers: Array<Pick<Bottle["distillers"][number], "id" | "name">>;
+  distillers: Array<Pick<Bottle["distillers"][number], "id" | "kind" | "name">>;
 };
 
 export default function BottleHeader({
@@ -70,7 +71,7 @@ export default function BottleHeader({
             <div title={bottle.fullName} className="flex min-w-0 flex-col">
               <span className="text-muted flex min-w-0 items-center justify-center gap-1.5 truncate text-xs font-medium uppercase tracking-wide lg:justify-start">
                 <Link
-                  href={`/entities/${bottle.brand.id}`}
+                  href={getEntityUrl(bottle.brand)}
                   className="truncate hover:underline"
                 >
                   {bottle.brand.shortName || bottle.brand.name}
@@ -94,7 +95,7 @@ export default function BottleHeader({
       }
       titleExtra={
         <div className="flex max-w-full flex-col items-center gap-1 lg:items-start">
-          <PeatedId value={bottle.peatedId} />
+          <PeatedId value={bottle.peatedId} href={getBottleUrl(bottle)} />
           {hasIdentityDetails ? (
             <>
               <BottleExactMetadata

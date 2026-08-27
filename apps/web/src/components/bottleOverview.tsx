@@ -3,6 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { Suspense } from "react";
 import AdvancedRatingDisplay from "./advancedRatingDisplay";
 import BottleBarcodes from "./bottleBarcodes";
@@ -85,7 +86,7 @@ export default function BottleOverview({
               <DefinitionList.Details>
                 <Link
                   key={bottle.brand.id}
-                  href={`/entities/${bottle.brand.id}`}
+                  href={getEntityUrl(bottle.brand)}
                   className="underline"
                 >
                   {bottle.brand.name}
@@ -112,7 +113,7 @@ export default function BottleOverview({
                     {bottle.distillers.map((d) => (
                       <Link
                         key={d.id}
-                        href={`/entities/${d.id}`}
+                        href={getEntityUrl(d)}
                         className="underline"
                       >
                         {d.name}
@@ -128,7 +129,7 @@ export default function BottleOverview({
                 {bottle.bottler ? (
                   <Link
                     key={bottle.bottler.id}
-                    href={`/entities/${bottle.bottler.id}`}
+                    href={getEntityUrl(bottle.bottler)}
                     className="underline"
                   >
                     {bottle.bottler.name}
