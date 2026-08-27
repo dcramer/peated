@@ -1,0 +1,134 @@
+## Context
+
+Peated's web styles are embedded in route and component Tailwind class strings. The current design package only exports Tailwind configuration, the root layout forces a dark palette, and email templates consume the resolved Tailwind theme. The new visual direction defines semantic colors, three type roles, tight radii, tonal structure, and separate light and dark schemes.
+
+The redesign will stay on one long-lived branch but move through small visual-review slices. Existing product behavior and data contracts must remain stable while screens migrate.
+
+## Goals / Non-Goals
+
+**Goals:**
+
+- Make the visual contract authoritative and easy to find.
+- Use StyleX for new React component styles.
+- Follow the operating system light or dark preference without client theme state.
+- Give reviewers a stable Storybook workspace for foundations and component states.
+- Encode repeated visual and domain rules in small named components.
+- Keep the app usable while product surfaces migrate.
+
+**Non-Goals:**
+
+- Add a product theme picker or persist a theme preference.
+- Change API, database, rating, or catalog behavior as part of styling work.
+- Create generic layout primitives or a configurable theme framework.
+- Move StyleX components into a cross-package library before the web build and test transforms are proven.
+
+## Decisions
+
+### Keep StyleX source in the web app
+
+StyleX token files and React components will live under `apps/web/src` and use a `*.stylex.ts` or `*.stylex.tsx` suffix. Next and PostCSS will use the StyleX SWC integration, while Vitest uses the official Babel transform. This keeps the application on Next's default compiler and avoids unresolved external-package transform behavior in Vitest. `packages/design` will continue to serve its existing email consumers until a later reviewed slice changes that boundary.
+
+### Let the operating system select the color scheme
+
+Semantic color variables will use light defaults and `prefers-color-scheme: dark` overrides. The root document will declare `color-scheme: light dark`. Product surfaces will not use a theme provider, cookie, local storage, hydration script, or theme toggle. Storybook may use its own non-persistent review toolbar to select an explicit scheme for the story canvas.
+
+### Migrate beside Tailwind
+
+StyleX and Tailwind will coexist during migration. A new component will use StyleX on its owned elements and will not mix Tailwind utilities onto those elements. Legacy surfaces will keep their existing classes until their review slice. The web build will not load Tailwind Forms, so it cannot inject native-control visuals into StyleX components. Tailwind can be removed only after its final consumer migrates.
+
+### Cut over one complete route at a time
+
+Product routes will not mix a new page frame with legacy page content. Each
+route will keep its current layout until its new StyleX components and product
+adapter are ready together. Storybook will render reusable components and
+bounded page sections with representative data. It does not need to duplicate
+the complete product route. The product route will supply live data,
+authentication, navigation, and mutations through thin adapters and assemble
+the complete page in one cutover. Route groups may separate migrated and legacy
+layouts while work is in progress, but they will not change public URLs.
+Migration-only layout scaffolding will be removed after the final route moves.
+
+### Use Storybook as the living catalog
+
+Storybook will list the entire implemented system in its sidebar. Foundation topics, individual components grouped by domain, and real multi-component patterns render the same tokens and components used by product pages. Each component keeps its story file beside its implementation and exposes meaningful states as named stories. Named behavior stories render their scenario directly and deterministically instead of requiring a reviewer to perform setup interactions. Storybook does not add a product route or appear in product navigation. Groups exist only when they contain a real story.
+
+Stories use one plain canvas treatment for spacing and width. They render each real component without decorative preview chrome. Reusable workflows and bounded multi-component sections live under `Patterns`. Complete product pages stay in the application unless the whole page is itself a reusable contract. One Storybook toolbar control changes the full story canvas between light and dark. It keeps no product preference and does not add product theme state.
+
+Stories use plain headings and unnumbered sections. They do not add editorial slogans, status labels, completion counts, planned categories, or placeholder specimens.
+
+Design-system presentation will be reviewed in Storybook with manual browser snapshots at desktop and mobile widths in each color scheme. Named Peated viewport presets cover the full responsive ladder. Direct Folded and Phone toolbar actions select exact review widths. The direct Wide action releases the fixed device frame so bounded components use the available canvas; the exact 1320px Wide checkpoint remains in the viewport menu. Direct Light and Dark actions update the same review-only theme global as the theme menu. It will not use component snapshots or presentation tests.
+
+Storybook will include the accessibility addon as a non-blocking manual review aid. Its local MCP addon will expose component and story manifests to supported agents. React prop metadata will use TypeScript docgen, with concise JSDoc reserved for semantic constraints that types do not explain. Global Autodocs pages remain disabled so agent metadata does not add sidebar clutter. CI will build Storybook as a compile gate.
+
+### Keep component APIs narrow
+
+Components will expose semantic variants and native element props. They will not expose arbitrary design configuration. Parent layouts will wrap components when they need spacing instead of reaching into component internals.
+
+The verdict mark exposes only the `pass`, `sip`, and `savor` domain values. The verdict distribution accepts the three raw counts and does not calculate an average or percentage. The numeric community-score component accepts the existing 100-point average and score count. Published critic reviews remain source-owned records and do not receive an invented aggregate. The scoped-search control combines a stationary scope trigger, an over-trigger menu, and a search input. The menu aligns its top and left outer edges with the control, aligns its option labels with the active scope label, lists the scopes directly without a redundant purpose label, and suppresses the query control's active ring while it is open. Pressing the existing query input closes the scope menu and gives query entry control without remounting the input or replacing caller-owned behavior. Query, scope, result, and permission state remain owned by the caller. These contracts preserve product meaning without creating a generic style API.
+
+The search experience owns disclosure and keyboard behavior. Up and Down traverse supplied results across groups. Enter selects the active result or submits the query. Escape clears the query before it closes the overlay, and `/` focuses the field outside editable controls. The 2px active ring is inset from the edge of the 40px scope-and-query control so the field fill remains visible around it, while the open results surface uses only its overlay shadow. Searching keeps the previous groups visible with a live status line. The caller supplies group order, totals, “See all” destinations, result ranking, contribution permission, and any recent or nearest matches. The component does not fabricate data that the current search API does not return.
+
+Facet rows accept an optional real count and total and calculate their own share when both exist. A count-free row remains an interactive filter without a fabricated statistic. A `null` count means the field is unavailable and disabled. Row menus accept explicit groups of links or actions. The numbered pager accepts explicit page facts and URLs; it does not infer page numbers from the application's cursor pagination contracts.
+
+The bottle catalog controller owns API queries, URL filters, and cursor links. Its reusable list and filter patterns receive resolved records and callback props. Storybook documents those bounded patterns instead of copying the full product page. The route renders category as a count-free facet. Age statement is also a facet group and uses the API-owned NAS, under-12, 12–17, 18–24, and 25-plus keys when available; the existing exact-age input remains only a compatibility contract for current links and callers. Full-result counts and age-statement buckets remain API-owned and never derive from the visible cursor page. The bottle catalog does not offer community score, community verdict, or flavor profile as filters. Until the bottle-list API owns totals, the route shows only the visible-page count and previous or next cursor actions.
+
+Summary strips accept three to five real page facts and reflow without horizontal scrolling. Passports use a discriminated closed-set or open-ended contract so a denominator can appear only when real membership is supplied. Passport components expose tracker nouns and distinct objects, never XP or badge levels.
+
+History timelines accept explicit dated events and an operating or silent state. They do not infer history from the existing entity description or establishment year. Storybook can show the component in a realistic distillery-page composition, while the live entity route waits for an owned API data contract.
+
+Tasting inputs preserve the existing nullable rating contracts. Verdict input maps only to Pass, Sip, and Savor. Score input uses the canonical whole-number 0–100 bands. Colour input uses the existing 21-step scale. Picture input delegates native files to its caller. The tasting-form pattern composes these controls without adding fields that the tasting schema does not own. The member's account setting selects either the verdict input or score input before the form renders. The form does not contain a rating-system picker.
+
+Actionable empty states own their explanation, next-action slot, and optional supplementary results. Module errors own a recoverable retry action and state what remains available. Loading record lists reserve the final row geometry instead of adding a page-level spinner.
+
+The tasting-form pattern keeps one component tree across desktop and mobile viewports. Storybook gives the configured verdict and score states separate named stories. CSS reflows the active rating input and the existing date, serving style, colour, notes, and picture controls without replacing them with a separate compact workflow.
+
+Form support components preserve the owning product contracts. Unit inputs keep their suffix separate from the numeric value. Form steps describe fixed progress without becoming navigation. Duplicate matches offer existing bottle records before creation continues. The member picker selects only supplied friends. The inline note field searches the existing vocabulary and opens the full note browser without creating a second notes contract.
+
+Critic reviews keep the publication's native score display and numeric scale. A selected-bottle summary keeps the current bottle identity visible while a related form is completed. It offers a change action only when the owning workflow allows bottle selection; the tasting form omits it because its bottle is preselected. Neither component invents a new aggregate or identity model.
+
+Bottle identity rows accept Peated's already resolved brand, name, metadata, related-release count, catalog image, and member statuses. They do not reproduce the existing bottle-identity resolver or infer catalog facts. A supplied catalog image takes precedence; the existing Peated bottle glyph is the missing-image fallback. The `isLibrary` and `hasTasted` inputs and their “In Library” and “Tasted” labels retain the current product contract. True states render as 12px muted book and circled-check marks directly after the name. They are facts, not accent-colored controls. False states are absent. Callers omit the marks when the surrounding view already implies the state, including the bottle page, the member's library or tastings, and another member's profile. Selected-bottle summaries and page patterns reuse the same visual instead of drawing decorative placeholder bottles.
+
+The bottle page header keeps one component tree across the responsive ladder. At the 900px folded width, its spec strip moves before its measures and the measures form a two-column row. At the 480px phone width, the identity panel loses its fill and padding, a four-cell spec strip becomes a 2×2 grid, the measures stack, and the action group becomes a fixed bottom bar. Page-action menus keep the row-menu behavior but use a page-sized trigger and open upward from that bottom bar.
+
+The bottle overview keeps collaborative recommendations separate from catalog similarity. Its product controller requests the bottle-recommendations endpoint and passes the returned bottles and server-owned reason into the reusable rail. Sparse recommendation data hides the rail instead of falling back to catalog-identity matches. The typed read-only mock implements the same contract with representative bottles so the complete product page remains reviewable without a local database.
+
+Navigation tabs accept destinations and one current URL. Record tables compare one record set across exactly two compact measures and replace the desktop header with repeated measure labels on compact screens. Rail lists own their shared surface, dividers, and fixed end slot. The application header keeps one component tree across four layout ranges. Personal links fold into the account menu below 960px, the scope control leaves the constrained field and database navigation scrolls below 760px, and the header becomes one row with drawer and search modes below 560px. Phone search keeps the query field and results and presents the available scopes as a horizontally scrollable chip row below the field. Its one global action is Log a tasting; Record a bottle remains contextual. Account destinations are links, while Sign out is a menu action that calls the existing logout server action instead of issuing a GET request. The application header and reference footer own only their responsive page frame; product search, account, routing, and mutation behavior remain with their callers until those product surfaces migrate.
+
+### Keep rating populations explicit
+
+The product has three rating populations: pass/sip/savor community verdicts, member 100-point community scores, and published critic reviews. Component names follow those nouns. This change does not merge their storage or aggregates. A future change to that product model requires its own API and data design.
+
+### Resolve baseline conflicts in favor of the living specimen
+
+Controls and buttons use a 3px radius. Chips and small data devices use a 2px radius. A spec strip has no background of its own: up to four equal surface cells sit directly on the page with 6px transparent gaps. Flavor meters and rank numerals are retired because the product does not own the data they imply. Shadows are limited to overlays. These choices match the dominant Peated specimen and the system's non-negotiable rules.
+
+Small row controls use the updated 34px size. A styled select suppresses browser and legacy background indicators when it renders its own caret. A facet row reserves its dismiss slot so selection does not shift data. A row menu opens over its vertical-dots trigger. Numbered pagination appears only where a caller owns a real page count and range.
+
+## Risks / Trade-offs
+
+- [Two styling systems coexist during migration] -> Keep ownership per element explicit, omit Tailwind Forms, and remove legacy utility CSS after the final route consumer migrates.
+- [StyleX adds transforms to Next and Vitest] -> Prove development, production build, typecheck, and focused tests in the foundation slice.
+- [The Next SWC integration is community-maintained] -> Pin its version, keep the StyleX file boundary explicit, and retain production-build coverage as an upgrade gate.
+- [System-only theming cannot honor an in-app override] -> Treat that as an explicit later capability if product requirements change.
+- [A long-lived branch can drift from main] -> Start from `origin/main`, keep visual commits small, and integrate main regularly.
+- [Storybook can become a second implementation] -> Render exported tokens and components directly and avoid story-only component copies.
+
+## Migration Plan
+
+1. Add the visual contract, StyleX transforms, semantic tokens, typography, base styles, and Storybook foundation story.
+2. Review the foundation in system light and dark modes at desktop and mobile widths.
+3. Add core controls and their preview states, then review them.
+4. Add Peated data and identity components and review them.
+5. Migrate navigation and one reference product screen.
+6. Review the reusable homepage components and bounded sections, then compose
+   them in the live homepage and cut over its complete application shell as the
+   first public route.
+7. Continue screen-by-screen migration with a review checkpoint after each slice.
+8. Remove unused Tailwind and legacy design-package code only after all intended consumers migrate.
+
+Rollback is a normal branch revert for each slice. The migration does not change persisted data.
+
+## Open Questions
+
+- Does the admin application migrate to the new visual system, or retain a scoped legacy theme?
+- Which product screen follows the bottle page after the core components are approved?

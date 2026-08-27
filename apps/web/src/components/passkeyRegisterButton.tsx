@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@peated/web/components/button";
+import { Button } from "@peated/web/components/designSystem/components";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -128,14 +128,16 @@ export default function PasskeyRegisterButton({
 
   return (
     <Button
+      align="start"
       fullWidth
-      color="highlight"
+      size="lg"
+      variant="accent"
       onClick={handlePasskeyRegister}
       loading={loading}
       disabled={isDisabled}
     >
-      <KeyRound className="mr-2 h-4 w-4" />
-      Sign Up with Passkey
+      <KeyRound aria-hidden="true" size={17} />
+      Create account with a passkey
     </Button>
   );
 }

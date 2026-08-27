@@ -1,67 +1,102 @@
 "use client";
 
-import Button from "@peated/web/components/button";
+import {
+  Button,
+  Field,
+  TextInput,
+} from "@peated/web/components/designSystem/components";
+import {
+  AuthActionStack,
+  AuthDivider,
+  AuthFooterLinks,
+  AuthFormSurface,
+  AuthLink,
+  AuthNotice,
+  AuthPanel,
+  AuthTextButton,
+} from "@peated/web/components/designSystem/patterns/authShell.stylex";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
-import Link from "@peated/web/components/link";
 import PasskeyLoginButton from "@peated/web/components/passkeyLoginButton";
-import TextField from "@peated/web/components/textField";
 import config from "@peated/web/config";
 import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";
 import { Mail } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import Alert from "./alert";
 
-function FormComponent({ showPassword }: { showPassword: boolean }) {
+function AccountLinks({ email }: { email?: string | null }) {
+  const recoveryHref = email
+    ? `/recover-account?email=${encodeURIComponent(email)}`
+    : "/recover-account";
+
+  return (
+    <>
+      <AuthDivider />
+      <AuthFooterLinks>
+        <span>No account yet?</span>
+        <AuthLink href="/register">Create one</AuthLink>
+        <span>·</span>
+        <AuthLink href={recoveryHref}>Recover your account</AuthLink>
+      </AuthFooterLinks>
+    </>
+  );
+}
+
+function EmailForm({ showPassword }: { showPassword: boolean }) {
   const { pending } = useFormStatus();
   const [showPasswordField, setShowPasswordField] = useState(showPassword);
   const searchParams = useSearchParams();
 
   return (
-    <>
-      <div className="-mx-4 -mt-4">
+    <AuthActionStack>
+      <AuthFormSurface>
         <input
           type="hidden"
           name="redirectTo"
           value={searchParams.get("redirectTo") ?? "/"}
         />
-        <TextField
-          name="email"
-          label="Email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="you@example.com"
-          autoFocus
-          defaultValue={searchParams.get("email") ?? ""}
-        />
-        {showPasswordField && (
-          <TextField
-            name="password"
-            label="Password"
-            type="password"
-            autoComplete="current-password"
+        <Field htmlFor="login-email" label="Email" required>
+          <TextInput
+            id="login-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            placeholder="you@example.com"
+            autoFocus
+            defaultValue={searchParams.get("email") ?? ""}
           />
+        </Field>
+        {showPasswordField ? (
+          <Field htmlFor="login-password" label="Password" required>
+            <TextInput
+              id="login-password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+            />
+          </Field>
+        ) : (
+          <AuthTextButton
+            type="button"
+            onClick={() => setShowPasswordField(true)}
+          >
+            Or sign in with a password
+          </AuthTextButton>
         )}
-        {!showPasswordField && (
-          <div className="px-4 pb-3">
-            <button
-              type="button"
-              onClick={() => setShowPasswordField(true)}
-              className="text-highlight text-sm underline"
-            >
-              Or sign in with a password
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="flex justify-center gap-x-2">
-        <Button type="submit" color="highlight" fullWidth loading={pending}>
-          Continue
-        </Button>
-      </div>
-    </>
+      </AuthFormSurface>
+      <Button
+        align="start"
+        fullWidth
+        loading={pending}
+        size="lg"
+        type="submit"
+        variant="accent"
+      >
+        {showPasswordField ? "Sign in" : "Send me a link"}
+      </Button>
+    </AuthActionStack>
   );
 }
 
@@ -70,82 +105,64 @@ export default function LoginForm() {
   const [showEmailForm, setShowEmailForm] = useState(false);
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
-  const recoveryHref = email
-    ? { pathname: "/recover-account", query: { email } }
-    : "/recover-account";
+
+  if (result?.magicLink) {
+    return (
+      <AuthPanel
+        description="Use the secure link we sent to finish signing in."
+        title="Check your email"
+      >
+        <AuthNotice>
+          The link is on its way{email ? ` to ${email}` : ""}.
+        </AuthNotice>
+        <AccountLinks email={email} />
+      </AuthPanel>
+    );
+  }
+
+  if (showEmailForm) {
+    return (
+      <AuthPanel
+        back={
+          <AuthTextButton type="button" onClick={() => setShowEmailForm(false)}>
+            ← Other ways to sign in
+          </AuthTextButton>
+        }
+        description="We send a link — no password unless you want one."
+        title="Sign in with email"
+      >
+        {result?.error ? <AuthNotice>{result.error}</AuthNotice> : null}
+        <form action={formAction}>
+          <EmailForm showPassword={false} />
+        </form>
+        <AccountLinks email={email} />
+      </AuthPanel>
+    );
+  }
 
   return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
-      {result?.error ? <Alert>{result.error}</Alert> : null}
-
-      {result?.magicLink ? (
-        <p className="mb-8 text-center font-bold">
-          Please check your email to continue.
-        </p>
-      ) : showEmailForm ? (
-        <>
-          <div className="mb-4 text-center">
-            <button
-              type="button"
-              onClick={() => setShowEmailForm(false)}
-              className="text-highlight text-sm underline"
-            >
-              ← Back to other options
-            </button>
-          </div>
-
-          <form action={formAction}>
-            <FormComponent showPassword={false} />
-          </form>
-
-          <div className="mt-4 flex items-center justify-center gap-x-3 text-center text-sm">
-            <div>
-              Don't have an account yet?{" "}
-              <Link href="/register" className="text-highlight underline">
-                Sign Up
-              </Link>
-            </div>
-            <div>&middot;</div>
-            <div>
-              <Link href={recoveryHref} className="text-highlight underline">
-                Account Recovery
-              </Link>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <PasskeyLoginButton action={authenticate} />
-
-          {config.GOOGLE_CLIENT_ID && (
-            <GoogleLoginButton action={authenticate} color="primary" />
-          )}
-
-          <Button
-            fullWidth
-            color="primary"
-            onClick={() => setShowEmailForm(true)}
-          >
-            <Mail className="mr-2 h-4 w-4" />
-            Sign in with Email
-          </Button>
-
-          <div className="mt-4 flex items-center justify-center gap-x-3 text-sm">
-            <div>
-              Don't have an account yet?{" "}
-              <Link href="/register" className="text-highlight underline">
-                Sign Up
-              </Link>
-            </div>
-            <div>&middot;</div>
-            <div>
-              <Link href={recoveryHref} className="text-highlight underline">
-                Account Recovery
-              </Link>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+    <AuthPanel
+      description="A passkey is fastest. Email works everywhere."
+      title="Sign in"
+    >
+      {result?.error ? <AuthNotice>{result.error}</AuthNotice> : null}
+      <AuthActionStack>
+        <PasskeyLoginButton action={authenticate} />
+        {config.GOOGLE_CLIENT_ID ? (
+          <GoogleLoginButton action={authenticate} />
+        ) : null}
+        <Button
+          align="start"
+          fullWidth
+          onClick={() => setShowEmailForm(true)}
+          size="lg"
+          variant="tonal"
+        >
+          <Mail aria-hidden="true" size={17} />
+          Continue with email
+        </Button>
+      </AuthActionStack>
+      <AccountLinks email={email} />
+    </AuthPanel>
   );
 }

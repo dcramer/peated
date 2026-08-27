@@ -332,6 +332,13 @@ export function mockBottleFor(
     : bottle;
 }
 
+export function mockRecommendationBottlesFor(user: User | null) {
+  return mockBottles
+    .filter((bottle) => bottle.id !== mockBottle.id)
+    .slice(0, 6)
+    .map((bottle) => mockBottleFor(user, bottle));
+}
+
 export const mockBottleDetails = {
   ...mockBottle,
   barcodes: [{ value: "5000281016290", volume: 700 }],

@@ -1,0 +1,795 @@
+"use client";
+
+import {
+  Menu as HeadlessMenu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from "@headlessui/react";
+import * as stylex from "@stylexjs/stylex";
+import { Menu as MenuIcon, Search, X } from "lucide-react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
+
+import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
+import { IconButton } from "./button.stylex";
+import { NavigationTabs, type NavigationItem } from "./navigation.stylex";
+
+const PAGE_INSET_TIGHTENS = "@media (max-width: 1099px)";
+const MOBILE = "@media (max-width: 559px)";
+const COMPACT = "@media (max-width: 639px)";
+
+export type HeaderNavigationItem = NavigationItem & {
+  count?: number;
+};
+
+export type HeaderAccountActionItem = {
+  count?: number;
+  disabled?: boolean;
+  label: string;
+  onSelect: () => void;
+};
+
+export type HeaderAccountItem = HeaderNavigationItem | HeaderAccountActionItem;
+
+export type ApplicationHeaderProps = {
+  account?: ReactNode;
+  accountItems?: readonly HeaderAccountItem[];
+  accountLabel?: string;
+  action: ReactNode;
+  brand?: string;
+  brandHref?: string;
+  currentHref: string;
+  databaseItems: readonly [HeaderNavigationItem, ...HeaderNavigationItem[]];
+  defaultSearchOpen?: boolean;
+  personalItems: readonly HeaderNavigationItem[];
+  search: ReactNode;
+  showNavigation?: boolean;
+};
+
+/** Keeps search and database navigation reachable across all header widths. */
+export function ApplicationHeader({
+  account,
+  accountItems,
+  accountLabel = "Open account menu",
+  action,
+  brand = "Peated",
+  brandHref = "/",
+  currentHref,
+  databaseItems,
+  defaultSearchOpen = false,
+  personalItems,
+  search,
+  showNavigation = true,
+}: ApplicationHeaderProps) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(defaultSearchOpen);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (searchOpen) {
+      searchRef.current
+        ?.querySelector<HTMLInputElement>('input[type="search"]')
+        ?.focus();
+    }
+  }, [searchOpen]);
+
+  function openSearch() {
+    setDrawerOpen(false);
+    setSearchOpen(true);
+  }
+
+  function toggleDrawer() {
+    setSearchOpen(false);
+    setDrawerOpen((open) => !open);
+  }
+
+  return (
+    <header {...stylex.props(styles.header)}>
+      <div {...stylex.props(styles.headerInner)}>
+        <div
+          {...stylex.props(
+            styles.primaryRow,
+            searchOpen && styles.primaryRowSearchOpen,
+          )}
+        >
+          <div
+            {...stylex.props(
+              styles.mobileMenu,
+              searchOpen && styles.hiddenDuringSearch,
+            )}
+          >
+            <IconButton
+              aria-expanded={drawerOpen}
+              icon={
+                drawerOpen ? (
+                  <X aria-hidden="true" size={18} />
+                ) : (
+                  <MenuIcon aria-hidden="true" size={18} />
+                )
+              }
+              label={drawerOpen ? "Close navigation" : "Open navigation"}
+              onClick={toggleDrawer}
+              size="sm"
+              variant="text"
+            />
+          </div>
+          <a
+            href={brandHref}
+            {...stylex.props(
+              styles.brand,
+              searchOpen && styles.hiddenDuringSearch,
+            )}
+          >
+            {brand}
+          </a>
+          <div
+            ref={searchRef}
+            {...stylex.props(
+              styles.search,
+              searchOpen && styles.mobileSearchVisible,
+            )}
+          >
+            {search}
+          </div>
+          <div {...stylex.props(styles.action)}>{action}</div>
+          <div
+            {...stylex.props(
+              styles.mobileSearchButton,
+              searchOpen && styles.hiddenDuringSearch,
+            )}
+          >
+            <IconButton
+              icon={<Search aria-hidden="true" size={18} />}
+              label="Open search"
+              onClick={openSearch}
+              size="sm"
+              variant="text"
+            />
+          </div>
+          {account ? (
+            <HeadlessMenu
+              as="div"
+              {...stylex.props(
+                styles.account,
+                searchOpen && styles.hiddenDuringSearch,
+              )}
+            >
+              <MenuButton
+                aria-label={accountLabel}
+                {...stylex.props(styles.accountButton)}
+              >
+                {account}
+              </MenuButton>
+              <MenuItems portal={false} {...stylex.props(styles.accountMenu)}>
+                {(accountItems ?? personalItems).map((item) => (
+                  <MenuItem
+                    as={Fragment}
+                    disabled={"onSelect" in item && item.disabled}
+                    key={"onSelect" in item ? item.label : item.href}
+                  >
+                    {({ close, focus }) => (
+                      <AccountMenuItem
+                        close={close}
+                        currentHref={currentHref}
+                        focused={focus}
+                        item={item}
+                      />
+                    )}
+                  </MenuItem>
+                ))}
+              </MenuItems>
+            </HeadlessMenu>
+          ) : null}
+          <button
+            onClick={() => setSearchOpen(false)}
+            type="button"
+            {...stylex.props(
+              styles.mobileSearchCancel,
+              searchOpen && styles.mobileSearchCancelVisible,
+            )}
+          >
+            Cancel
+          </button>
+        </div>
+        {showNavigation ? (
+          <div {...stylex.props(styles.navigationRow)}>
+            <NavigationTabs
+              ariaLabel="Peated"
+              currentHref={currentHref}
+              items={databaseItems}
+              personalItems={personalItems}
+            />
+          </div>
+        ) : null}
+        {drawerOpen ? (
+          <nav aria-label="Mobile navigation" {...stylex.props(styles.drawer)}>
+            <HeaderDrawerGroup
+              currentHref={currentHref}
+              items={databaseItems}
+              label="Database"
+            />
+            {personalItems.length ? (
+              <HeaderDrawerGroup
+                currentHref={currentHref}
+                items={personalItems}
+                label="You"
+              />
+            ) : null}
+            <div {...stylex.props(styles.drawerAction)}>{action}</div>
+          </nav>
+        ) : null}
+      </div>
+    </header>
+  );
+}
+
+function AccountMenuItem({
+  close,
+  currentHref,
+  focused,
+  item,
+}: {
+  close: () => void;
+  currentHref: string;
+  focused: boolean;
+  item: HeaderAccountItem;
+}) {
+  const content = (
+    <>
+      <span>{item.label}</span>
+      {item.count !== undefined ? (
+        <span {...stylex.props(styles.accountMenuCount)}>
+          {item.count.toLocaleString("en-US")}
+        </span>
+      ) : null}
+    </>
+  );
+
+  if ("onSelect" in item) {
+    return (
+      <button
+        disabled={item.disabled}
+        onClick={() => {
+          close();
+          item.onSelect();
+        }}
+        type="button"
+        {...stylex.props(
+          styles.accountMenuItem,
+          styles.accountMenuAction,
+          focused && styles.focusedAccountMenuItem,
+        )}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <a
+      aria-current={item.href === currentHref ? "page" : undefined}
+      href={item.href}
+      {...stylex.props(
+        styles.accountMenuItem,
+        focused && styles.focusedAccountMenuItem,
+      )}
+    >
+      {content}
+    </a>
+  );
+}
+
+function HeaderDrawerGroup({
+  currentHref,
+  items,
+  label,
+}: {
+  currentHref: string;
+  items: readonly HeaderNavigationItem[];
+  label: string;
+}) {
+  return (
+    <section>
+      <h2 {...stylex.props(styles.drawerHeading)}>{label}</h2>
+      <ul {...stylex.props(styles.drawerList)}>
+        {items.map((item) => (
+          <li key={item.href} {...stylex.props(styles.drawerListItem)}>
+            <a
+              aria-current={item.href === currentHref ? "page" : undefined}
+              href={item.href}
+              {...stylex.props(styles.drawerLink)}
+            >
+              {item.label}
+            </a>
+            {item.count !== undefined ? (
+              <span {...stylex.props(styles.drawerCount)}>
+                {item.count.toLocaleString("en-US")}
+              </span>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export type FooterLink = {
+  href: string;
+  label: string;
+};
+
+export type FooterGroup = {
+  label: string;
+  links: readonly [FooterLink, ...FooterLink[]];
+};
+
+export type SiteFooterProps = {
+  brand?: string;
+  coverage?: ReactNode;
+  groups: readonly [FooterGroup, FooterGroup, FooterGroup, FooterGroup];
+  provenance: ReactNode;
+  referenceLinks: readonly FooterLink[];
+  responsibility?: ReactNode;
+  statement: ReactNode;
+};
+
+/** Closes reference pages with durable destinations and data provenance. */
+export function SiteFooter({
+  brand = "Peated",
+  coverage,
+  groups,
+  provenance,
+  referenceLinks,
+  responsibility = "Drink responsibly.",
+  statement,
+}: SiteFooterProps) {
+  return (
+    <footer {...stylex.props(styles.footer)}>
+      <div {...stylex.props(styles.footerMain)}>
+        <div {...stylex.props(styles.footerIdentity)}>
+          <div {...stylex.props(styles.footerBrand)}>{brand}</div>
+          <p {...stylex.props(styles.statement)}>{statement}</p>
+        </div>
+        <div {...stylex.props(styles.footerGroups)}>
+          {groups.map((group) => (
+            <nav aria-label={group.label} key={group.label}>
+              <h2 {...stylex.props(styles.footerHeading)}>{group.label}</h2>
+              <ul {...stylex.props(styles.footerLinks)}>
+                {group.links.map((link) => (
+                  <li key={link.href}>
+                    <FooterAnchor link={link} />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+      </div>
+      {referenceLinks.length ? (
+        <div {...stylex.props(styles.referenceSection)}>
+          <h2 {...stylex.props(styles.footerHeading)}>Reference</h2>
+          <p {...stylex.props(styles.referenceLinks)}>
+            {referenceLinks.map((link) => (
+              <FooterAnchor key={link.href} link={link} />
+            ))}
+          </p>
+        </div>
+      ) : null}
+      <div {...stylex.props(styles.footerMeta)}>
+        {coverage ? <p {...stylex.props(styles.coverage)}>{coverage}</p> : null}
+        <p {...stylex.props(styles.provenance)}>{provenance}</p>
+        <p {...stylex.props(styles.responsibility)}>{responsibility}</p>
+      </div>
+    </footer>
+  );
+}
+
+function FooterAnchor({ link }: { link: FooterLink }) {
+  return (
+    <a href={link.href} {...stylex.props(styles.footerLink)}>
+      {link.label}
+    </a>
+  );
+}
+
+const styles = stylex.create({
+  header: {
+    width: "100%",
+    backgroundColor: colors.surface,
+  },
+  headerInner: {
+    boxSizing: "border-box",
+    width: "100%",
+    maxWidth: "1320px",
+    marginRight: "auto",
+    marginLeft: "auto",
+    paddingRight: space.x8,
+    paddingLeft: space.x8,
+    [PAGE_INSET_TIGHTENS]: {
+      paddingRight: space.x6,
+      paddingLeft: space.x6,
+    },
+    [MOBILE]: {
+      paddingRight: space.x3,
+      paddingLeft: space.x3,
+    },
+  },
+  primaryRow: {
+    display: "grid",
+    minHeight: "54px",
+    gridTemplateColumns: "auto minmax(220px, 620px) 1fr auto",
+    alignItems: "center",
+    gap: space.x3,
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
+    [MOBILE]: {
+      gridTemplateColumns: "auto minmax(0, 1fr) auto auto",
+      gap: space.x2,
+    },
+  },
+  primaryRowSearchOpen: {
+    [MOBILE]: {
+      gridTemplateColumns: "minmax(0, 1fr) auto",
+    },
+  },
+  mobileMenu: {
+    display: "none",
+    [MOBILE]: {
+      display: "inline-flex",
+    },
+  },
+  brand: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "24px",
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
+    lineHeight: 1,
+    textDecoration: "none",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  search: {
+    width: "100%",
+    minWidth: 0,
+    maxWidth: "620px",
+    [MOBILE]: {
+      display: "none",
+    },
+  },
+  mobileSearchVisible: {
+    [MOBILE]: {
+      display: "block",
+    },
+  },
+  action: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: space.x2,
+    justifySelf: "end",
+    [MOBILE]: {
+      display: "none",
+    },
+  },
+  account: {
+    position: "relative",
+    display: "inline-flex",
+  },
+  accountButton: {
+    display: "inline-flex",
+    width: "34px",
+    height: "34px",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: "50%",
+    outline: "none",
+    backgroundColor: colors.inset,
+    color: colors.ink,
+    cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  accountMenu: {
+    position: "absolute",
+    top: "calc(100% + 4px)",
+    right: 0,
+    zIndex: 40,
+    width: "220px",
+    paddingTop: space.x1,
+    paddingBottom: space.x1,
+    borderRadius: "3px",
+    outline: "none",
+    backgroundColor: colors.ground,
+    boxShadow: effects.overlayShadow,
+  },
+  accountMenuItem: {
+    display: "flex",
+    minHeight: "36px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x3,
+    paddingRight: space.x3,
+    paddingLeft: space.x3,
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+    lineHeight: 1.2,
+    textDecoration: "none",
+    outline: "none",
+  },
+  accountMenuAction: {
+    width: "100%",
+    paddingTop: 0,
+    paddingBottom: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    textAlign: "left",
+    cursor: {
+      default: "pointer",
+      ":disabled": "not-allowed",
+    },
+    opacity: {
+      default: 1,
+      ":disabled": 0.45,
+    },
+  },
+  focusedAccountMenuItem: {
+    backgroundColor: colors.surface,
+  },
+  accountMenuCount: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    lineHeight: 1,
+  },
+  mobileSearchButton: {
+    display: "none",
+    [MOBILE]: {
+      display: "inline-flex",
+    },
+  },
+  mobileSearchCancel: {
+    display: "none",
+    minHeight: "34px",
+    padding: 0,
+    borderWidth: 0,
+    outline: "none",
+    backgroundColor: "transparent",
+    color: colors.accentDeep,
+    fontFamily: fonts.display,
+    fontSize: "13px",
+    fontWeight: 700,
+    lineHeight: 1,
+    cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  mobileSearchCancelVisible: {
+    [MOBILE]: {
+      display: "inline-flex",
+      alignItems: "center",
+    },
+  },
+  hiddenDuringSearch: {
+    [MOBILE]: {
+      display: "none",
+    },
+  },
+  navigationRow: {
+    overflowX: "auto",
+    scrollbarWidth: "none",
+    paddingTop: space.x1,
+    paddingBottom: space.x2,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+    [MOBILE]: {
+      display: "none",
+    },
+    "::-webkit-scrollbar": {
+      display: "none",
+    },
+  },
+  drawer: {
+    display: "none",
+    paddingTop: space.x4,
+    paddingBottom: space.x4,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+    [MOBILE]: {
+      display: "flex",
+      flexDirection: "column",
+      rowGap: space.x4,
+    },
+  },
+  drawerHeading: {
+    margin: 0,
+    marginBottom: space.x2,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    fontWeight: 400,
+    letterSpacing: "0.08em",
+    lineHeight: 1.3,
+    textTransform: "uppercase",
+  },
+  drawerList: {
+    margin: 0,
+    paddingTop: space.x1,
+    paddingRight: space.x4,
+    paddingBottom: space.x1,
+    paddingLeft: space.x4,
+    borderRadius: "3px",
+    backgroundColor: colors.ground,
+    listStyle: "none",
+  },
+  drawerListItem: {
+    display: "flex",
+    minHeight: "42px",
+    alignItems: "center",
+    gap: space.x3,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+    ":last-child": {
+      borderBottomWidth: 0,
+    },
+  },
+  drawerLink: {
+    flex: 1,
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    fontWeight: 600,
+    lineHeight: 1.3,
+    textDecoration: "none",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  drawerCount: {
+    flexShrink: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontVariantNumeric: "tabular-nums",
+    lineHeight: 1,
+  },
+  drawerAction: {
+    display: "flex",
+  },
+  footer: {
+    width: "100%",
+    paddingTop: space.x6,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.sectionRule,
+  },
+  footerMain: {
+    display: "grid",
+    gridTemplateColumns: "minmax(220px, 260px) minmax(0, 1fr)",
+    gap: space.x12,
+    [COMPACT]: {
+      gridTemplateColumns: "minmax(0, 1fr)",
+      gap: space.x8,
+    },
+  },
+  footerIdentity: {
+    maxWidth: "260px",
+  },
+  footerBrand: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "18px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.2,
+  },
+  statement: {
+    margin: 0,
+    marginTop: space.x2,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.55,
+  },
+  footerGroups: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: space.x6,
+    [COMPACT]: {
+      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+      rowGap: space.x8,
+    },
+  },
+  footerHeading: {
+    margin: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    fontWeight: 400,
+    letterSpacing: "0.08em",
+    lineHeight: 1.3,
+    textTransform: "uppercase",
+  },
+  footerLinks: {
+    display: "flex",
+    flexDirection: "column",
+    gap: space.x2,
+    margin: 0,
+    marginTop: space.x3,
+    padding: 0,
+    listStyle: "none",
+  },
+  footerLink: {
+    color: {
+      default: colors.inkMuted,
+      ":hover": colors.ink,
+    },
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+    lineHeight: 1.3,
+    textDecoration: "none",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  referenceSection: {
+    marginTop: space.x8,
+  },
+  referenceLinks: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: space.x4,
+    margin: 0,
+    marginTop: space.x2,
+  },
+  footerMeta: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: space.x4,
+    marginTop: space.x8,
+    paddingBottom: space.x4,
+    flexWrap: "wrap",
+  },
+  coverage: {
+    minWidth: "280px",
+    flex: 1,
+    margin: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontVariantNumeric: "tabular-nums",
+    lineHeight: 1.4,
+  },
+  provenance: {
+    margin: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    lineHeight: 1.4,
+  },
+  responsibility: {
+    margin: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    lineHeight: 1.4,
+  },
+});

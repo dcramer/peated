@@ -2,18 +2,21 @@
 
 import { useGoogleLogin } from "@react-oauth/google";
 import { useSearchParams } from "next/navigation";
-import { type ComponentProps, useState } from "react";
+import { useState } from "react";
 import { logWarn } from "../lib/log";
-import Button from "./button";
+import {
+  Button,
+  type ButtonVariant,
+} from "./designSystem/components/button.stylex";
 
 export default function GoogleLoginButton({
   action,
-  title = "Sign in with Google",
-  color = "highlight",
+  title = "Continue with Google",
+  variant = "tonal",
 }: {
   action: (formData: FormData) => Promise<any>;
   title?: string;
-  color?: ComponentProps<typeof Button>["color"];
+  variant?: ButtonVariant;
 }) {
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
@@ -37,8 +40,10 @@ export default function GoogleLoginButton({
 
   return (
     <Button
+      align="start"
       fullWidth
-      color={color}
+      size="lg"
+      variant={variant}
       onClick={() => {
         setLoading(true);
         googleLogin();
@@ -46,7 +51,8 @@ export default function GoogleLoginButton({
       disabled={loading}
     >
       <svg
-        className="-ml-1 mr-2 h-4 w-4"
+        width="17"
+        height="17"
         aria-hidden="true"
         focusable="false"
         data-prefix="fab"

@@ -1,0 +1,345 @@
+import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
+import BottleIcon from "../../../assets/bottle.svg";
+
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../../../styles/tokens.stylex";
+
+const COMPACT = "@media (max-width: 639px)";
+// SAFETY: Next exposes SVGs as components while Storybook exposes the same import as a static asset.
+const bottleIconAsset = BottleIcon as { src?: string };
+
+export type BottleVisualSize = "sm" | "md" | "lg";
+
+export type BottleVisualProps = {
+  imageUrl?: string | null;
+  label?: string;
+  size?: BottleVisualSize;
+};
+
+/** Shows a supplied bottle image and uses Peated's bottle glyph when no image exists. */
+export function BottleVisual({
+  imageUrl,
+  label,
+  size = "md",
+}: BottleVisualProps) {
+  return (
+    <span
+      aria-hidden={label ? undefined : "true"}
+      aria-label={label}
+      role={label ? "img" : undefined}
+      {...stylex.props(styles.visual, visualSizeStyles[size])}
+    >
+      {imageUrl ? (
+        <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
+      ) : bottleIconAsset.src ? (
+        <span
+          style={{
+            maskImage: `url("${bottleIconAsset.src}")`,
+            WebkitMaskImage: `url("${bottleIconAsset.src}")`,
+          }}
+          {...stylex.props(styles.fallbackAsset)}
+        />
+      ) : (
+        <BottleIcon aria-hidden="true" {...stylex.props(styles.fallbackIcon)} />
+      )}
+    </span>
+  );
+}
+
+export type BottleIdentityRowProps = {
+  brand?: string;
+  brandHref?: string;
+  end?: ReactNode;
+  hasTasted?: boolean;
+  href?: string;
+  imageUrl?: string | null;
+  isLibrary?: boolean;
+  metadata?: readonly string[];
+  name: string;
+  relatedReleases?: {
+    count: number;
+    href: string;
+  };
+};
+
+function LibraryStatusMark() {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="12"
+      viewBox="0 0 16 16"
+      width="12"
+    >
+      <path
+        d="M8 4.2C6.9 3.4 5.4 3 3.5 3H2v9h1.5c1.9 0 3.4.4 4.5 1.2 1.1-.8 2.6-1.2 4.5-1.2H14V3h-1.5C10.6 3 9.1 3.4 8 4.2Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.4"
+      />
+      <path d="M8 4.4v8.8" stroke="currentColor" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+function TastedStatusMark() {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="12"
+      viewBox="0 0 16 16"
+      width="12"
+    >
+      <circle cx="8" cy="8" r="5.6" stroke="currentColor" strokeWidth="1.4" />
+      <path
+        d="M5.6 8.2 7.3 9.9l3.1-3.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
+
+/** Presents one catalog bottle using Peated's existing identity and member-status meanings. */
+export function BottleIdentityRow({
+  brand,
+  brandHref,
+  end,
+  hasTasted = false,
+  href,
+  imageUrl,
+  isLibrary = false,
+  metadata = [],
+  name,
+  relatedReleases,
+}: BottleIdentityRowProps) {
+  const Name = href ? "a" : "span";
+  const Brand = brandHref ? "a" : "span";
+
+  return (
+    <div {...stylex.props(styles.row)}>
+      <BottleVisual imageUrl={imageUrl} />
+      <div {...stylex.props(styles.copy)}>
+        {brand ? (
+          <Brand href={brandHref} {...stylex.props(styles.brand)}>
+            {brand}
+          </Brand>
+        ) : null}
+        <div {...stylex.props(styles.nameLine)}>
+          <Name href={href} {...stylex.props(styles.name)}>
+            {name}
+          </Name>
+          {isLibrary ? (
+            <span
+              aria-label="In Library"
+              role="img"
+              title="In Library"
+              {...stylex.props(styles.status)}
+            >
+              <LibraryStatusMark />
+            </span>
+          ) : null}
+          {hasTasted ? (
+            <span
+              aria-label="Tasted"
+              role="img"
+              title="Tasted"
+              {...stylex.props(styles.status)}
+            >
+              <TastedStatusMark />
+            </span>
+          ) : null}
+        </div>
+        {metadata.length ? (
+          <div {...stylex.props(styles.metadata)}>
+            {metadata.map((item, index) => (
+              <span key={`${item}-${index}`}>
+                {index ? <span aria-hidden="true"> · </span> : null}
+                {item}
+              </span>
+            ))}
+          </div>
+        ) : null}
+        {relatedReleases && relatedReleases.count > 1 ? (
+          <a
+            href={relatedReleases.href}
+            {...stylex.props(styles.relatedReleases)}
+          >
+            {relatedReleases.count.toLocaleString("en-US")} related releases
+          </a>
+        ) : null}
+      </div>
+      {end ? <div {...stylex.props(styles.end)}>{end}</div> : null}
+    </div>
+  );
+}
+
+const styles = stylex.create({
+  visual: {
+    boxSizing: "border-box",
+    display: "inline-flex",
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.surface,
+    color: colors.inkMuted,
+  },
+  visualSmall: {
+    width: "32px",
+    height: "46px",
+    padding: space.x1,
+  },
+  visualMedium: {
+    width: { default: "48px", [COMPACT]: "42px" },
+    height: { default: "64px", [COMPACT]: "58px" },
+    padding: space.x2,
+  },
+  visualLarge: {
+    width: { default: "132px", [COMPACT]: "80px" },
+    height: { default: "176px", [COMPACT]: "120px" },
+    padding: { default: space.x2, [COMPACT]: space.x1 },
+  },
+  image: {
+    display: "block",
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+  },
+  fallbackIcon: {
+    display: "block",
+    width: "100%",
+    height: "100%",
+  },
+  fallbackAsset: {
+    display: "block",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "currentColor",
+    maskPosition: "center",
+    maskRepeat: "no-repeat",
+    maskSize: "contain",
+    WebkitMaskPosition: "center",
+    WebkitMaskRepeat: "no-repeat",
+    WebkitMaskSize: "contain",
+  },
+  row: {
+    boxSizing: "border-box",
+    display: "flex",
+    width: "100%",
+    minWidth: 0,
+    alignItems: "center",
+    gap: space.x3,
+    paddingTop: space.x3,
+    paddingRight: 0,
+    paddingBottom: space.x3,
+    paddingLeft: 0,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  copy: {
+    display: "flex",
+    minWidth: 0,
+    flex: 1,
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  brand: {
+    maxWidth: "100%",
+    overflow: "hidden",
+    outline: "none",
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    fontWeight: 400,
+    letterSpacing: "0.08em",
+    lineHeight: 1.3,
+    textDecoration: "none",
+    textOverflow: "ellipsis",
+    textTransform: "uppercase",
+    whiteSpace: "nowrap",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  nameLine: {
+    display: "block",
+    width: "100%",
+    maxWidth: "100%",
+    minWidth: 0,
+    marginTop: "2px",
+  },
+  name: {
+    outline: "none",
+    overflowWrap: "anywhere",
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "15px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.2,
+    textDecoration: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  status: {
+    display: "inline-flex",
+    marginLeft: "6px",
+    color: colors.inkMuted,
+    verticalAlign: "-1px",
+  },
+  metadata: {
+    maxWidth: "100%",
+    overflow: "hidden",
+    marginTop: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    lineHeight: 1.4,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  relatedReleases: {
+    marginTop: space.x1,
+    outline: "none",
+    color: colors.accentDeep,
+    fontFamily: fonts.reading,
+    fontSize: "12px",
+    fontWeight: 600,
+    lineHeight: 1.3,
+    textDecorationLine: "underline",
+    textUnderlineOffset: "2px",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  end: {
+    display: "flex",
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+});
+
+const visualSizeStyles = {
+  sm: styles.visualSmall,
+  md: styles.visualMedium,
+  lg: styles.visualLarge,
+} satisfies Record<BottleVisualSize, stylex.StyleXStyles>;

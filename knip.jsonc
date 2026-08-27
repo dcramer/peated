@@ -15,8 +15,12 @@
     },
     "apps/web": {
       "entry": ["e2e/mock-rpc-server.mjs"],
-      // Next.js consumes this loader name from webpack/turbopack configuration.
-      "ignoreDependencies": ["@svgr/webpack"],
+      "ignoreDependencies": [
+        // Next.js consumes this loader name from webpack/turbopack configuration.
+        "@svgr/webpack",
+        // Storybook loads this parser from its reactDocgen configuration value.
+        "react-docgen-typescript",
+      ],
     },
     "packages/bottle-classifier": {
       "entry": ["vitest.evals.config.mts"],

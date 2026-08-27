@@ -1,4 +1,4 @@
-import { ErrorPageForbidden } from "@peated/web/components/errorPage";
+import { ForbiddenPage } from "@peated/web/components/designSystem/product/pageStatePages.stylex";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";
 import { type Metadata } from "next";
@@ -22,7 +22,7 @@ export default async function Layout({
   }
 
   if (!session.user?.admin) {
-    return <ErrorPageForbidden />;
+    return <ForbiddenPage route="/admin" />;
   }
 
   return <>{children}</>;

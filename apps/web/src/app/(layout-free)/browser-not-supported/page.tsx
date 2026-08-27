@@ -1,6 +1,14 @@
-import Button from "@peated/web/components/button";
-import LayoutSplash from "@peated/web/components/layoutSplash";
-import Link from "@peated/web/components/link";
+import { ButtonLink } from "@peated/web/components/designSystem/components";
+import {
+  AuthActionStack,
+  AuthDetailList,
+  AuthDivider,
+  AuthFooterLinks,
+  AuthFormSurface,
+  AuthLink,
+  AuthPanel,
+} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 
@@ -10,43 +18,50 @@ export const metadata: Metadata = {
 
 export default function BrowserNotSupported() {
   return (
-    <LayoutSplash>
-      <div className="mb-8 flex flex-col items-center">
-        <h1 className="mb-4 text-2xl font-semibold">Browser Not Supported</h1>
-        <p className="text-muted max-w-md text-center">
-          Your browser doesn't support passkeys, which are required for secure
-          authentication on Peated.
-        </p>
-      </div>
-
-      <div className="mb-8 rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <h2 className="mb-3 font-medium">Supported Browsers</h2>
-        <ul className="text-muted space-y-1 text-sm">
-          <li>Chrome 67+ (Desktop & Android)</li>
-          <li>Safari 14+ (macOS & iOS)</li>
-          <li>Edge 79+</li>
-          <li>Firefox 60+</li>
-        </ul>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {config.GOOGLE_CLIENT_ID && (
-          <Button href="/login" color="highlight" fullWidth>
-            Sign in with Google Instead
-          </Button>
-        )}
-        <Button href="/login" color="default" fullWidth>
-          Back to Login
-        </Button>
-        <div className="text-muted mt-2 text-center text-sm">
-          <Link
-            href="https://passkeys.dev/device-support/"
-            className="text-highlight underline"
+    <ProductAuthShell intro="database">
+      <AuthPanel
+        description="This browser does not support the passkey features Peated uses for secure authentication."
+        title="Passkeys aren’t available here"
+      >
+        <AuthActionStack>
+          <AuthFormSurface>
+            <AuthDetailList
+              items={[
+                "Chrome 67 or newer on desktop and Android",
+                "Safari 14 or newer on macOS and iOS",
+                "Edge 79 or newer",
+                "Firefox 60 or newer",
+              ]}
+            />
+          </AuthFormSurface>
+          {config.GOOGLE_CLIENT_ID ? (
+            <ButtonLink
+              align="start"
+              fullWidth
+              href="/login"
+              size="lg"
+              variant="accent"
+            >
+              Use another sign-in method
+            </ButtonLink>
+          ) : null}
+          <ButtonLink
+            align="start"
+            fullWidth
+            href="/login"
+            size="lg"
+            variant={config.GOOGLE_CLIENT_ID ? "tonal" : "accent"}
           >
+            Return to sign in
+          </ButtonLink>
+        </AuthActionStack>
+        <AuthDivider />
+        <AuthFooterLinks>
+          <AuthLink href="https://passkeys.dev/device-support/">
             Learn more about passkey support
-          </Link>
-        </div>
-      </div>
-    </LayoutSplash>
+          </AuthLink>
+        </AuthFooterLinks>
+      </AuthPanel>
+    </ProductAuthShell>
   );
 }

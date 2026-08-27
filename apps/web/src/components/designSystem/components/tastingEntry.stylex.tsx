@@ -1,0 +1,290 @@
+import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
+
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../../../styles/tokens.stylex";
+import { VerdictMark, type Verdict } from "./scoring.stylex";
+
+export type TastingEntryMember = {
+  description?: ReactNode;
+  href?: string;
+  metadata?: string;
+  name: string;
+  notes?: readonly string[];
+  score?: number;
+  verdict?: Verdict;
+};
+
+export type TastingEntryProps = {
+  author: string;
+  authorHref?: string;
+  comment?: string;
+  context?: string;
+  date: ReactNode;
+  leading?: ReactNode;
+  members: readonly [TastingEntryMember, ...TastingEntryMember[]];
+  menu?: ReactNode;
+  surface?: boolean;
+};
+
+/** Treats one tasting sitting as one entry whose bottles are member content. */
+export function TastingEntry({
+  author,
+  authorHref,
+  comment,
+  context,
+  date,
+  leading,
+  members,
+  menu,
+  surface = false,
+}: TastingEntryProps) {
+  return (
+    <article {...stylex.props(styles.entry, surface && styles.surfaceEntry)}>
+      <header {...stylex.props(styles.header)}>
+        {leading}
+        <div {...stylex.props(styles.headerCopy)}>
+          {authorHref ? (
+            <a href={authorHref} {...stylex.props(styles.author)}>
+              {author}
+            </a>
+          ) : (
+            <strong {...stylex.props(styles.author)}>{author}</strong>
+          )}
+          <span {...stylex.props(styles.date)}>
+            {date}
+            {context ? (
+              <>
+                <span aria-hidden="true"> · </span>
+                {context}
+              </>
+            ) : null}
+          </span>
+        </div>
+        {menu ? <div {...stylex.props(styles.menu)}>{menu}</div> : null}
+      </header>
+      <ul {...stylex.props(styles.members, surface && styles.surfaceMembers)}>
+        {members.map((member) => (
+          <li
+            key={`${member.href ?? member.name}-${member.name}`}
+            {...stylex.props(styles.member)}
+          >
+            <div {...stylex.props(styles.memberCopy)}>
+              {member.href ? (
+                <a href={member.href} {...stylex.props(styles.name)}>
+                  {member.name}
+                </a>
+              ) : (
+                <span {...stylex.props(styles.name)}>{member.name}</span>
+              )}
+              {member.metadata ? (
+                <span {...stylex.props(styles.metadata)}>
+                  {member.metadata}
+                </span>
+              ) : null}
+              {member.notes?.length ? (
+                <span {...stylex.props(styles.notes)}>
+                  {member.notes.join(" · ")}
+                </span>
+              ) : null}
+              {member.description ? (
+                <span {...stylex.props(styles.description)}>
+                  {member.description}
+                </span>
+              ) : null}
+            </div>
+            <div {...stylex.props(styles.measure)}>
+              {member.verdict ? (
+                <VerdictMark showLabel verdict={member.verdict} />
+              ) : member.score !== undefined ? (
+                <span {...stylex.props(styles.score)}>
+                  <span {...stylex.props(styles.screenReaderOnly)}>
+                    Score {member.score} out of 100
+                  </span>
+                  <span aria-hidden="true">{member.score}</span>
+                </span>
+              ) : (
+                <span {...stylex.props(styles.unknown)}>–</span>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+      {comment ? <p {...stylex.props(styles.comment)}>{comment}</p> : null}
+    </article>
+  );
+}
+
+const styles = stylex.create({
+  entry: {
+    paddingTop: space.x4,
+    paddingBottom: space.x4,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  surfaceEntry: {
+    paddingTop: "22px",
+    paddingRight: space.x6,
+    paddingBottom: "22px",
+    paddingLeft: space.x6,
+    borderBottomWidth: 0,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+  },
+  header: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: space.x3,
+  },
+  headerCopy: {
+    display: "flex",
+    minWidth: 0,
+    flex: 1,
+    flexDirection: "column",
+  },
+  author: {
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+    lineHeight: 1.3,
+    textDecoration: "none",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  date: {
+    marginTop: "2px",
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    lineHeight: 1.35,
+  },
+  menu: {
+    display: "flex",
+    flexShrink: 0,
+  },
+  members: {
+    margin: 0,
+    marginTop: space.x3,
+    paddingTop: space.x1,
+    paddingRight: space.x4,
+    paddingBottom: space.x1,
+    paddingLeft: space.x4,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+    listStyle: "none",
+  },
+  surfaceMembers: {
+    backgroundColor: colors.inset,
+  },
+  member: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: space.x4,
+    paddingTop: "12px",
+    paddingBottom: "12px",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+    ":last-child": {
+      borderBottomWidth: 0,
+    },
+  },
+  memberCopy: {
+    display: "flex",
+    minWidth: 0,
+    flex: 1,
+    flexDirection: "column",
+  },
+  name: {
+    overflow: "hidden",
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+    lineHeight: 1.3,
+    textDecoration: "none",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  metadata: {
+    marginTop: "2px",
+    overflow: "hidden",
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    lineHeight: 1.35,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  notes: {
+    marginTop: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "12px",
+    lineHeight: 1.35,
+  },
+  description: {
+    marginTop: space.x2,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.5,
+    whiteSpace: "pre-wrap",
+  },
+  measure: {
+    display: "flex",
+    minWidth: "76px",
+    flexShrink: 0,
+    justifyContent: "flex-end",
+  },
+  score: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "22px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
+    lineHeight: 1,
+  },
+  unknown: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "12px",
+  },
+  screenReaderOnly: {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    overflow: "hidden",
+    margin: "-1px",
+    padding: 0,
+    borderWidth: 0,
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+  },
+  comment: {
+    margin: 0,
+    marginTop: space.x3,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.5,
+  },
+});

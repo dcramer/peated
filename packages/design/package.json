@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@peated/tsconfig": "workspace:*",
-    "@tailwindcss/forms": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@types/node": "catalog:",
     "tailwind-scrollbar": "^3.1.0",

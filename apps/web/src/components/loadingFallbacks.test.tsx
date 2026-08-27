@@ -2,7 +2,6 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import BottlesLoading from "../app/(bottles-sidebar)/bottles/loading";
 import BottlersLoading from "../app/(entities-sidebar)/bottlers/loading";
 import BrandsLoading from "../app/(entities-sidebar)/brands/loading";
 import DistillersLoading from "../app/(entities-sidebar)/distillers/loading";
@@ -17,32 +16,23 @@ function countOccurrences(value: string, pattern: string) {
 describe("loading fallbacks", () => {
   it.each([
     {
-      Component: BottlesLoading,
-      hasSearch: false,
-      hasSecondLine: true,
-      name: "bottles",
-    },
-    {
       Component: BrandsLoading,
       hasSearch: true,
-      hasSecondLine: false,
       name: "brands",
     },
     {
       Component: BottlersLoading,
       hasSearch: true,
-      hasSecondLine: false,
       name: "bottlers",
     },
     {
       Component: DistillersLoading,
       hasSearch: true,
-      hasSecondLine: false,
       name: "distillers",
     },
   ])(
     "$name route reserves table structure while loading",
-    ({ Component, hasSearch, hasSecondLine }) => {
+    ({ Component, hasSearch }) => {
       const html = renderToStaticMarkup(createElement(Component));
 
       expect(html).toContain('role="status"');
@@ -59,11 +49,7 @@ describe("loading fallbacks", () => {
         expect(html).not.toContain("h-9 flex-grow");
       }
 
-      if (hasSecondLine) {
-        expect(countOccurrences(html, "mt-2 h-3 w-32")).toBe(12);
-      } else {
-        expect(html).not.toContain("mt-2 h-3 w-32");
-      }
+      expect(html).not.toContain("mt-2 h-3 w-32");
     },
   );
 

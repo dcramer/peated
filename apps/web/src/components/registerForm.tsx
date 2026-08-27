@@ -1,16 +1,28 @@
 "use client";
 
-import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
+import {
+  ButtonLink,
+  Checkbox,
+  Field,
+  TextInput,
+} from "@peated/web/components/designSystem/components";
+import {
+  AuthActionStack,
+  AuthDivider,
+  AuthFooterLinks,
+  AuthFormSurface,
+  AuthLink,
+  AuthNotice,
+  AuthPanel,
+  AuthTextButton,
+} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import PasskeyLoginButton from "@peated/web/components/passkeyLoginButton";
 import PasskeyRegisterButton from "@peated/web/components/passkeyRegisterButton";
-import TextField from "@peated/web/components/textField";
+import config from "@peated/web/config";
 import { authenticate, register } from "@peated/web/lib/auth.actions";
 import type { RegistrationConflictField } from "@peated/web/lib/registration";
 import { useState } from "react";
-import config from "../config";
-import Alert from "./alert";
-import GoogleLoginButton from "./googleLoginButton";
 
 export default function RegisterForm() {
   const [username, setUsername] = useState("");
@@ -27,132 +39,124 @@ export default function RegisterForm() {
 
   if (conflictField === "email") {
     return (
-      <div className="min-w-sm flex flex-auto flex-col gap-y-4">
-        <Alert>{error}</Alert>
-        <p className="text-muted text-center text-sm">
-          Sign in with an existing passkey, choose another sign-in method, or
-          recover access to your account.
-        </p>
-        <PasskeyLoginButton action={authenticate} />
-        <Button
-          href={{ pathname: "/login", query: { email } }}
-          color="primary"
-          fullWidth
-        >
-          Other Sign-in Options
-        </Button>
-        <div className="mt-4 flex items-center justify-center gap-x-3 text-center text-sm">
-          <Link
-            href={{ pathname: "/recover-account", query: { email } }}
-            className="text-highlight underline"
+      <AuthPanel
+        description="Sign in with an existing passkey, choose another method, or recover access."
+        title="That email already has an account"
+      >
+        {error ? <AuthNotice>{error}</AuthNotice> : null}
+        <AuthActionStack>
+          <PasskeyLoginButton action={authenticate} />
+          <ButtonLink
+            align="start"
+            fullWidth
+            href={`/login?email=${encodeURIComponent(email)}`}
+            size="lg"
+            variant="tonal"
           >
-            Account Recovery
-          </Link>
-          <span>&middot;</span>
-          <button
-            type="button"
-            className="text-highlight underline"
-            onClick={clearFeedback}
+            Other sign-in options
+          </ButtonLink>
+        </AuthActionStack>
+        <AuthDivider />
+        <AuthFooterLinks>
+          <AuthLink
+            href={`/recover-account?email=${encodeURIComponent(email)}`}
           >
-            Use a Different Email
-          </button>
-        </div>
-      </div>
+            Recover your account
+          </AuthLink>
+          <span>·</span>
+          <AuthTextButton type="button" onClick={clearFeedback}>
+            Use a different email
+          </AuthTextButton>
+        </AuthFooterLinks>
+      </AuthPanel>
     );
   }
 
   return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
-      {error ? <Alert>{error}</Alert> : null}
-
-      {config.GOOGLE_CLIENT_ID && (
-        <>
-          <GoogleLoginButton
-            action={authenticate}
-            title="Sign up with Google"
-          />
-          <div className="relative my-4 font-bold text-slate-500 opacity-60">
-            <div
-              className="absolute inset-0 flex items-center"
-              aria-hidden="true"
-            >
-              <div className="min-w-full border-t-2 border-slate-700" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-slate-900 px-2 text-lg uppercase">Or</span>
-            </div>
-          </div>
-        </>
-      )}
-
-      <div className="-mx-4 -mt-4">
-        <TextField
-          className="py-3"
-          name="email"
-          label="Email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="you@example.com"
-          autoFocus
-          value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setEmail(e.target.value);
-            clearFeedback();
-          }}
-        />
-        <TextField
-          className="py-3"
-          name="username"
-          label="Username"
-          autoComplete="username"
-          required
-          placeholder="you99"
-          value={username}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setUsername(e.target.value);
-            clearFeedback();
-          }}
-        />
-        <label className="relative mb-3 block flex items-start gap-2 px-4 py-3 text-sm">
-          <input
-            type="checkbox"
-            name="tosAccepted"
+    <AuthPanel
+      description="Two fields and a passkey. No password to remember."
+      title="Create an account"
+    >
+      {error ? <AuthNotice>{error}</AuthNotice> : null}
+      <AuthActionStack>
+        {config.GOOGLE_CLIENT_ID ? (
+          <>
+            <GoogleLoginButton
+              action={authenticate}
+              title="Sign up with Google"
+            />
+            <AuthDivider label="or" />
+          </>
+        ) : null}
+        <AuthFormSurface>
+          <Field htmlFor="register-email" label="Email" required>
+            <TextInput
+              autoComplete="email"
+              autoFocus
+              id="register-email"
+              name="email"
+              onChange={(event) => {
+                setEmail(event.currentTarget.value);
+                clearFeedback();
+              }}
+              placeholder="you@example.com"
+              required
+              type="email"
+              value={email}
+            />
+          </Field>
+          <Field
+            hint="Shown on every tasting you log."
+            htmlFor="register-username"
+            label="Username"
             required
+          >
+            <TextInput
+              autoComplete="username"
+              id="register-username"
+              name="username"
+              onChange={(event) => {
+                setUsername(event.currentTarget.value);
+                clearFeedback();
+              }}
+              placeholder="caskstrength_k"
+              required
+              value={username}
+            />
+          </Field>
+          <Checkbox
             checked={tosAccepted}
-            onChange={(e) => setTosAccepted(e.target.checked)}
+            label={
+              <>
+                I agree to the{" "}
+                <AuthLink href="/terms">Terms of Service</AuthLink>.
+              </>
+            }
+            name="tosAccepted"
+            onChange={(event) => setTosAccepted(event.currentTarget.checked)}
+            required
           />
-          <span>
-            I agree to the{" "}
-            <Link href="/terms" className="text-highlight underline">
-              Terms of Service
-            </Link>
-            .
-          </span>
-        </label>
-      </div>
-
-      <PasskeyRegisterButton
-        action={register}
-        username={username}
-        email={email}
-        tosAccepted={tosAccepted}
-        onError={(message) => {
-          setConflictField(null);
-          setError(message);
-        }}
-        onConflict={(field, message) => {
-          setConflictField(field);
-          setError(message);
-        }}
-      />
-
-      <p className="mt-4 text-center text-sm">
-        Already have an account?{" "}
-        <Link href="/login" className="text-highlight underline">
-          Sign In
-        </Link>
-      </p>
-    </div>
+        </AuthFormSurface>
+        <PasskeyRegisterButton
+          action={register}
+          email={email}
+          onConflict={(field, message) => {
+            setConflictField(field);
+            setError(message);
+          }}
+          onError={(message) => {
+            setConflictField(null);
+            setError(message);
+          }}
+          tosAccepted={tosAccepted}
+          username={username}
+        />
+      </AuthActionStack>
+      <AuthDivider />
+      <AuthFooterLinks>
+        <span>Already have an account?</span>
+        <AuthLink href="/login">Sign in</AuthLink>
+      </AuthFooterLinks>
+    </AuthPanel>
   );
 }

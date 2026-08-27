@@ -1,7 +1,21 @@
 "use client";
 
-import Button from "@peated/web/components/button";
-import TextField from "@peated/web/components/textField";
+import {
+  Button,
+  ButtonLink,
+  Field,
+  TextInput,
+} from "@peated/web/components/designSystem/components";
+import {
+  AuthActionStack,
+  AuthDivider,
+  AuthFooterLinks,
+  AuthFormSurface,
+  AuthLink,
+  AuthNotice,
+  AuthPanel,
+  AuthTextButton,
+} from "@peated/web/components/designSystem/patterns/authShell.stylex";
 import {
   passwordResetConfirmForm,
   passwordResetConfirmPasskeyForm,
@@ -11,35 +25,40 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound, Lock } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import Alert from "./alert";
 
-function PasswordFormComponent({ token }: { token: string }) {
+function PasswordFields({ token }: { token: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <>
-      <div className="-mx-4 -mt-4">
+    <AuthActionStack>
+      <AuthFormSurface>
         <input type="hidden" name="token" value={token} />
-        <TextField
-          name="password"
-          label="New Password"
-          type="password"
-          autoComplete="new-password"
-          required
-          placeholder="************"
-          autoFocus
-        />
-      </div>
-      <div className="flex justify-center gap-x-2">
-        <Button type="submit" color="highlight" fullWidth loading={pending}>
-          Set Password & Continue
-        </Button>
-      </div>
-    </>
+        <Field htmlFor="recovery-password" label="New password" required>
+          <TextInput
+            autoComplete="new-password"
+            autoFocus
+            id="recovery-password"
+            name="password"
+            placeholder="Enter a new password"
+            required
+            type="password"
+          />
+        </Field>
+      </AuthFormSurface>
+      <Button
+        align="start"
+        fullWidth
+        loading={pending}
+        size="lg"
+        type="submit"
+        variant="accent"
+      >
+        Set password and continue
+      </Button>
+    </AuthActionStack>
   );
 }
 
@@ -63,7 +82,6 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
   );
 
   const handlePasskeyRecovery = async () => {
-    // Check for WebAuthn support
     if (!globalThis.PublicKeyCredential) {
       router.push("/browser-not-supported");
       return;
@@ -73,38 +91,31 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
     setPasskeyError(null);
 
     try {
-      // Get WebAuthn challenge from server
       const { options, signedChallenge } = await challengeMutation.mutateAsync({
         token,
       });
-
-      // Start WebAuthn registration
       const response = await startRegistration({ optionsJSON: options });
-
-      // Prepare form data for server action
       const formData = new FormData();
       formData.append("token", token);
       formData.append("passkeyResponse", JSON.stringify(response));
       formData.append("signedChallenge", signedChallenge);
-
       passkeyFormAction(formData);
-    } catch (err: any) {
-      logError(err, { context: "passkey_recovery" });
+    } catch (error: any) {
+      logError(error, { context: "passkey_recovery" });
 
-      // Check if user cancelled the passkey prompt
-      if (err.name === "NotAllowedError" || err.message?.includes("cancel")) {
+      if (
+        error.name === "NotAllowedError" ||
+        error.message?.includes("cancel")
+      ) {
         setPasskeyLoading(false);
         return;
       }
 
-      // Check for invalid token error
-      if (err.message?.includes("Invalid verification token")) {
-        setPasskeyError("invalid_token");
-      } else {
-        setPasskeyError(
-          err.message || "Failed to recover account with passkey",
-        );
-      }
+      setPasskeyError(
+        error.message?.includes("Invalid verification token")
+          ? "invalid_token"
+          : error.message || "Failed to recover account with passkey",
+      );
       setPasskeyLoading(false);
     }
   };
@@ -114,67 +125,114 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
   const isInvalidToken =
     error === "invalid_token" || error?.includes("Invalid verification token");
 
-  return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
-      {error && !isInvalidToken && <Alert>{error}</Alert>}
-      {isInvalidToken && (
-        <Alert>
-          This recovery link has expired or is invalid.{" "}
-          <Link href="/recover-account" className="text-highlight underline">
-            Request a new one
-          </Link>
-          .
-        </Alert>
-      )}
-      {isInvalidToken ? null : isRecovered ? (
-        <>
-          <p className="mb-8 text-center">Your account has been recovered.</p>
-          <div className="flex flex-col gap-y-2">
-            <Button href="/settings/security" color="highlight" fullWidth>
-              Manage Passkeys
-            </Button>
-            <Button href="/" color="primary" fullWidth>
-              Return to Peated
-            </Button>
-          </div>
-        </>
-      ) : showPasswordForm ? (
-        <>
-          <div className="mb-4 text-center">
-            <button
-              type="button"
-              onClick={() => setShowPasswordForm(false)}
-              className="text-highlight text-sm underline"
-            >
-              ← Back to other options
-            </button>
-          </div>
+  if (isInvalidToken) {
+    return (
+      <AuthPanel
+        description="Recovery links work once and expire for your protection."
+        title="This recovery link is no longer valid"
+      >
+        <AuthNotice>
+          Request a new link to continue recovering your account.
+        </AuthNotice>
+        <ButtonLink
+          align="start"
+          fullWidth
+          href="/recover-account"
+          size="lg"
+          variant="accent"
+        >
+          Request a new link
+        </ButtonLink>
+      </AuthPanel>
+    );
+  }
 
-          <form action={formAction}>
-            <PasswordFormComponent token={token} />
-          </form>
-        </>
-      ) : (
-        <>
-          <Button
+  if (isRecovered) {
+    return (
+      <AuthPanel
+        description="Your new sign-in method is ready to use."
+        title="Account recovered"
+      >
+        <AuthNotice>Your account access has been restored.</AuthNotice>
+        <AuthActionStack>
+          <ButtonLink
+            align="start"
             fullWidth
-            color="highlight"
-            onClick={handlePasskeyRecovery}
-            loading={passkeyLoading}
+            href="/settings/security"
+            size="lg"
+            variant="accent"
           >
-            <KeyRound className="mr-2 h-4 w-4" />
-            Add a New Passkey
-          </Button>
-          <Button
+            Manage passkeys
+          </ButtonLink>
+          <ButtonLink
+            align="start"
             fullWidth
-            color="primary"
-            onClick={() => setShowPasswordForm(true)}
+            href="/"
+            size="lg"
+            variant="tonal"
           >
-            <Lock className="mr-2 h-4 w-4" />
-            Set a Password
-          </Button>
-        </>
-      )}
-    </div>
+            Return to Peated
+          </ButtonLink>
+        </AuthActionStack>
+      </AuthPanel>
+    );
+  }
+
+  if (showPasswordForm) {
+    return (
+      <AuthPanel
+        back={
+          <AuthTextButton
+            type="button"
+            onClick={() => setShowPasswordForm(false)}
+          >
+            ← Other recovery options
+          </AuthTextButton>
+        }
+        description="Choose a new password for this account."
+        title="Set a new password"
+      >
+        {error ? <AuthNotice>{error}</AuthNotice> : null}
+        <form action={formAction}>
+          <PasswordFields token={token} />
+        </form>
+      </AuthPanel>
+    );
+  }
+
+  return (
+    <AuthPanel
+      description="Add a new passkey or set a password to restore access."
+      title="Recover your account"
+    >
+      {error ? <AuthNotice>{error}</AuthNotice> : null}
+      <AuthActionStack>
+        <Button
+          align="start"
+          fullWidth
+          loading={passkeyLoading}
+          onClick={handlePasskeyRecovery}
+          size="lg"
+          variant="accent"
+        >
+          <KeyRound aria-hidden="true" size={17} />
+          Add a new passkey
+        </Button>
+        <Button
+          align="start"
+          fullWidth
+          onClick={() => setShowPasswordForm(true)}
+          size="lg"
+          variant="tonal"
+        >
+          <Lock aria-hidden="true" size={17} />
+          Set a password
+        </Button>
+      </AuthActionStack>
+      <AuthDivider />
+      <AuthFooterLinks>
+        <AuthLink href="/login">Return to sign in</AuthLink>
+      </AuthFooterLinks>
+    </AuthPanel>
   );
 }

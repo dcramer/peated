@@ -1,8 +1,8 @@
 "use client";
 
-import Button from "@peated/web/components/button";
+import { Button } from "@peated/web/components/designSystem/components";
+import { AuthNotice } from "@peated/web/components/designSystem/patterns/authShell.stylex";
 import { resendVerificationForm } from "@peated/web/lib/auth.actions";
-import type { ComponentProps } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -12,32 +12,37 @@ export default function ResendVerificationForm() {
     undefined,
   );
 
+  if (state?.ok) {
+    return (
+      <AuthNotice>
+        {state.alreadyVerified
+          ? "This account is already verified. You can continue to Peated."
+          : "Follow the instructions in your inbox to continue."}
+      </AuthNotice>
+    );
+  }
+
   return (
     <form action={resendVerificationAction}>
-      {state?.ok ? (
-        state.alreadyVerified ? (
-          <p className="mb-8 text-center">
-            Oops, it looks like you already verified your account. Nothing to
-            see here!
-          </p>
-        ) : (
-          <p className="mb-8 text-center">
-            Follow the instructions in your inbox to continue.
-          </p>
-        )
-      ) : (
-        <ResendVerificationButton />
-      )}
+      {state?.error ? <AuthNotice>{state.error}</AuthNotice> : null}
+      <ResendVerificationButton />
     </form>
   );
 }
 
-function ResendVerificationButton(props: ComponentProps<typeof Button>) {
+function ResendVerificationButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" color="highlight" loading={pending} {...props}>
-      Resend Verification Email
+    <Button
+      align="start"
+      fullWidth
+      loading={pending}
+      size="lg"
+      type="submit"
+      variant="accent"
+    >
+      Resend verification email
     </Button>
   );
 }

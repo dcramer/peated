@@ -1,0 +1,73 @@
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
+import { StoryCanvas } from "../storyFixtures.stylex";
+import {
+  Passport,
+  type PassportProps,
+  type PassportStamp,
+} from "./passport.stylex";
+
+const islayStamps = [
+  { label: "Ardbeg", stamped: true },
+  { label: "Bowmore", stamped: true },
+  { label: "Bruichladdich", stamped: true },
+  { label: "Caol Ila", stamped: true },
+  { label: "Kilchoman", stamped: true },
+  { label: "Lagavulin", stamped: true },
+  { label: "Laphroaig", stamped: true },
+  { label: "Ardnahoe", stamped: false },
+  { label: "Bunnahabhain", stamped: false },
+  { label: "Malt Mill", stamped: false },
+  { label: "Port Ellen", stamped: false },
+  { label: "Port Charlotte", stamped: false },
+] as const;
+
+const largeStamps: readonly [PassportStamp, ...PassportStamp[]] = [
+  { label: "Distillery 1", stamped: true },
+  ...Array.from({ length: 31 }, (_, index) => ({
+    label: `Distillery ${index + 2}`,
+    stamped: index < 17,
+  })),
+];
+
+const meta = {
+  title: "Components/Data Display/Passport",
+  component: Passport,
+  args: {
+    kind: "closed",
+    stamps: islayStamps,
+    unit: "distilleries",
+  },
+  argTypes: {
+    stamps: { table: { disable: true } },
+  },
+  decorators: [
+    (Story) => (
+      <StoryCanvas width="compact">
+        <Story />
+      </StoryCanvas>
+    ),
+  ],
+} satisfies Meta<PassportProps>;
+
+export default meta;
+type Story = StoryObj<PassportProps>;
+
+export const ClosedSet: Story = {};
+
+export const OpenEnded: Story = {
+  args: {
+    count: 23,
+    kind: "open",
+    nextStampIn: 2,
+    unit: "bottles",
+  },
+};
+
+export const LargeClosedSet: Story = {
+  args: {
+    kind: "closed",
+    stamps: largeStamps,
+    unit: "distilleries",
+  },
+};

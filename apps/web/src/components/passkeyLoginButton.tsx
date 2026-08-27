@@ -1,6 +1,10 @@
 "use client";
 
-import Button from "@peated/web/components/button";
+import {
+  Button,
+  type ButtonVariant,
+  ValidationMessage,
+} from "@peated/web/components/designSystem/components";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startAuthentication } from "@simplewebauthn/browser";
@@ -11,8 +15,12 @@ import { useState } from "react";
 
 export default function PasskeyLoginButton({
   action,
+  title = "Continue with a passkey",
+  variant = "tonal",
 }: {
   action: (formData: FormData) => Promise<any>;
+  title?: string;
+  variant?: ButtonVariant;
 }) {
   const orpc = useORPC();
   const router = useRouter();
@@ -75,15 +83,17 @@ export default function PasskeyLoginButton({
   return (
     <>
       <Button
+        align="start"
         fullWidth
-        color="primary"
+        size="lg"
+        variant={variant}
         onClick={handlePasskeyLogin}
         loading={loading}
       >
-        <KeyRound className="mr-2 h-4 w-4" />
-        Sign in with Passkey
+        <KeyRound aria-hidden="true" size={17} />
+        {title}
       </Button>
-      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+      {error ? <ValidationMessage>{error}</ValidationMessage> : null}
     </>
   );
 }

@@ -4,6 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@stylex;
+
 :root {
   --highlight-color: #fbbf24;
 

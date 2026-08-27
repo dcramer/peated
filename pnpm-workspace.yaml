@@ -7,6 +7,7 @@ allowBuilds:
   '@ast-grep/cli': true
   '@fission-ai/openspec': false
   '@sentry/cli': false
+  '@swc/core': true
   bcrypt: true
   core-js: false
   esbuild: false
@@ -39,7 +40,6 @@ catalog:
   "@logtape/redaction": 2.2.3
   "@opentelemetry/api": 1.9.1
   tailwindcss: ^3.4.19
-  "@tailwindcss/forms": ^0.5.11
   "@tailwindcss/typography": ^0.5.19
   "prettier-plugin-tailwindcss": ^0.5.14
   "@tanstack/react-query": ^5.90.21

@@ -1,8 +1,11 @@
 "use client";
 
-import Button from "@peated/web/components/button";
-import LayoutSplash from "@peated/web/components/layoutSplash";
-import Spinner from "@peated/web/components/spinner";
+import { ButtonLink } from "@peated/web/components/designSystem/components";
+import {
+  AuthNotice,
+  AuthPanel,
+} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { logError } from "@peated/web/lib/log";
@@ -16,8 +19,8 @@ export default function Verify() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const orpc = useORPC();
-
-  const [loading, setLoading] = useState(true);
+  const token = searchParams.get("token") || "";
+  const [loading, setLoading] = useState(Boolean(token));
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -30,24 +33,23 @@ export default function Verify() {
     }),
   );
 
-  const token = searchParams.get("token") || "";
   if (user?.verified || (!user && !token)) {
     redirect("/");
   }
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    if (!token) return;
     verifyEmail(
       { token },
       {
-        onError: (err: any) => {
-          if (err.name === "INVALID_TOKEN") {
-            setError(err.message);
+        onError: (requestError: any) => {
+          if (
+            requestError.name === "INVALID_TOKEN" ||
+            requestError.message?.includes("Invalid verification token")
+          ) {
+            setError("This verification link has expired or is invalid.");
           } else {
-            logError(err);
+            logError(requestError);
             setError("An unknown internal error occurred.");
           }
           setLoading(false);
@@ -59,38 +61,47 @@ export default function Verify() {
     );
   }, [token, verifyEmail]);
 
-  return (
-    <LayoutSplash>
-      <div className="mb-16 flex flex-col items-center">
-        <h1 className="mb-4 text-2xl font-semibold">Account Verification</h1>
-        {loading ? (
-          <Spinner />
-        ) : error ? (
-          <>
-            <p className="mb-4 text-center">
-              There was an error verifying your account.
-            </p>
-            <p className="mb-4 text-center">
-              The error returned was: <em>{error}</em>
-            </p>
-            <ResendVerificationForm />
-          </>
-        ) : success ? (
-          <>
-            <p className="mb-8 text-center">Your account has been verified.</p>
-            <Button href="/" color="highlight">
-              Return to Peated
-            </Button>
-          </>
-        ) : (
-          <>
-            <p className="mb-8 text-center">
-              Please check your email address to finish verifying your account.
-            </p>
-            <ResendVerificationForm />
-          </>
-        )}
-      </div>
-    </LayoutSplash>
-  );
+  let panel;
+  if (loading) {
+    panel = (
+      <AuthPanel
+        description="This usually takes only a moment."
+        title="Verifying your account"
+      >
+        <AuthNotice>Checking your verification link…</AuthNotice>
+      </AuthPanel>
+    );
+  } else if (error) {
+    panel = (
+      <AuthPanel
+        description="The link may have expired or already been used."
+        title="We couldn’t verify this account"
+      >
+        <AuthNotice>{error}</AuthNotice>
+        <ResendVerificationForm />
+      </AuthPanel>
+    );
+  } else if (success) {
+    panel = (
+      <AuthPanel
+        description="Your email address is confirmed."
+        title="Account verified"
+      >
+        <ButtonLink align="start" fullWidth href="/" size="lg" variant="accent">
+          Return to Peated
+        </ButtonLink>
+      </AuthPanel>
+    );
+  } else {
+    panel = (
+      <AuthPanel
+        description="Use the link in your inbox to finish setting up your account."
+        title="Check your email"
+      >
+        <ResendVerificationForm />
+      </AuthPanel>
+    );
+  }
+
+  return <ProductAuthShell intro="account">{panel}</ProductAuthShell>;
 }
