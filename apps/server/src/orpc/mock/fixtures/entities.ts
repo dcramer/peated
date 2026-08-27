@@ -197,6 +197,35 @@ export const mockEntities: Entity[] = [
     totalTastings: 1850,
     totalBottles: 130,
   },
+  {
+    ...mockEntity,
+    id: 9212,
+    peatedId: "E9212",
+    name: "The Scotch Malt Whisky Society",
+    shortName: "SMWS",
+    type: ["brand", "bottler"],
+    kind: "bottler",
+    description:
+      "An independent bottler known for identifying single-cask releases with distillery codes.",
+    yearEstablished: 1983,
+    website: "https://smws.com",
+    region: null,
+    totalTastings: 0,
+    totalBottles: 0,
+  },
+  {
+    ...mockEntity,
+    id: 9213,
+    peatedId: "E9213",
+    name: "Highland Park",
+    shortName: null,
+    description: "An island single malt distillery in Orkney.",
+    yearEstablished: 1798,
+    website: "https://www.highlandparkwhisky.com",
+    region: null,
+    totalTastings: 640,
+    totalBottles: 68,
+  },
 ];
 
 export const mockMacallanEntity = mockEntities[1]!;
