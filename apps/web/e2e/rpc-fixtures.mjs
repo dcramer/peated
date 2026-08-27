@@ -398,19 +398,6 @@ export const homeBottle = {
 export const bottleGroupId = 50_001;
 export const destinationBottleGroupId = 50_002;
 
-const bottleGroupRatingStats = {
-  pass: 2,
-  sip: 3,
-  savor: 4,
-  total: 9,
-  avg: 2.2,
-  percentage: {
-    pass: 22.2,
-    sip: 33.3,
-    savor: 44.5,
-  },
-};
-
 /** @type {CatalogFixtureBottle} */
 export const bottleGroupRepresentative = {
   ...buildBottle({
@@ -732,7 +719,7 @@ export function buildCollection({
  *   id?: number,
  *   bottle?: FixtureBottle | CatalogFixtureBottle,
  *   notes?: string,
- *   rating?: number,
+ *   ratingBand?: import("@peated/server/constants").TastingBandId,
  *   tags?: string[],
  *   awards?: import("@peated/server/types").BadgeAward[],
  * }} [options]
@@ -741,7 +728,7 @@ export function buildTasting({
   id = createdTastingId,
   bottle = existingBottle,
   notes = tastingNotes,
-  rating = 2,
+  ratingBand = "very_good",
   tags = /** @type {string[]} */ ([]),
   awards = /** @type {import("@peated/server/types").BadgeAward[]} */ ([]),
 } = {}) {
@@ -750,7 +737,9 @@ export function buildTasting({
     imageUrl: null,
     notes,
     bottle,
-    rating,
+    ratingBand,
+    legacySimpleRating: null,
+    legacyStarRating: null,
     tags,
     color: null,
     servingStyle: null,

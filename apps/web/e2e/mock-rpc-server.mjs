@@ -664,7 +664,9 @@ async function handleRpcRequest({ request, response, url }) {
         !isNumber(input?.bottle) ||
         input?.target !== undefined ||
         input?.release !== undefined ||
-        input?.rating !== 2 ||
+        input?.ratingBand !== "very_good" ||
+        input?.rating !== undefined ||
+        input?.score !== undefined ||
         ![tastingNotes, photoTastingNotes, failingTastingNotes].includes(
           input?.notes,
         )
@@ -691,7 +693,7 @@ async function handleRpcRequest({ request, response, url }) {
         tasting: buildTasting({
           bottle: getMockBottle(request, input.bottle),
           notes: input?.notes,
-          rating: input?.rating,
+          ratingBand: input?.ratingBand,
           tags: input?.tags ?? [],
         }),
         awards: [],
@@ -1047,6 +1049,22 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     case "comments/list":
       sendRpcResponse(response, emptyList);
+      return true;
+    case "memberReviews/list":
+      if (!isNumber(input?.bottle)) {
+        sendRpcError(response, "Unexpected member review list payload");
+        return true;
+      }
+
+      sendRpcResponse(response, emptyList);
+      return true;
+    case "memberReviews/mine":
+      if (!isNumber(input?.bottle)) {
+        sendRpcError(response, "Unexpected member review lookup payload");
+        return true;
+      }
+
+      sendRpcResponse(response, null);
       return true;
     case "externalReviews/list":
       if (input?.bottle !== undefined && !isNumber(input.bottle)) {
