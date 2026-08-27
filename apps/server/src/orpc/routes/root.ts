@@ -1,25 +1,9 @@
 import config from "@peated/server/config";
-import { procedure } from "@peated/server/orpc";
-import { z } from "zod";
+import { implement } from "@peated/server/orpc";
+import rootContract from "@peated/server/orpc/contracts/root";
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/",
-    summary: "API root",
-    description: "Get basic API information including version",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "getRoot",
-    }),
-  })
-  .output(
-    z.object({
-      version: z.string(),
-    }),
-  )
-  .handler(async function () {
-    return {
-      version: config.VERSION,
-    };
-  });
+export default implement(rootContract).handler(async function () {
+  return {
+    version: config.VERSION,
+  };
+});

@@ -45,7 +45,7 @@ export default procedure
         query: z.coerce
           .string()
           .default("")
-          .describe("Plain-text search; operator syntax is not supported."),
+          .describe("Search text only. Search operators are not supported."),
         brand: z.coerce.number().nullish(),
         distiller: z.coerce.number().nullish(),
         bottle: z.number().int().positive().optional(),

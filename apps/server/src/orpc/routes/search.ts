@@ -20,14 +20,15 @@ import {
   plainTextSearchQuery,
   prefixTextSearchQuery,
 } from "@peated/server/lib/search";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
-import {
-  BottleSchema,
-  EntitySchema,
-  RegionSchema,
-  UserSchema,
-} from "@peated/server/schemas";
+import searchContract, {
+  SEARCH_SCOPE_LIST,
+  SearchOutputSchema,
+  type ExactSchema,
+  type ScopeTotalsSchema,
+  type SearchScope,
+} from "@peated/server/orpc/contracts/search";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { EntitySerializer } from "@peated/server/serializers/entity";
@@ -44,20 +45,8 @@ import {
   sql,
   type SQL,
 } from "drizzle-orm";
-import { z } from "zod";
+import type { z } from "zod";
 
-const SEARCH_SCOPE_LIST = [
-  "bottles",
-  "distillers",
-  "brands",
-  "bottlers",
-  "blenders",
-  "companies",
-  "regions",
-  "members",
-] as const;
-
-type SearchScope = (typeof SEARCH_SCOPE_LIST)[number];
 type EntityScope =
   | "distillers"
   | "brands"
@@ -77,91 +66,6 @@ const ENTITY_TYPE_BY_SCOPE = {
   brands: "brand",
   bottlers: "bottler",
 } as const;
-
-const MemberResultSchema = z.object({
-  member: UserSchema,
-  totalTastings: z.number().int().nonnegative(),
-});
-
-const GroupSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("bottles"),
-    total: z.number().int().nonnegative(),
-    results: z.array(BottleSchema),
-  }),
-  z.object({
-    type: z.literal("distillers"),
-    total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
-  }),
-  z.object({
-    type: z.literal("brands"),
-    total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
-  }),
-  z.object({
-    type: z.literal("bottlers"),
-    total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
-  }),
-  z.object({
-    type: z.literal("blenders"),
-    total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
-  }),
-  z.object({
-    type: z.literal("companies"),
-    total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
-  }),
-  z.object({
-    type: z.literal("regions"),
-    total: z.number().int().nonnegative(),
-    results: z.array(RegionSchema),
-  }),
-  z.object({
-    type: z.literal("members"),
-    total: z.number().int().nonnegative(),
-    results: z.array(MemberResultSchema),
-  }),
-]);
-
-const ExactSchema = z
-  .discriminatedUnion("type", [
-    z.object({ type: z.literal("bottle"), ref: BottleSchema }),
-    z.object({ type: z.literal("entity"), ref: EntitySchema }),
-  ])
-  .nullable();
-
-const NearestSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("bottles"), result: BottleSchema }),
-  z.object({ type: z.literal("distillers"), result: EntitySchema }),
-  z.object({ type: z.literal("brands"), result: EntitySchema }),
-  z.object({ type: z.literal("bottlers"), result: EntitySchema }),
-  z.object({ type: z.literal("blenders"), result: EntitySchema }),
-  z.object({ type: z.literal("companies"), result: EntitySchema }),
-  z.object({ type: z.literal("regions"), result: RegionSchema }),
-  z.object({ type: z.literal("members"), result: MemberResultSchema }),
-]);
-
-const ScopeTotalsSchema = z.object({
-  bottles: z.number().int().nonnegative(),
-  distillers: z.number().int().nonnegative(),
-  brands: z.number().int().nonnegative(),
-  bottlers: z.number().int().nonnegative(),
-  blenders: z.number().int().nonnegative(),
-  companies: z.number().int().nonnegative(),
-  regions: z.number().int().nonnegative(),
-  members: z.number().int().nonnegative().optional(),
-});
-
-const OutputSchema = z.object({
-  query: z.string(),
-  exact: ExactSchema,
-  groups: z.array(GroupSchema),
-  scopeTotals: ScopeTotalsSchema,
-  nearest: z.array(NearestSchema).max(3),
-});
 
 type MemberRow = { member: User; totalTastings: number };
 type ScopeTotals = z.infer<typeof ScopeTotalsSchema>;
@@ -910,7 +814,7 @@ async function buildSearchResponse(
   for (const row of rows.nearest) {
     nearest.push(await serializeNearest(row, context));
   }
-  return OutputSchema.parse({
+  return SearchOutputSchema.parse({
     query: rows.query,
     exact,
     groups,
@@ -920,27 +824,6 @@ async function buildSearchResponse(
 }
 
 // Recent lookups stay in browser storage. This API does not store history.
-export default procedure
-  .route({
-    method: "GET",
-    path: "/search",
-    summary: "Global search",
-    description:
-      "Search each catalog and member type with separate results and exact counts",
-    spec: (spec) => ({ ...spec, operationId: "search" }),
-  })
-  .input(
-    z
-      .object({
-        query: z.coerce
-          .string()
-          .describe("Plain-text search; operator syntax is not supported."),
-        scopes: z
-          .array(z.enum(SEARCH_SCOPE_LIST))
-          .default([...SEARCH_SCOPE_LIST]),
-        limit: z.coerce.number().gte(1).lte(50).default(3),
-      })
-      .strict(),
-  )
-  .output(OutputSchema)
-  .handler(({ input, context }) => buildSearchResponse(input, context));
+export default implement(searchContract).handler(({ input, context }) =>
+  buildSearchResponse(input, context),
+);

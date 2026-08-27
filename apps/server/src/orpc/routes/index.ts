@@ -1,3 +1,4 @@
+import { api } from "@peated/server/orpc";
 import activity from "./activity";
 import admin from "./admin";
 import ai from "./ai";
@@ -74,7 +75,7 @@ export interface Router {
   version: typeof version;
 }
 
-export default {
+export default api.router({
   activity,
   admin,
   ai,
@@ -111,4 +112,4 @@ export default {
   toasts,
   users,
   version,
-};
+});

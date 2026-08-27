@@ -8,12 +8,11 @@ import {
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { RESERVED_COLLECTIONS } from "@peated/server/lib/db";
-import { procedure } from "@peated/server/orpc";
-import { detailsResponse, UserSchema } from "@peated/server/schemas";
+import { implement } from "@peated/server/orpc";
+import userDetailsContract from "@peated/server/orpc/contracts/users/details";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { and, eq, gt, sql } from "drizzle-orm";
-import { z } from "zod";
 import {
   readJoinedUserBottle,
   scanUserTastingBottles,
@@ -94,85 +93,57 @@ async function aggregateCollectionStats(userId: number) {
   return { collected: bottleIds.size, library };
 }
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/users/{user}",
-    summary: "Get user details",
-    description:
-      "Retrieve user profile information including statistics for tastings, bottles, and contributions",
-    operationId: "getUser",
-  })
-  .input(
-    z.object({
-      user: z.union([z.coerce.number(), z.literal("me"), z.string()]),
-    }),
-  )
-  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
-  .output(
-    detailsResponse(
-      UserSchema.extend({
-        stats: z.object({
-          tastings: z.number(),
-          bottles: z.number(),
-          collected: z.number(),
-          library: z.object({
-            total: z.number(),
-            open: z.number(),
-            sealed: z.number(),
-          }),
-          contributions: z.number(),
-        }),
-      }),
-    ),
-  )
-  .handler(async function ({ input, context, errors }) {
-    const user = await getUserFromId(db, input.user, context.user);
+export default implement(userDetailsContract).handler(async function ({
+  input,
+  context,
+  errors,
+}) {
+  const user = await getUserFromId(db, input.user, context.user);
 
-    if (!user) {
-      if (input.user === "me") {
-        throw errors.UNAUTHORIZED();
-      }
-      throw errors.NOT_FOUND({
-        message: "User not found",
-      });
+  if (!user) {
+    if (input.user === "me") {
+      throw errors.UNAUTHORIZED();
     }
-
-    let tastingStats: Awaited<ReturnType<typeof aggregateTastingStats>>;
-    let collectionStats: Awaited<ReturnType<typeof aggregateCollectionStats>>;
-    try {
-      tastingStats = await aggregateTastingStats(user.id);
-      collectionStats = await aggregateCollectionStats(user.id);
-    } catch (error) {
-      if (error instanceof UserBottleReadIntegrityError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      throw error;
-    }
-
-    const userActor = await db.query.actors.findFirst({
-      where: (table, { and, eq }) =>
-        and(eq(table.type, "user"), eq(table.key, String(user.id))),
+    throw errors.NOT_FOUND({
+      message: "User not found",
     });
+  }
 
-    const [{ totalContributions }] = userActor
-      ? await db
-          .select({
-            totalContributions: sql<string>`COUNT(${changes.actorId})`,
-          })
-          .from(changes)
-          .where(eq(changes.actorId, userActor.id))
-          .limit(1)
-      : [{ totalContributions: "0" }];
+  let tastingStats: Awaited<ReturnType<typeof aggregateTastingStats>>;
+  let collectionStats: Awaited<ReturnType<typeof aggregateCollectionStats>>;
+  try {
+    tastingStats = await aggregateTastingStats(user.id);
+    collectionStats = await aggregateCollectionStats(user.id);
+  } catch (error) {
+    if (error instanceof UserBottleReadIntegrityError) {
+      throw errors.CONFLICT({ message: error.message, cause: error });
+    }
+    throw error;
+  }
 
-    return {
-      ...(await serialize(UserSerializer, user, context.user)),
-      stats: {
-        tastings: tastingStats.tastings,
-        bottles: tastingStats.bottles,
-        collected: collectionStats.collected,
-        library: collectionStats.library,
-        contributions: Number(totalContributions),
-      },
-    };
+  const userActor = await db.query.actors.findFirst({
+    where: (table, { and, eq }) =>
+      and(eq(table.type, "user"), eq(table.key, String(user.id))),
   });
+
+  const [{ totalContributions }] = userActor
+    ? await db
+        .select({
+          totalContributions: sql<string>`COUNT(${changes.actorId})`,
+        })
+        .from(changes)
+        .where(eq(changes.actorId, userActor.id))
+        .limit(1)
+    : [{ totalContributions: "0" }];
+
+  return {
+    ...(await serialize(UserSerializer, user, context.user)),
+    stats: {
+      tastings: tastingStats.tastings,
+      bottles: tastingStats.bottles,
+      collected: collectionStats.collected,
+      library: collectionStats.library,
+      contributions: Number(totalContributions),
+    },
+  };
+});

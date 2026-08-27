@@ -5,62 +5,17 @@ import { identities, users } from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { createAccessToken, createUser } from "@peated/server/lib/auth";
 import { logError } from "@peated/server/lib/log";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import loginContract from "@peated/server/orpc/contracts/auth/login";
 import { authRateLimit } from "@peated/server/orpc/middleware";
-import { AuthSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
-import { z } from "zod";
 
-export default procedure
+export default implement(loginContract)
   .use(authRateLimit)
-  .route({
-    method: "POST",
-    path: "/auth/login",
-    summary: "User login",
-    description:
-      "Authenticate user with email/password, Google OAuth code, or Google ID token",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "login",
-    }),
-  })
-  .input(
-    z.union([
-      z
-        .object({
-          email: z
-            .string()
-            .email()
-            .toLowerCase()
-            .describe("User email address"),
-          password: z.string().describe("User password"),
-        })
-        .describe("Basic authentication"),
-      z
-        .object({
-          code: z.string().describe("Google OAuth authorization code"),
-          tosAccepted: z
-            .boolean()
-            .optional()
-            .describe("User accepted Terms of Service"),
-        })
-        .describe("Google OAuth (code)"),
-      z
-        .object({
-          idToken: z.string().describe("Google idToken"),
-          tosAccepted: z
-            .boolean()
-            .optional()
-            .describe("User accepted Terms of Service"),
-        })
-        .describe("Google OAuth (idToken)"),
-    ]),
-  )
-  .output(AuthSchema)
   .handler(async function ({ input, errors }) {
     try {
       const user =

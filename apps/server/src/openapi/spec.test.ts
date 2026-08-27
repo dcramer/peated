@@ -83,7 +83,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
         querySchema && "description" in querySchema
           ? querySchema.description
           : undefined,
-      ).toBe("Plain-text search; operator syntax is not supported.");
+      ).toBe("Search text only. Search operators are not supported.");
     }
   });
 
