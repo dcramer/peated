@@ -7,6 +7,7 @@ import FlavorProfile from "@peated/web/components/flavorProfile";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { Suspense } from "react";
 import BottleActions from "./bottleActions";
 
@@ -38,7 +39,7 @@ export default function BottleFullHeader({
             <PeatedGlyph className="h-4 w-4" /> Log Tasting
           </Button>
 
-          <ShareButton title={bottleIdentity} url={`/${bottle.peatedId}`} />
+          <ShareButton title={bottleIdentity} url={getBottleUrl(bottle)} />
 
           <BottleActions bottle={bottle} />
         </div>

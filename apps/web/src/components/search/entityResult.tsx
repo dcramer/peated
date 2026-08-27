@@ -1,6 +1,7 @@
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/assets/entity.svg";
 import Link from "@peated/web/components/link";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import Chip from "../chip";
 
 export type EntityResult = {
@@ -18,7 +19,7 @@ export default function EntityResultRow({
       <EntityIcon className="m-2 hidden h-10 w-auto sm:block" />
       <div className="min-w-0 flex-auto">
         <div className="flex items-center space-x-1 font-semibold leading-6">
-          <Link href={`/entities/${entity.id}`}>
+          <Link href={getEntityUrl(entity)}>
             <span className="absolute inset-x-0 -top-px bottom-0" />
             {entity.name}
           </Link>

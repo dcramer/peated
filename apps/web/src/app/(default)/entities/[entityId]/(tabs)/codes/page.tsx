@@ -9,6 +9,7 @@ import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 
@@ -63,7 +64,7 @@ export default function Page(props: { params: Promise<{ entityId: string }> }) {
           system. For example, <strong>Cask No. 4.360 Jangling dram</strong>{" "}
           means it is the <strong>360th cask</strong> from{" "}
           <strong>distillery number 4</strong>. In this case, distillery maps to{" "}
-          <Link href={`/entities/${exampleDistiller.id}`}>
+          <Link href={getEntityUrl(exampleDistiller, "distillery")}>
             {exampleDistiller.name}
           </Link>
           .
@@ -127,7 +128,7 @@ export default function Page(props: { params: Promise<{ entityId: string }> }) {
                         <td className="border-b border-slate-800 p-3 text-sm">
                           {distiller ? (
                             <Link
-                              href={`/entities/${distiller.id}`}
+                              href={getEntityUrl(distiller, "distillery")}
                               className="hover:underline"
                             >
                               {distiller.name}

@@ -1,4 +1,6 @@
+import type { EntityKind } from "@peated/server/types";
 import Link from "@peated/web/components/link";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import type { ComponentPropsWithoutRef } from "react";
 import Join from "./join";
 import Tooltip from "./tooltip";
@@ -6,6 +8,7 @@ import Tooltip from "./tooltip";
 type Distiller = {
   id: string | number | undefined | null;
   name: string;
+  kind?: EntityKind | null;
 };
 
 type Props = {
@@ -13,6 +16,7 @@ type Props = {
     brand: {
       id: string | number | undefined | null;
       name: string;
+      kind?: EntityKind | null;
     };
     distillers?: Distiller[];
     flavorProfile?: string | undefined | null;
@@ -28,7 +32,10 @@ export default function BottleMetadata({ data, ...props }: Props) {
             return (
               <Link
                 key={d.id}
-                href={`/entities/${d.id}`}
+                href={getEntityUrl(
+                  { id: Number(d.id), kind: d.kind },
+                  "distillery",
+                )}
                 className="hover:underline"
               >
                 {d.name}
@@ -46,7 +53,10 @@ export const Brand = ({ data: { brand } }: Props) => {
 
   return (
     <div className="max-w-[200px] space-x-1 truncate">
-      <Link href={`/entities/${brand.id}`} className="hover:underline">
+      <Link
+        href={getEntityUrl({ id: Number(brand.id), kind: brand.kind }, "brand")}
+        className="hover:underline"
+      >
         {brandName}
       </Link>
     </div>
@@ -74,7 +84,10 @@ export const Distillers = ({
               {distillers.map((distiller) => (
                 <li key={distiller.id}>
                   <Link
-                    href={`/entities/${distiller.id}`}
+                    href={getEntityUrl(
+                      { id: Number(distiller.id), kind: distiller.kind },
+                      "distillery",
+                    )}
                     className="block text-slate-200 hover:text-white hover:underline"
                   >
                     {distiller.name}
@@ -100,7 +113,7 @@ export const Distillers = ({
       <span>{isBlend ? "Distillery" : "Distilled at"}</span>
       <Link
         key={d.id}
-        href={`/entities/${d.id}`}
+        href={getEntityUrl({ id: Number(d.id), kind: d.kind }, "distillery")}
         className="inline-block max-w-[200px] truncate align-bottom hover:underline"
       >
         {d.name}

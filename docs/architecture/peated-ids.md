@@ -4,10 +4,10 @@ Peated IDs are short, permanent references for public catalog objects. They are 
 
 ## Supported Objects
 
-| Object | Format                | Example | Permanent URL              |
-| ------ | --------------------- | ------- | -------------------------- |
-| Bottle | `B` plus four+ digits | `B0123` | `https://peated.com/B0123` |
-| Entity | `E` plus four+ digits | `E0123` | `https://peated.com/E0123` |
+| Object | Format                | Example | Canonical URL                       |
+| ------ | --------------------- | ------- | ----------------------------------- |
+| Bottle | `B` plus four+ digits | `B0123` | `https://peated.com/bottles/123`    |
+| Entity | `E` plus four+ digits | `E0123` | `https://peated.com/distillers/123` |
 
 The number is the object's existing positive database ID. Numbers shorter than four digits use leading zeroes. The prefix identifies the type, so `B0123` and `E0123` are different Peated IDs.
 
@@ -15,13 +15,17 @@ Peated IDs are serialized in uppercase with at least four digits. Input and sear
 
 ## Public Behavior
 
-- Root URLs such as `/B0123` and `/E0123` are the permanent public links.
-- Short forms such as `/B123` redirect permanently to the canonical four-digit form.
-- Exact legacy detail URLs such as `/bottles/123` and `/entities/123` redirect permanently to the corresponding Peated ID URL.
-- Nested routes keep their existing paths.
+- Bottle URLs use `/bottles/{numeric ID}`.
+- Entity URLs use the collection for their primary kind: `/brands`,
+  `/distillers`, `/bottlers`, `/blenders`, or `/companies`.
+- Root ID URLs such as `/B0123`, `/B123`, and `/E0123` redirect permanently to
+  the canonical collection URL.
+- Legacy `/entities/{numeric ID}` URLs redirect permanently to the Entity's
+  primary-kind collection. Nested routes keep their suffix and query string.
 - Bottle and entity API responses include `peatedId` alongside the existing numeric `id`.
 - Global search recognizes an exact Peated ID and returns that object when its type is included in the search.
-- Bottle and entity pages display the compact label `ID` and provide a way to copy the permanent URL.
+- Bottle and entity pages display the compact label `ID` and provide a way to
+  copy the canonical URL.
 - IDs for merged bottles and entities continue to resolve through the existing tombstones to the surviving object.
 
 ## Scope

@@ -5,15 +5,20 @@ import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useState } from "react";
 import Link from "./link";
 
-export default function PeatedId({ value }: { value: string }) {
+export default function PeatedId({
+  value,
+  href,
+}: {
+  value: string;
+  href: `/${string}`;
+}) {
   const [copied, setCopied] = useState(false);
-  const pathname = `/${value}`;
 
   return (
     <div className="text-muted inline-flex items-center gap-1 text-xs">
       <span>ID</span>
       <Link
-        href={pathname}
+        href={href}
         className="focus-visible:ring-highlight rounded font-mono font-semibold text-white hover:underline focus-visible:outline-none focus-visible:ring-2"
       >
         {value}
@@ -26,7 +31,7 @@ export default function PeatedId({ value }: { value: string }) {
         onClick={async () => {
           try {
             await copyTextToClipboard(
-              new URL(pathname, window.location.origin).toString(),
+              new URL(href, window.location.origin).toString(),
             );
             setCopied(true);
             window.setTimeout(() => setCopied(false), 1800);

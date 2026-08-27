@@ -5,6 +5,7 @@ import EntityForm from "@peated/web/components/entityForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { formQueryOptions } from "@peated/web/lib/orpc/query";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -45,7 +46,7 @@ function EntityEditForm({ entityId }: { entityId: string }) {
           },
           {
             onSuccess: () => {
-              router.push(`/entities/${entity.id}`);
+              router.push(getEntityUrl(entity));
             },
           },
         );

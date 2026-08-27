@@ -5,7 +5,7 @@ import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import type { ComponentProps } from "react";
 import { toTitleCase } from "../../../server/src/lib/strings";
-import { getEntityTypeSearchUrl } from "../lib/urls";
+import { getEntityTypeSearchUrl, getEntityUrl } from "../lib/urls";
 import type { Column } from "./table";
 import Table from "./table";
 
@@ -45,7 +45,7 @@ export default function EntityTable({
           value: (item) => {
             return (
               <Link
-                href={`/entities/${item.id}`}
+                href={getEntityUrl(item)}
                 className="font-medium hover:underline"
               >
                 {item.name}

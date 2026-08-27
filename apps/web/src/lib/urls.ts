@@ -1,7 +1,37 @@
-import type { Entity, EntityType } from "@peated/server/types";
+import type { Entity, EntityKind, EntityType } from "@peated/server/types";
 
-export function getEntityUrl(entity: Entity) {
-  return `/entities/${entity.id}`;
+const ENTITY_COLLECTION_BY_KIND = {
+  brand: "/brands",
+  distillery: "/distillers",
+  bottler: "/bottlers",
+  blender: "/blenders",
+  company: "/companies",
+} as const satisfies Record<EntityKind, `/${string}`>;
+
+export function getEntityRoutePrefixes(entityId: number): `/${string}`[] {
+  return [
+    ...Object.values(ENTITY_COLLECTION_BY_KIND).map(
+      (collection): `/${string}` => `${collection}/${entityId}`,
+    ),
+    `/entities/${entityId}`,
+  ];
+}
+
+export function getBottleUrl(
+  bottle: Pick<{ id: number }, "id">,
+): `/bottles/${number}` {
+  return `/bottles/${bottle.id}`;
+}
+
+export function getEntityUrl(
+  entity: Pick<Entity, "id"> & Partial<Pick<Entity, "kind">>,
+  fallbackKind?: EntityKind,
+): `/${string}` {
+  // Older records can lack a kind. Keep their existing route until the data
+  // owns the invariant that every public Entity has a primary kind.
+  const kind = entity.kind === undefined ? fallbackKind : entity.kind;
+  const collection = kind ? ENTITY_COLLECTION_BY_KIND[kind] : "/entities";
+  return `${collection}/${entity.id}`;
 }
 
 export function getEntityTypeSearchUrl(type: EntityType) {

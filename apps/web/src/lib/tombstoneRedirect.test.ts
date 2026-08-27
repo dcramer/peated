@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  getCanonicalPublicRouteRedirectPath,
   getCanonicalRouteRedirectPath,
   getReleaseFamilyRouteRedirectPath,
   type LoadRequestHeaders,
@@ -80,5 +81,83 @@ describe("tombstone redirects", () => {
     await expect(
       getReleaseFamilyRouteRedirectPath(56, loadHeaders),
     ).resolves.toBe("/bottles/56/releases");
+  });
+
+  it("keeps a canonical primary-kind Entity route", async () => {
+    loadHeaders.mockResolvedValue(
+      new Headers({
+        "x-peated-request-path": "/distillers/12/tastings?sort=-created",
+      }),
+    );
+
+    await expect(
+      getCanonicalPublicRouteRedirectPath(
+        {
+          canonicalId: 12,
+          canonicalPath: "/distillers/12",
+          currentId: 12,
+          currentPathPrefixes: ["/distillers/12", "/entities/12"],
+        },
+        loadHeaders,
+      ),
+    ).resolves.toBeNull();
+  });
+
+  it("moves a wrong-kind Entity route to the primary kind", async () => {
+    loadHeaders.mockResolvedValue(
+      new Headers({
+        "x-peated-request-path": "/brands/12/bottles?sort=-tastings",
+      }),
+    );
+
+    await expect(
+      getCanonicalPublicRouteRedirectPath(
+        {
+          canonicalId: 12,
+          canonicalPath: "/distillers/12",
+          currentId: 12,
+          currentPathPrefixes: ["/brands/12", "/entities/12"],
+        },
+        loadHeaders,
+      ),
+    ).resolves.toBe("/distillers/12/bottles?sort=-tastings");
+  });
+
+  it("moves wrong-kind tombstone routes with their suffix", async () => {
+    loadHeaders.mockResolvedValue(
+      new Headers({
+        "x-peated-request-path": "/brands/12/tastings?sort=-created",
+      }),
+    );
+
+    await expect(
+      getCanonicalPublicRouteRedirectPath(
+        {
+          canonicalId: 34,
+          canonicalPath: "/distillers/34",
+          currentId: 12,
+          currentPathPrefixes: ["/brands/12", "/entities/12"],
+        },
+        loadHeaders,
+      ),
+    ).resolves.toBe("/distillers/34/tastings?sort=-created");
+  });
+
+  it("moves an Entity ID route to its primary kind", async () => {
+    loadHeaders.mockResolvedValue(
+      new Headers({ "x-peated-request-path": "/E0012" }),
+    );
+
+    await expect(
+      getCanonicalPublicRouteRedirectPath(
+        {
+          canonicalId: 12,
+          canonicalPath: "/companies/12",
+          currentId: 12,
+          currentPathPrefixes: ["/companies/12", "/entities/12"],
+        },
+        loadHeaders,
+      ),
+    ).resolves.toBe("/companies/12/");
   });
 });
