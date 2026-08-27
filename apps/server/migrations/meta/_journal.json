@@ -1695,6 +1695,13 @@
       "when": 1787853368904,
       "tag": "0241_normalize_location_coordinates",
       "breakpoints": false
+    },
+    {
+      "idx": 242,
+      "version": "7",
+      "when": 1787855694936,
+      "tag": "0242_wet_wolf_cub",
+      "breakpoints": false
     }
   ]
 }

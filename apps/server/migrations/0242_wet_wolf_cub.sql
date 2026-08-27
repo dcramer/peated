@@ -1,0 +1,1 @@
+ALTER TABLE "entity" ALTER COLUMN "type" SET DEFAULT ARRAY[]::entity_type[];
