@@ -207,7 +207,7 @@ describe("PATCH /entities/:entity", () => {
   });
 
   test("can change kind", async ({ fixtures }) => {
-    const entity = await fixtures.Entity();
+    const entity = await fixtures.Entity({ kind: null });
     const modUser = await fixtures.User({ mod: true });
 
     const data = await routerClient.entities.update(
