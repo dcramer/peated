@@ -2,13 +2,16 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { BottleReviewList } from "./bottleReviews";
+import { ExternalReviewList } from "./bottleReviews";
 
-type ReviewListItem = Outputs["reviews"]["list"]["results"][number];
+type ExternalReviewListItem =
+  Outputs["externalReviews"]["list"]["results"][number];
 
 const timestamp = "2026-07-22T12:00:00.000Z";
 
-function makeReview(overrides: Partial<ReviewListItem> = {}): ReviewListItem {
+function makeExternalReview(
+  overrides: Partial<ExternalReviewListItem> = {},
+): ExternalReviewListItem {
   return {
     id: 1,
     name: "Springbank 12 Cask Strength",
@@ -42,11 +45,11 @@ function makeReview(overrides: Partial<ReviewListItem> = {}): ReviewListItem {
 describe("BottleReviews", () => {
   it("renders complete reviews from multiple publishers", () => {
     const results = [
-      makeReview(),
-      makeReview({
+      makeExternalReview(),
+      makeExternalReview({
         id: 2,
         site: {
-          ...makeReview().site!,
+          ...makeExternalReview().site!,
           id: 3,
           name: "Dramface",
         },
@@ -56,7 +59,7 @@ describe("BottleReviews", () => {
       }),
     ];
 
-    const html = renderToStaticMarkup(<BottleReviewList results={results} />);
+    const html = renderToStaticMarkup(<ExternalReviewList results={results} />);
 
     expect(html).toContain("The Critics");
     expect(html).toContain("Whisky Advocate");
@@ -71,14 +74,14 @@ describe("BottleReviews", () => {
   });
 
   it("renders no empty review section when the Bottle has no reviews", () => {
-    expect(renderToStaticMarkup(<BottleReviewList results={[]} />)).toBe("");
+    expect(renderToStaticMarkup(<ExternalReviewList results={[]} />)).toBe("");
   });
 
   it("adds the shared band label to a native 100-point critic score", () => {
     const html = renderToStaticMarkup(
-      <BottleReviewList
+      <ExternalReviewList
         results={[
-          makeReview({
+          makeExternalReview({
             nativeScore: { value: 92, scale: 100, display: "92/100" },
           }),
         ]}
@@ -89,18 +92,18 @@ describe("BottleReviews", () => {
     expect(html).toContain("Outstanding");
   });
 
-  it("omits missing metadata and normalized compatibility ratings", () => {
+  it("omits missing metadata and old converted scores", () => {
     const results = [
-      makeReview({
+      makeExternalReview({
         reviewerName: null,
         article: { title: null, publishedAt: null },
         nativeScore: null,
         summary: null,
       }),
-      makeReview({ id: 2, site: undefined }),
+      makeExternalReview({ id: 2, site: undefined }),
     ];
 
-    const html = renderToStaticMarkup(<BottleReviewList results={results} />);
+    const html = renderToStaticMarkup(<ExternalReviewList results={results} />);
 
     expect(html).toContain("Whisky Advocate");
     expect(html).toContain("Read the full review on Whisky Advocate");

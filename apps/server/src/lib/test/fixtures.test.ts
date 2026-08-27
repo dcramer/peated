@@ -6,8 +6,8 @@ import {
   bottleGroups,
   bottlesToDistillers,
   changes,
+  externalReviewArticles,
   flightBottles,
-  reviewArticles,
 } from "../../db/schema";
 
 function requireFixtureId(id: number | null, fixture: string): number {
@@ -26,7 +26,7 @@ describe("catalog identity fixtures", () => {
     });
 
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
-    const review = await fixtures.Review({ bottleId: bottle.id });
+    const review = await fixtures.ExternalReview({ bottleId: bottle.id });
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
     const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
     const flight = await fixtures.Flight({ bottles: [bottle.id] });
@@ -40,10 +40,10 @@ describe("catalog identity fixtures", () => {
           eq(bottleAliases.name, bottle.fullName),
         ),
       }),
-      db.query.reviewArticles.findFirst({
+      db.query.externalReviewArticles.findFirst({
         where: eq(
-          reviewArticles.id,
-          requireFixtureId(review.articleId, "ReviewArticle"),
+          externalReviewArticles.id,
+          requireFixtureId(review.articleId, "ExternalReviewArticle"),
         ),
       }),
     ]);

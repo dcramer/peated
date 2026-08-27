@@ -19,7 +19,7 @@ export default procedure
     path: "/bottle-aliases",
     summary: "Upsert bottle alias",
     description:
-      "Create or update a bottle alias and associate it with a bottle. Updates related prices and reviews. Requires moderator privileges",
+      "Create or update a bottle alias and associate it with a bottle. Updates related prices and externalReviews. Requires moderator privileges",
     operationId: "upsertBottleAlias",
   })
   .input(BottleAliasSchema.strict())

@@ -1,6 +1,10 @@
 import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
-import { bottles, reviewArticles, reviews } from "@peated/server/db/schema";
+import {
+  bottles,
+  externalReviewArticles,
+  externalReviews,
+} from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -10,7 +14,7 @@ import {
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import { and, eq, ne } from "drizzle-orm";
 
-export type FixBadReviewEntitiesResult = {
+export type FixBadExternalReviewEntitiesResult = {
   scanned: number;
   reassigned: number;
   unresolved: number;
@@ -19,31 +23,41 @@ export type FixBadReviewEntitiesResult = {
 };
 
 /**
- * Re-resolve reviews whose linked bottle no longer matches the review title.
+ * Re-resolve external reviews whose linked Bottle no longer matches the title.
  *
  * This stays intentionally conservative: it never rewrites or deletes the
- * current bottle record. It only reassigns the review when an exact alias or
+ * current Bottle record. It only reassigns the external review when an exact alias or
  * reviewed classifier result returns a replacement Bottle.
  */
-export async function fixBadReviewEntities(
+export async function fixBadExternalReviewEntities(
   {
     user,
   }: {
     user: User;
   },
   classify?: NonNullable<Parameters<typeof resolveBottleReferenceTarget>[1]>,
-): Promise<FixBadReviewEntitiesResult> {
+): Promise<FixBadExternalReviewEntitiesResult> {
   const actor = await getUserActor(user);
   const results = await db
-    .select({ article: reviewArticles, bottle: bottles, review: reviews })
+    .select({
+      article: externalReviewArticles,
+      bottle: bottles,
+      review: externalReviews,
+    })
     .from(bottles)
     .innerJoin(
-      reviews,
-      and(eq(reviews.bottleId, bottles.id), ne(reviews.name, bottles.fullName)),
+      externalReviews,
+      and(
+        eq(externalReviews.bottleId, bottles.id),
+        ne(externalReviews.name, bottles.fullName),
+      ),
     )
-    .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id));
+    .innerJoin(
+      externalReviewArticles,
+      eq(externalReviews.articleId, externalReviewArticles.id),
+    );
 
-  const summary: FixBadReviewEntitiesResult = {
+  const summary: FixBadExternalReviewEntitiesResult = {
     scanned: 0,
     reassigned: 0,
     unresolved: 0,

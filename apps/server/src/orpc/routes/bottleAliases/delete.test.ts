@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  externalReviews,
+  storePrices,
+} from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
@@ -25,7 +29,7 @@ describe("DELETE /bottle-aliases/:alias", () => {
       bottleId: bottle.id,
       name: "Direct Bottle Alias",
     });
-    const matchingReview = await fixtures.Review({
+    const matchingReview = await fixtures.ExternalReview({
       bottleId: bottle.id,
       name: alias.name,
       issue: "direct-owner",
@@ -35,7 +39,7 @@ describe("DELETE /bottle-aliases/:alias", () => {
       name: alias.name,
       volume: 750,
     });
-    const otherReview = await fixtures.Review({
+    const otherReview = await fixtures.ExternalReview({
       bottleId: otherBottle.id,
       name: alias.name,
       issue: "other-owner",
@@ -59,8 +63,8 @@ describe("DELETE /bottle-aliases/:alias", () => {
       }),
     ).resolves.toMatchObject({ bottleId: null });
     await expect(
-      db.query.reviews.findFirst({
-        where: eq(reviews.id, matchingReview.id),
+      db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, matchingReview.id),
       }),
     ).resolves.toMatchObject({ bottleId: null });
     await expect(
@@ -69,7 +73,9 @@ describe("DELETE /bottle-aliases/:alias", () => {
       }),
     ).resolves.toMatchObject({ bottleId: null });
     await expect(
-      db.query.reviews.findFirst({ where: eq(reviews.id, otherReview.id) }),
+      db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, otherReview.id),
+      }),
     ).resolves.toMatchObject({ bottleId: otherBottle.id });
     await expect(
       db.query.storePrices.findFirst({
@@ -148,7 +154,7 @@ describe("DELETE /bottle-aliases/:alias", () => {
       ignored: false,
       name: "Concurrent Delete Alias",
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       name: alias.name,
     });
@@ -204,7 +210,9 @@ describe("DELETE /bottle-aliases/:alias", () => {
       ignored: true,
     });
     await expect(
-      db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).resolves.toMatchObject({ bottleId: bottle.id });
     await expect(
       db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),

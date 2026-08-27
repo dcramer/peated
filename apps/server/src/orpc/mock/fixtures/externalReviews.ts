@@ -2,9 +2,9 @@ import type { MockOutputs } from "../contract";
 import { mockBottle, mockBottles } from "./bottles";
 import { timestamp } from "./constants";
 
-type Review = MockOutputs["reviews"]["list"]["results"][number];
+type ExternalReview = MockOutputs["externalReviews"]["list"]["results"][number];
 
-export const mockReview = {
+export const mockExternalReview = {
   id: 9801,
   name: mockBottle.fullName,
   url: "https://example.com/reviews/lagavulin-16",
@@ -30,16 +30,16 @@ export const mockReview = {
   bottle: mockBottle,
   createdAt: timestamp,
   updatedAt: timestamp,
-} satisfies Review;
+} satisfies ExternalReview;
 
-export const mockReviews = [
-  mockReview,
+export const mockExternalReviews = [
+  mockExternalReview,
   {
-    ...mockReview,
+    ...mockExternalReview,
     id: 9810,
     url: "https://example.com/reviews/lagavulin-8",
     site: {
-      ...mockReview.site!,
+      ...mockExternalReview.site!,
       id: 9811,
       type: "whiskyfun",
       name: "Whiskyfun",
@@ -57,12 +57,12 @@ export const mockReviews = [
     updatedAt: "2026-08-20T10:00:00.000Z",
   },
   {
-    ...mockReview,
+    ...mockExternalReview,
     id: 9812,
     name: mockBottles[1]!.fullName,
     url: "https://example.com/reviews/macallan-12-sherry-oak",
     site: {
-      ...mockReview.site!,
+      ...mockExternalReview.site!,
       id: 9813,
       type: "whiskynotes",
       name: "WhiskyNotes",
@@ -80,12 +80,12 @@ export const mockReviews = [
     updatedAt: "2026-08-18T15:00:00.000Z",
   },
   {
-    ...mockReview,
+    ...mockExternalReview,
     id: 9814,
     name: mockBottles[3]!.fullName,
     url: "https://example.com/reviews/buffalo-trace-bourbon",
     site: {
-      ...mockReview.site!,
+      ...mockExternalReview.site!,
       id: 9815,
       type: "bourbonculture",
       name: "Bourbon Culture",
@@ -103,7 +103,7 @@ export const mockReviews = [
     updatedAt: "2026-08-15T17:00:00.000Z",
   },
   {
-    ...mockReview,
+    ...mockExternalReview,
     id: 9816,
     name: mockBottles[4]!.fullName,
     url: "https://example.com/reviews/yamazaki-12",
@@ -120,7 +120,7 @@ export const mockReviews = [
     updatedAt: "2026-08-12T12:00:00.000Z",
   },
   {
-    ...mockReview,
+    ...mockExternalReview,
     id: 9817,
     name: "Mystery Islay Malt 18-year-old",
     url: "https://example.com/reviews/mystery-islay-18",
@@ -137,11 +137,11 @@ export const mockReviews = [
     updatedAt: "2026-08-10T13:00:00.000Z",
   },
   {
-    ...mockReview,
+    ...mockExternalReview,
     id: 9818,
     url: "https://example.com/reviews/lagavulin-16-dramface",
     site: {
-      ...mockReview.site!,
+      ...mockExternalReview.site!,
       id: 9819,
       type: "dramface",
       name: "Dramface",
@@ -158,11 +158,11 @@ export const mockReviews = [
     updatedAt: "2026-08-08T13:00:00.000Z",
   },
   {
-    ...mockReview,
+    ...mockExternalReview,
     id: 9830,
     url: "https://example.com/reviews/lagavulin-16-words",
     site: {
-      ...mockReview.site!,
+      ...mockExternalReview.site!,
       id: 9831,
       type: "wordsofwhisky",
       name: "Words of Whisky",
@@ -178,4 +178,4 @@ export const mockReviews = [
     createdAt: "2026-08-05T13:00:00.000Z",
     updatedAt: "2026-08-05T13:00:00.000Z",
   },
-] satisfies Review[];
+] satisfies ExternalReview[];

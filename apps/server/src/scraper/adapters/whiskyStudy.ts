@@ -1,7 +1,6 @@
 import {
-  normalizeReviewRating,
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
@@ -27,10 +26,11 @@ const SCORE =
 export const WhiskyStudyCursorSchema =
   currentReviewCursorSchema(MAX_CURRENT_ARTICLES);
 
-export const WhiskyStudyObservationSchema = ReviewArticleIngestionSchema;
+export const WhiskyStudyObservationSchema =
+  ExternalReviewArticleIngestionSchema;
 
 export type WhiskyStudyCursor = z.infer<typeof WhiskyStudyCursorSchema>;
-export type WhiskyStudyObservation = ReviewArticleIngestion;
+export type WhiskyStudyObservation = ExternalReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -81,7 +81,6 @@ function reviewScore(value: string) {
   };
   return {
     nativeScore,
-    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 
@@ -134,7 +133,6 @@ export function parseWhiskyStudyArticle(
     category: null,
     reviewerName: metadata.author,
     nativeScore: score.nativeScore,
-    normalizedRating: score.normalizedRating,
   };
   const contentText = JSON.stringify({ review, reviewText });
 
@@ -145,9 +143,9 @@ export function parseWhiskyStudyArticle(
       issue: null,
       publishedAt,
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews: [review],
+      externalReviews: [review],
     },
-    reviewTexts: { [reviewSourceKey]: reviewText },
+    externalReviewTexts: { [reviewSourceKey]: reviewText },
   });
 }
 

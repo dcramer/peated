@@ -1,22 +1,22 @@
 import { db } from "@peated/server/db";
 import {
   actors,
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
-  reviewArticles,
-  reviews,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, sql } from "drizzle-orm";
 
-describe("GET /reviews", () => {
+describe("GET /external-reviews", () => {
   test("lists reviews", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({ externalSiteId: site.id });
-    await fixtures.Review({ externalSiteId: site.id });
+    const review = await fixtures.ExternalReview({ externalSiteId: site.id });
+    await fixtures.ExternalReview({ externalSiteId: site.id });
 
-    const { results } = await routerClient.reviews.list(
+    const { results } = await routerClient.externalReviews.list(
       { sort: "name" },
       { context: { user } },
     );
@@ -32,7 +32,7 @@ describe("GET /reviews", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    await fixtures.Review({ externalSiteId: site.id });
+    await fixtures.ExternalReview({ externalSiteId: site.id });
     const currentUser = await fixtures.User({ mod: true });
     const sentinel = {
       active: false,
@@ -46,7 +46,7 @@ describe("GET /reviews", () => {
       .select({ count: sql<number>`COUNT(*)::int` })
       .from(actors);
 
-    await routerClient.reviews.list(
+    await routerClient.externalReviews.list(
       { sort: "name" },
       { context: { user: currentUser } },
     );
@@ -66,10 +66,13 @@ describe("GET /reviews", () => {
     const user = await fixtures.User();
 
     const err = await waitError(
-      routerClient.reviews.list({ sort: "name" }, { context: { user } }),
+      routerClient.externalReviews.list(
+        { sort: "name" },
+        { context: { user } },
+      ),
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Must be a moderator to list all reviews.]`,
+      `[Error: Must be a moderator to list all external reviews.]`,
     );
   });
 
@@ -82,10 +85,12 @@ describe("GET /reviews", () => {
       type: "totalwine",
     });
 
-    const review = await fixtures.Review({ externalSiteId: astorwine.id });
-    await fixtures.Review({ externalSiteId: totalwine.id });
+    const review = await fixtures.ExternalReview({
+      externalSiteId: astorwine.id,
+    });
+    await fixtures.ExternalReview({ externalSiteId: totalwine.id });
 
-    const { results } = await routerClient.reviews.list(
+    const { results } = await routerClient.externalReviews.list(
       {
         site: astorwine.type,
         sort: "name",
@@ -103,17 +108,17 @@ describe("GET /reviews", () => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       hidden: true,
     });
 
-    const moderatorResults = await routerClient.reviews.list(
+    const moderatorResults = await routerClient.externalReviews.list(
       { site: site.type, sort: "name" },
       { context: { user } },
     );
-    const publicResults = await routerClient.reviews.list({
+    const publicResults = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
     });
@@ -138,17 +143,17 @@ describe("GET /reviews", () => {
       externalSiteId: site.id,
       publicationMode: "automatic",
     });
-    const older = await fixtures.Review({
+    const older = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       url: "https://example.com/older-review",
     });
-    const firstAtLatestDate = await fixtures.Review({
+    const firstAtLatestDate = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       url: "https://example.com/first-latest-review",
     });
-    const latest = await fixtures.Review({
+    const latest = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       url: "https://example.com/latest-review",
@@ -165,40 +170,40 @@ describe("GET /reviews", () => {
     });
     await Promise.all([
       db
-        .update(reviewArticles)
+        .update(externalReviewArticles)
         .set({
           contentHash: "older-content",
           publishedAt: new Date("2026-08-22T00:00:00.000Z"),
         })
-        .where(eq(reviewArticles.id, older.articleId!)),
+        .where(eq(externalReviewArticles.id, older.articleId!)),
       db
-        .update(reviewArticles)
+        .update(externalReviewArticles)
         .set({
           contentHash: "first-latest-content",
           publishedAt: new Date("2026-08-23T00:00:00.000Z"),
         })
-        .where(eq(reviewArticles.id, firstAtLatestDate.articleId!)),
+        .where(eq(externalReviewArticles.id, firstAtLatestDate.articleId!)),
       db
-        .update(reviewArticles)
+        .update(externalReviewArticles)
         .set({
           title: "Springbank 12 Year Old Cask Strength review",
           contentHash: "latest-content",
           publishedAt: new Date("2026-08-23T00:00:00.000Z"),
         })
-        .where(eq(reviewArticles.id, latest.articleId!)),
+        .where(eq(externalReviewArticles.id, latest.articleId!)),
     ]);
 
-    const hidden = await fixtures.Review({
+    const hidden = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       hidden: true,
     });
-    const unresolved = await fixtures.Review({
+    const unresolved = await fixtures.ExternalReview({
       bottleId: null,
       externalSiteId: site.id,
       name: "Unresolved review",
     });
-    const unpublished = await fixtures.Review({
+    const unpublished = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
     });
@@ -206,30 +211,30 @@ describe("GET /reviews", () => {
     await fixtures.EnabledExternalReviewSourcePolicy({
       externalSiteId: reviewOnlySite.id,
     });
-    const reviewOnly = await fixtures.Review({
+    const reviewOnly = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: reviewOnlySite.id,
     });
     await Promise.all(
       [hidden, unresolved, reviewOnly].map((review) =>
         db
-          .update(reviewArticles)
+          .update(externalReviewArticles)
           .set({
             contentHash: `content-${review.id}`,
             publishedAt: new Date("2026-08-24T00:00:00.000Z"),
           })
-          .where(eq(reviewArticles.id, review.articleId!)),
+          .where(eq(externalReviewArticles.id, review.articleId!)),
       ),
     );
     await db
-      .update(reviewArticles)
+      .update(externalReviewArticles)
       .set({ contentHash: `content-${unpublished.id}` })
-      .where(eq(reviewArticles.id, unpublished.articleId!));
+      .where(eq(externalReviewArticles.id, unpublished.articleId!));
 
-    const firstPage = await routerClient.reviews.list({
+    const firstPage = await routerClient.externalReviews.list({
       limit: 2,
     });
-    const secondPage = await routerClient.reviews.list({
+    const secondPage = await routerClient.externalReviews.list({
       sort: "recent",
       cursor: 2,
       limit: 2,
@@ -268,19 +273,19 @@ describe("GET /reviews", () => {
       type: "whiskyadvocate",
     });
     const otherSite = await fixtures.ExternalSite({ type: "totalwine" });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: articleSite.id,
       url: "https://example.com/article-owned-review",
     });
-    const articleResults = await routerClient.reviews.list(
+    const articleResults = await routerClient.externalReviews.list(
       { site: articleSite.type, sort: "name" },
       { context: { user } },
     );
-    const otherResults = await routerClient.reviews.list(
+    const otherResults = await routerClient.externalReviews.list(
       { site: otherSite.type, sort: "name" },
       { context: { user } },
     );
-    const allResults = await routerClient.reviews.list(
+    const allResults = await routerClient.externalReviews.list(
       { sort: "name" },
       { context: { user } },
     );
@@ -310,7 +315,7 @@ describe("GET /reviews", () => {
       publicationMode: "automatic",
     });
     const summaryContentHash = "current-article-content";
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       legacyNormalizedScore: 78,
@@ -325,15 +330,15 @@ describe("GET /reviews", () => {
       summaryGeneratedAt: new Date("2026-07-23T00:00:00.000Z"),
     });
     await db
-      .update(reviewArticles)
+      .update(externalReviewArticles)
       .set({
         title: "A review of Springbank 12 Cask Strength",
         publishedAt: new Date("2026-07-22T00:00:00.000Z"),
         contentHash: summaryContentHash,
       })
-      .where(eq(reviewArticles.id, review.articleId!));
+      .where(eq(externalReviewArticles.id, review.articleId!));
 
-    const { results } = await routerClient.reviews.list({
+    const { results } = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
     });
@@ -358,12 +363,12 @@ describe("GET /reviews", () => {
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
     await fixtures.ExternalReviewSourcePolicy({ externalSiteId: site.id });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
     });
 
-    const { results } = await routerClient.reviews.list({
+    const { results } = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
     });
@@ -381,7 +386,7 @@ describe("GET /reviews", () => {
       publicationMode: "automatic",
     });
     const summaryContentHash = "current-article-content";
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       nativeScoreValue: 7.8,
@@ -394,9 +399,9 @@ describe("GET /reviews", () => {
       summaryGeneratedAt: new Date("2026-07-23T00:00:00.000Z"),
     });
     await db
-      .update(reviewArticles)
+      .update(externalReviewArticles)
       .set({ contentHash: summaryContentHash })
-      .where(eq(reviewArticles.id, review.articleId!));
+      .where(eq(externalReviewArticles.id, review.articleId!));
 
     await db
       .update(externalReviewSourcePolicies)
@@ -407,7 +412,7 @@ describe("GET /reviews", () => {
       })
       .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
 
-    const contentRevoked = await routerClient.reviews.list({
+    const contentRevoked = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
     });
@@ -421,7 +426,7 @@ describe("GET /reviews", () => {
       .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
 
     await expect(
-      routerClient.reviews.list({ bottle: bottle.id, sort: "name" }),
+      routerClient.externalReviews.list({ bottle: bottle.id, sort: "name" }),
     ).resolves.toMatchObject({ results: [] });
   });
 
@@ -429,23 +434,23 @@ describe("GET /reviews", () => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSiteOrExisting();
-    const firstDirect = await fixtures.Review({
+    const firstDirect = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: bottle.id,
       issue: "First direct review",
     });
-    const secondDirect = await fixtures.Review({
+    const secondDirect = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: bottle.id,
       issue: "Second direct review",
     });
-    const otherReview = await fixtures.Review({
+    const otherReview = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: otherBottle.id,
       issue: "Other Bottle review",
     });
 
-    const { results } = await routerClient.reviews.list({
+    const { results } = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
     });
@@ -465,11 +470,15 @@ describe("GET /reviews", () => {
   test("rejects removed target and release filters", async () => {
     // SAFETY: These calls intentionally send removed fields to the runtime validator.
     await expect(
-      waitError(() => routerClient.reviews.list({ target: 1 } as never)),
+      waitError(() =>
+        routerClient.externalReviews.list({ target: 1 } as never),
+      ),
     ).resolves.toMatchObject({ message: "Input validation failed" });
     // SAFETY: This call intentionally sends a removed field to the runtime validator.
     await expect(
-      waitError(() => routerClient.reviews.list({ release: 1 } as never)),
+      waitError(() =>
+        routerClient.externalReviews.list({ release: 1 } as never),
+      ),
     ).resolves.toMatchObject({ message: "Input validation failed" });
   });
 
@@ -477,34 +486,34 @@ describe("GET /reviews", () => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSiteOrExisting();
-    const firstReview = await fixtures.Review({
+    const firstReview = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       name: "A direct Bottle review",
     });
-    const secondReview = await fixtures.Review({
+    const secondReview = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       name: "B direct Bottle review",
     });
-    const otherReview = await fixtures.Review({
+    const otherReview = await fixtures.ExternalReview({
       bottleId: otherBottle.id,
       externalSiteId: site.id,
       name: "C other Bottle review",
     });
 
-    const firstPage = await routerClient.reviews.list({
+    const firstPage = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
       limit: 1,
     });
-    const secondPage = await routerClient.reviews.list({
+    const secondPage = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
       cursor: 2,
       limit: 1,
     });
-    const thirdPage = await routerClient.reviews.list({
+    const thirdPage = await routerClient.externalReviews.list({
       bottle: bottle.id,
       sort: "name",
       cursor: 3,
@@ -524,7 +533,7 @@ describe("GET /reviews", () => {
 
   test("preserves empty Bottle-filter misses", async () => {
     await expect(
-      routerClient.reviews.list({ bottle: 999_999, sort: "name" }),
+      routerClient.externalReviews.list({ bottle: 999_999, sort: "name" }),
     ).resolves.toMatchObject({ results: [] });
   });
 
@@ -533,27 +542,27 @@ describe("GET /reviews", () => {
   }) => {
     const user = await fixtures.User({ mod: true });
     const site = await fixtures.ExternalSiteOrExisting();
-    const unresolved = await fixtures.Review({
+    const unresolved = await fixtures.ExternalReview({
       bottleId: null,
       externalSiteId: site.id,
     });
     const retainedBottle = await fixtures.Bottle();
-    const firstAssigned = await fixtures.Review({
+    const firstAssigned = await fixtures.ExternalReview({
       bottleId: retainedBottle.id,
       externalSiteId: site.id,
       issue: "First assigned review",
     });
-    const secondAssigned = await fixtures.Review({
+    const secondAssigned = await fixtures.ExternalReview({
       bottleId: retainedBottle.id,
       externalSiteId: site.id,
       issue: "Second assigned review",
     });
 
-    const unknownResults = await routerClient.reviews.list(
+    const unknownResults = await routerClient.externalReviews.list(
       { onlyUnknown: true, sort: "name" },
       { context: { user } },
     );
-    const allResults = await routerClient.reviews.list(
+    const allResults = await routerClient.externalReviews.list(
       { sort: "name" },
       { context: { user } },
     );
@@ -583,14 +592,14 @@ describe("GET /reviews", () => {
     const bottle = await fixtures.Bottle();
 
     const err = await waitError(
-      routerClient.reviews.list({
+      routerClient.externalReviews.list({
         bottle: bottle.id,
         onlyUnknown: true,
         sort: "name",
       }),
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Must be a moderator to list all reviews.]`,
+      `[Error: Must be a moderator to list all external reviews.]`,
     );
   });
 
@@ -599,7 +608,7 @@ describe("GET /reviews", () => {
     const site = await fixtures.ExternalSiteOrExisting();
 
     const err = await waitError(
-      routerClient.reviews.list(
+      routerClient.externalReviews.list(
         {
           site: site.type,
           sort: "name",
@@ -608,7 +617,7 @@ describe("GET /reviews", () => {
       ),
     );
     expect(err).toMatchInlineSnapshot(
-      `[Error: Must be a moderator to list all reviews.]`,
+      `[Error: Must be a moderator to list all external reviews.]`,
     );
   });
 });

@@ -5,14 +5,14 @@ import {
 } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
   externalSiteRuns,
   externalSites,
-  reviewArticles,
-  reviews,
   storePrices,
 } from "@peated/server/db/schema";
-import { ReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
+import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { syncExternalSites } from "@peated/server/lib/externalSites";
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { eq } from "drizzle-orm";
@@ -174,7 +174,9 @@ test("registers every scraper source with explicit target ownership", () => {
   for (const type of EXTERNAL_SITE_TYPE_LIST.filter(isExternalReviewSiteType)) {
     const source = scraperRegistry.sources.get(type);
     expect(source, `${type} is not registered`).toBeDefined();
-    expect(source?.observationSchema).toBe(ReviewArticleIngestionSchema);
+    expect(source?.observationSchema).toBe(
+      ExternalReviewArticleIngestionSchema,
+    );
     expect(source?.sink).toBe(externalReviewSink);
   }
 });
@@ -313,10 +315,10 @@ test("runs the bounded WhiskyNotes adapter through the production runtime", asyn
   expect(
     await db
       .select()
-      .from(reviewArticles)
-      .where(eq(reviewArticles.externalSiteId, site.id)),
+      .from(externalReviewArticles)
+      .where(eq(externalReviewArticles.externalSiteId, site.id)),
   ).toHaveLength(2);
-  expect(await db.select().from(reviews)).toHaveLength(4);
+  expect(await db.select().from(externalReviews)).toHaveLength(4);
   expect(
     await db
       .select()

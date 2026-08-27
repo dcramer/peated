@@ -4,7 +4,7 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { storeReviewArticleInTransaction } from "@peated/server/externalReviews/store";
+import { storeExternalReviewArticleInTransaction } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -27,7 +27,7 @@ import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { ReviewInputSchema } from "@peated/server/schemas";
+import { ExternalReviewInputSchema } from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
 import type { z } from "zod";
 
@@ -56,8 +56,6 @@ export class ExternalReviewBottleStateError extends Error {
     this.reason = reason;
   }
 }
-
-export const ExternalReviewInputSchema = ReviewInputSchema.strict();
 
 type ExternalReviewContext =
   | { initiatedByUserId: number }
@@ -129,7 +127,7 @@ export async function createExternalReview(
   let stored;
   try {
     stored = await db.transaction(async (tx) => {
-      const result = await storeReviewArticleInTransaction(
+      const result = await storeExternalReviewArticleInTransaction(
         tx,
         {
           externalSiteId: site.id,
@@ -139,14 +137,13 @@ export async function createExternalReview(
           publishedAt: null,
           contentHash: null,
           fetchedAt: null,
-          reviews: [
+          externalReviews: [
             {
               sourceKey,
               name: reviewName,
               category: input.category,
               reviewerName: null,
               nativeScore: input.nativeScore,
-              normalizedRating: null,
               bottleId,
               summary: null,
             },
@@ -159,13 +156,15 @@ export async function createExternalReview(
             bottleId === null ? [] : [aliasKey, reviewName, rawName],
         },
       );
-      const storedReview = result.storedReviews[0];
-      if (!storedReview) throw new Error("Unable to store review.");
-      const { previousBottleId, review } = storedReview;
+      const storedExternalReview = result.storedExternalReviews[0];
+      if (!storedExternalReview) {
+        throw new Error("Unable to store external review.");
+      }
+      const { previousBottleId, externalReview } = storedExternalReview;
 
-      const appliedIncomingIdentity = review.bottleId === bottleId;
+      const appliedIncomingIdentity = externalReview.bottleId === bottleId;
       if (!bottleId || !appliedIncomingIdentity) {
-        return { review, previousBottleId, aliasAssignment: null };
+        return { externalReview, previousBottleId, aliasAssignment: null };
       }
 
       const aliasAssignment = await assignBottleAliasInTransaction(tx, {
@@ -205,7 +204,7 @@ export async function createExternalReview(
         }
         await recordIncomingBottleDecisionInTransaction(tx, {
           sourceKind: "review",
-          sourceId: review.id,
+          sourceId: externalReview.id,
           externalSiteId: site.id,
           name: reviewName,
           url: input.url,
@@ -220,7 +219,7 @@ export async function createExternalReview(
         });
       }
 
-      return { review, previousBottleId, aliasAssignment };
+      return { externalReview, previousBottleId, aliasAssignment };
     });
   } catch (error) {
     if (error instanceof ActiveBottleSelectionError) {
@@ -238,18 +237,18 @@ export async function createExternalReview(
   await Promise.all(
     Array.from(
       new Set(
-        [stored.previousBottleId, stored.review.bottleId].filter(
+        [stored.previousBottleId, stored.externalReview.bottleId].filter(
           (id): id is number => id !== null && id !== undefined,
         ),
       ),
     ).map((bottleId) =>
       dispatchBottleStatsRecompute(
         "externalReview",
-        stored.review.id,
+        stored.externalReview.id,
         bottleId,
       ),
     ),
   );
 
-  return stored.review;
+  return stored.externalReview;
 }

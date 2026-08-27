@@ -17,6 +17,9 @@
 - [x] 1.6 Name the old normalized external score `legacyNormalizedScore` in
       application code, comment that it is an old import field, and exclude it from
       new public score fields
+- [x] 1.7 Rename publication-review application and API names to
+      `externalReview` and `externalReviewArticle` while keeping the shipped SQL
+      table names unchanged
 
 ## 2. Tasting and Member Review Writes
 
@@ -61,6 +64,9 @@
 - [x] 3.9 Change manual external-review writes to accept the publication's
       displayed value, scale, and label instead of a normalized score; test native
       100-point and other-scale reviews
+- [x] 3.10 Remove normalized-score calculation and writes from external review
+      observations, scrapers, imports, and fixtures; keep only explicit legacy
+      read coverage
 
 ## 4. Web Experience
 
@@ -84,3 +90,5 @@
       and API descriptions around tastings with bands and reviews with scores
 - [x] 5.2 Run targeted server and web tests, typechecks, lint, and formatting;
       report any full-repository checks left to pull request CI
+- [x] 5.3 Update external-review documentation, tests, mocks, and the pull
+      request for the clear naming cutover

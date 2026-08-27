@@ -30,23 +30,23 @@ describe("GET /admin/catalog/coverage", () => {
       newBottleId: coveredBottle.id,
     });
 
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       bottleId: coveredBottle.id,
       name: "Covered review one",
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       bottleId: coveredBottle.id,
       name: "Covered review two",
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       bottleId: retiredBottle.id,
       name: "Retired bottle review",
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       bottleId: null,
       name: "Unmatched review",
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       bottleId: hiddenOnlyBottle.id,
       name: "Hidden review",
       hidden: true,
@@ -86,7 +86,7 @@ describe("GET /admin/catalog/coverage", () => {
         withReviews: 1,
         withPriceListings: 1,
       },
-      reviews: {
+      externalReviews: {
         total: 4,
         matched: 3,
         unmatched: 1,

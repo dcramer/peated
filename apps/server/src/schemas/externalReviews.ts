@@ -15,10 +15,8 @@ export const NativeScoreSchema = z
     path: ["value"],
   });
 
-export const NormalizedReviewRatingSchema = z.number().int().min(0).max(100);
-
-export const ReviewSchema = z.object({
-  id: z.number().describe("Unique identifier for the review"),
+export const ExternalReviewSchema = z.object({
+  id: z.number().describe("Unique identifier for the external review"),
   name: z.string().describe("Name of the reviewed product"),
   url: z.string().describe("URL to the original review"),
   site: ExternalSiteSchema.optional().describe(
@@ -44,27 +42,29 @@ export const ReviewSchema = z.object({
     .describe("Timestamp when the review was last updated"),
 });
 
-export const ReviewInputSchema = z.object({
-  site: ExternalSiteTypeEnum.describe("Type of external site"),
-  name: z
-    .string()
-    .trim()
-    .min(1, "Required")
-    .describe("Name of the reviewed product"),
-  category: CategoryEnum.nullable()
-    .default(null)
-    .describe("Category of the whisky being reviewed"),
-  nativeScore: NativeScoreSchema.nullable()
-    .default(null)
-    .describe("Score exactly as displayed by the publication"),
-  issue: z
-    .string()
-    .trim()
-    .min(1, "Required")
-    .describe("Issue or problem with the review"),
-  url: z
-    .string()
-    .trim()
-    .min(1, "Required")
-    .describe("URL to the original review"),
-});
+export const ExternalReviewInputSchema = z
+  .object({
+    site: ExternalSiteTypeEnum.describe("Type of external site"),
+    name: z
+      .string()
+      .trim()
+      .min(1, "Required")
+      .describe("Name of the reviewed product"),
+    category: CategoryEnum.nullable()
+      .default(null)
+      .describe("Category of the whisky being reviewed"),
+    nativeScore: NativeScoreSchema.nullable()
+      .default(null)
+      .describe("Score exactly as displayed by the publication"),
+    issue: z
+      .string()
+      .trim()
+      .min(1, "Required")
+      .describe("Publisher issue that contains the external review"),
+    url: z
+      .string()
+      .trim()
+      .min(1, "Required")
+      .describe("URL to the original review"),
+  })
+  .strict();

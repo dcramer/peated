@@ -4,8 +4,8 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { ReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
-import { storeReviewArticle } from "@peated/server/externalReviews/store";
+import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
+import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { generateExternalReviewSummary } from "@peated/server/externalReviews/summary";
 import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
 import { logTelemetryError } from "@peated/server/lib/log";
@@ -13,28 +13,30 @@ import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = ReviewArticleIngestionSchema.safeExtend({
+const InputSchema = ExternalReviewArticleIngestionSchema.safeExtend({
   externalSiteId: z.number().int().positive(),
   fetchedAt: z.date(),
 });
-type ReviewArticleIngestionCandidate = Partial<z.input<typeof InputSchema>>;
+type ExternalReviewArticleIngestionCandidate = Partial<
+  z.input<typeof InputSchema>
+>;
 
-export interface ReviewIngestionServices {
+export interface ExternalReviewIngestionServices {
   generateSummary: typeof generateExternalReviewSummary;
   queueMissingBottles: typeof pushUniqueJob;
   reportError: typeof logTelemetryError;
 }
 
-const reviewIngestionServices: ReviewIngestionServices = {
+const externalReviewIngestionServices: ExternalReviewIngestionServices = {
   generateSummary: generateExternalReviewSummary,
   queueMissingBottles: pushUniqueJob,
   reportError: logTelemetryError,
 };
 
 /** Stores the article before model-based Bottle resolution runs in a worker. */
-export async function ingestReviewArticle(
-  rawInput: ReviewArticleIngestionCandidate,
-  services: ReviewIngestionServices = reviewIngestionServices,
+export async function ingestExternalReviewArticle(
+  rawInput: ExternalReviewArticleIngestionCandidate,
+  services: ExternalReviewIngestionServices = externalReviewIngestionServices,
 ) {
   const input = InputSchema.parse(rawInput);
   const site = await db.query.externalSites.findFirst({
@@ -44,10 +46,10 @@ export async function ingestReviewArticle(
   if (!site)
     throw new Error(`External site ${input.externalSiteId} not found.`);
 
-  const storedReviews = [];
+  const storedExternalReviews = [];
 
-  for (const review of input.article.reviews) {
-    const rawName = review.name;
+  for (const externalReview of input.article.externalReviews) {
+    const rawName = externalReview.name;
     const { name: normalizedName } = normalizeBottle({ name: rawName });
     const aliasKey = normalizeBottleAliasKey(rawName);
     let aliasMatch = null;
@@ -56,12 +58,12 @@ export async function ingestReviewArticle(
       if (aliasMatch) break;
     }
     let summary = null;
-    const sourceText = input.reviewTexts[review.sourceKey];
+    const sourceText = input.externalReviewTexts[externalReview.sourceKey];
     if (sourceText !== undefined) {
       try {
         summary = await services.generateSummary({
           externalSiteId: input.externalSiteId,
-          sourceKey: review.sourceKey,
+          sourceKey: externalReview.sourceKey,
           bottleName: normalizedName,
           sourceText,
           contentHash: input.article.contentHash,
@@ -71,28 +73,32 @@ export async function ingestReviewArticle(
           extra: {
             review: {
               externalSiteId: input.externalSiteId,
-              sourceKey: review.sourceKey,
+              sourceKey: externalReview.sourceKey,
               url: input.article.canonicalUrl,
             },
           },
         });
       }
     }
-    storedReviews.push({
-      ...review,
+    storedExternalReviews.push({
+      ...externalReview,
       bottleId: aliasMatch?.bottleId ?? null,
       summary,
     });
   }
 
-  const result = await storeReviewArticle({
+  const result = await storeExternalReviewArticle({
     externalSiteId: input.externalSiteId,
     fetchedAt: input.fetchedAt,
     ...input.article,
-    reviews: storedReviews,
+    externalReviews: storedExternalReviews,
   });
 
-  if (storedReviews.some((review) => review.bottleId === null)) {
+  if (
+    storedExternalReviews.some(
+      (externalReview) => externalReview.bottleId === null,
+    )
+  ) {
     try {
       await services.queueMissingBottles(
         "CreateMissingBottles",
@@ -100,11 +106,11 @@ export async function ingestReviewArticle(
         { removeOnComplete: true, removeOnFail: true },
       );
     } catch (error) {
-      // The stored reviews are durable and a later ingestion or maintenance run
-      // can queue their Bottle resolution again.
+      // The stored external reviews are durable. A later ingestion or
+      // maintenance run can queue their Bottle resolution again.
       services.reportError(error, {
         extra: {
-          reviewArticleId: result.articleId,
+          externalReviewArticleId: result.articleId,
           externalSiteId: input.externalSiteId,
         },
       });

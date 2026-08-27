@@ -8,9 +8,9 @@ import {
   bottleTombstones,
   bottles,
   collectionBottles,
+  externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
-  reviews,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -78,8 +78,8 @@ async function bottleMergeConsumerPreview(
     .then(([row]) => row?.total ?? 0);
   const reviewCount = await database
     .select({ total: count() })
-    .from(reviews)
-    .where(eq(reviews.bottleId, sourceBottleId))
+    .from(externalReviews)
+    .where(eq(externalReviews.bottleId, sourceBottleId))
     .then(([row]) => row?.total ?? 0);
   const storePriceCount = await database
     .select({ total: count() })
@@ -163,7 +163,7 @@ async function bottleMergeConsumerPreview(
   return {
     consumers: {
       tastings: tastingCount,
-      reviews: reviewCount,
+      externalReviews: reviewCount,
       storePrices: storePriceCount,
       observations: observationCount,
       collectionMemberships: collectionCount,
@@ -204,10 +204,10 @@ async function bottleMergeRelationshipState(
     .where(inArray(tastings.bottleId, bottleIds))
     .orderBy(asc(tastings.id));
   const reviewRows = await database
-    .select({ id: reviews.id })
-    .from(reviews)
-    .where(inArray(reviews.bottleId, bottleIds))
-    .orderBy(asc(reviews.id));
+    .select({ id: externalReviews.id })
+    .from(externalReviews)
+    .where(inArray(externalReviews.bottleId, bottleIds))
+    .orderBy(asc(externalReviews.id));
   const storePriceRows = await database
     .select({ id: storePrices.id })
     .from(storePrices)

@@ -1,7 +1,4 @@
-import {
-  normalizeReviewRating,
-  ReviewArticleIngestionSchema,
-} from "@peated/server/externalReviews/observation";
+import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { load as cheerio, type CheerioAPI } from "cheerio";
 import { createHash } from "node:crypto";
 import { z } from "zod";
@@ -32,7 +29,8 @@ export const WhiskyNotesCursorSchema = z
   })
   .strict();
 
-export const WhiskyNotesObservationSchema = ReviewArticleIngestionSchema;
+export const WhiskyNotesObservationSchema =
+  ExternalReviewArticleIngestionSchema;
 
 export type WhiskyNotesCursor = z.infer<typeof WhiskyNotesCursorSchema>;
 export type WhiskyNotesObservation = z.infer<
@@ -91,7 +89,6 @@ function score(value: string) {
   };
   return {
     nativeScore,
-    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 
@@ -141,7 +138,7 @@ export function parseWhiskyNotesArticle(
   if (!contentText) throw new Error("WhiskyNotes article content is missing.");
 
   const reviewList = [];
-  const reviewTexts: Record<string, string> = {};
+  const externalReviewTexts: Record<string, string> = {};
   const headings = content
     .find("h2")
     .toArray()
@@ -173,9 +170,8 @@ export function parseWhiskyNotesArticle(
       name,
       reviewerName,
       nativeScore: reviewScore?.nativeScore ?? null,
-      normalizedRating: reviewScore?.normalizedRating ?? null,
     });
-    reviewTexts[sourceKey] = sectionText;
+    externalReviewTexts[sourceKey] = sectionText;
   }
 
   if (reviewList.length === 0) {
@@ -189,9 +185,9 @@ export function parseWhiskyNotesArticle(
       issue: null,
       publishedAt,
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews: reviewList,
+      externalReviews: reviewList,
     },
-    reviewTexts,
+    externalReviewTexts,
   });
 }
 
@@ -228,7 +224,7 @@ export const whiskyNotesAdapter: ScraperAdapter<
     );
     await session.emit({
       sourceKey: observation.article.canonicalUrl,
-      itemCount: observation.article.reviews.length,
+      itemCount: observation.article.externalReviews.length,
       value: observation,
     });
   };

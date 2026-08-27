@@ -26,6 +26,7 @@ import entityCreate from "./routes/entities/create";
 import entityDetails from "./routes/entities/details";
 import entityList from "./routes/entities/list";
 import eventList from "./routes/events/list";
+import externalReviewList from "./routes/externalReviews/list";
 import flightDetails from "./routes/flights/details";
 import flightList from "./routes/flights/list";
 import friendCreate from "./routes/friends/create";
@@ -36,7 +37,6 @@ import notificationList from "./routes/notifications/list";
 import priceChangeList from "./routes/prices/change-list";
 import regionDetails from "./routes/regions/details";
 import regionList from "./routes/regions/list";
-import reviewList from "./routes/reviews/list";
 import root from "./routes/root";
 import search from "./routes/search";
 import smwsDistillerList from "./routes/smws/distiller-list";
@@ -129,8 +129,8 @@ export const mockRouter = mockOS.router({
     details: regionDetails,
     list: regionList,
   },
-  reviews: {
-    list: reviewList,
+  externalReviews: {
+    list: externalReviewList,
   },
   smws: {
     distillerList: smwsDistillerList,

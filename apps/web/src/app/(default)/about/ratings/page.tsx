@@ -5,7 +5,8 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Whisky Rating Guide",
-  description: "A simple guide to Peated tasting bands and 100-point reviews.",
+  description:
+    "A simple guide to Peated tasting bands and 100-point external reviews.",
 };
 
 const BAND_STYLES = {

@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottles,
-  reviews,
+  externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
@@ -77,12 +77,12 @@ export default procedure
           ),
         );
       await tx
-        .update(reviews)
+        .update(externalReviews)
         .set({ bottleId: null })
         .where(
           and(
-            eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()),
-            eq(reviews.bottleId, bottle.id),
+            eq(sql`LOWER(${externalReviews.name})`, alias.name.toLowerCase()),
+            eq(externalReviews.bottleId, bottle.id),
           ),
         );
 

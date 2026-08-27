@@ -12,6 +12,8 @@ many tastings of a Bottle, but their review should be one current opinion.
   review per Bottle.
 - Keep external reviews separate, but include permitted native 100-point scores
   in the same Bottle score as member reviews.
+- Use `externalReview` for publication reviews in application and API names;
+  reserve `memberReview` for reviews written by Peated members.
 - Calculate the Bottle score as a median. Hide it until at least 20 counted
   member and external scores exist.
 - Apply member privacy only when an individual review is shown. Every valid
@@ -51,3 +53,5 @@ None.
 - A generated schema migration and recalculation of affected Bottle and
   BottleGroup summaries. No member score data needs to move.
 - Existing advanced-ratings behavior is replaced by this change.
+- The shipped `review` and `review_article` SQL table names stay unchanged;
+  their application and API names become explicit.

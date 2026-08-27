@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleTombstones,
   externalReviewSourcePolicies,
-  reviews,
+  externalReviews,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -167,21 +167,21 @@ describe("external review source policy routes", () => {
     const replacementBottle = await fixtures.Bottle({
       name: "Replacement Bottle",
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       externalSiteId: site.id,
       sourceKey: "active",
       name: "Active review",
       bottleId: activeBottle.id,
       hidden: true,
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       externalSiteId: site.id,
       sourceKey: "unresolved",
       name: "Unresolved review",
       bottleId: null,
       hidden: true,
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       externalSiteId: site.id,
       sourceKey: "retired",
       name: "Retired review",
@@ -208,9 +208,9 @@ describe("external review source policy routes", () => {
     expect(result.publicationMode).toBe("automatic");
     expect(
       await db
-        .select({ name: reviews.name, hidden: reviews.hidden })
-        .from(reviews)
-        .orderBy(asc(reviews.name)),
+        .select({ name: externalReviews.name, hidden: externalReviews.hidden })
+        .from(externalReviews)
+        .orderBy(asc(externalReviews.name)),
     ).toEqual([
       { name: "Active review", hidden: false },
       { name: "Retired review", hidden: true },

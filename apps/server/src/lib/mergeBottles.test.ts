@@ -12,10 +12,10 @@ import {
   changes,
   collectionBottles,
   collections,
+  externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
   memberReviews,
-  reviews,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -90,7 +90,7 @@ describe("exact Bottle merges", () => {
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
       legacyStarRating: 3,
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: externalSite.id,
       name: "Merge review",
       bottleId: source.id,
@@ -242,8 +242,8 @@ describe("exact Bottle merges", () => {
       ]),
     );
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review!.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review!.id),
       }),
     ).toMatchObject({ bottleId: destination.id });
     expect(

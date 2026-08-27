@@ -1,8 +1,7 @@
 import {
-  normalizeReviewRating,
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
-  type ReviewArticleObservation,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
+  type ExternalReviewArticleObservation,
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
@@ -26,10 +25,11 @@ export const WordsOfWhiskyCursorSchema = currentReviewCursorSchema(
   MAX_HOMEPAGE_ARTICLES,
 );
 
-export const WordsOfWhiskyObservationSchema = ReviewArticleIngestionSchema;
+export const WordsOfWhiskyObservationSchema =
+  ExternalReviewArticleIngestionSchema;
 
 export type WordsOfWhiskyCursor = z.infer<typeof WordsOfWhiskyCursorSchema>;
-export type WordsOfWhiskyObservation = ReviewArticleIngestion;
+export type WordsOfWhiskyObservation = ExternalReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -81,7 +81,6 @@ function score(value: string) {
   };
   return {
     nativeScore,
-    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 
@@ -125,8 +124,9 @@ export function parseWordsOfWhiskyArticle(
   const reviewStarts = elements.flatMap((element, index) =>
     element.tagName === "h2" ? [index] : [],
   );
-  const reviews: ReviewArticleObservation["reviews"] = [];
-  const reviewTexts: Record<string, string> = {};
+  const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
+    [];
+  const externalReviewTexts: Record<string, string> = {};
 
   for (const [reviewIndex, start] of reviewStarts.entries()) {
     const end = reviewStarts[reviewIndex + 1] ?? elements.length;
@@ -143,13 +143,12 @@ export function parseWordsOfWhiskyArticle(
     if (!name || !reviewScore) continue;
 
     const sourceKey = reviewSourceKey(canonicalUrl.href, name, reviewerName);
-    reviews.push({
+    externalReviews.push({
       sourceKey,
       name,
       category: null,
       reviewerName,
       nativeScore: reviewScore.nativeScore,
-      normalizedRating: reviewScore.normalizedRating,
     });
 
     const reviewText = normalizeText(
@@ -159,19 +158,19 @@ export function parseWordsOfWhiskyArticle(
         .filter((text) => TASTING_PARAGRAPH.test(text))
         .join(" "),
     );
-    if (reviewText) reviewTexts[sourceKey] = reviewText;
+    if (reviewText) externalReviewTexts[sourceKey] = reviewText;
   }
 
-  if (reviews.length === 0) {
+  if (externalReviews.length === 0) {
     throw new Error(
       "Words of Whisky article contains no scored Bottle sections.",
     );
   }
 
   const contentText = JSON.stringify(
-    reviews.map((review) => ({
+    externalReviews.map((review) => ({
       ...review,
-      reviewText: reviewTexts[review.sourceKey] ?? null,
+      reviewText: externalReviewTexts[review.sourceKey] ?? null,
     })),
   );
   return WordsOfWhiskyObservationSchema.parse({
@@ -181,9 +180,9 @@ export function parseWordsOfWhiskyArticle(
       issue: null,
       publishedAt: publishedAt(dateText),
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews,
+      externalReviews,
     },
-    reviewTexts,
+    externalReviewTexts,
   });
 }
 

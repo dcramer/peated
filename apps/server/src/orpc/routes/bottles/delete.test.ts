@@ -8,9 +8,9 @@ import {
   bottleSeries,
   bottles,
   collectionBottles,
+  externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
-  reviews,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -215,7 +215,7 @@ describe("DELETE /bottles/:bottle", () => {
     const actor = await getUserActor(user);
     const bottle = await fixtures.LegacyBottle();
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
     });
     const reviewer = await fixtures.User();
@@ -278,8 +278,8 @@ describe("DELETE /bottles/:bottle", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    const updatedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const updatedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
       where: eq(storePriceMatchProposals.id, proposal.id),

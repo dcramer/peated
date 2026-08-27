@@ -22,6 +22,7 @@ import type {
   EntityKindEnum,
   EntitySchema,
   EventSchema,
+  ExternalReviewSchema,
   ExternalSiteSchema,
   ExternalSiteTypeEnum,
   FlavorProfileEnum,
@@ -38,7 +39,6 @@ import type {
   ProfileCollectionAddActivitySchema,
   ProfileTastingSessionActivitySchema,
   RegionSchema,
-  ReviewSchema,
   ServingStyleEnum,
   StorePriceSchema,
   TagCategoryEnum,
@@ -95,7 +95,7 @@ export type Follow = z.infer<typeof FollowSchema>;
 export type Friend = z.infer<typeof FriendSchema>;
 export type Notification = z.infer<typeof NotificationSchema>;
 export type OAuthClient = z.infer<typeof OAuthClientSchema>;
-export type Review = z.infer<typeof ReviewSchema>;
+export type ExternalReview = z.infer<typeof ExternalReviewSchema>;
 export type StorePrice = z.infer<typeof StorePriceSchema>;
 export type Tasting = z.infer<typeof TastingSchema>;
 export type User = z.infer<typeof UserSchema>;

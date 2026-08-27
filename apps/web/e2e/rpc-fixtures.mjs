@@ -561,7 +561,7 @@ export const priceSite = {
   lastRunAt: timestamp,
   nextRunAt: null,
   runEvery: 60,
-  reviews: {
+  externalReviews: {
     total: 0,
     matched: 0,
     unmatched: 0,

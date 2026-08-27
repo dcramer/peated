@@ -26,6 +26,7 @@ import entityCreate from "@peated/server/orpc/contracts/entities/create";
 import entityDetails from "@peated/server/orpc/contracts/entities/details";
 import entityList from "@peated/server/orpc/contracts/entities/list";
 import eventList from "@peated/server/orpc/contracts/events/list";
+import externalReviewList from "@peated/server/orpc/contracts/externalReviews/list";
 import flightDetails from "@peated/server/orpc/contracts/flights/details";
 import flightList from "@peated/server/orpc/contracts/flights/list";
 import friendCreate from "@peated/server/orpc/contracts/friends/create";
@@ -36,7 +37,6 @@ import notificationList from "@peated/server/orpc/contracts/notifications/list";
 import priceChangeList from "@peated/server/orpc/contracts/prices/change-list";
 import regionDetails from "@peated/server/orpc/contracts/regions/details";
 import regionList from "@peated/server/orpc/contracts/regions/list";
-import reviewList from "@peated/server/orpc/contracts/reviews/list";
 import root from "@peated/server/orpc/contracts/root";
 import search from "@peated/server/orpc/contracts/search";
 import smwsDistillerList from "@peated/server/orpc/contracts/smws/distiller-list";
@@ -129,8 +129,8 @@ export const mockContract = {
     details: regionDetails,
     list: regionList,
   },
-  reviews: {
-    list: reviewList,
+  externalReviews: {
+    list: externalReviewList,
   },
   smws: {
     distillerList: smwsDistillerList,

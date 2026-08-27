@@ -1,6 +1,6 @@
 import {
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
@@ -29,10 +29,11 @@ const TASTING_TEXT =
 export const FredMinnickCursorSchema =
   currentReviewCursorSchema(MAX_CURRENT_ARTICLES);
 
-export const FredMinnickObservationSchema = ReviewArticleIngestionSchema;
+export const FredMinnickObservationSchema =
+  ExternalReviewArticleIngestionSchema;
 
 export type FredMinnickCursor = z.infer<typeof FredMinnickCursorSchema>;
-export type FredMinnickObservation = ReviewArticleIngestion;
+export type FredMinnickObservation = ExternalReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -140,7 +141,6 @@ export function parseFredMinnickArticle(
     category: null,
     reviewerName: "Fred Minnick",
     nativeScore: null,
-    normalizedRating: null,
   };
   const contentText = JSON.stringify({
     review,
@@ -154,9 +154,9 @@ export function parseFredMinnickArticle(
       issue: null,
       publishedAt,
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews: [review],
+      externalReviews: [review],
     },
-    reviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
+    externalReviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
   });
 }
 

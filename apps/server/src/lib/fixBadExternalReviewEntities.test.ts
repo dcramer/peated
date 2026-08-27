@@ -4,21 +4,30 @@ import type {
   BottleClassificationDecision,
 } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
-import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
-import { fixBadReviewEntities as fixBadReviewEntitiesWithClassifier } from "@peated/server/lib/fixBadReviewEntities";
+import {
+  bottleAliases,
+  externalReviews,
+  storePrices,
+} from "@peated/server/db/schema";
+import { fixBadExternalReviewEntities as fixBadExternalReviewEntitiesWithClassifier } from "@peated/server/lib/fixBadExternalReviewEntities";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock =
   vi.fn<
-    NonNullable<Parameters<typeof fixBadReviewEntitiesWithClassifier>[1]>
+    NonNullable<
+      Parameters<typeof fixBadExternalReviewEntitiesWithClassifier>[1]
+    >
   >();
 
-function fixBadReviewEntities(
-  input: Parameters<typeof fixBadReviewEntitiesWithClassifier>[0],
+function fixBadExternalReviewEntities(
+  input: Parameters<typeof fixBadExternalReviewEntitiesWithClassifier>[0],
 ) {
-  return fixBadReviewEntitiesWithClassifier(input, classifyBottleReferenceMock);
+  return fixBadExternalReviewEntitiesWithClassifier(
+    input,
+    classifyBottleReferenceMock,
+  );
 }
 
 type MockClassificationDecision = Pick<
@@ -58,7 +67,7 @@ function buildClassification(
   });
 }
 
-describe("fixBadReviewEntities", () => {
+describe("fixBadExternalReviewEntities", () => {
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
     vi.mocked(workerClient.pushUniqueJob).mockReset();
@@ -82,7 +91,7 @@ describe("fixBadReviewEntities", () => {
       releaseYear: null,
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: wrongBottle.id,
       name: correctBottle.fullName,
@@ -90,7 +99,7 @@ describe("fixBadReviewEntities", () => {
       legacyNormalizedScore: 91,
       url: "https://example.com/review",
     });
-    const sameNameReview = await fixtures.Review({
+    const sameNameReview = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: correctBottle.fullName,
@@ -139,7 +148,7 @@ describe("fixBadReviewEntities", () => {
       ),
     );
 
-    const summary = await fixBadReviewEntities({ user });
+    const summary = await fixBadExternalReviewEntities({ user });
 
     expect(summary).toEqual({
       scanned: 1,
@@ -149,8 +158,8 @@ describe("fixBadReviewEntities", () => {
       unchanged: 0,
     });
 
-    const updatedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const updatedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     expect(updatedReview?.bottleId).toEqual(correctBottle.id);
 
@@ -161,8 +170,8 @@ describe("fixBadReviewEntities", () => {
       bottleId: correctBottle.id,
     });
 
-    const siblingReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, sameNameReview.id),
+    const siblingReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, sameNameReview.id),
     });
     expect(siblingReview?.bottleId).toEqual(correctBottle.id);
 
@@ -193,7 +202,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: stagedBottle.id,
       name: "Staged Exact Alias Review",
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: wrongBottle.id,
       name: alias.name,
@@ -202,7 +211,7 @@ describe("fixBadReviewEntities", () => {
       url: "https://example.com/staged-exact-alias-review",
     });
 
-    const summary = await fixBadReviewEntities({ user });
+    const summary = await fixBadExternalReviewEntities({ user });
 
     expect(summary).toEqual({
       scanned: 1,
@@ -212,7 +221,9 @@ describe("fixBadReviewEntities", () => {
       unchanged: 0,
     });
     expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).toMatchObject({
       bottleId: stagedBottle.id,
     });
@@ -230,7 +241,7 @@ describe("fixBadReviewEntities", () => {
       name: "Unpromoted Match Parent",
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: wrongBottle.id,
       name: "Unpromoted Classifier Match Review",
@@ -256,7 +267,7 @@ describe("fixBadReviewEntities", () => {
       ),
     );
 
-    const summary = await fixBadReviewEntities({ user });
+    const summary = await fixBadExternalReviewEntities({ user });
 
     expect(summary).toEqual({
       scanned: 1,
@@ -266,7 +277,9 @@ describe("fixBadReviewEntities", () => {
       unchanged: 0,
     });
     expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).toMatchObject({
       bottleId: stagedParent.id,
     });
@@ -290,7 +303,7 @@ describe("fixBadReviewEntities", () => {
       releaseYear: null,
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: bottle.id,
       name: "Unknown Review Title",
@@ -299,7 +312,7 @@ describe("fixBadReviewEntities", () => {
       url: "https://example.com/unresolved-review",
     });
 
-    const summary = await fixBadReviewEntities({ user });
+    const summary = await fixBadExternalReviewEntities({ user });
 
     expect(summary).toEqual({
       scanned: 1,
@@ -309,8 +322,8 @@ describe("fixBadReviewEntities", () => {
       unchanged: 0,
     });
 
-    const unchangedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const unchangedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     expect(unchangedReview?.bottleId).toEqual(bottle.id);
   });
@@ -325,7 +338,7 @@ describe("fixBadReviewEntities", () => {
       releaseYear: null,
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: bottle.id,
       name: "Errored Review Title",
@@ -338,7 +351,7 @@ describe("fixBadReviewEntities", () => {
       new Error("Classifier unavailable"),
     );
 
-    const summary = await fixBadReviewEntities({ user });
+    const summary = await fixBadExternalReviewEntities({ user });
 
     expect(summary).toEqual({
       scanned: 1,
@@ -348,8 +361,8 @@ describe("fixBadReviewEntities", () => {
       unchanged: 0,
     });
 
-    const unchangedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const unchangedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     expect(unchangedReview?.bottleId).toEqual(bottle.id);
   });
@@ -368,7 +381,7 @@ describe("fixBadReviewEntities", () => {
       name: "Conflicting Assignment Bottle",
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: wrongBottle.id,
       name: "Assignment Conflict Review",
@@ -399,12 +412,14 @@ describe("fixBadReviewEntities", () => {
       );
     });
 
-    await expect(fixBadReviewEntities({ user })).rejects.toThrow(
+    await expect(fixBadExternalReviewEntities({ user })).rejects.toThrow(
       /Cannot reserve exact Bottle alias/,
     );
 
     expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).toMatchObject({
       bottleId: wrongBottle.id,
     });
@@ -420,7 +435,7 @@ describe("fixBadReviewEntities", () => {
       name: "Concurrent Bottle",
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: wrongBottle.id,
       name: "Suggested Bottle Review",
@@ -431,11 +446,11 @@ describe("fixBadReviewEntities", () => {
 
     classifyBottleReferenceMock.mockImplementationOnce(async () => {
       await db
-        .update(reviews)
+        .update(externalReviews)
         .set({
           bottleId: concurrentBottle.id,
         })
-        .where(eq(reviews.id, review.id));
+        .where(eq(externalReviews.id, review.id));
       return buildClassification(
         {
           action: "match",
@@ -453,9 +468,9 @@ describe("fixBadReviewEntities", () => {
       );
     });
 
-    const summary = await fixBadReviewEntities({ user });
-    const preserved = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const summary = await fixBadExternalReviewEntities({ user });
+    const preserved = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
 
     expect(summary).toMatchObject({ reassigned: 0, unchanged: 1 });

@@ -15,7 +15,7 @@ export const externalReviewPublicationModeEnum = pgEnum(
 );
 
 /**
- * Owns the runtime controls for processing and displaying publisher reviews.
+ * Owns the runtime controls for processing and displaying publisher external reviews.
  */
 export const externalReviewSourcePolicies = pgTable(
   "external_review_source_policy",

@@ -1,12 +1,12 @@
 import { isExternalReviewSiteType } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  externalReviewArticles,
   externalReviewSourcePolicies,
+  externalReviews,
   externalSiteRuns,
   externalSiteScrapeTargets,
   externalSites,
-  reviewArticles,
-  reviews,
   scrapeOrigins,
   scrapeTargets,
   storePrices,
@@ -48,17 +48,20 @@ async function getHealthForSites(
   ] = await Promise.all([
     db
       .select({
-        externalSiteId: reviewArticles.externalSiteId,
+        externalSiteId: externalReviewArticles.externalSiteId,
         total: sql<number>`count(*)::int`,
-        matched: sql<number>`count(*) filter (where ${reviews.bottleId} is not null)::int`,
-        unmatched: sql<number>`count(*) filter (where ${reviews.bottleId} is null)::int`,
+        matched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null)::int`,
+        unmatched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is null)::int`,
       })
-      .from(reviews)
-      .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+      .from(externalReviews)
+      .innerJoin(
+        externalReviewArticles,
+        eq(externalReviews.articleId, externalReviewArticles.id),
+      )
       // Admin health includes staged reviews so operators can verify imports
       // before publication.
-      .where(inArray(reviewArticles.externalSiteId, siteIds))
-      .groupBy(reviewArticles.externalSiteId),
+      .where(inArray(externalReviewArticles.externalSiteId, siteIds))
+      .groupBy(externalReviewArticles.externalSiteId),
     db
       .select({
         externalSiteId: storePrices.externalSiteId,
@@ -213,7 +216,7 @@ async function getHealthForSites(
 
     return {
       ...serializeExternalSite(site),
-      reviews: reviewCoverage ?? { total: 0, matched: 0, unmatched: 0 },
+      externalReviews: reviewCoverage ?? { total: 0, matched: 0, unmatched: 0 },
       priceListings: priceCoverage ?? { total: 0, matched: 0, unmatched: 0 },
       latestRun: latestRun ? serializeExternalSiteRun(latestRun) : null,
       lastSucceededAt: lastSucceeded?.completedAt?.toISOString() ?? null,

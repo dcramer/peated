@@ -4,7 +4,7 @@ import {
   bottleAliases,
   bottleBarcodes,
   bottleTombstones,
-  reviews,
+  externalReviews,
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
@@ -792,7 +792,7 @@ describe("POST /external-sites/:site/prices", () => {
       volume: 750,
       url: "https://example.com/prices/concurrent-sibling",
     });
-    const siblingReview = await fixtures.Review({
+    const siblingReview = await fixtures.ExternalReview({
       bottleId: null,
       externalSiteId: site.id,
       name: aliasKey,
@@ -875,8 +875,8 @@ describe("POST /external-sites/:site/prices", () => {
         }),
       ).toMatchObject({ bottleId: null });
       expect(
-        await db.query.reviews.findFirst({
-          where: eq(reviews.id, siblingReview.id),
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, siblingReview.id),
         }),
       ).toMatchObject({ bottleId: null });
       expect(

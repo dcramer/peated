@@ -113,6 +113,12 @@ Do not convert these values into bands or reviews. There are no member
 
 ### External reviews that count stay in their current table
 
+Use `externalReview` and `externalReviewArticle` in application code, schemas,
+serializers, and API routes. Use the `externalReviews` API group and
+`/external-reviews` paths. Reserve `memberReview` for reviews written by Peated
+members. Keep the shipped SQL table names `review` and `review_article`; changing
+those physical names adds migration risk without making application code clearer.
+
 An external review contributes to the Bottle score only when all of these are
 true:
 
@@ -122,9 +128,10 @@ true:
 - Its native scale is exactly 100.
 - Its native value is a whole number from 0 through 100.
 
-The old normalized `review.rating` value never contributes. Give that field a
-clear application name such as `legacyNormalizedScore` and remove it from new
-public score displays.
+The old normalized `review.rating` value never contributes. Call that field
+`legacyNormalizedScore` in application code and remove it from new public score
+displays. New imports must not calculate or write it. Keep the SQL column only
+for historical rows, with a TODO for its later removal.
 
 Manual external-review writes must store the publication's displayed value,
 scale, and label. They must not require or create a normalized 100-point value.

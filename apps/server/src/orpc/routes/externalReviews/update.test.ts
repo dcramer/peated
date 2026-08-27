@@ -2,8 +2,8 @@ import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleTombstones,
+  externalReviews,
   incomingBottleDecisionLogs,
-  reviews,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -34,14 +34,14 @@ async function waitForSessionBlockedBy(
   throw new Error("Timed out waiting for review update lock.");
 }
 
-describe("PATCH /reviews/:review", () => {
+describe("PATCH /external-reviews/:externalReview", () => {
   test("requires mod role", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
-    const review = await fixtures.Review();
+    const review = await fixtures.ExternalReview();
 
     await expect(
-      routerClient.reviews.update(
-        { review: review.id, hidden: true },
+      routerClient.externalReviews.update(
+        { externalReview: review.id, hidden: true },
         { context: { user } },
       ),
     ).rejects.toThrow("Unauthorized.");
@@ -50,19 +50,19 @@ describe("PATCH /reviews/:review", () => {
   test("hidden-only updates preserve Bottle identity", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       hidden: false,
     });
 
-    const response = await routerClient.reviews.update(
-      { review: review.id, hidden: true },
+    const response = await routerClient.externalReviews.update(
+      { externalReview: review.id, hidden: true },
       { context: { user } },
     );
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({
       bottleId: bottle.id,
@@ -74,18 +74,18 @@ describe("PATCH /reviews/:review", () => {
   test("assigns an independently valid Bottle", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const nextBottle = await fixtures.Bottle();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: null,
     });
 
-    const response = await routerClient.reviews.update(
-      { review: review.id, bottle: nextBottle.id },
+    const response = await routerClient.externalReviews.update(
+      { externalReview: review.id, bottle: nextBottle.id },
       { context: { user } },
     );
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({
       bottleId: nextBottle.id,
@@ -114,13 +114,13 @@ describe("PATCH /reviews/:review", () => {
       type: "whiskyadvocate",
     });
     const canonicalUrl = "https://example.com/article-owned-review";
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: null,
       externalSiteId: articleSite.id,
       url: canonicalUrl,
     });
-    const response = await routerClient.reviews.update(
-      { review: review.id, bottle: nextBottle.id },
+    const response = await routerClient.externalReviews.update(
+      { externalReview: review.id, bottle: nextBottle.id },
       { context: { user } },
     );
 
@@ -144,18 +144,18 @@ describe("PATCH /reviews/:review", () => {
   test("supports explicit unassignment", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
     });
 
-    const response = await routerClient.reviews.update(
-      { review: review.id, bottle: null },
+    const response = await routerClient.externalReviews.update(
+      { externalReview: review.id, bottle: null },
       { context: { user } },
     );
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({
       bottleId: null,
@@ -167,11 +167,11 @@ describe("PATCH /reviews/:review", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
-    const review = await fixtures.Review({ hidden: false });
+    const review = await fixtures.ExternalReview({ hidden: false });
 
     const error = await waitError(
-      routerClient.reviews.update(
-        { review: review.id, bottle: 999_999, hidden: true },
+      routerClient.externalReviews.update(
+        { externalReview: review.id, bottle: 999_999, hidden: true },
         { context: { user } },
       ),
     );
@@ -183,22 +183,22 @@ describe("PATCH /reviews/:review", () => {
   }) => {
     const user = await fixtures.User({ mod: true });
     const retiredBottle = await fixtures.Bottle();
-    const review = await fixtures.Review({ hidden: false });
+    const review = await fixtures.ExternalReview({ hidden: false });
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: null,
     });
 
     const error = await waitError(
-      routerClient.reviews.update(
-        { review: review.id, bottle: retiredBottle.id, hidden: true },
+      routerClient.externalReviews.update(
+        { externalReview: review.id, bottle: retiredBottle.id, hidden: true },
         { context: { user } },
       ),
     );
     expect(error.message).toBe(`Bottle ${retiredBottle.id} is retired.`);
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({
       bottleId: review.bottleId,
@@ -211,11 +211,11 @@ describe("PATCH /reviews/:review", () => {
   }) => {
     const user = await fixtures.User({ mod: true });
     const selectedBottle = await fixtures.LegacyBottle();
-    const review = await fixtures.Review({ hidden: false });
+    const review = await fixtures.ExternalReview({ hidden: false });
 
     const error = await waitError(
-      routerClient.reviews.update(
-        { review: review.id, bottle: selectedBottle.id, hidden: true },
+      routerClient.externalReviews.update(
+        { externalReview: review.id, bottle: selectedBottle.id, hidden: true },
         { context: { user } },
       ),
     );
@@ -228,13 +228,15 @@ describe("PATCH /reviews/:review", () => {
     const user = await fixtures.User({ mod: true });
     const originalBottle = await fixtures.Bottle();
     const concurrentBottle = await fixtures.Bottle();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: originalBottle.id,
       hidden: false,
     });
     const client = new Client(getPostgresConnectionConfig());
     let committed = false;
-    let update: ReturnType<typeof routerClient.reviews.update> | undefined;
+    let update:
+      | ReturnType<typeof routerClient.externalReviews.update>
+      | undefined;
 
     await client.connect();
     try {
@@ -247,8 +249,8 @@ describe("PATCH /reviews/:review", () => {
         [concurrentBottle.id, review.id],
       );
 
-      update = routerClient.reviews.update(
-        { review: review.id, hidden: true },
+      update = routerClient.externalReviews.update(
+        { externalReview: review.id, hidden: true },
         { context: { user } },
       );
       await waitForSessionBlockedBy(client, blockerPid);
@@ -262,8 +264,8 @@ describe("PATCH /reviews/:review", () => {
     }
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({
       bottleId: concurrentBottle.id,
@@ -275,13 +277,15 @@ describe("PATCH /reviews/:review", () => {
     const user = await fixtures.User({ mod: true });
     const selectedBottle = await fixtures.Bottle();
     const concurrentBottle = await fixtures.Bottle();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: null,
       hidden: false,
     });
     const client = new Client(getPostgresConnectionConfig());
     let committed = false;
-    let update: ReturnType<typeof routerClient.reviews.update> | undefined;
+    let update:
+      | ReturnType<typeof routerClient.externalReviews.update>
+      | undefined;
 
     await client.connect();
     try {
@@ -294,8 +298,8 @@ describe("PATCH /reviews/:review", () => {
         [selectedBottle.id],
       );
 
-      update = routerClient.reviews.update(
-        { review: review.id, bottle: selectedBottle.id, hidden: true },
+      update = routerClient.externalReviews.update(
+        { externalReview: review.id, bottle: selectedBottle.id, hidden: true },
         { context: { user } },
       );
       await waitForSessionBlockedBy(client, blockerPid);
@@ -313,8 +317,8 @@ describe("PATCH /reviews/:review", () => {
     }
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({
       bottleId: selectedBottle.id,
@@ -326,21 +330,21 @@ describe("PATCH /reviews/:review", () => {
     const user = await fixtures.User({ mod: true });
 
     await expect(
-      routerClient.reviews.update(
-        { review: 999_999, hidden: true },
+      routerClient.externalReviews.update(
+        { externalReview: 999_999, hidden: true },
         { context: { user } },
       ),
-    ).rejects.toThrow("Review not found.");
+    ).rejects.toThrow("External review not found.");
   });
 
   test("returns the existing Review when no changes are sent", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
-    const review = await fixtures.Review();
+    const review = await fixtures.ExternalReview();
 
-    const response = await routerClient.reviews.update(
-      { review: review.id },
+    const response = await routerClient.externalReviews.update(
+      { externalReview: review.id },
       { context: { user } },
     );
 

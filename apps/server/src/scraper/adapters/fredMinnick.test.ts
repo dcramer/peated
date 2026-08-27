@@ -57,22 +57,21 @@ test("extracts an unscored review and only direct tasting text", async () => {
     title: "Review: 2025 BTAC George T. Stagg",
     publishedAt: new Date("2026-01-06T00:00:00.000Z"),
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-    reviews: [
+    externalReviews: [
       {
         name: "2025 BTAC George T. Stagg",
         reviewerName: "Fred Minnick",
         nativeScore: null,
-        normalizedRating: null,
       },
     ],
   });
-  expect(parsed.article.reviews[0]?.sourceKey).toBe(
-    reparsed.article.reviews[0]?.sourceKey,
+  expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
+    reparsed.article.externalReviews[0]?.sourceKey,
   );
-  expect(Object.values(parsed.reviewTexts)).toEqual([
+  expect(Object.values(parsed.externalReviewTexts)).toEqual([
     "The nose has caramel and peach. The first sip adds brown sugar. On the palate, spice develops before a long fruit finish.",
   ]);
-  expect(Object.values(parsed.reviewTexts).join(" ")).not.toMatch(
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /introduction|conclusion|navigation|price|read more/iu,
   );
 });

@@ -1,10 +1,10 @@
 import { isExternalReviewSiteType } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
   externalSites,
-  reviewArticles,
-  reviews,
 } from "@peated/server/db/schema";
 import { publishResolvedReviews } from "@peated/server/externalReviews/publication";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
@@ -138,15 +138,18 @@ export default procedure
     ) {
       const affected = await db
         .selectDistinct({
-          reviewId: reviews.id,
-          bottleId: reviews.bottleId,
+          reviewId: externalReviews.id,
+          bottleId: externalReviews.bottleId,
         })
-        .from(reviews)
-        .innerJoin(reviewArticles, eq(reviewArticles.id, reviews.articleId))
+        .from(externalReviews)
+        .innerJoin(
+          externalReviewArticles,
+          eq(externalReviewArticles.id, externalReviews.articleId),
+        )
         .where(
           and(
-            eq(reviewArticles.externalSiteId, site.id),
-            isNotNull(reviews.bottleId),
+            eq(externalReviewArticles.externalSiteId, site.id),
+            isNotNull(externalReviews.bottleId),
           ),
         );
 

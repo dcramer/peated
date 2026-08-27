@@ -11,8 +11,8 @@ import {
   bottleAliases,
   bottleTombstones,
   bottles,
-  reviewArticles,
-  reviews,
+  externalReviewArticles,
+  externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
 import {
@@ -134,7 +134,7 @@ export class BottleAliasIdentityChangedError extends Error {
 }
 
 export type BottleAliasReviewIdentitySnapshot = Pick<
-  typeof reviews.$inferSelect,
+  typeof externalReviews.$inferSelect,
   "id" | "name" | "bottleId"
 >;
 
@@ -472,12 +472,12 @@ async function assertExpectedReviewIdentity(
 ) {
   const [lockedReview] = await tx
     .select({
-      id: reviews.id,
-      name: reviews.name,
-      bottleId: reviews.bottleId,
+      id: externalReviews.id,
+      name: externalReviews.name,
+      bottleId: externalReviews.bottleId,
     })
-    .from(reviews)
-    .where(eq(reviews.id, expectedReview.id))
+    .from(externalReviews)
+    .where(eq(externalReviews.id, expectedReview.id))
     .limit(1)
     .for("update");
   if (
@@ -538,25 +538,29 @@ async function syncBottleAliasConsumersInTransaction(
     .returning({ imageUrl: storePrices.imageUrl });
 
   const reviewIdentity = or(
-    isNull(reviews.bottleId),
-    eq(reviews.bottleId, bottleId),
-    expectedReview ? eq(reviews.id, expectedReview.id) : undefined,
+    isNull(externalReviews.bottleId),
+    eq(externalReviews.bottleId, bottleId),
+    expectedReview ? eq(externalReviews.id, expectedReview.id) : undefined,
   );
   await tx
-    .update(reviews)
+    .update(externalReviews)
     .set({ bottleId })
     .where(
       and(
         or(
-          ...lookupNames.map((value) => eq(sql`LOWER(${reviews.name})`, value)),
+          ...lookupNames.map((value) =>
+            eq(sql`LOWER(${externalReviews.name})`, value),
+          ),
         ),
         externalSiteId !== undefined
           ? inArray(
-              reviews.articleId,
+              externalReviews.articleId,
               tx
-                .select({ id: reviewArticles.id })
-                .from(reviewArticles)
-                .where(eq(reviewArticles.externalSiteId, externalSiteId)),
+                .select({ id: externalReviewArticles.id })
+                .from(externalReviewArticles)
+                .where(
+                  eq(externalReviewArticles.externalSiteId, externalSiteId),
+                ),
             )
           : undefined,
         reviewIdentity,

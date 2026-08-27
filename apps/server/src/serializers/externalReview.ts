@@ -5,21 +5,21 @@ import { db } from "../db";
 import {
   bottles,
   bottleTombstones,
+  externalReviewArticles,
   externalReviewSourcePolicies,
   externalSites,
-  reviewArticles,
+  type ExternalReview,
+  type ExternalReviewArticle,
   type ExternalReviewSourcePolicy,
-  type Review,
-  type ReviewArticle,
   type User,
 } from "../db/schema";
-import { type BottleSchema, type ReviewSchema } from "../schemas";
+import { type BottleSchema, type ExternalReviewSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
-type ReviewAttrs = {
+type ExternalReviewAttrs = {
   article: Pick<
-    ReviewArticle,
+    ExternalReviewArticle,
     "canonicalUrl" | "contentHash" | "externalSiteId" | "publishedAt" | "title"
   >;
   bottle: z.infer<typeof BottleSchema> | null;
@@ -30,17 +30,17 @@ type ReviewAttrs = {
   site: ReturnType<(typeof ExternalSiteSerializer)["item"]>;
 };
 
-export const ReviewSerializer = serializer({
-  name: "review",
+export const ExternalReviewSerializer = serializer({
+  name: "externalReview",
   attrs: async (
-    itemList: Review[],
+    itemList: ExternalReview[],
     currentUser?: User,
-  ): Promise<Record<string, ReviewAttrs>> => {
+  ): Promise<Record<string, ExternalReviewAttrs>> => {
     const articleIds = Array.from(
       new Set(
         itemList.map((review) => {
           if (review.articleId === null) {
-            throw new Error(`Review ${review.id} has no article.`);
+            throw new Error(`External review ${review.id} has no article.`);
           }
           return review.articleId;
         }),
@@ -48,15 +48,15 @@ export const ReviewSerializer = serializer({
     );
     const articleList = await db
       .select({
-        id: reviewArticles.id,
-        canonicalUrl: reviewArticles.canonicalUrl,
-        contentHash: reviewArticles.contentHash,
-        externalSiteId: reviewArticles.externalSiteId,
-        publishedAt: reviewArticles.publishedAt,
-        title: reviewArticles.title,
+        id: externalReviewArticles.id,
+        canonicalUrl: externalReviewArticles.canonicalUrl,
+        contentHash: externalReviewArticles.contentHash,
+        externalSiteId: externalReviewArticles.externalSiteId,
+        publishedAt: externalReviewArticles.publishedAt,
+        title: externalReviewArticles.title,
       })
-      .from(reviewArticles)
-      .where(inArray(reviewArticles.id, articleIds));
+      .from(externalReviewArticles)
+      .where(inArray(externalReviewArticles.id, articleIds));
     const articlesById = new Map(
       articleList.map((article) => [article.id, article]),
     );
@@ -117,7 +117,7 @@ export const ReviewSerializer = serializer({
         const article = articlesById.get(item.articleId!);
         if (!article) {
           throw new Error(
-            `Review ${item.id} references missing article ${item.articleId}.`,
+            `External review ${item.id} references missing article ${item.articleId}.`,
           );
         }
         const bottle =
@@ -126,7 +126,7 @@ export const ReviewSerializer = serializer({
             : (bottlesById.get(item.bottleId) ?? null);
         if (item.bottleId !== null && bottle === null) {
           throw new Error(
-            `Review ${item.id} references missing Bottle ${item.bottleId}.`,
+            `External review ${item.id} references missing Bottle ${item.bottleId}.`,
           );
         }
         return [
@@ -143,10 +143,10 @@ export const ReviewSerializer = serializer({
   },
 
   item: (
-    item: Review,
-    attrs: ReviewAttrs,
+    item: ExternalReview,
+    attrs: ExternalReviewAttrs,
     currentUser?: User,
-  ): z.infer<typeof ReviewSchema> => {
+  ): z.infer<typeof ExternalReviewSchema> => {
     // This serializer owns the final display-capability check so every API
     // consumer receives the same permitted view after policy revocation.
     const nativeScore =

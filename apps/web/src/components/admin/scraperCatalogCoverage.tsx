@@ -62,10 +62,10 @@ export default function ScraperCatalogCoverage({
         </CoverageCard>
         <CoverageCard
           title="Visible reviews"
-          value={coverage.reviews.total.toLocaleString("en-US")}
+          value={coverage.externalReviews.total.toLocaleString("en-US")}
         >
-          {coverage.reviews.matched.toLocaleString("en-US")} matched ·{" "}
-          {coverage.reviews.unmatched.toLocaleString("en-US")} unmatched
+          {coverage.externalReviews.matched.toLocaleString("en-US")} matched ·{" "}
+          {coverage.externalReviews.unmatched.toLocaleString("en-US")} unmatched
         </CoverageCard>
         <CoverageCard
           title="Visible prices"

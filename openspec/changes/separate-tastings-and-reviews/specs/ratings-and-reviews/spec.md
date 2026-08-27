@@ -94,6 +94,8 @@ or new Bottle summaries.
 The system SHALL include an external review in the Bottle score only when the
 review is public, the source permits score display, the review has an active
 Bottle, and its native score is a whole number on a scale of exactly 100.
+Application and API names SHALL call these records external reviews so they
+cannot be confused with member reviews.
 
 #### Scenario: Native 100-point review
 
@@ -113,6 +115,12 @@ Bottle, and its native score is a whole number on a scale of exactly 100.
 - **WHEN** an external review has an old normalized score but no permitted native
   100-point score
 - **THEN** the normalized score does not contribute to any new summary
+
+#### Scenario: New external review import
+
+- **WHEN** an external review is imported or updated
+- **THEN** the system stores only its native score value, scale, and display text
+- **AND** it does not write a converted value to the legacy normalized score
 
 #### Scenario: Moderator records an external score
 

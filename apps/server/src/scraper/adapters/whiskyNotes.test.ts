@@ -37,38 +37,35 @@ test("extracts multi-bottle reviews with stable source keys", async () => {
     title: "Bowmore 2005 / 2x Ben Nevis 1996 (The Whisky Agency)",
     publishedAt: new Date("2026-05-04T00:30:43.000Z"),
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-    reviews: [
+    externalReviews: [
       {
         name: "Ben Nevis 30 yo 1996 (43,4%, The Whisky Agency 2026, sherry butt)",
         reviewerName: "Ruben",
         nativeScore: { value: 91, scale: 100, display: "91/100" },
-        normalizedRating: 91,
       },
       {
         name: "Ben Nevis 30 yo 1996 (45,3%, The Whisky Agency & Sansibar 2026, hogshead)",
         nativeScore: { value: 90, scale: 100, display: "90/100" },
-        normalizedRating: 90,
       },
       {
         name: "Bowmore 20 yo 2005 (48,8%, The Whisky Agency 2026, refill sherry hogshead)",
         nativeScore: { value: 91, scale: 100, display: "91/100" },
-        normalizedRating: 91,
       },
     ],
   });
-  expect(parsed.article.reviews.map(({ name }) => name)).not.toContain(
+  expect(parsed.article.externalReviews.map(({ name }) => name)).not.toContain(
     "Three independent releases",
   );
-  expect(new Set(parsed.article.reviews.map(({ name }) => name))).toHaveLength(
-    3,
+  expect(
+    new Set(parsed.article.externalReviews.map(({ name }) => name)),
+  ).toHaveLength(3);
+  expect(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
+  ).toEqual(reparsed.article.externalReviews.map(({ sourceKey }) => sourceKey));
+  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   );
-  expect(parsed.article.reviews.map(({ sourceKey }) => sourceKey)).toEqual(
-    reparsed.article.reviews.map(({ sourceKey }) => sourceKey),
-  );
-  expect(Object.keys(parsed.reviewTexts)).toEqual(
-    parsed.article.reviews.map(({ sourceKey }) => sourceKey),
-  );
-  expect(Object.values(parsed.reviewTexts).join(" ")).not.toContain(
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toContain(
     "Related posts",
   );
 });

@@ -6,13 +6,13 @@ import {
   bottles,
   bottleTombstones,
   entities,
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
-  reviewArticles,
-  reviews,
 } from "@peated/server/db/schema";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
-import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
+import { fixBadExternalReviewEntities } from "@peated/server/lib/fixBadExternalReviewEntities";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
@@ -85,13 +85,13 @@ subcommand
   });
 
 subcommand
-  .command("fix-bad-entities")
-  .description("Re-resolve mismatched review bottle assignments")
+  .command("fix-bad-external-review-entities")
+  .description("Re-resolve mismatched external review Bottle assignments")
   .action(async (options) => {
     const systemUser = await getAutomationModeratorUser();
-    const summary = await fixBadReviewEntities({ user: systemUser });
+    const summary = await fixBadExternalReviewEntities({ user: systemUser });
     console.log(
-      `Processed ${summary.scanned} mismatched reviews: ${summary.reassigned} reassigned, ${summary.unresolved} unresolved, ${summary.errored} errored, ${summary.unchanged} unchanged.`,
+      `Processed ${summary.scanned} mismatched external reviews: ${summary.reassigned} reassigned, ${summary.unresolved} unresolved, ${summary.errored} errored, ${summary.unchanged} unchanged.`,
     );
   });
 
@@ -142,23 +142,29 @@ subcommand
 
     if (processedBottleIds.length) {
       const expectedRows = await db
-        .select({ bottleId: reviews.bottleId, count: count(reviews.id) })
-        .from(reviews)
-        .innerJoin(reviewArticles, eq(reviewArticles.id, reviews.articleId))
+        .select({
+          bottleId: externalReviews.bottleId,
+          count: count(externalReviews.id),
+        })
+        .from(externalReviews)
+        .innerJoin(
+          externalReviewArticles,
+          eq(externalReviewArticles.id, externalReviews.articleId),
+        )
         .innerJoin(
           externalReviewSourcePolicies,
           eq(
             externalReviewSourcePolicies.externalSiteId,
-            reviewArticles.externalSiteId,
+            externalReviewArticles.externalSiteId,
           ),
         )
         .where(
           and(
-            inArray(reviews.bottleId, processedBottleIds),
+            inArray(externalReviews.bottleId, processedBottleIds),
             countedExternalReviewScoreWhere(),
           ),
         )
-        .groupBy(reviews.bottleId);
+        .groupBy(externalReviews.bottleId);
       const expectedByBottle = new Map(
         expectedRows.map(({ bottleId, count }) => [bottleId, count]),
       );

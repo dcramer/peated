@@ -50,25 +50,24 @@ test("extracts one scored review and only its tasting prose", async () => {
     title: "Springbank 12yo Cask Strength 2026",
     publishedAt: new Date("2026-08-18T00:00:00.000Z"),
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-    reviews: [
+    externalReviews: [
       {
         name: "Springbank 12yo Cask Strength, 2026 release, Batch 29, 56.6% ABV",
         reviewerName: "Drummond Dunbar",
         nativeScore: { value: 8, scale: 10, display: "8/10" },
-        normalizedRating: 80,
       },
     ],
   });
-  expect(parsed.article.reviews[0]?.sourceKey).toBe(
-    reparsed.article.reviews[0]?.sourceKey,
+  expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
+    reparsed.article.externalReviews[0]?.sourceKey,
   );
-  expect(parsed.article.reviews[0]?.sourceKey).toBe(
+  expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
     "dramface:a376fb89d0ea5fe526068a1200d1482ec4ab6c6400e43ecfa9b44d65c932fffd",
   );
-  expect(Object.values(parsed.reviewTexts)).toEqual([
+  expect(Object.values(parsed.externalReviewTexts)).toEqual([
     "Lemon oil and coastal peat. Dense malt with mineral smoke. A balanced and characterful release.",
   ]);
-  expect(Object.values(parsed.reviewTexts).join(" ")).not.toMatch(
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /TL;DR|Publisher summary|Article introduction|Footer content/u,
   );
 });
@@ -89,22 +88,20 @@ test("extracts each bottle and normalizes decimal scores", async () => {
   const html = await loadFixture("dramface", "multi-bottle.html");
   const parsed = parseDramfaceArticle(html, new URL(MULTI_URL));
 
-  expect(parsed.article.reviews).toMatchObject([
+  expect(parsed.article.externalReviews).toMatchObject([
     {
       name: "Isle of Raasay 4yo, Impex Collection, Manzanilla cask, 60.3% ABV",
       reviewerName: "Archie Dunlop",
       nativeScore: { value: 6, scale: 10, display: "6/10" },
-      normalizedRating: 60,
     },
     {
       name: "Ardmore 14yo, Impex Collection, ex-bourbon hogshead, 59.2% ABV",
       reviewerName: "Archie Dunlop",
       nativeScore: { value: 7.5, scale: 10, display: "7.5/10" },
-      normalizedRating: 75,
     },
   ]);
-  expect(Object.keys(parsed.reviewTexts)).toEqual(
-    parsed.article.reviews.map(({ sourceKey }) => sourceKey),
+  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   );
 });
 
@@ -113,10 +110,10 @@ test("keeps separate reviewers for the same bottle", async () => {
   const parsed = parseDramfaceArticle(html, new URL(WRITERS_URL));
 
   expect(
-    parsed.article.reviews.map(({ reviewerName }) => reviewerName),
+    parsed.article.externalReviews.map(({ reviewerName }) => reviewerName),
   ).toEqual(["Ogilvie", "Broddy"]);
   expect(
-    new Set(parsed.article.reviews.map(({ sourceKey }) => sourceKey)),
+    new Set(parsed.article.externalReviews.map(({ sourceKey }) => sourceKey)),
   ).toHaveLength(2);
 });
 
@@ -128,12 +125,12 @@ test("keeps separate sections for the same bottle and reviewer", async () => {
   );
   const parsed = parseDramfaceArticle(repeatedBottle, new URL(MULTI_URL));
 
-  expect(parsed.article.reviews.map(({ name }) => name)).toEqual([
+  expect(parsed.article.externalReviews.map(({ name }) => name)).toEqual([
     "Isle of Raasay 4yo, Impex Collection, Manzanilla cask, 60.3% ABV",
     "Isle of Raasay 4yo, Impex Collection, Manzanilla cask, 60.3% ABV",
   ]);
   expect(
-    new Set(parsed.article.reviews.map(({ sourceKey }) => sourceKey)),
+    new Set(parsed.article.externalReviews.map(({ sourceKey }) => sourceKey)),
   ).toHaveLength(2);
 });
 

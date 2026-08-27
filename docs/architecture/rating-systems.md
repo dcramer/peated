@@ -41,6 +41,15 @@ Bottle summary.
 
 ## External reviews
 
+Application code and APIs call these records `externalReview`. They call a
+Peated user's scored opinion `memberReview`. Do not use the bare name `review`
+for either record in shared schemas, serializers, routes, or exported types.
+
+The physical external-review tables still use the old SQL names `review` and
+`review_article`. The schema maps them to `externalReviews` and
+`externalReviewArticles` so new application code does not inherit that
+ambiguity.
+
 An external score enters a Bottle summary only when all of these rules are
 true:
 

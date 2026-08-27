@@ -5,10 +5,10 @@ import {
 import type { AnyTransaction } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import {
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
   memberReviews,
-  reviewArticles,
-  reviews,
   tastings,
 } from "@peated/server/db/schema";
 import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
@@ -77,13 +77,13 @@ export async function aggregateBottleActivityStatsInTransaction(
 
       UNION ALL
 
-      SELECT ${reviews.nativeScoreValue}::integer AS score, 'external'::text AS source
-      FROM ${reviews}
-      INNER JOIN ${reviewArticles}
-        ON ${reviewArticles.id} = ${reviews.articleId}
+      SELECT ${externalReviews.nativeScoreValue}::integer AS score, 'external'::text AS source
+      FROM ${externalReviews}
+      INNER JOIN ${externalReviewArticles}
+        ON ${externalReviewArticles.id} = ${externalReviews.articleId}
       INNER JOIN ${externalReviewSourcePolicies}
-        ON ${externalReviewSourcePolicies.externalSiteId} = ${reviewArticles.externalSiteId}
-      WHERE ${inArray(reviews.bottleId, bottleIds)}
+        ON ${externalReviewSourcePolicies.externalSiteId} = ${externalReviewArticles.externalSiteId}
+      WHERE ${inArray(externalReviews.bottleId, bottleIds)}
         AND ${externalWhere}
     ), score_stats AS (
       SELECT

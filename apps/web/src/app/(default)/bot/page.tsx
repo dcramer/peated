@@ -31,9 +31,9 @@ export default function BotPage() {
         </ul>
         <p>
           Peated stores normalized facts and links, not fetched page bodies. For
-          third-party reviews, Peated is designed to show attribution, a short
-          summary where permitted, and a link that sends readers to the original
-          publisher rather than republishing the full review.
+          third-party externalReviews, Peated is designed to show attribution, a
+          short summary where permitted, and a link that sends readers to the
+          original publisher rather than republishing the full review.
         </p>
 
         <h2>Contact</h2>

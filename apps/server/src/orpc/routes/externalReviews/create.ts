@@ -1,43 +1,51 @@
 import {
   createExternalReview,
   ExternalReviewBottleStateError,
-  ExternalReviewInputSchema,
   type ExternalReviewServices,
 } from "@peated/server/lib/createExternalReview";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { ReviewSchema } from "@peated/server/schemas";
+import {
+  ExternalReviewInputSchema,
+  ExternalReviewSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
-import { ReviewSerializer } from "@peated/server/serializers/review";
+import { ExternalReviewSerializer } from "@peated/server/serializers/externalReview";
 
-export type ReviewClassifier = NonNullable<
+export type ExternalReviewClassifier = NonNullable<
   ExternalReviewServices["classifyReference"]
 >;
 
-export function createReviewProcedure(classifyReference?: ReviewClassifier) {
+export function createExternalReviewProcedure(
+  classifyReference?: ExternalReviewClassifier,
+) {
   return procedure
     .use(requireAdmin)
     .route({
       method: "POST",
-      path: "/reviews",
-      summary: "Create review",
+      path: "/external-reviews",
+      summary: "Create external review",
       description:
-        "Create a new review from external site data with automatic bottle matching and alias creation. Requires admin privileges",
-      operationId: "createReview",
+        "Create an external review with automatic Bottle matching and alias creation. Requires admin privileges",
+      operationId: "createExternalReview",
     })
     .input(ExternalReviewInputSchema)
-    .output(ReviewSchema)
+    .output(ExternalReviewSchema)
     .handler(async function ({ input, context, errors }) {
       try {
-        const review = await createExternalReview(
+        const externalReview = await createExternalReview(
           input,
           {
             initiatedByUserId: context.user.id,
           },
           { classifyReference },
         );
-        return await serialize(ReviewSerializer, review, context.user);
+        return await serialize(
+          ExternalReviewSerializer,
+          externalReview,
+          context.user,
+        );
       } catch (error) {
         if (error instanceof ExternalSiteNotFoundError) {
           throw errors.NOT_FOUND({ message: "Site not found.", cause: error });
@@ -56,4 +64,4 @@ export function createReviewProcedure(classifyReference?: ReviewClassifier) {
     });
 }
 
-export default createReviewProcedure();
+export default createExternalReviewProcedure();

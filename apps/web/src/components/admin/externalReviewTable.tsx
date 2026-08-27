@@ -1,24 +1,28 @@
 import Link from "@peated/web/components/link";
 
-import type { PagingRel, Review } from "@peated/server/types";
+import type { ExternalReview, PagingRel } from "@peated/server/types";
 import PaginationButtons from "../paginationButtons";
 
-export default function ReviewTable({
-  reviewList,
+export default function ExternalReviewTable({
+  externalReviewList,
   rel,
 }: {
-  reviewList: Review[];
+  externalReviewList: ExternalReview[];
   rel?: PagingRel;
 }) {
   return (
     <>
-      <ReviewRows reviewList={reviewList} />
+      <ExternalReviewRows externalReviewList={externalReviewList} />
       <PaginationButtons rel={rel} />
     </>
   );
 }
 
-export function ReviewRows({ reviewList }: { reviewList: Review[] }) {
+export function ExternalReviewRows({
+  externalReviewList,
+}: {
+  externalReviewList: ExternalReview[];
+}) {
   return (
     <>
       <table className="min-w-full">
@@ -40,23 +44,26 @@ export function ReviewRows({ reviewList }: { reviewList: Review[] }) {
           </tr>
         </thead>
         <tbody>
-          {reviewList.map((review) => {
+          {externalReviewList.map((externalReview) => {
             return (
-              <tr key={review.id} className="border-b border-slate-800 text-sm">
+              <tr
+                key={externalReview.id}
+                className="border-b border-slate-800 text-sm"
+              >
                 <td className="max-w-0 px-3 py-3">
                   <Link
-                    href={review.url}
+                    href={externalReview.url}
                     className="font-semibold hover:underline"
                   >
-                    {review.name}
+                    {externalReview.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
-                    {review.bottle ? (
+                    {externalReview.bottle ? (
                       <Link
-                        href={`/bottles/${review.bottle.id}`}
+                        href={`/bottles/${externalReview.bottle.id}`}
                         className="font-semibold hover:underline"
                       >
-                        {review.bottle.fullName}
+                        {externalReview.bottle.fullName}
                       </Link>
                     ) : (
                       <em>No Bottle</em>
@@ -64,7 +71,7 @@ export function ReviewRows({ reviewList }: { reviewList: Review[] }) {
                   </div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  {review.nativeScore?.display ?? "—"}
+                  {externalReview.nativeScore?.display ?? "—"}
                 </td>
               </tr>
             );

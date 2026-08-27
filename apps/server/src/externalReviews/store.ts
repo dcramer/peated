@@ -1,8 +1,12 @@
 import { db, type AnyTransaction } from "@peated/server/db";
-import { reviewArticles, reviews, storePrices } from "@peated/server/db/schema";
 import {
-  ReviewArticleObservationSchema,
-  ReviewArticleReviewSchema,
+  externalReviewArticles,
+  externalReviews,
+  storePrices,
+} from "@peated/server/db/schema";
+import {
+  ExternalReviewArticleObservationSchema,
+  ExternalReviewObservationSchema,
 } from "@peated/server/externalReviews/observation";
 import { getExternalReviewPublicationModeInTransaction } from "@peated/server/externalReviews/publication";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
@@ -23,62 +27,67 @@ const StoredSummarySchema = z
   })
   .strict();
 
-const StoredReviewSchema = ReviewArticleReviewSchema.safeExtend({
+const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
   summary: StoredSummarySchema.nullable().default(null),
 });
 
-export const ReviewArticleInputSchema =
-  ReviewArticleObservationSchema.safeExtend({
+export const ExternalReviewArticleInputSchema =
+  ExternalReviewArticleObservationSchema.safeExtend({
     externalSiteId: z.number().int().positive(),
     fetchedAt: z.date(),
-    reviews: z.array(StoredReviewSchema).min(1),
-  }).superRefine(({ contentHash, reviews: reviewList }, context) => {
-    for (const [index, review] of reviewList.entries()) {
-      if (review.summary && review.summary.contentHash !== contentHash) {
+    externalReviews: z.array(StoredExternalReviewSchema).min(1),
+  }).superRefine(({ contentHash, externalReviews }, context) => {
+    for (const [index, externalReview] of externalReviews.entries()) {
+      if (
+        externalReview.summary &&
+        externalReview.summary.contentHash !== contentHash
+      ) {
         context.addIssue({
           code: "custom",
           message: "Summary content hash must match its article.",
-          path: ["reviews", index, "summary", "contentHash"],
+          path: ["externalReviews", index, "summary", "contentHash"],
         });
       }
     }
   });
 
-type SourceReviewArticleInput = z.infer<typeof ReviewArticleInputSchema>;
-type ReviewArticleInputValue =
+type ParsedExternalReviewArticleInput = z.infer<
+  typeof ExternalReviewArticleInputSchema
+>;
+type ExternalReviewArticleInputValue =
   | string
   | number
   | boolean
   | null
   | undefined
   | Date
-  | ReviewArticleInputValue[]
-  | { [key: string]: ReviewArticleInputValue };
-type ReviewArticleInputCandidate = {
-  [key: string]: ReviewArticleInputValue;
+  | ExternalReviewArticleInputValue[]
+  | { [key: string]: ExternalReviewArticleInputValue };
+type ExternalReviewArticleInputCandidate = {
+  [key: string]: ExternalReviewArticleInputValue;
 };
-type ReviewArticleInput = Omit<
-  SourceReviewArticleInput,
+type ExternalReviewArticleInput = Omit<
+  ParsedExternalReviewArticleInput,
   "contentHash" | "fetchedAt" | "title"
 > & {
   contentHash: string | null;
   fetchedAt: Date | null;
   title: string | null;
 };
-type ReviewOrigin = "manual" | "source";
+type ExternalReviewOrigin = "manual" | "source";
 type InvalidBottleAction = "reject" | "stage";
 
 /** Stores one article after locking its source, Bottles, and alias consumers. */
-export async function storeReviewArticleInTransaction(
+export async function storeExternalReviewArticleInTransaction(
   tx: AnyTransaction,
-  input: ReviewArticleInput,
+  input: ExternalReviewArticleInput,
   {
     origin,
     invalidBottleAction,
     aliasLookupNames = [],
   }: {
-    origin: ReviewOrigin;
+    origin: ExternalReviewOrigin;
     invalidBottleAction: InvalidBottleAction;
     aliasLookupNames?: string[];
   },
@@ -102,7 +111,7 @@ export async function storeReviewArticleInTransaction(
           updatedAt: sql`NOW()`,
         };
   const [article] = await tx
-    .insert(reviewArticles)
+    .insert(externalReviewArticles)
     .values({
       externalSiteId: input.externalSiteId,
       canonicalUrl: input.canonicalUrl,
@@ -113,16 +122,19 @@ export async function storeReviewArticleInTransaction(
       fetchedAt: input.fetchedAt,
     })
     .onConflictDoUpdate({
-      target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
+      target: [
+        externalReviewArticles.externalSiteId,
+        externalReviewArticles.canonicalUrl,
+      ],
       set: articleUpdate,
     })
-    .returning({ id: reviewArticles.id });
-  if (!article) throw new Error("Unable to store review article.");
+    .returning({ id: externalReviewArticles.id });
+  if (!article) throw new Error("Unable to store external review article.");
 
   const invalidBottleIds = new Set<number>();
   const bottleIds = [
     ...new Set(
-      input.reviews.flatMap(({ bottleId }) =>
+      input.externalReviews.flatMap(({ bottleId }) =>
         bottleId === null ? [] : [bottleId],
       ),
     ),
@@ -156,7 +168,7 @@ export async function storeReviewArticleInTransaction(
 
   if (origin === "source" && input.contentHash !== null) {
     await tx
-      .update(reviews)
+      .update(externalReviews)
       .set({
         summary: null,
         summaryContentHash: null,
@@ -167,30 +179,31 @@ export async function storeReviewArticleInTransaction(
       })
       .where(
         and(
-          eq(reviews.articleId, article.id),
-          isNotNull(reviews.summary),
-          ne(reviews.summaryContentHash, input.contentHash),
+          eq(externalReviews.articleId, article.id),
+          isNotNull(externalReviews.summary),
+          ne(externalReviews.summaryContentHash, input.contentHash),
         ),
       );
   }
 
-  const storedReviews = [];
+  const storedExternalReviews = [];
 
-  for (const review of input.reviews) {
+  for (const externalReview of input.externalReviews) {
     const [existing] = await tx
       .select()
-      .from(reviews)
+      .from(externalReviews)
       .where(
         and(
-          eq(reviews.articleId, article.id),
-          eq(reviews.sourceKey, review.sourceKey),
+          eq(externalReviews.articleId, article.id),
+          eq(externalReviews.sourceKey, externalReview.sourceKey),
         ),
       )
       .limit(1)
       .for("update");
     const hasInvalidBottle =
-      review.bottleId !== null && invalidBottleIds.has(review.bottleId);
-    const incomingBottleId = hasInvalidBottle ? null : review.bottleId;
+      externalReview.bottleId !== null &&
+      invalidBottleIds.has(externalReview.bottleId);
+    const incomingBottleId = hasInvalidBottle ? null : externalReview.bottleId;
     const bottleId =
       incomingBottleId !== null &&
       (existing?.bottleId == null || existing.bottleId === incomingBottleId)
@@ -198,7 +211,8 @@ export async function storeReviewArticleInTransaction(
         : (existing?.bottleId ?? null);
     const hidden = existing
       ? hasInvalidBottle &&
-        (existing.bottleId === null || existing.bottleId === review.bottleId)
+        (existing.bottleId === null ||
+          existing.bottleId === externalReview.bottleId)
         ? true
         : origin === "source" &&
             publishesAutomatically &&
@@ -210,51 +224,50 @@ export async function storeReviewArticleInTransaction(
         ? !(publishesAutomatically && bottleId !== null)
         : false;
     const values: Omit<
-      typeof reviews.$inferInsert,
+      typeof externalReviews.$inferInsert,
       "articleId" | "sourceKey" | "updatedAt"
     > = {
       bottleId,
-      name: review.name,
-      legacyNormalizedScore: review.normalizedRating,
-      nativeScoreValue: review.nativeScore?.value ?? null,
-      nativeScoreScale: review.nativeScore?.scale ?? null,
-      nativeScoreDisplay: review.nativeScore?.display ?? null,
+      name: externalReview.name,
+      nativeScoreValue: externalReview.nativeScore?.value ?? null,
+      nativeScoreScale: externalReview.nativeScore?.scale ?? null,
+      nativeScoreDisplay: externalReview.nativeScore?.display ?? null,
       hidden,
     };
     if (origin === "source") {
-      values.category = review.category;
-      values.reviewerName = review.reviewerName;
+      values.category = externalReview.category;
+      values.reviewerName = externalReview.reviewerName;
     }
-    if (review.summary) {
-      values.summary = review.summary.text;
-      values.summaryContentHash = review.summary.contentHash;
-      values.summaryModel = review.summary.model;
-      values.summaryPromptVersion = review.summary.promptVersion;
-      values.summaryGeneratedAt = review.summary.generatedAt;
+    if (externalReview.summary) {
+      values.summary = externalReview.summary.text;
+      values.summaryContentHash = externalReview.summary.contentHash;
+      values.summaryModel = externalReview.summary.model;
+      values.summaryPromptVersion = externalReview.summary.promptVersion;
+      values.summaryGeneratedAt = externalReview.summary.generatedAt;
     }
     const [stored] = existing
       ? await tx
-          .update(reviews)
+          .update(externalReviews)
           .set({ ...values, updatedAt: sql`NOW()` })
-          .where(eq(reviews.id, existing.id))
+          .where(eq(externalReviews.id, existing.id))
           .returning()
       : await tx
-          .insert(reviews)
+          .insert(externalReviews)
           .values({
             articleId: article.id,
-            sourceKey: review.sourceKey,
+            sourceKey: externalReview.sourceKey,
             ...values,
             updatedAt: sql`NOW()`,
           })
           .returning();
-    if (!stored) throw new Error("Unable to store review.");
-    storedReviews.push({
-      review: stored,
+    if (!stored) throw new Error("Unable to store external review.");
+    storedExternalReviews.push({
+      externalReview: stored,
       previousBottleId: existing?.bottleId,
     });
   }
 
-  return { articleId: article.id, storedReviews };
+  return { articleId: article.id, storedExternalReviews };
 }
 
 /**
@@ -262,43 +275,51 @@ export async function storeReviewArticleInTransaction(
  * tasting notes, conclusions, and images. Callers must discard those values
  * before they call this function.
  */
-export async function storeReviewArticle(
-  rawInput: ReviewArticleInputCandidate,
+export async function storeExternalReviewArticle(
+  rawInput: ExternalReviewArticleInputCandidate,
 ) {
-  const input = ReviewArticleInputSchema.parse(rawInput);
+  const input = ExternalReviewArticleInputSchema.parse(rawInput);
 
   const stored = await db.transaction(async (tx) => {
-    const { articleId, storedReviews } = await storeReviewArticleInTransaction(
-      tx,
-      input,
-      {
+    const { articleId, storedExternalReviews } =
+      await storeExternalReviewArticleInTransaction(tx, input, {
         origin: "source",
         invalidBottleAction: "stage",
-      },
-    );
+      });
     return {
       articleId,
-      reviewIds: storedReviews.map(({ review }) => review.id),
-      changedReviews: storedReviews.map(({ review, previousBottleId }) => ({
-        id: review.id,
-        bottleId: review.bottleId,
-        previousBottleId,
-      })),
+      externalReviewIds: storedExternalReviews.map(
+        ({ externalReview }) => externalReview.id,
+      ),
+      changedExternalReviews: storedExternalReviews.map(
+        ({ externalReview, previousBottleId }) => ({
+          id: externalReview.id,
+          bottleId: externalReview.bottleId,
+          previousBottleId,
+        }),
+      ),
     };
   });
 
   await Promise.all(
-    stored.changedReviews.flatMap((review) =>
+    stored.changedExternalReviews.flatMap((externalReview) =>
       Array.from(
         new Set(
-          [review.previousBottleId, review.bottleId].filter(
+          [externalReview.previousBottleId, externalReview.bottleId].filter(
             (id): id is number => id !== null && id !== undefined,
           ),
         ),
       ).map((bottleId) =>
-        dispatchBottleStatsRecompute("externalReview", review.id, bottleId),
+        dispatchBottleStatsRecompute(
+          "externalReview",
+          externalReview.id,
+          bottleId,
+        ),
       ),
     ),
   );
-  return { articleId: stored.articleId, reviewIds: stored.reviewIds };
+  return {
+    articleId: stored.articleId,
+    externalReviewIds: stored.externalReviewIds,
+  };
 }

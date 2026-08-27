@@ -50,22 +50,21 @@ test("extracts one scored review and only its tasting notes", async () => {
     title: "Bruichladdich Greener Still (2026)",
     publishedAt: new Date("2026-08-21T06:00:00.000Z"),
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-    reviews: [
+    externalReviews: [
       {
         name: "Bruichladdich Greener Still 15 Years (51.6%, OB, 2026)",
         reviewerName: "Thijs Klaverstijn",
         nativeScore: { value: 9, scale: 10, display: "9/10" },
-        normalizedRating: 90,
       },
     ],
   });
-  expect(parsed.article.reviews[0]?.sourceKey).toBe(
-    reparsed.article.reviews[0]?.sourceKey,
+  expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
+    reparsed.article.externalReviews[0]?.sourceKey,
   );
-  expect(Object.values(parsed.reviewTexts)).toEqual([
+  expect(Object.values(parsed.externalReviewTexts)).toEqual([
     "Nose: Fresh barley and lemon oil. Taste: Mineral malt and gentle spice. Finish: Long, bright, and coastal.",
   ]);
-  expect(Object.values(parsed.reviewTexts).join(" ")).not.toMatch(
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /Article introduction|Publisher conclusion|Footer content/u,
   );
 });
@@ -74,24 +73,22 @@ test("extracts each Bottle and normalizes decimal scores", async () => {
   const html = await loadFixture("wordsofwhisky", "multi-review.html");
   const parsed = parseWordsOfWhiskyArticle(html, new URL(MULTI_URL));
 
-  expect(parsed.article.reviews).toMatchObject([
+  expect(parsed.article.externalReviews).toMatchObject([
     {
       name: "Dingle 2020 5 Years Palo Cortado (59.6%, OB, 330 bts.)",
       reviewerName: "Thijs Klaverstijn",
       nativeScore: { value: 8.7, scale: 10, display: "8.7/10" },
-      normalizedRating: 87,
     },
     {
       name: "Kanosuke 2018 (57%, OB ‘Brush Stroke’, C#19044)",
       reviewerName: "Thijs Klaverstijn",
       nativeScore: { value: 9, scale: 10, display: "9/10" },
-      normalizedRating: 90,
     },
   ]);
-  expect(Object.keys(parsed.reviewTexts)).toEqual(
-    parsed.article.reviews.map(({ sourceKey }) => sourceKey),
+  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   );
-  expect(Object.values(parsed.reviewTexts).join(" ")).not.toMatch(
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /conclusion|Samples provided|Article introduction/iu,
   );
 });

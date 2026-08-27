@@ -1,8 +1,7 @@
 import { normalizeCategory } from "@peated/bottle-classifier/normalize";
 import {
-  normalizeReviewRating,
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
 } from "@peated/server/externalReviews/observation";
 import { logWarn } from "@peated/server/lib/log";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -36,7 +35,7 @@ export const WhiskyAdvocateCursorSchema = z.union([
 
 export type WhiskyAdvocateCursor = z.infer<typeof WhiskyAdvocateCursorSchema>;
 
-const WhiskyAdvocateReviewSchema = z
+const WhiskyAdvocateExternalReviewSchema = z
   .object({
     name: z.string().min(1),
     category: CategoryEnum.nullable(),
@@ -46,10 +45,11 @@ const WhiskyAdvocateReviewSchema = z
   })
   .strict();
 
-type WhiskyAdvocateReview = z.infer<typeof WhiskyAdvocateReviewSchema>;
+type WhiskyAdvocateReview = z.infer<typeof WhiskyAdvocateExternalReviewSchema>;
 
-export const WhiskyAdvocateObservationSchema = ReviewArticleIngestionSchema;
-export type WhiskyAdvocateObservation = ReviewArticleIngestion;
+export const WhiskyAdvocateObservationSchema =
+  ExternalReviewArticleIngestionSchema;
+export type WhiskyAdvocateObservation = ExternalReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -93,7 +93,7 @@ export function parseIssueList(data: string) {
 
 export function parseReviews(data: string, url: string) {
   const $ = cheerio(data);
-  const reviews: WhiskyAdvocateReview[] = [];
+  const externalReviews: WhiskyAdvocateReview[] = [];
 
   for (const element of $("#directoryResults .postsItem")) {
     const name = normalizeText(
@@ -136,7 +136,7 @@ export function parseReviews(data: string, url: string) {
       .contents()
       .first()
       .text();
-    reviews.push({
+    externalReviews.push({
       name,
       category: normalizeCategory(normalizeText(rawCategory)),
       rating: Number(rawRating),
@@ -145,7 +145,7 @@ export function parseReviews(data: string, url: string) {
     });
   }
 
-  return reviews;
+  return externalReviews;
 }
 
 export const whiskyAdvocateAdapter: ScraperAdapter<
@@ -172,12 +172,15 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
     target: TARGET,
     url: reviewUrl,
   });
-  const reviews = parseReviews(reviewResponse.body, reviewResponse.url.href);
-  if (reviews.length === 0) {
-    throw new Error("Whisky Advocate issue contains no reviews.");
+  const externalReviews = parseReviews(
+    reviewResponse.body,
+    reviewResponse.url.href,
+  );
+  if (externalReviews.length === 0) {
+    throw new Error("Whisky Advocate issue contains no external reviews.");
   }
 
-  for (const review of reviews) {
+  for (const review of externalReviews) {
     if (processedReviewUrls.has(review.url)) continue;
     const articleResponse = await session.request({
       target: TARGET,
@@ -206,18 +209,17 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
             }),
           )
           .digest("hex"),
-        reviews: [
+        externalReviews: [
           {
             sourceKey: review.url,
             name: review.name,
             category: review.category,
             reviewerName: null,
             nativeScore,
-            normalizedRating: normalizeReviewRating(nativeScore),
           },
         ],
       },
-      reviewTexts: {},
+      externalReviewTexts: {},
     });
     await session.emit({ sourceKey: review.url, value });
     processedReviewUrls.add(review.url);

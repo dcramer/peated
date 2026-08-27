@@ -27,7 +27,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
   const {
     data: { results },
   } = useSuspenseQuery(
-    orpc.reviews.list.queryOptions({
+    orpc.externalReviews.list.queryOptions({
       input: {
         bottle: bottleId,
         sort: "name",
@@ -44,7 +44,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
     <>
       <MyMemberReview bottleId={bottleId} />
       <MemberReviewList results={memberResults} />
-      <BottleReviewList results={results} />
+      <ExternalReviewList results={results} />
     </>
   );
 }
@@ -201,46 +201,57 @@ function MemberReviewList({ results }: { results: MemberReview[] }) {
   );
 }
 
-type ReviewListItem = Outputs["reviews"]["list"]["results"][number];
+type ExternalReviewListItem =
+  Outputs["externalReviews"]["list"]["results"][number];
 
-export function BottleReviewList({ results }: { results: ReviewListItem[] }) {
-  const reviews = results.filter((review) => review.site);
-  if (!reviews.length) return null;
+export function ExternalReviewList({
+  results,
+}: {
+  results: ExternalReviewListItem[];
+}) {
+  const externalReviews = results.filter(
+    (externalReview) => externalReview.site,
+  );
+  if (!externalReviews.length) return null;
 
   return (
     <>
       <Heading as="h3">The Critics</Heading>
       <ul className="mb-4 divide-y divide-slate-800">
-        {reviews.map((review) => {
-          const site = review.site!;
+        {externalReviews.map((externalReview) => {
+          const site = externalReview.site!;
           const nativeBand =
-            review.nativeScore?.scale === 100
-              ? getTastingBand(review.nativeScore.value)
+            externalReview.nativeScore?.scale === 100
+              ? getTastingBand(externalReview.nativeScore.value)
               : null;
           return (
-            <li key={review.id} className="py-4 first:pt-2">
+            <li key={externalReview.id} className="py-4 first:pt-2">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="font-semibold">{site.name}</p>
-                  {review.reviewerName || review.article.publishedAt ? (
+                  {externalReview.reviewerName ||
+                  externalReview.article.publishedAt ? (
                     <p className="text-muted mt-1 text-sm">
-                      {review.reviewerName ? `By ${review.reviewerName}` : null}
-                      {review.reviewerName && review.article.publishedAt
+                      {externalReview.reviewerName
+                        ? `By ${externalReview.reviewerName}`
+                        : null}
+                      {externalReview.reviewerName &&
+                      externalReview.article.publishedAt
                         ? " · "
                         : null}
-                      {review.article.publishedAt ? (
-                        <time dateTime={review.article.publishedAt}>
+                      {externalReview.article.publishedAt ? (
+                        <time dateTime={externalReview.article.publishedAt}>
                           {publicationDateFormatter.format(
-                            new Date(review.article.publishedAt),
+                            new Date(externalReview.article.publishedAt),
                           )}
                         </time>
                       ) : null}
                     </p>
                   ) : null}
                 </div>
-                {review.nativeScore ? (
+                {externalReview.nativeScore ? (
                   <span className="shrink-0 font-semibold">
-                    {review.nativeScore.display}
+                    {externalReview.nativeScore.display}
                     {nativeBand ? (
                       <span className="text-muted font-normal">
                         {" "}
@@ -250,16 +261,16 @@ export function BottleReviewList({ results }: { results: ReviewListItem[] }) {
                   </span>
                 ) : null}
               </div>
-              {review.summary ? (
+              {externalReview.summary ? (
                 <p className="mt-3 text-sm leading-6 text-slate-200">
                   <span className="font-semibold">
                     Peated summary of {site.name}:
                   </span>{" "}
-                  {review.summary}
+                  {externalReview.summary}
                 </p>
               ) : null}
               <a
-                href={review.url}
+                href={externalReview.url}
                 className="text-highlight mt-3 inline-flex items-center gap-1 text-sm font-semibold hover:underline"
               >
                 Read the full review on {site.name}

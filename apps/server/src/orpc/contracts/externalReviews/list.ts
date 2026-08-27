@@ -1,7 +1,7 @@
 import {
+  ExternalReviewSchema,
   ExternalSiteTypeEnum,
   listResponse,
-  ReviewSchema,
 } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
@@ -12,10 +12,10 @@ const SORT_OPTIONS = ["recent", "name"] as const;
 export default contract
   .route({
     method: "GET",
-    path: "/reviews",
-    summary: "List reviews",
-    description: "Find reviews by bottle, site, or name",
-    operationId: "listReviews",
+    path: "/external-reviews",
+    summary: "List external reviews",
+    description: "Find external reviews by bottle, site, or name",
+    operationId: "listExternalReviews",
   })
   .input(
     z
@@ -38,4 +38,4 @@ export default contract
   )
   // TODO(response-envelope): Return { data, meta } when all list routes use the
   // same wrapper.
-  .output(listResponse(ReviewSchema));
+  .output(listResponse(ExternalReviewSchema));

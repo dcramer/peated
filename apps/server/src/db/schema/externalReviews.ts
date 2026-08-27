@@ -16,7 +16,7 @@ import { bottles } from "./bottles";
 import { categoryEnum } from "./enums";
 import { externalSites } from "./externalSites";
 
-export const reviewArticles = pgTable(
+export const externalReviewArticles = pgTable(
   "review_article",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -41,7 +41,7 @@ export const reviewArticles = pgTable(
   ],
 );
 
-export const reviews = pgTable(
+export const externalReviews = pgTable(
   "review",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -50,14 +50,15 @@ export const reviews = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
-    // Retained compatibility field for safe migrations; do not use in new logic.
+    // TODO(ratings): Drop this old Release reference after all deployed code
+    // uses Bottle identity for external reviews.
     legacyReleaseId: bigint("release_id", { mode: "number" }),
     hidden: boolean("hidden").default(false),
     // Old normalized import values do not contribute to current summaries.
     // TODO(ratings): Drop this column after confirming no maintenance task reads it.
     legacyNormalizedScore: integer("rating"),
     articleId: bigint("article_id", { mode: "number" })
-      .references(() => reviewArticles.id, { onDelete: "cascade" })
+      .references(() => externalReviewArticles.id, { onDelete: "cascade" })
       .notNull(),
     sourceKey: text("source_key"),
     reviewerName: text("reviewer_name"),
@@ -118,29 +119,33 @@ export const reviews = pgTable(
   ],
 );
 
-export const reviewArticlesRelations = relations(
-  reviewArticles,
+export const externalReviewArticlesRelations = relations(
+  externalReviewArticles,
   ({ many, one }) => ({
     externalSite: one(externalSites, {
-      fields: [reviewArticles.externalSiteId],
+      fields: [externalReviewArticles.externalSiteId],
       references: [externalSites.id],
     }),
-    reviews: many(reviews),
+    externalReviews: many(externalReviews),
   }),
 );
 
-export const reviewsRelations = relations(reviews, ({ one }) => ({
-  bottle: one(bottles, {
-    fields: [reviews.bottleId],
-    references: [bottles.id],
+export const externalReviewsRelations = relations(
+  externalReviews,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [externalReviews.bottleId],
+      references: [bottles.id],
+    }),
+    article: one(externalReviewArticles, {
+      fields: [externalReviews.articleId],
+      references: [externalReviewArticles.id],
+    }),
   }),
-  article: one(reviewArticles, {
-    fields: [reviews.articleId],
-    references: [reviewArticles.id],
-  }),
-}));
+);
 
-export type ReviewArticle = typeof reviewArticles.$inferSelect;
-export type NewReviewArticle = typeof reviewArticles.$inferInsert;
-export type Review = typeof reviews.$inferSelect;
-export type NewReview = typeof reviews.$inferInsert;
+export type ExternalReviewArticle = typeof externalReviewArticles.$inferSelect;
+export type NewExternalReviewArticle =
+  typeof externalReviewArticles.$inferInsert;
+export type ExternalReview = typeof externalReviews.$inferSelect;
+export type NewExternalReview = typeof externalReviews.$inferInsert;

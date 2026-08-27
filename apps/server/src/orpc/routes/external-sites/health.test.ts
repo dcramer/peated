@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import {
+  externalReviews,
   externalSiteRuns,
   externalSiteScrapeTargets,
-  reviews,
   scrapeOrigins,
   scrapeTargets,
   storePrices,
@@ -89,7 +89,7 @@ test("health list reports source inventory, runtime, and latest execution", asyn
   expect(result.results).toHaveLength(1);
   expect(result.results[0]).toMatchObject({
     type: "decadentdrinks",
-    reviews: { total: 0, matched: 0, unmatched: 0 },
+    externalReviews: { total: 0, matched: 0, unmatched: 0 },
     priceListings: { total: 2, matched: 1, unmatched: 1 },
     lastRunAt: null,
     latestRun: {
@@ -178,11 +178,11 @@ test("health details show review inventory and blocked review policy", async ({
 }) => {
   const admin = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.Review({
+  await fixtures.ExternalReview({
     externalSiteId: site.id,
     hidden: true,
   });
-  await fixtures.Review({
+  await fixtures.ExternalReview({
     externalSiteId: site.id,
     bottleId: null,
     hidden: false,
@@ -213,7 +213,7 @@ test("health details show review inventory and blocked review policy", async ({
   );
 
   expect(result).toMatchObject({
-    reviews: { total: 2, matched: 1, unmatched: 1 },
+    externalReviews: { total: 2, matched: 1, unmatched: 1 },
     priceListings: { total: 0, matched: 0, unmatched: 0 },
     runtime: {
       registered: true,

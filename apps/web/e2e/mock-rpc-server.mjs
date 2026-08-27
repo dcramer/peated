@@ -1048,9 +1048,9 @@ async function handleRpcRequest({ request, response, url }) {
     case "comments/list":
       sendRpcResponse(response, emptyList);
       return true;
-    case "reviews/list":
+    case "externalReviews/list":
       if (input?.bottle !== undefined && !isNumber(input.bottle)) {
-        sendRpcError(response, "Unexpected reviews list payload");
+        sendRpcError(response, "Unexpected external review list payload");
         return true;
       }
 

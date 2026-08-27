@@ -2,7 +2,7 @@
 import { use } from "react";
 
 import { type ExternalSiteType } from "@peated/server/types";
-import ReviewTable from "@peated/web/components/admin/reviewTable";
+import ExternalReviewTable from "@peated/web/components/admin/externalReviewTable";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -23,16 +23,19 @@ export default function Page(props: {
   });
 
   const orpc = useORPC();
-  const { data: reviewList } = useSuspenseQuery(
-    orpc.reviews.list.queryOptions({
+  const { data: externalReviewList } = useSuspenseQuery(
+    orpc.externalReviews.list.queryOptions({
       input: queryParams,
     }),
   );
 
   return (
     <div>
-      {reviewList.results.length > 0 ? (
-        <ReviewTable reviewList={reviewList.results} rel={reviewList.rel} />
+      {externalReviewList.results.length > 0 ? (
+        <ExternalReviewTable
+          externalReviewList={externalReviewList.results}
+          rel={externalReviewList.rel}
+        />
       ) : (
         <EmptyActivity>
           Looks like there's nothing in the database yet. Weird.

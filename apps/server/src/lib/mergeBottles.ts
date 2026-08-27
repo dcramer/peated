@@ -20,10 +20,10 @@ import {
   changes,
   collectionBottles,
   collections,
+  externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
   memberReviews,
-  reviews,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -387,7 +387,7 @@ async function repointBottleConsumers(
   };
   for (const [name, table, column] of [
     ["tastings", tastings, tastings.bottleId],
-    ["reviews", reviews, reviews.bottleId],
+    ["reviews", externalReviews, externalReviews.bottleId],
     ["storePrices", storePrices, storePrices.bottleId],
     ["bottleObservations", bottleObservations, bottleObservations.bottleId],
     ["bottleBarcodes", bottleBarcodes, bottleBarcodes.bottleId],
@@ -530,9 +530,9 @@ export async function lockBottleMergeDependencies(
     .for("update");
   await tx
     .select()
-    .from(reviews)
-    .where(inArray(reviews.bottleId, bottleIds))
-    .orderBy(asc(reviews.id))
+    .from(externalReviews)
+    .where(inArray(externalReviews.bottleId, bottleIds))
+    .orderBy(asc(externalReviews.id))
     .for("update");
   await tx
     .select()

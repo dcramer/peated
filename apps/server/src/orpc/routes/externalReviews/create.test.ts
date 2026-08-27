@@ -6,20 +6,20 @@ import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
   bottleTombstones,
+  externalReviewArticles,
+  externalReviews,
   incomingBottleDecisionLogs,
-  reviewArticles,
-  reviews,
 } from "@peated/server/db/schema";
-import { storeReviewArticle } from "@peated/server/externalReviews/store";
+import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import type { ExternalReviewInputSchema } from "@peated/server/lib/createExternalReview";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import {
-  createReviewProcedure,
-  type ReviewClassifier,
-} from "@peated/server/orpc/routes/reviews/create";
+  createExternalReviewProcedure,
+  type ExternalReviewClassifier,
+} from "@peated/server/orpc/routes/externalReviews/create";
+import type { ExternalReviewInputSchema } from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -28,7 +28,7 @@ import type { z } from "zod";
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
 
-const classifyBottleReferenceMock = vi.fn<ReviewClassifier>();
+const classifyBottleReferenceMock = vi.fn<ExternalReviewClassifier>();
 
 type MockClassificationDecision = Pick<
   BottleClassificationDecision,
@@ -43,13 +43,13 @@ type MockClassificationDecision = Pick<
 };
 
 const routerClient = {
-  reviews: {
+  externalReviews: {
     create: (
       input: z.input<typeof ExternalReviewInputSchema>,
       options?: { context: Context },
     ) =>
       createRouterClient(
-        { create: createReviewProcedure(classifyBottleReferenceMock) },
+        { create: createExternalReviewProcedure(classifyBottleReferenceMock) },
         { context: options?.context ?? { user: null } },
       ).create(input),
   },
@@ -117,14 +117,17 @@ function nativeScore(value: number) {
   return { value, scale: 100, display: `${value}/100` };
 }
 
-async function findReviewByUrl(url: string) {
+async function findExternalReviewByUrl(url: string) {
   const [result] = await db
-    .select({ review: reviews })
-    .from(reviews)
-    .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
-    .where(eq(reviewArticles.canonicalUrl, url))
+    .select({ externalReview: externalReviews })
+    .from(externalReviews)
+    .innerJoin(
+      externalReviewArticles,
+      eq(externalReviews.articleId, externalReviewArticles.id),
+    )
+    .where(eq(externalReviewArticles.canonicalUrl, url))
     .limit(1);
-  return result?.review;
+  return result?.externalReview;
 }
 
 async function waitForSessionBlockedBy(
@@ -147,7 +150,7 @@ async function waitForSessionBlockedBy(
   throw new Error("Timed out waiting for Review conflict upsert lock.");
 }
 
-describe("POST /reviews", () => {
+describe("POST /external-reviews", () => {
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
@@ -160,7 +163,7 @@ describe("POST /reviews", () => {
     const moderator = await fixtures.User({ mod: true });
 
     const error = await waitError(() =>
-      routerClient.reviews.create(
+      routerClient.externalReviews.create(
         {
           site: site.type,
           name: "Unauthorized Review Bottle",
@@ -183,7 +186,7 @@ describe("POST /reviews", () => {
     const admin = await fixtures.User({ admin: true });
     const url = "https://example.com/reviews/unresolved";
 
-    const result = await routerClient.reviews.create(
+    const result = await routerClient.externalReviews.create(
       {
         site: site.type,
         name: "Unresolved Review Bottle",
@@ -195,7 +198,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    const review = await findReviewByUrl(url);
+    const review = await findExternalReviewByUrl(url);
     expect(review).toMatchObject({
       id: result.id,
       articleId: expect.any(Number),
@@ -206,8 +209,8 @@ describe("POST /reviews", () => {
       sourceKey: url,
     });
     expect(
-      await db.query.reviewArticles.findFirst({
-        where: eq(reviewArticles.id, review!.articleId!),
+      await db.query.externalReviewArticles.findFirst({
+        where: eq(externalReviewArticles.id, review!.articleId!),
       }),
     ).toMatchObject({
       externalSiteId: site.id,
@@ -233,7 +236,7 @@ describe("POST /reviews", () => {
     const admin = await fixtures.User({ admin: true });
     const url = "https://example.com/reviews/fetched-review";
     const generatedAt = new Date("2026-08-20T12:00:00Z");
-    await storeReviewArticle({
+    await storeExternalReviewArticle({
       externalSiteId: site.id,
       canonicalUrl: url,
       title: "Fetched review title",
@@ -241,13 +244,12 @@ describe("POST /reviews", () => {
       publishedAt: new Date("2026-08-19T12:00:00Z"),
       contentHash: "sha256:fetched",
       fetchedAt: new Date("2026-08-20T11:00:00Z"),
-      reviews: [
+      externalReviews: [
         {
           sourceKey: url,
           name: "Fetched Review Bottle",
           reviewerName: "Source Reviewer",
           nativeScore: { value: 8.8, scale: 10, display: "8.8/10" },
-          normalizedRating: 88,
           summary: {
             text: "The review describes a bright whisky. It notes a dry finish.",
             contentHash: "sha256:fetched",
@@ -259,7 +261,7 @@ describe("POST /reviews", () => {
       ],
     });
 
-    await routerClient.reviews.create(
+    await routerClient.externalReviews.create(
       {
         site: site.type,
         name: "Fetched Review Bottle",
@@ -272,15 +274,15 @@ describe("POST /reviews", () => {
     );
 
     expect(
-      await db.query.reviewArticles.findFirst({
-        where: eq(reviewArticles.canonicalUrl, url),
+      await db.query.externalReviewArticles.findFirst({
+        where: eq(externalReviewArticles.canonicalUrl, url),
       }),
     ).toMatchObject({
       title: "Fetched review title",
       issue: "Manual correction",
       contentHash: "sha256:fetched",
     });
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       legacyNormalizedScore: null,
       nativeScoreValue: 90,
       reviewerName: "Source Reviewer",
@@ -290,7 +292,7 @@ describe("POST /reviews", () => {
     });
   });
 
-  test("writes an exact alias match directly to reviews.bottleId", async ({
+  test("writes an exact alias match directly to externalReviews.bottleId", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -300,7 +302,7 @@ describe("POST /reviews", () => {
     });
     const url = "https://example.com/reviews/exact-bottle";
 
-    const result = await routerClient.reviews.create(
+    const result = await routerClient.externalReviews.create(
       {
         site: site.type,
         name: bottle.fullName,
@@ -312,7 +314,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
     });
@@ -334,7 +336,7 @@ describe("POST /reviews", () => {
     expect(normalizeBottleAliasKey(rawName)).toBe(bottle.fullName);
     const url = "https://example.com/reviews/identity-preserving-alias";
 
-    await routerClient.reviews.create(
+    await routerClient.externalReviews.create(
       {
         site: site.type,
         name: rawName,
@@ -346,7 +348,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       bottleId: bottle.id,
       name: bottle.fullName,
     });
@@ -380,7 +382,7 @@ describe("POST /reviews", () => {
     );
     const url = "https://example.com/reviews/lossy-display-normalization";
 
-    await routerClient.reviews.create(
+    await routerClient.externalReviews.create(
       {
         site: site.type,
         name: rawName,
@@ -395,7 +397,7 @@ describe("POST /reviews", () => {
     expect(normalizedAliasBottle.fullName).not.toBe(
       normalizeBottleAliasKey(rawName),
     );
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       bottleId: classifierBottle.id,
       name: normalizedAliasBottle.fullName,
     });
@@ -415,7 +417,7 @@ describe("POST /reviews", () => {
     });
     const url = "https://example.com/reviews/direct-alias";
 
-    await routerClient.reviews.create(
+    await routerClient.externalReviews.create(
       {
         site: site.type,
         name: aliasName,
@@ -427,7 +429,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       bottleId: bottle.id,
     });
     expect(
@@ -462,7 +464,7 @@ describe("POST /reviews", () => {
       ),
     );
 
-    const result = await routerClient.reviews.create(
+    const result = await routerClient.externalReviews.create(
       {
         site: site.type,
         name: reviewName,
@@ -474,7 +476,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
     });
@@ -515,7 +517,7 @@ describe("POST /reviews", () => {
       }),
     );
 
-    const result = await routerClient.reviews.create(
+    const result = await routerClient.externalReviews.create(
       {
         site: site.type,
         name: `${brand.name} Created Review Bottle`,
@@ -527,7 +529,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    const review = await findReviewByUrl(url);
+    const review = await findExternalReviewByUrl(url);
     expect(review).toMatchObject({
       id: result.id,
       bottleId: expect.any(Number),
@@ -564,7 +566,7 @@ describe("POST /reviews", () => {
     );
 
     const error = await waitError(() =>
-      routerClient.reviews.create(
+      routerClient.externalReviews.create(
         {
           site: site.type,
           name: "Missing Review Bottle",
@@ -587,7 +589,7 @@ describe("POST /reviews", () => {
         bottleId: missingBottleId,
       }),
     });
-    expect(await findReviewByUrl(url)).toBeUndefined();
+    expect(await findExternalReviewByUrl(url)).toBeUndefined();
   });
 
   test("rejects every inactive Bottle state and rolls back the review write", async ({
@@ -615,7 +617,7 @@ describe("POST /reviews", () => {
     ] as const) {
       const url = `https://example.com/reviews/${reason}`;
       const error = await waitError(() =>
-        routerClient.reviews.create(
+        routerClient.externalReviews.create(
           {
             site: site.type,
             name: bottle.fullName,
@@ -641,7 +643,7 @@ describe("POST /reviews", () => {
           bottleId: bottle.id,
         }),
       });
-      expect(await findReviewByUrl(url)).toBeUndefined();
+      expect(await findExternalReviewByUrl(url)).toBeUndefined();
     }
   });
 
@@ -674,7 +676,7 @@ describe("POST /reviews", () => {
     });
 
     await expect(
-      routerClient.reviews.create(
+      routerClient.externalReviews.create(
         {
           site: site.type,
           name: reviewName,
@@ -687,7 +689,7 @@ describe("POST /reviews", () => {
       ),
     ).rejects.toThrow();
 
-    expect(await findReviewByUrl(retryUrl)).toBeUndefined();
+    expect(await findExternalReviewByUrl(retryUrl)).toBeUndefined();
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
@@ -713,7 +715,9 @@ describe("POST /reviews", () => {
     const resultUrl = "https://example.com/reviews/concurrent-result";
     const client = new Client(getPostgresConnectionConfig());
     let committed = false;
-    let creation: ReturnType<typeof routerClient.reviews.create> | undefined;
+    let creation:
+      | ReturnType<typeof routerClient.externalReviews.create>
+      | undefined;
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
@@ -740,12 +744,12 @@ describe("POST /reviews", () => {
         )
       ).rows[0]!.id;
       await client.query(
-        `INSERT INTO "review" ("article_id", "source_key", "bottle_id", "name", "rating")
-         VALUES ($1, $2, $3, $4, $5)`,
-        [articleId, resultUrl, committedBottle.id, reviewName, 82],
+        `INSERT INTO "review" ("article_id", "source_key", "bottle_id", "name")
+         VALUES ($1, $2, $3, $4)`,
+        [articleId, resultUrl, committedBottle.id, reviewName],
       );
 
-      creation = routerClient.reviews.create(
+      creation = routerClient.externalReviews.create(
         {
           site: site.type,
           name: reviewName,
@@ -761,7 +765,7 @@ describe("POST /reviews", () => {
       committed = true;
 
       const result = await creation;
-      expect(await findReviewByUrl(resultUrl)).toMatchObject({
+      expect(await findExternalReviewByUrl(resultUrl)).toMatchObject({
         id: result.id,
         bottleId: committedBottle.id,
         legacyNormalizedScore: null,
@@ -798,7 +802,7 @@ describe("POST /reviews", () => {
     const reviewName = "Durable Unresolved Review";
     const issue = "Durable issue";
     const url = "https://example.com/reviews/durable";
-    const existing = await fixtures.Review({
+    const existing = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: bottle.id,
       name: reviewName,
@@ -806,7 +810,7 @@ describe("POST /reviews", () => {
       url,
     });
 
-    const result = await routerClient.reviews.create(
+    const result = await routerClient.externalReviews.create(
       {
         site: site.type,
         name: reviewName,
@@ -818,7 +822,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
       legacyNormalizedScore: null,
@@ -844,7 +848,7 @@ describe("POST /reviews", () => {
       name: aliasName,
       bottleId: incomingBottle.id,
     });
-    const existing = await fixtures.Review({
+    const existing = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: durableBottle.id,
       name: aliasName,
@@ -852,7 +856,7 @@ describe("POST /reviews", () => {
       url,
     });
 
-    const result = await routerClient.reviews.create(
+    const result = await routerClient.externalReviews.create(
       {
         site: site.type,
         name: aliasName,
@@ -864,7 +868,7 @@ describe("POST /reviews", () => {
       { context: { user: admin } },
     );
 
-    expect(await findReviewByUrl(url)).toMatchObject({
+    expect(await findExternalReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: durableBottle.id,
       legacyNormalizedScore: null,
@@ -884,7 +888,7 @@ describe("POST /reviews", () => {
     const admin = await fixtures.User({ admin: true });
 
     const error = await waitError(() =>
-      routerClient.reviews.create(
+      routerClient.externalReviews.create(
         {
           // SAFETY: This test sends an invalid site to the runtime validator.
           site: "not-a-site" as never,
@@ -906,7 +910,7 @@ describe("POST /reviews", () => {
     const admin = await fixtures.User({ admin: true });
 
     const error = await waitError(() =>
-      routerClient.reviews.create(
+      routerClient.externalReviews.create(
         {
           site: site.type,
           name: "Invalid Rating Review",

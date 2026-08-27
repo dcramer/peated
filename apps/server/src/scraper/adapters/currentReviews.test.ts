@@ -1,4 +1,4 @@
-import type { ReviewArticleIngestion } from "@peated/server/externalReviews/observation";
+import type { ExternalReviewArticleIngestion } from "@peated/server/externalReviews/observation";
 import { vi } from "vitest";
 import type { ScraperSession } from "../types";
 import {
@@ -11,8 +11,10 @@ const SECOND_URL = "https://example.com/second";
 type Cursor = { processedArticleUrls: string[] };
 
 function createSession(
-  overrides: Partial<ScraperSession<Cursor, ReviewArticleIngestion>> = {},
-): ScraperSession<Cursor, ReviewArticleIngestion> {
+  overrides: Partial<
+    ScraperSession<Cursor, ExternalReviewArticleIngestion>
+  > = {},
+): ScraperSession<Cursor, ExternalReviewArticleIngestion> {
   return {
     request: vi.fn(async ({ url }) => ({
       url,
@@ -27,7 +29,7 @@ function createSession(
   };
 }
 
-function observation(canonicalUrl: string): ReviewArticleIngestion {
+function observation(canonicalUrl: string): ExternalReviewArticleIngestion {
   return {
     article: {
       canonicalUrl,
@@ -35,18 +37,17 @@ function observation(canonicalUrl: string): ReviewArticleIngestion {
       issue: null,
       publishedAt: null,
       contentHash: "content-hash",
-      reviews: [
+      externalReviews: [
         {
           sourceKey: "example:review",
           name: "Example Bottle",
           category: null,
           reviewerName: null,
           nativeScore: null,
-          normalizedRating: null,
         },
       ],
     },
-    reviewTexts: {},
+    externalReviewTexts: {},
   };
 }
 

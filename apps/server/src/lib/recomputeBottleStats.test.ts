@@ -140,7 +140,7 @@ describe("Bottle statistics recomputation", () => {
       [allowedSite, 92, 100, true],
       [blockedSite, 93, 100, false],
     ] as const) {
-      await fixtures.Review({
+      await fixtures.ExternalReview({
         externalSiteId: site.id,
         bottleId: bottle.id,
         hidden,
@@ -149,7 +149,7 @@ describe("Bottle statistics recomputation", () => {
         nativeScoreDisplay: `${value}/${scale}`,
       });
     }
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       externalSiteId: allowedSite.id,
       bottleId: bottle.id,
       hidden: false,
@@ -182,7 +182,7 @@ describe("Bottle statistics recomputation", () => {
     await fixtures.EnabledExternalReviewSourcePolicy({
       externalSiteId: site.id,
     });
-    await fixtures.Review({
+    await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: bottle.id,
       hidden: false,

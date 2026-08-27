@@ -83,35 +83,34 @@ test("extracts scored reviews with stable source keys", async () => {
     html.replaceAll("Dailuaine 5 yo", "Dailuaine   5 yo"),
     article,
   );
-  if (!parsed || !reparsed) throw new Error("Expected scored reviews.");
+  if (!parsed || !reparsed)
+    throw new Error("Expected scored external reviews.");
 
   expect(parsed.article).toMatchObject({
     canonicalUrl: SECOND_URL,
     title: "A trio of Dailuaine",
     publishedAt: new Date("2026-08-19T06:49:00.000Z"),
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-    reviews: [
+    externalReviews: [
       {
         name: "Dailuaine 5 yo 2020/2025 (61%, Sample Bottler, cask #1)",
         reviewerName: "Serge Valentin",
         nativeScore: { value: 87, scale: 100, display: "87 points" },
-        normalizedRating: 87,
       },
       {
         name: "Dailuaine 23 yo 2002/2025 (57%, Sample Bottler, cask #2)",
         reviewerName: "Serge Valentin",
         nativeScore: { value: 89, scale: 100, display: "89 points" },
-        normalizedRating: 89,
       },
     ],
   });
-  expect(parsed.article.reviews.map(({ sourceKey }) => sourceKey)).toEqual(
-    reparsed.article.reviews.map(({ sourceKey }) => sourceKey),
+  expect(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
+  ).toEqual(reparsed.article.externalReviews.map(({ sourceKey }) => sourceKey));
+  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   );
-  expect(Object.keys(parsed.reviewTexts)).toEqual(
-    parsed.article.reviews.map(({ sourceKey }) => sourceKey),
-  );
-  expect(Object.values(parsed.reviewTexts).join(" ")).not.toContain(
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toContain(
     "Unscored introduction",
   );
 });
@@ -162,12 +161,11 @@ test("splits archive dates and excludes a non-whisky session", () => {
     discovered[0]!.body,
     discovered[0]!.article,
   );
-  expect(whisky?.article.reviews).toEqual([
+  expect(whisky?.article.externalReviews).toEqual([
     expect.objectContaining({
       name: "Archive Malt 10 yo (46%, Sample Bottler)",
       reviewerName: "Archive Reviewer",
       nativeScore: { value: 88, scale: 100, display: "88 points" },
-      normalizedRating: 88,
     }),
   ]);
   expect(
@@ -210,7 +208,7 @@ test("rejects a review-shaped article without a score", () => {
         publishedAt: new Date("2026-08-18T00:00:00.000Z"),
       },
     ),
-  ).toThrow("Whiskyfun article contains no scored reviews.");
+  ).toThrow("Whiskyfun article contains no scored external reviews.");
 });
 
 test("checkpoints an editorial item and continues to reviews", async () => {
@@ -338,7 +336,7 @@ test("drops completed URLs that leave the current feed window", async () => {
   expect(new Set(completedUrls)).toEqual(new Set(currentUrls));
 });
 
-test("checks current reviews, imports one archive page, and advances", async () => {
+test("checks current externalReviews, imports one archive page, and advances", async () => {
   const emit = vi.fn();
   const checkpoint = vi.fn();
   const request = vi.fn(async ({ url }: { url: URL }) => ({

@@ -1,31 +1,34 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { reviews, type Review } from "@peated/server/db/schema";
+import { externalReviews, type ExternalReview } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { asc, eq } from "drizzle-orm";
 import { DatabaseError } from "pg";
 
-type ReviewNormalizationUpdate = Pick<Review, "name"> &
-  Partial<Pick<Review, "bottleId">>;
+type ExternalReviewNameUpdate = Pick<ExternalReview, "name"> &
+  Partial<Pick<ExternalReview, "bottleId">>;
 
-export function buildReviewNormalizationUpdate(
+export function buildExternalReviewNameUpdate(
   name: string,
   bottleId: number | null,
-): ReviewNormalizationUpdate {
-  const update: ReviewNormalizationUpdate = { name };
+): ExternalReviewNameUpdate {
+  const update: ExternalReviewNameUpdate = { name };
   if (bottleId !== null) update.bottleId = bottleId;
   return update;
 }
 
-const subcommand = program.command("reviews");
+const subcommand = program.command("external-reviews");
 
 subcommand
   .command("normalize-names")
   .option("--dry-run")
   .action(async (options) => {
     const step = 1000;
-    const baseQuery = db.select().from(reviews).orderBy(asc(reviews.id));
+    const baseQuery = db
+      .select()
+      .from(externalReviews)
+      .orderBy(asc(externalReviews.id));
 
     let hasResults = true;
     let offset = 0;
@@ -40,20 +43,20 @@ subcommand
         if (review.name !== name) {
           const discoveredBottleId =
             review.bottleId === null ? await findBottleId(review.name) : null;
-          const values = buildReviewNormalizationUpdate(
+          const values = buildExternalReviewNameUpdate(
             name,
             discoveredBottleId,
           );
 
           console.log(`M: ${review.name} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
-            // TODO: move this code
+            // TODO(ratings): Move this maintenance command behind a server-owned boundary.
             try {
               await db.transaction(async (tx) => {
                 return await tx
-                  .update(reviews)
+                  .update(externalReviews)
                   .set(values)
-                  .where(eq(reviews.id, review.id));
+                  .where(eq(externalReviews.id, review.id));
               });
             } catch (error) {
               const databaseError =
@@ -67,7 +70,9 @@ subcommand
                 databaseError?.code === "23505" &&
                 databaseError.constraint === "review_unq_name"
               ) {
-                await db.delete(reviews).where(eq(reviews.id, review.id));
+                await db
+                  .delete(externalReviews)
+                  .where(eq(externalReviews.id, review.id));
               } else {
                 throw error;
               }

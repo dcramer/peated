@@ -1,7 +1,6 @@
 import {
-  normalizeReviewRating,
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
@@ -24,10 +23,11 @@ const TASTING_NOTE = /^(?:Nose|Palate|Finish)\s*:/iu;
 export const BourbonCultureCursorSchema =
   currentReviewCursorSchema(MAX_CURRENT_ARTICLES);
 
-export const BourbonCultureObservationSchema = ReviewArticleIngestionSchema;
+export const BourbonCultureObservationSchema =
+  ExternalReviewArticleIngestionSchema;
 
 export type BourbonCultureCursor = z.infer<typeof BourbonCultureCursorSchema>;
-export type BourbonCultureObservation = ReviewArticleIngestion;
+export type BourbonCultureObservation = ExternalReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -81,7 +81,6 @@ function score(value: string) {
   };
   return {
     nativeScore,
-    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 
@@ -153,7 +152,6 @@ export function parseBourbonCultureArticle(
     category: null,
     reviewerName,
     nativeScore: reviewScore.nativeScore,
-    normalizedRating: reviewScore.normalizedRating,
   };
   const contentText = JSON.stringify({
     review,
@@ -167,9 +165,9 @@ export function parseBourbonCultureArticle(
       issue: null,
       publishedAt,
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews: [review],
+      externalReviews: [review],
     },
-    reviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
+    externalReviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
   });
 }
 

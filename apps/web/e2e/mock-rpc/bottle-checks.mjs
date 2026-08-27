@@ -414,7 +414,7 @@ export function createBottleCheckMock({
                   },
                   consumers: {
                     tastings: 1,
-                    reviews: 0,
+                    externalReviews: 0,
                     storePrices: 1,
                     observations: 0,
                     collectionMemberships: 0,

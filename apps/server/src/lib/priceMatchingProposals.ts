@@ -1768,7 +1768,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     },
   );
 
-  // A BottleAlias affects other listings and reviews. Create it only when the
+  // A BottleAlias affects other listings and external reviews. Create it only when the
   // proposal explicitly allows that reuse and the moderator accepted the
   // suggested Bottle. The exact StorePrice assignment below is independent.
   const shouldAssignAlias =

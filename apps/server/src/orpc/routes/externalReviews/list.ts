@@ -1,29 +1,29 @@
 import { db } from "@peated/server/db";
 import {
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
   externalSites,
-  reviewArticles,
-  reviews,
 } from "@peated/server/db/schema";
 import { logWarn } from "@peated/server/lib/log";
 import { implement } from "@peated/server/orpc";
-import reviewListContract from "@peated/server/orpc/contracts/reviews/list";
+import externalReviewListContract from "@peated/server/orpc/contracts/externalReviews/list";
 import { serialize } from "@peated/server/serializers";
-import { ReviewSerializer } from "@peated/server/serializers/review";
+import { ExternalReviewSerializer } from "@peated/server/serializers/externalReview";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, ilike, isNotNull, isNull, or } from "drizzle-orm";
-export default implement(reviewListContract).handler(async function ({
+export default implement(externalReviewListContract).handler(async function ({
   input: { cursor, query, limit, sort, ...input },
   context,
   errors,
 }) {
   const hasPublicScope = input.bottle !== undefined || sort === "recent";
   const requiresModerator = input.onlyUnknown || !hasPublicScope;
-  // This route owns review visibility. Public Bottle and recent queries
-  // exclude staged reviews. Moderator queries include them for review and matching.
+  // This route owns external review visibility. Public Bottle and recent
+  // queries exclude staged records. Moderator queries include them for matching.
   const baseWhere: (SQL<unknown> | undefined)[] = requiresModerator
     ? []
-    : [eq(reviews.hidden, false)];
+    : [eq(externalReviews.hidden, false)];
   const identityWhere: SQL<unknown>[] = [];
 
   if (input.site) {
@@ -36,7 +36,7 @@ export default implement(reviewListContract).handler(async function ({
         message: "Site not found.",
       });
     }
-    baseWhere.push(eq(reviewArticles.externalSiteId, site.id));
+    baseWhere.push(eq(externalReviewArticles.externalSiteId, site.id));
   }
 
   if (hasPublicScope) {
@@ -44,7 +44,7 @@ export default implement(reviewListContract).handler(async function ({
     // legacy visibility. Newly fetched articles require automatic mode.
     baseWhere.push(
       or(
-        isNull(reviewArticles.contentHash),
+        isNull(externalReviewArticles.contentHash),
         eq(externalReviewSourcePolicies.publicationMode, "automatic"),
       ),
     );
@@ -52,43 +52,49 @@ export default implement(reviewListContract).handler(async function ({
 
   if (sort === "recent") {
     baseWhere.push(
-      isNotNull(reviews.bottleId),
-      isNotNull(reviewArticles.publishedAt),
+      isNotNull(externalReviews.bottleId),
+      isNotNull(externalReviewArticles.publishedAt),
     );
   }
 
   if (requiresModerator && !context.user?.admin && !context.user?.mod) {
-    logWarn("User requested review list without moderator permissions", {
-      extra: {
-        userId: context.user?.id,
+    logWarn(
+      "User requested external review list without moderator permissions",
+      {
+        extra: {
+          userId: context.user?.id,
+        },
       },
-    });
+    );
     throw errors.BAD_REQUEST({
-      message: "Must be a moderator to list all reviews.",
+      message: "Must be a moderator to list all external reviews.",
     });
   }
 
   if (input.onlyUnknown) {
-    identityWhere.push(isNull(reviews.bottleId));
+    identityWhere.push(isNull(externalReviews.bottleId));
   }
 
   if (input.bottle !== undefined) {
-    identityWhere.push(eq(reviews.bottleId, input.bottle));
+    identityWhere.push(eq(externalReviews.bottleId, input.bottle));
   }
 
   const offset = (cursor - 1) * limit;
   if (query) {
-    baseWhere.push(ilike(reviews.name, `%${query}%`));
+    baseWhere.push(ilike(externalReviews.name, `%${query}%`));
   }
 
   const rows = await db
-    .select({ review: reviews })
-    .from(reviews)
-    .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+    .select({ externalReview: externalReviews })
+    .from(externalReviews)
+    .innerJoin(
+      externalReviewArticles,
+      eq(externalReviews.articleId, externalReviewArticles.id),
+    )
     .leftJoin(
       externalReviewSourcePolicies,
       eq(
-        reviewArticles.externalSiteId,
+        externalReviewArticles.externalSiteId,
         externalReviewSourcePolicies.externalSiteId,
       ),
     )
@@ -97,14 +103,14 @@ export default implement(reviewListContract).handler(async function ({
     .offset(offset)
     .orderBy(
       ...(sort === "recent"
-        ? [desc(reviewArticles.publishedAt), desc(reviews.id)]
-        : [asc(reviews.name), asc(reviews.id)]),
+        ? [desc(externalReviewArticles.publishedAt), desc(externalReviews.id)]
+        : [asc(externalReviews.name), asc(externalReviews.id)]),
     );
-  const results = rows.map(({ review }) => review);
+  const results = rows.map(({ externalReview }) => externalReview);
 
   return {
     results: await serialize(
-      ReviewSerializer,
+      ExternalReviewSerializer,
       results.slice(0, limit),
       context.user,
       input.site && sort !== "recent" ? ["site"] : [],

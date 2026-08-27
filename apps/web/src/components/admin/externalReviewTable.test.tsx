@@ -1,8 +1,8 @@
-import type { Bottle, Entity, Review } from "@peated/server/types";
+import type { Bottle, Entity, ExternalReview } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { ReviewRows } from "./reviewTable";
+import { ExternalReviewRows } from "./externalReviewTable";
 
 const timestamp = "2026-07-22T12:00:00.000Z";
 
@@ -80,7 +80,10 @@ const bottle = {
   hasTasted: false,
 } satisfies Bottle;
 
-function makeReview(id: number, reviewBottle: Bottle | null): Review {
+function makeExternalReview(
+  id: number,
+  reviewBottle: Bottle | null,
+): ExternalReview {
   return {
     id,
     name: "Springbank review",
@@ -95,10 +98,12 @@ function makeReview(id: number, reviewBottle: Bottle | null): Review {
   };
 }
 
-describe("ReviewTable", () => {
+describe("ExternalReviewTable", () => {
   it("renders the direct Bottle identity", () => {
     const html = renderToStaticMarkup(
-      <ReviewRows reviewList={[makeReview(1, bottle)]} />,
+      <ExternalReviewRows
+        externalReviewList={[makeExternalReview(1, bottle)]}
+      />,
     );
 
     expect(html).toContain('href="/bottles/19"');
@@ -107,7 +112,7 @@ describe("ReviewTable", () => {
 
   it("renders unresolved review identity without a catalog link", () => {
     const html = renderToStaticMarkup(
-      <ReviewRows reviewList={[makeReview(3, null)]} />,
+      <ExternalReviewRows externalReviewList={[makeExternalReview(3, null)]} />,
     );
 
     expect(html).toContain("No Bottle");

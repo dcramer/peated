@@ -3,8 +3,8 @@ import type { BottleClassificationDecision } from "@peated/server/agents/bottleC
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  externalReviews,
   incomingBottleDecisionLogs,
-  reviews,
   storePrices,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
@@ -85,7 +85,7 @@ describe("createMissingBottles", () => {
     const issue = "Default";
     const url = "https://example.com/review";
     const systemActor = await getPeatedSystemActor();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: "Springbank Bottle Name",
@@ -127,8 +127,8 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles();
 
-    const updatedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const updatedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     expect(updatedReview?.bottleId).toBeTruthy();
     if (!updatedReview?.bottleId) throw new Error("Review has no Bottle");
@@ -211,7 +211,7 @@ describe("createMissingBottles", () => {
           eq(bottleAliases.name, bottle.fullName),
         ),
       );
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: `${bottle.fullName} critic review`,
@@ -244,8 +244,8 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles();
 
-    const updatedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const updatedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -277,7 +277,7 @@ describe("createMissingBottles", () => {
 
   test("only visits unresolved reviews once per run", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: "Unknown Review Title",
@@ -289,22 +289,22 @@ describe("createMissingBottles", () => {
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
 
-    const unchangedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const unchangedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     expect(unchangedReview?.bottleId).toBeNull();
   });
 
   test("limits queued work to one review article", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const selected = await fixtures.Review({
+    const selected = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: "Selected Article Review",
       category: "single_malt",
       url: "https://example.com/selected-review",
     });
-    const skipped = await fixtures.Review({
+    const skipped = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: "Other Article Review",
@@ -323,7 +323,9 @@ describe("createMissingBottles", () => {
       }),
     );
     expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, skipped.id) }),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, skipped.id),
+      }),
     ).toMatchObject({ bottleId: null });
   });
 
@@ -334,7 +336,7 @@ describe("createMissingBottles", () => {
     const bottle = await fixtures.Bottle({
       name: "Worker Direct Bottle",
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: "Worker Direct Bottle Review",
@@ -355,7 +357,9 @@ describe("createMissingBottles", () => {
     await createMissingBottles();
 
     expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).toMatchObject({
       bottleId: bottle.id,
     });
@@ -392,7 +396,7 @@ describe("createMissingBottles", () => {
       allowSummaryDisplay: true,
     });
     const bottle = await fixtures.Bottle({ name: "Published Worker Bottle" });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       hidden: true,
@@ -413,13 +417,15 @@ describe("createMissingBottles", () => {
     await createMissingBottles({ articleId: review.articleId });
 
     expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).toMatchObject({ bottleId: bottle.id, hidden: false });
   });
 
   test("attempts unresolved Reviews", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: "Generic Review Group",
@@ -431,7 +437,9 @@ describe("createMissingBottles", () => {
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).toMatchObject({
       bottleId: null,
     });
@@ -447,7 +455,7 @@ describe("createMissingBottles", () => {
     const concurrentBottle = await fixtures.Bottle({
       name: "Concurrent Worker Bottle",
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       bottleId: null,
       name: "Concurrent Worker Review",
@@ -456,11 +464,11 @@ describe("createMissingBottles", () => {
     });
     classifyBottleReferenceMock.mockImplementationOnce(async () => {
       await db
-        .update(reviews)
+        .update(externalReviews)
         .set({
           bottleId: concurrentBottle.id,
         })
-        .where(eq(reviews.id, review.id));
+        .where(eq(externalReviews.id, review.id));
       return buildClassification(
         {
           action: "match",
@@ -473,8 +481,8 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles();
 
-    const preserved = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const preserved = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     expect(preserved).toMatchObject({
       bottleId: concurrentBottle.id,

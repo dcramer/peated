@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleTombstones,
-  reviews,
+  externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
@@ -48,7 +48,7 @@ describe("PUT /bottle-aliases", () => {
     const bottle = await fixtures.Bottle();
     const name = "Direct Propagation Alias";
     const price = await fixtures.StorePrice({ name, bottleId: null });
-    const review = await fixtures.Review({ name, bottleId: null });
+    const review = await fixtures.ExternalReview({ name, bottleId: null });
     const user = await fixtures.User({ mod: true });
 
     await routerClient.bottleAliases.upsert(
@@ -62,7 +62,9 @@ describe("PUT /bottle-aliases", () => {
       }),
     ).resolves.toMatchObject({ bottleId: bottle.id });
     await expect(
-      db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).resolves.toMatchObject({ bottleId: bottle.id });
   });
 
@@ -113,7 +115,7 @@ describe("PUT /bottle-aliases", () => {
       name,
       bottleId: existing.id,
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       name,
       bottleId: existing.id,
     });
@@ -130,7 +132,9 @@ describe("PUT /bottle-aliases", () => {
       }),
     ).resolves.toMatchObject({ bottleId: existing.id });
     await expect(
-      db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
     ).resolves.toMatchObject({ bottleId: existing.id });
   });
 

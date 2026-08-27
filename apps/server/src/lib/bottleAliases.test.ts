@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleTombstones,
-  reviews,
+  externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
 import {
@@ -199,7 +199,7 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: null,
       volume: 750,
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       name,
       bottleId: null,
     });
@@ -208,7 +208,7 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: alreadyAssigned.id,
       volume: 700,
     });
-    const assignedReview = await fixtures.Review({
+    const assignedReview = await fixtures.ExternalReview({
       name,
       bottleId: alreadyAssigned.id,
       issue: "Second issue",
@@ -240,8 +240,8 @@ describe("assignBottleAliasInTransaction", () => {
       }),
     ).toMatchObject({ bottleId: alreadyAssigned.id });
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, assignedReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, assignedReview.id),
       }),
     ).toMatchObject({ bottleId: alreadyAssigned.id });
   });
@@ -252,11 +252,11 @@ describe("assignBottleAliasInTransaction", () => {
     const previous = await fixtures.Bottle();
     const selected = await fixtures.Bottle();
     const name = "Reviewed Direct Assignment";
-    const selectedReview = await fixtures.Review({
+    const selectedReview = await fixtures.ExternalReview({
       name,
       bottleId: previous.id,
     });
-    const otherReview = await fixtures.Review({
+    const otherReview = await fixtures.ExternalReview({
       name,
       bottleId: previous.id,
       issue: "Other issue",
@@ -272,13 +272,13 @@ describe("assignBottleAliasInTransaction", () => {
     );
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, selectedReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, selectedReview.id),
       }),
     ).toMatchObject({ bottleId: selected.id });
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, otherReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, otherReview.id),
       }),
     ).toMatchObject({ bottleId: previous.id });
   });
@@ -289,14 +289,14 @@ describe("assignBottleAliasInTransaction", () => {
     const previous = await fixtures.Bottle();
     const concurrent = await fixtures.Bottle();
     const selected = await fixtures.Bottle();
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       name: "Concurrent Review Alias",
       bottleId: previous.id,
     });
     await db
-      .update(reviews)
+      .update(externalReviews)
       .set({ bottleId: concurrent.id })
-      .where(eq(reviews.id, review.id));
+      .where(eq(externalReviews.id, review.id));
 
     await expect(
       db.transaction((tx) =>
@@ -468,12 +468,12 @@ describe("assignBottleAliasInTransaction", () => {
       externalSiteId: site.id,
       volume: 700,
     });
-    const matchingReview = await fixtures.Review({
+    const matchingReview = await fixtures.ExternalReview({
       name,
       bottleId: null,
       externalSiteId: site.id,
     });
-    const otherReview = await fixtures.Review({
+    const otherReview = await fixtures.ExternalReview({
       name,
       bottleId: null,
       externalSiteId: otherSite.id,
@@ -500,13 +500,13 @@ describe("assignBottleAliasInTransaction", () => {
       }),
     ).toMatchObject({ bottleId: null });
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, matchingReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, matchingReview.id),
       }),
     ).toMatchObject({ bottleId: bottle.id });
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, otherReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, otherReview.id),
       }),
     ).toMatchObject({ bottleId: null });
   });
@@ -548,7 +548,7 @@ describe("alias replay", () => {
       name: alias.name,
       bottleId: null,
     });
-    const assignedReview = await fixtures.Review({
+    const assignedReview = await fixtures.ExternalReview({
       name: alias.name,
       bottleId: otherBottle.id,
     });
@@ -561,8 +561,8 @@ describe("alias replay", () => {
       }),
     ).toMatchObject({ bottleId: bottle.id });
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, assignedReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, assignedReview.id),
       }),
     ).toMatchObject({ bottleId: otherBottle.id });
   });
@@ -576,7 +576,7 @@ describe("alias replay", () => {
       bottleId: bottle.id,
       ignored: null,
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       name: alias.name,
       bottleId: null,
     });
@@ -584,8 +584,8 @@ describe("alias replay", () => {
     await syncBottleAliasConsumersForAliasChange(alias.name);
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({ bottleId: bottle.id });
   });
