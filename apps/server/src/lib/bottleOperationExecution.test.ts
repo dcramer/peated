@@ -22,12 +22,17 @@ import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, desc, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+type EntityArtifact = Pick<
+  typeof entities.$inferSelect,
+  "id" | "kind" | "name"
+>;
+
 function artifacts({
   bottleIds = [],
   inspectedEntities = [],
 }: {
   bottleIds?: number[];
-  inspectedEntities?: Array<{ id: number; name: string }>;
+  inspectedEntities?: EntityArtifact[];
 }) {
   return {
     candidates: bottleIds.map((bottleId) => ({
@@ -36,13 +41,14 @@ function artifacts({
     })),
     resolvedEntities: inspectedEntities.map((entity) => ({
       entityId: entity.id,
+      kind: entity.kind!,
       name: entity.name,
     })),
     entityContexts: inspectedEntities.map((entity) => ({
       entityId: entity.id,
       name: entity.name,
       shortName: null,
-      kind: "brand" as const,
+      kind: entity.kind!,
       website: null,
       country: null,
       region: null,

@@ -28,6 +28,10 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
+type EntityArtifact = Pick<
+  typeof entities.$inferSelect,
+  "id" | "kind" | "name"
+>;
 
 async function waitForSessionBlockedBy(
   client: NodePgClient,
@@ -122,7 +126,7 @@ async function createPreparedCheck({
   bottleId: number;
   proposals: ProposedOperation[];
   inspectedBottleIds?: number[];
-  inspectedEntities: Array<{ id: number; name: string }>;
+  inspectedEntities: EntityArtifact[];
 }) {
   const bottleContexts = await Promise.all(
     inspectedBottleIds.map(async (inspectedBottleId) => {
@@ -139,6 +143,7 @@ async function createPreparedCheck({
     searchEvidence: [],
     resolvedEntities: inspectedEntities.map((entity) => ({
       entityId: entity.id,
+      kind: entity.kind!,
       name: entity.name,
     })),
     bottleContexts,
@@ -146,7 +151,7 @@ async function createPreparedCheck({
       entityId: entity.id,
       name: entity.name,
       shortName: null,
-      kind: "brand" as const,
+      kind: entity.kind!,
       website: null,
       country: null,
       region: null,

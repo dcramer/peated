@@ -21,6 +21,11 @@ function requireGroupId(groupId: number | null): number {
   return groupId;
 }
 
+type EntityArtifact = Pick<
+  typeof entities.$inferSelect,
+  "id" | "kind" | "name"
+>;
+
 function artifacts({
   bottleIds = [],
   entities: inspectedEntities = [],
@@ -30,9 +35,9 @@ function artifacts({
   bottleContexts = [],
 }: {
   bottleIds?: number[];
-  entities?: Array<{ id: number; name: string }>;
+  entities?: EntityArtifact[];
   candidateBottleIds?: number[];
-  resolvedEntities?: Array<{ id: number; name: string }>;
+  resolvedEntities?: EntityArtifact[];
   urls?: string[];
   bottleContexts?: BottleContext[];
 }) {
@@ -74,6 +79,7 @@ function artifacts({
     resolvedEntities: [...inspectedEntities, ...resolvedEntities].map(
       (entity) => ({
         entityId: entity.id,
+        kind: entity.kind!,
         name: entity.name,
       }),
     ),
@@ -81,7 +87,7 @@ function artifacts({
       entityId: entity.id,
       name: entity.name,
       shortName: null,
-      kind: "brand",
+      kind: entity.kind!,
       website: null,
       country: null,
       region: null,

@@ -123,7 +123,7 @@ type CandidateBottle = Pick<
 
 type CandidateBrand = Pick<
   typeof entities.$inferSelect,
-  "id" | "name" | "shortName" | "totalBottles" | "totalTastings"
+  "id" | "kind" | "name" | "shortName" | "totalBottles" | "totalTastings"
 > & { usedAsDistiller?: boolean };
 
 type BrandNameEntry = {
@@ -824,7 +824,11 @@ async function collectBrandRepairCandidates({
   const currentBrandsById = new Map(
     currentBrands.map((brand) => [
       brand.id,
-      { ...brand, usedAsDistiller: distillerUseIds.has(brand.id) },
+      {
+        ...brand,
+        usedAsDistiller:
+          brand.kind === "distillery" || distillerUseIds.has(brand.id),
+      },
     ]),
   );
   const aliasesByBottleId = new Map<number, string[]>();
