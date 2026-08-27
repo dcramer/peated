@@ -584,6 +584,118 @@ test("merges an SMWS collision while replacing a duplicate distiller", async ({
   ).toMatchObject({ newEntityId: destination.id });
 });
 
+test("merges an SMWS collision while replacing a duplicate bottler", async ({
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity({
+    name: "Example Distillery",
+    type: ["brand", "distiller"],
+  });
+  const destination = await fixtures.Entity({
+    name: "SMWS",
+    shortName: "SMWS",
+    type: ["bottler"],
+  });
+  const source = await fixtures.Entity({
+    name: "Scotch Malt Whisky Society",
+    type: ["bottler"],
+  });
+  const canonicalBottle = await fixtures.Bottle({
+    brandId: brand.id,
+    bottlerId: destination.id,
+    name: "1.2 Canonical subtitle",
+    distillerIds: [brand.id],
+  });
+  const duplicateBottle = await fixtures.Bottle({
+    brandId: brand.id,
+    bottlerId: source.id,
+    name: "1.2 Previous subtitle",
+    distillerIds: [brand.id],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, duplicateBottle.id),
+    }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, canonicalBottle.id),
+    }),
+  ).toMatchObject({ id: canonicalBottle.id });
+  expect(
+    await db.query.bottleTombstones.findFirst({
+      where: eq(bottleTombstones.bottleId, duplicateBottle.id),
+    }),
+  ).toMatchObject({ newBottleId: canonicalBottle.id });
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, source.id),
+    }),
+  ).toMatchObject({ newEntityId: destination.id });
+});
+
+test("merges an SMWS collision while replacing a duplicate brand", async ({
+  fixtures,
+}) => {
+  const distiller = await fixtures.Entity({
+    name: "Example Producer",
+    type: ["distiller"],
+  });
+  const destination = await fixtures.Entity({
+    name: "SMWS",
+    shortName: "SMWS",
+    type: ["brand", "bottler"],
+  });
+  const source = await fixtures.Entity({
+    name: "The Scotch Malt Whisky Society",
+    type: ["brand", "bottler"],
+  });
+  const canonicalBottle = await fixtures.Bottle({
+    brandId: destination.id,
+    bottlerId: destination.id,
+    name: "2.3 Canonical subtitle",
+    distillerIds: [distiller.id],
+  });
+  const duplicateBottle = await fixtures.Bottle({
+    brandId: source.id,
+    bottlerId: source.id,
+    name: "2.3 Previous subtitle",
+    distillerIds: [distiller.id],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, duplicateBottle.id),
+    }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, canonicalBottle.id),
+    }),
+  ).toMatchObject({ id: canonicalBottle.id });
+  expect(
+    await db.query.bottleTombstones.findFirst({
+      where: eq(bottleTombstones.bottleId, duplicateBottle.id),
+    }),
+  ).toMatchObject({ newBottleId: canonicalBottle.id });
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, source.id),
+    }),
+  ).toMatchObject({ newEntityId: destination.id });
+});
+
 test("preserves the source when the locked destination is deleted", async ({
   fixtures,
 }) => {
