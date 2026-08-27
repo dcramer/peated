@@ -274,7 +274,8 @@ export const upsertEntity = async ({
   db: AnyDatabase;
   data: EntityUpsertInput;
   createdByActorId: number;
-  kind?: EntityKind;
+  // The caller owns the creation context. Existing Entities keep their stored kind.
+  kind: EntityKind;
   creationSource?: CatalogVerificationCreationSource;
 }): Promise<UpsertOutcome<Entity>> => {
   if (!data) return undefined;
