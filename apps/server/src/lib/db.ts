@@ -34,7 +34,9 @@ const EntityUpsertDataSchema = EntityInputSchema.omit({
   countryId: z.number().nullish(),
   regionId: z.number().nullish(),
 });
-const EntityInsertDataSchema = EntityUpsertDataSchema.omit({ id: true });
+const EntityInsertDataSchema = EntityUpsertDataSchema.omit({
+  id: true,
+}).required({ kind: true });
 type EntityUpsertData = z.input<typeof EntityUpsertDataSchema>;
 type EntityUpsertInput = number | EntityUpsertData;
 

@@ -1,0 +1,1 @@
+ALTER TABLE "entity" ALTER COLUMN "kind" SET NOT NULL;

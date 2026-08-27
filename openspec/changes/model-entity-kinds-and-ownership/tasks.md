@@ -25,16 +25,16 @@
 
 ## 3. Backfill Existing Entities
 
-- [ ] 3.1 Page through the Entity API and collect every Entity whose kind is
+- [x] 3.1 Page through the Entity API and collect every Entity whose kind is
       empty, with its current details and Bottle-use counts.
-- [ ] 3.2 Choose one kind for each Entity. Research unclear and mixed-use cases
+- [x] 3.2 Choose one kind for each Entity. Research unclear and mixed-use cases
       before changing them.
-- [ ] 3.3 Update kinds through the normal authenticated Entity API in bounded
+- [x] 3.3 Update kinds through the normal authenticated Entity API in bounded
       batches and re-fetch every changed Entity.
-- [ ] 3.4 Query the API again and verify that no Entity has a missing kind.
-- [ ] 3.5 Add current owners through the same API where one owner is known;
+- [x] 3.4 Query the API again and verify that no Entity has a missing kind.
+- [x] 3.5 Add current owners through the same API where one owner is known;
       leave unknown and joint ownership empty.
-- [ ] 3.6 Check for invalid owner links, owner loops, and unchanged Bottle-use
+- [x] 3.6 Check for invalid owner links, owner loops, and unchanged Bottle-use
       counts.
 
 ## 4. Switch Server And Classifiers
@@ -61,7 +61,7 @@
       tests, and eval scoring for kind.
 - [x] 4.9 Add integration tests for first use in a Bottle field, one Entity in
       two fields, browse results, counts, and owner details.
-- [ ] 4.10 Check the three browse query plans and add an index only if a query
+- [x] 4.10 Check the three browse query plans and add an index only if a query
       needs it.
 
 ## 5. Update Entity Pages
@@ -82,15 +82,15 @@
 
 ## 6. Finish The Migration
 
-- [ ] 6.1 Run the final data check and require zero missing kinds, zero owner
+- [x] 6.1 Run the final data check and require zero missing kinds, zero owner
       loops, and matching Bottle-use counts.
-- [ ] 6.2 Make `kind` required and generate the final-switch migration with
+- [x] 6.2 Make `kind` required and generate the final-switch migration with
       `pnpm db:generate`.
 - [x] 6.3 Remove all application reads and writes for old Entity `type`; do not
       keep compatibility aliases.
 - [x] 6.4 Update the whisky identity, Entity classifier, and Bottle classifier
       documentation with the final terms.
-- [ ] 6.5 Run focused server, CLI, classifier, and web tests; run server and web
+- [x] 6.5 Run focused server, CLI, classifier, and web tests; run server and web
       typechecks, file lint, formatting, and relevant classifier evals.
 - [x] 6.6 Review the full change for duplicate logic, mixed terms, and code that
       keeps the old and new models alive.

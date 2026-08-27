@@ -60,9 +60,9 @@ export const entities = pgTable(
       .array()
       .default(sql`ARRAY[]::entity_type[]`)
       .notNull(),
-    // Nullable only for the preparation backfill. The final application
-    // requires a kind; make this NOT NULL after the zero-missing-kind gate.
-    kind: entityKindEnum("kind"),
+    // Every Entity has one top-level identity kind. Bottle links describe how
+    // an Entity is used and must not change this value.
+    kind: entityKindEnum("kind").notNull(),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),

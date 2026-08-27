@@ -26,12 +26,11 @@ describe("GET /stats", () => {
     await fixtures.Entity({ name: "Stats Bottler", kind: "bottler" });
     await fixtures.Entity({ name: "Stats Blender", kind: "blender" });
     await fixtures.Entity({ name: "Stats Company", kind: "company" });
-    await fixtures.Entity({ name: "Stats Unclassified", kind: null });
 
     const data = await routerClient.stats();
 
     expect(data).toMatchObject({
-      totalEntities: 6,
+      totalEntities: 5,
       totalBrands: 1,
       totalDistilleries: 1,
       totalBottlers: 1,
