@@ -131,7 +131,7 @@ export default async ({
 
   const data: Partial<Entity> = {
     address: match.formatted_address,
-    location: [match.geometry.location.lat, match.geometry.location.lng],
+    location: [match.geometry.location.lng, match.geometry.location.lat],
   };
   const actor = await getPeatedSystemActor();
 

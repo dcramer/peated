@@ -1688,6 +1688,13 @@
       "when": 1787773130121,
       "tag": "0240_parallel_stature",
       "breakpoints": false
+    },
+    {
+      "idx": 241,
+      "version": "7",
+      "when": 1787853368904,
+      "tag": "0241_normalize_location_coordinates",
+      "breakpoints": false
     }
   ]
 }

@@ -3,13 +3,13 @@ import { customType } from "drizzle-orm/pg-core";
 import wkx from "wkx";
 import { z } from "zod";
 
-type LatLng = [number, number];
+type Coordinates = [longitude: number, latitude: number];
 
-type GeometryPointType = Point | LatLng | string;
+type GeometryPointType = Coordinates | Point | string;
 
 type GeometryPointGeoJson = {
   type: "Point";
-  coordinates: LatLng;
+  coordinates: Coordinates;
 };
 
 type GeometryPointJsonValue = {
@@ -26,7 +26,7 @@ const GeometryPointGeoJsonSchema = z.object({
 
 export function parseGeometryPoint(
   value: string | GeometryPointJsonValue,
-): LatLng {
+): Coordinates {
   const encodedGeometry = z.string().safeParse(value);
   if (encodedGeometry.success) {
     const parsed = wkx.Geometry.parse(Buffer.from(encodedGeometry.data, "hex"));
@@ -40,16 +40,16 @@ export function parseGeometryPoint(
 }
 
 export class Point {
-  lat: number;
-  lng: number;
+  longitude: number;
+  latitude: number;
 
-  constructor(lat: number, lng: number) {
-    this.lat = lat;
-    this.lng = lng;
+  constructor(longitude: number, latitude: number) {
+    this.longitude = longitude;
+    this.latitude = latitude;
   }
 
   mapToDriverValue() {
-    return sql`ST_SetSRID(ST_MakePoint(${this.lat}, ${this.lng}), 4326)`;
+    return sql`ST_SetSRID(ST_MakePoint(${this.longitude}, ${this.latitude}), 4326)`;
   }
 }
 
@@ -69,13 +69,13 @@ export class Point {
 // }
 
 export function geometry_point(name: string) {
-  return customType<{ data: LatLng; driverData: string }>({
+  return customType<{ data: Coordinates; driverData: string }>({
     // this should be sql``
     dataType() {
       return "geometry(Point, 4326)";
     },
 
-    fromDriver(value: string | GeometryPointGeoJson): LatLng {
+    fromDriver(value: string | GeometryPointGeoJson): Coordinates {
       return parseGeometryPoint(value);
     },
 

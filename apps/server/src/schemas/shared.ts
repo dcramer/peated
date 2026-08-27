@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const PointSchema = z
-  .tuple([z.number(), z.number()])
+  .tuple([
+    z.number().min(-180).max(180).describe("Longitude in decimal degrees"),
+    z.number().min(-90).max(90).describe("Latitude in decimal degrees"),
+  ])
   .describe("Geographic coordinates as [longitude, latitude]");
 
 export const FollowStatusEnum = z

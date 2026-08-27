@@ -220,7 +220,7 @@ describe("price match queue", () => {
     const user = await fixtures.User({ mod: true });
     const bottler = await fixtures.Entity({
       type: ["bottler"],
-      location: [56.1, -3.2],
+      location: [-3.2, 56.1],
     });
     const bottle = await fixtures.Bottle({ bottlerId: bottler.id });
     const price = await fixtures.StorePrice({
@@ -250,13 +250,13 @@ describe("price match queue", () => {
     expect(list.results[0]).toMatchObject({
       id: proposal.id,
       currentBottle: {
-        bottler: { id: bottler.id, location: [56.1, -3.2] },
+        bottler: { id: bottler.id, location: [-3.2, 56.1] },
       },
     });
     expect(details).toMatchObject({
       id: proposal.id,
       currentBottle: {
-        bottler: { id: bottler.id, location: [56.1, -3.2] },
+        bottler: { id: bottler.id, location: [-3.2, 56.1] },
       },
     });
   });
