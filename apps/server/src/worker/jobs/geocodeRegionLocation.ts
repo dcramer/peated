@@ -46,8 +46,7 @@ export default async ({ regionId }: { regionId: number }) => {
   }
 
   const updates: Partial<Country> = {
-    // we expect lat, lng, but geojson is lng, lat seemingly
-    location: [match.geometry.coordinates[1], match.geometry.coordinates[0]],
+    location: [match.geometry.coordinates[0], match.geometry.coordinates[1]],
   };
 
   await db.update(regions).set(updates).where(eq(regions.id, region.id));

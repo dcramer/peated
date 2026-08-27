@@ -1,4 +1,5 @@
 import { type Entity } from "@peated/server/types";
+import { toLeafletLatLng } from "@peated/web/lib/coordinates";
 import Map from "./map";
 
 export default function EntityMap({
@@ -11,15 +12,16 @@ export default function EntityMap({
   width?: string;
 }) {
   if (!entity.location || !entity.address) return null;
+  const position = toLeafletLatLng(entity.location);
 
   return (
     <Map
       height={height}
       width={width}
-      position={entity.location}
+      position={position}
       markers={[
         {
-          position: entity.location,
+          position,
           name: entity.name,
           address: entity.address,
           useAsPosition: true,
