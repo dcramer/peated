@@ -92,7 +92,13 @@ export default implement(bottleListContract).handler(async function ({
       await db
         .select({ entityId: entityFollows.entityId })
         .from(entityFollows)
-        .where(eq(entityFollows.userId, context.user.id))
+        .innerJoin(entities, eq(entities.id, entityFollows.entityId))
+        .where(
+          and(
+            eq(entityFollows.userId, context.user.id),
+            eq(entities.kind, "distillery"),
+          ),
+        )
     ).map(({ entityId }) => entityId);
     where.push(
       followedDistillerIds.length
