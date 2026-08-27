@@ -346,6 +346,175 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
+  test("returns the unfiltered total and non-empty facet buckets", async ({
+    fixtures,
+  }) => {
+    await fixtures.Bottle({
+      name: "Young Single Malt",
+      category: "single_malt",
+      statedAge: 10,
+    });
+    await fixtures.Bottle({
+      name: "Twelve Year Single Malt",
+      category: "single_malt",
+      statedAge: 12,
+    });
+    await fixtures.Bottle({
+      name: "Mature Bourbon",
+      category: "bourbon",
+      statedAge: 18,
+    });
+    await fixtures.Bottle({
+      name: "Old Rye",
+      category: "rye",
+      statedAge: 25,
+    });
+    await fixtures.Bottle({
+      name: "NAS Blend",
+      category: "blend",
+      noAgeStatement: true,
+    });
+    await fixtures.Bottle({ name: "Unknown Age", category: "spirit" });
+
+    const response = await routerClient.bottles.list({ limit: 2 });
+
+    expect(response.results).toHaveLength(2);
+    expect(response.total).toBe(6);
+    expect(response.facets).toEqual({
+      category: [
+        { value: "blend", count: 1 },
+        { value: "bourbon", count: 1 },
+        { value: "rye", count: 1 },
+        { value: "single_malt", count: 2 },
+        { value: "spirit", count: 1 },
+      ],
+      ageBand: [
+        { value: "nas", count: 1 },
+        { value: "under_12", count: 1 },
+        { value: "12_17", count: 1 },
+        { value: "18_24", count: 1 },
+        { value: "25_plus", count: 1 },
+      ],
+    });
+  });
+
+  test("applies search text to the total and facets", async ({ fixtures }) => {
+    await fixtures.Bottle({
+      name: "Catalog Match Twelve",
+      category: "single_malt",
+      statedAge: 12,
+    });
+    await fixtures.Bottle({
+      name: "Catalog Match NAS",
+      category: "bourbon",
+      noAgeStatement: true,
+    });
+    await fixtures.Bottle({
+      name: "Different Bottle",
+      category: "rye",
+      statedAge: 25,
+    });
+
+    const response = await routerClient.bottles.list({
+      query: "Catalog Match",
+    });
+
+    expect(response.total).toBe(2);
+    expect(response.facets).toEqual({
+      category: [
+        { value: "bourbon", count: 1 },
+        { value: "single_malt", count: 1 },
+      ],
+      ageBand: [
+        { value: "nas", count: 1 },
+        { value: "12_17", count: 1 },
+      ],
+    });
+  });
+
+  test("omits each selected facet from its own buckets while paginating", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Facet Test Brand" });
+    await fixtures.Bottle({
+      name: "Young Single Malt",
+      brandId: brand.id,
+      category: "single_malt",
+      statedAge: 10,
+    });
+    const firstSelected = await fixtures.Bottle({
+      name: "First Selected Single Malt",
+      brandId: brand.id,
+      category: "single_malt",
+      statedAge: 12,
+    });
+    const secondSelected = await fixtures.Bottle({
+      name: "Second Selected Single Malt",
+      brandId: brand.id,
+      category: "single_malt",
+      statedAge: 15,
+    });
+    await fixtures.Bottle({
+      name: "Selected Bourbon",
+      brandId: brand.id,
+      category: "bourbon",
+      statedAge: 12,
+    });
+    await fixtures.Bottle({
+      name: "Mature Rye",
+      brandId: brand.id,
+      category: "rye",
+      statedAge: 18,
+    });
+
+    const page1 = await routerClient.bottles.list({
+      category: "single_malt",
+      ageBand: "12_17",
+      cursor: 1,
+      limit: 1,
+      sort: "name",
+    });
+    const page2 = await routerClient.bottles.list({
+      category: "single_malt",
+      ageBand: "12_17",
+      cursor: 2,
+      limit: 1,
+      sort: "name",
+    });
+
+    expect(page1.results.map(({ id }) => id)).toEqual([firstSelected.id]);
+    expect(page2.results.map(({ id }) => id)).toEqual([secondSelected.id]);
+    expect(page1.total).toBe(2);
+    expect(page2.total).toBe(2);
+    expect(page1.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(page2.rel).toEqual({ nextCursor: null, prevCursor: 1 });
+    expect(page1.facets).toEqual({
+      category: [
+        { value: "bourbon", count: 1 },
+        { value: "single_malt", count: 2 },
+      ],
+      ageBand: [
+        { value: "under_12", count: 1 },
+        { value: "12_17", count: 2 },
+      ],
+    });
+    expect(page2.facets).toEqual(page1.facets);
+  });
+
+  test("returns empty totals and facets for an unmatched query", async ({
+    fixtures,
+  }) => {
+    await fixtures.Bottle({ name: "Available Bottle", statedAge: 12 });
+
+    const response = await routerClient.bottles.list({
+      query: "No Such Catalog Bottle",
+    });
+
+    expect(response.results).toEqual([]);
+    expect(response.total).toBe(0);
+    expect(response.facets).toEqual({ category: [], ageBand: [] });
+  });
+
   test("filters tags by direct Bottle identity", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
     const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
@@ -402,6 +571,11 @@ describe("GET /bottles", () => {
 
     expect(result).toEqual({
       results: [],
+      total: 0,
+      facets: {
+        category: [],
+        ageBand: [],
+      },
       followedDistillerCount: null,
       rel: {
         nextCursor: null,
