@@ -4,31 +4,12 @@ import PendingTosAlert from "@peated/web/components/pendingTosAlert";
 import PendingVerificationAlert from "@peated/web/components/pendingVerificationAlert";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { getEntityUrl } from "@peated/web/lib/urls";
 import { Suspense, type ReactNode } from "react";
 import ActivityRailSection from "./activityRailSection";
 import NewBottles, { NewBottlesSkeleton } from "./newBottles";
 import PriceChanges, { PriceChangesSkeleton } from "./priceChanges";
 import UpcomingEvents, { UpcomingEventsSkeleton } from "./upcomingEvents";
 // import { PriceChanges, PriceChangesSkeleton } from "./content";
-
-async function SmwsCodesLink() {
-  const { client } = await getAnonymousServerClient();
-  const entity = await resolveOrNotFound(
-    client.entities.details({ entity: 4263 }),
-  );
-
-  return (
-    <Link
-      href={`${getEntityUrl(entity)}/codes`}
-      className="text-inherit hover:underline"
-    >
-      SMWS Distillery Codes
-    </Link>
-  );
-}
 
 export default async function Layout({
   children,
@@ -111,9 +92,12 @@ export default async function Layout({
 
             <ActivityRailSection title="Quick Links">
               <div className="text-muted px-3 text-sm">
-                <Suspense>
-                  <SmwsCodesLink />
-                </Suspense>
+                <Link
+                  href="/bottlers/4263/codes"
+                  className="text-inherit hover:underline"
+                >
+                  SMWS Distillery Codes
+                </Link>
               </div>
             </ActivityRailSection>
           </div>
