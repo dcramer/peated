@@ -3,9 +3,13 @@ import {
   mockAccessToken,
   mockActivity,
   mockBadgeAwards,
+  mockBadges,
+  mockBadgeUsers,
   mockBottle,
+  mockBottlePrices,
   mockBottles,
   mockBottleTags,
+  mockChanges,
   mockCollectionBottles,
   mockCommentsByTasting,
   mockCountries,
@@ -13,14 +17,18 @@ import {
   mockEntities,
   mockEntity,
   mockEntityCatalog,
+  mockEvents,
   mockFlight,
   mockFlights,
   mockFriendDetails,
   mockFriends,
+  mockFriendships,
+  mockNotifications,
   mockPublicUserDetails,
   mockRegion,
   mockRegions,
   mockReview,
+  mockStats,
   mockTasting,
   mockUser,
   mockUserDetails,
@@ -72,7 +80,7 @@ describe("mock oRPC router", () => {
     expect(user.id).toBe(mockUser.id);
   });
 
-  it("covers the main read-only page data", async () => {
+  it("returns data used by the main pages", async () => {
     await expect(
       anonymousClient.entities.details({ entity: mockEntity.id }),
     ).resolves.toEqual(mockEntity);
@@ -223,7 +231,7 @@ describe("mock oRPC router", () => {
     });
   });
 
-  it("returns fixed user profile insights", async () => {
+  it("returns fixed user profile stats", async () => {
     const input = { user: mockUser.username };
 
     await expect(anonymousClient.users.badgeList(input)).resolves.toMatchObject(
@@ -243,6 +251,58 @@ describe("mock oRPC router", () => {
     await expect(anonymousClient.users.libraryStats(input)).resolves.toEqual(
       mockUserLibraryStats,
     );
+  });
+
+  it("returns data used by the remaining main pages", async () => {
+    await expect(anonymousClient.stats()).resolves.toEqual(mockStats);
+
+    await expect(
+      anonymousClient.events.list({ limit: 3, onlyUpcoming: true }),
+    ).resolves.toMatchObject({ results: mockEvents.slice(0, 3) });
+
+    await expect(
+      anonymousClient.prices.changeList({ limit: 25 }),
+    ).resolves.toMatchObject({
+      results: expect.arrayContaining([
+        expect.objectContaining({ id: mockBottle.id }),
+      ]),
+    });
+
+    await expect(
+      anonymousClient.bottles.prices.list({ bottle: mockBottle.id }),
+    ).resolves.toEqual({ results: mockBottlePrices });
+
+    await expect(anonymousClient.changes.list({})).resolves.toEqual({
+      results: mockChanges,
+      rel: { nextCursor: null, prevCursor: null },
+    });
+
+    await expect(authenticatedClient.friends.list({})).resolves.toMatchObject({
+      results: mockFriendships,
+    });
+
+    await expect(
+      authenticatedClient.notifications.list({ filter: "unread" }),
+    ).resolves.toMatchObject({
+      results: mockNotifications.filter((notification) => !notification.read),
+    });
+
+    await expect(
+      authenticatedClient.users.activity.list({ user: "me" }),
+    ).resolves.toMatchObject({
+      results: expect.arrayContaining([
+        expect.objectContaining({
+          createdBy: expect.objectContaining({ id: mockUser.id }),
+        }),
+      ]),
+    });
+
+    await expect(
+      authenticatedClient.badges.details({ badge: mockBadges[0]!.id }),
+    ).resolves.toEqual(mockBadges[0]);
+    await expect(
+      authenticatedClient.badges.userList({ badge: mockBadges[0]!.id }),
+    ).resolves.toMatchObject({ results: mockBadgeUsers });
   });
 
   it("supports fixed tasting flights", async () => {
@@ -283,7 +343,10 @@ describe("mock oRPC router", () => {
     );
     await expect(
       authenticatedClient.notifications.count({ filter: "unread" }),
-    ).resolves.toEqual({ count: 3 });
+    ).resolves.toEqual({
+      count: mockNotifications.filter((notification) => !notification.read)
+        .length,
+    });
 
     await expect(
       anonymousClient.reviews.list({ sort: "name" }),
@@ -301,7 +364,7 @@ describe("mock oRPC router", () => {
     ]);
   });
 
-  it("applies read-only filters without saving state", async () => {
+  it("applies filters without saving changes", async () => {
     await expect(
       anonymousClient.countries.list({ query: "New Zealand" }),
     ).resolves.toMatchObject({ results: [] });
@@ -324,6 +387,19 @@ describe("mock oRPC router", () => {
   });
 
   it("keeps signed-in read filters protected", async () => {
+    await expect(anonymousClient.friends.list({})).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
+    await expect(anonymousClient.notifications.list({})).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
+    await expect(
+      anonymousClient.badges.userList({ badge: mockBadges[0]!.id }),
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+    await expect(
+      anonymousClient.users.activity.list({ user: "me" }),
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+
     await expect(
       anonymousClient.tastings.list({ filter: "friends" }),
     ).rejects.toMatchObject({ code: "UNAUTHORIZED" });

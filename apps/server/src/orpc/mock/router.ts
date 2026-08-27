@@ -1,9 +1,13 @@
 import { mockOS } from "./implementer";
 import activityList from "./routes/activity/list";
 import login from "./routes/auth/login";
+import badgeDetails from "./routes/badges/details";
+import badgeUserList from "./routes/badges/user-list";
 import bottleDetails from "./routes/bottles/details";
 import bottleList from "./routes/bottles/list";
+import bottlePriceList from "./routes/bottles/prices/list";
 import bottleTags from "./routes/bottles/tags";
+import changeList from "./routes/changes/list";
 import collectionBottleList from "./routes/collections/bottles/list";
 import commentList from "./routes/comments/list";
 import countryDetails from "./routes/countries/details";
@@ -11,16 +15,22 @@ import countryList from "./routes/countries/list";
 import entityCatalog from "./routes/entities/catalog";
 import entityDetails from "./routes/entities/details";
 import entityList from "./routes/entities/list";
+import eventList from "./routes/events/list";
 import flightDetails from "./routes/flights/details";
 import flightList from "./routes/flights/list";
+import friendList from "./routes/friends/list";
 import notificationCount from "./routes/notifications/count";
+import notificationList from "./routes/notifications/list";
+import priceChangeList from "./routes/prices/change-list";
 import regionDetails from "./routes/regions/details";
 import regionList from "./routes/regions/list";
 import reviewList from "./routes/reviews/list";
 import root from "./routes/root";
 import search from "./routes/search";
+import stats from "./routes/stats";
 import tastingDetails from "./routes/tastings/details";
 import tastingList from "./routes/tastings/list";
+import userActivityList from "./routes/users/activity/list";
 import userBadgeList from "./routes/users/badge-list";
 import userDetails from "./routes/users/details";
 import userFlavorList from "./routes/users/flavor-list";
@@ -32,16 +42,27 @@ import userTastingStats from "./routes/users/tasting-stats";
 export const mockRouter = mockOS.router({
   root,
   search,
+  stats,
   activity: {
     list: activityList,
   },
   auth: {
     login,
   },
+  badges: {
+    details: badgeDetails,
+    userList: badgeUserList,
+  },
   bottles: {
     details: bottleDetails,
     list: bottleList,
+    prices: {
+      list: bottlePriceList,
+    },
     tags: bottleTags,
+  },
+  changes: {
+    list: changeList,
   },
   comments: {
     list: commentList,
@@ -60,12 +81,22 @@ export const mockRouter = mockOS.router({
     details: entityDetails,
     list: entityList,
   },
+  events: {
+    list: eventList,
+  },
   flights: {
     details: flightDetails,
     list: flightList,
   },
+  friends: {
+    list: friendList,
+  },
   notifications: {
     count: notificationCount,
+    list: notificationList,
+  },
+  prices: {
+    changeList: priceChangeList,
   },
   regions: {
     details: regionDetails,
@@ -79,6 +110,9 @@ export const mockRouter = mockOS.router({
     list: tastingList,
   },
   users: {
+    activity: {
+      list: userActivityList,
+    },
     badgeList: userBadgeList,
     details: userDetails,
     flavorList: userFlavorList,

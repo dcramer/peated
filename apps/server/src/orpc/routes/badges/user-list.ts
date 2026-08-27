@@ -2,13 +2,14 @@ import { db } from "@peated/server/db";
 import type { BadgeAward, User } from "@peated/server/db/schema";
 import { badgeAwards, badges, users } from "@peated/server/db/schema";
 import { notEmpty } from "@peated/server/lib/filter";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import badgeUserListContract from "@peated/server/orpc/contracts/badges/user-list";
 import { requireAuth } from "@peated/server/orpc/middleware";
-import { UserSchema, listResponse } from "@peated/server/schemas";
+import type { UserSchema } from "@peated/server/schemas";
 import { serialize, serializer } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { and, desc, eq, ne } from "drizzle-orm";
-import { z } from "zod";
+import type { z } from "zod";
 
 interface BadgeAwardUserAttrs {
   user: z.infer<typeof UserSchema>;
@@ -50,34 +51,8 @@ export const Serializer = serializer({
   },
 });
 
-const InputSchema = z.object({
-  badge: z.coerce.number(),
-  cursor: z.coerce.number().gte(1).default(1),
-  limit: z.coerce.number().gte(1).lte(100).default(25),
-});
-
-const OutputSchema = listResponse(
-  z.object({
-    id: z.number(),
-    xp: z.number(),
-    level: z.number(),
-    user: UserSchema,
-    createdAt: z.string(),
-  }),
-);
-
-export default procedure
-  .route({
-    method: "GET",
-    path: "/badges/{badge}/users",
-    summary: "List badge users",
-    description:
-      "Retrieve users who have earned a specific badge, ordered by XP. Requires authentication",
-    operationId: "listBadgeUsers",
-  })
+export default implement(badgeUserListContract)
   .use(requireAuth)
-  .input(InputSchema)
-  .output(OutputSchema)
   .handler(async function ({
     input: { cursor, limit, ...input },
     context,

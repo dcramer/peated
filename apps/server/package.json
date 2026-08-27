@@ -71,6 +71,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@orpc/client": "catalog:",
     "@types/bcrypt": "^6.0.0",
     "@types/error-cause": "^1.0.4",
     "@types/jsonwebtoken": "^9.0.10",
