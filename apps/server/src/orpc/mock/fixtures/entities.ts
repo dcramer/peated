@@ -197,7 +197,6 @@ export const mockEntities: Entity[] = [
     peatedId: "E9212",
     name: "The Scotch Malt Whisky Society",
     shortName: "SMWS",
-    type: ["brand", "bottler"],
     kind: "bottler",
     description:
       "An independent bottler known for identifying single-cask releases with distillery codes.",
