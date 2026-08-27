@@ -253,6 +253,7 @@ export const BOT_USER_AGENT = "PeatedBot/1.0 (+https://peated.com/bot)";
 export const ALLOWED_VOLUMES = [500, 700, 750, 1000, 1500, 1750];
 
 export const SCRAPER_PRICE_BATCH_SIZE = 5;
+export const MIN_BOTTLE_SCORE_COUNT = 20;
 
 export const SIMPLE_RATING_VALUES = {
   PASS: -1,
@@ -275,24 +276,38 @@ export const SIMPLE_RATING_DESCRIPTIONS = {
 export type SimpleRatingValue =
   (typeof SIMPLE_RATING_VALUES)[keyof typeof SIMPLE_RATING_VALUES];
 
-export const RATING_SYSTEMS = ["simple", "advanced"] as const;
-export type RatingSystem = (typeof RATING_SYSTEMS)[number];
-
-export const ADVANCED_RATING_BANDS = [
-  { min: 95, max: 100, label: "Extraordinary" },
-  { min: 90, max: 94, label: "Exceptional" },
-  { min: 85, max: 89, label: "Very good" },
-  { min: 80, max: 84, label: "Good" },
-  { min: 75, max: 79, label: "Fair" },
-  { min: 0, max: 74, label: "Not recommended" },
+export const TASTING_BANDS = [
+  { id: "mediocre", min: 0, max: 79, label: "Mediocre" },
+  { id: "good", min: 80, max: 84, label: "Good" },
+  { id: "very_good", min: 85, max: 89, label: "Very good" },
+  { id: "outstanding", min: 90, max: 94, label: "Outstanding" },
+  { id: "unicorn", min: 95, max: 100, label: "Unicorn" },
 ] as const;
 
-export type AdvancedRatingBand = (typeof ADVANCED_RATING_BANDS)[number];
+export type TastingBand = (typeof TASTING_BANDS)[number];
+export type TastingBandId = TastingBand["id"];
+export type TastingBandCounts = Record<TastingBandId, number>;
 
-export function getAdvancedRatingBand(
-  score: number,
-): AdvancedRatingBand | undefined {
-  return ADVANCED_RATING_BANDS.find(
-    (band) => score >= band.min && score <= band.max,
-  );
+export const TASTING_BAND_IDS = [
+  TASTING_BANDS[0].id,
+  TASTING_BANDS[1].id,
+  TASTING_BANDS[2].id,
+  TASTING_BANDS[3].id,
+  TASTING_BANDS[4].id,
+] as const;
+
+export const EMPTY_TASTING_BAND_COUNTS = {
+  mediocre: 0,
+  good: 0,
+  very_good: 0,
+  outstanding: 0,
+  unicorn: 0,
+} satisfies TastingBandCounts;
+
+export function getTastingBand(score: number): TastingBand | undefined {
+  return TASTING_BANDS.find((band) => score >= band.min && score <= band.max);
+}
+
+export function getTastingBandById(id: TastingBandId): TastingBand {
+  return TASTING_BANDS.find((band) => band.id === id)!;
 }

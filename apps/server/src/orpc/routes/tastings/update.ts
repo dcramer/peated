@@ -21,18 +21,13 @@ const InputSchema = z
     tasting: z.coerce.number(),
     ...TastingUpdateFields,
   })
-  .strict()
-  .refine((data) => data.rating == null || data.score == null, {
-    message: "Cannot provide both a simple rating and an advanced score",
-    path: ["score"],
-  });
+  .strict();
 
 type TastingUpdate = Partial<
   Pick<
     NewTasting,
     | "notes"
-    | "rating"
-    | "score"
+    | "ratingBand"
     | "servingStyle"
     | "color"
     | "friends"
@@ -49,7 +44,7 @@ export default procedure
     path: "/tastings/{tasting}",
     summary: "Update tasting",
     description:
-      "Update tasting information including notes, rating, tags, and friends. Only the tasting creator can update",
+      "Update tasting information including notes, rating band, tags, and friends. Only the tasting creator can update",
     operationId: "updateTasting",
   })
   .input(InputSchema)
@@ -74,13 +69,11 @@ export default procedure
     if (input.notes !== undefined && input.notes !== tasting.notes) {
       tastingData.notes = input.notes;
     }
-    if (input.rating !== undefined && input.rating !== tasting.rating) {
-      tastingData.rating = input.rating;
-      if (input.rating !== null) tastingData.score = null;
-    }
-    if (input.score !== undefined && input.score !== tasting.score) {
-      tastingData.score = input.score;
-      if (input.score !== null) tastingData.rating = null;
+    if (
+      input.ratingBand !== undefined &&
+      input.ratingBand !== tasting.ratingBand
+    ) {
+      tastingData.ratingBand = input.ratingBand;
     }
     if (
       input.servingStyle !== undefined &&
@@ -129,8 +122,7 @@ export default procedure
       tastingData.imageUrl = null;
     }
 
-    const ratingChanged =
-      tastingData.rating !== undefined || tastingData.score !== undefined;
+    const ratingChanged = tastingData.ratingBand !== undefined;
     const updated = await db.transaction(async (tx) => {
       // Mutation and dispatch use the Bottle reference current after locking.
       const [currentTasting] = await tx

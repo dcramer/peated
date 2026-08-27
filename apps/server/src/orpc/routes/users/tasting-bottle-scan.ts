@@ -1,3 +1,4 @@
+import type { TastingBandId } from "@peated/server/constants";
 import { db, type AnyDatabase } from "@peated/server/db";
 import { bottles, bottleTombstones, tastings } from "@peated/server/db/schema";
 import { and, asc, eq, gt } from "drizzle-orm";
@@ -11,7 +12,7 @@ export type UserBottleRead = Pick<
 
 export type TastingBottleScanRow = {
   id: number;
-  rating: number | null;
+  ratingBand: TastingBandId | null;
   bottle: UserBottleRead | null;
 };
 
@@ -66,7 +67,7 @@ export async function* scanUserTastingBottles(
     const rows = await database
       .select({
         id: tastings.id,
-        rating: tastings.rating,
+        ratingBand: tastings.ratingBand,
         storedBottleId: tastings.bottleId,
         bottle: {
           id: bottles.id,
@@ -94,7 +95,7 @@ export async function* scanUserTastingBottles(
 
     yield rows.map((row) => ({
       id: row.id,
-      rating: row.rating,
+      ratingBand: row.ratingBand,
       bottle: readJoinedUserBottle(row),
     }));
 

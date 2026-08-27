@@ -12,7 +12,6 @@ function makeReview(overrides: Partial<ReviewListItem> = {}): ReviewListItem {
   return {
     id: 1,
     name: "Springbank 12 Cask Strength",
-    rating: 94,
     url: "https://example.com/reviews/springbank",
     site: {
       id: 2,
@@ -87,7 +86,7 @@ describe("BottleReviews", () => {
     );
 
     expect(html).toContain("92/100");
-    expect(html).toContain("Exceptional");
+    expect(html).toContain("Outstanding");
   });
 
   it("omits missing metadata and normalized compatibility ratings", () => {

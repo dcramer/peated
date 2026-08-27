@@ -30,7 +30,7 @@ describe("PATCH /tastings/{tasting}", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
   });
 
-  test("updates rating and queues direct Bottle statistics", async ({
+  test("updates the band and queues direct Bottle statistics", async ({
     defaults,
     fixtures,
   }) => {
@@ -38,16 +38,16 @@ describe("PATCH /tastings/{tasting}", () => {
     const tasting = await fixtures.Tasting({
       bottleId: bottle.id,
       createdById: defaults.user.id,
-      rating: 1,
+      ratingBand: "good",
     });
 
     const result = await routerClient.tastings.update(
-      { tasting: tasting.id, rating: 2 },
+      { tasting: tasting.id, ratingBand: "outstanding" },
       { context: { user: defaults.user } },
     );
 
     expect(result.bottle.id).toBe(bottle.id);
-    expect(result.rating).toBe(2);
+    expect(result.ratingBand).toBe("outstanding");
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
       { bottleId: bottle.id },
@@ -59,50 +59,18 @@ describe("PATCH /tastings/{tasting}", () => {
     );
   });
 
-  test("replaces a simple rating with an advanced score", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
+  test("clears a band", async ({ defaults, fixtures }) => {
     const tasting = await fixtures.Tasting({
-      bottleId: bottle.id,
       createdById: defaults.user.id,
-      rating: 2,
+      ratingBand: "very_good",
     });
 
     const result = await routerClient.tastings.update(
-      { tasting: tasting.id, score: 88 },
+      { tasting: tasting.id, ratingBand: null },
       { context: { user: defaults.user } },
     );
 
-    expect(result).toMatchObject({ rating: null, score: 88 });
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
-      "UpdateBottleStats",
-      { bottleId: bottle.id },
-      {
-        delay: 5000,
-        removeOnComplete: true,
-        removeOnFail: false,
-      },
-    );
-  });
-
-  test("clears an advanced score without creating a simple rating", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const tasting = await fixtures.Tasting({
-      createdById: defaults.user.id,
-      rating: null,
-      score: 88,
-    });
-
-    const result = await routerClient.tastings.update(
-      { tasting: tasting.id, score: null },
-      { context: { user: defaults.user } },
-    );
-
-    expect(result).toMatchObject({ rating: null, score: null });
+    expect(result.ratingBand).toBeNull();
   });
 
   test("updates tag accounting on the direct Bottle", async ({

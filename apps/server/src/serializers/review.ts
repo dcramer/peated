@@ -171,7 +171,6 @@ export const ReviewSerializer = serializer({
     return {
       id: item.id,
       name: item.name,
-      rating: item.rating,
       url: attrs.article.canonicalUrl,
       article: {
         title: attrs.article.title,

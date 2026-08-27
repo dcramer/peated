@@ -33,10 +33,10 @@ export default mockOS.bottleGroups.bottles.handler(
             return (left.statedAge ?? -1) - (right.statedAge ?? -1);
           case "-age":
             return (right.statedAge ?? -1) - (left.statedAge ?? -1);
-          case "rating":
-            return (left.avgRating ?? 3) - (right.avgRating ?? 3);
-          case "-rating":
-            return (right.avgRating ?? -1) - (left.avgRating ?? -1);
+          case "score":
+            return (left.medianScore ?? 101) - (right.medianScore ?? 101);
+          case "-score":
+            return (right.medianScore ?? -1) - (left.medianScore ?? -1);
           case "tastings":
             return left.totalTastings - right.totalTastings;
           case "-tastings":

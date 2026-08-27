@@ -87,7 +87,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: wrongBottle.id,
       name: correctBottle.fullName,
       issue: "Default",
-      rating: 91,
+      legacyNormalizedScore: 91,
       url: "https://example.com/review",
     });
     const sameNameReview = await fixtures.Review({
@@ -95,7 +95,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: null,
       name: correctBottle.fullName,
       issue: "Second",
-      rating: 88,
+      legacyNormalizedScore: 88,
       url: "https://example.com/second-review",
     });
     const sameNamePrice = await fixtures.StorePrice({
@@ -198,7 +198,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: wrongBottle.id,
       name: alias.name,
       issue: "Default",
-      rating: 90,
+      legacyNormalizedScore: 90,
       url: "https://example.com/staged-exact-alias-review",
     });
 
@@ -235,7 +235,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: wrongBottle.id,
       name: "Unpromoted Classifier Match Review",
       issue: "Default",
-      rating: 90,
+      legacyNormalizedScore: 90,
       url: "https://example.com/unpromoted-classifier-match-review",
     });
     classifyBottleReferenceMock.mockResolvedValue(
@@ -295,7 +295,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: bottle.id,
       name: "Unknown Review Title",
       issue: "Default",
-      rating: 90,
+      legacyNormalizedScore: 90,
       url: "https://example.com/unresolved-review",
     });
 
@@ -330,7 +330,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: bottle.id,
       name: "Errored Review Title",
       issue: "Default",
-      rating: 90,
+      legacyNormalizedScore: 90,
       url: "https://example.com/errored-review",
     });
 
@@ -373,7 +373,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: wrongBottle.id,
       name: "Assignment Conflict Review",
       issue: "Default",
-      rating: 90,
+      legacyNormalizedScore: 90,
       url: "https://example.com/assignment-conflict-review",
     });
 
@@ -425,7 +425,7 @@ describe("fixBadReviewEntities", () => {
       bottleId: wrongBottle.id,
       name: "Suggested Bottle Review",
       issue: "Default",
-      rating: 90,
+      legacyNormalizedScore: 90,
       url: "https://example.com/concurrent-review",
     });
 

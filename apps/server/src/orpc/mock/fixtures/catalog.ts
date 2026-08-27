@@ -27,7 +27,7 @@ export const mockEntityCatalog = {
       id: mockBottle.id,
       fullName: mockBottle.fullName,
       totalTastings: mockBottle.totalTastings,
-      avgRating: mockBottle.avgRating,
+      medianScore: mockBottle.medianScore,
     },
   ],
 } satisfies MockOutputs["entities"]["catalog"];
@@ -45,7 +45,7 @@ export function mockEntityCatalogFor(
         id: bottle.id,
         fullName: bottle.fullName,
         totalTastings: bottle.totalTastings,
-        avgRating: bottle.avgRating,
+        medianScore: bottle.medianScore,
       })),
     };
   }
@@ -126,7 +126,7 @@ export function mockEntityCatalogFor(
       id: bottle.id,
       fullName: bottle.fullName,
       totalTastings: bottle.totalTastings,
-      avgRating: bottle.avgRating,
+      medianScore: bottle.medianScore,
     })),
   };
 }

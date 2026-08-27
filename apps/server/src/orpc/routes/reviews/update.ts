@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { reviewArticles, reviews } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
@@ -50,73 +51,96 @@ export default procedure
       return await serialize(ReviewSerializer, review, context.user);
     }
 
-    const updatedReview = await db.transaction(async (tx) => {
-      if (nextBottleId !== undefined && nextBottleId !== null) {
-        try {
-          await resolveActiveBottleIds(tx, [nextBottleId], { lock: "update" });
-        } catch (error) {
-          if (!(error instanceof ActiveBottleSelectionError)) throw error;
-          if (error.reason === "missing") {
-            throw errors.NOT_FOUND({ message: "Bottle not found." });
+    const { updatedReview, previousBottleId } = await db.transaction(
+      async (tx) => {
+        if (nextBottleId !== undefined && nextBottleId !== null) {
+          try {
+            await resolveActiveBottleIds(tx, [nextBottleId], {
+              lock: "update",
+            });
+          } catch (error) {
+            if (!(error instanceof ActiveBottleSelectionError)) throw error;
+            if (error.reason === "missing") {
+              throw errors.NOT_FOUND({ message: "Bottle not found." });
+            }
+            throw errors.CONFLICT({
+              message:
+                error.reason === "bottle_retired"
+                  ? `Bottle ${nextBottleId} is retired.`
+                  : `Bottle ${nextBottleId} is not active.`,
+            });
           }
-          throw errors.CONFLICT({
-            message:
-              error.reason === "bottle_retired"
-                ? `Bottle ${nextBottleId} is retired.`
-                : `Bottle ${nextBottleId} is not active.`,
+        }
+
+        const [locked] = await tx
+          .select({ article: reviewArticles, review: reviews })
+          .from(reviews)
+          .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+          .where(eq(reviews.id, reviewId))
+          .limit(1)
+          .for("update", { of: reviews });
+        if (!locked) {
+          throw errors.NOT_FOUND({ message: "Review not found." });
+        }
+        const { article, review: lockedReview } = locked;
+
+        const update: Partial<typeof reviews.$inferInsert> = {};
+        if (hasBottleUpdate) update.bottleId = nextBottleId;
+        if (hasHiddenUpdate) update.hidden = hidden;
+        const [review] = await tx
+          .update(reviews)
+          .set(update)
+          .where(eq(reviews.id, reviewId))
+          .returning();
+        if (!review) {
+          throw errors.INTERNAL_SERVER_ERROR({
+            message: "Failed to update review.",
           });
         }
-      }
 
-      const [locked] = await tx
-        .select({ article: reviewArticles, review: reviews })
-        .from(reviews)
-        .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
-        .where(eq(reviews.id, reviewId))
-        .limit(1)
-        .for("update", { of: reviews });
-      if (!locked) {
-        throw errors.NOT_FOUND({ message: "Review not found." });
-      }
-      const { article, review: lockedReview } = locked;
+        if (
+          nextBottleId != null &&
+          shouldRecordIncomingBottleDecision({
+            previousBottleId: lockedReview.bottleId,
+            bottleId: nextBottleId,
+            decision: "match_existing",
+          })
+        ) {
+          const actor = await getUserActorForDatabase(tx, context.user);
+          await recordIncomingBottleDecisionInTransaction(tx, {
+            sourceKind: "review",
+            sourceId: review.id,
+            externalSiteId: article.externalSiteId,
+            name: review.name,
+            url: article.canonicalUrl,
+            decision: "match_existing",
+            actor,
+            bottleId: nextBottleId,
+          });
+        }
 
-      const update: Partial<typeof reviews.$inferInsert> = {};
-      if (hasBottleUpdate) update.bottleId = nextBottleId;
-      if (hasHiddenUpdate) update.hidden = hidden;
-      const [review] = await tx
-        .update(reviews)
-        .set(update)
-        .where(eq(reviews.id, reviewId))
-        .returning();
-      if (!review) {
-        throw errors.INTERNAL_SERVER_ERROR({
-          message: "Failed to update review.",
-        });
-      }
-
-      if (
-        nextBottleId != null &&
-        shouldRecordIncomingBottleDecision({
+        return {
+          updatedReview: review,
           previousBottleId: lockedReview.bottleId,
-          bottleId: nextBottleId,
-          decision: "match_existing",
-        })
-      ) {
-        const actor = await getUserActorForDatabase(tx, context.user);
-        await recordIncomingBottleDecisionInTransaction(tx, {
-          sourceKind: "review",
-          sourceId: review.id,
-          externalSiteId: article.externalSiteId,
-          name: review.name,
-          url: article.canonicalUrl,
-          decision: "match_existing",
-          actor,
-          bottleId: nextBottleId,
-        });
-      }
+        };
+      },
+    );
 
-      return review;
-    });
+    await Promise.all(
+      Array.from(
+        new Set(
+          [previousBottleId, updatedReview.bottleId].filter(
+            (id): id is number => id !== null,
+          ),
+        ),
+      ).map((bottleId) =>
+        dispatchBottleStatsRecompute(
+          "externalReview",
+          updatedReview.id,
+          bottleId,
+        ),
+      ),
+    );
 
     return await serialize(ReviewSerializer, updatedReview, context.user);
   });

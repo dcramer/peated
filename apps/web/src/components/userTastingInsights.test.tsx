@@ -23,7 +23,14 @@ describe("TastingSnapshotCard", () => {
         stats={{
           total: 10,
           uniqueBottles: 8,
-          ratings: { total: 8, pass: 1, sip: 3, savor: 4 },
+          bands: {
+            total: 8,
+            mediocre: 1,
+            good: 1,
+            very_good: 1,
+            outstanding: 4,
+            unicorn: 1,
+          },
           mostTastedBottle: { id: 42, name: "Favorite Bottle", count: 3 },
           age,
         }}
@@ -31,7 +38,8 @@ describe("TastingSnapshotCard", () => {
     );
 
     expect(html).toContain("Tasting snapshot");
-    expect(html).toContain("4 (50%)");
+    expect(html).toContain("Outstanding");
+    expect(html).toContain(">4<");
     expect(html).toContain("2</span><span");
     expect(html).toContain("repeat pours");
     expect(html).toContain("Favorite Bottle");
@@ -45,14 +53,21 @@ describe("TastingSnapshotCard", () => {
         stats={{
           total: 1,
           uniqueBottles: 1,
-          ratings: { total: 0, pass: 0, sip: 0, savor: 0 },
+          bands: {
+            total: 0,
+            mediocre: 0,
+            good: 0,
+            very_good: 0,
+            outstanding: 0,
+            unicorn: 0,
+          },
           mostTastedBottle: null,
           age,
         }}
       />,
     );
 
-    expect(html).toContain("No ratings yet");
+    expect(html).toContain("Mediocre");
     expect(html).toContain("0</span><span");
     expect(html).toContain("repeat pours");
     expect(html).not.toContain("Most revisited");

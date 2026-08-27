@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
+import { TASTING_BAND_IDS } from "@peated/server/constants";
 import type { AnyDatabase, AnyTransaction } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
 import * as dbSchema from "@peated/server/db/schema";
@@ -481,8 +481,14 @@ type BottleGroupMemberFixtureData = Partial<
     | "imageUrl"
     | "tastingNotes"
     | "suggestedTags"
-    | "avgRating"
-    | "ratingStats"
+    | "legacySimpleRatingAverage"
+    | "legacySimpleRatingStats"
+    | "medianScore"
+    | "minScore"
+    | "maxScore"
+    | "memberScoreCount"
+    | "externalScoreCount"
+    | "tastingBandCounts"
     | "totalTastings"
     | "numReleases"
     | "createdAt"
@@ -806,7 +812,7 @@ export const Tasting = async (
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
-        rating: faker.helpers.arrayElement(Object.values(SIMPLE_RATING_VALUES)),
+        ratingBand: faker.helpers.arrayElement(TASTING_BAND_IDS),
         tags: tags,
         createdAt: new Date(),
         ...data,
@@ -1187,7 +1193,7 @@ export const Review = async (
       .insert(reviews)
       .values({
         name: "",
-        rating: faker.number.int({ min: 59, max: 100 }),
+        legacyNormalizedScore: faker.number.int({ min: 59, max: 100 }),
         createdAt: new Date(),
         ...data,
         articleId,

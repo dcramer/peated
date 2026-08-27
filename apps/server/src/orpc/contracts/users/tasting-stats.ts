@@ -19,11 +19,13 @@ export default contract
     z.object({
       total: z.number(),
       uniqueBottles: z.number(),
-      ratings: z.object({
+      bands: z.object({
         total: z.number(),
-        pass: z.number(),
-        sip: z.number(),
-        savor: z.number(),
+        mediocre: z.number(),
+        good: z.number(),
+        very_good: z.number(),
+        outstanding: z.number(),
+        unicorn: z.number(),
       }),
       mostTastedBottle: z
         .object({

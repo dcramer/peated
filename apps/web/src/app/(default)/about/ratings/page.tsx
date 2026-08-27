@@ -1,12 +1,11 @@
-import { ADVANCED_RATING_BANDS } from "@peated/server/constants";
+import { TASTING_BANDS } from "@peated/server/constants";
 import type { Metadata } from "next";
 
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Whisky Rating Guide",
-  description:
-    "A simple guide to Pass, Sip, Savor and Peated's 100-point whisky scores.",
+  description: "A simple guide to Peated tasting bands and 100-point reviews.",
 };
 
 const BAND_STYLES = {
@@ -14,7 +13,6 @@ const BAND_STYLES = {
   90: "border-yellow-300/50 bg-yellow-300/10",
   85: "border-lime-300/40 bg-lime-300/10",
   80: "border-emerald-300/40 bg-emerald-300/10",
-  75: "border-sky-300/40 bg-sky-300/10",
   0: "border-slate-600 bg-slate-900",
 } satisfies Record<number, string>;
 
@@ -26,37 +24,33 @@ export default function RatingsPage() {
           Peated ratings
         </div>
         <h1 className="text-4xl font-semibold text-white sm:text-5xl">
-          Rate it your way
+          Tastings and reviews
         </h1>
         <p className="text-muted mt-5 text-lg leading-8">
-          Choose a quick rating or a 100-point score. They stay separate, so
-          every rating keeps its meaning.
+          Use a broad band for a tasting. Use a 100-point score when you write a
+          review. Each keeps a clear purpose.
         </p>
       </header>
 
       <section className="mt-12 grid gap-5 md:grid-cols-2">
         <div className="rounded-xl border border-slate-700 bg-slate-900/50 p-6">
-          <div className="text-muted text-sm font-medium">For a quick take</div>
+          <div className="text-muted text-sm font-medium">For a tasting</div>
           <h2 className="mt-1 text-2xl font-semibold text-white">
-            Pass, Sip, or Savor
+            Choose a broad band
           </h2>
           <div className="mt-6 space-y-3">
-            <RatingChoice label="Pass" description="Not my thing." />
-            <RatingChoice
-              label="Sip"
-              description="Enjoyable. I would drink it again."
-            />
-            <RatingChoice
-              label="Savor"
-              description="Amazing. I would seek it out."
-            />
+            {TASTING_BANDS.map((band) => (
+              <RatingChoice
+                key={band.id}
+                label={band.label}
+                description={`${band.min}–${band.max}`}
+              />
+            ))}
           </div>
         </div>
 
         <div className="rounded-xl border border-slate-700 bg-slate-900/50 p-6">
-          <div className="text-muted text-sm font-medium">
-            For closer comparison
-          </div>
+          <div className="text-muted text-sm font-medium">For a review</div>
           <h2 className="mt-1 text-2xl font-semibold text-white">
             The 100-point scale
           </h2>
@@ -65,13 +59,13 @@ export default function RatingsPage() {
               92
             </div>
             <div className="pb-1">
-              <div className="font-semibold text-white">Exceptional</div>
+              <div className="font-semibold text-white">Outstanding</div>
               <div className="text-muted text-sm">out of 100</div>
             </div>
           </div>
           <p className="text-muted mt-5 leading-7">
-            Pick a whole number from 0 to 100. An 80 means good—not 80% or a
-            school grade. Scores above 90 should be rare.
+            Pick a whole number from 0 to 100 and add notes when useful. A
+            review is one considered opinion about the Bottle.
           </p>
         </div>
       </section>
@@ -79,11 +73,11 @@ export default function RatingsPage() {
       <section className="mt-14 rounded-xl border border-slate-700 bg-slate-900/50 p-6 sm:p-8">
         <div className="max-w-2xl">
           <h2 className="text-2xl font-semibold text-white">
-            How to choose a score
+            How to write a review
           </h2>
           <p className="text-muted mt-2 leading-7">
-            You do not need 100 separate definitions. Start with good, then move
-            up or down.
+            Taste first. Then choose the whole number that best states your
+            view.
           </p>
         </div>
 
@@ -148,7 +142,7 @@ export default function RatingsPage() {
           </p>
         </div>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {ADVANCED_RATING_BANDS.map((band) => (
+          {TASTING_BANDS.map((band) => (
             <div
               className={`flex items-center justify-between rounded-lg border px-5 py-4 ${BAND_STYLES[band.min]}`}
               key={band.min}
@@ -166,16 +160,15 @@ export default function RatingsPage() {
         <div>
           <h2 className="text-xl font-semibold text-white">Community scores</h2>
           <p className="text-muted mt-3 leading-7">
-            Peated shows the average score from its users and how many people
-            scored the whisky.
+            Peated shows the median after at least 20 member and permitted
+            external review scores exist.
           </p>
         </div>
         <div>
           <h2 className="text-xl font-semibold text-white">Critic scores</h2>
           <p className="text-muted mt-3 leading-7">
-            Critic scores stay with the publication that gave them. When a
-            publication uses 100 points, we show the same labels. Critic scores
-            never change the Peated community score.
+            Peated includes a critic score only when the publication allows it
+            and the source gives a whole-number score on a 100-point scale.
           </p>
         </div>
       </section>

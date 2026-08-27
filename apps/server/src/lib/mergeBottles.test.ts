@@ -14,6 +14,7 @@ import {
   collections,
   flightBottles,
   incomingBottleDecisionLogs,
+  memberReviews,
   reviews,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -81,19 +82,19 @@ describe("exact Bottle merges", () => {
       bottleId: source.id,
       createdById: user.id,
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
-      rating: 4,
+      legacyStarRating: 4,
     });
     const destinationTasting = await fixtures.Tasting({
       bottleId: destination.id,
       createdById: user.id,
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
-      rating: 3,
+      legacyStarRating: 3,
     });
     const review = await fixtures.Review({
       externalSiteId: externalSite.id,
       name: "Merge review",
       bottleId: source.id,
-      rating: 88,
+      legacyNormalizedScore: 88,
       issue: "1",
       url: "https://example.com/merge-review",
     });
@@ -400,6 +401,97 @@ describe("exact Bottle merges", () => {
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: destination.id,
     });
+  });
+
+  test("keeps the most recently updated member review when both Bottles were reviewed", async ({
+    fixtures,
+  }) => {
+    const actor = await getUserActor(await fixtures.User({ mod: true }));
+    const member = await fixtures.User();
+    const source = await fixtures.Bottle({ name: "Review Merge Source" });
+    const destination = await fixtures.Bottle({
+      name: "Review Merge Destination",
+    });
+    await db.insert(memberReviews).values([
+      {
+        bottleId: source.id,
+        createdById: member.id,
+        score: 94,
+        updatedAt: new Date("2026-02-02T00:00:00Z"),
+      },
+      {
+        bottleId: destination.id,
+        createdById: member.id,
+        score: 82,
+        updatedAt: new Date("2026-02-01T00:00:00Z"),
+      },
+    ]);
+
+    await db.transaction((tx) =>
+      mergeBottlesInTransaction(tx, {
+        sourceBottleId: source.id,
+        destinationBottleId: destination.id,
+        actorId: actor.id,
+      }),
+    );
+
+    await expect(
+      db.query.memberReviews.findMany({
+        where: eq(memberReviews.createdById, member.id),
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({ bottleId: destination.id, score: 94 }),
+    ]);
+  });
+
+  test("uses the larger review id when update times tie", async ({
+    fixtures,
+  }) => {
+    const actor = await getUserActor(await fixtures.User({ mod: true }));
+    const member = await fixtures.User();
+    const source = await fixtures.Bottle({ name: "Tie Merge Source" });
+    const destination = await fixtures.Bottle({
+      name: "Tie Merge Destination",
+    });
+    const updatedAt = new Date("2026-02-02T00:00:00Z");
+    const inserted = await db
+      .insert(memberReviews)
+      .values([
+        {
+          bottleId: source.id,
+          createdById: member.id,
+          score: 81,
+          updatedAt,
+        },
+        {
+          bottleId: destination.id,
+          createdById: member.id,
+          score: 92,
+          updatedAt,
+        },
+      ])
+      .returning();
+    expect(inserted[1]!.id).toBeGreaterThan(inserted[0]!.id);
+
+    await db.transaction((tx) =>
+      mergeBottlesInTransaction(tx, {
+        sourceBottleId: source.id,
+        destinationBottleId: destination.id,
+        actorId: actor.id,
+      }),
+    );
+
+    await expect(
+      db.query.memberReviews.findMany({
+        where: eq(memberReviews.createdById, member.id),
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        id: inserted[1]!.id,
+        bottleId: destination.id,
+        score: 92,
+      }),
+    ]);
   });
 
   test("normalizes colliding direct memberships to one Bottle row", async ({

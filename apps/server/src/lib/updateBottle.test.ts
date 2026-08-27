@@ -148,12 +148,19 @@ async function loadBottleDistillers(bottleIds: number[]) {
 function selectBottleAggregates(
   rows: Awaited<ReturnType<typeof loadGroupMembers>>,
 ) {
-  return rows.map(({ id, totalTastings, avgRating, ratingStats }) => ({
-    id,
-    totalTastings,
-    avgRating,
-    ratingStats,
-  }));
+  return rows.map(
+    ({
+      id,
+      totalTastings,
+      legacySimpleRatingAverage,
+      legacySimpleRatingStats,
+    }) => ({
+      id,
+      totalTastings,
+      legacySimpleRatingAverage,
+      legacySimpleRatingStats,
+    }),
+  );
 }
 
 function resetQueueMock() {
@@ -1261,8 +1268,8 @@ describe("Bottle updates", () => {
     const aggregateBefore = {
       totalBottles: persistedGroupBefore.totalBottles,
       totalTastings: persistedGroupBefore.totalTastings,
-      avgRating: persistedGroupBefore.avgRating,
-      ratingStats: persistedGroupBefore.ratingStats,
+      legacySimpleRatingAverage: persistedGroupBefore.legacySimpleRatingAverage,
+      legacySimpleRatingStats: persistedGroupBefore.legacySimpleRatingStats,
     };
     const siblingExactBefore = members[1].bottle;
 
@@ -1270,8 +1277,8 @@ describe("Bottle updates", () => {
       {
         bottleId: members[0].bottle.id,
         totalTastings: 3,
-        avgRating: 2,
-        ratingStats: {
+        legacySimpleRatingAverage: 2,
+        legacySimpleRatingStats: {
           pass: 0,
           sip: 3,
           savor: 0,
@@ -1283,8 +1290,8 @@ describe("Bottle updates", () => {
       {
         bottleId: members[1].bottle.id,
         totalTastings: 5,
-        avgRating: 1.4,
-        ratingStats: {
+        legacySimpleRatingAverage: 1.4,
+        legacySimpleRatingStats: {
           pass: 3,
           sip: 2,
           savor: 0,
@@ -1494,8 +1501,8 @@ describe("Bottle updates", () => {
         edition: before.edition,
         abv: before.abv,
         totalTastings: before.totalTastings,
-        avgRating: before.avgRating,
-        ratingStats: before.ratingStats,
+        legacySimpleRatingAverage: before.legacySimpleRatingAverage,
+        legacySimpleRatingStats: before.legacySimpleRatingStats,
       });
       expect(member.fullName).toMatch(/^New Shared Brand Omission Label/);
     }

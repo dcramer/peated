@@ -27,10 +27,12 @@ export type BottleGroupStatsResult = Pick<
   | "id"
   | "totalBottles"
   | "totalTastings"
-  | "avgRating"
-  | "avgScore"
-  | "totalScores"
-  | "ratingStats"
+  | "medianScore"
+  | "minScore"
+  | "maxScore"
+  | "memberScoreCount"
+  | "externalScoreCount"
+  | "tastingBandCounts"
   | "updatedAt"
 >;
 
@@ -91,10 +93,12 @@ export async function recomputeBottleGroupStatsInTransaction(
       id: bottleGroups.id,
       totalBottles: bottleGroups.totalBottles,
       totalTastings: bottleGroups.totalTastings,
-      avgRating: bottleGroups.avgRating,
-      avgScore: bottleGroups.avgScore,
-      totalScores: bottleGroups.totalScores,
-      ratingStats: bottleGroups.ratingStats,
+      medianScore: bottleGroups.medianScore,
+      minScore: bottleGroups.minScore,
+      maxScore: bottleGroups.maxScore,
+      memberScoreCount: bottleGroups.memberScoreCount,
+      externalScoreCount: bottleGroups.externalScoreCount,
+      tastingBandCounts: bottleGroups.tastingBandCounts,
       updatedAt: bottleGroups.updatedAt,
     });
   if (!persisted) {

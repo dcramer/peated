@@ -53,8 +53,9 @@ export const reviews = pgTable(
     // Retained compatibility field for safe migrations; do not use in new logic.
     legacyReleaseId: bigint("release_id", { mode: "number" }),
     hidden: boolean("hidden").default(false),
-    // Normalized ratings are optional compatibility values on a 0-100 scale.
-    rating: integer("rating"),
+    // Old normalized import values do not contribute to current summaries.
+    // TODO(ratings): Drop this column after confirming no maintenance task reads it.
+    legacyNormalizedScore: integer("rating"),
     articleId: bigint("article_id", { mode: "number" })
       .references(() => reviewArticles.id, { onDelete: "cascade" })
       .notNull(),
@@ -81,7 +82,7 @@ export const reviews = pgTable(
     index("review_release_idx").on(table.legacyReleaseId),
     check(
       "review_rating_check",
-      sql`${table.rating} IS NULL OR ${table.rating} BETWEEN 0 AND 100`,
+      sql`${table.legacyNormalizedScore} IS NULL OR ${table.legacyNormalizedScore} BETWEEN 0 AND 100`,
     ),
     check(
       "review_native_score_check",

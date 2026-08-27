@@ -223,8 +223,13 @@ function entityAliasMatches(query: string) {
 
 function bottleRatingCount() {
   return sql<number>`(
-    COALESCE((${bottles.ratingStats}->>'total')::integer, 0)
-    + ${bottles.totalScores}
+    ${bottles.memberScoreCount}
+    + ${bottles.externalScoreCount}
+    + COALESCE((${bottles.tastingBandCounts}->>'mediocre')::integer, 0)
+    + COALESCE((${bottles.tastingBandCounts}->>'good')::integer, 0)
+    + COALESCE((${bottles.tastingBandCounts}->>'very_good')::integer, 0)
+    + COALESCE((${bottles.tastingBandCounts}->>'outstanding')::integer, 0)
+    + COALESCE((${bottles.tastingBandCounts}->>'unicorn')::integer, 0)
   )`;
 }
 
@@ -234,7 +239,7 @@ function entityRatingCount() {
     FROM ${tastings}
     INNER JOIN ${bottles} AS rating_bottle
       ON rating_bottle.id = ${tastings.bottleId}
-    WHERE (${tastings.rating} IS NOT NULL OR ${tastings.score} IS NOT NULL)
+    WHERE ${tastings.ratingBand} IS NOT NULL
       AND (
         rating_bottle.brand_id = ${entities.id}
         OR rating_bottle.bottler_id = ${entities.id}
@@ -561,7 +566,13 @@ async function findNearest(
               result.fullName,
               result.name,
             ]),
-            tie: result.ratingStats.total + result.totalScores,
+            tie:
+              result.memberScoreCount +
+              result.externalScoreCount +
+              Object.values(result.tastingBandCounts).reduce(
+                (total, count) => total + count,
+                0,
+              ),
           });
         }
         break;

@@ -1,10 +1,11 @@
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
+import type { TastingBandId } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import {
   bottleGroups,
   bottles,
   bottleTombstones,
+  memberReviews,
   tastings,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -38,55 +39,35 @@ async function createMember(source: Bottle, name: string) {
 async function createTasting(
   bottleId: number,
   createdById: number,
-  rating: number | null,
+  ratingBand: TastingBandId | null,
   sequence: number,
-  score: number | null = null,
 ) {
   await db.insert(tastings).values({
     bottleId,
-    rating,
-    score,
+    ratingBand,
     createdById,
     createdAt: new Date(Date.UTC(2026, 0, 1, 0, 0, sequence)),
   });
 }
 
 describe("BottleGroup statistics recomputation", () => {
-  test("counts raw activity across active member Bottles once", async ({
-    defaults,
-    fixtures,
-  }) => {
+  test("counts active member Bottles once", async ({ defaults, fixtures }) => {
     const first = await fixtures.Bottle();
     const second = await createMember(first, "Aggregate Member Two");
     const unrelated = await fixtures.Bottle();
 
-    await createTasting(
-      first.id,
-      defaults.user.id,
-      SIMPLE_RATING_VALUES.PASS,
-      1,
-    );
-    await createTasting(
-      first.id,
-      defaults.user.id,
-      SIMPLE_RATING_VALUES.SIP,
-      2,
-    );
-    await createTasting(
-      second.id,
-      defaults.user.id,
-      SIMPLE_RATING_VALUES.SAVOR,
-      3,
-    );
-    await createTasting(
-      unrelated.id,
-      defaults.user.id,
-      SIMPLE_RATING_VALUES.SAVOR,
-      4,
-    );
-    await createTasting(first.id, defaults.user.id, null, 5, 84);
-    await createTasting(second.id, defaults.user.id, null, 6, 88);
-    await createTasting(unrelated.id, defaults.user.id, null, 7, 99);
+    await createTasting(first.id, defaults.user.id, "good", 1);
+    await createTasting(first.id, defaults.user.id, "outstanding", 2);
+    await createTasting(second.id, defaults.user.id, "unicorn", 3);
+    await createTasting(unrelated.id, defaults.user.id, "unicorn", 4);
+    for (let index = 0; index < 20; index += 1) {
+      const member = index === 0 ? defaults.user : await fixtures.User();
+      await db.insert(memberReviews).values({
+        bottleId: index % 2 === 0 ? first.id : second.id,
+        createdById: member.id,
+        score: 75 + index,
+      });
+    }
 
     const firstResult = await db.transaction((tx) =>
       recomputeBottleGroupStatsInTransaction(tx, requireGroupId(first.groupId)),
@@ -95,35 +76,25 @@ describe("BottleGroup statistics recomputation", () => {
       requireGroupId(first.groupId),
     );
 
-    const expectedAverage =
-      (SIMPLE_RATING_VALUES.PASS +
-        SIMPLE_RATING_VALUES.SIP +
-        SIMPLE_RATING_VALUES.SAVOR) /
-      3;
     expect(firstResult).toMatchObject({
       id: first.groupId,
       totalBottles: 2,
-      totalTastings: 5,
-      avgRating: expectedAverage,
-      avgScore: 86,
-      totalScores: 2,
-      ratingStats: {
-        pass: 1,
-        sip: 1,
-        savor: 1,
-        total: 3,
-        avg: expectedAverage,
+      totalTastings: 3,
+      medianScore: 84,
+      minScore: 75,
+      maxScore: 94,
+      memberScoreCount: 20,
+      externalScoreCount: 0,
+      tastingBandCounts: {
+        mediocre: 0,
+        good: 1,
+        very_good: 0,
+        outstanding: 1,
+        unicorn: 1,
       },
     });
-    expect(firstResult.ratingStats.percentage.pass).toBeCloseTo(100 / 3, 12);
-    expect(secondResult).toMatchObject({
-      totalBottles: firstResult.totalBottles,
-      totalTastings: firstResult.totalTastings,
-      avgRating: firstResult.avgRating,
-      avgScore: firstResult.avgScore,
-      totalScores: firstResult.totalScores,
-      ratingStats: firstResult.ratingStats,
-    });
+    const { updatedAt: _firstUpdatedAt, ...firstStats } = firstResult;
+    expect(secondResult).toMatchObject(firstStats);
   });
 
   test("excludes retired members and their activity", async ({
@@ -138,25 +109,16 @@ describe("BottleGroup statistics recomputation", () => {
       newBottleId: replacement.id,
     });
     await createTasting(active.id, defaults.user.id, null, 1);
-    await createTasting(
-      retired.id,
-      defaults.user.id,
-      SIMPLE_RATING_VALUES.SAVOR,
-      2,
-    );
+    await createTasting(retired.id, defaults.user.id, "unicorn", 2);
 
     await expect(
       recomputeBottleGroupStats(requireGroupId(active.groupId)),
     ).resolves.toMatchObject({
       totalBottles: 1,
       totalTastings: 1,
-      avgRating: null,
-      avgScore: null,
-      totalScores: 0,
-      ratingStats: {
-        total: 0,
-        percentage: { pass: 0, sip: 0, savor: 0 },
-      },
+      memberScoreCount: 0,
+      externalScoreCount: 0,
+      tastingBandCounts: { unicorn: 0 },
     });
   });
 

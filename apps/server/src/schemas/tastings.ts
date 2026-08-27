@@ -4,7 +4,7 @@ import {
   ImageBottleEvidenceSchema,
 } from "@peated/bottle-classifier/contract";
 import { z } from "zod";
-import { SIMPLE_RATING_VALUES } from "../constants";
+import { SIMPLE_RATING_VALUES, TASTING_BAND_IDS } from "../constants";
 import { BadgeAwardSchema } from "./badges";
 import { BottleSchema } from "./bottles";
 import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
@@ -24,15 +24,12 @@ const TastingRatingSchema = z
   ])
   .nullable()
   .default(null)
-  .describe("Simple rating: -1 (Pass), 1 (Sip), 2 (Savor)");
-const TastingScoreSchema = z
-  .number()
-  .int()
-  .min(0)
-  .max(100)
+  .describe("Historical simple rating: -1 (Pass), 1 (Sip), 2 (Savor)");
+const TastingBandSchema = z
+  .enum(TASTING_BAND_IDS)
   .nullable()
   .default(null)
-  .describe("Advanced whole-number whisky score from 0 through 100");
+  .describe("Optional rating band for this tasting");
 const TastingTagsSchema = z
   .array(z.string())
   .default([])
@@ -62,8 +59,10 @@ export const TastingSchema = z.object({
     .describe("URL to the tasting's image"),
   notes: TastingNotesSchema,
   bottle: BottleSchema.describe("Bottle that was tasted"),
-  rating: TastingRatingSchema,
-  score: TastingScoreSchema,
+  ratingBand: TastingBandSchema,
+  // TODO(ratings): Remove these fields when historical rating display is retired.
+  legacySimpleRating: TastingRatingSchema.readonly(),
+  legacyStarRating: z.number().nullable().default(null).readonly(),
   tags: TastingTagsSchema,
   color: TastingColorSchema,
   servingStyle: TastingServingStyleSchema,
@@ -108,6 +107,8 @@ export const TastingContentInputSchema = TastingSchema.omit({
   toasts: true,
   hasToasted: true,
   createdBy: true,
+  legacySimpleRating: true,
+  legacyStarRating: true,
 }).extend({
   flight: z
     .string()
@@ -131,17 +132,11 @@ export const TastingContentInputSchema = TastingSchema.omit({
 
 export const TastingInputSchema = TastingContentInputSchema.extend({
   bottle: z.number().int().positive().describe("Bottle being tasted"),
-})
-  .strict()
-  .refine((data) => data.rating === null || data.score === null, {
-    message: "Cannot provide both a simple rating and an advanced score",
-    path: ["score"],
-  });
+}).strict();
 
 export const TastingUpdateFields = {
   notes: TastingNotesSchema.removeDefault().optional(),
-  rating: TastingRatingSchema.removeDefault().optional(),
-  score: TastingScoreSchema.removeDefault().optional(),
+  ratingBand: TastingBandSchema.removeDefault().optional(),
   servingStyle: TastingServingStyleSchema.removeDefault().optional(),
   color: TastingColorSchema.removeDefault().optional(),
   friends: z.array(z.number()).optional(),

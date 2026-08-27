@@ -7,7 +7,6 @@ type Review = MockOutputs["reviews"]["list"]["results"][number];
 export const mockReview = {
   id: 9801,
   name: mockBottle.fullName,
-  rating: 92,
   url: "https://example.com/reviews/lagavulin-16",
   site: {
     id: 9802,
@@ -38,7 +37,6 @@ export const mockReviews = [
   {
     ...mockReview,
     id: 9810,
-    rating: 88,
     url: "https://example.com/reviews/lagavulin-8",
     site: {
       ...mockReview.site!,
@@ -62,7 +60,6 @@ export const mockReviews = [
     ...mockReview,
     id: 9812,
     name: mockBottles[1]!.fullName,
-    rating: 87,
     url: "https://example.com/reviews/macallan-12-sherry-oak",
     site: {
       ...mockReview.site!,
@@ -86,7 +83,6 @@ export const mockReviews = [
     ...mockReview,
     id: 9814,
     name: mockBottles[3]!.fullName,
-    rating: 84,
     url: "https://example.com/reviews/buffalo-trace-bourbon",
     site: {
       ...mockReview.site!,
@@ -110,7 +106,6 @@ export const mockReviews = [
     ...mockReview,
     id: 9816,
     name: mockBottles[4]!.fullName,
-    rating: 91,
     url: "https://example.com/reviews/yamazaki-12",
     article: {
       title: "Yamazaki 12-year-old Review",
@@ -128,7 +123,6 @@ export const mockReviews = [
     ...mockReview,
     id: 9817,
     name: "Mystery Islay Malt 18-year-old",
-    rating: 90,
     url: "https://example.com/reviews/mystery-islay-18",
     article: {
       title: "Mystery Islay Malt Review",
@@ -145,7 +139,6 @@ export const mockReviews = [
   {
     ...mockReview,
     id: 9818,
-    rating: 89,
     url: "https://example.com/reviews/lagavulin-16-dramface",
     site: {
       ...mockReview.site!,
@@ -167,7 +160,6 @@ export const mockReviews = [
   {
     ...mockReview,
     id: 9830,
-    rating: 90,
     url: "https://example.com/reviews/lagavulin-16-words",
     site: {
       ...mockReview.site!,

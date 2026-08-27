@@ -6,15 +6,6 @@ import { describe, expect, it } from "vitest";
 import { ReleaseFamilyContent } from "./releaseFamilyView";
 
 const timestamp = "2026-07-22T12:00:00.000Z";
-const ratingStats = {
-  pass: 1,
-  sip: 2,
-  savor: 3,
-  total: 6,
-  avg: 1.25,
-  percentage: { pass: 16.7, sip: 33.3, savor: 50 },
-};
-
 const group = {
   schemaVersion: 1,
   id: 8,
@@ -28,10 +19,19 @@ const group = {
   statedAge: 18,
   representativeBottleId: 999,
   flavorProfile: "peated",
-  avgRating: 1.25,
-  avgScore: 87,
-  totalScores: 11,
-  ratingStats,
+  medianScore: 87,
+  minScore: 80,
+  maxScore: 95,
+  memberScoreCount: 18,
+  externalScoreCount: 2,
+  scoreCount: 20,
+  tastingBandCounts: {
+    mediocre: 0,
+    good: 1,
+    very_good: 2,
+    outstanding: 3,
+    unicorn: 1,
+  },
   totalTastings: 12,
   totalBottles: 2,
   createdByActorId: 4,
@@ -93,16 +93,18 @@ const bottle = {
   imageUrl: "https://example.com/exact.webp",
   tastingNotes: null,
   suggestedTags: [],
-  avgRating: 2,
-  avgScore: 91,
-  totalScores: 3,
-  ratingStats: {
-    pass: 0,
-    sip: 0,
-    savor: 1,
-    total: 1,
-    avg: 2,
-    percentage: { pass: 0, sip: 0, savor: 100 },
+  medianScore: 91,
+  minScore: 80,
+  maxScore: 99,
+  memberScoreCount: 20,
+  externalScoreCount: 0,
+  scoreCount: 20,
+  tastingBandCounts: {
+    mediocre: 0,
+    good: 0,
+    very_good: 0,
+    outstanding: 1,
+    unicorn: 0,
   },
   totalTastings: 1,
   createdAt: timestamp,
@@ -150,9 +152,8 @@ describe("ReleaseFamilyView", () => {
     expect(html).not.toContain("Single cask");
     expect(html).not.toContain("Cask strength");
     expect(html).not.toContain("1st Fill Oloroso Hogshead cask");
-    expect(html).toContain("1 rating");
+    expect(html).toContain("91 points");
     expect(html).not.toContain("1 tasting");
-    expect(html).toContain("Average rating 2.00");
     expect(html).toContain('src="https://example.com/exact.webp"');
     expect(html).toContain('aria-label="Release pagination"');
     expect(html).toContain("cursor next page: 2");

@@ -5,6 +5,7 @@ import {
   ReviewArticleReviewSchema,
 } from "@peated/server/externalReviews/observation";
 import { getExternalReviewPublicationModeInTransaction } from "@peated/server/externalReviews/publication";
+import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -214,15 +215,15 @@ export async function storeReviewArticleInTransaction(
     > = {
       bottleId,
       name: review.name,
-      rating: review.normalizedRating,
+      legacyNormalizedScore: review.normalizedRating,
+      nativeScoreValue: review.nativeScore?.value ?? null,
+      nativeScoreScale: review.nativeScore?.scale ?? null,
+      nativeScoreDisplay: review.nativeScore?.display ?? null,
       hidden,
     };
     if (origin === "source") {
       values.category = review.category;
       values.reviewerName = review.reviewerName;
-      values.nativeScoreValue = review.nativeScore?.value ?? null;
-      values.nativeScoreScale = review.nativeScore?.scale ?? null;
-      values.nativeScoreDisplay = review.nativeScore?.display ?? null;
     }
     if (review.summary) {
       values.summary = review.summary.text;
@@ -266,7 +267,7 @@ export async function storeReviewArticle(
 ) {
   const input = ReviewArticleInputSchema.parse(rawInput);
 
-  return await db.transaction(async (tx) => {
+  const stored = await db.transaction(async (tx) => {
     const { articleId, storedReviews } = await storeReviewArticleInTransaction(
       tx,
       input,
@@ -278,6 +279,26 @@ export async function storeReviewArticle(
     return {
       articleId,
       reviewIds: storedReviews.map(({ review }) => review.id),
+      changedReviews: storedReviews.map(({ review, previousBottleId }) => ({
+        id: review.id,
+        bottleId: review.bottleId,
+        previousBottleId,
+      })),
     };
   });
+
+  await Promise.all(
+    stored.changedReviews.flatMap((review) =>
+      Array.from(
+        new Set(
+          [review.previousBottleId, review.bottleId].filter(
+            (id): id is number => id !== null && id !== undefined,
+          ),
+        ),
+      ).map((bottleId) =>
+        dispatchBottleStatsRecompute("externalReview", review.id, bottleId),
+      ),
+    ),
+  );
+  return { articleId: stored.articleId, reviewIds: stored.reviewIds };
 }

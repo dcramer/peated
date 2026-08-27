@@ -35,7 +35,7 @@ export function ReviewRows({ reviewList }: { reviewList: Review[] }) {
               scope="col"
               className="hidden px-3 py-2.5 text-right sm:table-cell"
             >
-              Rating
+              Source score
             </th>
           </tr>
         </thead>
@@ -64,7 +64,7 @@ export function ReviewRows({ reviewList }: { reviewList: Review[] }) {
                   </div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  {review.rating}
+                  {review.nativeScore?.display ?? "—"}
                 </td>
               </tr>
             );

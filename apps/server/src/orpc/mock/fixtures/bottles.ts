@@ -16,6 +16,25 @@ type Bottle = MockOutputs["bottles"]["list"]["results"][number];
 type BottleDetails = MockOutputs["bottles"]["details"];
 type User = MockOutputs["auth"]["login"]["user"];
 
+function scoreSummary(medianScore: number, scoreCount: number) {
+  const externalScoreCount = Math.min(4, scoreCount);
+  return {
+    medianScore,
+    minScore: Math.max(0, medianScore - 8),
+    maxScore: Math.min(100, medianScore + 6),
+    memberScoreCount: scoreCount - externalScoreCount,
+    externalScoreCount,
+    scoreCount,
+    tastingBandCounts: {
+      mediocre: 2,
+      good: 8,
+      very_good: 18,
+      outstanding: 42,
+      unicorn: 10,
+    },
+  };
+}
+
 export const mockBottle = {
   id: 9301,
   peatedId: "B9301",
@@ -52,21 +71,7 @@ export const mockBottle = {
     finish: "Long and smoky",
   },
   suggestedTags: ["smoke", "sea salt", "dried fruit"],
-  avgRating: 1.6,
-  avgScore: 89,
-  totalScores: 24,
-  ratingStats: {
-    pass: 2,
-    sip: 18,
-    savor: 60,
-    total: 80,
-    avg: 1.7,
-    percentage: {
-      pass: 2.5,
-      sip: 22.5,
-      savor: 75,
-    },
-  },
+  ...scoreSummary(89, 24),
   totalTastings: 120,
   createdAt: timestamp,
   updatedAt: timestamp,
@@ -74,25 +79,6 @@ export const mockBottle = {
   isLibrary: false,
   hasTasted: false,
 } satisfies Bottle;
-
-function ratingStats(pass: number, sip: number, savor: number) {
-  const total = pass + sip + savor;
-  const percentage = (count: number) =>
-    Number(((count / total) * 100).toFixed(1));
-
-  return {
-    pass,
-    sip,
-    savor,
-    total,
-    avg: Number(((-pass + sip + savor * 2) / total).toFixed(1)),
-    percentage: {
-      pass: percentage(pass),
-      sip: percentage(sip),
-      savor: percentage(savor),
-    },
-  } satisfies Bottle["ratingStats"];
-}
 
 export const mockBottles: Bottle[] = [
   mockBottle,
@@ -115,10 +101,7 @@ export const mockBottles: Bottle[] = [
       finish: "Long, sweet, and gently spiced",
     },
     suggestedTags: ["raisin", "orange peel", "oak", "ginger"],
-    avgRating: 1.5,
-    avgScore: 87,
-    totalScores: 36,
-    ratingStats: ratingStats(5, 30, 65),
+    ...scoreSummary(87, 36),
     totalTastings: 180,
     createdAt: "2026-08-24T10:30:00.000Z",
     updatedAt: "2026-08-25T18:10:00.000Z",
@@ -144,10 +127,7 @@ export const mockBottles: Bottle[] = [
       finish: "Dry, coastal, and lightly smoky",
     },
     suggestedTags: ["brine", "pear", "mineral", "light smoke"],
-    avgRating: 1.6,
-    avgScore: 90,
-    totalScores: 31,
-    ratingStats: ratingStats(3, 20, 47),
+    ...scoreSummary(90, 31),
     totalTastings: 142,
     createdAt: "2026-08-21T09:00:00.000Z",
     updatedAt: "2026-08-23T16:45:00.000Z",
@@ -173,10 +153,7 @@ export const mockBottles: Bottle[] = [
       finish: "Medium, sweet, and gently dry",
     },
     suggestedTags: ["caramel", "vanilla", "oak", "cinnamon"],
-    avgRating: 1.2,
-    avgScore: 84,
-    totalScores: 44,
-    ratingStats: ratingStats(10, 55, 35),
+    ...scoreSummary(84, 44),
     totalTastings: 230,
     createdAt: "2026-08-18T14:20:00.000Z",
     updatedAt: "2026-08-22T11:05:00.000Z",
@@ -200,10 +177,7 @@ export const mockBottles: Bottle[] = [
       finish: "Long, fruity, and lightly spicy",
     },
     suggestedTags: ["peach", "incense", "coconut", "soft oak"],
-    avgRating: 1.6,
-    avgScore: 91,
-    totalScores: 28,
-    ratingStats: ratingStats(4, 24, 52),
+    ...scoreSummary(91, 28),
     totalTastings: 155,
     createdAt: "2026-08-15T08:15:00.000Z",
     updatedAt: "2026-08-20T19:30:00.000Z",
@@ -228,10 +202,7 @@ export const mockBottles: Bottle[] = [
       finish: "Rich, warming, and softly sweet",
     },
     suggestedTags: ["apple", "walnut", "honey", "allspice"],
-    avgRating: 1.6,
-    avgScore: 89,
-    totalScores: 26,
-    ratingStats: ratingStats(2, 18, 40),
+    ...scoreSummary(89, 26),
     totalTastings: 168,
     createdAt: "2026-08-12T17:40:00.000Z",
     updatedAt: "2026-08-19T12:00:00.000Z",
@@ -253,10 +224,7 @@ export const mockBottles: Bottle[] = [
       finish: "Clean, smoky, and mineral",
     },
     suggestedTags: ["ash", "lemon", "pepper", "sea air"],
-    avgRating: 1.4,
-    avgScore: 86,
-    totalScores: 17,
-    ratingStats: ratingStats(4, 25, 41),
+    ...scoreSummary(86, 17),
     totalTastings: 92,
     createdAt: "2026-08-09T13:25:00.000Z",
     updatedAt: "2026-08-17T09:40:00.000Z",
@@ -279,10 +247,7 @@ export const mockBottles: Bottle[] = [
       finish: "Smoky, sweet, and warming",
     },
     suggestedTags: ["charred oak", "vanilla", "dark chocolate", "smoke"],
-    avgRating: 1.5,
-    avgScore: 88,
-    totalScores: 12,
-    ratingStats: ratingStats(3, 17, 30),
+    ...scoreSummary(88, 12),
     totalTastings: 64,
     createdAt: "2026-08-06T11:10:00.000Z",
     updatedAt: "2026-08-16T15:20:00.000Z",
@@ -312,10 +277,7 @@ export const mockBottles: Bottle[] = [
       finish: "Long, smoky, and coastal",
     },
     suggestedTags: ["peat", "brine", "vanilla", "pepper"],
-    avgRating: 1.6,
-    avgScore: 90,
-    totalScores: 18,
-    ratingStats: ratingStats(1, 4, 13),
+    ...scoreSummary(90, 18),
     totalTastings: 42,
     createdAt: "2022-05-27T12:00:00.000Z",
     updatedAt: timestamp,
@@ -345,10 +307,7 @@ export const mockBottles: Bottle[] = [
       finish: "Smoky, fruity, and warming",
     },
     suggestedTags: ["peat", "red fruit", "sea salt", "spice"],
-    avgRating: 1.4,
-    avgScore: 88,
-    totalScores: 12,
-    ratingStats: ratingStats(1, 4, 7),
+    ...scoreSummary(88, 12),
     totalTastings: 33,
     createdAt: "2023-05-26T12:00:00.000Z",
     updatedAt: timestamp,

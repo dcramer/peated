@@ -39,7 +39,7 @@ describe("POST /tastings", () => {
     });
 
     const result = await routerClient.tastings.create(
-      { bottle: bottle.id, rating: 1 },
+      { bottle: bottle.id, ratingBand: "good" },
       { context: { user: defaults.user } },
     );
 
@@ -50,12 +50,12 @@ describe("POST /tastings", () => {
         where: eq(tastings.id, result.tasting.id),
         columns: {
           bottleId: true,
-          rating: true,
+          ratingBand: true,
         },
       }),
     ).toEqual({
       bottleId: bottle.id,
-      rating: 1,
+      ratingBand: "good",
     });
     expect(result.tasting.bottle.fullName).toBe(bottle.fullName);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
@@ -65,58 +65,12 @@ describe("POST /tastings", () => {
     );
   });
 
-  test("creates an advanced score and queues exact Bottle statistics", async ({
-    defaults,
-    fixtures,
-  }) => {
+  test("rejects an unknown band", async ({ defaults, fixtures }) => {
     const bottle = await fixtures.Bottle();
-
-    const result = await routerClient.tastings.create(
-      { bottle: bottle.id, score: 84 },
-      { context: { user: defaults.user } },
-    );
-
-    expect(result.tasting).toMatchObject({ rating: null, score: 84 });
-    await expect(
-      db.query.tastings.findFirst({
-        where: eq(tastings.id, result.tasting.id),
-        columns: { bottleId: true, rating: true, score: true },
-      }),
-    ).resolves.toEqual({ bottleId: bottle.id, rating: null, score: 84 });
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
-      "UpdateBottleStats",
-      { bottleId: bottle.id },
-      STATS_JOB_OPTIONS,
-    );
-  });
-
-  test("accepts zero as an advanced score", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const { tasting } = await routerClient.tastings.create(
-      { bottle: bottle.id, score: 0 },
-      { context: { user: defaults.user } },
-    );
-
-    expect(tasting.score).toBe(0);
-  });
-
-  test("rejects invalid or conflicting advanced scores", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    for (const score of [-1, 101, 84.5]) {
-      await expect(
-        routerClient.tastings.create(
-          { bottle: bottle.id, score },
-          { context: { user: defaults.user } },
-        ),
-      ).rejects.toThrow();
-    }
-
     await expect(
       routerClient.tastings.create(
-        { bottle: bottle.id, rating: 2, score: 90 },
+        // SAFETY: This test must send a value outside the public TypeScript type.
+        { bottle: bottle.id, ratingBand: "unknown" as "good" },
         { context: { user: defaults.user } },
       ),
     ).rejects.toThrow();

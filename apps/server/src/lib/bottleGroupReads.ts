@@ -57,10 +57,10 @@ function bottleOrderBy(sort: BottleGroupBottleSort): SQL<unknown>[] {
       return [sql`${bottles.statedAge} ASC NULLS FIRST`, asc(bottles.id)];
     case "-age":
       return [sql`${bottles.statedAge} DESC NULLS LAST`, asc(bottles.id)];
-    case "rating":
-      return [sql`${bottles.avgRating} ASC NULLS LAST`, asc(bottles.id)];
-    case "-rating":
-      return [sql`${bottles.avgRating} DESC NULLS LAST`, asc(bottles.id)];
+    case "score":
+      return [sql`${bottles.medianScore} ASC NULLS LAST`, asc(bottles.id)];
+    case "-score":
+      return [sql`${bottles.medianScore} DESC NULLS LAST`, asc(bottles.id)];
     case "tastings":
       return [asc(bottles.totalTastings), asc(bottles.id)];
     case "-tastings":

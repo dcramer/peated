@@ -92,7 +92,7 @@ describe("storeReviewArticle", () => {
         nativeScoreValue: 7.8,
         nativeScoreScale: 10,
         nativeScoreDisplay: "7.8/10",
-        rating: 78,
+        legacyNormalizedScore: 78,
         hidden: true,
       },
       {
@@ -102,7 +102,7 @@ describe("storeReviewArticle", () => {
         nativeScoreValue: null,
         nativeScoreScale: null,
         nativeScoreDisplay: null,
-        rating: null,
+        legacyNormalizedScore: null,
         hidden: true,
       },
     ]);
@@ -275,7 +275,7 @@ describe("storeReviewArticle", () => {
       nativeScoreValue: 8.1,
       nativeScoreScale: 10,
       nativeScoreDisplay: "8.1/10",
-      rating: 81,
+      legacyNormalizedScore: 81,
     });
   });
 

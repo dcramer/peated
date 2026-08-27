@@ -159,11 +159,13 @@ export const TastingSerializer = serializer({
       notes: item.notes,
       tags: item.tags || [],
       color: item.color,
-      rating: z
+      ratingBand: item.ratingBand,
+      // TODO(ratings): Remove these fields when historical rating display is retired.
+      legacySimpleRating: z
         .union([z.literal(-1), z.literal(1), z.literal(2)])
         .nullable()
-        .parse(item.rating),
-      score: item.score,
+        .parse(item.legacySimpleRating),
+      legacyStarRating: item.legacyStarRating,
       servingStyle: item.servingStyle,
       friends: attrs.friends,
 

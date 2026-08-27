@@ -26,10 +26,12 @@ export type BottleStatsResult = Omit<
     | "id"
     | "groupId"
     | "totalTastings"
-    | "avgRating"
-    | "avgScore"
-    | "totalScores"
-    | "ratingStats"
+    | "medianScore"
+    | "minScore"
+    | "maxScore"
+    | "memberScoreCount"
+    | "externalScoreCount"
+    | "tastingBandCounts"
     | "updatedAt"
   >,
   "groupId"
@@ -76,10 +78,12 @@ export async function recomputeBottleStatsInTransaction(
       id: bottles.id,
       groupId: bottles.groupId,
       totalTastings: bottles.totalTastings,
-      avgRating: bottles.avgRating,
-      avgScore: bottles.avgScore,
-      totalScores: bottles.totalScores,
-      ratingStats: bottles.ratingStats,
+      medianScore: bottles.medianScore,
+      minScore: bottles.minScore,
+      maxScore: bottles.maxScore,
+      memberScoreCount: bottles.memberScoreCount,
+      externalScoreCount: bottles.externalScoreCount,
+      tastingBandCounts: bottles.tastingBandCounts,
       updatedAt: bottles.updatedAt,
     });
   if (!persisted || persisted.groupId === null) {

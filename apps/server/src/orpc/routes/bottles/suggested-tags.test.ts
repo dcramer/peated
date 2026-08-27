@@ -18,17 +18,17 @@ describe("GET /bottles/:bottle/suggested-tags", () => {
     await fixtures.Tasting({
       bottleId: bottle.id,
       tags: ["solvent", "caramel"],
-      rating: 5,
+      legacyStarRating: 5,
     });
     await fixtures.Tasting({
       bottleId: bottle.id,
       tags: ["cedar", "caramel"],
-      rating: 5,
+      legacyStarRating: 5,
     });
     await fixtures.Tasting({
       bottleId: bottle2.id,
       tags: ["cedar", "caramel"],
-      rating: 5,
+      legacyStarRating: 5,
     });
 
     const { results } = await routerClient.bottles.suggestedTags({

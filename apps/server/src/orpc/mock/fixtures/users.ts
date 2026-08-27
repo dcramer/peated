@@ -12,7 +12,6 @@ export const mockUser = {
   username: "mock-user",
   pictureUrl: null,
   private: false,
-  ratingSystem: "simple",
   email: "mock@example.com",
   verified: true,
   admin: false,

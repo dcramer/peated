@@ -1,20 +1,18 @@
-import { getAdvancedRatingBand } from "@peated/server/constants";
+import { getTastingBand } from "@peated/server/constants";
 import classNames from "../lib/classNames";
 
-export default function AdvancedRatingDisplay({
+export default function ReviewScoreDisplay({
   score,
   count,
-  aggregate = false,
   showBand = true,
   className,
 }: {
   score: number;
   count?: number;
-  aggregate?: boolean;
   showBand?: boolean;
   className?: string;
 }) {
-  const band = getAdvancedRatingBand(score);
+  const band = getTastingBand(score);
 
   return (
     <span
@@ -23,9 +21,7 @@ export default function AdvancedRatingDisplay({
         className,
       )}
     >
-      <span className="font-semibold">
-        {aggregate ? score.toFixed(1) : score} points
-      </span>
+      <span className="font-semibold">{score} points</span>
       {showBand && band ? (
         <span className="text-muted">· {band.label}</span>
       ) : null}

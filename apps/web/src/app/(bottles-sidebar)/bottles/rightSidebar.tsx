@@ -26,12 +26,13 @@ export default function BottleListSidebar() {
           </Button>
         </li>
         <FilterSidebarSection
-          name="minRating"
-          title="Rating"
+          name="minScore"
+          title="Median review score"
           options={[
-            ["2", "Savor"],
-            ["1", "Sip or Better"],
-            ["-1", "Any Rating"],
+            ["95", "95 or better"],
+            ["90", "90 or better"],
+            ["85", "85 or better"],
+            ["80", "80 or better"],
           ]}
         />
         <FilterSidebarSection

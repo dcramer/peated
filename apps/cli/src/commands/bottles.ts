@@ -6,14 +6,18 @@ import {
   bottles,
   bottleTombstones,
   entities,
+  externalReviewSourcePolicies,
+  reviewArticles,
+  reviews,
 } from "@peated/server/db/schema";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
+import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
 import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 
@@ -108,6 +112,7 @@ subcommand
 
     let hasResults = true;
     let offset = 0;
+    const processedBottleIds: number[] = [];
     while (hasResults) {
       hasResults = false;
       const query = await db
@@ -129,9 +134,53 @@ subcommand
       for (const { bottleId } of query) {
         console.log(`Updating stats for Bottle ${bottleId}.`);
         await runJob("UpdateBottleStats", { bottleId });
+        processedBottleIds.push(bottleId);
         hasResults = true;
       }
       offset += step;
+    }
+
+    if (processedBottleIds.length) {
+      const expectedRows = await db
+        .select({ bottleId: reviews.bottleId, count: count(reviews.id) })
+        .from(reviews)
+        .innerJoin(reviewArticles, eq(reviewArticles.id, reviews.articleId))
+        .innerJoin(
+          externalReviewSourcePolicies,
+          eq(
+            externalReviewSourcePolicies.externalSiteId,
+            reviewArticles.externalSiteId,
+          ),
+        )
+        .where(
+          and(
+            inArray(reviews.bottleId, processedBottleIds),
+            countedExternalReviewScoreWhere(),
+          ),
+        )
+        .groupBy(reviews.bottleId);
+      const expectedByBottle = new Map(
+        expectedRows.map(({ bottleId, count }) => [bottleId, count]),
+      );
+      const storedRows = await db
+        .select({
+          bottleId: bottles.id,
+          externalScoreCount: bottles.externalScoreCount,
+        })
+        .from(bottles)
+        .where(inArray(bottles.id, processedBottleIds));
+      const mismatches = storedRows.filter(
+        ({ bottleId, externalScoreCount }) =>
+          externalScoreCount !== (expectedByBottle.get(bottleId) ?? 0),
+      );
+      if (mismatches.length) {
+        throw new Error(
+          `External review score count verification failed for ${mismatches.length} Bottles.`,
+        );
+      }
+      console.log(
+        `Verified external score counts for ${storedRows.length} Bottles.`,
+      );
     }
   });
 

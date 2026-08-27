@@ -23,7 +23,7 @@ describe("GET /entities/:entity/catalog", () => {
       distillerIds: [entity.id],
       category: "bourbon",
       totalTastings: 3,
-      avgRating: 1.5,
+      legacySimpleRatingAverage: 1.5,
     });
     await fixtures.Bottle({
       name: "Bottled Release",
@@ -108,19 +108,19 @@ describe("GET /entities/:entity/catalog", () => {
           id: expect.any(Number),
           fullName: "Summary Entity Overlapping Roles",
           totalTastings: 3,
-          avgRating: 1.5,
+          legacySimpleRatingAverage: 1.5,
         },
         {
           id: expect.any(Number),
           fullName: "Alpha Brand Bottled Release",
           totalTastings: 2,
-          avgRating: null,
+          legacySimpleRatingAverage: null,
         },
         {
           id: expect.any(Number),
           fullName: "Beta Brand Distilled Release",
           totalTastings: 1,
-          avgRating: null,
+          legacySimpleRatingAverage: null,
         },
       ],
     });

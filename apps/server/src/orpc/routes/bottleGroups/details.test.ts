@@ -11,7 +11,7 @@ describe("GET /bottle-groups/:group", () => {
     const bottle = await fixtures.Bottle({ name: "Group Details" });
     await db
       .update(bottleGroups)
-      .set({ avgRating: 1.25, totalTastings: 7 })
+      .set({ legacySimpleRatingAverage: 1.25, totalTastings: 7 })
       .where(eq(bottleGroups.id, bottle.groupId));
 
     const result = await routerClient.bottleGroups.details({
@@ -22,10 +22,10 @@ describe("GET /bottle-groups/:group", () => {
       id: bottle.groupId,
       name: bottle.name,
       representativeBottleId: bottle.id,
-      avgRating: 1.25,
       totalTastings: 7,
       totalBottles: 1,
     });
+    expect(result).not.toHaveProperty("legacySimpleRatingAverage");
     expect(result).not.toHaveProperty("kind");
   });
 

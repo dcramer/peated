@@ -264,10 +264,13 @@ export const BottleSerializer = serializer({
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
 
-      avgRating: item.avgRating,
-      avgScore: item.avgScore,
-      totalScores: item.totalScores,
-      ratingStats: item.ratingStats,
+      medianScore: item.medianScore,
+      minScore: item.minScore,
+      maxScore: item.maxScore,
+      memberScoreCount: item.memberScoreCount,
+      externalScoreCount: item.externalScoreCount,
+      scoreCount: item.memberScoreCount + item.externalScoreCount,
+      tastingBandCounts: item.tastingBandCounts,
       totalTastings: item.totalTastings,
 
       suggestedTags: item.suggestedTags,

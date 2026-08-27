@@ -25,6 +25,7 @@ import events from "./events";
 import externalSites from "./external-sites";
 import flights from "./flights";
 import friends from "./friends";
+import memberReviews from "./memberReviews";
 import notifications from "./notifications";
 import oauth from "./oauth";
 import pendingUploads from "./pendingUploads";
@@ -68,6 +69,7 @@ export interface Router {
   externalSites: typeof externalSites;
   flights: typeof flights;
   friends: typeof friends;
+  memberReviews: typeof memberReviews;
   notifications: typeof notifications;
   oauth: typeof oauth;
   pendingUploads: typeof pendingUploads;
@@ -112,6 +114,7 @@ export default api.router({
   externalSites,
   flights,
   friends,
+  memberReviews,
   smws,
   notifications,
   oauth,

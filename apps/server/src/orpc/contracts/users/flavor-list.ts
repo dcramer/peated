@@ -6,7 +6,7 @@ export default contract
     method: "GET",
     path: "/users/{user}/flavors",
     summary: "List user flavor profiles",
-    description: "Count and score the flavor profiles a user has tasted",
+    description: "Count flavor profiles and top-band tastings for a user",
     operationId: "listUserFlavors",
   })
   .input(
@@ -20,10 +20,10 @@ export default contract
         z.object({
           flavorProfile: z.string(),
           count: z.number(),
-          score: z.number(),
+          topBandCount: z.number(),
         }),
       ),
-      totalScore: z.number(),
+      totalTopBandCount: z.number(),
       totalCount: z.number(),
     }),
   );

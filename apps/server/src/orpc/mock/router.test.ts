@@ -155,7 +155,7 @@ describe("mock oRPC router", () => {
       new Set(bottles.results.map((bottle) => bottle.flavorProfile)).size,
     ).toBeGreaterThan(4);
     expect(
-      new Set(bottles.results.map((bottle) => bottle.avgScore)).size,
+      new Set(bottles.results.map((bottle) => bottle.medianScore)).size,
     ).toBeGreaterThan(4);
     expect(bottles.results.some((bottle) => bottle.imageUrl !== null)).toBe(
       true,

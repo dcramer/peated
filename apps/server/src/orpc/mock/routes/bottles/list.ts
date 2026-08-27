@@ -72,9 +72,7 @@ export default mockOS.bottles.list.handler(
       (omittedFacet === "ageBand" ||
         input.ageBand == null ||
         matchesAgeBand(bottle, input.ageBand)) &&
-      (input.minRating == null ||
-        (bottle.avgRating ?? -1) >= input.minRating) &&
-      (input.minScore == null || (bottle.avgScore ?? 0) >= input.minScore) &&
+      (input.minScore == null || (bottle.medianScore ?? 0) >= input.minScore) &&
       (input.flight == null || flightBottleIds?.includes(bottle.id) === true) &&
       (input.filter !== "following" ||
         bottle.brand.id === 9201 ||
@@ -109,10 +107,10 @@ export default mockOS.bottles.list.handler(
           return direction * left.brand.name.localeCompare(right.brand.name);
         case "age":
           return direction * ((left.statedAge ?? 0) - (right.statedAge ?? 0));
-        case "rating":
-          return direction * ((left.avgRating ?? -1) - (right.avgRating ?? -1));
         case "score":
-          return direction * ((left.avgScore ?? 0) - (right.avgScore ?? 0));
+          return (
+            direction * ((left.medianScore ?? 0) - (right.medianScore ?? 0))
+          );
         case "tastings":
           return direction * (left.totalTastings - right.totalTastings);
         case "rank":

@@ -1,11 +1,21 @@
 "use client";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
-import { getAdvancedRatingBand } from "@peated/server/constants";
+import { getTastingBand } from "@peated/server/constants";
 import type { Outputs } from "@peated/server/orpc/router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import useAuth from "@peated/web/hooks/useAuth";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { useState } from "react";
 import { useORPC } from "../lib/orpc/context";
+import Button from "./button";
 import Heading from "./heading";
+import TextAreaField from "./textAreaField";
+import TextInput from "./textInput";
 
 const publicationDateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -24,8 +34,171 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
       },
     }),
   );
+  const {
+    data: { results: memberResults },
+  } = useSuspenseQuery(
+    orpc.memberReviews.list.queryOptions({ input: { bottle: bottleId } }),
+  );
 
-  return <BottleReviewList results={results} />;
+  return (
+    <>
+      <MyMemberReview bottleId={bottleId} />
+      <MemberReviewList results={memberResults} />
+      <BottleReviewList results={results} />
+    </>
+  );
+}
+
+type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
+
+function MyMemberReview({ bottleId }: { bottleId: number }) {
+  const { user } = useAuth();
+  const orpc = useORPC();
+  const mineOptions = orpc.memberReviews.mine.queryOptions({
+    input: { bottle: bottleId },
+  });
+  const { data: review } = useQuery({ ...mineOptions, enabled: Boolean(user) });
+
+  if (!user) return null;
+
+  return (
+    <MemberReviewForm
+      key={review ? `${review.id}:${review.updatedAt}` : "new"}
+      bottleId={bottleId}
+      review={review}
+      mineQueryKey={mineOptions.queryKey}
+    />
+  );
+}
+
+function MemberReviewForm({
+  bottleId,
+  review,
+  mineQueryKey,
+}: {
+  bottleId: number;
+  review: Outputs["memberReviews"]["mine"] | undefined;
+  mineQueryKey: readonly unknown[];
+}) {
+  const orpc = useORPC();
+  const queryClient = useQueryClient();
+  const saveMutation = useMutation(orpc.memberReviews.upsert.mutationOptions());
+  const deleteMutation = useMutation(
+    orpc.memberReviews.delete.mutationOptions(),
+  );
+  const [score, setScore] = useState(review ? String(review.score) : "");
+  const [notes, setNotes] = useState(review?.notes ?? "");
+
+  async function refresh() {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: mineQueryKey }),
+      queryClient.invalidateQueries({
+        queryKey: orpc.memberReviews.list.key({
+          input: { bottle: bottleId },
+        }),
+      }),
+    ]);
+  }
+
+  const scoreNumber = Number(score);
+  const validScore =
+    score !== "" &&
+    Number.isInteger(scoreNumber) &&
+    scoreNumber >= 0 &&
+    scoreNumber <= 100;
+
+  return (
+    <section className="mb-6 rounded-lg border border-slate-800 p-4">
+      <Heading as="h3">Your review</Heading>
+      <form
+        className="space-y-4"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (!validScore) return;
+          await saveMutation.mutateAsync({
+            bottle: bottleId,
+            score: scoreNumber,
+            notes: notes.trim() || null,
+          });
+          await refresh();
+        }}
+      >
+        <label
+          htmlFor="member-review-score"
+          className="block text-sm font-medium"
+        >
+          Score
+          <TextInput
+            id="member-review-score"
+            className="mt-1"
+            type="number"
+            min={0}
+            max={100}
+            step={1}
+            inputMode="numeric"
+            value={score}
+            suffixLabel="/ 100"
+            onChange={(event) => setScore(event.target.value)}
+          />
+        </label>
+        <TextAreaField
+          name="member-review-notes"
+          label="Notes"
+          rows={4}
+          value={notes}
+          onChange={(event) => setNotes(event.target.value)}
+        />
+        <div className="flex gap-2">
+          <Button
+            type="submit"
+            color="highlight"
+            disabled={!validScore || saveMutation.isPending}
+          >
+            {review ? "Update review" : "Save review"}
+          </Button>
+          {review ? (
+            <Button
+              type="button"
+              color="danger"
+              disabled={deleteMutation.isPending}
+              onClick={async () => {
+                await deleteMutation.mutateAsync({ bottle: bottleId });
+                setScore("");
+                setNotes("");
+                await refresh();
+              }}
+            >
+              Delete
+            </Button>
+          ) : null}
+        </div>
+      </form>
+    </section>
+  );
+}
+
+function MemberReviewList({ results }: { results: MemberReview[] }) {
+  if (!results.length) return null;
+  return (
+    <section className="mb-6">
+      <Heading as="h3">Member reviews</Heading>
+      <ul className="divide-y divide-slate-800">
+        {results.map((review) => (
+          <li key={review.id} className="py-4 first:pt-2">
+            <div className="flex items-baseline justify-between gap-4">
+              <span className="font-semibold">{review.createdBy.username}</span>
+              <span className="font-semibold">{review.score}/100</span>
+            </div>
+            {review.notes ? (
+              <p className="mt-2 whitespace-pre-wrap text-sm text-slate-200">
+                {review.notes}
+              </p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 type ReviewListItem = Outputs["reviews"]["list"]["results"][number];
@@ -42,7 +215,7 @@ export function BottleReviewList({ results }: { results: ReviewListItem[] }) {
           const site = review.site!;
           const nativeBand =
             review.nativeScore?.scale === 100
-              ? getAdvancedRatingBand(review.nativeScore.value)
+              ? getTastingBand(review.nativeScore.value)
               : null;
           return (
             <li key={review.id} className="py-4 first:pt-2">

@@ -1,4 +1,4 @@
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
+import { EMPTY_TASTING_BAND_COUNTS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
@@ -31,23 +31,17 @@ export default implement(userTastingStatsContract).handler(async function ({
 
   const ages: number[] = [];
   const bottleCounts = new Map<number, number>();
-  const ratings = { total: 0, pass: 0, sip: 0, savor: 0 };
+  const bands = { total: 0, ...EMPTY_TASTING_BAND_COUNTS };
   let total = 0;
   let unstatedCount = 0;
 
   try {
     for await (const rows of scanUserTastingBottles(user.id)) {
       total += rows.length;
-      for (const { bottle, rating } of rows) {
-        if (rating === SIMPLE_RATING_VALUES.PASS) {
-          ratings.pass += 1;
-          ratings.total += 1;
-        } else if (rating === SIMPLE_RATING_VALUES.SIP) {
-          ratings.sip += 1;
-          ratings.total += 1;
-        } else if (rating === SIMPLE_RATING_VALUES.SAVOR) {
-          ratings.savor += 1;
-          ratings.total += 1;
+      for (const { bottle, ratingBand } of rows) {
+        if (ratingBand !== null) {
+          bands[ratingBand] += 1;
+          bands.total += 1;
         }
 
         if (bottle) {
@@ -84,7 +78,7 @@ export default implement(userTastingStatsContract).handler(async function ({
   return {
     total,
     uniqueBottles: bottleCounts.size,
-    ratings,
+    bands,
     mostTastedBottle: mostTastedBottle
       ? {
           id: mostTastedBottle.id,

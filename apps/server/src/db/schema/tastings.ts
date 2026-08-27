@@ -16,13 +16,14 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { SERVING_STYLE_LIST } from "../../constants";
+import { SERVING_STYLE_LIST, TASTING_BAND_IDS } from "../../constants";
 import { badgeAwards } from "./badges";
 import { bottles } from "./bottles";
 import { flights } from "./flights";
 import { users } from "./users";
 
 export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
+export const tastingBandEnum = pgEnum("tasting_band", TASTING_BAND_IDS);
 
 /**
  * User-authored tasting records.
@@ -44,9 +45,13 @@ export const tastings = pgTable(
       .default(sql`array[]::varchar[]`)
       .notNull(),
     color: integer("color"),
-    ratingLegacy: doublePrecision("rating_legacy"),
-    rating: smallint("rating"),
-    score: smallint("score"),
+    ratingBand: tastingBandEnum("rating_band"),
+    // Historical 0-5 values are read-only and excluded from current summaries.
+    // TODO(ratings): Drop this column when historical rating display is retired.
+    legacyStarRating: doublePrecision("legacy_star_rating"),
+    // Historical Pass/Sip/Savor values are read-only and excluded from current summaries.
+    // TODO(ratings): Drop this column when historical rating display is retired.
+    legacySimpleRating: smallint("legacy_simple_rating"),
     imageUrl: text("image_url"),
     notes: text("notes"),
     servingStyle: servingStyleEnum("serving_style"),
@@ -76,14 +81,6 @@ export const tastings = pgTable(
     index("tasting_release_idx").on(table.legacyReleaseId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
-    check(
-      "tasting_score_check",
-      sql`${table.score} IS NULL OR (${table.score} >= 0 AND ${table.score} <= 100)`,
-    ),
-    check(
-      "tasting_rating_system_check",
-      sql`${table.rating} IS NULL OR ${table.score} IS NULL`,
-    ),
   ],
 );
 

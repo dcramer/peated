@@ -113,6 +113,10 @@ function buildCreateBottleDecision({
   });
 }
 
+function nativeScore(value: number) {
+  return { value, scale: 100, display: `${value}/100` };
+}
+
 async function findReviewByUrl(url: string) {
   const [result] = await db
     .select({ review: reviews })
@@ -161,7 +165,7 @@ describe("POST /reviews", () => {
           site: site.type,
           name: "Unauthorized Review Bottle",
           issue: "Default",
-          rating: 89,
+          nativeScore: nativeScore(89),
           url: "https://example.com/reviews/unauthorized",
           category: "single_malt",
         },
@@ -184,7 +188,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: "Unresolved Review Bottle",
         issue: "Default",
-        rating: 89,
+        nativeScore: nativeScore(89),
         url,
         category: "single_malt",
       },
@@ -197,7 +201,8 @@ describe("POST /reviews", () => {
       articleId: expect.any(Number),
       bottleId: null,
       name: "Unresolved Review Bottle",
-      rating: 89,
+      legacyNormalizedScore: null,
+      nativeScoreValue: 89,
       sourceKey: url,
     });
     expect(
@@ -259,7 +264,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: "Fetched Review Bottle",
         issue: "Manual correction",
-        rating: 90,
+        nativeScore: nativeScore(90),
         url,
         category: "single_malt",
       },
@@ -276,9 +281,10 @@ describe("POST /reviews", () => {
       contentHash: "sha256:fetched",
     });
     expect(await findReviewByUrl(url)).toMatchObject({
-      rating: 90,
+      legacyNormalizedScore: null,
+      nativeScoreValue: 90,
       reviewerName: "Source Reviewer",
-      nativeScoreDisplay: "8.8/10",
+      nativeScoreDisplay: "90/100",
       summaryContentHash: "sha256:fetched",
       summaryGeneratedAt: generatedAt,
     });
@@ -299,7 +305,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: bottle.fullName,
         issue: "Default",
-        rating: 91,
+        nativeScore: nativeScore(91),
         url,
         category: bottle.category,
       },
@@ -333,7 +339,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: rawName,
         issue: "Default",
-        rating: 91,
+        nativeScore: nativeScore(91),
         url,
         category: bottle.category,
       },
@@ -379,7 +385,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: rawName,
         issue: "Default",
-        rating: 92,
+        nativeScore: nativeScore(92),
         url,
         category: classifierBottle.category,
       },
@@ -414,7 +420,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: aliasName,
         issue: "Default",
-        rating: 92,
+        nativeScore: nativeScore(92),
         url,
         category: bottle.category,
       },
@@ -461,7 +467,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: reviewName,
         issue: "Default",
-        rating: 93,
+        nativeScore: nativeScore(93),
         url,
         category: bottle.category,
       },
@@ -514,7 +520,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: `${brand.name} Created Review Bottle`,
         issue: "Default",
-        rating: 94,
+        nativeScore: nativeScore(94),
         url,
         category: "single_malt",
       },
@@ -563,7 +569,7 @@ describe("POST /reviews", () => {
           site: site.type,
           name: "Missing Review Bottle",
           issue: "Default",
-          rating: 89,
+          nativeScore: nativeScore(89),
           url,
           category: "single_malt",
         },
@@ -614,7 +620,7 @@ describe("POST /reviews", () => {
             site: site.type,
             name: bottle.fullName,
             issue: "Default",
-            rating: 89,
+            nativeScore: nativeScore(89),
             url,
             category: bottle.category,
           },
@@ -673,7 +679,7 @@ describe("POST /reviews", () => {
           site: site.type,
           name: reviewName,
           issue: "Default",
-          rating: 99,
+          nativeScore: nativeScore(99),
           url: retryUrl,
           category: selectedBottle.category,
         },
@@ -744,7 +750,7 @@ describe("POST /reviews", () => {
           site: site.type,
           name: reviewName,
           issue,
-          rating: 96,
+          nativeScore: nativeScore(96),
           url: resultUrl,
           category: incomingBottle.category,
         },
@@ -758,7 +764,8 @@ describe("POST /reviews", () => {
       expect(await findReviewByUrl(resultUrl)).toMatchObject({
         id: result.id,
         bottleId: committedBottle.id,
-        rating: 96,
+        legacyNormalizedScore: null,
+        nativeScoreValue: 96,
       });
       expect(
         await db.query.bottleAliases.findFirst({
@@ -804,7 +811,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: reviewName,
         issue,
-        rating: 97,
+        nativeScore: nativeScore(97),
         url,
         category: bottle.category,
       },
@@ -814,7 +821,8 @@ describe("POST /reviews", () => {
     expect(await findReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
-      rating: 97,
+      legacyNormalizedScore: null,
+      nativeScoreValue: 97,
     });
   });
 
@@ -849,7 +857,7 @@ describe("POST /reviews", () => {
         site: site.type,
         name: aliasName,
         issue,
-        rating: 98,
+        nativeScore: nativeScore(98),
         url,
         category: incomingBottle.category,
       },
@@ -859,7 +867,8 @@ describe("POST /reviews", () => {
     expect(await findReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: durableBottle.id,
-      rating: 98,
+      legacyNormalizedScore: null,
+      nativeScoreValue: 98,
     });
     expect(
       await db.query.incomingBottleDecisionLogs.findFirst({
@@ -881,7 +890,7 @@ describe("POST /reviews", () => {
           site: "not-a-site" as never,
           name: "Invalid Site Review",
           issue: "Default",
-          rating: 89,
+          nativeScore: nativeScore(89),
           url: "https://example.com/reviews/invalid-site",
           category: "single_malt",
         },
@@ -892,7 +901,7 @@ describe("POST /reviews", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
-  test("rejects ratings outside the normalized scale", async ({ fixtures }) => {
+  test("rejects scores outside the source scale", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const admin = await fixtures.User({ admin: true });
 
@@ -902,7 +911,7 @@ describe("POST /reviews", () => {
           site: site.type,
           name: "Invalid Rating Review",
           issue: "Default",
-          rating: 101,
+          nativeScore: { value: 101, scale: 100, display: "101/100" },
           url: "https://example.com/reviews/invalid-rating",
           category: "single_malt",
         },

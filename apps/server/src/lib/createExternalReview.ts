@@ -14,6 +14,7 @@ import {
   resolveBottleReferenceTarget,
   resolveScrapedBottleReferenceTarget,
 } from "@peated/server/lib/bottleReferenceResolution";
+import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import {
   getIncomingBottleDecisionFromResolutionSource,
@@ -144,8 +145,8 @@ export async function createExternalReview(
               name: reviewName,
               category: input.category,
               reviewerName: null,
-              nativeScore: null,
-              normalizedRating: input.rating,
+              nativeScore: input.nativeScore,
+              normalizedRating: null,
               bottleId,
               summary: null,
             },
@@ -164,7 +165,7 @@ export async function createExternalReview(
 
       const appliedIncomingIdentity = review.bottleId === bottleId;
       if (!bottleId || !appliedIncomingIdentity) {
-        return { review, aliasAssignment: null };
+        return { review, previousBottleId, aliasAssignment: null };
       }
 
       const aliasAssignment = await assignBottleAliasInTransaction(tx, {
@@ -219,7 +220,7 @@ export async function createExternalReview(
         });
       }
 
-      return { review, aliasAssignment };
+      return { review, previousBottleId, aliasAssignment };
     });
   } catch (error) {
     if (error instanceof ActiveBottleSelectionError) {
@@ -233,6 +234,22 @@ export async function createExternalReview(
       review: { site: input.site, name: reviewName, url: input.url },
     });
   }
+
+  await Promise.all(
+    Array.from(
+      new Set(
+        [stored.previousBottleId, stored.review.bottleId].filter(
+          (id): id is number => id !== null && id !== undefined,
+        ),
+      ),
+    ).map((bottleId) =>
+      dispatchBottleStatsRecompute(
+        "externalReview",
+        stored.review.id,
+        bottleId,
+      ),
+    ),
+  );
 
   return stored.review;
 }

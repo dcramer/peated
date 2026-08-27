@@ -122,7 +122,7 @@ export default implement(entityCatalogContract).handler(async function ({
         id: bottles.id,
         fullName: bottles.fullName,
         totalTastings: bottles.totalTastings,
-        avgRating: bottles.avgRating,
+        medianScore: bottles.medianScore,
       })
       .from(bottles)
       .where(associatedBottle)

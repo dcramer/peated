@@ -152,7 +152,7 @@ describe("GET /reviews", () => {
       bottleId: bottle.id,
       externalSiteId: site.id,
       url: "https://example.com/latest-review",
-      rating: 84,
+      legacyNormalizedScore: 84,
       reviewerName: "A. Critic",
       nativeScoreValue: 8.4,
       nativeScoreScale: 10,
@@ -241,7 +241,6 @@ describe("GET /reviews", () => {
     ]);
     expect(firstPage.results[0]).toMatchObject({
       url: "https://example.com/latest-review",
-      rating: 84,
       site: { id: site.id, name: "Whisky Advocate" },
       reviewerName: "A. Critic",
       article: {
@@ -314,7 +313,7 @@ describe("GET /reviews", () => {
     const review = await fixtures.Review({
       bottleId: bottle.id,
       externalSiteId: site.id,
-      rating: 78,
+      legacyNormalizedScore: 78,
       reviewerName: "A. Critic",
       nativeScoreValue: 7.8,
       nativeScoreScale: 10,
@@ -342,7 +341,6 @@ describe("GET /reviews", () => {
     expect(results).toMatchObject([
       {
         id: review.id,
-        rating: 78,
         article: {
           title: "A review of Springbank 12 Cask Strength",
           publishedAt: "2026-07-22T00:00:00.000Z",

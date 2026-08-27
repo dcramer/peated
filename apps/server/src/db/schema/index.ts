@@ -17,6 +17,7 @@ export * from "./flights";
 export * from "./follows";
 export * from "./identities";
 export * from "./incomingBottleDecisionLogs";
+export * from "./memberReviews";
 export * from "./notifications";
 export * from "./oauth";
 export * from "./passkeys";

@@ -20,9 +20,6 @@ export const NormalizedReviewRatingSchema = z.number().int().min(0).max(100);
 export const ReviewSchema = z.object({
   id: z.number().describe("Unique identifier for the review"),
   name: z.string().describe("Name of the reviewed product"),
-  rating: NormalizedReviewRatingSchema.nullable().describe(
-    "Normalized rating given in the review, when available",
-  ),
   url: z.string().describe("URL to the original review"),
   site: ExternalSiteSchema.optional().describe(
     "External site where the review was published",
@@ -57,9 +54,9 @@ export const ReviewInputSchema = z.object({
   category: CategoryEnum.nullable()
     .default(null)
     .describe("Category of the whisky being reviewed"),
-  rating: NormalizedReviewRatingSchema.describe(
-    "Normalized rating given in the review",
-  ),
+  nativeScore: NativeScoreSchema.nullable()
+    .default(null)
+    .describe("Score exactly as displayed by the publication"),
   issue: z
     .string()
     .trim()

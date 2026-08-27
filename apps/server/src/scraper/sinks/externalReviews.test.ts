@@ -77,7 +77,7 @@ test("Whisky Advocate observations use article and source identity", async ({
       articleId: expect.any(Number),
       bottleId: bottle.id,
       name: bottle.fullName,
-      rating: 94,
+      legacyNormalizedScore: 94,
       nativeScoreValue: 93.5,
       nativeScoreScale: 100,
       nativeScoreDisplay: "93.5/100",

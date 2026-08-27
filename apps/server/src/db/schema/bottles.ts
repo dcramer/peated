@@ -26,6 +26,10 @@ import type {
   BottleExtractedDetails,
   ProposedBottle,
 } from "@peated/bottle-classifier/internal/types";
+import {
+  EMPTY_TASTING_BAND_COUNTS,
+  type TastingBandCounts,
+} from "../../constants";
 import { tsvector } from "../columns";
 import { vector } from "../columns/vector";
 import { actors } from "./actors";
@@ -208,12 +212,25 @@ export const bottles = pgTable(
       .array()
       .default(sql`array[]::varchar[]`)
       .notNull(),
-    avgRating: doublePrecision("avg_rating"),
-    avgScore: doublePrecision("avg_score"),
-    totalScores: bigint("total_scores", { mode: "number" })
+    // Historical Pass/Sip/Savor average. New reads and writes must not use it.
+    // TODO(ratings): Drop this column when historical rating data no longer needs retention.
+    legacySimpleRatingAverage: doublePrecision("avg_rating"),
+    medianScore: smallint("median_score"),
+    minScore: smallint("min_score"),
+    maxScore: smallint("max_score"),
+    memberScoreCount: bigint("member_score_count", { mode: "number" })
       .default(0)
       .notNull(),
-    ratingStats: jsonb("rating_stats")
+    externalScoreCount: bigint("external_score_count", { mode: "number" })
+      .default(0)
+      .notNull(),
+    tastingBandCounts: jsonb("tasting_band_counts")
+      .default(EMPTY_TASTING_BAND_COUNTS)
+      .notNull()
+      .$type<TastingBandCounts>(),
+    // Historical Pass/Sip/Savor counts. New reads and writes must not use them.
+    // TODO(ratings): Drop this column when historical rating data no longer needs retention.
+    legacySimpleRatingStats: jsonb("rating_stats")
       .default(DEFAULT_RATING_STATS)
       .notNull()
       .$type<RatingStats>(),
@@ -314,12 +331,25 @@ export const bottleGroups = pgTable(
     representativeBottleId: bigint("representative_bottle_id", {
       mode: "number",
     }),
-    avgRating: doublePrecision("avg_rating"),
-    avgScore: doublePrecision("avg_score"),
-    totalScores: bigint("total_scores", { mode: "number" })
+    // Historical Pass/Sip/Savor average. New reads and writes must not use it.
+    // TODO(ratings): Drop this column when historical rating data no longer needs retention.
+    legacySimpleRatingAverage: doublePrecision("avg_rating"),
+    medianScore: smallint("median_score"),
+    minScore: smallint("min_score"),
+    maxScore: smallint("max_score"),
+    memberScoreCount: bigint("member_score_count", { mode: "number" })
       .default(0)
       .notNull(),
-    ratingStats: jsonb("rating_stats")
+    externalScoreCount: bigint("external_score_count", { mode: "number" })
+      .default(0)
+      .notNull(),
+    tastingBandCounts: jsonb("tasting_band_counts")
+      .default(EMPTY_TASTING_BAND_COUNTS)
+      .notNull()
+      .$type<TastingBandCounts>(),
+    // Historical Pass/Sip/Savor counts. New reads and writes must not use them.
+    // TODO(ratings): Drop this column when historical rating data no longer needs retention.
+    legacySimpleRatingStats: jsonb("rating_stats")
       .default(DEFAULT_RATING_STATS)
       .notNull()
       .$type<RatingStats>(),

@@ -558,7 +558,7 @@ subcommand
               .orderBy(sql`RANDOM()`)
               .limit(1)
           )[0].id,
-          rating: 4.5,
+          ratingBand: "outstanding",
           createdById: toUserId,
         })
         .returning();
