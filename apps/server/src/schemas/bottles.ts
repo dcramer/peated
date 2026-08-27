@@ -284,6 +284,22 @@ export const BottleSchema = z.object({
     .describe("Whether the current user has recorded a tasting this bottle"),
 });
 
+export const BOTTLE_RECOMMENDATION_REASON =
+  "People who liked this bottle also liked these bottles." as const;
+
+export const BottleRecommendationsSchema = z.object({
+  reason: z
+    .literal(BOTTLE_RECOMMENDATION_REASON)
+    .readonly()
+    .describe("Text that explains why these bottles are shown"),
+  results: z
+    .array(BottleSchema)
+    .readonly()
+    .describe(
+      "Recommended Bottles in display order, including community rating counts",
+    ),
+});
+
 export const EntityChoiceInputSchema = EntityInputSchema.extend({
   id: z.number().nullish().describe("Optional ID for the entity"),
 });
