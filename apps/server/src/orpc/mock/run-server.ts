@@ -2,7 +2,7 @@ import { createAdaptorServer } from "@hono/node-server";
 import { mockApp } from "./app";
 
 const host = "localhost";
-const port = 4999;
+const port = Number(process.env.PORT ?? 4999);
 
 const server = createAdaptorServer({
   fetch: mockApp.fetch,

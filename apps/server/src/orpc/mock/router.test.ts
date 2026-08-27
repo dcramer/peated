@@ -6,6 +6,7 @@ import {
   mockBadges,
   mockBadgeUsers,
   mockBottle,
+  mockBottleGroup,
   mockBottlePrices,
   mockBottles,
   mockBottleTags,
@@ -147,6 +148,12 @@ describe("mock oRPC router", () => {
     expect(
       new Set(bottles.results.map((bottle) => bottle.avgScore)).size,
     ).toBeGreaterThan(4);
+    expect(bottles.results.some((bottle) => bottle.imageUrl !== null)).toBe(
+      true,
+    );
+    expect(bottles.results.some((bottle) => bottle.imageUrl === null)).toBe(
+      true,
+    );
 
     const firstPage = await anonymousClient.countries.list({ limit: 2 });
     expect(firstPage.results).toHaveLength(2);
@@ -228,6 +235,32 @@ describe("mock oRPC router", () => {
       anonymousClient.comments.list({ tasting: mockTasting.id }),
     ).resolves.toMatchObject({
       results: mockCommentsByTasting.get(mockTasting.id),
+    });
+  });
+
+  it("returns a Bottle release family", async () => {
+    await expect(
+      anonymousClient.bottleGroups.details({ group: mockBottleGroup.id }),
+    ).resolves.toEqual(mockBottleGroup);
+
+    const releases = await anonymousClient.bottleGroups.bottles({
+      group: mockBottleGroup.id,
+      sort: "-releaseYear",
+    });
+    expect(releases.results.map((bottle) => bottle.releaseYear)).toEqual([
+      2023, 2022,
+    ]);
+    expect(releases.results.every((bottle) => bottle.imageUrl !== null)).toBe(
+      true,
+    );
+
+    await expect(
+      anonymousClient.bottleGroups.bottles({
+        group: mockBottleGroup.id,
+        query: "Warehouse 1",
+      }),
+    ).resolves.toMatchObject({
+      results: [expect.objectContaining({ edition: "Warehouse 1" })],
     });
   });
 
@@ -558,6 +591,13 @@ describe("mock oRPC router", () => {
     ).rejects.toMatchObject({
       code: "NOT_FOUND",
       message: "Mock bottle not found.",
+    });
+
+    await expect(
+      anonymousClient.bottleGroups.details({ group: 9999 }),
+    ).rejects.toMatchObject({
+      code: "NOT_FOUND",
+      message: "Mock Bottle Group not found.",
     });
   });
 

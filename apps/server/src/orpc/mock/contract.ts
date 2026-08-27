@@ -3,6 +3,8 @@ import activityList from "@peated/server/orpc/contracts/activity/list";
 import login from "@peated/server/orpc/contracts/auth/login";
 import badgeDetails from "@peated/server/orpc/contracts/badges/details";
 import badgeUserList from "@peated/server/orpc/contracts/badges/user-list";
+import bottleGroupBottles from "@peated/server/orpc/contracts/bottleGroups/bottles";
+import bottleGroupDetails from "@peated/server/orpc/contracts/bottleGroups/details";
 import bottleDetails from "@peated/server/orpc/contracts/bottles/details";
 import bottleList from "@peated/server/orpc/contracts/bottles/list";
 import bottlePriceList from "@peated/server/orpc/contracts/bottles/prices/list";
@@ -52,6 +54,10 @@ export const mockContract = {
   badges: {
     details: badgeDetails,
     userList: badgeUserList,
+  },
+  bottleGroups: {
+    bottles: bottleGroupBottles,
+    details: bottleGroupDetails,
   },
   bottles: {
     details: bottleDetails,

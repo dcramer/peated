@@ -44,4 +44,17 @@ describe("mock API over HTTP", () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ ok: true });
   });
+
+  it("serves local images", async () => {
+    const response = await mockApp.request(
+      "/_assets/cairdeas-warehouse-1.webp",
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("image/webp");
+    expect((await response.arrayBuffer()).byteLength).toBeGreaterThan(0);
+
+    await expect(
+      mockApp.request("/_assets/missing.webp"),
+    ).resolves.toMatchObject({ status: 404 });
+  });
 });

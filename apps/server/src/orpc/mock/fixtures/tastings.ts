@@ -1,6 +1,6 @@
 import type { MockOutputs } from "../contract";
 import { mockBottle, mockBottleFor, mockBottles } from "./bottles";
-import { timestamp } from "./constants";
+import { mockImageUrls, timestamp } from "./constants";
 import { mockFriends, mockPublicUser } from "./users";
 
 type Tasting = MockOutputs["tastings"]["details"];
@@ -102,6 +102,21 @@ export const mockTastings = [
     comments: 0,
     toasts: 6,
     createdAt: "2026-08-14T18:00:00.000Z",
+  },
+  {
+    ...mockTasting,
+    id: 9607,
+    imageUrl: mockImageUrls.cairdeasWarehouse1,
+    notes: "Coastal smoke, vanilla, pepper, and a salty finish.",
+    bottle: mockBottles[8]!,
+    rating: 2,
+    tags: ["peat", "brine", "vanilla", "pepper"],
+    color: 11,
+    servingStyle: "neat",
+    comments: 0,
+    toasts: 4,
+    createdAt: "2026-08-12T20:15:00.000Z",
+    createdBy: mockFriends[0]!,
   },
 ] satisfies Tasting[];
 
