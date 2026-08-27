@@ -204,7 +204,7 @@ export default procedure
         type: entity.type,
         suggestedKind: inferKindFromLegacyTypes(entity.type),
         ownerId: entity.ownerId,
-        owner: entity.ownerId ? ownersById.get(entity.ownerId) : null,
+        owner: entity.ownerId ? (ownersById.get(entity.ownerId) ?? null) : null,
         description: entity.description,
         descriptionSrc: entity.descriptionSrc,
         yearEstablished: entity.yearEstablished,
