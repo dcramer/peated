@@ -98,8 +98,8 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 - Use scoped search when one query can target several record types. Combine a scope menu and search input in one 40px tonal control. Open the menu over its stationary scope trigger, align its top and left outer edges with the control, align its option labels with the active scope label, and keep its divided header within the same 40px outer height. List the scopes without a redundant purpose label. Close the scope menu and focus the existing query input when the member presses that input. The open scope menu provides the active treatment, so suppress the query control's active ring until that menu closes. Show set sizes only when the caller supplies them. Keep the active scope visible and prevent horizontal overflow at narrow widths.
 - Use a segmented control for one choice among two to four short options. Keep every segment the same height and width. Use accent only for the current choice.
 - Use a switch for an independent setting that takes effect immediately. Put its label and consequence beside the control.
-- Use the verdict input for one member's Pass, Sip, or Savor choice. Keep the three choices on one equal-width track and allow the nullable value to be cleared.
-- Use the score input for Peated's whole-number 0–100 community score. Show the canonical score band and keep the control separate from verdicts and critic reviews.
+- Use one score input with two grains. A member can pick one of five equal-width bands or type one whole-number point from 0 through 100. Switching grain clears the current value instead of converting it.
+- Choose the grain per tasting. Remember the last grain only as the next default. Do not lock the account to one grain.
 - Use the colour input for Peated's fixed 0–20 whisky colour scale. Draw all 21 reference steps as one continuous strip, support keyboard changes through a native range input, and let the member state that they are unsure.
 - Use the picture input to open the native file picker. Start with one tonal action. When a picture exists, make the preview the change action and show explicit change and remove controls.
 - Use a fieldset and legend for grouped controls. Use a label only for a single field.
@@ -107,48 +107,49 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 
 ## Rating language
 
-Peated has three rating populations. Keep their storage, aggregates, and names separate.
+Peated has one 100-point measure entered at two grains.
 
-### Community verdict
+### Bands
 
-- A community verdict is one member's Pass, Sip, or Savor selection.
-- Show one verdict as a positional mark on a fixed pass-to-savor track.
-- Show an aggregate as a fixed pass, sip, savor distribution with its total rating count.
-- Never average a verdict or print a lone verdict percentage.
-- A verdict sort is named “Community verdict.” A product feature can define a minimum sample size for that sort without hiding the distribution.
+- Use five bands everywhere: Mediocre under 80, Good 80–84, Very good 85–89, Outstanding 90–94, and Unicorn 95–100.
+- A band is a coarse range. Never convert a picked band into a point or fabricate a numeric score from band centers.
+- Show aggregate band picks as five fixed bins. A narrow row can collapse the drawing to low, mid, and high blocks, but it must not introduce a second vocabulary.
+- Show one rating as five visible cells with one cell lit. An exact point adds a tick inside its band cell.
 
-### Community score
+### Score
 
-- A community score is a member's whole-number evaluation on Peated's 100-point system.
-- Show an aggregate to one decimal place with the number of scores.
-- Keep community scores separate from community verdicts and published critic reviews.
-- Use “score” only for this numeric community measure in design-system component names.
+- The headline score is the whole-number median of real typed points, never a mean.
+- The point pool splits by precision, not identity. A member's point and an eligible publication's native 100-point score use the same ruler.
+- With fewer than 20 points, withhold the median and let the score slot become a contribution path. Band picks still show their own distribution.
+- Show the real point count and, when supplied, the low and high points on the same 0–100 domain.
+- Use neutral ink for the score. Do not use accent to imply that Peated owns the datum.
 
 ### Critic reviews
 
-- A critic review belongs to its named publication and retains its native score display.
+- A critic review belongs to its named publication and retains its native score display as an attributed citation.
 - Draw an individual critic score on its native numeric domain. Do not relabel a 4.5/5 or 8/10 score as a published 100-point score.
-- Do not create a Peated critic aggregate, median, or shared range from published reviews.
+- A publication's score can join the point pool only when its permitted native scale is 100. Never add a normalized compatibility value from another scale.
 - Use “critic review” for the record and “critic score” only for a score attributed to that record.
 
-Use “rating” as an umbrella word or a count of submitted verdicts. Do not use it as the component name for either aggregate.
-
-The member's account setting selects the rating input used by the tasting form. Render either the community-verdict input or the community-score input, never an in-form rating-system picker. Keep both configured form states as named Storybook stories. A viewport change only reflows the active input.
+Use “rating” as the umbrella word for a band pick or exact point. Use “grain” only for the band-or-point input choice.
 
 ## Data devices
 
 - **Bottle identity row:** Use the catalog image when the caller supplies one. Otherwise, use Peated's existing bottle glyph. Keep brand, bottle name, exact supplied metadata, related-release count, and member status distinct. “In Library” and “Tasted” keep their current Peated meanings. Show true member states as 12px muted book and circled-check marks directly after the name. Do not use accent color or make the marks controls. Omit a false state. Callers also omit the marks when the page already implies the state, such as the bottle page, the member's library or tastings, and another member's profile. Do not replace missing data with a decorative bottle silhouette or infer identity details in the component.
-- **Verdict mark:** Use a 60×6px pass-to-savor track with one 20px third active. Position carries the value. Use ink for Pass, deep accent for Sip, and accent for Savor.
-- **Verdict distribution:** Show Pass, Sip, and Savor from left to right with 2px gaps. Lead with the number of community ratings and print all three counts. Do not print a percentage.
+- **Band mark:** Use five 12×8px cells with 2px gaps. Keep every empty cell visible. Light the selected band; an exact point also adds a 2px tick inside that cell.
+- **Band stack:** Show the five bands from Mediocre to Unicorn with 2px gaps. Use low, mid, and high fills. Carry proportion by shape and sample size by count; do not print a band percentage.
 - **ID stamp:** Show the canonical Peated ID above an entity title with the ID in accent. Print the supplied ID without changing it.
 - **Spec strip:** Show at most four equal-width mono fact cells. The strip has no background. Each cell uses `surface`, and a 6px transparent gap exposes the page behind it. Truncate labels and values and print an en dash for null or missing values. Place the strip as a sibling below its related header panel instead of nesting it inside that panel.
-- **Bottle page header:** Keep the catalog image, identity, member actions, community score, and community verdict in one responsive component tree. Keep the spec strip as the header surface's sibling. At 900px, place the strip before the measures and show supplied measures in two columns. At 480px, remove the identity-panel fill and padding, reflow a four-cell strip to 2×2, stack the measures, reduce the title to 26px, and pin the action row to the bottom. Omit a community measure when the caller cannot supply it. Do not substitute critic-review data for either community measure.
+- **Bottle page header:** Keep the catalog image, identity, member actions, score, and band stack in one responsive component tree. Keep the spec strip as the header surface's sibling. At 900px, place the strip before the measures and show supplied measures in two columns. At 480px, remove the identity-panel fill and padding, reflow a four-cell strip to 2×2, stack the measures, reduce the title to 26px, and pin the action row to the bottom. Omit a measure when the caller cannot supply it.
 - **Fact list:** Use compact mono labels and values for supplied record facts. Print “Not stated” for an absent value. Do not infer a fact from nearby copy.
 - **Range bar:** Keep the band, tick, and caption on one numeric domain when the underlying data owns a real range.
 - **Count chip:** Use mono type, accent tint, and a 2px radius. Use the neutral variant for status.
 - **Facet row:** Combine one real filter with an optional count and share of the current record set. When the caller omits counts, keep the filter interactive and omit both the share bar and count slot. Reserve the dismiss slot in every interactive row. Use accent tint and a dismiss mark for the selected row. Use `null` only for an unavailable, disabled field; print an en dash and omit its bar.
 - **Pager:** Use numbered links only when the caller knows the page count. State the shown range and active filter. Use an ellipsis for skipped ranges and tonal previous or next links. Do not derive page numbers from cursor pagination.
-- **Bottle catalog:** Treat the API response as one visible cursor page. Show its real records and current-page count. Keep filters in the URL and reachable through one disclosure at narrow widths. Render category as a count-free facet while the API owns only its filter value. Age statement is also a facet group, not a free-form final control; use the API-owned NAS, under-12, 12–17, 18–24, and 25-plus bands when that contract is available. Add counts only when the API supplies full-result statistics. Do not offer community-score, community-verdict, or flavor-profile filters, and do not derive facet counts from the cursor page. Do not show a total result count or numbered pages unless the API supplies those facts.
+- **Bottle catalog:** Treat the API response as one visible cursor page. Show its real records, current-page count, and API-owned full-result total. Keep filters in the URL and reachable through one disclosure at narrow widths. Render category and age statement as counted facets from the API response. Use the API-owned NAS, under-12, 12–17, 18–24, and 25-plus age bands. Keep the old exact-age query readable for existing links, but replace it when a member selects an age band. Do not offer community-score, community-verdict, or flavor-profile filters, and do not derive facet counts from the cursor page. Keep cursor navigation; do not invent numbered pages from the total.
+- **Entity catalogs:** Use one list contract for distillers, brands, and bottlers. Show the visible cursor page, Peated ID, kind, location, bottle count, and tasting count. Keep query, country, region, sort, and cursor state in the URL. Country rows are count-free until the API owns entity facet counts. Keep the active region removable when an existing link supplies one. Use Previous and Next cursor actions without inventing a total or numbered pages. At phone widths, keep bottle count visible and retain both measures in the row's accessible name.
+- **Entity detail:** Use one nested route frame for the entity header and the Overview, Bottles, Tastings, and optional Distillery codes tabs. The selected route owns its API and URL state while the header and tabs stay stable. Use the entity-details response for identity, kind, location, ownership, core facts, and bottle totals. Kind is the only entity classification used by the interface. A contextual bottle action maps only brand, bottler, and distillery kinds to their matching bottle field; blender and company records do not invent a bottle role. Keep the Bottles or Bottlings module visible for brand, bottler, distillery, and blender records. When the list is empty, show a short message and a button to record a bottle or bottling. Use the bottle-list response for bottle metadata, community scores, verdict distributions, sorting, and cursor pagination. Show these rows directly under the Bottles or Bottlings section; do not add a second list title or a generic catalog summary. Use tasting-list records for the Tastings tab. The SMWS codes tab is a reference list enriched with links from the existing SMWS distiller endpoint. A company portfolio waits for an API-owned current-owner filter; do not infer it from bottle relationships. Keep complete routes out of Storybook; document the reusable entity header, bottle rows, tasting entries, record table, and their sparse states there. Do not infer operating status, still count, capacity, community measures, or history from the entity description or establishment year.
+- **Member profile:** Keep the profile header, summary, privacy boundary, and Tastings, Library, and Activity tabs in one nested route frame. Use user-details counts for tastings, unique bottles, library entries, and contributions. Use the tasting and region lists for Tastings. Use the Library list and Library statistics for search, status and producer filters, bottle rows, owner actions, and cursor links. Use profile Activity only for the tasting sessions and collection additions returned by its API. Keep private records behind the existing friendship rule. Omit bio, location, follower totals, passport coverage, distinct distillery totals, and a Contributions tab until issue #774 supplies owned contracts. Storybook documents the reusable header and bounded Library and Activity content instead of duplicating complete routes.
 - **Summary strip:** Show three to five page-level facts in equal tonal cells. A cell can add one short mono detail, such as pass, sip, and savor counts. Reflow cells into additional rows at narrow widths; do not introduce horizontal scrolling.
 - **Passport:** Present distinct tracked objects as coverage. Use the tracker noun and never expose XP or levels. A closed set names every stamped or missing member and shows a denominator. An open-ended tracker shows only its count and the distance to its next stamp. Past 24 members, replace individual cells with a share bar and percentage chip.
 - **Record table:** Use a table only when comparison is the task. Keep the record name and metadata in the first column and use two fixed measure columns. On compact screens, turn each row into a two-measure record block and repeat the measure labels. Print an en dash for an unknown value.
@@ -228,18 +229,20 @@ Thin data is normal.
 
 New design-system components use StyleX and own their visual states. Name files that contain StyleX calls `*.stylex.ts` or `*.stylex.tsx`; this keeps the compile boundary narrow and explicit. Product screens compose these components without adding Tailwind classes to the same elements. Keep global CSS for document defaults and third-party markup that a component cannot own.
 
-Storybook is the living view of the implemented system. Its sidebar lists foundation topics, individual components grouped by domain, and real multi-component patterns. Keep each component's story file beside its implementation. Give each meaningful state a named story and expose narrow component props through Storybook controls. A named behavior story renders its scenario directly and deterministically; reviewers do not click through setup steps to reach the state under review. Add a group only after it contains real exported tokens or components. Stories render the same components used by product screens. Do not add visual copies, placeholder controls, or empty groups.
+Storybook is the living view of the implemented system. Its sidebar lists foundation topics, individual components grouped by domain, and real multi-component patterns. Keep each component's story file beside its implementation. A simple component starts with one Overview story that renders its useful static variants together and exposes narrow props through Storybook controls. Do not add separate stories for sizes, labels, selected values, item counts, or other prop permutations that can be understood in the overview or controls. Add a separate named story only when a behavior, asynchronous state, permission boundary, error, or responsive composition needs a stable direct review URL. A named behavior story renders its scenario directly and deterministically; reviewers do not click through setup steps to reach the state under review. Add a group only after it contains real exported tokens or components. Stories render the same components used by product screens. Do not add visual copies, placeholder controls, or empty groups.
 
 Storybook exposes an accessibility review panel and a local MCP endpoint for agents. Accessibility findings support manual review and do not create a presentation-test gate. Agent manifests use component types, concise JSDoc for non-obvious semantics, and real stories. Do not enable global Autodocs pages only to feed the manifest. CI builds the static Storybook as a compile gate.
 
 Storybook names the responsive review checkpoints after Peated's layouts instead of device brands: Wide at 1320px, Rail at 1040px, Folded at 900px, Stacked at 680px, Phone at 390px, and the 320px edge. Keep the exact ladder in the viewport menu. Keep Wide, Folded, and Phone as direct toolbar actions: Wide releases the fixed device frame so a component uses the available canvas, while Folded and Phone select their exact checkpoints. Keep Light and Dark as direct toolbar actions that update the same review-only theme global as the theme menu. A viewport or theme change updates the same story and component tree.
 
-Entity history remains a caller-owned data contract. The design system can render supplied events and a realistic distillery-page pattern, but a product route must not invent history from an establishment year or description. Add the live section only when the entity API supplies sourced events and operating state.
+Entity history remains a caller-owned data contract. Storybook can render the history component with realistic supplied events, but it does not duplicate the complete distillery route. A product route must not invent history from an establishment year or description. Add the live section only when the entity API supplies sourced events and operating state.
 
 Page compositions use the same ownership rule. A page component receives
 render-ready values and component slots. It owns page hierarchy and responsive
 layout, but it does not fetch data, inspect authentication, or run mutations.
-The product route or a small client adapter owns those behaviors.
+The product route owns those behaviors. When browser hooks are required, keep a
+small `*Client` component beside the route. Do not put route-only code in the
+design-system folders.
 
 Migrate one complete route at a time. Keep a route on its legacy layout while
 its new composition is reviewed in Storybook. Move the page composition, live

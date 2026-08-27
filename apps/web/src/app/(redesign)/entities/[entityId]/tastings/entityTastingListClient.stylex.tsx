@@ -1,0 +1,160 @@
+"use client";
+
+import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
+import { formatCategoryName } from "@peated/server/lib/format";
+import type { Outputs } from "@peated/server/orpc/router";
+import * as stylex from "@stylexjs/stylex";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { usePathname, useSearchParams } from "next/navigation";
+
+import {
+  ButtonLink,
+  CursorPager,
+  EmptyState,
+  TastingEntry,
+  type TastingEntryMember,
+  type Verdict,
+} from "@peated/web/components/designSystem/components";
+import { Avatar } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import TimeSince from "@peated/web/components/timeSince";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { space } from "../../../../../styles/tokens.stylex";
+
+type Tasting = Outputs["tastings"]["list"]["results"][number];
+
+export function EntityTastingListClient({
+  entityId,
+  entityName,
+}: {
+  entityId: number;
+  entityName: string;
+}) {
+  const orpc = useORPC();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const cursor = Number(searchParams.get("cursor") ?? "1") || 1;
+  const { data: tastingList } = useSuspenseQuery(
+    orpc.tastings.list.queryOptions({
+      input: { cursor, entity: entityId, limit: 25 },
+    }),
+  );
+
+  return (
+    <section
+      aria-label={`Tastings of ${entityName}`}
+      {...stylex.props(styles.content)}
+    >
+      {tastingList.results.length ? (
+        <div {...stylex.props(styles.list)}>
+          {tastingList.results.map((tasting) => (
+            <EntityTastingEntry key={tasting.id} tasting={tasting} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          action={
+            <ButtonLink
+              href="/addBottle?intent=tasting"
+              size="sm"
+              variant="accent"
+            >
+              Log a tasting
+            </ButtonLink>
+          }
+          heading="No tastings yet"
+        >
+          No one has recorded a tasting connected to {entityName} yet.
+        </EmptyState>
+      )}
+      <CursorPager
+        ariaLabel={`${entityName} tasting pages`}
+        nextHref={getCursorHref(
+          pathname,
+          searchParams,
+          tastingList.rel.nextCursor,
+        )}
+        page={cursor}
+        previousHref={getCursorHref(
+          pathname,
+          searchParams,
+          tastingList.rel.prevCursor,
+        )}
+      />
+    </section>
+  );
+}
+
+function EntityTastingEntry({ tasting }: { tasting: Tasting }) {
+  const member: TastingEntryMember = {
+    description: tasting.notes,
+    href: `/bottles/${tasting.bottle.id}`,
+    metadata: getBottleMetadata(tasting.bottle),
+    name: tasting.bottle.fullName,
+    notes: tasting.tags,
+    score: tasting.score ?? undefined,
+    verdict: getVerdict(tasting.rating),
+  };
+
+  return (
+    <TastingEntry
+      author={tasting.createdBy.username}
+      authorHref={`/users/${tasting.createdBy.username}`}
+      date={<TimeSince date={tasting.createdAt} />}
+      leading={
+        <Avatar
+          imageUrl={tasting.createdBy.pictureUrl}
+          initials={tasting.createdBy.username.slice(0, 2).toLocaleUpperCase()}
+        />
+      }
+      members={[member]}
+    />
+  );
+}
+
+function getVerdict(rating: number | null): Verdict | undefined {
+  if (rating === SIMPLE_RATING_VALUES.PASS) return "pass";
+  if (rating === SIMPLE_RATING_VALUES.SIP) return "sip";
+  if (rating === SIMPLE_RATING_VALUES.SAVOR) return "savor";
+  return undefined;
+}
+
+function getBottleMetadata(tastingBottle: Tasting["bottle"]) {
+  return [
+    tastingBottle.category ? formatCategoryName(tastingBottle.category) : null,
+    tastingBottle.statedAge === null
+      ? tastingBottle.noAgeStatement
+        ? "NAS"
+        : null
+      : `${tastingBottle.statedAge} years`,
+    tastingBottle.abv === null
+      ? null
+      : `${tastingBottle.abv.toFixed(1).replace(/\.0$/, "")}% ABV`,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" · ");
+}
+
+function getCursorHref(
+  pathname: string,
+  searchParams: URLSearchParams,
+  cursor: number | null,
+) {
+  if (cursor === null) return undefined;
+
+  const nextParams = new URLSearchParams(searchParams);
+  nextParams.set("cursor", String(cursor));
+  const query = nextParams.toString();
+  return query ? `${pathname}?${query}` : pathname;
+}
+
+const styles = stylex.create({
+  content: {
+    minWidth: 0,
+    paddingTop: space.x6,
+  },
+  list: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+  },
+});

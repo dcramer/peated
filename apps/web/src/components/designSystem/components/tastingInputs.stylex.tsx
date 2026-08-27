@@ -1,6 +1,6 @@
 "use client";
 
-import { COLOR_SCALE, getAdvancedRatingBand } from "@peated/server/constants";
+import { COLOR_SCALE } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
 import { Minus, Plus, Upload } from "lucide-react";
 import type { ChangeEvent } from "react";
@@ -14,7 +14,14 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import { Button } from "./button.stylex";
-import type { Verdict } from "./scoring.stylex";
+import {
+  getRatingBandForPoint,
+  RATING_BANDS,
+  type RatingBand,
+  type RatingGrain,
+  type RatingValue,
+  type Verdict,
+} from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -118,131 +125,183 @@ export function VerdictInput({
 
 export type ScoreInputProps = {
   disabled?: boolean;
+  grain: RatingGrain;
   id: string;
   label?: string;
   name: string;
-  onChange: (value: number | null) => void;
+  onChange: (value: RatingValue) => void;
+  onGrainChange: (grain: RatingGrain) => void;
   required?: boolean;
-  value: number | null;
+  value: RatingValue;
 };
 
-/** Records one member's whole-number community score from 0 through 100. */
+/** Records one rating as a picked band or an exact point on the same ruler. */
 export function ScoreInput({
   disabled = false,
+  grain,
   id,
-  label = "Your score",
+  label = "How was it",
   name,
   onChange,
+  onGrainChange,
   required = false,
   value,
 }: ScoreInputProps) {
-  const score = value === null ? null : clampScore(value);
-  const band = score === null ? undefined : getAdvancedRatingBand(score);
-  const bandScore = Math.max(60, score ?? 60);
-  const position = ((bandScore - 60) / 40) * 100;
+  const score =
+    grain === "point" && value?.grain === "point"
+      ? clampScore(value.point)
+      : null;
+  const selectedBand =
+    grain === "band" && value?.grain === "band"
+      ? RATING_BANDS.find((band) => band.key === value.band)
+      : score === null
+        ? undefined
+        : getRatingBandForPoint(score);
 
   function step(delta: number) {
-    onChange(clampScore((score ?? 80) + delta));
+    onChange({ grain: "point", point: clampScore((score ?? 85) + delta) });
   }
 
   function handleInput(event: ChangeEvent<HTMLInputElement>) {
     const next = event.currentTarget.value;
-    onChange(next === "" ? null : clampScore(Number(next)));
+    onChange(
+      next === "" ? null : { grain: "point", point: clampScore(Number(next)) },
+    );
   }
 
   return (
-    <div {...stylex.props(styles.scoreRoot, disabled && styles.disabled)}>
+    <div
+      data-grain={grain}
+      {...stylex.props(styles.scoreRoot, disabled && styles.disabled)}
+    >
       <div {...stylex.props(styles.ratingHeading)}>
         <span {...stylex.props(styles.ratingLabel)}>{label}</span>
         {required ? (
           <span {...stylex.props(styles.requiredLabel)}>Required</span>
         ) : null}
       </div>
-      <div {...stylex.props(styles.scoreControl)}>
-        <button
-          aria-label="Decrease score"
-          disabled={disabled || score === 0}
-          onClick={() => step(-1)}
-          type="button"
-          {...stylex.props(styles.scoreStep)}
-        >
-          <Minus aria-hidden="true" size={20} strokeWidth={1.75} />
-        </button>
-        <div {...stylex.props(styles.scoreValueGroup)}>
-          <div {...stylex.props(styles.scoreFigure)}>
-            <input
-              aria-label="100-point score"
-              disabled={disabled}
-              id={id}
-              inputMode="numeric"
-              max={100}
-              min={0}
-              name={name}
-              onChange={handleInput}
-              placeholder="–"
-              required={required}
-              step={1}
-              type="number"
-              value={score ?? ""}
-              {...stylex.props(styles.scoreInput)}
-            />
-            <span aria-hidden="true" {...stylex.props(styles.scoreOutOf)}>
-              / 100
-            </span>
+      {grain === "point" ? (
+        <>
+          <div {...stylex.props(styles.pointControl)}>
+            <button
+              aria-label="Decrease score"
+              disabled={disabled || score === 0}
+              onClick={() => step(-1)}
+              type="button"
+              {...stylex.props(styles.scoreStep)}
+            >
+              <Minus aria-hidden="true" size={20} strokeWidth={1.75} />
+            </button>
+            <div {...stylex.props(styles.scoreValueGroup)}>
+              <div {...stylex.props(styles.scoreFigure)}>
+                <input
+                  aria-label="Score out of 100"
+                  disabled={disabled}
+                  id={id}
+                  inputMode="numeric"
+                  max={100}
+                  min={0}
+                  name={name}
+                  onChange={handleInput}
+                  placeholder="–"
+                  required={required}
+                  step={1}
+                  type="number"
+                  value={score ?? ""}
+                  {...stylex.props(styles.scoreInput)}
+                />
+                <span aria-hidden="true" {...stylex.props(styles.scoreOutOf)}>
+                  / 100
+                </span>
+              </div>
+              <p aria-live="polite" {...stylex.props(styles.scoreBand)}>
+                {selectedBand?.label ?? "Choose a score"}
+              </p>
+            </div>
+            <button
+              aria-label="Increase score"
+              disabled={disabled || score === 100}
+              onClick={() => step(1)}
+              type="button"
+              {...stylex.props(styles.scoreStep)}
+            >
+              <Plus aria-hidden="true" size={20} strokeWidth={1.75} />
+            </button>
           </div>
-          <p aria-live="polite" {...stylex.props(styles.scoreBand)}>
-            {band?.label ?? "Choose a score"}
-          </p>
-        </div>
-        <button
-          aria-label="Increase score"
-          disabled={disabled || score === 100}
-          onClick={() => step(1)}
-          type="button"
-          {...stylex.props(styles.scoreStep)}
-        >
-          <Plus aria-hidden="true" size={20} strokeWidth={1.75} />
-        </button>
-      </div>
-      <div {...stylex.props(styles.scoreScale)}>
-        <span
-          {...stylex.props(
-            styles.scoreFill(position),
-            score === null && styles.scoreFillEmpty,
-          )}
-        />
-        <span
-          {...stylex.props(
-            styles.scoreMarker(position),
-            score === null && styles.scoreMarkerEmpty,
-          )}
-        />
-        <input
-          aria-label="Adjust score from 60 to 100"
-          disabled={disabled}
-          max={100}
-          min={60}
-          onChange={(event) => onChange(Number(event.currentTarget.value))}
-          step={1}
-          type="range"
-          value={bandScore}
-          {...stylex.props(styles.scoreRange)}
-        />
-      </div>
-      <div aria-hidden="true" {...stylex.props(styles.scoreAnchors)}>
-        <span {...stylex.props(styles.scoreEndpoint)}>60</span>
-        <span>70</span>
-        <span>80</span>
-        <span>90</span>
-        <span {...stylex.props(styles.scoreEndpoint)}>100</span>
-      </div>
-      <p {...stylex.props(styles.scoreGuidance, styles.desktopScoreGuidance)}>
-        80 good · 85 very good · 90 exceptional · 95 extraordinary
-      </p>
-      <p {...stylex.props(styles.scoreGuidance, styles.mobileScoreGuidance)}>
-        Drag the band for the range, then use −/+ for the final point. Tap the
-        figure to type it.
-      </p>
+          <div aria-hidden="true" {...stylex.props(styles.pointTrack)}>
+            {score !== null ? (
+              <span {...stylex.props(styles.pointMarker(score))} />
+            ) : null}
+          </div>
+          <button
+            disabled={disabled}
+            onClick={() => onGrainChange("band")}
+            type="button"
+            {...stylex.props(styles.grainAction)}
+          >
+            Pick a band instead
+          </button>
+        </>
+      ) : (
+        <>
+          <div {...stylex.props(styles.bandSelectionHeading)}>
+            <strong {...stylex.props(styles.selectedBandLabel)}>
+              {selectedBand?.label ?? "Pick a band"}
+            </strong>
+            {selectedBand ? (
+              <span {...stylex.props(styles.selectedBandRange)}>
+                {selectedBand.range}
+              </span>
+            ) : null}
+          </div>
+          <div
+            aria-label={label}
+            role="radiogroup"
+            {...stylex.props(styles.bandInputTrack)}
+          >
+            {RATING_BANDS.map((band) => {
+              const checked =
+                value?.grain === "band" && band.key === value.band;
+              return (
+                <label
+                  key={band.key}
+                  {...stylex.props(
+                    styles.bandInputCell,
+                    checked && bandInputSelectedStyles[band.key],
+                  )}
+                >
+                  <input
+                    checked={checked}
+                    disabled={disabled}
+                    id={`${id}-${band.key}`}
+                    name={name}
+                    onChange={() => onChange({ band: band.key, grain: "band" })}
+                    type="radio"
+                    value={band.key}
+                    {...stylex.props(styles.visuallyHiddenInput)}
+                  />
+                  <span {...stylex.props(styles.visuallyHiddenText)}>
+                    {band.label}, {band.range}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <div aria-hidden="true" {...stylex.props(styles.bandInputRanges)}>
+            {RATING_BANDS.map((band) => (
+              <span key={band.key}>{band.shortRange}</span>
+            ))}
+          </div>
+          <button
+            disabled={disabled}
+            onClick={() => onGrainChange("point")}
+            type="button"
+            {...stylex.props(styles.grainAction)}
+          >
+            Score out of 100
+          </button>
+        </>
+      )}
     </div>
   );
 }
@@ -523,6 +582,131 @@ const styles = stylex.create({
   scoreRoot: {
     width: "100%",
   },
+  pointControl: {
+    display: "flex",
+    alignItems: "center",
+    columnGap: { default: space.x4, [COMPACT]: space.x3 },
+    marginTop: space.x3,
+  },
+  pointTrack: {
+    position: "relative",
+    height: "8px",
+    marginTop: space.x4,
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.inset,
+  },
+  pointMarker: (score: number) => ({
+    position: "absolute",
+    top: "-3px",
+    left: `calc(${clampScore(score)}% - 1px)`,
+    width: "2px",
+    height: "14px",
+    backgroundColor: colors.ink,
+  }),
+  bandSelectionHeading: {
+    display: "flex",
+    alignItems: "baseline",
+    columnGap: space.x2,
+    marginTop: space.x3,
+  },
+  selectedBandLabel: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "18px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.2,
+  },
+  selectedBandRange: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    lineHeight: 1.45,
+  },
+  bandInputTrack: {
+    display: "grid",
+    width: "100%",
+    height: "44px",
+    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+    gap: "2px",
+    marginTop: space.x3,
+  },
+  bandInputCell: {
+    position: "relative",
+    minWidth: 0,
+    height: "44px",
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.inset,
+    cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-within": effects.focusRing,
+    },
+    opacity: {
+      default: 1,
+      ":hover": 0.86,
+    },
+  },
+  lowBandSelected: {
+    backgroundColor: colors.bandLow,
+  },
+  midBandSelected: {
+    backgroundColor: colors.bandMid,
+  },
+  highBandSelected: {
+    backgroundColor: colors.bandHigh,
+  },
+  bandInputRanges: {
+    display: "grid",
+    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+    gap: "2px",
+    marginTop: "6px",
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "9px",
+    fontVariantNumeric: "tabular-nums",
+    letterSpacing: "0.02em",
+    lineHeight: 1.35,
+    textTransform: "uppercase",
+  },
+  grainAction: {
+    width: "fit-content",
+    marginTop: space.x3,
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: 0,
+    outline: "none",
+    backgroundColor: "transparent",
+    color: colors.accentDeep,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    fontWeight: 700,
+    lineHeight: 1.35,
+    textDecoration: {
+      default: "none",
+      ":hover": "underline",
+    },
+    cursor: {
+      default: "pointer",
+      ":disabled": "not-allowed",
+    },
+    opacity: {
+      default: 1,
+      ":disabled": 0.45,
+    },
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
+  visuallyHiddenText: {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+  },
   scoreControl: {
     display: "flex",
     alignItems: "center",
@@ -582,6 +766,7 @@ const styles = stylex.create({
     height: { default: "48px", [COMPACT]: "52px" },
     padding: 0,
     borderWidth: 0,
+    borderRadius: 0,
     outline: "none",
     appearance: "textfield",
     backgroundColor: "transparent",
@@ -594,8 +779,8 @@ const styles = stylex.create({
     lineHeight: 1,
     textAlign: "center",
     boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
+      default: `inset 0 -2px 0 ${colors.inset}`,
+      ":focus-visible": `inset 0 -2px 0 ${colors.accent}`,
     },
     "::-webkit-inner-spin-button": {
       appearance: "none",
@@ -820,3 +1005,11 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
 });
+
+const bandInputSelectedStyles = {
+  mediocre: styles.lowBandSelected,
+  good: styles.lowBandSelected,
+  veryGood: styles.midBandSelected,
+  outstanding: styles.highBandSelected,
+  unicorn: styles.highBandSelected,
+} satisfies Record<RatingBand, stylex.StyleXStyles>;

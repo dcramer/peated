@@ -1,0 +1,542 @@
+"use client";
+
+import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
+import {
+  formatCategoryName,
+  formatServingStyle,
+} from "@peated/server/lib/format";
+import type { Outputs } from "@peated/server/orpc/router";
+import * as stylex from "@stylexjs/stylex";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import {
+  Button,
+  ButtonLink,
+  EmptyState,
+  LoadingRecordList,
+  ModuleError,
+  PageTabs,
+  RowMenu,
+  VerdictDistributionBar,
+  type CriticReviewProps,
+  type FactListItem,
+  type PageTabItem,
+  type RowMenuItem,
+  type TastingEntryProps,
+  type Verdict,
+} from "@peated/web/components/designSystem/components";
+import { BottleOverview } from "@peated/web/components/designSystem/patterns/bottleOverview.stylex";
+import { BottlePageHeader } from "@peated/web/components/designSystem/patterns/bottlePageHeader.stylex";
+import { useFlashMessages } from "@peated/web/components/flash";
+import TimeSince from "@peated/web/components/timeSince";
+import useAuth from "@peated/web/hooks/useAuth";
+import {
+  getAddBottleHref,
+  getAddSimilarBottlePath,
+} from "@peated/web/lib/addBottle";
+import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
+import { logTelemetryError } from "@peated/web/lib/log";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+
+type Bottle = Outputs["bottles"]["details"];
+type Review = Outputs["reviews"]["list"]["results"][number];
+type Tasting = Outputs["tastings"]["list"]["results"][number];
+
+const PHONE = "@media (max-width: 480px)";
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
+
+function getVerdict(rating: number | null): Verdict | undefined {
+  if (rating === SIMPLE_RATING_VALUES.PASS) return "pass";
+  if (rating === SIMPLE_RATING_VALUES.SIP) return "sip";
+  if (rating === SIMPLE_RATING_VALUES.SAVOR) return "savor";
+  return undefined;
+}
+
+function getBottleDetail(bottle: Bottle) {
+  return [
+    formatCategoryName(bottle.category),
+    bottle.distillers[0]?.name,
+    bottle.bottler?.name,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" · ");
+}
+
+function getBottleNotes(bottle: Bottle) {
+  return [
+    bottle.caskStrength ? "Cask strength" : null,
+    bottle.singleCask ? "Single cask" : null,
+    bottle.nonChillFiltered ? "Non-chill filtered" : null,
+    bottle.naturalColor ? "Natural colour" : null,
+  ].filter((value): value is string => value !== null);
+}
+
+function getBottleSpecs(bottle: Bottle) {
+  return [
+    {
+      label: "ABV",
+      value: bottle.abv === null ? null : `${bottle.abv.toFixed(1)}%`,
+    },
+    {
+      label: "Age",
+      value:
+        bottle.statedAge === null
+          ? bottle.noAgeStatement
+            ? "NAS"
+            : null
+          : `${bottle.statedAge} years`,
+    },
+    { label: "Cask", value: bottle.maturation },
+    {
+      label: "Release",
+      value:
+        bottle.releaseDate ??
+        (bottle.releaseYear === null ? null : String(bottle.releaseYear)),
+    },
+  ] as const;
+}
+
+function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
+  return [
+    {
+      label: "Phenols",
+      value:
+        bottle.maltPhenolPpm === null
+          ? null
+          : `${bottle.maltPhenolPpm.toLocaleString("en-US")} PPM`,
+    },
+    {
+      label: "Colouring",
+      value:
+        bottle.naturalColor === null
+          ? null
+          : bottle.naturalColor
+            ? "Natural colour"
+            : "Colour added",
+    },
+    {
+      label: "Filtration",
+      value:
+        bottle.nonChillFiltered === null
+          ? null
+          : bottle.nonChillFiltered
+            ? "Non-chill filtered"
+            : "Chill filtered",
+    },
+    { label: "Bottler", value: bottle.bottler?.name },
+  ];
+}
+
+function getReview(review: Review): CriticReviewProps | null {
+  if (!review.site) return null;
+
+  return {
+    href: review.url,
+    publication: review.site.name,
+    publishedAt: review.article.publishedAt
+      ? dateFormatter.format(new Date(review.article.publishedAt))
+      : undefined,
+    reviewerName: review.reviewerName ?? undefined,
+    score: review.nativeScore,
+    summary: review.summary ?? undefined,
+  };
+}
+
+function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
+  const member = {
+    description: tasting.notes ?? undefined,
+    name: bottle.fullName,
+    notes: tasting.tags,
+    score: tasting.score ?? undefined,
+    verdict: getVerdict(tasting.rating),
+  };
+
+  return {
+    author: tasting.createdBy.username,
+    authorHref: `/users/${tasting.createdBy.username}`,
+    context: tasting.servingStyle
+      ? formatServingStyle(tasting.servingStyle)
+      : undefined,
+    date: <TimeSince date={tasting.createdAt} />,
+    members: [member],
+  };
+}
+
+function getTabs(bottle: Bottle): [PageTabItem, ...PageTabItem[]] {
+  const baseUrl = `/bottles/${bottle.id}`;
+  const tabs: [PageTabItem, ...PageTabItem[]] = [
+    { href: baseUrl, label: "Overview" },
+    {
+      count: bottle.totalTastings,
+      href: `${baseUrl}/tastings`,
+      label: "Tastings",
+    },
+    { href: `${baseUrl}/prices`, label: "Prices" },
+  ];
+
+  if (bottle.group && bottle.group.totalBottles > 1) {
+    tabs.push({
+      count: bottle.group.totalBottles,
+      href: `${baseUrl}/releases`,
+      label: "Releases",
+    });
+  }
+
+  return tabs;
+}
+
+function BottleLibraryAction({ bottle }: { bottle: Bottle }) {
+  const { user } = useAuth();
+  const orpc = useORPC();
+  const queryClient = useQueryClient();
+  const { flash } = useFlashMessages();
+  const [libraryOverride, setLibraryOverride] = useState<boolean | null>(null);
+  const addMutation = useMutation(
+    orpc.collections.bottles.create.mutationOptions(),
+  );
+  const removeMutation = useMutation(
+    orpc.collections.bottles.delete.mutationOptions(),
+  );
+
+  if (!user) {
+    return (
+      <ButtonLink href="/login" size="lg" variant="tonal">
+        Add to library
+      </ButtonLink>
+    );
+  }
+
+  const isLibrary = libraryOverride ?? bottle.isLibrary;
+  const pending = addMutation.isPending || removeMutation.isPending;
+
+  return (
+    <Button
+      aria-pressed={isLibrary}
+      loading={pending}
+      loadingLabel={isLibrary ? "Removing…" : "Adding…"}
+      onClick={async () => {
+        try {
+          if (isLibrary) {
+            await removeMutation.mutateAsync({
+              bottle: bottle.id,
+              collection: "library",
+              user: "me",
+            });
+          } else {
+            await addMutation.mutateAsync({
+              bottle: bottle.id,
+              collection: "library",
+              user: "me",
+            });
+          }
+          setLibraryOverride(!isLibrary);
+          await queryClient.invalidateQueries({
+            queryKey: orpc.bottles.details.key({
+              input: { bottle: bottle.id },
+            }),
+          });
+        } catch (error) {
+          flash(
+            error instanceof Error
+              ? error.message
+              : "Unable to update your library.",
+            "error",
+          );
+        }
+      }}
+      size="lg"
+      variant="tonal"
+    >
+      {isLibrary ? "In library" : "Add to library"}
+    </Button>
+  );
+}
+
+function BottleActions({ bottle }: { bottle: Bottle }) {
+  const { user } = useAuth();
+  const orpc = useORPC();
+  const router = useRouter();
+  const { flash } = useFlashMessages();
+  const deleteMutation = useMutation(orpc.bottles.delete.mutationOptions());
+  const groups: RowMenuItem[][] = [
+    [
+      {
+        href: getAddSimilarBottlePath(bottle.id),
+        label: "Add similar bottle",
+      },
+      {
+        label: "Share",
+        onSelect: () => {
+          if (navigator.share) {
+            navigator
+              .share({ title: bottle.fullName, url: window.location.href })
+              .catch((error) => logTelemetryError(error, {}));
+            return;
+          }
+
+          void navigator.clipboard
+            .writeText(window.location.href)
+            .then(() => flash("Bottle link copied."))
+            .catch((error) => logTelemetryError(error, {}));
+        },
+      },
+    ],
+  ];
+
+  if (user?.mod || user?.admin) {
+    groups.push([
+      { href: `/bottles/${bottle.id}/aliases`, label: "View aliases" },
+      { href: `/bottles/${bottle.id}/edit`, label: "Edit bottle" },
+      { href: `/bottles/${bottle.id}/merge`, label: "Merge bottle" },
+      { href: `/bottles/${bottle.id}/audit`, label: "Audit bottle" },
+    ]);
+  }
+
+  if (user?.admin) {
+    groups.push([
+      {
+        disabled: deleteMutation.isPending,
+        label: deleteMutation.isPending ? "Deleting bottle…" : "Delete bottle",
+        onSelect: () => {
+          if (
+            !window.confirm(
+              "Permanently delete this bottle? This cannot be undone.",
+            )
+          ) {
+            return;
+          }
+          void deleteMutation
+            .mutateAsync({ bottle: bottle.id })
+            .then(() => router.replace("/bottles"))
+            .catch((error) => {
+              flash(
+                error instanceof Error
+                  ? error.message
+                  : "Unable to delete this bottle.",
+                "error",
+              );
+            });
+        },
+      },
+    ]);
+  }
+
+  return <RowMenu groups={groups} label="Bottle record" variant="page" />;
+}
+
+export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
+  const orpc = useORPC();
+  const bottleQuery = useQuery({
+    ...orpc.bottles.details.queryOptions({
+      input: { bottle: initialBottle.id },
+    }),
+    initialData: initialBottle,
+  });
+  const reviewsQuery = useQuery(
+    orpc.reviews.list.queryOptions({
+      input: { bottle: initialBottle.id, limit: 3, sort: "recent" },
+    }),
+  );
+  const tastingsQuery = useQuery(
+    orpc.tastings.list.queryOptions({
+      input: { bottle: initialBottle.id, limit: 3 },
+    }),
+  );
+  const recommendationsQuery = useQuery(
+    orpc.bottles.recommendations.queryOptions({
+      input: { bottle: initialBottle.id, limit: 3 },
+    }),
+  );
+
+  if (bottleQuery.error) {
+    return (
+      <ModuleError
+        heading="Bottle details are unavailable"
+        onRetry={() => void bottleQuery.refetch()}
+      >
+        We could not load this bottle. Try again.
+      </ModuleError>
+    );
+  }
+
+  const bottle = bottleQuery.data;
+  const criticReviews =
+    reviewsQuery.data?.results
+      .map(getReview)
+      .filter((review): review is CriticReviewProps => review !== null) ?? [];
+  const tastings =
+    tastingsQuery.data?.results.map((tasting) => getTasting(tasting, bottle)) ??
+    [];
+  const recommendations =
+    recommendationsQuery.data?.results.map((recommendation) => ({
+      end:
+        recommendation.ratingStats.total > 0 ? (
+          <VerdictDistributionBar
+            pass={recommendation.ratingStats.pass}
+            savor={recommendation.ratingStats.savor}
+            sip={recommendation.ratingStats.sip}
+          />
+        ) : undefined,
+      href: `/bottles/${recommendation.id}`,
+      metadata: [
+        formatCategoryName(recommendation.category),
+        recommendation.abv === null
+          ? null
+          : `${recommendation.abv.toFixed(1)}% ABV`,
+      ]
+        .filter((value): value is string => Boolean(value))
+        .join(" · "),
+      name: recommendation.fullName,
+    })) ?? [];
+  const mainPending =
+    !criticReviews.length &&
+    !tastings.length &&
+    (reviewsQuery.isPending || tastingsQuery.isPending);
+  const mainFailed =
+    !criticReviews.length &&
+    !tastings.length &&
+    !mainPending &&
+    Boolean(reviewsQuery.error && tastingsQuery.error);
+  const mainState = mainPending ? (
+    <LoadingRecordList label="Loading bottle reviews and tastings" rows={3} />
+  ) : mainFailed ? (
+    <ModuleError
+      heading="Reviews and tastings are unavailable"
+      onRetry={() => {
+        void reviewsQuery.refetch();
+        void tastingsQuery.refetch();
+      }}
+    >
+      We could not load this bottle's reviews or tastings. Try again.
+    </ModuleError>
+  ) : !criticReviews.length && !tastings.length ? (
+    <EmptyState
+      action={
+        <ButtonLink
+          href={getAddBottleHref({
+            bottleId: bottle.id,
+            intent: "tasting",
+          })}
+          size="sm"
+          variant="accent"
+        >
+          Log the first tasting
+        </ButtonLink>
+      }
+      heading="No reviews or tastings yet"
+    >
+      This bottle has no published critic reviews or community tastings.
+    </EmptyState>
+  ) : null;
+
+  return (
+    <div {...stylex.props(styles.page)}>
+      <BottlePageHeader
+        actions={
+          <>
+            <ButtonLink
+              href={getAddBottleHref({
+                bottleId: bottle.id,
+                intent: "tasting",
+              })}
+              size="lg"
+              variant="accent"
+            >
+              Log a tasting
+            </ButtonLink>
+            <BottleLibraryAction bottle={bottle} />
+          </>
+        }
+        brand={bottle.brand.shortName || bottle.brand.name}
+        brandHref={`/entities/${bottle.brand.id}`}
+        detail={getBottleDetail(bottle)}
+        id={bottle.peatedId}
+        imageUrl={bottle.imageUrl}
+        memberStatus={{
+          hasTasted: bottle.hasTasted,
+          isLibrary: bottle.isLibrary,
+        }}
+        menu={<BottleActions bottle={bottle} />}
+        name={getBottleExpressionName(bottle)}
+        notes={getBottleNotes(bottle)}
+        score={
+          bottle.avgScore === null || bottle.totalScores === 0
+            ? null
+            : { count: bottle.totalScores, score: bottle.avgScore }
+        }
+        specs={getBottleSpecs(bottle)}
+        verdict={
+          bottle.ratingStats.total === 0
+            ? null
+            : {
+                pass: bottle.ratingStats.pass,
+                savor: bottle.ratingStats.savor,
+                sip: bottle.ratingStats.sip,
+              }
+        }
+      />
+
+      <div {...stylex.props(styles.tabs)}>
+        <PageTabs
+          ariaLabel="Bottle sections"
+          currentHref={`/bottles/${bottle.id}`}
+          items={getTabs(bottle)}
+        />
+      </div>
+
+      <div {...stylex.props(styles.overview)}>
+        <BottleOverview
+          criticReviewDetail={
+            reviewsQuery.isPending ? "Loading reviews…" : undefined
+          }
+          criticReviews={criticReviews}
+          declaredFacts={getDeclaredFacts(bottle)}
+          mainState={mainState}
+          moreTastingsHref={`/bottles/${bottle.id}/tastings`}
+          recommendationIntro={recommendationsQuery.data?.reason}
+          recommendations={recommendations}
+          tastingCount={bottle.totalTastings}
+          tastings={tastings}
+        />
+      </div>
+
+      {recommendationsQuery.error ||
+      (!mainFailed && (reviewsQuery.error || tastingsQuery.error)) ? (
+        <p role="status" {...stylex.props(styles.partialError)}>
+          Some bottle details could not be loaded. The rest of this page is
+          still available.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+const styles = stylex.create({
+  page: {
+    minWidth: 0,
+    paddingBottom: { default: 0, [PHONE]: "76px" },
+  },
+  tabs: {
+    marginTop: space.x6,
+  },
+  overview: {
+    marginTop: space.x8,
+  },
+  partialError: {
+    margin: 0,
+    marginTop: space.x6,
+    padding: space.x4,
+    backgroundColor: colors.surface,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.5,
+  },
+});

@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import {
+  CursorPager,
   ListToolbar,
   PeriodHeader,
   RailList,
@@ -50,6 +51,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Toolbar: Story = {
   render: () => <ToolbarExample />,
+};
+
+export const CursorPagination: Story = {
+  render: () => (
+    <CursorPager nextHref="#page-4" page={3} previousHref="#page-2" />
+  ),
 };
 
 export const PeriodsAndRows: Story = {

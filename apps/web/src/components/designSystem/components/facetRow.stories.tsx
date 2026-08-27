@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { FacetRow, type FacetRowProps } from "./facetRow.stylex";
 
 const meta = {
@@ -28,20 +28,30 @@ const meta = {
 export default meta;
 type Story = StoryObj<FacetRowProps>;
 
-export const Available: Story = {};
-
-export const Selected: Story = {
-  args: { selected: true },
-};
-
-export const LongLabel: Story = {
-  args: { count: 6, label: "Campbeltown and the Islands", total: 41 },
-};
-
-export const WithoutCount: Story = {
-  args: { count: undefined, label: "Single malt", total: undefined },
-};
-
-export const Unavailable: Story = {
-  args: { count: null, label: "Paid under £100" },
+export const Overview: Story = {
+  render: (args: FacetRowProps) => (
+    <StoryStack>
+      <FacetRow count={12} label="Islay" onClick={args.onClick} total={41} />
+      <FacetRow
+        count={12}
+        label="Speyside"
+        onClick={args.onClick}
+        selected
+        total={41}
+      />
+      <FacetRow
+        count={6}
+        label="Campbeltown and the Islands"
+        onClick={args.onClick}
+        total={41}
+      />
+      <FacetRow
+        count={undefined}
+        label="Single malt"
+        onClick={args.onClick}
+        total={undefined}
+      />
+      <FacetRow count={null} label="Paid under £100" onClick={args.onClick} />
+    </StoryStack>
+  ),
 };

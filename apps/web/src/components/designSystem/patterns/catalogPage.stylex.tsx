@@ -1,0 +1,81 @@
+import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
+
+import { foundationStyles } from "../../../styles/foundations.stylex";
+import { colors, fonts, space } from "../../../styles/tokens.stylex";
+
+const NARROW = "@media (max-width: 759px)";
+
+export function CatalogPage({
+  action,
+  children,
+  eyebrow = "Whisky database",
+  filters,
+  title,
+}: {
+  action?: ReactNode;
+  children: ReactNode;
+  eyebrow?: ReactNode;
+  filters: ReactNode;
+  title: ReactNode;
+}) {
+  return (
+    <div {...stylex.props(styles.page)}>
+      <header {...stylex.props(styles.titleRow)}>
+        <div>
+          <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
+          <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
+        </div>
+        {action}
+      </header>
+      <div {...stylex.props(styles.layout)}>
+        <div {...stylex.props(styles.results)}>{children}</div>
+        <aside {...stylex.props(styles.filters)}>{filters}</aside>
+      </div>
+    </div>
+  );
+}
+
+const styles = stylex.create({
+  page: {
+    minWidth: 0,
+  },
+  titleRow: {
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: space.x4,
+    marginBottom: space.x6,
+    [NARROW]: {
+      alignItems: "flex-start",
+    },
+  },
+  eyebrow: {
+    marginBottom: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    letterSpacing: "0.08em",
+    lineHeight: 1.3,
+    textTransform: "uppercase",
+  },
+  layout: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: "minmax(0, 1fr) 300px",
+    alignItems: "start",
+    gap: space.x8,
+    [NARROW]: {
+      gridTemplateColumns: "minmax(0, 1fr)",
+    },
+  },
+  results: {
+    minWidth: 0,
+  },
+  filters: {
+    minWidth: 0,
+    [NARROW]: {
+      gridRow: 1,
+    },
+  },
+});

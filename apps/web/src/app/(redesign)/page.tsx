@@ -1,5 +1,5 @@
-import { HomePageController } from "@peated/web/components/designSystem/product/homePageController.stylex";
+import { HomePageClient } from "./homePageClient";
 
 export default function Page() {
-  return <HomePageController />;
+  return <HomePageClient />;
 }

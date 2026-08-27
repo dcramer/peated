@@ -44,8 +44,8 @@
 - [x] 3.10 Review and approve summary strip and passport at desktop and mobile widths in both system schemes
 - [x] 3.11 Add navigation tabs, record tables, list controls, rail lists, the application-header frame, and the reference footer
 - [x] 3.12 QA the complete reusable baseline at desktop and 320px widths in both system schemes
-- [x] 3.13 Add the entity history timeline and realistic distillery-page Storybook composition
-- [x] 3.14 Review history states and the distillery-page composition at desktop and mobile widths in both system schemes
+- [x] 3.13 Add the entity history timeline and realistic supplied-history stories
+- [x] 3.14 Review history states at desktop and mobile widths in both system schemes
 - [x] 3.15 Add attributed native-scale critic reviews and the selected-bottle summary
 - [x] 3.16 Add the settled responsive application-header component and compact scoped-search mode
 - [x] 3.17 Review the application header at all four responsive ranges in both system schemes
@@ -54,6 +54,7 @@
 - [ ] 3.20 Review and approve the bottle identity component in Storybook
 - [x] 3.21 Align library and tasted list marks with the settled 12px muted inline treatment
 - [x] 3.22 Focus the mobile header search when it opens and QA its active Storybook state
+- [x] 3.23 Replace community-score and verdict devices with Score, BandStack, and BandMark using the one-ruler rating model
 
 ## 4. Pickers and forms
 
@@ -69,6 +70,8 @@
 - [x] 4.10 QA the completed form-support component baseline at desktop and mobile widths in both system schemes
 - [x] 4.11 Align the verdict and 100-point inputs with the settled responsive tasting-input artifact
 - [ ] 4.12 Review and approve both configured tasting-form stories
+- [x] 4.13 Replace separate verdict and point controls with one per-tasting two-grain ScoreInput
+- [x] 4.14 QA the score measures and both tasting grains at desktop and phone widths in both schemes
 
 ## 5. Navigation and reference screen
 
@@ -102,8 +105,14 @@
 - [x] 6.19 Migrate the bottle catalog with real list data, URL-owned filters, cursor navigation, and bounded Storybook patterns
 - [ ] 6.20 Review and approve the bottle catalog at desktop and mobile widths in both system schemes
 - [x] 6.21 Remove the bottle catalog's flavor-profile filter and render count-optional facets in the app and Storybook
-- [ ] 6.22 Connect real bottle totals, facet counts, and age-statement facet filtering after API issue #762 lands
+- [x] 6.22 Connect real bottle totals, facet counts, and age-statement facet filtering after API issue #762 lands
 - [x] 6.23 Remove community-score and community-verdict filtering from the bottle catalog and its Storybook pattern
+- [x] 6.24 Migrate distiller, brand, and bottler catalogs with one shared route client, URL-owned filters, cursor pagination, and bounded Storybook states
+- [x] 6.25 Migrate the entity overview route with route-owned behavior, kind-specific presentation, live details, bottle-list-backed rows and empty states, a reusable entity header, and bounded Storybook states
+- [ ] 6.26 Replace the migrated entity catalogs' legacy type filter with the API-owned kind filter after issue #773 lands
+- [x] 6.27 Migrate the entity route frame, bottle list, tasting list, and SMWS codes sections with live API state, responsive StyleX composition, and reusable Storybook-owned components
+- [x] 6.28 Migrate the public member profile with API-owned summary, rating, tasting, region, privacy, and action state plus reusable profile-header stories
+- [x] 6.29 Complete the member profile route family with one nested frame, API-owned Library filters and owner actions, Activity records, cursor navigation, and bounded Storybook patterns
 
 ## 7. Storybook tooling
 
@@ -113,3 +122,4 @@
 - [x] 7.4 Verify lint, typecheck, the production build, MCP manifests, and the accessibility panel
 - [x] 7.5 Add Peated responsive and theme review presets with direct Wide, Folded, Phone, Light, and Dark toolbar actions
 - [x] 7.6 Make named behavior stories render their review state without manual setup interactions
+- [x] 7.7 Consolidate static component permutations into overview stories while preserving direct behavior states

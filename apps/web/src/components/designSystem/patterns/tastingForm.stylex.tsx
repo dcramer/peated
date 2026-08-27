@@ -5,7 +5,11 @@ import { useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, space } from "../../../styles/tokens.stylex";
-import type { MemberPickerOption, Verdict } from "../components";
+import type {
+  MemberPickerOption,
+  RatingGrain,
+  RatingValue,
+} from "../components";
 import {
   Button,
   ColourInput,
@@ -19,7 +23,6 @@ import {
   SelectedBottleSummary,
   Textarea,
   TextInput,
-  VerdictInput,
 } from "../components";
 import { memberOptions, noteOptions } from "../components/storyData";
 
@@ -33,20 +36,18 @@ function isServingStyle(value: string): value is ServingStyle {
 }
 
 export type TastingFormPatternProps = {
-  initialRatingSystem?: "score" | "verdict";
-  initialScore?: number | null;
-  initialVerdict?: Verdict | null;
+  initialGrain?: RatingGrain;
+  initialRating?: RatingValue;
   submitting?: boolean;
 };
 
 export function TastingFormPattern({
-  initialRatingSystem = "verdict",
-  initialScore = null,
-  initialVerdict = null,
+  initialGrain = "band",
+  initialRating = null,
   submitting = false,
 }: TastingFormPatternProps) {
-  const [verdict, setVerdict] = useState<Verdict | null>(initialVerdict);
-  const [score, setScore] = useState<number | null>(initialScore);
+  const [grain, setGrain] = useState<RatingGrain>(initialGrain);
+  const [rating, setRating] = useState<RatingValue>(initialRating);
   const [colour, setColour] = useState<number | null>(10);
   const [date, setDate] = useState("2026-08-25");
   const [comments, setComments] = useState("");
@@ -54,8 +55,12 @@ export function TastingFormPattern({
   const [notes, setNotes] = useState<readonly string[]>([]);
   const [serving, setServing] = useState<ServingStyle>("neat");
 
-  const complete =
-    initialRatingSystem === "verdict" ? verdict !== null : score !== null;
+  const complete = rating !== null;
+
+  function changeGrain(nextGrain: RatingGrain) {
+    setGrain(nextGrain);
+    setRating(null);
+  }
 
   return (
     <form
@@ -75,23 +80,15 @@ export function TastingFormPattern({
           />
         </div>
         <div {...stylex.props(styles.panel)}>
-          {initialRatingSystem === "verdict" ? (
-            <VerdictInput
-              id="tasting-verdict"
-              name="tasting-verdict"
-              onChange={setVerdict}
-              required
-              value={verdict}
-            />
-          ) : (
-            <ScoreInput
-              id="tasting-score"
-              name="tasting-score"
-              onChange={setScore}
-              required
-              value={score}
-            />
-          )}
+          <ScoreInput
+            grain={grain}
+            id="tasting-rating"
+            name="tasting-rating"
+            onChange={setRating}
+            onGrainChange={changeGrain}
+            required
+            value={rating}
+          />
         </div>
         <div {...stylex.props(styles.formGrid)}>
           <Field htmlFor="tasting-date" label="Date" optional>
@@ -178,7 +175,7 @@ export function TastingFormPattern({
         >
           {complete
             ? "Draft saved locally"
-            : `Choose a ${initialRatingSystem === "verdict" ? "verdict" : "score"} before saving`}
+            : `Choose ${grain === "band" ? "a band" : "a score"} before saving`}
         </span>
         <Button
           disabled={!complete}

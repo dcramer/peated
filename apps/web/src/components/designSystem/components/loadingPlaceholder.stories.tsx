@@ -26,19 +26,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Text: Story = {};
-
-export const Heading: Story = { args: { preset: "heading" } };
-
-export const Metadata: Story = { args: { preset: "metadata" } };
-
-export const Score: Story = { args: { preset: "score" } };
-
-export const Thumbnail: Story = { args: { preset: "thumbnail" } };
-
-export const TextModule: Story = {
-  render: () => (
+export const Overview: Story = {
+  render: (args) => (
     <StoryStack>
+      <LoadingPlaceholder {...args} />
+      <LoadingPlaceholder preset="heading" />
+      <LoadingPlaceholder preset="metadata" />
+      <LoadingPlaceholder preset="score" />
+      <LoadingPlaceholder preset="thumbnail" />
       <LoadingPlaceholder preset="heading" />
       <LoadingPlaceholder delay={1} preset="text" />
       <LoadingPlaceholder delay={2} preset="text" />

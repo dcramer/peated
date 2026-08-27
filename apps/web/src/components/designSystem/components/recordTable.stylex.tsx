@@ -14,14 +14,16 @@ export type RecordTableRow = {
 };
 
 export type RecordTableProps = {
+  ariaLabel?: string;
   columns: readonly [string, string];
   detail?: string;
-  heading: string;
+  heading?: string;
   rows: readonly [RecordTableRow, ...RecordTableRow[]];
 };
 
 /** Compares one record set across two compact measures. */
 export function RecordTable({
+  ariaLabel = "Bottle records",
   columns,
   detail,
   heading,
@@ -30,15 +32,20 @@ export function RecordTable({
   const headingId = useId();
 
   return (
-    <section aria-labelledby={headingId}>
-      <div {...stylex.props(styles.heading)}>
-        <div>
-          <h2 id={headingId} {...stylex.props(styles.title)}>
-            {heading}
-          </h2>
-          {detail ? <p {...stylex.props(styles.detail)}>{detail}</p> : null}
+    <section
+      aria-label={heading ? undefined : ariaLabel}
+      aria-labelledby={heading ? headingId : undefined}
+    >
+      {heading ? (
+        <div {...stylex.props(styles.heading)}>
+          <div>
+            <h2 id={headingId} {...stylex.props(styles.title)}>
+              {heading}
+            </h2>
+            {detail ? <p {...stylex.props(styles.detail)}>{detail}</p> : null}
+          </div>
         </div>
-      </div>
+      ) : null}
       <table {...stylex.props(styles.table)}>
         <thead {...stylex.props(styles.tableHead)}>
           <tr {...stylex.props(styles.headerRow)}>

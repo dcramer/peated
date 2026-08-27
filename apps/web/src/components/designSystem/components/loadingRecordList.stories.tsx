@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { LoadingRecordList } from "./feedback.stylex";
 
 const meta = {
@@ -22,6 +22,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const SingleRow: Story = { args: { rows: 1 } };
+export const Overview: Story = {
+  render: () => (
+    <StoryStack>
+      <LoadingRecordList rows={3} />
+      <LoadingRecordList rows={1} />
+    </StoryStack>
+  ),
+};

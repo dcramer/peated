@@ -338,8 +338,20 @@ export function BottleThumbnail({ label }: { label: string }) {
   return <BottleVisual label={label} size="sm" />;
 }
 
-export function Avatar({ initials }: { initials: string }) {
-  return <span {...stylex.props(styles.avatar)}>{initials}</span>;
+export function Avatar({
+  imageUrl,
+  initials,
+}: {
+  imageUrl?: string | null;
+  initials: string;
+}) {
+  return imageUrl ? (
+    <img alt="" src={imageUrl} {...stylex.props(styles.avatarImage)} />
+  ) : (
+    <span aria-hidden="true" {...stylex.props(styles.avatar)}>
+      {initials}
+    </span>
+  );
 }
 
 export function TextLink({
@@ -638,6 +650,14 @@ const styles = stylex.create({
     fontSize: "12px",
     fontWeight: 700,
     lineHeight: 1,
+  },
+  avatarImage: {
+    display: "block",
+    width: "38px",
+    height: "38px",
+    flexShrink: 0,
+    borderRadius: "50%",
+    objectFit: "cover",
   },
   textLink: {
     color: colors.accentDeep,

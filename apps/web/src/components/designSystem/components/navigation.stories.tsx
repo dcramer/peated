@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { NavigationTabs } from "./navigation.stylex";
 
 const databaseItems = [
@@ -37,12 +37,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Database: Story = {};
-
-export const WithPersonalDestinations: Story = {
-  args: { personalItems },
-};
-
-export const AnotherCurrentDestination: Story = {
-  args: { currentHref: "/distillers", personalItems },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <NavigationTabs {...args} />
+      <NavigationTabs {...args} personalItems={personalItems} />
+      <NavigationTabs
+        {...args}
+        currentHref="/distillers"
+        personalItems={personalItems}
+      />
+    </StoryStack>
+  ),
 };

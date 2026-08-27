@@ -1,0 +1,183 @@
+"use client";
+
+import type { Outputs } from "@peated/server/orpc/router";
+import * as stylex from "@stylexjs/stylex";
+import { useQuery } from "@tanstack/react-query";
+import { usePathname, useSearchParams } from "next/navigation";
+
+import {
+  ButtonLink,
+  CursorPager,
+  EmptyState,
+  LoadingRecordList,
+  ModuleError,
+  RailList,
+  RailListItem,
+  TastingEntry,
+  type TastingEntryMember,
+} from "@peated/web/components/designSystem/components";
+import {
+  PageColumns,
+  RailSection,
+} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import TimeSince from "@peated/web/components/timeSince";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { useProfile } from "./profileContext";
+import {
+  getProfileBottleMetadata,
+  getProfileVerdict,
+} from "./profilePresentation";
+
+type Tasting = Outputs["tastings"]["list"]["results"][number];
+type RegionList = Outputs["users"]["regionList"];
+
+export function ProfileTastingsPageClient() {
+  const orpc = useORPC();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { isCurrentUser, user } = useProfile();
+  const cursor = Number(searchParams.get("cursor") ?? "1") || 1;
+  const regionQuery = useQuery(
+    orpc.users.regionList.queryOptions({ input: { user: user.id } }),
+  );
+  const tastingQuery = useQuery(
+    orpc.tastings.list.queryOptions({
+      input: { cursor, limit: 10, user: user.id },
+    }),
+  );
+
+  return (
+    <PageColumns rail={getRegionRail(regionQuery, user.username)}>
+      <section aria-label={`${user.username}'s tastings`}>
+        {tastingQuery.isPending ? (
+          <LoadingRecordList label="Loading member tastings" rows={4} />
+        ) : tastingQuery.error ? (
+          <ModuleError
+            heading="Tastings are unavailable"
+            onRetry={() => void tastingQuery.refetch()}
+          >
+            The member profile is still available. Try loading their tastings
+            again.
+          </ModuleError>
+        ) : tastingQuery.data.results.length ? (
+          <div {...stylex.props(styles.tastingList)}>
+            {tastingQuery.data.results.map((tasting) => (
+              <ProfileTastingEntry key={tasting.id} tasting={tasting} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            action={
+              isCurrentUser ? (
+                <ButtonLink
+                  href="/addBottle?intent=tasting"
+                  size="sm"
+                  variant="accent"
+                >
+                  Log a tasting
+                </ButtonLink>
+              ) : undefined
+            }
+            heading="No tastings yet"
+          >
+            {isCurrentUser
+              ? "Your tasting record will appear here."
+              : `${user.username} has not recorded a tasting yet.`}
+          </EmptyState>
+        )}
+        <CursorPager
+          ariaLabel={`${user.username} tasting pages`}
+          nextHref={getCursorHref(
+            pathname,
+            searchParams,
+            tastingQuery.data?.rel.nextCursor,
+          )}
+          page={cursor}
+          previousHref={getCursorHref(
+            pathname,
+            searchParams,
+            tastingQuery.data?.rel.prevCursor,
+          )}
+        />
+      </section>
+    </PageColumns>
+  );
+}
+
+function ProfileTastingEntry({ tasting }: { tasting: Tasting }) {
+  const member: TastingEntryMember = {
+    description: tasting.notes,
+    href: `/bottles/${tasting.bottle.id}`,
+    metadata: getProfileBottleMetadata(tasting.bottle),
+    name: tasting.bottle.fullName,
+    notes: tasting.tags,
+    score: tasting.score ?? undefined,
+    verdict: getProfileVerdict(tasting.rating),
+  };
+  return (
+    <TastingEntry
+      author={tasting.createdBy.username}
+      authorHref={`/users/${tasting.createdBy.username}`}
+      date={<TimeSince date={tasting.createdAt} />}
+      members={[member]}
+    />
+  );
+}
+
+function getRegionRail(
+  query: ReturnType<typeof useQuery<RegionList>>,
+  username: string,
+) {
+  if (query.isPending) {
+    return (
+      <RailSection heading="What they pour">
+        <LoadingRecordList label="Loading member regions" rows={3} />
+      </RailSection>
+    );
+  }
+  if (query.error) {
+    return (
+      <ModuleError
+        heading="Regions are unavailable"
+        onRetry={() => void query.refetch()}
+      >
+        Try loading this part of the profile again.
+      </ModuleError>
+    );
+  }
+  if (!query.data.results.length) return undefined;
+  return (
+    <RailSection heading="What they pour">
+      <RailList ariaLabel={`${username}'s most tasted regions`}>
+        {query.data.results.slice(0, 6).map((item) => (
+          <RailListItem
+            end={item.count.toLocaleString("en-US")}
+            href={
+              item.region
+                ? `/locations/${item.country.slug}/regions/${item.region.slug}`
+                : `/locations/${item.country.slug}`
+            }
+            key={`${item.country.slug}-${item.region?.slug ?? "country"}`}
+            metadata={item.region ? item.country.name : undefined}
+            title={item.region?.name ?? item.country.name}
+          />
+        ))}
+      </RailList>
+    </RailSection>
+  );
+}
+
+function getCursorHref(
+  pathname: string,
+  searchParams: URLSearchParams,
+  cursor?: number | null,
+) {
+  if (cursor === null || cursor === undefined) return undefined;
+  const nextParams = new URLSearchParams(searchParams);
+  nextParams.set("cursor", String(cursor));
+  return `${pathname}?${nextParams.toString()}`;
+}
+
+const styles = stylex.create({
+  tastingList: { display: "flex", minWidth: 0, flexDirection: "column" },
+});

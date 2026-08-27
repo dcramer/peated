@@ -1,3 +1,4 @@
+import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/assets/entity.svg";
 import Link from "@peated/web/components/link";
@@ -30,7 +31,7 @@ export default function EntityResultRow({
       </div>
       <div className="hidden items-end gap-x-1 lg:flex">
         <Chip size="small" color="highlight">
-          {entity.kind}
+          {toTitleCase(entity.kind)}
         </Chip>
       </div>
     </>

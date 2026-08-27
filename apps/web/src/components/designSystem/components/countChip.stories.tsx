@@ -15,16 +15,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const Neutral: Story = { args: { tone: "neutral" } };
-
-export const Counts: Story = {
-  render: () => (
+export const Overview: Story = {
+  render: (args) => (
     <StoryRow>
+      <CountChip {...args} />
       <CountChip count={0} />
-      <CountChip count={12} />
       <CountChip count={2841} />
+      <CountChip count={12} tone="neutral" />
     </StoryRow>
   ),
 };

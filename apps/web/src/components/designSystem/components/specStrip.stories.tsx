@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { SpecStrip } from "./dataDevices.stylex";
 
 const meta = {
@@ -27,25 +27,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const FourCells: Story = {};
-
-export const ThreeCells: Story = {
-  args: {
-    cells: [
-      { label: "Founded", value: "1816" },
-      { label: "Capacity", value: "2.4m L" },
-      { label: "Bottlings", value: "148" },
-    ],
-  },
-};
-
-export const ThinData: Story = {
-  args: {
-    cells: [
-      { label: "ABV", value: "50.0%" },
-      { label: "Age", value: null },
-      { label: "Cask", value: null },
-      { label: "Size", value: "700 ml" },
-    ],
-  },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <SpecStrip {...args} />
+      <SpecStrip
+        cells={[
+          { label: "Founded", value: "1816" },
+          { label: "Capacity", value: "2.4m L" },
+          { label: "Bottlings", value: "148" },
+        ]}
+      />
+      <SpecStrip
+        cells={[
+          { label: "ABV", value: "50.0%" },
+          { label: "Age", value: null },
+          { label: "Cask", value: null },
+          { label: "Size", value: "700 ml" },
+        ]}
+      />
+    </StoryStack>
+  ),
 };

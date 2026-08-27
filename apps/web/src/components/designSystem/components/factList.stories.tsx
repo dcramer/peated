@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { FactList } from "./factList.stylex";
 
 const meta = {
@@ -26,16 +26,20 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const BottleLabel: Story = {};
-
-export const LongValues: Story = {
-  args: {
-    facts: [
-      { label: "Distilled at", value: "Bruichladdich Distillery" },
-      {
-        label: "Cask",
-        value: "First-fill ex-bourbon hogshead with a long label description",
-      },
-    ],
-  },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <FactList {...args} />
+      <FactList
+        facts={[
+          { label: "Distilled at", value: "Bruichladdich Distillery" },
+          {
+            label: "Cask",
+            value:
+              "First-fill ex-bourbon hogshead with a long label description",
+          },
+        ]}
+      />
+    </StoryStack>
+  ),
 };

@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { SegmentedControl } from "./formControls.stylex";
 
 const options = [
@@ -36,11 +36,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: (args) => <ControlledSegmentedControl {...args} />,
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <ControlledSegmentedControl {...args} />
+      <SegmentedControl
+        {...args}
+        disabled
+        id="disabled-served"
+        name="disabled-served"
+      />
+    </StoryStack>
+  ),
 };
-
-export const Disabled: Story = { args: { disabled: true } };
 
 function ControlledSegmentedControl(
   props: React.ComponentProps<typeof SegmentedControl>,

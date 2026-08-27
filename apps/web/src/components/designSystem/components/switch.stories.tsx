@@ -3,6 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
+import { StoryStack } from "../storyFixtures.stylex";
 import { Switch } from "./formControls.stylex";
 
 const meta = {
@@ -20,21 +21,21 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const On: Story = {
-  render: (args) => <ControlledSwitch {...args} />,
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <ControlledSwitch {...args} />
+      <ControlledSwitch {...args} checked={false} name="private-tasting" />
+      <ControlledSwitch
+        {...args}
+        checked={false}
+        description="Off means the tasting still counts, but only you see the note."
+        name="described-sharing"
+      />
+      <Switch {...args} disabled name="disabled-sharing" />
+    </StoryStack>
+  ),
 };
-
-export const Off: Story = { args: { checked: false } };
-
-export const WithDescription: Story = {
-  args: {
-    description:
-      "Off means the tasting still counts, but only you see the note.",
-  },
-  render: (args) => <ControlledSwitch {...args} />,
-};
-
-export const Disabled: Story = { args: { disabled: true } };
 
 function ControlledSwitch(props: React.ComponentProps<typeof Switch>) {
   const [checked, setChecked] = useState(props.checked);

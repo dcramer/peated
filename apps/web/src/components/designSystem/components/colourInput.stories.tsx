@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { ColourInput } from "./tastingInputs.stylex";
 
 const meta = {
@@ -27,15 +27,31 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Interactive: Story = {
-  render: (args) => <ControlledColourInput {...args} />,
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <ControlledColourInput {...args} />
+      <ControlledColourInput
+        {...args}
+        id="unsure-colour"
+        name="unsure-colour"
+        value={null}
+      />
+      <ControlledColourInput
+        {...args}
+        id="dark-colour"
+        name="dark-colour"
+        value={19}
+      />
+      <ColourInput
+        {...args}
+        disabled
+        id="disabled-colour"
+        name="disabled-colour"
+      />
+    </StoryStack>
+  ),
 };
-
-export const Unsure: Story = { args: { value: null } };
-
-export const DarkColour: Story = { args: { value: 19 } };
-
-export const Disabled: Story = { args: { disabled: true } };
 
 function ControlledColourInput(
   props: React.ComponentProps<typeof ColourInput>,

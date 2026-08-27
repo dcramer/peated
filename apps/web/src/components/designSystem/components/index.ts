@@ -83,12 +83,14 @@ export type {
   HistoryTimelineProps,
 } from "./historyTimeline.stylex";
 export {
+  CursorPager,
   ListToolbar,
   PeriodHeader,
   RailList,
   RailListItem,
 } from "./listStructures.stylex";
 export type {
+  CursorPagerProps,
   ListSortOption,
   ListToolbarProps,
   RailListItemProps,
@@ -120,13 +122,25 @@ export type {
   ScopedSearchProps,
 } from "./scopedSearch.stylex";
 export {
+  BandMark,
+  BandStack,
   CommunityScore,
+  RATING_BANDS,
+  Score,
   VerdictDistribution,
   VerdictDistributionBar,
   VerdictMark,
+  getRatingBandForPoint,
 } from "./scoring.stylex";
 export type {
+  BandCounts,
+  BandMarkProps,
+  BandStackProps,
   CommunityScoreProps,
+  RatingBand,
+  RatingGrain,
+  RatingValue,
+  ScoreProps,
   Verdict,
   VerdictDistributionProps,
   VerdictMarkProps,

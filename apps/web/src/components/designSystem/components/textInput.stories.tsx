@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { TextInput } from "./field.stylex";
 
 const meta = {
@@ -19,18 +19,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Empty: Story = {};
-
-export const Populated: Story = { args: { defaultValue: "Lagavulin 16" } };
-
-export const Data: Story = {
-  args: { defaultValue: "43.0", format: "data", inputMode: "decimal" },
-};
-
-export const Error: Story = {
-  args: { defaultValue: "592", format: "data", invalid: true },
-};
-
-export const Disabled: Story = {
-  args: { defaultValue: "Lagavulin 16", disabled: true },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <TextInput {...args} />
+      <TextInput defaultValue="Lagavulin 16" />
+      <TextInput defaultValue="43.0" format="data" inputMode="decimal" />
+      <TextInput defaultValue="592" format="data" invalid />
+      <TextInput defaultValue="Lagavulin 16" disabled />
+    </StoryStack>
+  ),
 };

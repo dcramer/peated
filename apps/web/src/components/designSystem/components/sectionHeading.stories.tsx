@@ -12,16 +12,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const WithoutCount: Story = { args: { count: undefined } };
-
-export const Examples: Story = {
-  render: () => (
+export const Overview: Story = {
+  render: (args) => (
     <StoryStack>
+      <SectionHeading {...args} />
       <SectionHeading count={12}>Similar bottles</SectionHeading>
       <SectionHeading count={2841}>Tastings</SectionHeading>
       <SectionHeading count={0}>Critic reviews</SectionHeading>
+      <SectionHeading>History</SectionHeading>
     </StoryStack>
   ),
 };

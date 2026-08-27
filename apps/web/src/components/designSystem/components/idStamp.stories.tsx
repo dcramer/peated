@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import { StoryStack } from "../storyFixtures.stylex";
 import { IdStamp } from "./dataDevices.stylex";
 
 const meta = {
@@ -11,6 +12,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const WithoutDetail: Story = { args: { detail: undefined } };
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <IdStamp {...args} />
+      <IdStamp id="B00872" />
+    </StoryStack>
+  ),
+};

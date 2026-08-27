@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { RowMenu } from "./rowMenu.stylex";
 import { TastingEntry } from "./tastingEntry.stylex";
 
@@ -46,25 +46,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Sitting: Story = {};
-
-export const SingleBottle: Story = {
-  args: {
-    comment: "A classic benchmark. The smoke never crowds out the fruit.",
-    context: undefined,
-    members: [
-      {
-        href: "/bottles/lagavulin-16",
-        metadata: "Islay · 16 years · 43% ABV",
-        name: "Lagavulin 16-year-old",
-        verdict: "savor",
-      },
-    ],
-  },
-};
-
-export const FeedCard: Story = {
-  args: {
-    surface: true,
-  },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <TastingEntry {...args} />
+      <TastingEntry
+        {...args}
+        comment="A classic benchmark. The smoke never crowds out the fruit."
+        context={undefined}
+        members={[
+          {
+            href: "/bottles/lagavulin-16",
+            metadata: "Islay · 16 years · 43% ABV",
+            name: "Lagavulin 16-year-old",
+            verdict: "savor",
+          },
+        ]}
+      />
+      <TastingEntry {...args} surface />
+    </StoryStack>
+  ),
 };

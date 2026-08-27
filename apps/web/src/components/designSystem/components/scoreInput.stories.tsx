@@ -3,7 +3,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
+import type { RatingGrain, RatingValue } from "./scoring.stylex";
 import { ScoreInput } from "./tastingInputs.stylex";
 
 const meta = {
@@ -17,28 +18,56 @@ const meta = {
     ),
   ],
   args: {
+    grain: "band",
     id: "score",
     name: "score",
     onChange: () => undefined,
+    onGrainChange: () => undefined,
     required: true,
-    value: 88,
+    value: { band: "veryGood", grain: "band" },
   },
 } satisfies Meta<typeof ScoreInput>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Interactive: Story = {
-  render: (args) => <ControlledScoreInput {...args} />,
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <ControlledScoreInput {...args} />
+      <ControlledScoreInput
+        {...args}
+        grain="point"
+        id="exact-score"
+        name="exact-score"
+        value={{ grain: "point", point: 88 }}
+      />
+      <ScoreInput
+        {...args}
+        disabled
+        id="disabled-score"
+        name="disabled-score"
+      />
+    </StoryStack>
+  ),
 };
 
-export const Empty: Story = { args: { value: null } };
-
-export const Extraordinary: Story = { args: { value: 97 } };
-
-export const Disabled: Story = { args: { disabled: true } };
-
 function ControlledScoreInput(props: React.ComponentProps<typeof ScoreInput>) {
-  const [value, setValue] = useState<number | null>(props.value);
-  return <ScoreInput {...props} onChange={setValue} value={value} />;
+  const [grain, setGrain] = useState<RatingGrain>(props.grain);
+  const [value, setValue] = useState<RatingValue>(props.value);
+
+  function changeGrain(nextGrain: RatingGrain) {
+    setGrain(nextGrain);
+    setValue(null);
+  }
+
+  return (
+    <ScoreInput
+      {...props}
+      grain={grain}
+      onChange={setValue}
+      onGrainChange={changeGrain}
+      value={value}
+    />
+  );
 }

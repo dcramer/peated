@@ -1,0 +1,173 @@
+"use client";
+
+import { toTitleCase } from "@peated/server/lib/strings";
+import type { Entity, EntityType } from "@peated/server/types";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+import { ButtonLink } from "@peated/web/components/designSystem/components";
+import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
+import {
+  EntityCatalogFilters,
+  EntityCatalogList,
+  type EntityCatalogItem,
+} from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import { useORPC } from "@peated/web/lib/orpc/context";
+
+const DEFAULT_SORT = "-tastings";
+
+const sortOptions = [
+  { label: "Most tasted", value: "-tastings" },
+  { label: "Most bottles", value: "-bottles" },
+  { label: "Name", value: "name" },
+  { label: "Recently added", value: "-created" },
+] as const;
+
+const catalogConfig = {
+  bottler: { noun: "bottler", title: "Bottlers" },
+  brand: { noun: "brand", title: "Brands" },
+  distiller: { noun: "distiller", title: "Distillers" },
+} satisfies Record<EntityType, { noun: string; title: string }>;
+
+export function EntityCatalogPageClient({ type }: { type: EntityType }) {
+  const config = catalogConfig[type];
+  const orpc = useORPC();
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryParams = useApiQueryParams({
+    numericFields: ["cursor", "limit"],
+    overrides: { type },
+  });
+  const { data: entityList } = useSuspenseQuery(
+    orpc.entities.list.queryOptions({ input: queryParams }),
+  );
+  const { data: countryList } = useSuspenseQuery(
+    orpc.countries.list.queryOptions({
+      input: { onlyMajor: true, sort: "-bottles" },
+    }),
+  );
+  const page = Number(searchParams.get("cursor") ?? "1") || 1;
+  const sort = searchParams.get("sort") ?? DEFAULT_SORT;
+  const country = searchParams.get("country") ?? "";
+  const query = searchParams.get("query") ?? "";
+  const region = searchParams.get("region") ?? "";
+  const hasFilters = Boolean(country || query || region);
+
+  function updateParams(updates: Record<string, string>) {
+    const nextParams = new URLSearchParams(searchParams);
+
+    Object.entries(updates).forEach(([name, value]) => {
+      if (value) nextParams.set(name, value);
+      else nextParams.delete(name);
+    });
+    if ("country" in updates) nextParams.delete("region");
+    nextParams.delete("cursor");
+    router.push(buildHref(pathname, nextParams));
+  }
+
+  function clearFilters() {
+    const nextParams = new URLSearchParams(searchParams);
+    ["country", "cursor", "query", "region"].forEach((name) =>
+      nextParams.delete(name),
+    );
+    router.push(buildHref(pathname, nextParams));
+  }
+
+  const addHref = `/addEntity?type=${type}`;
+  const items = entityList.results.map(toCatalogItem);
+
+  return (
+    <CatalogPage
+      action={
+        <ButtonLink href={addHref} size="md" variant="tonal">
+          Add {config.noun}
+        </ButtonLink>
+      }
+      filters={
+        <EntityCatalogFilters
+          countries={countryList.results.map((item) => ({
+            label: item.name,
+            value: String(item.id),
+          }))}
+          country={country}
+          key={query}
+          onClear={clearFilters}
+          onCountryChange={(value) => updateParams({ country: value })}
+          onQuerySubmit={(value) => updateParams({ query: value })}
+          onRegionClear={
+            region ? () => updateParams({ region: "" }) : undefined
+          }
+          query={query}
+          region={region ? formatRegion(region) : undefined}
+        />
+      }
+      title={config.title}
+    >
+      <EntityCatalogList
+        addHref={addHref}
+        items={items}
+        nextHref={getCursorHref(
+          pathname,
+          searchParams,
+          entityList.rel.nextCursor,
+        )}
+        noun={config.noun}
+        onClear={hasFilters ? clearFilters : undefined}
+        onSortChange={(value) => updateParams({ sort: value })}
+        page={page}
+        previousHref={getCursorHref(
+          pathname,
+          searchParams,
+          entityList.rel.prevCursor,
+        )}
+        sort={sort}
+        sortOptions={sortOptions}
+      />
+    </CatalogPage>
+  );
+}
+
+function toCatalogItem(entity: Entity): EntityCatalogItem {
+  const location = [entity.region?.name, entity.country?.name]
+    .filter((value): value is string => Boolean(value))
+    .join(", ");
+  const metadata = [
+    entity.peatedId,
+    entity.kind ? toTitleCase(entity.kind) : null,
+    location || null,
+  ].filter((value): value is string => value !== null);
+
+  return {
+    href: `/entities/${entity.id}`,
+    id: entity.peatedId,
+    metadata,
+    name: entity.name,
+    totalBottles: entity.totalBottles,
+    totalTastings: entity.totalTastings,
+  };
+}
+
+function formatRegion(region: string) {
+  return /^\d+$/.test(region)
+    ? `Region ${region}`
+    : toTitleCase(region.replaceAll("-", " "));
+}
+
+function getCursorHref(
+  pathname: string,
+  searchParams: URLSearchParams,
+  cursor: number | null,
+) {
+  if (cursor === null) return undefined;
+
+  const nextParams = new URLSearchParams(searchParams);
+  nextParams.set("cursor", String(cursor));
+  return buildHref(pathname, nextParams);
+}
+
+function buildHref(pathname: string, params: URLSearchParams) {
+  const queryString = params.toString();
+  return queryString ? `${pathname}?${queryString}` : pathname;
+}

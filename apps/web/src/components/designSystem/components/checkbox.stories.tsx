@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { Checkbox } from "./checkbox.stylex";
 
 const meta = {
@@ -21,14 +21,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Empty: Story = {};
-
-export const Checked: Story = { args: { defaultChecked: true } };
-
-export const WithDescription: Story = {
-  args: {
-    description: "You can change this later in account settings.",
-  },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <Checkbox {...args} />
+      <Checkbox defaultChecked label="Terms accepted" />
+      <Checkbox
+        description="You can change this later in account settings."
+        label="Share tasting activity"
+      />
+      <Checkbox disabled label="Unavailable option" />
+    </StoryStack>
+  ),
 };
-
-export const Disabled: Story = { args: { disabled: true } };

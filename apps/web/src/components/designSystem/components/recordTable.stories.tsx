@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { RecordTable, type RecordTableProps } from "./recordTable.stylex";
 import { VerdictDistributionBar } from "./scoring.stylex";
 
@@ -59,21 +59,36 @@ const meta = {
 export default meta;
 type Story = StoryObj<RecordTableProps>;
 
-export const Populated: Story = {};
-
-export const LongNames: Story = {
-  args: {
-    rows: [
-      {
-        href: "/bottles/4",
-        id: "4",
-        metadata: "Campbeltown · 15 years · 51.4% ABV",
-        name: "A deliberately long independent bottling name that tests the aligned row",
-        values: [
-          "91.3",
-          <VerdictDistributionBar key="verdict" pass={2} savor={21} sip={7} />,
-        ],
-      },
-    ],
-  },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <RecordTable {...args} />
+      <RecordTable
+        {...args}
+        ariaLabel="Associated bottles"
+        detail={undefined}
+        heading={undefined}
+      />
+      <RecordTable
+        {...args}
+        rows={[
+          {
+            href: "/bottles/4",
+            id: "4",
+            metadata: "Campbeltown · 15 years · 51.4% ABV",
+            name: "A deliberately long independent bottling name that tests the aligned row",
+            values: [
+              "91.3",
+              <VerdictDistributionBar
+                key="verdict"
+                pass={2}
+                savor={21}
+                sip={7}
+              />,
+            ],
+          },
+        ]}
+      />
+    </StoryStack>
+  ),
 };

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryRow } from "../storyFixtures.stylex";
+import { StoryRow, StoryStack } from "../storyFixtures.stylex";
 import { Button } from "./button.stylex";
 
 const meta = {
@@ -23,51 +23,38 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const Tonal: Story = {
-  args: { children: "Browse database", variant: "tonal" },
-};
-
-export const Accent: Story = {
-  args: { children: "Save tasting", variant: "accent" },
-};
-
-export const Text: Story = {
-  args: { children: "Record this bottle", variant: "text" },
-};
-
-export const Small: Story = { args: { size: "sm", variant: "tonal" } };
-
-export const Large: Story = { args: { size: "lg", variant: "accent" } };
-
-export const Loading: Story = {
-  args: {
-    children: "Save tasting",
-    loading: true,
-    loadingLabel: "Saving your tasting",
-    variant: "accent",
-  },
-};
-
-export const LoadingSizes: Story = {
-  render: () => (
-    <StoryRow>
-      {(["sm", "md", "lg"] as const).map((size) => (
-        <Button
-          key={size}
-          loading
-          loadingLabel="Saving your tasting"
-          size={size}
-          variant="accent"
-        >
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <StoryRow>
+        <Button {...args} />
+        <Button variant="tonal">Browse database</Button>
+        <Button variant="accent">Save tasting</Button>
+        <Button variant="text">Record this bottle</Button>
+      </StoryRow>
+      <StoryRow>
+        {(["sm", "md", "lg"] as const).map((size) => (
+          <Button key={size} size={size} variant="accent">
+            Save tasting
+          </Button>
+        ))}
+      </StoryRow>
+      <StoryRow>
+        {(["sm", "md", "lg"] as const).map((size) => (
+          <Button
+            key={size}
+            loading
+            loadingLabel="Saving your tasting"
+            size={size}
+            variant="accent"
+          >
+            Save tasting
+          </Button>
+        ))}
+        <Button disabled variant="accent">
           Save tasting
         </Button>
-      ))}
-    </StoryRow>
+      </StoryRow>
+    </StoryStack>
   ),
-};
-
-export const Disabled: Story = {
-  args: { disabled: true, variant: "accent" },
 };

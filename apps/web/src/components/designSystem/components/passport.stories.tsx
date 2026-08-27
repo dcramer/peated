@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import {
   Passport,
   type PassportProps,
@@ -53,21 +53,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<PassportProps>;
 
-export const ClosedSet: Story = {};
-
-export const OpenEnded: Story = {
-  args: {
-    count: 23,
-    kind: "open",
-    nextStampIn: 2,
-    unit: "bottles",
-  },
-};
-
-export const LargeClosedSet: Story = {
-  args: {
-    kind: "closed",
-    stamps: largeStamps,
-    unit: "distilleries",
-  },
+export const Overview: Story = {
+  render: (args: PassportProps) => (
+    <StoryStack>
+      <Passport {...args} />
+      <Passport count={23} kind="open" nextStampIn={2} unit="bottles" />
+      <Passport kind="closed" stamps={largeStamps} unit="distilleries" />
+    </StoryStack>
+  ),
 };

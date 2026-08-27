@@ -2,7 +2,7 @@
 
 import * as stylex from "@stylexjs/stylex";
 import { ListFilter } from "lucide-react";
-import type { FormEvent } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { useId, useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
@@ -17,6 +17,7 @@ import {
   BottleIdentityRow,
   Button,
   ButtonLink,
+  CursorPager,
   EmptyState,
   FacetRow,
   ListToolbar,
@@ -54,6 +55,9 @@ export type BottleCatalogItem = {
 };
 
 export type BottleCatalogListProps = {
+  emptyAction?: ReactNode;
+  emptyDescription?: ReactNode;
+  emptyHeading?: string;
   items: readonly BottleCatalogItem[];
   nextHref?: string;
   onClear?: () => void;
@@ -65,8 +69,11 @@ export type BottleCatalogListProps = {
   total?: number;
 };
 
-/** Presents one API page of bottle records without inventing a total count. */
+/** Presents one API page and an optional API-owned full-result total. */
 export function BottleCatalogList({
+  emptyAction,
+  emptyDescription = "Try a broader search or remove one of the active filters.",
+  emptyHeading = "No bottles found",
   items,
   nextHref,
   onClear,
@@ -109,7 +116,8 @@ export function BottleCatalogList({
       ) : (
         <EmptyState
           action={
-            onClear ? (
+            emptyAction ??
+            (onClear ? (
               <Button onClick={onClear} size="sm" variant="tonal">
                 Clear filters
               </Button>
@@ -117,35 +125,19 @@ export function BottleCatalogList({
               <ButtonLink href="/addBottle" size="sm" variant="tonal">
                 Record a bottle
               </ButtonLink>
-            )
+            ))
           }
-          heading="No bottles found"
+          heading={emptyHeading}
         >
-          Try a broader search or remove one of the active filters.
+          {emptyDescription}
         </EmptyState>
       )}
-      {previousHref || nextHref ? (
-        <nav aria-label="Bottle pages" {...stylex.props(styles.pagination)}>
-          <div {...stylex.props(styles.paginationLinks)}>
-            {previousHref ? (
-              <ButtonLink
-                href={previousHref}
-                rel="prev"
-                size="sm"
-                variant="tonal"
-              >
-                ← Previous
-              </ButtonLink>
-            ) : null}
-            {nextHref ? (
-              <ButtonLink href={nextHref} rel="next" size="sm" variant="tonal">
-                Next →
-              </ButtonLink>
-            ) : null}
-          </div>
-          <span {...stylex.props(styles.pageNumber)}>Page {page}</span>
-        </nav>
-      ) : null}
+      <CursorPager
+        ariaLabel="Bottle pages"
+        nextHref={nextHref}
+        page={page}
+        previousHref={previousHref}
+      />
     </section>
   );
 }
@@ -265,7 +257,7 @@ export type BottleCatalogFiltersProps = {
   query: string;
 };
 
-/** Keeps catalog filters reachable while the product controller owns URL state. */
+/** Keeps catalog filters reachable while the product route owns URL state. */
 export function BottleCatalogFilters({
   age,
   category,
@@ -454,26 +446,6 @@ const styles = stylex.create({
     fontWeight: 700,
     letterSpacing: "-0.03em",
     lineHeight: 1,
-  },
-  pagination: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: space.x3,
-    paddingTop: space.x6,
-    flexWrap: "wrap",
-  },
-  paginationLinks: {
-    display: "flex",
-    alignItems: "center",
-    gap: space.x2,
-  },
-  pageNumber: {
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.4,
   },
   filters: {
     minWidth: 0,

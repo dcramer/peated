@@ -9,7 +9,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { IconButton } from "./button.stylex";
+import { ButtonLink, IconButton } from "./button.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -100,6 +100,41 @@ function CompactSelect({
 
 export function PeriodHeader({ children }: { children: ReactNode }) {
   return <h3 {...stylex.props(styles.period)}>{children}</h3>;
+}
+
+export type CursorPagerProps = {
+  ariaLabel?: string;
+  nextHref?: string;
+  page: number;
+  previousHref?: string;
+};
+
+/** Presents only the cursor actions supplied by the owning API. */
+export function CursorPager({
+  ariaLabel = "Record pages",
+  nextHref,
+  page,
+  previousHref,
+}: CursorPagerProps) {
+  if (!previousHref && !nextHref) return null;
+
+  return (
+    <nav aria-label={ariaLabel} {...stylex.props(styles.pagination)}>
+      <div {...stylex.props(styles.paginationLinks)}>
+        {previousHref ? (
+          <ButtonLink href={previousHref} rel="prev" size="sm" variant="tonal">
+            ← Previous
+          </ButtonLink>
+        ) : null}
+        {nextHref ? (
+          <ButtonLink href={nextHref} rel="next" size="sm" variant="tonal">
+            Next →
+          </ButtonLink>
+        ) : null}
+      </div>
+      <span {...stylex.props(styles.pageNumber)}>Page {page}</span>
+    </nav>
+  );
 }
 
 export function RailList({
@@ -236,6 +271,26 @@ const styles = stylex.create({
     right: space.x2,
     color: colors.inkMuted,
     pointerEvents: "none",
+  },
+  pagination: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x3,
+    paddingTop: space.x6,
+    flexWrap: "wrap",
+  },
+  paginationLinks: {
+    display: "flex",
+    alignItems: "center",
+    gap: space.x2,
+  },
+  pageNumber: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontVariantNumeric: "tabular-nums",
+    lineHeight: 1.4,
   },
   period: {
     margin: 0,

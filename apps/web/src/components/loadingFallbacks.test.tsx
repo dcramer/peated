@@ -2,9 +2,6 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import BottlersLoading from "../app/(entities-sidebar)/bottlers/loading";
-import BrandsLoading from "../app/(entities-sidebar)/brands/loading";
-import DistillersLoading from "../app/(entities-sidebar)/distillers/loading";
 import DefaultLoading from "./defaultLoading";
 import RightSidebarSkeleton from "./rightSidebarSkeleton";
 import Spinner from "./spinner";
@@ -14,45 +11,6 @@ function countOccurrences(value: string, pattern: string) {
 }
 
 describe("loading fallbacks", () => {
-  it.each([
-    {
-      Component: BrandsLoading,
-      hasSearch: true,
-      name: "brands",
-    },
-    {
-      Component: BottlersLoading,
-      hasSearch: true,
-      name: "bottlers",
-    },
-    {
-      Component: DistillersLoading,
-      hasSearch: true,
-      name: "distillers",
-    },
-  ])(
-    "$name route reserves table structure while loading",
-    ({ Component, hasSearch }) => {
-      const html = renderToStaticMarkup(createElement(Component));
-
-      expect(html).toContain('role="status"');
-      expect(html).toContain('aria-busy="true"');
-      expect(html).toContain("Loading");
-      expect(html).toContain("<table");
-      expect(html).toContain('aria-hidden="true"');
-      expect(countOccurrences(html, '<tr class="table-row')).toBe(12);
-      expect(html).not.toContain('fill="transparent"');
-
-      if (hasSearch) {
-        expect(html).toContain("h-9 flex-grow");
-      } else {
-        expect(html).not.toContain("h-9 flex-grow");
-      }
-
-      expect(html).not.toContain("mt-2 h-3 w-32");
-    },
-  );
-
   it("renders the default spinner in a stable reserved block", () => {
     const html = renderToStaticMarkup(createElement(DefaultLoading));
 

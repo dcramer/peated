@@ -1,0 +1,85 @@
+import {
+  SMWS_CATEGORY_LIST,
+  SMWS_DISTILLERY_CODES,
+} from "@peated/bottle-classifier/smws";
+import { logError } from "@peated/web/lib/log";
+import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { notFound } from "next/navigation";
+
+import { EntityCodes } from "./entityCodes.stylex";
+
+export default async function EntityCodesPage(props: {
+  params: Promise<{ entityId: string }>;
+}) {
+  const { entityId } = await props.params;
+  const { client } = await getAnonymousServerClient();
+  const entity = await resolveOrNotFound(
+    client.entities.details({ entity: Number(entityId) }),
+  );
+
+  if (entity.shortName !== "SMWS") notFound();
+
+  const { results: distillerList } = await client.smws.distillerList();
+  const exampleDistiller = distillerList.find(
+    (distiller) =>
+      distiller.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase(),
+  );
+
+  if (!exampleDistiller) {
+    const error = new Error("Unable to find example distiller for SMWS codes.");
+    logError(error, {
+      entityId: entity.id,
+      entityName: entity.name,
+      entityShortName: entity.shortName,
+      expectedDistillerName: SMWS_DISTILLERY_CODES[4],
+      distillerCount: distillerList.length,
+      distillerNames: distillerList.map((distiller) => distiller.name),
+    });
+    throw error;
+  }
+
+  const distillersByName = Object.fromEntries([
+    ...distillerList.map((distiller) => [
+      distiller.name.toLowerCase(),
+      distiller,
+    ]),
+    ...distillerList
+      .filter((distiller) => Boolean(distiller.shortName))
+      .map((distiller) => [distiller.shortName!.toLowerCase(), distiller]),
+  ]);
+  const groups = SMWS_CATEGORY_LIST.flatMap(([categoryCode, categoryTitle]) => {
+    const rows = [];
+
+    for (let index = 1; index < 1000; index += 1) {
+      const code = `${categoryCode}${index}`;
+      const distillerName = SMWS_DISTILLERY_CODES[code];
+      if (distillerName === undefined) break;
+      const distiller = distillerName
+        ? distillersByName[distillerName.toLowerCase()]
+        : null;
+
+      rows.push({
+        code,
+        country: distiller?.country?.name ?? null,
+        href: distiller ? `/entities/${distiller.id}` : undefined,
+        name: distiller?.name ?? distillerName ?? "Unknown",
+      });
+    }
+
+    return rows.length
+      ? [{ code: categoryCode, heading: categoryTitle, rows }]
+      : [];
+  });
+
+  return (
+    <EntityCodes
+      entityName={entity.name}
+      example={{
+        href: `/entities/${exampleDistiller.id}`,
+        name: exampleDistiller.name,
+      }}
+      groups={groups}
+    />
+  );
+}

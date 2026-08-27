@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { ScopedSearch } from "./scopedSearch.stylex";
 
 const scopes = [
@@ -42,8 +42,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: (args) => <ControlledScopedSearch {...args} />,
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <ControlledScopedSearch {...args} />
+      <ControlledScopedSearch {...args} scope="bottles" />
+      <ControlledScopedSearch {...args} defaultValue="Lagavulin 16" />
+      <ScopedSearch {...args} disabled />
+    </StoryStack>
+  ),
 };
 
 export const Focused: Story = {
@@ -55,18 +62,6 @@ export const ScopeMenuOpen: Story = {
   args: { defaultScopeMenuOpen: true, scopes: uncountedScopes },
   render: (args) => <ControlledScopedSearch {...args} />,
 };
-
-export const BottleScope: Story = {
-  args: { scope: "bottles" },
-  render: (args) => <ControlledScopedSearch {...args} />,
-};
-
-export const Populated: Story = {
-  args: { defaultValue: "Lagavulin 16" },
-  render: (args) => <ControlledScopedSearch {...args} />,
-};
-
-export const Disabled: Story = { args: { disabled: true } };
 
 function ControlledScopedSearch(
   props: React.ComponentProps<typeof ScopedSearch>,

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryRow } from "../storyFixtures.stylex";
 import { RowMenu } from "./rowMenu.stylex";
 
 const groups = [
@@ -33,26 +33,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const PageAction: Story = {
-  args: {
-    variant: "page",
-  },
-};
-
-export const WithDisabledAction: Story = {
-  args: {
-    groups: [
-      [
-        { label: "Record a tasting", onSelect: () => undefined },
-        {
-          disabled: true,
-          label: "Add what you paid",
-          onSelect: () => undefined,
-        },
-      ],
-      [{ label: "Remove from library", onSelect: () => undefined }],
-    ],
-  },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryRow>
+      <RowMenu {...args} />
+      <RowMenu {...args} variant="page" />
+      <RowMenu
+        {...args}
+        groups={[
+          [
+            { label: "Record a tasting", onSelect: () => undefined },
+            {
+              disabled: true,
+              label: "Add what you paid",
+              onSelect: () => undefined,
+            },
+          ],
+          [{ label: "Remove from library", onSelect: () => undefined }],
+        ]}
+      />
+    </StoryRow>
+  ),
 };

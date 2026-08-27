@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { Field, ValidationMessage } from "./field.stylex";
 import { UnitInput } from "./unitInput.stylex";
 
@@ -15,9 +15,7 @@ const meta = {
   decorators: [
     (Story) => (
       <StoryCanvas width="compact">
-        <Field htmlFor="unit-input" label="ABV">
-          <Story />
-        </Field>
+        <Story />
       </StoryCanvas>
     ),
   ],
@@ -26,26 +24,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const Years: Story = {
-  args: { defaultValue: 16, unit: "yr" },
-};
-
-export const Invalid: Story = {
-  args: {
-    "aria-describedby": "unit-error",
-    defaultValue: 592,
-    invalid: true,
-  },
-  decorators: [
-    (Story) => (
-      <div>
-        <Story />
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <Field htmlFor="unit-input" label="ABV">
+        <UnitInput {...args} />
+      </Field>
+      <Field htmlFor="age-input" label="Age">
+        <UnitInput defaultValue={16} id="age-input" unit="yr" />
+      </Field>
+      <Field htmlFor="invalid-unit-input" label="ABV">
+        <UnitInput
+          aria-describedby="unit-error"
+          defaultValue={592}
+          id="invalid-unit-input"
+          invalid
+          unit="%"
+        />
         <ValidationMessage id="unit-error">
           Did you mean 59.2?
         </ValidationMessage>
-      </div>
-    ),
-  ],
+      </Field>
+    </StoryStack>
+  ),
 };

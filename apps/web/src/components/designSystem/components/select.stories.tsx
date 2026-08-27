@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { Select } from "./formControls.stylex";
 
 const options = (
@@ -28,8 +28,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const Error: Story = { args: { invalid: true } };
-
-export const Disabled: Story = { args: { disabled: true } };
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <Select {...args} />
+      <Select defaultValue="hogshead" invalid>
+        {options}
+      </Select>
+      <Select defaultValue="hogshead" disabled>
+        {options}
+      </Select>
+    </StoryStack>
+  ),
+};

@@ -21,15 +21,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Neutral: Story = {};
-
-export const Tinted: Story = { args: { variant: "tinted" } };
-
-export const Solid: Story = { args: { variant: "solid" } };
-
-export const Disabled: Story = {
-  args: { disabled: true, onClick: () => undefined },
-  argTypes: { onClick: { control: false } },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryRow>
+      <Chip {...args} />
+      <Chip variant="tinted">Dried fruit</Chip>
+      <Chip variant="solid">Selected</Chip>
+      <Chip disabled onClick={() => undefined}>
+        Unavailable
+      </Chip>
+    </StoryRow>
+  ),
 };
 
 export const InteractiveNotes: Story = {

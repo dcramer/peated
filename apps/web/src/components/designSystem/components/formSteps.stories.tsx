@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { FormSteps } from "./formSteps.stylex";
 
 const steps = [
@@ -29,6 +29,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const First: Story = {};
-export const Second: Story = { args: { current: 1 } };
-export const Final: Story = { args: { current: 2 } };
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <FormSteps {...args} />
+      <FormSteps current={1} steps={steps} />
+      <FormSteps current={2} steps={steps} />
+    </StoryStack>
+  ),
+};

@@ -1,11 +1,12 @@
 import type { Product, WithContext } from "schema-dts";
 
-import { BottlePageController } from "@peated/web/components/designSystem/product/bottlePageController.stylex";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
+
+import { BottlePageClient } from "./bottlePageClient.stylex";
 
 export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
@@ -69,7 +70,7 @@ export default async function BottlePage(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <BottlePageController initialBottle={bottle} />
+      <BottlePageClient initialBottle={bottle} />
     </>
   );
 }

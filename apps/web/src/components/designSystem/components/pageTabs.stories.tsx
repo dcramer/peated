@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { PageTabs } from "./pageTabs.stylex";
 
 const items = [
@@ -30,8 +30,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Overview: Story = {};
-
-export const Tastings: Story = {
-  args: { currentHref: "/bottles/19936/tastings" },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <PageTabs {...args} />
+      <PageTabs {...args} currentHref="/bottles/19936/tastings" />
+    </StoryStack>
+  ),
 };

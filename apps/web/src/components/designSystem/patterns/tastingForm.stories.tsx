@@ -6,9 +6,8 @@ const meta = {
   title: "Patterns/Tasting Form",
   component: TastingFormPattern,
   args: {
-    initialRatingSystem: "verdict",
-    initialScore: null,
-    initialVerdict: null,
+    initialGrain: "band",
+    initialRating: null,
     submitting: false,
   },
 } satisfies Meta<typeof TastingFormPattern>;
@@ -18,16 +17,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const HundredPoint: Story = {
+export const ExactPoint: Story = {
   args: {
-    initialRatingSystem: "score",
-    initialScore: 88,
+    initialGrain: "point",
+    initialRating: { grain: "point", point: 88 },
   },
 };
 
 export const Saving: Story = {
   args: {
-    initialVerdict: "savor",
+    initialRating: { band: "outstanding", grain: "band" },
     submitting: true,
   },
 };

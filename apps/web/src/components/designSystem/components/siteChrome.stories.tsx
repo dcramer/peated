@@ -27,7 +27,7 @@ const groups: SiteFooterProps["groups"] = [
     label: "Contribute",
     links: [
       { href: "/addBottle", label: "Record a bottle" },
-      { href: "/addEntity", label: "Add a maker" },
+      { href: "/addEntity", label: "Add a distiller" },
       { href: "/updates", label: "Recent changes" },
     ],
   },

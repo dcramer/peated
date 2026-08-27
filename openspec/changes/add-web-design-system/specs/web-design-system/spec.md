@@ -63,11 +63,16 @@ The web workspace SHALL provide Storybook as a design-system catalog that render
 #### Scenario: Reviewer opens a component
 
 - **WHEN** a reviewer opens an implemented component
-- **THEN** its named stories render the same exported component states used by product screens
+- **THEN** its overview renders useful static variants together from the same exported component used by product screens
+
+#### Scenario: Component has simple prop permutations
+
+- **WHEN** sizes, labels, item counts, selected values, or other static props do not create distinct behavior
+- **THEN** the catalog presents them in the component overview or controls instead of adding sidebar stories
 
 #### Scenario: Reviewer opens a behavior state
 
-- **WHEN** a reviewer opens a named story for an open, focused, loading, empty, error, or other supported behavior
+- **WHEN** a behavior, asynchronous state, permission boundary, error, or responsive composition needs isolated review
 - **THEN** the story renders that scenario directly without requiring setup interactions from the reviewer
 
 #### Scenario: Product route composes catalog components
@@ -199,17 +204,22 @@ The design system SHALL provide a scoped search experience that presents caller-
 
 ### Requirement: Domain-owned tasting inputs
 
-The design system SHALL provide verdict, score, colour, and picture inputs that preserve the existing tasting schema and rating-population boundaries.
+The design system SHALL provide one rating input with band and point grains, plus colour and picture inputs that preserve their owning product contracts.
 
-#### Scenario: Member records a verdict
+#### Scenario: Member records a band
 
-- **WHEN** a member selects Pass, Sip, or Savor
-- **THEN** the verdict input emits that domain value or null and does not invent a numeric score
+- **WHEN** a member selects Mediocre, Good, Very good, Outstanding, or Unicorn
+- **THEN** the score input emits that band value and does not invent a numeric point
 
-#### Scenario: Member records a score
+#### Scenario: Member records a point
 
-- **WHEN** a member changes the community score
-- **THEN** the score input emits a whole number from 0 through 100 or null and shows the canonical score band
+- **WHEN** a member types or steps an exact score
+- **THEN** the score input emits a whole number from 0 through 100 and shows its canonical band
+
+#### Scenario: Member changes rating grain
+
+- **WHEN** a member changes between band and point entry
+- **THEN** the input clears the old value instead of converting it and exposes the new grain to its caller for use as the next default
 
 #### Scenario: Member records colour or a picture
 
@@ -303,12 +313,12 @@ The design system SHALL use one tasting-form component tree across desktop and m
 
 #### Scenario: Member opens the tasting form
 
-- **WHEN** the member's account is configured for community verdicts or community scores
-- **THEN** the form renders only that rating input and does not offer an in-form rating-system picker
+- **WHEN** the caller supplies the member's last-used rating grain
+- **THEN** the form starts with that grain and lets the member change it for this tasting
 
 #### Scenario: Required tasting input is missing
 
-- **WHEN** no verdict is selected
+- **WHEN** no band or point is selected
 - **THEN** the save action is disabled and nearby status text states what is required
 
 #### Scenario: Member completes an optional field
@@ -347,7 +357,12 @@ The design system SHALL preserve each published critic review's publication and 
 #### Scenario: Publication uses a non-100-point scale
 
 - **WHEN** a critic review supplies a native score such as 4.5/5
-- **THEN** the component displays that native score and does not relabel it as a published 100-point score or merge it into an aggregate
+- **THEN** the component displays that native score and does not relabel it as a 100-point score or add it to the point pool
+
+#### Scenario: Publication uses a permitted native 100-point scale
+
+- **WHEN** a critic review supplies a native score such as 91/100
+- **THEN** the citation keeps its publication attribution and the caller can include the point in the shared point summary
 
 ### Requirement: Bottle identity presentation
 
@@ -377,12 +392,12 @@ The design system SHALL present bottle identity using Peated's resolved catalog 
 
 ### Requirement: Responsive bottle header
 
-The design system SHALL keep bottle identity, specs, community measures, member status, and record actions in one responsive header component tree.
+The design system SHALL keep bottle identity, specs, the real-point median, the band-pick distribution, member status, and record actions in one responsive header component tree.
 
 #### Scenario: Bottle header reaches the folded width
 
 - **WHEN** the header viewport is 900px or narrower
-- **THEN** the spec strip follows the identity and the available community measures follow it in two columns
+- **THEN** the spec strip follows the identity and the available rating measures follow it in two columns
 
 #### Scenario: Bottle header reaches the phone width
 
@@ -405,7 +420,7 @@ The bottle page SHALL use the server-owned collaborative recommendation result w
 
 ### Requirement: Bottle catalog route
 
-The web application SHALL compose the bottle catalog from reusable StyleX list and filter patterns while the product controller owns API and URL state.
+The web application SHALL compose the bottle catalog from reusable StyleX list and filter patterns while the product route owns API and URL state.
 
 #### Scenario: Member browses a cursor page
 
@@ -426,3 +441,110 @@ The web application SHALL compose the bottle catalog from reusable StyleX list a
 
 - **WHEN** the API does not supply full-result facet counts
 - **THEN** the product route renders a count-free category facet instead of deriving statistics from the visible cursor page and does not offer community-score or community-verdict filters
+
+### Requirement: Entity catalog routes
+
+The web application SHALL compose distiller, brand, and bottler catalogs from one reusable StyleX list and filter contract while each route supplies its entity kind.
+
+#### Scenario: Member browses an entity catalog
+
+- **WHEN** the entity-list API supplies records and previous or next cursors
+- **THEN** the catalog shows the visible records, Peated identity, location, bottle and tasting measures, real current-page count, and only the supplied cursor actions
+
+#### Scenario: Member filters an entity catalog
+
+- **WHEN** the member searches by name or selects a country
+- **THEN** the route writes the filter to the URL, clears the cursor, and renders count-free country rows without deriving entity totals from country bottle counts
+
+#### Scenario: Member opens an existing region-filtered link
+
+- **WHEN** the route URL already supplies a region
+- **THEN** the filter rail keeps that region visible and removable without inventing region options that the page did not request
+
+### Requirement: Entity detail route
+
+The web application SHALL compose an entity overview from reusable StyleX components while the product route owns live entity and bottle data.
+
+#### Scenario: Member opens an entity record
+
+- **WHEN** the entity-details endpoint supplies a record
+- **THEN** the page uses its singular kind as its only entity classification and shows its Peated identity, location, ownership, core facts, and tabs without duplicating the complete route in Storybook
+
+#### Scenario: Entity kind supports a bottle role
+
+- **WHEN** a brand, bottler, or distillery record offers contextual bottle creation
+- **THEN** the route prefills only the matching explicit Bottle field and does not read the legacy entity type collection
+
+#### Scenario: Associated bottle details are available
+
+- **WHEN** the bottle-list endpoint supplies notable bottles for the entity
+- **THEN** each row shows the supplied origin, age, ABV, community score, and verdict distribution directly under the Bottles or Bottlings section without a second list title or a generic catalog summary
+
+#### Scenario: Entity has no associated bottles
+
+- **WHEN** a brand, bottler, distillery, or blender has no supplied bottle rows
+- **THEN** the page keeps its Bottles or Bottlings module visible and offers a button to record a bottle or bottling instead of removing the section
+
+#### Scenario: Entity detail data is not owned
+
+- **WHEN** the API does not supply operating status, still count, capacity, entity-level community measures, or sourced history
+- **THEN** the route omits those values instead of deriving them from the entity description or establishment year
+
+#### Scenario: Member changes an entity section
+
+- **WHEN** the member selects Overview, Bottles, Tastings, or the available Distillery codes tab
+- **THEN** the nested route keeps the same entity header and tabs while only the selected section changes
+
+#### Scenario: Member browses all entity bottles
+
+- **WHEN** the bottle-list endpoint supplies an entity page, sort order, total, and cursor links
+- **THEN** the Bottles tab renders the shared bottle rows, writes sorting and cursor state to the URL, and does not duplicate the complete route in Storybook
+
+#### Scenario: Member browses entity tastings
+
+- **WHEN** the tasting-list endpoint supplies tastings and cursor links for the entity
+- **THEN** the Tastings tab renders the supplied authors, bottles, notes, scores or verdicts, and only the supplied cursor actions
+
+#### Scenario: Member opens SMWS distillery codes
+
+- **WHEN** an entity has the SMWS short name
+- **THEN** the route exposes the Distillery codes tab, renders the fixed code registry, and links only distillers resolved by the existing SMWS endpoint
+
+### Requirement: Member profile route
+
+The web application SHALL compose the member profile from reusable StyleX identity, measure, navigation, tasting, and feedback components while the route owns session, privacy, API, action, and cursor state.
+
+#### Scenario: Member opens a public profile
+
+- **WHEN** user details, tasting statistics, tasting records, and region records are available
+- **THEN** the page shows the supplied identity, friend or owner actions, verdict distribution, tasting, unique-bottle, library, and contribution totals, tasting rows, and regional counts without duplicating the complete route in Storybook
+
+#### Scenario: Member opens their own profile
+
+- **WHEN** the current session owns the profile
+- **THEN** the header offers profile and account settings instead of a friendship action and uses the supplied account creation date when it is available
+
+#### Scenario: Member opens a private profile
+
+- **WHEN** the profile is private and the current session is neither its owner nor a friend
+- **THEN** the page keeps the public identity and friendship action visible while withholding summary, tasting, library, and region data
+
+#### Scenario: Profile concept data is not owned
+
+- **WHEN** the API does not supply a bio, location, follower totals, passport coverage, distinct distillery total, or contribution list
+- **THEN** the page omits those modules instead of deriving or inventing them
+
+#### Scenario: Member changes a profile section
+
+- **WHEN** the member selects Tastings, Library, or Activity
+- **THEN** the nested route keeps the same profile header, summary, privacy boundary, and tabs while only the selected section changes
+
+#### Scenario: Member browses a Library
+
+- **WHEN** the Library list and statistics endpoints supply bottles, status totals, producer totals, and cursor links
+- **THEN** the Library tab renders the supplied bottle rows, search, status and producer filters, owner actions, and only the supplied cursor actions
+
+#### Scenario: Member browses profile activity
+
+- **WHEN** the profile Activity endpoint supplies tasting sessions and collection additions
+- **THEN** the Activity tab renders those supplied records without substituting them for unsupported contribution records

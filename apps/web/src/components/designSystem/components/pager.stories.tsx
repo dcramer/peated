@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { Pager } from "./pager.stylex";
 
 const meta = {
@@ -30,31 +30,20 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const FirstPage: Story = {};
-
-export const MiddlePage: Story = {
-  args: {
-    currentPage: 5,
-    rangeEnd: 30,
-    rangeStart: 25,
-  },
-};
-
-export const LastPage: Story = {
-  args: {
-    currentPage: 9,
-    rangeEnd: 52,
-    rangeStart: 49,
-  },
-};
-
-export const ShortList: Story = {
-  args: {
-    currentPage: 1,
-    filterLabel: undefined,
-    rangeEnd: 12,
-    rangeStart: 1,
-    totalCount: 12,
-    totalPages: 2,
-  },
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <Pager {...args} />
+      <Pager {...args} currentPage={5} rangeEnd={30} rangeStart={25} />
+      <Pager {...args} currentPage={9} rangeEnd={52} rangeStart={49} />
+      <Pager
+        {...args}
+        filterLabel={undefined}
+        rangeEnd={12}
+        rangeStart={1}
+        totalCount={12}
+        totalPages={2}
+      />
+    </StoryStack>
+  ),
 };

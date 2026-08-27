@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { BottleListController } from "@peated/web/components/designSystem/product/bottleListController.stylex";
+import { BottleCatalogPageClient } from "./bottleCatalogPageClient";
 
 export const metadata: Metadata = {
   title: "Whisky Bottles",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function BottleListPage() {
-  return <BottleListController />;
+  return <BottleCatalogPageClient />;
 }
