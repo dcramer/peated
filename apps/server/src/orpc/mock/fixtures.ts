@@ -115,7 +115,7 @@ export function mockUserDetailsFor(
   user: User | null,
   profile: MockOutputs["users"]["details"] = mockPublicUserDetails,
 ) {
-  return user?.id === profile.id ? mockUserDetails : profile;
+  return user?.id === profile.id ? { ...profile, ...user } : profile;
 }
 
 export function matchesMockUser(value: string | number, user: User | null) {
@@ -988,6 +988,7 @@ export const mockReviews = [
       publishedAt: "2026-08-12T11:00:00.000Z",
     },
     reviewerName: "Editorial Sample",
+    site: undefined,
     nativeScore: { value: 91, scale: 100, display: "91" },
     summary: "Layered orchard fruit, incense, and restrained oak.",
     bottle: mockBottles[4],
@@ -1005,6 +1006,7 @@ export const mockReviews = [
       publishedAt: "2026-08-10T12:00:00.000Z",
     },
     reviewerName: "Editorial Sample",
+    site: undefined,
     nativeScore: { value: 90, scale: 100, display: "90" },
     summary: "A mature smoky malt that has not yet been matched to a bottle.",
     bottle: null,

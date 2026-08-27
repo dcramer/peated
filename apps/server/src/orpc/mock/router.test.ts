@@ -37,6 +37,9 @@ const anonymousClient = createRouterClient(mockRouter, {
 const authenticatedClient = createRouterClient(mockRouter, {
   context: { user: mockUser },
 });
+const friendClient = createRouterClient(mockRouter, {
+  context: { user: mockFriends[0]! },
+});
 
 describe("mock oRPC router", () => {
   it("returns fixed data from supported routes", async () => {
@@ -288,6 +291,14 @@ describe("mock oRPC router", () => {
       code: "BAD_REQUEST",
       message: "Must be a moderator to list all reviews.",
     });
+
+    const whiskyAdvocateReviews = await anonymousClient.reviews.list({
+      site: "whiskyadvocate",
+      sort: "recent",
+    });
+    expect(whiskyAdvocateReviews.results.map((review) => review.id)).toEqual([
+      mockReview.id,
+    ]);
   });
 
   it("applies read-only filters without saving state", async () => {
@@ -459,6 +470,10 @@ describe("mock oRPC router", () => {
     await expect(
       authenticatedClient.users.details({ user: "me" }),
     ).resolves.toEqual(expect.objectContaining({ email: mockUser.email }));
+
+    await expect(friendClient.users.details({ user: "me" })).resolves.toEqual(
+      mockFriendDetails[0],
+    );
   });
 
   it("returns the route's not-found error for unknown records", async () => {
