@@ -4,6 +4,7 @@ import type { InferSelectModel, Table } from "drizzle-orm";
 import { and, eq, getTableColumns, inArray, ne, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { z } from "zod";
+import type { ReservedCollectionSlug } from "../constants";
 import type { AnyDatabase } from "../db";
 import type { Collection, Entity, EntityType } from "../db/schema";
 import { changes, collections, entities, entityAliases } from "../db/schema";
@@ -31,9 +32,6 @@ const EntityInsertDataSchema = EntityUpsertDataSchema.omit({ id: true });
 type EntityUpsertData = z.input<typeof EntityUpsertDataSchema>;
 type EntityUpsertInput = number | EntityUpsertData;
 
-export const reservedCollectionSlugs = ["default", "library"] as const;
-
-export type ReservedCollectionSlug = (typeof reservedCollectionSlugs)[number];
 export type ReservedCollection = Pick<
   Collection,
   "id" | "createdById" | "name"

@@ -2,8 +2,12 @@ import { createRouterClient } from "@orpc/server";
 import {
   mockAccessToken,
   mockBottle,
+  mockCollectionBottle,
+  mockCountry,
   mockEntity,
   mockPublicUserDetails,
+  mockRegion,
+  mockTasting,
   mockUser,
   mockUserDetails,
 } from "./fixtures";
@@ -40,6 +44,101 @@ describe("mock oRPC router", () => {
 
     const user = await authenticatedClient.users.details({ user: "me" });
     expect(user.id).toBe(mockUser.id);
+  });
+
+  it("covers the main read-only page data", async () => {
+    await expect(
+      anonymousClient.entities.details({ entity: mockEntity.id }),
+    ).resolves.toEqual(mockEntity);
+    await expect(
+      anonymousClient.countries.details({ country: mockCountry.slug }),
+    ).resolves.toEqual(mockCountry);
+    await expect(
+      anonymousClient.regions.details({
+        country: mockCountry.slug,
+        region: mockRegion.slug,
+      }),
+    ).resolves.toEqual(mockRegion);
+    await expect(
+      anonymousClient.tastings.details({ tasting: mockTasting.id }),
+    ).resolves.toEqual(mockTasting);
+
+    const countries = await anonymousClient.countries.list({});
+    expect(countries.results).toEqual([mockCountry]);
+
+    const regions = await anonymousClient.regions.list({
+      country: mockCountry.slug,
+    });
+    expect(regions.results).toEqual([mockRegion]);
+
+    const tastings = await anonymousClient.tastings.list({
+      bottle: mockBottle.id,
+    });
+    expect(tastings.results).toEqual([mockTasting]);
+
+    const collection = await anonymousClient.collections.bottles.list({
+      collection: "library",
+      user: mockUser.username,
+    });
+    expect(collection.results).toEqual([
+      {
+        ...mockCollectionBottle,
+        bottle: mockBottle,
+        hasTasted: false,
+      },
+    ]);
+  });
+
+  it("applies read-only filters without saving state", async () => {
+    await expect(
+      anonymousClient.countries.list({ query: "Japan" }),
+    ).resolves.toMatchObject({ results: [] });
+    await expect(
+      anonymousClient.regions.list({
+        country: mockCountry.slug,
+        query: "Speyside",
+      }),
+    ).resolves.toMatchObject({ results: [] });
+    await expect(
+      anonymousClient.tastings.list({ bottle: 9999 }),
+    ).resolves.toMatchObject({ results: [] });
+    await expect(
+      anonymousClient.collections.bottles.list({
+        collection: "library",
+        user: mockUser.username,
+        status: "sealed",
+      }),
+    ).resolves.toMatchObject({ results: [] });
+  });
+
+  it("keeps signed-in read filters protected", async () => {
+    await expect(
+      anonymousClient.tastings.list({ filter: "friends" }),
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+    await expect(
+      anonymousClient.collections.bottles.list({
+        collection: "library",
+        user: "me",
+      }),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+
+    await expect(
+      authenticatedClient.collections.bottles.list({
+        collection: "library",
+        user: "me",
+      }),
+    ).resolves.toMatchObject({
+      results: [
+        {
+          bottle: {
+            isFavorite: true,
+            isLibrary: true,
+            hasTasted: true,
+          },
+          hasTasted: true,
+        },
+      ],
+    });
   });
 
   it("returns no results when the fixed data does not match", async () => {

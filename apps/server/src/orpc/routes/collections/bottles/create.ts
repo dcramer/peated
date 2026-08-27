@@ -1,3 +1,4 @@
+import { RESERVED_COLLECTION_SLUGS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { CollectionBottle } from "@peated/server/db/schema";
 import { collectionBottles, collections } from "@peated/server/db/schema";
@@ -5,7 +6,6 @@ import { getUserFromId } from "@peated/server/lib/api";
 import {
   getReservedCollection,
   isReservedCollectionSlug,
-  reservedCollectionSlugs,
 } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { PendingUploadError } from "@peated/server/lib/pendingUploads";
@@ -35,7 +35,7 @@ import {
 } from "./imageHelpers";
 
 const CollectionBottleCreateFields = {
-  collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
+  collection: z.union([z.enum(RESERVED_COLLECTION_SLUGS), z.coerce.number()]),
   pendingImageId: z.string().trim().min(1).optional(),
   user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
 } as const;

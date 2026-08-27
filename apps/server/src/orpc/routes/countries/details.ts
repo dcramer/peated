@@ -1,40 +1,26 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
-import { procedure } from "@peated/server/orpc";
-import { CountrySchema, detailsResponse } from "@peated/server/schemas";
+import { implement } from "@peated/server/orpc";
+import countryDetailsContract from "@peated/server/orpc/contracts/countries/details";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { eq, sql } from "drizzle-orm";
-import { z } from "zod";
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/countries/{country}",
-    summary: "Get country details",
-    description:
-      "Retrieve detailed information about a specific country using its slug",
-    operationId: "getCountry",
-  })
-  .input(
-    z.object({
-      country: z.string(),
-    }),
-  )
-  // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
-  .output(detailsResponse(CountrySchema))
-  .handler(async function ({ input, context, errors }) {
-    const [country] = await db
-      .select()
-      .from(countries)
-      .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()));
+export default implement(countryDetailsContract).handler(async function ({
+  input,
+  context,
+  errors,
+}) {
+  const [country] = await db
+    .select()
+    .from(countries)
+    .where(eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()));
 
-    if (!country) {
-      throw errors.NOT_FOUND({
-        message: "Country not found.",
-      });
-    }
+  if (!country) {
+    throw errors.NOT_FOUND({
+      message: "Country not found.",
+    });
+  }
 
-    return await serialize(CountrySerializer, country, context.user);
-  });
+  return await serialize(CountrySerializer, country, context.user);
+});

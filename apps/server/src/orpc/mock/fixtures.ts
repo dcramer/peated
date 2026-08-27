@@ -1,7 +1,12 @@
 import type { MockOutputs } from "./contract";
 
 type Bottle = MockOutputs["bottles"]["list"]["results"][number];
+type CollectionBottle =
+  MockOutputs["collections"]["bottles"]["list"]["results"][number];
+type Country = MockOutputs["countries"]["details"];
 type Entity = MockOutputs["entities"]["list"]["results"][number];
+type Region = MockOutputs["regions"]["details"];
+type Tasting = MockOutputs["tastings"]["details"];
 type User = MockOutputs["auth"]["login"]["user"];
 
 const timestamp = "2026-08-26T12:00:00.000Z";
@@ -56,6 +61,28 @@ export function mockUserDetailsFor(user: User | null) {
   return user ? mockUserDetails : mockPublicUserDetails;
 }
 
+export const mockCountry = {
+  id: 9401,
+  name: "Scotland",
+  slug: "scotland",
+  description: "A major whisky-producing country.",
+  summary: "Home to distinct whisky regions and styles.",
+  location: [-4.2, 56.5],
+  totalBottles: 8200,
+  totalDistillers: 150,
+} satisfies Country;
+
+export const mockRegion = {
+  id: 9501,
+  name: "Islay",
+  slug: "islay",
+  country: mockCountry,
+  description: "An island region known for smoky single malt whisky.",
+  location: [-6.2, 55.8],
+  totalBottles: 680,
+  totalDistillers: 10,
+} satisfies Region;
+
 export const mockEntity = {
   id: 9201,
   peatedId: "E9201",
@@ -68,8 +95,8 @@ export const mockEntity = {
   descriptionSrc: "user",
   yearEstablished: 1816,
   website: "https://www.malts.com/en-row/distilleries/lagavulin",
-  country: null,
-  region: null,
+  country: mockCountry,
+  region: mockRegion,
   address: null,
   location: null,
   totalTastings: 1200,
@@ -163,6 +190,41 @@ export function mockBottleDetailsFor(
     ...mockBottleFor(user),
   };
 }
+
+export const mockTasting = {
+  id: 9601,
+  imageUrl: null,
+  notes: "Smoke, dried fruit, sea salt, and a long finish.",
+  bottle: mockBottle,
+  rating: 2,
+  score: null,
+  tags: ["smoke", "dried fruit", "sea salt"],
+  color: 14,
+  servingStyle: "neat",
+  friends: [],
+  awards: [],
+  comments: 2,
+  toasts: 5,
+  hasToasted: false,
+  createdAt: timestamp,
+  createdBy: mockPublicUser,
+} satisfies Tasting;
+
+export function mockTastingFor(user: User | null): Tasting {
+  return {
+    ...mockTasting,
+    bottle: mockBottleFor(user),
+    hasToasted: Boolean(user),
+  };
+}
+
+export const mockCollectionBottle = {
+  id: 9701,
+  imageUrl: null,
+  status: "open",
+  bottle: mockBottle,
+  hasTasted: true,
+} satisfies CollectionBottle;
 
 export const noMorePages = {
   nextCursor: null,
