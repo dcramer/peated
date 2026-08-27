@@ -1,29 +1,13 @@
 import { db } from "@peated/server/db";
 import { notifications } from "@peated/server/db/schema";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import notificationCountContract from "@peated/server/orpc/contracts/notifications/count";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import type { SQL } from "drizzle-orm";
 import { and, eq, sql } from "drizzle-orm";
-import { z } from "zod";
 
-export default procedure
+export default implement(notificationCountContract)
   .use(requireAuth)
-  .route({
-    method: "GET",
-    path: "/notifications/count",
-    summary: "Count notifications",
-    description:
-      "Get the count of user notifications with optional filtering by read status",
-    operationId: "countNotifications",
-  })
-  .input(
-    z
-      .object({
-        filter: z.enum(["unread", "all"]).nullish(),
-      })
-      .default({}),
-  )
-  .output(z.object({ count: z.number() }))
   .handler(async function ({ input, context }) {
     const where: (SQL<unknown> | undefined)[] = [
       eq(notifications.userId, context.user.id),

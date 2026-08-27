@@ -1,26 +1,4 @@
-import { z } from "zod";
-
-export const AgeStatsSchema = z.object({
-  knownCount: z.number(),
-  median: z.number().nullable(),
-  oldest: z.number().nullable(),
-  buckets: z.array(
-    z.object({
-      id: z.enum([
-        "under10",
-        "from10To12",
-        "from13To17",
-        "from18To24",
-        "atLeast25",
-        "unstated",
-      ]),
-      label: z.string(),
-      count: z.number(),
-    }),
-  ),
-});
-
-export type AgeStats = z.infer<typeof AgeStatsSchema>;
+import type { AgeStats } from "@peated/server/schemas";
 
 function median(values: number[]): number | null {
   if (values.length === 0) return null;

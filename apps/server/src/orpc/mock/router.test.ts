@@ -1,15 +1,25 @@
 import { createRouterClient } from "@orpc/server";
 import {
   mockAccessToken,
+  mockBadgeAward,
   mockBottle,
+  mockBottleTags,
   mockCollectionBottle,
+  mockComment,
   mockCountry,
   mockEntity,
+  mockEntityCatalog,
+  mockFlight,
   mockPublicUserDetails,
   mockRegion,
+  mockReview,
   mockTasting,
   mockUser,
   mockUserDetails,
+  mockUserFlavorList,
+  mockUserLibraryStats,
+  mockUserRegionList,
+  mockUserTastingStats,
 } from "./fixtures";
 import { mockRouter } from "./router";
 
@@ -87,6 +97,85 @@ describe("mock oRPC router", () => {
         hasTasted: false,
       },
     ]);
+  });
+
+  it("completes bottle, entity, and tasting detail pages", async () => {
+    await expect(
+      anonymousClient.reviews.list({
+        bottle: mockBottle.id,
+        sort: "name",
+      }),
+    ).resolves.toMatchObject({ results: [mockReview] });
+
+    await expect(
+      anonymousClient.bottles.tags({ bottle: mockBottle.id }),
+    ).resolves.toEqual(mockBottleTags);
+
+    await expect(
+      anonymousClient.entities.catalog({ entity: mockEntity.id }),
+    ).resolves.toEqual(mockEntityCatalog);
+
+    await expect(
+      anonymousClient.comments.list({ tasting: mockTasting.id }),
+    ).resolves.toMatchObject({ results: [mockComment] });
+  });
+
+  it("returns fixed user profile insights", async () => {
+    const input = { user: mockUser.username };
+
+    await expect(anonymousClient.users.badgeList(input)).resolves.toMatchObject(
+      {
+        results: [mockBadgeAward],
+      },
+    );
+    await expect(anonymousClient.users.regionList(input)).resolves.toEqual(
+      mockUserRegionList,
+    );
+    await expect(anonymousClient.users.flavorList(input)).resolves.toEqual(
+      mockUserFlavorList,
+    );
+    await expect(anonymousClient.users.tastingStats(input)).resolves.toEqual(
+      mockUserTastingStats,
+    );
+    await expect(anonymousClient.users.libraryStats(input)).resolves.toEqual(
+      mockUserLibraryStats,
+    );
+  });
+
+  it("supports fixed tasting flights", async () => {
+    await expect(anonymousClient.flights.list({})).resolves.toMatchObject({
+      results: [mockFlight],
+    });
+    await expect(
+      anonymousClient.flights.list({ query: "Speyside" }),
+    ).resolves.toMatchObject({ results: [] });
+
+    await expect(
+      anonymousClient.flights.details({ flight: mockFlight.id }),
+    ).resolves.toMatchObject({
+      bottles: [{ hasTasted: false, isLibrary: false }],
+    });
+    await expect(
+      authenticatedClient.flights.details({ flight: mockFlight.id }),
+    ).resolves.toMatchObject({
+      bottles: [{ hasTasted: true, isLibrary: true }],
+    });
+  });
+
+  it("keeps notification and review permissions", async () => {
+    await expect(anonymousClient.notifications.count({})).rejects.toMatchObject(
+      { code: "UNAUTHORIZED" },
+    );
+    await expect(
+      authenticatedClient.notifications.count({ filter: "unread" }),
+    ).resolves.toEqual({ count: 3 });
+
+    await expect(
+      anonymousClient.reviews.list({ sort: "name" }),
+    ).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Must be a moderator to list all reviews.",
+    });
   });
 
   it("applies read-only filters without saving state", async () => {

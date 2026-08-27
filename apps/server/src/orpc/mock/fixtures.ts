@@ -1,11 +1,15 @@
 import type { MockOutputs } from "./contract";
 
 type Bottle = MockOutputs["bottles"]["list"]["results"][number];
+type BadgeAward = MockOutputs["users"]["badgeList"]["results"][number];
+type Comment = MockOutputs["comments"]["list"]["results"][number];
 type CollectionBottle =
   MockOutputs["collections"]["bottles"]["list"]["results"][number];
 type Country = MockOutputs["countries"]["details"];
 type Entity = MockOutputs["entities"]["list"]["results"][number];
+type Flight = MockOutputs["flights"]["list"]["results"][number];
 type Region = MockOutputs["regions"]["details"];
+type Review = MockOutputs["reviews"]["list"]["results"][number];
 type Tasting = MockOutputs["tastings"]["details"];
 type User = MockOutputs["auth"]["login"]["user"];
 
@@ -59,6 +63,12 @@ export const mockPublicUserDetails = {
 
 export function mockUserDetailsFor(user: User | null) {
   return user ? mockUserDetails : mockPublicUserDetails;
+}
+
+export function matchesMockUser(value: string | number, user: User | null) {
+  return value === "me"
+    ? Boolean(user)
+    : value === mockUser.id || value === mockUser.username;
 }
 
 export const mockCountry = {
@@ -188,6 +198,198 @@ export function mockBottleDetailsFor(
   return {
     ...mockBottleDetails,
     ...mockBottleFor(user),
+  };
+}
+
+export const mockBottleTags = {
+  results: [
+    { tag: "smoke", count: 48 },
+    { tag: "sea salt", count: 31 },
+    { tag: "dried fruit", count: 22 },
+  ],
+  totalCount: 120,
+} satisfies MockOutputs["bottles"]["tags"];
+
+export const mockEntityCatalog = {
+  totalBottles: mockEntity.totalBottles,
+  relationships: {
+    brand: mockEntity.totalBottles,
+    bottler: 0,
+    distiller: mockEntity.totalBottles,
+  },
+  distilleryCoverage: {
+    documented: mockEntity.totalBottles,
+    total: mockEntity.totalBottles,
+  },
+  categories: [{ category: "single_malt", count: mockEntity.totalBottles }],
+  related: {
+    brands: [],
+    bottlers: [],
+    distillers: [],
+  },
+  notableBottles: [
+    {
+      id: mockBottle.id,
+      fullName: mockBottle.fullName,
+      totalTastings: mockBottle.totalTastings,
+      avgRating: mockBottle.avgRating,
+    },
+  ],
+} satisfies MockOutputs["entities"]["catalog"];
+
+export const mockReview = {
+  id: 9801,
+  name: mockBottle.fullName,
+  rating: 92,
+  url: "https://example.com/reviews/lagavulin-16",
+  site: {
+    id: 9802,
+    type: "whiskyadvocate",
+    name: "Whisky Advocate",
+    lastRunAt: timestamp,
+    nextRunAt: null,
+    runEvery: null,
+  },
+  article: {
+    title: "Lagavulin 16 Review",
+    publishedAt: timestamp,
+  },
+  reviewerName: "Mock Reviewer",
+  nativeScore: {
+    value: 92,
+    scale: 100,
+    display: "92",
+  },
+  summary: "Rich smoke, dried fruit, and maritime notes.",
+  bottle: mockBottle,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} satisfies Review;
+
+export const mockComment = {
+  id: 9803,
+  comment: "The smoke opens up after a few minutes in the glass.",
+  createdAt: timestamp,
+  createdBy: mockPublicUser,
+} satisfies Comment;
+
+export const mockBadgeAward = {
+  id: 9804,
+  xp: 12,
+  level: 2,
+  badge: {
+    id: 9805,
+    name: "Islay Explorer",
+    maxLevel: 25,
+    imageUrl: null,
+  },
+  createdAt: timestamp,
+} satisfies BadgeAward;
+
+export const mockUserRegionList = {
+  results: [
+    {
+      country: { name: mockCountry.name, slug: mockCountry.slug },
+      region: { name: mockRegion.name, slug: mockRegion.slug },
+      count: 42,
+    },
+  ],
+  totalCount: 42,
+} satisfies MockOutputs["users"]["regionList"];
+
+export const mockUserFlavorList = {
+  results: [{ flavorProfile: "peated", count: 42, score: 60 }],
+  totalScore: 60,
+  totalCount: 42,
+} satisfies MockOutputs["users"]["flavorList"];
+
+export const mockAgeStats = {
+  knownCount: 36,
+  median: 16,
+  oldest: 25,
+  buckets: [
+    { id: "under10", label: "Under 10", count: 4 },
+    { id: "from10To12", label: "10–12", count: 8 },
+    { id: "from13To17", label: "13–17", count: 18 },
+    { id: "from18To24", label: "18–24", count: 4 },
+    { id: "atLeast25", label: "25+", count: 2 },
+    { id: "unstated", label: "Unstated", count: 6 },
+  ],
+} satisfies MockOutputs["users"]["tastingStats"]["age"];
+
+export const mockUserTastingStats = {
+  total: 42,
+  uniqueBottles: 31,
+  ratings: {
+    total: 42,
+    pass: 2,
+    sip: 15,
+    savor: 25,
+  },
+  mostTastedBottle: {
+    id: mockBottle.id,
+    name: mockBottle.fullName,
+    count: 3,
+  },
+  age: mockAgeStats,
+} satisfies MockOutputs["users"]["tastingStats"];
+
+export const mockUserLibraryStats = {
+  total: 12,
+  status: {
+    open: 4,
+    sealed: 8,
+    unspecified: 0,
+  },
+  brands: [{ id: mockEntity.id, name: mockEntity.name, count: 12 }],
+  distillers: [{ id: mockEntity.id, name: mockEntity.name, count: 12 }],
+  age: {
+    ...mockAgeStats,
+    knownCount: 12,
+    buckets: [
+      { id: "under10", label: "Under 10", count: 0 },
+      { id: "from10To12", label: "10–12", count: 0 },
+      { id: "from13To17", label: "13–17", count: 12 },
+      { id: "from18To24", label: "18–24", count: 0 },
+      { id: "atLeast25", label: "25+", count: 0 },
+      { id: "unstated", label: "Unstated", count: 0 },
+    ],
+  },
+  categories: [{ category: "single_malt", count: 12 }],
+} satisfies MockOutputs["users"]["libraryStats"];
+
+export const mockFlight = {
+  id: "mock-islay-flight",
+  name: "Islay Smoke",
+  description: "A side-by-side tasting of smoky Islay whisky.",
+  public: true,
+  createdAt: timestamp,
+  createdBy: mockPublicUser,
+} satisfies Flight;
+
+export const mockFlightDetails = {
+  ...mockFlight,
+  bottles: [
+    {
+      bottle: mockBottle,
+      hasTasted: false,
+      isLibrary: false,
+    },
+  ],
+} satisfies MockOutputs["flights"]["details"];
+
+export function mockFlightDetailsFor(
+  user: User | null,
+): MockOutputs["flights"]["details"] {
+  return {
+    ...mockFlightDetails,
+    bottles: [
+      {
+        bottle: mockBottleFor(user),
+        hasTasted: Boolean(user),
+        isLibrary: Boolean(user),
+      },
+    ],
   };
 }
 

@@ -8,11 +8,13 @@ import {
 } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { getReservedCollection } from "@peated/server/lib/db";
-import { procedure } from "@peated/server/orpc";
-import { CategoryEnum } from "@peated/server/schemas";
+import { implement } from "@peated/server/orpc";
+import type { LibraryStatsSchema } from "@peated/server/orpc/contracts/users/library-stats";
+import libraryStatsContract from "@peated/server/orpc/contracts/users/library-stats";
+import type { CategoryEnum } from "@peated/server/schemas";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
-import { z } from "zod";
-import { AgeStatsSchema, buildAgeStats } from "./age-stats";
+import type { z } from "zod";
+import { buildAgeStats } from "./age-stats";
 import {
   readJoinedUserBottle,
   type UserBottleRead,
@@ -20,36 +22,6 @@ import {
 } from "./tasting-bottle-scan";
 
 const LIBRARY_STATS_BATCH_SIZE = 200;
-
-const LibraryStatsSchema = z.object({
-  total: z.number(),
-  status: z.object({
-    open: z.number(),
-    sealed: z.number(),
-    unspecified: z.number(),
-  }),
-  brands: z.array(
-    z.object({
-      id: z.number(),
-      name: z.string(),
-      count: z.number(),
-    }),
-  ),
-  distillers: z.array(
-    z.object({
-      id: z.number(),
-      name: z.string(),
-      count: z.number(),
-    }),
-  ),
-  age: AgeStatsSchema,
-  categories: z.array(
-    z.object({
-      category: CategoryEnum,
-      count: z.number(),
-    }),
-  ),
-});
 
 type Category = z.infer<typeof CategoryEnum>;
 type LibraryStats = z.infer<typeof LibraryStatsSchema>;
@@ -199,117 +171,106 @@ async function finalizeLibraryStats(
   };
 }
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/users/{user}/library/stats",
-    summary: "Get user Library statistics",
-    description:
-      "Retrieve producer, status, age, and category insights for non-empty bottles in a visible user's Library",
-    operationId: "getUserLibraryStats",
-  })
-  .input(
-    z.object({
-      user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-    }),
-  )
-  .output(LibraryStatsSchema)
-  .handler(async function ({ input, context, errors }) {
-    const user = await getUserFromId(db, input.user, context.user);
-    if (!user) {
-      throw errors.NOT_FOUND({
-        message: "User not found.",
-      });
-    }
+export default implement(libraryStatsContract).handler(async function ({
+  input,
+  context,
+  errors,
+}) {
+  const user = await getUserFromId(db, input.user, context.user);
+  if (!user) {
+    throw errors.NOT_FOUND({
+      message: "User not found.",
+    });
+  }
 
-    if (!(await profileVisible(db, user, context.user))) {
-      throw errors.BAD_REQUEST({
-        message: "User's profile is private.",
-      });
-    }
+  if (!(await profileVisible(db, user, context.user))) {
+    throw errors.BAD_REQUEST({
+      message: "User's profile is private.",
+    });
+  }
 
-    const library = await getReservedCollection(db, user.id, "library");
-    if (!library) {
-      return emptyStats;
-    }
+  const library = await getReservedCollection(db, user.id, "library");
+  if (!library) {
+    return emptyStats;
+  }
 
-    try {
-      const accumulator = createLibraryStatsAccumulator();
-      let afterId: number | null = null;
+  try {
+    const accumulator = createLibraryStatsAccumulator();
+    let afterId: number | null = null;
 
-      while (true) {
-        const rows = await db
-          .select({
-            id: collectionBottles.id,
-            storedBottleId: collectionBottles.bottleId,
-            bottle: {
-              id: bottles.id,
-              groupId: bottles.groupId,
-              brandId: bottles.brandId,
-              category: bottles.category,
-              flavorProfile: bottles.flavorProfile,
-              statedAge: bottles.statedAge,
-            },
-            retiredBottleId: bottleTombstones.bottleId,
-            status: collectionBottles.status,
-          })
-          .from(collectionBottles)
-          .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
-          .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-          .where(
-            and(
-              eq(collectionBottles.collectionId, library.id),
-              sql`${collectionBottles.status} IS DISTINCT FROM 'empty'`,
-              afterId === null ? undefined : gt(collectionBottles.id, afterId),
-            ),
-          )
-          .orderBy(collectionBottles.id)
-          .limit(LIBRARY_STATS_BATCH_SIZE);
-
-        if (rows.length === 0) break;
-
-        const directBottles = rows.map(readJoinedUserBottle);
-        const bottleIds = Array.from(
-          new Set(
-            directBottles.flatMap((bottle) =>
-              bottle === null ? [] : [bottle.id],
-            ),
+    while (true) {
+      const rows = await db
+        .select({
+          id: collectionBottles.id,
+          storedBottleId: collectionBottles.bottleId,
+          bottle: {
+            id: bottles.id,
+            groupId: bottles.groupId,
+            brandId: bottles.brandId,
+            category: bottles.category,
+            flavorProfile: bottles.flavorProfile,
+            statedAge: bottles.statedAge,
+          },
+          retiredBottleId: bottleTombstones.bottleId,
+          status: collectionBottles.status,
+        })
+        .from(collectionBottles)
+        .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
+        .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
+        .where(
+          and(
+            eq(collectionBottles.collectionId, library.id),
+            sql`${collectionBottles.status} IS DISTINCT FROM 'empty'`,
+            afterId === null ? undefined : gt(collectionBottles.id, afterId),
           ),
-        );
-        const distillerRows = bottleIds.length
-          ? await db
-              .select()
-              .from(bottlesToDistillers)
-              .where(inArray(bottlesToDistillers.bottleId, bottleIds))
-          : [];
-        const distillerIdsByBottleId = new Map<number, number[]>();
-        for (const { bottleId, distillerId } of distillerRows) {
-          const ids = distillerIdsByBottleId.get(bottleId) ?? [];
-          ids.push(distillerId);
-          distillerIdsByBottleId.set(bottleId, ids);
-        }
-        accumulateLibraryStats(
-          accumulator,
-          directBottles.map((bottle, index) =>
-            bottle === null
-              ? null
-              : {
-                  ...bottle,
-                  distillerIds: distillerIdsByBottleId.get(bottle.id) ?? [],
-                  status: rows[index]!.status,
-                },
+        )
+        .orderBy(collectionBottles.id)
+        .limit(LIBRARY_STATS_BATCH_SIZE);
+
+      if (rows.length === 0) break;
+
+      const directBottles = rows.map(readJoinedUserBottle);
+      const bottleIds = Array.from(
+        new Set(
+          directBottles.flatMap((bottle) =>
+            bottle === null ? [] : [bottle.id],
           ),
-        );
-
-        afterId = rows.at(-1)!.id;
-        if (rows.length < LIBRARY_STATS_BATCH_SIZE) break;
+        ),
+      );
+      const distillerRows = bottleIds.length
+        ? await db
+            .select()
+            .from(bottlesToDistillers)
+            .where(inArray(bottlesToDistillers.bottleId, bottleIds))
+        : [];
+      const distillerIdsByBottleId = new Map<number, number[]>();
+      for (const { bottleId, distillerId } of distillerRows) {
+        const ids = distillerIdsByBottleId.get(bottleId) ?? [];
+        ids.push(distillerId);
+        distillerIdsByBottleId.set(bottleId, ids);
       }
+      accumulateLibraryStats(
+        accumulator,
+        directBottles.map((bottle, index) =>
+          bottle === null
+            ? null
+            : {
+                ...bottle,
+                distillerIds: distillerIdsByBottleId.get(bottle.id) ?? [],
+                status: rows[index]!.status,
+              },
+        ),
+      );
 
-      return await finalizeLibraryStats(accumulator);
-    } catch (error) {
-      if (error instanceof UserBottleReadIntegrityError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      throw error;
+      afterId = rows.at(-1)!.id;
+      if (rows.length < LIBRARY_STATS_BATCH_SIZE) break;
     }
-  });
+
+    return await finalizeLibraryStats(accumulator);
+  } catch (error) {
+    if (error instanceof UserBottleReadIntegrityError) {
+      throw errors.CONFLICT({ message: error.message, cause: error });
+    }
+    throw error;
+  }
+});
