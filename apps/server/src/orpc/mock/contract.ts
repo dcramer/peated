@@ -1,9 +1,13 @@
 import type { InferContractRouterOutputs } from "@orpc/contract";
 import activityList from "@peated/server/orpc/contracts/activity/list";
 import login from "@peated/server/orpc/contracts/auth/login";
+import badgeDetails from "@peated/server/orpc/contracts/badges/details";
+import badgeUserList from "@peated/server/orpc/contracts/badges/user-list";
 import bottleDetails from "@peated/server/orpc/contracts/bottles/details";
 import bottleList from "@peated/server/orpc/contracts/bottles/list";
+import bottlePriceList from "@peated/server/orpc/contracts/bottles/prices/list";
 import bottleTags from "@peated/server/orpc/contracts/bottles/tags";
+import changeList from "@peated/server/orpc/contracts/changes/list";
 import collectionBottleList from "@peated/server/orpc/contracts/collections/bottles/list";
 import commentList from "@peated/server/orpc/contracts/comments/list";
 import countryDetails from "@peated/server/orpc/contracts/countries/details";
@@ -11,16 +15,22 @@ import countryList from "@peated/server/orpc/contracts/countries/list";
 import entityCatalog from "@peated/server/orpc/contracts/entities/catalog";
 import entityDetails from "@peated/server/orpc/contracts/entities/details";
 import entityList from "@peated/server/orpc/contracts/entities/list";
+import eventList from "@peated/server/orpc/contracts/events/list";
 import flightDetails from "@peated/server/orpc/contracts/flights/details";
 import flightList from "@peated/server/orpc/contracts/flights/list";
+import friendList from "@peated/server/orpc/contracts/friends/list";
 import notificationCount from "@peated/server/orpc/contracts/notifications/count";
+import notificationList from "@peated/server/orpc/contracts/notifications/list";
+import priceChangeList from "@peated/server/orpc/contracts/prices/change-list";
 import regionDetails from "@peated/server/orpc/contracts/regions/details";
 import regionList from "@peated/server/orpc/contracts/regions/list";
 import reviewList from "@peated/server/orpc/contracts/reviews/list";
 import root from "@peated/server/orpc/contracts/root";
 import search from "@peated/server/orpc/contracts/search";
+import stats from "@peated/server/orpc/contracts/stats";
 import tastingDetails from "@peated/server/orpc/contracts/tastings/details";
 import tastingList from "@peated/server/orpc/contracts/tastings/list";
+import userActivityList from "@peated/server/orpc/contracts/users/activity/list";
 import userBadgeList from "@peated/server/orpc/contracts/users/badge-list";
 import userDetails from "@peated/server/orpc/contracts/users/details";
 import userFlavorList from "@peated/server/orpc/contracts/users/flavor-list";
@@ -32,16 +42,27 @@ import userTastingStats from "@peated/server/orpc/contracts/users/tasting-stats"
 export const mockContract = {
   root,
   search,
+  stats,
   activity: {
     list: activityList,
   },
   auth: {
     login,
   },
+  badges: {
+    details: badgeDetails,
+    userList: badgeUserList,
+  },
   bottles: {
     details: bottleDetails,
     list: bottleList,
+    prices: {
+      list: bottlePriceList,
+    },
     tags: bottleTags,
+  },
+  changes: {
+    list: changeList,
   },
   comments: {
     list: commentList,
@@ -60,12 +81,22 @@ export const mockContract = {
     details: entityDetails,
     list: entityList,
   },
+  events: {
+    list: eventList,
+  },
   flights: {
     details: flightDetails,
     list: flightList,
   },
+  friends: {
+    list: friendList,
+  },
   notifications: {
     count: notificationCount,
+    list: notificationList,
+  },
+  prices: {
+    changeList: priceChangeList,
   },
   regions: {
     details: regionDetails,
@@ -79,6 +110,9 @@ export const mockContract = {
     list: tastingList,
   },
   users: {
+    activity: {
+      list: userActivityList,
+    },
     badgeList: userBadgeList,
     details: userDetails,
     flavorList: userFlavorList,

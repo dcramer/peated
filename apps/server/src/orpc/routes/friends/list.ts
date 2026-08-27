@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import friendListContract from "@peated/server/orpc/contracts/friends/list";
 import { requireAuth } from "@peated/server/orpc/middleware";
-import { FriendSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FriendSerializer } from "@peated/server/serializers/friend";
 import {
@@ -16,34 +16,9 @@ import {
   or,
   type SQL,
 } from "drizzle-orm";
-import { z } from "zod";
 
-export default procedure
+export default implement(friendListContract)
   .use(requireAuth)
-  .route({
-    method: "GET",
-    path: "/friends",
-    summary: "List friends",
-    description:
-      "Retrieve user's friend relationships with filtering by status (pending/active) and search support",
-    operationId: "listFriends",
-  })
-  .input(
-    z
-      .object({
-        query: z.string().default(""),
-        filter: z.enum(["pending", "active"]).optional(),
-        cursor: z.coerce.number().gte(1).default(1),
-        limit: z.coerce.number().gte(1).lte(100).default(100),
-      })
-      .default({
-        query: "",
-        cursor: 1,
-        limit: 100,
-      }),
-  )
-  // TODO(response-envelope): helper enables later switch to { data, meta }
-  .output(listResponse(FriendSchema))
   .handler(async function ({
     input: { query, cursor, limit, ...input },
     context,
