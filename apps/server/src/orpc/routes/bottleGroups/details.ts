@@ -2,25 +2,11 @@ import {
   BottleGroupNotFoundError,
   loadBottleGroup,
 } from "@peated/server/lib/bottleGroupReads";
-import { procedure } from "@peated/server/orpc";
-import { BottleGroupV1Schema } from "@peated/server/schemas";
-import { z } from "zod";
+import { implement } from "@peated/server/orpc";
+import bottleGroupDetailsContract from "@peated/server/orpc/contracts/bottleGroups/details";
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/bottle-groups/{group}",
-    summary: "Get Bottle Group details",
-    description:
-      "Retrieve one stable BottleGroup identity and its aggregate statistics",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "getBottleGroup",
-    }),
-  })
-  .input(z.object({ group: z.coerce.number().int().positive() }).strict())
-  .output(BottleGroupV1Schema)
-  .handler(async ({ input, errors }) => {
+export default implement(bottleGroupDetailsContract).handler(
+  async ({ input, errors }) => {
     try {
       return await loadBottleGroup(input.group);
     } catch (error) {
@@ -29,4 +15,5 @@ export default procedure
       }
       throw error;
     }
-  });
+  },
+);

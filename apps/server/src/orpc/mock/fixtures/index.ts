@@ -1,5 +1,6 @@
 export * from "./activity";
 export * from "./badges";
+export * from "./bottle-groups";
 export * from "./bottles";
 export * from "./catalog";
 export * from "./changes";

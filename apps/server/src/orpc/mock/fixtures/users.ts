@@ -1,5 +1,5 @@
 import type { MockOutputs } from "../contract";
-import { timestamp } from "./constants";
+import { mockImageUrls, timestamp } from "./constants";
 
 type User = MockOutputs["auth"]["login"]["user"];
 export type MockUser = User;
@@ -50,7 +50,7 @@ export const mockFriends = [
   {
     id: 9102,
     username: "islay-dreamer",
-    pictureUrl: null,
+    pictureUrl: mockImageUrls.profile,
     private: false,
     friendStatus: "friends",
   },

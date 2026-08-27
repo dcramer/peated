@@ -163,6 +163,18 @@ export const mockEntities: Entity[] = [
     totalTastings: 5200,
     totalBottles: 620,
   },
+  {
+    ...mockEntity,
+    id: 9211,
+    peatedId: "E9211",
+    name: "Laphroaig",
+    shortName: null,
+    description: "An Islay distillery known for strongly peated single malt.",
+    yearEstablished: 1815,
+    website: "https://www.laphroaig.com",
+    totalTastings: 1850,
+    totalBottles: 130,
+  },
 ];
 
 export const mockMacallanEntity = mockEntities[1]!;
@@ -171,3 +183,4 @@ export const mockBuffaloTraceEntity = mockEntities[3]!;
 export const mockYamazakiEntity = mockEntities[4]!;
 export const mockMidletonEntity = mockEntities[5]!;
 export const mockRedbreastEntity = mockEntities[6]!;
+export const mockLaphroaigEntity = mockEntities[10]!;

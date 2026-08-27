@@ -7,30 +7,13 @@ import {
   bottleTombstones,
   type User,
 } from "@peated/server/db/schema";
+import type { BottleGroupBottleSort } from "@peated/server/lib/bottleGroupSort";
 import { BottleSchema, type BottleGroupV1 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { BottleGroupSummarySerializer } from "@peated/server/serializers/catalogIdentity";
 import { and, asc, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import type { z } from "zod";
-
-export const BOTTLE_GROUP_BOTTLE_SORT_OPTIONS = [
-  "name",
-  "-name",
-  "created",
-  "-created",
-  "age",
-  "-age",
-  "rating",
-  "-rating",
-  "tastings",
-  "-tastings",
-  "releaseYear",
-  "-releaseYear",
-] as const;
-
-export type BottleGroupBottleSort =
-  (typeof BOTTLE_GROUP_BOTTLE_SORT_OPTIONS)[number];
 
 export type BottleGroupBottleListInput = {
   query: string;

@@ -1,36 +1,12 @@
 import {
-  BOTTLE_GROUP_BOTTLE_SORT_OPTIONS,
   BottleGroupNotFoundError,
   listBottleGroupBottles,
 } from "@peated/server/lib/bottleGroupReads";
-import { procedure } from "@peated/server/orpc";
-import { BottleSchema, listResponse } from "@peated/server/schemas";
-import { z } from "zod";
+import { implement } from "@peated/server/orpc";
+import bottleGroupBottlesContract from "@peated/server/orpc/contracts/bottleGroups/bottles";
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/bottle-groups/{group}/bottles",
-    summary: "List related bottles",
-    description: "List the independently complete Bottles in one Bottle Group",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "listBottleGroupBottles",
-    }),
-  })
-  .input(
-    z
-      .object({
-        group: z.coerce.number().int().positive(),
-        query: z.coerce.string().default(""),
-        cursor: z.coerce.number().int().gte(1).default(1),
-        limit: z.coerce.number().int().gte(1).lte(100).default(25),
-        sort: z.enum(BOTTLE_GROUP_BOTTLE_SORT_OPTIONS).default("-tastings"),
-      })
-      .strict(),
-  )
-  .output(listResponse(BottleSchema))
-  .handler(async ({ input: { group, ...input }, context, errors }) => {
+export default implement(bottleGroupBottlesContract).handler(
+  async ({ input: { group, ...input }, context, errors }) => {
     try {
       return await listBottleGroupBottles(
         group,
@@ -43,4 +19,5 @@ export default procedure
       }
       throw error;
     }
-  });
+  },
+);

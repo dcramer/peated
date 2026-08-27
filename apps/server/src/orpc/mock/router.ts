@@ -3,6 +3,8 @@ import activityList from "./routes/activity/list";
 import login from "./routes/auth/login";
 import badgeDetails from "./routes/badges/details";
 import badgeUserList from "./routes/badges/user-list";
+import bottleGroupBottles from "./routes/bottleGroups/bottles";
+import bottleGroupDetails from "./routes/bottleGroups/details";
 import bottleDetails from "./routes/bottles/details";
 import bottleList from "./routes/bottles/list";
 import bottlePriceList from "./routes/bottles/prices/list";
@@ -52,6 +54,10 @@ export const mockRouter = mockOS.router({
   badges: {
     details: badgeDetails,
     userList: badgeUserList,
+  },
+  bottleGroups: {
+    bottles: bottleGroupBottles,
+    details: bottleGroupDetails,
   },
   bottles: {
     details: bottleDetails,
