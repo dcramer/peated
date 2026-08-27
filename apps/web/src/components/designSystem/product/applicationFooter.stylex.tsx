@@ -37,6 +37,7 @@ const groups = [
     label: "Peated",
     links: [
       { href: "/about", label: "About" },
+      { href: "/about/brand", label: "Brand voice" },
       { href: "/about/ratings", label: "Rating systems" },
       { href: "https://github.com/peated/peated", label: "Source" },
       { href: "/terms", label: "Terms" },
