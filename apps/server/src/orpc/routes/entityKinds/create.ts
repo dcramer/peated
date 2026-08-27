@@ -20,7 +20,7 @@ import type { EntityKindCreateInputSchema } from "@peated/server/orpc/contracts/
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 type ErrorFactory = (options: { message: string; cause?: unknown }) => Error;
@@ -96,7 +96,7 @@ export async function createEntityKind({
       const [existing] = await tx
         .select()
         .from(entities)
-        .where(eq(entities.name, data.name));
+        .where(eq(sql`LOWER(${entities.name})`, data.name.toLowerCase()));
       if (existing?.kind === kind) return { entity: existing, created: false };
       throw errors.CONFLICT({
         message: "Entity with name already exists under another kind.",

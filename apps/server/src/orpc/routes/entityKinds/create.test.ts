@@ -144,4 +144,23 @@ describe("dedicated Entity kind create routes", () => {
       expect.anything(),
     );
   });
+
+  test("returns an existing entity when the name case differs", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Macallan",
+      kind: "brand",
+    });
+
+    const data = await routerClient.brands.create(
+      { name: "macallan" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.id).toBe(entity.id);
+    expect(data.name).toBe(entity.name);
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
 });
