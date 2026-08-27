@@ -90,6 +90,11 @@ export default implement(contract)
         if (existing?.kind === data.kind) {
           return { entity: existing, created: false };
         }
+        if (!existing) {
+          throw new Error(
+            `Entity insert conflict could not be resolved for "${data.name}".`,
+          );
+        }
         throw errors.CONFLICT({
           message: "Entity with name already exists under another kind.",
         });
