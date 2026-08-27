@@ -29,6 +29,7 @@ import regionList from "@peated/server/orpc/contracts/regions/list";
 import reviewList from "@peated/server/orpc/contracts/reviews/list";
 import root from "@peated/server/orpc/contracts/root";
 import search from "@peated/server/orpc/contracts/search";
+import smwsDistillerList from "@peated/server/orpc/contracts/smws/distiller-list";
 import stats from "@peated/server/orpc/contracts/stats";
 import tastingDetails from "@peated/server/orpc/contracts/tastings/details";
 import tastingList from "@peated/server/orpc/contracts/tastings/list";
@@ -110,6 +111,9 @@ export const mockContract = {
   },
   reviews: {
     list: reviewList,
+  },
+  smws: {
+    distillerList: smwsDistillerList,
   },
   tastings: {
     details: tastingDetails,

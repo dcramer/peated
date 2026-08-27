@@ -29,6 +29,7 @@ import regionList from "./routes/regions/list";
 import reviewList from "./routes/reviews/list";
 import root from "./routes/root";
 import search from "./routes/search";
+import smwsDistillerList from "./routes/smws/distiller-list";
 import stats from "./routes/stats";
 import tastingDetails from "./routes/tastings/details";
 import tastingList from "./routes/tastings/list";
@@ -110,6 +111,9 @@ export const mockRouter = mockOS.router({
   },
   reviews: {
     list: reviewList,
+  },
+  smws: {
+    distillerList: smwsDistillerList,
   },
   tastings: {
     details: tastingDetails,
