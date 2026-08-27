@@ -1,12 +1,11 @@
-import { implement, ORPCError } from "@orpc/server";
-import sentryMiddleware from "@peated/orpc/server/middleware";
+import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { identities, users } from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { createAccessToken, createUser } from "@peated/server/lib/auth";
 import { logError } from "@peated/server/lib/log";
-import type { Context } from "@peated/server/orpc/context";
+import { implement } from "@peated/server/orpc";
 import loginContract from "@peated/server/orpc/contracts/auth/login";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { serialize } from "@peated/server/serializers";
@@ -16,8 +15,6 @@ import { and, eq, sql } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
 
 export default implement(loginContract)
-  .$context<Context>()
-  .use(sentryMiddleware())
   .use(authRateLimit)
   .handler(async function ({ input, errors }) {
     try {

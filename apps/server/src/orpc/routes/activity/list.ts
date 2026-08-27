@@ -1,5 +1,3 @@
-import { implement } from "@orpc/server";
-import sentryMiddleware from "@peated/orpc/server/middleware";
 import { db } from "@peated/server/db";
 import {
   collectionBottles,
@@ -19,7 +17,7 @@ import {
   serializeTastingSessionEntries,
   type CollectionAddGroup,
 } from "@peated/server/lib/activityFeed";
-import type { Context } from "@peated/server/orpc/context";
+import { implement } from "@peated/server/orpc";
 import activityListContract from "@peated/server/orpc/contracts/activity/list";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq, lte, or, sql } from "drizzle-orm";
@@ -70,30 +68,31 @@ function visibleActivityUserCondition({
   return or(...visibleUsers)!;
 }
 
-export default implement(activityListContract)
-  .$context<Context>()
-  .use(sentryMiddleware())
-  .handler(async function ({ input, context, errors }) {
-    if (input.filter === "friends" && !context.user) {
-      throw errors.UNAUTHORIZED();
-    }
+export default implement(activityListContract).handler(async function ({
+  input,
+  context,
+  errors,
+}) {
+  if (input.filter === "friends" && !context.user) {
+    throw errors.UNAUTHORIZED();
+  }
 
-    const userCondition = visibleActivityUserCondition({
-      filter: input.filter,
-      currentUserId: context.user?.id,
-    });
-    const activityCursor = input.cursor
-      ? parseActivityCursor(input.cursor)!
-      : { page: 1, snapshotAt: new Date() };
-    const collectionBucket = sql<Date>`DATE_TRUNC('day', ${collectionBottles.createdAt})`;
-    const collectionGroupCreatedAt = sql<Date>`MAX(${collectionBottles.createdAt})`;
+  const userCondition = visibleActivityUserCondition({
+    filter: input.filter,
+    currentUserId: context.user?.id,
+  });
+  const activityCursor = input.cursor
+    ? parseActivityCursor(input.cursor)!
+    : { page: 1, snapshotAt: new Date() };
+  const collectionBucket = sql<Date>`DATE_TRUNC('day', ${collectionBottles.createdAt})`;
+  const collectionGroupCreatedAt = sql<Date>`MAX(${collectionBottles.createdAt})`;
 
-    const [totalPrimary, secondaryCountResult] = await Promise.all([
-      countTastingSessions({
-        userCondition,
-        snapshotAt: activityCursor.snapshotAt,
-      }),
-      db.execute<{ count: string }>(sql`
+  const [totalPrimary, secondaryCountResult] = await Promise.all([
+    countTastingSessions({
+      userCondition,
+      snapshotAt: activityCursor.snapshotAt,
+    }),
+    db.execute<{ count: string }>(sql`
         SELECT COUNT(*) as count
         FROM (
           SELECT 1
@@ -107,90 +106,90 @@ export default implement(activityListContract)
           GROUP BY ${users.id}, ${collections.id}, DATE_TRUNC('day', ${collectionBottles.createdAt})
         ) activity_groups
       `),
-    ]);
-    const totalSecondary = Number(secondaryCountResult.rows[0]?.count ?? 0);
-    const sourceWindow = getActivitySourceWindow({
-      cursor: activityCursor.page,
-      limit: input.limit,
-      totalPrimary,
-      totalSecondary,
-    });
+  ]);
+  const totalSecondary = Number(secondaryCountResult.rows[0]?.count ?? 0);
+  const sourceWindow = getActivitySourceWindow({
+    cursor: activityCursor.page,
+    limit: input.limit,
+    totalPrimary,
+    totalSecondary,
+  });
 
-    const [tastingRows, collectionGroupRows] = await Promise.all([
-      getTastingSessions({
-        userCondition,
-        snapshotAt: activityCursor.snapshotAt,
-        limit: sourceWindow.primaryLimit,
-        offset: sourceWindow.primaryOffset,
+  const [tastingRows, collectionGroupRows] = await Promise.all([
+    getTastingSessions({
+      userCondition,
+      snapshotAt: activityCursor.snapshotAt,
+      limit: sourceWindow.primaryLimit,
+      offset: sourceWindow.primaryOffset,
+    }),
+    db
+      .select({
+        collection: collections,
+        user: users,
+        windowStart: sql<Date>`MIN(${collectionBottles.createdAt})`,
+        windowEnd: sql<Date>`MAX(${collectionBottles.createdAt})`,
+        totalItems: sql<string>`COUNT(${collectionBottles.id})`,
+      })
+      .from(collectionBottles)
+      .innerJoin(
+        collections,
+        eq(collections.id, collectionBottles.collectionId),
+      )
+      .innerJoin(users, eq(users.id, collections.createdById))
+      .where(
+        and(
+          userCondition,
+          lte(collectionBottles.createdAt, activityCursor.snapshotAt),
+        ),
+      )
+      .groupBy(users.id, collections.id, collectionBucket)
+      .orderBy(desc(collectionGroupCreatedAt))
+      .limit(sourceWindow.secondaryLimit)
+      .offset(sourceWindow.secondaryOffset),
+  ]);
+
+  const primaryEntries = await serializeTastingSessionEntries(
+    tastingRows,
+    context.user,
+  );
+  const secondaryEntries = await serializeCollectionAddEntries({
+    groups: collectionGroupRows.map(
+      (row: CollectionAddGroupRow): CollectionAddGroup => ({
+        collection: row.collection,
+        user: row.user,
+        windowStart: coerceActivityDate(row.windowStart),
+        windowEnd: coerceActivityDate(row.windowEnd),
+        totalItems: Number(row.totalItems),
       }),
-      db
-        .select({
-          collection: collections,
-          user: users,
-          windowStart: sql<Date>`MIN(${collectionBottles.createdAt})`,
-          windowEnd: sql<Date>`MAX(${collectionBottles.createdAt})`,
-          totalItems: sql<string>`COUNT(${collectionBottles.id})`,
-        })
-        .from(collectionBottles)
-        .innerJoin(
-          collections,
-          eq(collections.id, collectionBottles.collectionId),
-        )
-        .innerJoin(users, eq(users.id, collections.createdById))
-        .where(
-          and(
-            userCondition,
-            lte(collectionBottles.createdAt, activityCursor.snapshotAt),
-          ),
-        )
-        .groupBy(users.id, collections.id, collectionBucket)
-        .orderBy(desc(collectionGroupCreatedAt))
-        .limit(sourceWindow.secondaryLimit)
-        .offset(sourceWindow.secondaryOffset),
-    ]);
+    ),
+    currentUser: context.user,
+  });
 
-    const primaryEntries = await serializeTastingSessionEntries(
-      tastingRows,
-      context.user,
-    );
-    const secondaryEntries = await serializeCollectionAddEntries({
-      groups: collectionGroupRows.map(
-        (row: CollectionAddGroupRow): CollectionAddGroup => ({
-          collection: row.collection,
-          user: row.user,
-          windowStart: coerceActivityDate(row.windowStart),
-          windowEnd: coerceActivityDate(row.windowEnd),
-          totalItems: Number(row.totalItems),
-        }),
-      ),
-      currentUser: context.user,
-    });
+  const activity = composeActivity({
+    primary: primaryEntries,
+    secondary: secondaryEntries,
+    limit: input.limit,
+    sourceWindow,
+    totalPrimary,
+    totalSecondary,
+  });
 
-    const activity = composeActivity({
-      primary: primaryEntries,
-      secondary: secondaryEntries,
-      limit: input.limit,
-      sourceWindow,
-      totalPrimary,
-      totalSecondary,
-    });
-
-    return {
-      results: activity.results,
-      rel: {
-        nextCursor: activity.hasNext
+  return {
+    results: activity.results,
+    rel: {
+      nextCursor: activity.hasNext
+        ? encodeActivityCursor({
+            page: activityCursor.page + 1,
+            snapshotAt: activityCursor.snapshotAt,
+          })
+        : null,
+      prevCursor:
+        activityCursor.page > 1
           ? encodeActivityCursor({
-              page: activityCursor.page + 1,
+              page: activityCursor.page - 1,
               snapshotAt: activityCursor.snapshotAt,
             })
           : null,
-        prevCursor:
-          activityCursor.page > 1
-            ? encodeActivityCursor({
-                page: activityCursor.page - 1,
-                snapshotAt: activityCursor.snapshotAt,
-              })
-            : null,
-      },
-    };
-  });
+    },
+  };
+});

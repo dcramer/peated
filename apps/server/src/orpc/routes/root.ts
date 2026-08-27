@@ -1,14 +1,9 @@
-import { implement } from "@orpc/server";
-import sentryMiddleware from "@peated/orpc/server/middleware";
 import config from "@peated/server/config";
-import type { Context } from "@peated/server/orpc/context";
+import { implement } from "@peated/server/orpc";
 import rootContract from "@peated/server/orpc/contracts/root";
 
-export default implement(rootContract)
-  .$context<Context>()
-  .use(sentryMiddleware())
-  .handler(async function () {
-    return {
-      version: config.VERSION,
-    };
-  });
+export default implement(rootContract).handler(async function () {
+  return {
+    version: config.VERSION,
+  };
+});

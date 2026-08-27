@@ -56,7 +56,9 @@ export default base.tag("tastings").router({
 });
 ```
 
-Top-level `routes/index.ts` composes routers eagerly. Do not use lazy imports.
+Top-level `routes/index.ts` must assemble the final router with
+`api.router(...)`. This applies global middleware to every route. Do not export
+a plain object or use lazy imports.
 
 ## 3. Route Definitions and Handlers
 
@@ -79,13 +81,17 @@ export default contract
   .output(BottleListOutputSchema);
 
 // routes/bottles/list.ts
-export default implement(bottleListContract)
-  .$context<Context>()
-  .use(sentryMiddleware())
-  .handler(async ({ input, context }) => {
+export default implement(bottleListContract).handler(
+  async ({ input, context }) => {
     // Production behavior.
-  });
+  },
+);
 ```
+
+Import `implement` from `@peated/server/orpc`. It adds the request context used
+by the real API. The top-level `api.router(...)` call applies global middleware.
+Keep permission checks, rate limits, and other route-specific middleware in the
+route file.
 
 List supported mock contracts in the same structure as the API. Create each
 mock handler from its `mockOS` path, such as `mockOS.bottles.list`, and create

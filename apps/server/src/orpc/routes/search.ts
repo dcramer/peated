@@ -1,5 +1,3 @@
-import { implement } from "@orpc/server";
-import sentryMiddleware from "@peated/orpc/server/middleware";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
   bottleAliases,
@@ -22,6 +20,7 @@ import {
   plainTextSearchQuery,
   prefixTextSearchQuery,
 } from "@peated/server/lib/search";
+import { implement } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import searchContract, {
   SEARCH_SCOPE_LIST,
@@ -825,7 +824,6 @@ async function buildSearchResponse(
 }
 
 // Recent lookups stay in browser storage. This API does not store history.
-export default implement(searchContract)
-  .$context<Context>()
-  .use(sentryMiddleware())
-  .handler(({ input, context }) => buildSearchResponse(input, context));
+export default implement(searchContract).handler(({ input, context }) =>
+  buildSearchResponse(input, context),
+);
