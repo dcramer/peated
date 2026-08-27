@@ -1,11 +1,9 @@
 import {
   includesQuery,
-  mockBottle,
   mockBottleFor,
-  mockCollectionBottle,
-  mockEntity,
+  mockCollectionBottles,
+  mockPage,
   mockUser,
-  noMorePages,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
@@ -45,34 +43,37 @@ export default mockOS.collections.bottles.list.handler(
       });
     }
 
-    const statusMatches =
-      input.status === undefined ||
-      input.status === mockCollectionBottle.status ||
-      (input.status === "unset" && mockCollectionBottle.status === null);
-    const matches =
-      includesQuery(
-        input.query,
-        mockBottle.fullName,
-        mockBottle.name,
-        mockEntity.name,
-      ) &&
-      (input.brand == null || input.brand === mockEntity.id) &&
-      (input.distiller == null || input.distiller === mockEntity.id) &&
-      (input.bottle === undefined || input.bottle === mockBottle.id) &&
-      statusMatches;
+    const collectionBottles = mockCollectionBottles.filter(
+      (item) =>
+        includesQuery(
+          input.query,
+          item.bottle.fullName,
+          item.bottle.name,
+          item.bottle.brand.name,
+        ) &&
+        (input.brand == null || item.bottle.brand.id === input.brand) &&
+        (input.distiller == null ||
+          item.bottle.distillers.some(
+            (entity) => entity.id === input.distiller,
+          )) &&
+        (input.bottle === undefined || item.bottle.id === input.bottle) &&
+        (input.status === undefined ||
+          input.status === item.status ||
+          (input.status === "unset" && item.status === null)),
+    );
 
-    return {
-      results: matches
-        ? [
-            {
-              ...mockCollectionBottle,
-              status: isLibrary ? mockCollectionBottle.status : null,
-              bottle: mockBottleFor(context.user),
-              hasTasted: Boolean(context.user),
-            },
-          ]
-        : [],
-      rel: noMorePages,
-    };
+    return mockPage(
+      collectionBottles.map((item) => {
+        const bottle = mockBottleFor(context.user, item.bottle);
+        return {
+          ...item,
+          status: isLibrary ? item.status : null,
+          bottle,
+          hasTasted: bottle.hasTasted,
+        };
+      }),
+      input.cursor,
+      input.limit,
+    );
   },
 );

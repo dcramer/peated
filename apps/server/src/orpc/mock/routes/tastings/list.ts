@@ -1,9 +1,9 @@
 import {
-  mockBottle,
-  mockEntity,
+  mockFriends,
+  mockPage,
   mockTastingFor,
+  mockTastings,
   mockUser,
-  noMorePages,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
@@ -17,23 +17,37 @@ export default mockOS.tastings.list.handler(
       throw errors.UNAUTHORIZED();
     }
 
-    const userMatches =
-      input.user === undefined ||
-      input.user === "me" ||
-      input.user === mockUser.id ||
-      input.user === mockUser.username;
-    if (input.user !== undefined && !userMatches) {
+    const requestedUserId =
+      input.user === "me"
+        ? mockUser.id
+        : [mockUser, ...mockFriends].find(
+            (user) => user.id === input.user || user.username === input.user,
+          )?.id;
+    const knownUserIds = new Set([
+      mockUser.id,
+      ...mockTastings.map((tasting) => tasting.createdBy.id),
+    ]);
+    if (input.user !== undefined && !knownUserIds.has(requestedUserId ?? -1)) {
       throw errors.NOT_FOUND({ message: "Mock user not found." });
     }
 
-    const matches =
-      userMatches &&
-      (input.bottle === undefined || input.bottle === mockBottle.id) &&
-      (input.entity === undefined || input.entity === mockEntity.id);
+    const tastings = mockTastings.filter(
+      (tasting) =>
+        (requestedUserId === undefined ||
+          tasting.createdBy.id === requestedUserId) &&
+        (input.filter !== "friends" || tasting.createdBy.id !== mockUser.id) &&
+        (input.bottle === undefined || tasting.bottle.id === input.bottle) &&
+        (input.entity === undefined ||
+          tasting.bottle.brand.id === input.entity ||
+          tasting.bottle.distillers.some(
+            (entity) => entity.id === input.entity,
+          )),
+    );
 
-    return {
-      results: matches ? [mockTastingFor(context.user)] : [],
-      rel: noMorePages,
-    };
+    return mockPage(
+      tastings.map((tasting) => mockTastingFor(context.user, tasting)),
+      input.cursor,
+      input.limit,
+    );
   },
 );

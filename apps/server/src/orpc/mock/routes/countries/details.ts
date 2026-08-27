@@ -1,10 +1,13 @@
-import { mockCountry } from "@peated/server/orpc/mock/fixtures";
+import { mockCountries } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
 export default mockOS.countries.details.handler(async ({ input, errors }) => {
-  if (input.country.toLowerCase() !== mockCountry.slug) {
+  const country = mockCountries.find(
+    (candidate) => candidate.slug === input.country.toLowerCase(),
+  );
+  if (!country) {
     throw errors.NOT_FOUND({ message: "Mock country not found." });
   }
 
-  return mockCountry;
+  return country;
 });

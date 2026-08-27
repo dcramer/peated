@@ -1,28 +1,35 @@
 import {
   includesQuery,
-  mockCountry,
-  mockRegion,
-  noMorePages,
+  mockCountries,
+  mockPage,
+  mockRegions,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
-function matchesCountry(value: string) {
-  return (
-    value.toLowerCase() === mockCountry.slug || Number(value) === mockCountry.id
-  );
-}
-
 export default mockOS.regions.list.handler(async ({ input, errors }) => {
-  if (!matchesCountry(input.country)) {
+  const country = mockCountries.find(
+    (candidate) =>
+      candidate.slug === input.country.toLowerCase() ||
+      candidate.id === Number(input.country),
+  );
+  if (!country) {
     throw errors.BAD_REQUEST({ message: "Invalid mock country." });
   }
 
-  const matches =
-    includesQuery(input.query, mockRegion.name, mockRegion.slug) &&
-    (!input.hasBottles || mockRegion.totalBottles > 0);
+  const direction = input.sort.startsWith("-") ? -1 : 1;
+  const sort = input.sort.replace(/^-/, "");
+  const regions = mockRegions
+    .filter(
+      (region) =>
+        region.country.id === country.id &&
+        includesQuery(input.query, region.name, region.slug) &&
+        (!input.hasBottles || region.totalBottles > 0),
+    )
+    .toSorted((left, right) =>
+      sort === "bottles"
+        ? direction * (left.totalBottles - right.totalBottles)
+        : direction * left.name.localeCompare(right.name),
+    );
 
-  return {
-    results: matches ? [mockRegion] : [],
-    rel: noMorePages,
-  };
+  return mockPage(regions, input.cursor, input.limit);
 });

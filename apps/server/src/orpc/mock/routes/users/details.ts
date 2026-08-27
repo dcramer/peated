@@ -1,5 +1,5 @@
 import {
-  mockUserDetails,
+  mockPublicUserDetailsList,
   mockUserDetailsFor,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
@@ -10,15 +10,19 @@ export default mockOS.users.details.handler(
       throw errors.UNAUTHORIZED();
     }
 
-    const matches =
-      input.user === "me" ||
-      input.user === mockUserDetails.id ||
-      input.user === mockUserDetails.username;
-
-    if (!matches) {
+    const profile =
+      input.user === "me"
+        ? mockPublicUserDetailsList.find(
+            (candidate) => candidate.id === context.user?.id,
+          )
+        : mockPublicUserDetailsList.find(
+            (candidate) =>
+              candidate.id === input.user || candidate.username === input.user,
+          );
+    if (!profile) {
       throw errors.NOT_FOUND({ message: "Mock user not found." });
     }
 
-    return mockUserDetailsFor(context.user);
+    return mockUserDetailsFor(context.user, profile);
   },
 );

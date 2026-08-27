@@ -1,13 +1,19 @@
-import { mockBottle, mockBottleTags } from "@peated/server/orpc/mock/fixtures";
+import {
+  mockBottles,
+  mockBottleTagsFor,
+} from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
 export default mockOS.bottles.tags.handler(async ({ input, errors }) => {
-  if (input.bottle !== mockBottle.id) {
+  const bottle = mockBottles.find((candidate) => candidate.id === input.bottle);
+  if (!bottle) {
     throw errors.NOT_FOUND({ message: "Mock bottle not found." });
   }
 
+  const tags = mockBottleTagsFor(bottle);
+
   return {
-    results: mockBottleTags.results.slice(0, input.limit),
-    totalCount: mockBottleTags.totalCount,
+    results: tags.results.slice(0, input.limit),
+    totalCount: tags.totalCount,
   };
 });
