@@ -5,6 +5,9 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
+import { toTitleCase } from "@peated/server/lib/strings";
+import { ENTITY_SEARCH_SCOPE_LIST } from "@peated/server/orpc/contracts/search";
+import { EntityKindEnum, EntitySchema } from "@peated/server/schemas";
 import BrandIcon from "@peated/web/assets/brand.svg";
 import DistillerIcon from "@peated/web/assets/distiller.svg";
 import Button from "@peated/web/components/button";
@@ -25,6 +28,18 @@ type FilterOption = {
   id: number;
   name: string;
 };
+
+function entityOptionMeta(item: Option) {
+  const parsedKind = EntityKindEnum.safeParse(
+    "kind" in item ? item.kind : undefined,
+  );
+  return [
+    parsedKind.success ? toTitleCase(parsedKind.data) : null,
+    item.shortName,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
 
 const FILTER_PARAMS = ["query", "brand", "distiller", "status", "cursor"];
 const STATUS_FILTER_OPTIONS = [
@@ -162,7 +177,6 @@ export function LibraryFilters({
               placeholder="Any brand"
               value={brand}
               loading={brandQuery.isFetching}
-              searchContextType="brand"
               onChange={(value) => setFilter("brand", value?.id)}
               onClear={() => setFilter("brand")}
             />
@@ -172,7 +186,6 @@ export function LibraryFilters({
               placeholder="Any distillery"
               value={distiller}
               loading={distillerQuery.isFetching}
-              searchContextType="distiller"
               onChange={(value) => setFilter("distiller", value?.id)}
               onClear={() => setFilter("distiller")}
             />
@@ -264,7 +277,6 @@ function LibraryEntityFilter({
   placeholder,
   value,
   loading,
-  searchContextType,
   onChange,
   onClear,
 }: {
@@ -273,7 +285,6 @@ function LibraryEntityFilter({
   placeholder: string;
   value?: FilterOption;
   loading?: boolean;
-  searchContextType: "brand" | "distiller";
   onChange: (value?: Option) => void;
   onClear: () => void;
 }) {
@@ -336,17 +347,23 @@ function LibraryEntityFilter({
         selectedValues={value ? [value] : []}
         searchPlaceholder={`Search ${label.toLowerCase()}`}
         onQuery={async (query) => {
-          const { results } = await orpc.entities.list.call({
+          const { groups } = await orpc.search.call({
             query,
-            searchContext: { type: searchContextType },
+            scopes: [...ENTITY_SEARCH_SCOPE_LIST],
+            limit: 25,
           });
-          return results;
+          return groups.flatMap((group) =>
+            group.results.flatMap((result) => {
+              const parsed = EntitySchema.safeParse(result);
+              return parsed.success ? [parsed.data] : [];
+            }),
+          );
         }}
         onRenderOption={(item) => (
           <div className="flex flex-col items-start">
             <div>{item.name}</div>
             <div className="text-muted font-normal">
-              {item.shortName || null}
+              {entityOptionMeta(item)}
             </div>
           </div>
         )}

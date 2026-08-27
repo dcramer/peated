@@ -9,7 +9,7 @@ export {
 
 export const MATCH_COMPONENT_PRIORITY = [
   "brand",
-  "bottler role, when evidenced",
+  "bottler relationship, when evidenced",
   "distillery, when known",
   "core expression name",
   "series or range",
@@ -35,9 +35,10 @@ const BOTTLE_IDENTITY_POLICY = [
     BOTTLE_SCHEMA_RULES.observationPolicy,
     BOTTLE_SCHEMA_RULES.aliasPolicy,
     "Unsupported novelty flavored whisky, whiskey liqueur, and additive-flavor products are outside the whisky catalog. Return `no_match` instead of matching or creating a Bottle.",
-    "`brand` is the consumer-facing label Brand. When product evidence presents a distinct consumer label and independent bottler company, assign the label to `brand` and the company to `bottler`. `series` is a range beneath a consumer-facing Brand; use it only when evidence establishes that parent Brand. Existing catalog relationships do not decide these roles.",
-    "Brand, distillers, and bottler are separate roles, but one Entity may fill more than one. Set `bottler` only when product evidence identifies the Entity as the market-facing bottler or release imprint. It may be the Brand or a distiller; a separate imprint is not required. Ownership, importing, distribution, packing, or page hosting alone does not establish the role. When local Bottle evidence separates a Brand Entity from a distillery Entity, reuse the Entity established in the required role; exact or shorter name overlap is not stronger role evidence.",
+    "`brand` is the consumer-facing label Brand. When product evidence presents a distinct consumer label and independent bottler company, assign the label to `brand` and the company to `bottler`. `series` is a range beneath a consumer-facing Brand; use it only when evidence establishes that parent Brand. An Entity's catalog `kind` does not restrict which Bottle relationship it can fill.",
+    "Brand, distillers, and bottler are separate Bottle relationships, but one Entity may fill more than one. Set `bottler` only when product evidence identifies the Entity as the market-facing bottler or release imprint. It may be the Brand or a distiller; a separate imprint is not required. Ownership, importing, distribution, packing, or page hosting alone does not establish the relationship. When local Bottle evidence separates a Brand Entity from a distillery Entity, reuse the Entity established in the required relationship; exact or shorter name overlap is not stronger relationship evidence.",
     "For a blend, keep every product-specific component distillery established by reviewed evidence in `proposedBottle.distillers`.",
+    "When `proposedBottle` creates an Entity with a null id, set its `kind` from the best identity evidence. Do not mechanically copy the Bottle relationship: Compass Box is a `blender` even when it fills Brand and bottler relationships. Existing Entity ids keep their stored kind.",
   ]),
   "</identity_policy>",
 ].join("\n");
@@ -100,7 +101,7 @@ const BOTTLE_OPERATION_POLICY = [
     "Inspect an existing Bottle or Entity with its context tool before you suggest a change to it. A search result alone is not inspection. The preloaded audit Bottle is already inspected.",
     "Use `update_bottle` for a sparse supported correction. Use `merge_bottles` only when inspected source and destination are the same exact marketed Bottle, with direct authoritative external equivalence evidence when available.",
     "Before an identity-changing Bottle update, search for the corrected identity. If an independently complete canonical Bottle already represents it, merge the malformed duplicate into that survivor.",
-    "Remove a populated Brand, bottler, distillery, series, category, or shared age only when product evidence shows it is wrong. Omission or one Entity filling multiple roles is not enough.",
+    "Remove a populated Brand, bottler, distillery, series, category, or shared age only when product evidence shows it is wrong. Omission or one Entity filling multiple Bottle relationships is not enough.",
     "Change a populated exact field only with evidence for the same Bottle. A value from another batch, edition, year, or exact cask does not qualify.",
     "One label-image extraction can fill a missing scalar Bottle field, but it cannot replace a populated value by itself. A replacement needs a matching structured Bottle observation or two agreeing label images; an unstructured web result may inform review but does not prove a field value.",
     "If evidence says an expression's batches are cask strength, barrel proof, or barrel strength but their ABVs vary, keep each Bottle's own ABV and set `caskStrength` to true.",
@@ -135,7 +136,7 @@ const BOTTLE_REFERENCE_INSTRUCTIONS = [
   "<decision_policy>",
   "Run these steps in order:",
   renderBulletLines([
-    "1. Establish the complete source Bottle before candidate comparison. Classify each source fact by what it describes: the complete marketed Bottle, one of its components, or source and production metadata. Only complete-Bottle facts can fill Bottle identity. Resolve Brand, bottler, and series from product evidence rather than copying their extracted or stored roles. When evidence changes an extracted Entity's role, search for that Entity in the corrected role before returning a draft. Keep the stable marketed expression instead of generic release wording. Treat a printed batch or lot code as `edition` only when product evidence shows that the producer markets it as a distinct release. Put a supported code in `observation` when it does not identify the marketed Bottle. Use `identityScope = exact_cask` only when the exact cask is the marketed Bottle.",
+    "1. Establish the complete source Bottle before candidate comparison. Classify each source fact by what it describes: the complete marketed Bottle, one of its components, or source and production metadata. Only complete-Bottle facts can fill Bottle identity. Resolve Brand, bottler, and series from product evidence. Search all Entities when resolving a Bottle relationship; do not filter by Entity kind. Keep the stable marketed expression instead of generic release wording. Treat a printed batch or lot code as `edition` only when product evidence shows that the producer markets it as a distinct release. Put a supported code in `observation` when it does not identify the marketed Bottle. Use `identityScope = exact_cask` only when the exact cask is the marketed Bottle.",
     "2. Compare local candidates only after step 1. Inspect a plausible target before you select it or reject it for a possible stored error. Never infer or borrow missing traits from sibling Bottles.",
     "3. If current evidence cannot resolve an identity-critical fact, its product level, or a candidate conflict, use only search tools attached to this run. When a candidate choice depends on whether a lot code or component trait belongs to the complete Bottle, seek focused product evidence instead of selecting by local exactness. Search the local catalog first when the initial candidates are thin or new evidence reveals a decisive trait. Use Firecrawl only for a question that local evidence cannot resolve. Keep the search focused. Do not perform a general audit. Read a returned page only when its short search excerpt does not expose the needed fact.",
     "4. Decide compatibility from populated candidate fields and marketed Bottle scope. A missing candidate field is not a conflict when evidence identifies the same exact marketed Bottle. A conflicting populated field makes that candidate unsafe. An unsupported extra marketed trait makes a candidate too specific. An additional source trait makes a candidate too broad only when evidence shows that trait defines a distinct marketed Bottle.",

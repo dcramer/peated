@@ -33,9 +33,9 @@ export default mockOS.search.handler(async ({ input, context }) => {
         includesQuery(input.query, entity.name, entity.shortName),
     );
   const entitiesByScope = {
-    distillers: matchingEntities((entity) => entity.type.includes("distiller")),
-    brands: matchingEntities((entity) => entity.type.includes("brand")),
-    bottlers: matchingEntities((entity) => entity.type.includes("bottler")),
+    distilleries: matchingEntities((entity) => entity.kind === "distillery"),
+    brands: matchingEntities((entity) => entity.kind === "brand"),
+    bottlers: matchingEntities((entity) => entity.kind === "bottler"),
     blenders: matchingEntities((entity) => entity.kind === "blender"),
     companies: matchingEntities((entity) => entity.kind === "company"),
   } as const;
@@ -51,7 +51,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
     });
   }
   for (const scope of [
-    "distillers",
+    "distilleries",
     "brands",
     "bottlers",
     "blenders",
@@ -105,12 +105,12 @@ export default mockOS.search.handler(async ({ input, context }) => {
   const entityMatchesSelectedScope = (entity: (typeof mockEntities)[number]) =>
     input.scopes.some((scope) => {
       switch (scope) {
-        case "distillers":
-          return entity.type.includes("distiller");
+        case "distilleries":
+          return entity.kind === "distillery";
         case "brands":
-          return entity.type.includes("brand");
+          return entity.kind === "brand";
         case "bottlers":
-          return entity.type.includes("bottler");
+          return entity.kind === "bottler";
         case "blenders":
           return entity.kind === "blender";
         case "companies":
@@ -131,13 +131,10 @@ export default mockOS.search.handler(async ({ input, context }) => {
 
   const scopeTotals: MockOutputs["search"]["scopeTotals"] = {
     bottles: mockBottles.length,
-    distillers: mockEntities.filter((entity) =>
-      entity.type.includes("distiller"),
-    ).length,
-    brands: mockEntities.filter((entity) => entity.type.includes("brand"))
+    distilleries: mockEntities.filter((entity) => entity.kind === "distillery")
       .length,
-    bottlers: mockEntities.filter((entity) => entity.type.includes("bottler"))
-      .length,
+    brands: mockEntities.filter((entity) => entity.kind === "brand").length,
+    bottlers: mockEntities.filter((entity) => entity.kind === "bottler").length,
     blenders: mockEntities.filter((entity) => entity.kind === "blender").length,
     companies: mockEntities.filter((entity) => entity.kind === "company")
       .length,

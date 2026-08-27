@@ -12,7 +12,7 @@ describe("buildBottleSearchVector", () => {
       },
       {
         name: "Decadent Drinks",
-        type: ["brand", "bottler"],
+        kind: "bottler",
         createdByActorId: 1,
       },
       [],

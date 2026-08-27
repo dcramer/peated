@@ -2,7 +2,7 @@ import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
 import { mockCountries, mockCountry, mockRegion, mockRegions } from "./places";
 
-type Entity = MockOutputs["entities"]["list"]["results"][number];
+type Entity = MockOutputs["entities"]["details"];
 
 // Producers and bottles
 export const mockEntity = {
@@ -10,7 +10,6 @@ export const mockEntity = {
   peatedId: "E9201",
   name: "Lagavulin",
   shortName: null,
-  type: ["brand", "distiller"],
   kind: "distillery",
   ownerId: null,
   description: "An Islay distillery known for heavily peated single malt.",
@@ -99,7 +98,6 @@ export const mockEntities: Entity[] = [
     peatedId: "E9206",
     name: "Midleton",
     shortName: null,
-    type: ["distiller"],
     description:
       "An Irish distillery that produces pot still and grain whiskey.",
     yearEstablished: 1975,
@@ -117,7 +115,6 @@ export const mockEntities: Entity[] = [
     peatedId: "E9207",
     name: "Redbreast",
     shortName: null,
-    type: ["brand"],
     kind: "brand",
     description: "A range of Irish single pot still whiskey made at Midleton.",
     yearEstablished: 1903,
@@ -135,7 +132,6 @@ export const mockEntities: Entity[] = [
     peatedId: "E9208",
     name: "Gordon & MacPhail",
     shortName: "G&M",
-    type: ["bottler"],
     kind: "bottler",
     description:
       "An independent Scotch whisky bottler and maturation specialist.",
@@ -153,7 +149,6 @@ export const mockEntities: Entity[] = [
     peatedId: "E9209",
     name: "Compass Box",
     shortName: null,
-    type: ["brand", "bottler"],
     kind: "blender",
     description: "A Scotch whisky blending house founded in London.",
     yearEstablished: 2000,
@@ -171,7 +166,6 @@ export const mockEntities: Entity[] = [
     peatedId: "E9210",
     name: "Diageo",
     shortName: null,
-    type: [],
     kind: "company",
     description: "A global drinks company that owns several whisky brands.",
     yearEstablished: 1997,

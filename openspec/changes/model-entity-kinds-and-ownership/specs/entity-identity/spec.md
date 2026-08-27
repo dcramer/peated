@@ -32,27 +32,73 @@ links. It MUST NOT copy those uses into an Entity type list.
   field before
 - **THEN** the Bottle update succeeds without changing the Entity kind
 
-#### Scenario: Distillers page
+#### Scenario: First use by another kind
 
-- **WHEN** a user opens the Distillers page
-- **THEN** the page lists Entities linked as Distillers by active Bottles
+- **WHEN** a Distillery Entity is first selected as a Bottle Brand
+- **THEN** the Bottle update succeeds and the Entity remains kind `distillery`
+
+#### Scenario: Create an Entity while creating a Bottle
+
+- **WHEN** Bottle creation includes a new Entity draft with an evidence-based
+  kind
+- **THEN** the system stores that kind instead of copying the Bottle field
+
+#### Scenario: Create an Entity without an explicit kind
+
+- **WHEN** Bottle creation includes a new Entity draft without a kind
+- **THEN** the system uses the Bottle field's default kind and stores one kind
 
 ### Requirement: Clear API names
 
-The system SHALL use `kind` for what an Entity is. Bottle APIs SHALL use Brand,
-Bottler, and Distiller as Bottle field names. The system MUST NOT add a stored
-Entity role or use `type` for both meanings.
+The system SHALL use dedicated Brand, Distillery, Bottler, Blender, and Company
+API collections for what an Entity is. Bottle APIs SHALL use Brand, Bottler,
+and Distiller as Bottle field names. The system MUST NOT add a stored Entity
+role, expose a generic Entity collection, or use `type` for both meanings.
 
-#### Scenario: Search for Companies
+#### Scenario: List one Entity kind
 
-- **WHEN** a caller filters Entities by `kind: company`
+- **WHEN** a caller lists `/blenders`
+- **THEN** every result has kind `blender` and the caller does not pass a kind
+  filter
+
+#### Scenario: Generic Entity collection
+
+- **WHEN** a caller needs a collection of one Entity kind
+- **THEN** it uses that kind's dedicated endpoint instead of `GET /entities`
+
+#### Scenario: Create one Entity kind
+
+- **WHEN** a caller creates a Blender through `/blenders`
+- **THEN** the server assigns kind `blender` and the caller does not pass a
+  kind field
+
+#### Scenario: Generic Entity creation
+
+- **WHEN** a caller needs to create an Entity of one known kind
+- **THEN** it uses that kind's dedicated endpoint instead of `POST /entities`
+
+#### Scenario: List Companies
+
+- **WHEN** a caller lists `/companies`
 - **THEN** the system returns Companies even when they have no Bottles
 
 #### Scenario: Search for a Bottler
 
 - **WHEN** a Bottle form searches for an Entity for its Bottler field
-- **THEN** the search ranks prior Bottler use but does not reject other matching
-  Entities
+- **THEN** global search considers every Entity kind and does not require or
+  infer a Bottler role
+
+#### Scenario: Search one Entity kind
+
+- **WHEN** a caller searches the Company scope
+- **THEN** every Entity result has kind `company`, regardless of its Bottle
+  relationships
+
+#### Scenario: Search all Entities for a Bottle field
+
+- **WHEN** a Bottle form searches its Brand, Bottler, or Distiller field
+- **THEN** it explicitly combines all five kind scopes and may return any
+  Entity kind
 
 ### Requirement: Current owner
 

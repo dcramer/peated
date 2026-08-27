@@ -1,6 +1,6 @@
 "use client";
 
-import { EntityTypeEnum } from "@peated/server/schemas";
+import { EntityKindEnum } from "@peated/server/schemas";
 import EntityForm from "@peated/web/components/entityForm";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -21,22 +21,32 @@ function AddEntityForm() {
   const orpc = useORPC();
 
   const searchParams = useSearchParams();
-  const type = searchParams.getAll("type").flatMap((value) => {
-    const parsed = EntityTypeEnum.safeParse(value);
-    return parsed.success ? [parsed.data] : [];
-  });
+  const parsedKind = EntityKindEnum.safeParse(searchParams.get("kind"));
+  const kind = parsedKind.success ? parsedKind.data : "brand";
 
-  const entityCreateMutation = useMutation(
-    orpc.entities.create.mutationOptions(),
+  const createBrand = useMutation(orpc.brands.create.mutationOptions());
+  const createDistillery = useMutation(
+    orpc.distilleries.create.mutationOptions(),
   );
+  const createBottler = useMutation(orpc.bottlers.create.mutationOptions());
+  const createBlender = useMutation(orpc.blenders.create.mutationOptions());
+  const createCompany = useMutation(orpc.companies.create.mutationOptions());
 
   return (
     <EntityForm
       onSubmit={async (data) => {
-        const newEntity = await entityCreateMutation.mutateAsync(data);
+        const { kind, ...input } = data;
+        const mutation = {
+          brand: createBrand,
+          distillery: createDistillery,
+          bottler: createBottler,
+          blender: createBlender,
+          company: createCompany,
+        }[kind];
+        const newEntity = await mutation.mutateAsync(input);
         router.push(getEntityUrl(newEntity));
       }}
-      initialData={{ type }}
+      initialData={{ kind }}
       title="Add Entity"
     />
   );

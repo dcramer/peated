@@ -73,7 +73,7 @@
           "entityId": 365733,
           "name": "Proof and Wood",
           "shortName": null,
-          "type": ["brand", "bottler"],
+          "kind": "brand",
           "alias": null,
           "score": 1,
           "source": ["context"]

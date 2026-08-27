@@ -264,7 +264,7 @@ export function createBottleCheckMock({
       entityId: testBrand.id,
       name: testBrand.name,
       shortName: testBrand.shortName,
-      roles: testBrand.type,
+      entityKind: testBrand.kind,
     };
     const source = {
       bottleId: exactMergeOtherBottleId,
@@ -506,7 +506,7 @@ export function createBottleCheckMock({
           entityId,
           name: beforeName,
           shortName: null,
-          roles: ["brand"],
+          kind: "brand",
           website: null,
           location: { country: null, region: null },
           yearEstablished: null,
@@ -515,7 +515,7 @@ export function createBottleCheckMock({
           entityId,
           name: afterName,
           shortName: null,
-          roles: ["brand"],
+          kind: "brand",
           website: null,
           location: { country: null, region: null },
           yearEstablished: null,

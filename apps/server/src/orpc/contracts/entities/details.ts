@@ -7,7 +7,7 @@ export default contract
     method: "GET",
     path: "/entities/{entity}",
     summary: "Get entity details",
-    description: "Get a brand, distillery, or bottler",
+    description: "Get a brand, distillery, bottler, blender, or company",
     operationId: "getEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))

@@ -22,11 +22,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     const targetBrand = await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 12,
       totalTastings: 180,
     });
@@ -78,11 +78,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   test("uses alias evidence from its direct Bottle", async ({ fixtures }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
     });
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle({
@@ -118,11 +118,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     const targetBrand = await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
     });
     const user = await fixtures.User({ mod: true });
     const retainedBottle = await fixtures.Bottle({
@@ -164,11 +164,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   test("filters alias evidence for retired Bottles", async ({ fixtures }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
     });
     const user = await fixtures.User({ mod: true });
     const retiredBottle = await fixtures.Bottle({
@@ -200,11 +200,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     const targetBrand = await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
     });
     const user = await fixtures.User({ mod: true });
     const activeBottle = await fixtures.Bottle({
@@ -268,11 +268,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Acme",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Acme Heritage",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 4,
       totalTastings: 20,
     });
@@ -303,11 +303,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Isle of Jura",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const targetBrand = await fixtures.Entity({
       name: "Jura",
-      type: ["brand"],
+      kind: "brand",
     });
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle({
@@ -354,11 +354,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Yamazaki",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     await fixtures.Entity({
       name: "Suntory",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 50,
       totalTastings: 500,
     });
@@ -389,11 +389,11 @@ describe("GET /bottles/brand-repair-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Wild Turkey Distillery",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const targetBrand = await fixtures.Entity({
       name: "Wild Turkey",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 22,
       totalTastings: 140,
     });

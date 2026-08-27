@@ -20,15 +20,15 @@ describe("GET /search", () => {
     );
     const distiller = await fixtures.Entity({
       name: "Contractneedle Distiller",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const brand = await fixtures.Entity({
       name: "Contractneedle Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const bottler = await fixtures.Entity({
       name: "Contractneedle Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const blender = await fixtures.Entity({
       name: "Contractneedle Blender",
@@ -54,14 +54,14 @@ describe("GET /search", () => {
         "bottles",
         "blenders",
         "bottlers",
-        "distillers",
+        "distilleries",
       ],
       limit: 2,
     });
 
     expect(data.groups.map(({ type }) => type)).toEqual([
       "bottles",
-      "distillers",
+      "distilleries",
       "brands",
       "bottlers",
       "blenders",
@@ -74,7 +74,7 @@ describe("GET /search", () => {
         total: 4,
         results: [{ id: bottles[0]!.id }, { id: bottles[1]!.id }],
       },
-      { type: "distillers", total: 1, results: [{ id: distiller.id }] },
+      { type: "distilleries", total: 1, results: [{ id: distiller.id }] },
       { type: "brands", total: 1, results: [{ id: brand.id }] },
       { type: "bottlers", total: 1, results: [{ id: bottler.id }] },
       { type: "blenders", total: 1, results: [{ id: blender.id }] },
@@ -90,23 +90,46 @@ describe("GET /search", () => {
       ["One", "Two", "Three"].map((suffix) =>
         fixtures.Entity({
           name: `Scopedneedle Brand ${suffix}`,
-          type: ["brand"],
+          kind: "brand",
         }),
       ),
     );
     const distiller = await fixtures.Entity({
       name: "Scopedneedle Distiller",
-      type: ["distiller"],
+      kind: "distillery",
     });
 
     const data = await routerClient.search({
       query: "scopedneedle",
-      scopes: ["distillers"],
+      scopes: ["distilleries"],
       limit: 1,
     });
 
     expect(data.groups).toMatchObject([
-      { type: "distillers", total: 1, results: [{ id: distiller.id }] },
+      { type: "distilleries", total: 1, results: [{ id: distiller.id }] },
+    ]);
+  });
+
+  test("uses kind as the authority for every Entity search scope", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Kindauthority Brand",
+      kind: "brand",
+    });
+    const company = await fixtures.Entity({
+      name: "Kindauthority Company",
+      kind: "company",
+    });
+
+    const data = await routerClient.search({
+      query: "kindauthority",
+      scopes: ["brands", "companies"],
+    });
+
+    expect(data.groups).toMatchObject([
+      { type: "brands", results: [{ id: brand.id }] },
+      { type: "companies", results: [{ id: company.id }] },
     ]);
   });
 
@@ -114,7 +137,7 @@ describe("GET /search", () => {
     await fixtures.Bottle({ name: "Population Bottle" });
     await fixtures.Entity({
       name: "Population Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     await fixtures.Entity({
       name: "Population Blender",

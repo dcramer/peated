@@ -23,8 +23,11 @@ import {
 import { implement } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import searchContract, {
+  ENTITY_KIND_BY_SEARCH_SCOPE,
+  ENTITY_SEARCH_SCOPE_LIST,
   SEARCH_SCOPE_LIST,
   SearchOutputSchema,
+  type EntitySearchScope,
   type ExactSchema,
   type ScopeTotalsSchema,
   type SearchScope,
@@ -47,31 +50,11 @@ import {
 } from "drizzle-orm";
 import type { z } from "zod";
 
-type EntityScope =
-  | "distillers"
-  | "brands"
-  | "bottlers"
-  | "blenders"
-  | "companies";
-const ENTITY_SCOPE_LIST = [
-  "distillers",
-  "brands",
-  "bottlers",
-  "blenders",
-  "companies",
-] as const;
-
-const ENTITY_TYPE_BY_SCOPE = {
-  distillers: "distiller",
-  brands: "brand",
-  bottlers: "bottler",
-} as const;
-
 type MemberRow = { member: User; totalTastings: number };
 type ScopeTotals = z.infer<typeof ScopeTotalsSchema>;
 type GroupRows =
   | { type: "bottles"; total: number; results: Bottle[] }
-  | { type: EntityScope; total: number; results: Entity[] }
+  | { type: EntitySearchScope; total: number; results: Entity[] }
   | { type: "regions"; total: number; results: Region[] }
   | { type: "members"; total: number; results: MemberRow[] };
 
@@ -82,7 +65,7 @@ type ExactRow =
 
 type NearestRow =
   | { type: "bottles"; result: Bottle; distance: number; tie: number }
-  | { type: EntityScope; result: Entity; distance: number; tie: number }
+  | { type: EntitySearchScope; result: Entity; distance: number; tie: number }
   | { type: "regions"; result: Region; distance: number; tie: number }
   | { type: "members"; result: MemberRow; distance: number; tie: number };
 
@@ -264,17 +247,8 @@ function entityRatingCount() {
   )`;
 }
 
-function entityScopeWhere(scope: EntityScope) {
-  switch (scope) {
-    case "blenders":
-      return eq(entities.kind, "blender");
-    case "companies":
-      return eq(entities.kind, "company");
-    case "distillers":
-    case "brands":
-    case "bottlers":
-      return sql`${ENTITY_TYPE_BY_SCOPE[scope]} = ANY(${entities.type})`;
-  }
+function entityScopeWhere(scope: EntitySearchScope) {
+  return eq(entities.kind, ENTITY_KIND_BY_SEARCH_SCOPE[scope]);
 }
 
 async function countRows(
@@ -329,7 +303,7 @@ async function searchBottles(
 
 async function searchEntities(
   database: AnyDatabase,
-  scope: EntityScope,
+  scope: EntitySearchScope,
   query: string,
   limit: number,
 ): Promise<{ total: number; results: Entity[] }> {
@@ -425,10 +399,10 @@ async function getScopeTotals(
 ): Promise<ScopeTotals> {
   const totals: ScopeTotals = {
     bottles: await countRows(database, bottles, activeBottleWhere()),
-    distillers: await countRows(
+    distilleries: await countRows(
       database,
       entities,
-      entityScopeWhere("distillers"),
+      entityScopeWhere("distilleries"),
     ),
     brands: await countRows(database, entities, entityScopeWhere("brands")),
     bottlers: await countRows(database, entities, entityScopeWhere("bottlers")),
@@ -451,22 +425,13 @@ async function getScopeTotals(
 }
 
 function entityMatchesScopes(entity: Entity, scopes: SearchScope[]) {
-  return ENTITY_SCOPE_LIST.some(
+  return ENTITY_SEARCH_SCOPE_LIST.some(
     (scope) => scopes.includes(scope) && entityMatchesScope(entity, scope),
   );
 }
 
-function entityMatchesScope(entity: Entity, scope: EntityScope) {
-  switch (scope) {
-    case "blenders":
-      return entity.kind === "blender";
-    case "companies":
-      return entity.kind === "company";
-    case "distillers":
-    case "brands":
-    case "bottlers":
-      return entity.type.includes(ENTITY_TYPE_BY_SCOPE[scope]);
-  }
+function entityMatchesScope(entity: Entity, scope: EntitySearchScope) {
+  return entity.kind === ENTITY_KIND_BY_SEARCH_SCOPE[scope];
 }
 
 async function findExact(
@@ -522,7 +487,7 @@ async function searchGroup(
   switch (scope) {
     case "bottles":
       return { type: scope, ...(await searchBottles(database, query, limit)) };
-    case "distillers":
+    case "distilleries":
     case "brands":
     case "bottlers":
     case "blenders":
@@ -600,7 +565,7 @@ async function findNearest(
           });
         }
         break;
-      case "distillers":
+      case "distilleries":
       case "brands":
       case "bottlers":
       case "blenders":
@@ -722,7 +687,7 @@ async function serializeGroup(group: GroupRows, context: Context) {
           { includeGroupSummary: true },
         ),
       };
-    case "distillers":
+    case "distilleries":
     case "brands":
     case "bottlers":
     case "blenders":
@@ -760,7 +725,7 @@ async function serializeNearest(row: NearestRow, context: Context) {
         type: row.type,
         result: await serialize(BottleSerializer, row.result, context.user),
       };
-    case "distillers":
+    case "distilleries":
     case "brands":
     case "bottlers":
     case "blenders":

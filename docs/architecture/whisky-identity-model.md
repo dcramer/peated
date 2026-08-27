@@ -25,6 +25,11 @@ Classifier terms are governed by the
 - **BottleObservation** is source evidence from a listing, label, or other
   observation. It may preserve facts more specific or less certain than the
   canonical Bottle identity.
+- **Entity** is a catalog identity with exactly one top-level `kind`: `brand`,
+  `distillery`, `bottler`, `blender`, or `company`. Kind controls browse
+  placement. It does not restrict Bottle relationships. A Bottle can use any
+  Entity as its brand, bottler, or distiller, and one Entity can fill more than
+  one of those relationships.
 
 Collection membership describes a user's physical unit, status, and image. It
 does not create another catalog identity layer.
@@ -90,15 +95,16 @@ edits, while Bottle remains the authority for exact reads.
 for that release. It is not a measurement of the finished whisky and does not
 affect Bottle identity, matching, or grouping.
 
-`bottler` is the market-facing bottler or release imprint named for the product.
+The Bottle `bottler` relationship identifies the market-facing bottler or
+release imprint named for the product.
 It may point to the same Entity as `brand` or a producing distillery; a separate
 imprint is not required. Ownership, importing, distribution, and physical
-packing alone do not establish the role.
+packing alone do not establish the relationship.
 
 During an audit, do not remove a populated bottler because the same Entity fills
-another role or because a source omits it. Remove it only when product evidence
-shows the assignment is wrong. Leave `bottler` null when classifying a product
-whose evidence does not establish the role.
+another Bottle relationship or because a source omits it. Remove it only when
+product evidence shows the assignment is wrong. Leave `bottler` null when
+classifying a product whose evidence does not establish the relationship.
 
 Observation-only facts by default include bottle number, non-marketed
 production lot codes, retailer-exclusive wording, and label notes. Store a
@@ -196,8 +202,8 @@ source-specific strings cannot prove an entity repair by themselves.
 
 Entity selection is also not a shortest-name match. When existing Bottle data
 uses separate Entities for the consumer Brand and producing distillery, reuse
-the Entity established in the required role unless stronger evidence shows the
-catalog assignment is wrong.
+the Entity established in the required Bottle relationship unless stronger
+evidence shows the catalog assignment is wrong.
 
 Do not automate brand moves where the only difference is a generic suffix or
 prefix such as `Whisky`, `Bourbon`, `Distillery`, `House`, or `Company`.

@@ -135,27 +135,27 @@
       {
         "id": 1422,
         "name": "Compass Box",
-        "type": ["brand", "bottler"]
+        "kind": "blender"
       },
       {
         "id": 1016,
         "name": "Hedonism",
-        "type": ["brand"]
+        "kind": "brand"
       },
       {
         "id": 1204,
         "name": "North British",
-        "type": ["distiller"]
+        "kind": "distillery"
       },
       {
         "id": 1270,
         "name": "Port Dundas",
-        "type": ["distiller", "brand"]
+        "kind": "distillery"
       },
       {
         "id": 944,
         "name": "Girvan",
-        "type": ["bottler", "brand", "distiller"]
+        "kind": "distillery"
       }
     ],
     "bottles": [

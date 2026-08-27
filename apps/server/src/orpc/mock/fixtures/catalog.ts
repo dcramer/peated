@@ -3,7 +3,7 @@ import { mockBottle, mockBottles } from "./bottles";
 import { mockEntity } from "./entities";
 
 type Bottle = MockOutputs["bottles"]["list"]["results"][number];
-type Entity = MockOutputs["entities"]["list"]["results"][number];
+type Entity = MockOutputs["entities"]["details"];
 
 export const mockEntityCatalog = {
   totalBottles: mockEntity.totalBottles,
@@ -88,16 +88,21 @@ export function mockEntityCatalogFor(
   return {
     totalBottles: entity.totalBottles,
     relationships: {
-      brand: entity.type.includes("brand") ? entity.totalBottles : 0,
-      bottler: entity.type.includes("bottler") ? entity.totalBottles : 0,
-      distiller: entity.type.includes("distiller") ? entity.totalBottles : 0,
+      brand: relatedBottles.filter((bottle) => bottle.brand.id === entity.id)
+        .length,
+      bottler: relatedBottles.filter(
+        (bottle) => bottle.bottler?.id === entity.id,
+      ).length,
+      distiller: relatedBottles.filter((bottle) =>
+        bottle.distillers.some((distiller) => distiller.id === entity.id),
+      ).length,
     },
     distilleryCoverage: {
-      documented:
-        entity.type.includes("distiller") ||
-        relatedBottles.some((bottle) => bottle.distillers.length > 0)
-          ? entity.totalBottles
-          : 0,
+      documented: relatedBottles.some((bottle) =>
+        bottle.distillers.some((distiller) => distiller.id === entity.id),
+      )
+        ? entity.totalBottles
+        : 0,
       total: entity.totalBottles,
     },
     categories: [...categoryCounts].map(([category, count]) => ({

@@ -51,7 +51,6 @@ import {
   requireNoEntityIdentityCollision,
   resolveLocation,
   sameValue,
-  sortedRoles,
   sortedUnique,
   type ParsedPreparationContext,
   type PreparedOperationExecution,
@@ -66,7 +65,7 @@ type ResolvedEntityChoice = {
     entityId: number;
     name: string;
     shortName: string | null;
-    roles: Entity["type"];
+    kind: NonNullable<Entity["kind"]>;
   } | null;
 };
 
@@ -76,11 +75,11 @@ type BottleUpdateStateToken = z.infer<
 
 async function resolveEntityChoice({
   choice,
-  requiredRole,
+  relationship: _relationship,
   context,
 }: {
   choice: BottleOperationEntityChoice;
-  requiredRole: Entity["type"][number];
+  relationship: "brand" | "bottler" | "distiller";
   context: ParsedPreparationContext;
 }): Promise<ResolvedEntityChoice> {
   if (choice.kind === "existing") {
@@ -90,7 +89,7 @@ async function resolveEntityChoice({
       entityId: current.entity.id,
       name: current.entity.name,
       shortName: current.entity.shortName,
-      roles: sortedRoles(current.entity.type),
+      kind: current.entity.kind!,
     };
     return {
       preview: existingEntityChoice(current.entity),
@@ -99,17 +98,10 @@ async function resolveEntityChoice({
     };
   }
 
-  if (!choice.entity.roles.includes(requiredRole)) {
-    fail(
-      "invalid_current_state",
-      `New ${requiredRole} draft does not include the ${requiredRole} role.`,
-    );
-  }
   const normalizedName = normalizeEntityName(choice.entity.name);
   const normalizedDraft = {
     ...choice.entity,
     name: normalizedName,
-    roles: sortedRoles(choice.entity.roles),
   };
   await requireNoEntityIdentityCollision({
     entityId: null,
@@ -131,7 +123,7 @@ async function resolveEntityChoice({
     id: null,
     name: normalizedDraft.name,
     shortName: normalizedDraft.shortName,
-    type: normalizedDraft.roles,
+    kind: normalizedDraft.kind,
     website: normalizedDraft.website,
     country: location.country?.id ?? null,
     region: location.region?.id ?? null,
@@ -263,7 +255,7 @@ function relevantBottleUpdateToken({
     entityId: number;
     name: string;
     shortName: string | null;
-    roles: Entity["type"];
+    kind: NonNullable<Entity["kind"]>;
   }>;
   referencedSeries: BottleSeries[];
   relationshipDigest?: string;
@@ -334,7 +326,7 @@ function relevantBottleUpdateToken({
       ).values(),
     )
       .sort((left, right) => left.entityId - right.entityId)
-      .map((entity) => ({ ...entity, roles: sortedRoles(entity.roles) })),
+      .map((entity) => ({ ...entity })),
     referencedSeries: referencedSeries
       .sort((left, right) => left.id - right.id)
       .map((series) => ({
@@ -424,13 +416,13 @@ export async function prepareBottleUpdate(
       entityId: resource.brand.id,
       name: resource.brand.name,
       shortName: resource.brand.shortName,
-      roles: sortedRoles(resource.brand.type),
+      kind: resource.brand.kind!,
     },
   };
   if (proposal.input.patch.brand) {
     brand = await resolveEntityChoice({
       choice: proposal.input.patch.brand,
-      requiredRole: "brand",
+      relationship: "brand",
       context,
     });
   }
@@ -451,7 +443,7 @@ export async function prepareBottleUpdate(
   } else if (proposal.input.patch.bottler) {
     bottler = await resolveEntityChoice({
       choice: proposal.input.patch.bottler,
-      requiredRole: "bottler",
+      relationship: "bottler",
       context,
     });
   } else if (resource.bottler) {
@@ -462,7 +454,7 @@ export async function prepareBottleUpdate(
         entityId: resource.bottler.id,
         name: resource.bottler.name,
         shortName: resource.bottler.shortName,
-        roles: sortedRoles(resource.bottler.type),
+        kind: resource.bottler.kind!,
       },
     };
   } else {
@@ -481,7 +473,7 @@ export async function prepareBottleUpdate(
       proposedDistillers.push(
         await resolveEntityChoice({
           choice,
-          requiredRole: "distiller",
+          relationship: "distiller",
           context,
         }),
       );
@@ -495,7 +487,7 @@ export async function prepareBottleUpdate(
           entityId: distiller.id,
           name: distiller.name,
           shortName: distiller.shortName,
-          roles: sortedRoles(distiller.type),
+          kind: distiller.kind!,
         },
       });
     }
@@ -753,11 +745,11 @@ export async function prepareBottleUpdate(
       group: resource.group,
       distillerIds: resource.distillerIds,
       referencedEntities: stateToken.referencedEntities.map(
-        ({ entityId: id, name, shortName, roles: type }) => ({
+        ({ entityId: id, name, shortName, kind }) => ({
           id,
           name,
           shortName,
-          type,
+          kind,
         }),
       ),
       series: resource.series,

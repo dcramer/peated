@@ -64,7 +64,11 @@ describe("OpenAPI generation ($ref reuse)", () => {
     const spec = await generateSpec();
     const searchPaths = [
       "/bottles",
-      "/entities",
+      "/brands",
+      "/distilleries",
+      "/bottlers",
+      "/blenders",
+      "/companies",
       "/bottle-series",
       "/search",
       "/users/{user}/collections/{collection}/bottles",

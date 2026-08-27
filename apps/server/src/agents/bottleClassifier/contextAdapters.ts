@@ -317,7 +317,7 @@ export async function getEntityClassifierContext(
       entityId: entities.id,
       name: entities.name,
       shortName: entities.shortName,
-      roles: entities.type,
+      kind: entities.kind,
       website: entities.website,
       country: countries.name,
       region: regions.name,
@@ -356,6 +356,7 @@ export async function getEntityClassifierContext(
         .where(
           and(
             eq(bottles.brandId, entityId),
+            isNotNull(bottles.groupId),
             notExists(
               db
                 .select({ bottleId: bottleTombstones.bottleId })
@@ -372,6 +373,7 @@ export async function getEntityClassifierContext(
         .where(
           and(
             eq(bottles.bottlerId, entityId),
+            isNotNull(bottles.groupId),
             notExists(
               db
                 .select({ bottleId: bottleTombstones.bottleId })
@@ -389,6 +391,7 @@ export async function getEntityClassifierContext(
         .where(
           and(
             eq(bottlesToDistillers.distillerId, entityId),
+            isNotNull(bottles.groupId),
             notExists(
               db
                 .select({ bottleId: bottleTombstones.bottleId })

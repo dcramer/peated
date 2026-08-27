@@ -2,10 +2,8 @@ import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Entity, User } from "@peated/server/db/schema";
 import {
-  bottleGroupDistillers,
   bottleGroups,
   bottles,
-  bottleSeries,
   bottlesToDistillers,
   changes,
   countries,
@@ -41,8 +39,7 @@ import { z } from "zod";
 export const EntityUpdateInputSchema = z.object({
   name: EntityInputFields.name.optional(),
   shortName: EntityInputFields.shortName.removeDefault().optional(),
-  type: EntityInputFields.type.removeDefault().optional(),
-  kind: EntityInputFields.kind.removeDefault().optional(),
+  kind: EntityInputFields.kind.optional(),
   ownerId: EntityInputFields.ownerId.removeDefault().optional(),
   description: EntityInputFields.description.removeDefault().optional(),
   descriptionSrc: EntityInputFields.descriptionSrc.optional(),
@@ -96,7 +93,6 @@ type EntityUpdateData = Partial<
     Entity,
     | "name"
     | "shortName"
-    | "type"
     | "kind"
     | "ownerId"
     | "description"
@@ -126,7 +122,6 @@ export type EntityUpdateExpectedState = {
   fields: {
     name?: string;
     shortName?: string | null;
-    roles?: Entity["type"];
     kind?: Entity["kind"];
     ownerId?: Entity["ownerId"];
     website?: string | null;
@@ -137,75 +132,6 @@ export type EntityUpdateExpectedState = {
   referencedCountry: { id: number; name: string } | null;
   referencedRegion: { id: number; countryId: number; name: string } | null;
 };
-
-async function assertRemovedRolesAreUnreferenced(
-  transaction: AnyTransaction,
-  entity: Entity,
-  nextRoles: Entity["type"],
-) {
-  const removesRole = (role: Entity["type"][number]) =>
-    entity.type.includes(role) && !nextRoles.includes(role);
-  const hasReference = async (
-    table:
-      | typeof bottles
-      | typeof bottleGroups
-      | typeof bottleSeries
-      | typeof bottlesToDistillers
-      | typeof bottleGroupDistillers,
-    field:
-      | typeof bottles.brandId
-      | typeof bottles.bottlerId
-      | typeof bottleGroups.brandId
-      | typeof bottleGroups.bottlerId
-      | typeof bottleSeries.brandId
-      | typeof bottlesToDistillers.distillerId
-      | typeof bottleGroupDistillers.distillerId,
-  ) =>
-    Boolean(
-      (
-        await transaction
-          .select({ id: sql`1` })
-          .from(table)
-          .where(eq(field, entity.id))
-          .limit(1)
-      )[0],
-    );
-
-  if (
-    removesRole("brand") &&
-    ((await hasReference(bottles, bottles.brandId)) ||
-      (await hasReference(bottleGroups, bottleGroups.brandId)) ||
-      (await hasReference(bottleSeries, bottleSeries.brandId)))
-  ) {
-    throw new EntityUpdateConflictError(
-      "Cannot remove the brand role while the Entity is referenced as a brand.",
-    );
-  }
-  if (
-    removesRole("bottler") &&
-    ((await hasReference(bottles, bottles.bottlerId)) ||
-      (await hasReference(bottleGroups, bottleGroups.bottlerId)))
-  ) {
-    throw new EntityUpdateConflictError(
-      "Cannot remove the bottler role while the Entity is referenced as a bottler.",
-    );
-  }
-  if (
-    removesRole("distiller") &&
-    ((await hasReference(
-      bottlesToDistillers,
-      bottlesToDistillers.distillerId,
-    )) ||
-      (await hasReference(
-        bottleGroupDistillers,
-        bottleGroupDistillers.distillerId,
-      )))
-  ) {
-    throw new EntityUpdateConflictError(
-      "Cannot remove the distiller role while the Entity is referenced as a distiller.",
-    );
-  }
-}
 
 /**
  * Applies the durable part of an Entity update inside a caller-owned
@@ -240,7 +166,6 @@ export async function updateEntityInTransaction(
     const currentFields = {
       name: entity.name,
       shortName: entity.shortName,
-      roles: [...entity.type].sort(),
       kind: entity.kind,
       ownerId: entity.ownerId,
       website: entity.website,
@@ -340,10 +265,6 @@ export async function updateEntityInTransaction(
     data.location = input.location;
   }
 
-  if (input.type !== undefined && !arraysEqual(input.type, entity.type)) {
-    await assertRemovedRolesAreUnreferenced(transaction, entity, input.type);
-    data.type = input.type;
-  }
   if (input.kind !== undefined && input.kind !== entity.kind) {
     data.kind = input.kind;
   }

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import {
+  BOTTLE_ENTITY_ROLE_LIST,
   CATEGORY_LIST,
   CURRENCY_LIST,
   ENTITY_KIND_LIST,
-  ENTITY_TYPE_LIST,
   FLAVOR_PROFILES,
   SERVING_STYLE_LIST,
 } from "../constants";
@@ -39,7 +39,7 @@ export const CurrencyEnum = z.enum(CURRENCY_LIST);
 
 export const CategoryEnum = z.enum(CATEGORY_LIST);
 
-export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
+export const BottleEntityRoleEnum = z.enum(BOTTLE_ENTITY_ROLE_LIST);
 
 export const EntityKindEnum = z.enum(ENTITY_KIND_LIST);
 

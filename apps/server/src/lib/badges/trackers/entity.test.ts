@@ -2,7 +2,9 @@ import { createTastingForBadge } from "../testHelpers";
 import { EntityTracker } from "./entity";
 
 describe("track", () => {
-  test("tracks an entity once across multiple roles", async ({ fixtures }) => {
+  test("tracks an Entity once across multiple Bottle relationships", async ({
+    fixtures,
+  }) => {
     const brand = await fixtures.Entity();
     const tasting = await createTastingForBadge(fixtures, {
       brand,

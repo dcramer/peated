@@ -1,4 +1,4 @@
-import type { Entity, EntityKind, EntityType } from "@peated/server/types";
+import type { Entity, EntityKind } from "@peated/server/types";
 
 const ENTITY_COLLECTION_BY_KIND = {
   brand: "/brands",
@@ -26,25 +26,26 @@ export function getBottleUrl(
 export function getEntityUrl(
   entity: Pick<Entity, "id" | "kind">,
 ): `/${string}` {
-  // Older records can lack a kind. Keep their existing route until the data
-  // owns the invariant that every public Entity has a primary kind.
-  const collection = entity.kind
-    ? ENTITY_COLLECTION_BY_KIND[entity.kind]
-    : "/entities";
-  return `${collection}/${entity.id}`;
+  return `${ENTITY_COLLECTION_BY_KIND[entity.kind]}/${entity.id}`;
 }
 
-export function getEntityTypeSearchUrl(type: EntityType) {
+export function getEntityKindSearchUrl(kind: EntityKind) {
   let link: string;
-  switch (type) {
+  switch (kind) {
     case "bottler":
       link = "/bottlers";
       break;
     case "brand":
       link = "/brands";
       break;
-    case "distiller":
+    case "distillery":
       link = "/distillers";
+      break;
+    case "blender":
+      link = "/blenders";
+      break;
+    case "company":
+      link = "/companies";
       break;
   }
   return link;

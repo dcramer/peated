@@ -128,17 +128,6 @@ export function sortedUnique(values: readonly number[]): number[] {
   return Array.from(new Set(values)).sort((left, right) => left - right);
 }
 
-export function sortedRoles(
-  roles: readonly Entity["type"][number][],
-): Entity["type"] {
-  const sorted = Array.from(new Set(roles)).sort();
-  const first = sorted[0];
-  if (!first) {
-    throw new Error("An Entity must have at least one role.");
-  }
-  return [first, ...sorted.slice(1)];
-}
-
 type JsonStringifyInput = Parameters<typeof JSON.stringify>[0];
 
 export function sameValue(
@@ -350,7 +339,7 @@ export function entityPreviewState({
     entityId: entity.id,
     name: entity.name,
     shortName: entity.shortName,
-    roles: [...entity.type].sort(),
+    kind: entity.kind!,
     website: entity.website,
     location: {
       country,

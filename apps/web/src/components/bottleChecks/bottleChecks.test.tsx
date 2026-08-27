@@ -89,7 +89,7 @@ const entityReview = {
       entityId: 42,
       name: "Wrong Brand",
       shortName: null,
-      roles: ["brand"],
+      kind: "brand",
       website: null,
       location: { country: null, region: null },
       yearEstablished: null,
@@ -98,7 +98,7 @@ const entityReview = {
       entityId: 42,
       name: "Correct Brand",
       shortName: null,
-      roles: ["brand"],
+      kind: "brand",
       website: null,
       location: { country: null, region: null },
       yearEstablished: null,
@@ -112,7 +112,7 @@ const entityReview = {
       series: 1,
       aliases: 2,
     },
-    warnings: [{ code: "role_union", message: "Roles will be preserved." }],
+    warnings: [],
   },
 } satisfies BottleOperationReview;
 
@@ -187,7 +187,6 @@ describe("Bottle Check review components", () => {
     expect(html).toContain('href="https://example.com/evidence"');
     expect(html).toContain("Wrong Brand");
     expect(html).toContain("Correct Brand");
-    expect(html).toContain("Roles will be preserved.");
     expect(html).toContain("8</dd><dt");
     expect(html).not.toContain("0</dd><dt");
     expect(html).not.toContain("1</dd><dt");
@@ -234,7 +233,7 @@ describe("Bottle Check review components", () => {
           entityId: 7,
           name: "Example",
           shortName: null,
-          roles: ["brand"],
+          entityKind: "brand",
         },
         distillers: [],
         bottler: null,

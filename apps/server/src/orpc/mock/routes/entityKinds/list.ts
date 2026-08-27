@@ -3,15 +3,28 @@ import {
   mockEntities,
   mockPage,
 } from "@peated/server/orpc/mock/fixtures";
-import { mockOS } from "@peated/server/orpc/mock/implementer";
+import type { EntityKind } from "@peated/server/types";
 
-export default mockOS.entities.list.handler(async ({ input }) => {
-  const type = input.type ?? input.searchContext?.type;
+export function listEntityKind(
+  kind: EntityKind,
+  input: {
+    query: string;
+    name?: string | null;
+    owner?: number | null;
+    country?: string | null;
+    region?: string | null;
+    sort: string;
+    cursor: number;
+    limit: number;
+  },
+) {
   const direction = input.sort.startsWith("-") ? -1 : 1;
   const sort = input.sort.replace(/^-/, "");
   const entities = mockEntities
     .filter(
       (entity) =>
+        entity.kind === kind &&
+        (input.owner == null || entity.ownerId === input.owner) &&
         includesQuery(input.query, entity.name, entity.shortName) &&
         (input.name == null || entity.name === input.name) &&
         (input.country == null ||
@@ -19,9 +32,7 @@ export default mockOS.entities.list.handler(async ({ input }) => {
           entity.country?.id === Number(input.country)) &&
         (input.region == null ||
           entity.region?.slug === input.region.toLowerCase() ||
-          entity.region?.id === Number(input.region)) &&
-        (type == null || entity.type.includes(type)) &&
-        input.bottler == null,
+          entity.region?.id === Number(input.region)),
     )
     .toSorted((left, right) => {
       switch (sort) {
@@ -31,8 +42,6 @@ export default mockOS.entities.list.handler(async ({ input }) => {
           return direction * left.createdAt.localeCompare(right.createdAt);
         case "tastings":
           return direction * (left.totalTastings - right.totalTastings);
-        case "rank":
-          return 0;
         case "bottles":
           return direction * (left.totalBottles - right.totalBottles);
         default:
@@ -41,4 +50,4 @@ export default mockOS.entities.list.handler(async ({ input }) => {
     });
 
   return mockPage(entities, input.cursor, input.limit);
-});
+}

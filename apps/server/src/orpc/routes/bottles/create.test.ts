@@ -832,7 +832,7 @@ describe("POST /bottles", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({
-      type: ["brand", "bottler"],
+      kind: "bottler",
       name: "SMWS Manual Guard Society",
       shortName: "SMWS",
     });

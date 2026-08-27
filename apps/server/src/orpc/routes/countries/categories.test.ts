@@ -14,7 +14,7 @@ describe("GET /countries/categories", () => {
     const country = await fixtures.Country();
     const distiller = await fixtures.Entity({
       countryId: country.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottle1 = await fixtures.Bottle({
       category: "bourbon",
@@ -48,7 +48,7 @@ describe("GET /countries/categories", () => {
     const country = await fixtures.Country({ slug: "scotland" });
     const distiller = await fixtures.Entity({
       countryId: country.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       category: "single_malt",
@@ -89,7 +89,7 @@ describe("GET /countries/categories", () => {
     const country = await fixtures.Country();
     const distiller = await fixtures.Entity({
       countryId: country.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     await fixtures.Bottle({
       category: "bourbon",
@@ -136,11 +136,11 @@ describe("GET /countries/categories", () => {
     });
     const countryDistiller = await fixtures.Entity({
       countryId: country.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     const otherDistiller = await fixtures.Entity({
       countryId: otherCountry.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     const activeBottle = await fixtures.Bottle({
       category: "bourbon",
@@ -219,15 +219,15 @@ describe("GET /countries/categories", () => {
     });
     const firstDistiller = await fixtures.Entity({
       countryId: country.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     const secondDistiller = await fixtures.Entity({
       countryId: country.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     const otherDistiller = await fixtures.Entity({
       countryId: otherCountry.id,
-      type: ["distiller"],
+      kind: "distillery",
     });
     await fixtures.Bottle({
       category: null,

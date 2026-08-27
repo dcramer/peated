@@ -13,7 +13,7 @@ import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import {
   BottleInputSchema,
-  EntityInputSchema,
+  EntityChoiceInputSchema,
   EntitySchema,
 } from "@peated/server/schemas";
 import { type BottlePreviewResult } from "@peated/server/types";
@@ -45,7 +45,8 @@ async function getEntityById(entityId: number, entityDb: AnyDatabase) {
     peatedId: formatPeatedId("entity", entity.id),
     name: entity.name,
     shortName: entity.shortName,
-    type: entity.type,
+    kind: entity.kind,
+    ownerId: entity.ownerId,
     description: entity.description,
     descriptionSrc: entity.descriptionSrc,
     yearEstablished: entity.yearEstablished,
@@ -62,8 +63,9 @@ async function getEntityById(entityId: number, entityDb: AnyDatabase) {
 }
 
 async function getEntity(
-  input: number | z.input<typeof EntityInputSchema>,
+  input: number | z.input<typeof EntityChoiceInputSchema>,
   entityDb: AnyDatabase,
+  defaultKind: "brand" | "bottler" | "distillery",
 ) {
   const entityId = z.number().safeParse(input);
   if (entityId.success) {
@@ -76,7 +78,8 @@ async function getEntity(
 
     return entity;
   }
-  const parsedInput = EntityInputSchema.parse(input);
+  const draft = EntityChoiceInputSchema.parse(input);
+  const parsedInput = { ...draft, kind: draft.kind ?? defaultKind };
   const existingEntity = await findEntityByExactNameOrAlias(
     entityDb,
     parsedInput.name,
@@ -91,7 +94,8 @@ async function getEntity(
     peatedId: formatPeatedId("entity", existingEntity.id),
     name: existingEntity.name,
     shortName: existingEntity.shortName,
-    type: existingEntity.type,
+    kind: existingEntity.kind,
+    ownerId: existingEntity.ownerId,
     description: existingEntity.description,
     descriptionSrc: existingEntity.descriptionSrc,
     yearEstablished: existingEntity.yearEstablished,
@@ -114,7 +118,7 @@ export async function bottleNormalize({
   input: z.infer<typeof BottleInputSchema>;
   entityDb?: AnyDatabase;
 }): Promise<BottlePreviewResult & NormalizedBottle> {
-  const brand = await getEntity(input.brand, entityDb);
+  const brand = await getEntity(input.brand, entityDb, "brand");
 
   const rv: BottlePreviewResult = {
     ...input,
@@ -142,6 +146,7 @@ export async function bottleNormalize({
               name: details.distiller,
             },
             entityDb,
+            "distillery",
           );
           if (distiller) rv.distillers = [distiller];
         }
@@ -150,12 +155,12 @@ export async function bottleNormalize({
   }
 
   if (!rv.bottler && input.bottler) {
-    rv.bottler = await getEntity(input.bottler, entityDb);
+    rv.bottler = await getEntity(input.bottler, entityDb, "bottler");
   }
 
   if (!rv.distillers && input.distillers) {
     rv.distillers = await Promise.all(
-      input.distillers.map((d) => getEntity(d, entityDb)),
+      input.distillers.map((d) => getEntity(d, entityDb, "distillery")),
     );
   }
 

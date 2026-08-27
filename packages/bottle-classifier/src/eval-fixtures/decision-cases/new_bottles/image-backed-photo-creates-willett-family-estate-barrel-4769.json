@@ -158,12 +158,12 @@
         "id": 502,
         "name": "Willett",
         "shortName": "Willett",
-        "type": ["brand", "bottler", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 1779,
         "name": "Kentucky Bourbon Distillers",
-        "type": ["brand", "bottler", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

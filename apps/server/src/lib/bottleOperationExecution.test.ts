@@ -42,7 +42,7 @@ function artifacts({
       entityId: entity.id,
       name: entity.name,
       shortName: null,
-      roles: [],
+      kind: "brand" as const,
       website: null,
       country: null,
       region: null,
@@ -199,7 +199,7 @@ describe("Bottle operation execution", () => {
             kind: "create",
             entity: {
               name: "Execution Created Brand",
-              roles: ["brand"],
+              kind: "brand",
             },
           },
         },
@@ -245,7 +245,7 @@ describe("Bottle operation execution", () => {
     const createdBrand = await db.query.entities.findFirst({
       where: eq(entities.name, "Execution Created Brand"),
     });
-    expect(createdBrand).toMatchObject({ type: ["brand"] });
+    expect(createdBrand).toMatchObject({ kind: "brand" });
     expect(
       await db.query.bottles.findFirst({
         where: eq(bottles.id, bottle.id),
@@ -332,7 +332,7 @@ describe("Bottle operation execution", () => {
     });
     const entity = await fixtures.Entity({
       name: "Execution Entity Before",
-      type: ["brand"],
+      kind: "brand",
     });
     const subjectBottle = await fixtures.Bottle({ brandId: entity.id });
     const proposal: ProposedOperation = {
@@ -401,11 +401,11 @@ describe("Bottle operation execution", () => {
     const moderator = await fixtures.User({ mod: true });
     const source = await fixtures.Entity({
       name: "Execution Entity Merge Source",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const destination = await fixtures.Entity({
       name: "Execution Entity Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     const subjectBottle = await fixtures.Bottle({
       brandId: destination.id,

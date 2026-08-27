@@ -762,7 +762,7 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
-      type: ["brand", "distiller"],
+      kind: "distillery",
       name: "Pappy Van Winkle's",
     });
     const fifteenYearBottle = await fixtures.Bottle({
@@ -868,7 +868,7 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "Shibui",
     });
     const bottle = await fixtures.Bottle({
@@ -910,7 +910,7 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "Shibui",
     });
     const bottle = await fixtures.Bottle({
@@ -960,7 +960,7 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
-      type: ["brand", "bottler"],
+      kind: "bottler",
       name: "SMWS Candidate Society",
       shortName: "SMWS",
     });
@@ -1022,7 +1022,7 @@ describe("priceMatching", () => {
 
     const reviewer = await fixtures.User();
     const brand = await fixtures.Entity({
-      type: ["brand", "bottler"],
+      kind: "bottler",
       name: "SMWS Price Guard Society",
       shortName: "SMWS",
     });
@@ -1187,7 +1187,7 @@ describe("priceMatching", () => {
     const reviewer = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({
       name: "Canonical Reuse Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const firstPrice = await fixtures.StorePrice({
@@ -1302,7 +1302,7 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const brand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "Alias Preference Brand",
     });
     const literalBottle = await fixtures.Bottle({
@@ -1464,7 +1464,7 @@ describe("priceMatching", () => {
 
     const tomatin = await fixtures.Entity({
       name: "Tomatin",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const generic12Bottle = await fixtures.Bottle({
       brandId: tomatin.id,
@@ -1622,7 +1622,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Example Distillery",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -1889,7 +1889,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Wild Turkey",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -1980,7 +1980,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Wild Turkey",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -2085,7 +2085,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Glenlivet",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -2206,7 +2206,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Example Heritage",
-      type: ["brand"],
+      kind: "brand",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -2439,7 +2439,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "The Whistler",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const currentBottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -2591,11 +2591,11 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const correctBrand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "The Whistler",
     });
     const distillery = await fixtures.Entity({
-      type: ["distiller"],
+      kind: "distillery",
       name: "Boann Distillery",
     });
     const currentBottle = await fixtures.Bottle({
@@ -2707,7 +2707,7 @@ describe("priceMatching", () => {
   }) => {
     const reviewer = await fixtures.User();
     const brand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "Repair Drift Brand",
     });
     const bottle = await fixtures.Bottle({
@@ -2856,7 +2856,7 @@ describe("priceMatching", () => {
   }) => {
     const reviewer = await fixtures.User();
     const brand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "Historical Repair Brand",
     });
     const selectedBottle = await fixtures.Bottle({
@@ -3241,11 +3241,11 @@ describe("priceMatching", () => {
     const brand = await fixtures.Entity({
       name: "The Scotch Malt Whisky Society",
       shortName: null,
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const distiller = await fixtures.Entity({
       name: "Kyrö",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -3356,11 +3356,11 @@ describe("priceMatching", () => {
     const brand = await fixtures.Entity({
       name: "The Scotch Malt Whisky Society",
       shortName: null,
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const distiller = await fixtures.Entity({
       name: "Kyrö",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -3471,11 +3471,11 @@ describe("priceMatching", () => {
     const brand = await fixtures.Entity({
       name: "The Scotch Malt Whisky Society",
       shortName: "SMWS",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const distiller = await fixtures.Entity({
       name: "Kyrö",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const price = await fixtures.StorePrice({
       externalSiteId: site.id,
@@ -3630,11 +3630,11 @@ describe("priceMatching", () => {
     const brand = await fixtures.Entity({
       name: "The Scotch Malt Whisky Society",
       shortName: null,
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const distiller = await fixtures.Entity({
       name: "Kyrö",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -3765,7 +3765,7 @@ describe("priceMatching", () => {
     const brand = await fixtures.Entity({
       name: "The Scotch Malt Whisky Society",
       shortName: null,
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -3939,11 +3939,11 @@ describe("priceMatching", () => {
     const brand = await fixtures.Entity({
       name: "The Scotch Malt Whisky Society",
       shortName: "SMWS",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const distiller = await fixtures.Entity({
       name: "Kyrö",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const mismatchedBottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -4375,11 +4375,11 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Aberfeldy",
-      type: ["brand"],
+      kind: "brand",
     });
     const distiller = await fixtures.Entity({
       name: "Aberfeldy Distillery",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const attemptedCanonicalName = "Aberfeldy 21-year-old";
     const bottle = await fixtures.Bottle({
@@ -4921,15 +4921,15 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Independent Label",
-      type: ["brand"],
+      kind: "brand",
     });
     const bottler = await fixtures.Entity({
       name: "Campbeltown Merchant",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const distiller = await fixtures.Entity({
       name: "Ben Nevis",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const series = await fixtures.BottleSeries({
       brandId: brand.id,
@@ -5007,7 +5007,7 @@ describe("priceMatching", () => {
     const lagavulin = await fixtures.Entity({
       name: "Lagavulin",
       shortName: "Lagavulin",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: lagavulin.id,
@@ -5061,7 +5061,7 @@ describe("priceMatching", () => {
     const lagavulin = await fixtures.Entity({
       name: "Lagavulin",
       shortName: "Lagavulin",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const springBottle = await fixtures.Bottle({
       brandId: lagavulin.id,
@@ -5126,7 +5126,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "The Macallan",
-      type: ["brand"],
+      kind: "brand",
     });
     const cleanParent = await fixtures.Bottle({
       brandId: brand.id,
@@ -5187,7 +5187,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       name: "Penelope",
-      type: ["brand"],
+      kind: "brand",
     });
     const cleanParent = await fixtures.Bottle({
       brandId: brand.id,
@@ -5757,16 +5757,16 @@ describe("priceMatching", () => {
     const brand = await fixtures.Entity({
       name: "Canonical Brand",
       shortName: "Brand Short",
-      type: ["brand"],
+      kind: "brand",
     });
     const distiller = await fixtures.Entity({
       name: "Canonical Distillery",
       shortName: "Distillery Short",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottler = await fixtures.Entity({
       name: "Canonical Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     await fixtures.EntityAlias({
       entityId: brand.id,
@@ -5830,7 +5830,7 @@ describe("priceMatching", () => {
             entityId: brand.id,
             name: brand.name,
             shortName: brand.shortName,
-            type: brand.type,
+            kind: brand.kind!,
             alias: "Brand Alias",
             score: 1,
             source: ["exact"],
@@ -5839,7 +5839,7 @@ describe("priceMatching", () => {
             entityId: distiller.id,
             name: distiller.name,
             shortName: distiller.shortName,
-            type: distiller.type,
+            kind: distiller.kind!,
             alias: null,
             score: 1,
             source: ["exact"],
@@ -5848,7 +5848,7 @@ describe("priceMatching", () => {
             entityId: bottler.id,
             name: bottler.name,
             shortName: bottler.shortName,
-            type: bottler.type,
+            kind: bottler.kind!,
             alias: "Bottler Alias",
             score: 1,
             source: ["exact"],

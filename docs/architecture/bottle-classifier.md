@@ -55,16 +55,17 @@ size, or fill. `caskNumber` stores a marketed cask or barrel identifier.
 decide identity. A marketed cask identifier, `singleCask`, and `caskStrength`
 can remain identity evidence.
 
-`bottler` is the market-facing bottler or release imprint named for the product.
-One Entity may be both Brand and bottler, or both distiller and bottler; a
-separate imprint is not required. Ownership, importing, distribution, physical
-packing, or page hosting alone does not establish the role. Otherwise the
-classifier leaves it null and does not treat the missing value as a generic
-enrichment gap.
+The Bottle `bottler` relationship identifies the market-facing bottler or
+release imprint named for the product. One Entity may be both Brand and
+bottler, or both distiller and bottler; a separate imprint is not required.
+An Entity's top-level kind does not restrict these Bottle relationships.
+Ownership, importing, distribution, physical packing, or page hosting alone
+does not establish the relationship. Otherwise the classifier leaves it null
+and does not treat the missing value as a generic enrichment gap.
 
 During an audit, do not remove a populated bottler because the same Entity fills
-another role or because a source omits it. Remove it only when product evidence
-shows the assignment is wrong. Likewise, change a populated exact field only
+another Bottle relationship or because a source omits it. Remove it only when
+product evidence shows the assignment is wrong. Likewise, change a populated exact field only
 with evidence for the same Bottle. Values from other batches or releases show
 variation, not a correction.
 
@@ -244,9 +245,9 @@ for that complete Bottle.
 - Treat bottling year as an optional Bottle detail. A different bottling year
   alone does not prove that it is a different release or block an otherwise
   clear match.
-- Reuse Entities by their established catalog role. Exact or shorter name
-  overlap does not override local evidence that distinguishes a Brand from its
-  producing distillery.
+- Reuse Entities by established Bottle relationships. Exact or shorter name
+  overlap does not override local Bottle evidence that distinguishes a Brand
+  from its producing distillery.
 - Create a Bottle only when reviewed source, label, image,
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a

@@ -19,10 +19,10 @@ export function buildEntityClassifierInstructions({
     "Use `no_issue` when the subject still looks valid after review.",
     `You may issue at most ${maxSearchQueries} web searches.`,
     hasEntitySearch
-      ? "Use `search_entities` to resolve likely sibling brands, distillers, or bottlers before relying on web search."
+      ? "Use `search_entities` to resolve likely sibling Entities before relying on web search. Always select the kind that the target Entity should have."
       : "No local entity search tool is available.",
     hasOpenAIWebSearch
-      ? "Use `openai_web_search` for official-site confirmation, trademark/branding language, or location/type verification."
+      ? "Use `openai_web_search` for official-site confirmation, trademark/branding language, or location and kind verification."
       : "No web search tool is available.",
     "Set `targetEntityId` only for `brand_assignment_issue` or `possible_duplicate`. Select an Entity that is present in local evidence.",
     "Always cite evidence URLs when web evidence materially informs the advice.",

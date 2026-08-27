@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EntityTypeEnum } from "./common";
+import { EntityKindEnum } from "./common";
 
 const PositiveIdSchema = z.number().int().positive();
 
@@ -52,7 +52,7 @@ export const EntityMergeOperationExecutionResultSchema = z
     type: z.literal("merge_entities"),
     sourceEntityId: PositiveIdSchema,
     destinationEntityId: PositiveIdSchema,
-    destinationRoles: z.array(EntityTypeEnum),
+    destinationKind: EntityKindEnum,
     approvingModeratorId: PositiveIdSchema,
     reconciled: z.boolean(),
     execution: z

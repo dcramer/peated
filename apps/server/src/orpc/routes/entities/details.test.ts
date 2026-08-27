@@ -27,6 +27,19 @@ describe("GET /entities/:entity", () => {
     expect(data.updatedAt).toBe(updatedAt.toISOString());
   });
 
+  test("returns the current direct owner", async ({ fixtures }) => {
+    const owner = await fixtures.Entity({ name: "Owner", kind: "company" });
+    const entity = await fixtures.Entity({ ownerId: owner.id });
+
+    const data = await routerClient.entities.details({ entity: entity.id });
+
+    expect(data.owner).toEqual({
+      id: owner.id,
+      peatedId: formatPeatedId("entity", owner.id),
+      name: owner.name,
+    });
+  });
+
   test("errors on invalid entity", async () => {
     const err = await waitError(
       routerClient.entities.details({

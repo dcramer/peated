@@ -91,7 +91,7 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
   }
 });
 
-test("deduplicates one Entity used by every Bottle role", async ({
+test("deduplicates one Entity used by every Bottle relationship", async ({
   fixtures,
 }) => {
   const entity = await fixtures.Entity({ name: "Deduplicated Stats Entity" });

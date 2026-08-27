@@ -12,7 +12,7 @@ test("an Entity name change reindexes every related Bottle", async ({
 }) => {
   const entity = await fixtures.Entity({
     name: "Shared Search Entity",
-    type: ["brand", "bottler", "distiller"],
+    kind: "distillery",
   });
   const brandBottle = await fixtures.Bottle({ brandId: entity.id });
   const bottlerBottle = await fixtures.Bottle({ bottlerId: entity.id });

@@ -338,7 +338,7 @@ export default function BottleForm({
                 createDialogHelpText="The brand is the label the spirit is bottled under. Sometimes this is
                 the same as the distiller."
                 searchContext={{
-                  type: "brand",
+                  role: "brand",
                 }}
                 required
                 onChange={(value) => {
@@ -448,9 +448,7 @@ export default function BottleForm({
                 {...field}
                 error={errors.distillers}
                 searchContext={{
-                  type: "distiller",
-                  brand: brandValue?.id ? Number(brandValue.id) : null,
-                  bottleName: watch("name"),
+                  role: "distiller",
                 }}
                 label="Distilled By"
                 placeholder="e.g. Angel's Envy, Suntory Whisky"
@@ -480,9 +478,7 @@ export default function BottleForm({
                 placeholder="e.g. The Scotch Malt Whisky Society"
                 suggestedOptions={brandValue ? [brandValue] : []}
                 searchContext={{
-                  type: "bottler",
-                  brand: brandValue?.id ? Number(brandValue.id) : null,
-                  bottleName: watch("name"),
+                  role: "bottler",
                 }}
                 onChange={(value) => {
                   onChange(value?.id ?? value ?? null);

@@ -3,12 +3,12 @@ import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
 describe("GET /entities/:entity/catalog", () => {
-  test("summarizes overlapping bottle roles and related entities", async ({
+  test("summarizes overlapping Bottle relationships and related Entities", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
       name: "Summary Entity",
-      type: ["brand", "bottler", "distiller"],
+      kind: "distillery",
     });
     const alphaBrand = await fixtures.Entity({ name: "Alpha Brand" });
     const betaBrand = await fixtures.Entity({ name: "Beta Brand" });

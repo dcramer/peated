@@ -66,13 +66,51 @@ An Entity is used as a Brand when `bottle.brandId` points to it. Bottler use
 comes from `bottle.bottlerId`. Distiller use comes from the Bottle-to-Distiller
 table.
 
-Brand, Bottler, and Distiller browse pages query these Bottle links. Bottle
-forms search all Entities and rank Entities already used in the requested
-field. A kind never blocks a valid Bottle link.
+Bottle forms search all Entities without a role filter or role-specific
+ranking. A kind never blocks a valid Bottle link.
 
-The API uses `kind` when it means what an Entity is. Bottle APIs continue to use
-the existing Brand, Bottler, and Distiller field names. There is no stored or
-public Entity role model.
+When Bottle creation includes a new Entity draft, an explicit kind from the
+user or classifier wins. If the draft has no kind, the Bottle field supplies a
+reasonable default: Brand uses `brand`, Bottler uses `bottler`, and Distiller
+uses `distillery`. This creation default does not constrain later Bottle links.
+
+### Make kinds top-level API resources
+
+Expose one collection API for each Entity kind:
+
+- `/brands`;
+- `/distilleries`;
+- `/bottlers`;
+- `/blenders`;
+- `/companies`.
+
+Each endpoint fixes and enforces its kind for list and create operations.
+Callers do not pass a kind filter or kind create field. The handlers may share
+query, mutation, and serialization helpers, but the public route, operation
+name, input, and output remain kind-specific. Do not expose generic `GET` or
+`POST /entities` collection operations or make callers combine several roles
+to describe an Entity.
+
+These kind collections answer what an Entity is. Bottle fields answer how an
+Entity is used. Bottle forms use global search across all Entity kinds. They do
+not filter or rank by a stored Entity role. This keeps a Distillery such as
+Lagavulin selectable as a Bottle Brand without also classifying Lagavulin as a
+Brand kind.
+
+Every public Entity search scope maps to exactly one kind. An all-kind search
+is explicit: it combines all five kind scopes. Entity-classifier searches also
+require one kind. Bottle forms and Bottle-classifier relationship resolution
+are the exception and may search all five kinds because kind does not constrain
+a Bottle relationship.
+
+Shared detail and moderation operations may keep the Entity domain noun when
+they address an Entity by its permanent Peated ID and do not list or classify
+Entities. They must return one required kind and must not expose the old type
+list.
+
+The API uses dedicated kind resources when it means what an Entity is. Bottle
+APIs continue to use the existing Brand, Bottler, and Distiller field names.
+There is no stored or public Entity role model.
 
 ### Store one current owner
 
@@ -114,6 +152,12 @@ overlap has one purpose: fill every kind before it becomes required.
 Preparation adds optional `kind` and renames `parentId` to `ownerId`. Existing
 code can continue to read `type` while the backfill runs. The normal Entity read
 and update APIs expose the optional fields during this deployment.
+
+The preparation and final application states must stay separate. Application
+code that requires `kind` and removes the generic Entity collection cannot
+serve the backfill because it cannot list or serialize an Entity whose kind is
+empty. Run the reviewed backfill through the preparation release, verify zero
+missing kinds, and only then deploy the final application switch.
 
 The backfill pages through Entities by API. For each Entity without a kind, it
 uses the Entity details and Bottle-use counts to choose a kind. Unclear cases

@@ -5,15 +5,20 @@ import ai from "./ai";
 import audits from "./audits";
 import auth from "./auth";
 import badges from "./badges";
+import blenders from "./blenders";
 import bottleAliases from "./bottleAliases";
 import bottleBarcodes from "./bottleBarcodes";
 import bottleGroups from "./bottleGroups";
+import bottlers from "./bottlers";
 import bottles from "./bottles";
 import bottleSeries from "./bottleSeries";
+import brands from "./brands";
 import changes from "./changes";
 import collections from "./collections";
 import comments from "./comments";
+import companies from "./companies";
 import countries from "./countries";
+import distilleries from "./distilleries";
 import email from "./email";
 import entities from "./entities";
 import events from "./events";
@@ -43,7 +48,10 @@ export interface Router {
   audits: typeof audits;
   auth: typeof auth;
   badges: typeof badges;
+  blenders: typeof blenders;
   bottles: typeof bottles;
+  bottlers: typeof bottlers;
+  brands: typeof brands;
   bottleAliases: typeof bottleAliases;
   bottleBarcodes: typeof bottleBarcodes;
   bottleGroups: typeof bottleGroups;
@@ -51,7 +59,9 @@ export interface Router {
   changes: typeof changes;
   collections: typeof collections;
   comments: typeof comments;
+  companies: typeof companies;
   countries: typeof countries;
+  distilleries: typeof distilleries;
   email: typeof email;
   entities: typeof entities;
   events: typeof events;
@@ -82,7 +92,10 @@ export default api.router({
   audits,
   auth,
   badges,
+  blenders,
   bottles,
+  bottlers,
+  brands,
   bottleAliases,
   bottleBarcodes,
   bottleGroups,
@@ -90,7 +103,9 @@ export default api.router({
   changes,
   collections,
   comments,
+  companies,
   countries,
+  distilleries,
   email,
   entities,
   events,

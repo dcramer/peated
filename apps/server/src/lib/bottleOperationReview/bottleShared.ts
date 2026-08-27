@@ -124,7 +124,7 @@ export function existingEntityChoice(entity: Entity) {
     entityId: entity.id,
     name: entity.name,
     shortName: entity.shortName,
-    roles: [...entity.type].sort(),
+    entityKind: entity.kind!,
   };
 }
 

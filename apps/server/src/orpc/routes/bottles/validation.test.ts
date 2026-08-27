@@ -15,7 +15,7 @@ describe("POST /bottles/validations", () => {
 
   test("returns normalized data", async ({ fixtures }) => {
     const user = await fixtures.User();
-    const brand = await fixtures.Entity({ type: ["brand"] });
+    const brand = await fixtures.Entity({ kind: "brand" });
 
     const data = await routerClient.bottles.validation(
       {
@@ -37,11 +37,11 @@ describe("POST /bottles/validations", () => {
   test("normalizes SMWS bottle", async ({ fixtures }) => {
     const user = await fixtures.User();
     const brand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "The Scotch Malt Whisky Society",
     });
     const distillery = await fixtures.Entity({
-      type: ["distiller"],
+      kind: "distillery",
       name: "Ardbeg",
     });
 
@@ -61,7 +61,7 @@ describe("POST /bottles/validations", () => {
   test("strips brand prefix from name", async ({ fixtures }) => {
     const user = await fixtures.User();
     const brand = await fixtures.Entity({
-      type: ["brand"],
+      kind: "brand",
       name: "Macallan",
     });
 

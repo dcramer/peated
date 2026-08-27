@@ -165,12 +165,12 @@
         "id": 4263,
         "name": "The Scotch Malt Whisky Society",
         "shortName": "SMWS",
-        "type": ["brand", "bottler"]
+        "kind": "brand"
       },
       {
         "id": 27,
         "name": "Auchroisk",
-        "type": ["brand", "bottler", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

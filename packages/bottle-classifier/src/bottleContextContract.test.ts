@@ -211,7 +211,7 @@ describe("Entity context contract", () => {
       entityId: 30,
       name: "Example Brand",
       shortName: "Example",
-      roles: ["brand" as const],
+      kind: "brand" as const,
       website: "https://example.com",
       country: "Scotland",
       region: "Islay",

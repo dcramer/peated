@@ -21,10 +21,9 @@ import { entityEvents } from "./entityEvents";
 import { contentSourceEnum } from "./enums";
 import { regions } from "./regions";
 
-export type EntityType = "brand" | "distiller" | "bottler";
 export type EntityKind = (typeof ENTITY_KIND_LIST)[number];
 
-export const entityTypeEnum = pgEnum("entity_type", [
+export const legacyEntityTypeEnum = pgEnum("entity_type", [
   "brand",
   "distiller",
   "bottler",
@@ -55,7 +54,14 @@ export const entities = pgTable(
     address: text("address"),
     location: geometry_point("location"),
 
-    type: entityTypeEnum("type").array().notNull(),
+    // Transitional migration storage only. Application code must not read or
+    // write this field. Remove it after the final kind cutover is stable.
+    type: legacyEntityTypeEnum("type")
+      .array()
+      .default(sql`ARRAY[]::entity_type[]`)
+      .notNull(),
+    // Nullable only for the preparation backfill. The final application
+    // requires a kind; make this NOT NULL after the zero-missing-kind gate.
     kind: entityKindEnum("kind"),
 
     description: text("description"),

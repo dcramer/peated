@@ -20,7 +20,7 @@ const GetEntityContextResultSchema = z
   .strict();
 
 const GET_ENTITY_CONTEXT_DESCRIPTION =
-  "Load bounded read-only identity context for one existing Peated Brand, distiller, or bottler Entity, including aliases, roles, public metadata, and related Bottle samples. Use before proposing an operation that targets or compares this Entity.";
+  "Load bounded read-only identity context for one existing Peated Entity, including aliases, kind, public metadata, Bottle relationships, and related Bottle samples. Use before proposing an operation that targets or compares this Entity.";
 
 export function createGetEntityContextTool({
   getEntityContext,

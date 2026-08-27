@@ -1,4 +1,3 @@
-import { ENTITY_TYPE_LIST } from "@peated/server/constants";
 import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
@@ -17,24 +16,16 @@ const SORT_OPTIONS = [
   "-bottles",
 ] as const;
 
-const InputSchema = z
+export const EntityKindListInputSchema = z
   .object({
     query: z
       .string()
       .default("")
       .describe("Search text only. Search operators are not supported."),
     name: z.string().nullish(),
+    owner: z.coerce.number().int().positive().nullish(),
     country: z.coerce.string().nullish().describe("Country slug or id"),
     region: z.coerce.string().nullish().describe("Region slug or id"),
-    type: z.enum(ENTITY_TYPE_LIST).nullish(),
-    bottler: z.number().nullish(),
-    searchContext: z
-      .object({
-        type: z.enum(ENTITY_TYPE_LIST).nullish(),
-        brand: z.number().nullish(),
-        bottleName: z.string().nullish(),
-      })
-      .nullish(),
     sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
     cursor: z.coerce.number().gte(1).default(1),
     limit: z.coerce.number().lte(500).default(100),
@@ -46,14 +37,25 @@ const InputSchema = z
     limit: 100,
   });
 
-export default contract
-  .route({
-    method: "GET",
-    path: "/entities",
-    summary: "List entities",
-    description:
-      "Find brands, distilleries, and bottlers by name, location, or type",
-    operationId: "listEntities",
-  })
-  .input(InputSchema)
-  .output(listResponse(EntitySchema));
+export function createEntityKindListContract({
+  description,
+  operationId,
+  path,
+  summary,
+}: {
+  description: string;
+  operationId: string;
+  path: `/${string}`;
+  summary: string;
+}) {
+  return contract
+    .route({
+      method: "GET",
+      path,
+      summary,
+      description,
+      operationId,
+    })
+    .input(EntityKindListInputSchema)
+    .output(listResponse(EntitySchema));
+}

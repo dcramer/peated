@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { EntityInputSchema } from "@peated/server/schemas";
+import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
 import { getGeneratedEntityDetails } from "@peated/server/worker/jobs/generateEntityDetails";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -12,7 +12,7 @@ const InputSchema = EntityInputSchema.partial();
 const OutputSchema = z.object({
   description: z.string().nullish(),
   yearEstablished: z.number().nullish(),
-  type: z.array(z.string().nullish()).nullish(),
+  kind: EntityKindEnum.nullish(),
   website: z.string().nullish(),
 });
 
@@ -23,7 +23,7 @@ export default procedure
     path: "/ai/entity-lookup",
     summary: "AI entity lookup",
     description:
-      "Use AI to generate entity details including description, establishment year, type, and website. Requires moderator privileges",
+      "Use AI to generate Entity details, including description, establishment year, kind, and website. Requires moderator privileges",
     operationId: "aiEntityLookup",
   })
   .input(InputSchema)
@@ -49,7 +49,7 @@ export default procedure
     return {
       description: result?.description,
       yearEstablished: result?.yearEstablished,
-      type: result?.type || null,
+      kind: result?.kind || null,
       website: result?.website,
     };
   });

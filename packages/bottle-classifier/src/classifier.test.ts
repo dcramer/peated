@@ -1311,7 +1311,7 @@ describe("createBottleClassifier", () => {
           entityId: args.query.length,
           name: args.query,
           shortName: null,
-          type: args.type ? [args.type] : [],
+          kind: "brand",
           alias: null,
           score: 0.98,
           source: ["entity_text"],
@@ -1351,22 +1351,18 @@ describe("createBottleClassifier", () => {
 
     expect(searchEntities).toHaveBeenCalledWith({
       query: "Bothan",
-      type: "brand",
       limit: 5,
     });
     expect(searchEntities).toHaveBeenCalledWith({
       query: "Whiskyland",
-      type: "brand",
       limit: 5,
     });
     expect(searchEntities).toHaveBeenCalledWith({
       query: "Alexander Murray & Co",
-      type: "bottler",
       limit: 5,
     });
     expect(searchEntities).toHaveBeenCalledWith({
       query: "Unknown Lowland Distillery",
-      type: "distiller",
       limit: 5,
     });
     expect(runBottleClassifierAgent).toHaveBeenCalledWith(
@@ -1374,31 +1370,28 @@ describe("createBottleClassifier", () => {
         resolvedEntities: expect.arrayContaining([
           expect.objectContaining({
             name: "Bothan",
-            type: ["brand"],
+            kind: "brand",
             retrievedFor: [
               {
                 query: "Bothan",
-                requestedType: "brand",
               },
             ],
           }),
           expect.objectContaining({
             name: "Whiskyland",
-            type: ["brand"],
+            kind: "brand",
             retrievedFor: [
               {
                 query: "Whiskyland",
-                requestedType: "brand",
               },
             ],
           }),
           expect.objectContaining({
             name: "Alexander Murray & Co",
-            type: ["bottler"],
+            kind: "brand",
             retrievedFor: [
               {
                 query: "Alexander Murray & Co",
-                requestedType: "bottler",
               },
             ],
           }),
@@ -1468,7 +1461,6 @@ describe("createBottleClassifier", () => {
     expect(searchEntities).toHaveBeenCalledTimes(13);
     expect(searchEntities).toHaveBeenCalledWith({
       query: "Source Brand",
-      type: "brand",
       limit: 5,
     });
   });

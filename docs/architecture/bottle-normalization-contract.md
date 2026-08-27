@@ -157,5 +157,5 @@ Deterministic normalization tests should cover:
 - no deterministic BottleGroup selection from normalized identity
 
 Classifier and eval coverage should cover semantic cases where stable-expression
-placement, structured exact-Bottle fields, observation-only facts, entity roles,
+placement, structured exact-Bottle fields, observation-only facts, Bottle Entity relationships,
 or exact candidate matching depend on label, local-catalog, or web evidence.

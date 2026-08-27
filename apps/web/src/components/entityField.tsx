@@ -1,5 +1,11 @@
-import { EntityInputSchema } from "@peated/server/schemas";
-import { type EntityType } from "@peated/server/types";
+import { toTitleCase } from "@peated/server/lib/strings";
+import { ENTITY_SEARCH_SCOPE_LIST } from "@peated/server/orpc/contracts/search";
+import {
+  EntityInputSchema,
+  EntityKindEnum,
+  EntitySchema,
+} from "@peated/server/schemas";
+import type { BottleEntityRole, EntityKind } from "@peated/server/types";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
@@ -15,7 +21,30 @@ import SelectField from "./selectField";
 import { type CreateFormOptions, type Option } from "./selectField/types";
 import TextField from "./textField";
 
+const entityKinds = EntityKindEnum.options.map((kind) => ({
+  id: kind,
+  name: toTitleCase(kind),
+}));
+
 type FormSchemaType = z.infer<typeof EntityInputSchema>;
+
+function entityOptionMeta(item: Option) {
+  const parsedKind = EntityKindEnum.safeParse(
+    "kind" in item ? item.kind : undefined,
+  );
+  return [
+    parsedKind.success ? toTitleCase(parsedKind.data) : null,
+    item.shortName,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+function roleDefaultKind(role?: BottleEntityRole | null): EntityKind {
+  if (role === "distiller") return "distillery";
+  if (role === "bottler") return "bottler";
+  return "brand";
+}
 
 export default function EntityField({
   createDialogHelpText,
@@ -24,30 +53,38 @@ export default function EntityField({
 }: React.ComponentProps<typeof SelectField> & {
   createDialogHelpText?: string;
   searchContext?: {
-    type?: EntityType | null;
-    brand?: number | null;
-    bottleName?: string | null;
+    role?: BottleEntityRole | null;
   };
 }) {
   const orpc = useORPC();
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { results } = await orpc.entities.list.call({
+        const { groups } = await orpc.search.call({
           query,
-          searchContext,
+          scopes: [...ENTITY_SEARCH_SCOPE_LIST],
+          limit: 25,
         });
-        return results;
+        return groups.flatMap((group) =>
+          group.results.flatMap((result) => {
+            const parsed = EntitySchema.safeParse(result);
+            return parsed.success ? [parsed.data] : [];
+          }),
+        );
       }}
       onRenderOption={(item) => (
         <div className="flex flex-col items-start">
           <div>{item.name}</div>
-          <div className="text-muted font-normal">{item.shortName || null}</div>
+          <div className="text-muted font-normal">{entityOptionMeta(item)}</div>
         </div>
       )}
       createForm={(props) => {
         return (
-          <CreateForm createDialogHelpText={createDialogHelpText} {...props} />
+          <CreateForm
+            createDialogHelpText={createDialogHelpText}
+            defaultKind={roleDefaultKind(searchContext.role)}
+            {...props}
+          />
         );
       }}
       {...props}
@@ -57,11 +94,13 @@ export default function EntityField({
 
 function CreateForm({
   createDialogHelpText,
+  defaultKind,
   data,
   onSubmit,
   onClose,
 }: CreateFormOptions<Option> & {
   createDialogHelpText?: string;
+  defaultKind: EntityKind;
 }) {
   const {
     control,
@@ -71,7 +110,7 @@ function CreateForm({
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(EntityInputSchema),
-    defaultValues: data,
+    defaultValues: { ...data, kind: defaultKind },
   });
 
   const [countryValue, setCountryValue] = useState<Option | undefined>();
@@ -112,6 +151,24 @@ function CreateForm({
             placeholder="e.g. Macallan"
             required
             autoComplete="off"
+          />
+
+          <Controller
+            control={control}
+            name="kind"
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                label="Kind"
+                required
+                onChange={(option) => onChange(option?.id)}
+                value={
+                  value ? { id: value, name: toTitleCase(value) } : undefined
+                }
+                options={entityKinds}
+                simple
+              />
+            )}
           />
 
           <Controller

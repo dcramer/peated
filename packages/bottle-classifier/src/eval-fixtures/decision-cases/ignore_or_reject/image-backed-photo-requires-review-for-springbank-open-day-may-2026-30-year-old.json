@@ -173,7 +173,7 @@
       {
         "id": 1362,
         "name": "Springbank",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

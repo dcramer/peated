@@ -1,12 +1,7 @@
 import program from "@peated/cli/program";
 import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import type {
-  Bottle,
-  Entity,
-  EntityType,
-  ExternalSite,
-} from "@peated/server/db/schema";
+import type { Bottle, Entity, ExternalSite } from "@peated/server/db/schema";
 import {
   bottles,
   collectionBottles,
@@ -75,16 +70,16 @@ const loadDefaultSites = async () => {
 
 const loadDefaultEntities = async () => {
   // TODO: add countries
-  const mocks: Pick<Entity, "name" | "type" | "shortName">[] = [
+  const mocks: Pick<Entity, "name" | "kind" | "shortName">[] = [
     {
       name: "The Scotch Malt Whisky Society",
-      type: ["brand", "bottler"],
+      kind: "bottler",
       shortName: "SMWS",
     },
     ...Fixtures.distilleryNames.map(
-      (name): Pick<Entity, "name" | "type" | "shortName"> => ({
+      (name): Pick<Entity, "name" | "kind" | "shortName"> => ({
         name,
-        type: ["brand", "distiller"],
+        kind: "distillery",
         shortName: null,
       }),
     ),
@@ -184,22 +179,20 @@ const loadDefaultBottles = async (
   })[] = [];
 
   const distilleryIdList = entityList
-    .filter((e) => e.type.includes("distiller"))
+    .filter((entity) => entity.kind === "distillery")
     .map((e) => e.id);
 
-  sample(
-    entityList.filter((e) => e.type.includes("brand")),
-    5,
-  ).forEach((brand) => {
+  sample(entityList, 5).forEach((brand) => {
     mocks.push(
       ...sample(BOTTLE_META, random(1, 8)).map((data) => ({
         category: null,
         statedAge: null,
         ...data,
         brandId: brand.id,
-        distillerIds: brand.type.includes("distiller")
-          ? [brand.id]
-          : sample(distilleryIdList, random(0, 2)),
+        distillerIds:
+          brand.kind === "distillery"
+            ? [brand.id]
+            : sample(distilleryIdList, random(0, 2)),
       })),
     );
   });
@@ -304,8 +297,10 @@ const loadDefaultBottles = async (
 };
 
 const loadIdentityBottleVariants = async () => {
-  const ensureBrand = (name: string, type: EntityType[] = ["brand"]) =>
-    Fixtures.EntityOrExisting({ name, type });
+  const ensureBrand = (
+    name: string,
+    kind: NonNullable<Entity["kind"]> = "brand",
+  ) => Fixtures.EntityOrExisting({ name, kind });
   const ensureSeries = async (brand: Entity, name: string) => {
     const existing = await db.query.bottleSeries.findFirst({
       where: (bottleSeries, { and, eq }) =>
@@ -335,7 +330,7 @@ const loadIdentityBottleVariants = async () => {
       existing ??
       Fixtures.Bottle({
         brandId: brand.id,
-        distillerIds: brand.type.includes("distiller") ? [brand.id] : [],
+        distillerIds: brand.kind === "distillery" ? [brand.id] : [],
         name,
         ...data,
       })
@@ -358,10 +353,7 @@ const loadIdentityBottleVariants = async () => {
     return existing ?? Fixtures.BottleGroupMember({ groupId, ...data });
   };
 
-  const decadentDrinks = await ensureBrand("Decadent Drinks", [
-    "brand",
-    "bottler",
-  ]);
+  const decadentDrinks = await ensureBrand("Decadent Drinks", "bottler");
   const whiskyland = await ensureSeries(decadentDrinks, "Whiskyland");
   const whiskylandGroup = await ensureGroup({
     brand: decadentDrinks,
@@ -383,7 +375,7 @@ const loadIdentityBottleVariants = async () => {
     caskNumber: "#5678",
   });
 
-  const springbank = await ensureBrand("Springbank", ["brand", "distiller"]);
+  const springbank = await ensureBrand("Springbank", "distillery");
   const springbankGroup = await ensureGroup({
     brand: springbank,
     name: "12-year-old Cask Strength",
@@ -403,7 +395,7 @@ const loadIdentityBottleVariants = async () => {
     caskStrength: true,
   });
 
-  const fourRoses = await ensureBrand("Four Roses", ["brand", "distiller"]);
+  const fourRoses = await ensureBrand("Four Roses", "distillery");
   const fourRosesGroup = await ensureGroup({
     brand: fourRoses,
     name: "Limited Edition Small Batch",
@@ -414,7 +406,7 @@ const loadIdentityBottleVariants = async () => {
     abv: 54.2,
   });
 
-  const macallan = await ensureBrand("Macallan", ["brand", "distiller"]);
+  const macallan = await ensureBrand("Macallan", "distillery");
   const macallanGroup = await ensureGroup({
     brand: macallan,
     name: "Sherry Oak 18-year-old",
@@ -427,7 +419,7 @@ const loadIdentityBottleVariants = async () => {
     abv: 43,
   });
 
-  const pokeno = await ensureBrand("Pōkeno", ["brand", "distiller"]);
+  const pokeno = await ensureBrand("Pōkeno", "distillery");
   const explorationSeries = await ensureSeries(pokeno, "Exploration Series");
   await ensureGroup({
     brand: pokeno,
@@ -436,10 +428,7 @@ const loadIdentityBottleVariants = async () => {
     seriesId: explorationSeries.id,
   });
 
-  const smws = await ensureBrand("The Scotch Malt Whisky Society", [
-    "brand",
-    "bottler",
-  ]);
+  const smws = await ensureBrand("The Scotch Malt Whisky Society", "bottler");
   const smwsGroup = await ensureGroup({
     brand: smws,
     name: "95.71 Prepare for Winter",
@@ -453,10 +442,7 @@ const loadIdentityBottleVariants = async () => {
     caskStrength: true,
   });
 
-  const highlandPark = await ensureBrand("Highland Park", [
-    "brand",
-    "distiller",
-  ]);
+  const highlandPark = await ensureBrand("Highland Park", "distillery");
   const highlandParkGroup = await ensureGroup({
     brand: highlandPark,
     name: "Cask Strength No. 5",
@@ -467,7 +453,7 @@ const loadIdentityBottleVariants = async () => {
     caskStrength: true,
   });
 
-  const willett = await ensureBrand("Willett", ["brand", "distiller"]);
+  const willett = await ensureBrand("Willett", "distillery");
   const willettSeries = await ensureSeries(willett, "Family Estate Bottled");
   const willettGroup = await ensureGroup({
     brand: willett,

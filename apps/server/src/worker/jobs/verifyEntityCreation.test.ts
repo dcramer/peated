@@ -9,7 +9,7 @@ describe("verifyEntityCreation", () => {
   }) => {
     const entity = await fixtures.Entity({
       name: "Bourbon Whiskey",
-      type: ["brand"],
+      kind: "brand",
     });
 
     await verifyEntityCreation({
@@ -47,7 +47,7 @@ describe("verifyEntityCreation", () => {
   }) => {
     const entity = await fixtures.Entity({
       name: "Trusted Brand",
-      type: ["brand"],
+      kind: "brand",
     });
 
     await verifyEntityCreation({

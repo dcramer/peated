@@ -564,7 +564,9 @@ describe("Bottle check persistence", () => {
       createBottleCheck(
         auditCheckInput({
           artifacts: {
-            resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+            resolvedEntities: [
+              { entityId: entity.id, name: entity.name, kind: entity.kind! },
+            ],
           },
           bottleId: bottle.id,
           summary: "Uninspected Entity evidence.",

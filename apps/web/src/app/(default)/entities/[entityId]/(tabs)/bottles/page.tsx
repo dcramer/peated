@@ -40,8 +40,6 @@ export default function EntityTastings(props: {
     }),
   );
 
-  // const groupBy = !entity.type.includes("distiller") ? (item) => item.brand : null;
-
   return (
     <>
       <BottleTable

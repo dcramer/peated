@@ -41,7 +41,7 @@ describe("Audit review action routes", () => {
           entityId: entity.id,
           name: entity.name,
           shortName: null,
-          roles: [],
+          kind: "brand" as const,
           website: null,
           country: null,
           region: null,

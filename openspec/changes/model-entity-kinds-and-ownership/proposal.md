@@ -9,6 +9,8 @@ as Diageo owning Lagavulin.
 
 - Keep one Entity record for each whisky identity or owning company.
 - Give each Entity one kind: Brand, Distillery, Bottler, Blender, or Company.
+- Expose each kind as its own top-level API collection. Do not expose a generic
+  Entity collection endpoint.
 - Find Brand, Bottler, and Distiller use from Bottle links instead of copying
   those values onto Entity.
 - Let an Entity point to one current owner. Owner links can form a company
@@ -18,8 +20,10 @@ as Diageo owning Lagavulin.
 - Backfill every existing Entity through the normal Entity API before kind
   becomes required.
 - **BREAKING**: replace Entity `type` with `kind` in server, web, CLI,
-  classifier, and generated API contracts. Use the named Bottle fields where a
-  caller needs Brands, Bottlers, or Distillers.
+  classifier, and generated API contracts. Replace the generic Entity
+  collection API with dedicated Brand, Distillery, Bottler, Blender, and
+  Company endpoints. Bottle fields use global Entity search without storing or
+  filtering by Entity roles.
 
 ## Capabilities
 

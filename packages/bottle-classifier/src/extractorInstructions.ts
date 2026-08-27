@@ -46,8 +46,8 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     outputField: "`bottler`",
     guidance: [
       "Populate `bottler` only when product-specific evidence names the market-facing bottler or release imprint for this product.",
-      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing relationships alone do not establish the role.",
-      "Leave this null when product-specific evidence does not establish the role.",
+      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing alone do not establish this Bottle relationship.",
+      "Leave this null when product-specific evidence does not establish this Bottle relationship.",
     ],
   },
   {
@@ -571,7 +571,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "For official distillery bottlings, `brand` often matches the single item inside `distillery`, but do not force them to be identical.",
       "Keep the consumer-facing brand when it differs from the producing distillery name. Official single-distillery bottlings such as `Jura` / `Isle of Jura` or `Ledaig` / `Tobermory` are real examples.",
       "Populate `bottler` only when product-specific evidence names the market-facing bottler or release imprint for the product.",
-      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing relationships alone do not establish the role.",
+      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing alone do not establish this Bottle relationship.",
       "When the visible label, capsule, or neck tag explicitly names a producer with `Distillery` in the name, include that producer in `distillery` even if the front brand is a shorter consumer label.",
       "Prefer `[]` over guessing when the producing distillery is unknown.",
       "When a component is ambiguous, leave it `null` or `[]` instead of guessing. Missing data is better than a fabricated identity signal.",

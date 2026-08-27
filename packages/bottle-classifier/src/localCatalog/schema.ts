@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CategoryEnum, EntityTypeEnum } from "../classifierTypes";
+import { CategoryEnum, EntityKindEnum } from "../classifierTypes";
 
 const LocalCatalogEntitySchema = z
   .object({
@@ -7,7 +7,7 @@ const LocalCatalogEntitySchema = z
     name: z.string().trim().min(1),
     shortName: z.string().trim().min(1).nullable().default(null),
     aliases: z.array(z.string().trim().min(1)).default([]),
-    type: z.array(EntityTypeEnum).min(1),
+    kind: EntityKindEnum,
   })
   .strict();
 
@@ -87,12 +87,6 @@ export const LocalCatalogSchema = z
           message: `Unknown brand id ${bottle.brandId}.`,
           path: ["bottles", index, "brandId"],
         });
-      } else if (!brand.type.includes("brand")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Entity ${bottle.brandId} is not a brand.`,
-          path: ["bottles", index, "brandId"],
-        });
       }
       if (bottle.bottlerId !== null) {
         const bottler = entitiesById.get(bottle.bottlerId);
@@ -100,12 +94,6 @@ export const LocalCatalogSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Unknown bottler id ${bottle.bottlerId}.`,
-            path: ["bottles", index, "bottlerId"],
-          });
-        } else if (!bottler.type.includes("bottler")) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Entity ${bottle.bottlerId} is not a bottler.`,
             path: ["bottles", index, "bottlerId"],
           });
         }
@@ -119,12 +107,6 @@ export const LocalCatalogSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Unknown distiller id ${distillerId}.`,
-            path: ["bottles", index, "distillerIds", distillerIndex],
-          });
-        } else if (!distiller.type.includes("distiller")) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Entity ${distillerId} is not a distiller.`,
             path: ["bottles", index, "distillerIds", distillerIndex],
           });
         }

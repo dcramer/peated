@@ -22,9 +22,9 @@ describe("repairBottleBrandDistilleryAssignments", () => {
   }) => {
     const fromBrand = await fixtures.Entity({
       name: "Isle of Jura",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
-    const toBrand = await fixtures.Entity({ name: "Jura", type: ["brand"] });
+    const toBrand = await fixtures.Entity({ name: "Jura", kind: "brand" });
     const sourceSeries = await fixtures.BottleSeries({
       brandId: fromBrand.id,
       name: "12-year-old",
@@ -74,7 +74,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
   }) => {
     const fromBrand = await fixtures.Entity({
       name: "Source Brand",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const toBrand = await fixtures.Entity({ name: "Target Brand" });
     const sourceSeries = await fixtures.BottleSeries({
@@ -173,9 +173,9 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     const systemUser = await fixtures.User({ admin: true });
     const fromBrand = await fixtures.Entity({
       name: "Isle of Jura",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
-    const toBrand = await fixtures.Entity({ name: "Jura", type: ["brand"] });
+    const toBrand = await fixtures.Entity({ name: "Jura", kind: "brand" });
     const sourceSeries = await fixtures.BottleSeries({
       brandId: fromBrand.id,
       name: "Annual",
@@ -266,9 +266,9 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     const systemUser = await fixtures.User({ admin: true });
     const fromBrand = await fixtures.Entity({
       name: "Isle of Jura",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
-    const toBrand = await fixtures.Entity({ name: "Jura", type: ["brand"] });
+    const toBrand = await fixtures.Entity({ name: "Jura", kind: "brand" });
     const sourceSeries = await fixtures.BottleSeries({
       brandId: fromBrand.id,
       name: "Elixir",

@@ -383,21 +383,12 @@ function searchCatalogEntities(
       if (!match) {
         return [];
       }
-      // Mirror production: only non-exact candidates are narrowed by role.
-      if (
-        match.source !== "exact" &&
-        args.type !== null &&
-        !entity.type.includes(args.type)
-      ) {
-        return [];
-      }
-
       return [
         EntityResolutionSchema.parse({
           entityId: entity.id,
           name: entity.name,
           shortName: entity.shortName,
-          type: entity.type,
+          kind: entity.kind,
           alias: match.alias,
           score: match.score,
           source: ["local_catalog", match.source],

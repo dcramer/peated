@@ -20,14 +20,13 @@ export default function Page(props: {
     numericFields: ["cursor", "limit"],
     overrides: {
       country: countrySlug,
-      type: "distiller",
       sort: "-bottles",
       limit: 20,
     },
   });
 
   const { data: topEntityList } = useSuspenseQuery(
-    orpc.entities.list.queryOptions({
+    orpc.distilleries.list.queryOptions({
       input: queryParams,
     }),
   );
@@ -37,7 +36,7 @@ export default function Page(props: {
       {topEntityList.results.length ? (
         <EntityTable
           entityList={topEntityList.results}
-          type="distiller"
+          kind="distillery"
           defaultSort="-bottles"
           withSearch
         />

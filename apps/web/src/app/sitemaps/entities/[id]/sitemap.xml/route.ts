@@ -18,27 +18,36 @@ export async function GET(
   const { id } = params;
 
   const { client } = await createAnonymousServerClient();
-
-  let cursor: number | null = (Number(id) - 1) * (PAGE_LIMIT / 100) + 1;
-  let count = 0;
-  const pages: Sitemap = [];
-  while (cursor && count < PAGE_LIMIT) {
-    const { results, rel } = await client.entities.list({
-      cursor,
-      limit: 100,
-      sort: "created",
-    });
-
-    pages.push(
-      ...results.map((entity) => ({
-        url: getEntityUrl(entity),
-        lastModified: entity.updatedAt,
-      })),
-    );
-
-    cursor = rel.nextCursor;
-    count += results.length;
-  }
+  const listKinds = [
+    client.brands.list,
+    client.distilleries.list,
+    client.bottlers.list,
+    client.blenders.list,
+    client.companies.list,
+  ];
+  const entities = (
+    await Promise.all(
+      listKinds.map(async (listKind) => {
+        let cursor: number | null = 1;
+        const results = [];
+        while (cursor) {
+          const page = await listKind({ cursor, limit: 100, sort: "created" });
+          results.push(...page.results);
+          cursor = page.rel.nextCursor;
+        }
+        return results;
+      }),
+    )
+  )
+    .flat()
+    .sort((left, right) => left.createdAt.localeCompare(right.createdAt));
+  const offset = (Number(id) - 1) * PAGE_LIMIT;
+  const pages: Sitemap = entities
+    .slice(offset, offset + PAGE_LIMIT)
+    .map((entity) => ({
+      url: getEntityUrl(entity),
+      lastModified: entity.updatedAt,
+    }));
 
   const pagesSitemapXML = await buildPagesSitemap(pages);
 

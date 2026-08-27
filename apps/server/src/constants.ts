@@ -135,7 +135,11 @@ export function isExternalReviewSiteType(type: ExternalSiteDefinitionType) {
   return "content" in definition && definition.content === "reviews";
 }
 
-export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
+export const BOTTLE_ENTITY_ROLE_LIST = [
+  "brand",
+  "bottler",
+  "distiller",
+] as const;
 
 export const ENTITY_KIND_LIST = [
   "brand",

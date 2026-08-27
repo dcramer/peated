@@ -174,15 +174,6 @@ async function handleRpcRequest({ request, response, url }) {
           : buildFavoriteActivity({ nextCursor: "2:1780833600000" }),
       );
       return true;
-    case "entities/list":
-      if (input?.query === testBrand.name) {
-        sendRpcResponse(response, {
-          ...emptyList,
-          results: [testBrand],
-        });
-        return true;
-      }
-      return false;
     case "entities/details":
       if (Number(input?.entity) === testBrand.id) {
         sendRpcResponse(response, testBrand);
@@ -222,7 +213,7 @@ async function handleRpcRequest({ request, response, url }) {
         "bottle-group-workflows",
       );
       const entityScopes = [
-        "distillers",
+        "distilleries",
         "brands",
         "bottlers",
         "blenders",
@@ -252,7 +243,7 @@ async function handleRpcRequest({ request, response, url }) {
       );
       const scopeTotals = {
         bottles: 1,
-        distillers: 0,
+        distilleries: 0,
         brands: 0,
         bottlers: 0,
         blenders: 0,

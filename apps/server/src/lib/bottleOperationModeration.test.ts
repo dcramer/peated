@@ -146,7 +146,7 @@ async function createPreparedCheck({
       entityId: entity.id,
       name: entity.name,
       shortName: null,
-      roles: [],
+      kind: "brand" as const,
       website: null,
       country: null,
       region: null,
@@ -539,11 +539,11 @@ describe("Bottle operation moderation", () => {
     const moderator = await fixtures.User({ mod: true });
     const source = await fixtures.Entity({
       name: "Concurrent Merge Source",
-      type: ["brand"],
+      kind: "brand",
     });
     const destination = await fixtures.Entity({
       name: "Concurrent Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     const bottle = await fixtures.Bottle({ brandId: source.id });
     if (bottle.groupId === null) throw new Error("Expected a BottleGroup.");
@@ -877,11 +877,11 @@ describe("Bottle operation moderation", () => {
     const moderator = await fixtures.User({ mod: true });
     const source = await fixtures.Entity({
       name: "Worker Merge Source",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const destination = await fixtures.Entity({
       name: "Worker Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     const bottle = await fixtures.Bottle({
       brandId: destination.id,
@@ -934,7 +934,7 @@ describe("Bottle operation moderation", () => {
         type: "merge_entities",
         sourceEntityId: source.id,
         destinationEntityId: destination.id,
-        destinationRoles: ["brand", "distiller"],
+        destinationKind: "brand",
         approvingModeratorId: moderator.id,
         reconciled: false,
         execution: { kind: "worker", name: "MergeEntity" },
@@ -950,7 +950,7 @@ describe("Bottle operation moderation", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, destination.id),
       }),
-    ).toMatchObject({ type: ["brand", "distiller"] });
+    ).toMatchObject({ kind: "brand" });
   });
 
   for (const approvalOrder of ["update_first", "merge_first"] as const) {
@@ -960,11 +960,11 @@ describe("Bottle operation moderation", () => {
       const moderator = await fixtures.User({ mod: true });
       const source = await fixtures.Entity({
         name: `Independent Source ${approvalOrder}`,
-        type: ["brand"],
+        kind: "brand",
       });
       const destination = await fixtures.Entity({
         name: `Independent Destination ${approvalOrder}`,
-        type: ["brand"],
+        kind: "brand",
       });
       const country = await fixtures.Country({
         name: `Independent Country ${approvalOrder}`,

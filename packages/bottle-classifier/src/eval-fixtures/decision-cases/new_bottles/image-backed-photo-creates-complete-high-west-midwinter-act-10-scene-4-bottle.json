@@ -120,7 +120,7 @@
       {
         "id": 1750,
         "name": "High West",
-        "type": ["brand", "bottler", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

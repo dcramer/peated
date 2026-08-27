@@ -89,7 +89,7 @@
       {
         "id": 1169,
         "name": "Mars",
-        "type": ["brand", "bottler"]
+        "kind": "brand"
       },
       {
         "id": 1953,
@@ -99,12 +99,12 @@
           "Mars Shinshu",
           "Mars Komagatake"
         ],
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 238555,
         "name": "Shinshu",
-        "type": ["distiller"]
+        "kind": "distillery"
       }
     ],
     "bottles": [

@@ -39,37 +39,39 @@
 
 ## 4. Switch Server And Classifiers
 
-- [ ] 4.1 Replace public Entity `type` with required `kind` in schemas,
+- [x] 4.1 Replace public Entity `type` with required `kind` in schemas,
       serializers, API documentation, and generated clients.
-- [ ] 4.2 Replace Entity list `type` input with `kind`. Keep Brand, Bottler, and
-      Distiller as explicit Bottle field names; do not add an Entity role.
-- [ ] 4.3 Query Brand, Bottler, and Distiller pages from active Bottle links.
-- [ ] 4.4 Search all Entities in Bottle fields and rank prior use without using
-      kind as a restriction.
-- [ ] 4.5 Remove type-list updates and removal guards from Bottle and Entity
+- [x] 4.2 Replace the generic Entity collection with dedicated Brand,
+      Distillery, Bottler, Blender, and Company endpoints. Each endpoint fixes
+      its kind and shares implementation only below the public contract.
+- [x] 4.3 Query Brand, Distillery, Bottler, Blender, and Company browse pages by
+      kind through their dedicated endpoints.
+- [x] 4.4 Use global Entity search for Bottle fields. Search all Entity kinds
+      without a stored role filter or role ranking.
+- [x] 4.5 Remove type-list updates and removal guards from Bottle and Entity
       create, edit, import, and merge code.
-- [ ] 4.6 Replace statistics, country, region, badge, repair, and audit queries
+- [x] 4.6 Replace statistics, country, region, badge, repair, and audit queries
       that read Entity type with Bottle-link queries.
-- [ ] 4.7 Update CLI and local classifier catalog schemas to store kind and use
+- [x] 4.7 Update CLI and local classifier catalog schemas to store kind and use
       Brand, Bottler, and Distiller only as Bottle field names.
-- [ ] 4.8 Update Bottle and Entity classifier instructions, tools, fixtures,
+- [x] 4.8 Update Bottle and Entity classifier instructions, tools, fixtures,
       tests, and eval scoring for kind.
-- [ ] 4.9 Add integration tests for first use in a Bottle field, one Entity in
+- [x] 4.9 Add integration tests for first use in a Bottle field, one Entity in
       two fields, browse results, counts, and owner details.
 - [ ] 4.10 Check the three browse query plans and add an index only if a query
       needs it.
 
 ## 5. Update Entity Pages
 
-- [ ] 5.1 Replace the type multi-select with one required kind field and an
+- [x] 5.1 Replace the type multi-select with one required kind field and an
       optional current owner field.
-- [ ] 5.2 Show one kind and “Owned by” on the Entity header.
-- [ ] 5.3 Show directly owned Entities on owner pages.
-- [ ] 5.4 Keep Brand, Bottler, and Distiller Bottle counts in the catalog
+- [x] 5.2 Show one kind and “Owned by” on the Entity header.
+- [x] 5.3 Show directly owned Entities on owner pages.
+- [x] 5.4 Keep Brand, Bottler, and Distiller Bottle counts in the catalog
       section instead of the header.
-- [ ] 5.5 Update Brand, Bottler, and Distiller browse pages to use Bottle links
-      and add kind filtering to general Entity search.
-- [ ] 5.6 Update Add Bottle defaults so kind never blocks a Brand, Bottler, or
+- [x] 5.5 Update all five kind browse pages to use their dedicated APIs. Keep
+      Bottle-role use in the Entity catalog section and Bottle field searches.
+- [x] 5.6 Update Add Bottle defaults so kind never blocks a Brand, Bottler, or
       Distiller selection.
 - [ ] 5.7 Add focused component and browser tests for forms, headers, owners,
       browse pages, and Add Bottle.
@@ -81,13 +83,13 @@
       loops, and matching Bottle-use counts.
 - [ ] 6.2 Make `kind` required and generate the final-switch migration with
       `pnpm db:generate`.
-- [ ] 6.3 Remove all application reads and writes for old Entity `type`; do not
+- [x] 6.3 Remove all application reads and writes for old Entity `type`; do not
       keep compatibility aliases.
-- [ ] 6.4 Update the whisky identity, Entity classifier, and Bottle classifier
+- [x] 6.4 Update the whisky identity, Entity classifier, and Bottle classifier
       documentation with the final terms.
 - [ ] 6.5 Run focused server, CLI, classifier, and web tests; run server and web
       typechecks, file lint, formatting, and relevant classifier evals.
-- [ ] 6.6 Review the full change for duplicate logic, mixed terms, and code that
+- [x] 6.6 Review the full change for duplicate logic, mixed terms, and code that
       keeps the old and new models alive.
 - [ ] 6.7 Deploy the final switch after a verified backup and validate Entity
       kinds, owners, Bottle links, browse pages, and create/edit workflows.

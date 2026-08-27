@@ -5,40 +5,39 @@ import { getUserActor } from "./actors";
 import { upsertEntity } from "./db";
 
 describe("upsertEntity", () => {
-  test("reports an existing entity role addition exactly once", async ({
+  test("reuses an existing Entity without changing its kind", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
     const actor = await getUserActor(user);
     const entity = await fixtures.Entity({
-      name: "Existing Role Candidate",
-      type: [],
+      name: "Existing Kind Candidate",
+      kind: "company",
     });
     const input = {
       db,
       data: { name: entity.name },
-      userId: user.id,
       createdByActorId: actor.id,
-      type: "brand" as const,
+      kind: "brand" as const,
     };
 
     const first = await upsertEntity(input);
     expect(first).toMatchObject({
       id: entity.id,
       created: false,
-      changed: true,
-      result: { type: ["brand"] },
+      changed: false,
+      result: { kind: "company" },
     });
     expect(
       await db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
-    ).toMatchObject({ type: ["brand"] });
+    ).toMatchObject({ kind: "company", type: [] });
 
     const repeated = await upsertEntity(input);
     expect(repeated).toMatchObject({
       id: entity.id,
       created: false,
       changed: false,
-      result: { type: ["brand"] },
+      result: { kind: "company" },
     });
   });
 });

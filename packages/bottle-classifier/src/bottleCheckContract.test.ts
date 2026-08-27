@@ -55,7 +55,7 @@ describe("bottle check public contract", () => {
               kind: "create",
               entity: {
                 name: "Example Bottler",
-                roles: ["bottler"],
+                kind: "bottler",
                 country: "Scotland",
               },
             },
@@ -81,11 +81,11 @@ describe("bottle check public contract", () => {
           entityId: 10,
           patch: {
             name: "Laphroaig",
-            roles: ["brand", "distiller"],
+            kind: "distillery",
             website: "https://www.laphroaig.com/",
           },
         },
-        rationale: "The Entity has a stale name and missing distiller role.",
+        rationale: "The Entity has a stale name and incorrect kind.",
         evidenceRefs: [{ kind: "entity", entityId: 10 }],
       },
       {
@@ -143,9 +143,9 @@ describe("bottle check public contract", () => {
         type: "update_entity",
         input: {
           entityId: 10,
-          patch: { roles: ["marketing_department"] },
+          patch: { kind: "marketing_department" },
         },
-        rationale: "Add a role outside the supported Entity role enum.",
+        rationale: "Set a kind outside the supported Entity kind enum.",
         evidenceRefs: [{ kind: "entity", entityId: 10 }],
       }).success,
     ).toBe(false);
@@ -279,7 +279,7 @@ describe("bottle check public contract", () => {
         kind: "create",
         entity: {
           name: "New Brand",
-          roles: ["brand"],
+          kind: "brand",
           country: "Scotland",
           region: "Islay",
         },
@@ -296,7 +296,7 @@ describe("bottle check public contract", () => {
         kind: "create",
         entity: {
           name: "Invented location id",
-          roles: ["brand"],
+          kind: "brand",
           countryId: 1,
         },
       }).success,

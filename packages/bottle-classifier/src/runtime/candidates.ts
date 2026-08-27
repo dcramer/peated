@@ -103,9 +103,7 @@ export function mergeResolvedEntity(
   for (const provenance of entity.retrievedFor ?? []) {
     if (
       !retrievedFor.some(
-        (existingProvenance) =>
-          existingProvenance.query === provenance.query &&
-          existingProvenance.requestedType === provenance.requestedType,
+        (existingProvenance) => existingProvenance.query === provenance.query,
       )
     ) {
       retrievedFor.push(provenance);

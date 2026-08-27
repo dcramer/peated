@@ -1,7 +1,7 @@
 import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 
-import { ContentSourceEnum, EntityKindEnum, EntityTypeEnum } from "./common";
+import { ContentSourceEnum, EntityKindEnum } from "./common";
 import { CountrySchema } from "./countries";
 import { RegionSchema } from "./regions";
 import { PointSchema } from "./shared";
@@ -17,18 +17,23 @@ const EntityShortNameSchema = z
   .nullable()
   .default(null)
   .describe("Abbreviated or short name for the entity");
-const EntityTypesSchema = z
-  .array(EntityTypeEnum)
-  .default([])
-  .describe("Types that classify this entity (e.g., brand, distillery)");
-const EntityKindSchema = EntityKindEnum.nullable()
-  .default(null)
-  .describe("Best short description of what this entity is");
+const EntityKindSchema = EntityKindEnum.describe(
+  "Best short description of what this entity is",
+);
 const EntityOwnerIdSchema = z
   .number()
   .nullable()
   .default(null)
   .describe("ID of the entity's current owner");
+const EntityOwnerSchema = z
+  .object({
+    id: z.number().readonly(),
+    peatedId: z.string().readonly(),
+    name: EntityNameSchema,
+  })
+  .nullable()
+  .optional()
+  .describe("Current direct owner");
 const EntityDescriptionSchema = z
   .string()
   .nullish()
@@ -70,9 +75,9 @@ export const EntitySchema = z.object({
     .describe("Permanent Peated ID for the entity"),
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
-  type: EntityTypesSchema,
   kind: EntityKindSchema,
   ownerId: EntityOwnerIdSchema,
+  owner: EntityOwnerSchema,
   description: EntityDescriptionSchema,
   descriptionSrc: EntityDescriptionSourceSchema,
   yearEstablished: EntityYearEstablishedSchema,
@@ -110,7 +115,6 @@ export const EntitySchema = z.object({
 export const EntityInputFields = {
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
-  type: EntityTypesSchema,
   kind: EntityKindSchema,
   ownerId: EntityOwnerIdSchema,
   description: EntityDescriptionSchema,

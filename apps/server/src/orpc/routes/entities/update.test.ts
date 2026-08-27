@@ -206,14 +206,14 @@ describe("PATCH /entities/:entity", () => {
     expect(newEntity.regionId).toBeNull();
   });
 
-  test("can change type", async ({ fixtures }) => {
+  test("can change kind", async ({ fixtures }) => {
     const entity = await fixtures.Entity();
     const modUser = await fixtures.User({ mod: true });
 
     const data = await routerClient.entities.update(
       {
         entity: entity.id,
-        type: ["distiller"],
+        kind: "distillery",
       },
       { context: { user: modUser } },
     );
@@ -225,10 +225,10 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(omit(entity, "type", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "type", "searchVector", "updatedAt"),
+    expect(omit(entity, "kind", "searchVector", "updatedAt")).toEqual(
+      omit(newEntity, "kind", "searchVector", "updatedAt"),
     );
-    expect(newEntity.type).toEqual(["distiller"]);
+    expect(newEntity.kind).toEqual("distillery");
   });
 
   test("can change kind and current owner", async ({ fixtures }) => {
@@ -341,7 +341,7 @@ describe("PATCH /entities/:entity", () => {
   }) => {
     const entity = await fixtures.Entity({
       name: "Foo",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const first = await fixtures.Bottle({
       brandId: entity.id,
@@ -441,7 +441,7 @@ describe("PATCH /entities/:entity", () => {
   test("short name change updates bottles if brand", async ({ fixtures }) => {
     const entity = await fixtures.Entity({
       name: "Foo",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: entity.id,
@@ -512,7 +512,7 @@ describe("PATCH /entities/:entity", () => {
     const entity = await fixtures.Entity({
       name: "Foo Distillery",
       shortName: "FD",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: entity.id,
@@ -603,7 +603,7 @@ describe("PATCH /entities/:entity", () => {
     const entity = await fixtures.Entity({
       name: "Foo",
       shortName: "F",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: entity.id,
@@ -655,7 +655,7 @@ describe("PATCH /entities/:entity", () => {
     const entity = await fixtures.Entity({
       name: "Foo",
       shortName: "F",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: entity.id,
@@ -706,7 +706,7 @@ describe("PATCH /entities/:entity", () => {
   }) => {
     const entity = await fixtures.Entity({
       name: "Original Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const bottle = await fixtures.Bottle({
       brandId: entity.id,

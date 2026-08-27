@@ -1,11 +1,11 @@
 "use client";
 
-import type { Entity, EntityType, PagingRel } from "@peated/server/types";
+import type { Entity, EntityKind, PagingRel } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import type { ComponentProps } from "react";
 import { toTitleCase } from "../../../server/src/lib/strings";
-import { getEntityTypeSearchUrl, getEntityUrl } from "../lib/urls";
+import { getEntityUrl } from "../lib/urls";
 import type { Column } from "./table";
 import Table from "./table";
 
@@ -14,17 +14,15 @@ export default function EntityTable({
   rel,
   withLocations = false,
   withTastings = false,
-  type,
+  kind,
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
   entityList: Entity[];
   withTastings?: boolean;
   withLocations?: boolean;
   rel?: PagingRel;
-  type: EntityType;
+  kind: EntityKind;
 }) {
-  const link = getEntityTypeSearchUrl(type);
-
   return (
     <Table<Entity>
       items={entityList}
@@ -32,7 +30,7 @@ export default function EntityTable({
       columns={[
         {
           name: "name",
-          title: type ? toTitleCase(type) : "Entity",
+          title: toTitleCase(kind),
           sort: "name",
           sortDefaultOrder: "asc",
           className: classNames(

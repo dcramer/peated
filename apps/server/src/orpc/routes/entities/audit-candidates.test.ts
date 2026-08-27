@@ -21,11 +21,11 @@ describe("GET /entities/audit-candidates", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     const canadianClub = await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 12,
       totalTastings: 180,
     });
@@ -93,19 +93,20 @@ describe("GET /entities/audit-candidates", () => {
   test("surfaces sibling-brand suffix collisions", async ({ fixtures }) => {
     const currentBrand = await fixtures.Entity({
       name: "Wild Turkey Distillery",
-      type: ["brand", "distiller"],
+      kind: "distillery",
       totalBottles: 1,
       totalTastings: 30,
     });
     const targetBrand = await fixtures.Entity({
       name: "Wild Turkey",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 12,
       totalTastings: 180,
     });
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle({
       brandId: currentBrand.id,
+      distillerIds: [currentBrand.id],
       name: "Rare Breed",
       totalTastings: 30,
     });
@@ -156,7 +157,7 @@ describe("GET /entities/audit-candidates", () => {
     const user = await fixtures.User({ mod: true });
     const genericBrand = await fixtures.Entity({
       name: "Bourbon Whiskey",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 2,
     });
     await fixtures.Bottle({

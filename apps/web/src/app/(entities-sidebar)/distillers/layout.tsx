@@ -13,7 +13,7 @@ export default async function BottlesLayout({
   children: ReactNode;
 }) {
   return (
-    <Layout rightSidebar={<EntityListSidebar type="distiller" />}>
+    <Layout rightSidebar={<EntityListSidebar kind="distillery" />}>
       {children}
     </Layout>
   );

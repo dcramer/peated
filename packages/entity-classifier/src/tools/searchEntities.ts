@@ -9,7 +9,7 @@ import { startToolSpan } from "../observability";
 
 const SearchEntitiesResultSchema = EntityResolutionSchema.array();
 const SEARCH_ENTITIES_TOOL_DESCRIPTION =
-  "Search the local entity database for likely sibling brands, distilleries, or bottlers. Use this before web search when you need to confirm whether a better existing producer row already exists locally.";
+  "Search one Entity kind in the local database for likely sibling identities. Use this before web search when you need to confirm whether a better existing producer row already exists locally.";
 
 export function createSearchEntitiesTool({
   onResults,

@@ -1,8 +1,9 @@
 import { BoltIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { EntityInputSchema } from "@peated/server/schemas";
+import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
 import { type Entity } from "@peated/server/types";
 import CountryField from "@peated/web/components/countryField";
+import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
 import FormError from "@peated/web/components/formError";
@@ -23,11 +24,10 @@ import Legend from "./legend";
 import RegionField from "./regionField";
 import TextAreaField from "./textAreaField";
 
-const entityTypes = [
-  { id: "brand", name: "Brand" },
-  { id: "distiller", name: "Distiller" },
-  { id: "bottler", name: "Bottler" },
-];
+const entityKinds = EntityKindEnum.options.map((kind) => ({
+  id: kind,
+  name: toTitleCase(kind),
+}));
 
 type FormSchemaType = z.infer<typeof EntityInputSchema>;
 
@@ -198,20 +198,43 @@ export default function EntityForm({
             rows={2}
           />
           <Controller
-            name="type"
+            name="kind"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <SelectField
                 {...field}
-                label="Type"
-                onChange={(value) => onChange(value.map((t: any) => t.id))}
-                value={value?.map((t) => ({
-                  id: t,
-                  name: toTitleCase(t),
-                }))}
-                options={entityTypes}
+                label="Kind"
+                required
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value ? { id: value, name: toTitleCase(value) } : undefined
+                }
+                options={entityKinds}
                 simple
-                multiple
+              />
+            )}
+          />
+          <Controller
+            name="ownerId"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <EntityField
+                {...field}
+                label="Owned by"
+                helpText="The current direct owner, when one owner is known."
+                placeholder="Search all Entities"
+                onChange={(owner) => onChange(owner?.id ?? null)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name:
+                          initialData.owner?.id === value
+                            ? initialData.owner.name
+                            : `Entity ${value}`,
+                      }
+                    : undefined
+                }
               />
             )}
           />

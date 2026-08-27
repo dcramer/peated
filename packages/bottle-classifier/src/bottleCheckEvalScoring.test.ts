@@ -60,7 +60,7 @@ function inspectedEntityContext(entityId: number) {
     entityId,
     name: `Entity ${entityId}`,
     shortName: null,
-    roles: ["brand"],
+    kind: "brand",
     website: null,
     country: null,
     region: null,
@@ -364,7 +364,7 @@ describe("Bottle-check eval scoring", () => {
         {
           entityId: 30,
           name: "Resolved entity",
-          type: ["brand"],
+          kind: "brand",
         },
       ],
       bottleContexts: [
@@ -620,7 +620,7 @@ describe("Bottle-check eval scoring", () => {
         {
           entityId: 30,
           name: "Shallow entity",
-          type: ["brand"],
+          kind: "brand",
         },
       ],
       bottleContexts: [inspectedBottleContext(1, { brandId: 10 })],

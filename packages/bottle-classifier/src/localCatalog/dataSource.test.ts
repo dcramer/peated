@@ -4,7 +4,7 @@ import { BottleCandidateSearchInputSchema } from "../classifierTypes";
 import { LocalCatalogSchema } from "./schema";
 
 const shieldaigCatalog = LocalCatalogSchema.parse({
-  entities: [{ id: 3943, name: "Shieldaig", type: ["brand"] }],
+  entities: [{ id: 3943, name: "Shieldaig", kind: "brand" }],
   bottles: [
     {
       id: 44175,
@@ -45,24 +45,18 @@ describe("local catalog data source", () => {
     }
   });
 
-  test("rejects entity references with the wrong role", () => {
+  test("allows any Entity kind in Bottle relationships", () => {
     const result = LocalCatalogSchema.safeParse({
-      entities: [{ id: 1, name: "Shieldaig", type: ["distiller"] }],
+      entities: [{ id: 1, name: "Shieldaig", kind: "distillery" }],
       bottles: [{ id: 1, name: "Speyside", brandId: 1 }],
     });
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues[0]).toMatchObject({
-        path: ["bottles", 0, "brandId"],
-        message: "Entity 1 is not a brand.",
-      });
-    }
+    expect(result.success).toBe(true);
   });
 
   test("rejects aliases pointing at an unknown Bottle", () => {
     const result = LocalCatalogSchema.safeParse({
-      entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
+      entities: [{ id: 1, name: "Shieldaig", kind: "brand" }],
       bottles: [{ id: 1, name: "Speyside", brandId: 1 }],
       aliases: [{ name: "Shieldaig Highland", bottleId: 2 }],
     });
@@ -78,7 +72,7 @@ describe("local catalog data source", () => {
 
   test("preserves producer-stated cask details on catalog rows", () => {
     const result = LocalCatalogSchema.parse({
-      entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
+      entities: [{ id: 1, name: "Shieldaig", kind: "brand" }],
       bottles: [
         {
           id: 1,
@@ -101,7 +95,7 @@ describe("local catalog data source", () => {
   test("keeps cask details out of local text scores", async () => {
     const dataSource = createLocalCatalogDataSource(
       LocalCatalogSchema.parse({
-        entities: [{ id: 1, name: "Example", type: ["brand"] }],
+        entities: [{ id: 1, name: "Example", kind: "brand" }],
         bottles: [
           {
             id: 1,
@@ -198,7 +192,7 @@ describe("local catalog data source", () => {
 
   test("does not infer sibling context from similar Bottle names", async () => {
     const catalog = LocalCatalogSchema.parse({
-      entities: [{ id: 1, name: "Example", type: ["brand"] }],
+      entities: [{ id: 1, name: "Example", kind: "brand" }],
       bottles: [
         {
           id: 1,
@@ -263,7 +257,6 @@ describe("local catalog data source", () => {
     await expect(
       dataSource.searchEntities?.({
         query: "Shieldaig",
-        type: "brand",
         limit: 5,
       }),
     ).resolves.toEqual([
@@ -277,7 +270,6 @@ describe("local catalog data source", () => {
     await expect(
       dataSource.searchEntities?.({
         query: "North Shieldaig Distillery",
-        type: "brand",
         limit: 5,
       }),
     ).resolves.toEqual([
@@ -289,7 +281,7 @@ describe("local catalog data source", () => {
     ]);
   });
 
-  test("returns an exact entity identity without the requested role", async () => {
+  test("searches Entities without Bottle role filtering", async () => {
     const dataSource = createLocalCatalogDataSource({
       ...shieldaigCatalog,
       entities: [
@@ -299,7 +291,7 @@ describe("local catalog data source", () => {
           name: "Suntory",
           shortName: null,
           aliases: [],
-          type: ["brand", "distiller"],
+          kind: "brand",
         },
       ],
     });
@@ -307,13 +299,12 @@ describe("local catalog data source", () => {
     await expect(
       dataSource.searchEntities?.({
         query: "Suntory",
-        type: "bottler",
         limit: 5,
       }),
     ).resolves.toEqual([
       expect.objectContaining({
         entityId: 1383,
-        type: ["brand", "distiller"],
+        kind: "brand",
         source: ["local_catalog", "exact"],
       }),
     ]);
@@ -321,10 +312,15 @@ describe("local catalog data source", () => {
     await expect(
       dataSource.searchEntities?.({
         query: "Suntory Holdings",
-        type: "bottler",
         limit: 5,
       }),
-    ).resolves.toEqual([]);
+    ).resolves.toEqual([
+      expect.objectContaining({
+        entityId: 1383,
+        kind: "brand",
+        source: ["local_catalog", "contained"],
+      }),
+    ]);
   });
 
   test("ranks more specific contained entity candidates first", async () => {
@@ -337,21 +333,20 @@ describe("local catalog data source", () => {
           name: "Northstar",
           shortName: null,
           aliases: [],
-          type: ["distiller"],
+          kind: "distillery",
         },
         {
           id: 5002,
           name: "Northstar Distillery",
           shortName: null,
           aliases: [],
-          type: ["distiller"],
+          kind: "distillery",
         },
       ],
     });
 
     const results = await dataSource.searchEntities?.({
       query: "Northstar Distillery Co.",
-      type: "distiller",
       limit: 5,
     });
 
@@ -369,14 +364,14 @@ describe("local catalog data source", () => {
           name: "Komagatake",
           shortName: null,
           aliases: ["Mars Shinshu Distillery"],
-          type: ["brand", "distiller"],
+          kind: "brand",
         },
         {
           id: 238555,
           name: "Shinshu",
           shortName: null,
           aliases: [],
-          type: ["distiller"],
+          kind: "distillery",
         },
       ],
     });
@@ -384,7 +379,6 @@ describe("local catalog data source", () => {
     await expect(
       dataSource.searchEntities?.({
         query: "Mars Shinshu Distillery",
-        type: "distiller",
         limit: 5,
       }),
     ).resolves.toEqual([

@@ -126,22 +126,22 @@
       {
         "id": 5569,
         "name": "Creative Whisky Company",
-        "type": ["brand", "bottler"]
+        "kind": "brand"
       },
       {
         "id": 1355,
         "name": "Speyside",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 1056,
         "name": "Invergordon",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 90001,
         "name": "A Distillery in Ireland",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

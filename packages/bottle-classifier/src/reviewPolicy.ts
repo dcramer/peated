@@ -611,7 +611,7 @@ interface ResolvedEntityChoice {
 
 function sanitizeResolvedEntityChoice(
   choice: ResolvedEntityChoice,
-  expectedType: "brand" | "distiller" | "bottler",
+  _expectedRole: "brand" | "distiller" | "bottler",
   resolvedEntities: Map<number, EntityResolution>,
 ): ResolvedEntityChoice {
   if (choice.id === null) {
@@ -619,7 +619,7 @@ function sanitizeResolvedEntityChoice(
   }
 
   const resolvedEntity = resolvedEntities.get(choice.id);
-  if (!resolvedEntity || !resolvedEntity.type.includes(expectedType)) {
+  if (!resolvedEntity) {
     return {
       ...choice,
       id: null,
