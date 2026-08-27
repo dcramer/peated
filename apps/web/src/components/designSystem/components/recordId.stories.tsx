@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { StoryStack } from "../storyFixtures.stylex";
-import { IdStamp } from "./dataDevices.stylex";
+import { RecordId } from "./dataDevices.stylex";
 
 const meta = {
-  title: "Components/Data Display/ID Stamp",
-  component: IdStamp,
+  title: "Components/Data Display/Record ID",
+  component: RecordId,
   args: { detail: "Islay · single malt", id: "№ 00872" },
-} satisfies Meta<typeof IdStamp>;
+} satisfies Meta<typeof RecordId>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -15,8 +15,8 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <IdStamp {...args} />
-      <IdStamp id="B00872" />
+      <RecordId {...args} />
+      <RecordId id="B00872" />
     </StoryStack>
   ),
 };

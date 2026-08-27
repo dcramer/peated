@@ -60,6 +60,7 @@ export function ScopedSearch({
   ...inputProps
 }: ScopedSearchProps) {
   const hasAppliedScope = scope !== scopes[0]?.value;
+  const hasScopeChoices = scopes.length > 1;
   const hasQuery = String(inputProps.value ?? "").length > 0;
   const menuId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -96,82 +97,88 @@ export function ScopedSearch({
           scopeMenuOpen && styles.scopeMenuRoot,
         )}
       >
-        <span {...stylex.props(styles.scopePosition)}>
-          <button
-            aria-controls={scopeMenuOpen ? menuId : undefined}
-            aria-expanded={scopeMenuOpen}
-            aria-haspopup="listbox"
-            aria-label={scopeLabel}
-            disabled={disabled}
-            onClick={() => setScopeMenuOpen((open) => !open)}
-            onKeyDown={(event) => {
-              if (event.key === "Escape") setScopeMenuOpen(false);
-              if (event.key === "ArrowDown") {
-                event.preventDefault();
-                setScopeMenuOpen(true);
-              }
-            }}
-            type="button"
-            {...stylex.props(
-              styles.scope,
-              scopeMenuOpen && styles.openScope,
-              hasAppliedScope && styles.appliedScope,
-            )}
-          >
-            {selectedScope?.label ?? "Search"}
-          </button>
-          <ChevronDown
-            aria-hidden="true"
-            size={12}
-            strokeWidth={1.75}
-            {...stylex.props(
-              styles.scopeIcon,
-              scopeMenuOpen && styles.openScopeIcon,
-              hasAppliedScope && styles.appliedScopeIcon,
-            )}
-          />
-          {scopeMenuOpen ? (
-            <div id={menuId} role="listbox" {...stylex.props(styles.scopeMenu)}>
+        {hasScopeChoices ? (
+          <span {...stylex.props(styles.scopePosition)}>
+            <button
+              aria-controls={scopeMenuOpen ? menuId : undefined}
+              aria-expanded={scopeMenuOpen}
+              aria-haspopup="listbox"
+              aria-label={scopeLabel}
+              disabled={disabled}
+              onClick={() => setScopeMenuOpen((open) => !open)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setScopeMenuOpen(false);
+                if (event.key === "ArrowDown") {
+                  event.preventDefault();
+                  setScopeMenuOpen(true);
+                }
+              }}
+              type="button"
+              {...stylex.props(
+                styles.scope,
+                scopeMenuOpen && styles.openScope,
+                hasAppliedScope && styles.appliedScope,
+              )}
+            >
+              {selectedScope?.label ?? "Search"}
+            </button>
+            <ChevronDown
+              aria-hidden="true"
+              size={12}
+              strokeWidth={1.75}
+              {...stylex.props(
+                styles.scopeIcon,
+                scopeMenuOpen && styles.openScopeIcon,
+                hasAppliedScope && styles.appliedScopeIcon,
+              )}
+            />
+            {scopeMenuOpen ? (
               <div
-                aria-hidden="true"
-                {...stylex.props(styles.scopeMenuHeader)}
-              />
-              <div {...stylex.props(styles.scopeMenuOptions)}>
-                {scopes.map((option) => {
-                  const selected = option.value === scope;
-                  return (
-                    <button
-                      aria-selected={selected}
-                      key={option.value}
-                      onClick={() => {
-                        onScopeChange(option.value);
-                        setScopeMenuOpen(false);
-                      }}
-                      role="option"
-                      type="button"
-                      {...stylex.props(styles.scopeMenuOption)}
-                    >
-                      <span>{option.label}</span>
-                      {option.count !== undefined ? (
-                        <span {...stylex.props(styles.scopeMenuCount)}>
-                          {option.count.toLocaleString("en-US")}
-                        </span>
-                      ) : null}
-                      {selected ? (
-                        <Check
-                          aria-hidden="true"
-                          size={13}
-                          strokeWidth={2}
-                          {...stylex.props(styles.scopeMenuCheck)}
-                        />
-                      ) : null}
-                    </button>
-                  );
-                })}
+                id={menuId}
+                role="listbox"
+                {...stylex.props(styles.scopeMenu)}
+              >
+                <div
+                  aria-hidden="true"
+                  {...stylex.props(styles.scopeMenuHeader)}
+                />
+                <div {...stylex.props(styles.scopeMenuOptions)}>
+                  {scopes.map((option) => {
+                    const selected = option.value === scope;
+                    return (
+                      <button
+                        aria-selected={selected}
+                        key={option.value}
+                        onClick={() => {
+                          onScopeChange(option.value);
+                          setScopeMenuOpen(false);
+                        }}
+                        role="option"
+                        type="button"
+                        {...stylex.props(styles.scopeMenuOption)}
+                      >
+                        <span>{option.label}</span>
+                        {option.count !== undefined ? (
+                          <span {...stylex.props(styles.scopeMenuCount)}>
+                            {option.count.toLocaleString("en-US")}
+                          </span>
+                        ) : null}
+                        {selected ? (
+                          <Check
+                            aria-hidden="true"
+                            size={13}
+                            strokeWidth={2}
+                            {...stylex.props(styles.scopeMenuCheck)}
+                          />
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ) : null}
-        </span>
+            ) : null}
+          </span>
+        ) : null}
         <input
           aria-label={inputProps["aria-label"] ?? "Search"}
           disabled={disabled}
@@ -196,22 +203,28 @@ export function ScopedSearch({
           </button>
         ) : null}
       </div>
-      <div aria-label={scopeLabel} {...stylex.props(styles.compactScopes)}>
-        {scopes.map((option) => {
-          const selected = option.value === scope;
-          return (
-            <Chip
-              aria-pressed={selected}
-              disabled={disabled}
-              key={option.value}
-              onClick={() => onScopeChange(option.value)}
-              variant={selected ? "solid" : "neutral"}
-            >
-              {option.label}
-            </Chip>
-          );
-        })}
-      </div>
+      {hasScopeChoices ? (
+        <div
+          aria-label={scopeLabel}
+          role="group"
+          {...stylex.props(styles.compactScopes)}
+        >
+          {scopes.map((option) => {
+            const selected = option.value === scope;
+            return (
+              <Chip
+                aria-pressed={selected}
+                disabled={disabled}
+                key={option.value}
+                onClick={() => onScopeChange(option.value)}
+                variant={selected ? "solid" : "neutral"}
+              >
+                {option.label}
+              </Chip>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

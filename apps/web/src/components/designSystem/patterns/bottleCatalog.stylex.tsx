@@ -21,7 +21,7 @@ import {
   EmptyState,
   FacetRow,
   ListToolbar,
-  LoadingRecordList,
+  LoadingList,
   Select,
   TextInput,
   VerdictDistributionBar,
@@ -387,7 +387,7 @@ export function BottleCatalogLoading() {
     <section aria-label="Bottle catalog" {...stylex.props(styles.catalog)}>
       <h1 {...stylex.props(foundationStyles.pageTitle)}>Bottles</h1>
       <div {...stylex.props(styles.loading)}>
-        <LoadingRecordList label="Loading bottles" rows={4} />
+        <LoadingList label="Loading bottles" rows={4} />
       </div>
     </section>
   );

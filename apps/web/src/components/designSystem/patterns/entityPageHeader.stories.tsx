@@ -4,7 +4,7 @@ import { Button, RowMenu } from "../components";
 import { EntityPageHeader } from "./entityPageHeader.stylex";
 
 const meta = {
-  title: "Patterns/Entity Page Header",
+  title: "Patterns/Entities/Header",
   component: EntityPageHeader,
   decorators: [
     (Story) => (
@@ -53,7 +53,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const SparseRecord: Story = {
+export const ThinData: Story = {
   args: {
     actions: undefined,
     description: undefined,

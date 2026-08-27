@@ -42,7 +42,7 @@ export type ApplicationHeaderProps = {
   databaseItems: readonly [HeaderNavigationItem, ...HeaderNavigationItem[]];
   defaultSearchOpen?: boolean;
   personalItems: readonly HeaderNavigationItem[];
-  search: ReactNode;
+  search?: ReactNode;
   showNavigation?: boolean;
 };
 
@@ -64,14 +64,15 @@ export function ApplicationHeader({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(defaultSearchOpen);
   const searchRef = useRef<HTMLDivElement>(null);
+  const hasSearch = search !== undefined && search !== null;
 
   useEffect(() => {
-    if (searchOpen) {
+    if (searchOpen && hasSearch) {
       searchRef.current
         ?.querySelector<HTMLInputElement>('input[type="search"]')
         ?.focus();
     }
-  }, [searchOpen]);
+  }, [hasSearch, searchOpen]);
 
   function openSearch() {
     setDrawerOpen(false);
@@ -90,6 +91,7 @@ export function ApplicationHeader({
           {...stylex.props(
             styles.primaryRow,
             searchOpen && styles.primaryRowSearchOpen,
+            !hasSearch && styles.primaryRowWithoutSearch,
           )}
         >
           <div
@@ -122,30 +124,34 @@ export function ApplicationHeader({
           >
             {brand}
           </a>
-          <div
-            ref={searchRef}
-            {...stylex.props(
-              styles.search,
-              searchOpen && styles.mobileSearchVisible,
-            )}
-          >
-            {search}
-          </div>
+          {hasSearch ? (
+            <div
+              ref={searchRef}
+              {...stylex.props(
+                styles.search,
+                searchOpen && styles.mobileSearchVisible,
+              )}
+            >
+              {search}
+            </div>
+          ) : null}
           <div {...stylex.props(styles.action)}>{action}</div>
-          <div
-            {...stylex.props(
-              styles.mobileSearchButton,
-              searchOpen && styles.hiddenDuringSearch,
-            )}
-          >
-            <IconButton
-              icon={<Search aria-hidden="true" size={18} />}
-              label="Open search"
-              onClick={openSearch}
-              size="sm"
-              variant="text"
-            />
-          </div>
+          {hasSearch ? (
+            <div
+              {...stylex.props(
+                styles.mobileSearchButton,
+                searchOpen && styles.hiddenDuringSearch,
+              )}
+            >
+              <IconButton
+                icon={<Search aria-hidden="true" size={18} />}
+                label="Open search"
+                onClick={openSearch}
+                size="sm"
+                variant="text"
+              />
+            </div>
+          ) : null}
           {account ? (
             <HeadlessMenu
               as="div"
@@ -180,16 +186,18 @@ export function ApplicationHeader({
               </MenuItems>
             </HeadlessMenu>
           ) : null}
-          <button
-            onClick={() => setSearchOpen(false)}
-            type="button"
-            {...stylex.props(
-              styles.mobileSearchCancel,
-              searchOpen && styles.mobileSearchCancelVisible,
-            )}
-          >
-            Cancel
-          </button>
+          {hasSearch ? (
+            <button
+              onClick={() => setSearchOpen(false)}
+              type="button"
+              {...stylex.props(
+                styles.mobileSearchCancel,
+                searchOpen && styles.mobileSearchCancelVisible,
+              )}
+            >
+              Cancel
+            </button>
+          ) : null}
         </div>
         {showNavigation ? (
           <div {...stylex.props(styles.navigationRow)}>
@@ -430,6 +438,12 @@ const styles = stylex.create({
   primaryRowSearchOpen: {
     [MOBILE]: {
       gridTemplateColumns: "minmax(0, 1fr) auto",
+    },
+  },
+  primaryRowWithoutSearch: {
+    gridTemplateColumns: "auto 1fr auto",
+    [MOBILE]: {
+      gridTemplateColumns: "auto minmax(0, 1fr) auto",
     },
   },
   mobileMenu: {

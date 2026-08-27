@@ -9,10 +9,10 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
-  LoadingRecordList,
-  ModuleError,
+  LoadingList,
   RailList,
   RailListItem,
+  SectionError,
   TastingEntry,
   type TastingEntryMember,
 } from "@peated/web/components/designSystem/components";
@@ -50,15 +50,15 @@ export function ProfileTastingsPageClient() {
     <PageColumns rail={getRegionRail(regionQuery, user.username)}>
       <section aria-label={`${user.username}'s tastings`}>
         {tastingQuery.isPending ? (
-          <LoadingRecordList label="Loading member tastings" rows={4} />
+          <LoadingList label="Loading member tastings" rows={4} />
         ) : tastingQuery.error ? (
-          <ModuleError
+          <SectionError
             heading="Tastings are unavailable"
             onRetry={() => void tastingQuery.refetch()}
           >
             The member profile is still available. Try loading their tastings
             again.
-          </ModuleError>
+          </SectionError>
         ) : tastingQuery.data.results.length ? (
           <div {...stylex.props(styles.tastingList)}>
             {tastingQuery.data.results.map((tasting) => (
@@ -131,18 +131,18 @@ function getRegionRail(
   if (query.isPending) {
     return (
       <RailSection heading="What they pour">
-        <LoadingRecordList label="Loading member regions" rows={3} />
+        <LoadingList label="Loading member regions" rows={3} />
       </RailSection>
     );
   }
   if (query.error) {
     return (
-      <ModuleError
+      <SectionError
         heading="Regions are unavailable"
         onRetry={() => void query.refetch()}
       >
         Try loading this part of the profile again.
-      </ModuleError>
+      </SectionError>
     );
   }
   if (!query.data.results.length) return undefined;

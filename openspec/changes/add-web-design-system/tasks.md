@@ -32,17 +32,17 @@
 
 ## 3. Peated data components
 
-- [x] 3.1 Add the ID stamp and max-four spec strip; retire flavor meters and rank numerals
+- [x] 3.1 Add the record ID and max-four spec strip; retire flavor meters and rank numerals
 - [x] 3.2 Add community-score and verdict-distribution components using the existing rating populations
 - [x] 3.3 Add data-component stories to Storybook
-- [ ] 3.4 Review and approve the reconciled ID stamp and spec strip at desktop and mobile widths in both system schemes
+- [ ] 3.4 Review and approve the reconciled record ID and spec strip at desktop and mobile widths in both system schemes
 - [x] 3.5 Add the positional verdict-mark component and its Storybook states
 - [ ] 3.6 Review and approve community score, verdict distribution, and verdict mark at desktop and mobile widths in both system schemes
 - [x] 3.7 Add facet-row, row-menu, and numbered-pager components from the updated reference package
 - [x] 3.8 Review and approve facet row, row menu, and pager at desktop and mobile widths in both system schemes
 - [x] 3.9 Add summary-strip and passport components from the updated reference package
 - [x] 3.10 Review and approve summary strip and passport at desktop and mobile widths in both system schemes
-- [x] 3.11 Add navigation tabs, record tables, list controls, rail lists, the application-header frame, and the reference footer
+- [x] 3.11 Add navigation tabs, bottle comparison tables, list controls, rail lists, the application-header frame, and the reference footer
 - [x] 3.12 QA the complete reusable baseline at desktop and 320px widths in both system schemes
 - [x] 3.13 Add the entity history timeline and realistic supplied-history stories
 - [x] 3.14 Review history states at desktop and mobile widths in both system schemes
@@ -92,14 +92,14 @@
 - [ ] 6.6 Remove styling dependencies and compatibility code with no remaining consumers
 - [ ] 6.7 Run full web validation and final desktop and mobile visual QA
 - [x] 6.8 Review the reusable homepage components and bounded sections in Storybook, then connect them through thin product adapters
-- [x] 6.9 Compose and cut over `/` and its complete application shell together without duplicating the full page in Storybook or changing its public URL
-- [x] 6.10 Migrate login and registration with one shared auth shell, existing authentication behavior, and focused component stories
-- [x] 6.11 Migrate recovery, verification, terms, browser-support, and OAuth consent states onto the shared auth shell
+- [x] 6.9 Compose and cut over `/` and its complete application layout together without duplicating the full page in Storybook or changing its public URL
+- [x] 6.10 Migrate login and registration with one shared authentication layout, existing authentication behavior, and focused component stories
+- [x] 6.11 Migrate recovery, verification, terms, browser-support, and OAuth consent states onto the shared authentication layout
 - [x] 6.12 Reconcile the signed-in homepage widgets with the approved Home concepts and live product contracts
 - [x] 6.13 Join the header search field and results into one typeahead surface and align its real product scopes
 - [x] 6.14 Align the shared footer frame with the header and main page content
 - [x] 6.15 Add shared 404, forbidden, page-failure, and offline patterns from the approved error concepts
-- [x] 6.16 Migrate route error boundaries and not-found responses without weakening Sentry reporting or module-error ownership
+- [x] 6.16 Migrate route error boundaries and not-found responses without weakening Sentry reporting or section-error ownership
 - [x] 6.17 Add the centered global loading frame and connect it at the root route boundary without application chrome or a spinner
 - [ ] 6.18 Review global loading at desktop and mobile widths in both system schemes
 - [x] 6.19 Migrate the bottle catalog with real list data, URL-owned filters, cursor navigation, and bounded Storybook patterns
@@ -113,6 +113,7 @@
 - [x] 6.27 Migrate the entity route frame, bottle list, tasting list, and SMWS codes sections with live API state, responsive StyleX composition, and reusable Storybook-owned components
 - [x] 6.28 Migrate the public member profile with API-owned summary, rating, tasting, region, privacy, and action state plus reusable profile-header stories
 - [x] 6.29 Complete the member profile route family with one nested frame, API-owned Library filters and owner actions, Activity records, cursor navigation, and bounded Storybook patterns
+- [x] 6.30 Cut over `/search` with grouped API results, preserved bottle-selection intents, and the redesign application layout
 
 ## 7. Storybook tooling
 
@@ -123,3 +124,4 @@
 - [x] 7.5 Add Peated responsive and theme review presets with direct Wide, Folded, Phone, Light, and Dark toolbar actions
 - [x] 7.6 Make named behavior stories render their review state without manual setup interactions
 - [x] 7.7 Consolidate static component permutations into overview stories while preserving direct behavior states
+- [x] 7.8 Replace vague implementation names with Peated concepts and plain UI nouns across components and Storybook

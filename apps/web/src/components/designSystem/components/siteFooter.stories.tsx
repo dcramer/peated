@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { StoryCanvas } from "../storyFixtures.stylex";
-import { SiteFooter, type SiteFooterProps } from "./siteChrome.stylex";
+import {
+  SiteFooter,
+  type SiteFooterProps,
+} from "./applicationNavigation.stylex";
 
 const groups: SiteFooterProps["groups"] = [
   {

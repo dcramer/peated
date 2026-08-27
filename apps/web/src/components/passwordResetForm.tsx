@@ -6,14 +6,14 @@ import {
   TextInput,
 } from "@peated/web/components/designSystem/components";
 import {
-  AuthActionStack,
-  AuthDivider,
-  AuthFooterLinks,
-  AuthFormSurface,
-  AuthLink,
-  AuthNotice,
-  AuthPanel,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationDivider,
+  AuthenticationLink,
+  AuthenticationLinks,
+  AuthenticationNotice,
+  AuthenticationPanel,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import { passwordResetForm } from "@peated/web/lib/auth.actions";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
@@ -22,8 +22,8 @@ function RecoveryRequestFields({ initialEmail }: { initialEmail: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <AuthActionStack>
-      <AuthFormSurface>
+    <AuthenticationActions>
+      <AuthenticationCard>
         <Field htmlFor="recovery-email" label="Email" required>
           <TextInput
             autoComplete="email"
@@ -36,7 +36,7 @@ function RecoveryRequestFields({ initialEmail }: { initialEmail: string }) {
             type="email"
           />
         </Field>
-      </AuthFormSurface>
+      </AuthenticationCard>
       <Button
         align="start"
         fullWidth
@@ -47,7 +47,7 @@ function RecoveryRequestFields({ initialEmail }: { initialEmail: string }) {
       >
         Send recovery link
       </Button>
-    </AuthActionStack>
+    </AuthenticationActions>
   );
 }
 
@@ -60,33 +60,39 @@ export default function PasswordResetForm({
 
   if (result?.ok) {
     return (
-      <AuthPanel
+      <AuthenticationPanel
         description="Follow the secure link we sent to choose a new way to sign in."
         title="Check your email"
       >
-        <AuthNotice>Recovery instructions are on their way.</AuthNotice>
-        <AuthDivider />
-        <AuthFooterLinks>
-          <AuthLink href="/login">Return to sign in</AuthLink>
-        </AuthFooterLinks>
-      </AuthPanel>
+        <AuthenticationNotice>
+          Recovery instructions are on their way.
+        </AuthenticationNotice>
+        <AuthenticationDivider />
+        <AuthenticationLinks>
+          <AuthenticationLink href="/login">
+            Return to sign in
+          </AuthenticationLink>
+        </AuthenticationLinks>
+      </AuthenticationPanel>
     );
   }
 
   return (
-    <AuthPanel
+    <AuthenticationPanel
       description="We’ll email a one-time link so you can restore access."
       title="Recover your account"
     >
-      {result?.error ? <AuthNotice>{result.error}</AuthNotice> : null}
+      {result?.error ? (
+        <AuthenticationNotice>{result.error}</AuthenticationNotice>
+      ) : null}
       <form action={formAction}>
         <RecoveryRequestFields initialEmail={initialEmail} />
       </form>
-      <AuthDivider />
-      <AuthFooterLinks>
+      <AuthenticationDivider />
+      <AuthenticationLinks>
         <span>Remembered how to sign in?</span>
-        <AuthLink href="/login">Return to sign in</AuthLink>
-      </AuthFooterLinks>
-    </AuthPanel>
+        <AuthenticationLink href="/login">Return to sign in</AuthenticationLink>
+      </AuthenticationLinks>
+    </AuthenticationPanel>
   );
 }

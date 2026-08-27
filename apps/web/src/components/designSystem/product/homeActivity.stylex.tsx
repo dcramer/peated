@@ -18,8 +18,8 @@ import TimeSince from "../../timeSince";
 import {
   ButtonLink,
   EmptyState,
-  LoadingRecordList,
-  ModuleError,
+  LoadingList,
+  SectionError,
   TastingEntry,
   type TastingEntryMember,
   type Verdict,
@@ -237,17 +237,17 @@ export function HomeActivity({
   }, [fetchNextPage, hasNextPage, isFetchingNextPage, results.length]);
 
   if (status === "pending") {
-    return <LoadingRecordList label="Loading recent activity" rows={4} />;
+    return <LoadingList label="Loading recent activity" rows={4} />;
   }
 
   if (error) {
     return (
-      <ModuleError
+      <SectionError
         heading="Activity is unavailable"
         onRetry={() => void refetch()}
       >
         We could not load the latest activity. Try again.
-      </ModuleError>
+      </SectionError>
     );
   }
 
@@ -298,7 +298,7 @@ export function HomeActivity({
       ))}
       {isFetchingNextPage ? (
         <div {...stylex.props(styles.moreLoading)}>
-          <LoadingRecordList label="Loading more activity" rows={1} />
+          <LoadingList label="Loading more activity" rows={1} />
         </div>
       ) : null}
     </div>

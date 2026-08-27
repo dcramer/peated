@@ -7,7 +7,7 @@ import {
 } from "./memberProfileContent.stylex";
 
 const meta = {
-  title: "Patterns/Profile/Member Content",
+  title: "Patterns/Profile/Library and Activity",
   parameters: { layout: "padded" },
 } satisfies Meta;
 

@@ -9,8 +9,8 @@ import { useState, useTransition } from "react";
 
 import {
   ButtonLink,
-  LoadingRecordList,
-  ModuleError,
+  LoadingList,
+  SectionError,
 } from "@peated/web/components/designSystem/components";
 import {
   MemberLibraryFilters,
@@ -211,15 +211,15 @@ export function ProfileLibraryPageClient() {
             </p>
           ) : null}
           {libraryQuery.isPending ? (
-            <LoadingRecordList label="Loading member library" rows={4} />
+            <LoadingList label="Loading member library" rows={4} />
           ) : libraryQuery.error ? (
-            <ModuleError
+            <SectionError
               heading="Library is unavailable"
               onRetry={() => void libraryQuery.refetch()}
             >
               The member profile is still available. Try loading the Library
               again.
-            </ModuleError>
+            </SectionError>
           ) : (
             <MemberLibraryList
               emptyAction={

@@ -3,13 +3,13 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { useORPC } from "../../../lib/orpc/context";
-import { LoadingRecordList, ModuleError } from "../components";
+import { LoadingList, SectionError } from "../components";
 import {
-  HomeWidgetLoading,
-  MemberRecordSummary,
-} from "../patterns/homeWidgets.stylex";
+  HomeMemberSummary,
+  HomeSectionLoading,
+} from "../patterns/homeSummary.stylex";
 
-export function HomeMemberRecord() {
+export function HomeMemberSummarySection() {
   const orpc = useORPC();
   const details = useQuery(
     orpc.users.details.queryOptions({ input: { user: "me" } }),
@@ -20,15 +20,15 @@ export function HomeMemberRecord() {
 
   if (details.isPending || tastingStats.isPending) {
     return (
-      <HomeWidgetLoading>
-        <LoadingRecordList label="Loading your record" rows={3} />
-      </HomeWidgetLoading>
+      <HomeSectionLoading>
+        <LoadingList label="Loading your record" rows={3} />
+      </HomeSectionLoading>
     );
   }
 
   if (details.error || tastingStats.error) {
     return (
-      <ModuleError
+      <SectionError
         heading="Your record is unavailable"
         onRetry={() => {
           void details.refetch();
@@ -36,12 +36,12 @@ export function HomeMemberRecord() {
         }}
       >
         We could not load your tasting summary. Try again.
-      </ModuleError>
+      </SectionError>
     );
   }
 
   return (
-    <MemberRecordSummary
+    <HomeMemberSummary
       facts={[
         { label: "On the shelf", value: details.data.stats.library.total },
         { label: "Bottles tasted", value: tastingStats.data.uniqueBottles },

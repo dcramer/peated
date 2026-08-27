@@ -1,6 +1,6 @@
 import type { OAuthAuthorizationRequest } from "@peated/server/schemas";
 import { Button } from "@peated/web/components/designSystem/components";
-import { AuthActionStack } from "@peated/web/components/designSystem/patterns/authShell.stylex";
+import { AuthenticationActions } from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import { approveOAuthAuthorization, denyOAuthAuthorization } from "./actions";
 
 function AuthorizationFields({
@@ -34,7 +34,7 @@ export default function AuthorizationForm({
   request: OAuthAuthorizationRequest;
 }) {
   return (
-    <AuthActionStack>
+    <AuthenticationActions>
       <form action={approveOAuthAuthorization}>
         <AuthorizationFields request={request} />
         <Button
@@ -53,6 +53,6 @@ export default function AuthorizationForm({
           Deny
         </Button>
       </form>
-    </AuthActionStack>
+    </AuthenticationActions>
   );
 }

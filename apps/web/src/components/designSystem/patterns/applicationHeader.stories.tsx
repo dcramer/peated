@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { CircleUserRound } from "lucide-react";
 import { useState } from "react";
 
+import { ApplicationHeader } from "../components/applicationNavigation.stylex";
 import { Button, ButtonLink } from "../components/button.stylex";
 import { ScopedSearch } from "../components/scopedSearch.stylex";
-import { SearchExperience } from "../components/searchExperience.stylex";
-import { ApplicationHeader } from "../components/siteChrome.stylex";
+import { SearchBox } from "../components/searchBox.stylex";
 import { searchResultGroups } from "../components/storyData";
 
 const databaseItems = [
@@ -74,7 +74,7 @@ function HeaderExample({
       personalItems={signedIn ? personalItems : []}
       search={
         searchOpen ? (
-          <SearchExperience
+          <SearchBox
             contribution={{
               description: "Not here?",
               href: "#record",

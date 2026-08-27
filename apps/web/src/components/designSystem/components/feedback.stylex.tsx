@@ -13,14 +13,14 @@ import { Button } from "./button.stylex";
 
 const REDUCED_MOTION = "@media (prefers-reduced-motion: reduce)";
 
-export type OverlaySurfaceProps = Omit<
+export type FloatingPanelProps = Omit<
   HTMLAttributes<HTMLDivElement>,
   "className" | "style"
 > & {
   children: ReactNode;
 };
 
-export function OverlaySurface({ children, ...props }: OverlaySurfaceProps) {
+export function FloatingPanel({ children, ...props }: FloatingPanelProps) {
   return (
     <div {...props} {...stylex.props(styles.overlay)}>
       {children}
@@ -66,7 +66,7 @@ export type EmptyStateProps = {
   supplementary?: ReactNode;
 };
 
-/** Explains an empty result and keeps the next useful action in the module. */
+/** Explains an empty result and keeps the next useful action in the section. */
 export function EmptyState({
   action,
   children,
@@ -95,7 +95,7 @@ export function EmptyState({
   );
 }
 
-export type ModuleErrorProps = {
+export type SectionErrorProps = {
   children: ReactNode;
   detail?: string;
   heading: ReactNode;
@@ -103,14 +103,14 @@ export type ModuleErrorProps = {
   retryLabel?: string;
 };
 
-/** Keeps a recoverable failure inside the module that owns it. */
-export function ModuleError({
+/** Keeps a recoverable failure inside the section that owns it. */
+export function SectionError({
   children,
   detail,
   heading,
   onRetry,
   retryLabel = "Retry",
-}: ModuleErrorProps) {
+}: SectionErrorProps) {
   return (
     <section role="alert" {...stylex.props(styles.statePanel)}>
       <div {...stylex.props(styles.stateCopy)}>
@@ -135,18 +135,18 @@ export function ModuleError({
   );
 }
 
-type LoadingRecordCount = 1 | 2 | 3 | 4;
+type LoadingRowCount = 1 | 2 | 3 | 4;
 
-export type LoadingRecordListProps = {
+export type LoadingListProps = {
   label?: string;
-  rows?: LoadingRecordCount;
+  rows?: LoadingRowCount;
 };
 
-/** Reserves the final row geometry while a record list is loading. */
-export function LoadingRecordList({
+/** Reserves the final row geometry while a list is loading. */
+export function LoadingList({
   label = "Loading records",
   rows = 3,
-}: LoadingRecordListProps) {
+}: LoadingListProps) {
   return (
     <div
       aria-busy="true"

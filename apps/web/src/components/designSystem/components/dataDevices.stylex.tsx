@@ -9,12 +9,12 @@ import {
 
 const PHONE = "@media (max-width: 480px)";
 
-export type IdStampProps = {
+export type RecordIdProps = {
   detail?: string;
   id: string;
 };
 
-export function IdStamp({ detail, id }: IdStampProps) {
+export function RecordId({ detail, id }: RecordIdProps) {
   return (
     <div {...stylex.props(styles.idStamp)}>
       <span {...stylex.props(styles.idLabel)}>Peated ID</span>

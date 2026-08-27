@@ -1,3 +1,18 @@
+export { ApplicationHeader, SiteFooter } from "./applicationNavigation.stylex";
+export type {
+  ApplicationHeaderProps,
+  FooterGroup,
+  FooterLink,
+  HeaderAccountActionItem,
+  HeaderAccountItem,
+  HeaderNavigationItem,
+  SiteFooterProps,
+} from "./applicationNavigation.stylex";
+export { BottleComparisonTable } from "./bottleComparisonTable.stylex";
+export type {
+  BottleComparisonRow,
+  BottleComparisonTableProps,
+} from "./bottleComparisonTable.stylex";
 export { BottleIdentityRow, BottleVisual } from "./bottleIdentityRow.stylex";
 export type {
   BottleIdentityRowProps,
@@ -20,9 +35,9 @@ export type {
   CriticReviewProps,
   NativeReviewScore,
 } from "./criticReview.stylex";
-export { IdStamp, SpecStrip } from "./dataDevices.stylex";
+export { RecordId, SpecStrip } from "./dataDevices.stylex";
 export type {
-  IdStampProps,
+  RecordIdProps,
   SpecStripCell,
   SpecStripCells,
 } from "./dataDevices.stylex";
@@ -43,16 +58,16 @@ export { FactList } from "./factList.stylex";
 export type { FactListItem, FactListProps } from "./factList.stylex";
 export {
   EmptyState,
+  FloatingPanel,
+  LoadingList,
   LoadingPlaceholder,
-  LoadingRecordList,
-  ModuleError,
-  OverlaySurface,
+  SectionError,
 } from "./feedback.stylex";
 export type {
   EmptyStateProps,
-  LoadingRecordListProps,
-  ModuleErrorProps,
-  OverlaySurfaceProps,
+  FloatingPanelProps,
+  LoadingListProps,
+  SectionErrorProps,
 } from "./feedback.stylex";
 export {
   Field,
@@ -112,8 +127,6 @@ export { PageTabs } from "./pageTabs.stylex";
 export type { PageTabItem, PageTabsProps } from "./pageTabs.stylex";
 export { Passport } from "./passport.stylex";
 export type { PassportProps, PassportStamp } from "./passport.stylex";
-export { RecordTable } from "./recordTable.stylex";
-export type { RecordTableProps, RecordTableRow } from "./recordTable.stylex";
 export { RowMenu } from "./rowMenu.stylex";
 export type { RowMenuGroup, RowMenuItem, RowMenuProps } from "./rowMenu.stylex";
 export { ScopedSearch } from "./scopedSearch.stylex";
@@ -145,28 +158,18 @@ export type {
   VerdictDistributionProps,
   VerdictMarkProps,
 } from "./scoring.stylex";
-export { SearchExperience } from "./searchExperience.stylex";
-export type { SearchExperienceProps } from "./searchExperience.stylex";
-export { SearchResultsPanel } from "./searchResults.stylex";
+export { SearchBox } from "./searchBox.stylex";
+export type { SearchBoxProps } from "./searchBox.stylex";
+export { SearchResults } from "./searchResults.stylex";
 export type {
   SearchResultGroup,
   SearchResultItem,
   SearchResultMeasure,
-  SearchResultsPanelProps,
+  SearchResultsProps,
 } from "./searchResults.stylex";
 export { SectionHeading } from "./sectionHeading.stylex";
 export { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
 export type { SelectedBottleSummaryProps } from "./selectedBottleSummary.stylex";
-export { ApplicationHeader, SiteFooter } from "./siteChrome.stylex";
-export type {
-  ApplicationHeaderProps,
-  FooterGroup,
-  FooterLink,
-  HeaderAccountActionItem,
-  HeaderAccountItem,
-  HeaderNavigationItem,
-  SiteFooterProps,
-} from "./siteChrome.stylex";
 export { SummaryStrip } from "./summaryStrip.stylex";
 export type {
   SummaryStripCell,

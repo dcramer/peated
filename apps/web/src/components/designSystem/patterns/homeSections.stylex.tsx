@@ -8,7 +8,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
-  IdStamp,
+  RecordId,
   SectionHeading,
   SpecStrip,
   SummaryStrip,
@@ -18,7 +18,7 @@ import {
 
 const NARROW = "@media (max-width: 759px)";
 
-export type HomeHeroProps = {
+export type PublicHomeIntroProps = {
   description: ReactNode;
   eyebrow?: ReactNode;
   facts?: SummaryStripCells;
@@ -28,14 +28,14 @@ export type HomeHeroProps = {
 };
 
 /** Introduces Peated and shows caller-supplied platform facts. */
-export function HomeHero({
+export function PublicHomeIntro({
   description,
   eyebrow,
   facts,
   primaryAction,
   secondaryAction,
   title,
-}: HomeHeroProps) {
+}: PublicHomeIntroProps) {
   return (
     <section {...stylex.props(styles.hero)}>
       {eyebrow ? <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div> : null}
@@ -75,7 +75,7 @@ export function HomeDatabaseOverview({
       <div {...stylex.props(styles.overviewColumn)}>
         <SectionHeading>What a bottle page holds</SectionHeading>
         <div {...stylex.props(styles.recordPreview)}>
-          <IdStamp detail={record.detail} id={record.id} />
+          <RecordId detail={record.detail} id={record.id} />
           <h3 {...stylex.props(styles.recordTitle)}>{record.title}</h3>
           <div {...stylex.props(styles.recordSpecs)}>
             <SpecStrip cells={record.specs} />

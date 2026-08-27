@@ -5,11 +5,11 @@ import {
   Checkbox,
 } from "@peated/web/components/designSystem/components";
 import {
-  AuthActionStack,
-  AuthFormSurface,
-  AuthLink,
-  AuthNotice,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationLink,
+  AuthenticationNotice,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import { acceptTosForm, logoutForm } from "@peated/web/lib/auth.actions";
 import { useActionState, useState } from "react";
 
@@ -19,25 +19,30 @@ export default function Actions({ redirectTo }: { redirectTo: string }) {
   const [, logoutAction] = useActionState(logoutForm, undefined);
 
   return (
-    <AuthActionStack>
-      {acceptState?.error ? <AuthNotice>{acceptState.error}</AuthNotice> : null}
+    <AuthenticationActions>
+      {acceptState?.error ? (
+        <AuthenticationNotice>{acceptState.error}</AuthenticationNotice>
+      ) : null}
       <form action={acceptAction}>
-        <AuthActionStack>
+        <AuthenticationActions>
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <AuthFormSurface>
+          <AuthenticationCard>
             <Checkbox
               checked={accepted}
               label={
                 <>
                   I agree to the updated{" "}
-                  <AuthLink href="/terms">Terms of Service</AuthLink>.
+                  <AuthenticationLink href="/terms">
+                    Terms of Service
+                  </AuthenticationLink>
+                  .
                 </>
               }
               name="tosAccepted"
               onChange={(event) => setAccepted(event.currentTarget.checked)}
               required
             />
-          </AuthFormSurface>
+          </AuthenticationCard>
           <Button
             align="start"
             disabled={!accepted}
@@ -48,13 +53,13 @@ export default function Actions({ redirectTo }: { redirectTo: string }) {
           >
             Accept and continue
           </Button>
-        </AuthActionStack>
+        </AuthenticationActions>
       </form>
       <form action={logoutAction}>
         <Button align="start" fullWidth size="lg" type="submit" variant="tonal">
           Sign out
         </Button>
       </form>
-    </AuthActionStack>
+    </AuthenticationActions>
   );
 }

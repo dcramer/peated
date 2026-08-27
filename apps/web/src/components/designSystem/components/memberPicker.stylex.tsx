@@ -13,7 +13,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import { Chip } from "./chip.stylex";
-import { OverlaySurface } from "./feedback.stylex";
+import { FloatingPanel } from "./feedback.stylex";
 
 export type MemberPickerOption = {
   detail?: string;
@@ -152,7 +152,7 @@ export function MemberPicker({
           {...stylex.props(styles.input)}
         />
         {isOpen ? (
-          <OverlaySurface {...stylex.props(styles.overlay)}>
+          <FloatingPanel {...stylex.props(styles.overlay)}>
             <div
               aria-label="Friend results"
               id={listboxId}
@@ -190,7 +190,7 @@ export function MemberPicker({
                 </p>
               )}
             </div>
-          </OverlaySurface>
+          </FloatingPanel>
         ) : null}
       </div>
       <p {...stylex.props(foundationStyles.metadata, styles.help)}>

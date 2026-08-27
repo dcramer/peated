@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@peated/web/components/designSystem/components";
-import { AuthNotice } from "@peated/web/components/designSystem/patterns/authShell.stylex";
+import { AuthenticationNotice } from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import { resendVerificationForm } from "@peated/web/lib/auth.actions";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
@@ -14,17 +14,19 @@ export default function ResendVerificationForm() {
 
   if (state?.ok) {
     return (
-      <AuthNotice>
+      <AuthenticationNotice>
         {state.alreadyVerified
           ? "This account is already verified. You can continue to Peated."
           : "Follow the instructions in your inbox to continue."}
-      </AuthNotice>
+      </AuthenticationNotice>
     );
   }
 
   return (
     <form action={resendVerificationAction}>
-      {state?.error ? <AuthNotice>{state.error}</AuthNotice> : null}
+      {state?.error ? (
+        <AuthenticationNotice>{state.error}</AuthenticationNotice>
+      ) : null}
       <ResendVerificationButton />
     </form>
   );

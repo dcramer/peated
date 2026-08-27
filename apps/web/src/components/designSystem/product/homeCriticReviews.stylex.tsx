@@ -5,9 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useORPC } from "../../../lib/orpc/context";
 import TimeSince from "../../timeSince";
-import { LoadingRecordList, ModuleError } from "../components";
+import { LoadingList, SectionError } from "../components";
 import { HomeCriticReviews as CriticReviewSection } from "../patterns/homeDiscovery.stylex";
-import { HomeWidgetLoading } from "../patterns/homeWidgets.stylex";
+import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
 
 type Review = Outputs["reviews"]["list"]["results"][number];
 type Bottle = NonNullable<Review["bottle"]>;
@@ -31,20 +31,20 @@ export function HomeCriticReviews() {
 
   if (reviews.isPending) {
     return (
-      <HomeWidgetLoading>
-        <LoadingRecordList label="Loading recent critic reviews" rows={2} />
-      </HomeWidgetLoading>
+      <HomeSectionLoading>
+        <LoadingList label="Loading recent critic reviews" rows={2} />
+      </HomeSectionLoading>
     );
   }
 
   if (reviews.error) {
     return (
-      <ModuleError
+      <SectionError
         heading="Critic reviews are unavailable"
         onRetry={() => void reviews.refetch()}
       >
         We could not load the latest critic reviews. Try again.
-      </ModuleError>
+      </SectionError>
     );
   }
 

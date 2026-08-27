@@ -7,15 +7,15 @@ import {
   TextInput,
 } from "@peated/web/components/designSystem/components";
 import {
-  AuthActionStack,
-  AuthDivider,
-  AuthFooterLinks,
-  AuthFormSurface,
-  AuthLink,
-  AuthNotice,
-  AuthPanel,
-  AuthTextButton,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationDivider,
+  AuthenticationLink,
+  AuthenticationLinks,
+  AuthenticationNotice,
+  AuthenticationPanel,
+  AuthenticationTextButton,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import {
   passwordResetConfirmForm,
   passwordResetConfirmPasskeyForm,
@@ -33,8 +33,8 @@ function PasswordFields({ token }: { token: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <AuthActionStack>
-      <AuthFormSurface>
+    <AuthenticationActions>
+      <AuthenticationCard>
         <input type="hidden" name="token" value={token} />
         <Field htmlFor="recovery-password" label="New password" required>
           <TextInput
@@ -47,7 +47,7 @@ function PasswordFields({ token }: { token: string }) {
             type="password"
           />
         </Field>
-      </AuthFormSurface>
+      </AuthenticationCard>
       <Button
         align="start"
         fullWidth
@@ -58,7 +58,7 @@ function PasswordFields({ token }: { token: string }) {
       >
         Set password and continue
       </Button>
-    </AuthActionStack>
+    </AuthenticationActions>
   );
 }
 
@@ -127,13 +127,13 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
 
   if (isInvalidToken) {
     return (
-      <AuthPanel
+      <AuthenticationPanel
         description="Recovery links work once and expire for your protection."
         title="This recovery link is no longer valid"
       >
-        <AuthNotice>
+        <AuthenticationNotice>
           Request a new link to continue recovering your account.
-        </AuthNotice>
+        </AuthenticationNotice>
         <ButtonLink
           align="start"
           fullWidth
@@ -143,18 +143,20 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
         >
           Request a new link
         </ButtonLink>
-      </AuthPanel>
+      </AuthenticationPanel>
     );
   }
 
   if (isRecovered) {
     return (
-      <AuthPanel
+      <AuthenticationPanel
         description="Your new sign-in method is ready to use."
         title="Account recovered"
       >
-        <AuthNotice>Your account access has been restored.</AuthNotice>
-        <AuthActionStack>
+        <AuthenticationNotice>
+          Your account access has been restored.
+        </AuthenticationNotice>
+        <AuthenticationActions>
           <ButtonLink
             align="start"
             fullWidth
@@ -173,40 +175,40 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
           >
             Return to Peated
           </ButtonLink>
-        </AuthActionStack>
-      </AuthPanel>
+        </AuthenticationActions>
+      </AuthenticationPanel>
     );
   }
 
   if (showPasswordForm) {
     return (
-      <AuthPanel
+      <AuthenticationPanel
         back={
-          <AuthTextButton
+          <AuthenticationTextButton
             type="button"
             onClick={() => setShowPasswordForm(false)}
           >
             ← Other recovery options
-          </AuthTextButton>
+          </AuthenticationTextButton>
         }
         description="Choose a new password for this account."
         title="Set a new password"
       >
-        {error ? <AuthNotice>{error}</AuthNotice> : null}
+        {error ? <AuthenticationNotice>{error}</AuthenticationNotice> : null}
         <form action={formAction}>
           <PasswordFields token={token} />
         </form>
-      </AuthPanel>
+      </AuthenticationPanel>
     );
   }
 
   return (
-    <AuthPanel
+    <AuthenticationPanel
       description="Add a new passkey or set a password to restore access."
       title="Recover your account"
     >
-      {error ? <AuthNotice>{error}</AuthNotice> : null}
-      <AuthActionStack>
+      {error ? <AuthenticationNotice>{error}</AuthenticationNotice> : null}
+      <AuthenticationActions>
         <Button
           align="start"
           fullWidth
@@ -228,11 +230,11 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
           <Lock aria-hidden="true" size={17} />
           Set a password
         </Button>
-      </AuthActionStack>
-      <AuthDivider />
-      <AuthFooterLinks>
-        <AuthLink href="/login">Return to sign in</AuthLink>
-      </AuthFooterLinks>
-    </AuthPanel>
+      </AuthenticationActions>
+      <AuthenticationDivider />
+      <AuthenticationLinks>
+        <AuthenticationLink href="/login">Return to sign in</AuthenticationLink>
+      </AuthenticationLinks>
+    </AuthenticationPanel>
   );
 }

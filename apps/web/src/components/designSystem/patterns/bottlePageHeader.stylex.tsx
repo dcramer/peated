@@ -18,7 +18,7 @@ import {
   BottleVisual,
   Chip,
   CommunityScore,
-  IdStamp,
+  RecordId,
   SpecStrip,
   VerdictDistribution,
 } from "../components";
@@ -73,7 +73,7 @@ export function BottlePageHeader({
       {...stylex.props(styles.root, hasMeasures && styles.rootWithMeasures)}
     >
       <div {...stylex.props(styles.stampPanel)}>
-        <IdStamp detail={detail} id={id} />
+        <RecordId detail={detail} id={id} />
       </div>
       <div
         {...stylex.props(

@@ -1,6 +1,6 @@
 "use client";
 
-import { ErrorDocument } from "../components/designSystem/product/pageStatePages.stylex";
+import { ErrorDocument } from "../components/designSystem/product/errorPages.stylex";
 import RouteErrorPage from "../components/routeErrorPage";
 import "../styles/error-document.css";
 

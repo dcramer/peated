@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { SearchExperience } from "../components/searchExperience.stylex";
+import { SearchBox } from "../components/searchBox.stylex";
 import { searchResultGroups } from "../components/storyData";
 import { StoryCanvas } from "../storyFixtures.stylex";
 
@@ -18,7 +18,7 @@ const scopes = [
 
 const meta = {
   title: "Patterns/Search",
-  component: SearchExperience,
+  component: SearchBox,
   args: {
     contribution: {
       description: "Not the bottle you have? Add it to the catalog.",
@@ -52,7 +52,7 @@ const meta = {
     ),
   ],
   render: (args) => <ControlledSearch {...args} />,
-} satisfies Meta<typeof SearchExperience>;
+} satisfies Meta<typeof SearchBox>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -138,14 +138,12 @@ export const Unavailable: Story = {
   },
 };
 
-function ControlledSearch(
-  props: React.ComponentProps<typeof SearchExperience>,
-) {
+function ControlledSearch(props: React.ComponentProps<typeof SearchBox>) {
   const [query, setQuery] = useState(props.query);
   const [scope, setScope] = useState(props.scope);
 
   return (
-    <SearchExperience
+    <SearchBox
       {...props}
       onQueryChange={setQuery}
       onResultSelect={(item) => setQuery(item.title)}

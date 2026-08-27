@@ -20,7 +20,7 @@ import {
   EmptyState,
   FacetRow,
   ListToolbar,
-  LoadingRecordList,
+  LoadingList,
   TextInput,
   type ListSortOption,
 } from "../components";
@@ -251,7 +251,7 @@ export function EntityCatalogLoading({ title }: { title: string }) {
     <section aria-label={`${title} catalog`} {...stylex.props(styles.catalog)}>
       <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
       <div {...stylex.props(styles.loading)}>
-        <LoadingRecordList label={`Loading ${title.toLowerCase()}`} rows={4} />
+        <LoadingList label={`Loading ${title.toLowerCase()}`} rows={4} />
       </div>
     </section>
   );

@@ -7,18 +7,19 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { colors, controlMetrics, effects } from "../../../styles/tokens.stylex";
 import { ScopedSearch, type ScopedSearchOption } from "./scopedSearch.stylex";
 import {
-  SearchResultsPanel,
+  SearchResults,
   type SearchResultGroup,
   type SearchResultItem,
-  type SearchResultsPanelProps,
+  type SearchResultsProps,
 } from "./searchResults.stylex";
 
 const COMPACT = "@media (max-width: 559px)";
 
-export type SearchExperienceProps = Pick<
-  SearchResultsPanelProps,
+export type SearchBoxProps = Pick<
+  SearchResultsProps,
   "contribution" | "emptyText" | "onRetry" | "status" | "statusText"
 > & {
+  autoFocus?: boolean;
   defaultOpen?: boolean;
   disabled?: boolean;
   groups: readonly SearchResultGroup[];
@@ -28,13 +29,15 @@ export type SearchExperienceProps = Pick<
   onScopeChange: (scope: string) => void;
   onSubmit?: (query: string) => void;
   placeholder?: string;
+  placement?: "overlay" | "page";
   query: string;
   scope: string;
   scopes: readonly ScopedSearchOption[];
 };
 
 /** Owns the keyboard and disclosure behavior for Peated's scoped search UI. */
-export function SearchExperience({
+export function SearchBox({
+  autoFocus = false,
   contribution,
   defaultOpen = false,
   disabled = false,
@@ -47,12 +50,13 @@ export function SearchExperience({
   onScopeChange,
   onSubmit,
   placeholder = "bottles, distillers, brands…",
+  placement = "overlay",
   query,
   scope,
   scopes,
   status = "ready",
   statusText,
-}: SearchExperienceProps) {
+}: SearchBoxProps) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,7 +68,7 @@ export function SearchExperience({
     Boolean(emptyText) ||
     Boolean(contribution) ||
     status !== "ready";
-  const expanded = open && hasPanelContent;
+  const expanded = (placement === "page" || open) && hasPanelContent;
 
   useEffect(() => {
     function focusSearch(event: KeyboardEvent) {
@@ -101,14 +105,14 @@ export function SearchExperience({
         event.target instanceof Node &&
         !rootRef.current?.contains(event.target)
       ) {
-        setOpen(false);
+        if (placement === "overlay") setOpen(false);
       }
     }
 
     document.addEventListener("pointerdown", closeOnOutsidePress);
     return () =>
       document.removeEventListener("pointerdown", closeOnOutsidePress);
-  }, []);
+  }, [placement]);
 
   function moveActive(offset: -1 | 1) {
     if (!items.length) return;
@@ -163,9 +167,16 @@ export function SearchExperience({
   }
 
   return (
-    <div ref={rootRef} {...stylex.props(styles.root)}>
+    <div
+      ref={rootRef}
+      {...stylex.props(styles.root, placement === "page" && styles.pageRoot)}
+    >
       <div
-        {...stylex.props(styles.surface, expanded && styles.expandedSurface)}
+        {...stylex.props(
+          styles.surface,
+          expanded && styles.expandedSurface,
+          placement === "page" && styles.pageSurface,
+        )}
       >
         <ScopedSearch
           aria-activedescendant={
@@ -173,6 +184,7 @@ export function SearchExperience({
           }
           aria-autocomplete="list"
           aria-controls={expanded ? panelId : undefined}
+          autoFocus={autoFocus}
           disabled={disabled}
           expanded={expanded}
           inputRef={inputRef}
@@ -209,7 +221,7 @@ export function SearchExperience({
                 )}
               />
             </div>
-            <SearchResultsPanel
+            <SearchResults
               activeId={activeId}
               contribution={contribution}
               embedded
@@ -220,6 +232,7 @@ export function SearchExperience({
               optionIdPrefix={panelId}
               panelId={panelId}
               query={query}
+              scroll={placement === "overlay"}
               status={status}
               statusText={statusText}
             />
@@ -246,6 +259,10 @@ const styles = stylex.create({
       minHeight: controlMetrics.controlHeight,
     },
   },
+  pageRoot: {
+    height: "auto",
+    maxWidth: "880px",
+  },
   surface: {
     width: "100%",
   },
@@ -258,6 +275,14 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.ground,
     boxShadow: effects.overlayShadow,
+  },
+  pageSurface: {
+    position: "relative",
+    zIndex: 0,
+    top: "auto",
+    right: "auto",
+    left: "auto",
+    boxShadow: "none",
   },
   results: {
     width: "100%",

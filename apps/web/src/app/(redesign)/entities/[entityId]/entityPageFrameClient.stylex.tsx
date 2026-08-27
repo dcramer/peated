@@ -7,9 +7,9 @@ import type { ReactNode } from "react";
 
 import {
   ButtonLink,
-  ModuleError,
   PageTabs,
   RowMenu,
+  SectionError,
   type RowMenuItem,
 } from "@peated/web/components/designSystem/components";
 import { EntityPageHeader } from "@peated/web/components/designSystem/patterns/entityPageHeader.stylex";
@@ -116,12 +116,12 @@ export function EntityPageFrameClient({
 
   if (entityQuery.error) {
     return (
-      <ModuleError
+      <SectionError
         heading="Entity details are unavailable"
         onRetry={() => void entityQuery.refetch()}
       >
         We could not load this entity. Try again.
-      </ModuleError>
+      </SectionError>
     );
   }
 

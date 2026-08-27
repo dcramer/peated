@@ -1,4 +1,4 @@
-import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import LoginForm from "@peated/web/components/loginForm";
 import { getSafeRedirect } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";
@@ -19,8 +19,8 @@ export default async function Login(props: {
   }
 
   return (
-    <ProductAuthShell intro="database">
+    <AuthenticationPage intro="database">
       <LoginForm />
-    </ProductAuthShell>
+    </AuthenticationPage>
   );
 }

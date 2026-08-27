@@ -12,7 +12,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { OverlaySurface } from "./feedback.stylex";
+import { FloatingPanel } from "./feedback.stylex";
 
 export type EntityPickerKind = "brand" | "bottler" | "distiller" | "note";
 
@@ -202,7 +202,7 @@ export function EntityPicker({
             </div>
 
             {isOpen ? (
-              <OverlaySurface {...stylex.props(styles.overlay)}>
+              <FloatingPanel {...stylex.props(styles.overlay)}>
                 <div
                   aria-label={`${copy.label} results`}
                   id={listboxId}
@@ -266,7 +266,7 @@ export function EntityPicker({
                     </span>
                   </button>
                 ) : null}
-              </OverlaySurface>
+              </FloatingPanel>
             ) : null}
           </div>
 

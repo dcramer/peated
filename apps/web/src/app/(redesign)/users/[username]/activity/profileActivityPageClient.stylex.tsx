@@ -6,8 +6,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import {
   CursorPager,
-  LoadingRecordList,
-  ModuleError,
+  LoadingList,
+  SectionError,
   type TastingEntryMember,
 } from "@peated/web/components/designSystem/components";
 import {
@@ -46,14 +46,14 @@ export function ProfileActivityPageClient() {
     <PageColumns>
       <section aria-label={`${user.username}'s activity`}>
         {activityQuery.isPending ? (
-          <LoadingRecordList label="Loading member activity" rows={4} />
+          <LoadingList label="Loading member activity" rows={4} />
         ) : activityQuery.error ? (
-          <ModuleError
+          <SectionError
             heading="Activity is unavailable"
             onRetry={() => void activityQuery.refetch()}
           >
             The member profile is still available. Try loading activity again.
-          </ModuleError>
+          </SectionError>
         ) : (
           <>
             <MemberActivityList

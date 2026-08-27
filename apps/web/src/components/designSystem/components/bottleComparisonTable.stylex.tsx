@@ -5,7 +5,7 @@ import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
-export type RecordTableRow = {
+export type BottleComparisonRow = {
   href?: string;
   id: string;
   metadata?: string;
@@ -13,22 +13,22 @@ export type RecordTableRow = {
   values: readonly [ReactNode, ReactNode];
 };
 
-export type RecordTableProps = {
+export type BottleComparisonTableProps = {
   ariaLabel?: string;
   columns: readonly [string, string];
   detail?: string;
   heading?: string;
-  rows: readonly [RecordTableRow, ...RecordTableRow[]];
+  rows: readonly [BottleComparisonRow, ...BottleComparisonRow[]];
 };
 
-/** Compares one record set across two compact measures. */
-export function RecordTable({
+/** Compares bottles across two compact measures. */
+export function BottleComparisonTable({
   ariaLabel = "Bottle records",
   columns,
   detail,
   heading,
   rows,
-}: RecordTableProps) {
+}: BottleComparisonTableProps) {
   const headingId = useId();
 
   return (

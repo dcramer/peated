@@ -2,10 +2,10 @@
 
 import { ButtonLink } from "@peated/web/components/designSystem/components";
 import {
-  AuthNotice,
-  AuthPanel,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
-import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
+  AuthenticationNotice,
+  AuthenticationPanel,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { logError } from "@peated/web/lib/log";
@@ -64,44 +64,46 @@ export default function Verify() {
   let panel;
   if (loading) {
     panel = (
-      <AuthPanel
+      <AuthenticationPanel
         description="This usually takes only a moment."
         title="Verifying your account"
       >
-        <AuthNotice>Checking your verification link…</AuthNotice>
-      </AuthPanel>
+        <AuthenticationNotice>
+          Checking your verification link…
+        </AuthenticationNotice>
+      </AuthenticationPanel>
     );
   } else if (error) {
     panel = (
-      <AuthPanel
+      <AuthenticationPanel
         description="The link may have expired or already been used."
         title="We couldn’t verify this account"
       >
-        <AuthNotice>{error}</AuthNotice>
+        <AuthenticationNotice>{error}</AuthenticationNotice>
         <ResendVerificationForm />
-      </AuthPanel>
+      </AuthenticationPanel>
     );
   } else if (success) {
     panel = (
-      <AuthPanel
+      <AuthenticationPanel
         description="Your email address is confirmed."
         title="Account verified"
       >
         <ButtonLink align="start" fullWidth href="/" size="lg" variant="accent">
           Return to Peated
         </ButtonLink>
-      </AuthPanel>
+      </AuthenticationPanel>
     );
   } else {
     panel = (
-      <AuthPanel
+      <AuthenticationPanel
         description="Use the link in your inbox to finish setting up your account."
         title="Check your email"
       >
         <ResendVerificationForm />
-      </AuthPanel>
+      </AuthenticationPanel>
     );
   }
 
-  return <ProductAuthShell intro="account">{panel}</ProductAuthShell>;
+  return <AuthenticationPage intro="account">{panel}</AuthenticationPage>;
 }

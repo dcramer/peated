@@ -6,15 +6,15 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import {
+  BottleComparisonTable,
   ButtonLink,
   EmptyState,
   FactList,
-  LoadingRecordList,
-  ModuleError,
-  RecordTable,
+  LoadingList,
+  SectionError,
   VerdictDistributionBar,
+  type BottleComparisonRow,
   type FactListItem,
-  type RecordTableRow,
 } from "@peated/web/components/designSystem/components";
 import {
   PageSection,
@@ -114,7 +114,7 @@ function formatAbv(abv: number) {
 
 function toBottleTableRow(
   bottle: BottleList["results"][number],
-): RecordTableRow {
+): BottleComparisonRow {
   return {
     href: `/bottles/${bottle.id}`,
     id: bottle.peatedId,
@@ -167,7 +167,7 @@ function EntityBottleOverview({
   if (pending) {
     return (
       <PageSection heading={presentation.bottleSectionLabel}>
-        <LoadingRecordList label="Loading associated bottles" rows={4} />
+        <LoadingList label="Loading associated bottles" rows={4} />
       </PageSection>
     );
   }
@@ -175,12 +175,12 @@ function EntityBottleOverview({
   if (error) {
     return (
       <PageSection heading={presentation.bottleSectionLabel}>
-        <ModuleError
+        <SectionError
           heading="Associated bottles are unavailable"
           onRetry={retry}
         >
           The entity record is still available. Try loading its bottles again.
-        </ModuleError>
+        </SectionError>
       </PageSection>
     );
   }
@@ -223,7 +223,7 @@ function EntityBottleOverview({
         </TextLink>
       }
     >
-      <RecordTable
+      <BottleComparisonTable
         ariaLabel={`${entity.name} ${presentation.bottleSectionLabel.toLowerCase()}`}
         columns={["Community score", "Verdicts"]}
         rows={[
@@ -259,12 +259,12 @@ export function EntityOverviewClient({
 
   if (entityQuery.error) {
     return (
-      <ModuleError
+      <SectionError
         heading="Entity details are unavailable"
         onRetry={() => void entityQuery.refetch()}
       >
         We could not load this entity. Try again.
-      </ModuleError>
+      </SectionError>
     );
   }
 

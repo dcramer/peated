@@ -50,7 +50,7 @@ const countries = [
 ] as const;
 
 const meta = {
-  title: "Patterns/Entity Catalog",
+  title: "Patterns/Entities/Catalog",
   component: EntityCatalogList,
   decorators: [
     (Story) => (

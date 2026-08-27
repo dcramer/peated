@@ -6,7 +6,7 @@ import type {
   SearchResultGroup,
   SearchResultItem,
 } from "@peated/web/components/designSystem/components";
-import { SearchExperience } from "@peated/web/components/designSystem/components";
+import { SearchBox } from "@peated/web/components/designSystem/components";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
-const scopes = [
+const searchScopes = [
   { label: "Everything", value: "all" },
   { label: "Bottles", value: "bottles" },
   { label: "Distillers", value: "distillers" },
@@ -54,10 +54,32 @@ type MemberSearchResult = Extract<
   SearchGroup,
   { type: "members" }
 >["results"][number];
-type SearchScope = (typeof scopes)[number]["value"];
+export type SearchScope = (typeof searchScopes)[number]["value"];
+
+export type SearchProps = {
+  autoFocus?: boolean;
+  defaultOpen?: boolean;
+  getBottleHref?: (bottleId: number) => string;
+  getContributionHref?: (query: string) => string;
+  initialQuery?: string;
+  initialScope?: SearchScope;
+  limit?: number;
+  onSubmit?: (query: string) => void;
+  placement?: "overlay" | "page";
+  scopeValues?: readonly SearchScope[];
+  showBottleMeasures?: boolean;
+};
 
 const SEARCH_DEBOUNCE_MS = 140;
 const SEARCH_INDICATOR_FLOOR_MS = 250;
+
+function getDefaultBottleHref(bottleId: number) {
+  return `/bottles/${bottleId}`;
+}
+
+function getDefaultContributionHref(query: string) {
+  return getCreateBottleHref({ query });
+}
 
 function waitForSearchIndicator() {
   return new Promise<void>((resolve) => {
@@ -66,7 +88,7 @@ function waitForSearchIndicator() {
 }
 
 function isSearchScope(value: string): value is SearchScope {
-  return scopes.some((scope) => scope.value === value);
+  return searchScopes.some((scope) => scope.value === value);
 }
 
 function getApiScopes(scope: SearchScope, signedIn: boolean) {
@@ -80,11 +102,20 @@ function getSearchingText(scope: SearchScope, signedIn: boolean) {
       ? "Searching bottles, entities, and members…"
       : "Searching bottles and entities…";
   }
-  const label = scopes.find((option) => option.value === scope)?.label;
+  const label = searchScopes.find((option) => option.value === scope)?.label;
   return label ? `Searching ${label.toLocaleLowerCase()}…` : "Searching…";
 }
 
-function bottleItem(bottle: BottleSearchResult) {
+function bottleItem(
+  bottle: BottleSearchResult,
+  {
+    getBottleHref,
+    showMeasures,
+  }: {
+    getBottleHref: (bottleId: number) => string;
+    showMeasures: boolean;
+  },
+) {
   const metadata = [
     bottle.brand.name,
     bottle.category ? formatCategoryName(bottle.category) : null,
@@ -93,22 +124,24 @@ function bottleItem(bottle: BottleSearchResult) {
   ].filter((value): value is string => Boolean(value));
 
   return {
-    href: `/bottles/${bottle.id}`,
+    href: getBottleHref(bottle.id),
     id: `bottle-${bottle.id}`,
-    measures: {
-      score:
-        bottle.avgScore === null || bottle.totalScores === 0
-          ? undefined
-          : { count: bottle.totalScores, value: bottle.avgScore },
-      verdict:
-        bottle.ratingStats.total === 0
-          ? undefined
-          : {
-              pass: bottle.ratingStats.pass,
-              savor: bottle.ratingStats.savor,
-              sip: bottle.ratingStats.sip,
-            },
-    },
+    measures: showMeasures
+      ? {
+          score:
+            bottle.avgScore === null || bottle.totalScores === 0
+              ? undefined
+              : { count: bottle.totalScores, value: bottle.avgScore },
+          verdict:
+            bottle.ratingStats.total === 0
+              ? undefined
+              : {
+                  pass: bottle.ratingStats.pass,
+                  savor: bottle.ratingStats.savor,
+                  sip: bottle.ratingStats.sip,
+                },
+        }
+      : undefined,
     metadata: metadata.join(" · "),
     title: bottle.fullName,
     visual: {
@@ -187,10 +220,15 @@ function getMoreHref(query: string, type: SearchGroup["type"]) {
     : `/search?q=${encodedQuery}`;
 }
 
-function groupItems(group: SearchGroup): SearchResultItem[] {
+type BottleItemOptions = Parameters<typeof bottleItem>[1];
+
+function groupItems(
+  group: SearchGroup,
+  bottleOptions: BottleItemOptions,
+): SearchResultItem[] {
   switch (group.type) {
     case "bottles":
-      return group.results.map(bottleItem);
+      return group.results.map((bottle) => bottleItem(bottle, bottleOptions));
     case "distillers":
     case "brands":
     case "bottlers":
@@ -207,12 +245,14 @@ function groupItems(group: SearchGroup): SearchResultItem[] {
 function resultGroups(
   response: SearchResponse,
   query: string,
+  bottleOptions: BottleItemOptions,
+  showMoreLinks: boolean,
 ): SearchResultGroup[] {
   if (response.exact) {
     return [
       {
         id: "exact",
-        items: [exactItem(response.exact)],
+        items: [exactItem(response.exact, bottleOptions)],
         label: "Exact match",
         total: 1,
       },
@@ -220,7 +260,7 @@ function resultGroups(
   }
 
   const groups = response.groups.flatMap((group): SearchResultGroup[] => {
-    const items = groupItems(group);
+    const items = groupItems(group, bottleOptions);
     if (!items.length) return [];
     return [
       {
@@ -228,7 +268,7 @@ function resultGroups(
         items,
         label: getGroupLabel(group.type),
         moreHref:
-          group.total > items.length
+          showMoreLinks && group.total > items.length
             ? getMoreHref(query, group.type)
             : undefined,
         total: group.total,
@@ -239,23 +279,25 @@ function resultGroups(
   if (!groups.length && response.nearest.length) {
     groups.push({
       id: "nearest",
-      items: response.nearest.map(nearestItem),
+      items: response.nearest.map((nearest) =>
+        nearestItem(nearest, bottleOptions),
+      ),
       label: "Did you mean?",
     });
   }
   return groups;
 }
 
-function exactItem(exact: SearchExact) {
+function exactItem(exact: SearchExact, bottleOptions: BottleItemOptions) {
   return exact.type === "bottle"
-    ? bottleItem(exact.ref)
+    ? bottleItem(exact.ref, bottleOptions)
     : entityItem(exact.ref);
 }
 
-function nearestItem(nearest: SearchNearest) {
+function nearestItem(nearest: SearchNearest, bottleOptions: BottleItemOptions) {
   switch (nearest.type) {
     case "bottles":
-      return bottleItem(nearest.result);
+      return bottleItem(nearest.result, bottleOptions);
     case "distillers":
     case "brands":
     case "bottlers":
@@ -281,12 +323,24 @@ function getScopeCount(
   );
 }
 
-export function ProductSearch() {
+export function Search({
+  autoFocus = false,
+  defaultOpen = false,
+  getBottleHref = getDefaultBottleHref,
+  getContributionHref = getDefaultContributionHref,
+  initialQuery = "",
+  initialScope = "all",
+  limit = 3,
+  onSubmit,
+  placement = "overlay",
+  scopeValues,
+  showBottleMeasures = true,
+}: SearchProps = {}) {
   const { user } = useAuth();
   const orpc = useORPC();
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [scope, setScope] = useState<SearchScope>("all");
+  const [query, setQuery] = useState(initialQuery);
+  const [scope, setScope] = useState<SearchScope>(initialScope);
   const [groups, setGroups] = useState<SearchResultGroup[]>([]);
   const [emptyText, setEmptyText] = useState<string>();
   const [hasExactResult, setHasExactResult] = useState(false);
@@ -294,12 +348,23 @@ export function ProductSearch() {
     useState<SearchResponse["scopeTotals"]>();
   const [settledQuery, setSettledQuery] = useState<string>();
   const [status, setStatus] = useState<"error" | "ready" | "searching">(
-    "ready",
+    initialQuery.trim() ? "searching" : "ready",
   );
   const latestRequest = useRef(0);
-  const availableScopes = (
-    user ? scopes : scopes.filter((option) => option.value !== "members")
-  ).map((option) => ({
+  const initialSearchStarted = useRef(false);
+  const previousInitialQuery = useRef(initialQuery);
+  const previousInitialScope = useRef(initialScope);
+  const availableScopeDefinitions = scopeValues
+    ? searchScopes.filter((option) => scopeValues.includes(option.value))
+    : user
+      ? searchScopes
+      : searchScopes.filter((option) => option.value !== "members");
+  const effectiveScope = availableScopeDefinitions.some(
+    (option) => option.value === scope,
+  )
+    ? scope
+    : (availableScopeDefinitions[0]?.value ?? "all");
+  const availableScopes = availableScopeDefinitions.map((option) => ({
     ...option,
     count: getScopeCount(option.value, scopeTotals),
   }));
@@ -323,14 +388,19 @@ export function ProductSearch() {
       try {
         const [response] = await Promise.all([
           orpc.search.call({
-            limit: 3,
+            limit,
             query: trimmedQuery,
             scopes: [...getApiScopes(nextScope, Boolean(user))],
           }),
           indicatorFloor,
         ]);
         if (latestRequest.current !== requestId) return;
-        const nextGroups = resultGroups(response, trimmedQuery);
+        const nextGroups = resultGroups(
+          response,
+          trimmedQuery,
+          { getBottleHref, showMeasures: showBottleMeasures },
+          placement === "overlay",
+        );
         const hasMatches =
           Boolean(response.exact) ||
           response.groups.some((group) => group.results.length > 0);
@@ -352,11 +422,33 @@ export function ProductSearch() {
         setStatus("error");
       }
     },
-    [orpc, user],
+    [getBottleHref, limit, orpc, placement, showBottleMeasures, user],
   );
   const debouncedSearch = useDebounceCallback(runSearch, SEARCH_DEBOUNCE_MS);
 
   useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
+
+  useEffect(() => {
+    if (initialSearchStarted.current || !initialQuery.trim()) return;
+    initialSearchStarted.current = true;
+    void runSearch(initialQuery, effectiveScope);
+  }, [effectiveScope, initialQuery, runSearch]);
+
+  useEffect(() => {
+    if (previousInitialQuery.current === initialQuery) return;
+    previousInitialQuery.current = initialQuery;
+    setQuery(initialQuery);
+    debouncedSearch.cancel();
+    void runSearch(initialQuery, effectiveScope);
+  }, [debouncedSearch, effectiveScope, initialQuery, runSearch]);
+
+  useEffect(() => {
+    if (previousInitialScope.current === initialScope) return;
+    previousInitialScope.current = initialScope;
+    setScope(initialScope);
+    debouncedSearch.cancel();
+    void runSearch(query, initialScope);
+  }, [debouncedSearch, initialScope, query, runSearch]);
 
   function updateQuery(nextQuery: string) {
     setQuery(nextQuery);
@@ -370,29 +462,29 @@ export function ProductSearch() {
       setStatus("ready");
       return;
     }
-    void debouncedSearch(nextQuery, scope);
+    void debouncedSearch(nextQuery, effectiveScope);
   }
 
   return (
-    <SearchExperience
+    <SearchBox
+      autoFocus={autoFocus}
       contribution={
         query.trim() &&
         settledQuery &&
         !hasExactResult &&
-        (scope === "all" || scope === "bottles")
+        (effectiveScope === "all" || effectiveScope === "bottles")
           ? {
               description: `Can't find “${settledQuery}”?`,
-              href: getCreateBottleHref({
-                query: settledQuery,
-              }),
+              href: getContributionHref(settledQuery),
               label: "Record a bottle",
             }
           : undefined
       }
+      defaultOpen={defaultOpen || placement === "page"}
       emptyText={emptyText}
       groups={groups}
       onQueryChange={updateQuery}
-      onRetry={() => void runSearch(query, scope)}
+      onRetry={() => void runSearch(query, effectiveScope)}
       onResultSelect={(item) => router.push(item.href)}
       onScopeChange={(nextScope) => {
         if (!isSearchScope(nextScope)) return;
@@ -400,15 +492,25 @@ export function ProductSearch() {
         setScope(nextScope);
         void runSearch(query, nextScope);
       }}
-      onSubmit={(value) =>
-        router.push(`/search?q=${encodeURIComponent(value.trim())}`)
-      }
+      onSubmit={(value) => {
+        const trimmedValue = value.trim();
+        if (onSubmit) {
+          onSubmit(trimmedValue);
+          return;
+        }
+        router.push(`/search?q=${encodeURIComponent(trimmedValue)}`);
+      }}
+      placement={placement}
       placeholder="bottles, distillers, brands…"
       query={query}
-      scope={scope}
+      scope={effectiveScope}
       scopes={availableScopes}
       status={status}
-      statusText={getSearchingText(scope, Boolean(user))}
+      statusText={
+        status === "searching"
+          ? getSearchingText(effectiveScope, Boolean(user))
+          : undefined
+      }
     />
   );
 }

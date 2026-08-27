@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
 
-export type PageStateProps = {
+export type ErrorPageProps = {
   actions?: ReactNode;
   children: ReactNode;
   detail?: ReactNode;
@@ -13,7 +13,7 @@ export type PageStateProps = {
   title: ReactNode;
 };
 
-export function PageStateShell({ children }: { children: ReactNode }) {
+export function ErrorPageLayout({ children }: { children: ReactNode }) {
   return (
     <main
       {...stylex.props(foundationStyles.document, shellStyles.shell)}
@@ -28,31 +28,31 @@ export function PageStateShell({ children }: { children: ReactNode }) {
  * Presents a page-level state after the owning route has decided that its
  * normal page content cannot render.
  */
-export function PageState({
+export function ErrorPage({
   actions,
   children,
   detail,
   status,
   support,
   title,
-}: PageStateProps) {
+}: ErrorPageProps) {
   return (
     <section {...stylex.props(styles.root)}>
       <div {...stylex.props(styles.status)}>{status}</div>
       <h1 {...stylex.props(styles.title)}>{title}</h1>
       <div {...stylex.props(styles.description)}>{children}</div>
-      {actions ? <PageStateActions>{actions}</PageStateActions> : null}
+      {actions ? <ErrorPageActions>{actions}</ErrorPageActions> : null}
       {detail ? <div {...stylex.props(styles.detail)}>{detail}</div> : null}
       {support}
     </section>
   );
 }
 
-export function PageStateActions({ children }: { children: ReactNode }) {
+export function ErrorPageActions({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.actions)}>{children}</div>;
 }
 
-export type PageStateReferenceProps = {
+export type ErrorReferenceProps = {
   action?: ReactNode;
   description?: ReactNode;
   label: ReactNode;
@@ -68,13 +68,13 @@ export type PageStateReferenceProps = {
  * Shows a route or incident reference. Its caller owns the redaction boundary
  * for any technical detail that can appear in production.
  */
-export function PageStateReference({
+export function ErrorReference({
   action,
   description,
   label,
   technicalDetail,
   value,
-}: PageStateReferenceProps) {
+}: ErrorReferenceProps) {
   return (
     <div {...stylex.props(styles.reference)}>
       <div {...stylex.props(styles.referenceRow)}>
@@ -111,7 +111,7 @@ export function PageStateReference({
   );
 }
 
-export function PageStateSupport({
+export function ErrorSupport({
   action,
   children,
 }: {

@@ -2,41 +2,46 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button, ButtonLink } from "../components";
 import {
-  AuthActionStack,
-  AuthDivider,
-  AuthFooterLinks,
-  AuthIntro,
-  AuthLink,
-  AuthPanel,
-  AuthShell,
-} from "./authShell.stylex";
+  AuthenticationActions,
+  AuthenticationDivider,
+  AuthenticationIntro,
+  AuthenticationLayout,
+  AuthenticationLink,
+  AuthenticationLinks,
+  AuthenticationPanel,
+} from "./authentication.stylex";
 
 function SignInShell() {
   return (
-    <AuthShell
+    <AuthenticationLayout
       intro={
-        <AuthIntro
+        <AuthenticationIntro
           artwork={{
             alt: "",
             src: "/assets/auth-discovery-illustration.webp",
           }}
           description="Sign in to record what you pour, keep your library, and see critic and community views side by side."
           facts={[
-            { label: "Bottles", value: "47,402" },
-            { label: "Brands, distillers & bottlers", value: "2,418" },
+            { label: "Bottles", value: "28,430" },
+            { label: "Distillers", value: "2,410" },
+            { label: "Brands", value: "3,980" },
+            { label: "Bottlers", value: "1,125" },
+            { label: "Blenders", value: "420" },
           ]}
           footer={
-            <AuthLink href="/bottles">Browse without an account →</AuthLink>
+            <AuthenticationLink href="/bottles">
+              Browse without an account →
+            </AuthenticationLink>
           }
           title="Every bottle, every review, in one place."
         />
       }
     >
-      <AuthPanel
+      <AuthenticationPanel
         description="A passkey is fastest. Email works everywhere."
         title="Sign in"
       >
-        <AuthActionStack>
+        <AuthenticationActions>
           <Button align="start" fullWidth size="lg" variant="tonal">
             Continue with a passkey
           </Button>
@@ -46,26 +51,28 @@ function SignInShell() {
           <Button align="start" fullWidth size="lg" variant="tonal">
             Continue with email
           </Button>
-        </AuthActionStack>
-        <AuthDivider />
-        <AuthFooterLinks>
+        </AuthenticationActions>
+        <AuthenticationDivider />
+        <AuthenticationLinks>
           <span>No account yet?</span>
-          <AuthLink href="/register">Create one</AuthLink>
-        </AuthFooterLinks>
-        <AuthFooterLinks>
+          <AuthenticationLink href="/register">Create one</AuthenticationLink>
+        </AuthenticationLinks>
+        <AuthenticationLinks>
           <span>Lost access?</span>
-          <AuthLink href="/recover-account">Recover your account</AuthLink>
-        </AuthFooterLinks>
-      </AuthPanel>
-    </AuthShell>
+          <AuthenticationLink href="/recover-account">
+            Recover your account
+          </AuthenticationLink>
+        </AuthenticationLinks>
+      </AuthenticationPanel>
+    </AuthenticationLayout>
   );
 }
 
 function RegistrationShell() {
   return (
-    <AuthShell
+    <AuthenticationLayout
       intro={
-        <AuthIntro
+        <AuthenticationIntro
           footer="Your tastings stay yours — export them at any time."
           points={[
             "Log a dram in three taps, then add a note when you want one.",
@@ -76,11 +83,11 @@ function RegistrationShell() {
         />
       }
     >
-      <AuthPanel
+      <AuthenticationPanel
         description="Two fields and a passkey. No password to remember."
         title="Create an account"
       >
-        <AuthActionStack>
+        <AuthenticationActions>
           <ButtonLink
             align="start"
             fullWidth
@@ -99,15 +106,15 @@ function RegistrationShell() {
           >
             Create account with a passkey
           </ButtonLink>
-        </AuthActionStack>
-      </AuthPanel>
-    </AuthShell>
+        </AuthenticationActions>
+      </AuthenticationPanel>
+    </AuthenticationLayout>
   );
 }
 
 const meta = {
-  title: "Patterns/Authentication/Auth Shell",
-  component: AuthShell,
+  title: "Patterns/Authentication/Layout",
+  component: AuthenticationLayout,
   args: {
     children: null,
     intro: null,
@@ -117,7 +124,7 @@ const meta = {
     intro: { control: false },
   },
   parameters: { layout: "fullscreen" },
-} satisfies Meta<typeof AuthShell>;
+} satisfies Meta<typeof AuthenticationLayout>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

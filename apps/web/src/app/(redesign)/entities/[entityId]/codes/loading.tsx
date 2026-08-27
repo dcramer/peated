@@ -1,5 +1,5 @@
-import { LoadingRecordList } from "@peated/web/components/designSystem/components";
+import { LoadingList } from "@peated/web/components/designSystem/components";
 
 export default function EntityCodesLoading() {
-  return <LoadingRecordList label="Loading distillery codes" rows={4} />;
+  return <LoadingList label="Loading distillery codes" rows={4} />;
 }

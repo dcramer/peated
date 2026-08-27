@@ -13,31 +13,31 @@ import Link from "../../link";
 const NARROW = "@media (max-width: 759px)";
 const DARK = "@media (prefers-color-scheme: dark)";
 
-export type AuthFact = {
+export type AuthenticationFact = {
   label: string;
   value: ReactNode;
 };
 
-export type AuthIntroProps = {
+export type AuthenticationIntroProps = {
   artwork?: {
     alt: string;
     src: string;
   };
   description?: ReactNode;
-  facts?: readonly AuthFact[];
+  facts?: readonly AuthenticationFact[];
   footer?: ReactNode;
   points?: readonly ReactNode[];
   title: ReactNode;
 };
 
-export function AuthIntro({
+export function AuthenticationIntro({
   artwork,
   description,
   facts,
   footer,
   points,
   title,
-}: AuthIntroProps) {
+}: AuthenticationIntroProps) {
   return (
     <aside {...stylex.props(styles.intro)}>
       {artwork ? (
@@ -82,7 +82,7 @@ export function AuthIntro({
   );
 }
 
-export function AuthShell({
+export function AuthenticationLayout({
   children,
   intro,
 }: {
@@ -97,7 +97,7 @@ export function AuthShell({
   );
 }
 
-export function AuthPanel({
+export function AuthenticationPanel({
   back,
   children,
   description,
@@ -120,15 +120,15 @@ export function AuthPanel({
   );
 }
 
-export function AuthFormSurface({ children }: { children: ReactNode }) {
+export function AuthenticationCard({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.formSurface)}>{children}</div>;
 }
 
-export function AuthActionStack({ children }: { children: ReactNode }) {
+export function AuthenticationActions({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.actionStack)}>{children}</div>;
 }
 
-export function AuthDivider({ label }: { label?: string }) {
+export function AuthenticationDivider({ label }: { label?: string }) {
   return (
     <div aria-hidden="true" {...stylex.props(styles.divider)}>
       <span {...stylex.props(styles.rule)} />
@@ -140,13 +140,16 @@ export function AuthDivider({ label }: { label?: string }) {
   );
 }
 
-type AuthLinkProps = Omit<ComponentProps<typeof Link>, "className" | "style">;
+type AuthenticationLinkProps = Omit<
+  ComponentProps<typeof Link>,
+  "className" | "style"
+>;
 
-export function AuthLink(props: AuthLinkProps) {
+export function AuthenticationLink(props: AuthenticationLinkProps) {
   return <Link {...props} {...stylex.props(styles.link)} />;
 }
 
-export function AuthTextButton({
+export function AuthenticationTextButton({
   children,
   ...props
 }: Omit<ComponentProps<"button">, "className" | "style">) {
@@ -157,11 +160,11 @@ export function AuthTextButton({
   );
 }
 
-export function AuthFooterLinks({ children }: { children: ReactNode }) {
+export function AuthenticationLinks({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.footerLinks)}>{children}</div>;
 }
 
-export function AuthNotice({ children }: { children: ReactNode }) {
+export function AuthenticationNotice({ children }: { children: ReactNode }) {
   return (
     <div role="alert" {...stylex.props(styles.notice)}>
       {children}
@@ -169,7 +172,11 @@ export function AuthNotice({ children }: { children: ReactNode }) {
   );
 }
 
-export function AuthDetailList({ items }: { items: readonly ReactNode[] }) {
+export function AuthenticationDetails({
+  items,
+}: {
+  items: readonly ReactNode[];
+}) {
   return (
     <ul {...stylex.props(styles.detailList)}>
       {items.map((item, index) => (

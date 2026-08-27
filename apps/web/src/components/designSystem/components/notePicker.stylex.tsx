@@ -14,7 +14,7 @@ import {
 } from "../../../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { Chip } from "./chip.stylex";
-import { OverlaySurface } from "./feedback.stylex";
+import { FloatingPanel } from "./feedback.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -166,7 +166,7 @@ export function NotePickerField({
       </div>
 
       {suggestionsOpen ? (
-        <OverlaySurface {...stylex.props(styles.suggestionOverlay)}>
+        <FloatingPanel {...stylex.props(styles.suggestionOverlay)}>
           <div id={listboxId} role="listbox">
             {matches.length ? (
               matches.map((note, index) => (
@@ -197,7 +197,7 @@ export function NotePickerField({
               </p>
             )}
           </div>
-        </OverlaySurface>
+        </FloatingPanel>
       ) : null}
 
       {isBrowserOpen ? (
@@ -267,7 +267,7 @@ export function NotePicker({
     : "none";
 
   return (
-    <OverlaySurface
+    <FloatingPanel
       aria-labelledby={titleId}
       data-state="open"
       role="dialog"
@@ -387,7 +387,7 @@ export function NotePicker({
           </Button>
         ) : null}
       </footer>
-    </OverlaySurface>
+    </FloatingPanel>
   );
 }
 

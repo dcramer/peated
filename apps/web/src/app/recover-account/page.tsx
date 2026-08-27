@@ -1,4 +1,4 @@
-import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import PasswordResetChangeForm from "@peated/web/components/passwordResetChangeForm";
 import PasswordResetForm from "@peated/web/components/passwordResetForm";
 import { type Metadata } from "next";
@@ -15,12 +15,12 @@ export default async function PasswordReset(props: {
   const email = searchParams.email ?? "";
 
   return (
-    <ProductAuthShell intro="database">
+    <AuthenticationPage intro="database">
       {token ? (
         <PasswordResetChangeForm token={token} />
       ) : (
         <PasswordResetForm initialEmail={email} />
       )}
-    </ProductAuthShell>
+    </AuthenticationPage>
   );
 }

@@ -7,15 +7,15 @@ import {
   TextInput,
 } from "@peated/web/components/designSystem/components";
 import {
-  AuthActionStack,
-  AuthDivider,
-  AuthFooterLinks,
-  AuthFormSurface,
-  AuthLink,
-  AuthNotice,
-  AuthPanel,
-  AuthTextButton,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationDivider,
+  AuthenticationLink,
+  AuthenticationLinks,
+  AuthenticationNotice,
+  AuthenticationPanel,
+  AuthenticationTextButton,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import PasskeyLoginButton from "@peated/web/components/passkeyLoginButton";
 import PasskeyRegisterButton from "@peated/web/components/passkeyRegisterButton";
@@ -39,12 +39,12 @@ export default function RegisterForm() {
 
   if (conflictField === "email") {
     return (
-      <AuthPanel
+      <AuthenticationPanel
         description="Sign in with an existing passkey, choose another method, or recover access."
         title="That email already has an account"
       >
-        {error ? <AuthNotice>{error}</AuthNotice> : null}
-        <AuthActionStack>
+        {error ? <AuthenticationNotice>{error}</AuthenticationNotice> : null}
+        <AuthenticationActions>
           <PasskeyLoginButton action={authenticate} />
           <ButtonLink
             align="start"
@@ -55,40 +55,40 @@ export default function RegisterForm() {
           >
             Other sign-in options
           </ButtonLink>
-        </AuthActionStack>
-        <AuthDivider />
-        <AuthFooterLinks>
-          <AuthLink
+        </AuthenticationActions>
+        <AuthenticationDivider />
+        <AuthenticationLinks>
+          <AuthenticationLink
             href={`/recover-account?email=${encodeURIComponent(email)}`}
           >
             Recover your account
-          </AuthLink>
+          </AuthenticationLink>
           <span>·</span>
-          <AuthTextButton type="button" onClick={clearFeedback}>
+          <AuthenticationTextButton type="button" onClick={clearFeedback}>
             Use a different email
-          </AuthTextButton>
-        </AuthFooterLinks>
-      </AuthPanel>
+          </AuthenticationTextButton>
+        </AuthenticationLinks>
+      </AuthenticationPanel>
     );
   }
 
   return (
-    <AuthPanel
+    <AuthenticationPanel
       description="Two fields and a passkey. No password to remember."
       title="Create an account"
     >
-      {error ? <AuthNotice>{error}</AuthNotice> : null}
-      <AuthActionStack>
+      {error ? <AuthenticationNotice>{error}</AuthenticationNotice> : null}
+      <AuthenticationActions>
         {config.GOOGLE_CLIENT_ID ? (
           <>
             <GoogleLoginButton
               action={authenticate}
               title="Sign up with Google"
             />
-            <AuthDivider label="or" />
+            <AuthenticationDivider label="or" />
           </>
         ) : null}
-        <AuthFormSurface>
+        <AuthenticationCard>
           <Field htmlFor="register-email" label="Email" required>
             <TextInput
               autoComplete="email"
@@ -129,14 +129,17 @@ export default function RegisterForm() {
             label={
               <>
                 I agree to the{" "}
-                <AuthLink href="/terms">Terms of Service</AuthLink>.
+                <AuthenticationLink href="/terms">
+                  Terms of Service
+                </AuthenticationLink>
+                .
               </>
             }
             name="tosAccepted"
             onChange={(event) => setTosAccepted(event.currentTarget.checked)}
             required
           />
-        </AuthFormSurface>
+        </AuthenticationCard>
         <PasskeyRegisterButton
           action={register}
           email={email}
@@ -151,12 +154,12 @@ export default function RegisterForm() {
           tosAccepted={tosAccepted}
           username={username}
         />
-      </AuthActionStack>
-      <AuthDivider />
-      <AuthFooterLinks>
+      </AuthenticationActions>
+      <AuthenticationDivider />
+      <AuthenticationLinks>
         <span>Already have an account?</span>
-        <AuthLink href="/login">Sign in</AuthLink>
-      </AuthFooterLinks>
-    </AuthPanel>
+        <AuthenticationLink href="/login">Sign in</AuthenticationLink>
+      </AuthenticationLinks>
+    </AuthenticationPanel>
   );
 }

@@ -15,10 +15,10 @@ import {
   Button,
   ButtonLink,
   EmptyState,
-  LoadingRecordList,
-  ModuleError,
+  LoadingList,
   PageTabs,
   RowMenu,
+  SectionError,
   VerdictDistributionBar,
   type CriticReviewProps,
   type FactListItem,
@@ -357,12 +357,12 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
 
   if (bottleQuery.error) {
     return (
-      <ModuleError
+      <SectionError
         heading="Bottle details are unavailable"
         onRetry={() => void bottleQuery.refetch()}
       >
         We could not load this bottle. Try again.
-      </ModuleError>
+      </SectionError>
     );
   }
 
@@ -405,9 +405,9 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
     !mainPending &&
     Boolean(reviewsQuery.error && tastingsQuery.error);
   const mainState = mainPending ? (
-    <LoadingRecordList label="Loading bottle reviews and tastings" rows={3} />
+    <LoadingList label="Loading bottle reviews and tastings" rows={3} />
   ) : mainFailed ? (
-    <ModuleError
+    <SectionError
       heading="Reviews and tastings are unavailable"
       onRetry={() => {
         void reviewsQuery.refetch();
@@ -415,7 +415,7 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
       }}
     >
       We could not load this bottle's reviews or tastings. Try again.
-    </ModuleError>
+    </SectionError>
   ) : !criticReviews.length && !tastings.length ? (
     <EmptyState
       action={

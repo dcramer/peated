@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
-import { RecordTable, type RecordTableProps } from "./recordTable.stylex";
+import {
+  BottleComparisonTable,
+  type BottleComparisonTableProps,
+} from "./bottleComparisonTable.stylex";
 import { VerdictDistributionBar } from "./scoring.stylex";
 
-const rows: RecordTableProps["rows"] = [
+const rows: BottleComparisonTableProps["rows"] = [
   {
     href: "/bottles/1",
     id: "1",
@@ -38,8 +41,8 @@ const rows: RecordTableProps["rows"] = [
 ];
 
 const meta = {
-  title: "Components/Data Display/Record Table",
-  component: RecordTable,
+  title: "Components/Data Display/Bottle Comparison Table",
+  component: BottleComparisonTable,
   args: {
     columns: ["Community score", "Verdicts"],
     detail: "3 bottles in this set",
@@ -54,22 +57,22 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<RecordTableProps>;
+} satisfies Meta<BottleComparisonTableProps>;
 
 export default meta;
-type Story = StoryObj<RecordTableProps>;
+type Story = StoryObj<BottleComparisonTableProps>;
 
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <RecordTable {...args} />
-      <RecordTable
+      <BottleComparisonTable {...args} />
+      <BottleComparisonTable
         {...args}
         ariaLabel="Associated bottles"
         detail={undefined}
         heading={undefined}
       />
-      <RecordTable
+      <BottleComparisonTable
         {...args}
         rows={[
           {

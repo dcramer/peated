@@ -1,4 +1,4 @@
-import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import RegisterForm from "@peated/web/components/registerForm";
 import { type Metadata } from "next";
 
@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function Register() {
   return (
-    <ProductAuthShell intro="account">
+    <AuthenticationPage intro="account">
       <RegisterForm />
-    </ProductAuthShell>
+    </AuthenticationPage>
   );
 }

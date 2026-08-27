@@ -1,8 +1,8 @@
 import {
-  AuthNotice,
-  AuthPanel,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
-import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
+  AuthenticationNotice,
+  AuthenticationPanel,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import {
   oauthAuthorizationSearchParams,
@@ -52,7 +52,7 @@ const pageServices: OAuthAuthorizationPageServices = {
   redirectToLogin: redirectToAuth,
   renderForm: (request) => <AuthorizationForm request={request} />,
   renderLayout: (children) => (
-    <ProductAuthShell intro="database">{children}</ProductAuthShell>
+    <AuthenticationPage intro="database">{children}</AuthenticationPage>
   ),
 };
 
@@ -60,14 +60,14 @@ function InvalidAuthorizationRequest({
   renderLayout,
 }: Pick<OAuthAuthorizationPageServices, "renderLayout">) {
   return renderLayout(
-    <AuthPanel
+    <AuthenticationPanel
       description="The requesting application supplied an unknown client, unsafe redirect, or invalid security challenge."
       title="Invalid authorization request"
     >
-      <AuthNotice>
+      <AuthenticationNotice>
         Return to the application that sent you here and try again.
-      </AuthNotice>
-    </AuthPanel>,
+      </AuthenticationNotice>
+    </AuthenticationPanel>,
   );
 }
 
@@ -100,16 +100,16 @@ export function createOAuthAuthorizationPage(
     }
 
     return services.renderLayout(
-      <AuthPanel
+      <AuthenticationPanel
         description={`This application will receive API access as @${user.username}.`}
         title={`Authorize ${clientDetails.name}?`}
       >
-        <AuthNotice>
+        <AuthenticationNotice>
           It can perform the same Peated API actions your account can. Peated
           does not share your password or sign-in credentials.
-        </AuthNotice>
+        </AuthenticationNotice>
         {services.renderForm(parsed.data)}
-      </AuthPanel>,
+      </AuthenticationPanel>,
     );
   };
 }

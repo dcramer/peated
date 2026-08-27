@@ -9,8 +9,7 @@ import { HomeDatabaseOverview } from "@peated/web/components/designSystem/patter
 import { HomeActivity } from "@peated/web/components/designSystem/product/homeActivity.stylex";
 import { HomeCriticReviews } from "@peated/web/components/designSystem/product/homeCriticReviews.stylex";
 import { HomeFollowedReleases } from "@peated/web/components/designSystem/product/homeFollowedReleases.stylex";
-import { HomeMemberRecord } from "@peated/web/components/designSystem/product/homeMemberRecord.stylex";
-import { HomeQuickTasting } from "@peated/web/components/designSystem/product/homeQuickTasting.stylex";
+import { HomeMemberSummarySection } from "@peated/web/components/designSystem/product/homeMemberSummarySection.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
@@ -38,10 +37,9 @@ export function HomePageClient() {
           setFeed(nextFeed);
         }
       }}
-      prompt={<HomeQuickTasting />}
       rail={
         <>
-          <HomeMemberRecord />
+          <HomeMemberSummarySection />
           <HomeFollowedReleases />
         </>
       }

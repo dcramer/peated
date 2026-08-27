@@ -1,5 +1,5 @@
-import { LoadingRecordList } from "@peated/web/components/designSystem/components";
+import { LoadingList } from "@peated/web/components/designSystem/components";
 
 export default function ProfileLoading() {
-  return <LoadingRecordList label="Loading member profile" rows={4} />;
+  return <LoadingList label="Loading member profile" rows={4} />;
 }

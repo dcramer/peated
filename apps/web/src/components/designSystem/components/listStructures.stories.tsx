@@ -34,7 +34,7 @@ function ToolbarExample() {
 }
 
 const meta = {
-  title: "Components/Data Display/List Structures",
+  title: "Components/Data Display/Lists",
   component: RailList,
   args: { ariaLabel: "Records", children: null },
   decorators: [
@@ -49,17 +49,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Toolbar: Story = {
+export const BottleListControls: Story = {
   render: () => <ToolbarExample />,
 };
 
-export const CursorPagination: Story = {
+export const PreviousAndNext: Story = {
   render: () => (
     <CursorPager nextHref="#page-4" page={3} previousHref="#page-2" />
   ),
 };
 
-export const PeriodsAndRows: Story = {
+export const TastingsByMonth: Story = {
   render: () => (
     <StoryStack>
       <div>
@@ -94,7 +94,7 @@ export const PeriodsAndRows: Story = {
   ),
 };
 
-export const LongContent: Story = {
+export const LongBottleNames: Story = {
   render: () => (
     <RailList ariaLabel="Recent tastings">
       <RailListItem

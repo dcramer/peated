@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
 import { SectionHeading } from "../components";
 import { type SummaryStripCells } from "../components/summaryStrip.stylex";
-import { HomeHero } from "./homeSections.stylex";
+import { PublicHomeIntro } from "./homeSections.stylex";
 import { PageColumns } from "./pagePatternShell.stylex";
 
 const NARROW = "@media (max-width: 759px)";
@@ -16,7 +16,6 @@ export type SignedInHomePageProps = {
   feedContext?: ReactNode;
   feeds: readonly { label: string; value: string }[];
   onFeedChange: (feed: string) => void;
-  prompt: ReactNode;
   rail?: ReactNode;
   signedIn: true;
 };
@@ -39,7 +38,7 @@ export function HomePage(props: HomePageProps) {
   if (!props.signedIn) {
     return (
       <>
-        <HomeHero
+        <PublicHomeIntro
           description={props.description}
           eyebrow={props.eyebrow}
           facts={props.facts}
@@ -55,7 +54,6 @@ export function HomePage(props: HomePageProps) {
   return (
     <PageColumns rail={props.rail}>
       <div {...stylex.props(styles.signedInMain)}>
-        {props.prompt}
         {props.critics}
         <section
           aria-labelledby="home-feed-heading"

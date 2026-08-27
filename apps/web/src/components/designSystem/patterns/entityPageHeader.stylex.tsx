@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { space } from "../../../styles/tokens.stylex";
-import { IdStamp, SpecStrip, type SpecStripCells } from "../components";
+import { RecordId, SpecStrip, type SpecStripCells } from "../components";
 import { PageHeader } from "./pagePatternShell.stylex";
 
 export type EntityPageHeaderProps = {
@@ -35,7 +35,7 @@ export function EntityPageHeader({
         actions={actions}
         description={description}
         eyebrow={eyebrow}
-        identity={<IdStamp detail={detail} id={id} />}
+        identity={<RecordId detail={detail} id={id} />}
         menu={menu}
         parent={parent}
         title={title}

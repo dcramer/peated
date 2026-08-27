@@ -11,8 +11,8 @@ import { logout } from "../../../lib/auth.actions";
 import { colors, controlMetrics } from "../../../styles/tokens.stylex";
 import { ApplicationHeader, ButtonLink } from "../components";
 import { PageFrame } from "../patterns/pagePatternShell.stylex";
-import { ProductFooter } from "./productFooter.stylex";
-import { ProductSearch } from "./productSearch.stylex";
+import { ApplicationFooter } from "./applicationFooter.stylex";
+import { Search } from "./search.stylex";
 
 const databaseItems = [
   { href: "/bottles", label: "Bottles" },
@@ -46,7 +46,7 @@ function AccountVisual({
   return <CircleUserRound aria-hidden="true" size={19} />;
 }
 
-export function ApplicationShell({ children }: { children: ReactNode }) {
+export function ApplicationLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
   const [logoutPending, startLogout] = useTransition();
@@ -74,7 +74,7 @@ export function ApplicationShell({ children }: { children: ReactNode }) {
 
   return (
     <PageFrame
-      footer={<ProductFooter />}
+      footer={<ApplicationFooter />}
       header={
         <ApplicationHeader
           account={
@@ -110,7 +110,7 @@ export function ApplicationShell({ children }: { children: ReactNode }) {
           currentHref={pathname}
           databaseItems={databaseItems}
           personalItems={personalItems}
-          search={<ProductSearch />}
+          search={pathname === "/search" ? undefined : <Search />}
           showNavigation={Boolean(user)}
         />
       }

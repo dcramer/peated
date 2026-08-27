@@ -1,14 +1,14 @@
 import { ButtonLink } from "@peated/web/components/designSystem/components";
 import {
-  AuthActionStack,
-  AuthDetailList,
-  AuthDivider,
-  AuthFooterLinks,
-  AuthFormSurface,
-  AuthLink,
-  AuthPanel,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
-import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationDetails,
+  AuthenticationDivider,
+  AuthenticationLink,
+  AuthenticationLinks,
+  AuthenticationPanel,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 
@@ -18,14 +18,14 @@ export const metadata: Metadata = {
 
 export default function BrowserNotSupported() {
   return (
-    <ProductAuthShell intro="database">
-      <AuthPanel
+    <AuthenticationPage intro="database">
+      <AuthenticationPanel
         description="This browser does not support the passkey features Peated uses for secure authentication."
         title="Passkeys aren’t available here"
       >
-        <AuthActionStack>
-          <AuthFormSurface>
-            <AuthDetailList
+        <AuthenticationActions>
+          <AuthenticationCard>
+            <AuthenticationDetails
               items={[
                 "Chrome 67 or newer on desktop and Android",
                 "Safari 14 or newer on macOS and iOS",
@@ -33,7 +33,7 @@ export default function BrowserNotSupported() {
                 "Firefox 60 or newer",
               ]}
             />
-          </AuthFormSurface>
+          </AuthenticationCard>
           {config.GOOGLE_CLIENT_ID ? (
             <ButtonLink
               align="start"
@@ -54,14 +54,14 @@ export default function BrowserNotSupported() {
           >
             Return to sign in
           </ButtonLink>
-        </AuthActionStack>
-        <AuthDivider />
-        <AuthFooterLinks>
-          <AuthLink href="https://passkeys.dev/device-support/">
+        </AuthenticationActions>
+        <AuthenticationDivider />
+        <AuthenticationLinks>
+          <AuthenticationLink href="https://passkeys.dev/device-support/">
             Learn more about passkey support
-          </AuthLink>
-        </AuthFooterLinks>
-      </AuthPanel>
-    </ProductAuthShell>
+          </AuthenticationLink>
+        </AuthenticationLinks>
+      </AuthenticationPanel>
+    </AuthenticationPage>
   );
 }

@@ -12,18 +12,18 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
+  BottleComparisonTable,
   Button,
   Chip,
   CommunityScore,
   CriticReview,
   FacetRow,
   FactList,
-  IdStamp,
   PageTabs,
   Passport,
   RailList,
   RailListItem,
-  RecordTable,
+  RecordId,
   RowMenu,
   ScopedSearch,
   SpecStrip,
@@ -152,7 +152,7 @@ export function BottlePagePattern() {
           }
           description="A benchmark Islay single malt matured for sixteen years, balancing dense peat smoke with dried fruit and maritime salinity."
           eyebrow="Islay · single malt"
-          identity={<IdStamp detail="Islay · single malt" id="B00872" />}
+          identity={<RecordId detail="Islay · single malt" id="B00872" />}
           menu={
             <RowMenu groups={recordMenuGroups} label="Lagavulin 16-year-old" />
           }
@@ -337,7 +337,7 @@ export function EntityPagePattern({
           }
           description={entity.description}
           eyebrow={entity.eyebrow}
-          identity={<IdStamp detail={entity.detail} id={entity.id} />}
+          identity={<RecordId detail={entity.detail} id={entity.id} />}
           menu={<RowMenu groups={recordMenuGroups} label={entity.title} />}
           parent={entity.parent}
           title={entity.title}
@@ -354,7 +354,7 @@ export function EntityPagePattern({
           count={3}
           heading={kind === "corporation" ? "Distilleries" : "Bottlings"}
         >
-          <RecordTable
+          <BottleComparisonTable
             columns={["Score", "Verdict"]}
             detail="Core range"
             heading={kind === "corporation" ? "Islay" : "Core range"}
@@ -365,7 +365,7 @@ export function EntityPagePattern({
           count={2}
           heading={kind === "brand" ? "Series" : "Annual & limited"}
         >
-          <RecordTable
+          <BottleComparisonTable
             columns={["Score", "Verdict"]}
             heading={kind === "brand" ? "Related series" : "Annual & limited"}
             rows={[bottleRows[1], bottleRows[2]]}
@@ -525,7 +525,7 @@ export function SearchPagePattern() {
         }
       >
         <PageSection count={1832} heading={`Results for “${query}”`}>
-          <RecordTable
+          <BottleComparisonTable
             columns={["Score", "Verdict"]}
             detail="Bottles matching the current scope and facets"
             heading="Bottles"

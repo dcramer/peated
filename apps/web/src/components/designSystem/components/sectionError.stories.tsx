@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
-import { ModuleError } from "./feedback.stylex";
+import { SectionError } from "./feedback.stylex";
 
 const meta = {
-  title: "Components/Feedback/Module Error",
-  component: ModuleError,
+  title: "Components/Feedback/Section Error",
+  component: SectionError,
   args: {
     children:
       "The rest of this bottle page still works. Try loading the tasting history again.",
@@ -20,7 +20,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof ModuleError>;
+} satisfies Meta<typeof SectionError>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -28,8 +28,8 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <ModuleError {...args} />
-      <ModuleError {...args} onRetry={undefined} />
+      <SectionError {...args} />
+      <SectionError {...args} onRetry={undefined} />
     </StoryStack>
   ),
 };

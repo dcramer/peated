@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { ButtonLink } from "../components";
 import { StoryCanvas } from "../storyFixtures.stylex";
-import { HomeHero } from "./homeSections.stylex";
+import { PublicHomeIntro } from "./homeSections.stylex";
 
 const meta = {
-  title: "Patterns/Home/Hero",
-  component: HomeHero,
+  title: "Patterns/Home/Public Introduction",
+  component: PublicHomeIntro,
   args: {
     description:
       "Peated is a whisky database: bottlings down to the cask, critic scores kept per release, and your own tastings and collection alongside them.",
@@ -41,7 +41,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof HomeHero>;
+} satisfies Meta<typeof PublicHomeIntro>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

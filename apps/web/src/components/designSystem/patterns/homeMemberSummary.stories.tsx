@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { StoryCanvas } from "../storyFixtures.stylex";
-import { MemberRecordSummary } from "./homeWidgets.stylex";
+import { HomeMemberSummary } from "./homeSummary.stylex";
 
 const meta = {
-  title: "Patterns/Home/Member Record",
-  component: MemberRecordSummary,
+  title: "Patterns/Home/Your Record",
+  component: HomeMemberSummary,
   args: {
     facts: [
       { label: "On the shelf", value: 34 },
@@ -22,7 +22,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof MemberRecordSummary>;
+} satisfies Meta<typeof HomeMemberSummary>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

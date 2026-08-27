@@ -7,11 +7,11 @@ import {
   StoryStack,
   StorySurfaceContent,
 } from "../storyFixtures.stylex";
-import { OverlaySurface } from "./feedback.stylex";
+import { FloatingPanel } from "./feedback.stylex";
 
 const meta = {
-  title: "Components/Feedback/Overlay Surface",
-  component: OverlaySurface,
+  title: "Components/Feedback/Floating Panel",
+  component: FloatingPanel,
   args: {
     children: (
       <StorySurfaceContent>
@@ -32,7 +32,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof OverlaySurface>;
+} satisfies Meta<typeof FloatingPanel>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -40,15 +40,15 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <OverlaySurface {...args} />
-      <OverlaySurface>
+      <FloatingPanel {...args} />
+      <FloatingPanel>
         <StorySurfaceContent>
           <strong {...stylex.props(foundationStyles.rowTitle)}>Saved</strong>
           <span {...stylex.props(foundationStyles.metadata)}>
             Your tasting is now visible to friends.
           </span>
         </StorySurfaceContent>
-      </OverlaySurface>
+      </FloatingPanel>
     </StoryStack>
   ),
 };

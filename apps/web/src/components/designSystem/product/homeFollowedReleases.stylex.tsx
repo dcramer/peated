@@ -4,9 +4,9 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useQuery } from "@tanstack/react-query";
 
 import { useORPC } from "../../../lib/orpc/context";
-import { LoadingRecordList, ModuleError } from "../components";
+import { LoadingList, SectionError } from "../components";
 import { HomeFollowedReleases as FollowedReleaseSection } from "../patterns/homeDiscovery.stylex";
-import { HomeWidgetLoading } from "../patterns/homeWidgets.stylex";
+import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
@@ -28,20 +28,20 @@ export function HomeFollowedReleases() {
 
   if (releases.isPending) {
     return (
-      <HomeWidgetLoading>
-        <LoadingRecordList label="Loading followed releases" rows={3} />
-      </HomeWidgetLoading>
+      <HomeSectionLoading>
+        <LoadingList label="Loading followed releases" rows={3} />
+      </HomeSectionLoading>
     );
   }
 
   if (releases.error) {
     return (
-      <ModuleError
+      <SectionError
         heading="New releases are unavailable"
         onRetry={() => void releases.refetch()}
       >
         We could not load releases from the distillers you follow. Try again.
-      </ModuleError>
+      </SectionError>
     );
   }
 

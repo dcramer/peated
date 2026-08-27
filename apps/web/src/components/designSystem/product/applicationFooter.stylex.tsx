@@ -49,7 +49,7 @@ function formatCount(value: number, noun: string) {
 }
 
 /** Connects the shared footer to platform facts without putting data access in it. */
-export function ProductFooter() {
+export function ApplicationFooter() {
   const orpc = useORPC();
   const stats = useQuery(orpc.stats.queryOptions());
   const coverage = stats.data

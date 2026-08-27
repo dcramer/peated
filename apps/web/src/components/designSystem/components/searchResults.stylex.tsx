@@ -9,7 +9,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import { Button } from "./button.stylex";
-import { OverlaySurface } from "./feedback.stylex";
+import { FloatingPanel } from "./feedback.stylex";
 import {
   VerdictDistributionBar,
   type VerdictDistributionProps,
@@ -47,7 +47,7 @@ export type SearchResultGroup = {
   total?: number;
 };
 
-export type SearchResultsPanelProps = {
+export type SearchResultsProps = {
   activeId?: string;
   contribution?: {
     description: string;
@@ -64,12 +64,14 @@ export type SearchResultsPanelProps = {
   optionIdPrefix?: string;
   panelId?: string;
   query: string;
+  /** Lets a page keep results in document flow instead of a bounded overlay. */
+  scroll?: boolean;
   status?: "error" | "ready" | "searching";
   statusText?: string;
 };
 
 /** Presents supplied search results without owning search, ranking, or navigation. */
-export function SearchResultsPanel({
+export function SearchResults({
   activeId,
   contribution,
   embedded = false,
@@ -81,9 +83,10 @@ export function SearchResultsPanel({
   optionIdPrefix,
   panelId,
   query,
+  scroll = true,
   status = "ready",
   statusText,
-}: SearchResultsPanelProps) {
+}: SearchResultsProps) {
   const hasResults = groups.some((group) => group.items.length > 0);
   const hasColdLoadingState =
     status === "searching" && !hasResults && !emptyText;
@@ -95,7 +98,7 @@ export function SearchResultsPanel({
     <div
       aria-busy={status === "searching" || undefined}
       id={panelId}
-      {...stylex.props(styles.panel)}
+      {...stylex.props(styles.panel, !scroll && styles.documentPanel)}
     >
       {hasReplacementLoadingState ? (
         <p aria-live="polite" {...stylex.props(styles.visuallyHidden)}>
@@ -162,9 +165,9 @@ export function SearchResultsPanel({
       {content}
     </div>
   ) : (
-    <OverlaySurface aria-label={label} role="region">
+    <FloatingPanel aria-label={label} role="region">
       {content}
-    </OverlaySurface>
+    </FloatingPanel>
   );
 }
 
@@ -326,6 +329,10 @@ const styles = stylex.create({
     maxHeight: "min(560px, calc(100vh - 96px))",
     overflow: "hidden",
     overflowY: "auto",
+  },
+  documentPanel: {
+    maxHeight: "none",
+    overflow: "visible",
   },
   searchingText: {
     margin: 0,

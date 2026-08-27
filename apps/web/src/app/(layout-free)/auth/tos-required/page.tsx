@@ -1,5 +1,5 @@
-import { AuthPanel } from "@peated/web/components/designSystem/patterns/authShell.stylex";
-import { ProductAuthShell } from "@peated/web/components/designSystem/product/authPageShell.stylex";
+import { AuthenticationPanel } from "@peated/web/components/designSystem/patterns/authentication.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import { getSafeRedirect } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";
 import type { Metadata } from "next";
@@ -26,13 +26,13 @@ export default async function TOSRequired(props: {
   }
 
   return (
-    <ProductAuthShell intro="account">
-      <AuthPanel
+    <AuthenticationPage intro="account">
+      <AuthenticationPanel
         description="Review and accept the latest Terms of Service to continue."
         title="One thing before you continue"
       >
         <Actions redirectTo={redirectTo} />
-      </AuthPanel>
-    </ProductAuthShell>
+      </AuthenticationPanel>
+    </AuthenticationPage>
   );
 }

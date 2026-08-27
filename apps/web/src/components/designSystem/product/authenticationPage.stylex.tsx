@@ -4,14 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import { useORPC } from "../../../lib/orpc/context";
-import { AuthIntro, AuthLink, AuthShell } from "../patterns/authShell.stylex";
+import {
+  AuthenticationIntro,
+  AuthenticationLayout,
+  AuthenticationLink,
+} from "../patterns/authentication.stylex";
 
 function DatabaseIntro() {
   const orpc = useORPC();
   const stats = useQuery(orpc.stats.queryOptions());
 
   return (
-    <AuthIntro
+    <AuthenticationIntro
       artwork={{
         alt: "",
         src: "/assets/auth-discovery-illustration.webp",
@@ -23,11 +27,27 @@ function DatabaseIntro() {
           value: stats.data?.totalBottles.toLocaleString("en-US") ?? "–",
         },
         {
-          label: "Brands, distillers & bottlers",
-          value: stats.data?.totalEntities.toLocaleString("en-US") ?? "–",
+          label: "Distillers",
+          value: stats.data?.totalDistilleries.toLocaleString("en-US") ?? "–",
+        },
+        {
+          label: "Brands",
+          value: stats.data?.totalBrands.toLocaleString("en-US") ?? "–",
+        },
+        {
+          label: "Bottlers",
+          value: stats.data?.totalBottlers.toLocaleString("en-US") ?? "–",
+        },
+        {
+          label: "Blenders",
+          value: stats.data?.totalBlenders.toLocaleString("en-US") ?? "–",
         },
       ]}
-      footer={<AuthLink href="/bottles">Browse without an account →</AuthLink>}
+      footer={
+        <AuthenticationLink href="/bottles">
+          Browse without an account →
+        </AuthenticationLink>
+      }
       title="Every bottle, every review, in one place."
     />
   );
@@ -35,7 +55,7 @@ function DatabaseIntro() {
 
 function AccountIntro() {
   return (
-    <AuthIntro
+    <AuthenticationIntro
       footer="Your tastings stay yours — export them at any time."
       points={[
         "Log a dram in three taps, then add a note when you want one.",
@@ -47,7 +67,7 @@ function AccountIntro() {
   );
 }
 
-export function ProductAuthShell({
+export function AuthenticationPage({
   children,
   intro,
 }: {
@@ -55,10 +75,10 @@ export function ProductAuthShell({
   intro: "account" | "database";
 }) {
   return (
-    <AuthShell
+    <AuthenticationLayout
       intro={intro === "database" ? <DatabaseIntro /> : <AccountIntro />}
     >
       {children}
-    </AuthShell>
+    </AuthenticationLayout>
   );
 }

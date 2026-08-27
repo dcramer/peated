@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { StoryCanvas } from "../storyFixtures.stylex";
-import { SearchResultsPanel } from "./searchResults.stylex";
+import { SearchResults } from "./searchResults.stylex";
 import { searchResultGroups } from "./storyData";
 
 const meta = {
-  title: "Components/Data Display/Search Results Panel",
-  component: SearchResultsPanel,
+  title: "Components/Data Display/Search Results",
+  component: SearchResults,
   args: {
     activeId: "bottle-872",
     contribution: {
@@ -28,7 +28,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof SearchResultsPanel>;
+} satisfies Meta<typeof SearchResults>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

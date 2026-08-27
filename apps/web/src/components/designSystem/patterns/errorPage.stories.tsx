@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button, ButtonLink } from "../components";
 import { StoryCanvas } from "../storyFixtures.stylex";
-import {
-  PageState,
-  PageStateReference,
-  PageStateSupport,
-} from "./pageState.stylex";
+import { ErrorPage, ErrorReference, ErrorSupport } from "./errorPage.stylex";
 
 const reportAction = (
   <ButtonLink
@@ -20,7 +16,7 @@ const reportAction = (
 
 function NotFoundState() {
   return (
-    <PageState
+    <ErrorPage
       actions={
         <>
           <ButtonLink href="/search">Search the database</ButtonLink>
@@ -31,21 +27,21 @@ function NotFoundState() {
       }
       status="404 · nothing at this address"
       support={
-        <PageStateSupport action={reportAction}>
+        <ErrorSupport action={reportAction}>
           Something wrong here that we should know about?
-        </PageStateSupport>
+        </ErrorSupport>
       }
       title="Nothing lives here"
     >
       This address does not match anything in the database. Search for the
       record, or add the bottling if it is genuinely missing.
-    </PageState>
+    </ErrorPage>
   );
 }
 
 function ForbiddenState() {
   return (
-    <PageState
+    <ErrorPage
       actions={
         <>
           <Button onClick={() => undefined}>Go back</Button>
@@ -55,7 +51,7 @@ function ForbiddenState() {
         </>
       }
       detail={
-        <PageStateReference
+        <ErrorReference
           description="A refused request is not an application failure, so it has no Sentry reference."
           label="Route"
           value="POST /bottles/B00872/merge · 403"
@@ -63,21 +59,21 @@ function ForbiddenState() {
       }
       status="403 · no permission"
       support={
-        <PageStateSupport action={reportAction}>
+        <ErrorSupport action={reportAction}>
           Think this account should have access?
-        </PageStateSupport>
+        </ErrorSupport>
       }
       title="You do not have permission for this"
     >
       Your account cannot perform this action. Nothing has changed, and the rest
       of the database remains available.
-    </PageState>
+    </ErrorPage>
   );
 }
 
 function FailureState() {
   return (
-    <PageState
+    <ErrorPage
       actions={
         <>
           <Button onClick={() => undefined}>Try again</Button>
@@ -93,7 +89,7 @@ function FailureState() {
         </>
       }
       detail={
-        <PageStateReference
+        <ErrorReference
           action={
             <Button onClick={() => undefined} size="sm" variant="text">
               Copy
@@ -118,26 +114,26 @@ function FailureState() {
     >
       Nothing you did caused this, and nothing you recorded is affected. The
       failure was reported automatically.
-    </PageState>
+    </ErrorPage>
   );
 }
 
 function OfflineState() {
   return (
-    <PageState
+    <ErrorPage
       actions={<Button onClick={() => undefined}>Try again</Button>}
       status="Offline"
       title="Peated cannot reach the database"
     >
       Search and bottle pages need a connection. Check your signal and try again
       when the database is reachable.
-    </PageState>
+    </ErrorPage>
   );
 }
 
 const meta = {
-  title: "Patterns/Page State",
-  component: PageState,
+  title: "Patterns/Error Pages",
+  component: ErrorPage,
   args: {
     children: null,
     status: "",
@@ -158,7 +154,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof PageState>;
+} satisfies Meta<typeof ErrorPage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

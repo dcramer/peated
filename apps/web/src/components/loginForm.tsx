@@ -6,15 +6,15 @@ import {
   TextInput,
 } from "@peated/web/components/designSystem/components";
 import {
-  AuthActionStack,
-  AuthDivider,
-  AuthFooterLinks,
-  AuthFormSurface,
-  AuthLink,
-  AuthNotice,
-  AuthPanel,
-  AuthTextButton,
-} from "@peated/web/components/designSystem/patterns/authShell.stylex";
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationDivider,
+  AuthenticationLink,
+  AuthenticationLinks,
+  AuthenticationNotice,
+  AuthenticationPanel,
+  AuthenticationTextButton,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import PasskeyLoginButton from "@peated/web/components/passkeyLoginButton";
 import config from "@peated/web/config";
@@ -31,13 +31,15 @@ function AccountLinks({ email }: { email?: string | null }) {
 
   return (
     <>
-      <AuthDivider />
-      <AuthFooterLinks>
+      <AuthenticationDivider />
+      <AuthenticationLinks>
         <span>No account yet?</span>
-        <AuthLink href="/register">Create one</AuthLink>
+        <AuthenticationLink href="/register">Create one</AuthenticationLink>
         <span>·</span>
-        <AuthLink href={recoveryHref}>Recover your account</AuthLink>
-      </AuthFooterLinks>
+        <AuthenticationLink href={recoveryHref}>
+          Recover your account
+        </AuthenticationLink>
+      </AuthenticationLinks>
     </>
   );
 }
@@ -48,8 +50,8 @@ function EmailForm({ showPassword }: { showPassword: boolean }) {
   const searchParams = useSearchParams();
 
   return (
-    <AuthActionStack>
-      <AuthFormSurface>
+    <AuthenticationActions>
+      <AuthenticationCard>
         <input
           type="hidden"
           name="redirectTo"
@@ -78,14 +80,14 @@ function EmailForm({ showPassword }: { showPassword: boolean }) {
             />
           </Field>
         ) : (
-          <AuthTextButton
+          <AuthenticationTextButton
             type="button"
             onClick={() => setShowPasswordField(true)}
           >
             Or sign in with a password
-          </AuthTextButton>
+          </AuthenticationTextButton>
         )}
-      </AuthFormSurface>
+      </AuthenticationCard>
       <Button
         align="start"
         fullWidth
@@ -96,7 +98,7 @@ function EmailForm({ showPassword }: { showPassword: boolean }) {
       >
         {showPasswordField ? "Sign in" : "Send me a link"}
       </Button>
-    </AuthActionStack>
+    </AuthenticationActions>
   );
 }
 
@@ -108,45 +110,52 @@ export default function LoginForm() {
 
   if (result?.magicLink) {
     return (
-      <AuthPanel
+      <AuthenticationPanel
         description="Use the secure link we sent to finish signing in."
         title="Check your email"
       >
-        <AuthNotice>
+        <AuthenticationNotice>
           The link is on its way{email ? ` to ${email}` : ""}.
-        </AuthNotice>
+        </AuthenticationNotice>
         <AccountLinks email={email} />
-      </AuthPanel>
+      </AuthenticationPanel>
     );
   }
 
   if (showEmailForm) {
     return (
-      <AuthPanel
+      <AuthenticationPanel
         back={
-          <AuthTextButton type="button" onClick={() => setShowEmailForm(false)}>
+          <AuthenticationTextButton
+            type="button"
+            onClick={() => setShowEmailForm(false)}
+          >
             ← Other ways to sign in
-          </AuthTextButton>
+          </AuthenticationTextButton>
         }
         description="We send a link — no password unless you want one."
         title="Sign in with email"
       >
-        {result?.error ? <AuthNotice>{result.error}</AuthNotice> : null}
+        {result?.error ? (
+          <AuthenticationNotice>{result.error}</AuthenticationNotice>
+        ) : null}
         <form action={formAction}>
           <EmailForm showPassword={false} />
         </form>
         <AccountLinks email={email} />
-      </AuthPanel>
+      </AuthenticationPanel>
     );
   }
 
   return (
-    <AuthPanel
+    <AuthenticationPanel
       description="A passkey is fastest. Email works everywhere."
       title="Sign in"
     >
-      {result?.error ? <AuthNotice>{result.error}</AuthNotice> : null}
-      <AuthActionStack>
+      {result?.error ? (
+        <AuthenticationNotice>{result.error}</AuthenticationNotice>
+      ) : null}
+      <AuthenticationActions>
         <PasskeyLoginButton action={authenticate} />
         {config.GOOGLE_CLIENT_ID ? (
           <GoogleLoginButton action={authenticate} />
@@ -161,8 +170,8 @@ export default function LoginForm() {
           <Mail aria-hidden="true" size={17} />
           Continue with email
         </Button>
-      </AuthActionStack>
+      </AuthenticationActions>
       <AccountLinks email={email} />
-    </AuthPanel>
+    </AuthenticationPanel>
   );
 }

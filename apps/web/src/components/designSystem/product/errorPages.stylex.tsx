@@ -6,11 +6,11 @@ import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors } from "../../../styles/tokens.stylex";
 import { Button, ButtonLink } from "../components/button.stylex";
 import {
-  PageState,
-  PageStateReference,
-  PageStateShell,
-  PageStateSupport,
-} from "../patterns/pageState.stylex";
+  ErrorPage,
+  ErrorPageLayout,
+  ErrorReference,
+  ErrorSupport,
+} from "../patterns/errorPage.stylex";
 
 const issueUrl = `${config.GITHUB_REPO}/issues/new`;
 
@@ -47,7 +47,7 @@ export function ErrorDocument({
 
 export function NotFoundPage({ document = false }: { document?: boolean }) {
   const content = (
-    <PageState
+    <ErrorPage
       actions={
         <>
           <ButtonLink href="/search">Search the database</ButtonLink>
@@ -58,18 +58,18 @@ export function NotFoundPage({ document = false }: { document?: boolean }) {
       }
       status="404 · nothing at this address"
       support={
-        <PageStateSupport action={<ReportAction />}>
+        <ErrorSupport action={<ReportAction />}>
           Something wrong here that we should know about?
-        </PageStateSupport>
+        </ErrorSupport>
       }
       title="Nothing lives here"
     >
       This address does not match anything in the database. Search for the
       record, or add the bottling if it is genuinely missing.
-    </PageState>
+    </ErrorPage>
   );
 
-  const page = <PageStateShell>{content}</PageStateShell>;
+  const page = <ErrorPageLayout>{content}</ErrorPageLayout>;
   return document ? (
     <ErrorDocument title="Not found | Peated">{page}</ErrorDocument>
   ) : (
@@ -79,8 +79,8 @@ export function NotFoundPage({ document = false }: { document?: boolean }) {
 
 export function ForbiddenPage({ route }: { route?: string }) {
   return (
-    <PageStateShell>
-      <PageState
+    <ErrorPageLayout>
+      <ErrorPage
         actions={
           <>
             <ButtonLink href="/">Go home</ButtonLink>
@@ -91,7 +91,7 @@ export function ForbiddenPage({ route }: { route?: string }) {
         }
         detail={
           route ? (
-            <PageStateReference
+            <ErrorReference
               description="A refused request is not an application failure, so it has no Sentry reference."
               label="Route"
               value={`${route} · 403`}
@@ -100,31 +100,31 @@ export function ForbiddenPage({ route }: { route?: string }) {
         }
         status="403 · no permission"
         support={
-          <PageStateSupport action={<ReportAction />}>
+          <ErrorSupport action={<ReportAction />}>
             Think this account should have access?
-          </PageStateSupport>
+          </ErrorSupport>
         }
         title="You do not have permission for this"
       >
         Your account cannot perform this action. Nothing has changed, and the
         rest of the database remains available.
-      </PageState>
-    </PageStateShell>
+      </ErrorPage>
+    </ErrorPageLayout>
   );
 }
 
 export function OfflinePage({ onRetry }: { onRetry: () => void }) {
   return (
-    <PageStateShell>
-      <PageState
+    <ErrorPageLayout>
+      <ErrorPage
         actions={<Button onClick={onRetry}>Try again</Button>}
         status="Offline"
         title="Peated cannot reach the database"
       >
         Search and bottle pages need a connection. Check your signal and try
         again when the database is reachable.
-      </PageState>
-    </PageStateShell>
+      </ErrorPage>
+    </ErrorPageLayout>
   );
 }
 
@@ -142,8 +142,8 @@ export function CapturedFailurePage({
   stack?: string;
 }) {
   return (
-    <PageStateShell>
-      <PageState
+    <ErrorPageLayout>
+      <ErrorPage
         actions={
           <>
             <Button onClick={onRetry}>Try again</Button>
@@ -156,7 +156,7 @@ export function CapturedFailurePage({
           </>
         }
         detail={
-          <PageStateReference
+          <ErrorReference
             action={
               incidentReference && onCopyReference ? (
                 <Button onClick={onCopyReference} size="sm" variant="text">
@@ -175,8 +175,8 @@ export function CapturedFailurePage({
       >
         Nothing you did caused this, and nothing you recorded is affected. The
         failure was reported automatically.
-      </PageState>
-    </PageStateShell>
+      </ErrorPage>
+    </ErrorPageLayout>
   );
 }
 
