@@ -4,6 +4,23 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+import { inferKindFromLegacyTypes } from "./kind-backfill";
+
+describe("inferKindFromLegacyTypes", () => {
+  test.each([
+    { legacyTypes: ["brand"] as const, kind: "brand" },
+    { legacyTypes: ["bottler"] as const, kind: "bottler" },
+    { legacyTypes: ["distiller"] as const, kind: "distillery" },
+    { legacyTypes: ["brand", "bottler"] as const, kind: "bottler" },
+    {
+      legacyTypes: ["brand", "bottler", "distiller"] as const,
+      kind: "distillery",
+    },
+    { legacyTypes: [] as const, kind: null },
+  ])("maps $legacyTypes to $kind", ({ legacyTypes, kind }) => {
+    expect(inferKindFromLegacyTypes([...legacyTypes])).toBe(kind);
+  });
+});
 
 describe("GET /entities/kind-backfill", () => {
   test("requires moderator access", async ({ fixtures }) => {
@@ -28,6 +45,7 @@ describe("GET /entities/kind-backfill", () => {
       kind: null,
       ownerId: owner.id,
       description: "Needs reviewed classification.",
+      type: ["brand", "bottler"],
       totalBottles: 1,
       totalTastings: 3,
       website: "https://example.com",
@@ -59,6 +77,8 @@ describe("GET /entities/kind-backfill", () => {
       id: entity.id,
       name: "Backfill Subject",
       kind: null,
+      legacyTypes: ["brand", "bottler"],
+      suggestedKind: "bottler",
       ownerId: owner.id,
       owner: {
         id: owner.id,

@@ -6,11 +6,16 @@ import {
   countries,
   entities,
   regions,
+  type EntityKind,
 } from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { EntitySchema, listResponse } from "@peated/server/schemas";
+import {
+  EntityKindEnum,
+  EntitySchema,
+  listResponse,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CountrySerializer } from "@peated/server/serializers/country";
 import { RegionSerializer } from "@peated/server/serializers/region";
@@ -31,6 +36,8 @@ const InputSchema = z
 
 const BackfillEntitySchema = EntitySchema.extend({
   kind: z.null(),
+  legacyTypes: z.array(z.enum(["brand", "distiller", "bottler"])),
+  suggestedKind: EntityKindEnum.nullable(),
   relationships: z.object({
     brand: z.number().int().nonnegative(),
     bottler: z.number().int().nonnegative(),
@@ -56,8 +63,17 @@ function countsByEntity(
   );
 }
 
-// This preparation route is the only read boundary that permits a null kind.
-// Remove it when the legacy type column is removed after the final cutover.
+export function inferKindFromLegacyTypes(
+  legacyTypes: ("brand" | "bottler" | "distiller")[],
+): EntityKind | null {
+  if (legacyTypes.includes("distiller")) return "distillery";
+  if (legacyTypes.includes("bottler")) return "bottler";
+  if (legacyTypes.includes("brand")) return "brand";
+  return null;
+}
+
+// This preparation route is the only boundary that permits a null kind or
+// reads the legacy type list. Remove it after the final cutover is stable.
 export default procedure
   .use(requireMod)
   .route({
@@ -65,7 +81,7 @@ export default procedure
     path: "/entities/kind-backfill",
     summary: "List Entities that need a kind",
     description:
-      "List legacy Entities without a kind and include active Bottle-use counts for reviewed backfill",
+      "List legacy Entities without a kind and include their legacy types, suggested kind, and active Bottle-use counts",
     spec: (spec) => ({
       ...spec,
       operationId: "listEntityKindBackfill",
@@ -185,6 +201,8 @@ export default procedure
         name: entity.name,
         shortName: entity.shortName,
         kind: null,
+        legacyTypes: entity.type,
+        suggestedKind: inferKindFromLegacyTypes(entity.type),
         ownerId: entity.ownerId,
         owner: entity.ownerId ? ownersById.get(entity.ownerId) : null,
         description: entity.description,
