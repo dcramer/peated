@@ -1,4 +1,3 @@
-import { RESERVED_COLLECTION_SLUGS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
@@ -6,39 +5,18 @@ import {
   getReservedCollection,
   isReservedCollectionSlug,
 } from "@peated/server/lib/db";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import collectionBottleDeleteContract from "@peated/server/orpc/contracts/collections/bottles/delete";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { CollectionBottleInputSchema } from "@peated/server/schemas";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const CollectionBottleDeleteFields = {
-  collection: z.union([z.enum(RESERVED_COLLECTION_SLUGS), z.coerce.number()]),
-  user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-} as const;
-
-const CollectionBottleDeleteInputSchema = CollectionBottleInputSchema.pick({
-  bottle: true,
-})
-  .safeExtend(CollectionBottleDeleteFields)
-  .strict();
-
-export default procedure
+export default implement(collectionBottleDeleteContract)
   .use(requireAuth)
   .use(requireTosAccepted)
-  .route({
-    method: "DELETE",
-    path: "/users/{user}/collections/{collection}/bottles",
-    summary: "Remove a Bottle from a collection",
-    description:
-      "Remove one Bottle membership from a user's collection. Requires authentication and ownership.",
-    operationId: "removeBottleFromCollection",
-  })
-  .input(CollectionBottleDeleteInputSchema)
-  .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {

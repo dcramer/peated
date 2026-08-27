@@ -1,4 +1,3 @@
-import { RESERVED_COLLECTION_SLUGS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
@@ -6,17 +5,13 @@ import {
   getReservedCollection,
   isReservedCollectionSlug,
 } from "@peated/server/lib/db";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import collectionBottleUpdateContract from "@peated/server/orpc/contracts/collections/bottles/update";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import {
-  CollectionBottleSchema,
-  CollectionBottleStatusSchema,
-} from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 import {
   findCollectionBottleEntry,
   isLibraryCollection,
@@ -29,29 +24,9 @@ async function findCollectionById(collectionId: number) {
   });
 }
 
-export default procedure
+export default implement(collectionBottleUpdateContract)
   .use(requireAuth)
   .use(requireTosAccepted)
-  .route({
-    method: "PATCH",
-    path: "/users/{user}/collections/{collection}/bottles/{collectionBottle}",
-    summary: "Update collection bottle entry",
-    description:
-      "Update collection bottle entry fields. Requires authentication and ownership",
-    operationId: "updateCollectionBottle",
-  })
-  .input(
-    z.object({
-      collection: z.union([
-        z.enum(RESERVED_COLLECTION_SLUGS),
-        z.coerce.number(),
-      ]),
-      collectionBottle: z.coerce.number(),
-      status: CollectionBottleStatusSchema.nullable(),
-      user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-    }),
-  )
-  .output(CollectionBottleSchema)
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {

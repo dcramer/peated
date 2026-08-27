@@ -1,9 +1,9 @@
 import {
   includesQuery,
+  matchesMockUser,
   mockBottleFor,
   mockCollectionBottles,
   mockPage,
-  mockUser,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
@@ -11,11 +11,7 @@ const mockCollectionId = 9801;
 
 export default mockOS.collections.bottles.list.handler(
   async ({ input, context, errors }) => {
-    const userMatches =
-      input.user === "me"
-        ? Boolean(context.user)
-        : input.user === mockUser.id || input.user === mockUser.username;
-    if (!userMatches) {
+    if (!matchesMockUser(input.user, context.user)) {
       throw errors.NOT_FOUND({ message: "Mock user not found." });
     }
 
