@@ -1,4 +1,5 @@
 import type OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { BottleExtractedDetailsSchema } from "./classifierTypes";
 import { buildWhiskyLabelExtractorInstructions } from "./extractorInstructions";
@@ -11,6 +12,7 @@ const ResponseSchema = z.object({
   result: BottleExtractedDetailsSchema.nullable(),
   rawLabelText: z.string().trim().min(1).max(4000).nullable().default(null),
 });
+const ResponseFormat = zodTextFormat(ResponseSchema, "ExtractedBottleDetails");
 
 interface WhiskyLabelProviderResponse {
   id: string;
@@ -149,11 +151,7 @@ export async function extractFromImageWithMetadata({
       },
     ],
     text: {
-      format: {
-        type: "json_schema",
-        name: "ExtractedBottleDetails",
-        schema: z.toJSONSchema(ResponseSchema),
-      },
+      format: ResponseFormat,
     },
     ...getStableOpenAISettings(model, reasoningEffort),
   });
@@ -214,11 +212,7 @@ export async function extractFromText({
       },
     ],
     text: {
-      format: {
-        type: "json_schema",
-        name: "ExtractedBottleDetails",
-        schema: z.toJSONSchema(ResponseSchema),
-      },
+      format: ResponseFormat,
     },
     ...getStableOpenAISettings(model, reasoningEffort),
   });

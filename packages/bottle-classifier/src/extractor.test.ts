@@ -40,6 +40,31 @@ describe("createWhiskyLabelExtractor", () => {
       expect.objectContaining({
         model: "gpt-5.6-luna",
         reasoning: { effort: "high" },
+        text: {
+          format: expect.objectContaining({
+            type: "json_schema",
+            strict: true,
+            schema: expect.objectContaining({
+              properties: expect.objectContaining({
+                result: expect.objectContaining({
+                  anyOf: expect.arrayContaining([
+                    expect.objectContaining({
+                      type: "object",
+                      properties: expect.objectContaining({
+                        bottling_year: expect.any(Object),
+                      }),
+                      required: expect.arrayContaining(["bottling_year"]),
+                      additionalProperties: false,
+                    }),
+                  ]),
+                }),
+                rawLabelText: expect.any(Object),
+              }),
+              required: expect.arrayContaining(["result", "rawLabelText"]),
+              additionalProperties: false,
+            }),
+          }),
+        },
       }),
     );
     expect(extraction).toMatchObject({
