@@ -8,9 +8,7 @@ export default async ({ entityId }: { entityId: number }) => {
   const entity = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, entityId),
   });
-  if (!entity) {
-    throw new Error(`Unknown entity: ${entityId}`);
-  }
+  if (!entity) return;
 
   const aliasList = await db
     .select()

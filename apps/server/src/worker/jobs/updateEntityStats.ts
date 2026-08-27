@@ -25,9 +25,7 @@ export default async (input: JobPayload) => {
   const entity = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, entityId),
   });
-  if (!entity) {
-    throw new Error(`Unknown entity: ${entityId}`);
-  }
+  if (!entity) return;
 
   await db.transaction(async (tx) => {
     await tx

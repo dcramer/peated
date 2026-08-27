@@ -55,6 +55,13 @@ test("generates details only when explicitly requested", async ({
   );
 });
 
+test("skips stale work for a deleted Bottle", async () => {
+  await onBottleChange({ bottleId: 2_147_483_647 });
+
+  expect(workerClient.runJob).not.toHaveBeenCalled();
+  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+});
+
 test.each([
   undefined,
   {},

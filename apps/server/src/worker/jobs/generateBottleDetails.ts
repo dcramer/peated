@@ -25,6 +25,7 @@ import {
   bottleUpdateExpectedSelectedBottleState,
   bottleUpdateExpectedSharedState,
   BottleUpdateExpectedStateError,
+  BottleUpdateGraphError,
   finalizeBottleUpdate,
   updateBottleInTransaction,
 } from "@peated/server/lib/updateBottle";
@@ -201,6 +202,11 @@ export async function generateBottleDetails(
     .where(and(eq(bottles.id, bottleId), isNull(bottleTombstones.bottleId)))
     .limit(1);
   if (!owned) {
+    const bottle = await db.query.bottles.findFirst({
+      columns: { id: true },
+      where: eq(bottles.id, bottleId),
+    });
+    if (!bottle) return;
     throw new Error(
       `Bottle ${bottleId} does not belong to an active BottleGroup.`,
     );
@@ -301,7 +307,9 @@ export async function generateBottleDetails(
     // authoritative edit supersedes them, so the stale result is discarded.
     if (
       error instanceof BottleUpdateExpectedBottleStateError ||
-      error instanceof BottleUpdateExpectedStateError
+      error instanceof BottleUpdateExpectedStateError ||
+      (error instanceof BottleUpdateGraphError &&
+        (error.code === "not_found" || error.code === "retired"))
     ) {
       return;
     }

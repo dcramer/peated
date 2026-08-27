@@ -7,7 +7,6 @@ import {
   deleteTerminalModeratorBottleAudits,
   getCurrentModeratorBottleAudit,
   type BottleCheckWithOperations,
-  type CreateBottleCheckInput,
   type CreateBottleCheckResult,
 } from "@peated/server/lib/bottleChecks";
 import { eq } from "drizzle-orm";
@@ -41,28 +40,6 @@ export type PostUserCreationBottleAuditInput = z.input<
 export type ModeratorBottleAuditResult =
   | { status: "clean"; summary: string }
   | { status: "needs_review"; check: BottleCheckWithOperations };
-
-async function runAndPersistBottleAudit({
-  input,
-  backgroundEventKey,
-  runAudit,
-}: {
-  input: AuditBottleInput;
-  backgroundEventKey?: string;
-  runAudit: typeof auditBottleWithServerAdapters;
-}): Promise<CreateBottleCheckResult> {
-  const { result, modelMetadata } = await runAudit(input);
-
-  const checkInput: CreateBottleCheckInput = {
-    intent: "audit_bottle",
-    input,
-    result,
-    model: config.BOTTLE_CLASSIFIER_MODEL,
-    modelMetadata,
-  };
-  if (backgroundEventKey) checkInput.backgroundEventKey = backgroundEventKey;
-  return await createBottleCheck(checkInput);
-}
 
 export async function runModeratorBottleAudit(
   rawInput: ModeratorBottleAuditInput,
@@ -110,7 +87,7 @@ export async function runModeratorBottleAudit(
 export async function runPostUserCreationBottleAudit(
   rawInput: PostUserCreationBottleAuditInput,
   runAudit: typeof auditBottleWithServerAdapters = auditBottleWithServerAdapters,
-): Promise<CreateBottleCheckResult> {
+): Promise<CreateBottleCheckResult | null> {
   const input = PostUserCreationBottleAuditInputSchema.parse(rawInput);
   const existing = await db.query.bottleChecks.findFirst({
     where: eq(bottleChecks.backgroundEventKey, input.backgroundEventKey),
@@ -129,14 +106,30 @@ export async function runPostUserCreationBottleAudit(
     return { check: existing, created: false };
   }
 
+  const bottle = await db.query.bottles.findFirst({
+    columns: { id: true },
+    where: (bottles, { eq }) => eq(bottles.id, input.bottleId),
+  });
+  if (!bottle) return null;
+
   const auditInput: AuditBottleInput = {
     bottleId: input.bottleId,
     origin: "post_user_creation",
   };
   if (input.note) auditInput.note = input.note;
-  return await runAndPersistBottleAudit({
+  const { result, modelMetadata } = await runAudit(auditInput);
+  const activeBottle = await db.query.bottles.findFirst({
+    columns: { id: true },
+    where: (bottles, { eq }) => eq(bottles.id, input.bottleId),
+  });
+  if (!activeBottle) return null;
+
+  return await createBottleCheck({
+    intent: "audit_bottle",
     input: auditInput,
+    result,
+    model: config.BOTTLE_CLASSIFIER_MODEL,
+    modelMetadata,
     backgroundEventKey: input.backgroundEventKey,
-    runAudit,
   });
 }

@@ -9,16 +9,15 @@ export default async ({ seriesId }: { seriesId: number }) => {
   const series = await db.query.bottleSeries.findFirst({
     where: (bottleSeries, { eq }) => eq(bottleSeries.id, seriesId),
   });
-  if (!series) {
-    throw new Error(`Unknown series: ${seriesId}`);
-  }
+  if (!series) return;
 
   const [brand] = await db
     .select()
     .from(entities)
     .where(eq(entities.id, series.brandId));
+  if (!brand) return;
 
-  const searchVector = buildBottleSeriesSearchVector(series, brand!) || null;
+  const searchVector = buildBottleSeriesSearchVector(series, brand) || null;
 
   logInfo("Updating search vector for series {seriesId}", {
     extra: {

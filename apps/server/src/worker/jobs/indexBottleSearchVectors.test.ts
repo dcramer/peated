@@ -117,9 +117,9 @@ describe("indexBottleSearchVectors", () => {
     );
   });
 
-  test("rejects an unknown Bottle", async () => {
+  test("skips stale work for a deleted Bottle", async () => {
     await expect(
       indexBottleSearchVectors({ bottleId: 2_147_483_647 }),
-    ).rejects.toThrow("Unknown bottle: 2147483647");
+    ).resolves.toBeUndefined();
   });
 });

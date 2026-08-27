@@ -131,6 +131,12 @@ test("excludes Bottle-tombstoned members and their tastings", async ({
   });
 });
 
+test("skips stale work for a deleted Entity", async () => {
+  await expect(
+    updateEntityStats({ entityId: 2_147_483_647 }),
+  ).resolves.toBeUndefined();
+});
+
 test.each([
   undefined,
   {},

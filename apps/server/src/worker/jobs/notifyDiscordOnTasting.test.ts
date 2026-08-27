@@ -76,6 +76,13 @@ test("uses the referenced Bottle label", async ({ fixtures }) => {
   });
 });
 
+test("skips stale work for a deleted Tasting", async () => {
+  await expect(
+    notifyDiscordOnTasting({ tastingId: 2_147_483_647 }),
+  ).resolves.toBeUndefined();
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+
 test("rejects a retired Bottle without sending a webhook", async ({
   fixtures,
 }) => {

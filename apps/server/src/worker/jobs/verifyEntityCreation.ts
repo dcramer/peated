@@ -20,6 +20,7 @@ export default async function ({
     objectId: entityId,
     objectType: "entity",
   });
+  if (!displayName) return;
 
   const policyInput = { objectType: "entity", source: creationSource } as const;
 

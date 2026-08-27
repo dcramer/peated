@@ -32,7 +32,7 @@ export default async function notifyDiscordOnTasting(input: JobPayload) {
       },
     });
     if (!selected) {
-      throw new Error(`Unknown tasting: ${tastingId}`);
+      return null;
     }
     const bottleId = selected.bottleId;
     if (bottleId === null) {
@@ -50,6 +50,7 @@ export default async function notifyDiscordOnTasting(input: JobPayload) {
     }
     return { ...selected, bottle };
   });
+  if (!tasting) return;
 
   // TODO: pretty sure we're mismatched timezones on db + server, and need normalization
   // move db to UTC (if its not, or if its not storing tzinfo), and then run all these checks

@@ -128,9 +128,7 @@ export default async ({
       region: true,
     },
   });
-  if (!entity) {
-    throw new Error(`Unknown entity: ${entityId}`);
-  }
+  if (!entity) return;
 
   const generateDesc =
     (!entity.descriptionSrc || entity.descriptionSrc === "generated") &&
@@ -187,7 +185,12 @@ export default async ({
   const actor = await getPeatedSystemActor();
 
   await db.transaction(async (tx) => {
-    await tx.update(entities).set(data).where(eq(entities.id, entity.id));
+    const [updated] = await tx
+      .update(entities)
+      .set(data)
+      .where(eq(entities.id, entity.id))
+      .returning({ id: entities.id });
+    if (!updated) return;
 
     await tx.insert(changes).values({
       objectType: "entity",

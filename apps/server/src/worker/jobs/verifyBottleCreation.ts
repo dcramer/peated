@@ -37,11 +37,13 @@ export async function verifyBottleCreation(
 
   const policyInput = { objectType: "bottle", source: creationSource } as const;
 
+  const displayName = await getCatalogVerificationDisplayName({
+    objectId: bottleId,
+    objectType: "bottle",
+  });
+  if (!displayName) return;
+
   if (!shouldRunCatalogVerification(policyInput)) {
-    const displayName = await getCatalogVerificationDisplayName({
-      objectId: bottleId,
-      objectType: "bottle",
-    });
     await recordCatalogVerificationResult({
       displayName,
       objectId: bottleId,
