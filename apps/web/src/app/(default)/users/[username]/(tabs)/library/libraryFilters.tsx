@@ -6,8 +6,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { ENTITY_SEARCH_SCOPE_LIST } from "@peated/server/orpc/contracts/search";
-import { EntityKindEnum, EntitySchema } from "@peated/server/schemas";
+import { EntityKindEnum } from "@peated/server/schemas";
 import BrandIcon from "@peated/web/assets/brand.svg";
 import DistillerIcon from "@peated/web/assets/distiller.svg";
 import Button from "@peated/web/components/button";
@@ -347,17 +346,11 @@ function LibraryEntityFilter({
         selectedValues={value ? [value] : []}
         searchPlaceholder={`Search ${label.toLowerCase()}`}
         onQuery={async (query) => {
-          const { groups } = await orpc.search.call({
+          const { results } = await orpc.entities.list.call({
             query,
-            scopes: [...ENTITY_SEARCH_SCOPE_LIST],
             limit: 25,
           });
-          return groups.flatMap((group) =>
-            group.results.flatMap((result) => {
-              const parsed = EntitySchema.safeParse(result);
-              return parsed.success ? [parsed.data] : [];
-            }),
-          );
+          return results;
         }}
         onRenderOption={(item) => (
           <div className="flex flex-col items-start">
