@@ -20,10 +20,6 @@ describe("public catalog URLs", () => {
     expect(getEntityUrl({ id: 123, kind: null })).toBe("/entities/123");
   });
 
-  it("uses a relationship fallback when a narrow Entity omits kind", () => {
-    expect(getEntityUrl({ id: 123 }, "distillery")).toBe("/distillers/123");
-  });
-
   it("lists every route prefix that can resolve an Entity", () => {
     expect(getEntityRoutePrefixes(123)).toEqual([
       "/brands/123",

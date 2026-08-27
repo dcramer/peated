@@ -20,10 +20,7 @@ import PeatedId from "./peatedId";
 
 export type BottleHeaderBottle = BottleIdentitySource & {
   peatedId: string;
-  distillers: Array<
-    Pick<Bottle["distillers"][number], "id" | "name"> &
-      Partial<Pick<Bottle["distillers"][number], "kind">>
-  >;
+  distillers: Array<Pick<Bottle["distillers"][number], "id" | "kind" | "name">>;
 };
 
 export default function BottleHeader({
@@ -74,7 +71,7 @@ export default function BottleHeader({
             <div title={bottle.fullName} className="flex min-w-0 flex-col">
               <span className="text-muted flex min-w-0 items-center justify-center gap-1.5 truncate text-xs font-medium uppercase tracking-wide lg:justify-start">
                 <Link
-                  href={getEntityUrl(bottle.brand, "brand")}
+                  href={getEntityUrl(bottle.brand)}
                   className="truncate hover:underline"
                 >
                   {bottle.brand.shortName || bottle.brand.name}

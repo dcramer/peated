@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import type { BottleIdentitySource } from "@peated/web/components/bottleIdentity";
 import { PriceChangeIdentity } from "./priceChanges";
 
 function bottleIdentity({
@@ -11,12 +12,12 @@ function bottleIdentity({
   id: number;
   fullName: string;
   category: "single_malt" | null;
-}) {
+}): BottleIdentitySource {
   return {
     id,
     fullName,
     name: fullName.replace(/^Springbank /, ""),
-    brand: { id: 1, name: "Springbank", shortName: null },
+    brand: { id: 1, kind: "distillery", name: "Springbank", shortName: null },
     series: null,
     group: { name: "12 Cask Strength", statedAge: 12 },
     category,

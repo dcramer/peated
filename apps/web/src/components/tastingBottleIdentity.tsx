@@ -14,8 +14,7 @@ import Join from "./join";
 
 export type TastingBottleIdentitySource = BottleIdentitySource &
   Pick<Bottle, "isLibrary" | "hasTasted"> & {
-    distillers: (Pick<Bottle["distillers"][number], "id" | "name"> &
-      Partial<Pick<Bottle["distillers"][number], "kind">>)[];
+    distillers: Pick<Bottle["distillers"][number], "id" | "kind" | "name">[];
   };
 
 export default function TastingBottleIdentity({
@@ -88,7 +87,7 @@ export default function TastingBottleIdentity({
               {distinctDistillers.map((distiller) => (
                 <Link
                   key={distiller.id}
-                  href={getEntityUrl(distiller, "distillery")}
+                  href={getEntityUrl(distiller)}
                   className="hover:underline"
                 >
                   {distiller.name}

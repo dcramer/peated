@@ -12,6 +12,7 @@ const bottle = {
   name: "21-year-old - 2025 Release - 55.1% ABV - Single Cask - Cask Strength",
   brand: {
     id: 7,
+    kind: "brand",
     name: "Lagavulin",
     shortName: null,
   },
@@ -32,7 +33,7 @@ const bottle = {
   outturn: null,
   maturation: null,
   caskNumber: null,
-  distillers: [{ id: 7, name: "Lagavulin Distillery" }],
+  distillers: [{ id: 7, kind: "distillery", name: "Lagavulin Distillery" }],
   isLibrary: true,
   hasTasted: true,
 } satisfies TastingBottleIdentitySource;

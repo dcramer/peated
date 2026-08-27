@@ -64,7 +64,7 @@ export default function Page(props: { params: Promise<{ entityId: string }> }) {
           system. For example, <strong>Cask No. 4.360 Jangling dram</strong>{" "}
           means it is the <strong>360th cask</strong> from{" "}
           <strong>distillery number 4</strong>. In this case, distillery maps to{" "}
-          <Link href={getEntityUrl(exampleDistiller, "distillery")}>
+          <Link href={getEntityUrl(exampleDistiller)}>
             {exampleDistiller.name}
           </Link>
           .
@@ -128,7 +128,7 @@ export default function Page(props: { params: Promise<{ entityId: string }> }) {
                         <td className="border-b border-slate-800 p-3 text-sm">
                           {distiller ? (
                             <Link
-                              href={getEntityUrl(distiller, "distillery")}
+                              href={getEntityUrl(distiller)}
                               className="hover:underline"
                             >
                               {distiller.name}

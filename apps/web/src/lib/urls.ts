@@ -24,13 +24,13 @@ export function getBottleUrl(
 }
 
 export function getEntityUrl(
-  entity: Pick<Entity, "id"> & Partial<Pick<Entity, "kind">>,
-  fallbackKind?: EntityKind,
+  entity: Pick<Entity, "id" | "kind">,
 ): `/${string}` {
   // Older records can lack a kind. Keep their existing route until the data
   // owns the invariant that every public Entity has a primary kind.
-  const kind = entity.kind === undefined ? fallbackKind : entity.kind;
-  const collection = kind ? ENTITY_COLLECTION_BY_KIND[kind] : "/entities";
+  const collection = entity.kind
+    ? ENTITY_COLLECTION_BY_KIND[entity.kind]
+    : "/entities";
   return `${collection}/${entity.id}`;
 }
 
