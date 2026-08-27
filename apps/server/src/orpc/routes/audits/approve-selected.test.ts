@@ -28,7 +28,11 @@ async function createStorePriceUpdateEntityCheck({
   storePrice,
 }: {
   bottleId: number;
-  entity: { id: number; name: string };
+  entity: {
+    id: number;
+    name: string;
+    kind: "brand" | "bottler" | "distillery" | "blender" | "company" | null;
+  };
   nextName: string;
   price: { id: number; name: string };
   storePrice: { attemptId: number };
@@ -43,13 +47,15 @@ async function createStorePriceUpdateEntityCheck({
     evidenceRefs: [{ kind: "entity", entityId: entity.id }],
   };
   const artifacts = {
-    resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+    resolvedEntities: [
+      { entityId: entity.id, name: entity.name, kind: entity.kind! },
+    ],
     entityContexts: [
       {
         entityId: entity.id,
         name: entity.name,
         shortName: null,
-        roles: [],
+        kind: entity.kind!,
         website: null,
         country: null,
         region: null,
@@ -105,13 +111,15 @@ describe("POST /audits/{audit}/operations/approve", () => {
       evidenceRefs: [{ kind: "entity", entityId: entity.id }],
     };
     const artifacts = {
-      resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+      resolvedEntities: [
+        { entityId: entity.id, name: entity.name, kind: entity.kind! },
+      ],
       entityContexts: [
         {
           entityId: entity.id,
           name: entity.name,
           shortName: null,
-          roles: [],
+          kind: entity.kind!,
           website: null,
           country: null,
           region: null,
@@ -205,13 +213,15 @@ describe("POST /audits/{audit}/operations/approve", () => {
         ],
         findings: [],
         artifacts: {
-          resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+          resolvedEntities: [
+            { entityId: entity.id, name: entity.name, kind: entity.kind! },
+          ],
           entityContexts: [
             {
               entityId: entity.id,
               name: entity.name,
               shortName: entity.shortName,
-              roles: entity.type,
+              kind: entity.kind!,
               website: entity.website,
               country: null,
               region: null,
@@ -253,13 +263,13 @@ describe("POST /audits/{audit}/operations/approve", () => {
     ).toMatchObject({ excludedFields: ["website"], status: "applied" });
   });
 
-  test("applies a Bottle relationship to an inspected Entity that lacks the role", async ({
+  test("adds a Bottle relationship without changing the Entity kind", async ({
     fixtures,
   }) => {
     const moderator = await fixtures.User({ mod: true });
     const producer = await fixtures.Entity({
       name: "Shared Producer Relationship Test",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       name: "Open Day Relationship Test",
@@ -288,13 +298,19 @@ describe("POST /audits/{audit}/operations/approve", () => {
         findings: [],
         artifacts: {
           bottleContexts: [await inspectedBottleContext(bottle.id)],
-          resolvedEntities: [{ entityId: producer.id, name: producer.name }],
+          resolvedEntities: [
+            {
+              entityId: producer.id,
+              name: producer.name,
+              kind: producer.kind!,
+            },
+          ],
           entityContexts: [
             {
               entityId: producer.id,
               name: producer.name,
               shortName: producer.shortName,
-              roles: producer.type,
+              kind: producer.kind!,
               website: producer.website,
               country: null,
               region: null,
@@ -337,9 +353,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, producer.id),
       }),
-    ).toMatchObject({
-      type: expect.arrayContaining(["brand", "bottler", "distiller"]),
-    });
+    ).toMatchObject({ kind: "distillery", type: [] });
   });
 
   test("blocks a destination identity update selected with an Entity merge", async ({
@@ -348,11 +362,11 @@ describe("POST /audits/{audit}/operations/approve", () => {
     const moderator = await fixtures.User({ mod: true });
     const source = await fixtures.Entity({
       name: "Route Merge Source",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const destination = await fixtures.Entity({
       name: "Route Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     const bottle = await fixtures.Bottle({ brandId: destination.id });
     const proposals: ProposedOperation[] = [
@@ -360,9 +374,9 @@ describe("POST /audits/{audit}/operations/approve", () => {
         type: "update_entity",
         input: {
           entityId: destination.id,
-          patch: { roles: ["brand", "bottler"] },
+          patch: { kind: "bottler" },
         },
-        rationale: "The official source confirms the destination roles.",
+        rationale: "The official source confirms the destination kind.",
         evidenceRefs: [{ kind: "entity", entityId: destination.id }],
       },
       {
@@ -382,12 +396,13 @@ describe("POST /audits/{audit}/operations/approve", () => {
       resolvedEntities: [source, destination].map((entity) => ({
         entityId: entity.id,
         name: entity.name,
+        kind: entity.kind!,
       })),
       entityContexts: [source, destination].map((entity) => ({
         entityId: entity.id,
         name: entity.name,
         shortName: entity.shortName,
-        roles: entity.type,
+        kind: entity.kind!,
         website: entity.website,
         country: null,
         region: null,
@@ -440,7 +455,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, destination.id),
       }),
-    ).toMatchObject({ type: ["brand"] });
+    ).toMatchObject({ kind: "brand" });
     expect(
       await db.query.entities.findFirst({
         where: eq(entities.id, source.id),

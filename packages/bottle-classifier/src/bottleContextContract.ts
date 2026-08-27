@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 import {
+  BottleEntityRoleEnum,
   BottleExtractedDetailsSchema,
-  EntityTypeEnum,
+  EntityKindEnum,
   ProposedBottleFields,
 } from "./classifierTypes";
 
@@ -188,7 +189,7 @@ export const EntityContextBottleSampleSchema = z
   .object({
     bottleId: PositiveIdSchema,
     fullName: NonEmptyTextSchema,
-    relationships: z.array(EntityTypeEnum).nonempty(),
+    relationships: z.array(BottleEntityRoleEnum).nonempty(),
   })
   .strict();
 
@@ -196,7 +197,7 @@ export const EntityContextFields = {
   entityId: PositiveIdSchema,
   name: NonEmptyTextSchema,
   shortName: NonEmptyTextSchema.nullable(),
-  roles: z.array(EntityTypeEnum),
+  kind: EntityKindEnum,
   website: HttpUrlSchema.nullable(),
   country: NonEmptyTextSchema.nullable(),
   region: NonEmptyTextSchema.nullable(),

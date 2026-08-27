@@ -937,15 +937,15 @@ async function reconcilePriorExecution({
       }),
       transaction.query.entities.findFirst({
         where: eq(entities.id, proposal.data.input.destinationEntityId),
-        columns: { id: true, type: true },
+        columns: { id: true, kind: true },
       }),
     ]);
-    if (tombstone?.newEntityId && !source && destination) {
+    if (tombstone?.newEntityId && !source && destination?.kind) {
       return EntityMergeOperationExecutionResultSchema.parse({
         type: "merge_entities",
         sourceEntityId: proposal.data.input.sourceEntityId,
         destinationEntityId: tombstone.newEntityId,
-        destinationRoles: destination.type,
+        destinationKind: destination.kind,
         approvingModeratorId: moderator.id,
         reconciled: true,
         execution: { kind: "worker", name: "MergeEntity" },

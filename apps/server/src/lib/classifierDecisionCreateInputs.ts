@@ -12,14 +12,16 @@ function buildBottleEntityInput(
   choice: {
     id: number | null;
     name: string;
+    kind?: "brand" | "distillery" | "bottler" | "blender" | "company" | null;
   },
-  entityType: "brand" | "distiller" | "bottler",
+  defaultKind: "brand" | "distillery" | "bottler",
 ): RouteBottleInput["brand"] {
   return (
     choice.id ?? {
       name: choice.name,
-      type: [entityType],
-      kind: null,
+      // Classifier evidence is stronger than the Bottle relationship default.
+      // The default keeps older and non-classifier Bottle drafts usable.
+      kind: choice.kind ?? defaultKind,
       ownerId: null,
       description: null,
       shortName: null,
@@ -54,7 +56,7 @@ export function buildBottleInputFromProposedBottle(
       : null,
     brand: buildBottleEntityInput(proposedBottle.brand, "brand"),
     distillers: proposedBottle.distillers.map((distiller) =>
-      buildBottleEntityInput(distiller, "distiller"),
+      buildBottleEntityInput(distiller, "distillery"),
     ),
     bottler: proposedBottle.bottler
       ? buildBottleEntityInput(proposedBottle.bottler, "bottler")

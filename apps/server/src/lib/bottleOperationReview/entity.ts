@@ -17,7 +17,6 @@ import {
 import { formatBottleName } from "@peated/server/lib/format";
 import {
   EntityUpdateInputSchema,
-  type EntityUpdateExpectedState,
   type EntityUpdateInput,
 } from "@peated/server/lib/updateEntity";
 import {
@@ -47,7 +46,6 @@ import {
   requireNoEntityIdentityCollision,
   resolveLocation,
   sameValue,
-  sortedRoles,
   type EntityWithLocation,
   type ParsedPreparationContext,
   type PreparedOperationExecution,
@@ -161,7 +159,7 @@ async function resolveEntityUpdateInput({
   const canonicalInput: EntityUpdateInput = {};
   if (patch.name !== undefined) canonicalInput.name = name;
   if (patch.shortName !== undefined) canonicalInput.shortName = shortName;
-  if (patch.roles !== undefined) canonicalInput.type = sortedRoles(patch.roles);
+  if (patch.kind !== undefined) canonicalInput.kind = patch.kind;
   if (patch.website !== undefined) canonicalInput.website = patch.website;
   if (patch.country !== undefined) canonicalInput.country = country?.id ?? null;
   if (patch.region !== undefined || patch.country !== undefined) {
@@ -177,10 +175,7 @@ async function resolveEntityUpdateInput({
       entityId: current.entity.id,
       name,
       shortName,
-      roles:
-        input.type === undefined
-          ? sortedRoles(current.entity.type)
-          : sortedRoles(input.type),
+      kind: input.kind === undefined ? current.entity.kind! : input.kind,
       website:
         input.website === undefined ? current.entity.website : input.website,
       location: {
@@ -205,7 +200,7 @@ function entityChangedFields(
     [
       ["name", before.name, after.name],
       ["shortName", before.shortName, after.shortName],
-      ["roles", before.roles, after.roles],
+      ["kind", before.kind, after.kind],
       ["website", before.website, after.website],
       [
         "country",
@@ -244,11 +239,13 @@ export async function prepareEntityUpdate(
     );
   }
 
-  const tokenFields: EntityUpdateExpectedState["fields"] = {};
+  const tokenFields: z.infer<
+    typeof PreparedEntityUpdateDataSchema
+  >["stateToken"]["fields"] = {};
   for (const field of Object.keys(proposal.input.patch)) {
     switch (field) {
-      case "roles":
-        tokenFields.roles = sortedRoles(current.entity.type);
+      case "kind":
+        tokenFields.kind = current.entity.kind!;
         break;
       case "country":
       case "region":
@@ -337,7 +334,7 @@ function entityMergeIdentityState(
     entityId: current.entity.id,
     name: current.entity.name,
     shortName: current.entity.shortName,
-    roles: sortedRoles(current.entity.type),
+    kind: current.entity.kind!,
     aliasDigest: relationshipDigest(aliases),
     tombstoneDestinationEntityId,
   };
@@ -462,28 +459,13 @@ export async function prepareEntityMerge(
   if (tombstones.length > 0) {
     fail("invalid_current_state", "An Entity merge target is already retired.");
   }
-  const roles = sortedRoles([
-    ...source.entity.type,
-    ...destination.entity.type,
-  ]);
-  const after = {
-    ...entityPreviewState(destination),
-    roles,
-  };
+  const after = entityPreviewState(destination);
   const collisions = await entityMergeCollisions(
     context.database,
     source,
     destination,
   );
   const warnings = [
-    ...(!sameValue(roles, sortedRoles(destination.entity.type))
-      ? [
-          {
-            code: "role_union" as const,
-            message: "The survivor will retain the union of both Entity roles.",
-          },
-        ]
-      : []),
     ...(collisions.bottleIdentities > 0
       ? [
           {

@@ -119,3 +119,58 @@ test("keeps a marketed age exact without duplicating its name wording", () => {
     statedAge: 12,
   });
 });
+
+test("keeps a classifier-proposed kind for a new Entity", () => {
+  const proposedBottle: ProposedBottle = {
+    name: "Hedonism",
+    series: null,
+    category: "blend",
+    edition: null,
+    statedAge: null,
+    caskStrength: null,
+    singleCask: null,
+    maturation: null,
+    caskNumber: null,
+    outturn: null,
+    abv: null,
+    vintageYear: null,
+    releaseYear: null,
+    brand: { id: null, name: "Compass Box", kind: "blender" },
+    distillers: [],
+    bottler: null,
+  };
+
+  expect(
+    buildBottleInputFromProposedBottle(proposedBottle).brand,
+  ).toMatchObject({
+    name: "Compass Box",
+    kind: "blender",
+  });
+});
+
+test("uses Bottle relationship defaults when a new Entity has no kind", () => {
+  const proposedBottle: ProposedBottle = {
+    name: "Test Blend",
+    series: null,
+    category: "blend",
+    edition: null,
+    statedAge: null,
+    caskStrength: null,
+    singleCask: null,
+    maturation: null,
+    caskNumber: null,
+    outturn: null,
+    abv: null,
+    vintageYear: null,
+    releaseYear: null,
+    brand: { id: null, name: "Test Brand" },
+    distillers: [{ id: null, name: "Test Distillery" }],
+    bottler: { id: null, name: "Test Bottler" },
+  };
+
+  expect(buildBottleInputFromProposedBottle(proposedBottle)).toMatchObject({
+    brand: { name: "Test Brand", kind: "brand" },
+    distillers: [{ name: "Test Distillery", kind: "distillery" }],
+    bottler: { name: "Test Bottler", kind: "bottler" },
+  });
+});

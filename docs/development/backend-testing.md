@@ -120,7 +120,7 @@ happened.
 
 ```shell
 pnpm --filter=./apps/server test --run
-pnpm --filter=./apps/server test --run routes/entities/list.test.ts
+pnpm --filter=./apps/server test --run routes/entityKinds/list.test.ts
 ```
 
 For local PR preparation, run the backend tests that cover the touched behavior

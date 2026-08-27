@@ -115,43 +115,43 @@
       {
         "entityId": 1422,
         "name": "Compass Box",
-        "type": ["brand", "bottler"],
+        "kind": "blender",
         "source": ["context"]
       },
       {
         "entityId": 15,
         "name": "Allt-a-Bhainne",
-        "type": ["distiller"],
+        "kind": "distillery",
         "source": ["context"]
       },
       {
         "entityId": 89,
         "name": "Benrinnes",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       },
       {
         "entityId": 242,
         "name": "Glen Ord",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       },
       {
         "entityId": 410,
         "name": "Dailuaine",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       },
       {
         "entityId": 516,
         "name": "Teaninich",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       },
       {
         "entityId": 843,
         "name": "Clynelish",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       }
     ]
@@ -221,42 +221,42 @@
       {
         "id": 1361,
         "name": "Spice Tree",
-        "type": ["brand"]
+        "kind": "brand"
       },
       {
         "id": 1422,
         "name": "Compass Box",
-        "type": ["brand", "bottler"]
+        "kind": "blender"
       },
       {
         "id": 15,
         "name": "Allt-a-Bhainne",
-        "type": ["distiller"]
+        "kind": "distillery"
       },
       {
         "id": 89,
         "name": "Benrinnes",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 242,
         "name": "Glen Ord",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 410,
         "name": "Dailuaine",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 516,
         "name": "Teaninich",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 843,
         "name": "Clynelish",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

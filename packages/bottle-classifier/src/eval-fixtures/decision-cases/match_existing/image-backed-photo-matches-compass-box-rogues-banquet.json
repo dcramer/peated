@@ -122,31 +122,31 @@
       {
         "entityId": 1422,
         "name": "Compass Box",
-        "type": ["brand", "bottler"],
+        "kind": "blender",
         "source": ["context"]
       },
       {
         "entityId": 237,
         "name": "Glen Elgin",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       },
       {
         "entityId": 843,
         "name": "Clynelish",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       },
       {
         "entityId": 1185,
         "name": "Miltonduff",
-        "type": ["brand", "distiller"],
+        "kind": "brand",
         "source": ["context"]
       },
       {
         "entityId": 1204,
         "name": "North British",
-        "type": ["distiller"],
+        "kind": "distillery",
         "source": ["context"]
       }
     ]
@@ -182,27 +182,27 @@
       {
         "id": 1422,
         "name": "Compass Box",
-        "type": ["brand", "bottler"]
+        "kind": "blender"
       },
       {
         "id": 237,
         "name": "Glen Elgin",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 843,
         "name": "Clynelish",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 1185,
         "name": "Miltonduff",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 1204,
         "name": "North British",
-        "type": ["distiller"]
+        "kind": "distillery"
       }
     ],
     "bottles": [

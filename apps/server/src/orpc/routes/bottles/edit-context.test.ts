@@ -89,7 +89,7 @@ describe("GET /bottles/{bottle}/edit-context", () => {
     const brand = await fixtures.Entity({ name: "Context Group Brand" });
     const bottler = await fixtures.Entity({
       name: "Context Group Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const distillers = [
       await fixtures.Entity({ name: "Context Distiller A" }),
@@ -130,7 +130,7 @@ describe("GET /bottles/{bottle}/edit-context", () => {
     const driftBrand = await fixtures.Entity({ name: "Drift Bottle Brand" });
     const driftBottler = await fixtures.Entity({
       name: "Drift Bottle Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const driftDistiller = await fixtures.Entity({
       name: "Drift Bottle Distiller",

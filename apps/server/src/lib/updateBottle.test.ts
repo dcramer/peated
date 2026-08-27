@@ -360,7 +360,7 @@ describe("Bottle updates", () => {
     const targetBrand = await fixtures.Entity({ name: "Snapshot Target" });
     const distiller = await fixtures.Entity({
       name: "Snapshot Distillery",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const { first } = await createGroup({
       user: mod,
@@ -465,25 +465,23 @@ describe("Bottle updates", () => {
     ).toMatchObject({ seriesId: null });
   });
 
-  test("adds requested roles to existing numeric entities", async ({
-    fixtures,
-  }) => {
+  test("uses any Entity kind without changing it", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({
       name: "Role Validation Brand",
-      type: ["brand"],
+      kind: "brand",
     });
-    const rolelessBrand = await fixtures.Entity({
-      name: "Roleless Brand",
-      type: [],
+    const selectedBrand = await fixtures.Entity({
+      name: "Selected Brand",
+      kind: "company",
     });
-    const rolelessBottler = await fixtures.Entity({
-      name: "Roleless Bottler",
-      type: [],
+    const selectedBottler = await fixtures.Entity({
+      name: "Selected Bottler",
+      kind: "blender",
     });
-    const rolelessDistiller = await fixtures.Entity({
-      name: "Roleless Distiller",
-      type: [],
+    const selectedDistiller = await fixtures.Entity({
+      name: "Selected Distiller",
+      kind: "brand",
     });
     const { first } = await createGroup({
       user: mod,
@@ -495,94 +493,75 @@ describe("Bottle updates", () => {
     const result = await updateBottle({
       bottleId: first.bottle.id,
       input: {
-        brand: rolelessBrand.id,
-        bottler: rolelessBottler.id,
-        distillers: [rolelessDistiller.id],
+        brand: selectedBrand.id,
+        bottler: selectedBottler.id,
+        distillers: [selectedDistiller.id],
       },
       context: contextFor(mod),
     });
 
     expect(result.changed).toBe(true);
     expect(result.group).toMatchObject({
-      brandId: rolelessBrand.id,
-      bottlerId: rolelessBottler.id,
+      brandId: selectedBrand.id,
+      bottlerId: selectedBottler.id,
     });
-    for (const [entityId, role] of [
-      [rolelessBrand.id, "brand"],
-      [rolelessBottler.id, "bottler"],
-      [rolelessDistiller.id, "distiller"],
+    for (const [entityId, kind] of [
+      [selectedBrand.id, "company"],
+      [selectedBottler.id, "blender"],
+      [selectedDistiller.id, "brand"],
     ] as const) {
       expect(
         await db.query.entities.findFirst({
           where: eq(entities.id, entityId),
         }),
-      ).toMatchObject({ type: [role] });
-      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-        "OnEntityChange",
-        { entityId },
-      );
+      ).toMatchObject({ kind });
     }
     expect(await loadBottleDistillers([first.bottle.id])).toMatchObject([
-      { bottleId: first.bottle.id, distillerId: rolelessDistiller.id },
+      { bottleId: first.bottle.id, distillerId: selectedDistiller.id },
     ]);
     expect(await loadUpdateAudits([first.bottle.id])).toHaveLength(1);
   });
 
-  test("accounts for a role added while resolving an existing entity", async ({
+  test("reuses an existing Entity without changing its kind", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
-    const brand = await fixtures.Entity({
-      name: "Existing Role Lifecycle Brand",
-      type: ["brand"],
+    const oldBrand = await fixtures.Entity({
+      name: "Existing Kind Lifecycle Brand",
+      kind: "brand",
+    });
+    const selectedBrand = await fixtures.Entity({
+      name: "Selected Existing Kind Brand",
+      kind: "blender",
     });
     const { first } = await createGroup({
       user: mod,
-      stable: { name: "Role Lifecycle Label", brand: brand.id },
+      stable: { name: "Kind Lifecycle Label", brand: oldBrand.id },
       exacts: [{ edition: "One" }],
     });
-    await db
-      .update(entities)
-      .set({ type: [] })
-      .where(eq(entities.id, brand.id));
     resetQueueMock();
-    let observedCommittedRole = false;
-    vi.mocked(workerClient.pushUniqueJob).mockImplementation(
-      async (jobName, payload) => {
-        if (
-          jobName === "OnEntityChange" &&
-          payload !== undefined &&
-          "entityId" in payload &&
-          payload.entityId === brand.id
-        ) {
-          const persisted = await db.query.entities.findFirst({
-            where: eq(entities.id, brand.id),
-          });
-          observedCommittedRole = persisted?.type.includes("brand") ?? false;
-        }
-      },
-    );
 
     const result = await updateBottle({
       bottleId: first.bottle.id,
-      input: { brand: { name: brand.name } },
+      input: { brand: { name: selectedBrand.name } },
       context: contextFor(mod),
     });
 
     expect(result.changed).toBe(true);
-    expect(observedCommittedRole).toBe(true);
     expect(
-      await db.query.entities.findFirst({ where: eq(entities.id, brand.id) }),
-    ).toMatchObject({ type: ["brand"] });
+      await db.query.entities.findFirst({
+        where: eq(entities.id, selectedBrand.id),
+      }),
+    ).toMatchObject({ kind: "blender", type: [] });
     const audits = await loadUpdateAudits([first.bottle.id]);
     expect(audits).toHaveLength(1);
     expect(audits[0].data).toMatchObject({ updateScope: "shared" });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
-      entityId: brand.id,
+      entityId: selectedBrand.id,
     });
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyEntityCreation",
-      expect.objectContaining({ entityId: brand.id }),
+      expect.objectContaining({ entityId: selectedBrand.id }),
     );
   });
 
@@ -592,27 +571,27 @@ describe("Bottle updates", () => {
     const mod = await fixtures.User({ mod: true });
     const oldBrand = await fixtures.Entity({
       name: "Aggregate Old Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const oldBottler = await fixtures.Entity({
       name: "Aggregate Old Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const oldDistiller = await fixtures.Entity({
       name: "Aggregate Old Distiller",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const newBrand = await fixtures.Entity({
       name: "Aggregate New Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const newBottler = await fixtures.Entity({
       name: "Aggregate New Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const newDistiller = await fixtures.Entity({
       name: "Aggregate New Distiller",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const { first } = await createGroup({
       user: mod,
@@ -920,7 +899,7 @@ describe("Bottle updates", () => {
     const brand = await fixtures.Entity({ name: "Exact Update Brand" });
     const bottler = await fixtures.Entity({
       name: "Exact Update Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const distillers = [
       await fixtures.Entity({ name: "Exact Update Distiller A" }),
@@ -1234,14 +1213,14 @@ describe("Bottle updates", () => {
     const oldBrand = await fixtures.Entity({ name: "Old Shared Brand" });
     const oldBottler = await fixtures.Entity({
       name: "Old Shared Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const oldDistiller = await fixtures.Entity({ name: "Old Distiller" });
     const oldSeries = await fixtures.BottleSeries({ brandId: oldBrand.id });
     const newBrand = await fixtures.Entity({ name: "New Shared Brand" });
     const newBottler = await fixtures.Entity({
       name: "New Shared Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const newDistillers = [
       await fixtures.Entity({ name: "New Distiller A" }),
@@ -1912,7 +1891,7 @@ describe("Bottle updates", () => {
     const smws = await fixtures.Entity({
       name: "SMWS",
       shortName: "SMWS",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const existing = await fixtures.Bottle({
       brandId: smws.id,
@@ -1959,7 +1938,7 @@ describe("Bottle updates", () => {
     const smws = await fixtures.Entity({
       name: "SMWS",
       shortName: "SMWS",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const existing = await fixtures.Bottle({
       brandId: smws.id,
@@ -1968,7 +1947,7 @@ describe("Bottle updates", () => {
     });
     const ordinaryBrand = await fixtures.Entity({
       name: "Semantic Collision Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const { first } = await createGroup({
       user: mod,
@@ -2020,7 +1999,7 @@ describe("Bottle updates", () => {
     const smws = await fixtures.Entity({
       name: "SMWS",
       shortName: "SMWS",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const { first, members } = await createGroup({
       user: mod,

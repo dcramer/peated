@@ -2,17 +2,16 @@ import { EntityResolutionSchema } from "@peated/bottle-classifier/internal/types
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
 
 describe("searchClassifierEntities", () => {
-  test("returns a role-independent exact identity without widening fuzzy results", async ({
+  test("returns global exact and contained Entity matches", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
       name: "Existing Release Imprint",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
 
     const results = await searchClassifierEntities({
       query: "Existing Release Imprint",
-      type: "bottler",
       limit: 5,
     });
 
@@ -25,13 +24,10 @@ describe("searchClassifierEntities", () => {
 
     const fuzzyResults = await searchClassifierEntities({
       query: "Existing Release Imprint Company",
-      type: "bottler",
       limit: 5,
     });
 
-    expect(fuzzyResults.map((result) => result.entityId)).not.toContain(
-      entity.id,
-    );
+    expect(fuzzyResults.map((result) => result.entityId)).toContain(entity.id);
   });
 
   test("returns schema-valid full-text entity matches", async ({
@@ -39,12 +35,11 @@ describe("searchClassifierEntities", () => {
   }) => {
     const entity = await fixtures.Entity({
       name: "Ichiro’s Malt",
-      type: ["brand"],
+      kind: "brand",
     });
 
     const results = await searchClassifierEntities({
       query: "Ichiro's Malt",
-      type: "brand",
       limit: 10,
     });
 
@@ -54,9 +49,30 @@ describe("searchClassifierEntities", () => {
     expect(results).toContainEqual(
       expect.objectContaining({
         entityId: entity.id,
-        type: ["brand"],
+        kind: "brand",
       }),
     );
+  });
+
+  test("filters Entity-classifier search by kind", async ({ fixtures }) => {
+    const brand = await fixtures.Entity({
+      name: "Kindfilter Brand",
+      kind: "brand",
+    });
+    const company = await fixtures.Entity({
+      name: "Kindfilter Company",
+      kind: "company",
+    });
+
+    const results = await searchClassifierEntities({
+      query: "Kindfilter",
+      kind: "company",
+      limit: 5,
+    });
+
+    expect(results.map(({ entityId }) => entityId)).toContain(company.id);
+    expect(results.map(({ entityId }) => entityId)).not.toContain(brand.id);
+    expect(results.every(({ kind }) => kind === "company")).toBe(true);
   });
 
   test("returns a shorter contained distillery name as a candidate", async ({
@@ -64,12 +80,11 @@ describe("searchClassifierEntities", () => {
   }) => {
     const distillery = await fixtures.Entity({
       name: "Copperfield",
-      type: ["distiller"],
+      kind: "distillery",
     });
 
     const results = await searchClassifierEntities({
       query: "Atlas Copperfield Distillery Co.",
-      type: "distiller",
       limit: 5,
     });
 
@@ -86,16 +101,15 @@ describe("searchClassifierEntities", () => {
   }) => {
     const broad = await fixtures.Entity({
       name: "Northstar",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const specific = await fixtures.Entity({
       name: "Northstar Distillery",
-      type: ["distiller"],
+      kind: "distillery",
     });
 
     const results = await searchClassifierEntities({
       query: "Northstar Distillery Co.",
-      type: "distiller",
       limit: 5,
     });
 
@@ -118,12 +132,11 @@ describe("searchClassifierEntities", () => {
       "Qzxalpha Qzxbeta Qzxgamma Distillery",
     ];
     const created = await Promise.all(
-      names.map((name) => fixtures.Entity({ name, type: ["distiller"] })),
+      names.map((name) => fixtures.Entity({ name, kind: "distillery" })),
     );
 
     const results = await searchClassifierEntities({
       query: "Qzxalpha Qzxbeta Qzxgamma Distillery Company",
-      type: "distiller",
       limit: 1,
     });
 
@@ -136,11 +149,11 @@ describe("searchClassifierEntities", () => {
   }) => {
     const aliasHeavy = await fixtures.Entity({
       name: "Crowd Holder",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const specific = await fixtures.Entity({
       name: "Needle Producer",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const aliases = Array.from(
       { length: 10 },
@@ -154,7 +167,6 @@ describe("searchClassifierEntities", () => {
 
     const results = await searchClassifierEntities({
       query: `${aliases.join(" ")} Needle Producer Company`,
-      type: "distiller",
       limit: 2,
     });
 
@@ -173,7 +185,7 @@ describe("searchClassifierEntities", () => {
       Array.from({ length: 5 }, async (_, index) => {
         const entity = await fixtures.Entity({
           name: `Unrelated Extremely Long Canonical Distillery Name ${index}`,
-          type: ["distiller"],
+          kind: "distillery",
         });
         await fixtures.EntityAlias({
           entityId: entity.id,
@@ -184,12 +196,11 @@ describe("searchClassifierEntities", () => {
     );
     const specific = await fixtures.Entity({
       name: "Needle Producer",
-      type: ["distiller"],
+      kind: "distillery",
     });
 
     const results = await searchClassifierEntities({
       query: `${misleading.map((_, index) => `Alias${index}`).join(" ")} Needle Producer Company`,
-      type: "distiller",
       limit: 1,
     });
 
@@ -202,7 +213,7 @@ describe("searchClassifierEntities", () => {
   }) => {
     const entity = await fixtures.Entity({
       name: "Canonical Producer",
-      type: ["distiller"],
+      kind: "distillery",
     });
     await fixtures.EntityAlias({ entityId: entity.id, name: "Zed Alias" });
     await fixtures.EntityAlias({
@@ -212,7 +223,6 @@ describe("searchClassifierEntities", () => {
 
     const results = await searchClassifierEntities({
       query: "Zed Alias Alpha Very Long Specific Producer Alias Company",
-      type: "distiller",
       limit: 5,
     });
 

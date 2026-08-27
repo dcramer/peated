@@ -10,15 +10,15 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /entities/:entity/categories", () => {
-  test("lists Bottle-owned categories across every entity role", async ({
+  test("lists Bottle-owned categories across every Bottle relationship", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
       totalBottles: 99,
-      type: ["brand", "bottler", "distiller"],
+      kind: "distillery",
     });
     const otherEntity = await fixtures.Entity({
-      type: ["brand", "bottler", "distiller"],
+      kind: "distillery",
     });
     await fixtures.Bottle({
       name: "Brand Role Bottle",
@@ -54,11 +54,11 @@ describe("GET /entities/:entity/categories", () => {
     });
   });
 
-  test("counts a Bottle once when the entity fills multiple roles", async ({
+  test("counts a Bottle once when the Entity fills multiple relationships", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
-      type: ["brand", "bottler", "distiller"],
+      kind: "distillery",
     });
     await fixtures.Bottle({
       name: "Overlapping Roles Bottle",
@@ -82,10 +82,10 @@ describe("GET /entities/:entity/categories", () => {
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
-      type: ["brand", "bottler", "distiller"],
+      kind: "distillery",
     });
     const otherEntity = await fixtures.Entity({
-      type: ["brand", "bottler", "distiller"],
+      kind: "distillery",
     });
     const activeBottle = await fixtures.Bottle({
       name: "Active Bottle Identity",

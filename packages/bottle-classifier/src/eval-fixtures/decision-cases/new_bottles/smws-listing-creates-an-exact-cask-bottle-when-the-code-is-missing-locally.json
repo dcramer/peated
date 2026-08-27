@@ -31,12 +31,12 @@
         "id": 4263,
         "name": "The Scotch Malt Whisky Society",
         "shortName": "SMWS",
-        "type": ["brand", "bottler"]
+        "kind": "brand"
       },
       {
         "id": 127,
         "name": "Kyrö",
-        "type": ["distiller"]
+        "kind": "distillery"
       }
     ],
     "bottles": [],

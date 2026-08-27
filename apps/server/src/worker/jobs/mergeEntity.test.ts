@@ -240,15 +240,18 @@ async function createApplyingEntityMergeOperation({
     ],
   };
   const inspectedEntities = await db
-    .select({ entityId: entities.id, name: entities.name })
+    .select({ entityId: entities.id, name: entities.name, kind: entities.kind })
     .from(entities)
     .where(inArray(entities.id, [sourceEntityId, destinationEntityId]));
   const artifacts = {
-    resolvedEntities: inspectedEntities,
+    resolvedEntities: inspectedEntities.map((entity) => ({
+      ...entity,
+      kind: entity.kind!,
+    })),
     entityContexts: inspectedEntities.map((entity) => ({
       ...entity,
       shortName: null,
-      roles: [],
+      kind: entity.kind!,
       website: null,
       country: null,
       region: null,
@@ -326,7 +329,7 @@ test("validates persisted Entity merge results by lifecycle state", async ({
     type: "merge_entities",
     sourceEntityId: sourceEntity.id,
     destinationEntityId: destinationEntity.id,
-    destinationRoles: destinationEntity.type,
+    destinationKind: destinationEntity.kind,
     approvingModeratorId: moderator.id,
     reconciled: false,
     execution: { kind: "worker", name: "MergeEntity" },
@@ -466,11 +469,11 @@ test("preserves generated Bottle content during an equivalent Entity merge", asy
 }) => {
   const source = await fixtures.Entity({
     name: "Legacy Bottler Name",
-    type: ["bottler"],
+    kind: "bottler",
   });
   const destination = await fixtures.Entity({
     name: "Canonical Bottler Name",
-    type: ["bottler"],
+    kind: "bottler",
   });
   const bottle = await fixtures.Bottle({ bottlerId: source.id });
   const tastingNotes = {
@@ -514,16 +517,16 @@ test("merges an SMWS collision while replacing a duplicate distiller", async ({
   const smws = await fixtures.Entity({
     name: "SMWS",
     shortName: "SMWS",
-    type: ["brand", "bottler"],
+    kind: "bottler",
   });
   const destination = await fixtures.Entity({
     name: "Balcones Distilling",
     shortName: "Balcones",
-    type: ["distiller"],
+    kind: "distillery",
   });
   const source = await fixtures.Entity({
     name: "Balcones",
-    type: ["distiller"],
+    kind: "distillery",
   });
   const canonicalBottle = await fixtures.Bottle({
     brandId: smws.id,
@@ -589,16 +592,16 @@ test("merges an SMWS collision while replacing a duplicate bottler", async ({
 }) => {
   const brand = await fixtures.Entity({
     name: "Example Distillery",
-    type: ["brand", "distiller"],
+    kind: "distillery",
   });
   const destination = await fixtures.Entity({
     name: "SMWS",
     shortName: "SMWS",
-    type: ["bottler"],
+    kind: "bottler",
   });
   const source = await fixtures.Entity({
     name: "Scotch Malt Whisky Society",
-    type: ["bottler"],
+    kind: "bottler",
   });
   const canonicalBottle = await fixtures.Bottle({
     brandId: brand.id,
@@ -645,16 +648,16 @@ test("merges an SMWS collision while replacing a duplicate brand", async ({
 }) => {
   const distiller = await fixtures.Entity({
     name: "Example Producer",
-    type: ["distiller"],
+    kind: "distillery",
   });
   const destination = await fixtures.Entity({
     name: "SMWS",
     shortName: "SMWS",
-    type: ["brand", "bottler"],
+    kind: "bottler",
   });
   const source = await fixtures.Entity({
     name: "The Scotch Malt Whisky Society",
-    type: ["brand", "bottler"],
+    kind: "bottler",
   });
   const canonicalBottle = await fixtures.Bottle({
     brandId: destination.id,
@@ -701,7 +704,7 @@ test("preserves the source when the locked destination is deleted", async ({
 }) => {
   const source = await fixtures.Entity({
     name: "Missing Destination Source",
-    type: ["brand"],
+    kind: "brand",
   });
   const destination = await fixtures.Entity({
     name: "Missing Destination Target",
@@ -849,16 +852,16 @@ test("moves followers to the destination Entity", async ({ fixtures }) => {
   ]);
 });
 
-test("preserves the disjoint Entity role union shown in the merge preview", async ({
+test("preserves the destination Entity kind shown in the merge preview", async ({
   fixtures,
 }) => {
   const source = await fixtures.Entity({
-    name: "Role Union Source",
-    type: ["distiller"],
+    name: "Kind Merge Source",
+    kind: "distillery",
   });
   const destination = await fixtures.Entity({
-    name: "Role Union Destination",
-    type: ["brand", "bottler"],
+    name: "Kind Merge Destination",
+    kind: "bottler",
   });
   const proposal: MergeEntitiesOperation = {
     type: "merge_entities",
@@ -876,14 +879,18 @@ test("preserves the disjoint Entity role union shown in the merge preview", asyn
     operation: { id: 1, proposal },
     artifacts: {
       resolvedEntities: [
-        { entityId: source.id, name: source.name },
-        { entityId: destination.id, name: destination.name },
+        { entityId: source.id, name: source.name, kind: source.kind! },
+        {
+          entityId: destination.id,
+          name: destination.name,
+          kind: destination.kind!,
+        },
       ],
       entityContexts: [source, destination].map((entity) => ({
         entityId: entity.id,
         name: entity.name,
         shortName: entity.shortName,
-        roles: entity.type,
+        kind: entity.kind,
         website: entity.website,
         country: null,
         region: null,
@@ -910,9 +917,7 @@ test("preserves the disjoint Entity role union shown in the merge preview", asyn
     await db.query.entities.findFirst({
       where: eq(entities.id, destination.id),
     }),
-  ).toMatchObject({
-    type: prepared.preview.after.roles,
-  });
+  ).toMatchObject({ kind: prepared.preview.after.kind });
 });
 
 test("merge duplicate bottle", async ({ fixtures }) => {
@@ -1007,17 +1012,17 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
   });
 });
 
-test("fans merged shared entity roles through every BottleGroup member", async ({
+test("fans merged Bottle relationships through every BottleGroup member", async ({
   defaults,
   fixtures,
 }) => {
   const sourceEntity = await fixtures.Entity({
     name: "Shared Source",
-    type: ["brand", "bottler", "distiller"],
+    kind: "distillery",
   });
   const destinationEntity = await fixtures.Entity({
     name: "Shared Destination",
-    type: ["brand", "bottler", "distiller"],
+    kind: "distillery",
   });
   const sourceSeries = await fixtures.BottleSeries({
     brandId: sourceEntity.id,
@@ -1112,11 +1117,11 @@ test("operation-backed merge records applied only after canonical state and attr
 }) => {
   const sourceEntity = await fixtures.Entity({
     name: "Operation Source",
-    type: ["distiller"],
+    kind: "distillery",
   });
   const destinationEntity = await fixtures.Entity({
     name: "Operation Destination",
-    type: ["brand"],
+    kind: "brand",
   });
   const bottle = await fixtures.Bottle({
     distillerIds: [sourceEntity.id],
@@ -1148,7 +1153,7 @@ test("operation-backed merge records applied only after canonical state and attr
       type: "merge_entities",
       sourceEntityId: sourceEntity.id,
       destinationEntityId: destinationEntity.id,
-      destinationRoles: ["brand", "distiller"],
+      destinationKind: "brand",
       approvingModeratorId: moderator.id,
       reconciled: false,
       execution: {
@@ -1191,11 +1196,7 @@ test("operation-backed merge records applied only after canonical state and attr
   });
   expect(destinationChange?.data).toMatchObject({
     operationId: operation.id,
-    destinationRoles: ["brand", "distiller"],
-    roleChange: {
-      before: ["brand"],
-      after: ["brand", "distiller"],
-    },
+    destinationKind: "brand",
   });
 
   const bottleChange = await db.query.changes.findFirst({
@@ -1331,11 +1332,11 @@ test("operation-backed retry reconciles an already-applied merge without mutatin
 }) => {
   const sourceEntity = await fixtures.Entity({
     name: "Reconcile Source",
-    type: ["brand", "distiller"],
+    kind: "distillery",
   });
   const destinationEntity = await fixtures.Entity({
     name: "Reconcile Destination",
-    type: ["bottler"],
+    kind: "bottler",
   });
   const bottle = await fixtures.Bottle({ brandId: sourceEntity.id });
   const moderator = await fixtures.User({ mod: true });
@@ -1373,7 +1374,7 @@ test("operation-backed retry reconciles an already-applied merge without mutatin
     result: {
       sourceEntityId: sourceEntity.id,
       destinationEntityId: destinationEntity.id,
-      destinationRoles: ["bottler", "brand", "distiller"],
+      destinationKind: "bottler",
       reconciled: true,
     },
   });
@@ -1382,7 +1383,7 @@ test("operation-backed retry reconciles an already-applied merge without mutatin
       where: eq(entities.id, destinationEntity.id),
     }),
   ).toMatchObject({
-    type: ["bottler", "brand", "distiller"],
+    kind: "bottler",
   });
   expect(
     await db

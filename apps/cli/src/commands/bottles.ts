@@ -19,13 +19,7 @@ const subcommand = program.command("bottles");
 
 async function resolveEntityReference(
   value: string,
-  {
-    label,
-    requiredType,
-  }: {
-    label: string;
-    requiredType?: "brand" | "distiller" | "bottler";
-  },
+  { label }: { label: string },
 ) {
   const entity = /^\d+$/.test(value)
     ? await db.query.entities.findFirst({
@@ -35,12 +29,6 @@ async function resolveEntityReference(
 
   if (!entity) {
     throw new Error(`${label} not found: ${value}`);
-  }
-
-  if (requiredType && !entity.type.includes(requiredType)) {
-    throw new Error(
-      `${label} must include entity type "${requiredType}": ${entity.name}`,
-    );
   }
 
   return entity;
@@ -218,16 +206,13 @@ subcommand
   .action(async (bottleIds: string[], options) => {
     const fromBrand = await resolveEntityReference(options.fromBrand, {
       label: "Source brand",
-      requiredType: "brand",
     });
     const toBrand = await resolveEntityReference(options.toBrand, {
       label: "Target brand",
-      requiredType: "brand",
     });
     const distillery = options.distillery
       ? await resolveEntityReference(options.distillery, {
           label: "Distillery",
-          requiredType: "distiller",
         })
       : null;
 

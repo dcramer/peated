@@ -340,7 +340,8 @@ export const Entity = async (
     const entityData: dbSchema.NewEntity = {
       name,
       countryId: data.countryId ?? (await Country({}, tx)).id,
-      type: ["brand", "distiller"],
+      type: [],
+      kind: data.kind ?? "brand",
       createdAt: new Date(),
       updatedAt: new Date(),
       ...data,
@@ -1318,7 +1319,7 @@ export async function BottleSeries(
 ): Promise<dbSchema.BottleSeries> {
   const result = await db.transaction(async (tx) => {
     const brandId =
-      data.brandId ?? (await Entity({ type: ["distiller"] }, tx)).id;
+      data.brandId ?? (await Entity({ kind: "distillery" }, tx)).id;
 
     // Get the brand to build fullName
     const brand = await tx.query.entities.findFirst({

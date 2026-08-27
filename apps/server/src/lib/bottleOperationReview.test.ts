@@ -21,6 +21,11 @@ function requireGroupId(groupId: number | null): number {
   return groupId;
 }
 
+type EntityArtifact = Pick<
+  typeof entities.$inferSelect,
+  "id" | "kind" | "name"
+>;
+
 function artifacts({
   bottleIds = [],
   entities: inspectedEntities = [],
@@ -30,9 +35,9 @@ function artifacts({
   bottleContexts = [],
 }: {
   bottleIds?: number[];
-  entities?: Array<{ id: number; name: string }>;
+  entities?: EntityArtifact[];
   candidateBottleIds?: number[];
-  resolvedEntities?: Array<{ id: number; name: string }>;
+  resolvedEntities?: EntityArtifact[];
   urls?: string[];
   bottleContexts?: BottleContext[];
 }) {
@@ -74,6 +79,7 @@ function artifacts({
     resolvedEntities: [...inspectedEntities, ...resolvedEntities].map(
       (entity) => ({
         entityId: entity.id,
+        kind: entity.kind!,
         name: entity.name,
       }),
     ),
@@ -81,7 +87,7 @@ function artifacts({
       entityId: entity.id,
       name: entity.name,
       shortName: null,
-      roles: [],
+      kind: entity.kind!,
       website: null,
       country: null,
       region: null,
@@ -129,15 +135,15 @@ describe("Bottle operation review preparation", () => {
     const entityToUpdate = await fixtures.Entity({
       name: "Entity Before",
       shortName: null,
-      type: ["brand"],
+      kind: "brand",
     });
     const entityMergeSource = await fixtures.Entity({
       name: "Entity Merge Source",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const entityMergeDestination = await fixtures.Entity({
       name: "Entity Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
 
     const result = await prepareOperations({
@@ -153,7 +159,7 @@ describe("Bottle operation review preparation", () => {
                   kind: "create",
                   entity: {
                     name: "Review Created Brand",
-                    roles: ["brand"],
+                    kind: "brand",
                   },
                 },
               },
@@ -234,7 +240,7 @@ describe("Bottle operation review preparation", () => {
         entityCreations: [
           {
             kind: "create",
-            entity: { name: "Review Created Brand", roles: ["brand"] },
+            entity: { name: "Review Created Brand", kind: "brand" },
           },
         ],
         warnings: expect.arrayContaining([
@@ -263,12 +269,8 @@ describe("Bottle operation review preparation", () => {
     expect(result[3]).toMatchObject({
       type: "merge_entities",
       preview: {
-        after: { roles: ["brand", "distiller"] },
-        warnings: [
-          expect.objectContaining({
-            code: "role_union",
-          }),
-        ],
+        after: { kind: "brand" },
+        warnings: [],
       },
     });
   });
@@ -279,7 +281,7 @@ describe("Bottle operation review preparation", () => {
     const distiller = await fixtures.Entity({
       name: "Legacy Blank Short Name Distillery",
       shortName: "",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       name: "Legacy Distiller Preview",
@@ -337,11 +339,11 @@ describe("Bottle operation review preparation", () => {
     const source = await fixtures.Entity({
       name: "Legacy Blank Merge Source",
       shortName: "",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const destination = await fixtures.Entity({
       name: "Legacy Blank Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
 
     const result = await prepareOperation({
@@ -381,7 +383,7 @@ describe("Bottle operation review preparation", () => {
     const entity = await fixtures.Entity({
       name: "Legacy Blank Update Entity",
       shortName: "",
-      type: ["brand"],
+      kind: "brand",
     });
     const context = { artifacts: artifacts({ entities: [entity] }) };
 
@@ -453,11 +455,11 @@ describe("Bottle operation review preparation", () => {
 
     const sourceEntity = await fixtures.Entity({
       name: "Old Collision Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const destinationEntity = await fixtures.Entity({
       name: "Surviving Collision Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Bottle({
       brandId: sourceEntity.id,
@@ -941,7 +943,7 @@ describe("Bottle operation review preparation", () => {
   }) => {
     const brand = await fixtures.Entity({
       name: "Series Review Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const series = await fixtures.BottleSeries({
       brandId: brand.id,
@@ -1009,11 +1011,11 @@ describe("Bottle operation review preparation", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Current Series Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const proposedBrand = await fixtures.Entity({
       name: "Proposed Series Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const retainedSeries = await fixtures.BottleSeries({
       brandId: currentBrand.id,
@@ -1065,11 +1067,11 @@ describe("Bottle operation review preparation", () => {
     });
     const sourceEntity = await fixtures.Entity({
       name: "Role Merge Source",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const destinationEntity = await fixtures.Entity({
       name: "Role Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     const context = {
       artifacts: artifacts({
@@ -1145,9 +1147,9 @@ describe("Bottle operation review preparation", () => {
             type: "update_entity",
             input: {
               entityId: destinationEntity.id,
-              patch: { roles: ["brand", "bottler"] },
+              patch: { kind: "bottler" },
             },
-            rationale: "Updates a merge-owned role set.",
+            rationale: "Updates the destination kind.",
             evidenceRefs: [{ kind: "entity", entityId: destinationEntity.id }],
           },
         },
@@ -1159,7 +1161,7 @@ describe("Bottle operation review preparation", () => {
               sourceEntityId: sourceEntity.id,
               destinationEntityId: destinationEntity.id,
             },
-            rationale: "Merges roles into the destination.",
+            rationale: "Merges the source into the destination.",
             evidenceRefs: [
               { kind: "entity", entityId: sourceEntity.id },
               { kind: "entity", entityId: destinationEntity.id },
@@ -1218,11 +1220,11 @@ describe("Bottle operation review preparation", () => {
   }) => {
     const sourceEntity = await fixtures.Entity({
       name: "Metadata Merge Source",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const destinationEntity = await fixtures.Entity({
       name: "Metadata Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     const country = await fixtures.Country({ name: "Metadata Country" });
     const region = await fixtures.Region({
@@ -1687,7 +1689,7 @@ describe("Bottle operation review preparation", () => {
 
     const entity = await fixtures.Entity({
       name: "Relationship Entity Before",
-      type: ["brand"],
+      kind: "brand",
     });
     const entityOperation = {
       id: 72,
@@ -1733,11 +1735,11 @@ describe("Bottle operation review preparation", () => {
   }) => {
     const firstDistiller = await fixtures.Entity({
       name: "First Set Distiller",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const secondDistiller = await fixtures.Entity({
       name: "Second Set Distiller",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       name: "Distiller Set Bottle",
@@ -1780,11 +1782,11 @@ describe("Bottle operation review preparation", () => {
   }) => {
     const source = await fixtures.Entity({
       name: "Batched Collision Source",
-      type: ["brand"],
+      kind: "brand",
     });
     const destination = await fixtures.Entity({
       name: "Batched Collision Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     for (let index = 0; index <= 20; index += 1) {
       await fixtures.Bottle({

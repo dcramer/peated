@@ -29,11 +29,9 @@ export default function EntityResultRow({
         </div>
       </div>
       <div className="hidden items-end gap-x-1 lg:flex">
-        {entity.type.map((t) => (
-          <Chip key={t} size="small" color="highlight">
-            {t}
-          </Chip>
-        ))}
+        <Chip size="small" color="highlight">
+          {entity.kind}
+        </Chip>
       </div>
     </>
   );

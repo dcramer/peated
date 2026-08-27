@@ -1,7 +1,4 @@
-import {
-  EntityClassificationReferenceSchema,
-  EntityTypeEnum,
-} from "@peated/entity-classifier";
+import { EntityClassificationReferenceSchema } from "@peated/entity-classifier";
 import { getEntityAuditCandidates } from "@peated/server/lib/entityAuditCandidates";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -25,7 +22,6 @@ export default procedure
       query: z.coerce.string().default(""),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
-      type: EntityTypeEnum.nullable().default("brand"),
     }),
   )
   .output(

@@ -386,7 +386,7 @@ describe("eval fixture validation", () => {
         },
       },
       localCatalog: {
-        entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
+        entities: [{ id: 1, name: "Shieldaig", kind: "brand" }],
         bottles: [],
         aliases: [],
       },

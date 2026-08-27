@@ -67,25 +67,27 @@ function replaceMergedEntityIds(
   ).sort((left, right) => left - right);
 }
 
-type EntityRole = (typeof entities.$inferSelect)["type"][number];
-type EntityDestinationUpdate = Partial<
-  Pick<typeof entities.$inferInsert, "type" | "ownerId">
->;
+type EntityKind = NonNullable<(typeof entities.$inferSelect)["kind"]>;
 
-function sortedUniqueEntityRoles(roleSets: readonly EntityRole[][]) {
-  return Array.from(new Set<EntityRole>(roleSets.flat())).sort();
+function requireEntityKind(
+  entity: Pick<typeof entities.$inferSelect, "id" | "kind">,
+): EntityKind {
+  if (!entity.kind) {
+    throw new Error(`Entity ${entity.id} does not have a kind.`);
+  }
+  return entity.kind;
 }
 
 function buildOperationResult(
   operation: LoadedEntityMergeOperation,
   reconciled: boolean,
-  destinationRoles: EntityRole[],
+  destinationKind: EntityKind,
 ) {
   return {
     type: "merge_entities" as const,
     sourceEntityId: operation.sourceEntityId,
     destinationEntityId: operation.destinationEntityId,
-    destinationRoles,
+    destinationKind,
     approvingModeratorId: operation.approvingModerator.id,
     reconciled,
     execution: {
@@ -193,7 +195,7 @@ async function performEntityMerge({
         completedOperationResult = buildOperationResult(
           currentOperation,
           true,
-          sortedUniqueEntityRoles([reconciledDestination.type]),
+          requireEntityKind(reconciledDestination),
         );
         await markEntityMergeOperationApplied({
           database: tx,
@@ -236,15 +238,7 @@ async function performEntityMerge({
     const actor = operation
       ? await getUserActorForDatabase(tx, operation.approvingModerator)
       : await getPeatedSystemActorForDatabase(tx);
-    const destinationRolesBefore = sortedUniqueEntityRoles([toEntity.type]);
-    const destinationRolesAfter = sortedUniqueEntityRoles(
-      mergeEntityRows.map(({ type }) => type),
-    );
-    const destinationRolesChanged =
-      destinationRolesBefore.length !== destinationRolesAfter.length ||
-      destinationRolesBefore.some(
-        (role, index) => role !== destinationRolesAfter[index],
-      );
+    const destinationKind = requireEntityKind(toEntity);
 
     const mergedEntityIds = new Set([toEntityId, ...fromEntityIds]);
     const externalOwnerIds = new Set(
@@ -262,15 +256,10 @@ async function performEntityMerge({
     }
     const destinationOwnerId = externalOwnerIds.values().next().value ?? null;
     const destinationOwnerChanged = toEntity.ownerId !== destinationOwnerId;
-    if (destinationRolesChanged || destinationOwnerChanged) {
-      const destinationUpdate: EntityDestinationUpdate = {};
-      if (destinationRolesChanged)
-        destinationUpdate.type = destinationRolesAfter;
-      if (destinationOwnerChanged)
-        destinationUpdate.ownerId = destinationOwnerId;
+    if (destinationOwnerChanged) {
       await tx
         .update(entities)
-        .set(destinationUpdate)
+        .set({ ownerId: destinationOwnerId })
         .where(eq(entities.id, toEntityId));
     }
 
@@ -681,26 +670,16 @@ async function performEntityMerge({
         operationId: number;
         updateScope: "entity_merge";
         sourceEntityIds: number[];
-        destinationRoles: typeof destinationRolesAfter;
-        roleChange?: {
-          before: typeof destinationRolesBefore;
-          after: typeof destinationRolesAfter;
-        };
+        destinationKind: EntityKind;
         execution: { kind: "worker"; name: "MergeEntity" };
       };
       const destinationChangeData: DestinationEntityMergeChangeData = {
         operationId: operation.operationId,
         updateScope: "entity_merge",
         sourceEntityIds: fromEntityIds,
-        destinationRoles: destinationRolesAfter,
+        destinationKind,
         execution: { kind: "worker", name: "MergeEntity" },
       };
-      if (destinationRolesChanged) {
-        destinationChangeData.roleChange = {
-          before: destinationRolesBefore,
-          after: destinationRolesAfter,
-        };
-      }
       await tx.insert(changes).values([
         ...sourceEntities.map((sourceEntity) => ({
           objectType: "entity" as const,
@@ -762,7 +741,7 @@ async function performEntityMerge({
       completedOperationResult = buildOperationResult(
         operation,
         false,
-        destinationRolesAfter,
+        destinationKind,
       );
       await markEntityMergeOperationApplied({
         database: tx,

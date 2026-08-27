@@ -69,12 +69,12 @@ describe("mock oRPC router", () => {
 
     const search = await anonymousClient.search({
       query: "Lagavulin",
-      scopes: ["bottles", "distillers"],
+      scopes: ["bottles", "distilleries"],
     });
     expect(search.exact).toEqual({ type: "entity", ref: mockEntity });
     expect(search.groups).toMatchObject([
       { type: "bottles", total: 3 },
-      { type: "distillers", total: 1, results: [mockEntity] },
+      { type: "distilleries", total: 1, results: [mockEntity] },
     ]);
 
     const user = await authenticatedClient.users.details({ user: "me" });
@@ -85,6 +85,15 @@ describe("mock oRPC router", () => {
     await expect(
       anonymousClient.entities.details({ entity: mockEntity.id }),
     ).resolves.toEqual(mockEntity);
+    const entities = await anonymousClient.entities.list({ limit: 100 });
+    expect(entities.results).toHaveLength(mockEntities.length);
+    expect(entities.results.every((entity) => entity.kind)).toBe(true);
+    await expect(
+      authenticatedClient.entities.create({
+        name: "New Blender",
+        kind: "blender",
+      }),
+    ).resolves.toMatchObject({ name: "New Blender", kind: "blender" });
     await expect(
       anonymousClient.countries.details({ country: mockCountry.slug }),
     ).resolves.toEqual(mockCountry);
@@ -475,7 +484,7 @@ describe("mock oRPC router", () => {
   it("returns no results when the fixed data does not match", async () => {
     const results = await anonymousClient.search({
       query: "Ardbeg",
-      scopes: ["bottles", "distillers", "members"],
+      scopes: ["bottles", "distilleries", "members"],
     });
 
     expect(results).toEqual({
@@ -483,18 +492,16 @@ describe("mock oRPC router", () => {
       exact: null,
       groups: [
         { type: "bottles", total: 0, results: [] },
-        { type: "distillers", total: 0, results: [] },
+        { type: "distilleries", total: 0, results: [] },
       ],
       scopeTotals: {
         bottles: mockBottles.length,
-        distillers: mockEntities.filter((entity) =>
-          entity.type.includes("distiller"),
+        distilleries: mockEntities.filter(
+          (entity) => entity.kind === "distillery",
         ).length,
-        brands: mockEntities.filter((entity) => entity.type.includes("brand"))
+        brands: mockEntities.filter((entity) => entity.kind === "brand").length,
+        bottlers: mockEntities.filter((entity) => entity.kind === "bottler")
           .length,
-        bottlers: mockEntities.filter((entity) =>
-          entity.type.includes("bottler"),
-        ).length,
         blenders: mockEntities.filter((entity) => entity.kind === "blender")
           .length,
         companies: mockEntities.filter((entity) => entity.kind === "company")

@@ -52,7 +52,7 @@
       {
         "id": 1093,
         "name": "Johnnie Walker",
-        "type": ["brand", "bottler", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

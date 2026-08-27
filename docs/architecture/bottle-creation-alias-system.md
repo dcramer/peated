@@ -146,7 +146,7 @@ The classifier decides:
 - whether evidence supports creating one complete Bottle;
 - which wording is the stable expression and which facts are structured
   exact-Bottle fields or observations;
-- whether brand, distillery, and bottler entities have the correct roles;
+- whether Entities fill the correct Bottle relationships;
 - whether a candidate is too broad or too specific; and
 - whether available local, label, image, or web evidence is supportive,
   conflicting, or insufficient.
@@ -252,7 +252,7 @@ Classifier and eval coverage should prove:
 - one complete `create_bottle` draft with stable and structured exact fields;
 - exact candidate matching versus over-broad or over-specific candidates;
 - observation-only treatment of source-specific facts;
-- evidence-reviewed brand, distillery, and bottler roles;
+- evidence-reviewed brand, distillery, and bottler relationships;
 - evidence-derived automation routing without numeric confidence; and
 - production-miss provenance using the real observed source and Peated DB
   outcome.

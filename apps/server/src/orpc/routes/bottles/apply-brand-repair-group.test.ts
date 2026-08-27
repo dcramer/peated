@@ -30,15 +30,15 @@ describe("POST /bottles/apply-brand-repair-group", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     const canadianClub = await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Canadian Mist",
-      type: ["brand"],
+      kind: "brand",
     });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);

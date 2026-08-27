@@ -29,11 +29,11 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Isle of Jura",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const targetBrand = await fixtures.Entity({
       name: "Jura",
-      type: ["brand"],
+      kind: "brand",
     });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
@@ -88,11 +88,11 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Acme",
-      type: ["brand"],
+      kind: "brand",
     });
     const targetBrand = await fixtures.Entity({
       name: "Acme Heritage",
-      type: ["brand"],
+      kind: "brand",
     });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);

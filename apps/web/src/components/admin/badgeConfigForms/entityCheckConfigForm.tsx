@@ -12,7 +12,7 @@ import type { z } from "zod";
 
 type FormSchema = z.infer<typeof EntityCheckConfigSchema>;
 
-const entityTypes = [
+const entityRoles = [
   { id: "brand", name: "Brand" },
   { id: "distiller", name: "Distiller" },
   { id: "bottler", name: "Bottler" },
@@ -73,19 +73,19 @@ export default function EntityCheckConfigForm({
             )}
           />
           <Controller
-            name="type"
+            name="role"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
               <SelectField
                 {...field}
-                label="Type"
+                label="Bottle relationship"
                 onChange={(value) => onChange(value?.id)}
                 value={
                   value ? { id: value, name: toTitleCase(value) } : undefined
                 }
-                options={entityTypes}
+                options={entityRoles}
                 simple
-                helpText="Optionally limit to bottles where the entity is of the specified type."
+                helpText="Optionally match only one Bottle relationship."
               />
             )}
           />

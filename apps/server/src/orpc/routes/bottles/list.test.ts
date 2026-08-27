@@ -225,7 +225,7 @@ describe("GET /bottles", () => {
 
   test("lists bottles with bottler", async ({ fixtures }) => {
     const bottler = await fixtures.Entity({
-      type: ["bottler"],
+      kind: "bottler",
     });
     const bottle1 = await fixtures.Bottle({
       name: "Delicious Wood",
@@ -804,8 +804,8 @@ describe("GET /bottles", () => {
     defaults,
     fixtures,
   }) => {
-    const distiller = await fixtures.Entity({ type: ["distiller"] });
-    const followedBrand = await fixtures.Entity({ type: ["brand"] });
+    const distiller = await fixtures.Entity({ kind: "distillery" });
+    const followedBrand = await fixtures.Entity({ kind: "brand" });
     await db.insert(entityFollows).values([
       {
         userId: defaults.user.id,

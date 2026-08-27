@@ -376,7 +376,7 @@ function Preview({
             <strong className="text-white">
               {review.preview.destination.name}
             </strong>
-            . Surviving roles: {review.preview.after.roles.join(", ")}.
+            . Survivor kind: {review.preview.after.kind}.
           </div>
           <ImpactList values={review.preview.impact} />
           <ImpactList

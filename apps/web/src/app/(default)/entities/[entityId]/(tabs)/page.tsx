@@ -7,6 +7,7 @@ import EntityCatalogOverview from "@peated/web/components/entityCatalogOverview"
 import EntityMap from "@peated/web/components/entityMap";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
+import OwnedEntities from "@peated/web/components/ownedEntities";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { parseDomain } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -46,6 +47,7 @@ export default function EntityDetails(props: {
         )}
 
         <EntityCatalogOverview entity={entity} />
+        <OwnedEntities ownerId={entity.id} />
 
         <div className="prose prose-invert max-w-none flex-auto">
           <dl>

@@ -119,10 +119,15 @@ is the agent path that can return related Entity Suggested Changes. The server
 validates them as Review Operations. Do not convert Entity advice into either
 object by implication.
 
+Entity-classifier local search requires one Entity kind and returns only that
+kind. Bottle relationship resolution can search all kinds because an Entity's
+kind does not restrict its Bottle use.
+
 For Bottle checks:
 
 - existing Entity targets must have been inspected;
-- Entity roles use the canonical supported role enum;
+- every Entity has one canonical kind;
+- Bottle relationships do not depend on Entity kind;
 - create-versus-existing Entity choices are explicit inside the Bottle
   operation;
 - the server builds a live diff and impact preview;

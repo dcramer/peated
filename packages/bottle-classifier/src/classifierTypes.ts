@@ -10,12 +10,24 @@ export const CATEGORY_LIST = [
   "spirit",
 ] as const;
 
-export const ENTITY_TYPE_LIST = ["brand", "bottler", "distiller"] as const;
+export const BOTTLE_ENTITY_ROLE_LIST = [
+  "brand",
+  "bottler",
+  "distiller",
+] as const;
+export const ENTITY_KIND_LIST = [
+  "brand",
+  "distillery",
+  "bottler",
+  "blender",
+  "company",
+] as const;
 
 export const ALIAS_SCOPES = ["global_alias", "none"] as const;
 
 export const CategoryEnum = z.enum(CATEGORY_LIST);
-export const EntityTypeEnum = z.enum(ENTITY_TYPE_LIST);
+export const BottleEntityRoleEnum = z.enum(BOTTLE_ENTITY_ROLE_LIST);
+export const EntityKindEnum = z.enum(ENTITY_KIND_LIST);
 export const AliasScopeEnum = z.enum(ALIAS_SCOPES);
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -246,6 +258,11 @@ export const ProposedEntityChoiceSchema = z
   .object({
     id: z.number().int().nullable().default(null),
     name: z.string().trim().min(1),
+    kind: EntityKindEnum.nullable()
+      .optional()
+      .describe(
+        "Best single Entity kind. Set this when proposing a new Entity; an existing Entity keeps its stored kind.",
+      ),
   })
   .strict();
 
@@ -328,7 +345,7 @@ export const BottleCandidateSearchInputSchema = z
       .nullable()
       .default(null)
       .describe(
-        "Named market-facing bottler or release imprint for this product. It may equal the brand or a distillery; leave null when product-specific evidence does not establish the role.",
+        "Named market-facing bottler or release imprint for this product. It may equal the brand or a distillery; leave null when product-specific evidence does not establish this Bottle relationship.",
       ),
     expression: z
       .string()
@@ -438,11 +455,6 @@ export const SearchEntitiesArgsSchema = z.object({
     .min(1)
     .describe(
       "Producer, distillery, or bottler name to resolve. Use the cleanest entity text you have, without bottle-specific suffixes.",
-    ),
-  type: EntityTypeEnum.nullable()
-    .default(null)
-    .describe(
-      "Entity type hint used to narrow non-exact results. Exact names, short names, and aliases may match an Entity without this role because assignment can add it.",
     ),
   limit: z
     .number()
@@ -593,7 +605,7 @@ export const EntityResolutionSchema = z.object({
   entityId: z.number(),
   name: z.string(),
   shortName: z.string().nullable().default(null),
-  type: z.array(EntityTypeEnum).default([]),
+  kind: EntityKindEnum,
   alias: z.string().nullable().default(null),
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
@@ -601,7 +613,6 @@ export const EntityResolutionSchema = z.object({
     .array(
       z.object({
         query: z.string().min(1),
-        requestedType: EntityTypeEnum.nullable(),
       }),
     )
     .optional(),

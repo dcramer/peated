@@ -23,10 +23,19 @@ export default async function updateRegionStats(input: JobPayload) {
     .update(regions)
     .set({
       totalDistillers: sql<string>`(
-        SELECT COUNT(*)
-        FROM ${entities}
-        WHERE 'distiller' = ANY(${entities.type})
-          AND ${entities.regionId} = ${regions.id}
+        SELECT COUNT(DISTINCT ${bottlesToDistillers.distillerId})
+        FROM ${bottlesToDistillers}
+        INNER JOIN ${bottles}
+          ON ${bottles.id} = ${bottlesToDistillers.bottleId}
+        INNER JOIN ${entities}
+          ON ${entities.id} = ${bottlesToDistillers.distillerId}
+        WHERE ${entities.regionId} = ${regions.id}
+          AND ${bottles.groupId} IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1
+            FROM ${bottleTombstones}
+            WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+          )
       )`,
       totalBottles: sql<string>`(
         SELECT COUNT(*)

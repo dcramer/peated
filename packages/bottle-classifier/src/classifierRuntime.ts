@@ -424,7 +424,6 @@ function addEntitySearchRequest(
   requests: SearchEntitiesArgs[],
   seen: Set<string>,
   query: string | null | undefined,
-  type: SearchEntitiesArgs["type"],
   maxRequests = Number.POSITIVE_INFINITY,
 ) {
   const normalizedQuery = query?.trim();
@@ -432,7 +431,7 @@ function addEntitySearchRequest(
     return;
   }
 
-  const key = `${type ?? "any"}:${normalizedQuery.toLowerCase()}`;
+  const key = normalizedQuery.toLowerCase();
   if (seen.has(key) || requests.length >= maxRequests) {
     return;
   }
@@ -440,7 +439,6 @@ function addEntitySearchRequest(
   seen.add(key);
   requests.push({
     query: normalizedQuery,
-    type,
     limit: 5,
   });
 }
@@ -467,38 +465,20 @@ export async function collectInitialResolvedEntities({
 
   const requests: SearchEntitiesArgs[] = [];
   const seen = new Set<string>();
-  addEntitySearchRequest(requests, seen, extractedIdentity.brand, "brand");
-  // Extracted roles are hypotheses. A consumer Brand can be mislabeled as a
+  addEntitySearchRequest(requests, seen, extractedIdentity.brand);
+  // Extracted Bottle relationships are hypotheses. A consumer Brand can be mislabeled as a
   // series, so expose that local Brand candidate without rewriting the source.
-  addEntitySearchRequest(requests, seen, extractedIdentity.series, "brand");
-  addEntitySearchRequest(requests, seen, extractedIdentity.bottler, "bottler");
+  addEntitySearchRequest(requests, seen, extractedIdentity.series);
+  addEntitySearchRequest(requests, seen, extractedIdentity.bottler);
   for (const distillery of extractedIdentity.distillery ?? []) {
-    addEntitySearchRequest(requests, seen, distillery, "distiller");
+    addEntitySearchRequest(requests, seen, distillery);
   }
   const maxRequests = requests.length + MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS;
   for (const candidate of initialCandidates) {
-    addEntitySearchRequest(
-      requests,
-      seen,
-      candidate.brand,
-      "brand",
-      maxRequests,
-    );
-    addEntitySearchRequest(
-      requests,
-      seen,
-      candidate.bottler,
-      "bottler",
-      maxRequests,
-    );
+    addEntitySearchRequest(requests, seen, candidate.brand, maxRequests);
+    addEntitySearchRequest(requests, seen, candidate.bottler, maxRequests);
     for (const distillery of candidate.distillery) {
-      addEntitySearchRequest(
-        requests,
-        seen,
-        distillery,
-        "distiller",
-        maxRequests,
-      );
+      addEntitySearchRequest(requests, seen, distillery, maxRequests);
     }
   }
 
@@ -524,7 +504,6 @@ export async function collectInitialResolvedEntities({
         retrievedFor: [
           {
             query: request.query,
-            requestedType: request.type ?? null,
           },
         ],
       });

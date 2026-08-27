@@ -8,7 +8,7 @@ import Tooltip from "./tooltip";
 type Distiller = {
   id: number;
   name: string;
-  kind: EntityKind | null;
+  kind: EntityKind;
 };
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
     brand: {
       id: number;
       name: string;
-      kind: EntityKind | null;
+      kind: EntityKind;
     };
     distillers?: Distiller[];
     flavorProfile?: string | undefined | null;

@@ -63,12 +63,6 @@ export default async function Layout(props: {
   const createBottleParams = new URLSearchParams({
     returnTo: entityUrl,
   });
-  if (entity.type.includes("brand"))
-    createBottleParams.set("brand", `${entity.id}`);
-  if (entity.type.includes("distiller"))
-    createBottleParams.set("distiller", `${entity.id}`);
-  if (entity.type.includes("bottler"))
-    createBottleParams.set("bottler", `${entity.id}`);
 
   return (
     <>

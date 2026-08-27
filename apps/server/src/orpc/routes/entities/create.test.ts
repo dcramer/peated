@@ -15,6 +15,7 @@ describe("POST /entities", () => {
     const err = await waitError(
       routerClient.entities.create({
         name: "Delicious Wood",
+        kind: "brand",
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -24,6 +25,7 @@ describe("POST /entities", () => {
     const data = await routerClient.entities.create(
       {
         name: "Macallan",
+        kind: "brand",
       },
       { context: { user: defaults.user } },
     );
@@ -34,7 +36,7 @@ describe("POST /entities", () => {
       .select()
       .from(entities)
       .where(eq(entities.id, data.id));
-    expect(brand.name).toEqual("Macallan");
+    expect(brand).toMatchObject({ name: "Macallan", kind: "brand" });
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: data.id,
     });
@@ -48,7 +50,7 @@ describe("POST /entities", () => {
     );
   });
 
-  test("creates an entity with a kind and current owner", async ({
+  test("creates an entity with a current owner", async ({
     fixtures,
     defaults,
   }) => {
@@ -75,6 +77,26 @@ describe("POST /entities", () => {
     });
   });
 
+  test("accepts every entity kind", async ({ defaults }) => {
+    const created = await Promise.all(
+      (["brand", "distillery", "bottler", "blender", "company"] as const).map(
+        (kind) =>
+          routerClient.entities.create(
+            { name: `Generic ${kind}`, kind },
+            { context: { user: defaults.user } },
+          ),
+      ),
+    );
+
+    expect(created.map((entity) => entity.kind)).toEqual([
+      "brand",
+      "distillery",
+      "bottler",
+      "blender",
+      "company",
+    ]);
+  });
+
   test("rejects an unknown current owner", async ({ defaults }) => {
     const err = await waitError(
       routerClient.entities.create(
@@ -90,38 +112,67 @@ describe("POST /entities", () => {
     expect(err.message).toBe("Owner not found.");
   });
 
-  test("updates existing entity with new type", async ({
+  test("returns an existing entity with the same kind", async ({
     fixtures,
     defaults,
   }) => {
     const entity = await fixtures.Entity({
       name: "A",
-      type: ["distiller"],
+      kind: "distillery",
     });
 
     const data = await routerClient.entities.create(
       {
         name: entity.name,
-        type: ["brand"],
+        kind: "distillery",
       },
       { context: { user: defaults.user } },
     );
 
-    expect(data.id).toBeDefined();
-
-    const [brand] = await db
-      .select()
-      .from(entities)
-      .where(eq(entities.id, data.id));
-    expect(brand.id).toEqual(entity.id);
-    expect(brand.type).toEqual(["distiller", "brand"]);
-    expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
-      entityId: entity.id,
-    });
+    expect(data.id).toEqual(entity.id);
+    expect(data.kind).toEqual("distillery");
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyEntityCreation",
       expect.anything(),
       expect.anything(),
+    );
+  });
+
+  test("returns an existing entity when the name case differs", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Macallan",
+      kind: "brand",
+    });
+
+    const data = await routerClient.entities.create(
+      { name: "macallan", kind: "brand" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.id).toBe(entity.id);
+    expect(data.name).toBe(entity.name);
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("rejects an existing entity under another kind", async ({
+    fixtures,
+    defaults,
+  }) => {
+    await fixtures.Entity({ name: "Compass Box", kind: "blender" });
+
+    const err = await waitError(
+      routerClient.entities.create(
+        { name: "Compass Box", kind: "brand" },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err.message).toBe(
+      "Entity with name already exists under another kind.",
     );
   });
 });

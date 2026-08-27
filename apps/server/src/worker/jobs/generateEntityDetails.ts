@@ -7,7 +7,7 @@ import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { logTelemetryError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
-import { EntityTypeEnum } from "@peated/server/schemas";
+import { EntityKindEnum } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -33,8 +33,8 @@ function generatePrompt(entity: InputEntity) {
   if (entity.website) {
     infoLines.push(`Website: ${entity.website}`);
   }
-  if (entity.type) {
-    infoLines.push(`Entity Types: ${entity.type.join(", ")}`);
+  if (entity.kind) {
+    infoLines.push(`Kind: ${entity.kind}`);
   }
 
   const sections = [
@@ -53,8 +53,7 @@ function generatePrompt(entity: InputEntity) {
       "'website' should be the official HTTPS website only when it is confidently known; otherwise return null.",
     ].join(" "),
     [
-      "'type' should include every strongly supported value from: brand, distiller, bottler.",
-      "If none can be determined confidently, return an empty array.",
+      "'kind' must be the best single identity from: brand, distillery, bottler, blender, company.",
     ].join(" "),
   ];
 
@@ -72,14 +71,14 @@ export const OpenAIEntityDetailsSchema = z.object({
   description: z.string().nullable().default(null),
   yearEstablished: EntityEstablishedYearSchema,
   website: z.string().trim().nullable().default(null),
-  type: z.array(z.string()).default([]),
+  kind: EntityKindEnum,
 });
 
 export const OpenAIEntityDetailsValidationSchema = z.object({
   description: z.string().nullable().default(null),
   yearEstablished: EntityEstablishedYearSchema,
   website: z.string().trim().nullable().default(null),
-  type: z.array(EntityTypeEnum).default([]),
+  kind: EntityKindEnum,
 });
 
 export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;

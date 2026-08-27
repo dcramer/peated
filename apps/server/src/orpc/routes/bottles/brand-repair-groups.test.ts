@@ -38,17 +38,17 @@ describe("GET /bottles/brand-repair-groups", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand"],
+      kind: "brand",
     });
     const canadianClub = await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 12,
       totalTastings: 180,
     });
     const canadianMist = await fixtures.Entity({
       name: "Canadian Mist",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 3,
       totalTastings: 10,
     });
@@ -147,11 +147,11 @@ describe("GET /bottles/brand-repair-groups", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Acme",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Acme Heritage",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 4,
       totalTastings: 20,
     });
@@ -182,12 +182,12 @@ describe("GET /bottles/brand-repair-groups", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "A.D. Laws",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Laws Whiskey House",
       shortName: "Laws",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 12,
     });
     const user = await fixtures.User({ mod: true });
@@ -225,11 +225,11 @@ describe("GET /bottles/brand-repair-groups", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Belle Meade",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Belle Meade Bourbon",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 1,
       totalTastings: 1,
     });
@@ -260,11 +260,11 @@ describe("GET /bottles/brand-repair-groups", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Belle Meade Bourbon",
-      type: ["brand"],
+      kind: "brand",
     });
     await fixtures.Entity({
       name: "Belle Meade",
-      type: ["brand"],
+      kind: "brand",
     });
     const user = await fixtures.User({ mod: true });
 

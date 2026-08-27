@@ -219,7 +219,7 @@ describe("price match queue", () => {
   }) => {
     const user = await fixtures.User({ mod: true });
     const bottler = await fixtures.Entity({
-      type: ["bottler"],
+      kind: "bottler",
       location: [-3.2, 56.1],
     });
     const bottle = await fixtures.Bottle({ bottlerId: bottler.id });
@@ -781,7 +781,7 @@ describe("price match queue", () => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const brand = await fixtures.Entity({
       name: "The Whistler",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const currentBottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -923,7 +923,7 @@ describe("price match queue", () => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const brand = await fixtures.Entity({
       name: "The Whistler",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const currentBottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -1085,11 +1085,11 @@ describe("price match queue", () => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const brand = await fixtures.Entity({
       name: "The Whistler",
-      type: ["brand", "bottler"],
+      kind: "bottler",
     });
     const distillery = await fixtures.Entity({
       name: "Boann Distillery",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const sourceSeries = await fixtures.BottleSeries({
       brandId: brand.id,
@@ -1450,7 +1450,7 @@ describe("price match queue", () => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const brand = await fixtures.Entity({
       name: "Repair Collision Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const selected = await fixtures.Bottle({
       brandId: brand.id,
@@ -1948,12 +1948,12 @@ describe("price match queue", () => {
           statedAge: null,
           brand: {
             name: "Independent Brand",
-            type: ["brand"],
+            kind: "brand",
           },
           distillers: [
             {
               name: "Ben Nevis",
-              type: ["distiller"],
+              kind: "distillery",
             },
           ],
         },

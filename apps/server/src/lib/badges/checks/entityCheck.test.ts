@@ -7,13 +7,13 @@ describe("config schema", () => {
   test("valid params", async () => {
     const config = {
       entity: 1,
-      type: "distiller",
+      role: "distiller",
     };
     expect(await EntityCheckConfigSchema.parseAsync(config))
       .toMatchInlineSnapshot(`
       {
         "entity": 1,
-        "type": "distiller",
+        "role": "distiller",
       }
     `);
   });
@@ -21,21 +21,21 @@ describe("config schema", () => {
   test("no type", async () => {
     const config = {
       entity: 1,
-      type: null,
+      role: null,
     };
 
     expect(await EntityCheckConfigSchema.parseAsync(config))
       .toMatchInlineSnapshot(`
       {
         "entity": 1,
-        "type": null,
+        "role": null,
       }
     `);
   });
 
   test("no entity", async () => {
     const config = {
-      type: null,
+      role: null,
     };
     const err = await waitError(EntityCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
@@ -68,7 +68,7 @@ describe("test", () => {
     const badgeImpl = new EntityCheck();
     const config = {
       entity: brand.id,
-      type: null,
+      role: null,
     } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
@@ -87,7 +87,7 @@ describe("test", () => {
     const badgeImpl = new EntityCheck();
     const config = {
       entity: brand.id,
-      type: "brand",
+      role: "brand",
     } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
@@ -106,7 +106,7 @@ describe("test", () => {
     const badgeImpl = new EntityCheck();
     const config = {
       entity: brand.id,
-      type: "distiller",
+      role: "distiller",
     } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(false);
   });
@@ -124,7 +124,7 @@ describe("test", () => {
     const badgeImpl = new EntityCheck();
     const config = {
       entity: distiller.id,
-      type: null,
+      role: null,
     } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
@@ -142,7 +142,7 @@ describe("test", () => {
     const badgeImpl = new EntityCheck();
     const config = {
       entity: distiller.id,
-      type: "distiller",
+      role: "distiller",
     } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
@@ -160,7 +160,7 @@ describe("test", () => {
     const badgeImpl = new EntityCheck();
     const config = {
       entity: distiller.id,
-      type: "brand",
+      role: "brand",
     } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(false);
   });

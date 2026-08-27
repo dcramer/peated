@@ -496,7 +496,7 @@ describe("auditBottle", () => {
                   entityId: 10,
                   name: "Stale Brand",
                   shortName: null,
-                  roles: ["brand"],
+                  kind: "brand",
                   website: null,
                   country: null,
                   region: null,

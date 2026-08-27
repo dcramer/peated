@@ -267,7 +267,7 @@ async function prepareBottleCreateInTransaction(
     db: tx,
     data: coerceToUpsert(bottleData.brand),
     creationSource,
-    type: "brand",
+    kind: "brand",
     createdByActorId: actorId,
   });
 
@@ -284,7 +284,7 @@ async function prepareBottleCreateInTransaction(
       db: tx,
       data: coerceToUpsert(bottleData.bottler),
       creationSource,
-      type: "bottler",
+      kind: "bottler",
       createdByActorId: actorId,
     });
     if (!bottlerUpsert) {
@@ -321,7 +321,7 @@ async function prepareBottleCreateInTransaction(
         data: coerceToUpsert(distData),
         creationSource,
         createdByActorId: actorId,
-        type: "distiller",
+        kind: "distillery",
       });
       if (!distUpsert) {
         throw new BottleCreateBadRequestError("Could not identify distiller.");

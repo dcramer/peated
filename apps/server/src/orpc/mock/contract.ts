@@ -3,20 +3,26 @@ import activityList from "@peated/server/orpc/contracts/activity/list";
 import login from "@peated/server/orpc/contracts/auth/login";
 import badgeDetails from "@peated/server/orpc/contracts/badges/details";
 import badgeUserList from "@peated/server/orpc/contracts/badges/user-list";
+import blenderList from "@peated/server/orpc/contracts/blenders/list";
 import bottleGroupBottles from "@peated/server/orpc/contracts/bottleGroups/bottles";
 import bottleGroupDetails from "@peated/server/orpc/contracts/bottleGroups/details";
+import bottlerList from "@peated/server/orpc/contracts/bottlers/list";
 import bottleDetails from "@peated/server/orpc/contracts/bottles/details";
 import bottleList from "@peated/server/orpc/contracts/bottles/list";
 import bottlePriceList from "@peated/server/orpc/contracts/bottles/prices/list";
 import bottleTags from "@peated/server/orpc/contracts/bottles/tags";
+import brandList from "@peated/server/orpc/contracts/brands/list";
 import changeList from "@peated/server/orpc/contracts/changes/list";
 import collectionBottleDelete from "@peated/server/orpc/contracts/collections/bottles/delete";
 import collectionBottleList from "@peated/server/orpc/contracts/collections/bottles/list";
 import collectionBottleUpdate from "@peated/server/orpc/contracts/collections/bottles/update";
 import commentList from "@peated/server/orpc/contracts/comments/list";
+import companyList from "@peated/server/orpc/contracts/companies/list";
 import countryDetails from "@peated/server/orpc/contracts/countries/details";
 import countryList from "@peated/server/orpc/contracts/countries/list";
+import distilleryList from "@peated/server/orpc/contracts/distilleries/list";
 import entityCatalog from "@peated/server/orpc/contracts/entities/catalog";
+import entityCreate from "@peated/server/orpc/contracts/entities/create";
 import entityDetails from "@peated/server/orpc/contracts/entities/details";
 import entityList from "@peated/server/orpc/contracts/entities/list";
 import eventList from "@peated/server/orpc/contracts/events/list";
@@ -64,6 +70,7 @@ export const mockContract = {
     bottles: bottleGroupBottles,
     details: bottleGroupDetails,
   },
+  blenders: { list: blenderList },
   bottles: {
     details: bottleDetails,
     list: bottleList,
@@ -72,12 +79,15 @@ export const mockContract = {
     },
     tags: bottleTags,
   },
+  bottlers: { list: bottlerList },
+  brands: { list: brandList },
   changes: {
     list: changeList,
   },
   comments: {
     list: commentList,
   },
+  companies: { list: companyList },
   collections: {
     bottles: {
       delete: collectionBottleDelete,
@@ -89,8 +99,10 @@ export const mockContract = {
     details: countryDetails,
     list: countryList,
   },
+  distilleries: { list: distilleryList },
   entities: {
     catalog: entityCatalog,
+    create: entityCreate,
     details: entityDetails,
     list: entityList,
   },

@@ -81,7 +81,8 @@ function selectRelatedEntities(entity: Entity, catalog: Catalog) {
 
   const showSourceDistilleries =
     catalog.related.distillers.length > 1 ||
-    (entity.type.includes("bottler") && catalog.related.distillers.length > 0);
+    (catalog.relationships.bottler > 0 &&
+      catalog.related.distillers.length > 0);
 
   if (showSourceDistilleries) {
     const { documented, total } = catalog.distilleryCoverage;
@@ -94,10 +95,10 @@ function selectRelatedEntities(entity: Entity, catalog: Catalog) {
           : undefined,
     });
   }
-  if (entity.type.includes("distiller") && catalog.related.bottlers.length) {
+  if (catalog.relationships.distiller > 0 && catalog.related.bottlers.length) {
     views.push({ title: "Bottled by", items: catalog.related.bottlers });
   }
-  if (entity.type.includes("distiller") && catalog.related.brands.length) {
+  if (catalog.relationships.distiller > 0 && catalog.related.brands.length) {
     views.push({ title: "Released as", items: catalog.related.brands });
   }
 

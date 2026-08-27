@@ -241,7 +241,7 @@ type ExpectedSeries = Pick<
 >;
 export type BottleUpdateExpectedEntityState = Pick<
   Entity,
-  "id" | "name" | "shortName" | "type"
+  "id" | "name" | "shortName" | "kind"
 >;
 
 export type BottleUpdateExpectedSharedState = {
@@ -294,15 +294,6 @@ export function bottleUpdateExpectedSelectedBottleState(
   };
 }
 
-function sortedEntityRoles(roles: Entity["type"]): Entity["type"] {
-  const sorted = [...roles].sort();
-  const first = sorted[0];
-  if (!first) {
-    throw new Error("An Entity must have at least one role.");
-  }
-  return [first, ...sorted.slice(1)];
-}
-
 /** Captures the shared authority a maintenance caller used to plan an edit. */
 export function bottleUpdateExpectedSharedState({
   group,
@@ -332,11 +323,11 @@ export function bottleUpdateExpectedSharedState({
     },
     distillerIds: [...distillerIds].sort((left, right) => left - right),
     referencedEntities: referencedEntities
-      .map(({ id, name, shortName, type }) => ({
+      .map(({ id, name, shortName, kind }) => ({
         id,
         name,
         shortName,
-        type: sortedEntityRoles(type),
+        kind,
       }))
       .sort((left, right) => left.id - right.id),
     series: series
@@ -742,39 +733,6 @@ async function loadEntity(tx: AnyTransaction, entityId: number) {
   return entity;
 }
 
-async function addEntityRoleIfNeeded({
-  tx,
-  entity,
-  role,
-  actorId,
-  creationSource,
-  changedEntityIds,
-}: {
-  tx: AnyTransaction;
-  entity: Entity;
-  role: Entity["type"][number];
-  actorId: number;
-  creationSource: CatalogVerificationCreationSource;
-  changedEntityIds: Set<number>;
-}): Promise<Entity> {
-  if (entity.type.includes(role)) return entity;
-
-  const result = await upsertEntity({
-    db: tx,
-    data: entity.id,
-    creationSource,
-    createdByActorId: actorId,
-    type: role,
-  });
-  if (!result) {
-    throw new BottleUpdateInputError(
-      `Entity ${entity.id} could not be resolved.`,
-    );
-  }
-  if (result.changed) changedEntityIds.add(result.id);
-  return result.result;
-}
-
 /**
  * Resolves shared state inside the caller's transaction. Object choices may
  * create entities or a series and collect ids needed for post-commit work.
@@ -800,45 +758,18 @@ async function resolveStableState(
   },
 ): Promise<StableState> {
   const numericBrandId = numericEntityChoiceId(patch?.brand);
-  let numericBrand =
+  const numericBrand =
     numericBrandId === null ? null : await loadEntity(tx, numericBrandId);
-  if (numericBrand) {
-    numericBrand = await addEntityRoleIfNeeded({
-      tx,
-      entity: numericBrand,
-      role: "brand",
-      actorId,
-      creationSource,
-      changedEntityIds,
-    });
-  }
 
   const numericBottlerId = numericEntityChoiceId(patch?.bottler);
-  let numericBottler =
+  const numericBottler =
     numericBottlerId === null ? null : await loadEntity(tx, numericBottlerId);
-  if (numericBottler) {
-    numericBottler = await addEntityRoleIfNeeded({
-      tx,
-      entity: numericBottler,
-      role: "bottler",
-      actorId,
-      creationSource,
-      changedEntityIds,
-    });
-  }
 
   const numericDistillers = new Map<number, Entity>();
   for (const choice of patch?.distillers ?? []) {
     const choiceId = numericEntityChoiceId(choice);
     if (choiceId === null || numericDistillers.has(choiceId)) continue;
-    const distiller = await addEntityRoleIfNeeded({
-      tx,
-      entity: await loadEntity(tx, choiceId),
-      role: "distiller",
-      actorId,
-      creationSource,
-      changedEntityIds,
-    });
+    const distiller = await loadEntity(tx, choiceId);
     numericDistillers.set(choiceId, distiller);
   }
 
@@ -851,7 +782,7 @@ async function resolveStableState(
       data: coerceToUpsert(entityDraftChoice(patch.brand)),
       creationSource,
       createdByActorId: actorId,
-      type: "brand",
+      kind: "brand",
     });
     if (!result) {
       throw new BottleUpdateInputError("Brand could not be resolved.");
@@ -874,7 +805,7 @@ async function resolveStableState(
       data: coerceToUpsert(entityDraftChoice(patch.bottler)),
       creationSource,
       createdByActorId: actorId,
-      type: "bottler",
+      kind: "bottler",
     });
     if (!result) {
       throw new BottleUpdateInputError("Bottler could not be resolved.");
@@ -902,7 +833,7 @@ async function resolveStableState(
         data: coerceToUpsert(entityDraftChoice(choice)),
         creationSource,
         createdByActorId: actorId,
-        type: "distiller",
+        kind: "distillery",
       });
       if (!result) {
         throw new BottleUpdateInputError("Distiller could not be resolved.");
@@ -1331,14 +1262,10 @@ export async function updateBottleInTransaction(
     );
     const currentReferencedEntities = referencedEntities
       .filter(({ id }) => expectedReferencedEntityIdSet.has(id))
-      .map(({ id, name, shortName, type }) => ({ id, name, shortName, type }));
+      .map(({ id, name, shortName, kind }) => ({ id, name, shortName, kind }));
     const referencedEntitiesChanged =
-      JSON.stringify(
-        currentReferencedEntities.map((entity) => ({
-          ...entity,
-          type: [...entity.type].sort(),
-        })),
-      ) !== JSON.stringify(expectedSharedState.referencedEntities);
+      JSON.stringify(currentReferencedEntities) !==
+      JSON.stringify(expectedSharedState.referencedEntities);
     if (
       groupChanged ||
       !sameValues(currentGroupDistillerIds, expectedSharedState.distillerIds) ||

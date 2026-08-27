@@ -165,7 +165,7 @@
         "id": 70736,
         "name": "Old Trestle",
         "shortName": "Trestle",
-        "type": ["brand", "bottler", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

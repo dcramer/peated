@@ -3,7 +3,12 @@ import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 import { BottleSeriesInputSchema, BottleSeriesSchema } from "./bottleSeries";
 import { BottleGroupV1Schema } from "./catalogIdentity";
-import { CategoryEnum, ContentSourceEnum, FlavorProfileEnum } from "./common";
+import {
+  CategoryEnum,
+  ContentSourceEnum,
+  EntityKindEnum,
+  FlavorProfileEnum,
+} from "./common";
 import { EntityInputSchema, EntitySchema } from "./entities";
 
 const BottleNameSchema = z
@@ -301,6 +306,7 @@ export const BottleRecommendationsSchema = z.object({
 });
 
 export const EntityChoiceInputSchema = EntityInputSchema.extend({
+  kind: EntityKindEnum.optional(),
   id: z.number().nullish().describe("Optional ID for the entity"),
 });
 export const EntityChoiceSchema = z.union([

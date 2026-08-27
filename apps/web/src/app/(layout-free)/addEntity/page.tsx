@@ -1,6 +1,6 @@
 "use client";
 
-import { EntityTypeEnum } from "@peated/server/schemas";
+import { EntityKindEnum } from "@peated/server/schemas";
 import EntityForm from "@peated/web/components/entityForm";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -21,22 +21,18 @@ function AddEntityForm() {
   const orpc = useORPC();
 
   const searchParams = useSearchParams();
-  const type = searchParams.getAll("type").flatMap((value) => {
-    const parsed = EntityTypeEnum.safeParse(value);
-    return parsed.success ? [parsed.data] : [];
-  });
+  const parsedKind = EntityKindEnum.safeParse(searchParams.get("kind"));
+  const kind = parsedKind.success ? parsedKind.data : "brand";
 
-  const entityCreateMutation = useMutation(
-    orpc.entities.create.mutationOptions(),
-  );
+  const createEntity = useMutation(orpc.entities.create.mutationOptions());
 
   return (
     <EntityForm
       onSubmit={async (data) => {
-        const newEntity = await entityCreateMutation.mutateAsync(data);
+        const newEntity = await createEntity.mutateAsync(data);
         router.push(getEntityUrl(newEntity));
       }}
-      initialData={{ type }}
+      initialData={{ kind }}
       title="Add Entity"
     />
   );

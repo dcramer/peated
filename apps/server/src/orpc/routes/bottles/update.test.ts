@@ -350,7 +350,7 @@ describe("PATCH /bottles/{bottle}", () => {
     const newBrand = await fixtures.Entity({ name: "New Route Brand" });
     const newBottler = await fixtures.Entity({
       name: "New Route Bottler",
-      type: [],
+      kind: "bottler",
     });
     const newDistillers = [
       await fixtures.Entity({ name: "New Route Distiller A" }),
@@ -447,7 +447,7 @@ describe("PATCH /bottles/{bottle}", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, newBottler.id),
       }),
-    ).toMatchObject({ type: ["bottler"] });
+    ).toMatchObject({ kind: "bottler", type: [] });
   });
 
   test("maps input, graph, and identity failures to stable statuses", async ({

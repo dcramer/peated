@@ -11,14 +11,11 @@ const DEFAULT_SORT = "-tastings";
 export default function Page() {
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit", "country", "region"],
-    overrides: {
-      type: "brand",
-    },
   });
 
   const orpc = useORPC();
   const { data: entityList } = useSuspenseQuery(
-    orpc.entities.list.queryOptions({
+    orpc.brands.list.queryOptions({
       input: queryParams,
     }),
   );
@@ -30,7 +27,7 @@ export default function Page() {
           entityList={entityList.results}
           rel={entityList.rel}
           defaultSort={DEFAULT_SORT}
-          type="brand"
+          kind="brand"
           withLocations
           withSearch
         />

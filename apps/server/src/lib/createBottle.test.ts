@@ -40,7 +40,7 @@ describe("Bottle creation", () => {
     const brand = await fixtures.Entity({ name: "Creation Test Brand" });
     const bottler = await fixtures.Entity({
       name: "Creation Test Bottler",
-      type: ["bottler"],
+      kind: "bottler",
     });
     const distiller = await fixtures.Entity({
       name: "Creation Test Distillery",
@@ -204,7 +204,7 @@ describe("Bottle creation", () => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({
       name: "Classifier Exact Age Brand",
-      type: ["brand"],
+      kind: "brand",
     });
     const input = buildClassifierBottleInput({
       name: "Speyside 12-year-old",
@@ -418,7 +418,7 @@ describe("Bottle creation", () => {
     });
 
     const smws = await fixtures.Entity({
-      type: ["brand", "bottler"],
+      kind: "bottler",
       name: "SMWS Concrete Guard Society",
       shortName: "SMWS",
     });

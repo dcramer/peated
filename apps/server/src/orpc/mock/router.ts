@@ -3,20 +3,26 @@ import activityList from "./routes/activity/list";
 import login from "./routes/auth/login";
 import badgeDetails from "./routes/badges/details";
 import badgeUserList from "./routes/badges/user-list";
+import blenderList from "./routes/blenders/list";
 import bottleGroupBottles from "./routes/bottleGroups/bottles";
 import bottleGroupDetails from "./routes/bottleGroups/details";
+import bottlerList from "./routes/bottlers/list";
 import bottleDetails from "./routes/bottles/details";
 import bottleList from "./routes/bottles/list";
 import bottlePriceList from "./routes/bottles/prices/list";
 import bottleTags from "./routes/bottles/tags";
+import brandList from "./routes/brands/list";
 import changeList from "./routes/changes/list";
 import collectionBottleDelete from "./routes/collections/bottles/delete";
 import collectionBottleList from "./routes/collections/bottles/list";
 import collectionBottleUpdate from "./routes/collections/bottles/update";
 import commentList from "./routes/comments/list";
+import companyList from "./routes/companies/list";
 import countryDetails from "./routes/countries/details";
 import countryList from "./routes/countries/list";
+import distilleryList from "./routes/distilleries/list";
 import entityCatalog from "./routes/entities/catalog";
+import entityCreate from "./routes/entities/create";
 import entityDetails from "./routes/entities/details";
 import entityList from "./routes/entities/list";
 import eventList from "./routes/events/list";
@@ -64,6 +70,7 @@ export const mockRouter = mockOS.router({
     bottles: bottleGroupBottles,
     details: bottleGroupDetails,
   },
+  blenders: { list: blenderList },
   bottles: {
     details: bottleDetails,
     list: bottleList,
@@ -72,12 +79,15 @@ export const mockRouter = mockOS.router({
     },
     tags: bottleTags,
   },
+  bottlers: { list: bottlerList },
+  brands: { list: brandList },
   changes: {
     list: changeList,
   },
   comments: {
     list: commentList,
   },
+  companies: { list: companyList },
   collections: {
     bottles: {
       delete: collectionBottleDelete,
@@ -89,8 +99,10 @@ export const mockRouter = mockOS.router({
     details: countryDetails,
     list: countryList,
   },
+  distilleries: { list: distilleryList },
   entities: {
     catalog: entityCatalog,
+    create: entityCreate,
     details: entityDetails,
     list: entityList,
   },

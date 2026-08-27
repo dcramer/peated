@@ -7,6 +7,7 @@ import type {
 } from "@peated/entity-classifier";
 import { db } from "@peated/server/db";
 import {
+  bottleTombstones,
   bottles,
   countries,
   entities,
@@ -18,9 +19,8 @@ import {
   getBrandRepairGroups,
   type BrandRepairGroup,
 } from "@peated/server/lib/brandRepairCandidates";
-import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
 
-const DEFAULT_ENTITY_TYPE = "brand";
 const MAX_BRAND_REPAIR_GROUPS = 1000;
 const MAX_ENTITY_SCAN_LIMIT = 300;
 const MAX_SAMPLE_BOTTLES = 5;
@@ -103,7 +103,17 @@ const NAME_SUFFIX_RULES = [
   },
 ] as const;
 
-type EntityType = "brand" | "bottler" | "distiller";
+function entityBrandUseCondition() {
+  return sql`EXISTS (
+    SELECT 1 FROM ${bottles}
+    WHERE ${bottles.brandId} = ${entities.id}
+      AND ${bottles.groupId} IS NOT NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM ${bottleTombstones}
+        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+      )
+  )`;
+}
 
 type CandidateEntity = {
   countryName: null | string;
@@ -113,7 +123,7 @@ type CandidateEntity = {
   shortName: null | string;
   totalBottles: number;
   totalTastings: number;
-  type: EntityType[];
+  kind: "brand" | "bottler" | "distillery" | "blender" | "company";
   website: null | string;
 };
 
@@ -351,7 +361,7 @@ async function getBrandLookup() {
         id: entities.id,
         name: entities.name,
         shortName: entities.shortName,
-        type: entities.type,
+        kind: sql<CandidateEntity["kind"]>`${entities.kind}`,
         website: entities.website,
         countryName: countries.name,
         regionName: regions.name,
@@ -364,7 +374,7 @@ async function getBrandLookup() {
     .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
     .leftJoin(countries, eq(countries.id, entities.countryId))
     .leftJoin(regions, eq(regions.id, entities.regionId))
-    .where(sql`'brand' = ANY(${entities.type})`);
+    .where(or(eq(entities.kind, "brand"), entityBrandUseCondition()));
 
   const brandsById = new Map<number, CandidateEntity>();
   const brandAliasesById = new Map<number, string[]>();
@@ -416,7 +426,7 @@ async function getEntityRowsByIds(
       id: entities.id,
       name: entities.name,
       shortName: entities.shortName,
-      type: entities.type,
+      kind: sql<CandidateEntity["kind"]>`${entities.kind}`,
       website: entities.website,
       countryName: countries.name,
       regionName: regions.name,
@@ -429,11 +439,7 @@ async function getEntityRowsByIds(
     .where(inArray(entities.id, entityIds));
 }
 
-async function findHeuristicEntityRows({
-  type,
-}: {
-  type: EntityType | null;
-}): Promise<CandidateEntity[]> {
+async function findHeuristicEntityRows(): Promise<CandidateEntity[]> {
   const genericMatchers = Array.from(GENERIC_BRAND_NAMES).map((value) =>
     ilike(entities.name, value),
   );
@@ -446,7 +452,7 @@ async function findHeuristicEntityRows({
       id: entities.id,
       name: entities.name,
       shortName: entities.shortName,
-      type: entities.type,
+      kind: sql<CandidateEntity["kind"]>`${entities.kind}`,
       website: entities.website,
       countryName: countries.name,
       regionName: regions.name,
@@ -457,10 +463,7 @@ async function findHeuristicEntityRows({
     .leftJoin(countries, eq(countries.id, entities.countryId))
     .leftJoin(regions, eq(regions.id, entities.regionId))
     .where(
-      and(
-        type ? sql`${type} = ANY(${entities.type})` : undefined,
-        or(...genericMatchers, ...suffixMatchers),
-      ),
+      and(entityBrandUseCondition(), or(...genericMatchers, ...suffixMatchers)),
     )
     .orderBy(desc(entities.totalTastings), desc(entities.totalBottles))
     .limit(MAX_ENTITY_SCAN_LIMIT);
@@ -468,17 +471,15 @@ async function findHeuristicEntityRows({
 
 async function findQueryMatchedEntityRows({
   query,
-  type,
 }: {
   query: string;
-  type: EntityType | null;
 }): Promise<CandidateEntity[]> {
   return await db
     .select({
       id: entities.id,
       name: entities.name,
       shortName: entities.shortName,
-      type: entities.type,
+      kind: sql<CandidateEntity["kind"]>`${entities.kind}`,
       website: entities.website,
       countryName: countries.name,
       regionName: regions.name,
@@ -490,7 +491,7 @@ async function findQueryMatchedEntityRows({
     .leftJoin(regions, eq(regions.id, entities.regionId))
     .where(
       and(
-        type ? sql`${type} = ANY(${entities.type})` : undefined,
+        entityBrandUseCondition(),
         or(
           ilike(entities.name, `%${query}%`),
           ilike(sql`COALESCE(${entities.shortName}, '')`, `%${query}%`),
@@ -512,17 +513,13 @@ async function findQueryMatchedEntityRows({
     .limit(MAX_ENTITY_SCAN_LIMIT);
 }
 
-async function findTopEntityRows({
-  type,
-}: {
-  type: EntityType | null;
-}): Promise<CandidateEntity[]> {
+async function findTopEntityRows(): Promise<CandidateEntity[]> {
   return await db
     .select({
       id: entities.id,
       name: entities.name,
       shortName: entities.shortName,
-      type: entities.type,
+      kind: sql<CandidateEntity["kind"]>`${entities.kind}`,
       website: entities.website,
       countryName: countries.name,
       regionName: regions.name,
@@ -532,7 +529,7 @@ async function findTopEntityRows({
     .from(entities)
     .leftJoin(countries, eq(countries.id, entities.countryId))
     .leftJoin(regions, eq(regions.id, entities.regionId))
-    .where(type ? sql`${type} = ANY(${entities.type})` : undefined)
+    .where(entityBrandUseCondition())
     .orderBy(desc(entities.totalTastings), desc(entities.totalBottles))
     .limit(MAX_ENTITY_SCAN_LIMIT);
 }
@@ -585,7 +582,16 @@ async function getSampleBottlesByBrandIds(brandIds: number[]) {
       totalTastings: bottles.totalTastings,
     })
     .from(bottles)
-    .where(inArray(bottles.brandId, brandIds))
+    .where(
+      and(
+        inArray(bottles.brandId, brandIds),
+        isNotNull(bottles.groupId),
+        sql`NOT EXISTS (
+          SELECT 1 FROM ${bottleTombstones}
+          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+        )`,
+      ),
+    )
     .orderBy(desc(bottles.totalTastings), desc(bottles.id));
 
   const samplesByBrandId = new Map<
@@ -640,7 +646,7 @@ function buildSuffixTargetCandidates({
         name: entry.entity.name,
         shortName: entry.entity.shortName,
         aliases: brandAliasesById.get(entry.entity.id) ?? [],
-        type: entry.entity.type,
+        kind: entry.entity.kind,
         website: entry.entity.website,
         score: 0.7,
         candidateCount: 0,
@@ -672,7 +678,7 @@ function buildBrandRepairTargets({
       name: group.targetBrand.name,
       shortName: targetBrand?.shortName ?? group.targetBrand.shortName,
       aliases: brandAliasesById.get(group.targetBrand.id) ?? [],
-      type: targetBrand?.type ?? ["brand"],
+      kind: targetBrand?.kind ?? "brand",
       website: targetBrand?.website ?? null,
       score: null,
       candidateCount: group.candidateCount,
@@ -784,9 +790,7 @@ async function materializeCandidates(
       getAliasesByEntityIds(sourceIds),
       getAliasesByEntityIds(targetIds),
       getSampleBottlesByBrandIds(
-        candidates
-          .filter((candidate) => candidate.entity.type.includes("brand"))
-          .map((candidate) => candidate.entity.id),
+        candidates.map((candidate) => candidate.entity.id),
       ),
     ]);
 
@@ -850,11 +854,9 @@ async function materializeCandidates(
 async function collectEntityAuditCandidates({
   entityId,
   query = "",
-  type = DEFAULT_ENTITY_TYPE,
 }: {
   entityId?: number;
   query?: string;
-  type?: EntityType | null;
 }): Promise<EntityAuditCandidateInternal[]> {
   const trimmedQuery = query.trim();
   const { brandAliasesById, brandsById, lookup } = await getBrandLookup();
@@ -866,15 +868,12 @@ async function collectEntityAuditCandidates({
     }
 
     const aliasesById = await getAliasesByEntityIds([entity.id]);
-    const groupedBrandRepairs =
-      entity.type.includes("brand") && (type === null || type === "brand")
-        ? (
-            await getBrandRepairGroups({
-              currentBrandId: entity.id,
-              limit: MAX_BRAND_REPAIR_GROUPS,
-            })
-          ).results
-        : [];
+    const groupedBrandRepairs = (
+      await getBrandRepairGroups({
+        currentBrandId: entity.id,
+        limit: MAX_BRAND_REPAIR_GROUPS,
+      })
+    ).results;
 
     const candidate = buildCandidate({
       brandAliasesById,
@@ -888,16 +887,13 @@ async function collectEntityAuditCandidates({
     return candidate ? [candidate] : [];
   }
 
-  const groupedBrandRepairs =
-    type === null || type === "brand"
-      ? (
-          await getBrandRepairGroups({
-            cursor: 1,
-            limit: MAX_BRAND_REPAIR_GROUPS,
-            query: trimmedQuery,
-          })
-        ).results
-      : [];
+  const groupedBrandRepairs = (
+    await getBrandRepairGroups({
+      cursor: 1,
+      limit: MAX_BRAND_REPAIR_GROUPS,
+      query: trimmedQuery,
+    })
+  ).results;
 
   const subjectIds = new Set<number>();
 
@@ -910,19 +906,10 @@ async function collectEntityAuditCandidates({
       trimmedQuery
         ? findQueryMatchedEntityRows({
             query: trimmedQuery,
-            type,
           })
         : Promise.resolve([]),
-      trimmedQuery
-        ? Promise.resolve([])
-        : findTopEntityRows({
-            type,
-          }),
-      trimmedQuery
-        ? Promise.resolve([])
-        : findHeuristicEntityRows({
-            type,
-          }),
+      trimmedQuery ? Promise.resolve([]) : findTopEntityRows(),
+      trimmedQuery ? Promise.resolve([]) : findHeuristicEntityRows(),
     ]);
 
   for (const entity of [
@@ -978,7 +965,6 @@ export async function getEntityClassificationReference({
 }): Promise<EntityClassificationReference | null> {
   const [candidate] = await collectEntityAuditCandidates({
     entityId: entity,
-    type: null,
   });
 
   if (!candidate) {
@@ -1037,16 +1023,13 @@ export async function getEntityAuditCandidates({
   cursor = 1,
   limit = 25,
   query = "",
-  type = DEFAULT_ENTITY_TYPE,
 }: {
   cursor?: number;
   limit?: number;
   query?: string;
-  type?: EntityType | null;
 }) {
   const candidates = await collectEntityAuditCandidates({
     query,
-    type,
   });
 
   const start = (cursor - 1) * limit;

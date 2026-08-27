@@ -28,7 +28,7 @@ describe("Bottle classifier context adapters", () => {
     const entity = await fixtures.Entity({
       name: "Context Laphroaig",
       shortName: "Laphroaig",
-      type: ["brand", "distiller", "bottler"],
+      kind: "distillery",
       countryId: country.id,
       regionId: region.id,
       yearEstablished: 1815,
@@ -200,13 +200,13 @@ describe("Bottle classifier context adapters", () => {
     ).resolves.toBe("https://images.example.com/external.webp");
   });
 
-  test("returns narrow Entity identity and related Bottle roles", async ({
+  test("returns Entity kind and related Bottle relationships", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
       name: "Context Multi Role Entity",
       shortName: "Context Entity",
-      type: ["brand", "distiller", "bottler"],
+      kind: "distillery",
       website: "https://example.com/entity",
       description: "ENTITY_DESCRIPTION_MUST_NOT_ESCAPE",
       address: "ENTITY_ADDRESS_MUST_NOT_ESCAPE",
@@ -230,7 +230,7 @@ describe("Bottle classifier context adapters", () => {
       entityId: entity.id,
       name: "Context Multi Role Entity",
       shortName: "Context Entity",
-      roles: ["brand", "distiller", "bottler"],
+      kind: "distillery",
       website: "https://example.com/entity",
       aliases: expect.arrayContaining(["Context Entity Alias"]),
       relatedBottles: [

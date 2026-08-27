@@ -54,7 +54,6 @@ export const OperationWarningSchema = z
       "consumer_memberships_collapse",
       "bottle_identity_collision_resolved",
       "series_collision_resolved",
-      "role_union",
     ]),
     message: NonEmptyTextSchema,
   })
@@ -93,7 +92,7 @@ export const ExistingEntityPreviewSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: EntityPreviewShortNameSchema,
-    roles: EntityContextFields.roles,
+    entityKind: EntityContextFields.kind,
   })
   .strict();
 
@@ -137,7 +136,7 @@ export const EntityPreviewStateSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: EntityPreviewShortNameSchema,
-    roles: EntityContextFields.roles,
+    kind: EntityContextFields.kind,
     website: EntityContextFields.website,
     location: EntityLocationSchema,
     yearEstablished: EntityContextFields.yearEstablished,
@@ -227,7 +226,7 @@ export const EntityUpdatePreviewSchema = z
       z.enum([
         "name",
         "shortName",
-        "roles",
+        "kind",
         "website",
         "country",
         "region",
@@ -266,7 +265,7 @@ const EntityDependencyStateSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: RawEntityShortNameSchema,
-    roles: EntityContextFields.roles,
+    kind: EntityContextFields.kind,
   })
   .strict();
 
@@ -338,7 +337,7 @@ const EntityPatchStateTokenSchema = z
   .object({
     name: NonEmptyTextSchema.optional(),
     shortName: RawEntityShortNameSchema.optional(),
-    roles: EntityContextFields.roles.optional(),
+    kind: EntityContextFields.kind.optional(),
     website: EntityContextFields.website.optional(),
     countryId: PositiveIdSchema.nullable().optional(),
     regionId: PositiveIdSchema.nullable().optional(),
@@ -371,7 +370,7 @@ const EntityMergeIdentityStateSchema = z
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
     shortName: RawEntityShortNameSchema,
-    roles: EntityContextFields.roles,
+    kind: EntityContextFields.kind,
     aliasDigest: RelationshipDigestSchema,
     tombstoneDestinationEntityId: PositiveIdSchema.nullable(),
   })

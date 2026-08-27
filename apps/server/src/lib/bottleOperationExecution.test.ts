@@ -22,12 +22,17 @@ import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, desc, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+type EntityArtifact = Pick<
+  typeof entities.$inferSelect,
+  "id" | "kind" | "name"
+>;
+
 function artifacts({
   bottleIds = [],
   inspectedEntities = [],
 }: {
   bottleIds?: number[];
-  inspectedEntities?: Array<{ id: number; name: string }>;
+  inspectedEntities?: EntityArtifact[];
 }) {
   return {
     candidates: bottleIds.map((bottleId) => ({
@@ -36,13 +41,14 @@ function artifacts({
     })),
     resolvedEntities: inspectedEntities.map((entity) => ({
       entityId: entity.id,
+      kind: entity.kind!,
       name: entity.name,
     })),
     entityContexts: inspectedEntities.map((entity) => ({
       entityId: entity.id,
       name: entity.name,
       shortName: null,
-      roles: [],
+      kind: entity.kind!,
       website: null,
       country: null,
       region: null,
@@ -199,7 +205,7 @@ describe("Bottle operation execution", () => {
             kind: "create",
             entity: {
               name: "Execution Created Brand",
-              roles: ["brand"],
+              kind: "brand",
             },
           },
         },
@@ -245,7 +251,7 @@ describe("Bottle operation execution", () => {
     const createdBrand = await db.query.entities.findFirst({
       where: eq(entities.name, "Execution Created Brand"),
     });
-    expect(createdBrand).toMatchObject({ type: ["brand"] });
+    expect(createdBrand).toMatchObject({ kind: "brand" });
     expect(
       await db.query.bottles.findFirst({
         where: eq(bottles.id, bottle.id),
@@ -332,7 +338,7 @@ describe("Bottle operation execution", () => {
     });
     const entity = await fixtures.Entity({
       name: "Execution Entity Before",
-      type: ["brand"],
+      kind: "brand",
     });
     const subjectBottle = await fixtures.Bottle({ brandId: entity.id });
     const proposal: ProposedOperation = {
@@ -401,11 +407,11 @@ describe("Bottle operation execution", () => {
     const moderator = await fixtures.User({ mod: true });
     const source = await fixtures.Entity({
       name: "Execution Entity Merge Source",
-      type: ["distiller"],
+      kind: "distillery",
     });
     const destination = await fixtures.Entity({
       name: "Execution Entity Merge Destination",
-      type: ["brand"],
+      kind: "brand",
     });
     const subjectBottle = await fixtures.Bottle({
       brandId: destination.id,

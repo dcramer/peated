@@ -74,17 +74,17 @@
       {
         "id": 5775,
         "name": "Decadent Drinks",
-        "type": ["brand", "bottler", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 365738,
         "name": "Whiskyland",
-        "type": ["brand"]
+        "kind": "brand"
       },
       {
         "id": 987,
         "name": "Glenturret",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

@@ -6,7 +6,7 @@ const RelatedEntitySchema = z.object({
   id: z.number(),
   name: z.string(),
   shortName: z.string().nullable(),
-  kind: EntityKindEnum.nullable(),
+  kind: EntityKindEnum,
   count: z.number(),
 });
 

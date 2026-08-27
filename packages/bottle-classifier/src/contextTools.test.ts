@@ -71,7 +71,7 @@ function entityContext(): EntityContext {
     entityId: 9,
     name: "Laphroaig",
     shortName: null,
-    roles: ["brand", "distiller"],
+    kind: "brand",
     website: "https://www.laphroaig.com",
     country: "Scotland",
     region: "Islay",

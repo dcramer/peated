@@ -96,7 +96,7 @@ export default implement(bottleListContract).handler(async function ({
         .where(
           and(
             eq(entityFollows.userId, context.user.id),
-            sql`'distiller' = ANY(${entities.type})`,
+            eq(entities.kind, "distillery"),
           ),
         )
     ).map(({ entityId }) => entityId);

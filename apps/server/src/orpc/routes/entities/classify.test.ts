@@ -50,11 +50,11 @@ describe("POST /entities/{entity}/classify", () => {
   }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const canadianClub = await fixtures.Entity({
       name: "Canadian Club",
-      type: ["brand"],
+      kind: "brand",
       totalBottles: 12,
       totalTastings: 180,
     });

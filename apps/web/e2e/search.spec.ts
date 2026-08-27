@@ -24,7 +24,7 @@ test("search settles after one request", async ({ page }) => {
       limit: 50,
       scopes: [
         "bottles",
-        "distillers",
+        "distilleries",
         "brands",
         "bottlers",
         "blenders",

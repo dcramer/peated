@@ -144,7 +144,7 @@ function operationsConflict(
       (left.input.entityId === right.input.destinationEntityId &&
         (left.input.patch.name !== undefined ||
           left.input.patch.shortName !== undefined ||
-          left.input.patch.roles !== undefined))
+          left.input.patch.kind !== undefined))
     );
   }
   if (left.type === "merge_entities" && right.type === "update_entity") {

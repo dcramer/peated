@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export const EntityTypeEnum = z.enum(["brand", "bottler", "distiller"]);
+export const EntityKindEnum = z.enum([
+  "brand",
+  "distillery",
+  "bottler",
+  "blender",
+  "company",
+]);
 
 export const EntityClassificationReasonKindEnum = z.enum([
   "brand_repair_group",
@@ -39,7 +45,7 @@ export const EntityClassificationCandidateTargetSchema = z
     name: z.string().trim().min(1),
     shortName: z.string().trim().nullable().default(null),
     aliases: z.array(z.string().trim().min(1)).default([]),
-    type: z.array(EntityTypeEnum).default([]),
+    kind: EntityKindEnum,
     website: z.string().trim().nullable().default(null),
     score: z.number().nullable().default(null),
     candidateCount: z.number().int().min(0).default(0),
@@ -56,7 +62,7 @@ export const EntityClassificationSubjectSchema = z
     name: z.string().trim().min(1),
     shortName: z.string().trim().nullable().default(null),
     aliases: z.array(z.string().trim().min(1)).default([]),
-    type: z.array(EntityTypeEnum).default([]),
+    kind: EntityKindEnum,
     website: z.string().trim().nullable().default(null),
     countryName: z.string().trim().nullable().default(null),
     regionName: z.string().trim().nullable().default(null),
@@ -79,7 +85,7 @@ export const EntityClassificationReferenceSchema = z
 export const SearchEntitiesArgsSchema = z
   .object({
     query: z.string().trim().min(1),
-    type: EntityTypeEnum.nullable().default(null),
+    kind: EntityKindEnum.describe("Entity kind to search"),
     limit: z.number().int().min(1).max(25).default(10),
   })
   .strict();
@@ -89,7 +95,7 @@ export const EntityResolutionSchema = z
     entityId: z.number().int(),
     name: z.string().trim().min(1),
     shortName: z.string().trim().nullable().default(null),
-    type: z.array(EntityTypeEnum).default([]),
+    kind: EntityKindEnum,
     alias: z.string().trim().nullable().default(null),
     score: z.number().nullable().default(null),
     source: z.array(z.enum(["exact", "text", "prefix"])).default([]),

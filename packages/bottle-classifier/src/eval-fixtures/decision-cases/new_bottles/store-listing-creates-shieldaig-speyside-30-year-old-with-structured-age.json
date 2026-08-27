@@ -55,7 +55,7 @@
       {
         "id": 3943,
         "name": "Shieldaig",
-        "type": ["brand"]
+        "kind": "brand"
       }
     ],
     "bottles": [

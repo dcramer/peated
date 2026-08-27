@@ -6,9 +6,13 @@ import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import type { ReservedCollectionSlug } from "../constants";
 import type { AnyDatabase } from "../db";
-import type { Collection, Entity, EntityType } from "../db/schema";
+import type { Collection, Entity, EntityKind } from "../db/schema";
 import { changes, collections, entities, entityAliases } from "../db/schema";
-import { EntityInputSchema, type EntitySchema } from "../schemas";
+import {
+  EntityInputSchema,
+  EntityKindEnum,
+  type EntitySchema,
+} from "../schemas";
 import { getCatalogVerificationCreationMetadata } from "./catalogVerification";
 
 export type UpsertOutcome<T> =
@@ -22,9 +26,11 @@ export type UpsertOutcome<T> =
 
 const EntityUpsertDataSchema = EntityInputSchema.omit({
   country: true,
+  kind: true,
   region: true,
 }).extend({
   id: z.number().nullish(),
+  kind: EntityKindEnum.optional(),
   countryId: z.number().nullish(),
   regionId: z.number().nullish(),
 });
@@ -62,9 +68,10 @@ export function coerceToUpsert({
   country,
   region,
   ...data
-}:
-  | z.infer<typeof EntityInputSchema>
-  | z.infer<typeof EntitySchema>): EntityUpsertData {
+}: EntityUpsertData & {
+  country?: number | { id: number } | null;
+  region?: number | { id: number } | null;
+}): EntityUpsertData {
   const rv: EntityUpsertData = { ...data };
   if (country instanceof Object) {
     rv.countryId = country.id;
@@ -172,49 +179,6 @@ export async function findEntityByExactNameOrAlias(
 }
 
 /**
- * A conditional update elects one role-adding caller; concurrent losers reload
- * the winning row and report `changed: false`.
- */
-async function mergeEntityTypeIfNeeded({
-  db,
-  entity,
-  type,
-}: {
-  db: AnyDatabase;
-  entity: Entity;
-  type?: EntityType;
-}): Promise<{ result: Entity; changed: boolean }> {
-  if (!type || entity.type.includes(type)) {
-    return { result: entity, changed: false };
-  }
-
-  const [updatedEntity] = await db
-    .update(entities)
-    .set({ type: sql`array_append(${entities.type}, ${type})` })
-    .where(
-      and(
-        eq(entities.id, entity.id),
-        sql`NOT (${type} = ANY(${entities.type}))`,
-      ),
-    )
-    .returning();
-
-  if (updatedEntity) {
-    return { result: updatedEntity, changed: true };
-  }
-
-  const currentEntity = await db.query.entities.findFirst({
-    where: (entities, { eq }) => eq(entities.id, entity.id),
-  });
-  if (!currentEntity) {
-    throw new Error(
-      `Entity ${entity.id} disappeared while adding the ${type} role.`,
-    );
-  }
-  return { result: currentEntity, changed: false };
-}
-
-/**
  * Keep entity aliases in sync anywhere we can create or rename entities.
  * Exact short-name and alias matching is one of the cheap deterministic paths
  * that lets ingestion bypass the classifier safely when the identity is known.
@@ -304,13 +268,14 @@ export const upsertEntity = async ({
   db,
   data,
   createdByActorId,
-  type,
+  kind,
   creationSource,
 }: {
   db: AnyDatabase;
   data: EntityUpsertInput;
   createdByActorId: number;
-  type?: EntityType;
+  // The caller owns the creation context. Existing Entities keep their stored kind.
+  kind: EntityKind;
   creationSource?: CatalogVerificationCreationSource;
 }): Promise<UpsertOutcome<Entity>> => {
   if (!data) return undefined;
@@ -325,16 +290,11 @@ export const upsertEntity = async ({
       return undefined;
     }
 
-    const merged = await mergeEntityTypeIfNeeded({
-      db,
-      entity: result,
-      type,
-    });
     return {
-      id: merged.result.id,
-      result: merged.result,
+      id: result.id,
+      result,
       created: false,
-      changed: merged.changed,
+      changed: false,
     };
   }
 
@@ -349,21 +309,17 @@ export const upsertEntity = async ({
       return undefined;
     }
 
-    const merged = await mergeEntityTypeIfNeeded({
-      db,
-      entity: result,
-      type,
-    });
     return {
-      id: merged.result.id,
-      result: merged.result,
+      id: result.id,
+      result,
       created: false,
-      changed: merged.changed,
+      changed: false,
     };
   }
 
   const normalizedData = EntityInsertDataSchema.parse({
     ...entityData,
+    kind: entityData.kind ?? kind,
     name: normalizeEntityName(entityData.name),
   });
   const actorId = createdByActorId;
@@ -373,16 +329,11 @@ export const upsertEntity = async ({
     normalizedData.name,
   );
   if (existingEntity) {
-    const merged = await mergeEntityTypeIfNeeded({
-      db,
-      entity: existingEntity,
-      type,
-    });
     return {
-      id: merged.result.id,
-      result: merged.result,
+      id: existingEntity.id,
+      result: existingEntity,
       created: false,
-      changed: merged.changed,
+      changed: false,
     };
   }
 
@@ -390,9 +341,6 @@ export const upsertEntity = async ({
     .insert(entities)
     .values({
       ...normalizedData,
-      type: Array.from(
-        new Set([...(type ? [type] : []), ...(normalizedData.type || [])]),
-      ),
       createdByActorId: actorId,
     })
     .onConflictDoNothing()
@@ -437,16 +385,11 @@ export const upsertEntity = async ({
   );
 
   if (resultConflict) {
-    const merged = await mergeEntityTypeIfNeeded({
-      db,
-      entity: resultConflict,
-      type,
-    });
     return {
-      id: merged.result.id,
-      result: merged.result,
+      id: resultConflict.id,
+      result: resultConflict,
       created: false,
-      changed: merged.changed,
+      changed: false,
     };
   }
   throw new Error("We should never hit this case in upsert");

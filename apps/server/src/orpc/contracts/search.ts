@@ -4,16 +4,33 @@ import {
   RegionSchema,
   UserSchema,
 } from "@peated/server/schemas";
+import type { EntityKind } from "@peated/server/types";
 import { z } from "zod";
 import { contract } from "./base";
 
-export const SEARCH_SCOPE_LIST = [
-  "bottles",
-  "distillers",
+export const ENTITY_SEARCH_SCOPE_LIST = [
+  "distilleries",
   "brands",
   "bottlers",
   "blenders",
   "companies",
+] as const;
+
+export type EntitySearchScope = (typeof ENTITY_SEARCH_SCOPE_LIST)[number];
+
+// Each public Entity search scope owns one Entity kind. All-kind callers must
+// request every Entity scope explicitly.
+export const ENTITY_KIND_BY_SEARCH_SCOPE = {
+  distilleries: "distillery",
+  brands: "brand",
+  bottlers: "bottler",
+  blenders: "blender",
+  companies: "company",
+} as const satisfies Record<EntitySearchScope, EntityKind>;
+
+export const SEARCH_SCOPE_LIST = [
+  "bottles",
+  ...ENTITY_SEARCH_SCOPE_LIST,
   "regions",
   "members",
 ] as const;
@@ -32,7 +49,7 @@ const GroupSchema = z.discriminatedUnion("type", [
     results: z.array(BottleSchema),
   }),
   z.object({
-    type: z.literal("distillers"),
+    type: z.literal("distilleries"),
     total: z.number().int().nonnegative(),
     results: z.array(EntitySchema),
   }),
@@ -77,7 +94,7 @@ export const ExactSchema = z
 
 const NearestSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("bottles"), result: BottleSchema }),
-  z.object({ type: z.literal("distillers"), result: EntitySchema }),
+  z.object({ type: z.literal("distilleries"), result: EntitySchema }),
   z.object({ type: z.literal("brands"), result: EntitySchema }),
   z.object({ type: z.literal("bottlers"), result: EntitySchema }),
   z.object({ type: z.literal("blenders"), result: EntitySchema }),
@@ -88,7 +105,7 @@ const NearestSchema = z.discriminatedUnion("type", [
 
 export const ScopeTotalsSchema = z.object({
   bottles: z.number().int().nonnegative(),
-  distillers: z.number().int().nonnegative(),
+  distilleries: z.number().int().nonnegative(),
   brands: z.number().int().nonnegative(),
   bottlers: z.number().int().nonnegative(),
   blenders: z.number().int().nonnegative(),
@@ -111,7 +128,7 @@ export default contract
     path: "/search",
     summary: "Global search",
     description:
-      "Search bottles, brands, distilleries, bottlers, regions, and members",
+      "Search bottles, brands, distilleries, bottlers, blenders, companies, regions, and members",
     spec: (spec) => ({ ...spec, operationId: "search" }),
   })
   .input(

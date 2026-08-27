@@ -2,7 +2,13 @@ import { inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { countries, regions, type Entity, type User } from "../db/schema";
+import {
+  countries,
+  entities,
+  regions,
+  type Entity,
+  type User,
+} from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { formatPeatedId } from "../lib/peatedId";
 import { type EntitySchema } from "../schemas";
@@ -11,6 +17,7 @@ import { RegionSerializer } from "./region";
 
 interface EntityAttrs {
   country: z.infer<typeof EntitySchema>["country"];
+  owner: z.infer<typeof EntitySchema>["owner"];
   region: z.infer<typeof EntitySchema>["region"];
 }
 
@@ -46,12 +53,31 @@ export const EntitySerializer = serializer({
         )
       : {};
 
+    const ownerIds = itemList.map((item) => item.ownerId).filter(notEmpty);
+    const ownerList = ownerIds.length
+      ? await db
+          .select({ id: entities.id, name: entities.name })
+          .from(entities)
+          .where(inArray(entities.id, ownerIds))
+      : [];
+    const ownersById = Object.fromEntries(
+      ownerList.map((owner) => [
+        owner.id,
+        {
+          id: owner.id,
+          peatedId: formatPeatedId("entity", owner.id),
+          name: owner.name,
+        },
+      ]),
+    );
+
     return Object.fromEntries(
       itemList.map((item) => {
         return [
           item.id,
           {
             country: item.countryId ? countriesById[item.countryId] : null,
+            owner: item.ownerId ? ownersById[item.ownerId] : null,
             region: item.regionId ? regionsById[item.regionId] : null,
           },
         ];
@@ -59,14 +85,18 @@ export const EntitySerializer = serializer({
     );
   },
   item: (item: Entity, attrs: EntityAttrs): z.infer<typeof EntitySchema> => {
+    if (!item.kind) {
+      throw new Error(`Entity ${item.id} has no kind.`);
+    }
+
     return {
       id: item.id,
       peatedId: formatPeatedId("entity", item.id),
       name: item.name,
       shortName: item.shortName,
-      type: item.type,
       kind: item.kind,
       ownerId: item.ownerId,
+      owner: attrs.owner,
       description: item.description,
       yearEstablished: item.yearEstablished,
       website: item.website,

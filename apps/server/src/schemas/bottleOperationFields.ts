@@ -21,7 +21,7 @@ export const BottleOperationFieldPathSchema = z.enum([
   "exact.outturn",
   "name",
   "shortName",
-  "roles",
+  "kind",
   "website",
   "country",
   "region",

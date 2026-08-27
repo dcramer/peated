@@ -1,10 +1,25 @@
 import { describe, expect, test } from "vitest";
+import { SearchEntitiesArgsSchema } from "./classifierTypes";
 import {
   ClassifyEntityInputSchema,
   EntityClassificationResultSchema,
 } from "./contract";
 
 describe("entity classifier contract", () => {
+  test("requires a kind for local Entity search", () => {
+    expect(
+      SearchEntitiesArgsSchema.safeParse({ query: "Compass Box", limit: 5 })
+        .success,
+    ).toBe(false);
+    expect(
+      SearchEntitiesArgsSchema.parse({
+        query: "Compass Box",
+        kind: "blender",
+        limit: 5,
+      }),
+    ).toEqual({ query: "Compass Box", kind: "blender", limit: 5 });
+  });
+
   test("parses a suspect entity reference", () => {
     expect(
       ClassifyEntityInputSchema.parse({
@@ -14,7 +29,7 @@ describe("entity classifier contract", () => {
             name: "Canadian",
             shortName: null,
             aliases: ["Canadian"],
-            type: ["brand", "distiller"],
+            kind: "brand",
             website: "https://www.canadianwhisky.org/",
             countryName: "Canada",
             regionName: null,
@@ -43,7 +58,7 @@ describe("entity classifier contract", () => {
               name: "Canadian Club",
               shortName: null,
               aliases: ["Canadian Club"],
-              type: ["brand"],
+              kind: "brand",
               website: "https://www.canadianclub.com/",
               score: null,
               candidateCount: 2,

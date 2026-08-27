@@ -3,12 +3,12 @@ import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
 describe("GET /entities/:entity/catalog", () => {
-  test("summarizes overlapping bottle roles and related entities", async ({
+  test("summarizes overlapping Bottle relationships and related Entities", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
       name: "Summary Entity",
-      type: ["brand", "bottler", "distiller"],
+      kind: "distillery",
     });
     const alphaBrand = await fixtures.Entity({ name: "Alpha Brand" });
     const betaBrand = await fixtures.Entity({ name: "Beta Brand" });
@@ -66,14 +66,14 @@ describe("GET /entities/:entity/catalog", () => {
             id: alphaBrand.id,
             name: "Alpha Brand",
             shortName: null,
-            kind: null,
+            kind: "brand",
             count: 1,
           },
           {
             id: betaBrand.id,
             name: "Beta Brand",
             shortName: null,
-            kind: null,
+            kind: "brand",
             count: 1,
           },
         ],
@@ -82,7 +82,7 @@ describe("GET /entities/:entity/catalog", () => {
             id: outsideBottler.id,
             name: "Outside Bottler",
             shortName: null,
-            kind: null,
+            kind: "brand",
             count: 1,
           },
         ],
@@ -91,14 +91,14 @@ describe("GET /entities/:entity/catalog", () => {
             id: sourceA.id,
             name: "Source A",
             shortName: null,
-            kind: null,
+            kind: "brand",
             count: 1,
           },
           {
             id: sourceB.id,
             name: "Source B",
             shortName: null,
-            kind: null,
+            kind: "brand",
             count: 1,
           },
         ],

@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottles,
+  bottlesToDistillers,
   bottleTombstones,
   entities,
   entityAliases,
@@ -122,8 +123,8 @@ type CandidateBottle = Pick<
 
 type CandidateBrand = Pick<
   typeof entities.$inferSelect,
-  "id" | "name" | "shortName" | "totalBottles" | "totalTastings" | "type"
->;
+  "id" | "kind" | "name" | "shortName" | "totalBottles" | "totalTastings"
+> & { usedAsDistiller?: boolean };
 
 type BrandNameEntry = {
   entityId: number;
@@ -202,6 +203,18 @@ function activeBottleConditions(bottle: {
     isNotNull(bottle.groupId),
     sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottle.id})`,
   );
+}
+
+function activeBrandUseCondition() {
+  return sql`EXISTS (
+    SELECT 1 FROM ${bottles}
+    WHERE ${bottles.brandId} = ${entities.id}
+      AND ${bottles.groupId} IS NOT NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM ${bottleTombstones}
+        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+      )
+  )`;
 }
 
 async function getQueryAliasMembership({
@@ -332,9 +345,9 @@ function targetNameIsCurrentDistilleryBrandContraction({
   currentBrand: CandidateBrand;
   targetBrand: CandidateBrand;
 }): boolean {
-  // Alias-only contractions are safe only when the current entity is also a
-  // distiller; otherwise stale aliases can create reversible brand repairs.
-  if (!currentBrand.type.includes("distiller")) {
+  // Alias-only contractions are safe only when Bottles also use the current
+  // Entity as a distiller; otherwise stale aliases can create bad repairs.
+  if (!currentBrand.usedAsDistiller) {
     return false;
   }
 
@@ -675,7 +688,7 @@ async function getCandidateBottles({
         .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
         .where(
           and(
-            sql`'brand' = ANY(${entities.type})`,
+            activeBrandUseCondition(),
             or(
               ilike(entities.name, `%${query}%`),
               ilike(sql`COALESCE(${entities.shortName}, '')`, `%${query}%`),
@@ -781,21 +794,42 @@ async function collectBrandRepairCandidates({
     return [];
   }
 
-  const [currentBrands, aliasRows, brandRows] = await Promise.all([
-    db.select().from(entities).where(inArray(entities.id, currentBrandIds)),
-    getSupportingAliasMembership(candidateBottleIds),
-    db
-      .select({
-        alias: entityAliases.name,
-        brand: entities,
-      })
-      .from(entities)
-      .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
-      .where(sql`'brand' = ANY(${entities.type})`),
-  ]);
+  const [currentBrands, aliasRows, brandRows, distillerUseRows] =
+    await Promise.all([
+      db.select().from(entities).where(inArray(entities.id, currentBrandIds)),
+      getSupportingAliasMembership(candidateBottleIds),
+      db
+        .select({
+          alias: entityAliases.name,
+          brand: entities,
+        })
+        .from(entities)
+        .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+        .where(or(eq(entities.kind, "brand"), activeBrandUseCondition())),
+      db
+        .selectDistinct({ entityId: bottlesToDistillers.distillerId })
+        .from(bottlesToDistillers)
+        .innerJoin(bottles, eq(bottles.id, bottlesToDistillers.bottleId))
+        .where(
+          and(
+            inArray(bottlesToDistillers.distillerId, currentBrandIds),
+            activeBottleConditions(bottles),
+          ),
+        ),
+    ]);
 
+  const distillerUseIds = new Set(
+    distillerUseRows.map(({ entityId }) => entityId),
+  );
   const currentBrandsById = new Map(
-    currentBrands.map((brand) => [brand.id, brand]),
+    currentBrands.map((brand) => [
+      brand.id,
+      {
+        ...brand,
+        usedAsDistiller:
+          brand.kind === "distillery" || distillerUseIds.has(brand.id),
+      },
+    ]),
   );
   const aliasesByBottleId = new Map<number, string[]>();
   for (const row of aliasRows) {
@@ -999,7 +1033,7 @@ async function collectBrandRepairCandidates({
         totalBottles: currentBrand.totalBottles,
         totalTastings: currentBrand.totalTastings,
       },
-      suggestedDistillery: currentBrand.type.includes("distiller")
+      suggestedDistillery: currentBrand.usedAsDistiller
         ? {
             id: currentBrand.id,
             name: currentBrand.name,

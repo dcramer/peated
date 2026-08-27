@@ -59,21 +59,15 @@ export default procedure
           }),
     ]);
 
-    if (!fromBrand || !fromBrand.type.includes("brand")) {
+    if (!fromBrand) {
       throw errors.BAD_REQUEST({
         message: "Source brand is invalid.",
       });
     }
 
-    if (!toBrand || !toBrand.type.includes("brand")) {
+    if (!toBrand) {
       throw errors.BAD_REQUEST({
         message: "Target brand is invalid.",
-      });
-    }
-
-    if (distillery && !distillery.type.includes("distiller")) {
-      throw errors.BAD_REQUEST({
-        message: "Suggested distillery is invalid.",
       });
     }
 

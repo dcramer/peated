@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EntityTypeEnum, ProposedBottleFields } from "./classifierTypes";
+import { EntityKindEnum, ProposedBottleFields } from "./classifierTypes";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const PositiveIdSchema = z.number().int().positive();
@@ -90,7 +90,7 @@ export const FindingSchema = z
 export const ProposedEntityDraftSchema = z
   .object({
     name: NonEmptyTextSchema,
-    roles: z.array(EntityTypeEnum).nonempty(),
+    kind: EntityKindEnum,
     shortName: NullableNonEmptyTextSchema.optional(),
     website: WebUrlSchema.nullable().optional(),
     country: NullableNonEmptyTextSchema.optional(),
@@ -155,7 +155,7 @@ export const EntityIdentityPatchSchema = z
   .object({
     name: NonEmptyTextSchema.optional(),
     shortName: NullableNonEmptyTextSchema.optional(),
-    roles: z.array(EntityTypeEnum).nonempty().optional(),
+    kind: EntityKindEnum.optional(),
     website: WebUrlSchema.nullable().optional(),
     country: NullableNonEmptyTextSchema.optional(),
     region: NullableNonEmptyTextSchema.optional(),

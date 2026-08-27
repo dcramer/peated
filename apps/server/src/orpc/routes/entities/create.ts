@@ -16,35 +16,24 @@ import {
 } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import contract from "@peated/server/orpc/contracts/entities/create";
 import {
   requireTosAccepted,
   requireVerified,
 } from "@peated/server/orpc/middleware/auth";
-import { EntityInputSchema, EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushJob } from "@peated/server/worker/client";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
-export default procedure
+export default implement(contract)
   .use(requireVerified)
   .use(requireTosAccepted)
-  .route({
-    method: "POST",
-    path: "/entities",
-    summary: "Create entity",
-    description:
-      "Create a new entity (brand, distillery, or bottler) with location and type information",
-    operationId: "createEntity",
-  })
-  .input(EntityInputSchema)
-  .output(EntitySchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async ({ input, context, errors }) => {
     const data: Omit<NewEntity, "createdByActorId"> = {
       ...input,
       name: normalizeEntityName(input.name),
-      type: input.type || [],
     };
 
     if (input.country) {
@@ -53,11 +42,7 @@ export default procedure
         .from(countries)
         .where(eq(countries.id, input.country))
         .limit(1);
-      if (!country) {
-        throw errors.NOT_FOUND({
-          message: "Country not found.",
-        });
-      }
+      if (!country) throw errors.NOT_FOUND({ message: "Country not found." });
       data.countryId = country.id;
 
       if (input.region) {
@@ -67,37 +52,27 @@ export default procedure
           .where(eq(regions.id, input.region))
           .limit(1);
         if (!region || region.countryId !== data.countryId) {
-          throw errors.NOT_FOUND({
-            message: "Region not found.",
-          });
+          throw errors.NOT_FOUND({ message: "Region not found." });
         }
         data.regionId = region.id;
       }
     }
 
-    if (data.description && data.description !== "") {
-      data.descriptionSrc =
-        input.descriptionSrc ||
-        (input.description && input.description !== null ? "user" : null);
+    if (data.description) {
+      data.descriptionSrc = input.descriptionSrc || "user";
     }
 
-    const user = context.user;
     const result = await db.transaction(async (tx) => {
       if (data.ownerId !== null && data.ownerId !== undefined) {
         const owner = await tx.query.entities.findFirst({
           where: eq(entities.id, data.ownerId),
           columns: { id: true },
         });
-        if (!owner) {
-          throw errors.NOT_FOUND({ message: "Owner not found." });
-        }
+        if (!owner) throw errors.NOT_FOUND({ message: "Owner not found." });
       }
 
-      const actorId = (await getUserActorForDatabase(tx, user)).id;
-      const entityData: NewEntity = {
-        ...data,
-        createdByActorId: actorId,
-      };
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
+      const entityData: NewEntity = { ...data, createdByActorId: actorId };
       const [entity] = await tx
         .insert(entities)
         .values({
@@ -108,41 +83,28 @@ export default procedure
         .returning();
 
       if (!entity) {
-        // see if we can update an existing entity to add a type
         const [existing] = await tx
           .select()
           .from(entities)
-          .where(eq(entities.name, data.name));
-        const missingTypes = data.type.filter(
-          (x) => !existing.type.includes(x),
-        );
-        if (missingTypes) {
-          const [updated] = await tx
-            .update(entities)
-            .set({
-              type: [...existing.type, ...missingTypes],
-            })
-            .where(eq(entities.name, data.name))
-            .returning();
-          return {
-            entity: updated,
-            created: false,
-          };
+          .where(eq(sql`LOWER(${entities.name})`, data.name.toLowerCase()));
+        if (existing?.kind === data.kind) {
+          return { entity: existing, created: false };
         }
-        return null;
+        if (!existing) {
+          throw new Error(
+            `Entity insert conflict could not be resolved for "${data.name}".`,
+          );
+        }
+        throw errors.CONFLICT({
+          message: "Entity with name already exists under another kind.",
+        });
       }
 
       try {
-        await upsertEntityAliases({
-          db: tx,
-          entity,
-        });
+        await upsertEntityAliases({ db: tx, entity });
       } catch (err) {
         if (err instanceof DuplicateEntityAliasError) {
-          throw errors.CONFLICT({
-            message: err.message,
-            cause: err,
-          });
+          throw errors.CONFLICT({ message: err.message, cause: err });
         }
         throw err;
       }
@@ -160,45 +122,25 @@ export default procedure
             buildCatalogVerificationCreationMetadata("manual_entry"),
         },
       });
-
-      return {
-        entity,
-        created: true,
-      };
+      return { entity, created: true };
     });
 
-    if (!result?.entity) {
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Failed to create entity.",
-      });
-    }
+    if (result.created) {
+      try {
+        await pushJob("OnEntityChange", { entityId: result.entity.id });
+      } catch (err) {
+        logError(err, { entity: { id: result.entity.id } });
+      }
 
-    const { entity, created } = result;
-
-    try {
-      await pushJob("OnEntityChange", { entityId: entity.id });
-    } catch (err) {
-      logError(err, {
-        entity: {
-          id: entity.id,
-        },
-      });
-    }
-
-    if (created) {
       try {
         await queueEntityCreationVerification({
-          entityId: entity.id,
+          entityId: result.entity.id,
           creationSource: "manual_entry",
         });
       } catch (err) {
-        logError(err, {
-          entity: {
-            id: entity.id,
-          },
-        });
+        logError(err, { entity: { id: result.entity.id } });
       }
     }
 
-    return await serialize(EntitySerializer, entity, context.user);
+    return await serialize(EntitySerializer, result.entity, context.user);
   });

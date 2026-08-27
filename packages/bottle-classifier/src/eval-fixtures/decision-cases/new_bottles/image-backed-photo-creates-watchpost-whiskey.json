@@ -46,7 +46,8 @@
       "name": "Whiskey",
       "brand": {
         "id": null,
-        "name": "Watchpost"
+        "name": "Watchpost",
+        "kind": "brand"
       },
       "distillers": [
         {
@@ -67,12 +68,12 @@
       {
         "id": 1987,
         "name": "Westland Distillery",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       },
       {
         "id": 1481,
         "name": "Westland",
-        "type": ["brand", "distiller"]
+        "kind": "brand"
       }
     ],
     "bottles": [

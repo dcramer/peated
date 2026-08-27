@@ -124,6 +124,20 @@ export default function Sidebar() {
                   >
                     Bottlers
                   </SidebarLink>
+                  <SidebarLink
+                    href="/blenders"
+                    icon={BottlerIcon}
+                    active={pathname.startsWith("/blenders")}
+                  >
+                    Blenders
+                  </SidebarLink>
+                  <SidebarLink
+                    href="/companies"
+                    icon={BrandIcon}
+                    active={pathname.startsWith("/companies")}
+                  >
+                    Companies
+                  </SidebarLink>
                 </ul>
               </li>
               <li>

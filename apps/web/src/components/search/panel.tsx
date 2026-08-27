@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  ENTITY_SEARCH_SCOPE_LIST,
+  type SearchScope,
+} from "@peated/server/orpc/contracts/search";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -86,15 +90,7 @@ export default function SearchPanel({
       const isUserQuery =
         (searchType === "users" || query.indexOf("@") !== -1) && user;
 
-      const scopes: (
-        | "bottles"
-        | "distillers"
-        | "brands"
-        | "bottlers"
-        | "blenders"
-        | "companies"
-        | "members"
-      )[] = [];
+      const scopes: SearchScope[] = [];
       if (directToTasting || addBottleIntent || !isUserQuery)
         scopes.push("bottles");
       if (
@@ -105,13 +101,7 @@ export default function SearchPanel({
       )
         scopes.push("members");
       if (!directToTasting && !addBottleIntent) {
-        scopes.push(
-          "distillers",
-          "brands",
-          "bottlers",
-          "blenders",
-          "companies",
-        );
+        scopes.push(...ENTITY_SEARCH_SCOPE_LIST);
       }
 
       try {
@@ -128,7 +118,7 @@ export default function SearchPanel({
               switch (group.type) {
                 case "bottles":
                   return group.results.map((ref) => ({ type: "bottle", ref }));
-                case "distillers":
+                case "distilleries":
                 case "brands":
                 case "bottlers":
                 case "blenders":

@@ -18,9 +18,8 @@ export default base.tag("entities").router({
   auditCandidates,
   catalog,
   classify,
-  details,
-  list,
   create,
+  details,
   update,
   delete: delete_,
   merge,
@@ -28,5 +27,6 @@ export default base.tag("entities").router({
   categories,
   events,
   follow,
+  list,
   unfollow,
 });

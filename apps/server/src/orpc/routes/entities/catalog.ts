@@ -136,7 +136,12 @@ export default implement(entityCatalogContract).handler(async function ({
   }
 
   const related = (rows: typeof brandRows) =>
-    rows.map((row) => ({ ...row, count: Number(row.count) }));
+    rows.map((row) => {
+      if (!row.kind) {
+        throw new Error(`Related Entity ${row.id} has no kind.`);
+      }
+      return { ...row, kind: row.kind, count: Number(row.count) };
+    });
   const totalBottles = Number(summary.totalBottles);
 
   return {

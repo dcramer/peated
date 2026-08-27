@@ -3,6 +3,7 @@ import {
   actors,
   bottleAliases,
   bottles,
+  bottlesToDistillers,
   changes,
   entities,
   entityAliases,
@@ -21,7 +22,7 @@ describe("updateEntity", () => {
   }) => {
     const entity = await fixtures.Entity({
       name: "Old Harbor",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const bottle = await fixtures.Bottle({
       brandId: entity.id,
@@ -152,12 +153,12 @@ describe("updateEntity", () => {
     ).rejects.toBeInstanceOf(EntityUpdateAuthorizationError);
   });
 
-  test("rejects removing Entity roles that active Bottle identity references", async ({
+  test("allows kind changes while Bottle relationships stay intact", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
-      name: "All Roles",
-      type: ["brand", "bottler", "distiller"],
+      name: "Relationship Fixture",
+      kind: "brand",
     });
     await fixtures.Bottle({
       brandId: entity.id,
@@ -165,42 +166,25 @@ describe("updateEntity", () => {
       distillerIds: [entity.id],
     });
     const moderator = await fixtures.User({ mod: true });
-    const scenarios = [
-      {
-        role: "brand" as const,
-        message:
-          "Cannot remove the brand role while the Entity is referenced as a brand.",
-      },
-      {
-        role: "bottler" as const,
-        message:
-          "Cannot remove the bottler role while the Entity is referenced as a bottler.",
-      },
-      {
-        role: "distiller" as const,
-        message:
-          "Cannot remove the distiller role while the Entity is referenced as a distiller.",
-      },
-    ];
+    await updateEntity({
+      entityId: entity.id,
+      input: { kind: "company" },
+      user: moderator,
+    });
 
-    for (const { role, message } of scenarios) {
-      await expect(
-        updateEntity({
-          entityId: entity.id,
-          input: {
-            type: entity.type.filter((candidate) => candidate !== role),
-          },
-          user: moderator,
-        }),
-      ).rejects.toMatchObject({
-        name: EntityUpdateConflictError.name,
-        message,
-      });
-    }
-
-    const unchanged = await db.query.entities.findFirst({
+    const updated = await db.query.entities.findFirst({
       where: eq(entities.id, entity.id),
     });
-    expect(unchanged?.type).toEqual(entity.type);
+    expect(updated?.kind).toBe("company");
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.brandId, entity.id),
+      }),
+    ).toMatchObject({ bottlerId: entity.id });
+    expect(
+      await db.query.bottlesToDistillers.findFirst({
+        where: eq(bottlesToDistillers.distillerId, entity.id),
+      }),
+    ).toBeDefined();
   });
 });

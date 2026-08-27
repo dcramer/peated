@@ -1156,7 +1156,7 @@ describe("POST /tastings/photo-identification", () => {
   }) => {
     const brand = await fixtures.Entity({
       name: "Photo Canonical Reuse Brand",
-      type: ["brand", "distiller"],
+      kind: "distillery",
     });
     const existingBottle = await fixtures.Bottle({
       brandId: brand.id,

@@ -9,6 +9,7 @@ import type {
   BadgeFormulaEnum,
   BadgeSchema,
   BadgeTrackerEnum,
+  BottleEntityRoleEnum,
   BottleSchema,
   CategoryEnum,
   ChangeSchema,
@@ -20,7 +21,6 @@ import type {
   EntityInputSchema,
   EntityKindEnum,
   EntitySchema,
-  EntityTypeEnum,
   EventSchema,
   ExternalSiteSchema,
   ExternalSiteTypeEnum,
@@ -56,7 +56,7 @@ export type BadgeCheckType = z.infer<typeof BadgeCheckTypeEnum>;
 export type BadgeTracker = z.infer<typeof BadgeTrackerEnum>;
 export type BadgeFormula = z.infer<typeof BadgeFormulaEnum>;
 
-export type EntityType = z.infer<typeof EntityTypeEnum>;
+export type BottleEntityRole = z.infer<typeof BottleEntityRoleEnum>;
 export type EntityKind = z.infer<typeof EntityKindEnum>;
 export type ObjectType = z.infer<typeof ObjectTypeEnum>;
 export type FollowStatus = z.infer<typeof FollowStatusEnum>;
@@ -130,16 +130,6 @@ export type Paginated<T> = {
   results: T[];
   rel?: PagingRel;
 };
-
-export type EntityInput =
-  | number
-  | {
-      id?: number;
-      name: string;
-      countryId?: number | null;
-      regionId?: number | null;
-      type?: ("brand" | "bottler" | "distiller")[];
-    };
 
 type FreeformEntity =
   | z.infer<typeof EntityInputSchema>
