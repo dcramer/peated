@@ -59,7 +59,7 @@ export async function getCanonicalPublicRouteRedirectPath(
   const requestedRoute = await getRequestedRoute(loadHeaders);
 
   if (!requestedRoute) {
-    return canonicalId === currentId ? null : `${canonicalPath}/`;
+    return canonicalId === currentId ? null : canonicalPath;
   }
 
   const { pathname, search } = requestedRoute;
@@ -72,7 +72,7 @@ export async function getCanonicalPublicRouteRedirectPath(
     return pathname.startsWith(prefix) && (!suffix || suffix.startsWith("/"));
   });
   const suffix = currentPrefix ? pathname.slice(currentPrefix.length) : "";
-  return `${canonicalPath}${suffix || "/"}${search}`;
+  return `${canonicalPath}${suffix}${search}`;
 }
 
 export async function getCanonicalRouteRedirectPath(
@@ -84,7 +84,7 @@ export async function getCanonicalRouteRedirectPath(
   const requestedRoute = await getRequestedRoute(loadHeaders);
 
   if (!requestedRoute) {
-    return `${canonicalPrefix}/`;
+    return canonicalPrefix;
   }
 
   const { pathname: requestedPathname, search } = requestedRoute;
@@ -93,10 +93,10 @@ export async function getCanonicalRouteRedirectPath(
     !requestedPathname.startsWith(currentPrefix) ||
     (suffix && !suffix.startsWith("/"))
   ) {
-    return `${canonicalPrefix}/${search}`;
+    return `${canonicalPrefix}${search}`;
   }
 
-  return `${canonicalPrefix}${suffix || "/"}${search}`;
+  return `${canonicalPrefix}${suffix}${search}`;
 }
 
 export async function getReleaseFamilyRouteRedirectPath(

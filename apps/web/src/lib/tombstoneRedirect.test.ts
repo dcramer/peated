@@ -77,7 +77,7 @@ describe("tombstone redirects", () => {
         },
         loadHeaders,
       ),
-    ).resolves.toBe("/bottles/34/");
+    ).resolves.toBe("/bottles/34");
     await expect(
       getReleaseFamilyRouteRedirectPath(56, loadHeaders),
     ).resolves.toBe("/bottles/56/releases");
@@ -158,6 +158,6 @@ describe("tombstone redirects", () => {
         },
         loadHeaders,
       ),
-    ).resolves.toBe("/companies/12/");
+    ).resolves.toBe("/companies/12");
   });
 });
