@@ -1,34 +1,18 @@
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
 import { deleteNotification } from "@peated/server/lib/notifications";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import friendDeleteContract from "@peated/server/orpc/contracts/friends/delete";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
-import { FriendStatusEnum } from "@peated/server/schemas";
 import type { FriendStatus } from "@peated/server/types";
 import { and, eq } from "drizzle-orm";
-import { z } from "zod";
 
-export default procedure
+export default implement(friendDeleteContract)
   .use(requireAuth)
   .use(requireTosAccepted)
-  // TODO: better path
-  .route({
-    method: "DELETE",
-    path: "/friends/{user}",
-    summary: "Remove friend",
-    description:
-      "Remove a friend relationship and cancel any pending friend requests. Requires authentication",
-    operationId: "removeFriend",
-  })
-  .input(z.object({ user: z.coerce.number() }))
-  .output(
-    z.object({
-      status: FriendStatusEnum,
-    }),
-  )
   .handler(async function ({ input, context, errors }) {
     const { user: userId } = input;
 

@@ -20,6 +20,8 @@ import entityList from "@peated/server/orpc/contracts/entities/list";
 import eventList from "@peated/server/orpc/contracts/events/list";
 import flightDetails from "@peated/server/orpc/contracts/flights/details";
 import flightList from "@peated/server/orpc/contracts/flights/list";
+import friendCreate from "@peated/server/orpc/contracts/friends/create";
+import friendDelete from "@peated/server/orpc/contracts/friends/delete";
 import friendList from "@peated/server/orpc/contracts/friends/list";
 import notificationCount from "@peated/server/orpc/contracts/notifications/count";
 import notificationList from "@peated/server/orpc/contracts/notifications/list";
@@ -95,6 +97,8 @@ export const mockContract = {
     list: flightList,
   },
   friends: {
+    create: friendCreate,
+    delete: friendDelete,
     list: friendList,
   },
   notifications: {

@@ -1,38 +1,18 @@
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import friendCreateContract from "@peated/server/orpc/contracts/friends/create";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
-import { FriendStatusEnum } from "@peated/server/schemas";
 import type { FriendStatus } from "@peated/server/types";
 import { and, eq, inArray } from "drizzle-orm";
-import { z } from "zod";
 
-export default procedure
+export default implement(friendCreateContract)
   .use(requireAuth)
   .use(requireTosAccepted)
-  // TODO: better path
-  .route({
-    method: "PUT",
-    path: "/friends/{user}",
-    summary: "Send friend request",
-    description:
-      "Send a friend request to another user or accept a pending request. Creates mutual following relationship when accepted",
-    operationId: "addFriend",
-  })
-  .input(
-    z.object({
-      user: z.coerce.number(),
-    }),
-  )
-  .output(
-    z.object({
-      status: FriendStatusEnum,
-    }),
-  )
   .handler(async function ({ input, context, errors }) {
     const { user: userId } = input;
 
