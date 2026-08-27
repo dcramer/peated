@@ -52,8 +52,10 @@ links. It MUST NOT copy those uses into an Entity type list.
 
 The system SHALL use dedicated Brand, Distillery, Bottler, Blender, and Company
 API collections for what an Entity is. Bottle APIs SHALL use Brand, Bottler,
-and Distiller as Bottle field names. The system MUST NOT add a stored Entity
-role, expose a generic Entity collection, or use `type` for both meanings.
+and Distiller as Bottle field names. The system SHALL keep a read-only generic
+Entity collection for cross-kind selectors. It MUST NOT add a stored Entity
+role, use the generic collection for kind browse pages, expose generic Entity
+creation, or use `type` for both meanings.
 
 #### Scenario: List one Entity kind
 
@@ -61,10 +63,16 @@ role, expose a generic Entity collection, or use `type` for both meanings.
 - **THEN** every result has kind `blender` and the caller does not pass a kind
   filter
 
-#### Scenario: Generic Entity collection
+#### Scenario: Browse one Entity kind
 
 - **WHEN** a caller needs a collection of one Entity kind
 - **THEN** it uses that kind's dedicated endpoint instead of `GET /entities`
+
+#### Scenario: Select across Entity kinds
+
+- **WHEN** a Bottle or ownership field needs to select any Entity
+- **THEN** `GET /entities` searches all five kinds and returns each result's
+  kind
 
 #### Scenario: Create one Entity kind
 
@@ -85,8 +93,8 @@ role, expose a generic Entity collection, or use `type` for both meanings.
 #### Scenario: Search for a Bottler
 
 - **WHEN** a Bottle form searches for an Entity for its Bottler field
-- **THEN** global search considers every Entity kind and does not require or
-  infer a Bottler role
+- **THEN** the generic Entity selector considers every Entity kind and does not
+  require or infer a Bottler role
 
 #### Scenario: Search one Entity kind
 
@@ -97,7 +105,7 @@ role, expose a generic Entity collection, or use `type` for both meanings.
 #### Scenario: Search all Entities for a Bottle field
 
 - **WHEN** a Bottle form searches its Brand, Bottler, or Distiller field
-- **THEN** it explicitly combines all five kind scopes and may return any
+- **THEN** it uses the generic Entity selector collection and may return any
   Entity kind
 
 ### Requirement: Current owner

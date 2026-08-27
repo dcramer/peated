@@ -174,6 +174,15 @@ async function handleRpcRequest({ request, response, url }) {
           : buildFavoriteActivity({ nextCursor: "2:1780833600000" }),
       );
       return true;
+    case "entities/list":
+      if (input?.query === testBrand.name) {
+        sendRpcResponse(response, {
+          ...emptyList,
+          results: [testBrand],
+        });
+        return true;
+      }
+      return false;
     case "entities/details":
       if (Number(input?.entity) === testBrand.id) {
         sendRpcResponse(response, testBrand);

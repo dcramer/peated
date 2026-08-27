@@ -5,25 +5,28 @@ import {
 } from "@peated/server/orpc/mock/fixtures";
 import type { EntityKind } from "@peated/server/types";
 
-export function listEntityKind(
-  kind: EntityKind,
-  input: {
-    query: string;
-    name?: string | null;
-    owner?: number | null;
-    country?: string | null;
-    region?: string | null;
-    sort: string;
-    cursor: number;
-    limit: number;
-  },
-) {
+type EntityListInput = {
+  query: string;
+  name?: string | null;
+  owner?: number | null;
+  country?: string | null;
+  region?: string | null;
+  sort: string;
+  cursor: number;
+  limit: number;
+};
+
+export function listEntityKind(kind: EntityKind, input: EntityListInput) {
+  return listEntities(input, kind);
+}
+
+export function listEntities(input: EntityListInput, kind?: EntityKind) {
   const direction = input.sort.startsWith("-") ? -1 : 1;
   const sort = input.sort.replace(/^-/, "");
   const entities = mockEntities
     .filter(
       (entity) =>
-        entity.kind === kind &&
+        (kind === undefined || entity.kind === kind) &&
         (input.owner == null || entity.ownerId === input.owner) &&
         includesQuery(input.query, entity.name, entity.shortName) &&
         (input.name == null || entity.name === input.name) &&

@@ -87,21 +87,24 @@ Expose one collection API for each Entity kind:
 Each endpoint fixes and enforces its kind for list and create operations.
 Callers do not pass a kind filter or kind create field. The handlers may share
 query, mutation, and serialization helpers, but the public route, operation
-name, input, and output remain kind-specific. Do not expose generic `GET` or
-`POST /entities` collection operations or make callers combine several roles
-to describe an Entity.
+name, input, and output remain kind-specific.
+
+Keep `GET /entities` as a read-only, cross-kind selector collection. Bottle,
+owner, merge, badge, and other Entity fields can query it when any kind is a
+valid choice. Each result includes its required kind. Kind browse pages do not
+use this collection, and the API does not expose generic `POST /entities`.
 
 These kind collections answer what an Entity is. Bottle fields answer how an
-Entity is used. Bottle forms use global search across all Entity kinds. They do
-not filter or rank by a stored Entity role. This keeps a Distillery such as
-Lagavulin selectable as a Bottle Brand without also classifying Lagavulin as a
-Brand kind.
+Entity is used. Bottle forms use the generic selector collection across all
+Entity kinds. They do not filter or rank by a stored Entity role. This keeps a
+Distillery such as Lagavulin selectable as a Bottle Brand without also
+classifying Lagavulin as a Brand kind.
 
-Every public Entity search scope maps to exactly one kind. An all-kind search
-is explicit: it combines all five kind scopes. Entity-classifier searches also
-require one kind. Bottle forms and Bottle-classifier relationship resolution
-are the exception and may search all five kinds because kind does not constrain
-a Bottle relationship.
+Every public global-search scope maps to exactly one kind. An all-kind global
+search is explicit: it combines all five kind scopes. Entity-classifier
+searches also require one kind. UI Entity selectors use the generic read-only
+Entity collection. Bottle-classifier relationship resolution may search all
+five kinds because kind does not constrain a Bottle relationship.
 
 Shared detail and moderation operations may keep the Entity domain noun when
 they address an Entity by its permanent Peated ID and do not list or classify
@@ -154,10 +157,10 @@ code can continue to read `type` while the backfill runs. The normal Entity read
 and update APIs expose the optional fields during this deployment.
 
 The preparation and final application states must stay separate. Application
-code that requires `kind` and removes the generic Entity collection cannot
-serve the backfill because it cannot list or serialize an Entity whose kind is
-empty. Run the reviewed backfill through the preparation release, verify zero
-missing kinds, and only then deploy the final application switch.
+code that requires `kind` cannot serve the backfill because it cannot list or
+serialize an Entity whose kind is empty. Run the reviewed backfill through the
+preparation release, verify zero missing kinds, and only then deploy the final
+application switch.
 
 The backfill pages through Entities by API. For each Entity without a kind, it
 uses the Entity details and Bottle-use counts to choose a kind. Unclear cases

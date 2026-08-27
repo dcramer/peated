@@ -8,6 +8,7 @@ import delete_ from "./delete";
 import details from "./details";
 import events from "./events";
 import follow from "./follow";
+import list from "./list";
 import merge from "./merge";
 import unfollow from "./unfollow";
 import update from "./update";
@@ -24,5 +25,6 @@ export default base.tag("entities").router({
   categories,
   events,
   follow,
+  list,
   unfollow,
 });

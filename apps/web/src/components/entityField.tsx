@@ -1,10 +1,5 @@
 import { toTitleCase } from "@peated/server/lib/strings";
-import { ENTITY_SEARCH_SCOPE_LIST } from "@peated/server/orpc/contracts/search";
-import {
-  EntityInputSchema,
-  EntityKindEnum,
-  EntitySchema,
-} from "@peated/server/schemas";
+import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
 import type { BottleEntityRole, EntityKind } from "@peated/server/types";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
@@ -60,17 +55,11 @@ export default function EntityField({
   return (
     <SelectField<Option>
       onQuery={async (query) => {
-        const { groups } = await orpc.search.call({
+        const { results } = await orpc.entities.list.call({
           query,
-          scopes: [...ENTITY_SEARCH_SCOPE_LIST],
           limit: 25,
         });
-        return groups.flatMap((group) =>
-          group.results.flatMap((result) => {
-            const parsed = EntitySchema.safeParse(result);
-            return parsed.success ? [parsed.data] : [];
-          }),
-        );
+        return results;
       }}
       onRenderOption={(item) => (
         <div className="flex flex-col items-start">

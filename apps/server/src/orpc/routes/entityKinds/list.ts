@@ -20,22 +20,25 @@ import type { z } from "zod";
 
 type Input = z.infer<typeof EntityKindListInputSchema>;
 
-export async function listEntityKind({
+type ListEntitiesOptions = {
+  badRequest: (message: string) => never;
+  currentUser?: User | null;
+  input: Input;
+};
+
+export async function listEntities({
   badRequest,
   currentUser,
   input,
   kind,
-}: {
-  badRequest: (message: string) => never;
-  currentUser?: User | null;
-  input: Input;
-  kind: EntityKind;
-}) {
+}: ListEntitiesOptions & { kind?: EntityKind }) {
   const { query, cursor, limit } = input;
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
-  const where: (SQL<unknown> | undefined)[] = [eq(entities.kind, kind)];
+  const where: (SQL<unknown> | undefined)[] = [
+    kind ? eq(entities.kind, kind) : undefined,
+  ];
 
   if (input.owner) {
     where.push(eq(entities.ownerId, input.owner));
@@ -160,4 +163,10 @@ export async function listEntityKind({
       prevCursor: cursor > 1 ? cursor - 1 : null,
     },
   };
+}
+
+export function listEntityKind(
+  options: ListEntitiesOptions & { kind: EntityKind },
+) {
+  return listEntities(options);
 }

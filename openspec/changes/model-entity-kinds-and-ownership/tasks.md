@@ -41,13 +41,15 @@
 
 - [x] 4.1 Replace public Entity `type` with required `kind` in schemas,
       serializers, API documentation, and generated clients.
-- [x] 4.2 Replace the generic Entity collection with dedicated Brand,
-      Distillery, Bottler, Blender, and Company endpoints. Each endpoint fixes
-      its kind and shares implementation only below the public contract.
+- [x] 4.2 Add dedicated Brand, Distillery, Bottler, Blender, and Company browse
+      and create endpoints. Keep a read-only generic Entity list for cross-kind
+      selectors. Each dedicated endpoint fixes its kind, and all list endpoints
+      share implementation only below the public contract.
 - [x] 4.3 Query Brand, Distillery, Bottler, Blender, and Company browse pages by
       kind through their dedicated endpoints.
-- [x] 4.4 Use global Entity search for Bottle fields. Search all Entity kinds
-      without a stored role filter or role ranking.
+- [x] 4.4 Use the generic read-only Entity list for Bottle and other cross-kind
+      selectors. Search all Entity kinds without a stored role filter or role
+      ranking.
 - [x] 4.5 Remove type-list updates and removal guards from Bottle and Entity
       create, edit, import, and merge code.
 - [x] 4.6 Replace statistics, country, region, badge, repair, and audit queries

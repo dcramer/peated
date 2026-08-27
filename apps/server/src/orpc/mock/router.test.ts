@@ -85,6 +85,9 @@ describe("mock oRPC router", () => {
     await expect(
       anonymousClient.entities.details({ entity: mockEntity.id }),
     ).resolves.toEqual(mockEntity);
+    const entities = await anonymousClient.entities.list({ limit: 100 });
+    expect(entities.results).toHaveLength(mockEntities.length);
+    expect(entities.results.every((entity) => entity.kind)).toBe(true);
     await expect(
       anonymousClient.countries.details({ country: mockCountry.slug }),
     ).resolves.toEqual(mockCountry);
