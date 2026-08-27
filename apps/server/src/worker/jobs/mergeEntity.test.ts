@@ -879,8 +879,12 @@ test("preserves the destination Entity kind shown in the merge preview", async (
     operation: { id: 1, proposal },
     artifacts: {
       resolvedEntities: [
-        { entityId: source.id, name: source.name },
-        { entityId: destination.id, name: destination.name },
+        { entityId: source.id, name: source.name, kind: source.kind! },
+        {
+          entityId: destination.id,
+          name: destination.name,
+          kind: destination.kind!,
+        },
       ],
       entityContexts: [source, destination].map((entity) => ({
         entityId: entity.id,

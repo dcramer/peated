@@ -111,13 +111,15 @@ describe("POST /audits/{audit}/operations/approve", () => {
       evidenceRefs: [{ kind: "entity", entityId: entity.id }],
     };
     const artifacts = {
-      resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+      resolvedEntities: [
+        { entityId: entity.id, name: entity.name, kind: entity.kind! },
+      ],
       entityContexts: [
         {
           entityId: entity.id,
           name: entity.name,
           shortName: null,
-          kind: "brand" as const,
+          kind: entity.kind!,
           website: null,
           country: null,
           region: null,
@@ -394,6 +396,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       resolvedEntities: [source, destination].map((entity) => ({
         entityId: entity.id,
         name: entity.name,
+        kind: entity.kind!,
       })),
       entityContexts: [source, destination].map((entity) => ({
         entityId: entity.id,

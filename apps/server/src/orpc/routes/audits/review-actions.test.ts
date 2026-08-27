@@ -16,9 +16,11 @@ import { describe, expect, test } from "vitest";
 describe("Audit review action routes", () => {
   async function createEntityUpdateCheck(
     fixtures: {
-      Entity: (input: {
+      Entity: (input: { name: string }) => Promise<{
+        id: number;
+        kind: typeof entities.$inferSelect.kind;
         name: string;
-      }) => Promise<{ id: number; name: string }>;
+      }>;
       Bottle: (input: { brandId: number }) => Promise<{ id: number }>;
     },
     name = "Reviewed Entity",
@@ -35,13 +37,15 @@ describe("Audit review action routes", () => {
       evidenceRefs: [{ kind: "entity", entityId: entity.id }],
     };
     const artifacts = {
-      resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+      resolvedEntities: [
+        { entityId: entity.id, name: entity.name, kind: entity.kind! },
+      ],
       entityContexts: [
         {
           entityId: entity.id,
           name: entity.name,
           shortName: null,
-          kind: "brand" as const,
+          kind: entity.kind!,
           website: null,
           country: null,
           region: null,
