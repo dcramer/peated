@@ -45,8 +45,8 @@ function EntityEditForm({ entityId }: { entityId: string }) {
             ...data,
           },
           {
-            onSuccess: () => {
-              router.push(getEntityUrl(entity));
+            onSuccess: (updatedEntity) => {
+              router.push(getEntityUrl(updatedEntity));
             },
           },
         );
