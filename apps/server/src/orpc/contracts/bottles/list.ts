@@ -1,4 +1,8 @@
-import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
+import {
+  BOTTLE_AGE_BAND_LIST,
+  CATEGORY_LIST,
+  FLAVOR_PROFILES,
+} from "@peated/server/constants";
 import { BottleSchema, listResponse } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
@@ -24,6 +28,21 @@ const SORT_OPTIONS = [
 ] as const;
 
 const OutputSchema = listResponse(BottleSchema).extend({
+  total: z.number().int().nonnegative(),
+  facets: z.object({
+    category: z.array(
+      z.object({
+        value: z.enum(CATEGORY_LIST),
+        count: z.number().int().positive(),
+      }),
+    ),
+    ageBand: z.array(
+      z.object({
+        value: z.enum(BOTTLE_AGE_BAND_LIST),
+        count: z.number().int().positive(),
+      }),
+    ),
+  }),
   followedDistillerCount: z.number().int().nonnegative().nullable(),
 });
 
@@ -55,6 +74,7 @@ export default contract
       flight: z.string().nullish(),
       category: z.enum(CATEGORY_LIST).nullish(),
       age: z.coerce.number().nullish(),
+      ageBand: z.enum(BOTTLE_AGE_BAND_LIST).nullish(),
       minRating: z.coerce.number().min(-1).max(2).nullish(),
       minScore: z.coerce.number().int().min(0).max(100).nullish(),
       cursor: z.coerce.number().gte(1).default(1),

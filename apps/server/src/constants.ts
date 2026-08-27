@@ -20,6 +20,14 @@ export const CATEGORY_LIST = [
   "spirit",
 ] as const;
 
+export const BOTTLE_AGE_BAND_LIST = [
+  "nas",
+  "under_12",
+  "12_17",
+  "18_24",
+  "25_plus",
+] as const;
+
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
 export const RESERVED_COLLECTION_SLUGS = ["default", "library"] as const;

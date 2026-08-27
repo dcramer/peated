@@ -1,3 +1,4 @@
+import { BOTTLE_AGE_BAND_LIST, CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -31,12 +32,29 @@ import {
   sql,
 } from "drizzle-orm";
 
+type BottleAgeBand = (typeof BOTTLE_AGE_BAND_LIST)[number];
+
+function ageBandFilter(ageBand: BottleAgeBand): SQL<unknown> {
+  switch (ageBand) {
+    case "nas":
+      return sql`${bottles.noAgeStatement} IS TRUE`;
+    case "under_12":
+      return sql`${bottles.statedAge} < 12`;
+    case "12_17":
+      return sql`${bottles.statedAge} >= 12 AND ${bottles.statedAge} < 18`;
+    case "18_24":
+      return sql`${bottles.statedAge} >= 18 AND ${bottles.statedAge} < 25`;
+    case "25_plus":
+      return sql`${bottles.statedAge} >= 25`;
+  }
+}
+
 export default implement(bottleListContract).handler(async function ({
   input,
   context,
   errors,
 }) {
-  const { query, cursor, limit, filter, ...rest } = input;
+  const { query, cursor, limit, filter, category, ageBand, ...rest } = input;
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
@@ -60,6 +78,7 @@ export default implement(bottleListContract).handler(async function ({
 
   const where: (SQL<unknown> | undefined)[] = [];
   let followedDistillerIds: number[] | null = null;
+  let hasUnknownFlight = false;
   where.push(isNotNull(bottles.groupId));
   where.push(
     sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
@@ -129,9 +148,6 @@ export default implement(bottleListContract).handler(async function ({
   if (rest.series) {
     where.push(eq(bottles.seriesId, rest.series));
   }
-  if (rest.category) {
-    where.push(eq(bottles.category, rest.category));
-  }
   if (rest.flavorProfile) {
     where.push(eq(bottles.flavorProfile, rest.flavorProfile));
   }
@@ -167,20 +183,17 @@ export default implement(bottleListContract).handler(async function ({
       .select({ id: flights.id })
       .from(flights)
       .where(eq(flights.publicId, rest.flight));
-    if (!flight) {
-      return {
-        results: [],
-        followedDistillerCount: followedDistillerIds?.length ?? null,
-        rel: {
-          nextCursor: null,
-          prevCursor: null,
-        },
-      };
-    }
+    hasUnknownFlight = !flight;
     where.push(
-      sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.bottleId} = ${bottles.id})`,
+      flight
+        ? sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.bottleId} = ${bottles.id})`
+        : sql`FALSE`,
     );
   }
+
+  const categoryWhere = category ? eq(bottles.category, category) : undefined;
+  const ageBandWhere = ageBand ? ageBandFilter(ageBand) : undefined;
+  const resultWhere = [...where, categoryWhere, ageBandWhere];
 
   let orderBy: SQL<unknown>;
   switch (rest.sort) {
@@ -248,25 +261,54 @@ export default implement(bottleListContract).handler(async function ({
       orderBy = desc(bottles.totalTastings);
   }
 
-  const results = await db
-    .select({ ...getTableColumns(bottles) })
-    .from(bottles)
-    .innerJoin(entities, eq(entities.id, bottles.brandId))
-    .where(where ? and(...where) : undefined)
-    .limit(limit + 1)
-    .offset(offset)
-    .orderBy(
-      ...(exactAliasBottleIds.length
-        ? [
-            sql`CASE WHEN ${bottles.id} IN (${sql.join(
-              exactAliasBottleIds.map((bottleId) => sql`${bottleId}`),
-              sql`, `,
-            )}) THEN 0 ELSE 1 END`,
-            orderBy,
-            asc(bottles.id),
-          ]
-        : [orderBy, asc(bottles.id)]),
-    );
+  const [results, [totalRow], categoryRows, [ageBandCounts]] =
+    await Promise.all([
+      db
+        .select({ ...getTableColumns(bottles) })
+        .from(bottles)
+        .innerJoin(entities, eq(entities.id, bottles.brandId))
+        .where(and(...resultWhere))
+        .limit(limit + 1)
+        .offset(offset)
+        .orderBy(
+          ...(exactAliasBottleIds.length
+            ? [
+                sql`CASE WHEN ${bottles.id} IN (${sql.join(
+                  exactAliasBottleIds.map((bottleId) => sql`${bottleId}`),
+                  sql`, `,
+                )}) THEN 0 ELSE 1 END`,
+                orderBy,
+                asc(bottles.id),
+              ]
+            : [orderBy, asc(bottles.id)]),
+        ),
+      db
+        .select({ count: sql<string>`COUNT(*)` })
+        .from(bottles)
+        .where(and(...resultWhere)),
+      db
+        .select({
+          value: bottles.category,
+          count: sql<string>`COUNT(*)`,
+        })
+        .from(bottles)
+        .where(and(...where, ageBandWhere, isNotNull(bottles.category)))
+        .groupBy(bottles.category),
+      db
+        .select({
+          nas: sql<string>`COUNT(*) FILTER (WHERE ${bottles.noAgeStatement} IS TRUE)`,
+          under_12: sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} < 12)`,
+          "12_17": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 12 AND ${bottles.statedAge} < 18)`,
+          "18_24": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 18 AND ${bottles.statedAge} < 25)`,
+          "25_plus": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 25)`,
+        })
+        .from(bottles)
+        .where(and(...where, categoryWhere)),
+    ]);
+
+  const categoryCounts = new Map(
+    categoryRows.map(({ value, count }) => [value, Number(count)]),
+  );
 
   return {
     results: await serialize(
@@ -276,10 +318,21 @@ export default implement(bottleListContract).handler(async function ({
       ["description", "tastingNotes"],
       { includeGroupSummary: true },
     ),
+    total: Number(totalRow?.count ?? 0),
+    facets: {
+      category: CATEGORY_LIST.flatMap((value) => {
+        const count = categoryCounts.get(value) ?? 0;
+        return count > 0 ? [{ value, count }] : [];
+      }),
+      ageBand: BOTTLE_AGE_BAND_LIST.flatMap((value) => {
+        const count = Number(ageBandCounts?.[value] ?? 0);
+        return count > 0 ? [{ value, count }] : [];
+      }),
+    },
     followedDistillerCount: followedDistillerIds?.length ?? null,
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,
-      prevCursor: cursor > 1 ? cursor - 1 : null,
+      prevCursor: !hasUnknownFlight && cursor > 1 ? cursor - 1 : null,
     },
   };
 });
