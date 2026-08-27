@@ -1,7 +1,7 @@
 import { expect, type Page } from "@playwright/test";
 
-export function bottlePeatedIdPath(id: number) {
-  return `/B${String(id).padStart(4, "0")}`;
+export function bottlePath(id: number) {
+  return `/bottles/${id}`;
 }
 
 /** Asserts that the rendered page does not create horizontal overflow. */
