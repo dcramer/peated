@@ -74,7 +74,7 @@ user or classifier wins. If the draft has no kind, the Bottle field supplies a
 reasonable default: Brand uses `brand`, Bottler uses `bottler`, and Distiller
 uses `distillery`. This creation default does not constrain later Bottle links.
 
-### Make kinds top-level API resources
+### Make kinds top-level browse resources
 
 Expose one collection API for each Entity kind:
 
@@ -84,15 +84,20 @@ Expose one collection API for each Entity kind:
 - `/blenders`;
 - `/companies`.
 
-Each endpoint fixes and enforces its kind for list and create operations.
-Callers do not pass a kind filter or kind create field. The handlers may share
-query, mutation, and serialization helpers, but the public route, operation
-name, input, and output remain kind-specific.
+Each endpoint fixes and enforces its kind for list operations. Callers do not
+pass a kind filter. The handlers share query and serialization helpers below
+the public contract.
 
-Keep `GET /entities` as a read-only, cross-kind selector collection. Bottle,
-owner, merge, badge, and other Entity fields can query it when any kind is a
-valid choice. Each result includes its required kind. Kind browse pages do not
-use this collection, and the API does not expose generic `POST /entities`.
+Keep the generic Entity API for cross-kind selection and shared mutations.
+Bottle, owner, merge, badge, and other Entity fields can use `GET /entities`
+when any kind is a valid choice. Each result includes its required kind. Entity
+creation uses `POST /entities` with a required kind. Entity updates continue to
+use `PATCH /entities/{entity}`. Kind browse pages do not use the generic list.
+
+The five kinds are views of one Entity domain, not separate mutation owners.
+Dedicated create and update routes would repeat one contract five times and
+would not match generic Entity details, merges, aliases, or nested Bottle
+creation.
 
 These kind collections answer what an Entity is. Bottle fields answer how an
 Entity is used. Bottle forms use the generic selector collection across all
@@ -106,10 +111,9 @@ searches also require one kind. UI Entity selectors use the generic read-only
 Entity collection. Bottle-classifier relationship resolution may search all
 five kinds because kind does not constrain a Bottle relationship.
 
-Shared detail and moderation operations may keep the Entity domain noun when
-they address an Entity by its permanent Peated ID and do not list or classify
-Entities. They must return one required kind and must not expose the old type
-list.
+Shared detail and moderation operations keep the Entity domain noun when they
+address one Entity rather than browse a kind. They must return one required
+kind and must not expose the old type list.
 
 The API uses dedicated kind resources when it means what an Entity is. Bottle
 APIs continue to use the existing Brand, Bottler, and Distiller field names.

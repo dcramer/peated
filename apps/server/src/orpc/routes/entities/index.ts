@@ -4,6 +4,7 @@ import auditCandidates from "./audit-candidates";
 import catalog from "./catalog";
 import categories from "./categories";
 import classify from "./classify";
+import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
 import events from "./events";
@@ -17,6 +18,7 @@ export default base.tag("entities").router({
   auditCandidates,
   catalog,
   classify,
+  create,
   details,
   update,
   delete: delete_,

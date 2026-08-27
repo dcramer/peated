@@ -1,5 +1,4 @@
 import { base } from "@peated/server/orpc";
-import create from "./create";
 import list from "./list";
 
-export default base.tag("brands").router({ create, list });
+export default base.tag("brands").router({ list });

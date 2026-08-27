@@ -52,10 +52,10 @@ links. It MUST NOT copy those uses into an Entity type list.
 
 The system SHALL use dedicated Brand, Distillery, Bottler, Blender, and Company
 API collections for what an Entity is. Bottle APIs SHALL use Brand, Bottler,
-and Distiller as Bottle field names. The system SHALL keep a read-only generic
-Entity collection for cross-kind selectors. It MUST NOT add a stored Entity
-role, use the generic collection for kind browse pages, expose generic Entity
-creation, or use `type` for both meanings.
+and Distiller as Bottle field names. The system SHALL keep the generic Entity
+API for cross-kind selectors, creation, updates, and other shared Entity
+operations. It MUST NOT add a stored Entity role, use the generic collection
+for kind browse pages, or use `type` for both meanings.
 
 #### Scenario: List one Entity kind
 
@@ -74,16 +74,15 @@ creation, or use `type` for both meanings.
 - **THEN** `GET /entities` searches all five kinds and returns each result's
   kind
 
-#### Scenario: Create one Entity kind
+#### Scenario: Create an Entity
 
-- **WHEN** a caller creates a Blender through `/blenders`
-- **THEN** the server assigns kind `blender` and the caller does not pass a
-  kind field
+- **WHEN** a caller creates a Blender through `POST /entities`
+- **THEN** the caller passes kind `blender` and the server stores that kind
 
-#### Scenario: Generic Entity creation
+#### Scenario: Update an Entity
 
-- **WHEN** a caller needs to create an Entity of one known kind
-- **THEN** it uses that kind's dedicated endpoint instead of `POST /entities`
+- **WHEN** a moderator changes an Entity's kind or other shared fields
+- **THEN** it uses the shared Entity update endpoint
 
 #### Scenario: List Companies
 

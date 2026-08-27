@@ -24,26 +24,12 @@ function AddEntityForm() {
   const parsedKind = EntityKindEnum.safeParse(searchParams.get("kind"));
   const kind = parsedKind.success ? parsedKind.data : "brand";
 
-  const createBrand = useMutation(orpc.brands.create.mutationOptions());
-  const createDistillery = useMutation(
-    orpc.distilleries.create.mutationOptions(),
-  );
-  const createBottler = useMutation(orpc.bottlers.create.mutationOptions());
-  const createBlender = useMutation(orpc.blenders.create.mutationOptions());
-  const createCompany = useMutation(orpc.companies.create.mutationOptions());
+  const createEntity = useMutation(orpc.entities.create.mutationOptions());
 
   return (
     <EntityForm
       onSubmit={async (data) => {
-        const { kind, ...input } = data;
-        const mutation = {
-          brand: createBrand,
-          distillery: createDistillery,
-          bottler: createBottler,
-          blender: createBlender,
-          company: createCompany,
-        }[kind];
-        const newEntity = await mutation.mutateAsync(input);
+        const newEntity = await createEntity.mutateAsync(data);
         router.push(getEntityUrl(newEntity));
       }}
       initialData={{ kind }}

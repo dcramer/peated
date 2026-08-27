@@ -60,11 +60,26 @@ function expectBottleResponse(schema: any) {
 }
 
 describe("OpenAPI generation ($ref reuse)", () => {
-  it("keeps the generic Entity collection read-only", async () => {
+  it("keeps generic Entity mutations and kind-specific browse collections", async () => {
     const spec = await generateSpec();
 
     expect(spec.paths?.["/entities"]?.get?.operationId).toBe("listEntities");
-    expect(spec.paths?.["/entities"]?.post).toBeUndefined();
+    expect(spec.paths?.["/entities"]?.post?.operationId).toBe("createEntity");
+
+    const createSchema = getJsonRequestSchema(spec.paths?.["/entities"]?.post);
+    expect(createSchema?.required).toContain("kind");
+    expect(createSchema?.properties?.kind).toBeDefined();
+    expect(createSchema?.properties?.type).toBeUndefined();
+
+    for (const path of [
+      "/brands",
+      "/distilleries",
+      "/bottlers",
+      "/blenders",
+      "/companies",
+    ] as const) {
+      expect(spec.paths?.[path]?.post).toBeUndefined();
+    }
   });
 
   it("documents human search input as plain text", async () => {

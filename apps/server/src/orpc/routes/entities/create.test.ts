@@ -6,24 +6,26 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("dedicated Entity kind create routes", () => {
+describe("POST /entities", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
   test("requires authentication", async () => {
     const err = await waitError(
-      routerClient.brands.create({
+      routerClient.entities.create({
         name: "Delicious Wood",
+        kind: "brand",
       }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("creates a new entity", async ({ defaults }) => {
-    const data = await routerClient.brands.create(
+    const data = await routerClient.entities.create(
       {
         name: "Macallan",
+        kind: "brand",
       },
       { context: { user: defaults.user } },
     );
@@ -34,7 +36,7 @@ describe("dedicated Entity kind create routes", () => {
       .select()
       .from(entities)
       .where(eq(entities.id, data.id));
-    expect(brand.name).toEqual("Macallan");
+    expect(brand).toMatchObject({ name: "Macallan", kind: "brand" });
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: data.id,
     });
@@ -48,15 +50,16 @@ describe("dedicated Entity kind create routes", () => {
     );
   });
 
-  test("creates an entity with a kind and current owner", async ({
+  test("creates an entity with a current owner", async ({
     fixtures,
     defaults,
   }) => {
     const owner = await fixtures.Entity({ kind: "company" });
 
-    const data = await routerClient.distilleries.create(
+    const data = await routerClient.entities.create(
       {
         name: "Lagavulin",
+        kind: "distillery",
         ownerId: owner.id,
       },
       { context: { user: defaults.user } },
@@ -74,25 +77,20 @@ describe("dedicated Entity kind create routes", () => {
     });
   });
 
-  test("fixes the kind for Bottler, Blender, and Company creates", async ({
-    defaults,
-  }) => {
-    const [bottler, blender, company] = await Promise.all([
-      routerClient.bottlers.create(
-        { name: "Dedicated Bottler" },
-        { context: { user: defaults.user } },
+  test("accepts every entity kind", async ({ defaults }) => {
+    const created = await Promise.all(
+      (["brand", "distillery", "bottler", "blender", "company"] as const).map(
+        (kind) =>
+          routerClient.entities.create(
+            { name: `Generic ${kind}`, kind },
+            { context: { user: defaults.user } },
+          ),
       ),
-      routerClient.blenders.create(
-        { name: "Dedicated Blender" },
-        { context: { user: defaults.user } },
-      ),
-      routerClient.companies.create(
-        { name: "Dedicated Company" },
-        { context: { user: defaults.user } },
-      ),
-    ]);
+    );
 
-    expect([bottler.kind, blender.kind, company.kind]).toEqual([
+    expect(created.map((entity) => entity.kind)).toEqual([
+      "brand",
+      "distillery",
       "bottler",
       "blender",
       "company",
@@ -101,9 +99,10 @@ describe("dedicated Entity kind create routes", () => {
 
   test("rejects an unknown current owner", async ({ defaults }) => {
     const err = await waitError(
-      routerClient.distilleries.create(
+      routerClient.entities.create(
         {
           name: "Lagavulin",
+          kind: "distillery",
           ownerId: 999999,
         },
         { context: { user: defaults.user } },
@@ -122,21 +121,16 @@ describe("dedicated Entity kind create routes", () => {
       kind: "distillery",
     });
 
-    const data = await routerClient.distilleries.create(
+    const data = await routerClient.entities.create(
       {
         name: entity.name,
+        kind: "distillery",
       },
       { context: { user: defaults.user } },
     );
 
-    expect(data.id).toBeDefined();
-
-    const [brand] = await db
-      .select()
-      .from(entities)
-      .where(eq(entities.id, data.id));
-    expect(brand.id).toEqual(entity.id);
-    expect(brand.kind).toEqual("distillery");
+    expect(data.id).toEqual(entity.id);
+    expect(data.kind).toEqual("distillery");
     expect(workerClient.pushJob).not.toHaveBeenCalled();
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyEntityCreation",
@@ -154,13 +148,31 @@ describe("dedicated Entity kind create routes", () => {
       kind: "brand",
     });
 
-    const data = await routerClient.brands.create(
-      { name: "macallan" },
+    const data = await routerClient.entities.create(
+      { name: "macallan", kind: "brand" },
       { context: { user: defaults.user } },
     );
 
     expect(data.id).toBe(entity.id);
     expect(data.name).toBe(entity.name);
     expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("rejects an existing entity under another kind", async ({
+    fixtures,
+    defaults,
+  }) => {
+    await fixtures.Entity({ name: "Compass Box", kind: "blender" });
+
+    const err = await waitError(
+      routerClient.entities.create(
+        { name: "Compass Box", kind: "brand" },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err.message).toBe(
+      "Entity with name already exists under another kind.",
+    );
   });
 });
