@@ -408,8 +408,10 @@ async function performEntityMerge({
       // SMWS cask codes own Bottle identity. Merge an existing code collision
       // before changing its producer Entity.
       if (
-        (distillersChange || driftedDistillerGroupIds.has(groupId)) &&
-        !brandChanges
+        brandChanges ||
+        bottlerChanges ||
+        distillersChange ||
+        driftedDistillerGroupIds.has(groupId)
       ) {
         const members = await tx
           .select()
@@ -431,11 +433,15 @@ async function performEntityMerge({
           })
           .from(entities)
           .where(inArray(entities.id, identityEntityIds));
-        const brand = identityEntities.find(({ id }) => id === group.brandId);
+        const brand = brandChanges
+          ? toEntity
+          : identityEntities.find(({ id }) => id === group.brandId);
         const bottler =
           group.bottlerId === null
             ? null
-            : identityEntities.find(({ id }) => id === group.bottlerId);
+            : bottlerChanges
+              ? toEntity
+              : identityEntities.find(({ id }) => id === group.bottlerId);
         if (!brand || (group.bottlerId !== null && !bottler)) {
           throw new Error(
             `BottleGroup ${groupId} has an invalid brand or bottler Entity.`,
@@ -457,14 +463,19 @@ async function performEntityMerge({
           const [destinationOwnedDuplicate] = await tx
             .select({ id: bottles.id })
             .from(bottles)
-            .innerJoin(
+            .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
+            .leftJoin(
               bottleGroupDistillers,
               eq(bottleGroupDistillers.groupId, bottles.groupId),
             )
             .where(
               and(
                 eq(bottles.id, duplicateBottleId),
-                eq(bottleGroupDistillers.distillerId, toEntityId),
+                or(
+                  eq(bottleGroups.brandId, toEntityId),
+                  eq(bottleGroups.bottlerId, toEntityId),
+                  eq(bottleGroupDistillers.distillerId, toEntityId),
+                ),
               ),
             )
             .limit(1);
