@@ -1,10 +1,10 @@
+import { RESERVED_COLLECTION_SLUGS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import {
   getReservedCollection,
   isReservedCollectionSlug,
-  reservedCollectionSlugs,
 } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -39,7 +39,10 @@ export default procedure
   })
   .input(
     z.object({
-      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
+      collection: z.union([
+        z.enum(RESERVED_COLLECTION_SLUGS),
+        z.coerce.number(),
+      ]),
       collectionBottle: z.coerce.number(),
       user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
     }),

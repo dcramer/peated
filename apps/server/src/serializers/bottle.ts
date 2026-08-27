@@ -2,6 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
+import type { ReservedCollectionSlug } from "../constants";
 import { db } from "../db";
 import type { Bottle, User } from "../db/schema";
 import {
@@ -13,7 +14,7 @@ import {
   entities,
   tastings,
 } from "../db/schema";
-import { getReservedCollection, type ReservedCollectionSlug } from "../lib/db";
+import { getReservedCollection } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { formatPeatedId } from "../lib/peatedId";
 import { absoluteUrl } from "../lib/urls";

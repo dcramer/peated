@@ -22,6 +22,9 @@ export const CATEGORY_LIST = [
 
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
+export const RESERVED_COLLECTION_SLUGS = ["default", "library"] as const;
+export type ReservedCollectionSlug = (typeof RESERVED_COLLECTION_SLUGS)[number];
+
 export const EXTERNAL_SITE_DEFINITIONS = {
   // Astor stays manual-only while its non-browser catalog behavior is checked.
   astorwines: { name: "Astor Wines", runEvery: null },
