@@ -1,7 +1,7 @@
 import {
   matchesMockUser,
-  mockBadgeAward,
-  noMorePages,
+  mockBadgeAwards,
+  mockPage,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
@@ -11,6 +11,6 @@ export default mockOS.users.badgeList.handler(
       throw errors.NOT_FOUND({ message: "Mock user not found." });
     }
 
-    return { results: [mockBadgeAward], rel: noMorePages };
+    return mockPage(mockBadgeAwards, input.cursor, input.limit);
   },
 );
