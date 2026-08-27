@@ -1,6 +1,9 @@
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStats } from "@peated/server/lib/recomputeBottleGroupStats";
-import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
+import {
+  BottleStatsIntegrityError,
+  recomputeBottleStats,
+} from "@peated/server/lib/recomputeBottleStats";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 import { queueBottleEntityStats } from "./queueBottleEntityStats";
@@ -26,6 +29,12 @@ export default async function updateBottleStats(
     await recomputeBottleGroupStats(bottle.groupId);
     await queueBottleEntityStats(bottleId);
   } catch (error) {
+    if (
+      error instanceof BottleStatsIntegrityError &&
+      (error.code === "not_found" || error.code === "retired")
+    ) {
+      return;
+    }
     logError(error, {
       job: { name: "UpdateBottleStats" },
       extra: { bottleId },

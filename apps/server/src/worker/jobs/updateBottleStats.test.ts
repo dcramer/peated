@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import {
   bottleGroupDistillers,
   bottleGroups,
+  bottleTombstones,
   bottles,
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/lib/test/workerDispatch";
@@ -123,8 +124,23 @@ test.each([
   await expect(updateBottleStats(input)).rejects.toThrow();
 });
 
-test("rejects a missing Bottle", async () => {
-  await expect(updateBottleStats({ bottleId: 2_000_000_000 })).rejects.toThrow(
-    "Cannot recompute Bottle 2000000000 statistics: not_found",
-  );
+test("skips stale work for a deleted Bottle", async () => {
+  await expect(
+    updateBottleStats({ bottleId: 2_000_000_000 }),
+  ).resolves.toBeUndefined();
+  expect(pushJob).not.toHaveBeenCalled();
+});
+
+test("skips stale work for a retired Bottle", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const destination = await fixtures.Bottle();
+  await db.insert(bottleTombstones).values({
+    bottleId: bottle.id,
+    newBottleId: destination.id,
+  });
+
+  await expect(
+    updateBottleStats({ bottleId: bottle.id }),
+  ).resolves.toBeUndefined();
+  expect(pushJob).not.toHaveBeenCalled();
 });

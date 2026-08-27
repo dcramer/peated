@@ -1,3 +1,4 @@
+import { db } from "@peated/server/db";
 import { pushUniqueJob, runJob } from "@peated/server/worker/client";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -34,6 +35,14 @@ export function buildBottleChangeStatsJob(
 export default async (input: JobPayload) => {
   const { bottleId, generateDetails } =
     OnBottleChangeJobArgsSchema.parse(input);
+
+  const bottle = await db.query.bottles.findFirst({
+    columns: { id: true },
+    where: (bottles, { eq }) => eq(bottles.id, bottleId),
+  });
+  // Bottle change jobs can outlive a delete or merge. Missing rows mean that
+  // this queued work is stale, so no derived Bottle state remains to update.
+  if (!bottle) return;
 
   if (generateDetails) {
     await runJob("GenerateBottleDetails", { bottleId });

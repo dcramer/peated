@@ -100,9 +100,7 @@ export async function getCatalogVerificationDisplayName({
       .where(eq(bottles.id, objectId))
       .limit(1);
 
-    if (!bottle) {
-      throw new Error(`Unknown bottle: ${objectId}`);
-    }
+    if (!bottle) return null;
 
     return bottle.displayName;
   }
@@ -115,9 +113,7 @@ export async function getCatalogVerificationDisplayName({
     .where(eq(entities.id, objectId))
     .limit(1);
 
-  if (!entity) {
-    throw new Error(`Unknown entity: ${objectId}`);
-  }
+  if (!entity) return null;
 
   return entity.displayName;
 }

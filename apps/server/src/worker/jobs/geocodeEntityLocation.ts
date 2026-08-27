@@ -86,9 +86,7 @@ export default async ({
     },
   });
 
-  if (!entity) {
-    throw new Error(`Unknown entity: ${entityId}`);
-  }
+  if (!entity) return;
 
   if (!entity.country) {
     // cant geocode if we dont know the country
@@ -138,7 +136,12 @@ export default async ({
   const actor = await getPeatedSystemActor();
 
   await db.transaction(async (tx) => {
-    await tx.update(entities).set(data).where(eq(entities.id, entity.id));
+    const [updated] = await tx
+      .update(entities)
+      .set(data)
+      .where(eq(entities.id, entity.id))
+      .returning({ id: entities.id });
+    if (!updated) return;
 
     await tx.insert(changes).values({
       objectType: "entity",

@@ -70,4 +70,13 @@ describe("verifyEntityCreation", () => {
       status: "skipped",
     });
   });
+
+  test("skips stale verification for a deleted Entity", async () => {
+    await expect(
+      verifyEntityCreation({
+        entityId: 2_147_483_647,
+        creationSource: "repair_workflow",
+      }),
+    ).resolves.toBeUndefined();
+  });
 });

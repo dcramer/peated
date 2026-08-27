@@ -142,6 +142,13 @@ test("rejects an unassigned Bottle before invoking AI", async ({
   expect(bottleDetailsModel).not.toHaveBeenCalled();
 });
 
+test("skips stale work for a deleted Bottle before invoking AI", async () => {
+  await expect(
+    generateBottleDetails({ bottleId: 2_147_483_647 }),
+  ).resolves.toBeUndefined();
+  expect(bottleDetailsModel).not.toHaveBeenCalled();
+});
+
 test("rejects a Bottle tombstone before invoking AI", async ({ fixtures }) => {
   const retiredBottle = await fixtures.Bottle();
   const bottleDestination = await fixtures.Bottle();

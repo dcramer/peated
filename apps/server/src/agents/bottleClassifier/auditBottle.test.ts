@@ -5,6 +5,7 @@ import {
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   bottleChecks,
   bottleOperations,
   bottles,
@@ -409,6 +410,50 @@ describe("server-owned Bottle audit workflows", () => {
     ).toHaveLength(1);
   });
 
+  test("discards a post-user-creation audit after its Bottle is deleted", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.LegacyBottle();
+    const deferred =
+      Promise.withResolvers<
+        Awaited<ReturnType<typeof auditBottleWithServerAdapters>>
+      >();
+    auditBottleWithServerAdapters.mockImplementation(
+      async () => await deferred.promise,
+    );
+    const input = {
+      bottleId: bottle.id,
+      backgroundEventKey: `deleted_bottle_created:${bottle.id}`,
+    };
+
+    const work = runPostUserCreationBottleAudit(input);
+    await vi.waitFor(() =>
+      expect(auditBottleWithServerAdapters).toHaveBeenCalledOnce(),
+    );
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(bottleAliases)
+        .where(eq(bottleAliases.bottleId, bottle.id));
+      await tx.delete(bottles).where(eq(bottles.id, bottle.id));
+    });
+    deferred.resolve({
+      result: createAuditBottleResult({
+        summary: "The deleted Bottle has no remaining verification work.",
+        proposedOperations: [],
+        findings: [],
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+      modelMetadata: null,
+    });
+
+    await expect(work).resolves.toBeNull();
+    expect(
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.backgroundEventKey, input.backgroundEventKey),
+      }),
+    ).toEqual([]);
+  });
+
   test("keeps concurrent post-user-creation retries race-safe at persistence", async ({
     fixtures,
   }) => {
@@ -437,10 +482,11 @@ describe("server-owned Bottle audit workflows", () => {
       runPostUserCreationBottleAudit(input),
     ]);
 
-    expect(results.map((entry) => entry?.created).sort()).toEqual([
-      false,
-      true,
-    ]);
+    expect(
+      results
+        .map((entry) => entry?.created)
+        .sort((left, right) => String(left).localeCompare(String(right))),
+    ).toEqual([false, true]);
     expect(results[0]?.check.id).toBe(results[1]?.check.id);
     expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(2);
     expect(

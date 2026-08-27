@@ -31,9 +31,7 @@ export async function queueBottleEntityStats(bottleId: number): Promise<void> {
       },
     },
   });
-  if (!bottle) {
-    throw new Error(`Bottle ${bottleId} is not active.`);
-  }
+  if (!bottle) return;
 
   await queueEntityStats({
     brandId: bottle.brandId,

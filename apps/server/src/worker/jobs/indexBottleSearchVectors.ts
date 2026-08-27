@@ -24,9 +24,7 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
   const bottle = await db.query.bottles.findFirst({
     where: (bottles, { eq }) => eq(bottles.id, bottleId),
   });
-  if (!bottle) {
-    throw new Error(`Unknown bottle: ${bottleId}`);
-  }
+  if (!bottle) return;
 
   const aliasList = await db
     .select({
@@ -55,6 +53,7 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
     .select()
     .from(entities)
     .where(eq(entities.id, bottle.brandId));
+  if (!brand) return;
 
   const [bottler] = bottle.bottlerId
     ? await db.select().from(entities).where(eq(entities.id, bottle.bottlerId))
@@ -70,7 +69,7 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
   const searchVector =
     buildBottleSearchVector(
       bottle,
-      brand!,
+      brand,
       aliasList,
       bottler,
       distillerList,

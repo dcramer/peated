@@ -82,6 +82,16 @@ describe("verifyBottleCreation", () => {
     });
   });
 
+  test("skips stale verification for a deleted Bottle", async () => {
+    await expect(
+      verifyBottleCreation({
+        bottleId: 2_147_483_647,
+        creationSource: "manual_entry",
+      }),
+    ).resolves.toBeUndefined();
+    expect(runAudit).not.toHaveBeenCalled();
+  });
+
   test("fails for retry without falling back to the old heuristic conclusion", async ({
     fixtures,
   }) => {

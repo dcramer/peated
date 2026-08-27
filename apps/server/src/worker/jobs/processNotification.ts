@@ -9,9 +9,7 @@ export default async function processNotification({
   const notif = await db.query.notifications.findFirst({
     where: (notifications, { eq }) => eq(notifications.id, notificationId),
   });
-  if (!notif) {
-    throw new Error(`Unknown notifification: ${notificationId}`);
-  }
+  if (!notif) return;
 
   if (notif.type === "comment") {
     const comment = await db.query.comments.findFirst({
@@ -26,11 +24,7 @@ export default async function processNotification({
       },
     });
 
-    if (!comment) {
-      throw new Error(
-        `Unable to find comment for notification: ${notificationId}`,
-      );
-    }
+    if (!comment) return;
 
     await notifyComment({
       comment,
