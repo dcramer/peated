@@ -77,7 +77,7 @@ describe("GET /entities/kind-backfill", () => {
       id: entity.id,
       name: "Backfill Subject",
       kind: null,
-      legacyTypes: ["brand", "bottler"],
+      type: ["brand", "bottler"],
       suggestedKind: "bottler",
       ownerId: owner.id,
       owner: {

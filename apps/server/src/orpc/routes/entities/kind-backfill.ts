@@ -36,7 +36,7 @@ const InputSchema = z
 
 const BackfillEntitySchema = EntitySchema.extend({
   kind: z.null(),
-  legacyTypes: z.array(z.enum(["brand", "distiller", "bottler"])),
+  type: z.array(z.enum(["brand", "distiller", "bottler"])),
   suggestedKind: EntityKindEnum.nullable(),
   relationships: z.object({
     brand: z.number().int().nonnegative(),
@@ -201,7 +201,7 @@ export default procedure
         name: entity.name,
         shortName: entity.shortName,
         kind: null,
-        legacyTypes: entity.type,
+        type: entity.type,
         suggestedKind: inferKindFromLegacyTypes(entity.type),
         ownerId: entity.ownerId,
         owner: entity.ownerId ? ownersById.get(entity.ownerId) : null,
