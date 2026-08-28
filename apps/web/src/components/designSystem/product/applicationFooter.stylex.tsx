@@ -51,12 +51,12 @@ function formatCount(value: number, noun: string) {
 export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
   const coverage = stats
     ? [
-        formatCount(stats.totalBottles, "bottles"),
-        formatCount(stats.totalDistilleries, "distilleries"),
-        formatCount(stats.totalBrands, "brands"),
-        formatCount(stats.totalBottlers, "bottlers"),
-        formatCount(stats.totalBlenders, "blenders"),
-        formatCount(stats.totalTastings, "tastings"),
+        formatCount(stats.bottles, "bottles"),
+        formatCount(stats.distilleries, "distilleries"),
+        formatCount(stats.brands, "brands"),
+        formatCount(stats.bottlers, "bottlers"),
+        formatCount(stats.blenders, "blenders"),
+        formatCount(stats.tastings, "tastings"),
       ].join(" · ")
     : undefined;
 

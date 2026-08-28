@@ -13,6 +13,9 @@ import {
 function DatabaseIntro() {
   const orpc = useORPC();
   const stats = useQuery(orpc.stats.queryOptions());
+  const reviewCount = stats.data
+    ? stats.data.memberReviews + stats.data.externalReviews
+    : undefined;
 
   return (
     <AuthenticationIntro
@@ -24,23 +27,31 @@ function DatabaseIntro() {
       facts={[
         {
           label: "Bottles",
-          value: stats.data?.totalBottles.toLocaleString("en-US") ?? "–",
+          value: stats.data?.bottles.toLocaleString("en-US") ?? "–",
         },
         {
           label: "Distillers",
-          value: stats.data?.totalDistilleries.toLocaleString("en-US") ?? "–",
+          value: stats.data?.distilleries.toLocaleString("en-US") ?? "–",
         },
         {
           label: "Brands",
-          value: stats.data?.totalBrands.toLocaleString("en-US") ?? "–",
+          value: stats.data?.brands.toLocaleString("en-US") ?? "–",
         },
         {
           label: "Bottlers",
-          value: stats.data?.totalBottlers.toLocaleString("en-US") ?? "–",
+          value: stats.data?.bottlers.toLocaleString("en-US") ?? "–",
         },
         {
           label: "Blenders",
-          value: stats.data?.totalBlenders.toLocaleString("en-US") ?? "–",
+          value: stats.data?.blenders.toLocaleString("en-US") ?? "–",
+        },
+        {
+          label: "Tastings",
+          value: stats.data?.tastings.toLocaleString("en-US") ?? "–",
+        },
+        {
+          label: "Reviews",
+          value: reviewCount?.toLocaleString("en-US") ?? "–",
         },
       ]}
       footer={

@@ -70,8 +70,8 @@ export function PublicHome({
     ...orpc.stats.queryOptions(),
     initialData: initialData?.stats,
   });
-  const totalBottles = stats.data?.totalBottles;
-  const totalTastings = stats.data?.totalTastings;
+  const totalBottles = stats.data?.bottles;
+  const totalTastings = stats.data?.tastings;
 
   return (
     <HomePage
@@ -111,10 +111,10 @@ export function PublicHome({
           >
             <Distilleries
               initialData={initialData?.distilleries}
-              totalBlenders={stats.data?.totalBlenders}
-              totalBottlers={stats.data?.totalBottlers}
-              totalBrands={stats.data?.totalBrands}
-              totalDistilleries={stats.data?.totalDistilleries}
+              totalBlenders={stats.data?.blenders}
+              totalBottlers={stats.data?.bottlers}
+              totalBrands={stats.data?.brands}
+              totalDistilleries={stats.data?.distilleries}
             />
           </PageColumns>
           <HomeQuestions questions={questions} />

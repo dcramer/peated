@@ -186,6 +186,11 @@ page composition and its live product adapter are ready to replace it together.
 - **THEN** the route fetches its indexable records through the anonymous server client and includes their names, links, facts, and available public activity in the first HTML response
 - **AND** the interactive client component receives that same result as its initial query state instead of making a loading shell the route's only initial content
 
+#### Scenario: A visitor opens sign-in
+
+- **WHEN** the public statistics response supplies tasting, member-review, and external-review totals
+- **THEN** the sign-in introduction shows the tasting total and a review total composed from the two owned review sources
+
 ### Requirement: Responsive application header
 
 The design system SHALL provide one application-header component tree that keeps database navigation, personal navigation, search, the account menu, and the global tasting action reachable at every supported width.

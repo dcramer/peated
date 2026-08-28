@@ -124,6 +124,7 @@
 - [x] 6.37 Simplify critic reviews to permitted native 100-point values and omit other scales without conversion copy
 - [x] 6.38 Connect the landed tasting-band and review-score contract across live routes, shared components, structured data, and Storybook
 - [x] 6.39 Add the SSR-hydrated Highest rated homepage module from the published median-score list, omit source-scale explainer copy, and keep critic-review dates on one line
+- [x] 6.40 Show API-owned tasting and combined member/external review totals in the sign-in introduction
 
 ## 7. Storybook tooling
 

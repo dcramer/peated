@@ -27,15 +27,15 @@ export default async function AboutPage() {
       {stats ? (
         <SummaryStrip
           cells={[
-            { label: "Bottles", value: stats.totalBottles.toLocaleString() },
+            { label: "Bottles", value: stats.bottles.toLocaleString() },
             {
               label: "Distilleries",
-              value: stats.totalDistilleries.toLocaleString(),
+              value: stats.distilleries.toLocaleString(),
             },
-            { label: "Brands", value: stats.totalBrands.toLocaleString() },
+            { label: "Brands", value: stats.brands.toLocaleString() },
             {
               label: "Tastings",
-              value: stats.totalTastings.toLocaleString(),
+              value: stats.tastings.toLocaleString(),
             },
           ]}
         />
