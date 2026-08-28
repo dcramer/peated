@@ -15,11 +15,11 @@ import {
   unique,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import type { ScrapeSourcePreviewResult } from "../../scraper/configured/preview";
 import {
   type ScrapeRules,
   SCRAPE_SOURCE_KIND_LIST,
-} from "../../scraper/configured/config";
-import type { ScrapeSourcePreviewResult } from "../../scraper/configured/preview";
+} from "../../scraper/configured/rules";
 import { externalSiteRuns, externalSites } from "./externalSites";
 import { users } from "./users";
 

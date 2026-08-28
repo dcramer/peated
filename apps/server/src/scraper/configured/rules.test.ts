@@ -3,7 +3,7 @@ import {
   parseScrapeRules,
   SCRAPE_SOURCE_MAX_ITEMS,
   ScrapeRulesSchema,
-} from "./config";
+} from "./rules";
 
 function reviewConfig(maxItems: number) {
   return {

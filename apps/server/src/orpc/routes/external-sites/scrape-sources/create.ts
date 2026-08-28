@@ -9,14 +9,15 @@ import {
   ScrapeSourceValidationError,
   createSiteWithScrapeSource,
 } from "@peated/server/scraper/configured/service";
-import { serializeScrapeSource } from "./serialize";
+import { serialize } from "@peated/server/serializers";
+import { ScrapeSourceSerializer } from "@peated/server/serializers/scrapeSource";
 
 export default procedure
   .use(requireAdmin)
   .route({
     method: "POST",
     path: "/admin/scrape-sources",
-    summary: "Create a database-managed source",
+    summary: "Create a scrape source",
     operationId: "createScrapeSource",
   })
   .input(ScrapeSourceCreateSchema)
@@ -27,7 +28,11 @@ export default procedure
         ...input,
         createdById: context.user.id,
       });
-      return serializeScrapeSource(source, site, []);
+      return await serialize(
+        ScrapeSourceSerializer,
+        { source, site, revisions: [] },
+        context.user,
+      );
     } catch (error) {
       if (error instanceof ScrapeSourceConflictError) {
         throw errors.CONFLICT({ message: error.message, cause: error });

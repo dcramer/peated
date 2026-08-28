@@ -13,7 +13,7 @@ import { eq } from "drizzle-orm";
 import { createPinnedScrapeSourceRun } from "./runs";
 import {
   activateScrapeSourceRevision,
-  createScrapeSourceDraft,
+  createScrapeSourceRevision,
   createSiteWithScrapeSource,
   listScrapeSourceRevisions,
   recordScrapeSourcePreview,
@@ -43,7 +43,7 @@ async function createUser() {
   return user;
 }
 
-test("creates a site and its governed admin-owned traffic rows", async () => {
+test("creates a site and its admin-owned request rows", async () => {
   const user = await createUser();
   const created = await createSiteWithScrapeSource({
     key: "example-reviews",
@@ -100,7 +100,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     listUrl: "https://versioned.example/archive",
     createdById: user.id,
   });
-  const first = await createScrapeSourceDraft({
+  const first = await createScrapeSourceRevision({
     scrapeSourceId: source.id,
     rules,
     author: "person",
@@ -127,7 +127,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
   });
   expect(activated.revision).toMatchObject({ id: first.id, active: true });
 
-  const second = await createScrapeSourceDraft({
+  const second = await createScrapeSourceRevision({
     scrapeSourceId: source.id,
     listUrl: "https://versioned.example/new-archive",
     rules: {
@@ -181,7 +181,7 @@ test("database constraints keep source and revision identity valid", async () =>
     listUrl: "https://constraints.example/archive",
     createdById: user.id,
   });
-  const first = await createScrapeSourceDraft({
+  const first = await createScrapeSourceRevision({
     scrapeSourceId: source.id,
     rules,
     author: "person",

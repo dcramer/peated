@@ -54,8 +54,7 @@ sync changes code-managed rows only.
 
 Parsing rules cannot contain origins, credentials, headers, robots exceptions,
 or retry policy. The list URL can change only within the source's current
-origin. Preview, AI sampling, and collection use the normal governed request
-session.
+origin. Preview, AI page reads, and collection use the normal request controls.
 
 ## Rules Version 1
 
@@ -86,8 +85,8 @@ keeps that revision across retries even if an admin activates another one.
 
 AI is allowed only when the source opts in. It is available for the first
 revision or after the latest revision fails its test. The server fetches a
-bounded list of approved pages and makes one structured AI call with no
-tools and provider storage disabled.
+bounded list of approved pages and makes one AI request. The response must match
+the rules format. The AI has no tools, and provider storage is disabled.
 
 Code validates the returned rules and source kind before it stores a revision.
 The system records the AI model name and instructions version. An admin must
@@ -110,8 +109,8 @@ this first design.
 Parser tests use synthetic HTML without a database or network. Integration
 tests cover source identity, immutable revisions, activation, run pinning,
 preview isolation, and target ownership. Live AI suggestion evals replace only
-the publisher website with fixture HTML. They use the real AI service, database,
-run lifecycle, and preview parser. These evals belong in `pnpm evals`, not
+the publisher website with fixture HTML. They use the real AI service,
+database, run code, and preview parser. These evals belong in `pnpm evals`, not
 `pnpm test`.
 
 ## Migration

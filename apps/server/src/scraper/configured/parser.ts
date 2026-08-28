@@ -4,8 +4,8 @@ import { StorePriceInputSchema } from "@peated/server/schemas";
 import { load } from "cheerio";
 import { createHash } from "node:crypto";
 import type { z } from "zod";
-import type { ScrapeRules, ScrapeValueSelector } from "./config";
 import type { ScrapeIssue } from "./preview";
+import type { ScrapeRules, ScrapeValueSelector } from "./rules";
 
 export type { ScrapeIssue } from "./preview";
 
@@ -25,10 +25,6 @@ export type ScrapeDetailResult =
       value: z.infer<typeof StorePriceInputSchema>[];
       issues: ScrapeIssue[];
     };
-
-function messageForError(error: Error) {
-  return error.message;
-}
 
 function readValue(
   root: ReturnType<typeof load>,
@@ -73,11 +69,10 @@ export function parseScrapeList(
       } catch (error) {
         issues.push({
           field: "list.detailLink",
-          message: messageForError(
+          message:
             error instanceof Error
-              ? error
-              : new Error("Unable to parse selector."),
-          ),
+              ? error.message
+              : "Unable to parse selector.",
         });
       }
       if (links.size >= rules.list.maxItems) break;
@@ -85,9 +80,8 @@ export function parseScrapeList(
   } catch (error) {
     issues.push({
       field: "list.detailLink",
-      message: messageForError(
-        error instanceof Error ? error : new Error("Unable to parse selector."),
-      ),
+      message:
+        error instanceof Error ? error.message : "Unable to parse selector.",
     });
   }
   if (links.size === 0) {
@@ -129,7 +123,7 @@ function parseVolume(value: string | null) {
     : Math.round(number);
 }
 
-function zodIssues(error: z.ZodError): ScrapeIssue[] {
+function validationIssues(error: z.ZodError): ScrapeIssue[] {
   return error.issues.map((issue) => ({
     field: issue.path.join("."),
     message: issue.message,
@@ -137,15 +131,15 @@ function zodIssues(error: z.ZodError): ScrapeIssue[] {
 }
 
 function parseReviewDetail(
-  config: Extract<ScrapeRules, { kind: "review" }>,
+  rules: Extract<ScrapeRules, { kind: "review" }>,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
   const $ = load(html);
   const issues: ScrapeIssue[] = [];
-  const title = readValue($, config.detail.title);
-  const publishedAtText = config.detail.publishedAt
-    ? readValue($, config.detail.publishedAt)
+  const title = readValue($, rules.detail.title);
+  const publishedAtText = rules.detail.publishedAt
+    ? readValue($, rules.detail.publishedAt)
     : null;
   const publishedAt = parseDate(publishedAtText);
   if (publishedAtText && !publishedAt) {
@@ -161,9 +155,9 @@ function parseReviewDetail(
   const externalReviewTexts: Record<string, string> = {};
 
   try {
-    $(config.detail.reviewItem).each((index, element) => {
+    $(rules.detail.reviewItem).each((index, element) => {
       const item = load($.html(element));
-      const name = readValue(item, config.detail.name);
+      const name = readValue(item, rules.detail.name);
       if (!name) {
         issues.push({
           field: `detail.reviewItem.${index}.name`,
@@ -172,11 +166,11 @@ function parseReviewDetail(
         return;
       }
       const sourceKey = `${pageUrl.toString()}#review-${index + 1}`;
-      const reviewerName = config.detail.reviewerName
-        ? readValue(item, config.detail.reviewerName)
+      const reviewerName = rules.detail.reviewerName
+        ? readValue(item, rules.detail.reviewerName)
         : null;
-      const scoreText = config.detail.score
-        ? readValue(item, config.detail.score.value)
+      const scoreText = rules.detail.score
+        ? readValue(item, rules.detail.score.value)
         : null;
       const scoreValue = parseNumber(scoreText);
       if (scoreText && scoreValue === null) {
@@ -191,25 +185,24 @@ function parseReviewDetail(
         category: null,
         reviewerName,
         nativeScore:
-          config.detail.score && scoreValue !== null
+          rules.detail.score && scoreValue !== null
             ? {
                 value: scoreValue,
-                scale: config.detail.score.scale,
+                scale: rules.detail.score.scale,
                 display: scoreText ?? String(scoreValue),
               }
             : null,
       });
-      if (config.detail.reviewText) {
-        const text = readValue(item, config.detail.reviewText);
+      if (rules.detail.reviewText) {
+        const text = readValue(item, rules.detail.reviewText);
         if (text) externalReviewTexts[sourceKey] = text;
       }
     });
   } catch (error) {
     issues.push({
       field: "detail.reviewItem",
-      message: messageForError(
-        error instanceof Error ? error : new Error("Unable to parse selector."),
-      ),
+      message:
+        error instanceof Error ? error.message : "Unable to parse selector.",
     });
   }
 
@@ -225,45 +218,45 @@ function parseReviewDetail(
     externalReviewTexts,
   });
   if (!result.success) {
-    issues.push(...zodIssues(result.error));
+    issues.push(...validationIssues(result.error));
     return { kind: "review", value: null, issues };
   }
   return { kind: "review", value: result.data, issues };
 }
 
 function parseStorePriceDetail(
-  config: Extract<ScrapeRules, { kind: "price" }>,
+  rules: Extract<ScrapeRules, { kind: "price" }>,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
   const $ = load(html);
   let url = pageUrl.toString();
-  if (config.detail.url) {
-    const value = readValue($, config.detail.url);
+  if (rules.detail.url) {
+    const value = readValue($, rules.detail.url);
     if (value) url = absoluteHttpUrl(value, pageUrl);
   }
-  const raw = {
-    name: readValue($, config.detail.name),
-    price: parsePriceInSmallestUnit(readValue($, config.detail.price)),
-    currency: config.detail.currency,
-    volume: parseVolume(readValue($, config.detail.volume)),
+  const price = {
+    name: readValue($, rules.detail.name),
+    price: parsePriceInSmallestUnit(readValue($, rules.detail.price)),
+    currency: rules.detail.currency,
+    volume: parseVolume(readValue($, rules.detail.volume)),
     url,
-    externalProductId: config.detail.externalProductId
-      ? (readValue($, config.detail.externalProductId) ?? undefined)
+    externalProductId: rules.detail.externalProductId
+      ? (readValue($, rules.detail.externalProductId) ?? undefined)
       : undefined,
-    imageUrl: config.detail.imageUrl
-      ? (readValue($, config.detail.imageUrl) ?? undefined)
+    imageUrl: rules.detail.imageUrl
+      ? (readValue($, rules.detail.imageUrl) ?? undefined)
       : undefined,
-    barcode: config.detail.barcode
-      ? (readValue($, config.detail.barcode) ?? undefined)
+    barcode: rules.detail.barcode
+      ? (readValue($, rules.detail.barcode) ?? undefined)
       : undefined,
   };
-  const result = StorePriceInputSchema.safeParse(raw);
+  const result = StorePriceInputSchema.safeParse(price);
   if (!result.success) {
     return {
       kind: "price",
       value: [],
-      issues: zodIssues(result.error),
+      issues: validationIssues(result.error),
     };
   }
   return { kind: "price", value: [result.data], issues: [] };
@@ -279,9 +272,8 @@ export function parseScrapeDetail(
       ? parseReviewDetail(rules, html, pageUrl)
       : parseStorePriceDetail(rules, html, pageUrl);
   } catch (error) {
-    const message = messageForError(
-      error instanceof Error ? error : new Error("Unable to parse selector."),
-    );
+    const message =
+      error instanceof Error ? error.message : "Unable to parse selector.";
     return rules.kind === "review"
       ? {
           kind: "review",

@@ -8,37 +8,27 @@ import {
   scrapeSources,
   scrapeTargets,
 } from "@peated/server/db/schema";
-import { ExternalSiteKeySchema } from "@peated/server/schemas";
+import {
+  ScrapeSourceCreateSchema,
+  ScrapeSourceUrlSchema,
+} from "@peated/server/schemas";
 import { and, desc, eq, max } from "drizzle-orm";
 import { z } from "zod";
 import { DEFAULT_SCRAPER_REQUEST_POLICY } from "../definitions";
+import type { ScrapeSourcePreviewResult } from "./preview";
 import {
   SCRAPE_RULES_VERSION,
-  SCRAPE_SOURCE_KIND_LIST,
   type ScrapeRules,
   ScrapeRulesSchema,
-} from "./config";
-import type { ScrapeSourcePreviewResult } from "./preview";
+} from "./rules";
 
-const HttpUrlSchema = z
-  .url()
-  .refine((value) => ["http:", "https:"].includes(new URL(value).protocol), {
-    message: "URL must use HTTP or HTTPS.",
-  });
+const CreateScrapeSourceInputSchema = ScrapeSourceCreateSchema.extend({
+  createdById: z.number().int().positive(),
+}).strict();
 
-const CreateSiteInputSchema = z
-  .object({
-    key: ExternalSiteKeySchema,
-    name: z.string().trim().min(1).max(200),
-    kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
-    listUrl: HttpUrlSchema,
-    sampleUrls: z.array(HttpUrlSchema).max(10).default([]),
-    allowAiSuggestions: z.boolean().default(false),
-    createdById: z.number().int().positive(),
-  })
-  .strict();
-
-export type CreateScrapeSourceSiteInput = z.input<typeof CreateSiteInputSchema>;
+export type CreateScrapeSourceInput = z.input<
+  typeof CreateScrapeSourceInputSchema
+>;
 
 export class ScrapeSourceConflictError extends Error {
   override name = "ScrapeSourceConflictError";
@@ -64,9 +54,9 @@ function exactOrigin(url: URL) {
 }
 
 export async function createSiteWithScrapeSource(
-  rawInput: CreateScrapeSourceSiteInput,
+  rawInput: CreateScrapeSourceInput,
 ) {
-  const input = CreateSiteInputSchema.parse(rawInput);
+  const input = CreateScrapeSourceInputSchema.parse(rawInput);
   const listUrl = new URL(input.listUrl);
   const origin = exactOrigin(listUrl);
   for (const sample of input.sampleUrls) {
@@ -142,7 +132,7 @@ export async function createSiteWithScrapeSource(
   }
 }
 
-export type CreateScrapeSourceDraftInput = {
+export type CreateScrapeSourceRevisionInput = {
   scrapeSourceId: number;
   listUrl?: string;
   rules: ScrapeRules;
@@ -152,8 +142,8 @@ export type CreateScrapeSourceDraftInput = {
   | { author: "ai"; aiModel: string; aiInstructionsVersion: string }
 );
 
-export async function createScrapeSourceDraft(
-  input: CreateScrapeSourceDraftInput,
+export async function createScrapeSourceRevision(
+  input: CreateScrapeSourceRevisionInput,
 ) {
   const rules = ScrapeRulesSchema.parse(input.rules);
   return await db.transaction(async (tx) => {
@@ -163,7 +153,9 @@ export async function createScrapeSourceDraft(
       .where(eq(scrapeSources.id, input.scrapeSourceId))
       .for("update");
     if (!source) throw new ScrapeSourceNotFoundError();
-    const listUrl = HttpUrlSchema.parse(input.listUrl ?? source.listUrl);
+    const listUrl = ScrapeSourceUrlSchema.parse(
+      input.listUrl ?? source.listUrl,
+    );
     if (
       exactOrigin(new URL(listUrl)) !== exactOrigin(new URL(source.listUrl))
     ) {
@@ -303,7 +295,7 @@ export async function activateScrapeSourceRevision(input: {
   });
 }
 
-export async function disableScrapeSource(scrapeSourceId: number) {
+export async function pauseScrapeSource(scrapeSourceId: number) {
   const [source] = await db
     .update(scrapeSources)
     .set({ enabled: false, updatedAt: new Date() })

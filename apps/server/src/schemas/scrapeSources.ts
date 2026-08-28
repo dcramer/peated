@@ -1,37 +1,45 @@
 import { z } from "zod";
+import { ScrapeSourcePreviewResultSchema } from "../scraper/configured/preview";
 import {
   SCRAPE_SOURCE_KIND_LIST,
   ScrapeRulesSchema,
-} from "../scraper/configured/config";
-import { ScrapeSourcePreviewResultSchema } from "../scraper/configured/preview";
+} from "../scraper/configured/rules";
 import { ExternalSiteKeySchema, ExternalSiteSchema } from "./externalSites";
 
-export { ScrapeRulesSchema } from "../scraper/configured/config";
+export { ScrapeRulesSchema } from "../scraper/configured/rules";
+
+export const ScrapeSourceUrlSchema = z
+  .url()
+  .refine((value) => ["http:", "https:"].includes(new URL(value).protocol), {
+    message: "URL must use HTTP or HTTPS.",
+  });
 
 export const ScrapeSourceCreateSchema = z
   .object({
     key: ExternalSiteKeySchema,
     name: z.string().trim().min(1).max(200),
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
-    listUrl: z.url(),
-    sampleUrls: z.array(z.url()).max(10).default([]),
+    listUrl: ScrapeSourceUrlSchema,
+    sampleUrls: z.array(ScrapeSourceUrlSchema).max(10).default([]),
     allowAiSuggestions: z.boolean().default(false),
   })
   .strict();
 
-const ScrapeSourceRevisionBaseSchema = z.object({
-  id: z.number().int().positive(),
-  scrapeSourceId: z.number().int().positive(),
-  revision: z.number().int().positive(),
-  rulesVersion: z.number().int().positive(),
-  listUrl: z.url(),
-  rules: ScrapeRulesSchema,
-  active: z.boolean(),
-  previewStatus: z.enum(["pending", "passed", "failed"]),
-  previewResult: ScrapeSourcePreviewResultSchema,
-  previewedAt: z.string().datetime().nullable(),
-  createdAt: z.string().datetime(),
-});
+const ScrapeSourceRevisionBaseSchema = z
+  .object({
+    id: z.number().int().positive(),
+    scrapeSourceId: z.number().int().positive(),
+    revision: z.number().int().positive(),
+    rulesVersion: z.number().int().positive(),
+    listUrl: ScrapeSourceUrlSchema,
+    rules: ScrapeRulesSchema,
+    active: z.boolean(),
+    previewStatus: z.enum(["pending", "passed", "failed"]),
+    previewResult: ScrapeSourcePreviewResultSchema,
+    previewedAt: z.string().datetime().nullable(),
+    createdAt: z.string().datetime(),
+  })
+  .strict();
 
 export const ScrapeSourceRevisionSchema = z.discriminatedUnion("author", [
   ScrapeSourceRevisionBaseSchema.extend({
@@ -46,16 +54,18 @@ export const ScrapeSourceRevisionSchema = z.discriminatedUnion("author", [
   }),
 ]);
 
-export const ScrapeSourceSchema = z.object({
-  id: z.number().int().positive(),
-  site: ExternalSiteSchema,
-  kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
-  enabled: z.boolean(),
-  allowAiSuggestions: z.boolean(),
-  listUrl: z.url(),
-  sampleUrls: z.array(z.url()),
-  activeRevisionId: z.number().int().positive().nullable(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  revisions: z.array(ScrapeSourceRevisionSchema),
-});
+export const ScrapeSourceSchema = z
+  .object({
+    id: z.number().int().positive(),
+    site: ExternalSiteSchema,
+    kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
+    enabled: z.boolean(),
+    allowAiSuggestions: z.boolean(),
+    listUrl: ScrapeSourceUrlSchema,
+    sampleUrls: z.array(ScrapeSourceUrlSchema),
+    activeRevisionId: z.number().int().positive().nullable(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+    revisions: z.array(ScrapeSourceRevisionSchema),
+  })
+  .strict();

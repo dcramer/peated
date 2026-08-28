@@ -94,8 +94,12 @@ function TestResult({ revision }: { revision: Revision }) {
             <ul className="mt-2 space-y-1">
               {page.products.map((product, index) => (
                 <li key={`${product.url}-${index}`}>
-                  {product.name} · {product.price} {product.currency} ·{" "}
-                  {product.volume} ml
+                  {product.name} ·{" "}
+                  {(product.price / 100).toLocaleString(undefined, {
+                    style: "currency",
+                    currency: product.currency,
+                  })}{" "}
+                  · {product.volume} ml
                 </li>
               ))}
             </ul>
@@ -114,8 +118,8 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
   const query = orpc.externalSites.scrapeSources.list.queryOptions({
     input: { site },
   });
-  const { data } = useSuspenseQuery(query);
-  const source = data[0];
+  const { data: sources } = useSuspenseQuery(query);
+  const source = sources[0];
   if (!source) throw new Error("Parsing rules not found.");
 
   return (
@@ -139,11 +143,11 @@ function ConfigEditor({
   const [error, setError] = useState<string>();
   const latest = source.revisions[0];
   const [listUrl, setListUrl] = useState(latest?.listUrl ?? source.listUrl);
-  const [text, setText] = useState(() =>
+  const [rulesText, setRulesText] = useState(() =>
     JSON.stringify(latest?.rules ?? defaultRules(source.kind), null, 2),
   );
-  const createDraft = useMutation(
-    orpc.externalSites.scrapeSources.createDraft.mutationOptions(),
+  const createRevision = useMutation(
+    orpc.externalSites.scrapeSources.createRevision.mutationOptions(),
   );
   const preview = useMutation(
     orpc.externalSites.scrapeSources.preview.mutationOptions(),
@@ -151,17 +155,17 @@ function ConfigEditor({
   const activate = useMutation(
     orpc.externalSites.scrapeSources.activate.mutationOptions(),
   );
-  const disable = useMutation(
-    orpc.externalSites.scrapeSources.disable.mutationOptions(),
+  const pause = useMutation(
+    orpc.externalSites.scrapeSources.pause.mutationOptions(),
   );
   const suggest = useMutation(
     orpc.externalSites.scrapeSources.suggest.mutationOptions(),
   );
   const busy =
-    createDraft.isPending ||
+    createRevision.isPending ||
     preview.isPending ||
     activate.isPending ||
-    disable.isPending ||
+    pause.isPending ||
     suggest.isPending;
   const activeRevision = useMemo(
     () =>
@@ -173,7 +177,7 @@ function ConfigEditor({
   const canSuggest =
     source.allowAiSuggestions && (!latest || latest.previewStatus === "failed");
 
-  async function action(callback: () => Promise<void>) {
+  async function runAndRefresh(callback: () => Promise<void>) {
     setError(undefined);
     try {
       await callback();
@@ -207,7 +211,7 @@ function ConfigEditor({
               <Button
                 disabled={busy}
                 onClick={() =>
-                  void action(async () => {
+                  void runAndRefresh(async () => {
                     await suggest.mutateAsync({ id: source.id });
                   })
                 }
@@ -220,12 +224,12 @@ function ConfigEditor({
                 color="danger"
                 disabled={busy}
                 onClick={() =>
-                  void action(async () => {
-                    await disable.mutateAsync({ id: source.id });
+                  void runAndRefresh(async () => {
+                    await pause.mutateAsync({ id: source.id });
                   })
                 }
               >
-                Pause source
+                Pause collection
               </Button>
             )}
           </div>
@@ -257,8 +261,8 @@ function ConfigEditor({
         <textarea
           id="parsing-rules"
           className="mt-4 min-h-96 w-full rounded border border-slate-700 bg-slate-900 p-3 font-mono text-sm"
-          value={text}
-          onChange={(event) => setText(event.target.value)}
+          value={rulesText}
+          onChange={(event) => setRulesText(event.target.value)}
           spellCheck={false}
         />
         <div className="mt-3 flex justify-end">
@@ -266,11 +270,11 @@ function ConfigEditor({
             color="highlight"
             disabled={busy}
             onClick={() =>
-              void action(async () => {
-                await createDraft.mutateAsync({
+              void runAndRefresh(async () => {
+                await createRevision.mutateAsync({
                   id: source.id,
                   listUrl,
-                  rules: ScrapeRulesSchema.parse(JSON.parse(text)),
+                  rules: ScrapeRulesSchema.parse(JSON.parse(rulesText)),
                 });
               })
             }
@@ -311,7 +315,7 @@ function ConfigEditor({
                   <Button
                     disabled={busy}
                     onClick={() =>
-                      void action(async () => {
+                      void runAndRefresh(async () => {
                         await preview.mutateAsync({
                           id: source.id,
                           revisionId: revision.id,
@@ -325,7 +329,7 @@ function ConfigEditor({
                     color="highlight"
                     disabled={busy || revision.previewStatus !== "passed"}
                     onClick={() =>
-                      void action(async () => {
+                      void runAndRefresh(async () => {
                         await activate.mutateAsync({
                           id: source.id,
                           revisionId: revision.id,

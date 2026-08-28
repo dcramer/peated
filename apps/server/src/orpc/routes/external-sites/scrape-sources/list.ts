@@ -8,28 +8,31 @@ import {
   listScrapeSourceRevisions,
   listScrapeSources,
 } from "@peated/server/scraper/configured/service";
+import { serialize } from "@peated/server/serializers";
+import { ScrapeSourceSerializer } from "@peated/server/serializers/scrapeSource";
 import { z } from "zod";
-import { serializeScrapeSource } from "./serialize";
 
 export default procedure
   .use(requireAdmin)
   .route({
     method: "GET",
     path: "/admin/scrape-sources",
-    summary: "List database-managed sources",
+    summary: "List scrape sources",
     operationId: "listScrapeSources",
   })
   .input(z.object({ site: ExternalSiteKeySchema.optional() }).strict())
   .output(z.array(ScrapeSourceSchema))
-  .handler(async ({ input }) => {
+  .handler(async ({ input, context }) => {
     const rows = await listScrapeSources(input.site);
-    return await Promise.all(
-      rows.map(async ({ source, site }) =>
-        serializeScrapeSource(
+    return await serialize(
+      ScrapeSourceSerializer,
+      await Promise.all(
+        rows.map(async ({ source, site }) => ({
           source,
           site,
-          await listScrapeSourceRevisions(source.id),
-        ),
+          revisions: await listScrapeSourceRevisions(source.id),
+        })),
       ),
+      context.user,
     );
   });

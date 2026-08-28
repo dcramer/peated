@@ -14,12 +14,12 @@ import {
   ScrapeSelectorSchema,
   type ScrapeRules,
   type ScrapeValueSelector,
-} from "./config";
-import { createScrapeSourceDraft } from "./service";
+} from "./rules";
+import { createScrapeSourceRevision } from "./service";
 
-export const SCRAPE_SOURCE_INSTRUCTIONS_VERSION = "scrape-source-v1";
-export const SCRAPE_SOURCE_MAX_MODEL_INPUT_CHARS = 200_000;
-const SCRAPE_SOURCE_MAX_MODEL_PAGE_CHARS = 75_000;
+const AI_INSTRUCTIONS_VERSION = "scrape-source-v1";
+export const MAX_AI_INPUT_CHARS = 200_000;
+const MAX_AI_PAGE_CHARS = 75_000;
 
 // The AI API requires every field. Null means that the suggested rule omits it.
 const SuggestedValueSelectorSchema = z
@@ -155,7 +155,7 @@ function toPriceRules(input: SuggestedPriceRules): ScrapeRules {
   });
 }
 
-export function createScrapeRulesSuggestionFormat(kind: ScrapeRules["kind"]) {
+export function createSuggestionFormat(kind: ScrapeRules["kind"]) {
   return zodTextFormat(
     kind === "review" ? SuggestedReviewRulesSchema : SuggestedPriceRulesSchema,
     "suggested_scrape_rules",
@@ -176,13 +176,11 @@ const INSTRUCTIONS = [
   "</rules>",
 ].join("\n");
 
-export function prepareScrapeSourceModelPages(
-  pages: Array<{ url: string; html: string }>,
-) {
+export function prepareAiPages(pages: Array<{ url: string; html: string }>) {
   if (pages.length === 0) return [];
   const charsPerPage = Math.min(
-    SCRAPE_SOURCE_MAX_MODEL_PAGE_CHARS,
-    Math.floor(SCRAPE_SOURCE_MAX_MODEL_INPUT_CHARS / pages.length),
+    MAX_AI_PAGE_CHARS,
+    Math.floor(MAX_AI_INPUT_CHARS / pages.length),
   );
   return pages.map((page) => ({
     url: page.url,
@@ -190,7 +188,7 @@ export function prepareScrapeSourceModelPages(
   }));
 }
 
-export async function suggestScrapeSourceDraft(input: {
+export async function suggestScrapeSourceRevision(input: {
   scrapeSourceId: number;
   createdById: number;
   pages: Array<{ url: string; html: string }>;
@@ -220,10 +218,10 @@ export async function suggestScrapeSourceDraft(input: {
         instructions: INSTRUCTIONS,
         input: JSON.stringify({
           kind: source.kind,
-          pages: prepareScrapeSourceModelPages(input.pages),
+          pages: prepareAiPages(input.pages),
         }),
         text: {
-          format: createScrapeRulesSuggestionFormat(source.kind),
+          format: createSuggestionFormat(source.kind),
         },
         max_output_tokens: 8_000,
         store: false,
@@ -249,19 +247,19 @@ export async function suggestScrapeSourceDraft(input: {
     },
   });
   const responseJson = JSON.parse(response.output_text);
-  const generated =
+  const suggestedRules =
     source.kind === "review"
       ? toReviewRules(SuggestedReviewRulesSchema.parse(responseJson))
       : toPriceRules(SuggestedPriceRulesSchema.parse(responseJson));
-  if (generated.kind !== source.kind) {
+  if (suggestedRules.kind !== source.kind) {
     throw new Error("The suggested rules collect the wrong content.");
   }
-  return await createScrapeSourceDraft({
+  return await createScrapeSourceRevision({
     scrapeSourceId: input.scrapeSourceId,
-    rules: generated,
+    rules: suggestedRules,
     author: "ai",
     createdById: input.createdById,
     aiModel: response.model,
-    aiInstructionsVersion: SCRAPE_SOURCE_INSTRUCTIONS_VERSION,
+    aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
   });
 }

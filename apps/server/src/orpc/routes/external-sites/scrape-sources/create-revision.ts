@@ -3,10 +3,12 @@ import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
   ScrapeRulesSchema,
   ScrapeSourceRevisionSchema,
+  ScrapeSourceUrlSchema,
 } from "@peated/server/schemas";
-import { createScrapeSourceDraft } from "@peated/server/scraper/configured/service";
+import { createScrapeSourceRevision } from "@peated/server/scraper/configured/service";
+import { serialize } from "@peated/server/serializers";
+import { ScrapeSourceRevisionSerializer } from "@peated/server/serializers/scrapeSource";
 import { z } from "zod";
-import { serializeScrapeSourceRevision } from "./serialize";
 
 export default procedure
   .use(requireAdmin)
@@ -14,26 +16,28 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/revisions",
     summary: "Save a parsing-rule revision",
-    operationId: "createScrapeSourceDraft",
+    operationId: "createScrapeSourceRevision",
   })
   .input(
     z
       .object({
         id: z.number().int().positive(),
-        listUrl: z.url(),
+        listUrl: ScrapeSourceUrlSchema,
         rules: ScrapeRulesSchema,
       })
       .strict(),
   )
   .output(ScrapeSourceRevisionSchema)
   .handler(async ({ input, context }) =>
-    serializeScrapeSourceRevision(
-      await createScrapeSourceDraft({
+    serialize(
+      ScrapeSourceRevisionSerializer,
+      await createScrapeSourceRevision({
         scrapeSourceId: input.id,
         listUrl: input.listUrl,
         rules: input.rules,
         author: "person",
         createdById: context.user.id,
       }),
+      context.user,
     ),
   );

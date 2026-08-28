@@ -35,13 +35,13 @@ export default function Page() {
         name: textValue("name"),
         kind,
         listUrl: textValue("listUrl"),
-        sampleUrls: textValue("sampleUrl")
+        sampleUrls: textValue("sampleUrls")
           .split("\n")
           .map((value) => value.trim())
           .filter(Boolean),
         allowAiSuggestions,
       });
-      router.push(`/admin/sites/${source.site.type}/configs`);
+      router.push(`/admin/sites/${source.site.type}/parsing`);
     } catch (err) {
       setError(getFormErrorMessage(err));
     }
@@ -56,7 +56,7 @@ export default function Page() {
           { name: "Add site", href: "/admin/sites/add", current: true },
         ]}
       />
-      <h1 className="my-6 text-3xl font-semibold text-white">Add source</h1>
+      <h1 className="my-6 text-3xl font-semibold text-white">Add site</h1>
       {error && <FormError values={[error]} />}
       <form onSubmit={submit} className="space-y-6">
         <Fieldset>
@@ -92,7 +92,7 @@ export default function Page() {
               Example detail pages
             </span>
             <textarea
-              name="sampleUrl"
+              name="sampleUrls"
               rows={3}
               className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
               placeholder="One URL per line"

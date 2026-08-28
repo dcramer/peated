@@ -14,7 +14,7 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/revisions/{revisionId}/preview",
     summary: "Test one parsing-rule revision",
-    operationId: "previewScrapeSourceDraft",
+    operationId: "previewScrapeSourceRevision",
   })
   .input(
     z

@@ -180,7 +180,7 @@ export default function Layout(props: {
         </TabItem>
         <TabItem
           as={Link}
-          href={`/admin/sites/${site.type}/configs`}
+          href={`/admin/sites/${site.type}/parsing`}
           controlled
         >
           Parsing

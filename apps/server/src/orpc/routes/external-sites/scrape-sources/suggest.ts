@@ -11,7 +11,7 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/suggest",
     summary: "Ask AI to suggest parsing rules",
-    operationId: "suggestScrapeSourceDraft",
+    operationId: "suggestScrapeSourceRevision",
   })
   .input(z.object({ id: z.number().int().positive() }).strict())
   .output(ExternalSiteRunSchema)

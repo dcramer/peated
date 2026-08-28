@@ -6,7 +6,7 @@ import {
   scrapeSources,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { parseScrapeRules } from "./config";
+import { parseScrapeRules } from "./rules";
 import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,

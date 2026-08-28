@@ -12,7 +12,10 @@ import { createScraperRegistry } from "../definitions";
 import type { ScraperHttpClock } from "../http";
 import { executeScraperRun } from "../runs";
 import { createPinnedScrapeSourceRun } from "./runs";
-import { createScrapeSourceDraft, createSiteWithScrapeSource } from "./service";
+import {
+  createScrapeSourceRevision,
+  createSiteWithScrapeSource,
+} from "./service";
 
 function fixedClock(): ScraperHttpClock {
   let now = new Date("2026-08-28T12:00:00Z");
@@ -38,7 +41,7 @@ async function setupPreview(titleSelector = "h1") {
     listUrl: "https://preview.example/archive",
     createdById: user.id,
   });
-  const revision = await createScrapeSourceDraft({
+  const revision = await createScrapeSourceRevision({
     scrapeSourceId: source.id,
     author: "person",
     createdById: user.id,
@@ -89,7 +92,7 @@ function previewFetch() {
   });
 }
 
-test("runs preview through the governed runtime without product writes", async () => {
+test("runs preview through the normal request controls without product writes", async () => {
   const { pinned, revision } = await setupPreview();
   await expect(
     executeScraperRun(

@@ -21,11 +21,11 @@ import type {
   ScraperSink,
   ScraperSourceDefinition,
 } from "../types";
-import { type ScrapeRules, parseScrapeRules } from "./config";
-import { suggestScrapeSourceDraft } from "./generator";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
+import { type ScrapeRules, parseScrapeRules } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
+import { suggestScrapeSourceRevision } from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
 export class ScrapeSourceParseError extends Error {
@@ -163,7 +163,7 @@ function createScrapeSourceAdapter(input: {
   };
 }
 
-function scrapeSourceDefinition(input: {
+function createScrapeSourceDefinition(input: {
   siteKey: string;
   scrapeSourceId: number;
   revisionId: number;
@@ -214,7 +214,7 @@ function scrapeSourceDefinition(input: {
   };
 }
 
-/** Adds a run's pinned database config to the code-owned runtime registry. */
+/** Adds the saved source for this run to the scraper registry. */
 export async function resolveScrapeSourceRunRegistry(
   runId: number,
   baseRegistry: ScraperRegistry,
@@ -288,7 +288,7 @@ export async function resolveScrapeSourceRunRegistry(
           });
           pages.push({ url: response.url.toString(), html: response.body });
         }
-        const revision = await suggestScrapeSourceDraft({
+        const revision = await suggestScrapeSourceRevision({
           scrapeSourceId: suggestion.source.id,
           createdById: requestedById,
           pages,
@@ -352,7 +352,7 @@ export async function resolveScrapeSourceRunRegistry(
     throw new Error("The parsing rules collect the wrong content.");
   }
   const target = await loadScrapeSourceTarget(row.target);
-  const source = scrapeSourceDefinition({
+  const source = createScrapeSourceDefinition({
     siteKey: row.siteKey,
     scrapeSourceId: row.source.id,
     revisionId: row.revision.id,

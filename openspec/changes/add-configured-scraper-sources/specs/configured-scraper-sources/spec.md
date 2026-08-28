@@ -1,6 +1,6 @@
 ## ADDED Requirements
 
-### Requirement: Admins can create governed sources
+### Requirement: Admins can create controlled sources
 
 The system SHALL let an admin create an external site and its first scrape
 source with a bounded key, name, exact HTTP origin, list URL, conservative
@@ -65,7 +65,7 @@ or prices.
 - **WHEN** an admin previews price rules against current pages
 - **THEN** the system stores structured product fields and bounded issues without storing prices as products
 
-### Requirement: AI suggestions create drafts only
+### Requirement: AI suggestions create inactive revisions only
 
 The system SHALL make at most one AI request to suggest rules from
 admin-selected pages. The AI MUST have no tools. It MUST NOT activate a
@@ -74,7 +74,7 @@ revision, change network control, or write products.
 #### Scenario: AI is allowed
 
 - **WHEN** an admin requests the first suggestion or a repair after the latest test fails
-- **THEN** the system fetches bounded samples, checks the output, and stores a draft with the AI model name and instructions version
+- **THEN** the system fetches bounded samples, checks the output, and stores an inactive revision with the AI model name and instructions version
 
 #### Scenario: AI is not allowed
 
@@ -115,12 +115,12 @@ SHALL emit the strict store-price observation.
 #### Scenario: Review collection succeeds
 
 - **WHEN** an enabled review source emits valid observations
-- **THEN** external-review ingestion owns matching, persistence, and publication
+- **THEN** the existing review storage code owns matching, storage, and publication
 
 #### Scenario: Price collection succeeds
 
 - **WHEN** an enabled price source emits valid observations
-- **THEN** store-price ingestion owns identity, matching, persistence, and visibility
+- **THEN** the existing price storage code owns identity, matching, storage, and visibility
 
 #### Scenario: Parsed output is invalid
 
@@ -140,8 +140,8 @@ not disable or rewrite admin-managed targets, origins, or site mappings.
 ### Requirement: The admin flow exposes the revision lifecycle
 
 The Admin Scrapers area SHALL let an admin add a site, choose a source kind,
-enter or request draft rules, edit the list URL, preview, activate, view
-revision history, roll back, pause collection, and inspect health.
+enter rules or request an AI revision, edit the list URL, preview, activate,
+view revision history, roll back, pause collection, and inspect health.
 
 #### Scenario: An active source needs repair
 
