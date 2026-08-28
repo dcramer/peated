@@ -47,14 +47,14 @@ export async function createPinnedScrapeSourceRun(
   if (
     selected.length !== 1 ||
     (input.purpose === "collect" &&
-      selected[0]?.revision.validationStatus !== "passed")
+      selected[0]?.revision.previewStatus !== "passed")
   ) {
     throw new ScrapeSourceValidationError(
       "Exactly one tested source revision must be ready for this run.",
     );
   }
   const [{ source, revision }] = selected;
-  const rules = parseScrapeRules(revision.formatVersion, revision.rules);
+  const rules = parseScrapeRules(revision.rulesVersion, revision.rules);
   const [run] = await connection
     .insert(externalSiteRuns)
     .values({
@@ -85,20 +85,20 @@ export async function createScrapeSourceSuggestionRun(input: {
       .where(eq(scrapeSources.id, input.scrapeSourceId))
       .for("update");
     if (!source) throw new ScrapeSourceNotFoundError();
-    if (!source.allowLlmProcessing) {
+    if (!source.allowAiSuggestions) {
       throw new ScrapeSourceValidationError(
         "AI suggestions are not allowed for this source.",
       );
     }
     const [latestRevision] = await tx
       .select({
-        validationStatus: scrapeSourceRevisions.validationStatus,
+        previewStatus: scrapeSourceRevisions.previewStatus,
       })
       .from(scrapeSourceRevisions)
       .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id))
       .orderBy(desc(scrapeSourceRevisions.revision))
       .limit(1);
-    if (latestRevision && latestRevision.validationStatus !== "failed") {
+    if (latestRevision && latestRevision.previewStatus !== "failed") {
       throw new ScrapeSourceValidationError(
         "AI repair is available only after the latest test fails.",
       );

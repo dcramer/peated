@@ -8,7 +8,7 @@ import { zodTextFormat } from "openai/helpers/zod";
 import { ScrapeRulesSchema } from "./config";
 import { createScrapeSourceDraft } from "./service";
 
-export const SCRAPE_SOURCE_PROMPT_VERSION = "scrape-source-v1";
+export const SCRAPE_SOURCE_INSTRUCTIONS_VERSION = "scrape-source-v1";
 export const SCRAPE_SOURCE_MAX_MODEL_INPUT_CHARS = 200_000;
 const SCRAPE_SOURCE_MAX_MODEL_PAGE_CHARS = 75_000;
 
@@ -45,15 +45,15 @@ export async function suggestScrapeSourceDraft(input: {
   createdById: number;
   pages: Array<{ url: string; html: string }>;
 }) {
-  // This check owns model access and runs immediately before the call.
+  // This check owns AI access and runs immediately before the call.
   const [source] = await db
     .select({
-      allowLlmProcessing: scrapeSources.allowLlmProcessing,
+      allowAiSuggestions: scrapeSources.allowAiSuggestions,
       kind: scrapeSources.kind,
     })
     .from(scrapeSources)
     .where(eq(scrapeSources.id, input.scrapeSourceId));
-  if (!source?.allowLlmProcessing) {
+  if (!source?.allowAiSuggestions) {
     throw new Error("AI suggestions are not allowed for this source.");
   }
   const client = createOpenAIClient({
@@ -105,9 +105,9 @@ export async function suggestScrapeSourceDraft(input: {
   return await createScrapeSourceDraft({
     scrapeSourceId: input.scrapeSourceId,
     rules: generated,
-    createdWith: "ai",
+    author: "ai",
     createdById: input.createdById,
-    model: response.model,
-    promptVersion: SCRAPE_SOURCE_PROMPT_VERSION,
+    aiModel: response.model,
+    aiInstructionsVersion: SCRAPE_SOURCE_INSTRUCTIONS_VERSION,
   });
 }

@@ -33,6 +33,6 @@ test("keeps the list and every detail page within one run", () => {
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesSchema.parse(reviewConfig(25));
   expect(() => parseScrapeRules(2, rules)).toThrow(
-    "Unsupported scrape rules format: 2.",
+    "Unsupported scrape rules version: 2.",
   );
 });

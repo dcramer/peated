@@ -24,9 +24,9 @@ import type {
 import { type ScrapeRules, parseScrapeRules } from "./config";
 import { suggestScrapeSourceDraft } from "./generator";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
-import { recordScrapeSourceValidation } from "./service";
+import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
+import { recordScrapeSourcePreview } from "./service";
 import { loadScrapeSourceTarget } from "./target";
-import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./validation";
 
 export class ScrapeSourceParseError extends Error {
   override name = "ScrapeSourceParseError";
@@ -133,7 +133,7 @@ function createScrapeSourceAdapter(input: {
       }
 
       if (input.purpose === "preview") {
-        await recordScrapeSourceValidation({
+        await recordScrapeSourcePreview({
           revisionId: input.revisionId,
           status: pages.length > 0 ? "passed" : "failed",
           result: {
@@ -152,7 +152,7 @@ function createScrapeSourceAdapter(input: {
       }
     } catch (error) {
       if (error instanceof ScrapeSourceParseError) {
-        await recordScrapeSourceValidation({
+        await recordScrapeSourcePreview({
           revisionId: input.revisionId,
           status: "failed",
           result: { issues: error.issues, pages },
@@ -344,10 +344,7 @@ export async function resolveScrapeSourceRunRegistry(
     .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
   if (!row) return baseRegistry;
 
-  const rules = parseScrapeRules(
-    row.revision.formatVersion,
-    row.revision.rules,
-  );
+  const rules = parseScrapeRules(row.revision.rulesVersion, row.revision.rules);
   if (row.run.purpose === "suggest") {
     throw new Error("An AI run cannot use saved parsing rules.");
   }

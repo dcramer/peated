@@ -8,7 +8,7 @@
 
 ## 2. Rules And Validation
 
-- [x] 2.1 Define rules format 1 for review and price sources
+- [x] 2.1 Define rules version 1 for review and price sources
 - [x] 2.2 Read bounded detail links and fields without database or network access
 - [x] 2.3 Parse review articles into the existing strict ingestion schema
 - [x] 2.4 Parse store prices into the existing strict price schema
@@ -33,9 +33,9 @@
 
 ## 5. AI Suggestions
 
-- [x] 5.1 Use one stable prompt and a strict structured output schema
-- [x] 5.2 Check source AI permission immediately before model access
-- [x] 5.3 Store model and prompt provenance with valid draft rules
+- [x] 5.1 Use one stable set of AI instructions and a strict output schema
+- [x] 5.2 Check source AI permission immediately before AI access
+- [x] 5.3 Store the AI model name and instructions version with valid draft rules
 - [ ] 5.4 Add focused review and price suggestion eval fixtures
 
 ## 6. Admin API And UI
@@ -47,7 +47,7 @@
 
 ## 7. Verification And Pilot
 
-- [x] 7.1 Document terms, ownership, rules format, admin flow, and rollback
+- [x] 7.1 Document terms, ownership, rules version, admin flow, and rollback
 - [x] 7.2 Run focused tests, typechecks, lint, format, and OpenSpec validation
 - [ ] 7.3 Run one manual admin smoke check without browser test coverage
 - [ ] 7.4 Pilot one review source and one simple price source

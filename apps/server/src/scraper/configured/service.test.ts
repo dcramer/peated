@@ -16,7 +16,7 @@ import {
   createScrapeSourceDraft,
   createSiteWithScrapeSource,
   listScrapeSourceRevisions,
-  recordScrapeSourceValidation,
+  recordScrapeSourcePreview,
   ScrapeSourceConflictError,
   ScrapeSourceValidationError,
 } from "./service";
@@ -103,7 +103,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
   const first = await createScrapeSourceDraft({
     scrapeSourceId: source.id,
     rules,
-    createdWith: "person",
+    author: "person",
     createdById: user.id,
   });
   await expect(
@@ -113,7 +113,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     }),
   ).rejects.toBeInstanceOf(ScrapeSourceValidationError);
 
-  await recordScrapeSourceValidation({
+  await recordScrapeSourcePreview({
     revisionId: first.id,
     status: "passed",
     result: { issues: [], pages: [] },
@@ -134,7 +134,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
       ...rules,
       detail: { ...rules.detail, title: { selector: "main h1" } },
     },
-    createdWith: "person",
+    author: "person",
     createdById: user.id,
   });
   expect(second.revision).toBe(2);
@@ -160,7 +160,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     }),
   ]);
 
-  await recordScrapeSourceValidation({
+  await recordScrapeSourcePreview({
     revisionId: second.id,
     status: "passed",
     result: { issues: [], pages: [] },
@@ -184,7 +184,7 @@ test("database constraints keep source and revision identity valid", async () =>
   const first = await createScrapeSourceDraft({
     scrapeSourceId: source.id,
     rules,
-    createdWith: "person",
+    author: "person",
     createdById: user.id,
   });
   expect(first.revision).toBe(1);
@@ -201,11 +201,11 @@ test("database constraints keep source and revision identity valid", async () =>
     db.insert(scrapeSourceRevisions).values({
       scrapeSourceId: source.id,
       revision: 2,
-      formatVersion: 1,
+      rulesVersion: 1,
       listUrl: source.listUrl,
       rules,
-      createdWith: "ai",
-      validationResult: { issues: [], pages: [] },
+      author: "ai",
+      previewResult: { issues: [], pages: [] },
       createdById: user.id,
     }),
   ).rejects.toThrow();

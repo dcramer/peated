@@ -3,7 +3,7 @@ import {
   SCRAPE_SOURCE_KIND_LIST,
   ScrapeRulesSchema,
 } from "../scraper/configured/config";
-import { ScrapeSourceValidationSchema } from "../scraper/configured/validation";
+import { ScrapeSourcePreviewResultSchema } from "../scraper/configured/preview";
 import { ExternalSiteKeySchema, ExternalSiteSchema } from "./externalSites";
 
 export { ScrapeRulesSchema } from "../scraper/configured/config";
@@ -15,7 +15,7 @@ export const ScrapeSourceCreateSchema = z
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
     listUrl: z.url(),
     sampleUrls: z.array(z.url()).max(10).default([]),
-    allowLlmProcessing: z.boolean().default(false),
+    allowAiSuggestions: z.boolean().default(false),
   })
   .strict();
 
@@ -23,26 +23,26 @@ const ScrapeSourceRevisionBaseSchema = z.object({
   id: z.number().int().positive(),
   scrapeSourceId: z.number().int().positive(),
   revision: z.number().int().positive(),
-  formatVersion: z.number().int().positive(),
+  rulesVersion: z.number().int().positive(),
   listUrl: z.url(),
   rules: ScrapeRulesSchema,
   active: z.boolean(),
-  validationStatus: z.enum(["pending", "passed", "failed"]),
-  validationResult: ScrapeSourceValidationSchema,
-  validatedAt: z.string().datetime().nullable(),
+  previewStatus: z.enum(["pending", "passed", "failed"]),
+  previewResult: ScrapeSourcePreviewResultSchema,
+  previewedAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
 });
 
-export const ScrapeSourceRevisionSchema = z.discriminatedUnion("createdWith", [
+export const ScrapeSourceRevisionSchema = z.discriminatedUnion("author", [
   ScrapeSourceRevisionBaseSchema.extend({
-    createdWith: z.literal("person"),
-    model: z.null(),
-    promptVersion: z.null(),
+    author: z.literal("person"),
+    aiModel: z.null(),
+    aiInstructionsVersion: z.null(),
   }),
   ScrapeSourceRevisionBaseSchema.extend({
-    createdWith: z.literal("ai"),
-    model: z.string(),
-    promptVersion: z.string(),
+    author: z.literal("ai"),
+    aiModel: z.string(),
+    aiInstructionsVersion: z.string(),
   }),
 ]);
 
@@ -51,7 +51,7 @@ export const ScrapeSourceSchema = z.object({
   site: ExternalSiteSchema,
   kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
   enabled: z.boolean(),
-  allowLlmProcessing: z.boolean(),
+  allowAiSuggestions: z.boolean(),
   listUrl: z.url(),
   sampleUrls: z.array(z.url()),
   activeRevisionId: z.number().int().positive().nullable(),

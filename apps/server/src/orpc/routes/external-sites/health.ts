@@ -149,7 +149,7 @@ async function getHealthForSites(
         kind: scrapeSources.kind,
         enabled: scrapeSources.enabled,
         activeRevisionId: scrapeSourceRevisions.id,
-        validationStatus: scrapeSourceRevisions.validationStatus,
+        previewStatus: scrapeSourceRevisions.previewStatus,
       })
       .from(scrapeSources)
       .leftJoin(
@@ -243,7 +243,7 @@ async function getHealthForSites(
           registration !== null ||
           (configured?.enabled === true &&
             configured.activeRevisionId !== null &&
-            configured.validationStatus === "passed"),
+            configured.previewStatus === "passed"),
         targetKeys:
           registration?.targetKeys ??
           (configured ? [...(targets?.keys() ?? [])] : []),

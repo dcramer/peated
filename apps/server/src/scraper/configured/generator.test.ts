@@ -4,7 +4,7 @@ import {
   prepareScrapeSourceModelPages,
 } from "./generator";
 
-test("bounds total model input while keeping every sample page", () => {
+test("bounds total AI input while keeping every sample page", () => {
   const pages = Array.from({ length: 10 }, (_, index) => ({
     url: `https://example.test/${index}`,
     html: "x".repeat(50_000),

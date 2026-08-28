@@ -1,28 +1,28 @@
 CREATE TYPE "public"."scrape_definition_manager" AS ENUM('code', 'admin');
 CREATE TYPE "public"."scrape_source_kind" AS ENUM('review', 'price');
-CREATE TYPE "public"."scrape_source_revision_created_with" AS ENUM('person', 'ai');
+CREATE TYPE "public"."scrape_source_preview_status" AS ENUM('pending', 'passed', 'failed');
+CREATE TYPE "public"."scrape_source_revision_author" AS ENUM('person', 'ai');
 CREATE TYPE "public"."scrape_source_run_purpose" AS ENUM('collect', 'preview', 'suggest');
-CREATE TYPE "public"."scrape_source_validation_status" AS ENUM('pending', 'passed', 'failed');
 CREATE TABLE "scrape_source_revision" (
 	"id" bigserial PRIMARY KEY NOT NULL,
 	"scrape_source_id" bigint NOT NULL,
 	"revision" integer NOT NULL,
-	"format_version" integer NOT NULL,
+	"rules_version" integer NOT NULL,
 	"list_url" text NOT NULL,
 	"rules" jsonb NOT NULL,
-	"created_with" "scrape_source_revision_created_with" NOT NULL,
-	"model" text,
-	"prompt_version" text,
+	"author" "scrape_source_revision_author" NOT NULL,
+	"ai_model" text,
+	"ai_instructions_version" text,
 	"active" boolean DEFAULT false NOT NULL,
-	"validation_status" "scrape_source_validation_status" DEFAULT 'pending' NOT NULL,
-	"validation_result" jsonb NOT NULL,
-	"validated_at" timestamp,
+	"preview_status" "scrape_source_preview_status" DEFAULT 'pending' NOT NULL,
+	"preview_result" jsonb NOT NULL,
+	"previewed_at" timestamp,
 	"created_by_id" bigint,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "scrape_source_revision_id_source_unq" UNIQUE("id","scrape_source_id"),
-	CONSTRAINT "scrape_source_revision_number_check" CHECK ("scrape_source_revision"."revision" > 0 AND "scrape_source_revision"."format_version" > 0),
-	CONSTRAINT "scrape_source_revision_ai_metadata_check" CHECK (("scrape_source_revision"."created_with" = 'person' AND "scrape_source_revision"."model" IS NULL AND "scrape_source_revision"."prompt_version" IS NULL)
-        OR ("scrape_source_revision"."created_with" = 'ai' AND "scrape_source_revision"."model" IS NOT NULL AND "scrape_source_revision"."prompt_version" IS NOT NULL))
+	CONSTRAINT "scrape_source_revision_numbers_check" CHECK ("scrape_source_revision"."revision" > 0 AND "scrape_source_revision"."rules_version" > 0),
+	CONSTRAINT "scrape_source_revision_ai_details_check" CHECK (("scrape_source_revision"."author" = 'person' AND "scrape_source_revision"."ai_model" IS NULL AND "scrape_source_revision"."ai_instructions_version" IS NULL)
+        OR ("scrape_source_revision"."author" = 'ai' AND "scrape_source_revision"."ai_model" IS NOT NULL AND "scrape_source_revision"."ai_instructions_version" IS NOT NULL))
 );
 
 CREATE TABLE "scrape_source_run" (
@@ -38,7 +38,7 @@ CREATE TABLE "scrape_source" (
 	"external_site_id" bigint NOT NULL,
 	"kind" "scrape_source_kind" NOT NULL,
 	"enabled" boolean DEFAULT false NOT NULL,
-	"allow_llm_processing" boolean DEFAULT false NOT NULL,
+	"allow_ai_suggestions" boolean DEFAULT false NOT NULL,
 	"list_url" text NOT NULL,
 	"sample_urls" jsonb DEFAULT '[]'::jsonb NOT NULL,
 	"created_by_id" bigint,

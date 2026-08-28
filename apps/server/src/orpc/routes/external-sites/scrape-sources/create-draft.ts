@@ -32,7 +32,7 @@ export default procedure
         scrapeSourceId: input.id,
         listUrl: input.listUrl,
         rules: input.rules,
-        createdWith: "person",
+        author: "person",
         createdById: context.user.id,
       }),
     ),

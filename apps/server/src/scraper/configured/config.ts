@@ -1,7 +1,7 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
 import { z } from "zod";
 
-export const SCRAPE_RULES_FORMAT_VERSION = 1;
+export const SCRAPE_RULES_VERSION = 1;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 // One list request plus every detail request must fit the 100-request run budget.
@@ -81,10 +81,10 @@ export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
 export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
 export type ScrapeValueSelector = z.infer<typeof ScrapeValueSelectorSchema>;
 
-/** Parses rules only with the interpreter that owns their stored format. */
-export function parseScrapeRules(formatVersion: number, rules: ScrapeRules) {
-  if (formatVersion !== SCRAPE_RULES_FORMAT_VERSION) {
-    throw new Error(`Unsupported scrape rules format: ${formatVersion}.`);
+/** Parses rules only with the interpreter that owns their stored version. */
+export function parseScrapeRules(rulesVersion: number, rules: ScrapeRules) {
+  if (rulesVersion !== SCRAPE_RULES_VERSION) {
+    throw new Error(`Unsupported scrape rules version: ${rulesVersion}.`);
   }
   return ScrapeRulesSchema.parse(rules);
 }

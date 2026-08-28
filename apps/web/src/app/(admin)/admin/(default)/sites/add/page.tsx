@@ -20,7 +20,7 @@ export default function Page() {
   );
   const [error, setError] = useState<string>();
   const [kind, setKind] = useState<"review" | "price">("review");
-  const [allowLlmProcessing, setAllowLlmProcessing] = useState(false);
+  const [allowAiSuggestions, setAllowAiSuggestions] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,7 +39,7 @@ export default function Page() {
           .split("\n")
           .map((value) => value.trim())
           .filter(Boolean),
-        allowLlmProcessing,
+        allowAiSuggestions,
       });
       router.push(`/admin/sites/${source.site.type}/configs`);
     } catch (err) {
@@ -101,8 +101,8 @@ export default function Page() {
           <label className="flex items-center gap-3">
             <input
               type="checkbox"
-              checked={allowLlmProcessing}
-              onChange={(event) => setAllowLlmProcessing(event.target.checked)}
+              checked={allowAiSuggestions}
+              onChange={(event) => setAllowAiSuggestions(event.target.checked)}
             />
             <span>Allow AI to suggest parsing rules</span>
           </label>

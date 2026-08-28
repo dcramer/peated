@@ -59,7 +59,7 @@ export const ScrapeSourcePreviewPageSchema = z.discriminatedUnion("kind", [
   PricePageSchema,
 ]);
 
-export const ScrapeSourceValidationSchema = z
+export const ScrapeSourcePreviewResultSchema = z
   .object({
     issues: z.array(ScrapeIssueSchema),
     pages: z.array(ScrapeSourcePreviewPageSchema),
@@ -70,6 +70,6 @@ export type ScrapeIssue = z.infer<typeof ScrapeIssueSchema>;
 export type ScrapeSourcePreviewPage = z.infer<
   typeof ScrapeSourcePreviewPageSchema
 >;
-export type ScrapeSourceValidation = z.infer<
-  typeof ScrapeSourceValidationSchema
+export type ScrapeSourcePreviewResult = z.infer<
+  typeof ScrapeSourcePreviewResultSchema
 >;

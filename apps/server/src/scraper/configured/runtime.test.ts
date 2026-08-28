@@ -40,7 +40,7 @@ async function setupPreview(titleSelector = "h1") {
   });
   const revision = await createScrapeSourceDraft({
     scrapeSourceId: source.id,
-    createdWith: "person",
+    author: "person",
     createdById: user.id,
     rules: {
       kind: "review",
@@ -107,8 +107,8 @@ test("runs preview through the governed runtime without product writes", async (
     .select()
     .from(scrapeSourceRevisions)
     .where(eq(scrapeSourceRevisions.id, revision.id));
-  expect(storedRevision).toMatchObject({ validationStatus: "passed" });
-  expect(JSON.stringify(storedRevision?.validationResult)).not.toContain(
+  expect(storedRevision).toMatchObject({ previewStatus: "passed" });
+  expect(JSON.stringify(storedRevision?.previewResult)).not.toContain(
     "Publisher prose",
   );
   expect(await db.select().from(externalReviewArticles)).toHaveLength(0);
@@ -137,8 +137,8 @@ test("stores safe validation issues when a selector stops matching", async () =>
     .select()
     .from(scrapeSourceRevisions)
     .where(eq(scrapeSourceRevisions.id, revision.id));
-  expect(storedRevision).toMatchObject({ validationStatus: "failed" });
-  expect(storedRevision?.validationResult).toMatchObject({
+  expect(storedRevision).toMatchObject({ previewStatus: "failed" });
+  expect(storedRevision?.previewResult).toMatchObject({
     pages: [],
     issues: [expect.objectContaining({ field: "article.title" })],
   });

@@ -4,24 +4,24 @@ import type {
   ScrapeSourceRevision,
 } from "@peated/server/db/schema";
 import { parseScrapeRules } from "@peated/server/scraper/configured/config";
-import { ScrapeSourceValidationSchema } from "@peated/server/scraper/configured/validation";
+import { ScrapeSourcePreviewResultSchema } from "@peated/server/scraper/configured/preview";
 import { serializeExternalSite } from "@peated/server/serializers/externalSite";
 
-function serializeRevisionCreation(revision: ScrapeSourceRevision) {
-  if (revision.createdWith === "person") {
+function serializeRevisionAuthor(revision: ScrapeSourceRevision) {
+  if (revision.author === "person") {
     return {
-      createdWith: "person" as const,
-      model: null,
-      promptVersion: null,
+      author: "person" as const,
+      aiModel: null,
+      aiInstructionsVersion: null,
     };
   }
-  if (revision.model === null || revision.promptVersion === null) {
+  if (revision.aiModel === null || revision.aiInstructionsVersion === null) {
     throw new Error("AI-created parsing rules have missing details.");
   }
   return {
-    createdWith: "ai" as const,
-    model: revision.model,
-    promptVersion: revision.promptVersion,
+    author: "ai" as const,
+    aiModel: revision.aiModel,
+    aiInstructionsVersion: revision.aiInstructionsVersion,
   };
 }
 
@@ -30,16 +30,16 @@ export function serializeScrapeSourceRevision(revision: ScrapeSourceRevision) {
     id: revision.id,
     scrapeSourceId: revision.scrapeSourceId,
     revision: revision.revision,
-    formatVersion: revision.formatVersion,
+    rulesVersion: revision.rulesVersion,
     listUrl: revision.listUrl,
-    rules: parseScrapeRules(revision.formatVersion, revision.rules),
+    rules: parseScrapeRules(revision.rulesVersion, revision.rules),
     active: revision.active,
-    ...serializeRevisionCreation(revision),
-    validationStatus: revision.validationStatus,
-    validationResult: ScrapeSourceValidationSchema.parse(
-      revision.validationResult,
+    ...serializeRevisionAuthor(revision),
+    previewStatus: revision.previewStatus,
+    previewResult: ScrapeSourcePreviewResultSchema.parse(
+      revision.previewResult,
     ),
-    validatedAt: revision.validatedAt?.toISOString() ?? null,
+    previewedAt: revision.previewedAt?.toISOString() ?? null,
     createdAt: revision.createdAt.toISOString(),
   };
 }
@@ -54,7 +54,7 @@ export function serializeScrapeSource(
     site: serializeExternalSite(site),
     kind: source.kind,
     enabled: source.enabled,
-    allowLlmProcessing: source.allowLlmProcessing,
+    allowAiSuggestions: source.allowAiSuggestions,
     listUrl: source.listUrl,
     sampleUrls: source.sampleUrls,
     activeRevisionId: revisions.find((revision) => revision.active)?.id ?? null,

@@ -1,5 +1,5 @@
 {
-  "id": "b3ef4bf4-9a67-479c-a3cc-e456c05fa0bb",
+  "id": "0213016b-de32-4c28-8635-3cf7167aa09c",
   "prevId": "ee292586-1a5d-4f15-946b-0bb3b8523353",
   "version": "7",
   "dialect": "postgresql",
@@ -7338,8 +7338,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "format_version": {
-          "name": "format_version",
+        "rules_version": {
+          "name": "rules_version",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -7356,21 +7356,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_with": {
-          "name": "created_with",
-          "type": "scrape_source_revision_created_with",
+        "author": {
+          "name": "author",
+          "type": "scrape_source_revision_author",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
-        "model": {
-          "name": "model",
+        "ai_model": {
+          "name": "ai_model",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "prompt_version": {
-          "name": "prompt_version",
+        "ai_instructions_version": {
+          "name": "ai_instructions_version",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -7382,22 +7382,22 @@
           "notNull": true,
           "default": false
         },
-        "validation_status": {
-          "name": "validation_status",
-          "type": "scrape_source_validation_status",
+        "preview_status": {
+          "name": "preview_status",
+          "type": "scrape_source_preview_status",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
         },
-        "validation_result": {
-          "name": "validation_result",
+        "preview_result": {
+          "name": "preview_result",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
-        "validated_at": {
-          "name": "validated_at",
+        "previewed_at": {
+          "name": "previewed_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -7496,13 +7496,13 @@
       },
       "policies": {},
       "checkConstraints": {
-        "scrape_source_revision_number_check": {
-          "name": "scrape_source_revision_number_check",
-          "value": "\"scrape_source_revision\".\"revision\" > 0 AND \"scrape_source_revision\".\"format_version\" > 0"
+        "scrape_source_revision_numbers_check": {
+          "name": "scrape_source_revision_numbers_check",
+          "value": "\"scrape_source_revision\".\"revision\" > 0 AND \"scrape_source_revision\".\"rules_version\" > 0"
         },
-        "scrape_source_revision_ai_metadata_check": {
-          "name": "scrape_source_revision_ai_metadata_check",
-          "value": "(\"scrape_source_revision\".\"created_with\" = 'person' AND \"scrape_source_revision\".\"model\" IS NULL AND \"scrape_source_revision\".\"prompt_version\" IS NULL)\n        OR (\"scrape_source_revision\".\"created_with\" = 'ai' AND \"scrape_source_revision\".\"model\" IS NOT NULL AND \"scrape_source_revision\".\"prompt_version\" IS NOT NULL)"
+        "scrape_source_revision_ai_details_check": {
+          "name": "scrape_source_revision_ai_details_check",
+          "value": "(\"scrape_source_revision\".\"author\" = 'person' AND \"scrape_source_revision\".\"ai_model\" IS NULL AND \"scrape_source_revision\".\"ai_instructions_version\" IS NULL)\n        OR (\"scrape_source_revision\".\"author\" = 'ai' AND \"scrape_source_revision\".\"ai_model\" IS NOT NULL AND \"scrape_source_revision\".\"ai_instructions_version\" IS NOT NULL)"
         }
       },
       "isRLSEnabled": false
@@ -7644,8 +7644,8 @@
           "notNull": true,
           "default": false
         },
-        "allow_llm_processing": {
-          "name": "allow_llm_processing",
+        "allow_ai_suggestions": {
+          "name": "allow_ai_suggestions",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
@@ -10152,8 +10152,17 @@
         "price"
       ]
     },
-    "public.scrape_source_revision_created_with": {
-      "name": "scrape_source_revision_created_with",
+    "public.scrape_source_preview_status": {
+      "name": "scrape_source_preview_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "passed",
+        "failed"
+      ]
+    },
+    "public.scrape_source_revision_author": {
+      "name": "scrape_source_revision_author",
       "schema": "public",
       "values": [
         "person",
@@ -10167,15 +10176,6 @@
         "collect",
         "preview",
         "suggest"
-      ]
-    },
-    "public.scrape_source_validation_status": {
-      "name": "scrape_source_validation_status",
-      "schema": "public",
-      "values": [
-        "pending",
-        "passed",
-        "failed"
       ]
     },
     "public.currency": {

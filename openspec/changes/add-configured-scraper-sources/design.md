@@ -12,7 +12,7 @@ stays transient.
 - Pin every run to immutable parsing rules.
 - Use the same parser for preview and collection.
 - Keep AI optional and unable to change active behavior.
-- Keep the first rules format small.
+- Keep the first rules version small.
 
 ## Non-Goals
 
@@ -32,17 +32,17 @@ or `price`. A site owns one source. The source stores enablement, AI permission,
 sample URLs, and the current list URL.
 
 `scrape_source_revision` stores an immutable parsing-rule revision. It pins the
-list URL, rules format, rules, creation method, and latest test result. A
+list URL, rules version, rules, author, and latest preview result. A
 partial unique index permits one active revision for each source.
 
 `scrape_source_run` links a durable external-site run to its source and
 revision. Foreign keys prove that both records exist. A composite key proves
 that the revision belongs to the source. The run-creation service selects the
 source by site and inserts the run and link in one transaction. A suggestion
-run starts without a revision and records the new revision after the model
-response passes validation.
+run starts without a revision and records the new revision after the AI
+response passes the server checks.
 
-The small source-kind enum represents code-supported behavior. Site keys stay
+The short source-kind list represents code-supported behavior. Site keys stay
 text because admins can add them without a deploy. A TODO beside the enum marks
 the planned `event` kind and its required product boundary.
 
@@ -57,14 +57,14 @@ or retry policy. The list URL can change only within the source's current
 origin. Preview, AI sampling, and collection use the normal governed request
 session.
 
-## Rules Format 1
+## Rules Version 1
 
 The first format supports one bounded list page and same-origin detail pages.
 It has CSS selectors for detail links and known review or price fields. Code
 owns date, score, money, currency, and volume conversion.
 
-The rules do not include their own format number. The revision column is the
-single source of truth for format dispatch. The format does not support
+The rules JSON does not include its version. The revision stores the rules
+version used to read it. This version does not support
 pagination, browser rendering, APIs, or custom transforms. A code source is
 the escape hatch for those cases.
 
@@ -86,12 +86,12 @@ keeps that revision across retries even if an admin activates another one.
 
 AI is allowed only when the source opts in. It is available for the first
 revision or after the latest revision fails its test. The server fetches a
-bounded list of approved pages and makes one structured model call with no
+bounded list of approved pages and makes one structured AI call with no
 tools and provider storage disabled.
 
 Code validates the returned rules and source kind before it stores a revision.
-The model and prompt revision are stored as provenance. An admin must preview
-and activate the result.
+The system records the AI model name and instructions version. An admin must
+preview and activate the result.
 
 ## Admin Flow
 
@@ -109,7 +109,7 @@ this first design.
 
 Parser tests use synthetic HTML without a database or network. Integration
 tests cover source identity, immutable revisions, activation, run pinning,
-preview isolation, and target ownership. Live model quality belongs in
+preview isolation, and target ownership. Live AI suggestion quality belongs in
 `pnpm evals`, not `pnpm test`.
 
 ## Migration

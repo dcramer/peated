@@ -5,9 +5,9 @@ import { load } from "cheerio";
 import { createHash } from "node:crypto";
 import type { z } from "zod";
 import type { ScrapeRules, ScrapeValueSelector } from "./config";
-import type { ScrapeIssue } from "./validation";
+import type { ScrapeIssue } from "./preview";
 
-export type { ScrapeIssue } from "./validation";
+export type { ScrapeIssue } from "./preview";
 
 export type ScrapeListResult = {
   links: string[];

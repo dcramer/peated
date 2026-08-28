@@ -13,12 +13,12 @@ import { and, desc, eq, max } from "drizzle-orm";
 import { z } from "zod";
 import { DEFAULT_SCRAPER_REQUEST_POLICY } from "../definitions";
 import {
-  SCRAPE_RULES_FORMAT_VERSION,
+  SCRAPE_RULES_VERSION,
   SCRAPE_SOURCE_KIND_LIST,
   type ScrapeRules,
   ScrapeRulesSchema,
 } from "./config";
-import type { ScrapeSourceValidation } from "./validation";
+import type { ScrapeSourcePreviewResult } from "./preview";
 
 const HttpUrlSchema = z
   .url()
@@ -33,7 +33,7 @@ const CreateSiteInputSchema = z
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
     listUrl: HttpUrlSchema,
     sampleUrls: z.array(HttpUrlSchema).max(10).default([]),
-    allowLlmProcessing: z.boolean().default(false),
+    allowAiSuggestions: z.boolean().default(false),
     createdById: z.number().int().positive(),
   })
   .strict();
@@ -116,7 +116,7 @@ export async function createSiteWithScrapeSource(
           sampleUrls: input.sampleUrls.map((value) =>
             new URL(value).toString(),
           ),
-          allowLlmProcessing: input.allowLlmProcessing,
+          allowAiSuggestions: input.allowAiSuggestions,
           createdById: input.createdById,
         })
         .returning();
@@ -148,8 +148,8 @@ export type CreateScrapeSourceDraftInput = {
   rules: ScrapeRules;
   createdById: number;
 } & (
-  | { createdWith: "person" }
-  | { createdWith: "ai"; model: string; promptVersion: string }
+  | { author: "person" }
+  | { author: "ai"; aiModel: string; aiInstructionsVersion: string }
 );
 
 export async function createScrapeSourceDraft(
@@ -176,7 +176,7 @@ export async function createScrapeSourceDraft(
         "The parsing rules collect the wrong content.",
       );
     }
-    if (input.createdWith === "ai" && !source.allowLlmProcessing) {
+    if (input.author === "ai" && !source.allowAiSuggestions) {
       throw new ScrapeSourceValidationError(
         "AI suggestions are not allowed for this source.",
       );
@@ -190,13 +190,14 @@ export async function createScrapeSourceDraft(
       .values({
         scrapeSourceId: source.id,
         revision: (latest?.revision ?? 0) + 1,
-        formatVersion: SCRAPE_RULES_FORMAT_VERSION,
+        rulesVersion: SCRAPE_RULES_VERSION,
         listUrl: new URL(listUrl).toString(),
         rules,
-        createdWith: input.createdWith,
-        model: input.createdWith === "ai" ? input.model : null,
-        promptVersion: input.createdWith === "ai" ? input.promptVersion : null,
-        validationResult: { issues: [], pages: [] },
+        author: input.author,
+        aiModel: input.author === "ai" ? input.aiModel : null,
+        aiInstructionsVersion:
+          input.author === "ai" ? input.aiInstructionsVersion : null,
+        previewResult: { issues: [], pages: [] },
         createdById: input.createdById,
       })
       .returning();
@@ -226,17 +227,17 @@ export async function listScrapeSourceRevisions(scrapeSourceId: number) {
     .orderBy(desc(scrapeSourceRevisions.revision));
 }
 
-export async function recordScrapeSourceValidation(input: {
+export async function recordScrapeSourcePreview(input: {
   revisionId: number;
   status: "passed" | "failed";
-  result: ScrapeSourceValidation;
+  result: ScrapeSourcePreviewResult;
 }) {
   const [revision] = await db
     .update(scrapeSourceRevisions)
     .set({
-      validationStatus: input.status,
-      validationResult: input.result,
-      validatedAt: new Date(),
+      previewStatus: input.status,
+      previewResult: input.result,
+      previewedAt: new Date(),
     })
     .where(eq(scrapeSourceRevisions.id, input.revisionId))
     .returning();
@@ -266,7 +267,7 @@ export async function activateScrapeSourceRevision(input: {
         ),
       );
     if (!revision) throw new ScrapeSourceNotFoundError();
-    if (revision.validationStatus !== "passed") {
+    if (revision.previewStatus !== "passed") {
       throw new ScrapeSourceValidationError(
         "Test this revision successfully before you activate it.",
       );

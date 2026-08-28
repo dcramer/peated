@@ -51,7 +51,7 @@ function defaultRules(kind: Source["kind"]) {
 }
 
 function TestResult({ revision }: { revision: Revision }) {
-  const { issues, pages } = revision.validationResult;
+  const { issues, pages } = revision.previewResult;
   return (
     <div className="mt-4 space-y-3 rounded bg-slate-950 p-3 text-sm text-slate-300">
       {issues.length > 0 && (
@@ -171,8 +171,7 @@ function ConfigEditor({
     [source],
   );
   const canSuggest =
-    source.allowLlmProcessing &&
-    (!latest || latest.validationStatus === "failed");
+    source.allowAiSuggestions && (!latest || latest.previewStatus === "failed");
 
   async function action(callback: () => Promise<void>) {
     setError(undefined);
@@ -298,12 +297,12 @@ function ConfigEditor({
                     {revision.id === source.activeRevisionId && " · Active"}
                   </div>
                   <div className="text-muted mt-1 text-sm">
-                    {revision.validationStatus === "pending"
+                    {revision.previewStatus === "pending"
                       ? "Not tested"
-                      : revision.validationStatus === "passed"
+                      : revision.previewStatus === "passed"
                         ? "Test passed"
                         : "Test failed"}
-                    {revision.createdWith === "ai"
+                    {revision.author === "ai"
                       ? " · Created with AI"
                       : " · Created by a person"}
                   </div>
@@ -324,7 +323,7 @@ function ConfigEditor({
                   </Button>
                   <Button
                     color="highlight"
-                    disabled={busy || revision.validationStatus !== "passed"}
+                    disabled={busy || revision.previewStatus !== "passed"}
                     onClick={() =>
                       void action(async () => {
                         await activate.mutateAsync({
@@ -342,7 +341,7 @@ function ConfigEditor({
                   </Button>
                 </div>
               </div>
-              {revision.validationStatus !== "pending" && (
+              {revision.previewStatus !== "pending" && (
                 <TestResult revision={revision} />
               )}
             </div>

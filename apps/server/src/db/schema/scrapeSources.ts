@@ -19,7 +19,7 @@ import {
   type ScrapeRules,
   SCRAPE_SOURCE_KIND_LIST,
 } from "../../scraper/configured/config";
-import type { ScrapeSourceValidation } from "../../scraper/configured/validation";
+import type { ScrapeSourcePreviewResult } from "../../scraper/configured/preview";
 import { externalSiteRuns, externalSites } from "./externalSites";
 import { users } from "./users";
 
@@ -29,13 +29,13 @@ export const scrapeSourceKindEnum = pgEnum(
   SCRAPE_SOURCE_KIND_LIST,
 );
 
-export const scrapeSourceRevisionCreatedWithEnum = pgEnum(
-  "scrape_source_revision_created_with",
+export const scrapeSourceRevisionAuthorEnum = pgEnum(
+  "scrape_source_revision_author",
   ["person", "ai"],
 );
 
-export const scrapeSourceValidationStatusEnum = pgEnum(
-  "scrape_source_validation_status",
+export const scrapeSourcePreviewStatusEnum = pgEnum(
+  "scrape_source_preview_status",
   ["pending", "passed", "failed"],
 );
 
@@ -54,7 +54,7 @@ export const scrapeSources = pgTable(
       .notNull(),
     kind: scrapeSourceKindEnum("kind").notNull(),
     enabled: boolean("enabled").default(false).notNull(),
-    allowLlmProcessing: boolean("allow_llm_processing")
+    allowAiSuggestions: boolean("allow_ai_suggestions")
       .default(false)
       .notNull(),
     listUrl: text("list_url").notNull(),
@@ -77,20 +77,20 @@ export const scrapeSourceRevisions = pgTable(
       .references(() => scrapeSources.id, { onDelete: "cascade" })
       .notNull(),
     revision: integer("revision").notNull(),
-    formatVersion: integer("format_version").notNull(),
+    rulesVersion: integer("rules_version").notNull(),
     listUrl: text("list_url").notNull(),
     rules: jsonb("rules").$type<ScrapeRules>().notNull(),
-    createdWith: scrapeSourceRevisionCreatedWithEnum("created_with").notNull(),
-    model: text("model"),
-    promptVersion: text("prompt_version"),
+    author: scrapeSourceRevisionAuthorEnum("author").notNull(),
+    aiModel: text("ai_model"),
+    aiInstructionsVersion: text("ai_instructions_version"),
     active: boolean("active").default(false).notNull(),
-    validationStatus: scrapeSourceValidationStatusEnum("validation_status")
+    previewStatus: scrapeSourcePreviewStatusEnum("preview_status")
       .default("pending")
       .notNull(),
-    validationResult: jsonb("validation_result")
-      .$type<ScrapeSourceValidation>()
+    previewResult: jsonb("preview_result")
+      .$type<ScrapeSourcePreviewResult>()
       .notNull(),
-    validatedAt: timestamp("validated_at"),
+    previewedAt: timestamp("previewed_at"),
     createdById: bigint("created_by_id", { mode: "number" }).references(
       () => users.id,
       { onDelete: "set null" },
@@ -110,18 +110,18 @@ export const scrapeSourceRevisions = pgTable(
       .on(table.scrapeSourceId)
       .where(sql`${table.active} = true`),
     check(
-      "scrape_source_revision_number_check",
-      sql`${table.revision} > 0 AND ${table.formatVersion} > 0`,
+      "scrape_source_revision_numbers_check",
+      sql`${table.revision} > 0 AND ${table.rulesVersion} > 0`,
     ),
     check(
-      "scrape_source_revision_ai_metadata_check",
-      sql`(${table.createdWith} = 'person' AND ${table.model} IS NULL AND ${table.promptVersion} IS NULL)
-        OR (${table.createdWith} = 'ai' AND ${table.model} IS NOT NULL AND ${table.promptVersion} IS NOT NULL)`,
+      "scrape_source_revision_ai_details_check",
+      sql`(${table.author} = 'person' AND ${table.aiModel} IS NULL AND ${table.aiInstructionsVersion} IS NULL)
+        OR (${table.author} = 'ai' AND ${table.aiModel} IS NOT NULL AND ${table.aiInstructionsVersion} IS NOT NULL)`,
     ),
   ],
 );
 
-/** Pins a managed run to one source and, except for suggestions, one revision. */
+/** Links a site run to one source and, except for AI suggestions, one revision. */
 export const scrapeSourceRuns = pgTable(
   "scrape_source_run",
   {

@@ -35,7 +35,7 @@ list URL, sample URLs, and revisions.
 ### Requirement: Rule revisions are immutable and explicit
 
 The system SHALL store each rules change as a new immutable revision. Each
-revision SHALL pin its list URL and rules format. A source SHALL have at most
+revision SHALL pin its list URL and rules version. A source SHALL have at most
 one active revision. Each collection or preview run MUST record its exact
 source and revision.
 
@@ -67,23 +67,23 @@ or prices.
 
 ### Requirement: AI suggestions create drafts only
 
-The system SHALL use at most one structured model call to suggest rules from
-admin-selected pages. The model MUST have no tools. It MUST NOT activate a
+The system SHALL make at most one AI request to suggest rules from
+admin-selected pages. The AI MUST have no tools. It MUST NOT activate a
 revision, change network control, or write products.
 
 #### Scenario: AI is allowed
 
 - **WHEN** an admin requests the first suggestion or a repair after the latest test fails
-- **THEN** the system fetches bounded samples, validates the output, and stores a draft with model and prompt provenance
+- **THEN** the system fetches bounded samples, checks the output, and stores a draft with the AI model name and instructions version
 
 #### Scenario: AI is not allowed
 
 - **WHEN** the source does not permit AI processing
-- **THEN** the system rejects the request before it sends page content to a model
+- **THEN** the system rejects the request before it sends page content to the AI provider
 
 #### Scenario: Model output is invalid
 
-- **WHEN** model output fails the strict rules schema or uses the wrong kind
+- **WHEN** the AI response fails the strict rules schema or uses the wrong kind
 - **THEN** the system stores no revision and reports a bounded error without page content
 
 ### Requirement: Activation and rollback require a passing test
@@ -152,9 +152,9 @@ revision history, roll back, pause collection, and inspect health.
 
 The system MUST test parsing without database or network access. It MUST test
 persistence and runtime behavior with deterministic integration tests. Hosted
-model quality MUST run only through the eval command.
+AI suggestion quality MUST run only through the eval command.
 
 #### Scenario: Deterministic tests run
 
 - **WHEN** `pnpm test` runs
-- **THEN** it tests schemas, parsing, validation, source identity, activation, run pinning, preview isolation, and sinks without a hosted model
+- **THEN** it tests schemas, parsing, checks, source identity, activation, run pinning, preview isolation, and outputs without hosted AI
