@@ -29,6 +29,8 @@ export const scrapeOriginRobotsModeEnum = pgEnum("scrape_origin_robots_mode", [
   "not_applicable",
 ]);
 
+// TODO(scraper-platform): Remove this enum and managed_by when the last
+// code-owned scrape definition moves into the database.
 export const scrapeDefinitionManagerEnum = pgEnum("scrape_definition_manager", [
   "code",
   "admin",
