@@ -16,7 +16,7 @@ const site = {
   lastRunAt: null,
   nextRunAt: null,
   runEvery: 1_440,
-  reviews: { total: 12, matched: 10, unmatched: 2 },
+  externalReviews: { total: 12, matched: 10, unmatched: 2 },
   priceListings: { total: 0, matched: 0, unmatched: 0 },
   latestRun: null,
   lastSucceededAt: null,
@@ -134,7 +134,7 @@ describe("scraper observability", () => {
             withReviews: 25,
             withPriceListings: 80,
           },
-          reviews: { total: 40, matched: 30, unmatched: 10 },
+          externalReviews: { total: 40, matched: 30, unmatched: 10 },
           priceListings: { total: 200, matched: 180, unmatched: 20 },
         }}
       />,

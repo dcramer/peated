@@ -17,7 +17,6 @@ import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";
 import classNames from "../lib/classNames";
 import { useORPC } from "../lib/orpc/context";
-import AdvancedRatingDisplay from "./advancedRatingDisplay";
 import BadgeImage from "./badgeImage";
 import Button from "./button";
 import Counter from "./counter";
@@ -28,6 +27,7 @@ import ServingStyleIcon from "./servingStyleIcon";
 import ShareButton from "./shareButton";
 import SimpleRatingDisplay from "./simpleRatingDisplay";
 import Tags from "./tags";
+import TastingBandDisplay from "./tastingBandDisplay";
 import TastingBottleIdentity from "./tastingBottleIdentity";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
@@ -144,28 +144,37 @@ export function TastingContent({
 
       {(tasting.servingStyle ||
         tasting.color ||
-        tasting.rating ||
-        tasting.score !== null ||
+        tasting.ratingBand ||
+        tasting.legacySimpleRating ||
+        tasting.legacyStarRating !== null ||
         tasting.tags.length > 0) && (
         <div className="text-muted px-3 text-sm sm:px-5">
           <DefinitionList className="grid-cols mb-0 grid grid-cols-2 gap-y-2 sm:grid-cols-2 [&>div>dd]:mb-0">
-            {tasting.rating && (
+            {tasting.ratingBand && (
               <div>
                 <DefinitionList.Term>Rating</DefinitionList.Term>
                 <DefinitionList.Details>
+                  <TastingBandDisplay ratingBand={tasting.ratingBand} />
+                </DefinitionList.Details>
+              </div>
+            )}
+            {tasting.legacySimpleRating && (
+              <div>
+                <DefinitionList.Term>Legacy rating</DefinitionList.Term>
+                <DefinitionList.Details>
                   <SimpleRatingDisplay
-                    value={tasting.rating}
+                    value={tasting.legacySimpleRating}
                     size="small"
                     showLabel
                   />
                 </DefinitionList.Details>
               </div>
             )}
-            {tasting.score !== null && (
+            {tasting.legacyStarRating !== null && (
               <div>
-                <DefinitionList.Term>Score</DefinitionList.Term>
+                <DefinitionList.Term>Legacy rating</DefinitionList.Term>
                 <DefinitionList.Details>
-                  <AdvancedRatingDisplay score={tasting.score} />
+                  {tasting.legacyStarRating}/5 stars
                 </DefinitionList.Details>
               </div>
             )}

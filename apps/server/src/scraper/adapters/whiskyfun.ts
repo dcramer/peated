@@ -1,8 +1,7 @@
 import {
-  normalizeReviewRating,
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
-  type ReviewArticleObservation,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
+  type ExternalReviewArticleObservation,
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
@@ -47,10 +46,10 @@ export const WhiskyfunCursorSchema = currentReviewCursorSchema(
   historyComplete: z.boolean().default(false),
 });
 
-export const WhiskyfunObservationSchema = ReviewArticleIngestionSchema;
+export const WhiskyfunObservationSchema = ExternalReviewArticleIngestionSchema;
 
 export type WhiskyfunCursor = z.infer<typeof WhiskyfunCursorSchema>;
-export type WhiskyfunObservation = ReviewArticleIngestion;
+export type WhiskyfunObservation = ExternalReviewArticleIngestion;
 type WhiskyfunFeedArticle = z.infer<typeof WhiskyfunFeedArticleSchema>;
 
 function normalizeText(value: string): string {
@@ -287,7 +286,6 @@ function score(value: string) {
   };
   return {
     nativeScore,
-    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 
@@ -313,8 +311,9 @@ export function parseWhiskyfunArticle(
     article.reviewerName ??
     (normalizeText($('meta[name="author"]').first().attr("content") ?? "") ||
       null);
-  const reviews: ReviewArticleObservation["reviews"] = [];
-  const reviewTexts: Record<string, string> = {};
+  const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
+    [];
+  const externalReviewTexts: Record<string, string> = {};
   let hasReviewCandidate = false;
   let sessionTitle = article.title;
 
@@ -339,23 +338,22 @@ export function parseWhiskyfunArticle(
     if (!reviewScore) return;
 
     const sourceKey = reviewSourceKey(canonicalUrl.href, heading);
-    reviews.push({
+    externalReviews.push({
       sourceKey,
       name: heading,
       category: null,
       reviewerName,
       nativeScore: reviewScore.nativeScore,
-      normalizedRating: reviewScore.normalizedRating,
     });
-    reviewTexts[sourceKey] = reviewText;
+    externalReviewTexts[sourceKey] = reviewText;
   });
 
-  if (reviews.length === 0) {
+  if (externalReviews.length === 0) {
     if (!hasReviewCandidate) return null;
-    throw new Error("Whiskyfun article contains no scored reviews.");
+    throw new Error("Whiskyfun article contains no scored external reviews.");
   }
 
-  const contentText = Object.values(reviewTexts).join("\n");
+  const contentText = Object.values(externalReviewTexts).join("\n");
   return WhiskyfunObservationSchema.parse({
     article: {
       canonicalUrl: canonicalUrl.href,
@@ -363,9 +361,9 @@ export function parseWhiskyfunArticle(
       issue: null,
       publishedAt: article.publishedAt,
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews,
+      externalReviews,
     },
-    reviewTexts,
+    externalReviewTexts,
   });
 }
 
@@ -453,7 +451,7 @@ export const whiskyfunAdapter: ScraperAdapter<
     if (observation) {
       await session.emit({
         sourceKey: observation.article.canonicalUrl,
-        itemCount: observation.article.reviews.length,
+        itemCount: observation.article.externalReviews.length,
         value: observation,
       });
     }

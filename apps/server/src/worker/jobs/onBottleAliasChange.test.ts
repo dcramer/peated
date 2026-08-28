@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   bottleTombstones,
-  reviews,
+  externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -34,7 +34,7 @@ describe("onBottleAliasChange", () => {
       bottleId: bottle.id,
       name: "Direct Bottle Worker Alias",
     });
-    const unresolvedReview = await fixtures.Review({
+    const unresolvedReview = await fixtures.ExternalReview({
       bottleId: null,
       name: alias.name,
     });
@@ -42,7 +42,7 @@ describe("onBottleAliasChange", () => {
       bottleId: null,
       name: alias.name,
     });
-    const assignedReview = await fixtures.Review({
+    const assignedReview = await fixtures.ExternalReview({
       bottleId: otherBottle.id,
       name: alias.name,
       issue: "Independent assignment",
@@ -57,8 +57,8 @@ describe("onBottleAliasChange", () => {
     await onBottleAliasChange({ name: alias.name });
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, unresolvedReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, unresolvedReview.id),
       }),
     ).toMatchObject({ bottleId: bottle.id });
     expect(
@@ -67,8 +67,8 @@ describe("onBottleAliasChange", () => {
       }),
     ).toMatchObject({ bottleId: bottle.id });
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, assignedReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, assignedReview.id),
       }),
     ).toMatchObject({ bottleId: otherBottle.id });
     expect(
@@ -93,7 +93,7 @@ describe("onBottleAliasChange", () => {
       bottleId: null,
       name: "Unbound Worker Alias",
     });
-    const ignoredReview = await fixtures.Review({
+    const ignoredReview = await fixtures.ExternalReview({
       bottleId: null,
       name: ignoredAlias.name,
     });
@@ -106,8 +106,8 @@ describe("onBottleAliasChange", () => {
     await onBottleAliasChange({ name: unboundAlias.name });
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, ignoredReview.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, ignoredReview.id),
       }),
     ).toMatchObject({ bottleId: null });
     expect(
@@ -128,7 +128,7 @@ describe("onBottleAliasChange", () => {
       bottleId: retiredBottle.id,
       name: "Retired Bottle Worker Alias",
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       bottleId: null,
       name: alias.name,
     });
@@ -140,8 +140,8 @@ describe("onBottleAliasChange", () => {
     await onBottleAliasChange({ name: alias.name });
 
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({ bottleId: null });
     expect(runAliasIndex).toHaveBeenCalledWith(alias.name);

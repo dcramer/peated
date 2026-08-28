@@ -1,8 +1,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import AdvancedRatingDisplay from "@peated/web/components/advancedRatingDisplay";
 import BottleIdentity from "@peated/web/components/bottleIdentity";
-import BottleRatingSummary from "@peated/web/components/bottleRatingSummary";
 import PaginationButtons from "@peated/web/components/paginationButtons";
+import ReviewScoreDisplay from "@peated/web/components/reviewScoreDisplay";
 import { type ReactNode, Suspense } from "react";
 
 type BottleGroupBottleList = Outputs["bottleGroups"]["bottles"];
@@ -52,16 +51,15 @@ export function ReleaseFamilyContent({
           Releases
         </h2>
 
-        {group && group.avgScore !== null && group.totalScores > 0 ? (
+        {group && group.medianScore !== null && group.scoreCount >= 20 ? (
           <div className="mb-6 rounded-lg border border-slate-700 bg-slate-900/50 p-4">
             <div className="text-muted text-sm">
-              Community score across releases
+              Median review score across releases
             </div>
             <div className="mt-1 text-lg">
-              <AdvancedRatingDisplay
-                score={group.avgScore}
-                count={group.totalScores}
-                aggregate
+              <ReviewScoreDisplay
+                score={group.medianScore}
+                count={group.scoreCount}
               />
             </div>
           </div>
@@ -90,20 +88,14 @@ export function ReleaseFamilyContent({
                     />
                   </div>
                   <div className="w-28 shrink-0 text-right sm:w-36">
-                    {bottle.avgScore !== null && bottle.totalScores > 0 ? (
-                      <AdvancedRatingDisplay
-                        score={bottle.avgScore}
-                        count={bottle.totalScores}
-                        aggregate
+                    {bottle.medianScore !== null && bottle.scoreCount >= 20 ? (
+                      <ReviewScoreDisplay
+                        score={bottle.medianScore}
+                        count={bottle.scoreCount}
                         showBand={false}
                         className="justify-end text-sm"
                       />
                     ) : null}
-                    <BottleRatingSummary
-                      avgRating={bottle.avgRating}
-                      totalRatings={bottle.ratingStats.total}
-                      className="mt-1 w-full"
-                    />
                   </div>
                 </div>
               </li>

@@ -1,7 +1,6 @@
 import {
-  normalizeReviewRating,
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
@@ -36,10 +35,10 @@ export const WhiskySagaCursorSchema = currentReviewCursorSchema(
   historyComplete: z.boolean().default(false),
 });
 
-export const WhiskySagaObservationSchema = ReviewArticleIngestionSchema;
+export const WhiskySagaObservationSchema = ExternalReviewArticleIngestionSchema;
 
 export type WhiskySagaCursor = z.infer<typeof WhiskySagaCursorSchema>;
-export type WhiskySagaObservation = ReviewArticleIngestion;
+export type WhiskySagaObservation = ExternalReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -111,7 +110,6 @@ function reviewScore(value: string) {
   };
   return {
     nativeScore,
-    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 
@@ -159,7 +157,6 @@ export function parseWhiskySagaArticle(
     category: null,
     reviewerName: metadata.author,
     nativeScore: score.nativeScore,
-    normalizedRating: score.normalizedRating,
   };
   const contentText = JSON.stringify({ review, reviewText });
 
@@ -170,9 +167,9 @@ export function parseWhiskySagaArticle(
       issue: null,
       publishedAt,
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews: [review],
+      externalReviews: [review],
     },
-    reviewTexts: { [reviewSourceKey]: reviewText },
+    externalReviewTexts: { [reviewSourceKey]: reviewText },
   });
 }
 
@@ -247,7 +244,7 @@ export const whiskySagaAdapter: ScraperAdapter<
     if (observation) {
       await session.emit({
         sourceKey: observation.article.canonicalUrl,
-        itemCount: observation.article.reviews.length,
+        itemCount: observation.article.externalReviews.length,
         value: observation,
       });
     }

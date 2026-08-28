@@ -921,53 +921,11 @@ describe("GET /bottles", () => {
     expect(results[1].id).toBe(bottle1.id); // 5 tastings
   });
 
-  test("sorts bottles by rating ascending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "High Rated",
-      avgRating: 2,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Low Rated",
-      avgRating: 1,
-    });
-    const bottle3 = await fixtures.Bottle({ name: "No Rating" }); // null rating
-
-    const { results } = await routerClient.bottles.list({
-      sort: "rating",
-    });
-
-    expect(results.length).toBe(3);
-    expect(results[2].id).toBe(bottle3.id); // null last
-    expect(results[0].id).toBe(bottle2.id); // 3.0 first
-    expect(results[1].id).toBe(bottle1.id); // 4.5
-  });
-
-  test("sorts bottles by rating descending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "High Rated",
-      avgRating: 2,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Low Rated",
-      avgRating: 1,
-    });
-    const bottle3 = await fixtures.Bottle({ name: "No Rating" }); // null rating
-
-    const { results } = await routerClient.bottles.list({
-      sort: "-rating",
-    });
-
-    expect(results.length).toBe(3);
-    expect(results[0].id).toBe(bottle1.id); // 4.5 first
-    expect(results[1].id).toBe(bottle2.id); // 3.0
-    expect(results[2].id).toBe(bottle3.id); // null last
-  });
-
-  test("sorts bottles by advanced score with nulls last", async ({
+  test("sorts bottles by median score with nulls last", async ({
     fixtures,
   }) => {
-    const high = await fixtures.Bottle({ name: "High", avgScore: 92 });
-    const low = await fixtures.Bottle({ name: "Low", avgScore: 82 });
+    const high = await fixtures.Bottle({ name: "High", medianScore: 92 });
+    const low = await fixtures.Bottle({ name: "Low", medianScore: 82 });
     const unscored = await fixtures.Bottle({ name: "Unscored" });
 
     const { results } = await routerClient.bottles.list({ sort: "-score" });
@@ -979,9 +937,9 @@ describe("GET /bottles", () => {
     ]);
   });
 
-  test("filters bottles by minimum advanced score", async ({ fixtures }) => {
-    const included = await fixtures.Bottle({ avgScore: 88 });
-    await fixtures.Bottle({ avgScore: 84 });
+  test("filters bottles by minimum median score", async ({ fixtures }) => {
+    const included = await fixtures.Bottle({ medianScore: 88 });
+    await fixtures.Bottle({ medianScore: 84 });
     await fixtures.Bottle();
 
     const { results } = await routerClient.bottles.list({ minScore: 85 });

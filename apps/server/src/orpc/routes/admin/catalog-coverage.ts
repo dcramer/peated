@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleTombstones,
   bottles,
-  reviews,
+  externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -38,7 +38,7 @@ export default procedure
         withReviews: z.number().int().nonnegative(),
         withPriceListings: z.number().int().nonnegative(),
       }),
-      reviews: itemCoverageSchema,
+      externalReviews: itemCoverageSchema,
       priceListings: itemCoverageSchema,
     }),
   )
@@ -68,13 +68,13 @@ export default procedure
         ),
       db
         .select({
-          total: sql<number>`count(distinct ${reviews.bottleId})::int`,
+          total: sql<number>`count(distinct ${externalReviews.bottleId})::int`,
         })
-        .from(reviews)
-        .innerJoin(bottles, eq(reviews.bottleId, bottles.id))
+        .from(externalReviews)
+        .innerJoin(bottles, eq(externalReviews.bottleId, bottles.id))
         .where(
           and(
-            eq(reviews.hidden, false),
+            eq(externalReviews.hidden, false),
             isNotNull(bottles.groupId),
             sql`not exists (
                 select 1 from ${bottleTombstones}
@@ -101,11 +101,11 @@ export default procedure
       db
         .select({
           total: sql<number>`count(*)::int`,
-          matched: sql<number>`count(*) filter (where ${reviews.bottleId} is not null)::int`,
-          unmatched: sql<number>`count(*) filter (where ${reviews.bottleId} is null)::int`,
+          matched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null)::int`,
+          unmatched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is null)::int`,
         })
-        .from(reviews)
-        .where(eq(reviews.hidden, false)),
+        .from(externalReviews)
+        .where(eq(externalReviews.hidden, false)),
       db
         .select({
           total: sql<number>`count(*)::int`,
@@ -122,7 +122,7 @@ export default procedure
         withReviews: reviewBottleCoverage!.total,
         withPriceListings: priceListingBottleCoverage!.total,
       },
-      reviews: reviewCoverage!,
+      externalReviews: reviewCoverage!,
       priceListings: priceListingCoverage!,
     };
   });

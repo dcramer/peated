@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
+import { RATING_BAND_IDS } from "@peated/server/constants";
 import type { AnyDatabase, AnyTransaction } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
 import * as dbSchema from "@peated/server/db/schema";
@@ -18,6 +18,8 @@ import {
   collections,
   comments,
   entities,
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
   externalSites,
   flightBottles,
@@ -25,8 +27,6 @@ import {
   follows,
   oauthClients,
   passkeys,
-  reviewArticles,
-  reviews,
   storePriceHistories,
   storePrices,
   tastings,
@@ -481,8 +481,14 @@ type BottleGroupMemberFixtureData = Partial<
     | "imageUrl"
     | "tastingNotes"
     | "suggestedTags"
-    | "avgRating"
-    | "ratingStats"
+    | "legacySimpleRatingAverage"
+    | "legacySimpleRatingStats"
+    | "medianScore"
+    | "minScore"
+    | "maxScore"
+    | "memberScoreCount"
+    | "externalScoreCount"
+    | "tastingBandCounts"
     | "totalTastings"
     | "numReleases"
     | "createdAt"
@@ -806,7 +812,7 @@ export const Tasting = async (
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
-        rating: faker.helpers.arrayElement(Object.values(SIMPLE_RATING_VALUES)),
+        ratingBand: faker.helpers.arrayElement(RATING_BAND_IDS),
         tags: tags,
         createdAt: new Date(),
         ...data,
@@ -1121,8 +1127,8 @@ export const StorePriceHistory = async (
   return result;
 };
 
-type ReviewFixtureData = Partial<
-  Omit<dbSchema.NewReview, "id" | "articleId">
+type ExternalReviewFixtureData = Partial<
+  Omit<dbSchema.NewExternalReview, "id" | "articleId">
 > & {
   articleId?: number;
   externalSiteId?: number;
@@ -1130,15 +1136,15 @@ type ReviewFixtureData = Partial<
   url?: string;
 };
 
-export const Review = async (
+export const ExternalReview = async (
   {
     externalSiteId: requestedExternalSiteId,
     issue: requestedIssue,
     url: requestedUrl,
     ...data
-  }: ReviewFixtureData = {},
+  }: ExternalReviewFixtureData = {},
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.Review> => {
+): Promise<dbSchema.ExternalReview> => {
   const [result] = await db.transaction(async (tx) => {
     if (!data.name) {
       const parsedBottleId = z.number().safeParse(data.bottleId);
@@ -1171,23 +1177,27 @@ export const Review = async (
     let sourceKey = data.sourceKey;
     if (articleId === undefined) {
       const [article] = await tx
-        .insert(reviewArticles)
+        .insert(externalReviewArticles)
         .values({ externalSiteId, canonicalUrl: url, issue })
         .onConflictDoUpdate({
-          target: [reviewArticles.externalSiteId, reviewArticles.canonicalUrl],
+          target: [
+            externalReviewArticles.externalSiteId,
+            externalReviewArticles.canonicalUrl,
+          ],
           set: { issue },
         })
-        .returning({ id: reviewArticles.id });
-      if (!article) throw new Error("Unable to create ReviewArticle fixture");
+        .returning({ id: externalReviewArticles.id });
+      if (!article) {
+        throw new Error("Unable to create ExternalReviewArticle fixture");
+      }
       articleId = article.id;
       if (sourceKey === undefined) sourceKey = url;
     }
 
     return await tx
-      .insert(reviews)
+      .insert(externalReviews)
       .values({
         name: "",
-        rating: faker.number.int({ min: 59, max: 100 }),
         createdAt: new Date(),
         ...data,
         articleId,
@@ -1195,7 +1205,7 @@ export const Review = async (
       })
       .returning();
   });
-  if (!result) throw new Error("Unable to create Review fixture");
+  if (!result) throw new Error("Unable to create ExternalReview fixture");
   return result;
 };
 

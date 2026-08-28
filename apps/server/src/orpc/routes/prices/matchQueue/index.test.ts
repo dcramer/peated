@@ -11,8 +11,8 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
+  externalReviews,
   incomingBottleDecisionLogs,
-  reviews,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePriceMatchRetryRunItems,
@@ -2037,7 +2037,7 @@ describe("price match queue", () => {
       name: "Queue Approval",
       bottleId: null,
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site1.id,
       name: "Queue Approval",
       bottleId: null,
@@ -2096,8 +2096,8 @@ describe("price match queue", () => {
     const updatedSiblingPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, siblingPrice.id),
     });
-    const updatedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
+    const updatedReview = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
     });
     const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
       where: eq(storePriceMatchProposals.id, proposal.id),
@@ -2193,7 +2193,7 @@ describe("price match queue", () => {
       name: price.name,
       bottleId: null,
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       name: price.name,
       bottleId: null,
@@ -2237,7 +2237,9 @@ describe("price match queue", () => {
       db.query.storePrices.findFirst({
         where: eq(storePrices.id, siblingPrice.id),
       }),
-      db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+      db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
       db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, price.name),
       }),
@@ -2294,7 +2296,7 @@ describe("price match queue", () => {
       bottleId: null,
       imageUrl,
     });
-    const review = await fixtures.Review({
+    const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
       name: "Removed Image Approval",
       bottleId: null,
@@ -2336,8 +2338,8 @@ describe("price match queue", () => {
       }),
     ).toMatchObject({ bottleId: bottle.id });
     expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({ bottleId: null });
     expect(

@@ -12,8 +12,8 @@ import {
   changes,
   collectionBottles,
   entities,
+  externalReviews,
   flightBottles,
-  reviews,
   storePriceMatchProposals,
   storePrices,
   tastings,
@@ -144,7 +144,9 @@ export default procedure
       const aliasFilters: SQL<unknown>[] = [
         eq(bottleAliases.bottleId, bottle.id),
       ];
-      const reviewFilters: SQL<unknown>[] = [eq(reviews.bottleId, bottle.id)];
+      const reviewFilters: SQL<unknown>[] = [
+        eq(externalReviews.bottleId, bottle.id),
+      ];
       const storePriceFilters: SQL<unknown>[] = [
         eq(storePrices.bottleId, bottle.id),
       ];
@@ -203,7 +205,7 @@ export default procedure
         .set({ bottleId: null })
         .where(or(...aliasFilters));
       await tx
-        .update(reviews)
+        .update(externalReviews)
         .set({ bottleId: null })
         .where(or(...reviewFilters));
       await tx

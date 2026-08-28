@@ -23,14 +23,15 @@ import email from "./email";
 import entities from "./entities";
 import events from "./events";
 import externalSites from "./external-sites";
+import externalReviews from "./externalReviews";
 import flights from "./flights";
 import friends from "./friends";
+import memberReviews from "./memberReviews";
 import notifications from "./notifications";
 import oauth from "./oauth";
 import pendingUploads from "./pendingUploads";
 import prices from "./prices";
 import regions from "./regions";
-import reviews from "./reviews";
 import root from "./root";
 import search from "./search";
 import smws from "./smws";
@@ -68,12 +69,13 @@ export interface Router {
   externalSites: typeof externalSites;
   flights: typeof flights;
   friends: typeof friends;
+  memberReviews: typeof memberReviews;
   notifications: typeof notifications;
   oauth: typeof oauth;
   pendingUploads: typeof pendingUploads;
   prices: typeof prices;
   regions: typeof regions;
-  reviews: typeof reviews;
+  externalReviews: typeof externalReviews;
   root: typeof root;
   search: typeof search;
   smws: typeof smws;
@@ -112,13 +114,14 @@ export default api.router({
   externalSites,
   flights,
   friends,
+  memberReviews,
   smws,
   notifications,
   oauth,
   pendingUploads,
   prices,
   regions,
-  reviews,
+  externalReviews,
   root,
   search,
   stats,

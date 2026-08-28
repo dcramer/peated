@@ -98,18 +98,17 @@ test("fetches dates for the latest issue and checkpoints each review", async () 
         issue: "Winter 2023",
         publishedAt: new Date("2023-12-19T00:00:00.000Z"),
         contentHash: expect.any(String),
-        reviews: [
+        externalReviews: [
           {
             sourceKey:
               "https://whiskyadvocate.com/Angel-s-Envy-Cask-Strength-Sauternes-and-Toasted-Oak-Barrel-Finished-Batch-RC1-57-2",
             name: "Angel’s Envy Cask Strength Sauternes and Toasted Oak Barrel Finished (Batch RC1), 57.2%",
             category: "rye",
             nativeScore: { value: 94, scale: 100, display: "94/100" },
-            normalizedRating: 94,
           },
         ],
       },
-      reviewTexts: {},
+      externalReviewTexts: {},
     },
   });
   expect(checkpoint).toHaveBeenCalledTimes(166);
@@ -122,11 +121,13 @@ test("fetches dates for the latest issue and checkpoints each review", async () 
 test("resumes the same issue after the last stored review", async () => {
   const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
   const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
-  const reviews = parseReviews(
+  const externalReviews = parseReviews(
     reviewHtml,
     "https://whiskyadvocate.com/ratings-reviews",
   );
-  const processedReviewUrls = reviews.slice(0, -1).map((review) => review.url);
+  const processedReviewUrls = externalReviews
+    .slice(0, -1)
+    .map((review) => review.url);
   const emit = vi.fn();
   const checkpoint = vi.fn();
   const request = vi.fn(async ({ url }: { url: URL }) => ({
@@ -153,11 +154,11 @@ test("resumes the same issue after the last stored review", async () => {
   expect(request).toHaveBeenCalledTimes(2);
   expect(emit).toHaveBeenCalledOnce();
   expect(emit).toHaveBeenCalledWith(
-    expect.objectContaining({ sourceKey: reviews.at(-1)?.url }),
+    expect.objectContaining({ sourceKey: externalReviews.at(-1)?.url }),
   );
   expect(checkpoint).toHaveBeenCalledWith({
     issue: "Winter 2023",
-    processedReviewUrls: reviews.map((review) => review.url),
+    processedReviewUrls: externalReviews.map((review) => review.url),
   });
 });
 
@@ -181,5 +182,5 @@ test("fails when the newest issue has no review results", async () => {
 
   await expect(
     whiskyAdvocateAdapter({ cursor: null, session }),
-  ).rejects.toThrow("Whisky Advocate issue contains no reviews.");
+  ).rejects.toThrow("Whisky Advocate issue contains no external reviews.");
 });

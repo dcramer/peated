@@ -1,18 +1,18 @@
 "use client";
 
+import { RATING_BANDS } from "@peated/server/constants";
 import type { Outputs } from "@peated/server/orpc/router";
 import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { Suspense } from "react";
-import AdvancedRatingDisplay from "./advancedRatingDisplay";
 import BottleBarcodes from "./bottleBarcodes";
 import BottleReviews from "./bottleReviews";
 import BottleTagDistribution from "./bottleTagDistribution";
 import DefinitionList from "./definitionList";
 import Heading from "./heading";
 import Markdown from "./markdown";
-import SimpleRatingStats from "./simpleRatingStats";
+import ReviewScoreDisplay from "./reviewScoreDisplay";
 
 export default function BottleOverview({
   bottle,
@@ -35,19 +35,13 @@ export default function BottleOverview({
                 </div>
               </>
             )}
-            {bottle.ratingStats && bottle.ratingStats.total > 0 && (
-              <div className="my-6">
-                <SimpleRatingStats stats={bottle.ratingStats} />
-              </div>
-            )}
-            {bottle.avgScore !== null && bottle.totalScores > 0 && (
+            {bottle.medianScore !== null && bottle.scoreCount >= 20 && (
               <section className="my-6">
-                <Heading as="h3">Peated Community Score</Heading>
+                <Heading as="h3">Review score</Heading>
                 <div className="text-lg">
-                  <AdvancedRatingDisplay
-                    score={bottle.avgScore}
-                    count={bottle.totalScores}
-                    aggregate
+                  <ReviewScoreDisplay
+                    score={bottle.medianScore}
+                    count={bottle.scoreCount}
                   />
                 </div>
                 <Link
@@ -56,6 +50,24 @@ export default function BottleOverview({
                 >
                   How ratings work
                 </Link>
+              </section>
+            )}
+            {Object.values(bottle.tastingBandCounts).some(
+              (count) => count > 0,
+            ) && (
+              <section className="my-6">
+                <Heading as="h3">Tasting ratings</Heading>
+                <dl className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                  {RATING_BANDS.map((band) => (
+                    <div key={band.id} className="rounded bg-slate-900 p-3">
+                      <dt className="font-semibold">{band.label}</dt>
+                      <dd className="text-muted text-sm">
+                        {band.min}–{band.max} ·{" "}
+                        {bottle.tastingBandCounts[band.id]}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
               </section>
             )}
             <div className="my-6">

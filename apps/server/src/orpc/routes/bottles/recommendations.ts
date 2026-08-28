@@ -1,4 +1,3 @@
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles, bottleTombstones, tastings } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -59,7 +58,7 @@ export default procedure
       .where(
         and(
           eq(tastings.bottleId, source.id),
-          eq(tastings.rating, SIMPLE_RATING_VALUES.SAVOR),
+          inArray(tastings.ratingBand, ["outstanding", "unicorn"]),
         ),
       );
 
@@ -85,8 +84,8 @@ export default procedure
       .where(
         and(
           eq(sourceRatings.bottleId, source.id),
-          eq(sourceRatings.rating, SIMPLE_RATING_VALUES.SAVOR),
-          eq(candidateRatings.rating, SIMPLE_RATING_VALUES.SAVOR),
+          inArray(sourceRatings.ratingBand, ["outstanding", "unicorn"]),
+          inArray(candidateRatings.ratingBand, ["outstanding", "unicorn"]),
           ne(candidateRatings.bottleId, source.id),
           activeBottleConditions,
         ),

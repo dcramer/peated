@@ -47,7 +47,7 @@ export default procedure
     path: "/tastings",
     summary: "Create tasting",
     description:
-      "Create a new tasting entry for a bottle with notes, rating, and optional metadata like flight and friends",
+      "Create a new tasting entry for a Bottle with notes, an optional rating band, and tasting details",
     operationId: "createTasting",
   })
   .input(TastingInputSchema)
@@ -79,8 +79,7 @@ export default procedure
 
     const data: Omit<NewTasting, "bottleId"> = {
       notes: input.notes || null,
-      rating: input.rating ?? null,
-      score: input.score ?? null,
+      ratingBand: input.ratingBand ?? null,
       servingStyle: input.servingStyle || null,
       color: input.color || null,
       tags: input.tags ? await validateTags(input.tags) : [],

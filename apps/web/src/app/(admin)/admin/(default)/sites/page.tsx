@@ -61,7 +61,8 @@ export default function Page() {
                   <div>{site.name}</div>
                   <div className="text-muted mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:hidden">
                     <span>
-                      {site.reviews.total.toLocaleString("en-US")} reviews
+                      {site.externalReviews.total.toLocaleString("en-US")}{" "}
+                      reviews
                     </span>
                     <span>
                       {site.priceListings.total.toLocaleString("en-US")} prices
@@ -78,9 +79,10 @@ export default function Page() {
               value: (site) => (
                 <div className="space-y-1 text-sm">
                   <div>
-                    {site.reviews.total.toLocaleString("en-US")} reviews
+                    {site.externalReviews.total.toLocaleString("en-US")} reviews
                     <span className="text-muted ml-2 text-xs">
-                      {site.reviews.matched.toLocaleString("en-US")} matched
+                      {site.externalReviews.matched.toLocaleString("en-US")}{" "}
+                      matched
                     </span>
                   </div>
                   <div>

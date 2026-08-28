@@ -1,4 +1,3 @@
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleGroupDistillers,
@@ -48,10 +47,10 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
   });
   await fixtures.Tasting({
     bottleId: bottle.id,
-    rating: SIMPLE_RATING_VALUES.SIP,
+    ratingBand: "good",
   });
-  await fixtures.Tasting({ bottleId: bottle.id, rating: null, score: 84 });
-  await fixtures.Tasting({ bottleId: bottle.id, rating: null, score: 88 });
+  await fixtures.Tasting({ bottleId: bottle.id, ratingBand: "outstanding" });
+  await fixtures.Tasting({ bottleId: bottle.id, ratingBand: null });
 
   await updateBottleStats({ bottleId: bottle.id });
 
@@ -59,9 +58,9 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
     db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
   ).resolves.toMatchObject({
     totalTastings: 3,
-    avgRating: SIMPLE_RATING_VALUES.SIP,
-    avgScore: 86,
-    totalScores: 2,
+    medianScore: null,
+    memberScoreCount: 0,
+    tastingBandCounts: { good: 1, outstanding: 1 },
   });
   await expect(
     db.query.bottleGroups.findFirst({
@@ -69,9 +68,9 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
     }),
   ).resolves.toMatchObject({
     totalTastings: 3,
-    avgRating: SIMPLE_RATING_VALUES.SIP,
-    avgScore: 86,
-    totalScores: 2,
+    medianScore: null,
+    memberScoreCount: 0,
+    tastingBandCounts: { good: 1, outstanding: 1 },
   });
 
   expect(pushJob).toHaveBeenCalledTimes(3);

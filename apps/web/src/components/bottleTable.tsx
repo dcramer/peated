@@ -5,10 +5,9 @@ import BottleStatusIcons, {
   BottleStatusIndicators,
 } from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
+import ReviewScoreDisplay from "@peated/web/components/reviewScoreDisplay";
 import type { ComponentProps, ReactNode } from "react";
 import BottleIdentity from "./bottleIdentity";
-import BottleRatingSummary from "./bottleRatingSummary";
-import SimpleRatingIndicator from "./simpleRatingIndicator";
 import Table from "./table";
 
 type BottleRow = {
@@ -123,11 +122,13 @@ export default function BottleTable({
                   ) : null}
                 </div>
                 {showRatingSummary ? (
-                  <BottleRatingSummary
-                    avgRating={bottle.avgRating}
-                    totalRatings={bottle.ratingStats.total}
-                    className="w-20 sm:hidden"
-                  />
+                  bottle.medianScore !== null ? (
+                    <ReviewScoreDisplay
+                      score={bottle.medianScore}
+                      showBand={false}
+                      className="w-20 justify-end text-sm sm:hidden"
+                    />
+                  ) : null
                 ) : null}
                 {mobileCollectionActions && (
                   <div className="ml-auto shrink-0 sm:hidden">
@@ -143,12 +144,14 @@ export default function BottleTable({
               {
                 name: "rating-summary",
                 title: "Rating",
-                value: (item: BottleRow) => (
-                  <BottleRatingSummary
-                    avgRating={item.bottle.avgRating}
-                    totalRatings={item.bottle.ratingStats.total}
-                  />
-                ),
+                value: (item: BottleRow) =>
+                  item.bottle.medianScore !== null ? (
+                    <ReviewScoreDisplay
+                      score={item.bottle.medianScore}
+                      count={item.bottle.scoreCount}
+                      showBand={false}
+                    />
+                  ) : null,
                 className: "sm:w-24",
                 align: "center" as const,
               },
@@ -165,11 +168,13 @@ export default function BottleTable({
               },
               {
                 name: "rating",
-                value: (item: BottleRow) => (
-                  <SimpleRatingIndicator
-                    avgRating={item.bottle.avgRating ?? null}
-                  />
-                ),
+                value: (item: BottleRow) =>
+                  item.bottle.medianScore !== null ? (
+                    <ReviewScoreDisplay
+                      score={item.bottle.medianScore}
+                      showBand={false}
+                    />
+                  ) : null,
                 className: "sm:w-20",
                 sortDefaultOrder: "desc" as const,
                 align: "center" as const,

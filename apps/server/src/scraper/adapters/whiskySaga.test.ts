@@ -96,25 +96,23 @@ test("extracts source facts and only direct tasting paragraphs", async () => {
     title: "Example Scotch 18 YO",
     publishedAt: new Date("2026-08-17T20:36:08.000Z"),
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-    reviews: [
+    externalReviews: [
       {
         name: "Example Scotch 18 YO",
         reviewerName: "Thomas Øhrbom",
         nativeScore: { value: 92, scale: 100, display: "92/100" },
-        normalizedRating: 92,
       },
     ],
   });
-  expect(decimalScore?.article.reviews[0]).toMatchObject({
+  expect(decimalScore?.article.externalReviews[0]).toMatchObject({
     nativeScore: { value: 92.5, scale: 100, display: "92,5/100" },
-    normalizedRating: 93,
   });
-  expect(Object.values(parsed?.reviewTexts ?? {})).toEqual([
+  expect(Object.values(parsed?.externalReviewTexts ?? {})).toEqual([
     "Nose: Orchard fruit and soft wax. Palate: Malt, citrus, and gentle oak. Finish: Long and lightly spiced.",
   ]);
-  expect(Object.values(parsed?.reviewTexts ?? {}).join(" ")).not.toMatch(
-    /introduction|price|comment|sláinte/iu,
-  );
+  expect(
+    Object.values(parsed?.externalReviewTexts ?? {}).join(" "),
+  ).not.toMatch(/introduction|price|comment|sláinte/iu);
 });
 
 test("accepts object author metadata", async () => {
@@ -127,7 +125,9 @@ test("accepts object author metadata", async () => {
     new URL(FIRST_URL),
   );
 
-  expect(parsed?.article.reviews[0]?.reviewerName).toBe("Thomas Øhrbom");
+  expect(parsed?.article.externalReviews[0]?.reviewerName).toBe(
+    "Thomas Øhrbom",
+  );
 });
 
 test("skips a clear non-review but rejects an incomplete review", async () => {

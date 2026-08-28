@@ -8,8 +8,7 @@ import {
 } from "./tastingForm";
 
 const fields: TastingFormFields = {
-  rating: 1,
-  score: null,
+  ratingBand: "good",
   notes: "Orchard fruit",
   tags: ["apple"],
   color: 8,

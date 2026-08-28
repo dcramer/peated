@@ -1,30 +1,32 @@
 import { db } from "@peated/server/db";
 import {
   bottleTombstones,
-  reviewArticles,
-  reviews,
+  externalReviewArticles,
+  externalReviews,
 } from "@peated/server/db/schema";
 import {
-  ingestReviewArticle as ingestReviewArticleWithServices,
-  type ReviewIngestionServices,
+  ingestExternalReviewArticle as ingestExternalReviewArticleWithServices,
+  type ExternalReviewIngestionServices,
 } from "@peated/server/externalReviews/ingest";
 import { asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 
-const generateSummaryMock = vi.fn<ReviewIngestionServices["generateSummary"]>();
-const logTelemetryErrorMock = vi.fn<ReviewIngestionServices["reportError"]>();
+const generateSummaryMock =
+  vi.fn<ExternalReviewIngestionServices["generateSummary"]>();
+const logTelemetryErrorMock =
+  vi.fn<ExternalReviewIngestionServices["reportError"]>();
 const pushUniqueJobMock =
-  vi.fn<ReviewIngestionServices["queueMissingBottles"]>();
-const services: ReviewIngestionServices = {
+  vi.fn<ExternalReviewIngestionServices["queueMissingBottles"]>();
+const services: ExternalReviewIngestionServices = {
   generateSummary: generateSummaryMock,
   queueMissingBottles: pushUniqueJobMock,
   reportError: logTelemetryErrorMock,
 };
 
-function ingestReviewArticle(
-  input: Parameters<typeof ingestReviewArticleWithServices>[0],
+function ingestExternalReviewArticle(
+  input: Parameters<typeof ingestExternalReviewArticleWithServices>[0],
 ) {
-  return ingestReviewArticleWithServices(input, services);
+  return ingestExternalReviewArticleWithServices(input, services);
 }
 
 beforeEach(() => {
@@ -37,14 +39,14 @@ test("rejects a missing source before Bottle resolution", async () => {
   const externalSiteId = 2_147_483_647;
 
   await expect(
-    ingestReviewArticle({
+    ingestExternalReviewArticle({
       externalSiteId,
       fetchedAt: new Date("2026-04-13T12:00:00Z"),
       article: {
         canonicalUrl: "https://reviews.example/articles/missing-source",
         title: "Missing source review",
         contentHash: "sha256:missing-source",
-        reviews: [{ sourceKey: "review", name: "Review Bottle" }],
+        externalReviews: [{ sourceKey: "review", name: "Review Bottle" }],
       },
     }),
   ).rejects.toThrow(`External site ${externalSiteId} not found.`);
@@ -59,14 +61,14 @@ test("stores exact aliases and queues model resolution after storage", async ({
   const unresolvedName =
     "Mister Sam Tribute Whiskey (66,9%, OB 2019 (Batch 1), 1200 btl.)";
 
-  const result = await ingestReviewArticle({
+  const result = await ingestExternalReviewArticle({
     externalSiteId: site.id,
     fetchedAt: new Date("2026-04-13T12:00:00Z"),
     article: {
       canonicalUrl: "https://reviews.example/articles/spring-releases",
       title: "Three spring releases reviewed",
       contentHash: "sha256:first",
-      reviews: [
+      externalReviews: [
         { sourceKey: "resolved", name: bottle.fullName },
         {
           sourceKey: "unresolved",
@@ -77,9 +79,12 @@ test("stores exact aliases and queues model resolution after storage", async ({
     },
   });
 
-  expect(await db.select().from(reviewArticles)).toHaveLength(1);
+  expect(await db.select().from(externalReviewArticles)).toHaveLength(1);
   expect(
-    await db.select().from(reviews).orderBy(asc(reviews.sourceKey)),
+    await db
+      .select()
+      .from(externalReviews)
+      .orderBy(asc(externalReviews.sourceKey)),
   ).toMatchObject([
     {
       sourceKey: "resolved",
@@ -116,25 +121,25 @@ test("hides an existing review when its resolved Bottle is retired", async ({
       canonicalUrl: "https://reviews.example/articles/retired-bottle",
       title: "A retired Bottle review",
       contentHash: "sha256:retired",
-      reviews: [{ sourceKey: "retired", name: bottle.fullName }],
+      externalReviews: [{ sourceKey: "retired", name: bottle.fullName }],
     },
   };
 
-  await ingestReviewArticle(input);
+  await ingestExternalReviewArticle(input);
   await db
-    .update(reviews)
+    .update(externalReviews)
     .set({ hidden: false })
-    .where(eq(reviews.sourceKey, "retired"));
+    .where(eq(externalReviews.sourceKey, "retired"));
   await db.insert(bottleTombstones).values({
     bottleId: bottle.id,
     newBottleId: replacement.id,
   });
 
-  await ingestReviewArticle(input);
+  await ingestExternalReviewArticle(input);
 
   expect(
-    await db.query.reviews.findFirst({
-      where: eq(reviews.sourceKey, "retired"),
+    await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.sourceKey, "retired"),
     }),
   ).toMatchObject({
     bottleId: bottle.id,
@@ -149,24 +154,24 @@ test("keeps stored reviews when background dispatch fails", async ({
   const queueError = new Error("queue unavailable");
   pushUniqueJobMock.mockRejectedValue(queueError);
 
-  const result = await ingestReviewArticle({
+  const result = await ingestExternalReviewArticle({
     externalSiteId: site.id,
     fetchedAt: new Date("2026-04-13T12:00:00Z"),
     article: {
       canonicalUrl: "https://reviews.example/articles/queued-later",
       title: "A review queued later",
       contentHash: "sha256:queued-later",
-      reviews: [{ sourceKey: "queued-later", name: "Unknown Bottle" }],
+      externalReviews: [{ sourceKey: "queued-later", name: "Unknown Bottle" }],
     },
   });
 
-  expect(await db.query.reviews.findFirst()).toMatchObject({
+  expect(await db.query.externalReviews.findFirst()).toMatchObject({
     articleId: result.articleId,
     bottleId: null,
   });
   expect(logTelemetryErrorMock).toHaveBeenCalledWith(queueError, {
     extra: {
-      reviewArticleId: result.articleId,
+      externalReviewArticleId: result.articleId,
       externalSiteId: site.id,
     },
   });
@@ -187,19 +192,19 @@ test("stores a generated summary without storing its source text", async ({
     generatedAt,
   });
 
-  await ingestReviewArticle({
+  await ingestExternalReviewArticle({
     externalSiteId: site.id,
     fetchedAt: new Date("2026-04-13T12:00:00Z"),
     article: {
       canonicalUrl: "https://reviews.example/articles/summary",
       title: "A summarized review",
       contentHash: "sha256:summary",
-      reviews: [{ sourceKey: "summary", name: bottle.fullName }],
+      externalReviews: [{ sourceKey: "summary", name: bottle.fullName }],
     },
-    reviewTexts: { summary: sourceText },
+    externalReviewTexts: { summary: sourceText },
   });
 
-  expect(await db.query.reviews.findFirst()).toMatchObject({
+  expect(await db.query.externalReviews.findFirst()).toMatchObject({
     summary:
       "The reviewer finds the whisky balanced. They recommend it for its dry finish.",
     summaryContentHash: "sha256:summary",
@@ -207,9 +212,9 @@ test("stores a generated summary without storing its source text", async ({
     summaryPromptVersion: "external-review-summary-v1",
     summaryGeneratedAt: generatedAt,
   });
-  expect(JSON.stringify(await db.query.reviews.findFirst())).not.toContain(
-    sourceText,
-  );
+  expect(
+    JSON.stringify(await db.query.externalReviews.findFirst()),
+  ).not.toContain(sourceText);
 });
 
 test("stores review metadata when summary generation fails", async ({
@@ -220,19 +225,19 @@ test("stores review metadata when summary generation fails", async ({
   const sourceText = "Publisher text that must not enter the failure log.";
   generateSummaryMock.mockRejectedValue(new Error(sourceText));
 
-  await ingestReviewArticle({
+  await ingestExternalReviewArticle({
     externalSiteId: site.id,
     fetchedAt: new Date("2026-04-13T12:00:00Z"),
     article: {
       canonicalUrl: "https://reviews.example/articles/summary-failure",
       title: "A review with a failed summary",
       contentHash: "sha256:failure",
-      reviews: [{ sourceKey: "failure", name: bottle.fullName }],
+      externalReviews: [{ sourceKey: "failure", name: bottle.fullName }],
     },
-    reviewTexts: { failure: sourceText },
+    externalReviewTexts: { failure: sourceText },
   });
 
-  expect(await db.query.reviews.findFirst()).toMatchObject({
+  expect(await db.query.externalReviews.findFirst()).toMatchObject({
     bottleId: bottle.id,
     sourceKey: "failure",
     summary: null,

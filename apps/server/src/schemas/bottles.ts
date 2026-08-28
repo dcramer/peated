@@ -221,42 +221,44 @@ export const BottleSchema = z.object({
     .readonly()
     .describe("System-generated tags based on the bottle's characteristics"),
 
-  avgRating: z
+  medianScore: z
     .number()
-    .gte(-1)
-    .lte(2)
-    .nullable()
-    .readonly()
-    .describe(
-      "Average rating from simple rating system (-1=Pass, 1=Sip, 2=Savor)",
-    ),
-  avgScore: z
-    .number()
+    .int()
     .gte(0)
     .lte(100)
     .nullable()
     .readonly()
-    .describe("Average 100-point community score for this exact bottle"),
-  totalScores: z
+    .describe("Published median review score for this exact Bottle"),
+  minScore: z.number().int().gte(0).lte(100).nullable().readonly(),
+  maxScore: z.number().int().gte(0).lte(100).nullable().readonly(),
+  memberScoreCount: z
     .number()
+    .int()
     .gte(0)
     .readonly()
-    .describe("Number of 100-point community scores for this exact bottle"),
-  ratingStats: z
+    .describe("Number of member review scores for this exact Bottle"),
+  externalScoreCount: z
+    .number()
+    .int()
+    .gte(0)
+    .readonly()
+    .describe("Number of permitted external scores for this exact Bottle"),
+  scoreCount: z
+    .number()
+    .int()
+    .gte(0)
+    .readonly()
+    .describe("Combined member and external score count"),
+  tastingBandCounts: z
     .object({
-      pass: z.number().describe("Number of Pass (-1) ratings"),
-      sip: z.number().describe("Number of Sip (1) ratings"),
-      savor: z.number().describe("Number of Savor (2) ratings"),
-      total: z.number().describe("Total number of simple ratings"),
-      avg: z.number().nullable().describe("Average simple rating (-1 to 2)"),
-      percentage: z.object({
-        pass: z.number().describe("Percentage of Pass ratings"),
-        sip: z.number().describe("Percentage of Sip ratings"),
-        savor: z.number().describe("Percentage of Savor ratings"),
-      }),
+      mediocre: z.number().int().gte(0),
+      good: z.number().int().gte(0),
+      very_good: z.number().int().gte(0),
+      outstanding: z.number().int().gte(0),
+      unicorn: z.number().int().gte(0),
     })
     .readonly()
-    .describe("Distribution statistics for simple ratings"),
+    .describe("Tasting counts in each rating band"),
   totalTastings: z
     .number()
     .gte(0)

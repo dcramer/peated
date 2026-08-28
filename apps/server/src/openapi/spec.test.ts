@@ -301,10 +301,12 @@ describe("OpenAPI generation ($ref reuse)", () => {
 
   it("publishes direct nullable Bottle identity for reviews and prices", async () => {
     const spec = await generateSpec();
-    const reviewItem = getJsonResponseSchema(spec.paths?.["/reviews"]?.get)
-      ?.properties?.results?.items;
+    const reviewItem = getJsonResponseSchema(
+      spec.paths?.["/external-reviews"]?.get,
+    )?.properties?.results?.items;
     const storePrice = spec.components?.schemas?.StorePrice;
-    const reviewParameters = spec.paths?.["/reviews"]?.get?.parameters ?? [];
+    const reviewParameters =
+      spec.paths?.["/external-reviews"]?.get?.parameters ?? [];
     const reviewParameterNames = reviewParameters.map((parameter) =>
       "name" in parameter ? parameter.name : undefined,
     );
@@ -323,7 +325,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(reviewParameterNames).not.toContain("release");
 
     expectTypeOf<
-      Outputs["reviews"]["list"]["results"][number]["bottle"]
+      Outputs["externalReviews"]["list"]["results"][number]["bottle"]
     >().toEqualTypeOf<z.infer<typeof BottleSchema> | null>();
     expectTypeOf<
       Outputs["bottles"]["prices"]["list"]["results"][number]["bottle"]
@@ -544,7 +546,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     );
     const flightRequest = getJsonRequestSchema(spec.paths?.["/flights"]?.post);
     const reviewRequest = getJsonRequestSchema(
-      spec.paths?.["/reviews/{review}"]?.patch,
+      spec.paths?.["/external-reviews/{externalReview}"]?.patch,
     );
 
     expect(spec.paths?.["/bottles/{bottle}/merge-targets"]).toBeUndefined();
@@ -582,7 +584,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectTypeOf<Inputs["flights"]["create"]["bottles"]>().toEqualTypeOf<
       number[] | undefined
     >();
-    expectTypeOf<Inputs["reviews"]["update"]["bottle"]>().toEqualTypeOf<
+    expectTypeOf<Inputs["externalReviews"]["update"]["bottle"]>().toEqualTypeOf<
       number | null | undefined
     >();
   });

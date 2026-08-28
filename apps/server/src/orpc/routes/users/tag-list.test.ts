@@ -14,19 +14,19 @@ describe("GET /users/:user/tags", () => {
     await fixtures.Tasting({
       bottleId: bottle.id,
       tags: ["solvent", "caramel"],
-      rating: 5,
+      ratingBand: "good",
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle.id,
       tags: ["caramel"],
-      rating: 5,
+      ratingBand: "good",
       createdById: defaults.user.id,
     });
     await fixtures.Tasting({
       bottleId: bottle2.id,
       tags: ["cedar", "caramel"],
-      rating: 5,
+      ratingBand: "good",
     });
 
     const { results, totalCount } = await routerClient.users.tagList(

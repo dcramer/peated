@@ -59,14 +59,14 @@ export const mockUserRegionList = {
 
 export const mockUserFlavorList = {
   results: [
-    { flavorProfile: "peated", count: 11, score: 19 },
-    { flavorProfile: "deep_rich_dried_fruit", count: 8, score: 13 },
-    { flavorProfile: "oily_coastal", count: 6, score: 11 },
-    { flavorProfile: "juicy_oak_vanilla", count: 6, score: 7 },
-    { flavorProfile: "spicy_sweet", count: 5, score: 7 },
-    { flavorProfile: "light_delicate", count: 3, score: 4 },
+    { flavorProfile: "peated", count: 11, topBandCount: 7 },
+    { flavorProfile: "deep_rich_dried_fruit", count: 8, topBandCount: 5 },
+    { flavorProfile: "oily_coastal", count: 6, topBandCount: 4 },
+    { flavorProfile: "juicy_oak_vanilla", count: 6, topBandCount: 3 },
+    { flavorProfile: "spicy_sweet", count: 5, topBandCount: 2 },
+    { flavorProfile: "light_delicate", count: 3, topBandCount: 1 },
   ],
-  totalScore: 61,
+  totalTopBandCount: 22,
   totalCount: 42,
 } satisfies MockOutputs["users"]["flavorList"];
 
@@ -87,11 +87,13 @@ export const mockAgeStats = {
 export const mockUserTastingStats = {
   total: 42,
   uniqueBottles: 31,
-  ratings: {
+  bands: {
     total: 42,
-    pass: 2,
-    sip: 15,
-    savor: 25,
+    mediocre: 2,
+    good: 8,
+    very_good: 10,
+    outstanding: 15,
+    unicorn: 7,
   },
   mostTastedBottle: {
     id: mockBottle.id,

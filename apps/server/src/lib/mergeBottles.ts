@@ -20,9 +20,10 @@ import {
   changes,
   collectionBottles,
   collections,
+  externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
-  reviews,
+  memberReviews,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -302,6 +303,50 @@ async function assertNoTastingCollision(
   }
 }
 
+async function consolidateMemberReviews(
+  tx: AnyTransaction,
+  sourceBottleId: number,
+  destinationBottleId: number,
+) {
+  const rows = await tx
+    .select()
+    .from(memberReviews)
+    .where(
+      inArray(memberReviews.bottleId, [sourceBottleId, destinationBottleId]),
+    )
+    .orderBy(
+      asc(memberReviews.createdById),
+      asc(memberReviews.updatedAt),
+      asc(memberReviews.id),
+    )
+    .for("update");
+  const rowsByMember = new Map<number, typeof rows>();
+  for (const row of rows) {
+    const memberRows = rowsByMember.get(row.createdById) ?? [];
+    memberRows.push(row);
+    rowsByMember.set(row.createdById, memberRows);
+  }
+
+  let moved = 0;
+  let collapsed = 0;
+  for (const memberRows of rowsByMember.values()) {
+    const survivor = memberRows.at(-1)!;
+    for (const row of memberRows) {
+      if (row.id === survivor.id) continue;
+      await tx.delete(memberReviews).where(eq(memberReviews.id, row.id));
+      collapsed += 1;
+    }
+    if (survivor.bottleId === sourceBottleId) {
+      await tx
+        .update(memberReviews)
+        .set({ bottleId: destinationBottleId })
+        .where(eq(memberReviews.id, survivor.id));
+      moved += 1;
+    }
+  }
+  return { moved, collapsed };
+}
+
 interface BottleConsumerCounts {
   [name: string]: number;
   collectionMembershipsMoved: number;
@@ -326,16 +371,23 @@ async function repointBottleConsumers(
     sourceBottleId,
     destinationBottleId,
   );
+  const memberReviewChanges = await consolidateMemberReviews(
+    tx,
+    sourceBottleId,
+    destinationBottleId,
+  );
 
   const counts: BottleConsumerCounts = {
     collectionMembershipsMoved: collectionMemberships.moved,
     collectionMembershipsCollapsed: collectionMemberships.collapsed,
     flightMembershipsMoved: flightMemberships.moved,
     flightMembershipsCollapsed: flightMemberships.collapsed,
+    memberReviewsMoved: memberReviewChanges.moved,
+    memberReviewsCollapsed: memberReviewChanges.collapsed,
   };
   for (const [name, table, column] of [
     ["tastings", tastings, tastings.bottleId],
-    ["reviews", reviews, reviews.bottleId],
+    ["reviews", externalReviews, externalReviews.bottleId],
     ["storePrices", storePrices, storePrices.bottleId],
     ["bottleObservations", bottleObservations, bottleObservations.bottleId],
     ["bottleBarcodes", bottleBarcodes, bottleBarcodes.bottleId],
@@ -478,9 +530,15 @@ export async function lockBottleMergeDependencies(
     .for("update");
   await tx
     .select()
-    .from(reviews)
-    .where(inArray(reviews.bottleId, bottleIds))
-    .orderBy(asc(reviews.id))
+    .from(externalReviews)
+    .where(inArray(externalReviews.bottleId, bottleIds))
+    .orderBy(asc(externalReviews.id))
+    .for("update");
+  await tx
+    .select()
+    .from(memberReviews)
+    .where(inArray(memberReviews.bottleId, bottleIds))
+    .orderBy(asc(memberReviews.createdById), asc(memberReviews.id))
     .for("update");
   await tx
     .select()

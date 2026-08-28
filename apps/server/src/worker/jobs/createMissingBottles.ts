@@ -1,5 +1,8 @@
 import { db } from "@peated/server/db";
-import { reviewArticles, reviews } from "@peated/server/db/schema";
+import {
+  externalReviewArticles,
+  externalReviews,
+} from "@peated/server/db/schema";
 import {
   getExternalReviewPublicationModeInTransaction,
   publishResolvedReview,
@@ -48,19 +51,22 @@ export async function createMissingBottles(
   let hasMore = true;
   while (hasMore) {
     const missingInReviews = await db
-      .select({ article: reviewArticles, review: reviews })
-      .from(reviews)
-      .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+      .select({ article: externalReviewArticles, review: externalReviews })
+      .from(externalReviews)
+      .innerJoin(
+        externalReviewArticles,
+        eq(externalReviews.articleId, externalReviewArticles.id),
+      )
       .where(
         and(
-          isNull(reviews.bottleId),
-          gt(reviews.id, cursor),
+          isNull(externalReviews.bottleId),
+          gt(externalReviews.id, cursor),
           articleId === undefined
             ? undefined
-            : eq(reviewArticles.id, articleId),
+            : eq(externalReviewArticles.id, articleId),
         ),
       )
-      .orderBy(asc(reviews.id))
+      .orderBy(asc(externalReviews.id))
       .limit(100);
 
     hasMore = missingInReviews.length > 0;

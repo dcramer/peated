@@ -10,7 +10,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /users/:user/flavors", () => {
-  test("uses Bottle-owned flavors and preserves null-rating behavior", async ({
+  test("uses Bottle-owned flavors and top tasting bands", async ({
     defaults,
     fixtures,
   }) => {
@@ -44,42 +44,42 @@ describe("GET /users/:user/flavors", () => {
     await Promise.all([
       fixtures.Tasting({
         bottleId: peatedBottle.id,
-        rating: 2,
+        ratingBand: "outstanding",
         createdById: defaults.user.id,
       }),
       fixtures.Tasting({
         bottleId: spicyBottle.id,
-        rating: 1,
+        ratingBand: "good",
         createdById: defaults.user.id,
       }),
       fixtures.Tasting({
         bottleId: youngBottle.id,
-        rating: 2,
+        ratingBand: "unicorn",
         createdById: defaults.user.id,
       }),
       fixtures.Tasting({
         bottleId: sweetBottle.id,
-        rating: 1,
+        ratingBand: "good",
         createdById: defaults.user.id,
       }),
       fixtures.Tasting({
         bottleId: oldBottle.id,
-        rating: 2,
+        ratingBand: "outstanding",
         createdById: defaults.user.id,
       }),
       fixtures.Tasting({
         bottleId: nullFlavorBottle.id,
-        rating: 2,
+        ratingBand: "unicorn",
         createdById: defaults.user.id,
       }),
       fixtures.Tasting({
         bottleId: nullRatingBottle.id,
-        rating: null,
+        ratingBand: null,
         createdById: defaults.user.id,
       }),
       fixtures.Tasting({
         bottleId: peatedBottle.id,
-        rating: 2,
+        ratingBand: "outstanding",
       }),
     ]);
 
@@ -90,14 +90,14 @@ describe("GET /users/:user/flavors", () => {
 
     expect(response).toEqual({
       results: [
-        { flavorProfile: "spicy_sweet", count: 1, score: 0 },
-        { flavorProfile: "old_dignified", count: 1, score: 2 },
-        { flavorProfile: "peated", count: 1, score: 2 },
-        { flavorProfile: "young_spritely", count: 1, score: 2 },
-        { flavorProfile: "spicy_dry", count: 1, score: 1 },
-        { flavorProfile: "sweet_fruit_mellow", count: 1, score: 1 },
+        { flavorProfile: "old_dignified", count: 1, topBandCount: 1 },
+        { flavorProfile: "peated", count: 1, topBandCount: 1 },
+        { flavorProfile: "young_spritely", count: 1, topBandCount: 1 },
+        { flavorProfile: "spicy_dry", count: 1, topBandCount: 0 },
+        { flavorProfile: "spicy_sweet", count: 1, topBandCount: 0 },
+        { flavorProfile: "sweet_fruit_mellow", count: 1, topBandCount: 0 },
       ],
-      totalScore: 10,
+      totalTopBandCount: 4,
       totalCount: 7,
     });
   });
@@ -110,7 +110,7 @@ describe("GET /users/:user/flavors", () => {
     await db.insert(tastings).values(
       Array.from({ length: 201 }, (_, index) => ({
         bottleId: bottle.id,
-        rating: 1,
+        ratingBand: "good" as const,
         createdById: defaults.user.id,
         createdAt: new Date(Date.UTC(2026, 0, 1, 0, 0, index)),
       })),
@@ -122,8 +122,8 @@ describe("GET /users/:user/flavors", () => {
     );
 
     expect(response).toEqual({
-      results: [{ flavorProfile: "peated", count: 201, score: 201 }],
-      totalScore: 201,
+      results: [{ flavorProfile: "peated", count: 201, topBandCount: 0 }],
+      totalTopBandCount: 0,
       totalCount: 201,
     });
   });
@@ -177,7 +177,11 @@ describe("GET /users/:user/flavors", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(response).toEqual({ results: [], totalCount: 0, totalScore: 0 });
+    expect(response).toEqual({
+      results: [],
+      totalCount: 0,
+      totalTopBandCount: 0,
+    });
   });
 
   test("can list public without friend", async ({ defaults, fixtures }) => {
@@ -188,6 +192,10 @@ describe("GET /users/:user/flavors", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(response).toEqual({ results: [], totalCount: 0, totalScore: 0 });
+    expect(response).toEqual({
+      results: [],
+      totalCount: 0,
+      totalTopBandCount: 0,
+    });
   });
 });

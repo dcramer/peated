@@ -1,5 +1,6 @@
 "use client";
 
+import { RATING_BANDS } from "@peated/server/constants";
 import { formatFlavorProfile } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import AgeInsightCard from "@peated/web/components/ageInsightCard";
@@ -9,7 +10,6 @@ import {
   RankedInsightBars,
 } from "@peated/web/components/insightCard";
 import Link from "@peated/web/components/link";
-import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
 import classNames from "@peated/web/lib/classNames";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -125,24 +125,26 @@ export function TastingSnapshotCard({
   stats: TastingStats;
   className?: string;
 }) {
-  const ratingPercentage = (count: number) =>
-    stats.ratings.total ? (count / stats.ratings.total) * 100 : 0;
   const repeatPours = stats.total - stats.uniqueBottles;
 
   return (
     <InsightCard title="Tasting snapshot" className={className}>
       <div className="grid flex-1 gap-6 sm:grid-cols-[minmax(0,1.35fr)_minmax(12rem,0.65fr)] sm:divide-x sm:divide-slate-800">
-        <SimpleRatingStats
-          stats={{
-            ...stats.ratings,
-            avg: null,
-            percentage: {
-              pass: ratingPercentage(stats.ratings.pass),
-              sip: ratingPercentage(stats.ratings.sip),
-              savor: ratingPercentage(stats.ratings.savor),
-            },
-          }}
-        />
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-1">
+          {RATING_BANDS.map((band) => (
+            <div key={band.id} className="flex justify-between gap-3 text-sm">
+              <dt>
+                {band.label}{" "}
+                <span className="text-muted">
+                  {band.min}–{band.max}
+                </span>
+              </dt>
+              <dd className="font-semibold tabular-nums">
+                {stats.bands[band.id].toLocaleString()}
+              </dd>
+            </div>
+          ))}
+        </dl>
         <div className="flex flex-col justify-center sm:pl-6">
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-white">

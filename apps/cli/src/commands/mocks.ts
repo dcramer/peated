@@ -5,9 +5,9 @@ import type { Bottle, Entity, ExternalSite } from "@peated/server/db/schema";
 import {
   bottles,
   collectionBottles,
+  externalReviewArticles,
+  externalReviews,
   externalSites,
-  reviewArticles,
-  reviews,
   tastings,
   users,
 } from "@peated/server/db/schema";
@@ -230,24 +230,27 @@ const loadDefaultBottles = async (
         }));
 
       const [review] = await db
-        .select({ id: reviews.id })
-        .from(reviews)
-        .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
+        .select({ id: externalReviews.id })
+        .from(externalReviews)
+        .innerJoin(
+          externalReviewArticles,
+          eq(externalReviews.articleId, externalReviewArticles.id),
+        )
         .where(
           and(
-            eq(reviewArticles.externalSiteId, site.id),
-            eq(reviews.bottleId, bottle.id),
+            eq(externalReviewArticles.externalSiteId, site.id),
+            eq(externalReviews.bottleId, bottle.id),
           ),
         )
         .limit(1);
       if (!review) {
-        await Fixtures.Review({
+        await Fixtures.ExternalReview({
           externalSiteId: site.id,
           bottleId: bottle.id,
         });
       }
 
-      await Fixtures.Review({
+      await Fixtures.ExternalReview({
         externalSiteId: site.id,
         bottleId: null,
       });
@@ -558,7 +561,7 @@ subcommand
               .orderBy(sql`RANDOM()`)
               .limit(1)
           )[0].id,
-          rating: 4.5,
+          ratingBand: "outstanding",
           createdById: toUserId,
         })
         .returning();

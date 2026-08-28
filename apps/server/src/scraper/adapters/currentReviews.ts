@@ -1,4 +1,4 @@
-import type { ReviewArticleIngestion } from "@peated/server/externalReviews/observation";
+import type { ExternalReviewArticleIngestion } from "@peated/server/externalReviews/observation";
 import { z } from "zod";
 import type { ScraperResponse, ScraperSession } from "../types";
 
@@ -30,11 +30,11 @@ export async function processCurrentReviews<TArticle>({
   articles: readonly TArticle[];
   articleUrl: (article: TArticle) => URL;
   cursor: CurrentReviewCursor | null;
-  session: ScraperSession<CurrentReviewCursor, ReviewArticleIngestion>;
+  session: ScraperSession<CurrentReviewCursor, ExternalReviewArticleIngestion>;
   parse: (
     response: ScraperResponse,
     article: TArticle,
-  ) => ReviewArticleIngestion | null;
+  ) => ExternalReviewArticleIngestion | null;
 }) {
   const currentUrls = new Set(
     articles.map((article) => articleUrl(article).href),
@@ -52,7 +52,7 @@ export async function processCurrentReviews<TArticle>({
     if (observation) {
       await session.emit({
         sourceKey: observation.article.canonicalUrl,
-        itemCount: observation.article.reviews.length,
+        itemCount: observation.article.externalReviews.length,
         value: observation,
       });
     }

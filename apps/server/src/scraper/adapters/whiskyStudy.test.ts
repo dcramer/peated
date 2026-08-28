@@ -46,25 +46,23 @@ test("extracts source facts and only direct tasting paragraphs", async () => {
     title: "Example Scotch 18 Year Shelf Review",
     publishedAt: new Date("2026-07-04T19:03:15.000Z"),
     contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
-    reviews: [
+    externalReviews: [
       {
         name: "Example Scotch 18 Year",
         reviewerName: "Chris Ellis",
         nativeScore: { value: 92, scale: 100, display: "92/100" },
-        normalizedRating: 92,
       },
     ],
   });
-  expect(decimalScore?.article.reviews[0]).toMatchObject({
+  expect(decimalScore?.article.externalReviews[0]).toMatchObject({
     nativeScore: { value: 92.5, scale: 100, display: "92,5/100" },
-    normalizedRating: 93,
   });
-  expect(Object.values(parsed?.reviewTexts ?? {})).toEqual([
+  expect(Object.values(parsed?.externalReviewTexts ?? {})).toEqual([
     "Nose: Orchard fruit and soft wax. Palate: Malt, citrus, and gentle oak. Finish: Long and lightly spiced.",
   ]);
-  expect(Object.values(parsed?.reviewTexts ?? {}).join(" ")).not.toMatch(
-    /introduction|price|age:|review date|final thoughts/iu,
-  );
+  expect(
+    Object.values(parsed?.externalReviewTexts ?? {}).join(" "),
+  ).not.toMatch(/introduction|price|age:|review date|final thoughts/iu);
 });
 
 test("skips a clear non-review but rejects an incomplete review", async () => {

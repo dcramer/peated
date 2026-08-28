@@ -114,10 +114,12 @@ export default function Layout(props: {
           </div>
           <dl className="mt-5 grid w-full max-w-2xl grid-cols-2 divide-x divide-slate-800 self-center sm:grid-cols-4 sm:self-start">
             <div className="flex flex-col px-3 text-center first:pl-0 sm:text-left">
-              <dt className="text-muted order-2 text-xs sm:text-sm">Reviews</dt>
+              <dt className="text-muted order-2 text-xs sm:text-sm">
+                External reviews
+              </dt>
               <dd className="order-1 text-lg font-bold tracking-wide text-white">
-                {site.reviews.matched.toLocaleString("en-US")} /{" "}
-                {site.reviews.total.toLocaleString("en-US")}
+                {site.externalReviews.matched.toLocaleString("en-US")} /{" "}
+                {site.externalReviews.total.toLocaleString("en-US")}
               </dd>
             </div>
             <div className="flex flex-col px-3 text-center sm:text-left">
@@ -168,10 +170,10 @@ export default function Layout(props: {
         </TabItem>
         <TabItem
           as={Link}
-          href={`/admin/sites/${site.type}/reviews`}
+          href={`/admin/sites/${site.type}/external-reviews`}
           controlled
         >
-          Reviews
+          External reviews
         </TabItem>
         <TabItem as={Link} href={`/admin/sites/${site.type}/runs`} controlled>
           Runs

@@ -12,7 +12,9 @@ import {
 import { signIn } from "./session";
 
 test.describe("Bottle releases", () => {
-  test("renders exact release identity and ratings", async ({ page }) => {
+  test("renders exact release identity and hides low-count scores", async ({
+    page,
+  }) => {
     await page.goto(`/bottles/${bottleGroupRepresentative.id}/releases`);
 
     await expect(
@@ -49,7 +51,10 @@ test.describe("Bottle releases", () => {
       has: page.locator(`a[href="/bottles/${bottleGroupRepresentative.id}"]`),
     });
     await expect(representativeItem.getByText("Cask 42")).toBeVisible();
-    await expect(releases.getByText("0 ratings")).toHaveCount(3);
+    await expect(
+      releases.getByText("Median review score across releases"),
+    ).toHaveCount(0);
+    await expect(releases.getByText(/\d+ points/)).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
 
     await page.goto(`/bottles/${bottleGroupMember.id}/releases`);

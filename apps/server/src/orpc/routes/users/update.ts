@@ -60,13 +60,6 @@ export default procedure
       data.private = input.private;
     }
 
-    if (
-      input.ratingSystem !== undefined &&
-      input.ratingSystem !== user.ratingSystem
-    ) {
-      data.ratingSystem = input.ratingSystem;
-    }
-
     if (input.admin !== undefined && input.admin !== user.admin) {
       if (!context.user.admin) {
         throw errors.FORBIDDEN({

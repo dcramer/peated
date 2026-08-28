@@ -79,13 +79,14 @@ The adapter emits one strict article observation with:
   hash;
 - one or more Bottle review observations;
 - a stable key, Bottle name, optional reviewer, optional native score, and
-  optional normalized compatibility rating for each review.
+  exact source display text for each scored review.
 
 Review keys must be unique within the article and stable across runs. Array
 position is not a stable key. One article can own several reviews.
 
-All review adapters emit `ReviewArticleIngestionSchema` and use the shared
-review sink. Do not translate a source-specific review shape in the sink.
+All review adapters emit `ExternalReviewArticleIngestionSchema` and use the
+shared external-review sink. Do not translate a source-specific review shape
+in the sink.
 
 ### Review source acceptance rules
 
@@ -101,8 +102,8 @@ once in the scraper module. Each adapter test owns only publisher behavior.
 3. Test discovery with current publisher markup and unrelated links. The
    adapter must select only planned review URLs.
 4. Test one normal article. Verify its canonical URL, title, publication date,
-   writer, Bottle name, native score, normalized rating, and permitted summary
-   text.
+   writer, Bottle name, native score, source display text, and permitted
+   summary text.
 5. Test every source shape that can contain several reviews. Include repeated
    Bottle names or writers when the publisher can show them. Review keys must
    stay stable and unique without using array position alone.
@@ -126,9 +127,9 @@ once in the scraper module. Each adapter test owns only publisher behavior.
     successful parser test is not enough if the run defers without progress or
     fails after partial ingestion.
 
-The production registry test automatically requires every external site marked
-as review content to use `ReviewArticleIngestionSchema` and the shared review
-sink.
+The production registry test requires every external site marked as review
+content to use `ExternalReviewArticleIngestionSchema` and the shared
+external-review sink.
 
 The adapter does not access the database, select a Peated Bottle, decide public
 visibility, call a model, or store records. The sink and external-review
@@ -144,8 +145,8 @@ snapshot.
 If an enabled source supplies text for summary generation, keep it separate
 from the strict article metadata. A source-specific in-memory observation can
 carry only the text needed by its sink. The sink passes that text directly to
-the ingestion boundary as `reviewTexts`, keyed by the review source key. The
-scraper runtime does not persist observations.
+the ingestion boundary as `externalReviewTexts`, keyed by the external review
+source key. The scraper runtime does not persist observations.
 
 The summary boundary sends the text to the model only when
 `allowLlmProcessing` is active. It uses provider storage disabled. It returns
@@ -243,7 +244,7 @@ most five single-Bottle review URLs. Requests are at least 30 seconds apart.
 The target allows 10 requests per hour, and each worker pass stops after eight
 source requests plus the governed robots request when its cache is stale. The
 adapter stores the explicit date, canonical link, and Fred
-Minnick reviewer attribution. Native and normalized scores stay absent. Only
+Minnick reviewer attribution. Native scores stay absent. Only
 direct tasting paragraphs stay transient for summary generation; comparisons,
 introductions, prices, related links, and site furniture are excluded.
 

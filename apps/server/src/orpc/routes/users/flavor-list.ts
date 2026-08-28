@@ -25,29 +25,26 @@ export default implement(userFlavorListContract).handler(async function ({
     });
   }
 
-  const byFlavor = new Map<
-    string,
-    { count: number; score: number; hasRating: boolean }
-  >();
+  const byFlavor = new Map<string, { count: number; topBandCount: number }>();
   let totalCount = 0;
-  let totalScore = 0;
+  let totalTopBandCount = 0;
 
   try {
     for await (const rows of scanUserTastingBottles(user.id)) {
-      for (const { bottle, rating } of rows) {
+      for (const { bottle, ratingBand } of rows) {
         totalCount += 1;
-        totalScore += rating ?? 0;
+        const isTopBand =
+          ratingBand === "outstanding" || ratingBand === "unicorn";
+        if (isTopBand) totalTopBandCount += 1;
 
         if (!bottle?.flavorProfile) continue;
 
         const current = byFlavor.get(bottle.flavorProfile) ?? {
           count: 0,
-          score: 0,
-          hasRating: false,
+          topBandCount: 0,
         };
         current.count += 1;
-        current.score += rating ?? 0;
-        current.hasRating ||= rating !== null;
+        if (isTopBand) current.topBandCount += 1;
         byFlavor.set(bottle.flavorProfile, current);
       }
     }
@@ -61,22 +58,19 @@ export default implement(userFlavorListContract).handler(async function ({
   const results = Array.from(byFlavor, ([flavorProfile, stats]) => ({
     flavorProfile,
     count: stats.count,
-    score: stats.score,
-    hasRating: stats.hasRating,
+    topBandCount: stats.topBandCount,
   }))
     .sort(
       (left, right) =>
-        Number(left.hasRating) - Number(right.hasRating) ||
-        right.score - left.score ||
+        right.topBandCount - left.topBandCount ||
         right.count - left.count ||
         left.flavorProfile.localeCompare(right.flavorProfile),
     )
-    .slice(0, 25)
-    .map(({ hasRating: _, ...result }) => result);
+    .slice(0, 25);
 
   return {
     results,
-    totalScore,
+    totalTopBandCount,
     totalCount,
   };
 });

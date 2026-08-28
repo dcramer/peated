@@ -14,7 +14,7 @@ describe("GET /users/:user/tasting-stats", () => {
       await fixtures.Tasting({
         bottleId: bottle.id,
         createdById: defaults.user.id,
-        rating: null,
+        ratingBand: null,
       });
     }
 
@@ -29,7 +29,14 @@ describe("GET /users/:user/tasting-stats", () => {
     expect(data).toEqual({
       total: 5,
       uniqueBottles: 5,
-      ratings: { total: 0, pass: 0, sip: 0, savor: 0 },
+      bands: {
+        total: 0,
+        mediocre: 0,
+        good: 0,
+        very_good: 0,
+        outstanding: 0,
+        unicorn: 0,
+      },
       mostTastedBottle: null,
       age: {
         knownCount: 4,
@@ -57,7 +64,14 @@ describe("GET /users/:user/tasting-stats", () => {
 
     expect(data.total).toBe(0);
     expect(data.uniqueBottles).toBe(0);
-    expect(data.ratings).toEqual({ total: 0, pass: 0, sip: 0, savor: 0 });
+    expect(data.bands).toEqual({
+      total: 0,
+      mediocre: 0,
+      good: 0,
+      very_good: 0,
+      outstanding: 0,
+      unicorn: 0,
+    });
     expect(data.mostTastedBottle).toBeNull();
     expect(data.age).toMatchObject({
       knownCount: 0,
@@ -67,24 +81,24 @@ describe("GET /users/:user/tasting-stats", () => {
     expect(data.age.buckets.every((bucket) => bucket.count === 0)).toBe(true);
   });
 
-  test("summarizes ratings and repeated bottles", async ({
+  test("summarizes bands and repeated Bottles", async ({
     defaults,
     fixtures,
   }) => {
     const favorite = await fixtures.Bottle({ fullName: "Favorite Bottle" });
     const occasional = await fixtures.Bottle({ fullName: "Occasional Bottle" });
     const tastingInputs = [
-      { bottleId: favorite.id, rating: 2, day: 1 },
-      { bottleId: favorite.id, rating: 2, day: 2 },
-      { bottleId: favorite.id, rating: 1, day: 3 },
-      { bottleId: occasional.id, rating: -1, day: 4 },
-      { bottleId: occasional.id, rating: null, day: 5 },
+      { bottleId: favorite.id, ratingBand: "unicorn" as const, day: 1 },
+      { bottleId: favorite.id, ratingBand: "outstanding" as const, day: 2 },
+      { bottleId: favorite.id, ratingBand: "good" as const, day: 3 },
+      { bottleId: occasional.id, ratingBand: "mediocre" as const, day: 4 },
+      { bottleId: occasional.id, ratingBand: null, day: 5 },
     ];
 
-    for (const { bottleId, rating, day } of tastingInputs) {
+    for (const { bottleId, ratingBand, day } of tastingInputs) {
       await fixtures.Tasting({
         bottleId,
-        rating,
+        ratingBand,
         createdById: defaults.user.id,
         createdAt: new Date(`2026-01-0${day}T00:00:00.000Z`),
       });
@@ -98,7 +112,14 @@ describe("GET /users/:user/tasting-stats", () => {
     expect(data).toMatchObject({
       total: 5,
       uniqueBottles: 2,
-      ratings: { total: 4, pass: 1, sip: 1, savor: 2 },
+      bands: {
+        total: 4,
+        mediocre: 1,
+        good: 1,
+        very_good: 0,
+        outstanding: 1,
+        unicorn: 1,
+      },
       mostTastedBottle: {
         id: favorite.id,
         name: favorite.fullName,

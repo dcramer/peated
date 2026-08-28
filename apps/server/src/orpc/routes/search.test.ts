@@ -253,11 +253,11 @@ describe("GET /search", () => {
   }) => {
     const lessRated = await fixtures.Bottle({
       name: "Tienneedle Alpha",
-      totalScores: 1,
+      memberScoreCount: 1,
     });
     const moreRated = await fixtures.Bottle({
       name: "Tienneedle Beta",
-      totalScores: 5,
+      memberScoreCount: 5,
     });
 
     const data = await routerClient.search({

@@ -41,7 +41,7 @@ test.describe("log tasting", () => {
       page.getByRole("heading", { name: "Bottle found" }),
     ).toBeHidden();
     await expect(page.getByTitle(existingBottle.fullName)).toBeVisible();
-    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByRole("button", { name: /^Very good/ }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     await uploadTastingImage(page);
     const createRequestPromise = waitForTastingCreate(page);
@@ -72,7 +72,7 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByRole("button", { name: /^Very good/ }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     await uploadTastingImage(page);
 
@@ -132,7 +132,7 @@ test.describe("log tasting", () => {
         name: existingBottle.fullName,
       }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByRole("button", { name: /^Very good/ }).click();
     await page.getByLabel("Comments").fill(photoTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -167,7 +167,7 @@ test.describe("log tasting", () => {
         name: existingBottle.fullName,
       }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByRole("button", { name: /^Very good/ }).click();
     await page.getByLabel("Comments").fill(failingTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
 

@@ -19,6 +19,7 @@ import {
   mockEntity,
   mockEntityCatalog,
   mockEvents,
+  mockExternalReview,
   mockFlight,
   mockFlights,
   mockFriendDetails,
@@ -28,7 +29,6 @@ import {
   mockPublicUserDetails,
   mockRegion,
   mockRegions,
-  mockReview,
   mockStats,
   mockTasting,
   mockUser,
@@ -155,7 +155,7 @@ describe("mock oRPC router", () => {
       new Set(bottles.results.map((bottle) => bottle.flavorProfile)).size,
     ).toBeGreaterThan(4);
     expect(
-      new Set(bottles.results.map((bottle) => bottle.avgScore)).size,
+      new Set(bottles.results.map((bottle) => bottle.medianScore)).size,
     ).toBeGreaterThan(4);
     expect(bottles.results.some((bottle) => bottle.imageUrl !== null)).toBe(
       true,
@@ -215,16 +215,18 @@ describe("mock oRPC router", () => {
   });
 
   it("completes bottle, entity, and tasting detail pages", async () => {
-    const reviews = await anonymousClient.reviews.list({
+    const externalReviews = await anonymousClient.externalReviews.list({
       bottle: mockBottle.id,
       sort: "name",
     });
-    expect(reviews.results).toHaveLength(3);
-    expect(reviews.results).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: mockReview.id })]),
+    expect(externalReviews.results).toHaveLength(3);
+    expect(externalReviews.results).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: mockExternalReview.id }),
+      ]),
     );
     expect(
-      new Set(reviews.results.map((review) => review.site?.type)).size,
+      new Set(externalReviews.results.map((review) => review.site?.type)).size,
     ).toBe(3);
 
     await expect(
@@ -391,18 +393,18 @@ describe("mock oRPC router", () => {
     });
 
     await expect(
-      anonymousClient.reviews.list({ sort: "name" }),
+      anonymousClient.externalReviews.list({ sort: "name" }),
     ).rejects.toMatchObject({
       code: "BAD_REQUEST",
-      message: "Must be a moderator to list all reviews.",
+      message: "Must be a moderator to list all external reviews.",
     });
 
-    const whiskyAdvocateReviews = await anonymousClient.reviews.list({
+    const whiskyAdvocateReviews = await anonymousClient.externalReviews.list({
       site: "whiskyadvocate",
       sort: "recent",
     });
     expect(whiskyAdvocateReviews.results.map((review) => review.id)).toEqual([
-      mockReview.id,
+      mockExternalReview.id,
     ]);
   });
 

@@ -16,7 +16,7 @@ export default procedure
     path: "/admin/moderation/history",
     summary: "List moderation history",
     description:
-      "Project durable listing decisions, operation reviews, and audit closures. Requires administrator privileges.",
+      "Project durable listing decisions, operation externalReviews, and audit closures. Requires administrator privileges.",
     operationId: "listModerationHistory",
   })
   .input(ModerationHistoryListInputSchema)

@@ -159,21 +159,11 @@ export default implement(bottleListContract).handler(async function ({
       sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
     );
   }
-  if (rest.minRating !== null && rest.minRating !== undefined) {
-    // Filter by minimum average rating
-    // This ensures bottles have at least some ratings and meet the minimum threshold
-    where.push(
-      and(
-        sql`${bottles.avgRating} IS NOT NULL`,
-        sql`${bottles.avgRating} >= ${rest.minRating}`,
-      ),
-    );
-  }
   if (rest.minScore !== null && rest.minScore !== undefined) {
     where.push(
       and(
-        sql`${bottles.avgScore} IS NOT NULL`,
-        sql`${bottles.avgScore} >= ${rest.minScore}`,
+        sql`${bottles.medianScore} IS NOT NULL`,
+        sql`${bottles.medianScore} >= ${rest.minScore}`,
       ),
     );
   }
@@ -236,12 +226,6 @@ export default implement(bottleListContract).handler(async function ({
     case "tastings":
       orderBy = asc(bottles.totalTastings);
       break;
-    case "rating":
-      orderBy = sql`${bottles.avgRating} ASC NULLS LAST`;
-      break;
-    case "-rating":
-      orderBy = sql`${bottles.avgRating} DESC NULLS LAST`;
-      break;
     case "-release":
       orderBy = sql`
           COALESCE(${bottles.releaseYear}, EXTRACT(YEAR FROM ${bottles.createdAt})) DESC,
@@ -251,10 +235,10 @@ export default implement(bottleListContract).handler(async function ({
         `;
       break;
     case "score":
-      orderBy = sql`${bottles.avgScore} ASC NULLS LAST`;
+      orderBy = sql`${bottles.medianScore} ASC NULLS LAST`;
       break;
     case "-score":
-      orderBy = sql`${bottles.avgScore} DESC NULLS LAST`;
+      orderBy = sql`${bottles.medianScore} DESC NULLS LAST`;
       break;
     case "-tastings":
     default:

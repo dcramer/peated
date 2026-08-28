@@ -6,14 +6,18 @@ import {
   bottles,
   bottleTombstones,
   entities,
+  externalReviewArticles,
+  externalReviews,
+  externalReviewSourcePolicies,
 } from "@peated/server/db/schema";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
-import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
+import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
+import { fixBadExternalReviewEntities } from "@peated/server/lib/fixBadExternalReviewEntities";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 
@@ -81,13 +85,13 @@ subcommand
   });
 
 subcommand
-  .command("fix-bad-entities")
-  .description("Re-resolve mismatched review bottle assignments")
+  .command("fix-bad-external-review-entities")
+  .description("Re-resolve mismatched external review Bottle assignments")
   .action(async (options) => {
     const systemUser = await getAutomationModeratorUser();
-    const summary = await fixBadReviewEntities({ user: systemUser });
+    const summary = await fixBadExternalReviewEntities({ user: systemUser });
     console.log(
-      `Processed ${summary.scanned} mismatched reviews: ${summary.reassigned} reassigned, ${summary.unresolved} unresolved, ${summary.errored} errored, ${summary.unchanged} unchanged.`,
+      `Processed ${summary.scanned} mismatched external reviews: ${summary.reassigned} reassigned, ${summary.unresolved} unresolved, ${summary.errored} errored, ${summary.unchanged} unchanged.`,
     );
   });
 
@@ -108,6 +112,7 @@ subcommand
 
     let hasResults = true;
     let offset = 0;
+    const processedBottleIds: number[] = [];
     while (hasResults) {
       hasResults = false;
       const query = await db
@@ -129,9 +134,59 @@ subcommand
       for (const { bottleId } of query) {
         console.log(`Updating stats for Bottle ${bottleId}.`);
         await runJob("UpdateBottleStats", { bottleId });
+        processedBottleIds.push(bottleId);
         hasResults = true;
       }
       offset += step;
+    }
+
+    if (processedBottleIds.length) {
+      const expectedRows = await db
+        .select({
+          bottleId: externalReviews.bottleId,
+          count: count(externalReviews.id),
+        })
+        .from(externalReviews)
+        .innerJoin(
+          externalReviewArticles,
+          eq(externalReviewArticles.id, externalReviews.articleId),
+        )
+        .innerJoin(
+          externalReviewSourcePolicies,
+          eq(
+            externalReviewSourcePolicies.externalSiteId,
+            externalReviewArticles.externalSiteId,
+          ),
+        )
+        .where(
+          and(
+            inArray(externalReviews.bottleId, processedBottleIds),
+            countedExternalReviewScoreWhere(),
+          ),
+        )
+        .groupBy(externalReviews.bottleId);
+      const expectedByBottle = new Map(
+        expectedRows.map(({ bottleId, count }) => [bottleId, count]),
+      );
+      const storedRows = await db
+        .select({
+          bottleId: bottles.id,
+          externalScoreCount: bottles.externalScoreCount,
+        })
+        .from(bottles)
+        .where(inArray(bottles.id, processedBottleIds));
+      const mismatches = storedRows.filter(
+        ({ bottleId, externalScoreCount }) =>
+          externalScoreCount !== (expectedByBottle.get(bottleId) ?? 0),
+      );
+      if (mismatches.length) {
+        throw new Error(
+          `External review score count verification failed for ${mismatches.length} Bottles.`,
+        );
+      }
+      console.log(
+        `Verified external score counts for ${storedRows.length} Bottles.`,
+      );
     }
   });
 

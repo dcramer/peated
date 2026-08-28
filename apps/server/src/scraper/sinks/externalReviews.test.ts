@@ -1,5 +1,8 @@
 import { db } from "@peated/server/db";
-import { reviewArticles, reviews } from "@peated/server/db/schema";
+import {
+  externalReviewArticles,
+  externalReviews,
+} from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
 import { expect, test } from "vitest";
 import { externalReviewSink } from "./externalReviews";
@@ -26,18 +29,17 @@ test("Whisky Advocate observations use article and source identity", async ({
         issue: "Fall 2026",
         publishedAt: null,
         contentHash: "first",
-        reviews: [
+        externalReviews: [
           {
             sourceKey: url,
             name: bottle.fullName,
             category: bottle.category,
             reviewerName: null,
             nativeScore: { value: 92, scale: 100, display: "92/100" },
-            normalizedRating: 92,
           },
         ],
       },
-      reviewTexts: {},
+      externalReviewTexts: {},
     },
   };
 
@@ -51,15 +53,14 @@ test("Whisky Advocate observations use article and source identity", async ({
         article: {
           ...observation.value.article,
           contentHash: "second",
-          reviews: [
+          externalReviews: [
             {
-              ...observation.value.article.reviews[0],
+              ...observation.value.article.externalReviews[0],
               nativeScore: {
                 value: 93.5,
                 scale: 100,
                 display: "93.5/100",
               },
-              normalizedRating: 94,
             },
           ],
         },
@@ -67,17 +68,22 @@ test("Whisky Advocate observations use article and source identity", async ({
     },
   });
 
-  const storedReviews = await db
-    .select({ review: reviews })
-    .from(reviews)
-    .innerJoin(reviewArticles, eq(reviews.articleId, reviewArticles.id))
-    .where(eq(reviewArticles.externalSiteId, site.id));
-  expect(storedReviews.map(({ review }) => review)).toMatchObject([
+  const storedExternalReviews = await db
+    .select({ externalReview: externalReviews })
+    .from(externalReviews)
+    .innerJoin(
+      externalReviewArticles,
+      eq(externalReviews.articleId, externalReviewArticles.id),
+    )
+    .where(eq(externalReviewArticles.externalSiteId, site.id));
+  expect(
+    storedExternalReviews.map(({ externalReview }) => externalReview),
+  ).toMatchObject([
     {
       articleId: expect.any(Number),
       bottleId: bottle.id,
       name: bottle.fullName,
-      rating: 94,
+      legacyNormalizedScore: null,
       nativeScoreValue: 93.5,
       nativeScoreScale: 100,
       nativeScoreDisplay: "93.5/100",
@@ -88,16 +94,16 @@ test("Whisky Advocate observations use article and source identity", async ({
   expect(
     await db
       .select()
-      .from(reviewArticles)
+      .from(externalReviewArticles)
       .where(
         and(
-          eq(reviewArticles.externalSiteId, site.id),
-          eq(reviewArticles.canonicalUrl, url),
+          eq(externalReviewArticles.externalSiteId, site.id),
+          eq(externalReviewArticles.canonicalUrl, url),
         ),
       ),
   ).toMatchObject([
     {
-      id: storedReviews[0]!.review.articleId,
+      id: storedExternalReviews[0]!.externalReview.articleId,
       issue: "Fall 2026",
       title: bottle.fullName,
       contentHash: expect.any(String),

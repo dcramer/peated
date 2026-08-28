@@ -1,11 +1,14 @@
 import { isExternalReviewSiteType } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  externalReviewArticles,
+  externalReviews,
   externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
 import { publishResolvedReviews } from "@peated/server/externalReviews/publication";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
+import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -14,7 +17,7 @@ import {
   ExternalSiteTypeEnum,
 } from "@peated/server/schemas";
 import { serializeExternalReviewSourcePolicy } from "@peated/server/serializers/externalSite";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z
@@ -23,6 +26,8 @@ const InputSchema = z
     policy: ExternalReviewSourcePolicyInputSchema,
   })
   .strict();
+
+const RECOMPUTE_BATCH_SIZE = 50;
 
 function auditFields(
   policy: z.infer<typeof ExternalReviewSourcePolicySchema> | null,
@@ -126,6 +131,46 @@ export default procedure
         next: auditFields(serialized),
       },
     });
+
+    if (
+      previous.allowScoreDisplay !== serialized.allowScoreDisplay ||
+      previous.publicationMode !== serialized.publicationMode
+    ) {
+      const affected = await db
+        .selectDistinct({
+          reviewId: externalReviews.id,
+          bottleId: externalReviews.bottleId,
+        })
+        .from(externalReviews)
+        .innerJoin(
+          externalReviewArticles,
+          eq(externalReviewArticles.id, externalReviews.articleId),
+        )
+        .where(
+          and(
+            eq(externalReviewArticles.externalSiteId, site.id),
+            isNotNull(externalReviews.bottleId),
+          ),
+        );
+
+      for (
+        let offset = 0;
+        offset < affected.length;
+        offset += RECOMPUTE_BATCH_SIZE
+      ) {
+        await Promise.all(
+          affected
+            .slice(offset, offset + RECOMPUTE_BATCH_SIZE)
+            .map(({ reviewId, bottleId }) =>
+              dispatchBottleStatsRecompute(
+                "externalReview",
+                reviewId,
+                bottleId!,
+              ),
+            ),
+        );
+      }
+    }
 
     return serialized;
   });

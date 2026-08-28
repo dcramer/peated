@@ -1,8 +1,7 @@
 import {
-  normalizeReviewRating,
-  type ReviewArticleIngestion,
-  ReviewArticleIngestionSchema,
-  type ReviewArticleObservation,
+  type ExternalReviewArticleIngestion,
+  ExternalReviewArticleIngestionSchema,
+  type ExternalReviewArticleObservation,
 } from "@peated/server/externalReviews/observation";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
@@ -26,10 +25,10 @@ const TASTING_HEADING = /^(?:Nose|Palate|Finish|The Dregs)\s*:?$/iu;
 export const DramfaceCursorSchema =
   currentReviewCursorSchema(MAX_INDEX_ARTICLES);
 
-export const DramfaceObservationSchema = ReviewArticleIngestionSchema;
+export const DramfaceObservationSchema = ExternalReviewArticleIngestionSchema;
 
 export type DramfaceCursor = z.infer<typeof DramfaceCursorSchema>;
-export type DramfaceObservation = ReviewArticleIngestion;
+export type DramfaceObservation = ExternalReviewArticleIngestion;
 
 function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
@@ -88,7 +87,6 @@ function score(value: string) {
   };
   return {
     nativeScore,
-    normalizedRating: normalizeReviewRating(nativeScore),
   };
 }
 
@@ -140,8 +138,9 @@ export function parseDramfaceArticle(
       ? [index]
       : [],
   );
-  const reviews: ReviewArticleObservation["reviews"] = [];
-  const reviewTexts: Record<string, string> = {};
+  const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
+    [];
+  const externalReviewTexts: Record<string, string> = {};
 
   for (const [reviewIndex, start] of reviewStarts.entries()) {
     const end = reviewStarts[reviewIndex + 1] ?? elements.length;
@@ -168,18 +167,17 @@ export function parseDramfaceArticle(
       name,
       reviewerName,
     );
-    const sourceKey = reviews.some(
+    const sourceKey = externalReviews.some(
       (review) => review.sourceKey === baseSourceKey,
     )
       ? reviewSourceKey(canonicalUrl.href, name, reviewerName, heading)
       : baseSourceKey;
-    reviews.push({
+    externalReviews.push({
       sourceKey,
       name,
       category: null,
       reviewerName,
       nativeScore: reviewScore.nativeScore,
-      normalizedRating: reviewScore.normalizedRating,
     });
 
     const tastingStart = section.findIndex((element) =>
@@ -200,17 +198,17 @@ export function parseDramfaceArticle(
             .map((element) => $(element).text())
             .join(" "),
     );
-    if (reviewText) reviewTexts[sourceKey] = reviewText;
+    if (reviewText) externalReviewTexts[sourceKey] = reviewText;
   }
 
-  if (reviews.length === 0) {
+  if (externalReviews.length === 0) {
     throw new Error("Dramface article contains no scored review sections.");
   }
 
   const contentText = JSON.stringify(
-    reviews.map((review) => ({
+    externalReviews.map((review) => ({
       ...review,
-      reviewText: reviewTexts[review.sourceKey] ?? null,
+      reviewText: externalReviewTexts[review.sourceKey] ?? null,
     })),
   );
   return DramfaceObservationSchema.parse({
@@ -220,9 +218,9 @@ export function parseDramfaceArticle(
       issue: null,
       publishedAt: publishedAt(dateText, canonicalUrl),
       contentHash: createHash("sha256").update(contentText).digest("hex"),
-      reviews,
+      externalReviews,
     },
-    reviewTexts,
+    externalReviewTexts,
   });
 }
 

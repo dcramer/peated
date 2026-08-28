@@ -1,15 +1,14 @@
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
+import type { RatingBandId } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleGroups,
   bottles,
   bottleTombstones,
+  memberReviews,
   tastings,
 } from "@peated/server/db/schema";
-import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import {
-  BottleStatsIntegrityError,
   recomputeBottleStats,
   recomputeBottleStatsInTransaction,
 } from "./recomputeBottleStats";
@@ -17,44 +16,49 @@ import {
 async function createTasting(
   bottleId: number,
   createdById: number,
-  rating: number | null,
+  ratingBand: RatingBandId | null,
   sequence: number,
-  score: number | null = null,
 ) {
   await db.insert(tastings).values({
     bottleId,
-    rating,
-    score,
+    ratingBand,
     createdById,
     createdAt: new Date(Date.UTC(2026, 0, 2, 0, 0, sequence)),
   });
 }
 
 describe("Bottle statistics recomputation", () => {
-  test("counts raw activity assigned directly to only the Bottle", async ({
+  test("counts direct tasting bands and publishes 20 member scores", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const unrelated = await fixtures.Bottle();
 
-    for (const [sequence, rating] of [
-      SIMPLE_RATING_VALUES.PASS,
-      SIMPLE_RATING_VALUES.SIP,
-      SIMPLE_RATING_VALUES.SAVOR,
+    const tastingBands = [
+      "mediocre",
+      "good",
+      "outstanding",
       null,
-    ].entries()) {
-      await createTasting(bottle.id, defaults.user.id, rating, sequence);
+    ] satisfies (RatingBandId | null)[];
+    for (const [sequence, band] of tastingBands.entries()) {
+      await createTasting(bottle.id, defaults.user.id, band, sequence);
     }
-    await createTasting(bottle.id, defaults.user.id, null, 4, 84);
-    await createTasting(bottle.id, defaults.user.id, null, 5, 88);
-    await createTasting(
-      unrelated.id,
-      defaults.user.id,
-      SIMPLE_RATING_VALUES.SAVOR,
-      10,
-    );
-    await createTasting(unrelated.id, defaults.user.id, null, 11, 99);
+    await createTasting(unrelated.id, defaults.user.id, "unicorn", 10);
+
+    for (let index = 0; index < 20; index += 1) {
+      const member = index === 0 ? defaults.user : await fixtures.User();
+      await db.insert(memberReviews).values({
+        bottleId: bottle.id,
+        createdById: member.id,
+        score: 80 + index,
+      });
+    }
+    await db.insert(memberReviews).values({
+      bottleId: unrelated.id,
+      createdById: defaults.user.id,
+      score: 100,
+    });
     const groupBefore = await db.query.bottleGroups.findFirst({
       where: eq(bottleGroups.id, bottle.groupId),
     });
@@ -64,34 +68,25 @@ describe("Bottle statistics recomputation", () => {
       recomputeBottleStatsInTransaction(tx, bottle.id),
     );
 
-    const expectedAverage =
-      (SIMPLE_RATING_VALUES.PASS +
-        SIMPLE_RATING_VALUES.SIP +
-        SIMPLE_RATING_VALUES.SAVOR) /
-      3;
     expect(firstResult).toMatchObject({
       id: bottle.id,
       groupId: bottle.groupId,
-      totalTastings: 6,
-      avgRating: expectedAverage,
-      avgScore: 86,
-      totalScores: 2,
-      ratingStats: {
-        pass: 1,
-        sip: 1,
-        savor: 1,
-        total: 3,
-        avg: expectedAverage,
+      totalTastings: 4,
+      medianScore: 89,
+      minScore: 80,
+      maxScore: 99,
+      memberScoreCount: 20,
+      externalScoreCount: 0,
+      tastingBandCounts: {
+        mediocre: 1,
+        good: 1,
+        very_good: 0,
+        outstanding: 1,
+        unicorn: 0,
       },
     });
-    expect(firstResult.ratingStats.percentage.pass).toBeCloseTo(100 / 3, 12);
-    expect(secondResult).toMatchObject({
-      totalTastings: firstResult.totalTastings,
-      avgRating: firstResult.avgRating,
-      avgScore: firstResult.avgScore,
-      totalScores: firstResult.totalScores,
-      ratingStats: firstResult.ratingStats,
-    });
+    const { updatedAt: _firstUpdatedAt, ...firstStats } = firstResult;
+    expect(secondResult).toMatchObject(firstStats);
     await expect(
       db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
     ).resolves.toMatchObject(secondResult);
@@ -102,42 +97,106 @@ describe("Bottle statistics recomputation", () => {
     ).toEqual(groupBefore);
   });
 
-  test("persists empty and unrated direct statistics", async ({
+  test("hides the range and median below 20 scores", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-
-    await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
-      totalTastings: 0,
-      avgRating: null,
-      avgScore: null,
-      totalScores: 0,
-      ratingStats: {
-        pass: 0,
-        sip: 0,
-        savor: 0,
-        total: 0,
-        avg: null,
-        percentage: { pass: 0, sip: 0, savor: 0 },
-      },
+    await createTasting(bottle.id, defaults.user.id, null, 1);
+    await db.insert(memberReviews).values({
+      bottleId: bottle.id,
+      createdById: defaults.user.id,
+      score: 92,
     });
 
-    await createTasting(bottle.id, defaults.user.id, null, 1);
-    await createTasting(bottle.id, defaults.user.id, null, 2);
+    await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
+      totalTastings: 1,
+      medianScore: null,
+      minScore: null,
+      maxScore: null,
+      memberScoreCount: 1,
+      externalScoreCount: 0,
+    });
+  });
+
+  test("counts only permitted public whole-number external scores", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const allowedSite = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const blockedSite = await fixtures.ExternalSite({ type: "whiskyfun" });
+    await fixtures.EnabledExternalReviewSourcePolicy({
+      externalSiteId: allowedSite.id,
+    });
+    await fixtures.EnabledExternalReviewSourcePolicy({
+      externalSiteId: blockedSite.id,
+      allowScoreDisplay: false,
+    });
+
+    for (const [site, value, scale, hidden] of [
+      [allowedSite, 90, 100, false],
+      [allowedSite, 91.5, 100, false],
+      [allowedSite, 9, 10, false],
+      [allowedSite, 92, 100, true],
+      [blockedSite, 93, 100, false],
+    ] as const) {
+      await fixtures.ExternalReview({
+        externalSiteId: site.id,
+        bottleId: bottle.id,
+        hidden,
+        nativeScoreValue: value,
+        nativeScoreScale: scale,
+        nativeScoreDisplay: `${value}/${scale}`,
+      });
+    }
+    await fixtures.ExternalReview({
+      externalSiteId: allowedSite.id,
+      bottleId: bottle.id,
+      hidden: false,
+      nativeScoreValue: null,
+      nativeScoreScale: null,
+      legacyNormalizedScore: 99,
+    });
 
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
-      totalTastings: 2,
-      avgRating: null,
-      avgScore: null,
-      totalScores: 0,
-      ratingStats: {
-        pass: 0,
-        sip: 0,
-        savor: 0,
-        total: 0,
-        avg: null,
-      },
+      memberScoreCount: 0,
+      externalScoreCount: 1,
+      medianScore: null,
+    });
+  });
+
+  test("uses member and external scores together at the publication floor", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    for (let index = 0; index < 19; index += 1) {
+      const member = index === 0 ? defaults.user : await fixtures.User();
+      await db.insert(memberReviews).values({
+        bottleId: bottle.id,
+        createdById: member.id,
+        score: 80 + index,
+      });
+    }
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await fixtures.EnabledExternalReviewSourcePolicy({
+      externalSiteId: site.id,
+    });
+    await fixtures.ExternalReview({
+      externalSiteId: site.id,
+      bottleId: bottle.id,
+      hidden: false,
+      nativeScoreValue: 100,
+      nativeScoreScale: 100,
+      nativeScoreDisplay: "100/100",
+    });
+
+    await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
+      memberScoreCount: 19,
+      externalScoreCount: 1,
+      medianScore: 89,
+      minScore: 80,
+      maxScore: 100,
     });
   });
 

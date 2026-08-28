@@ -7,17 +7,12 @@ const CatalogIdentitySchemaVersion = z
   .literal(CATALOG_IDENTITY_SCHEMA_VERSION)
   .describe("Version of the catalog identity result contract");
 
-const RatingStatsSchema = z.object({
-  pass: z.number().int().gte(0),
-  sip: z.number().int().gte(0),
-  savor: z.number().int().gte(0),
-  total: z.number().int().gte(0),
-  avg: z.number().nullable(),
-  percentage: z.object({
-    pass: z.number().gte(0),
-    sip: z.number().gte(0),
-    savor: z.number().gte(0),
-  }),
+const TastingBandCountsSchema = z.object({
+  mediocre: z.number().int().gte(0),
+  good: z.number().int().gte(0),
+  very_good: z.number().int().gte(0),
+  outstanding: z.number().int().gte(0),
+  unicorn: z.number().int().gte(0),
 });
 
 const TastingNotesSchema = z.object({
@@ -40,10 +35,13 @@ export const BottleGroupV1Fields = {
   statedAge: z.number().int().min(0).max(100).nullable(),
   representativeBottleId: z.number().int().positive().nullable(),
   flavorProfile: FlavorProfileEnum.nullable(),
-  avgRating: z.number().nullable(),
-  avgScore: z.number().min(0).max(100).nullable(),
-  totalScores: z.number().int().gte(0),
-  ratingStats: RatingStatsSchema,
+  medianScore: z.number().int().min(0).max(100).nullable(),
+  minScore: z.number().int().min(0).max(100).nullable(),
+  maxScore: z.number().int().min(0).max(100).nullable(),
+  memberScoreCount: z.number().int().gte(0),
+  externalScoreCount: z.number().int().gte(0),
+  scoreCount: z.number().int().gte(0),
+  tastingBandCounts: TastingBandCountsSchema,
   totalTastings: z.number().int().gte(0),
   totalBottles: z.number().int().gte(1),
   createdByActorId: z.number().int().positive(),
@@ -87,10 +85,13 @@ export const BottleV1Fields = {
   imageUrl: z.string().url().nullable(),
   tastingNotes: TastingNotesSchema.nullable(),
   suggestedTags: z.array(z.string()),
-  avgRating: z.number().nullable(),
-  avgScore: z.number().min(0).max(100).nullable(),
-  totalScores: z.number().int().gte(0),
-  ratingStats: RatingStatsSchema,
+  medianScore: z.number().int().min(0).max(100).nullable(),
+  minScore: z.number().int().min(0).max(100).nullable(),
+  maxScore: z.number().int().min(0).max(100).nullable(),
+  memberScoreCount: z.number().int().gte(0),
+  externalScoreCount: z.number().int().gte(0),
+  scoreCount: z.number().int().gte(0),
+  tastingBandCounts: TastingBandCountsSchema,
   totalTastings: z.number().int().gte(0),
   createdByActorId: z.number().int().positive(),
   createdAt: z.string().datetime(),

@@ -4,7 +4,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { Entity } from "@peated/server/types";
 import Link from "@peated/web/components/link";
-import SimpleRatingIndicator from "@peated/web/components/simpleRatingIndicator";
+import ReviewScoreDisplay from "@peated/web/components/reviewScoreDisplay";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -210,7 +210,12 @@ export default function EntityCatalogOverview({ entity }: { entity: Entity }) {
                   {bottle.fullName}
                 </Link>
                 <div className="flex shrink-0 items-center gap-3">
-                  <SimpleRatingIndicator avgRating={bottle.avgRating} />
+                  {bottle.medianScore !== null ? (
+                    <ReviewScoreDisplay
+                      score={bottle.medianScore}
+                      showBand={false}
+                    />
+                  ) : null}
                   {bottle.totalTastings > 0 ? (
                     <div className="text-right">
                       <div className="font-semibold tabular-nums">
