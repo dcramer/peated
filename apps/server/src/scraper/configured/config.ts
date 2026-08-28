@@ -1,9 +1,11 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
 import { z } from "zod";
 
-export const CONFIGURED_SCRAPER_ENGINE_VERSION = 1;
+export const SCRAPE_RULES_FORMAT_VERSION = 1;
+// TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
+export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 // One list request plus every detail request must fit the 100-request run budget.
-export const CONFIGURED_SCRAPER_MAX_ITEMS = 99;
+export const SCRAPE_SOURCE_MAX_ITEMS = 99;
 
 const SelectorSchema = z
   .string()
@@ -14,41 +16,35 @@ const SelectorSchema = z
     message: "The :has selector is not supported.",
   });
 
-export const ConfiguredValueSelectorSchema = z
+export const ScrapeValueSelectorSchema = z
   .object({
     selector: SelectorSchema,
     attribute: z.string().trim().min(1).max(100).optional(),
   })
   .strict();
 
-const IndexSchema = z
+const ListRulesSchema = z
   .object({
-    itemLink: ConfiguredValueSelectorSchema,
-    maxItems: z
-      .number()
-      .int()
-      .min(1)
-      .max(CONFIGURED_SCRAPER_MAX_ITEMS)
-      .default(25),
+    detailLink: ScrapeValueSelectorSchema,
+    maxItems: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS).default(25),
   })
   .strict();
 
-const ReviewConfigSchema = z
+const ReviewRulesSchema = z
   .object({
-    engineVersion: z.literal(CONFIGURED_SCRAPER_ENGINE_VERSION),
-    collection: z.literal("reviews"),
-    index: IndexSchema,
+    kind: z.literal("review"),
+    list: ListRulesSchema,
     detail: z
       .object({
-        title: ConfiguredValueSelectorSchema,
-        publishedAt: ConfiguredValueSelectorSchema.optional(),
+        title: ScrapeValueSelectorSchema,
+        publishedAt: ScrapeValueSelectorSchema.optional(),
         reviewItem: SelectorSchema,
-        name: ConfiguredValueSelectorSchema,
-        reviewerName: ConfiguredValueSelectorSchema.optional(),
-        reviewText: ConfiguredValueSelectorSchema.optional(),
+        name: ScrapeValueSelectorSchema,
+        reviewerName: ScrapeValueSelectorSchema.optional(),
+        reviewText: ScrapeValueSelectorSchema.optional(),
         score: z
           .object({
-            value: ConfiguredValueSelectorSchema,
+            value: ScrapeValueSelectorSchema,
             scale: z.number().positive(),
           })
           .strict()
@@ -58,34 +54,37 @@ const ReviewConfigSchema = z
   })
   .strict();
 
-const StorePriceConfigSchema = z
+const PriceRulesSchema = z
   .object({
-    engineVersion: z.literal(CONFIGURED_SCRAPER_ENGINE_VERSION),
-    collection: z.literal("store_prices"),
-    index: IndexSchema,
+    kind: z.literal("price"),
+    list: ListRulesSchema,
     detail: z
       .object({
-        name: ConfiguredValueSelectorSchema,
-        price: ConfiguredValueSelectorSchema,
+        name: ScrapeValueSelectorSchema,
+        price: ScrapeValueSelectorSchema,
         currency: z.enum(CURRENCY_LIST),
-        volume: ConfiguredValueSelectorSchema,
-        url: ConfiguredValueSelectorSchema.optional(),
-        externalProductId: ConfiguredValueSelectorSchema.optional(),
-        imageUrl: ConfiguredValueSelectorSchema.optional(),
-        barcode: ConfiguredValueSelectorSchema.optional(),
+        volume: ScrapeValueSelectorSchema,
+        url: ScrapeValueSelectorSchema.optional(),
+        externalProductId: ScrapeValueSelectorSchema.optional(),
+        imageUrl: ScrapeValueSelectorSchema.optional(),
+        barcode: ScrapeValueSelectorSchema.optional(),
       })
       .strict(),
   })
   .strict();
 
-export const ConfiguredScraperConfigSchema = z.discriminatedUnion(
-  "collection",
-  [ReviewConfigSchema, StorePriceConfigSchema],
-);
+export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
+  ReviewRulesSchema,
+  PriceRulesSchema,
+]);
 
-export type ConfiguredScraperConfig = z.infer<
-  typeof ConfiguredScraperConfigSchema
->;
-export type ConfiguredValueSelector = z.infer<
-  typeof ConfiguredValueSelectorSchema
->;
+export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
+export type ScrapeValueSelector = z.infer<typeof ScrapeValueSelectorSchema>;
+
+/** Parses rules only with the interpreter that owns their stored format. */
+export function parseScrapeRules(formatVersion: number, rules: ScrapeRules) {
+  if (formatVersion !== SCRAPE_RULES_FORMAT_VERSION) {
+    throw new Error(`Unsupported scrape rules format: ${formatVersion}.`);
+  }
+  return ScrapeRulesSchema.parse(rules);
+}

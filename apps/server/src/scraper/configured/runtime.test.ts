@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
 import {
-  configuredScraperConfigVersions,
   externalReviewArticles,
   externalSiteRuns,
   scrapeOrigins,
+  scrapeSourceRevisions,
   users,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -11,11 +11,8 @@ import { vi } from "vitest";
 import { createScraperRegistry } from "../definitions";
 import type { ScraperHttpClock } from "../http";
 import { executeScraperRun } from "../runs";
-import { createPinnedConfiguredRun } from "./runs";
-import {
-  createConfiguredScraperDraft,
-  createConfiguredScraperSite,
-} from "./service";
+import { createPinnedScrapeSourceRun } from "./runs";
+import { createScrapeSourceDraft, createSiteWithScrapeSource } from "./service";
 
 function fixedClock(): ScraperHttpClock {
   let now = new Date("2026-08-28T12:00:00Z");
@@ -34,22 +31,21 @@ async function setupPreview(titleSelector = "h1") {
     .values({ username: "admin", email: "admin@example.com", admin: true })
     .returning();
   if (!user) throw new Error("Failed to create user.");
-  const { site, scraper } = await createConfiguredScraperSite({
+  const { site, source } = await createSiteWithScrapeSource({
     key: "preview-reviews",
     name: "Preview Reviews",
-    collection: "reviews",
-    indexUrl: "https://preview.example/archive",
+    kind: "review",
+    listUrl: "https://preview.example/archive",
     createdById: user.id,
   });
-  const version = await createConfiguredScraperDraft({
-    configuredScraperId: scraper.id,
+  const revision = await createScrapeSourceDraft({
+    scrapeSourceId: source.id,
     createdWith: "person",
     createdById: user.id,
-    config: {
-      engineVersion: 1,
-      collection: "reviews",
-      index: {
-        itemLink: { selector: "a.review", attribute: "href" },
+    rules: {
+      kind: "review",
+      list: {
+        detailLink: { selector: "a.review", attribute: "href" },
         maxItems: 5,
       },
       detail: {
@@ -67,14 +63,15 @@ async function setupPreview(titleSelector = "h1") {
       robotsRationale: "Reserved test origin has no network operator.",
     })
     .where(eq(scrapeOrigins.origin, "https://preview.example"));
-  const pinned = await createPinnedConfiguredRun(db, {
+  const pinned = await createPinnedScrapeSourceRun(db, {
     externalSiteId: site.id,
-    configVersionId: version.id,
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
     requestedById: user.id,
     trigger: "manual",
     purpose: "preview",
   });
-  return { pinned, version };
+  return { pinned, revision };
 }
 
 function previewFetch() {
@@ -93,7 +90,7 @@ function previewFetch() {
 }
 
 test("runs preview through the governed runtime without product writes", async () => {
-  const { pinned, version } = await setupPreview();
+  const { pinned, revision } = await setupPreview();
   await expect(
     executeScraperRun(
       { runId: pinned.run.id },
@@ -106,12 +103,12 @@ test("runs preview through the governed runtime without product writes", async (
     ),
   ).resolves.toEqual({ status: "completed" });
 
-  const [storedVersion] = await db
+  const [storedRevision] = await db
     .select()
-    .from(configuredScraperConfigVersions)
-    .where(eq(configuredScraperConfigVersions.id, version.id));
-  expect(storedVersion).toMatchObject({ validationStatus: "passed" });
-  expect(JSON.stringify(storedVersion?.validationResult)).not.toContain(
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(storedRevision).toMatchObject({ validationStatus: "passed" });
+  expect(JSON.stringify(storedRevision?.validationResult)).not.toContain(
     "Publisher prose",
   );
   expect(await db.select().from(externalReviewArticles)).toHaveLength(0);
@@ -123,7 +120,7 @@ test("runs preview through the governed runtime without product writes", async (
 });
 
 test("stores safe validation issues when a selector stops matching", async () => {
-  const { pinned, version } = await setupPreview("h3.missing");
+  const { pinned, revision } = await setupPreview("h3.missing");
   await expect(
     executeScraperRun(
       { runId: pinned.run.id },
@@ -136,12 +133,12 @@ test("stores safe validation issues when a selector stops matching", async () =>
     ),
   ).rejects.toThrow("The page did not match the saved parsing rules.");
 
-  const [storedVersion] = await db
+  const [storedRevision] = await db
     .select()
-    .from(configuredScraperConfigVersions)
-    .where(eq(configuredScraperConfigVersions.id, version.id));
-  expect(storedVersion).toMatchObject({ validationStatus: "failed" });
-  expect(storedVersion?.validationResult).toMatchObject({
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(storedRevision).toMatchObject({ validationStatus: "failed" });
+  expect(storedRevision?.validationResult).toMatchObject({
     pages: [],
     issues: [expect.objectContaining({ field: "article.title" })],
   });

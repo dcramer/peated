@@ -120,7 +120,7 @@ test("preserves admin-owned targets, origins, and site mappings", async () => {
 
   await db.insert(scrapeTargets).values({
     key: "admin-source",
-    owner: "admin",
+    managedBy: "admin",
     enabled: true,
     minimumSpacingMs: 2_000,
     requestsPerWindow: 60,
@@ -131,14 +131,14 @@ test("preserves admin-owned targets, origins, and site mappings", async () => {
   });
   await db.insert(scrapeOrigins).values({
     origin: "https://admin-source.test",
-    owner: "admin",
+    managedBy: "admin",
     targetKey: "admin-source",
     robotsMode: "enforce",
   });
   await db.insert(externalSiteScrapeTargets).values({
     externalSiteId: site.id,
     targetKey: "admin-source",
-    owner: "admin",
+    managedBy: "admin",
   });
 
   await syncScraperDefinitions(
@@ -148,21 +148,21 @@ test("preserves admin-owned targets, origins, and site mappings", async () => {
   expect(await db.select().from(scrapeTargets)).toEqual([
     expect.objectContaining({
       key: "admin-source",
-      owner: "admin",
+      managedBy: "admin",
       enabled: true,
     }),
   ]);
   expect(await db.select().from(scrapeOrigins)).toEqual([
     expect.objectContaining({
       origin: "https://admin-source.test",
-      owner: "admin",
+      managedBy: "admin",
       active: true,
     }),
   ]);
   expect(await db.select().from(externalSiteScrapeTargets)).toEqual([
     expect.objectContaining({
       externalSiteId: site.id,
-      owner: "admin",
+      managedBy: "admin",
       active: true,
     }),
   ]);

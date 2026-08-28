@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { parseConfiguredDetail, parseConfiguredIndex } from "./parser";
+import { parseScrapeDetail, parseScrapeList } from "./parser";
 
 const reviewConfig = {
-  engineVersion: 1 as const,
-  collection: "reviews" as const,
-  index: {
-    itemLink: { selector: "a.review", attribute: "href" },
+  kind: "review" as const,
+  list: {
+    detailLink: { selector: "a.review", attribute: "href" },
     maxItems: 2,
   },
   detail: {
@@ -19,9 +18,9 @@ const reviewConfig = {
   },
 };
 
-describe("configured scraper parser", () => {
+describe("scrape source parser", () => {
   it("extracts bounded, same-origin detail links", () => {
-    const result = parseConfiguredIndex(
+    const result = parseScrapeList(
       reviewConfig,
       '<a class="review" href="/one">One</a><a class="review" href="https://reviews.test/two#top">Two</a><a class="review" href="/three">Three</a>',
       new URL("https://reviews.test/archive"),
@@ -33,7 +32,7 @@ describe("configured scraper parser", () => {
   });
 
   it("rejects links on another origin", () => {
-    const result = parseConfiguredIndex(
+    const result = parseScrapeList(
       reviewConfig,
       '<a class="review" href="https://other.test/one">One</a>',
       new URL("https://reviews.test/archive"),
@@ -45,14 +44,14 @@ describe("configured scraper parser", () => {
   });
 
   it("extracts and validates review records", () => {
-    const result = parseConfiguredDetail(
+    const result = parseScrapeDetail(
       reviewConfig,
       '<h1>Spring reviews</h1><time datetime="2026-04-02"></time><article class="review"><h2>Example 12 Year</h2><span class="author">Ada</span><span class="score">91 / 100</span><div class="body">Rich and balanced.</div></article>',
       new URL("https://reviews.test/spring"),
     );
-    expect(result.collection).toBe("reviews");
+    expect(result.kind).toBe("review");
     expect(result.issues).toEqual([]);
-    if (result.collection !== "reviews") throw new Error("Wrong collection");
+    if (result.kind !== "review") throw new Error("Wrong kind");
     expect(result.value?.article.externalReviews[0]).toMatchObject({
       name: "Example 12 Year",
       reviewerName: "Ada",
@@ -61,13 +60,13 @@ describe("configured scraper parser", () => {
   });
 
   it("extracts repeated reviews and reports invalid dates and scores", () => {
-    const result = parseConfiguredDetail(
+    const result = parseScrapeDetail(
       reviewConfig,
       '<h1>Spring reviews</h1><time datetime="not-a-date"></time><article class="review"><h2>First Bottle</h2><span class="score">none</span></article><article class="review"><h2>Second Bottle</h2><span class="score">88</span></article>',
       new URL("https://reviews.test/spring"),
     );
-    expect(result.collection).toBe("reviews");
-    if (result.collection !== "reviews") throw new Error("Wrong collection");
+    expect(result.kind).toBe("review");
+    if (result.kind !== "review") throw new Error("Wrong kind");
     expect(result.value?.article.externalReviews).toHaveLength(2);
     expect(result.issues).toEqual([
       { field: "detail.publishedAt", message: "Date is not valid." },
@@ -79,24 +78,23 @@ describe("configured scraper parser", () => {
   });
 
   it("reports required review fields when unrelated markup is selected", () => {
-    const result = parseConfiguredDetail(
+    const result = parseScrapeDetail(
       reviewConfig,
       "<main><p>Nothing to parse</p></main>",
       new URL("https://reviews.test/unrelated"),
     );
-    expect(result.collection).toBe("reviews");
-    if (result.collection !== "reviews") throw new Error("Wrong collection");
+    expect(result.kind).toBe("review");
+    if (result.kind !== "review") throw new Error("Wrong kind");
     expect(result.value).toBeNull();
     expect(result.issues.length).toBeGreaterThan(0);
   });
 
   it("normalizes a store price and volume", () => {
-    const result = parseConfiguredDetail(
+    const result = parseScrapeDetail(
       {
-        engineVersion: 1,
-        collection: "store_prices",
-        index: {
-          itemLink: { selector: "a.product", attribute: "href" },
+        kind: "price",
+        list: {
+          detailLink: { selector: "a.product", attribute: "href" },
           maxItems: 10,
         },
         detail: {
@@ -110,7 +108,7 @@ describe("configured scraper parser", () => {
       new URL("https://store.test/products/example"),
     );
     expect(result).toEqual({
-      collection: "store_prices",
+      kind: "price",
       value: [
         {
           name: "Example Whisky",
@@ -126,12 +124,11 @@ describe("configured scraper parser", () => {
   });
 
   it("reports invalid store fields", () => {
-    const result = parseConfiguredDetail(
+    const result = parseScrapeDetail(
       {
-        engineVersion: 1,
-        collection: "store_prices",
-        index: {
-          itemLink: { selector: "a.product", attribute: "href" },
+        kind: "price",
+        list: {
+          detailLink: { selector: "a.product", attribute: "href" },
           maxItems: 10,
         },
         detail: {
@@ -145,7 +142,7 @@ describe("configured scraper parser", () => {
       new URL("https://store.test/products/invalid"),
     );
     expect(result).toMatchObject({
-      collection: "store_prices",
+      kind: "price",
       value: [],
     });
     expect(result.issues.map((issue) => issue.field)).toEqual([
@@ -156,7 +153,7 @@ describe("configured scraper parser", () => {
   });
 
   it("reports a selector that no longer finds detail links", () => {
-    const result = parseConfiguredIndex(
+    const result = parseScrapeList(
       reviewConfig,
       '<a class="new-review-link" href="/one">One</a>',
       new URL("https://reviews.test/archive"),
@@ -165,7 +162,7 @@ describe("configured scraper parser", () => {
       links: [],
       issues: [
         {
-          field: "index.itemLink",
+          field: "list.detailLink",
           message: "The selector did not find any detail links.",
         },
       ],

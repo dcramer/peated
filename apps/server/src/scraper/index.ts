@@ -6,7 +6,7 @@
  */
 import type { ExternalSite } from "@peated/server/db/schema";
 import type { ExternalSiteKey } from "@peated/server/types";
-import { createConfiguredGenerationRun } from "./configured/runs";
+import { createScrapeSourceSuggestionRun } from "./configured/runs";
 import {
   findScraperSourceBySiteKey,
   ScraperTargetDisabledError,
@@ -53,19 +53,20 @@ export function queueManualExternalSiteRun(input: {
   return lifecycle.queueManualExternalSiteRun(input);
 }
 
-export function queueConfiguredScraperPreview(input: {
+export function queueScrapeSourcePreview(input: {
   site: ExternalSite;
-  configVersionId: number;
+  scrapeSourceId: number;
+  revisionId: number;
   requestedById: number;
 }) {
-  return lifecycle.queueConfiguredScraperPreview(input);
+  return lifecycle.queueScrapeSourcePreview(input);
 }
 
-export async function queueConfiguredScraperGeneration(input: {
-  configuredScraperId: number;
+export async function queueScrapeSourceSuggestion(input: {
+  scrapeSourceId: number;
   requestedById: number;
 }) {
-  const run = await createConfiguredGenerationRun(input);
+  const run = await createScrapeSourceSuggestionRun(input);
   await enqueueScraperRun(
     "RunScraper",
     { runId: run.id },

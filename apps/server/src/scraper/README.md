@@ -65,33 +65,33 @@ this grouping from a registrable domain. Stricter limits need no exception;
 less restrictive spacing, window, or quota requires a reviewed rationale in
 the code-owned definition.
 
-## Configured sources
+## Scrape sources
 
 Admins can add a review or store-price source in Admin → Scrapers. These
 sources use the same run, request, robots, limit, retry, validation, and sink
 boundaries as code-owned sources.
 
-The database stores each source and its parsing rules. Each saved version is
+The database stores each source and its parsing rules. Each saved revision is
 immutable. A test reads sample pages and stores only parsed fields and errors.
 It does not store fetched HTML, review text, or full product records. Only a
-version that passes its test can become active. An admin can return to any
-older version that passed. Pausing a source stops collection but keeps its
-versions and run history.
+revision that passes its test can become active. An admin can return to any
+older revision that passed. Pausing a source stops collection but keeps its
+revisions and run history.
 
-Version 1 supports one bounded HTML index page, same-origin detail links, CSS
-selectors, and fixed date, number, price, and volume conversions. It does not
+Rules format 1 supports one bounded HTML list page, same-origin detail links,
+CSS selectors, and fixed date, number, price, and volume conversions. It does not
 support scripts, custom code, arbitrary request headers, browser automation,
 pagination, or cross-origin discovery. Add a code-owned adapter when a source
 needs those capabilities.
 
-Event sources, such as whisky festivals, are the next planned collection type.
+Event sources, such as whisky festivals, are the next planned source kind.
 Peated already stores these events. Add the scraper type only after its match
 and update rules are defined, so repeated runs do not create duplicate events.
 
 AI can suggest parsing rules only when an admin allows it for that source. The
 server fetches the allowed pages before it calls the model. The model has no
-tools, and provider storage is off. Its response creates a new version. An
-admin must test and activate that version. AI never changes the active version
+tools, and provider storage is off. Its response creates a new revision. An
+admin must test and activate that revision. AI never changes the active revision
 directly.
 
 ## Source acceptance rules

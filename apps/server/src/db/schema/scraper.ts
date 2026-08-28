@@ -29,7 +29,7 @@ export const scrapeOriginRobotsModeEnum = pgEnum("scrape_origin_robots_mode", [
   "not_applicable",
 ]);
 
-export const scrapeDefinitionOwnerEnum = pgEnum("scrape_definition_owner", [
+export const scrapeDefinitionManagerEnum = pgEnum("scrape_definition_manager", [
   "code",
   "admin",
 ]);
@@ -42,7 +42,9 @@ export const scrapeTargets = pgTable(
   "scrape_target",
   {
     key: text("key").primaryKey(),
-    owner: scrapeDefinitionOwnerEnum("owner").default("code").notNull(),
+    managedBy: scrapeDefinitionManagerEnum("managed_by")
+      .default("code")
+      .notNull(),
     enabled: boolean("enabled").default(false).notNull(),
     minimumSpacingMs: integer("minimum_spacing_ms").notNull(),
     requestsPerWindow: integer("requests_per_window").notNull(),
@@ -90,7 +92,9 @@ export const scrapeOrigins = pgTable(
   "scrape_origin",
   {
     origin: text("origin").primaryKey(),
-    owner: scrapeDefinitionOwnerEnum("owner").default("code").notNull(),
+    managedBy: scrapeDefinitionManagerEnum("managed_by")
+      .default("code")
+      .notNull(),
     targetKey: text("target_key")
       .references(() => scrapeTargets.key, { onDelete: "restrict" })
       .notNull(),
@@ -136,7 +140,9 @@ export const externalSiteScrapeTargets = pgTable(
     targetKey: text("target_key")
       .references(() => scrapeTargets.key, { onDelete: "restrict" })
       .notNull(),
-    owner: scrapeDefinitionOwnerEnum("owner").default("code").notNull(),
+    managedBy: scrapeDefinitionManagerEnum("managed_by")
+      .default("code")
+      .notNull(),
     active: boolean("active").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

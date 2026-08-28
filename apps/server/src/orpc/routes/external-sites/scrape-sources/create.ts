@@ -1,38 +1,38 @@
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
-  ConfiguredScraperCreateSchema,
-  ConfiguredScraperSchema,
+  ScrapeSourceCreateSchema,
+  ScrapeSourceSchema,
 } from "@peated/server/schemas";
 import {
-  ConfiguredScraperConflictError,
-  ConfiguredScraperValidationError,
-  createConfiguredScraperSite,
+  ScrapeSourceConflictError,
+  ScrapeSourceValidationError,
+  createSiteWithScrapeSource,
 } from "@peated/server/scraper/configured/service";
-import { serializeConfiguredScraper } from "./serialize";
+import { serializeScrapeSource } from "./serialize";
 
 export default procedure
   .use(requireAdmin)
   .route({
     method: "POST",
-    path: "/admin/configured-scrapers",
+    path: "/admin/scrape-sources",
     summary: "Create a database-managed source",
-    operationId: "createConfiguredScraper",
+    operationId: "createScrapeSource",
   })
-  .input(ConfiguredScraperCreateSchema)
-  .output(ConfiguredScraperSchema)
+  .input(ScrapeSourceCreateSchema)
+  .output(ScrapeSourceSchema)
   .handler(async ({ input, context, errors }) => {
     try {
-      const { scraper, site } = await createConfiguredScraperSite({
+      const { source, site } = await createSiteWithScrapeSource({
         ...input,
         createdById: context.user.id,
       });
-      return serializeConfiguredScraper(scraper, site, []);
+      return serializeScrapeSource(source, site, []);
     } catch (error) {
-      if (error instanceof ConfiguredScraperConflictError) {
+      if (error instanceof ScrapeSourceConflictError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
-      if (error instanceof ConfiguredScraperValidationError) {
+      if (error instanceof ScrapeSourceValidationError) {
         throw errors.BAD_REQUEST({ message: error.message, cause: error });
       }
       throw error;

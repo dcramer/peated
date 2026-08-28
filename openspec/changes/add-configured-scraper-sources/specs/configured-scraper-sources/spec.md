@@ -1,156 +1,160 @@
 ## ADDED Requirements
 
-### Requirement: Administrators can create governed sources
+### Requirement: Admins can create governed sources
 
-The system SHALL let a moderator create an external site with a bounded slug,
-name, exact HTTP origin, starting URL, conservative request policy, and robots
-enforcement. A new site and its configured scrapers MUST start disabled.
+The system SHALL let an admin create an external site and its first scrape
+source with a bounded key, name, exact HTTP origin, list URL, conservative
+request policy, and robots enforcement. The source MUST start disabled.
 
-#### Scenario: Moderator creates a review publisher
+#### Scenario: Admin creates a review source
 
-- **WHEN** a moderator submits a valid new site and chooses review collection
-- **THEN** the system stores the site, its admin-owned target and origin, and a disabled review scraper without requiring a deployment
+- **WHEN** an admin submits a valid new site and chooses `review`
+- **THEN** the system stores the site, admin-managed network rows, and a disabled review source without a deploy
 
-#### Scenario: Generated config attempts to change network access
+#### Scenario: Rules try to change network access
 
-- **WHEN** an LLM-generated config contains an origin, credential, request limit, or header
-- **THEN** strict config validation rejects the complete candidate
+- **WHEN** proposed rules contain an origin, credential, header, or robots exception
+- **THEN** strict rules validation rejects the complete proposal
 
-### Requirement: Each source has one collection type
+### Requirement: Each source has one kind
 
-The system SHALL support `reviews` and `store_prices` as explicit configured
-scraper collection types. Each external site SHALL own at most one configured
-scraper with its own enablement, LLM permission, and active config.
+The system SHALL support `review` and `price` source kinds. A site SHALL own at
+most one scrape source. The source SHALL own its kind, enablement, AI permission,
+list URL, sample URLs, and revisions.
 
-#### Scenario: Moderator chooses a collection
+#### Scenario: An admin chooses a source kind
 
-- **WHEN** a moderator creates a source and chooses reviews or store prices
-- **THEN** that source retains its own config versions and active version
+- **WHEN** an admin creates a site with a review or price source
+- **THEN** its source retains that kind across all revisions
 
-### Requirement: Config versions are immutable and explicit
+#### Scenario: A second source is stored
 
-The system SHALL store each config change as a new immutable version and SHALL
-use one active version per site and collection type. Every configured scraper
-run MUST record the exact version that it uses.
+- **WHEN** code tries to store a second scrape source for one site
+- **THEN** the database rejects it
 
-#### Scenario: Draft is edited
+### Requirement: Rule revisions are immutable and explicit
 
-- **WHEN** a moderator or LLM changes a draft config
-- **THEN** the system creates a new version and leaves the earlier version unchanged
+The system SHALL store each rules change as a new immutable revision. Each
+revision SHALL pin its list URL and rules format. A source SHALL have at most
+one active revision. Each collection or preview run MUST record its exact
+source and revision.
 
-#### Scenario: Active config changes during a run
+#### Scenario: An admin edits rules or the list URL
 
-- **WHEN** a moderator activates another version while a run is queued or running
-- **THEN** that run continues to use the version recorded when it was created
+- **WHEN** an admin saves a change
+- **THEN** the system creates a new revision and leaves prior revisions unchanged
+
+#### Scenario: The active revision changes during a run
+
+- **WHEN** an admin activates another revision while a run is queued or running
+- **THEN** the run continues with its recorded revision and list URL
 
 ### Requirement: Preview uses production parsing
 
-The system SHALL preview a draft with the same interpreter, validator, request
-controls, and output schema used by production collection. Preview MUST NOT
-write reviews or store prices.
+The system SHALL preview a revision with the same parser, validator, request
+controls, and output schema used for collection. Preview MUST NOT write reviews
+or prices.
 
-#### Scenario: Review draft is previewed
+#### Scenario: A review revision is previewed
 
-- **WHEN** a moderator previews a review config against current sample pages
-- **THEN** the system shows structured articles and reviews, source links, and validation warnings without storing publisher HTML or reviews
+- **WHEN** an admin previews review rules against current pages
+- **THEN** the system stores structured article and review fields, source links, and bounded issues without storing HTML or review text
 
-#### Scenario: Price draft is previewed
+#### Scenario: A price revision is previewed
 
-- **WHEN** a moderator previews a store-price config against current sample pages
-- **THEN** the system shows structured products, prices, currencies, volumes, source links, and validation warnings without storing store prices
+- **WHEN** an admin previews price rules against current pages
+- **THEN** the system stores structured product fields and bounded issues without storing prices as products
 
-### Requirement: LLM generation creates drafts only
+### Requirement: AI suggestions create drafts only
 
-The system SHALL use at most one schema-constrained model call to propose a
-config from moderator-selected pages. The model MUST have no tools and MUST NOT
-activate a config, change network authority, write products, or publish reviews.
+The system SHALL use at most one structured model call to suggest rules from
+admin-selected pages. The model MUST have no tools. It MUST NOT activate a
+revision, change network control, or write products.
 
-#### Scenario: New source config is generated
+#### Scenario: AI is allowed
 
-- **WHEN** a moderator requests generation for a source that permits LLM processing
-- **THEN** the system fetches the bounded samples, validates the model output, stores a draft with model and prompt provenance, and starts normal draft validation
+- **WHEN** an admin requests the first suggestion or a repair after the latest test fails
+- **THEN** the system fetches bounded samples, validates the output, and stores a draft with model and prompt provenance
 
-#### Scenario: LLM processing is disabled
+#### Scenario: AI is not allowed
 
-- **WHEN** a moderator requests generation for a configured scraper that does not permit LLM processing
-- **THEN** the system rejects the request before page content is sent to a model
+- **WHEN** the source does not permit AI processing
+- **THEN** the system rejects the request before it sends page content to a model
 
 #### Scenario: Model output is invalid
 
-- **WHEN** the model returns a config that fails the strict schema
-- **THEN** the system stores no draft and reports a bounded failure without page content
+- **WHEN** model output fails the strict rules schema or uses the wrong kind
+- **THEN** the system stores no revision and reports a bounded error without page content
 
-### Requirement: Activation and rollback require passing validation
+### Requirement: Activation and rollback require a passing test
 
-The system MUST prevent activation of a config version that has not passed its
-latest production validator. Activation and rollback SHALL update only the
-active version pointer and SHALL retain all prior versions.
+The system MUST prevent activation of a revision that has not passed its latest
+test. Activation and rollback SHALL retain all prior revisions.
 
-#### Scenario: Passing draft is activated
+#### Scenario: A passing revision is activated
 
-- **WHEN** a moderator activates a draft whose latest validation passed
-- **THEN** the draft becomes active atomically and the previous active version remains in history
+- **WHEN** an admin activates a revision whose latest test passed
+- **THEN** it becomes the source's only active revision and the source becomes enabled
 
-#### Scenario: Failed draft is activated
+#### Scenario: A failed revision is activated
 
-- **WHEN** a moderator tries to activate a draft whose validation failed or is stale
-- **THEN** the system rejects activation and leaves the current active version unchanged
+- **WHEN** an admin activates a pending or failed revision
+- **THEN** the system rejects activation and keeps the current active revision
 
-#### Scenario: Moderator rolls back
+#### Scenario: An admin rolls back
 
-- **WHEN** a moderator activates an older version that passes current validation
-- **THEN** new runs use that version and existing runs keep their recorded versions
+- **WHEN** an admin activates an older passing revision
+- **THEN** new runs use it and existing runs keep their recorded revisions
 
-### Requirement: Configured runs preserve current domain boundaries
+### Requirement: Scrape source runs preserve product boundaries
 
-The system SHALL run configured sources through the existing scraper session
-and SHALL emit only the strict existing review or store-price observation for
-the configured collection type.
+The system SHALL execute scrape sources through the existing scraper session.
+Review sources SHALL emit the strict external-review observation. Price sources
+SHALL emit the strict store-price observation.
 
 #### Scenario: Review collection succeeds
 
-- **WHEN** an enabled review scraper completes with valid observations
-- **THEN** its normal run sends them to external-review ingestion and that boundary continues to own Bottle matching, source policy, persistence, and publication
+- **WHEN** an enabled review source emits valid observations
+- **THEN** external-review ingestion owns matching, persistence, and publication
 
-#### Scenario: Store-price collection succeeds
+#### Scenario: Price collection succeeds
 
-- **WHEN** an enabled store-price scraper completes with valid observations
-- **THEN** its normal run sends them to store-price ingestion and that boundary continues to own identity, matching, persistence, and product visibility
+- **WHEN** an enabled price source emits valid observations
+- **THEN** store-price ingestion owns identity, matching, persistence, and visibility
 
-#### Scenario: Page output fails validation
+#### Scenario: Parsed output is invalid
 
-- **WHEN** a configured page produces missing, contradictory, or invalid required fields
-- **THEN** the run fails without partial product writes and the active config remains unchanged
+- **WHEN** required fields are missing or invalid
+- **THEN** the run fails without partial product writes and does not change the active revision
 
-### Requirement: Code-owned and admin-owned sources coexist
+### Requirement: Code-managed and admin-managed sources coexist
 
-The system SHALL preserve existing code-owned scraper definitions and SHALL
-prevent definition synchronization from disabling or rewriting admin-owned
-targets, origins, and site mappings.
+The system SHALL preserve existing code source definitions. Startup sync SHALL
+not disable or rewrite admin-managed targets, origins, or site mappings.
 
-#### Scenario: Runtime definitions synchronize
+#### Scenario: Definitions synchronize
 
-- **WHEN** application startup synchronizes code-owned scraper definitions
-- **THEN** admin-owned configured sites and their enabled state remain unchanged
+- **WHEN** the application synchronizes code source definitions
+- **THEN** admin-managed network rows remain unchanged
 
-### Requirement: Admin workflow exposes the full config lifecycle
+### Requirement: The admin flow exposes the revision lifecycle
 
-The Admin Scrapers area SHALL let a moderator add a site, choose a collection
-type, generate or enter a draft, preview it, activate it, view version history,
-roll back, disable collection, and inspect collection health.
+The Admin Scrapers area SHALL let an admin add a site, choose a source kind,
+enter or request draft rules, edit the list URL, preview, activate, view
+revision history, roll back, pause collection, and inspect health.
 
-#### Scenario: Existing site needs repair
+#### Scenario: An active source needs repair
 
-- **WHEN** a run fails validation for an active config
-- **THEN** the site config view identifies the failed collection and offers creation of a repair draft from the failed source pages
+- **WHEN** its latest test fails after a page change
+- **THEN** the source view shows the failure and permits a repair revision
 
 ### Requirement: Tests match ownership boundaries
 
-The system MUST test config interpretation without database or network access,
-test persistence and routes with deterministic integration tests, and test live
-model generation only through the separate eval command.
+The system MUST test parsing without database or network access. It MUST test
+persistence and runtime behavior with deterministic integration tests. Hosted
+model quality MUST run only through the eval command.
 
 #### Scenario: Deterministic tests run
 
-- **WHEN** the normal test suite executes
-- **THEN** it validates config schemas, parsing, validation, permissions, version activation, run pinning, preview isolation, and sinks without calling a hosted model
+- **WHEN** `pnpm test` runs
+- **THEN** it tests schemas, parsing, validation, source identity, activation, run pinning, preview isolation, and sinks without a hosted model

@@ -1,34 +1,34 @@
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
-  ConfiguredScraperSchema,
   ExternalSiteKeySchema,
+  ScrapeSourceSchema,
 } from "@peated/server/schemas";
 import {
-  listConfiguredScrapers,
-  listConfiguredScraperVersions,
+  listScrapeSourceRevisions,
+  listScrapeSources,
 } from "@peated/server/scraper/configured/service";
 import { z } from "zod";
-import { serializeConfiguredScraper } from "./serialize";
+import { serializeScrapeSource } from "./serialize";
 
 export default procedure
   .use(requireAdmin)
   .route({
     method: "GET",
-    path: "/admin/configured-scrapers",
+    path: "/admin/scrape-sources",
     summary: "List database-managed sources",
-    operationId: "listConfiguredScrapers",
+    operationId: "listScrapeSources",
   })
   .input(z.object({ site: ExternalSiteKeySchema.optional() }).strict())
-  .output(z.array(ConfiguredScraperSchema))
+  .output(z.array(ScrapeSourceSchema))
   .handler(async ({ input }) => {
-    const rows = await listConfiguredScrapers(input.site);
+    const rows = await listScrapeSources(input.site);
     return await Promise.all(
-      rows.map(async ({ scraper, site }) =>
-        serializeConfiguredScraper(
-          scraper,
+      rows.map(async ({ source, site }) =>
+        serializeScrapeSource(
+          source,
           site,
-          await listConfiguredScraperVersions(scraper.id),
+          await listScrapeSourceRevisions(source.id),
         ),
       ),
     );

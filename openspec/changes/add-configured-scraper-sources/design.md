@@ -1,196 +1,125 @@
 ## Context
 
-The scraper runtime already separates remote requests, durable runs, adapters,
-and sinks. Review adapters also share one strict article observation and one
-ingestion boundary. The remaining source-specific work is compiled into the
-application: an external-site constant, target registration, adapter, parser,
-and tests for each publisher or store.
+The scraper runtime already owns requests, robots rules, limits, retries,
+durable runs, and product writes. Source-specific page parsing still lives in
+code. This change adds a database path for simple HTML sources. Publisher HTML
+stays transient.
 
-The new path must keep the runtime's exact-origin, robots, request-budget,
-retry, and idempotency rules. It must also preserve the review and store-price
-ingestion boundaries. Publisher HTML remains transient.
+## Goals
 
-## Goals / Non-Goals
+- Let an admin add and repair a simple source without a deploy.
+- Keep one clear term for each stored concept.
+- Pin every run to immutable parsing rules.
+- Use the same parser for preview and collection.
+- Keep AI optional and unable to change active behavior.
+- Keep the first rules format small.
 
-**Goals:**
+## Non-Goals
 
-- Let an administrator add a source without deploying application code.
-- Let one source collect reviews or store prices.
-- Store immutable config versions in PostgreSQL and make activation and
-  rollback explicit.
-- Use the same parser and validator for preview and production collection.
-- Let one constrained LLM call create a draft config for a new or changed site.
-- Keep existing code adapters available while configured sources prove their
-  coverage.
-- Keep the shared code small and test each ownership boundary independently.
+- A general crawler, browser automation, authenticated scraping, or evasion.
+- Custom scripts, headers, request bodies, or regular expressions in rules.
+- Automatic activation of AI suggestions.
+- A workflow engine or multi-agent repair system.
+- Event parsing before event match and update behavior is defined.
 
-**Non-Goals:**
+## Stored Terms
 
-- An unrestricted crawler, browser automation, authenticated scraping, or
-  evasion of remote controls.
-- Automatic rights decisions, origin changes, or request-policy changes.
-- Automatic activation of an LLM-generated repair in the first release.
-- Replacing all current adapters before the configured path is measured.
-- A workflow engine, several agents, config inheritance, arbitrary scripts, or
-  arbitrary regular expressions in stored config.
-- Event parsing. Whisky festivals are the next planned collection kind, but
-  they need explicit match and update rules before they enter stored config.
+`external_site` identifies the remote publisher or store. It remains the owner
+of run history and product source identity.
 
-## Decisions
+`scrape_source` describes the site's collection intent. Its `kind` is `review`
+or `price`. A site owns one source. The source stores enablement, AI permission,
+sample URLs, and the current list URL.
 
-### Separate the site, collection, and config version
+`scrape_source_revision` stores an immutable parsing-rule revision. It pins the
+list URL, rules format, rules, creation method, and latest test result. A
+partial unique index permits one active revision for each source.
 
-An `external_site` remains one collection source. A new configured scraper
-record identifies whether that source collects `reviews` or `store_prices`. It
-owns enablement, LLM permission, starting URLs, and the active config pointer.
-Each external site owns exactly one configured scraper.
+`scrape_source_run` links a durable external-site run to its source and
+revision. Composite foreign keys prove that the run, source, revision, and site
+belong together. A suggestion run starts without a revision and records the
+new revision after the model response passes validation.
 
-Config versions are append-only rows. Each stores one strict JSON config,
-creation provenance, and its latest validation result. The configured scraper
-points to one active version. Activation changes the pointer in a transaction;
-rollback points it to an older validated version. Editing always creates a new
-draft.
+The small source-kind enum represents code-supported behavior. Site keys stay
+text because admins can add them without a deploy. A TODO beside the enum marks
+the planned `event` kind and its required product boundary.
 
-The explicit collection kind leaves a narrow place to add `events` later. The
-event parser can use Peated's existing event record and join this lifecycle
-without making the current parser generic. Its sink must first define how a
-scraped event matches and updates an existing event.
+## Network Control
 
-This is two tables instead of one status-heavy version table. It keeps mutable
-operating state separate from immutable versions and makes one active version
-an ordinary foreign-key invariant.
+An admin creates the exact origin and a conservative request policy. Targets,
+origins, and site mappings record `managed_by` as `code` or `admin`. Startup
+sync changes code-managed rows only.
 
-### Keep network authority outside generated config
+Parsing rules cannot contain origins, credentials, headers, robots exceptions,
+or retry policy. The list URL can change only within the source's current
+origin. Preview, AI sampling, and collection use the normal governed request
+session.
 
-An administrator creates the site's exact origin and a conservative target
-policy. The database stores whether a target, origin, and site-target mapping
-is code-owned or admin-owned. Definition synchronization updates only
-code-owned rows, so it cannot disable admin-owned sources during startup.
+## Rules Format 1
 
-Stored extraction config cannot contain origins, headers, credentials, request
-limits, robots exceptions, or browser actions. Preview, generation, and normal
-collection all use the existing governed request session.
+The first format supports one bounded list page and same-origin detail pages.
+It has CSS selectors for detail links and known review or price fields. Code
+owns date, score, money, currency, and volume conversion.
 
-Alternative considered: let the LLM return a complete scraper definition. This
-was rejected because page content and model output cannot own network access.
+The rules do not include their own format number. The revision column is the
+single source of truth for format dispatch. The format does not support
+pagination, browser rendering, APIs, or custom transforms. A code source is
+the escape hatch for those cases.
 
-### Use one small config language
+## Revision Lifecycle
 
-Version 1 supports a bounded index page plus detail pages. It contains:
+Editing always creates a revision. Preview runs that exact revision and stores
+only parsed fields and bounded issues. It does not store fetched HTML, review
+text, or products.
 
-- collection type and schema version;
-- selectors for detail links;
-- a maximum item count;
-- field selectors relative to an article, review, or product container;
-- fixed field readers for text, attributes, dates, native scores, money,
-  currency, volume, URLs, and optional identifiers.
+Activation locks the source, requires a passing test, clears the old active
+revision, activates the selected revision, and enables the source. It also
+makes the revision's list URL current for later suggestions. Rollback uses the
+same operation with an older passing revision.
 
-Selectors select data only. Transforms are code-owned and named. Config cannot
-contain JavaScript or free-form regular expressions. Review output must parse
-to `ExternalReviewArticleIngestionSchema`; price output must parse to a bounded
-array of `StorePriceInputSchema`.
+A collection run selects the active passing revision before queueing. The run
+keeps that revision across retries even if an admin activates another one.
 
-Version 1 does not support archive pagination, browser rendering, APIs, or
-source-specific request bodies. Current adapters remain the escape hatch for
-those cases.
+## AI Suggestions
 
-### Resolve a source for each durable run
+AI is allowed only when the source opts in. It is available for the first
+revision or after the latest revision fails its test. The server fetches a
+bounded list of approved pages and makes one structured model call with no
+tools and provider storage disabled.
 
-Current code sources continue to come from the production registry. A run for
-a configured scraper records the configured scraper id and exact config
-version id. The runtime builds its source definition from that immutable
-version and the separately approved database target. A resumed or retried run
-therefore cannot switch config midway through execution.
+Code validates the returned rules and source kind before it stores a revision.
+The model and prompt revision are stored as provenance. An admin must preview
+and activate the result.
 
-Preview is a bounded manual run with an in-memory product sink and a stored
-structured result. It never calls review or price persistence. Normal runs use
-the existing external-review or store-price sink selected by the collection
-type.
+## Admin Flow
 
-### Treat LLM generation as a proposal
+1. Add a site and its first review or price source.
+2. Enter rules or ask AI for a suggestion.
+3. Preview the parsed fields from current pages.
+4. Activate a passing revision.
+5. Use history to repair, roll back, or pause the source.
 
-The administrator supplies one index URL and representative detail URLs. The
-generation service fetches them through the scraper runtime and sends only the
-transient page content, the requested collection type, and the strict config
-schema to one model call. The source must explicitly allow LLM processing.
+The route creates a site with its source. Supporting several source kinds on
+one site would also need separate scheduling and run fan-out, so it is outside
+this first design.
 
-The model has no tools. It returns one config candidate. Code validates the
-schema, rejects selectors or URLs outside the contract, stores a draft, and
-runs the normal preview validator. The prompt, model, and engine version are
-stored with the draft. Failure creates no config and logs no page content.
+## Tests
 
-Alternative considered: run an autonomous repair agent. This was rejected
-because one bounded structured generation call is enough and is easier to
-test.
+Parser tests use synthetic HTML without a database or network. Integration
+tests cover source identity, immutable revisions, activation, run pinning,
+preview isolation, and target ownership. Live model quality belongs in
+`pnpm evals`, not `pnpm test`.
 
-### Use the same admin flow for new sites and changes
+## Migration
 
-Admin → Scrapers gains an Add Site action. A site page gains a Configs tab with
-one section per collection type. The flow is:
-
-1. create or select the collection;
-2. generate or enter a draft;
-3. preview structured results from current pages;
-4. activate a passing draft;
-5. inspect version history or roll back.
-
-Preview shows extracted fields, warnings, and canonical source links. Raw HTML
-and publisher prose are not stored.
-
-### Test code and live config separately
-
-The config interpreter is a function with no database or network access. Unit
-tests pass synthetic HTML and strict config into it. Integration tests own
-database versioning, permissions, run pinning, sinks, and route behavior.
-Model-sensitive config generation uses focused evals and does not enter
-`pnpm test`.
-
-Every draft uses the production interpreter and validator before activation.
-Live validation fetches several current pages and stores only structured
-results and warnings. Production runs apply the same validator, so preview
-cannot approve behavior that production would reject.
-
-## Risks / Trade-offs
-
-- **A selector returns plausible but wrong content** → Validate required facts,
-  keep first activation review-only, and require an admin to inspect structured
-  preview output.
-- **A model update produces worse configs** → Record and pin model and prompt
-  versions, keep all prior configs, and require preview before activation.
-- **Database-owned targets bypass startup policy** → Use conservative defaults,
-  enforce robots, separate target ownership, and require moderator routes for
-  all network changes.
-- **The first config language does not cover a source** → Keep the current code
-  adapter and add a shared reader only after repeated sources prove the need.
-- **Live preview is slow or deferred** → Run it through the durable scraper
-  runtime and show its normal queued, running, or failed state.
-- **Dynamic site keys weaken compile-time source lists** → Keep a separate
-  registered-source type for code adapters and validate public site keys as
-  bounded slugs resolved against the database.
-
-## Migration Plan
-
-1. Add the configured scraper, config version, target ownership, and run
-   reference columns with no behavior change.
-2. Add strict config schemas, the interpreter, validator, and deterministic
-   tests.
-3. Add database services and moderator routes for site creation, drafts,
-   preview, activation, disablement, and rollback.
-4. Add dynamic run resolution and reuse the existing review and price sinks.
-5. Add the single-call LLM draft generator and focused eval harness.
-6. Add the Configs admin tab and Add Site flow.
-7. Pilot one new review source and one simple store source in review-only or
-   hidden mode. Keep existing code adapters unchanged.
-
-Rollback disables the configured scraper and reactivates the prior config or
-the existing code adapter. Additive tables and columns remain in place so run
-history stays valid.
+This schema has not shipped. Replace the old generated migration instead of
+adding rename SQL or a compatibility layer. The first generated migration adds
+management metadata and the run support key. The second adds source tables and
+their composite foreign keys. This order is required by PostgreSQL. Keep
+existing code sources unchanged during the pilot.
 
 ## Open Questions
 
-- Which review and store sources are the best first fixtures for the version 1
-  selector language?
-- How should a future festival event collection match and update Peated's
-  existing event records across repeated runs?
-- After measured pilot results, which exact validation results can permit
-  automatic repair activation, if any?
+- Which review publisher and store are the best first pilot sources?
+- How will repeated event observations match and update existing events?
+- What measured validation result, if any, could permit automatic repair later?

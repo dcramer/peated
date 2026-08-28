@@ -16,12 +16,10 @@ export default function Page() {
   const router = useRouter();
   const orpc = useORPC();
   const create = useMutation(
-    orpc.externalSites.configured.create.mutationOptions(),
+    orpc.externalSites.scrapeSources.create.mutationOptions(),
   );
   const [error, setError] = useState<string>();
-  const [collection, setCollection] = useState<"reviews" | "store_prices">(
-    "reviews",
-  );
+  const [kind, setKind] = useState<"review" | "price">("review");
   const [allowLlmProcessing, setAllowLlmProcessing] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -32,18 +30,18 @@ export default function Page() {
       return z.string().catch("").parse(data.get(name));
     };
     try {
-      const scraper = await create.mutateAsync({
+      const source = await create.mutateAsync({
         key: textValue("key"),
         name: textValue("name"),
-        collection,
-        indexUrl: textValue("indexUrl"),
+        kind,
+        listUrl: textValue("listUrl"),
         sampleUrls: textValue("sampleUrl")
           .split("\n")
           .map((value) => value.trim())
           .filter(Boolean),
         allowLlmProcessing,
       });
-      router.push(`/admin/sites/${scraper.site.type}/configs`);
+      router.push(`/admin/sites/${source.site.type}/configs`);
     } catch (err) {
       setError(getFormErrorMessage(err));
     }
@@ -73,21 +71,17 @@ export default function Page() {
             <span className="mb-2 block font-semibold">Content to collect</span>
             <select
               className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
-              value={collection}
+              value={kind}
               onChange={(event) =>
-                setCollection(
-                  event.target.value === "store_prices"
-                    ? "store_prices"
-                    : "reviews",
-                )
+                setKind(event.target.value === "price" ? "price" : "review")
               }
             >
-              <option value="reviews">Reviews</option>
-              <option value="store_prices">Store prices</option>
+              <option value="review">Reviews</option>
+              <option value="price">Store prices</option>
             </select>
           </label>
           <TextField
-            name="indexUrl"
+            name="listUrl"
             type="url"
             label="List page"
             helpText="The page that links to review or product detail pages."

@@ -12,6 +12,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -86,6 +87,7 @@ export const externalSiteRuns = pgTable(
     uniqueIndex("external_site_run_active_unq")
       .on(table.externalSiteId)
       .where(sql`${table.status} IN ('queued', 'running')`),
+    unique("external_site_run_id_site_unq").on(table.id, table.externalSiteId),
     index("external_site_run_site_created_idx").on(
       table.externalSiteId,
       table.createdAt,

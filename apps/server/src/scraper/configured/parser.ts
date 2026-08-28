@@ -4,29 +4,26 @@ import { StorePriceInputSchema } from "@peated/server/schemas";
 import { load } from "cheerio";
 import { createHash } from "node:crypto";
 import type { z } from "zod";
-import type {
-  ConfiguredScraperConfig,
-  ConfiguredValueSelector,
-} from "./config";
-import type { ConfiguredParseIssue } from "./validation";
+import type { ScrapeRules, ScrapeValueSelector } from "./config";
+import type { ScrapeIssue } from "./validation";
 
-export type { ConfiguredParseIssue } from "./validation";
+export type { ScrapeIssue } from "./validation";
 
-export type ConfiguredIndexResult = {
+export type ScrapeListResult = {
   links: string[];
-  issues: ConfiguredParseIssue[];
+  issues: ScrapeIssue[];
 };
 
-export type ConfiguredDetailResult =
+export type ScrapeDetailResult =
   | {
-      collection: "reviews";
+      kind: "review";
       value: ExternalReviewArticleIngestion | null;
-      issues: ConfiguredParseIssue[];
+      issues: ScrapeIssue[];
     }
   | {
-      collection: "store_prices";
+      kind: "price";
       value: z.infer<typeof StorePriceInputSchema>[];
-      issues: ConfiguredParseIssue[];
+      issues: ScrapeIssue[];
     };
 
 function messageForError(error: Error) {
@@ -35,7 +32,7 @@ function messageForError(error: Error) {
 
 function readValue(
   root: ReturnType<typeof load>,
-  selector: ConfiguredValueSelector,
+  selector: ScrapeValueSelector,
 ) {
   const element = root(selector.selector).first();
   const raw = selector.attribute
@@ -57,25 +54,25 @@ function absoluteHttpUrl(value: string, baseUrl: URL) {
   return url.toString();
 }
 
-export function parseConfiguredIndex(
-  config: ConfiguredScraperConfig,
+export function parseScrapeList(
+  rules: ScrapeRules,
   html: string,
   pageUrl: URL,
-): ConfiguredIndexResult {
-  const issues: ConfiguredParseIssue[] = [];
+): ScrapeListResult {
+  const issues: ScrapeIssue[] = [];
   const links = new Set<string>();
   try {
     const $ = load(html);
-    for (const element of $(config.index.itemLink.selector).toArray()) {
-      const raw = config.index.itemLink.attribute
-        ? $(element).attr(config.index.itemLink.attribute)
+    for (const element of $(rules.list.detailLink.selector).toArray()) {
+      const raw = rules.list.detailLink.attribute
+        ? $(element).attr(rules.list.detailLink.attribute)
         : $(element).text();
       if (!raw?.trim()) continue;
       try {
         links.add(absoluteHttpUrl(raw.trim(), pageUrl));
       } catch (error) {
         issues.push({
-          field: "index.itemLink",
+          field: "list.detailLink",
           message: messageForError(
             error instanceof Error
               ? error
@@ -83,11 +80,11 @@ export function parseConfiguredIndex(
           ),
         });
       }
-      if (links.size >= config.index.maxItems) break;
+      if (links.size >= rules.list.maxItems) break;
     }
   } catch (error) {
     issues.push({
-      field: "index.itemLink",
+      field: "list.detailLink",
       message: messageForError(
         error instanceof Error ? error : new Error("Unable to parse selector."),
       ),
@@ -95,7 +92,7 @@ export function parseConfiguredIndex(
   }
   if (links.size === 0) {
     issues.push({
-      field: "index.itemLink",
+      field: "list.detailLink",
       message: "The selector did not find any detail links.",
     });
   }
@@ -132,7 +129,7 @@ function parseVolume(value: string | null) {
     : Math.round(number);
 }
 
-function zodIssues(error: z.ZodError): ConfiguredParseIssue[] {
+function zodIssues(error: z.ZodError): ScrapeIssue[] {
   return error.issues.map((issue) => ({
     field: issue.path.join("."),
     message: issue.message,
@@ -140,12 +137,12 @@ function zodIssues(error: z.ZodError): ConfiguredParseIssue[] {
 }
 
 function parseReviewDetail(
-  config: Extract<ConfiguredScraperConfig, { collection: "reviews" }>,
+  config: Extract<ScrapeRules, { kind: "review" }>,
   html: string,
   pageUrl: URL,
-): ConfiguredDetailResult {
+): ScrapeDetailResult {
   const $ = load(html);
-  const issues: ConfiguredParseIssue[] = [];
+  const issues: ScrapeIssue[] = [];
   const title = readValue($, config.detail.title);
   const publishedAtText = config.detail.publishedAt
     ? readValue($, config.detail.publishedAt)
@@ -229,16 +226,16 @@ function parseReviewDetail(
   });
   if (!result.success) {
     issues.push(...zodIssues(result.error));
-    return { collection: "reviews", value: null, issues };
+    return { kind: "review", value: null, issues };
   }
-  return { collection: "reviews", value: result.data, issues };
+  return { kind: "review", value: result.data, issues };
 }
 
 function parseStorePriceDetail(
-  config: Extract<ConfiguredScraperConfig, { collection: "store_prices" }>,
+  config: Extract<ScrapeRules, { kind: "price" }>,
   html: string,
   pageUrl: URL,
-): ConfiguredDetailResult {
+): ScrapeDetailResult {
   const $ = load(html);
   let url = pageUrl.toString();
   if (config.detail.url) {
@@ -264,35 +261,35 @@ function parseStorePriceDetail(
   const result = StorePriceInputSchema.safeParse(raw);
   if (!result.success) {
     return {
-      collection: "store_prices",
+      kind: "price",
       value: [],
       issues: zodIssues(result.error),
     };
   }
-  return { collection: "store_prices", value: [result.data], issues: [] };
+  return { kind: "price", value: [result.data], issues: [] };
 }
 
-export function parseConfiguredDetail(
-  config: ConfiguredScraperConfig,
+export function parseScrapeDetail(
+  rules: ScrapeRules,
   html: string,
   pageUrl: URL,
-): ConfiguredDetailResult {
+): ScrapeDetailResult {
   try {
-    return config.collection === "reviews"
-      ? parseReviewDetail(config, html, pageUrl)
-      : parseStorePriceDetail(config, html, pageUrl);
+    return rules.kind === "review"
+      ? parseReviewDetail(rules, html, pageUrl)
+      : parseStorePriceDetail(rules, html, pageUrl);
   } catch (error) {
     const message = messageForError(
       error instanceof Error ? error : new Error("Unable to parse selector."),
     );
-    return config.collection === "reviews"
+    return rules.kind === "review"
       ? {
-          collection: "reviews",
+          kind: "review",
           value: null,
           issues: [{ field: "detail", message }],
         }
       : {
-          collection: "store_prices",
+          kind: "price",
           value: [],
           issues: [{ field: "detail", message }],
         };

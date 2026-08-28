@@ -1,8 +1,6 @@
 import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  configuredScraperConfigVersions,
-  configuredScrapers,
   externalReviewArticles,
   externalReviewSourcePolicies,
   externalReviews,
@@ -10,6 +8,8 @@ import {
   externalSiteScrapeTargets,
   externalSites,
   scrapeOrigins,
+  scrapeSourceRevisions,
+  scrapeSources,
   scrapeTargets,
   storePrices,
   type ExternalSite,
@@ -145,21 +145,21 @@ async function getHealthForSites(
       .where(inArray(externalReviewSourcePolicies.externalSiteId, siteIds)),
     db
       .select({
-        externalSiteId: configuredScrapers.externalSiteId,
-        collection: configuredScrapers.collection,
-        enabled: configuredScrapers.enabled,
-        activeConfigVersionId: configuredScrapers.activeConfigVersionId,
-        validationStatus: configuredScraperConfigVersions.validationStatus,
+        externalSiteId: scrapeSources.externalSiteId,
+        kind: scrapeSources.kind,
+        enabled: scrapeSources.enabled,
+        activeRevisionId: scrapeSourceRevisions.id,
+        validationStatus: scrapeSourceRevisions.validationStatus,
       })
-      .from(configuredScrapers)
+      .from(scrapeSources)
       .leftJoin(
-        configuredScraperConfigVersions,
-        eq(
-          configuredScraperConfigVersions.id,
-          configuredScrapers.activeConfigVersionId,
+        scrapeSourceRevisions,
+        and(
+          eq(scrapeSourceRevisions.scrapeSourceId, scrapeSources.id),
+          eq(scrapeSourceRevisions.active, true),
         ),
       )
-      .where(inArray(configuredScrapers.externalSiteId, siteIds)),
+      .where(inArray(scrapeSources.externalSiteId, siteIds)),
   ]);
 
   const reviewCoverageBySite = new Map(
@@ -224,8 +224,7 @@ async function getHealthForSites(
     const registration = getScraperRegistration(site.type);
     const configured = configuredBySite.get(site.id);
     const hasReviewPolicy =
-      isExternalReviewSiteKey(site.type) ||
-      configured?.collection === "reviews";
+      isExternalReviewSiteKey(site.type) || configured?.kind === "review";
     const reviewCoverage = reviewCoverageBySite.get(site.id);
     const priceCoverage = priceCoverageBySite.get(site.id);
     const latestRun = latestRunBySite.get(site.id);
@@ -243,7 +242,7 @@ async function getHealthForSites(
         registered:
           registration !== null ||
           (configured?.enabled === true &&
-            configured.activeConfigVersionId !== null &&
+            configured.activeRevisionId !== null &&
             configured.validationStatus === "passed"),
         targetKeys:
           registration?.targetKeys ??

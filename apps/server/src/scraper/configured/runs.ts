@@ -1,125 +1,125 @@
 import { type AnyDatabase, db } from "@peated/server/db";
 import {
-  configuredScraperConfigVersions,
-  configuredScraperRuns,
-  configuredScrapers,
   externalSiteRuns,
+  scrapeSourceRevisions,
+  scrapeSourceRuns,
+  scrapeSources,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { ConfiguredScraperConfigSchema } from "./config";
+import { parseScrapeRules } from "./config";
 import {
-  ConfiguredScraperNotFoundError,
-  ConfiguredScraperValidationError,
+  ScrapeSourceNotFoundError,
+  ScrapeSourceValidationError,
 } from "./service";
 
-export async function createPinnedConfiguredRun(
+export async function createPinnedScrapeSourceRun(
   connection: AnyDatabase,
   input: {
     externalSiteId: number;
+    scrapeSourceId?: number;
     requestedById?: number;
     trigger: "manual" | "scheduled";
     purpose: "collect" | "preview";
-    configVersionId?: number;
+    revisionId?: number;
   },
 ) {
-  const conditions = [
-    eq(configuredScrapers.externalSiteId, input.externalSiteId),
+  const sourceConditions = [
+    eq(scrapeSources.externalSiteId, input.externalSiteId),
   ];
-  if (input.purpose === "collect") {
-    conditions.push(eq(configuredScrapers.enabled, true));
+  if (input.scrapeSourceId) {
+    sourceConditions.push(eq(scrapeSources.id, input.scrapeSourceId));
   }
-  const [selected] = await connection
-    .select({
-      scraper: configuredScrapers,
-      version: configuredScraperConfigVersions,
-    })
-    .from(configuredScrapers)
-    .innerJoin(
-      configuredScraperConfigVersions,
-      input.configVersionId
-        ? eq(configuredScraperConfigVersions.id, input.configVersionId)
-        : eq(
-            configuredScraperConfigVersions.id,
-            configuredScrapers.activeConfigVersionId,
-          ),
-    )
-    .where(and(...conditions));
+  if (input.purpose === "collect") {
+    sourceConditions.push(eq(scrapeSources.enabled, true));
+  }
+  const revisionConditions = [
+    eq(scrapeSourceRevisions.scrapeSourceId, scrapeSources.id),
+    input.revisionId
+      ? eq(scrapeSourceRevisions.id, input.revisionId)
+      : eq(scrapeSourceRevisions.active, true),
+  ];
+  const selected = await connection
+    .select({ source: scrapeSources, revision: scrapeSourceRevisions })
+    .from(scrapeSources)
+    .innerJoin(scrapeSourceRevisions, and(...revisionConditions))
+    .where(and(...sourceConditions))
+    .limit(2);
   if (
-    !selected ||
-    selected.version.configuredScraperId !== selected.scraper.id ||
+    selected.length !== 1 ||
     (input.purpose === "collect" &&
-      selected.version.validationStatus !== "passed")
+      selected[0]?.revision.validationStatus !== "passed")
   ) {
-    throw new ConfiguredScraperValidationError(
-      "No tested version is ready for this run.",
+    throw new ScrapeSourceValidationError(
+      "Exactly one tested source revision must be ready for this run.",
     );
   }
-  const config = ConfiguredScraperConfigSchema.parse(selected.version.config);
+  const [{ source, revision }] = selected;
+  const rules = parseScrapeRules(revision.formatVersion, revision.rules);
   const [run] = await connection
     .insert(externalSiteRuns)
     .values({
-      externalSiteId: input.externalSiteId,
+      externalSiteId: source.externalSiteId,
       trigger: input.trigger,
       requestedById: input.requestedById,
-      requestLimit: config.index.maxItems + 1,
+      requestLimit: rules.list.maxItems + 1,
     })
     .returning();
   if (!run) throw new Error("Failed to create source run.");
-  await connection.insert(configuredScraperRuns).values({
+  await connection.insert(scrapeSourceRuns).values({
     externalSiteRunId: run.id,
-    configuredScraperId: selected.scraper.id,
-    configVersionId: selected.version.id,
+    externalSiteId: source.externalSiteId,
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
     purpose: input.purpose,
   });
-  return { run, scraper: selected.scraper, version: selected.version };
+  return { run, source, revision };
 }
 
-export async function createConfiguredGenerationRun(input: {
-  configuredScraperId: number;
+export async function createScrapeSourceSuggestionRun(input: {
+  scrapeSourceId: number;
   requestedById: number;
 }) {
   return await db.transaction(async (tx) => {
-    const [scraper] = await tx
+    const [source] = await tx
       .select()
-      .from(configuredScrapers)
-      .where(eq(configuredScrapers.id, input.configuredScraperId))
+      .from(scrapeSources)
+      .where(eq(scrapeSources.id, input.scrapeSourceId))
       .for("update");
-    if (!scraper) throw new ConfiguredScraperNotFoundError();
-    if (!scraper.allowLlmProcessing) {
-      throw new ConfiguredScraperValidationError(
+    if (!source) throw new ScrapeSourceNotFoundError();
+    if (!source.allowLlmProcessing) {
+      throw new ScrapeSourceValidationError(
         "AI suggestions are not allowed for this source.",
       );
     }
-    const [latestVersion] = await tx
+    const [latestRevision] = await tx
       .select({
-        validationStatus: configuredScraperConfigVersions.validationStatus,
+        validationStatus: scrapeSourceRevisions.validationStatus,
       })
-      .from(configuredScraperConfigVersions)
-      .where(
-        eq(configuredScraperConfigVersions.configuredScraperId, scraper.id),
-      )
-      .orderBy(desc(configuredScraperConfigVersions.version))
+      .from(scrapeSourceRevisions)
+      .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id))
+      .orderBy(desc(scrapeSourceRevisions.revision))
       .limit(1);
-    if (latestVersion && latestVersion.validationStatus !== "failed") {
-      throw new ConfiguredScraperValidationError(
+    if (latestRevision && latestRevision.validationStatus !== "failed") {
+      throw new ScrapeSourceValidationError(
         "AI repair is available only after the latest test fails.",
       );
     }
     const [run] = await tx
       .insert(externalSiteRuns)
       .values({
-        externalSiteId: scraper.externalSiteId,
+        externalSiteId: source.externalSiteId,
         trigger: "manual",
         requestedById: input.requestedById,
-        requestLimit: Math.min(scraper.sampleUrls.length + 1, 11),
+        requestLimit: Math.min(source.sampleUrls.length + 1, 11),
       })
       .returning();
     if (!run) throw new Error("Failed to create AI suggestion run.");
-    await tx.insert(configuredScraperRuns).values({
+    await tx.insert(scrapeSourceRuns).values({
       externalSiteRunId: run.id,
-      configuredScraperId: scraper.id,
-      configVersionId: null,
-      purpose: "generate",
+      externalSiteId: source.externalSiteId,
+      scrapeSourceId: source.id,
+      revisionId: null,
+      purpose: "suggest",
     });
     return run;
   });

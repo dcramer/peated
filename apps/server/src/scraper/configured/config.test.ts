@@ -1,15 +1,15 @@
 import { expect, test } from "vitest";
 import {
-  CONFIGURED_SCRAPER_MAX_ITEMS,
-  ConfiguredScraperConfigSchema,
+  parseScrapeRules,
+  SCRAPE_SOURCE_MAX_ITEMS,
+  ScrapeRulesSchema,
 } from "./config";
 
 function reviewConfig(maxItems: number) {
   return {
-    engineVersion: 1,
-    collection: "reviews",
-    index: {
-      itemLink: { selector: "a.review", attribute: "href" },
+    kind: "review",
+    list: {
+      detailLink: { selector: "a.review", attribute: "href" },
       maxItems,
     },
     detail: {
@@ -22,13 +22,17 @@ function reviewConfig(maxItems: number) {
 
 test("keeps the list and every detail page within one run", () => {
   expect(
-    ConfiguredScraperConfigSchema.parse(
-      reviewConfig(CONFIGURED_SCRAPER_MAX_ITEMS),
-    ).index.maxItems,
+    ScrapeRulesSchema.parse(reviewConfig(SCRAPE_SOURCE_MAX_ITEMS)).list
+      .maxItems,
   ).toBe(99);
   expect(() =>
-    ConfiguredScraperConfigSchema.parse(
-      reviewConfig(CONFIGURED_SCRAPER_MAX_ITEMS + 1),
-    ),
+    ScrapeRulesSchema.parse(reviewConfig(SCRAPE_SOURCE_MAX_ITEMS + 1)),
   ).toThrow();
+});
+
+test("rejects rules for an unsupported stored format", () => {
+  const rules = ScrapeRulesSchema.parse(reviewConfig(25));
+  expect(() => parseScrapeRules(2, rules)).toThrow(
+    "Unsupported scrape rules format: 2.",
+  );
 });

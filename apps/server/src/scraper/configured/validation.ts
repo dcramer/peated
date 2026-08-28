@@ -1,7 +1,7 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
 import { z } from "zod";
 
-export const ConfiguredParseIssueSchema = z
+export const ScrapeIssueSchema = z
   .object({
     field: z.string(),
     message: z.string(),
@@ -10,7 +10,7 @@ export const ConfiguredParseIssueSchema = z
 
 const ReviewPageSchema = z
   .object({
-    collection: z.literal("reviews"),
+    kind: z.literal("review"),
     url: z.url(),
     title: z.string(),
     publishedAt: z.string().datetime().nullable(),
@@ -33,9 +33,9 @@ const ReviewPageSchema = z
   })
   .strict();
 
-const StorePricePageSchema = z
+const PricePageSchema = z
   .object({
-    collection: z.literal("store_prices"),
+    kind: z.literal("price"),
     url: z.url(),
     products: z.array(
       z
@@ -54,22 +54,22 @@ const StorePricePageSchema = z
   })
   .strict();
 
-export const ConfiguredScraperPreviewPageSchema = z.discriminatedUnion(
-  "collection",
-  [ReviewPageSchema, StorePricePageSchema],
-);
+export const ScrapeSourcePreviewPageSchema = z.discriminatedUnion("kind", [
+  ReviewPageSchema,
+  PricePageSchema,
+]);
 
-export const ConfiguredScraperValidationSchema = z
+export const ScrapeSourceValidationSchema = z
   .object({
-    issues: z.array(ConfiguredParseIssueSchema),
-    pages: z.array(ConfiguredScraperPreviewPageSchema),
+    issues: z.array(ScrapeIssueSchema),
+    pages: z.array(ScrapeSourcePreviewPageSchema),
   })
   .strict();
 
-export type ConfiguredParseIssue = z.infer<typeof ConfiguredParseIssueSchema>;
-export type ConfiguredScraperPreviewPage = z.infer<
-  typeof ConfiguredScraperPreviewPageSchema
+export type ScrapeIssue = z.infer<typeof ScrapeIssueSchema>;
+export type ScrapeSourcePreviewPage = z.infer<
+  typeof ScrapeSourcePreviewPageSchema
 >;
-export type ConfiguredScraperValidation = z.infer<
-  typeof ConfiguredScraperValidationSchema
+export type ScrapeSourceValidation = z.infer<
+  typeof ScrapeSourceValidationSchema
 >;

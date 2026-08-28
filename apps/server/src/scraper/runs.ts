@@ -9,7 +9,7 @@ import * as Sentry from "@sentry/node";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveConfiguredRunRegistry } from "./configured/runtime";
+import { resolveScrapeSourceRunRegistry } from "./configured/runtime";
 import { ScraperCoordinationError } from "./coordinator";
 import {
   findScraperSourceBySiteKey,
@@ -280,7 +280,7 @@ export async function executeScraperRun(
   },
 ): Promise<ScraperRunExecutionResult> {
   const { runId } = ScraperRunJobInputSchema.parse(input);
-  const runRegistry = await resolveConfiguredRunRegistry(runId, registry);
+  const runRegistry = await resolveScrapeSourceRunRegistry(runId, registry);
   const claimed = await claimScraperRun({
     runId,
     registry: runRegistry,

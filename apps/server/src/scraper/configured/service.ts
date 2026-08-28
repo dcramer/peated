@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import {
-  configuredScraperConfigVersions,
-  configuredScrapers,
   externalReviewSourcePolicies,
   externalSites,
   externalSiteScrapeTargets,
   scrapeOrigins,
+  scrapeSourceRevisions,
+  scrapeSources,
   scrapeTargets,
 } from "@peated/server/db/schema";
 import { ExternalSiteKeySchema } from "@peated/server/schemas";
@@ -13,11 +13,12 @@ import { and, desc, eq, max } from "drizzle-orm";
 import { z } from "zod";
 import { DEFAULT_SCRAPER_REQUEST_POLICY } from "../definitions";
 import {
-  CONFIGURED_SCRAPER_ENGINE_VERSION,
-  type ConfiguredScraperConfig,
-  ConfiguredScraperConfigSchema,
+  SCRAPE_RULES_FORMAT_VERSION,
+  SCRAPE_SOURCE_KIND_LIST,
+  type ScrapeRules,
+  ScrapeRulesSchema,
 } from "./config";
-import type { ConfiguredScraperValidation } from "./validation";
+import type { ScrapeSourceValidation } from "./validation";
 
 const HttpUrlSchema = z
   .url()
@@ -29,50 +30,48 @@ const CreateSiteInputSchema = z
   .object({
     key: ExternalSiteKeySchema,
     name: z.string().trim().min(1).max(200),
-    collection: z.enum(["reviews", "store_prices"]),
-    indexUrl: HttpUrlSchema,
+    kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
+    listUrl: HttpUrlSchema,
     sampleUrls: z.array(HttpUrlSchema).max(10).default([]),
     allowLlmProcessing: z.boolean().default(false),
     createdById: z.number().int().positive(),
   })
   .strict();
 
-export type CreateConfiguredScraperSiteInput = z.input<
-  typeof CreateSiteInputSchema
->;
+export type CreateScrapeSourceSiteInput = z.input<typeof CreateSiteInputSchema>;
 
-export class ConfiguredScraperConflictError extends Error {
-  override name = "ConfiguredScraperConflictError";
+export class ScrapeSourceConflictError extends Error {
+  override name = "ScrapeSourceConflictError";
 }
 
-export class ConfiguredScraperNotFoundError extends Error {
-  override name = "ConfiguredScraperNotFoundError";
+export class ScrapeSourceNotFoundError extends Error {
+  override name = "ScrapeSourceNotFoundError";
 }
 
-export class ConfiguredScraperValidationError extends Error {
-  override name = "ConfiguredScraperValidationError";
+export class ScrapeSourceValidationError extends Error {
+  override name = "ScrapeSourceValidationError";
 }
 
 const DatabaseErrorSchema = z.object({ code: z.string() });
 
 function exactOrigin(url: URL) {
   if (url.username || url.password) {
-    throw new ConfiguredScraperValidationError(
+    throw new ScrapeSourceValidationError(
       "Source URLs cannot contain credentials.",
     );
   }
   return url.origin;
 }
 
-export async function createConfiguredScraperSite(
-  rawInput: CreateConfiguredScraperSiteInput,
+export async function createSiteWithScrapeSource(
+  rawInput: CreateScrapeSourceSiteInput,
 ) {
   const input = CreateSiteInputSchema.parse(rawInput);
-  const indexUrl = new URL(input.indexUrl);
-  const origin = exactOrigin(indexUrl);
+  const listUrl = new URL(input.listUrl);
+  const origin = exactOrigin(listUrl);
   for (const sample of input.sampleUrls) {
     if (exactOrigin(new URL(sample)) !== origin) {
-      throw new ConfiguredScraperValidationError(
+      throw new ScrapeSourceValidationError(
         "Example pages must use the same website as the list page.",
       );
     }
@@ -88,7 +87,7 @@ export async function createConfiguredScraperSite(
 
       await tx.insert(scrapeTargets).values({
         key: input.key,
-        owner: "admin",
+        managedBy: "admin",
         enabled: true,
         minimumSpacingMs: DEFAULT_SCRAPER_REQUEST_POLICY.minimumSpacingMs,
         requestsPerWindow: DEFAULT_SCRAPER_REQUEST_POLICY.requestsPerWindow,
@@ -99,21 +98,21 @@ export async function createConfiguredScraperSite(
       });
       await tx.insert(scrapeOrigins).values({
         origin,
-        owner: "admin",
+        managedBy: "admin",
         targetKey: input.key,
         robotsMode: "enforce",
       });
       await tx.insert(externalSiteScrapeTargets).values({
         externalSiteId: site.id,
         targetKey: input.key,
-        owner: "admin",
+        managedBy: "admin",
       });
-      const [scraper] = await tx
-        .insert(configuredScrapers)
+      const [source] = await tx
+        .insert(scrapeSources)
         .values({
           externalSiteId: site.id,
-          collection: input.collection,
-          indexUrl: indexUrl.toString(),
+          kind: input.kind,
+          listUrl: listUrl.toString(),
           sampleUrls: input.sampleUrls.map((value) =>
             new URL(value).toString(),
           ),
@@ -121,8 +120,8 @@ export async function createConfiguredScraperSite(
           createdById: input.createdById,
         })
         .returning();
-      if (!scraper) throw new Error("Failed to create source parsing rules.");
-      if (input.collection === "reviews") {
+      if (!source) throw new Error("Failed to create scrape source.");
+      if (input.kind === "review") {
         await tx.insert(externalReviewSourcePolicies).values({
           externalSiteId: site.id,
           publicationMode: "disabled",
@@ -131,11 +130,11 @@ export async function createConfiguredScraperSite(
           allowSummaryDisplay: false,
         });
       }
-      return { site, scraper };
+      return { site, source };
     });
   } catch (error) {
     if (DatabaseErrorSchema.safeParse(error).data?.code === "23505") {
-      throw new ConfiguredScraperConflictError(
+      throw new ScrapeSourceConflictError(
         "A source with this short name already exists.",
       );
     }
@@ -143,151 +142,172 @@ export async function createConfiguredScraperSite(
   }
 }
 
-export type CreateConfiguredScraperDraftInput = {
-  configuredScraperId: number;
-  config: ConfiguredScraperConfig;
+export type CreateScrapeSourceDraftInput = {
+  scrapeSourceId: number;
+  listUrl?: string;
+  rules: ScrapeRules;
   createdById: number;
 } & (
   | { createdWith: "person" }
   | { createdWith: "ai"; model: string; promptVersion: string }
 );
 
-export async function createConfiguredScraperDraft(
-  input: CreateConfiguredScraperDraftInput,
+export async function createScrapeSourceDraft(
+  input: CreateScrapeSourceDraftInput,
 ) {
-  const config = ConfiguredScraperConfigSchema.parse(input.config);
+  const rules = ScrapeRulesSchema.parse(input.rules);
   return await db.transaction(async (tx) => {
-    const [scraper] = await tx
+    const [source] = await tx
       .select()
-      .from(configuredScrapers)
-      .where(eq(configuredScrapers.id, input.configuredScraperId))
+      .from(scrapeSources)
+      .where(eq(scrapeSources.id, input.scrapeSourceId))
       .for("update");
-    if (!scraper) throw new ConfiguredScraperNotFoundError();
-    if (scraper.collection !== config.collection) {
-      throw new ConfiguredScraperValidationError(
+    if (!source) throw new ScrapeSourceNotFoundError();
+    const listUrl = HttpUrlSchema.parse(input.listUrl ?? source.listUrl);
+    if (
+      exactOrigin(new URL(listUrl)) !== exactOrigin(new URL(source.listUrl))
+    ) {
+      throw new ScrapeSourceValidationError(
+        "The list page must stay on the source website.",
+      );
+    }
+    if (source.kind !== rules.kind) {
+      throw new ScrapeSourceValidationError(
         "The parsing rules collect the wrong content.",
       );
     }
-    if (input.createdWith === "ai" && !scraper.allowLlmProcessing) {
-      throw new ConfiguredScraperValidationError(
+    if (input.createdWith === "ai" && !source.allowLlmProcessing) {
+      throw new ScrapeSourceValidationError(
         "AI suggestions are not allowed for this source.",
       );
     }
     const [latest] = await tx
-      .select({ version: max(configuredScraperConfigVersions.version) })
-      .from(configuredScraperConfigVersions)
-      .where(
-        eq(configuredScraperConfigVersions.configuredScraperId, scraper.id),
-      );
-    const [version] = await tx
-      .insert(configuredScraperConfigVersions)
+      .select({ revision: max(scrapeSourceRevisions.revision) })
+      .from(scrapeSourceRevisions)
+      .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
+    const [revision] = await tx
+      .insert(scrapeSourceRevisions)
       .values({
-        configuredScraperId: scraper.id,
-        version: (latest?.version ?? 0) + 1,
-        config,
-        origin: input.createdWith === "ai" ? "llm" : "manual",
+        scrapeSourceId: source.id,
+        revision: (latest?.revision ?? 0) + 1,
+        formatVersion: SCRAPE_RULES_FORMAT_VERSION,
+        listUrl: new URL(listUrl).toString(),
+        rules,
+        createdWith: input.createdWith,
         model: input.createdWith === "ai" ? input.model : null,
         promptVersion: input.createdWith === "ai" ? input.promptVersion : null,
-        engineVersion: CONFIGURED_SCRAPER_ENGINE_VERSION,
         validationResult: { issues: [], pages: [] },
         createdById: input.createdById,
       })
       .returning();
-    if (!version) throw new Error("Failed to create parsing-rule version.");
-    return version;
+    if (!revision) throw new Error("Failed to create parsing-rule revision.");
+    return revision;
   });
 }
 
-export async function listConfiguredScrapers(siteKey?: string) {
+export async function listScrapeSources(siteKey?: string) {
   const query = db
-    .select({ scraper: configuredScrapers, site: externalSites })
-    .from(configuredScrapers)
+    .select({ source: scrapeSources, site: externalSites })
+    .from(scrapeSources)
     .innerJoin(
       externalSites,
-      eq(externalSites.id, configuredScrapers.externalSiteId),
+      eq(externalSites.id, scrapeSources.externalSiteId),
     );
   return siteKey
     ? await query.where(eq(externalSites.type, siteKey))
-    : await query.orderBy(externalSites.name, configuredScrapers.collection);
+    : await query.orderBy(externalSites.name, scrapeSources.kind);
 }
 
-export async function listConfiguredScraperVersions(
-  configuredScraperId: number,
-) {
+export async function listScrapeSourceRevisions(scrapeSourceId: number) {
   return await db
     .select()
-    .from(configuredScraperConfigVersions)
-    .where(
-      eq(
-        configuredScraperConfigVersions.configuredScraperId,
-        configuredScraperId,
-      ),
-    )
-    .orderBy(desc(configuredScraperConfigVersions.version));
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.scrapeSourceId, scrapeSourceId))
+    .orderBy(desc(scrapeSourceRevisions.revision));
 }
 
-export async function recordConfiguredScraperValidation(input: {
-  configVersionId: number;
+export async function recordScrapeSourceValidation(input: {
+  revisionId: number;
   status: "passed" | "failed";
-  result: ConfiguredScraperValidation;
+  result: ScrapeSourceValidation;
 }) {
-  const [version] = await db
-    .update(configuredScraperConfigVersions)
+  const [revision] = await db
+    .update(scrapeSourceRevisions)
     .set({
       validationStatus: input.status,
       validationResult: input.result,
       validatedAt: new Date(),
     })
-    .where(eq(configuredScraperConfigVersions.id, input.configVersionId))
+    .where(eq(scrapeSourceRevisions.id, input.revisionId))
     .returning();
-  if (!version) throw new ConfiguredScraperNotFoundError();
-  return version;
+  if (!revision) throw new ScrapeSourceNotFoundError();
+  return revision;
 }
 
-export async function activateConfiguredScraperVersion(input: {
-  configuredScraperId: number;
-  configVersionId: number;
+export async function activateScrapeSourceRevision(input: {
+  scrapeSourceId: number;
+  revisionId: number;
 }) {
   return await db.transaction(async (tx) => {
-    const [version] = await tx
+    const [source] = await tx
       .select()
-      .from(configuredScraperConfigVersions)
+      .from(scrapeSources)
+      .where(eq(scrapeSources.id, input.scrapeSourceId))
+      .for("update");
+    if (!source) throw new ScrapeSourceNotFoundError();
+
+    const [revision] = await tx
+      .select()
+      .from(scrapeSourceRevisions)
       .where(
         and(
-          eq(configuredScraperConfigVersions.id, input.configVersionId),
-          eq(
-            configuredScraperConfigVersions.configuredScraperId,
-            input.configuredScraperId,
-          ),
+          eq(scrapeSourceRevisions.id, input.revisionId),
+          eq(scrapeSourceRevisions.scrapeSourceId, source.id),
         ),
-      )
-      .for("update");
-    if (!version) throw new ConfiguredScraperNotFoundError();
-    if (version.validationStatus !== "passed") {
-      throw new ConfiguredScraperValidationError(
-        "Test this version successfully before you activate it.",
+      );
+    if (!revision) throw new ScrapeSourceNotFoundError();
+    if (revision.validationStatus !== "passed") {
+      throw new ScrapeSourceValidationError(
+        "Test this revision successfully before you activate it.",
       );
     }
-    const [scraper] = await tx
-      .update(configuredScrapers)
+
+    await tx
+      .update(scrapeSourceRevisions)
+      .set({ active: false })
+      .where(
+        and(
+          eq(scrapeSourceRevisions.scrapeSourceId, source.id),
+          eq(scrapeSourceRevisions.active, true),
+        ),
+      );
+    const [activeRevision] = await tx
+      .update(scrapeSourceRevisions)
+      .set({ active: true })
+      .where(eq(scrapeSourceRevisions.id, revision.id))
+      .returning();
+    if (!activeRevision) throw new ScrapeSourceNotFoundError();
+
+    const [enabledSource] = await tx
+      .update(scrapeSources)
       .set({
-        activeConfigVersionId: version.id,
         enabled: true,
+        listUrl: activeRevision.listUrl,
         updatedAt: new Date(),
       })
-      .where(eq(configuredScrapers.id, input.configuredScraperId))
+      .where(eq(scrapeSources.id, source.id))
       .returning();
-    if (!scraper) throw new ConfiguredScraperNotFoundError();
-    return { scraper, version };
+    if (!enabledSource) throw new ScrapeSourceNotFoundError();
+    return { source: enabledSource, revision: activeRevision };
   });
 }
 
-export async function disableConfiguredScraper(configuredScraperId: number) {
-  const [scraper] = await db
-    .update(configuredScrapers)
+export async function disableScrapeSource(scrapeSourceId: number) {
+  const [source] = await db
+    .update(scrapeSources)
     .set({ enabled: false, updatedAt: new Date() })
-    .where(eq(configuredScrapers.id, configuredScraperId))
+    .where(eq(scrapeSources.id, scrapeSourceId))
     .returning();
-  if (!scraper) throw new ConfiguredScraperNotFoundError();
-  return scraper;
+  if (!source) throw new ScrapeSourceNotFoundError();
+  return source;
 }

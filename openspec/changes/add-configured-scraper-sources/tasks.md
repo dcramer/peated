@@ -1,54 +1,53 @@
 ## 1. Data Model And Source Identity
 
-- [x] 1.1 Add one configured scraper per external site and immutable config-version tables with one active version pointer
-- [x] 1.2 Add admin ownership to scraper targets, origins, and site mappings so code definition sync preserves admin rows
-- [x] 1.3 Pin configured scraper and config version ids on durable scraper runs
-- [x] 1.4 Generate and inspect the database migration and add schema constraint tests
-- [x] 1.5 Add bounded dynamic site keys while retaining a narrow registered-source type for code adapters
+- [x] 1.1 Add one scrape source per site, immutable revisions, and run links with one active revision
+- [x] 1.2 Mark scraper targets, origins, and site mappings as managed by code or an admin
+- [x] 1.3 Use composite foreign keys to keep runs, sites, sources, and revisions consistent
+- [x] 1.4 Generate and inspect the replacement migration and run schema constraint tests
+- [x] 1.5 Keep site keys dynamic and source kinds limited to code-supported values
 
-## 2. Config Interpreter And Validation
+## 2. Rules And Validation
 
-- [x] 2.1 Define the version 1 common, review, and store-price config schemas
-- [x] 2.2 Implement shared HTML field reading and bounded detail-link discovery without database or network access
-- [x] 2.3 Implement review article parsing into the existing strict ingestion schema
-- [x] 2.4 Implement store-price parsing into the existing strict price schema
-- [x] 2.5 Add typed production validation results
-- [x] 2.6 Add synthetic parser tests for single and repeated reviews, products, invalid fields, unrelated markup, and selector changes
+- [x] 2.1 Define rules format 1 for review and price sources
+- [x] 2.2 Read bounded detail links and fields without database or network access
+- [x] 2.3 Parse review articles into the existing strict ingestion schema
+- [x] 2.4 Parse store prices into the existing strict price schema
+- [x] 2.5 Store typed test results without HTML or publisher prose
+- [x] 2.6 Add synthetic parser tests for valid and broken pages
 
-## 3. Version And Administration Services
+## 3. Revision And Admin Services
 
-- [x] 3.1 Add moderator-owned site and configured scraper creation with conservative target defaults and robots enforcement
-- [x] 3.2 Add draft creation, list, details, disablement, and immutable history services
-- [x] 3.3 Add preview storage that contains structured output and warnings but no fetched HTML or publisher prose
-- [x] 3.4 Add atomic activation and rollback that require current passing validation
-- [ ] 3.5 Add integration tests for permissions, ownership, version immutability, activation, rollback, and sync preservation
+- [x] 3.1 Create a site and first source with conservative network defaults
+- [x] 3.2 Create immutable revisions and list revision history
+- [x] 3.3 Permit same-origin list URL changes through a new revision
+- [x] 3.4 Require a passing test for activation and rollback
+- [ ] 3.5 Add integration tests for authorization and route errors
 
 ## 4. Runtime Integration
 
-- [x] 4.1 Resolve code-owned or configured source definitions at run creation and pin the configured version
-- [x] 4.2 Execute preview and normal collection through the governed scraper session with the same parser and validator
-- [x] 4.3 Route review observations to external-review ingestion and price observations to external-site-id price ingestion
-- [x] 4.4 Keep preview isolated from product writes and add run, replay, deferral, and failure tests
-- [x] 4.5 Surface configured scraper readiness and validation failures through external-site health
+- [x] 4.1 Pin collection and preview runs to one source revision
+- [x] 4.2 Use the same governed request session and parser for preview and collection
+- [x] 4.3 Send review and price observations to their existing sinks
+- [x] 4.4 Keep preview isolated from product writes
+- [x] 4.5 Show scrape source readiness in external-site health
 
-## 5. LLM Draft Generation
+## 5. AI Suggestions
 
-- [x] 5.1 Add the stable prompt and strict output contract for one-call config generation
-- [x] 5.2 Enforce per-collection LLM permission immediately before model access and disable provider storage
-- [x] 5.3 Store valid output as a draft with model, prompt, and engine provenance and redact fetched content from failures
-- [ ] 5.4 Add deterministic boundary tests and a focused eval fixture set for review and price config generation
+- [x] 5.1 Use one stable prompt and a strict structured output schema
+- [x] 5.2 Check source AI permission immediately before model access
+- [x] 5.3 Store model and prompt provenance with valid draft rules
+- [ ] 5.4 Add focused review and price suggestion eval fixtures
 
-## 6. Moderator API And Admin UI
+## 6. Admin API And UI
 
-- [x] 6.1 Add moderator routes for site creation and configured scraper creation, listing, draft generation, preview, activation, rollback, and disablement
-- [ ] 6.2 Add route integration tests for authorization, validation, conflicts, and preview isolation
-- [x] 6.3 Add an Admin Scrapers Add Site flow with review or store-price collection choice
-- [x] 6.4 Add the site Parsing tab with active version, drafts, generation, preview, activation, disablement, history, and rollback controls
+- [x] 6.1 Add admin routes for creation, list, draft, suggestion, preview, activation, rollback, and pause
+- [ ] 6.2 Add route integration tests for authorization, validation, and conflicts
+- [x] 6.3 Add an Admin Scrapers Add Site flow with review or price choice
+- [x] 6.4 Add the Parsing tab with list URL, rules, preview, active revision, history, and rollback
 
 ## 7. Verification And Pilot
 
-- [x] 7.1 Document the configured scraper ownership boundaries, config format, admin procedure, and rollback path
-- [x] 7.2 Run targeted server and web tests, server and web typechecks, lint, and formatting
-- [ ] 7.3 Run one manual admin smoke check for add, generate, preview, activate, run, repair, disable, and rollback
-- [ ] 7.4 Pilot one new review source and one simple store source while keeping existing code adapters unchanged
-- [x] 7.5 Validate the OpenSpec change and record any measured follow-up instead of expanding the first config language speculatively
+- [x] 7.1 Document terms, ownership, rules format, admin flow, and rollback
+- [x] 7.2 Run focused tests, typechecks, lint, format, and OpenSpec validation
+- [ ] 7.3 Run one manual admin smoke check without browser test coverage
+- [ ] 7.4 Pilot one review source and one simple price source

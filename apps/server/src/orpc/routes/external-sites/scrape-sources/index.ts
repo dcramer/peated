@@ -3,9 +3,9 @@ import activate from "./activate";
 import create from "./create";
 import createDraft from "./create-draft";
 import disable from "./disable";
-import generate from "./generate";
 import list from "./list";
 import preview from "./preview";
+import suggest from "./suggest";
 
 export default base.router({
   list,
@@ -14,5 +14,5 @@ export default base.router({
   preview,
   activate,
   disable,
-  generate,
+  suggest,
 });

@@ -17,7 +17,7 @@ import {
   or,
 } from "drizzle-orm";
 import { z } from "zod";
-import { createPinnedConfiguredRun } from "./configured/runs";
+import { createPinnedScrapeSourceRun } from "./configured/runs";
 import {
   findScraperSourceBySiteKey,
   requireEnabledScraperTargets,
@@ -72,7 +72,7 @@ async function insertRun(
 ) {
   const source = findScraperSourceBySiteKey(registry, site.type);
   if (!source) {
-    const configured = await createPinnedConfiguredRun(connection, {
+    const configured = await createPinnedScrapeSourceRun(connection, {
       externalSiteId: site.id,
       requestedById,
       trigger,
@@ -273,22 +273,25 @@ async function queueManualExternalSiteRun({
   return run;
 }
 
-async function queueConfiguredScraperPreview({
+async function queueScrapeSourcePreview({
   site,
-  configVersionId,
+  scrapeSourceId,
+  revisionId,
   requestedById,
   enqueue,
 }: {
   site: ExternalSite;
-  configVersionId: number;
+  scrapeSourceId: number;
+  revisionId: number;
   requestedById: number;
   enqueue: ScraperEnqueue;
 }) {
   let run: ExternalSiteRun;
   try {
-    const configured = await createPinnedConfiguredRun(db, {
+    const configured = await createPinnedScrapeSourceRun(db, {
       externalSiteId: site.id,
-      configVersionId,
+      scrapeSourceId,
+      revisionId,
       requestedById,
       trigger: "manual",
       purpose: "preview",
@@ -354,11 +357,12 @@ export function createScraperLifecycle({
       site: ExternalSite;
       requestedById: number;
     }) => queueManualExternalSiteRun({ ...input, registry, enqueue }),
-    queueConfiguredScraperPreview: (input: {
+    queueScrapeSourcePreview: (input: {
       site: ExternalSite;
-      configVersionId: number;
+      scrapeSourceId: number;
+      revisionId: number;
       requestedById: number;
-    }) => queueConfiguredScraperPreview({ ...input, enqueue }),
+    }) => queueScrapeSourcePreview({ ...input, enqueue }),
     queueScheduledExternalSiteRun: (siteId: number) =>
       queueScheduledExternalSiteRun(siteId, registry, enqueue),
     redispatchStaleExternalSiteRuns: (options?: {

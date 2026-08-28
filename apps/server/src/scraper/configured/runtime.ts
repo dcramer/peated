@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import {
-  configuredScraperConfigVersions,
-  configuredScraperRuns,
-  configuredScrapers,
   externalSiteRuns,
   externalSites,
   externalSiteScrapeTargets,
+  scrapeSourceRevisions,
+  scrapeSourceRuns,
+  scrapeSources,
   scrapeTargets,
 } from "@peated/server/db/schema";
 import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
@@ -21,36 +21,30 @@ import type {
   ScraperSink,
   ScraperSourceDefinition,
 } from "../types";
-import {
-  type ConfiguredScraperConfig,
-  ConfiguredScraperConfigSchema,
-} from "./config";
-import { generateConfiguredScraperDraft } from "./generator";
-import { parseConfiguredDetail, parseConfiguredIndex } from "./parser";
-import { recordConfiguredScraperValidation } from "./service";
-import { loadConfiguredTarget } from "./target";
-import type {
-  ConfiguredParseIssue,
-  ConfiguredScraperPreviewPage,
-} from "./validation";
+import { type ScrapeRules, parseScrapeRules } from "./config";
+import { suggestScrapeSourceDraft } from "./generator";
+import { parseScrapeDetail, parseScrapeList } from "./parser";
+import { recordScrapeSourceValidation } from "./service";
+import { loadScrapeSourceTarget } from "./target";
+import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./validation";
 
-export class ConfiguredScraperParseError extends Error {
-  override name = "ConfiguredScraperParseError";
+export class ScrapeSourceParseError extends Error {
+  override name = "ScrapeSourceParseError";
 
-  constructor(readonly issues: ConfiguredParseIssue[]) {
+  constructor(readonly issues: ScrapeIssue[]) {
     super("The page did not match the saved parsing rules.");
   }
 }
 
 function createPreviewPage(
   observation: ScraperObservation<unknown>,
-  collection: "reviews" | "store_prices",
+  kind: "review" | "price",
   url: string,
-): ConfiguredScraperPreviewPage {
-  if (collection === "reviews") {
+): ScrapeSourcePreviewPage {
+  if (kind === "review") {
     const value = ExternalReviewArticleIngestionSchema.parse(observation.value);
     return {
-      collection,
+      kind,
       url,
       title: value.article.title,
       publishedAt: value.article.publishedAt?.toISOString() ?? null,
@@ -62,7 +56,7 @@ function createPreviewPage(
     };
   }
   return {
-    collection,
+    kind,
     url,
     products: z
       .array(StorePriceInputSchema)
@@ -80,48 +74,48 @@ function createPreviewPage(
   };
 }
 
-function createConfiguredAdapter(input: {
+function createScrapeSourceAdapter(input: {
   targetKey: string;
-  indexUrl: string;
-  configVersionId: number;
-  config: ConfiguredScraperConfig;
+  listUrl: string;
+  revisionId: number;
+  rules: ScrapeRules;
   purpose: "collect" | "preview";
 }): ScraperAdapter<null, unknown> {
   return async ({ session }) => {
-    const pages: ConfiguredScraperPreviewPage[] = [];
-    const indexUrl = new URL(input.indexUrl);
+    const pages: ScrapeSourcePreviewPage[] = [];
+    const listUrl = new URL(input.listUrl);
     try {
-      const indexResponse = await session.request({
+      const listResponse = await session.request({
         target: input.targetKey,
-        url: indexUrl,
+        url: listUrl,
       });
-      const indexResult = parseConfiguredIndex(
-        input.config,
-        indexResponse.body,
-        indexResponse.url,
+      const listResult = parseScrapeList(
+        input.rules,
+        listResponse.body,
+        listResponse.url,
       );
-      if (indexResult.issues.length > 0) {
-        throw new ConfiguredScraperParseError(indexResult.issues);
+      if (listResult.issues.length > 0) {
+        throw new ScrapeSourceParseError(listResult.issues);
       }
 
-      for (const link of indexResult.links) {
+      for (const link of listResult.links) {
         const response = await session.request({
           target: input.targetKey,
           url: new URL(link),
         });
-        const parsed = parseConfiguredDetail(
-          input.config,
+        const parsed = parseScrapeDetail(
+          input.rules,
           response.body,
           response.url,
         );
         if (parsed.issues.length > 0 || !parsed.value) {
-          throw new ConfiguredScraperParseError(parsed.issues);
+          throw new ScrapeSourceParseError(parsed.issues);
         }
         const observation = {
           sourceKey: response.url.toString(),
           value: parsed.value,
           itemCount:
-            parsed.collection === "reviews"
+            parsed.kind === "review"
               ? parsed.value.article.externalReviews.length
               : parsed.value.length,
         };
@@ -129,7 +123,7 @@ function createConfiguredAdapter(input: {
           pages.push(
             createPreviewPage(
               observation,
-              parsed.collection,
+              parsed.kind,
               response.url.toString(),
             ),
           );
@@ -139,8 +133,8 @@ function createConfiguredAdapter(input: {
       }
 
       if (input.purpose === "preview") {
-        await recordConfiguredScraperValidation({
-          configVersionId: input.configVersionId,
+        await recordScrapeSourceValidation({
+          revisionId: input.revisionId,
           status: pages.length > 0 ? "passed" : "failed",
           result: {
             issues:
@@ -148,7 +142,7 @@ function createConfiguredAdapter(input: {
                 ? []
                 : [
                     {
-                      field: "index.itemLink",
+                      field: "list.detailLink",
                       message: "No pages produced valid output.",
                     },
                   ],
@@ -157,9 +151,9 @@ function createConfiguredAdapter(input: {
         });
       }
     } catch (error) {
-      if (error instanceof ConfiguredScraperParseError) {
-        await recordConfiguredScraperValidation({
-          configVersionId: input.configVersionId,
+      if (error instanceof ScrapeSourceParseError) {
+        await recordScrapeSourceValidation({
+          revisionId: input.revisionId,
           status: "failed",
           result: { issues: error.issues, pages },
         });
@@ -169,23 +163,23 @@ function createConfiguredAdapter(input: {
   };
 }
 
-function configuredSource(input: {
+function scrapeSourceDefinition(input: {
   siteKey: string;
-  configuredScraperId: number;
-  configVersionId: number;
+  scrapeSourceId: number;
+  revisionId: number;
   targetKey: string;
-  indexUrl: string;
+  listUrl: string;
   purpose: "collect" | "preview";
-  config: ConfiguredScraperConfig;
+  rules: ScrapeRules;
 }): ScraperSourceDefinition<null, unknown> {
   const observationSchema =
-    input.config.collection === "reviews"
+    input.rules.kind === "review"
       ? ExternalReviewArticleIngestionSchema
       : z.array(StorePriceInputSchema);
   const sink: ScraperSink<unknown> =
     input.purpose === "preview"
       ? async () => {}
-      : input.config.collection === "reviews"
+      : input.rules.kind === "review"
         ? async ({ externalSiteId, observation }) => {
             await externalReviewSink({
               externalSiteId,
@@ -208,50 +202,50 @@ function configuredSource(input: {
           };
 
   return {
-    key: `configured-${input.configuredScraperId}`,
+    key: `source-${input.scrapeSourceId}`,
     externalSiteKey: input.siteKey,
     targetKeys: [input.targetKey],
-    requestLimit: input.config.index.maxItems + 1,
+    requestLimit: input.rules.list.maxItems + 1,
     resumeFromLastRun: false,
     cursorSchema: z.null(),
     observationSchema,
-    adapter: createConfiguredAdapter(input),
+    adapter: createScrapeSourceAdapter(input),
     sink,
   };
 }
 
 /** Adds a run's pinned database config to the code-owned runtime registry. */
-export async function resolveConfiguredRunRegistry(
+export async function resolveScrapeSourceRunRegistry(
   runId: number,
   baseRegistry: ScraperRegistry,
 ): Promise<ScraperRegistry> {
-  const [generation] = await db
+  const [suggestion] = await db
     .select({
-      run: configuredScraperRuns,
+      run: scrapeSourceRuns,
       requestedById: externalSiteRuns.requestedById,
-      scraper: configuredScrapers,
+      source: scrapeSources,
       siteKey: externalSites.type,
       target: scrapeTargets,
     })
-    .from(configuredScraperRuns)
+    .from(scrapeSourceRuns)
     .innerJoin(
       externalSiteRuns,
-      eq(externalSiteRuns.id, configuredScraperRuns.externalSiteRunId),
+      eq(externalSiteRuns.id, scrapeSourceRuns.externalSiteRunId),
     )
     .innerJoin(
-      configuredScrapers,
-      eq(configuredScrapers.id, configuredScraperRuns.configuredScraperId),
+      scrapeSources,
+      eq(scrapeSources.id, scrapeSourceRuns.scrapeSourceId),
     )
     .innerJoin(
       externalSites,
-      eq(externalSites.id, configuredScrapers.externalSiteId),
+      eq(externalSites.id, scrapeSources.externalSiteId),
     )
     .innerJoin(
       externalSiteScrapeTargets,
       and(
         eq(
           externalSiteScrapeTargets.externalSiteId,
-          configuredScrapers.externalSiteId,
+          scrapeSources.externalSiteId,
         ),
         eq(externalSiteScrapeTargets.active, true),
       ),
@@ -262,29 +256,29 @@ export async function resolveConfiguredRunRegistry(
     )
     .where(
       and(
-        eq(configuredScraperRuns.externalSiteRunId, runId),
-        eq(configuredScraperRuns.purpose, "generate"),
+        eq(scrapeSourceRuns.externalSiteRunId, runId),
+        eq(scrapeSourceRuns.purpose, "suggest"),
       ),
     );
-  if (generation) {
-    const requestedById = generation.requestedById;
+  if (suggestion) {
+    const requestedById = suggestion.requestedById;
     if (!requestedById) {
-      throw new Error("Configured generation run has no requesting admin.");
+      throw new Error("AI suggestion run has no requesting admin.");
     }
-    const target = await loadConfiguredTarget(generation.target);
+    const target = await loadScrapeSourceTarget(suggestion.target);
     const source: ScraperSourceDefinition<null, unknown> = {
-      key: `configured-${generation.scraper.id}`,
-      externalSiteKey: generation.siteKey,
+      key: `source-${suggestion.source.id}`,
+      externalSiteKey: suggestion.siteKey,
       targetKeys: [target.key],
-      requestLimit: generation.scraper.sampleUrls.length + 1,
+      requestLimit: suggestion.source.sampleUrls.length + 1,
       resumeFromLastRun: false,
       cursorSchema: z.null(),
       observationSchema: z.unknown(),
       sink: async () => {},
       adapter: async ({ session }) => {
         const urls = [
-          generation.scraper.indexUrl,
-          ...generation.scraper.sampleUrls,
+          suggestion.source.listUrl,
+          ...suggestion.source.sampleUrls,
         ];
         const pages = [];
         for (const value of urls) {
@@ -294,15 +288,15 @@ export async function resolveConfiguredRunRegistry(
           });
           pages.push({ url: response.url.toString(), html: response.body });
         }
-        const version = await generateConfiguredScraperDraft({
-          configuredScraperId: generation.scraper.id,
+        const revision = await suggestScrapeSourceDraft({
+          scrapeSourceId: suggestion.source.id,
           createdById: requestedById,
           pages,
         });
         await db
-          .update(configuredScraperRuns)
-          .set({ configVersionId: version.id })
-          .where(eq(configuredScraperRuns.externalSiteRunId, runId));
+          .update(scrapeSourceRuns)
+          .set({ revisionId: revision.id })
+          .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
       },
     };
     const sources = new Map(baseRegistry.sources);
@@ -314,34 +308,31 @@ export async function resolveConfiguredRunRegistry(
 
   const [row] = await db
     .select({
-      run: configuredScraperRuns,
-      scraper: configuredScrapers,
-      version: configuredScraperConfigVersions,
+      run: scrapeSourceRuns,
+      source: scrapeSources,
+      revision: scrapeSourceRevisions,
       siteKey: externalSites.type,
       target: scrapeTargets,
     })
-    .from(configuredScraperRuns)
+    .from(scrapeSourceRuns)
     .innerJoin(
-      configuredScrapers,
-      eq(configuredScrapers.id, configuredScraperRuns.configuredScraperId),
+      scrapeSources,
+      eq(scrapeSources.id, scrapeSourceRuns.scrapeSourceId),
     )
     .innerJoin(
-      configuredScraperConfigVersions,
-      eq(
-        configuredScraperConfigVersions.id,
-        configuredScraperRuns.configVersionId,
-      ),
+      scrapeSourceRevisions,
+      eq(scrapeSourceRevisions.id, scrapeSourceRuns.revisionId),
     )
     .innerJoin(
       externalSites,
-      eq(externalSites.id, configuredScrapers.externalSiteId),
+      eq(externalSites.id, scrapeSources.externalSiteId),
     )
     .innerJoin(
       externalSiteScrapeTargets,
       and(
         eq(
           externalSiteScrapeTargets.externalSiteId,
-          configuredScrapers.externalSiteId,
+          scrapeSources.externalSiteId,
         ),
         eq(externalSiteScrapeTargets.active, true),
       ),
@@ -350,32 +341,33 @@ export async function resolveConfiguredRunRegistry(
       scrapeTargets,
       eq(scrapeTargets.key, externalSiteScrapeTargets.targetKey),
     )
-    .where(eq(configuredScraperRuns.externalSiteRunId, runId));
+    .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
   if (!row) return baseRegistry;
 
-  const config = ConfiguredScraperConfigSchema.parse(row.version.config);
-  if (row.run.purpose === "generate") {
+  const rules = parseScrapeRules(
+    row.revision.formatVersion,
+    row.revision.rules,
+  );
+  if (row.run.purpose === "suggest") {
     throw new Error("An AI run cannot use saved parsing rules.");
   }
-  if (config.collection !== row.scraper.collection) {
+  if (rules.kind !== row.source.kind) {
     throw new Error("The parsing rules collect the wrong content.");
   }
-  const target = await loadConfiguredTarget(row.target);
-  const source = configuredSource({
+  const target = await loadScrapeSourceTarget(row.target);
+  const source = scrapeSourceDefinition({
     siteKey: row.siteKey,
-    configuredScraperId: row.scraper.id,
-    configVersionId: row.version.id,
+    scrapeSourceId: row.source.id,
+    revisionId: row.revision.id,
     targetKey: target.key,
-    indexUrl: row.scraper.indexUrl,
+    listUrl: row.revision.listUrl,
     purpose: row.run.purpose,
-    config,
+    rules,
   });
   const sources = new Map(baseRegistry.sources);
   const targets = new Map(baseRegistry.targets);
   if (sources.has(source.key) || targets.has(target.key)) {
-    throw new Error(
-      "Configured scraper collides with a code-owned definition.",
-    );
+    throw new Error("Scrape source collides with a code-owned definition.");
   }
   sources.set(source.key, source);
   targets.set(target.key, target);

@@ -20,7 +20,7 @@ function toOrigin(origin: ScrapeOrigin): ScrapeOriginDefinition {
   };
 }
 
-export async function loadConfiguredTarget(
+export async function loadScrapeSourceTarget(
   target: ScrapeTarget,
 ): Promise<ScrapeTargetDefinition> {
   const origins = await db

@@ -1,30 +1,30 @@
 import { db } from "@peated/server/db";
 import {
-  configuredScraperRuns,
-  configuredScrapers,
   externalSites,
   externalSiteScrapeTargets,
   scrapeOrigins,
+  scrapeSourceRevisions,
+  scrapeSourceRuns,
+  scrapeSources,
   scrapeTargets,
   users,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import { createPinnedConfiguredRun } from "./runs";
+import { createPinnedScrapeSourceRun } from "./runs";
 import {
-  activateConfiguredScraperVersion,
-  ConfiguredScraperConflictError,
-  ConfiguredScraperValidationError,
-  createConfiguredScraperDraft,
-  createConfiguredScraperSite,
-  listConfiguredScraperVersions,
-  recordConfiguredScraperValidation,
+  activateScrapeSourceRevision,
+  createScrapeSourceDraft,
+  createSiteWithScrapeSource,
+  listScrapeSourceRevisions,
+  recordScrapeSourceValidation,
+  ScrapeSourceConflictError,
+  ScrapeSourceValidationError,
 } from "./service";
 
-const config = {
-  engineVersion: 1 as const,
-  collection: "reviews" as const,
-  index: {
-    itemLink: { selector: "a.review", attribute: "href" },
+const rules = {
+  kind: "review" as const,
+  list: {
+    detailLink: { selector: "a.review", attribute: "href" },
     maxItems: 99,
   },
   detail: {
@@ -45,142 +45,167 @@ async function createUser() {
 
 test("creates a site and its governed admin-owned traffic rows", async () => {
   const user = await createUser();
-  const created = await createConfiguredScraperSite({
+  const created = await createSiteWithScrapeSource({
     key: "example-reviews",
     name: "Example Reviews",
-    collection: "reviews",
-    indexUrl: "https://reviews.example/archive",
+    kind: "review",
+    listUrl: "https://reviews.example/archive",
     sampleUrls: ["https://reviews.example/review/one"],
     createdById: user.id,
   });
 
-  expect(created.scraper).toMatchObject({
-    collection: "reviews",
+  expect(created.source).toMatchObject({
+    kind: "review",
     enabled: false,
-    activeConfigVersionId: null,
+    listUrl: "https://reviews.example/archive",
   });
   expect(await db.select().from(scrapeTargets)).toEqual([
     expect.objectContaining({
       key: "example-reviews",
-      owner: "admin",
+      managedBy: "admin",
       enabled: true,
     }),
   ]);
   expect(await db.select().from(scrapeOrigins)).toEqual([
     expect.objectContaining({
       origin: "https://reviews.example",
-      owner: "admin",
+      managedBy: "admin",
       robotsMode: "enforce",
     }),
   ]);
   expect(await db.select().from(externalSiteScrapeTargets)).toEqual([
     expect.objectContaining({
       externalSiteId: created.site.id,
-      owner: "admin",
+      managedBy: "admin",
     }),
   ]);
 
   await expect(
-    createConfiguredScraperSite({
+    createSiteWithScrapeSource({
       key: "example-reviews",
       name: "Duplicate",
-      collection: "reviews",
-      indexUrl: "https://duplicate.example/archive",
+      kind: "review",
+      listUrl: "https://duplicate.example/archive",
       createdById: user.id,
     }),
-  ).rejects.toBeInstanceOf(ConfiguredScraperConflictError);
+  ).rejects.toBeInstanceOf(ScrapeSourceConflictError);
 });
 
-test("keeps immutable versions and only activates a passing version", async () => {
+test("keeps immutable revisions and only activates a passing revision", async () => {
   const user = await createUser();
-  const { site, scraper } = await createConfiguredScraperSite({
+  const { site, source } = await createSiteWithScrapeSource({
     key: "versioned-reviews",
     name: "Versioned Reviews",
-    collection: "reviews",
-    indexUrl: "https://versioned.example/archive",
+    kind: "review",
+    listUrl: "https://versioned.example/archive",
     createdById: user.id,
   });
-  const first = await createConfiguredScraperDraft({
-    configuredScraperId: scraper.id,
-    config,
+  const first = await createScrapeSourceDraft({
+    scrapeSourceId: source.id,
+    rules,
     createdWith: "person",
     createdById: user.id,
   });
   await expect(
-    activateConfiguredScraperVersion({
-      configuredScraperId: scraper.id,
-      configVersionId: first.id,
+    activateScrapeSourceRevision({
+      scrapeSourceId: source.id,
+      revisionId: first.id,
     }),
-  ).rejects.toBeInstanceOf(ConfiguredScraperValidationError);
+  ).rejects.toBeInstanceOf(ScrapeSourceValidationError);
 
-  await recordConfiguredScraperValidation({
-    configVersionId: first.id,
+  await recordScrapeSourceValidation({
+    revisionId: first.id,
     status: "passed",
     result: { issues: [], pages: [] },
   });
-  const activated = await activateConfiguredScraperVersion({
-    configuredScraperId: scraper.id,
-    configVersionId: first.id,
+  const activated = await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: first.id,
   });
-  expect(activated.scraper).toMatchObject({
+  expect(activated.source).toMatchObject({
     enabled: true,
-    activeConfigVersionId: first.id,
   });
+  expect(activated.revision).toMatchObject({ id: first.id, active: true });
 
-  const second = await createConfiguredScraperDraft({
-    configuredScraperId: scraper.id,
-    config: {
-      ...config,
-      detail: { ...config.detail, title: { selector: "main h1" } },
+  const second = await createScrapeSourceDraft({
+    scrapeSourceId: source.id,
+    listUrl: "https://versioned.example/new-archive",
+    rules: {
+      ...rules,
+      detail: { ...rules.detail, title: { selector: "main h1" } },
     },
     createdWith: "person",
     createdById: user.id,
   });
-  expect(second.version).toBe(2);
+  expect(second.revision).toBe(2);
+  expect(second.listUrl).toBe("https://versioned.example/new-archive");
   expect(
-    (await listConfiguredScraperVersions(scraper.id)).map((v) => v.id),
+    (await listScrapeSourceRevisions(source.id)).map((revision) => revision.id),
   ).toEqual([second.id, first.id]);
 
-  const pinned = await createPinnedConfiguredRun(db, {
+  const pinned = await createPinnedScrapeSourceRun(db, {
     externalSiteId: site.id,
     requestedById: user.id,
     trigger: "manual",
     purpose: "collect",
   });
-  expect(pinned.version.id).toBe(first.id);
+  expect(pinned.revision.id).toBe(first.id);
   expect(pinned.run.requestLimit).toBe(100);
-  expect(await db.select().from(configuredScraperRuns)).toEqual([
+  expect(await db.select().from(scrapeSourceRuns)).toEqual([
     expect.objectContaining({
       externalSiteRunId: pinned.run.id,
-      configuredScraperId: scraper.id,
-      configVersionId: first.id,
+      scrapeSourceId: source.id,
+      revisionId: first.id,
       purpose: "collect",
     }),
   ]);
+
+  await recordScrapeSourceValidation({
+    revisionId: second.id,
+    status: "passed",
+    result: { issues: [], pages: [] },
+  });
+  const updated = await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: second.id,
+  });
+  expect(updated.source.listUrl).toBe("https://versioned.example/new-archive");
 });
 
-test("database constraints reject invalid ownership metadata", async () => {
+test("database constraints keep source and revision identity valid", async () => {
   const user = await createUser();
-  const { scraper } = await createConfiguredScraperSite({
+  const { source } = await createSiteWithScrapeSource({
     key: "constraint-reviews",
     name: "Constraint Reviews",
-    collection: "reviews",
-    indexUrl: "https://constraints.example/archive",
+    kind: "review",
+    listUrl: "https://constraints.example/archive",
     createdById: user.id,
   });
-  const first = await createConfiguredScraperDraft({
-    configuredScraperId: scraper.id,
-    config,
+  const first = await createScrapeSourceDraft({
+    scrapeSourceId: source.id,
+    rules,
     createdWith: "person",
     createdById: user.id,
   });
-  expect(first.version).toBe(1);
+  expect(first.revision).toBe(1);
 
   await expect(
-    db.insert(configuredScrapers).values({
-      externalSiteId: scraper.externalSiteId,
-      collection: "store_prices",
-      indexUrl: "https://constraints.example/products",
+    db.insert(scrapeSources).values({
+      externalSiteId: source.externalSiteId,
+      kind: "price",
+      listUrl: "https://constraints.example/products",
+      createdById: user.id,
+    }),
+  ).rejects.toThrow();
+  await expect(
+    db.insert(scrapeSourceRevisions).values({
+      scrapeSourceId: source.id,
+      revision: 2,
+      formatVersion: 1,
+      listUrl: source.listUrl,
+      rules,
+      createdWith: "ai",
+      validationResult: { issues: [], pages: [] },
       createdById: user.id,
     }),
   ).rejects.toThrow();
@@ -193,7 +218,7 @@ test("database constraints reject invalid ownership metadata", async () => {
   await expect(
     db.insert(scrapeOrigins).values({
       origin: "https://invalid-policy.example",
-      owner: "admin",
+      managedBy: "admin",
       targetKey: "constraint-reviews",
       robotsMode: "not_applicable",
     }),
