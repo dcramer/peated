@@ -523,9 +523,6 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      date-fns:
-        specifier: ^4.1.0
-        version: 4.1.0
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
@@ -571,9 +568,6 @@ importers:
       react-hook-form:
         specifier: ^7.78.0
         version: 7.78.0(react@19.2.7)
-      react-leaflet:
-        specifier: ^5.0.0
-        version: 5.0.0(leaflet@1.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react-qr-code:
         specifier: ^2.0.18
         version: 2.0.18(react@19.2.7)
@@ -4372,13 +4366,6 @@ packages:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-leaflet/core@3.0.0':
-    resolution: {integrity: sha512-3EWmekh4Nz+pGcr+xjf0KNyYfC3U2JjnkWsh0zcqaexYqmmB5ZhH37kz41JXGmKzpaMZCnPofBBm64i+YrEvGQ==}
-    peerDependencies:
-      leaflet: ^1.9.0
-      react: ^19.0.0
-      react-dom: ^19.0.0
-
   '@react-oauth/google@0.11.1':
     resolution: {integrity: sha512-tywZisXbsdaRBVbEu0VX6dRbOSL2I6DgY97woq5NMOOOz+xtDsm418vqq+Vx10KMtra3kdHMRMf0hXLWrk2RMg==}
     peerDependencies:
@@ -6426,9 +6413,6 @@ packages:
   date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
-
-  date-fns@4.1.0:
-    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   dayjs@1.11.19:
     resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
@@ -9090,13 +9074,6 @@ packages:
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
-
-  react-leaflet@5.0.0:
-    resolution: {integrity: sha512-CWbTpr5vcHw5bt9i4zSlPEVQdTVcML390TjeDG0cK59z1ylexpqC6M1PJFjV8jD7CF+ACBFsLIDs6DRMoLEofw==}
-    peerDependencies:
-      leaflet: ^1.9.0
-      react: ^19.0.0
-      react-dom: ^19.0.0
 
   react-qr-code@2.0.18:
     resolution: {integrity: sha512-v1Jqz7urLMhkO6jkgJuBYhnqvXagzceg3qJUWayuCK/c6LTIonpWbwxR1f1APGd4xrW/QcQEovNrAojbUz65Tg==}
@@ -14285,12 +14262,6 @@ snapshots:
       react-aria: 3.50.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react-dom: 19.2.7(react@19.2.7)
 
-  '@react-leaflet/core@3.0.0(leaflet@1.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      leaflet: 1.9.4
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
   '@react-oauth/google@0.11.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       react: 19.2.7
@@ -16487,8 +16458,6 @@ snapshots:
   date-fns@2.30.0:
     dependencies:
       '@babel/runtime': 7.26.7
-
-  date-fns@4.1.0: {}
 
   dayjs@1.11.19: {}
 
@@ -19536,13 +19505,6 @@ snapshots:
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
-
-  react-leaflet@5.0.0(leaflet@1.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
-    dependencies:
-      '@react-leaflet/core': 3.0.0(leaflet@1.9.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      leaflet: 1.9.4
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
 
   react-qr-code@2.0.18(react@19.2.7):
     dependencies:
