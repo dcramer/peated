@@ -23,9 +23,11 @@ rows. They are labeled as legacy ratings and do not affect new summaries.
 
 ## Write a review
 
-A review is a deeper opinion about one exact Bottle. A member gives one whole
-number from 0 through 100 and can add notes. Saving another review for the same
-Bottle updates the existing review. The member can also delete it.
+A review is a deeper opinion about one exact Bottle. It can come from a Peated
+member or an external publication. A member gives one whole number from 0
+through 100 and can add notes. Saving another member review for the same Bottle
+updates the existing review. The member can also delete it. External reviews
+can include publication, reviewer, link, summary, and source score details.
 
 Public review lists follow the same member visibility rules as tasting activity.
 Privacy hides who wrote a review and its text from unauthorized viewers. It does

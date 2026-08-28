@@ -1,14 +1,11 @@
-import {
-  getTastingBandById,
-  type TastingBandId,
-} from "@peated/server/constants";
+import { getRatingBandById, type RatingBandId } from "@peated/server/constants";
 
 export default function TastingBandDisplay({
   ratingBand,
 }: {
-  ratingBand: TastingBandId;
+  ratingBand: RatingBandId;
 }) {
-  const item = getTastingBandById(ratingBand);
+  const item = getRatingBandById(ratingBand);
   return (
     <span className="font-medium">
       {item.label}{" "}

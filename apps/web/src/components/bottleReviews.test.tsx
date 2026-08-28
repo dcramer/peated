@@ -61,7 +61,7 @@ describe("BottleReviews", () => {
 
     const html = renderToStaticMarkup(<ExternalReviewList results={results} />);
 
-    expect(html).toContain("The Critics");
+    expect(html).toContain("External reviews");
     expect(html).toContain("Whisky Advocate");
     expect(html).toContain("Dramface");
     expect(html).toContain("By A. Critic");
@@ -77,7 +77,7 @@ describe("BottleReviews", () => {
     expect(renderToStaticMarkup(<ExternalReviewList results={[]} />)).toBe("");
   });
 
-  it("adds the shared band label to a native 100-point critic score", () => {
+  it("adds the shared band label to an external 100-point score", () => {
     const html = renderToStaticMarkup(
       <ExternalReviewList
         results={[

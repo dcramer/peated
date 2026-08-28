@@ -11,6 +11,11 @@ have a band. A member review records one current Bottle opinion and has a
 100-point score. Permitted external 100-point reviews join member reviews in the
 Bottle score.
 
+Member and external reviews are two sources of the same concept: a considered
+opinion about one exact Bottle. They keep separate tables because external
+reviews have publication, article, reviewer, source score, and import fields.
+Do not add a shared review table or another review abstraction.
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -111,7 +116,7 @@ enter new summaries.
 Do not convert these values into bands or reviews. There are no member
 100-point scores, so do not add temporary data-copy code.
 
-### External reviews that count stay in their current table
+### External reviews keep their source fields
 
 Use `externalReview` and `externalReviewArticle` in application code, schemas,
 serializers, and API routes. Use the `externalReviews` API group and

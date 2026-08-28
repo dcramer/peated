@@ -276,7 +276,7 @@ export const SIMPLE_RATING_DESCRIPTIONS = {
 export type SimpleRatingValue =
   (typeof SIMPLE_RATING_VALUES)[keyof typeof SIMPLE_RATING_VALUES];
 
-export const TASTING_BANDS = [
+export const RATING_BANDS = [
   { id: "mediocre", min: 0, max: 79, label: "Mediocre" },
   { id: "good", min: 80, max: 84, label: "Good" },
   { id: "very_good", min: 85, max: 89, label: "Very good" },
@@ -284,16 +284,16 @@ export const TASTING_BANDS = [
   { id: "unicorn", min: 95, max: 100, label: "Unicorn" },
 ] as const;
 
-export type TastingBand = (typeof TASTING_BANDS)[number];
-export type TastingBandId = TastingBand["id"];
-export type TastingBandCounts = Record<TastingBandId, number>;
+export type RatingBand = (typeof RATING_BANDS)[number];
+export type RatingBandId = RatingBand["id"];
+export type TastingBandCounts = Record<RatingBandId, number>;
 
-export const TASTING_BAND_IDS = [
-  TASTING_BANDS[0].id,
-  TASTING_BANDS[1].id,
-  TASTING_BANDS[2].id,
-  TASTING_BANDS[3].id,
-  TASTING_BANDS[4].id,
+export const RATING_BAND_IDS = [
+  RATING_BANDS[0].id,
+  RATING_BANDS[1].id,
+  RATING_BANDS[2].id,
+  RATING_BANDS[3].id,
+  RATING_BANDS[4].id,
 ] as const;
 
 export const EMPTY_TASTING_BAND_COUNTS = {
@@ -304,10 +304,10 @@ export const EMPTY_TASTING_BAND_COUNTS = {
   unicorn: 0,
 } satisfies TastingBandCounts;
 
-export function getTastingBand(score: number): TastingBand | undefined {
-  return TASTING_BANDS.find((band) => score >= band.min && score <= band.max);
+export function getRatingBand(score: number): RatingBand | undefined {
+  return RATING_BANDS.find((band) => score >= band.min && score <= band.max);
 }
 
-export function getTastingBandById(id: TastingBandId): TastingBand {
-  return TASTING_BANDS.find((band) => band.id === id)!;
+export function getRatingBandById(id: RatingBandId): RatingBand {
+  return RATING_BANDS.find((band) => band.id === id)!;
 }

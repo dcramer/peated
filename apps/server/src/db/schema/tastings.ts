@@ -16,14 +16,14 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { SERVING_STYLE_LIST, TASTING_BAND_IDS } from "../../constants";
+import { RATING_BAND_IDS, SERVING_STYLE_LIST } from "../../constants";
 import { badgeAwards } from "./badges";
 import { bottles } from "./bottles";
 import { flights } from "./flights";
 import { users } from "./users";
 
 export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
-export const tastingBandEnum = pgEnum("tasting_band", TASTING_BAND_IDS);
+export const ratingBandEnum = pgEnum("tasting_band", RATING_BAND_IDS);
 
 /**
  * User-authored tasting records.
@@ -45,7 +45,7 @@ export const tastings = pgTable(
       .default(sql`array[]::varchar[]`)
       .notNull(),
     color: integer("color"),
-    ratingBand: tastingBandEnum("rating_band"),
+    ratingBand: ratingBandEnum("rating_band"),
     // Historical 0-5 values are read-only and excluded from current summaries.
     // TODO(ratings): Drop this column when historical rating display is retired.
     legacyStarRating: doublePrecision("legacy_star_rating"),

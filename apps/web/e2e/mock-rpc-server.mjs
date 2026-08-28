@@ -1058,7 +1058,7 @@ async function handleRpcRequest({ request, response, url }) {
 
       sendRpcResponse(response, emptyList);
       return true;
-    case "memberReviews/mine":
+    case "memberReviews/getMy":
       if (!isNumber(input?.bottle)) {
         sendRpcError(response, "Unexpected member review lookup payload");
         return true;

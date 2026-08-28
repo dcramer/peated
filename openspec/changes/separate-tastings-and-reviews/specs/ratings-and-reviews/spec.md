@@ -34,6 +34,11 @@ The system SHALL store a member's 100-point Bottle assessment as a member
 review, separate from their tastings. A member review SHALL contain a whole
 number score from 0 through 100 and MAY contain notes.
 
+Member reviews and external reviews SHALL represent the same broad concept: a
+considered opinion about one exact Bottle. The system SHALL identify the source
+when their ownership or fields differ. It SHALL NOT combine their tables because
+external reviews have source-specific fields.
+
 #### Scenario: Member writes a review
 
 - **WHEN** a member reviews a Bottle they have not reviewed before

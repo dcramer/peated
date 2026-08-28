@@ -1,4 +1,4 @@
-import type { TastingBandId } from "@peated/server/constants";
+import type { RatingBandId } from "@peated/server/constants";
 import { db, type AnyDatabase } from "@peated/server/db";
 import { bottles, bottleTombstones, tastings } from "@peated/server/db/schema";
 import { and, asc, eq, gt } from "drizzle-orm";
@@ -12,7 +12,7 @@ export type UserBottleRead = Pick<
 
 export type TastingBottleScanRow = {
   id: number;
-  ratingBand: TastingBandId | null;
+  ratingBand: RatingBandId | null;
   bottle: UserBottleRead | null;
 };
 

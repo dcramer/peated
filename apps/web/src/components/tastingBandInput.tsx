@@ -1,6 +1,6 @@
 "use client";
 
-import { TASTING_BANDS, type TastingBandId } from "@peated/server/constants";
+import { RATING_BANDS, type RatingBandId } from "@peated/server/constants";
 import type { FieldError } from "react-hook-form";
 import classNames from "../lib/classNames";
 import FormField from "./formField";
@@ -11,19 +11,19 @@ export default function TastingBandInput({
   disabled,
   onChange,
 }: {
-  value?: TastingBandId | null;
+  value?: RatingBandId | null;
   error?: FieldError;
   disabled?: boolean;
-  onChange: (value: TastingBandId | null) => void;
+  onChange: (value: RatingBandId | null) => void;
 }) {
   return (
     <FormField
       label="How was it?"
       error={error}
-      helpText="Choose a broad band. You can leave this blank."
+      helpText="Choose one rating. You can leave this blank."
     >
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
-        {TASTING_BANDS.map((band) => {
+        {RATING_BANDS.map((band) => {
           const selected = value === band.id;
           return (
             <button

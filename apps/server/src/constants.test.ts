@@ -1,6 +1,6 @@
-import { getTastingBand } from "./constants";
+import { getRatingBand } from "./constants";
 
-describe("getTastingBand", () => {
+describe("getRatingBand", () => {
   test.each([
     [100, "Unicorn"],
     [95, "Unicorn"],
@@ -13,10 +13,10 @@ describe("getTastingBand", () => {
     [79, "Mediocre"],
     [0, "Mediocre"],
   ])("maps %i to %s", (score, label) => {
-    expect(getTastingBand(score)?.label).toBe(label);
+    expect(getRatingBand(score)?.label).toBe(label);
   });
 
   test.each([-1, 101])("does not map out-of-range score %i", (score) => {
-    expect(getTastingBand(score)).toBeUndefined();
+    expect(getRatingBand(score)).toBeUndefined();
   });
 });

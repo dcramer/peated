@@ -719,7 +719,7 @@ export function buildCollection({
  *   id?: number,
  *   bottle?: FixtureBottle | CatalogFixtureBottle,
  *   notes?: string,
- *   ratingBand?: import("@peated/server/constants").TastingBandId,
+ *   ratingBand?: import("@peated/server/constants").RatingBandId,
  *   tags?: string[],
  *   awards?: import("@peated/server/types").BadgeAward[],
  * }} [options]

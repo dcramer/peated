@@ -1,4 +1,4 @@
-import { TASTING_BANDS } from "@peated/server/constants";
+import { RATING_BANDS } from "@peated/server/constants";
 import type { Metadata } from "next";
 
 export const dynamic = "force-static";
@@ -6,7 +6,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Whisky Rating Guide",
   description:
-    "A simple guide to Peated tasting bands and 100-point external reviews.",
+    "A simple guide to Peated tasting ratings and 100-point reviews.",
 };
 
 const BAND_STYLES = {
@@ -28,8 +28,8 @@ export default function RatingsPage() {
           Tastings and reviews
         </h1>
         <p className="text-muted mt-5 text-lg leading-8">
-          Use a broad band for a tasting. Use a 100-point score when you write a
-          review. Each keeps a clear purpose.
+          Choose one of five ratings for a tasting. Use a 100-point score when
+          you write a review. Each keeps a clear purpose.
         </p>
       </header>
 
@@ -37,10 +37,10 @@ export default function RatingsPage() {
         <div className="rounded-xl border border-slate-700 bg-slate-900/50 p-6">
           <div className="text-muted text-sm font-medium">For a tasting</div>
           <h2 className="mt-1 text-2xl font-semibold text-white">
-            Choose a broad band
+            Choose a rating
           </h2>
           <div className="mt-6 space-y-3">
-            {TASTING_BANDS.map((band) => (
+            {RATING_BANDS.map((band) => (
               <RatingChoice
                 key={band.id}
                 label={band.label}
@@ -143,7 +143,7 @@ export default function RatingsPage() {
           </p>
         </div>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {TASTING_BANDS.map((band) => (
+          {RATING_BANDS.map((band) => (
             <div
               className={`flex items-center justify-between rounded-lg border px-5 py-4 ${BAND_STYLES[band.min]}`}
               key={band.min}
@@ -159,17 +159,18 @@ export default function RatingsPage() {
 
       <section className="mt-14 grid gap-8 border-t border-slate-800 pt-10 md:grid-cols-2">
         <div>
-          <h2 className="text-xl font-semibold text-white">Community scores</h2>
+          <h2 className="text-xl font-semibold text-white">Bottle score</h2>
           <p className="text-muted mt-3 leading-7">
-            Peated shows the median after at least 20 member and permitted
-            external review scores exist.
+            Peated shows one median after at least 20 member and permitted
+            external review scores exist. Both are reviews of the same Bottle.
           </p>
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-white">Critic scores</h2>
+          <h2 className="text-xl font-semibold text-white">External reviews</h2>
           <p className="text-muted mt-3 leading-7">
-            Peated includes a critic score only when the publication allows it
-            and the source gives a whole-number score on a 100-point scale.
+            An external review can include a publication, reviewer, link, and
+            source score. Its score counts only when the publication allows it
+            and uses a whole-number 100-point scale.
           </p>
         </div>
       </section>

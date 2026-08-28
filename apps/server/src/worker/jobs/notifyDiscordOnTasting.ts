@@ -1,5 +1,5 @@
 import config from "@peated/server/config";
-import { getTastingBandById } from "@peated/server/constants";
+import { getRatingBandById } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { formatColor } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
@@ -62,7 +62,7 @@ export default async function notifyDiscordOnTasting(input: JobPayload) {
 
   const fields = [];
   if (tasting.ratingBand !== null) {
-    const band = getTastingBandById(tasting.ratingBand);
+    const band = getRatingBandById(tasting.ratingBand);
     fields.push({
       name: "Rating",
       value: `${band.label} (${band.min}-${band.max})`,

@@ -10,8 +10,10 @@ many tastings of a Bottle, but their review should be one current opinion.
   rating bands.
 - **BREAKING** Move member 100-point scores out of tastings and into one member
   review per Bottle.
-- Keep external reviews separate, but include permitted native 100-point scores
-  in the same Bottle score as member reviews.
+- Treat member and external reviews as the same kind of Bottle opinion. Keep
+  their existing tables because external reviews have source-specific fields.
+  Include permitted native 100-point scores in the same Bottle score as member
+  reviews.
 - Use `externalReview` for publication reviews in application and API names;
   reserve `memberReview` for reviews written by Peated members.
 - Calculate the Bottle score as a median. Hide it until at least 20 counted

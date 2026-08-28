@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { TASTING_BAND_IDS } from "@peated/server/constants";
+import { RATING_BAND_IDS } from "@peated/server/constants";
 import type { AnyDatabase, AnyTransaction } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
 import * as dbSchema from "@peated/server/db/schema";
@@ -812,7 +812,7 @@ export const Tasting = async (
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
-        ratingBand: faker.helpers.arrayElement(TASTING_BAND_IDS),
+        ratingBand: faker.helpers.arrayElement(RATING_BAND_IDS),
         tags: tags,
         createdAt: new Date(),
         ...data,

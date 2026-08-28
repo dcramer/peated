@@ -1,6 +1,6 @@
 "use client";
 
-import { TASTING_BANDS } from "@peated/server/constants";
+import { RATING_BANDS } from "@peated/server/constants";
 import { formatFlavorProfile } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import AgeInsightCard from "@peated/web/components/ageInsightCard";
@@ -131,7 +131,7 @@ export function TastingSnapshotCard({
     <InsightCard title="Tasting snapshot" className={className}>
       <div className="grid flex-1 gap-6 sm:grid-cols-[minmax(0,1.35fr)_minmax(12rem,0.65fr)] sm:divide-x sm:divide-slate-800">
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-1">
-          {TASTING_BANDS.map((band) => (
+          {RATING_BANDS.map((band) => (
             <div key={band.id} className="flex justify-between gap-3 text-sm">
               <dt>
                 {band.label}{" "}

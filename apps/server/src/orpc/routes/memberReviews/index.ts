@@ -1,12 +1,12 @@
 import { base } from "@peated/server/orpc";
 import delete_ from "./delete";
+import getMy from "./getMy";
 import list from "./list";
-import mine from "./mine";
-import upsert from "./upsert";
+import save from "./save";
 
 export default base.tag("member reviews").router({
   list,
-  mine,
-  upsert,
+  getMy,
+  save,
   delete: delete_,
 });

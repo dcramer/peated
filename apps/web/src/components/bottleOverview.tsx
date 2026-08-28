@@ -1,6 +1,6 @@
 "use client";
 
-import { TASTING_BANDS } from "@peated/server/constants";
+import { RATING_BANDS } from "@peated/server/constants";
 import type { Outputs } from "@peated/server/orpc/router";
 import RobotImage from "@peated/web/assets/robot.png";
 import Link from "@peated/web/components/link";
@@ -58,7 +58,7 @@ export default function BottleOverview({
               <section className="my-6">
                 <Heading as="h3">Tasting ratings</Heading>
                 <dl className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-                  {TASTING_BANDS.map((band) => (
+                  {RATING_BANDS.map((band) => (
                     <div key={band.id} className="rounded bg-slate-900 p-3">
                       <dt className="font-semibold">{band.label}</dt>
                       <dd className="text-muted text-sm">

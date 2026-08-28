@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
-import { getTastingBand } from "@peated/server/constants";
+import { getRatingBand } from "@peated/server/constants";
 import type { Outputs } from "@peated/server/orpc/router";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
@@ -42,7 +42,7 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
 
   return (
     <>
-      <MyMemberReview bottleId={bottleId} />
+      <MyReview bottleId={bottleId} />
       <MemberReviewList results={memberResults} />
       <ExternalReviewList results={results} />
     </>
@@ -51,13 +51,16 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
 
 type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
 
-function MyMemberReview({ bottleId }: { bottleId: number }) {
+function MyReview({ bottleId }: { bottleId: number }) {
   const { user } = useAuth();
   const orpc = useORPC();
-  const mineOptions = orpc.memberReviews.mine.queryOptions({
+  const myReviewOptions = orpc.memberReviews.getMy.queryOptions({
     input: { bottle: bottleId },
   });
-  const { data: review } = useQuery({ ...mineOptions, enabled: Boolean(user) });
+  const { data: review } = useQuery({
+    ...myReviewOptions,
+    enabled: Boolean(user),
+  });
 
   if (!user) return null;
 
@@ -66,7 +69,7 @@ function MyMemberReview({ bottleId }: { bottleId: number }) {
       key={review ? `${review.id}:${review.updatedAt}` : "new"}
       bottleId={bottleId}
       review={review}
-      mineQueryKey={mineOptions.queryKey}
+      myReviewQueryKey={myReviewOptions.queryKey}
     />
   );
 }
@@ -74,15 +77,15 @@ function MyMemberReview({ bottleId }: { bottleId: number }) {
 function MemberReviewForm({
   bottleId,
   review,
-  mineQueryKey,
+  myReviewQueryKey,
 }: {
   bottleId: number;
-  review: Outputs["memberReviews"]["mine"] | undefined;
-  mineQueryKey: readonly unknown[];
+  review: Outputs["memberReviews"]["getMy"] | undefined;
+  myReviewQueryKey: readonly unknown[];
 }) {
   const orpc = useORPC();
   const queryClient = useQueryClient();
-  const saveMutation = useMutation(orpc.memberReviews.upsert.mutationOptions());
+  const saveMutation = useMutation(orpc.memberReviews.save.mutationOptions());
   const deleteMutation = useMutation(
     orpc.memberReviews.delete.mutationOptions(),
   );
@@ -91,7 +94,7 @@ function MemberReviewForm({
 
   async function refresh() {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: mineQueryKey }),
+      queryClient.invalidateQueries({ queryKey: myReviewQueryKey }),
       queryClient.invalidateQueries({
         queryKey: orpc.memberReviews.list.key({
           input: { bottle: bottleId },
@@ -216,13 +219,13 @@ export function ExternalReviewList({
 
   return (
     <>
-      <Heading as="h3">The Critics</Heading>
+      <Heading as="h3">External reviews</Heading>
       <ul className="mb-4 divide-y divide-slate-800">
         {externalReviews.map((externalReview) => {
           const site = externalReview.site!;
-          const nativeBand =
+          const scoreBand =
             externalReview.nativeScore?.scale === 100
-              ? getTastingBand(externalReview.nativeScore.value)
+              ? getRatingBand(externalReview.nativeScore.value)
               : null;
           return (
             <li key={externalReview.id} className="py-4 first:pt-2">
@@ -252,10 +255,10 @@ export function ExternalReviewList({
                 {externalReview.nativeScore ? (
                   <span className="shrink-0 font-semibold">
                     {externalReview.nativeScore.display}
-                    {nativeBand ? (
+                    {scoreBand ? (
                       <span className="text-muted font-normal">
                         {" "}
-                        · {nativeBand.label}
+                        · {scoreBand.label}
                       </span>
                     ) : null}
                   </span>

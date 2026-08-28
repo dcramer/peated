@@ -1,4 +1,4 @@
-import { getTastingBand } from "@peated/server/constants";
+import { getRatingBand } from "@peated/server/constants";
 import classNames from "../lib/classNames";
 
 export default function ReviewScoreDisplay({
@@ -12,7 +12,7 @@ export default function ReviewScoreDisplay({
   showBand?: boolean;
   className?: string;
 }) {
-  const band = getTastingBand(score);
+  const band = getRatingBand(score);
 
   return (
     <span

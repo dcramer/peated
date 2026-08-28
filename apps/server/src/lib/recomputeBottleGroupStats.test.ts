@@ -1,4 +1,4 @@
-import type { TastingBandId } from "@peated/server/constants";
+import type { RatingBandId } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import {
@@ -39,7 +39,7 @@ async function createMember(source: Bottle, name: string) {
 async function createTasting(
   bottleId: number,
   createdById: number,
-  ratingBand: TastingBandId | null,
+  ratingBand: RatingBandId | null,
   sequence: number,
 ) {
   await db.insert(tastings).values({

@@ -91,4 +91,5 @@
 - [x] 5.2 Run targeted server and web tests, typechecks, lint, and formatting;
       report any full-repository checks left to pull request CI
 - [x] 5.3 Update external-review documentation, tests, mocks, and the pull
-      request for the clear naming cutover
+      request for the clear naming cutover; describe member and external reviews
+      as two sources of the same review concept

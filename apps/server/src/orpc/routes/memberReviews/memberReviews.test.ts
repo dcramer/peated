@@ -18,16 +18,22 @@ describe("member reviews", () => {
   }) => {
     const bottle = await fixtures.Bottle();
 
-    const created = await routerClient.memberReviews.upsert(
+    const created = await routerClient.memberReviews.save(
       { bottle: bottle.id, score: 88, notes: "Bright fruit." },
       { context: { user: defaults.user } },
     );
-    const updated = await routerClient.memberReviews.upsert(
+    const updated = await routerClient.memberReviews.save(
       { bottle: bottle.id, score: 90, notes: null },
       { context: { user: defaults.user } },
     );
 
     expect(updated).toMatchObject({ id: created.id, score: 90, notes: null });
+    await expect(
+      routerClient.memberReviews.getMy(
+        { bottle: bottle.id },
+        { context: { user: defaults.user } },
+      ),
+    ).resolves.toMatchObject({ id: created.id, score: 90, notes: null });
     await expect(
       db.query.memberReviews.findMany({
         where: and(
@@ -47,7 +53,7 @@ describe("member reviews", () => {
     const bottle = await fixtures.Bottle();
     for (const score of [-1, 101, 88.5]) {
       await expect(
-        routerClient.memberReviews.upsert(
+        routerClient.memberReviews.save(
           { bottle: bottle.id, score, notes: null },
           { context: { user: defaults.user } },
         ),
@@ -58,7 +64,7 @@ describe("member reviews", () => {
   test("only the owner can delete a review", async ({ defaults, fixtures }) => {
     const bottle = await fixtures.Bottle();
     const other = await fixtures.User();
-    await routerClient.memberReviews.upsert(
+    await routerClient.memberReviews.save(
       { bottle: bottle.id, score: 86, notes: null },
       { context: { user: defaults.user } },
     );
@@ -89,7 +95,7 @@ describe("member reviews", () => {
     const bottle = await fixtures.Bottle();
     const privateMember = await fixtures.User({ private: true });
     const stranger = await fixtures.User();
-    await routerClient.memberReviews.upsert(
+    await routerClient.memberReviews.save(
       { bottle: bottle.id, score: 93, notes: "Private notes." },
       { context: { user: privateMember } },
     );

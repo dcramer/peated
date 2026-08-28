@@ -1,12 +1,18 @@
 # Ratings
 
-Peated has two kinds of member input:
+Peated has tastings and reviews:
 
-- A tasting records an experience. It can have one broad rating band.
-- A member review records a considered opinion about one exact Bottle. It has
-  one whole-number score from 0 through 100 and optional notes.
+- A tasting records an experience. It can have one rating from five fixed
+  bands.
+- A review records a considered opinion about one exact Bottle. A review can
+  come from a Peated member or an external publication.
 
 These records have different intent. Do not add review fields to a tasting.
+
+Member reviews and external reviews share the same basic meaning. Their source
+and fields differ. A member review has a member, a whole-number score from 0
+through 100, and optional notes. An external review can have a publication,
+reviewer, article link, summary, and the score format used by its source.
 
 ## Tasting bands
 
@@ -41,9 +47,10 @@ Bottle summary.
 
 ## External reviews
 
-Application code and APIs call these records `externalReview`. They call a
-Peated user's scored opinion `memberReview`. Do not use the bare name `review`
-for either record in shared schemas, serializers, routes, or exported types.
+Application code and APIs use `externalReview` and `memberReview` only when
+they must identify the review source. Do not use the bare name `review` for
+either record in shared schemas, serializers, routes, or exported types because
+the types have different fields.
 
 The physical external-review tables still use the old SQL names `review` and
 `review_article`. The schema maps them to `externalReviews` and

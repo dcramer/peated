@@ -4,7 +4,7 @@ import {
   ImageBottleEvidenceSchema,
 } from "@peated/bottle-classifier/contract";
 import { z } from "zod";
-import { SIMPLE_RATING_VALUES, TASTING_BAND_IDS } from "../constants";
+import { RATING_BAND_IDS, SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
 import { BottleSchema } from "./bottles";
 import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
@@ -26,7 +26,7 @@ const TastingRatingSchema = z
   .default(null)
   .describe("Historical simple rating: -1 (Pass), 1 (Sip), 2 (Savor)");
 const TastingBandSchema = z
-  .enum(TASTING_BAND_IDS)
+  .enum(RATING_BAND_IDS)
   .nullable()
   .default(null)
   .describe("Optional rating band for this tasting");
