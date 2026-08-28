@@ -1,0 +1,56 @@
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
+import { StoryCanvas } from "../storyFixtures.stylex";
+import { Button } from "./button.stylex";
+import { Field, TextInput } from "./field.stylex";
+import { Switch } from "./formControls.stylex";
+import {
+  FormActions,
+  FormNotice,
+  FormSection,
+  FormStack,
+} from "./formLayout.stylex";
+
+const meta = {
+  title: "Components/Forms/Form layout",
+  component: FormSection,
+  decorators: [
+    (Story) => (
+      <StoryCanvas width="compact">
+        <Story />
+      </StoryCanvas>
+    ),
+  ],
+} satisfies Meta<typeof FormSection>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Overview: Story = {
+  args: {
+    children: null,
+    title: "Profile",
+  },
+  render: () => (
+    <FormStack>
+      <FormNotice>Your email address is waiting for verification.</FormNotice>
+      <FormSection
+        description="The name and picture shown beside your activity."
+        title="Profile"
+      >
+        <Field htmlFor="form-layout-name" label="Username" required>
+          <TextInput defaultValue="dramfriend" id="form-layout-name" />
+        </Field>
+        <Switch
+          checked={false}
+          description="Only friends can see your activity."
+          label="Private profile"
+          onCheckedChange={() => undefined}
+        />
+      </FormSection>
+      <FormActions>
+        <Button variant="accent">Save changes</Button>
+      </FormActions>
+    </FormStack>
+  ),
+};

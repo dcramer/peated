@@ -1,5 +1,6 @@
 "use client";
 
+import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityKindEnum } from "@peated/server/schemas";
 import EntityForm from "@peated/web/components/entityForm";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
@@ -33,7 +34,7 @@ function AddEntityForm() {
         router.push(getEntityUrl(newEntity));
       }}
       initialData={{ kind }}
-      title="Add Entity"
+      title={`Add ${toTitleCase(kind)}`}
     />
   );
 }

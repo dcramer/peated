@@ -14,7 +14,12 @@ import {
 } from "../../../styles/tokens.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 
-export type EntityPickerKind = "brand" | "bottler" | "distiller" | "note";
+export type EntityPickerKind =
+  | "brand"
+  | "bottler"
+  | "distiller"
+  | "entity"
+  | "note";
 
 export type EntityPickerOption = {
   detail: string;
@@ -24,9 +29,13 @@ export type EntityPickerOption = {
 };
 
 export type EntityPickerProps = {
+  help?: string;
   kind: EntityPickerKind;
+  label?: string;
+  loading?: boolean;
   onChange: (value: EntityPickerOption | null) => void;
   onCreate?: (query: string) => void;
+  onQueryChange?: (query: string) => void;
   options: readonly EntityPickerOption[];
   placeholder?: string;
   value: EntityPickerOption | null;
@@ -40,6 +49,7 @@ const kindCopy = {
     plural: "distillers",
     singular: "distiller",
   },
+  entity: { label: "Entity", plural: "entities", singular: "entity" },
   note: { label: "Note", plural: "notes", singular: "note" },
 } satisfies Record<
   EntityPickerKind,
@@ -47,9 +57,13 @@ const kindCopy = {
 >;
 
 export function EntityPicker({
+  help,
   kind,
+  label,
+  loading = false,
   onChange,
   onCreate,
+  onQueryChange,
   options,
   placeholder,
   value,
@@ -141,7 +155,7 @@ export function EntityPicker({
         htmlFor={inputId}
         {...stylex.props(foundationStyles.fieldLabel, styles.label)}
       >
-        {copy.label}
+        {label ?? copy.label}
       </label>
 
       {value ? (
@@ -180,7 +194,9 @@ export function EntityPicker({
                 aria-expanded={isOpen}
                 id={inputId}
                 onChange={(event) => {
-                  setQuery(event.currentTarget.value);
+                  const nextQuery = event.currentTarget.value;
+                  setQuery(nextQuery);
+                  onQueryChange?.(nextQuery);
                   setActiveIndex(-1);
                   setIsOpen(true);
                 }}
@@ -209,7 +225,14 @@ export function EntityPicker({
                   role="listbox"
                   {...stylex.props(styles.resultList)}
                 >
-                  {filteredOptions.length > 0 ? (
+                  {loading ? (
+                    <p
+                      role="status"
+                      {...stylex.props(foundationStyles.body, styles.noResults)}
+                    >
+                      Searching…
+                    </p>
+                  ) : filteredOptions.length > 0 ? (
                     filteredOptions.map((option, index) => (
                       <button
                         aria-selected={index === activeIndex}
@@ -274,7 +297,7 @@ export function EntityPicker({
             id={helpId}
             {...stylex.props(foundationStyles.metadata, styles.help)}
           >
-            ↑↓ move · Enter picks · Esc closes
+            {help ?? "↑↓ move · Enter picks · Esc closes"}
           </p>
         </>
       )}

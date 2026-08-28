@@ -6,19 +6,12 @@ const meta = {
   title: "Components/Forms/Tasting Form",
   component: TastingFormPattern,
   args: {
+    disabled: false,
     initialRating: null,
-    submitting: false,
   },
 } satisfies Meta<typeof TastingFormPattern>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const Saving: Story = {
-  args: {
-    initialRating: "outstanding",
-    submitting: true,
-  },
-};
+export const Overview: Story = {};

@@ -3,14 +3,13 @@
 import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
 
-import { foundationStyles } from "../../../styles/foundations.stylex";
-import { colors, space } from "../../../styles/tokens.stylex";
 import type { MemberPickerOption, RatingBand } from "../components";
 import {
-  Button,
   ColourInput,
   Field,
   FieldGroup,
+  FormSection,
+  FormStack,
   MemberPicker,
   NotePickerField,
   PictureInput,
@@ -18,243 +17,114 @@ import {
   Select,
   SelectedBottleSummary,
   Textarea,
-  TextInput,
 } from "../components";
 import { memberOptions, noteOptions } from "../components/storyData";
 
-const COMPACT = "@media (max-width: 639px)";
-
-const servingStyles = ["neat", "splash", "rocks"] as const;
-type ServingStyle = (typeof servingStyles)[number];
-
-function isServingStyle(value: string): value is ServingStyle {
-  return servingStyles.some((servingStyle) => servingStyle === value);
-}
-
 export type TastingFormPatternProps = {
+  disabled?: boolean;
   initialRating?: RatingBand | null;
-  submitting?: boolean;
 };
 
+/** Shows the reusable tasting fields without the route-owned workflow header. */
 export function TastingFormPattern({
+  disabled = false,
   initialRating = null,
-  submitting = false,
 }: TastingFormPatternProps) {
   const [rating, setRating] = useState<RatingBand | null>(initialRating);
   const [colour, setColour] = useState<number | null>(10);
-  const [date, setDate] = useState("2026-08-25");
   const [comments, setComments] = useState("");
   const [friends, setFriends] = useState<readonly MemberPickerOption[]>([]);
   const [notes, setNotes] = useState<readonly string[]>([]);
-  const [serving, setServing] = useState<ServingStyle>("neat");
-
-  const complete = rating !== null;
+  const [serving, setServing] = useState("");
 
   return (
     <form
-      aria-busy={submitting || undefined}
       onSubmit={(event) => event.preventDefault()}
       {...stylex.props(styles.form)}
     >
-      <fieldset
-        disabled={submitting}
-        {...stylex.props(styles.fields, submitting && styles.fieldsPending)}
-      >
-        <div {...stylex.props(styles.context)}>
+      <fieldset disabled={disabled} {...stylex.props(styles.fields)}>
+        <FormStack>
           <SelectedBottleSummary
             bottleId="B00872"
             metadata="Islay · 16 yr · 43.0% · ex-bourbon"
             name="Lagavulin 16"
           />
-        </div>
-        <div {...stylex.props(styles.panel)}>
-          <RatingBandInput
-            id="tasting-rating"
-            name="tasting-rating"
-            onChange={setRating}
-            required
-            value={rating}
-          />
-        </div>
-        <div {...stylex.props(styles.formGrid)}>
-          <Field htmlFor="tasting-date" label="Date" optional>
-            <TextInput
-              format="data"
-              id="tasting-date"
-              onChange={(event) => setDate(event.currentTarget.value)}
-              type="date"
-              value={date}
+          <FormSection title="Rating">
+            <RatingBandInput
+              disabled={disabled}
+              id="tasting-rating"
+              label="How was it"
+              name="tasting-rating"
+              onChange={setRating}
+              value={rating}
             />
-          </Field>
-          <Field htmlFor="tasting-serving" label="Served" optional>
-            <Select
-              id="tasting-serving"
-              onChange={(event) => {
-                const value = event.currentTarget.value;
-                if (isServingStyle(value)) setServing(value);
-              }}
-              value={serving}
+          </FormSection>
+          <FormSection title="Tasting notes">
+            <FieldGroup label="Flavours and aromas" optional>
+              <NotePickerField
+                notes={noteOptions}
+                onChange={setNotes}
+                value={notes}
+              />
+            </FieldGroup>
+            <FieldGroup label="Colour" optional>
+              <ColourInput
+                disabled={disabled}
+                id="tasting-colour"
+                name="tasting-colour"
+                onChange={setColour}
+                value={colour}
+              />
+            </FieldGroup>
+            <Field
+              hint="Describe the aroma, taste, texture, and finish in your own words."
+              htmlFor="tasting-comments"
+              label="Comments"
+              optional
             >
-              <option value="neat">Neat</option>
-              <option value="splash">With a splash of water</option>
-              <option value="rocks">On the rocks</option>
-            </Select>
-          </Field>
-        </div>
-        <div {...stylex.props(styles.section, styles.panel)}>
-          <FieldGroup label="Notes" optional>
-            <NotePickerField
-              notes={noteOptions}
-              onChange={setNotes}
-              value={notes}
+              <Textarea
+                id="tasting-comments"
+                onChange={(event) => setComments(event.currentTarget.value)}
+                placeholder="Tell us how it drank."
+                rows={6}
+                value={comments}
+              />
+            </Field>
+          </FormSection>
+          <FormSection title="Context">
+            <Field htmlFor="tasting-serving" label="Served" optional>
+              <Select
+                id="tasting-serving"
+                onChange={(event) => setServing(event.currentTarget.value)}
+                value={serving}
+              >
+                <option value="">Not set</option>
+                <option value="neat">Neat</option>
+                <option value="splash">With water</option>
+                <option value="rocks">On the rocks</option>
+              </Select>
+            </Field>
+            <MemberPicker
+              onChange={setFriends}
+              options={memberOptions}
+              value={friends}
             />
-          </FieldGroup>
-        </div>
-        <div {...stylex.props(styles.section, styles.panel)}>
-          <FieldGroup label="Colour" optional>
-            <ColourInput
-              id="tasting-colour"
-              name="tasting-colour"
-              onChange={setColour}
-              value={colour}
-            />
-          </FieldGroup>
-        </div>
-        <div {...stylex.props(styles.notes, styles.panel)}>
-          <Field
-            hint="Describe the aroma, taste, texture, and finish in your own words."
-            htmlFor="tasting-comments"
-            label="Comments"
-            optional
-          >
-            <Textarea
-              id="tasting-comments"
-              onChange={(event) => setComments(event.currentTarget.value)}
-              value={comments}
-            />
-          </Field>
-        </div>
-        <div {...stylex.props(styles.section, styles.panel)}>
-          <MemberPicker
-            onChange={setFriends}
-            options={memberOptions}
-            value={friends}
-          />
-        </div>
-        <div {...stylex.props(styles.section, styles.panel)}>
-          <FieldGroup label="Picture" optional>
-            <PictureInput
-              id="tasting-picture"
-              name="tasting-picture"
-              onFilesSelected={() => undefined}
-            />
-          </FieldGroup>
-        </div>
+            <FieldGroup label="Picture" optional>
+              <PictureInput
+                disabled={disabled}
+                id="tasting-picture"
+                name="tasting-picture"
+                onFilesSelected={() => undefined}
+              />
+            </FieldGroup>
+          </FormSection>
+        </FormStack>
       </fieldset>
-      <div {...stylex.props(styles.actions)}>
-        <span
-          {...stylex.props(
-            foundationStyles.metadata,
-            styles.muted,
-            submitting && styles.actionCompanionPending,
-          )}
-        >
-          {complete ? "Draft saved locally" : "Choose a rating before saving"}
-        </span>
-        <Button
-          disabled={!complete}
-          loading={submitting}
-          loadingLabel="Saving your tasting"
-          variant="accent"
-        >
-          Save tasting
-        </Button>
-      </div>
     </form>
   );
 }
 
 const styles = stylex.create({
-  form: {
-    boxSizing: "border-box",
-    width: "100%",
-    maxWidth: "760px",
-  },
-  fields: {
-    minWidth: 0,
-    margin: 0,
-    padding: 0,
-    borderWidth: 0,
-    transitionProperty: "opacity",
-    transitionDuration: "120ms",
-  },
-  fieldsPending: {
-    pointerEvents: "none",
-    opacity: 0.5,
-  },
-  actionCompanionPending: {
-    opacity: 0.5,
-  },
-  context: {
-    marginBottom: "6px",
-  },
-  panel: {
-    paddingTop: "22px",
-    paddingRight: "24px",
-    paddingBottom: "22px",
-    paddingLeft: "24px",
-    borderRadius: "3px",
-    backgroundColor: colors.surface,
-    [COMPACT]: {
-      paddingTop: "20px",
-      paddingRight: "20px",
-      paddingBottom: "20px",
-      paddingLeft: "20px",
-    },
-  },
-  formGrid: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "repeat(2, minmax(0, 1fr))",
-      [COMPACT]: "1fr",
-    },
-    gap: space.x4,
-    marginTop: "6px",
-    paddingTop: "22px",
-    paddingRight: "24px",
-    paddingBottom: "22px",
-    paddingLeft: "24px",
-    borderRadius: "3px",
-    backgroundColor: colors.surface,
-    [COMPACT]: {
-      paddingTop: "20px",
-      paddingRight: "20px",
-      paddingBottom: "20px",
-      paddingLeft: "20px",
-    },
-  },
-  notes: {
-    marginTop: "6px",
-  },
-  section: {
-    marginTop: "6px",
-  },
-  actions: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    columnGap: space.x4,
-    rowGap: space.x3,
-    marginTop: "6px",
-    paddingTop: "14px",
-    paddingRight: space.x4,
-    paddingBottom: "14px",
-    paddingLeft: space.x4,
-    borderRadius: "3px",
-    backgroundColor: colors.surface,
-    flexWrap: "wrap",
-  },
-  muted: {
-    color: colors.inkMuted,
-  },
+  form: { boxSizing: "border-box", width: "100%", maxWidth: "760px" },
+  fields: { minWidth: 0, margin: 0, padding: 0, borderWidth: 0 },
 });
