@@ -39,7 +39,7 @@ import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
 export async function GET() {
   const { client } = await getServerClient();
-  const { totalBottles } = await client.stats();
+  const { bottles } = await client.stats();
   // ...
 }
 ```
