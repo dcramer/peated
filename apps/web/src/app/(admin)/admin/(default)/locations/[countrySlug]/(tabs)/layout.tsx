@@ -1,74 +1,55 @@
 "use client";
 
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
+import { use, type ReactNode } from "react";
+
+import {
+  AdminActions,
+  AdminBreadcrumbs,
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
-import PageHeader from "@peated/web/components/pageHeader";
-import Tabs, { TabItem } from "@peated/web/components/tabs";
+import { PageTabs } from "@peated/web/components/designSystem/components";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { type ReactNode, use } from "react";
 
-export default function Page(props: {
-  params: Promise<{ countrySlug: string }>;
+export default function Layout({
+  children,
+  params,
+}: {
   children: ReactNode;
+  params: Promise<{ countrySlug: string }>;
 }) {
-  const params = use(props.params);
-
-  const { countrySlug } = params;
-
-  const { children } = props;
-
+  const { countrySlug } = use(params);
   const orpc = useORPC();
   const { data: country } = useSuspenseQuery(
-    orpc.countries.details.queryOptions({
-      input: {
-        country: countrySlug,
-      },
-    }),
+    orpc.countries.details.queryOptions({ input: { country: countrySlug } }),
   );
+  const href = `/admin/locations/${country.slug}`;
 
   return (
-    <div className="w-full p-3 lg:py-0">
-      <Breadcrumbs
-        pages={[
-          {
-            name: "Admin",
-            href: "/admin",
-          },
-          {
-            name: "Locations",
-            href: "/admin/locations",
-          },
-          {
-            name: country.name,
-            href: `/admin/locations/${country.slug}`,
-            current: true,
-          },
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[
+          { label: "Locations", href: "/admin/locations" },
+          { label: country.name, href, current: true },
         ]}
       />
-
-      <PageHeader
+      <AdminPageHeader
         title={country.name}
-        metadata={
-          <div className="flex gap-x-1">
-            <Button href={`/admin/locations/${country.slug}/regions/add`}>
-              Add Region
-            </Button>
-            <Button href={`/admin/locations/${country.slug}/edit`}>
-              Edit Location
-            </Button>
-          </div>
+        actions={
+          <AdminActions>
+            <Button href={`${href}/regions/add`}>Add region</Button>
+            <Button href={`${href}/edit`}>Edit location</Button>
+          </AdminActions>
         }
       />
-
-      <Tabs border>
-        <TabItem as={Link} href={`/admin/locations/${country.slug}`} controlled>
-          Regions
-        </TabItem>
-      </Tabs>
-
+      <PageTabs
+        ariaLabel="Location"
+        currentHref={href}
+        items={[{ href, label: "Regions" }]}
+      />
       {children}
-    </div>
+    </AdminPage>
   );
 }

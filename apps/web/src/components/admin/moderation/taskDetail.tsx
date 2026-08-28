@@ -3,11 +3,22 @@
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
+import {
+  AdminCodeBlock,
+  AdminDetails,
+  AdminSection,
+  AdminTextLink,
+} from "@peated/web/components/admin/adminContent.stylex";
+import {
+  AdminSelectField,
+  AdminTextareaField,
+} from "@peated/web/components/admin/adminForm.stylex";
+import Alert from "@peated/web/components/alert";
 import CheckResult from "@peated/web/components/bottleChecks/checkResult";
 import type { ExcludedOperationField } from "@peated/web/components/bottleChecks/operationCard";
 import OperationCard from "@peated/web/components/bottleChecks/operationCard";
 import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
+import DefinitionList from "@peated/web/components/definitionList";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -17,10 +28,17 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { Check, Copy, RotateCcw } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useState } from "react";
 import { z } from "zod";
 import BottleSelector from "./bottleSelector";
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
+import {
+  ModerationActions,
+  ModerationLoading,
+  ModerationMedia,
+  ModerationStack,
+  ModerationTaskHeader,
+} from "./moderationDetail.stylex";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 type QueueItem = Outputs["prices"]["matchQueue"]["details"];
@@ -50,36 +68,19 @@ function formatField(value: ProposedBottleField): string {
 }
 
 function TaskHeader({ task }: { task: Task }) {
-  const headingRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    headingRef.current?.focus();
-  }, [task.key]);
-
   return (
-    <header className="border-b border-slate-800 pb-5">
-      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-        <span>{task.category}</span>
-        <span aria-hidden="true">/</span>
-        <span
-          className={
-            task.state === "blocked" ? "text-amber-300" : "text-slate-400"
-          }
-        >
-          {task.statusLabel}
-        </span>
-      </div>
-      <h1
-        className="mt-3 text-2xl font-semibold text-white"
-        ref={headingRef}
-        tabIndex={-1}
-      >
-        {task.question}
-      </h1>
-      <p className="mt-2 text-sm text-slate-400">
-        {task.title} · {task.sourceLabel}
-      </p>
-    </header>
+    <ModerationTaskHeader
+      blocked={task.state === "blocked"}
+      category={task.category}
+      meta={
+        <>
+          {task.title} · {task.sourceLabel}
+        </>
+      }
+      question={task.question}
+      status={task.statusLabel}
+      taskKey={task.key}
+    />
   );
 }
 
@@ -180,10 +181,9 @@ function ListingTask({
     if (item.status === "errored") {
       return (
         <Button
-          className="min-h-11"
           color="highlight"
           disabled={busy}
-          icon={<RotateCcw aria-hidden="true" className="h-4 w-4" />}
+          icon={<RotateCcw aria-hidden="true" size={16} />}
           loading={retry.isPending}
           onClick={() => void retryClassification()}
         >
@@ -194,7 +194,6 @@ function ListingTask({
     if (item.proposalType === "match_existing" && item.suggestedBottle) {
       return (
         <Button
-          className="min-h-11"
           color="highlight"
           disabled={busy}
           loading={resolve.isPending}
@@ -217,7 +216,6 @@ function ListingTask({
     if (item.proposalType === "create_new" && item.proposedBottle) {
       return (
         <Button
-          className="min-h-11"
           color="highlight"
           disabled={busy}
           loading={createBottle.isPending}
@@ -241,7 +239,6 @@ function ListingTask({
     if (item.proposalType === "correction" && item.proposedBottle) {
       return (
         <Button
-          className="min-h-11"
           color="highlight"
           disabled={busy}
           loading={repair.isPending}
@@ -260,128 +257,80 @@ function ListingTask({
   })();
 
   return (
-    <div className="space-y-5">
+    <ModerationStack>
       <TaskHeader task={task} />
-      <section
-        aria-labelledby="listing-source"
-        className="rounded-xl border border-slate-800 bg-slate-950 p-4 sm:p-5"
-      >
-        <h2
-          className="text-xs font-semibold uppercase tracking-wide text-slate-400"
-          id="listing-source"
-        >
-          Source listing
-        </h2>
-        <div className="mt-3 flex gap-4">
-          {item.price.imageUrl ? (
-            <img
-              alt=""
-              className="h-24 w-20 rounded-lg bg-slate-900 object-contain"
-              src={item.price.imageUrl}
-            />
-          ) : null}
-          <div className="min-w-0">
-            <p className="font-semibold text-white">{item.price.name}</p>
-            <p className="mt-1 text-sm text-slate-400">
-              {item.price.site.name} ·{" "}
-              {(item.price.price / 100).toLocaleString(undefined, {
-                style: "currency",
-                currency: item.price.currency.toUpperCase(),
-              })}
-            </p>
-            <a
-              className="text-highlight mt-2 inline-block text-sm underline"
-              href={item.price.url}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Open source listing
-            </a>
+      <AdminSection title="Source listing">
+        <ModerationMedia imageUrl={item.price.imageUrl}>
+          <strong>{item.price.name}</strong>
+          <div>
+            {item.price.site.name} ·{" "}
+            {(item.price.price / 100).toLocaleString(undefined, {
+              style: "currency",
+              currency: item.price.currency.toUpperCase(),
+            })}
           </div>
-        </div>
-      </section>
+          <AdminTextLink href={item.price.url}>
+            Open source listing
+          </AdminTextLink>
+        </ModerationMedia>
+      </AdminSection>
 
       {item.suggestedBottle ? (
-        <section className="rounded-xl border border-emerald-900/70 bg-emerald-950/20 p-4 sm:p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">
-            Recommended Bottle
-          </p>
-          <h2 className="mt-2 text-lg font-semibold text-white">
-            {item.suggestedBottle.fullName}
-          </h2>
-          <Link
-            className="text-highlight mt-2 inline-block text-sm underline"
-            href={`/bottles/${item.suggestedBottle.id}`}
-          >
-            View Bottle #{item.suggestedBottle.id}
-          </Link>
-        </section>
+        <AdminSection title="Recommended bottle" tone="accent">
+          <strong>{item.suggestedBottle.fullName}</strong>
+          {" · "}
+          <AdminTextLink href={`/bottles/${item.suggestedBottle.id}`}>
+            View bottle #{item.suggestedBottle.id}
+          </AdminTextLink>
+        </AdminSection>
       ) : null}
 
       {item.proposedBottle ? (
-        <section className="rounded-xl border border-slate-800 bg-slate-950 p-4 sm:p-5">
-          <h2 className="font-semibold text-white">Proposed Bottle</h2>
-          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+        <AdminSection title="Proposed bottle">
+          <DefinitionList>
             {Object.entries(item.proposedBottle).map(([field, value]) => (
-              <div className="border-b border-slate-800 pb-2" key={field}>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <Fragment key={field}>
+                <DefinitionList.Term>
                   {field.replaceAll("_", " ")}
-                </dt>
-                <dd className="mt-1 text-sm text-slate-200">
+                </DefinitionList.Term>
+                <DefinitionList.Details>
                   {formatField(value)}
-                </dd>
-              </div>
+                </DefinitionList.Details>
+              </Fragment>
             ))}
-          </dl>
-        </section>
+          </DefinitionList>
+        </AdminSection>
       ) : null}
 
       {item.error ? (
-        <div className="rounded-lg border border-amber-800 bg-amber-950/30 p-4 text-sm text-amber-100">
+        <Alert type="warn">
           <strong>Classification needs attention.</strong>
-          <p className="mt-1">{item.error}</p>
-        </div>
+          <p>{item.error}</p>
+        </Alert>
       ) : null}
       {item.proposalType === "no_match" && item.status !== "errored" ? (
-        <div className="rounded-lg border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-200">
+        <Alert type="default">
           <strong>No clear Bottle outcome was found.</strong>
-          <p className="mt-1 text-slate-400">
+          <p>
             Choose a Bottle if you recognize the listing. Otherwise, ignore it
             to remove it from moderation without assigning a Bottle.
           </p>
-        </div>
+        </Alert>
       ) : null}
       {item.rationale ? (
-        <p className="text-sm leading-6 text-slate-300">{item.rationale}</p>
+        <AdminSection title="Rationale">{item.rationale}</AdminSection>
       ) : null}
-      {error ? (
-        <div
-          className="rounded-lg border border-red-900 bg-red-950/40 p-3 text-sm text-red-200"
-          role="alert"
-        >
-          {error}
-        </div>
-      ) : null}
+      {error ? <Alert type="error">{error}</Alert> : null}
 
-      {primary ? (
-        <div className="fixed inset-x-3 bottom-16 z-30 rounded-lg border border-slate-700 bg-slate-950/95 p-2 shadow-2xl backdrop-blur sm:hidden [&>*]:w-full">
-          {primary}
-        </div>
-      ) : null}
-      <div className="flex flex-col gap-2 border-t border-slate-800 pt-5 sm:flex-row sm:flex-wrap">
-        {primary ? <div className="hidden sm:contents">{primary}</div> : null}
-        <Button
-          className="min-h-11"
-          disabled={busy}
-          onClick={() => setSelecting(true)}
-        >
+      <ModerationActions>
+        {primary}
+        <Button disabled={busy} onClick={() => setSelecting(true)}>
           {item.suggestedBottle ? "Choose another Bottle" : "Choose Bottle"}
         </Button>
         {item.status !== "errored" ? (
           <Button
-            className="min-h-11"
             disabled={busy || item.isProcessing}
-            icon={<RotateCcw aria-hidden="true" className="h-4 w-4" />}
+            icon={<RotateCcw aria-hidden="true" size={16} />}
             loading={retry.isPending}
             onClick={() => void retryClassification()}
           >
@@ -389,13 +338,12 @@ function ListingTask({
           </Button>
         ) : null}
         <Button
-          className="min-h-11"
           disabled={copyStatus === "copying"}
           icon={
             copyStatus === "copied" ? (
-              <Check aria-hidden="true" className="h-4 w-4" />
+              <Check aria-hidden="true" size={16} />
             ) : (
-              <Copy aria-hidden="true" className="h-4 w-4" />
+              <Copy aria-hidden="true" size={16} />
             )
           }
           loading={copyStatus === "copying"}
@@ -406,14 +354,12 @@ function ListingTask({
         </Button>
         {item.proposalType === "create_new" && item.proposedBottle ? (
           <Button
-            className="min-h-11"
             href={`/bottles/new?name=${encodeURIComponent(item.proposedBottle.name)}`}
           >
             Edit before creation
           </Button>
         ) : null}
         <Button
-          className="min-h-11"
           disabled={busy}
           onClick={() =>
             void finish(
@@ -427,47 +373,37 @@ function ListingTask({
             ? "Ignore as inconclusive"
             : "Ignore listing"}
         </Button>
-      </div>
+      </ModerationActions>
 
-      <details className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-        <summary className="cursor-pointer font-semibold text-slate-200">
-          Evidence
-        </summary>
-        <div className="mt-3 space-y-2 text-sm text-slate-400">
+      <AdminDetails summary="Evidence">
+        <ModerationStack>
           {item.searchEvidence.length ? (
             item.searchEvidence.map((evidence, index) => (
-              <pre className="overflow-x-auto whitespace-pre-wrap" key={index}>
+              <AdminCodeBlock key={index}>
                 {JSON.stringify(evidence, null, 2)}
-              </pre>
+              </AdminCodeBlock>
             ))
           ) : (
             <p>No supporting web evidence was saved.</p>
           )}
-        </div>
-      </details>
-      <details className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-        <summary className="cursor-pointer font-semibold text-slate-200">
-          System details
-        </summary>
-        <dl className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
-          <div>
-            <dt>Proposal</dt>
-            <dd>#{item.id}</dd>
-          </div>
-          <div>
-            <dt>Model</dt>
-            <dd>{item.model ?? "Unavailable"}</dd>
-          </div>
-          <div>
-            <dt>Automation score</dt>
-            <dd>{item.automationScore ?? "Unavailable"}</dd>
-          </div>
-          <div>
-            <dt>Status</dt>
-            <dd>{item.status}</dd>
-          </div>
-        </dl>
-      </details>
+        </ModerationStack>
+      </AdminDetails>
+      <AdminDetails summary="System details">
+        <DefinitionList>
+          <DefinitionList.Term>Proposal</DefinitionList.Term>
+          <DefinitionList.Details>#{item.id}</DefinitionList.Details>
+          <DefinitionList.Term>Model</DefinitionList.Term>
+          <DefinitionList.Details>
+            {item.model ?? "Unavailable"}
+          </DefinitionList.Details>
+          <DefinitionList.Term>Automation score</DefinitionList.Term>
+          <DefinitionList.Details>
+            {item.automationScore ?? "Unavailable"}
+          </DefinitionList.Details>
+          <DefinitionList.Term>Status</DefinitionList.Term>
+          <DefinitionList.Details>{item.status}</DefinitionList.Details>
+        </DefinitionList>
+      </AdminDetails>
 
       <BottleSelector
         name={item.price.name}
@@ -476,7 +412,7 @@ function ListingTask({
         open={selecting}
         source={item.price.url}
       />
-    </div>
+    </ModerationStack>
   );
 }
 
@@ -587,16 +523,9 @@ function AuditTask({
     );
     if (!operation) return <UnavailableTask />;
     return (
-      <div className="space-y-5">
+      <ModerationStack>
         <TaskHeader task={task} />
-        {error ? (
-          <div
-            className="rounded-lg border border-red-900 bg-red-950/40 p-3 text-sm text-red-200"
-            role="alert"
-          >
-            {error}
-          </div>
-        ) : null}
+        {error ? <Alert type="error">{error}</Alert> : null}
         <OperationCard
           actionError={error}
           actionPending={busy}
@@ -608,66 +537,49 @@ function AuditTask({
           operation={operation}
           review={live?.review ?? null}
         />
-        <details className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-          <summary className="cursor-pointer font-semibold text-slate-200">
-            System details
-          </summary>
-          <p className="mt-3 text-sm text-slate-400">
+        <AdminDetails summary="System details">
+          <p>
             Audit #{data.audit.id} · Operation #{operation.id} · Schema{" "}
             {data.audit.schemaVersion}
           </p>
-        </details>
-      </div>
+        </AdminDetails>
+      </ModerationStack>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <ModerationStack>
       <TaskHeader task={task} />
       <CheckResult check={data.audit} compact title="Unresolved findings" />
       {data.audit.bottleId ? (
-        <Button
-          className="min-h-11"
-          href={`/bottles/${data.audit.bottleId}/edit`}
-        >
+        <Button href={`/bottles/${data.audit.bottleId}/edit`}>
           Edit Bottle manually
         </Button>
       ) : null}
-      <section className="rounded-xl border border-slate-800 bg-slate-950 p-4 sm:p-5">
-        <h2 className="font-semibold text-white">Record disposition</h2>
-        <div className="mt-4 grid gap-3">
-          <label className="text-sm text-slate-300">
-            Reason
-            <select
-              className="mt-1 min-h-11 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-white"
-              onChange={(event) =>
-                setCloseReason(
-                  z
-                    .enum(["dismissed", "resolved_manually"])
-                    .parse(event.currentTarget.value),
-                )
-              }
-              value={closeReason}
-            >
-              <option value="dismissed">Dismissed</option>
-              <option value="resolved_manually">Resolved manually</option>
-            </select>
-          </label>
-          <label className="text-sm text-slate-300">
-            Optional note
-            <textarea
-              className="mt-1 min-h-24 w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-white"
-              onChange={(event) => setCloseNote(event.currentTarget.value)}
-              value={closeNote}
-            />
-          </label>
-          {error ? (
-            <p className="text-sm text-red-300" role="alert">
-              {error}
-            </p>
-          ) : null}
+      <AdminSection title="Record disposition">
+        <ModerationStack>
+          <AdminSelectField
+            label="Reason"
+            options={[
+              { value: "dismissed", label: "Dismissed" },
+              { value: "resolved_manually", label: "Resolved manually" },
+            ]}
+            onChange={(event) =>
+              setCloseReason(
+                z
+                  .enum(["dismissed", "resolved_manually"])
+                  .parse(event.currentTarget.value),
+              )
+            }
+            value={closeReason}
+          />
+          <AdminTextareaField
+            label="Optional note"
+            onChange={(event) => setCloseNote(event.currentTarget.value)}
+            value={closeNote}
+          />
+          {error ? <Alert type="error">{error}</Alert> : null}
           <Button
-            className="min-h-11 sm:justify-self-start"
             color="highlight"
             disabled={busy}
             loading={close.isPending}
@@ -675,26 +587,21 @@ function AuditTask({
           >
             Close findings
           </Button>
-        </div>
-      </section>
-    </div>
+        </ModerationStack>
+      </AdminSection>
+    </ModerationStack>
   );
 }
 
 export function UnavailableTask() {
   return (
-    <div className="mx-auto max-w-lg py-16 text-center">
-      <p className="text-lg font-semibold text-white">
-        This task no longer needs attention
-      </p>
-      <p className="mt-2 text-sm text-slate-400">
+    <AdminSection title="This task no longer needs attention">
+      <p>
         It may have been completed in another session. The Inbox has been
         refreshed.
       </p>
-      <Button className="mt-5 min-h-11" href="/admin/moderation/inbox">
-        Return to Inbox
-      </Button>
-    </div>
+      <Button href="/admin/moderation/inbox">Return to Inbox</Button>
+    </AdminSection>
   );
 }
 
@@ -710,11 +617,7 @@ export default function TaskDetail({
     orpc.admin.moderation.task.queryOptions({ input: { key: taskKey } }),
   );
   if (locator.isPending)
-    return (
-      <div className="animate-pulse p-8 text-sm text-slate-400">
-        Loading decision…
-      </div>
-    );
+    return <ModerationLoading>Loading decision…</ModerationLoading>;
   if (locator.isError || !locator.data) return <UnavailableTask />;
   const task = locator.data.task;
   if (task.source.kind === "listing")

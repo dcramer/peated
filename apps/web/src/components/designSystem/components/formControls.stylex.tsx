@@ -5,6 +5,7 @@ import type {
   ReactNode,
   SelectHTMLAttributes,
 } from "react";
+import { forwardRef } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
@@ -22,35 +23,36 @@ export type SelectProps = Omit<
   invalid?: boolean;
 };
 
-export function Select({
-  children,
-  disabled = false,
-  invalid = false,
-  ...props
-}: SelectProps) {
-  return (
-    <span {...stylex.props(styles.selectWrapper)}>
-      <select
-        {...props}
-        aria-invalid={invalid || undefined}
-        disabled={disabled}
-        {...stylex.props(
-          styles.select,
-          invalid && styles.invalid,
-          disabled && styles.disabled,
-        )}
-      >
-        {children}
-      </select>
-      <ChevronDown
-        aria-hidden="true"
-        size={15}
-        strokeWidth={1.75}
-        {...stylex.props(styles.selectIcon, disabled && styles.disabled)}
-      />
-    </span>
-  );
-}
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(
+  function Select(
+    { children, disabled = false, invalid = false, ...props },
+    ref,
+  ) {
+    return (
+      <span {...stylex.props(styles.selectWrapper)}>
+        <select
+          {...props}
+          aria-invalid={invalid || undefined}
+          disabled={disabled}
+          ref={ref}
+          {...stylex.props(
+            styles.select,
+            invalid && styles.invalid,
+            disabled && styles.disabled,
+          )}
+        >
+          {children}
+        </select>
+        <ChevronDown
+          aria-hidden="true"
+          size={15}
+          strokeWidth={1.75}
+          {...stylex.props(styles.selectIcon, disabled && styles.disabled)}
+        />
+      </span>
+    );
+  },
+);
 
 export type SegmentedControlOption<Value extends string = string> = {
   disabled?: boolean;

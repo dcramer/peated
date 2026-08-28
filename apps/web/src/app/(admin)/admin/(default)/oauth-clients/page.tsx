@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import OAuthClientTable from "@peated/web/components/admin/oauthClientTable";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -14,7 +18,7 @@ export default function Page() {
   );
 
   return (
-    <div>
+    <AdminPage>
       <Breadcrumbs
         pages={[
           { name: "Admin", href: "/admin" },
@@ -25,16 +29,19 @@ export default function Page() {
           },
         ]}
       />
-      <div className="flex items-center justify-end">
-        <Button color="primary" href="/admin/oauth-clients/add">
-          Register Client
-        </Button>
-      </div>
+      <AdminPageHeader
+        actions={
+          <Button color="primary" href="/admin/oauth-clients/add">
+            Register Client
+          </Button>
+        }
+        title="OAuth clients"
+      />
       {data.results.length ? (
         <OAuthClientTable clients={data.results} />
       ) : (
         <EmptyActivity>No OAuth clients are registered yet.</EmptyActivity>
       )}
-    </div>
+    </AdminPage>
   );
 }

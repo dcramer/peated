@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
@@ -24,7 +28,7 @@ export default function Page() {
   );
 
   return (
-    <div>
+    <AdminPage>
       <Breadcrumbs
         pages={[
           {
@@ -38,6 +42,7 @@ export default function Page() {
           },
         ]}
       />
+      <AdminPageHeader title="Users" />
 
       <Table
         items={userList.results}
@@ -54,6 +59,6 @@ export default function Page() {
           },
         ]}
       />
-    </div>
+    </AdminPage>
   );
 }

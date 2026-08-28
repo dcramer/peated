@@ -15,7 +15,6 @@ import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
-import AdminSidebar from "./sidebar";
 
 export function parseOAuthClientRedirectUris(value: string): string[] {
   return value
@@ -97,7 +96,6 @@ export default function OAuthClientForm({
       title={title}
       saveDisabled={isSubmitting}
       onSave={handleSubmit(onSubmitHandler)}
-      sidebar={<AdminSidebar />}
     >
       {error && <FormError values={[error]} />}
       <Form

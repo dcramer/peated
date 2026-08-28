@@ -4,6 +4,7 @@ import type {
   ButtonHTMLAttributes,
   ReactNode,
 } from "react";
+import { forwardRef } from "react";
 
 import {
   colors,
@@ -15,7 +16,7 @@ import {
 
 const REDUCED_MOTION = "@media (prefers-reduced-motion: reduce)";
 
-export type ButtonVariant = "default" | "tonal" | "accent" | "text";
+export type ButtonVariant = "default" | "tonal" | "accent" | "danger" | "text";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export type ButtonProps = Omit<
@@ -30,47 +31,53 @@ export type ButtonProps = Omit<
   variant?: ButtonVariant;
 };
 
-export function Button({
-  align = "center",
-  children,
-  disabled = false,
-  fullWidth = false,
-  loading = false,
-  loadingLabel,
-  size = "md",
-  type = "button",
-  variant = "default",
-  ...props
-}: ButtonProps) {
-  return (
-    <button
-      {...props}
-      aria-busy={loading || undefined}
-      data-size={size}
-      data-variant={variant}
-      disabled={disabled || loading}
-      type={type}
-      {...stylex.props(
-        styles.control,
-        styles.button,
-        fullWidth && styles.fullWidth,
-        align === "start" && styles.alignStart,
-        controlSizeStyles[size],
-        buttonSizeStyles[size],
-        variantStyles[variant],
-        loading && styles.loading,
-        loading && variant === "accent" && styles.loadingAccent,
-      )}
-    >
-      {loading && loadingLabel !== undefined ? loadingLabel : children}
-      {loading ? (
-        <span aria-hidden {...stylex.props(styles.loadingTrack)}>
-          <span {...stylex.props(styles.loadingSweep)} />
-        </span>
-      ) : null}
-    </button>
-  );
-}
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button(
+    {
+      align = "center",
+      children,
+      disabled = false,
+      fullWidth = false,
+      loading = false,
+      loadingLabel,
+      size = "md",
+      type = "button",
+      variant = "default",
+      ...props
+    },
+    ref,
+  ) {
+    return (
+      <button
+        {...props}
+        aria-busy={loading || undefined}
+        data-size={size}
+        data-variant={variant}
+        disabled={disabled || loading}
+        ref={ref}
+        type={type}
+        {...stylex.props(
+          styles.control,
+          styles.button,
+          fullWidth && styles.fullWidth,
+          align === "start" && styles.alignStart,
+          controlSizeStyles[size],
+          buttonSizeStyles[size],
+          variantStyles[variant],
+          loading && styles.loading,
+          loading && variant === "accent" && styles.loadingAccent,
+        )}
+      >
+        {loading && loadingLabel !== undefined ? loadingLabel : children}
+        {loading ? (
+          <span aria-hidden {...stylex.props(styles.loadingTrack)}>
+            <span {...stylex.props(styles.loadingSweep)} />
+          </span>
+        ) : null}
+      </button>
+    );
+  },
+);
 
 export type ButtonLinkProps = Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -259,6 +266,10 @@ const styles = stylex.create({
     backgroundColor: colors.accent,
     color: colors.ground,
   },
+  danger: {
+    backgroundColor: colors.accentDeep,
+    color: colors.ground,
+  },
   text: {
     backgroundColor: {
       default: "transparent",
@@ -299,6 +310,7 @@ const variantStyles = {
   default: styles.default,
   tonal: styles.tonal,
   accent: styles.accent,
+  danger: styles.danger,
   text: styles.text,
 } satisfies Record<ButtonVariant, stylex.StyleXStyles>;
 

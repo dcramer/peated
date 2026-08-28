@@ -591,3 +591,24 @@ The web application SHALL compose the member profile from reusable StyleX identi
 
 - **WHEN** the profile Activity endpoint supplies tasting sessions and collection additions
 - **THEN** the Activity tab renders those supplied records without substituting them for unsupported contribution records
+
+### Requirement: Admin workspace
+
+The web application SHALL compose admin routes from a shared StyleX workspace,
+navigation, page header, section, data table, feedback, and form controls while
+each route continues to own its data and mutations.
+
+#### Scenario: Administrator opens an admin route
+
+- **WHEN** an authorized administrator opens the dashboard, a catalog, a detail, a form, or a moderation route
+- **THEN** the route renders inside the same responsive admin workspace and keeps its current URL and behavior
+
+#### Scenario: Administrator uses a common admin surface
+
+- **WHEN** an admin route needs navigation, a page heading, actions, a section, a table, an empty state, pagination, or a form control
+- **THEN** it uses the existing design-system component or one narrow shared admin component instead of defining a page-specific visual primitive
+
+#### Scenario: Admin styling migration completes
+
+- **WHEN** the final admin route no longer renders a Tailwind-owned element
+- **THEN** the web application removes the admin legacy stylesheet and its unused Tailwind dependencies

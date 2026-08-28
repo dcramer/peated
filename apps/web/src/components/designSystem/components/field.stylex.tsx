@@ -4,6 +4,7 @@ import type {
   ReactNode,
   TextareaHTMLAttributes,
 } from "react";
+import { forwardRef } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
@@ -115,25 +116,24 @@ export type TextInputProps = Omit<
   invalid?: boolean;
 };
 
-export function TextInput({
-  format = "text",
-  invalid = false,
-  ...props
-}: TextInputProps) {
-  return (
-    <input
-      {...props}
-      aria-invalid={invalid || undefined}
-      data-format={format}
-      {...stylex.props(
-        styles.control,
-        styles.input,
-        format === "data" && styles.data,
-        invalid && styles.invalid,
-      )}
-    />
-  );
-}
+export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
+  function TextInput({ format = "text", invalid = false, ...props }, ref) {
+    return (
+      <input
+        {...props}
+        aria-invalid={invalid || undefined}
+        data-format={format}
+        ref={ref}
+        {...stylex.props(
+          styles.control,
+          styles.input,
+          format === "data" && styles.data,
+          invalid && styles.invalid,
+        )}
+      />
+    );
+  },
+);
 
 export type TextareaProps = Omit<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -142,19 +142,22 @@ export type TextareaProps = Omit<
   invalid?: boolean;
 };
 
-export function Textarea({ invalid = false, ...props }: TextareaProps) {
-  return (
-    <textarea
-      {...props}
-      aria-invalid={invalid || undefined}
-      {...stylex.props(
-        styles.control,
-        styles.textarea,
-        invalid && styles.invalid,
-      )}
-    />
-  );
-}
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+  function Textarea({ invalid = false, ...props }, ref) {
+    return (
+      <textarea
+        {...props}
+        aria-invalid={invalid || undefined}
+        ref={ref}
+        {...stylex.props(
+          styles.control,
+          styles.textarea,
+          invalid && styles.invalid,
+        )}
+      />
+    );
+  },
+);
 
 export function ValidationMessage({
   children,

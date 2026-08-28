@@ -1,5 +1,6 @@
 import type { OAuthClient } from "@peated/server/types";
-import Link from "@peated/web/components/link";
+import { AdminCode, AdminStatus } from "./adminContent.stylex";
+import AdminTable from "./adminTable.stylex";
 
 export default function OAuthClientTable({
   clients,
@@ -7,47 +8,33 @@ export default function OAuthClientTable({
   clients: OAuthClient[];
 }) {
   return (
-    <table className="min-w-full">
-      <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
-        <tr>
-          <th scope="col" className="px-3 py-2.5 text-left">
-            Client
-          </th>
-          <th scope="col" className="px-3 py-2.5 text-left">
-            Redirects
-          </th>
-          <th scope="col" className="px-3 py-2.5 text-right">
-            Status
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {clients.map((client) => (
-          <tr
-            key={client.clientId}
-            className="border-b border-slate-800 text-sm"
-          >
-            <td className="max-w-0 px-3 py-3 align-top">
-              <Link
-                href={`/admin/oauth-clients/${client.clientId}`}
-                className="font-medium hover:underline"
-              >
-                {client.name}
-              </Link>
-              <div className="text-muted mt-1 break-all font-mono text-xs">
-                {client.clientId}
-              </div>
-            </td>
-            <td className="px-3 py-3 align-top">
-              <span className="sm:hidden">Redirects: </span>
-              {client.redirectUris.length}
-            </td>
-            <td className="px-3 py-3 text-right align-top">
+    <AdminTable
+      columns={[
+        {
+          name: "client",
+          value: (client) => (
+            <span>
+              {client.name} · <AdminCode>{client.clientId}</AdminCode>
+            </span>
+          ),
+        },
+        {
+          name: "redirects",
+          value: (client) => client.redirectUris.length.toLocaleString("en-US"),
+        },
+        {
+          align: "right",
+          name: "status",
+          value: (client) => (
+            <AdminStatus tone={client.active ? "success" : "neutral"}>
               {client.active ? "Active" : "Inactive"}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            </AdminStatus>
+          ),
+        },
+      ]}
+      items={clients}
+      primaryKey={(client) => client.clientId}
+      url={(client) => `/admin/oauth-clients/${client.clientId}`}
+    />
   );
 }

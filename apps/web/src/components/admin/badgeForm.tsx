@@ -25,14 +25,13 @@ import { z } from "zod";
 import Button from "../button";
 import Form from "../form";
 import ImageField from "../imageField";
-import Legend from "../legend";
 import SelectField from "../selectField";
+import { BadgeCheckEditor, BadgeCheckItem } from "./badgeCheckEditor.stylex";
 import AgeCheckConfigForm from "./badgeConfigForms/ageCheckConfigForm";
 import BottleCheckConfigForm from "./badgeConfigForms/bottleCheckConfigForm";
 import CategoryCheckConfigForm from "./badgeConfigForms/categoryCheckConfigForm";
 import EntityCheckConfigForm from "./badgeConfigForms/entityCheckConfigForm";
 import RegionCheckConfigForm from "./badgeConfigForms/regionCheckConfigForm";
-import AdminSidebar from "./sidebar";
 
 const BadgeFormInputSchema = BadgeInputSchema.extend({
   checks: z
@@ -122,7 +121,6 @@ export default function BadgeForm({
       title={title}
       saveDisabled={isSubmitting}
       onSave={handleSubmit(onSubmitHandler)}
-      sidebar={<AdminSidebar />}
     >
       {error && <FormError values={[error]} />}
 
@@ -214,138 +212,82 @@ export default function BadgeForm({
         </Fieldset>
       </Form>
 
-      <div className="mb-4 mt-4 border-y border-slate-800 sm:rounded sm:border">
-        <Legend title="Checks" />
-        {errors.checks && (
-          <div className="px-5 pt-4">
+      <BadgeCheckEditor
+        error={
+          errors.checks ? (
             <FormError
               values={[
                 "Add at least one check and complete each check's required fields.",
               ]}
             />
-          </div>
-        )}
-        <div className="mb-8 mt-4 flex flex-wrap items-center gap-2 px-5">
-          <div className="font-bold">Add:</div>
-          {BADGE_CHECK_TYPE_LIST.map((t) => {
-            return (
+          ) : null
+        }
+        actions={BADGE_CHECK_TYPE_LIST.map((type) => (
+          <Button
+            color="primary"
+            key={type}
+            onClick={(event) => {
+              event.preventDefault();
+              setChecks((value) => {
+                const counter = value.counter + 1;
+                const items = [
+                  ...value.items,
+                  createBadgeCheckItem(type, counter),
+                ];
+                setValue("checks", items.map(withoutItemId));
+                return { items, counter };
+              });
+            }}
+          >
+            {toTitleCase(type)}
+          </Button>
+        ))}
+      >
+        {checks.items.map((check, index) => (
+          <BadgeCheckItem
+            index={index}
+            key={check.id}
+            title={toTitleCase(check.type)}
+            removeAction={
               <Button
-                color="primary"
-                key={t}
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  setChecks((value) => {
-                    const counter = value.counter + 1;
-                    const items = [
-                      ...value.items,
-                      createBadgeCheckItem(t, counter),
-                    ];
-
-                    setValue("checks", items.map(withoutItemId));
-
-                    return {
-                      items,
-                      counter,
-                    };
-                  });
+                color="danger"
+                size="small"
+                onClick={(event) => {
+                  event.preventDefault();
+                  const items = checks.items.filter(
+                    (item) => item.id !== check.id,
+                  );
+                  setValue("checks", items.map(withoutItemId));
+                  setChecks((value) => ({
+                    ...value,
+                    items: value.items.filter((item) => item.id !== check.id),
+                  }));
                 }}
               >
-                {toTitleCase(t)}
+                Remove
               </Button>
-            );
-          })}
-        </div>
-
-        <ol className="px-3">
-          {checks.items.map((check, index) => {
-            return (
-              <>
-                {index > 0 && (
-                  <li
-                    key={`and-${index}`}
-                    className="relative my-4 font-bold text-slate-500 opacity-60"
-                  >
-                    <div
-                      className="absolute inset-0 flex items-center"
-                      aria-hidden="true"
-                    >
-                      <div className="min-w-full border-t-2 border-slate-700" />
-                    </div>
-                    <div className="relative flex justify-center">
-                      <span className="bg-slate-950 px-2 text-lg uppercase">
-                        And
-                      </span>
-                    </div>
-                  </li>
-                )}
-                <li key={`${check.id}`} className="mb-4 flex gap-x-2">
-                  <div className="p-3 font-semibold">#{index + 1}</div>
-                  <div className="flex-grow">
-                    <div className="flex items-center rounded-t bg-slate-700 p-3">
-                      <h5 className="flex-grow font-semibold">
-                        {toTitleCase(check.type)}
-                      </h5>
-                      <div className="self-end">
-                        <Button
-                          color="primary"
-                          size="small"
-                          onClick={(e) => {
-                            e.preventDefault();
-
-                            setValue(
-                              "checks",
-                              checks.items
-                                .filter((v) => v.id !== check.id)
-                                .map(withoutItemId),
-                            );
-
-                            setChecks((value) => {
-                              return {
-                                ...value,
-                                items: value.items.filter(
-                                  (v) => v.id !== check.id,
-                                ),
-                              };
-                            });
-                          }}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-                    {renderBadgeConfig({
-                      check,
-                      onChange: (updatedCheck) => {
-                        setValue(
-                          "checks",
-                          checks.items.map((c) => {
-                            if (c.id === check.id) {
-                              return withoutItemId(updatedCheck);
-                            }
-                            return withoutItemId(c);
-                          }),
-                        );
-                        setChecks((value) => {
-                          return {
-                            ...value,
-                            items: value.items.map((c) => {
-                              if (c.id === check.id) {
-                                return updatedCheck;
-                              }
-                              return c;
-                            }),
-                          };
-                        });
-                      },
-                    })}
-                  </div>
-                </li>
-              </>
-            );
-          })}
-        </ol>
-      </div>
+            }
+          >
+            {renderBadgeConfig({
+              check,
+              onChange: (updatedCheck) => {
+                setValue(
+                  "checks",
+                  checks.items.map((item) =>
+                    withoutItemId(item.id === check.id ? updatedCheck : item),
+                  ),
+                );
+                setChecks((value) => ({
+                  ...value,
+                  items: value.items.map((item) =>
+                    item.id === check.id ? updatedCheck : item,
+                  ),
+                }));
+              },
+            })}
+          </BadgeCheckItem>
+        ))}
+      </BadgeCheckEditor>
     </FormScreen>
   );
 }

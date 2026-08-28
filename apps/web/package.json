@@ -35,7 +35,6 @@
     "@orpc/server": "catalog:",
     "@orpc/tanstack-query": "catalog:",
     "@peated/bottle-classifier": "workspace:*",
-    "@peated/design": "workspace:*",
     "@peated/orpc": "workspace:*",
     "@peated/server": "workspace:*",
     "@react-oauth/google": "^0.11.1",
@@ -87,7 +86,6 @@
     "postcss-import": "^16.1.1",
     "react-docgen-typescript": "2.4.0",
     "storybook": "10.5.10",
-    "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

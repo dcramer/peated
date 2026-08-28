@@ -16,7 +16,6 @@ import CountryField from "../countryField";
 import Form from "../form";
 import type { Option } from "../selectField";
 import TextAreaField from "../textAreaField";
-import AdminSidebar from "./sidebar";
 
 type FormSchemaType = z.infer<typeof EventInputSchema>;
 
@@ -65,7 +64,6 @@ export default function EventForm({
       title={title}
       saveDisabled={isSubmitting}
       onSave={handleSubmit(onSubmitHandler)}
-      sidebar={<AdminSidebar />}
     >
       {error && <FormError values={[error]} />}
 

@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import DateRange from "@peated/web/components/dateRange";
@@ -26,7 +30,7 @@ export default function Page() {
   );
 
   return (
-    <div>
+    <AdminPage>
       <Breadcrumbs
         pages={[
           {
@@ -40,11 +44,14 @@ export default function Page() {
           },
         ]}
       />
-      <div className="flex items-center justify-end">
-        <Button color="primary" href="/admin/events/add">
-          Add Event
-        </Button>
-      </div>
+      <AdminPageHeader
+        actions={
+          <Button color="primary" href="/admin/events/add">
+            Add Event
+          </Button>
+        }
+        title="Events"
+      />
 
       {eventList.results.length > 0 ? (
         <Table
@@ -58,15 +65,12 @@ export default function Page() {
               name: "dateStart",
               title: "When",
               value: (v) => <DateRange start={v.dateStart} end={v.dateEnd} />,
-              className: "w-64",
             },
           ]}
         />
       ) : (
-        <EmptyActivity>
-          Looks like there's nothing in the database yet. Weird.
-        </EmptyActivity>
+        <EmptyActivity>No events yet.</EmptyActivity>
       )}
-    </div>
+    </AdminPage>
   );
 }

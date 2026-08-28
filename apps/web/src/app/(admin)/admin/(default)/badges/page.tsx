@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import BadgeTable from "@peated/web/components/admin/badgeTable";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -24,7 +28,7 @@ export default function Page() {
   );
 
   return (
-    <div>
+    <AdminPage>
       <Breadcrumbs
         pages={[
           {
@@ -38,18 +42,19 @@ export default function Page() {
           },
         ]}
       />
-      <div className="flex items-center justify-end">
-        <Button color="primary" href="/admin/badges/add">
-          Add Badge
-        </Button>
-      </div>
+      <AdminPageHeader
+        actions={
+          <Button color="primary" href="/admin/badges/add">
+            Add Badge
+          </Button>
+        }
+        title="Badges"
+      />
       {badgeList.results.length > 0 ? (
         <BadgeTable badgeList={badgeList.results} rel={badgeList.rel} />
       ) : (
-        <EmptyActivity>
-          Looks like there's nothing in the database yet. Weird.
-        </EmptyActivity>
+        <EmptyActivity>No badges yet.</EmptyActivity>
       )}
-    </div>
+    </AdminPage>
   );
 }

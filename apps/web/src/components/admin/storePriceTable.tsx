@@ -1,8 +1,9 @@
 import type { PagingRel, StorePrice } from "@peated/server/types";
-import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
-import PaginationButtons from "../paginationButtons";
+
+import { AdminTextLink } from "./adminContent.stylex";
+import AdminTable from "./adminTable.stylex";
 
 export default function StorePriceTable({
   priceList,
@@ -12,91 +13,41 @@ export default function StorePriceTable({
   rel?: PagingRel;
 }) {
   return (
-    <>
-      <table className="min-w-full table-fixed sm:table-auto">
-        <colgroup>
-          <col className="w-16 sm:w-1/12" />
-          <col className="sm:w-7/12" />
-          <col className="sm:w-2/12" />
-          <col className="sm:w-2/12" />
-        </colgroup>
-        <thead className="text-muted hidden border-b border-slate-800 text-sm font-semibold sm:table-header-group">
-          <tr>
-            <th
-              scope="col"
-              aria-label="Image"
-              className="px-3 py-2.5 text-left"
-            />
-            <th scope="col" className="px-3 py-2.5 text-left">
-              Name
-            </th>
-            <th
-              scope="col"
-              className="hidden px-3 py-2.5 text-right sm:table-cell"
-            >
-              Price
-            </th>
-            <th
-              scope="col"
-              className="hidden px-3 py-2.5 text-right sm:table-cell"
-            >
-              Last seen
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {priceList.map((price) => {
-            return (
-              <tr key={price.id} className="border-b border-slate-800 text-sm">
-                <td className="py-3 align-top">
-                  {price.imageUrl && (
-                    <img
-                      src={price.imageUrl}
-                      alt={price.name}
-                      className="mx-auto max-h-16 max-w-14 object-contain"
-                    />
-                  )}
-                </td>
-                <td className="min-w-0 px-3 py-3 align-top">
-                  <Link
-                    href={price.url}
-                    className="font-medium hover:underline"
-                  >
-                    {price.name}
-                  </Link>
-                  <div className="mt-2 space-x-2 text-xs">
-                    {price.bottle ? (
-                      <Link
-                        href={`/bottles/${price.bottle.id}`}
-                        className="font-semibold hover:underline"
-                      >
-                        {price.bottle.fullName}
-                      </Link>
-                    ) : (
-                      <em>No Bottle</em>
-                    )}
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:hidden">
-                    <span className="font-medium text-white">
-                      <Price value={price.price} currency={price.currency} />
-                    </span>
-                    <span className="text-muted">
-                      Last seen <TimeSince date={price.updatedAt} />
-                    </span>
-                  </div>
-                </td>
-                <td className="hidden px-3 py-3 text-right sm:table-cell">
-                  <Price value={price.price} currency={price.currency} />
-                </td>
-                <td className="text-muted hidden px-3 py-3 text-right sm:table-cell">
-                  <TimeSince date={price.updatedAt} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <PaginationButtons rel={rel} />
-    </>
+    <AdminTable
+      columns={[
+        {
+          name: "listing",
+          value: (price) => (
+            <span>
+              <AdminTextLink href={price.url}>{price.name}</AdminTextLink>
+              {price.bottle ? (
+                <>
+                  {" · "}
+                  <AdminTextLink href={`/bottles/${price.bottle.id}`}>
+                    {price.bottle.fullName}
+                  </AdminTextLink>
+                </>
+              ) : (
+                " · No bottle"
+              )}
+            </span>
+          ),
+        },
+        {
+          align: "right",
+          name: "price",
+          value: (price) => (
+            <Price value={price.price} currency={price.currency} />
+          ),
+        },
+        {
+          align: "right",
+          name: "last seen",
+          value: (price) => <TimeSince date={price.updatedAt} />,
+        },
+      ]}
+      items={priceList}
+      rel={rel}
+    />
   );
 }

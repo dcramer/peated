@@ -16,9 +16,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import Button from "../button";
 import Form from "../form";
-import Legend from "../legend";
 import TextAreaField from "../textAreaField";
-import AdminSidebar from "./sidebar";
 
 type FormSchemaType = z.infer<typeof CountryInputSchema>;
 
@@ -64,7 +62,6 @@ export default function CountryForm({
       title={title}
       saveDisabled={isSubmitting}
       onSave={handleSubmit(onSubmitHandler)}
-      sidebar={<AdminSidebar />}
     >
       {error && <FormError values={[error]} />}
 
@@ -83,8 +80,9 @@ export default function CountryForm({
           />
         </Fieldset>
 
-        <Fieldset>
-          <Legend title="Additional Details">
+        <Fieldset
+          title="Additional details"
+          action={
             <Button
               color="default"
               onClick={async () => {
@@ -99,11 +97,12 @@ export default function CountryForm({
                   setValue("summary", result.summary);
               }}
               disabled={generateDataMutation.isPending}
-              icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
+              icon={<BoltIcon />}
             >
               Help me fill this in [Beta]
             </Button>
-          </Legend>
+          }
+        >
           <TextAreaField
             {...register("description", {
               setValueAs: (v) => (v === "" || !v ? null : v),

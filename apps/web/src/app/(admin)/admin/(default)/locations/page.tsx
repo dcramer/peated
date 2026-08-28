@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Table from "@peated/web/components/table";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -22,7 +26,7 @@ export default function Page() {
   );
 
   return (
-    <div>
+    <AdminPage>
       <Breadcrumbs
         pages={[
           {
@@ -36,6 +40,7 @@ export default function Page() {
           },
         ]}
       />
+      <AdminPageHeader title="Locations" />
 
       <Table
         items={countryList.results}
@@ -45,6 +50,6 @@ export default function Page() {
         columns={[{ name: "name", sort: "name", sortDefaultOrder: "asc" }]}
         withSearch
       />
-    </div>
+    </AdminPage>
   );
 }

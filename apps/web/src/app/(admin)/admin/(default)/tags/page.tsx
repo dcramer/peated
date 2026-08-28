@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import TagTable from "@peated/web/components/admin/tagTable";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -21,7 +25,7 @@ export default function Page() {
   );
 
   return (
-    <div>
+    <AdminPage>
       <Breadcrumbs
         pages={[
           {
@@ -35,18 +39,19 @@ export default function Page() {
           },
         ]}
       />
-      <div className="flex items-center justify-end">
-        <Button color="primary" href="/admin/tags/add">
-          Add Tag
-        </Button>
-      </div>
+      <AdminPageHeader
+        actions={
+          <Button color="primary" href="/admin/tags/add">
+            Add Tag
+          </Button>
+        }
+        title="Tags"
+      />
       {tagList.results.length > 0 ? (
         <TagTable tagList={tagList.results} rel={tagList.rel} />
       ) : (
-        <EmptyActivity>
-          Looks like there's nothing in the database yet. Weird.
-        </EmptyActivity>
+        <EmptyActivity>No tags yet.</EmptyActivity>
       )}
-    </div>
+    </AdminPage>
   );
 }

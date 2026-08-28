@@ -135,3 +135,14 @@
 - [x] 7.6 Make named behavior stories render their review state without manual setup interactions
 - [x] 7.7 Consolidate static component permutations into overview stories while preserving direct behavior states
 - [x] 7.8 Replace vague implementation names with Peated concepts and plain UI nouns across components and Storybook
+
+## 8. Admin migration
+
+- [x] 8.1 Add the shared responsive StyleX admin workspace and focused Storybook story
+- [x] 8.2 Move the existing admin landing behavior into the shared workspace without inventing a dashboard
+- [x] 8.3 Migrate admin list routes onto shared tables, filters, empty states, and cursor controls
+- [x] 8.4 Migrate admin detail routes and nested tabs onto shared headers, facts, sections, and actions
+- [x] 8.5 Migrate admin add and edit routes onto the shared workflow and form components
+- [x] 8.6 Migrate moderation routes while preserving their operational behavior and dense review states
+- [x] 8.7 Remove the admin legacy stylesheet and unused Tailwind dependencies
+- [x] 8.8 Run web validation and review admin at desktop and phone widths in both system schemes

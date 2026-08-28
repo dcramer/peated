@@ -1,162 +1,112 @@
-import Link from "@peated/web/components/link";
-import React, { forwardRef, type ForwardedRef, type ReactNode } from "react";
-import { type UrlObject } from "url";
-import classNames from "../lib/classNames";
+import {
+  ButtonLink,
+  Button as DesignButton,
+  type ButtonSize,
+  type ButtonVariant,
+} from "@peated/web/components/designSystem/components";
+import { forwardRef, type ReactNode } from "react";
 
 type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
-
-type ButtonSize = "small" | "base";
+type LegacyButtonSize = "small" | "base";
 
 type BaseProps = {
-  color?: ButtonColor;
-  icon?: ReactNode;
-  size?: ButtonSize;
-  type?: "button" | "submit" | "reset";
-  children?: ReactNode;
-  disabled?: boolean;
-  loading?: boolean;
-  active?: boolean;
-  fullWidth?: boolean;
-  fullHeight?: boolean;
-  unstyled?: boolean;
-  className?: string;
-  title?: string;
   "aria-label"?: string;
   "aria-pressed"?: boolean | "false" | "true" | "mixed";
+  active?: boolean;
+  children?: ReactNode;
+  className?: string;
+  color?: ButtonColor;
+  disabled?: boolean;
+  fullHeight?: boolean;
+  fullWidth?: boolean;
+  icon?: ReactNode;
+  loading?: boolean;
+  size?: LegacyButtonSize;
+  title?: string;
+  type?: "button" | "submit" | "reset";
+  unstyled?: boolean;
   [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 };
 
 type ConditionalProps =
-  | {
-      href?: string | UrlObject;
-      onClick?: never;
-    }
+  | { href?: string; onClick?: never }
   | {
       href?: never;
-      onClick?: (e: any) => void;
+      onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     };
 
 type Props = BaseProps & ConditionalProps;
 
-const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
-  (
-    {
-      icon,
-      children,
-      type,
-      href,
-      color = "default",
-      size = "base",
-      fullWidth = false,
-      fullHeight = false,
-      unstyled = false,
-      disabled = false,
-      loading = false,
-      active = false,
-      className,
-      ...props
-    },
-    ref,
-  ) => {
-    const defaultClassName =
-      "inline-flex gap-x-2 justify-center border items-center text-center rounded font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated";
+function mapVariant(color: ButtonColor, active: boolean): ButtonVariant {
+  if (color === "highlight" || active) return "accent";
+  if (color === "danger") return "danger";
+  if (color === "primary") return "default";
+  return "tonal";
+}
 
-    let textColor = "text-white";
-    let colorClassName;
-    switch (color) {
-      case "highlight":
-        colorClassName = classNames(
-          disabled
-            ? "bg-highlight border-highlight"
-            : "bg-highlight border-highlight",
-        );
-        textColor = "text-black";
-        break;
-      case "danger":
-        colorClassName = classNames(
-          disabled
-            ? "bg-red-900 border-red-900"
-            : "bg-red-700 border-red-700 hover:bg-red-600",
-        );
-        textColor = "text-black";
-        break;
-      case "primary":
-        colorClassName = classNames(
-          disabled
-            ? "bg-slate-900 border-slate-900"
-            : "bg-slate-800 border-slate-800 hover:bg-slate-700",
-        );
-        break;
-      default:
-        colorClassName = classNames(
-          disabled
-            ? "bg-slate-900 border-slate-900"
-            : "bg-slate-900 border-slate-900 hover:bg-slate-800",
-        );
-    }
+function mapSize(size: LegacyButtonSize): ButtonSize {
+  return size === "small" ? "sm" : "md";
+}
 
-    if (color === "danger") {
-      textColor = "text-white";
-    } else if (active) {
-      textColor = "text-highlight";
-    } else if (disabled) {
-      textColor = color === "highlight" ? "text-highlight-dark" : "text-muted";
-    }
-
-    if (href) {
-      // TODO: ref doesnt get passed here yet
-      return (
-        <Link
-          className={classNames(
-            !unstyled && defaultClassName,
-            !unstyled && colorClassName,
-            !unstyled && (icon ? "inline-flex items-center gap-x-1.5" : ""),
-            !unstyled &&
-              (size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm"),
-            !unstyled && (fullWidth ? "w-full" : ""),
-            !unstyled && (fullHeight ? "h-full" : ""),
-            !unstyled && (disabled ? "cursor-auto" : "cursor-pointer"),
-            !unstyled && (loading ? "animate-pulse" : ""),
-            !unstyled && textColor,
-            className,
-          )}
-          href={href}
-          {...props}
-        >
-          {icon}
-          {children}
-        </Link>
-      );
-    }
-
-    // SAFETY: The href branch renders the anchor; this branch always renders a button.
-    const buttonRef = ref as ForwardedRef<HTMLButtonElement | null>;
-    return (
-      <button
-        className={classNames(
-          !unstyled && defaultClassName,
-          !unstyled && colorClassName,
-          !unstyled && (icon ? "inline-flex items-center gap-x-1.5" : ""),
-          !unstyled &&
-            (size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"),
-          !unstyled && (fullWidth ? "w-full" : ""),
-          !unstyled && (disabled ? "cursor-auto" : "cursor-pointer"),
-          !unstyled && (loading ? "animate-pulse" : ""),
-          !unstyled && textColor,
-          className,
-        )}
-        disabled={disabled}
-        type={type || "button"}
-        ref={buttonRef}
-        {...props}
-      >
-        {icon}
-        {children}
-      </button>
-    );
+const Button = forwardRef<HTMLButtonElement, Props>(function Button(
+  {
+    active = false,
+    children,
+    className: _className,
+    color = "default",
+    disabled = false,
+    fullHeight: _fullHeight,
+    fullWidth = false,
+    href,
+    icon,
+    loading = false,
+    onClick,
+    size = "base",
+    type = "button",
+    unstyled: _unstyled,
+    ...props
   },
-);
+  ref,
+) {
+  const content = (
+    <>
+      {icon}
+      {children}
+    </>
+  );
+  const variant = mapVariant(color, active);
 
-Button.displayName = "Button";
+  if (href) {
+    return (
+      <ButtonLink
+        {...props}
+        aria-disabled={disabled || undefined}
+        fullWidth={fullWidth}
+        href={disabled ? undefined : href}
+        size={mapSize(size)}
+        variant={variant}
+      >
+        {content}
+      </ButtonLink>
+    );
+  }
+
+  return (
+    <DesignButton
+      {...props}
+      disabled={disabled}
+      fullWidth={fullWidth}
+      loading={loading}
+      loadingLabel="Working…"
+      onClick={onClick}
+      ref={ref}
+      size={mapSize(size)}
+      type={type}
+      variant={variant}
+    >
+      {content}
+    </DesignButton>
+  );
+});
 
 export default Button;

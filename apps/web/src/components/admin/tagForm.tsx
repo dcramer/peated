@@ -16,7 +16,6 @@ import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import Form from "../form";
-import AdminSidebar from "./sidebar";
 
 type FormSchemaType = z.infer<typeof TagInputSchema>;
 
@@ -66,7 +65,6 @@ export default function TagForm({
       title={title}
       saveDisabled={isSubmitting}
       onSave={handleSubmit(onSubmitHandler)}
-      sidebar={<AdminSidebar />}
     >
       {error && <FormError values={[error]} />}
 

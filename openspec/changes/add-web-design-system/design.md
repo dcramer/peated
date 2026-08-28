@@ -66,6 +66,21 @@ Storybook will include the accessibility addon as a non-blocking manual review a
 
 Components will expose semantic variants and native element props. They will not expose arbitrary design configuration. Parent layouts will wrap components when they need spacing instead of reaching into component internals.
 
+### Migrate admin through one shared workspace
+
+Admin keeps its existing routes, authorization checks, data ownership, and
+mutations. A small StyleX workspace owns the responsive navigation rail, mobile
+navigation, content width, page headings, sections, and common metadata. Admin
+routes reuse the existing Button, DataTable, PageTabs, form, feedback, and
+pagination components. Admin-only components are added only for repeated
+workspace structure that has no public product meaning. Complete admin pages do
+not move into Storybook; only new reusable components receive focused stories.
+
+The migration starts with the workspace and dashboard, then moves through list,
+detail, form, and moderation families. Tailwind remains scoped to admin until
+the final family moves, then the legacy stylesheet and unused dependencies are
+removed together.
+
 Links own visible interaction beyond the browser cursor. Neutral text links move from ink to the deeper accent on hover and to accent while pressed. Linked surface cards and rows step from surface to inset on hover and to accent tint while pressed without moving or gaining elevation. Keyboard focus uses the shared 2px inset ring on the complete actionable surface. Header navigation keeps database destinations available on every page. Its current destination uses ink-colored display type at weight 700 with `aria-current="page"`; the accent rule remains reserved for page tabs.
 
 The rating model separates tasting bands from review scores. `BandMark` accepts one tasting band. `BandStack` accepts five tasting-band counts and never converts them into a point. `Score` accepts a whole-number review median, member and external score counts, and optional low and high scores; it withholds the number below the product floor. Published critic reviews remain attributed records. The interface shows a critic number only when its permitted native score already uses the 100-point scale and never converts another scale. The scoped-search control combines a stationary scope trigger, an over-trigger menu, and a search input. The menu aligns its top and left outer edges with the control, aligns its option labels with the active scope label, lists the scopes directly without a redundant purpose label, and suppresses the query control's active ring while it is open. Pressing the existing query input closes the scope menu and gives query entry control without remounting the input or replacing caller-owned behavior. Query, scope, result, and permission state remain owned by the caller. These contracts preserve product meaning without creating a generic style API.

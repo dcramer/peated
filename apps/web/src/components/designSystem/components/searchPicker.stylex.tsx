@@ -22,6 +22,7 @@ export type SearchPickerOption = {
 };
 
 export type SearchPickerProps = {
+  disabled?: boolean;
   emptyText?: string;
   help?: string;
   label: string;
@@ -55,6 +56,7 @@ export function SearchSelect({ onChange, value, ...props }: SearchSelectProps) {
 
 /** Selects several supplied records while the caller owns remote search. */
 export function SearchPicker({
+  disabled = false,
   emptyText = "No matches.",
   help,
   label,
@@ -86,6 +88,7 @@ export function SearchPicker({
   const trimmedQuery = query.trim();
 
   function selectOption(option: SearchPickerOption) {
+    if (disabled) return;
     onChange([...value, option]);
     setQuery("");
     onQueryChange?.("");
@@ -146,6 +149,7 @@ export function SearchPicker({
               aria-label={`Remove ${option.label}`}
               key={option.id}
               onClick={() =>
+                !disabled &&
                 onChange(value.filter((item) => item.id !== option.id))
               }
               variant="tinted"
@@ -165,21 +169,23 @@ export function SearchPicker({
           aria-expanded={isOpen}
           id={inputId}
           onChange={(event) => {
+            if (disabled) return;
             const nextQuery = event.currentTarget.value;
             setQuery(nextQuery);
             onQueryChange?.(nextQuery);
             setActiveIndex(-1);
             setIsOpen(true);
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => !disabled && setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           role="combobox"
           type="search"
           value={query}
+          disabled={disabled}
           {...stylex.props(styles.input)}
         />
-        {isOpen ? (
+        {isOpen && !disabled ? (
           <FloatingPanel {...stylex.props(styles.overlay)}>
             <div
               aria-label={`${label} results`}
