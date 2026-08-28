@@ -19,6 +19,7 @@ import type { ConfiguredScraperValidation } from "../../scraper/configured/valid
 import { externalSiteRuns, externalSites } from "./externalSites";
 import { users } from "./users";
 
+// TODO(scraper-platform): Add events after scraped event match and update rules are defined.
 export const configuredScraperCollectionEnum = pgEnum(
   "configured_scraper_collection",
   ["reviews", "store_prices"],
