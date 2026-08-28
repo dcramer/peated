@@ -182,8 +182,9 @@ Before the final switch, a check must report:
   queries.
 
 The final deployment makes kind required, changes all readers and writers to
-the new fields, and stops updating `type`. After that deployment is stable, a
-generated cleanup migration removes `type` and the old Entity type enum.
+the new fields, and stops updating `type`. Keep `type` and its enum as unused
+legacy storage while they may support a future query optimization. Do not add
+an application reader or writer without a separate, measured need.
 
 All migrations come from `pnpm db:generate`. Do not edit migration SQL or
 metadata by hand.
@@ -202,8 +203,8 @@ metadata by hand.
   version rather than storing incorrect data.
 - **Bottle-link queries can be slower than the current array filter.** → Check
   the three browse queries and add an index only if the query plan needs it.
-- **Two deployments briefly keep both fields.** → Limit the first deployment
-  to backfill work and remove all old reads in the second deployment.
+- **The legacy type column remains.** → Keep application reads and writes
+  removed. Revisit the column only when a measured query need justifies it.
 
 ## Migration Plan
 
@@ -222,8 +223,8 @@ metadata by hand.
 6. Run the final checks for kinds, owners, and Bottle-use counts.
 7. Deploy the final switch: require kind, derive Bottle uses from Bottle links,
    and remove old type reads and writes.
-8. After the switch is stable and backed up, generate removal of `type` and its
-   enum.
+8. Keep `type` and its enum as unused legacy storage while they may support a
+   future query optimization.
 
 Before the final switch, rollback removes optional `kind` and renames `ownerId`
 back to `parentId`. After the final switch, rollback restores the database

@@ -353,7 +353,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, producer.id),
       }),
-    ).toMatchObject({ kind: "distillery" });
+    ).toMatchObject({ kind: "distillery", type: [] });
   });
 
   test("blocks a destination identity update selected with an Entity merge", async ({

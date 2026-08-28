@@ -726,6 +726,7 @@ test("preserves the source when the locked destination is deleted", async ({
   ).toMatchObject({
     id: source.id,
     name: source.name,
+    type: source.type,
   });
   expect(
     await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
@@ -774,7 +775,7 @@ test("stales an operation when its locked destination is deleted", async ({
   });
   expect(
     await db.query.entities.findFirst({ where: eq(entities.id, source.id) }),
-  ).toMatchObject({ id: source.id, name: source.name });
+  ).toMatchObject({ id: source.id, name: source.name, type: source.type });
   expect(
     await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
   ).toMatchObject({ brandId: source.id });

@@ -96,5 +96,6 @@
       keeps the old and new models alive.
 - [x] 6.7 Deploy the final switch after a verified backup and validate Entity
       kinds, owners, Bottle links, browse pages, and create/edit workflows.
-- [x] 6.8 After the switch is stable, remove the old type column and enum from
-      the Drizzle schema, generate the cleanup migration, and run `pnpm test`.
+- [x] 6.8 Keep the old type column and enum in Drizzle as unused legacy storage,
+      with a comment. Defer removal while they may support a future query
+      optimization.

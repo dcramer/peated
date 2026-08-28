@@ -447,7 +447,7 @@ describe("PATCH /bottles/{bottle}", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, newBottler.id),
       }),
-    ).toMatchObject({ kind: "bottler" });
+    ).toMatchObject({ kind: "bottler", type: [] });
   });
 
   test("maps input, graph, and identity failures to stable statuses", async ({

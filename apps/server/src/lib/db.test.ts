@@ -30,7 +30,7 @@ describe("upsertEntity", () => {
     });
     expect(
       await db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
-    ).toMatchObject({ kind: "company" });
+    ).toMatchObject({ kind: "company", type: [] });
 
     const repeated = await upsertEntity(input);
     expect(repeated).toMatchObject({
