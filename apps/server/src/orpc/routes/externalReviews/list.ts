@@ -5,13 +5,14 @@ import {
   externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
+import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
 import { logWarn } from "@peated/server/lib/log";
 import { implement } from "@peated/server/orpc";
 import externalReviewListContract from "@peated/server/orpc/contracts/externalReviews/list";
 import { serialize } from "@peated/server/serializers";
 import { ExternalReviewSerializer } from "@peated/server/serializers/externalReview";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, isNotNull, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNotNull, isNull } from "drizzle-orm";
 export default implement(externalReviewListContract).handler(async function ({
   input: { cursor, query, limit, sort, ...input },
   context,
@@ -19,11 +20,10 @@ export default implement(externalReviewListContract).handler(async function ({
 }) {
   const hasPublicScope = input.bottle !== undefined || sort === "recent";
   const requiresModerator = input.onlyUnknown || !hasPublicScope;
-  // This route owns external review visibility. Public Bottle and recent
-  // queries exclude staged records. Moderator queries include them for matching.
+  // Moderator queries include staged records for matching.
   const baseWhere: (SQL<unknown> | undefined)[] = requiresModerator
     ? []
-    : [eq(externalReviews.hidden, false)];
+    : [visibleExternalReviewWhere()];
   const identityWhere: SQL<unknown>[] = [];
 
   if (input.site) {
@@ -37,17 +37,6 @@ export default implement(externalReviewListContract).handler(async function ({
       });
     }
     baseWhere.push(eq(externalReviewArticles.externalSiteId, site.id));
-  }
-
-  if (hasPublicScope) {
-    // No-fetch migration articles have no content hash and preserve their
-    // legacy visibility. Newly fetched articles require automatic mode.
-    baseWhere.push(
-      or(
-        isNull(externalReviewArticles.contentHash),
-        eq(externalReviewSourcePolicies.publicationMode, "automatic"),
-      ),
-    );
   }
 
   if (sort === "recent") {

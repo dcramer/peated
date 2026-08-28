@@ -13,31 +13,31 @@ describe("Entity sitemaps", () => {
         clientKey: "brands",
         collection: "brands",
         kind: "brand",
-        statsKey: "totalBrands",
+        statsKey: "brands",
       },
       {
         clientKey: "distilleries",
         collection: "distillers",
         kind: "distillery",
-        statsKey: "totalDistilleries",
+        statsKey: "distilleries",
       },
       {
         clientKey: "bottlers",
         collection: "bottlers",
         kind: "bottler",
-        statsKey: "totalBottlers",
+        statsKey: "bottlers",
       },
       {
         clientKey: "blenders",
         collection: "blenders",
         kind: "blender",
-        statsKey: "totalBlenders",
+        statsKey: "blenders",
       },
       {
         clientKey: "companies",
         collection: "companies",
         kind: "company",
-        statsKey: "totalCompanies",
+        statsKey: "companies",
       },
     ]);
     expect(getEntitySitemapCollection("entities")).toBeUndefined();

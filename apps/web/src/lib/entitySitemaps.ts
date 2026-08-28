@@ -6,42 +6,42 @@ export const ENTITY_SITEMAP_PAGE_LIMIT = 1000;
 const API_PAGE_LIMIT = 500;
 
 type EntitySitemapStatsKey =
-  | "totalBlenders"
-  | "totalBottlers"
-  | "totalBrands"
-  | "totalCompanies"
-  | "totalDistilleries";
+  | "blenders"
+  | "bottlers"
+  | "brands"
+  | "companies"
+  | "distilleries";
 
 export const ENTITY_SITEMAP_COLLECTIONS = [
   {
     clientKey: "brands",
     collection: "brands",
     kind: "brand",
-    statsKey: "totalBrands",
+    statsKey: "brands",
   },
   {
     clientKey: "distilleries",
     collection: "distillers",
     kind: "distillery",
-    statsKey: "totalDistilleries",
+    statsKey: "distilleries",
   },
   {
     clientKey: "bottlers",
     collection: "bottlers",
     kind: "bottler",
-    statsKey: "totalBottlers",
+    statsKey: "bottlers",
   },
   {
     clientKey: "blenders",
     collection: "blenders",
     kind: "blender",
-    statsKey: "totalBlenders",
+    statsKey: "blenders",
   },
   {
     clientKey: "companies",
     collection: "companies",
     kind: "company",
-    statsKey: "totalCompanies",
+    statsKey: "companies",
   },
 ] as const satisfies readonly {
   clientKey: string;

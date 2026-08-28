@@ -32,10 +32,16 @@ export default function Stats() {
     return <div>{"Oops, maybe you're offline?"}</div>;
   }
 
+  const entities =
+    data.brands +
+    data.distilleries +
+    data.bottlers +
+    data.blenders +
+    data.companies;
   const stats = [
-    { name: "Tastings", value: data.totalTastings.toLocaleString() },
-    { name: "Bottles", value: data.totalBottles.toLocaleString() },
-    { name: "Entities", value: data.totalEntities.toLocaleString() },
+    { name: "Tastings", value: data.tastings.toLocaleString() },
+    { name: "Bottles", value: data.bottles.toLocaleString() },
+    { name: "Entities", value: entities.toLocaleString() },
   ];
 
   return (

@@ -1,12 +1,14 @@
 import type { MockOutputs } from "../contract";
 
 export const mockStats = {
-  totalTastings: 142_580,
-  totalBottles: 28_430,
-  totalEntities: 9_215,
-  totalBrands: 3_980,
-  totalDistilleries: 2_410,
-  totalBottlers: 1_125,
-  totalBlenders: 420,
-  totalCompanies: 1_280,
+  asOf: "2026-08-28T15:00:00.000Z",
+  bottles: 28_430,
+  brands: 3_980,
+  distilleries: 2_410,
+  bottlers: 1_125,
+  blenders: 420,
+  companies: 1_280,
+  tastings: 142_580,
+  memberReviews: 8_420,
+  externalReviews: 56_730,
 } satisfies MockOutputs["stats"];
