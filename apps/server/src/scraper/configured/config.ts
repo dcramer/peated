@@ -7,7 +7,7 @@ export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 // One list request plus every detail request must fit the 100-request run budget.
 export const SCRAPE_SOURCE_MAX_ITEMS = 99;
 
-const SelectorSchema = z
+export const ScrapeSelectorSchema = z
   .string()
   .trim()
   .min(1)
@@ -16,10 +16,12 @@ const SelectorSchema = z
     message: "The :has selector is not supported.",
   });
 
+export const ScrapeAttributeSchema = z.string().trim().min(1).max(100);
+
 export const ScrapeValueSelectorSchema = z
   .object({
-    selector: SelectorSchema,
-    attribute: z.string().trim().min(1).max(100).optional(),
+    selector: ScrapeSelectorSchema,
+    attribute: ScrapeAttributeSchema.optional(),
   })
   .strict();
 
@@ -38,7 +40,7 @@ const ReviewRulesSchema = z
       .object({
         title: ScrapeValueSelectorSchema,
         publishedAt: ScrapeValueSelectorSchema.optional(),
-        reviewItem: SelectorSchema,
+        reviewItem: ScrapeSelectorSchema,
         name: ScrapeValueSelectorSchema,
         reviewerName: ScrapeValueSelectorSchema.optional(),
         reviewText: ScrapeValueSelectorSchema.optional(),

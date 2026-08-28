@@ -36,7 +36,8 @@
 - [x] 5.1 Use one stable set of AI instructions and a strict output schema
 - [x] 5.2 Check source AI permission immediately before AI access
 - [x] 5.3 Store the AI model name and instructions version with valid draft rules
-- [ ] 5.4 Add focused review and price suggestion eval fixtures
+- [x] 5.4 Add an end-to-end review suggestion eval fixture
+- [ ] 5.5 Add an end-to-end price suggestion eval fixture
 
 ## 6. Admin API And UI
 

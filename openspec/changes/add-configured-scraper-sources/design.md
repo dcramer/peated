@@ -109,8 +109,10 @@ this first design.
 
 Parser tests use synthetic HTML without a database or network. Integration
 tests cover source identity, immutable revisions, activation, run pinning,
-preview isolation, and target ownership. Live AI suggestion quality belongs in
-`pnpm evals`, not `pnpm test`.
+preview isolation, and target ownership. Live AI suggestion evals replace only
+the publisher website with fixture HTML. They use the real AI service, database,
+run lifecycle, and preview parser. These evals belong in `pnpm evals`, not
+`pnpm test`.
 
 ## Migration
 

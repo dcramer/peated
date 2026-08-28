@@ -1,16 +1,166 @@
 import config from "@peated/server/config";
+import { CURRENCY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { scrapeSources } from "@peated/server/db/schema";
 import { createOpenAIClient } from "@peated/server/lib/openaiClient";
 import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
 import { eq } from "drizzle-orm";
 import { zodTextFormat } from "openai/helpers/zod";
-import { ScrapeRulesSchema } from "./config";
+import { z } from "zod";
+import {
+  SCRAPE_SOURCE_MAX_ITEMS,
+  ScrapeAttributeSchema,
+  ScrapeRulesSchema,
+  ScrapeSelectorSchema,
+  type ScrapeRules,
+  type ScrapeValueSelector,
+} from "./config";
 import { createScrapeSourceDraft } from "./service";
 
 export const SCRAPE_SOURCE_INSTRUCTIONS_VERSION = "scrape-source-v1";
 export const SCRAPE_SOURCE_MAX_MODEL_INPUT_CHARS = 200_000;
 const SCRAPE_SOURCE_MAX_MODEL_PAGE_CHARS = 75_000;
+
+// The AI API requires every field. Null means that the suggested rule omits it.
+const SuggestedValueSelectorSchema = z
+  .object({
+    selector: ScrapeSelectorSchema,
+    attribute: ScrapeAttributeSchema.nullable(),
+  })
+  .strict();
+
+const SuggestedListRulesSchema = z
+  .object({
+    detailLink: SuggestedValueSelectorSchema,
+    maxItems: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS),
+  })
+  .strict();
+
+const SuggestedReviewRulesSchema = z
+  .object({
+    kind: z.literal("review"),
+    list: SuggestedListRulesSchema,
+    detail: z
+      .object({
+        title: SuggestedValueSelectorSchema,
+        publishedAt: SuggestedValueSelectorSchema.nullable(),
+        reviewItem: ScrapeSelectorSchema,
+        name: SuggestedValueSelectorSchema,
+        reviewerName: SuggestedValueSelectorSchema.nullable(),
+        reviewText: SuggestedValueSelectorSchema.nullable(),
+        score: z
+          .object({
+            value: SuggestedValueSelectorSchema,
+            scale: z.number().positive(),
+          })
+          .strict()
+          .nullable(),
+      })
+      .strict(),
+  })
+  .strict();
+
+const SuggestedPriceRulesSchema = z
+  .object({
+    kind: z.literal("price"),
+    list: SuggestedListRulesSchema,
+    detail: z
+      .object({
+        name: SuggestedValueSelectorSchema,
+        price: SuggestedValueSelectorSchema,
+        currency: z.enum(CURRENCY_LIST),
+        volume: SuggestedValueSelectorSchema,
+        url: SuggestedValueSelectorSchema.nullable(),
+        externalProductId: SuggestedValueSelectorSchema.nullable(),
+        imageUrl: SuggestedValueSelectorSchema.nullable(),
+        barcode: SuggestedValueSelectorSchema.nullable(),
+      })
+      .strict(),
+  })
+  .strict();
+
+type SuggestedValueSelector = z.infer<typeof SuggestedValueSelectorSchema>;
+type SuggestedReviewRules = z.infer<typeof SuggestedReviewRulesSchema>;
+type SuggestedPriceRules = z.infer<typeof SuggestedPriceRulesSchema>;
+type ReviewRules = Extract<ScrapeRules, { kind: "review" }>;
+type PriceRules = Extract<ScrapeRules, { kind: "price" }>;
+
+function toScrapeValueSelector(
+  value: SuggestedValueSelector,
+): ScrapeValueSelector {
+  return value.attribute === null
+    ? { selector: value.selector }
+    : { attribute: value.attribute, selector: value.selector };
+}
+
+function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
+  const detail: ReviewRules["detail"] = {
+    title: toScrapeValueSelector(input.detail.title),
+    reviewItem: input.detail.reviewItem,
+    name: toScrapeValueSelector(input.detail.name),
+  };
+  if (input.detail.publishedAt !== null) {
+    detail.publishedAt = toScrapeValueSelector(input.detail.publishedAt);
+  }
+  if (input.detail.reviewerName !== null) {
+    detail.reviewerName = toScrapeValueSelector(input.detail.reviewerName);
+  }
+  if (input.detail.reviewText !== null) {
+    detail.reviewText = toScrapeValueSelector(input.detail.reviewText);
+  }
+  if (input.detail.score !== null) {
+    detail.score = {
+      scale: input.detail.score.scale,
+      value: toScrapeValueSelector(input.detail.score.value),
+    };
+  }
+  return ScrapeRulesSchema.parse({
+    kind: input.kind,
+    list: {
+      detailLink: toScrapeValueSelector(input.list.detailLink),
+      maxItems: input.list.maxItems,
+    },
+    detail,
+  });
+}
+
+function toPriceRules(input: SuggestedPriceRules): ScrapeRules {
+  const detail: PriceRules["detail"] = {
+    name: toScrapeValueSelector(input.detail.name),
+    price: toScrapeValueSelector(input.detail.price),
+    currency: input.detail.currency,
+    volume: toScrapeValueSelector(input.detail.volume),
+  };
+  if (input.detail.url !== null) {
+    detail.url = toScrapeValueSelector(input.detail.url);
+  }
+  if (input.detail.externalProductId !== null) {
+    detail.externalProductId = toScrapeValueSelector(
+      input.detail.externalProductId,
+    );
+  }
+  if (input.detail.imageUrl !== null) {
+    detail.imageUrl = toScrapeValueSelector(input.detail.imageUrl);
+  }
+  if (input.detail.barcode !== null) {
+    detail.barcode = toScrapeValueSelector(input.detail.barcode);
+  }
+  return ScrapeRulesSchema.parse({
+    kind: input.kind,
+    list: {
+      detailLink: toScrapeValueSelector(input.list.detailLink),
+      maxItems: input.list.maxItems,
+    },
+    detail,
+  });
+}
+
+export function createScrapeRulesSuggestionFormat(kind: ScrapeRules["kind"]) {
+  return zodTextFormat(
+    kind === "review" ? SuggestedReviewRulesSchema : SuggestedPriceRulesSchema,
+    "suggested_scrape_rules",
+  );
+}
 
 const INSTRUCTIONS = [
   "<mission>",
@@ -73,9 +223,9 @@ export async function suggestScrapeSourceDraft(input: {
           pages: prepareScrapeSourceModelPages(input.pages),
         }),
         text: {
-          format: zodTextFormat(ScrapeRulesSchema, "scrape_rules"),
+          format: createScrapeRulesSuggestionFormat(source.kind),
         },
-        max_output_tokens: 2_000,
+        max_output_tokens: 8_000,
         store: false,
       });
       reportResponse({
@@ -98,7 +248,11 @@ export async function suggestScrapeSourceDraft(input: {
       return result;
     },
   });
-  const generated = ScrapeRulesSchema.parse(JSON.parse(response.output_text));
+  const responseJson = JSON.parse(response.output_text);
+  const generated =
+    source.kind === "review"
+      ? toReviewRules(SuggestedReviewRulesSchema.parse(responseJson))
+      : toPriceRules(SuggestedPriceRulesSchema.parse(responseJson));
   if (generated.kind !== source.kind) {
     throw new Error("The suggested rules collect the wrong content.");
   }
