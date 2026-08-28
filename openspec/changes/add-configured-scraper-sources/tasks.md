@@ -1,6 +1,6 @@
 ## 1. Data Model And Source Identity
 
-- [x] 1.1 Add configured scraper and immutable config-version tables with one active version pointer per site and collection type
+- [x] 1.1 Add one configured scraper per external site and immutable config-version tables with one active version pointer
 - [x] 1.2 Add admin ownership to scraper targets, origins, and site mappings so code definition sync preserves admin rows
 - [x] 1.3 Pin configured scraper and config version ids on durable scraper runs
 - [x] 1.4 Generate and inspect the database migration and add schema constraint tests
@@ -12,7 +12,7 @@
 - [x] 2.2 Implement shared HTML field reading and bounded detail-link discovery without database or network access
 - [x] 2.3 Implement review article parsing into the existing strict ingestion schema
 - [x] 2.4 Implement store-price parsing into the existing strict price schema
-- [ ] 2.5 Add production validation results and active-versus-draft structured comparison
+- [x] 2.5 Add typed production validation results
 - [x] 2.6 Add synthetic parser tests for single and repeated reviews, products, invalid fields, unrelated markup, and selector changes
 
 ## 3. Version And Administration Services
@@ -43,13 +43,12 @@
 - [x] 6.1 Add moderator routes for site creation and configured scraper creation, listing, draft generation, preview, activation, rollback, and disablement
 - [ ] 6.2 Add route integration tests for authorization, validation, conflicts, and preview isolation
 - [x] 6.3 Add an Admin Scrapers Add Site flow with review or store-price collection choice
-- [x] 6.4 Add the site Configs tab with active version, drafts, generation, preview, comparison, activation, disablement, history, and rollback controls
-- [ ] 6.5 Add deterministic component tests for empty, loading, passing, failing, active, repair, and rollback states
+- [x] 6.4 Add the site Parsing tab with active version, drafts, generation, preview, activation, disablement, history, and rollback controls
 
 ## 7. Verification And Pilot
 
 - [x] 7.1 Document the configured scraper ownership boundaries, config format, admin procedure, and rollback path
 - [x] 7.2 Run targeted server and web tests, server and web typechecks, lint, and formatting
-- [ ] 7.3 Manually QA add, generate, preview, activate, run, repair, disable, and rollback at desktop and mobile widths
-- [ ] 7.4 Pilot one existing review source and one simple store source without removing their code adapters, then compare structured results
+- [ ] 7.3 Run one manual admin smoke check for add, generate, preview, activate, run, repair, disable, and rollback
+- [ ] 7.4 Pilot one new review source and one simple store source while keeping existing code adapters unchanged
 - [x] 7.5 Validate the OpenSpec change and record any measured follow-up instead of expanding the first config language speculatively

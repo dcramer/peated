@@ -15,7 +15,7 @@ ingestion boundaries. Publisher HTML remains transient.
 **Goals:**
 
 - Let an administrator add a source without deploying application code.
-- Let one site collect reviews, store prices, or both.
+- Let one source collect reviews or store prices.
 - Store immutable config versions in PostgreSQL and make activation and
   rollback explicit.
 - Use the same parser and validator for preview and production collection.
@@ -33,22 +33,28 @@ ingestion boundaries. Publisher HTML remains transient.
 - Replacing all current adapters before the configured path is measured.
 - A workflow engine, several agents, config inheritance, arbitrary scripts, or
   arbitrary regular expressions in stored config.
+- Event parsing. Whisky festivals are the next planned collection kind, but
+  they need explicit match and update rules before they enter stored config.
 
 ## Decisions
 
 ### Separate the site, collection, and config version
 
-An `external_site` remains the remote publisher or store. A new configured
-scraper record identifies one collection at that site: `reviews` or
-`store_prices`. It owns enablement, LLM permission, starting URLs, and the
-active config pointer. A site may own at most one configured scraper of each
-collection type.
+An `external_site` remains one collection source. A new configured scraper
+record identifies whether that source collects `reviews` or `store_prices`. It
+owns enablement, LLM permission, starting URLs, and the active config pointer.
+Each external site owns exactly one configured scraper.
 
 Config versions are append-only rows. Each stores one strict JSON config,
 creation provenance, and its latest validation result. The configured scraper
 points to one active version. Activation changes the pointer in a transaction;
 rollback points it to an older validated version. Editing always creates a new
 draft.
+
+The explicit collection kind leaves a narrow place to add `events` later. The
+event parser can use Peated's existing event record and join this lifecycle
+without making the current parser generic. Its sink must first define how a
+scraped event matches and updates an existing event.
 
 This is two tables instead of one status-heavy version table. It keeps mutable
 operating state separate from immutable versions and makes one active version
@@ -128,8 +134,8 @@ one section per collection type. The flow is:
 4. activate a passing draft;
 5. inspect version history or roll back.
 
-Preview shows extracted fields, warnings, the active-versus-draft difference,
-and canonical source links. Raw HTML and publisher prose are not stored.
+Preview shows extracted fields, warnings, and canonical source links. Raw HTML
+and publisher prose are not stored.
 
 ### Test code and live config separately
 
@@ -147,8 +153,8 @@ cannot approve behavior that production would reject.
 ## Risks / Trade-offs
 
 - **A selector returns plausible but wrong content** → Validate required facts,
-  compare drafts with active output, keep first activation review-only, and
-  show every changed field in preview.
+  keep first activation review-only, and require an admin to inspect structured
+  preview output.
 - **A model update produces worse configs** → Record and pin model and prompt
   versions, keep all prior configs, and require preview before activation.
 - **Database-owned targets bypass startup policy** → Use conservative defaults,
@@ -173,8 +179,8 @@ cannot approve behavior that production would reject.
 4. Add dynamic run resolution and reuse the existing review and price sinks.
 5. Add the single-call LLM draft generator and focused eval harness.
 6. Add the Configs admin tab and Add Site flow.
-7. Pilot one review source and one simple store source in review-only or hidden
-   mode. Keep their current adapters until results agree.
+7. Pilot one new review source and one simple store source in review-only or
+   hidden mode. Keep existing code adapters unchanged.
 
 Rollback disables the configured scraper and reactivates the prior config or
 the existing code adapter. Additive tables and columns remain in place so run
@@ -182,7 +188,9 @@ history stays valid.
 
 ## Open Questions
 
-- Which existing review and store sources are the best first fixtures for the
-  version 1 selector language?
+- Which review and store sources are the best first fixtures for the version 1
+  selector language?
+- How should a future festival event collection match and update Peated's
+  existing event records across repeated runs?
 - After measured pilot results, which exact validation results can permit
   automatic repair activation, if any?

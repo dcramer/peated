@@ -1720,22 +1720,8 @@
     {
       "idx": 245,
       "version": "7",
-      "when": 1787936603423,
-      "tag": "0245_windy_spiral",
-      "breakpoints": false
-    },
-    {
-      "idx": 246,
-      "version": "7",
-      "when": 1787939891681,
-      "tag": "0246_harsh_overlord",
-      "breakpoints": false
-    },
-    {
-      "idx": 247,
-      "version": "7",
-      "when": 1787940332038,
-      "tag": "0247_striped_cerebro",
+      "when": 1787947301903,
+      "tag": "0245_swift_oracle",
       "breakpoints": false
     }
   ]

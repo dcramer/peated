@@ -84,6 +84,10 @@ support scripts, custom code, arbitrary request headers, browser automation,
 pagination, or cross-origin discovery. Add a code-owned adapter when a source
 needs those capabilities.
 
+Event sources, such as whisky festivals, are the next planned collection type.
+Peated already stores these events. Add the scraper type only after its match
+and update rules are defined, so repeated runs do not create duplicate events.
+
 AI can suggest parsing rules only when an admin allows it for that source. The
 server fetches the allowed pages before it calls the model. The model has no
 tools, and provider storage is off. Its response creates a new version. An

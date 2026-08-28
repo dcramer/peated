@@ -16,16 +16,16 @@ enforcement. A new site and its configured scrapers MUST start disabled.
 - **WHEN** an LLM-generated config contains an origin, credential, request limit, or header
 - **THEN** strict config validation rejects the complete candidate
 
-### Requirement: Sites support separate collection types
+### Requirement: Each source has one collection type
 
-The system SHALL support `reviews` and `store_prices` as separate configured
-scrapers at one external site. Each configured scraper SHALL have independent
-enablement, LLM permission, active config, and schedule.
+The system SHALL support `reviews` and `store_prices` as explicit configured
+scraper collection types. Each external site SHALL own at most one configured
+scraper with its own enablement, LLM permission, and active config.
 
-#### Scenario: One site has two collections
+#### Scenario: Moderator chooses a collection
 
-- **WHEN** a moderator adds review and store-price collection to one site
-- **THEN** each collection retains its own config versions and active version while sharing the site's remote request limits
+- **WHEN** a moderator creates a source and chooses reviews or store prices
+- **THEN** that source retains its own config versions and active version
 
 ### Requirement: Config versions are immutable and explicit
 
@@ -52,7 +52,7 @@ write reviews or store prices.
 #### Scenario: Review draft is previewed
 
 - **WHEN** a moderator previews a review config against current sample pages
-- **THEN** the system shows structured articles and reviews, source links, changed fields, and validation warnings without storing publisher HTML or reviews
+- **THEN** the system shows structured articles and reviews, source links, and validation warnings without storing publisher HTML or reviews
 
 #### Scenario: Price draft is previewed
 
@@ -143,11 +143,6 @@ roll back, disable collection, and inspect collection health.
 
 - **WHEN** a run fails validation for an active config
 - **THEN** the site config view identifies the failed collection and offers creation of a repair draft from the failed source pages
-
-#### Scenario: Administrator compares a draft
-
-- **WHEN** an active version and draft both exist
-- **THEN** preview shows their structured output differences on the same sample pages
 
 ### Requirement: Tests match ownership boundaries
 

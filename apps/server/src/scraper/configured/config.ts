@@ -2,6 +2,8 @@ import { CURRENCY_LIST } from "@peated/server/constants";
 import { z } from "zod";
 
 export const CONFIGURED_SCRAPER_ENGINE_VERSION = 1;
+// One list request plus every detail request must fit the 100-request run budget.
+export const CONFIGURED_SCRAPER_MAX_ITEMS = 99;
 
 const SelectorSchema = z
   .string()
@@ -22,7 +24,12 @@ export const ConfiguredValueSelectorSchema = z
 const IndexSchema = z
   .object({
     itemLink: ConfiguredValueSelectorSchema,
-    maxItems: z.number().int().min(1).max(100).default(25),
+    maxItems: z
+      .number()
+      .int()
+      .min(1)
+      .max(CONFIGURED_SCRAPER_MAX_ITEMS)
+      .default(25),
   })
   .strict();
 

@@ -9,6 +9,8 @@ import { ConfiguredScraperConfigSchema } from "./config";
 import { createConfiguredScraperDraft } from "./service";
 
 export const CONFIGURED_SCRAPER_PROMPT_VERSION = "configured-scraper-v1";
+export const CONFIGURED_SCRAPER_MAX_MODEL_INPUT_CHARS = 200_000;
+const CONFIGURED_SCRAPER_MAX_MODEL_PAGE_CHARS = 75_000;
 
 const INSTRUCTIONS = [
   "<mission>",
@@ -23,6 +25,20 @@ const INSTRUCTIONS = [
   "Return only the required structured output.",
   "</rules>",
 ].join("\n");
+
+export function prepareConfiguredScraperModelPages(
+  pages: Array<{ url: string; html: string }>,
+) {
+  if (pages.length === 0) return [];
+  const charsPerPage = Math.min(
+    CONFIGURED_SCRAPER_MAX_MODEL_PAGE_CHARS,
+    Math.floor(CONFIGURED_SCRAPER_MAX_MODEL_INPUT_CHARS / pages.length),
+  );
+  return pages.map((page) => ({
+    url: page.url,
+    html: page.html.slice(0, charsPerPage),
+  }));
+}
 
 export async function generateConfiguredScraperDraft(input: {
   configuredScraperId: number;
@@ -54,10 +70,7 @@ export async function generateConfiguredScraperDraft(input: {
         instructions: INSTRUCTIONS,
         input: JSON.stringify({
           collection: scraper.collection,
-          pages: input.pages.map((page) => ({
-            url: page.url,
-            html: page.html.slice(0, 75_000),
-          })),
+          pages: prepareConfiguredScraperModelPages(input.pages),
         }),
         text: {
           format: zodTextFormat(

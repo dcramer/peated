@@ -6,7 +6,7 @@ import {
   externalSiteRuns,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { DEFAULT_SCRAPER_REQUEST_POLICY } from "../definitions";
+import { ConfiguredScraperConfigSchema } from "./config";
 import {
   ConfiguredScraperNotFoundError,
   ConfiguredScraperValidationError,
@@ -54,16 +54,14 @@ export async function createPinnedConfiguredRun(
       "No tested version is ready for this run.",
     );
   }
+  const config = ConfiguredScraperConfigSchema.parse(selected.version.config);
   const [run] = await connection
     .insert(externalSiteRuns)
     .values({
       externalSiteId: input.externalSiteId,
       trigger: input.trigger,
       requestedById: input.requestedById,
-      requestLimit: Math.min(
-        selected.version.config.index.maxItems + 1,
-        DEFAULT_SCRAPER_REQUEST_POLICY.requestLimit,
-      ),
+      requestLimit: config.index.maxItems + 1,
     })
     .returning();
   if (!run) throw new Error("Failed to create source run.");

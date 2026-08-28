@@ -8,6 +8,8 @@ preview its output, repair it, and roll back a bad change.
 ## What Changes
 
 - Add versioned database configs for review and store-price collection.
+- Keep the collection kind explicit so a later event scraper can reuse the
+  same version and run lifecycle after its match and update rules are defined.
 - Add one shared configured scraper that reads an active config and emits the
   existing strict review or store-price observation.
 - Add draft preview and validation before activation. New and repaired configs

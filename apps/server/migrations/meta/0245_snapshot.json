@@ -1,5 +1,5 @@
 {
-  "id": "3cae195d-2e3b-4a16-988a-302603b217f3",
+  "id": "cbc7c873-6131-42ea-9e16-ac187cc8200e",
   "prevId": "ee292586-1a5d-4f15-946b-0bb3b8523353",
   "version": "7",
   "dialect": "postgresql",
@@ -3442,6 +3442,105 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.comments": {
+      "name": "comments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tasting_id": {
+          "name": "tasting_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "comment_unq": {
+          "name": "comment_unq",
+          "columns": [
+            {
+              "expression": "tasting_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_by_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "comments_tasting_id_tasting_id_fk": {
+          "name": "comments_tasting_id_tasting_id_fk",
+          "tableFrom": "comments",
+          "tableTo": "tasting",
+          "columnsFrom": [
+            "tasting_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "comments_created_by_id_user_id_fk": {
+          "name": "comments_created_by_id_user_id_fk",
+          "tableFrom": "comments",
+          "tableTo": "user",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.configured_scraper_config_version": {
       "name": "configured_scraper_config_version",
       "schema": "",
@@ -3636,7 +3735,7 @@
           "name": "config_version_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "purpose": {
           "name": "purpose",
@@ -3720,7 +3819,12 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "configured_scraper_run_version_check": {
+          "name": "configured_scraper_run_version_check",
+          "value": "\"configured_scraper_run\".\"purpose\"::text = 'generate' OR \"configured_scraper_run\".\"config_version_id\" IS NOT NULL"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.configured_scraper": {
@@ -3773,18 +3877,6 @@
           "notNull": true,
           "default": "'[]'::jsonb"
         },
-        "run_every": {
-          "name": "run_every",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "next_run_at": {
-          "name": "next_run_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
         "active_config_version_id": {
           "name": "active_config_version_id",
           "type": "bigint",
@@ -3813,17 +3905,11 @@
         }
       },
       "indexes": {
-        "configured_scraper_site_collection_unq": {
-          "name": "configured_scraper_site_collection_unq",
+        "configured_scraper_site_unq": {
+          "name": "configured_scraper_site_unq",
           "columns": [
             {
               "expression": "external_site_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "collection",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3873,110 +3959,6 @@
             "id"
           ],
           "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "configured_scraper_run_every_check": {
-          "name": "configured_scraper_run_every_check",
-          "value": "\"configured_scraper\".\"run_every\" IS NULL OR \"configured_scraper\".\"run_every\" > 0"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.comments": {
-      "name": "comments",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "bigserial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "tasting_id": {
-          "name": "tasting_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "comment": {
-          "name": "comment",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "created_by_id": {
-          "name": "created_by_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "comment_unq": {
-          "name": "comment_unq",
-          "columns": [
-            {
-              "expression": "tasting_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_by_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "comments_tasting_id_tasting_id_fk": {
-          "name": "comments_tasting_id_tasting_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "tasting",
-          "columnsFrom": [
-            "tasting_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "comments_created_by_id_user_id_fk": {
-          "name": "comments_created_by_id_user_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "user",
-          "columnsFrom": [
-            "created_by_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -9967,7 +9949,8 @@
       "schema": "public",
       "values": [
         "collect",
-        "preview"
+        "preview",
+        "generate"
       ]
     },
     "public.configured_scraper_validation_status": {

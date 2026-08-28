@@ -53,8 +53,6 @@ export const configuredScrapers = pgTable(
       .notNull(),
     indexUrl: text("index_url").notNull(),
     sampleUrls: jsonb("sample_urls").$type<string[]>().default([]).notNull(),
-    runEvery: integer("run_every"),
-    nextRunAt: timestamp("next_run_at"),
     activeConfigVersionId: bigint("active_config_version_id", {
       mode: "number",
     }).references((): AnyPgColumn => configuredScraperConfigVersions.id, {
@@ -68,14 +66,7 @@ export const configuredScrapers = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("configured_scraper_site_collection_unq").on(
-      table.externalSiteId,
-      table.collection,
-    ),
-    check(
-      "configured_scraper_run_every_check",
-      sql`${table.runEvery} IS NULL OR ${table.runEvery} > 0`,
-    ),
+    uniqueIndex("configured_scraper_site_unq").on(table.externalSiteId),
   ],
 );
 

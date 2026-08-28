@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   configuredScraperRuns,
+  configuredScrapers,
   externalSites,
   externalSiteScrapeTargets,
   scrapeOrigins,
@@ -24,7 +25,7 @@ const config = {
   collection: "reviews" as const,
   index: {
     itemLink: { selector: "a.review", attribute: "href" },
-    maxItems: 5,
+    maxItems: 99,
   },
   detail: {
     title: { selector: "h1" },
@@ -147,6 +148,7 @@ test("keeps immutable versions and only activates a passing version", async () =
     purpose: "collect",
   });
   expect(pinned.version.id).toBe(first.id);
+  expect(pinned.run.requestLimit).toBe(100);
   expect(await db.select().from(configuredScraperRuns)).toEqual([
     expect.objectContaining({
       externalSiteRunId: pinned.run.id,
@@ -173,6 +175,15 @@ test("database constraints reject invalid ownership metadata", async () => {
     createdById: user.id,
   });
   expect(first.version).toBe(1);
+
+  await expect(
+    db.insert(configuredScrapers).values({
+      externalSiteId: scraper.externalSiteId,
+      collection: "store_prices",
+      indexUrl: "https://constraints.example/products",
+      createdById: user.id,
+    }),
+  ).rejects.toThrow();
 
   const [site] = await db
     .select()

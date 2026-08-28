@@ -1,5 +1,5 @@
 CREATE TYPE "public"."configured_scraper_collection" AS ENUM('reviews', 'store_prices');
-CREATE TYPE "public"."configured_scraper_run_purpose" AS ENUM('collect', 'preview');
+CREATE TYPE "public"."configured_scraper_run_purpose" AS ENUM('collect', 'preview', 'generate');
 CREATE TYPE "public"."configured_scraper_validation_status" AS ENUM('pending', 'passed', 'failed');
 CREATE TYPE "public"."configured_scraper_version_origin" AS ENUM('manual', 'llm');
 CREATE TYPE "public"."scrape_definition_owner" AS ENUM('code', 'admin');
@@ -25,9 +25,10 @@ CREATE TABLE "configured_scraper_config_version" (
 CREATE TABLE "configured_scraper_run" (
 	"external_site_run_id" bigint PRIMARY KEY NOT NULL,
 	"configured_scraper_id" bigint NOT NULL,
-	"config_version_id" bigint NOT NULL,
+	"config_version_id" bigint,
 	"purpose" "configured_scraper_run_purpose" NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "configured_scraper_run_version_check" CHECK ("configured_scraper_run"."purpose"::text = 'generate' OR "configured_scraper_run"."config_version_id" IS NOT NULL)
 );
 
 CREATE TABLE "configured_scraper" (
@@ -38,13 +39,10 @@ CREATE TABLE "configured_scraper" (
 	"allow_llm_processing" boolean DEFAULT false NOT NULL,
 	"index_url" text NOT NULL,
 	"sample_urls" jsonb DEFAULT '[]'::jsonb NOT NULL,
-	"run_every" integer,
-	"next_run_at" timestamp,
 	"active_config_version_id" bigint,
 	"created_by_id" bigint,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "configured_scraper_run_every_check" CHECK ("configured_scraper"."run_every" IS NULL OR "configured_scraper"."run_every" > 0)
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 
 ALTER TABLE "external_site_scrape_target" ADD COLUMN "owner" "scrape_definition_owner" DEFAULT 'code' NOT NULL;
@@ -61,4 +59,4 @@ ALTER TABLE "configured_scraper" ADD CONSTRAINT "configured_scraper_created_by_i
 CREATE UNIQUE INDEX "configured_scraper_config_version_unq" ON "configured_scraper_config_version" USING btree ("configured_scraper_id","version");
 CREATE INDEX "configured_scraper_config_version_created_idx" ON "configured_scraper_config_version" USING btree ("configured_scraper_id","created_at");
 CREATE INDEX "configured_scraper_run_config_idx" ON "configured_scraper_run" USING btree ("configured_scraper_id","config_version_id");
-CREATE UNIQUE INDEX "configured_scraper_site_collection_unq" ON "configured_scraper" USING btree ("external_site_id","collection");
+CREATE UNIQUE INDEX "configured_scraper_site_unq" ON "configured_scraper" USING btree ("external_site_id");
