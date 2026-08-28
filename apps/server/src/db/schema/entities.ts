@@ -54,8 +54,8 @@ export const entities = pgTable(
     address: text("address"),
     location: geometry_point("location"),
 
-    // Transitional migration storage only. Application code must not read or
-    // write this field. Remove it after the final kind cutover is stable.
+    // Legacy storage only. Application code must not read or write this field.
+    // Keep it available while it may support a future query optimization.
     type: legacyEntityTypeEnum("type")
       .array()
       .default(sql`ARRAY[]::entity_type[]`)

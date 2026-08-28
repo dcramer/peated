@@ -24,6 +24,7 @@ import {
   createdTastingId,
   destinationBottleGroup,
   destinationBottleGroupId,
+  emptyEntityCatalog,
   emptyList,
   exactMatchedBottle,
   exactMatchedBottleId,
@@ -49,6 +50,8 @@ import {
   suggestedTags,
   tastingNotes,
   testBrand,
+  testOwnedEntity,
+  testOwner,
   testUser,
   unifiedBottleEditContext,
 } from "./rpc-fixtures.mjs";
@@ -184,11 +187,51 @@ async function handleRpcRequest({ request, response, url }) {
       }
       return false;
     case "entities/details":
-      if (Number(input?.entity) === testBrand.id) {
-        sendRpcResponse(response, testBrand);
+      if (
+        [testBrand, testOwnedEntity, testOwner].some(
+          (entity) => entity.id === Number(input?.entity),
+        )
+      ) {
+        sendRpcResponse(
+          response,
+          [testBrand, testOwnedEntity, testOwner].find(
+            (entity) => entity.id === Number(input?.entity),
+          ),
+        );
         return true;
       }
       sendRpcError(response, "Unexpected entity details payload");
+      return true;
+    case "entities/catalog":
+      if (
+        ![testBrand.id, testOwnedEntity.id, testOwner.id].includes(
+          Number(input?.entity),
+        )
+      ) {
+        sendRpcError(response, "Unexpected entity catalog payload");
+        return true;
+      }
+      sendRpcResponse(response, emptyEntityCatalog);
+      return true;
+    case "brands/list":
+      sendRpcResponse(response, {
+        ...emptyList,
+        results: input?.owner ? [] : [testBrand],
+      });
+      return true;
+    case "distilleries/list":
+      sendRpcResponse(response, {
+        ...emptyList,
+        results:
+          input?.owner && input.owner !== testOwner.id ? [] : [testOwnedEntity],
+      });
+      return true;
+    case "bottlers/list":
+    case "blenders/list":
+    case "companies/list":
+    case "countries/list":
+    case "regions/list":
+      sendRpcResponse(response, emptyList);
       return true;
     case "bottles/editContext":
       if (input?.bottle !== unifiedBottleEditContext.bottleId) {
