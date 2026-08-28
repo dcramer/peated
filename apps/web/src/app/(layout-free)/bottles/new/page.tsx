@@ -4,13 +4,12 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import BottleForm, {
   type BottleFormInitialData,
 } from "@peated/web/components/bottleForm";
+import { WorkflowLoading } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
 import { useFlashMessages } from "@peated/web/components/flash";
 import { parseCreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
-import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -224,7 +223,9 @@ function CreateBottleForm() {
   const { flash } = useFlashMessages();
 
   if (loading) {
-    return <Spinner />;
+    return (
+      <WorkflowLoading label="Loading bottle details" title="Add Bottle" />
+    );
   }
 
   return (
@@ -242,10 +243,9 @@ function CreateBottleForm() {
 
         if (image) {
           try {
-            const blob = await toBlob(image);
             await bottleImageUpdateMutation.mutateAsync({
               bottle: createdBottle.id,
-              file: blob,
+              file: image,
             });
           } catch (err) {
             logError(err, {

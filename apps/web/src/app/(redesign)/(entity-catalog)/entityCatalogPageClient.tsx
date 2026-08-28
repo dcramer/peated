@@ -30,13 +30,14 @@ type EntityList = Outputs["distilleries"]["list"];
 type CountryList = Outputs["countries"]["list"];
 export type EntityCatalogKind = Extract<
   EntityKind,
-  "blender" | "bottler" | "brand" | "distillery"
+  "blender" | "bottler" | "brand" | "company" | "distillery"
 >;
 
 const catalogConfig = {
   blender: { noun: "blender", title: "Blenders" },
   bottler: { noun: "bottler", title: "Bottlers" },
   brand: { noun: "brand", title: "Brands" },
+  company: { noun: "company", title: "Companies" },
   distillery: { noun: "distiller", title: "Distillers" },
 } satisfies Record<EntityCatalogKind, { noun: string; title: string }>;
 
@@ -64,7 +65,9 @@ export function EntityCatalogPageClient({
         ? orpc.brands.list.queryOptions({ input: queryParams })
         : kind === "bottler"
           ? orpc.bottlers.list.queryOptions({ input: queryParams })
-          : orpc.blenders.list.queryOptions({ input: queryParams });
+          : kind === "company"
+            ? orpc.companies.list.queryOptions({ input: queryParams })
+            : orpc.blenders.list.queryOptions({ input: queryParams });
   const { data: entityList } = useSuspenseQuery({
     ...listQueryOptions,
     initialData: initialEntityList,

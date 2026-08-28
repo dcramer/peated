@@ -1,8 +1,10 @@
 "use client";
 
-import FormError from "@peated/web/components/formError";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
+import {
+  FormNotice,
+  FormStack,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -11,8 +13,6 @@ import {
   type ORPCResponseTraceContext,
 } from "@peated/web/lib/orpc/link";
 import { useMutation } from "@tanstack/react-query";
-import { ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import {
@@ -76,7 +76,6 @@ export default function BottleResolver({
   createProposalActionLabel = "Continue",
   searchActionLabel = "Search Bottles",
 }: BottleResolverProps) {
-  const router = useRouter();
   const orpc = useORPC();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -153,12 +152,12 @@ export default function BottleResolver({
   }, [isIdentifying]);
 
   function replacePreviewUrl(nextPreviewUrl: string | null) {
-    setPreviewUrl((current) => {
-      if (current && current !== transferredPreviewUrlRef.current) {
-        URL.revokeObjectURL(current);
-      }
-      return nextPreviewUrl;
-    });
+    const current = previewUrlRef.current;
+    if (current && current !== transferredPreviewUrlRef.current) {
+      URL.revokeObjectURL(current);
+    }
+    previewUrlRef.current = nextPreviewUrl;
+    setPreviewUrl(nextPreviewUrl);
   }
 
   async function resolveBottle(
@@ -414,35 +413,16 @@ export default function BottleResolver({
   }, [matchedBottle, orpc]);
 
   return (
-    <Layout
-      footer={null}
-      header={
-        <Header>
-          <div className="flex w-full items-center gap-3">
-            <button
-              type="button"
-              aria-label="Back"
-              className="text-muted group flex justify-center lg:hidden"
-              onClick={() => router.back()}
-            >
-              <div className="-my-1 rounded bg-slate-800 p-1 group-hover:bg-slate-700 group-hover:text-white">
-                <ChevronLeft className="h-8 w-8" />
-              </div>
-            </button>
-            <h1 className="text-2xl font-bold">{title}</h1>
-          </div>
-        </Header>
-      }
-    >
+    <WorkflowScreen title={title}>
       <input
-        ref={fileInputRef}
-        className="hidden"
-        type="file"
         accept="image/*"
+        hidden
         onChange={onFileChange}
+        ref={fileInputRef}
+        type="file"
       />
 
-      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
+      <FormStack>
         {!previewUrl && !photoResult && !isIdentifying && (
           <PhotoUploadState
             searchHref={defaultSearchHref}
@@ -542,23 +522,8 @@ export default function BottleResolver({
           </>
         )}
 
-        {error && <FormError values={[error]} />}
-
-        <style jsx global>{`
-          @keyframes bottle-resolver-loading-shimmer {
-            0% {
-              background-position: 200% 0;
-            }
-            100% {
-              background-position: -200% 0;
-            }
-          }
-
-          .bottle-resolver-loading-shimmer {
-            animation: bottle-resolver-loading-shimmer 2.4s ease-in-out infinite;
-          }
-        `}</style>
-      </div>
-    </Layout>
+        {error ? <FormNotice role="alert">{error}</FormNotice> : null}
+      </FormStack>
+    </WorkflowScreen>
   );
 }

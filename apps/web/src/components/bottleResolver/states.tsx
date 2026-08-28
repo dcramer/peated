@@ -1,8 +1,13 @@
 import type { Bottle } from "@peated/server/types";
-import BottleIdentity from "@peated/web/components/bottleIdentity";
-import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
-import { Camera, Check, Plus, Search } from "lucide-react";
+import {
+  Button,
+  ButtonLink,
+  FormSection,
+  FormStack,
+  LoadingList,
+  SelectedBottleSummary,
+} from "@peated/web/components/designSystem/components";
+import { Camera, Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
 import type { PhotoIdentification } from "./helpers";
@@ -13,8 +18,6 @@ import {
   PhotoFailurePanel,
   type PhotoFailureTrace,
   PhotoIdentificationTraceFootnote,
-  PhotoResultCard,
-  SearchBottleCallout,
 } from "./panels";
 import type {
   BottleResolverAction,
@@ -31,37 +34,26 @@ export function PhotoUploadState({
   onSelectPhoto: () => void;
 }) {
   return (
-    <>
-      <section className="px-3 sm:px-0">
-        <div className="space-y-5">
-          <div className="text-center">
-            <div className="text-muted text-sm">Start with a bottle photo</div>
-            <h2 className="mt-1 text-2xl font-semibold text-white">
-              Capture the label, then confirm the match.
-            </h2>
-          </div>
-
-          <button
-            type="button"
-            className="flex min-h-72 w-full flex-col items-center justify-center gap-4 rounded border border-slate-800 bg-slate-950 p-6 text-center transition hover:border-slate-700 hover:bg-black"
-            onClick={onSelectPhoto}
-          >
-            <div className="rounded-full border border-slate-700 bg-slate-950 p-5">
-              <Camera className="text-highlight h-10 w-10" />
-            </div>
-            <div>
-              <div className="text-lg font-semibold text-white">
-                Take or upload a photo
-              </div>
-              <div className="text-muted mt-1 text-sm">
-                Use a clear bottle label for the fastest match.
-              </div>
-            </div>
-          </button>
-        </div>
-      </section>
-      <SearchBottleCallout searchHref={searchHref} />
-    </>
+    <FormStack>
+      <FormSection
+        description="Use a clear photo of the front label for the fastest match."
+        title="Capture the label, then confirm the match"
+      >
+        <Button fullWidth onClick={onSelectPhoto} size="lg" variant="accent">
+          <Camera aria-hidden="true" size={18} />
+          Take or upload a photo
+        </Button>
+      </FormSection>
+      <FormSection
+        description="Find a bottle in the catalog or add one manually."
+        title="Prefer to search?"
+      >
+        <ButtonLink fullWidth href={searchHref} variant="tonal">
+          <Search aria-hidden="true" size={16} />
+          Search bottles
+        </ButtonLink>
+      </FormSection>
+    </FormStack>
   );
 }
 
@@ -114,33 +106,26 @@ export function PhotoLoadingState({
   searchHref: string;
 }) {
   return (
-    <section className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-3 py-8 text-center sm:min-h-0 sm:items-start sm:justify-start sm:py-10 sm:text-left">
-      <div className="mx-auto max-w-md space-y-5 sm:flex sm:max-w-3xl sm:items-center sm:gap-8 sm:space-y-0">
-        {previewUrl && (
-          <img
-            src={previewUrl}
-            alt="Selected bottle label"
-            className="mx-auto h-28 w-28 rounded object-cover sm:mx-0 sm:h-56 sm:w-56"
-          />
-        )}
-        <div>
-          <h2 className="bottle-resolver-loading-shimmer via-highlight inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent">
-            {loadingMessage}
-          </h2>
-          <p className="text-muted mt-2 text-sm">
-            Reading the label and checking Peated for a match.
-          </p>
-          <p className="text-muted mt-1 text-sm">
-            This can take up to 30 seconds.
-          </p>
-          <div className="mt-5">
-            <Button href={searchHref} icon={<Search className="h-4 w-4" />}>
-              Search Bottles
-            </Button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <FormStack>
+      {previewUrl ? (
+        <SelectedBottleSummary
+          bottleId="Reading label"
+          imageUrl={previewUrl}
+          metadata="Checking the catalog"
+          name={loadingMessage}
+        />
+      ) : null}
+      <FormSection
+        description="Reading the label and checking the catalog. This can take up to 30 seconds."
+        title={loadingMessage}
+      >
+        <LoadingList label="Identifying bottle" rows={3} />
+        <ButtonLink href={searchHref} variant="tonal">
+          <Search aria-hidden="true" size={16} />
+          Search bottles instead
+        </ButtonLink>
+      </FormSection>
+    </FormStack>
   );
 }
 
@@ -180,7 +165,7 @@ export function PhotoNoMatchState({
       onStartOver={onStartOver}
       variant="no-match"
     >
-      <EvidencePills result={result} compact />
+      <EvidencePills result={result} />
     </PhotoFailurePanel>
   );
 }
@@ -231,97 +216,83 @@ export function PhotoMatchCreateState({
 }) {
   if (matchedBottle) {
     return (
-      <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-        <div className="space-y-5">
-          <PhotoResultCard
-            previewUrl={previewUrl}
-            title="Matched bottle"
-            subtitle="Matched to existing bottle in Peated"
-            fallbackIcon={<Check className="text-highlight h-6 w-6" />}
+      <FormSection
+        description="Matched to an existing bottle in the catalog."
+        title="Matched bottle"
+      >
+        <SelectedBottleSummary
+          bottleId={matchedBottle.peatedId}
+          imageUrl={previewUrl ?? matchedBottle.imageUrl}
+          metadata={matchedBottle.category ?? "Catalog bottle"}
+          name={matchedBottle.fullName}
+        />
+        <EvidencePills result={result} />
+        {renderMatchedResultActions ? (
+          renderMatchedResultActions({
+            bottle: matchedBottle,
+            hasLibraryEntry,
+            libraryEntryImageUrl,
+            pendingImage,
+            loadingExactLibraryStatus,
+            resolvingAction:
+              resolvingAction === "create" ? null : resolvingAction,
+            onResolve: (action) => {
+              onLoadBottle(matchedBottle, action);
+            },
+          })
+        ) : (
+          <Button
+            disabled={Boolean(resolvingAction)}
+            fullWidth
+            onClick={() => onLoadBottle(matchedBottle)}
+            variant="accent"
           >
-            <div className="space-y-2">
-              <BottleIdentity
-                bottle={matchedBottle}
-                linkClassName="font-semibold text-white hover:underline"
-                showReleaseYear
-              />
-              <EvidencePills result={result} compact />
-            </div>
-          </PhotoResultCard>
-          {renderMatchedResultActions ? (
-            renderMatchedResultActions({
-              bottle: matchedBottle,
-              hasLibraryEntry,
-              libraryEntryImageUrl,
-              pendingImage,
-              loadingExactLibraryStatus,
-              resolvingAction:
-                resolvingAction === "create" ? null : resolvingAction,
-              onResolve: (action) => {
-                onLoadBottle(matchedBottle, action);
-              },
-            })
-          ) : (
-            <div className="mx-auto grid w-full gap-2 sm:w-1/2">
-              <Button
-                color="highlight"
-                fullWidth
-                disabled={Boolean(resolvingAction)}
-                onClick={() => onLoadBottle(matchedBottle)}
-              >
-                Continue
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
+            Continue
+          </Button>
+        )}
+      </FormSection>
     );
   }
 
   return (
-    <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-      <div className="space-y-5">
-        <PhotoResultCard
-          previewUrl={previewUrl}
-          title={
-            proposedName ?? createProposalLabel?.title ?? "New bottle found"
-          }
-          subtitle={
-            createProposalLabel?.description ??
-            "Create a new bottle from this label."
-          }
-          fallbackIcon={<Plus className="text-highlight h-6 w-6" />}
-        >
-          <EvidencePills result={result} compact />
-        </PhotoResultCard>
-        {hasCreateDecision && (
-          <div
-            className={
-              renderCreateProposalActions
-                ? "space-y-3"
-                : "mx-auto grid w-full gap-2 sm:w-1/2"
-            }
-          >
-            {renderCreateProposalActions ? (
-              renderCreateProposalActions({
-                createPending,
-                resolvingAction,
-                onResolve: (action) => onAcceptCreateProposal(result, action),
-              })
-            ) : (
-              <Button
-                color="highlight"
-                fullWidth
-                icon={<Plus className="h-4 w-4" />}
-                onClick={() => onAcceptCreateProposal(result, "create")}
-                disabled={createPending}
-              >
-                {createPending ? "Creating..." : createActionLabel}
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-    </section>
+    <FormSection
+      description={
+        createProposalLabel?.description ??
+        "Create a new bottle from this label."
+      }
+      title={proposedName ?? createProposalLabel?.title ?? "New bottle found"}
+    >
+      {previewUrl ? (
+        <SelectedBottleSummary
+          bottleId="New bottle"
+          imageUrl={previewUrl}
+          metadata="Read from label"
+          name={proposedName ?? "Bottle preview"}
+        />
+      ) : null}
+      <EvidencePills result={result} />
+      {hasCreateDecision && (
+        <FormStack>
+          {renderCreateProposalActions ? (
+            renderCreateProposalActions({
+              createPending,
+              resolvingAction,
+              onResolve: (action) => onAcceptCreateProposal(result, action),
+            })
+          ) : (
+            <Button
+              disabled={createPending}
+              fullWidth
+              loading={createPending}
+              onClick={() => onAcceptCreateProposal(result, "create")}
+              variant="accent"
+            >
+              <Plus aria-hidden="true" size={16} />
+              {createActionLabel}
+            </Button>
+          )}
+        </FormStack>
+      )}
+    </FormSection>
   );
 }

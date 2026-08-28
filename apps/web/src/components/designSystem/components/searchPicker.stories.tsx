@@ -3,8 +3,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
-import { SearchPicker, type SearchPickerOption } from "./searchPicker.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
+import {
+  SearchPicker,
+  SearchSelect,
+  type SearchPickerOption,
+} from "./searchPicker.stylex";
 
 const options = [
   { id: 1, label: "Lagavulin 16-year-old", detail: "Islay · 43% ABV" },
@@ -35,8 +39,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {
-  render: (args) => <ControlledPicker {...args} />,
+  render: (args) => (
+    <StoryStack>
+      <ControlledSelect {...args} />
+      <ControlledPicker {...args} />
+    </StoryStack>
+  ),
 };
+
+function ControlledSelect(props: React.ComponentProps<typeof SearchPicker>) {
+  const [value, setValue] = useState<SearchPickerOption | null>(options[0]!);
+  return (
+    <SearchSelect {...props} label="Bottle" onChange={setValue} value={value} />
+  );
+}
 
 function ControlledPicker(props: React.ComponentProps<typeof SearchPicker>) {
   const [value, setValue] = useState<readonly SearchPickerOption[]>([

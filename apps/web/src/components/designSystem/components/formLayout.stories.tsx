@@ -6,6 +6,8 @@ import { Field, TextInput } from "./field.stylex";
 import { Switch } from "./formControls.stylex";
 import {
   FormActions,
+  FormDetails,
+  FormGrid,
   FormNotice,
   FormSection,
   FormStack,
@@ -48,6 +50,19 @@ export const Overview: Story = {
           onCheckedChange={() => undefined}
         />
       </FormSection>
+      <FormDetails
+        description="Optional catalog and production information."
+        title="More details"
+      >
+        <FormGrid>
+          <Field htmlFor="form-layout-year" label="Release year" optional>
+            <TextInput id="form-layout-year" placeholder="2026" />
+          </Field>
+          <Field htmlFor="form-layout-edition" label="Edition" optional>
+            <TextInput id="form-layout-edition" placeholder="Batch 24" />
+          </Field>
+        </FormGrid>
+      </FormDetails>
       <FormActions>
         <Button variant="accent">Save changes</Button>
       </FormActions>

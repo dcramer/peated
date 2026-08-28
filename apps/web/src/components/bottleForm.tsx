@@ -1,62 +1,58 @@
 "use client";
 
-import {
-  BoltIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "@heroicons/react/20/solid";
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
   formatCategoryName,
   formatFlavorProfile,
-  notesForProfile,
 } from "@peated/server/lib/format";
+import { toTitleCase } from "@peated/server/lib/strings";
 import {
   BottleInputFields,
   EntityChoiceSchema,
   FlavorProfileEnum,
 } from "@peated/server/schemas";
-import type { Entity, FlavorProfile } from "@peated/server/types";
-import EntityField from "@peated/web/components/entityField";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import ImageField from "@peated/web/components/imageField";
-import { PreviewBottleCard } from "@peated/web/components/previewBottleCard";
-import type { Option } from "@peated/web/components/selectField";
-import SelectField from "@peated/web/components/selectField";
-import SeriesField from "@peated/web/components/seriesField";
-import TextField from "@peated/web/components/textField";
+import type { Entity, EntityKind } from "@peated/server/types";
+import {
+  BottleIdentityRow,
+  Button,
+  EntityPicker,
+  Field,
+  FieldGroup,
+  FormActions,
+  FormDetails,
+  FormGrid,
+  FormNotice,
+  FormSection,
+  FormStack,
+  PictureInput,
+  SearchPicker,
+  Select,
+  Switch,
+  Textarea,
+  TextInput,
+  UnitInput,
+  type EntityPickerOption,
+  type SearchPickerOption,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
   getFormErrorMessage,
   toChoiceValue,
-  toOption,
-  toOptionList,
 } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { WandSparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import BooleanField from "./booleanField";
-import Button from "./button";
-import { classesForProfile } from "./flavorProfile";
-import Form from "./form";
-import TextAreaField from "./textAreaField";
 
-const categoryList = CATEGORY_LIST.map((c) => ({
-  id: c,
-  name: formatCategoryName(c),
-}));
-
-const flavorProfileList = FLAVOR_PROFILES.map((c) => ({
-  id: c,
-  name: formatFlavorProfile(c),
+const categoryList = CATEGORY_LIST.map((category) => ({
+  id: category,
+  name: formatCategoryName(category),
 }));
 
 type BooleanChoice = {
@@ -81,42 +77,60 @@ const filtrationChoices: BooleanChoice[] = [
   { id: "no", name: "Chill-filtered" },
 ];
 
-function booleanChoice(
-  choices: BooleanChoice[],
-  value: boolean | null | undefined,
-) {
-  const id = value === true ? "yes" : value === false ? "no" : "unknown";
-  return choices.find((choice) => choice.id === id) ?? choices[0];
-}
-
-function booleanChoiceValue(choice: BooleanChoice | undefined) {
-  if (choice?.id === "yes") return true;
-  if (choice?.id === "no") return false;
+function booleanChoiceValue(value: string) {
+  if (value === "yes") return true;
+  if (value === "no") return false;
   return null;
 }
 
-type CreateFormSchemaType = z.infer<typeof BottleCreateInputSchema>;
-const BottleFormSchema = BottleCreateInputSchema;
-type FormSchemaType = CreateFormSchemaType;
-type ChoiceLike = {
-  id?: number | null;
-  name: string;
-};
+function booleanChoiceId(value: boolean | null | undefined) {
+  if (value === true) return "yes";
+  if (value === false) return "no";
+  return "unknown";
+}
+
+type FormSchemaType = z.infer<typeof BottleCreateInputSchema>;
+type ChoiceLike = { id?: number | null; name: string };
+const ChoiceLikeSchema = z.object({
+  id: z.number().nullable().optional(),
+  name: z.string(),
+});
+const CatalogEntityMarkerSchema = z.object({ peatedId: z.string() });
+
+function isNumericChoice(value: number | Entity | ChoiceLike): value is number {
+  return z.number().safeParse(value).success;
+}
+
+function isCatalogEntity(value: number | Entity | ChoiceLike): value is Entity {
+  return CatalogEntityMarkerSchema.safeParse(value).success;
+}
+
+function isDraftSeries(
+  value: number | ChoiceLike | null | undefined,
+): value is ChoiceLike {
+  const parsed = ChoiceLikeSchema.safeParse(value);
+  return parsed.success && !parsed.data.id;
+}
+
+function seriesChoiceId(value: number | ChoiceLike | null | undefined) {
+  const numeric = z.number().safeParse(value);
+  if (numeric.success) return String(numeric.data);
+  const choice = ChoiceLikeSchema.safeParse(value);
+  return choice.success && choice.data.id ? String(choice.data.id) : "";
+}
+
 export type BottleFormInitialData = Partial<
-  Omit<
-    CreateFormSchemaType,
-    "brand" | "distillers" | "bottler" | "series" | "image"
-  >
+  Omit<FormSchemaType, "brand" | "distillers" | "bottler" | "series" | "image">
 > & {
+  bottler?: number | Entity | ChoiceLike | null;
   brand?: number | Entity | ChoiceLike | null;
   distillers?: Array<number | Entity | ChoiceLike>;
-  bottler?: number | Entity | ChoiceLike | null;
-  series?: number | ChoiceLike | null;
   imageUrl?: string | null;
+  series?: number | ChoiceLike | null;
 };
 
 export type BottleFormSubmitValue = Omit<FormSchemaType, "image"> & {
-  image: HTMLCanvasElement | null | undefined;
+  image: File | null | undefined;
 };
 
 export type BottleFormFieldName = keyof FormSchemaType;
@@ -156,52 +170,174 @@ function hasMoreDetails(initialData: BottleFormInitialData) {
   );
 }
 
-const toEntityChoiceValue = (
+function toEntityChoiceValue(
   value: number | Entity | ChoiceLike | null | undefined,
-): FormSchemaType["brand"] | FormSchemaType["bottler"] =>
-  z
+): FormSchemaType["brand"] | FormSchemaType["bottler"] {
+  return z
     .union([EntityChoiceSchema, z.null(), z.undefined()])
     .parse(toChoiceValue(value));
+}
 
-const toSeriesChoiceValue = (
+function toSeriesChoiceValue(
   value: number | ChoiceLike | null | undefined,
-): FormSchemaType["series"] =>
-  BottleInputFields.series.parse(toChoiceValue(value));
+): FormSchemaType["series"] {
+  return BottleInputFields.series.parse(toChoiceValue(value));
+}
 
-const toDistillerChoiceValues = (
+function toDistillerChoiceValues(
   values: Array<number | Entity | ChoiceLike> | null | undefined,
-): NonNullable<FormSchemaType["distillers"]> =>
-  z
+): NonNullable<FormSchemaType["distillers"]> {
+  return z
     .array(EntityChoiceSchema)
     .parse(values?.map((value) => toChoiceValue(value)) ?? []);
+}
+
+function choiceName(value: number | Entity | ChoiceLike) {
+  return isNumericChoice(value) ? `Entity ${value}` : value.name;
+}
+
+function choiceId(value: number | Entity | ChoiceLike) {
+  if (isNumericChoice(value)) return String(value);
+  return value.id ? String(value.id) : `new:${value.name}`;
+}
+
+function choiceDetail(value: number | Entity | ChoiceLike) {
+  if (isNumericChoice(value)) return "Catalog entity";
+  if (isCatalogEntity(value)) {
+    return [toTitleCase(value.kind), value.region?.name ?? value.country?.name]
+      .filter(Boolean)
+      .join(" · ");
+  }
+  return value.id ? "Catalog entity" : "New entity";
+}
+
+function toEntityPickerOption(
+  value: number | Entity | ChoiceLike | null | undefined,
+): EntityPickerOption | null {
+  if (value === null || value === undefined) return null;
+  return {
+    detail: choiceDetail(value),
+    id: choiceId(value),
+    meta: isCatalogEntity(value) ? value.peatedId : "Bottle form",
+    name: choiceName(value),
+  };
+}
+
+function toSearchPickerOption(
+  value: number | Entity | ChoiceLike,
+): SearchPickerOption {
+  return {
+    detail: choiceDetail(value),
+    id: choiceId(value),
+    label: choiceName(value),
+  };
+}
+
+function entityPickerOption(entity: Entity): EntityPickerOption {
+  return {
+    detail: choiceDetail(entity),
+    id: String(entity.id),
+    meta: entity.peatedId,
+    name: entity.name,
+  };
+}
+
+function entitySearchOption(entity: Entity): SearchPickerOption {
+  return {
+    detail: choiceDetail(entity),
+    id: String(entity.id),
+    label: entity.name,
+  };
+}
+
+function entityChoiceFromOption(
+  option: EntityPickerOption,
+  kind: EntityKind,
+): z.infer<typeof EntityChoiceSchema> {
+  return option.id.startsWith("new:")
+    ? EntityChoiceSchema.parse({ kind, name: option.name })
+    : Number(option.id);
+}
+
+function distillerChoiceFromOption(
+  option: SearchPickerOption,
+): z.infer<typeof EntityChoiceSchema> {
+  return String(option.id).startsWith("new:")
+    ? EntityChoiceSchema.parse({ kind: "distillery", name: option.label })
+    : Number(option.id);
+}
+
+function draftSeries(name: string): NonNullable<FormSchemaType["series"]> {
+  return BottleInputFields.series.parse({ name })!;
+}
+
+function makeDraftEntityOption(
+  name: string,
+  kind: EntityKind,
+): EntityPickerOption {
+  return {
+    detail: `New ${toTitleCase(kind).toLocaleLowerCase()}`,
+    id: `new:${name}`,
+    meta: "Will be created on save",
+    name,
+  };
+}
+
+function numberOrNull(value: string) {
+  return value ? Number(value) : null;
+}
 
 export default function BottleForm({
-  onSubmit,
   initialData,
-  title,
+  onSubmit,
   returnTo,
-  saveLabel,
+  saveLabel = "Save bottle",
+  title,
 }: {
+  initialData: BottleFormInitialData;
   onSubmit: (
     value: BottleFormSubmitValue,
     meta: BottleFormSubmitMeta,
   ) => void | Promise<void>;
-  initialData: BottleFormInitialData;
-  title: string;
   returnTo?: string | null;
   saveLabel?: string;
+  title: string;
 }) {
   const { imageUrl, ...initialFormData } = initialData;
+  const orpc = useORPC();
+  const { user } = useAuth();
+  const [submitError, setSubmitError] = useState<string>();
+  const [brandQuery, setBrandQuery] = useState("");
+  const [bottlerQuery, setBottlerQuery] = useState("");
+  const [distillerQuery, setDistillerQuery] = useState("");
+  const [brand, setBrand] = useState<EntityPickerOption | null>(() =>
+    toEntityPickerOption(initialData.brand),
+  );
+  const [bottler, setBottler] = useState<EntityPickerOption | null>(() =>
+    toEntityPickerOption(initialData.bottler),
+  );
+  const [distillers, setDistillers] = useState<readonly SearchPickerOption[]>(
+    () => initialData.distillers?.map(toSearchPickerOption) ?? [],
+  );
+  const [seriesMode, setSeriesMode] = useState(() => {
+    const series = initialData.series;
+    return isDraftSeries(series) ? "new" : "";
+  });
+  const [newSeriesName, setNewSeriesName] = useState(() => {
+    const series = initialData.series;
+    return isDraftSeries(series) ? series.name : "";
+  });
+  const [image, setImage] = useState<File | null | undefined>(undefined);
+  const [imagePreview, setImagePreview] = useState(imageUrl ?? undefined);
   const {
     control,
-    register,
-    handleSubmit,
+    formState: { dirtyFields, errors, isSubmitting },
     getValues,
+    handleSubmit,
+    register,
     setValue,
     watch,
-    formState: { dirtyFields, errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(BottleFormSchema),
     defaultValues: {
       ...initialFormData,
       bottler: toEntityChoiceValue(initialData.bottler),
@@ -209,576 +345,699 @@ export default function BottleForm({
       distillers: toDistillerChoiceValues(initialData.distillers),
       series: toSeriesChoiceValue(initialData.series),
     },
+    resolver: zodResolver(BottleCreateInputSchema),
   });
 
-  const [error, setError] = useState<string | undefined>();
-  const [moreDetailsOpen, setMoreDetailsOpen] = useState(() =>
-    hasMoreDetails(initialData),
+  const brandResults = useQuery(
+    orpc.entities.list.queryOptions({
+      input: {
+        limit: 25,
+        query: brandQuery,
+        sort: brandQuery ? "rank" : "name",
+      },
+    }),
   );
-  const [image, setImage] = useState<HTMLCanvasElement | null | undefined>(
-    undefined,
+  const bottlerResults = useQuery(
+    orpc.entities.list.queryOptions({
+      input: {
+        limit: 25,
+        query: bottlerQuery,
+        sort: bottlerQuery ? "rank" : "name",
+      },
+    }),
   );
-  const router = useRouter();
-  const orpc = useORPC();
-  const { user } = useAuth();
-  const canUseBottleLookup = !!(user?.mod || user?.admin);
+  const distillerResults = useQuery(
+    orpc.entities.list.queryOptions({
+      input: {
+        limit: 25,
+        query: distillerQuery,
+        sort: distillerQuery ? "rank" : "name",
+      },
+    }),
+  );
+  const numericBrandId = brand && /^\d+$/.test(brand.id) ? Number(brand.id) : 0;
+  const seriesResults = useQuery({
+    ...orpc.bottleSeries.list.queryOptions({
+      input: { brand: numericBrandId, limit: 100, query: "" },
+    }),
+    enabled: Boolean(numericBrandId),
+  });
+  const generateData = useMutation(orpc.ai.bottleLookup.mutationOptions());
+  const name = watch("name");
+  const category = watch("category");
+  const statedAge = watch("statedAge");
+  const noAgeStatement = watch("noAgeStatement");
+  const abv = watch("abv");
+  const previewMetadata = useMemo(
+    () =>
+      [
+        category ? formatCategoryName(category) : null,
+        noAgeStatement ? "NAS" : statedAge != null ? `${statedAge} yr` : null,
+        abv != null ? `${abv}%` : null,
+      ].filter((item): item is string => Boolean(item)),
+    [abv, category, noAgeStatement, statedAge],
+  );
 
   useEffect(() => {
-    if (moreDetailFields.some((field) => errors[field])) {
-      setMoreDetailsOpen(true);
-    }
-  }, [errors]);
+    return () => {
+      if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
-  const generateDataMutation = useMutation(
-    orpc.ai.bottleLookup.mutationOptions(),
-  );
-
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+  const submit: SubmitHandler<FormSchemaType> = async (data) => {
+    setSubmitError(undefined);
     try {
       await onSubmit(
         { image, ...data },
         {
+          // SAFETY: react-hook-form keys come from this form's typed field map.
           dirtyFields: new Set(
-            // SAFETY: React Hook Form creates dirtyFields only from this typed form's registered keys.
             Object.keys(dirtyFields) as Array<keyof FormSchemaType>,
           ),
         },
       );
-    } catch (err) {
-      setError(
-        getFormErrorMessage(err, {
-          allowAnyErrorMessage: true,
-        }),
+    } catch (error) {
+      setSubmitError(
+        getFormErrorMessage(error, { allowAnyErrorMessage: true }),
       );
     }
   };
 
-  const [brandValue, setBrandValue] = useState<Option | undefined>(
-    toOption(initialData.brand),
-  );
-  const [distillersValue, setDistillersValue] = useState<Option[]>(
-    toOptionList(initialData.distillers),
-  );
-  const [bottlerValue, setBottlerValue] = useState<Option | undefined>(
-    toOption(initialData.bottler),
-  );
-  const [seriesValue, setSeriesValue] = useState<Option | undefined>(
-    toOption(initialData.series),
-  );
-
-  const previewData = {
-    name: watch("name"),
-    category: watch("category"),
-    statedAge: watch("statedAge"),
-    noAgeStatement: watch("noAgeStatement"),
-    edition: watch("edition"),
-    vintageYear: watch("vintageYear"),
-    bottlingYear: watch("bottlingYear"),
-    releaseYear: watch("releaseYear"),
-    releaseDate: watch("releaseDate"),
-    abv: watch("abv"),
-    singleCask: watch("singleCask"),
-    caskStrength: watch("caskStrength"),
-    maturation: watch("maturation"),
-    caskNumber: watch("caskNumber"),
-    outturn: watch("outturn"),
-    distillers: distillersValue,
-    brand: brandValue,
-    series: seriesValue,
-  };
-  const showPreview =
-    Boolean(
-      previewData.name ||
-      previewData.category ||
-      previewData.brand ||
-      previewData.distillers.length,
-    ) ||
-    (previewData.statedAge !== null && previewData.statedAge !== undefined);
+  async function fillDetails() {
+    const result = await generateData.mutateAsync(getValues());
+    if (!result) return;
+    const current = getValues();
+    if (result.description && !current.description) {
+      setValue("description", result.description, { shouldDirty: true });
+      setValue("descriptionSrc", "generated", { shouldDirty: true });
+    }
+    if (result.flavorProfile && !current.flavorProfile) {
+      setValue("flavorProfile", FlavorProfileEnum.parse(result.flavorProfile), {
+        shouldDirty: true,
+      });
+    }
+  }
 
   return (
-    <FormScreen
-      title={title}
-      saveDisabled={isSubmitting}
+    <WorkflowScreen
+      onClose={returnTo ? () => window.location.assign(returnTo) : undefined}
+      onSave={handleSubmit(submit)}
       saveLabel={saveLabel}
-      onSave={handleSubmit(onSubmitHandler)}
-      onClose={() => (returnTo ? router.push(returnTo) : router.back())}
+      saving={isSubmitting}
+      title={title}
     >
-      <div className="border-slate-700 p-4 lg:mb-8 lg:border">
-        <div className="prose prose-invert text-muted max-w-full text-sm leading-6">
-          <p>
+      <form onSubmit={handleSubmit(submit)}>
+        <FormStack>
+          <FormNotice>
             Add what you can confirm from the label. Brand and bottle name are
-            required; anything else can be left blank.
-          </p>
-        </div>
-      </div>
-
-      {showPreview && (
-        <div className="lg:mb-8 lg:p-0">
-          <PreviewBottleCard data={previewData} />
-        </div>
-      )}
-
-      {error && <FormError values={[error]} />}
-
-      <Form
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
-      >
-        <Fieldset>
-          <Controller
-            name="brand"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <EntityField
-                {...field}
-                error={errors.brand}
-                label="Brand"
-                helpText="The brand, or main label of the bottle."
-                placeholder="e.g. Laphroaig"
-                createDialogHelpText="The brand is the label the spirit is bottled under. Sometimes this is
-                the same as the distiller."
-                searchContext={{
-                  role: "brand",
-                }}
-                required
-                onChange={(value) => {
-                  onChange(value?.id || value);
-                  setBrandValue(value);
-                }}
-                canCreate
-                value={brandValue}
+            required. You can leave everything else blank.
+          </FormNotice>
+          {name || brand ? (
+            <BottleIdentityRow
+              brand={brand?.name}
+              metadata={previewMetadata}
+              name={name || "Bottle preview"}
+            />
+          ) : null}
+          {submitError ? (
+            <FormNotice role="alert">{submitError}</FormNotice>
+          ) : null}
+          <FormSection title="Identity">
+            <EntityPicker
+              help="The main label the bottle is sold under."
+              kind="brand"
+              loading={brandResults.isFetching}
+              onChange={(option) => {
+                setBrand(option);
+                const nextBrand = option
+                  ? entityChoiceFromOption(option, "brand")
+                  : undefined;
+                // SAFETY: the form can hold an empty required field until schema validation runs.
+                setValue("brand", nextBrand as FormSchemaType["brand"], {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                setValue("series", null, { shouldDirty: true });
+                setSeriesMode("");
+                setNewSeriesName("");
+              }}
+              onCreate={(query) => {
+                const option = makeDraftEntityOption(query, "brand");
+                setBrand(option);
+                setValue(
+                  "brand",
+                  EntityChoiceSchema.parse({ kind: "brand", name: query }),
+                  {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  },
+                );
+              }}
+              onQueryChange={setBrandQuery}
+              options={(brandResults.data?.results ?? []).map(
+                entityPickerOption,
+              )}
+              placeholder="Laphroaig"
+              value={brand}
+            />
+            <Field
+              error={errors.name?.message}
+              htmlFor="bottle-name"
+              label="Bottle name"
+              required
+            >
+              <TextInput
+                {...register("name")}
+                autoFocus
+                id="bottle-name"
+                invalid={Boolean(errors.name)}
+                placeholder="12-year-old"
               />
-            )}
-          />
-
-          <TextField
-            {...register("name")}
-            error={errors.name}
-            type="text"
-            label="Bottle Name"
-            required
-            helpText="Enter the name without repeating the brand. Add edition, batch, and year information under More Details."
-            placeholder="e.g. 12-year-old"
-          />
-
-          <Controller
-            name="category"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.category}
-                label="Type"
-                placeholder="e.g. Single Malt"
-                helpText="The kind of spirit."
-                simple
-                options={categoryList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: formatCategoryName(value),
-                      }
-                    : undefined
-                }
-              />
-            )}
-          />
-
-          <TextField
-            {...register("statedAge", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-            })}
-            error={errors.statedAge}
-            type="number"
-            label="Age Statement"
-            placeholder="e.g. 12"
-            helpText="The age shown on the bottle's label."
-            suffixLabel="years"
-            disabled={watch("noAgeStatement") === true}
-          />
-
-          <Controller
-            name="noAgeStatement"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.noAgeStatement}
+            </Field>
+            <Field
+              error={errors.category?.message}
+              htmlFor="bottle-category"
+              label="Type"
+              optional
+            >
+              <Select
+                {...register("category", {
+                  setValueAs: (value) => value || null,
+                })}
+                id="bottle-category"
+                invalid={Boolean(errors.category)}
+              >
+                <option value="">Not set</option>
+                {categoryList.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <FormGrid>
+              <Field
+                error={errors.statedAge?.message}
+                htmlFor="bottle-age"
+                label="Age statement"
+                optional
+              >
+                <UnitInput
+                  {...register("statedAge", {
+                    setValueAs: (value) => numberOrNull(value),
+                  })}
+                  disabled={noAgeStatement === true}
+                  id="bottle-age"
+                  invalid={Boolean(errors.statedAge)}
+                  min={0}
+                  placeholder="12"
+                  unit="years"
+                />
+              </Field>
+              <Field
+                error={errors.noAgeStatement?.message}
+                htmlFor="bottle-age-information"
                 label="Age information"
-                helpText="Choose No age statement only when the bottle label does not show an age."
-                simple
-                options={noAgeStatementChoices}
-                onChange={(choice) => {
-                  const noAgeStatement = booleanChoiceValue(choice);
-                  onChange(noAgeStatement);
-                  if (noAgeStatement) {
-                    setValue("statedAge", null, {
+                optional
+              >
+                <Controller
+                  control={control}
+                  name="noAgeStatement"
+                  render={({ field }) => (
+                    <Select
+                      id="bottle-age-information"
+                      onChange={(event) => {
+                        const next = booleanChoiceValue(
+                          event.currentTarget.value,
+                        );
+                        field.onChange(next);
+                        if (next) {
+                          setValue("statedAge", null, { shouldDirty: true });
+                        }
+                      }}
+                      value={booleanChoiceId(field.value)}
+                    >
+                      {noAgeStatementChoices.map((choice) => (
+                        <option key={choice.id} value={choice.id}>
+                          {choice.name}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </Field>
+            </FormGrid>
+            <Field
+              error={errors.abv?.message}
+              htmlFor="bottle-abv"
+              label="Alcohol"
+              optional
+            >
+              <UnitInput
+                {...register("abv", {
+                  setValueAs: (value) => numberOrNull(value),
+                })}
+                id="bottle-abv"
+                invalid={Boolean(errors.abv)}
+                max={100}
+                min={0}
+                placeholder="40.5"
+                step="0.1"
+                unit="% ABV"
+              />
+            </Field>
+            <SearchPicker
+              help="The distilleries that produced the spirit."
+              label="Distilled by"
+              loading={distillerResults.isFetching}
+              onChange={(options) => {
+                setDistillers(options);
+                setValue("distillers", options.map(distillerChoiceFromOption), {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }}
+              onCreate={(query) => {
+                const option: SearchPickerOption = {
+                  detail: "New distillery",
+                  id: `new:${query}`,
+                  label: query,
+                };
+                const next = [...distillers, option];
+                setDistillers(next);
+                setValue("distillers", next.map(distillerChoiceFromOption), {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }}
+              onQueryChange={setDistillerQuery}
+              options={(distillerResults.data?.results ?? []).map(
+                entitySearchOption,
+              )}
+              placeholder="Search distilleries"
+              value={distillers}
+            />
+            <EntityPicker
+              help="The market-facing bottler or release imprint, when one is stated."
+              kind="bottler"
+              loading={bottlerResults.isFetching}
+              onChange={(option) => {
+                setBottler(option);
+                setValue(
+                  "bottler",
+                  option ? entityChoiceFromOption(option, "bottler") : null,
+                  { shouldDirty: true, shouldValidate: true },
+                );
+              }}
+              onCreate={(query) => {
+                const option = makeDraftEntityOption(query, "bottler");
+                setBottler(option);
+                setValue(
+                  "bottler",
+                  EntityChoiceSchema.parse({ kind: "bottler", name: query }),
+                  {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  },
+                );
+              }}
+              onQueryChange={setBottlerQuery}
+              options={(bottlerResults.data?.results ?? []).map(
+                entityPickerOption,
+              )}
+              placeholder="Search bottlers"
+              value={bottler}
+            />
+          </FormSection>
+
+          <FormDetails
+            defaultOpen={hasMoreDetails(initialData)}
+            description="Edition, year, cask, production, and catalog information."
+            title="More details"
+          >
+            <Field
+              error={errors.edition?.message}
+              htmlFor="bottle-edition"
+              label="Edition or batch"
+              optional
+            >
+              <TextInput
+                {...register("edition", {
+                  setValueAs: (value) => value || null,
+                })}
+                id="bottle-edition"
+                invalid={Boolean(errors.edition)}
+                placeholder="Batch 24"
+              />
+            </Field>
+            <Field
+              error={errors.series?.message}
+              htmlFor="bottle-series"
+              label="Series"
+              optional
+            >
+              <Select
+                disabled={!brand}
+                id="bottle-series"
+                onChange={(event) => {
+                  const next = event.currentTarget.value;
+                  setSeriesMode(next);
+                  if (!next) setValue("series", null, { shouldDirty: true });
+                  else if (next === "new") {
+                    setValue("series", draftSeries(newSeriesName), {
+                      shouldDirty: true,
+                    });
+                  } else {
+                    setValue("series", Number(next), { shouldDirty: true });
+                  }
+                }}
+                value={seriesMode || seriesChoiceId(initialData.series)}
+              >
+                <option value="">Not set</option>
+                {seriesResults.data?.results.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+                <option value="new">Add a new series…</option>
+              </Select>
+            </Field>
+            {seriesMode === "new" ? (
+              <Field
+                error={errors.series?.message}
+                htmlFor="bottle-new-series"
+                label="New series name"
+                required
+              >
+                <TextInput
+                  id="bottle-new-series"
+                  onChange={(event) => {
+                    const next = event.currentTarget.value;
+                    setNewSeriesName(next);
+                    setValue("series", draftSeries(next), {
                       shouldDirty: true,
                       shouldValidate: true,
                     });
-                  }
-                }}
-                value={booleanChoice(noAgeStatementChoices, value)}
-              />
-            )}
-          />
-
-          <TextField
-            {...register("abv", {
-              setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
-            })}
-            error={errors.abv}
-            type="number"
-            label="Alcohol (ABV)"
-            placeholder="e.g. 40.5"
-            helpText="The alcohol percentage shown on the label."
-            suffixLabel="%"
-            step="0.1"
-            min="0"
-            max="100"
-          />
-
-          <Controller
-            name="distillers"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <EntityField
-                {...field}
-                error={errors.distillers}
-                searchContext={{
-                  role: "distiller",
-                }}
-                label="Distilled By"
-                placeholder="e.g. Angel's Envy, Suntory Whisky"
-                helpText="The distilleries that produced the spirit."
-                createDialogHelpText="The distiller is the group that makes the spirit."
-                suggestedOptions={brandValue ? [brandValue] : []}
-                onChange={(value) => {
-                  onChange(value.map((option) => option.id || option));
-                  setDistillersValue(value);
-                }}
-                canCreate
-                value={distillersValue}
-                multiple
-              />
-            )}
-          />
-
-          <Controller
-            name="bottler"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <EntityField
-                {...field}
-                error={errors.bottler}
-                label="Bottler"
-                helpText="Market-facing bottler or release imprint for this bottle. It may match the brand or distillery."
-                placeholder="e.g. The Scotch Malt Whisky Society"
-                suggestedOptions={brandValue ? [brandValue] : []}
-                searchContext={{
-                  role: "bottler",
-                }}
-                onChange={(value) => {
-                  onChange(value?.id ?? value ?? null);
-                  setBottlerValue(value);
-                }}
-                canCreate
-                value={bottlerValue}
-              />
-            )}
-          />
-        </Fieldset>
-
-        <Fieldset>
-          <button
-            type="button"
-            className="flex w-full items-center justify-between px-4 py-4 text-left"
-            aria-controls="more-bottle-details"
-            aria-expanded={moreDetailsOpen}
-            onClick={() => setMoreDetailsOpen((open) => !open)}
-          >
-            <span>
-              <span className="block text-lg font-medium">More Details</span>
-              <span className="text-muted mt-1 block text-sm font-normal">
-                Edition, batch, year, cask information, and other optional
-                details.
-              </span>
-            </span>
-            {moreDetailsOpen ? (
-              <ChevronUpIcon className="text-muted h-5 w-5 shrink-0" />
-            ) : (
-              <ChevronDownIcon className="text-muted h-5 w-5 shrink-0" />
-            )}
-          </button>
-
-          <div id="more-bottle-details" hidden={!moreDetailsOpen}>
-            <TextField
-              {...register("edition")}
-              error={errors.edition}
-              type="text"
-              label="Edition or Batch"
-              helpText="An edition, batch, or label shown on the bottle."
-              placeholder="e.g. Batch 24"
-            />
-
-            <Controller
-              name="series"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SeriesField
-                  {...field}
-                  error={errors.series}
-                  label="Series"
-                  helpText="The series this bottle belongs to, if any."
-                  placeholder="e.g. A Midwinter Night's Dram"
-                  brand={brandValue?.id ? Number(brandValue.id) : 0}
-                  disabled={!brandValue}
-                  canCreate
-                  onChange={(value) => {
-                    onChange(value?.id ?? value ?? null);
-                    setSeriesValue(value);
                   }}
-                  value={seriesValue}
+                  value={newSeriesName}
                 />
-              )}
-            />
-
-            <TextField
-              {...register("vintageYear", {
-                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-              })}
-              error={errors.vintageYear}
-              type="number"
-              label="Distillation Year"
-              placeholder="e.g. 1986"
-              helpText="The year the spirit was distilled."
-            />
-
-            <TextField
-              {...register("bottlingYear", {
-                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-              })}
-              error={errors.bottlingYear}
-              type="number"
-              label="Bottling Year"
-              placeholder="e.g. 2023"
-              helpText="The year the whisky was bottled."
-            />
-
-            <TextField
-              {...register("releaseYear", {
-                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-              })}
-              error={errors.releaseYear}
-              type="number"
-              label="Release Year"
-              placeholder="e.g. 2024"
-              helpText="The year this release became available."
-            />
-
-            <TextField
-              {...register("releaseDate", {
-                setValueAs: (v) => (v === "" || !v ? null : v),
-              })}
-              error={errors.releaseDate}
-              type="date"
-              label="Exact Release Date"
-              helpText="The exact date this release became available, when known."
-            />
-
-            <BooleanField
+              </Field>
+            ) : null}
+            <FormGrid>
+              <YearField
+                error={errors.vintageYear?.message}
+                id="bottle-distillation-year"
+                label="Distillation year"
+                register={register("vintageYear", {
+                  setValueAs: (value) => numberOrNull(value),
+                })}
+              />
+              <YearField
+                error={errors.bottlingYear?.message}
+                id="bottle-bottling-year"
+                label="Bottling year"
+                register={register("bottlingYear", {
+                  setValueAs: (value) => numberOrNull(value),
+                })}
+              />
+              <YearField
+                error={errors.releaseYear?.message}
+                id="bottle-release-year"
+                label="Release year"
+                register={register("releaseYear", {
+                  setValueAs: (value) => numberOrNull(value),
+                })}
+              />
+              <Field
+                error={errors.releaseDate?.message}
+                htmlFor="bottle-release-date"
+                label="Exact release date"
+                optional
+              >
+                <TextInput
+                  {...register("releaseDate", {
+                    setValueAs: (value) => value || null,
+                  })}
+                  format="data"
+                  id="bottle-release-date"
+                  invalid={Boolean(errors.releaseDate)}
+                  type="date"
+                />
+              </Field>
+            </FormGrid>
+            <Controller
               control={control}
-              label="Single Cask"
-              helpText="Shown as a single-cask bottling on the label."
               name="singleCask"
+              render={({ field }) => (
+                <Switch
+                  checked={Boolean(field.value)}
+                  description="The label states that this is a single-cask bottling."
+                  label="Single cask"
+                  onCheckedChange={field.onChange}
+                />
+              )}
             />
-
-            <BooleanField
+            <Controller
               control={control}
-              label="Cask Strength"
-              helpText="Shown as cask strength on the label."
               name="caskStrength"
-            />
-
-            <Controller
-              name="naturalColor"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  label="Color"
-                  helpText="Use what the bottle or producer states."
-                  simple
-                  options={colorChoices}
-                  onChange={(choice) => onChange(booleanChoiceValue(choice))}
-                  value={booleanChoice(colorChoices, value)}
+              render={({ field }) => (
+                <Switch
+                  checked={Boolean(field.value)}
+                  description="The label states that this was bottled at cask strength."
+                  label="Cask strength"
+                  onCheckedChange={field.onChange}
                 />
               )}
             />
-
-            <Controller
-              name="nonChillFiltered"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  label="Filtration"
-                  helpText="Use what the bottle or producer states."
-                  simple
-                  options={filtrationChoices}
-                  onChange={(choice) => onChange(booleanChoiceValue(choice))}
-                  value={booleanChoice(filtrationChoices, value)}
-                />
-              )}
-            />
-
-            <TextField
-              {...register("maltPhenolPpm", {
-                setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
-              })}
-              error={errors.maltPhenolPpm}
-              type="number"
-              label="PPM"
-              placeholder="e.g. 101.4"
-              helpText="The phenol level of the malted barley, as stated by the producer for this bottle."
-              step="0.1"
-              min="0"
-            />
-
-            <TextAreaField
-              {...register("maturation", {
-                setValueAs: (value) => value?.trim() || null,
-              })}
-              error={errors.maturation}
+            <FormGrid>
+              <BooleanSelectField
+                choices={colorChoices}
+                id="bottle-color"
+                label="Color"
+                onChange={(value) =>
+                  setValue("naturalColor", value, { shouldDirty: true })
+                }
+                value={watch("naturalColor")}
+              />
+              <BooleanSelectField
+                choices={filtrationChoices}
+                id="bottle-filtration"
+                label="Filtration"
+                onChange={(value) =>
+                  setValue("nonChillFiltered", value, { shouldDirty: true })
+                }
+                value={watch("nonChillFiltered")}
+              />
+            </FormGrid>
+            <Field
+              error={errors.maltPhenolPpm?.message}
+              htmlFor="bottle-ppm"
+              label="Phenol level"
+              optional
+            >
+              <UnitInput
+                {...register("maltPhenolPpm", {
+                  setValueAs: (value) => numberOrNull(value),
+                })}
+                id="bottle-ppm"
+                invalid={Boolean(errors.maltPhenolPpm)}
+                min={0}
+                placeholder="101.4"
+                step="0.1"
+                unit="PPM"
+              />
+            </Field>
+            <Field
+              error={errors.maturation?.message}
+              hint="Use the producer's cask or maturation wording."
+              htmlFor="bottle-maturation"
               label="Maturation"
-              helpText="Copy the producer's cask or maturation wording."
-              placeholder="e.g. 2nd fill ex-bourbon hogshead"
-              rows={3}
-            />
-
-            <TextField
-              {...register("caskNumber", {
-                setValueAs: (value) => value?.trim() || null,
-              })}
-              error={errors.caskNumber}
-              type="text"
-              label="Cask Number"
-              helpText="The cask or barrel number shown by the producer."
-              placeholder="e.g. 35.401"
-            />
-
-            <TextField
-              {...register("outturn", {
-                setValueAs: (value) =>
-                  value === "" || !value ? null : parseInt(value, 10),
-              })}
-              error={errors.outturn}
-              type="number"
-              label="Outturn"
-              helpText="The total number of bottles in this release."
-              placeholder="e.g. 240"
-              min="1"
-            />
-
-            <Controller
-              name="flavorProfile"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.flavorProfile}
-                  placeholder="The flavor profile of the spirit."
-                  suggestedOptions={[]}
-                  label="Flavor Profile"
-                  onRenderOption={(option) => {
-                    const profile = FlavorProfileEnum.parse(option.id);
-                    const classes = classesForProfile(profile);
-                    return (
-                      <div className="flex flex-col items-start justify-start gap-y-2 text-left">
-                        <h4
-                          className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
-                        >
-                          {option.name}
-                        </h4>
-                        <div className="text-muted text-sm font-normal">
-                          {notesForProfile(profile)}
-                        </div>
-                      </div>
-                    );
-                  }}
-                  options={flavorProfileList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? {
-                          id: value,
-                          name: formatFlavorProfile(value),
-                        }
-                      : undefined
-                  }
+              optional
+            >
+              <Textarea
+                {...register("maturation", {
+                  setValueAs: (value) => value?.trim() || null,
+                })}
+                id="bottle-maturation"
+                invalid={Boolean(errors.maturation)}
+                placeholder="2nd fill ex-bourbon hogshead"
+                rows={3}
+              />
+            </Field>
+            <FormGrid>
+              <Field
+                error={errors.caskNumber?.message}
+                htmlFor="bottle-cask-number"
+                label="Cask number"
+                optional
+              >
+                <TextInput
+                  {...register("caskNumber", {
+                    setValueAs: (value) => value?.trim() || null,
+                  })}
+                  id="bottle-cask-number"
+                  invalid={Boolean(errors.caskNumber)}
+                  placeholder="35.401"
                 />
-              )}
-            />
-
-            {canUseBottleLookup && (
-              <div className="flex justify-end px-4 py-4">
+              </Field>
+              <Field
+                error={errors.outturn?.message}
+                htmlFor="bottle-outturn"
+                label="Outturn"
+                optional
+              >
+                <UnitInput
+                  {...register("outturn", {
+                    setValueAs: (value) => numberOrNull(value),
+                  })}
+                  id="bottle-outturn"
+                  invalid={Boolean(errors.outturn)}
+                  min={1}
+                  placeholder="240"
+                  unit="bottles"
+                />
+              </Field>
+            </FormGrid>
+            <Field
+              error={errors.flavorProfile?.message}
+              htmlFor="bottle-flavor-profile"
+              label="Flavor profile"
+              optional
+            >
+              <Select
+                {...register("flavorProfile", {
+                  setValueAs: (value) => value || null,
+                })}
+                id="bottle-flavor-profile"
+                invalid={Boolean(errors.flavorProfile)}
+              >
+                <option value="">Not set</option>
+                {FLAVOR_PROFILES.map((profile) => (
+                  <option key={profile} value={profile}>
+                    {formatFlavorProfile(profile)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            {user?.mod || user?.admin ? (
+              <FormActions>
                 <Button
-                  color="primary"
-                  onClick={async () => {
-                    const result =
-                      await generateDataMutation.mutateAsync(getValues());
-
-                    if (!result) return;
-                    const currentValues = getValues();
-                    if (result.description && !currentValues.description) {
-                      setValue("description", result.description, {
-                        shouldDirty: true,
-                      });
-                      setValue("descriptionSrc", "generated", {
-                        shouldDirty: true,
-                      });
-                    }
-
-                    if (result.flavorProfile && !currentValues.flavorProfile) {
-                      setValue(
-                        "flavorProfile",
-                        FlavorProfileEnum.parse(result.flavorProfile),
-                        { shouldDirty: true },
-                      );
-                    }
-                  }}
-                  disabled={generateDataMutation.isPending}
-                  icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
+                  loading={generateData.isPending}
+                  onClick={() => void fillDetails()}
+                  size="sm"
+                  variant="tonal"
                 >
-                  Suggest Description &amp; Flavor [Beta]
+                  <WandSparkles aria-hidden="true" size={15} />
+                  Fill description
                 </Button>
-              </div>
-            )}
-
-            <ImageField
-              name="image"
-              label="Catalog Image"
-              value={imageUrl}
-              onChange={(value) => setImage(value)}
-              noEditor
-            />
-
-            <TextAreaField
-              {...register("description", {
-                setValueAs: (v) => (v === "" || !v ? null : v),
-                onChange: () => {
-                  setValue("descriptionSrc", "user", { shouldDirty: true });
-                },
-              })}
-              error={errors.description}
+              </FormActions>
+            ) : null}
+            <FieldGroup label="Catalog image" optional>
+              <PictureInput
+                disabled={isSubmitting}
+                id="bottle-image"
+                label="Add a bottle image"
+                name="image"
+                onFilesSelected={(files) => {
+                  const file = files.item(0);
+                  if (!file) return;
+                  setImage(file);
+                  setImagePreview(URL.createObjectURL(file));
+                }}
+                onRemove={
+                  imagePreview
+                    ? () => {
+                        setImage(null);
+                        setImagePreview(undefined);
+                      }
+                    : undefined
+                }
+                preview={
+                  imagePreview
+                    ? { alt: "Current bottle image", src: imagePreview }
+                    : undefined
+                }
+              />
+            </FieldGroup>
+            <Field
+              error={errors.description?.message}
+              htmlFor="bottle-description"
               label="Description"
-              rows={8}
-            />
-          </div>
-        </Fieldset>
-      </Form>
-    </FormScreen>
+              optional
+            >
+              <Textarea
+                {...register("description", {
+                  onChange: () =>
+                    setValue("descriptionSrc", "user", { shouldDirty: true }),
+                  setValueAs: (value) => value || null,
+                })}
+                id="bottle-description"
+                invalid={Boolean(errors.description)}
+                rows={8}
+              />
+            </Field>
+          </FormDetails>
+        </FormStack>
+      </form>
+    </WorkflowScreen>
+  );
+}
+
+function YearField({
+  error,
+  id,
+  label,
+  register,
+}: {
+  error?: string;
+  id: string;
+  label: string;
+  register: ReturnType<ReturnType<typeof useForm<FormSchemaType>>["register"]>;
+}) {
+  return (
+    <Field error={error} htmlFor={id} label={label} optional>
+      <TextInput
+        {...register}
+        format="data"
+        id={id}
+        invalid={Boolean(error)}
+        max={new Date().getFullYear()}
+        min={1800}
+        placeholder="2024"
+        type="number"
+      />
+    </Field>
+  );
+}
+
+function BooleanSelectField({
+  choices,
+  id,
+  label,
+  onChange,
+  value,
+}: {
+  choices: readonly BooleanChoice[];
+  id: string;
+  label: string;
+  onChange: (value: boolean | null) => void;
+  value: boolean | null | undefined;
+}) {
+  return (
+    <Field htmlFor={id} label={label} optional>
+      <Select
+        id={id}
+        onChange={(event) =>
+          onChange(booleanChoiceValue(event.currentTarget.value))
+        }
+        value={booleanChoiceId(value)}
+      >
+        {choices.map((choice) => (
+          <option key={choice.id} value={choice.id}>
+            {choice.name}
+          </option>
+        ))}
+      </Select>
+    </Field>
   );
 }

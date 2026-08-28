@@ -88,8 +88,15 @@ export type {
   TextInputProps,
   TextareaProps,
 } from "./field.stylex";
-export { SegmentedControl, Select, Switch } from "./formControls.stylex";
+export {
+  ChoiceList,
+  SegmentedControl,
+  Select,
+  Switch,
+} from "./formControls.stylex";
 export type {
+  ChoiceListOption,
+  ChoiceListProps,
   SegmentedControlOption,
   SegmentedControlProps,
   SelectProps,
@@ -97,11 +104,17 @@ export type {
 } from "./formControls.stylex";
 export {
   FormActions,
+  FormDetails,
+  FormGrid,
   FormNotice,
   FormSection,
   FormStack,
 } from "./formLayout.stylex";
-export type { FormSectionProps } from "./formLayout.stylex";
+export type {
+  FormDetailsProps,
+  FormNoticeProps,
+  FormSectionProps,
+} from "./formLayout.stylex";
 export { FormSteps } from "./formSteps.stylex";
 export type { FormStep, FormStepsProps } from "./formSteps.stylex";
 export { HistoryTimeline } from "./historyTimeline.stylex";
@@ -159,10 +172,11 @@ export type {
 } from "./scoring.stylex";
 export { SearchBox } from "./searchBox.stylex";
 export type { SearchBoxProps } from "./searchBox.stylex";
-export { SearchPicker } from "./searchPicker.stylex";
+export { SearchPicker, SearchSelect } from "./searchPicker.stylex";
 export type {
   SearchPickerOption,
   SearchPickerProps,
+  SearchSelectProps,
 } from "./searchPicker.stylex";
 export { SearchResults } from "./searchResults.stylex";
 export type {

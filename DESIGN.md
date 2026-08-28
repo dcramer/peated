@@ -238,6 +238,14 @@ Thin data is normal.
 
 New design-system components use StyleX and own their visual states. Name files that contain StyleX calls `*.stylex.ts` or `*.stylex.tsx`; this keeps the compile boundary narrow and explicit. Product screens compose these components without adding Tailwind classes to the same elements. Keep global CSS for document defaults and third-party markup that a component cannot own.
 
+Use the shared composition baseline before adding another visual container:
+
+- Use `Card`, `CardLink`, and `CardGrid` for neutral content cards. Add a named card component only when it owns a Peated concept, data contract, or behavior.
+- Use `DataTable` for ordinary comparison rows. The route owns fetching, URL state, sorting, filtering, and paging. Keep a specialized table only when its compact layout or columns are part of a product contract.
+- Use `FormStack`, `FormSection`, `FormGrid`, `FormDetails`, `FormActions`, and `FormNotice` to compose workflows. Field components own labels and controls; routes own state and mutations.
+- Use `SearchSelect` for one remote record and `SearchPicker` for several. The caller owns the query and available results.
+- Use `WorkflowScreen` for standalone add, edit, merge, and capture tasks. Do not put complete workflow routes in Storybook. Show reusable controls and meaningful component states there.
+
 Name an exported component after the Peated concept or user task that it owns. Use a normal UI noun for a generic control. Do not name a component after its implementation shape with words such as `Product`, `Experience`, `Surface`, `Shell`, `Widget`, `Module`, `Structure`, or `Record` unless that word is the real product concept. Storybook titles use the same nouns as the product and group them by their owning domain. State names describe what the reviewer sees or does.
 
 Storybook is the living view of the implemented shared system. Its sidebar lists foundation topics and reusable components grouped by domain. Keep each component's story file beside its implementation. A simple component starts with one Overview story that renders its useful static variants together and exposes narrow props through Storybook controls. Do not add separate stories for sizes, labels, selected values, item counts, or other prop permutations that can be understood in the overview or controls. Add a separate named story only when a behavior, asynchronous state, permission boundary, error, or responsive composition needs a stable direct review URL. A named behavior story renders its scenario directly and deterministically; reviewers do not click through setup steps to reach the state under review. Add a group only after it contains real exported tokens or components. Stories render the same components used by product screens. Do not add visual copies, placeholder controls, empty groups, route-specific sections, or complete page compositions.

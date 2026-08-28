@@ -13,12 +13,12 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { Button, IconButton } from "../components";
+import { Button, IconButton, LoadingList } from "../components";
 
 export type WorkflowScreenProps = {
   children: ReactNode;
   onClose?: () => void;
-  onSave: (event: FormEvent<HTMLButtonElement>) => void;
+  onSave?: (event: FormEvent<HTMLButtonElement>) => void;
   saveLabel?: string;
   saving?: boolean;
   title: string;
@@ -50,19 +50,38 @@ export function WorkflowScreen({
             Peated
           </Link>
           <h1 {...stylex.props(styles.title)}>{title}</h1>
-          <Button
-            loading={saving}
-            loadingLabel="Saving…"
-            onClick={onSave}
-            size="sm"
-            variant="accent"
-          >
-            {saveLabel}
-          </Button>
+          {onSave ? (
+            <Button
+              loading={saving}
+              loadingLabel="Saving…"
+              onClick={onSave}
+              size="sm"
+              variant="accent"
+            >
+              {saveLabel}
+            </Button>
+          ) : (
+            <span />
+          )}
         </div>
       </header>
       <div {...stylex.props(styles.content)}>{children}</div>
     </main>
+  );
+}
+
+/** Reserves the standalone workflow frame while its route data loads. */
+export function WorkflowLoading({
+  label = "Loading form",
+  title = "Loading",
+}: {
+  label?: string;
+  title?: string;
+}) {
+  return (
+    <WorkflowScreen title={title}>
+      <LoadingList label={label} rows={3} />
+    </WorkflowScreen>
   );
 }
 

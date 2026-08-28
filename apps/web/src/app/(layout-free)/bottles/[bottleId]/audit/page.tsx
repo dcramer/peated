@@ -1,28 +1,27 @@
 "use client";
 
 import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import Link from "@peated/web/components/link";
-import TextAreaField from "@peated/web/components/textAreaField";
+import {
+  Field,
+  FormNotice,
+  FormSection,
+  FormStack,
+  SelectedBottleSummary,
+  Textarea,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { use, useState, type FormEvent } from "react";
 
-interface AuditRequestInput {
-  bottle: number;
-  note?: string;
-}
-
 export default function AuditBottle(props: {
   params: Promise<{ bottleId: string }>;
 }) {
   const { bottleId } = use(props.params);
-
   return (
     <ModRequired>
       <AuditBottleForm bottleId={bottleId} />
@@ -34,123 +33,81 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
   const orpc = useORPC();
   const router = useRouter();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({
-      input: { bottle: Number(bottleId) },
-    }),
+    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
   );
-  const auditMutation = useMutation(orpc.audits.create.mutationOptions());
+  const audit = useMutation(orpc.audits.create.mutationOptions());
   const [note, setNote] = useState("");
-  const [cleanSummary, setCleanSummary] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string>();
+  const [error, setError] = useState<string>();
 
   async function runAudit(
-    event: FormEvent<HTMLFormElement | HTMLButtonElement>,
+    event: FormEvent<HTMLButtonElement | HTMLFormElement>,
   ) {
     event.preventDefault();
-    const input: AuditRequestInput = { bottle: bottle.id };
-    if (note.trim()) input.note = note.trim();
-    const result = await auditMutation.mutateAsync(input);
-    if (result.status === "needs_review") {
-      router.replace(moderationHrefForAudit(result.audit));
-      return;
-    }
-    setCleanSummary(result.summary);
-  }
-
-  function handlePrimaryAction(
-    event: FormEvent<HTMLFormElement | HTMLButtonElement>,
-  ) {
-    if (cleanSummary) {
-      event.preventDefault();
+    if (summary) {
       router.push(`/bottles/${bottle.id}`);
       return;
     }
-    void runAudit(event);
+
+    setError(undefined);
+    try {
+      const context = note.trim();
+      const input = {
+        bottle: bottle.id,
+        note: context || undefined,
+      } satisfies Parameters<typeof audit.mutateAsync>[0];
+      const result = await audit.mutateAsync(input);
+      if (result.status === "needs_review") {
+        router.replace(moderationHrefForAudit(result.audit));
+        return;
+      }
+      setSummary(result.summary);
+    } catch (caught) {
+      setError(
+        getFormErrorMessage(caught, {
+          allowAnyErrorMessage: true,
+          fallbackMessage:
+            "The audit could not be completed. Try again when the classifier is available.",
+        }),
+      );
+    }
   }
 
   return (
-    <FormScreen
-      title="Audit Bottle"
-      saveDisabled={auditMutation.isPending}
-      saveLabel={
-        cleanSummary
-          ? "Return to Bottle"
-          : auditMutation.isPending
-            ? "Running Audit"
-            : "Run Bottle Audit"
-      }
-      onSave={handlePrimaryAction}
+    <WorkflowScreen
+      onSave={runAudit}
+      saveLabel={summary ? "Return to bottle" : "Run audit"}
+      saving={audit.isPending}
+      title="Audit bottle"
     >
-      {cleanSummary ? (
-        <Fieldset>
-          <section
-            aria-labelledby="audit-bottle-result"
-            className="relative block px-4 py-5 text-white"
-          >
-            <div className="flex items-start gap-3">
-              <div
-                aria-hidden="true"
-                className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400"
-              />
-              <div>
-                <h2
-                  className="font-semibold leading-6"
-                  id="audit-bottle-result"
-                >
-                  No changes proposed
-                </h2>
-                <p className="mt-1 text-sm text-slate-300">{cleanSummary}</p>
-                <Link
-                  className="text-highlight mt-3 inline-block text-sm font-semibold hover:underline"
-                  href={`/bottles/${bottle.id}`}
-                >
-                  {bottle.fullName}
-                </Link>
-              </div>
-            </div>
-          </section>
-        </Fieldset>
-      ) : (
-        <Form onSubmit={runAudit} isSubmitting={auditMutation.isPending}>
-          {auditMutation.isError ? (
-            <FormError
-              values={[
-                auditMutation.error instanceof Error
-                  ? auditMutation.error.message
-                  : "The audit could not be completed. Try again when the classifier is available.",
-              ]}
-            />
-          ) : null}
-
-          <Fieldset>
-            <section
-              aria-labelledby="audit-bottle-target"
-              className="relative block px-4 py-4 text-white"
+      <form onSubmit={runAudit}>
+        <FormStack>
+          <SelectedBottleSummary
+            bottleId={bottle.peatedId}
+            imageUrl={bottle.imageUrl}
+            metadata={getBottleMetadata(bottle)}
+            name={bottle.fullName}
+          />
+          {error ? <FormNotice>{error}</FormNotice> : null}
+          {summary ? (
+            <FormNotice>No changes proposed. {summary}</FormNotice>
+          ) : (
+            <FormSection
+              description="The audit is read-only. Each suggested change still requires separate approval."
+              title="Audit context"
             >
-              <h2
-                className="mb-2 font-semibold leading-6"
-                id="audit-bottle-target"
-              >
-                Bottle
-              </h2>
-              <Link
-                className="font-medium text-white hover:underline"
-                href={`/bottles/${bottle.id}`}
-              >
-                {bottle.fullName}
-              </Link>
-            </section>
-            <TextAreaField
-              name="note"
-              label="Optional context"
-              helpText="The audit is read-only. Each Suggested Change requires separate admin approval."
-              onChange={(event) => setNote(event.target.value)}
-              placeholder="What looks wrong?"
-              rows={4}
-              value={note}
-            />
-          </Fieldset>
-        </Form>
-      )}
-    </FormScreen>
+              <Field htmlFor="audit-note" label="What looks wrong?" optional>
+                <Textarea
+                  id="audit-note"
+                  onChange={(event) => setNote(event.currentTarget.value)}
+                  rows={5}
+                  value={note}
+                />
+              </Field>
+            </FormSection>
+          )}
+        </FormStack>
+      </form>
+    </WorkflowScreen>
   );
 }

@@ -27,11 +27,31 @@ export type SearchPickerProps = {
   label: string;
   loading?: boolean;
   onChange: (value: readonly SearchPickerOption[]) => void;
+  onCreate?: (query: string) => void;
   onQueryChange?: (query: string) => void;
   options: readonly SearchPickerOption[];
   placeholder: string;
   value: readonly SearchPickerOption[];
 };
+
+export type SearchSelectProps = Omit<
+  SearchPickerProps,
+  "onChange" | "value"
+> & {
+  onChange: (value: SearchPickerOption | null) => void;
+  value: SearchPickerOption | null;
+};
+
+/** Selects one supplied record while the caller owns remote search. */
+export function SearchSelect({ onChange, value, ...props }: SearchSelectProps) {
+  return (
+    <SearchPicker
+      {...props}
+      onChange={(next) => onChange(next.at(-1) ?? null)}
+      value={value ? [value] : []}
+    />
+  );
+}
 
 /** Selects several supplied records while the caller owns remote search. */
 export function SearchPicker({
@@ -40,6 +60,7 @@ export function SearchPicker({
   label,
   loading = false,
   onChange,
+  onCreate,
   onQueryChange,
   options,
   placeholder,
@@ -62,6 +83,7 @@ export function SearchPicker({
     );
   }, [options, query, value]);
   const activeOption = availableOptions[activeIndex];
+  const trimmedQuery = query.trim();
 
   function selectOption(option: SearchPickerOption) {
     onChange([...value, option]);
@@ -200,6 +222,21 @@ export function SearchPicker({
                 </p>
               )}
             </div>
+            {onCreate && trimmedQuery ? (
+              <button
+                onClick={() => {
+                  onCreate(trimmedQuery);
+                  setQuery("");
+                  onQueryChange?.("");
+                  setActiveIndex(-1);
+                  setIsOpen(false);
+                }}
+                type="button"
+                {...stylex.props(styles.createAction)}
+              >
+                Add “{trimmedQuery}”
+              </button>
+            ) : null}
           </FloatingPanel>
         ) : null}
       </div>
@@ -285,6 +322,23 @@ const styles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "14px",
     lineHeight: 1.4,
+  },
+  createAction: {
+    boxSizing: "border-box",
+    display: "block",
+    width: "100%",
+    padding: space.x3,
+    borderWidth: 0,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+    backgroundColor: { default: colors.surface, ":hover": colors.inset },
+    color: colors.accentDeep,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 700,
+    textAlign: "left",
+    cursor: "pointer",
   },
   help: { margin: 0, color: colors.inkMuted },
 });

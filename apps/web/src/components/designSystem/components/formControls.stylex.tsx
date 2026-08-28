@@ -114,6 +114,82 @@ export function SegmentedControl<Value extends string>({
   );
 }
 
+export type ChoiceListOption<Value extends string = string> = {
+  description?: ReactNode;
+  disabled?: boolean;
+  label: ReactNode;
+  value: Value;
+};
+
+export type ChoiceListProps<Value extends string = string> = {
+  disabled?: boolean;
+  id: string;
+  label: string;
+  name: string;
+  onChange: (value: Value) => void;
+  options: readonly ChoiceListOption<Value>[];
+  value: Value;
+};
+
+/** Presents mutually exclusive choices that need more space than tabs. */
+export function ChoiceList<Value extends string>({
+  disabled = false,
+  id,
+  label,
+  name,
+  onChange,
+  options,
+  value,
+}: ChoiceListProps<Value>) {
+  return (
+    <div aria-label={label} role="radiogroup" {...stylex.props(styles.choices)}>
+      {options.map((option) => {
+        const checked = option.value === value;
+        const optionDisabled = disabled || option.disabled;
+        return (
+          <label
+            key={option.value}
+            {...stylex.props(
+              styles.choice,
+              checked && styles.choiceChecked,
+              optionDisabled && styles.disabled,
+            )}
+          >
+            <input
+              checked={checked}
+              disabled={optionDisabled}
+              id={`${id}-${option.value}`}
+              name={name}
+              onChange={() => onChange(option.value)}
+              type="radio"
+              value={option.value}
+              {...stylex.props(styles.visuallyHiddenInput)}
+            />
+            <span aria-hidden="true" {...stylex.props(styles.radioMark)}>
+              {checked ? <span {...stylex.props(styles.radioDot)} /> : null}
+            </span>
+            <span {...stylex.props(styles.choiceCopy)}>
+              <span {...stylex.props(foundationStyles.interactive)}>
+                {option.label}
+              </span>
+              {option.description ? (
+                <span
+                  {...stylex.props(
+                    foundationStyles.metadata,
+                    styles.description,
+                  )}
+                >
+                  {option.description}
+                </span>
+              ) : null}
+            </span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
 export type SwitchProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   | "checked"
@@ -176,6 +252,61 @@ export function Switch({
 }
 
 const styles = stylex.create({
+  choices: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    rowGap: space.x2,
+  },
+  choice: {
+    position: "relative",
+    boxSizing: "border-box",
+    display: "flex",
+    minWidth: 0,
+    alignItems: "flex-start",
+    gap: space.x3,
+    padding: space.x4,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: { default: colors.inset, ":hover": colors.surface },
+    color: colors.ink,
+    cursor: "pointer",
+    boxShadow: { default: "none", ":focus-within": effects.focusRing },
+  },
+  choiceChecked: {
+    borderColor: colors.accentDeep,
+    backgroundColor: colors.accentTint,
+  },
+  choiceCopy: {
+    display: "flex",
+    minWidth: 0,
+    flex: 1,
+    flexDirection: "column",
+    rowGap: space.x1,
+  },
+  radioMark: {
+    boxSizing: "border-box",
+    display: "flex",
+    width: "18px",
+    height: "18px",
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: "1px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.inkMuted,
+    borderRadius: "50%",
+  },
+  radioDot: {
+    display: "block",
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    backgroundColor: colors.accentDeep,
+  },
   selectWrapper: {
     position: "relative",
     display: "block",

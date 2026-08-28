@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import { ChevronDown } from "lucide-react";
 import type { HTMLAttributes, ReactNode } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
@@ -6,6 +7,10 @@ import { colors, fonts, space } from "../../../styles/tokens.stylex";
 
 export function FormStack({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.stack)}>{children}</div>;
+}
+
+export function FormGrid({ children }: { children: ReactNode }) {
+  return <div {...stylex.props(styles.grid)}>{children}</div>;
 }
 
 export type FormSectionProps = Omit<
@@ -50,11 +55,60 @@ export function FormActions({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.actions)}>{children}</div>;
 }
 
-export function FormNotice({ children }: { children: ReactNode }) {
+export type FormNoticeProps = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "className" | "style"
+> & {
+  children: ReactNode;
+};
+
+export function FormNotice({
+  children,
+  role = "status",
+  ...props
+}: FormNoticeProps) {
   return (
-    <div role="status" {...stylex.props(styles.notice)}>
+    <div {...props} role={role} {...stylex.props(styles.notice)}>
       {children}
     </div>
+  );
+}
+
+export type FormDetailsProps = {
+  children: ReactNode;
+  defaultOpen?: boolean;
+  description?: ReactNode;
+  title: ReactNode;
+};
+
+/** Keeps optional form fields available without making the primary form dense. */
+export function FormDetails({
+  children,
+  defaultOpen = false,
+  description,
+  title,
+}: FormDetailsProps) {
+  return (
+    <details open={defaultOpen || undefined} {...stylex.props(styles.details)}>
+      <summary {...stylex.props(styles.summary)}>
+        <span {...stylex.props(styles.copy)}>
+          <span {...stylex.props(foundationStyles.sectionHeading)}>
+            {title}
+          </span>
+          {description ? (
+            <span {...stylex.props(foundationStyles.body, styles.description)}>
+              {description}
+            </span>
+          ) : null}
+        </span>
+        <ChevronDown
+          aria-hidden="true"
+          size={18}
+          {...stylex.props(styles.detailsIcon)}
+        />
+      </summary>
+      <div {...stylex.props(styles.detailFields)}>{children}</div>
+    </details>
   );
 }
 
@@ -64,6 +118,15 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     rowGap: space.x4,
+  },
+  grid: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      "@media (max-width: 559px)": "1fr",
+    },
+    gap: space.x4,
   },
   section: {
     boxSizing: "border-box",
@@ -121,5 +184,38 @@ const styles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "14px",
     lineHeight: 1.45,
+  },
+  details: {
+    boxSizing: "border-box",
+    minWidth: 0,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    backgroundColor: colors.surface,
+  },
+  summary: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: space.x4,
+    padding: { default: space.x6, "@media (max-width: 559px)": space.x4 },
+    listStyle: "none",
+    cursor: "pointer",
+    "::-webkit-details-marker": { display: "none" },
+  },
+  detailsIcon: { flexShrink: 0, color: colors.inkMuted },
+  detailFields: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    rowGap: space.x4,
+    paddingTop: 0,
+    paddingRight: { default: space.x6, "@media (max-width: 559px)": space.x4 },
+    paddingBottom: {
+      default: space.x6,
+      "@media (max-width: 559px)": space.x4,
+    },
+    paddingLeft: { default: space.x6, "@media (max-width: 559px)": space.x4 },
   },
 });

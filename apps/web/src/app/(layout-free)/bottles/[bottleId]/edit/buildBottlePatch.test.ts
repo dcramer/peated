@@ -169,7 +169,7 @@ describe("buildBottlePatch", () => {
     });
   });
 
-  test("clears a removed image but leaves a new canvas to the upload route", () => {
+  test("clears a removed image but leaves a new file to the upload route", () => {
     expect(buildBottlePatch(formValue({ image: null }), submitMeta())).toEqual({
       image: null,
     });
@@ -177,7 +177,7 @@ describe("buildBottlePatch", () => {
     expect(
       buildBottlePatch(
         formValue({
-          image: document.createElement("canvas"),
+          image: new File(["image"], "bottle.jpg", { type: "image/jpeg" }),
         }),
         submitMeta(),
       ),

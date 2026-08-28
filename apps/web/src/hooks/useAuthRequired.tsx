@@ -1,6 +1,6 @@
 "use client";
 
-import Spinner from "@peated/web/components/spinner";
+import { LoadingList } from "@peated/web/components/designSystem/components";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { redirectToAuth } from "../lib/auth";
@@ -94,7 +94,9 @@ export function useVerifiedRequired() {
  * Holds child hooks until the authenticated session is available client-side.
  */
 export function AuthRequired({ children }: { children: ReactNode }) {
-  if (useAuthRequired() === false) return <Spinner />;
+  if (useAuthRequired() === false) {
+    return <LoadingList label="Checking account" rows={3} />;
+  }
   return <>{children}</>;
 }
 
@@ -102,7 +104,9 @@ export function AuthRequired({ children }: { children: ReactNode }) {
  * Holds child hooks until a moderator session is available client-side.
  */
 export function ModRequired({ children }: { children: ReactNode }) {
-  if (useModRequired() === false) return <Spinner />;
+  if (useModRequired() === false) {
+    return <LoadingList label="Checking access" rows={3} />;
+  }
   return <>{children}</>;
 }
 
@@ -110,6 +114,8 @@ export function ModRequired({ children }: { children: ReactNode }) {
  * Holds child hooks until a verified session is available client-side.
  */
 export function VerifiedRequired({ children }: { children: ReactNode }) {
-  if (useVerifiedRequired() === false) return <Spinner />;
+  if (useVerifiedRequired() === false) {
+    return <LoadingList label="Checking account" rows={3} />;
+  }
   return <>{children}</>;
 }

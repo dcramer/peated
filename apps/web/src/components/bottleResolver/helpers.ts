@@ -1,9 +1,11 @@
-import type { Inputs, Outputs } from "@peated/server/orpc/router";
+import type { Inputs } from "@peated/server/orpc/router";
 import { CategoryEnum } from "@peated/server/schemas";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { z } from "zod";
 
-export type PhotoIdentification = Outputs["tastings"]["photoIdentification"];
+import { getFieldValue, type PhotoIdentification } from "./fieldValues";
+
+export type { PhotoIdentification } from "./fieldValues";
 export type PhotoIdentificationCreateInput =
   Inputs["tastings"]["photoIdentificationCreate"];
 
@@ -18,27 +20,6 @@ export function createIdempotencyKey() {
   const randomId = globalThis.crypto?.randomUUID?.();
   if (randomId) return randomId;
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-export function getFieldValue(
-  result: PhotoIdentification | null,
-  field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
-) {
-  const value = result?.imageEvidence.fieldCandidates[field]?.value;
-  if (value === undefined || value === null) return null;
-  if (Array.isArray(value)) return value.join(", ");
-  const booleanValue = z.boolean().safeParse(value);
-  if (booleanValue.success) return booleanValue.data ? "Yes" : "No";
-  if (field === "statedAge") return `${value} years`;
-  if (field === "abv") return `${value}% ABV`;
-  if (field === "category") {
-    return String(value)
-      .split("_")
-      .filter(Boolean)
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(" ");
-  }
-  return String(value);
 }
 
 function getRawFieldValue(
