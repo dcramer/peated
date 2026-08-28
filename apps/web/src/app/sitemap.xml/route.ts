@@ -1,3 +1,4 @@
+import { ENTITY_SITEMAP_COLLECTIONS } from "@peated/web/lib/entitySitemaps";
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
 
 const SITEMAP_CACHE_CONTROL =
@@ -11,7 +12,9 @@ export const dynamic = "force-static";
 export async function GET() {
   const sitemapIndexXML = await buildSitemapIndex([
     "/sitemaps/locations.xml",
-    "/sitemaps/entities/sitemap.xml",
+    ...ENTITY_SITEMAP_COLLECTIONS.map(
+      ({ collection }) => `/sitemaps/${collection}/sitemap.xml`,
+    ),
     "/sitemaps/bottles/sitemap.xml",
     "/sitemaps/static.xml",
   ]);

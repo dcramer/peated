@@ -1,3 +1,7 @@
+import {
+  getEntitySitemapCollection,
+  getEntitySitemapPagePaths,
+} from "@peated/web/lib/entitySitemaps";
 import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
 
@@ -6,29 +10,20 @@ const SITEMAP_CACHE_CONTROL =
 
 export const dynamic = "force-dynamic";
 
-const PAGE_LIMIT = 1000;
-
-function range(end: number, _: number): number[];
-function range(start: number, end?: number): number[] {
-  if (end === undefined) {
-    end = start;
-    start = 0;
+export async function GET(
+  request: Request,
+  props: { params: Promise<{ collection: string }> },
+) {
+  const { collection } = await props.params;
+  const sitemapCollection = getEntitySitemapCollection(collection);
+  if (!sitemapCollection) {
+    return new Response(null, { status: 404 });
   }
-  const r = [];
-  for (let i = start; i <= end; i++) {
-    r.push(i);
-  }
-  return r;
-}
 
-export async function GET() {
   const { client } = await createAnonymousServerClient();
-
-  const { totalEntities } = await client.stats();
+  const stats = await client.stats();
   const sitemapIndexXML = await buildSitemapIndex(
-    range(1, Math.ceil(totalEntities / PAGE_LIMIT)).map(
-      (i) => `/sitemaps/entities/${i}/sitemap.xml`,
-    ),
+    getEntitySitemapPagePaths(collection, stats[sitemapCollection.statsKey]),
   );
 
   return new Response(sitemapIndexXML, {

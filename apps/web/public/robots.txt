@@ -22,4 +22,8 @@ Host: https://peated.com
 # Sitemaps
 Sitemap: https://peated.com/sitemap.xml
 Sitemap: https://peated.com/sitemaps/bottles/sitemap.xml
-Sitemap: https://peated.com/sitemaps/entities/sitemap.xml
+Sitemap: https://peated.com/sitemaps/brands/sitemap.xml
+Sitemap: https://peated.com/sitemaps/distillers/sitemap.xml
+Sitemap: https://peated.com/sitemaps/bottlers/sitemap.xml
+Sitemap: https://peated.com/sitemaps/blenders/sitemap.xml
+Sitemap: https://peated.com/sitemaps/companies/sitemap.xml
