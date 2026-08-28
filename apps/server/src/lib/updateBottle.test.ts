@@ -559,7 +559,7 @@ describe("Bottle updates", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, selectedBrand.id),
       }),
-    ).toMatchObject({ kind: "blender", type: [] });
+    ).toMatchObject({ kind: "blender" });
     const audits = await loadUpdateAudits([first.bottle.id]);
     expect(audits).toHaveLength(1);
     expect(audits[0].data).toMatchObject({ updateScope: "shared" });

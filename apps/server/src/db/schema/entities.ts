@@ -23,12 +23,6 @@ import { regions } from "./regions";
 
 export type EntityKind = (typeof ENTITY_KIND_LIST)[number];
 
-export const legacyEntityTypeEnum = pgEnum("entity_type", [
-  "brand",
-  "distiller",
-  "bottler",
-]);
-
 export const entityKindEnum = pgEnum("entity_kind", ENTITY_KIND_LIST);
 
 export const entities = pgTable(
@@ -54,12 +48,6 @@ export const entities = pgTable(
     address: text("address"),
     location: geometry_point("location"),
 
-    // Transitional migration storage only. Application code must not read or
-    // write this field. Remove it after the final kind cutover is stable.
-    type: legacyEntityTypeEnum("type")
-      .array()
-      .default(sql`ARRAY[]::entity_type[]`)
-      .notNull(),
     // Every Entity has one top-level identity kind. Bottle links describe how
     // an Entity is used and must not change this value.
     kind: entityKindEnum("kind").notNull(),

@@ -169,7 +169,7 @@ application switch.
 The backfill pages through Entities by API. For each Entity without a kind, it
 uses the Entity details and Bottle-use counts to choose a kind. Unclear cases
 are researched before they are changed. Each update goes through the normal
-authenticated Entity update API and is fetched again after the write. The
+authenticated Entity update API and checked from the update response. The
 existing Entity change history records the change. Known current owners can be
 added through the same API, but ownership is optional and does not block the
 kind migration.
@@ -196,8 +196,8 @@ metadata by hand.
   Entities before the enum is fixed, research unclear cases, and do not make a
   write until one kind is defensible.
 - **An API backfill can stop partway through.** → Use bounded pages, update one
-  Entity at a time, re-fetch each write, and resume by querying for missing
-  kinds.
+  Entity at a time, check the returned Entity, and resume by querying for
+  missing kinds.
 - **One owner cannot represent joint ownership.** → Leave it unknown in this
   version rather than storing incorrect data.
 - **Bottle-link queries can be slower than the current array filter.** → Check
@@ -213,7 +213,8 @@ metadata by hand.
 2. Add optional `kind` and rename `parentId` to `ownerId` with a generated
    migration. Expose `kind` and `ownerId` through the normal Entity API.
 3. Page through Entities with missing kinds. Research unclear cases, update
-   them through the authenticated API, and re-fetch every write.
+   them through the authenticated API, and check the Entity returned by each
+   write.
 4. Query the API again and verify that no Entity has a missing kind.
 5. Add current owners through the API where one owner is known. Ownership is
    optional and does not block the

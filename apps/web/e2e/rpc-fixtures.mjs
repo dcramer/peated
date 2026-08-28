@@ -110,6 +110,37 @@ export const testBrand = {
   updatedAt: timestamp,
 };
 
+export const testOwner = {
+  ...testBrand,
+  id: 9202,
+  peatedId: "E9202",
+  name: "Diageo",
+  kind: "company",
+};
+
+export const testOwnedEntity = {
+  ...testBrand,
+  id: 9203,
+  peatedId: "E9203",
+  name: "Lagavulin Distillery",
+  kind: "distillery",
+  ownerId: testOwner.id,
+  owner: {
+    id: testOwner.id,
+    peatedId: testOwner.peatedId,
+    name: testOwner.name,
+  },
+};
+
+export const emptyEntityCatalog = {
+  totalBottles: 0,
+  relationships: { brand: 0, bottler: 0, distiller: 0 },
+  distilleryCoverage: { documented: 0, total: 0 },
+  categories: [],
+  related: { brands: [], bottlers: [], distillers: [] },
+  notableBottles: [],
+};
+
 export const existingBottleId = 9301;
 export const createdBottleId = 9302;
 export const exactMatchedBottleId = 9305;

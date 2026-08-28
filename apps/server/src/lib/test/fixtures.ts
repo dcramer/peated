@@ -340,7 +340,6 @@ export const Entity = async (
     const entityData: dbSchema.NewEntity = {
       name,
       countryId: data.countryId ?? (await Country({}, tx)).id,
-      type: [],
       kind: data.kind ?? "brand",
       createdAt: new Date(),
       updatedAt: new Date(),

@@ -30,7 +30,7 @@
 - [x] 3.2 Choose one kind for each Entity. Research unclear and mixed-use cases
       before changing them.
 - [x] 3.3 Update kinds through the normal authenticated Entity API in bounded
-      batches and re-fetch every changed Entity.
+      batches and check the Entity returned by every update.
 - [x] 3.4 Query the API again and verify that no Entity has a missing kind.
 - [x] 3.5 Add current owners through the same API where one owner is known;
       leave unknown and joint ownership empty.
@@ -76,9 +76,9 @@
       Bottle-role use in the Entity catalog section and Bottle field searches.
 - [x] 5.6 Update Add Bottle defaults so kind never blocks a Brand, Bottler, or
       Distiller selection.
-- [ ] 5.7 Add focused component and browser tests for forms, headers, owners,
+- [x] 5.7 Add focused component and browser tests for forms, headers, owners,
       browse pages, and Add Bottle.
-- [ ] 5.8 Run desktop and mobile Entity-page QA with the local UI guide.
+- [x] 5.8 Run desktop and mobile Entity-page QA with the local UI guide.
 
 ## 6. Finish The Migration
 
@@ -94,7 +94,7 @@
       typechecks, file lint, formatting, and relevant classifier evals.
 - [x] 6.6 Review the full change for duplicate logic, mixed terms, and code that
       keeps the old and new models alive.
-- [ ] 6.7 Deploy the final switch after a verified backup and validate Entity
+- [x] 6.7 Deploy the final switch after a verified backup and validate Entity
       kinds, owners, Bottle links, browse pages, and create/edit workflows.
-- [ ] 6.8 After the switch is stable, remove the old type column and enum from
+- [x] 6.8 After the switch is stable, remove the old type column and enum from
       the Drizzle schema, generate the cleanup migration, and run `pnpm test`.

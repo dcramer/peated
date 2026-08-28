@@ -36,7 +36,9 @@ export default function OwnedEntities({ ownerId }: { ownerId: number }) {
             >
               {entity.name}
             </Link>
-            <Chip size="small">{toTitleCase(entity.kind)}</Chip>
+            <Chip as="span" size="small">
+              {toTitleCase(entity.kind)}
+            </Chip>
           </li>
         ))}
       </ul>

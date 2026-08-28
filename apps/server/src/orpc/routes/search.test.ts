@@ -32,12 +32,10 @@ describe("GET /search", () => {
     });
     const blender = await fixtures.Entity({
       name: "Contractneedle Blender",
-      type: [],
       kind: "blender",
     });
     const company = await fixtures.Entity({
       name: "Contractneedle Company",
-      type: [],
       kind: "company",
     });
     const region = await fixtures.Region({
@@ -141,12 +139,10 @@ describe("GET /search", () => {
     });
     await fixtures.Entity({
       name: "Population Blender",
-      type: [],
       kind: "blender",
     });
     await fixtures.Entity({
       name: "Population Company",
-      type: [],
       kind: "company",
     });
 
@@ -296,7 +292,7 @@ describe("GET /search", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const entity = await fixtures.Entity({ type: [], kind: "company" });
+    const entity = await fixtures.Entity({ kind: "company" });
     await db.insert(bottleTombstones).values({
       bottleId: 9001,
       newBottleId: bottle.id,

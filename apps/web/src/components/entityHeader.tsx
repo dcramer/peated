@@ -1,6 +1,7 @@
 import type { Entity } from "@peated/server/types";
 import EntityIcon from "@peated/web/assets/entity.svg";
 import Link from "@peated/web/components/link";
+import type { ElementType } from "react";
 import { getEntityKindSearchUrl, getEntityUrl } from "../lib/urls";
 import Chip from "./chip";
 import PageHeader from "./pageHeader";
@@ -9,13 +10,15 @@ import PeatedId from "./peatedId";
 export default function EntityHeader({
   entity,
   to,
+  icon = EntityIcon,
 }: {
   entity: Entity;
   to?: string;
+  icon?: ElementType;
 }) {
   return (
     <PageHeader
-      icon={EntityIcon}
+      icon={icon}
       title={entity.name}
       titleExtra={
         <div className="flex max-w-full flex-col items-center lg:items-start">
