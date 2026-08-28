@@ -67,7 +67,6 @@ export async function createPinnedScrapeSourceRun(
   if (!run) throw new Error("Failed to create source run.");
   await connection.insert(scrapeSourceRuns).values({
     externalSiteRunId: run.id,
-    externalSiteId: source.externalSiteId,
     scrapeSourceId: source.id,
     revisionId: revision.id,
     purpose: input.purpose,
@@ -116,7 +115,6 @@ export async function createScrapeSourceSuggestionRun(input: {
     if (!run) throw new Error("Failed to create AI suggestion run.");
     await tx.insert(scrapeSourceRuns).values({
       externalSiteRunId: run.id,
-      externalSiteId: source.externalSiteId,
       scrapeSourceId: source.id,
       revisionId: null,
       purpose: "suggest",

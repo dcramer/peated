@@ -2,7 +2,7 @@
 
 - [x] 1.1 Add one scrape source per site, immutable revisions, and run links with one active revision
 - [x] 1.2 Mark scraper targets, origins, and site mappings as managed by code or an admin
-- [x] 1.3 Use composite foreign keys to keep runs, sites, sources, and revisions consistent
+- [x] 1.3 Use foreign keys to pin each run to a source and one of its revisions
 - [x] 1.4 Generate and inspect the replacement migration and run schema constraint tests
 - [x] 1.5 Keep site keys dynamic and source kinds limited to code-supported values
 

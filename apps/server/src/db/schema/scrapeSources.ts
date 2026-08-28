@@ -66,10 +66,7 @@ export const scrapeSources = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => [
-    uniqueIndex("scrape_source_site_unq").on(table.externalSiteId),
-    unique("scrape_source_id_site_unq").on(table.id, table.externalSiteId),
-  ],
+  (table) => [uniqueIndex("scrape_source_site_unq").on(table.externalSiteId)],
 );
 
 export const scrapeSourceRevisions = pgTable(
@@ -130,23 +127,15 @@ export const scrapeSourceRuns = pgTable(
   {
     externalSiteRunId: bigint("external_site_run_id", { mode: "number" })
       .primaryKey()
+      .references(() => externalSiteRuns.id, { onDelete: "cascade" })
       .notNull(),
-    externalSiteId: bigint("external_site_id", { mode: "number" }).notNull(),
-    scrapeSourceId: bigint("scrape_source_id", { mode: "number" }).notNull(),
+    scrapeSourceId: bigint("scrape_source_id", { mode: "number" })
+      .references(() => scrapeSources.id, { onDelete: "cascade" })
+      .notNull(),
     revisionId: bigint("revision_id", { mode: "number" }),
     purpose: scrapeSourceRunPurposeEnum("purpose").notNull(),
   },
   (table) => [
-    foreignKey({
-      name: "scrape_source_run_site_fk",
-      columns: [table.externalSiteRunId, table.externalSiteId],
-      foreignColumns: [externalSiteRuns.id, externalSiteRuns.externalSiteId],
-    }).onDelete("cascade"),
-    foreignKey({
-      name: "scrape_source_run_source_fk",
-      columns: [table.scrapeSourceId, table.externalSiteId],
-      foreignColumns: [scrapeSources.id, scrapeSources.externalSiteId],
-    }).onDelete("cascade"),
     foreignKey({
       name: "scrape_source_run_revision_fk",
       columns: [table.revisionId, table.scrapeSourceId],

@@ -36,9 +36,11 @@ list URL, rules format, rules, creation method, and latest test result. A
 partial unique index permits one active revision for each source.
 
 `scrape_source_run` links a durable external-site run to its source and
-revision. Composite foreign keys prove that the run, source, revision, and site
-belong together. A suggestion run starts without a revision and records the
-new revision after the model response passes validation.
+revision. Foreign keys prove that both records exist. A composite key proves
+that the revision belongs to the source. The run-creation service selects the
+source by site and inserts the run and link in one transaction. A suggestion
+run starts without a revision and records the new revision after the model
+response passes validation.
 
 The small source-kind enum represents code-supported behavior. Site keys stay
 text because admins can add them without a deploy. A TODO beside the enum marks
@@ -112,11 +114,9 @@ preview isolation, and target ownership. Live model quality belongs in
 
 ## Migration
 
-This schema has not shipped. Replace the old generated migration instead of
-adding rename SQL or a compatibility layer. The first generated migration adds
-management metadata and the run support key. The second adds source tables and
-their composite foreign keys. This order is required by PostgreSQL. Keep
-existing code sources unchanged during the pilot.
+This schema has not shipped. Replace the old generated migrations with one
+generated migration instead of adding rename SQL or a compatibility layer.
+Keep existing code sources unchanged during the pilot.
 
 ## Open Questions
 
