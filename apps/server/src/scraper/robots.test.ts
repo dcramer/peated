@@ -70,7 +70,7 @@ async function setupRobotsRuntime({
     sources: [
       defineScraperSource({
         key: "finedrams",
-        externalSiteType: "finedrams",
+        externalSiteKey: "finedrams",
         targetKeys: ["operator"],
         cursorSchema: z.null(),
         observationSchema: z.string(),

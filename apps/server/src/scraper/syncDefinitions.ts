@@ -18,15 +18,23 @@ async function applyScraperDefinitions(
   // definition disappears so coordination history is never silently deleted.
   await tx
     .update(externalSiteScrapeTargets)
-    .set({ active: false, updatedAt: now });
-  await tx.update(scrapeOrigins).set({ active: false, updatedAt: now });
-  await tx.update(scrapeTargets).set({ enabled: false, updatedAt: now });
+    .set({ active: false, updatedAt: now })
+    .where(eq(externalSiteScrapeTargets.owner, "code"));
+  await tx
+    .update(scrapeOrigins)
+    .set({ active: false, updatedAt: now })
+    .where(eq(scrapeOrigins.owner, "code"));
+  await tx
+    .update(scrapeTargets)
+    .set({ enabled: false, updatedAt: now })
+    .where(eq(scrapeTargets.owner, "code"));
 
   for (const target of registry.targets.values()) {
     await tx
       .insert(scrapeTargets)
       .values({
         key: target.key,
+        owner: "code",
         enabled: target.enabled,
         minimumSpacingMs: target.minimumSpacingMs,
         requestsPerWindow: target.requestsPerWindow,
@@ -48,6 +56,7 @@ async function applyScraperDefinitions(
           maxRetries: target.maxRetries,
           updatedAt: now,
         },
+        setWhere: eq(scrapeTargets.owner, "code"),
       });
 
     for (const origin of target.origins) {
@@ -55,6 +64,7 @@ async function applyScraperDefinitions(
         .insert(scrapeOrigins)
         .values({
           origin: origin.origin,
+          owner: "code",
           targetKey: target.key,
           active: true,
           robotsMode: origin.robots.mode,
@@ -76,6 +86,7 @@ async function applyScraperDefinitions(
                 : null,
             updatedAt: now,
           },
+          setWhere: eq(scrapeOrigins.owner, "code"),
         });
     }
   }
@@ -84,10 +95,10 @@ async function applyScraperDefinitions(
     const [site] = await tx
       .select({ id: externalSites.id })
       .from(externalSites)
-      .where(eq(externalSites.type, source.externalSiteType));
+      .where(eq(externalSites.type, source.externalSiteKey));
     if (!site) {
       throw new Error(
-        `External site ${source.externalSiteType} must be synchronized before scraper definitions.`,
+        `External site ${source.externalSiteKey} must be synchronized before scraper definitions.`,
       );
     }
 
@@ -97,6 +108,7 @@ async function applyScraperDefinitions(
         .values({
           externalSiteId: site.id,
           targetKey,
+          owner: "code",
           active: true,
           updatedAt: now,
         })
@@ -106,6 +118,7 @@ async function applyScraperDefinitions(
             externalSiteScrapeTargets.targetKey,
           ],
           set: { active: true, updatedAt: now },
+          setWhere: eq(externalSiteScrapeTargets.owner, "code"),
         });
     }
   }

@@ -41,7 +41,7 @@ It owns source policy, transient content, pilot review, and rollback.
    shared traffic capacity, not necessarily one hostname. Declare every exact
    origin it may use and either enforce robots or record why robots do not
    apply.
-2. Define the source with its external-site type, allowed target keys, strict
+2. Define the source with its external-site key, allowed target keys, strict
    cursor and observation schemas, request limit, adapter, and sink.
 3. Make the adapter use only its injected session. Checkpoint after a page or
    partition is safely emitted, before requesting the next one. A cursor must
@@ -64,6 +64,31 @@ operator intentionally serves an integration from several hosts. Never infer
 this grouping from a registrable domain. Stricter limits need no exception;
 less restrictive spacing, window, or quota requires a reviewed rationale in
 the code-owned definition.
+
+## Configured sources
+
+Admins can add a review or store-price source in Admin → Scrapers. These
+sources use the same run, request, robots, limit, retry, validation, and sink
+boundaries as code-owned sources.
+
+The database stores each source and its parsing rules. Each saved version is
+immutable. A test reads sample pages and stores only parsed fields and errors.
+It does not store fetched HTML, review text, or full product records. Only a
+version that passes its test can become active. An admin can return to any
+older version that passed. Pausing a source stops collection but keeps its
+versions and run history.
+
+Version 1 supports one bounded HTML index page, same-origin detail links, CSS
+selectors, and fixed date, number, price, and volume conversions. It does not
+support scripts, custom code, arbitrary request headers, browser automation,
+pagination, or cross-origin discovery. Add a code-owned adapter when a source
+needs those capabilities.
+
+AI can suggest parsing rules only when an admin allows it for that source. The
+server fetches the allowed pages before it calls the model. The model has no
+tools, and provider storage is off. Its response creates a new version. An
+admin must test and activate that version. AI never changes the active version
+directly.
 
 ## Source acceptance rules
 

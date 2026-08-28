@@ -3,8 +3,8 @@ import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
+  ExternalSiteKeySchema,
   ExternalSiteRunSchema,
-  ExternalSiteTypeEnum,
   listResponse,
 } from "@peated/server/schemas";
 import { serializeExternalSiteRun } from "@peated/server/serializers/externalSite";
@@ -21,7 +21,7 @@ export default procedure
   })
   .input(
     z.object({
-      site: ExternalSiteTypeEnum,
+      site: ExternalSiteKeySchema,
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(20),
     }),

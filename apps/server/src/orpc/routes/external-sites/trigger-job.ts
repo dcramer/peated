@@ -3,8 +3,8 @@ import { externalSites } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
+  ExternalSiteKeySchema,
   ExternalSiteRunSchema,
-  ExternalSiteTypeEnum,
 } from "@peated/server/schemas";
 import {
   ExternalSiteRunActiveError,
@@ -28,7 +28,7 @@ export default procedure
   })
   .input(
     z.object({
-      site: ExternalSiteTypeEnum,
+      site: ExternalSiteKeySchema,
     }),
   )
   .output(ExternalSiteRunSchema)

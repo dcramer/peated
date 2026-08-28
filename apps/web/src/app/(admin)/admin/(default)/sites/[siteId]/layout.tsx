@@ -1,7 +1,7 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import { ExternalSiteTypeEnum } from "@peated/server/schemas/externalSites";
+import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
 import { getScraperRunAvailability } from "@peated/web/components/admin/scraperRunAvailability";
@@ -76,7 +76,7 @@ export default function Layout(props: {
   const { data: site } = useSuspenseQuery(
     orpc.externalSites.healthDetails.queryOptions({
       input: {
-        site: ExternalSiteTypeEnum.parse(siteId),
+        site: ExternalSiteKeySchema.parse(siteId),
       },
     }),
   );
@@ -177,6 +177,13 @@ export default function Layout(props: {
         </TabItem>
         <TabItem as={Link} href={`/admin/sites/${site.type}/runs`} controlled>
           Runs
+        </TabItem>
+        <TabItem
+          as={Link}
+          href={`/admin/sites/${site.type}/configs`}
+          controlled
+        >
+          Parsing
         </TabItem>
       </Tabs>
 

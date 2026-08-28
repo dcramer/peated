@@ -15,7 +15,7 @@ function source(
 ) {
   return defineScraperSource({
     key,
-    externalSiteType: key,
+    externalSiteKey: key,
     targetKeys,
     cursorSchema: z.object({ page: z.number().int().positive() }).strict(),
     observationSchema: z.object({ name: z.string() }).strict(),

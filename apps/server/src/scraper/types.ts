@@ -1,4 +1,4 @@
-import type { ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteKey } from "@peated/server/types";
 import type { z } from "zod";
 
 export type JsonValue =
@@ -55,7 +55,7 @@ export type ScraperSink<TObservation> = (input: {
 
 export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   key: string;
-  externalSiteType: ExternalSiteType;
+  externalSiteKey: ExternalSiteKey;
   targetKeys: readonly [string, ...string[]];
   requestLimit: number;
   resumeFromLastRun: boolean;

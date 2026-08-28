@@ -1,7 +1,7 @@
 import {
   EXTERNAL_SITE_DEFINITIONS,
-  EXTERNAL_SITE_TYPE_LIST,
-  isExternalReviewSiteType,
+  isExternalReviewSiteKey,
+  REGISTERED_EXTERNAL_SITE_KEY_LIST,
 } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
@@ -84,7 +84,7 @@ test("registers every scraper source with explicit target ownership", () => {
     migratedSources.sort(),
   );
   for (const source of scraperRegistry.sources.values()) {
-    expect(source.targetKeys).toEqual([source.externalSiteType]);
+    expect(source.targetKeys).toEqual([source.externalSiteKey]);
     expect(scraperRegistry.targets.get(source.targetKeys[0])).toBeDefined();
   }
   expect(scraperRegistry.targets.get("astorwines")?.enabled).toBe(true);
@@ -171,7 +171,9 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("wordsofwhisky")?.requestLimit).toBe(25);
-  for (const type of EXTERNAL_SITE_TYPE_LIST.filter(isExternalReviewSiteType)) {
+  for (const type of REGISTERED_EXTERNAL_SITE_KEY_LIST.filter(
+    isExternalReviewSiteKey,
+  )) {
     const source = scraperRegistry.sources.get(type);
     expect(source, `${type} is not registered`).toBeDefined();
     expect(source?.observationSchema).toBe(

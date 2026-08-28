@@ -1,17 +1,17 @@
 import {
   EXTERNAL_SITE_DEFINITIONS,
-  isExternalReviewSiteType,
+  isExternalReviewSiteKey,
 } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
-import { ExternalSiteTypeEnum } from "@peated/server/schemas/externalSites";
-import type { ExternalSiteType } from "@peated/server/types";
+import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
+import type { ExternalSiteKey } from "@peated/server/types";
 
 export class ExternalSiteNotFoundError extends Error {
-  constructor(readonly site: ExternalSiteType) {
+  constructor(readonly site: ExternalSiteKey) {
     super(`External site not found: ${site}`);
     this.name = "ExternalSiteNotFoundError";
   }
@@ -20,14 +20,12 @@ export class ExternalSiteNotFoundError extends Error {
 /** Keeps durable foreign-key rows aligned with the code-owned scraper list. */
 export async function syncExternalSites() {
   await db.transaction(async (tx) => {
-    for (const [type, definition] of Object.entries(
-      EXTERNAL_SITE_DEFINITIONS,
-    )) {
-      const siteType = ExternalSiteTypeEnum.parse(type);
+    for (const [key, definition] of Object.entries(EXTERNAL_SITE_DEFINITIONS)) {
+      const siteKey = ExternalSiteKeySchema.parse(key);
       const [site] = await tx
         .insert(externalSites)
         .values({
-          type: siteType,
+          type: siteKey,
           name: definition.name,
           runEvery: definition.runEvery,
         })
@@ -40,7 +38,7 @@ export async function syncExternalSites() {
         })
         .returning({ id: externalSites.id });
 
-      if (site && isExternalReviewSiteType(siteType)) {
+      if (site && isExternalReviewSiteKey(siteKey)) {
         await tx
           .insert(externalReviewSourcePolicies)
           .values({ externalSiteId: site.id })

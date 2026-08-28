@@ -17,8 +17,9 @@ import {
   or,
 } from "drizzle-orm";
 import { z } from "zod";
+import { createPinnedConfiguredRun } from "./configured/runs";
 import {
-  findScraperSourceBySiteType,
+  findScraperSourceBySiteKey,
   requireEnabledScraperTargets,
 } from "./definitions";
 import type { ScraperRegistry } from "./types";
@@ -69,11 +70,15 @@ async function insertRun(
   registry: ScraperRegistry,
   requestedById?: number,
 ) {
-  const source = findScraperSourceBySiteType(registry, site.type);
+  const source = findScraperSourceBySiteKey(registry, site.type);
   if (!source) {
-    throw new Error(
-      `External site ${site.type} is not registered with the scraper runtime.`,
-    );
+    const configured = await createPinnedConfiguredRun(connection, {
+      externalSiteId: site.id,
+      requestedById,
+      trigger,
+      purpose: "collect",
+    });
+    return configured.run;
   }
   requireEnabledScraperTargets(registry, source);
   let cursor = null;
@@ -157,17 +162,10 @@ async function completeExternalSiteRun({
 async function dispatchExternalSiteRun(
   run: ExternalSiteRun,
   site: ExternalSite,
-  registry: ScraperRegistry,
   enqueue: ScraperEnqueue,
   { completeOnFailure = true }: { completeOnFailure?: boolean } = {},
 ) {
   try {
-    const source = findScraperSourceBySiteType(registry, site.type);
-    if (!source) {
-      throw new Error(
-        `External site ${site.type} is not registered with the scraper runtime.`,
-      );
-    }
     await enqueue(
       "RunScraper",
       { runId: run.id },
@@ -246,7 +244,7 @@ async function redispatchStaleExternalSiteRuns({
     .limit(EXTERNAL_SITE_RUN_RECONCILE_LIMIT);
 
   for (const { run, site } of staleRuns) {
-    await dispatchExternalSiteRun(run, site, registry, enqueue, {
+    await dispatchExternalSiteRun(run, site, enqueue, {
       completeOnFailure: false,
     });
   }
@@ -271,7 +269,36 @@ async function queueManualExternalSiteRun({
     if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
     return await throwActiveRunConflict(site.id);
   }
-  await dispatchExternalSiteRun(run, site, registry, enqueue);
+  await dispatchExternalSiteRun(run, site, enqueue);
+  return run;
+}
+
+async function queueConfiguredScraperPreview({
+  site,
+  configVersionId,
+  requestedById,
+  enqueue,
+}: {
+  site: ExternalSite;
+  configVersionId: number;
+  requestedById: number;
+  enqueue: ScraperEnqueue;
+}) {
+  let run: ExternalSiteRun;
+  try {
+    const configured = await createPinnedConfiguredRun(db, {
+      externalSiteId: site.id,
+      configVersionId,
+      requestedById,
+      trigger: "manual",
+      purpose: "preview",
+    });
+    run = configured.run;
+  } catch (error) {
+    if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
+    return await throwActiveRunConflict(site.id);
+  }
+  await dispatchExternalSiteRun(run, site, enqueue);
   return run;
 }
 
@@ -310,7 +337,7 @@ async function queueScheduledExternalSiteRun(
   }
 
   if (!result) return null;
-  await dispatchExternalSiteRun(result.run, result.site, registry, enqueue);
+  await dispatchExternalSiteRun(result.run, result.site, enqueue);
   return result.run;
 }
 
@@ -327,6 +354,11 @@ export function createScraperLifecycle({
       site: ExternalSite;
       requestedById: number;
     }) => queueManualExternalSiteRun({ ...input, registry, enqueue }),
+    queueConfiguredScraperPreview: (input: {
+      site: ExternalSite;
+      configVersionId: number;
+      requestedById: number;
+    }) => queueConfiguredScraperPreview({ ...input, enqueue }),
     queueScheduledExternalSiteRun: (siteId: number) =>
       queueScheduledExternalSiteRun(siteId, registry, enqueue),
     redispatchStaleExternalSiteRuns: (options?: {

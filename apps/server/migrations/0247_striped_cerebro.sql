@@ -1,0 +1,2 @@
+ALTER TABLE "configured_scraper_run" DROP CONSTRAINT "configured_scraper_run_version_check";
+ALTER TABLE "configured_scraper_run" ADD CONSTRAINT "configured_scraper_run_version_check" CHECK ("configured_scraper_run"."purpose"::text = 'generate' OR "configured_scraper_run"."config_version_id" IS NOT NULL);

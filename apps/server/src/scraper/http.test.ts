@@ -85,7 +85,7 @@ async function setupRuntime({
     sources: [
       defineScraperSource({
         key: "finedrams",
-        externalSiteType: "finedrams",
+        externalSiteKey: "finedrams",
         targetKeys: ["operator"],
         requestLimit,
         cursorSchema: z.null(),

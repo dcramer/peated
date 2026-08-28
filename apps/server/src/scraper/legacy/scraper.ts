@@ -23,7 +23,7 @@ import type {
   BottleInputSchema,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
-import type { ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteKey } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { z } from "zod";
@@ -240,7 +240,7 @@ function getScrapedProductKey(product: StorePrice): string {
 }
 
 export default async function scrapePrices(
-  site: ExternalSiteType,
+  site: ExternalSiteKey,
   urlFn: (page: number) => string,
   scrapeProducts: (
     url: string,

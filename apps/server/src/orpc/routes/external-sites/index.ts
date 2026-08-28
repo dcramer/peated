@@ -1,5 +1,6 @@
 import { base } from "@peated/server/orpc";
 import config from "./config";
+import configured from "./configured";
 import details from "./details";
 import { healthDetails, healthList } from "./health";
 import list from "./list";
@@ -15,5 +16,6 @@ export default base.tag("sites").router({
   details,
   triggerJob,
   config,
+  configured,
   reviewPolicy,
 });

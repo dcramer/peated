@@ -120,18 +120,22 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   whiskyworld: { name: "The Whisky World", runEvery: 10080 },
 } as const;
 
-type ExternalSiteDefinitionType = keyof typeof EXTERNAL_SITE_DEFINITIONS;
+type RegisteredExternalSiteKey = keyof typeof EXTERNAL_SITE_DEFINITIONS;
 
-const externalSiteTypes = Object.keys(EXTERNAL_SITE_DEFINITIONS);
-export const EXTERNAL_SITE_TYPE_LIST =
+const externalSiteKeys = Object.keys(EXTERNAL_SITE_DEFINITIONS);
+// TODO(scraper-platform): Delete this list after the last code-owned scraper moves to database-managed parsing rules.
+export const REGISTERED_EXTERNAL_SITE_KEY_LIST =
   // SAFETY: Object.keys returns the keys of this non-empty, code-owned object.
-  externalSiteTypes as [
-    ExternalSiteDefinitionType,
-    ...ExternalSiteDefinitionType[],
+  externalSiteKeys as [
+    RegisteredExternalSiteKey,
+    ...RegisteredExternalSiteKey[],
   ];
 
-export function isExternalReviewSiteType(type: ExternalSiteDefinitionType) {
-  const definition = EXTERNAL_SITE_DEFINITIONS[type];
+export function isExternalReviewSiteKey(key: string) {
+  if (!Object.hasOwn(EXTERNAL_SITE_DEFINITIONS, key)) return false;
+  // SAFETY: Object.hasOwn above proves that key names a code-owned definition.
+  const definition =
+    EXTERNAL_SITE_DEFINITIONS[key as RegisteredExternalSiteKey];
   return "content" in definition && definition.content === "reviews";
 }
 

@@ -4,14 +4,15 @@ import {
   externalSites,
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
-import type { ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteKey } from "@peated/server/types";
 import * as Sentry from "@sentry/node";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { resolveConfiguredRunRegistry } from "./configured/runtime";
 import { ScraperCoordinationError } from "./coordinator";
 import {
-  findScraperSourceBySiteType,
+  findScraperSourceBySiteKey,
   requireEnabledScraperTargets,
   ScraperTargetDisabledError,
 } from "./definitions";
@@ -43,7 +44,7 @@ const ScraperRunJobInputSchema = z
 
 type ClaimedRun = {
   run: ExternalSiteRun;
-  siteType: ExternalSiteType;
+  siteKey: ExternalSiteKey;
   source: ScraperSourceDefinition;
   executionToken: string;
 };
@@ -136,7 +137,7 @@ async function claimScraperRun({
       };
     }
 
-    const source = findScraperSourceBySiteType(registry, candidate.site.type);
+    const source = findScraperSourceBySiteKey(registry, candidate.site.type);
     if (!source) {
       throw new Error(
         `External site ${candidate.site.type} is not registered with the scraper runtime.`,
@@ -161,7 +162,7 @@ async function claimScraperRun({
     if (!claimed) throw new Error(`Unable to claim scraper run ${runId}.`);
     return {
       run: claimed,
-      siteType: candidate.site.type,
+      siteKey: candidate.site.type,
       source,
       executionToken,
     };
@@ -279,9 +280,10 @@ export async function executeScraperRun(
   },
 ): Promise<ScraperRunExecutionResult> {
   const { runId } = ScraperRunJobInputSchema.parse(input);
+  const runRegistry = await resolveConfiguredRunRegistry(runId, registry);
   const claimed = await claimScraperRun({
     runId,
-    registry,
+    registry: runRegistry,
     now: clock.now(),
     executionToken,
   });
@@ -289,11 +291,11 @@ export async function executeScraperRun(
 
   Sentry.getIsolationScope().setContext("externalSiteRun", {
     id: claimed.run.id,
-    site: claimed.siteType,
+    site: claimed.siteKey,
   });
 
   try {
-    requireEnabledScraperTargets(registry, claimed.source);
+    requireEnabledScraperTargets(runRegistry, claimed.source);
     const cursor =
       claimed.run.cursor === null
         ? null
@@ -301,7 +303,7 @@ export async function executeScraperRun(
     const session = createScraperSession({
       run: claimed.run,
       source: claimed.source,
-      registry,
+      registry: runRegistry,
       executionToken: claimed.executionToken,
       fetchImpl,
       clock,

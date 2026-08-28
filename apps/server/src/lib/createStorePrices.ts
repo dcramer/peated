@@ -22,7 +22,7 @@ import { normalizeGtin, type NormalizedGtin } from "@peated/server/lib/gtin";
 import { ActiveBottleSelectionError } from "@peated/server/lib/resolveActiveBottleIds";
 import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import {
-  ExternalSiteTypeEnum,
+  ExternalSiteKeySchema,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
@@ -37,7 +37,7 @@ import { z } from "zod";
  */
 export const CreateStorePricesInputSchema = z
   .object({
-    site: ExternalSiteTypeEnum,
+    site: ExternalSiteKeySchema,
     prices: z.array(StorePriceInputSchema.strict()),
   })
   .strict();

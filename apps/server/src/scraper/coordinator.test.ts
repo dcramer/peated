@@ -34,17 +34,17 @@ const baseTarget = {
 };
 
 async function createRun({
-  siteType = "finedrams",
+  siteKey = "finedrams",
   requestLimit = 100,
   mapTarget = true,
 }: {
-  siteType?: "finedrams" | "whiskyworld";
+  siteKey?: "finedrams" | "whiskyworld";
   requestLimit?: number;
   mapTarget?: boolean;
 } = {}) {
   const [site] = await db
     .insert(externalSites)
-    .values({ type: siteType, name: siteType })
+    .values({ type: siteKey, name: siteKey })
     .returning();
   if (!site) throw new Error("Expected site.");
   const [run] = await db
@@ -100,7 +100,7 @@ test("grants one bounded permit and accounts for a retry atomically", async () =
 test("serializes competing workers and releases only the matching lease", async () => {
   await db.insert(scrapeTargets).values(baseTarget);
   const firstRun = await createRun();
-  const secondRun = await createRun({ siteType: "whiskyworld" });
+  const secondRun = await createRun({ siteKey: "whiskyworld" });
   const now = new Date("2026-08-18T12:00:00Z");
 
   const [first, second] = await Promise.all([
@@ -239,7 +239,7 @@ test("enforces spacing, fixed-window quota, and the run budget", async () => {
     token: second.token,
     now: secondAt,
   });
-  const otherRun = await createRun({ siteType: "whiskyworld" });
+  const otherRun = await createRun({ siteKey: "whiskyworld" });
   expect(
     await acquireScrapePermit({
       runId: otherRun.id,
@@ -259,7 +259,7 @@ test("enforces spacing, fixed-window quota, and the run budget", async () => {
 test("shares server-directed cooldowns across source runs", async () => {
   await db.insert(scrapeTargets).values(baseTarget);
   const firstRun = await createRun();
-  const secondRun = await createRun({ siteType: "whiskyworld" });
+  const secondRun = await createRun({ siteKey: "whiskyworld" });
   const now = new Date("2026-08-18T12:00:00Z");
   const permit = await acquireScrapePermit({
     runId: firstRun.id,

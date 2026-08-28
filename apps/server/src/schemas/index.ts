@@ -10,6 +10,7 @@ export * from "./changes";
 export * from "./collections";
 export * from "./comments";
 export * from "./common";
+export * from "./configuredScrapers";
 export * from "./countries";
 export * from "./entities";
 export * from "./entityEvents";

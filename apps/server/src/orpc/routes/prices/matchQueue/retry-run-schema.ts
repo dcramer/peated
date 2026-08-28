@@ -1,4 +1,4 @@
-import { ExternalSiteTypeEnum } from "@peated/server/schemas";
+import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { z } from "zod";
 
 export const PriceMatchRetryRunSchema = z.object({
@@ -19,7 +19,7 @@ export const PriceMatchRetryRunSchema = z.object({
   query: z.string(),
   resolvedCount: z.number().int().min(0),
   reviewableCount: z.number().int().min(0),
-  site: ExternalSiteTypeEnum.nullable(),
+  site: ExternalSiteKeySchema.nullable(),
   skippedCount: z.number().int().min(0),
   startedAt: z.string().datetime().nullable(),
   status: z.enum(["pending", "running", "completed", "failed", "canceled"]),

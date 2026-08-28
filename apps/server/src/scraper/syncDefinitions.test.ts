@@ -23,7 +23,7 @@ function source(
 ) {
   return defineScraperSource({
     key,
-    externalSiteType: key,
+    externalSiteKey: key,
     targetKeys,
     cursorSchema: z.null(),
     observationSchema: z.string(),
@@ -108,6 +108,63 @@ test("deactivates removed definitions without deleting their state", async () =>
   ]);
   expect(await db.select().from(externalSiteScrapeTargets)).toEqual([
     expect.objectContaining({ externalSiteId: site?.id, active: false }),
+  ]);
+});
+
+test("preserves admin-owned targets, origins, and site mappings", async () => {
+  const [site] = await db
+    .insert(externalSites)
+    .values({ type: "admin-source", name: "Admin Source" })
+    .returning();
+  if (!site) throw new Error("Failed to create test site.");
+
+  await db.insert(scrapeTargets).values({
+    key: "admin-source",
+    owner: "admin",
+    enabled: true,
+    minimumSpacingMs: 2_000,
+    requestsPerWindow: 60,
+    windowMs: 3_600_000,
+    timeoutMs: 30_000,
+    maxResponseBytes: 10 * 1024 * 1024,
+    maxRetries: 2,
+  });
+  await db.insert(scrapeOrigins).values({
+    origin: "https://admin-source.test",
+    owner: "admin",
+    targetKey: "admin-source",
+    robotsMode: "enforce",
+  });
+  await db.insert(externalSiteScrapeTargets).values({
+    externalSiteId: site.id,
+    targetKey: "admin-source",
+    owner: "admin",
+  });
+
+  await syncScraperDefinitions(
+    createScraperRegistry({ targets: [], sources: [] }),
+  );
+
+  expect(await db.select().from(scrapeTargets)).toEqual([
+    expect.objectContaining({
+      key: "admin-source",
+      owner: "admin",
+      enabled: true,
+    }),
+  ]);
+  expect(await db.select().from(scrapeOrigins)).toEqual([
+    expect.objectContaining({
+      origin: "https://admin-source.test",
+      owner: "admin",
+      active: true,
+    }),
+  ]);
+  expect(await db.select().from(externalSiteScrapeTargets)).toEqual([
+    expect.objectContaining({
+      externalSiteId: site.id,
+      owner: "admin",
+      active: true,
+    }),
   ]);
 });
 

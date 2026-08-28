@@ -1,6 +1,6 @@
 import {
   ExternalReviewSchema,
-  ExternalSiteTypeEnum,
+  ExternalSiteKeySchema,
   listResponse,
 } from "@peated/server/schemas";
 import { z } from "zod";
@@ -20,7 +20,7 @@ export default contract
   .input(
     z
       .object({
-        site: ExternalSiteTypeEnum.optional(),
+        site: ExternalSiteKeySchema.optional(),
         bottle: z.coerce.number().gte(1).optional(),
         query: z.string().default(""),
         onlyUnknown: z.coerce.boolean().optional(),

@@ -77,8 +77,8 @@ const run = {
 describe("scraper observability", () => {
   it("explains why a disabled scraper cannot run", () => {
     expect(getScraperRunAvailability(site)).toEqual({
-      label: "Scraper disabled",
-      reason: "Scraper target whiskyadvocate is disabled.",
+      label: "Source paused",
+      reason: "Requests to whiskyadvocate are paused.",
     });
   });
 
@@ -107,9 +107,9 @@ describe("scraper observability", () => {
   it("shows runtime, robots, and review-policy readiness", () => {
     const html = renderToStaticMarkup(<ScraperReadiness site={site} />);
 
-    expect(html).toContain("Runtime readiness");
+    expect(html).toContain("Connection");
     expect(html).toContain("Disabled");
-    expect(html).toContain("Robots: Unknown");
+    expect(html).toContain("Site access: Not checked");
     expect(html).toContain("Publication: disabled");
   });
 

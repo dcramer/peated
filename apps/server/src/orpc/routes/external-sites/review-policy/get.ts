@@ -1,4 +1,4 @@
-import { isExternalReviewSiteType } from "@peated/server/constants";
+import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewSourcePolicies,
@@ -8,7 +8,7 @@ import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   ExternalReviewSourcePolicySchema,
-  ExternalSiteTypeEnum,
+  ExternalSiteKeySchema,
 } from "@peated/server/schemas";
 import { serializeExternalReviewSourcePolicy } from "@peated/server/serializers/externalSite";
 import { eq } from "drizzle-orm";
@@ -22,13 +22,9 @@ export default procedure
     summary: "Retrieve external review source policy",
     operationId: "retrieveExternalReviewSourcePolicy",
   })
-  .input(z.object({ site: ExternalSiteTypeEnum }).strict())
+  .input(z.object({ site: ExternalSiteKeySchema }).strict())
   .output(ExternalReviewSourcePolicySchema)
   .handler(async ({ input, errors }) => {
-    if (!isExternalReviewSiteType(input.site)) {
-      throw errors.NOT_FOUND({ message: "Review source not found." });
-    }
-
     const [site] = await db
       .select()
       .from(externalSites)
@@ -39,6 +35,9 @@ export default procedure
     const policy = await db.query.externalReviewSourcePolicies.findFirst({
       where: eq(externalReviewSourcePolicies.externalSiteId, site.id),
     });
+    if (!policy && !isExternalReviewSiteKey(input.site)) {
+      throw errors.NOT_FOUND({ message: "Review source not found." });
+    }
 
     return serializeExternalReviewSourcePolicy(site.id, policy ?? null);
   });

@@ -41,8 +41,8 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { z } from "zod";
 import {
-  EXTERNAL_SITE_TYPE_LIST,
   FLAVOR_PROFILES,
+  REGISTERED_EXTERNAL_SITE_KEY_LIST,
   TAG_CATEGORIES,
 } from "../../constants";
 import { getUserActorByIdForDatabase } from "../actors";
@@ -970,7 +970,7 @@ export const ExternalSiteOrExisting = async (
     const existing = await db.query.externalSites.findFirst();
     if (existing) return existing;
 
-    type = choose(EXTERNAL_SITE_TYPE_LIST);
+    type = choose(REGISTERED_EXTERNAL_SITE_KEY_LIST);
   }
 
   const existing = await db.query.externalSites.findFirst({
@@ -985,7 +985,7 @@ export const ExternalSite = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
-  const type = data.type ?? choose(EXTERNAL_SITE_TYPE_LIST);
+  const type = data.type ?? choose(REGISTERED_EXTERNAL_SITE_KEY_LIST);
 
   const [result] = await db
     .insert(externalSites)

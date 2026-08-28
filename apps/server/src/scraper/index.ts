@@ -5,9 +5,10 @@
  * API routes and workers only queue, execute, or initialize durable runs.
  */
 import type { ExternalSite } from "@peated/server/db/schema";
-import type { ExternalSiteType } from "@peated/server/types";
+import type { ExternalSiteKey } from "@peated/server/types";
+import { createConfiguredGenerationRun } from "./configured/runs";
 import {
-  findScraperSourceBySiteType,
+  findScraperSourceBySiteKey,
   ScraperTargetDisabledError,
 } from "./definitions";
 import {
@@ -36,8 +37,8 @@ const lifecycle = createScraperLifecycle({
 export { ExternalSiteRunActiveError, ScraperTargetDisabledError };
 export type { ScraperRunExecutionResult };
 
-export function getScraperRegistration(siteType: ExternalSiteType) {
-  const source = findScraperSourceBySiteType(scraperRegistry, siteType);
+export function getScraperRegistration(siteKey: ExternalSiteKey) {
+  const source = findScraperSourceBySiteKey(scraperRegistry, siteKey);
   return source
     ? {
         targetKeys: [...source.targetKeys],
@@ -50,6 +51,31 @@ export function queueManualExternalSiteRun(input: {
   requestedById: number;
 }) {
   return lifecycle.queueManualExternalSiteRun(input);
+}
+
+export function queueConfiguredScraperPreview(input: {
+  site: ExternalSite;
+  configVersionId: number;
+  requestedById: number;
+}) {
+  return lifecycle.queueConfiguredScraperPreview(input);
+}
+
+export async function queueConfiguredScraperGeneration(input: {
+  configuredScraperId: number;
+  requestedById: number;
+}) {
+  const run = await createConfiguredGenerationRun(input);
+  await enqueueScraperRun(
+    "RunScraper",
+    { runId: run.id },
+    {
+      jobId: `external-site-run-${run.id}`,
+      removeOnComplete: true,
+      removeOnFail: true,
+    },
+  );
+  return run;
 }
 
 export function queueScheduledExternalSiteRun(siteId: number) {

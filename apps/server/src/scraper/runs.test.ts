@@ -79,7 +79,7 @@ async function setupRun({
     sources: [
       defineScraperSource({
         key: "fixture-source",
-        externalSiteType: "finedrams",
+        externalSiteKey: "finedrams",
         targetKeys: ["fixture-target"],
         requestLimit,
         cursorSchema: FixtureCursorSchema,

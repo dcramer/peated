@@ -1,5 +1,5 @@
-import { EXTERNAL_SITE_TYPE_LIST } from "@peated/server/constants";
-import type { ExternalSiteType } from "@peated/server/types";
+import { REGISTERED_EXTERNAL_SITE_KEY_LIST } from "@peated/server/constants";
+import type { RegisteredExternalSiteKey } from "@peated/server/types";
 import { z } from "zod";
 import type {
   ScrapeOriginDefinition,
@@ -149,7 +149,7 @@ const FunctionSchema = z.function();
 const SourceDefinitionSchema = z
   .object({
     key: DefinitionKeySchema,
-    externalSiteType: z.enum(EXTERNAL_SITE_TYPE_LIST),
+    externalSiteKey: z.enum(REGISTERED_EXTERNAL_SITE_KEY_LIST),
     targetKeys: z.tuple([DefinitionKeySchema], DefinitionKeySchema),
     requestLimit: z
       .number()
@@ -164,6 +164,13 @@ const SourceDefinitionSchema = z
     sink: FunctionSchema,
   })
   .strict();
+
+export type CodeOwnedScraperSourceDefinition<
+  TCursor = any,
+  TObservation = any,
+> = Omit<ScraperSourceDefinition<TCursor, TObservation>, "externalSiteKey"> & {
+  externalSiteKey: RegisteredExternalSiteKey;
+};
 
 export function defineScrapeTarget(
   input: Omit<
@@ -196,13 +203,13 @@ export function defineScrapeTarget(
 
 export function defineScraperSource<TCursor, TObservation>(
   input: Omit<
-    ScraperSourceDefinition<TCursor, TObservation>,
+    CodeOwnedScraperSourceDefinition<TCursor, TObservation>,
     "requestLimit" | "resumeFromLastRun"
   > & {
     requestLimit?: number;
     resumeFromLastRun?: boolean;
   },
-): ScraperSourceDefinition<TCursor, TObservation> {
+): CodeOwnedScraperSourceDefinition<TCursor, TObservation> {
   const parsed = SourceDefinitionSchema.parse(input);
   return {
     ...input,
@@ -213,7 +220,7 @@ export function defineScraperSource<TCursor, TObservation>(
 
 export function createScraperRegistry(input: {
   targets: readonly ScrapeTargetDefinition[];
-  sources: readonly ScraperSourceDefinition[];
+  sources: readonly CodeOwnedScraperSourceDefinition[];
 }): ScraperRegistry {
   const targets = new Map<string, ScrapeTargetDefinition>();
   const originOwners = new Map<string, string>();
@@ -241,10 +248,10 @@ export function createScraperRegistry(input: {
     if (sources.has(source.key)) {
       throw new Error(`Duplicate scraper source: ${source.key}`);
     }
-    const existingOwner = externalSiteOwners.get(source.externalSiteType);
+    const existingOwner = externalSiteOwners.get(source.externalSiteKey);
     if (existingOwner) {
       throw new Error(
-        `External site ${source.externalSiteType} belongs to both ${existingOwner} and ${source.key}.`,
+        `External site ${source.externalSiteKey} belongs to both ${existingOwner} and ${source.key}.`,
       );
     }
     for (const targetKey of source.targetKeys) {
@@ -255,7 +262,7 @@ export function createScraperRegistry(input: {
       }
     }
     sources.set(source.key, source);
-    externalSiteOwners.set(source.externalSiteType, source.key);
+    externalSiteOwners.set(source.externalSiteKey, source.key);
   }
 
   return { sources, targets };
@@ -285,12 +292,12 @@ export function resolveScraperOrigin(
   return origin;
 }
 
-export function findScraperSourceBySiteType(
+export function findScraperSourceBySiteKey(
   registry: ScraperRegistry,
-  externalSiteType: ExternalSiteType,
+  externalSiteKey: string,
 ) {
   return [...registry.sources.values()].find(
-    (source) => source.externalSiteType === externalSiteType,
+    (source) => source.externalSiteKey === externalSiteKey,
   );
 }
 
