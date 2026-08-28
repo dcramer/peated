@@ -1,3 +1,8 @@
+export { AliasManager } from "./aliasManager.stylex";
+export type {
+  AliasManagerItem,
+  AliasManagerProps,
+} from "./aliasManager.stylex";
 export { ApplicationHeader, SiteFooter } from "./applicationNavigation.stylex";
 export type {
   ApplicationHeaderProps,
@@ -26,6 +31,8 @@ export type {
   ButtonSize,
   ButtonVariant,
 } from "./button.stylex";
+export { Card, CardGrid, CardLink } from "./card.stylex";
+export type { CardLinkProps, CardProps } from "./card.stylex";
 export { Checkbox } from "./checkbox.stylex";
 export type { CheckboxProps } from "./checkbox.stylex";
 export { Chip, CountChip } from "./chip.stylex";
@@ -38,6 +45,8 @@ export type {
   SpecStripCell,
   SpecStripCells,
 } from "./dataDevices.stylex";
+export { DataTable } from "./dataTable.stylex";
+export type { DataTableColumn, DataTableProps } from "./dataTable.stylex";
 export { DuplicateMatchList } from "./duplicateMatchList.stylex";
 export type {
   DuplicateMatch,
@@ -107,6 +116,8 @@ export type {
   ListToolbarProps,
   RailListItemProps,
 } from "./listStructures.stylex";
+export { LocationCard } from "./locationCard.stylex";
+export type { LocationCardProps } from "./locationCard.stylex";
 export { MemberPicker } from "./memberPicker.stylex";
 export type {
   MemberPickerOption,

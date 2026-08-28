@@ -14,6 +14,7 @@ import {
   type EntityCatalogItem,
 } from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
 const DEFAULT_SORT = "-tastings";
@@ -90,7 +91,7 @@ export function EntityCatalogPageClient({
     });
     if ("country" in updates) nextParams.delete("region");
     nextParams.delete("cursor");
-    router.push(buildHref(pathname, nextParams));
+    router.push(buildSearchHref(pathname, nextParams));
   }
 
   function clearFilters() {
@@ -98,7 +99,7 @@ export function EntityCatalogPageClient({
     ["country", "cursor", "query", "region"].forEach((name) =>
       nextParams.delete(name),
     );
-    router.push(buildHref(pathname, nextParams));
+    router.push(buildSearchHref(pathname, nextParams));
   }
 
   const addHref = `/addEntity?kind=${kind}`;
@@ -179,21 +180,4 @@ function formatRegion(region: string) {
   return /^\d+$/.test(region)
     ? `Region ${region}`
     : toTitleCase(region.replaceAll("-", " "));
-}
-
-function getCursorHref(
-  pathname: string,
-  searchParams: URLSearchParams,
-  cursor: number | null,
-) {
-  if (cursor === null) return undefined;
-
-  const nextParams = new URLSearchParams(searchParams);
-  nextParams.set("cursor", String(cursor));
-  return buildHref(pathname, nextParams);
-}
-
-function buildHref(pathname: string, params: URLSearchParams) {
-  const queryString = params.toString();
-  return queryString ? `${pathname}?${queryString}` : pathname;
 }

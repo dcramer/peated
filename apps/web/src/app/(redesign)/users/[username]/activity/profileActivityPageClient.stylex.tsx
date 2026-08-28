@@ -20,9 +20,10 @@ import {
 } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useProfile } from "../profileContext";
-import { getProfileBottleMetadata } from "../profilePresentation";
 
 type Activity = Outputs["users"]["activity"]["list"]["results"][number];
 type ActivityList = Outputs["users"]["activity"]["list"];
@@ -79,14 +80,14 @@ export function ProfileActivityPageClient({
                 pathname,
                 searchParams,
                 activityQuery.data.rel.nextCursor,
-                page + 1,
+                { page: page + 1 },
               )}
               page={page}
               previousHref={getCursorHref(
                 pathname,
                 searchParams,
                 activityQuery.data.rel.prevCursor,
-                Math.max(1, page - 1),
+                { page: Math.max(1, page - 1) },
               )}
             />
           </>
@@ -112,7 +113,7 @@ function toActivityItem(activity: Activity): MemberActivityItem {
           href: `/bottles/${entry.bottle.id}`,
           id: String(entry.id),
           imageUrl: entry.imageUrl ?? entry.bottle.imageUrl,
-          metadata: getProfileBottleMetadata(entry.bottle).split(" · "),
+          metadata: getBottleMetadata(entry.bottle).split(" · "),
           name: getBottleExpressionName(entry.bottle),
         })),
         totalItems: activity.totalItems,
@@ -130,7 +131,7 @@ function toActivityItem(activity: Activity): MemberActivityItem {
   ): TastingEntryMember => ({
     description: tasting.notes,
     href: `/bottles/${tasting.bottle.id}`,
-    metadata: getProfileBottleMetadata(tasting.bottle),
+    metadata: getBottleMetadata(tasting.bottle),
     name: tasting.bottle.fullName,
     notes: tasting.tags,
     ratingBand: tasting.ratingBand ?? undefined,
@@ -155,17 +156,4 @@ function toActivityItem(activity: Activity): MemberActivityItem {
       members,
     },
   };
-}
-
-function getCursorHref(
-  pathname: string,
-  searchParams: URLSearchParams,
-  cursor: string | null,
-  page: number,
-) {
-  if (!cursor) return undefined;
-  const next = new URLSearchParams(searchParams);
-  next.set("cursor", cursor);
-  next.set("page", String(page));
-  return `${pathname}?${next.toString()}`;
 }

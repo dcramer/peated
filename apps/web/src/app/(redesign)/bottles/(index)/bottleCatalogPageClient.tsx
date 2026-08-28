@@ -16,6 +16,7 @@ import {
 import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
+import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
 const DEFAULT_SORT = "-tastings";
@@ -105,13 +106,13 @@ export function BottleCatalogPageClient({
     if ("age" in updates) nextParams.delete("ageBand");
     nextParams.delete("cursor");
     nextParams.delete("minScore");
-    router.push(buildHref(pathname, nextParams));
+    router.push(buildSearchHref(pathname, nextParams));
   }
 
   function clearFilters() {
     const nextParams = new URLSearchParams(searchParams);
     clearedFilterKeys.forEach((name) => nextParams.delete(name));
-    router.push(buildHref(pathname, nextParams));
+    router.push(buildSearchHref(pathname, nextParams));
   }
 
   const items = bottleList.results.map(toBottleCatalogItem);
@@ -187,21 +188,4 @@ export function BottleCatalogPageClient({
       />
     </CatalogPage>
   );
-}
-
-function getCursorHref(
-  pathname: string,
-  searchParams: URLSearchParams,
-  cursor: number | null,
-) {
-  if (cursor === null) return undefined;
-
-  const nextParams = new URLSearchParams(searchParams);
-  nextParams.set("cursor", String(cursor));
-  return buildHref(pathname, nextParams);
-}
-
-function buildHref(pathname: string, params: URLSearchParams) {
-  const query = params.toString();
-  return query ? `${pathname}?${query}` : pathname;
 }

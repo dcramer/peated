@@ -21,9 +21,10 @@ import {
   RailSection,
 } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import TimeSince from "@peated/web/components/timeSince";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useProfile } from "./profileContext";
-import { getProfileBottleMetadata } from "./profilePresentation";
 
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 type TastingList = Outputs["tastings"]["list"];
@@ -114,7 +115,7 @@ function ProfileTastingEntry({ tasting }: { tasting: Tasting }) {
   const member: TastingEntryMember = {
     description: tasting.notes,
     href: `/bottles/${tasting.bottle.id}`,
-    metadata: getProfileBottleMetadata(tasting.bottle),
+    metadata: getBottleMetadata(tasting.bottle),
     name: tasting.bottle.fullName,
     notes: tasting.tags,
     ratingBand: tasting.ratingBand ?? undefined,
@@ -170,17 +171,6 @@ function getRegionRail(
       </RailList>
     </RailSection>
   );
-}
-
-function getCursorHref(
-  pathname: string,
-  searchParams: URLSearchParams,
-  cursor?: number | null,
-) {
-  if (cursor === null || cursor === undefined) return undefined;
-  const nextParams = new URLSearchParams(searchParams);
-  nextParams.set("cursor", String(cursor));
-  return `${pathname}?${nextParams.toString()}`;
 }
 
 const styles = stylex.create({

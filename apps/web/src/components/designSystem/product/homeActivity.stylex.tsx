@@ -171,8 +171,10 @@ function filterFavoriteActivity(results: readonly ActivityResult[]) {
 
 export function HomeActivity({
   filter = "friends",
+  initialData,
 }: {
-  filter?: "friends" | "global";
+  filter?: "friends" | "global" | "local";
+  initialData?: ActivityList;
 }) {
   const orpc = useORPC();
   // The activity cursor belongs to each fetched page, so the first page has no
@@ -185,8 +187,8 @@ export function HomeActivity({
     hasNextPage,
     isFetching,
     isFetchingNextPage,
+    isPending,
     refetch,
-    status,
   } = useInfiniteQuery<
     ActivityList,
     Error,
@@ -204,6 +206,9 @@ export function HomeActivity({
         limit: 10,
       }),
     initialPageParam: undefined,
+    initialData: initialData
+      ? { pages: [initialData], pageParams: [undefined] }
+      : undefined,
     getNextPageParam: (lastPage) => lastPage.rel.nextCursor ?? undefined,
   });
   /* oxlint-enable @tanstack/query/prefer-query-options */
@@ -226,7 +231,7 @@ export function HomeActivity({
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage, results.length]);
 
-  if (status === "pending") {
+  if (isPending) {
     return <LoadingList label="Loading recent activity" rows={4} />;
   }
 

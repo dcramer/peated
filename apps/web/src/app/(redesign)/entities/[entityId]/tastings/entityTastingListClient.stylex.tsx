@@ -1,6 +1,5 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -15,6 +14,8 @@ import {
 } from "@peated/web/components/designSystem/components";
 import { Avatar } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import TimeSince from "@peated/web/components/timeSince";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../../styles/tokens.stylex";
 
@@ -110,35 +111,6 @@ function EntityTastingEntry({ tasting }: { tasting: Tasting }) {
       members={[member]}
     />
   );
-}
-
-function getBottleMetadata(tastingBottle: Tasting["bottle"]) {
-  return [
-    tastingBottle.category ? formatCategoryName(tastingBottle.category) : null,
-    tastingBottle.statedAge === null
-      ? tastingBottle.noAgeStatement
-        ? "NAS"
-        : null
-      : `${tastingBottle.statedAge} years`,
-    tastingBottle.abv === null
-      ? null
-      : `${tastingBottle.abv.toFixed(1).replace(/\.0$/, "")}% ABV`,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
-}
-
-function getCursorHref(
-  pathname: string,
-  searchParams: URLSearchParams,
-  cursor: number | null,
-) {
-  if (cursor === null) return undefined;
-
-  const nextParams = new URLSearchParams(searchParams);
-  nextParams.set("cursor", String(cursor));
-  const query = nextParams.toString();
-  return query ? `${pathname}?${query}` : pathname;
 }
 
 const styles = stylex.create({

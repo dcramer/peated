@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { BottleCatalogList } from "@peated/web/components/designSystem/patterns/bottleCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
+import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../../styles/tokens.stylex";
 
@@ -68,7 +69,7 @@ export function EntityBottleListClient({
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set("sort", value);
     nextParams.delete("cursor");
-    router.push(buildHref(pathname, nextParams));
+    router.push(buildSearchHref(pathname, nextParams));
   }
 
   return (
@@ -96,23 +97,6 @@ export function EntityBottleListClient({
       />
     </div>
   );
-}
-
-function getCursorHref(
-  pathname: string,
-  searchParams: URLSearchParams,
-  cursor: number | null,
-) {
-  if (cursor === null) return undefined;
-
-  const nextParams = new URLSearchParams(searchParams);
-  nextParams.set("cursor", String(cursor));
-  return buildHref(pathname, nextParams);
-}
-
-function buildHref(pathname: string, params: URLSearchParams) {
-  const query = params.toString();
-  return query ? `${pathname}?${query}` : pathname;
 }
 
 const styles = stylex.create({

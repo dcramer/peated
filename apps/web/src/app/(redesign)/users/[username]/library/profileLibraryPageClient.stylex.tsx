@@ -20,6 +20,7 @@ import {
 } from "@peated/web/components/designSystem/patterns/memberProfileContent.stylex";
 import { PageColumns } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
+import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
 import { useProfile } from "../profileContext";
@@ -461,17 +462,6 @@ function parseStatus(
         ? value
         : undefined
     : undefined;
-}
-
-function getCursorHref(
-  pathname: string,
-  searchParams: URLSearchParams,
-  cursor?: number | null,
-) {
-  if (cursor === null || cursor === undefined) return undefined;
-  const next = new URLSearchParams(searchParams);
-  next.set("cursor", String(cursor));
-  return `${pathname}?${next.toString()}`;
 }
 
 function capitalize(value: string) {

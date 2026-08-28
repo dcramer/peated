@@ -7,8 +7,8 @@ import {
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
   BandStack,
@@ -45,6 +45,8 @@ type ExternalReviewList = Outputs["externalReviews"]["list"];
 type TastingList = Outputs["tastings"]["list"];
 type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
+
+const BottlePageContext = createContext<Bottle | null>(null);
 
 const PHONE = "@media (max-width: 480px)";
 
@@ -329,41 +331,20 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
   return <RowMenu groups={groups} label="Bottle record" variant="page" />;
 }
 
-export function BottlePageClient({
+export function BottlePageFrameClient({
+  children,
   initialBottle,
-  initialRecommendations,
-  initialReviews,
-  initialTastings,
 }: {
+  children: ReactNode;
   initialBottle: Bottle;
-  initialRecommendations?: RecommendationList;
-  initialReviews?: ExternalReviewList;
-  initialTastings?: TastingList;
 }) {
   const orpc = useORPC();
+  const pathname = usePathname();
   const bottleQuery = useQuery({
     ...orpc.bottles.details.queryOptions({
       input: { bottle: initialBottle.id },
     }),
     initialData: initialBottle,
-  });
-  const externalReviewsQuery = useQuery({
-    ...orpc.externalReviews.list.queryOptions({
-      input: { bottle: initialBottle.id, limit: 3, sort: "recent" },
-    }),
-    initialData: initialReviews,
-  });
-  const tastingsQuery = useQuery({
-    ...orpc.tastings.list.queryOptions({
-      input: { bottle: initialBottle.id, limit: 3 },
-    }),
-    initialData: initialTastings,
-  });
-  const recommendationsQuery = useQuery({
-    ...orpc.bottles.recommendations.queryOptions({
-      input: { bottle: initialBottle.id, limit: 3 },
-    }),
-    initialData: initialRecommendations,
   });
 
   if (bottleQuery.error) {
@@ -378,6 +359,100 @@ export function BottlePageClient({
   }
 
   const bottle = bottleQuery.data;
+  const currentHref =
+    pathname === `/${bottle.peatedId}` ? `/bottles/${bottle.id}` : pathname;
+
+  return (
+    <BottlePageContext.Provider value={bottle}>
+      <div {...stylex.props(styles.page)}>
+        <BottlePageHeader
+          actions={
+            <>
+              <ButtonLink
+                href={getAddBottleHref({
+                  bottleId: bottle.id,
+                  intent: "tasting",
+                })}
+                size="lg"
+                variant="accent"
+              >
+                Log a tasting
+              </ButtonLink>
+              <BottleLibraryAction bottle={bottle} />
+            </>
+          }
+          bands={
+            Object.values(bottle.tastingBandCounts).some((count) => count > 0)
+              ? { counts: bottle.tastingBandCounts, showCounts: true }
+              : null
+          }
+          brand={bottle.brand.shortName || bottle.brand.name}
+          brandHref={`/entities/${bottle.brand.id}`}
+          detail={getBottleDetail(bottle)}
+          id={bottle.peatedId}
+          imageUrl={bottle.imageUrl}
+          memberStatus={{
+            hasTasted: bottle.hasTasted,
+            isLibrary: bottle.isLibrary,
+          }}
+          menu={<BottleActions bottle={bottle} />}
+          name={getBottleExpressionName(bottle)}
+          notes={getBottleNotes(bottle)}
+          score={
+            bottle.scoreCount === 0
+              ? null
+              : {
+                  count: bottle.scoreCount,
+                  high: bottle.maxScore,
+                  low: bottle.minScore,
+                  median: bottle.medianScore,
+                }
+          }
+          specs={getBottleSpecs(bottle)}
+        />
+        <div {...stylex.props(styles.tabs)}>
+          <PageTabs
+            ariaLabel="Bottle sections"
+            currentHref={currentHref}
+            items={getTabs(bottle)}
+          />
+        </div>
+        <div {...stylex.props(styles.overview)}>{children}</div>
+      </div>
+    </BottlePageContext.Provider>
+  );
+}
+
+export function BottleOverviewClient({
+  initialRecommendations,
+  initialReviews,
+  initialTastings,
+}: {
+  initialRecommendations?: RecommendationList;
+  initialReviews?: ExternalReviewList;
+  initialTastings?: TastingList;
+}) {
+  const orpc = useORPC();
+  const bottle = useBottlePage();
+  const externalReviewsQuery = useQuery({
+    ...orpc.externalReviews.list.queryOptions({
+      input: { bottle: bottle.id, limit: 3, sort: "recent" },
+    }),
+    initialData: initialReviews,
+  });
+  const tastingsQuery = useQuery({
+    ...orpc.tastings.list.queryOptions({
+      input: { bottle: bottle.id, limit: 3 },
+    }),
+    initialData: initialTastings,
+  });
+  const recommendationsQuery = useQuery({
+    ...orpc.bottles.recommendations.queryOptions({
+      input: { bottle: bottle.id, limit: 3 },
+    }),
+    initialData: initialRecommendations,
+  });
+
   const criticReviews =
     externalReviewsQuery.data?.results
       .map(getCriticReview)
@@ -448,76 +523,20 @@ export function BottlePageClient({
   ) : null;
 
   return (
-    <div {...stylex.props(styles.page)}>
-      <BottlePageHeader
-        actions={
-          <>
-            <ButtonLink
-              href={getAddBottleHref({
-                bottleId: bottle.id,
-                intent: "tasting",
-              })}
-              size="lg"
-              variant="accent"
-            >
-              Log a tasting
-            </ButtonLink>
-            <BottleLibraryAction bottle={bottle} />
-          </>
+    <>
+      <BottleOverview
+        criticReviewDetail={
+          externalReviewsQuery.isPending ? "Loading reviews…" : undefined
         }
-        brand={bottle.brand.shortName || bottle.brand.name}
-        brandHref={`/entities/${bottle.brand.id}`}
-        detail={getBottleDetail(bottle)}
-        id={bottle.peatedId}
-        imageUrl={bottle.imageUrl}
-        memberStatus={{
-          hasTasted: bottle.hasTasted,
-          isLibrary: bottle.isLibrary,
-        }}
-        menu={<BottleActions bottle={bottle} />}
-        name={getBottleExpressionName(bottle)}
-        notes={getBottleNotes(bottle)}
-        bands={
-          Object.values(bottle.tastingBandCounts).some((count) => count > 0)
-            ? { counts: bottle.tastingBandCounts, showCounts: true }
-            : null
-        }
-        score={
-          bottle.scoreCount === 0
-            ? null
-            : {
-                count: bottle.scoreCount,
-                high: bottle.maxScore,
-                low: bottle.minScore,
-                median: bottle.medianScore,
-              }
-        }
-        specs={getBottleSpecs(bottle)}
+        criticReviews={criticReviews}
+        declaredFacts={getDeclaredFacts(bottle)}
+        mainState={mainState}
+        moreTastingsHref={`/bottles/${bottle.id}/tastings`}
+        recommendationIntro={recommendationsQuery.data?.reason}
+        recommendations={recommendations}
+        tastingCount={bottle.totalTastings}
+        tastings={tastings}
       />
-
-      <div {...stylex.props(styles.tabs)}>
-        <PageTabs
-          ariaLabel="Bottle sections"
-          currentHref={`/bottles/${bottle.id}`}
-          items={getTabs(bottle)}
-        />
-      </div>
-
-      <div {...stylex.props(styles.overview)}>
-        <BottleOverview
-          criticReviewDetail={
-            externalReviewsQuery.isPending ? "Loading reviews…" : undefined
-          }
-          criticReviews={criticReviews}
-          declaredFacts={getDeclaredFacts(bottle)}
-          mainState={mainState}
-          moreTastingsHref={`/bottles/${bottle.id}/tastings`}
-          recommendationIntro={recommendationsQuery.data?.reason}
-          recommendations={recommendations}
-          tastingCount={bottle.totalTastings}
-          tastings={tastings}
-        />
-      </div>
 
       {recommendationsQuery.error ||
       (!mainFailed && (externalReviewsQuery.error || tastingsQuery.error)) ? (
@@ -526,8 +545,14 @@ export function BottlePageClient({
           still available.
         </p>
       ) : null}
-    </div>
+    </>
   );
+}
+
+export function useBottlePage() {
+  const bottle = useContext(BottlePageContext);
+  if (!bottle) throw new Error("Bottle page content requires its route frame");
+  return bottle;
 }
 
 const styles = stylex.create({

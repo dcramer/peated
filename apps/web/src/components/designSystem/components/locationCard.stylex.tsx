@@ -1,0 +1,89 @@
+import * as stylex from "@stylexjs/stylex";
+
+import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import CountryMapIcon from "../../countryMapIcon";
+import { CardLink } from "./card.stylex";
+
+export type LocationCardProps = {
+  href: string;
+  name: string;
+  slug: string;
+  summary?: string | null;
+  totalBottles: number;
+  totalDistillers: number;
+};
+
+export function LocationCard({
+  href,
+  name,
+  slug,
+  summary,
+  totalBottles,
+  totalDistillers,
+}: LocationCardProps) {
+  return (
+    <CardLink href={href}>
+      <div {...stylex.props(styles.map)}>
+        <CountryMapIcon
+          aria-hidden="true"
+          slug={slug}
+          {...stylex.props(styles.mapIcon)}
+        />
+      </div>
+      <h2 {...stylex.props(styles.title)}>{name}</h2>
+      {summary ? <p {...stylex.props(styles.summary)}>{summary}</p> : null}
+      <p {...stylex.props(styles.measures)}>
+        {totalBottles.toLocaleString("en-US")} bottles ·{" "}
+        {totalDistillers.toLocaleString("en-US")} distillers
+      </p>
+    </CardLink>
+  );
+}
+
+const styles = stylex.create({
+  map: {
+    display: "flex",
+    height: "132px",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: space.x4,
+    padding: space.x4,
+    borderRadius: "2px",
+    backgroundColor: colors.inset,
+  },
+  mapIcon: {
+    display: "block",
+    width: "100%",
+    maxWidth: "180px",
+    height: "100%",
+    color: colors.ink,
+  },
+  title: {
+    margin: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "18px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.25,
+  },
+  summary: {
+    margin: 0,
+    marginTop: space.x2,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.5,
+  },
+  measures: {
+    margin: 0,
+    marginTop: space.x3,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    fontVariantNumeric: "tabular-nums",
+    letterSpacing: "0.04em",
+    lineHeight: 1.4,
+    textTransform: "uppercase",
+  },
+});
