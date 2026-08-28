@@ -9,8 +9,7 @@ The web app has page-local Tailwind styles, one dark palette, and no shared visu
 - Add the selected display, reading, and data typefaces with shared base styles.
 - Add Storybook as the internal workshop for foundations and components at desktop and mobile widths.
 - Add small React components for repeated interface and Peated domain patterns.
-- Migrate product screens in reviewable slices while legacy Tailwind styles continue to support surfaces that have not moved yet.
-- Remove obsolete styling infrastructure only after its consumers have migrated.
+- Migrate product and admin screens in reviewable slices, then remove the obsolete Tailwind styling infrastructure after its final consumer moves.
 
 ## Capabilities
 
@@ -24,7 +23,7 @@ None.
 
 ## Impact
 
-- Affects `apps/web`, `packages/design`, and web-facing documentation.
+- Affects `apps/web`, `packages/email`, and web-facing documentation.
 - Adds StyleX and Storybook build dependencies.
 - Keeps existing routes and API contracts unchanged during the component migration.
 - Requires visual QA at desktop and mobile widths for each reviewed slice.

@@ -20,8 +20,6 @@ import { AdminPager } from "./adminUtility.stylex";
 
 export type AdminTableColumn<Item extends object> = {
   align?: "center" | "default" | "left" | "right";
-  cellClassName?: string;
-  className?: string;
   hidden?: boolean;
   name: string;
   sort?: string;

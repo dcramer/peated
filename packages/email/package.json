@@ -18,7 +18,6 @@
     "jsx-email": "catalog:"
   },
   "devDependencies": {
-    "@peated/design": "workspace:",
     "@peated/tsconfig": "workspace:",
     "@types/react": "catalog:",
     "react": "catalog:",

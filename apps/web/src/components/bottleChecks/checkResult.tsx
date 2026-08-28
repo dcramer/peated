@@ -1,4 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
+import * as stylex from "@stylexjs/stylex";
+import { colors, fonts, space } from "../../styles/tokens.stylex";
 import {
   getBottleCheckFindings,
   getBottleCheckState,
@@ -19,12 +21,10 @@ export default function CheckResult({
 }) {
   if (!check.schemaSupported) {
     return (
-      <section className="rounded-xl border border-amber-800 bg-amber-950/40 p-5">
-        <div className="text-xs font-semibold uppercase tracking-wide text-amber-200">
-          Unsupported schema
-        </div>
-        <h2 className="mt-2 text-lg font-semibold text-white">{title}</h2>
-        <p className="mt-2 text-sm text-amber-100">
+      <section {...stylex.props(styles.panel, styles.warningPanel)}>
+        <div {...stylex.props(styles.eyebrow)}>Unsupported schema</div>
+        <h2 {...stylex.props(styles.title)}>{title}</h2>
+        <p {...stylex.props(styles.copy)}>
           This audit uses schema version {check.schemaVersion}. Its historical
           proposals cannot be reviewed safely
           {check.canClose
@@ -40,29 +40,26 @@ export default function CheckResult({
 
   if (compact) {
     return (
-      <section
-        aria-label="Review summary"
-        className="rounded-xl border border-slate-800 bg-slate-950 p-4"
-      >
-        <p className="text-sm text-slate-200">{getBottleCheckSummary(check)}</p>
+      <section aria-label="Review summary" {...stylex.props(styles.panel)}>
+        <p {...stylex.props(styles.copy)}>{getBottleCheckSummary(check)}</p>
 
         {clean ? (
-          <p className="mt-2 text-sm text-emerald-300">
+          <p {...stylex.props(styles.copy, styles.success)}>
             No catalog changes or unresolved findings were proposed.
           </p>
         ) : null}
 
         {findings.length > 0 ? (
-          <div className="mt-3 space-y-3 border-t border-slate-800 pt-3">
+          <div {...stylex.props(styles.findings)}>
             {findings.map((finding, index) => (
               <article
-                className="text-sm text-slate-200"
+                {...stylex.props(styles.finding)}
                 key={`${finding.scope}:${finding.summary}:${index}`}
               >
                 <p>{finding.summary}</p>
                 {finding.evidenceRefs.length > 0 ? (
-                  <details className="mt-1 text-xs text-slate-400">
-                    <summary className="cursor-pointer hover:text-white">
+                  <details {...stylex.props(styles.evidence)}>
+                    <summary {...stylex.props(styles.summary)}>
                       Evidence
                     </summary>
                     <EvidenceList evidence={finding.evidenceRefs} />
@@ -77,37 +74,35 @@ export default function CheckResult({
   }
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full border border-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-200">
+    <section {...stylex.props(styles.panel)}>
+      <div {...stylex.props(styles.heading)}>
+        <span {...stylex.props(styles.status)}>
           {getBottleCheckState(check)}
         </span>
-        <h2 className="text-sm font-semibold text-white">{title}</h2>
+        <h2 {...stylex.props(styles.compactTitle)}>{title}</h2>
       </div>
-      <p className="mt-2 text-sm text-slate-200">
-        {getBottleCheckSummary(check)}
-      </p>
+      <p {...stylex.props(styles.copy)}>{getBottleCheckSummary(check)}</p>
 
       {clean ? (
-        <div className="mt-2 text-sm text-emerald-300">
+        <div {...stylex.props(styles.copy, styles.success)}>
           No catalog changes or unresolved findings were proposed.
         </div>
       ) : null}
 
       {findings.length > 0 ? (
-        <div className="mt-4 border-t border-slate-800 pt-3">
-          <h3 className="text-sm font-semibold text-white">Findings</h3>
-          <div className="mt-2 space-y-3">
+        <div {...stylex.props(styles.findings)}>
+          <h3 {...stylex.props(styles.compactTitle)}>Findings</h3>
+          <div {...stylex.props(styles.findingList)}>
             {findings.map((finding, index) => {
               return (
                 <article
-                  className="text-sm text-slate-200"
+                  {...stylex.props(styles.finding)}
                   key={`${finding.scope}:${finding.summary}:${index}`}
                 >
                   <p>{finding.summary}</p>
                   {finding.evidenceRefs.length > 0 ? (
-                    <details className="mt-1 text-xs text-slate-400">
-                      <summary className="cursor-pointer hover:text-white">
+                    <details {...stylex.props(styles.evidence)}>
+                      <summary {...stylex.props(styles.summary)}>
                         Evidence
                       </summary>
                       <EvidenceList evidence={finding.evidenceRefs} />
@@ -122,3 +117,96 @@ export default function CheckResult({
     </section>
   );
 }
+
+const styles = stylex.create({
+  panel: {
+    boxSizing: "border-box",
+    padding: space.x4,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: "3px",
+    backgroundColor: colors.surface,
+  },
+  warningPanel: {
+    padding: space.x6,
+    borderLeftWidth: "3px",
+    borderLeftColor: colors.accent,
+    backgroundColor: colors.accentTint,
+  },
+  eyebrow: {
+    color: colors.accentDeep,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontWeight: 600,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+  },
+  title: {
+    margin: 0,
+    marginTop: space.x2,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "18px",
+    fontWeight: 600,
+  },
+  compactTitle: {
+    margin: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "14px",
+    fontWeight: 600,
+  },
+  copy: {
+    margin: 0,
+    marginTop: space.x2,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    lineHeight: 1.5,
+  },
+  success: { color: colors.ink },
+  heading: {
+    display: "flex",
+    alignItems: "center",
+    gap: space.x2,
+    flexWrap: "wrap",
+  },
+  status: {
+    padding: "4px 10px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: "999px",
+    color: colors.ink,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontWeight: 600,
+  },
+  findings: {
+    display: "grid",
+    gap: space.x3,
+    marginTop: space.x3,
+    paddingTop: space.x3,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+  },
+  findingList: { display: "grid", gap: space.x3 },
+  finding: {
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    lineHeight: 1.5,
+  },
+  evidence: {
+    marginTop: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+  },
+  summary: {
+    cursor: "pointer",
+    color: { default: colors.inkMuted, ":hover": colors.ink },
+  },
+});

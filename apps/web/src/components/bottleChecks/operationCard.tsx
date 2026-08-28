@@ -8,8 +8,16 @@ import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
+import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../../styles/tokens.stylex";
 
 type Details = Outputs["audits"]["details"];
 export type BottleOperation = Details["audit"]["operations"][number];
@@ -126,11 +134,13 @@ function ImpactList({
   if (entries.length === 0) return null;
 
   return (
-    <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+    <dl {...stylex.props(styles.impactList)}>
       {entries.map(([label, value]) => (
-        <div className="flex gap-1" key={label}>
-          <dd className="font-semibold text-slate-200">{value}</dd>
-          <dt className="lowercase">{label.replaceAll(/([A-Z])/g, " $1")}</dt>
+        <div {...stylex.props(styles.impactItem)} key={label}>
+          <dd {...stylex.props(styles.impactValue)}>{value}</dd>
+          <dt {...stylex.props(styles.lowercase)}>
+            {label.replaceAll(/([A-Z])/g, " $1")}
+          </dt>
         </div>
       ))}
     </dl>
@@ -144,11 +154,9 @@ function Warnings({
 }) {
   if (warnings.length === 0) return null;
   return (
-    <div className="mt-4 rounded border border-amber-800 bg-amber-950/40 p-3">
-      <div className="text-xs font-semibold uppercase tracking-wide text-amber-300">
-        Warnings
-      </div>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-100">
+    <div {...stylex.props(styles.notice, styles.warningNotice)}>
+      <div {...stylex.props(styles.eyebrow)}>Warnings</div>
+      <ul {...stylex.props(styles.bulletList)}>
         {warnings.map((warning) => (
           <li key={`${warning.code}:${warning.message}`}>{warning.message}</li>
         ))}
@@ -178,17 +186,16 @@ function FieldDiff({
     const editable = editableFields.includes(field);
     if (!onToggleField) return null;
     if (!editable) {
-      return <span className="text-xs text-slate-500">Linked</span>;
+      return <span {...stylex.props(styles.meta)}>Linked</span>;
     }
     return (
       <button
         aria-label={`${excluded ? "Include" : "Exclude"} ${labelField(field)}`}
         aria-pressed={!excluded}
-        className={`focus-visible:outline-peated min-h-9 rounded border px-2.5 py-1 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-          excluded
-            ? "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-white"
-            : "border-emerald-700 bg-emerald-950/40 text-emerald-200 hover:bg-emerald-900/50"
-        }`}
+        {...stylex.props(
+          styles.toggle,
+          excluded ? styles.toggleExcluded : styles.toggleIncluded,
+        )}
         onClick={() => {
           const parsed = BottleOperationFieldPathSchema.safeParse(field);
           if (parsed.success) onToggleField(parsed.data);
@@ -201,45 +208,37 @@ function FieldDiff({
   }
 
   return (
-    <div className="mt-3">
-      <div className="space-y-2 sm:hidden">
+    <div {...stylex.props(styles.diff)}>
+      <div {...stylex.props(styles.mobileDiff)}>
         {fields.map((field) => {
           const excluded = excludedFields.has(field);
           return (
             <div
-              className={`rounded-lg border border-slate-800 bg-slate-950/60 p-3 ${
-                excluded ? "opacity-50" : ""
-              }`}
               key={field}
+              {...stylex.props(styles.diffCard, excluded && styles.excluded)}
             >
-              <div className="flex min-h-9 items-center justify-between gap-3">
+              <div {...stylex.props(styles.diffCardHeader)}>
                 <div
-                  className={`text-sm font-semibold text-slate-200 ${
-                    excluded ? "line-through" : ""
-                  }`}
+                  {...stylex.props(styles.diffLabel, excluded && styles.struck)}
                 >
                   {labelField(field)}
                 </div>
                 {renderToggle(field, excluded)}
               </div>
-              <dl className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2">
-                <div className="min-w-0">
-                  <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                    Current
-                  </dt>
-                  <dd className="mt-1 break-words text-sm text-slate-400">
+              <dl {...stylex.props(styles.diffValues)}>
+                <div {...stylex.props(styles.minWidth)}>
+                  <dt {...stylex.props(styles.meta)}>Current</dt>
+                  <dd {...stylex.props(styles.diffValue)}>
                     {formatValue(getPath(before, field))}
                   </dd>
                 </div>
                 <ArrowRightIcon
                   aria-hidden="true"
-                  className="mt-5 h-4 w-4 text-slate-600"
+                  {...stylex.props(styles.arrow)}
                 />
-                <div className="min-w-0">
-                  <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                    Proposed
-                  </dt>
-                  <dd className="mt-1 break-words text-sm font-medium text-white">
+                <div {...stylex.props(styles.minWidth)}>
+                  <dt {...stylex.props(styles.meta)}>Proposed</dt>
+                  <dd {...stylex.props(styles.diffValue, styles.strong)}>
                     {formatValue(getPath(after, field))}
                   </dd>
                 </div>
@@ -248,32 +247,36 @@ function FieldDiff({
           );
         })}
       </div>
-      <table className="hidden min-w-full divide-y divide-slate-800 text-sm sm:table">
+      <table {...stylex.props(styles.diffTable)}>
         <thead>
-          <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
-            {onToggleField ? <th className="w-20 py-2 pr-4">Apply</th> : null}
-            <th className="py-2 pr-4">Field</th>
-            <th className="py-2 pr-4">Current</th>
-            <th className="py-2">Proposed</th>
+          <tr {...stylex.props(styles.tableHeading)}>
+            {onToggleField ? (
+              <th {...stylex.props(styles.applyCell)}>Apply</th>
+            ) : null}
+            <th {...stylex.props(styles.tableCell)}>Field</th>
+            <th {...stylex.props(styles.tableCell)}>Current</th>
+            <th {...stylex.props(styles.tableLastCell)}>Proposed</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800">
+        <tbody>
           {fields.map((field) => {
             const excluded = excludedFields.has(field);
             return (
-              <tr className={excluded ? "opacity-50" : undefined} key={field}>
+              <tr key={field} {...stylex.props(excluded && styles.excluded)}>
                 {onToggleField ? (
-                  <td className="py-2 pr-4">{renderToggle(field, excluded)}</td>
+                  <td {...stylex.props(styles.tableCell)}>
+                    {renderToggle(field, excluded)}
+                  </td>
                 ) : null}
-                <td className="py-2 pr-4 font-medium text-slate-300">
-                  <span className={excluded ? "line-through" : undefined}>
+                <td {...stylex.props(styles.tableCell, styles.strong)}>
+                  <span {...stylex.props(excluded && styles.struck)}>
                     {labelField(field)}
                   </span>
                 </td>
-                <td className="py-2 pr-4 text-slate-400">
+                <td {...stylex.props(styles.tableCell, styles.muted)}>
                   {formatValue(getPath(before, field))}
                 </td>
-                <td className="py-2 text-white">
+                <td {...stylex.props(styles.tableLastCell, styles.strong)}>
                   {formatValue(getPath(after, field))}
                 </td>
               </tr>
@@ -298,7 +301,7 @@ function Preview({
 }) {
   if (review.status === "blocked") {
     return (
-      <div className="mt-4 rounded border border-red-900 bg-red-950/40 p-3 text-sm text-red-200">
+      <div {...stylex.props(styles.notice, styles.dangerNotice)}>
         {review.preparationError.message}
       </div>
     );
@@ -307,10 +310,8 @@ function Preview({
   switch (review.type) {
     case "update_bottle":
       return (
-        <div className="mt-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Live Bottle diff
-          </div>
+        <div {...stylex.props(styles.preview)}>
+          <div {...stylex.props(styles.eyebrow)}>Live Bottle diff</div>
           <FieldDiff
             after={review.preview.after}
             before={review.preview.before}
@@ -332,14 +333,14 @@ function Preview({
       );
     case "merge_bottles":
       return (
-        <div className="mt-4">
-          <div className="text-sm text-slate-300">
+        <div {...stylex.props(styles.preview)}>
+          <div {...stylex.props(styles.copy)}>
             Retire{" "}
-            <strong className="text-white">
+            <strong {...stylex.props(styles.strong)}>
               {review.preview.source.fullName}
             </strong>{" "}
             into{" "}
-            <strong className="text-white">
+            <strong {...stylex.props(styles.strong)}>
               {review.preview.destination.fullName}
             </strong>
             .
@@ -350,10 +351,8 @@ function Preview({
       );
     case "update_entity":
       return (
-        <div className="mt-4">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Live Entity diff
-          </div>
+        <div {...stylex.props(styles.preview)}>
+          <div {...stylex.props(styles.eyebrow)}>Live Entity diff</div>
           <FieldDiff
             after={review.preview.after}
             before={review.preview.before}
@@ -368,12 +367,14 @@ function Preview({
       );
     case "merge_entities":
       return (
-        <div className="mt-4">
-          <div className="text-sm text-slate-300">
+        <div {...stylex.props(styles.preview)}>
+          <div {...stylex.props(styles.copy)}>
             Retire{" "}
-            <strong className="text-white">{review.preview.source.name}</strong>{" "}
+            <strong {...stylex.props(styles.strong)}>
+              {review.preview.source.name}
+            </strong>{" "}
             into{" "}
-            <strong className="text-white">
+            <strong {...stylex.props(styles.strong)}>
               {review.preview.destination.name}
             </strong>
             . Survivor kind: {review.preview.after.kind}.
@@ -399,9 +400,9 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
     case "update_bottle":
       links = [
         <Link
-          className="underline"
           href={`/bottles/${proposal.input.bottleId}/edit`}
           key="bottle"
+          {...stylex.props(styles.link)}
         >
           Edit Bottle #{proposal.input.bottleId}
         </Link>,
@@ -410,16 +411,16 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
     case "merge_bottles":
       links = [
         <Link
-          className="underline"
           href={`/bottles/${proposal.input.sourceBottleId}/edit`}
           key="source"
+          {...stylex.props(styles.link)}
         >
           Edit source Bottle
         </Link>,
         <Link
-          className="underline"
           href={`/bottles/${proposal.input.destinationBottleId}/edit`}
           key="destination"
+          {...stylex.props(styles.link)}
         >
           Edit destination Bottle
         </Link>,
@@ -428,9 +429,9 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
     case "update_entity":
       links = [
         <Link
-          className="underline"
           href={`/entities/${proposal.input.entityId}/edit`}
           key="entity"
+          {...stylex.props(styles.link)}
         >
           Edit Entity #{proposal.input.entityId}
         </Link>,
@@ -439,27 +440,23 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
     case "merge_entities":
       links = [
         <Link
-          className="underline"
           href={`/entities/${proposal.input.sourceEntityId}/edit`}
           key="source"
+          {...stylex.props(styles.link)}
         >
           Edit source Entity
         </Link>,
         <Link
-          className="underline"
           href={`/entities/${proposal.input.destinationEntityId}/edit`}
           key="destination"
+          {...stylex.props(styles.link)}
         >
           Edit destination Entity
         </Link>,
       ];
       break;
   }
-  return (
-    <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-300">
-      {links}
-    </div>
-  );
+  return <div {...stylex.props(styles.resourceLinks)}>{links}</div>;
 }
 
 function ExecutionSummary({ operation }: { operation: BottleOperation }) {
@@ -498,7 +495,7 @@ function ExecutionSummary({ operation }: { operation: BottleOperation }) {
     "reconciled" in operation.result &&
     operation.result.reconciled === true;
   return (
-    <div className="mt-4 rounded border border-slate-800 bg-slate-950 p-3 text-sm text-slate-200">
+    <div {...stylex.props(styles.notice)}>
       {message}
       {reconciled ? " The prior execution was reconciled safely." : ""}
     </div>
@@ -512,14 +509,17 @@ export function EvidenceList({
 }) {
   if (evidence.length === 0) return null;
   return (
-    <ul className="mt-2 space-y-1 text-sm text-slate-300">
+    <ul {...stylex.props(styles.evidenceList)}>
       {evidence.map((ref) => {
         switch (ref.kind) {
           case "bottle":
             return (
               <li key={`bottle:${ref.bottleId}`}>
                 Bottle evidence:{" "}
-                <Link className="underline" href={`/bottles/${ref.bottleId}`}>
+                <Link
+                  href={`/bottles/${ref.bottleId}`}
+                  {...stylex.props(styles.link)}
+                >
                   #{ref.bottleId}
                 </Link>
               </li>
@@ -528,7 +528,10 @@ export function EvidenceList({
             return (
               <li key={`entity:${ref.entityId}`}>
                 Entity evidence:{" "}
-                <Link className="underline" href={`/entities/${ref.entityId}`}>
+                <Link
+                  href={`/entities/${ref.entityId}`}
+                  {...stylex.props(styles.link)}
+                >
                   #{ref.entityId}
                 </Link>
               </li>
@@ -538,10 +541,10 @@ export function EvidenceList({
               <li key={ref.url}>
                 Web evidence:{" "}
                 <a
-                  className="break-all underline"
                   href={ref.url}
                   rel="noreferrer"
                   target="_blank"
+                  {...stylex.props(styles.externalLink)}
                 >
                   {ref.url}
                 </a>
@@ -726,13 +729,13 @@ export default function OperationCard({
 
   if (pendingRemoval) {
     return (
-      <article className="rounded-xl border border-amber-800/70 bg-amber-950/20 p-4 sm:p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <article {...stylex.props(styles.card, styles.warningCard)}>
+        <div {...stylex.props(styles.cardHeader, styles.centeredHeader)}>
           <div>
-            <Heading className="font-semibold text-white">
+            <Heading {...stylex.props(styles.cardTitle)}>
               {OPERATION_LABELS[operation.proposal.type]}
             </Heading>
-            <p className="mt-1 text-sm text-amber-100" role="status">
+            <p {...stylex.props(styles.copy)} role="status">
               {savingRemoval
                 ? "Removing operation…"
                 : "Operation removed. This will be saved shortly."}
@@ -749,16 +752,16 @@ export default function OperationCard({
   }
 
   return (
-    <article className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <article {...stylex.props(styles.card)}>
+      <div {...stylex.props(styles.cardHeader)}>
         <div>
-          <Heading className="font-semibold text-white">
+          <Heading {...stylex.props(styles.cardTitle)}>
             {OPERATION_LABELS[operation.proposal.type]}
           </Heading>
           {!compact ||
           operation.status !== "pending_review" ||
           notApprovalReady ? (
-            <span className="mt-2 inline-block rounded-full border border-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-200">
+            <span {...stylex.props(styles.status)}>
               {notApprovalReady
                 ? "Not ready to approve"
                 : STATUS_LABELS[operation.status]}
@@ -769,20 +772,23 @@ export default function OperationCard({
           <Button
             disabled={copying}
             icon={
-              <DocumentDuplicateIcon aria-hidden="true" className="h-5 w-5" />
+              <DocumentDuplicateIcon
+                aria-hidden="true"
+                {...stylex.props(styles.icon)}
+              />
             }
             loading={copying}
             onClick={() => onCopy(operation.id)}
             size="small"
             title="Copy structured audit operation data as JSON"
           >
-            <span className="sr-only">Copy operation payload</span>
+            <span {...stylex.props(styles.srOnly)}>Copy operation payload</span>
           </Button>
         ) : null}
       </div>
 
       {notApprovalReady ? (
-        <p className="mt-3 text-sm text-amber-200" role="status">
+        <p {...stylex.props(styles.copy, styles.accentCopy)} role="status">
           The current catalog state does not support applying this proposal.
         </p>
       ) : null}
@@ -799,7 +805,7 @@ export default function OperationCard({
       ) : null}
 
       {excludedFields.size > 0 ? (
-        <p className="mt-3 text-sm text-slate-400">
+        <p {...stylex.props(styles.copy)}>
           {excludedFields.size} proposed field
           {excludedFields.size === 1 ? " is" : "s are"} struck out and will not
           be applied.
@@ -807,30 +813,29 @@ export default function OperationCard({
       ) : null}
 
       {operation.rejectionReason ? (
-        <div className="mt-4 text-sm text-slate-300">
+        <div {...stylex.props(styles.copy)}>
           Removed: {operation.rejectionReason.replaceAll("_", " ")}
           {operation.reviewerNote ? ` — ${operation.reviewerNote}` : ""}
         </div>
       ) : null}
       <ExecutionSummary operation={operation} />
       {operation.error ? (
-        <div className="mt-4 rounded border border-red-900 bg-red-950/40 p-3 text-sm text-red-200">
+        <div {...stylex.props(styles.notice, styles.dangerNotice)}>
           {operation.error}
         </div>
       ) : null}
 
       {actionError ? (
-        <div className="mt-4 rounded border border-red-900 bg-red-950/40 p-3 text-sm text-red-200">
+        <div {...stylex.props(styles.notice, styles.dangerNotice)}>
           {actionError}
         </div>
       ) : null}
 
       {canApply || canReject || canRetry ? (
-        <div className="-mx-4 mt-4 grid grid-cols-2 gap-2 border-y border-slate-800 bg-slate-900/95 px-4 py-3 sm:mx-0 sm:flex sm:flex-wrap sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-4">
+        <div {...stylex.props(styles.actions)}>
           {canApply ? (
             <Button
               aria-label="Apply included changes"
-              className="min-h-10 sm:flex-none"
               color={
                 approvalReady && !allFieldsExcluded ? "highlight" : undefined
               }
@@ -849,7 +854,6 @@ export default function OperationCard({
           {canReject ? (
             <Button
               aria-label="Remove operation"
-              className="min-h-10 sm:flex-none"
               disabled={disabled}
               onClick={() => setRejecting((value) => !value)}
               size="small"
@@ -859,7 +863,6 @@ export default function OperationCard({
           ) : null}
           {canRetry ? (
             <Button
-              className="min-h-10 sm:flex-none"
               disabled={disabled}
               loading={actionPending}
               onClick={() => onRetry?.(operation.id)}
@@ -871,27 +874,21 @@ export default function OperationCard({
         </div>
       ) : null}
 
-      <details className="mt-4 border-t border-slate-800 pt-3">
-        <summary className="cursor-pointer text-sm font-medium text-slate-300 hover:text-white">
+      <details {...stylex.props(styles.details)}>
+        <summary {...stylex.props(styles.detailsSummary)}>
           {compact ? "Evidence" : "Evidence and reasoning"}
         </summary>
-        <p className="mt-3 text-sm text-slate-300">
-          {operation.proposal.rationale}
-        </p>
+        <p {...stylex.props(styles.copy)}>{operation.proposal.rationale}</p>
         <EvidenceList evidence={operation.proposal.evidenceRefs} />
         <ResourceLinks operation={operation} />
       </details>
 
       {rejecting && canReject ? (
-        <div
-          className="mt-3 scroll-mb-32 rounded border border-slate-800 bg-slate-950 p-3"
-          ref={rejectionPanel}
-        >
-          <div className="grid gap-3 sm:grid-cols-[180px_minmax(0,1fr)]">
-            <label className="text-xs text-slate-300">
+        <div ref={rejectionPanel} {...stylex.props(styles.rejectionPanel)}>
+          <div {...stylex.props(styles.rejectionFields)}>
+            <label {...stylex.props(styles.fieldLabel)}>
               Reason
               <select
-                className="mt-1 block w-full rounded border-0 bg-slate-800 px-3 py-2 text-sm"
                 disabled={disabled}
                 onChange={(event) => {
                   const reason = REJECTION_REASONS.find(
@@ -900,6 +897,7 @@ export default function OperationCard({
                   if (reason) setRejectionReason(reason.id);
                 }}
                 value={rejectionReason}
+                {...stylex.props(styles.input)}
               >
                 {REJECTION_REASONS.map((reason) => (
                   <option key={reason.id} value={reason.id}>
@@ -908,19 +906,19 @@ export default function OperationCard({
                 ))}
               </select>
             </label>
-            <label className="text-xs text-slate-300">
+            <label {...stylex.props(styles.fieldLabel)}>
               Note {rejectionReason === "other" ? "(required)" : "(optional)"}
               <input
-                className="mt-1 block w-full rounded border-0 bg-slate-800 px-3 py-2 text-sm"
                 disabled={disabled}
                 onChange={(event) =>
                   setRejectionNote(event.currentTarget.value)
                 }
                 value={rejectionNote}
+                {...stylex.props(styles.input)}
               />
             </label>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div {...stylex.props(styles.rejectionActions)}>
             <Button
               color="danger"
               disabled={disabled || !canConfirmRejection}
@@ -942,3 +940,348 @@ export default function OperationCard({
     </article>
   );
 }
+
+const styles = stylex.create({
+  minWidth: { minWidth: 0 },
+  card: {
+    boxSizing: "border-box",
+    padding: { default: space.x6, "@media (max-width: 639px)": space.x4 },
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+  },
+  warningCard: {
+    borderLeftWidth: "3px",
+    borderLeftColor: colors.accent,
+    backgroundColor: colors.accentTint,
+  },
+  cardHeader: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: space.x3,
+    flexWrap: "wrap",
+  },
+  centeredHeader: { alignItems: "center" },
+  cardTitle: {
+    margin: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "16px",
+    fontWeight: 600,
+  },
+  status: {
+    display: "inline-block",
+    marginTop: space.x2,
+    padding: "4px 10px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: "999px",
+    color: colors.ink,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontWeight: 600,
+  },
+  preview: { marginTop: space.x4 },
+  eyebrow: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontWeight: 600,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+  },
+  copy: {
+    margin: 0,
+    marginTop: space.x3,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    lineHeight: 1.5,
+  },
+  accentCopy: { color: colors.accentDeep },
+  strong: { color: colors.ink, fontWeight: 600 },
+  muted: { color: colors.inkMuted },
+  meta: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontWeight: 500,
+    letterSpacing: "0.05em",
+    textTransform: "uppercase",
+  },
+  impactList: {
+    display: "flex",
+    margin: 0,
+    marginTop: space.x3,
+    padding: 0,
+    gap: `${space.x1} ${space.x4}`,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    flexWrap: "wrap",
+  },
+  impactItem: { display: "flex", gap: space.x1 },
+  impactValue: { margin: 0, color: colors.ink, fontWeight: 600 },
+  lowercase: { textTransform: "lowercase" },
+  notice: {
+    marginTop: space.x4,
+    padding: space.x3,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.inset,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    lineHeight: 1.5,
+  },
+  warningNotice: {
+    borderLeftWidth: "3px",
+    borderLeftColor: colors.accent,
+    backgroundColor: colors.accentTint,
+  },
+  dangerNotice: {
+    borderLeftWidth: "3px",
+    borderLeftColor: colors.accentDeep,
+    color: colors.ink,
+  },
+  bulletList: {
+    display: "grid",
+    margin: 0,
+    marginTop: space.x2,
+    paddingLeft: space.x6,
+    gap: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    listStyleType: "disc",
+  },
+  toggle: {
+    minHeight: "36px",
+    padding: "4px 10px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderRadius: controlMetrics.radius,
+    outline: "none",
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontWeight: 600,
+    cursor: "pointer",
+    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
+  },
+  toggleExcluded: {
+    borderColor: colors.hairline,
+    backgroundColor: "transparent",
+    color: { default: colors.inkMuted, ":hover": colors.ink },
+  },
+  toggleIncluded: {
+    borderColor: colors.accent,
+    backgroundColor: {
+      default: colors.accentTint,
+      ":hover": colors.inset,
+    },
+    color: colors.accentDeep,
+  },
+  diff: { marginTop: space.x3 },
+  mobileDiff: {
+    display: { default: "none", "@media (max-width: 639px)": "grid" },
+    gap: space.x2,
+  },
+  diffCard: {
+    padding: space.x3,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.inset,
+  },
+  diffCardHeader: {
+    display: "flex",
+    minHeight: "36px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x3,
+  },
+  diffLabel: {
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    fontWeight: 600,
+  },
+  diffValues: {
+    display: "grid",
+    margin: 0,
+    marginTop: space.x3,
+    gridTemplateColumns: "minmax(0,1fr) auto minmax(0,1fr)",
+    alignItems: "start",
+    gap: space.x2,
+  },
+  diffValue: {
+    margin: 0,
+    marginTop: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    overflowWrap: "anywhere",
+  },
+  arrow: {
+    width: "16px",
+    height: "16px",
+    marginTop: "20px",
+    color: colors.hairline,
+  },
+  diffTable: {
+    display: { default: "table", "@media (max-width: 639px)": "none" },
+    width: "100%",
+    borderCollapse: "collapse",
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+  },
+  tableHeading: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    letterSpacing: "0.05em",
+    textAlign: "left",
+    textTransform: "uppercase",
+  },
+  tableCell: {
+    paddingTop: space.x2,
+    paddingRight: space.x4,
+    paddingBottom: space.x2,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  tableLastCell: {
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  applyCell: {
+    width: "80px",
+    paddingTop: space.x2,
+    paddingRight: space.x4,
+    paddingBottom: space.x2,
+  },
+  excluded: { opacity: 0.5 },
+  struck: { textDecoration: "line-through" },
+  resourceLinks: {
+    display: "flex",
+    marginTop: space.x3,
+    gap: space.x3,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    flexWrap: "wrap",
+  },
+  link: {
+    color: { default: colors.inkMuted, ":hover": colors.accentDeep },
+    textDecoration: "underline",
+  },
+  externalLink: {
+    color: { default: colors.inkMuted, ":hover": colors.accentDeep },
+    textDecoration: "underline",
+    overflowWrap: "anywhere",
+  },
+  evidenceList: {
+    display: "grid",
+    margin: 0,
+    marginTop: space.x2,
+    padding: 0,
+    gap: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    listStyle: "none",
+  },
+  icon: { width: "20px", height: "20px" },
+  srOnly: {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    padding: 0,
+    margin: "-1px",
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
+  },
+  actions: {
+    display: "flex",
+    marginTop: space.x4,
+    paddingTop: space.x4,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+    gap: space.x2,
+    flexWrap: "wrap",
+  },
+  details: {
+    marginTop: space.x4,
+    paddingTop: space.x3,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+  },
+  detailsSummary: {
+    color: { default: colors.inkMuted, ":hover": colors.ink },
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  rejectionPanel: {
+    marginTop: space.x3,
+    padding: space.x3,
+    scrollMarginBottom: "128px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.inset,
+  },
+  rejectionFields: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "180px minmax(0,1fr)",
+      "@media (max-width: 639px)": "minmax(0,1fr)",
+    },
+    gap: space.x3,
+  },
+  fieldLabel: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+  },
+  input: {
+    boxSizing: "border-box",
+    display: "block",
+    width: "100%",
+    minHeight: "40px",
+    marginTop: space.x1,
+    padding: `${space.x2} ${space.x3}`,
+    borderWidth: 0,
+    borderRadius: controlMetrics.radius,
+    outline: "none",
+    backgroundColor: colors.surface,
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
+  },
+  rejectionActions: {
+    display: "flex",
+    marginTop: space.x3,
+    gap: space.x2,
+    flexWrap: "wrap",
+  },
+});

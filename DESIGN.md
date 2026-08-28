@@ -22,7 +22,7 @@ Peated is a whisky database first. It is a reference work with community data, n
 6. Use uppercase text only for short data labels in the mono type role.
 7. End an actionable empty state with the contribution path.
 
-During migration, Tailwind utilities remain available only to legacy elements that name them. The web build does not load Tailwind Forms. StyleX components own their complete control treatment. Remove Tailwind after its final route consumer migrates.
+The web app uses StyleX for component styles and does not load or compile Tailwind. Components own their complete visual and control treatment. Keep global CSS for document defaults and third-party markup that a component cannot own.
 
 ## Color
 
@@ -236,7 +236,7 @@ Thin data is normal.
 
 ## Component ownership
 
-New design-system components use StyleX and own their visual states. Name files that contain StyleX calls `*.stylex.ts` or `*.stylex.tsx`; this keeps the compile boundary narrow and explicit. Product screens compose these components without adding Tailwind classes to the same elements. Keep global CSS for document defaults and third-party markup that a component cannot own.
+Design-system components use StyleX and own their visual states. Name files that contain StyleX calls `*.stylex.ts` or `*.stylex.tsx`; this keeps the compile boundary narrow and explicit. Product screens compose these components instead of adding page-local visual classes.
 
 Use the shared composition baseline before adding another visual container:
 

@@ -6,7 +6,7 @@
 - Search `src/components/designSystem/` before creating a component or visual pattern.
 - Query the `peated-storybook` MCP server when Storybook is running. Use documented component props and story states.
 - Keep each component story beside its implementation. Put real compositions under `patterns/`.
-- Use StyleX for new design-system elements. Do not add Tailwind classes to elements owned by a StyleX component.
+- Use StyleX for web styling. Do not add Tailwind utilities or configuration.
 - Do not add component snapshots or presentation tests. Use the accessibility panel and manual light, dark, desktop, and mobile review.
 
 ## Design-system checks

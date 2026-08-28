@@ -1,6 +1,8 @@
 import type { Finding } from "@peated/bottle-classifier";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
+import * as stylex from "@stylexjs/stylex";
+import { colors } from "../../styles/tokens.stylex";
 
 export type BottleCheck = Outputs["audits"]["list"]["results"][number];
 
@@ -67,8 +69,8 @@ export function BottleCheckSubject({
   if (check.bottleId) {
     return (
       <Link
-        className="font-medium text-white underline"
         href={`/bottles/${check.bottleId}`}
+        {...stylex.props(styles.subjectLink)}
       >
         Bottle #{check.bottleId}
       </Link>
@@ -76,7 +78,7 @@ export function BottleCheckSubject({
   }
   if (check.intent === "resolve_reference") {
     return (
-      <span className="text-slate-300">
+      <span {...stylex.props(styles.subject)}>
         {check.sourceKind === "store_price"
           ? "Incoming listing"
           : "Bottle reference"}
@@ -84,8 +86,17 @@ export function BottleCheckSubject({
       </span>
     );
   }
-  return <span className="text-slate-300">Deleted Bottle</span>;
+  return <span {...stylex.props(styles.subject)}>Deleted Bottle</span>;
 }
+
+const styles = stylex.create({
+  subject: { color: colors.inkMuted },
+  subjectLink: {
+    color: colors.ink,
+    fontWeight: 600,
+    textDecoration: "underline",
+  },
+});
 
 export function BottleCheckOrigin({
   check,

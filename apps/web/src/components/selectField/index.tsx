@@ -17,7 +17,6 @@ import type {
 
 type BaseProps<T extends Option> = {
   canCreate?: boolean;
-  className?: string;
   createForm?: CreateForm<T>;
   disabled?: boolean;
   emptyListItem?: (query: string) => React.ReactNode;

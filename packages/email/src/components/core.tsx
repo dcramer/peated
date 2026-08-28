@@ -1,4 +1,3 @@
-import theme from "@peated/design";
 import {
   Button as DefaultButton,
   Heading as DefaultHeading,
@@ -9,6 +8,7 @@ import {
 } from "jsx-email";
 import type { ComponentProps } from "react";
 import React from "react";
+import theme from "../theme";
 
 export function Section({
   style = {},

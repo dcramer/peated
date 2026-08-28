@@ -147,3 +147,4 @@
 - [x] 8.6 Migrate moderation routes while preserving their operational behavior and dense review states
 - [x] 8.7 Remove the admin legacy stylesheet and unused Tailwind dependencies
 - [x] 8.8 Run web validation and review admin at desktop and phone widths in both system schemes
+- [x] 8.9 Remove the remaining utility-class component tree, Tailwind packages and formatter plugin, replace the email theme dependency with a local palette, and convert the live audit-operation UI to StyleX

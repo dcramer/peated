@@ -9,8 +9,9 @@ at the component that renders the UI.
 
 - Prefer shared form components for add/edit variants of the same workflow.
   Route pages should mostly provide data, mutations, auth checks, and redirects.
-- Keep Tailwind classes with the component or component-local helper that owns
-  the markup.
+- Keep StyleX declarations with the component or component-local helper that
+  owns the markup. Do not add Tailwind utilities or configuration to the web
+  application.
 - Extract small named components for repeated UI surfaces instead of creating
   broad feature stylesheets or semantic class APIs.
 - Use existing Peated fields, buttons, form screens, selectors, and empty states
@@ -23,5 +24,5 @@ at the component that renders the UI.
 ## Exceptions
 
 - Shared design-system packages may own their styling outside the call site.
-- Third-party generated markup may need narrow wrapper selectors when utilities
+- Third-party generated markup may need narrow wrapper selectors when StyleX
   cannot safely reach the DOM.

@@ -14,17 +14,14 @@ type BaseProps = {
   "aria-pressed"?: boolean | "false" | "true" | "mixed";
   active?: boolean;
   children?: ReactNode;
-  className?: string;
   color?: ButtonColor;
   disabled?: boolean;
-  fullHeight?: boolean;
   fullWidth?: boolean;
   icon?: ReactNode;
   loading?: boolean;
   size?: LegacyButtonSize;
   title?: string;
   type?: "button" | "submit" | "reset";
-  unstyled?: boolean;
   [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 };
 
@@ -52,10 +49,8 @@ const Button = forwardRef<HTMLButtonElement, Props>(function Button(
   {
     active = false,
     children,
-    className: _className,
     color = "default",
     disabled = false,
-    fullHeight: _fullHeight,
     fullWidth = false,
     href,
     icon,
@@ -63,7 +58,6 @@ const Button = forwardRef<HTMLButtonElement, Props>(function Button(
     onClick,
     size = "base",
     type = "button",
-    unstyled: _unstyled,
     ...props
   },
   ref,

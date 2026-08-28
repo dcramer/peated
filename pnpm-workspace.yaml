@@ -39,9 +39,6 @@ catalog:
   "@logtape/logtape": 2.2.3
   "@logtape/redaction": 2.2.3
   "@opentelemetry/api": 1.9.1
-  tailwindcss: ^3.4.19
-  "@tailwindcss/typography": ^0.5.19
-  "prettier-plugin-tailwindcss": ^0.5.14
   "@tanstack/react-query": ^5.90.21
   "@tanstack/react-query-next-experimental": ^5.91.0
   # TODO: theres an issue upgrading right now to 11.0.1

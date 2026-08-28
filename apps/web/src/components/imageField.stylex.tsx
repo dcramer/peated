@@ -24,7 +24,6 @@ import { colors, effects, fonts, space } from "../styles/tokens.stylex";
 import { Button, Field } from "./designSystem/components";
 
 type Props = {
-  className?: string;
   error?: { message?: string };
   helpText?: string;
   imageHeight?: number;

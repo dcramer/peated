@@ -15,13 +15,13 @@ describe("Join", () => {
     ];
 
     const html = renderToStaticMarkup(
-      <div className="flex gap-x-1">
+      <div className="join-container">
         <Join divider=", ">{links}</Join>
       </div>,
     );
 
     expect(html).toBe(
-      '<div class="flex gap-x-1"><span><a href="/x">X</a>, <a href="/y">Y</a></span></div>',
+      '<div class="join-container"><span><a href="/x">X</a>, <a href="/y">Y</a></span></div>',
     );
   });
 });

@@ -1,9 +1,9 @@
-import theme from "@peated/design";
 import { Preview } from "jsx-email";
 import React from "react";
 import { defaulted, object, string, type Infer } from "superstruct";
 import { Button, Section, Text } from "../components/core";
 import Layout from "../components/layout";
+import theme from "../theme";
 
 export const TemplateName = "PasswordResetEmail";
 

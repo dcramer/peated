@@ -1,6 +1,6 @@
 ## Context
 
-Peated's web styles are embedded in route and component Tailwind class strings. The current design package only exports Tailwind configuration, the root layout forces a dark palette, and email templates consume the resolved Tailwind theme. The new visual direction defines semantic colors, three type roles, tight radii, tonal structure, and separate light and dark schemes.
+Peated's web styles were embedded in route and component Tailwind class strings. The old design package only exported Tailwind configuration, the root layout forced a dark palette, and email templates consumed the resolved Tailwind theme. The new visual direction defines semantic colors, three type roles, tight radii, tonal structure, and separate light and dark schemes.
 
 The redesign will stay on one long-lived branch but move through small visual-review slices. Existing product behavior and data contracts must remain stable while screens migrate.
 
@@ -26,15 +26,15 @@ The redesign will stay on one long-lived branch but move through small visual-re
 
 ### Keep StyleX source in the web app
 
-StyleX token files and React components will live under `apps/web/src` and use a `*.stylex.ts` or `*.stylex.tsx` suffix. Next and PostCSS will use the StyleX SWC integration, while Vitest uses the official Babel transform. This keeps the application on Next's default compiler and avoids unresolved external-package transform behavior in Vitest. `packages/design` will continue to serve its existing email consumers until a later reviewed slice changes that boundary.
+StyleX token files and React components live under `apps/web/src` and use a `*.stylex.ts` or `*.stylex.tsx` suffix. Next and PostCSS use the StyleX SWC integration, while Vitest uses the official Babel transform. This keeps the application on Next's default compiler and avoids unresolved external-package transform behavior in Vitest. Email owns its small fixed color palette and does not depend on the web styling toolchain.
 
 ### Let the operating system select the color scheme
 
 Semantic color variables will use light defaults and `prefers-color-scheme: dark` overrides. The root document will declare `color-scheme: light dark`. Product surfaces will not use a theme provider, cookie, local storage, hydration script, or theme toggle. Storybook may use its own non-persistent review toolbar to select an explicit scheme for the story canvas.
 
-### Migrate beside Tailwind
+### Complete the Tailwind cutover
 
-StyleX and Tailwind will coexist during migration. A new component will use StyleX on its owned elements and will not mix Tailwind utilities onto those elements. Legacy surfaces will keep their existing classes until their review slice. The web build will not load Tailwind Forms, so it cannot inject native-control visuals into StyleX components. Tailwind can be removed only after its final consumer migrates.
+StyleX and Tailwind coexisted only while route slices moved. After the final public and admin consumers migrated, the web app removed the legacy components, utility helper, Tailwind packages, formatter plugin, and Tailwind-only design package together. The email package now owns the fixed colors required by rendered email. A third-party email preview tool can keep its own transitive implementation dependencies without exposing them to Peated source or web builds.
 
 ### Cut over one complete route at a time
 
@@ -77,9 +77,8 @@ workspace structure that has no public product meaning. Complete admin pages do
 not move into Storybook; only new reusable components receive focused stories.
 
 The migration starts with the workspace and dashboard, then moves through list,
-detail, form, and moderation families. Tailwind remains scoped to admin until
-the final family moves, then the legacy stylesheet and unused dependencies are
-removed together.
+detail, form, and moderation families. After the final family moves, the legacy
+components and unused styling dependencies are removed together.
 
 Links own visible interaction beyond the browser cursor. Neutral text links move from ink to the deeper accent on hover and to accent while pressed. Linked surface cards and rows step from surface to inset on hover and to accent tint while pressed without moving or gaining elevation. Keyboard focus uses the shared 2px inset ring on the complete actionable surface. Header navigation keeps database destinations available on every page. Its current destination uses ink-colored display type at weight 700 with `aria-current="page"`; the accent rule remains reserved for page tabs.
 
@@ -135,7 +134,6 @@ Small row controls use the updated 34px size. A styled select suppresses browser
 
 ## Risks / Trade-offs
 
-- [Two styling systems coexist during migration] -> Keep ownership per element explicit, omit Tailwind Forms, and remove legacy utility CSS after the final route consumer migrates.
 - [StyleX adds transforms to Next and Vitest] -> Prove development, production build, typecheck, and focused tests in the foundation slice.
 - [The Next SWC integration is community-maintained] -> Pin its version, keep the StyleX file boundary explicit, and retain production-build coverage as an upgrade gate.
 - [System-only theming cannot honor an in-app override] -> Treat that as an explicit later capability if product requirements change.
@@ -153,11 +151,6 @@ Small row controls use the updated 34px size. A styled select suppresses browser
    live homepage and cut over its complete application shell as the first
    public route.
 7. Continue screen-by-screen migration with a review checkpoint after each slice.
-8. Remove unused Tailwind and legacy design-package code only after all intended consumers migrate.
+8. Remove Tailwind, the utility-class component tree, and the legacy design package after all intended consumers migrate. Keep the email palette local to email.
 
 Rollback is a normal branch revert for each slice. The migration does not change persisted data.
-
-## Open Questions
-
-- Does the admin application migrate to the new visual system, or retain a scoped legacy theme?
-- Which product screen follows the bottle page after the core components are approved?

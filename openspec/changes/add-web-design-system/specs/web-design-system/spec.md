@@ -46,10 +46,10 @@ New design-system components SHALL own their visual styles through StyleX and SH
 - **WHEN** a design-system select renders its disclosure caret
 - **THEN** it suppresses browser and legacy background indicators and shows exactly one caret in Storybook and product layouts
 
-#### Scenario: StyleX and Tailwind coexist during migration
+#### Scenario: Styling migration completes
 
-- **WHEN** a migrated control renders beside legacy Tailwind support
-- **THEN** Tailwind utilities remain class-driven and the web build does not load Tailwind Forms or inject its native-control styles into the migrated control
+- **WHEN** the final route consumer migrates
+- **THEN** the web app removes Tailwind packages, configuration, utility-class helpers, and obsolete Tailwind-owned components
 
 ### Requirement: Living design catalog
 
