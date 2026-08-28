@@ -12,7 +12,11 @@ import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
 import { IconButton } from "./button.stylex";
-import { NavigationTabs, type NavigationItem } from "./navigation.stylex";
+import {
+  isCurrentNavigationHref,
+  NavigationTabs,
+  type NavigationItem,
+} from "./navigation.stylex";
 
 const PAGE_INSET_TIGHTENS = "@media (max-width: 1099px)";
 const MOBILE = "@media (max-width: 559px)";
@@ -36,6 +40,7 @@ export type ApplicationHeaderProps = {
   accountItems?: readonly HeaderAccountItem[];
   accountLabel?: string;
   action: ReactNode;
+  background?: "page" | "surface";
   brand?: string;
   brandHref?: string;
   currentHref: string;
@@ -44,7 +49,6 @@ export type ApplicationHeaderProps = {
   navigationPlacement?: "inline" | "separate";
   personalItems: readonly HeaderNavigationItem[];
   search?: ReactNode;
-  showNavigation?: boolean;
 };
 
 /** Keeps search and database navigation reachable across all header widths. */
@@ -53,6 +57,7 @@ export function ApplicationHeader({
   accountItems,
   accountLabel = "Open account menu",
   action,
+  background = "surface",
   brand = "Peated",
   brandHref = "/",
   currentHref,
@@ -61,7 +66,6 @@ export function ApplicationHeader({
   navigationPlacement = "separate",
   personalItems,
   search,
-  showNavigation = true,
 }: ApplicationHeaderProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(defaultSearchOpen);
@@ -87,7 +91,12 @@ export function ApplicationHeader({
   }
 
   return (
-    <header {...stylex.props(styles.header)}>
+    <header
+      {...stylex.props(
+        styles.header,
+        background === "page" && styles.headerOnPage,
+      )}
+    >
       <div {...stylex.props(styles.headerInner)}>
         <div
           {...stylex.props(
@@ -127,7 +136,7 @@ export function ApplicationHeader({
           >
             {brand}
           </a>
-          {showNavigation && navigationPlacement === "inline" ? (
+          {navigationPlacement === "inline" ? (
             <div {...stylex.props(styles.inlineNavigation)}>
               <NavigationTabs
                 ariaLabel="Peated"
@@ -212,7 +221,7 @@ export function ApplicationHeader({
             </button>
           ) : null}
         </div>
-        {showNavigation && navigationPlacement === "separate" ? (
+        {navigationPlacement === "separate" ? (
           <div {...stylex.props(styles.navigationRow)}>
             <NavigationTabs
               ariaLabel="Peated"
@@ -265,6 +274,8 @@ function AccountMenuItem({
       ) : null}
     </>
   );
+  const current =
+    "href" in item && isCurrentNavigationHref(currentHref, item.href);
 
   if ("onSelect" in item) {
     return (
@@ -288,10 +299,11 @@ function AccountMenuItem({
 
   return (
     <a
-      aria-current={item.href === currentHref ? "page" : undefined}
+      aria-current={current ? "page" : undefined}
       href={item.href}
       {...stylex.props(
         styles.accountMenuItem,
+        current && styles.currentMenuLink,
         focused && styles.focusedAccountMenuItem,
       )}
     >
@@ -316,9 +328,17 @@ function HeaderDrawerGroup({
         {items.map((item) => (
           <li key={item.href} {...stylex.props(styles.drawerListItem)}>
             <a
-              aria-current={item.href === currentHref ? "page" : undefined}
+              aria-current={
+                isCurrentNavigationHref(currentHref, item.href)
+                  ? "page"
+                  : undefined
+              }
               href={item.href}
-              {...stylex.props(styles.drawerLink)}
+              {...stylex.props(
+                styles.drawerLink,
+                isCurrentNavigationHref(currentHref, item.href) &&
+                  styles.currentMenuLink,
+              )}
             >
               {item.label}
             </a>
@@ -417,6 +437,9 @@ const styles = stylex.create({
   header: {
     width: "100%",
     backgroundColor: colors.surface,
+  },
+  headerOnPage: {
+    backgroundColor: colors.ground,
   },
   headerInner: {
     boxSizing: "border-box",
@@ -573,6 +596,12 @@ const styles = stylex.create({
   },
   focusedAccountMenuItem: {
     backgroundColor: colors.surface,
+  },
+  currentMenuLink: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "13px",
+    fontWeight: 700,
   },
   accountMenuCount: {
     color: colors.inkMuted,

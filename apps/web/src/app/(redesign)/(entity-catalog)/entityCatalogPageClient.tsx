@@ -1,6 +1,7 @@
 "use client";
 
 import { toTitleCase } from "@peated/server/lib/strings";
+import type { Outputs } from "@peated/server/orpc/router";
 import type { Entity, EntityKind } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -24,15 +25,29 @@ const sortOptions = [
   { label: "Recently added", value: "-created" },
 ] as const;
 
-type CatalogKind = Extract<EntityKind, "bottler" | "brand" | "distillery">;
+type EntityList = Outputs["distilleries"]["list"];
+type CountryList = Outputs["countries"]["list"];
+export type EntityCatalogKind = Extract<
+  EntityKind,
+  "blender" | "bottler" | "brand" | "distillery"
+>;
 
 const catalogConfig = {
+  blender: { noun: "blender", title: "Blenders" },
   bottler: { noun: "bottler", title: "Bottlers" },
   brand: { noun: "brand", title: "Brands" },
   distillery: { noun: "distiller", title: "Distillers" },
-} satisfies Record<CatalogKind, { noun: string; title: string }>;
+} satisfies Record<EntityCatalogKind, { noun: string; title: string }>;
 
-export function EntityCatalogPageClient({ kind }: { kind: CatalogKind }) {
+export function EntityCatalogPageClient({
+  initialCountryList,
+  initialEntityList,
+  kind,
+}: {
+  initialCountryList: CountryList;
+  initialEntityList: EntityList;
+  kind: EntityCatalogKind;
+}) {
   const config = catalogConfig[kind];
   const orpc = useORPC();
   const pathname = usePathname();
@@ -46,13 +61,19 @@ export function EntityCatalogPageClient({ kind }: { kind: CatalogKind }) {
       ? orpc.distilleries.list.queryOptions({ input: queryParams })
       : kind === "brand"
         ? orpc.brands.list.queryOptions({ input: queryParams })
-        : orpc.bottlers.list.queryOptions({ input: queryParams });
-  const { data: entityList } = useSuspenseQuery(listQueryOptions);
-  const { data: countryList } = useSuspenseQuery(
-    orpc.countries.list.queryOptions({
+        : kind === "bottler"
+          ? orpc.bottlers.list.queryOptions({ input: queryParams })
+          : orpc.blenders.list.queryOptions({ input: queryParams });
+  const { data: entityList } = useSuspenseQuery({
+    ...listQueryOptions,
+    initialData: initialEntityList,
+  });
+  const { data: countryList } = useSuspenseQuery({
+    ...orpc.countries.list.queryOptions({
       input: { onlyMajor: true, sort: "-bottles" },
     }),
-  );
+    initialData: initialCountryList,
+  });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
   const sort = searchParams.get("sort") ?? DEFAULT_SORT;
   const country = searchParams.get("country") ?? "";

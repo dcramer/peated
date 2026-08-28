@@ -115,6 +115,20 @@ The web workspace SHALL provide Storybook as a design-system catalog that render
 - **WHEN** a web change runs the CI web-build job
 - **THEN** the static Storybook build must compile successfully
 
+### Requirement: Visible link interaction
+
+Links and linked surfaces SHALL communicate hover, pressed, and keyboard-focus states without relying on the pointer cursor or changing layout geometry.
+
+#### Scenario: Member points to a text link
+
+- **WHEN** a neutral text link is hovered or pressed
+- **THEN** it uses the deeper accent on hover and the accent on press without changing its dimensions
+
+#### Scenario: Member points to a linked card or row
+
+- **WHEN** a linked surface is hovered, pressed, or receives keyboard focus
+- **THEN** it steps from surface to inset on hover, uses accent tint while pressed, and puts the shared inset focus ring around the complete actionable surface
+
 ### Requirement: Reviewable migration slices
 
 The redesign SHALL migrate through bounded slices that receive desktop, mobile, light, and dark visual review before the next slice begins.
@@ -149,9 +163,37 @@ page composition and its live product adapter are ready to replace it together.
 - **WHEN** the visitor has a session
 - **THEN** member activity and personalized homepage data remain client-owned and the application header keeps its global search
 
+#### Scenario: An anonymous visitor browses homepage origins
+
+- **WHEN** the countries and Scottish regions endpoints return public records
+- **THEN** the homepage groups those real regions under Scotland and lists the other countries with their API-owned bottle totals
+- **AND** the interface does not infer regional membership or counts
+
+#### Scenario: An anonymous visitor sees the highest-rated bottles
+
+- **WHEN** the bottle list supplies published median scores in descending score order
+- **THEN** the homepage renders those bottles as Highest rated and hydrates the matching client query
+- **AND** the interface does not derive the ranking or expose a median below the publication floor
+
+#### Scenario: The homepage shell renders
+
+- **WHEN** a signed-in or signed-out visitor opens the homepage
+- **THEN** the application header uses the page ground so it reads as one surface with the homepage while inner routes retain the separate header surface
+
+#### Scenario: A crawler opens a public catalog or detail page
+
+- **WHEN** an anonymous request opens a bottle catalog, entity catalog, bottle detail, entity detail, public entity tab, or public member-profile tab
+- **THEN** the route fetches its indexable records through the anonymous server client and includes their names, links, facts, and available public activity in the first HTML response
+- **AND** the interactive client component receives that same result as its initial query state instead of making a loading shell the route's only initial content
+
 ### Requirement: Responsive application header
 
 The design system SHALL provide one application-header component tree that keeps database navigation, personal navigation, search, the account menu, and the global tasting action reachable at every supported width.
+
+#### Scenario: Member opens an inner page
+
+- **WHEN** a signed-in or signed-out member opens a page outside the public homepage
+- **THEN** the header renders database navigation in its second row and marks the current destination with ink-colored display type at weight 700 without the page-tab accent rule
 
 #### Scenario: Header width becomes constrained
 
@@ -214,22 +256,12 @@ The design system SHALL provide a scoped search experience that presents caller-
 
 ### Requirement: Domain-owned tasting inputs
 
-The design system SHALL provide one rating input with band and point grains, plus colour and picture inputs that preserve their owning product contracts.
+The design system SHALL provide a five-band tasting rating input, plus colour and picture inputs that preserve their owning product contracts.
 
 #### Scenario: Member records a band
 
 - **WHEN** a member selects Mediocre, Good, Very good, Outstanding, or Unicorn
-- **THEN** the score input emits that band value and does not invent a numeric point
-
-#### Scenario: Member records a point
-
-- **WHEN** a member types or steps an exact score
-- **THEN** the score input emits a whole number from 0 through 100 and shows its canonical band
-
-#### Scenario: Member changes rating grain
-
-- **WHEN** a member changes between band and point entry
-- **THEN** the input clears the old value instead of converting it and exposes the new grain to its caller for use as the next default
+- **THEN** the rating input emits that band value and does not invent a numeric point
 
 #### Scenario: Member records colour or a picture
 
@@ -290,7 +322,7 @@ The design system SHALL provide page-level not-found, forbidden, captured-failur
 #### Scenario: The application shell cannot render
 
 - **WHEN** a route needs a page-level recovery state, including a global 404 or root-layout failure
-- **THEN** the state uses a minimal recovery shell, and the global document does not depend on session loading, application providers, analytics, the application header, or the footer
+- **THEN** the state uses a minimal recovery shell with its bounded content column centered in the viewport, and the global document does not depend on session loading, application providers, analytics, the application header, or the footer
 
 #### Scenario: A route is not found or forbidden
 
@@ -305,7 +337,7 @@ The design system SHALL provide page-level not-found, forbidden, captured-failur
 #### Scenario: A page failure is captured
 
 - **WHEN** the route cannot render because of an application failure
-- **THEN** the page offers retry and may show a safe incident reference and caller-supplied production stack trace after the owning error boundary removes request bodies, account data, and other sensitive context
+- **THEN** the page offers retry and shows the event ID returned by Sentry capture plus a caller-supplied production stack trace after the owning error boundary removes request bodies, account data, and other sensitive context
 
 #### Scenario: The application is offline
 
@@ -323,12 +355,12 @@ The design system SHALL use one tasting-form component tree across desktop and m
 
 #### Scenario: Member opens the tasting form
 
-- **WHEN** the caller supplies the member's last-used rating grain
-- **THEN** the form starts with that grain and lets the member change it for this tasting
+- **WHEN** the caller supplies an existing tasting rating
+- **THEN** the form selects that canonical band without creating a point score
 
 #### Scenario: Required tasting input is missing
 
-- **WHEN** no band or point is selected
+- **WHEN** no rating band is selected
 - **THEN** the save action is disabled and nearby status text states what is required
 
 #### Scenario: Member completes an optional field
@@ -362,17 +394,18 @@ The design system SHALL provide reusable unit, progress, duplicate-match, note-v
 
 ### Requirement: Attributed critic reviews
 
-The design system SHALL preserve each published critic review's publication and native score scale.
+The design system SHALL preserve each published critic review's publication and SHALL show a numeric critic rating only when its permitted native score already uses the 100-point scale.
 
-#### Scenario: Publication uses a non-100-point scale
+#### Scenario: Critic review uses the 100-point scale
 
-- **WHEN** a critic review supplies a native score such as 4.5/5
-- **THEN** the component displays that native score and does not relabel it as a 100-point score or add it to the point pool
+- **WHEN** a critic review supplies a permitted `nativeScore` with a scale of 100
+- **THEN** the component displays its numeric value with the publication attribution and original article link
+- **AND** an eligible whole-number value may contribute to the Bottle score
 
-#### Scenario: Publication uses a permitted native 100-point scale
+#### Scenario: Critic review uses another scale
 
-- **WHEN** a critic review supplies a native score such as 91/100
-- **THEN** the citation keeps its publication attribution and the caller can include the point in the shared point summary
+- **WHEN** a critic review has no permitted score or its native scale is not 100
+- **THEN** the component keeps the publication attribution and original article link, omits the number, and does not convert or explain the source scale
 
 ### Requirement: Bottle identity presentation
 
@@ -454,7 +487,7 @@ The web application SHALL compose the bottle catalog from reusable StyleX list a
 
 ### Requirement: Entity catalog routes
 
-The web application SHALL compose distiller, brand, and bottler catalogs from one reusable StyleX list and filter contract while each route supplies its entity kind.
+The web application SHALL compose distiller, brand, bottler, and blender catalogs from one reusable StyleX list and filter contract while each route supplies its entity kind.
 
 #### Scenario: Member browses an entity catalog
 
@@ -488,7 +521,7 @@ The web application SHALL compose an entity overview from reusable StyleX compon
 #### Scenario: Associated bottle details are available
 
 - **WHEN** the bottle-list endpoint supplies notable bottles for the entity
-- **THEN** each row shows the supplied origin, age, ABV, community score, and verdict distribution directly under the Bottles or Bottlings section without a second list title or a generic catalog summary
+- **THEN** each row shows the supplied origin, age, ABV, median review score, and tasting-band distribution directly under the Bottles or Bottlings section without a second list title or a generic catalog summary
 
 #### Scenario: Entity has no associated bottles
 
@@ -513,7 +546,7 @@ The web application SHALL compose an entity overview from reusable StyleX compon
 #### Scenario: Member browses entity tastings
 
 - **WHEN** the tasting-list endpoint supplies tastings and cursor links for the entity
-- **THEN** the Tastings tab renders the supplied authors, bottles, notes, scores or verdicts, and only the supplied cursor actions
+- **THEN** the Tastings tab renders the supplied authors, bottles, notes, rating bands, and only the supplied cursor actions
 
 #### Scenario: Member opens SMWS distillery codes
 
@@ -527,7 +560,7 @@ The web application SHALL compose the member profile from reusable StyleX identi
 #### Scenario: Member opens a public profile
 
 - **WHEN** user details, tasting statistics, tasting records, and region records are available
-- **THEN** the page shows the supplied identity, friend or owner actions, verdict distribution, tasting, unique-bottle, library, and contribution totals, tasting rows, and regional counts without duplicating the complete route in Storybook
+- **THEN** the page shows the supplied identity, friend or owner actions, tasting-band distribution, tasting, unique-bottle, library, and contribution totals, tasting rows, and regional counts without duplicating the complete route in Storybook
 
 #### Scenario: Member opens their own profile
 

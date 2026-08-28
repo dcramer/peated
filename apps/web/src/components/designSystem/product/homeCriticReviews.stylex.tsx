@@ -9,8 +9,8 @@ import { LoadingList, SectionError } from "../components";
 import { HomeCriticReviews as CriticReviewSection } from "../patterns/homeDiscovery.stylex";
 import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
 
-type Review = Outputs["reviews"]["list"]["results"][number];
-type Bottle = NonNullable<Review["bottle"]>;
+type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
+type Bottle = NonNullable<ExternalReview["bottle"]>;
 
 function getBottleMetadata(bottle: Bottle) {
   return [
@@ -23,13 +23,13 @@ function getBottleMetadata(bottle: Bottle) {
 
 export function HomeCriticReviews() {
   const orpc = useORPC();
-  const reviews = useQuery(
-    orpc.reviews.list.queryOptions({
+  const externalReviews = useQuery(
+    orpc.externalReviews.list.queryOptions({
       input: { limit: 2, sort: "recent" },
     }),
   );
 
-  if (reviews.isPending) {
+  if (externalReviews.isPending) {
     return (
       <HomeSectionLoading>
         <LoadingList label="Loading recent critic reviews" rows={2} />
@@ -37,19 +37,20 @@ export function HomeCriticReviews() {
     );
   }
 
-  if (reviews.error) {
+  if (externalReviews.error) {
     return (
       <SectionError
         heading="Critic reviews are unavailable"
-        onRetry={() => void reviews.refetch()}
+        onRetry={() => void externalReviews.refetch()}
       >
         We couldn't load the latest critic reviews. Try again.
       </SectionError>
     );
   }
 
-  const visibleReviews = reviews.data.results.filter(
-    (review): review is Review & { bottle: Bottle } => review.bottle !== null,
+  const visibleReviews = externalReviews.data.results.filter(
+    (review): review is ExternalReview & { bottle: Bottle } =>
+      review.bottle !== null,
   );
   if (!visibleReviews.length) return null;
 
@@ -63,7 +64,8 @@ export function HomeCriticReviews() {
         ),
         imageUrl: review.bottle.imageUrl,
         metadata: getBottleMetadata(review.bottle),
-        score: review.rating ?? review.nativeScore?.display,
+        rating:
+          review.nativeScore?.scale === 100 ? review.nativeScore.value : null,
         source: review.site?.name ?? review.reviewerName ?? "Critic review",
         sourceHref: review.url,
         summary: review.summary,

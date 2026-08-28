@@ -11,7 +11,13 @@ const meta = {
   title: "Components/Profile/Profile Header",
   component: MemberProfileHeader,
   args: {
-    ratings: { pass: 15, savor: 69, sip: 44 },
+    bands: {
+      good: 15,
+      mediocre: 4,
+      outstanding: 44,
+      unicorn: 10,
+      very_good: 31,
+    },
     username: "dcramer",
   },
   decorators: [
@@ -54,14 +60,14 @@ export const Private: Story = {
   args: {
     actions: <Button variant="accent">Add friend</Button>,
     privateProfile: true,
-    ratings: undefined,
+    bands: undefined,
   },
 };
 
 export const RatingLoading: Story = {
   args: {
     actions: <Button variant="accent">Add friend</Button>,
-    ratings: undefined,
+    bands: undefined,
     ratingsLoading: true,
   },
 };

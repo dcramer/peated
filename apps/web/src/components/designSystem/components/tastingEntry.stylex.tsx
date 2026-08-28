@@ -8,7 +8,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { VerdictMark, type Verdict } from "./scoring.stylex";
+import { BandMark, type RatingBand } from "./scoring.stylex";
 
 export type TastingEntryMember = {
   description?: ReactNode;
@@ -16,8 +16,7 @@ export type TastingEntryMember = {
   metadata?: string;
   name: string;
   notes?: readonly string[];
-  score?: number;
-  verdict?: Verdict;
+  ratingBand?: RatingBand;
 };
 
 export type TastingEntryProps = {
@@ -50,7 +49,10 @@ export function TastingEntry({
         {leading}
         <div {...stylex.props(styles.headerCopy)}>
           {authorHref ? (
-            <a href={authorHref} {...stylex.props(styles.author)}>
+            <a
+              href={authorHref}
+              {...stylex.props(styles.author, styles.authorLink)}
+            >
               {author}
             </a>
           ) : (
@@ -76,7 +78,10 @@ export function TastingEntry({
           >
             <div {...stylex.props(styles.memberCopy)}>
               {member.href ? (
-                <a href={member.href} {...stylex.props(styles.name)}>
+                <a
+                  href={member.href}
+                  {...stylex.props(styles.name, styles.nameLink)}
+                >
                   {member.name}
                 </a>
               ) : (
@@ -99,15 +104,8 @@ export function TastingEntry({
               ) : null}
             </div>
             <div {...stylex.props(styles.measure)}>
-              {member.verdict ? (
-                <VerdictMark showLabel verdict={member.verdict} />
-              ) : member.score !== undefined ? (
-                <span {...stylex.props(styles.score)}>
-                  <span {...stylex.props(styles.screenReaderOnly)}>
-                    Score {member.score} out of 100
-                  </span>
-                  <span aria-hidden="true">{member.score}</span>
-                </span>
+              {member.ratingBand ? (
+                <BandMark band={member.ratingBand} />
               ) : (
                 <span {...stylex.props(styles.unknown)}>–</span>
               )}
@@ -160,6 +158,13 @@ const styles = stylex.create({
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
+    },
+  },
+  authorLink: {
+    color: {
+      default: null,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
     },
   },
   date: {
@@ -223,6 +228,13 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
+  nameLink: {
+    color: {
+      default: null,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
+  },
   metadata: {
     marginTop: "2px",
     overflow: "hidden",
@@ -254,30 +266,10 @@ const styles = stylex.create({
     flexShrink: 0,
     justifyContent: "flex-end",
   },
-  score: {
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "22px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1,
-  },
   unknown: {
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "12px",
-  },
-  screenReaderOnly: {
-    position: "absolute",
-    width: "1px",
-    height: "1px",
-    overflow: "hidden",
-    margin: "-1px",
-    padding: 0,
-    borderWidth: 0,
-    clip: "rect(0, 0, 0, 0)",
-    whiteSpace: "nowrap",
   },
   comment: {
     margin: 0,

@@ -37,7 +37,7 @@
 - [x] 3.3 Add data-component stories to Storybook
 - [ ] 3.4 Review and approve the reconciled record ID and spec strip at desktop and mobile widths in both system schemes
 - [x] 3.5 Add the positional verdict-mark component and its Storybook states
-- [ ] 3.6 Review and approve community score, verdict distribution, and verdict mark at desktop and mobile widths in both system schemes
+- [ ] 3.6 Review and approve Score, BandStack, and BandMark at desktop and mobile widths in both system schemes
 - [x] 3.7 Add facet-row, row-menu, and numbered-pager components from the updated reference package
 - [x] 3.8 Review and approve facet row, row menu, and pager at desktop and mobile widths in both system schemes
 - [x] 3.9 Add summary-strip and passport components from the updated reference package
@@ -46,7 +46,7 @@
 - [x] 3.12 QA the complete reusable baseline at desktop and 320px widths in both system schemes
 - [x] 3.13 Add the entity history timeline and realistic supplied-history stories
 - [x] 3.14 Review history states at desktop and mobile widths in both system schemes
-- [x] 3.15 Add attributed native-scale critic reviews and the selected-bottle summary
+- [x] 3.15 Add attributed 100-point critic reviews and the selected-bottle summary
 - [x] 3.16 Add the settled responsive application-header component and compact scoped-search mode
 - [x] 3.17 Review the application header at all four responsive ranges in both system schemes
 - [x] 3.18 Reconcile bottle identity rows and selected-bottle visuals with Peated's catalog image and member-status contracts
@@ -54,7 +54,8 @@
 - [ ] 3.20 Review and approve the bottle identity component in Storybook
 - [x] 3.21 Align library and tasted list marks with the settled 12px muted inline treatment
 - [x] 3.22 Focus the mobile header search when it opens and QA its active Storybook state
-- [x] 3.23 Replace community-score and verdict devices with Score, BandStack, and BandMark using the one-ruler rating model
+- [x] 3.23 Replace community-score and verdict devices with Score, BandStack, and BandMark using the separate review-score and tasting-rating model
+- [x] 3.24 Define and apply shared hover, pressed, and keyboard-focus treatments to linked text, cards, and rows
 
 ## 4. Pickers and forms
 
@@ -62,20 +63,20 @@
 - [x] 4.2 Add the note-picker component and selection behavior
 - [x] 4.3 Rebuild shared form surfaces with the approved controls
 - [ ] 4.4 Review and approve form components at desktop and mobile widths in both system schemes
-- [x] 4.5 Add verdict, 0–100 score, 0–20 colour, and picture inputs using the existing tasting contracts
+- [x] 4.5 Add tasting rating, 0–20 colour, and picture inputs using the existing tasting contracts
 - [x] 4.6 Replace speculative tasting-form fields with a composition of fields owned by the tasting schema
 - [x] 4.7 QA the new tasting inputs and composed form at desktop and mobile widths in both system schemes
 - [x] 4.8 Keep one responsive tasting-form composition across desktop and mobile viewports
 - [x] 4.9 Add unit inputs, fixed form progress, duplicate matches, friend selection, and the inline note vocabulary field
 - [x] 4.10 QA the completed form-support component baseline at desktop and mobile widths in both system schemes
-- [x] 4.11 Align the verdict and 100-point inputs with the settled responsive tasting-input artifact
+- [x] 4.11 Align the tasting rating input with the settled responsive tasting-input artifact
 - [ ] 4.12 Review and approve both configured tasting-form stories
-- [x] 4.13 Replace separate verdict and point controls with one per-tasting two-grain ScoreInput
-- [x] 4.14 QA the score measures and both tasting grains at desktop and phone widths in both schemes
+- [x] 4.13 Replace the old verdict and point controls with the five-band RatingBandInput
+- [x] 4.14 QA the rating input at desktop and phone widths in both schemes
 
 ## 5. Navigation and reference screen
 
-- [ ] 5.1 Rebuild the application header and responsive navigation
+- [x] 5.1 Rebuild the application header and responsive navigation
 - [x] 5.2 Rebuild the bottle page with approved design-system components and existing data fetching
 - [x] 5.3 Add thin-data, loading, empty, and module-error states
 - [ ] 5.4 Run existing bottle-page tests and end-to-end smoke checks
@@ -114,6 +115,15 @@
 - [x] 6.28 Migrate the public member profile with API-owned summary, rating, tasting, region, privacy, and action state plus reusable profile-header stories
 - [x] 6.29 Complete the member profile route family with one nested frame, API-owned Library filters and owner actions, Activity records, cursor navigation, and bounded Storybook patterns
 - [x] 6.30 Cut over `/search` with grouped API results, preserved bottle-selection intents, and the redesign application layout
+- [x] 6.31 Seed public bottle, entity, and member-profile catalogs, details, and tabs from request-time server reads so their indexable content is present before hydration
+- [x] 6.32 Merge the signed-in and signed-out homepage header with the page ground while preserving the separate header surface on inner routes
+- [x] 6.33 Migrate the blender catalog through the shared entity-list route and stable database navigation
+- [x] 6.34 Revise the homepage with API-owned country and Scottish-region discovery while leaving unsupported ranking modules behind issue #781
+- [x] 6.35 Center the bounded content column across the shared page-level recovery states and render that real shell in their existing Storybook states
+- [x] 6.36 Show only the Sentry event ID returned by route-error capture, use concise reference copy, and expose copying as an icon button instead of a reporting state or Next-digest fallback
+- [x] 6.37 Simplify critic reviews to permitted native 100-point values and omit other scales without conversion copy
+- [x] 6.38 Connect the landed tasting-band and review-score contract across live routes, shared components, structured data, and Storybook
+- [x] 6.39 Add the SSR-hydrated Highest rated homepage module from the published median-score list, omit source-scale explainer copy, and keep critic-review dates on one line
 
 ## 7. Storybook tooling
 

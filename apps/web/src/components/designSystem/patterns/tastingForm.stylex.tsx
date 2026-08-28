@@ -5,11 +5,7 @@ import { useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, space } from "../../../styles/tokens.stylex";
-import type {
-  MemberPickerOption,
-  RatingGrain,
-  RatingValue,
-} from "../components";
+import type { MemberPickerOption, RatingBand } from "../components";
 import {
   Button,
   ColourInput,
@@ -18,7 +14,7 @@ import {
   MemberPicker,
   NotePickerField,
   PictureInput,
-  ScoreInput,
+  RatingBandInput,
   Select,
   SelectedBottleSummary,
   Textarea,
@@ -36,18 +32,15 @@ function isServingStyle(value: string): value is ServingStyle {
 }
 
 export type TastingFormPatternProps = {
-  initialGrain?: RatingGrain;
-  initialRating?: RatingValue;
+  initialRating?: RatingBand | null;
   submitting?: boolean;
 };
 
 export function TastingFormPattern({
-  initialGrain = "band",
   initialRating = null,
   submitting = false,
 }: TastingFormPatternProps) {
-  const [grain, setGrain] = useState<RatingGrain>(initialGrain);
-  const [rating, setRating] = useState<RatingValue>(initialRating);
+  const [rating, setRating] = useState<RatingBand | null>(initialRating);
   const [colour, setColour] = useState<number | null>(10);
   const [date, setDate] = useState("2026-08-25");
   const [comments, setComments] = useState("");
@@ -56,11 +49,6 @@ export function TastingFormPattern({
   const [serving, setServing] = useState<ServingStyle>("neat");
 
   const complete = rating !== null;
-
-  function changeGrain(nextGrain: RatingGrain) {
-    setGrain(nextGrain);
-    setRating(null);
-  }
 
   return (
     <form
@@ -80,12 +68,10 @@ export function TastingFormPattern({
           />
         </div>
         <div {...stylex.props(styles.panel)}>
-          <ScoreInput
-            grain={grain}
+          <RatingBandInput
             id="tasting-rating"
             name="tasting-rating"
             onChange={setRating}
-            onGrainChange={changeGrain}
             required
             value={rating}
           />
@@ -173,9 +159,7 @@ export function TastingFormPattern({
             submitting && styles.actionCompanionPending,
           )}
         >
-          {complete
-            ? "Draft saved locally"
-            : `Choose ${grain === "band" ? "a band" : "a score"} before saving`}
+          {complete ? "Draft saved locally" : "Choose a rating before saving"}
         </span>
         <Button
           disabled={!complete}

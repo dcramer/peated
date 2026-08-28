@@ -3,7 +3,10 @@ import type { Product, WithContext } from "schema-dts";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { summarize } from "@peated/web/lib/markdown";
-import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import {
+  getAnonymousServerClient,
+  getServerClient,
+} from "@peated/web/lib/orpc/client.server";
 import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
 
 import { BottlePageClient } from "./bottlePageClient.stylex";
@@ -33,8 +36,26 @@ export default async function BottlePage(props: {
   const canonicalBottle = await getBottlePage(
     parseReleaseFamilyRouteId(bottleId),
   );
-  const { client } = await getServerClient();
-  const bottle = await client.bottles.details({ bottle: canonicalBottle.id });
+  const [{ client }, { client: anonymousClient }] = await Promise.all([
+    getServerClient(),
+    getAnonymousServerClient(),
+  ]);
+  const [bottle, secondaryData] = await Promise.all([
+    client.bottles.details({ bottle: canonicalBottle.id }),
+    Promise.allSettled([
+      anonymousClient.externalReviews.list({
+        bottle: canonicalBottle.id,
+        limit: 3,
+        sort: "recent",
+      }),
+      anonymousClient.tastings.list({ bottle: canonicalBottle.id, limit: 3 }),
+      anonymousClient.bottles.recommendations({
+        bottle: canonicalBottle.id,
+        limit: 3,
+      }),
+    ]),
+  ]);
+  const [reviews, tastings, recommendations] = secondaryData;
   const bottleIdentity = getBottlePlainTextIdentity(bottle);
   const jsonLd: WithContext<Product> = {
     "@context": "https://schema.org",
@@ -44,13 +65,13 @@ export default async function BottlePage(props: {
     description: summarize(bottle.description || "", 200),
     brand: { "@type": "Brand", name: bottle.brand.name },
     aggregateRating:
-      bottle.totalScores > 0 && bottle.avgScore !== null
+      bottle.scoreCount > 0 && bottle.medianScore !== null
         ? {
             "@type": "AggregateRating",
-            ratingValue: bottle.avgScore,
+            ratingValue: bottle.medianScore,
             bestRating: 100,
             worstRating: 0,
-            reviewCount: bottle.totalScores,
+            reviewCount: bottle.scoreCount,
           }
         : undefined,
     offers: bottle.lastPrice
@@ -70,7 +91,20 @@ export default async function BottlePage(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <BottlePageClient initialBottle={bottle} />
+      <BottlePageClient
+        initialBottle={bottle}
+        initialRecommendations={
+          recommendations.status === "fulfilled"
+            ? recommendations.value
+            : undefined
+        }
+        initialReviews={
+          reviews.status === "fulfilled" ? reviews.value : undefined
+        }
+        initialTastings={
+          tastings.status === "fulfilled" ? tastings.value : undefined
+        }
+      />
     </>
   );
 }

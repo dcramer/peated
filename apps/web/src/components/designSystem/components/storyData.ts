@@ -61,8 +61,14 @@ export const searchResultGroups = [
         href: "/bottles/872",
         id: "bottle-872",
         measures: {
-          score: { count: 48, value: 88.4 },
-          verdict: { pass: 5, sip: 18, savor: 39 },
+          bands: {
+            good: 8,
+            mediocre: 3,
+            outstanding: 19,
+            unicorn: 6,
+            very_good: 12,
+          },
+          score: { count: 48, value: 88 },
         },
         metadata: "Islay · 16 years · 43.0% ABV",
         title: "Lagavulin 16-year-old",
@@ -71,8 +77,14 @@ export const searchResultGroups = [
         href: "/bottles/1188",
         id: "bottle-1188",
         measures: {
-          score: { count: 16, value: 91.2 },
-          verdict: { pass: 2, sip: 8, savor: 28 },
+          bands: {
+            good: 3,
+            mediocre: 1,
+            outstanding: 8,
+            unicorn: 2,
+            very_good: 4,
+          },
+          score: { count: 26, value: 91 },
         },
         metadata: "Islay · 12 years · 56.4% ABV",
         title: "Lagavulin 12 Cask Strength 2024",

@@ -14,6 +14,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
+  BandStack,
   BottleIdentityRow,
   Button,
   ButtonLink,
@@ -24,7 +25,7 @@ import {
   LoadingList,
   Select,
   TextInput,
-  VerdictDistributionBar,
+  type BandCounts,
   type ListSortOption,
 } from "../components";
 
@@ -32,7 +33,7 @@ const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (max-width: 759px)";
 
 export type BottleCatalogItem = {
-  averageScore: number | null;
+  bandCounts: BandCounts;
   brand: string;
   brandHref?: string;
   hasTasted?: boolean;
@@ -46,12 +47,8 @@ export type BottleCatalogItem = {
     count: number;
     href: string;
   };
-  totalScores: number;
-  verdicts: {
-    pass: number;
-    savor: number;
-    sip: number;
-  };
+  medianScore: number | null;
+  scoreCount: number;
 };
 
 export type BottleCatalogListProps = {
@@ -143,32 +140,30 @@ export function BottleCatalogList({
 }
 
 function BottleCatalogMeasures({ item }: { item: BottleCatalogItem }) {
-  const score =
-    item.averageScore === null ? "–" : formatScore(item.averageScore);
+  const score = item.medianScore === null ? "–" : String(item.medianScore);
 
   return (
     <div {...stylex.props(styles.measures)}>
       <span
         aria-label={
-          item.averageScore === null
-            ? "No community score"
-            : `Community score ${item.averageScore.toFixed(1)} from ${item.totalScores} ${item.totalScores === 1 ? "score" : "scores"}`
+          item.medianScore === null
+            ? "No published score"
+            : `Score ${item.medianScore} from ${item.scoreCount} ${item.scoreCount === 1 ? "review" : "reviews"}`
         }
         {...stylex.props(styles.measure)}
       >
         <span {...stylex.props(styles.measureLabel)}>Score</span>
         <strong {...stylex.props(styles.score)}>{score}</strong>
       </span>
-      <span {...stylex.props(styles.measure, styles.verdictMeasure)}>
-        <span {...stylex.props(styles.measureLabel)}>Verdict</span>
-        <VerdictDistributionBar {...item.verdicts} />
+      <span
+        aria-label="Tasting ratings"
+        {...stylex.props(styles.measure, styles.bandMeasure)}
+      >
+        <span {...stylex.props(styles.measureLabel)}>Ratings</span>
+        <BandStack counts={item.bandCounts} variant="compact" />
       </span>
     </div>
   );
-}
-
-function formatScore(score: number) {
-  return score.toFixed(1).replace(/\.0$/, "");
 }
 
 export type BottleCatalogFilterOption = {
@@ -425,7 +420,7 @@ const styles = stylex.create({
     alignItems: "flex-end",
     gap: space.x1,
   },
-  verdictMeasure: {
+  bandMeasure: {
     [COMPACT]: {
       display: "none",
     },

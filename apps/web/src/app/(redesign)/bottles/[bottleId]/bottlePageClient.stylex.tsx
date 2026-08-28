@@ -1,6 +1,5 @@
 "use client";
 
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import {
   formatCategoryName,
   formatServingStyle,
@@ -12,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
+  BandStack,
   Button,
   ButtonLink,
   EmptyState,
@@ -19,13 +19,11 @@ import {
   PageTabs,
   RowMenu,
   SectionError,
-  VerdictDistributionBar,
   type CriticReviewProps,
   type FactListItem,
   type PageTabItem,
   type RowMenuItem,
   type TastingEntryProps,
-  type Verdict,
 } from "@peated/web/components/designSystem/components";
 import { BottleOverview } from "@peated/web/components/designSystem/patterns/bottleOverview.stylex";
 import { BottlePageHeader } from "@peated/web/components/designSystem/patterns/bottlePageHeader.stylex";
@@ -42,7 +40,10 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 type Bottle = Outputs["bottles"]["details"];
-type Review = Outputs["reviews"]["list"]["results"][number];
+type RecommendationList = Outputs["bottles"]["recommendations"];
+type ExternalReviewList = Outputs["externalReviews"]["list"];
+type TastingList = Outputs["tastings"]["list"];
+type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 const PHONE = "@media (max-width: 480px)";
@@ -51,13 +52,6 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
   timeZone: "UTC",
 });
-
-function getVerdict(rating: number | null): Verdict | undefined {
-  if (rating === SIMPLE_RATING_VALUES.PASS) return "pass";
-  if (rating === SIMPLE_RATING_VALUES.SIP) return "sip";
-  if (rating === SIMPLE_RATING_VALUES.SAVOR) return "savor";
-  return undefined;
-}
 
 function getBottleDetail(bottle: Bottle) {
   return [
@@ -134,18 +128,23 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   ];
 }
 
-function getReview(review: Review): CriticReviewProps | null {
-  if (!review.site) return null;
+function getCriticReview(
+  externalReview: ExternalReview,
+): CriticReviewProps | null {
+  if (!externalReview.site) return null;
 
   return {
-    href: review.url,
-    publication: review.site.name,
-    publishedAt: review.article.publishedAt
-      ? dateFormatter.format(new Date(review.article.publishedAt))
+    href: externalReview.url,
+    publication: externalReview.site.name,
+    publishedAt: externalReview.article.publishedAt
+      ? dateFormatter.format(new Date(externalReview.article.publishedAt))
       : undefined,
-    reviewerName: review.reviewerName ?? undefined,
-    score: review.nativeScore,
-    summary: review.summary ?? undefined,
+    rating:
+      externalReview.nativeScore?.scale === 100
+        ? externalReview.nativeScore.value
+        : null,
+    reviewerName: externalReview.reviewerName ?? undefined,
+    summary: externalReview.summary ?? undefined,
   };
 }
 
@@ -154,8 +153,7 @@ function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
     description: tasting.notes ?? undefined,
     name: bottle.fullName,
     notes: tasting.tags,
-    score: tasting.score ?? undefined,
-    verdict: getVerdict(tasting.rating),
+    ratingBand: tasting.ratingBand ?? undefined,
   };
 
   return {
@@ -331,7 +329,17 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
   return <RowMenu groups={groups} label="Bottle record" variant="page" />;
 }
 
-export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
+export function BottlePageClient({
+  initialBottle,
+  initialRecommendations,
+  initialReviews,
+  initialTastings,
+}: {
+  initialBottle: Bottle;
+  initialRecommendations?: RecommendationList;
+  initialReviews?: ExternalReviewList;
+  initialTastings?: TastingList;
+}) {
   const orpc = useORPC();
   const bottleQuery = useQuery({
     ...orpc.bottles.details.queryOptions({
@@ -339,21 +347,24 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
     }),
     initialData: initialBottle,
   });
-  const reviewsQuery = useQuery(
-    orpc.reviews.list.queryOptions({
+  const externalReviewsQuery = useQuery({
+    ...orpc.externalReviews.list.queryOptions({
       input: { bottle: initialBottle.id, limit: 3, sort: "recent" },
     }),
-  );
-  const tastingsQuery = useQuery(
-    orpc.tastings.list.queryOptions({
+    initialData: initialReviews,
+  });
+  const tastingsQuery = useQuery({
+    ...orpc.tastings.list.queryOptions({
       input: { bottle: initialBottle.id, limit: 3 },
     }),
-  );
-  const recommendationsQuery = useQuery(
-    orpc.bottles.recommendations.queryOptions({
+    initialData: initialTastings,
+  });
+  const recommendationsQuery = useQuery({
+    ...orpc.bottles.recommendations.queryOptions({
       input: { bottle: initialBottle.id, limit: 3 },
     }),
-  );
+    initialData: initialRecommendations,
+  });
 
   if (bottleQuery.error) {
     return (
@@ -368,22 +379,22 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
 
   const bottle = bottleQuery.data;
   const criticReviews =
-    reviewsQuery.data?.results
-      .map(getReview)
+    externalReviewsQuery.data?.results
+      .map(getCriticReview)
       .filter((review): review is CriticReviewProps => review !== null) ?? [];
   const tastings =
     tastingsQuery.data?.results.map((tasting) => getTasting(tasting, bottle)) ??
     [];
   const recommendations =
     recommendationsQuery.data?.results.map((recommendation) => ({
-      end:
-        recommendation.ratingStats.total > 0 ? (
-          <VerdictDistributionBar
-            pass={recommendation.ratingStats.pass}
-            savor={recommendation.ratingStats.savor}
-            sip={recommendation.ratingStats.sip}
-          />
-        ) : undefined,
+      end: Object.values(recommendation.tastingBandCounts).some(
+        (count) => count > 0,
+      ) ? (
+        <BandStack
+          counts={recommendation.tastingBandCounts}
+          variant="compact"
+        />
+      ) : undefined,
       href: `/bottles/${recommendation.id}`,
       metadata: [
         formatCategoryName(recommendation.category),
@@ -398,19 +409,19 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
   const mainPending =
     !criticReviews.length &&
     !tastings.length &&
-    (reviewsQuery.isPending || tastingsQuery.isPending);
+    (externalReviewsQuery.isPending || tastingsQuery.isPending);
   const mainFailed =
     !criticReviews.length &&
     !tastings.length &&
     !mainPending &&
-    Boolean(reviewsQuery.error && tastingsQuery.error);
+    Boolean(externalReviewsQuery.error && tastingsQuery.error);
   const mainState = mainPending ? (
     <LoadingList label="Loading bottle reviews and tastings" rows={3} />
   ) : mainFailed ? (
     <SectionError
       heading="Reviews and tastings are unavailable"
       onRetry={() => {
-        void reviewsQuery.refetch();
+        void externalReviewsQuery.refetch();
         void tastingsQuery.refetch();
       }}
     >
@@ -466,21 +477,22 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
         menu={<BottleActions bottle={bottle} />}
         name={getBottleExpressionName(bottle)}
         notes={getBottleNotes(bottle)}
-        score={
-          bottle.avgScore === null || bottle.totalScores === 0
-            ? null
-            : { count: bottle.totalScores, score: bottle.avgScore }
+        bands={
+          Object.values(bottle.tastingBandCounts).some((count) => count > 0)
+            ? { counts: bottle.tastingBandCounts, showCounts: true }
+            : null
         }
-        specs={getBottleSpecs(bottle)}
-        verdict={
-          bottle.ratingStats.total === 0
+        score={
+          bottle.scoreCount === 0
             ? null
             : {
-                pass: bottle.ratingStats.pass,
-                savor: bottle.ratingStats.savor,
-                sip: bottle.ratingStats.sip,
+                count: bottle.scoreCount,
+                high: bottle.maxScore,
+                low: bottle.minScore,
+                median: bottle.medianScore,
               }
         }
+        specs={getBottleSpecs(bottle)}
       />
 
       <div {...stylex.props(styles.tabs)}>
@@ -494,7 +506,7 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
       <div {...stylex.props(styles.overview)}>
         <BottleOverview
           criticReviewDetail={
-            reviewsQuery.isPending ? "Loading reviews…" : undefined
+            externalReviewsQuery.isPending ? "Loading reviews…" : undefined
           }
           criticReviews={criticReviews}
           declaredFacts={getDeclaredFacts(bottle)}
@@ -508,7 +520,7 @@ export function BottlePageClient({ initialBottle }: { initialBottle: Bottle }) {
       </div>
 
       {recommendationsQuery.error ||
-      (!mainFailed && (reviewsQuery.error || tastingsQuery.error)) ? (
+      (!mainFailed && (externalReviewsQuery.error || tastingsQuery.error)) ? (
         <p role="status" {...stylex.props(styles.partialError)}>
           Some bottle details could not be loaded. The rest of this page is
           still available.

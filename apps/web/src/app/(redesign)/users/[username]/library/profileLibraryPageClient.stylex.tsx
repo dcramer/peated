@@ -26,11 +26,19 @@ import { useProfile } from "../profileContext";
 
 type LibraryEntry =
   Outputs["collections"]["bottles"]["list"]["results"][number];
+type LibraryList = Outputs["collections"]["bottles"]["list"];
+type LibraryStats = Outputs["users"]["libraryStats"];
 type LibraryStatus = NonNullable<LibraryEntry["status"]>;
 type LibraryEntryChange = LibraryEntry["status"] | "removed";
 const statusValues = new Set(["open", "sealed", "empty", "unset"]);
 
-export function ProfileLibraryPageClient() {
+export function ProfileLibraryPageClient({
+  initialLibraryList,
+  initialLibraryStats,
+}: {
+  initialLibraryList: LibraryList;
+  initialLibraryStats: LibraryStats;
+}) {
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const pathname = usePathname();
@@ -63,10 +71,14 @@ export function ProfileLibraryPageClient() {
   const libraryListQueryKey = orpc.collections.bottles.list.key({
     type: "query",
   });
-  const libraryQuery = useQuery(libraryQueryOptions);
-  const statsQuery = useQuery(
-    orpc.users.libraryStats.queryOptions({ input: { user: user.id } }),
-  );
+  const libraryQuery = useQuery({
+    ...libraryQueryOptions,
+    initialData: initialLibraryList,
+  });
+  const statsQuery = useQuery({
+    ...orpc.users.libraryStats.queryOptions({ input: { user: user.id } }),
+    initialData: initialLibraryStats,
+  });
   const updateMutation = useMutation(
     orpc.collections.bottles.update.mutationOptions(),
   );

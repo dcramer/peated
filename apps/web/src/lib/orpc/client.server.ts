@@ -59,3 +59,14 @@ export async function createAnonymousServerClient(): Promise<{
 }
 
 export const getAnonymousServerClient = cache(createAnonymousServerClient);
+
+/** Uses anonymous API identity for public requests and session identity when member state applies. */
+export async function createPublicPageServerClient() {
+  const session = await getSession();
+
+  return session.accessToken
+    ? createServerClient({ accessToken: session.accessToken })
+    : createAnonymousServerClient();
+}
+
+export const getPublicPageServerClient = cache(createPublicPageServerClient);

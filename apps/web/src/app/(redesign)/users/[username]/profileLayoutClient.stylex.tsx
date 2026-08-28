@@ -68,7 +68,7 @@ export function ProfileLayoutClient({
         pictureUrl={initialUser.pictureUrl}
         privateProfile={privateRecord}
         ratingLabel={isCurrentUser ? "How you rate" : "How they rate"}
-        ratings={getRatings(ratingQuery.data)}
+        bands={getBands(ratingQuery.data)}
         ratingsLoading={!privateRecord && ratingQuery.isPending}
         username={initialUser.username}
       />
@@ -208,12 +208,14 @@ function ProfileActions({
   );
 }
 
-function getRatings(stats?: TastingStats) {
-  if (!stats?.ratings.total) return undefined;
+function getBands(stats?: TastingStats) {
+  if (!stats?.bands.total) return undefined;
   return {
-    pass: stats.ratings.pass,
-    savor: stats.ratings.savor,
-    sip: stats.ratings.sip,
+    good: stats.bands.good,
+    mediocre: stats.bands.mediocre,
+    outstanding: stats.bands.outstanding,
+    unicorn: stats.bands.unicorn,
+    very_good: stats.bands.very_good,
   };
 }
 

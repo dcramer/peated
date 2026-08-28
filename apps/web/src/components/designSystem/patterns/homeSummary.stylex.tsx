@@ -7,7 +7,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { CountChip, VerdictDistribution } from "../components";
+import { BandStack, CountChip, type BandCounts } from "../components";
 
 export type HomeMemberFact = {
   label: string;
@@ -16,14 +16,14 @@ export type HomeMemberFact = {
 
 export type HomeMemberSummaryProps = {
   facts: readonly [HomeMemberFact, HomeMemberFact, HomeMemberFact];
-  ratings: { pass: number; savor: number; sip: number };
+  bands: BandCounts;
   totalTastings: number;
 };
 
 /** Summarizes the signed-in member's existing tasting and collection record. */
 export function HomeMemberSummary({
   facts,
-  ratings,
+  bands,
   totalTastings,
 }: HomeMemberSummaryProps) {
   return (
@@ -47,7 +47,7 @@ export function HomeMemberSummary({
           </span>
         </div>
         <div {...stylex.props(styles.recordDistribution)}>
-          <VerdictDistribution {...ratings} />
+          <BandStack counts={bands} showCounts />
         </div>
         <dl {...stylex.props(styles.recordFacts)}>
           {facts.map((fact) => (

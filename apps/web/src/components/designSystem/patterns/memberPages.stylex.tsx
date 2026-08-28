@@ -12,8 +12,8 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
+  BandMark,
   Button,
-  CommunityScore,
   FacetRow,
   ListToolbar,
   PageTabs,
@@ -21,10 +21,9 @@ import {
   Passport,
   PeriodHeader,
   RowMenu,
+  Score,
   SummaryStrip,
   TastingEntry,
-  VerdictDistribution,
-  VerdictMark,
 } from "../components";
 import {
   Avatar,
@@ -43,14 +42,14 @@ import {
 const sortOptions = [
   { label: "Recently added", value: "recent" },
   { label: "Bottle name", value: "name" },
-  { label: "Community score", value: "score" },
+  { label: "Score", value: "score" },
 ] as const;
 
 const libraryRows = [
-  ["Lagavulin 16-year-old", "Islay · 16 years · 43% ABV", "savor"],
-  ["Ardbeg Uigeadail", "Islay · NAS · 54.2% ABV", "savor"],
-  ["Springbank 10-year-old", "Campbeltown · 10 years · 46% ABV", "sip"],
-  ["Redbreast 12-year-old", "Ireland · 12 years · 40% ABV", "sip"],
+  ["Lagavulin 16-year-old", "Islay · 16 years · 43% ABV", "outstanding"],
+  ["Ardbeg Uigeadail", "Islay · NAS · 54.2% ABV", "outstanding"],
+  ["Springbank 10-year-old", "Campbeltown · 10 years · 46% ABV", "very_good"],
+  ["Redbreast 12-year-old", "Ireland · 12 years · 40% ABV", "very_good"],
 ] as const;
 
 export function LibraryPagePattern() {
@@ -84,7 +83,7 @@ export function LibraryPagePattern() {
           sortOptions={sortOptions}
         />
         <RecordList ariaLabel="Bottles in your library">
-          {libraryRows.map(([title, metadata, verdict], index) => (
+          {libraryRows.map(([title, metadata, ratingBand]) => (
             <RecordRow
               action={
                 <RowMenu
@@ -100,7 +99,7 @@ export function LibraryPagePattern() {
                   label={title}
                 />
               }
-              end={<VerdictMark verdict={verdict} />}
+              end={<BandMark band={ratingBand} />}
               href="#"
               key={title}
               leading={<BottleThumbnail label={`${title} bottle`} />}
@@ -138,10 +137,12 @@ function LibraryFacets() {
         <FacetRow count={13} label="12–17 years" total={41} />
         <FacetRow count={5} label="18–24 years" total={41} />
       </RailSection>
-      <RailSection heading="Your verdict">
-        <FacetRow count={17} label="Savor" total={41} />
-        <FacetRow count={19} label="Sip" total={41} />
-        <FacetRow count={5} label="Pass" total={41} />
+      <RailSection heading="Your tasting rating">
+        <FacetRow count={4} label="Unicorn" total={41} />
+        <FacetRow count={11} label="Outstanding" total={41} />
+        <FacetRow count={17} label="Very good" total={41} />
+        <FacetRow count={7} label="Good" total={41} />
+        <FacetRow count={2} label="Mediocre" total={41} />
       </RailSection>
     </>
   );
@@ -174,10 +175,12 @@ export function TastingsPagePattern() {
               <FacetRow count={84} label="2025" total={412} />
               <FacetRow count={103} label="2024" total={412} />
             </RailSection>
-            <RailSection heading="Verdict">
-              <FacetRow count={164} label="Savor" total={412} />
-              <FacetRow count={191} label="Sip" total={412} />
-              <FacetRow count={57} label="Pass" total={412} />
+            <RailSection heading="Tasting rating">
+              <FacetRow count={28} label="Unicorn" total={412} />
+              <FacetRow count={116} label="Outstanding" total={412} />
+              <FacetRow count={164} label="Very good" total={412} />
+              <FacetRow count={79} label="Good" total={412} />
+              <FacetRow count={25} label="Mediocre" total={412} />
             </RailSection>
           </>
         }
@@ -195,14 +198,14 @@ export function TastingsPagePattern() {
               metadata: "Islay · 16 years · 43% ABV",
               name: "Lagavulin 16-year-old",
               notes: ["Smoke", "Dried fruit", "Sea salt"],
-              verdict: "savor",
+              ratingBand: "outstanding",
             },
             {
               href: "#",
               metadata: "Islay · NAS · 54.2% ABV",
               name: "Ardbeg Uigeadail",
               notes: ["Tar", "Raisin", "Espresso"],
-              verdict: "sip",
+              ratingBand: "good",
             },
           ]}
           menu={
@@ -222,7 +225,7 @@ export function TastingsPagePattern() {
               metadata: "Campbeltown · 10 years · 46% ABV",
               name: "Springbank 10-year-old",
               notes: ["Mineral", "Wax", "Pear"],
-              verdict: "savor",
+              ratingBand: "outstanding",
             },
           ]}
         />
@@ -237,7 +240,7 @@ export function TastingsPagePattern() {
               metadata: "Ireland · 12 years · 40% ABV",
               name: "Redbreast 12-year-old",
               notes: ["Orchard fruit", "Spice"],
-              score: 88,
+              ratingBand: "very_good",
             },
           ]}
         />
@@ -319,8 +322,13 @@ export function ProfilePagePattern({
           <PageColumns
             rail={
               <>
-                <MeasurePanel label="Community score">
-                  <CommunityScore count={isYou ? 208 : 94} score={90.2} />
+                <MeasurePanel label="Review score">
+                  <Score
+                    count={isYou ? 208 : 94}
+                    high={97}
+                    low={72}
+                    median={90}
+                  />
                 </MeasurePanel>
                 <RailSection heading="Passports">
                   <Passport
@@ -353,7 +361,7 @@ export function ProfilePagePattern({
                     metadata: "Islay · 16 years · 43% ABV",
                     name: "Lagavulin 16-year-old",
                     notes: ["Smoke", "Orange", "Chocolate"],
-                    verdict: "savor",
+                    ratingBand: "outstanding",
                   },
                 ]}
               />
@@ -363,8 +371,11 @@ export function ProfilePagePattern({
                 date="August 16, 2026"
                 leading={<Avatar initials={isYou ? "DC" : "MB"} />}
                 members={[
-                  { name: "Springbank 10-year-old", verdict: "savor" },
-                  { name: "Kilkerran 12-year-old", verdict: "sip" },
+                  {
+                    name: "Springbank 10-year-old",
+                    ratingBand: "outstanding",
+                  },
+                  { name: "Kilkerran 12-year-old", ratingBand: "very_good" },
                 ]}
               />
             </PageSection>

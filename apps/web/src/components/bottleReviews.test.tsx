@@ -66,7 +66,7 @@ describe("BottleReviews", () => {
     expect(html).toContain("Dramface");
     expect(html).toContain("By A. Critic");
     expect(html).toContain("Jul 22, 2026");
-    expect(html).toContain("7.8/10");
+    expect(html).not.toContain("7.8/10");
     expect(html).toContain("Peated summary of Whisky Advocate:");
     expect(html).toContain("Read the full review on Whisky Advocate");
     expect(html).toContain('href="https://example.com/reviews/springbank"');
@@ -77,7 +77,7 @@ describe("BottleReviews", () => {
     expect(renderToStaticMarkup(<ExternalReviewList results={[]} />)).toBe("");
   });
 
-  it("adds the shared band label to an external 100-point score", () => {
+  it("renders a 100-point critic rating without source-scale decoration", () => {
     const html = renderToStaticMarkup(
       <ExternalReviewList
         results={[
@@ -88,11 +88,12 @@ describe("BottleReviews", () => {
       />,
     );
 
-    expect(html).toContain("92/100");
-    expect(html).toContain("Outstanding");
+    expect(html).toContain(">92<");
+    expect(html).not.toContain("92/100");
+    expect(html).not.toContain("Outstanding");
   });
 
-  it("omits missing metadata and old converted scores", () => {
+  it("omits missing metadata and critic ratings", () => {
     const results = [
       makeExternalReview({
         reviewerName: null,

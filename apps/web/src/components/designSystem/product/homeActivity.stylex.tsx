@@ -1,6 +1,5 @@
 "use client";
 
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
@@ -22,7 +21,6 @@ import {
   SectionError,
   TastingEntry,
   type TastingEntryMember,
-  type Verdict,
 } from "../components";
 import { RecordList, RecordRow } from "../patterns/pagePatternShell.stylex";
 
@@ -30,13 +28,6 @@ type ActivityList = Outputs["activity"]["list"];
 type ActivityResult = ActivityList["results"][number];
 type TastingSession = Extract<ActivityResult, { type: "tasting_session" }>;
 type CollectionActivity = Extract<ActivityResult, { type: "collection_add" }>;
-
-function getVerdict(rating: number | null): Verdict | undefined {
-  if (rating === SIMPLE_RATING_VALUES.PASS) return "pass";
-  if (rating === SIMPLE_RATING_VALUES.SIP) return "sip";
-  if (rating === SIMPLE_RATING_VALUES.SAVOR) return "savor";
-  return undefined;
-}
 
 function getBottleMetadata(
   bottle: TastingSession["tastings"][number]["bottle"],
@@ -59,8 +50,7 @@ function getTastingMember(
     metadata: getBottleMetadata(tasting.bottle),
     name: tasting.bottle.fullName,
     notes: tasting.tags,
-    score: tasting.score ?? undefined,
-    verdict: getVerdict(tasting.rating),
+    ratingBand: tasting.ratingBand ?? undefined,
   };
 }
 

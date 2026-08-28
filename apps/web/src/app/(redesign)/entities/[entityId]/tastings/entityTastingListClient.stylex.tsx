@@ -1,6 +1,5 @@
 "use client";
 
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
@@ -13,7 +12,6 @@ import {
   EmptyState,
   TastingEntry,
   type TastingEntryMember,
-  type Verdict,
 } from "@peated/web/components/designSystem/components";
 import { Avatar } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import TimeSince from "@peated/web/components/timeSince";
@@ -21,23 +19,27 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../../styles/tokens.stylex";
 
 type Tasting = Outputs["tastings"]["list"]["results"][number];
+type TastingList = Outputs["tastings"]["list"];
 
 export function EntityTastingListClient({
   entityId,
   entityName,
+  initialTastingList,
 }: {
   entityId: number;
   entityName: string;
+  initialTastingList: TastingList;
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const cursor = Number(searchParams.get("cursor") ?? "1") || 1;
-  const { data: tastingList } = useSuspenseQuery(
-    orpc.tastings.list.queryOptions({
+  const { data: tastingList } = useSuspenseQuery({
+    ...orpc.tastings.list.queryOptions({
       input: { cursor, entity: entityId, limit: 25 },
     }),
-  );
+    initialData: initialTastingList,
+  });
 
   return (
     <section
@@ -91,8 +93,7 @@ function EntityTastingEntry({ tasting }: { tasting: Tasting }) {
     metadata: getBottleMetadata(tasting.bottle),
     name: tasting.bottle.fullName,
     notes: tasting.tags,
-    score: tasting.score ?? undefined,
-    verdict: getVerdict(tasting.rating),
+    ratingBand: tasting.ratingBand ?? undefined,
   };
 
   return (
@@ -109,13 +110,6 @@ function EntityTastingEntry({ tasting }: { tasting: Tasting }) {
       members={[member]}
     />
   );
-}
-
-function getVerdict(rating: number | null): Verdict | undefined {
-  if (rating === SIMPLE_RATING_VALUES.PASS) return "pass";
-  if (rating === SIMPLE_RATING_VALUES.SIP) return "sip";
-  if (rating === SIMPLE_RATING_VALUES.SAVOR) return "savor";
-  return undefined;
 }
 
 function getBottleMetadata(tastingBottle: Tasting["bottle"]) {

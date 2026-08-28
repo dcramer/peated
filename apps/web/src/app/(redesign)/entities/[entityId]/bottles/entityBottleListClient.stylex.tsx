@@ -1,5 +1,6 @@
 "use client";
 
+import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -13,11 +14,12 @@ import { space } from "../../../../../styles/tokens.stylex";
 
 const DEFAULT_SORT = "-release";
 
+type BottleList = Outputs["bottles"]["list"];
+
 const sortOptions = [
   { label: "Newest release", value: "-release" },
   { label: "Most tasted", value: "-tastings" },
   { label: "Highest score", value: "-score" },
-  { label: "Best verdict", value: "-rating" },
   { label: "Brand and bottle", value: "brand" },
   { label: "Bottle name", value: "name" },
   { label: "Oldest age", value: "-age" },
@@ -27,10 +29,12 @@ export function EntityBottleListClient({
   emptyAction,
   entityId,
   entityName,
+  initialBottleList,
 }: {
   emptyAction: ReactNode;
   entityId: number;
   entityName: string;
+  initialBottleList: BottleList;
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
@@ -51,13 +55,12 @@ export function EntityBottleListClient({
     overrides: {
       entity: entityId,
       limit: 25,
-      minRating: null,
-      minScore: null,
     },
   });
-  const { data: bottleList } = useSuspenseQuery(
-    orpc.bottles.list.queryOptions({ input: queryParams }),
-  );
+  const { data: bottleList } = useSuspenseQuery({
+    ...orpc.bottles.list.queryOptions({ input: queryParams }),
+    initialData: initialBottleList,
+  });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
   const sort = searchParams.get("sort") ?? DEFAULT_SORT;
 
@@ -65,8 +68,6 @@ export function EntityBottleListClient({
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set("sort", value);
     nextParams.delete("cursor");
-    nextParams.delete("minRating");
-    nextParams.delete("minScore");
     router.push(buildHref(pathname, nextParams));
   }
 
@@ -106,8 +107,6 @@ function getCursorHref(
 
   const nextParams = new URLSearchParams(searchParams);
   nextParams.set("cursor", String(cursor));
-  nextParams.delete("minRating");
-  nextParams.delete("minScore");
   return buildHref(pathname, nextParams);
 }
 

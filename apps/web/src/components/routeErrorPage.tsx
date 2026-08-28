@@ -1,7 +1,7 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import {
   CapturedFailurePage,
@@ -65,17 +65,23 @@ export default function RouteErrorPage({
     getServerOnlineStatus,
   );
   const stack = useMemo(() => projectSafeStack(error), [error]);
+  const [sentryEventId, setSentryEventId] = useState<string>();
 
   useEffect(() => {
     try {
-      Sentry.captureException(error, {
+      const eventId = Sentry.captureException(error, {
         tags: error.digest
           ? {
               "nextjs.digest": error.digest,
             }
           : undefined,
       });
+      // Sentry owns this reference; the boundary re-renders once capture returns it.
+      // oxlint-disable-next-line react/set-state-in-effect
+      setSentryEventId(eventId);
     } catch {
+      // oxlint-disable-next-line react/set-state-in-effect
+      setSentryEventId(undefined);
       // Telemetry must not prevent the owning error boundary from recovering.
     }
   }, [error]);
@@ -84,14 +90,12 @@ export default function RouteErrorPage({
     return <OfflinePage onRetry={reset} />;
   }
 
-  const incidentReference = error.digest;
-
   return (
     <CapturedFailurePage
-      incidentReference={incidentReference}
+      incidentReference={sentryEventId}
       onCopyReference={
-        incidentReference
-          ? () => void navigator.clipboard?.writeText(incidentReference)
+        sentryEventId
+          ? () => void navigator.clipboard?.writeText(sentryEventId)
           : undefined
       }
       onRetry={reset}

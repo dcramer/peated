@@ -2,6 +2,7 @@
 
 import { CATEGORY_LIST } from "@peated/server/constants";
 import { formatCategoryName } from "@peated/server/lib/format";
+import type { Outputs } from "@peated/server/orpc/router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -19,10 +20,11 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 
 const DEFAULT_SORT = "-tastings";
 
+type BottleList = Outputs["bottles"]["list"];
+
 const sortOptions = [
   { label: "Most tasted", value: "-tastings" },
   { label: "Highest score", value: "-score" },
-  { label: "Best verdict", value: "-rating" },
   { label: "Recently added", value: "-created" },
   { label: "Bottle name", value: "name" },
   { label: "Oldest age", value: "-age" },
@@ -56,14 +58,17 @@ const clearedFilterKeys = [
   "filter",
   "flavorProfile",
   "flight",
-  "minRating",
   "minScore",
   "query",
   "series",
   "tag",
 ] as const;
 
-export function BottleCatalogPageClient() {
+export function BottleCatalogPageClient({
+  initialBottleList,
+}: {
+  initialBottleList: BottleList;
+}) {
   const orpc = useORPC();
   const pathname = usePathname();
   const router = useRouter();
@@ -77,13 +82,15 @@ export function BottleCatalogPageClient() {
       "distiller",
       "entity",
       "limit",
+      "minScore",
       "series",
     ],
-    overrides: { limit: 50, minRating: null, minScore: null },
+    overrides: { limit: 50 },
   });
-  const { data: bottleList } = useSuspenseQuery(
-    orpc.bottles.list.queryOptions({ input: queryParams }),
-  );
+  const { data: bottleList } = useSuspenseQuery({
+    ...orpc.bottles.list.queryOptions({ input: queryParams }),
+    initialData: initialBottleList,
+  });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
   const sort = searchParams.get("sort") ?? DEFAULT_SORT;
 
@@ -97,7 +104,6 @@ export function BottleCatalogPageClient() {
     if ("ageBand" in updates) nextParams.delete("age");
     if ("age" in updates) nextParams.delete("ageBand");
     nextParams.delete("cursor");
-    nextParams.delete("minRating");
     nextParams.delete("minScore");
     router.push(buildHref(pathname, nextParams));
   }
@@ -192,8 +198,6 @@ function getCursorHref(
 
   const nextParams = new URLSearchParams(searchParams);
   nextParams.set("cursor", String(cursor));
-  nextParams.delete("minRating");
-  nextParams.delete("minScore");
   return buildHref(pathname, nextParams);
 }
 

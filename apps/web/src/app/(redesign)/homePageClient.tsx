@@ -34,7 +34,7 @@ export function HomePageClient({
       currentFeed={feed}
       feeds={[
         { label: "Friends", value: "friends" },
-        { label: "Everyone", value: "global" },
+        { label: "Global", value: "global" },
       ]}
       onFeedChange={(nextFeed) => {
         if (nextFeed === "friends" || nextFeed === "global") {

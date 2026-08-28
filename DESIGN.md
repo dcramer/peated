@@ -80,6 +80,8 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 
 - Every interactive control has a visible hover, pressed, disabled, and keyboard-focus state.
 - Keyboard focus uses a 2px inset accent ring. Do not remove focus indication.
+- A neutral text link shifts to `accentDeep` on hover and `accent` while pressed. A linked `surface` card or row steps to `inset` on hover and `accentTint` while pressed. Keep its geometry fixed and put the focus ring on the complete actionable surface.
+- Do not use a pointer cursor as the only interaction state.
 - Disabled controls use 45% opacity and state the reason nearby when the reason is not obvious.
 - A pending commit stays in the button that started it. Change its label to the present participle, use the deeper accent fill, and move one 2px rule across its bottom edge. Keep the button opaque and disable the rest of the form.
 - Use the same 33%-wide rule and 1.15-second sweep for indeterminate work. Respect reduced-motion preferences. Do not use spinners, shimmer gradients, or fake progress.
@@ -98,8 +100,8 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 - Use scoped search when one query can target several record types. Combine a scope menu and search input in one 40px tonal control. Open the menu over its stationary scope trigger, align its top and left outer edges with the control, align its option labels with the active scope label, and keep its divided header within the same 40px outer height. List the scopes without a redundant purpose label. Close the scope menu and focus the existing query input when the member presses that input. The open scope menu provides the active treatment, so suppress the query control's active ring until that menu closes. Show set sizes only when the caller supplies them. Keep the active scope visible and prevent horizontal overflow at narrow widths.
 - Use a segmented control for one choice among two to four short options. Keep every segment the same height and width. Use accent only for the current choice.
 - Use a switch for an independent setting that takes effect immediately. Put its label and consequence beside the control.
-- Use one score input with two grains. A member can pick one of five equal-width bands or type one whole-number point from 0 through 100. Switching grain clears the current value instead of converting it.
-- Choose the grain per tasting. Remember the last grain only as the next default. Do not lock the account to one grain.
+- Use the five-band rating input for a tasting. Do not offer an exact point in the tasting workflow.
+- Use a whole-number 0–100 input only when a member writes or edits a review.
 - Use the colour input for Peated's fixed 0–20 whisky colour scale. Draw all 21 reference steps as one continuous strip, support keyboard changes through a native range input, and let the member state that they are unsure.
 - Use the picture input to open the native file picker. Start with one tonal action. When a picture exists, make the preview the change action and show explicit change and remove controls.
 - Use a fieldset and legend for grouped controls. Use a label only for a single field.
@@ -107,36 +109,39 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 
 ## Rating language
 
-Peated has one 100-point measure entered at two grains.
+Peated keeps tasting bands and review scores separate. A tasting records one
+coarse band. A review records one exact 0–100 score.
 
 ### Bands
 
 - Use five bands everywhere: Mediocre under 80, Good 80–84, Very good 85–89, Outstanding 90–94, and Unicorn 95–100.
-- A band is a coarse range. Never convert a picked band into a point or fabricate a numeric score from band centers.
+- A tasting stores one band. Never convert it into a point or fabricate a numeric score from band centers.
 - Show aggregate band picks as five fixed bins. A narrow row can collapse the drawing to low, mid, and high blocks, but it must not introduce a second vocabulary.
-- Show one rating as five visible cells with one cell lit. An exact point adds a tick inside its band cell.
+- Show one tasting rating as five visible cells with one cell lit.
 
 ### Score
 
-- The headline score is the whole-number median of real typed points, never a mean.
-- The point pool splits by precision, not identity. A member's point and an eligible publication's native 100-point score use the same ruler.
-- With fewer than 20 points, withhold the median and let the score slot become a contribution path. Band picks still show their own distribution.
-- Show the real point count and, when supplied, the low and high points on the same 0–100 domain.
+- A member review stores one whole-number score from 0 through 100.
+- The headline score is the whole-number median of eligible member and external review scores, never a mean.
+- An external score enters the pool only when its permitted native value is a whole number on a 100-point scale.
+- With fewer than 20 scores, withhold the median and let the score slot become a contribution path. Tasting bands still show their own distribution.
+- Show the real member and external score counts and, when supplied, the low and high scores on the same 0–100 domain.
 - Use neutral ink for the score. Do not use accent to imply that Peated owns the datum.
 
 ### Critic reviews
 
-- A critic review belongs to its named publication and retains its native score display as an attributed citation.
-- Draw an individual critic score on its native numeric domain. Do not relabel a 4.5/5 or 8/10 score as a published 100-point score.
-- A publication's score can join the point pool only when its permitted native scale is 100. Never add a normalized compatibility value from another scale.
+- A critic review belongs to its named publication. Keep the publication and original article link visible.
+- When `externalReview.nativeScore.scale` is 100, show its numeric value as the critic rating.
+- For every other scale, omit the number. Do not convert it or explain the conversion in product copy.
+- Eligible whole-number critic ratings can contribute to the Bottle score while remaining attributed to their publication.
 - Use “critic review” for the record and “critic score” only for a score attributed to that record.
 
-Use “rating” as the umbrella word for a band pick or exact point. Use “grain” only for the band-or-point input choice.
+Use “tasting rating” for a band and “review score” for an exact point.
 
 ## Data devices
 
 - **Bottle identity row:** Use the catalog image when the caller supplies one. Otherwise, use Peated's existing bottle glyph. Keep brand, bottle name, exact supplied metadata, related-release count, and member status distinct. “In Library” and “Tasted” keep their current Peated meanings. Show true member states as 12px muted book and circled-check marks directly after the name. Do not use accent color or make the marks controls. Omit a false state. Callers also omit the marks when the page already implies the state, such as the bottle page, the member's library or tastings, and another member's profile. Do not replace missing data with a decorative bottle silhouette or infer identity details in the component.
-- **Band mark:** Use five 12×8px cells with 2px gaps. Keep every empty cell visible. Light the selected band; an exact point also adds a 2px tick inside that cell.
+- **Band mark:** Use five 12×8px cells with 2px gaps. Keep every empty cell visible and light the selected tasting band.
 - **Band stack:** Show the five bands from Mediocre to Unicorn with 2px gaps. Use low, mid, and high fills. Carry proportion by shape and sample size by count; do not print a band percentage.
 - **Record ID:** Show the canonical Peated ID above an entity title with the ID in accent. Print the supplied ID without changing it.
 - **Spec strip:** Show at most four equal-width mono fact cells. The strip has no background. Each cell uses `surface`, and a 6px transparent gap exposes the page behind it. Truncate labels and values and print an en dash for null or missing values. Place the strip as a sibling below its related header panel instead of nesting it inside that panel.
@@ -147,9 +152,9 @@ Use “rating” as the umbrella word for a band pick or exact point. Use “gra
 - **Facet row:** Combine one real filter with an optional count and share of the current record set. When the caller omits counts, keep the filter interactive and omit both the share bar and count slot. Reserve the dismiss slot in every interactive row. Use accent tint and a dismiss mark for the selected row. Use `null` only for an unavailable, disabled field; print an en dash and omit its bar.
 - **Pager:** Use numbered links only when the caller knows the page count. State the shown range and active filter. Use an ellipsis for skipped ranges and tonal previous or next links. Do not derive page numbers from cursor pagination.
 - **Bottle catalog:** Treat the API response as one visible cursor page. Show its real records, current-page count, and API-owned full-result total. Keep filters in the URL and reachable through one disclosure at narrow widths. Render category and age statement as counted facets from the API response. Use the API-owned NAS, under-12, 12–17, 18–24, and 25-plus age bands. Keep the old exact-age query readable for existing links, but replace it when a member selects an age band. Do not offer community-score, community-verdict, or flavor-profile filters, and do not derive facet counts from the cursor page. Keep cursor navigation; do not invent numbered pages from the total.
-- **Entity catalogs:** Use one list contract for distillers, brands, and bottlers. Show the visible cursor page, Peated ID, kind, location, bottle count, and tasting count. Keep query, country, region, sort, and cursor state in the URL. Country rows are count-free until the API owns entity facet counts. Keep the active region removable when an existing link supplies one. Use Previous and Next cursor actions without inventing a total or numbered pages. At phone widths, keep bottle count visible and retain both measures in the row's accessible name.
-- **Homepage:** Fetch the signed-out homepage's public stats and lists on the server through the anonymous API client, then hydrate the same React Query keys used by its client components. Keep the route request-time rendered because the shell varies by session. Keep signed-in activity and member data client-owned. The signed-out homepage header shows database navigation but omits global search because the hero owns the page's search control. Do not render popularity, annual rankings, or highest-rated distillery bottles until issue #781 supplies those server-owned facts.
-- **Entity detail:** Use one nested route frame for the entity header and the Overview, Bottles, Tastings, and optional Distillery codes tabs. The selected route owns its API and URL state while the header and tabs stay stable. Use the entity-details response for identity, kind, location, ownership, core facts, and bottle totals. Kind is the only entity classification used by the interface. A contextual bottle action maps only brand, bottler, and distillery kinds to their matching bottle field; blender and company records do not invent one. Keep the Bottles or Bottlings section visible for brand, bottler, distillery, and blender records. When the list is empty, show a short message and a button to record a bottle or bottling. Use the bottle-list response for bottle metadata, community scores, verdict distributions, sorting, and cursor pagination. Show these rows directly under the Bottles or Bottlings section; do not add a second list title or a generic catalog summary. Use tasting-list records for the Tastings tab. The SMWS codes tab is a reference list enriched with links from the existing SMWS distiller endpoint. A company portfolio waits for an API-owned current-owner filter; do not infer it from bottle relationships. Keep complete routes out of Storybook; document the reusable entity header, bottle rows, tasting entries, bottle comparison table, and their sparse states there. Do not infer operating status, still count, capacity, community measures, or history from the entity description or establishment year.
+- **Entity catalogs:** Use one list contract for distillers, brands, bottlers, and blenders. Show the visible cursor page, Peated ID, kind, location, bottle count, and tasting count. Keep query, country, region, sort, and cursor state in the URL. Country rows are count-free until the API owns entity facet counts. Keep the active region removable when an existing link supplies one. Use Previous and Next cursor actions without inventing a total or numbered pages. At phone widths, keep bottle count visible and retain both measures in the row's accessible name.
+- **Homepage:** Fetch the signed-out homepage's public stats and lists on the server through the anonymous API client, then hydrate the same React Query keys used by its client components. Use the bottle list's published median-score sort for the database-wide Highest rated module. Use real country totals for the origin directory and group the API-owned Scottish regions under Scotland. Keep the route request-time rendered because the shell varies by session. Keep signed-in activity and member data client-owned. The signed-out homepage header shows database navigation but omits global search because the hero owns the page's search control. Do not render popularity, annual rankings, critic-source totals, or highest-rated bottles scoped to one distillery until issue #781 supplies those server-owned facts.
+- **Entity detail:** Use one nested route frame for the entity header and the Overview, Bottles, Tastings, and optional Distillery codes tabs. The selected route owns its API and URL state while the header and tabs stay stable. Use the entity-details response for identity, kind, location, ownership, core facts, and bottle totals. Kind is the only entity classification used by the interface. A contextual bottle action maps only brand, bottler, and distillery kinds to their matching bottle field; blender and company records do not invent one. Keep the Bottles or Bottlings section visible for brand, bottler, distillery, and blender records. When the list is empty, show a short message and a button to record a bottle or bottling. Use the bottle-list response for bottle metadata, median review score, tasting-band counts, sorting, and cursor pagination. Show these rows directly under the Bottles or Bottlings section; do not add a second list title or a generic catalog summary. Use tasting-list records for the Tastings tab. The SMWS codes tab is a reference list enriched with links from the existing SMWS distiller endpoint. A company portfolio waits for an API-owned current-owner filter; do not infer it from bottle relationships. Keep complete routes out of Storybook; document the reusable entity header, bottle rows, tasting entries, bottle comparison table, and their sparse states there. Do not infer operating status, still count, capacity, community measures, or history from the entity description or establishment year.
 - **Member profile:** Keep the profile header, summary, privacy boundary, and Tastings, Library, and Activity tabs in one nested route frame. Use user-details counts for tastings, unique bottles, library entries, and contributions. Use the tasting and region lists for Tastings. Use the Library list and Library statistics for search, status and producer filters, bottle rows, owner actions, and cursor links. Use profile Activity only for the tasting sessions and collection additions returned by its API. Keep private records behind the existing friendship rule. Omit bio, location, follower totals, passport coverage, distinct distillery totals, and a Contributions tab until issue #774 supplies owned contracts. Storybook documents the reusable header and bounded Library and Activity content instead of duplicating complete routes.
 - **Summary strip:** Show three to five page-level facts in equal tonal cells. A cell can add one short mono detail, such as pass, sip, and savor counts. Reflow cells into additional rows at narrow widths; do not introduce horizontal scrolling.
 - **Passport:** Present distinct tracked objects as coverage. Use the tracker noun and never expose XP or levels. A closed set names every stamped or missing member and shows a denominator. An open-ended tracker shows only its count and the distance to its next stamp. Past 24 members, replace individual cells with a share bar and percentage chip.
@@ -163,7 +168,10 @@ Do not add flavor meters. Peated does not own a derived flavor scale. Do not add
 ## Navigation and page frame
 
 - Keep the header, main content, and footer on the same maximum-width frame and responsive horizontal insets.
-- Show peer destinations as plain links. Use display type and a 2px accent rule only for the current page. Use `aria-current="page"` for that link.
+- On the homepage, use the page ground for the application header so the header and homepage read as one surface. Inner pages keep the separate header surface.
+- Center the bounded content column inside the minimal page-level recovery shell. Keep its text left-aligned.
+- Public catalog, detail, and member-profile routes fetch indexable records in their server route files. Pass the result to the interactive client component as its initial query state so names, links, facts, and public activity are present in the first HTML response. Use anonymous API identity for public data and session identity only when the response includes member state or enforces profile privacy.
+- Show peer destinations as plain links. Use ink-colored display type at weight 700 and `aria-current="page"` for the current header destination. Do not use the accent rule; that device belongs to page tabs.
 - Keep record-page tabs in one horizontally scrollable row. Show a count only when the caller supplies it, and keep the count separate from the destination label.
 - Keep database and personal destinations in one navigation system. Label the personal group “You” in the mono micro role when both groups share a row.
 - The application header uses one responsive component tree. On wide screens, the first row holds the brand, scoped search, “Log a tasting,” and the account menu. The second row holds database and personal navigation.
@@ -182,7 +190,7 @@ Do not add flavor meters. Peated does not own a derived flavor scale. Do not add
 - Do not open an empty results surface during the debounce interval. A query alone is not panel content; wait for loading, results, a settled miss, or an error.
 - On the first query, show the sweep and one mono line that names the searched set. Do not add placeholder rows. Debounce input by 140ms and keep a displayed sweep visible for at least 250ms so the panel does not flash.
 - End with “Record a bottle” only when the caller permits contribution. This action is never part of arrow-key result traversal.
-- On narrow screens, move the Community Score and Community Verdict under the result name. Remove scope selection from the constrained field. On phone search, expose the same scopes as a horizontally scrollable chip row and keep the same component and result order.
+- On narrow screens, move the review score and tasting ratings under the result name. Remove scope selection from the constrained field. On phone search, expose the same scopes as a horizontally scrollable chip row and keep the same component and result order.
 - The component does not rank results, create nearest matches, store recent queries, or invent total counts. Those values and behaviors belong to the search service or its owning product surface.
 
 ## Pickers

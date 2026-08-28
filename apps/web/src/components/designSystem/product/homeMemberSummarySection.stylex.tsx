@@ -47,7 +47,7 @@ export function HomeMemberSummarySection() {
         { label: "Bottles tasted", value: tastingStats.data.uniqueBottles },
         { label: "Contributions", value: details.data.stats.contributions },
       ]}
-      ratings={tastingStats.data.ratings}
+      bands={tastingStats.data.bands}
       totalTastings={details.data.stats.tastings}
     />
   );

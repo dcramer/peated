@@ -6,13 +6,13 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import {
+  BandStack,
   BottleComparisonTable,
   ButtonLink,
   EmptyState,
   FactList,
   LoadingList,
   SectionError,
-  VerdictDistributionBar,
   type BottleComparisonRow,
   type FactListItem,
 } from "@peated/web/components/designSystem/components";
@@ -121,17 +121,14 @@ function toBottleTableRow(
     metadata: formatBottleMetadata(bottle),
     name: bottle.fullName,
     values: [
-      bottle.totalScores > 0 && bottle.avgScore !== null
-        ? bottle.avgScore.toLocaleString("en-US", {
-            maximumFractionDigits: 1,
-          })
+      bottle.scoreCount > 0 && bottle.medianScore !== null
+        ? bottle.medianScore.toLocaleString("en-US")
         : null,
-      bottle.ratingStats.total > 0 ? (
-        <VerdictDistributionBar
-          key={`${bottle.id}-verdicts`}
-          pass={bottle.ratingStats.pass}
-          savor={bottle.ratingStats.savor}
-          sip={bottle.ratingStats.sip}
+      Object.values(bottle.tastingBandCounts).some((count) => count > 0) ? (
+        <BandStack
+          key={`${bottle.id}-ratings`}
+          counts={bottle.tastingBandCounts}
+          variant="compact"
         />
       ) : null,
     ],
@@ -225,7 +222,7 @@ function EntityBottleOverview({
     >
       <BottleComparisonTable
         ariaLabel={`${entity.name} ${presentation.bottleSectionLabel.toLowerCase()}`}
-        columns={["Community score", "Verdicts"]}
+        columns={["Score", "Tasting ratings"]}
         rows={[
           toBottleTableRow(firstBottle),
           ...remainingBottles.map(toBottleTableRow),
@@ -236,8 +233,10 @@ function EntityBottleOverview({
 }
 
 export function EntityOverviewClient({
+  initialBottleList,
   initialEntity,
 }: {
+  initialBottleList?: BottleList;
   initialEntity: Entity;
 }) {
   const orpc = useORPC();
@@ -247,15 +246,16 @@ export function EntityOverviewClient({
     }),
     initialData: initialEntity,
   });
-  const bottleListQuery = useQuery(
-    orpc.bottles.list.queryOptions({
+  const bottleListQuery = useQuery({
+    ...orpc.bottles.list.queryOptions({
       input: {
         entity: initialEntity.id,
         limit: 4,
         sort: "-tastings",
       },
     }),
-  );
+    initialData: initialBottleList,
+  });
 
   if (entityQuery.error) {
     return (

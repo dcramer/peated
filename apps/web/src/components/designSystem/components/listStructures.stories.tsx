@@ -9,11 +9,11 @@ import {
   RailList,
   RailListItem,
 } from "./listStructures.stylex";
-import { VerdictMark } from "./scoring.stylex";
+import { BandMark } from "./scoring.stylex";
 
 const sortOptions = [
   { label: "Recently tasted", value: "recent" },
-  { label: "Community score", value: "score" },
+  { label: "Score", value: "score" },
   { label: "Name", value: "name" },
 ] as const;
 
@@ -66,13 +66,13 @@ export const TastingsByMonth: Story = {
         <PeriodHeader>August 2026</PeriodHeader>
         <RailList ariaLabel="August 2026 tastings">
           <RailListItem
-            end={<VerdictMark verdict="savor" />}
+            end={<BandMark band="outstanding" />}
             href="/tastings/1"
             metadata="Aug 22 · 46% ABV"
             title="Port Charlotte 10 Year Old"
           />
           <RailListItem
-            end={<VerdictMark verdict="sip" />}
+            end={<BandMark band="very_good" />}
             href="/tastings/2"
             metadata="Aug 14 · 54.2% ABV"
             title="Ardbeg Uigeadail"
@@ -83,7 +83,7 @@ export const TastingsByMonth: Story = {
         <PeriodHeader>July 2026</PeriodHeader>
         <RailList ariaLabel="July 2026 tastings">
           <RailListItem
-            end={<VerdictMark verdict="pass" />}
+            end={<BandMark band="mediocre" />}
             href="/tastings/3"
             metadata="Jul 30 · 43% ABV"
             title="Caol Ila 12 Year Old"
@@ -98,7 +98,7 @@ export const LongBottleNames: Story = {
   render: () => (
     <RailList ariaLabel="Recent tastings">
       <RailListItem
-        end="91.3"
+        end="91"
         href="/tastings/4"
         metadata="A deliberately long metadata value that stays within the fixed row slot"
         title="A deliberately long independent bottling name that truncates before the value"

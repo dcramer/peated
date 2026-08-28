@@ -8,7 +8,7 @@ const counts = {
   mediocre: 312,
   outstanding: 796,
   unicorn: 199,
-  veryGood: 966,
+  very_good: 966,
 };
 
 const meta = {
@@ -39,7 +39,7 @@ export const Overview: Story = {
             mediocre: 1,
             outstanding: 18,
             unicorn: 1,
-            veryGood: 4,
+            very_good: 4,
           }}
           variant="compact"
         />

@@ -131,6 +131,8 @@ const styles = stylex.create({
     boxSizing: "border-box",
     width: "100%",
     maxWidth: "760px",
+    marginRight: "auto",
+    marginLeft: "auto",
     color: colors.ink,
   },
   status: {

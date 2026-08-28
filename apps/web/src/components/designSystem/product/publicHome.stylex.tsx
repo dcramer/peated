@@ -1,20 +1,23 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
+import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { useORPC } from "../../../lib/orpc/context";
 import { getEntityUrl } from "../../../lib/urls";
+import { space } from "../../../styles/tokens.stylex";
 import TimeSince from "../../timeSince";
 import { ButtonLink, LoadingList, SectionError } from "../components";
 import {
   HomeContributionPrompt,
   HomeDistilleries,
+  HomeHighestRated,
+  HomeOrigins,
   HomeQuestions,
   HomeRecentBottles,
   HomeRecentReviews,
-  HomeRegions,
 } from "../patterns/homeBrowse.stylex";
 import { HomePage } from "../patterns/homePage.stylex";
 import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
@@ -25,32 +28,34 @@ type Bottle = Outputs["bottles"]["list"]["results"][number];
 
 export type PublicHomeInitialData = {
   bottles?: Outputs["bottles"]["list"];
+  countries?: Outputs["countries"]["list"];
   distilleries?: Outputs["distilleries"]["list"];
   regions?: Outputs["regions"]["list"];
-  reviews?: Outputs["reviews"]["list"];
+  reviews?: Outputs["externalReviews"]["list"];
+  highestRated?: Outputs["bottles"]["list"];
   stats?: Outputs["stats"];
 };
 
 const questions = [
   {
-    question: "How is a Community Score calculated?",
+    question: "How is a score calculated?",
     answer:
-      "Peated averages the point ratings for that exact bottling. Pass, Sip, and Savor ratings stay separate.",
+      "It's the median of member scores and published scores that use a 100-point scale. Each score counts once. The number appears after 20 scores.",
   },
   {
-    question: "Why do some bottles have no Community Score?",
+    question: "Why do some bottles have no score?",
     answer:
-      "A bottle has no Community Score until someone gives it a point rating. Pass, Sip, and Savor ratings stay separate.",
+      "Some records are single casks that only a few people have tasted. We show what people said and leave the number blank until 20 scores.",
   },
   {
     question: "Do I need an account?",
     answer:
-      "You only need an account to record a tasting, keep a library, or add a bottling. Every public record is free to browse.",
+      "Only to record a tasting, keep a library, or add a bottling. Every record page is readable without one.",
   },
   {
     question: "Where do critic reviews come from?",
     answer:
-      "Each review keeps its source and original scale. Peated never turns 7/10 into 70/100.",
+      "Each review names its publication and links to the original article.",
   },
 ] as const;
 
@@ -72,8 +77,15 @@ export function PublicHome({
     <HomePage
       content={
         <>
-          <RecentReviews initialData={initialData?.reviews} />
-          <Regions initialData={initialData?.regions} />
+          <div {...stylex.props(styles.ratingsGrid)}>
+            <HighestRated initialData={initialData?.highestRated} />
+            <RecentReviews initialData={initialData?.reviews} />
+          </div>
+          <Origins
+            initialCountryData={initialData?.countries}
+            initialRegionData={initialData?.regions}
+            totalBottles={totalBottles}
+          />
           <PageColumns
             rail={
               <>
@@ -89,7 +101,7 @@ export function PublicHome({
                   }
                   secondaryAction={
                     <ButtonLink href="/bottles" size="sm" variant="text">
-                      Keep browsing
+                      Or keep browsing
                     </ButtonLink>
                   }
                 />
@@ -110,8 +122,8 @@ export function PublicHome({
       }
       description={
         totalTastings === undefined
-          ? "Browse bottlings down to the cask, published critic scores on their original scales, and tasting notes from the people who drank them. No account needed."
-          : `Browse bottlings down to the cask, published critic scores on their original scales, and ${totalTastings.toLocaleString("en-US")} recorded tastings. No account needed.`
+          ? "Every release down to the cask, critic scores, and tasting notes from the people who drank them. Free to browse, no account needed."
+          : `Every release down to the cask, critic scores, and what ${totalTastings.toLocaleString("en-US")} recorded tastings said. Free to browse, no account needed.`
       }
       search={
         <Search
@@ -119,6 +131,11 @@ export function PublicHome({
             router.push(
               query ? `/search?q=${encodeURIComponent(query)}` : "/search",
             )
+          }
+          placeholder={
+            totalBottles === undefined
+              ? "Search bottlings…"
+              : `Search ${totalBottles.toLocaleString("en-US")} bottlings…`
           }
           scopeValues={["all"]}
           showBottleMeasures={false}
@@ -128,27 +145,79 @@ export function PublicHome({
       signedIn={false}
       title={
         totalBottles === undefined
-          ? "Whisky bottlings, critic scores, and tasting notes."
-          : `Whisky bottlings, critic scores, and tasting notes — ${totalBottles.toLocaleString("en-US")} records.`
+          ? "Whisky bottlings, critic scores and tasting notes."
+          : `Whisky bottlings, critic scores and tasting notes — ${totalBottles.toLocaleString("en-US")} records.`
       }
     />
   );
 }
 
+function HighestRated({
+  initialData,
+}: {
+  initialData?: Outputs["bottles"]["list"];
+}) {
+  const orpc = useORPC();
+  const bottles = useQuery({
+    ...orpc.bottles.list.queryOptions({
+      input: { limit: 5, minScore: 0, sort: "-score" },
+    }),
+    initialData,
+  });
+
+  if (bottles.isPending) {
+    return (
+      <HomeSectionLoading>
+        <LoadingList label="Loading highest-rated bottles" rows={4} />
+      </HomeSectionLoading>
+    );
+  }
+
+  if (bottles.error) {
+    return (
+      <SectionError
+        heading="Highest-rated bottles are unavailable"
+        onRetry={() => void bottles.refetch()}
+      >
+        We couldn't load the highest-rated bottles. The rest of the database is
+        still available.
+      </SectionError>
+    );
+  }
+
+  const items = bottles.data.results.flatMap((bottle) =>
+    bottle.medianScore === null
+      ? []
+      : [
+          {
+            bandCounts: bottle.tastingBandCounts,
+            href: `/bottles/${bottle.id}`,
+            metadata: getHighestRatedMetadata(bottle),
+            name: bottle.fullName,
+            score: bottle.medianScore,
+          },
+        ],
+  );
+
+  return items.length ? (
+    <HomeHighestRated bottles={items} totalRated={bottles.data.total} />
+  ) : null;
+}
+
 function RecentReviews({
   initialData,
 }: {
-  initialData?: Outputs["reviews"]["list"];
+  initialData?: Outputs["externalReviews"]["list"];
 }) {
   const orpc = useORPC();
-  const reviews = useQuery({
-    ...orpc.reviews.list.queryOptions({
+  const externalReviews = useQuery({
+    ...orpc.externalReviews.list.queryOptions({
       input: { limit: 5, sort: "recent" },
     }),
     initialData,
   });
 
-  if (reviews.isPending) {
+  if (externalReviews.isPending) {
     return (
       <HomeSectionLoading>
         <LoadingList label="Loading recent critic reviews" rows={4} />
@@ -156,11 +225,11 @@ function RecentReviews({
     );
   }
 
-  if (reviews.error) {
+  if (externalReviews.error) {
     return (
       <SectionError
         heading="Critic reviews are unavailable"
-        onRetry={() => void reviews.refetch()}
+        onRetry={() => void externalReviews.refetch()}
       >
         We couldn't load the latest critic reviews. The rest of the database is
         still available.
@@ -168,7 +237,7 @@ function RecentReviews({
     );
   }
 
-  const items = reviews.data.results.flatMap((review) =>
+  const items = externalReviews.data.results.flatMap((review) =>
     review.bottle
       ? [
           {
@@ -180,7 +249,10 @@ function RecentReviews({
               />
             ),
             id: String(review.id),
-            score: review.nativeScore?.display,
+            rating:
+              review.nativeScore?.scale === 100
+                ? review.nativeScore.value
+                : null,
             source: review.site?.name ?? review.reviewerName ?? "Critic review",
             sourceHref: review.url,
           },
@@ -191,12 +263,22 @@ function RecentReviews({
   return items.length ? <HomeRecentReviews reviews={items} /> : null;
 }
 
-function Regions({
-  initialData,
+function Origins({
+  initialCountryData,
+  initialRegionData,
+  totalBottles,
 }: {
-  initialData?: Outputs["regions"]["list"];
+  initialCountryData?: Outputs["countries"]["list"];
+  initialRegionData?: Outputs["regions"]["list"];
+  totalBottles?: number;
 }) {
   const orpc = useORPC();
+  const countries = useQuery({
+    ...orpc.countries.list.queryOptions({
+      input: { hasBottles: true, limit: 10, sort: "-bottles" },
+    }),
+    initialData: initialCountryData,
+  });
   const regions = useQuery({
     ...orpc.regions.list.queryOptions({
       input: {
@@ -206,38 +288,62 @@ function Regions({
         sort: "-bottles",
       },
     }),
-    initialData,
+    initialData: initialRegionData,
   });
 
-  if (regions.isPending) {
+  if (countries.isPending || regions.isPending) {
     return (
       <HomeSectionLoading>
-        <LoadingList label="Loading whisky regions" rows={3} />
+        <LoadingList label="Loading whisky origins" rows={3} />
       </HomeSectionLoading>
     );
   }
 
-  if (regions.error) {
+  if (countries.error && regions.error) {
     return (
       <SectionError
-        heading="Regions are unavailable"
-        onRetry={() => void regions.refetch()}
+        heading="Origins are unavailable"
+        onRetry={() => {
+          void countries.refetch();
+          void regions.refetch();
+        }}
       >
-        We couldn't load the region guide. Bottle search and the other homepage
+        We couldn't load the origin guide. Bottle search and the other homepage
         sections still work.
       </SectionError>
     );
   }
 
-  return regions.data.results.length ? (
-    <HomeRegions
-      regions={regions.data.results.map((region) => ({
+  const countryItems = countries.data?.results ?? [];
+  const scotland = countryItems.find((country) => country.slug === "scotland");
+  const regionItems = regions.data?.results ?? [];
+
+  return countryItems.length || regionItems.length ? (
+    <HomeOrigins
+      countries={countryItems
+        .filter((country) => country.slug !== "scotland")
+        .slice(0, 6)
+        .map((country) => ({
+          description: country.summary ?? undefined,
+          href: `/locations/${country.slug}`,
+          name: country.name,
+          totalBottles: country.totalBottles,
+        }))}
+      regions={regionItems.map((region) => ({
         description: region.description ?? undefined,
         href: `/locations/${region.country.slug}/regions/${region.slug}`,
         name: region.name,
         totalBottles: region.totalBottles,
-        totalDistilleries: region.totalDistillers,
       }))}
+      scotland={
+        scotland
+          ? {
+              href: `/locations/${scotland.slug}`,
+              totalBottles: scotland.totalBottles,
+            }
+          : undefined
+      }
+      totalBottles={totalBottles}
     />
   ) : null;
 }
@@ -287,6 +393,9 @@ function Distilleries({
     <HomeDistilleries
       distilleries={distilleries.data.results.map((distillery) => ({
         href: getEntityUrl(distillery),
+        location: [distillery.region?.name, distillery.country?.name]
+          .filter(Boolean)
+          .join(", "),
         name: distillery.name,
         totalBottles: distillery.totalBottles,
       }))}
@@ -378,3 +487,29 @@ function getBottleMetadata(bottle: Bottle) {
     bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
   ].filter((value): value is string => Boolean(value));
 }
+
+function getHighestRatedMetadata(bottle: Bottle) {
+  const distiller = bottle.distillers[0];
+  const origin = distiller?.region?.name ?? distiller?.country?.name;
+
+  return [
+    origin,
+    bottle.vintageYear === null ? null : String(bottle.vintageYear),
+    bottle.statedAge === null ? null : `${bottle.statedAge} yr`,
+    bottle.abv === null ? null : `${bottle.abv.toFixed(1)}%`,
+  ].filter((value): value is string => Boolean(value));
+}
+
+const STACKED = "@media (max-width: 759px)";
+
+const styles = stylex.create({
+  ratingsGrid: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: space.x8,
+    [STACKED]: {
+      gridTemplateColumns: "minmax(0, 1fr)",
+    },
+  },
+});

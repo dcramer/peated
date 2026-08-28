@@ -17,14 +17,14 @@ const meta = {
         metadata: "Islay · 16 years · 43% ABV",
         name: "Lagavulin 16-year-old",
         notes: ["Smoke", "Dried fruit", "Sea salt"],
-        verdict: "savor",
+        ratingBand: "outstanding",
       },
       {
         href: "/bottles/ardbeg-uigeadail",
         metadata: "Islay · NAS · 54.2% ABV",
         name: "Ardbeg Uigeadail",
         notes: ["Tar", "Raisin", "Espresso"],
-        verdict: "sip",
+        ratingBand: "good",
       },
     ],
     menu: (
@@ -59,7 +59,7 @@ export const Overview: Story = {
             href: "/bottles/lagavulin-16",
             metadata: "Islay · 16 years · 43% ABV",
             name: "Lagavulin 16-year-old",
-            verdict: "savor",
+            ratingBand: "outstanding",
           },
         ]}
       />

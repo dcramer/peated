@@ -21,6 +21,7 @@ const databaseItems = [
   { href: "/distillers", label: "Distillers" },
   { href: "/brands", label: "Brands" },
   { href: "/bottlers", label: "Bottlers" },
+  { href: "/blenders", label: "Blenders" },
 ] as const;
 
 function AccountVisual({
@@ -57,6 +58,7 @@ export function ApplicationLayout({
   const pathname = usePathname();
   const { user } = useAuth();
   const [logoutPending, startLogout] = useTransition();
+  const isHome = pathname === "/";
   const isPublicHome = pathname === "/" && !user;
   const personalItems = user
     ? [
@@ -115,6 +117,7 @@ export function ApplicationLayout({
               </>
             )
           }
+          background={isHome ? "page" : "surface"}
           currentHref={pathname}
           databaseItems={databaseItems}
           navigationPlacement={isPublicHome ? "inline" : "separate"}
@@ -124,7 +127,6 @@ export function ApplicationLayout({
               <Search scopeValues={user ? undefined : ["all"]} />
             )
           }
-          showNavigation={Boolean(user) || isPublicHome}
         />
       }
     >

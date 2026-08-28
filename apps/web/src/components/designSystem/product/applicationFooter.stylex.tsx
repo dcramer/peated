@@ -10,6 +10,7 @@ const groups = [
       { href: "/distillers", label: "Distillers" },
       { href: "/brands", label: "Brands" },
       { href: "/bottlers", label: "Bottlers" },
+      { href: "/blenders", label: "Blenders" },
       { href: "/locations", label: "Locations" },
     ],
   },

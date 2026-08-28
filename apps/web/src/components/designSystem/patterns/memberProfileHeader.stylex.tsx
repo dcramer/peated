@@ -9,10 +9,10 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
+  BandStack,
   Chip,
   LoadingPlaceholder,
-  VerdictDistribution,
-  type VerdictDistributionProps,
+  type BandCounts,
 } from "../components";
 
 const FOLDED = "@media (max-width: 899px)";
@@ -25,7 +25,7 @@ export type MemberProfileHeaderProps = {
   pictureUrl?: string | null;
   privateProfile?: boolean;
   ratingLabel?: "How they rate" | "How you rate";
-  ratings?: VerdictDistributionProps;
+  bands?: BandCounts;
   ratingsLoading?: boolean;
   username: string;
 };
@@ -38,11 +38,11 @@ export function MemberProfileHeader({
   pictureUrl,
   privateProfile = false,
   ratingLabel = "How they rate",
-  ratings,
+  bands,
   ratingsLoading = false,
   username,
 }: MemberProfileHeaderProps) {
-  const showRatings = Boolean(ratings || ratingsLoading);
+  const showRatings = Boolean(bands || ratingsLoading);
 
   return (
     <header {...stylex.props(styles.header)}>
@@ -78,8 +78,8 @@ export function MemberProfileHeader({
       {showRatings ? (
         <section aria-label={ratingLabel} {...stylex.props(styles.ratings)}>
           <h2 {...stylex.props(styles.ratingLabel)}>{ratingLabel}</h2>
-          {ratings ? (
-            <VerdictDistribution {...ratings} />
+          {bands ? (
+            <BandStack counts={bands} showCounts />
           ) : (
             <div
               aria-busy="true"

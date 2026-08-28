@@ -6,7 +6,7 @@ import { BandMark, RATING_BANDS } from "./scoring.stylex";
 const meta = {
   title: "Components/Measures/Band Mark",
   component: BandMark,
-  args: { value: { band: "outstanding", grain: "band" } },
+  args: { band: "outstanding" },
 } satisfies Meta<typeof BandMark>;
 
 export default meta;
@@ -17,13 +17,8 @@ export const Overview: Story = {
     <StoryStack>
       <StoryRow>
         {RATING_BANDS.map((band) => (
-          <BandMark key={band.key} value={{ band: band.key, grain: "band" }} />
+          <BandMark band={band.key} key={band.key} />
         ))}
-      </StoryRow>
-      <StoryRow>
-        <BandMark value={{ grain: "point", point: 90 }} />
-        <BandMark value={{ grain: "point", point: 92 }} />
-        <BandMark value={{ grain: "point", point: 94 }} />
       </StoryRow>
     </StoryStack>
   ),

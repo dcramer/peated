@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
-import { getRatingBand } from "@peated/server/constants";
 import type { Outputs } from "@peated/server/orpc/router";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
@@ -223,9 +222,9 @@ export function ExternalReviewList({
       <ul className="mb-4 divide-y divide-slate-800">
         {externalReviews.map((externalReview) => {
           const site = externalReview.site!;
-          const scoreBand =
+          const rating =
             externalReview.nativeScore?.scale === 100
-              ? getRatingBand(externalReview.nativeScore.value)
+              ? externalReview.nativeScore.value
               : null;
           return (
             <li key={externalReview.id} className="py-4 first:pt-2">
@@ -252,15 +251,12 @@ export function ExternalReviewList({
                     </p>
                   ) : null}
                 </div>
-                {externalReview.nativeScore ? (
-                  <span className="shrink-0 font-semibold">
-                    {externalReview.nativeScore.display}
-                    {scoreBand ? (
-                      <span className="text-muted font-normal">
-                        {" "}
-                        · {scoreBand.label}
-                      </span>
-                    ) : null}
+                {rating !== null ? (
+                  <span
+                    aria-label={`${site.name} critic rating ${rating} out of 100`}
+                    className="shrink-0 font-semibold"
+                  >
+                    {rating}
                   </span>
                 ) : null}
               </div>

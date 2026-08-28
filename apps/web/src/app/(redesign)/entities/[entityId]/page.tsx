@@ -11,6 +11,14 @@ export default async function EntityPage(props: {
   const entity = await resolveOrNotFound(
     client.entities.details({ entity: Number(entityId) }),
   );
+  const bottleList = await client.bottles
+    .list({ entity: entity.id, limit: 4, sort: "-tastings" })
+    .catch(() => undefined);
 
-  return <EntityOverviewClient initialEntity={entity} />;
+  return (
+    <EntityOverviewClient
+      initialBottleList={bottleList}
+      initialEntity={entity}
+    />
+  );
 }

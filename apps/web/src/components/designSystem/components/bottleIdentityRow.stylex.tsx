@@ -132,12 +132,21 @@ export function BottleIdentityRow({
       <BottleVisual imageUrl={imageUrl} />
       <div {...stylex.props(styles.copy)}>
         {brand ? (
-          <Brand href={brandHref} {...stylex.props(styles.brand)}>
+          <Brand
+            href={brandHref}
+            {...stylex.props(
+              styles.brand,
+              Boolean(brandHref) && styles.brandLink,
+            )}
+          >
             {brand}
           </Brand>
         ) : null}
         <div {...stylex.props(styles.nameLine)}>
-          <Name href={href} {...stylex.props(styles.name)}>
+          <Name
+            href={href}
+            {...stylex.props(styles.name, Boolean(href) && styles.nameLink)}
+          >
             {name}
           </Name>
           {isLibrary ? (
@@ -276,6 +285,13 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
+  brandLink: {
+    color: {
+      default: null,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
+  },
   nameLine: {
     display: "block",
     width: "100%",
@@ -298,6 +314,13 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
+  nameLink: {
+    color: {
+      default: null,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
+  },
   status: {
     display: "inline-flex",
     marginLeft: "6px",
@@ -318,7 +341,11 @@ const styles = stylex.create({
   relatedReleases: {
     marginTop: space.x1,
     outline: "none",
-    color: colors.accentDeep,
+    color: {
+      default: colors.accentDeep,
+      ":hover": colors.accent,
+      ":active": colors.ink,
+    },
     fontFamily: fonts.reading,
     fontSize: "12px",
     fontWeight: 600,

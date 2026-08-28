@@ -12,10 +12,10 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
+  BandStack,
   BottleComparisonTable,
   Button,
   Chip,
-  CommunityScore,
   CriticReview,
   FacetRow,
   FactList,
@@ -26,10 +26,9 @@ import {
   RecordId,
   RowMenu,
   ScopedSearch,
+  Score,
   SpecStrip,
   TastingEntry,
-  VerdictDistribution,
-  VerdictDistributionBar,
 } from "../components";
 import {
   Avatar,
@@ -72,7 +71,17 @@ const bottleRows = [
     name: "Lagavulin 16-year-old",
     values: [
       91,
-      <VerdictDistributionBar key="v1" pass={12} savor={142} sip={46} />,
+      <BandStack
+        key="v1"
+        counts={{
+          good: 22,
+          mediocre: 12,
+          outstanding: 72,
+          unicorn: 18,
+          very_good: 76,
+        }}
+        variant="compact"
+      />,
     ],
   },
   {
@@ -82,7 +91,17 @@ const bottleRows = [
     name: "Lagavulin 12-year-old Cask Strength",
     values: [
       93,
-      <VerdictDistributionBar key="v2" pass={4} savor={88} sip={23} />,
+      <BandStack
+        key="v2"
+        counts={{
+          good: 9,
+          mediocre: 4,
+          outstanding: 47,
+          unicorn: 12,
+          very_good: 43,
+        }}
+        variant="compact"
+      />,
     ],
   },
   {
@@ -92,7 +111,17 @@ const bottleRows = [
     name: "Lagavulin 8-year-old",
     values: [
       89,
-      <VerdictDistributionBar key="v3" pass={8} savor={61} sip={31} />,
+      <BandStack
+        key="v3"
+        counts={{
+          good: 13,
+          mediocre: 8,
+          outstanding: 29,
+          unicorn: 6,
+          very_good: 44,
+        }}
+        variant="compact"
+      />,
     ],
   },
 ] as const;
@@ -103,11 +132,20 @@ export function BottlePagePattern() {
       <PageColumns
         rail={
           <>
-            <MeasurePanel label="Community score">
-              <CommunityScore count={184} score={91.2} />
+            <MeasurePanel label="Review score">
+              <Score count={184} high={98} low={71} median={91} />
             </MeasurePanel>
-            <MeasurePanel label="Community verdict">
-              <VerdictDistribution pass={12} savor={142} sip={46} />
+            <MeasurePanel label="Tasting ratings">
+              <BandStack
+                counts={{
+                  good: 22,
+                  mediocre: 12,
+                  outstanding: 72,
+                  unicorn: 18,
+                  very_good: 76,
+                }}
+                showCounts
+              />
             </MeasurePanel>
             <RailSection heading="Declared on the label">
               <Panel>
@@ -176,20 +214,16 @@ export function BottlePagePattern() {
           <CriticReview
             href="#"
             publication="Whisky Advocate"
-            score={{ display: "92/100", scale: 100, value: 92 }}
+            rating={92}
             summary="A standard-setter: smoky, rich, and composed."
           />
           <CriticReview
             href="#"
             publication="Malt Review"
-            score={{ display: "8/10", scale: 10, value: 8 }}
+            rating={80}
             summary="The classic southern Islay profile, with fruit beneath the smoke."
           />
-          <CriticReview
-            href="#"
-            publication="The Whisky Wash"
-            score={{ display: "4.5/5", scale: 5, value: 4.5 }}
-          />
+          <CriticReview href="#" publication="The Whisky Wash" rating={90} />
         </PageSection>
         <PageSection count={200} heading="Tastings">
           <PageTabs
@@ -210,7 +244,7 @@ export function BottlePagePattern() {
                 metadata: "Neat · 30 ml",
                 name: "Lagavulin 16-year-old",
                 notes: ["Smoke", "Orange", "Chocolate"],
-                verdict: "savor",
+                ratingBand: "outstanding",
               },
             ]}
           />
@@ -223,12 +257,12 @@ export function BottlePagePattern() {
               {
                 name: "Lagavulin 16-year-old",
                 notes: ["Sea salt", "Raisin"],
-                score: 91,
+                ratingBand: "outstanding",
               },
               {
                 name: "Ardbeg Uigeadail",
                 notes: ["Tar", "Espresso"],
-                score: 93,
+                ratingBand: "outstanding",
               },
             ]}
           />
@@ -311,11 +345,20 @@ export function EntityPagePattern({
       <PageColumns
         rail={
           <>
-            <MeasurePanel label="Community score">
-              <CommunityScore count={624} score={90.4} />
+            <MeasurePanel label="Review score">
+              <Score count={624} high={99} low={68} median={90} />
             </MeasurePanel>
-            <MeasurePanel label="Community verdict">
-              <VerdictDistribution pass={44} savor={431} sip={149} />
+            <MeasurePanel label="Tasting ratings">
+              <BandStack
+                counts={{
+                  good: 82,
+                  mediocre: 44,
+                  outstanding: 210,
+                  unicorn: 61,
+                  very_good: 227,
+                }}
+                showCounts
+              />
             </MeasurePanel>
             <RailSection heading="Coverage">
               <Passport
@@ -355,7 +398,7 @@ export function EntityPagePattern({
           heading={kind === "corporation" ? "Distilleries" : "Bottlings"}
         >
           <BottleComparisonTable
-            columns={["Score", "Verdict"]}
+            columns={["Score", "Tasting ratings"]}
             detail="Core range"
             heading={kind === "corporation" ? "Islay" : "Core range"}
             rows={bottleRows}
@@ -366,7 +409,7 @@ export function EntityPagePattern({
           heading={kind === "brand" ? "Series" : "Annual & limited"}
         >
           <BottleComparisonTable
-            columns={["Score", "Verdict"]}
+            columns={["Score", "Tasting ratings"]}
             heading={kind === "brand" ? "Related series" : "Annual & limited"}
             rows={[bottleRows[1], bottleRows[2]]}
           />
@@ -526,7 +569,7 @@ export function SearchPagePattern() {
       >
         <PageSection count={1832} heading={`Results for “${query}”`}>
           <BottleComparisonTable
-            columns={["Score", "Verdict"]}
+            columns={["Score", "Tasting ratings"]}
             detail="Bottles matching the current scope and facets"
             heading="Bottles"
             rows={bottleRows}

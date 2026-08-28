@@ -54,12 +54,9 @@ export function HomePage(props: HomePageProps) {
         >
           <div {...stylex.props(styles.feedHeading)}>
             <div id="home-feed-heading">
-              <SectionHeading>Activity</SectionHeading>
+              <SectionHeading>Feed</SectionHeading>
             </div>
-            <div
-              aria-label="Activity filter"
-              {...stylex.props(styles.feedTabs)}
-            >
+            <div aria-label="Feed filter" {...stylex.props(styles.feedTabs)}>
               {props.feeds.map((feed) => {
                 const selected = feed.value === props.currentFeed;
                 return (

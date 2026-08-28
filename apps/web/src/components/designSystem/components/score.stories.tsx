@@ -32,7 +32,7 @@ export const Overview: Story = {
       <Score
         contributionAction={
           <Button size="sm" variant="text">
-            Score it on 100
+            Write a review
           </Button>
         }
         count={12}

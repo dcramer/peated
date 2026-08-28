@@ -26,10 +26,11 @@ const MOBILE = "@media (max-width: 559px)";
 
 const databaseItems = [
   { href: "/bottles", label: "Bottles" },
+  { href: "/locations", label: "Locations" },
   { href: "/distillers", label: "Distillers" },
   { href: "/brands", label: "Brands" },
   { href: "/bottlers", label: "Bottlers" },
-  { href: "/map", label: "Map" },
+  { href: "/blenders", label: "Blenders" },
 ] as const;
 
 const personalItems = [
@@ -56,6 +57,8 @@ const footerGroups = [
       { href: "/bottles", label: "Bottles" },
       { href: "/distillers", label: "Distillers" },
       { href: "/brands", label: "Brands" },
+      { href: "/bottlers", label: "Bottlers" },
+      { href: "/blenders", label: "Blenders" },
     ],
   },
   {
@@ -327,7 +330,13 @@ export function RecordRow({
     <li {...stylex.props(styles.recordRow)}>
       {leading ? <div {...stylex.props(styles.leading)}>{leading}</div> : null}
       <div {...stylex.props(styles.recordCopy)}>
-        <Title href={href} {...stylex.props(styles.recordTitle)}>
+        <Title
+          href={href}
+          {...stylex.props(
+            styles.recordTitle,
+            Boolean(href) && styles.recordTitleLink,
+          )}
+        >
           {title}
         </Title>
         {metadata ? (
@@ -622,6 +631,13 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
+  recordTitleLink: {
+    color: {
+      default: null,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
+  },
   recordMetadata: {
     marginTop: space.x1,
     overflow: "hidden",
@@ -676,7 +692,11 @@ const styles = stylex.create({
     objectFit: "cover",
   },
   textLink: {
-    color: colors.accentDeep,
+    color: {
+      default: colors.accentDeep,
+      ":hover": colors.accent,
+      ":active": colors.ink,
+    },
     fontFamily: fonts.reading,
     fontSize: "13px",
     fontWeight: 600,

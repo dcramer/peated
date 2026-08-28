@@ -10,10 +10,11 @@ import { searchResultGroups } from "../components/storyData";
 
 const databaseItems = [
   { href: "/bottles", label: "Bottles" },
+  { href: "/locations", label: "Locations" },
   { href: "/distillers", label: "Distillers" },
   { href: "/brands", label: "Brands" },
   { href: "/bottlers", label: "Bottlers" },
-  { href: "/map", label: "Map" },
+  { href: "/blenders", label: "Blenders" },
 ] as const;
 
 const personalItems = [
@@ -103,7 +104,6 @@ function HeaderExample({
           />
         )
       }
-      showNavigation={signedIn || publicHome}
     />
   );
 }
@@ -128,7 +128,7 @@ type Story = StoryObj<typeof meta>;
 export const SignedIn: Story = { render: () => <HeaderExample /> };
 
 export const SignedOut: Story = {
-  render: () => <HeaderExample publicHome signedIn={false} />,
+  render: () => <HeaderExample signedIn={false} />,
 };
 
 export const SearchOpen: Story = {

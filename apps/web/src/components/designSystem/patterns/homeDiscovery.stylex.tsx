@@ -16,7 +16,7 @@ export type HomeCriticReview = {
   date: ReactNode;
   imageUrl?: string | null;
   metadata: readonly string[];
-  score?: ReactNode;
+  rating?: number | null;
   source: string;
   sourceHref: string;
   summary?: ReactNode;
@@ -57,9 +57,10 @@ export function HomeCriticReviews({
                 >
                   {review.bottleName}
                 </a>
-                {review.score === undefined ? null : (
-                  <strong {...stylex.props(styles.criticScore)}>
-                    {review.score}
+                {review.rating === null ||
+                review.rating === undefined ? null : (
+                  <strong {...stylex.props(styles.criticRating)}>
+                    {review.rating}
                   </strong>
                 )}
               </div>
@@ -185,7 +186,11 @@ const styles = stylex.create({
   },
   sourceLink: {
     outline: "none",
-    color: "inherit",
+    color: {
+      default: colors.inkMuted,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
     textDecoration: "none",
     boxShadow: {
       default: "none",
@@ -203,7 +208,11 @@ const styles = stylex.create({
     minWidth: 0,
     flex: 1,
     outline: "none",
-    color: colors.ink,
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
     fontFamily: fonts.display,
     fontSize: "15px",
     fontWeight: 700,
@@ -216,7 +225,7 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
-  criticScore: {
+  criticRating: {
     flexShrink: 0,
     color: colors.ink,
     fontFamily: fonts.display,
@@ -282,7 +291,11 @@ const styles = stylex.create({
     overflow: "hidden",
     marginTop: "2px",
     outline: "none",
-    color: colors.ink,
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
     fontFamily: fonts.display,
     fontSize: "15px",
     fontWeight: 700,
@@ -320,7 +333,11 @@ const styles = stylex.create({
   seeAll: {
     flexShrink: 0,
     outline: "none",
-    color: colors.accent,
+    color: {
+      default: colors.accentDeep,
+      ":hover": colors.accent,
+      ":active": colors.ink,
+    },
     fontFamily: fonts.display,
     fontSize: "13px",
     fontWeight: 700,

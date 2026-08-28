@@ -2,27 +2,42 @@
 
 import dayjs from "dayjs";
 import DayJsRelativeTime from "dayjs/plugin/relativeTime";
-import { useState } from "react";
-import { useInterval } from "usehooks-ts";
+import { useEffect, useState } from "react";
 
 dayjs.extend(DayJsRelativeTime);
+
+const absoluteDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
+  year: "numeric",
+});
 
 export default function TimeSince({
   date,
   ...props
 }: { date: string | Date } & React.ComponentProps<"time">) {
-  const [value, setValue] = useState(dayjs(date).fromNow());
+  const dateTime = date instanceof Date ? date.toISOString() : date;
 
-  useInterval(() => {
-    setValue(dayjs(date).fromNow());
-  }, 60000);
+  // Keep the server and first client render identical. Relative time starts
+  // after hydration because it depends on the browser's current clock.
+  const [value, setValue] = useState(() =>
+    dateTime ? absoluteDateFormatter.format(new Date(dateTime)) : "",
+  );
 
-  if (!date) return null;
+  useEffect(() => {
+    if (!dateTime) return;
+
+    const update = () => setValue(dayjs(dateTime).fromNow());
+    update();
+
+    const interval = window.setInterval(update, 60000);
+    return () => window.clearInterval(interval);
+  }, [dateTime]);
+
+  if (!dateTime) return null;
   return (
-    <time
-      dateTime={date instanceof Date ? date.toISOString() : date}
-      {...props}
-    >
+    <time dateTime={dateTime} {...props}>
       {value}
     </time>
   );

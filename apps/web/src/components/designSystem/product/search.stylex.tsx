@@ -72,6 +72,7 @@ export type SearchProps = {
   limit?: number;
   onSubmit?: (query: string) => void;
   placement?: "overlay" | "page";
+  placeholder?: string;
   scopeValues?: readonly SearchScope[];
   showBottleMeasures?: boolean;
   submitLabel?: string;
@@ -136,17 +137,10 @@ function bottleItem(
     measures: showMeasures
       ? {
           score:
-            bottle.avgScore === null || bottle.totalScores === 0
+            bottle.medianScore === null || bottle.scoreCount === 0
               ? undefined
-              : { count: bottle.totalScores, value: bottle.avgScore },
-          verdict:
-            bottle.ratingStats.total === 0
-              ? undefined
-              : {
-                  pass: bottle.ratingStats.pass,
-                  savor: bottle.ratingStats.savor,
-                  sip: bottle.ratingStats.sip,
-                },
+              : { count: bottle.scoreCount, value: bottle.medianScore },
+          bands: bottle.tastingBandCounts,
         }
       : undefined,
     metadata: metadata.join(" · "),
@@ -340,6 +334,7 @@ export function Search({
   limit = 3,
   onSubmit,
   placement = "overlay",
+  placeholder = "bottles, distillers, brands…",
   scopeValues,
   showBottleMeasures = true,
   submitLabel,
@@ -512,7 +507,7 @@ export function Search({
       }}
       onSubmit={submitSearch}
       placement={placement}
-      placeholder="bottles, distillers, brands…"
+      placeholder={placeholder}
       query={query}
       scope={effectiveScope}
       scopes={availableScopes}

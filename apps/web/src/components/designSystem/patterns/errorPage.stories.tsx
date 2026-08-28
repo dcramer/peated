@@ -1,8 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { Copy } from "lucide-react";
 
-import { Button, ButtonLink } from "../components";
-import { StoryCanvas } from "../storyFixtures.stylex";
-import { ErrorPage, ErrorReference, ErrorSupport } from "./errorPage.stylex";
+import { Button, ButtonLink, IconButton } from "../components";
+import {
+  ErrorPage,
+  ErrorPageLayout,
+  ErrorReference,
+  ErrorSupport,
+} from "./errorPage.stylex";
 
 const reportAction = (
   <ButtonLink
@@ -91,11 +96,16 @@ function FailureState() {
       detail={
         <ErrorReference
           action={
-            <Button onClick={() => undefined} size="sm" variant="text">
-              Copy
-            </Button>
+            <IconButton
+              icon={<Copy aria-hidden="true" size={15} strokeWidth={1.75} />}
+              label="Copy error reference"
+              onClick={() => undefined}
+              size="sm"
+              title="Copy error reference"
+              variant="text"
+            />
           }
-          description="Quote this reference when reporting the problem. It identifies the captured failure without exposing account or request data."
+          description="Use this reference when reporting the problem."
           label="Sentry ID"
           technicalDetail={{
             context:
@@ -149,11 +159,12 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <StoryCanvas width="wide">
+      <ErrorPageLayout>
         <Story />
-      </StoryCanvas>
+      </ErrorPageLayout>
     ),
   ],
+  parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof ErrorPage>;
 
 export default meta;

@@ -9,18 +9,14 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import type {
-  CommunityScoreProps,
-  SpecStripCells,
-  VerdictDistributionProps,
-} from "../components";
+import type { BandStackProps, ScoreProps, SpecStripCells } from "../components";
 import {
+  BandStack,
   BottleVisual,
   Chip,
-  CommunityScore,
   RecordId,
+  Score,
   SpecStrip,
-  VerdictDistribution,
 } from "../components";
 
 const NARROW = "@media (max-width: 900px)";
@@ -34,6 +30,7 @@ export type BottleMemberStatus = {
 
 export type BottlePageHeaderProps = {
   actions?: ReactNode;
+  bands?: BandStackProps | null;
   brand: string;
   brandHref?: string;
   detail?: string;
@@ -43,14 +40,14 @@ export type BottlePageHeaderProps = {
   menu?: ReactNode;
   name: string;
   notes?: readonly string[];
-  score?: CommunityScoreProps | null;
+  score?: ScoreProps | null;
   specs: SpecStripCells;
-  verdict?: VerdictDistributionProps | null;
 };
 
 /** Presents a bottle's catalog identity, member actions, community measures, and core facts. */
 export function BottlePageHeader({
   actions,
+  bands,
   brand,
   brandHref,
   detail,
@@ -62,11 +59,10 @@ export function BottlePageHeader({
   notes = [],
   score,
   specs,
-  verdict,
 }: BottlePageHeaderProps) {
   const Brand = brandHref ? "a" : "span";
   const hasActions = Boolean(actions || menu);
-  const hasMeasures = Boolean(score || verdict);
+  const hasMeasures = Boolean(score || bands);
 
   return (
     <header
@@ -126,17 +122,16 @@ export function BottlePageHeader({
         <div aria-label="Community measures" {...stylex.props(styles.measures)}>
           {score ? (
             <section {...stylex.props(styles.measure)}>
-              <h2 {...stylex.props(styles.measureLabel)}>Community score</h2>
               <div {...stylex.props(styles.measureContent)}>
-                <CommunityScore {...score} />
+                <Score {...score} />
               </div>
             </section>
           ) : null}
-          {verdict ? (
+          {bands ? (
             <section {...stylex.props(styles.measure)}>
-              <h2 {...stylex.props(styles.measureLabel)}>Community verdict</h2>
+              <h2 {...stylex.props(styles.measureLabel)}>Tasting ratings</h2>
               <div {...stylex.props(styles.measureContent)}>
-                <VerdictDistribution {...verdict} />
+                <BandStack {...bands} />
               </div>
             </section>
           ) : null}

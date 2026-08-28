@@ -22,25 +22,28 @@ import TimeSince from "@peated/web/components/timeSince";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useProfile } from "../profileContext";
-import {
-  getProfileBottleMetadata,
-  getProfileVerdict,
-} from "../profilePresentation";
+import { getProfileBottleMetadata } from "../profilePresentation";
 
 type Activity = Outputs["users"]["activity"]["list"]["results"][number];
+type ActivityList = Outputs["users"]["activity"]["list"];
 
-export function ProfileActivityPageClient() {
+export function ProfileActivityPageClient({
+  initialActivityList,
+}: {
+  initialActivityList: ActivityList;
+}) {
   const orpc = useORPC();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isCurrentUser, user } = useProfile();
   const cursor = searchParams.get("cursor") || undefined;
   const page = Number(searchParams.get("page") ?? "1") || 1;
-  const activityQuery = useQuery(
-    orpc.users.activity.list.queryOptions({
+  const activityQuery = useQuery({
+    ...orpc.users.activity.list.queryOptions({
       input: { cursor, limit: 10, user: user.id },
     }),
-  );
+    initialData: initialActivityList,
+  });
 
   return (
     <PageColumns>
@@ -130,8 +133,7 @@ function toActivityItem(activity: Activity): MemberActivityItem {
     metadata: getProfileBottleMetadata(tasting.bottle),
     name: tasting.bottle.fullName,
     notes: tasting.tags,
-    score: tasting.score ?? undefined,
-    verdict: getProfileVerdict(tasting.rating),
+    ratingBand: tasting.ratingBand ?? undefined,
   });
   const members: [TastingEntryMember, ...TastingEntryMember[]] = [
     toMember(firstTasting),

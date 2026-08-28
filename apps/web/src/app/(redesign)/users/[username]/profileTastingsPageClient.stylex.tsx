@@ -23,28 +23,34 @@ import {
 import TimeSince from "@peated/web/components/timeSince";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useProfile } from "./profileContext";
-import {
-  getProfileBottleMetadata,
-  getProfileVerdict,
-} from "./profilePresentation";
+import { getProfileBottleMetadata } from "./profilePresentation";
 
 type Tasting = Outputs["tastings"]["list"]["results"][number];
+type TastingList = Outputs["tastings"]["list"];
 type RegionList = Outputs["users"]["regionList"];
 
-export function ProfileTastingsPageClient() {
+export function ProfileTastingsPageClient({
+  initialRegionList,
+  initialTastingList,
+}: {
+  initialRegionList: RegionList;
+  initialTastingList: TastingList;
+}) {
   const orpc = useORPC();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isCurrentUser, user } = useProfile();
   const cursor = Number(searchParams.get("cursor") ?? "1") || 1;
-  const regionQuery = useQuery(
-    orpc.users.regionList.queryOptions({ input: { user: user.id } }),
-  );
-  const tastingQuery = useQuery(
-    orpc.tastings.list.queryOptions({
+  const regionQuery = useQuery({
+    ...orpc.users.regionList.queryOptions({ input: { user: user.id } }),
+    initialData: initialRegionList,
+  });
+  const tastingQuery = useQuery({
+    ...orpc.tastings.list.queryOptions({
       input: { cursor, limit: 10, user: user.id },
     }),
-  );
+    initialData: initialTastingList,
+  });
 
   return (
     <PageColumns rail={getRegionRail(regionQuery, user.username)}>
@@ -111,8 +117,7 @@ function ProfileTastingEntry({ tasting }: { tasting: Tasting }) {
     metadata: getProfileBottleMetadata(tasting.bottle),
     name: tasting.bottle.fullName,
     notes: tasting.tags,
-    score: tasting.score ?? undefined,
-    verdict: getProfileVerdict(tasting.rating),
+    ratingBand: tasting.ratingBand ?? undefined,
   };
   return (
     <TastingEntry

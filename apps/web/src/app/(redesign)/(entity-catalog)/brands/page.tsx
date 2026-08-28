@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 
-import { EntityCatalogPageClient } from "../entityCatalogPageClient";
+import { EntityCatalogPage } from "../entityCatalogPage";
 
 export const metadata: Metadata = {
   title: "Whisky Brands",
   description: "Browse whisky brands recorded in the Peated database.",
 };
 
-export default function BrandListPage() {
-  return <EntityCatalogPageClient kind="brand" />;
+export default function BrandListPage(props: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return <EntityCatalogPage kind="brand" searchParams={props.searchParams} />;
 }

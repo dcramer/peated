@@ -6,7 +6,6 @@ const meta = {
   title: "Components/Forms/Tasting Form",
   component: TastingFormPattern,
   args: {
-    initialGrain: "band",
     initialRating: null,
     submitting: false,
   },
@@ -17,16 +16,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const ExactPoint: Story = {
-  args: {
-    initialGrain: "point",
-    initialRating: { grain: "point", point: 88 },
-  },
-};
-
 export const Saving: Story = {
   args: {
-    initialRating: { band: "outstanding", grain: "band" },
+    initialRating: "outstanding",
     submitting: true,
   },
 };

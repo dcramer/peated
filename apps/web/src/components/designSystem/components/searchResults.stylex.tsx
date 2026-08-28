@@ -10,10 +10,7 @@ import {
 } from "../../../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
-import {
-  VerdictDistributionBar,
-  type VerdictDistributionProps,
-} from "./scoring.stylex";
+import { BandStack, type BandCounts } from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 559px)";
 
@@ -22,7 +19,7 @@ export type SearchResultMeasure = {
     count: number;
     value: number;
   };
-  verdict?: VerdictDistributionProps;
+  bands?: BandCounts;
 };
 
 export type SearchResultItem = {
@@ -291,14 +288,14 @@ function ResultMeasures({ measures }: { measures: SearchResultMeasure }) {
     <>
       {measures.score ? (
         <span
-          aria-label={`Community score ${measures.score.value.toFixed(1)} out of 100 from ${measures.score.count} ${measures.score.count === 1 ? "score" : "scores"}`}
+          aria-label={`Score ${measures.score.value} out of 100 from ${measures.score.count} ${measures.score.count === 1 ? "review" : "reviews"}`}
           {...stylex.props(styles.score)}
         >
-          {measures.score.value.toFixed(1)}
+          {measures.score.value}
         </span>
       ) : null}
-      {measures.verdict ? (
-        <VerdictDistributionBar {...measures.verdict} />
+      {measures.bands ? (
+        <BandStack counts={measures.bands} variant="compact" />
       ) : null}
     </>
   );

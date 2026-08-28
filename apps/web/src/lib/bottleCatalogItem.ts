@@ -21,7 +21,7 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
   const relatedReleaseCount = bottle.group?.totalBottles ?? 1;
 
   return {
-    averageScore: bottle.avgScore,
+    bandCounts: bottle.tastingBandCounts,
     brand: bottle.brand.name,
     brandHref: `/entities/${bottle.brand.id}`,
     hasTasted: bottle.hasTasted,
@@ -38,8 +38,8 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
             href: getReleaseFamilyHref(bottle.id),
           }
         : undefined,
-    totalScores: bottle.totalScores,
-    verdicts: bottle.ratingStats,
+    medianScore: bottle.medianScore,
+    scoreCount: bottle.scoreCount,
   };
 }
 

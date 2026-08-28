@@ -1,10 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
+import { Copy } from "lucide-react";
 import type { ReactNode } from "react";
 
 import config from "../../../config";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors } from "../../../styles/tokens.stylex";
-import { Button, ButtonLink } from "../components/button.stylex";
+import { Button, ButtonLink, IconButton } from "../components/button.stylex";
 import {
   ErrorPage,
   ErrorPageLayout,
@@ -129,13 +130,11 @@ export function OfflinePage({ onRetry }: { onRetry: () => void }) {
 }
 
 export function CapturedFailurePage({
-  incidentLabel = "Error reference",
   incidentReference,
   onCopyReference,
   onRetry,
   stack,
 }: {
-  incidentLabel?: string;
   incidentReference?: string;
   onCopyReference?: () => void;
   onRetry: () => void;
@@ -156,19 +155,28 @@ export function CapturedFailurePage({
           </>
         }
         detail={
-          <ErrorReference
-            action={
-              incidentReference && onCopyReference ? (
-                <Button onClick={onCopyReference} size="sm" variant="text">
-                  Copy
-                </Button>
-              ) : undefined
-            }
-            description="Quote this reference when reporting the problem. It identifies the captured failure without exposing account or request data."
-            label={incidentLabel}
-            technicalDetail={stack ? { stack } : undefined}
-            value={incidentReference ?? "Reporting…"}
-          />
+          incidentReference ? (
+            <ErrorReference
+              action={
+                onCopyReference ? (
+                  <IconButton
+                    icon={
+                      <Copy aria-hidden="true" size={15} strokeWidth={1.75} />
+                    }
+                    label="Copy error reference"
+                    onClick={onCopyReference}
+                    size="sm"
+                    title="Copy error reference"
+                    variant="text"
+                  />
+                ) : undefined
+              }
+              description="Use this reference when reporting the problem."
+              label="Sentry event ID"
+              technicalDetail={stack ? { stack } : undefined}
+              value={incidentReference}
+            />
+          ) : undefined
         }
         status="500 · our fault"
         title="This page broke on our side"

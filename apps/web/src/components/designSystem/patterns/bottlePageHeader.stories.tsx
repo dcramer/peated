@@ -39,14 +39,23 @@ const meta = {
     ),
     name: "Elements L 2.0",
     notes: ["Cask strength", "Non-chill filtered"],
-    score: { count: 48, score: 88.4 },
+    bands: {
+      counts: {
+        good: 8,
+        mediocre: 3,
+        outstanding: 19,
+        unicorn: 6,
+        very_good: 12,
+      },
+      showCounts: true,
+    },
+    score: { count: 48, high: 96, low: 78, median: 88 },
     specs: [
       { label: "ABV", value: "59.6%" },
       { label: "Age", value: null },
       { label: "Cask", value: "Ex-bourbon" },
       { label: "Release", value: "2024" },
     ],
-    verdict: { pass: 3, savor: 19, sip: 12 },
   },
   argTypes: {
     actions: { control: false },
@@ -90,6 +99,7 @@ export const ThinData: Story = {
     menu: null,
     name: "Independent bottling",
     notes: [],
+    bands: null,
     score: null,
     specs: [
       { label: "ABV", value: "46.0%" },
@@ -97,6 +107,5 @@ export const ThinData: Story = {
       { label: "Cask", value: null },
       { label: "Release", value: null },
     ],
-    verdict: null,
   },
 };

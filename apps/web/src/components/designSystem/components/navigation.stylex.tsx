@@ -17,6 +17,10 @@ export type NavigationTabsProps = {
   personalItems?: readonly NavigationItem[];
 };
 
+export function isCurrentNavigationHref(currentHref: string, href: string) {
+  return currentHref === href || currentHref.startsWith(`${href}/`);
+}
+
 /** Shows the current location in a small set of peer destinations. */
 export function NavigationTabs({
   ariaLabel,
@@ -29,7 +33,7 @@ export function NavigationTabs({
       <div {...stylex.props(styles.group)}>
         {items.map((item) => (
           <NavigationLink
-            current={item.href === currentHref}
+            current={isCurrentNavigationHref(currentHref, item.href)}
             item={item}
             key={item.href}
           />
@@ -42,7 +46,7 @@ export function NavigationTabs({
           </span>
           {personalItems.map((item) => (
             <NavigationLink
-              current={item.href === currentHref}
+              current={isCurrentNavigationHref(currentHref, item.href)}
               item={item}
               key={item.href}
             />
@@ -147,6 +151,5 @@ const styles = stylex.create({
     fontFamily: fonts.display,
     fontSize: "13px",
     fontWeight: 700,
-    boxShadow: `inset 0 -2px 0 ${colors.accent}`,
   },
 });

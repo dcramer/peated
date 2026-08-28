@@ -168,7 +168,10 @@ export function RailListItem({
     <li {...stylex.props(styles.railRow)}>
       <div {...stylex.props(styles.railCopy)}>
         {href ? (
-          <a href={href} {...stylex.props(styles.railTitle)}>
+          <a
+            href={href}
+            {...stylex.props(styles.railTitle, styles.railTitleLink)}
+          >
             {title}
           </a>
         ) : (
@@ -347,6 +350,13 @@ const styles = stylex.create({
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
+    },
+  },
+  railTitleLink: {
+    color: {
+      default: null,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
     },
   },
   railMetadata: {

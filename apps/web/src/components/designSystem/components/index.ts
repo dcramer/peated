@@ -31,10 +31,7 @@ export type { CheckboxProps } from "./checkbox.stylex";
 export { Chip, CountChip } from "./chip.stylex";
 export type { ChipProps, ChipVariant } from "./chip.stylex";
 export { CriticReview } from "./criticReview.stylex";
-export type {
-  CriticReviewProps,
-  NativeReviewScore,
-} from "./criticReview.stylex";
+export type { CriticReviewProps } from "./criticReview.stylex";
 export { RecordId, SpecStrip } from "./dataDevices.stylex";
 export type {
   RecordIdProps,
@@ -134,29 +131,13 @@ export type {
   ScopedSearchOption,
   ScopedSearchProps,
 } from "./scopedSearch.stylex";
-export {
-  BandMark,
-  BandStack,
-  CommunityScore,
-  RATING_BANDS,
-  Score,
-  VerdictDistribution,
-  VerdictDistributionBar,
-  VerdictMark,
-  getRatingBandForPoint,
-} from "./scoring.stylex";
+export { BandMark, BandStack, RATING_BANDS, Score } from "./scoring.stylex";
 export type {
   BandCounts,
   BandMarkProps,
   BandStackProps,
-  CommunityScoreProps,
   RatingBand,
-  RatingGrain,
-  RatingValue,
   ScoreProps,
-  Verdict,
-  VerdictDistributionProps,
-  VerdictMarkProps,
 } from "./scoring.stylex";
 export { SearchBox } from "./searchBox.stylex";
 export type { SearchBoxProps } from "./searchBox.stylex";
@@ -183,14 +164,12 @@ export type {
 export {
   ColourInput,
   PictureInput,
-  ScoreInput,
-  VerdictInput,
+  RatingBandInput,
 } from "./tastingInputs.stylex";
 export type {
   ColourInputProps,
   PictureInputProps,
-  ScoreInputProps,
-  VerdictInputProps,
+  RatingBandInputProps,
 } from "./tastingInputs.stylex";
 export { UnitInput } from "./unitInput.stylex";
 export type { UnitInputProps } from "./unitInput.stylex";
