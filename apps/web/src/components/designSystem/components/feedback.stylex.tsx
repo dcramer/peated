@@ -28,6 +28,38 @@ export function FloatingPanel({ children, ...props }: FloatingPanelProps) {
   );
 }
 
+export type FlashMessageTone = "error" | "info" | "success";
+
+export type FlashMessageProps = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "className" | "style"
+> & {
+  children: ReactNode;
+  tone?: FlashMessageTone;
+};
+
+/** Presents short-lived application feedback without owning its lifetime. */
+export function FlashMessage({
+  children,
+  role,
+  tone = "success",
+  ...props
+}: FlashMessageProps) {
+  return (
+    <div
+      {...props}
+      role={role ?? (tone === "error" ? "alert" : "status")}
+      {...stylex.props(
+        foundationStyles.body,
+        styles.flashMessage,
+        flashMessageTones[tone],
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
 type PlaceholderPreset =
   | "heading"
   | "metadata"
@@ -190,6 +222,30 @@ const pulse = stylex.keyframes({
 });
 
 const styles = stylex.create({
+  flashMessage: {
+    boxSizing: "border-box",
+    pointerEvents: "auto",
+    width: "min(100%, 480px)",
+    paddingTop: space.x3,
+    paddingRight: space.x4,
+    paddingBottom: space.x3,
+    paddingLeft: space.x4,
+    borderLeftWidth: "3px",
+    borderLeftStyle: "solid",
+    backgroundColor: colors.surface,
+    color: colors.ink,
+    boxShadow: effects.overlayShadow,
+  },
+  flashSuccess: {
+    borderLeftColor: colors.accent,
+  },
+  flashError: {
+    borderLeftColor: colors.accentDeep,
+    backgroundColor: colors.accentTint,
+  },
+  flashInfo: {
+    borderLeftColor: colors.inkMuted,
+  },
   overlay: {
     boxSizing: "border-box",
     borderRadius: controlMetrics.radius,
@@ -317,6 +373,12 @@ const styles = stylex.create({
   delay3: { animationDelay: "250ms" },
   delay4: { animationDelay: "350ms" },
 });
+
+const flashMessageTones = {
+  error: styles.flashError,
+  info: styles.flashInfo,
+  success: styles.flashSuccess,
+} satisfies Record<FlashMessageTone, stylex.StyleXStyles>;
 
 const presets = {
   heading: styles.heading,

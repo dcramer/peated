@@ -13,6 +13,8 @@ export type {
   HeaderNavigationItem,
   SiteFooterProps,
 } from "./applicationNavigation.stylex";
+export { BadgeImage, PlaceholderBadgeImage } from "./badgeImage.stylex";
+export type { BadgeImageProps } from "./badgeImage.stylex";
 export { BottleComparisonTable } from "./bottleComparisonTable.stylex";
 export type {
   BottleComparisonRow,
@@ -37,6 +39,15 @@ export { Checkbox } from "./checkbox.stylex";
 export type { CheckboxProps } from "./checkbox.stylex";
 export { Chip, CountChip } from "./chip.stylex";
 export type { ChipProps, ChipVariant } from "./chip.stylex";
+export {
+  CollectionBottleStatusChips,
+  CollectionBottleStatusLabel,
+  getCollectionBottleStatusLabel,
+} from "./collectionBottleStatus.stylex";
+export type {
+  CollectionBottleStatus,
+  CollectionBottleStatusValue,
+} from "./collectionBottleStatus.stylex";
 export { CriticReview } from "./criticReview.stylex";
 export type { CriticReviewProps } from "./criticReview.stylex";
 export { RecordId, SpecStrip } from "./dataDevices.stylex";
@@ -64,6 +75,7 @@ export { FactList } from "./factList.stylex";
 export type { FactListItem, FactListProps } from "./factList.stylex";
 export {
   EmptyState,
+  FlashMessage,
   FloatingPanel,
   LoadingList,
   LoadingPlaceholder,
@@ -71,6 +83,8 @@ export {
 } from "./feedback.stylex";
 export type {
   EmptyStateProps,
+  FlashMessageProps,
+  FlashMessageTone,
   FloatingPanelProps,
   LoadingListProps,
   SectionErrorProps,

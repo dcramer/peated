@@ -1,6 +1,6 @@
 "use client";
 
-import FlashMessages from "@peated/web/components/flash";
+import { FlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import { default as config } from "@peated/web/config";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";

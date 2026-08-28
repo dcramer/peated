@@ -1,10 +1,10 @@
 "use client";
 import { use } from "react";
 
-import BadgeImage from "@peated/web/components/badgeImage";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import DefinitionList from "@peated/web/components/definitionList";
+import { BadgeImage } from "@peated/web/components/designSystem/components";
 import Heading from "@peated/web/components/heading";
 import Link from "@peated/web/components/link";
 // import Markdown from "@peated/web/components/markdown";

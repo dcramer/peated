@@ -13,7 +13,7 @@ import {
   type RowMenuItem,
 } from "@peated/web/components/designSystem/components";
 import { EntityPageHeader } from "@peated/web/components/designSystem/patterns/entityPageHeader.stylex";
-import { useFlashMessages } from "@peated/web/components/flash";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import Markdown from "@peated/web/components/markdown";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";

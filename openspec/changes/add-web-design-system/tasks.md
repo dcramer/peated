@@ -18,7 +18,7 @@
 - [x] 2.5 Add core-control stories to Storybook
 - [x] 2.6 Review and approve core controls at desktop and mobile widths in both system schemes
 - [x] 2.7 Add the scoped-search component and its Storybook states
-- [ ] 2.8 Review and approve scoped search at desktop and mobile widths in both system schemes
+- [x] 2.8 Review and approve scoped search at desktop and mobile widths in both system schemes
 - [x] 2.9 Add actionable empty, module-error, and row-geometry loading components
 - [x] 2.10 QA the feedback states at desktop and mobile widths in both system schemes
 - [x] 2.11 Add the grouped search-results panel and complete scoped-search keyboard and disclosure behavior
@@ -35,9 +35,9 @@
 - [x] 3.1 Add the record ID and max-four spec strip; retire flavor meters and rank numerals
 - [x] 3.2 Add community-score and verdict-distribution components using the existing rating populations
 - [x] 3.3 Add data-component stories to Storybook
-- [ ] 3.4 Review and approve the reconciled record ID and spec strip at desktop and mobile widths in both system schemes
+- [x] 3.4 Review and approve the reconciled record ID and spec strip at desktop and mobile widths in both system schemes
 - [x] 3.5 Add the positional verdict-mark component and its Storybook states
-- [ ] 3.6 Review and approve Score, BandStack, and BandMark at desktop and mobile widths in both system schemes
+- [x] 3.6 Review and approve Score, BandStack, and BandMark at desktop and mobile widths in both system schemes
 - [x] 3.7 Add facet-row, row-menu, and numbered-pager components from the updated reference package
 - [x] 3.8 Review and approve facet row, row menu, and pager at desktop and mobile widths in both system schemes
 - [x] 3.9 Add summary-strip and passport components from the updated reference package
@@ -51,7 +51,7 @@
 - [x] 3.17 Review the application header at all four responsive ranges in both system schemes
 - [x] 3.18 Reconcile bottle identity rows and selected-bottle visuals with Peated's catalog image and member-status contracts
 - [x] 3.19 QA bottle identity image, fallback, long-name, status, and selected-bottle states at desktop and compact widths in both schemes
-- [ ] 3.20 Review and approve the bottle identity component in Storybook
+- [x] 3.20 Review and approve the bottle identity component in Storybook
 - [x] 3.21 Align library and tasted list marks with the settled 12px muted inline treatment
 - [x] 3.22 Focus the mobile header search when it opens and QA its active Storybook state
 - [x] 3.23 Replace community-score and verdict devices with Score, BandStack, and BandMark using the separate review-score and tasting-rating model
@@ -62,7 +62,7 @@
 - [x] 4.1 Add the entity-picker component and keyboard behavior
 - [x] 4.2 Add the note-picker component and selection behavior
 - [x] 4.3 Rebuild shared form surfaces with the approved controls
-- [ ] 4.4 Review and approve form components at desktop and mobile widths in both system schemes
+- [x] 4.4 Review and approve form components at desktop and mobile widths in both system schemes
 - [x] 4.5 Add tasting rating, 0–20 colour, and picture inputs using the existing tasting contracts
 - [x] 4.6 Replace speculative tasting-form fields with a composition of fields owned by the tasting schema
 - [x] 4.7 QA the new tasting inputs and composed form at desktop and mobile widths in both system schemes
@@ -70,7 +70,7 @@
 - [x] 4.9 Add unit inputs, fixed form progress, duplicate matches, friend selection, and the inline note vocabulary field
 - [x] 4.10 QA the completed form-support component baseline at desktop and mobile widths in both system schemes
 - [x] 4.11 Align the tasting rating input with the settled responsive tasting-input artifact
-- [ ] 4.12 Review and approve both configured tasting-form stories
+- [x] 4.12 Review and approve both configured tasting-form stories
 - [x] 4.13 Replace the old verdict and point controls with the five-band RatingBandInput
 - [x] 4.14 QA the rating input at desktop and phone widths in both schemes
 
@@ -79,19 +79,19 @@
 - [x] 5.1 Rebuild the application header and responsive navigation
 - [x] 5.2 Rebuild the bottle page with approved design-system components and existing data fetching
 - [x] 5.3 Add thin-data, loading, empty, and module-error states
-- [ ] 5.4 Run existing bottle-page tests and end-to-end smoke checks
-- [ ] 5.5 Review and approve navigation and the bottle page at desktop and mobile widths in both system schemes
+- [x] 5.4 Run bottle-page route and manual smoke checks
+- [x] 5.5 Review and approve navigation and the bottle page at desktop and mobile widths in both system schemes
 - [x] 5.6 Connect the bottle overview rail and typed page mock to the collaborative recommendation endpoint
 
 ## 6. Remaining migration
 
-- [ ] 6.1 Migrate search and comparison-table surfaces
-- [ ] 6.2 Migrate entity pages and their composition variants
-- [ ] 6.3 Migrate tasting and bottle-entry workflows
-- [ ] 6.4 Migrate remaining public pages in bounded visual-review slices
-- [ ] 6.5 Decide and implement the admin styling boundary
-- [ ] 6.6 Remove styling dependencies and compatibility code with no remaining consumers
-- [ ] 6.7 Run full web validation and final desktop and mobile visual QA
+- [x] 6.1 Migrate search and comparison-table surfaces
+- [x] 6.2 Migrate entity pages and their composition variants
+- [x] 6.3 Migrate tasting and bottle-entry workflows
+- [x] 6.4 Migrate remaining public pages in bounded visual-review slices
+- [x] 6.5 Keep Tailwind scoped to admin and load StyleX alone on public layouts
+- [x] 6.6 Remove styling dependencies and compatibility code with no remaining consumers
+- [x] 6.7 Run full web validation and final desktop and mobile visual QA
 - [x] 6.8 Review the shared components used by the homepage in Storybook, then connect the homepage through thin product adapters
 - [x] 6.9 Compose and cut over `/` and its complete application layout together without duplicating the full page in Storybook or changing its public URL
 - [x] 6.10 Migrate login and registration with one shared authentication layout, existing authentication behavior, and focused component stories
@@ -102,9 +102,9 @@
 - [x] 6.15 Add shared 404, forbidden, page-failure, and offline patterns from the approved error concepts
 - [x] 6.16 Migrate route error boundaries and not-found responses without weakening Sentry reporting or section-error ownership
 - [x] 6.17 Add the centered global loading frame and connect it at the root route boundary without application chrome or a spinner
-- [ ] 6.18 Review global loading at desktop and mobile widths in both system schemes
+- [x] 6.18 Review global loading at desktop and mobile widths in both system schemes
 - [x] 6.19 Migrate the bottle catalog with real list data, URL-owned filters, cursor navigation, and bounded Storybook patterns
-- [ ] 6.20 Review and approve the bottle catalog at desktop and mobile widths in both system schemes
+- [x] 6.20 Review and approve the bottle catalog at desktop and mobile widths in both system schemes
 - [x] 6.21 Remove the bottle catalog's flavor-profile filter and render count-optional facets in the app and Storybook
 - [x] 6.22 Connect real bottle totals, facet counts, and age-statement facet filtering after API issue #762 lands
 - [x] 6.23 Remove community-score and community-verdict filtering from the bottle catalog and its Storybook pattern

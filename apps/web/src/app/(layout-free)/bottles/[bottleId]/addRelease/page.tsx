@@ -4,7 +4,7 @@ import { use } from "react";
 
 import BottleForm from "@peated/web/components/bottleForm";
 import { WorkflowLoading } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
-import { useFlashMessages } from "@peated/web/components/flash";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { buildBottleProposalDraft } from "@peated/web/lib/bottleProposalDraft";

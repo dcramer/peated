@@ -1,7 +1,7 @@
 import Link from "@peated/web/components/link";
 
 import type { Badge, PagingRel } from "@peated/server/types";
-import BadgeImage from "../badgeImage";
+import { BadgeImage } from "../designSystem/components";
 import PaginationButtons from "../paginationButtons";
 
 export default function BadgeTable({

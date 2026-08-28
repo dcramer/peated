@@ -6,8 +6,10 @@ import "@fontsource/raleway/index.css";
 import Fathom from "@peated/web/components/fathom";
 import config from "@peated/web/config";
 import { getSession } from "@peated/web/lib/session.server";
+import { foundationStyles } from "@peated/web/styles/foundations.stylex";
 import "@peated/web/styles/index.css";
 import * as Sentry from "@sentry/nextjs";
+import * as stylex from "@stylexjs/stylex";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import Providers from "./providers/providers";
@@ -61,7 +63,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="h-full">
+      <body {...stylex.props(foundationStyles.document)}>
         <Providers
           session={{
             user: session.user,

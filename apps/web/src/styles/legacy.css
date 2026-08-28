@@ -1,0 +1,152 @@
+@import "rating.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .legacy {
+    @apply min-h-screen text-white;
+
+    background-color: theme("colors.slate.900");
+    background-image: linear-gradient(
+      to right,
+      theme("colors.slate.900"),
+      theme("colors.slate.950"),
+      theme("colors.slate.900")
+    );
+  }
+
+  .legacy h1 {
+    @apply text-2xl;
+  }
+
+  .legacy h2 {
+    @apply text-xl;
+  }
+
+  .layout {
+    @apply text-white;
+    background-color: theme("colors.slate.900");
+    background-image: linear-gradient(
+      to right,
+      theme("colors.slate.900"),
+      theme("colors.slate.950"),
+      theme("colors.slate.900")
+    );
+  }
+
+  .main-gradient {
+    background-color: rgba(15, 23, 42, 0.25);
+    background-image: linear-gradient(
+      to right,
+      rgba(15, 23, 42, 0.5),
+      rgba(0, 0, 0, 0.5),
+      rgba(15, 23, 42, 0.5)
+    );
+  }
+
+  .gradient-top-opaque {
+    background-color: rgba(15, 23, 42, 0.25);
+    background-image: linear-gradient(
+      to bottom,
+      rgba(2, 6, 23, 0),
+      rgba(2, 6, 23, 0.8),
+      theme("colors.slate.950")
+    );
+  }
+
+  .backdrop-blur {
+    -webkit-backdrop-filter: blur(4px);
+    -o-backdrop-filter: blur(4px);
+    -moz-backdrop-filter: blur(4px);
+
+    backdrop-filter: blur(4px);
+  }
+
+  .menu {
+    @apply relative text-sm;
+  }
+
+  .menu div[role="menu"] {
+    @apply bg-slate-800 py-1 text-sm text-white shadow-lg focus:outline-none;
+  }
+
+  .menu div[role="menu"].origin-top-right {
+    @apply rounded-b rounded-tl;
+  }
+
+  .menu div[role="menu"].origin-bottom-right {
+    @apply rounded;
+  }
+
+  .menu div[role="menu"] a,
+  .menu div[role="menu"] button {
+    @apply block w-full px-4 py-2 text-left hover:bg-slate-500;
+  }
+
+  .dialog {
+    @apply fixed inset-0 z-50 min-h-screen overflow-y-auto text-center;
+  }
+
+  .dialog-panel {
+    @apply relative h-screen min-h-full min-w-full overflow-hidden overflow-y-auto text-left backdrop-blur-md;
+
+    background-color: rgba(15, 23, 42, 0.65);
+    background-image: linear-gradient(
+      to right,
+      rgba(15, 23, 42, 0.65),
+      rgba(0, 0, 0, 0.65),
+      rgba(15, 23, 42, 0.65)
+    );
+
+    img {
+      @apply cursor-auto rounded-lg;
+    }
+  }
+
+  .range {
+    @apply my-6 cursor-pointer appearance-none bg-inherit focus:outline-none;
+  }
+
+  .range::-webkit-slider-runnable-track {
+    @apply h-1 rounded-lg bg-slate-700;
+  }
+
+  .range::-webkit-slider-thumb {
+    @apply bg-highlight h-8 w-8 appearance-none rounded-lg;
+    margin-top: -15px;
+  }
+
+  .range:focus::-webkit-slider-thumb {
+    border: 1px solid theme(colors.slate[400]);
+    outline: 3px solid theme(colors.slate[400]);
+    outline-offset: 0.125rem;
+  }
+
+  .range::-moz-range-track {
+    @apply h-1 rounded-lg bg-slate-700;
+  }
+
+  .range::-moz-range-thumb {
+    @apply bg-highlight h-8 w-8 rounded-none border-0;
+  }
+
+  .range:focus::-moz-range-thumb {
+    border: 1px solid theme(colors.slate[400]);
+    outline: 3px solid theme(colors.slate[400]);
+    outline-offset: 0.125rem;
+  }
+}
+
+.svg-animate path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: dash 5s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}

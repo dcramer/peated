@@ -2,7 +2,6 @@
 
 import type { Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
-import BadgeImage from "@peated/web/components/badgeImage";
 import BottleResolver, {
   type BottleResolverAction,
   type BottleResolverCreateProposalActionsProps,
@@ -14,20 +13,17 @@ import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleR
 import {
   Button,
   ButtonLink,
+  CollectionBottleStatusChips,
   FormGrid,
   FormNotice,
   FormSection,
   FormStack,
   LoadingList,
   SelectedBottleSummary,
+  type CollectionBottleStatusValue,
 } from "@peated/web/components/designSystem/components";
 import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
-import { useFlashMessages } from "@peated/web/components/flash";
-import {
-  CollectionBottleStatusChips,
-  type CollectionBottleStatusValue,
-} from "@peated/web/components/libraryBottleStatus";
-import Link from "@peated/web/components/link";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import TastingForm, {
@@ -46,7 +42,8 @@ import { uploadTastingImageAfterSave } from "@peated/web/lib/tastingImageUpload"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { BadgeAwardMessage } from "./badgeAwardMessage.stylex";
 
 type AddBottleIntent = "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
@@ -867,17 +864,7 @@ function AddBottleFlowContent() {
     for (const award of awards) {
       if (award.level != award.prevLevel && award.level) {
         flash(
-          <div className="relative flex flex-row items-center gap-x-3">
-            <Link
-              href={`/badges/${award.badge.id}`}
-              className="absolute inset-0"
-            />
-            <BadgeImage badge={award.badge} size={48} level={award.level} />
-            <div className="flex flex-col">
-              <h5 className="font-semibold">{award.badge.name}</h5>
-              <p className="font-normal">You've reached level {award.level}!</p>
-            </div>
-          </div>,
+          <BadgeAwardMessage badge={award.badge} level={award.level} />,
           "info",
         );
       }

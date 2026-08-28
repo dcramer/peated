@@ -27,7 +27,7 @@ import {
 } from "@peated/web/components/designSystem/components";
 import { BottleOverview } from "@peated/web/components/designSystem/patterns/bottleOverview.stylex";
 import { BottlePageHeader } from "@peated/web/components/designSystem/patterns/bottlePageHeader.stylex";
-import { useFlashMessages } from "@peated/web/components/flash";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import {

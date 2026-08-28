@@ -12,7 +12,7 @@ import {
   type SearchPickerOption,
 } from "@peated/web/components/designSystem/components";
 import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
-import { useFlashMessages } from "@peated/web/components/flash";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";

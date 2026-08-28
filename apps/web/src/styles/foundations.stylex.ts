@@ -3,6 +3,8 @@ import { colors, fonts } from "./tokens.stylex";
 
 export const foundationStyles = stylex.create({
   document: {
+    boxSizing: "border-box",
+    margin: 0,
     minHeight: "100dvh",
     colorScheme: "light dark",
     backgroundColor: colors.ground,

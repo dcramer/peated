@@ -2,7 +2,7 @@
 
 import type { Bottle } from "@peated/server/types";
 import { ClientOnly } from "@peated/web/components/clientOnly";
-import QRCodeClient from "@peated/web/components/qrcode.client";
+import QRCodeClient from "@peated/web/components/qrcode.client.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottleUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
