@@ -110,7 +110,7 @@ describe("scrape source parser", () => {
     expect(result.issues).toEqual([
       { field: "detail.publishedAt", message: "Date is not valid." },
       {
-        field: "detail.reviewItem.0.score",
+        field: "detail.score",
         message: "Score is not a number.",
       },
     ]);
@@ -125,7 +125,10 @@ describe("scrape source parser", () => {
     expect(result.kind).toBe("review");
     if (result.kind !== "review") throw new Error("Wrong kind");
     expect(result.value).toBeNull();
-    expect(result.issues.length).toBeGreaterThan(0);
+    expect(result.issues.map(({ field }) => field)).toEqual([
+      "detail.title",
+      "detail.reviewItem",
+    ]);
   });
 
   it("normalizes a store price and volume", () => {
@@ -210,9 +213,9 @@ describe("scrape source parser", () => {
       value: [],
     });
     expect(result.issues.map((issue) => issue.field)).toEqual([
-      "name",
-      "price",
-      "volume",
+      "detail.name",
+      "detail.price",
+      "detail.volume",
     ]);
   });
 

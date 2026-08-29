@@ -5,6 +5,7 @@ const SETUP_FIELD_LABELS = {
   listPageUrl: "Collection page",
   "list.detailLink": "Item links",
   "list.nextPage": "Next page",
+  detail: "Item page",
   "detail.title": "Page title",
   "detail.publishedAt": "Published date",
   "detail.reviewItem": "Reviews",
@@ -26,10 +27,15 @@ function setupFieldLabel(field: string) {
   const pageField = field.startsWith("rules.")
     ? field.slice("rules.".length)
     : field;
+  const exactLabel = Object.entries(SETUP_FIELD_LABELS).find(
+    ([key]) => key === pageField,
+  )?.[1];
+  if (exactLabel) return exactLabel;
   return (
-    Object.entries(SETUP_FIELD_LABELS).find(
-      ([key]) => pageField === key || pageField.startsWith(`${key}.`),
-    )?.[1] ?? "Page details"
+    Object.entries(SETUP_FIELD_LABELS)
+      .filter(([key]) => pageField.startsWith(`${key}.`))
+      .sort(([left], [right]) => right.length - left.length)[0]?.[1] ??
+    "Page content"
   );
 }
 
@@ -64,7 +70,7 @@ export class ScrapeSourceSetupError extends Error {
       ),
     ];
     return fields.length > 0
-      ? `AI could not finish setup. Check: ${fields.join(", ")}.`
+      ? `AI could not finish setup. Missing or invalid: ${fields.join(", ")}.`
       : "AI could not finish setup for this site.";
   }
 }
