@@ -9,7 +9,7 @@
 ## 2. Rules And Validation
 
 - [x] 2.1 Define rules version 1 for review and price sources
-- [x] 2.2 Read bounded detail links and fields without database or network access
+- [x] 2.2 Read a limited number of detail links and fields without database or network access
 - [x] 2.3 Parse review articles into the existing validated review format
 - [x] 2.4 Parse store prices into the existing strict price schema
 - [x] 2.5 Store typed test results without HTML or publisher prose
@@ -39,10 +39,10 @@
 - [x] 5.3 Store the AI model name and instructions version with each valid inactive revision
 - [x] 5.4 Add an end-to-end review suggestion eval fixture
 - [x] 5.5 Add an end-to-end price suggestion eval fixture
-- [x] 5.6 Let one bounded AI request choose from likely pages on the same website
-- [x] 5.7 Parse bounded current detail pages before saving AI-generated rules
-- [x] 5.8 Require a second typed AI call to review parsed fields against page evidence
-- [x] 5.9 Cover deterministic rejection and run both live suggestion evals
+- [x] 5.6 Let one AI request choose from the main page and up to four likely pages on the same website
+- [x] 5.7 Parse up to three current detail pages before saving AI-generated rules
+- [x] 5.8 Require a second AI response with fixed fields to review parsed fields against the HTML
+- [x] 5.9 Cover code rejection and run both live suggestion evals
 
 ## 6. Admin API And UI
 

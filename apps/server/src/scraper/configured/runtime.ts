@@ -22,16 +22,16 @@ import type {
   ScraperSink,
   ScraperSourceDefinition,
 } from "../types";
-import {
-  MAX_SUGGESTION_PAGE_REQUESTS,
-  findLikelyDetailPages,
-  findLikelyListPages,
-} from "./discovery";
+import { findLikelyDetailPages, findLikelyListPages } from "./discovery";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
 import { type ScrapeRules, parseScrapeRules } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
-import { suggestScrapeSourceRevision } from "./suggestion";
+import {
+  MAX_SUGGESTION_DETAIL_PAGES,
+  suggestScrapeSourceRevision,
+  suggestionRequestLimit,
+} from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
 export class ScrapeSourceParseError extends Error {
@@ -340,6 +340,7 @@ export async function resolveScrapeSourceRunRegistry(
             );
             const likelyDetailPages = findLikelyDetailPages({
               kind: suggestion.source.kind,
+              limit: MAX_SUGGESTION_DETAIL_PAGES,
               pages: listPages,
             }).filter((value) => !suppliedDetailUrls.has(value));
             for (const value of likelyDetailPages) {
@@ -387,8 +388,7 @@ export async function resolveScrapeSourceRunRegistry(
       key: `source-${suggestion.source.id}`,
       externalSiteKey: suggestion.siteKey,
       targetKeys: [target.key],
-      requestLimit:
-        suggestion.source.sampleUrls.length + MAX_SUGGESTION_PAGE_REQUESTS,
+      requestLimit: suggestionRequestLimit(suggestion.source.sampleUrls.length),
       resumeFromLastRun: false,
       cursorSchema: z.null(),
       observationSchema: z.unknown(),

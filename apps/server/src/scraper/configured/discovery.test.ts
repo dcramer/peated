@@ -1,11 +1,9 @@
 import { expect, test } from "vitest";
-import {
-  MAX_SUGGESTION_DETAIL_PAGES,
-  findLikelyDetailPages,
-  findLikelyListPages,
-} from "./discovery";
+import { findLikelyDetailPages, findLikelyListPages } from "./discovery";
 
-test("finds bounded same-site review pages", () => {
+const DETAIL_PAGE_LIMIT = 3;
+
+test("limits same-site review pages", () => {
   const result = findLikelyListPages({
     kind: "review",
     pageUrl: new URL("https://example.test/"),
@@ -39,9 +37,10 @@ test("uses store terms only for price sources", () => {
   ).toEqual(["https://example.test/collections/whisky"]);
 });
 
-test("finds bounded detail pages from list-page cards", () => {
+test("limits detail pages found in list-page cards", () => {
   const result = findLikelyDetailPages({
     kind: "review",
+    limit: DETAIL_PAGE_LIMIT,
     pages: [
       {
         url: "https://example.test/",
@@ -50,7 +49,7 @@ test("finds bounded detail pages from list-page cards", () => {
       {
         url: "https://example.test/reviews",
         html: Array.from(
-          { length: MAX_SUGGESTION_DETAIL_PAGES + 2 },
+          { length: DETAIL_PAGE_LIMIT + 2 },
           (_, index) =>
             `<article class="review-card"><a href="/reviews/${index}">Review ${index}</a></article>`,
         ).join(""),
@@ -69,6 +68,7 @@ test("ignores navigation, supplied pages, and links on other sites", () => {
   expect(
     findLikelyDetailPages({
       kind: "price",
+      limit: DETAIL_PAGE_LIMIT,
       pages: [
         {
           url: "https://example.test/shop",

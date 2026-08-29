@@ -2,10 +2,6 @@ import { load } from "cheerio";
 import type { ScrapeSourceKind } from "./rules";
 
 export const MAX_LIKELY_LIST_PAGES = 4;
-export const MAX_SUGGESTION_DETAIL_PAGES = 3;
-// Covers the main page, likely list and detail pages, and final detail checks.
-export const MAX_SUGGESTION_PAGE_REQUESTS =
-  1 + MAX_LIKELY_LIST_PAGES + MAX_SUGGESTION_DETAIL_PAGES * 2;
 
 const LIST_PAGE_WORDS = {
   review: ["review", "reviews", "rating", "ratings", "tasting", "archive"],
@@ -99,6 +95,7 @@ export function findLikelyListPages(input: {
 
 export function findLikelyDetailPages(input: {
   kind: ScrapeSourceKind;
+  limit: number;
   pages: Array<{ url: string; html: string }>;
 }) {
   const pageUrls = new Set(
@@ -177,6 +174,6 @@ export function findLikelyDetailPages(input: {
         ? left.order - right.order
         : right.score - left.score,
     )
-    .slice(0, MAX_SUGGESTION_DETAIL_PAGES)
+    .slice(0, input.limit)
     .map(([url]) => url);
 }

@@ -1,12 +1,13 @@
 import { expect, test } from "vitest";
 import {
   MAX_AI_INPUT_CHARS,
+  checkDetailPages,
+  checkListPage,
+  checkRuleReview,
+  createRuleReviewFormat,
   createSuggestionFormat,
-  createSuggestionReviewFormat,
-  parseAcceptedSuggestionReview,
   prepareAiPages,
-  validateSuggestedDetailPages,
-  validateSuggestedListPage,
+  suggestionRequestLimit,
 } from "./suggestion";
 
 const reviewRules = {
@@ -29,9 +30,14 @@ test("uses object schemas for AI output", () => {
     expect(format.schema).toMatchObject({ type: "object" });
     expect(JSON.stringify(format.schema)).not.toContain('"oneOf"');
   }
-  expect(createSuggestionReviewFormat().schema).toMatchObject({
+  expect(createRuleReviewFormat().schema).toMatchObject({
     type: "object",
   });
+});
+
+test("reserves requests for discovery and final page checks", () => {
+  expect(suggestionRequestLimit(0)).toBe(11);
+  expect(suggestionRequestLimit(2)).toBe(13);
 });
 
 test("bounds total AI input while keeping every sample page", () => {
@@ -49,7 +55,7 @@ test("bounds total AI input while keeping every sample page", () => {
 });
 
 test("validates the selected list page and returns its detail links", () => {
-  const page = validateSuggestedListPage({
+  const page = checkListPage({
     listPageUrl: "https://example.test/reviews",
     rules: reviewRules,
     pages: [
@@ -76,7 +82,7 @@ test("validates the selected list page and returns its detail links", () => {
 
 test("rejects a list page that was not supplied", () => {
   expect(() =>
-    validateSuggestedListPage({
+    checkListPage({
       listPageUrl: "https://example.test/archive",
       rules: reviewRules,
       pages: [{ url: "https://example.test/", html: "<main></main>" }],
@@ -90,7 +96,7 @@ test("parses supplied detail pages with the production parser", async () => {
     html: '<a class="review" href="/reviews/one">One</a>',
     links: ["https://example.test/reviews/one"],
   };
-  const detailPages = await validateSuggestedDetailPages({
+  const detailPages = await checkDetailPages({
     rules: reviewRules,
     listPage: page,
     suppliedPages: [
@@ -118,7 +124,7 @@ test("parses supplied detail pages with the production parser", async () => {
 
 test("rejects suggested rules that do not parse a detail page", async () => {
   await expect(
-    validateSuggestedDetailPages({
+    checkDetailPages({
       rules: reviewRules,
       listPage: {
         url: "https://example.test/reviews",
@@ -134,18 +140,11 @@ test("rejects suggested rules that do not parse a detail page", async () => {
   ).rejects.toThrow("The suggested rules did not parse a detail page.");
 });
 
-test("requires an accepted AI review with no issues", () => {
-  expect(
-    parseAcceptedSuggestionReview('{"accepted":true,"issues":[]}'),
-  ).toEqual({ accepted: true, issues: [] });
+test("requires an AI review with no issues", () => {
+  expect(() => checkRuleReview('{"issues":[]}')).not.toThrow();
   expect(() =>
-    parseAcceptedSuggestionReview(
-      '{"accepted":false,"issues":[{"field":"name","message":"The name does not match."}]}',
-    ),
-  ).toThrow("AI review did not confirm the suggested parsing rules.");
-  expect(() =>
-    parseAcceptedSuggestionReview(
-      '{"accepted":true,"issues":[{"field":"name","message":"The name does not match."}]}',
+    checkRuleReview(
+      '{"issues":[{"field":"name","message":"The name does not match."}]}',
     ),
   ).toThrow("AI review did not confirm the suggested parsing rules.");
 });

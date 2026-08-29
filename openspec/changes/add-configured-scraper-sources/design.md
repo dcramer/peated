@@ -65,7 +65,7 @@ origin. Preview, AI page reads, and collection use the normal request controls.
 
 ## Rules Version 1
 
-The first format supports one bounded list page and same-origin detail pages.
+The first format supports one list page with an item limit and same-origin detail pages.
 It has CSS selectors for detail links and known review or price fields. Code
 owns date, score, money, currency, and volume conversion.
 
@@ -77,7 +77,7 @@ the escape hatch for those cases.
 ## Revision Lifecycle
 
 Editing always creates a revision. Preview runs that exact revision and stores
-only parsed fields and bounded issues. It does not store fetched HTML, review
+only parsed fields and a limited number of errors. It does not store fetched HTML, review
 text, or products.
 
 Activation locks the source, requires a passing test, clears the old active
@@ -96,18 +96,17 @@ fails its test. The server reads the main page and selects a small number of
 links on the same website that look like review or store pages. It fetches
 those pages and the admin's examples, then makes one AI request for parsing
 rules. The response must match the rules format. The AI has no tools, and
-provider storage is disabled.
+the AI provider does not store request content.
 
-The typed response names one supplied list page. The server runs the returned
-list selector against that exact page, fetches a bounded sample of the detail
-links, and parses them with the production parser. Any selector, conversion, or
-schema error stops the suggestion without saving a revision.
+The response names one supplied list page. The server runs the returned list
+selector against that exact page, fetches up to three detail links, and parses
+them with the production parser. Any selector, conversion, or response error
+stops the suggestion without saving a revision.
 
-A second bounded AI request compares the parsed fields with the same page
-evidence. Its strict response accepts or rejects the proposed rules and cannot
-change them. Rejection stops the suggestion. There are no retries or repair
-loop. This keeps the workflow bounded while adding a semantic check that code
-cannot provide.
+A second AI request compares the parsed fields with the same HTML. Its response
+lists any errors and cannot change the rules. An error stops the suggestion.
+There are no retries or repair loop. This keeps the workflow to two AI requests
+while adding a content check that code cannot provide.
 
 Pagination remains outside rules version 1 until a pilot proves the required
 page behavior. Code validates the returned rules and source kind before it

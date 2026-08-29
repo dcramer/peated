@@ -19,7 +19,7 @@ const reviewConfig = {
 };
 
 describe("scrape source parser", () => {
-  it("extracts bounded, same-origin detail links", () => {
+  it("limits detail links to the same website", () => {
     const result = parseScrapeList(
       reviewConfig,
       '<a class="review" href="/one">One</a><a class="review" href="https://reviews.test/two#top">Two</a><a class="review" href="/three">Three</a>',

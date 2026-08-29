@@ -4,9 +4,9 @@
 
 The system SHALL let an admin create an external site and its first scrape
 source with a name, website URL, conservative request policy, and robots
-enforcement. The system MUST derive its bounded internal key from the website
-hostname and use the website URL as the initial list page. The source MUST
-start disabled.
+enforcement. The system MUST derive its internal key from the website hostname,
+limit it to the allowed length, and use the website URL as the initial list
+page. The source MUST start disabled.
 
 #### Scenario: Admin creates a review source
 
@@ -65,12 +65,12 @@ or prices.
 #### Scenario: A review revision is previewed
 
 - **WHEN** an admin previews review rules against current pages
-- **THEN** the system stores structured article and review fields, source links, and bounded issues without storing HTML or review text
+- **THEN** the system stores structured article and review fields, source links, and a limited number of errors without storing HTML or review text
 
 #### Scenario: A price revision is previewed
 
 - **WHEN** an admin previews price rules against current pages
-- **THEN** the system stores structured product fields and bounded issues without storing prices as products
+- **THEN** the system stores structured product fields and a limited number of errors without storing prices as products
 
 ### Requirement: AI suggestions create inactive revisions only
 
@@ -83,7 +83,7 @@ or write products.
 #### Scenario: AI is allowed
 
 - **WHEN** an admin requests the first suggestion or a repair after the latest test fails
-- **THEN** the system fetches the main page, bounded candidates from the same website, and bounded detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the page evidence, and stores an inactive revision only when both checks pass
+- **THEN** the system fetches the main page, up to four candidate list pages from the same website, and up to three detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the HTML, and stores an inactive revision only when both checks pass
 
 #### Scenario: AI is not allowed
 
@@ -92,8 +92,8 @@ or write products.
 
 #### Scenario: Model output is invalid
 
-- **WHEN** the AI response fails the strict rules schema or uses the wrong kind
-- **THEN** the system stores no revision and reports a bounded error without page content
+- **WHEN** the AI response does not match the required rules format or uses the wrong kind
+- **THEN** the system stores no revision and reports an error without page content
 
 #### Scenario: Proposed rules do not parse current pages
 
@@ -102,7 +102,7 @@ or write products.
 
 #### Scenario: AI review rejects parsed fields
 
-- **WHEN** the reviewer finds that a parsed field does not represent the supplied page evidence
+- **WHEN** the reviewer finds that a parsed field does not represent the supplied HTML
 - **THEN** the system stores no revision and does not retry or let the reviewer change the rules
 
 ### Requirement: Activation and rollback require a passing test

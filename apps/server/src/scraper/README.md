@@ -4,7 +4,7 @@ This module owns Peated's outbound scraper boundary. It keeps four concerns
 separate:
 
 - definitions say which Peated source may use which remote target and origin;
-- runs own bounded, resumable source work;
+- runs limit their source work and can resume it;
 - coordination and HTTP own when and how remote requests happen;
 - adapters parse responses and emit source observations through an injected
   session.
@@ -78,7 +78,7 @@ revision that passes its test can become active. An admin can return to any
 older revision that passed. Pausing a source stops collection but keeps its
 revisions and run history.
 
-Rules format 1 supports one bounded HTML list page, same-origin detail links,
+Rules format 1 supports one HTML list page with an item limit, same-origin detail links,
 CSS selectors, and fixed date, number, price, and volume conversions. It does not
 support scripts, custom code, arbitrary request headers, browser automation,
 pagination, or cross-origin discovery. Add a code-owned adapter when a source
@@ -89,14 +89,14 @@ Peated already stores these events. Add the scraper type only after its match
 and update rules are defined, so repeated runs do not create duplicate events.
 
 New sources allow AI parsing suggestions by default. An admin can turn this off
-when they create the source. The server reads the main page, a bounded set of
-likely pages on the same website, and any example review or product pages. One
-model call proposes rules. Code then fetches bounded detail pages and parses
-them with the production parser. A second model call compares those parsed
-fields with the page evidence. Both calls have strict outputs and no tools. No
-revision is saved unless the code checks and AI review pass. Provider
-storage is off. An admin must still test and activate the inactive revision.
-AI never changes the active revision directly.
+when they create the source. The server reads the main page, up to four likely
+list pages on the same website, and any example review or product pages. One AI
+request proposes rules. Code then fetches up to three detail pages and parses
+them with the same parser used during collection. A second AI request compares
+those parsed fields with the HTML. Both responses require fixed fields, and the
+AI has no tools. No revision is saved unless the code checks and AI review pass.
+The AI provider does not store request content. An admin must still test and
+activate the inactive revision. AI never changes the active revision directly.
 
 ## Source acceptance rules
 
@@ -106,7 +106,7 @@ listed owner. Do not repeat a runtime test in every adapter.
 | Rule                                                                                                                                                                                            | Owner and proof                                                                                                                                                              |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The source requests only its declared targets and exact origins.                                                                                                                                | The registry owns the declaration. Definition and boundary tests prove it.                                                                                                   |
-| Discovery is bounded. The adapter does not become a generic crawler.                                                                                                                            | The adapter owns its exact entry points and maximum pages or items. A fixture test proves the bound.                                                                         |
+| Discovery has fixed limits. The adapter does not crawl the whole website.                                                                                                                       | The adapter owns its exact entry points and maximum pages or items. A fixture test proves the limit.                                                                         |
 | Every request uses the injected session. Robots, spacing, quotas, retries, response limits, and `429` cooldowns stay active.                                                                    | The runtime owns request control. Boundary and HTTP tests prove it.                                                                                                          |
 | The configured limits let a run complete or make durable progress. Discovery plus the first work request must fit before a quota or slice boundary. Request spacing must not restart discovery. | The registry owns limits. A registered runtime test proves completion or a cursor advance.                                                                                   |
 | A cursor is strict and describes the next safe work. The adapter emits before it checkpoints. A replay is safe.                                                                                 | The adapter owns progress. Fixture tests prove resume, replay, and failed emit or parse behavior.                                                                            |
@@ -128,7 +128,7 @@ weaken a shared schema or runtime rule to accept one malformed page.
   budget, spacing, quota, lease, or remote cooldown. It is not a failure.
 - `failed` means validation, robots, configuration, persistence, or an
   unexpected remote failure was terminal for that run. Stored errors are
-  bounded; detailed unexpected failures belong in Sentry.
+  limited; detailed unexpected failures belong in Sentry.
 
 `sliceRequestCount` resets when a deferred run is reclaimed. `requestCount`,
 retry counts, rate-limit counts, and emitted-item counts are lifetime run

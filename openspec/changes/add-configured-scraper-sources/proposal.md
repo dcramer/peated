@@ -15,7 +15,7 @@ return to an older revision.
 - Require a passing preview before an admin can activate a revision.
 - Allow AI parsing suggestions by default for new sources, with an admin
   opt-out. Code tests proposed rules against current pages, and a second AI
-  call checks the parsed fields before an inactive revision is saved. AI cannot
+  request checks the parsed fields before an inactive revision is saved. AI cannot
   activate revisions or change network access.
 - Add admin controls to create a site and source, edit the list URL and parsing
   rules, preview a revision, activate it, view history, roll back, and pause it.
