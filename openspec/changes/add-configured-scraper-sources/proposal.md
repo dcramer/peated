@@ -2,7 +2,7 @@
 
 Peated has one code adapter for each review publisher or store. This does not
 scale to a large source catalog. Routine page changes also require a deploy.
-Admins need a safe way to add a source, test its parsed output, repair it, and
+Admins need a safe way to add a source, preview its parsed output, repair it, and
 return to an older revision.
 
 ## What Changes
@@ -15,11 +15,12 @@ return to an older revision.
 - Require a passing preview before an admin can activate a revision.
 - Start AI setup for every new source. The AI identifies the list page, detail
   fields, and an optional next-page link. Code tests the proposed rules against
-  current pages, and a second AI request checks the parsed fields before an
-  inactive revision is saved. AI cannot activate revisions or change network
-  access.
+  current pages, and another AI request checks the parsed fields before an
+  inactive revision is saved. Expected rule failures receive one automatic AI
+  repair attempt. AI cannot activate revisions or change network access.
 - Add admin controls to create a site and source, edit the list URL and parsing
-  rules, preview a revision, activate it, view history, roll back, and pause it.
+  rules, follow AI setup status, preview a revision, activate it, view history,
+  roll back, and pause it.
 - Keep existing code sources available.
 
 ## Capabilities

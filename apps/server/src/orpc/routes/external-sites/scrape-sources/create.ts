@@ -29,13 +29,13 @@ export default procedure
         ...input,
         createdById: context.user.id,
       });
-      await queueScrapeSourceSuggestion({
+      const setup = await queueScrapeSourceSuggestion({
         scrapeSourceId: source.id,
         requestedById: context.user.id,
       });
       return await serialize(
         ScrapeSourceSerializer,
-        { source, site, revisions: [] },
+        { source, site, revisions: [], setup },
         context.user,
       );
     } catch (error) {

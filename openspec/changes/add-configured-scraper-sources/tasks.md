@@ -12,7 +12,7 @@
 - [x] 2.2 Read a limited number of detail links and fields without database or network access
 - [x] 2.3 Parse review articles into the existing validated review format
 - [x] 2.4 Parse store prices into the existing strict price schema
-- [x] 2.5 Store typed test results without HTML or publisher prose
+- [x] 2.5 Store typed preview results without HTML or publisher prose
 - [x] 2.6 Add synthetic parser tests for valid and broken pages
 
 ## 3. Revision And Admin Services
@@ -20,7 +20,7 @@
 - [x] 3.1 Create a site and first source with conservative network defaults
 - [x] 3.2 Create immutable revisions and list revision history
 - [x] 3.3 Permit same-origin list URL changes through a new revision
-- [x] 3.4 Require a passing test for activation and rollback
+- [x] 3.4 Require a passing preview for activation and rollback
 - [x] 3.5 Add integration tests for authorization and route errors
 - [x] 3.6 Derive the internal site key and initial list page from the website URL
 
@@ -68,3 +68,10 @@
 - [x] 8.3 Prove pagination with parser, runtime, route, and live eval coverage
 - [x] 8.4 Update the admin flow and plain-language documentation
 - [x] 8.5 Run focused tests, both live evals, typecheck, lint, format, and OpenSpec validation
+
+## 9. Pilot Setup Feedback
+
+- [x] 9.1 Give expected rule failures to one automatic AI repair attempt
+- [x] 9.2 Store expected final setup failures without reporting them only to Sentry
+- [x] 9.3 Show setup progress, failure, retry, and optional examples in Admin
+- [x] 9.4 Add deterministic coverage and run focused validation and manual UI QA

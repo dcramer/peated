@@ -68,7 +68,8 @@ origin. Preview, AI page reads, and collection use the normal request controls.
 The first format supports same-origin list and detail pages. It has CSS
 selectors for detail links, an optional next-page link, and known review or
 price fields. Code owns date, score, money, currency, and volume conversion.
-Code follows at most five list pages and stops after the saved item limit. It
+Code sets the item limit, follows at most five list pages, and stops at that
+limit. It
 rejects cross-origin and repeated next-page links.
 
 The rules JSON does not include its version. The revision stores the rules
@@ -79,10 +80,10 @@ source is the escape hatch for those cases.
 ## Revision Lifecycle
 
 Editing always creates a revision. Preview runs that exact revision and stores
-only parsed fields and a limited number of errors. It does not store fetched HTML, review
-text, or products.
+only parsed fields and a limited number of errors. It does not store fetched
+HTML, review text, or products.
 
-Activation locks the source, requires a passing test, clears the old active
+Activation locks the source, requires a passing preview, clears the old active
 revision, activates the selected revision, and enables the source. It also
 makes the revision's list URL current for later suggestions. Rollback uses the
 same operation with an older passing revision.
@@ -93,7 +94,7 @@ keeps that revision across retries even if an admin activates another one.
 ## AI Suggestions
 
 Every new source starts an AI setup run. AI is also available after the latest
-revision fails its test. The server reads the main page and selects a small
+revision fails its preview. The server reads the main page and selects a small
 number of links on the same website that look like review or store pages. It
 fetches those pages and the admin's examples, then makes one AI request for
 parsing rules. The response must match the rules format. The AI has no tools,
@@ -103,13 +104,17 @@ The response names one supplied list page. The server runs the returned list
 and next-page selectors against that exact page. When a next page exists, code
 fetches one page and proves that it produces new detail links. Code then
 fetches up to three detail links and parses them with the production parser.
-Any selector, conversion, or response error stops the suggestion without
-saving a revision.
+Any selector, conversion, or response error becomes concise repair feedback.
+AI receives the supplied pages and that feedback for one more attempt. The
+system does not retry provider, database, queue, or unexpected network errors.
 
-A second AI request compares the parsed fields with the same HTML. Its response
-lists any errors and cannot change the rules. An error stops the suggestion.
-There are no retries or repair loop. This keeps the workflow to two AI requests
-while adding a content check that code cannot provide.
+Another AI request compares the parsed fields with the same HTML. Its response
+lists only the fixed field names that failed and cannot change the rules. Code
+writes the error messages, so publisher text is not stored. Review errors
+become repair feedback when the repair attempt remains available. Each proposal
+attempt gets the same code and AI checks. Setup makes at most two proposal
+attempts. Expected rule failures are stored on the run and shown to the admin
+instead of being reported only as unexpected system failures.
 
 Code validates the returned rules and source kind before it stores a revision.
 The system records the AI model name and instructions version. An admin must
@@ -118,10 +123,12 @@ still preview and activate the result.
 ## Admin Flow
 
 1. Add a site and choose reviews or prices.
-2. AI discovers the pages and creates an inactive revision.
-3. Review and preview the parsed fields from current pages.
-4. Activate a passing revision.
-5. Use history to repair, roll back, or pause the source.
+2. Follow queued, running, failed, or completed AI setup on the source page.
+3. AI discovers the pages and creates an inactive revision. It automatically
+   retries once when its first rules fail the page checks.
+4. Review and preview the parsed fields from current pages.
+5. Activate a passing revision.
+6. Use history to repair, roll back, or pause the source.
 
 The route creates a site with its source. Supporting several source kinds on
 one site would also need separate scheduling and run fan-out, so it is outside

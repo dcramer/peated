@@ -5,6 +5,7 @@ import {
   ScrapeSourceSchema,
 } from "@peated/server/schemas";
 import {
+  getLatestScrapeSourceSetup,
   listScrapeSourceRevisions,
   listScrapeSources,
 } from "@peated/server/scraper/configured/service";
@@ -31,6 +32,7 @@ export default procedure
           source,
           site,
           revisions: await listScrapeSourceRevisions(source.id),
+          setup: await getLatestScrapeSourceSetup(source.id),
         })),
       ),
       context.user,

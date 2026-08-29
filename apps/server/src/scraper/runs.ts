@@ -10,6 +10,7 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { resolveScrapeSourceRunRegistry } from "./configured/runtime";
+import { ScrapeSourceSetupError } from "./configured/setupError";
 import { ScraperCoordinationError } from "./coordinator";
 import {
   findScraperSourceBySiteKey,
@@ -56,6 +57,7 @@ export type ScraperRunExecutionResult =
 
 function safeRunError(error: Error) {
   if (error instanceof ScraperTargetDisabledError) return error.message;
+  if (error instanceof ScrapeSourceSetupError) return error.message;
   if (error instanceof z.ZodError) return "Scraper data failed validation.";
   if (error instanceof ScraperRobotsDeniedError) {
     return "Robots policy disallows this scraper path.";
@@ -324,6 +326,10 @@ export async function executeScraperRun(
     ) {
       const nextAttemptAt = await deferRun(claimed, error, clock.now());
       return { status: "deferred", nextAttemptAt };
+    }
+    if (error instanceof ScrapeSourceSetupError) {
+      await failRun(claimed, error, clock.now());
+      return { status: "completed" };
     }
     await failRun(
       claimed,

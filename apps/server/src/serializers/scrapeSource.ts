@@ -2,6 +2,7 @@ import type { z } from "zod";
 import { serializer } from ".";
 import type {
   ExternalSite,
+  ExternalSiteRun,
   ScrapeSource,
   ScrapeSourceRevision,
 } from "../db/schema";
@@ -61,6 +62,7 @@ type ScrapeSourceView = {
   source: ScrapeSource;
   site: ExternalSite;
   revisions: ScrapeSourceRevision[];
+  setup: ExternalSiteRun | null;
 };
 
 export const ScrapeSourceSerializer = serializer({
@@ -69,6 +71,7 @@ export const ScrapeSourceSerializer = serializer({
     source,
     site,
     revisions,
+    setup,
   }: ScrapeSourceView): z.infer<typeof ScrapeSourceSchema> => {
     return {
       id: source.id,
@@ -82,6 +85,15 @@ export const ScrapeSourceSerializer = serializer({
       createdAt: source.createdAt.toISOString(),
       updatedAt: source.updatedAt.toISOString(),
       revisions: revisions.map(revisionItem),
+      setup: setup
+        ? {
+            runId: setup.id,
+            status: setup.status,
+            error: setup.error,
+            createdAt: setup.createdAt.toISOString(),
+            completedAt: setup.completedAt?.toISOString() ?? null,
+          }
+        : null,
     };
   },
 });

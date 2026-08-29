@@ -83,7 +83,8 @@ export default function Page() {
             <span className="mb-2 block font-semibold">
               {kind === "review"
                 ? "Example review pages"
-                : "Example product pages"}
+                : "Example product pages"}{" "}
+              <span className="text-muted font-normal">(optional)</span>
             </span>
             <textarea
               name="sampleUrls"
@@ -91,6 +92,10 @@ export default function Page() {
               className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
               placeholder="One URL per line"
             />
+            <span className="text-muted mt-2 block text-sm">
+              Leave this blank unless the site is hard to navigate. Peated will
+              find examples from the main page first.
+            </span>
           </label>
           <p className="text-muted text-sm">
             Peated will find the list, detail fields, and next pages. You will

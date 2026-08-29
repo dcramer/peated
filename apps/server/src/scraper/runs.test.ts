@@ -8,6 +8,7 @@ import {
   FixtureObservationSchema,
   fixtureScraperAdapter,
 } from "./adapters/fixture";
+import { ScrapeSourceSetupError } from "./configured/setupError";
 import { ScraperCoordinationError } from "./coordinator";
 import {
   createScraperRegistry,
@@ -177,6 +178,34 @@ test("fails a queued run before adapter execution when its target is disabled", 
     attemptCount: 1,
     requestCount: 0,
     error: "Scraper target fixture-target is disabled.",
+  });
+});
+
+test("stores an expected setup failure without failing the worker", async () => {
+  const adapter: ScraperAdapter<
+    FixtureCursor,
+    FixtureObservation
+  > = async () => {
+    throw new ScrapeSourceSetupError("AI setup needs attention.", [
+      { field: "detail.name", message: "The name was not found." },
+    ]);
+  };
+  const { registry, run } = await setupRun({ adapter });
+
+  await expect(
+    executeScraperRun(
+      { runId: run.id },
+      { registry, clock: fixedClock(), executionToken: "owner" },
+    ),
+  ).resolves.toEqual({ status: "completed" });
+
+  const [stored] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(stored).toMatchObject({
+    status: "failed",
+    error: "AI setup needs attention. detail.name: The name was not found.",
   });
 });
 
