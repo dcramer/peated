@@ -130,7 +130,11 @@ export function SetupNotice({
             loading={busy}
             onClick={retry}
           >
-            {setup ? "Retry AI setup" : "Start AI setup"}
+            {setup
+              ? hasRevision
+                ? "Retry AI repair"
+                : "Retry AI setup"
+              : "Start AI setup"}
           </Button>
         )}
       </div>

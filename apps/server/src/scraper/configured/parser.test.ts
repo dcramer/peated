@@ -98,6 +98,38 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("reads page fields for a single review", () => {
+    const result = parseScrapeDetail(
+      reviewConfig,
+      '<h1>Spring reviews</h1><h2>Example 12 Year</h2><article class="review"><span class="author">Ada</span><div class="body">Rich and balanced.</div></article>',
+      new URL("https://reviews.test/spring"),
+    );
+
+    expect(result).toMatchObject({
+      kind: "review",
+      issues: [],
+      value: {
+        article: {
+          externalReviews: [{ name: "Example 12 Year", reviewerName: "Ada" }],
+        },
+      },
+    });
+  });
+
+  it("does not reuse a page field for repeated reviews", () => {
+    const result = parseScrapeDetail(
+      reviewConfig,
+      '<h1>Spring reviews</h1><h2>Shared bottle</h2><article class="review"></article><article class="review"></article>',
+      new URL("https://reviews.test/spring"),
+    );
+
+    expect(result.kind).toBe("review");
+    expect(result.value).toBeNull();
+    expect(
+      result.issues.filter(({ field }) => field === "detail.name"),
+    ).toHaveLength(2);
+  });
+
   it("extracts repeated reviews and reports invalid dates and scores", () => {
     const result = parseScrapeDetail(
       reviewConfig,

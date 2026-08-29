@@ -1,3 +1,4 @@
+import { trace } from "@opentelemetry/api";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { scrapeSources } from "@peated/server/db/schema";
@@ -24,6 +25,8 @@ import {
   type AiPage,
 } from "./setupAgent";
 import { ScrapeSourceSetupError } from "./setupError";
+
+const scraperTracer = trace.getTracer("@peated/server");
 
 const RuleReviewFieldSchema = z.enum([
   "kind",
@@ -264,9 +267,7 @@ function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
           name: review.name,
           reviewerName: review.reviewerName ?? null,
           nativeScore: review.nativeScore ?? null,
-          reviewText:
-            value.externalReviewTexts[review.sourceKey]?.slice(0, 1_000) ??
-            null,
+          reviewText: value.externalReviewTexts[review.sourceKey] ?? null,
         })),
       },
     };
@@ -456,6 +457,7 @@ export async function suggestScrapeSourceRevision(input: {
       page,
     ]),
   );
+  let checkNumber = 0;
   const setup = await runScrapeSourceSetupAgent({
     kind: source.kind,
     listPages: input.listPages,
@@ -472,52 +474,83 @@ export async function suggestScrapeSourceRevision(input: {
       });
     },
     checkRules: async (candidate) => {
-      const inspectedPages: AiPage[] = [];
-      const loadPage = async (url: URL) => {
-        const key = url.toString();
-        const cached = pageCache.get(key);
-        if (cached) return cached;
-        const page = await input.loadPage(url);
-        pageCache.set(new URL(page.url).toString(), page);
-        inspectedPages.push(page);
-        return page;
-      };
-      try {
-        const firstListPage = checkListPage({
-          listPageUrl: candidate.listPageUrl,
-          rules: candidate.rules,
-          pages: input.listPages,
-        });
-        const listPage = await checkNextListPage({
-          rules: candidate.rules,
-          listPage: firstListPage,
-          loadPage,
-        });
-        const detailPages = await checkDetailPages({
-          rules: candidate.rules,
-          listPage,
-          suppliedPages: [...pageCache.values()],
-          loadPage,
-        });
-        await reviewSuggestedRules({
-          scrapeSourceId: input.scrapeSourceId,
-          kind: source.kind,
-          rules: candidate.rules,
-          listPage,
-          detailPages,
-        });
-        return {
-          status: "passed" as const,
-          checked: { listPage, detailPages },
-        };
-      } catch (error) {
-        if (!(error instanceof ScrapeSourceSetupError)) throw error;
-        return {
-          status: "failed" as const,
-          feedback: error.feedback(),
-          inspectedPages,
-        };
-      }
+      checkNumber += 1;
+      return await scraperTracer.startActiveSpan(
+        "scraper.setup.check_rules",
+        {
+          attributes: {
+            "scraper.source.id": input.scrapeSourceId,
+            "scraper.source.kind": source.kind,
+            "scraper.setup.check.number": checkNumber,
+            // Rules contain public selectors only. Do not add page content or URLs.
+            "scraper.setup.rules": JSON.stringify(candidate.rules),
+          },
+        },
+        async (span) => {
+          const inspectedPages: AiPage[] = [];
+          const loadPage = async (url: URL) => {
+            const key = url.toString();
+            const cached = pageCache.get(key);
+            if (cached) return cached;
+            const page = await input.loadPage(url);
+            pageCache.set(new URL(page.url).toString(), page);
+            inspectedPages.push(page);
+            return page;
+          };
+          try {
+            const firstListPage = checkListPage({
+              listPageUrl: candidate.listPageUrl,
+              rules: candidate.rules,
+              pages: input.listPages,
+            });
+            const listPage = await checkNextListPage({
+              rules: candidate.rules,
+              listPage: firstListPage,
+              loadPage,
+            });
+            const detailPages = await checkDetailPages({
+              rules: candidate.rules,
+              listPage,
+              suppliedPages: [...pageCache.values()],
+              loadPage,
+            });
+            await reviewSuggestedRules({
+              scrapeSourceId: input.scrapeSourceId,
+              kind: source.kind,
+              rules: candidate.rules,
+              listPage,
+              detailPages,
+            });
+            span.setAttributes({
+              "scraper.setup.check.status": "passed",
+              "scraper.setup.detail_page.count": detailPages.length,
+              "scraper.setup.detail_link.count": listPage.links.length,
+            });
+            return {
+              status: "passed" as const,
+              checked: { listPage, detailPages },
+            };
+          } catch (error) {
+            if (!(error instanceof ScrapeSourceSetupError)) {
+              span.setAttribute("scraper.setup.check.status", "error");
+              throw error;
+            }
+            span.setAttributes({
+              "scraper.setup.check.status": "rejected",
+              "scraper.setup.issue.fields": error.issues
+                .slice(0, 10)
+                .map(({ field }) => field),
+            });
+            return {
+              status: "failed" as const,
+              feedback: error.feedback(),
+              inspectedPages,
+            };
+          } finally {
+            span.end();
+          }
+        },
+      );
     },
   });
   const suggestedRules = setup.rules;

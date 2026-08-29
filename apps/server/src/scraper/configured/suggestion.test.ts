@@ -134,6 +134,35 @@ test("parses supplied detail pages with the production parser", async () => {
   ]);
 });
 
+test("keeps complete review text for the AI check", async () => {
+  const reviewText = "Long review sentence. ".repeat(100);
+  const detailPages = await checkDetailPages({
+    rules: reviewRules,
+    listPage: {
+      url: "https://example.test/reviews",
+      html: '<a class="review" href="/reviews/one">One</a>',
+      links: ["https://example.test/reviews/one"],
+      firstPageLinks: ["https://example.test/reviews/one"],
+      nextPageUrl: null,
+      nextPage: null,
+    },
+    suppliedPages: [
+      {
+        url: "https://example.test/reviews/one",
+        html: `<h1>Autumn reviews</h1><article class="review"><h2>North Coast 12</h2><p class="body">${reviewText}</p></article>`,
+      },
+    ],
+    loadPage: async () => {
+      throw new Error("A supplied detail page must not be fetched again.");
+    },
+  });
+
+  expect(detailPages[0]?.output).toMatchObject({
+    kind: "review",
+    reviews: [{ reviewText: reviewText.trim() }],
+  });
+});
+
 test("rejects suggested rules that do not parse a detail page", async () => {
   await expect(
     checkDetailPages({
