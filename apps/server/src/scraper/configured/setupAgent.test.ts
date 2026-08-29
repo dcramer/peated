@@ -1,12 +1,9 @@
 import { expect, test, vi } from "vitest";
 import { SCRAPE_SOURCE_DEFAULT_MAX_ITEMS } from "./rules";
 import {
-  MAX_AI_INPUT_CHARS,
-  MAX_RULE_CHECKS,
-  createCheckRulesTool,
   prepareAiPages,
   runScrapeSourceSetupAgent,
-  type SetupAgentModelResponse,
+  suggestionRequestLimit,
 } from "./setupAgent";
 
 function reviewCandidate(nameSelector: string) {
@@ -34,12 +31,12 @@ function reviewCandidate(nameSelector: string) {
 function toolCallResponse(
   callId: string,
   candidate: ReturnType<typeof reviewCandidate>,
-): SetupAgentModelResponse {
+) {
   return {
     model: "test-setup-model",
     output: [
       {
-        type: "function_call",
+        type: "function_call" as const,
         call_id: callId,
         name: "check_rules",
         arguments: JSON.stringify(candidate),
@@ -48,15 +45,9 @@ function toolCallResponse(
   };
 }
 
-test("gives the setup agent one strict rule-check tool", () => {
-  const tool = createCheckRulesTool("review");
-  expect(tool).toMatchObject({
-    name: "check_rules",
-    strict: true,
-    parameters: { type: "object" },
-  });
-  expect(JSON.stringify(tool.parameters)).not.toContain('"oneOf"');
-  expect(JSON.stringify(tool.parameters)).not.toContain('"maxItems"');
+test("reserves requests for discovery and three rule checks", () => {
+  expect(suggestionRequestLimit(0)).toBe(20);
+  expect(suggestionRequestLimit(2)).toBe(22);
 });
 
 test("bounds total AI input while keeping every sample page", () => {
@@ -70,7 +61,7 @@ test("bounds total AI input while keeping every sample page", () => {
   expect(prepared.every((page) => page.html.length > 0)).toBe(true);
   expect(
     prepared.reduce((total, page) => total + page.html.length, 0),
-  ).toBeLessThanOrEqual(MAX_AI_INPUT_CHARS);
+  ).toBeLessThanOrEqual(200_000);
 });
 
 test("returns rules only after the rule check passes", async () => {
@@ -126,6 +117,15 @@ test("returns rules only after the rule check passes", async () => {
     detail: { name: { selector: ".bottle-name" } },
   });
   expect(request).toHaveBeenCalledTimes(2);
+  const firstRequest = request.mock.calls[0]?.[0];
+  expect(firstRequest?.tools).toHaveLength(1);
+  expect(firstRequest?.tools[0]).toMatchObject({
+    name: "check_rules",
+    strict: true,
+    parameters: { type: "object" },
+  });
+  expect(JSON.stringify(firstRequest?.tools[0])).not.toContain('"oneOf"');
+  expect(JSON.stringify(firstRequest?.tools[0])).not.toContain('"maxItems"');
   const secondRequest = request.mock.calls[1]?.[0];
   expect(JSON.stringify(secondRequest?.input)).toContain("detail.name");
   expect(JSON.stringify(secondRequest?.input)).toContain("North Coast 12");
@@ -159,5 +159,5 @@ test("stops after the rule-check limit", async () => {
       }),
     }),
   ).rejects.toThrow("The rules still fail.");
-  expect(request).toHaveBeenCalledTimes(MAX_RULE_CHECKS);
+  expect(request).toHaveBeenCalledTimes(3);
 });

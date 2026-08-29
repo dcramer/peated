@@ -1,6 +1,7 @@
 const FIELD_LABELS = {
   "list.detailLink": "Item links",
   "list.nextPage": "Next page",
+  detail: "Item page",
   "detail.title": "Page title",
   "detail.publishedAt": "Published date",
   "detail.reviewItem": "Reviews",

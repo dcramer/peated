@@ -1,5 +1,4 @@
 import { expect, test } from "vitest";
-import { suggestionRequestLimit } from "./setupAgent";
 import {
   checkDetailPages,
   checkListPage,
@@ -28,11 +27,6 @@ test("uses object schemas for AI output", () => {
     type: "object",
   });
   expect(JSON.stringify(reviewFormat.schema)).not.toContain('"message"');
-});
-
-test("reserves requests for discovery and final page checks", () => {
-  expect(suggestionRequestLimit(0)).toBe(20);
-  expect(suggestionRequestLimit(2)).toBe(22);
 });
 
 test("validates the selected list page and returns its detail links", () => {

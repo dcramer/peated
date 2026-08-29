@@ -8,5 +8,8 @@ test("uses plain labels for preview errors", () => {
   expect(issueText("detail.reviewerName")).toBe(
     "Reviewer name: Peated could not read this part of the page.",
   );
+  expect(issueText("detail")).toBe(
+    "Item page: Peated could not read this part of the page.",
+  );
   expect(text).not.toContain("detail.name");
 });

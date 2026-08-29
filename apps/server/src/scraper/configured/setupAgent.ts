@@ -22,9 +22,9 @@ import {
 } from "./setupError";
 
 export const AI_INSTRUCTIONS_VERSION = "scrape-source-v6";
-export const MAX_AI_INPUT_CHARS = 200_000;
+const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
-export const MAX_RULE_CHECKS = 3;
+const MAX_RULE_CHECKS = 3;
 const MAX_AI_PAGE_CHARS = 75_000;
 const CHECK_RULES_TOOL_NAME = "check_rules";
 
@@ -126,7 +126,7 @@ type SuggestedPriceRules = z.infer<typeof SuggestedPriceRulesSchema>;
 type ReviewRules = Extract<ScrapeRules, { kind: "review" }>;
 type PriceRules = Extract<ScrapeRules, { kind: "price" }>;
 
-export type SetupAgentCheckResult<T> =
+type SetupAgentCheckResult<T> =
   | { status: "passed"; checked: T }
   | {
       status: "failed";
@@ -134,13 +134,13 @@ export type SetupAgentCheckResult<T> =
       inspectedPages: AiPage[];
     };
 
-export type SetupAgentModelRequest = {
+type SetupAgentModelRequest = {
   instructions: string;
   input: ResponseInput;
   tools: Tool[];
 };
 
-export type SetupAgentModelResponse = {
+type SetupAgentModelResponse = {
   model: string;
   output: ResponseOutputItem[];
 };
@@ -253,7 +253,7 @@ function suggestionSchema(kind: ScrapeRules["kind"]) {
     : SuggestedPriceRevisionSchema;
 }
 
-export function createCheckRulesTool(kind: ScrapeRules["kind"]) {
+function createCheckRulesTool(kind: ScrapeRules["kind"]) {
   return zodResponsesFunction({
     name: CHECK_RULES_TOOL_NAME,
     description:
@@ -288,10 +288,16 @@ function parseCandidate(kind: ScrapeRules["kind"], argumentsJson: string) {
   const value: unknown = JSON.parse(argumentsJson);
   if (kind === "review") {
     const suggestion = SuggestedReviewRevisionSchema.parse(value);
-    return { suggestion, rules: toReviewRules(suggestion.rules) };
+    return {
+      listPageUrl: suggestion.listPageUrl,
+      rules: toReviewRules(suggestion.rules),
+    };
   }
   const suggestion = SuggestedPriceRevisionSchema.parse(value);
-  return { suggestion, rules: toPriceRules(suggestion.rules) };
+  return {
+    listPageUrl: suggestion.listPageUrl,
+    rules: toPriceRules(suggestion.rules),
+  };
 }
 
 function setupFailure(error: Error) {
@@ -364,12 +370,12 @@ export async function runScrapeSourceSetupAgent<T>(input: {
     }
 
     const result = await input.checkRules({
-      listPageUrl: candidate.suggestion.listPageUrl,
+      listPageUrl: candidate.listPageUrl,
       rules: candidate.rules,
     });
     if (result.status === "passed") {
       return {
-        ...candidate,
+        rules: candidate.rules,
         checked: result.checked,
         model: response.model,
       };
