@@ -4,9 +4,10 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { PageTabs } from "@peated/web/components/designSystem/components";
-import { PageHeader } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
-import { space } from "../../../styles/tokens.stylex";
+import {
+  PageHeader,
+  TabbedPage,
+} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 
 const tabs = [
   { href: "/notifications", label: "Unread" },
@@ -18,21 +19,18 @@ export function NotificationPageFrame({ children }: { children: ReactNode }) {
 
   return (
     <div {...stylex.props(styles.page)}>
-      <PageHeader eyebrow="Your account" title="Notifications" />
-      <div {...stylex.props(styles.tabs)}>
-        <PageTabs
-          ariaLabel="Notification filters"
-          currentHref={pathname}
-          items={tabs}
-        />
-      </div>
-      <div {...stylex.props(styles.list)}>{children}</div>
+      <TabbedPage
+        currentHref={pathname}
+        header={<PageHeader eyebrow="Your account" title="Notifications" />}
+        tabs={tabs}
+        tabsLabel="Notification filters"
+      >
+        {children}
+      </TabbedPage>
     </div>
   );
 }
 
 const styles = stylex.create({
   page: { minWidth: 0, maxWidth: "900px" },
-  tabs: { marginTop: space.x6 },
-  list: { marginTop: space.x4 },
 });

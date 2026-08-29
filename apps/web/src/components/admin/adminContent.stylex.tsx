@@ -13,7 +13,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import { linkedRowStyles } from "../designSystem/components/linkedRow.stylex";
+import { TextLink } from "../designSystem/components";
 
 export type AdminBreadcrumb = {
   current?: boolean;
@@ -195,14 +195,7 @@ export function AdminTextLink({
   children: ReactNode;
   href: string;
 }) {
-  return (
-    <Link
-      href={href}
-      {...stylex.props(styles.textLink, linkedRowStyles.nestedAction)}
-    >
-      {children}
-    </Link>
-  );
+  return <TextLink href={href}>{children}</TextLink>;
 }
 
 export function AdminCode({ children }: { children: ReactNode }) {
@@ -451,18 +444,6 @@ const styles = stylex.create({
   statusDanger: {
     backgroundColor: colors.accentTint,
     color: colors.accentDeep,
-  },
-  textLink: {
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
-    fontWeight: 600,
-    textDecoration: "none",
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },
   code: {
     color: colors.ink,

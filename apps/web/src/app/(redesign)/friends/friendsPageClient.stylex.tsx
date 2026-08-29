@@ -12,9 +12,9 @@ import {
   EmptyState,
   ItemList,
   ItemRow,
+  MemberAvatar,
   RowMenu,
 } from "@peated/web/components/designSystem/components";
-import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import { PageHeader } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { Search } from "@peated/web/components/designSystem/product/search.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -123,10 +123,7 @@ function FriendRow({ friend }: { friend: Friend }) {
       }
       href={`/users/${user.username}`}
       leading={
-        <Avatar
-          imageUrl={user.pictureUrl}
-          initials={user.username.slice(0, 2).toLocaleUpperCase()}
-        />
+        <MemberAvatar pictureUrl={user.pictureUrl} username={user.username} />
       }
       metadata={friend.status === "pending" ? "Request pending" : "Friend"}
       title={user.username}

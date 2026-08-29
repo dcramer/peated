@@ -66,6 +66,11 @@ export const Overview: Story = {
         />
       </RailList>
       <CursorPager nextHref="#page-4" page={3} previousHref="#page-2" />
+      <CursorPager
+        ariaLabel="Cursor-only record pages"
+        nextHref="#next-cursor"
+        previousHref="#previous-cursor"
+      />
     </StoryStack>
   ),
 };

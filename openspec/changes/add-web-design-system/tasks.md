@@ -168,3 +168,5 @@
 - [x] 9.15 Review the reduced component catalog and live routes at desktop and phone widths in both schemes
 - [x] 9.16 Restore the tasting form in the local mock app by implementing the bottle suggested-tags contract in the typed mock router
 - [x] 9.17 Audit every web route and Storybook component for clean route ownership, shared component reuse, duplicate implementations, and obsolete page-shaped stories; fix the proven factoring issues and QA representative route families
+- [x] 9.18 Server-render and hydrate the signed-in homepage query snapshots so its primary modules do not replace loading placeholders after hydration
+- [x] 9.19 Replace homepage result-prop hydration with one route-owned TanStack Query hydration boundary and shared oRPC query definitions

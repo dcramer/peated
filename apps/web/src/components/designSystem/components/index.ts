@@ -102,8 +102,13 @@ export type {
   TextInputProps,
   TextareaProps,
 } from "./field.stylex";
-export { FilterPanel } from "./filterPanel.stylex";
-export type { FilterPanelProps } from "./filterPanel.stylex";
+export { FacetGroup, FilterPanel, FilterQuery } from "./filterPanel.stylex";
+export type {
+  FacetGroupOption,
+  FacetGroupProps,
+  FilterPanelProps,
+  FilterQueryProps,
+} from "./filterPanel.stylex";
 export { ChoiceList, Select, Switch } from "./formControls.stylex";
 export type {
   ChoiceListOption,
@@ -154,6 +159,8 @@ export type {
 } from "./lists.stylex";
 export { LocationCard } from "./locationCard.stylex";
 export type { LocationCardProps } from "./locationCard.stylex";
+export { MemberAvatar } from "./memberAvatar";
+export type { MemberAvatarProps } from "./memberAvatar";
 export { MemberPicker } from "./memberPicker.stylex";
 export type {
   MemberPickerOption,

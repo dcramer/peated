@@ -1,8 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
-import type { AnchorHTMLAttributes, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
-import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { TextLink, type TextLinkProps } from "../components";
 
 export function ContentPage({
   children,
@@ -67,14 +68,11 @@ export function ContentList({ children }: { children: ReactNode }) {
   return <ul {...stylex.props(styles.list)}>{children}</ul>;
 }
 
-export function ContentLink({
-  children,
-  ...props
-}: AnchorHTMLAttributes<HTMLAnchorElement> & { children: ReactNode }) {
+export function ContentLink({ children, ...props }: TextLinkProps) {
   return (
-    <a {...props} {...stylex.props(styles.link)}>
+    <TextLink {...props} size="inherit">
       {children}
-    </a>
+    </TextLink>
   );
 }
 
@@ -160,19 +158,5 @@ const styles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "15px",
     lineHeight: 1.6,
-  },
-  link: {
-    color: {
-      default: colors.accentDeep,
-      ":hover": colors.accent,
-      ":active": colors.ink,
-    },
-    fontWeight: 600,
-    textDecoration: "none",
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
 });

@@ -16,7 +16,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import { ButtonLink } from "../designSystem/components";
+import { CursorPager } from "../designSystem/components";
 
 export function AdminPager({
   ariaLabel = "Pagination",
@@ -35,30 +35,19 @@ export function AdminPager({
   if (!rel || (!rel.prevCursor && !rel.nextCursor)) return null;
 
   return (
-    <nav aria-label={ariaLabel} {...stylex.props(styles.pager)}>
-      {rel.prevCursor ? (
-        <ButtonLink
-          href={`${pathname}?${buildQueryString(params, { [cursorParam]: rel.prevCursor })}`}
-          rel="prev"
-          size="sm"
-          variant="tonal"
-        >
-          ← Previous
-        </ButtonLink>
-      ) : (
-        <span />
-      )}
-      {rel.nextCursor ? (
-        <ButtonLink
-          href={`${pathname}?${buildQueryString(params, { [cursorParam]: rel.nextCursor })}`}
-          rel="next"
-          size="sm"
-          variant="tonal"
-        >
-          Next →
-        </ButtonLink>
-      ) : null}
-    </nav>
+    <CursorPager
+      ariaLabel={ariaLabel}
+      nextHref={
+        rel.nextCursor
+          ? `${pathname}?${buildQueryString(params, { [cursorParam]: rel.nextCursor })}`
+          : undefined
+      }
+      previousHref={
+        rel.prevCursor
+          ? `${pathname}?${buildQueryString(params, { [cursorParam]: rel.prevCursor })}`
+          : undefined
+      }
+    />
   );
 }
 
@@ -144,13 +133,6 @@ export function AdminMarkdown({ content }: { content: string }) {
 }
 
 const styles = stylex.create({
-  pager: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: space.x3,
-    paddingTop: space.x3,
-  },
   definitionList: {
     display: "grid",
     minWidth: 0,

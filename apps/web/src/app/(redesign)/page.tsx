@@ -1,58 +1,63 @@
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { createTanstackQueryUtils } from "@orpc/tanstack-query";
+import {
+  getAnonymousServerClient,
+  getServerClient,
+} from "@peated/web/lib/orpc/client.server";
+import {
+  memberHomeQueries,
+  publicHomeQueries,
+} from "@peated/web/lib/orpc/homeQueries";
+import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getPublicStats } from "@peated/web/lib/publicStats.server";
 import { getSession } from "@peated/web/lib/session.server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { HomePageClient } from "./homePageClient";
 
 export default async function Page() {
   const session = await getSession();
+  const queryClient = getQueryClient();
 
   if (session.user) {
-    return <HomePageClient />;
+    const { client } = await getServerClient();
+    const orpc = createTanstackQueryUtils(client);
+
+    await Promise.all([
+      queryClient.prefetchInfiniteQuery(
+        memberHomeQueries.activity(orpc, "friends"),
+      ),
+      queryClient.prefetchQuery(memberHomeQueries.criticReviews(orpc)),
+      queryClient.prefetchQuery(memberHomeQueries.releases(orpc)),
+      queryClient.prefetchQuery(memberHomeQueries.member(orpc)),
+      queryClient.prefetchQuery(memberHomeQueries.tastingStats(orpc)),
+    ]);
+
+    return (
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <HomePageClient />
+      </HydrationBoundary>
+    );
   }
 
   const { client } = await getAnonymousServerClient();
-  const [
-    stats,
-    reviews,
-    regions,
-    countries,
-    distilleries,
-    bottles,
-    highestRated,
-  ] = await Promise.allSettled([
-    getPublicStats(),
-    client.externalReviews.list({ limit: 5, sort: "recent" }),
-    client.regions.list({
-      country: "scotland",
-      hasBottles: true,
-      limit: 6,
-      sort: "-bottles",
+  const orpc = createTanstackQueryUtils(client);
+
+  await Promise.all([
+    queryClient.prefetchQuery({
+      ...publicHomeQueries.stats(orpc),
+      queryFn: getPublicStats,
     }),
-    client.countries.list({
-      hasBottles: true,
-      limit: 100,
-      sort: "-bottles",
-    }),
-    client.distilleries.list({ limit: 12, sort: "-bottles" }),
-    client.bottles.list({ limit: 3, sort: "-created" }),
-    client.bottles.list({ limit: 5, minScore: 0, sort: "-score" }),
+    queryClient.prefetchQuery(publicHomeQueries.recentReviews(orpc)),
+    queryClient.prefetchQuery(publicHomeQueries.regions(orpc)),
+    queryClient.prefetchQuery(publicHomeQueries.countries(orpc)),
+    queryClient.prefetchQuery(publicHomeQueries.distilleries(orpc)),
+    queryClient.prefetchQuery(publicHomeQueries.recentBottles(orpc)),
+    queryClient.prefetchQuery(publicHomeQueries.highestRated(orpc)),
   ]);
 
   return (
-    <HomePageClient
-      publicHomeInitialData={{
-        bottles: bottles.status === "fulfilled" ? bottles.value : undefined,
-        countries:
-          countries.status === "fulfilled" ? countries.value : undefined,
-        distilleries:
-          distilleries.status === "fulfilled" ? distilleries.value : undefined,
-        highestRated:
-          highestRated.status === "fulfilled" ? highestRated.value : undefined,
-        regions: regions.status === "fulfilled" ? regions.value : undefined,
-        reviews: reviews.status === "fulfilled" ? reviews.value : undefined,
-        stats: stats.status === "fulfilled" ? stats.value : undefined,
-      }}
-    />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <HomePageClient />
+    </HydrationBoundary>
   );
 }

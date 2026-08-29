@@ -12,15 +12,16 @@ import { useEffect } from "react";
 import {
   CursorPager,
   LoadingList,
+  MemberAvatar,
   SectionError,
   type TastingEntryMember,
 } from "@peated/web/components/designSystem/components";
-import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import {
   MemberActivityList,
   type MemberActivityItem,
 } from "@peated/web/components/designSystem/patterns/memberProfileContent.stylex";
 import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
@@ -166,19 +167,9 @@ function toActivityItem(activity: Activity): MemberActivityItem {
   const [firstTasting, ...remainingTastings] = activity.tastings;
   if (!firstTasting)
     throw new Error("A tasting session must contain a tasting");
-  const toMember = (
-    tasting: (typeof activity.tastings)[number],
-  ): TastingEntryMember => ({
-    description: tasting.notes,
-    href: `/bottles/${tasting.bottle.id}`,
-    metadata: getBottleMetadata(tasting.bottle),
-    name: tasting.bottle.fullName,
-    notes: tasting.tags,
-    ratingBand: tasting.ratingBand ?? undefined,
-  });
   const members: [TastingEntryMember, ...TastingEntryMember[]] = [
-    toMember(firstTasting),
-    ...remainingTastings.map(toMember),
+    getTastingEntryMember(firstTasting),
+    ...remainingTastings.map(getTastingEntryMember),
   ];
   return {
     id: activity.id,
@@ -188,9 +179,9 @@ function toActivityItem(activity: Activity): MemberActivityItem {
       authorHref: `/users/${activity.createdBy.username}`,
       date: <TimeSince date={activity.lastActivityAt} />,
       leading: (
-        <Avatar
-          imageUrl={activity.createdBy.pictureUrl}
-          initials={activity.createdBy.username.slice(0, 2).toUpperCase()}
+        <MemberAvatar
+          pictureUrl={activity.createdBy.pictureUrl}
+          username={activity.createdBy.username}
         />
       ),
       members,

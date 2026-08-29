@@ -1,24 +1,20 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import type { FormEvent, ReactNode } from "react";
-import { useId, useState } from "react";
+import type { ReactNode } from "react";
+import { useId } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
-import {
-  colors,
-  controlMetrics,
-  fonts,
-  space,
-} from "../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../styles/tokens.stylex";
 import {
   BottleIdentityRow,
   Button,
   ButtonLink,
   CursorPager,
   EmptyState,
-  FacetRow,
+  FacetGroup,
   FilterPanel,
+  FilterQuery,
   ListToolbar,
   LoadingList,
   RatingMeasure,
@@ -185,45 +181,17 @@ export function BottleCatalogFacets({
   selected,
   total,
 }: BottleCatalogFacetsProps) {
-  const id = useId();
-
   return (
     <div {...stylex.props(styles.facetGroups)}>
       {groups.map((group) => (
-        <section
-          aria-labelledby={`${id}-${group.name}`}
+        <FacetGroup
           key={group.name}
-          {...stylex.props(styles.facetGroup)}
-        >
-          <h3
-            id={`${id}-${group.name}`}
-            {...stylex.props(styles.filterHeading)}
-          >
-            {group.label}
-          </h3>
-          <div {...stylex.props(styles.facetRows)}>
-            {group.options.map((option) => {
-              const isSelected = selected[group.name] === option.value;
-              const rowProps = {
-                label: option.label,
-                onClick: () =>
-                  onChange(group.name, isSelected ? "" : option.value),
-                selected: isSelected,
-              };
-
-              return option.count === undefined || total === undefined ? (
-                <FacetRow {...rowProps} key={option.value} />
-              ) : (
-                <FacetRow
-                  {...rowProps}
-                  count={option.count}
-                  key={option.value}
-                  total={total}
-                />
-              );
-            })}
-          </div>
-        </section>
+          label={group.label}
+          onChange={(value) => onChange(group.name, value)}
+          options={group.options}
+          selected={selected[group.name]}
+          total={total}
+        />
       ))}
     </div>
   );
@@ -252,31 +220,16 @@ export function BottleCatalogFilters({
   query,
 }: BottleCatalogFiltersProps) {
   const id = useId();
-  const [queryDraft, setQueryDraft] = useState(query);
   const facetNames = new Set(facets?.groups.map((group) => group.name));
-
-  function submitQuery(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    onQuerySubmit(queryDraft);
-  }
 
   return (
     <FilterPanel ariaLabel="Bottle filters">
-      <form onSubmit={submitQuery} {...stylex.props(styles.queryForm)}>
-        <label htmlFor={`${id}-query`} {...stylex.props(styles.field)}>
-          <span {...stylex.props(styles.filterHeading)}>Find a bottle</span>
-          <TextInput
-            aria-label="Find a bottle"
-            id={`${id}-query`}
-            onChange={(event) => setQueryDraft(event.currentTarget.value)}
-            placeholder="Name, brand, or release"
-            value={queryDraft}
-          />
-        </label>
-        <Button size="sm" type="submit" variant="tonal">
-          Search
-        </Button>
-      </form>
+      <FilterQuery
+        label="Find a bottle"
+        onSubmit={onQuerySubmit}
+        placeholder="Name, brand, or release"
+        query={query}
+      />
       {facetNames.has("category") ? null : (
         <FilterSelect
           label="Category"
@@ -301,15 +254,7 @@ export function BottleCatalogFilters({
           />
         </label>
       )}
-      <Button
-        align="start"
-        onClick={() => {
-          setQueryDraft("");
-          onClear();
-        }}
-        size="sm"
-        variant="text"
-      >
+      <Button align="start" onClick={onClear} size="sm" variant="text">
         Clear filters
       </Button>
     </FilterPanel>
@@ -381,14 +326,6 @@ const styles = stylex.create({
       width: "104px",
     },
   },
-  queryForm: {
-    display: "flex",
-    alignItems: "flex-end",
-    gap: space.x2,
-    [NARROW]: {
-      gridColumn: "1 / -1",
-    },
-  },
   field: {
     display: "flex",
     minWidth: 0,
@@ -413,18 +350,6 @@ const styles = stylex.create({
     [NARROW]: {
       gridColumn: "1 / -1",
     },
-  },
-  facetGroup: {
-    minWidth: 0,
-  },
-  facetRows: {
-    marginTop: space.x2,
-    paddingTop: space.x1,
-    paddingRight: space.x1,
-    paddingBottom: space.x1,
-    paddingLeft: space.x1,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
   },
   loading: {
     marginTop: space.x6,

@@ -28,6 +28,13 @@ export const InteractionStates: Story = {
       <TextLink {...args} href="#pressed" id="text-link-pressed">
         Pressed
       </TextLink>
+      <p>
+        Body copy with an{" "}
+        <TextLink href="#inherited" size="inherit">
+          inherited-size link
+        </TextLink>
+        .
+      </p>
     </StoryStack>
   ),
   parameters: {

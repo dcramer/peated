@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { useORPC } from "../../../lib/orpc/context";
+import { publicHomeQueries } from "../../../lib/orpc/homeQueries";
 import { getEntityUrl } from "../../../lib/urls";
 import { space } from "../../../styles/tokens.stylex";
 import TimeSince from "../../timeSince";
@@ -25,16 +26,6 @@ import { PageColumns } from "../patterns/pageLayout.stylex";
 import { Search } from "./search.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
-
-export type PublicHomeInitialData = {
-  bottles?: Outputs["bottles"]["list"];
-  countries?: Outputs["countries"]["list"];
-  distilleries?: Outputs["distilleries"]["list"];
-  regions?: Outputs["regions"]["list"];
-  reviews?: Outputs["externalReviews"]["list"];
-  highestRated?: Outputs["bottles"]["list"];
-  stats?: Outputs["stats"];
-};
 
 const questions = [
   {
@@ -59,17 +50,10 @@ const questions = [
   },
 ] as const;
 
-export function PublicHome({
-  initialData,
-}: {
-  initialData?: PublicHomeInitialData;
-}) {
+export function PublicHome() {
   const orpc = useORPC();
   const router = useRouter();
-  const stats = useQuery({
-    ...orpc.stats.queryOptions(),
-    initialData: initialData?.stats,
-  });
+  const stats = useQuery(publicHomeQueries.stats(orpc));
   const totalBottles = stats.data?.bottles;
 
   return (
@@ -77,20 +61,14 @@ export function PublicHome({
       content={
         <>
           <div {...stylex.props(styles.ratingsGrid)}>
-            <HighestRated initialData={initialData?.highestRated} />
-            <RecentReviews initialData={initialData?.reviews} />
+            <HighestRated />
+            <RecentReviews />
           </div>
-          <Origins
-            initialCountryData={initialData?.countries}
-            initialRegionData={initialData?.regions}
-          />
+          <Origins />
           <PageColumns
             rail={
               <>
-                <RecentBottles
-                  initialData={initialData?.bottles}
-                  totalBottles={totalBottles}
-                />
+                <RecentBottles totalBottles={totalBottles} />
                 <HomeContributionPrompt
                   primaryAction={
                     <ButtonLink href="/register" size="sm" variant="accent">
@@ -108,7 +86,6 @@ export function PublicHome({
             railBehavior="stack"
           >
             <Distilleries
-              initialData={initialData?.distilleries}
               totalBlenders={stats.data?.blenders}
               totalBottlers={stats.data?.bottlers}
               totalBrands={stats.data?.brands}
@@ -142,18 +119,9 @@ export function PublicHome({
   );
 }
 
-function HighestRated({
-  initialData,
-}: {
-  initialData?: Outputs["bottles"]["list"];
-}) {
+function HighestRated() {
   const orpc = useORPC();
-  const bottles = useQuery({
-    ...orpc.bottles.list.queryOptions({
-      input: { limit: 5, minScore: 0, sort: "-score" },
-    }),
-    initialData,
-  });
+  const bottles = useQuery(publicHomeQueries.highestRated(orpc));
 
   if (bottles.isPending) {
     return (
@@ -197,18 +165,9 @@ function HighestRated({
   ) : null;
 }
 
-function RecentReviews({
-  initialData,
-}: {
-  initialData?: Outputs["externalReviews"]["list"];
-}) {
+function RecentReviews() {
   const orpc = useORPC();
-  const externalReviews = useQuery({
-    ...orpc.externalReviews.list.queryOptions({
-      input: { limit: 5, sort: "recent" },
-    }),
-    initialData,
-  });
+  const externalReviews = useQuery(publicHomeQueries.recentReviews(orpc));
 
   if (externalReviews.isPending) {
     return (
@@ -256,31 +215,10 @@ function RecentReviews({
   return items.length ? <HomeRecentReviews reviews={items} /> : null;
 }
 
-function Origins({
-  initialCountryData,
-  initialRegionData,
-}: {
-  initialCountryData?: Outputs["countries"]["list"];
-  initialRegionData?: Outputs["regions"]["list"];
-}) {
+function Origins() {
   const orpc = useORPC();
-  const countries = useQuery({
-    ...orpc.countries.list.queryOptions({
-      input: { hasBottles: true, limit: 100, sort: "-bottles" },
-    }),
-    initialData: initialCountryData,
-  });
-  const regions = useQuery({
-    ...orpc.regions.list.queryOptions({
-      input: {
-        country: "scotland",
-        hasBottles: true,
-        limit: 6,
-        sort: "-bottles",
-      },
-    }),
-    initialData: initialRegionData,
-  });
+  const countries = useQuery(publicHomeQueries.countries(orpc));
+  const regions = useQuery(publicHomeQueries.regions(orpc));
 
   if (countries.isPending || regions.isPending) {
     return (
@@ -342,25 +280,18 @@ function Origins({
 }
 
 function Distilleries({
-  initialData,
   totalBlenders,
   totalBottlers,
   totalBrands,
   totalDistilleries,
 }: {
-  initialData?: Outputs["distilleries"]["list"];
   totalBlenders?: number;
   totalBottlers?: number;
   totalBrands?: number;
   totalDistilleries?: number;
 }) {
   const orpc = useORPC();
-  const distilleries = useQuery({
-    ...orpc.distilleries.list.queryOptions({
-      input: { limit: 12, sort: "-bottles" },
-    }),
-    initialData,
-  });
+  const distilleries = useQuery(publicHomeQueries.distilleries(orpc));
 
   if (distilleries.isPending) {
     return (
@@ -427,20 +358,9 @@ function Distilleries({
   ) : null;
 }
 
-function RecentBottles({
-  initialData,
-  totalBottles,
-}: {
-  initialData?: Outputs["bottles"]["list"];
-  totalBottles?: number;
-}) {
+function RecentBottles({ totalBottles }: { totalBottles?: number }) {
   const orpc = useORPC();
-  const bottles = useQuery({
-    ...orpc.bottles.list.queryOptions({
-      input: { limit: 3, sort: "-created" },
-    }),
-    initialData,
-  });
+  const bottles = useQuery(publicHomeQueries.recentBottles(orpc));
 
   if (bottles.isPending) {
     return (

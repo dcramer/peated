@@ -4,6 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useQuery } from "@tanstack/react-query";
 
 import { useORPC } from "../../../lib/orpc/context";
+import { memberHomeQueries } from "../../../lib/orpc/homeQueries";
 import { LoadingList, SectionError } from "../components";
 import { FollowedReleaseList } from "../patterns/homeDiscovery.stylex";
 import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
@@ -20,11 +21,7 @@ function getBottleMetadata(bottle: Bottle) {
 
 export function HomeFollowedReleases() {
   const orpc = useORPC();
-  const releases = useQuery(
-    orpc.bottles.list.queryOptions({
-      input: { filter: "following", limit: 3, sort: "-release" },
-    }),
-  );
+  const releases = useQuery(memberHomeQueries.releases(orpc));
 
   if (releases.isPending) {
     return (

@@ -1,7 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import type { FocusEvent } from "react";
+import type { FocusEvent, ReactNode } from "react";
 import { useId, useMemo, useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
@@ -20,11 +20,14 @@ export type SearchPickerOption = {
   detail?: string;
   id: number | string;
   label: string;
+  selectedDetail?: string;
 };
 
 export type SearchPickerProps = {
+  createHint?: ReactNode;
   disabled?: boolean;
   emptyText?: string;
+  getCreateLabel?: (query: string) => ReactNode;
   help?: string;
   label: string;
   loading?: boolean;
@@ -47,9 +50,10 @@ export type SearchSelectProps = Omit<
 /** Selects one supplied record while the caller owns remote search. */
 export function SearchSelect({ onChange, value, ...props }: SearchSelectProps) {
   return (
-    <SearchPicker
+    <PickerControl
       {...props}
       onChange={(next) => onChange(next.at(-1) ?? null)}
+      selectionMode="single"
       value={value ? [value] : []}
     />
   );
@@ -57,8 +61,10 @@ export function SearchSelect({ onChange, value, ...props }: SearchSelectProps) {
 
 /** Selects several supplied records while the caller owns remote search. */
 export function SearchPicker({
+  createHint,
   disabled = false,
   emptyText = "No matches.",
+  getCreateLabel,
   help,
   label,
   loading = false,
@@ -69,6 +75,42 @@ export function SearchPicker({
   placeholder,
   value,
 }: SearchPickerProps) {
+  return (
+    <PickerControl
+      createHint={createHint}
+      disabled={disabled}
+      emptyText={emptyText}
+      getCreateLabel={getCreateLabel}
+      help={help}
+      label={label}
+      loading={loading}
+      onChange={onChange}
+      onCreate={onCreate}
+      onQueryChange={onQueryChange}
+      options={options}
+      placeholder={placeholder}
+      selectionMode="multiple"
+      value={value}
+    />
+  );
+}
+
+function PickerControl({
+  createHint,
+  disabled = false,
+  emptyText = "No matches.",
+  getCreateLabel,
+  help,
+  label,
+  loading = false,
+  onChange,
+  onCreate,
+  onQueryChange,
+  options,
+  placeholder,
+  selectionMode,
+  value,
+}: SearchPickerProps & { selectionMode: "multiple" | "single" }) {
   const generatedId = useId();
   const inputId = `${generatedId}-input`;
   const listboxId = `${generatedId}-listbox`;
@@ -119,12 +161,34 @@ export function SearchPicker({
   return (
     <div onBlur={handleBlur} {...stylex.props(styles.root)}>
       <label
-        htmlFor={inputId}
+        htmlFor={
+          selectionMode === "single" && value.length ? undefined : inputId
+        }
         {...stylex.props(foundationStyles.fieldLabel, styles.label)}
       >
         {label}
       </label>
-      {value.length ? (
+      {selectionMode === "single" && value[0] ? (
+        <div {...stylex.props(styles.selectedControl)}>
+          <span {...stylex.props(styles.selectedCopy)}>
+            <span {...stylex.props(styles.selectedName)}>{value[0].label}</span>
+            {(value[0].selectedDetail ?? value[0].detail) ? (
+              <span {...stylex.props(styles.selectedDetail)}>
+                {value[0].selectedDetail ?? value[0].detail}
+              </span>
+            ) : null}
+          </span>
+          <button
+            aria-label={`Clear ${value[0].label}`}
+            disabled={disabled}
+            onClick={() => onChange([])}
+            type="button"
+            {...stylex.props(styles.clearButton)}
+          >
+            ×
+          </button>
+        </div>
+      ) : value.length ? (
         <div
           aria-label={`Selected ${label}`}
           {...stylex.props(styles.selected)}
@@ -144,93 +208,102 @@ export function SearchPicker({
           ))}
         </div>
       ) : null}
-      <div {...stylex.props(styles.position)}>
-        <input
-          aria-activedescendant={
-            activeOption ? `${listboxId}-option-${activeIndex}` : undefined
-          }
-          aria-autocomplete="list"
-          aria-controls={listboxId}
-          aria-expanded={isOpen}
-          id={inputId}
-          onChange={(event) => {
-            if (disabled) return;
-            const nextQuery = event.currentTarget.value;
-            setQuery(nextQuery);
-            onQueryChange?.(nextQuery);
-            resetNavigation();
-            setIsOpen(true);
-          }}
-          onFocus={() => !disabled && setIsOpen(true)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          role="combobox"
-          type="search"
-          value={query}
-          disabled={disabled}
-          {...stylex.props(styles.input)}
-        />
-        {isOpen && !disabled ? (
-          <FloatingPanel {...stylex.props(styles.overlay)}>
-            <div
-              aria-label={`${label} results`}
-              id={listboxId}
-              role="listbox"
-              {...stylex.props(styles.results)}
-            >
-              {loading ? (
-                <p role="status" {...stylex.props(styles.empty)}>
-                  Searching…
-                </p>
-              ) : availableOptions.length ? (
-                availableOptions.map((option, index) => (
-                  <button
-                    aria-selected={index === activeIndex}
-                    id={`${listboxId}-option-${index}`}
-                    key={option.id}
-                    onClick={() => selectOption(option)}
-                    onMouseMove={() => setActiveIndex(index)}
-                    role="option"
-                    type="button"
-                    {...stylex.props(
-                      styles.result,
-                      index === activeIndex && styles.activeResult,
-                    )}
-                  >
-                    <span {...stylex.props(styles.resultLabel)}>
-                      {option.label}
-                    </span>
-                    {option.detail ? (
-                      <span {...stylex.props(styles.detail)}>
-                        {option.detail}
-                      </span>
-                    ) : null}
-                  </button>
-                ))
-              ) : (
-                <p role="status" {...stylex.props(styles.empty)}>
-                  {emptyText}
-                </p>
-              )}
-            </div>
-            {onCreate && trimmedQuery ? (
-              <button
-                onClick={() => {
-                  onCreate(trimmedQuery);
-                  setQuery("");
-                  onQueryChange?.("");
-                  resetNavigation();
-                  setIsOpen(false);
-                }}
-                type="button"
-                {...stylex.props(styles.createAction)}
+      {selectionMode === "single" && value.length ? null : (
+        <div {...stylex.props(styles.position)}>
+          <input
+            aria-activedescendant={
+              activeOption ? `${listboxId}-option-${activeIndex}` : undefined
+            }
+            aria-autocomplete="list"
+            aria-controls={listboxId}
+            aria-expanded={isOpen}
+            id={inputId}
+            onChange={(event) => {
+              if (disabled) return;
+              const nextQuery = event.currentTarget.value;
+              setQuery(nextQuery);
+              onQueryChange?.(nextQuery);
+              resetNavigation();
+              setIsOpen(true);
+            }}
+            onFocus={() => !disabled && setIsOpen(true)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            role="combobox"
+            type="search"
+            value={query}
+            disabled={disabled}
+            {...stylex.props(styles.input)}
+          />
+          {isOpen && !disabled ? (
+            <FloatingPanel {...stylex.props(styles.overlay)}>
+              <div
+                aria-label={`${label} results`}
+                id={listboxId}
+                role="listbox"
+                {...stylex.props(styles.results)}
               >
-                Add “{trimmedQuery}”
-              </button>
-            ) : null}
-          </FloatingPanel>
-        ) : null}
-      </div>
+                {loading ? (
+                  <p role="status" {...stylex.props(styles.empty)}>
+                    Searching…
+                  </p>
+                ) : availableOptions.length ? (
+                  availableOptions.map((option, index) => (
+                    <button
+                      aria-selected={index === activeIndex}
+                      id={`${listboxId}-option-${index}`}
+                      key={option.id}
+                      onClick={() => selectOption(option)}
+                      onMouseMove={() => setActiveIndex(index)}
+                      role="option"
+                      type="button"
+                      {...stylex.props(
+                        styles.result,
+                        index === activeIndex && styles.activeResult,
+                      )}
+                    >
+                      <span {...stylex.props(styles.resultLabel)}>
+                        {option.label}
+                      </span>
+                      {option.detail ? (
+                        <span {...stylex.props(styles.detail)}>
+                          {option.detail}
+                        </span>
+                      ) : null}
+                    </button>
+                  ))
+                ) : (
+                  <p role="status" {...stylex.props(styles.empty)}>
+                    {emptyText}
+                  </p>
+                )}
+              </div>
+              {onCreate && trimmedQuery ? (
+                <button
+                  onClick={() => {
+                    onCreate(trimmedQuery);
+                    setQuery("");
+                    onQueryChange?.("");
+                    resetNavigation();
+                    setIsOpen(false);
+                  }}
+                  type="button"
+                  {...stylex.props(styles.createAction)}
+                >
+                  <span>
+                    {getCreateLabel?.(trimmedQuery) ?? `Add “${trimmedQuery}”`}
+                  </span>
+                  {createHint ? (
+                    <span {...stylex.props(styles.createHint)}>
+                      {createHint}
+                    </span>
+                  ) : null}
+                </button>
+              ) : null}
+            </FloatingPanel>
+          ) : null}
+        </div>
+      )}
       {help ? (
         <p {...stylex.props(foundationStyles.metadata, styles.help)}>{help}</p>
       ) : null}
@@ -249,6 +322,67 @@ const styles = stylex.create({
   },
   label: { color: colors.inkMuted },
   selected: { display: "flex", gap: space.x2, flexWrap: "wrap" },
+  selectedControl: {
+    display: "flex",
+    width: "100%",
+    minWidth: 0,
+    minHeight: controlMetrics.controlHeight,
+    alignItems: "center",
+    gap: space.x2,
+    paddingLeft: "14px",
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.inset,
+  },
+  selectedCopy: {
+    display: "flex",
+    minWidth: 0,
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+  },
+  selectedName: {
+    overflow: "hidden",
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    fontWeight: 600,
+    lineHeight: 1.25,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  selectedDetail: {
+    overflow: "hidden",
+    marginTop: "2px",
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    lineHeight: 1.2,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  clearButton: {
+    width: controlMetrics.controlHeight,
+    height: controlMetrics.controlHeight,
+    flexShrink: 0,
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: controlMetrics.radius,
+    outline: "none",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.surface,
+      ":active": colors.surface,
+    },
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "20px",
+    lineHeight: 1,
+    cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+  },
   position: { position: "relative" },
   input: {
     boxSizing: "border-box",
@@ -316,8 +450,11 @@ const styles = stylex.create({
   },
   createAction: {
     boxSizing: "border-box",
-    display: "block",
+    display: "flex",
     width: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x3,
     padding: space.x3,
     borderWidth: 0,
     borderTopWidth: "1px",
@@ -330,6 +467,16 @@ const styles = stylex.create({
     fontWeight: 700,
     textAlign: "left",
     cursor: "pointer",
+  },
+  createHint: {
+    flexShrink: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    fontWeight: 500,
+    letterSpacing: "0.06em",
+    lineHeight: 1.2,
+    textTransform: "uppercase",
   },
   help: { margin: 0, color: colors.inkMuted },
 });

@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { useTransition } from "react";
 import useAuth from "../../../hooks/useAuth";
 import { logout } from "../../../lib/auth.actions";
-import { ApplicationHeader, Avatar, ButtonLink } from "../components";
+import { ApplicationHeader, ButtonLink, MemberAvatar } from "../components";
 import { PageFrame } from "../patterns/pageLayout.stylex";
 import { ApplicationFooter } from "./applicationFooter.stylex";
 import { Search } from "./search.stylex";
@@ -31,11 +31,7 @@ function AccountVisual({
 }) {
   if (username) {
     return (
-      <Avatar
-        imageUrl={pictureUrl}
-        initials={username.slice(0, 2).toLocaleUpperCase()}
-        size="xs"
-      />
+      <MemberAvatar pictureUrl={pictureUrl} size="xs" username={username} />
     );
   }
 

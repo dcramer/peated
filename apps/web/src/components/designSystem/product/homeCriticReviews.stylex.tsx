@@ -4,6 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useQuery } from "@tanstack/react-query";
 
 import { useORPC } from "../../../lib/orpc/context";
+import { memberHomeQueries } from "../../../lib/orpc/homeQueries";
 import TimeSince from "../../timeSince";
 import { LoadingList, SectionError } from "../components";
 import { CriticReviewCards } from "../patterns/homeDiscovery.stylex";
@@ -23,11 +24,7 @@ function getBottleMetadata(bottle: Bottle) {
 
 export function HomeCriticReviews() {
   const orpc = useORPC();
-  const externalReviews = useQuery(
-    orpc.externalReviews.list.queryOptions({
-      input: { limit: 2, sort: "recent" },
-    }),
-  );
+  const externalReviews = useQuery(memberHomeQueries.criticReviews(orpc));
 
   if (externalReviews.isPending) {
     return (

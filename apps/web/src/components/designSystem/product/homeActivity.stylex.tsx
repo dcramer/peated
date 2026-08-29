@@ -1,26 +1,24 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
-import {
-  useInfiniteQuery,
-  type InfiniteData,
-  type QueryKey,
-} from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Fragment, useEffect } from "react";
 import { useEventListener } from "usehooks-ts";
 
+import { getBottleMetadata } from "../../../lib/bottleMetadata";
 import { useORPC } from "../../../lib/orpc/context";
+import { memberHomeQueries } from "../../../lib/orpc/homeQueries";
 import { colors } from "../../../styles/tokens.stylex";
+import { getTastingEntryMember } from "../../tastingRecordEntry";
 import TimeSince from "../../timeSince";
 import {
-  Avatar,
   ButtonLink,
   EmptyState,
   ItemList,
   ItemRow,
   LoadingList,
+  MemberAvatar,
   SectionError,
   TastingEntry,
   type TastingEntryMember,
@@ -31,54 +29,13 @@ type ActivityResult = ActivityList["results"][number];
 type TastingSession = Extract<ActivityResult, { type: "tasting_session" }>;
 type CollectionActivity = Extract<ActivityResult, { type: "collection_add" }>;
 
-function getBottleMetadata(
-  bottle: TastingSession["tastings"][number]["bottle"],
-) {
-  return [
-    formatCategoryName(bottle.category),
-    bottle.statedAge === null ? null : `${bottle.statedAge} years`,
-    bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
-}
-
-function getTastingMember(
-  tasting: TastingSession["tastings"][number],
-): TastingEntryMember {
-  return {
-    description: tasting.notes,
-    href: `/bottles/${tasting.bottle.id}`,
-    metadata: getBottleMetadata(tasting.bottle),
-    name: tasting.bottle.fullName,
-    notes: tasting.tags,
-    ratingBand: tasting.ratingBand ?? undefined,
-  };
-}
-
-function UserVisual({
-  pictureUrl,
-  username,
-}: {
-  pictureUrl: string | null;
-  username: string;
-}) {
-  return (
-    <Avatar
-      imageUrl={pictureUrl}
-      initials={username.slice(0, 2).toLocaleUpperCase()}
-      size="sm"
-    />
-  );
-}
-
 function TastingActivity({ session }: { session: TastingSession }) {
   const [firstTasting, ...otherTastings] = session.tastings;
   if (!firstTasting) return null;
 
   const members: [TastingEntryMember, ...TastingEntryMember[]] = [
-    getTastingMember(firstTasting),
-    ...otherTastings.map(getTastingMember),
+    getTastingEntryMember(firstTasting),
+    ...otherTastings.map(getTastingEntryMember),
   ];
 
   return (
@@ -92,8 +49,9 @@ function TastingActivity({ session }: { session: TastingSession }) {
       }
       date={<TimeSince date={session.lastActivityAt} />}
       leading={
-        <UserVisual
+        <MemberAvatar
           pictureUrl={session.createdBy.pictureUrl}
+          size="sm"
           username={session.createdBy.username}
         />
       }
@@ -118,8 +76,9 @@ function CollectionActivityItem({
   return (
     <div {...stylex.props(styles.collection)}>
       <div {...stylex.props(styles.collectionHeader)}>
-        <UserVisual
+        <MemberAvatar
           pictureUrl={activity.createdBy.pictureUrl}
+          size="sm"
           username={activity.createdBy.username}
         />
         <div {...stylex.props(styles.collectionCopy)}>
@@ -179,9 +138,6 @@ export function HomeActivity({
   initialData?: ActivityList;
 }) {
   const orpc = useORPC();
-  // The activity cursor belongs to each fetched page, so the first page has no
-  // cursor. ORPC does not expose an infinite query helper for this route.
-  /* oxlint-disable @tanstack/query/prefer-query-options */
   const {
     data,
     error,
@@ -191,29 +147,13 @@ export function HomeActivity({
     isFetchingNextPage,
     isPending,
     refetch,
-  } = useInfiniteQuery<
-    ActivityList,
-    Error,
-    InfiniteData<ActivityList>,
-    QueryKey,
-    string | undefined
-  >({
-    queryKey: orpc.activity.list.key({
-      input: { filter, limit: 10 },
-    }),
-    queryFn: ({ pageParam }) =>
-      orpc.activity.list.call({
-        cursor: pageParam,
-        filter,
-        limit: 10,
-      }),
+  } = useInfiniteQuery({
+    ...memberHomeQueries.activity(orpc, filter),
     initialPageParam: undefined,
     initialData: initialData
       ? { pages: [initialData], pageParams: [undefined] }
       : undefined,
-    getNextPageParam: (lastPage) => lastPage.rel.nextCursor ?? undefined,
   });
-  /* oxlint-enable @tanstack/query/prefer-query-options */
 
   const results = filterFavoriteActivity(
     data?.pages.flatMap((page) => page.results) ?? [],

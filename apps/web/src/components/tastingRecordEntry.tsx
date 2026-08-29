@@ -1,14 +1,37 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 import {
+  MemberAvatar,
   TastingEntry,
   type TastingEntryMember,
 } from "@peated/web/components/designSystem/components";
-import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import TimeSince from "@peated/web/components/timeSince";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import {
+  getBottleMetadata,
+  type BottleMetadata,
+} from "@peated/web/lib/bottleMetadata";
 
 type Tasting = Outputs["tastings"]["list"]["results"][number];
+
+type TastingEntryRecord = {
+  bottle: BottleMetadata & { fullName: string; id: number };
+  notes?: string | null;
+  ratingBand?: TastingEntryMember["ratingBand"] | null;
+  tags?: readonly string[] | null;
+};
+
+export function getTastingEntryMember(
+  tasting: TastingEntryRecord,
+): TastingEntryMember {
+  return {
+    description: tasting.notes,
+    href: `/bottles/${tasting.bottle.id}`,
+    metadata: getBottleMetadata(tasting.bottle),
+    name: tasting.bottle.fullName,
+    notes: tasting.tags ?? undefined,
+    ratingBand: tasting.ratingBand ?? undefined,
+  };
+}
 
 export function TastingRecordEntry({
   showAvatar = true,
@@ -17,15 +40,6 @@ export function TastingRecordEntry({
   showAvatar?: boolean;
   tasting: Tasting;
 }) {
-  const member: TastingEntryMember = {
-    description: tasting.notes,
-    href: `/bottles/${tasting.bottle.id}`,
-    metadata: getBottleMetadata(tasting.bottle),
-    name: tasting.bottle.fullName,
-    notes: tasting.tags,
-    ratingBand: tasting.ratingBand ?? undefined,
-  };
-
   return (
     <TastingEntry
       author={tasting.createdBy.username}
@@ -33,15 +47,13 @@ export function TastingRecordEntry({
       date={<TimeSince date={tasting.createdAt} />}
       leading={
         showAvatar ? (
-          <Avatar
-            imageUrl={tasting.createdBy.pictureUrl}
-            initials={tasting.createdBy.username
-              .slice(0, 2)
-              .toLocaleUpperCase()}
+          <MemberAvatar
+            pictureUrl={tasting.createdBy.pictureUrl}
+            username={tasting.createdBy.username}
           />
         ) : undefined
       }
-      members={[member]}
+      members={[getTastingEntryMember(tasting)]}
     />
   );
 }

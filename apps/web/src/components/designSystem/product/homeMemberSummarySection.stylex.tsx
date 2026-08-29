@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { useORPC } from "../../../lib/orpc/context";
+import { memberHomeQueries } from "../../../lib/orpc/homeQueries";
 import { LoadingList, SectionError } from "../components";
 import {
   HomeMemberSummary,
@@ -11,12 +12,8 @@ import {
 
 export function HomeMemberSummarySection() {
   const orpc = useORPC();
-  const details = useQuery(
-    orpc.users.details.queryOptions({ input: { user: "me" } }),
-  );
-  const tastingStats = useQuery(
-    orpc.users.tastingStats.queryOptions({ input: { user: "me" } }),
-  );
+  const details = useQuery(memberHomeQueries.member(orpc));
+  const tastingStats = useQuery(memberHomeQueries.tastingStats(orpc));
 
   if (details.isPending || tastingStats.isPending) {
     return (

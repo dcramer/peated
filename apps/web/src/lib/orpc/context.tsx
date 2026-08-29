@@ -3,7 +3,7 @@ import type { RouterUtils } from "@orpc/tanstack-query";
 import { type Router } from "@peated/server/orpc/router";
 import { createContext, use } from "react";
 
-type ORPCQueryUtils = RouterUtils<RouterClient<Router>>;
+export type ORPCQueryUtils = RouterUtils<RouterClient<Router>>;
 
 export const ORPCContext = createContext<ORPCQueryUtils | undefined>(undefined);
 

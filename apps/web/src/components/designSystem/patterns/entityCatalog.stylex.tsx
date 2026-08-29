@@ -1,33 +1,25 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import type { FormEvent } from "react";
-import { useId, useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
-import {
-  colors,
-  controlMetrics,
-  fonts,
-  space,
-} from "../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../styles/tokens.stylex";
 import {
   Button,
   ButtonLink,
   CursorPager,
   EmptyState,
-  FacetRow,
+  FacetGroup,
   FilterPanel,
+  FilterQuery,
   ItemList,
   ItemRow,
   ListToolbar,
   LoadingList,
-  TextInput,
   type ListSortOption,
 } from "../components";
 
 const COMPACT = "@media (max-width: 639px)";
-const NARROW = "@media (max-width: 759px)";
 
 export type EntityCatalogItem = {
   href: string;
@@ -162,67 +154,29 @@ export function EntityCatalogFilters({
   query,
   region,
 }: EntityCatalogFiltersProps) {
-  const id = useId();
-  const [queryDraft, setQueryDraft] = useState(query);
-
-  function submitQuery(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    onQuerySubmit(queryDraft.trim());
-  }
-
   return (
     <FilterPanel ariaLabel="Entity filters">
-      <form onSubmit={submitQuery} {...stylex.props(styles.queryForm)}>
-        <label htmlFor={`${id}-query`} {...stylex.props(styles.field)}>
-          <span {...stylex.props(styles.filterHeading)}>Find a record</span>
-          <TextInput
-            aria-label="Find a record"
-            id={`${id}-query`}
-            onChange={(event) => setQueryDraft(event.currentTarget.value)}
-            placeholder="Name"
-            value={queryDraft}
-          />
-        </label>
-        <Button size="sm" type="submit" variant="tonal">
-          Search
-        </Button>
-      </form>
-      <section aria-labelledby={`${id}-country`}>
-        <h3 id={`${id}-country`} {...stylex.props(styles.filterHeading)}>
-          Country
-        </h3>
-        <div {...stylex.props(styles.facetRows)}>
-          {countries.map((option) => (
-            <FacetRow
-              key={option.value}
-              label={option.label}
-              onClick={() =>
-                onCountryChange(country === option.value ? "" : option.value)
-              }
-              selected={country === option.value}
-            />
-          ))}
-        </div>
-      </section>
+      <FilterQuery
+        label="Find a record"
+        onSubmit={onQuerySubmit}
+        placeholder="Name"
+        query={query}
+      />
+      <FacetGroup
+        label="Country"
+        onChange={onCountryChange}
+        options={countries}
+        selected={country}
+      />
       {region && onRegionClear ? (
-        <section aria-labelledby={`${id}-region`}>
-          <h3 id={`${id}-region`} {...stylex.props(styles.filterHeading)}>
-            Region
-          </h3>
-          <div {...stylex.props(styles.facetRows)}>
-            <FacetRow label={region} onClick={onRegionClear} selected />
-          </div>
-        </section>
+        <FacetGroup
+          label="Region"
+          onChange={onRegionClear}
+          options={[{ label: region, value: region }]}
+          selected={region}
+        />
       ) : null}
-      <Button
-        align="start"
-        onClick={() => {
-          setQueryDraft("");
-          onClear();
-        }}
-        size="sm"
-        variant="text"
-      >
+      <Button align="start" onClick={onClear} size="sm" variant="text">
         Clear filters
       </Button>
     </FilterPanel>
@@ -288,40 +242,6 @@ const styles = stylex.create({
     [COMPACT]: {
       display: "none",
     },
-  },
-  queryForm: {
-    display: "flex",
-    alignItems: "flex-end",
-    gap: space.x2,
-    [NARROW]: {
-      gridColumn: "1 / -1",
-    },
-  },
-  field: {
-    display: "flex",
-    minWidth: 0,
-    flex: 1,
-    flexDirection: "column",
-    gap: space.x2,
-  },
-  filterHeading: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
-  facetRows: {
-    marginTop: space.x2,
-    paddingTop: space.x1,
-    paddingRight: space.x1,
-    paddingBottom: space.x1,
-    paddingLeft: space.x1,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
   },
   loading: {
     marginTop: space.x6,

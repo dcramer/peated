@@ -8,7 +8,12 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { SectionHeading, SkipLink } from "../components";
+import {
+  PageTabs,
+  SectionHeading,
+  SkipLink,
+  type PageTabItem,
+} from "../components";
 
 const NARROW = "@media (max-width: 759px)";
 const MOBILE = "@media (max-width: 559px)";
@@ -99,6 +104,34 @@ export function PageHeader({
         ) : null}
       </div>
     </header>
+  );
+}
+
+export function TabbedPage({
+  children,
+  currentHref,
+  header,
+  tabs,
+  tabsLabel,
+}: {
+  children: ReactNode;
+  currentHref: string;
+  header: ReactNode;
+  tabs: readonly [PageTabItem, ...PageTabItem[]];
+  tabsLabel: string;
+}) {
+  return (
+    <div {...stylex.props(styles.tabbedPage)}>
+      {header}
+      <div {...stylex.props(styles.pageTabs)}>
+        <PageTabs
+          ariaLabel={tabsLabel}
+          currentHref={currentHref}
+          items={tabs}
+        />
+      </div>
+      <div {...stylex.props(styles.pageTabContent)}>{children}</div>
+    </div>
   );
 }
 
@@ -257,6 +290,15 @@ const styles = stylex.create({
     alignItems: "center",
     gap: space.x2,
     flexWrap: "wrap",
+  },
+  tabbedPage: {
+    minWidth: 0,
+  },
+  pageTabs: {
+    marginTop: space.x6,
+  },
+  pageTabContent: {
+    marginTop: space.x4,
   },
   section: {
     display: "flex",

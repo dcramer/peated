@@ -12,12 +12,12 @@ import {
   Field,
   ItemList,
   ItemRow,
+  MemberAvatar,
   RowMenu,
   SectionError,
   Textarea,
   ValidationMessage,
 } from "@peated/web/components/designSystem/components";
-import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -139,11 +139,9 @@ export function TastingComments({
                 href={`/users/${item.createdBy.username}`}
                 key={item.id}
                 leading={
-                  <Avatar
-                    imageUrl={item.createdBy.pictureUrl}
-                    initials={item.createdBy.username
-                      .slice(0, 2)
-                      .toLocaleUpperCase()}
+                  <MemberAvatar
+                    pictureUrl={item.createdBy.pictureUrl}
+                    username={item.createdBy.username}
                   />
                 }
                 metadata={<TimeSince date={item.createdAt} />}

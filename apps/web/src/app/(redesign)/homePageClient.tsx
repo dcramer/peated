@@ -7,24 +7,17 @@ import { HomeActivity } from "@peated/web/components/designSystem/product/homeAc
 import { HomeCriticReviews } from "@peated/web/components/designSystem/product/homeCriticReviews.stylex";
 import { HomeFollowedReleases } from "@peated/web/components/designSystem/product/homeFollowedReleases.stylex";
 import { HomeMemberSummarySection } from "@peated/web/components/designSystem/product/homeMemberSummarySection.stylex";
-import {
-  PublicHome,
-  type PublicHomeInitialData,
-} from "@peated/web/components/designSystem/product/publicHome.stylex";
+import { PublicHome } from "@peated/web/components/designSystem/product/publicHome.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 
 type HomeFeed = "friends" | "global";
 
-export function HomePageClient({
-  publicHomeInitialData,
-}: {
-  publicHomeInitialData?: PublicHomeInitialData;
-}) {
+export function HomePageClient() {
   const { user } = useAuth();
   const [feed, setFeed] = useState<HomeFeed>("friends");
 
   if (!user) {
-    return <PublicHome initialData={publicHomeInitialData} />;
+    return <PublicHome />;
   }
 
   return (

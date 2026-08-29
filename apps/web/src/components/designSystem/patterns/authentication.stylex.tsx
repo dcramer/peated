@@ -9,6 +9,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { TextLink, type TextLinkProps } from "../components";
 
 const NARROW = "@media (max-width: 759px)";
 const DARK = "@media (prefers-color-scheme: dark)";
@@ -140,13 +141,10 @@ export function AuthenticationDivider({ label }: { label?: string }) {
   );
 }
 
-type AuthenticationLinkProps = Omit<
-  ComponentProps<typeof NextLink>,
-  "className" | "style"
->;
+type AuthenticationLinkProps = TextLinkProps;
 
 export function AuthenticationLink(props: AuthenticationLinkProps) {
-  return <NextLink {...props} {...stylex.props(styles.link)} />;
+  return <TextLink {...props} size="inherit" />;
 }
 
 export function AuthenticationTextButton({
@@ -431,15 +429,6 @@ const styles = stylex.create({
     letterSpacing: "0.1em",
     lineHeight: 1.3,
     textTransform: "uppercase",
-  },
-  link: {
-    color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontWeight: 600,
-    textDecoration: "none",
-    ":hover": {
-      color: colors.accent,
-    },
   },
   textButton: {
     margin: 0,

@@ -101,7 +101,7 @@ function CompactSelect({
 export type CursorPagerProps = {
   ariaLabel?: string;
   nextHref?: string;
-  page: number;
+  page?: number;
   previousHref?: string;
 };
 
@@ -116,7 +116,12 @@ export function CursorPager({
 
   return (
     <nav aria-label={ariaLabel} {...stylex.props(styles.pagination)}>
-      <div {...stylex.props(styles.paginationLinks)}>
+      <div
+        {...stylex.props(
+          styles.paginationLinks,
+          page === undefined && styles.paginationLinksWithoutPage,
+        )}
+      >
         {previousHref ? (
           <ButtonLink href={previousHref} rel="prev" size="sm" variant="tonal">
             ← Previous
@@ -128,7 +133,9 @@ export function CursorPager({
           </ButtonLink>
         ) : null}
       </div>
-      <span {...stylex.props(styles.pageNumber)}>Page {page}</span>
+      {page !== undefined ? (
+        <span {...stylex.props(styles.pageNumber)}>Page {page}</span>
+      ) : null}
     </nav>
   );
 }
@@ -283,6 +290,10 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     gap: space.x2,
+  },
+  paginationLinksWithoutPage: {
+    width: "100%",
+    justifyContent: "space-between",
   },
   pageNumber: {
     color: colors.inkMuted,

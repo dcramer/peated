@@ -1,7 +1,7 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 
-type BottleMetadata = Pick<
+export type BottleMetadata = Pick<
   Bottle,
   "abv" | "category" | "noAgeStatement" | "statedAge"
 >;

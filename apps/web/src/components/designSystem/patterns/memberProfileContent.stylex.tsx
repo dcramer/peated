@@ -1,7 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { useRef, type FormEvent, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import {
   colors,
@@ -15,7 +15,8 @@ import {
   Chip,
   CursorPager,
   EmptyState,
-  FacetRow,
+  FacetGroup,
+  FilterQuery,
   RowMenu,
   TastingEntry,
   type BottleIdentityRowProps,
@@ -129,71 +130,28 @@ export function MemberLibraryFilters({
   query: string;
   total?: number;
 }) {
-  const queryInputRef = useRef<HTMLInputElement>(null);
   const hasFilters = Boolean(
     query ||
     groups.some((group) => group.filters.some((filter) => filter.selected)),
   );
   const content = (
     <div {...stylex.props(styles.filterContent)}>
-      <form
-        onSubmit={(event: FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          onQuerySubmit(queryInputRef.current?.value.trim() ?? "");
-        }}
-        role="search"
-        {...stylex.props(styles.searchForm)}
-      >
-        <label
-          htmlFor={`library-query-${mode}`}
-          {...stylex.props(styles.filterHeading)}
-        >
-          Find in this library
-        </label>
-        <div {...stylex.props(styles.searchRow)}>
-          <input
-            defaultValue={query}
-            id={`library-query-${mode}`}
-            key={query}
-            name="query"
-            placeholder="Bottle or brand"
-            ref={queryInputRef}
-            type="search"
-            {...stylex.props(styles.searchInput)}
-          />
-          <Button size="sm" type="submit" variant="tonal">
-            Find
-          </Button>
-        </div>
-      </form>
+      <FilterQuery
+        label="Find in this library"
+        onSubmit={onQuerySubmit}
+        placeholder="Bottle or brand"
+        query={query}
+        submitLabel="Find"
+      />
       {groups.map((group) => (
-        <section
-          aria-label={group.label}
+        <FacetGroup
           key={group.name}
-          {...stylex.props(styles.filterGroup)}
-        >
-          <h3 {...stylex.props(styles.filterHeading)}>{group.label}</h3>
-          <div {...stylex.props(styles.facetList)}>
-            {group.filters.map((filter) => {
-              const props = {
-                label: filter.label,
-                onClick: () =>
-                  onChange(group.name, filter.selected ? "" : filter.value),
-                selected: filter.selected,
-              };
-              return filter.count === undefined || total === undefined ? (
-                <FacetRow {...props} key={filter.value} />
-              ) : (
-                <FacetRow
-                  {...props}
-                  count={filter.count}
-                  key={filter.value}
-                  total={total}
-                />
-              );
-            })}
-          </div>
-        </section>
+          label={group.label}
+          onChange={(value) => onChange(group.name, value)}
+          options={group.filters}
+          selected={group.filters.find((filter) => filter.selected)?.value}
+          total={total}
+        />
       ))}
       {hasFilters ? (
         <Button onClick={onClear} size="sm" variant="text">
@@ -324,39 +282,6 @@ const styles = stylex.create({
   },
   libraryEnd: { display: "flex", alignItems: "center", gap: space.x2 },
   filterContent: { display: "flex", flexDirection: "column", gap: space.x6 },
-  searchForm: { display: "flex", flexDirection: "column", gap: space.x2 },
-  searchRow: { display: "flex", gap: space.x2 },
-  searchInput: {
-    boxSizing: "border-box",
-    width: "100%",
-    minWidth: 0,
-    height: controlMetrics.controlHeightSmall,
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderWidth: 0,
-    borderRadius: controlMetrics.radius,
-    outline: "none",
-    backgroundColor: colors.inset,
-    color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-  },
-  filterGroup: { display: "flex", flexDirection: "column", gap: space.x1 },
-  filterHeading: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
-  facetList: {
-    padding: space.x1,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
-  },
   railFilters: { display: "block", [NARROW]: { display: "none" } },
   mobileFilters: {
     display: "none",

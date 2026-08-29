@@ -4,9 +4,10 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { PageTabs } from "@peated/web/components/designSystem/components";
-import { PageHeader } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
-import { space } from "../../../styles/tokens.stylex";
+import {
+  PageHeader,
+  TabbedPage,
+} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 
 const tabs = [
   { href: "/activity/friends", label: "Friends" },
@@ -19,21 +20,18 @@ export function ActivityPageFrame({ children }: { children: ReactNode }) {
 
   return (
     <div {...stylex.props(styles.page)}>
-      <PageHeader eyebrow="Community" title="Activity" />
-      <div {...stylex.props(styles.tabs)}>
-        <PageTabs
-          ariaLabel="Activity feeds"
-          currentHref={pathname}
-          items={tabs}
-        />
-      </div>
-      <div {...stylex.props(styles.feed)}>{children}</div>
+      <TabbedPage
+        currentHref={pathname}
+        header={<PageHeader eyebrow="Community" title="Activity" />}
+        tabs={tabs}
+        tabsLabel="Activity feeds"
+      >
+        {children}
+      </TabbedPage>
     </div>
   );
 }
 
 const styles = stylex.create({
   page: { minWidth: 0, maxWidth: "900px" },
-  tabs: { marginTop: space.x6 },
-  feed: { marginTop: space.x4 },
 });
