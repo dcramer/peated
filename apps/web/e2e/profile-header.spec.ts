@@ -15,8 +15,10 @@ test("refreshes the profile after an administrator changes the moderator role", 
   await page.goto(`/users/${testUser.username}/activity`, {
     waitUntil: "commit",
   });
-  await page.getByRole("button", { name: "Manage user" }).click();
-  await page.getByRole("menuitem", { name: "Add Moderator Role" }).click();
+  await page
+    .getByRole("button", { name: `Actions for ${testUser.username}` })
+    .click();
+  await page.getByRole("menuitem", { name: "Add moderator role" }).click();
 
   const moderatorRole = page
     .getByRole("main")

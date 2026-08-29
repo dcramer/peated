@@ -464,6 +464,7 @@ export default function BottleForm({
           ) : null}
           <FormSection title="Identity">
             <EntityPicker
+              error={errors.brand?.message}
               help="The main label the bottle is sold under."
               kind="brand"
               loading={brandResults.isFetching}
@@ -498,6 +499,7 @@ export default function BottleForm({
                 entityPickerOption,
               )}
               placeholder="Laphroaig"
+              required
               value={brand}
             />
             <Field

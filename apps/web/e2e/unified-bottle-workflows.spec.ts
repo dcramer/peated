@@ -7,6 +7,7 @@ import {
   createdBottleName,
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
+  existingBottle,
   existingBottleId,
   testAccessToken,
   testBrand,
@@ -164,13 +165,13 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("heading", { name: "Add a Similar Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle Name", { exact: true })).toHaveValue(
+    await expect(page.getByLabel("Bottle name", { exact: true })).toHaveValue(
       createdBottleName,
     );
     await expect(
       page.getByText(testBrand.name, { exact: true }).first(),
     ).toBeVisible();
-    await expect(page.getByLabel("Age Statement")).toHaveValue(
+    await expect(page.getByLabel("Age statement")).toHaveValue(
       String(anotherReleaseSourceBottle.statedAge),
     );
     await expect(page.getByLabel("Edition or batch")).toHaveValue(
@@ -225,10 +226,10 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("heading", { name: "Edit Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle Name", { exact: true })).toHaveValue(
+    await expect(page.getByLabel("Bottle name", { exact: true })).toHaveValue(
       unifiedBottleEditContext.shared.name,
     );
-    await expect(page.getByLabel("Age Statement")).toHaveValue(
+    await expect(page.getByLabel("Age statement")).toHaveValue(
       String(unifiedBottleEditContext.exact.statedAge),
     );
     await expect(page.getByLabel("Shared Stated Age")).toHaveCount(0);
@@ -257,8 +258,8 @@ test.describe("unified Bottle workflows", () => {
 
     await page.getByLabel("Edition or batch").fill("Cask 43");
     await expect(page.getByLabel("Edition or batch")).toHaveValue("Cask 43");
-    await page.getByLabel("Age Statement").fill("22");
-    await expect(page.getByLabel("Age Statement")).toHaveValue("22");
+    await page.getByLabel("Age statement").fill("22");
+    await expect(page.getByLabel("Age statement")).toHaveValue("22");
 
     const updateRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottles/update"),
@@ -286,19 +287,26 @@ test.describe("unified Bottle workflows", () => {
       page.getByRole("heading", { name: "Merge Bottle" }),
     ).toBeVisible();
 
-    await page.getByText("Other Bottle", { exact: true }).click();
+    const otherBottle = page.getByRole("combobox", { name: "Other bottle" });
+    await otherBottle.fill(exactMergeOtherBottle.fullName);
     await page
-      .getByRole("button", {
-        name: `${exactMergeOtherBottle.fullName} · Bottle ${exactMergeOtherBottleId}`,
+      .getByRole("option", {
+        name: new RegExp(exactMergeOtherBottle.fullName),
       })
       .click();
 
-    const retireCurrent = `Retire “${exactMergeOtherBottle.fullName}” (Bottle ${existingBottleId}); keep “${exactMergeOtherBottle.fullName}” (Bottle ${exactMergeOtherBottleId})`;
-    const retireOther = `Retire “${exactMergeOtherBottle.fullName}” (Bottle ${exactMergeOtherBottleId}); keep “${exactMergeOtherBottle.fullName}” (Bottle ${existingBottleId})`;
     await expect(
-      page.getByRole("radio", { name: retireCurrent }),
+      page.getByRole("radio", {
+        exact: true,
+        name: `Keep ${exactMergeOtherBottle.fullName} (${exactMergeOtherBottle.peatedId}) Retire ${existingBottle.fullName} (${existingBottle.peatedId}).`,
+      }),
     ).toBeChecked();
-    await expect(page.getByRole("radio", { name: retireOther })).toBeVisible();
+    await expect(
+      page.getByRole("radio", {
+        exact: true,
+        name: `Keep ${existingBottle.fullName} (${existingBottle.peatedId}) Retire ${exactMergeOtherBottle.fullName} (${exactMergeOtherBottle.peatedId}).`,
+      }),
+    ).toBeVisible();
 
     const mergeRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottles/merge"),

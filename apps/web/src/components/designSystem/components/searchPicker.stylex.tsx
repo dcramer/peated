@@ -14,6 +14,7 @@ import {
 } from "../../../styles/tokens.stylex";
 import { Chip } from "./chip.stylex";
 import { FloatingPanel } from "./feedback.stylex";
+import { ValidationMessage } from "./field.stylex";
 import { useListboxNavigation } from "./useListboxNavigation";
 
 export type SearchPickerOption = {
@@ -27,6 +28,7 @@ export type SearchPickerProps = {
   createHint?: ReactNode;
   disabled?: boolean;
   emptyText?: string;
+  error?: ReactNode;
   getCreateLabel?: (query: string) => ReactNode;
   help?: string;
   label: string;
@@ -36,6 +38,7 @@ export type SearchPickerProps = {
   onQueryChange?: (query: string) => void;
   options: readonly SearchPickerOption[];
   placeholder: string;
+  required?: boolean;
   value: readonly SearchPickerOption[];
 };
 
@@ -64,6 +67,7 @@ export function SearchPicker({
   createHint,
   disabled = false,
   emptyText = "No matches.",
+  error,
   getCreateLabel,
   help,
   label,
@@ -73,6 +77,7 @@ export function SearchPicker({
   onQueryChange,
   options,
   placeholder,
+  required = false,
   value,
 }: SearchPickerProps) {
   return (
@@ -80,6 +85,7 @@ export function SearchPicker({
       createHint={createHint}
       disabled={disabled}
       emptyText={emptyText}
+      error={error}
       getCreateLabel={getCreateLabel}
       help={help}
       label={label}
@@ -89,6 +95,7 @@ export function SearchPicker({
       onQueryChange={onQueryChange}
       options={options}
       placeholder={placeholder}
+      required={required}
       selectionMode="multiple"
       value={value}
     />
@@ -99,6 +106,7 @@ function PickerControl({
   createHint,
   disabled = false,
   emptyText = "No matches.",
+  error,
   getCreateLabel,
   help,
   label,
@@ -108,12 +116,16 @@ function PickerControl({
   onQueryChange,
   options,
   placeholder,
+  required = false,
   selectionMode,
   value,
 }: SearchPickerProps & { selectionMode: "multiple" | "single" }) {
   const generatedId = useId();
   const inputId = `${generatedId}-input`;
   const listboxId = `${generatedId}-listbox`;
+  const errorId = `${generatedId}-error`;
+  const helpId = `${generatedId}-help`;
+  const descriptionId = error ? errorId : help ? helpId : undefined;
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const availableOptions = useMemo(() => {
@@ -160,16 +172,28 @@ function PickerControl({
 
   return (
     <div onBlur={handleBlur} {...stylex.props(styles.root)}>
-      <label
-        htmlFor={
-          selectionMode === "single" && value.length ? undefined : inputId
-        }
-        {...stylex.props(foundationStyles.fieldLabel, styles.label)}
-      >
-        {label}
-      </label>
+      <div {...stylex.props(styles.labelRow)}>
+        <label
+          htmlFor={
+            selectionMode === "single" && value.length ? undefined : inputId
+          }
+          {...stylex.props(foundationStyles.fieldLabel, styles.label)}
+        >
+          {label}
+        </label>
+        {required ? (
+          <span {...stylex.props(foundationStyles.microLabel, styles.required)}>
+            Required
+          </span>
+        ) : null}
+      </div>
       {selectionMode === "single" && value[0] ? (
-        <div {...stylex.props(styles.selectedControl)}>
+        <div
+          {...stylex.props(
+            styles.selectedControl,
+            Boolean(error) && styles.invalid,
+          )}
+        >
           <span {...stylex.props(styles.selectedCopy)}>
             <span {...stylex.props(styles.selectedName)}>{value[0].label}</span>
             {(value[0].selectedDetail ?? value[0].detail) ? (
@@ -217,6 +241,9 @@ function PickerControl({
             aria-autocomplete="list"
             aria-controls={listboxId}
             aria-expanded={isOpen}
+            aria-describedby={descriptionId}
+            aria-invalid={error ? true : undefined}
+            aria-required={required || undefined}
             id={inputId}
             onChange={(event) => {
               if (disabled) return;
@@ -233,7 +260,7 @@ function PickerControl({
             type="search"
             value={query}
             disabled={disabled}
-            {...stylex.props(styles.input)}
+            {...stylex.props(styles.input, Boolean(error) && styles.invalid)}
           />
           {isOpen && !disabled ? (
             <FloatingPanel {...stylex.props(styles.overlay)}>
@@ -304,8 +331,15 @@ function PickerControl({
           ) : null}
         </div>
       )}
-      {help ? (
-        <p {...stylex.props(foundationStyles.metadata, styles.help)}>{help}</p>
+      {error ? (
+        <ValidationMessage id={errorId}>{error}</ValidationMessage>
+      ) : help ? (
+        <p
+          id={helpId}
+          {...stylex.props(foundationStyles.metadata, styles.help)}
+        >
+          {help}
+        </p>
       ) : null}
     </div>
   );
@@ -320,7 +354,14 @@ const styles = stylex.create({
     flexDirection: "column",
     rowGap: space.x2,
   },
+  labelRow: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    columnGap: space.x4,
+  },
   label: { color: colors.inkMuted },
+  required: { color: colors.accentDeep },
   selected: { display: "flex", gap: space.x2, flexWrap: "wrap" },
   selectedControl: {
     display: "flex",
@@ -405,6 +446,7 @@ const styles = stylex.create({
     "::placeholder": { color: colors.inkMuted, opacity: 1 },
     "::-webkit-search-cancel-button": { appearance: "none" },
   },
+  invalid: { boxShadow: effects.errorRing },
   overlay: {
     position: "absolute",
     zIndex: 10,

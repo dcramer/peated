@@ -38,6 +38,7 @@ export function ProfileLayoutClient({
   const orpc = useORPC();
   const pathname = usePathname();
   const isCurrentUser = currentUserId === initialUser.id;
+  const [isModerator, setIsModerator] = useState(Boolean(initialUser.mod));
   const ratingQuery = useQuery({
     ...orpc.users.tastingStats.queryOptions({
       input: { user: initialUser.id },
@@ -49,7 +50,7 @@ export function ProfileLayoutClient({
     : [];
   const badges = initialUser.admin
     ? ["Admin"]
-    : initialUser.mod
+    : isModerator
       ? ["Moderator"]
       : [];
 
@@ -61,6 +62,8 @@ export function ProfileLayoutClient({
             currentUserAdmin={currentUserAdmin}
             currentUserId={currentUserId}
             initialUser={initialUser}
+            isModerator={isModerator}
+            onModeratorChange={setIsModerator}
           />
         }
         badges={badges}
@@ -126,10 +129,14 @@ function ProfileActions({
   currentUserAdmin,
   currentUserId,
   initialUser,
+  isModerator,
+  onModeratorChange,
 }: {
   currentUserAdmin: boolean;
   currentUserId?: number;
   initialUser: ProfileUser;
+  isModerator: boolean;
+  onModeratorChange: (value: boolean) => void;
 }) {
   const orpc = useORPC();
   const isCurrentUser = currentUserId === initialUser.id;
@@ -144,7 +151,10 @@ function ProfileActions({
     ...orpc.friends.delete.mutationOptions(),
     onSuccess: () => setFriendStatus("none"),
   });
-  const userUpdateMutation = useMutation(orpc.users.update.mutationOptions());
+  const userUpdateMutation = useMutation({
+    ...orpc.users.update.mutationOptions(),
+    onSuccess: (updatedUser) => onModeratorChange(Boolean(updatedUser.mod)),
+  });
 
   if (isCurrentUser) {
     return (
@@ -189,12 +199,12 @@ function ProfileActions({
             [
               {
                 disabled: userUpdateMutation.isPending,
-                label: initialUser.mod
+                label: isModerator
                   ? "Remove moderator role"
                   : "Add moderator role",
                 onSelect: () =>
                   userUpdateMutation.mutate({
-                    mod: !initialUser.mod,
+                    mod: !isModerator,
                     user: initialUser.id,
                   }),
               },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import { SearchSelect, type SearchPickerOption } from "./searchPicker.stylex";
 
@@ -19,6 +19,7 @@ export type EntityPickerOption = {
 };
 
 export type EntityPickerProps = {
+  error?: ReactNode;
   help?: string;
   kind: EntityPickerKind;
   label?: string;
@@ -28,6 +29,7 @@ export type EntityPickerProps = {
   onQueryChange?: (query: string) => void;
   options: readonly EntityPickerOption[];
   placeholder?: string;
+  required?: boolean;
   value: EntityPickerOption | null;
 };
 
@@ -48,6 +50,7 @@ const kindCopy = {
 
 /** Supplies entity data and copy to the shared single-record picker. */
 export function EntityPicker({
+  error,
   help,
   kind,
   label,
@@ -57,6 +60,7 @@ export function EntityPicker({
   onQueryChange,
   options,
   placeholder,
+  required = false,
   value,
 }: EntityPickerProps) {
   const copy = kindCopy[kind];
@@ -84,6 +88,7 @@ export function EntityPicker({
     <SearchSelect
       createHint="Last resort"
       emptyText={`No matching ${copy.plural}.`}
+      error={error}
       getCreateLabel={(query) => `Add “${query}” as a new ${copy.singular}`}
       help={help ?? "↑↓ move · Enter picks · Esc closes"}
       label={label ?? copy.label}
@@ -97,6 +102,7 @@ export function EntityPicker({
       onQueryChange={onQueryChange}
       options={options.map(toPickerOption)}
       placeholder={placeholder ?? `Search ${copy.plural}`}
+      required={required}
       value={value ? toPickerOption(value) : null}
     />
   );

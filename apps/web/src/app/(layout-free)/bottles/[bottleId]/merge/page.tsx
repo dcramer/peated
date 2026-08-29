@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { BottleMergeSchema } from "@peated/server/schemas";
 import {
   ChoiceList,
@@ -183,15 +184,15 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
                   options={[
                     {
                       description: other
-                        ? `Retire ${other.label}.`
+                        ? `Retire ${other.label} (${formatPeatedId("bottle", Number(other.id))}).`
                         : "Retire the selected duplicate.",
-                      label: `Keep ${bottle.fullName}`,
+                      label: `Keep ${bottle.fullName} (${bottle.peatedId})`,
                       value: "mergeFrom",
                     },
                     {
-                      description: `Retire ${bottle.fullName}.`,
+                      description: `Retire ${bottle.fullName} (${bottle.peatedId}).`,
                       label: other
-                        ? `Keep ${other.label}`
+                        ? `Keep ${other.label} (${formatPeatedId("bottle", Number(other.id))})`
                         : "Keep the duplicate",
                       value: "mergeInto",
                     },

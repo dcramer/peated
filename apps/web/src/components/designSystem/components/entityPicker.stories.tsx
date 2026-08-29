@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { EntityPicker, type EntityPickerOption } from "./entityPicker.stylex";
 import { distillerOptions } from "./storyData";
 
@@ -34,7 +34,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Search: Story = {
-  render: (args) => <ControlledEntityPicker {...args} />,
+  render: (args) => (
+    <StoryStack>
+      <ControlledEntityPicker {...args} />
+      <ControlledEntityPicker
+        {...args}
+        error="Brand is required."
+        kind="brand"
+        required
+      />
+    </StoryStack>
+  ),
 };
 
 export const Selected: Story = {

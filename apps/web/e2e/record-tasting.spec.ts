@@ -4,7 +4,6 @@ import { z } from "zod";
 
 import {
   createdTastingId,
-  destinationBottleGroup,
   existingBottle,
   failingTastingNotes,
   photoTastingNotes,
@@ -34,7 +33,7 @@ test.describe("log tasting", () => {
     const imageRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/tastings/imageUpdate"),
     );
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByRole("button", { name: "Save tasting" }).click();
     const createInput = getRpcInput(await createRequestPromise);
     await imageRequestPromise;
 
@@ -58,7 +57,7 @@ test.describe("log tasting", () => {
     await fillComments(page, tastingNotes);
     await uploadTastingImage(page);
 
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByRole("button", { name: "Save tasting" }).click();
 
     await expect(
       page.getByText(
@@ -83,14 +82,15 @@ test.describe("log tasting", () => {
     await uploadLabel(page);
 
     await expect(
-      page.getByRole("heading", { name: "Matched bottle" }),
+      page.getByRole("heading", { name: "Check the bottle" }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Log Tasting" }).click();
 
     await chooseVeryGood(page);
     await fillComments(page, photoTastingNotes);
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Save tasting" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
   });
@@ -109,15 +109,17 @@ test.describe("log tasting", () => {
     await uploadLabel(page);
 
     await expect(
-      page.getByRole("heading", { name: "Matched bottle" }),
+      page.getByRole("heading", { name: "Check the bottle" }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Log Tasting" }).click();
 
     await chooseVeryGood(page);
     await fillComments(page, failingTastingNotes);
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Save tasting" }).click();
 
     await expect(page.getByText("Internal error")).toBeVisible();
+    await page.getByRole("button", { name: "Back", exact: true }).click();
     await expect(page.getByLabel("Comments")).toHaveValue(failingTastingNotes);
     await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
   });
@@ -125,7 +127,7 @@ test.describe("log tasting", () => {
 
 async function uploadLabel(page: Page) {
   await expect(
-    page.getByRole("button", { name: /Take or upload a photo/ }),
+    page.getByRole("button", { name: "Photograph the label" }),
   ).toBeVisible();
 
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -150,6 +152,7 @@ async function uploadLabel(page: Page) {
 }
 
 async function uploadTastingImage(page: Page) {
+  await page.getByRole("button", { name: "Continue" }).click();
   await page.locator('input[type="file"]').setInputFiles({
     name: "tasting.png",
     mimeType: "image/png",
@@ -158,7 +161,7 @@ async function uploadTastingImage(page: Page) {
 }
 
 async function fillComments(page: Page, value: string) {
-  await page.getByText("Comments", { exact: true }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
   await page.getByLabel("Comments").fill(value);
 }
 
