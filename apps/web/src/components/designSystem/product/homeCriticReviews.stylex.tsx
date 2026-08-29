@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useORPC } from "../../../lib/orpc/context";
 import TimeSince from "../../timeSince";
 import { LoadingList, SectionError } from "../components";
-import { HomeCriticReviews as CriticReviewSection } from "../patterns/homeDiscovery.stylex";
+import { CriticReviewCards } from "../patterns/homeDiscovery.stylex";
 import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
 
 type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
@@ -55,7 +55,7 @@ export function HomeCriticReviews() {
   if (!visibleReviews.length) return null;
 
   return (
-    <CriticReviewSection
+    <CriticReviewCards
       reviews={visibleReviews.map((review) => ({
         bottleHref: `/bottles/${review.bottle.id}`,
         bottleName: review.bottle.fullName,

@@ -6,8 +6,8 @@ import {
 } from "@heroicons/react/24/outline";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
-import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
+import Link from "@peated/web/components/admin/adminLink.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";

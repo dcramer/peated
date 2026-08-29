@@ -39,6 +39,8 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
           }
         : undefined,
     medianScore: bottle.medianScore,
+    scoreHigh: bottle.maxScore,
+    scoreLow: bottle.minScore,
     scoreCount: bottle.scoreCount,
   };
 }

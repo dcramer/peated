@@ -3,22 +3,23 @@
 import { BoltIcon } from "@heroicons/react/20/solid";
 import { RegionInputSchema } from "@peated/server/schemas";
 import { type Region } from "@peated/server/types";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import TextField from "@peated/web/components/textField";
-import { getFormErrorMessage, toOption } from "@peated/web/lib/formHelpers";
+import {
+  AdminFieldset as Fieldset,
+  AdminFormPage as FormPage,
+  AdminTextField as TextField,
+} from "@peated/web/components/admin/adminForm.stylex";
+import { toOption } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
-import Button from "../button";
 import CountryField from "../countryField";
-import Form from "../form";
 import { type Option } from "../selectField";
-import TextAreaField from "../textAreaField";
+import { AdminButton as Button } from "./adminButton.stylex";
+import { AdminTextareaField as TextAreaField } from "./adminForm.stylex";
+import { useAdminFormSubmit } from "./useAdminFormSubmit";
 
 type FormSchemaType = z.infer<typeof RegionInputSchema>;
 
@@ -53,96 +54,82 @@ export default function RegionForm({
     orpc.ai.regionLookup.mutationOptions(),
   );
 
-  const [error, setError] = useState<string | undefined>();
-
   const [countryValue, setCountryValue] = useState<Option | undefined>(
     toOption(initialData.country),
   );
 
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
-    try {
-      await onSubmit(data);
-    } catch (err) {
-      setError(getFormErrorMessage(err));
-    }
-  };
+  const { error, submit } = useAdminFormSubmit(onSubmit);
 
   return (
-    <FormScreen
+    <FormPage
+      error={error}
+      isSubmitting={isSubmitting}
+      onSubmit={handleSubmit(submit)}
       title={title}
-      saveDisabled={isSubmitting}
-      onSave={handleSubmit(onSubmitHandler)}
     >
-      {error && <FormError values={[error]} />}
+      <Fieldset>
+        <TextField
+          {...register("name")}
+          label="Name"
+          placeholder="e.g. Islay"
+          error={errors.name}
+          required
+        />
 
-      <Form
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
-      >
-        <Fieldset>
-          <TextField
-            {...register("name")}
-            label="Name"
-            placeholder="e.g. Islay"
-            error={errors.name}
-            required
-          />
-
-          <Controller
-            control={control}
-            name="country"
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <CountryField
-                {...field}
-                error={errors.country}
-                label="Country"
-                readOnly={edit}
-                placeholder="e.g. Scotland"
-                onChange={(value) => {
-                  onChange(value?.id);
-                  setCountryValue(value);
-                }}
-                value={countryValue}
-              />
-            )}
-          />
-        </Fieldset>
-
-        <Fieldset
-          title="Additional details"
-          action={
-            <Button
-              color="default"
-              onClick={async () => {
-                const result =
-                  await generateDataMutation.mutateAsync(getValues());
-
-                const currentValues = getValues();
-                if (result && result.description && !currentValues.description)
-                  setValue("description", result.description);
-                setValue("descriptionSrc", "generated");
+        <Controller
+          control={control}
+          name="country"
+          render={({ field: { onChange, value, ref, ...field } }) => (
+            <CountryField
+              {...field}
+              error={errors.country}
+              label="Country"
+              readOnly={edit}
+              placeholder="e.g. Scotland"
+              onChange={(value) => {
+                onChange(value?.id);
+                setCountryValue(value);
               }}
-              disabled={generateDataMutation.isPending}
-              icon={<BoltIcon />}
-            >
-              Help me fill this in [Beta]
-            </Button>
-          }
-        >
-          <TextAreaField
-            {...register("description", {
-              setValueAs: (v) => (v === "" || !v ? null : v),
-              onChange: () => {
-                setValue("descriptionSrc", "user");
-              },
-            })}
-            error={errors.description}
-            autoFocus
-            label="Description"
-            rows={8}
-          />
-        </Fieldset>
-      </Form>
-    </FormScreen>
+              value={countryValue}
+            />
+          )}
+        />
+      </Fieldset>
+
+      <Fieldset
+        title="Additional details"
+        action={
+          <Button
+            color="default"
+            onClick={async () => {
+              const result =
+                await generateDataMutation.mutateAsync(getValues());
+
+              const currentValues = getValues();
+              if (result && result.description && !currentValues.description)
+                setValue("description", result.description);
+              setValue("descriptionSrc", "generated");
+            }}
+            disabled={generateDataMutation.isPending}
+            icon={<BoltIcon />}
+          >
+            Help me fill this in [Beta]
+          </Button>
+        }
+      >
+        <TextAreaField
+          {...register("description", {
+            setValueAs: (v) => (v === "" || !v ? null : v),
+            onChange: () => {
+              setValue("descriptionSrc", "user");
+            },
+          })}
+          error={errors.description}
+          autoFocus
+          label="Description"
+          rows={8}
+        />
+      </Fieldset>
+    </FormPage>
   );
 }

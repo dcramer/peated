@@ -54,68 +54,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   },
 );
 
-export type SegmentedControlOption<Value extends string = string> = {
-  disabled?: boolean;
-  label: ReactNode;
-  value: Value;
-};
-
-export type SegmentedControlProps<Value extends string = string> = {
-  disabled?: boolean;
-  id: string;
-  label: string;
-  name: string;
-  onChange: (value: Value) => void;
-  options: readonly SegmentedControlOption<Value>[];
-  value: Value;
-};
-
-export function SegmentedControl<Value extends string>({
-  disabled = false,
-  id,
-  label,
-  name,
-  onChange,
-  options,
-  value,
-}: SegmentedControlProps<Value>) {
-  return (
-    <div
-      aria-label={label}
-      role="radiogroup"
-      {...stylex.props(styles.segmented)}
-    >
-      {options.map((option) => {
-        const checked = option.value === value;
-        const optionDisabled = disabled || option.disabled;
-
-        return (
-          <label
-            key={option.value}
-            {...stylex.props(
-              styles.segment,
-              checked && styles.segmentChecked,
-              optionDisabled && styles.disabled,
-            )}
-          >
-            <input
-              checked={checked}
-              disabled={optionDisabled}
-              id={`${id}-${option.value}`}
-              name={name}
-              onChange={() => onChange(option.value)}
-              type="radio"
-              value={option.value}
-              {...stylex.props(styles.visuallyHiddenInput)}
-            />
-            <span>{option.label}</span>
-          </label>
-        );
-      })}
-    </div>
-  );
-}
-
 export type ChoiceListOption<Value extends string = string> = {
   description?: ReactNode;
   disabled?: boolean;
@@ -350,41 +288,6 @@ const styles = stylex.create({
       default: effects.errorRing,
       ":focus-visible": effects.errorRing,
     },
-  },
-  segmented: {
-    display: "flex",
-    width: "100%",
-    columnGap: space.x1,
-  },
-  segment: {
-    position: "relative",
-    boxSizing: "border-box",
-    display: "flex",
-    minWidth: 0,
-    height: controlMetrics.controlHeight,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.inset,
-    color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    fontWeight: 600,
-    lineHeight: 1,
-    cursor: "pointer",
-    boxShadow: {
-      default: "none",
-      ":focus-within": effects.focusRing,
-    },
-    transitionProperty: "background-color, color, opacity",
-    transitionDuration: "120ms",
-  },
-  segmentChecked: {
-    backgroundColor: colors.accent,
-    color: colors.ground,
   },
   visuallyHiddenInput: {
     position: "absolute",

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { PageTabs } from "@peated/web/components/designSystem/components";
-import { PageHeader } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { PageHeader } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { space } from "../../../styles/tokens.stylex";
 
 const tabs = [

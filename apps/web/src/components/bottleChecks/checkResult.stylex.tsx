@@ -5,8 +5,8 @@ import {
   getBottleCheckFindings,
   getBottleCheckState,
   getBottleCheckSummary,
-} from "./checkSummary";
-import { EvidenceList } from "./operationCard";
+} from "./checkSummary.stylex";
+import { EvidenceList } from "./operationCard.stylex";
 
 type Check = Outputs["audits"]["details"]["audit"];
 

@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useId } from "react";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
+import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -10,18 +11,18 @@ export type BottleComparisonRow = {
   id: string;
   metadata?: string;
   name: string;
-  values: readonly [ReactNode, ReactNode];
+  values: readonly [ReactNode, ...ReactNode[]];
 };
 
 export type BottleComparisonTableProps = {
   ariaLabel?: string;
-  columns: readonly [string, string];
+  columns: readonly [string, ...string[]];
   detail?: string;
   heading?: string;
   rows: readonly [BottleComparisonRow, ...BottleComparisonRow[]];
 };
 
-/** Compares bottles across two compact measures. */
+/** Compares bottles across one or more compact measures. */
 export function BottleComparisonTable({
   ariaLabel = "Bottle records",
   columns,
@@ -52,9 +53,9 @@ export function BottleComparisonTable({
             <th scope="col" {...stylex.props(styles.nameHeader)}>
               Bottle
             </th>
-            {columns.map((column) => (
+            {columns.map((column, index) => (
               <th
-                key={column}
+                key={`${column}-${index}`}
                 scope="col"
                 {...stylex.props(styles.valueHeader)}
               >
@@ -65,10 +66,25 @@ export function BottleComparisonTable({
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id} {...stylex.props(styles.row)}>
+            <tr
+              data-record-key={row.id}
+              key={row.id}
+              {...stylex.props(
+                styles.row,
+                Boolean(row.href) && linkedRowStyles.container,
+                Boolean(row.href) && linkedRowStyles.onGround,
+              )}
+            >
               <th scope="row" {...stylex.props(styles.nameCell)}>
                 {row.href ? (
-                  <a href={row.href} {...stylex.props(styles.name)}>
+                  <a
+                    href={row.href}
+                    {...stylex.props(
+                      styles.name,
+                      styles.nameLink,
+                      linkedRowStyles.primaryLink,
+                    )}
+                  >
                     {row.name}
                   </a>
                 ) : (
@@ -79,7 +95,7 @@ export function BottleComparisonTable({
                 ) : null}
               </th>
               {row.values.map((value, index) => (
-                <td key={columns[index]} {...stylex.props(styles.valueCell)}>
+                <td key={index} {...stylex.props(styles.valueCell)}>
                   <span {...stylex.props(styles.mobileLabel)}>
                     {columns[index]}
                   </span>
@@ -148,7 +164,7 @@ const styles = stylex.create({
     textTransform: "uppercase",
   },
   valueHeader: {
-    width: "88px",
+    width: "152px",
     paddingTop: space.x2,
     paddingRight: 0,
     paddingBottom: space.x2,
@@ -207,6 +223,19 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
+  },
+  nameLink: {
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
   },
   metadata: {
     display: "block",

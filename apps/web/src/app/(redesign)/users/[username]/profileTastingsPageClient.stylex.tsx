@@ -13,20 +13,16 @@ import {
   RailList,
   RailListItem,
   SectionError,
-  TastingEntry,
-  type TastingEntryMember,
 } from "@peated/web/components/designSystem/components";
 import {
   PageColumns,
   RailSection,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
-import TimeSince from "@peated/web/components/timeSince";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useProfile } from "./profileContext";
 
-type Tasting = Outputs["tastings"]["list"]["results"][number];
 type TastingList = Outputs["tastings"]["list"];
 type RegionList = Outputs["users"]["regionList"];
 
@@ -69,7 +65,11 @@ export function ProfileTastingsPageClient({
         ) : tastingQuery.data.results.length ? (
           <div {...stylex.props(styles.tastingList)}>
             {tastingQuery.data.results.map((tasting) => (
-              <ProfileTastingEntry key={tasting.id} tasting={tasting} />
+              <TastingRecordEntry
+                key={tasting.id}
+                showAvatar={false}
+                tasting={tasting}
+              />
             ))}
           </div>
         ) : (
@@ -108,25 +108,6 @@ export function ProfileTastingsPageClient({
         />
       </section>
     </PageColumns>
-  );
-}
-
-function ProfileTastingEntry({ tasting }: { tasting: Tasting }) {
-  const member: TastingEntryMember = {
-    description: tasting.notes,
-    href: `/bottles/${tasting.bottle.id}`,
-    metadata: getBottleMetadata(tasting.bottle),
-    name: tasting.bottle.fullName,
-    notes: tasting.tags,
-    ratingBand: tasting.ratingBand ?? undefined,
-  };
-  return (
-    <TastingEntry
-      author={tasting.createdBy.username}
-      authorHref={`/users/${tasting.createdBy.username}`}
-      date={<TimeSince date={tasting.createdAt} />}
-      members={[member]}
-    />
   );
 }
 

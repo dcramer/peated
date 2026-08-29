@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Table from "@peated/web/components/table";
+import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -27,14 +27,14 @@ export default function Page() {
 
   return (
     <AdminPage>
-      <Breadcrumbs
-        pages={[
+      <AdminBreadcrumbs
+        items={[
           {
-            name: "Admin",
+            label: "Admin",
             href: "/admin",
           },
           {
-            name: "Locations",
+            label: "Locations",
             href: "/admin/locations",
             current: true,
           },

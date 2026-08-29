@@ -6,7 +6,6 @@ import {
   EmptyState,
   type DataTableColumn,
 } from "@peated/web/components/designSystem/components";
-import { TextLink } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 
 type LocationListItem = {
   name: string;
@@ -47,10 +46,7 @@ export function LocationTable({
   items: readonly LocationListItem[];
 }) {
   const columns: DataTableColumn<LocationListItem>[] = [
-    {
-      ...locationColumns[0],
-      cell: (item) => <TextLink href={getHref(item)}>{item.name}</TextLink>,
-    },
+    { ...locationColumns[0], cell: (item) => item.name },
     ...locationColumns.slice(1),
   ];
 
@@ -58,6 +54,7 @@ export function LocationTable({
     <DataTable
       caption={caption}
       columns={columns}
+      getHref={getHref}
       getKey={(item) => item.slug}
       items={items}
     />
@@ -66,9 +63,7 @@ export function LocationTable({
 
 const distillerColumns: DataTableColumn<Entity>[] = [
   {
-    cell: (item) => (
-      <TextLink href={`/entities/${item.id}`}>{item.name}</TextLink>
-    ),
+    cell: (item) => item.name,
     header: "Distiller",
     key: "name",
   },
@@ -107,6 +102,7 @@ export function LocationDistillerList({
         <DataTable
           caption={`Distillers in ${name}`}
           columns={distillerColumns}
+          getHref={(item) => `/entities/${item.id}`}
           getKey={(item) => item.id}
           items={items}
         />

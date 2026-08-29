@@ -4,6 +4,7 @@ import { use, useState, type ReactNode } from "react";
 
 import type { Outputs } from "@peated/server/orpc/router";
 import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
   AdminBreadcrumbs,
@@ -15,7 +16,6 @@ import {
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
 import { getScraperRunAvailability } from "@peated/web/components/admin/scraperRunAvailability";
-import Button from "@peated/web/components/button";
 import { PageTabs } from "@peated/web/components/designSystem/components";
 import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";

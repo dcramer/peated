@@ -1,6 +1,7 @@
 "use client";
 
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
   AdminCodeBlock,
@@ -17,8 +18,7 @@ import {
   AdminSelectField,
   AdminTextField,
 } from "@peated/web/components/admin/adminForm.stylex";
-import AdminTable from "@peated/web/components/admin/adminTable.stylex";
-import Button from "@peated/web/components/button";
+import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";

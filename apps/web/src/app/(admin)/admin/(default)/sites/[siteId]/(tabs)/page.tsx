@@ -2,8 +2,8 @@
 import { use } from "react";
 
 import { type ExternalSiteKey } from "@peated/server/types";
+import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import StorePriceTable from "@peated/web/components/admin/storePriceTable";
-import EmptyActivity from "@peated/web/components/emptyActivity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";

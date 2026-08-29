@@ -1,7 +1,6 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { ListFilter } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { useId, useState } from "react";
 
@@ -9,20 +8,20 @@ import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
-  effects,
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
 import {
-  BandStack,
   BottleIdentityRow,
   Button,
   ButtonLink,
   CursorPager,
   EmptyState,
   FacetRow,
+  FilterPanel,
   ListToolbar,
   LoadingList,
+  RatingMeasure,
   Select,
   TextInput,
   type BandCounts,
@@ -48,6 +47,8 @@ export type BottleCatalogItem = {
     href: string;
   };
   medianScore: number | null;
+  scoreHigh: number | null;
+  scoreLow: number | null;
   scoreCount: number;
 };
 
@@ -140,28 +141,15 @@ export function BottleCatalogList({
 }
 
 function BottleCatalogMeasures({ item }: { item: BottleCatalogItem }) {
-  const score = item.medianScore === null ? "–" : String(item.medianScore);
-
   return (
     <div {...stylex.props(styles.measures)}>
-      <span
-        aria-label={
-          item.medianScore === null
-            ? "No published score"
-            : `Score ${item.medianScore} from ${item.scoreCount} ${item.scoreCount === 1 ? "review" : "reviews"}`
-        }
-        {...stylex.props(styles.measure)}
-      >
-        <span {...stylex.props(styles.measureLabel)}>Score</span>
-        <strong {...stylex.props(styles.score)}>{score}</strong>
-      </span>
-      <span
-        aria-label="Tasting ratings"
-        {...stylex.props(styles.measure, styles.bandMeasure)}
-      >
-        <span {...stylex.props(styles.measureLabel)}>Ratings</span>
-        <BandStack counts={item.bandCounts} variant="compact" />
-      </span>
+      <RatingMeasure
+        counts={item.bandCounts}
+        high={item.scoreHigh}
+        low={item.scoreLow}
+        median={item.medianScore}
+        scoreCount={item.scoreCount}
+      />
     </div>
   );
 }
@@ -264,7 +252,6 @@ export function BottleCatalogFilters({
   query,
 }: BottleCatalogFiltersProps) {
   const id = useId();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [queryDraft, setQueryDraft] = useState(query);
   const facetNames = new Set(facets?.groups.map((group) => group.name));
 
@@ -274,74 +261,58 @@ export function BottleCatalogFilters({
   }
 
   return (
-    <section aria-label="Bottle filters" {...stylex.props(styles.filters)}>
-      <button
-        aria-expanded={mobileOpen}
-        onClick={() => setMobileOpen((open) => !open)}
-        type="button"
-        {...stylex.props(styles.filterToggle)}
-      >
-        <ListFilter aria-hidden="true" size={16} strokeWidth={1.75} />
-        Filters
-      </button>
-      <div
-        {...stylex.props(
-          styles.filterContent,
-          mobileOpen && styles.filterContentOpen,
-        )}
-      >
-        <form onSubmit={submitQuery} {...stylex.props(styles.queryForm)}>
-          <label htmlFor={`${id}-query`} {...stylex.props(styles.field)}>
-            <span {...stylex.props(styles.filterHeading)}>Find a bottle</span>
-            <TextInput
-              aria-label="Find a bottle"
-              id={`${id}-query`}
-              onChange={(event) => setQueryDraft(event.currentTarget.value)}
-              placeholder="Name, brand, or release"
-              value={queryDraft}
-            />
-          </label>
-          <Button size="sm" type="submit" variant="tonal">
-            Search
-          </Button>
-        </form>
-        {facetNames.has("category") ? null : (
-          <FilterSelect
-            label="Category"
-            onChange={(value) => onChange("category", value)}
-            options={categoryOptions}
-            value={category}
+    <FilterPanel ariaLabel="Bottle filters">
+      <form onSubmit={submitQuery} {...stylex.props(styles.queryForm)}>
+        <label htmlFor={`${id}-query`} {...stylex.props(styles.field)}>
+          <span {...stylex.props(styles.filterHeading)}>Find a bottle</span>
+          <TextInput
+            aria-label="Find a bottle"
+            id={`${id}-query`}
+            onChange={(event) => setQueryDraft(event.currentTarget.value)}
+            placeholder="Name, brand, or release"
+            value={queryDraft}
           />
-        )}
-        {facets ? <BottleCatalogFacets {...facets} /> : null}
-        {facetNames.has("ageBand") ? null : (
-          <label htmlFor={`${id}-age`} {...stylex.props(styles.field)}>
-            <span {...stylex.props(styles.filterHeading)}>Age statement</span>
-            <TextInput
-              aria-label="Age statement in years"
-              id={`${id}-age`}
-              inputMode="numeric"
-              min={0}
-              onChange={(event) => onChange("age", event.currentTarget.value)}
-              placeholder="Any age"
-              type="number"
-              value={age}
-            />
-          </label>
-        )}
-        <Button
-          align="start"
-          onClick={() => {
-            setQueryDraft("");
-            onClear();
-          }}
-          size="sm"
-          variant="text"
-        >
-          Clear filters
+        </label>
+        <Button size="sm" type="submit" variant="tonal">
+          Search
         </Button>
-      </div>
-    </section>
+      </form>
+      {facetNames.has("category") ? null : (
+        <FilterSelect
+          label="Category"
+          onChange={(value) => onChange("category", value)}
+          options={categoryOptions}
+          value={category}
+        />
+      )}
+      {facets ? <BottleCatalogFacets {...facets} /> : null}
+      {facetNames.has("ageBand") ? null : (
+        <label htmlFor={`${id}-age`} {...stylex.props(styles.field)}>
+          <span {...stylex.props(styles.filterHeading)}>Age statement</span>
+          <TextInput
+            aria-label="Age statement in years"
+            id={`${id}-age`}
+            inputMode="numeric"
+            min={0}
+            onChange={(event) => onChange("age", event.currentTarget.value)}
+            placeholder="Any age"
+            type="number"
+            value={age}
+          />
+        </label>
+      )}
+      <Button
+        align="start"
+        onClick={() => {
+          setQueryDraft("");
+          onClear();
+        }}
+        size="sm"
+        variant="text"
+      >
+        Clear filters
+      </Button>
+    </FilterPanel>
   );
 }
 
@@ -403,90 +374,11 @@ const styles = stylex.create({
     minWidth: 0,
   },
   measures: {
-    display: "grid",
-    width: "168px",
-    gridTemplateColumns: "64px 80px",
-    alignItems: "center",
-    gap: space.x3,
-    [COMPACT]: {
-      width: "52px",
-      gridTemplateColumns: "52px",
-    },
-  },
-  measure: {
     display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: space.x1,
-  },
-  bandMeasure: {
+    width: "152px",
+    justifyContent: "flex-end",
     [COMPACT]: {
-      display: "none",
-    },
-  },
-  measureLabel: {
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "9px",
-    letterSpacing: "0.07em",
-    lineHeight: 1.2,
-    textTransform: "uppercase",
-  },
-  score: {
-    color: colors.accentDeep,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1,
-  },
-  filters: {
-    minWidth: 0,
-  },
-  filterToggle: {
-    display: "none",
-    width: "100%",
-    height: controlMetrics.controlHeight,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: space.x2,
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderWidth: 0,
-    borderRadius: controlMetrics.radius,
-    outline: "none",
-    backgroundColor: colors.inset,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "13px",
-    fontWeight: 700,
-    cursor: "pointer",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-    [NARROW]: {
-      display: "flex",
-    },
-  },
-  filterContent: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x4,
-    [NARROW]: {
-      display: "none",
-      paddingTop: space.x4,
-    },
-  },
-  filterContentOpen: {
-    [NARROW]: {
-      display: "grid",
-      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    },
-    [COMPACT]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
+      width: "104px",
     },
   },
   queryForm: {

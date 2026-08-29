@@ -7,6 +7,7 @@ import {
   AdminStat,
   AdminStatGrid,
   AdminStatus,
+  AdminTextLink,
 } from "../../admin/adminContent.stylex";
 import { AdminTableContent } from "../../admin/adminTable.stylex";
 import { ButtonLink } from "../components";
@@ -35,9 +36,10 @@ const groups = [
 ] satisfies readonly AdminNavigationGroup[];
 
 const records = [
-  { id: 41, name: "Example record", status: "Ready" },
-  { id: 42, name: "Needs attention", status: "Blocked" },
-  { id: 43, name: "Recently updated", status: "Ready" },
+  { id: 41, name: "Default", status: "Ready" },
+  { id: 42, name: "Hovered", status: "Blocked" },
+  { id: 43, name: "Keyboard focused", status: "Ready" },
+  { id: 44, name: "Pressed", status: "Ready" },
 ];
 
 function WorkspaceContent() {
@@ -68,6 +70,15 @@ function WorkspaceContent() {
                 </AdminStatus>
               ),
             },
+            {
+              align: "right",
+              name: "activity",
+              value: (record) => (
+                <AdminTextLink href={`#activity-${record.id}`}>
+                  View activity
+                </AdminTextLink>
+              ),
+            },
           ]}
           items={records}
           searchParams={new URLSearchParams()}
@@ -94,3 +105,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Workspace: Story = {};
+
+export const TableInteractionStates: Story = {
+  parameters: {
+    pseudo: {
+      active: ['tr[data-record-key="44"]'],
+      focusWithin: ['tr[data-record-key="43"]'],
+      hover: ['tr[data-record-key="42"]'],
+    },
+  },
+};

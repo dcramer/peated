@@ -1,14 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 
 import {
+  Card,
   RailList,
   RailListItem,
-} from "@peated/web/components/designSystem/components";
-import {
-  PageSection,
-  Panel,
   TextLink,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+} from "@peated/web/components/designSystem/components";
+import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
 
 type CodeGroup = {
@@ -34,7 +32,7 @@ export function EntityCodes({
   return (
     <div {...stylex.props(styles.content)}>
       <PageSection heading="How the codes work">
-        <Panel>
+        <Card appearance="surface" padding="sm">
           <div {...stylex.props(styles.intro)}>
             <p {...stylex.props(styles.paragraph)}>
               {entityName} uses the number before the decimal point to identify
@@ -50,7 +48,7 @@ export function EntityCodes({
               .
             </p>
           </div>
-        </Panel>
+        </Card>
       </PageSection>
 
       {groups.map((group) => (

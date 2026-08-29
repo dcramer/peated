@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
 import { SectionHeading } from "../components";
 import { PublicHomeIntro } from "./homeSections.stylex";
-import { PageColumns } from "./pagePatternShell.stylex";
+import { PageColumns } from "./pageLayout.stylex";
 
 export type SignedInHomePageProps = {
   activity: ReactNode;

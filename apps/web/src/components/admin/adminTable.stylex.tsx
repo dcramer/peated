@@ -16,6 +16,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
+import { linkedRowStyles } from "../designSystem/components/linkedRow.stylex";
 import { AdminPager } from "./adminUtility.stylex";
 
 export type AdminTableColumn<Item extends object> = {
@@ -45,7 +46,7 @@ export type AdminTableProps<Item extends object, ItemGroup extends Group> = {
   withSearch?: boolean;
 };
 
-export default function AdminTable<
+export function AdminTable<
   Item extends object,
   ItemGroup extends Group = Group,
 >(props: AdminTableProps<Item, ItemGroup>) {
@@ -165,7 +166,15 @@ export function AdminTableContent<
                     </th>
                   </tr>
                 ) : null,
-                <tr key={itemKey} {...stylex.props(styles.row)}>
+                <tr
+                  data-record-key={itemKey}
+                  key={itemKey}
+                  {...stylex.props(
+                    styles.row,
+                    Boolean(itemHref) && linkedRowStyles.container,
+                    Boolean(itemHref) && linkedRowStyles.onSurface,
+                  )}
+                >
                   {columns.map((column, index) => {
                     if (column.hidden) return null;
                     const align = resolveAlignment(column.align, index);
@@ -182,7 +191,7 @@ export function AdminTableContent<
                           <Link
                             aria-label={`Open ${itemKey}`}
                             href={itemHref}
-                            {...stylex.props(styles.rowLink)}
+                            {...stylex.props(linkedRowStyles.primaryLink)}
                           />
                         ) : null}
                         <span {...stylex.props(styles.cellContent)}>
@@ -323,10 +332,8 @@ const styles = stylex.create({
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
-    backgroundColor: { default: "transparent", ":hover": colors.inset },
   },
   cell: {
-    position: "relative",
     padding: `${space.x3} ${space.x3}`,
     color: colors.ink,
     fontFamily: fonts.reading,
@@ -334,15 +341,7 @@ const styles = stylex.create({
     lineHeight: 1.4,
     verticalAlign: "middle",
   },
-  cellContent: { position: "relative", zIndex: 1 },
-  rowLink: {
-    position: "absolute",
-    zIndex: 2,
-    inset: 0,
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-  },
+  cellContent: {},
   secondary: { "@media (max-width: 639px)": { display: "none" } },
   groupRow: {
     borderBottomWidth: "1px",

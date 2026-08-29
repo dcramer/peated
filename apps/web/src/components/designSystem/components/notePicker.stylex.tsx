@@ -1,7 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import type { FocusEvent, KeyboardEvent } from "react";
+import type { FocusEvent } from "react";
 import { useId, useMemo, useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
@@ -15,6 +15,7 @@ import {
 import { Button } from "./button.stylex";
 import { Chip } from "./chip.stylex";
 import { FloatingPanel } from "./feedback.stylex";
+import { useListboxNavigation } from "./useListboxNavigation";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -47,7 +48,6 @@ export function NotePickerField({
   const generatedId = useId();
   const inputId = `${generatedId}-input`;
   const listboxId = `${generatedId}-listbox`;
-  const [activeIndex, setActiveIndex] = useState(-1);
   const [isBrowserOpen, setIsBrowserOpen] = useState(false);
   const [query, setQuery] = useState("");
   const matches = useMemo(() => {
@@ -68,52 +68,37 @@ export function NotePickerField({
       .slice(0, 6);
   }, [notes, query, value]);
   const suggestionsOpen = !isBrowserOpen && query.trim().length > 0;
-  const activeMatch = matches[activeIndex];
+
+  const {
+    activeIndex,
+    activeItem: activeMatch,
+    handleKeyDown,
+    resetNavigation,
+    setActiveIndex,
+  } = useListboxNavigation({
+    items: matches,
+    onClose: () => {
+      setQuery("");
+      setIsBrowserOpen(false);
+    },
+    onOpen: () => undefined,
+    onSelect: (note) => {
+      onChange([...value, note.name]);
+      setQuery("");
+    },
+    open: suggestionsOpen,
+  });
 
   function selectNote(note: NotePickerOption) {
     onChange([...value, note.name]);
     setQuery("");
-    setActiveIndex(-1);
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      if (matches.length) {
-        setActiveIndex((current) =>
-          current >= matches.length - 1 ? 0 : current + 1,
-        );
-      }
-      return;
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      if (matches.length) {
-        setActiveIndex((current) =>
-          current <= 0 ? matches.length - 1 : current - 1,
-        );
-      }
-      return;
-    }
-
-    if (event.key === "Enter" && activeMatch) {
-      event.preventDefault();
-      selectNote(activeMatch);
-      return;
-    }
-
-    if (event.key === "Escape") {
-      setQuery("");
-      setActiveIndex(-1);
-      setIsBrowserOpen(false);
-    }
+    resetNavigation();
   }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget)) {
       setQuery("");
-      setActiveIndex(-1);
+      resetNavigation();
     }
   }
 
@@ -141,7 +126,7 @@ export function NotePickerField({
           id={inputId}
           onChange={(event) => {
             setQuery(event.currentTarget.value);
-            setActiveIndex(-1);
+            resetNavigation();
           }}
           onKeyDown={handleKeyDown}
           placeholder={value.length ? "Add another note" : "Find a note"}
@@ -155,7 +140,7 @@ export function NotePickerField({
           aria-haspopup="dialog"
           onClick={() => {
             setQuery("");
-            setActiveIndex(-1);
+            resetNavigation();
             setIsBrowserOpen(true);
           }}
           size="sm"

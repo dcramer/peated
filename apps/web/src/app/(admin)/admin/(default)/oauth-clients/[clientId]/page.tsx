@@ -2,6 +2,7 @@
 
 import { use } from "react";
 
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
   AdminBreadcrumbs,
@@ -11,8 +12,7 @@ import {
   AdminSection,
   AdminStatus,
 } from "@peated/web/components/admin/adminContent.stylex";
-import Button from "@peated/web/components/button";
-import DefinitionList from "@peated/web/components/definitionList";
+import { AdminDefinitionList as DefinitionList } from "@peated/web/components/admin/adminUtility.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 

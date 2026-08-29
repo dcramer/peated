@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useORPC } from "../../../lib/orpc/context";
 import { LoadingList, SectionError } from "../components";
-import { HomeFollowedReleases as FollowedReleaseSection } from "../patterns/homeDiscovery.stylex";
+import { FollowedReleaseList } from "../patterns/homeDiscovery.stylex";
 import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
@@ -51,7 +51,7 @@ export function HomeFollowedReleases() {
   if (!releases.data.results.length) return null;
 
   return (
-    <FollowedReleaseSection
+    <FollowedReleaseList
       followedDistillerCount={releases.data.followedDistillerCount ?? 0}
       releases={releases.data.results.map((bottle) => ({
         bottleHref: `/bottles/${bottle.id}`,

@@ -1,9 +1,11 @@
 import { BottleCheckConfigSchema } from "@peated/server/lib/badges/checks/bottleCheck";
+import {
+  AdminFieldset as Fieldset,
+  AdminForm as Form,
+} from "@peated/web/components/admin/adminForm.stylex";
 import BottleField, {
   type BottleOption,
 } from "@peated/web/components/bottleField";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -56,8 +58,6 @@ export default function BottleCheckConfigForm({
                 label="Bottle"
                 placeholder="e.g. Glenlivet 12-year-old"
                 helpText="The bottles to match on."
-                canCreate={false}
-                required
                 multiple
                 onChange={(value) => {
                   onChange(value.map((b) => b.id));

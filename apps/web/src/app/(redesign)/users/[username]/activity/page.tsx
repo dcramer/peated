@@ -1,6 +1,6 @@
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { getProfilePage } from "@peated/web/lib/profilePage.server";
 
 import { ProfileActivityPageClient } from "./profileActivityPageClient.stylex";
 
@@ -10,9 +10,7 @@ export default async function ProfileActivityPage(props: {
 }) {
   const { username } = await props.params;
   const { client } = await createServerClient();
-  const user = await resolveOrNotFound(
-    client.users.details({ user: username }),
-  );
+  const user = await getProfilePage(username);
   const activityInput = getApiQueryParams(await props.searchParams, {
     overrides: { limit: 10, user: user.id },
   });

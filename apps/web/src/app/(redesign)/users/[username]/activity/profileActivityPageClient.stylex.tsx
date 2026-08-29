@@ -10,14 +10,12 @@ import {
   SectionError,
   type TastingEntryMember,
 } from "@peated/web/components/designSystem/components";
+import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import {
   MemberActivityList,
   type MemberActivityItem,
 } from "@peated/web/components/designSystem/patterns/memberProfileContent.stylex";
-import {
-  Avatar,
-  PageColumns,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";

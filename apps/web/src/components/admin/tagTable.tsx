@@ -1,6 +1,6 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel, Tag } from "@peated/server/types";
-import AdminTable from "./adminTable.stylex";
+import { AdminTable } from "./adminTable.stylex";
 
 export default function TagTable({
   tagList,

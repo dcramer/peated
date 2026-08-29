@@ -1,8 +1,8 @@
 "use client";
 
 import type { Inputs } from "@peated/server/orpc/router";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import { AdminSplitView } from "@peated/web/components/admin/adminContent.stylex";
-import Button from "@peated/web/components/button";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,

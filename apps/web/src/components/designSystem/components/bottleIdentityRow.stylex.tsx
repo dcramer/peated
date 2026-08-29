@@ -9,6 +9,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 // SAFETY: Next exposes SVGs as components while Storybook exposes the same import as a static asset.
@@ -128,7 +129,13 @@ export function BottleIdentityRow({
   const Brand = brandHref ? "a" : "span";
 
   return (
-    <div {...stylex.props(styles.row)}>
+    <div
+      {...stylex.props(
+        styles.row,
+        Boolean(href) && linkedRowStyles.container,
+        Boolean(href) && linkedRowStyles.onGround,
+      )}
+    >
       <BottleVisual imageUrl={imageUrl} />
       <div {...stylex.props(styles.copy)}>
         {brand ? (
@@ -137,6 +144,7 @@ export function BottleIdentityRow({
             {...stylex.props(
               styles.brand,
               Boolean(brandHref) && styles.brandLink,
+              Boolean(brandHref) && linkedRowStyles.nestedAction,
             )}
           >
             {brand}
@@ -145,7 +153,11 @@ export function BottleIdentityRow({
         <div {...stylex.props(styles.nameLine)}>
           <Name
             href={href}
-            {...stylex.props(styles.name, Boolean(href) && styles.nameLink)}
+            {...stylex.props(
+              styles.name,
+              Boolean(href) && styles.nameLink,
+              Boolean(href) && linkedRowStyles.primaryLink,
+            )}
           >
             {name}
           </Name>
@@ -183,7 +195,10 @@ export function BottleIdentityRow({
         {relatedReleases && relatedReleases.count > 1 ? (
           <a
             href={relatedReleases.href}
-            {...stylex.props(styles.relatedReleases)}
+            {...stylex.props(
+              styles.relatedReleases,
+              linkedRowStyles.nestedAction,
+            )}
           >
             {relatedReleases.count.toLocaleString("en-US")} related releases
           </a>
@@ -247,14 +262,16 @@ const styles = stylex.create({
   row: {
     boxSizing: "border-box",
     display: "flex",
-    width: "100%",
+    width: "calc(100% + 24px)",
     minWidth: 0,
     alignItems: "center",
     gap: space.x3,
+    marginRight: "-12px",
+    marginLeft: "-12px",
     paddingTop: space.x3,
-    paddingRight: 0,
+    paddingRight: "12px",
     paddingBottom: space.x3,
-    paddingLeft: 0,
+    paddingLeft: "12px",
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
@@ -287,10 +304,16 @@ const styles = stylex.create({
   },
   brandLink: {
     color: {
-      default: null,
+      default: colors.inkMuted,
       ":hover": colors.accentDeep,
       ":active": colors.accent,
     },
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
   },
   nameLine: {
     display: "block",
@@ -316,10 +339,16 @@ const styles = stylex.create({
   },
   nameLink: {
     color: {
-      default: null,
+      default: colors.ink,
       ":hover": colors.accentDeep,
       ":active": colors.accent,
     },
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
   },
   status: {
     display: "inline-flex",

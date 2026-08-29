@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -16,14 +17,16 @@ export type DataTableColumn<Item> = {
 export type DataTableProps<Item> = {
   caption: string;
   columns: readonly DataTableColumn<Item>[];
+  getHref?: (item: Item) => string | undefined;
   getKey: (item: Item) => string | number;
   items: readonly Item[];
 };
 
-/** A display-only table. Routes own data, sorting, filtering, and paging. */
+/** A semantic table. Routes own data, sorting, filtering, and paging. */
 export function DataTable<Item>({
   caption,
   columns,
+  getHref,
   getKey,
   items,
 }: DataTableProps<Item>) {
@@ -49,22 +52,45 @@ export function DataTable<Item>({
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={getKey(item)} {...stylex.props(styles.row)}>
-              {columns.map((column) => (
-                <td
-                  key={column.key}
-                  {...stylex.props(
-                    styles.cell,
-                    alignStyles[column.align ?? "left"],
-                    column.priority === "secondary" && styles.secondary,
-                  )}
-                >
-                  {column.cell(item)}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {items.map((item) => {
+            const href = getHref?.(item);
+            return (
+              <tr
+                data-record-key={getKey(item)}
+                key={getKey(item)}
+                {...stylex.props(
+                  styles.row,
+                  Boolean(href) && linkedRowStyles.container,
+                  Boolean(href) && linkedRowStyles.onGround,
+                )}
+              >
+                {columns.map((column, index) => (
+                  <td
+                    key={column.key}
+                    {...stylex.props(
+                      styles.cell,
+                      alignStyles[column.align ?? "left"],
+                      column.priority === "secondary" && styles.secondary,
+                    )}
+                  >
+                    {index === 0 && href ? (
+                      <a
+                        href={href}
+                        {...stylex.props(
+                          styles.rowLink,
+                          linkedRowStyles.primaryLink,
+                        )}
+                      >
+                        {column.cell(item)}
+                      </a>
+                    ) : (
+                      column.cell(item)
+                    )}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -118,10 +144,6 @@ const styles = stylex.create({
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.surface,
-    },
   },
   cell: {
     paddingTop: "13px",
@@ -133,6 +155,20 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: 1.4,
     verticalAlign: "middle",
+  },
+  rowLink: {
+    color: {
+      default: colors.accentDeep,
+      ":hover": colors.accent,
+      ":active": colors.ink,
+    },
+    fontWeight: 600,
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
   },
   secondary: {
     [COMPACT]: {

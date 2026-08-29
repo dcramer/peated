@@ -5,18 +5,23 @@ import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { cache } from "react";
 
 import { LocationDistillerList } from "../../../locationLists";
 import { LocationPageFrame } from "../../../locationPageFrame.stylex";
+
+const getRegion = cache(async (countrySlug: string, regionSlug: string) => {
+  const { client } = await getPublicPageServerClient();
+  return await resolveOrNotFound(
+    client.regions.details({ country: countrySlug, region: regionSlug }),
+  );
+});
 
 export async function generateMetadata(props: {
   params: Promise<{ countrySlug: string; regionSlug: string }>;
 }) {
   const { countrySlug, regionSlug } = await props.params;
-  const { client } = await getPublicPageServerClient();
-  const region = await resolveOrNotFound(
-    client.regions.details({ country: countrySlug, region: regionSlug }),
-  );
+  const region = await getRegion(countrySlug, regionSlug);
 
   return {
     title: `Whisky from ${region.name}, ${region.country.name}`,
@@ -33,9 +38,7 @@ export default async function RegionPage(props: {
     props.searchParams,
   ]);
   const { client } = await getPublicPageServerClient();
-  const region = await resolveOrNotFound(
-    client.regions.details({ country: countrySlug, region: regionSlug }),
-  );
+  const region = await getRegion(countrySlug, regionSlug);
   const queryParams = getApiQueryParams(searchParams, {
     defaults: { sort: "-bottles" },
     numericFields: ["cursor", "limit"],

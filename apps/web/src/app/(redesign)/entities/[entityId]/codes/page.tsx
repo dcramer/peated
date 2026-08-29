@@ -2,9 +2,9 @@ import {
   SMWS_CATEGORY_LIST,
   SMWS_DISTILLERY_CODES,
 } from "@peated/bottle-classifier/smws";
+import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { logError } from "@peated/web/lib/log";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { notFound } from "next/navigation";
 
 import { EntityCodes } from "./entityCodes.stylex";
@@ -14,9 +14,7 @@ export default async function EntityCodesPage(props: {
 }) {
   const { entityId } = await props.params;
   const { client } = await getAnonymousServerClient();
-  const entity = await resolveOrNotFound(
-    client.entities.details({ entity: Number(entityId) }),
-  );
+  const entity = await getEntityPage(Number(entityId));
 
   if (entity.shortName !== "SMWS") notFound();
 

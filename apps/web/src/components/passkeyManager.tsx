@@ -6,12 +6,10 @@ import {
   FormNotice,
   FormStack,
   IconButton,
+  ItemList,
+  ItemRow,
   TextInput,
 } from "@peated/web/components/designSystem/components";
-import {
-  RecordList,
-  RecordRow,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";
@@ -116,11 +114,11 @@ export default function PasskeyManager() {
     <FormStack>
       {error ? <FormNotice>{error}</FormNotice> : null}
       {passkeys?.results.length ? (
-        <RecordList ariaLabel="Your passkeys">
+        <ItemList ariaLabel="Your passkeys">
           {passkeys.results.map((passkey) => {
             const editing = editingId === passkey.id;
             return (
-              <RecordRow
+              <ItemRow
                 key={passkey.id}
                 action={
                   editing ? (
@@ -191,7 +189,7 @@ export default function PasskeyManager() {
               />
             );
           })}
-        </RecordList>
+        </ItemList>
       ) : (
         <FormNotice>
           No passkeys yet. Add one to sign in with your fingerprint, face, or

@@ -18,7 +18,7 @@ import {
   type MemberLibraryFilterGroup,
   type MemberLibraryItem,
 } from "@peated/web/components/designSystem/patterns/memberProfileContent.stylex";
-import { PageColumns } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";

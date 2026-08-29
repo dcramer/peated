@@ -4,7 +4,7 @@ import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { Button } from "./button.stylex";
 import { CountChip } from "./chip.stylex";
 import { EmptyState } from "./feedback.stylex";
-import { RailList, RailListItem } from "./listStructures.stylex";
+import { RailList, RailListItem } from "./lists.stylex";
 
 const meta = {
   title: "Components/Feedback/Empty State",

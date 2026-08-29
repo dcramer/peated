@@ -98,10 +98,6 @@ function CompactSelect({
   );
 }
 
-export function PeriodHeader({ children }: { children: ReactNode }) {
-  return <h3 {...stylex.props(styles.period)}>{children}</h3>;
-}
-
 export type CursorPagerProps = {
   ariaLabel?: string;
   nextHref?: string;
@@ -294,18 +290,6 @@ const styles = stylex.create({
     fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.4,
-  },
-  period: {
-    margin: 0,
-    paddingTop: space.x4,
-    paddingBottom: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   railList: {
     margin: 0,

@@ -9,9 +9,17 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { BandStack, type BandCounts } from "../components";
+import CountryMapIcon from "../../countryMapIcon";
+import {
+  CardLink,
+  ItemList,
+  ItemRow,
+  RatingMeasure,
+  type BandCounts,
+} from "../components";
 
 const COMPACT = "@media (max-width: 639px)";
+const NARROW = "@media (max-width: 899px)";
 
 function HomeModuleHeading({
   action,
@@ -38,6 +46,9 @@ export type HomeRatedBottle = {
   href: string;
   metadata: readonly string[];
   name: string;
+  scoreCount: number;
+  scoreHigh?: number | null;
+  scoreLow?: number | null;
   score: number;
 };
 
@@ -64,26 +75,25 @@ export function HomeHighestRated({
         title="Highest rated"
       />
       <div {...stylex.props(styles.rows)}>
-        {bottles.map((bottle) => (
-          <Link
-            href={bottle.href}
-            key={bottle.href}
-            {...stylex.props(styles.row, styles.ratedRow)}
-          >
-            <span {...stylex.props(styles.rowCopy)}>
-              <strong {...stylex.props(styles.ratedBottleName)}>
-                {bottle.name}
-              </strong>
-              {bottle.metadata.length ? (
-                <span {...stylex.props(styles.rowMetadata)}>
-                  {bottle.metadata.join(" · ")}
-                </span>
-              ) : null}
-            </span>
-            <BandStack counts={bottle.bandCounts} variant="compact" />
-            <strong {...stylex.props(styles.ratedScore)}>{bottle.score}</strong>
-          </Link>
-        ))}
+        <ItemList ariaLabel="Highest rated bottles">
+          {bottles.map((bottle) => (
+            <ItemRow
+              end={
+                <RatingMeasure
+                  counts={bottle.bandCounts}
+                  high={bottle.scoreHigh}
+                  low={bottle.scoreLow}
+                  median={bottle.score}
+                  scoreCount={bottle.scoreCount}
+                />
+              }
+              href={bottle.href}
+              key={bottle.href}
+              metadata={bottle.metadata.join(" · ")}
+              title={bottle.name}
+            />
+          ))}
+        </ItemList>
       </div>
     </section>
   );
@@ -109,29 +119,35 @@ export function HomeRecentReviews({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading title="Newest critic reviews" />
       <div {...stylex.props(styles.rows)}>
-        {reviews.map((review) => (
-          <article key={review.id} {...stylex.props(styles.row)}>
-            <div {...stylex.props(styles.rowCopy)}>
-              <a href={review.bottleHref} {...stylex.props(styles.rowTitle)}>
-                {review.bottleName}
-              </a>
-              <a
-                href={review.sourceHref}
-                rel="noreferrer"
-                target="_blank"
-                {...stylex.props(styles.rowMetadata, styles.sourceLink)}
-              >
-                {review.source}
-              </a>
-            </div>
-            {review.rating !== null && review.rating !== undefined ? (
-              <strong {...stylex.props(styles.reviewRating)}>
-                {review.rating}
-              </strong>
-            ) : null}
-            <span {...stylex.props(styles.rowDate)}>{review.date}</span>
-          </article>
-        ))}
+        <ItemList ariaLabel="Newest critic reviews">
+          {reviews.map((review) => (
+            <ItemRow
+              end={
+                <span {...stylex.props(styles.reviewFacts)}>
+                  {review.rating !== null && review.rating !== undefined ? (
+                    <strong {...stylex.props(styles.reviewRating)}>
+                      {review.rating}
+                    </strong>
+                  ) : null}
+                  <span {...stylex.props(styles.rowDate)}>{review.date}</span>
+                </span>
+              }
+              href={review.bottleHref}
+              key={review.id}
+              metadata={
+                <a
+                  href={review.sourceHref}
+                  rel="noreferrer"
+                  target="_blank"
+                  {...stylex.props(styles.sourceLink)}
+                >
+                  {review.source}
+                </a>
+              }
+              title={review.bottleName}
+            />
+          ))}
+        </ItemList>
       </div>
     </section>
   );
@@ -141,98 +157,112 @@ export type HomeOrigin = {
   description?: ReactNode;
   href: string;
   name: string;
+  slug: string;
   totalBottles: number;
 };
 
 export function HomeOrigins({
   countries,
+  remainingCountries,
   regions,
-  scotland,
-  totalBottles,
 }: {
   countries: readonly HomeOrigin[];
+  remainingCountries?: { count: number; totalBottles: number };
   regions: readonly HomeOrigin[];
-  scotland?: { href: string; totalBottles: number };
-  totalBottles?: number;
 }) {
-  const scotlandShare =
-    scotland && totalBottles
-      ? Math.round((scotland.totalBottles / totalBottles) * 100)
-      : undefined;
-
   return (
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
-        detail="Country first · regions only where the trade uses them"
+        action={
+          <Link href="/locations" {...stylex.props(styles.moreLink)}>
+            Open the map <span aria-hidden="true">→</span>
+          </Link>
+        }
         title="Browse by origin"
       />
-      {scotland ? (
-        <div {...stylex.props(styles.originPanel)}>
-          <div {...stylex.props(styles.originHeader)}>
-            <a href={scotland.href} {...stylex.props(styles.originName)}>
-              Scotland
-            </a>
-            <span {...stylex.props(styles.originCount)}>
-              {scotland.totalBottles.toLocaleString("en-US")} bottlings
-              {scotlandShare === undefined
-                ? null
-                : ` · ${scotlandShare}% of the database`}
-            </span>
-          </div>
-          <div {...stylex.props(styles.regionHeading)}>Whisky regions</div>
-          <div {...stylex.props(styles.regionGrid)}>
-            {regions.map((region) => (
-              <a
-                href={region.href}
-                key={region.href}
-                {...stylex.props(styles.region)}
-              >
-                <strong {...stylex.props(styles.regionName)}>
-                  {region.name}
-                </strong>
-                <span {...stylex.props(styles.regionFacts)}>
-                  {region.totalBottles.toLocaleString("en-US")} bottlings
-                </span>
-              </a>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      <p {...stylex.props(styles.originIntro)}>
+        Mostly Scotch, a good deal of American, and a growing amount of
+        everything else.
+      </p>
       <div {...stylex.props(styles.countryGrid)}>
         {countries.map((country) => (
-          <a
+          <CardLink
+            appearance="surface"
             href={country.href}
             key={country.href}
+            padding="none"
             {...stylex.props(styles.country)}
           >
+            <span aria-hidden="true" {...stylex.props(styles.countryMap)}>
+              <CountryMapIcon
+                slug={country.slug}
+                {...stylex.props(styles.countryMapSvg)}
+              />
+            </span>
             <span {...stylex.props(styles.countryHeading)}>
               <strong {...stylex.props(styles.countryName)}>
                 {country.name}
               </strong>
-              <span {...stylex.props(styles.countryCount)}>
-                {country.totalBottles.toLocaleString("en-US")}
-              </span>
             </span>
-            {country.description ? (
-              <span {...stylex.props(styles.countryDescription)}>
-                {country.description}
-              </span>
-            ) : null}
-          </a>
+            <span {...stylex.props(styles.countryCount)}>
+              {country.totalBottles.toLocaleString("en-US")} bottles
+            </span>
+          </CardLink>
         ))}
+        {remainingCountries && remainingCountries.count > 0 ? (
+          <CardLink
+            appearance="surface"
+            href="/locations"
+            padding="none"
+            {...stylex.props(styles.country)}
+          >
+            <span
+              aria-hidden="true"
+              {...stylex.props(styles.countryMap, styles.remainingMap)}
+            >
+              +{remainingCountries.count}
+            </span>
+            <span {...stylex.props(styles.countryHeading)}>
+              <strong {...stylex.props(styles.countryName)}>
+                Everywhere else
+              </strong>
+            </span>
+            <span {...stylex.props(styles.countryCount)}>
+              {remainingCountries.totalBottles.toLocaleString("en-US")} bottles
+            </span>
+          </CardLink>
+        ) : null}
       </div>
-      <div {...stylex.props(styles.originFooter)}>
-        <Link href="/locations" {...stylex.props(styles.moreLink)}>
-          All countries <span aria-hidden="true">→</span>
-        </Link>
-        <Link href="/locations" {...stylex.props(styles.moreLink)}>
-          Map <span aria-hidden="true">→</span>
-        </Link>
-        <span {...stylex.props(styles.originNote)}>
-          Countries are divided into whisky regions only where the trade uses
-          them.
-        </span>
-      </div>
+      {regions.length ? (
+        <>
+          <div {...stylex.props(styles.regionHeading)}>By region</div>
+          <div {...stylex.props(styles.regionGrid)}>
+            {regions.map((region) => (
+              <CardLink
+                appearance="surface"
+                href={region.href}
+                key={region.href}
+                padding="none"
+                {...stylex.props(styles.region)}
+              >
+                <span {...stylex.props(styles.regionLine)}>
+                  <strong {...stylex.props(styles.regionName)}>
+                    {region.name}
+                  </strong>
+                  <span {...stylex.props(styles.regionFacts)}>
+                    {region.totalBottles.toLocaleString("en-US")}
+                  </span>
+                </span>
+                {region.description ? (
+                  <span {...stylex.props(styles.regionDescription)}>
+                    {region.description}
+                  </span>
+                ) : null}
+              </CardLink>
+            ))}
+          </div>
+        </>
+      ) : null}
     </section>
   );
 }
@@ -255,23 +285,21 @@ export function HomeDistilleries({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading title="Most recorded distilleries" />
       <div {...stylex.props(styles.distilleries)}>
-        {distilleries.map((distillery) => (
-          <a
-            href={distillery.href}
-            key={distillery.href}
-            {...stylex.props(styles.distillery)}
-          >
-            <span {...stylex.props(styles.distilleryCopy)}>
-              <strong {...stylex.props(styles.distilleryName)}>
-                {distillery.name}
-              </strong>
-              <span {...stylex.props(styles.distilleryMetadata)}>
-                {distillery.location ? `${distillery.location} · ` : null}
-                {distillery.totalBottles.toLocaleString("en-US")} bottlings
-              </span>
-            </span>
-          </a>
-        ))}
+        <ItemList ariaLabel="Most recorded distilleries">
+          {distilleries.map((distillery) => (
+            <ItemRow
+              href={distillery.href}
+              key={distillery.href}
+              metadata={
+                <>
+                  {distillery.location ? `${distillery.location} · ` : null}
+                  {distillery.totalBottles.toLocaleString("en-US")} bottlings
+                </>
+              }
+              title={distillery.name}
+            />
+          ))}
+        </ItemList>
       </div>
       <div {...stylex.props(styles.directoryLinks)}>
         {links.map((link, index) => (
@@ -315,22 +343,18 @@ export function HomeRecentBottles({
         title="Added this week"
       />
       <div {...stylex.props(styles.recentBottles)}>
-        {bottles.map((bottle) => (
-          <a
-            href={bottle.href}
-            key={bottle.href}
-            {...stylex.props(styles.recentBottle)}
-          >
-            <strong {...stylex.props(styles.recentBottleName)}>
-              {bottle.name}
-            </strong>
-            {bottle.metadata.length ? (
-              <span {...stylex.props(styles.rowMetadata)}>
-                {bottle.metadata.join(" · ")}
-              </span>
-            ) : null}
-          </a>
-        ))}
+        <ItemList ariaLabel="Bottles added this week" variant="surface">
+          {bottles.map((bottle) => (
+            <ItemRow
+              href={bottle.href}
+              key={bottle.href}
+              metadata={bottle.metadata.join(" · ")}
+              size="sm"
+              title={bottle.name}
+              variant="surface"
+            />
+          ))}
+        </ItemList>
       </div>
     </section>
   );
@@ -428,97 +452,9 @@ const styles = stylex.create({
   rows: {
     marginTop: space.x2,
   },
-  row: {
-    display: "flex",
-    minWidth: 0,
-    alignItems: "baseline",
-    gap: space.x3,
-    paddingTop: "11px",
-    paddingBottom: "11px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    ":last-child": {
-      borderBottomWidth: 0,
-    },
-  },
-  ratedRow: {
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.surface,
-      ":active": colors.accentTint,
-    },
-    color: colors.ink,
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  rowCopy: {
-    minWidth: 0,
-    flex: 1,
-  },
-  rowTitle: {
-    display: "block",
-    overflow: "hidden",
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 500,
-    letterSpacing: "-0.01em",
-    lineHeight: 1.25,
-    textDecoration: "none",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  rowMetadata: {
-    display: "block",
-    overflow: "hidden",
-    marginTop: "2px",
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  ratedBottleName: {
-    display: "block",
-    overflow: "hidden",
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 500,
-    letterSpacing: "-0.01em",
-    lineHeight: 1.25,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  ratedScore: {
-    width: "32px",
-    flexShrink: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-    textAlign: "right",
-  },
   sourceLink: {
+    position: "relative",
+    zIndex: 2,
     width: "fit-content",
     maxWidth: "100%",
     borderRadius: controlMetrics.radiusSmall,
@@ -528,11 +464,21 @@ const styles = stylex.create({
       ":hover": colors.accentDeep,
       ":active": colors.accent,
     },
-    textDecoration: "none",
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     boxShadow: {
       default: "none",
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": "none",
     },
+  },
+  reviewFacts: {
+    display: "flex",
+    alignItems: "center",
+    gap: space.x3,
   },
   reviewRating: {
     flexShrink: 0,
@@ -556,52 +502,17 @@ const styles = stylex.create({
       display: "none",
     },
   },
-  originPanel: {
-    marginTop: "14px",
-    padding: "18px",
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
-  },
-  originHeader: {
-    display: "flex",
-    minWidth: 0,
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x3,
-    [COMPACT]: {
-      alignItems: "flex-start",
-      flexDirection: "column",
-      gap: space.x1,
-    },
-  },
-  originName: {
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
-    fontFamily: fonts.display,
-    fontSize: "20px",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1.2,
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  originCount: {
-    flexShrink: 0,
+  originIntro: {
+    maxWidth: "640px",
+    marginTop: space.x2,
+    marginBottom: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
+    fontFamily: fonts.reading,
+    fontSize: "15px",
+    lineHeight: 1.5,
   },
   regionHeading: {
-    marginTop: space.x4,
+    marginTop: space.x6,
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "10px",
@@ -611,9 +522,12 @@ const styles = stylex.create({
   },
   regionGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
     gap: "6px",
     marginTop: space.x2,
+    [NARROW]: {
+      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    },
     [COMPACT]: {
       gridTemplateColumns: "minmax(0, 1fr)",
     },
@@ -622,19 +536,8 @@ const styles = stylex.create({
     display: "block",
     minWidth: 0,
     padding: space.x3,
-    borderRadius: controlMetrics.radius,
-    outline: "none",
-    backgroundColor: {
-      default: colors.inset,
-      ":hover": colors.accentTint,
-      ":active": colors.accentTint,
-    },
     color: colors.ink,
     textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
   regionName: {
     display: "block",
@@ -644,9 +547,16 @@ const styles = stylex.create({
     letterSpacing: "-0.02em",
     lineHeight: 1.2,
   },
+  regionLine: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: space.x2,
+  },
   regionFacts: {
     display: "block",
-    marginTop: space.x1,
+    flexShrink: 0,
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "11px",
@@ -654,7 +564,7 @@ const styles = stylex.create({
   },
   regionDescription: {
     display: "block",
-    marginTop: space.x2,
+    marginTop: space.x1,
     color: colors.inkMuted,
     fontFamily: fonts.reading,
     fontSize: "13px",
@@ -663,30 +573,25 @@ const styles = stylex.create({
   },
   countryGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
     gap: "6px",
-    marginTop: "6px",
+    marginTop: space.x4,
+    [NARROW]: {
+      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    },
     [COMPACT]: {
       gridTemplateColumns: "minmax(0, 1fr)",
     },
   },
   country: {
-    display: "block",
+    display: "flex",
     minWidth: 0,
+    minHeight: "188px",
+    flexDirection: "column",
+    justifyContent: "flex-end",
     padding: "18px",
-    borderRadius: controlMetrics.radius,
-    outline: "none",
-    backgroundColor: {
-      default: colors.surface,
-      ":hover": colors.inset,
-      ":active": colors.accentTint,
-    },
     color: colors.ink,
     textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
   countryHeading: {
     display: "flex",
@@ -706,106 +611,62 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   countryCount: {
+    display: "block",
     flexShrink: 0,
+    marginTop: space.x1,
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.4,
   },
-  countryDescription: {
-    display: "-webkit-box",
-    overflow: "hidden",
-    marginTop: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
-    WebkitBoxOrient: "vertical",
-    WebkitLineClamp: 2,
-  },
-  originFooter: {
+  countryMap: {
     display: "flex",
-    alignItems: "baseline",
-    gap: space.x4,
-    marginTop: space.x3,
-    flexWrap: "wrap",
-  },
-  originNote: {
+    width: "100%",
+    minHeight: 0,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: space.x2,
+    paddingRight: space.x3,
+    paddingBottom: space.x4,
+    paddingLeft: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
-    lineHeight: 1.4,
+  },
+  countryMapSvg: {
+    width: "100%",
+    maxWidth: "132px",
+    height: "76px",
+  },
+  remainingMap: {
+    fontFamily: fonts.display,
+    fontSize: "42px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
   },
   distilleries: {
     marginTop: "14px",
-  },
-  distillery: {
-    display: "block",
-    minWidth: 0,
-    paddingTop: "11px",
-    paddingBottom: "11px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.surface,
-      ":active": colors.accentTint,
-    },
-    color: colors.ink,
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-    ":last-child": {
-      borderBottomWidth: 0,
-    },
-  },
-  distilleryName: {
-    display: "block",
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
-  distilleryCount: {
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "13px",
-    fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.2,
-  },
-  distilleryCopy: {
-    display: "block",
-    minWidth: 0,
-  },
-  distilleryMetadata: {
-    display: "block",
-    marginTop: "2px",
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
   },
   moreLink: {
     display: "inline-block",
     borderRadius: controlMetrics.radiusSmall,
     outline: "none",
     color: {
-      default: colors.accentDeep,
-      ":hover": colors.accent,
-      ":active": colors.ink,
+      default: colors.accent,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
     },
     fontFamily: fonts.display,
     fontSize: "13px",
     fontWeight: 700,
     lineHeight: 1.2,
-    textDecoration: "none",
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
@@ -830,42 +691,6 @@ const styles = stylex.create({
   },
   recentBottles: {
     marginTop: "10px",
-    paddingRight: "18px",
-    paddingLeft: "18px",
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
-  },
-  recentBottle: {
-    display: "block",
-    paddingTop: "11px",
-    paddingBottom: "11px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.inset,
-      ":active": colors.accentTint,
-    },
-    color: colors.ink,
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-    ":last-child": {
-      borderBottomWidth: 0,
-    },
-  },
-  recentBottleName: {
-    display: "block",
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
   },
   prompt: {
     padding: "18px",

@@ -2,13 +2,13 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
+  ItemList,
+  ItemRow,
 } from "@peated/web/components/designSystem/components";
 import {
   PageHeader,
   PageSection,
-  RecordList,
-  RecordRow,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
@@ -47,9 +47,9 @@ export default async function FlightsPage(props: {
       />
       <PageSection count={flightList.results.length} heading="Your flights">
         {flightList.results.length ? (
-          <RecordList ariaLabel="Tasting flights">
+          <ItemList ariaLabel="Tasting flights">
             {flightList.results.map((flight) => (
-              <RecordRow
+              <ItemRow
                 description={flight.description}
                 href={`/flights/${flight.id}`}
                 key={flight.id}
@@ -57,7 +57,7 @@ export default async function FlightsPage(props: {
                 title={flight.name}
               />
             ))}
-          </RecordList>
+          </ItemList>
         ) : (
           <EmptyState
             action={

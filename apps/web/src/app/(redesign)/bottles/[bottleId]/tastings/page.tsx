@@ -2,13 +2,9 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
-  TastingEntry,
-  type TastingEntryMember,
 } from "@peated/web/components/designSystem/components";
-import { Avatar } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
-import TimeSince from "@peated/web/components/timeSince";
+import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
@@ -37,33 +33,9 @@ export default async function BottleTastingsPage(props: {
     <BottleSection count={tastingList.results.length} heading="Tastings">
       {tastingList.results.length ? (
         <div>
-          {tastingList.results.map((tasting) => {
-            const member: TastingEntryMember = {
-              description: tasting.notes,
-              href: `/bottles/${tasting.bottle.id}`,
-              metadata: getBottleMetadata(tasting.bottle),
-              name: tasting.bottle.fullName,
-              notes: tasting.tags,
-              ratingBand: tasting.ratingBand ?? undefined,
-            };
-            return (
-              <TastingEntry
-                author={tasting.createdBy.username}
-                authorHref={`/users/${tasting.createdBy.username}`}
-                date={<TimeSince date={tasting.createdAt} />}
-                key={tasting.id}
-                leading={
-                  <Avatar
-                    imageUrl={tasting.createdBy.pictureUrl}
-                    initials={tasting.createdBy.username
-                      .slice(0, 2)
-                      .toLocaleUpperCase()}
-                  />
-                }
-                members={[member]}
-              />
-            );
-          })}
+          {tastingList.results.map((tasting) => (
+            <TastingRecordEntry key={tasting.id} tasting={tasting} />
+          ))}
         </div>
       ) : (
         <EmptyState

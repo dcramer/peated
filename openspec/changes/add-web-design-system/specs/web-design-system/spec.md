@@ -75,6 +75,11 @@ The web workspace SHALL provide Storybook as a design-system catalog that render
 - **WHEN** a behavior, asynchronous state, permission boundary, error, or responsive composition needs isolated review
 - **THEN** the story renders that scenario directly without requiring setup interactions from the reviewer
 
+#### Scenario: Reviewer inspects a shared interaction treatment
+
+- **WHEN** a shared component owns hover, pressed, and keyboard-focus styles
+- **THEN** one behavior story pins those real pseudo states on the product component for direct visual review
+
 #### Scenario: Product route composes catalog components
 
 - **WHEN** a product route assembles reviewed components into a complete page
@@ -122,12 +127,30 @@ Links and linked surfaces SHALL communicate hover, pressed, and keyboard-focus s
 #### Scenario: Member points to a text link
 
 - **WHEN** a neutral text link is hovered or pressed
-- **THEN** it uses the deeper accent on hover and the accent on press without changing its dimensions
+- **THEN** it uses the deeper accent and a 1px underline on hover, then the accent on press, without changing its dimensions
 
 #### Scenario: Member points to a linked card or row
 
 - **WHEN** a linked surface is hovered, pressed, or receives keyboard focus
 - **THEN** it steps from surface to inset on hover, uses accent tint while pressed, and puts the shared inset focus ring around the complete actionable surface
+
+#### Scenario: Member points to a plain linked row
+
+- **WHEN** a linked row sits directly on the page ground
+- **THEN** its interaction surface extends 12px past the text grid on both sides while equal inner padding keeps its content aligned and its layout dimensions stable
+
+#### Scenario: A linked row contains another action
+
+- **WHEN** a record row has a primary destination plus a secondary link, menu, or button
+- **THEN** the primary destination remains the default for the row surface while the nested action keeps its own destination or behavior
+- **AND** every linked record row uses the same tonal hover, pressed, and keyboard-focus treatment
+
+#### Scenario: A table row has a primary destination
+
+- **WHEN** a bottle row or semantic table row represents a record with a destination
+- **THEN** the complete row uses that destination and the shared hover, pressed, and keyboard-focus treatment
+- **AND** links, buttons, and menus inside the row remain independent actions
+- **AND** rows without a destination do not present a linked-row hover treatment
 
 ### Requirement: Reviewable migration slices
 
@@ -158,6 +181,12 @@ page composition and its live product adapter are ready to replace it together.
 - **WHEN** the visitor has no session
 - **THEN** public homepage data is fetched through the anonymous server client and hydrated into the matching client queries, the route remains request-time rendered, and the header shows database navigation without duplicating the hero search
 
+#### Scenario: Homepage production data is sparse
+
+- **WHEN** the signed-out homepage introduces the database
+- **THEN** the introduction describes browsable records without claiming complete coverage or requiring a large total to make the product sound useful
+- **AND** factual search, directory, and statistics modules may show the real totals they own
+
 #### Scenario: A member opens the homepage
 
 - **WHEN** the visitor has a session
@@ -166,8 +195,14 @@ page composition and its live product adapter are ready to replace it together.
 #### Scenario: An anonymous visitor browses homepage origins
 
 - **WHEN** the countries and Scottish regions endpoints return public records
-- **THEN** the homepage groups those real regions under Scotland and lists the other countries with their API-owned bottle totals
+- **THEN** the homepage shows the three largest countries as map tiles, combines the remaining returned country records into one real total, and lists the four largest supplied Scottish regions below them
 - **AND** the interface does not infer regional membership or counts
+
+#### Scenario: A bottle row shows ratings
+
+- **WHEN** a bottle supplies five tasting-band counts and an optional published median and score range
+- **THEN** one compact measure keeps all five bands visible, reserves the withheld median slot, and exposes the full counts and range to assistive technology
+- **AND** the interface does not merge tasting bands into review scores
 
 #### Scenario: An anonymous visitor sees the highest-rated bottles
 
@@ -258,6 +293,12 @@ The design system SHALL provide a scoped search experience that presents caller-
 
 - **WHEN** the caller does not supply totals, nearest matches, recent queries, or contribution permission
 - **THEN** the component does not infer those values or render actions that require them
+
+#### Scenario: Member opens the dedicated search route
+
+- **WHEN** a member opens the general search page or a bottle-selection intent
+- **THEN** the route centers a compact contextual heading and the shared page search without a catalog-style surface banner
+- **AND** the route does not force query focus before the member interacts, so phone browsers keep the heading visible and do not open the keyboard on load
 
 ### Requirement: Domain-owned tasting inputs
 
@@ -375,22 +416,46 @@ The design system SHALL use one tasting-form component tree across desktop and m
 
 ### Requirement: Form support components
 
-The design system SHALL provide reusable unit, progress, duplicate-match, note-vocabulary, friend-selection, and selected-bottle controls that preserve their owning product contracts.
+The design system SHALL provide reusable unit, note-vocabulary, friend-selection, and selected-bottle controls that preserve their owning product contracts.
 
 #### Scenario: Contributor enters a measured bottle fact
 
 - **WHEN** a numeric bottle field has a fixed unit
 - **THEN** the control keeps the numeric value editable and the unit visible but not editable
 
-#### Scenario: Contributor may be creating a duplicate
-
-- **WHEN** matching bottle records are supplied
-- **THEN** the duplicate-match component identifies each record and lets the contributor select it before continuing
-
 #### Scenario: Member records notes and friends
 
 - **WHEN** a member searches tasting notes or drinking companions
 - **THEN** the controls select from the supplied note vocabulary and friend results without inventing a second data contract
+
+#### Scenario: Contributor may be creating a duplicate
+
+- **WHEN** the live bottle-entry flow finds possible matching records
+- **THEN** that route presents the matches before creation without adding a Storybook-only duplicate component
+
+### Requirement: Plain shared component boundaries
+
+The web application SHALL use plain UI nouns for shared components and SHALL keep reusable layout and behavior independent from route-specific page copies.
+
+#### Scenario: A route renders aligned linked rows
+
+- **WHEN** several routes need the same row geometry and interaction treatment
+- **THEN** they use `ItemList` and `ItemRow` instead of route-local rows or a vague record abstraction
+
+#### Scenario: A route renders a member picture
+
+- **WHEN** a header or row needs a circular member picture or initials fallback
+- **THEN** it uses the shared `Avatar` sizes while profile-specific portrait geometry stays with the profile header
+
+#### Scenario: A picker handles listbox keys
+
+- **WHEN** search, entity, and note pickers handle Up, Down, Enter, and Escape
+- **THEN** they share one private navigation behavior while retaining their distinct product data and visual contracts
+
+#### Scenario: A page uses shared layout
+
+- **WHEN** a server route composes the page frame, columns, heading, or sections
+- **THEN** those helpers do not require a client boundary or include fabricated navigation, search, footer, or page data
 
 #### Scenario: Member opens a tasting for a preselected bottle
 

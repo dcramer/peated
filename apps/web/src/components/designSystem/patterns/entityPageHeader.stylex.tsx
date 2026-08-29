@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { space } from "../../../styles/tokens.stylex";
 import { RecordId, SpecStrip, type SpecStripCells } from "../components";
-import { PageHeader } from "./pagePatternShell.stylex";
+import { PageHeader } from "./pageLayout.stylex";
 
 export type EntityPageHeaderProps = {
   actions?: ReactNode;

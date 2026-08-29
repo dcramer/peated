@@ -10,7 +10,7 @@ import {
 } from "../../../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
-import { BandStack, type BandCounts } from "./scoring.stylex";
+import { RatingMeasure, type BandCounts } from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 559px)";
 
@@ -284,21 +284,13 @@ function ResultVisual({
 }
 
 function ResultMeasures({ measures }: { measures: SearchResultMeasure }) {
-  return (
-    <>
-      {measures.score ? (
-        <span
-          aria-label={`Score ${measures.score.value} out of 100 from ${measures.score.count} ${measures.score.count === 1 ? "review" : "reviews"}`}
-          {...stylex.props(styles.score)}
-        >
-          {measures.score.value}
-        </span>
-      ) : null}
-      {measures.bands ? (
-        <BandStack counts={measures.bands} variant="compact" />
-      ) : null}
-    </>
-  );
+  return measures.score || measures.bands ? (
+    <RatingMeasure
+      counts={measures.bands}
+      median={measures.score?.value}
+      scoreCount={measures.score?.count}
+    />
+  ) : null;
 }
 
 function MatchedText({ query, text }: { query: string; text: string }) {
@@ -485,7 +477,7 @@ const styles = stylex.create({
   },
   wideMeasures: {
     display: "flex",
-    minWidth: "136px",
+    minWidth: "152px",
     flexShrink: 0,
     alignItems: "center",
     justifyContent: "flex-end",
@@ -502,15 +494,6 @@ const styles = stylex.create({
     [COMPACT]: {
       display: "flex",
     },
-  },
-  score: {
-    minWidth: "48px",
-    color: colors.accent,
-    fontFamily: fonts.data,
-    fontSize: "12px",
-    fontVariantNumeric: "tabular-nums",
-    lineHeight: 1,
-    textAlign: "right",
   },
   more: {
     display: "flex",

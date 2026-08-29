@@ -7,7 +7,11 @@ const webRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(ts|tsx)"],
-  addons: ["@storybook/addon-a11y", "@storybook/addon-mcp"],
+  addons: [
+    "@storybook/addon-a11y",
+    "@storybook/addon-mcp",
+    "storybook-addon-pseudo-states",
+  ],
   framework: {
     name: "@storybook/nextjs-vite",
     options: {},

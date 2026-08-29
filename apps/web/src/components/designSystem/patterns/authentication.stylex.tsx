@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import NextLink from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
@@ -8,7 +9,6 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import Link from "../../link";
 
 const NARROW = "@media (max-width: 759px)";
 const DARK = "@media (prefers-color-scheme: dark)";
@@ -47,9 +47,9 @@ export function AuthenticationIntro({
           {...stylex.props(styles.artwork)}
         />
       ) : null}
-      <Link href="/" {...stylex.props(styles.brand)}>
+      <NextLink href="/" {...stylex.props(styles.brand)}>
         Peated
-      </Link>
+      </NextLink>
       <div {...stylex.props(styles.introBody)}>
         <h1 {...stylex.props(styles.introTitle)}>{title}</h1>
         {description ? (
@@ -141,12 +141,12 @@ export function AuthenticationDivider({ label }: { label?: string }) {
 }
 
 type AuthenticationLinkProps = Omit<
-  ComponentProps<typeof Link>,
+  ComponentProps<typeof NextLink>,
   "className" | "style"
 >;
 
 export function AuthenticationLink(props: AuthenticationLinkProps) {
-  return <Link {...props} {...stylex.props(styles.link)} />;
+  return <NextLink {...props} {...stylex.props(styles.link)} />;
 }
 
 export function AuthenticationTextButton({
@@ -225,11 +225,14 @@ const styles = stylex.create({
     alignSelf: "flex-start",
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "18px",
+    fontSize: "32px",
     fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
+    letterSpacing: "-0.04em",
+    lineHeight: 1,
     textDecoration: "none",
+    [NARROW]: {
+      fontSize: "24px",
+    },
   },
   introBody: {
     position: "relative",

@@ -3,7 +3,7 @@ import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 
 import { AdminTextLink } from "./adminContent.stylex";
-import AdminTable from "./adminTable.stylex";
+import { AdminTable } from "./adminTable.stylex";
 
 export default function StorePriceTable({
   priceList,

@@ -54,3 +54,36 @@ export const Overview: Story = {
     </StoryStack>
   ),
 };
+
+export const InteractionStates: Story = {
+  render: (args) => (
+    <StoryStack>
+      <div id="bottle-row-default">
+        <BottleIdentityRow {...args} name="Default" />
+      </div>
+      <div id="bottle-row-hovered">
+        <BottleIdentityRow {...args} name="Hovered" />
+      </div>
+      <div id="bottle-row-focused">
+        <BottleIdentityRow {...args} name="Keyboard focused" />
+      </div>
+      <div id="bottle-row-nested">
+        <BottleIdentityRow
+          {...args}
+          name="Primary bottle with brand and release links"
+          relatedReleases={{ count: 3, href: "#releases" }}
+        />
+      </div>
+      <div id="bottle-row-pressed">
+        <BottleIdentityRow {...args} name="Pressed" />
+      </div>
+    </StoryStack>
+  ),
+  parameters: {
+    pseudo: {
+      active: ["#bottle-row-pressed > div"],
+      focusWithin: ["#bottle-row-focused > div"],
+      hover: ["#bottle-row-hovered > div"],
+    },
+  },
+};

@@ -2,8 +2,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
 
-import DefinitionList from "../definitionList";
 import { AdminDetails, AdminSection, AdminStatus } from "./adminContent.stylex";
+import { AdminDefinitionList as DefinitionList } from "./adminUtility.stylex";
 
 type Site = Outputs["externalSites"]["healthDetails"];
 

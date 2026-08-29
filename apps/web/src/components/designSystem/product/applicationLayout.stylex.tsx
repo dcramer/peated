@@ -1,7 +1,6 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import * as stylex from "@stylexjs/stylex";
 import { CircleUserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -9,9 +8,8 @@ import type { ReactNode } from "react";
 import { useTransition } from "react";
 import useAuth from "../../../hooks/useAuth";
 import { logout } from "../../../lib/auth.actions";
-import { colors, controlMetrics } from "../../../styles/tokens.stylex";
-import { ApplicationHeader, ButtonLink } from "../components";
-import { PageFrame } from "../patterns/pagePatternShell.stylex";
+import { ApplicationHeader, Avatar, ButtonLink } from "../components";
+import { PageFrame } from "../patterns/pageLayout.stylex";
 import { ApplicationFooter } from "./applicationFooter.stylex";
 import { Search } from "./search.stylex";
 
@@ -31,17 +29,13 @@ function AccountVisual({
   pictureUrl?: string | null;
   username?: string;
 }) {
-  if (pictureUrl) {
-    return (
-      <img alt="" src={pictureUrl} {...stylex.props(styles.accountImage)} />
-    );
-  }
-
   if (username) {
     return (
-      <span aria-hidden="true" {...stylex.props(styles.accountInitials)}>
-        {username.slice(0, 2).toLocaleUpperCase()}
-      </span>
+      <Avatar
+        imageUrl={pictureUrl}
+        initials={username.slice(0, 2).toLocaleUpperCase()}
+        size="xs"
+      />
     );
   }
 
@@ -134,26 +128,3 @@ export function ApplicationLayout({
     </PageFrame>
   );
 }
-
-const styles = stylex.create({
-  accountImage: {
-    display: "block",
-    width: "26px",
-    height: "26px",
-    borderRadius: "50%",
-    objectFit: "cover",
-  },
-  accountInitials: {
-    display: "inline-flex",
-    width: "26px",
-    height: "26px",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.inset,
-    color: colors.ink,
-    fontSize: "10px",
-    fontWeight: 700,
-    lineHeight: 1,
-  },
-});

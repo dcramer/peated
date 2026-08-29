@@ -8,6 +8,8 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 
+const COMPACT = "@media (max-width: 639px)";
+
 export const RATING_BANDS = [
   {
     key: "mediocre",
@@ -124,19 +126,17 @@ export type BandStackProps = {
   counts?: BandCounts;
   showCounts?: boolean;
   showRanges?: boolean;
-  variant?: "full" | "compact";
 };
 
-/** Shows tasting ratings as five fixed bins, or three drawing blocks in narrow rows. */
+/** Shows aggregate tasting ratings as five fixed bins. */
 export function BandStack({
   counts = {},
   showCounts = false,
   showRanges = false,
-  variant = "full",
 }: BandStackProps) {
-  const bins = getBandStackBins(counts, variant);
+  const bins = getBandStackBins(counts);
   const total = bins.reduce((sum, bin) => sum + bin.count, 0);
-  const shares = getBandStackShares(bins, variant);
+  const shares = getBandStackShares(bins);
   const label = bins
     .map((bin) => `${bin.label} ${formatCount(bin.count)}`)
     .join(", ");
@@ -146,15 +146,11 @@ export function BandStack({
       aria-label={label}
       data-state={total === 0 ? "empty" : "populated"}
       role="img"
-      {...stylex.props(
-        styles.bandStack,
-        variant === "compact" && styles.compactBandStack,
-      )}
+      {...stylex.props(styles.bandStack)}
     >
       <div
         {...stylex.props(
           styles.bandStackTrack,
-          variant === "compact" && styles.compactBandStackTrack,
           total === 0 && styles.emptyBandStackTrack,
         )}
       >
@@ -232,6 +228,86 @@ export function BandMark({ band }: BandMarkProps) {
   );
 }
 
+export type RatingMeasureProps = {
+  /** Tasting rating counts in the fixed five-band order. */
+  counts?: BandCounts;
+  /** Highest eligible score in the median pool. */
+  high?: number | null;
+  /** Lowest eligible score in the median pool. */
+  low?: number | null;
+  /** Published median score. Keep this empty when the sample is withheld. */
+  median?: number | null;
+  /** Number of eligible scores in the median pool. */
+  scoreCount?: number;
+};
+
+/** Combines the five tasting bands and published score into one compact row measure. */
+export function RatingMeasure({
+  counts = {},
+  high = null,
+  low = null,
+  median = null,
+  scoreCount = 0,
+}: RatingMeasureProps) {
+  const bandCounts = RATING_BANDS.map((band) => counts[band.key] ?? 0);
+  const tastingCount = bandCounts.reduce((sum, count) => sum + count, 0);
+  const maxBandCount = Math.max(...bandCounts, 0);
+  const sampleHeight = getRatingSampleHeight(tastingCount);
+  const hasRange = low !== null && high !== null;
+  const label = [
+    median === null
+      ? "No published score"
+      : `Median score ${median} from ${formatCount(scoreCount)} ${scoreCount === 1 ? "score" : "scores"}`,
+    `Tasting ratings: ${RATING_BANDS.map((band, index) => `${band.label} ${formatCount(bandCounts[index] ?? 0)}`).join(", ")}`,
+    hasRange ? `Score range ${low} to ${high}` : null,
+  ]
+    .filter(Boolean)
+    .join(". ");
+
+  return (
+    <span
+      aria-label={label}
+      data-state={tastingCount === 0 && median === null ? "empty" : "populated"}
+      role="img"
+      title={label}
+      {...stylex.props(styles.ratingMeasure)}
+    >
+      <span aria-hidden="true" {...stylex.props(styles.ratingPlot)}>
+        <span {...stylex.props(styles.ratingBars)}>
+          {bandCounts.map((count, index) => (
+            <span
+              key={RATING_BANDS[index]?.key}
+              {...stylex.props(styles.ratingTrack)}
+            >
+              {count > 0 ? (
+                <span
+                  {...stylex.props(
+                    styles.ratingBar(
+                      getRatingBarHeight(count, maxBandCount, sampleHeight),
+                    ),
+                  )}
+                />
+              ) : null}
+            </span>
+          ))}
+        </span>
+        <span {...stylex.props(styles.ratingBaseline)} />
+        <span {...stylex.props(styles.ratingRangeSlot)}>
+          {hasRange ? (
+            <span {...stylex.props(styles.ratingRange(low, high))}>
+              <span {...stylex.props(styles.ratingRangeStart)} />
+              <span {...stylex.props(styles.ratingRangeEnd)} />
+            </span>
+          ) : null}
+        </span>
+      </span>
+      <strong {...stylex.props(styles.ratingMedian)}>
+        {median === null ? null : median}
+      </strong>
+    </span>
+  );
+}
+
 type BandFill = "high" | "low" | "mid";
 type BandStackBin = {
   count: number;
@@ -247,36 +323,7 @@ function bandFillForKey(key: RatingBand): BandFill {
   return "high";
 }
 
-function getBandStackBins(
-  counts: BandCounts,
-  variant: NonNullable<BandStackProps["variant"]>,
-): BandStackBin[] {
-  if (variant === "compact") {
-    return [
-      {
-        count: (counts.mediocre ?? 0) + (counts.good ?? 0),
-        fill: "low",
-        key: "low",
-        label: "Under 85",
-        range: "under 85",
-      },
-      {
-        count: counts.very_good ?? 0,
-        fill: "mid",
-        key: "mid",
-        label: "85–89",
-        range: "85–89",
-      },
-      {
-        count: (counts.outstanding ?? 0) + (counts.unicorn ?? 0),
-        fill: "high",
-        key: "high",
-        label: "90 and up",
-        range: "90+",
-      },
-    ];
-  }
-
+function getBandStackBins(counts: BandCounts): BandStackBin[] {
   return RATING_BANDS.map((band) => ({
     count: counts[band.key] ?? 0,
     fill: bandFillForKey(band.key),
@@ -286,40 +333,30 @@ function getBandStackBins(
   }));
 }
 
-function getBandStackShares(
-  bins: readonly BandStackBin[],
-  variant: NonNullable<BandStackProps["variant"]>,
-) {
+function getBandStackShares(bins: readonly BandStackBin[]) {
   const total = bins.reduce((sum, bin) => sum + bin.count, 0);
   if (total === 0) return bins.map(() => 0);
-
-  const shares = bins.map((bin) => (bin.count / total) * 100);
-  if (variant !== "compact") return shares;
-
-  const minimumShare = 12;
-  let debt = 0;
-  const adjusted = shares.map((share) => {
-    if (share === 0 || share >= minimumShare) return share;
-    debt += minimumShare - share;
-    return minimumShare;
-  });
-
-  while (debt > 0.01) {
-    const largest = Math.max(...adjusted);
-    const index = adjusted.indexOf(largest);
-    const available = Math.max(0, largest - minimumShare);
-    const payment = Math.min(available, debt);
-    if (payment === 0) break;
-    adjusted[index] -= payment;
-    debt -= payment;
-  }
-
-  return adjusted;
+  return bins.map((bin) => (bin.count / total) * 100);
 }
 
 function clampPoint(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.min(100, Math.max(0, Math.round(value)));
+}
+
+function clampRatingPoint(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(75, value));
+}
+
+function getRatingSampleHeight(total: number) {
+  if (total <= 0) return 0;
+  return Math.min(100, 30 + Math.log10(total + 1) * 27);
+}
+
+function getRatingBarHeight(count: number, maxCount: number, sample: number) {
+  if (count <= 0 || maxCount <= 0) return 0;
+  return Math.max(12, (count / maxCount) * sample);
 }
 
 function formatCount(count: number) {
@@ -402,18 +439,11 @@ const styles = stylex.create({
   bandStack: {
     width: "100%",
   },
-  compactBandStack: {
-    width: "52px",
-    flexShrink: 0,
-  },
   bandStackTrack: {
     display: "flex",
     height: "10px",
     alignItems: "center",
     gap: "2px",
-  },
-  compactBandStackTrack: {
-    height: "8px",
   },
   emptyBandStackTrack: {
     borderRadius: controlMetrics.radiusSmall,
@@ -471,6 +501,109 @@ const styles = stylex.create({
     flexShrink: 0,
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.inset,
+  },
+  ratingMeasure: {
+    display: "inline-flex",
+    width: "152px",
+    minWidth: 0,
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: space.x2,
+    [COMPACT]: {
+      width: "104px",
+      gap: space.x1,
+    },
+  },
+  ratingPlot: {
+    display: "flex",
+    width: "108px",
+    minWidth: 0,
+    flexDirection: "column",
+    [COMPACT]: {
+      width: "68px",
+    },
+  },
+  ratingBars: {
+    display: "grid",
+    height: "20px",
+    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+    alignItems: "end",
+    gap: "3px",
+    [COMPACT]: {
+      height: "16px",
+      gap: "2px",
+    },
+  },
+  ratingTrack: {
+    position: "relative",
+    display: "flex",
+    height: "100%",
+    alignItems: "flex-end",
+    borderTopLeftRadius: controlMetrics.radiusSmall,
+    borderTopRightRadius: controlMetrics.radiusSmall,
+    backgroundImage: `linear-gradient(to top, ${colors.ratingTrack} 1px, transparent 1px)`,
+  },
+  ratingBar: (height: number) => ({
+    display: "block",
+    width: "100%",
+    height: `${height}%`,
+    minHeight: "2px",
+    borderTopLeftRadius: controlMetrics.radiusSmall,
+    borderTopRightRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.ratingFill,
+  }),
+  ratingBaseline: {
+    display: "block",
+    height: "1px",
+    backgroundColor: colors.ratingTrack,
+  },
+  ratingRangeSlot: {
+    position: "relative",
+    display: "block",
+    height: "6px",
+  },
+  ratingRange: (low: number, high: number) => ({
+    position: "absolute",
+    top: "2px",
+    right: `${100 - ((clampRatingPoint(high) - 75) / 25) * 100}%`,
+    left: `${((clampRatingPoint(low) - 75) / 25) * 100}%`,
+    height: "1px",
+    backgroundColor: colors.inkMuted,
+  }),
+  ratingRangeStart: {
+    position: "absolute",
+    top: "-1px",
+    left: 0,
+    width: "1px",
+    height: "3px",
+    backgroundColor: colors.inkMuted,
+  },
+  ratingRangeEnd: {
+    position: "absolute",
+    top: "-1px",
+    right: 0,
+    width: "1px",
+    height: "3px",
+    backgroundColor: colors.inkMuted,
+  },
+  ratingMedian: {
+    display: "block",
+    width: "36px",
+    minHeight: "22px",
+    flexShrink: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "18px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
+    lineHeight: 1.1,
+    textAlign: "right",
+    [COMPACT]: {
+      width: "32px",
+      fontSize: "16px",
+    },
   },
   measureMetadata: {
     color: colors.inkMuted,

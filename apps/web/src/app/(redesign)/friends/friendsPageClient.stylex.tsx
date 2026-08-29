@@ -10,14 +10,12 @@ import { useState } from "react";
 import {
   CursorPager,
   EmptyState,
+  ItemList,
+  ItemRow,
   RowMenu,
 } from "@peated/web/components/designSystem/components";
-import {
-  Avatar,
-  PageHeader,
-  RecordList,
-  RecordRow,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
+import { PageHeader } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { Search } from "@peated/web/components/designSystem/product/search.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -61,11 +59,11 @@ export function FriendsPageClient({
       </div>
       <div {...stylex.props(styles.list)}>
         {friendList.results.length ? (
-          <RecordList ariaLabel="Friends">
+          <ItemList ariaLabel="Friends">
             {friendList.results.map((friend) => (
               <FriendRow friend={friend} key={friend.id} />
             ))}
-          </RecordList>
+          </ItemList>
         ) : (
           <EmptyState heading="No friends yet">
             Search for a member to start following their tasting record.
@@ -105,7 +103,7 @@ function FriendRow({ friend }: { friend: Friend }) {
   const pending = removeFriend.isPending;
 
   return (
-    <RecordRow
+    <ItemRow
       action={
         <RowMenu
           groups={[

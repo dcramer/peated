@@ -1,7 +1,7 @@
 import type { ExternalReview, PagingRel } from "@peated/server/types";
 
 import { AdminTextLink } from "./adminContent.stylex";
-import AdminTable from "./adminTable.stylex";
+import { AdminTable } from "./adminTable.stylex";
 
 export default function ExternalReviewTable({
   externalReviewList,

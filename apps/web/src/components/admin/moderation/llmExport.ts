@@ -39,26 +39,7 @@ function serializeBottleIdentity(value: BottleLike | null) {
   return {
     id: value.id,
     fullName: value.fullName,
-    name: value.name,
-    brand: serializeEntity(value.brand),
-    series: serializeSeries(value.series),
-    category: value.category,
-    distillers: value.distillers.map((distiller) => ({
-      id: distiller.id,
-      name: distiller.name,
-    })),
-    bottler: serializeEntity(value.bottler),
-    edition: value.edition,
-    statedAge: value.statedAge,
-    abv: value.abv,
-    caskStrength: value.caskStrength,
-    singleCask: value.singleCask,
-    vintageYear: value.vintageYear,
-    bottlingYear: value.bottlingYear,
-    releaseYear: value.releaseYear,
-    maturation: value.maturation,
-    caskNumber: value.caskNumber,
-    outturn: value.outturn,
+    ...serializeBottleFields(value),
     imageUrl: value.imageUrl,
   };
 }
@@ -66,6 +47,10 @@ function serializeBottleIdentity(value: BottleLike | null) {
 function serializeProposedBottle(value: ProposedBottleLike | null) {
   if (!value) return null;
 
+  return serializeBottleFields(value);
+}
+
+function serializeBottleFields(value: BottleLike | ProposedBottleLike) {
   return {
     name: value.name,
     brand: serializeEntity(value.brand),

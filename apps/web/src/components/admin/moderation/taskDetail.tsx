@@ -3,6 +3,7 @@
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminCodeBlock,
   AdminDetails,
@@ -13,12 +14,13 @@ import {
   AdminSelectField,
   AdminTextareaField,
 } from "@peated/web/components/admin/adminForm.stylex";
-import Alert from "@peated/web/components/alert";
-import CheckResult from "@peated/web/components/bottleChecks/checkResult";
-import type { ExcludedOperationField } from "@peated/web/components/bottleChecks/operationCard";
-import OperationCard from "@peated/web/components/bottleChecks/operationCard";
-import Button from "@peated/web/components/button";
-import DefinitionList from "@peated/web/components/definitionList";
+import {
+  AdminAlert as Alert,
+  AdminDefinitionList as DefinitionList,
+} from "@peated/web/components/admin/adminUtility.stylex";
+import CheckResult from "@peated/web/components/bottleChecks/checkResult.stylex";
+import type { ExcludedOperationField } from "@peated/web/components/bottleChecks/operationCard.stylex";
+import OperationCard from "@peated/web/components/bottleChecks/operationCard.stylex";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {

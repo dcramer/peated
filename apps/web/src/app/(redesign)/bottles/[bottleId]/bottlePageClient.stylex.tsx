@@ -11,12 +11,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
-  BandStack,
   Button,
   ButtonLink,
   EmptyState,
   LoadingList,
   PageTabs,
+  RatingMeasure,
   RowMenu,
   SectionError,
   type CriticReviewProps,
@@ -462,14 +462,15 @@ export function BottleOverviewClient({
     [];
   const recommendations =
     recommendationsQuery.data?.results.map((recommendation) => ({
-      end: Object.values(recommendation.tastingBandCounts).some(
-        (count) => count > 0,
-      ) ? (
-        <BandStack
+      end: (
+        <RatingMeasure
           counts={recommendation.tastingBandCounts}
-          variant="compact"
+          high={recommendation.maxScore}
+          low={recommendation.minScore}
+          median={recommendation.medianScore}
+          scoreCount={recommendation.scoreCount}
         />
-      ) : undefined,
+      ),
       href: `/bottles/${recommendation.id}`,
       metadata: [
         formatCategoryName(recommendation.category),

@@ -17,7 +17,6 @@ import {
   space,
 } from "../../styles/tokens.stylex";
 import { ButtonLink } from "../designSystem/components";
-import { AdminBreadcrumbs, AdminPageHeader } from "./adminContent.stylex";
 
 export function AdminPager({
   ariaLabel = "Pagination",
@@ -63,43 +62,7 @@ export function AdminPager({
   );
 }
 
-export function LegacyPageHeader({
-  metadata,
-  title,
-  titleExtra,
-}: {
-  compact?: boolean;
-  icon?: ElementType;
-  metadata?: ReactNode;
-  title: ReactNode;
-  titleExtra?: ReactNode;
-}) {
-  return (
-    <AdminPageHeader
-      actions={metadata}
-      description={titleExtra}
-      title={title}
-    />
-  );
-}
-
-export function LegacyBreadcrumbs({
-  pages,
-}: {
-  pages: Array<{ current?: boolean; href: string; name: string }>;
-}) {
-  return (
-    <AdminBreadcrumbs
-      items={pages.map((page) => ({
-        current: page.current,
-        href: page.href,
-        label: page.name,
-      }))}
-    />
-  );
-}
-
-export function AdminDefinitionList(props: ComponentPropsWithoutRef<"dl">) {
+function AdminDefinitionListRoot(props: ComponentPropsWithoutRef<"dl">) {
   const { className: _className, ...rest } = props;
   return <dl {...rest} {...stylex.props(styles.definitionList)} />;
 }
@@ -113,6 +76,11 @@ export function AdminDefinitionDetails(props: ComponentPropsWithoutRef<"dd">) {
   const { className: _className, ...rest } = props;
   return <dd {...rest} {...stylex.props(styles.definitionDetails)} />;
 }
+
+export const AdminDefinitionList = Object.assign(AdminDefinitionListRoot, {
+  Details: AdminDefinitionDetails,
+  Term: AdminDefinitionTerm,
+});
 
 export function AdminEmptyActivity({
   children,

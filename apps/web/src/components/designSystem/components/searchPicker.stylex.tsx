@@ -1,7 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import type { FocusEvent, KeyboardEvent } from "react";
+import type { FocusEvent } from "react";
 import { useId, useMemo, useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
@@ -14,6 +14,7 @@ import {
 } from "../../../styles/tokens.stylex";
 import { Chip } from "./chip.stylex";
 import { FloatingPanel } from "./feedback.stylex";
+import { useListboxNavigation } from "./useListboxNavigation";
 
 export type SearchPickerOption = {
   detail?: string;
@@ -71,7 +72,6 @@ export function SearchPicker({
   const generatedId = useId();
   const inputId = `${generatedId}-input`;
   const listboxId = `${generatedId}-listbox`;
-  const [activeIndex, setActiveIndex] = useState(-1);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const availableOptions = useMemo(() => {
@@ -84,49 +84,34 @@ export function SearchPicker({
           option.label.toLocaleLowerCase().includes(normalizedQuery)),
     );
   }, [options, query, value]);
-  const activeOption = availableOptions[activeIndex];
   const trimmedQuery = query.trim();
+
+  const {
+    activeIndex,
+    activeItem: activeOption,
+    handleKeyDown,
+    resetNavigation,
+    setActiveIndex,
+  } = useListboxNavigation({
+    items: availableOptions,
+    onClose: () => setIsOpen(false),
+    onOpen: () => setIsOpen(true),
+    onSelect: selectOption,
+    open: isOpen,
+  });
 
   function selectOption(option: SearchPickerOption) {
     if (disabled) return;
     onChange([...value, option]);
     setQuery("");
     onQueryChange?.("");
-    setActiveIndex(-1);
+    resetNavigation();
     setIsOpen(false);
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      setIsOpen(true);
-      if (availableOptions.length) {
-        setActiveIndex((current) =>
-          event.key === "ArrowDown"
-            ? current >= availableOptions.length - 1
-              ? 0
-              : current + 1
-            : current <= 0
-              ? availableOptions.length - 1
-              : current - 1,
-        );
-      }
-      return;
-    }
-    if (event.key === "Enter" && isOpen && activeOption) {
-      event.preventDefault();
-      selectOption(activeOption);
-      return;
-    }
-    if (event.key === "Escape") {
-      setActiveIndex(-1);
-      setIsOpen(false);
-    }
   }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget)) {
-      setActiveIndex(-1);
+      resetNavigation();
       setIsOpen(false);
     }
   }
@@ -173,7 +158,7 @@ export function SearchPicker({
             const nextQuery = event.currentTarget.value;
             setQuery(nextQuery);
             onQueryChange?.(nextQuery);
-            setActiveIndex(-1);
+            resetNavigation();
             setIsOpen(true);
           }}
           onFocus={() => !disabled && setIsOpen(true)}
@@ -234,7 +219,7 @@ export function SearchPicker({
                   onCreate(trimmedQuery);
                   setQuery("");
                   onQueryChange?.("");
-                  setActiveIndex(-1);
+                  resetNavigation();
                   setIsOpen(false);
                 }}
                 type="button"

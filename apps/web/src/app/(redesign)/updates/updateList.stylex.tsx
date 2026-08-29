@@ -1,12 +1,12 @@
 import type { Change, PagingRel } from "@peated/server/types";
 
-import { CursorPager } from "@peated/web/components/designSystem/components";
 import {
   Avatar,
-  RecordList,
-  RecordRow,
+  CursorPager,
+  ItemList,
+  ItemRow,
   TextLink,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+} from "@peated/web/components/designSystem/components";
 import TimeSince from "@peated/web/components/timeSince";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 
@@ -32,12 +32,12 @@ export function UpdateList({
 }) {
   return (
     <>
-      <RecordList ariaLabel="Database updates">
+      <ItemList ariaLabel="Database updates">
         {changes.map((change) => {
           const actor = change.createdByActor;
           const href = `/${change.objectType === "bottle" ? "bottles" : "entities"}/${change.objectId}`;
           return (
-            <RecordRow
+            <ItemRow
               description={
                 <>
                   {actor.user ? (
@@ -65,7 +65,7 @@ export function UpdateList({
             />
           );
         })}
-      </RecordList>
+      </ItemList>
       <CursorPager
         ariaLabel="Update pages"
         nextHref={getCursorHref("/updates", {}, rel.nextCursor)}

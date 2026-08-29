@@ -6,24 +6,27 @@ import {
 import {
   PageHeader,
   PageSection,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { cache } from "react";
 
 import { FlightActions } from "./flightActions";
+
+const getFlight = cache(async (flightId: string) => {
+  const { client } = await getServerClient();
+  return await resolveOrNotFound(client.flights.details({ flight: flightId }));
+});
 
 export async function generateMetadata(props: {
   params: Promise<{ flightId: string }>;
 }) {
   const { flightId } = await props.params;
-  const { client } = await getServerClient();
-  const flight = await resolveOrNotFound(
-    client.flights.details({ flight: flightId }),
-  );
+  const flight = await getFlight(flightId);
 
   return {
     title: flight.name,
@@ -35,10 +38,7 @@ export default async function FlightPage(props: {
   params: Promise<{ flightId: string }>;
 }) {
   const { flightId } = await props.params;
-  const { client } = await getServerClient();
-  const flight = await resolveOrNotFound(
-    client.flights.details({ flight: flightId }),
-  );
+  const flight = await getFlight(flightId);
 
   return (
     <div>

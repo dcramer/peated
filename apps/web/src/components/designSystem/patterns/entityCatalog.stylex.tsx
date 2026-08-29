@@ -1,7 +1,6 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { ListFilter } from "lucide-react";
 import type { FormEvent } from "react";
 import { useId, useState } from "react";
 
@@ -9,7 +8,6 @@ import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
-  effects,
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
@@ -19,12 +17,14 @@ import {
   CursorPager,
   EmptyState,
   FacetRow,
+  FilterPanel,
+  ItemList,
+  ItemRow,
   ListToolbar,
   LoadingList,
   TextInput,
   type ListSortOption,
 } from "../components";
-import { RecordList, RecordRow } from "./pagePatternShell.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (max-width: 759px)";
@@ -74,9 +74,9 @@ export function EntityCatalogList({
         sortOptions={sortOptions}
       />
       {items.length ? (
-        <RecordList ariaLabel={`${noun} records`}>
+        <ItemList ariaLabel={`${noun} records`}>
           {items.map((item) => (
-            <RecordRow
+            <ItemRow
               end={<EntityMeasures item={item} />}
               href={item.href}
               key={item.id}
@@ -84,7 +84,7 @@ export function EntityCatalogList({
               title={item.name}
             />
           ))}
-        </RecordList>
+        </ItemList>
       ) : (
         <EmptyState
           action={
@@ -163,7 +163,6 @@ export function EntityCatalogFilters({
   region,
 }: EntityCatalogFiltersProps) {
   const id = useId();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [queryDraft, setQueryDraft] = useState(query);
 
   function submitQuery(event: FormEvent<HTMLFormElement>) {
@@ -172,77 +171,61 @@ export function EntityCatalogFilters({
   }
 
   return (
-    <section aria-label="Entity filters" {...stylex.props(styles.filters)}>
-      <button
-        aria-expanded={mobileOpen}
-        onClick={() => setMobileOpen((open) => !open)}
-        type="button"
-        {...stylex.props(styles.filterToggle)}
-      >
-        <ListFilter aria-hidden="true" size={16} strokeWidth={1.75} />
-        Filters
-      </button>
-      <div
-        {...stylex.props(
-          styles.filterContent,
-          mobileOpen && styles.filterContentOpen,
-        )}
-      >
-        <form onSubmit={submitQuery} {...stylex.props(styles.queryForm)}>
-          <label htmlFor={`${id}-query`} {...stylex.props(styles.field)}>
-            <span {...stylex.props(styles.filterHeading)}>Find a record</span>
-            <TextInput
-              aria-label="Find a record"
-              id={`${id}-query`}
-              onChange={(event) => setQueryDraft(event.currentTarget.value)}
-              placeholder="Name"
-              value={queryDraft}
+    <FilterPanel ariaLabel="Entity filters">
+      <form onSubmit={submitQuery} {...stylex.props(styles.queryForm)}>
+        <label htmlFor={`${id}-query`} {...stylex.props(styles.field)}>
+          <span {...stylex.props(styles.filterHeading)}>Find a record</span>
+          <TextInput
+            aria-label="Find a record"
+            id={`${id}-query`}
+            onChange={(event) => setQueryDraft(event.currentTarget.value)}
+            placeholder="Name"
+            value={queryDraft}
+          />
+        </label>
+        <Button size="sm" type="submit" variant="tonal">
+          Search
+        </Button>
+      </form>
+      <section aria-labelledby={`${id}-country`}>
+        <h3 id={`${id}-country`} {...stylex.props(styles.filterHeading)}>
+          Country
+        </h3>
+        <div {...stylex.props(styles.facetRows)}>
+          {countries.map((option) => (
+            <FacetRow
+              key={option.value}
+              label={option.label}
+              onClick={() =>
+                onCountryChange(country === option.value ? "" : option.value)
+              }
+              selected={country === option.value}
             />
-          </label>
-          <Button size="sm" type="submit" variant="tonal">
-            Search
-          </Button>
-        </form>
-        <section aria-labelledby={`${id}-country`}>
-          <h3 id={`${id}-country`} {...stylex.props(styles.filterHeading)}>
-            Country
+          ))}
+        </div>
+      </section>
+      {region && onRegionClear ? (
+        <section aria-labelledby={`${id}-region`}>
+          <h3 id={`${id}-region`} {...stylex.props(styles.filterHeading)}>
+            Region
           </h3>
           <div {...stylex.props(styles.facetRows)}>
-            {countries.map((option) => (
-              <FacetRow
-                key={option.value}
-                label={option.label}
-                onClick={() =>
-                  onCountryChange(country === option.value ? "" : option.value)
-                }
-                selected={country === option.value}
-              />
-            ))}
+            <FacetRow label={region} onClick={onRegionClear} selected />
           </div>
         </section>
-        {region && onRegionClear ? (
-          <section aria-labelledby={`${id}-region`}>
-            <h3 id={`${id}-region`} {...stylex.props(styles.filterHeading)}>
-              Region
-            </h3>
-            <div {...stylex.props(styles.facetRows)}>
-              <FacetRow label={region} onClick={onRegionClear} selected />
-            </div>
-          </section>
-        ) : null}
-        <Button
-          align="start"
-          onClick={() => {
-            setQueryDraft("");
-            onClear();
-          }}
-          size="sm"
-          variant="text"
-        >
-          Clear filters
-        </Button>
-      </div>
-    </section>
+      ) : null}
+      <Button
+        align="start"
+        onClick={() => {
+          setQueryDraft("");
+          onClear();
+        }}
+        size="sm"
+        variant="text"
+      >
+        Clear filters
+      </Button>
+    </FilterPanel>
   );
 }
 
@@ -304,53 +287,6 @@ const styles = stylex.create({
   tastingMeasure: {
     [COMPACT]: {
       display: "none",
-    },
-  },
-  filters: {
-    minWidth: 0,
-  },
-  filterToggle: {
-    display: "none",
-    width: "100%",
-    height: controlMetrics.controlHeight,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: space.x2,
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderWidth: 0,
-    borderRadius: controlMetrics.radius,
-    outline: "none",
-    backgroundColor: colors.inset,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "13px",
-    fontWeight: 700,
-    cursor: "pointer",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-    [NARROW]: {
-      display: "flex",
-    },
-  },
-  filterContent: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x4,
-    [NARROW]: {
-      display: "none",
-      paddingTop: space.x4,
-    },
-  },
-  filterContentOpen: {
-    [NARROW]: {
-      display: "grid",
-      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    },
-    [COMPACT]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
     },
   },
   queryForm: {

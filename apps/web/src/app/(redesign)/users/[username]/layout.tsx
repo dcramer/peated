@@ -1,6 +1,5 @@
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { getProfilePage } from "@peated/web/lib/profilePage.server";
 import type { ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 
@@ -12,10 +11,7 @@ export async function generateMetadata(props: {
   params: Promise<{ username: string }>;
 }) {
   const { username } = await props.params;
-  const { client } = await createServerClient();
-  const user = await resolveOrNotFound(
-    client.users.details({ user: username }),
-  );
+  const user = await getProfilePage(username);
   return {
     title: `@${user.username}`,
     openGraph: { type: "profile", profile: { username: user.username } },
@@ -30,9 +26,8 @@ export default async function ProfileLayout({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  const { client } = await createServerClient();
   const [user, currentUser] = await Promise.all([
-    resolveOrNotFound(client.users.details({ user: username })),
+    getProfilePage(username),
     getCurrentUser(),
   ]);
   const privateRecord =

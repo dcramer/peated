@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas, StoryRow, StoryStack } from "../storyFixtures.stylex";
+import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
 import { BandStack } from "./scoring.stylex";
 
 const counts = {
@@ -14,7 +14,7 @@ const counts = {
 const meta = {
   title: "Components/Measures/Band Stack",
   component: BandStack,
-  args: { counts, showCounts: true, showRanges: true, variant: "full" },
+  args: { counts, showCounts: true, showRanges: true },
   decorators: [
     (Story) => (
       <StoryCanvas>
@@ -31,20 +31,6 @@ export const Overview: Story = {
   render: (args) => (
     <StoryStack>
       <BandStack {...args} />
-      <StoryRow>
-        <BandStack counts={counts} variant="compact" />
-        <BandStack
-          counts={{
-            good: 2,
-            mediocre: 1,
-            outstanding: 18,
-            unicorn: 1,
-            very_good: 4,
-          }}
-          variant="compact"
-        />
-        <BandStack counts={{}} variant="compact" />
-      </StoryRow>
       <BandStack counts={{}} />
     </StoryStack>
   ),

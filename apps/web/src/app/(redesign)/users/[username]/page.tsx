@@ -1,6 +1,6 @@
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { getProfilePage } from "@peated/web/lib/profilePage.server";
 
 import { ProfileTastingsPageClient } from "./profileTastingsPageClient.stylex";
 
@@ -12,9 +12,7 @@ export default async function ProfilePageRoute(props: {
 }) {
   const { username } = await props.params;
   const { client } = await createServerClient();
-  const user = await resolveOrNotFound(
-    client.users.details({ user: username }),
-  );
+  const user = await getProfilePage(username);
   const tastingInput = getApiQueryParams(await props.searchParams, {
     defaults: { cursor: 1 },
     numericFields: ["cursor"],

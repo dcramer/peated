@@ -10,16 +10,14 @@ import {
   Button,
   ButtonLink,
   Field,
+  ItemList,
+  ItemRow,
   RowMenu,
   SectionError,
   Textarea,
   ValidationMessage,
 } from "@peated/web/components/designSystem/components";
-import {
-  Avatar,
-  RecordList,
-  RecordRow,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -111,13 +109,13 @@ export function TastingComments({
       )}
 
       {comments.length ? (
-        <RecordList ariaLabel="Tasting comments">
+        <ItemList ariaLabel="Tasting comments">
           {comments.map((item) => {
             const canDelete = Boolean(
               user?.admin || user?.id === item.createdBy.id,
             );
             return (
-              <RecordRow
+              <ItemRow
                 action={
                   canDelete ? (
                     <RowMenu
@@ -153,7 +151,7 @@ export function TastingComments({
               />
             );
           })}
-        </RecordList>
+        </ItemList>
       ) : null}
     </div>
   );

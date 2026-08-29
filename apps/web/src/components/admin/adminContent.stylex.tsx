@@ -13,6 +13,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
+import { linkedRowStyles } from "../designSystem/components/linkedRow.stylex";
 
 export type AdminBreadcrumb = {
   current?: boolean;
@@ -195,7 +196,10 @@ export function AdminTextLink({
   href: string;
 }) {
   return (
-    <Link href={href} {...stylex.props(styles.textLink)}>
+    <Link
+      href={href}
+      {...stylex.props(styles.textLink, linkedRowStyles.nestedAction)}
+    >
       {children}
     </Link>
   );

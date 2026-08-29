@@ -12,7 +12,7 @@ import {
   EmptyState,
   IconButton,
 } from "@peated/web/components/designSystem/components";
-import { Avatar } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { useORPC } from "@peated/web/lib/orpc/context";

@@ -3,16 +3,15 @@ export type {
   AliasManagerItem,
   AliasManagerProps,
 } from "./aliasManager.stylex";
-export { ApplicationHeader, SiteFooter } from "./applicationNavigation.stylex";
+export { ApplicationHeader } from "./applicationHeader.stylex";
 export type {
   ApplicationHeaderProps,
-  FooterGroup,
-  FooterLink,
   HeaderAccountActionItem,
   HeaderAccountItem,
   HeaderNavigationItem,
-  SiteFooterProps,
-} from "./applicationNavigation.stylex";
+} from "./applicationHeader.stylex";
+export { Avatar } from "./avatar.stylex";
+export type { AvatarProps, AvatarSize } from "./avatar.stylex";
 export { BadgeImage, PlaceholderBadgeImage } from "./badgeImage.stylex";
 export type { BadgeImageProps } from "./badgeImage.stylex";
 export { BottleComparisonTable } from "./bottleComparisonTable.stylex";
@@ -33,7 +32,13 @@ export type {
   ButtonSize,
   ButtonVariant,
 } from "./button.stylex";
-export { Card, CardGrid, CardLink } from "./card.stylex";
+export {
+  Card,
+  CardActionLink,
+  CardGrid,
+  CardLink,
+  CardPrimaryLink,
+} from "./card.stylex";
 export type { CardLinkProps, CardProps } from "./card.stylex";
 export { Checkbox } from "./checkbox.stylex";
 export type { CheckboxProps } from "./checkbox.stylex";
@@ -58,11 +63,6 @@ export type {
 } from "./dataDevices.stylex";
 export { DataTable } from "./dataTable.stylex";
 export type { DataTableColumn, DataTableProps } from "./dataTable.stylex";
-export { DuplicateMatchList } from "./duplicateMatchList.stylex";
-export type {
-  DuplicateMatch,
-  DuplicateMatchListProps,
-} from "./duplicateMatchList.stylex";
 export { EntityPicker } from "./entityPicker.stylex";
 export type {
   EntityPickerKind,
@@ -102,17 +102,12 @@ export type {
   TextInputProps,
   TextareaProps,
 } from "./field.stylex";
-export {
-  ChoiceList,
-  SegmentedControl,
-  Select,
-  Switch,
-} from "./formControls.stylex";
+export { FilterPanel } from "./filterPanel.stylex";
+export type { FilterPanelProps } from "./filterPanel.stylex";
+export { ChoiceList, Select, Switch } from "./formControls.stylex";
 export type {
   ChoiceListOption,
   ChoiceListProps,
-  SegmentedControlOption,
-  SegmentedControlProps,
   SelectProps,
   SwitchProps,
 } from "./formControls.stylex";
@@ -129,27 +124,31 @@ export type {
   FormNoticeProps,
   FormSectionProps,
 } from "./formLayout.stylex";
-export { FormSteps } from "./formSteps.stylex";
-export type { FormStep, FormStepsProps } from "./formSteps.stylex";
 export { HistoryTimeline } from "./historyTimeline.stylex";
 export type {
   HistoryEvent,
   HistoryState,
   HistoryTimelineProps,
 } from "./historyTimeline.stylex";
+export { ItemList, ItemRow } from "./itemList.stylex";
+export type {
+  ItemListProps,
+  ItemListVariant,
+  ItemRowProps,
+  ItemRowSize,
+} from "./itemList.stylex";
 export {
   CursorPager,
   ListToolbar,
-  PeriodHeader,
   RailList,
   RailListItem,
-} from "./listStructures.stylex";
+} from "./lists.stylex";
 export type {
   CursorPagerProps,
   ListSortOption,
   ListToolbarProps,
   RailListItemProps,
-} from "./listStructures.stylex";
+} from "./lists.stylex";
 export { LocationCard } from "./locationCard.stylex";
 export type { LocationCardProps } from "./locationCard.stylex";
 export { MemberPicker } from "./memberPicker.stylex";
@@ -163,8 +162,6 @@ export type {
   NotePickerOption,
   NotePickerProps,
 } from "./notePicker.stylex";
-export { Pager } from "./pager.stylex";
-export type { PagerProps } from "./pager.stylex";
 export { PageTabs } from "./pageTabs.stylex";
 export type { PageTabItem, PageTabsProps } from "./pageTabs.stylex";
 export { Passport } from "./passport.stylex";
@@ -176,12 +173,19 @@ export type {
   ScopedSearchOption,
   ScopedSearchProps,
 } from "./scopedSearch.stylex";
-export { BandMark, BandStack, RATING_BANDS, Score } from "./scoring.stylex";
+export {
+  BandMark,
+  BandStack,
+  RATING_BANDS,
+  RatingMeasure,
+  Score,
+} from "./scoring.stylex";
 export type {
   BandCounts,
   BandMarkProps,
   BandStackProps,
   RatingBand,
+  RatingMeasureProps,
   ScoreProps,
 } from "./scoring.stylex";
 export { SearchBox } from "./searchBox.stylex";
@@ -202,6 +206,13 @@ export type {
 export { SectionHeading } from "./sectionHeading.stylex";
 export { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
 export type { SelectedBottleSummaryProps } from "./selectedBottleSummary.stylex";
+export { SiteFooter } from "./siteFooter.stylex";
+export type {
+  FooterGroup,
+  FooterLink,
+  SiteFooterProps,
+} from "./siteFooter.stylex";
+export { SkipLink } from "./skipLink.stylex";
 export { SummaryStrip } from "./summaryStrip.stylex";
 export type {
   SummaryStripCell,
@@ -222,5 +233,7 @@ export type {
   PictureInputProps,
   RatingBandInputProps,
 } from "./tastingInputs.stylex";
+export { TextLink } from "./textLink.stylex";
+export type { TextLinkProps } from "./textLink.stylex";
 export { UnitInput } from "./unitInput.stylex";
 export type { UnitInputProps } from "./unitInput.stylex";

@@ -29,7 +29,8 @@
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
     "start": "dotenv -e .env.local -- turbo start",
     "typecheck": "turbo typecheck",
-    "lint": "github-actionlint && oxlint . && pnpm ast-grep:lint && pnpm --filter @peated/bottle-classifier run terms:check",
+    "lint": "github-actionlint && oxlint . && pnpm ast-grep:lint && pnpm design:lint && pnpm --filter @peated/bottle-classifier run terms:check",
+    "design:lint": "designmd lint DESIGN.md",
     "ast-grep:lint": "ast-grep scan",
     "ast-grep:test": "ast-grep test --skip-snapshot-tests",
     "knip": "knip --include files,dependencies,devDependencies,optionalPeerDependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
@@ -58,6 +59,7 @@
   "devDependencies": {
     "@ast-grep/cli": "0.45.1",
     "@fission-ai/openspec": "^1.5.0",
+    "@google/design.md": "^0.4.0",
     "@oxlint/plugins": "1.79.0",
     "@tanstack/eslint-plugin-query": "5.101.4",
     "dotenv-cli": "catalog:",

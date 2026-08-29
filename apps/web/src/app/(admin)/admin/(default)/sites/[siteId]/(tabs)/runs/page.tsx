@@ -4,9 +4,9 @@ import { use } from "react";
 
 import { type ExternalSiteKey } from "@peated/server/types";
 import { AdminStatus } from "@peated/web/components/admin/adminContent.stylex";
+import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
+import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import ExternalSiteRunTelemetry from "@peated/web/components/admin/externalSiteRunTelemetry";
-import EmptyActivity from "@peated/web/components/emptyActivity";
-import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { formatDuration } from "@peated/web/lib/format";

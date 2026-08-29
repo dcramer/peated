@@ -71,6 +71,36 @@ export function AdminForm({
   );
 }
 
+export function AdminFormPage({
+  afterForm,
+  children,
+  error,
+  isSubmitting,
+  onSubmit,
+  title,
+}: {
+  afterForm?: ReactNode;
+  children: ReactNode;
+  error?: string;
+  isSubmitting: boolean;
+  onSubmit: (event: FormEvent<HTMLFormElement | HTMLButtonElement>) => void;
+  title: string;
+}) {
+  return (
+    <AdminFormScreen
+      onSave={onSubmit}
+      saveDisabled={isSubmitting}
+      title={title}
+    >
+      {error ? <AdminFormError values={[error]} /> : null}
+      <AdminForm isSubmitting={isSubmitting} onSubmit={onSubmit}>
+        {children}
+      </AdminForm>
+      {afterForm}
+    </AdminFormScreen>
+  );
+}
+
 export function AdminFieldset({
   action,
   children,

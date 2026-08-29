@@ -4,7 +4,6 @@ import * as stylex from "@stylexjs/stylex";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import { PageHeader } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import {
   Search,
   type SearchScope,
@@ -15,6 +14,7 @@ import {
   getPendingImageFromParams,
   type AddBottleRouteIntent,
 } from "@peated/web/lib/addBottle";
+import { foundationStyles } from "../../../styles/foundations.stylex";
 import { space } from "../../../styles/tokens.stylex";
 
 const addBottleIntents = [
@@ -116,10 +116,13 @@ export function SearchPageClient() {
 
   return (
     <div {...stylex.props(styles.page)}>
-      <PageHeader title={getTitle({ directToTasting, intent, memberSearch })} />
+      <header {...stylex.props(styles.header)}>
+        <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>
+          {getTitle({ directToTasting, intent, memberSearch })}
+        </h1>
+      </header>
       <section aria-label="Search Peated" {...stylex.props(styles.search)}>
         <Search
-          autoFocus
           getBottleHref={getBottleHref}
           getContributionHref={getContributionHref}
           initialQuery={query}
@@ -139,8 +142,15 @@ const styles = stylex.create({
   page: {
     width: "100%",
     maxWidth: "880px",
+    marginRight: "auto",
+    marginLeft: "auto",
+  },
+  header: { marginBottom: space.x4 },
+  title: {
+    fontSize: "clamp(26px, 4vw, 32px)",
+    lineHeight: 1.1,
   },
   search: {
-    marginTop: space.x6,
+    minWidth: 0,
   },
 });

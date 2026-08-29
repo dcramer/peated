@@ -1,6 +1,6 @@
 import type { Finding } from "@peated/bottle-classifier";
 import type { Outputs } from "@peated/server/orpc/router";
-import Link from "@peated/web/components/link";
+import Link from "@peated/web/components/admin/adminLink.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { colors } from "../../styles/tokens.stylex";
 

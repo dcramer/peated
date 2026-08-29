@@ -1,28 +1,27 @@
 import {
-  TastingEntry,
-  type TastingEntryMember,
-} from "@peated/web/components/designSystem/components";
-import {
-  Avatar,
   PageHeader,
   PageSection,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
-import TimeSince from "@peated/web/components/timeSince";
+} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { cache } from "react";
 
 import { TastingComments } from "./tastingComments.stylex";
+
+const getTasting = cache(async (tastingId: number) => {
+  const { client } = await getPublicPageServerClient();
+  return await resolveOrNotFound(
+    client.tastings.details({ tasting: tastingId }),
+  );
+});
 
 export async function generateMetadata(props: {
   params: Promise<{ tastingId: string }>;
 }) {
   const { tastingId } = await props.params;
-  const { client } = await getPublicPageServerClient();
-  const tasting = await resolveOrNotFound(
-    client.tastings.details({ tasting: Number(tastingId) }),
-  );
+  const tasting = await getTasting(Number(tastingId));
   const title = `${getBottlePlainTextIdentity(tasting.bottle)} — tasting by ${tasting.createdBy.username}`;
 
   return {
@@ -45,19 +44,8 @@ export default async function TastingPage(props: {
 }) {
   const { tastingId } = await props.params;
   const { client } = await getPublicPageServerClient();
-  const tasting = await resolveOrNotFound(
-    client.tastings.details({ tasting: Number(tastingId) }),
-  );
+  const tasting = await getTasting(Number(tastingId));
   const commentList = await client.comments.list({ tasting: tasting.id });
-  const member: TastingEntryMember = {
-    description: tasting.notes,
-    href: `/bottles/${tasting.bottle.id}`,
-    metadata: getBottleMetadata(tasting.bottle),
-    name: tasting.bottle.fullName,
-    notes: tasting.tags,
-    ratingBand: tasting.ratingBand ?? undefined,
-  };
-
   return (
     <div>
       <PageHeader
@@ -70,20 +58,7 @@ export default async function TastingPage(props: {
         title={getBottlePlainTextIdentity(tasting.bottle)}
       />
       <PageSection heading="Tasting">
-        <TastingEntry
-          author={tasting.createdBy.username}
-          authorHref={`/users/${tasting.createdBy.username}`}
-          date={<TimeSince date={tasting.createdAt} />}
-          leading={
-            <Avatar
-              imageUrl={tasting.createdBy.pictureUrl}
-              initials={tasting.createdBy.username
-                .slice(0, 2)
-                .toLocaleUpperCase()}
-            />
-          }
-          members={[member]}
-        />
+        <TastingRecordEntry tasting={tasting} />
       </PageSection>
       <PageSection count={commentList.results.length} heading="Comments">
         <TastingComments

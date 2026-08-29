@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { CircleUserRound } from "lucide-react";
 import { useState } from "react";
 
-import { ApplicationHeader } from "../components/applicationNavigation.stylex";
+import { ApplicationHeader } from "../components/applicationHeader.stylex";
 import { Button, ButtonLink } from "../components/button.stylex";
 import { ScopedSearch } from "../components/scopedSearch.stylex";
 import { SearchBox } from "../components/searchBox.stylex";

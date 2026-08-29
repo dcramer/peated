@@ -3,18 +3,22 @@ import Markdown from "@peated/web/components/markdown";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import type { ReactNode } from "react";
+import { cache, type ReactNode } from "react";
 
 import { LocationPageFrame } from "../../locationPageFrame.stylex";
+
+const getCountry = cache(async (countrySlug: string) => {
+  const { client } = await getPublicPageServerClient();
+  return await resolveOrNotFound(
+    client.countries.details({ country: countrySlug }),
+  );
+});
 
 export async function generateMetadata(props: {
   params: Promise<{ countrySlug: string }>;
 }) {
   const { countrySlug } = await props.params;
-  const { client } = await getPublicPageServerClient();
-  const country = await resolveOrNotFound(
-    client.countries.details({ country: countrySlug }),
-  );
+  const country = await getCountry(countrySlug);
 
   return {
     title: `Whisky from ${country.name}`,
@@ -27,9 +31,8 @@ export default async function CountryLayout(props: {
   params: Promise<{ countrySlug: string }>;
 }) {
   const { countrySlug } = await props.params;
-  const { client } = await getPublicPageServerClient();
   const [country, user] = await Promise.all([
-    resolveOrNotFound(client.countries.details({ country: countrySlug })),
+    getCountry(countrySlug),
     getCurrentUser(),
   ]);
   const rootHref = `/locations/${country.slug}`;

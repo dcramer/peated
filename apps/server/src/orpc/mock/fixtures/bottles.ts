@@ -388,3 +388,30 @@ export function mockBottleTagsFor(
     totalCount: bottle.totalTastings,
   };
 }
+
+function mockSuggestedTagCategory(name: string) {
+  if (/ash|brine|peat|sea|smoke/.test(name)) return "peaty" as const;
+  if (/apple|fruit|lemon|orange|peach|pear|raisin/.test(name)) {
+    return "fruity" as const;
+  }
+  if (/caramel|honey/.test(name)) return "cereal" as const;
+  return "woody" as const;
+}
+
+export function mockBottleSuggestedTagsFor(
+  bottle: Bottle,
+): MockOutputs["bottles"]["suggestedTags"] {
+  const tags = mockBottleTagsFor(bottle);
+
+  return {
+    results: tags.results.map(({ tag, count }) => ({
+      tag: {
+        name: tag,
+        synonyms: [],
+        tagCategory: mockSuggestedTagCategory(tag),
+        flavorProfiles: [],
+      },
+      count,
+    })),
+  };
+}

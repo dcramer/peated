@@ -1,7 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import type { FocusEvent, KeyboardEvent } from "react";
+import type { FocusEvent } from "react";
 import { useId, useMemo, useState } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
@@ -13,6 +13,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import { FloatingPanel } from "./feedback.stylex";
+import { useListboxNavigation } from "./useListboxNavigation";
 
 export type EntityPickerKind =
   | "brand"
@@ -73,7 +74,6 @@ export function EntityPicker({
   const listboxId = `${generatedId}-listbox`;
   const helpId = `${generatedId}-help`;
   const copy = kindCopy[kind];
-  const [activeIndex, setActiveIndex] = useState(-1);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const trimmedQuery = query.trim();
@@ -85,54 +85,31 @@ export function EntityPicker({
       option.name.toLocaleLowerCase().includes(normalizedQuery),
     );
   }, [options, trimmedQuery]);
-  const activeOption = filteredOptions[activeIndex];
+
+  const {
+    activeIndex,
+    activeItem: activeOption,
+    handleKeyDown,
+    resetNavigation,
+    setActiveIndex,
+  } = useListboxNavigation({
+    items: filteredOptions,
+    onClose: () => setIsOpen(false),
+    onOpen: () => setIsOpen(true),
+    onSelect: selectOption,
+    open: isOpen,
+  });
 
   function selectOption(option: EntityPickerOption) {
     onChange(option);
     setQuery("");
-    setActiveIndex(-1);
+    resetNavigation();
     setIsOpen(false);
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      setIsOpen(true);
-      if (filteredOptions.length > 0) {
-        setActiveIndex((current) =>
-          current >= filteredOptions.length - 1 ? 0 : current + 1,
-        );
-      }
-      return;
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      setIsOpen(true);
-      if (filteredOptions.length > 0) {
-        setActiveIndex((current) =>
-          current <= 0 ? filteredOptions.length - 1 : current - 1,
-        );
-      }
-      return;
-    }
-
-    if (event.key === "Enter" && isOpen && activeOption) {
-      event.preventDefault();
-      selectOption(activeOption);
-      return;
-    }
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      setActiveIndex(-1);
-      setIsOpen(false);
-    }
   }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget)) {
-      setActiveIndex(-1);
+      resetNavigation();
       setIsOpen(false);
     }
   }
@@ -141,7 +118,7 @@ export function EntityPicker({
     if (!trimmedQuery || !onCreate) return;
 
     onCreate(trimmedQuery);
-    setActiveIndex(-1);
+    resetNavigation();
     setIsOpen(false);
   }
 
@@ -197,7 +174,7 @@ export function EntityPicker({
                   const nextQuery = event.currentTarget.value;
                   setQuery(nextQuery);
                   onQueryChange?.(nextQuery);
-                  setActiveIndex(-1);
+                  resetNavigation();
                   setIsOpen(true);
                 }}
                 onFocus={() => setIsOpen(true)}

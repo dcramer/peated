@@ -31,7 +31,7 @@ export default async function Page() {
     }),
     client.countries.list({
       hasBottles: true,
-      limit: 10,
+      limit: 100,
       sort: "-bottles",
     }),
     client.distilleries.list({ limit: 12, sort: "-bottles" }),

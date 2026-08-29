@@ -2,8 +2,10 @@ import { CATEGORY_LIST } from "@peated/server/constants";
 import { CategoryCheckConfigSchema } from "@peated/server/lib/badges/checks/categoryCheck";
 import { notEmpty } from "@peated/server/lib/filter";
 import { formatCategoryName } from "@peated/server/lib/format";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
+import {
+  AdminFieldset as Fieldset,
+  AdminForm as Form,
+} from "@peated/web/components/admin/adminForm.stylex";
 import SelectField from "@peated/web/components/selectField";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useEffect } from "react";
@@ -53,8 +55,6 @@ export default function CategoryCheckConfigForm({
                 multiple
                 placeholder="e.g. Single Malt"
                 helpText="The kind of spirit."
-                simple
-                required
                 options={categoryList}
                 onChange={(value) =>
                   onChange(value ? value.map((c) => c.id).filter(notEmpty) : [])

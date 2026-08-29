@@ -1,6 +1,6 @@
 import type { OAuthClient } from "@peated/server/types";
 import { AdminCode, AdminStatus } from "./adminContent.stylex";
-import AdminTable from "./adminTable.stylex";
+import { AdminTable } from "./adminTable.stylex";
 
 export default function OAuthClientTable({
   clients,

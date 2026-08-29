@@ -15,14 +15,16 @@ import { useORPC } from "../../../lib/orpc/context";
 import { colors } from "../../../styles/tokens.stylex";
 import TimeSince from "../../timeSince";
 import {
+  Avatar,
   ButtonLink,
   EmptyState,
+  ItemList,
+  ItemRow,
   LoadingList,
   SectionError,
   TastingEntry,
   type TastingEntryMember,
 } from "../components";
-import { RecordList, RecordRow } from "../patterns/pagePatternShell.stylex";
 
 type ActivityList = Outputs["activity"]["list"];
 type ActivityResult = ActivityList["results"][number];
@@ -61,12 +63,12 @@ function UserVisual({
   pictureUrl: string | null;
   username: string;
 }) {
-  return pictureUrl ? (
-    <img alt="" src={pictureUrl} {...stylex.props(styles.avatar)} />
-  ) : (
-    <span aria-hidden="true" {...stylex.props(styles.avatarFallback)}>
-      {username.slice(0, 2).toLocaleUpperCase()}
-    </span>
+  return (
+    <Avatar
+      imageUrl={pictureUrl}
+      initials={username.slice(0, 2).toLocaleUpperCase()}
+      size="sm"
+    />
   );
 }
 
@@ -140,9 +142,9 @@ function CollectionActivityItem({
         </div>
       </div>
       {visibleItems.length ? (
-        <RecordList ariaLabel={`${activity.collection.name} additions`}>
+        <ItemList ariaLabel={`${activity.collection.name} additions`}>
           {visibleItems.map((item) => (
-            <RecordRow
+            <ItemRow
               href={`/bottles/${item.bottle.id}`}
               key={item.id}
               metadata={getBottleMetadata(item.bottle)}
@@ -150,12 +152,12 @@ function CollectionActivityItem({
             />
           ))}
           {remaining > 0 ? (
-            <RecordRow
+            <ItemRow
               href={activity.collection.href ?? undefined}
               title={`+${remaining.toLocaleString()} more`}
             />
           ) : null}
-        </RecordList>
+        </ItemList>
       ) : null}
     </div>
   );
@@ -301,27 +303,6 @@ export function HomeActivity({
 }
 
 const styles = stylex.create({
-  avatar: {
-    display: "block",
-    width: "32px",
-    height: "32px",
-    flexShrink: 0,
-    borderRadius: "50%",
-    objectFit: "cover",
-  },
-  avatarFallback: {
-    display: "inline-flex",
-    width: "32px",
-    height: "32px",
-    flexShrink: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "50%",
-    backgroundColor: colors.inset,
-    color: colors.ink,
-    fontSize: "10px",
-    fontWeight: 700,
-  },
   collection: {
     paddingTop: "22px",
     paddingRight: "24px",

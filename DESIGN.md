@@ -1,8 +1,181 @@
+---
+version: alpha
+name: Peated
+description: A dense, reference-first whisky database with quiet chrome and one warm accent.
+colors:
+  primary: "#9a5b12"
+  primary-dark: "#d9922f"
+  primary-deep: "#6e400c"
+  primary-deep-dark: "#f0d9b0"
+  primary-tint: "rgb(154 91 18 / 0.15)"
+  primary-tint-dark: "rgb(217 146 47 / 0.15)"
+  neutral: "#f7f8f5"
+  neutral-dark: "#101210"
+  surface: "#ebeee7"
+  surface-dark: "#1b1e1a"
+  inset: "#dce0d6"
+  inset-dark: "#2b2f29"
+  ink: "#161914"
+  ink-dark: "#e8eae3"
+  ink-muted: "rgb(22 25 20 / 0.75)"
+  ink-muted-dark: "rgb(232 234 227 / 0.75)"
+  data-accent: "rgb(154 91 18 / 0.42)"
+  data-accent-dark: "rgb(217 146 47 / 0.42)"
+  rating-fill: "rgb(154 91 18 / 0.75)"
+  rating-fill-dark: "rgb(217 146 47 / 0.75)"
+  rating-track: "#cbd0c2"
+  rating-track-dark: "#3a3f37"
+  passport-empty: "rgb(22 25 20 / 0.16)"
+  passport-empty-dark: "rgb(232 234 227 / 0.16)"
+  hairline: "rgb(22 25 20 / 0.11)"
+  hairline-dark: "rgb(232 234 227 / 0.11)"
+  section-rule: "rgb(22 25 20 / 0.16)"
+  section-rule-dark: "rgb(232 234 227 / 0.16)"
+typography:
+  page-title:
+    fontFamily: Space Grotesk
+    fontSize: 44px
+    fontWeight: 700
+    lineHeight: 1.04
+    letterSpacing: -0.035em
+  section-heading:
+    fontFamily: Space Grotesk
+    fontSize: 18px
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: -0.02em
+  row-title:
+    fontFamily: Space Grotesk
+    fontSize: 17px
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: -0.02em
+  body:
+    fontFamily: Karla
+    fontSize: 14px
+    fontWeight: 400
+    lineHeight: 1.55
+  interactive:
+    fontFamily: Karla
+    fontSize: 14px
+    fontWeight: 600
+    lineHeight: 1.2
+  metadata:
+    fontFamily: IBM Plex Mono
+    fontSize: 12px
+    fontWeight: 400
+    lineHeight: 1.4
+  field-label:
+    fontFamily: IBM Plex Mono
+    fontSize: 11px
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: 0.08em
+  micro-label:
+    fontFamily: IBM Plex Mono
+    fontSize: 10px
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: 0.08em
+rounded:
+  small: 2px
+  control: 3px
+spacing:
+  x1: 4px
+  x2: 8px
+  x3: 12px
+  x4: 16px
+  x6: 24px
+  x8: 32px
+  x12: 48px
+components:
+  page-light:
+    backgroundColor: "{colors.neutral}"
+    textColor: "{colors.ink}"
+    typography: "{typography.body}"
+  page-dark:
+    backgroundColor: "{colors.neutral-dark}"
+    textColor: "{colors.ink-dark}"
+    typography: "{typography.body}"
+  surface-light:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.control}"
+  surface-dark:
+    backgroundColor: "{colors.surface-dark}"
+    textColor: "{colors.ink-dark}"
+    rounded: "{rounded.control}"
+  field-light:
+    backgroundColor: "{colors.inset}"
+    textColor: "{colors.ink}"
+    height: 40px
+    rounded: "{rounded.control}"
+  field-dark:
+    backgroundColor: "{colors.inset-dark}"
+    textColor: "{colors.ink-dark}"
+    height: 40px
+    rounded: "{rounded.control}"
+  primary-button-light:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.neutral}"
+    typography: "{typography.interactive}"
+    height: 40px
+    rounded: "{rounded.control}"
+  primary-button-dark:
+    backgroundColor: "{colors.primary-dark}"
+    textColor: "{colors.neutral-dark}"
+    typography: "{typography.interactive}"
+    height: 40px
+    rounded: "{rounded.control}"
+  pending-button-light:
+    backgroundColor: "{colors.primary-deep}"
+    textColor: "{colors.neutral}"
+  pending-button-dark:
+    backgroundColor: "{colors.primary-deep-dark}"
+    textColor: "{colors.neutral-dark}"
+  secondary-text-light:
+    textColor: "{colors.ink-muted}"
+  secondary-text-dark:
+    textColor: "{colors.ink-muted-dark}"
+  selected-light:
+    backgroundColor: "{colors.primary-tint}"
+  selected-dark:
+    backgroundColor: "{colors.primary-tint-dark}"
+  data-fill-light:
+    backgroundColor: "{colors.data-accent}"
+  data-fill-dark:
+    backgroundColor: "{colors.data-accent-dark}"
+  rating-fill-light:
+    backgroundColor: "{colors.rating-fill}"
+  rating-fill-dark:
+    backgroundColor: "{colors.rating-fill-dark}"
+  rating-track-light:
+    backgroundColor: "{colors.rating-track}"
+  rating-track-dark:
+    backgroundColor: "{colors.rating-track-dark}"
+  passport-empty-light:
+    backgroundColor: "{colors.passport-empty}"
+  passport-empty-dark:
+    backgroundColor: "{colors.passport-empty-dark}"
+  list-divider-light:
+    backgroundColor: "{colors.hairline}"
+    height: 1px
+  list-divider-dark:
+    backgroundColor: "{colors.hairline-dark}"
+    height: 1px
+  section-divider-light:
+    backgroundColor: "{colors.section-rule}"
+    height: 1px
+  section-divider-dark:
+    backgroundColor: "{colors.section-rule-dark}"
+    height: 1px
+---
+
 # Peated design system
 
 This document is the visual contract for Peated. Product code and tests remain authoritative for behavior and data. Update this document when a reviewed visual decision changes.
 
-## Product direction
+## Overview
 
 Peated is a whisky database first. It is a reference work with community data, not a social feed with reference data attached.
 
@@ -12,7 +185,7 @@ Peated is a whisky database first. It is a reference work with community data, n
 - State precise values. Write “2,841 tastings,” not “popular.”
 - Treat missing data as a normal state and offer a contribution path when the member can fill the gap.
 
-## System rules
+### System rules
 
 1. Use `ground`, `surface`, and `inset` tones for structure. Do not outline cards, fields, image slots, or bars.
 2. Use one accent for community measures, active state, links, and one main action per view.
@@ -24,7 +197,7 @@ Peated is a whisky database first. It is a reference work with community data, n
 
 The web app uses StyleX for component styles and does not load or compile Tailwind. Components own their complete visual and control treatment. Keep global CSS for document defaults and third-party markup that a component cannot own.
 
-## Color
+## Colors
 
 The operating system selects the light or dark scheme. The product does not keep separate theme state. Storybook is the only exception: its review-only toolbar lets reviewers switch every story between the light and dark schemes. It does not add theme state to the product.
 
@@ -39,6 +212,8 @@ The operating system selects the light or dark scheme. The product does not keep
 | `accentDeep`    | `#6E400C`  | `#F0D9B0`  | Small accent text on a tint      |
 | `accentTint`    | 15% accent | 15% accent | Selected and related data        |
 | `dataAccent`    | 42% accent | 42% accent | Secondary data and facet fills   |
+| `ratingFill`    | 75% accent | 75% accent | Compact rating distribution bars |
+| `ratingTrack`   | `#CBD0C2`  | `#3A3F37`  | Rating tracks on hover surfaces  |
 | `passportEmpty` | 16% ink    | 16% ink    | Unstamped passport cells         |
 | `hairline`      | 11% ink    | 11% ink    | Dividers inside a list           |
 | `sectionRule`   | 16% ink    | 16% ink    | Major page and footer boundaries |
@@ -64,23 +239,32 @@ Use `inset` for neutral tracks and empty data regions. Do not introduce a second
 
 Use tabular numerals for aligned measures. Do not use the display face as body copy.
 
-## Shape, spacing, and elevation
+## Layout
 
 The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these values before adding a local exception.
 
-- Controls, panels, cards, and buttons use a 3px radius.
-- Chips, tags, image slots, and bar segments use a 2px radius.
 - Buttons use `sm` at 34px, `md` at 40px, and `lg` at 48px. `md` is the default.
 - Controls that share one action row use the same size. Form controls use the 40px `md` height.
 - List dividers can use a 1px hairline inside the list.
+
+## Elevation & Depth
+
 - Floating overlays use `0 18px 40px` with 16% light ink or 55% black in dark mode.
 - Other elements do not use elevation.
 
-## Interaction
+## Shapes
+
+- Controls, panels, cards, and buttons use a 3px radius.
+- Chips, tags, image slots, and bar segments use a 2px radius.
+- Do not use pills.
+
+## Components
+
+### Interaction
 
 - Every interactive control has a visible hover, pressed, disabled, and keyboard-focus state.
 - Keyboard focus uses a 2px inset accent ring. Do not remove focus indication.
-- A neutral text link shifts to `accentDeep` on hover and `accent` while pressed. A linked `surface` card or row steps to `inset` on hover and `accentTint` while pressed. Keep its geometry fixed and put the focus ring on the complete actionable surface.
+- A neutral text link shifts to `accentDeep` and gains a 1px underline on hover. It uses `accent` while pressed. A linked `surface` card or row steps to `inset` on hover and `accentTint` while pressed. A plain linked row uses 12px horizontal padding and an equal negative margin so its interaction surface extends past the text grid without moving the content. When a record has a destination, make the complete row its primary link. Keep links and controls inside that row independent. Do not give a static row a linked-row hover treatment. Keep its geometry fixed and put the focus ring on the complete actionable surface. Keep data tracks visible against every tonal state.
 - Do not use a pointer cursor as the only interaction state.
 - Disabled controls use 45% opacity and state the reason nearby when the reason is not obvious.
 - A pending commit stays in the button that started it. Change its label to the present participle, use the deeper accent fill, and move one 2px rule across its bottom edge. Keep the button opaque and disable the rest of the form.
@@ -90,7 +274,7 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 - Use overlays for menus and typeahead results. Keep their shadow local to the overlay.
 - Put a row's secondary actions in one 34px vertical-dots menu. Open the menu over its trigger and keep the trigger as the top-right cell of the overlay.
 
-## Form controls
+### Form controls
 
 - Use a native select for a compact list of familiar options. A styled select owns one disclosure caret; suppress browser and legacy background indicators when the component renders its caret.
 - Keep a numeric field and its fixed unit in one inset control. The unit is not editable and uses the data type role.
@@ -107,7 +291,7 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 - Use a fieldset and legend for grouped controls. Use a label only for a single field.
 - Keep selects, segmented controls, text fields, and buttons on the 40px `md` control rhythm when they share a form.
 
-## Rating language
+### Rating language
 
 Peated keeps tasting bands and review scores separate. A tasting records one
 coarse band. A review records one exact 0–100 score.
@@ -116,7 +300,7 @@ coarse band. A review records one exact 0–100 score.
 
 - Use five bands everywhere: Mediocre under 80, Good 80–84, Very good 85–89, Outstanding 90–94, and Unicorn 95–100.
 - A tasting stores one band. Never convert it into a point or fabricate a numeric score from band centers.
-- Show aggregate band picks as five fixed bins. A narrow row can collapse the drawing to low, mid, and high blocks, but it must not introduce a second vocabulary.
+- Show aggregate band picks as five fixed bins. Do not collapse them into a second low, mid, and high vocabulary.
 - Show one tasting rating as five visible cells with one cell lit.
 
 ### Score
@@ -138,11 +322,12 @@ coarse band. A review records one exact 0–100 score.
 
 Use “tasting rating” for a band and “review score” for an exact point.
 
-## Data devices
+### Data devices
 
 - **Bottle identity row:** Use the catalog image when the caller supplies one. Otherwise, use Peated's existing bottle glyph. Keep brand, bottle name, exact supplied metadata, related-release count, and member status distinct. “In Library” and “Tasted” keep their current Peated meanings. Show true member states as 12px muted book and circled-check marks directly after the name. Do not use accent color or make the marks controls. Omit a false state. Callers also omit the marks when the page already implies the state, such as the bottle page, the member's library or tastings, and another member's profile. Do not replace missing data with a decorative bottle silhouette or infer identity details in the component.
 - **Band mark:** Use five 12×8px cells with 2px gaps. Keep every empty cell visible and light the selected tasting band.
 - **Band stack:** Show the five bands from Mediocre to Unicorn with 2px gaps. Use low, mid, and high fills. Carry proportion by shape and sample size by count; do not print a band percentage.
+- **Rating measure:** In bottle rows, show five fixed vertical tasting-band bars and the published median as one compact measure. Scale each bar by its share of that bottle's tasting ratings and scale the overall height by sample size. Reserve the score slot when the median is withheld. Use the supplied low and high scores for the bracket; do not describe it as a critic-only range. Keep the full distribution and counts in one accessible label.
 - **Record ID:** Show the canonical Peated ID above an entity title with the ID in accent. Print the supplied ID without changing it.
 - **Spec strip:** Show at most four equal-width mono fact cells. The strip has no background. Each cell uses `surface`, and a 6px transparent gap exposes the page behind it. Truncate labels and values and print an en dash for null or missing values. Place the strip as a sibling below its related header panel instead of nesting it inside that panel.
 - **Bottle page header:** Keep the catalog image, identity, member actions, score, and band stack in one responsive component tree. Keep the spec strip as the header surface's sibling. At 900px, place the strip before the measures and show supplied measures in two columns. At 480px, remove the identity-panel fill and padding, reflow a four-cell strip to 2×2, stack the measures, reduce the title to 26px, and pin the action row to the bottom. Omit a measure when the caller cannot supply it.
@@ -153,19 +338,19 @@ Use “tasting rating” for a band and “review score” for an exact point.
 - **Pager:** Use numbered links only when the caller knows the page count. State the shown range and active filter. Use an ellipsis for skipped ranges and tonal previous or next links. Do not derive page numbers from cursor pagination.
 - **Bottle catalog:** Treat the API response as one visible cursor page. Show its real records, current-page count, and API-owned full-result total. Keep filters in the URL and reachable through one disclosure at narrow widths. Render category and age statement as counted facets from the API response. Use the API-owned NAS, under-12, 12–17, 18–24, and 25-plus age bands. Keep the old exact-age query readable for existing links, but replace it when a member selects an age band. Do not offer community-score, community-verdict, or flavor-profile filters, and do not derive facet counts from the cursor page. Keep cursor navigation; do not invent numbered pages from the total.
 - **Entity catalogs:** Use one list contract for distillers, brands, bottlers, and blenders. Show the visible cursor page, Peated ID, kind, location, bottle count, and tasting count. Keep query, country, region, sort, and cursor state in the URL. Country rows are count-free until the API owns entity facet counts. Keep the active region removable when an existing link supplies one. Use Previous and Next cursor actions without inventing a total or numbered pages. At phone widths, keep bottle count visible and retain both measures in the row's accessible name.
-- **Homepage:** Fetch the signed-out homepage's public stats and lists on the server through the anonymous API client, then hydrate the same React Query keys used by its client components. Use the bottle list's published median-score sort for the database-wide Highest rated module. Use real country totals for the origin directory and group the API-owned Scottish regions under Scotland. Keep the route request-time rendered because the shell varies by session. Keep signed-in activity and member data client-owned. The signed-out homepage header shows database navigation but omits global search because the hero owns the page's search control. Do not render popularity, annual rankings, critic-source totals, or highest-rated bottles scoped to one distillery until issue #781 supplies those server-owned facts.
+- **Homepage:** Fetch the signed-out homepage's public stats and lists on the server through the anonymous API client, then hydrate the same React Query keys used by its client components. Use the bottle list's published median-score sort for the database-wide Highest rated module. Show the three largest API-owned country records as map tiles, aggregate the remaining returned countries into one truthful remainder tile, and list the four largest supplied Scottish regions below them. Keep the route request-time rendered because the shell varies by session. Keep signed-in activity and member data client-owned. The signed-out homepage header shows database navigation but omits global search because the hero owns the page's search control. Do not render popularity, annual rankings, critic-source totals, or highest-rated bottles scoped to one distillery until issue #781 supplies those server-owned facts.
 - **Entity detail:** Use one nested route frame for the entity header and the Overview, Bottles, Tastings, and optional Distillery codes tabs. The selected route owns its API and URL state while the header and tabs stay stable. Use the entity-details response for identity, kind, location, ownership, core facts, and bottle totals. Kind is the only entity classification used by the interface. A contextual bottle action maps only brand, bottler, and distillery kinds to their matching bottle field; blender and company records do not invent one. Keep the Bottles or Bottlings section visible for brand, bottler, distillery, and blender records. When the list is empty, show a short message and a button to record a bottle or bottling. Use the bottle-list response for bottle metadata, median review score, tasting-band counts, sorting, and cursor pagination. Show these rows directly under the Bottles or Bottlings section; do not add a second list title or a generic catalog summary. Use tasting-list records for the Tastings tab. The SMWS codes tab is a reference list enriched with links from the existing SMWS distiller endpoint. A company portfolio waits for an API-owned current-owner filter; do not infer it from bottle relationships. Keep complete routes out of Storybook; document the reusable entity header, bottle rows, tasting entries, bottle comparison table, and their sparse states there. Do not infer operating status, still count, capacity, community measures, or history from the entity description or establishment year.
 - **Member profile:** Keep the profile header, summary, privacy boundary, and Tastings, Library, and Activity tabs in one nested route frame. Use user-details counts for tastings, unique bottles, library entries, and contributions. Use the tasting and region lists for Tastings. Use the Library list and Library statistics for search, status and producer filters, bottle rows, owner actions, and cursor links. Use profile Activity only for the tasting sessions and collection additions returned by its API. Keep private records behind the existing friendship rule. Omit bio, location, follower totals, passport coverage, distinct distillery totals, and a Contributions tab until issue #774 supplies owned contracts. Storybook documents the reusable header and bounded Library and Activity content instead of duplicating complete routes.
 - **Summary strip:** Show three to five page-level facts in equal tonal cells. A cell can add one short mono detail, such as pass, sip, and savor counts. Reflow cells into additional rows at narrow widths; do not introduce horizontal scrolling.
 - **Passport:** Present distinct tracked objects as coverage. Use the tracker noun and never expose XP or levels. A closed set names every stamped or missing member and shows a denominator. An open-ended tracker shows only its count and the distance to its next stamp. Past 24 members, replace individual cells with a share bar and percentage chip.
-- **Bottle comparison table:** Use a table only when bottle comparison is the task. Keep the bottle name and metadata in the first column and use two fixed measure columns. On compact screens, turn each row into a two-measure bottle block and repeat the measure labels. Print an en dash for an unknown value.
+- **Bottle comparison table:** Use a table only when bottle comparison is the task. Keep the bottle name and metadata in the first column and use one or more supplied measure columns. On compact screens, turn each row into a bottle block and repeat the measure labels. Print an en dash for an unknown value.
 - **List toolbar:** State the visible record count first. Put sort and optional export actions at the end. Stack these groups at compact widths. A period header is a plain mono micro label without a count chip.
 - **Rail list:** Put related short rows on one `surface` panel. Use reading type for the row title, mono type for metadata, fixed end slots, and one hairline between rows. Do not add a divider after the final row.
 - **History timeline:** List entity events from oldest to newest. Keep the date in a fixed mono column and use one 4px spine to show whether the distillery was operating or silent at each event. State that status for assistive technology instead of relying on color. End with a short mono summary when the caller can provide one.
 
 Do not add flavor meters. Peated does not own a derived flavor scale. Do not add rank numerals to lists; the list order and heading must state any meaningful position.
 
-## Navigation and page frame
+### Navigation and page frame
 
 - Keep the header, main content, and footer on the same maximum-width frame and responsive horizontal insets.
 - On the homepage, use the page ground for the application header so the header and homepage read as one surface. Inner pages keep the separate header surface.
@@ -180,7 +365,7 @@ Do not add flavor meters. Peated does not own a derived flavor scale. Do not add
 - Render account destinations as links and session changes as actions. “Sign out” calls the existing logout server action from a menu button; it is not a GET destination.
 - The reference footer is not a panel. Start it with one `sectionRule`, then show the product statement and four stable link groups. Keep coverage, provenance, and responsibility text in the closing reference band. Do not add a second divider inside the footer.
 
-## Search
+### Search
 
 - Treat an open header typeahead as one object. Open its ground surface over the field, keep the same input as the top row, and separate results with one hairline. Inset the 2px active ring from the edge of that 40px top control so the field fill remains visible around it; the results surface uses only its overlay shadow. Do not place a detached results panel below the field or move the query when results appear.
 - Group supplied results by record type. Keep group order, result caps, totals, and “See all” destinations owned by the caller because the search API defines what is known.
@@ -193,7 +378,7 @@ Do not add flavor meters. Peated does not own a derived flavor scale. Do not add
 - On narrow screens, move the review score and tasting ratings under the result name. Remove scope selection from the constrained field. On phone search, expose the same scopes as a horizontally scrollable chip row and keep the same component and result order.
 - The component does not rank results, create nearest matches, store recent queries, or invent total counts. Those values and behaviors belong to the search service or its owning product surface.
 
-## Pickers
+### Pickers
 
 - Show the canonical Peated ID and a useful size figure in each entity result.
 - Let Up and Down move through existing results only. Let Enter choose the active result and Escape close the results.
@@ -206,7 +391,7 @@ Do not add flavor meters. Peated does not own a derived flavor scale. Do not add
 - In forms, keep selected notes inside one searchable field. Show existing vocabulary and usage counts as the member types. Use Browse to open the full category picker.
 - The drinking-with field selects existing friends only. It does not create members or broaden the audience beyond the caller's friend results.
 
-## States
+### States
 
 Thin data is normal.
 
@@ -226,7 +411,7 @@ Thin data is normal.
 - Offline copy states only what the current product can still do. Do not claim that work is queued or saved unless a real persistence contract supplies that state.
 - Print an en dash for unknown table or spec-strip values. Do not use “n/a.”
 
-## Responsive behavior
+### Responsive behavior
 
 - Start with content that works at 320px without horizontal page overflow.
 - Preserve information order when columns collapse.
@@ -234,21 +419,23 @@ Thin data is normal.
 - Use a table only when comparison is the task. Provide a row or card treatment for narrow screens.
 - Verify each reviewed slice at desktop and mobile widths in both system color schemes.
 
-## Component ownership
+### Component ownership
 
 Design-system components use StyleX and own their visual states. Name files that contain StyleX calls `*.stylex.ts` or `*.stylex.tsx`; this keeps the compile boundary narrow and explicit. Product screens compose these components instead of adding page-local visual classes.
 
 Use the shared composition baseline before adding another visual container:
 
 - Use `Card`, `CardLink`, and `CardGrid` for neutral content cards. Add a named card component only when it owns a Peated concept, data contract, or behavior.
+- Use `ItemList` and `ItemRow` for aligned linked rows. The item noun stays neutral; the caller supplies the Peated record, label, and destination.
 - Use `DataTable` for ordinary comparison rows. The route owns fetching, URL state, sorting, filtering, and paging. Keep a specialized table only when its compact layout or columns are part of a product contract.
 - Use `FormStack`, `FormSection`, `FormGrid`, `FormDetails`, `FormActions`, and `FormNotice` to compose workflows. Field components own labels and controls; routes own state and mutations.
 - Use `SearchSelect` for one remote record and `SearchPicker` for several. The caller owns the query and available results.
+- Use `Avatar` for circular member pictures and initials at the supported header and row sizes. Keep profile portraits separate when their shape and scale are part of the profile header.
 - Use `WorkflowScreen` for standalone add, edit, merge, and capture tasks. Do not put complete workflow routes in Storybook. Show reusable controls and meaningful component states there.
 
 Name an exported component after the Peated concept or user task that it owns. Use a normal UI noun for a generic control. Do not name a component after its implementation shape with words such as `Product`, `Experience`, `Surface`, `Shell`, `Widget`, `Module`, `Structure`, or `Record` unless that word is the real product concept. Storybook titles use the same nouns as the product and group them by their owning domain. State names describe what the reviewer sees or does.
 
-Storybook is the living view of the implemented shared system. Its sidebar lists foundation topics and reusable components grouped by domain. Keep each component's story file beside its implementation. A simple component starts with one Overview story that renders its useful static variants together and exposes narrow props through Storybook controls. Do not add separate stories for sizes, labels, selected values, item counts, or other prop permutations that can be understood in the overview or controls. Add a separate named story only when a behavior, asynchronous state, permission boundary, error, or responsive composition needs a stable direct review URL. A named behavior story renders its scenario directly and deterministically; reviewers do not click through setup steps to reach the state under review. Add a group only after it contains real exported tokens or components. Stories render the same components used by product screens. Do not add visual copies, placeholder controls, empty groups, route-specific sections, or complete page compositions.
+Storybook is the living view of the implemented shared system. Its sidebar lists foundation topics and reusable components grouped by domain. Keep each component's story file beside its implementation. A simple component starts with one Overview story that renders its useful static variants together and exposes narrow props through Storybook controls. Do not add separate stories for sizes, labels, selected values, item counts, or other prop permutations that can be understood in the overview or controls. Add a separate named story only when a behavior, asynchronous state, permission boundary, error, or responsive composition needs a stable direct review URL. A named behavior story renders its scenario directly and deterministically; reviewers do not click through setup steps to reach the state under review. Pin shared hover, pressed, and keyboard-focus rules in one interaction-state story so reviewers can inspect those real pseudo states without holding the pointer in place. Add a group only after it contains real exported tokens or components. Stories render the same components used by product screens. Do not add visual copies, placeholder controls, empty groups, route-specific sections, or complete page compositions.
 
 Storybook exposes an accessibility review panel and a local MCP endpoint for agents. Accessibility findings support manual review and do not create a presentation-test gate. Agent manifests use component types, concise JSDoc for non-obvious semantics, and real stories. Do not enable global Autodocs pages only to feed the manifest. CI builds the static Storybook as a compile gate.
 
@@ -274,7 +461,7 @@ Use one plain canvas treatment for spacing and width. Render each component dire
 
 Stories use plain headings and unnumbered sections. They do not use editorial slogans, status labels, completion counts, planned categories, or placeholder specimens. Keep each story focused on real component states or a real composition.
 
-## Review process
+### Review process
 
 Implement one bounded slice at a time:
 

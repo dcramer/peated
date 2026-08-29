@@ -1,8 +1,7 @@
+import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { summarize } from "@peated/web/lib/markdown";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { getCanonicalRouteRedirectPath } from "@peated/web/lib/tombstoneRedirect";
-import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
 
@@ -12,10 +11,7 @@ export async function generateMetadata(props: {
   params: Promise<{ entityId: string }>;
 }) {
   const { entityId } = await props.params;
-  const { client } = await getAnonymousServerClient();
-  const entity = await resolveOrNotFound(
-    client.entities.details({ entity: Number(entityId) }),
-  );
+  const entity = await getEntityPage(Number(entityId));
   const description = summarize(entity.description || "", 200);
 
   return {
@@ -31,21 +27,8 @@ export default async function EntityLayout(props: {
   params: Promise<{ entityId: string }>;
 }) {
   const { entityId } = await props.params;
-  const requestedId = Number(entityId);
   const { client } = await getAnonymousServerClient();
-  const entity = await resolveOrNotFound(
-    client.entities.details({ entity: requestedId }),
-  );
-
-  if (entity.id !== requestedId) {
-    return redirect(
-      await getCanonicalRouteRedirectPath({
-        currentId: requestedId,
-        canonicalId: entity.id,
-        collectionPath: "/entities",
-      }),
-    );
-  }
+  const entity = await getEntityPage(Number(entityId));
 
   const owner = entity.ownerId
     ? await resolveOrNotFound(

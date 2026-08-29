@@ -3,12 +3,12 @@
 import { use } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
-import Button from "@peated/web/components/button";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 

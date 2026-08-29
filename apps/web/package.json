@@ -82,6 +82,7 @@
     "postcss-import": "^16.1.1",
     "react-docgen-typescript": "2.4.0",
     "storybook": "10.5.10",
+    "storybook-addon-pseudo-states": "10.5.8",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

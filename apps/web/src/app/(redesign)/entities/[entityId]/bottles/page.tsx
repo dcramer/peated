@@ -1,8 +1,8 @@
 import { ButtonLink } from "@peated/web/components/designSystem/components";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
+import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 
 import { EntityBottleListClient } from "./entityBottleListClient.stylex";
 
@@ -12,9 +12,7 @@ export default async function EntityBottlesPage(props: {
 }) {
   const { entityId } = await props.params;
   const { client } = await getPublicPageServerClient();
-  const entity = await resolveOrNotFound(
-    client.entities.details({ entity: Number(entityId) }),
-  );
+  const entity = await getEntityPage(Number(entityId));
   const createBottleHref = getEntityBottleCreateHref(entity);
   const queryParams = getApiQueryParams(await props.searchParams, {
     defaults: { sort: "-release" },

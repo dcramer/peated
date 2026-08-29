@@ -4,7 +4,6 @@ import {
   EmptyState,
   type DataTableColumn,
 } from "@peated/web/components/designSystem/components";
-import { TextLink } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
@@ -17,13 +16,9 @@ type PriceRow = Outputs["bottles"]["prices"]["list"]["results"][number];
 const columns: DataTableColumn<PriceRow>[] = [
   {
     cell: (item) =>
-      item.isValid ? (
-        <TextLink href={item.url}>
-          {item.site?.name} — {item.name}
-        </TextLink>
-      ) : (
-        `${item.site?.name} — ${item.name}`
-      ),
+      item.isValid
+        ? `${item.site?.name} — ${item.name}`
+        : `${item.site?.name} — ${item.name}`,
     header: "Seller",
     key: "seller",
   },
@@ -63,6 +58,7 @@ export default async function BottlePricesPage(props: {
         <DataTable
           caption="Bottle sellers"
           columns={columns}
+          getHref={(item) => (item.isValid ? item.url : undefined)}
           getKey={(item) => item.id}
           items={priceList.results}
         />

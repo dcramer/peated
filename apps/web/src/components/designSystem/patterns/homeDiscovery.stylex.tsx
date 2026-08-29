@@ -8,7 +8,14 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { BottleVisual, SectionHeading } from "../components";
+import {
+  BottleVisual,
+  Card,
+  CardActionLink,
+  CardLink,
+  CardPrimaryLink,
+  SectionHeading,
+} from "../components";
 
 export type HomeCriticReview = {
   bottleHref: string;
@@ -22,7 +29,7 @@ export type HomeCriticReview = {
   summary?: ReactNode;
 };
 
-export function HomeCriticReviews({
+export function CriticReviewCards({
   reviews,
 }: {
   reviews: readonly HomeCriticReview[];
@@ -32,31 +39,36 @@ export function HomeCriticReviews({
       <SectionHeading>From the critics</SectionHeading>
       <div {...stylex.props(styles.criticGrid)}>
         {reviews.map((review) => (
-          <article key={review.sourceHref} {...stylex.props(styles.criticCard)}>
+          <Card
+            appearance="surface"
+            key={review.sourceHref}
+            linked
+            padding="none"
+            {...stylex.props(styles.criticCard)}
+          >
             <BottleVisual
               imageUrl={review.imageUrl}
               label={review.bottleName}
             />
             <div {...stylex.props(styles.criticCopy)}>
               <div {...stylex.props(styles.sourceLine)}>
-                <a
+                <CardActionLink
                   href={review.sourceHref}
                   rel="noreferrer"
                   target="_blank"
                   {...stylex.props(styles.sourceLink)}
                 >
                   {review.source}
-                </a>
+                </CardActionLink>
                 <span aria-hidden="true"> · </span>
                 {review.date}
               </div>
               <div {...stylex.props(styles.criticTitleLine)}>
-                <a
-                  href={review.bottleHref}
-                  {...stylex.props(styles.criticTitle)}
-                >
-                  {review.bottleName}
-                </a>
+                <CardPrimaryLink href={review.bottleHref}>
+                  <span {...stylex.props(styles.criticTitle)}>
+                    {review.bottleName}
+                  </span>
+                </CardPrimaryLink>
                 {review.rating === null ||
                 review.rating === undefined ? null : (
                   <strong {...stylex.props(styles.criticRating)}>
@@ -73,7 +85,7 @@ export function HomeCriticReviews({
                 <p {...stylex.props(styles.summary)}>{review.summary}</p>
               ) : null}
             </div>
-          </article>
+          </Card>
         ))}
       </div>
     </section>
@@ -88,7 +100,7 @@ export type HomeFollowedRelease = {
   metadata: readonly string[];
 };
 
-export function HomeFollowedReleases({
+export function FollowedReleaseList({
   followedDistillerCount,
   releases,
   seeAllHref,
@@ -102,7 +114,13 @@ export function HomeFollowedReleases({
       <SectionHeading>New from distillers you follow</SectionHeading>
       <div {...stylex.props(styles.releaseList)}>
         {releases.map((release) => (
-          <article key={release.bottleHref} {...stylex.props(styles.release)}>
+          <CardLink
+            appearance="surface"
+            href={release.bottleHref}
+            key={release.bottleHref}
+            padding="none"
+            {...stylex.props(styles.release)}
+          >
             <BottleVisual
               imageUrl={release.imageUrl}
               label={release.bottleName}
@@ -112,12 +130,9 @@ export function HomeFollowedReleases({
               <div {...stylex.props(styles.releaseDistiller)}>
                 {release.distiller}
               </div>
-              <a
-                href={release.bottleHref}
-                {...stylex.props(styles.releaseName)}
-              >
+              <span {...stylex.props(styles.releaseName)}>
                 {release.bottleName}
-              </a>
+              </span>
               {release.metadata.length ? (
                 <div {...stylex.props(styles.metadata)}>
                   {release.metadata.join(" · ")}
@@ -125,7 +140,7 @@ export function HomeFollowedReleases({
               ) : null}
             </div>
             <span {...stylex.props(styles.newLabel)}>new</span>
-          </article>
+          </CardLink>
         ))}
       </div>
       <div {...stylex.props(styles.releaseFooter)}>
@@ -154,16 +169,12 @@ const styles = stylex.create({
     },
   },
   criticCard: {
-    boxSizing: "border-box",
     display: "flex",
-    minWidth: 0,
     gap: "14px",
     paddingTop: "22px",
     paddingRight: space.x6,
     paddingBottom: "22px",
     paddingLeft: space.x6,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
     [COMPACT]: {
       paddingTop: space.x4,
       paddingRight: space.x4,
@@ -191,39 +202,35 @@ const styles = stylex.create({
       ":hover": colors.accentDeep,
       ":active": colors.accent,
     },
-    textDecoration: "none",
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     boxShadow: {
       default: "none",
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": "none",
     },
   },
   criticTitleLine: {
     display: "flex",
     minWidth: 0,
-    alignItems: "baseline",
+    alignItems: "center",
     gap: "10px",
     marginTop: "6px",
   },
   criticTitle: {
+    display: "block",
     minWidth: 0,
     flex: 1,
-    outline: "none",
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
+    color: colors.ink,
     fontFamily: fonts.display,
     fontSize: "15px",
     fontWeight: 700,
     letterSpacing: "-0.02em",
     lineHeight: 1.2,
-    textDecoration: "none",
     textWrap: "pretty",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
   criticRating: {
     flexShrink: 0,
@@ -261,17 +268,15 @@ const styles = stylex.create({
     marginTop: space.x3,
   },
   release: {
-    boxSizing: "border-box",
     display: "flex",
-    minWidth: 0,
     alignItems: "center",
     gap: space.x3,
     paddingTop: "14px",
     paddingRight: space.x4,
     paddingBottom: "14px",
     paddingLeft: space.x4,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
+    color: colors.ink,
+    textDecoration: "none",
   },
   releaseCopy: {
     minWidth: 0,
@@ -290,24 +295,14 @@ const styles = stylex.create({
     display: "block",
     overflow: "hidden",
     marginTop: "2px",
-    outline: "none",
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
+    color: colors.ink,
     fontFamily: fonts.display,
     fontSize: "15px",
     fontWeight: 700,
     letterSpacing: "-0.02em",
     lineHeight: 1.2,
-    textDecoration: "none",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
   newLabel: {
     flexShrink: 0,
@@ -342,7 +337,12 @@ const styles = stylex.create({
     fontSize: "13px",
     fontWeight: 700,
     lineHeight: 1.2,
-    textDecoration: "none",
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,

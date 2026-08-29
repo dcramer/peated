@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
+import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   BottleComparisonTable,
   type BottleComparisonTableProps,
 } from "./bottleComparisonTable.stylex";
-import { BandStack } from "./scoring.stylex";
+import { RatingMeasure } from "./scoring.stylex";
 
 const rows: BottleComparisonTableProps["rows"] = [
   {
@@ -14,9 +14,7 @@ const rows: BottleComparisonTableProps["rows"] = [
     metadata: "Islay · 10 years · 46% ABV",
     name: "Port Charlotte 10 Year Old",
     values: [
-      "84",
-      <BandStack
-        key="ratings"
+      <RatingMeasure
         counts={{
           good: 19,
           mediocre: 14,
@@ -24,7 +22,11 @@ const rows: BottleComparisonTableProps["rows"] = [
           unicorn: 4,
           very_good: 42,
         }}
-        variant="compact"
+        high={94}
+        key="rating"
+        low={77}
+        median={84}
+        scoreCount={28}
       />,
     ],
   },
@@ -34,9 +36,7 @@ const rows: BottleComparisonTableProps["rows"] = [
     metadata: "Islay · NAS · 54.2% ABV",
     name: "Ardbeg Uigeadail",
     values: [
-      "89",
-      <BandStack
-        key="ratings"
+      <RatingMeasure
         counts={{
           good: 14,
           mediocre: 9,
@@ -44,7 +44,11 @@ const rows: BottleComparisonTableProps["rows"] = [
           unicorn: 9,
           very_good: 46,
         }}
-        variant="compact"
+        high={98}
+        key="rating"
+        low={80}
+        median={89}
+        scoreCount={54}
       />,
     ],
   },
@@ -53,7 +57,29 @@ const rows: BottleComparisonTableProps["rows"] = [
     id: "3",
     metadata: "Islay · 12 years · 43% ABV",
     name: "Caol Ila 12 Year Old",
-    values: [null, <BandStack key="ratings" counts={{}} variant="compact" />],
+    values: [<RatingMeasure counts={{}} key="rating" />],
+  },
+  {
+    href: "/bottles/4",
+    id: "4",
+    metadata: "Campbeltown · 15 years · 51.4% ABV",
+    name: "A deliberately long independent bottling name that tests the aligned row",
+    values: [
+      <RatingMeasure
+        counts={{
+          good: 3,
+          mediocre: 2,
+          outstanding: 11,
+          unicorn: 4,
+          very_good: 10,
+        }}
+        high={97}
+        key="rating"
+        low={82}
+        median={91}
+        scoreCount={22}
+      />,
+    ],
   },
 ];
 
@@ -61,7 +87,7 @@ const meta = {
   title: "Components/Data Display/Bottle Comparison Table",
   component: BottleComparisonTable,
   args: {
-    columns: ["Score", "Tasting ratings"],
+    columns: ["Rating"],
     detail: "3 bottles in this set",
     heading: "Islay single malts",
     rows,
@@ -80,40 +106,16 @@ export default meta;
 type Story = StoryObj<BottleComparisonTableProps>;
 
 export const Overview: Story = {
-  render: (args) => (
-    <StoryStack>
-      <BottleComparisonTable {...args} />
-      <BottleComparisonTable
-        {...args}
-        ariaLabel="Associated bottles"
-        detail={undefined}
-        heading={undefined}
-      />
-      <BottleComparisonTable
-        {...args}
-        rows={[
-          {
-            href: "/bottles/4",
-            id: "4",
-            metadata: "Campbeltown · 15 years · 51.4% ABV",
-            name: "A deliberately long independent bottling name that tests the aligned row",
-            values: [
-              "91",
-              <BandStack
-                key="ratings"
-                counts={{
-                  good: 3,
-                  mediocre: 2,
-                  outstanding: 11,
-                  unicorn: 4,
-                  very_good: 10,
-                }}
-                variant="compact"
-              />,
-            ],
-          },
-        ]}
-      />
-    </StoryStack>
-  ),
+  render: (args) => <BottleComparisonTable {...args} />,
+};
+
+export const InteractionStates: Story = {
+  render: (args) => <BottleComparisonTable {...args} />,
+  parameters: {
+    pseudo: {
+      active: ['tr[data-record-key="4"]'],
+      focusWithin: ['tr[data-record-key="3"]'],
+      hover: ['tr[data-record-key="2"]'],
+    },
+  },
 };

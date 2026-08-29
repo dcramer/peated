@@ -14,6 +14,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { SkipLink } from "../components/skipLink.stylex";
 
 const COMPACT = "@media (max-width: 759px)";
 const WIDE = "@media (min-width: 760px)";
@@ -90,9 +91,7 @@ export function AdminWorkspace({
 
   return (
     <div {...stylex.props(foundationStyles.document, styles.workspace)}>
-      <a href="#admin-content" {...stylex.props(styles.skipLink)}>
-        Skip to admin content
-      </a>
+      <SkipLink href="#admin-content">Skip to admin content</SkipLink>
 
       <header {...stylex.props(styles.mobileHeader)}>
         <Link href="/admin" {...stylex.props(styles.mobileBrand)}>
@@ -138,26 +137,6 @@ const styles = stylex.create({
     minHeight: "100dvh",
     backgroundColor: colors.ground,
     color: colors.ink,
-  },
-  skipLink: {
-    position: "fixed",
-    zIndex: 100,
-    top: space.x2,
-    left: space.x2,
-    paddingTop: space.x2,
-    paddingRight: space.x3,
-    paddingBottom: space.x2,
-    paddingLeft: space.x3,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.ink,
-    color: colors.ground,
-    fontFamily: fonts.reading,
-    fontWeight: 700,
-    textDecoration: "none",
-    transform: {
-      default: "translateY(-160%)",
-      ":focus": "translateY(0)",
-    },
   },
   mobileHeader: {
     position: "sticky",

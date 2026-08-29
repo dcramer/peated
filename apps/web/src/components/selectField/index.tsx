@@ -6,38 +6,19 @@ import {
 } from "@peated/web/components/designSystem/components";
 import { useEffect, useMemo, useState } from "react";
 
-import type {
-  CreateForm,
-  OnQuery,
-  OnRenderChip,
-  OnRenderOption,
-  OnResults,
-  Option,
-} from "./types";
+import type { OnQuery, Option } from "./types";
 
 type BaseProps<T extends Option> = {
-  canCreate?: boolean;
-  createForm?: CreateForm<T>;
   disabled?: boolean;
-  emptyListItem?: (query: string) => React.ReactNode;
   error?: { message?: string };
   helpText?: string;
   label?: string;
   name?: string;
-  noDialog?: boolean;
-  noSort?: boolean;
   onQuery?: OnQuery<T>;
-  onRenderChip?: OnRenderChip<T>;
-  onRenderOption?: OnRenderOption<T>;
-  onResults?: OnResults<T>;
   options?: T[];
   placeholder?: string;
   readOnly?: boolean;
-  rememberValues?: boolean;
-  required?: boolean;
-  simple?: boolean;
   suggestedOptions?: T[];
-  targetOptions?: number;
 };
 
 type Props<T extends Option> = BaseProps<T> &
@@ -52,7 +33,7 @@ type Props<T extends Option> = BaseProps<T> &
 
 export type { Option };
 
-/** Keeps the old field contract while admin forms move to the shared StyleX picker. */
+/** Connects API-backed admin fields to the shared picker. */
 export default function SelectField<T extends Option>(props: Props<T>) {
   const {
     disabled = false,

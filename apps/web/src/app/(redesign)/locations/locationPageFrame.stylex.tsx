@@ -9,7 +9,7 @@ import {
   PageTabs,
   SpecStrip,
 } from "@peated/web/components/designSystem/components";
-import { PageHeader } from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { PageHeader } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
 import { colors, space } from "../../../styles/tokens.stylex";
 

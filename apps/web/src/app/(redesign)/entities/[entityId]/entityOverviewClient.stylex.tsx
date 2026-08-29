@@ -6,21 +6,19 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import {
-  BandStack,
   BottleComparisonTable,
   ButtonLink,
+  Card,
   EmptyState,
   FactList,
   LoadingList,
+  RatingMeasure,
   SectionError,
+  TextLink,
   type BottleComparisonRow,
   type FactListItem,
 } from "@peated/web/components/designSystem/components";
-import {
-  PageSection,
-  Panel,
-  TextLink,
-} from "@peated/web/components/designSystem/patterns/pagePatternShell.stylex";
+import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { parseDomain } from "@peated/web/lib/urls";
@@ -121,16 +119,14 @@ function toBottleTableRow(
     metadata: formatBottleMetadata(bottle),
     name: bottle.fullName,
     values: [
-      bottle.scoreCount > 0 && bottle.medianScore !== null
-        ? bottle.medianScore.toLocaleString("en-US")
-        : null,
-      Object.values(bottle.tastingBandCounts).some((count) => count > 0) ? (
-        <BandStack
-          key={`${bottle.id}-ratings`}
-          counts={bottle.tastingBandCounts}
-          variant="compact"
-        />
-      ) : null,
+      <RatingMeasure
+        counts={bottle.tastingBandCounts}
+        high={bottle.maxScore}
+        key={`${bottle.id}-rating`}
+        low={bottle.minScore}
+        median={bottle.medianScore}
+        scoreCount={bottle.scoreCount}
+      />,
     ],
   };
 }
@@ -222,7 +218,7 @@ function EntityBottleOverview({
     >
       <BottleComparisonTable
         ariaLabel={`${entity.name} ${presentation.bottleSectionLabel.toLowerCase()}`}
-        columns={["Score", "Tasting ratings"]}
+        columns={["Rating"]}
         rows={[
           toBottleTableRow(firstBottle),
           ...remainingBottles.map(toBottleTableRow),
@@ -275,9 +271,9 @@ export function EntityOverviewClient({
     <div {...stylex.props(styles.overviewGrid)}>
       <aside {...stylex.props(styles.details)}>
         <PageSection heading="Details">
-          <Panel>
+          <Card appearance="surface" padding="sm">
             <FactList facts={getEntityFacts(entity)} />
-          </Panel>
+          </Card>
         </PageSection>
       </aside>
 

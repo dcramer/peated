@@ -148,3 +148,23 @@
 - [x] 8.7 Remove the admin legacy stylesheet and unused Tailwind dependencies
 - [x] 8.8 Run web validation and review admin at desktop and phone widths in both system schemes
 - [x] 8.9 Remove the remaining utility-class component tree, Tailwind packages and formatter plugin, replace the email theme dependency with a local palette, and convert the live audit-operation UI to StyleX
+
+## 9. Final visual refinements
+
+- [x] 9.1 Replace the homepage origin panel with API-owned country map tiles, a truthful remainder total, and compact region links
+- [x] 9.2 Add one shared five-band row rating measure and use it in bottle lists, search results, recommendations, and entity comparisons
+- [x] 9.3 Align linked cards, rows, and text links with the reviewed tonal hover, pressed, underline, and focus treatments
+- [x] 9.4 Replace the homepage-only recent-bottle links with the shared record list and pin its hover, pressed, and keyboard-focus states in Storybook
+- [x] 9.5 Give plain linked rows the reviewed padded overhang, migrate the remaining homepage record rows to the shared component, and pin both row variants in Storybook
+- [x] 9.6 Make the signed-out homepage introduction useful at any production data size without removing factual totals from the modules that own them
+- [x] 9.7 Make every linked record row use one primary row destination and preserve independent nested links and actions
+- [x] 9.8 Standardize bottle identity, comparison, public data, and admin table rows with one primary row destination, independent nested actions, and reviewable interaction states
+- [x] 9.9 Move homepage destination cards, including critic reviews and followed releases, onto the shared card interaction contract and pin its states in Storybook
+- [x] 9.10 Reframe the dedicated search route as a compact centered utility screen and stop forcing query focus on page load
+- [x] 9.11 Replace vague shared-component names with plain UI nouns and move page layout helpers out of the client-only pattern shell
+- [x] 9.12 Consolidate repeated circular avatar and picker-navigation behavior without merging distinct product components
+- [x] 9.13 Remove dead Storybook-only page copies, speculative controls, and obsolete pagination components
+- [x] 9.14 Narrow the remaining search-field adapter to the behavior its live admin consumers use
+- [x] 9.15 Review the reduced component catalog and live routes at desktop and phone widths in both schemes
+- [x] 9.16 Restore the tasting form in the local mock app by implementing the bottle suggested-tags contract in the typed mock router
+- [x] 9.17 Audit every web route and Storybook component for clean route ownership, shared component reuse, duplicate implementations, and obsolete page-shaped stories; fix the proven factoring issues and QA representative route families

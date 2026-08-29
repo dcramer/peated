@@ -21,7 +21,7 @@ import {
 } from "../patterns/homeBrowse.stylex";
 import { HomePage } from "../patterns/homePage.stylex";
 import { HomeSectionLoading } from "../patterns/homeSummary.stylex";
-import { PageColumns } from "../patterns/pagePatternShell.stylex";
+import { PageColumns } from "../patterns/pageLayout.stylex";
 import { Search } from "./search.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
@@ -71,7 +71,6 @@ export function PublicHome({
     initialData: initialData?.stats,
   });
   const totalBottles = stats.data?.bottles;
-  const totalTastings = stats.data?.tastings;
 
   return (
     <HomePage
@@ -84,7 +83,6 @@ export function PublicHome({
           <Origins
             initialCountryData={initialData?.countries}
             initialRegionData={initialData?.regions}
-            totalBottles={totalBottles}
           />
           <PageColumns
             rail={
@@ -120,11 +118,7 @@ export function PublicHome({
           <HomeQuestions questions={questions} />
         </>
       }
-      description={
-        totalTastings === undefined
-          ? "Every release down to the cask, critic scores, and tasting notes from the people who drank them. Free to browse, no account needed."
-          : `Every release down to the cask, critic scores, and what ${totalTastings.toLocaleString("en-US")} recorded tastings said. Free to browse, no account needed.`
-      }
+      description="Browse whisky bottlings, including single casks, with critic scores and tasting notes. No account needed."
       search={
         <Search
           onSubmit={(query) =>
@@ -143,11 +137,7 @@ export function PublicHome({
         />
       }
       signedIn={false}
-      title={
-        totalBottles === undefined
-          ? "Whisky bottlings, critic scores and tasting notes."
-          : `Whisky bottlings, critic scores and tasting notes — ${totalBottles.toLocaleString("en-US")} records.`
-      }
+      title="Whisky bottlings, critic scores and tasting notes."
     />
   );
 }
@@ -194,6 +184,9 @@ function HighestRated({
             href: `/bottles/${bottle.id}`,
             metadata: getHighestRatedMetadata(bottle),
             name: bottle.fullName,
+            scoreCount: bottle.scoreCount,
+            scoreHigh: bottle.maxScore,
+            scoreLow: bottle.minScore,
             score: bottle.medianScore,
           },
         ],
@@ -266,16 +259,14 @@ function RecentReviews({
 function Origins({
   initialCountryData,
   initialRegionData,
-  totalBottles,
 }: {
   initialCountryData?: Outputs["countries"]["list"];
   initialRegionData?: Outputs["regions"]["list"];
-  totalBottles?: number;
 }) {
   const orpc = useORPC();
   const countries = useQuery({
     ...orpc.countries.list.queryOptions({
-      input: { hasBottles: true, limit: 10, sort: "-bottles" },
+      input: { hasBottles: true, limit: 100, sort: "-bottles" },
     }),
     initialData: initialCountryData,
   });
@@ -315,35 +306,37 @@ function Origins({
   }
 
   const countryItems = countries.data?.results ?? [];
-  const scotland = countryItems.find((country) => country.slug === "scotland");
   const regionItems = regions.data?.results ?? [];
+  const featuredCountries = countryItems.slice(0, 3);
+  const remainingCountries = countryItems.slice(3);
 
   return countryItems.length || regionItems.length ? (
     <HomeOrigins
-      countries={countryItems
-        .filter((country) => country.slug !== "scotland")
-        .slice(0, 6)
-        .map((country) => ({
-          description: country.summary ?? undefined,
-          href: `/locations/${country.slug}`,
-          name: country.name,
-          totalBottles: country.totalBottles,
-        }))}
-      regions={regionItems.map((region) => ({
+      countries={featuredCountries.map((country) => ({
+        description: country.summary ?? undefined,
+        href: `/locations/${country.slug}`,
+        name: country.name,
+        slug: country.slug,
+        totalBottles: country.totalBottles,
+      }))}
+      regions={regionItems.slice(0, 4).map((region) => ({
         description: region.description ?? undefined,
         href: `/locations/${region.country.slug}/regions/${region.slug}`,
         name: region.name,
+        slug: region.slug,
         totalBottles: region.totalBottles,
       }))}
-      scotland={
-        scotland
+      remainingCountries={
+        remainingCountries.length
           ? {
-              href: `/locations/${scotland.slug}`,
-              totalBottles: scotland.totalBottles,
+              count: remainingCountries.length,
+              totalBottles: remainingCountries.reduce(
+                (total, country) => total + country.totalBottles,
+                0,
+              ),
             }
           : undefined
       }
-      totalBottles={totalBottles}
     />
   ) : null;
 }

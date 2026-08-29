@@ -5,17 +5,16 @@ import { formatFlavorProfile } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
 import { TagInputSchema } from "@peated/server/schemas";
 import { type Tag } from "@peated/server/types";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
+import {
+  AdminFieldset as Fieldset,
+  AdminFormPage as FormPage,
+  AdminTextField as TextField,
+} from "@peated/web/components/admin/adminForm.stylex";
 import SelectField from "@peated/web/components/selectField";
-import TextField from "@peated/web/components/textField";
-import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { zodResolver } from "@peated/web/lib/zodResolver";
-import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
-import Form from "../form";
+import { useAdminFormSubmit } from "./useAdminFormSubmit";
 
 type FormSchemaType = z.infer<typeof TagInputSchema>;
 
@@ -50,81 +49,63 @@ export default function TagForm({
     defaultValues: initialData,
   });
 
-  const [error, setError] = useState<string | undefined>();
-
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
-    try {
-      await onSubmit(data);
-    } catch (err) {
-      setError(getFormErrorMessage(err));
-    }
-  };
+  const { error, submit } = useAdminFormSubmit(onSubmit);
 
   return (
-    <FormScreen
+    <FormPage
+      error={error}
+      isSubmitting={isSubmitting}
+      onSubmit={handleSubmit(submit)}
       title={title}
-      saveDisabled={isSubmitting}
-      onSave={handleSubmit(onSubmitHandler)}
     >
-      {error && <FormError values={[error]} />}
+      <Fieldset>
+        <TextField
+          {...register("name")}
+          label="Name"
+          placeholder="e.g. acidic"
+          readOnly={edit}
+          error={errors.name}
+        />
 
-      <Form
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
-      >
-        <Fieldset>
-          <TextField
-            {...register("name")}
-            label="Name"
-            placeholder="e.g. acidic"
-            readOnly={edit}
-            error={errors.name}
-          />
+        <Controller
+          name="tagCategory"
+          control={control}
+          render={({ field: { onChange, ref, value, ...field } }) => (
+            <SelectField
+              {...field}
+              label="Category"
+              value={value ? { id: value, name: toTitleCase(value) } : null}
+              placeholder="e.g. fruity"
+              options={CATEGORY_TYPES}
+              onChange={(value) => onChange(value?.id)}
+              error={errors.tagCategory}
+            />
+          )}
+        />
 
-          <Controller
-            name="tagCategory"
-            control={control}
-            render={({ field: { onChange, ref, value, ...field } }) => (
-              <SelectField
-                {...field}
-                label="Category"
-                value={value ? { id: value, name: toTitleCase(value) } : null}
-                placeholder="e.g. fruity"
-                options={CATEGORY_TYPES}
-                simple
-                required
-                onChange={(value) => onChange(value?.id)}
-                error={errors.tagCategory}
-              />
-            )}
-          />
-
-          <Controller
-            name="flavorProfiles"
-            control={control}
-            render={({ field: { onChange, ref, value, ...field } }) => (
-              <SelectField
-                {...field}
-                label="Flavor Profiles"
-                multiple
-                value={
-                  value
-                    ? value.map((v) => ({
-                        id: v,
-                        name: formatFlavorProfile(v),
-                      }))
-                    : null
-                }
-                options={FLAVOR_PROFILE_TYPES}
-                simple
-                required
-                onChange={(value) => onChange(value.map((v) => v.id))}
-                error={errors.flavorProfiles}
-              />
-            )}
-          />
-        </Fieldset>
-      </Form>
-    </FormScreen>
+        <Controller
+          name="flavorProfiles"
+          control={control}
+          render={({ field: { onChange, ref, value, ...field } }) => (
+            <SelectField
+              {...field}
+              label="Flavor Profiles"
+              multiple
+              value={
+                value
+                  ? value.map((v) => ({
+                      id: v,
+                      name: formatFlavorProfile(v),
+                    }))
+                  : null
+              }
+              options={FLAVOR_PROFILE_TYPES}
+              onChange={(value) => onChange(value.map((v) => v.id))}
+              error={errors.flavorProfiles}
+            />
+          )}
+        />
+      </Fieldset>
+    </FormPage>
   );
 }

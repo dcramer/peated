@@ -2,6 +2,7 @@
 
 import { use } from "react";
 
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminBreadcrumbs,
   AdminPage,
@@ -9,9 +10,8 @@ import {
   AdminSection,
   AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
-import Button from "@peated/web/components/button";
+import { AdminDefinitionList as DefinitionList } from "@peated/web/components/admin/adminUtility.stylex";
 import DateRange from "@peated/web/components/dateRange";
-import DefinitionList from "@peated/web/components/definitionList";
 import Markdown from "@peated/web/components/markdown";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
