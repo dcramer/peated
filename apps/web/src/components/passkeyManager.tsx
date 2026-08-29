@@ -51,7 +51,11 @@ export default function PasskeyManager() {
         {},
       );
       const response = await startRegistration({ optionsJSON: options });
-      await registerVerify.mutateAsync({ response, signedChallenge });
+      await registerVerify.mutateAsync({
+        response,
+        signedChallenge,
+        nickname: `Passkey added ${formatDate(new Date())}`,
+      });
       await queryClient.invalidateQueries({
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });

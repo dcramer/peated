@@ -13,8 +13,11 @@ import {
   IconButton,
 } from "@peated/web/components/designSystem/components";
 import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
+import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   colors,
@@ -38,7 +41,10 @@ export function NotificationList({
   previousHref?: string;
 }) {
   const orpc = useORPC();
+  const { flash } = useFlashMessages();
   const [notifications, setNotifications] = useState(initialNotifications);
+  const [acceptingNotificationId, setAcceptingNotificationId] =
+    useState<number>();
   const deleteNotification = useMutation(
     orpc.notifications.delete.mutationOptions(),
   );
@@ -50,6 +56,52 @@ export function NotificationList({
   async function archive(id: number) {
     await deleteNotification.mutateAsync({ notification: id });
     setNotifications((values) => values.filter((value) => value.id !== id));
+  }
+
+  async function acceptFriend(notificationId: number, userId: number) {
+    setAcceptingNotificationId(notificationId);
+    let friendAdded = false;
+    try {
+      const friend = await createFriend.mutateAsync({ user: userId });
+      friendAdded = true;
+      setNotifications((values) =>
+        values.map((value) =>
+          value.id === notificationId &&
+          value.type === "friend_request" &&
+          value.ref
+            ? { ...value, ref: { ...value.ref, status: friend.status } }
+            : value,
+        ),
+      );
+      await archive(notificationId);
+    } catch (caught) {
+      if (friendAdded) {
+        logError(caught, { context: "notification_archive_after_friend" });
+        flash(
+          "Friend added. We couldn't dismiss this notification. Try again.",
+          "error",
+        );
+        return;
+      }
+
+      flash(
+        getFormErrorMessage(caught, {
+          fallbackMessage: "We couldn't add this friend. Try again.",
+        }),
+        "error",
+      );
+    } finally {
+      setAcceptingNotificationId(undefined);
+    }
+  }
+
+  async function dismiss(notificationId: number) {
+    try {
+      await archive(notificationId);
+    } catch (caught) {
+      logError(caught, { context: "notification_archive" });
+      flash("We couldn't dismiss this notification. Try again.", "error");
+    }
   }
 
   function markRead(id: number) {
@@ -117,13 +169,14 @@ export function NotificationList({
                       </span>
                     ) : (
                       <Button
-                        loading={createFriend.isPending}
-                        onClick={async () => {
-                          await createFriend.mutateAsync({
-                            user: notification.ref!.userId,
-                          });
-                          await archive(notification.id);
-                        }}
+                        disabled={acceptingNotificationId !== undefined}
+                        loading={acceptingNotificationId === notification.id}
+                        onClick={() =>
+                          void acceptFriend(
+                            notification.id,
+                            notification.ref!.userId,
+                          )
+                        }
                         size="sm"
                         variant="accent"
                       >
@@ -134,9 +187,13 @@ export function NotificationList({
                 ) : null}
               </div>
               <IconButton
+                disabled={
+                  deleteNotification.isPending ||
+                  acceptingNotificationId === notification.id
+                }
                 icon={<X aria-hidden="true" size={16} />}
                 label="Dismiss notification"
-                onClick={() => void archive(notification.id)}
+                onClick={() => void dismiss(notification.id)}
                 size="sm"
                 variant="text"
               />
