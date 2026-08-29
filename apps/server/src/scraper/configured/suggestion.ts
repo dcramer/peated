@@ -1,9 +1,7 @@
-import { trace } from "@opentelemetry/api";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { scrapeSources } from "@peated/server/db/schema";
-import { createOpenAIClient } from "@peated/server/lib/openaiClient";
-import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
+import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
 import type { Currency } from "@peated/server/types";
 import { eq } from "drizzle-orm";
 import { zodTextFormat } from "openai/helpers/zod";
@@ -25,8 +23,6 @@ import {
   type AiPage,
 } from "./setupAgent";
 import { ScrapeSourceSetupError } from "./setupError";
-
-const scraperTracer = trace.getTracer("@peated/server");
 
 const RuleReviewFieldSchema = z.enum([
   "kind",
@@ -336,9 +332,8 @@ async function loadAiSource(scrapeSourceId: number) {
 
 type AiTextFormat = ReturnType<typeof createRuleReviewFormat>;
 
-/** Keeps provider storage off and records each AI request. */
+/** Keeps provider storage off and records complete public-site model calls. */
 async function requestAi(input: {
-  scrapeSourceId: number;
   model: string;
   instructions: string;
   request: string | ResponseInput;
@@ -346,50 +341,22 @@ async function requestAi(input: {
   tools?: Tool[];
   maxOutputTokens: number;
 }) {
-  const client = createOpenAIClient({
-    instrumentWithSentry: false,
-    workload: "scraper",
-  });
-  return await instrumentOpenAIResponsesCall({
-    baseURL: config.AI_GATEWAY_HOST,
-    conversationId: `scrape_source:${input.scrapeSourceId}`,
+  const client = createOpenAIAgentClient({ workload: "scraper" });
+  const request: ResponseCreateParamsNonStreaming = {
     model: input.model,
-    callback: async (reportResponse) => {
-      const request: ResponseCreateParamsNonStreaming = {
-        model: input.model,
-        instructions: input.instructions,
-        input: input.request,
-        max_output_tokens: input.maxOutputTokens,
-        store: false,
-      };
-      if (input.format) request.text = { format: input.format };
-      if (input.tools) {
-        request.include = ["reasoning.encrypted_content"];
-        request.parallel_tool_calls = false;
-        request.tool_choice = "required";
-        request.tools = input.tools;
-      }
-      const result = await client.responses.create(request);
-      reportResponse({
-        response: {
-          id: result.id,
-          model: result.model,
-          serviceTier: result.service_tier ?? null,
-        },
-        usage: result.usage
-          ? {
-              inputTokens: result.usage.input_tokens,
-              cachedInputTokens:
-                result.usage.input_tokens_details.cached_tokens,
-              outputTokens: result.usage.output_tokens,
-              reasoningTokens:
-                result.usage.output_tokens_details.reasoning_tokens,
-            }
-          : null,
-      });
-      return result;
-    },
-  });
+    instructions: input.instructions,
+    input: input.request,
+    max_output_tokens: input.maxOutputTokens,
+    store: false,
+  };
+  if (input.format) request.text = { format: input.format };
+  if (input.tools) {
+    request.include = ["reasoning.encrypted_content"];
+    request.parallel_tool_calls = false;
+    request.tool_choice = "required";
+    request.tools = input.tools;
+  }
+  return await client.responses.create(request);
 }
 
 async function reviewSuggestedRules(input: {
@@ -411,7 +378,6 @@ async function reviewSuggestedRules(input: {
   }
   await loadAiSource(input.scrapeSourceId);
   const response = await requestAi({
-    scrapeSourceId: input.scrapeSourceId,
     model: config.OPENAI_MODEL,
     instructions: RULE_REVIEW_INSTRUCTIONS,
     request: JSON.stringify({
@@ -445,6 +411,7 @@ async function reviewSuggestedRules(input: {
 /** Creates an inactive revision only after code and AI both check the rules. */
 export async function suggestScrapeSourceRevision(input: {
   scrapeSourceId: number;
+  externalSiteRunId: number;
   createdById: number;
   listPages: AiPage[];
   detailPages: AiPage[];
@@ -457,15 +424,16 @@ export async function suggestScrapeSourceRevision(input: {
       page,
     ]),
   );
-  let checkNumber = 0;
   const setup = await runScrapeSourceSetupAgent({
+    conversationId: `scrape_source:${input.scrapeSourceId}`,
+    externalSiteRunId: input.externalSiteRunId,
     kind: source.kind,
+    scrapeSourceId: input.scrapeSourceId,
     listPages: input.listPages,
     detailPages: input.detailPages,
     request: async (request) => {
       await loadAiSource(input.scrapeSourceId);
       return await requestAi({
-        scrapeSourceId: input.scrapeSourceId,
         model: config.SCRAPER_SETUP_MODEL,
         instructions: request.instructions,
         request: request.input,
@@ -474,84 +442,52 @@ export async function suggestScrapeSourceRevision(input: {
       });
     },
     checkRules: async (candidate) => {
-      checkNumber += 1;
-      return await scraperTracer.startActiveSpan(
-        "scraper.setup.check_rules",
-        {
-          attributes: {
-            "scraper.source.id": input.scrapeSourceId,
-            "scraper.source.kind": source.kind,
-            "scraper.setup.check.number": checkNumber,
-            // Rules contain public selectors only. Do not add page content or URLs.
-            "scraper.setup.rules": JSON.stringify(candidate.rules),
-          },
-        },
-        async (span) => {
-          const inspectedPages: AiPage[] = [];
-          const loadPage = async (url: URL) => {
-            const key = url.toString();
-            const cached = pageCache.get(key);
-            if (cached) return cached;
-            const page = await input.loadPage(url);
-            pageCache.set(new URL(page.url).toString(), page);
-            inspectedPages.push(page);
-            return page;
-          };
-          try {
-            const firstListPage = checkListPage({
-              listPageUrl: candidate.listPageUrl,
-              rules: candidate.rules,
-              pages: input.listPages,
-            });
-            const listPage = await checkNextListPage({
-              rules: candidate.rules,
-              listPage: firstListPage,
-              loadPage,
-            });
-            const detailPages = await checkDetailPages({
-              rules: candidate.rules,
-              listPage,
-              suppliedPages: [...pageCache.values()],
-              loadPage,
-            });
-            await reviewSuggestedRules({
-              scrapeSourceId: input.scrapeSourceId,
-              kind: source.kind,
-              rules: candidate.rules,
-              listPage,
-              detailPages,
-            });
-            span.setAttributes({
-              "scraper.setup.check.status": "passed",
-              "scraper.setup.detail_page.count": detailPages.length,
-              "scraper.setup.detail_link.count": listPage.links.length,
-            });
-            return {
-              status: "passed" as const,
-              checked: { listPage, detailPages },
-            };
-          } catch (error) {
-            if (!(error instanceof ScrapeSourceSetupError)) {
-              span.setAttribute("scraper.setup.check.status", "error");
-              throw error;
-            }
-            span.setAttributes({
-              "scraper.setup.check.status": "rejected",
-              "scraper.setup.failure.summary": error.summary,
-              "scraper.setup.issue.fields": error.issues
-                .slice(0, 10)
-                .map(({ field }) => field),
-            });
-            return {
-              status: "failed" as const,
-              feedback: error.feedback(),
-              inspectedPages,
-            };
-          } finally {
-            span.end();
-          }
-        },
-      );
+      const inspectedPages: AiPage[] = [];
+      const loadPage = async (url: URL) => {
+        const key = url.toString();
+        const cached = pageCache.get(key);
+        if (cached) return cached;
+        const page = await input.loadPage(url);
+        pageCache.set(new URL(page.url).toString(), page);
+        inspectedPages.push(page);
+        return page;
+      };
+      try {
+        const firstListPage = checkListPage({
+          listPageUrl: candidate.listPageUrl,
+          rules: candidate.rules,
+          pages: input.listPages,
+        });
+        const listPage = await checkNextListPage({
+          rules: candidate.rules,
+          listPage: firstListPage,
+          loadPage,
+        });
+        const detailPages = await checkDetailPages({
+          rules: candidate.rules,
+          listPage,
+          suppliedPages: [...pageCache.values()],
+          loadPage,
+        });
+        await reviewSuggestedRules({
+          scrapeSourceId: input.scrapeSourceId,
+          kind: source.kind,
+          rules: candidate.rules,
+          listPage,
+          detailPages,
+        });
+        return {
+          status: "passed" as const,
+          checked: { listPage, detailPages },
+        };
+      } catch (error) {
+        if (!(error instanceof ScrapeSourceSetupError)) throw error;
+        return {
+          status: "failed" as const,
+          feedback: error.feedback(),
+          inspectedPages,
+        };
+      }
     },
   });
   const suggestedRules = setup.rules;

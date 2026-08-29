@@ -37,5 +37,9 @@ to collect unrestricted user or provider data.
 
 ## Exceptions
 
+- Scrape-source setup traces may record the complete model instructions,
+  public website input, model output, and rule-check arguments and results.
+  This content is required to diagnose and improve the setup agent. Do not
+  include credentials, request headers, cookies, or private admin data.
 - A narrowly scoped administrative or migration tool may inspect raw data when
   access is explicit, output defaults are safe, and the operation is audited.

@@ -391,6 +391,7 @@ export async function resolveScrapeSourceRunRegistry(
             }
             const revision = await suggestScrapeSourceRevision({
               scrapeSourceId: suggestion.source.id,
+              externalSiteRunId: runId,
               createdById: requestedById,
               listPages,
               detailPages,

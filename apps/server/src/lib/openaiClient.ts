@@ -1,3 +1,7 @@
+/**
+ * Owns OpenAI client setup and model-call tracing. Trace delivery failures do
+ * not change model-call behavior.
+ */
 import * as Sentry from "@sentry/node";
 import OpenAI from "openai";
 
@@ -17,11 +21,21 @@ export function isAIGatewayConfigured(
   return Boolean(getAIGatewayApiKey(workload));
 }
 
+export function buildOpenAITraceOptions(recordFullContent: boolean) {
+  return {
+    enableTruncation: !recordFullContent,
+    recordInputs: true,
+    recordOutputs: true,
+  } as const;
+}
+
 export function createOpenAIClient({
   instrumentWithSentry = true,
+  recordFullContent = false,
   workload = "application",
 }: {
   instrumentWithSentry?: boolean;
+  recordFullContent?: boolean;
   workload?: AIGatewayWorkload;
 } = {}): OpenAI {
   const apiKey = getAIGatewayApiKey(workload);
@@ -34,10 +48,19 @@ export function createOpenAIClient({
     return client;
   }
 
-  return Sentry.instrumentOpenAiClient(client, {
-    recordInputs: true,
-    recordOutputs: true,
-  });
+  return Sentry.instrumentOpenAiClient(
+    client,
+    buildOpenAITraceOptions(recordFullContent),
+  );
+}
+
+/** Agent clients always record complete model input and output in Sentry. */
+export function createOpenAIAgentClient({
+  workload = "application",
+}: {
+  workload?: AIGatewayWorkload;
+} = {}): OpenAI {
+  return createOpenAIClient({ recordFullContent: true, workload });
 }
 
 /** Run an AI conversation scope without clearing inherited Sentry attribution. */

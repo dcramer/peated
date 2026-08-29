@@ -1,4 +1,5 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
+import { runAgent, runAgentTool } from "@peated/server/lib/agentTelemetry";
 import { zodResponsesFunction } from "openai/helpers/zod";
 import type {
   ResponseInput,
@@ -27,6 +28,9 @@ export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
 const MAX_AI_PAGE_CHARS = 75_000;
 const CHECK_RULES_TOOL_NAME = "check_rules";
+const CHECK_RULES_TOOL_DESCRIPTION =
+  "Read controlled website pages with a complete set of parsing rules and check the found values. A passing call becomes the saved candidate.";
+const SETUP_AGENT_NAME = "Scrape source setup";
 
 export type AiPage = { url: string; html: string };
 
@@ -256,8 +260,7 @@ function suggestionSchema(kind: ScrapeRules["kind"]) {
 function createCheckRulesTool(kind: ScrapeRules["kind"]) {
   return zodResponsesFunction({
     name: CHECK_RULES_TOOL_NAME,
-    description:
-      "Read controlled website pages with a complete set of parsing rules and check the found values. A passing call becomes the saved candidate.",
+    description: CHECK_RULES_TOOL_DESCRIPTION,
     parameters: suggestionSchema(kind),
   });
 }
@@ -308,8 +311,35 @@ function setupFailure(error: Error) {
   );
 }
 
-export async function runScrapeSourceSetupAgent<T>(input: {
+async function checkRulesWithTelemetry<T>(input: {
+  argumentsJson: string;
+  callId: string;
+  checkNumber: number;
+  candidate: { listPageUrl: string; rules: ScrapeRules };
+  checkRules: (candidate: {
+    listPageUrl: string;
+    rules: ScrapeRules;
+  }) => Promise<SetupAgentCheckResult<T>>;
+}) {
+  return await runAgentTool({
+    agentName: SETUP_AGENT_NAME,
+    argumentsJson: input.argumentsJson,
+    attributes: { "scraper.setup.check.number": input.checkNumber },
+    callId: input.callId,
+    description: CHECK_RULES_TOOL_DESCRIPTION,
+    name: CHECK_RULES_TOOL_NAME,
+    run: async () => {
+      const result = await input.checkRules(input.candidate);
+      return { output: JSON.stringify(result), value: result };
+    },
+  });
+}
+
+type ScrapeSourceSetupAgentInput<T> = {
+  conversationId: string;
+  externalSiteRunId: number;
   kind: ScrapeRules["kind"];
+  scrapeSourceId: number;
   listPages: AiPage[];
   detailPages: AiPage[];
   request: (
@@ -319,20 +349,19 @@ export async function runScrapeSourceSetupAgent<T>(input: {
     listPageUrl: string;
     rules: ScrapeRules;
   }) => Promise<SetupAgentCheckResult<T>>;
-}) {
-  const tool = createCheckRulesTool(input.kind);
-  const pages = prepareAiPages([...input.listPages, ...input.detailPages]);
+};
+
+async function runSetupTurns<T>(
+  input: ScrapeSourceSetupAgentInput<T>,
+  tool: Tool,
+  initialInput: string,
+) {
   const conversation: ResponseInput = [
     {
       role: "user",
-      content: JSON.stringify({
-        kind: input.kind,
-        listPages: pages.slice(0, input.listPages.length),
-        detailPages: pages.slice(input.listPages.length),
-      }),
+      content: initialInput,
     },
   ];
-
   for (let checkNumber = 1; checkNumber <= MAX_RULE_CHECKS; checkNumber += 1) {
     const response = await input.request({
       instructions: RULE_INSTRUCTIONS,
@@ -369,12 +398,16 @@ export async function runScrapeSourceSetupAgent<T>(input: {
       continue;
     }
 
-    const result = await input.checkRules({
-      listPageUrl: candidate.listPageUrl,
-      rules: candidate.rules,
+    const result = await checkRulesWithTelemetry({
+      argumentsJson: call.arguments,
+      callId: call.call_id,
+      checkNumber,
+      candidate,
+      checkRules: input.checkRules,
     });
     if (result.status === "passed") {
       return {
+        listPageUrl: candidate.listPageUrl,
         rules: candidate.rules,
         checked: result.checked,
         model: response.model,
@@ -398,4 +431,44 @@ export async function runScrapeSourceSetupAgent<T>(input: {
   }
 
   throw new Error("The setup agent exceeded its rule-check limit.");
+}
+
+export async function runScrapeSourceSetupAgent<T>(
+  input: ScrapeSourceSetupAgentInput<T>,
+) {
+  const tool = createCheckRulesTool(input.kind);
+  const pages = prepareAiPages([...input.listPages, ...input.detailPages]);
+  const initialInput = JSON.stringify({
+    kind: input.kind,
+    listPages: pages.slice(0, input.listPages.length),
+    detailPages: pages.slice(input.listPages.length),
+  });
+  return await runAgent({
+    attributes: {
+      "scraper.run.id": input.externalSiteRunId,
+      "scraper.source.id": input.scrapeSourceId,
+      "scraper.source.kind": input.kind,
+    },
+    conversationId: input.conversationId,
+    instructions: RULE_INSTRUCTIONS,
+    name: SETUP_AGENT_NAME,
+    prompt: { name: "scrape-source-setup", version: AI_INSTRUCTIONS_VERSION },
+    task: initialInput,
+    toolDefinitions: JSON.stringify([tool]),
+    run: async () => {
+      const result = await runSetupTurns(input, tool, initialInput);
+      return {
+        model: result.model,
+        output: JSON.stringify({
+          listPageUrl: result.listPageUrl,
+          rules: result.rules,
+        }),
+        value: {
+          rules: result.rules,
+          checked: result.checked,
+          model: result.model,
+        },
+      };
+    },
+  });
 }
