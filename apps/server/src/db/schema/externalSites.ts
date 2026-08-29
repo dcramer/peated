@@ -15,7 +15,6 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-import type { EXTERNAL_SITE_TYPE_LIST } from "../../constants";
 import { users } from "./users";
 
 export const externalSiteRunStatusEnum = pgEnum("external_site_run_status", [
@@ -36,9 +35,7 @@ export const externalSites = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     // External-site types are validated at application boundaries so adding a
     // scraper does not require a PostgreSQL enum migration.
-    type: text("type")
-      .$type<(typeof EXTERNAL_SITE_TYPE_LIST)[number]>()
-      .notNull(),
+    type: text("type").$type<string>().notNull(),
     name: text("name").notNull(),
     lastRunAt: timestamp("last_run_at"),
     lastRunId: bigint("last_run_id", { mode: "number" }).references(

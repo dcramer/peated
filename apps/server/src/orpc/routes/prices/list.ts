@@ -4,7 +4,7 @@ import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidit
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
-  ExternalSiteTypeEnum,
+  ExternalSiteKeySchema,
   StorePriceSchema,
   listResponse,
 } from "@peated/server/schemas";
@@ -27,7 +27,7 @@ export default procedure
   .input(
     z
       .object({
-        site: ExternalSiteTypeEnum.optional(),
+        site: ExternalSiteKeySchema.optional(),
         query: z.string().default(""),
         onlyUnknown: z.boolean().optional(),
         onlyValid: z.boolean().optional(),

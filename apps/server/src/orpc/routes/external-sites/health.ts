@@ -1,4 +1,4 @@
-import { isExternalReviewSiteType } from "@peated/server/constants";
+import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
@@ -8,6 +8,8 @@ import {
   externalSiteScrapeTargets,
   externalSites,
   scrapeOrigins,
+  scrapeSourceRevisions,
+  scrapeSources,
   scrapeTargets,
   storePrices,
   type ExternalSite,
@@ -16,7 +18,7 @@ import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
   ExternalSiteHealthSchema,
-  ExternalSiteTypeEnum,
+  ExternalSiteKeySchema,
   listResponse,
   type ExternalSiteScrapeTargetSchema,
 } from "@peated/server/schemas";
@@ -35,9 +37,6 @@ async function getHealthForSites(
   if (sites.length === 0) return [];
 
   const siteIds = sites.map((site) => site.id);
-  const reviewSiteIds = sites
-    .filter((site) => isExternalReviewSiteType(site.type))
-    .map((site) => site.id);
   const [
     reviewCoverageRows,
     priceCoverageRows,
@@ -45,6 +44,7 @@ async function getHealthForSites(
     lastSucceededRuns,
     runtimeRows,
     reviewPolicies,
+    configuredRows,
   ] = await Promise.all([
     db
       .select({
@@ -139,14 +139,27 @@ async function getHealthForSites(
         asc(scrapeTargets.key),
         asc(scrapeOrigins.origin),
       ),
-    reviewSiteIds.length > 0
-      ? db
-          .select()
-          .from(externalReviewSourcePolicies)
-          .where(
-            inArray(externalReviewSourcePolicies.externalSiteId, reviewSiteIds),
-          )
-      : Promise.resolve([]),
+    db
+      .select()
+      .from(externalReviewSourcePolicies)
+      .where(inArray(externalReviewSourcePolicies.externalSiteId, siteIds)),
+    db
+      .select({
+        externalSiteId: scrapeSources.externalSiteId,
+        kind: scrapeSources.kind,
+        enabled: scrapeSources.enabled,
+        activeRevisionId: scrapeSourceRevisions.id,
+        previewStatus: scrapeSourceRevisions.previewStatus,
+      })
+      .from(scrapeSources)
+      .leftJoin(
+        scrapeSourceRevisions,
+        and(
+          eq(scrapeSourceRevisions.scrapeSourceId, scrapeSources.id),
+          eq(scrapeSourceRevisions.active, true),
+        ),
+      )
+      .where(inArray(scrapeSources.externalSiteId, siteIds)),
   ]);
 
   const reviewCoverageBySite = new Map(
@@ -163,6 +176,9 @@ async function getHealthForSites(
   );
   const reviewPolicyBySite = new Map(
     reviewPolicies.map((policy) => [policy.externalSiteId, policy]),
+  );
+  const configuredBySite = new Map(
+    configuredRows.map((row) => [row.externalSiteId, row]),
   );
   const targetsBySite = new Map<
     number,
@@ -206,7 +222,9 @@ async function getHealthForSites(
 
   return sites.map((site) => {
     const registration = getScraperRegistration(site.type);
-    const hasReviewPolicy = isExternalReviewSiteType(site.type);
+    const configured = configuredBySite.get(site.id);
+    const hasReviewPolicy =
+      isExternalReviewSiteKey(site.type) || configured?.kind === "review";
     const reviewCoverage = reviewCoverageBySite.get(site.id);
     const priceCoverage = priceCoverageBySite.get(site.id);
     const latestRun = latestRunBySite.get(site.id);
@@ -221,8 +239,14 @@ async function getHealthForSites(
       latestRun: latestRun ? serializeExternalSiteRun(latestRun) : null,
       lastSucceededAt: lastSucceeded?.completedAt?.toISOString() ?? null,
       runtime: {
-        registered: registration !== null,
-        targetKeys: registration?.targetKeys ?? [],
+        registered:
+          registration !== null ||
+          (configured?.enabled === true &&
+            configured.activeRevisionId !== null &&
+            configured.previewStatus === "passed"),
+        targetKeys:
+          registration?.targetKeys ??
+          (configured ? [...(targets?.keys() ?? [])] : []),
         targets: targets ? [...targets.values()] : [],
       },
       reviewPolicy: hasReviewPolicy
@@ -283,7 +307,7 @@ export const healthDetails = procedure
     summary: "Retrieve external site health",
     operationId: "retrieveExternalSiteHealth",
   })
-  .input(z.object({ site: ExternalSiteTypeEnum }))
+  .input(z.object({ site: ExternalSiteKeySchema }))
   .output(ExternalSiteHealthSchema)
   .handler(async ({ input, errors }) => {
     const [site] = await db

@@ -3,6 +3,7 @@
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperCatalogCoverage from "@peated/web/components/admin/scraperCatalogCoverage";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
+import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
@@ -44,6 +45,11 @@ export default function Page() {
         ]}
       />
       <ScraperCatalogCoverage coverage={coverage} />
+      <div className="mb-4 flex justify-end">
+        <Button href="/admin/sites/add" color="highlight">
+          Add site
+        </Button>
+      </div>
       {siteList.results.length > 0 ? (
         <Table
           items={siteList.results}

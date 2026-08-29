@@ -1,11 +1,20 @@
 import { z } from "zod";
-import { EXTERNAL_SITE_TYPE_LIST } from "../constants";
+import { REGISTERED_EXTERNAL_SITE_KEY_LIST } from "../constants";
 
-export const ExternalSiteTypeEnum = z.enum(EXTERNAL_SITE_TYPE_LIST);
+// TODO(scraper-platform): Delete this narrow schema and type after all scraper sources use database-managed keys.
+export const RegisteredExternalSiteKeySchema = z.enum(
+  REGISTERED_EXTERNAL_SITE_KEY_LIST,
+);
+export const ExternalSiteKeySchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(64)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
 export const ExternalSiteSchema = z.object({
   id: z.number().describe("Unique identifier for the external site"),
-  type: ExternalSiteTypeEnum.describe("Type of external site"),
+  type: ExternalSiteKeySchema.describe("Stable key for the external site"),
   name: z.string().describe("Name of the external site"),
   lastRunAt: z
     .string()

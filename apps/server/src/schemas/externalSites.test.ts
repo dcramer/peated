@@ -1,9 +1,12 @@
-import { ExternalSiteTypeEnum } from "./externalSites";
+import { ExternalSiteKeySchema } from "./externalSites";
 
-test("accepts registered external-site types", () => {
-  expect(ExternalSiteTypeEnum.parse("whiskyworld")).toBe("whiskyworld");
+test("accepts an existing external-site key", () => {
+  expect(ExternalSiteKeySchema.parse("whiskyworld")).toBe("whiskyworld");
 });
 
-test("rejects unknown external-site types", () => {
-  expect(() => ExternalSiteTypeEnum.parse("unknown-source")).toThrow();
+test("accepts new keys and rejects malformed keys", () => {
+  expect(ExternalSiteKeySchema.parse("new-review-source")).toBe(
+    "new-review-source",
+  );
+  expect(() => ExternalSiteKeySchema.parse("Not a site key")).toThrow();
 });

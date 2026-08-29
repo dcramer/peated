@@ -1,6 +1,6 @@
 "use client";
 
-import { type ExternalSiteType } from "@peated/server/types";
+import { type ExternalSiteKey } from "@peated/server/types";
 import ExternalSiteRunTelemetry from "@peated/web/components/admin/externalSiteRunTelemetry";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import PaginationButtons from "@peated/web/components/paginationButtons";
@@ -47,7 +47,7 @@ function runDuration(run: Run) {
 }
 
 export default function Page(props: {
-  params: Promise<{ siteId: ExternalSiteType }>;
+  params: Promise<{ siteId: ExternalSiteKey }>;
 }) {
   const { siteId } = use(props.params);
   const queryParams = useApiQueryParams({

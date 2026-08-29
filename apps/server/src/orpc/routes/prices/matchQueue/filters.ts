@@ -3,7 +3,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { ExternalSiteTypeEnum } from "@peated/server/schemas";
+import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { and, eq, ilike, inArray, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
@@ -20,7 +20,7 @@ export const QueueSortSchema = z
   .enum(["priority", "created", "-created"])
   .default("priority");
 
-export const QueueSiteSchema = ExternalSiteTypeEnum.optional();
+export const QueueSiteSchema = ExternalSiteKeySchema.optional();
 
 export const QueueListInputSchema = z
   .object({

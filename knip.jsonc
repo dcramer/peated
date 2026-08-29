@@ -8,6 +8,8 @@
       "ignoreBinaries": ["playwright"],
     },
     "apps/server": {
+      // The eval command loads this config through a shell conditional.
+      "entry": ["vitest.evals.config.mts"],
       // The binary is nested in shell conditionals that Knip cannot parse.
       "ignoreDependencies": ["dotenv-cli"],
     },

@@ -23,8 +23,8 @@ import type {
   EntitySchema,
   EventSchema,
   ExternalReviewSchema,
+  ExternalSiteKeySchema,
   ExternalSiteSchema,
-  ExternalSiteTypeEnum,
   FlavorProfileEnum,
   FlightSchema,
   FollowSchema,
@@ -39,6 +39,7 @@ import type {
   ProfileCollectionAddActivitySchema,
   ProfileTastingSessionActivitySchema,
   RegionSchema,
+  RegisteredExternalSiteKeySchema,
   ServingStyleEnum,
   StorePriceSchema,
   TagCategoryEnum,
@@ -51,7 +52,10 @@ export type ServingStyle = z.infer<typeof ServingStyleEnum>;
 export type FlavorProfile = z.infer<typeof FlavorProfileEnum>;
 export type TagCategory = z.infer<typeof TagCategoryEnum>;
 export type Currency = z.infer<typeof CurrencyEnum>;
-export type ExternalSiteType = z.infer<typeof ExternalSiteTypeEnum>;
+export type ExternalSiteKey = z.infer<typeof ExternalSiteKeySchema>;
+export type RegisteredExternalSiteKey = z.infer<
+  typeof RegisteredExternalSiteKeySchema
+>;
 export type BadgeCheckType = z.infer<typeof BadgeCheckTypeEnum>;
 export type BadgeTracker = z.infer<typeof BadgeTrackerEnum>;
 export type BadgeFormula = z.infer<typeof BadgeFormulaEnum>;

@@ -884,14 +884,13 @@ describe("POST /external-reviews", () => {
     ).toBeUndefined();
   });
 
-  test("rejects invalid site input", async ({ fixtures }) => {
+  test("rejects an unknown site", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
 
     const error = await waitError(() =>
       routerClient.externalReviews.create(
         {
-          // SAFETY: This test sends an invalid site to the runtime validator.
-          site: "not-a-site" as never,
+          site: "not-a-site",
           name: "Invalid Site Review",
           issue: "Default",
           nativeScore: nativeScore(89),
@@ -902,7 +901,7 @@ describe("POST /external-reviews", () => {
       ),
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(error).toMatchInlineSnapshot(`[Error: Site not found.]`);
   });
 
   test("rejects scores outside the source scale", async ({ fixtures }) => {

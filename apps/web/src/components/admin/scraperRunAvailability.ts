@@ -13,7 +13,7 @@ export function getScraperRunAvailability(
   if (!site.runtime.registered) {
     return {
       label: "Run unavailable",
-      reason: "This scraper is not registered with the runtime.",
+      reason: "This source is not ready.",
     };
   }
 
@@ -23,7 +23,7 @@ export function getScraperRunAvailability(
   if (missingTarget) {
     return {
       label: "Run unavailable",
-      reason: `Scraper target ${missingTarget} is not synchronized.`,
+      reason: `Request settings for ${missingTarget} are incomplete.`,
     };
   }
 
@@ -32,8 +32,8 @@ export function getScraperRunAvailability(
   );
   if (disabledTarget) {
     return {
-      label: "Scraper disabled",
-      reason: `Scraper target ${disabledTarget.key} is disabled.`,
+      label: "Source paused",
+      reason: `Requests to ${disabledTarget.key} are paused.`,
     };
   }
 

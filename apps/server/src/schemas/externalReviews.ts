@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { BottleSchema } from "./bottles";
 import { CategoryEnum } from "./common";
-import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
+import { ExternalSiteKeySchema, ExternalSiteSchema } from "./externalSites";
 
 export const NativeScoreSchema = z
   .object({
@@ -44,7 +44,7 @@ export const ExternalReviewSchema = z.object({
 
 export const ExternalReviewInputSchema = z
   .object({
-    site: ExternalSiteTypeEnum.describe("Type of external site"),
+    site: ExternalSiteKeySchema.describe("Stable key for the external site"),
     name: z
       .string()
       .trim()

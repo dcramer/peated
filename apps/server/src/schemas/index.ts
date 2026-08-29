@@ -27,6 +27,7 @@ export * from "./pendingUploads";
 export * from "./priceMatches";
 export * from "./profileActivity";
 export * from "./regions";
+export * from "./scrapeSources";
 export * from "./shared";
 export * from "./stores";
 export * from "./tags";

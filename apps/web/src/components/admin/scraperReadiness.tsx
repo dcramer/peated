@@ -49,10 +49,10 @@ function TargetStatus({
 }
 
 const robotsLabels = {
-  unknown: "Unknown",
-  missing: "No robots file",
-  rules: "Rules cached",
-  not_applicable: "Not applicable",
+  unknown: "Not checked",
+  missing: "No published rules",
+  rules: "Rules checked",
+  not_applicable: "No check needed",
 } as const;
 
 export default function ScraperReadiness({ site }: { site: Site }) {
@@ -74,18 +74,18 @@ export default function ScraperReadiness({ site }: { site: Site }) {
             id="scraper-readiness-heading"
             className="text-lg font-semibold text-white"
           >
-            Runtime readiness
+            Connection
           </h2>
           <p className="text-muted mt-1 text-sm">
-            Code-owned traffic policy and cached remote state.
+            Request limits and access checks for this site.
           </p>
         </div>
         {!runtime.registered ? (
-          <Status color="red">Not registered</Status>
+          <Status color="red">Not ready</Status>
         ) : !runtimeSynchronized ? (
-          <Status color="amber">Definitions not synchronized</Status>
+          <Status color="amber">Setup incomplete</Status>
         ) : (
-          <Status color="green">Registered</Status>
+          <Status color="green">Ready</Status>
         )}
       </div>
 
@@ -118,7 +118,7 @@ export default function ScraperReadiness({ site }: { site: Site }) {
                       {origin.origin}
                     </div>
                     <div className="text-muted mt-1 text-xs">
-                      Robots: {robotsLabels[origin.robotsStatus]}
+                      Site access: {robotsLabels[origin.robotsStatus]}
                       {origin.robotsFetchedAt ? (
                         <>
                           {" "}
@@ -146,7 +146,7 @@ export default function ScraperReadiness({ site }: { site: Site }) {
           </div>
           <div className="text-muted mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
             <span>
-              LLM processing:{" "}
+              AI summaries:{" "}
               {reviewPolicy.allowLlmProcessing ? "allowed" : "blocked"}
             </span>
             <span>

@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { externalSites, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { ExternalSiteTypeEnum } from "@peated/server/schemas";
+import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -26,7 +26,7 @@ export default procedure
       "Retrieve current StorePrice identity coverage for one external site. Requires admin privileges",
     operationId: "getExternalSitePriceIdentityCoverage",
   })
-  .input(z.object({ site: ExternalSiteTypeEnum }).strict())
+  .input(z.object({ site: ExternalSiteKeySchema }).strict())
   .output(SitePriceIdentityCoverageSchema)
   .handler(async ({ input, errors }) => {
     const site = await db.query.externalSites.findFirst({

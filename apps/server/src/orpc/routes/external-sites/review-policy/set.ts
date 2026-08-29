@@ -1,4 +1,4 @@
-import { isExternalReviewSiteType } from "@peated/server/constants";
+import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
@@ -14,7 +14,7 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import {
   ExternalReviewSourcePolicyInputSchema,
   ExternalReviewSourcePolicySchema,
-  ExternalSiteTypeEnum,
+  ExternalSiteKeySchema,
 } from "@peated/server/schemas";
 import { serializeExternalReviewSourcePolicy } from "@peated/server/serializers/externalSite";
 import { and, eq, isNotNull, sql } from "drizzle-orm";
@@ -22,7 +22,7 @@ import { z } from "zod";
 
 const InputSchema = z
   .object({
-    site: ExternalSiteTypeEnum,
+    site: ExternalSiteKeySchema,
     policy: ExternalReviewSourcePolicyInputSchema,
   })
   .strict();
@@ -53,10 +53,6 @@ export default procedure
   .input(InputSchema)
   .output(ExternalReviewSourcePolicySchema)
   .handler(async ({ input, context, errors }) => {
-    if (!isExternalReviewSiteType(input.site)) {
-      throw errors.NOT_FOUND({ message: "Review source not found." });
-    }
-
     const { policy: inputPolicy } = input;
 
     const { previous, policy, site } = await db.transaction(async (tx) => {
@@ -74,6 +70,9 @@ export default procedure
         .where(eq(externalReviewSourcePolicies.externalSiteId, site.id))
         .limit(1)
         .for("update");
+      if (!previousPolicy && !isExternalReviewSiteKey(input.site)) {
+        throw errors.NOT_FOUND({ message: "Review source not found." });
+      }
       const previous = serializeExternalReviewSourcePolicy(
         site.id,
         previousPolicy ?? null,

@@ -2,8 +2,8 @@ import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import {
+  ExternalSiteKeySchema,
   ExternalSiteSchema,
-  ExternalSiteTypeEnum,
   detailsResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -22,7 +22,7 @@ export default procedure
   })
   .input(
     z.object({
-      site: ExternalSiteTypeEnum,
+      site: ExternalSiteKeySchema,
     }),
   )
   // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover

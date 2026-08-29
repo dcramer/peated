@@ -2,7 +2,7 @@ import { setExternalSiteConfig } from "@peated/server/lib/externalSiteConfig";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { ExternalSiteTypeEnum } from "@peated/server/schemas";
+import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { z } from "zod";
 
 export default procedure
@@ -17,7 +17,7 @@ export default procedure
   })
   .input(
     z.object({
-      site: ExternalSiteTypeEnum,
+      site: ExternalSiteKeySchema,
       key: z.string(),
       value: z.any(),
     }),

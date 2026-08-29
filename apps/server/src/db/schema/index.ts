@@ -25,6 +25,7 @@ export * from "./passkeys";
 export * from "./pendingUploads";
 export * from "./regions";
 export * from "./scraper";
+export * from "./scrapeSources";
 export * from "./stores";
 export * from "./tags";
 export * from "./tastings";

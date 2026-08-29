@@ -70,21 +70,20 @@ describe("POST /external-sites/:site/prices", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("rejects invalid site input", async ({ fixtures }) => {
+  test("rejects an unknown site", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
 
     const error = await waitError(() =>
       routerClient.prices.createBatch(
         {
-          // SAFETY: This test sends an invalid site to the runtime validator.
-          site: "not-a-site" as never,
+          site: "not-a-site",
           prices: [],
         },
         { context: { user: admin } },
       ),
     );
 
-    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(error).toMatchInlineSnapshot(`[Error: Site not found.]`);
   });
 
   test("processes a mixed batch with direct and unresolved Bottle identity", async ({

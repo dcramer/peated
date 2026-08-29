@@ -364,7 +364,7 @@ export const scraperRegistry = createScraperRegistry({
     ...legacyPriceSources.map((source) =>
       defineScraperSource({
         key: source.type,
-        externalSiteType: source.type,
+        externalSiteKey: source.type,
         targetKeys: [source.type],
         cursorSchema: LegacyPriceCursorSchema,
         observationSchema: StorePriceBatchSchema,
@@ -375,7 +375,7 @@ export const scraperRegistry = createScraperRegistry({
     ...legacyBottleSources.map((source) =>
       defineScraperSource({
         key: source.type,
-        externalSiteType: source.type,
+        externalSiteKey: source.type,
         targetKeys: [source.type],
         cursorSchema: z.null(),
         observationSchema: LegacyBottleObservationSchema,
@@ -385,7 +385,7 @@ export const scraperRegistry = createScraperRegistry({
     ),
     defineScraperSource({
       key: "bourbonculture",
-      externalSiteType: "bourbonculture",
+      externalSiteKey: "bourbonculture",
       targetKeys: ["bourbonculture"],
       requestLimit: 7,
       cursorSchema: BourbonCultureCursorSchema,
@@ -395,7 +395,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "dramface",
-      externalSiteType: "dramface",
+      externalSiteKey: "dramface",
       targetKeys: ["dramface"],
       requestLimit: 30,
       cursorSchema: DramfaceCursorSchema,
@@ -405,7 +405,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "fredminnick",
-      externalSiteType: "fredminnick",
+      externalSiteKey: "fredminnick",
       targetKeys: ["fredminnick"],
       requestLimit: 9,
       cursorSchema: FredMinnickCursorSchema,
@@ -415,7 +415,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "whiskeyreviewer",
-      externalSiteType: "whiskeyreviewer",
+      externalSiteKey: "whiskeyreviewer",
       targetKeys: ["whiskeyreviewer"],
       requestLimit: 6,
       cursorSchema: WhiskeyReviewerCursorSchema,
@@ -425,7 +425,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "whiskyadvocate",
-      externalSiteType: "whiskyadvocate",
+      externalSiteKey: "whiskyadvocate",
       targetKeys: ["whiskyadvocate"],
       // Keep the slice budget above the target quota so one hourly deferral
       // consumes one execution attempt.
@@ -437,7 +437,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "whiskynotes",
-      externalSiteType: "whiskynotes",
+      externalSiteKey: "whiskynotes",
       targetKeys: ["whiskynotes"],
       requestLimit: 30,
       resumeFromLastRun: true,
@@ -448,7 +448,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "whiskyfun",
-      externalSiteType: "whiskyfun",
+      externalSiteKey: "whiskyfun",
       targetKeys: ["whiskyfun"],
       requestLimit: 30,
       resumeFromLastRun: true,
@@ -459,7 +459,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "whiskysaga",
-      externalSiteType: "whiskysaga",
+      externalSiteKey: "whiskysaga",
       targetKeys: ["whiskysaga"],
       requestLimit: 22,
       resumeFromLastRun: true,
@@ -470,7 +470,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "whiskystudy",
-      externalSiteType: "whiskystudy",
+      externalSiteKey: "whiskystudy",
       targetKeys: ["whiskystudy"],
       requestLimit: 22,
       cursorSchema: WhiskyStudyCursorSchema,
@@ -480,7 +480,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScraperSource({
       key: "wordsofwhisky",
-      externalSiteType: "wordsofwhisky",
+      externalSiteKey: "wordsofwhisky",
       targetKeys: ["wordsofwhisky"],
       requestLimit: 25,
       cursorSchema: WordsOfWhiskyCursorSchema,
