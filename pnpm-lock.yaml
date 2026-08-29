@@ -130,8 +130,8 @@ catalogs:
       specifier: ~4.1.4
       version: 4.1.4
     zod:
-      specifier: ^4.1.8
-      version: 4.3.6
+      specifier: ^4.5.4
+      version: 4.5.4
 
 importers:
 
@@ -232,7 +232,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: 'catalog:'
-        version: 4.3.6
+        version: 4.5.4
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -287,7 +287,7 @@ importers:
         version: 1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3)
       '@orpc/zod':
         specifier: 'catalog:'
-        version: 1.15.0(@opentelemetry/api@1.9.1)(@orpc/contract@1.15.0(@opentelemetry/api@1.9.1))(@orpc/server@1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3))(ws@8.18.3)(zod@4.3.6)
+        version: 1.15.0(@opentelemetry/api@1.9.1)(@orpc/contract@1.15.0(@opentelemetry/api@1.9.1))(@orpc/server@1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3))(ws@8.18.3)(zod@4.5.4)
       '@paralleldrive/cuid2':
         specifier: ^2.2.2
         version: 2.2.2
@@ -383,7 +383,7 @@ importers:
         version: 9.0.1
       openai:
         specifier: ^6.27.0
-        version: 6.27.0(ws@8.18.3)(zod@4.3.6)
+        version: 6.27.0(ws@8.18.3)(zod@4.5.4)
       pg:
         specifier: 'catalog:'
         version: 8.20.0
@@ -407,7 +407,7 @@ importers:
         version: 0.5.0
       zod:
         specifier: 'catalog:'
-        version: 4.3.6
+        version: 4.5.4
     devDependencies:
       '@orpc/client':
         specifier: 'catalog:'
@@ -576,7 +576,7 @@ importers:
         version: 3.1.1(react@19.2.7)
       zod:
         specifier: 'catalog:'
-        version: 4.3.6
+        version: 4.5.4
     devDependencies:
       '@peated/tsconfig':
         specifier: workspace:*
@@ -628,7 +628,7 @@ importers:
     dependencies:
       '@openai/agents':
         specifier: ^0.8.5
-        version: 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
+        version: 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -637,10 +637,10 @@ importers:
         version: 10.69.0
       openai:
         specifier: ^6.27.0
-        version: 6.27.0(ws@8.18.3)(zod@4.3.6)
+        version: 6.27.0(ws@8.18.3)(zod@4.5.4)
       zod:
         specifier: 'catalog:'
-        version: 4.3.6
+        version: 4.5.4
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -659,13 +659,13 @@ importers:
         version: 4.1.4(@opentelemetry/api@1.9.1)(@types/node@24.13.2)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1(supports-color@8.1.1))(vite@8.2.1(@types/node@24.13.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
       vitest-evals:
         specifier: 0.16.1
-        version: 0.16.1(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6)
+        version: 0.16.1(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.5.4)
 
   packages/catalog-verifier:
     dependencies:
       zod:
-        specifier: ^3.24.2
-        version: 3.25.76
+        specifier: 'catalog:'
+        version: 4.5.4
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -727,7 +727,7 @@ importers:
     dependencies:
       '@openai/agents':
         specifier: ^0.6.0
-        version: 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
+        version: 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -736,10 +736,10 @@ importers:
         version: 10.69.0
       openai:
         specifier: ^6.27.0
-        version: 6.27.0(ws@8.18.3)(zod@4.3.6)
+        version: 6.27.0(ws@8.18.3)(zod@4.5.4)
       zod:
         specifier: 'catalog:'
-        version: 4.3.6
+        version: 4.5.4
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -9904,14 +9904,17 @@ packages:
     peerDependencies:
       zod: ^3.25 || ^4
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+
+  zod@4.5.1:
+    resolution: {integrity: sha512-P3GqeAEOEDqKvafVGLezbg+39YW/ze4xrD4qdS0adOY8eoI3zfjv1PQM4UwQzgT8mZKXEbqtVt8K+ZKGqkMFKg==}
+
+  zod@4.5.4:
+    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -12067,7 +12070,7 @@ snapshots:
     dependencies:
       '@logtape/logtape': 2.2.3
 
-  '@modelcontextprotocol/sdk@1.27.1(supports-color@8.1.1)(zod@4.3.6)':
+  '@modelcontextprotocol/sdk@1.27.1(supports-color@8.1.1)(zod@4.5.4)':
     dependencies:
       '@hono/node-server': 1.19.13(hono@4.12.34)
       ajv: 8.20.0
@@ -12084,8 +12087,8 @@ snapshots:
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 4.3.6
-      zod-to-json-schema: 3.25.1(zod@4.3.6)
+      zod: 4.5.4
+      zod-to-json-schema: 3.25.1(zod@4.5.4)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -12157,86 +12160,86 @@ snapshots:
 
   '@one-ini/wasm@0.1.1': {}
 
-  '@openai/agents-core@0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)':
+  '@openai/agents-core@0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)':
     dependencies:
       debug: 4.4.1(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
+      openai: 6.27.0(ws@8.18.3)(zod@4.5.4)
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.27.1(supports-color@8.1.1)(zod@4.3.6)
-      zod: 4.3.6
+      '@modelcontextprotocol/sdk': 1.27.1(supports-color@8.1.1)(zod@4.5.4)
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
       - ws
 
-  '@openai/agents-core@0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)':
+  '@openai/agents-core@0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)':
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
+      openai: 6.27.0(ws@8.18.3)(zod@4.5.4)
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.27.1(supports-color@8.1.1)(zod@4.3.6)
-      zod: 4.3.6
+      '@modelcontextprotocol/sdk': 1.27.1(supports-color@8.1.1)(zod@4.5.4)
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
       - ws
 
-  '@openai/agents-openai@0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)':
+  '@openai/agents-openai@0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)':
     dependencies:
-      '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
+      '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
       debug: 4.4.1(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
-      zod: 4.3.6
+      openai: 6.27.0(ws@8.18.3)(zod@4.5.4)
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
       - ws
 
-  '@openai/agents-openai@0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)':
+  '@openai/agents-openai@0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)':
     dependencies:
-      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
+      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
       debug: 4.4.3(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
-      zod: 4.3.6
+      openai: 6.27.0(ws@8.18.3)(zod@4.5.4)
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
       - ws
 
-  '@openai/agents-realtime@0.6.0(supports-color@8.1.1)(zod@4.3.6)':
+  '@openai/agents-realtime@0.6.0(supports-color@8.1.1)(zod@4.5.4)':
     dependencies:
-      '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
+      '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
       '@types/ws': 8.18.1
       debug: 4.4.1(supports-color@8.1.1)
       ws: 8.18.3
-      zod: 4.3.6
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@openai/agents-realtime@0.8.5(supports-color@8.1.1)(zod@4.3.6)':
+  '@openai/agents-realtime@0.8.5(supports-color@8.1.1)(zod@4.5.4)':
     dependencies:
-      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
+      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
       '@types/ws': 8.18.1
       debug: 4.4.3(supports-color@8.1.1)
       ws: 8.18.3
-      zod: 4.3.6
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@openai/agents@0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)':
+  '@openai/agents@0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)':
     dependencies:
-      '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
-      '@openai/agents-openai': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
-      '@openai/agents-realtime': 0.6.0(supports-color@8.1.1)(zod@4.3.6)
+      '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
+      '@openai/agents-openai': 0.6.0(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
+      '@openai/agents-realtime': 0.6.0(supports-color@8.1.1)(zod@4.5.4)
       debug: 4.4.1(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
-      zod: 4.3.6
+      openai: 6.27.0(ws@8.18.3)(zod@4.5.4)
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - bufferutil
@@ -12244,14 +12247,14 @@ snapshots:
       - utf-8-validate
       - ws
 
-  '@openai/agents@0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)':
+  '@openai/agents@0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)':
     dependencies:
-      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
-      '@openai/agents-openai': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.3.6)
-      '@openai/agents-realtime': 0.8.5(supports-color@8.1.1)(zod@4.3.6)
+      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
+      '@openai/agents-openai': 0.8.5(supports-color@8.1.1)(ws@8.18.3)(zod@4.5.4)
+      '@openai/agents-realtime': 0.8.5(supports-color@8.1.1)(zod@4.5.4)
       debug: 4.4.3(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.18.3)(zod@4.3.6)
-      zod: 4.3.6
+      openai: 6.27.0(ws@8.18.3)(zod@4.5.4)
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - bufferutil
@@ -12441,7 +12444,7 @@ snapshots:
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/zod@1.15.0(@opentelemetry/api@1.9.1)(@orpc/contract@1.15.0(@opentelemetry/api@1.9.1))(@orpc/server@1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3))(ws@8.18.3)(zod@4.3.6)':
+  '@orpc/zod@1.15.0(@opentelemetry/api@1.9.1)(@orpc/contract@1.15.0(@opentelemetry/api@1.9.1))(@orpc/server@1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3))(ws@8.18.3)(zod@4.5.4)':
     dependencies:
       '@orpc/contract': 1.15.0(@opentelemetry/api@1.9.1)
       '@orpc/json-schema': 1.15.0(@opentelemetry/api@1.9.1)(ws@8.18.3)
@@ -12450,7 +12453,7 @@ snapshots:
       '@orpc/shared': 1.15.0(@opentelemetry/api@1.9.1)
       escape-string-regexp: 5.0.0
       wildcard-match: 5.1.4
-      zod: 4.3.6
+      zod: 4.5.4
     transitivePeerDependencies:
       - '@opentelemetry/api'
       - crossws
@@ -14154,7 +14157,7 @@ snapshots:
 
   '@vitest-evals/core@0.16.1':
     dependencies:
-      zod: 3.25.76
+      zod: 4.5.1
 
   '@vitest-evals/report-ui@0.16.1':
     dependencies:
@@ -17447,10 +17450,10 @@ snapshots:
     dependencies:
       mimic-function: 5.0.1
 
-  openai@6.27.0(ws@8.18.3)(zod@4.3.6):
+  openai@6.27.0(ws@8.18.3)(zod@4.5.4):
     optionalDependencies:
       ws: 8.18.3
-      zod: 4.3.6
+      zod: 4.5.4
 
   openapi-types@12.1.3: {}
 
@@ -19614,14 +19617,14 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.9.0
 
-  vitest-evals@0.16.1(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.3.6):
+  vitest-evals@0.16.1(tinyrainbow@2.0.0)(vitest@4.1.4)(zod@4.5.4):
     dependencies:
       '@vitest-evals/core': 0.16.1
       '@vitest-evals/report-ui': 0.16.1
       tinyrainbow: 2.0.0
       vitest: 4.1.4(@opentelemetry/api@1.9.1)(@types/node@24.13.2)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1(supports-color@8.1.1))(vite@8.2.1(@types/node@24.13.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
     optionalDependencies:
-      zod: 4.3.6
+      zod: 4.5.4
 
   vitest@3.2.4(@types/node@26.1.0)(jiti@1.21.7)(jsdom@25.0.1(supports-color@8.1.1))(lightningcss@1.33.0)(supports-color@8.1.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0):
     dependencies:
@@ -19959,15 +19962,17 @@ snapshots:
 
   yoctocolors-cjs@2.1.3: {}
 
-  zod-to-json-schema@3.25.1(zod@4.3.6):
+  zod-to-json-schema@3.25.1(zod@4.5.4):
     dependencies:
-      zod: 4.3.6
+      zod: 4.5.4
     optional: true
-
-  zod@3.25.76: {}
 
   zod@4.3.6: {}
 
   zod@4.4.3: {}
+
+  zod@4.5.1: {}
+
+  zod@4.5.4: {}
 
   zwitch@2.0.4: {}
