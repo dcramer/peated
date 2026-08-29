@@ -2,7 +2,6 @@ import config from "@peated/server/config";
 import * as Sentry from "@sentry/node";
 import { afterEach, describe, expect, test } from "vitest";
 import {
-  buildOpenAITraceOptions,
   createOpenAIClient,
   isAIGatewayConfigured,
   withSentryConversation,
@@ -46,14 +45,6 @@ describe("createOpenAIClient", () => {
 
     expect(isAIGatewayConfigured("scraper")).toBe(true);
     expect(scraperClient.apiKey).toBe("application-key");
-  });
-
-  test("full-content traces keep complete inputs and outputs", () => {
-    expect(buildOpenAITraceOptions(true)).toEqual({
-      enableTruncation: false,
-      recordInputs: true,
-      recordOutputs: true,
-    });
   });
 });
 

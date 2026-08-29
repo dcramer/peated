@@ -1,5 +1,5 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
-import { runAgent, runAgentTool } from "@peated/server/lib/agentTelemetry";
+import { runAgent, runTool } from "@peated/server/lib/agentTrace";
 import { zodResponsesFunction } from "openai/helpers/zod";
 import type {
   ResponseInput,
@@ -311,7 +311,7 @@ function setupFailure(error: Error) {
   );
 }
 
-async function checkRulesWithTelemetry<T>(input: {
+async function runRuleCheck<T>(input: {
   argumentsJson: string;
   callId: string;
   checkNumber: number;
@@ -321,16 +321,16 @@ async function checkRulesWithTelemetry<T>(input: {
     rules: ScrapeRules;
   }) => Promise<SetupAgentCheckResult<T>>;
 }) {
-  return await runAgentTool({
-    agentName: SETUP_AGENT_NAME,
-    argumentsJson: input.argumentsJson,
-    attributes: { "scraper.setup.check.number": input.checkNumber },
+  return await runTool({
+    agent: SETUP_AGENT_NAME,
     callId: input.callId,
     description: CHECK_RULES_TOOL_DESCRIPTION,
+    details: { "scraper.setup.check.number": input.checkNumber },
+    input: input.argumentsJson,
     name: CHECK_RULES_TOOL_NAME,
     run: async () => {
       const result = await input.checkRules(input.candidate);
-      return { output: JSON.stringify(result), value: result };
+      return { output: JSON.stringify(result), result };
     },
   });
 }
@@ -398,7 +398,7 @@ async function runSetupTurns<T>(
       continue;
     }
 
-    const result = await checkRulesWithTelemetry({
+    const result = await runRuleCheck({
       argumentsJson: call.arguments,
       callId: call.call_id,
       checkNumber,
@@ -444,7 +444,7 @@ export async function runScrapeSourceSetupAgent<T>(
     detailPages: pages.slice(input.listPages.length),
   });
   return await runAgent({
-    attributes: {
+    details: {
       "scraper.run.id": input.externalSiteRunId,
       "scraper.source.id": input.scrapeSourceId,
       "scraper.source.kind": input.kind,
@@ -453,8 +453,8 @@ export async function runScrapeSourceSetupAgent<T>(
     instructions: RULE_INSTRUCTIONS,
     name: SETUP_AGENT_NAME,
     prompt: { name: "scrape-source-setup", version: AI_INSTRUCTIONS_VERSION },
-    task: initialInput,
-    toolDefinitions: JSON.stringify([tool]),
+    input: initialInput,
+    tools: JSON.stringify([tool]),
     run: async () => {
       const result = await runSetupTurns(input, tool, initialInput);
       return {
@@ -463,7 +463,7 @@ export async function runScrapeSourceSetupAgent<T>(
           listPageUrl: result.listPageUrl,
           rules: result.rules,
         }),
-        value: {
+        result: {
           rules: result.rules,
           checked: result.checked,
           model: result.model,

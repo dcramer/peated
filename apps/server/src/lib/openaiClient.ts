@@ -21,14 +21,6 @@ export function isAIGatewayConfigured(
   return Boolean(getAIGatewayApiKey(workload));
 }
 
-export function buildOpenAITraceOptions(recordFullContent: boolean) {
-  return {
-    enableTruncation: !recordFullContent,
-    recordInputs: true,
-    recordOutputs: true,
-  } as const;
-}
-
 export function createOpenAIClient({
   instrumentWithSentry = true,
   recordFullContent = false,
@@ -48,10 +40,11 @@ export function createOpenAIClient({
     return client;
   }
 
-  return Sentry.instrumentOpenAiClient(
-    client,
-    buildOpenAITraceOptions(recordFullContent),
-  );
+  return Sentry.instrumentOpenAiClient(client, {
+    enableTruncation: !recordFullContent,
+    recordInputs: true,
+    recordOutputs: true,
+  });
 }
 
 /** Agent clients always record complete model input and output in Sentry. */

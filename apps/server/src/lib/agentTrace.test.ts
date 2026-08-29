@@ -1,20 +1,17 @@
 import { describe, expect, test } from "vitest";
-import {
-  buildAgentSpanAttributes,
-  buildAgentToolSpanAttributes,
-} from "./agentTelemetry";
+import { agentFields, toolFields } from "./agentTrace";
 
-describe("agent telemetry", () => {
+describe("agent traces", () => {
   test("builds the standard agent span contract", () => {
     expect(
-      buildAgentSpanAttributes({
-        attributes: { "scraper.run.id": 380 },
+      agentFields({
         conversationId: "scrape_source:1",
+        details: { "scraper.run.id": 380 },
+        input: '{"kind":"review"}',
         instructions: "Build page rules.",
         name: "Scrape source setup",
         prompt: { name: "scrape-source-setup", version: "v6" },
-        task: '{"kind":"review"}',
-        toolDefinitions: '[{"name":"check_rules"}]',
+        tools: '[{"name":"check_rules"}]',
       }),
     ).toEqual({
       "gen_ai.agent.name": "Scrape source setup",
@@ -33,17 +30,16 @@ describe("agent telemetry", () => {
       ]),
       "gen_ai.tool.definitions": '[{"name":"check_rules"}]',
       "scraper.run.id": 380,
-      "sentry.op": "gen_ai.invoke_agent",
     });
   });
 
   test("builds the standard tool span contract", () => {
     expect(
-      buildAgentToolSpanAttributes({
-        agentName: "Scrape source setup",
-        argumentsJson: '{"listPageUrl":"https://example.com"}',
+      toolFields({
+        agent: "Scrape source setup",
         callId: "call_123",
         description: "Check the page rules.",
+        input: '{"listPageUrl":"https://example.com"}',
         name: "check_rules",
       }),
     ).toEqual({
@@ -54,7 +50,6 @@ describe("agent telemetry", () => {
       "gen_ai.tool.description": "Check the page rules.",
       "gen_ai.tool.name": "check_rules",
       "gen_ai.tool.type": "function",
-      "sentry.op": "gen_ai.execute_tool",
     });
   });
 });
