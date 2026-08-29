@@ -2,18 +2,19 @@ import { expect, test } from "vitest";
 import { ScrapeSourceCreateSchema } from "./scrapeSources";
 
 const source = {
-  key: "example-reviews",
   name: "Example Reviews",
   kind: "review" as const,
-  listUrl: "https://reviews.example/archive",
+  websiteUrl: "https://reviews.example/",
 };
 
 test("accepts only HTTP website URLs", () => {
-  expect(ScrapeSourceCreateSchema.parse(source).listUrl).toBe(source.listUrl);
+  expect(ScrapeSourceCreateSchema.parse(source).websiteUrl).toBe(
+    source.websiteUrl,
+  );
   expect(() =>
     ScrapeSourceCreateSchema.parse({
       ...source,
-      listUrl: "ftp://reviews.example/archive",
+      websiteUrl: "ftp://reviews.example/",
     }),
   ).toThrow("URL must use HTTP or HTTPS.");
 });

@@ -20,7 +20,7 @@ describe("GET /admin/scrape-sources", () => {
     const { source } = await createTestSource(admin.id);
 
     const result = await routerClient.externalSites.scrapeSources.list(
-      { site: "route-reviews" },
+      { site: "route-reviews-example" },
       { context: { user: admin } },
     );
 
@@ -28,7 +28,7 @@ describe("GET /admin/scrape-sources", () => {
       expect.objectContaining({
         id: source.id,
         revisions: [],
-        site: expect.objectContaining({ type: "route-reviews" }),
+        site: expect.objectContaining({ type: "route-reviews-example" }),
       }),
     ]);
   });

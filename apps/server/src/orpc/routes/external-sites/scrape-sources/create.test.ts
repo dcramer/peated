@@ -3,10 +3,9 @@ import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
 const input = {
-  key: "route-reviews",
   name: "Route Reviews",
   kind: "review" as const,
-  listUrl: "https://route-reviews.example/archive",
+  websiteUrl: "https://route-reviews.example/",
 };
 
 describe("POST /admin/scrape-sources", () => {
@@ -32,8 +31,8 @@ describe("POST /admin/scrape-sources", () => {
       activeRevisionId: null,
       enabled: false,
       kind: "review",
-      listUrl: input.listUrl,
-      site: { name: input.name, type: input.key },
+      listUrl: input.websiteUrl,
+      site: { name: input.name, type: "route-reviews-example" },
     });
   });
 
@@ -47,11 +46,11 @@ describe("POST /admin/scrape-sources", () => {
     );
 
     expect(error).toMatchInlineSnapshot(
-      `[Error: Example pages must use the same website as the list page.]`,
+      `[Error: Example pages must use the source website.]`,
     );
   });
 
-  test("reports a duplicate key as a conflict", async ({ fixtures }) => {
+  test("reports an existing website as a conflict", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     await routerClient.externalSites.scrapeSources.create(input, {
       context: { user: admin },
@@ -64,7 +63,7 @@ describe("POST /admin/scrape-sources", () => {
     );
 
     expect(error).toMatchInlineSnapshot(
-      `[Error: A source with this short name already exists.]`,
+      `[Error: A source for this website already exists.]`,
     );
   });
 });

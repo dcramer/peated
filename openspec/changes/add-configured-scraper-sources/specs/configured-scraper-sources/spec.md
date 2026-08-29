@@ -3,13 +3,15 @@
 ### Requirement: Admins can create controlled sources
 
 The system SHALL let an admin create an external site and its first scrape
-source with a bounded key, name, exact HTTP origin, list URL, conservative
-request policy, and robots enforcement. The source MUST start disabled.
+source with a name, website URL, conservative request policy, and robots
+enforcement. The system MUST derive its bounded internal key from the website
+hostname and use the website URL as the initial list page. The source MUST
+start disabled.
 
 #### Scenario: Admin creates a review source
 
 - **WHEN** an admin submits a valid new site and chooses `review`
-- **THEN** the system stores the site, admin-managed network rows, and a disabled review source without a deploy
+- **THEN** the system stores the site, generated internal key, admin-managed network rows, and a disabled review source without a deploy
 
 #### Scenario: Rules try to change network access
 
@@ -74,7 +76,7 @@ revision, change network control, or write products.
 #### Scenario: AI is allowed
 
 - **WHEN** an admin requests the first suggestion or a repair after the latest test fails
-- **THEN** the system fetches bounded samples, checks the output, and stores an inactive revision with the AI model name and instructions version
+- **THEN** the system fetches the main page, bounded candidates from the same website, and bounded samples, checks that the named supplied list page matches the output, and stores an inactive revision with that list page, the AI model name, and the instructions version
 
 #### Scenario: AI is not allowed
 

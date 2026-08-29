@@ -46,6 +46,13 @@ The short source-kind list represents code-supported behavior. Site keys stay
 text because admins can add them without a deploy. A TODO beside the enum marks
 the planned `event` kind and its required product boundary.
 
+## Site Creation
+
+The admin enters a site name, website URL, and source kind. The server derives
+the internal site key from the website hostname. The key remains visible in
+URLs and APIs but is not an admin decision. The website URL becomes the first
+list-page candidate.
+
 ## Network Control
 
 An admin creates the exact origin and a conservative request policy. Targets,
@@ -84,9 +91,16 @@ keeps that revision across retries even if an admin activates another one.
 ## AI Suggestions
 
 AI is allowed only when the source opts in. It is available for the first
-revision or after the latest revision fails its test. The server fetches a
-bounded list of approved pages and makes one AI request. The response must match
-the rules format. The AI has no tools, and provider storage is disabled.
+revision or after the latest revision fails its test. The server reads the
+main page and selects a small number of links on the same website that look
+like review or store pages. It fetches those pages and the admin's examples,
+then makes one AI request. The response must match the rules format. The AI has
+no tools, and provider storage is disabled.
+
+The typed response names one supplied list page. The server runs the returned
+list selector against that exact page before it saves the revision. This keeps
+list-page selection bounded and testable without a model tool loop. Pagination
+remains outside rules version 1 until a pilot proves the required page behavior.
 
 Code validates the returned rules and source kind before it stores a revision.
 The system records the AI model name and instructions version. An admin must
@@ -94,7 +108,7 @@ preview and activate the result.
 
 ## Admin Flow
 
-1. Add a site and its first review or price source.
+1. Add a site and its first review or price source from its website URL.
 2. Enter rules or ask AI for a suggestion.
 3. Preview the parsed fields from current pages.
 4. Activate a passing revision.

@@ -30,9 +30,9 @@ describe("POST /admin/scrape-sources/:id/revisions/:revisionId/preview", () => {
 
   test("rejects a revision from another source", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
-    const first = await createTestSource(admin.id, { key: "first-reviews" });
+    const first = await createTestSource(admin.id, { host: "first-reviews" });
     const second = await createTestSource(admin.id, {
-      key: "second-reviews",
+      host: "second-reviews",
     });
     const revision = await createTestRevision(second.source.id, admin.id);
     const error = await waitError(() =>

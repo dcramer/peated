@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   externalSiteRuns,
-  externalSites,
   externalSiteScrapeTargets,
+  externalSites,
   scrapeSourceRevisions,
   scrapeSourceRuns,
   scrapeSources,
@@ -12,6 +12,7 @@ import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalRev
 import { StorePriceInputSchema } from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { ScraperHttpStatusError } from "../http";
 import { externalReviewSink } from "../sinks/externalReviews";
 import { createStorePriceSink } from "../sinks/storePrices";
 import type {
@@ -21,6 +22,7 @@ import type {
   ScraperSink,
   ScraperSourceDefinition,
 } from "../types";
+import { MAX_LIKELY_LIST_PAGES, findLikelyListPages } from "./discovery";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
 import { type ScrapeRules, parseScrapeRules } from "./rules";
@@ -277,22 +279,63 @@ export async function resolveScrapeSourceRunRegistry(
             if (!requestedById) {
               throw new Error("AI suggestion run has no requesting admin.");
             }
-            const urls = [
-              suggestion.source.listUrl,
-              ...suggestion.source.sampleUrls,
+            const entryResponse = await session.request({
+              target: target.key,
+              url: new URL(suggestion.source.listUrl),
+            });
+            const sampleUrls = new Set(
+              suggestion.source.sampleUrls.map((value) =>
+                new URL(value).toString(),
+              ),
+            );
+            const listPages = [
+              {
+                url: entryResponse.url.toString(),
+                html: entryResponse.body,
+              },
             ];
-            const pages = [];
-            for (const value of urls) {
+            const likelyListPages = findLikelyListPages({
+              kind: suggestion.source.kind,
+              pageUrl: entryResponse.url,
+              html: entryResponse.body,
+            }).filter((value) => !sampleUrls.has(value));
+            for (const value of likelyListPages) {
+              try {
+                const response = await session.request({
+                  target: target.key,
+                  url: new URL(value),
+                });
+                listPages.push({
+                  url: response.url.toString(),
+                  html: response.body,
+                });
+              } catch (error) {
+                if (
+                  error instanceof ScraperHttpStatusError &&
+                  [404, 410].includes(error.status)
+                ) {
+                  continue;
+                }
+                throw error;
+              }
+            }
+            const detailPages = [];
+            for (const value of sampleUrls) {
+              if (value === entryResponse.url.toString()) continue;
               const response = await session.request({
                 target: target.key,
                 url: new URL(value),
               });
-              pages.push({ url: response.url.toString(), html: response.body });
+              detailPages.push({
+                url: response.url.toString(),
+                html: response.body,
+              });
             }
             const revision = await suggestScrapeSourceRevision({
               scrapeSourceId: suggestion.source.id,
               createdById: requestedById,
-              pages,
+              listPages,
+              detailPages,
             });
             await db
               .update(scrapeSourceRuns)
@@ -303,7 +346,8 @@ export async function resolveScrapeSourceRunRegistry(
       key: `source-${suggestion.source.id}`,
       externalSiteKey: suggestion.siteKey,
       targetKeys: [target.key],
-      requestLimit: suggestion.source.sampleUrls.length + 1,
+      requestLimit:
+        suggestion.source.sampleUrls.length + MAX_LIKELY_LIST_PAGES + 1,
       resumeFromLastRun: false,
       cursorSchema: z.null(),
       observationSchema: z.unknown(),

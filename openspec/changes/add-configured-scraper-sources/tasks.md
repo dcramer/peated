@@ -22,6 +22,7 @@
 - [x] 3.3 Permit same-origin list URL changes through a new revision
 - [x] 3.4 Require a passing test for activation and rollback
 - [x] 3.5 Add integration tests for authorization and route errors
+- [x] 3.6 Derive the internal site key and initial list page from the website URL
 
 ## 4. Runtime Integration
 
@@ -38,6 +39,7 @@
 - [x] 5.3 Store the AI model name and instructions version with each valid inactive revision
 - [x] 5.4 Add an end-to-end review suggestion eval fixture
 - [x] 5.5 Add an end-to-end price suggestion eval fixture
+- [x] 5.6 Let one bounded AI request choose from likely pages on the same website
 
 ## 6. Admin API And UI
 
@@ -45,6 +47,7 @@
 - [x] 6.2 Add route integration tests for authorization, validation, and conflicts
 - [x] 6.3 Add an Admin Scrapers Add Site flow with review or price choice
 - [x] 6.4 Add the Parsing tab with list URL, rules, preview, active revision, history, and rollback
+- [x] 6.5 Remove the short-name and list-page decisions from the Add Site form
 
 ## 7. Verification And Pilot
 
@@ -52,3 +55,4 @@
 - [x] 7.2 Run focused tests, typechecks, lint, format, and OpenSpec validation
 - [x] 7.3 Run one manual admin smoke check without browser test coverage
 - [ ] 7.4 Pilot one review source and one simple price source
+- [x] 7.5 Run focused tests, both live suggestion evals, typecheck, lint, format, and OpenSpec validation

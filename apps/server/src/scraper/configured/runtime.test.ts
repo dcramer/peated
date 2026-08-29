@@ -41,10 +41,9 @@ async function setupSource(titleSelector = "h1") {
     .returning();
   if (!user) throw new Error("Failed to create user.");
   const { site, source } = await createSiteWithScrapeSource({
-    key: "preview-reviews",
     name: "Preview Reviews",
     kind: "review",
-    listUrl: "https://preview.example/archive",
+    websiteUrl: "https://preview.example/archive",
     createdById: user.id,
   });
   const revision = await createScrapeSourceRevision({
@@ -205,10 +204,9 @@ test("a resumed suggestion run reuses its saved revision", async () => {
     .returning();
   if (!user) throw new Error("Failed to create user.");
   const { source } = await createSiteWithScrapeSource({
-    key: "suggest-reviews",
     name: "Suggest Reviews",
     kind: "review",
-    listUrl: "https://suggest.example/archive",
+    websiteUrl: "https://suggest.example/archive",
     allowAiSuggestions: true,
     createdById: user.id,
   });

@@ -17,11 +17,25 @@ import {
 import { createSiteWithScrapeSource } from "./service";
 
 const SITE_ORIGIN = "https://review-fixture.test";
+const HOME_URL = `${SITE_ORIGIN}/`;
 const LIST_URL = `${SITE_ORIGIN}/reviews`;
 const FIRST_REVIEW_URL = `${SITE_ORIGIN}/reviews/autumn-notes`;
 const SECOND_REVIEW_URL = `${SITE_ORIGIN}/reviews/island-notes`;
 
 const WEBSITE_PAGES = new Map([
+  [
+    HOME_URL,
+    `<!doctype html>
+      <html lang="en">
+        <body>
+          <main>
+            <h1>Review Fixture</h1>
+            <a href="/about">About</a>
+            <a href="/reviews">All whisky reviews</a>
+          </main>
+        </body>
+      </html>`,
+  ],
   [
     LIST_URL,
     `<!doctype html>
@@ -127,9 +141,8 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       const { site, source } = await createSiteWithScrapeSource({
         allowAiSuggestions: true,
         createdById: admin.id,
-        key: "review-fixture",
         kind: "review",
-        listUrl: LIST_URL,
+        websiteUrl: HOME_URL,
         name: "Review Fixture",
         sampleUrls: [FIRST_REVIEW_URL, SECOND_REVIEW_URL],
       });
@@ -159,8 +172,9 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         .from(scrapeSourceRevisions)
         .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
       expect(suggestedRevision).toMatchObject({
-        aiInstructionsVersion: "scrape-source-v1",
+        aiInstructionsVersion: "scrape-source-v2",
         author: "ai",
+        listUrl: LIST_URL,
         previewStatus: "pending",
       });
       if (!suggestedRevision) throw new Error("AI did not create a revision.");
@@ -235,6 +249,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         },
       ]);
       expect(fixtureWebsite.requests).toEqual([
+        HOME_URL,
         LIST_URL,
         FIRST_REVIEW_URL,
         SECOND_REVIEW_URL,
