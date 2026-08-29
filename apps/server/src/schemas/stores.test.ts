@@ -9,6 +9,12 @@ const validInput = {
 };
 
 describe("StorePriceInputSchema", () => {
+  test("accepts a 350 ml half bottle", () => {
+    expect(
+      StorePriceInputSchema.safeParse({ ...validInput, volume: 350 }).success,
+    ).toBe(true);
+  });
+
   test.each([0, -1, 1.5])("rejects invalid price %s", (price) => {
     expect(
       StorePriceInputSchema.safeParse({ ...validInput, price }).success,

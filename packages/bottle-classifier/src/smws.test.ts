@@ -3,7 +3,6 @@ import {
   composeExactCaskCodeFromComponents,
   getCategoryFromCask,
   parseDetailsFromName,
-  parseFlavorProfile,
   parseReferenceName,
 } from "./smws";
 
@@ -18,11 +17,6 @@ describe("smws", () => {
       distiller: "Dailuaine",
       name: "41.176 Baristaliscious",
     });
-  });
-
-  test("maps SMWS flavor profile labels to canonical ids", () => {
-    expect(parseFlavorProfile("Juicy Oak & Vanilla")).toBe("juicy_oak_vanilla");
-    expect(parseFlavorProfile("Unknown Profile")).toBeNull();
   });
 
   test("maps SMWS cask codes to categories", () => {

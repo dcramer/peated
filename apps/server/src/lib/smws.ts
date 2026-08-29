@@ -3,7 +3,5 @@ export {
   SMWS_DISTILLERY_CODES,
   getCategoryFromCask,
   parseDetailsFromName,
-  parseFlavorProfile,
-  type FlavorProfile,
   type SMWSCaskDetails,
 } from "@peated/bottle-classifier/smws";

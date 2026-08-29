@@ -3,23 +3,6 @@ import { getExactCaskCodeAnchor } from "./exactCask";
 import { escapeRegExp } from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
 
-const FLAVOR_PROFILES = [
-  "young_spritely",
-  "sweet_fruit_mellow",
-  "spicy_sweet",
-  "spicy_dry",
-  "deep_rich_dried_fruit",
-  "old_dignified",
-  "light_delicate",
-  "juicy_oak_vanilla",
-  "oily_coastal",
-  "lightly_peated",
-  "peated",
-  "heavily_peated",
-] as const;
-
-export type FlavorProfile = (typeof FLAVOR_PROFILES)[number];
-
 interface SmwsDistilleryCodes {
   [code: string]: string;
 }
@@ -440,40 +423,4 @@ export function parseReferenceName(
     distiller: details?.distiller ?? null,
     name: `${code} ${selector ?? ""}`.trim(),
   };
-}
-
-export function parseFlavorProfile(name: string): FlavorProfile | null {
-  name = name.replace("&amp;", "&").replace(",", "");
-
-  switch (name) {
-    case "Young & Spritely":
-      return "young_spritely";
-    case "Sweet Fruit & Mellow":
-    case "Sweet Fruity & Mellow":
-      return "sweet_fruit_mellow";
-    case "Spicy & Sweet":
-      return "spicy_sweet";
-    case "Spicy & Dry":
-      return "spicy_dry";
-    case "Deep Rich & Dried Fruit":
-    case "Deep Rich & Dried Fruits":
-      return "deep_rich_dried_fruit";
-    case "Old & Dignified":
-      return "old_dignified";
-    case "Light & Delicate":
-      return "light_delicate";
-    case "Juicy Oak & Vanilla":
-      return "juicy_oak_vanilla";
-    case "Oily & Coastal":
-      return "oily_coastal";
-    case "Lightly Peated":
-      return "lightly_peated";
-    case "Peated":
-      return "peated";
-    case "Heavily Peated":
-      return "heavily_peated";
-    default:
-      console.error(`Unknown flavor profile: ${name}`);
-      return null;
-  }
 }
