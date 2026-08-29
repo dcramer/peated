@@ -148,7 +148,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     purpose: "collect",
   });
   expect(pinned.revision.id).toBe(first.id);
-  expect(pinned.run.requestLimit).toBe(100);
+  expect(pinned.run.requestLimit).toBe(104);
   expect(await db.select().from(scrapeSourceRuns)).toEqual([
     expect.objectContaining({
       externalSiteRunId: pinned.run.id,

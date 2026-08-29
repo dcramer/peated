@@ -78,25 +78,26 @@ revision that passes its test can become active. An admin can return to any
 older revision that passed. Pausing a source stops collection but keeps its
 revisions and run history.
 
-Rules format 1 supports one HTML list page with an item limit, same-origin detail links,
-CSS selectors, and fixed date, number, price, and volume conversions. It does not
-support scripts, custom code, arbitrary request headers, browser automation,
-pagination, or cross-origin discovery. Add a code-owned adapter when a source
-needs those capabilities.
+Rules format 1 supports same-origin HTML list and detail pages, an item limit,
+an optional next-page link, CSS selectors, and fixed date, number, price, and
+volume conversions. Code follows at most five list pages. It does not support
+scripts, custom code, arbitrary request headers, browser automation, numbered
+page templates, infinite scrolling, or cross-origin discovery. Add a code-owned
+adapter when a source needs those capabilities.
 
 Event sources, such as whisky festivals, are the next planned source kind.
 Peated already stores these events. Add the scraper type only after its match
 and update rules are defined, so repeated runs do not create duplicate events.
 
-New sources allow AI parsing suggestions by default. An admin can turn this off
-when they create the source. The server reads the main page, up to four likely
-list pages on the same website, and any example review or product pages. One AI
-request proposes rules. Code then fetches up to three detail pages and parses
-them with the same parser used during collection. A second AI request compares
-those parsed fields with the HTML. Both responses require fixed fields, and the
-AI has no tools. No revision is saved unless the code checks and AI review pass.
-The AI provider does not store request content. An admin must still test and
-activate the inactive revision. AI never changes the active revision directly.
+Adding a source starts AI setup. The server reads the main page, up to four
+likely list pages on the same website, and any example review or product pages.
+One AI request proposes the list, next-page, and detail rules. Code checks the
+list page, one next page when present, and up to three detail pages with the
+same parser used during collection. A second AI request compares those parsed
+fields with the HTML. Both responses require fixed fields, and the AI has no
+tools. No revision is saved unless the code checks and AI review pass. The AI
+provider does not store request content. An admin must still test and activate
+the inactive revision. AI never changes the active revision directly.
 
 `pnpm evals:scraper` checks rule generation with fixed website fixtures and the
 live AI service. Normal test runs exclude these checks. Add the `trigger-evals`

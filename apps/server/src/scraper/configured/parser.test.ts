@@ -27,7 +27,46 @@ describe("scrape source parser", () => {
     );
     expect(result).toEqual({
       links: ["https://reviews.test/one", "https://reviews.test/two"],
+      nextPageUrl: null,
       issues: [],
+    });
+  });
+
+  it("extracts a same-website next page", () => {
+    const result = parseScrapeList(
+      {
+        ...reviewConfig,
+        list: {
+          ...reviewConfig.list,
+          nextPage: { selector: "a.next", attribute: "href" },
+        },
+      },
+      '<a class="review" href="/one">One</a><a class="next" href="/archive?page=2">Next</a>',
+      new URL("https://reviews.test/archive"),
+    );
+    expect(result).toEqual({
+      links: ["https://reviews.test/one"],
+      nextPageUrl: "https://reviews.test/archive?page=2",
+      issues: [],
+    });
+  });
+
+  it("rejects a next page on another website", () => {
+    const result = parseScrapeList(
+      {
+        ...reviewConfig,
+        list: {
+          ...reviewConfig.list,
+          nextPage: { selector: "a.next", attribute: "href" },
+        },
+      },
+      '<a class="review" href="/one">One</a><a class="next" href="https://other.test/page/2">Next</a>',
+      new URL("https://reviews.test/archive"),
+    );
+    expect(result.nextPageUrl).toBeNull();
+    expect(result.issues).toContainEqual({
+      field: "list.nextPage",
+      message: "Pages must stay on the source website.",
     });
   });
 
@@ -39,7 +78,7 @@ describe("scrape source parser", () => {
     );
     expect(result.links).toEqual([]);
     expect(result.issues.map((issue) => issue.message)).toContain(
-      "Detail pages must use the same website as the list page.",
+      "Pages must stay on the source website.",
     );
   });
 
@@ -185,6 +224,7 @@ describe("scrape source parser", () => {
     );
     expect(result).toEqual({
       links: [],
+      nextPageUrl: null,
       issues: [
         {
           field: "list.detailLink",

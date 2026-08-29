@@ -18,11 +18,10 @@ export const reviewRules = {
 
 export async function createTestSource(
   createdById: number,
-  options: { allowAiSuggestions?: boolean; host?: string } = {},
+  options: { host?: string } = {},
 ) {
   const host = options.host ?? "route-reviews";
   return await createSiteWithScrapeSource({
-    allowAiSuggestions: options.allowAiSuggestions ?? false,
     createdById,
     kind: "review",
     websiteUrl: `https://${host}.example/archive`,

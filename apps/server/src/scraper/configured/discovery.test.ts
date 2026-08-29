@@ -64,7 +64,7 @@ test("limits detail pages found in list-page cards", () => {
   ]);
 });
 
-test("ignores navigation, supplied pages, and links on other sites", () => {
+test("ignores navigation, pagination, supplied pages, and other sites", () => {
   expect(
     findLikelyDetailPages({
       kind: "price",
@@ -74,6 +74,7 @@ test("ignores navigation, supplied pages, and links on other sites", () => {
           url: "https://example.test/shop",
           html: `
             <a href="/shop">Current page</a>
+            <a href="/shop?page=2">Next</a>
             <a href="/account">Account</a>
             <a href="https://other.test/products/one">Other store</a>
             <article class="product-card"><a href="/products/one">Product</a></article>

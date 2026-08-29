@@ -28,26 +28,9 @@ describe("POST /admin/scrape-sources/:id/suggest", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Source not found.]`);
   });
 
-  test("requires AI permission", async ({ fixtures }) => {
+  test("queues a suggestion", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const { source } = await createTestSource(admin.id);
-    const error = await waitError(() =>
-      routerClient.externalSites.scrapeSources.suggest(
-        { id: source.id },
-        { context: { user: admin } },
-      ),
-    );
-
-    expect(error).toMatchInlineSnapshot(
-      `[Error: AI suggestions are not allowed for this source.]`,
-    );
-  });
-
-  test("queues an allowed suggestion", async ({ fixtures }) => {
-    const admin = await fixtures.User({ admin: true });
-    const { source } = await createTestSource(admin.id, {
-      allowAiSuggestions: true,
-    });
 
     const run = await routerClient.externalSites.scrapeSources.suggest(
       { id: source.id },

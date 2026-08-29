@@ -3,6 +3,7 @@ import {
   MAX_AI_INPUT_CHARS,
   checkDetailPages,
   checkListPage,
+  checkNextListPage,
   checkRuleReview,
   createRuleReviewFormat,
   createSuggestionFormat,
@@ -36,8 +37,8 @@ test("uses object schemas for AI output", () => {
 });
 
 test("reserves requests for discovery and final page checks", () => {
-  expect(suggestionRequestLimit(0)).toBe(11);
-  expect(suggestionRequestLimit(2)).toBe(13);
+  expect(suggestionRequestLimit(0)).toBe(12);
+  expect(suggestionRequestLimit(2)).toBe(14);
 });
 
 test("bounds total AI input while keeping every sample page", () => {
@@ -78,6 +79,40 @@ test("validates the selected list page and returns its detail links", () => {
     "https://example.test/reviews/one",
     "https://example.test/reviews/two",
   ]);
+  expect(page.nextPageUrl).toBeNull();
+});
+
+test("checks that pagination adds detail links", async () => {
+  const rules = {
+    ...reviewRules,
+    list: {
+      ...reviewRules.list,
+      nextPage: { selector: "a.next", attribute: "href" },
+    },
+  };
+  const firstPage = checkListPage({
+    listPageUrl: "https://example.test/reviews",
+    rules,
+    pages: [
+      {
+        url: "https://example.test/reviews",
+        html: '<a class="review" href="/reviews/one">One</a><a class="next" href="/reviews?page=2">Next</a>',
+      },
+    ],
+  });
+  const checked = await checkNextListPage({
+    rules,
+    listPage: firstPage,
+    loadPage: async (url) => ({
+      url: url.toString(),
+      html: '<a class="review" href="/reviews/two">Two</a>',
+    }),
+  });
+
+  expect(checked.links).toEqual([
+    "https://example.test/reviews/one",
+    "https://example.test/reviews/two",
+  ]);
 });
 
 test("rejects a list page that was not supplied", () => {
@@ -95,6 +130,9 @@ test("parses supplied detail pages with the production parser", async () => {
     url: "https://example.test/reviews",
     html: '<a class="review" href="/reviews/one">One</a>',
     links: ["https://example.test/reviews/one"],
+    firstPageLinks: ["https://example.test/reviews/one"],
+    nextPageUrl: null,
+    nextPage: null,
   };
   const detailPages = await checkDetailPages({
     rules: reviewRules,
@@ -130,6 +168,9 @@ test("rejects suggested rules that do not parse a detail page", async () => {
         url: "https://example.test/reviews",
         html: '<a class="review" href="/reviews/one">One</a>',
         links: ["https://example.test/reviews/one"],
+        firstPageLinks: ["https://example.test/reviews/one"],
+        nextPageUrl: null,
+        nextPage: null,
       },
       suppliedPages: [],
       loadPage: async (url) => ({

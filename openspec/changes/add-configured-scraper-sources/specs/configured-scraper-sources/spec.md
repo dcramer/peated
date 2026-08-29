@@ -13,10 +13,10 @@ page. The source MUST start disabled.
 - **WHEN** an admin submits a valid new site and chooses `review`
 - **THEN** the system stores the site, generated internal key, admin-managed network rows, and a disabled review source without a deploy
 
-#### Scenario: Admin uses the default AI setting
+#### Scenario: Admin creates a source
 
-- **WHEN** an admin creates a source without changing the AI setting
-- **THEN** the source permits AI to suggest its first parsing-rule revision
+- **WHEN** an admin creates a source
+- **THEN** the system queues AI setup for its first parsing-rule revision
 
 #### Scenario: Rules try to change network access
 
@@ -26,8 +26,8 @@ page. The source MUST start disabled.
 ### Requirement: Each source has one kind
 
 The system SHALL support `review` and `price` source kinds. A site SHALL own at
-most one scrape source. The source SHALL own its kind, enablement, AI permission,
-list URL, sample URLs, and revisions.
+most one scrape source. The source SHALL own its kind, enablement, list URL,
+sample URLs, and revisions.
 
 #### Scenario: An admin chooses a source kind
 
@@ -74,21 +74,21 @@ or prices.
 
 ### Requirement: AI suggestions create inactive revisions only
 
-The system SHALL allow AI suggestions by default for new sources and permit the
-admin to turn them off. It SHALL make at most two AI requests: one to suggest
-rules from supplied pages and one to review fields parsed from those rules. The
-AI MUST have no tools. It MUST NOT activate a revision, change network control,
-or write products.
+The system SHALL run AI setup for every new source. It SHALL make at most two
+AI requests: one to suggest rules from supplied pages and one to review fields
+parsed from those rules. The AI MUST identify the list page, detail fields, and
+an optional next-page link. It MUST have no tools. It MUST NOT activate a
+revision, change network control, or write products.
 
 #### Scenario: AI is allowed
 
 - **WHEN** an admin requests the first suggestion or a repair after the latest test fails
-- **THEN** the system fetches the main page, up to four candidate list pages from the same website, and up to three detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the HTML, and stores an inactive revision only when both checks pass
+- **THEN** the system fetches the main page, up to four candidate list pages from the same website, one next list page when found, and up to three detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the HTML, and stores an inactive revision only when both checks pass
 
-#### Scenario: AI is not allowed
+#### Scenario: Proposed pagination repeats or leaves the website
 
-- **WHEN** the source does not permit AI processing
-- **THEN** the system rejects the request before it sends page content to the AI provider
+- **WHEN** the next-page selector returns a page that was already read or uses another origin
+- **THEN** code rejects the run before it reads that page
 
 #### Scenario: Model output is invalid
 
@@ -159,8 +159,9 @@ not disable or rewrite admin-managed targets, origins, or site mappings.
 ### Requirement: The admin flow exposes the revision lifecycle
 
 The Admin Scrapers area SHALL let an admin add a site, choose a source kind,
-enter rules or request an AI revision, edit the list URL, preview, activate,
-view revision history, roll back, pause collection, and inspect health.
+wait for its AI revision, edit the generated list URL and rules, preview,
+activate, view revision history, roll back, pause collection, and inspect
+health.
 
 #### Scenario: An active source needs repair
 

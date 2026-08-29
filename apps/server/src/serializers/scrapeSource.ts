@@ -75,7 +75,6 @@ export const ScrapeSourceSerializer = serializer({
       site: serializeExternalSite(site),
       kind: source.kind,
       enabled: source.enabled,
-      allowAiSuggestions: source.allowAiSuggestions,
       listUrl: source.listUrl,
       sampleUrls: source.sampleUrls,
       activeRevisionId:

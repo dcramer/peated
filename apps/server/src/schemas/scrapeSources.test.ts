@@ -19,12 +19,11 @@ test("accepts only HTTP website URLs", () => {
   ).toThrow("URL must use HTTP or HTTPS.");
 });
 
-test("allows AI suggestions by default", () => {
-  expect(ScrapeSourceCreateSchema.parse(source).allowAiSuggestions).toBe(true);
-  expect(
+test("does not expose an AI opt-out", () => {
+  expect(() =>
     ScrapeSourceCreateSchema.parse({
       ...source,
       allowAiSuggestions: false,
-    }).allowAiSuggestions,
-  ).toBe(false);
+    }),
+  ).toThrow();
 });

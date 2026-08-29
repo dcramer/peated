@@ -1,4 +1,5 @@
 import waitError from "@peated/server/lib/test/waitError";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
@@ -29,12 +30,12 @@ describe("POST /admin/scrape-sources", () => {
 
     expect(source).toMatchObject({
       activeRevisionId: null,
-      allowAiSuggestions: true,
       enabled: false,
       kind: "review",
       listUrl: input.websiteUrl,
       site: { name: input.name, type: "route-reviews-example" },
     });
+    expect(pushJob).toHaveBeenCalledOnce();
   });
 
   test("rejects sample pages on another website", async ({ fixtures }) => {

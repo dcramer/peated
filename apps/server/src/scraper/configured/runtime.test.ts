@@ -12,6 +12,7 @@ import { vi } from "vitest";
 import { createScraperRegistry } from "../definitions";
 import type { ScraperHttpClock } from "../http";
 import { executeScraperRun } from "../runs";
+import type { ScrapeRules } from "./rules";
 import {
   createPinnedScrapeSourceRun,
   createScrapeSourceSuggestionRun,
@@ -34,7 +35,7 @@ function fixedClock(): ScraperHttpClock {
   };
 }
 
-async function setupSource(titleSelector = "h1") {
+async function setupSource(titleSelector = "h1", paginate = false) {
   const [user] = await db
     .insert(users)
     .values({ username: "admin", email: "admin@example.com", admin: true })
@@ -46,16 +47,20 @@ async function setupSource(titleSelector = "h1") {
     websiteUrl: "https://preview.example/archive",
     createdById: user.id,
   });
+  const list: Extract<ScrapeRules, { kind: "review" }>["list"] = {
+    detailLink: { selector: "a.review", attribute: "href" },
+    maxItems: 5,
+  };
+  if (paginate) {
+    list.nextPage = { selector: "a.next", attribute: "href" };
+  }
   const revision = await createScrapeSourceRevision({
     scrapeSourceId: source.id,
     author: "person",
     createdById: user.id,
     rules: {
       kind: "review",
-      list: {
-        detailLink: { selector: "a.review", attribute: "href" },
-        maxItems: 5,
-      },
+      list,
       detail: {
         title: { selector: titleSelector },
         reviewItem: "article.review",
@@ -74,8 +79,8 @@ async function setupSource(titleSelector = "h1") {
   return { revision, site, source, user };
 }
 
-async function setupPreview(titleSelector = "h1") {
-  const created = await setupSource(titleSelector);
+async function setupPreview(titleSelector = "h1", paginate = false) {
+  const created = await setupSource(titleSelector, paginate);
   const pinned = await createPinnedScrapeSourceRun(db, {
     externalSiteId: created.site.id,
     scrapeSourceId: created.source.id,
@@ -87,15 +92,24 @@ async function setupPreview(titleSelector = "h1") {
   return { ...created, pinned };
 }
 
-function previewFetch() {
+function previewFetch(paginate = false) {
   return vi.fn<typeof fetch>(async (input) => {
     const url = new URL(input instanceof Request ? input.url : input);
     if (url.pathname === "/archive") {
-      return new Response('<a class="review" href="/one">One</a>');
+      return new Response(
+        url.searchParams.get("page") === "2"
+          ? '<a class="review" href="/two">Two</a>'
+          : `<a class="review" href="/one">One</a>${paginate ? '<a class="next" href="/archive?page=2">Next</a>' : ""}`,
+      );
     }
     if (url.pathname === "/one") {
       return new Response(
         '<h1>August reviews</h1><article class="review"><h2>Example Whisky</h2><div class="body">Publisher prose must not be stored in preview.</div></article>',
+      );
+    }
+    if (url.pathname === "/two") {
+      return new Response(
+        '<h1>Earlier reviews</h1><article class="review"><h2>Second Whisky</h2><div class="body">Another review.</div></article>',
       );
     }
     throw new Error(`Unexpected URL: ${url.toString()}`);
@@ -130,6 +144,35 @@ test("runs preview through the normal request controls without product writes", 
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, pinned.run.id));
   expect(run).toMatchObject({ status: "succeeded", emittedItemCount: 0 });
+});
+
+test("follows a bounded next-page selector", async () => {
+  const { pinned, revision } = await setupPreview("h1", true);
+  const fetchImpl = previewFetch(true);
+
+  await expect(
+    executeScraperRun(
+      { runId: pinned.run.id },
+      {
+        registry: createScraperRegistry({ targets: [], sources: [] }),
+        fetchImpl,
+        clock: fixedClock(),
+        executionToken: "pagination-owner",
+      },
+    ),
+  ).resolves.toEqual({ status: "completed" });
+
+  const [storedRevision] = await db
+    .select()
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(storedRevision?.previewResult).toMatchObject({
+    issues: [],
+    pages: [
+      { url: "https://preview.example/one" },
+      { url: "https://preview.example/two" },
+    ],
+  });
 });
 
 test("stores safe validation issues when a selector stops matching", async () => {
@@ -207,7 +250,6 @@ test("a resumed suggestion run reuses its saved revision", async () => {
     name: "Suggest Reviews",
     kind: "review",
     websiteUrl: "https://suggest.example/archive",
-    allowAiSuggestions: true,
     createdById: user.id,
   });
   const run = await createScrapeSourceSuggestionRun({

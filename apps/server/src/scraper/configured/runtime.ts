@@ -25,7 +25,11 @@ import type {
 import { findLikelyDetailPages, findLikelyListPages } from "./discovery";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
-import { type ScrapeRules, parseScrapeRules } from "./rules";
+import {
+  SCRAPE_SOURCE_MAX_LIST_PAGES,
+  type ScrapeRules,
+  parseScrapeRules,
+} from "./rules";
 import { recordScrapeSourcePreview } from "./service";
 import {
   MAX_SUGGESTION_DETAIL_PAGES,
@@ -89,22 +93,44 @@ function createScrapeSourceAdapter(input: {
 }): ScraperAdapter<null, unknown> {
   return async ({ session }) => {
     const pages: ScrapeSourcePreviewPage[] = [];
-    const listUrl = new URL(input.listUrl);
     try {
-      const listResponse = await session.request({
-        target: input.targetKey,
-        url: listUrl,
-      });
-      const listResult = parseScrapeList(
-        input.rules,
-        listResponse.body,
-        listResponse.url,
-      );
-      if (listResult.issues.length > 0) {
-        throw new ScrapeSourceParseError(listResult.issues);
+      const listUrls = new Set<string>();
+      const detailUrls = new Set<string>();
+      let nextListUrl: string | null = new URL(input.listUrl).toString();
+      while (
+        nextListUrl &&
+        listUrls.size < SCRAPE_SOURCE_MAX_LIST_PAGES &&
+        detailUrls.size < input.rules.list.maxItems
+      ) {
+        if (listUrls.has(nextListUrl)) {
+          throw new ScrapeSourceParseError([
+            {
+              field: "list.nextPage",
+              message: "Pagination returned a page that was already read.",
+            },
+          ]);
+        }
+        listUrls.add(nextListUrl);
+        const listResponse = await session.request({
+          target: input.targetKey,
+          url: new URL(nextListUrl),
+        });
+        const listResult = parseScrapeList(
+          input.rules,
+          listResponse.body,
+          listResponse.url,
+        );
+        if (listResult.issues.length > 0) {
+          throw new ScrapeSourceParseError(listResult.issues);
+        }
+        for (const link of listResult.links) {
+          detailUrls.add(link);
+          if (detailUrls.size >= input.rules.list.maxItems) break;
+        }
+        nextListUrl = listResult.nextPageUrl;
       }
 
-      for (const link of listResult.links) {
+      for (const link of detailUrls) {
         const response = await session.request({
           target: input.targetKey,
           url: new URL(link),
@@ -214,7 +240,7 @@ function createScrapeSourceDefinition(input: {
     key: `source-${input.scrapeSourceId}`,
     externalSiteKey: input.siteKey,
     targetKeys: [input.targetKey],
-    requestLimit: input.rules.list.maxItems + 1,
+    requestLimit: input.rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
     cursorSchema: z.null(),
     observationSchema,

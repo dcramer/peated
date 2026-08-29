@@ -11,7 +11,7 @@ stays transient.
 - Keep one clear term for each stored concept.
 - Pin every run to immutable parsing rules.
 - Use the same parser for preview and collection.
-- Use AI suggestions by default while keeping an opt-out and human activation.
+- Use AI to set up every new source while keeping human activation.
 - Keep the first rules version small.
 
 ## Non-Goals
@@ -28,8 +28,8 @@ stays transient.
 of run history and product source identity.
 
 `scrape_source` describes the site's collection intent. Its `kind` is `review`
-or `price`. A site owns one source. The source stores enablement, AI permission,
-sample URLs, and the current list URL.
+or `price`. A site owns one source. The source stores enablement, sample URLs,
+and the current list URL.
 
 `scrape_source_revision` stores an immutable parsing-rule revision. It pins the
 list URL, rules version, rules, author, and latest preview result. A
@@ -65,14 +65,16 @@ origin. Preview, AI page reads, and collection use the normal request controls.
 
 ## Rules Version 1
 
-The first format supports one list page with an item limit and same-origin detail pages.
-It has CSS selectors for detail links and known review or price fields. Code
-owns date, score, money, currency, and volume conversion.
+The first format supports same-origin list and detail pages. It has CSS
+selectors for detail links, an optional next-page link, and known review or
+price fields. Code owns date, score, money, currency, and volume conversion.
+Code follows at most five list pages and stops after the saved item limit. It
+rejects cross-origin and repeated next-page links.
 
 The rules JSON does not include its version. The revision stores the rules
-version used to read it. This version does not support
-pagination, browser rendering, APIs, or custom transforms. A code source is
-the escape hatch for those cases.
+version used to read it. This version does not support numbered-page templates,
+infinite scrolling, browser rendering, APIs, or custom transforms. A code
+source is the escape hatch for those cases.
 
 ## Revision Lifecycle
 
@@ -90,34 +92,34 @@ keeps that revision across retries even if an admin activates another one.
 
 ## AI Suggestions
 
-New sources allow AI suggestions by default. The admin can turn them off during
-setup. AI is available for the first revision or after the latest revision
-fails its test. The server reads the main page and selects a small number of
-links on the same website that look like review or store pages. It fetches
-those pages and the admin's examples, then makes one AI request for parsing
-rules. The response must match the rules format. The AI has no tools, and
-the AI provider does not store request content.
+Every new source starts an AI setup run. AI is also available after the latest
+revision fails its test. The server reads the main page and selects a small
+number of links on the same website that look like review or store pages. It
+fetches those pages and the admin's examples, then makes one AI request for
+parsing rules. The response must match the rules format. The AI has no tools,
+and the AI provider does not store request content.
 
 The response names one supplied list page. The server runs the returned list
-selector against that exact page, fetches up to three detail links, and parses
-them with the production parser. Any selector, conversion, or response error
-stops the suggestion without saving a revision.
+and next-page selectors against that exact page. When a next page exists, code
+fetches one page and proves that it produces new detail links. Code then
+fetches up to three detail links and parses them with the production parser.
+Any selector, conversion, or response error stops the suggestion without
+saving a revision.
 
 A second AI request compares the parsed fields with the same HTML. Its response
 lists any errors and cannot change the rules. An error stops the suggestion.
 There are no retries or repair loop. This keeps the workflow to two AI requests
 while adding a content check that code cannot provide.
 
-Pagination remains outside rules version 1 until a pilot proves the required
-page behavior. Code validates the returned rules and source kind before it
-stores a revision. The system records the AI model name and instructions
-version. An admin must still preview and activate the result.
+Code validates the returned rules and source kind before it stores a revision.
+The system records the AI model name and instructions version. An admin must
+still preview and activate the result.
 
 ## Admin Flow
 
-1. Add a site and its first review or price source from its website URL.
-2. Enter rules or ask AI to create and review a suggestion.
-3. Preview the parsed fields from current pages.
+1. Add a site and choose reviews or prices.
+2. AI discovers the pages and creates an inactive revision.
+3. Review and preview the parsed fields from current pages.
 4. Activate a passing revision.
 5. Use history to repair, roll back, or pause the source.
 

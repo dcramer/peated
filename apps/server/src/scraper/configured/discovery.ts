@@ -119,7 +119,8 @@ export function findLikelyDetailPages(input: {
           url.origin !== pageUrl.origin ||
           url.username ||
           url.password ||
-          pageUrls.has(url.toString())
+          pageUrls.has(url.toString()) ||
+          (url.pathname === pageUrl.pathname && url.search !== pageUrl.search)
         ) {
           continue;
         }

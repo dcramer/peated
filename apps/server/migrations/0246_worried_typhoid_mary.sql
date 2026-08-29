@@ -1,0 +1,1 @@
+ALTER TABLE "scrape_source" DROP COLUMN "allow_ai_suggestions";

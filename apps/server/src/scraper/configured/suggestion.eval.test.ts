@@ -21,8 +21,10 @@ import { createSiteWithScrapeSource } from "./service";
 const SITE_ORIGIN = "https://review-fixture.test";
 const HOME_URL = `${SITE_ORIGIN}/`;
 const LIST_URL = `${SITE_ORIGIN}/reviews`;
+const SECOND_LIST_URL = `${SITE_ORIGIN}/reviews?page=2`;
 const FIRST_REVIEW_URL = `${SITE_ORIGIN}/reviews/autumn-notes`;
 const SECOND_REVIEW_URL = `${SITE_ORIGIN}/reviews/island-notes`;
+const THIRD_REVIEW_URL = `${SITE_ORIGIN}/reviews/highland-notes`;
 
 const WEBSITE_PAGES = new Map([
   [
@@ -52,6 +54,24 @@ const WEBSITE_PAGES = new Map([
             <article class="review-card">
               <h2>Island bottle notes</h2>
               <a class="review-card__link" href="/reviews/island-notes">Read reviews</a>
+            </article>
+            <nav aria-label="Review pages">
+              <a class="pagination-next" href="/reviews?page=2">Next</a>
+            </nav>
+          </main>
+        </body>
+      </html>`,
+  ],
+  [
+    SECOND_LIST_URL,
+    `<!doctype html>
+      <html lang="en">
+        <body>
+          <main>
+            <h1>Earlier whisky reviews</h1>
+            <article class="review-card">
+              <h2>Highland bottle notes</h2>
+              <a class="review-card__link" href="/reviews/highland-notes">Read reviews</a>
             </article>
           </main>
         </body>
@@ -107,6 +127,28 @@ const WEBSITE_PAGES = new Map([
         </body>
       </html>`,
   ],
+  [
+    THIRD_REVIEW_URL,
+    `<!doctype html>
+      <html lang="en">
+        <body>
+          <main>
+            <article class="review-article">
+              <header>
+                <h1 class="article-title">Highland bottle notes</h1>
+                <time class="published-date" datetime="2026-08-13">August 13, 2026</time>
+              </header>
+              <section class="bottle-review">
+                <h2 class="bottle-name">Hill Farm 10 Year</h2>
+                <p>Reviewed by <span class="reviewer-name">Jon Bell</span></p>
+                <p>Score: <span class="review-score">89 / 100</span></p>
+                <p class="review-notes">Apple skin, malt, and gentle spice.</p>
+              </section>
+            </article>
+          </main>
+        </body>
+      </html>`,
+  ],
 ]);
 
 function getFixtureHtml(url: string) {
@@ -149,7 +191,6 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       if (!admin) throw new Error("Failed to create eval admin.");
 
       const { site, source } = await createSiteWithScrapeSource({
-        allowAiSuggestions: true,
         createdById: admin.id,
         kind: "review",
         websiteUrl: HOME_URL,
@@ -182,7 +223,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         .from(scrapeSourceRevisions)
         .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
       expect(suggestedRevision).toMatchObject({
-        aiInstructionsVersion: "scrape-source-v3",
+        aiInstructionsVersion: "scrape-source-v4",
         author: "ai",
         listUrl: LIST_URL,
         previewStatus: "pending",
@@ -191,6 +232,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       expect(suggestedRevision.aiModel).toBeTruthy();
       expect(suggestedRevision.rules).toMatchObject({
         kind: "review",
+        list: { nextPage: expect.any(Object) },
         detail: {
           publishedAt: expect.any(Object),
           reviewerName: expect.any(Object),
@@ -211,8 +253,13 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       expect(listResult).toEqual({
         issues: [],
         links: [FIRST_REVIEW_URL, SECOND_REVIEW_URL],
+        nextPageUrl: SECOND_LIST_URL,
       });
-      const parsedPages = [FIRST_REVIEW_URL, SECOND_REVIEW_URL].map((url) => {
+      const parsedPages = [
+        FIRST_REVIEW_URL,
+        SECOND_REVIEW_URL,
+        THIRD_REVIEW_URL,
+      ].map((url) => {
         const result = parseScrapeDetail(
           rules,
           getFixtureHtml(url),
@@ -265,6 +312,18 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
             },
           ],
         },
+        {
+          title: "Highland bottle notes",
+          publishedAt: "2026-08-13T00:00:00.000Z",
+          reviews: [
+            {
+              name: "Hill Farm 10 Year",
+              reviewerName: "Jon Bell",
+              nativeScore: { display: "89 / 100", scale: 100, value: 89 },
+              reviewText: "Apple skin, malt, and gentle spice.",
+            },
+          ],
+        },
       ]);
 
       const [suggestionLink] = await db
@@ -302,15 +361,19 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         previewedRevision?.previewResult,
       );
       expect(preview.issues).toEqual([]);
-      expect(preview.pages).toHaveLength(2);
+      expect(preview.pages).toHaveLength(3);
       expect(fixtureWebsite.requests).toEqual([
         HOME_URL,
         LIST_URL,
         FIRST_REVIEW_URL,
         SECOND_REVIEW_URL,
+        SECOND_LIST_URL,
+        THIRD_REVIEW_URL,
         LIST_URL,
+        SECOND_LIST_URL,
         FIRST_REVIEW_URL,
         SECOND_REVIEW_URL,
+        THIRD_REVIEW_URL,
       ]);
     });
   },

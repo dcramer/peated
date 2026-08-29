@@ -6,7 +6,7 @@ import {
   scrapeSources,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { parseScrapeRules } from "./rules";
+import { SCRAPE_SOURCE_MAX_LIST_PAGES, parseScrapeRules } from "./rules";
 import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,
@@ -62,7 +62,7 @@ export async function createPinnedScrapeSourceRun(
       externalSiteId: source.externalSiteId,
       trigger: input.trigger,
       requestedById: input.requestedById,
-      requestLimit: rules.list.maxItems + 1,
+      requestLimit: rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
     })
     .returning();
   if (!run) throw new Error("Failed to create source run.");
@@ -86,11 +86,6 @@ export async function createScrapeSourceSuggestionRun(input: {
       .where(eq(scrapeSources.id, input.scrapeSourceId))
       .for("update");
     if (!source) throw new ScrapeSourceNotFoundError();
-    if (!source.allowAiSuggestions) {
-      throw new ScrapeSourceValidationError(
-        "AI suggestions are not allowed for this source.",
-      );
-    }
     const [latestRevision] = await tx
       .select({
         previewStatus: scrapeSourceRevisions.previewStatus,

@@ -60,3 +60,11 @@
 - [x] 7.3 Run one manual admin smoke check without browser test coverage
 - [ ] 7.4 Pilot one review source and one simple price source
 - [x] 7.5 Run focused tests, both live suggestion evals, typecheck, lint, format, and OpenSpec validation
+
+## 8. Guided AI Setup And Pagination
+
+- [x] 8.1 Remove the AI opt-out and queue AI setup when an admin adds a site
+- [x] 8.2 Add an optional next-page selector with a code-owned five-page limit
+- [x] 8.3 Prove pagination with parser, runtime, route, and live eval coverage
+- [x] 8.4 Update the admin flow and plain-language documentation
+- [x] 8.5 Run focused tests, both live evals, typecheck, lint, format, and OpenSpec validation

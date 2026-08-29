@@ -54,9 +54,6 @@ export const scrapeSources = pgTable(
       .notNull(),
     kind: scrapeSourceKindEnum("kind").notNull(),
     enabled: boolean("enabled").default(false).notNull(),
-    allowAiSuggestions: boolean("allow_ai_suggestions")
-      .default(false)
-      .notNull(),
     listUrl: text("list_url").notNull(),
     sampleUrls: jsonb("sample_urls").$type<string[]>().default([]).notNull(),
     createdById: bigint("created_by_id", { mode: "number" }).references(

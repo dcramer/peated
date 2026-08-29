@@ -5,7 +5,7 @@ export const SCRAPE_RULES_VERSION = 1;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
-// One list request plus every detail request must fit the 100-request run budget.
+export const SCRAPE_SOURCE_MAX_LIST_PAGES = 5;
 export const SCRAPE_SOURCE_MAX_ITEMS = 99;
 
 export const ScrapeSelectorSchema = z
@@ -29,6 +29,7 @@ export const ScrapeValueSelectorSchema = z
 const ListRulesSchema = z
   .object({
     detailLink: ScrapeValueSelectorSchema,
+    nextPage: ScrapeValueSelectorSchema.optional(),
     maxItems: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS).default(25),
   })
   .strict();

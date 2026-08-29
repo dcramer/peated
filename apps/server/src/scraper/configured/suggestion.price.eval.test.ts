@@ -21,8 +21,10 @@ import { createSiteWithScrapeSource } from "./service";
 const SITE_ORIGIN = "https://price-fixture.test";
 const HOME_URL = `${SITE_ORIGIN}/`;
 const LIST_URL = `${SITE_ORIGIN}/shop`;
+const SECOND_LIST_URL = `${SITE_ORIGIN}/shop?page=2`;
 const FIRST_PRODUCT_URL = `${SITE_ORIGIN}/products/coastal-12`;
 const SECOND_PRODUCT_URL = `${SITE_ORIGIN}/products/orchard-blend`;
+const THIRD_PRODUCT_URL = `${SITE_ORIGIN}/products/highland-cask`;
 
 const WEBSITE_PAGES = new Map([
   [
@@ -52,6 +54,24 @@ const WEBSITE_PAGES = new Map([
             <article class="product-card">
               <h2>Orchard Blend</h2>
               <a class="product-card__link" href="/products/orchard-blend">View product</a>
+            </article>
+            <nav aria-label="Shop pages">
+              <a class="pagination-next" href="/shop?page=2">Next</a>
+            </nav>
+          </main>
+        </body>
+      </html>`,
+  ],
+  [
+    SECOND_LIST_URL,
+    `<!doctype html>
+      <html lang="en">
+        <body>
+          <main>
+            <h1>More whisky</h1>
+            <article class="product-card">
+              <h2>Highland Cask</h2>
+              <a class="product-card__link" href="/products/highland-cask">View product</a>
             </article>
           </main>
         </body>
@@ -83,6 +103,21 @@ const WEBSITE_PAGES = new Map([
             <p class="product-volume">70 cl</p>
             <span class="product-sku">ORCHARD-70</span>
             <img class="product-image" src="https://price-fixture.test/images/orchard-blend.jpg" alt="Orchard Blend bottle">
+          </main>
+        </body>
+      </html>`,
+  ],
+  [
+    THIRD_PRODUCT_URL,
+    `<!doctype html>
+      <html lang="en">
+        <body>
+          <main class="product-page">
+            <h1 class="product-title">Highland Cask</h1>
+            <p class="product-price">$72.00</p>
+            <p class="product-volume">700 ml</p>
+            <span class="product-sku">HIGHLAND-700</span>
+            <img class="product-image" src="https://price-fixture.test/images/highland-cask.jpg" alt="Highland Cask bottle">
           </main>
         </body>
       </html>`,
@@ -129,7 +164,6 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       if (!admin) throw new Error("Failed to create eval admin.");
 
       const { site, source } = await createSiteWithScrapeSource({
-        allowAiSuggestions: true,
         createdById: admin.id,
         kind: "price",
         websiteUrl: HOME_URL,
@@ -162,7 +196,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         .from(scrapeSourceRevisions)
         .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
       expect(suggestedRevision).toMatchObject({
-        aiInstructionsVersion: "scrape-source-v3",
+        aiInstructionsVersion: "scrape-source-v4",
         author: "ai",
         listUrl: LIST_URL,
         previewStatus: "pending",
@@ -171,6 +205,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       expect(suggestedRevision.aiModel).toBeTruthy();
       expect(suggestedRevision.rules).toMatchObject({
         kind: "price",
+        list: { nextPage: expect.any(Object) },
         detail: {
           externalProductId: expect.any(Object),
           imageUrl: expect.any(Object),
@@ -189,8 +224,13 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       expect(listResult).toEqual({
         issues: [],
         links: [FIRST_PRODUCT_URL, SECOND_PRODUCT_URL],
+        nextPageUrl: SECOND_LIST_URL,
       });
-      const parsedPages = [FIRST_PRODUCT_URL, SECOND_PRODUCT_URL].map((url) => {
+      const parsedPages = [
+        FIRST_PRODUCT_URL,
+        SECOND_PRODUCT_URL,
+        THIRD_PRODUCT_URL,
+      ].map((url) => {
         const result = parseScrapeDetail(
           rules,
           getFixtureHtml(url),
@@ -205,6 +245,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       expect(parsedPages).toEqual([
         [
           {
+            barcode: undefined,
             currency: "usd",
             externalProductId: "COASTAL-12-750",
             imageUrl: "https://price-fixture.test/images/coastal-12.jpg",
@@ -216,12 +257,25 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         ],
         [
           {
+            barcode: undefined,
             currency: "usd",
             externalProductId: "ORCHARD-70",
             imageUrl: "https://price-fixture.test/images/orchard-blend.jpg",
             name: "Orchard Blend",
             price: 12950,
             url: SECOND_PRODUCT_URL,
+            volume: 700,
+          },
+        ],
+        [
+          {
+            barcode: undefined,
+            currency: "usd",
+            externalProductId: "HIGHLAND-700",
+            imageUrl: "https://price-fixture.test/images/highland-cask.jpg",
+            name: "Highland Cask",
+            price: 7200,
+            url: THIRD_PRODUCT_URL,
             volume: 700,
           },
         ],
@@ -262,15 +316,19 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         previewedRevision?.previewResult,
       );
       expect(preview.issues).toEqual([]);
-      expect(preview.pages).toHaveLength(2);
+      expect(preview.pages).toHaveLength(3);
       expect(fixtureWebsite.requests).toEqual([
         HOME_URL,
         LIST_URL,
         FIRST_PRODUCT_URL,
         SECOND_PRODUCT_URL,
+        SECOND_LIST_URL,
+        THIRD_PRODUCT_URL,
         LIST_URL,
+        SECOND_LIST_URL,
         FIRST_PRODUCT_URL,
         SECOND_PRODUCT_URL,
+        THIRD_PRODUCT_URL,
       ]);
     });
   },

@@ -115,7 +115,6 @@ export async function createSiteWithScrapeSource(
           sampleUrls: input.sampleUrls.map((value) =>
             new URL(value).toString(),
           ),
-          allowAiSuggestions: input.allowAiSuggestions,
           createdById: input.createdById,
         })
         .returning();
@@ -175,11 +174,6 @@ export async function createScrapeSourceRevision(
     if (source.kind !== rules.kind) {
       throw new ScrapeSourceValidationError(
         "The parsing rules collect the wrong content.",
-      );
-    }
-    if (input.author === "ai" && !source.allowAiSuggestions) {
-      throw new ScrapeSourceValidationError(
-        "AI suggestions are not allowed for this source.",
       );
     }
     const [latest] = await tx

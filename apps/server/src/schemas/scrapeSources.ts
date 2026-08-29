@@ -20,7 +20,6 @@ export const ScrapeSourceCreateSchema = z
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
     websiteUrl: ScrapeSourceUrlSchema,
     sampleUrls: z.array(ScrapeSourceUrlSchema).max(10).default([]),
-    allowAiSuggestions: z.boolean().default(true),
   })
   .strict();
 
@@ -59,7 +58,6 @@ export const ScrapeSourceSchema = z
     site: ExternalSiteSchema,
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
     enabled: z.boolean(),
-    allowAiSuggestions: z.boolean(),
     listUrl: ScrapeSourceUrlSchema,
     sampleUrls: z.array(ScrapeSourceUrlSchema),
     activeRevisionId: z.number().int().positive().nullable(),

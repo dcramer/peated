@@ -20,7 +20,6 @@ export default function Page() {
   );
   const [error, setError] = useState<string>();
   const [kind, setKind] = useState<"review" | "price">("review");
-  const [allowAiSuggestions, setAllowAiSuggestions] = useState(true);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,7 +37,6 @@ export default function Page() {
           .split("\n")
           .map((value) => value.trim())
           .filter(Boolean),
-        allowAiSuggestions,
       });
       router.push(`/admin/sites/${source.site.type}/parsing`);
     } catch (err) {
@@ -94,14 +92,10 @@ export default function Page() {
               placeholder="One URL per line"
             />
           </label>
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={allowAiSuggestions}
-              onChange={(event) => setAllowAiSuggestions(event.target.checked)}
-            />
-            <span>Use AI to find the right page and create parsing rules</span>
-          </label>
+          <p className="text-muted text-sm">
+            Peated will find the list, detail fields, and next pages. You will
+            review the result before collection starts.
+          </p>
         </Fieldset>
         <div className="flex justify-end gap-2">
           <Button href="/admin/sites">Cancel</Button>
