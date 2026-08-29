@@ -98,6 +98,10 @@ AI has no tools. No revision is saved unless the code checks and AI review pass.
 The AI provider does not store request content. An admin must still test and
 activate the inactive revision. AI never changes the active revision directly.
 
+`pnpm evals:scraper` checks rule generation with fixed website fixtures and the
+live AI service. Normal test runs exclude these checks. Add the `trigger-evals`
+label to a pull request to run them in CI.
+
 ## Source acceptance rules
 
 Every new or changed source must satisfy this contract. Prove a rule at the
@@ -113,7 +117,7 @@ listed owner. Do not repeat a runtime test in every adapter.
 | Observation keys are stable across runs. They are unique within their storage scope.                                                                                                            | The adapter owns source identity. Parser tests prove stable keys, multi-item keys, and known collision cases.                                                                |
 | Parsed output uses the registered strict schema. Product writes happen only in the registered sink.                                                                                             | The session and registry own validation and sink selection. Registry and sink tests prove it.                                                                                |
 | Expected remote deferrals remain non-terminal. Unexpected markup, validation, and persistence failures fail the run.                                                                            | The runtime owns deferrals. The adapter owns the difference between an expected non-item and malformed source data.                                                          |
-| A source change passes deterministic fixtures and one local acceptance run against the current public source.                                                                                   | The source author runs the registered adapter through the local runtime and inspects the run, cursor, request count, and emitted observations. Live checks do not run in CI. |
+| A source change passes deterministic fixtures and one local acceptance run against the current public source.                                                                                   | The source author runs the registered adapter through the local runtime and inspects the run, cursor, request count, and emitted observations. Live checks use the CI label. |
 | The first production run is checked in Admin → Scrapers and Sentry.                                                                                                                             | The source author confirms status, counts, cursor progress, robots state, and any terminal error.                                                                            |
 
 Keep source-specific facts in the adapter tests and the owning feature or

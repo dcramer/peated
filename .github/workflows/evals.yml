@@ -15,8 +15,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-# Model behavior has qualitative variance, so the aggregate suite owns the
-# quality gate. Missing or invalid result reports remain hard failures.
+# Classifier evals use an aggregate quality gate. Scraper evals require exact
+# parser output from fixed website fixtures.
 env:
   EVAL_MIN_PASS_RATE: "0.8"
 
@@ -139,3 +139,29 @@ jobs:
           # Keep the existing workflow job blocking until branch protection
           # explicitly requires the dedicated Check Run.
           soft-fail: false
+
+  scraper:
+    name: "evals / scraper"
+    needs: gate
+    if: needs.gate.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    env:
+      AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.18.0"
+          cache: "pnpm"
+
+      - run: docker compose up -d
+      - run: pnpm install --frozen-lockfile
+      - name: Run scraper evals
+        run: pnpm evals:scraper

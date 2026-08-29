@@ -9,7 +9,9 @@ import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
 import { and, eq } from "drizzle-orm";
 import { createScraperRegistry } from "../definitions";
 import { executeScraperRun } from "../runs";
+import { parseScrapeDetail, parseScrapeList } from "./parser";
 import { ScrapeSourcePreviewResultSchema } from "./preview";
+import { parseScrapeRules } from "./rules";
 import {
   createPinnedScrapeSourceRun,
   createScrapeSourceSuggestionRun,
@@ -87,6 +89,14 @@ const WEBSITE_PAGES = new Map([
   ],
 ]);
 
+function getFixtureHtml(url: string) {
+  const html = WEBSITE_PAGES.get(url);
+  if (html === undefined) {
+    throw new Error(`Missing fixture page: ${url}`);
+  }
+  return html;
+}
+
 function createFixtureWebsite() {
   const requests: string[] = [];
   const fetchImpl: typeof fetch = async (input) => {
@@ -105,9 +115,9 @@ function createFixtureWebsite() {
 }
 
 describe.skipIf(!isAIGatewayConfigured("scraper"))(
-  "price scrape source suggestion eval",
+  "price rule suggestion eval",
   () => {
-    test("creates and previews price rules from fixture website HTML", async () => {
+    test("generated selectors extract the exact price fields", async () => {
       const [admin] = await db
         .insert(users)
         .values({
@@ -167,6 +177,56 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         },
       });
 
+      const rules = parseScrapeRules(
+        suggestedRevision.rulesVersion,
+        suggestedRevision.rules,
+      );
+      const listResult = parseScrapeList(
+        rules,
+        getFixtureHtml(LIST_URL),
+        new URL(LIST_URL),
+      );
+      expect(listResult).toEqual({
+        issues: [],
+        links: [FIRST_PRODUCT_URL, SECOND_PRODUCT_URL],
+      });
+      const parsedPages = [FIRST_PRODUCT_URL, SECOND_PRODUCT_URL].map((url) => {
+        const result = parseScrapeDetail(
+          rules,
+          getFixtureHtml(url),
+          new URL(url),
+        );
+        expect(result.issues).toEqual([]);
+        if (result.kind !== "price") {
+          throw new Error("Generated rules did not parse a price page.");
+        }
+        return result.value;
+      });
+      expect(parsedPages).toEqual([
+        [
+          {
+            currency: "usd",
+            externalProductId: "COASTAL-12-750",
+            imageUrl: "https://price-fixture.test/images/coastal-12.jpg",
+            name: "Coastal 12 Year",
+            price: 8499,
+            url: FIRST_PRODUCT_URL,
+            volume: 750,
+          },
+        ],
+        [
+          {
+            currency: "usd",
+            externalProductId: "ORCHARD-70",
+            imageUrl: "https://price-fixture.test/images/orchard-blend.jpg",
+            name: "Orchard Blend",
+            price: 12950,
+            url: SECOND_PRODUCT_URL,
+            volume: 700,
+          },
+        ],
+      ]);
+
       const [suggestionLink] = await db
         .select()
         .from(scrapeSourceRuns)
@@ -202,34 +262,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         previewedRevision?.previewResult,
       );
       expect(preview.issues).toEqual([]);
-      expect(preview.pages).toEqual([
-        {
-          kind: "price",
-          products: [
-            expect.objectContaining({
-              currency: "usd",
-              name: "Coastal 12 Year",
-              price: 8499,
-              url: FIRST_PRODUCT_URL,
-              volume: 750,
-            }),
-          ],
-          url: FIRST_PRODUCT_URL,
-        },
-        {
-          kind: "price",
-          products: [
-            expect.objectContaining({
-              currency: "usd",
-              name: "Orchard Blend",
-              price: 12950,
-              url: SECOND_PRODUCT_URL,
-              volume: 700,
-            }),
-          ],
-          url: SECOND_PRODUCT_URL,
-        },
-      ]);
+      expect(preview.pages).toHaveLength(2);
       expect(fixtureWebsite.requests).toEqual([
         HOME_URL,
         LIST_URL,

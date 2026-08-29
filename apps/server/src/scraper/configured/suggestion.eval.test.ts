@@ -9,7 +9,9 @@ import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
 import { and, eq } from "drizzle-orm";
 import { createScraperRegistry } from "../definitions";
 import { executeScraperRun } from "../runs";
+import { parseScrapeDetail, parseScrapeList } from "./parser";
 import { ScrapeSourcePreviewResultSchema } from "./preview";
+import { parseScrapeRules } from "./rules";
 import {
   createPinnedScrapeSourceRun,
   createScrapeSourceSuggestionRun,
@@ -107,6 +109,14 @@ const WEBSITE_PAGES = new Map([
   ],
 ]);
 
+function getFixtureHtml(url: string) {
+  const html = WEBSITE_PAGES.get(url);
+  if (html === undefined) {
+    throw new Error(`Missing fixture page: ${url}`);
+  }
+  return html;
+}
+
 function createFixtureWebsite() {
   const requests: string[] = [];
   const fetchImpl: typeof fetch = async (input) => {
@@ -125,9 +135,9 @@ function createFixtureWebsite() {
 }
 
 describe.skipIf(!isAIGatewayConfigured("scraper"))(
-  "scrape source suggestion eval",
+  "review rule suggestion eval",
   () => {
-    test("creates and previews review rules from fixture website HTML", async () => {
+    test("generated selectors extract the exact review fields", async () => {
       const [admin] = await db
         .insert(users)
         .values({
@@ -189,6 +199,74 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         },
       });
 
+      const rules = parseScrapeRules(
+        suggestedRevision.rulesVersion,
+        suggestedRevision.rules,
+      );
+      const listResult = parseScrapeList(
+        rules,
+        getFixtureHtml(LIST_URL),
+        new URL(LIST_URL),
+      );
+      expect(listResult).toEqual({
+        issues: [],
+        links: [FIRST_REVIEW_URL, SECOND_REVIEW_URL],
+      });
+      const parsedPages = [FIRST_REVIEW_URL, SECOND_REVIEW_URL].map((url) => {
+        const result = parseScrapeDetail(
+          rules,
+          getFixtureHtml(url),
+          new URL(url),
+        );
+        expect(result.issues).toEqual([]);
+        if (result.kind !== "review" || !result.value) {
+          throw new Error("Generated rules did not parse a review page.");
+        }
+        const value = result.value;
+        return {
+          title: value.article.title,
+          publishedAt: value.article.publishedAt?.toISOString() ?? null,
+          reviews: value.article.externalReviews.map((review) => ({
+            name: review.name,
+            reviewerName: review.reviewerName,
+            nativeScore: review.nativeScore,
+            reviewText: value.externalReviewTexts[review.sourceKey] ?? null,
+          })),
+        };
+      });
+      expect(parsedPages).toEqual([
+        {
+          title: "Autumn bottle notes",
+          publishedAt: "2026-08-20T00:00:00.000Z",
+          reviews: [
+            {
+              name: "North Coast 12 Year",
+              reviewerName: "Mara Vale",
+              nativeScore: { display: "91 / 100", scale: 100, value: 91 },
+              reviewText: "Orange peel, toasted grain, and a dry finish.",
+            },
+            {
+              name: "Harbor Blend Batch 4",
+              reviewerName: "Jon Bell",
+              nativeScore: { display: "87 / 100", scale: 100, value: 87 },
+              reviewText: "Honey, pepper, and soft oak.",
+            },
+          ],
+        },
+        {
+          title: "Island bottle notes",
+          publishedAt: "2026-08-27T00:00:00.000Z",
+          reviews: [
+            {
+              name: "West Isle Peated Malt",
+              reviewerName: "Mara Vale",
+              nativeScore: { display: "93 / 100", scale: 100, value: 93 },
+              reviewText: "Coastal smoke, lemon oil, and mineral notes.",
+            },
+          ],
+        },
+      ]);
+
       const [suggestionLink] = await db
         .select()
         .from(scrapeSourceRuns)
@@ -224,39 +302,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         previewedRevision?.previewResult,
       );
       expect(preview.issues).toEqual([]);
-      expect(preview.pages).toEqual([
-        {
-          kind: "review",
-          publishedAt: "2026-08-20T00:00:00.000Z",
-          reviews: [
-            {
-              name: "North Coast 12 Year",
-              nativeScore: { display: "91 / 100", scale: 100, value: 91 },
-              reviewerName: "Mara Vale",
-            },
-            {
-              name: "Harbor Blend Batch 4",
-              nativeScore: { display: "87 / 100", scale: 100, value: 87 },
-              reviewerName: "Jon Bell",
-            },
-          ],
-          title: "Autumn bottle notes",
-          url: FIRST_REVIEW_URL,
-        },
-        {
-          kind: "review",
-          publishedAt: "2026-08-27T00:00:00.000Z",
-          reviews: [
-            {
-              name: "West Isle Peated Malt",
-              nativeScore: { display: "93 / 100", scale: 100, value: 93 },
-              reviewerName: "Mara Vale",
-            },
-          ],
-          title: "Island bottle notes",
-          url: SECOND_REVIEW_URL,
-        },
-      ]);
+      expect(preview.pages).toHaveLength(2);
       expect(fixtureWebsite.requests).toEqual([
         HOME_URL,
         LIST_URL,
