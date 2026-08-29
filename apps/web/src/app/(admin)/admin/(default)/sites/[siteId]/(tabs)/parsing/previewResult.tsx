@@ -1,4 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
+import issueText from "./issueText";
 
 type Source = Outputs["externalSites"]["scrapeSources"]["list"][number];
 type Revision = Source["revisions"][number];
@@ -10,9 +11,7 @@ export default function PreviewResult({ revision }: { revision: Revision }) {
       {issues.length > 0 && (
         <ul className="list-disc space-y-1 pl-5 text-red-300">
           {issues.map((issue, index) => (
-            <li key={`${issue.field}-${index}`}>
-              {issue.field}: {issue.message}
-            </li>
+            <li key={`${issue.field}-${index}`}>{issueText(issue.field)}</li>
           ))}
         </ul>
       )}

@@ -1,5 +1,36 @@
 import type { ScrapeIssue } from "./preview";
 
+const SETUP_FIELD_LABELS = {
+  kind: "Content type",
+  listPageUrl: "Collection page",
+  "list.detailLink": "Item links",
+  "list.nextPage": "Next page",
+  "detail.title": "Page title",
+  "detail.publishedAt": "Published date",
+  "detail.reviewItem": "Reviews",
+  "detail.name": "Item name",
+  "detail.reviewerName": "Reviewer name",
+  "detail.reviewText": "Review text",
+  "detail.score": "Score",
+  "detail.price": "Price",
+  "detail.currency": "Currency",
+  "detail.volume": "Bottle size",
+  "detail.url": "Product link",
+  "detail.externalProductId": "Product ID",
+  "detail.imageUrl": "Image",
+  "detail.barcode": "Barcode",
+  output: "AI response",
+};
+
+function setupFieldLabel(field: string) {
+  if (field.includes(".name")) return "Item name";
+  if (field.includes(".score")) return "Score";
+  return (
+    Object.entries(SETUP_FIELD_LABELS).find(([key]) => key === field)?.[1] ??
+    "Page details"
+  );
+}
+
 export type ScrapeSourceSetupFeedback = {
   message: string;
   issues: ScrapeIssue[];
@@ -22,5 +53,16 @@ export class ScrapeSourceSetupError extends Error {
 
   feedback(): ScrapeSourceSetupFeedback {
     return { message: this.summary, issues: this.issues };
+  }
+
+  adminMessage() {
+    const fields = [
+      ...new Set(
+        this.issues.slice(0, 3).map(({ field }) => setupFieldLabel(field)),
+      ),
+    ];
+    return fields.length > 0
+      ? `AI could not finish setup. Check: ${fields.join(", ")}.`
+      : "AI could not finish setup for this site.";
   }
 }

@@ -98,8 +98,8 @@ export default function Page() {
             </span>
           </label>
           <p className="text-muted text-sm">
-            Peated will find the list, detail fields, and next pages. You will
-            review the result before collection starts.
+            Peated will find the pages and information to collect. You will
+            preview the result before collection starts.
           </p>
         </Fieldset>
         <div className="flex justify-end gap-2">

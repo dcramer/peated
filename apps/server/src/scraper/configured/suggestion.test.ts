@@ -82,6 +82,21 @@ test("does not retry an unexpected setup failure", async () => {
   expect(attempt).toHaveBeenCalledOnce();
 });
 
+test("keeps internal field names out of admin setup errors", () => {
+  const error = new ScrapeSourceSetupError("The list rule failed.", [
+    {
+      field: "list.detailLink",
+      message: "The selector did not find any detail links.",
+    },
+  ]);
+
+  expect(error.adminMessage()).toBe(
+    "AI could not finish setup. Check: Item links.",
+  );
+  expect(error.adminMessage()).not.toContain("detailLink");
+  expect(error.adminMessage()).not.toContain("selector");
+});
+
 test("bounds total AI input while keeping every sample page", () => {
   const pages = Array.from({ length: 10 }, (_, index) => ({
     url: `https://example.test/${index}`,

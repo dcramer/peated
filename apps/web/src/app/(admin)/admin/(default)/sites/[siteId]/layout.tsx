@@ -183,7 +183,7 @@ export default function Layout(props: {
           href={`/admin/sites/${site.type}/parsing`}
           controlled
         >
-          Parsing
+          Setup
         </TabItem>
       </Tabs>
 

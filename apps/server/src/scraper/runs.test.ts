@@ -205,7 +205,7 @@ test("stores an expected setup failure without failing the worker", async () => 
     .where(eq(externalSiteRuns.id, run.id));
   expect(stored).toMatchObject({
     status: "failed",
-    error: "AI setup needs attention. detail.name: The name was not found.",
+    error: "AI could not finish setup. Check: Item name.",
   });
 });
 

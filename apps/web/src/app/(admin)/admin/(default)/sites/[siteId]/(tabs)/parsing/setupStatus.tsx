@@ -88,10 +88,10 @@ export function SetupNotice({
   const title =
     setup?.status === "running"
       ? hasRevision
-        ? "AI is repairing the parsing rules"
-        : "AI is building the parsing rules"
+        ? "AI is updating the site setup"
+        : "AI is setting up this site"
       : setup?.status === "failed"
-        ? "AI setup could not create working rules"
+        ? "AI could not finish setup"
         : setup?.status === "succeeded"
           ? "AI setup finished"
           : setup?.status === "queued"
@@ -99,16 +99,16 @@ export function SetupNotice({
             : "AI setup has not started";
   const description =
     setup?.status === "running"
-      ? `Peated is finding the list, next page, and ${
-          source.kind === "review" ? "review" : "product"
-        } details. It will repair one failed attempt automatically.`
+      ? `Peated is finding the pages and ${
+          source.kind === "review" ? "review details" : "product information"
+        }. It will correct one failed attempt automatically.`
       : setup?.status === "queued"
-        ? "A scraper worker will start this setup. This page refreshes automatically."
+        ? "Setup will start shortly. This page refreshes automatically."
         : setup?.status === "succeeded"
-          ? "The generated revision is loading."
+          ? "The new version is loading."
           : setup?.status === "failed"
             ? "Review the reason below, then retry if the site is available."
-            : "Start AI setup to create the first revision.";
+            : "Start AI setup to create the first version.";
 
   return (
     <section

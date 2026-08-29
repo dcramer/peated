@@ -43,7 +43,7 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
     },
   });
   const source = sources[0];
-  if (!source) throw new Error("Parsing rules not found.");
+  if (!source) throw new Error("Site setup not found.");
 
   return (
     <ConfigEditor
@@ -132,8 +132,8 @@ function ConfigEditor({
           </h1>
           <p className="text-muted mt-1 text-sm">
             {activeRevision
-              ? `Revision ${activeRevision.revision} is active.`
-              : "Collection stays paused until you preview and activate a revision."}
+              ? `Version ${activeRevision.revision} is active.`
+              : "Collection stays paused until you preview and activate a version."}
           </p>
         </div>
         <div className="flex gap-2">
@@ -166,7 +166,7 @@ function ConfigEditor({
 
       {latest && (
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-white">Revisions</h2>
+          <h2 className="text-xl font-semibold text-white">Versions</h2>
           {source.revisions.map((revision) => (
             <div
               key={revision.id}
@@ -175,7 +175,7 @@ function ConfigEditor({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="font-semibold text-white">
-                    Revision {revision.revision}
+                    Version {revision.revision}
                     {revision.id === source.activeRevisionId && " · Active"}
                   </div>
                   <div className="text-muted mt-1 text-sm">
@@ -217,7 +217,7 @@ function ConfigEditor({
                       })
                     }
                   >
-                    Preview revision
+                    Preview version
                   </Button>
                   <Button
                     color="highlight"
@@ -250,18 +250,18 @@ function ConfigEditor({
       {latest && (
         <details className="rounded border border-slate-800 bg-slate-950 p-4">
           <summary className="cursor-pointer font-semibold text-white">
-            Edit parsing rules <span className="text-muted">(advanced)</span>
+            Edit site setup <span className="text-muted">(advanced)</span>
           </summary>
           <p className="text-muted mt-3 text-sm">
-            Use this only when you need to correct the generated rules by hand.
-            Saving creates a new revision.
+            Use this only when you need to correct the generated setup by hand.
+            Saving creates a new version.
           </p>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <label
               className="mt-4 block font-semibold text-white"
               htmlFor="list-url"
             >
-              List page
+              Collection page
             </label>
           </div>
           <input
@@ -293,7 +293,7 @@ function ConfigEditor({
                 })
               }
             >
-              Save as new revision
+              Save as new version
             </Button>
           </div>
         </details>

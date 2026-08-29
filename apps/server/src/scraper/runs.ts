@@ -57,7 +57,7 @@ export type ScraperRunExecutionResult =
 
 function safeRunError(error: Error) {
   if (error instanceof ScraperTargetDisabledError) return error.message;
-  if (error instanceof ScrapeSourceSetupError) return error.message;
+  if (error instanceof ScrapeSourceSetupError) return error.adminMessage();
   if (error instanceof z.ZodError) return "Scraper data failed validation.";
   if (error instanceof ScraperRobotsDeniedError) {
     return "Robots policy disallows this scraper path.";
