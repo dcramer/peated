@@ -368,7 +368,7 @@ export function NotePicker({
         </p>
         {onConfirm ? (
           <Button onClick={() => onConfirm(value)} size="md" variant="accent">
-            {`Use ${value.length} ${value.length === 1 ? "note" : "notes"}`}
+            Done
           </Button>
         ) : null}
       </footer>

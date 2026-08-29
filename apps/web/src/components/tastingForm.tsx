@@ -1,23 +1,25 @@
 "use client";
 
-import { SERVING_STYLE_LIST } from "@peated/server/constants";
+import { COLOR_SCALE, SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
 import type { User } from "@peated/server/types";
 import {
   ColourInput,
   Field,
-  FieldGroup,
   FormNotice,
   FormSection,
   FormStack,
   MemberPicker,
   NotePickerField,
+  OptionalField,
+  OptionalFieldList,
   PictureInput,
   RatingBandInput,
   Select,
   SelectedBottleSummary,
   Textarea,
+  ValidationMessage,
   type MemberPickerOption,
   type NotePickerOption,
 } from "@peated/web/components/designSystem/components";
@@ -29,6 +31,7 @@ import {
   buildTastingCreateFormSubmission,
   buildTastingEditFormSubmission,
   buildTastingTagOptions,
+  TastingCreateFormFieldsSchema,
   TastingFormFieldsSchema,
   type TastingCreateFormSubmitData,
   type TastingEditFormSubmitData,
@@ -40,7 +43,7 @@ import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import type { z } from "zod";
 
 export type {
@@ -98,8 +101,20 @@ export default function TastingForm(
       servingStyle: initialData.servingStyle,
       tags: initialData.tags,
     },
-    resolver: zodResolver(TastingFormFieldsSchema),
+    resolver: zodResolver(
+      props.mode === "edit"
+        ? TastingFormFieldsSchema
+        : TastingCreateFormFieldsSchema,
+    ),
   });
+  const [ratingBand, selectedTags, selectedColour, notes, servingStyle] =
+    useWatch({
+      control,
+      name: ["ratingBand", "tags", "color", "notes", "servingStyle"],
+    });
+  const tags = selectedTags ?? [];
+  const comments = notes?.trim() ?? "";
+  const needsRating = props.mode !== "edit" && !ratingBand;
   const noteOptions: NotePickerOption[] = buildTastingTagOptions(
     suggestedTags.results,
     initialData.tags ?? [],
@@ -141,7 +156,10 @@ export default function TastingForm(
 
   return (
     <WorkflowScreen
+      mobileSaveBar
       onSave={handleSubmit(submit)}
+      saveDisabled={needsRating}
+      saveHint={needsRating ? "Pick a rating to save." : undefined}
       saveLabel="Save tasting"
       saving={isSubmitting}
       title={title}
@@ -168,132 +186,160 @@ export default function TastingForm(
                   label="How was it"
                   name={field.name}
                   onChange={field.onChange}
+                  required={props.mode !== "edit"}
                   value={field.value ?? null}
                 />
               )}
             />
+            {errors.ratingBand?.message ? (
+              <ValidationMessage>{errors.ratingBand.message}</ValidationMessage>
+            ) : null}
           </FormSection>
-          <FormSection title="Tasting notes">
-            <Controller
-              control={control}
-              name="tags"
-              render={({ field }) => (
-                <FieldGroup
-                  error={errors.tags?.message}
-                  label="Flavours and aromas"
-                  optional
-                >
-                  <NotePickerField
-                    notes={noteOptions}
-                    onChange={field.onChange}
-                    value={field.value ?? []}
-                  />
-                </FieldGroup>
-              )}
-            />
-            <Controller
-              control={control}
-              name="color"
-              render={({ field }) => (
-                <FieldGroup
-                  error={errors.color?.message}
-                  label="Colour"
-                  optional
-                >
-                  <ColourInput
-                    disabled={isSubmitting}
-                    id="tasting-colour"
-                    name={field.name}
-                    onChange={field.onChange}
-                    value={field.value ?? null}
-                  />
-                </FieldGroup>
-              )}
-            />
-            <Field
-              error={errors.notes?.message}
-              hint="Describe the aroma, taste, texture, and finish in your own words."
-              htmlFor="tasting-comments"
-              label="Comments"
-              optional
-            >
-              <Textarea
-                {...register("notes", {
-                  setValueAs: (value) => value || null,
-                })}
-                id="tasting-comments"
-                invalid={Boolean(errors.notes)}
-                placeholder="Tell us how it drank."
-                rows={6}
-              />
-            </Field>
-          </FormSection>
-          <FormSection title="Context">
-            <Field
-              error={errors.servingStyle?.message}
-              htmlFor="tasting-serving-style"
-              label="Served"
-              optional
-            >
-              <Select
-                {...register("servingStyle", {
-                  setValueAs: (value) => value || null,
-                })}
-                id="tasting-serving-style"
-                invalid={Boolean(errors.servingStyle)}
+          <FormSection title="Details">
+            <OptionalFieldList>
+              <OptionalField
+                label="Flavours and aromas"
+                summary={tags.length ? formatListSummary(tags) : "No notes"}
               >
-                <option value="">Not set</option>
-                {SERVING_STYLE_LIST.map((style) => (
-                  <option key={style} value={style}>
-                    {toTitleCase(style)}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Controller
-              control={control}
-              name="friends"
-              render={({ field }) => (
-                <MemberPicker
-                  loading={friendResults.isFetching}
-                  onChange={(nextFriends) => {
-                    setFriends(nextFriends);
-                    field.onChange(nextFriends.map((friend) => friend.id));
-                  }}
-                  onQueryChange={setFriendQuery}
-                  options={(friendResults.data?.results ?? []).map(({ user }) =>
-                    userToMember(user),
+                <Controller
+                  control={control}
+                  name="tags"
+                  render={({ field }) => (
+                    <NotePickerField
+                      notes={noteOptions}
+                      onChange={field.onChange}
+                      value={field.value ?? []}
+                    />
                   )}
-                  value={friends}
                 />
-              )}
-            />
-            <FieldGroup label="Picture" optional>
-              <PictureInput
-                disabled={isSubmitting}
-                id="tasting-picture"
-                name="image"
-                onFilesSelected={(files) => {
-                  const file = files.item(0);
-                  if (!file) return;
-                  setImage(file);
-                  setImagePreview(URL.createObjectURL(file));
-                }}
-                onRemove={
-                  imagePreview
-                    ? () => {
-                        setImage(null);
-                        setImagePreview(undefined);
-                      }
-                    : undefined
+                {errors.tags?.message ? (
+                  <ValidationMessage>{errors.tags.message}</ValidationMessage>
+                ) : null}
+              </OptionalField>
+              <OptionalField
+                label="Colour"
+                summary={getColourName(selectedColour ?? null)}
+              >
+                <Controller
+                  control={control}
+                  name="color"
+                  render={({ field }) => (
+                    <ColourInput
+                      disabled={isSubmitting}
+                      id="tasting-colour"
+                      name={field.name}
+                      onChange={field.onChange}
+                      value={field.value ?? null}
+                    />
+                  )}
+                />
+                {errors.color?.message ? (
+                  <ValidationMessage>{errors.color.message}</ValidationMessage>
+                ) : null}
+              </OptionalField>
+              <OptionalField
+                label="Comments"
+                summary={comments ? truncate(comments, 64) : "None"}
+              >
+                <Textarea
+                  {...register("notes", {
+                    setValueAs: (value) => value || null,
+                  })}
+                  aria-label="Comments"
+                  id="tasting-comments"
+                  invalid={Boolean(errors.notes)}
+                  placeholder="Tell us how it drank."
+                  rows={6}
+                />
+                {errors.notes?.message ? (
+                  <ValidationMessage>{errors.notes.message}</ValidationMessage>
+                ) : null}
+              </OptionalField>
+              {props.mode === "edit" ? (
+                <OptionalField
+                  label="Served"
+                  summary={servingStyle ? toTitleCase(servingStyle) : "Not set"}
+                >
+                  <Field
+                    error={errors.servingStyle?.message}
+                    htmlFor="tasting-serving-style"
+                    label="Served"
+                  >
+                    <Select
+                      {...register("servingStyle", {
+                        setValueAs: (value) => value || null,
+                      })}
+                      id="tasting-serving-style"
+                      invalid={Boolean(errors.servingStyle)}
+                    >
+                      <option value="">Not set</option>
+                      {SERVING_STYLE_LIST.map((style) => (
+                        <option key={style} value={style}>
+                          {toTitleCase(style)}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
+                </OptionalField>
+              ) : null}
+              <OptionalField
+                label="Picture"
+                summary={imagePreview ? "Added" : "None"}
+              >
+                <PictureInput
+                  disabled={isSubmitting}
+                  id="tasting-picture"
+                  name="image"
+                  onFilesSelected={(files) => {
+                    const file = files.item(0);
+                    if (!file) return;
+                    setImage(file);
+                    setImagePreview(URL.createObjectURL(file));
+                  }}
+                  onRemove={
+                    imagePreview
+                      ? () => {
+                          setImage(null);
+                          setImagePreview(undefined);
+                        }
+                      : undefined
+                  }
+                  preview={
+                    imagePreview
+                      ? { alt: "Tasting picture", src: imagePreview }
+                      : undefined
+                  }
+                />
+              </OptionalField>
+              <OptionalField
+                label="Drinking with"
+                summary={
+                  friends.length
+                    ? formatListSummary(friends.map(({ username }) => username))
+                    : "No one added"
                 }
-                preview={
-                  imagePreview
-                    ? { alt: "Tasting picture", src: imagePreview }
-                    : undefined
-                }
-              />
-            </FieldGroup>
+              >
+                <Controller
+                  control={control}
+                  name="friends"
+                  render={({ field }) => (
+                    <MemberPicker
+                      label="Drinking with"
+                      loading={friendResults.isFetching}
+                      onChange={(nextFriends) => {
+                        setFriends(nextFriends);
+                        field.onChange(nextFriends.map((friend) => friend.id));
+                      }}
+                      onQueryChange={setFriendQuery}
+                      options={(friendResults.data?.results ?? []).map(
+                        ({ user }) => userToMember(user),
+                      )}
+                      value={friends}
+                    />
+                  )}
+                />
+              </OptionalField>
+            </OptionalFieldList>
           </FormSection>
         </FormStack>
       </form>
@@ -303,4 +349,18 @@ export default function TastingForm(
 
 function userToMember(user: User): MemberPickerOption {
   return { id: user.id, username: user.username };
+}
+
+function getColourName(value: number | null) {
+  if (value === null) return "Unsure";
+  return COLOR_SCALE.find(([number]) => number === value)?.[1] ?? "Unsure";
+}
+
+function formatListSummary(values: readonly string[]) {
+  if (values.length <= 2) return values.join(", ");
+  return `${values.slice(0, 2).join(", ")} +${values.length - 2}`;
+}
+
+function truncate(value: string, length: number) {
+  return value.length > length ? `${value.slice(0, length - 1)}…` : value;
 }

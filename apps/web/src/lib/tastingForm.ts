@@ -11,6 +11,14 @@ export const TastingFormFieldsSchema = TastingContentInputSchema.pick({
   friends: true,
 }).strict();
 
+export const TastingCreateFormFieldsSchema = TastingFormFieldsSchema.refine(
+  ({ ratingBand }) => ratingBand !== null,
+  {
+    message: "Pick a rating.",
+    path: ["ratingBand"],
+  },
+);
+
 export type TastingFormFields = z.infer<typeof TastingFormFieldsSchema>;
 export type TastingFormImage = HTMLCanvasElement | File | null | undefined;
 export type TastingEditFormSubmitData = TastingFormFields & {

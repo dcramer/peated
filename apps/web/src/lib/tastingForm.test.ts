@@ -4,6 +4,7 @@ import {
   buildTastingCreateFormSubmission,
   buildTastingEditFormSubmission,
   buildTastingTagOptions,
+  TastingCreateFormFieldsSchema,
   type TastingFormFields,
 } from "./tastingForm";
 
@@ -17,6 +18,15 @@ const fields: TastingFormFields = {
 };
 
 describe("tasting form submissions", () => {
+  it("requires a rating for a new tasting", () => {
+    expect(
+      TastingCreateFormFieldsSchema.safeParse({
+        ...fields,
+        ratingBand: null,
+      }).success,
+    ).toBe(false);
+  });
+
   it("builds create payloads with one Bottle and image intent", () => {
     const image = new File([], "label.jpg");
     expect(

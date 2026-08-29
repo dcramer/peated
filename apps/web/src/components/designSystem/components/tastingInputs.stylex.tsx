@@ -76,6 +76,7 @@ export function RatingBandInput({
                 id={`${id}-${band.key}`}
                 name={name}
                 onChange={() => onChange(band.key)}
+                required={required}
                 type="radio"
                 value={band.key}
                 {...stylex.props(styles.visuallyHiddenInput)}
@@ -123,15 +124,16 @@ export function ColourInput({
         <strong {...stylex.props(styles.colourName)}>
           {selected?.[1] ?? "Unsure"}
         </strong>
-        <Button
-          aria-pressed={value === null}
-          disabled={disabled}
-          onClick={() => onChange(null)}
-          size="sm"
-          variant="tonal"
-        >
-          Unsure
-        </Button>
+        {value !== null ? (
+          <Button
+            disabled={disabled}
+            onClick={() => onChange(null)}
+            size="sm"
+            variant="tonal"
+          >
+            Unsure
+          </Button>
+        ) : null}
       </div>
       <div {...stylex.props(styles.colourScale)}>
         <div aria-hidden="true" {...stylex.props(styles.colourSwatches)}>

@@ -11,6 +11,8 @@ import {
   FormNotice,
   FormSection,
   FormStack,
+  OptionalField,
+  OptionalFieldList,
 } from "./formLayout.stylex";
 
 const meta = {
@@ -63,9 +65,36 @@ export const Overview: Story = {
           </Field>
         </FormGrid>
       </FormDetails>
+      <FormSection title="Optional fields">
+        <OptionalFieldList>
+          <div id="optional-field-hovered">
+            <OptionalField label="Colour" summary="Unsure">
+              <TextInput aria-label="Colour" placeholder="Choose a colour" />
+            </OptionalField>
+          </div>
+          <div id="optional-field-focused">
+            <OptionalField
+              defaultOpen
+              label="Comments"
+              summary="Honey, smoke, and orange peel"
+            >
+              <TextInput
+                aria-label="Comments"
+                defaultValue="Honey, smoke, and orange peel"
+              />
+            </OptionalField>
+          </div>
+        </OptionalFieldList>
+      </FormSection>
       <FormActions>
         <Button variant="accent">Save changes</Button>
       </FormActions>
     </FormStack>
   ),
+  parameters: {
+    pseudo: {
+      focusVisible: ["#optional-field-focused summary"],
+      hover: ["#optional-field-hovered summary"],
+    },
+  },
 };

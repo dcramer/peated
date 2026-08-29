@@ -17,8 +17,11 @@ import { Button, IconButton, LoadingList } from "../components";
 
 export type WorkflowScreenProps = {
   children: ReactNode;
+  mobileSaveBar?: boolean;
   onClose?: () => void;
   onSave?: (event: FormEvent<HTMLButtonElement>) => void;
+  saveDisabled?: boolean;
+  saveHint?: ReactNode;
   saveLabel?: string;
   saving?: boolean;
   title: string;
@@ -27,8 +30,11 @@ export type WorkflowScreenProps = {
 /** Keeps add and edit workflows usable without the full application chrome. */
 export function WorkflowScreen({
   children,
+  mobileSaveBar = false,
   onClose,
   onSave,
+  saveDisabled = false,
+  saveHint,
   saveLabel = "Save",
   saving = false,
   title,
@@ -51,21 +57,51 @@ export function WorkflowScreen({
           </Link>
           <h1 {...stylex.props(styles.title)}>{title}</h1>
           {onSave ? (
-            <Button
-              loading={saving}
-              loadingLabel="Saving…"
-              onClick={onSave}
-              size="sm"
-              variant="accent"
-            >
-              {saveLabel}
-            </Button>
+            <span {...stylex.props(mobileSaveBar && styles.mobileHeaderSave)}>
+              <Button
+                disabled={saveDisabled}
+                loading={saving}
+                loadingLabel="Saving…"
+                onClick={onSave}
+                size="sm"
+                variant="accent"
+              >
+                {saveLabel}
+              </Button>
+            </span>
           ) : (
             <span />
           )}
         </div>
       </header>
-      <div {...stylex.props(styles.content)}>{children}</div>
+      <div
+        {...stylex.props(
+          styles.content,
+          mobileSaveBar && styles.contentWithMobileSave,
+        )}
+      >
+        {children}
+      </div>
+      {onSave && mobileSaveBar ? (
+        <div {...stylex.props(styles.mobileSaveBar)}>
+          <div {...stylex.props(styles.mobileSaveInner)}>
+            {saveHint ? (
+              <p {...stylex.props(styles.saveHint)}>{saveHint}</p>
+            ) : null}
+            <Button
+              disabled={saveDisabled}
+              fullWidth
+              loading={saving}
+              loadingLabel="Saving…"
+              onClick={onSave}
+              size="lg"
+              variant="accent"
+            >
+              {saveLabel}
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
@@ -160,5 +196,51 @@ const styles = stylex.create({
       paddingBottom: space.x8,
       paddingLeft: space.x3,
     },
+  },
+  mobileHeaderSave: {
+    "@media (max-width: 559px)": { display: "none" },
+  },
+  contentWithMobileSave: {
+    "@media (max-width: 559px)": {
+      paddingBottom: "calc(104px + env(safe-area-inset-bottom))",
+    },
+  },
+  mobileSaveBar: {
+    display: "none",
+    "@media (max-width: 559px)": {
+      position: "fixed",
+      zIndex: 20,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      display: "block",
+      paddingBottom: "env(safe-area-inset-bottom)",
+      borderTopWidth: "1px",
+      borderTopStyle: "solid",
+      borderTopColor: colors.hairline,
+      backgroundColor: colors.surface,
+    },
+  },
+  mobileSaveInner: {
+    boxSizing: "border-box",
+    display: "flex",
+    width: "100%",
+    maxWidth: "760px",
+    flexDirection: "column",
+    rowGap: space.x2,
+    marginRight: "auto",
+    marginLeft: "auto",
+    paddingTop: space.x3,
+    paddingRight: space.x3,
+    paddingBottom: space.x3,
+    paddingLeft: space.x3,
+  },
+  saveHint: {
+    margin: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    lineHeight: 1.3,
+    textAlign: "center",
   },
 });

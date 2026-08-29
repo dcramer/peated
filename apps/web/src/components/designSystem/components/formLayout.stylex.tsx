@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import type { HTMLAttributes, ReactNode } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
 
 export function FormStack({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.stack)}>{children}</div>;
@@ -108,6 +108,59 @@ export function FormDetails({
         />
       </summary>
       <div {...stylex.props(styles.detailFields)}>{children}</div>
+    </details>
+  );
+}
+
+export type OptionalFieldProps = {
+  children: ReactNode;
+  defaultOpen?: boolean;
+  label: ReactNode;
+  summary: ReactNode;
+};
+
+export function OptionalFieldList({ children }: { children: ReactNode }) {
+  return <div {...stylex.props(styles.optionalFieldList)}>{children}</div>;
+}
+
+/** Shows one optional value as a compact row until the user chooses to edit it. */
+export function OptionalField({
+  children,
+  defaultOpen = false,
+  label,
+  summary,
+}: OptionalFieldProps) {
+  return (
+    <details
+      open={defaultOpen || undefined}
+      {...stylex.props(styles.optionalField)}
+    >
+      <summary {...stylex.props(styles.optionalFieldSummary)}>
+        <span {...stylex.props(styles.optionalFieldCopy)}>
+          <span
+            {...stylex.props(
+              foundationStyles.fieldLabel,
+              styles.optionalFieldLabel,
+            )}
+          >
+            {label}
+          </span>
+          <span
+            {...stylex.props(
+              foundationStyles.metadata,
+              styles.optionalFieldValue,
+            )}
+          >
+            {summary}
+          </span>
+        </span>
+        <ChevronDown
+          aria-hidden="true"
+          size={18}
+          {...stylex.props(styles.optionalFieldIcon)}
+        />
+      </summary>
+      <div {...stylex.props(styles.optionalFieldControl)}>{children}</div>
     </details>
   );
 }
@@ -217,5 +270,69 @@ const styles = stylex.create({
       "@media (max-width: 559px)": space.x4,
     },
     paddingLeft: { default: space.x6, "@media (max-width: 559px)": space.x4 },
+  },
+  optionalField: {
+    boxSizing: "border-box",
+    minWidth: 0,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+    backgroundColor: colors.surface,
+  },
+  optionalFieldList: {
+    minWidth: 0,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  optionalFieldSummary: {
+    boxSizing: "border-box",
+    display: "flex",
+    minWidth: 0,
+    minHeight: "56px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x4,
+    marginRight: `calc(-1 * ${space.x3})`,
+    marginLeft: `calc(-1 * ${space.x3})`,
+    paddingRight: space.x3,
+    paddingLeft: space.x3,
+    borderRadius: "2px",
+    listStyle: "none",
+    cursor: "pointer",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.inset,
+    },
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+    outline: "none",
+    "::-webkit-details-marker": { display: "none" },
+  },
+  optionalFieldCopy: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    rowGap: space.x1,
+  },
+  optionalFieldLabel: {
+    color: colors.ink,
+  },
+  optionalFieldValue: {
+    overflow: "hidden",
+    color: colors.inkMuted,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  optionalFieldIcon: {
+    flexShrink: 0,
+    color: colors.inkMuted,
+  },
+  optionalFieldControl: {
+    minWidth: 0,
+    paddingTop: space.x2,
+    paddingBottom: space.x6,
   },
 });

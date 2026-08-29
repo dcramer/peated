@@ -118,11 +118,14 @@ export {
   FormNotice,
   FormSection,
   FormStack,
+  OptionalField,
+  OptionalFieldList,
 } from "./formLayout.stylex";
 export type {
   FormDetailsProps,
   FormNoticeProps,
   FormSectionProps,
+  OptionalFieldProps,
 } from "./formLayout.stylex";
 export { HistoryTimeline } from "./historyTimeline.stylex";
 export type {
