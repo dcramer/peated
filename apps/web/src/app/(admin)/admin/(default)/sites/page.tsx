@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
   AdminBreadcrumbs,
@@ -8,7 +9,6 @@ import {
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
-import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperCatalogCoverage from "@peated/web/components/admin/scraperCatalogCoverage";
 import TimeSince from "@peated/web/components/timeSince";
