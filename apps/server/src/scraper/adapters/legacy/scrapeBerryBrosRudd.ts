@@ -45,7 +45,7 @@ export interface BerryBrosRuddPage {
   hasSourceProducts: boolean;
 }
 
-export function parseBerryBrosRuddPage(
+function parseBerryBrosRuddPage(
   html: string,
   sourceUrl: string,
 ): BerryBrosRuddPage {

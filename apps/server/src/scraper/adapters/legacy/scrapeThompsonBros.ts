@@ -50,7 +50,7 @@ function getImageUrl(value: JsonValue, rawName: string): string | null {
   return result.data.src;
 }
 
-export function parseThompsonBrosProducts(input: JsonValue): StorePrice[] {
+function parseThompsonBrosProducts(input: JsonValue): StorePrice[] {
   const payload = WooCommerceCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

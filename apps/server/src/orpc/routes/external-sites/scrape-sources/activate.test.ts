@@ -40,7 +40,7 @@ describe("POST /admin/scrape-sources/:id/revisions/:revisionId/activate", () => 
     );
 
     expect(error).toMatchInlineSnapshot(
-      `[Error: Test this revision successfully before you activate it.]`,
+      `[Error: Preview this version successfully before you activate it.]`,
     );
   });
 

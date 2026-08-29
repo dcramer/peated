@@ -1,10 +1,12 @@
 import { db } from "@peated/server/db";
 import {
   externalReviewSourcePolicies,
+  externalSiteRuns,
   externalSites,
   externalSiteScrapeTargets,
   scrapeOrigins,
   scrapeSourceRevisions,
+  scrapeSourceRuns,
   scrapeSources,
   scrapeTargets,
 } from "@peated/server/db/schema";
@@ -222,6 +224,25 @@ export async function listScrapeSourceRevisions(scrapeSourceId: number) {
     .orderBy(desc(scrapeSourceRevisions.revision));
 }
 
+export async function getLatestScrapeSourceSetup(scrapeSourceId: number) {
+  const [setup] = await db
+    .select({ run: externalSiteRuns })
+    .from(scrapeSourceRuns)
+    .innerJoin(
+      externalSiteRuns,
+      eq(externalSiteRuns.id, scrapeSourceRuns.externalSiteRunId),
+    )
+    .where(
+      and(
+        eq(scrapeSourceRuns.scrapeSourceId, scrapeSourceId),
+        eq(scrapeSourceRuns.purpose, "suggest"),
+      ),
+    )
+    .orderBy(desc(externalSiteRuns.createdAt))
+    .limit(1);
+  return setup?.run ?? null;
+}
+
 export async function recordScrapeSourcePreview(input: {
   revisionId: number;
   status: "passed" | "failed";
@@ -264,7 +285,7 @@ export async function activateScrapeSourceRevision(input: {
     if (!revision) throw new ScrapeSourceNotFoundError();
     if (revision.previewStatus !== "passed") {
       throw new ScrapeSourceValidationError(
-        "Test this revision successfully before you activate it.",
+        "Preview this version successfully before you activate it.",
       );
     }
 

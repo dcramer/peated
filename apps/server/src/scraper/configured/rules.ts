@@ -6,6 +6,7 @@ export const SCRAPE_RULES_VERSION = 1;
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
 export const SCRAPE_SOURCE_MAX_LIST_PAGES = 5;
+export const SCRAPE_SOURCE_DEFAULT_MAX_ITEMS = 25;
 export const SCRAPE_SOURCE_MAX_ITEMS = 99;
 
 export const ScrapeSelectorSchema = z
@@ -19,7 +20,7 @@ export const ScrapeSelectorSchema = z
 
 export const ScrapeAttributeSchema = z.string().trim().min(1).max(100);
 
-export const ScrapeValueSelectorSchema = z
+const ScrapeValueSelectorSchema = z
   .object({
     selector: ScrapeSelectorSchema,
     attribute: ScrapeAttributeSchema.optional(),
@@ -30,7 +31,12 @@ const ListRulesSchema = z
   .object({
     detailLink: ScrapeValueSelectorSchema,
     nextPage: ScrapeValueSelectorSchema.optional(),
-    maxItems: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS).default(25),
+    maxItems: z
+      .number()
+      .int()
+      .min(1)
+      .max(SCRAPE_SOURCE_MAX_ITEMS)
+      .default(SCRAPE_SOURCE_DEFAULT_MAX_ITEMS),
   })
   .strict();
 

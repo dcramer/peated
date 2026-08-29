@@ -76,7 +76,7 @@ function getProductName(title: string): string | null {
   return normalizeBottle({ name: withoutTerminalVolume }).name;
 }
 
-export function parseMissionLiquorProducts(input: JsonValue): StorePrice[] {
+function parseMissionLiquorProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

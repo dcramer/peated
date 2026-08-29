@@ -43,7 +43,7 @@ describe("POST /admin/scrape-sources/:id/revisions/:revisionId/preview", () => {
     );
 
     expect(error).toMatchInlineSnapshot(
-      `[Error: Exactly one tested source revision must be ready for this run.]`,
+      `[Error: This version does not belong to this site.]`,
     );
   });
 

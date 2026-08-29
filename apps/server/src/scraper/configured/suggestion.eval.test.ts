@@ -223,7 +223,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         .from(scrapeSourceRevisions)
         .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
       expect(suggestedRevision).toMatchObject({
-        aiInstructionsVersion: "scrape-source-v4",
+        aiInstructionsVersion: "scrape-source-v5",
         author: "ai",
         listUrl: LIST_URL,
         previewStatus: "pending",

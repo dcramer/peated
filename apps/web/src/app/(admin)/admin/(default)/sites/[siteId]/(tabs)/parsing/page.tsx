@@ -15,100 +15,10 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { use, useMemo, useState } from "react";
+import PreviewResult from "./previewResult";
+import { SetupNotice, SetupSteps } from "./setupStatus";
 
 type Source = Outputs["externalSites"]["scrapeSources"]["list"][number];
-type Revision = Source["revisions"][number];
-
-function defaultRules(kind: Source["kind"]) {
-  return kind === "review"
-    ? {
-        kind: "review",
-        list: {
-          detailLink: { selector: "a.review", attribute: "href" },
-          maxItems: 25,
-        },
-        detail: {
-          title: { selector: "h1" },
-          reviewItem: "article.review",
-          name: { selector: "h2" },
-          reviewerName: { selector: ".author" },
-          reviewText: { selector: ".review-body" },
-        },
-      }
-    : {
-        kind: "price",
-        list: {
-          detailLink: { selector: "a.product", attribute: "href" },
-          maxItems: 25,
-        },
-        detail: {
-          name: { selector: "h1" },
-          price: { selector: ".price" },
-          currency: "usd",
-          volume: { selector: ".volume" },
-        },
-      };
-}
-
-function TestResult({ revision }: { revision: Revision }) {
-  const { issues, pages } = revision.previewResult;
-  return (
-    <div className="mt-4 space-y-3 rounded bg-slate-950 p-3 text-sm text-slate-300">
-      {issues.length > 0 && (
-        <ul className="list-disc space-y-1 pl-5 text-red-300">
-          {issues.map((issue, index) => (
-            <li key={`${issue.field}-${index}`}>
-              {issue.field}: {issue.message}
-            </li>
-          ))}
-        </ul>
-      )}
-      {pages.map((page) => (
-        <div
-          key={page.url}
-          className="border-t border-slate-800 pt-3 first:border-0 first:pt-0"
-        >
-          <a className="break-all text-cyan-300" href={page.url}>
-            {page.url}
-          </a>
-          {page.kind === "review" ? (
-            <div className="mt-2">
-              <div className="font-medium text-white">{page.title}</div>
-              <div className="text-muted mt-1">
-                {page.reviews.length} review
-                {page.reviews.length === 1 ? "" : "s"}
-              </div>
-              <ul className="mt-2 space-y-1">
-                {page.reviews.map((review, index) => (
-                  <li key={`${review.name}-${index}`}>
-                    {review.name}
-                    {review.reviewerName ? ` · ${review.reviewerName}` : ""}
-                    {review.nativeScore !== null
-                      ? ` · score ${review.nativeScore.display}`
-                      : ""}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <ul className="mt-2 space-y-1">
-              {page.products.map((product, index) => (
-                <li key={`${product.url}-${index}`}>
-                  {product.name} ·{" "}
-                  {(product.price / 100).toLocaleString(undefined, {
-                    style: "currency",
-                    currency: product.currency,
-                  })}{" "}
-                  · {product.volume} ml
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default function Page(props: { params: Promise<{ siteId: string }> }) {
   const { siteId } = use(props.params);
@@ -122,14 +32,22 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
     ...query,
     refetchInterval: ({ state }) => {
       const current = state.data?.[0];
-      return current?.revisions.length ? false : 2_000;
+      if (!current) return false;
+      if (!current.revisions.length) {
+        return current.setup?.status === "failed" ? false : 2_000;
+      }
+      return current.setup?.status === "queued" ||
+        current.setup?.status === "running"
+        ? 2_000
+        : false;
     },
   });
   const source = sources[0];
-  if (!source) throw new Error("Parsing rules not found.");
+  if (!source) throw new Error("Site setup not found.");
 
   return (
     <ConfigEditor
+      key={source.revisions[0]?.id ?? "setup"}
       source={source}
       refresh={async () => {
         await queryClient.invalidateQueries({ queryKey: query.queryKey });
@@ -150,7 +68,7 @@ function ConfigEditor({
   const latest = source.revisions[0];
   const [listUrl, setListUrl] = useState(latest?.listUrl ?? source.listUrl);
   const [rulesText, setRulesText] = useState(() =>
-    JSON.stringify(latest?.rules ?? defaultRules(source.kind), null, 2),
+    latest ? JSON.stringify(latest.rules, null, 2) : "",
   );
   const createRevision = useMutation(
     orpc.externalSites.scrapeSources.createRevision.mutationOptions(),
@@ -180,7 +98,10 @@ function ConfigEditor({
       ),
     [source],
   );
-  const canSuggest = !latest || latest.previewStatus === "failed";
+  const setupInProgress =
+    source.setup?.status === "queued" || source.setup?.status === "running";
+  const canSuggest =
+    !setupInProgress && (!latest || latest.previewStatus === "failed");
 
   async function runAndRefresh(callback: () => Promise<void>) {
     setError(undefined);
@@ -192,136 +113,101 @@ function ConfigEditor({
     }
   }
 
+  const retrySetup = () => {
+    if (!canSuggest) return;
+    void runAndRefresh(async () => {
+      await suggest.mutateAsync({ id: source.id });
+    });
+  };
+
   return (
     <div className="space-y-6 py-6">
       {error && <FormError values={[error]} />}
-      <div className="rounded border border-slate-800 bg-slate-950 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-white">
-              How Peated reads{" "}
-              {source.kind === "review" ? "reviews" : "store prices"}
-            </h2>
-            <p className="text-muted mt-1 text-sm">
-              {activeRevision
-                ? `Revision ${activeRevision.revision} is active.`
-                : "No revision is active. Collection is paused."}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => void refresh()} disabled={busy}>
-              Refresh
-            </Button>
-            {canSuggest && (
-              <Button
-                disabled={busy}
-                onClick={() =>
-                  void runAndRefresh(async () => {
-                    await suggest.mutateAsync({ id: source.id });
-                  })
-                }
-              >
-                {latest ? "Ask AI to repair" : "Retry AI setup"}
-              </Button>
-            )}
-            {source.enabled && (
-              <Button
-                color="danger"
-                disabled={busy}
-                onClick={() =>
-                  void runAndRefresh(async () => {
-                    await pause.mutateAsync({ id: source.id });
-                  })
-                }
-              >
-                Pause collection
-              </Button>
-            )}
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">
+            {source.kind === "review"
+              ? "Review collection"
+              : "Price collection"}
+          </h1>
+          <p className="text-muted mt-1 text-sm">
+            {activeRevision
+              ? `Version ${activeRevision.revision} is active.`
+              : "Collection stays paused until you preview and activate a version."}
+          </p>
         </div>
-        <label
-          className="mt-4 block font-semibold text-white"
-          htmlFor="parsing-rules"
-        >
-          Parsing rules{" "}
-          <span className="text-muted font-normal">(advanced)</span>
-        </label>
-        <p className="text-muted mt-1 text-sm">
-          Edit these rules only when the test reads a page incorrectly.
-        </p>
-        <label
-          className="mt-4 block font-semibold text-white"
-          htmlFor="list-url"
-        >
-          List page
-        </label>
-        <input
-          id="list-url"
-          type="url"
-          className="mt-2 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
-          value={listUrl}
-          onChange={(event) => setListUrl(event.target.value)}
-          required
-        />
-        <textarea
-          id="parsing-rules"
-          className="mt-4 min-h-96 w-full rounded border border-slate-700 bg-slate-900 p-3 font-mono text-sm"
-          value={rulesText}
-          onChange={(event) => setRulesText(event.target.value)}
-          spellCheck={false}
-        />
-        <div className="mt-3 flex justify-end">
-          <Button
-            color="highlight"
-            disabled={busy}
-            onClick={() =>
-              void runAndRefresh(async () => {
-                await createRevision.mutateAsync({
-                  id: source.id,
-                  listUrl,
-                  rules: ScrapeRulesSchema.parse(JSON.parse(rulesText)),
-                });
-              })
-            }
-          >
-            Save as new revision
+        <div className="flex gap-2">
+          <Button onClick={() => void refresh()} disabled={busy}>
+            Refresh
           </Button>
+          {source.enabled && (
+            <Button
+              color="danger"
+              disabled={busy}
+              onClick={() =>
+                void runAndRefresh(async () => {
+                  await pause.mutateAsync({ id: source.id });
+                })
+              }
+            >
+              Pause collection
+            </Button>
+          )}
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h2 className="text-xl font-semibold text-white">Revision history</h2>
-        {source.revisions.length === 0 ? (
-          <p className="text-muted">
-            AI setup is running. Generated rules will appear here. Use Retry AI
-            setup if the run failed.
-          </p>
-        ) : (
-          source.revisions.map((revision) => (
+      <SetupSteps source={source} />
+      <SetupNotice
+        source={source}
+        busy={busy}
+        canRetry={canSuggest}
+        retry={retrySetup}
+      />
+
+      {latest && (
+        <div className="space-y-3">
+          <h2 className="text-xl font-semibold text-white">Versions</h2>
+          {source.revisions.map((revision) => (
             <div
               key={revision.id}
-              className="rounded border border-slate-800 p-4"
+              className="rounded border border-slate-800 bg-slate-950 p-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="font-semibold text-white">
-                    Revision {revision.revision}
+                    Version {revision.revision}
                     {revision.id === source.activeRevisionId && " · Active"}
                   </div>
                   <div className="text-muted mt-1 text-sm">
                     {revision.previewStatus === "pending"
-                      ? "Not tested"
+                      ? "Not previewed"
                       : revision.previewStatus === "passed"
-                        ? "Test passed"
-                        : "Test failed"}
+                        ? "Preview passed"
+                        : "Preview failed"}
                     {revision.author === "ai"
                       ? " · Created with AI"
                       : " · Created by a person"}
                   </div>
+                  <div className="text-muted mt-1 break-all text-xs">
+                    {revision.listUrl}
+                  </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  {revision.previewStatus === "failed" &&
+                    revision.id === latest.id &&
+                    canSuggest && (
+                      <Button disabled={busy} onClick={retrySetup}>
+                        Ask AI to repair
+                      </Button>
+                    )}
                   <Button
+                    color={
+                      revision.previewStatus === "pending"
+                        ? "highlight"
+                        : undefined
+                    }
                     disabled={busy}
+                    loading={preview.isPending}
                     onClick={() =>
                       void runAndRefresh(async () => {
                         await preview.mutateAsync({
@@ -331,7 +217,7 @@ function ConfigEditor({
                       })
                     }
                   >
-                    Test revision
+                    Preview version
                   </Button>
                   <Button
                     color="highlight"
@@ -354,12 +240,64 @@ function ConfigEditor({
                 </div>
               </div>
               {revision.previewStatus !== "pending" && (
-                <TestResult revision={revision} />
+                <PreviewResult revision={revision} />
               )}
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {latest && (
+        <details className="rounded border border-slate-800 bg-slate-950 p-4">
+          <summary className="cursor-pointer font-semibold text-white">
+            Edit site setup <span className="text-muted">(advanced)</span>
+          </summary>
+          <p className="text-muted mt-3 text-sm">
+            Use this only when you need to correct the generated setup by hand.
+            Saving creates a new version.
+          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <label
+              className="mt-4 block font-semibold text-white"
+              htmlFor="list-url"
+            >
+              Collection page
+            </label>
+          </div>
+          <input
+            id="list-url"
+            type="url"
+            className="mt-2 w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
+            value={listUrl}
+            onChange={(event) => setListUrl(event.target.value)}
+            required
+          />
+          <textarea
+            id="parsing-rules"
+            className="mt-4 min-h-96 w-full rounded border border-slate-700 bg-slate-900 p-3 font-mono text-sm"
+            value={rulesText}
+            onChange={(event) => setRulesText(event.target.value)}
+            spellCheck={false}
+          />
+          <div className="mt-3 flex justify-end">
+            <Button
+              color="highlight"
+              disabled={busy}
+              onClick={() =>
+                void runAndRefresh(async () => {
+                  await createRevision.mutateAsync({
+                    id: source.id,
+                    listUrl,
+                    rules: ScrapeRulesSchema.parse(JSON.parse(rulesText)),
+                  });
+                })
+              }
+            >
+              Save as new version
+            </Button>
+          </div>
+        </details>
+      )}
     </div>
   );
 }

@@ -65,7 +65,7 @@ export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   sink: ScraperSink<TObservation>;
 };
 
-export type RobotsPolicy =
+type RobotsPolicy =
   | { mode: "enforce" }
   | { mode: "not_applicable"; rationale: string };
 

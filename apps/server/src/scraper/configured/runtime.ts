@@ -38,7 +38,7 @@ import {
 } from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
-export class ScrapeSourceParseError extends Error {
+class ScrapeSourceParseError extends Error {
   override name = "ScrapeSourceParseError";
 
   constructor(readonly issues: ScrapeIssue[]) {

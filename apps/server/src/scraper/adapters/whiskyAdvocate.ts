@@ -75,7 +75,7 @@ export function parseReviewPublishedAt(data: string): Date | null {
   return publishedAt;
 }
 
-export function parseIssueList(data: string) {
+function parseIssueList(data: string) {
   const $ = cheerio(data);
   const results: string[] = [];
   $("select")

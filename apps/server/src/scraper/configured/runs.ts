@@ -51,7 +51,9 @@ export async function createPinnedScrapeSourceRun(
       selected[0]?.revision.previewStatus !== "passed")
   ) {
     throw new ScrapeSourceValidationError(
-      "Exactly one tested source revision must be ready for this run.",
+      input.purpose === "preview"
+        ? "This version does not belong to this site."
+        : "This site does not have an active version that passed preview.",
     );
   }
   const [{ source, revision }] = selected;
@@ -96,7 +98,7 @@ export async function createScrapeSourceSuggestionRun(input: {
       .limit(1);
     if (latestRevision && latestRevision.previewStatus !== "failed") {
       throw new ScrapeSourceValidationError(
-        "AI repair is available only after the latest test fails.",
+        "AI repair is available only after the latest preview fails.",
       );
     }
     const [run] = await tx

@@ -35,7 +35,7 @@ const SingleCaskNationProductsSchema = ShopifyCatalogSchema.extend({
   products: z.array(SingleCaskNationProductSchema),
 });
 
-export function parseSingleCaskNationProducts(
+function parseSingleCaskNationProducts(
   input: JsonValue,
   sourceUrl: string,
 ): StorePrice[] {

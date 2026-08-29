@@ -97,7 +97,7 @@ function getImageUrl(value: string | null | undefined): string | null {
   return z.string().url().safeParse(value).success ? value : null;
 }
 
-export function parseDramfoolProducts(input: JsonValue): StorePrice[] {
+function parseDramfoolProducts(input: JsonValue): StorePrice[] {
   const payload = DramfoolCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

@@ -75,14 +75,14 @@ or prices.
 ### Requirement: AI suggestions create inactive revisions only
 
 The system SHALL run AI setup for every new source. It SHALL make at most two
-AI requests: one to suggest rules from supplied pages and one to review fields
-parsed from those rules. The AI MUST identify the list page, detail fields, and
-an optional next-page link. It MUST have no tools. It MUST NOT activate a
-revision, change network control, or write products.
+rule proposals. Each proposal that passes code checks SHALL receive an AI review
+of the parsed fields. The AI MUST identify the list page, detail fields, and an
+optional next-page link. It MUST have no tools. It MUST NOT activate a revision,
+change network control, or write products.
 
 #### Scenario: AI is allowed
 
-- **WHEN** an admin requests the first suggestion or a repair after the latest test fails
+- **WHEN** an admin requests the first suggestion or a repair after the latest preview fails
 - **THEN** the system fetches the main page, up to four candidate list pages from the same website, one next list page when found, and up to three detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the HTML, and stores an inactive revision only when both checks pass
 
 #### Scenario: Proposed pagination repeats or leaves the website
@@ -90,7 +90,7 @@ revision, change network control, or write products.
 - **WHEN** the next-page selector returns a page that was already read or uses another origin
 - **THEN** code rejects the run before it reads that page
 
-#### Scenario: Model output is invalid
+#### Scenario: AI response is invalid
 
 - **WHEN** the AI response does not match the required rules format or uses the wrong kind
 - **THEN** the system stores no revision and reports an error without page content
@@ -98,21 +98,26 @@ revision, change network control, or write products.
 #### Scenario: Proposed rules do not parse current pages
 
 - **WHEN** the list selector, detail selectors, conversions, or product schema fail against the supplied pages
-- **THEN** the system stores no revision and does not ask AI to approve invalid parsed fields
+- **THEN** the system does not ask AI to approve invalid parsed fields and gives the failure to one automatic repair attempt before it fails the run
 
 #### Scenario: AI review rejects parsed fields
 
 - **WHEN** the reviewer finds that a parsed field does not represent the supplied HTML
-- **THEN** the system stores no revision and does not retry or let the reviewer change the rules
+- **THEN** the system lets one remaining proposal attempt repair the reported fields, repeats all checks, and stores no revision if the final review fails
 
-### Requirement: Activation and rollback require a passing test
+#### Scenario: AI setup cannot produce working rules
+
+- **WHEN** both proposal attempts fail expected rule or content checks
+- **THEN** the run stores a concise failure without page content and completes as an expected setup failure instead of reporting only to Sentry
+
+### Requirement: Activation and rollback require a passing preview
 
 The system MUST prevent activation of a revision that has not passed its latest
-test. Activation and rollback SHALL retain all prior revisions.
+preview. Activation and rollback SHALL retain all prior revisions.
 
 #### Scenario: A passing revision is activated
 
-- **WHEN** an admin activates a revision whose latest test passed
+- **WHEN** an admin activates a revision whose latest preview passed
 - **THEN** it becomes the source's only active revision and the source becomes enabled
 
 #### Scenario: A failed revision is activated
@@ -159,13 +164,20 @@ not disable or rewrite admin-managed targets, origins, or site mappings.
 ### Requirement: The admin flow exposes the revision lifecycle
 
 The Admin Scrapers area SHALL let an admin add a site, choose a source kind,
-wait for its AI revision, edit the generated list URL and rules, preview,
-activate, view revision history, roll back, pause collection, and inspect
-health.
+follow queued or running AI setup, see a setup failure, retry it, edit the
+generated list URL and rules, preview, activate, view revision history, roll
+back, pause collection, and inspect health. Example detail pages SHALL be
+optional and labeled as such. The manual rules editor SHALL stay hidden until
+the admin chooses to open it.
+
+#### Scenario: AI setup has not created a revision
+
+- **WHEN** an admin opens a source with no revision
+- **THEN** the source view shows whether setup is queued, running, failed, or completed and does not show placeholder rules as a revision
 
 #### Scenario: An active source needs repair
 
-- **WHEN** its latest test fails after a page change
+- **WHEN** its latest preview fails after a page change
 - **THEN** the source view shows the failure and permits a repair revision
 
 ### Requirement: Tests match ownership boundaries

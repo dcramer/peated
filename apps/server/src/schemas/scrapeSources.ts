@@ -52,6 +52,16 @@ export const ScrapeSourceRevisionSchema = z.discriminatedUnion("author", [
   }),
 ]);
 
+const ScrapeSourceSetupSchema = z
+  .object({
+    runId: z.number().int().positive(),
+    status: z.enum(["queued", "running", "succeeded", "failed"]),
+    error: z.string().nullable(),
+    createdAt: z.string().datetime(),
+    completedAt: z.string().datetime().nullable(),
+  })
+  .strict();
+
 export const ScrapeSourceSchema = z
   .object({
     id: z.number().int().positive(),
@@ -64,5 +74,6 @@ export const ScrapeSourceSchema = z
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
     revisions: z.array(ScrapeSourceRevisionSchema),
+    setup: ScrapeSourceSetupSchema.nullable(),
   })
   .strict();

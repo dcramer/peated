@@ -7,8 +7,6 @@ import type { z } from "zod";
 import type { ScrapeIssue } from "./preview";
 import type { ScrapeRules, ScrapeValueSelector } from "./rules";
 
-export type { ScrapeIssue } from "./preview";
-
 export type ScrapeListResult = {
   links: string[];
   nextPageUrl: string | null;

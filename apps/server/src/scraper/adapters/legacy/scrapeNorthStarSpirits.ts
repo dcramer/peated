@@ -49,7 +49,7 @@ function isExplicitlyNonWhisky(title: string, bodyHtml: string | null) {
   return /\bgin\b/i.test(title) && !/\bwhisk(?:y|ey)\b/i.test(text);
 }
 
-export function parseNorthStarProducts(
+function parseNorthStarProducts(
   input: JsonValue,
   sourceUrl: string,
 ): StorePrice[] {

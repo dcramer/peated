@@ -37,10 +37,6 @@ export async function runLegacyPriceAdapter<T>({
   });
 }
 
-export function getLegacyPriceContext() {
-  return legacyPriceStorage.getStore();
-}
-
 export function beginLegacyPricePagination() {
   const context = legacyPriceStorage.getStore();
   if (!context) return null;
