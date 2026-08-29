@@ -1,4 +1,8 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+import {
+  ScrapeSourceSetupError,
+  type ScrapeSourceSetupFeedback,
+} from "./setupError";
 import {
   MAX_AI_INPUT_CHARS,
   checkDetailPages,
@@ -8,6 +12,7 @@ import {
   createRuleReviewFormat,
   createSuggestionFormat,
   prepareAiPages,
+  runRuleSetupAttempts,
   suggestionRequestLimit,
 } from "./suggestion";
 
@@ -30,15 +35,51 @@ test("uses object schemas for AI output", () => {
     const format = createSuggestionFormat(kind);
     expect(format.schema).toMatchObject({ type: "object" });
     expect(JSON.stringify(format.schema)).not.toContain('"oneOf"');
+    expect(JSON.stringify(format.schema)).not.toContain('"maxItems"');
   }
-  expect(createRuleReviewFormat().schema).toMatchObject({
+  const reviewFormat = createRuleReviewFormat();
+  expect(reviewFormat.schema).toMatchObject({
     type: "object",
   });
+  expect(JSON.stringify(reviewFormat.schema)).not.toContain('"message"');
 });
 
 test("reserves requests for discovery and final page checks", () => {
-  expect(suggestionRequestLimit(0)).toBe(12);
-  expect(suggestionRequestLimit(2)).toBe(14);
+  expect(suggestionRequestLimit(0)).toBe(16);
+  expect(suggestionRequestLimit(2)).toBe(18);
+});
+
+test("gives an expected rule failure to one repair attempt", async () => {
+  const feedback: Array<ScrapeSourceSetupFeedback | null> = [];
+  const result = await runRuleSetupAttempts(async (current) => {
+    feedback.push(current);
+    if (!current) {
+      throw new ScrapeSourceSetupError("The list rule failed.", [
+        { field: "list.detailLink", message: "No links were found." },
+      ]);
+    }
+    return "working rules";
+  });
+
+  expect(result).toBe("working rules");
+  expect(feedback).toEqual([
+    null,
+    {
+      message: "The list rule failed.",
+      issues: [{ field: "list.detailLink", message: "No links were found." }],
+    },
+  ]);
+});
+
+test("does not retry an unexpected setup failure", async () => {
+  const attempt = vi.fn(async () => {
+    throw new Error("Database unavailable.");
+  });
+
+  await expect(runRuleSetupAttempts(attempt)).rejects.toThrow(
+    "Database unavailable.",
+  );
+  expect(attempt).toHaveBeenCalledOnce();
 });
 
 test("bounds total AI input while keeping every sample page", () => {
@@ -122,7 +163,7 @@ test("rejects a list page that was not supplied", () => {
       rules: reviewRules,
       pages: [{ url: "https://example.test/", html: "<main></main>" }],
     }),
-  ).toThrow("The suggested list page was not supplied to the model.");
+  ).toThrow("The proposed list page was not one of the supplied pages.");
 });
 
 test("parses supplied detail pages with the production parser", async () => {
@@ -178,14 +219,12 @@ test("rejects suggested rules that do not parse a detail page", async () => {
         html: "<main>Unrelated page</main>",
       }),
     }),
-  ).rejects.toThrow("The suggested rules did not parse a detail page.");
+  ).rejects.toThrow("The proposed rules did not read a detail page.");
 });
 
 test("requires an AI review with no issues", () => {
   expect(() => checkRuleReview('{"issues":[]}')).not.toThrow();
-  expect(() =>
-    checkRuleReview(
-      '{"issues":[{"field":"name","message":"The name does not match."}]}',
-    ),
-  ).toThrow("AI review did not confirm the suggested parsing rules.");
+  expect(() => checkRuleReview('{"issues":[{"field":"detail.name"}]}')).toThrow(
+    "AI review found incorrect parsed fields.",
+  );
 });

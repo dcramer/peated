@@ -72,9 +72,9 @@ sources use the same run, request, robots, limit, retry, validation, and sink
 boundaries as code-owned sources.
 
 The database stores each source and its parsing rules. Each saved revision is
-immutable. A test reads sample pages and stores only parsed fields and errors.
+immutable. A preview reads sample pages and stores only parsed fields and errors.
 It does not store fetched HTML, review text, or full product records. Only a
-revision that passes its test can become active. An admin can return to any
+revision that passes its preview can become active. An admin can return to any
 older revision that passed. Pausing a source stops collection but keeps its
 revisions and run history.
 
@@ -90,14 +90,19 @@ Peated already stores these events. Add the scraper type only after its match
 and update rules are defined, so repeated runs do not create duplicate events.
 
 Adding a source starts AI setup. The server reads the main page, up to four
-likely list pages on the same website, and any example review or product pages.
-One AI request proposes the list, next-page, and detail rules. Code checks the
-list page, one next page when present, and up to three detail pages with the
-same parser used during collection. A second AI request compares those parsed
-fields with the HTML. Both responses require fixed fields, and the AI has no
-tools. No revision is saved unless the code checks and AI review pass. The AI
-provider does not store request content. An admin must still test and activate
-the inactive revision. AI never changes the active revision directly.
+likely list pages on the same website, and any optional example review or
+product pages. AI proposes the list, next-page, and detail rules. Code checks
+the list page, one next page when present, and up to three detail pages with the
+same parser used during collection. Another AI request compares those parsed
+fields with the HTML. If either check finds a rule problem, AI receives the
+concise errors and gets one repair attempt. Each repaired proposal repeats all
+checks. Expected final rule failures are stored on the run and shown in Admin;
+they do not fail only through Sentry. Provider, database, queue, and unexpected
+network failures remain system errors. AI responses require fixed fields, and
+the AI has no tools. No revision is saved unless the code checks and AI review
+pass. The AI provider does not store request content. An admin must still
+preview and activate the inactive revision. AI never changes the active
+revision directly.
 
 `pnpm evals:scraper` checks rule generation with fixed website fixtures and the
 live AI service. Normal test runs exclude these checks. Add the `trigger-evals`

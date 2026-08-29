@@ -33,6 +33,7 @@ describe("POST /admin/scrape-sources", () => {
       enabled: false,
       kind: "review",
       listUrl: input.websiteUrl,
+      setup: expect.objectContaining({ status: "queued" }),
       site: { name: input.name, type: "route-reviews-example" },
     });
     expect(pushJob).toHaveBeenCalledOnce();
