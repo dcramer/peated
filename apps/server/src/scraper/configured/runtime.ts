@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   externalSiteRuns,
-  externalSites,
   externalSiteScrapeTargets,
+  externalSites,
   scrapeSourceRevisions,
   scrapeSourceRuns,
   scrapeSources,
@@ -12,6 +12,7 @@ import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalRev
 import { StorePriceInputSchema } from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { ScraperHttpStatusError } from "../http";
 import { externalReviewSink } from "../sinks/externalReviews";
 import { createStorePriceSink } from "../sinks/storePrices";
 import type {
@@ -21,11 +22,20 @@ import type {
   ScraperSink,
   ScraperSourceDefinition,
 } from "../types";
+import { findLikelyDetailPages, findLikelyListPages } from "./discovery";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
-import { type ScrapeRules, parseScrapeRules } from "./rules";
+import {
+  SCRAPE_SOURCE_MAX_LIST_PAGES,
+  type ScrapeRules,
+  parseScrapeRules,
+} from "./rules";
 import { recordScrapeSourcePreview } from "./service";
-import { suggestScrapeSourceRevision } from "./suggestion";
+import {
+  MAX_SUGGESTION_DETAIL_PAGES,
+  suggestScrapeSourceRevision,
+  suggestionRequestLimit,
+} from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
 export class ScrapeSourceParseError extends Error {
@@ -83,22 +93,44 @@ function createScrapeSourceAdapter(input: {
 }): ScraperAdapter<null, unknown> {
   return async ({ session }) => {
     const pages: ScrapeSourcePreviewPage[] = [];
-    const listUrl = new URL(input.listUrl);
     try {
-      const listResponse = await session.request({
-        target: input.targetKey,
-        url: listUrl,
-      });
-      const listResult = parseScrapeList(
-        input.rules,
-        listResponse.body,
-        listResponse.url,
-      );
-      if (listResult.issues.length > 0) {
-        throw new ScrapeSourceParseError(listResult.issues);
+      const listUrls = new Set<string>();
+      const detailUrls = new Set<string>();
+      let nextListUrl: string | null = new URL(input.listUrl).toString();
+      while (
+        nextListUrl &&
+        listUrls.size < SCRAPE_SOURCE_MAX_LIST_PAGES &&
+        detailUrls.size < input.rules.list.maxItems
+      ) {
+        if (listUrls.has(nextListUrl)) {
+          throw new ScrapeSourceParseError([
+            {
+              field: "list.nextPage",
+              message: "Pagination returned a page that was already read.",
+            },
+          ]);
+        }
+        listUrls.add(nextListUrl);
+        const listResponse = await session.request({
+          target: input.targetKey,
+          url: new URL(nextListUrl),
+        });
+        const listResult = parseScrapeList(
+          input.rules,
+          listResponse.body,
+          listResponse.url,
+        );
+        if (listResult.issues.length > 0) {
+          throw new ScrapeSourceParseError(listResult.issues);
+        }
+        for (const link of listResult.links) {
+          detailUrls.add(link);
+          if (detailUrls.size >= input.rules.list.maxItems) break;
+        }
+        nextListUrl = listResult.nextPageUrl;
       }
 
-      for (const link of listResult.links) {
+      for (const link of detailUrls) {
         const response = await session.request({
           target: input.targetKey,
           url: new URL(link),
@@ -151,7 +183,10 @@ function createScrapeSourceAdapter(input: {
         });
       }
     } catch (error) {
-      if (error instanceof ScrapeSourceParseError) {
+      if (
+        input.purpose === "preview" &&
+        error instanceof ScrapeSourceParseError
+      ) {
         await recordScrapeSourcePreview({
           revisionId: input.revisionId,
           status: "failed",
@@ -205,7 +240,7 @@ function createScrapeSourceDefinition(input: {
     key: `source-${input.scrapeSourceId}`,
     externalSiteKey: input.siteKey,
     targetKeys: [input.targetKey],
-    requestLimit: input.rules.list.maxItems + 1,
+    requestLimit: input.rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
     cursorSchema: z.null(),
     observationSchema,
@@ -262,42 +297,129 @@ export async function resolveScrapeSourceRunRegistry(
     );
   if (suggestion) {
     const requestedById = suggestion.requestedById;
-    if (!requestedById) {
+    if (suggestion.run.revisionId === null && !requestedById) {
       throw new Error("AI suggestion run has no requesting admin.");
     }
     const target = await loadScrapeSourceTarget(suggestion.target);
+    const adapter: ScraperAdapter<null, unknown> =
+      suggestion.run.revisionId !== null
+        ? // A linked revision means the suggestion finished before the run was retried.
+          async () => {}
+        : async ({ session }) => {
+            if (!requestedById) {
+              throw new Error("AI suggestion run has no requesting admin.");
+            }
+            const entryResponse = await session.request({
+              target: target.key,
+              url: new URL(suggestion.source.listUrl),
+            });
+            const sampleUrls = new Set(
+              suggestion.source.sampleUrls.map((value) =>
+                new URL(value).toString(),
+              ),
+            );
+            const listPages = [
+              {
+                url: entryResponse.url.toString(),
+                html: entryResponse.body,
+              },
+            ];
+            const likelyListPages = findLikelyListPages({
+              kind: suggestion.source.kind,
+              pageUrl: entryResponse.url,
+              html: entryResponse.body,
+            }).filter((value) => !sampleUrls.has(value));
+            for (const value of likelyListPages) {
+              try {
+                const response = await session.request({
+                  target: target.key,
+                  url: new URL(value),
+                });
+                listPages.push({
+                  url: response.url.toString(),
+                  html: response.body,
+                });
+              } catch (error) {
+                if (
+                  error instanceof ScraperHttpStatusError &&
+                  [404, 410].includes(error.status)
+                ) {
+                  continue;
+                }
+                throw error;
+              }
+            }
+            const detailPages = [];
+            for (const value of sampleUrls) {
+              if (value === entryResponse.url.toString()) continue;
+              const response = await session.request({
+                target: target.key,
+                url: new URL(value),
+              });
+              detailPages.push({
+                url: response.url.toString(),
+                html: response.body,
+              });
+            }
+            const suppliedDetailUrls = new Set(
+              detailPages.map((page) => new URL(page.url).toString()),
+            );
+            const likelyDetailPages = findLikelyDetailPages({
+              kind: suggestion.source.kind,
+              limit: MAX_SUGGESTION_DETAIL_PAGES,
+              pages: listPages,
+            }).filter((value) => !suppliedDetailUrls.has(value));
+            for (const value of likelyDetailPages) {
+              try {
+                const response = await session.request({
+                  target: target.key,
+                  url: new URL(value),
+                });
+                detailPages.push({
+                  url: response.url.toString(),
+                  html: response.body,
+                });
+              } catch (error) {
+                if (
+                  error instanceof ScraperHttpStatusError &&
+                  [404, 410].includes(error.status)
+                ) {
+                  continue;
+                }
+                throw error;
+              }
+            }
+            const revision = await suggestScrapeSourceRevision({
+              scrapeSourceId: suggestion.source.id,
+              createdById: requestedById,
+              listPages,
+              detailPages,
+              loadPage: async (url) => {
+                const response = await session.request({
+                  target: target.key,
+                  url,
+                });
+                return {
+                  url: response.url.toString(),
+                  html: response.body,
+                };
+              },
+            });
+            await db
+              .update(scrapeSourceRuns)
+              .set({ revisionId: revision.id })
+              .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
+          };
     const source: ScraperSourceDefinition<null, unknown> = {
       key: `source-${suggestion.source.id}`,
       externalSiteKey: suggestion.siteKey,
       targetKeys: [target.key],
-      requestLimit: suggestion.source.sampleUrls.length + 1,
+      requestLimit: suggestionRequestLimit(suggestion.source.sampleUrls.length),
       resumeFromLastRun: false,
       cursorSchema: z.null(),
       observationSchema: z.unknown(),
       sink: async () => {},
-      adapter: async ({ session }) => {
-        const urls = [
-          suggestion.source.listUrl,
-          ...suggestion.source.sampleUrls,
-        ];
-        const pages = [];
-        for (const value of urls) {
-          const response = await session.request({
-            target: target.key,
-            url: new URL(value),
-          });
-          pages.push({ url: response.url.toString(), html: response.body });
-        }
-        const revision = await suggestScrapeSourceRevision({
-          scrapeSourceId: suggestion.source.id,
-          createdById: requestedById,
-          pages,
-        });
-        await db
-          .update(scrapeSourceRuns)
-          .set({ revisionId: revision.id })
-          .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
-      },
+      adapter,
     };
     const sources = new Map(baseRegistry.sources);
     const targets = new Map(baseRegistry.targets);

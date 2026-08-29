@@ -4,6 +4,7 @@ import {
   ScrapeSourceCreateSchema,
   ScrapeSourceSchema,
 } from "@peated/server/schemas";
+import { queueScrapeSourceSuggestion } from "@peated/server/scraper";
 import {
   ScrapeSourceConflictError,
   ScrapeSourceValidationError,
@@ -27,6 +28,10 @@ export default procedure
       const { source, site } = await createSiteWithScrapeSource({
         ...input,
         createdById: context.user.id,
+      });
+      await queueScrapeSourceSuggestion({
+        scrapeSourceId: source.id,
+        requestedById: context.user.id,
       });
       return await serialize(
         ScrapeSourceSerializer,

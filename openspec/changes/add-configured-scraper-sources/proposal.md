@@ -13,8 +13,11 @@ return to an older revision.
 - Run all saved sources through one shared parser and the existing request,
   review, and price controls.
 - Require a passing preview before an admin can activate a revision.
-- Let AI create an inactive revision only for an allowed source. AI cannot
-  activate it or change network access.
+- Start AI setup for every new source. The AI identifies the list page, detail
+  fields, and an optional next-page link. Code tests the proposed rules against
+  current pages, and a second AI request checks the parsed fields before an
+  inactive revision is saved. AI cannot activate revisions or change network
+  access.
 - Add admin controls to create a site and source, edit the list URL and parsing
   rules, preview a revision, activate it, view history, roll back, and pause it.
 - Keep existing code sources available.

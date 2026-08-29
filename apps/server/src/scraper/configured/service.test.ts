@@ -14,6 +14,7 @@ import { createPinnedScrapeSourceRun } from "./runs";
 import {
   activateScrapeSourceRevision,
   createScrapeSourceRevision,
+  createSiteKey,
   createSiteWithScrapeSource,
   listScrapeSourceRevisions,
   recordScrapeSourcePreview,
@@ -46,10 +47,9 @@ async function createUser() {
 test("creates a site and its admin-owned request rows", async () => {
   const user = await createUser();
   const created = await createSiteWithScrapeSource({
-    key: "example-reviews",
     name: "Example Reviews",
     kind: "review",
-    listUrl: "https://reviews.example/archive",
+    websiteUrl: "https://reviews.example/",
     sampleUrls: ["https://reviews.example/review/one"],
     createdById: user.id,
   });
@@ -57,11 +57,11 @@ test("creates a site and its admin-owned request rows", async () => {
   expect(created.source).toMatchObject({
     kind: "review",
     enabled: false,
-    listUrl: "https://reviews.example/archive",
+    listUrl: "https://reviews.example/",
   });
   expect(await db.select().from(scrapeTargets)).toEqual([
     expect.objectContaining({
-      key: "example-reviews",
+      key: "reviews-example",
       managedBy: "admin",
       enabled: true,
     }),
@@ -82,10 +82,9 @@ test("creates a site and its admin-owned request rows", async () => {
 
   await expect(
     createSiteWithScrapeSource({
-      key: "example-reviews",
       name: "Duplicate",
       kind: "review",
-      listUrl: "https://duplicate.example/archive",
+      websiteUrl: "https://reviews.example/other",
       createdById: user.id,
     }),
   ).rejects.toBeInstanceOf(ScrapeSourceConflictError);
@@ -94,10 +93,9 @@ test("creates a site and its admin-owned request rows", async () => {
 test("keeps immutable revisions and only activates a passing revision", async () => {
   const user = await createUser();
   const { site, source } = await createSiteWithScrapeSource({
-    key: "versioned-reviews",
     name: "Versioned Reviews",
     kind: "review",
-    listUrl: "https://versioned.example/archive",
+    websiteUrl: "https://versioned.example/",
     createdById: user.id,
   });
   const first = await createScrapeSourceRevision({
@@ -150,7 +148,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     purpose: "collect",
   });
   expect(pinned.revision.id).toBe(first.id);
-  expect(pinned.run.requestLimit).toBe(100);
+  expect(pinned.run.requestLimit).toBe(104);
   expect(await db.select().from(scrapeSourceRuns)).toEqual([
     expect.objectContaining({
       externalSiteRunId: pinned.run.id,
@@ -175,10 +173,9 @@ test("keeps immutable revisions and only activates a passing revision", async ()
 test("database constraints keep source and revision identity valid", async () => {
   const user = await createUser();
   const { source } = await createSiteWithScrapeSource({
-    key: "constraint-reviews",
     name: "Constraint Reviews",
     kind: "review",
-    listUrl: "https://constraints.example/archive",
+    websiteUrl: "https://constraints.example/",
     createdById: user.id,
   });
   const first = await createScrapeSourceRevision({
@@ -213,14 +210,23 @@ test("database constraints keep source and revision identity valid", async () =>
   const [site] = await db
     .select()
     .from(externalSites)
-    .where(eq(externalSites.type, "constraint-reviews"));
+    .where(eq(externalSites.type, "constraints-example"));
   expect(site).toBeDefined();
   await expect(
     db.insert(scrapeOrigins).values({
       origin: "https://invalid-policy.example",
       managedBy: "admin",
-      targetKey: "constraint-reviews",
+      targetKey: "constraints-example",
       robotsMode: "not_applicable",
     }),
   ).rejects.toThrow();
+});
+
+test("derives the internal key from the website hostname", () => {
+  expect(createSiteKey(new URL("https://www.Example-Shop.com/"))).toBe(
+    "example-shop-com",
+  );
+  expect(createSiteKey(new URL("http://127.0.0.1:4400/"))).toBe(
+    "127-0-0-1-4400",
+  );
 });

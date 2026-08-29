@@ -11,6 +11,7 @@ export type { ScrapeIssue } from "./preview";
 
 export type ScrapeListResult = {
   links: string[];
+  nextPageUrl: string | null;
   issues: ScrapeIssue[];
 };
 
@@ -44,7 +45,7 @@ function absoluteHttpUrl(value: string, baseUrl: URL) {
     throw new Error("URL must use HTTP or HTTPS.");
   }
   if (url.origin !== baseUrl.origin) {
-    throw new Error("Detail pages must use the same website as the list page.");
+    throw new Error("Pages must stay on the source website.");
   }
   url.hash = "";
   return url.toString();
@@ -90,7 +91,25 @@ export function parseScrapeList(
       message: "The selector did not find any detail links.",
     });
   }
-  return { links: [...links], issues };
+  let nextPageUrl: string | null = null;
+  if (rules.list.nextPage) {
+    const $ = load(html);
+    const raw = readValue($, rules.list.nextPage);
+    if (raw) {
+      try {
+        nextPageUrl = absoluteHttpUrl(raw, pageUrl);
+      } catch (error) {
+        issues.push({
+          field: "list.nextPage",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to parse selector.",
+        });
+      }
+    }
+  }
+  return { links: [...links], nextPageUrl, issues };
 }
 
 function parseDate(value: string | null) {
@@ -118,9 +137,11 @@ function parseVolume(value: string | null) {
   const normalized = value.toLowerCase().replaceAll(",", "");
   const number = parseNumber(normalized);
   if (number === null || number <= 0) return null;
-  return normalized.includes("cl")
-    ? Math.round(number * 10)
-    : Math.round(number);
+  if (normalized.includes("cl")) return Math.round(number * 10);
+  if (/(?:^|[^a-z])l(?:[^a-z]|$)/.test(normalized)) {
+    return Math.round(number * 1000);
+  }
+  return Math.round(number);
 }
 
 function validationIssues(error: z.ZodError): ScrapeIssue[] {

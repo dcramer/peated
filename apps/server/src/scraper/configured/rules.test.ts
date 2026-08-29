@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import {
   parseScrapeRules,
   SCRAPE_SOURCE_MAX_ITEMS,
+  SCRAPE_SOURCE_MAX_LIST_PAGES,
   ScrapeRulesSchema,
 } from "./rules";
 
@@ -20,7 +21,7 @@ function reviewConfig(maxItems: number) {
   };
 }
 
-test("keeps the list and every detail page within one run", () => {
+test("bounds list and detail pages", () => {
   expect(
     ScrapeRulesSchema.parse(reviewConfig(SCRAPE_SOURCE_MAX_ITEMS)).list
       .maxItems,
@@ -28,6 +29,7 @@ test("keeps the list and every detail page within one run", () => {
   expect(() =>
     ScrapeRulesSchema.parse(reviewConfig(SCRAPE_SOURCE_MAX_ITEMS + 1)),
   ).toThrow();
+  expect(SCRAPE_SOURCE_MAX_LIST_PAGES).toBe(5);
 });
 
 test("rejects rules for an unsupported stored format", () => {

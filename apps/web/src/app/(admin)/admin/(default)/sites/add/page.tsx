@@ -20,7 +20,6 @@ export default function Page() {
   );
   const [error, setError] = useState<string>();
   const [kind, setKind] = useState<"review" | "price">("review");
-  const [allowAiSuggestions, setAllowAiSuggestions] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,15 +30,13 @@ export default function Page() {
     };
     try {
       const source = await create.mutateAsync({
-        key: textValue("key"),
         name: textValue("name"),
         kind,
-        listUrl: textValue("listUrl"),
+        websiteUrl: textValue("websiteUrl"),
         sampleUrls: textValue("sampleUrls")
           .split("\n")
           .map((value) => value.trim())
           .filter(Boolean),
-        allowAiSuggestions,
       });
       router.push(`/admin/sites/${source.site.type}/parsing`);
     } catch (err) {
@@ -62,9 +59,11 @@ export default function Page() {
         <Fieldset>
           <TextField name="name" label="Site name" required />
           <TextField
-            name="key"
-            label="Short name"
-            helpText="Use lowercase words and hyphens. Peated uses this value in the page address."
+            name="websiteUrl"
+            type="url"
+            label="Website"
+            helpText="Start with the site's main page. Peated will look for a review or shop page."
+            placeholder="https://example.com"
             required
           />
           <label className="block">
@@ -80,16 +79,11 @@ export default function Page() {
               <option value="price">Store prices</option>
             </select>
           </label>
-          <TextField
-            name="listUrl"
-            type="url"
-            label="List page"
-            helpText="The page that links to review or product detail pages."
-            required
-          />
           <label className="block">
             <span className="mb-2 block font-semibold">
-              Example detail pages
+              {kind === "review"
+                ? "Example review pages"
+                : "Example product pages"}
             </span>
             <textarea
               name="sampleUrls"
@@ -98,14 +92,10 @@ export default function Page() {
               placeholder="One URL per line"
             />
           </label>
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={allowAiSuggestions}
-              onChange={(event) => setAllowAiSuggestions(event.target.checked)}
-            />
-            <span>Allow AI to suggest parsing rules</span>
-          </label>
+          <p className="text-muted text-sm">
+            Peated will find the list, detail fields, and next pages. You will
+            review the result before collection starts.
+          </p>
         </Fieldset>
         <div className="flex justify-end gap-2">
           <Button href="/admin/sites">Cancel</Button>

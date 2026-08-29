@@ -12,6 +12,8 @@ import {
   ScrapeSourceCreateSchema,
   ScrapeSourceUrlSchema,
 } from "@peated/server/schemas";
+import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
+import slugify from "@sindresorhus/slugify";
 import { and, desc, eq, max } from "drizzle-orm";
 import { z } from "zod";
 import { DEFAULT_SCRAPER_REQUEST_POLICY } from "../definitions";
@@ -53,16 +55,23 @@ function exactOrigin(url: URL) {
   return url.origin;
 }
 
+export function createSiteKey(websiteUrl: URL) {
+  const hostname = websiteUrl.host.replace(/^www\./, "");
+  const key = slugify(hostname).slice(0, 64).replace(/-+$/, "");
+  return ExternalSiteKeySchema.parse(key);
+}
+
 export async function createSiteWithScrapeSource(
   rawInput: CreateScrapeSourceInput,
 ) {
   const input = CreateScrapeSourceInputSchema.parse(rawInput);
-  const listUrl = new URL(input.listUrl);
+  const listUrl = new URL(input.websiteUrl);
   const origin = exactOrigin(listUrl);
+  const key = createSiteKey(listUrl);
   for (const sample of input.sampleUrls) {
     if (exactOrigin(new URL(sample)) !== origin) {
       throw new ScrapeSourceValidationError(
-        "Example pages must use the same website as the list page.",
+        "Example pages must use the source website.",
       );
     }
   }
@@ -71,12 +80,12 @@ export async function createSiteWithScrapeSource(
     return await db.transaction(async (tx) => {
       const [site] = await tx
         .insert(externalSites)
-        .values({ type: input.key, name: input.name, runEvery: null })
+        .values({ type: key, name: input.name, runEvery: null })
         .returning();
       if (!site) throw new Error("Failed to create external site.");
 
       await tx.insert(scrapeTargets).values({
-        key: input.key,
+        key,
         managedBy: "admin",
         enabled: true,
         minimumSpacingMs: DEFAULT_SCRAPER_REQUEST_POLICY.minimumSpacingMs,
@@ -89,12 +98,12 @@ export async function createSiteWithScrapeSource(
       await tx.insert(scrapeOrigins).values({
         origin,
         managedBy: "admin",
-        targetKey: input.key,
+        targetKey: key,
         robotsMode: "enforce",
       });
       await tx.insert(externalSiteScrapeTargets).values({
         externalSiteId: site.id,
-        targetKey: input.key,
+        targetKey: key,
         managedBy: "admin",
       });
       const [source] = await tx
@@ -106,7 +115,6 @@ export async function createSiteWithScrapeSource(
           sampleUrls: input.sampleUrls.map((value) =>
             new URL(value).toString(),
           ),
-          allowAiSuggestions: input.allowAiSuggestions,
           createdById: input.createdById,
         })
         .returning();
@@ -125,7 +133,7 @@ export async function createSiteWithScrapeSource(
   } catch (error) {
     if (DatabaseErrorSchema.safeParse(error).data?.code === "23505") {
       throw new ScrapeSourceConflictError(
-        "A source with this short name already exists.",
+        "A source for this website already exists.",
       );
     }
     throw error;
@@ -166,11 +174,6 @@ export async function createScrapeSourceRevision(
     if (source.kind !== rules.kind) {
       throw new ScrapeSourceValidationError(
         "The parsing rules collect the wrong content.",
-      );
-    }
-    if (input.author === "ai" && !source.allowAiSuggestions) {
-      throw new ScrapeSourceValidationError(
-        "AI suggestions are not allowed for this source.",
       );
     }
     const [latest] = await tx

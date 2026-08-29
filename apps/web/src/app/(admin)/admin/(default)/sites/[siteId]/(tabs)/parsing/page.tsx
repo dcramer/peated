@@ -118,7 +118,13 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
   const query = orpc.externalSites.scrapeSources.list.queryOptions({
     input: { site },
   });
-  const { data: sources } = useSuspenseQuery(query);
+  const { data: sources } = useSuspenseQuery({
+    ...query,
+    refetchInterval: ({ state }) => {
+      const current = state.data?.[0];
+      return current?.revisions.length ? false : 2_000;
+    },
+  });
   const source = sources[0];
   if (!source) throw new Error("Parsing rules not found.");
 
@@ -174,8 +180,7 @@ function ConfigEditor({
       ),
     [source],
   );
-  const canSuggest =
-    source.allowAiSuggestions && (!latest || latest.previewStatus === "failed");
+  const canSuggest = !latest || latest.previewStatus === "failed";
 
   async function runAndRefresh(callback: () => Promise<void>) {
     setError(undefined);
@@ -216,7 +221,7 @@ function ConfigEditor({
                   })
                 }
               >
-                {latest ? "Ask AI to repair" : "Ask AI for first revision"}
+                {latest ? "Ask AI to repair" : "Retry AI setup"}
               </Button>
             )}
             {source.enabled && (
@@ -287,7 +292,10 @@ function ConfigEditor({
       <div className="space-y-3">
         <h2 className="text-xl font-semibold text-white">Revision history</h2>
         {source.revisions.length === 0 ? (
-          <p className="text-muted">Save the first revision to start.</p>
+          <p className="text-muted">
+            AI setup is running. Generated rules will appear here. Use Retry AI
+            setup if the run failed.
+          </p>
         ) : (
           source.revisions.map((revision) => (
             <div

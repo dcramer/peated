@@ -4,7 +4,7 @@ This module owns Peated's outbound scraper boundary. It keeps four concerns
 separate:
 
 - definitions say which Peated source may use which remote target and origin;
-- runs own bounded, resumable source work;
+- runs limit their source work and can resume it;
 - coordination and HTTP own when and how remote requests happen;
 - adapters parse responses and emit source observations through an injected
   session.
@@ -78,21 +78,30 @@ revision that passes its test can become active. An admin can return to any
 older revision that passed. Pausing a source stops collection but keeps its
 revisions and run history.
 
-Rules format 1 supports one bounded HTML list page, same-origin detail links,
-CSS selectors, and fixed date, number, price, and volume conversions. It does not
-support scripts, custom code, arbitrary request headers, browser automation,
-pagination, or cross-origin discovery. Add a code-owned adapter when a source
-needs those capabilities.
+Rules format 1 supports same-origin HTML list and detail pages, an item limit,
+an optional next-page link, CSS selectors, and fixed date, number, price, and
+volume conversions. Code follows at most five list pages. It does not support
+scripts, custom code, arbitrary request headers, browser automation, numbered
+page templates, infinite scrolling, or cross-origin discovery. Add a code-owned
+adapter when a source needs those capabilities.
 
 Event sources, such as whisky festivals, are the next planned source kind.
 Peated already stores these events. Add the scraper type only after its match
 and update rules are defined, so repeated runs do not create duplicate events.
 
-AI can suggest parsing rules only when an admin allows it for that source. The
-server fetches the allowed pages before it calls the model. The model has no
-tools, and provider storage is off. Its response creates a new revision. An
-admin must test and activate that revision. AI never changes the active revision
-directly.
+Adding a source starts AI setup. The server reads the main page, up to four
+likely list pages on the same website, and any example review or product pages.
+One AI request proposes the list, next-page, and detail rules. Code checks the
+list page, one next page when present, and up to three detail pages with the
+same parser used during collection. A second AI request compares those parsed
+fields with the HTML. Both responses require fixed fields, and the AI has no
+tools. No revision is saved unless the code checks and AI review pass. The AI
+provider does not store request content. An admin must still test and activate
+the inactive revision. AI never changes the active revision directly.
+
+`pnpm evals:scraper` checks rule generation with fixed website fixtures and the
+live AI service. Normal test runs exclude these checks. Add the `trigger-evals`
+label to a pull request to run them in CI.
 
 ## Source acceptance rules
 
@@ -102,14 +111,14 @@ listed owner. Do not repeat a runtime test in every adapter.
 | Rule                                                                                                                                                                                            | Owner and proof                                                                                                                                                              |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The source requests only its declared targets and exact origins.                                                                                                                                | The registry owns the declaration. Definition and boundary tests prove it.                                                                                                   |
-| Discovery is bounded. The adapter does not become a generic crawler.                                                                                                                            | The adapter owns its exact entry points and maximum pages or items. A fixture test proves the bound.                                                                         |
+| Discovery has fixed limits. The adapter does not crawl the whole website.                                                                                                                       | The adapter owns its exact entry points and maximum pages or items. A fixture test proves the limit.                                                                         |
 | Every request uses the injected session. Robots, spacing, quotas, retries, response limits, and `429` cooldowns stay active.                                                                    | The runtime owns request control. Boundary and HTTP tests prove it.                                                                                                          |
 | The configured limits let a run complete or make durable progress. Discovery plus the first work request must fit before a quota or slice boundary. Request spacing must not restart discovery. | The registry owns limits. A registered runtime test proves completion or a cursor advance.                                                                                   |
 | A cursor is strict and describes the next safe work. The adapter emits before it checkpoints. A replay is safe.                                                                                 | The adapter owns progress. Fixture tests prove resume, replay, and failed emit or parse behavior.                                                                            |
 | Observation keys are stable across runs. They are unique within their storage scope.                                                                                                            | The adapter owns source identity. Parser tests prove stable keys, multi-item keys, and known collision cases.                                                                |
 | Parsed output uses the registered strict schema. Product writes happen only in the registered sink.                                                                                             | The session and registry own validation and sink selection. Registry and sink tests prove it.                                                                                |
 | Expected remote deferrals remain non-terminal. Unexpected markup, validation, and persistence failures fail the run.                                                                            | The runtime owns deferrals. The adapter owns the difference between an expected non-item and malformed source data.                                                          |
-| A source change passes deterministic fixtures and one local acceptance run against the current public source.                                                                                   | The source author runs the registered adapter through the local runtime and inspects the run, cursor, request count, and emitted observations. Live checks do not run in CI. |
+| A source change passes deterministic fixtures and one local acceptance run against the current public source.                                                                                   | The source author runs the registered adapter through the local runtime and inspects the run, cursor, request count, and emitted observations. Live checks use the CI label. |
 | The first production run is checked in Admin → Scrapers and Sentry.                                                                                                                             | The source author confirms status, counts, cursor progress, robots state, and any terminal error.                                                                            |
 
 Keep source-specific facts in the adapter tests and the owning feature or
@@ -124,7 +133,7 @@ weaken a shared schema or runtime rule to accept one malformed page.
   budget, spacing, quota, lease, or remote cooldown. It is not a failure.
 - `failed` means validation, robots, configuration, persistence, or an
   unexpected remote failure was terminal for that run. Stored errors are
-  bounded; detailed unexpected failures belong in Sentry.
+  limited; detailed unexpected failures belong in Sentry.
 
 `sliceRequestCount` resets when a deferred run is reclaimed. `requestCount`,
 retry counts, rate-limit counts, and emitted-item counts are lifetime run

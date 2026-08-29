@@ -4,7 +4,7 @@ import {
   SCRAPE_SOURCE_KIND_LIST,
   ScrapeRulesSchema,
 } from "../scraper/configured/rules";
-import { ExternalSiteKeySchema, ExternalSiteSchema } from "./externalSites";
+import { ExternalSiteSchema } from "./externalSites";
 
 export { ScrapeRulesSchema } from "../scraper/configured/rules";
 
@@ -16,12 +16,10 @@ export const ScrapeSourceUrlSchema = z
 
 export const ScrapeSourceCreateSchema = z
   .object({
-    key: ExternalSiteKeySchema,
     name: z.string().trim().min(1).max(200),
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
-    listUrl: ScrapeSourceUrlSchema,
+    websiteUrl: ScrapeSourceUrlSchema,
     sampleUrls: z.array(ScrapeSourceUrlSchema).max(10).default([]),
-    allowAiSuggestions: z.boolean().default(false),
   })
   .strict();
 
@@ -60,7 +58,6 @@ export const ScrapeSourceSchema = z
     site: ExternalSiteSchema,
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
     enabled: z.boolean(),
-    allowAiSuggestions: z.boolean(),
     listUrl: ScrapeSourceUrlSchema,
     sampleUrls: z.array(ScrapeSourceUrlSchema),
     activeRevisionId: z.number().int().positive().nullable(),

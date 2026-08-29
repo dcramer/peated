@@ -3,7 +3,11 @@ import { externalSites, scrapeSources } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ExternalSiteRunSchema } from "@peated/server/schemas";
-import { queueScrapeSourcePreview } from "@peated/server/scraper";
+import {
+  ExternalSiteRunActiveError,
+  queueScrapeSourcePreview,
+} from "@peated/server/scraper";
+import { ScrapeSourceValidationError } from "@peated/server/scraper/configured/service";
 import { serializeExternalSiteRun } from "@peated/server/serializers/externalSite";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -35,11 +39,21 @@ export default procedure
       )
       .where(eq(scrapeSources.id, input.id));
     if (!row) throw errors.NOT_FOUND({ message: "Source not found." });
-    const run = await queueScrapeSourcePreview({
-      site: row.site,
-      scrapeSourceId: input.id,
-      revisionId: input.revisionId,
-      requestedById: context.user.id,
-    });
-    return serializeExternalSiteRun(run);
+    try {
+      const run = await queueScrapeSourcePreview({
+        site: row.site,
+        scrapeSourceId: input.id,
+        revisionId: input.revisionId,
+        requestedById: context.user.id,
+      });
+      return serializeExternalSiteRun(run);
+    } catch (error) {
+      if (error instanceof ScrapeSourceValidationError) {
+        throw errors.BAD_REQUEST({ message: error.message, cause: error });
+      }
+      if (error instanceof ExternalSiteRunActiveError) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      throw error;
+    }
   });

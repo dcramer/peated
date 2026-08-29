@@ -3,13 +3,20 @@
 ### Requirement: Admins can create controlled sources
 
 The system SHALL let an admin create an external site and its first scrape
-source with a bounded key, name, exact HTTP origin, list URL, conservative
-request policy, and robots enforcement. The source MUST start disabled.
+source with a name, website URL, conservative request policy, and robots
+enforcement. The system MUST derive its internal key from the website hostname,
+limit it to the allowed length, and use the website URL as the initial list
+page. The source MUST start disabled.
 
 #### Scenario: Admin creates a review source
 
 - **WHEN** an admin submits a valid new site and chooses `review`
-- **THEN** the system stores the site, admin-managed network rows, and a disabled review source without a deploy
+- **THEN** the system stores the site, generated internal key, admin-managed network rows, and a disabled review source without a deploy
+
+#### Scenario: Admin creates a source
+
+- **WHEN** an admin creates a source
+- **THEN** the system queues AI setup for its first parsing-rule revision
 
 #### Scenario: Rules try to change network access
 
@@ -19,8 +26,8 @@ request policy, and robots enforcement. The source MUST start disabled.
 ### Requirement: Each source has one kind
 
 The system SHALL support `review` and `price` source kinds. A site SHALL own at
-most one scrape source. The source SHALL own its kind, enablement, AI permission,
-list URL, sample URLs, and revisions.
+most one scrape source. The source SHALL own its kind, enablement, list URL,
+sample URLs, and revisions.
 
 #### Scenario: An admin chooses a source kind
 
@@ -58,33 +65,45 @@ or prices.
 #### Scenario: A review revision is previewed
 
 - **WHEN** an admin previews review rules against current pages
-- **THEN** the system stores structured article and review fields, source links, and bounded issues without storing HTML or review text
+- **THEN** the system stores structured article and review fields, source links, and a limited number of errors without storing HTML or review text
 
 #### Scenario: A price revision is previewed
 
 - **WHEN** an admin previews price rules against current pages
-- **THEN** the system stores structured product fields and bounded issues without storing prices as products
+- **THEN** the system stores structured product fields and a limited number of errors without storing prices as products
 
 ### Requirement: AI suggestions create inactive revisions only
 
-The system SHALL make at most one AI request to suggest rules from
-admin-selected pages. The AI MUST have no tools. It MUST NOT activate a
+The system SHALL run AI setup for every new source. It SHALL make at most two
+AI requests: one to suggest rules from supplied pages and one to review fields
+parsed from those rules. The AI MUST identify the list page, detail fields, and
+an optional next-page link. It MUST have no tools. It MUST NOT activate a
 revision, change network control, or write products.
 
 #### Scenario: AI is allowed
 
 - **WHEN** an admin requests the first suggestion or a repair after the latest test fails
-- **THEN** the system fetches bounded samples, checks the output, and stores an inactive revision with the AI model name and instructions version
+- **THEN** the system fetches the main page, up to four candidate list pages from the same website, one next list page when found, and up to three detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the HTML, and stores an inactive revision only when both checks pass
 
-#### Scenario: AI is not allowed
+#### Scenario: Proposed pagination repeats or leaves the website
 
-- **WHEN** the source does not permit AI processing
-- **THEN** the system rejects the request before it sends page content to the AI provider
+- **WHEN** the next-page selector returns a page that was already read or uses another origin
+- **THEN** code rejects the run before it reads that page
 
 #### Scenario: Model output is invalid
 
-- **WHEN** the AI response fails the strict rules schema or uses the wrong kind
-- **THEN** the system stores no revision and reports a bounded error without page content
+- **WHEN** the AI response does not match the required rules format or uses the wrong kind
+- **THEN** the system stores no revision and reports an error without page content
+
+#### Scenario: Proposed rules do not parse current pages
+
+- **WHEN** the list selector, detail selectors, conversions, or product schema fail against the supplied pages
+- **THEN** the system stores no revision and does not ask AI to approve invalid parsed fields
+
+#### Scenario: AI review rejects parsed fields
+
+- **WHEN** the reviewer finds that a parsed field does not represent the supplied HTML
+- **THEN** the system stores no revision and does not retry or let the reviewer change the rules
 
 ### Requirement: Activation and rollback require a passing test
 
@@ -140,8 +159,9 @@ not disable or rewrite admin-managed targets, origins, or site mappings.
 ### Requirement: The admin flow exposes the revision lifecycle
 
 The Admin Scrapers area SHALL let an admin add a site, choose a source kind,
-enter rules or request an AI revision, edit the list URL, preview, activate,
-view revision history, roll back, pause collection, and inspect health.
+wait for its AI revision, edit the generated list URL and rules, preview,
+activate, view revision history, roll back, pause collection, and inspect
+health.
 
 #### Scenario: An active source needs repair
 
