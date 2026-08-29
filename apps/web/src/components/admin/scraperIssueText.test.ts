@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import issueText from "./issueText";
+import issueText from "./scraperIssueText";
 
 test("uses plain labels for preview errors", () => {
   const text = issueText("detail.name");

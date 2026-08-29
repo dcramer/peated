@@ -22,6 +22,7 @@ import {
   AdminTextField,
 } from "./adminForm.stylex";
 import { AdminEmptyActivity } from "./adminUtility.stylex";
+import issueText from "./scraperIssueText";
 
 type Source = Outputs["externalSites"]["scrapeSources"]["list"][number];
 type Revision = Source["revisions"][number];
@@ -77,9 +78,7 @@ function TestResult({ revision }: { revision: Revision }) {
       {issues.length > 0 ? (
         <ul {...stylex.props(styles.issueList)}>
           {issues.map((issue, index) => (
-            <li key={`${issue.field}-${index}`}>
-              {issue.field}: {issue.message}
-            </li>
+            <li key={`${issue.field}-${index}`}>{issueText(issue.field)}</li>
           ))}
         </ul>
       ) : null}
@@ -178,7 +177,12 @@ export function ScraperParsingEditor({
       ),
     [source],
   );
-  const canSuggest = !latest || latest.previewStatus === "failed";
+  const setupInProgress =
+    source.setup?.status === "queued" || source.setup?.status === "running";
+  const canSuggest =
+    !setupInProgress && (!latest || latest.previewStatus === "failed");
+  const setupSteps = getSetupSteps(source);
+  const setupDescription = getSetupDescription(source);
 
   async function runAndRefresh(callback: () => Promise<void>) {
     setError(undefined);
@@ -194,6 +198,41 @@ export function ScraperParsingEditor({
     <div {...stylex.props(styles.stack)}>
       {error ? <AdminFormError values={[error]} /> : null}
       <AdminSection
+        title="Setup progress"
+        description={setupDescription}
+        action={
+          canSuggest ? (
+            <AdminButton
+              disabled={busy}
+              loading={suggest.isPending}
+              onClick={() =>
+                void runAndRefresh(async () => {
+                  await suggest.mutateAsync({ id: source.id });
+                })
+              }
+            >
+              {latest
+                ? "Ask AI to repair"
+                : source.setup
+                  ? "Retry AI setup"
+                  : "Start AI setup"}
+            </AdminButton>
+          ) : undefined
+        }
+      >
+        <ol {...stylex.props(styles.setupList)}>
+          {setupSteps.map((step) => (
+            <li key={step.name} {...stylex.props(styles.setupStep)}>
+              <span {...stylex.props(styles.setupStepName)}>{step.name}</span>
+              <AdminStatus tone={step.tone}>{step.status}</AdminStatus>
+            </li>
+          ))}
+        </ol>
+        {source.setup?.error ? (
+          <p {...stylex.props(styles.setupError)}>{source.setup.error}</p>
+        ) : null}
+      </AdminSection>
+      <AdminSection
         title={`How Peated reads ${source.kind === "review" ? "reviews" : "store prices"}`}
         description={
           activeRevision
@@ -205,18 +244,6 @@ export function ScraperParsingEditor({
             <AdminButton onClick={() => void refresh()} disabled={busy}>
               Refresh
             </AdminButton>
-            {canSuggest ? (
-              <AdminButton
-                disabled={busy}
-                onClick={() =>
-                  void runAndRefresh(async () => {
-                    await suggest.mutateAsync({ id: source.id });
-                  })
-                }
-              >
-                {latest ? "Ask AI to repair" : "Retry AI setup"}
-              </AdminButton>
-            ) : null}
             {source.enabled ? (
               <AdminButton
                 color="danger"
@@ -350,6 +377,80 @@ export function ScraperParsingEditor({
   );
 }
 
+function getSetupSteps(source: Source) {
+  const latest = source.revisions[0];
+  const setupStatus = source.setup?.status;
+  const setupComplete =
+    Boolean(latest) && (!setupStatus || setupStatus === "succeeded");
+
+  return [
+    {
+      name: "AI setup",
+      status:
+        setupStatus === "running"
+          ? "Running"
+          : setupStatus === "failed"
+            ? "Needs attention"
+            : setupStatus === "queued"
+              ? "Queued"
+              : latest
+                ? "Complete"
+                : "Not started",
+      tone: setupComplete
+        ? ("success" as const)
+        : setupStatus === "failed"
+          ? ("danger" as const)
+          : ("neutral" as const),
+    },
+    {
+      name: "Preview",
+      status: !latest
+        ? "Waiting"
+        : latest.previewStatus === "passed"
+          ? "Passed"
+          : latest.previewStatus === "failed"
+            ? "Needs repair"
+            : "Ready",
+      tone:
+        latest?.previewStatus === "passed"
+          ? ("success" as const)
+          : latest?.previewStatus === "failed"
+            ? ("danger" as const)
+            : ("neutral" as const),
+    },
+    {
+      name: "Activate",
+      status: source.activeRevisionId ? "Active" : "Waiting",
+      tone: source.activeRevisionId
+        ? ("success" as const)
+        : ("neutral" as const),
+    },
+  ];
+}
+
+function getSetupDescription(source: Source) {
+  const hasRevision = source.revisions.length > 0;
+  const setup = source.setup;
+
+  if (setup?.status === "running") {
+    return hasRevision
+      ? "Peated is updating this site's setup."
+      : "Peated is finding the pages and information to collect.";
+  }
+  if (setup?.status === "queued") {
+    return "Setup will start shortly. This page refreshes automatically.";
+  }
+  if (setup?.status === "failed") {
+    return "AI could not finish setup. Review the reason, then retry when the site is available.";
+  }
+  if (setup?.status === "succeeded") {
+    return hasRevision
+      ? "The generated setup is ready to test."
+      : "The generated revision is loading.";
+  }
+  return "Start AI setup to create the first revision.";
+}
+
 const styles = stylex.create({
   stack: {
     display: "flex",
@@ -361,6 +462,41 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: space.x6,
+  },
+  setupList: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(3, minmax(0, 1fr))",
+      "@media (max-width: 639px)": "1fr",
+    },
+    gap: space.x3,
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+  },
+  setupStep: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x3,
+    padding: space.x3,
+    backgroundColor: colors.inset,
+  },
+  setupStepName: {
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+  },
+  setupError: {
+    marginTop: space.x4,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    color: colors.accentDeep,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.45,
   },
   revisionList: {
     display: "flex",
