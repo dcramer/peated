@@ -109,8 +109,10 @@ describe("scraper observability", () => {
 
     expect(html).toContain("Connection");
     expect(html).toContain("Disabled");
-    expect(html).toContain("Site access: Not checked");
-    expect(html).toContain("Publication: disabled");
+    expect(html).toContain("Origins");
+    expect(html).toContain("Not checked");
+    expect(html).toContain("Publication");
+    expect(html).toContain("disabled");
   });
 
   it("shows responsible-request and deferral telemetry", () => {
@@ -120,7 +122,7 @@ describe("scraper observability", () => {
     expect(html).toContain("3 retries");
     expect(html).toContain("2 rate limits");
     expect(html).toContain("15 items emitted");
-    expect(html).toContain("Continues");
+    expect(html).toContain("continues");
   });
 
   it("shows aggregate Bottle and item coverage", () => {

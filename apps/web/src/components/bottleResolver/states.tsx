@@ -1,3 +1,4 @@
+import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import {
   Button,
@@ -223,7 +224,7 @@ export function PhotoMatchCreateState({
         <SelectedBottleSummary
           bottleId={matchedBottle.peatedId}
           imageUrl={previewUrl ?? matchedBottle.imageUrl}
-          metadata={matchedBottle.category ?? "Catalog bottle"}
+          metadata={getMatchedBottleMetadata(matchedBottle)}
           name={matchedBottle.fullName}
         />
         <EvidencePills result={result} />
@@ -295,4 +296,22 @@ export function PhotoMatchCreateState({
       )}
     </FormSection>
   );
+}
+
+function getMatchedBottleMetadata(bottle: Bottle) {
+  const release =
+    bottle.releaseYear !== null &&
+    !bottle.edition
+      ?.toLocaleLowerCase()
+      .includes(`${bottle.releaseYear} release`)
+      ? `${bottle.releaseYear} release`
+      : null;
+
+  return [
+    bottle.category ? formatCategoryName(bottle.category) : "Catalog bottle",
+    bottle.edition,
+    release,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" · ");
 }

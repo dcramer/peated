@@ -54,7 +54,9 @@ export function AdminTable<
   return (
     <AdminTableContent
       {...props}
-      searchParams={props.searchParams ?? navigationParams}
+      searchParams={
+        props.searchParams ?? navigationParams ?? new URLSearchParams()
+      }
     />
   );
 }

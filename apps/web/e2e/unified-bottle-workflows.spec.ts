@@ -176,10 +176,10 @@ test.describe("unified Bottle workflows", () => {
     await expect(page.getByLabel("Age Statement")).toHaveValue(
       String(anotherReleaseSourceBottle.statedAge),
     );
-    await expect(page.getByLabel("Edition or Batch")).toHaveValue(
+    await expect(page.getByLabel("Edition or batch")).toHaveValue(
       "First Fill Oloroso",
     );
-    await expect(page.getByLabel("Release Year")).toHaveValue("2026");
+    await expect(page.getByLabel("Release year")).toHaveValue("2026");
     await expectNoHorizontalOverflow(page);
 
     const createRequestPromise = page.waitForRequest((request) =>
@@ -237,16 +237,16 @@ test.describe("unified Bottle workflows", () => {
     );
     await expect(page.getByLabel("Shared Stated Age")).toHaveCount(0);
     await expect(page.getByLabel("Bottle-specific Stated Age")).toHaveCount(0);
-    await expect(page.getByLabel("Edition or Batch")).toHaveValue(
+    await expect(page.getByLabel("Edition or batch")).toHaveValue(
       unifiedBottleEditContext.exact.edition,
     );
-    await expect(page.getByLabel("Alcohol (ABV)")).toHaveValue(
+    await expect(page.getByLabel("Alcohol")).toHaveValue(
       String(unifiedBottleEditContext.exact.abv),
     );
-    await expect(page.getByLabel("Distillation Year")).toHaveValue(
+    await expect(page.getByLabel("Distillation year")).toHaveValue(
       String(unifiedBottleEditContext.exact.vintageYear),
     );
-    await expect(page.getByLabel("Release Year")).toHaveValue(
+    await expect(page.getByLabel("Release year")).toHaveValue(
       String(unifiedBottleEditContext.exact.releaseYear),
     );
     await expect(
@@ -259,8 +259,8 @@ test.describe("unified Bottle workflows", () => {
       0,
     );
 
-    await page.getByLabel("Edition or Batch").fill("Cask 43");
-    await expect(page.getByLabel("Edition or Batch")).toHaveValue("Cask 43");
+    await page.getByLabel("Edition or batch").fill("Cask 43");
+    await expect(page.getByLabel("Edition or batch")).toHaveValue("Cask 43");
     await page.getByLabel("Age Statement").fill("22");
     await expect(page.getByLabel("Age Statement")).toHaveValue("22");
 

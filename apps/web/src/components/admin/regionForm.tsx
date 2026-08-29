@@ -1,6 +1,5 @@
 "use client";
 
-import { BoltIcon } from "@heroicons/react/20/solid";
 import { RegionInputSchema } from "@peated/server/schemas";
 import { type Region } from "@peated/server/types";
 import {
@@ -12,6 +11,7 @@ import { toOption } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation } from "@tanstack/react-query";
+import { WandSparkles } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
@@ -111,7 +111,7 @@ export default function RegionForm({
               setValue("descriptionSrc", "generated");
             }}
             disabled={generateDataMutation.isPending}
-            icon={<BoltIcon />}
+            icon={<WandSparkles aria-hidden="true" size={18} />}
           >
             Help me fill this in [Beta]
           </Button>

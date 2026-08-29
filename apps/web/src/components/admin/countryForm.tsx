@@ -1,6 +1,5 @@
 "use client";
 
-import { BoltIcon } from "@heroicons/react/20/solid";
 import { CountryInputSchema } from "@peated/server/schemas";
 import { type Country } from "@peated/server/types";
 import {
@@ -11,6 +10,7 @@ import {
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation } from "@tanstack/react-query";
+import { WandSparkles } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
 import { AdminButton as Button } from "./adminButton.stylex";
@@ -83,7 +83,7 @@ export default function CountryForm({
                 setValue("summary", result.summary);
             }}
             disabled={generateDataMutation.isPending}
-            icon={<BoltIcon />}
+            icon={<WandSparkles aria-hidden="true" size={18} />}
           >
             Help me fill this in [Beta]
           </Button>

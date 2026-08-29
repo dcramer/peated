@@ -105,7 +105,7 @@ describe("StorePriceTable", () => {
       <StorePriceTable priceList={[makePrice({ updatedAt })]} />,
     );
 
-    expect(html).toContain("Last seen");
+    expect(html).toContain("Last Seen");
     expect(html).toContain(`dateTime="${updatedAt}"`);
   });
 
@@ -127,7 +127,7 @@ describe("StorePriceTable", () => {
       />,
     );
 
-    expect(html).toContain("No Bottle");
+    expect(html).toContain("No bottle");
     expect(html).not.toContain('href="/bottles/');
   });
 });

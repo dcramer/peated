@@ -93,7 +93,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
             <FormNotice>No changes proposed. {summary}</FormNotice>
           ) : (
             <FormSection
-              description="The audit is read-only. Each suggested change still requires separate approval."
+              description="The audit is read-only. Every catalog update still requires separate approval."
               title="Audit context"
             >
               <Field htmlFor="audit-note" label="What looks wrong?" optional>

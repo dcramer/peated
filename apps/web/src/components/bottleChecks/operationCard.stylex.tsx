@@ -1,14 +1,11 @@
 "use client";
 
-import {
-  ArrowRightIcon,
-  DocumentDuplicateIcon,
-} from "@heroicons/react/24/outline";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import Link from "@peated/web/components/admin/adminLink.stylex";
 import * as stylex from "@stylexjs/stylex";
+import { ArrowRight, Copy } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
 import {
@@ -232,7 +229,7 @@ function FieldDiff({
                     {formatValue(getPath(before, field))}
                   </dd>
                 </div>
-                <ArrowRightIcon
+                <ArrowRight
                   aria-hidden="true"
                   {...stylex.props(styles.arrow)}
                 />
@@ -771,12 +768,7 @@ export default function OperationCard({
         {onCopy ? (
           <Button
             disabled={copying}
-            icon={
-              <DocumentDuplicateIcon
-                aria-hidden="true"
-                {...stylex.props(styles.icon)}
-              />
-            }
+            icon={<Copy aria-hidden="true" {...stylex.props(styles.icon)} />}
             loading={copying}
             onClick={() => onCopy(operation.id)}
             size="small"

@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
-import BottleIcon from "../../../assets/bottle.svg";
 
 import {
   colors,
@@ -12,8 +11,7 @@ import {
 import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
-// SAFETY: Next exposes SVGs as components while Storybook exposes the same import as a static asset.
-const bottleIconAsset = BottleIcon as { src?: string };
+const bottleIconUrl = "/assets/bottle.svg";
 
 export type BottleVisualSize = "sm" | "md" | "lg";
 
@@ -38,16 +36,14 @@ export function BottleVisual({
     >
       {imageUrl ? (
         <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
-      ) : bottleIconAsset.src ? (
+      ) : (
         <span
           style={{
-            maskImage: `url("${bottleIconAsset.src}")`,
-            WebkitMaskImage: `url("${bottleIconAsset.src}")`,
+            maskImage: `url("${bottleIconUrl}")`,
+            WebkitMaskImage: `url("${bottleIconUrl}")`,
           }}
           {...stylex.props(styles.fallbackAsset)}
         />
-      ) : (
-        <BottleIcon aria-hidden="true" {...stylex.props(styles.fallbackIcon)} />
       )}
     </span>
   );
@@ -241,11 +237,6 @@ const styles = stylex.create({
     width: "100%",
     height: "100%",
     objectFit: "contain",
-  },
-  fallbackIcon: {
-    display: "block",
-    width: "100%",
-    height: "100%",
   },
   fallbackAsset: {
     display: "block",
