@@ -1,6 +1,10 @@
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { activateScrapeSourceRevision } from "@peated/server/scraper/configured/service";
+import {
+  ScrapeSourceNotFoundError,
+  ScrapeSourceValidationError,
+  activateScrapeSourceRevision,
+} from "@peated/server/scraper/configured/service";
 import { z } from "zod";
 
 export default procedure
@@ -20,10 +24,20 @@ export default procedure
       .strict(),
   )
   .output(z.object({ activeRevisionId: z.number().int().positive() }))
-  .handler(async ({ input }) => {
-    const result = await activateScrapeSourceRevision({
-      scrapeSourceId: input.id,
-      revisionId: input.revisionId,
-    });
-    return { activeRevisionId: result.revision.id };
+  .handler(async ({ input, errors }) => {
+    try {
+      const result = await activateScrapeSourceRevision({
+        scrapeSourceId: input.id,
+        revisionId: input.revisionId,
+      });
+      return { activeRevisionId: result.revision.id };
+    } catch (error) {
+      if (error instanceof ScrapeSourceNotFoundError) {
+        throw errors.NOT_FOUND({ message: "Source not found.", cause: error });
+      }
+      if (error instanceof ScrapeSourceValidationError) {
+        throw errors.BAD_REQUEST({ message: error.message, cause: error });
+      }
+      throw error;
+    }
   });

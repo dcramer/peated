@@ -118,9 +118,11 @@ function parseVolume(value: string | null) {
   const normalized = value.toLowerCase().replaceAll(",", "");
   const number = parseNumber(normalized);
   if (number === null || number <= 0) return null;
-  return normalized.includes("cl")
-    ? Math.round(number * 10)
-    : Math.round(number);
+  if (normalized.includes("cl")) return Math.round(number * 10);
+  if (/(?:^|[^a-z])l(?:[^a-z]|$)/.test(normalized)) {
+    return Math.round(number * 1000);
+  }
+  return Math.round(number);
 }
 
 function validationIssues(error: z.ZodError): ScrapeIssue[] {

@@ -5,7 +5,11 @@ import {
   ScrapeSourceRevisionSchema,
   ScrapeSourceUrlSchema,
 } from "@peated/server/schemas";
-import { createScrapeSourceRevision } from "@peated/server/scraper/configured/service";
+import {
+  ScrapeSourceNotFoundError,
+  ScrapeSourceValidationError,
+  createScrapeSourceRevision,
+} from "@peated/server/scraper/configured/service";
 import { serialize } from "@peated/server/serializers";
 import { ScrapeSourceRevisionSerializer } from "@peated/server/serializers/scrapeSource";
 import { z } from "zod";
@@ -28,16 +32,26 @@ export default procedure
       .strict(),
   )
   .output(ScrapeSourceRevisionSchema)
-  .handler(async ({ input, context }) =>
-    serialize(
-      ScrapeSourceRevisionSerializer,
-      await createScrapeSourceRevision({
-        scrapeSourceId: input.id,
-        listUrl: input.listUrl,
-        rules: input.rules,
-        author: "person",
-        createdById: context.user.id,
-      }),
-      context.user,
-    ),
-  );
+  .handler(async ({ input, context, errors }) => {
+    try {
+      return await serialize(
+        ScrapeSourceRevisionSerializer,
+        await createScrapeSourceRevision({
+          scrapeSourceId: input.id,
+          listUrl: input.listUrl,
+          rules: input.rules,
+          author: "person",
+          createdById: context.user.id,
+        }),
+        context.user,
+      );
+    } catch (error) {
+      if (error instanceof ScrapeSourceNotFoundError) {
+        throw errors.NOT_FOUND({ message: "Source not found.", cause: error });
+      }
+      if (error instanceof ScrapeSourceValidationError) {
+        throw errors.BAD_REQUEST({ message: error.message, cause: error });
+      }
+      throw error;
+    }
+  });

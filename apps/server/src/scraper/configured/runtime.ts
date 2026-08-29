@@ -151,7 +151,10 @@ function createScrapeSourceAdapter(input: {
         });
       }
     } catch (error) {
-      if (error instanceof ScrapeSourceParseError) {
+      if (
+        input.purpose === "preview" &&
+        error instanceof ScrapeSourceParseError
+      ) {
         await recordScrapeSourcePreview({
           revisionId: input.revisionId,
           status: "failed",
@@ -262,10 +265,40 @@ export async function resolveScrapeSourceRunRegistry(
     );
   if (suggestion) {
     const requestedById = suggestion.requestedById;
-    if (!requestedById) {
+    if (suggestion.run.revisionId === null && !requestedById) {
       throw new Error("AI suggestion run has no requesting admin.");
     }
     const target = await loadScrapeSourceTarget(suggestion.target);
+    const adapter: ScraperAdapter<null, unknown> =
+      suggestion.run.revisionId !== null
+        ? // A linked revision means the suggestion finished before the run was retried.
+          async () => {}
+        : async ({ session }) => {
+            if (!requestedById) {
+              throw new Error("AI suggestion run has no requesting admin.");
+            }
+            const urls = [
+              suggestion.source.listUrl,
+              ...suggestion.source.sampleUrls,
+            ];
+            const pages = [];
+            for (const value of urls) {
+              const response = await session.request({
+                target: target.key,
+                url: new URL(value),
+              });
+              pages.push({ url: response.url.toString(), html: response.body });
+            }
+            const revision = await suggestScrapeSourceRevision({
+              scrapeSourceId: suggestion.source.id,
+              createdById: requestedById,
+              pages,
+            });
+            await db
+              .update(scrapeSourceRuns)
+              .set({ revisionId: revision.id })
+              .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
+          };
     const source: ScraperSourceDefinition<null, unknown> = {
       key: `source-${suggestion.source.id}`,
       externalSiteKey: suggestion.siteKey,
@@ -275,29 +308,7 @@ export async function resolveScrapeSourceRunRegistry(
       cursorSchema: z.null(),
       observationSchema: z.unknown(),
       sink: async () => {},
-      adapter: async ({ session }) => {
-        const urls = [
-          suggestion.source.listUrl,
-          ...suggestion.source.sampleUrls,
-        ];
-        const pages = [];
-        for (const value of urls) {
-          const response = await session.request({
-            target: target.key,
-            url: new URL(value),
-          });
-          pages.push({ url: response.url.toString(), html: response.body });
-        }
-        const revision = await suggestScrapeSourceRevision({
-          scrapeSourceId: suggestion.source.id,
-          createdById: requestedById,
-          pages,
-        });
-        await db
-          .update(scrapeSourceRuns)
-          .set({ revisionId: revision.id })
-          .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
-      },
+      adapter,
     };
     const sources = new Map(baseRegistry.sources);
     const targets = new Map(baseRegistry.targets);

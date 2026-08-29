@@ -123,6 +123,31 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("converts liters to milliliters", () => {
+    const result = parseScrapeDetail(
+      {
+        kind: "price",
+        list: {
+          detailLink: { selector: "a.product", attribute: "href" },
+          maxItems: 10,
+        },
+        detail: {
+          name: { selector: "h1" },
+          price: { selector: ".price" },
+          currency: "usd",
+          volume: { selector: ".volume" },
+        },
+      },
+      '<h1>Example Whisky</h1><span class="price">$84.99</span><span class="volume">0.75l</span>',
+      new URL("https://store.test/products/example"),
+    );
+    expect(result).toMatchObject({
+      kind: "price",
+      value: [{ volume: 750 }],
+      issues: [],
+    });
+  });
+
   it("reports invalid store fields", () => {
     const result = parseScrapeDetail(
       {
