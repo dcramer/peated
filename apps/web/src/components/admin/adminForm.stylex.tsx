@@ -188,6 +188,7 @@ type AdminTextareaFieldProps = Omit<
   "className" | "style"
 > & {
   error?: FieldError;
+  format?: "data" | "text";
   helpText?: ReactNode;
   label?: ReactNode;
 };

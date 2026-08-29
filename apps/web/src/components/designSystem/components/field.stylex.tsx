@@ -139,19 +139,22 @@ export type TextareaProps = Omit<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
   "className" | "style"
 > & {
+  format?: InputFormat;
   invalid?: boolean;
 };
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  function Textarea({ invalid = false, ...props }, ref) {
+  function Textarea({ format = "text", invalid = false, ...props }, ref) {
     return (
       <textarea
         {...props}
         aria-invalid={invalid || undefined}
+        data-format={format}
         ref={ref}
         {...stylex.props(
           styles.control,
           styles.textarea,
+          format === "data" && styles.data,
           invalid && styles.invalid,
         )}
       />
