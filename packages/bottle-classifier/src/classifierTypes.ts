@@ -137,7 +137,7 @@ export const BottleExtractedDetailsSchema = z
     vintage_year: z.number().nullable().default(null),
     // Model and replay data can omit fields added later. Omission and null both
     // mean that the value is unknown; server inputs store unknown values as null.
-    bottling_year: z.number().nullable().optional(),
+    bottling_year: z.number().int().nullable().optional(),
     cask_strength: z.boolean().nullable().default(null),
     single_cask: z.boolean().nullable().default(null),
     maturation: MaturationSchema,

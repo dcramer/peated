@@ -8,20 +8,6 @@ import { OpenAIRegionDetailsSchema } from "../worker/jobs/generateRegionDetails"
 import { MAX_BOTTLE_SUGGESTED_TAGS } from "./bottleSchemas";
 import { buildStructuredResponseSpanContext } from "./openai";
 
-const EntityJsonSchemaContract = z.object({
-  properties: z
-    .object({
-      website: z
-        .object({
-          anyOf: z
-            .array(z.object({ format: z.string().optional() }))
-            .optional(),
-        })
-        .optional(),
-    })
-    .optional(),
-});
-
 const BottleJsonSchemaContract = z.object({
   properties: z
     .object({
@@ -72,15 +58,9 @@ describe("openai structured output schemas", () => {
   });
 
   test("does not emit unsupported uri formats for generated entity websites", () => {
-    const jsonSchema = EntityJsonSchemaContract.parse(
-      z.toJSONSchema(OpenAIEntityDetailsValidationSchema),
-    );
+    const jsonSchema = z.toJSONSchema(OpenAIEntityDetailsValidationSchema);
 
-    expect(
-      jsonSchema.properties?.website?.anyOf?.some(
-        (schema) => schema.format === "uri",
-      ),
-    ).toBe(false);
+    expect(JSON.stringify(jsonSchema)).not.toContain('"format":"uri"');
   });
 
   test("limits generated bottle tags to the storage contract", () => {
