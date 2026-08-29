@@ -1,8 +1,5 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
-import {
-  parseDetailsFromName,
-  parseFlavorProfile,
-} from "@peated/bottle-classifier/smws";
+import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
@@ -89,9 +86,6 @@ export async function scrapeBottles(
     const ageSpec = specList.find(([name]) => name === "Age:");
     let statedAge = ageSpec ? Number(ageSpec[1].split(" ")[0]) : null;
 
-    const flavorSpec = specList.find(([name]) => name === "Flavour:");
-    const flavorProfile = flavorSpec ? parseFlavorProfile(flavorSpec[1]) : null;
-
     const caskSpec = specList.find(([name]) => name === "Cask:");
     const maturation = caskSpec?.[1] || null;
     const caskNumber = itemType.replace(/^Cask No\.\s*/i, "").trim();
@@ -140,7 +134,6 @@ export async function scrapeBottles(
           name: "The Scotch Malt Whisky Society",
         },
         distillers: [{ name: details.distiller }],
-        flavorProfile,
         maturation,
         caskNumber,
         singleCask: true,
