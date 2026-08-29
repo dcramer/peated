@@ -41,15 +41,14 @@ describe("PUT /external-sites/:site/config/:key", () => {
     const err = await waitError(() =>
       routerClient.externalSites.config.set(
         {
-          // SAFETY: This test sends an unknown site to the runtime validator.
-          site: "non-existent-site" as any,
+          site: "non-existent-site",
           key: "test",
           value: "test",
         },
         { context: { user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+    expect(err).toMatchInlineSnapshot(`[Error: Site not found.]`);
   });
 
   test("set new value", async ({ fixtures }) => {
