@@ -146,7 +146,7 @@ async function getAccessToken(): Promise<string> {
   return AuthenticationResponseSchema.parse(data).data.token;
 }
 
-export async function scrapeProducts(
+async function scrapeProducts(
   url: string,
   cb: ScrapePricesCallback,
   accessToken?: string,

@@ -81,7 +81,7 @@ export interface WhiskyWorldPage {
   hasNextPage: boolean;
 }
 
-export function parseWhiskyWorldPage(html: string): WhiskyWorldPage {
+function parseWhiskyWorldPage(html: string): WhiskyWorldPage {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);

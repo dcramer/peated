@@ -81,7 +81,7 @@ function getProductName(
   return brand ? normalizeBottle({ name: `${brand} ${title}` }).name : null;
 }
 
-export function parseBruichladdichProducts(input: JsonValue): StorePrice[] {
+function parseBruichladdichProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

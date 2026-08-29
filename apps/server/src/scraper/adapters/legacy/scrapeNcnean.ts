@@ -100,7 +100,7 @@ function getProductName(title: string, vendor: string): string | null {
   return normalizeBottle({ name: publishedName }).name;
 }
 
-export function parseNcneanProducts(input: JsonValue): StorePrice[] {
+function parseNcneanProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 

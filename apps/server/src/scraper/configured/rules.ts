@@ -20,7 +20,7 @@ export const ScrapeSelectorSchema = z
 
 export const ScrapeAttributeSchema = z.string().trim().min(1).max(100);
 
-export const ScrapeValueSelectorSchema = z
+const ScrapeValueSelectorSchema = z
   .object({
     selector: ScrapeSelectorSchema,
     attribute: ScrapeAttributeSchema.optional(),

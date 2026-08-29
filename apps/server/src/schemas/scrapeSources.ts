@@ -52,7 +52,7 @@ export const ScrapeSourceRevisionSchema = z.discriminatedUnion("author", [
   }),
 ]);
 
-export const ScrapeSourceSetupSchema = z
+const ScrapeSourceSetupSchema = z
   .object({
     runId: z.number().int().positive(),
     status: z.enum(["queued", "running", "succeeded", "failed"]),

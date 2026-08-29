@@ -24,7 +24,6 @@ import type {
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import type { ExternalSiteKey } from "@peated/server/types";
-import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { z } from "zod";
 import { emitLegacyBottleObservation } from "./bottleContext";
@@ -36,11 +35,11 @@ import {
 } from "./priceContext";
 import { requestLegacyUrl } from "./requestContext";
 
-export class PageNotFound extends Error {
+class PageNotFound extends Error {
   override name = "PageNotFound";
 }
 
-export function downloadFileAsBlob(url: string) {
+function downloadFileAsBlob(url: string) {
   return fetch(url).then((res) => res.blob());
 }
 
@@ -102,16 +101,6 @@ export async function requestUrl(
   return data;
 }
 
-export function absoluteUrl(url: string, baseUrl: string) {
-  if (url.indexOf("https://") === 0) return url;
-  const urlParts = new URL(baseUrl);
-  return `${urlParts.origin}${url.indexOf("/") !== 0 ? "/" : ""}${url}`;
-}
-
-export function removeBottleSize(name: string) {
-  return name.replace(/\([^)]+\)$/, "");
-}
-
 export function parsePrice(value: string) {
   // $XX.YY
   if (value.indexOf("$") !== 0) {
@@ -143,15 +132,6 @@ export async function chunked<T>(
 }
 
 export type StorePrice = z.infer<typeof StorePriceInputSchema>;
-
-export type BottleReview = {
-  name: string;
-  category: Category | null;
-  rating: number;
-  url: string;
-  issue: string;
-  publishedAt?: Date;
-};
 
 export async function handleBottle(
   bottle: z.input<typeof BottleInputSchema>,

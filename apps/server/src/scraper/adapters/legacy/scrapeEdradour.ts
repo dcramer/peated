@@ -66,7 +66,7 @@ function parseAbv(value: string): number | null {
   return Number.isFinite(abv) && abv >= 0 && abv <= 100 ? abv : null;
 }
 
-export function parseEdradourProductCards(html: string): EdradourProductCard[] {
+function parseEdradourProductCards(html: string): EdradourProductCard[] {
   const $ = cheerio(html);
   const products: EdradourProductCard[] = [];
 
@@ -107,7 +107,7 @@ function getDetailProperty(
   return result;
 }
 
-export function parseEdradourProduct(
+function parseEdradourProduct(
   html: string,
   sourceUrl: string,
 ): StorePrice | null {

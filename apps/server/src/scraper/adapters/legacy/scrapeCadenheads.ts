@@ -73,7 +73,7 @@ function extractVolume(
   return match ? parseVolume(match[1], match[2]) : null;
 }
 
-export function parseCadenheadsProducts(input: JsonValue): StorePrice[] {
+function parseCadenheadsProducts(input: JsonValue): StorePrice[] {
   const payload = CadenheadsProductsSchema.parse(input);
   const products: StorePrice[] = [];
 

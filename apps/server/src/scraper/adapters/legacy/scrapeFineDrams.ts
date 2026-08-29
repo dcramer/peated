@@ -106,7 +106,7 @@ export interface FineDramsPage {
   hasSourceProducts: boolean;
 }
 
-export function parseFineDramsPage(html: string): FineDramsPage {
+function parseFineDramsPage(html: string): FineDramsPage {
   const $ = cheerio(html);
   const products: StorePrice[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);

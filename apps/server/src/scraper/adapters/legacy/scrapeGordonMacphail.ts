@@ -64,7 +64,7 @@ function isExplicitlyNonWhisky(title: string, bodyHtml: string | null) {
   );
 }
 
-export function parseGordonMacphailProducts(
+function parseGordonMacphailProducts(
   input: JsonValue,
   sourceUrl: string,
 ): StorePrice[] {

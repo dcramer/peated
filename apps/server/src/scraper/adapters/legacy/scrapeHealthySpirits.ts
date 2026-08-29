@@ -241,7 +241,7 @@ export function parseHealthySpiritsProducts(
   };
 }
 
-export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
+async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
   const offset = Number(new URL(url).searchParams.get("offset"));
   if (!Number.isInteger(offset) || offset < 0) {
     throw new Error("Invalid Healthy Spirits catalog offset.");

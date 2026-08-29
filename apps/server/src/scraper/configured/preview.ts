@@ -1,7 +1,7 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
 import { z } from "zod";
 
-export const ScrapeIssueSchema = z
+const ScrapeIssueSchema = z
   .object({
     field: z.string(),
     message: z.string(),
@@ -54,7 +54,7 @@ const PricePageSchema = z
   })
   .strict();
 
-export const ScrapeSourcePreviewPageSchema = z.discriminatedUnion("kind", [
+const ScrapeSourcePreviewPageSchema = z.discriminatedUnion("kind", [
   ReviewPageSchema,
   PricePageSchema,
 ]);

@@ -69,7 +69,7 @@ function getProductName(title: string, tags: string[]): string | null {
   return null;
 }
 
-export function parseGlenAllachieProducts(input: JsonValue): StorePrice[] {
+function parseGlenAllachieProducts(input: JsonValue): StorePrice[] {
   const payload = ShopifyCatalogSchema.parse(input);
   const products: StorePrice[] = [];
 
