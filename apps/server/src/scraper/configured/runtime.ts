@@ -33,9 +33,9 @@ import {
 import { recordScrapeSourcePreview } from "./service";
 import {
   MAX_SUGGESTION_DETAIL_PAGES,
-  suggestScrapeSourceRevision,
   suggestionRequestLimit,
-} from "./suggestion";
+} from "./setupAgent";
+import { suggestScrapeSourceRevision } from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
 class ScrapeSourceParseError extends Error {

@@ -57,6 +57,8 @@ export default {
   AI_GATEWAY_API_KEY: aiGatewayConfig.apiKey,
   SCRAPER_AI_GATEWAY_API_KEY:
     process.env.SCRAPER_AI_GATEWAY_API_KEY?.trim() || undefined,
+  SCRAPER_SETUP_MODEL:
+    process.env.SCRAPER_SETUP_MODEL?.trim() || "spacexai/grok-4.5",
   BOTTLE_CLASSIFIER_MODEL: aiGatewayConfig.bottleClassifierModel,
   BOTTLE_CLASSIFIER_REASONING_EFFORT:
     aiGatewayConfig.bottleClassifierReasoningEffort,

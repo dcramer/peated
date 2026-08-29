@@ -142,11 +142,42 @@ function parseVolume(value: string | null) {
   return Math.round(number);
 }
 
-function validationIssues(error: z.ZodError): ScrapeIssue[] {
+function validationIssues(
+  error: z.ZodError,
+  fieldForPath: (path: PropertyKey[]) => string,
+): ScrapeIssue[] {
   return error.issues.map((issue) => ({
-    field: issue.path.join("."),
+    field: fieldForPath(issue.path),
     message: issue.message,
   }));
+}
+
+function reviewField(path: PropertyKey[]) {
+  if (path[0] === "externalReviewTexts") return "detail.reviewText";
+  if (path[0] !== "article") return "detail";
+  if (path[1] === "title") return "detail.title";
+  if (path[1] === "publishedAt") return "detail.publishedAt";
+  if (path[1] !== "externalReviews") return "detail";
+  if (path[3] === "name") return "detail.name";
+  if (path[3] === "reviewerName") return "detail.reviewerName";
+  if (path[3] === "nativeScore") return "detail.score";
+  return "detail.reviewItem";
+}
+
+const PRICE_FIELDS = new Set([
+  "name",
+  "price",
+  "currency",
+  "volume",
+  "url",
+  "externalProductId",
+  "imageUrl",
+  "barcode",
+]);
+
+function priceField(path: PropertyKey[]) {
+  const field = String(path[0] ?? "");
+  return PRICE_FIELDS.has(field) ? `detail.${field}` : "detail";
 }
 
 function parseReviewDetail(
@@ -179,7 +210,7 @@ function parseReviewDetail(
       const name = readValue(item, rules.detail.name);
       if (!name) {
         issues.push({
-          field: `detail.reviewItem.${index}.name`,
+          field: "detail.name",
           message: "Required value was not found.",
         });
         return;
@@ -194,7 +225,7 @@ function parseReviewDetail(
       const scoreValue = parseNumber(scoreText);
       if (scoreText && scoreValue === null) {
         issues.push({
-          field: `detail.reviewItem.${index}.score`,
+          field: "detail.score",
           message: "Score is not a number.",
         });
       }
@@ -237,7 +268,7 @@ function parseReviewDetail(
     externalReviewTexts,
   });
   if (!result.success) {
-    issues.push(...validationIssues(result.error));
+    issues.push(...validationIssues(result.error, reviewField));
     return { kind: "review", value: null, issues };
   }
   return { kind: "review", value: result.data, issues };
@@ -275,7 +306,7 @@ function parseStorePriceDetail(
     return {
       kind: "price",
       value: [],
-      issues: validationIssues(result.error),
+      issues: validationIssues(result.error, priceField),
     };
   }
   return { kind: "price", value: [result.data], issues: [] };

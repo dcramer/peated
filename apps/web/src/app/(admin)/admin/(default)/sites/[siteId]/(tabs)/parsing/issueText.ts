@@ -1,6 +1,7 @@
 const FIELD_LABELS = {
   "list.detailLink": "Item links",
   "list.nextPage": "Next page",
+  detail: "Item page",
   "detail.title": "Page title",
   "detail.publishedAt": "Published date",
   "detail.reviewItem": "Reviews",
@@ -18,13 +19,8 @@ const FIELD_LABELS = {
 };
 
 export default function issueText(field: string) {
-  const knownLabel = Object.entries(FIELD_LABELS).find(
-    ([key]) => key === field,
-  )?.[1];
-  const label = field.includes(".name")
-    ? "Item name"
-    : field.includes(".score")
-      ? "Score"
-      : (knownLabel ?? "Page details");
+  const label =
+    Object.entries(FIELD_LABELS).find(([key]) => key === field)?.[1] ??
+    "Page content";
   return `${label}: Peated could not read this part of the page.`;
 }

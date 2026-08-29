@@ -101,7 +101,7 @@ export function SetupNotice({
     setup?.status === "running"
       ? `Peated is finding the pages and ${
           source.kind === "review" ? "review details" : "product information"
-        }. It will correct one failed attempt automatically.`
+        }. It will test and correct the rules before creating a version.`
       : setup?.status === "queued"
         ? "Setup will start shortly. This page refreshes automatically."
         : setup?.status === "succeeded"
