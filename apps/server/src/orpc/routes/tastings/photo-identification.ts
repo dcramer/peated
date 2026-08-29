@@ -22,17 +22,17 @@ import { humanizeBytes } from "@peated/server/lib/strings";
 import { logInfo } from "@peated/server/lib/structuredLog";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
+import photoIdentificationContract from "@peated/server/orpc/contracts/tastings/photo-identification";
 import {
   createRateLimit,
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import {
-  PhotoIdentificationInputSchema,
-  PhotoIdentificationSchema,
   type PhotoIdentificationDiagnosticsSchema,
+  type PhotoIdentificationSchema,
   type PhotoIdentificationSuggestedNextStepEnum,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -717,37 +717,10 @@ const photoIdentificationProcedureServices: PhotoIdentificationProcedureServices
 export function createPhotoIdentificationProcedure(
   services: PhotoIdentificationProcedureServices = photoIdentificationProcedureServices,
 ) {
-  return procedure
+  return implement(photoIdentificationContract)
     .use(requireAuth)
     .use(requireTosAccepted)
     .use(photoIdentificationRateLimit)
-    .route({
-      method: "POST",
-      path: "/tastings/photo-identification",
-      summary: "Identify tasting bottle from photo",
-      description:
-        "Upload a temporary bottle photo, extract label evidence, and classify the likely bottle without creating a tasting.",
-      operationId: "identifyTastingBottleFromPhoto",
-      // Advertise one request format so generated clients send a file upload.
-      spec: (spec) => {
-        const multipart =
-          spec.requestBody && "content" in spec.requestBody
-            ? spec.requestBody.content?.["multipart/form-data"]
-            : undefined;
-
-        return multipart
-          ? {
-              ...spec,
-              requestBody: {
-                ...spec.requestBody,
-                content: { "multipart/form-data": multipart },
-              },
-            }
-          : spec;
-      },
-    })
-    .input(PhotoIdentificationInputSchema)
-    .output(PhotoIdentificationSchema)
     .handler(async function ({ input, context, errors }) {
       const { file, idempotencyKey } = input;
 

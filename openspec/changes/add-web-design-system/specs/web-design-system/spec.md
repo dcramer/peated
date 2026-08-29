@@ -404,6 +404,11 @@ The design system SHALL use one tasting-form component tree across desktop and m
 - **WHEN** the caller supplies an existing tasting rating
 - **THEN** the form selects that canonical band without creating a point score
 
+#### Scenario: Member moves through the tasting form
+
+- **WHEN** the member continues from Rating through Notes and Details
+- **THEN** the progress control names all three steps, the active step renders each of its fields directly, and values remain intact when the member moves backward or forward
+
 #### Scenario: Required tasting input is missing
 
 - **WHEN** no rating band is selected
@@ -411,8 +416,8 @@ The design system SHALL use one tasting-form component tree across desktop and m
 
 #### Scenario: Member completes an optional field
 
-- **WHEN** the member changes date, serving style, colour, notes, or picture input
-- **THEN** the same field contract is used at every supported viewport without creating a new product field
+- **WHEN** the member changes notes, colour, comment, picture, friends, or edit-only serving style
+- **THEN** the same visible field contract is used at every supported viewport without a per-field disclosure or a new product field
 
 ### Requirement: Form support components
 

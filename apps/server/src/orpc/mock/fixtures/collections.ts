@@ -12,7 +12,7 @@ export const mockCollectionBottle = {
   hasTasted: true,
 } satisfies CollectionBottle;
 
-export const mockCollectionBottles = [
+export const mockCollectionBottles: CollectionBottle[] = [
   mockCollectionBottle,
   {
     id: 9702,
@@ -49,4 +49,4 @@ export const mockCollectionBottles = [
     bottle: mockBottles[5]!,
     hasTasted: true,
   },
-] satisfies CollectionBottle[];
+];

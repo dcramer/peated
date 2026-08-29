@@ -55,6 +55,38 @@ export function FormActions({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.actions)}>{children}</div>;
 }
 
+export type FormStepsProps = {
+  currentStep: number;
+  steps: readonly string[];
+};
+
+/** Shows the full sequence for a form that moves through a few clear steps. */
+export function FormSteps({ currentStep, steps }: FormStepsProps) {
+  return (
+    <nav aria-label="Form progress" {...stylex.props(styles.steps)}>
+      <ol {...stylex.props(styles.stepList)}>
+        {steps.map((step, index) => (
+          <li
+            aria-current={index === currentStep ? "step" : undefined}
+            key={step}
+            {...stylex.props(
+              styles.step,
+              index < currentStep && styles.completedStep,
+              index === currentStep && styles.currentStep,
+            )}
+          >
+            <span aria-hidden="true">{index + 1}</span>
+            <span {...stylex.props(styles.stepLabel)}>{step}</span>
+          </li>
+        ))}
+      </ol>
+      <span {...stylex.props(styles.stepCount)}>
+        Step {currentStep + 1} of {steps.length}
+      </span>
+    </nav>
+  );
+}
+
 export type FormNoticeProps = Omit<
   HTMLAttributes<HTMLDivElement>,
   "className" | "style"
@@ -108,59 +140,6 @@ export function FormDetails({
         />
       </summary>
       <div {...stylex.props(styles.detailFields)}>{children}</div>
-    </details>
-  );
-}
-
-export type OptionalFieldProps = {
-  children: ReactNode;
-  defaultOpen?: boolean;
-  label: ReactNode;
-  summary: ReactNode;
-};
-
-export function OptionalFieldList({ children }: { children: ReactNode }) {
-  return <div {...stylex.props(styles.optionalFieldList)}>{children}</div>;
-}
-
-/** Shows one optional value as a compact row until the user chooses to edit it. */
-export function OptionalField({
-  children,
-  defaultOpen = false,
-  label,
-  summary,
-}: OptionalFieldProps) {
-  return (
-    <details
-      open={defaultOpen || undefined}
-      {...stylex.props(styles.optionalField)}
-    >
-      <summary {...stylex.props(styles.optionalFieldSummary)}>
-        <span {...stylex.props(styles.optionalFieldCopy)}>
-          <span
-            {...stylex.props(
-              foundationStyles.fieldLabel,
-              styles.optionalFieldLabel,
-            )}
-          >
-            {label}
-          </span>
-          <span
-            {...stylex.props(
-              foundationStyles.metadata,
-              styles.optionalFieldValue,
-            )}
-          >
-            {summary}
-          </span>
-        </span>
-        <ChevronDown
-          aria-hidden="true"
-          size={18}
-          {...stylex.props(styles.optionalFieldIcon)}
-        />
-      </summary>
-      <div {...stylex.props(styles.optionalFieldControl)}>{children}</div>
     </details>
   );
 }
@@ -226,6 +205,60 @@ const styles = stylex.create({
     gap: space.x2,
     flexWrap: "wrap",
   },
+  steps: {
+    boxSizing: "border-box",
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: space.x4,
+    paddingTop: space.x4,
+    paddingRight: space.x4,
+    paddingBottom: space.x4,
+    paddingLeft: space.x4,
+    borderRadius: "3px",
+    backgroundColor: colors.inset,
+    "@media (max-width: 559px)": {
+      flexDirection: "column",
+      alignItems: "stretch",
+      gap: space.x2,
+    },
+  },
+  stepList: {
+    display: "flex",
+    minWidth: 0,
+    flex: 1,
+    gap: space.x4,
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+    "@media (max-width: 559px)": { gap: space.x3 },
+  },
+  step: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    gap: space.x2,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    letterSpacing: "0.06em",
+    lineHeight: 1.3,
+    textTransform: "uppercase",
+  },
+  completedStep: { color: colors.ink },
+  currentStep: { color: colors.accentDeep, fontWeight: 500 },
+  stepLabel: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  stepCount: {
+    flexShrink: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    lineHeight: 1.3,
+  },
   notice: {
     boxSizing: "border-box",
     padding: space.x4,
@@ -270,69 +303,5 @@ const styles = stylex.create({
       "@media (max-width: 559px)": space.x4,
     },
     paddingLeft: { default: space.x6, "@media (max-width: 559px)": space.x4 },
-  },
-  optionalField: {
-    boxSizing: "border-box",
-    minWidth: 0,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-    backgroundColor: colors.surface,
-  },
-  optionalFieldList: {
-    minWidth: 0,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-  },
-  optionalFieldSummary: {
-    boxSizing: "border-box",
-    display: "flex",
-    minWidth: 0,
-    minHeight: "56px",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: space.x4,
-    marginRight: `calc(-1 * ${space.x3})`,
-    marginLeft: `calc(-1 * ${space.x3})`,
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderRadius: "2px",
-    listStyle: "none",
-    cursor: "pointer",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.inset,
-    },
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-    outline: "none",
-    "::-webkit-details-marker": { display: "none" },
-  },
-  optionalFieldCopy: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    rowGap: space.x1,
-  },
-  optionalFieldLabel: {
-    color: colors.ink,
-  },
-  optionalFieldValue: {
-    overflow: "hidden",
-    color: colors.inkMuted,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  optionalFieldIcon: {
-    flexShrink: 0,
-    color: colors.inkMuted,
-  },
-  optionalFieldControl: {
-    minWidth: 0,
-    paddingTop: space.x2,
-    paddingBottom: space.x6,
   },
 });

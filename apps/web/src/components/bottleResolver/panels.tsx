@@ -4,10 +4,7 @@ import {
   FactList,
   FormGrid,
   FormNotice,
-  FormSection,
-  FormStack,
   IconButton,
-  SelectedBottleSummary,
 } from "@peated/web/components/designSystem/components";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { logError } from "@peated/web/lib/log";
@@ -15,6 +12,8 @@ import { Copy, Plus, RotateCcw, Search } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import { getFieldValue, type PhotoIdentification } from "./fieldValues";
+import { BottleResolverColumn, BottleResolverSection } from "./layout.stylex";
+import { PhotoPreview } from "./photoPreview.stylex";
 
 export type PhotoFailureTrace = {
   traceId: string;
@@ -27,16 +26,12 @@ export type PhotoFailureTrace = {
   error: string;
 };
 
-export function EvidencePills({
-  result,
-}: {
-  result: PhotoIdentification | null;
-}) {
+export function LabelFacts({ result }: { result: PhotoIdentification | null }) {
   const fields = [
     ["Brand", getFieldValue(result, "brand")],
-    ["Expression", getFieldValue(result, "expression")],
+    ["Name", getFieldValue(result, "expression")],
     ["Series", getFieldValue(result, "series")],
-    ["Distillers", getFieldValue(result, "distillery")],
+    ["Distillery", getFieldValue(result, "distillery")],
     ["Bottler", getFieldValue(result, "bottler")],
     ["Category", getFieldValue(result, "category")],
     ["Age", getFieldValue(result, "statedAge")],
@@ -46,8 +41,8 @@ export function EvidencePills({
     ["Bottled", getFieldValue(result, "bottlingYear")],
     ["Release", getFieldValue(result, "releaseYear")],
     ["Cask", getFieldValue(result, "caskNumber")],
-    ["Cask Strength", getFieldValue(result, "caskStrength")],
-    ["Single Cask", getFieldValue(result, "singleCask")],
+    ["Cask strength", getFieldValue(result, "caskStrength")],
+    ["Single cask", getFieldValue(result, "singleCask")],
   ].filter(([, value]) => value);
 
   if (!fields.length) return null;
@@ -71,7 +66,7 @@ export function PhotoFailurePanel({
   searchHref,
   searchLabel,
   createBottleHref,
-  createBottleLabel = "Create Manually",
+  createBottleLabel = "Add a new bottle",
   primaryAction = "search",
   onStartOver,
   variant,
@@ -92,17 +87,20 @@ export function PhotoFailurePanel({
   const isError = variant === "error";
 
   return (
-    <FormStack>
+    <BottleResolverColumn>
       {previewUrl ? (
-        <SelectedBottleSummary
-          bottleId="Uploaded photo"
-          imageUrl={previewUrl}
-          metadata="No catalog match selected"
-          name={title}
+        <PhotoPreview
+          metadata={
+            isError
+              ? "We couldn't read enough from this image"
+              : "No bottle selected"
+          }
+          src={previewUrl}
+          title="Your label photo"
         />
       ) : null}
       {isError ? <FormNotice role="alert">{description}</FormNotice> : null}
-      <FormSection
+      <BottleResolverSection
         description={isError ? undefined : description}
         title={title}
       >
@@ -138,8 +136,8 @@ export function PhotoFailurePanel({
             Start over
           </Button>
         </FormGrid>
-      </FormSection>
-    </FormStack>
+      </BottleResolverSection>
+    </BottleResolverColumn>
   );
 }
 
@@ -223,7 +221,7 @@ export function FallbackActions({
   searchHref,
   searchLabel,
   createBottleHref,
-  createBottleLabel = "Create Bottle",
+  createBottleLabel = "Add a new bottle",
   title,
   description,
   onStartOver,
@@ -259,11 +257,15 @@ export function FallbackActions({
     </FormGrid>
   );
 
-  return title ? (
-    <FormSection description={description} title={title}>
-      {actions}
-    </FormSection>
-  ) : (
-    actions
+  return (
+    <BottleResolverColumn>
+      {title ? (
+        <BottleResolverSection description={description} title={title}>
+          {actions}
+        </BottleResolverSection>
+      ) : (
+        actions
+      )}
+    </BottleResolverColumn>
   );
 }

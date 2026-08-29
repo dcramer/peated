@@ -112,7 +112,7 @@ The tasting rating input uses the five canonical bands. A tasting does not own a
 
 Actionable empty states own their explanation, next-action slot, and optional supplementary results. Section errors own a recoverable retry action and state what remains available. Loading lists reserve the final row geometry instead of adding a page-level spinner.
 
-The live tasting form keeps one component tree across desktop and mobile viewports. Storybook shows its reusable fields directly instead of copying the complete workflow. CSS reflows the rating input and the existing date, serving style, colour, notes, and picture controls without replacing them with a separate compact workflow.
+The live tasting form keeps one component tree across desktop and mobile viewports. It moves through Rating, Notes, and Details while its progress control always names the full sequence. Each active step renders its complete owned controls directly instead of hiding fields behind separate optional disclosures. Form state remains intact when the member moves backward or forward. Storybook shows the reusable fields and step progress instead of copying the complete workflow. CSS reflows the same rating, note, colour, comment, picture, friend, and edit-only serving-style controls at every width.
 
 Form support components preserve the owning product contracts. Unit inputs keep their suffix separate from the numeric value. The member picker selects only supplied friends. The inline note field searches the existing vocabulary and opens the full note browser without creating a second notes contract. Duplicate handling stays with the live bottle-entry flow until more than one workflow needs the same component contract.
 

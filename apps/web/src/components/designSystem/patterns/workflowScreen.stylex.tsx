@@ -19,7 +19,9 @@ export type WorkflowScreenProps = {
   children: ReactNode;
   mobileSaveBar?: boolean;
   onClose?: () => void;
+  onPrevious?: (event: FormEvent<HTMLButtonElement>) => void;
   onSave?: (event: FormEvent<HTMLButtonElement>) => void;
+  previousLabel?: string;
   saveDisabled?: boolean;
   saveHint?: ReactNode;
   saveLabel?: string;
@@ -32,7 +34,9 @@ export function WorkflowScreen({
   children,
   mobileSaveBar = false,
   onClose,
+  onPrevious,
   onSave,
+  previousLabel = "Back",
   saveDisabled = false,
   saveHint,
   saveLabel = "Save",
@@ -57,7 +61,22 @@ export function WorkflowScreen({
           </Link>
           <h1 {...stylex.props(styles.title)}>{title}</h1>
           {onSave ? (
-            <span {...stylex.props(mobileSaveBar && styles.mobileHeaderSave)}>
+            <span
+              {...stylex.props(
+                styles.headerActions,
+                mobileSaveBar && styles.mobileHeaderSave,
+              )}
+            >
+              {onPrevious ? (
+                <Button
+                  disabled={saving}
+                  onClick={onPrevious}
+                  size="sm"
+                  variant="tonal"
+                >
+                  {previousLabel}
+                </Button>
+              ) : null}
               <Button
                 disabled={saveDisabled}
                 loading={saving}
@@ -88,17 +107,35 @@ export function WorkflowScreen({
             {saveHint ? (
               <p {...stylex.props(styles.saveHint)}>{saveHint}</p>
             ) : null}
-            <Button
-              disabled={saveDisabled}
-              fullWidth
-              loading={saving}
-              loadingLabel="Saving…"
-              onClick={onSave}
-              size="lg"
-              variant="accent"
+            <div
+              {...stylex.props(
+                styles.mobileActions,
+                !onPrevious && styles.singleMobileAction,
+              )}
             >
-              {saveLabel}
-            </Button>
+              {onPrevious ? (
+                <Button
+                  disabled={saving}
+                  fullWidth
+                  onClick={onPrevious}
+                  size="lg"
+                  variant="tonal"
+                >
+                  {previousLabel}
+                </Button>
+              ) : null}
+              <Button
+                disabled={saveDisabled}
+                fullWidth
+                loading={saving}
+                loadingLabel="Saving…"
+                onClick={onSave}
+                size="lg"
+                variant="accent"
+              >
+                {saveLabel}
+              </Button>
+            </div>
           </div>
         </div>
       ) : null}
@@ -180,6 +217,11 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: space.x2,
+  },
   content: {
     boxSizing: "border-box",
     width: "100%",
@@ -234,6 +276,15 @@ const styles = stylex.create({
     paddingRight: space.x3,
     paddingBottom: space.x3,
     paddingLeft: space.x3,
+  },
+  mobileActions: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: "minmax(0, 1fr) minmax(0, 2fr)",
+    gap: space.x2,
+  },
+  singleMobileAction: {
+    gridTemplateColumns: "minmax(0, 1fr)",
   },
   saveHint: {
     margin: 0,

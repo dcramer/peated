@@ -58,23 +58,16 @@ export type {
   PendingImageRef,
 } from "./types";
 
-const loadingMessages = [
-  "Holding it up to the light",
-  "Letting the label breathe",
-  "Checking the dusty shelf",
-  "Asking the tasting room",
-  "Comparing the fine print",
-];
-
 export default function BottleResolver({
   onResolve,
   searchHrefForQuery,
   createBottleHrefForResult,
   title,
+  search,
   renderMatchedResultActions,
   renderCreateProposalActions,
   createProposalActionLabel = "Continue",
-  searchActionLabel = "Search Bottles",
+  searchActionLabel = "Search bottles",
 }: BottleResolverProps) {
   const orpc = useORPC();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -92,7 +85,6 @@ export default function BottleResolver({
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [photoFailureTrace, setPhotoFailureTrace] =
     useState<PhotoFailureTrace | null>(null);
-  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [resolvingAction, setResolvingAction] =
     useState<BottleResolverAction | null>(null);
   const [matchedBottleStatus, setMatchedBottleStatus] = useState<{
@@ -137,19 +129,6 @@ export default function BottleResolver({
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (!isIdentifying) {
-      setLoadingMessageIndex(0);
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      setLoadingMessageIndex((index) => (index + 1) % loadingMessages.length);
-    }, 2700);
-
-    return () => window.clearInterval(timer);
-  }, [isIdentifying]);
 
   function replacePreviewUrl(nextPreviewUrl: string | null) {
     const current = previewUrlRef.current;
@@ -299,7 +278,7 @@ export default function BottleResolver({
         },
       });
       setPhotoError(
-        "We couldn't read that photo. Search can still find the bottle, or you can try another photo.",
+        "Search can still find the bottle, or you can try another photo.",
       );
       const sentryTraceId = responseTraceContext.sentryTraceId;
       if (sentryTraceId) {
@@ -425,6 +404,7 @@ export default function BottleResolver({
       <FormStack>
         {!previewUrl && !photoResult && !isIdentifying && (
           <PhotoUploadState
+            search={search}
             searchHref={defaultSearchHref}
             onSelectPhoto={() => fileInputRef.current?.click()}
           />
@@ -445,8 +425,9 @@ export default function BottleResolver({
         {isIdentifying && (
           <PhotoLoadingState
             previewUrl={previewUrl}
-            loadingMessage={loadingMessages[loadingMessageIndex]}
+            search={search}
             searchHref={defaultSearchHref}
+            onStartOver={startOver}
           />
         )}
 
@@ -475,6 +456,7 @@ export default function BottleResolver({
                 onAcceptCreateProposal={(result, action) => {
                   void acceptCreateProposal(result, action);
                 }}
+                onStartOver={startOver}
               />
             ) : (
               <PhotoNoMatchState
@@ -498,7 +480,7 @@ export default function BottleResolver({
                 searchLabel={searchActionLabel}
                 createBottleHref={matchedBottle ? createBottleHref : null}
                 createBottleLabel={
-                  matchedBottle ? "Create New Bottle" : undefined
+                  matchedBottle ? "Add a new bottle" : undefined
                 }
                 title={matchedBottle ? "Not the right bottle?" : undefined}
                 description={
@@ -506,8 +488,6 @@ export default function BottleResolver({
                     ? "Search for the correct bottle or create a new one using the details from this label."
                     : undefined
                 }
-                showStartOver
-                onStartOver={startOver}
               />
             )}
             {photoIdentificationTraceId && (

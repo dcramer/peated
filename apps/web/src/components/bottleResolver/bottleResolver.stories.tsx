@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
 
 import BottleImage from "../../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
+import { SearchBox } from "../designSystem/components";
 import { StoryCanvas } from "../designSystem/storyFixtures.stylex";
 import {
   PhotoLoadingState,
@@ -10,12 +12,62 @@ import {
 
 type ResolverState = "ready" | "reading" | "failure";
 
+function BottleSearch() {
+  const [query, setQuery] = useState("");
+  const groups = query.trim()
+    ? [
+        {
+          id: "bottles",
+          items: [
+            {
+              href: "#bottle-42",
+              id: "bottle-42",
+              metadata: "Springbank · 12 years · 57.2% ABV",
+              title: "Springbank 12-year-old Cask Strength",
+              visual: {
+                fallback: "B",
+                label: "Springbank 12-year-old Cask Strength bottle",
+              },
+            },
+          ],
+          label: "Bottles",
+          total: 1,
+        },
+      ]
+    : [];
+
+  return (
+    <SearchBox
+      contribution={
+        query.trim()
+          ? {
+              description: `Can't find “${query.trim()}”?`,
+              href: `#add-${encodeURIComponent(query.trim())}`,
+              label: "Add a new bottle",
+            }
+          : undefined
+      }
+      groups={groups}
+      onQueryChange={setQuery}
+      onScopeChange={() => undefined}
+      placement="page"
+      placeholder="Search by bottle, brand, or distiller…"
+      query={query}
+      scope="bottles"
+      scopes={[{ label: "Bottles", value: "bottles" }]}
+    />
+  );
+}
+
 function BottleResolverState({ state }: { state: ResolverState }) {
+  const search = <BottleSearch />;
+
   if (state === "reading") {
     return (
       <PhotoLoadingState
-        loadingMessage="Checking the dusty shelf"
+        onStartOver={() => undefined}
         previewUrl={BottleImage.src}
+        search={search}
         searchHref="#search"
       />
     );
@@ -26,17 +78,21 @@ function BottleResolverState({ state }: { state: ResolverState }) {
       <PhotoReadFailureState
         createBottleHref="#create"
         onStartOver={() => undefined}
-        photoError="We couldn't read that photo. Search can still find the bottle, or you can try another photo."
+        photoError="Search can still find the bottle, or you can try another photo."
         previewUrl={BottleImage.src}
         searchHref="#search"
-        searchLabel="Search Bottles"
+        searchLabel="Search bottles"
         trace={null}
       />
     );
   }
 
   return (
-    <PhotoUploadState onSelectPhoto={() => undefined} searchHref="#search" />
+    <PhotoUploadState
+      onSelectPhoto={() => undefined}
+      search={search}
+      searchHref="#search"
+    />
   );
 }
 
@@ -52,7 +108,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <StoryCanvas width="compact">
+      <StoryCanvas width="wide">
         <Story />
       </StoryCanvas>
     ),

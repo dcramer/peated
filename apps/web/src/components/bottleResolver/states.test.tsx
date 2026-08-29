@@ -143,6 +143,7 @@ function renderMatchedBottle(bottle: Bottle) {
       loadingExactLibraryStatus={false}
       onLoadBottle={vi.fn()}
       onAcceptCreateProposal={vi.fn()}
+      onStartOver={vi.fn()}
     />,
   );
 }

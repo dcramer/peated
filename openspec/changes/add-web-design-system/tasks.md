@@ -170,3 +170,6 @@
 - [x] 9.17 Audit every web route and Storybook component for clean route ownership, shared component reuse, duplicate implementations, and obsolete page-shaped stories; fix the proven factoring issues and QA representative route families
 - [x] 9.18 Server-render and hydrate the signed-in homepage query snapshots so its primary modules do not replace loading placeholders after hydration
 - [x] 9.19 Replace homepage result-prop hydration with one route-owned TanStack Query hydration boundary and shared oRPC query definitions
+- [x] 9.20 Refine the add-bottle workflow with search-first composition, a stable photo-reading preview, intent-ranked actions, shared controls, and plain Peated copy
+- [x] 9.21 Align the add-bottle resolver with the reviewed single-column task structure: page introduction, dominant search, one responsive photo action, photo-led reading state, and ranked outcome actions
+- [x] 9.22 Split the tasting form into three explicit steps, keep each step's real fields visible, and remove the obsolete per-field disclosures

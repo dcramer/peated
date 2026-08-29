@@ -37,16 +37,19 @@ export type NotePickerProps = {
 export type NotePickerFieldProps = Pick<
   NotePickerProps,
   "notes" | "onChange" | "value"
->;
+> & {
+  id?: string;
+};
 
 /** Keeps the full picker available without replacing the surrounding form. */
 export function NotePickerField({
+  id,
   notes,
   onChange,
   value,
 }: NotePickerFieldProps) {
   const generatedId = useId();
-  const inputId = `${generatedId}-input`;
+  const inputId = id ?? `${generatedId}-input`;
   const listboxId = `${generatedId}-listbox`;
   const [isBrowserOpen, setIsBrowserOpen] = useState(false);
   const [query, setQuery] = useState("");

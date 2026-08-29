@@ -11,13 +11,12 @@ import {
   FormNotice,
   FormSection,
   FormStack,
-  OptionalField,
-  OptionalFieldList,
+  FormSteps,
 } from "./formLayout.stylex";
 
 const meta = {
   title: "Components/Forms/Form layout",
-  component: FormSection,
+  component: FormSteps,
   decorators: [
     (Story) => (
       <StoryCanvas width="compact">
@@ -25,18 +24,19 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof FormSection>;
+} satisfies Meta<typeof FormSteps>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {
   args: {
-    children: null,
-    title: "Profile",
+    currentStep: 1,
+    steps: ["Rating", "Notes", "Details"],
   },
-  render: () => (
+  render: (args) => (
     <FormStack>
+      <FormSteps {...args} />
       <FormNotice>Your email address is waiting for verification.</FormNotice>
       <FormSection
         description="The name and picture shown beside your activity."
@@ -65,36 +65,9 @@ export const Overview: Story = {
           </Field>
         </FormGrid>
       </FormDetails>
-      <FormSection title="Optional fields">
-        <OptionalFieldList>
-          <div id="optional-field-hovered">
-            <OptionalField label="Colour" summary="Unsure">
-              <TextInput aria-label="Colour" placeholder="Choose a colour" />
-            </OptionalField>
-          </div>
-          <div id="optional-field-focused">
-            <OptionalField
-              defaultOpen
-              label="Comments"
-              summary="Honey, smoke, and orange peel"
-            >
-              <TextInput
-                aria-label="Comments"
-                defaultValue="Honey, smoke, and orange peel"
-              />
-            </OptionalField>
-          </div>
-        </OptionalFieldList>
-      </FormSection>
       <FormActions>
         <Button variant="accent">Save changes</Button>
       </FormActions>
     </FormStack>
   ),
-  parameters: {
-    pseudo: {
-      focusVisible: ["#optional-field-focused summary"],
-      hover: ["#optional-field-hovered summary"],
-    },
-  },
 };

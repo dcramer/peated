@@ -64,6 +64,7 @@ export type SearchScope = (typeof searchScopes)[number]["value"];
 
 export type SearchProps = {
   autoFocus?: boolean;
+  contributionLabel?: string;
   defaultOpen?: boolean;
   getBottleHref?: (bottleId: number) => string;
   getContributionHref?: (query: string) => string;
@@ -326,6 +327,7 @@ function getScopeCount(
 
 export function Search({
   autoFocus = false,
+  contributionLabel = "Add a new bottle",
   defaultOpen = false,
   getBottleHref = getDefaultBottleHref,
   getContributionHref = getDefaultContributionHref,
@@ -488,7 +490,7 @@ export function Search({
           ? {
               description: `Can't find “${settledQuery}”?`,
               href: getContributionHref(settledQuery),
-              label: "Record a bottle",
+              label: contributionLabel,
             }
           : undefined
       }

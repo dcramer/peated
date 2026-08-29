@@ -237,7 +237,7 @@ export function getManualResultCopy(
         title: "We couldn't find this bottle",
         description:
           "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
-        createLabel: "Create Bottle",
+        createLabel: "Add a new bottle",
         primaryAction: "create" as const,
       };
     }
@@ -246,7 +246,7 @@ export function getManualResultCopy(
       title: "We couldn't identify the bottle",
       description:
         "Search can still find it, or you can start over with a clearer photo.",
-      createLabel: "Create Manually",
+      createLabel: "Add a new bottle",
       primaryAction: "search" as const,
     };
   }
@@ -256,7 +256,7 @@ export function getManualResultCopy(
       title: "We couldn't find this bottle",
       description:
         "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
-      createLabel: "Create Bottle",
+      createLabel: "Add a new bottle",
       primaryAction: "create" as const,
     };
   }
@@ -265,7 +265,7 @@ export function getManualResultCopy(
     title: "We couldn't identify the bottle",
     description:
       "Search can still find it, or you can start over with another photo.",
-    createLabel: "Create Manually",
+    createLabel: "Add a new bottle",
     primaryAction: "search" as const,
   };
 }

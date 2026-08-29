@@ -1,6 +1,6 @@
 "use client";
 
-import { COLOR_SCALE, SERVING_STYLE_LIST } from "@peated/server/constants";
+import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
 import type { User } from "@peated/server/types";
@@ -10,10 +10,9 @@ import {
   FormNotice,
   FormSection,
   FormStack,
+  FormSteps,
   MemberPicker,
   NotePickerField,
-  OptionalField,
-  OptionalFieldList,
   PictureInput,
   RatingBandInput,
   Select,
@@ -92,6 +91,7 @@ export default function TastingForm(
     formState: { errors, isSubmitting },
     handleSubmit,
     register,
+    trigger,
   } = useForm<TastingFormFields>({
     defaultValues: {
       color: initialData.color,
@@ -107,13 +107,10 @@ export default function TastingForm(
         : TastingCreateFormFieldsSchema,
     ),
   });
-  const [ratingBand, selectedTags, selectedColour, notes, servingStyle] =
-    useWatch({
-      control,
-      name: ["ratingBand", "tags", "color", "notes", "servingStyle"],
-    });
-  const tags = selectedTags ?? [];
-  const comments = notes?.trim() ?? "";
+  const ratingBand = useWatch({ control, name: "ratingBand" });
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = ["Rating", "Notes", "Details"] as const;
+  const isLastStep = currentStep === steps.length - 1;
   const needsRating = props.mode !== "edit" && !ratingBand;
   const noteOptions: NotePickerOption[] = buildTastingTagOptions(
     suggestedTags.results,
@@ -154,58 +151,89 @@ export default function TastingForm(
     }
   };
 
+  async function continueForm() {
+    const stepIsValid = await trigger(
+      currentStep === 0
+        ? ["ratingBand"]
+        : currentStep === 1
+          ? ["tags", "color", "notes"]
+          : ["servingStyle", "friends"],
+    );
+    if (!stepIsValid) return;
+    setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
+  }
+
+  const formAction = isLastStep
+    ? handleSubmit(submit)
+    : (event: React.FormEvent) => {
+        event.preventDefault();
+        void continueForm();
+      };
+
   return (
     <WorkflowScreen
       mobileSaveBar
-      onSave={handleSubmit(submit)}
+      onPrevious={
+        currentStep > 0
+          ? () => setCurrentStep((step) => Math.max(0, step - 1))
+          : undefined
+      }
+      onSave={formAction}
       saveDisabled={needsRating}
-      saveHint={needsRating ? "Pick a rating to save." : undefined}
-      saveLabel="Save tasting"
+      saveHint={
+        needsRating
+          ? "Pick a rating to continue."
+          : `Step ${currentStep + 1} of ${steps.length}`
+      }
+      saveLabel={isLastStep ? "Save tasting" : "Continue"}
       saving={isSubmitting}
       title={title}
     >
-      <form onSubmit={handleSubmit(submit)}>
+      <form onSubmit={formAction}>
         <FormStack>
           <SelectedBottleSummary
             bottleId={initialData.bottle.peatedId}
-            imageUrl={initialData.bottle.imageUrl}
+            imageUrl={imagePreview ?? initialData.bottle.imageUrl}
             metadata={getBottleMetadata(initialData.bottle)}
             name={initialData.bottle.fullName}
           />
           {submitError || errorMessage ? (
             <FormNotice>{submitError ?? errorMessage}</FormNotice>
           ) : null}
-          <FormSection title="Rating">
-            <Controller
-              control={control}
-              name="ratingBand"
-              render={({ field }) => (
-                <RatingBandInput
-                  disabled={isSubmitting}
-                  id="tasting-rating"
-                  label="How was it"
-                  name={field.name}
-                  onChange={field.onChange}
-                  required={props.mode !== "edit"}
-                  value={field.value ?? null}
-                />
-              )}
-            />
-            {errors.ratingBand?.message ? (
-              <ValidationMessage>{errors.ratingBand.message}</ValidationMessage>
-            ) : null}
-          </FormSection>
-          <FormSection title="Details">
-            <OptionalFieldList>
-              <OptionalField
-                label="Flavours and aromas"
-                summary={tags.length ? formatListSummary(tags) : "No notes"}
-              >
+          <FormSteps currentStep={currentStep} steps={steps} />
+          {currentStep === 0 ? (
+            <FormSection title="Your rating">
+              <Controller
+                control={control}
+                name="ratingBand"
+                render={({ field }) => (
+                  <RatingBandInput
+                    disabled={isSubmitting}
+                    id="tasting-rating"
+                    label="How was it"
+                    name={field.name}
+                    onChange={field.onChange}
+                    required={props.mode !== "edit"}
+                    value={field.value ?? null}
+                  />
+                )}
+              />
+              {errors.ratingBand?.message ? (
+                <ValidationMessage>
+                  {errors.ratingBand.message}
+                </ValidationMessage>
+              ) : null}
+            </FormSection>
+          ) : null}
+          {currentStep === 1 ? (
+            <FormSection title="What you noticed">
+              <Field htmlFor="tasting-notes" label="Notes" optional>
                 <Controller
                   control={control}
                   name="tags"
                   render={({ field }) => (
                     <NotePickerField
+                      id="tasting-notes"
                       notes={noteOptions}
                       onChange={field.onChange}
                       value={field.value ?? []}
@@ -215,11 +243,8 @@ export default function TastingForm(
                 {errors.tags?.message ? (
                   <ValidationMessage>{errors.tags.message}</ValidationMessage>
                 ) : null}
-              </OptionalField>
-              <OptionalField
-                label="Colour"
-                summary={getColourName(selectedColour ?? null)}
-              >
+              </Field>
+              <Field htmlFor="tasting-colour" label="Colour" optional>
                 <Controller
                   control={control}
                   name="color"
@@ -236,10 +261,12 @@ export default function TastingForm(
                 {errors.color?.message ? (
                   <ValidationMessage>{errors.color.message}</ValidationMessage>
                 ) : null}
-              </OptionalField>
-              <OptionalField
-                label="Comments"
-                summary={comments ? truncate(comments, 64) : "None"}
+              </Field>
+              <Field
+                error={errors.notes?.message}
+                htmlFor="tasting-comments"
+                label="Comment"
+                optional
               >
                 <Textarea
                   {...register("notes", {
@@ -248,44 +275,38 @@ export default function TastingForm(
                   aria-label="Comments"
                   id="tasting-comments"
                   invalid={Boolean(errors.notes)}
-                  placeholder="Tell us how it drank."
+                  placeholder="What stood out?"
                   rows={6}
                 />
-                {errors.notes?.message ? (
-                  <ValidationMessage>{errors.notes.message}</ValidationMessage>
-                ) : null}
-              </OptionalField>
+              </Field>
+            </FormSection>
+          ) : null}
+          {currentStep === 2 ? (
+            <FormSection title="Picture and company">
               {props.mode === "edit" ? (
-                <OptionalField
+                <Field
+                  error={errors.servingStyle?.message}
+                  htmlFor="tasting-serving-style"
                   label="Served"
-                  summary={servingStyle ? toTitleCase(servingStyle) : "Not set"}
+                  optional
                 >
-                  <Field
-                    error={errors.servingStyle?.message}
-                    htmlFor="tasting-serving-style"
-                    label="Served"
+                  <Select
+                    {...register("servingStyle", {
+                      setValueAs: (value) => value || null,
+                    })}
+                    id="tasting-serving-style"
+                    invalid={Boolean(errors.servingStyle)}
                   >
-                    <Select
-                      {...register("servingStyle", {
-                        setValueAs: (value) => value || null,
-                      })}
-                      id="tasting-serving-style"
-                      invalid={Boolean(errors.servingStyle)}
-                    >
-                      <option value="">Not set</option>
-                      {SERVING_STYLE_LIST.map((style) => (
-                        <option key={style} value={style}>
-                          {toTitleCase(style)}
-                        </option>
-                      ))}
-                    </Select>
-                  </Field>
-                </OptionalField>
+                    <option value="">Not set</option>
+                    {SERVING_STYLE_LIST.map((style) => (
+                      <option key={style} value={style}>
+                        {toTitleCase(style)}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
               ) : null}
-              <OptionalField
-                label="Picture"
-                summary={imagePreview ? "Added" : "None"}
-              >
+              <Field htmlFor="tasting-picture" label="Picture" optional>
                 <PictureInput
                   disabled={isSubmitting}
                   id="tasting-picture"
@@ -310,37 +331,28 @@ export default function TastingForm(
                       : undefined
                   }
                 />
-              </OptionalField>
-              <OptionalField
-                label="Drinking with"
-                summary={
-                  friends.length
-                    ? formatListSummary(friends.map(({ username }) => username))
-                    : "No one added"
-                }
-              >
-                <Controller
-                  control={control}
-                  name="friends"
-                  render={({ field }) => (
-                    <MemberPicker
-                      label="Drinking with"
-                      loading={friendResults.isFetching}
-                      onChange={(nextFriends) => {
-                        setFriends(nextFriends);
-                        field.onChange(nextFriends.map((friend) => friend.id));
-                      }}
-                      onQueryChange={setFriendQuery}
-                      options={(friendResults.data?.results ?? []).map(
-                        ({ user }) => userToMember(user),
-                      )}
-                      value={friends}
-                    />
-                  )}
-                />
-              </OptionalField>
-            </OptionalFieldList>
-          </FormSection>
+              </Field>
+              <Controller
+                control={control}
+                name="friends"
+                render={({ field }) => (
+                  <MemberPicker
+                    label="Drinking with"
+                    loading={friendResults.isFetching}
+                    onChange={(nextFriends) => {
+                      setFriends(nextFriends);
+                      field.onChange(nextFriends.map((friend) => friend.id));
+                    }}
+                    onQueryChange={setFriendQuery}
+                    options={(friendResults.data?.results ?? []).map(
+                      ({ user }) => userToMember(user),
+                    )}
+                    value={friends}
+                  />
+                )}
+              />
+            </FormSection>
+          ) : null}
         </FormStack>
       </form>
     </WorkflowScreen>
@@ -349,18 +361,4 @@ export default function TastingForm(
 
 function userToMember(user: User): MemberPickerOption {
   return { id: user.id, username: user.username };
-}
-
-function getColourName(value: number | null) {
-  if (value === null) return "Unsure";
-  return COLOR_SCALE.find(([number]) => number === value)?.[1] ?? "Unsure";
-}
-
-function formatListSummary(values: readonly string[]) {
-  if (values.length <= 2) return values.join(", ");
-  return `${values.slice(0, 2).join(", ")} +${values.length - 2}`;
-}
-
-function truncate(value: string, length: number) {
-  return value.length > length ? `${value.slice(0, length - 1)}…` : value;
 }

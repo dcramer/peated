@@ -24,6 +24,7 @@ import {
 } from "@peated/web/components/designSystem/components";
 import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
 import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
+import { Search as BottleSearch } from "@peated/web/components/designSystem/product/search.stylex";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import TastingForm, {
@@ -31,7 +32,10 @@ import TastingForm, {
 } from "@peated/web/components/tastingForm";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
-import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
+import {
+  getAddBottleHref,
+  getPendingImageFromParams,
+} from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
@@ -42,7 +46,13 @@ import { uploadTastingImageAfterSave } from "@peated/web/lib/tastingImageUpload"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { BadgeAwardMessage } from "./badgeAwardMessage.stylex";
 
 type AddBottleIntent = "choose" | "library" | "tasting" | "view";
@@ -103,8 +113,8 @@ function getLibraryActionLabel(state: {
   hasLibraryEntry: boolean;
   canSaveLibraryPhoto?: boolean;
 }) {
-  if (!state.hasLibraryEntry) return "Add to Library";
-  return state.canSaveLibraryPhoto ? "Save Photo" : "In Library";
+  if (!state.hasLibraryEntry) return "Add to library";
+  return state.canSaveLibraryPhoto ? "Save photo" : "In library";
 }
 
 function BottlePanel({
@@ -232,12 +242,20 @@ function MatchedOutcomeActions({
   const canSaveLibraryPhoto = Boolean(
     pendingImage && hasLibraryEntry && libraryEntryImageUrl === null,
   );
+  const primaryAction =
+    intent === "tasting"
+      ? "tasting"
+      : intent === "view"
+        ? "view"
+        : hasLibraryEntry && !canSaveLibraryPhoto
+          ? "tasting"
+          : "library";
   const libraryButton = (
     <OutcomeButton
       key="library"
       onClick={() => onResolve("library")}
       icon={<BookOpen aria-hidden="true" size={16} />}
-      emphasized
+      emphasized={primaryAction === "library"}
       disabled={
         Boolean(resolvingAction) ||
         loadingExactLibraryStatus ||
@@ -253,11 +271,11 @@ function MatchedOutcomeActions({
       key="tasting"
       onClick={() => onResolve("tasting")}
       icon={<Wine aria-hidden="true" size={16} />}
-      emphasized
+      emphasized={primaryAction === "tasting"}
       disabled={Boolean(resolvingAction)}
       loading={resolvingAction === "tasting"}
     >
-      Log Tasting
+      Log tasting
     </OutcomeButton>
   );
   const viewButton = (
@@ -265,16 +283,23 @@ function MatchedOutcomeActions({
       key="view"
       href={getViewBottleHref(bottle)}
       icon={<Eye aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "view"}
     >
-      View Bottle
+      View bottle
     </OutcomeButton>
   );
   const actionButtons =
     intent === "tasting"
       ? [tastingButton, libraryButton, viewButton]
       : [libraryButton, tastingButton, viewButton];
+  const [primaryButton, ...secondaryButtons] = actionButtons;
 
-  return <FormGrid>{actionButtons}</FormGrid>;
+  return (
+    <FormStack>
+      {primaryButton}
+      <FormGrid>{secondaryButtons}</FormGrid>
+    </FormStack>
+  );
 }
 
 function CreateProposalOutcomeActions({
@@ -284,16 +309,18 @@ function CreateProposalOutcomeActions({
   onResolve,
 }: BottleResolverCreateProposalActionsProps & { intent: AddBottleIntent }) {
   const creating = createPending || Boolean(resolvingAction);
+  const primaryAction =
+    intent === "tasting" ? "tasting" : intent === "view" ? "create" : "library";
   const libraryButton = (
     <OutcomeButton
       key="library"
       onClick={() => onResolve("library")}
       icon={<BookOpen aria-hidden="true" size={16} />}
-      emphasized
+      emphasized={primaryAction === "library"}
       disabled={creating}
       loading={resolvingAction === "library"}
     >
-      Add to Library
+      Add to library
     </OutcomeButton>
   );
   const tastingButton = (
@@ -301,11 +328,11 @@ function CreateProposalOutcomeActions({
       key="tasting"
       onClick={() => onResolve("tasting")}
       icon={<Wine aria-hidden="true" size={16} />}
-      emphasized
+      emphasized={primaryAction === "tasting"}
       disabled={creating}
       loading={resolvingAction === "tasting"}
     >
-      Log Tasting
+      Log tasting
     </OutcomeButton>
   );
   const createButton = (
@@ -313,10 +340,11 @@ function CreateProposalOutcomeActions({
       key="create"
       onClick={() => onResolve("create")}
       icon={<Plus aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "create"}
       disabled={creating}
       loading={resolvingAction === "create"}
     >
-      Create Bottle
+      Add bottle
     </OutcomeButton>
   );
   const actionButtons =
@@ -325,8 +353,14 @@ function CreateProposalOutcomeActions({
       : intent === "view"
         ? [createButton, libraryButton, tastingButton]
         : [libraryButton, tastingButton, createButton];
+  const [primaryButton, ...secondaryButtons] = actionButtons;
 
-  return <FormGrid>{actionButtons}</FormGrid>;
+  return (
+    <FormStack>
+      {primaryButton}
+      <FormGrid>{secondaryButtons}</FormGrid>
+    </FormStack>
+  );
 }
 
 function OutcomeSelection({
@@ -353,15 +387,22 @@ function OutcomeSelection({
   const description = wasCreated
     ? "Choose what you want to do next."
     : "Choose what you want to do with this bottle.";
+  const canSaveLibrary = canSaveBottleToLibrary(selection);
+  const primaryAction =
+    intent === "tasting"
+      ? "tasting"
+      : intent === "view"
+        ? "view"
+        : canSaveLibrary
+          ? "library"
+          : "tasting";
   const libraryButton = (
     <OutcomeButton
       key="library"
       onClick={onAddToLibrary}
       icon={<BookOpen aria-hidden="true" size={16} />}
-      emphasized
-      disabled={
-        !canSaveBottleToLibrary(selection) || addingToLibrary || loggingTasting
-      }
+      emphasized={primaryAction === "library"}
+      disabled={!canSaveLibrary || addingToLibrary || loggingTasting}
       loading={addingToLibrary}
     >
       {getLibraryActionLabel({
@@ -377,11 +418,11 @@ function OutcomeSelection({
       key="tasting"
       onClick={onLogTasting}
       icon={<Wine aria-hidden="true" size={16} />}
-      emphasized
+      emphasized={primaryAction === "tasting"}
       disabled={loggingTasting}
       loading={loggingTasting}
     >
-      Log Tasting
+      Log tasting
     </OutcomeButton>
   );
   const viewButton = (
@@ -389,8 +430,9 @@ function OutcomeSelection({
       key="view"
       href={getViewBottleHref(selection.bottle)}
       icon={<Eye aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "view"}
     >
-      View Bottle
+      View bottle
     </OutcomeButton>
   );
   const actionButtons =
@@ -416,6 +458,7 @@ function OutcomeSelection({
           <ButtonLink
             fullWidth
             href={getSearchHref("", intent, selection.pendingImage)}
+            variant="tonal"
           >
             <Search aria-hidden="true" size={16} />
             Search bottles
@@ -551,6 +594,22 @@ function AddBottleFlowContent() {
   >();
   const [loadingTastingDraft, setLoadingTastingDraft] = useState(false);
   const userLibraryHref = user ? `/users/${user.username}/library` : "/library";
+  const inlineBottleHref = useCallback(
+    (bottleId: number) =>
+      getAddBottleHref({
+        bottleId,
+        intent: getCreateReturnAction(intent),
+      }),
+    [intent],
+  );
+  const inlineCreateBottleHref = useCallback(
+    (query: string) =>
+      getCreateBottleHref({
+        query,
+        returnAction: getCreateReturnAction(intent),
+      }),
+    [intent],
+  );
 
   const libraryCreateMutation = useMutation(
     orpc.collections.bottles.create.mutationOptions(),
@@ -904,7 +963,7 @@ function AddBottleFlowContent() {
   if (tastingDraft) {
     return (
       <TastingForm
-        title="Log Tasting"
+        title="Log tasting"
         initialData={{
           bottle: tastingDraft.bottle,
           imageUrl: tastingDraft.pendingImage?.imageUrl,
@@ -937,7 +996,18 @@ function AddBottleFlowContent() {
 
   return (
     <BottleResolver
-      title="Add Bottle"
+      title="Add bottle"
+      search={
+        <BottleSearch
+          getBottleHref={inlineBottleHref}
+          getContributionHref={inlineCreateBottleHref}
+          initialScope="bottles"
+          placement="page"
+          placeholder="Search by bottle, brand, or distiller…"
+          scopeValues={["bottles"]}
+          showBottleMeasures={false}
+        />
+      }
       searchHrefForQuery={(query, pendingImage) =>
         getSearchHref(query, intent, pendingImage)
       }
@@ -953,8 +1023,8 @@ function AddBottleFlowContent() {
           pendingImage,
         })
       }
-      createProposalActionLabel="Create Bottle"
-      searchActionLabel="Search Bottles"
+      createProposalActionLabel="Add bottle"
+      searchActionLabel="Search bottles"
       renderMatchedResultActions={(props) => (
         <MatchedOutcomeActions {...props} intent={intent} />
       )}

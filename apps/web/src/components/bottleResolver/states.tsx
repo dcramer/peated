@@ -3,23 +3,29 @@ import type { Bottle } from "@peated/server/types";
 import {
   Button,
   ButtonLink,
-  FormSection,
   FormStack,
-  LoadingList,
   SelectedBottleSummary,
 } from "@peated/web/components/designSystem/components";
-import { Camera, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
 import type { PhotoIdentification } from "./helpers";
 import {
-  EvidencePills,
+  BottlePhotoAction,
+  BottleResolverColumn,
+  BottleResolverInlineAction,
+  BottleResolverIntroduction,
+  BottleResolverSection,
+} from "./layout.stylex";
+import {
   FallbackActions,
   getPhotoFailureCopyPayload,
+  LabelFacts,
   PhotoFailurePanel,
   type PhotoFailureTrace,
   PhotoIdentificationTraceFootnote,
 } from "./panels";
+import { PhotoPreview } from "./photoPreview.stylex";
 import type {
   BottleResolverAction,
   BottleResolverCreateProposalActionsProps,
@@ -28,33 +34,28 @@ import type {
 } from "./types";
 
 export function PhotoUploadState({
+  search,
   searchHref,
   onSelectPhoto,
 }: {
+  search?: ReactNode;
   searchHref: string;
   onSelectPhoto: () => void;
 }) {
   return (
-    <FormStack>
-      <FormSection
-        description="Use a clear photo of the front label for the fastest match."
-        title="Capture the label, then confirm the match"
-      >
-        <Button fullWidth onClick={onSelectPhoto} size="lg" variant="accent">
-          <Camera aria-hidden="true" size={18} />
-          Take or upload a photo
-        </Button>
-      </FormSection>
-      <FormSection
-        description="Find a bottle in the catalog or add one manually."
-        title="Prefer to search?"
-      >
-        <ButtonLink fullWidth href={searchHref} variant="tonal">
+    <BottleResolverColumn>
+      <BottleResolverIntroduction
+        description="Search the database, or photograph the front label and we’ll look."
+        title="Add a bottle"
+      />
+      {search ?? (
+        <ButtonLink fullWidth href={searchHref} variant="accent">
           <Search aria-hidden="true" size={16} />
           Search bottles
         </ButtonLink>
-      </FormSection>
-    </FormStack>
+      )}
+      <BottlePhotoAction onSelectPhoto={onSelectPhoto} />
+    </BottleResolverColumn>
   );
 }
 
@@ -99,34 +100,42 @@ export function PhotoReadFailureState({
 
 export function PhotoLoadingState({
   previewUrl,
-  loadingMessage,
+  search,
   searchHref,
+  onStartOver,
 }: {
   previewUrl: string | null;
-  loadingMessage: string;
+  search?: ReactNode;
   searchHref: string;
+  onStartOver: () => void;
 }) {
   return (
-    <FormStack>
+    <BottleResolverColumn>
+      <BottleResolverInlineAction>
+        <Button onClick={onStartOver} variant="text">
+          Use a different photo
+        </Button>
+      </BottleResolverInlineAction>
       {previewUrl ? (
-        <SelectedBottleSummary
-          bottleId="Reading label"
-          imageUrl={previewUrl}
-          metadata="Checking the catalog"
-          name={loadingMessage}
+        <PhotoPreview
+          loading
+          metadata="Usually about 10 seconds"
+          src={previewUrl}
+          title="Reading the label"
         />
       ) : null}
-      <FormSection
-        description="Reading the label and checking the catalog. This can take up to 30 seconds."
-        title={loadingMessage}
+      <BottleResolverSection
+        description="You can keep looking while we read the photo."
+        title="Search by name instead"
       >
-        <LoadingList label="Identifying bottle" rows={3} />
-        <ButtonLink href={searchHref} variant="tonal">
-          <Search aria-hidden="true" size={16} />
-          Search bottles instead
-        </ButtonLink>
-      </FormSection>
-    </FormStack>
+        {search ?? (
+          <ButtonLink href={searchHref} variant="tonal">
+            <Search aria-hidden="true" size={16} />
+            Search bottles instead
+          </ButtonLink>
+        )}
+      </BottleResolverSection>
+    </BottleResolverColumn>
   );
 }
 
@@ -166,7 +175,7 @@ export function PhotoNoMatchState({
       onStartOver={onStartOver}
       variant="no-match"
     >
-      <EvidencePills result={result} />
+      <LabelFacts result={result} />
     </PhotoFailurePanel>
   );
 }
@@ -189,6 +198,7 @@ export function PhotoMatchCreateState({
   loadingExactLibraryStatus,
   onLoadBottle,
   onAcceptCreateProposal,
+  onStartOver,
 }: {
   result: PhotoIdentification;
   previewUrl: string | null;
@@ -214,87 +224,108 @@ export function PhotoMatchCreateState({
     result: PhotoIdentification,
     action: BottleResolverAction,
   ) => void;
+  onStartOver: () => void;
 }) {
   if (matchedBottle) {
     return (
-      <FormSection
-        description="Matched to an existing bottle in the catalog."
-        title="Matched bottle"
-      >
-        <SelectedBottleSummary
-          bottleId={matchedBottle.peatedId}
-          imageUrl={previewUrl ?? matchedBottle.imageUrl}
-          metadata={getMatchedBottleMetadata(matchedBottle)}
-          name={matchedBottle.fullName}
-        />
-        <EvidencePills result={result} />
-        {renderMatchedResultActions ? (
-          renderMatchedResultActions({
-            bottle: matchedBottle,
-            hasLibraryEntry,
-            libraryEntryImageUrl,
-            pendingImage,
-            loadingExactLibraryStatus,
-            resolvingAction:
-              resolvingAction === "create" ? null : resolvingAction,
-            onResolve: (action) => {
-              onLoadBottle(matchedBottle, action);
-            },
-          })
-        ) : (
-          <Button
-            disabled={Boolean(resolvingAction)}
-            fullWidth
-            onClick={() => onLoadBottle(matchedBottle)}
-            variant="accent"
-          >
-            Continue
+      <BottleResolverColumn>
+        <BottleResolverInlineAction>
+          <Button onClick={onStartOver} variant="text">
+            Use a different photo
           </Button>
-        )}
-      </FormSection>
+        </BottleResolverInlineAction>
+        <BottleResolverSection
+          description="Compare this record with the label before you continue."
+          title="Check the bottle"
+        >
+          {previewUrl ? (
+            <PhotoPreview
+              metadata="Compare this photo with the record below"
+              src={previewUrl}
+              title="Your label photo"
+            />
+          ) : null}
+          <SelectedBottleSummary
+            bottleId={matchedBottle.peatedId}
+            imageUrl={matchedBottle.imageUrl}
+            metadata={getMatchedBottleMetadata(matchedBottle)}
+            name={matchedBottle.fullName}
+          />
+          <LabelFacts result={result} />
+          {renderMatchedResultActions ? (
+            renderMatchedResultActions({
+              bottle: matchedBottle,
+              hasLibraryEntry,
+              libraryEntryImageUrl,
+              pendingImage,
+              loadingExactLibraryStatus,
+              resolvingAction:
+                resolvingAction === "create" ? null : resolvingAction,
+              onResolve: (action) => {
+                onLoadBottle(matchedBottle, action);
+              },
+            })
+          ) : (
+            <Button
+              disabled={Boolean(resolvingAction)}
+              fullWidth
+              onClick={() => onLoadBottle(matchedBottle)}
+              variant="accent"
+            >
+              Continue
+            </Button>
+          )}
+        </BottleResolverSection>
+      </BottleResolverColumn>
     );
   }
 
   return (
-    <FormSection
-      description={
-        createProposalLabel?.description ??
-        "Create a new bottle from this label."
-      }
-      title={proposedName ?? createProposalLabel?.title ?? "New bottle found"}
-    >
-      {previewUrl ? (
-        <SelectedBottleSummary
-          bottleId="New bottle"
-          imageUrl={previewUrl}
-          metadata="Read from label"
-          name={proposedName ?? "Bottle preview"}
-        />
-      ) : null}
-      <EvidencePills result={result} />
-      {hasCreateDecision && (
-        <FormStack>
-          {renderCreateProposalActions ? (
-            renderCreateProposalActions({
-              createPending,
-              resolvingAction,
-              onResolve: (action) => onAcceptCreateProposal(result, action),
-            })
-          ) : (
-            <Button
-              disabled={createPending}
-              fullWidth
-              loading={createPending}
-              onClick={() => onAcceptCreateProposal(result, "create")}
-              variant="accent"
-            >
-              <Plus aria-hidden="true" size={16} />
-              {createActionLabel}
-            </Button>
-          )}
-        </FormStack>
-      )}
-    </FormSection>
+    <BottleResolverColumn>
+      <BottleResolverInlineAction>
+        <Button onClick={onStartOver} variant="text">
+          Use a different photo
+        </Button>
+      </BottleResolverInlineAction>
+      <BottleResolverSection
+        description={
+          createProposalLabel?.description ??
+          "Create a new bottle from this label."
+        }
+        title={proposedName ?? createProposalLabel?.title ?? "New bottle found"}
+      >
+        {previewUrl ? (
+          <PhotoPreview
+            metadata="We used this label to fill the details below"
+            src={previewUrl}
+            title={proposedName ?? "Your label photo"}
+          />
+        ) : null}
+        <LabelFacts result={result} />
+        {hasCreateDecision && (
+          <FormStack>
+            {renderCreateProposalActions ? (
+              renderCreateProposalActions({
+                createPending,
+                resolvingAction,
+                onResolve: (action) => onAcceptCreateProposal(result, action),
+              })
+            ) : (
+              <Button
+                disabled={createPending}
+                fullWidth
+                loading={createPending}
+                onClick={() => onAcceptCreateProposal(result, "create")}
+                variant="accent"
+              >
+                <Plus aria-hidden="true" size={16} />
+                {createActionLabel}
+              </Button>
+            )}
+          </FormStack>
+        )}
+      </BottleResolverSection>
+    </BottleResolverColumn>
   );
 }
 
@@ -308,7 +339,7 @@ function getMatchedBottleMetadata(bottle: Bottle) {
       : null;
 
   return [
-    bottle.category ? formatCategoryName(bottle.category) : "Catalog bottle",
+    bottle.category ? formatCategoryName(bottle.category) : "Bottle record",
     bottle.edition,
     release,
   ]
