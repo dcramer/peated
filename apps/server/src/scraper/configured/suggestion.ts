@@ -59,6 +59,10 @@ const RuleReviewSchema = z
   })
   .strict();
 
+const MAX_RULE_REVIEW_INPUT_CHARS = 150_000;
+const MAX_RULE_REVIEW_ITEMS_PER_PAGE = 10;
+const MIN_RULE_REVIEW_EXCERPT_CHARS = 250;
+
 type SelectedListPage = AiPage & {
   links: string[];
   firstPageLinks: string[];
@@ -129,9 +133,11 @@ const RULE_REVIEW_INSTRUCTIONS = [
   "Check whether parsed scraper fields correctly represent the supplied HTML pages.",
   "</mission>",
   "<success_criteria>",
-  "Return no issues only when the found list links lead to the supplied detail pages and every parsed field matches the HTML.",
+  "Return no issues only when the found list links lead to the supplied detail pages and every supplied parsed field matches the HTML.",
   "The listPages are consecutive pages. Check each page's found detail links and next-page URL against that page's HTML.",
+  `Each detail page includes its total item count and at most ${MAX_RULE_REVIEW_ITEMS_PER_PAGE} parsed items.`,
   "For reviews, check the article title, date, bottle names, reviewer names, scores, score scales, and any extracted review text.",
+  "Long review text includes its full character count and an excerpt from its beginning and end.",
   "For prices, check the product name, price, currency, volume, URL, product id, image URL, and barcode.",
   "Dates may be normalized to ISO format. Prices are normalized to the smallest currency unit. Volumes are normalized to milliliters.",
   "Reject a missing optional rule when the supplied pages clearly and consistently provide that field.",
@@ -366,6 +372,62 @@ async function reviewSuggestedRules(input: {
   listPage: SelectedListPage;
   detailPages: CheckedDetailPage[];
 }) {
+  const request = buildRuleReviewRequest(input);
+  await loadAiSource(input.scrapeSourceId);
+  const response = await requestAi({
+    model: config.OPENAI_MODEL,
+    instructions: RULE_REVIEW_INSTRUCTIONS,
+    request,
+    format: createRuleReviewFormat(),
+    maxOutputTokens: 2_000,
+  });
+  checkRuleReview(response.output_text);
+}
+
+function excerpt(value: string, maxChars: number) {
+  if (value.length <= maxChars) return value;
+  const marker = "\n…\n";
+  const keptChars = maxChars - marker.length;
+  const startChars = Math.ceil(keptChars / 2);
+  const endChars = Math.floor(keptChars / 2);
+  return `${value.slice(0, startChars)}${marker}${value.slice(-endChars)}`;
+}
+
+function parsedOutputForRuleReview(
+  output: CheckedDetailPage["output"],
+  excerptChars: number,
+) {
+  if (output.kind === "price") {
+    return {
+      ...output,
+      productCount: output.products.length,
+      products: output.products.slice(0, MAX_RULE_REVIEW_ITEMS_PER_PAGE),
+    };
+  }
+  return {
+    ...output,
+    reviewCount: output.reviews.length,
+    reviews: output.reviews
+      .slice(0, MAX_RULE_REVIEW_ITEMS_PER_PAGE)
+      .map((review) => ({
+        ...review,
+        reviewText:
+          review.reviewText === null
+            ? null
+            : {
+                characters: review.reviewText.length,
+                excerpt: excerpt(review.reviewText, excerptChars),
+              },
+      })),
+  };
+}
+
+export function buildRuleReviewRequest(input: {
+  kind: ScrapeRules["kind"];
+  rules: ScrapeRules;
+  listPage: SelectedListPage;
+  detailPages: CheckedDetailPage[];
+}) {
   const listPages = [
     input.listPage,
     ...(input.listPage.nextPage ? [input.listPage.nextPage] : []),
@@ -376,16 +438,15 @@ async function reviewSuggestedRules(input: {
   if (!preparedListPages[0]) {
     throw new Error("The AI review has no list page.");
   }
-  await loadAiSource(input.scrapeSourceId);
-  const response = await requestAi({
-    model: config.OPENAI_MODEL,
-    instructions: RULE_REVIEW_INSTRUCTIONS,
-    request: JSON.stringify({
+
+  let excerptChars = MAX_RULE_REVIEW_INPUT_CHARS;
+  while (true) {
+    const request = JSON.stringify({
       kind: input.kind,
       rules: input.rules,
       listPages: listPages.map((page, index) => ({
         url: page.url,
-        html: preparedListPages[index]?.html ?? "",
+        html: excerpt(preparedListPages[index]?.html ?? "", excerptChars),
         foundDetailLinkCount:
           index === 0
             ? input.listPage.firstPageLinks.length
@@ -398,14 +459,27 @@ async function reviewSuggestedRules(input: {
       })),
       detailPages: input.detailPages.map((page, index) => ({
         url: page.url,
-        html: preparedDetailPages[index]?.html ?? "",
-        parsed: page.output,
+        html: excerpt(preparedDetailPages[index]?.html ?? "", excerptChars),
+        parsed: parsedOutputForRuleReview(page.output, excerptChars),
       })),
-    }),
-    format: createRuleReviewFormat(),
-    maxOutputTokens: 2_000,
-  });
-  checkRuleReview(response.output_text);
+    });
+    if (request.length <= MAX_RULE_REVIEW_INPUT_CHARS) return request;
+    if (excerptChars === MIN_RULE_REVIEW_EXCERPT_CHARS) break;
+    excerptChars = Math.max(
+      MIN_RULE_REVIEW_EXCERPT_CHARS,
+      Math.floor(excerptChars / 2),
+    );
+  }
+
+  throw new ScrapeSourceSetupError(
+    "The page data was too large for the final check.",
+    [
+      {
+        field: input.kind === "review" ? "detail.reviewItem" : "detail.name",
+        message: "The page contained too many items to check safely.",
+      },
+    ],
+  );
 }
 
 /** Creates an inactive revision only after code and AI both check the rules. */

@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import {
+  buildRuleReviewRequest,
   checkDetailPages,
   checkListPage,
   checkNextListPage,
@@ -161,6 +162,47 @@ test("keeps complete review text for the AI check", async () => {
     kind: "review",
     reviews: [{ reviewText: reviewText.trim() }],
   });
+});
+
+test("bounds long review evidence sent to the AI check", async () => {
+  const reviewText = `START-${"x".repeat(49_990)}-END`;
+  const urls = ["one", "two", "three"].map(
+    (slug) => `https://example.test/reviews/${slug}`,
+  );
+  const listPage = {
+    url: "https://example.test/reviews",
+    html: urls
+      .map((url) => `<a class="review" href="${url}">Review</a>`)
+      .join(""),
+    links: urls,
+    firstPageLinks: urls,
+    nextPageUrl: null,
+    nextPage: null,
+  };
+  const detailPages = await checkDetailPages({
+    rules: reviewRules,
+    listPage,
+    suppliedPages: urls.map((url, index) => ({
+      url,
+      html: `<h1>Review ${index + 1}</h1><article class="review"><h2>Bottle ${index + 1}</h2><p class="body">${reviewText}</p></article>`,
+    })),
+    loadPage: async () => {
+      throw new Error("A supplied detail page must not be fetched again.");
+    },
+  });
+
+  const request = buildRuleReviewRequest({
+    kind: "review",
+    rules: reviewRules,
+    listPage,
+    detailPages,
+  });
+
+  expect(request.length).toBeLessThanOrEqual(150_000);
+  expect(request).toContain('"characters":50000');
+  expect(request).toContain("START-");
+  expect(request).toContain("-END");
+  expect(request).toContain("\\n…\\n");
 });
 
 test("rejects suggested rules that do not parse a detail page", async () => {
