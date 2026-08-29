@@ -6,7 +6,7 @@ import {
   scrapeSources,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { MAX_LIKELY_LIST_PAGES } from "./discovery";
+import { MAX_SUGGESTION_PAGE_REQUESTS } from "./discovery";
 import { parseScrapeRules } from "./rules";
 import {
   ScrapeSourceNotFoundError,
@@ -110,7 +110,7 @@ export async function createScrapeSourceSuggestionRun(input: {
         externalSiteId: source.externalSiteId,
         trigger: "manual",
         requestedById: input.requestedById,
-        requestLimit: source.sampleUrls.length + MAX_LIKELY_LIST_PAGES + 1,
+        requestLimit: source.sampleUrls.length + MAX_SUGGESTION_PAGE_REQUESTS,
       })
       .returning();
     if (!run) throw new Error("Failed to create AI suggestion run.");

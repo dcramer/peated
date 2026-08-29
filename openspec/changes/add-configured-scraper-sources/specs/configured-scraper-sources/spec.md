@@ -75,14 +75,15 @@ or prices.
 ### Requirement: AI suggestions create inactive revisions only
 
 The system SHALL allow AI suggestions by default for new sources and permit the
-admin to turn them off. It SHALL make at most one AI request to suggest rules
-from admin-selected pages. The AI MUST have no tools. It MUST NOT activate a
-revision, change network control, or write products.
+admin to turn them off. It SHALL make at most two AI requests: one to suggest
+rules from supplied pages and one to review fields parsed from those rules. The
+AI MUST have no tools. It MUST NOT activate a revision, change network control,
+or write products.
 
 #### Scenario: AI is allowed
 
 - **WHEN** an admin requests the first suggestion or a repair after the latest test fails
-- **THEN** the system fetches the main page, bounded candidates from the same website, and bounded samples, checks that the named supplied list page matches the output, and stores an inactive revision with that list page, the AI model name, and the instructions version
+- **THEN** the system fetches the main page, bounded candidates from the same website, and bounded detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the page evidence, and stores an inactive revision only when both checks pass
 
 #### Scenario: AI is not allowed
 
@@ -93,6 +94,16 @@ revision, change network control, or write products.
 
 - **WHEN** the AI response fails the strict rules schema or uses the wrong kind
 - **THEN** the system stores no revision and reports a bounded error without page content
+
+#### Scenario: Proposed rules do not parse current pages
+
+- **WHEN** the list selector, detail selectors, conversions, or product schema fail against the supplied pages
+- **THEN** the system stores no revision and does not ask AI to approve invalid parsed fields
+
+#### Scenario: AI review rejects parsed fields
+
+- **WHEN** the reviewer finds that a parsed field does not represent the supplied page evidence
+- **THEN** the system stores no revision and does not retry or let the reviewer change the rules
 
 ### Requirement: Activation and rollback require a passing test
 

@@ -1,5 +1,9 @@
 import { expect, test } from "vitest";
-import { findLikelyListPages } from "./discovery";
+import {
+  MAX_SUGGESTION_DETAIL_PAGES,
+  findLikelyDetailPages,
+  findLikelyListPages,
+} from "./discovery";
 
 test("finds bounded same-site review pages", () => {
   const result = findLikelyListPages({
@@ -33,4 +37,49 @@ test("uses store terms only for price sources", () => {
       html,
     }),
   ).toEqual(["https://example.test/collections/whisky"]);
+});
+
+test("finds bounded detail pages from list-page cards", () => {
+  const result = findLikelyDetailPages({
+    kind: "review",
+    pages: [
+      {
+        url: "https://example.test/",
+        html: '<a href="/reviews">Reviews</a><a href="/about">About</a>',
+      },
+      {
+        url: "https://example.test/reviews",
+        html: Array.from(
+          { length: MAX_SUGGESTION_DETAIL_PAGES + 2 },
+          (_, index) =>
+            `<article class="review-card"><a href="/reviews/${index}">Review ${index}</a></article>`,
+        ).join(""),
+      },
+    ],
+  });
+
+  expect(result).toEqual([
+    "https://example.test/reviews/0",
+    "https://example.test/reviews/1",
+    "https://example.test/reviews/2",
+  ]);
+});
+
+test("ignores navigation, supplied pages, and links on other sites", () => {
+  expect(
+    findLikelyDetailPages({
+      kind: "price",
+      pages: [
+        {
+          url: "https://example.test/shop",
+          html: `
+            <a href="/shop">Current page</a>
+            <a href="/account">Account</a>
+            <a href="https://other.test/products/one">Other store</a>
+            <article class="product-card"><a href="/products/one">Product</a></article>
+          `,
+        },
+      ],
+    }),
+  ).toEqual(["https://example.test/products/one"]);
 });

@@ -124,7 +124,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         kind: "price",
         websiteUrl: HOME_URL,
         name: "Price Fixture",
-        sampleUrls: [FIRST_PRODUCT_URL, SECOND_PRODUCT_URL],
+        sampleUrls: [],
       });
       await db
         .update(scrapeOrigins)
@@ -152,13 +152,20 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         .from(scrapeSourceRevisions)
         .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
       expect(suggestedRevision).toMatchObject({
-        aiInstructionsVersion: "scrape-source-v2",
+        aiInstructionsVersion: "scrape-source-v3",
         author: "ai",
         listUrl: LIST_URL,
         previewStatus: "pending",
       });
       if (!suggestedRevision) throw new Error("AI did not create a revision.");
       expect(suggestedRevision.aiModel).toBeTruthy();
+      expect(suggestedRevision.rules).toMatchObject({
+        kind: "price",
+        detail: {
+          externalProductId: expect.any(Object),
+          imageUrl: expect.any(Object),
+        },
+      });
 
       const [suggestionLink] = await db
         .select()

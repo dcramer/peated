@@ -94,23 +94,30 @@ New sources allow AI suggestions by default. The admin can turn them off during
 setup. AI is available for the first revision or after the latest revision
 fails its test. The server reads the main page and selects a small number of
 links on the same website that look like review or store pages. It fetches
-those pages and the admin's examples, then makes one AI request. The response
-must match the rules format. The AI has no tools, and provider storage is
-disabled.
+those pages and the admin's examples, then makes one AI request for parsing
+rules. The response must match the rules format. The AI has no tools, and
+provider storage is disabled.
 
 The typed response names one supplied list page. The server runs the returned
-list selector against that exact page before it saves the revision. This keeps
-list-page selection bounded and testable without a model tool loop. Pagination
-remains outside rules version 1 until a pilot proves the required page behavior.
+list selector against that exact page, fetches a bounded sample of the detail
+links, and parses them with the production parser. Any selector, conversion, or
+schema error stops the suggestion without saving a revision.
 
-Code validates the returned rules and source kind before it stores a revision.
-The system records the AI model name and instructions version. An admin must
-preview and activate the result.
+A second bounded AI request compares the parsed fields with the same page
+evidence. Its strict response accepts or rejects the proposed rules and cannot
+change them. Rejection stops the suggestion. There are no retries or repair
+loop. This keeps the workflow bounded while adding a semantic check that code
+cannot provide.
+
+Pagination remains outside rules version 1 until a pilot proves the required
+page behavior. Code validates the returned rules and source kind before it
+stores a revision. The system records the AI model name and instructions
+version. An admin must still preview and activate the result.
 
 ## Admin Flow
 
 1. Add a site and its first review or price source from its website URL.
-2. Enter rules or ask AI for a suggestion.
+2. Enter rules or ask AI to create and review a suggestion.
 3. Preview the parsed fields from current pages.
 4. Activate a passing revision.
 5. Use history to repair, roll back, or pause the source.

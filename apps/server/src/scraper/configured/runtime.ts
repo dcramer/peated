@@ -22,7 +22,11 @@ import type {
   ScraperSink,
   ScraperSourceDefinition,
 } from "../types";
-import { MAX_LIKELY_LIST_PAGES, findLikelyListPages } from "./discovery";
+import {
+  MAX_SUGGESTION_PAGE_REQUESTS,
+  findLikelyDetailPages,
+  findLikelyListPages,
+} from "./discovery";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
 import { type ScrapeRules, parseScrapeRules } from "./rules";
@@ -331,11 +335,48 @@ export async function resolveScrapeSourceRunRegistry(
                 html: response.body,
               });
             }
+            const suppliedDetailUrls = new Set(
+              detailPages.map((page) => new URL(page.url).toString()),
+            );
+            const likelyDetailPages = findLikelyDetailPages({
+              kind: suggestion.source.kind,
+              pages: listPages,
+            }).filter((value) => !suppliedDetailUrls.has(value));
+            for (const value of likelyDetailPages) {
+              try {
+                const response = await session.request({
+                  target: target.key,
+                  url: new URL(value),
+                });
+                detailPages.push({
+                  url: response.url.toString(),
+                  html: response.body,
+                });
+              } catch (error) {
+                if (
+                  error instanceof ScraperHttpStatusError &&
+                  [404, 410].includes(error.status)
+                ) {
+                  continue;
+                }
+                throw error;
+              }
+            }
             const revision = await suggestScrapeSourceRevision({
               scrapeSourceId: suggestion.source.id,
               createdById: requestedById,
               listPages,
               detailPages,
+              loadPage: async (url) => {
+                const response = await session.request({
+                  target: target.key,
+                  url,
+                });
+                return {
+                  url: response.url.toString(),
+                  html: response.body,
+                };
+              },
             });
             await db
               .update(scrapeSourceRuns)
@@ -347,7 +388,7 @@ export async function resolveScrapeSourceRunRegistry(
       externalSiteKey: suggestion.siteKey,
       targetKeys: [target.key],
       requestLimit:
-        suggestion.source.sampleUrls.length + MAX_LIKELY_LIST_PAGES + 1,
+        suggestion.source.sampleUrls.length + MAX_SUGGESTION_PAGE_REQUESTS,
       resumeFromLastRun: false,
       cursorSchema: z.null(),
       observationSchema: z.unknown(),

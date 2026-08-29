@@ -40,6 +40,9 @@
 - [x] 5.4 Add an end-to-end review suggestion eval fixture
 - [x] 5.5 Add an end-to-end price suggestion eval fixture
 - [x] 5.6 Let one bounded AI request choose from likely pages on the same website
+- [x] 5.7 Parse bounded current detail pages before saving AI-generated rules
+- [x] 5.8 Require a second typed AI call to review parsed fields against page evidence
+- [x] 5.9 Cover deterministic rejection and run both live suggestion evals
 
 ## 6. Admin API And UI
 

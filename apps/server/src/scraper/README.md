@@ -90,11 +90,13 @@ and update rules are defined, so repeated runs do not create duplicate events.
 
 New sources allow AI parsing suggestions by default. An admin can turn this off
 when they create the source. The server reads the main page, a bounded set of
-likely pages on the same website, and any example review or product pages
-before it calls the model. The model has no tools, and provider storage is off.
-The typed response names one supplied list page, and code checks the returned
-rules against it. The response creates a new revision. An admin must test and
-activate that revision. AI never changes the active revision directly.
+likely pages on the same website, and any example review or product pages. One
+model call proposes rules. Code then fetches bounded detail pages and parses
+them with the production parser. A second model call compares those parsed
+fields with the page evidence. Both calls have strict outputs and no tools. No
+revision is saved unless the code checks and AI review pass. Provider
+storage is off. An admin must still test and activate the inactive revision.
+AI never changes the active revision directly.
 
 ## Source acceptance rules
 
