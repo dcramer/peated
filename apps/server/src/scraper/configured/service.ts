@@ -285,7 +285,7 @@ export async function activateScrapeSourceRevision(input: {
     if (!revision) throw new ScrapeSourceNotFoundError();
     if (revision.previewStatus !== "passed") {
       throw new ScrapeSourceValidationError(
-        "Preview this revision successfully before you activate it.",
+        "Preview this version successfully before you activate it.",
       );
     }
 
