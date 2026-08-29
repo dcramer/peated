@@ -20,7 +20,7 @@ export const ScrapeSourceCreateSchema = z
     kind: z.enum(SCRAPE_SOURCE_KIND_LIST),
     websiteUrl: ScrapeSourceUrlSchema,
     sampleUrls: z.array(ScrapeSourceUrlSchema).max(10).default([]),
-    allowAiSuggestions: z.boolean().default(false),
+    allowAiSuggestions: z.boolean().default(true),
   })
   .strict();
 

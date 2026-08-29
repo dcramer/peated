@@ -13,8 +13,9 @@ return to an older revision.
 - Run all saved sources through one shared parser and the existing request,
   review, and price controls.
 - Require a passing preview before an admin can activate a revision.
-- Let AI create an inactive revision only for an allowed source. AI cannot
-  activate it or change network access.
+- Allow AI parsing suggestions by default for new sources, with an admin
+  opt-out. AI creates inactive revisions and cannot activate them or change
+  network access.
 - Add admin controls to create a site and source, edit the list URL and parsing
   rules, preview a revision, activate it, view history, roll back, and pause it.
 - Keep existing code sources available.

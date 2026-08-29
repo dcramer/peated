@@ -18,3 +18,13 @@ test("accepts only HTTP website URLs", () => {
     }),
   ).toThrow("URL must use HTTP or HTTPS.");
 });
+
+test("allows AI suggestions by default", () => {
+  expect(ScrapeSourceCreateSchema.parse(source).allowAiSuggestions).toBe(true);
+  expect(
+    ScrapeSourceCreateSchema.parse({
+      ...source,
+      allowAiSuggestions: false,
+    }).allowAiSuggestions,
+  ).toBe(false);
+});

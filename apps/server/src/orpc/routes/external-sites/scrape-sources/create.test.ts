@@ -29,6 +29,7 @@ describe("POST /admin/scrape-sources", () => {
 
     expect(source).toMatchObject({
       activeRevisionId: null,
+      allowAiSuggestions: true,
       enabled: false,
       kind: "review",
       listUrl: input.websiteUrl,

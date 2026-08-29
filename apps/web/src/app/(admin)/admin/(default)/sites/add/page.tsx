@@ -20,7 +20,7 @@ export default function Page() {
   );
   const [error, setError] = useState<string>();
   const [kind, setKind] = useState<"review" | "price">("review");
-  const [allowAiSuggestions, setAllowAiSuggestions] = useState(false);
+  const [allowAiSuggestions, setAllowAiSuggestions] = useState(true);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -100,7 +100,7 @@ export default function Page() {
               checked={allowAiSuggestions}
               onChange={(event) => setAllowAiSuggestions(event.target.checked)}
             />
-            <span>Let AI find the right page and set up this source</span>
+            <span>Use AI to find the right page and create parsing rules</span>
           </label>
         </Fieldset>
         <div className="flex justify-end gap-2">

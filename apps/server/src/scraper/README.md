@@ -88,13 +88,13 @@ Event sources, such as whisky festivals, are the next planned source kind.
 Peated already stores these events. Add the scraper type only after its match
 and update rules are defined, so repeated runs do not create duplicate events.
 
-AI can suggest parsing rules only when an admin allows it for that source. The
-server reads the main page, a bounded set of likely pages on the same website,
-and any example review or product pages before it calls the model. The model
-has no tools, and provider storage is off. The typed response names one
-supplied list page, and code checks the returned rules against it. The response
-creates a new revision. An admin must test and activate that revision. AI never
-changes the active revision directly.
+New sources allow AI parsing suggestions by default. An admin can turn this off
+when they create the source. The server reads the main page, a bounded set of
+likely pages on the same website, and any example review or product pages
+before it calls the model. The model has no tools, and provider storage is off.
+The typed response names one supplied list page, and code checks the returned
+rules against it. The response creates a new revision. An admin must test and
+activate that revision. AI never changes the active revision directly.
 
 ## Source acceptance rules
 

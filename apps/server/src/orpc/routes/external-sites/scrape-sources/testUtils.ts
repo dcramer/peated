@@ -22,7 +22,7 @@ export async function createTestSource(
 ) {
   const host = options.host ?? "route-reviews";
   return await createSiteWithScrapeSource({
-    allowAiSuggestions: options.allowAiSuggestions,
+    allowAiSuggestions: options.allowAiSuggestions ?? false,
     createdById,
     kind: "review",
     websiteUrl: `https://${host}.example/archive`,

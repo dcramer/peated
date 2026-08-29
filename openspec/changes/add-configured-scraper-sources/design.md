@@ -11,7 +11,7 @@ stays transient.
 - Keep one clear term for each stored concept.
 - Pin every run to immutable parsing rules.
 - Use the same parser for preview and collection.
-- Keep AI optional and unable to change active behavior.
+- Use AI suggestions by default while keeping an opt-out and human activation.
 - Keep the first rules version small.
 
 ## Non-Goals
@@ -90,12 +90,13 @@ keeps that revision across retries even if an admin activates another one.
 
 ## AI Suggestions
 
-AI is allowed only when the source opts in. It is available for the first
-revision or after the latest revision fails its test. The server reads the
-main page and selects a small number of links on the same website that look
-like review or store pages. It fetches those pages and the admin's examples,
-then makes one AI request. The response must match the rules format. The AI has
-no tools, and provider storage is disabled.
+New sources allow AI suggestions by default. The admin can turn them off during
+setup. AI is available for the first revision or after the latest revision
+fails its test. The server reads the main page and selects a small number of
+links on the same website that look like review or store pages. It fetches
+those pages and the admin's examples, then makes one AI request. The response
+must match the rules format. The AI has no tools, and provider storage is
+disabled.
 
 The typed response names one supplied list page. The server runs the returned
 list selector against that exact page before it saves the revision. This keeps

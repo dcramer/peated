@@ -13,6 +13,11 @@ start disabled.
 - **WHEN** an admin submits a valid new site and chooses `review`
 - **THEN** the system stores the site, generated internal key, admin-managed network rows, and a disabled review source without a deploy
 
+#### Scenario: Admin uses the default AI setting
+
+- **WHEN** an admin creates a source without changing the AI setting
+- **THEN** the source permits AI to suggest its first parsing-rule revision
+
 #### Scenario: Rules try to change network access
 
 - **WHEN** proposed rules contain an origin, credential, header, or robots exception
@@ -69,8 +74,9 @@ or prices.
 
 ### Requirement: AI suggestions create inactive revisions only
 
-The system SHALL make at most one AI request to suggest rules from
-admin-selected pages. The AI MUST have no tools. It MUST NOT activate a
+The system SHALL allow AI suggestions by default for new sources and permit the
+admin to turn them off. It SHALL make at most one AI request to suggest rules
+from admin-selected pages. The AI MUST have no tools. It MUST NOT activate a
 revision, change network control, or write products.
 
 #### Scenario: AI is allowed

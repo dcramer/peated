@@ -48,6 +48,7 @@
 - [x] 6.3 Add an Admin Scrapers Add Site flow with review or price choice
 - [x] 6.4 Add the Parsing tab with list URL, rules, preview, active revision, history, and rollback
 - [x] 6.5 Remove the short-name and list-page decisions from the Add Site form
+- [x] 6.6 Default new sources to allow AI-generated parsing rules
 
 ## 7. Verification And Pilot
 
