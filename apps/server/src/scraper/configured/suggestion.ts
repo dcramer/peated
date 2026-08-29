@@ -1,8 +1,7 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { scrapeSources } from "@peated/server/db/schema";
-import { createOpenAIClient } from "@peated/server/lib/openaiClient";
-import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
+import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
 import type { Currency } from "@peated/server/types";
 import { eq } from "drizzle-orm";
 import { zodTextFormat } from "openai/helpers/zod";
@@ -60,6 +59,10 @@ const RuleReviewSchema = z
   })
   .strict();
 
+const MAX_RULE_REVIEW_INPUT_CHARS = 150_000;
+const MAX_RULE_REVIEW_ITEMS_PER_PAGE = 10;
+const MIN_RULE_REVIEW_EXCERPT_CHARS = 250;
+
 type SelectedListPage = AiPage & {
   links: string[];
   firstPageLinks: string[];
@@ -116,7 +119,7 @@ export function checkRuleReview(outputText: string) {
   }
   if (review.issues.length > 0) {
     throw new ScrapeSourceSetupError(
-      "AI review found incorrect parsed fields.",
+      "The final check found page values that did not match.",
       review.issues.map(({ field }) => ({
         field,
         message: "The parsed value did not match the supplied page.",
@@ -130,9 +133,11 @@ const RULE_REVIEW_INSTRUCTIONS = [
   "Check whether parsed scraper fields correctly represent the supplied HTML pages.",
   "</mission>",
   "<success_criteria>",
-  "Return no issues only when the found list links lead to the supplied detail pages and every parsed field matches the HTML.",
+  "Return no issues only when the found list links lead to the supplied detail pages and every supplied parsed field matches the HTML.",
   "The listPages are consecutive pages. Check each page's found detail links and next-page URL against that page's HTML.",
+  `Each detail page includes its total item count and at most ${MAX_RULE_REVIEW_ITEMS_PER_PAGE} parsed items.`,
   "For reviews, check the article title, date, bottle names, reviewer names, scores, score scales, and any extracted review text.",
+  "Long review text includes its full character count and an excerpt from its beginning and end.",
   "For prices, check the product name, price, currency, volume, URL, product id, image URL, and barcode.",
   "Dates may be normalized to ISO format. Prices are normalized to the smallest currency unit. Volumes are normalized to milliliters.",
   "Reject a missing optional rule when the supplied pages clearly and consistently provide that field.",
@@ -264,9 +269,7 @@ function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
           name: review.name,
           reviewerName: review.reviewerName ?? null,
           nativeScore: review.nativeScore ?? null,
-          reviewText:
-            value.externalReviewTexts[review.sourceKey]?.slice(0, 1_000) ??
-            null,
+          reviewText: value.externalReviewTexts[review.sourceKey] ?? null,
         })),
       },
     };
@@ -335,9 +338,8 @@ async function loadAiSource(scrapeSourceId: number) {
 
 type AiTextFormat = ReturnType<typeof createRuleReviewFormat>;
 
-/** Keeps provider storage off and records each AI request. */
+/** Keeps provider storage off and records complete public-site model calls. */
 async function requestAi(input: {
-  scrapeSourceId: number;
   model: string;
   instructions: string;
   request: string | ResponseInput;
@@ -345,54 +347,82 @@ async function requestAi(input: {
   tools?: Tool[];
   maxOutputTokens: number;
 }) {
-  const client = createOpenAIClient({
-    instrumentWithSentry: false,
-    workload: "scraper",
-  });
-  return await instrumentOpenAIResponsesCall({
-    baseURL: config.AI_GATEWAY_HOST,
-    conversationId: `scrape_source:${input.scrapeSourceId}`,
+  const client = createOpenAIAgentClient({ workload: "scraper" });
+  const request: ResponseCreateParamsNonStreaming = {
     model: input.model,
-    callback: async (reportResponse) => {
-      const request: ResponseCreateParamsNonStreaming = {
-        model: input.model,
-        instructions: input.instructions,
-        input: input.request,
-        max_output_tokens: input.maxOutputTokens,
-        store: false,
-      };
-      if (input.format) request.text = { format: input.format };
-      if (input.tools) {
-        request.include = ["reasoning.encrypted_content"];
-        request.parallel_tool_calls = false;
-        request.tool_choice = "required";
-        request.tools = input.tools;
-      }
-      const result = await client.responses.create(request);
-      reportResponse({
-        response: {
-          id: result.id,
-          model: result.model,
-          serviceTier: result.service_tier ?? null,
-        },
-        usage: result.usage
-          ? {
-              inputTokens: result.usage.input_tokens,
-              cachedInputTokens:
-                result.usage.input_tokens_details.cached_tokens,
-              outputTokens: result.usage.output_tokens,
-              reasoningTokens:
-                result.usage.output_tokens_details.reasoning_tokens,
-            }
-          : null,
-      });
-      return result;
-    },
-  });
+    instructions: input.instructions,
+    input: input.request,
+    max_output_tokens: input.maxOutputTokens,
+    store: false,
+  };
+  if (input.format) request.text = { format: input.format };
+  if (input.tools) {
+    request.include = ["reasoning.encrypted_content"];
+    request.parallel_tool_calls = false;
+    request.tool_choice = "required";
+    request.tools = input.tools;
+  }
+  return await client.responses.create(request);
 }
 
 async function reviewSuggestedRules(input: {
   scrapeSourceId: number;
+  kind: ScrapeRules["kind"];
+  rules: ScrapeRules;
+  listPage: SelectedListPage;
+  detailPages: CheckedDetailPage[];
+}) {
+  const request = buildRuleReviewRequest(input);
+  await loadAiSource(input.scrapeSourceId);
+  const response = await requestAi({
+    model: config.OPENAI_MODEL,
+    instructions: RULE_REVIEW_INSTRUCTIONS,
+    request,
+    format: createRuleReviewFormat(),
+    maxOutputTokens: 2_000,
+  });
+  checkRuleReview(response.output_text);
+}
+
+function excerpt(value: string, maxChars: number) {
+  if (value.length <= maxChars) return value;
+  const marker = "\n…\n";
+  const keptChars = maxChars - marker.length;
+  const startChars = Math.ceil(keptChars / 2);
+  const endChars = Math.floor(keptChars / 2);
+  return `${value.slice(0, startChars)}${marker}${value.slice(-endChars)}`;
+}
+
+function parsedOutputForRuleReview(
+  output: CheckedDetailPage["output"],
+  excerptChars: number,
+) {
+  if (output.kind === "price") {
+    return {
+      ...output,
+      productCount: output.products.length,
+      products: output.products.slice(0, MAX_RULE_REVIEW_ITEMS_PER_PAGE),
+    };
+  }
+  return {
+    ...output,
+    reviewCount: output.reviews.length,
+    reviews: output.reviews
+      .slice(0, MAX_RULE_REVIEW_ITEMS_PER_PAGE)
+      .map((review) => ({
+        ...review,
+        reviewText:
+          review.reviewText === null
+            ? null
+            : {
+                characters: review.reviewText.length,
+                excerpt: excerpt(review.reviewText, excerptChars),
+              },
+      })),
+  };
+}
+
+export function buildRuleReviewRequest(input: {
   kind: ScrapeRules["kind"];
   rules: ScrapeRules;
   listPage: SelectedListPage;
@@ -408,17 +438,15 @@ async function reviewSuggestedRules(input: {
   if (!preparedListPages[0]) {
     throw new Error("The AI review has no list page.");
   }
-  await loadAiSource(input.scrapeSourceId);
-  const response = await requestAi({
-    scrapeSourceId: input.scrapeSourceId,
-    model: config.OPENAI_MODEL,
-    instructions: RULE_REVIEW_INSTRUCTIONS,
-    request: JSON.stringify({
+
+  let excerptChars = MAX_RULE_REVIEW_INPUT_CHARS;
+  while (true) {
+    const request = JSON.stringify({
       kind: input.kind,
       rules: input.rules,
       listPages: listPages.map((page, index) => ({
         url: page.url,
-        html: preparedListPages[index]?.html ?? "",
+        html: excerpt(preparedListPages[index]?.html ?? "", excerptChars),
         foundDetailLinkCount:
           index === 0
             ? input.listPage.firstPageLinks.length
@@ -431,19 +459,33 @@ async function reviewSuggestedRules(input: {
       })),
       detailPages: input.detailPages.map((page, index) => ({
         url: page.url,
-        html: preparedDetailPages[index]?.html ?? "",
-        parsed: page.output,
+        html: excerpt(preparedDetailPages[index]?.html ?? "", excerptChars),
+        parsed: parsedOutputForRuleReview(page.output, excerptChars),
       })),
-    }),
-    format: createRuleReviewFormat(),
-    maxOutputTokens: 2_000,
-  });
-  checkRuleReview(response.output_text);
+    });
+    if (request.length <= MAX_RULE_REVIEW_INPUT_CHARS) return request;
+    if (excerptChars === MIN_RULE_REVIEW_EXCERPT_CHARS) break;
+    excerptChars = Math.max(
+      MIN_RULE_REVIEW_EXCERPT_CHARS,
+      Math.floor(excerptChars / 2),
+    );
+  }
+
+  throw new ScrapeSourceSetupError(
+    "The page data was too large for the final check.",
+    [
+      {
+        field: input.kind === "review" ? "detail.reviewItem" : "detail.name",
+        message: "The page contained too many items to check safely.",
+      },
+    ],
+  );
 }
 
 /** Creates an inactive revision only after code and AI both check the rules. */
 export async function suggestScrapeSourceRevision(input: {
   scrapeSourceId: number;
+  externalSiteRunId: number;
   createdById: number;
   listPages: AiPage[];
   detailPages: AiPage[];
@@ -457,13 +499,15 @@ export async function suggestScrapeSourceRevision(input: {
     ]),
   );
   const setup = await runScrapeSourceSetupAgent({
+    conversationId: `scrape_source:${input.scrapeSourceId}`,
+    externalSiteRunId: input.externalSiteRunId,
     kind: source.kind,
+    scrapeSourceId: input.scrapeSourceId,
     listPages: input.listPages,
     detailPages: input.detailPages,
     request: async (request) => {
       await loadAiSource(input.scrapeSourceId);
       return await requestAi({
-        scrapeSourceId: input.scrapeSourceId,
         model: config.SCRAPER_SETUP_MODEL,
         instructions: request.instructions,
         request: request.input,

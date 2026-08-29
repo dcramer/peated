@@ -19,9 +19,10 @@ test("labels nested AI output fields without exposing their paths", () => {
 
   const message = error.adminMessage();
   expect(message).toBe(
-    "AI could not finish setup. Missing or invalid: Item links, Score, Item name.",
+    "AI setup stopped. AI returned invalid rules. Check: Item links, Score, Item name.",
   );
-  expect(message).not.toContain("rules");
+  expect(message).not.toContain("rules.list");
+  expect(message).not.toContain("rules.detail");
   expect(message).not.toContain("selector");
   expect(message).not.toContain("attribute");
 });
@@ -33,6 +34,16 @@ test("names missing review fields", () => {
   ]);
 
   expect(error.adminMessage()).toBe(
-    "AI could not finish setup. Missing or invalid: Item name, Page title.",
+    "AI setup stopped. The page could not be read. Check: Item name, Page title.",
+  );
+});
+
+test("shows the failure reason when no page field is known", () => {
+  const error = new ScrapeSourceSetupError(
+    "The website blocked the setup request.",
+  );
+
+  expect(error.adminMessage()).toBe(
+    "AI setup stopped. The website blocked the setup request.",
   );
 });

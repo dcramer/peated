@@ -97,7 +97,10 @@ test("returns rules only after the rule check passes", async () => {
   });
 
   const result = await runScrapeSourceSetupAgent({
+    conversationId: "scrape_source:1",
+    externalSiteRunId: 10,
     kind: "review",
+    scrapeSourceId: 1,
     listPages: [
       {
         url: "https://example.test/reviews",
@@ -141,7 +144,10 @@ test("stops after the rule-check limit", async () => {
 
   await expect(
     runScrapeSourceSetupAgent({
+      conversationId: "scrape_source:1",
+      externalSiteRunId: 10,
       kind: "review",
+      scrapeSourceId: 1,
       listPages: [
         { url: "https://example.test/reviews", html: "<main></main>" },
       ],

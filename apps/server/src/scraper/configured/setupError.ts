@@ -49,6 +49,7 @@ export class ScrapeSourceSetupError extends Error {
   override name = "ScrapeSourceSetupError";
 
   constructor(
+    // Keep this fixed and safe to show to admins and in telemetry.
     readonly summary: string,
     readonly issues: ScrapeIssue[] = [],
   ) {
@@ -70,7 +71,7 @@ export class ScrapeSourceSetupError extends Error {
       ),
     ];
     return fields.length > 0
-      ? `AI could not finish setup. Missing or invalid: ${fields.join(", ")}.`
-      : "AI could not finish setup for this site.";
+      ? `AI setup stopped. ${this.summary} Check: ${fields.join(", ")}.`
+      : `AI setup stopped. ${this.summary}`;
   }
 }

@@ -203,11 +203,18 @@ function parseReviewDetail(
     nativeScore: { value: number; scale: number; display: string } | null;
   }> = [];
   const externalReviewTexts: Record<string, string> = {};
+  const reviewItems = $(rules.detail.reviewItem).toArray();
+  const readReviewValue = (
+    item: ReturnType<typeof load>,
+    selector: ScrapeValueSelector,
+  ) =>
+    readValue(item, selector) ??
+    (reviewItems.length === 1 ? readValue($, selector) : null);
 
   try {
-    $(rules.detail.reviewItem).each((index, element) => {
+    reviewItems.forEach((element, index) => {
       const item = load($.html(element));
-      const name = readValue(item, rules.detail.name);
+      const name = readReviewValue(item, rules.detail.name);
       if (!name) {
         issues.push({
           field: "detail.name",
@@ -217,10 +224,10 @@ function parseReviewDetail(
       }
       const sourceKey = `${pageUrl.toString()}#review-${index + 1}`;
       const reviewerName = rules.detail.reviewerName
-        ? readValue(item, rules.detail.reviewerName)
+        ? readReviewValue(item, rules.detail.reviewerName)
         : null;
       const scoreText = rules.detail.score
-        ? readValue(item, rules.detail.score.value)
+        ? readReviewValue(item, rules.detail.score.value)
         : null;
       const scoreValue = parseNumber(scoreText);
       if (scoreText && scoreValue === null) {
@@ -244,7 +251,7 @@ function parseReviewDetail(
             : null,
       });
       if (rules.detail.reviewText) {
-        const text = readValue(item, rules.detail.reviewText);
+        const text = readReviewValue(item, rules.detail.reviewText);
         if (text) externalReviewTexts[sourceKey] = text;
       }
     });
