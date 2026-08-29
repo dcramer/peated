@@ -196,7 +196,7 @@ test("stores safe validation issues when a selector stops matching", async () =>
   expect(storedRevision).toMatchObject({ previewStatus: "failed" });
   expect(storedRevision?.previewResult).toMatchObject({
     pages: [],
-    issues: [expect.objectContaining({ field: "article.title" })],
+    issues: [expect.objectContaining({ field: "detail.title" })],
   });
 });
 

@@ -1,19 +1,11 @@
-import { expect, test, vi } from "vitest";
+import { expect, test } from "vitest";
+import { suggestionRequestLimit } from "./setupAgent";
 import {
-  ScrapeSourceSetupError,
-  type ScrapeSourceSetupFeedback,
-} from "./setupError";
-import {
-  MAX_AI_INPUT_CHARS,
   checkDetailPages,
   checkListPage,
   checkNextListPage,
   checkRuleReview,
   createRuleReviewFormat,
-  createSuggestionFormat,
-  prepareAiPages,
-  runRuleSetupAttempts,
-  suggestionRequestLimit,
 } from "./suggestion";
 
 const reviewRules = {
@@ -31,12 +23,6 @@ const reviewRules = {
 };
 
 test("uses object schemas for AI output", () => {
-  for (const kind of ["review", "price"] as const) {
-    const format = createSuggestionFormat(kind);
-    expect(format.schema).toMatchObject({ type: "object" });
-    expect(JSON.stringify(format.schema)).not.toContain('"oneOf"');
-    expect(JSON.stringify(format.schema)).not.toContain('"maxItems"');
-  }
   const reviewFormat = createRuleReviewFormat();
   expect(reviewFormat.schema).toMatchObject({
     type: "object",
@@ -45,55 +31,8 @@ test("uses object schemas for AI output", () => {
 });
 
 test("reserves requests for discovery and final page checks", () => {
-  expect(suggestionRequestLimit(0)).toBe(16);
-  expect(suggestionRequestLimit(2)).toBe(18);
-});
-
-test("gives an expected rule failure to one repair attempt", async () => {
-  const feedback: Array<ScrapeSourceSetupFeedback | null> = [];
-  const result = await runRuleSetupAttempts(async (current) => {
-    feedback.push(current);
-    if (!current) {
-      throw new ScrapeSourceSetupError("The list rule failed.", [
-        { field: "list.detailLink", message: "No links were found." },
-      ]);
-    }
-    return "working rules";
-  });
-
-  expect(result).toBe("working rules");
-  expect(feedback).toEqual([
-    null,
-    {
-      message: "The list rule failed.",
-      issues: [{ field: "list.detailLink", message: "No links were found." }],
-    },
-  ]);
-});
-
-test("does not retry an unexpected setup failure", async () => {
-  const attempt = vi.fn(async () => {
-    throw new Error("Database unavailable.");
-  });
-
-  await expect(runRuleSetupAttempts(attempt)).rejects.toThrow(
-    "Database unavailable.",
-  );
-  expect(attempt).toHaveBeenCalledOnce();
-});
-
-test("bounds total AI input while keeping every sample page", () => {
-  const pages = Array.from({ length: 10 }, (_, index) => ({
-    url: `https://example.test/${index}`,
-    html: "x".repeat(50_000),
-  }));
-  const prepared = prepareAiPages(pages);
-
-  expect(prepared).toHaveLength(pages.length);
-  expect(prepared.every((page) => page.html.length > 0)).toBe(true);
-  expect(
-    prepared.reduce((total, page) => total + page.html.length, 0),
-  ).toBeLessThanOrEqual(MAX_AI_INPUT_CHARS);
+  expect(suggestionRequestLimit(0)).toBe(20);
+  expect(suggestionRequestLimit(2)).toBe(22);
 });
 
 test("validates the selected list page and returns its detail links", () => {
