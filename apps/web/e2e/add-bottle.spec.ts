@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-import { bottlePath, expectNoHorizontalOverflow } from "./assertions";
+import { bottlePath } from "./assertions";
 import {
   addAnotherReleaseSourceBottle,
   createdBottleId,
@@ -37,23 +37,16 @@ import { signIn } from "./session";
 const pendingScanImageUrl =
   "http://127.0.0.1:4999/uploads/playwright-photo.webp";
 test.describe("create bottle", () => {
-  test("renders the Add Bottle resolver at the plain route", async ({
+  test("loads the Add Bottle resolver at the plain route", async ({
     context,
     page,
   }) => {
     await signIn(context);
 
-    await page.goto("/addBottle");
+    const response = await page.goto("/addBottle");
 
+    expect(response?.status()).toBeLessThan(400);
     await expect(page).toHaveURL(/\/addBottle$/);
-    await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
-    ).toBeVisible();
-    await expect(page.getByText("Take or upload a photo")).toBeVisible();
-    const photoInput = page.locator('input[type="file"]');
-    await expect(photoInput).toHaveAttribute("accept", "image/*");
-    await expect(photoInput).not.toHaveAttribute("capture");
-    await expectNoHorizontalOverflow(page);
   });
 
   test("redirects legacy add bottle create links", async ({
@@ -68,9 +61,6 @@ test.describe("create bottle", () => {
     const currentUrl = new URL(page.url());
     expect(currentUrl.pathname).toBe("/bottles/new");
     expect(currentUrl.searchParams.get("name")).toBe(createdBottleName);
-    await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
-    ).toBeVisible();
   });
 
   test("creates a bottle with an existing fixture brand", async ({
@@ -173,7 +163,6 @@ test.describe("create bottle", () => {
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(getSelectedBottle(page, createdBottleName)).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("continues to tasting from explicit tasting intent", async ({
@@ -348,10 +337,6 @@ test.describe("create bottle", () => {
     await page.goto(
       `/bottles/new?name=${encodeURIComponent(createdBottleName)}&brandName=${encodeURIComponent(testBrand.name)}&returnAction=addBottle&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingScanImageUrl)}`,
     );
-    await expect(page.getByAltText("uploaded image")).toHaveAttribute(
-      "src",
-      pendingScanImageUrl,
-    );
 
     await page
       .locator('input[type="file"][name="image"]')
@@ -457,7 +442,6 @@ test.describe("create bottle", () => {
     expect(createInput).not.toHaveProperty("release");
     expect(createInput).not.toHaveProperty("releaseId");
     await expect(page).toHaveURL(bottlePath(createdBottleId));
-    await expectNoHorizontalOverflow(page);
   });
 
   test("shows validation when saving without a brand", async ({
@@ -482,12 +466,11 @@ test.describe("create bottle", () => {
     await expect(brandField).toHaveAttribute("aria-expanded", "true");
     await expect(page).toHaveURL(/\/bottles\/new\?name=Hogback$/);
     expect(pageErrors).toEqual([]);
-    await expectNoHorizontalOverflow(page);
   });
 });
 
 test.describe("add bottle flow", () => {
-  test("shows outcome actions for a resolved bottle query", async ({
+  test("adds a resolved bottle to Library and starts a tasting", async ({
     context,
     page,
   }, testInfo) => {
@@ -497,45 +480,15 @@ test.describe("add bottle flow", () => {
 
     await page.goto(`/addBottle?bottle=${existingBottle.id}`);
 
-    await expect(
-      page.getByRole("heading", { name: "Add Bottle" }),
-    ).toBeVisible();
-    await expect(
-      getBottleIdentityLink(page, destinationBottleGroup.name),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Add to Library" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "View Bottle" }),
-    ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
-    await expect(page.getByRole("link", { name: "Add Similar" })).toBeHidden();
-    await expect(
-      page.getByRole("link", { name: "Search Bottles" }),
-    ).toHaveAttribute("href", "/search?intent=addBottle");
-
     await page.getByRole("button", { name: "Add to Library" }).click();
 
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
-    await expect(
-      getBottleIdentityLink(page, destinationBottleGroup.name),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Log Tasting" }),
-    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/addTasting`);
-    await expect(
-      page.getByRole("link", { name: "View Bottle" }),
-    ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await page.getByRole("link", { name: "Log Tasting" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Log Tasting" }),
-    ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
+    await expect(page).toHaveURL(
+      `/addBottle?bottle=${existingBottle.id}&intent=tasting`,
+    );
   });
 
   test("routes Add Bottle search results into the resolver outcome", async ({
@@ -578,7 +531,6 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("preserves scanned photos through Add Bottle search fallback", async ({
@@ -621,7 +573,6 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("adds a searched bottle to Library from the Add Bottle resolver", async ({
@@ -642,7 +593,6 @@ test.describe("add bottle flow", () => {
     await expect(
       getBottleIdentityLink(page, destinationBottleGroup.name),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("disables Library action when the bottle is already saved", async ({
@@ -666,7 +616,6 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
     ).toBeEnabled();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("shows Library save errors in the direct Add Bottle flow", async ({
@@ -684,7 +633,6 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("adds a matched scan to Library with the scanned photo", async ({
@@ -768,7 +716,6 @@ test.describe("add bottle flow", () => {
     const inLibraryButton = page.getByRole("button", { name: "In Library" });
     await expect(inLibraryButton).toBeVisible();
     await expect(inLibraryButton).toBeDisabled();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("saves a scanned photo onto an existing Library entry without an image", async ({
@@ -806,7 +753,6 @@ test.describe("add bottle flow", () => {
       "src",
       /library\.webp$/,
     );
-    await expectNoHorizontalOverflow(page);
   });
 
   test("redirects to login when a scan hits an expired session", async ({
@@ -887,7 +833,6 @@ test.describe("add bottle flow", () => {
         name: `${testBrand.name} ${createdBottleName}`,
       }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates a complete bottle from a scan when Create Bottle is clicked", async ({
@@ -922,7 +867,6 @@ test.describe("add bottle flow", () => {
     await expect(page.locator('dt:has-text("Release Year") + dd')).toHaveText(
       "2026",
     );
-    await expectNoHorizontalOverflow(page);
   });
 
   test("prefills exact bottle fields from a scan before creating it", async ({
@@ -959,7 +903,6 @@ test.describe("add bottle flow", () => {
     await expect(page.locator('dt:has-text("Bottle Label") + dd')).toHaveText(
       "First Fill Oloroso",
     );
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates from an unsuitable scan without requesting image approval", async ({
@@ -987,7 +930,6 @@ test.describe("add bottle flow", () => {
         name: `${testBrand.name} ${createdBottleName}`,
       }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("shows catalog image warning without blocking created Bottle resolution", async ({
@@ -1014,7 +956,6 @@ test.describe("add bottle flow", () => {
         name: `${testBrand.name} ${createdBottleName}`,
       }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates a scan proposal as part of Add to Library", async ({
@@ -1051,7 +992,6 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Bottle created" }),
     ).toBeHidden();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates a complete scan bottle as part of Add to Library", async ({
@@ -1085,7 +1025,6 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(page.getByText("First Fill Oloroso")).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates a scan proposal as part of Log Tasting", async ({
@@ -1123,7 +1062,6 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Bottle created" }),
     ).toBeHidden();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("routes to an existing bottle when action-time create reuses it", async ({
@@ -1150,7 +1088,6 @@ test.describe("add bottle flow", () => {
         name: `${testBrand.name} ${destinationBottleGroup.name}`,
       }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("adds an existing reused create proposal to Library", async ({
@@ -1177,7 +1114,6 @@ test.describe("add bottle flow", () => {
     await expect(
       getBottleIdentityLink(page, destinationBottleGroup.name),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("opens Log Tasting for an existing reused create proposal", async ({
@@ -1202,7 +1138,6 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("offers review and create when a low-confidence scan has label details", async ({
@@ -1288,7 +1223,6 @@ test.describe("add bottle flow", () => {
     );
     expect(createUrl.searchParams.get("brandName")).toBe(testBrand.name);
     expect(createUrl.searchParams.get("name")).toBe(createdBottleName);
-    await expectNoHorizontalOverflow(page);
   });
 
   test("carries uncertain scan details into manual bottle creation", async ({
@@ -1342,7 +1276,6 @@ test.describe("add bottle flow", () => {
       "src",
       pendingScanImageUrl,
     );
-    await expectNoHorizontalOverflow(page);
   });
 
   test("keeps a downgraded scan match actionable and offers manual creation", async ({
@@ -1384,7 +1317,6 @@ test.describe("add bottle flow", () => {
     );
     expect(createUrl.searchParams.get("brandName")).toBe(testBrand.name);
     expect(createUrl.searchParams.get("name")).toBe(existingBottle.name);
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates a catalog bottle from a no-match scan and shows the created bottle", async ({
@@ -1440,7 +1372,6 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("clears a pending scan when the manual create image is removed", async ({

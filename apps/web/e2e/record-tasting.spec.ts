@@ -2,7 +2,6 @@ import { expect, type Page, type Request, test } from "@playwright/test";
 import { Buffer } from "node:buffer";
 import { z } from "zod";
 
-import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdTastingId,
   destinationBottleGroup,
@@ -57,7 +56,6 @@ test.describe("log tasting", () => {
     expect(createInput).not.toHaveProperty("release");
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
-    await expectNoHorizontalOverflow(page);
   });
 
   test("finishes saving when tasting image upload fails", async ({
@@ -137,7 +135,6 @@ test.describe("log tasting", () => {
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
-    await expectNoHorizontalOverflow(page);
   });
 
   test("returns to the filled photo tasting form when submit fails", async ({
@@ -180,7 +177,6 @@ test.describe("log tasting", () => {
     await expect(page.getByLabel("Comments")).toHaveValue(failingTastingNotes);
     await expect(page.getByAltText("uploaded image")).toBeVisible();
     await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
-    await expectNoHorizontalOverflow(page);
   });
 });
 

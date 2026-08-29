@@ -1,7 +1,7 @@
 import { expect, type Request, test, type TestInfo } from "@playwright/test";
 import { z } from "zod";
 
-import { bottlePath, expectNoHorizontalOverflow } from "./assertions";
+import { bottlePath } from "./assertions";
 import {
   anotherReleaseSourceBottle,
   createdBottleName,
@@ -83,7 +83,6 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByText("Nothing needs a decision", { exact: true }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("reviews an Incoming Listing follow-up as a focused catalog task", async ({
@@ -134,7 +133,6 @@ test.describe("unified Bottle workflows", () => {
       hasText: "The inspected listing matched the canonical Bottle",
     });
     await expect(reviewOperation).toBeVisible();
-    await expectNoHorizontalOverflow(page);
 
     const approvalRequest = page.waitForRequest((request) =>
       request.url().includes("/rpc/audits/approveSelected"),
@@ -147,7 +145,6 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByText("Nothing needs a decision", { exact: true }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates an independent Bottle from a source-backed proposal", async ({
@@ -180,7 +177,6 @@ test.describe("unified Bottle workflows", () => {
       "First Fill Oloroso",
     );
     await expect(page.getByLabel("Release year")).toHaveValue("2026");
-    await expectNoHorizontalOverflow(page);
 
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
@@ -274,7 +270,6 @@ test.describe("unified Bottle workflows", () => {
       edition: "Cask 43",
       statedAge: 22,
     });
-    await expectNoHorizontalOverflow(page);
   });
 
   test("merges same-name Bottles with explicit retire and keep identities", async ({

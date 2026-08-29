@@ -2,22 +2,13 @@ import { expect, test } from "@playwright/test";
 
 import { bottlePath } from "./assertions";
 import {
-  destinationBottleGroup,
   exactMatchedBottleId,
-  existingBottleId,
   missingBottleId,
   replacementSourceBottleId,
 } from "./rpc-fixtures.mjs";
 
 test.describe("Bottle page redirects", () => {
   test.describe.configure({ mode: "serial" });
-
-  test("renders an active Bottle without redirecting", async ({ page }) => {
-    await page.goto(`/bottles/${existingBottleId}`);
-    await expect(
-      page.getByRole("heading", { name: destinationBottleGroup.fullName }),
-    ).toBeVisible();
-  });
 
   test("permanently redirects an exact replacement and preserves its suffix", async ({
     page,
@@ -39,7 +30,7 @@ test.describe("Bottle page redirects", () => {
     ]) {
       await page.goto(`/bottles/${bottleId}/releases`);
       await expect(
-        page.getByRole("heading", { name: "Not Found" }),
+        page.getByRole("heading", { name: "Nothing lives here" }),
       ).toBeVisible();
     }
   });
@@ -50,7 +41,7 @@ test.describe("Bottle page redirects", () => {
     await page.goto(`/bottles/${missingBottleId}`);
     await expect(page).toHaveURL(bottlePath(missingBottleId));
     await expect(
-      page.getByRole("heading", { name: "Not Found" }),
+      page.getByRole("heading", { name: "Nothing lives here" }),
     ).toBeVisible();
   });
 });

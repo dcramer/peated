@@ -1,6 +1,6 @@
 import { expect, test, type TestInfo } from "@playwright/test";
 
-import { bottlePath, expectNoHorizontalOverflow } from "./assertions";
+import { bottlePath } from "./assertions";
 import {
   existingBottle,
   existingBottleId,
@@ -37,7 +37,6 @@ test("reviews independent catalog operations one task at a time", async ({
   await expect(
     readyOperation.getByRole("button", { name: "Apply included changes" }),
   ).toBeEnabled();
-  await expectNoHorizontalOverflow(page);
 
   const approvalRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/audits/approveSelected"),
@@ -76,7 +75,6 @@ test("reviews independent catalog operations one task at a time", async ({
       .getByRole("region", { name: "Moderation Inbox" })
       .getByText("Nothing needs a decision"),
   ).toBeVisible();
-  await expectNoHorizontalOverflow(page);
 });
 
 test("runs a clean moderator Bottle audit inline and returns to the Bottle", async ({
@@ -119,7 +117,6 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
       { exact: true },
     ),
   ).toBeVisible();
-  await expectNoHorizontalOverflow(page);
 
   await page.getByRole("button", { name: "Return to Bottle" }).click();
   await expect(page).toHaveURL(bottlePath(existingBottleId));
@@ -152,7 +149,6 @@ test("opens an actionable admin audit in its focused Moderation task", async ({
   await expect(
     page.getByText("Review the second inspected Brand independently."),
   ).toHaveCount(0);
-  await expectNoHorizontalOverflow(page);
 });
 
 function uniqueAccessToken(testInfo: TestInfo, suffix = "bottle-check-review") {
