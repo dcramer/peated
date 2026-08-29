@@ -23,11 +23,13 @@ const SETUP_FIELD_LABELS = {
 };
 
 function setupFieldLabel(field: string) {
-  if (field.includes(".name")) return "Item name";
-  if (field.includes(".score")) return "Score";
+  const pageField = field.startsWith("rules.")
+    ? field.slice("rules.".length)
+    : field;
   return (
-    Object.entries(SETUP_FIELD_LABELS).find(([key]) => key === field)?.[1] ??
-    "Page details"
+    Object.entries(SETUP_FIELD_LABELS).find(
+      ([key]) => pageField === key || pageField.startsWith(`${key}.`),
+    )?.[1] ?? "Page details"
   );
 }
 
