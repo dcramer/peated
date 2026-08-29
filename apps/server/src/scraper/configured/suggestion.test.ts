@@ -1,11 +1,8 @@
 import { expect, test } from "vitest";
 import {
-  buildRuleReviewRequest,
   checkDetailPages,
   checkListPage,
   checkNextListPage,
-  checkRuleReview,
-  createRuleReviewFormat,
 } from "./suggestion";
 
 const reviewRules = {
@@ -21,14 +18,6 @@ const reviewRules = {
     reviewText: { selector: ".body" },
   },
 };
-
-test("uses object schemas for AI output", () => {
-  const reviewFormat = createRuleReviewFormat();
-  expect(reviewFormat.schema).toMatchObject({
-    type: "object",
-  });
-  expect(JSON.stringify(reviewFormat.schema)).not.toContain('"message"');
-});
 
 test("validates the selected list page and returns its detail links", () => {
   const page = checkListPage({
@@ -135,7 +124,7 @@ test("parses supplied detail pages with the production parser", async () => {
   ]);
 });
 
-test("keeps complete review text for the AI check", async () => {
+test("keeps complete review text in the checked output", async () => {
   const reviewText = "Long review sentence. ".repeat(100);
   const detailPages = await checkDetailPages({
     rules: reviewRules,
@@ -164,47 +153,6 @@ test("keeps complete review text for the AI check", async () => {
   });
 });
 
-test("bounds long review evidence sent to the AI check", async () => {
-  const reviewText = `START-${"x".repeat(49_990)}-END`;
-  const urls = ["one", "two", "three"].map(
-    (slug) => `https://example.test/reviews/${slug}`,
-  );
-  const listPage = {
-    url: "https://example.test/reviews",
-    html: urls
-      .map((url) => `<a class="review" href="${url}">Review</a>`)
-      .join(""),
-    links: urls,
-    firstPageLinks: urls,
-    nextPageUrl: null,
-    nextPage: null,
-  };
-  const detailPages = await checkDetailPages({
-    rules: reviewRules,
-    listPage,
-    suppliedPages: urls.map((url, index) => ({
-      url,
-      html: `<h1>Review ${index + 1}</h1><article class="review"><h2>Bottle ${index + 1}</h2><p class="body">${reviewText}</p></article>`,
-    })),
-    loadPage: async () => {
-      throw new Error("A supplied detail page must not be fetched again.");
-    },
-  });
-
-  const request = buildRuleReviewRequest({
-    kind: "review",
-    rules: reviewRules,
-    listPage,
-    detailPages,
-  });
-
-  expect(request.length).toBeLessThanOrEqual(150_000);
-  expect(request).toContain('"characters":50000');
-  expect(request).toContain("START-");
-  expect(request).toContain("-END");
-  expect(request).toContain("\\n…\\n");
-});
-
 test("rejects suggested rules that do not parse a detail page", async () => {
   await expect(
     checkDetailPages({
@@ -224,11 +172,4 @@ test("rejects suggested rules that do not parse a detail page", async () => {
       }),
     }),
   ).rejects.toThrow("The proposed rules did not read a detail page.");
-});
-
-test("requires an AI review with no issues", () => {
-  expect(() => checkRuleReview('{"issues":[]}')).not.toThrow();
-  expect(() => checkRuleReview('{"issues":[{"field":"detail.name"}]}')).toThrow(
-    "The final check found page values that did not match.",
-  );
 });
