@@ -187,6 +187,6 @@ test("rejects suggested rules that do not parse a detail page", async () => {
 test("requires an AI review with no issues", () => {
   expect(() => checkRuleReview('{"issues":[]}')).not.toThrow();
   expect(() => checkRuleReview('{"issues":[{"field":"detail.name"}]}')).toThrow(
-    "AI review found incorrect parsed fields.",
+    "The final check found page values that did not match.",
   );
 });

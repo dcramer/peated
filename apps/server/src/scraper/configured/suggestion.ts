@@ -119,7 +119,7 @@ export function checkRuleReview(outputText: string) {
   }
   if (review.issues.length > 0) {
     throw new ScrapeSourceSetupError(
-      "AI review found incorrect parsed fields.",
+      "The final check found page values that did not match.",
       review.issues.map(({ field }) => ({
         field,
         message: "The parsed value did not match the supplied page.",
@@ -537,6 +537,7 @@ export async function suggestScrapeSourceRevision(input: {
             }
             span.setAttributes({
               "scraper.setup.check.status": "rejected",
+              "scraper.setup.failure.summary": error.summary,
               "scraper.setup.issue.fields": error.issues
                 .slice(0, 10)
                 .map(({ field }) => field),
