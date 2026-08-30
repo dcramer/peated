@@ -42,4 +42,28 @@ describe("GET /entities", () => {
       expect.arrayContaining([brand.id, bottler.id]),
     );
   });
+
+  test("filters Entities across kinds by current owner", async ({
+    fixtures,
+  }) => {
+    const owner = await fixtures.Entity({ kind: "company" });
+    const brand = await fixtures.Entity({
+      name: "A Owned Brand",
+      kind: "brand",
+      ownerId: owner.id,
+    });
+    const distillery = await fixtures.Entity({
+      name: "B Owned Distillery",
+      kind: "distillery",
+      ownerId: owner.id,
+    });
+    await fixtures.Entity({ name: "Unowned Bottler", kind: "bottler" });
+
+    const { results } = await routerClient.entities.list({
+      owner: owner.id,
+      sort: "name",
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([brand.id, distillery.id]);
+  });
 });
