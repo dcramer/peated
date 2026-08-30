@@ -1,8 +1,17 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { ExternalReview, PagingRel } from "@peated/server/types";
+import * as stylex from "@stylexjs/stylex";
 
+import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { AdminTextLink } from "./adminContent.stylex";
 import { AdminTable } from "./adminTable.stylex";
+
+const publishedDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
+  year: "numeric",
+});
 
 export default function ExternalReviewTable({
   externalReviewList,
@@ -29,18 +38,30 @@ export function ExternalReviewRows({
         {
           name: "review",
           value: (review) => (
-            <span>
-              <AdminTextLink href={review.url}>{review.name}</AdminTextLink>
-              {review.bottle ? (
-                <>
-                  {" · "}
+            <span {...stylex.props(styles.review)}>
+              <span>
+                <AdminTextLink href={review.url}>{review.name}</AdminTextLink>
+              </span>
+              <span {...stylex.props(styles.metadata)}>
+                {review.bottle ? (
                   <AdminTextLink href={`/bottles/${review.bottle.id}`}>
                     {formatBottleDisplayName(review.bottle)}
                   </AdminTextLink>
-                </>
-              ) : (
-                " · No bottle"
-              )}
+                ) : (
+                  "No bottle"
+                )}
+                {" · "}
+                {review.article.publishedAt ? (
+                  <time dateTime={review.article.publishedAt}>
+                    Published{" "}
+                    {publishedDateFormatter.format(
+                      new Date(review.article.publishedAt),
+                    )}
+                  </time>
+                ) : (
+                  "Publish date unknown"
+                )}
+              </span>
             </span>
           ),
         },
@@ -55,3 +76,17 @@ export function ExternalReviewRows({
     />
   );
 }
+
+const styles = stylex.create({
+  review: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x1,
+  },
+  metadata: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+  },
+});

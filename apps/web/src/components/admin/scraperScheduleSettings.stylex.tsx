@@ -8,10 +8,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDuration } from "../../lib/format";
 import { getFormErrorMessage } from "../../lib/formHelpers";
 import { useORPC } from "../../lib/orpc/context";
-import { space } from "../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../styles/tokens.stylex";
 import TimeSince from "../timeSince";
 import { AdminButton } from "./adminButton.stylex";
-import { AdminSection } from "./adminContent.stylex";
 import {
   AdminFormError,
   AdminFormGrid,
@@ -19,6 +18,7 @@ import {
   AdminTextField,
 } from "./adminForm.stylex";
 import { AdminDefinitionList as DefinitionList } from "./adminUtility.stylex";
+import ScraperSetting from "./scraperSetting.stylex";
 
 type Site = Outputs["externalSites"]["healthDetails"];
 export type ScheduleChoice = "manual" | "daily" | "weekly" | "custom";
@@ -98,7 +98,7 @@ export default function ScraperScheduleSettings({ site }: { site: Site }) {
   }
 
   return (
-    <AdminSection
+    <ScraperSetting
       title="Schedule"
       description="Choose when this scraper runs. You can still run it manually."
       action={
@@ -117,72 +117,69 @@ export default function ScraperScheduleSettings({ site }: { site: Site }) {
         </AdminButton>
       }
     >
-      <div {...stylex.props(styles.stack)}>
-        {error ? <AdminFormError values={[error]} /> : null}
-        <DefinitionList>
-          <DefinitionList.Term>Current</DefinitionList.Term>
-          <DefinitionList.Details>
-            {site.runEvery === null
-              ? "Manual"
-              : `Every ${formatDuration(site.runEvery * 60_000)}`}
-          </DefinitionList.Details>
-          <DefinitionList.Term>Next run</DefinitionList.Term>
-          <DefinitionList.Details>
-            {site.nextRunAt ? (
-              <TimeSince date={site.nextRunAt} />
-            ) : site.runEvery === null ? (
-              "Not scheduled"
-            ) : (
-              "Due now"
-            )}
-          </DefinitionList.Details>
-        </DefinitionList>
-        <AdminFormGrid>
-          <AdminSelectField
-            label="Run schedule"
-            name="schedule"
-            value={choice}
-            onChange={(event) =>
-              setChoice(parseScheduleChoice(event.target.value))
-            }
-            options={[
-              { label: "Manual only", value: "manual" },
-              { label: "Every day", value: "daily" },
-              { label: "Every week", value: "weekly" },
-              { label: "Custom", value: "custom" },
-            ]}
+      {error ? <AdminFormError values={[error]} /> : null}
+      <DefinitionList>
+        <DefinitionList.Term>Current</DefinitionList.Term>
+        <DefinitionList.Details>
+          {site.runEvery === null
+            ? "Manual"
+            : `Every ${formatDuration(site.runEvery * 60_000)}`}
+        </DefinitionList.Details>
+        <DefinitionList.Term>Next run</DefinitionList.Term>
+        <DefinitionList.Details>
+          {site.nextRunAt ? (
+            <TimeSince date={site.nextRunAt} />
+          ) : site.runEvery === null ? (
+            "Not scheduled"
+          ) : (
+            "Due now"
+          )}
+        </DefinitionList.Details>
+      </DefinitionList>
+      <AdminFormGrid>
+        <AdminSelectField
+          label="Run schedule"
+          name="schedule"
+          value={choice}
+          onChange={(event) =>
+            setChoice(parseScheduleChoice(event.target.value))
+          }
+          options={[
+            { label: "Manual only", value: "manual" },
+            { label: "Every day", value: "daily" },
+            { label: "Every week", value: "weekly" },
+            { label: "Custom", value: "custom" },
+          ]}
+          required
+        />
+        {choice === "custom" ? (
+          <AdminTextField
+            label="Run every"
+            name="customMinutes"
+            type="number"
+            min={1}
+            step={1}
+            value={customMinutes}
+            suffixLabel="minutes"
+            onChange={(event) => setCustomMinutes(event.target.value)}
             required
           />
-          {choice === "custom" ? (
-            <AdminTextField
-              label="Run every"
-              name="customMinutes"
-              type="number"
-              min={1}
-              step={1}
-              value={customMinutes}
-              suffixLabel="minutes"
-              onChange={(event) => setCustomMinutes(event.target.value)}
-              required
-            />
-          ) : null}
-        </AdminFormGrid>
-        {automaticUnavailable ? (
-          <p {...stylex.props(styles.help)}>
-            Set up this scraper before you schedule automatic runs.
-          </p>
         ) : null}
-      </div>
-    </AdminSection>
+      </AdminFormGrid>
+      {automaticUnavailable ? (
+        <p {...stylex.props(styles.help)}>
+          Set up this scraper before you schedule automatic runs.
+        </p>
+      ) : null}
+    </ScraperSetting>
   );
 }
 
 const styles = stylex.create({
-  stack: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x4,
+  help: {
+    margin: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
   },
-  help: { margin: 0 },
 });
