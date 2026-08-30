@@ -122,12 +122,20 @@ async function runAdapter(
   return { checkpoints, observations, request };
 }
 
-test("continues four archive pages per run and refreshes the current page", async () => {
-  const first = await runAdapter(null);
+test("starts old saved progress again and checks four older pages", async () => {
+  const first = await runAdapter(
+    WhiskyNotesCursorSchema.parse({
+      page: 99,
+      processedArticleUrls: [],
+      currentArticleUrls: [],
+      historyComplete: true,
+    }),
+  );
 
   expect(first.observations).toHaveLength(8);
   expect(first.request).toHaveBeenCalledTimes(12);
   expect(first.checkpoints.at(-1)).toEqual({
+    checksReviewDates: true,
     page: 5,
     processedArticleUrls: [],
     currentArticleUrls: [
@@ -153,6 +161,7 @@ test("continues four archive pages per run and refreshes the current page", asyn
 
 test("resumes within a history page without requesting stored articles", async () => {
   const cursor = WhiskyNotesCursorSchema.parse({
+    checksReviewDates: true,
     page: 3,
     processedArticleUrls: [
       "https://www.whiskynotes.be/2026/world/single-review-3/",
@@ -185,6 +194,7 @@ test("resumes within a history page without requesting stored articles", async (
 
 test("ingests a new current review while history points to an older page", async () => {
   const cursor = WhiskyNotesCursorSchema.parse({
+    checksReviewDates: true,
     page: 5,
     processedArticleUrls: [],
     currentArticleUrls: [
@@ -207,6 +217,7 @@ test("ingests a new current review while history points to an older page", async
 
 test("stops history at the archive end but keeps checking current reviews", async () => {
   const cursor = WhiskyNotesCursorSchema.parse({
+    checksReviewDates: true,
     page: 3,
     processedArticleUrls: [],
     currentArticleUrls: [
@@ -239,6 +250,7 @@ test("accepts cursors stored by the bounded pilot adapter", () => {
       processedArticleUrls: ["https://www.whiskynotes.be/2026/world/example/"],
     }),
   ).toEqual({
+    checksReviewDates: false,
     page: 5,
     processedArticleUrls: ["https://www.whiskynotes.be/2026/world/example/"],
     currentArticleUrls: [],

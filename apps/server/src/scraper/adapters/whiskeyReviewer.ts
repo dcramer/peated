@@ -84,19 +84,27 @@ export function discoverWhiskeyReviewerArticles(data: string): URL[] {
   return [...articles.values()].slice(0, MAX_CURRENT_ARTICLES);
 }
 
-function publishedAt(url: URL): Date | null {
+function publishedAt(url: URL): Date {
   const pathMatch = ARTICLE_PATH.exec(url.pathname);
   const slug = url.pathname.split("/").at(-1) ?? "";
   const dateMatch = /(?<month>\d{2})(?<day>\d{2})(?<year>\d{2})$/u.exec(slug);
-  if (!pathMatch?.groups || !dateMatch?.groups) return null;
+  if (!pathMatch?.groups || !dateMatch?.groups) {
+    throw new Error("Whiskey Reviewer article date is missing.");
+  }
 
   const year = Number(pathMatch.groups.year);
   const pathMonth = Number(pathMatch.groups.month);
   const month = Number(dateMatch.groups.month);
   const shortYear = Number(dateMatch.groups.year);
-  if (year % 100 !== shortYear || pathMonth !== month) return null;
+  if (year % 100 !== shortYear || pathMonth !== month) {
+    throw new Error("Whiskey Reviewer article date conflicts with its URL.");
+  }
 
-  return parseDate(`${year}-${dateMatch.groups.month}-${dateMatch.groups.day}`);
+  const date = parseDate(
+    `${year}-${dateMatch.groups.month}-${dateMatch.groups.day}`,
+  );
+  if (!date) throw new Error("Whiskey Reviewer article date is invalid.");
+  return date;
 }
 
 function reviewGrade(value: string) {

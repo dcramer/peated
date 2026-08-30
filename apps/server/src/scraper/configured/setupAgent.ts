@@ -74,7 +74,7 @@ const SuggestedReviewRulesSchema = z
     detail: z
       .object({
         title: SuggestedValueSelectorSchema,
-        publishedAt: SuggestedValueSelectorSchema.nullable(),
+        publishedAt: SuggestedValueSelectorSchema,
         reviewItem: ScrapeSelectorSchema,
         name: SuggestedValueSelectorSchema,
         reviewerName: SuggestedValueSelectorSchema.nullable(),
@@ -162,6 +162,7 @@ const RULE_INSTRUCTIONS = [
   "<success_criteria>",
   "Identify the content and attributes that represent each output field.",
   "Selectors must match the same field across the supplied detail pages.",
+  "Review rules must read the publisher's publication date.",
   "Include an optional field when the supplied pages clearly and consistently provide it.",
   "Pagination must add new detail-page links when the website has a next page.",
   "</success_criteria>",
@@ -192,6 +193,7 @@ function toScrapeValueSelector(
 function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
   const detail: ReviewRules["detail"] = {
     title: toScrapeValueSelector(input.detail.title),
+    publishedAt: toScrapeValueSelector(input.detail.publishedAt),
     reviewItem: input.detail.reviewItem,
     name: toScrapeValueSelector(input.detail.name),
   };
@@ -201,9 +203,6 @@ function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
   };
   if (input.list.nextPage !== null) {
     list.nextPage = toScrapeValueSelector(input.list.nextPage);
-  }
-  if (input.detail.publishedAt !== null) {
-    detail.publishedAt = toScrapeValueSelector(input.detail.publishedAt);
   }
   if (input.detail.reviewerName !== null) {
     detail.reviewerName = toScrapeValueSelector(input.detail.reviewerName);

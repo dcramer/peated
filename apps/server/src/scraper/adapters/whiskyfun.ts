@@ -38,6 +38,8 @@ const WhiskyfunFeedArticleSchema = z
 export const WhiskyfunCursorSchema = currentReviewCursorSchema(
   MAX_FEED_ITEMS,
 ).extend({
+  // Old saved progress skipped some dates. Start from the oldest list once.
+  checksReviewDates: z.boolean().default(false),
   nextArchiveUrl: z.url().nullable().default(null),
   processedArchiveArticleUrls: z
     .array(z.url())
@@ -370,8 +372,9 @@ export const whiskyfunAdapter: ScraperAdapter<
   WhiskyfunCursor,
   WhiskyfunObservation
 > = async ({ cursor, session }) => {
+  const savedProgress = cursor?.checksReviewDates ? cursor : null;
   let nextCursor = WhiskyfunCursorSchema.parse(
-    cursor ?? { processedArticleUrls: [] },
+    savedProgress ?? { checksReviewDates: true, processedArticleUrls: [] },
   );
   const feedResponse = await session.request({
     target: TARGET,

@@ -35,7 +35,7 @@ function observation(canonicalUrl: string): ExternalReviewArticleIngestion {
       canonicalUrl,
       title: "Example review",
       issue: null,
-      publishedAt: null,
+      publishedAt: new Date("2026-08-20T00:00:00.000Z"),
       contentHash: "content-hash",
       externalReviews: [
         {

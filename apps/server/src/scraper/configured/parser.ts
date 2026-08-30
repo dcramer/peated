@@ -195,7 +195,12 @@ function parseReviewDetail(
     ? readValue($, rules.detail.publishedAt)
     : null;
   const publishedAt = parseDate(publishedAtText);
-  if (publishedAtText && !publishedAt) {
+  if (!publishedAtText) {
+    issues.push({
+      field: "detail.publishedAt",
+      message: "Required value was not found.",
+    });
+  } else if (!publishedAt) {
     issues.push({ field: "detail.publishedAt", message: "Date is not valid." });
   }
   const externalReviews: Array<{
@@ -277,7 +282,11 @@ function parseReviewDetail(
     },
   });
   if (!result.success) {
-    issues.push(...validationIssues(result.error, reviewField));
+    issues.push(
+      ...validationIssues(result.error, reviewField).filter(
+        ({ field }) => field !== "detail.publishedAt",
+      ),
+    );
     return { kind: "review", value: null, issues };
   }
   return {

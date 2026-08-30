@@ -5,6 +5,7 @@ import type { ScraperObservation, ScraperSession } from "../types";
 import {
   type WhiskyAdvocateCursor,
   type WhiskyAdvocateObservation,
+  parseIssueList,
   parseReviewPublishedAt,
   parseReviews,
   whiskyAdvocateAdapter,
@@ -26,13 +27,72 @@ test("accepts a cursor stored by the previous adapter", () => {
   });
 });
 
+test("starts old saved progress again and checks older issues later", async () => {
+  const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
+  const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
+  const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
+  const issueNames = parseIssueList(issueHtml);
+  const $ = cheerio(reviewHtml);
+  $("#directoryResults .postsItem").slice(1).remove();
+  const oneReviewHtml = $.html();
+
+  const run = async (cursor: WhiskyAdvocateCursor) => {
+    const checkpoint = vi.fn();
+    const request = vi.fn(async ({ url }: { url: URL }) => ({
+      url,
+      status: 200,
+      headers: {},
+      body:
+        url.pathname !== "/ratings-reviews"
+          ? articleHtml
+          : url.search.includes("custom_rating_issue")
+            ? oneReviewHtml
+            : issueHtml,
+    }));
+    await whiskyAdvocateAdapter({
+      cursor,
+      session: {
+        request,
+        emit: vi.fn(),
+        checkpoint,
+        remainingRequests: () => 30,
+      },
+    });
+    return { checkpoint, request };
+  };
+
+  const oldRun = await run({ processedIssues: [issueNames[0]!] });
+  expect(
+    oldRun.request.mock.calls[1]?.[0].url.searchParams.get(
+      "custom_rating_issue[0]",
+    ),
+  ).toBe(issueNames[0]);
+
+  const nextRun = await run({
+    checksReviewDates: true,
+    completedIssues: [issueNames[0]!],
+    issue: null,
+    completedReviewUrls: [],
+  });
+  expect(
+    nextRun.request.mock.calls[1]?.[0].url.searchParams.get(
+      "custom_rating_issue[0]",
+    ),
+  ).toBe(issueNames[1]);
+  expect(nextRun.checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({ completedIssues: issueNames.slice(0, 2) }),
+  );
+});
+
 test("parses the publisher date template", async () => {
   const html = await loadFixture("whiskyadvocate", "review-page.html");
 
   expect(parseReviewPublishedAt(html)).toEqual(
     new Date("2023-12-19T00:00:00.000Z"),
   );
-  expect(parseReviewPublishedAt("<html></html>")).toBeNull();
+  expect(() => parseReviewPublishedAt("<html></html>")).toThrow(
+    "Whisky Advocate review date is missing.",
+  );
   expect(() =>
     parseReviewPublishedAt('<script>"datePublished": "not-a-date"</script>'),
   ).toThrow("Whisky Advocate review date is invalid.");
@@ -110,54 +170,84 @@ test("fetches dates for the latest issue and checkpoints each review", async () 
       },
     },
   });
-  expect(checkpoint).toHaveBeenCalledTimes(166);
+  expect(checkpoint).toHaveBeenCalledTimes(167);
   expect(checkpoint).toHaveBeenLastCalledWith({
-    issue: "Winter 2023",
-    processedReviewUrls: observations.map(({ sourceKey }) => sourceKey),
+    checksReviewDates: true,
+    completedIssues: ["Winter 2023"],
+    issue: null,
+    completedReviewUrls: [],
   });
 });
 
-test("resumes the same issue after the last stored review", async () => {
+test("rechecks old saved reviews and resumes reviews checked for dates", async () => {
+  const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
   const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
   const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
+  const $ = cheerio(reviewHtml);
+  $("#directoryResults .postsItem").slice(2).remove();
+  const twoReviewHtml = $.html();
   const externalReviews = parseReviews(
-    reviewHtml,
+    twoReviewHtml,
     "https://whiskyadvocate.com/ratings-reviews",
   );
-  const processedReviewUrls = externalReviews
-    .slice(0, -1)
-    .map((review) => review.url);
-  const emit = vi.fn();
-  const checkpoint = vi.fn();
-  const request = vi.fn(async ({ url }: { url: URL }) => ({
-    url,
-    status: 200,
-    headers: {},
-    body: url.pathname === "/ratings-reviews" ? reviewHtml : articleHtml,
-  }));
-  const session: ScraperSession<
-    WhiskyAdvocateCursor,
-    WhiskyAdvocateObservation
-  > = {
-    request,
-    emit,
-    checkpoint,
-    remainingRequests: () => 20,
+  const firstReviewUrl = externalReviews[0]!.url;
+
+  const run = async (cursor: WhiskyAdvocateCursor) => {
+    const emit = vi.fn();
+    const checkpoint = vi.fn();
+    const request = vi.fn(async ({ url }: { url: URL }) => ({
+      url,
+      status: 200,
+      headers: {},
+      body:
+        url.pathname !== "/ratings-reviews"
+          ? articleHtml
+          : url.search.includes("custom_rating_issue")
+            ? twoReviewHtml
+            : issueHtml,
+    }));
+    const session: ScraperSession<
+      WhiskyAdvocateCursor,
+      WhiskyAdvocateObservation
+    > = {
+      request,
+      emit,
+      checkpoint,
+      remainingRequests: () => 20,
+    };
+    await whiskyAdvocateAdapter({ cursor, session });
+    return { checkpoint, emit, request };
   };
 
-  await whiskyAdvocateAdapter({
-    cursor: { issue: "Winter 2023", processedReviewUrls },
-    session,
+  const oldRun = await run({
+    issue: "Winter 2023",
+    processedReviewUrls: [firstReviewUrl],
   });
+  expect(oldRun.request).toHaveBeenCalledTimes(4);
+  expect(oldRun.emit).toHaveBeenCalledTimes(2);
 
-  expect(request).toHaveBeenCalledTimes(2);
-  expect(emit).toHaveBeenCalledOnce();
-  expect(emit).toHaveBeenCalledWith(
+  const datedRun = await run({
+    checksReviewDates: true,
+    completedIssues: [],
+    issue: "Winter 2023",
+    completedReviewUrls: [firstReviewUrl],
+  });
+  expect(datedRun.request).toHaveBeenCalledTimes(3);
+  expect(datedRun.emit).toHaveBeenCalledOnce();
+  expect(datedRun.emit).toHaveBeenCalledWith(
     expect.objectContaining({ sourceKey: externalReviews.at(-1)?.url }),
   );
-  expect(checkpoint).toHaveBeenCalledWith({
+  expect(datedRun.checkpoint).toHaveBeenCalledWith({
+    checksReviewDates: true,
+    completedIssues: [],
     issue: "Winter 2023",
-    processedReviewUrls: externalReviews.map((review) => review.url),
+    completedReviewUrls: externalReviews.map((review) => review.url),
+  });
+  expect(datedRun.checkpoint).toHaveBeenLastCalledWith({
+    checksReviewDates: true,
+    completedIssues: ["Winter 2023"],
+    issue: null,
+    completedReviewUrls: [],
   });
 });
 

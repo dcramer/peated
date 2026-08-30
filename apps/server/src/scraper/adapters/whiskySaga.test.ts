@@ -19,8 +19,12 @@ const OLDER_HISTORY_URL =
   "https://www.whiskysaga.com/blog?offset=1772902711929&category=Scotland";
 const COMPLETED_HISTORY: Pick<
   WhiskySagaCursor,
-  "nextHistoryUrl" | "processedHistoryArticleUrls" | "historyComplete"
+  | "checksReviewDates"
+  | "nextHistoryUrl"
+  | "processedHistoryArticleUrls"
+  | "historyComplete"
 > = {
+  checksReviewDates: true,
   nextHistoryUrl: null,
   processedHistoryArticleUrls: [],
   historyComplete: true,
@@ -76,6 +80,7 @@ test("accepts the current-only cursor and adds history defaults", () => {
   expect(
     WhiskySagaCursorSchema.parse({ processedArticleUrls: [FIRST_URL] }),
   ).toEqual({
+    checksReviewDates: false,
     processedArticleUrls: [FIRST_URL],
     nextHistoryUrl: null,
     processedHistoryArticleUrls: [],
@@ -183,7 +188,7 @@ test("resumes without requesting a completed current article", async () => {
   });
 });
 
-test("imports one older Scotland page and advances the history cursor", async () => {
+test("starts old saved progress again and checks one older page", async () => {
   const article = await loadFixture("whiskysaga", "review.html");
   const emit = vi.fn();
   const checkpoint = vi.fn();
@@ -205,7 +210,15 @@ test("imports one older Scotland page and advances the history cursor", async ()
     remainingRequests: () => 22,
   };
 
-  await whiskySagaAdapter({ cursor: null, session });
+  await whiskySagaAdapter({
+    cursor: WhiskySagaCursorSchema.parse({
+      processedArticleUrls: [],
+      nextHistoryUrl: null,
+      processedHistoryArticleUrls: [],
+      historyComplete: true,
+    }),
+    session,
+  });
 
   expect(request.mock.calls.map(([input]) => input.url.href)).toEqual([
     "https://www.whiskysaga.com/blog/category/Scotland",
@@ -216,6 +229,7 @@ test("imports one older Scotland page and advances the history cursor", async ()
     expect.objectContaining({ sourceKey: FIRST_URL, itemCount: 1 }),
   );
   expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
+    checksReviewDates: true,
     processedArticleUrls: [],
     nextHistoryUrl: OLDER_HISTORY_URL,
     processedHistoryArticleUrls: [],
@@ -243,6 +257,7 @@ test("resumes within an older page and records the history end", async () => {
 
   await whiskySagaAdapter({
     cursor: {
+      checksReviewDates: true,
       processedArticleUrls: [],
       nextHistoryUrl: HISTORY_URL,
       processedHistoryArticleUrls: [FIRST_URL],
@@ -256,6 +271,7 @@ test("resumes within an older page and records the history end", async () => {
     HISTORY_URL,
   ]);
   expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
+    checksReviewDates: true,
     processedArticleUrls: [],
     nextHistoryUrl: null,
     processedHistoryArticleUrls: [],
