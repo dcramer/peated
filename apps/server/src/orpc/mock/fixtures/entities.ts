@@ -22,6 +22,7 @@ export const mockEntity = {
   location: [-6.126, 55.635],
   totalTastings: 1200,
   totalBottles: 84,
+  isFollowing: false,
   createdAt: timestamp,
   updatedAt: timestamp,
 } satisfies Entity;
@@ -255,6 +256,19 @@ export const mockEntities: Entity[] = [
     totalBottles: 188,
   },
 ];
+
+const followedEntityIds = new Set([9201, 9207, 9208]);
+
+export function isMockEntityFollowing(entityId: number) {
+  return followedEntityIds.has(entityId);
+}
+
+export function mockEntityFor(signedIn: boolean, entity: Entity): Entity {
+  return {
+    ...entity,
+    isFollowing: signedIn && isMockEntityFollowing(entity.id),
+  };
+}
 
 export const mockMacallanEntity = mockEntities[1]!;
 export const mockSpringbankEntity = mockEntities[2]!;

@@ -23,6 +23,7 @@ const brand = {
   location: null,
   totalTastings: 0,
   totalBottles: 1,
+  isFollowing: false,
   createdAt: timestamp,
   updatedAt: timestamp,
 } satisfies Entity;

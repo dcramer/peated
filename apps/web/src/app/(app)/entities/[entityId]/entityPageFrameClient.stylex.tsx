@@ -1,9 +1,9 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 import {
   AppLink,
@@ -17,6 +17,7 @@ import {
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import Markdown from "@peated/web/components/markdown";
 import useAuth from "@peated/web/hooks/useAuth";
+import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -40,16 +41,7 @@ import {
 
 function EntityFollowAction({ entity }: { entity: Entity }) {
   const { user } = useAuth();
-  const orpc = useORPC();
-  const queryClient = useQueryClient();
-  const { flash } = useFlashMessages();
-  const [followingOverride, setFollowingOverride] = useState<boolean | null>(
-    null,
-  );
-  const followMutation = useMutation(orpc.entities.follow.mutationOptions());
-  const unfollowMutation = useMutation(
-    orpc.entities.unfollow.mutationOptions(),
-  );
+  const followControls = useEntityFollowing();
 
   if (!user) {
     return (
@@ -64,8 +56,8 @@ function EntityFollowAction({ entity }: { entity: Entity }) {
     );
   }
 
-  const isFollowing = followingOverride ?? entity.isFollowing;
-  const pending = followMutation.isPending || unfollowMutation.isPending;
+  const isFollowing = followControls.isFollowing(entity);
+  const pending = followControls.pendingId === entity.id;
 
   return (
     <Button
@@ -75,28 +67,7 @@ function EntityFollowAction({ entity }: { entity: Entity }) {
       aria-pressed={isFollowing}
       loading={pending}
       loadingLabel={isFollowing ? "Unfollowing…" : "Following…"}
-      onClick={async () => {
-        try {
-          if (isFollowing) {
-            await unfollowMutation.mutateAsync({ entity: entity.id });
-          } else {
-            await followMutation.mutateAsync({ entity: entity.id });
-          }
-          setFollowingOverride(!isFollowing);
-          await queryClient.invalidateQueries({
-            queryKey: orpc.entities.details.key({
-              input: { entity: entity.id },
-            }),
-          });
-        } catch (error) {
-          flash(
-            error instanceof Error
-              ? error.message
-              : "We couldn't update this follow. Try again.",
-            "error",
-          );
-        }
-      }}
+      onClick={() => followControls.toggle(entity)}
       size="md"
       variant="accent"
     >

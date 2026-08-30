@@ -6,6 +6,6 @@ export default mockOS.bottlers.list.handler(
     if (input.filter === "following" && !context.user) {
       throw errors.UNAUTHORIZED();
     }
-    return listEntityKind("bottler", input);
+    return listEntityKind("bottler", input, Boolean(context.user));
   },
 );

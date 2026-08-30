@@ -109,8 +109,8 @@ function getApiScopes(scope: SearchScope, signedIn: boolean) {
 function getSearchingText(scope: SearchScope, signedIn: boolean) {
   if (scope === "all") {
     return signedIn
-      ? "Searching bottles, entities, and members…"
-      : "Searching bottles and entities…";
+      ? "Searching bottles, distillers, brands, bottlers, and members…"
+      : "Searching bottles, distillers, brands, and bottlers…";
   }
   const label = searchScopes.find((option) => option.value === scope)?.label;
   return label ? `Searching ${label.toLocaleLowerCase()}…` : "Searching…";
@@ -158,6 +158,7 @@ function entityItem(entity: EntitySearchResult) {
   return {
     href: getEntityUrl(entity),
     id: `entity-${entity.id}`,
+    isFollowing: entity.isFollowing,
     metadata: entity.region?.name,
     title: entity.name,
     visual: {

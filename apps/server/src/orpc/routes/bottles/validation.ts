@@ -57,6 +57,7 @@ async function getEntityById(entityId: number, entityDb: AnyDatabase) {
     location: entity.location,
     totalTastings: entity.totalTastings,
     totalBottles: entity.totalBottles,
+    isFollowing: false,
     createdAt: entity.createdAt.toISOString(),
     updatedAt: entity.updatedAt.toISOString(),
   });
@@ -106,6 +107,7 @@ async function getEntity(
     location: existingEntity.location,
     totalTastings: existingEntity.totalTastings,
     totalBottles: existingEntity.totalBottles,
+    isFollowing: false,
     createdAt: existingEntity.createdAt.toISOString(),
     updatedAt: existingEntity.updatedAt.toISOString(),
   });

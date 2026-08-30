@@ -6,6 +6,6 @@ export default mockOS.companies.list.handler(
     if (input.filter === "following" && !context.user) {
       throw errors.UNAUTHORIZED();
     }
-    return listEntityKind("company", input);
+    return listEntityKind("company", input, Boolean(context.user));
   },
 );

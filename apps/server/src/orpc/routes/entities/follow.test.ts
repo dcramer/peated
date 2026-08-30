@@ -27,6 +27,24 @@ describe("PUT /entities/:entity/follow", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found.]`);
   });
 
+  test("rejects an Entity kind that cannot be followed", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const company = await fixtures.Entity({ kind: "company" });
+
+    const err = await waitError(() =>
+      routerClient.entities.follow(
+        { entity: company.id },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: You can follow distillers, brands, and bottlers.]`,
+    );
+  });
+
   test("does not create duplicate follows", async ({ defaults, fixtures }) => {
     const entity = await fixtures.Entity();
 

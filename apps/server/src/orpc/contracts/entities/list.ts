@@ -1,6 +1,25 @@
 import { EntitySchema, listResponse } from "@peated/server/schemas";
+import { EntityKindEnum } from "@peated/server/schemas/common";
+import { z } from "zod";
 import { contract } from "../base";
 import { EntityKindListInputSchema } from "../entityKinds/list";
+
+export const EntityListInputSchema = EntityKindListInputSchema.unwrap()
+  .extend({
+    kinds: z
+      .array(EntityKindEnum)
+      .min(1)
+      .max(4)
+      .optional()
+      .describe("Only return Entities with one of these kinds"),
+  })
+  .default({
+    query: "",
+    filter: "all",
+    sort: "rank",
+    cursor: 1,
+    limit: 100,
+  });
 
 export default contract
   .route({
@@ -10,5 +29,5 @@ export default contract
     description: "Find Entities of any kind for selection fields",
     operationId: "listEntities",
   })
-  .input(EntityKindListInputSchema)
+  .input(EntityListInputSchema)
   .output(listResponse(EntitySchema));
