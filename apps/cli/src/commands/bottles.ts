@@ -7,8 +7,8 @@ import {
   bottleTombstones,
   entities,
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
 } from "@peated/server/db/schema";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
@@ -152,9 +152,9 @@ subcommand
           eq(externalReviewArticles.id, externalReviews.articleId),
         )
         .innerJoin(
-          externalReviewSourcePolicies,
+          externalReviewPublications,
           eq(
-            externalReviewSourcePolicies.externalSiteId,
+            externalReviewPublications.externalSiteId,
             externalReviewArticles.externalSiteId,
           ),
         )
