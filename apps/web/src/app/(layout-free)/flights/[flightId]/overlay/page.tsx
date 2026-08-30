@@ -1,9 +1,9 @@
 "use client";
 
-import { FlightOverlay } from "@peated/web/components/designSystem/product/flightOverlay.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
+import { FlightOverlay } from "./flightOverlay.stylex";
 
 export default function Page(props: { params: Promise<{ flightId: string }> }) {
   const { flightId } = use(props.params);

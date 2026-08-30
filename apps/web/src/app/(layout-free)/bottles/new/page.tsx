@@ -4,9 +4,9 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import BottleForm, {
   type BottleFormInitialData,
 } from "@peated/web/components/bottleForm";
-import { WorkflowLoading } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
-import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
+import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { parseCreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
+import { WorkflowLoading } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";

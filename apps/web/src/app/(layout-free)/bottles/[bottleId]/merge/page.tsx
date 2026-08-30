@@ -12,8 +12,8 @@ import {
   SelectedBottleSummary,
   type SearchPickerOption,
 } from "@peated/web/components/designSystem/components";
-import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
-import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
+import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";

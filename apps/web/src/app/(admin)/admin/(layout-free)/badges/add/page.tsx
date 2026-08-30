@@ -1,7 +1,7 @@
 "use client";
 
 import BadgeForm from "@peated/web/components/admin/badgeForm";
-import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
+import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";

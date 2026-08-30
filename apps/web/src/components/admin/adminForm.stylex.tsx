@@ -18,7 +18,7 @@ import {
   Textarea,
   TextInput,
 } from "../designSystem/components";
-import { WorkflowScreen } from "../designSystem/patterns/workflowScreen.stylex";
+import { WorkflowScreen } from "../workflowScreen.stylex";
 
 type FieldError = { message?: string } | undefined;
 

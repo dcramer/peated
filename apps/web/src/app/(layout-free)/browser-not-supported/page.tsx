@@ -1,3 +1,4 @@
+import { AuthenticationPage } from "@peated/web/components/auth/authenticationPage.stylex";
 import { ButtonLink } from "@peated/web/components/designSystem/components";
 import {
   AuthenticationActions,
@@ -8,7 +9,6 @@ import {
   AuthenticationLinks,
   AuthenticationPanel,
 } from "@peated/web/components/designSystem/patterns/authentication.stylex";
-import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   CapturedFailurePage,
   OfflinePage,
-} from "./designSystem/product/errorPages.stylex";
+} from "@peated/web/components/errors/errorPages.stylex";
 
 const MAX_STACK_FRAMES = 40;
 const MAX_STACK_LENGTH = 8_000;

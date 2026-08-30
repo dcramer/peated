@@ -11,7 +11,7 @@ export type BadgeImageProps = {
   size?: number;
 };
 
-export function PlaceholderBadgeImage({
+function PlaceholderBadgeImage({
   isMaxLevel = false,
   size = 64,
 }: {

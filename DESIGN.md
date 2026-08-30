@@ -450,12 +450,12 @@ The product route owns those behaviors. When browser hooks are required, keep a
 small `*Client` component beside the route. Do not put route-only code in the
 design-system folders.
 
-Migrate one complete route at a time. Review shared components in Storybook and
-review the route composition in the application. Move the page composition,
-live adapter, and application frame together so a product page never mixes new
-chrome with legacy content. Route groups can separate migrated and legacy
-layouts during the branch, but public URLs must stay stable. Remove temporary
-migration boundaries after the last route moves.
+Keep the visual system app-local while the web app is its only runtime consumer.
+`components/designSystem/components` owns reusable visual components, and
+`components/designSystem/patterns` owns reusable render-only compositions.
+Route-only behavior lives beside its route. Behavior shared by several routes
+lives in a narrowly named feature folder outside the design-system tree. Do not
+add a catch-all product, experience, or feature layer inside the visual system.
 
 Use one plain canvas treatment for spacing and width. Render each component directly instead of wrapping it in a decorative preview card. If a component needs a surface, radius, minimum height, or shadow, the component owns it. Keep a shared composite component in its owning component category. Do not use a separate pattern category for route-specific sections or page layouts; review those in the application. The Storybook theme toolbar changes the complete story canvas.
 

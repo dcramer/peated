@@ -1,4 +1,4 @@
-import { NotFoundPage } from "../components/designSystem/product/errorPages.stylex";
+import { NotFoundPage } from "@peated/web/components/errors/errorPages.stylex";
 import "../styles/error-document.css";
 
 export default function GlobalNotFound() {
