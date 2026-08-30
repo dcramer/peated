@@ -164,9 +164,9 @@ export function HomeRecentReviews({
 }) {
   return (
     <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading title="Newest critic reviews" />
+      <HomeModuleHeading title="From the critics" />
       <div {...stylex.props(styles.rows)}>
-        <ItemList ariaLabel="Newest critic reviews">
+        <ItemList ariaLabel="From the critics">
           {reviews.map((review) => (
             <ItemRow
               end={
@@ -480,10 +480,6 @@ export function HomeContributionPrompt({
 const styles = stylex.create({
   section: {
     minWidth: 0,
-    paddingTop: space.x6,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
   },
   heading: {
     display: "flex",

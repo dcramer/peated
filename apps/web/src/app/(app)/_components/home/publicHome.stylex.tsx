@@ -128,7 +128,7 @@ function LatestReleases() {
   ) {
     return (
       <HomeSectionLoading>
-        <LoadingList label="Loading latest releases" rows={4} />
+        <LoadingList label="Loading recent releases" rows={4} />
       </HomeSectionLoading>
     );
   }
@@ -136,13 +136,13 @@ function LatestReleases() {
   if (!releases) {
     return (
       <SectionError
-        heading="Latest releases are unavailable"
+        heading="Recent releases are unavailable"
         onRetry={() => {
           void globalReleases.refetch();
           if (user) void followedReleases.refetch();
         }}
       >
-        We couldn't load the latest releases. The rest of the database is still
+        We couldn't load the recent releases. The rest of the database is still
         available.
       </SectionError>
     );
@@ -171,7 +171,7 @@ function LatestReleases() {
       title={
         useFollowedReleases
           ? "New from distilleries you follow"
-          : "Latest releases"
+          : "Recent releases"
       }
     />
   ) : null;
