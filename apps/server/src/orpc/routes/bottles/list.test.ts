@@ -782,6 +782,35 @@ describe("GET /bottles", () => {
     expect(results[1].id).toBe(bottle1.id);
   });
 
+  test("requires a release year and orders year-only releases by creation time", async ({
+    fixtures,
+  }) => {
+    const earlierAddition = await fixtures.Bottle({
+      name: "Earlier Addition",
+      releaseYear: 2026,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    const laterAddition = await fixtures.Bottle({
+      name: "Later Addition",
+      releaseYear: 2026,
+      createdAt: new Date("2026-06-01T00:00:00.000Z"),
+    });
+    await fixtures.Bottle({
+      name: "Recently Added",
+      createdAt: new Date("2027-01-01T00:00:00.000Z"),
+    });
+
+    const { results, total } = await routerClient.bottles.list({
+      sort: "-release",
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([
+      laterAddition.id,
+      earlierAddition.id,
+    ]);
+    expect(total).toBe(2);
+  });
+
   test("requires authentication for followed entity releases", async () => {
     const err = await waitError(() =>
       routerClient.bottles.list({ filter: "following" }),
@@ -800,7 +829,7 @@ describe("GET /bottles", () => {
     expect(response.followedDistillerCount).toBe(0);
   });
 
-  test("lists recent releases from followed distillers", async ({
+  test("lists known releases from followed distillers", async ({
     defaults,
     fixtures,
   }) => {
@@ -836,7 +865,7 @@ describe("GET /bottles", () => {
       releaseYear: 2026,
       createdAt: new Date("2026-07-01T00:00:00.000Z"),
     });
-    const addedThisYear = await fixtures.Bottle({
+    await fixtures.Bottle({
       name: "Added This Year",
       distillerIds: [distiller.id],
       createdAt: new Date("2026-09-01T00:00:00.000Z"),
@@ -847,7 +876,7 @@ describe("GET /bottles", () => {
       releaseYear: 2025,
       createdAt: new Date("2026-08-15T00:00:00.000Z"),
     });
-    const addedLastYear = await fixtures.Bottle({
+    await fixtures.Bottle({
       name: "Added Last Year",
       distillerIds: [distiller.id],
       createdAt: new Date("2025-12-01T00:00:00.000Z"),
@@ -874,9 +903,7 @@ describe("GET /bottles", () => {
       exactLaterThisYear.id,
       exactEarlierThisYear.id,
       yearOnlyThisYear.id,
-      addedThisYear.id,
       knownLastYear.id,
-      addedLastYear.id,
     ]);
     expect(followedDistillerCount).toBe(1);
   });

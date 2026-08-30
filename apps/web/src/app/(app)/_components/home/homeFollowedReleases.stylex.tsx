@@ -24,7 +24,7 @@ function getBottleMetadata(bottle: Bottle) {
 
 export function HomeFollowedReleases() {
   const orpc = useORPC();
-  const releases = useQuery(memberHomeQueries.releases(orpc));
+  const releases = useQuery(memberHomeQueries.followedReleases(orpc));
 
   if (releases.isPending) {
     return (

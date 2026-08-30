@@ -53,7 +53,6 @@ export function ApplicationLayout({
   const { user } = useAuth();
   const [logoutPending, startLogout] = useTransition();
   const isHome = pathname === "/";
-  const isPublicHome = pathname === "/" && !user;
   const personalItems = user
     ? [
         {
@@ -114,10 +113,10 @@ export function ApplicationLayout({
           background={isHome ? "page" : "surface"}
           currentHref={pathname}
           databaseItems={databaseItems}
-          navigationPlacement={isPublicHome ? "inline" : "separate"}
+          navigationPlacement={isHome ? "inline" : "separate"}
           personalItems={personalItems}
           search={
-            pathname === "/search" || isPublicHome ? undefined : (
+            pathname === "/search" || isHome ? undefined : (
               <Search scopeValues={user ? undefined : ["all"]} />
             )
           }

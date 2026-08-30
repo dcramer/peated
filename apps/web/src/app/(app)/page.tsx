@@ -17,29 +17,9 @@ import { HomePageClient } from "./homePageClient";
 export default async function Page() {
   const session = await getSession();
   const queryClient = getQueryClient();
-
-  if (session.user) {
-    const { client } = await getServerClient();
-    const orpc = createTanstackQueryUtils(client);
-
-    await Promise.all([
-      queryClient.prefetchInfiniteQuery(
-        memberHomeQueries.activity(orpc, "friends"),
-      ),
-      queryClient.prefetchQuery(memberHomeQueries.criticReviews(orpc)),
-      queryClient.prefetchQuery(memberHomeQueries.releases(orpc)),
-      queryClient.prefetchQuery(memberHomeQueries.member(orpc)),
-      queryClient.prefetchQuery(memberHomeQueries.tastingStats(orpc)),
-    ]);
-
-    return (
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <HomePageClient />
-      </HydrationBoundary>
-    );
-  }
-
-  const { client } = await getAnonymousServerClient();
+  const { client } = session.user
+    ? await getServerClient()
+    : await getAnonymousServerClient();
   const orpc = createTanstackQueryUtils(client);
 
   await Promise.all([
@@ -52,7 +32,10 @@ export default async function Page() {
     queryClient.prefetchQuery(publicHomeQueries.countries(orpc)),
     queryClient.prefetchQuery(publicHomeQueries.distilleries(orpc)),
     queryClient.prefetchQuery(publicHomeQueries.recentBottles(orpc)),
-    queryClient.prefetchQuery(publicHomeQueries.highestRated(orpc)),
+    queryClient.prefetchQuery(publicHomeQueries.releases(orpc)),
+    ...(session.user
+      ? [queryClient.prefetchQuery(memberHomeQueries.followedReleases(orpc))]
+      : []),
   ]);
 
   return (
