@@ -127,7 +127,6 @@ function bottleItem(
   },
 ) {
   const metadata = [
-    bottle.brand.name,
     bottle.category ? formatCategoryName(bottle.category) : null,
     bottle.statedAge === null ? null : `${bottle.statedAge} years`,
     bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
@@ -146,7 +145,7 @@ function bottleItem(
         }
       : undefined,
     metadata: metadata.join(" · "),
-    title: formatBottleDisplayName(bottle, { includeBrand: false }),
+    title: formatBottleDisplayName(bottle),
     visual: {
       fallback: "B",
       imageUrl: bottle.imageUrl,
