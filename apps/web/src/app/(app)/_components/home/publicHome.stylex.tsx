@@ -170,11 +170,7 @@ function LatestReleases() {
           ? "/bottles?filter=following&sort=-release"
           : "/bottles?sort=-release"
       }
-      title={
-        useFollowedReleases
-          ? "New from distillers, brands, and bottlers you follow"
-          : "Recent releases"
-      }
+      title={useFollowedReleases ? "New for you" : "Recent releases"}
     />
   ) : null;
 }
