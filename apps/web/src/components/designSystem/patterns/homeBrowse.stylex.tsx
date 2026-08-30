@@ -426,33 +426,6 @@ export function HomeContributionPrompt({
   );
 }
 
-export type HomeQuestion = {
-  answer: ReactNode;
-  question: string;
-};
-
-export function HomeQuestions({
-  questions,
-}: {
-  questions: readonly HomeQuestion[];
-}) {
-  return (
-    <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading title="Common questions" />
-      <div {...stylex.props(styles.questionGrid)}>
-        {questions.map((question) => (
-          <article key={question.question} {...stylex.props(styles.question)}>
-            <h3 {...stylex.props(styles.questionTitle)}>{question.question}</h3>
-            <div {...stylex.props(styles.questionAnswer)}>
-              {question.answer}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 const styles = stylex.create({
   section: {
     minWidth: 0,
@@ -774,39 +747,5 @@ const styles = stylex.create({
     gap: "6px",
     marginTop: space.x3,
     flexWrap: "wrap",
-  },
-  questionGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "6px",
-    marginTop: "14px",
-    [COMPACT]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
-    },
-  },
-  question: {
-    paddingTop: "18px",
-    paddingRight: "20px",
-    paddingBottom: "18px",
-    paddingLeft: "20px",
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
-  },
-  questionTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
-  },
-  questionAnswer: {
-    marginTop: "6px",
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
-    textWrap: "pretty",
   },
 });
