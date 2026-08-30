@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
+import { ItemList, ItemListItem } from "./itemList.stylex";
 import { RowMenu } from "./rowMenu.stylex";
 import { TastingEntry } from "./tastingEntry.stylex";
 
@@ -49,20 +50,26 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <TastingEntry {...args} />
-      <TastingEntry
-        {...args}
-        comment="A classic benchmark. The smoke never crowds out the fruit."
-        context={undefined}
-        members={[
-          {
-            href: "/bottles/lagavulin-16",
-            metadata: "Islay · 16 years · 43% ABV",
-            name: "Lagavulin 16-year-old",
-            ratingBand: "outstanding",
-          },
-        ]}
-      />
+      <ItemList ariaLabel="Tasting entry examples">
+        <ItemListItem>
+          <TastingEntry {...args} />
+        </ItemListItem>
+        <ItemListItem>
+          <TastingEntry
+            {...args}
+            comment="A classic benchmark. The smoke never crowds out the fruit."
+            context={undefined}
+            members={[
+              {
+                href: "/bottles/lagavulin-16",
+                metadata: "Islay · 16 years · 43% ABV",
+                name: "Lagavulin 16-year-old",
+                ratingBand: "outstanding",
+              },
+            ]}
+          />
+        </ItemListItem>
+      </ItemList>
       <TastingEntry {...args} surface />
     </StoryStack>
   ),

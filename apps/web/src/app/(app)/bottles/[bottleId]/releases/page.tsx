@@ -2,6 +2,8 @@ import {
   BottleIdentityRow,
   CursorPager,
   EmptyState,
+  ItemList,
+  ItemListItem,
 } from "@peated/web/components/designSystem/components";
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
@@ -53,24 +55,25 @@ export default async function BottleReleasesPage(props: {
   return (
     <BottleSection count={bottleList.results.length} heading="Releases">
       {bottleList.results.length ? (
-        <div>
+        <ItemList ariaLabel="Bottle releases">
           {bottleList.results.map((bottle) => (
-            <BottleIdentityRow
-              brand={bottle.brand.name}
-              brandHref={`/entities/${bottle.brand.id}`}
-              end={
-                bottle.medianScore !== null && bottle.scoreCount >= 20
-                  ? `${bottle.medianScore} / 100`
-                  : undefined
-              }
-              href={`/bottles/${bottle.id}`}
-              imageUrl={bottle.imageUrl}
-              key={bottle.id}
-              metadata={getBottleMetadata(bottle).split(" · ")}
-              name={getBottleExpressionName(bottle)}
-            />
+            <ItemListItem key={bottle.id}>
+              <BottleIdentityRow
+                brand={bottle.brand.name}
+                brandHref={`/entities/${bottle.brand.id}`}
+                end={
+                  bottle.medianScore !== null && bottle.scoreCount >= 20
+                    ? `${bottle.medianScore} / 100`
+                    : undefined
+                }
+                href={`/bottles/${bottle.id}`}
+                imageUrl={bottle.imageUrl}
+                metadata={getBottleMetadata(bottle).split(" · ")}
+                name={getBottleExpressionName(bottle)}
+              />
+            </ItemListItem>
           ))}
-        </div>
+        </ItemList>
       ) : (
         <EmptyState heading="No releases found">
           This release family has no visible bottles.

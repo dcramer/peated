@@ -15,6 +15,8 @@ import {
   FacetGroup,
   FilterPanel,
   FilterQuery,
+  ItemList,
+  ItemListItem,
   ListToolbar,
   LoadingList,
   RatingMeasure,
@@ -89,9 +91,9 @@ export function BottleCatalogList({
         total={total}
       />
       {items.length ? (
-        <ul {...stylex.props(styles.list)}>
+        <ItemList ariaLabel="Bottle records" showTopDivider={false}>
           {items.map((item) => (
-            <li key={item.id} {...stylex.props(styles.listItem)}>
+            <ItemListItem key={item.id}>
               <BottleIdentityRow
                 brand={item.brand}
                 brandHref={item.brandHref}
@@ -104,9 +106,9 @@ export function BottleCatalogList({
                 name={item.name}
                 relatedReleases={item.relatedReleases}
               />
-            </li>
+            </ItemListItem>
           ))}
-        </ul>
+        </ItemList>
       ) : (
         <EmptyState
           action={
@@ -306,16 +308,6 @@ export function BottleCatalogLoading() {
 
 const styles = stylex.create({
   catalog: {
-    minWidth: 0,
-  },
-  list: {
-    display: "flex",
-    margin: 0,
-    padding: 0,
-    flexDirection: "column",
-    listStyle: "none",
-  },
-  listItem: {
     minWidth: 0,
   },
   measures: {

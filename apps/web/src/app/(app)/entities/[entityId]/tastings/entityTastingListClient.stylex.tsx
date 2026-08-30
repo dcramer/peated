@@ -9,6 +9,8 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
+  ItemList,
+  ItemListItem,
 } from "@peated/web/components/designSystem/components";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -43,11 +45,13 @@ export function EntityTastingListClient({
       {...stylex.props(styles.content)}
     >
       {tastingList.results.length ? (
-        <div {...stylex.props(styles.list)}>
+        <ItemList ariaLabel={`${entityName} tasting records`}>
           {tastingList.results.map((tasting) => (
-            <TastingRecordEntry key={tasting.id} tasting={tasting} />
+            <ItemListItem key={tasting.id}>
+              <TastingRecordEntry tasting={tasting} />
+            </ItemListItem>
           ))}
-        </div>
+        </ItemList>
       ) : (
         <EmptyState
           action={
@@ -86,10 +90,5 @@ const styles = stylex.create({
   content: {
     minWidth: 0,
     paddingTop: space.x6,
-  },
-  list: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
   },
 });

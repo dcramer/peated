@@ -8,6 +8,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import type { ItemListVariant } from "./itemList.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -63,6 +64,7 @@ export type BottleIdentityRowProps = {
     count: number;
     href: string;
   };
+  variant?: ItemListVariant;
 };
 
 function LibraryStatusMark() {
@@ -120,6 +122,7 @@ export function BottleIdentityRow({
   metadata = [],
   name,
   relatedReleases,
+  variant = "plain",
 }: BottleIdentityRowProps) {
   const Name = href ? "a" : "span";
   const Brand = brandHref ? "a" : "span";
@@ -128,8 +131,12 @@ export function BottleIdentityRow({
     <div
       {...stylex.props(
         styles.row,
+        variant === "surface" && styles.surfaceRow,
         Boolean(href) && linkedRowStyles.container,
-        Boolean(href) && linkedRowStyles.onGround,
+        Boolean(href) &&
+          (variant === "plain"
+            ? linkedRowStyles.onGround
+            : linkedRowStyles.onSurface),
       )}
     >
       <BottleVisual imageUrl={imageUrl} />
@@ -263,9 +270,13 @@ const styles = stylex.create({
     paddingRight: "12px",
     paddingBottom: space.x3,
     paddingLeft: "12px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
+  },
+  surfaceRow: {
+    width: "100%",
+    marginRight: 0,
+    marginLeft: 0,
+    paddingRight: "18px",
+    paddingLeft: "18px",
   },
   copy: {
     display: "flex",

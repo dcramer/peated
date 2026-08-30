@@ -2,6 +2,8 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
+  ItemList,
+  ItemListItem,
 } from "@peated/web/components/designSystem/components";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
@@ -32,11 +34,13 @@ export default async function BottleTastingsPage(props: {
   return (
     <BottleSection count={tastingList.results.length} heading="Tastings">
       {tastingList.results.length ? (
-        <div>
+        <ItemList ariaLabel="Bottle tasting records">
           {tastingList.results.map((tasting) => (
-            <TastingRecordEntry key={tasting.id} tasting={tasting} />
+            <ItemListItem key={tasting.id}>
+              <TastingRecordEntry tasting={tasting} />
+            </ItemListItem>
           ))}
-        </div>
+        </ItemList>
       ) : (
         <EmptyState
           action={

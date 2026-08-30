@@ -17,6 +17,8 @@ import {
   EmptyState,
   FacetGroup,
   FilterQuery,
+  ItemList,
+  ItemListItem,
   RowMenu,
   TastingEntry,
   type BottleIdentityRowProps,
@@ -66,9 +68,9 @@ export function MemberLibraryList({
         ) : null}
       </div>
       {items.length ? (
-        <ul {...stylex.props(styles.libraryList)}>
+        <ItemList ariaLabel="Library bottles" showTopDivider={false}>
           {items.map(({ actions, id, status, ...identity }) => (
-            <li key={id} {...stylex.props(styles.libraryRow)}>
+            <ItemListItem key={id}>
               <BottleIdentityRow
                 {...identity}
                 end={
@@ -82,9 +84,9 @@ export function MemberLibraryList({
                   ) : undefined
                 }
               />
-            </li>
+            </ItemListItem>
           ))}
-        </ul>
+        </ItemList>
       ) : (
         <EmptyState action={emptyAction} heading={emptyHeading}>
           {emptyDescription}
@@ -200,15 +202,19 @@ export function MemberActivityList({
   }
 
   return (
-    <div aria-label="Member activity" {...stylex.props(styles.activityList)}>
+    <ItemList ariaLabel="Member activity">
       {items.map((item) =>
         item.kind === "tasting" ? (
-          <TastingEntry key={item.id} {...item.tasting} />
+          <ItemListItem key={item.id}>
+            <TastingEntry {...item.tasting} />
+          </ItemListItem>
         ) : (
-          <CollectionActivity key={item.id} activity={item.activity} />
+          <ItemListItem key={item.id}>
+            <CollectionActivity activity={item.activity} />
+          </ItemListItem>
         ),
       )}
-    </div>
+    </ItemList>
   );
 }
 
@@ -235,18 +241,25 @@ function CollectionActivity({
         </div>
       </header>
       {activity.items.length ? (
-        <ul {...stylex.props(styles.collectionItems)}>
-          {activity.items.map(({ id, ...identity }) => (
-            <li key={id} {...stylex.props(styles.collectionItem)}>
-              <BottleIdentityRow {...identity} />
-            </li>
-          ))}
-          {hiddenCount ? (
-            <li {...stylex.props(styles.moreItems)}>
-              +{hiddenCount.toLocaleString("en-US")} more
-            </li>
-          ) : null}
-        </ul>
+        <div {...stylex.props(styles.collectionItems)}>
+          <ItemList
+            ariaLabel={`${activity.collectionName} additions`}
+            variant="surface"
+          >
+            {activity.items.map(({ id, ...identity }) => (
+              <ItemListItem key={id}>
+                <BottleIdentityRow {...identity} variant="surface" />
+              </ItemListItem>
+            ))}
+            {hiddenCount ? (
+              <ItemListItem>
+                <div {...stylex.props(styles.moreItems)}>
+                  +{hiddenCount.toLocaleString("en-US")} more
+                </div>
+              </ItemListItem>
+            ) : null}
+          </ItemList>
+        </div>
       ) : null}
     </article>
   );
@@ -272,14 +285,6 @@ const styles = stylex.create({
     letterSpacing: "-0.02em",
     lineHeight: 1.2,
   },
-  libraryList: { margin: 0, padding: 0, listStyle: "none" },
-  libraryRow: {
-    paddingTop: "14px",
-    paddingBottom: "14px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-  },
   libraryEnd: { display: "flex", alignItems: "center", gap: space.x2 },
   filterContent: { display: "flex", flexDirection: "column", gap: space.x6 },
   railFilters: { display: "block", [NARROW]: { display: "none" } },
@@ -298,13 +303,9 @@ const styles = stylex.create({
     fontWeight: 600,
     cursor: "pointer",
   },
-  activityList: { display: "flex", minWidth: 0, flexDirection: "column" },
   collectionActivity: {
     paddingTop: space.x4,
     paddingBottom: space.x4,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   activityHeader: { display: "flex", minWidth: 0 },
   activityCopy: {
@@ -327,24 +328,13 @@ const styles = stylex.create({
     lineHeight: 1.35,
   },
   collectionItems: {
-    margin: 0,
     marginTop: space.x3,
-    paddingRight: space.x4,
-    paddingLeft: space.x4,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
-    listStyle: "none",
-  },
-  collectionItem: {
-    paddingTop: space.x3,
-    paddingBottom: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   moreItems: {
     paddingTop: space.x2,
+    paddingRight: "18px",
     paddingBottom: space.x2,
+    paddingLeft: "18px",
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "10px",
