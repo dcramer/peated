@@ -6,9 +6,9 @@ import { useState } from "react";
 import { getFormErrorMessage } from "../../lib/formHelpers";
 import { useORPC } from "../../lib/orpc/context";
 import { AdminButton } from "./adminButton.stylex";
-import { AdminSection } from "./adminContent.stylex";
 import { AdminFormError } from "./adminForm.stylex";
 import { ExternalSiteIdentity } from "./externalSiteIcon.stylex";
+import ScraperSetting from "./scraperSetting.stylex";
 
 type Site = Outputs["externalSites"]["healthDetails"];
 
@@ -43,7 +43,7 @@ export default function ScraperIconSettings({ site }: { site: Site }) {
   }
 
   return (
-    <AdminSection
+    <ScraperSetting
       title="Site icon"
       description={
         hasWebsite
@@ -65,6 +65,6 @@ export default function ScraperIconSettings({ site }: { site: Site }) {
       <ExternalSiteIdentity imageUrl={site.imageUrl} name={site.name} size="lg">
         {site.imageUrl ? "Saved icon" : "No icon saved"}
       </ExternalSiteIdentity>
-    </AdminSection>
+    </ScraperSetting>
   );
 }

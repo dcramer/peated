@@ -7,9 +7,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getFormErrorMessage } from "../../lib/formHelpers";
 import { useORPC } from "../../lib/orpc/context";
 import { AdminButton } from "./adminButton.stylex";
-import { AdminSection, AdminStatus } from "./adminContent.stylex";
+import { AdminStatus } from "./adminContent.stylex";
 import { AdminFormError } from "./adminForm.stylex";
 import { AdminDefinitionList as DefinitionList } from "./adminUtility.stylex";
+import ScraperSetting from "./scraperSetting.stylex";
 
 type Site = Outputs["externalSites"]["healthDetails"];
 
@@ -87,12 +88,12 @@ export default function ScraperPublicationSettings({ site }: { site: Site }) {
   }
 
   return (
-    <AdminSection
+    <ScraperSetting
       title="Public reviews"
       description={
         approved
-          ? "Matched reviews are public. New matches will be public too."
-          : "Publish matched reviews. New matches will be public too."
+          ? "Reviews linked to bottles are public. Reviews linked later will be public too."
+          : "Publish reviews linked to bottles. Reviews linked later will be public too."
       }
       action={
         <ReviewPublishingAction
@@ -105,6 +106,6 @@ export default function ScraperPublicationSettings({ site }: { site: Site }) {
     >
       {error ? <AdminFormError values={[error]} /> : null}
       <ReviewPublishingState site={site} />
-    </AdminSection>
+    </ScraperSetting>
   );
 }

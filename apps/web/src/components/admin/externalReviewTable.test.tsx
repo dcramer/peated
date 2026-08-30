@@ -88,7 +88,7 @@ function makeExternalReview(
     id,
     name: "Springbank review",
     url: `https://example.com/reviews/${id}`,
-    article: { title: null, publishedAt: null },
+    article: { title: null, publishedAt: "2026-07-21T00:00:00.000Z" },
     reviewerName: null,
     nativeScore: { value: 91, scale: 100, display: "91/100" },
     bottle: reviewBottle,
@@ -107,6 +107,8 @@ describe("ExternalReviewTable", () => {
 
     expect(html).toContain('href="/bottles/19"');
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");
+    expect(html).toContain("Published Jul 21, 2026");
+    expect(html).toContain('dateTime="2026-07-21T00:00:00.000Z"');
   });
 
   it("renders unresolved review identity without a catalog link", () => {

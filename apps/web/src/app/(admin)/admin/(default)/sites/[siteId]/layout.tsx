@@ -113,7 +113,7 @@ export default function Layout({
       />
       <AdminStatGrid>
         <AdminStat
-          label="External reviews"
+          label="Reviews"
           value={`${site.externalReviews.matched.toLocaleString("en-US")} / ${site.externalReviews.total.toLocaleString("en-US")}`}
         />
         <AdminStat
@@ -125,10 +125,10 @@ export default function Layout({
         ariaLabel="Scraper"
         currentHref={pathname}
         items={[
-          { href: root, label: "Setup" },
+          { href: root, label: "Settings" },
           { href: `${root}/runs`, label: "Runs" },
           { href: `${root}/prices`, label: "Prices" },
-          { href: `${root}/external-reviews`, label: "External reviews" },
+          { href: `${root}/external-reviews`, label: "Reviews" },
         ]}
       />
       {children}
