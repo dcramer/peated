@@ -128,7 +128,7 @@ function reviewGrade(value: string) {
 }
 
 function bottleName(title: string): string | null {
-  const name = normalizeText(title.replace(/\s+Review$/iu, ""));
+  const name = normalizeText(title.replace(/\s+R(?:e)?view$/iu, ""));
   return name === title ? null : name;
 }
 

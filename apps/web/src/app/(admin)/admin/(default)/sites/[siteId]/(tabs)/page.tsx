@@ -13,10 +13,11 @@ import ScraperPublicationSettings from "@peated/web/components/admin/scraperPubl
 import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
 import ScraperScheduleSettings from "@peated/web/components/admin/scraperScheduleSettings.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { colors, space } from "@peated/web/styles/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
+
+import { styles } from "./page.stylex";
 
 export default function Page(props: { params: Promise<{ siteId: string }> }) {
   const { siteId } = use(props.params);
@@ -83,19 +84,3 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
     </AdminPage>
   );
 }
-
-const styles = stylex.create({
-  settings: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-  },
-  dividedSetting: {
-    minWidth: 0,
-    marginTop: space.x6,
-    paddingTop: space.x6,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-  },
-});

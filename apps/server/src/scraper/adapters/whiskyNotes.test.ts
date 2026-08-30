@@ -64,6 +64,21 @@ test("extracts multi-bottle reviews with stable source keys", async () => {
   ).toEqual(reparsed.article.externalReviews.map(({ sourceKey }) => sourceKey));
 });
 
+test("accepts proof-strength review headings", async () => {
+  const html = await loadFixture("whiskynotes", "single-review.html");
+  const parsed = parseWhiskyNotesArticle(
+    html.replace("43%", "100 Proof"),
+    new URL(SINGLE_URL),
+  );
+
+  expect(parsed.article.externalReviews).toEqual([
+    expect.objectContaining({
+      name: "Kanekou Okinawa Whisky (100 Proof, OB +/- 2025)",
+      nativeScore: { value: 52, scale: 100, display: "52/100" },
+    }),
+  ]);
+});
+
 async function runAdapter(
   cursor: WhiskyNotesCursor | null,
   {

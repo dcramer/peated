@@ -96,7 +96,9 @@ function score(value: string) {
 
 function bottleName(heading: string): string | null {
   const name = normalizeText(heading);
-  return /^.+\s+\((?=[^)]*\d{1,3}(?:[.,]\d+)?\s*%)[^)]*\)\s*$/u.test(name)
+  return /^.+\s+\((?=[^)]*\d{1,3}(?:[.,]\d+)?\s*(?:%|proof\b))[^)]*\)\s*$/iu.test(
+    name,
+  )
     ? name
     : null;
 }

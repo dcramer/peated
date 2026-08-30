@@ -16,6 +16,7 @@ import {
 import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
+import { normalizeBottleCatalogQueryParams } from "@peated/web/lib/bottleCatalogQueryParams";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
@@ -75,20 +76,22 @@ export function BottleCatalogPageClient({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryParams = useApiQueryParams({
-    numericFields: [
-      "age",
-      "brand",
-      "bottler",
-      "cursor",
-      "distiller",
-      "entity",
-      "limit",
-      "minScore",
-      "series",
-    ],
-    overrides: { limit: 50 },
-  });
+  const queryParams = normalizeBottleCatalogQueryParams(
+    useApiQueryParams({
+      numericFields: [
+        "age",
+        "brand",
+        "bottler",
+        "cursor",
+        "distiller",
+        "entity",
+        "limit",
+        "minScore",
+        "series",
+      ],
+      overrides: { limit: 50 },
+    }),
+  );
   const { data: bottleList } = useSuspenseQuery({
     ...orpc.bottles.list.queryOptions({ input: queryParams }),
     initialData: initialBottleList,

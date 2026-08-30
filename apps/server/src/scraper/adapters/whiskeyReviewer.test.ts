@@ -60,6 +60,18 @@ test("extracts the grade and only tasting-note paragraphs", async () => {
   );
 });
 
+test("accepts the publisher's misspelled review suffix", async () => {
+  const html = await loadFixture("whiskeyreviewer", "review.html");
+  const parsed = parseWhiskeyReviewerArticle(
+    html.replace("Bourbon Review", "Bourbon Rview"),
+    new URL(BOURBON_URL),
+  );
+
+  expect(parsed.article.externalReviews[0]?.name).toBe(
+    "Example 8 Year Old Bourbon",
+  );
+});
+
 test("rejects an article without an encoded date", async () => {
   const html = await loadFixture("whiskeyreviewer", "review.html");
   const undatedUrl =

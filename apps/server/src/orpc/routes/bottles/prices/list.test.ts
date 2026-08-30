@@ -1,3 +1,5 @@
+import { db } from "@peated/server/db";
+import { bottleTombstones } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /bottles/:bottle/prices", () => {
@@ -95,6 +97,20 @@ describe("GET /bottles/:bottle/prices", () => {
       ),
     ).toBe(true);
     expect(result.results.every((price) => !("target" in price))).toBe(true);
+  });
+
+  test("uses the replacement Bottle for a tombstone", async ({ fixtures }) => {
+    const replacement = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({ bottleId: replacement.id });
+    await db.insert(bottleTombstones).values({
+      bottleId: 999,
+      newBottleId: replacement.id,
+    });
+
+    const result = await routerClient.bottles.prices.list({ bottle: 999 });
+
+    expect(result.results.map(({ id }) => id)).toEqual([price.id]);
+    expect(result.results[0]?.bottle?.id).toBe(replacement.id);
   });
 
   test("filters direct Bottle prices by validity", async ({ fixtures }) => {
