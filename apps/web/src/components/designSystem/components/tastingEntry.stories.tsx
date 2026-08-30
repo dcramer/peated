@@ -67,3 +67,20 @@ export const Overview: Story = {
     </StoryStack>
   ),
 };
+
+export const LongDescription: Story = {
+  args: {
+    members: [
+      {
+        description:
+          "The nose starts with wood smoke, dried orange, and old leather before moving into dark chocolate and sea salt. The palate adds roasted coffee, black pepper, and a little raisin sweetness. With time, the smoke softens and more fruit comes through. The finish is long, dry, and smoky, with espresso and orange peel lingering after the last sip.",
+        descriptionHref: "/tastings/42",
+        href: "/bottles/lagavulin-16",
+        metadata: "Islay · 16 years · 43% ABV",
+        name: "Lagavulin 16-year-old",
+        notes: ["Smoke", "Dried fruit", "Sea salt"],
+        ratingBand: "outstanding",
+      },
+    ],
+  },
+};

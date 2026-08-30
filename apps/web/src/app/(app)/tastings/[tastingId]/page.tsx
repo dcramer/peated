@@ -58,7 +58,7 @@ export default async function TastingPage(props: {
         title={getBottlePlainTextIdentity(tasting.bottle)}
       />
       <PageSection heading="Tasting">
-        <TastingRecordEntry tasting={tasting} />
+        <TastingRecordEntry showFullNotes tasting={tasting} />
       </PageSection>
       <PageSection count={commentList.results.length} heading="Comments">
         <TastingComments
