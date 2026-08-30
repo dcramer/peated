@@ -15,7 +15,10 @@ import { afterEach, expect, test, vi } from "vitest";
 
 afterEach(() => vi.unstubAllGlobals());
 
-async function sourceWithOrigin(fixtures: typeof FixtureModule) {
+async function sourceWithOrigin(
+  fixtures: typeof FixtureModule,
+  origin = "https://icon-source.example",
+) {
   const site = await fixtures.ExternalSite({ type: "icon-source" });
   await db.insert(scrapeTargets).values({
     key: site.type,
@@ -28,7 +31,7 @@ async function sourceWithOrigin(fixtures: typeof FixtureModule) {
     windowMs: 3_600_000,
   });
   await db.insert(scrapeOrigins).values({
-    origin: "https://icon-source.example",
+    origin,
     robotsMode: "enforce",
     targetKey: site.type,
   });
@@ -119,4 +122,70 @@ test("rejects icon capture when the scraper has no website", async ({
   expect(error).toMatchInlineSnapshot(
     `[Error: This scraper has no website to check.]`,
   );
+});
+
+test("tries the next website when an icon is unavailable", async ({
+  fixtures,
+}) => {
+  const site = await sourceWithOrigin(fixtures);
+  await db.insert(scrapeOrigins).values({
+    origin: "https://second-icon-source.example",
+    robotsMode: "enforce",
+    targetKey: site.type,
+  });
+  const administrator = await fixtures.User({ admin: true });
+  const sourceIcon = await sharp({
+    create: {
+      background: "#e89b24",
+      channels: 4,
+      height: 128,
+      width: 128,
+    },
+  })
+    .png()
+    .toBuffer();
+  let homepageRequests = 0;
+  vi.stubGlobal(
+    "fetch",
+    vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input);
+      if (url.pathname === "/") {
+        homepageRequests += 1;
+        return homepageRequests === 1
+          ? new Response(null, { status: 404 })
+          : new Response(
+              `<link rel="icon" href="/site-icon.png" sizes="128x128">`,
+              { headers: { "content-type": "text/html" } },
+            );
+      }
+      if (url.pathname === "/site-icon.png") {
+        return new Response(new Uint8Array(sourceIcon), {
+          headers: { "content-type": "image/png" },
+        });
+      }
+      return new Response(null, { status: 404 });
+    }),
+  );
+
+  const result = await routerClient.externalSites.icon.capture(
+    { site: site.type },
+    { context: { user: administrator } },
+  );
+
+  expect(result.imageUrl).toContain("/uploads/external-sites/");
+  expect(homepageRequests).toBe(2);
+});
+
+test("does not hide an invalid stored origin", async ({ fixtures }) => {
+  const site = await sourceWithOrigin(fixtures, "https://[");
+  const administrator = await fixtures.User({ admin: true });
+
+  const error = await waitError(() =>
+    routerClient.externalSites.icon.capture(
+      { site: site.type },
+      { context: { user: administrator } },
+    ),
+  );
+
+  expect(error).toMatchInlineSnapshot(`[TypeError: Invalid URL]`);
 });

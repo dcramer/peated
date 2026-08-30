@@ -1,6 +1,10 @@
 import sharp from "sharp";
 import { describe, expect, test, vi } from "vitest";
-import { downloadSiteIcon, findSiteIconDeclarations } from "./siteIcon";
+import {
+  downloadSiteIcon,
+  findSiteIconDeclarations,
+  SiteIconUnavailableError,
+} from "./siteIcon";
 
 function response(body: string | Uint8Array, contentType: string) {
   return new Response(body, {
@@ -138,5 +142,52 @@ describe("downloadSiteIcon", () => {
 
     expect(result.sourceUrl).toBe("https://example.com/app/icons/site.png");
     expect(fetchImpl).toHaveBeenCalledTimes(3);
+  });
+
+  test("ignores a broken optional manifest", async () => {
+    const icon = await sharp({
+      create: {
+        background: "#00ff00",
+        channels: 4,
+        height: 192,
+        width: 192,
+      },
+    })
+      .png()
+      .toBuffer();
+    const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input);
+      if (url.pathname === "/") {
+        return response(
+          `<link rel="manifest" href="/site.webmanifest">
+           <link rel="icon" href="/site.png" sizes="192x192">`,
+          "text/html",
+        );
+      }
+      if (url.pathname === "/site.webmanifest") {
+        return response("not json", "application/manifest+json");
+      }
+      if (url.pathname === "/site.png") {
+        return response(new Uint8Array(icon), "image/png");
+      }
+      return new Response(null, { status: 404 });
+    });
+
+    const result = await downloadSiteIcon(
+      new URL("https://example.com/"),
+      fetchImpl,
+    );
+
+    expect(result.sourceUrl).toBe("https://example.com/site.png");
+  });
+
+  test("reports network failures as an unavailable icon", async () => {
+    const fetchImpl = vi.fn<typeof fetch>(async () => {
+      throw new TypeError("fetch failed");
+    });
+
+    await expect(
+      downloadSiteIcon(new URL("https://example.com/"), fetchImpl),
+    ).rejects.toBeInstanceOf(SiteIconUnavailableError);
   });
 });

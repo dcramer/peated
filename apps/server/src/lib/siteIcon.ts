@@ -41,8 +41,9 @@ const ManifestSchema = z.looseObject({
     .default([]),
 });
 
-class SiteIconFetchError extends Error {
-  override name = "SiteIconFetchError";
+/** An expected failure while reading an external website or icon file. */
+export class SiteIconUnavailableError extends Error {
+  override name = "SiteIconUnavailableError";
 }
 
 function siteHostname(url: URL) {
@@ -153,7 +154,7 @@ async function readBounded(response: Response, maximumBytes: number) {
   const length = response.headers.get("content-length");
   if (length !== null && Number(length) > maximumBytes) {
     await response.body?.cancel();
-    throw new SiteIconFetchError("Site icon response was too large.");
+    throw new SiteIconUnavailableError("Site icon response was too large.");
   }
   if (!response.body) return Buffer.alloc(0);
 
@@ -166,7 +167,7 @@ async function readBounded(response: Response, maximumBytes: number) {
     total += value.byteLength;
     if (total > maximumBytes) {
       await reader.cancel();
-      throw new SiteIconFetchError("Site icon response was too large.");
+      throw new SiteIconUnavailableError("Site icon response was too large.");
     }
     chunks.push(value);
   }
@@ -188,31 +189,69 @@ async function fetchSameSite(
       url.password ||
       !isSameSite(url, siteUrl)
     ) {
-      throw new SiteIconFetchError("Site icon URL left the source website.");
+      throw new SiteIconUnavailableError(
+        "Site icon URL left the source website.",
+      );
     }
-    const response = await fetchImpl(url, {
-      headers: { Accept: accept, "User-Agent": BOT_USER_AGENT },
-      redirect: "manual",
-      signal: AbortSignal.timeout(10_000),
-    });
+    let response: Response;
+    try {
+      response = await fetchImpl(url, {
+        headers: { Accept: accept, "User-Agent": BOT_USER_AGENT },
+        redirect: "manual",
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch (error) {
+      if (!(error instanceof Error)) throw error;
+      throw new SiteIconUnavailableError("Site icon request failed.", {
+        cause: error,
+      });
+    }
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get("location");
       await response.body?.cancel();
       if (!location || redirects === MAX_REDIRECTS) {
-        throw new SiteIconFetchError("Site icon redirect failed.");
+        throw new SiteIconUnavailableError("Site icon redirect failed.");
       }
-      url = new URL(location, url);
+      try {
+        url = new URL(location, url);
+      } catch (error) {
+        if (!(error instanceof Error)) throw error;
+        throw new SiteIconUnavailableError("Site icon redirect failed.", {
+          cause: error,
+        });
+      }
       continue;
     }
     if (!response.ok) {
       await response.body?.cancel();
-      throw new SiteIconFetchError(
+      throw new SiteIconUnavailableError(
         `Site icon request returned ${response.status}.`,
       );
     }
-    return { data: await readBounded(response, maximumBytes), url };
+    try {
+      return { data: await readBounded(response, maximumBytes), url };
+    } catch (error) {
+      if (error instanceof SiteIconUnavailableError) throw error;
+      if (!(error instanceof Error)) throw error;
+      throw new SiteIconUnavailableError(
+        "Site icon response could not be read.",
+        { cause: error },
+      );
+    }
   }
-  throw new SiteIconFetchError("Site icon redirect failed.");
+  throw new SiteIconUnavailableError("Site icon redirect failed.");
+}
+
+function parseManifest(data: Buffer) {
+  let value: unknown;
+  try {
+    value = JSON.parse(new TextDecoder().decode(data));
+  } catch (error) {
+    if (error instanceof SyntaxError) return null;
+    throw error;
+  }
+  const result = ManifestSchema.safeParse(value);
+  return result.success ? result.data : null;
 }
 
 function sortCandidates(candidates: SiteIconCandidate[]) {
@@ -230,14 +269,22 @@ function sortCandidates(candidates: SiteIconCandidate[]) {
 }
 
 async function normalizeIcon(data: Buffer) {
-  return await sharp(data, { density: 128, limitInputPixels: 16_777_216 })
-    .rotate()
-    .resize(SITE_ICON_SIZE, SITE_ICON_SIZE, {
-      background: { alpha: 0, b: 0, g: 0, r: 0 },
-      fit: "contain",
-    })
-    .webp({ quality: 90 })
-    .toBuffer();
+  try {
+    return await sharp(data, { density: 128, limitInputPixels: 16_777_216 })
+      .rotate()
+      .resize(SITE_ICON_SIZE, SITE_ICON_SIZE, {
+        background: { alpha: 0, b: 0, g: 0, r: 0 },
+        fit: "contain",
+      })
+      .webp({ quality: 90 })
+      .toBuffer();
+  } catch (error) {
+    if (!(error instanceof Error)) throw error;
+    // An unreadable external image rejects this choice, not the whole request.
+    throw new SiteIconUnavailableError("Site icon file could not be read.", {
+      cause: error,
+    });
+  }
 }
 
 /** Downloads the best same-site icon declared by a homepage and returns WebP. */
@@ -261,35 +308,35 @@ export async function downloadSiteIcon(
   let order = candidates.length;
 
   for (const manifestUrl of declarations.manifests) {
+    let response: Awaited<ReturnType<typeof fetchSameSite>>;
     try {
-      const response = await fetchSameSite(
+      response = await fetchSameSite(
         manifestUrl,
         homepage.url,
         MAX_MANIFEST_BYTES,
         "application/manifest+json,application/json",
         fetchImpl,
       );
-      const manifest = ManifestSchema.parse(
-        JSON.parse(new TextDecoder().decode(response.data)),
-      );
-      for (const icon of manifest.icons) {
-        const url = candidateUrl(icon.src, response.url);
-        if (!url) continue;
-        candidates.push({
-          order: order++,
-          size: iconSize(
-            icon.sizes,
-            icon.type?.toLowerCase() === "image/svg+xml" ||
-              url.pathname.toLowerCase().endsWith(".svg")
-              ? 512
-              : 64,
-          ),
-          url,
-        });
-      }
     } catch (error) {
-      if (!(error instanceof Error)) throw error;
-      // A broken optional manifest must not hide usable HTML icon links.
+      if (!(error instanceof SiteIconUnavailableError)) throw error;
+      continue;
+    }
+    const manifest = parseManifest(response.data);
+    if (!manifest) continue;
+    for (const icon of manifest.icons) {
+      const url = candidateUrl(icon.src, response.url);
+      if (!url) continue;
+      candidates.push({
+        order: order++,
+        size: iconSize(
+          icon.sizes,
+          icon.type?.toLowerCase() === "image/svg+xml" ||
+            url.pathname.toLowerCase().endsWith(".svg")
+            ? 512
+            : 64,
+        ),
+        url,
+      });
     }
   }
 
@@ -313,9 +360,8 @@ export async function downloadSiteIcon(
         sourceUrl: candidate.url.toString(),
       };
     } catch (error) {
-      if (!(error instanceof Error)) throw error;
-      // Invalid and missing candidates are expected; try the next declaration.
+      if (!(error instanceof SiteIconUnavailableError)) throw error;
     }
   }
-  throw new SiteIconFetchError(SITE_ICON_NOT_FOUND_MESSAGE);
+  throw new SiteIconUnavailableError(SITE_ICON_NOT_FOUND_MESSAGE);
 }

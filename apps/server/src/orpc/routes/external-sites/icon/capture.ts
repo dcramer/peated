@@ -8,6 +8,7 @@ import { logWarn } from "@peated/server/lib/log";
 import {
   downloadSiteIcon,
   SITE_ICON_NOT_FOUND_MESSAGE,
+  SiteIconUnavailableError,
 } from "@peated/server/lib/siteIcon";
 import { deleteFile, storeFile } from "@peated/server/lib/uploads";
 import { procedure } from "@peated/server/orpc";
@@ -76,8 +77,7 @@ export default procedure
         icon = await downloadSiteIcon(new URL(row.origin));
         break;
       } catch (error) {
-        if (!(error instanceof Error)) throw error;
-        // A scraper can have API and website origins; try each active website.
+        if (!(error instanceof SiteIconUnavailableError)) throw error;
       }
     }
     if (!icon) {
