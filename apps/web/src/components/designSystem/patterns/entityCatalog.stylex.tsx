@@ -66,7 +66,7 @@ export function EntityCatalogList({
         sortOptions={sortOptions}
       />
       {items.length ? (
-        <ItemList ariaLabel={`${noun} records`}>
+        <ItemList ariaLabel={`${noun} records`} showTopDivider={false}>
           {items.map((item) => (
             <ItemRow
               end={<EntityMeasures item={item} />}

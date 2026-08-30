@@ -131,8 +131,9 @@ export type {
   FormSectionProps,
   FormStepsProps,
 } from "./formLayout.stylex";
-export { ItemList, ItemRow } from "./itemList.stylex";
+export { ItemList, ItemListItem, ItemRow } from "./itemList.stylex";
 export type {
+  ItemListItemProps,
   ItemListProps,
   ItemListVariant,
   ItemRowProps,

@@ -10,6 +10,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import { ButtonLink, IconButton } from "./button.stylex";
+import { ItemList, ItemListItem } from "./itemList.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -148,9 +149,11 @@ export function RailList({
   children: ReactNode;
 }) {
   return (
-    <ul aria-label={ariaLabel} {...stylex.props(styles.railList)}>
-      {children}
-    </ul>
+    <div {...stylex.props(styles.railList)}>
+      <ItemList ariaLabel={ariaLabel} showTopDivider={false}>
+        {children}
+      </ItemList>
+    </div>
   );
 }
 
@@ -168,24 +171,26 @@ export function RailListItem({
   title,
 }: RailListItemProps) {
   return (
-    <li {...stylex.props(styles.railRow)}>
-      <div {...stylex.props(styles.railCopy)}>
-        {href ? (
-          <a
-            href={href}
-            {...stylex.props(styles.railTitle, styles.railTitleLink)}
-          >
-            {title}
-          </a>
-        ) : (
-          <span {...stylex.props(styles.railTitle)}>{title}</span>
-        )}
-        {metadata ? (
-          <span {...stylex.props(styles.railMetadata)}>{metadata}</span>
-        ) : null}
+    <ItemListItem>
+      <div {...stylex.props(styles.railRow)}>
+        <div {...stylex.props(styles.railCopy)}>
+          {href ? (
+            <a
+              href={href}
+              {...stylex.props(styles.railTitle, styles.railTitleLink)}
+            >
+              {title}
+            </a>
+          ) : (
+            <span {...stylex.props(styles.railTitle)}>{title}</span>
+          )}
+          {metadata ? (
+            <span {...stylex.props(styles.railMetadata)}>{metadata}</span>
+          ) : null}
+        </div>
+        {end ? <span {...stylex.props(styles.railEnd)}>{end}</span> : null}
       </div>
-      {end ? <span {...stylex.props(styles.railEnd)}>{end}</span> : null}
-    </li>
+    </ItemListItem>
   );
 }
 
@@ -303,14 +308,12 @@ const styles = stylex.create({
     lineHeight: 1.4,
   },
   railList: {
-    margin: 0,
     paddingTop: space.x1,
     paddingRight: space.x4,
     paddingBottom: space.x1,
     paddingLeft: space.x4,
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
-    listStyle: "none",
   },
   railRow: {
     display: "flex",
@@ -319,12 +322,6 @@ const styles = stylex.create({
     gap: space.x3,
     paddingTop: "10px",
     paddingBottom: "10px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    ":last-child": {
-      borderBottomWidth: 0,
-    },
   },
   railCopy: {
     minWidth: 0,

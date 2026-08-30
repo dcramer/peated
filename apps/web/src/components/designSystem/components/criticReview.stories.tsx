@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { StoryCanvas, StoryStack } from "../storyFixtures.stylex";
+import { StoryCanvas } from "../storyFixtures.stylex";
 import { CriticReview } from "./criticReview.stylex";
+import { ItemList, ItemListItem } from "./itemList.stylex";
 
 const meta = {
   title: "Components/Data Display/Critic Review",
@@ -29,14 +30,20 @@ type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {
   render: (args) => (
-    <StoryStack>
-      <CriticReview {...args} />
-      <CriticReview
-        publication="Malt Review"
-        publishedAt="2 Sep 2024"
-        rating={80}
-      />
-      <CriticReview publication="Whisky Notes" rating={null} />
-    </StoryStack>
+    <ItemList ariaLabel="Critic review examples">
+      <ItemListItem>
+        <CriticReview {...args} />
+      </ItemListItem>
+      <ItemListItem>
+        <CriticReview
+          publication="Malt Review"
+          publishedAt="2 Sep 2024"
+          rating={80}
+        />
+      </ItemListItem>
+      <ItemListItem>
+        <CriticReview publication="Whisky Notes" rating={null} />
+      </ItemListItem>
+    </ItemList>
   ),
 };

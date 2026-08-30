@@ -11,6 +11,8 @@ import {
   CursorPager,
   EmptyState,
   IconButton,
+  ItemList,
+  ItemListItem,
 } from "@peated/web/components/designSystem/components";
 import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
@@ -123,84 +125,91 @@ export function NotificationList({
 
   return (
     <>
-      <ul aria-label="Notifications" {...stylex.props(styles.list)}>
+      <ItemList ariaLabel="Notifications">
         {notifications.map((notification) => {
           const href = getNotificationHref(notification);
           const from = notification.fromUser;
           return (
-            <li
-              key={notification.id}
-              {...stylex.props(styles.row, !notification.read && styles.unread)}
-            >
-              <Avatar
-                imageUrl={from?.pictureUrl}
-                initials={from?.username.slice(0, 2).toLocaleUpperCase() ?? "P"}
-              />
-              <div {...stylex.props(styles.copy)}>
-                <div {...stylex.props(styles.message)}>
-                  {from ? (
-                    <a
-                      href={`/users/${from.username}`}
-                      {...stylex.props(styles.author)}
-                    >
-                      {from.username}
-                    </a>
-                  ) : null}{" "}
-                  {href ? (
-                    <a
-                      href={href}
-                      onClick={() => markRead(notification.id)}
-                      {...stylex.props(styles.target)}
-                    >
-                      {getNotificationMessage(notification)}
-                    </a>
-                  ) : (
-                    getNotificationMessage(notification)
-                  )}
-                </div>
-                <span {...stylex.props(styles.date)}>
-                  <TimeSince date={notification.createdAt} />
-                </span>
-                {notification.type === "friend_request" && notification.ref ? (
-                  <div {...stylex.props(styles.friendActions)}>
-                    {notification.ref.status === "friends" ? (
-                      <span {...stylex.props(styles.friendStatus)}>
-                        Friends
-                      </span>
-                    ) : (
-                      <Button
-                        disabled={acceptingNotificationId !== undefined}
-                        loading={acceptingNotificationId === notification.id}
-                        onClick={() =>
-                          void acceptFriend(
-                            notification.id,
-                            notification.ref!.userId,
-                          )
-                        }
-                        size="sm"
-                        variant="accent"
+            <ItemListItem key={notification.id}>
+              <div
+                {...stylex.props(
+                  styles.row,
+                  !notification.read && styles.unread,
+                )}
+              >
+                <Avatar
+                  imageUrl={from?.pictureUrl}
+                  initials={
+                    from?.username.slice(0, 2).toLocaleUpperCase() ?? "P"
+                  }
+                />
+                <div {...stylex.props(styles.copy)}>
+                  <div {...stylex.props(styles.message)}>
+                    {from ? (
+                      <a
+                        href={`/users/${from.username}`}
+                        {...stylex.props(styles.author)}
                       >
-                        Add friend
-                      </Button>
+                        {from.username}
+                      </a>
+                    ) : null}{" "}
+                    {href ? (
+                      <a
+                        href={href}
+                        onClick={() => markRead(notification.id)}
+                        {...stylex.props(styles.target)}
+                      >
+                        {getNotificationMessage(notification)}
+                      </a>
+                    ) : (
+                      getNotificationMessage(notification)
                     )}
                   </div>
-                ) : null}
+                  <span {...stylex.props(styles.date)}>
+                    <TimeSince date={notification.createdAt} />
+                  </span>
+                  {notification.type === "friend_request" &&
+                  notification.ref ? (
+                    <div {...stylex.props(styles.friendActions)}>
+                      {notification.ref.status === "friends" ? (
+                        <span {...stylex.props(styles.friendStatus)}>
+                          Friends
+                        </span>
+                      ) : (
+                        <Button
+                          disabled={acceptingNotificationId !== undefined}
+                          loading={acceptingNotificationId === notification.id}
+                          onClick={() =>
+                            void acceptFriend(
+                              notification.id,
+                              notification.ref!.userId,
+                            )
+                          }
+                          size="sm"
+                          variant="accent"
+                        >
+                          Add friend
+                        </Button>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+                <IconButton
+                  disabled={
+                    deleteNotification.isPending ||
+                    acceptingNotificationId === notification.id
+                  }
+                  icon={<X aria-hidden="true" size={16} />}
+                  label="Dismiss notification"
+                  onClick={() => void dismiss(notification.id)}
+                  size="sm"
+                  variant="text"
+                />
               </div>
-              <IconButton
-                disabled={
-                  deleteNotification.isPending ||
-                  acceptingNotificationId === notification.id
-                }
-                icon={<X aria-hidden="true" size={16} />}
-                label="Dismiss notification"
-                onClick={() => void dismiss(notification.id)}
-                size="sm"
-                variant="text"
-              />
-            </li>
+            </ItemListItem>
           );
         })}
-      </ul>
+      </ItemList>
       <CursorPager
         ariaLabel="Notification pages"
         nextHref={nextHref}
@@ -239,7 +248,6 @@ function getNotificationMessage(notification: Notification) {
 }
 
 const styles = stylex.create({
-  list: { margin: 0, padding: 0, listStyle: "none" },
   row: {
     display: "flex",
     minWidth: 0,
@@ -249,15 +257,7 @@ const styles = stylex.create({
     paddingRight: space.x3,
     paddingBottom: space.x4,
     paddingLeft: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
     backgroundColor: "transparent",
-    ":first-child": {
-      borderTopWidth: "1px",
-      borderTopStyle: "solid",
-      borderTopColor: colors.hairline,
-    },
   },
   unread: { backgroundColor: colors.surface },
   copy: { minWidth: 0, flex: 1 },

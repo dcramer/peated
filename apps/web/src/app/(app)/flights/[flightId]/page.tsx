@@ -2,6 +2,8 @@ import {
   BottleIdentityRow,
   ButtonLink,
   EmptyState,
+  ItemList,
+  ItemListItem,
 } from "@peated/web/components/designSystem/components";
 import {
   PageHeader,
@@ -59,34 +61,35 @@ export default async function FlightPage(props: {
       />
       <PageSection count={flight.bottles.length} heading="Bottles">
         {flight.bottles.length ? (
-          <div>
+          <ItemList ariaLabel="Flight bottles">
             {flight.bottles.map(({ bottle, hasTasted, isLibrary }) => (
-              <BottleIdentityRow
-                brand={bottle.brand.name}
-                brandHref={`/entities/${bottle.brand.id}`}
-                end={
-                  <ButtonLink
-                    href={getAddBottleHref({
-                      bottleId: bottle.id,
-                      flightId: flight.id,
-                      intent: "tasting",
-                    })}
-                    size="sm"
-                    variant={hasTasted ? "tonal" : "accent"}
-                  >
-                    Log tasting
-                  </ButtonLink>
-                }
-                hasTasted={hasTasted}
-                href={`/bottles/${bottle.id}`}
-                imageUrl={bottle.imageUrl}
-                isLibrary={isLibrary}
-                key={bottle.id}
-                metadata={getBottleMetadata(bottle).split(" · ")}
-                name={getBottleExpressionName(bottle)}
-              />
+              <ItemListItem key={bottle.id}>
+                <BottleIdentityRow
+                  brand={bottle.brand.name}
+                  brandHref={`/entities/${bottle.brand.id}`}
+                  end={
+                    <ButtonLink
+                      href={getAddBottleHref({
+                        bottleId: bottle.id,
+                        flightId: flight.id,
+                        intent: "tasting",
+                      })}
+                      size="sm"
+                      variant={hasTasted ? "tonal" : "accent"}
+                    >
+                      Log tasting
+                    </ButtonLink>
+                  }
+                  hasTasted={hasTasted}
+                  href={`/bottles/${bottle.id}`}
+                  imageUrl={bottle.imageUrl}
+                  isLibrary={isLibrary}
+                  metadata={getBottleMetadata(bottle).split(" · ")}
+                  name={getBottleExpressionName(bottle)}
+                />
+              </ItemListItem>
             ))}
-          </div>
+          </ItemList>
         ) : (
           <EmptyState heading="No bottles yet">
             Edit this flight to add bottles.

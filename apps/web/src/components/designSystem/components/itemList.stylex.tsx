@@ -18,6 +18,7 @@ export type ItemRowSize = "sm" | "md";
 export type ItemListProps = {
   ariaLabel: string;
   children: ReactNode;
+  showTopDivider?: boolean;
   variant?: ItemListVariant;
 };
 
@@ -25,6 +26,7 @@ export type ItemListProps = {
 export function ItemList({
   ariaLabel,
   children,
+  showTopDivider = true,
   variant = "plain",
 }: ItemListProps) {
   return (
@@ -32,11 +34,27 @@ export function ItemList({
       aria-label={ariaLabel}
       {...stylex.props(
         styles.list,
-        variant === "plain" ? styles.plainList : styles.surfaceList,
+        variant === "plain" && styles.plainList,
+        variant === "plain" && !showTopDivider && styles.withoutTopDivider,
+        variant === "surface" && styles.surfaceList,
       )}
     >
       {children}
     </ul>
+  );
+}
+
+export type ItemListItemProps = {
+  children: ReactNode;
+  id?: string;
+};
+
+/** Owns the divider for one custom row inside an ItemList. */
+export function ItemListItem({ children, id }: ItemListItemProps) {
+  return (
+    <li id={id} {...stylex.props(styles.row)}>
+      {children}
+    </li>
   );
 }
 
@@ -69,7 +87,7 @@ export function ItemRow({
   const hasLinkedContent = Boolean(href);
 
   return (
-    <li id={id} {...stylex.props(styles.row)}>
+    <ItemListItem id={id}>
       <div
         {...stylex.props(
           styles.content,
@@ -127,7 +145,7 @@ export function ItemRow({
         {end ? <div {...stylex.props(styles.end)}>{end}</div> : null}
         {action ? <div {...stylex.props(styles.action)}>{action}</div> : null}
       </div>
-    </li>
+    </ItemListItem>
   );
 }
 
@@ -141,6 +159,9 @@ const styles = stylex.create({
     borderTopWidth: "1px",
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
+  },
+  withoutTopDivider: {
+    borderTopWidth: 0,
   },
   surfaceList: {
     overflow: "hidden",

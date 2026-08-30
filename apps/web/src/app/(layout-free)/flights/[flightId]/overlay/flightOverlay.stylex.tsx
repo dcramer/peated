@@ -5,6 +5,8 @@ import { ClientOnly } from "@peated/web/components/clientOnly";
 import {
   BottleIdentityRow,
   Card,
+  ItemList,
+  ItemListItem,
 } from "@peated/web/components/designSystem/components";
 import QRCodeClient from "@peated/web/components/qrcode.client.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
@@ -42,19 +44,21 @@ export function FlightOverlay({
           ) : null}
         </header>
         <div {...stylex.props(styles.layout)}>
-          <Card>
-            <div {...stylex.props(styles.list)}>
+          <Card padding="none">
+            <ItemList ariaLabel="Flight bottles" variant="surface">
               {bottles.map(({ bottle }) => (
-                <BottleIdentityRow
-                  brand={bottle.brand.name}
-                  href={getBottleUrl(bottle)}
-                  imageUrl={bottle.imageUrl}
-                  key={bottle.id}
-                  metadata={getBottleMetadata(bottle).split(" · ")}
-                  name={bottle.fullName}
-                />
+                <ItemListItem key={bottle.id}>
+                  <BottleIdentityRow
+                    brand={bottle.brand.name}
+                    href={getBottleUrl(bottle)}
+                    imageUrl={bottle.imageUrl}
+                    metadata={getBottleMetadata(bottle).split(" · ")}
+                    name={bottle.fullName}
+                    variant="surface"
+                  />
+                </ItemListItem>
               ))}
-            </div>
+            </ItemList>
           </Card>
           <aside {...stylex.props(styles.qr)}>
             <Card>
@@ -108,6 +112,5 @@ const styles = stylex.create({
     alignItems: "start",
     gap: space.x6,
   },
-  list: { display: "flex", minWidth: 0, flexDirection: "column" },
   qr: { "@media (max-width: 759px)": { display: "none" } },
 });

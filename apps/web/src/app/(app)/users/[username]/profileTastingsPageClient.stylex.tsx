@@ -1,7 +1,6 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -9,6 +8,8 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
+  ItemList,
+  ItemListItem,
   LoadingList,
   RailList,
   RailListItem,
@@ -63,15 +64,13 @@ export function ProfileTastingsPageClient({
             again.
           </SectionError>
         ) : tastingQuery.data.results.length ? (
-          <div {...stylex.props(styles.tastingList)}>
+          <ItemList ariaLabel={`${user.username}'s tasting records`}>
             {tastingQuery.data.results.map((tasting) => (
-              <TastingRecordEntry
-                key={tasting.id}
-                showAvatar={false}
-                tasting={tasting}
-              />
+              <ItemListItem key={tasting.id}>
+                <TastingRecordEntry showAvatar={false} tasting={tasting} />
+              </ItemListItem>
             ))}
-          </div>
+          </ItemList>
         ) : (
           <EmptyState
             action={
@@ -153,7 +152,3 @@ function getRegionRail(
     </RailSection>
   );
 }
-
-const styles = stylex.create({
-  tastingList: { display: "flex", minWidth: 0, flexDirection: "column" },
-});

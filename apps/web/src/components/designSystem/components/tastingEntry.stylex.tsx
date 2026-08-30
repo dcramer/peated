@@ -156,16 +156,12 @@ const styles = stylex.create({
   entry: {
     paddingTop: space.x4,
     paddingBottom: space.x4,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   surfaceEntry: {
     paddingTop: "22px",
     paddingRight: space.x6,
     paddingBottom: "22px",
     paddingLeft: space.x6,
-    borderBottomWidth: 0,
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
   },

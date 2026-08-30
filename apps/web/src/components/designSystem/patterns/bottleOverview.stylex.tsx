@@ -17,6 +17,8 @@ import {
   CriticReview,
   FactList,
   hasVisibleFacts,
+  ItemList,
+  ItemListItem,
   RailList,
   RailListItem,
   SectionHeading,
@@ -80,14 +82,15 @@ export function BottleOverview({
                 </span>
               ) : null}
             </div>
-            <div>
+            <ItemList ariaLabel="Critic reviews">
               {criticReviews.map((review, index) => (
-                <CriticReview
-                  {...review}
+                <ItemListItem
                   key={`${review.publication}-${review.publishedAt ?? index}`}
-                />
+                >
+                  <CriticReview {...review} />
+                </ItemListItem>
               ))}
-            </div>
+            </ItemList>
           </section>
         ) : null}
 
@@ -96,11 +99,13 @@ export function BottleOverview({
             <SectionHeading count={tastingCount ?? tastings.length}>
               Tastings
             </SectionHeading>
-            <div>
+            <ItemList ariaLabel="Bottle tastings">
               {tastings.map((tasting, index) => (
-                <TastingEntry {...tasting} key={`${tasting.author}-${index}`} />
+                <ItemListItem key={`${tasting.author}-${index}`}>
+                  <TastingEntry {...tasting} />
+                </ItemListItem>
               ))}
-            </div>
+            </ItemList>
             {moreTastingsHref &&
             tastingCount !== undefined &&
             tastingCount > tastings.length ? (
