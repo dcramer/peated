@@ -133,6 +133,12 @@ export type {
   FormSectionProps,
   FormStepsProps,
 } from "./formLayout.stylex";
+export { HistoryTimeline } from "./historyTimeline.stylex";
+export type {
+  HistoryEvent,
+  HistoryState,
+  HistoryTimelineProps,
+} from "./historyTimeline.stylex";
 export { ItemList, ItemListItem, ItemRow } from "./itemList.stylex";
 export type {
   ItemListItemProps,

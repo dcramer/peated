@@ -2,14 +2,16 @@ import * as stylex from "@stylexjs/stylex";
 
 import {
   AppLink,
-  Card,
-  FactList,
   hasVisibleFacts,
   type FactListItem,
 } from "@peated/web/components/designSystem/components";
-import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { parseDomain } from "@peated/web/lib/urls";
-import { colors, effects } from "../../../../styles/tokens.stylex";
+import {
+  colors,
+  effects,
+  fonts,
+  space,
+} from "../../../../styles/tokens.stylex";
 
 import type { Entity } from "./entityPageData";
 
@@ -37,6 +39,18 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
   ) : null;
 
   return [
+    { label: "Region", value: location },
+    {
+      label: "Owned by",
+      value: entity.owner ? (
+        <AppLink
+          href={`/entities/${entity.owner.id}`}
+          {...stylex.props(styles.factLink)}
+        >
+          {entity.owner.name}
+        </AppLink>
+      ) : null,
+    },
     {
       label: "Website",
       value: entity.website ? (
@@ -50,8 +64,6 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
         </a>
       ) : null,
     },
-    { label: "Location", value: location },
-    { label: "Address", value: entity.address },
     { label: "Also known as", value: entity.shortName },
   ];
 }
@@ -64,16 +76,63 @@ export function EntityDetails({ entity }: { entity: Entity }) {
   const facts = getEntityFacts(entity);
   if (!hasVisibleFacts(facts)) return null;
 
+  const visibleFacts = facts.filter(
+    (fact) =>
+      fact.value !== null &&
+      fact.value !== undefined &&
+      fact.value !== "" &&
+      fact.value !== false &&
+      fact.value !== true,
+  );
+
   return (
-    <PageSection heading="Details">
-      <Card appearance="surface" padding="sm">
-        <FactList facts={facts} />
-      </Card>
-    </PageSection>
+    <dl {...stylex.props(styles.factGrid)}>
+      {visibleFacts.map((fact) => (
+        <div key={fact.label} {...stylex.props(styles.fact)}>
+          <dt {...stylex.props(styles.factLabel)}>{fact.label}</dt>
+          <dd {...stylex.props(styles.factValue)}>{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
 const styles = stylex.create({
+  factGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(auto-fit, minmax(160px, 1fr))",
+      "@media (max-width: 559px)": "minmax(0, 1fr)",
+    },
+    gap: space.x4,
+    margin: 0,
+    paddingTop: space.x4,
+    paddingBottom: space.x4,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  fact: {
+    minWidth: 0,
+  },
+  factLabel: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    letterSpacing: "0.04em",
+    lineHeight: 1.3,
+  },
+  factValue: {
+    minWidth: 0,
+    margin: 0,
+    marginTop: space.x1,
+    color: colors.ink,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    fontWeight: 700,
+    lineHeight: 1.35,
+    overflowWrap: "anywhere",
+  },
   factLink: {
     color: colors.accentDeep,
     outline: "none",

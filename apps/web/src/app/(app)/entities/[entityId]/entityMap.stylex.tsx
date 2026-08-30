@@ -36,6 +36,9 @@ export function EntityMap({ entity }: { entity: Entity }) {
   return (
     <PageSection heading="Where">
       <Card appearance="surface" padding="sm">
+        {entity.address ? (
+          <p {...stylex.props(styles.address)}>{entity.address}</p>
+        ) : null}
         <iframe
           loading="lazy"
           src={`https://www.openstreetmap.org/export/embed.html?${embedParams.toString()}`}
@@ -59,6 +62,14 @@ export function EntityMap({ entity }: { entity: Entity }) {
 }
 
 const styles = stylex.create({
+  address: {
+    margin: 0,
+    marginBottom: space.x3,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.45,
+  },
   mapFrame: {
     display: "block",
     width: "100%",

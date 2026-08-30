@@ -19,6 +19,7 @@ import {
   mockEntities,
   mockEntity,
   mockEntityCatalog,
+  mockEntityHistory,
   mockEvents,
   mockExternalReview,
   mockFlight,
@@ -88,6 +89,9 @@ describe("mock oRPC router", () => {
     await expect(
       anonymousClient.entities.details({ entity: mockEntity.id }),
     ).resolves.toEqual({ ...mockEntity, isFollowing: false });
+    await expect(
+      anonymousClient.entities.events.list({ entity: mockEntity.id }),
+    ).resolves.toEqual({ results: mockEntityHistory });
     const entities = await anonymousClient.entities.list({ limit: 100 });
     expect(entities.results).toHaveLength(mockEntities.length);
     expect(entities.results.every((entity) => entity.kind)).toBe(true);
