@@ -368,7 +368,7 @@ function getLibraryMetadata(bottle: LibraryEntry["bottle"]) {
     bottle.statedAge !== null
       ? `${bottle.statedAge} years`
       : bottle.noAgeStatement
-        ? "NAS"
+        ? "No age statement"
         : null,
     bottle.abv !== null
       ? `${bottle.abv.toFixed(1).replace(/\.0$/, "")}% ABV`

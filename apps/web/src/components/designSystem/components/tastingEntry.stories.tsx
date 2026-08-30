@@ -22,7 +22,7 @@ const meta = {
       },
       {
         href: "/bottles/ardbeg-uigeadail",
-        metadata: "Islay · NAS · 54.2% ABV",
+        metadata: "Islay · No age statement · 54.2% ABV",
         name: "Ardbeg Uigeadail",
         notes: ["Tar", "Raisin", "Espresso"],
         ratingBand: "good",

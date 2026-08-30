@@ -9,7 +9,7 @@ const meta = {
   args: {
     cells: [
       { label: "ABV", value: "43.0%" },
-      { label: "Age", value: "16 yr" },
+      { label: "Age", value: "16 years" },
       { label: "Cask", value: "ex-bourbon" },
       { label: "Size", value: "700 ml" },
     ],

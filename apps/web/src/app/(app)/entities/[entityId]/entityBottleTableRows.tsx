@@ -40,7 +40,7 @@ function formatBottleMetadata(bottle: Bottle) {
     bottle.statedAge !== null
       ? `${bottle.statedAge} years`
       : bottle.noAgeStatement
-        ? "NAS"
+        ? "No age statement"
         : null,
     bottle.abv !== null ? `${formatAbv(bottle.abv)}% ABV` : null,
   ]

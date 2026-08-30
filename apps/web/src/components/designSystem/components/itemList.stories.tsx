@@ -127,6 +127,12 @@ export const Overview: Story = {
           metadata="Japan · 12 years · 43.0% ABV"
           title="Yamazaki 12-year-old"
         />
+        <ItemRow
+          href="#blended-malt"
+          metadata="Glen Moray, Caol Ila, Glen Spey · 36 years · 52.4% ABV"
+          metadataWrap
+          title="Long release metadata"
+        />
       </ItemList>
     </StoryStack>
   ),

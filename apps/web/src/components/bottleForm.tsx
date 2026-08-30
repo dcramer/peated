@@ -392,8 +392,12 @@ export default function BottleForm({
     () =>
       [
         category ? formatCategoryName(category) : null,
-        noAgeStatement ? "NAS" : statedAge != null ? `${statedAge} yr` : null,
-        abv != null ? `${abv}%` : null,
+        noAgeStatement
+          ? "No age statement"
+          : statedAge != null
+            ? `${statedAge} years`
+            : null,
+        abv != null ? `${abv}% ABV` : null,
       ].filter((item): item is string => Boolean(item)),
     [abv, category, noAgeStatement, statedAge],
   );

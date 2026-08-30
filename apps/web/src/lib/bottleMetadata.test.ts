@@ -1,8 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { getBottleReviewMetadata } from "./bottleMetadata";
+import { getBottleMetadata, getBottleReviewMetadata } from "./bottleMetadata";
 
 describe("bottle metadata", () => {
+  it("spells out a missing age statement", () => {
+    expect(
+      getBottleMetadata({
+        abv: 43,
+        category: "single_malt",
+        noAgeStatement: true,
+        statedAge: null,
+      }),
+    ).toBe("Single Malt · No age statement · 43% ABV");
+  });
+
   it("keeps reviewed release facts out of the bottle name", () => {
     expect(
       getBottleReviewMetadata({

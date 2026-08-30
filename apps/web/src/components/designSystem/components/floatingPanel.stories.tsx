@@ -19,7 +19,7 @@ const meta = {
           Port Charlotte 10
         </strong>
         <span {...stylex.props(foundationStyles.metadata)}>
-          Islay · 10 yr · 50.0%
+          Islay · 10 years · 50.0% ABV
         </span>
       </StorySurfaceContent>
     ),
