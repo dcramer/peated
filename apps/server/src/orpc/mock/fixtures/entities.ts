@@ -2,7 +2,7 @@ import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
 import { mockCountries, mockCountry, mockRegion, mockRegions } from "./places";
 
-type Entity = MockOutputs["entities"]["details"];
+type Entity = MockOutputs["entities"]["list"]["results"][number];
 
 // Producers and bottles
 export const mockEntity = {
@@ -22,7 +22,6 @@ export const mockEntity = {
   location: [-6.126, 55.635],
   totalTastings: 1200,
   totalBottles: 84,
-  isFollowing: false,
   createdAt: timestamp,
   updatedAt: timestamp,
 } satisfies Entity;
