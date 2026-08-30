@@ -36,17 +36,19 @@ import type {
 export function PhotoUploadState({
   search,
   searchHref,
+  title,
   onSelectPhoto,
 }: {
   search?: ReactNode;
   searchHref: string;
+  title: string;
   onSelectPhoto: () => void;
 }) {
   return (
     <BottleResolverColumn>
       <BottleResolverIntroduction
         description="Search the database, or photograph the front label and we’ll look."
-        title="Add a bottle"
+        title={title}
       />
       {search ?? (
         <ButtonLink fullWidth href={searchHref} variant="accent">
@@ -290,7 +292,7 @@ export function PhotoMatchCreateState({
       <BottleResolverSection
         description={
           createProposalLabel?.description ??
-          "Create a new bottle from this label."
+          "Add a new bottle using this label."
         }
         title={proposedName ?? createProposalLabel?.title ?? "New bottle found"}
       >

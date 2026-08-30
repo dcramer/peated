@@ -3,7 +3,7 @@
 This file keeps its old path so existing links do not break. The Simple and
 Advanced rating switch no longer exists.
 
-## Record a tasting
+## Log a tasting
 
 A tasting is a quick record of one pour. A member can add notes, flavors,
 serving details, a photo, and an optional rating band:

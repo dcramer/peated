@@ -210,7 +210,7 @@ export function getCreateProposalLabel(result: PhotoIdentification | null) {
 
   return {
     title: "Bottle not in Peated",
-    description: "Create a new bottle from this label.",
+    description: "Add a new bottle using this label.",
   };
 }
 

@@ -92,6 +92,7 @@ function BottleResolverState({ state }: { state: ResolverState }) {
       onSelectPhoto={() => undefined}
       search={search}
       searchHref="#search"
+      title="Find a bottle"
     />
   );
 }

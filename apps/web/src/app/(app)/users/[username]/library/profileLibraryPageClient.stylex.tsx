@@ -238,7 +238,11 @@ export function ProfileLibraryPageClient({
               emptyAction={
                 isCurrentUser &&
                 !hasActiveFilters({ brand, distiller, query, status }) ? (
-                  <ButtonLink href="/addBottle" size="sm" variant="accent">
+                  <ButtonLink
+                    href="/addBottle?intent=library"
+                    size="sm"
+                    variant="accent"
+                  >
                     Add your first bottle
                   </ButtonLink>
                 ) : undefined
@@ -248,7 +252,7 @@ export function ProfileLibraryPageClient({
                   ? "No library bottles match these filters."
                   : isCurrentUser
                     ? "Track what you own, what you have finished, and what you want to open next."
-                    : `${user.username} has not recorded any library bottles.`
+                    : `${user.username} has not added any bottles to their Library.`
               }
               emptyHeading={
                 hasActiveFilters({ brand, distiller, query, status })
@@ -316,7 +320,7 @@ function toLibraryItem(
             items: [
               {
                 href: `/bottles/${bottle.id}/addTasting`,
-                label: "Record a tasting",
+                label: "Log a tasting",
               },
             ],
           },

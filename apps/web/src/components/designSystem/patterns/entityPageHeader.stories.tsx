@@ -16,7 +16,7 @@ const meta = {
   args: {
     actions: (
       <Button size="lg" variant="accent">
-        Record a bottle
+        Add a bottle
       </Button>
     ),
     description:

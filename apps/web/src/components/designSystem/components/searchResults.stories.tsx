@@ -11,8 +11,8 @@ const meta = {
     activeId: "bottle-872",
     contribution: {
       description: "Not the bottle you have? Add it to the catalog.",
-      href: "/addBottle?name=lagav",
-      label: "Record a bottle",
+      href: "/bottles/new?name=lagav&returnAction=catalog",
+      label: "Add a bottle",
     },
     groups: searchResultGroups,
     query: "lagav",
@@ -49,7 +49,7 @@ export const NoResults: Story = {
   args: {
     activeId: undefined,
     emptyText:
-      "Nothing matches “glenfarcls”. Check the spelling or record the bottle if it is missing.",
+      "Nothing matches “glenfarcls”. Check the spelling or add the bottle if it is missing.",
     groups: [],
     query: "glenfarcls",
   },

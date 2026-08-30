@@ -82,7 +82,7 @@ function HeaderExample({
             contribution={{
               description: "Not here?",
               href: "#record",
-              label: "Record this bottle",
+              label: "Add this bottle",
             }}
             defaultOpen
             groups={searchResultGroups}

@@ -76,7 +76,7 @@ export function EntityBottleListClient({
     <div {...stylex.props(styles.content)}>
       <BottleCatalogList
         emptyAction={emptyAction}
-        emptyDescription={`No bottles have been recorded for ${entityName} yet.`}
+        emptyDescription={`No bottles have been added for ${entityName} yet.`}
         emptyHeading="No bottles yet"
         items={bottleList.results.map(toBottleCatalogItem)}
         nextHref={getCursorHref(

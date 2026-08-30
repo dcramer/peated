@@ -1,18 +1,19 @@
 ## ADDED Requirements
 
-### Requirement: Add Bottle entry point
+### Requirement: Bottle flow entry point
 
-The system SHALL expose `/addBottle` as the user-facing Add Bottle flow for identifying a bottle before choosing a follow-up action.
+The system SHALL expose `/addBottle` as the shared flow for identifying a bottle before choosing a follow-up action.
 
-#### Scenario: Open Add Bottle
+#### Scenario: Open generic bottle flow
 
 - **WHEN** an authenticated user opens `/addBottle`
 - **THEN** the system displays a flow that lets the user scan a bottle label or search for a bottle
+- **AND** the flow title is Find a bottle
 
-#### Scenario: Manual catalog form is Create Bottle
+#### Scenario: Manual catalog form is Add a bottle
 
 - **WHEN** a user needs to manually create a catalog bottle
-- **THEN** the system routes the user to a Create Bottle form separate from the top-level Add Bottle flow
+- **THEN** the system routes the user to an Add a bottle form separate from the shared resolver
 
 ### Requirement: Bottle resolver outcomes
 
@@ -21,13 +22,13 @@ The system SHALL resolve scan, search, and manual creation paths into a bottle t
 #### Scenario: Existing bottle resolved
 
 - **WHEN** the resolver identifies an existing bottle or release
-- **THEN** the system shows actions to Add to Library, Log Tasting, and View Bottle
+- **THEN** the system shows actions to Add to Library, Log a tasting, and View bottle
 
 #### Scenario: Existing target already in Library
 
 - **WHEN** the resolver identifies a bottle or release that is already saved in the user's Library for that exact target
 - **THEN** the system shows the Library action as In Library
-- **AND** the Library action is disabled while Log Tasting and View Bottle remain available
+- **AND** the Library action is disabled while Log a tasting and View bottle remain available
 
 #### Scenario: No bottle resolved
 
@@ -38,7 +39,7 @@ The system SHALL resolve scan, search, and manual creation paths into a bottle t
 
 - **WHEN** photo identification proposes creating a bottle or release
 - **THEN** the system shows proposed bottle or release fields
-- **AND** the system offers Add to Library, Log Tasting, and Create Bottle actions
+- **AND** the system offers Add to Library, Log a tasting, and Add a bottle actions
 - **AND** each selected action creates or reuses the proposed target before continuing
 
 #### Scenario: Scan resolves source identity before catalog action
@@ -75,22 +76,36 @@ The system SHALL support intent parameters that prioritize a follow-up action wi
 
 #### Scenario: Library intent
 
-- **WHEN** the Add Bottle flow runs with Library intent and resolves an existing bottle
+- **WHEN** the bottle flow runs with Library intent and resolves an existing bottle
 - **THEN** Add to Library is the primary action
+- **AND** the flow title is Add to your Library
 
 #### Scenario: Tasting intent
 
-- **WHEN** the Add Bottle flow runs with tasting intent and resolves an existing bottle
-- **THEN** Log Tasting is the primary action
+- **WHEN** the bottle flow runs with tasting intent and resolves an existing bottle
+- **THEN** Log a tasting is the primary action
+- **AND** the flow title is Log a tasting
+
+#### Scenario: Catalog intent
+
+- **WHEN** the bottle flow runs with catalog intent and resolves an existing bottle
+- **THEN** View bottle is the primary action because the bottle is already in Peated
+- **AND** the flow title is Add a bottle
+
+#### Scenario: Catalog intent needs a new bottle
+
+- **WHEN** the bottle flow runs with catalog intent and resolves an approved create proposal
+- **THEN** Add a bottle is the primary action
 
 #### Scenario: Choose intent
 
-- **WHEN** the Add Bottle flow runs without a specific intent
-- **THEN** the system allows the user to choose among Add to Library, Log Tasting, and View Bottle when applicable
+- **WHEN** the bottle flow runs without a specific intent
+- **THEN** the system allows the user to choose among Add to Library, Log a tasting, and View bottle when applicable
+- **AND** the flow does not present one outcome as the user's stated intent
 
 ### Requirement: Library add confirmation
 
-The system SHALL show a terminal confirmation state after adding a bottle or release to Library from the Add Bottle flow.
+The system SHALL show a terminal confirmation state after adding a bottle or release to Library from the bottle flow.
 
 #### Scenario: Added to Library
 
@@ -102,29 +117,29 @@ The system SHALL show a terminal confirmation state after adding a bottle or rel
 - **WHEN** the user adds a resolved bottle or release to Library from a scan with a pending image
 - **THEN** the system saves the scan image as the Library entry image without requiring a second confirmation step
 
-#### Scenario: Add another bottle
+#### Scenario: Add another to Library
 
-- **WHEN** the user chooses Add Another Bottle from the Added to Library state
-- **THEN** the system clears resolver state and starts a fresh Add Bottle flow
+- **WHEN** the user chooses Add another to Library from the Added to Library state
+- **THEN** the system clears resolver state and starts a fresh Library-intent bottle flow
 
 #### Scenario: View Library
 
 - **WHEN** the user chooses View Library from the Added to Library state
 - **THEN** the system routes to the user's Library page
 
-### Requirement: Log Tasting language
+### Requirement: Log a tasting language
 
-The system SHALL use Log Tasting for user-facing tasting actions and titles in this flow and related navigation.
+The system SHALL use Log a tasting for user-facing tasting actions and titles in this flow and related navigation.
 
 #### Scenario: Tasting action copy
 
 - **WHEN** the system renders a user-facing action that starts a tasting form
-- **THEN** the visible action text uses Log Tasting instead of Add Tasting or Record Tasting
+- **THEN** the visible action text uses Log a tasting instead of Add Tasting or Record Tasting
 
 #### Scenario: Tasting form title
 
 - **WHEN** the system renders the tasting form for a new tasting
-- **THEN** the visible title uses Log Tasting
+- **THEN** the visible title uses Log a tasting
 
 ### Requirement: Catalog image approval during creation
 
@@ -159,7 +174,7 @@ The system SHALL require explicit user approval before a scan image is saved as 
 
 ### Requirement: Existing tasting deep links
 
-The system SHALL preserve existing bottle-scoped tasting deep links while user-facing copy changes to Log Tasting.
+The system SHALL preserve existing bottle-scoped tasting deep links while user-facing copy changes to Log a tasting.
 
 #### Scenario: Bottle-scoped tasting route
 
@@ -169,4 +184,4 @@ The system SHALL preserve existing bottle-scoped tasting deep links while user-f
 #### Scenario: Bottle-scoped tasting copy
 
 - **WHEN** the bottle-scoped tasting route renders visible tasting copy
-- **THEN** the copy uses Log Tasting
+- **THEN** the copy uses Log a tasting

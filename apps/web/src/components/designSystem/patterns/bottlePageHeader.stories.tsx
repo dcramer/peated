@@ -15,7 +15,7 @@ const meta = {
           Log a tasting
         </ButtonLink>
         <Button size="lg" variant="tonal">
-          Add to library
+          Add to Library
         </Button>
       </>
     ),
@@ -29,7 +29,7 @@ const meta = {
       <RowMenu
         groups={[
           [
-            { href: "#similar", label: "Add similar bottle" },
+            { href: "#similar", label: "Add a similar bottle" },
             { href: "#share", label: "Share" },
           ],
         ]}

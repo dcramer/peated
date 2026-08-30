@@ -55,7 +55,7 @@ import {
 } from "react";
 import { BadgeAwardMessage } from "./badgeAwardMessage.stylex";
 
-type AddBottleIntent = "choose" | "library" | "tasting" | "view";
+type AddBottleIntent = "catalog" | "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
 type FlowBottle = BottleResolverResult;
 type SuggestedTags = { results: TastingTagSuggestion[] };
@@ -66,14 +66,26 @@ type TastingDraft = FlowBottle & {
 };
 
 function getIntent(value: string | null): AddBottleIntent {
-  if (value === "library" || value === "tasting" || value === "view") {
+  if (
+    value === "catalog" ||
+    value === "library" ||
+    value === "tasting" ||
+    value === "view"
+  ) {
     return value;
   }
   return "choose";
 }
 
 function getCreateReturnAction(intent: AddBottleIntent) {
-  return intent === "choose" ? "addBottle" : intent;
+  return intent;
+}
+
+function getFlowTitle(intent: AddBottleIntent) {
+  if (intent === "catalog") return "Add a bottle";
+  if (intent === "library") return "Add to your Library";
+  if (intent === "tasting") return "Log a tasting";
+  return "Find a bottle";
 }
 
 function parseId(value: string | null) {
@@ -88,7 +100,7 @@ function getSearchHref(
   pendingImage?: PendingImageRef | null,
 ) {
   const params = new URLSearchParams({
-    intent: intent === "choose" ? "addBottle" : intent,
+    intent,
   });
   if (query) params.set("q", query);
   if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
@@ -113,8 +125,8 @@ function getLibraryActionLabel(state: {
   hasLibraryEntry: boolean;
   canSaveLibraryPhoto?: boolean;
 }) {
-  if (!state.hasLibraryEntry) return "Add to library";
-  return state.canSaveLibraryPhoto ? "Save photo" : "In library";
+  if (!state.hasLibraryEntry) return "Add to Library";
+  return state.canSaveLibraryPhoto ? "Save photo" : "In Library";
 }
 
 function BottlePanel({
@@ -145,9 +157,9 @@ function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
   );
 }
 
-function LoadingBottlePanel() {
+function LoadingBottlePanel({ title }: { title: string }) {
   return (
-    <WorkflowScreen title="Add bottle">
+    <WorkflowScreen title={title}>
       <LoadingList label="Loading bottle" rows={3} />
     </WorkflowScreen>
   );
@@ -162,12 +174,14 @@ function revokeBlobPreviewUrl(selection: FlowBottle) {
 function BottleLoadErrorPanel({
   message,
   onStartOver,
+  title,
 }: {
   message: string;
   onStartOver: () => void;
+  title: string;
 }) {
   return (
-    <WorkflowScreen title="Add bottle">
+    <WorkflowScreen title={title}>
       <FormStack>
         <FormNotice>{message}</FormNotice>
         <FormGrid>
@@ -245,11 +259,11 @@ function MatchedOutcomeActions({
   const primaryAction =
     intent === "tasting"
       ? "tasting"
-      : intent === "view"
+      : intent === "catalog" || intent === "view"
         ? "view"
-        : hasLibraryEntry && !canSaveLibraryPhoto
-          ? "tasting"
-          : "library";
+        : intent === "library"
+          ? "library"
+          : null;
   const libraryButton = (
     <OutcomeButton
       key="library"
@@ -275,7 +289,7 @@ function MatchedOutcomeActions({
       disabled={Boolean(resolvingAction)}
       loading={resolvingAction === "tasting"}
     >
-      Log tasting
+      Log a tasting
     </OutcomeButton>
   );
   const viewButton = (
@@ -291,7 +305,9 @@ function MatchedOutcomeActions({
   const actionButtons =
     intent === "tasting"
       ? [tastingButton, libraryButton, viewButton]
-      : [libraryButton, tastingButton, viewButton];
+      : intent === "catalog" || intent === "view"
+        ? [viewButton, libraryButton, tastingButton]
+        : [libraryButton, tastingButton, viewButton];
   const [primaryButton, ...secondaryButtons] = actionButtons;
 
   return (
@@ -310,7 +326,13 @@ function CreateProposalOutcomeActions({
 }: BottleResolverCreateProposalActionsProps & { intent: AddBottleIntent }) {
   const creating = createPending || Boolean(resolvingAction);
   const primaryAction =
-    intent === "tasting" ? "tasting" : intent === "view" ? "create" : "library";
+    intent === "tasting"
+      ? "tasting"
+      : intent === "catalog" || intent === "view"
+        ? "create"
+        : intent === "library"
+          ? "library"
+          : null;
   const libraryButton = (
     <OutcomeButton
       key="library"
@@ -320,7 +342,7 @@ function CreateProposalOutcomeActions({
       disabled={creating}
       loading={resolvingAction === "library"}
     >
-      Add to library
+      Add to Library
     </OutcomeButton>
   );
   const tastingButton = (
@@ -332,7 +354,7 @@ function CreateProposalOutcomeActions({
       disabled={creating}
       loading={resolvingAction === "tasting"}
     >
-      Log tasting
+      Log a tasting
     </OutcomeButton>
   );
   const createButton = (
@@ -344,13 +366,13 @@ function CreateProposalOutcomeActions({
       disabled={creating}
       loading={resolvingAction === "create"}
     >
-      Add bottle
+      Add a bottle
     </OutcomeButton>
   );
   const actionButtons =
     intent === "tasting"
       ? [tastingButton, libraryButton, createButton]
-      : intent === "view"
+      : intent === "catalog" || intent === "view"
         ? [createButton, libraryButton, tastingButton]
         : [libraryButton, tastingButton, createButton];
   const [primaryButton, ...secondaryButtons] = actionButtons;
@@ -383,7 +405,7 @@ function OutcomeSelection({
   error?: string;
 }) {
   const wasCreated = selection.resultSource === "created";
-  const title = wasCreated ? "Bottle created" : "Bottle found";
+  const title = wasCreated ? "Bottle added" : "Bottle found";
   const description = wasCreated
     ? "Choose what you want to do next."
     : "Choose what you want to do with this bottle.";
@@ -391,11 +413,11 @@ function OutcomeSelection({
   const primaryAction =
     intent === "tasting"
       ? "tasting"
-      : intent === "view"
+      : intent === "catalog" || intent === "view"
         ? "view"
-        : canSaveLibrary
+        : intent === "library" && canSaveLibrary
           ? "library"
-          : "tasting";
+          : null;
   const libraryButton = (
     <OutcomeButton
       key="library"
@@ -422,7 +444,7 @@ function OutcomeSelection({
       disabled={loggingTasting}
       loading={loggingTasting}
     >
-      Log tasting
+      Log a tasting
     </OutcomeButton>
   );
   const viewButton = (
@@ -438,10 +460,12 @@ function OutcomeSelection({
   const actionButtons =
     intent === "tasting"
       ? [tastingButton, libraryButton, viewButton]
-      : [libraryButton, tastingButton, viewButton];
+      : intent === "catalog" || intent === "view"
+        ? [viewButton, libraryButton, tastingButton]
+        : [libraryButton, tastingButton, viewButton];
 
   return (
-    <WorkflowScreen title="Add bottle">
+    <WorkflowScreen title={getFlowTitle(intent)}>
       <FormStack>
         <BottlePanel
           bottle={selection.bottle}
@@ -497,7 +521,7 @@ function AddedToLibrary({
   updatingStatus?: boolean;
 }) {
   return (
-    <WorkflowScreen title="Add bottle">
+    <WorkflowScreen title="Add to your Library">
       <FormStack>
         <FormSection
           description="This bottle is now saved in your Library."
@@ -520,7 +544,7 @@ function AddedToLibrary({
             fullWidth
           >
             <Wine aria-hidden="true" size={16} />
-            Log tasting
+            Log a tasting
           </ButtonLink>
           <ButtonLink
             href={getViewBottleHref(entry.bottle)}
@@ -532,7 +556,7 @@ function AddedToLibrary({
           </ButtonLink>
           <Button fullWidth onClick={onAddAnother} variant="tonal">
             <Plus aria-hidden="true" size={16} />
-            Add another bottle
+            Add another to Library
           </Button>
           <ButtonLink fullWidth href={userLibraryHref} variant="tonal">
             <BookOpen aria-hidden="true" size={16} />
@@ -558,6 +582,7 @@ function AddBottleFlowContent() {
   const { user } = useAuth();
   const { flash } = useFlashMessages();
   const intent = getIntent(searchParams.get("intent"));
+  const flowTitle = getFlowTitle(intent);
   const requestedBottleId = parseId(searchParams.get("bottle"));
   const requestedResultSource =
     searchParams.get("resultSource") === "created" ? "created" : undefined;
@@ -724,7 +749,7 @@ function AddBottleFlowContent() {
     requestedResultSource,
   ]);
 
-  function startOver() {
+  function resetFlow(nextIntent: AddBottleIntent) {
     setSelectedBottle(null);
     setLibraryError(undefined);
     setAddedEntry(null);
@@ -733,7 +758,15 @@ function AddBottleFlowContent() {
     setTastingLoadError(undefined);
     setBottleLoadError(null);
     setLoadedBottleKey(requestedBottleKey);
-    router.replace("/addBottle");
+    router.replace(getAddBottleHref({ intent: nextIntent }));
+  }
+
+  function startOver() {
+    resetFlow(intent);
+  }
+
+  function addAnotherToLibrary() {
+    resetFlow("library");
   }
 
   async function startLogTasting(selection: FlowBottle) {
@@ -937,12 +970,16 @@ function AddBottleFlowContent() {
   }
 
   if (loadingBottle) {
-    return <LoadingBottlePanel />;
+    return <LoadingBottlePanel title={flowTitle} />;
   }
 
   if (bottleLoadError) {
     return (
-      <BottleLoadErrorPanel message={bottleLoadError} onStartOver={startOver} />
+      <BottleLoadErrorPanel
+        message={bottleLoadError}
+        onStartOver={startOver}
+        title={flowTitle}
+      />
     );
   }
 
@@ -952,7 +989,7 @@ function AddBottleFlowContent() {
         entry={addedEntry}
         userLibraryHref={userLibraryHref}
         photoTrace={addedEntryPhotoTrace}
-        onAddAnother={startOver}
+        onAddAnother={addAnotherToLibrary}
         onStatusChange={(status) => void updateAddedEntryStatus(status)}
         statusError={libraryError}
         updatingStatus={libraryStatusUpdateMutation.isPending}
@@ -963,7 +1000,7 @@ function AddBottleFlowContent() {
   if (tastingDraft) {
     return (
       <TastingForm
-        title="Log tasting"
+        title="Log a tasting"
         initialData={{
           bottle: tastingDraft.bottle,
           imageUrl: tastingDraft.pendingImage?.imageUrl,
@@ -996,7 +1033,7 @@ function AddBottleFlowContent() {
 
   return (
     <BottleResolver
-      title="Add bottle"
+      title={flowTitle}
       search={
         <BottleSearch
           getBottleHref={inlineBottleHref}
@@ -1023,7 +1060,7 @@ function AddBottleFlowContent() {
           pendingImage,
         })
       }
-      createProposalActionLabel="Add bottle"
+      createProposalActionLabel="Add a bottle"
       searchActionLabel="Search bottles"
       renderMatchedResultActions={(props) => (
         <MatchedOutcomeActions {...props} intent={intent} />
@@ -1037,7 +1074,7 @@ function AddBottleFlowContent() {
 }
 
 /**
- * Owns the standalone Add Bottle route: auth-gated resolution, direct
+ * Owns the standalone Bottle flow route: auth-gated resolution, direct
  * Bottle and legacy-release query parameters, direct Library saves, and tasting continuation
  * stay in this flow so scan image reuse remains attached to the user's action.
  */

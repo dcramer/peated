@@ -7,7 +7,7 @@ const meta = {
   title: "Components/Actions/Button",
   component: Button,
   args: {
-    children: "Record a bottle",
+    children: "Add a bottle",
     size: "md",
     variant: "default",
   },
@@ -30,7 +30,7 @@ export const Overview: Story = {
         <Button {...args} />
         <Button variant="tonal">Browse database</Button>
         <Button variant="accent">Save tasting</Button>
-        <Button variant="text">Record this bottle</Button>
+        <Button variant="text">Add this bottle</Button>
       </StoryRow>
       <StoryRow>
         {(["sm", "md", "lg"] as const).map((size) => (

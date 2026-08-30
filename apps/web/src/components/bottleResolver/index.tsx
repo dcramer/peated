@@ -211,7 +211,7 @@ export default function BottleResolver({
     try {
       if (!result.createToken) {
         setError(
-          "We couldn't create that bottle from the photo. Search for the bottle to keep going.",
+          "We couldn't add that bottle from the photo. Search for the bottle to keep going.",
         );
         return;
       }
@@ -229,7 +229,7 @@ export default function BottleResolver({
           warnings: (created.warnings ?? []).map(
             (warning) =>
               warning.message ||
-              "The bottle was created, but the public image was not saved.",
+              "The bottle was added, but the public image was not saved.",
           ),
         },
         action,
@@ -239,7 +239,7 @@ export default function BottleResolver({
 
       logError(err);
       setError(
-        "We couldn't create that bottle from the photo. Search for the bottle to keep going.",
+        "We couldn't add that bottle from the photo. Search for the bottle to keep going.",
       );
     } finally {
       setResolvingAction(null);
@@ -406,6 +406,7 @@ export default function BottleResolver({
           <PhotoUploadState
             search={search}
             searchHref={defaultSearchHref}
+            title={title}
             onSelectPhoto={() => fileInputRef.current?.click()}
           />
         )}
@@ -485,7 +486,7 @@ export default function BottleResolver({
                 title={matchedBottle ? "Not the right bottle?" : undefined}
                 description={
                   matchedBottle
-                    ? "Search for the correct bottle or create a new one using the details from this label."
+                    ? "Search for the correct bottle or add a new one using the details from this label."
                     : undefined
                 }
               />

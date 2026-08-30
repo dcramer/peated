@@ -208,9 +208,7 @@ export function EntityPageFrameClient({
             <>
               {createBottleHref ? (
                 <ButtonLink href={createBottleHref} size="lg" variant="accent">
-                  {presentation.bottleSectionLabel === "Bottlings"
-                    ? "Record a bottling"
-                    : "Record a bottle"}
+                  Add a bottle
                 </ButtonLink>
               ) : null}
               {entity.kind === "distillery" ? (

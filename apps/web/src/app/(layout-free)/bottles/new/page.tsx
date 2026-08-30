@@ -17,7 +17,7 @@ import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { mergeCreateBottleInitialData } from "./createBottleInitialData";
 
-type ReturnAction = "addBottle" | "library" | "tasting" | "view";
+type ReturnAction = "catalog" | "choose" | "library" | "tasting" | "view";
 
 interface NameChoice {
   id?: number;
@@ -37,9 +37,14 @@ function getNameChoice(
 
 function getReturnAction(value: string | null): ReturnAction | null {
   if (value === "addBottle" || value === "choose") {
-    return "addBottle";
+    return "choose";
   }
-  if (value === "library" || value === "tasting" || value === "view") {
+  if (
+    value === "catalog" ||
+    value === "library" ||
+    value === "tasting" ||
+    value === "view"
+  ) {
     return value;
   }
   return null;
@@ -224,7 +229,7 @@ function CreateBottleForm() {
 
   if (loading) {
     return (
-      <WorkflowLoading label="Loading bottle details" title="Add Bottle" />
+      <WorkflowLoading label="Loading bottle details" title="Add a bottle" />
     );
   }
 
@@ -277,7 +282,7 @@ function CreateBottleForm() {
               },
             });
             flash(
-              "The bottle was created, but it could not be added to your Library.",
+              "The bottle was added to Peated, but it could not be added to your Library.",
               "error",
             );
           }
@@ -292,13 +297,14 @@ function CreateBottleForm() {
           );
         } else if (returnAction === "view") {
           router.replace(`/bottles/${createdBottle.id}`);
-        } else if (returnAction === "addBottle") {
+        } else if (returnAction === "catalog" || returnAction === "choose") {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
               resultSource: "created",
+              intent: returnAction,
             }),
           );
         } else if (returnAction === "tasting") {
@@ -314,18 +320,12 @@ function CreateBottleForm() {
         } else if (returnTo) {
           router.push(returnTo);
         } else {
-          router.replace(
-            getAddBottleHref({
-              bottleId: createdBottle.id,
-              resultSource: "created",
-              intent: "tasting",
-            }),
-          );
+          router.replace(`/bottles/${createdBottle.id}`);
         }
       }}
       initialData={initialData}
-      title="Add Bottle"
-      saveLabel="Add Bottle"
+      title="Add a bottle"
+      saveLabel="Add a bottle"
       returnTo={returnTo}
     />
   );

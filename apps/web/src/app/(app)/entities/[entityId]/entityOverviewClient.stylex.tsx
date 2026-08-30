@@ -181,8 +181,7 @@ function EntityBottleOverview({
 
   if (!bottleList?.results.length) {
     const isBottling = presentation.bottleSectionLabel === "Bottlings";
-    const bottleNoun = isBottling ? "bottling" : "bottle";
-    const recordHref =
+    const addBottleHref =
       createBottleHref ??
       `/bottles/new?${new URLSearchParams({
         returnTo: `/entities/${entity.id}`,
@@ -192,14 +191,14 @@ function EntityBottleOverview({
       <PageSection heading={presentation.bottleSectionLabel}>
         <EmptyState
           action={
-            <ButtonLink href={recordHref} size="sm" variant="accent">
-              Record a {bottleNoun}
+            <ButtonLink href={addBottleHref} size="sm" variant="accent">
+              Add a bottle
             </ButtonLink>
           }
           heading={isBottling ? "No bottlings yet" : "No bottles yet"}
         >
-          No {presentation.bottleSectionLabel.toLowerCase()} have been recorded
-          for {entity.name} yet.
+          No {presentation.bottleSectionLabel.toLowerCase()} have been added for
+          {entity.name} yet.
         </EmptyState>
       </PageSection>
     );

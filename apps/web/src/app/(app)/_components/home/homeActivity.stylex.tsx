@@ -217,7 +217,7 @@ export function HomeActivity({
         }
         heading="No recent activity"
       >
-        No one has recorded a tasting or updated a library recently.
+        No recent tastings or Library updates.
       </EmptyState>
     );
   }

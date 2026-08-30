@@ -9,7 +9,7 @@ const meta = {
   component: IconButton,
   args: {
     icon: <Plus aria-hidden size={17} />,
-    label: "Add bottle",
+    label: "Add a bottle",
     size: "md",
     variant: "tonal",
   },
@@ -34,7 +34,7 @@ export const Overview: Story = {
         <IconButton icon={<Search aria-hidden size={17} />} label="Search" />
         <IconButton
           icon={<Plus aria-hidden size={17} />}
-          label="Add bottle"
+          label="Add a bottle"
           variant="accent"
         />
         <IconButton
@@ -46,19 +46,19 @@ export const Overview: Story = {
       <StoryRow>
         <IconButton
           icon={<Plus aria-hidden size={14} />}
-          label="Small add bottle"
+          label="Add a bottle, small"
           size="sm"
         />
         <IconButton
           icon={<Plus aria-hidden size={20} />}
-          label="Large add bottle"
+          label="Add a bottle, large"
           size="lg"
           variant="accent"
         />
         <IconButton
           disabled
           icon={<Plus aria-hidden size={17} />}
-          label="Add bottle unavailable"
+          label="Add a bottle unavailable"
         />
       </StoryRow>
     </StoryStack>

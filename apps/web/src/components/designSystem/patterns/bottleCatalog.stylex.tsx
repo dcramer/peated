@@ -118,8 +118,12 @@ export function BottleCatalogList({
                 Clear filters
               </Button>
             ) : (
-              <ButtonLink href="/addBottle" size="sm" variant="tonal">
-                Record a bottle
+              <ButtonLink
+                href="/addBottle?intent=catalog"
+                size="sm"
+                variant="tonal"
+              >
+                Add a bottle
               </ButtonLink>
             ))
           }

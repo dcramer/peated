@@ -79,7 +79,7 @@ function RegistrationShell() {
           points={[
             "Log a dram in three taps, then add a note when you want one.",
             "Keep the bottles you own, have open, or are hunting.",
-            "Record a missing bottling and publish it to the shared database.",
+            "Add a missing bottle to the shared database.",
           ]}
           title="An account is a shelf and a record."
         />

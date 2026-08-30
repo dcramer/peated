@@ -46,7 +46,7 @@ export default async function EntityBottlesPage(props: {
           size="sm"
           variant="accent"
         >
-          Record a bottle
+          Add a bottle
         </ButtonLink>
       }
       entityId={entity.id}

@@ -18,7 +18,7 @@ import { foundationStyles } from "../../../styles/foundations.stylex";
 import { space } from "../../../styles/tokens.stylex";
 
 const addBottleIntents = [
-  "addBottle",
+  "catalog",
   "choose",
   "library",
   "tasting",
@@ -26,6 +26,7 @@ const addBottleIntents = [
 ] as const satisfies readonly AddBottleRouteIntent[];
 
 function getAddBottleIntent(value: string | null) {
+  if (value === "addBottle") return "choose";
   return addBottleIntents.find((intent) => intent === value);
 }
 
@@ -33,8 +34,13 @@ function getCreateReturnAction(
   intent: AddBottleRouteIntent | undefined,
   directToTasting: boolean,
 ) {
-  if (intent === "choose" || intent === "addBottle") return "addBottle";
-  if (intent === "library" || intent === "tasting" || intent === "view") {
+  if (
+    intent === "catalog" ||
+    intent === "choose" ||
+    intent === "library" ||
+    intent === "tasting" ||
+    intent === "view"
+  ) {
     return intent;
   }
   return directToTasting ? "tasting" : undefined;
@@ -50,11 +56,12 @@ function getTitle({
   memberSearch: boolean;
 }) {
   if (memberSearch) return "Find members";
-  if (intent === "library") return "Choose a bottle for your Library";
+  if (intent === "catalog") return "Add a bottle";
+  if (intent === "library") return "Add to your Library";
   if (intent === "tasting" || directToTasting) {
-    return "Choose a bottle to taste";
+    return "Log a tasting";
   }
-  if (intent) return "Choose a bottle";
+  if (intent) return "Find a bottle";
   return "Search";
 }
 

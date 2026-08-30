@@ -65,7 +65,7 @@ export function EntityTastingListClient({
           }
           heading="No tastings yet"
         >
-          No one has recorded a tasting connected to {entityName} yet.
+          No one has logged a tasting connected to {entityName} yet.
         </EmptyState>
       )}
       <CursorPager

@@ -85,7 +85,7 @@ test.describe("log tasting", () => {
       page.getByRole("heading", { name: "Check the bottle" }),
     ).toBeVisible();
 
-    await page.getByRole("button", { name: "Log Tasting" }).click();
+    await page.getByRole("button", { name: "Log a tasting" }).click();
 
     await chooseVeryGood(page);
     await fillComments(page, photoTastingNotes);
@@ -111,7 +111,7 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "Check the bottle" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Log Tasting" }).click();
+    await page.getByRole("button", { name: "Log a tasting" }).click();
 
     await chooseVeryGood(page);
     await fillComments(page, failingTastingNotes);

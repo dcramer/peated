@@ -1782,7 +1782,7 @@ function buildDirectBottleProposal() {
 }
 
 /**
- * Builds the no-match photo-identification RPC fixture for Add Bottle fallback tests.
+ * Builds the no-match photo-identification RPC fixture for bottle resolver fallback tests.
  */
 function buildNoMatchPhotoIdentification() {
   return {

@@ -140,8 +140,8 @@ export function BottleCatalogPageClient({
   return (
     <CatalogPage
       action={
-        <ButtonLink href="/addBottle" size="md" variant="tonal">
-          Record a bottle
+        <ButtonLink href="/addBottle?intent=catalog" size="md" variant="tonal">
+          Add a bottle
         </ButtonLink>
       }
       filters={
