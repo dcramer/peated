@@ -92,11 +92,11 @@ export function PhotoFailurePanel({
         <PhotoPreview
           metadata={
             isError
-              ? "We couldn't read enough from this image"
-              : "No bottle selected"
+              ? "We couldn't read enough from this photo"
+              : "Details read from this photo"
           }
           src={previewUrl}
-          title="Your label photo"
+          title="Label photo"
         />
       ) : null}
       {isError ? <FormNotice role="alert">{description}</FormNotice> : null}
