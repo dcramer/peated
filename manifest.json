@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/server/migrations/0251_wide_the_twelve.sql",
+    "apps/server/migrations/0252_purple_marvel_apes.sql",
+    "apps/server/migrations/meta/0251_snapshot.json",
+    "apps/server/migrations/meta/0252_snapshot.json",
+    "apps/server/migrations/meta/_journal.json",
+    "apps/server/src/db/schema/entities.ts",
+    "apps/server/src/lib/entityImages.ts",
+    "apps/server/src/orpc/mock/router.test.ts",
+    "apps/server/src/orpc/mock/routes/entities/details.ts",
+    "apps/server/src/orpc/routes/entities/delete.ts",
+    "apps/server/src/orpc/routes/entities/details.test.ts",
+    "apps/server/src/orpc/routes/entities/details.ts",
+    "apps/server/src/orpc/routes/entities/images/create.ts",
+    "apps/server/src/orpc/routes/entities/images/delete.ts",
+    "apps/server/src/orpc/routes/entities/images/images.test.ts",
+    "apps/server/src/orpc/routes/entities/images/index.ts",
+    "apps/server/src/orpc/routes/entities/images/update.ts",
+    "apps/server/src/orpc/routes/entities/index.ts",
+    "apps/server/src/schemas/entities.ts",
+    "apps/server/src/serializers/entityImage.ts"
+  ],
+  "commitSha": "ecfd1e341e63abf628c38e01d01edc6b7be42f78",
+  "scenarioIds": [
+    "home",
+    "bottle-detail",
+    "member-profile",
+    "add-tasting"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    },
+    {
+      "file": "add-tasting__desktop.png",
+      "label": "Log a tasting · desktop"
+    },
+    {
+      "file": "add-tasting__mobile.png",
+      "label": "Log a tasting · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
