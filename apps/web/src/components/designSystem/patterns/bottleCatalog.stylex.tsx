@@ -4,7 +4,6 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 import { useId } from "react";
 
-import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
 import {
   BottleIdentityRow,
@@ -18,13 +17,13 @@ import {
   ItemList,
   ItemListItem,
   ListToolbar,
-  LoadingList,
   RatingMeasure,
   Select,
   TextInput,
   type BandCounts,
   type ListSortOption,
 } from "../components";
+import { CatalogPageLoading } from "./catalogPage.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (max-width: 759px)";
@@ -296,14 +295,7 @@ function FilterSelect({
 }
 
 export function BottleCatalogLoading() {
-  return (
-    <section aria-label="Bottle catalog" {...stylex.props(styles.catalog)}>
-      <h1 {...stylex.props(foundationStyles.pageTitle)}>Bottles</h1>
-      <div {...stylex.props(styles.loading)}>
-        <LoadingList label="Loading bottles" rows={4} />
-      </div>
-    </section>
-  );
+  return <CatalogPageLoading title="Bottles" />;
 }
 
 const styles = stylex.create({
@@ -342,8 +334,5 @@ const styles = stylex.create({
     [NARROW]: {
       gridColumn: "1 / -1",
     },
-  },
-  loading: {
-    marginTop: space.x6,
   },
 });

@@ -10,6 +10,7 @@ import {
   effects,
   fonts,
 } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 
 const PHONE = "@media (max-width: 480px)";
 
@@ -93,7 +94,7 @@ export function RowMenu({
                   >
                     {({ disabled, focus }) =>
                       item.href ? (
-                        <a
+                        <AppLink
                           href={item.href}
                           {...stylex.props(
                             styles.item,
@@ -102,7 +103,7 @@ export function RowMenu({
                           )}
                         >
                           {item.label}
-                        </a>
+                        </AppLink>
                       ) : (
                         <button
                           onClick={item.onSelect}

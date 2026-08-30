@@ -16,6 +16,7 @@ import {
   requireReleaseFamilyAnchor,
   requireReleaseFamilyGroup,
 } from "@peated/web/lib/releaseFamily";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { BottleSection } from "../bottleSection.stylex";
 
@@ -60,7 +61,10 @@ export default async function BottleReleasesPage(props: {
             <ItemListItem key={bottle.id}>
               <BottleIdentityRow
                 brand={bottle.brand.name}
-                brandHref={`/entities/${bottle.brand.id}`}
+                brandHref={getEntityUrl({
+                  id: bottle.brand.id,
+                  kind: "brand",
+                })}
                 end={
                   bottle.medianScore !== null && bottle.scoreCount >= 20
                     ? `${bottle.medianScore} / 100`

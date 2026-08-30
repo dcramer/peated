@@ -9,6 +9,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import { ButtonLink, IconButton } from "./button.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 
@@ -175,12 +176,12 @@ export function RailListItem({
       <div {...stylex.props(styles.railRow)}>
         <div {...stylex.props(styles.railCopy)}>
           {href ? (
-            <a
+            <AppLink
               href={href}
               {...stylex.props(styles.railTitle, styles.railTitleLink)}
             >
               {title}
-            </a>
+            </AppLink>
           ) : (
             <span {...stylex.props(styles.railTitle)}>{title}</span>
           )}

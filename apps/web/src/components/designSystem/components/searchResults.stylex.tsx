@@ -8,6 +8,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import { Button } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { RatingMeasure, type BandCounts } from "./scoring.stylex";
@@ -141,7 +142,7 @@ export function SearchResults({
       {visibleContribution ? (
         <>
           <div aria-hidden="true" {...stylex.props(styles.contributionRule)} />
-          <a
+          <AppLink
             href={visibleContribution.href}
             {...stylex.props(styles.contribution)}
           >
@@ -151,7 +152,7 @@ export function SearchResults({
             <strong {...stylex.props(styles.contributionAction)}>
               {visibleContribution.label} →
             </strong>
-          </a>
+          </AppLink>
         </>
       ) : null}
     </div>
@@ -206,7 +207,7 @@ function SearchResultsGroup({
       <ul {...stylex.props(styles.list)}>
         {group.items.map((item) => (
           <li key={item.id} {...stylex.props(styles.listItem)}>
-            <a
+            <AppLink
               href={item.href}
               id={
                 optionIdPrefix
@@ -245,19 +246,19 @@ function SearchResultsGroup({
                   <ResultMeasures measures={item.measures} />
                 </span>
               ) : null}
-            </a>
+            </AppLink>
           </li>
         ))}
       </ul>
       {group.moreHref ? (
-        <a href={group.moreHref} {...stylex.props(styles.more)}>
+        <AppLink href={group.moreHref} {...stylex.props(styles.more)}>
           <span>
             {remaining === undefined || remaining === 0
               ? "More results"
               : `${remaining.toLocaleString("en-US")} more ${group.label.toLowerCase()}`}
           </span>
           <strong>{group.moreLabel ?? "See all"} →</strong>
-        </a>
+        </AppLink>
       ) : null}
     </section>
   );

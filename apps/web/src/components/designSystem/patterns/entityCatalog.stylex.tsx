@@ -2,7 +2,6 @@
 
 import * as stylex from "@stylexjs/stylex";
 
-import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
 import {
   Button,
@@ -15,9 +14,9 @@ import {
   ItemList,
   ItemRow,
   ListToolbar,
-  LoadingList,
   type ListSortOption,
 } from "../components";
+import { CatalogPageLoading } from "./catalogPage.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -184,14 +183,7 @@ export function EntityCatalogFilters({
 }
 
 export function EntityCatalogLoading({ title }: { title: string }) {
-  return (
-    <section aria-label={`${title} catalog`} {...stylex.props(styles.catalog)}>
-      <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
-      <div {...stylex.props(styles.loading)}>
-        <LoadingList label={`Loading ${title.toLowerCase()}`} rows={4} />
-      </div>
-    </section>
-  );
+  return <CatalogPageLoading title={title} />;
 }
 
 const styles = stylex.create({
@@ -242,8 +234,5 @@ const styles = stylex.create({
     [COMPACT]: {
       display: "none",
     },
-  },
-  loading: {
-    marginTop: space.x6,
   },
 });

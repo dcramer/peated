@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { LoadingList, LoadingPlaceholder } from "../components";
 
 const NARROW = "@media (max-width: 759px)";
 
@@ -33,6 +34,20 @@ export function CatalogPage({
         <aside {...stylex.props(styles.filters)}>{filters}</aside>
       </div>
     </div>
+  );
+}
+
+export function CatalogPageLoading({ title }: { title: ReactNode }) {
+  return (
+    <CatalogPage
+      filters={<LoadingList label="Loading catalog filters" rows={4} />}
+      title={title}
+    >
+      <div {...stylex.props(styles.loadingResults)}>
+        <LoadingPlaceholder preset="heading" />
+        <LoadingList label="Loading catalog records" rows={4} />
+      </div>
+    </CatalogPage>
   );
 }
 
@@ -71,6 +86,12 @@ const styles = stylex.create({
   },
   results: {
     minWidth: 0,
+  },
+  loadingResults: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x4,
   },
   filters: {
     minWidth: 0,

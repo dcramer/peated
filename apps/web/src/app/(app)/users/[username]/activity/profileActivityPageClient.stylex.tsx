@@ -27,6 +27,7 @@ import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useProfile } from "../profileContext";
 
 type Activity = Outputs["users"]["activity"]["list"]["results"][number];
@@ -150,7 +151,10 @@ function toActivityItem(activity: Activity): MemberActivityItem {
         id: activity.id,
         items: activity.items.map((entry) => ({
           brand: entry.bottle.brand.shortName || entry.bottle.brand.name,
-          brandHref: `/entities/${entry.bottle.brand.id}`,
+          brandHref: getEntityUrl({
+            id: entry.bottle.brand.id,
+            kind: "brand",
+          }),
           href: `/bottles/${entry.bottle.id}`,
           id: String(entry.id),
           imageUrl: entry.imageUrl ?? entry.bottle.imageUrl,

@@ -4,6 +4,7 @@ import type { BottleCatalogItem } from "@peated/web/components/designSystem/patt
 
 import { getBottleExpressionName } from "./bottleLabel";
 import { getReleaseFamilyHref } from "./releaseFamily";
+import { getEntityUrl } from "./urls";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
@@ -23,7 +24,7 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
   return {
     bandCounts: bottle.tastingBandCounts,
     brand: bottle.brand.name,
-    brandHref: `/entities/${bottle.brand.id}`,
+    brandHref: getEntityUrl({ id: bottle.brand.id, kind: "brand" }),
     hasTasted: bottle.hasTasted,
     href: `/bottles/${bottle.id}`,
     id: bottle.peatedId,

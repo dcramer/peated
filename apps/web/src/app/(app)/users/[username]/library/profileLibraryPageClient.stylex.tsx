@@ -22,6 +22,7 @@ import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLa
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
 import { useProfile } from "../profileContext";
 
@@ -347,7 +348,7 @@ function toLibraryItem(
         ]
       : undefined,
     brand: bottle.brand.shortName || bottle.brand.name,
-    brandHref: `/entities/${bottle.brand.id}`,
+    brandHref: getEntityUrl({ id: bottle.brand.id, kind: "brand" }),
     href: `/bottles/${bottle.id}`,
     id: String(entry.id),
     imageUrl: entry.imageUrl ?? bottle.imageUrl,

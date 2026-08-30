@@ -3,6 +3,7 @@ import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { EntityBottleListClient } from "./entityBottleListClient.stylex";
 
@@ -40,7 +41,7 @@ export default async function EntityBottlesPage(props: {
           href={
             createBottleHref ??
             `/bottles/new?${new URLSearchParams({
-              returnTo: `/entities/${entity.id}/bottles`,
+              returnTo: `${getEntityUrl(entity)}/bottles`,
             }).toString()}`
           }
           size="sm"

@@ -13,6 +13,7 @@ import {
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -156,7 +157,7 @@ function bottleItem(
 
 function entityItem(entity: EntitySearchResult) {
   return {
-    href: `/entities/${entity.id}`,
+    href: getEntityUrl(entity),
     id: `entity-${entity.id}`,
     metadata: entity.region?.name,
     title: entity.name,

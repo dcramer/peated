@@ -1,10 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
-import type { AnchorHTMLAttributes } from "react";
 
 import { colors, effects, fonts } from "../../../styles/tokens.stylex";
+import { AppLink, type AppLinkProps } from "./appLink";
 
 export type TextLinkProps = Omit<
-  AnchorHTMLAttributes<HTMLAnchorElement>,
+  AppLinkProps,
   "href" | "className" | "style"
 > & {
   href: string;
@@ -19,13 +19,13 @@ export function TextLink({
   ...props
 }: TextLinkProps) {
   return (
-    <a
+    <AppLink
       href={href}
       {...props}
       {...stylex.props(styles.link, size === "sm" && styles.small)}
     >
       {children}
-    </a>
+    </AppLink>
   );
 }
 

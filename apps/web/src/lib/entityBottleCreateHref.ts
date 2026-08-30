@@ -1,5 +1,7 @@
 import type { EntityKind } from "@peated/server/types";
 
+import { getEntityUrl } from "./urls";
+
 export function getEntityBottleCreateHref({
   id,
   kind,
@@ -7,7 +9,7 @@ export function getEntityBottleCreateHref({
   id: number;
   kind: EntityKind | null;
 }) {
-  const params = new URLSearchParams({ returnTo: `/entities/${id}` });
+  const params = new URLSearchParams({ returnTo: getEntityUrl({ id, kind }) });
 
   switch (kind) {
     case "brand":

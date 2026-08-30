@@ -1,9 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type {
-  AnchorHTMLAttributes,
-  ButtonHTMLAttributes,
-  ReactNode,
-} from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
 
 import {
@@ -13,6 +9,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { AppLink, type AppLinkProps } from "./appLink";
 
 const REDUCED_MOTION = "@media (prefers-reduced-motion: reduce)";
 
@@ -79,10 +76,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 
-export type ButtonLinkProps = Omit<
-  AnchorHTMLAttributes<HTMLAnchorElement>,
-  "className" | "style"
-> & {
+export type ButtonLinkProps = Omit<AppLinkProps, "className" | "style"> & {
   align?: "center" | "start";
   fullWidth?: boolean;
   size?: ButtonSize;
@@ -99,7 +93,7 @@ export function ButtonLink({
   ...props
 }: ButtonLinkProps) {
   return (
-    <a
+    <AppLink
       {...props}
       data-size={size}
       data-variant={variant}
@@ -115,7 +109,7 @@ export function ButtonLink({
       )}
     >
       {children}
-    </a>
+    </AppLink>
   );
 }
 

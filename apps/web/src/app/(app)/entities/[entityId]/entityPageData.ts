@@ -1,7 +1,12 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import type { PageTabItem } from "@peated/web/components/designSystem/components";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 export type Entity = Outputs["entities"]["details"];
+type EntityTabSource = Pick<
+  Entity,
+  "id" | "kind" | "shortName" | "totalBottles" | "totalTastings"
+>;
 
 const entityKindPresentation = {
   blender: {
@@ -49,8 +54,10 @@ export function getEntityLocationLabel(entity: Entity) {
     .join(" · ");
 }
 
-export function getEntityTabs(entity: Entity): [PageTabItem, ...PageTabItem[]] {
-  const baseUrl = `/entities/${entity.id}`;
+export function getEntityTabs(
+  entity: EntityTabSource,
+): [PageTabItem, ...PageTabItem[]] {
+  const baseUrl = getEntityUrl(entity);
   const tabs: [PageTabItem, ...PageTabItem[]] = [
     { href: baseUrl, label: "Overview" },
     {
@@ -70,4 +77,11 @@ export function getEntityTabs(entity: Entity): [PageTabItem, ...PageTabItem[]] {
   }
 
   return tabs;
+}
+
+export function getEntityCurrentHref(
+  entity: Pick<Entity, "id" | "kind" | "peatedId">,
+  pathname: string,
+) {
+  return pathname === `/${entity.peatedId}` ? getEntityUrl(entity) : pathname;
 }

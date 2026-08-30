@@ -7,6 +7,7 @@ import { Fragment, useEffect } from "react";
 import { useEventListener } from "usehooks-ts";
 
 import {
+  AppLink,
   ButtonLink,
   EmptyState,
   ItemList,
@@ -82,16 +83,18 @@ function CollectionActivityItem({
           username={activity.createdBy.username}
         />
         <div {...stylex.props(styles.collectionCopy)}>
-          <a
+          <AppLink
             href={`/users/${activity.createdBy.username}`}
             {...stylex.props(styles.collectionAuthor)}
           >
             {activity.createdBy.username}
-          </a>
+          </AppLink>
           <span {...stylex.props(styles.collectionContext)}>
             added {formatBottleCount(activity.totalItems)} to{" "}
             {activity.collection.href ? (
-              <a href={activity.collection.href}>{activity.collection.name}</a>
+              <AppLink href={activity.collection.href}>
+                {activity.collection.name}
+              </AppLink>
             ) : (
               activity.collection.name
             )}

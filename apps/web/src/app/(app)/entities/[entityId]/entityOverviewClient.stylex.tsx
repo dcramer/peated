@@ -6,6 +6,7 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import {
+  AppLink,
   BottleComparisonTable,
   ButtonLink,
   Card,
@@ -22,7 +23,7 @@ import {
 import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { parseDomain } from "@peated/web/lib/urls";
+import { getEntityUrl, parseDomain } from "@peated/web/lib/urls";
 import {
   colors,
   effects,
@@ -41,21 +42,21 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
     <>
       {entity.region ? (
         <>
-          <a
+          <AppLink
             href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
             {...stylex.props(styles.factLink)}
           >
             {entity.region.name}
-          </a>
+          </AppLink>
           <span>, </span>
         </>
       ) : null}
-      <a
+      <AppLink
         href={`/locations/${entity.country.slug}`}
         {...stylex.props(styles.factLink)}
       >
         {entity.country.name}
-      </a>
+      </AppLink>
     </>
   ) : null;
 
@@ -150,6 +151,7 @@ function EntityBottleOverview({
   totalBottles: number;
 }) {
   const presentation = getEntityPresentation(entity);
+  const entityHref = getEntityUrl(entity);
   const ownsBottleModule =
     entity.kind === "brand" ||
     entity.kind === "bottler" ||
@@ -185,7 +187,7 @@ function EntityBottleOverview({
     const recordHref =
       createBottleHref ??
       `/bottles/new?${new URLSearchParams({
-        returnTo: `/entities/${entity.id}`,
+        returnTo: entityHref,
       }).toString()}`;
 
     return (
@@ -212,7 +214,7 @@ function EntityBottleOverview({
       count={bottleList.results.length}
       heading={presentation.bottleSectionLabel}
       intro={
-        <TextLink href={`/entities/${entity.id}/bottles?sort=-tastings`}>
+        <TextLink href={`${entityHref}/bottles?sort=-tastings`}>
           View all {totalBottles.toLocaleString("en-US")} bottles
         </TextLink>
       }

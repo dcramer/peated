@@ -8,6 +8,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import type { ItemListVariant } from "./itemList.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
@@ -124,9 +125,6 @@ export function BottleIdentityRow({
   relatedReleases,
   variant = "plain",
 }: BottleIdentityRowProps) {
-  const Name = href ? "a" : "span";
-  const Brand = brandHref ? "a" : "span";
-
   return (
     <div
       {...stylex.props(
@@ -142,28 +140,36 @@ export function BottleIdentityRow({
       <BottleVisual imageUrl={imageUrl} />
       <div {...stylex.props(styles.copy)}>
         {brand ? (
-          <Brand
-            href={brandHref}
-            {...stylex.props(
-              styles.brand,
-              Boolean(brandHref) && styles.brandLink,
-              Boolean(brandHref) && linkedRowStyles.nestedAction,
-            )}
-          >
-            {brand}
-          </Brand>
+          brandHref ? (
+            <AppLink
+              href={brandHref}
+              {...stylex.props(
+                styles.brand,
+                styles.brandLink,
+                linkedRowStyles.nestedAction,
+              )}
+            >
+              {brand}
+            </AppLink>
+          ) : (
+            <span {...stylex.props(styles.brand)}>{brand}</span>
+          )
         ) : null}
         <div {...stylex.props(styles.nameLine)}>
-          <Name
-            href={href}
-            {...stylex.props(
-              styles.name,
-              Boolean(href) && styles.nameLink,
-              Boolean(href) && linkedRowStyles.primaryLink,
-            )}
-          >
-            {name}
-          </Name>
+          {href ? (
+            <AppLink
+              href={href}
+              {...stylex.props(
+                styles.name,
+                styles.nameLink,
+                linkedRowStyles.primaryLink,
+              )}
+            >
+              {name}
+            </AppLink>
+          ) : (
+            <span {...stylex.props(styles.name)}>{name}</span>
+          )}
           {isLibrary ? (
             <span
               aria-label="In Library"
@@ -196,7 +202,7 @@ export function BottleIdentityRow({
           </div>
         ) : null}
         {relatedReleases && relatedReleases.count > 1 ? (
-          <a
+          <AppLink
             href={relatedReleases.href}
             {...stylex.props(
               styles.relatedReleases,
@@ -204,7 +210,7 @@ export function BottleIdentityRow({
             )}
           >
             {relatedReleases.count.toLocaleString("en-US")} related releases
-          </a>
+          </AppLink>
         ) : null}
       </div>
       {end ? <div {...stylex.props(styles.end)}>{end}</div> : null}

@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { useState } from "react";
 
 import {
+  AppLink,
   Button,
   CursorPager,
   EmptyState,
@@ -146,21 +147,21 @@ export function NotificationList({
                 <div {...stylex.props(styles.copy)}>
                   <div {...stylex.props(styles.message)}>
                     {from ? (
-                      <a
+                      <AppLink
                         href={`/users/${from.username}`}
                         {...stylex.props(styles.author)}
                       >
                         {from.username}
-                      </a>
+                      </AppLink>
                     ) : null}{" "}
                     {href ? (
-                      <a
+                      <AppLink
                         href={href}
                         onClick={() => markRead(notification.id)}
                         {...stylex.props(styles.target)}
                       >
                         {getNotificationMessage(notification)}
-                      </a>
+                      </AppLink>
                     ) : (
                       getNotificationMessage(notification)
                     )}

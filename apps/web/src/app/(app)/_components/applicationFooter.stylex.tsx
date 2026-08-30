@@ -70,7 +70,7 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
       provenance="Edited by members · corrections welcome"
       referenceLinks={[
         {
-          href: "/entities/4263/codes",
+          href: "/bottlers/4263/codes",
           label: "SMWS distillery codes",
         },
       ]}

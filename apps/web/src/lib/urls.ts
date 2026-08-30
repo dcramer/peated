@@ -1,4 +1,4 @@
-import type { Entity, EntityKind } from "@peated/server/types";
+import type { EntityKind } from "@peated/server/types";
 
 const ENTITY_COLLECTION_BY_KIND = {
   brand: "/brands",
@@ -23,9 +23,11 @@ export function getBottleUrl(
   return `/bottles/${bottle.id}`;
 }
 
-export function getEntityUrl(
-  entity: Pick<Entity, "id" | "kind">,
-): `/${string}` {
+export function getEntityUrl(entity: {
+  id: number;
+  kind: EntityKind | null;
+}): `/${string}` {
+  if (!entity.kind) return `/entities/${entity.id}`;
   return `${ENTITY_COLLECTION_BY_KIND[entity.kind]}/${entity.id}`;
 }
 
