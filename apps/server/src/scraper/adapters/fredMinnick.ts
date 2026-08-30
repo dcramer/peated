@@ -156,7 +156,6 @@ export function parseFredMinnickArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews: [review],
     },
-    externalReviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
   });
 }
 

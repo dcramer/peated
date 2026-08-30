@@ -4,7 +4,7 @@ import {
   externalReviews,
 } from "@peated/server/db/schema";
 import {
-  getExternalReviewPublicationModeInTransaction,
+  isExternalReviewPublicationApprovedInTransaction,
   publishResolvedReview,
 } from "@peated/server/externalReviews/publication";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
@@ -131,8 +131,8 @@ export async function createMissingBottles(
       let aliasAssignment;
       try {
         aliasAssignment = await db.transaction(async (tx) => {
-          const publicationMode =
-            await getExternalReviewPublicationModeInTransaction(
+          const publicationApproved =
+            await isExternalReviewPublicationApprovedInTransaction(
               tx,
               article.externalSiteId,
             );
@@ -200,7 +200,7 @@ export async function createMissingBottles(
             });
           }
 
-          if (publicationMode === "automatic") {
+          if (publicationApproved) {
             await publishResolvedReview(tx, article.externalSiteId, review.id);
           }
 

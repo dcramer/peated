@@ -6,8 +6,8 @@ import {
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
   externalSiteRuns,
   externalSites,
   storePrices,
@@ -252,14 +252,11 @@ test("runs the bounded WhiskyNotes adapter through the production runtime", asyn
     .where(eq(externalSites.type, "whiskynotes"));
   if (!site) throw new Error("Expected synchronized WhiskyNotes site.");
   await db
-    .update(externalReviewSourcePolicies)
+    .update(externalReviewPublications)
     .set({
-      publicationMode: "review_only",
-      allowLlmProcessing: false,
-      allowScoreDisplay: true,
-      allowSummaryDisplay: false,
+      approvedAt: null,
     })
-    .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
+    .where(eq(externalReviewPublications.externalSiteId, site.id));
   await fixtures.Bottle({ name: "Kanekou Okinawa Whisky" });
   await fixtures.Bottle({ name: "Ben Nevis 30 yo 1996" });
   await fixtures.Bottle({ name: "Bowmore 20 yo 2005" });

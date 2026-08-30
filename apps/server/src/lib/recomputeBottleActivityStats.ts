@@ -6,8 +6,8 @@ import type { AnyTransaction } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import {
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
   memberReviews,
   tastings,
 } from "@peated/server/db/schema";
@@ -81,8 +81,8 @@ export async function aggregateBottleActivityStatsInTransaction(
       FROM ${externalReviews}
       INNER JOIN ${externalReviewArticles}
         ON ${externalReviewArticles.id} = ${externalReviews.articleId}
-      INNER JOIN ${externalReviewSourcePolicies}
-        ON ${externalReviewSourcePolicies.externalSiteId} = ${externalReviewArticles.externalSiteId}
+      LEFT JOIN ${externalReviewPublications}
+        ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
       WHERE ${inArray(externalReviews.bottleId, bottleIds)}
         AND ${externalWhere}
     ), score_stats AS (

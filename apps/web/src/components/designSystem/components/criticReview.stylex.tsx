@@ -8,7 +8,6 @@ export type CriticReviewProps = {
   publishedAt?: string;
   rating?: number | null;
   reviewerName?: string;
-  summary?: string;
 };
 
 /** Renders an attributed critic review with its normalized 100-point rating. */
@@ -18,7 +17,6 @@ export function CriticReview({
   publishedAt,
   rating,
   reviewerName,
-  summary,
 }: CriticReviewProps) {
   const byline = [reviewerName ? `By ${reviewerName}` : null, publishedAt]
     .filter(Boolean)
@@ -43,7 +41,6 @@ export function CriticReview({
         ) : null}
       </div>
 
-      {summary ? <p {...stylex.props(styles.summary)}>{summary}</p> : null}
       {href ? (
         <a href={href} {...stylex.props(styles.reviewLink)}>
           Read the full review on {publication} →
@@ -95,15 +92,6 @@ const styles = stylex.create({
     fontWeight: 700,
     letterSpacing: "-0.03em",
     lineHeight: 1,
-  },
-  summary: {
-    maxWidth: "68ch",
-    margin: 0,
-    marginTop: space.x3,
-    color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.55,
   },
   reviewLink: {
     display: "inline-block",

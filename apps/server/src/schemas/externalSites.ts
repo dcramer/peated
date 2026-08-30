@@ -49,18 +49,10 @@ export const ExternalSiteRunSchema = z.object({
   createdAt: z.string().datetime(),
 });
 
-export const ExternalReviewPublicationModeSchema = z.enum([
-  "disabled",
-  "review_only",
-  "automatic",
-]);
-
-export const ExternalReviewSourcePolicySchema = z.object({
+export const ExternalReviewPublicationSchema = z.object({
   externalSiteId: z.number().int().positive(),
-  publicationMode: ExternalReviewPublicationModeSchema,
-  allowLlmProcessing: z.boolean(),
-  allowScoreDisplay: z.boolean(),
-  allowSummaryDisplay: z.boolean(),
+  approved: z.boolean(),
+  approvedAt: z.string().datetime().nullable(),
   updatedAt: z.string().datetime().nullable(),
 });
 
@@ -99,35 +91,9 @@ export const ExternalSiteHealthSchema = ExternalSiteSchema.extend({
     targetKeys: z.array(z.string()),
     targets: z.array(ExternalSiteScrapeTargetSchema),
   }),
-  reviewPolicy: ExternalReviewSourcePolicySchema.nullable(),
+  reviewPublication: ExternalReviewPublicationSchema.nullable(),
 });
 
-const DisabledExternalReviewSourcePolicyInputSchema = z
-  .object({
-    publicationMode: z.literal("disabled"),
-  })
+export const ExternalReviewPublicationInputSchema = z
+  .object({ approved: z.boolean() })
   .strict();
-
-const EnabledExternalReviewSourcePolicyInputSchema = z
-  .object({
-    publicationMode: z.enum(["review_only", "automatic"]),
-    allowLlmProcessing: z.boolean(),
-    allowScoreDisplay: z.boolean(),
-    allowSummaryDisplay: z.boolean(),
-  })
-  .strict()
-  .refine(
-    (policy) => !policy.allowSummaryDisplay || policy.allowLlmProcessing,
-    {
-      message: "Summary display requires the LLM processing capability.",
-      path: ["allowSummaryDisplay"],
-    },
-  );
-
-export const ExternalReviewSourcePolicyInputSchema = z.discriminatedUnion(
-  "publicationMode",
-  [
-    DisabledExternalReviewSourcePolicyInputSchema,
-    EnabledExternalReviewSourcePolicyInputSchema,
-  ],
-);

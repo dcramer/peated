@@ -28,7 +28,6 @@ export const ExternalReviewSchema = z.object({
   }),
   reviewerName: z.string().nullable(),
   nativeScore: NativeScoreSchema.nullable(),
-  summary: z.string().nullable(),
   bottle: BottleSchema.nullable().describe(
     "Bottle associated with the review, or null when unresolved",
   ),

@@ -11,14 +11,11 @@ import {
 import { asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 
-const generateSummaryMock =
-  vi.fn<ExternalReviewIngestionServices["generateSummary"]>();
 const logTelemetryErrorMock =
   vi.fn<ExternalReviewIngestionServices["reportError"]>();
 const pushUniqueJobMock =
   vi.fn<ExternalReviewIngestionServices["queueMissingBottles"]>();
 const services: ExternalReviewIngestionServices = {
-  generateSummary: generateSummaryMock,
   queueMissingBottles: pushUniqueJobMock,
   reportError: logTelemetryErrorMock,
 };
@@ -30,7 +27,6 @@ function ingestExternalReviewArticle(
 }
 
 beforeEach(() => {
-  generateSummaryMock.mockReset();
   logTelemetryErrorMock.mockReset();
   pushUniqueJobMock.mockReset();
 });
@@ -175,86 +171,4 @@ test("keeps stored reviews when background dispatch fails", async ({
       externalSiteId: site.id,
     },
   });
-});
-
-test("stores a generated summary without storing its source text", async ({
-  fixtures,
-}) => {
-  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  const bottle = await fixtures.Bottle({ name: "Summarized Review Bottle" });
-  const generatedAt = new Date("2026-04-13T12:01:00Z");
-  const sourceText = "Publisher text that must remain transient.";
-  generateSummaryMock.mockResolvedValue({
-    text: "The reviewer finds the whisky balanced. They recommend it for its dry finish.",
-    contentHash: "sha256:summary",
-    model: "gpt-5.4-2026-08-01",
-    promptVersion: "external-review-summary-v1",
-    generatedAt,
-  });
-
-  await ingestExternalReviewArticle({
-    externalSiteId: site.id,
-    fetchedAt: new Date("2026-04-13T12:00:00Z"),
-    article: {
-      canonicalUrl: "https://reviews.example/articles/summary",
-      title: "A summarized review",
-      contentHash: "sha256:summary",
-      externalReviews: [{ sourceKey: "summary", name: bottle.fullName }],
-    },
-    externalReviewTexts: { summary: sourceText },
-  });
-
-  expect(await db.query.externalReviews.findFirst()).toMatchObject({
-    summary:
-      "The reviewer finds the whisky balanced. They recommend it for its dry finish.",
-    summaryContentHash: "sha256:summary",
-    summaryModel: "gpt-5.4-2026-08-01",
-    summaryPromptVersion: "external-review-summary-v1",
-    summaryGeneratedAt: generatedAt,
-  });
-  expect(
-    JSON.stringify(await db.query.externalReviews.findFirst()),
-  ).not.toContain(sourceText);
-});
-
-test("stores review metadata when summary generation fails", async ({
-  fixtures,
-}) => {
-  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  const bottle = await fixtures.Bottle({ name: "Summary Failure Bottle" });
-  const sourceText = "Publisher text that must not enter the failure log.";
-  generateSummaryMock.mockRejectedValue(new Error(sourceText));
-
-  await ingestExternalReviewArticle({
-    externalSiteId: site.id,
-    fetchedAt: new Date("2026-04-13T12:00:00Z"),
-    article: {
-      canonicalUrl: "https://reviews.example/articles/summary-failure",
-      title: "A review with a failed summary",
-      contentHash: "sha256:failure",
-      externalReviews: [{ sourceKey: "failure", name: bottle.fullName }],
-    },
-    externalReviewTexts: { failure: sourceText },
-  });
-
-  expect(await db.query.externalReviews.findFirst()).toMatchObject({
-    bottleId: bottle.id,
-    sourceKey: "failure",
-    summary: null,
-  });
-  expect(logTelemetryErrorMock).toHaveBeenCalledWith(
-    "Unable to generate external review summary.",
-    {
-      extra: {
-        review: {
-          externalSiteId: site.id,
-          sourceKey: "failure",
-          url: "https://reviews.example/articles/summary-failure",
-        },
-      },
-    },
-  );
-  expect(JSON.stringify(logTelemetryErrorMock.mock.calls)).not.toContain(
-    sourceText,
-  );
 });

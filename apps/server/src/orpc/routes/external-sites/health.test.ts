@@ -122,7 +122,7 @@ test("health list reports source inventory, runtime, and latest execution", asyn
         },
       ],
     },
-    reviewPolicy: null,
+    reviewPublication: null,
   });
 });
 
@@ -173,7 +173,7 @@ test("health list keeps batched source data isolated", async ({ fixtures }) => {
   });
 });
 
-test("health details show review inventory and blocked review policy", async ({
+test("health details show review inventory and publication approval", async ({
   fixtures,
 }) => {
   const admin = await fixtures.User({ admin: true });
@@ -231,8 +231,9 @@ test("health details show review inventory and blocked review policy", async ({
         },
       ],
     },
-    reviewPolicy: {
-      publicationMode: "disabled",
+    reviewPublication: {
+      approved: false,
+      approvedAt: null,
     },
   });
 });

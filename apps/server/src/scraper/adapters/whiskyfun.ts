@@ -313,7 +313,7 @@ export function parseWhiskyfunArticle(
       null);
   const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
     [];
-  const externalReviewTexts: Record<string, string> = {};
+  const reviewTexts: Record<string, string> = {};
   let hasReviewCandidate = false;
   let sessionTitle = article.title;
 
@@ -345,7 +345,7 @@ export function parseWhiskyfunArticle(
       reviewerName,
       nativeScore: reviewScore.nativeScore,
     });
-    externalReviewTexts[sourceKey] = reviewText;
+    reviewTexts[sourceKey] = reviewText;
   });
 
   if (externalReviews.length === 0) {
@@ -353,7 +353,7 @@ export function parseWhiskyfunArticle(
     throw new Error("Whiskyfun article contains no scored external reviews.");
   }
 
-  const contentText = Object.values(externalReviewTexts).join("\n");
+  const contentText = Object.values(reviewTexts).join("\n");
   return WhiskyfunObservationSchema.parse({
     article: {
       canonicalUrl: canonicalUrl.href,
@@ -363,7 +363,6 @@ export function parseWhiskyfunArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews,
     },
-    externalReviewTexts,
   });
 }
 

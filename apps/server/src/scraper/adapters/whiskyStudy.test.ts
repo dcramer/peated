@@ -57,12 +57,6 @@ test("extracts source facts and only direct tasting paragraphs", async () => {
   expect(decimalScore?.article.externalReviews[0]).toMatchObject({
     nativeScore: { value: 92.5, scale: 100, display: "92,5/100" },
   });
-  expect(Object.values(parsed?.externalReviewTexts ?? {})).toEqual([
-    "Nose: Orchard fruit and soft wax. Palate: Malt, citrus, and gentle oak. Finish: Long and lightly spiced.",
-  ]);
-  expect(
-    Object.values(parsed?.externalReviewTexts ?? {}).join(" "),
-  ).not.toMatch(/introduction|price|age:|review date|final thoughts/iu);
 });
 
 test("skips a clear non-review but rejects an incomplete review", async () => {

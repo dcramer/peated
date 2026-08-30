@@ -2,7 +2,7 @@ import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
-  externalReviewSourcePolicies,
+  externalReviewPublications,
   externalReviews,
   externalSiteRuns,
   externalSiteScrapeTargets,
@@ -24,7 +24,7 @@ import {
 } from "@peated/server/schemas";
 import { getScraperRegistration } from "@peated/server/scraper";
 import {
-  serializeExternalReviewSourcePolicy,
+  serializeExternalReviewPublication,
   serializeExternalSite,
   serializeExternalSiteRun,
 } from "@peated/server/serializers/externalSite";
@@ -43,7 +43,7 @@ async function getHealthForSites(
     latestRuns,
     lastSucceededRuns,
     runtimeRows,
-    reviewPolicies,
+    reviewPublications,
     configuredRows,
   ] = await Promise.all([
     db
@@ -141,8 +141,8 @@ async function getHealthForSites(
       ),
     db
       .select()
-      .from(externalReviewSourcePolicies)
-      .where(inArray(externalReviewSourcePolicies.externalSiteId, siteIds)),
+      .from(externalReviewPublications)
+      .where(inArray(externalReviewPublications.externalSiteId, siteIds)),
     db
       .select({
         externalSiteId: scrapeSources.externalSiteId,
@@ -174,8 +174,11 @@ async function getHealthForSites(
   const lastSucceededBySite = new Map(
     lastSucceededRuns.map((run) => [run.externalSiteId, run]),
   );
-  const reviewPolicyBySite = new Map(
-    reviewPolicies.map((policy) => [policy.externalSiteId, policy]),
+  const reviewPublicationBySite = new Map(
+    reviewPublications.map((publication) => [
+      publication.externalSiteId,
+      publication,
+    ]),
   );
   const configuredBySite = new Map(
     configuredRows.map((row) => [row.externalSiteId, row]),
@@ -223,14 +226,14 @@ async function getHealthForSites(
   return sites.map((site) => {
     const registration = getScraperRegistration(site.type);
     const configured = configuredBySite.get(site.id);
-    const hasReviewPolicy =
+    const hasReviewPublication =
       isExternalReviewSiteKey(site.type) || configured?.kind === "review";
     const reviewCoverage = reviewCoverageBySite.get(site.id);
     const priceCoverage = priceCoverageBySite.get(site.id);
     const latestRun = latestRunBySite.get(site.id);
     const lastSucceeded = lastSucceededBySite.get(site.id);
     const targets = targetsBySite.get(site.id);
-    const reviewPolicy = reviewPolicyBySite.get(site.id);
+    const reviewPublication = reviewPublicationBySite.get(site.id);
 
     return {
       ...serializeExternalSite(site),
@@ -249,8 +252,8 @@ async function getHealthForSites(
           (configured ? [...(targets?.keys() ?? [])] : []),
         targets: targets ? [...targets.values()] : [],
       },
-      reviewPolicy: hasReviewPolicy
-        ? serializeExternalReviewSourcePolicy(site.id, reviewPolicy ?? null)
+      reviewPublication: hasReviewPublication
+        ? serializeExternalReviewPublication(site.id, reviewPublication ?? null)
         : null,
     };
   });

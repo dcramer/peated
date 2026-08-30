@@ -8,6 +8,6 @@ export const externalReviewSink: ScraperSink<
   await ingestExternalReviewArticle({
     externalSiteId,
     fetchedAt: new Date(),
-    ...observation.value,
+    article: observation.value.article,
   });
 };

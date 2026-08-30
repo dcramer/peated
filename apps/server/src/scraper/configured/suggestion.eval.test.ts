@@ -277,7 +277,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
             name: review.name,
             reviewerName: review.reviewerName,
             nativeScore: review.nativeScore,
-            reviewText: value.externalReviewTexts[review.sourceKey] ?? null,
+            reviewText: value.reviewTextByKey[review.sourceKey] ?? null,
           })),
         };
       });

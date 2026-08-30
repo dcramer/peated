@@ -25,7 +25,7 @@ describe("POST /external-sites/:site/trigger", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("triggers a review job without a publication policy", async ({
+  test("triggers a review job before publication approval", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({

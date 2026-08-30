@@ -68,7 +68,6 @@ export function HomeCriticReviews() {
           review.nativeScore?.scale === 100 ? review.nativeScore.value : null,
         source: review.site?.name ?? review.reviewerName ?? "Critic review",
         sourceHref: review.url,
-        summary: review.summary,
       }))}
     />
   );

@@ -11,12 +11,9 @@ test("Whisky Advocate observations use article and source identity", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  await fixtures.ExternalReviewSourcePolicy({
+  await fixtures.ExternalReviewPublication({
     externalSiteId: site.id,
-    publicationMode: "review_only",
-    allowLlmProcessing: true,
-    allowScoreDisplay: true,
-    allowSummaryDisplay: false,
+    approvedAt: null,
   });
   const bottle = await fixtures.Bottle({ name: "Sink Review Bottle" });
   const url = "https://whiskyadvocate.com/reviews/sink-review";
@@ -39,7 +36,6 @@ test("Whisky Advocate observations use article and source identity", async ({
           },
         ],
       },
-      externalReviewTexts: {},
     },
   };
 

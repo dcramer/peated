@@ -61,12 +61,6 @@ test("extracts publisher facts and only tasting notes", async () => {
   expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
     reparsed.article.externalReviews[0]?.sourceKey,
   );
-  expect(Object.values(parsed.externalReviewTexts)).toEqual([
-    "Nose: Cherry, vanilla, and mature oak. Palate: Caramel and baking spice. Finish: Long, dry, and balanced.",
-  ]);
-  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
-    /introduction|conclusion/iu,
-  );
 });
 
 test("resumes without requesting a completed current article", async () => {

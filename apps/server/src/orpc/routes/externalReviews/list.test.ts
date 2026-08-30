@@ -2,8 +2,8 @@ import { db } from "@peated/server/db";
 import {
   actors,
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -139,9 +139,9 @@ describe("GET /external-reviews", () => {
       name: "Whisky Advocate",
       type: "whiskyadvocate",
     });
-    await fixtures.EnabledExternalReviewSourcePolicy({
+    await fixtures.ApprovedExternalReviewPublication({
       externalSiteId: site.id,
-      publicationMode: "automatic",
+      approvedAt: new Date(),
     });
     const older = await fixtures.ExternalReview({
       bottleId: bottle.id,
@@ -162,11 +162,6 @@ describe("GET /external-reviews", () => {
       nativeScoreValue: 8.4,
       nativeScoreScale: 10,
       nativeScoreDisplay: "8.4/10",
-      summary: "A balanced whisky with coastal smoke and a long finish.",
-      summaryContentHash: "latest-content",
-      summaryModel: "summary-model",
-      summaryPromptVersion: "v1",
-      summaryGeneratedAt: new Date("2026-08-24T00:00:00.000Z"),
     });
     await Promise.all([
       db
@@ -208,7 +203,7 @@ describe("GET /external-reviews", () => {
       externalSiteId: site.id,
     });
     const reviewOnlySite = await fixtures.ExternalSite({ type: "dramface" });
-    await fixtures.EnabledExternalReviewSourcePolicy({
+    await fixtures.ExternalReviewPublication({
       externalSiteId: reviewOnlySite.id,
     });
     const reviewOnly = await fixtures.ExternalReview({
@@ -253,7 +248,6 @@ describe("GET /external-reviews", () => {
         publishedAt: "2026-08-23T00:00:00.000Z",
       },
       nativeScore: { value: 8.4, scale: 10, display: "8.4/10" },
-      summary: "A balanced whisky with coastal smoke and a long finish.",
       bottle: {
         id: bottle.id,
         fullName: bottle.fullName,
@@ -305,16 +299,15 @@ describe("GET /external-reviews", () => {
     ]);
   });
 
-  test("returns approved article details and native review content", async ({
+  test("returns approved article details and native scores", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.EnabledExternalReviewSourcePolicy({
+    await fixtures.ApprovedExternalReviewPublication({
       externalSiteId: site.id,
-      publicationMode: "automatic",
+      approvedAt: new Date(),
     });
-    const summaryContentHash = "current-article-content";
     const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
@@ -323,18 +316,13 @@ describe("GET /external-reviews", () => {
       nativeScoreValue: 7.8,
       nativeScoreScale: 10,
       nativeScoreDisplay: "7.8/10",
-      summary: "A balanced whisky with coastal smoke and a long finish.",
-      summaryContentHash,
-      summaryModel: "summary-model",
-      summaryPromptVersion: "v1",
-      summaryGeneratedAt: new Date("2026-07-23T00:00:00.000Z"),
     });
     await db
       .update(externalReviewArticles)
       .set({
         title: "A review of Springbank 12 Cask Strength",
         publishedAt: new Date("2026-07-22T00:00:00.000Z"),
-        contentHash: summaryContentHash,
+        contentHash: "current-article-content",
       })
       .where(eq(externalReviewArticles.id, review.articleId!));
 
@@ -352,17 +340,16 @@ describe("GET /external-reviews", () => {
         },
         reviewerName: "A. Critic",
         nativeScore: { value: 7.8, scale: 10, display: "7.8/10" },
-        summary: "A balanced whisky with coastal smoke and a long finish.",
       },
     ]);
   });
 
-  test("preserves migrated reviews when their source policy is disabled", async ({
+  test("preserves migrated reviews before source approval", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.ExternalReviewSourcePolicy({ externalSiteId: site.id });
+    await fixtures.ExternalReviewPublication({ externalSiteId: site.id });
     const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
@@ -376,54 +363,43 @@ describe("GET /external-reviews", () => {
     expect(results.map(({ id }) => id)).toContain(review.id);
   });
 
-  test("removes review content and public visibility when policy is revoked", async ({
+  test("keeps scores available to moderators after publishing stops", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.EnabledExternalReviewSourcePolicy({
+    await fixtures.ApprovedExternalReviewPublication({
       externalSiteId: site.id,
-      publicationMode: "automatic",
+      approvedAt: new Date(),
     });
-    const summaryContentHash = "current-article-content";
     const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       externalSiteId: site.id,
       nativeScoreValue: 7.8,
       nativeScoreScale: 10,
       nativeScoreDisplay: "7.8/10",
-      summary: "A short generated summary.",
-      summaryContentHash,
-      summaryModel: "summary-model",
-      summaryPromptVersion: "v1",
-      summaryGeneratedAt: new Date("2026-07-23T00:00:00.000Z"),
     });
     await db
       .update(externalReviewArticles)
-      .set({ contentHash: summaryContentHash })
+      .set({ contentHash: "current-article-content" })
       .where(eq(externalReviewArticles.id, review.articleId!));
 
     await db
-      .update(externalReviewSourcePolicies)
-      .set({
-        allowLlmProcessing: false,
-        allowScoreDisplay: false,
-        allowSummaryDisplay: false,
-      })
-      .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
+      .update(externalReviewPublications)
+      .set({ approvedAt: null })
+      .where(eq(externalReviewPublications.externalSiteId, site.id));
 
-    const contentRevoked = await routerClient.externalReviews.list({
-      bottle: bottle.id,
-      sort: "name",
-    });
-    expect(contentRevoked.results).toMatchObject([
-      { id: review.id, nativeScore: null, summary: null },
+    const moderator = await fixtures.User({ mod: true });
+    const staged = await routerClient.externalReviews.list(
+      { site: site.type, sort: "name" },
+      { context: { user: moderator } },
+    );
+    expect(staged.results).toMatchObject([
+      {
+        id: review.id,
+        nativeScore: { value: 7.8, scale: 10, display: "7.8/10" },
+      },
     ]);
-
-    await db
-      .update(externalReviewSourcePolicies)
-      .set({ publicationMode: "disabled" })
-      .where(eq(externalReviewSourcePolicies.externalSiteId, site.id));
 
     await expect(
       routerClient.externalReviews.list({ bottle: bottle.id, sort: "name" }),

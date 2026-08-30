@@ -4,7 +4,7 @@ import {
 } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  externalReviewSourcePolicies,
+  externalReviewPublications,
   externalSites,
 } from "@peated/server/db/schema";
 import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
@@ -40,7 +40,7 @@ export async function syncExternalSites() {
 
       if (site && isExternalReviewSiteKey(siteKey)) {
         await tx
-          .insert(externalReviewSourcePolicies)
+          .insert(externalReviewPublications)
           .values({ externalSiteId: site.id })
           .onConflictDoNothing();
       }

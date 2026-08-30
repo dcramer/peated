@@ -44,12 +44,10 @@ const site = {
       },
     ],
   },
-  reviewPolicy: {
+  reviewPublication: {
     externalSiteId: 1,
-    publicationMode: "disabled",
-    allowLlmProcessing: false,
-    allowScoreDisplay: false,
-    allowSummaryDisplay: false,
+    approved: false,
+    approvedAt: null,
     updatedAt: timestamp,
   },
 } satisfies Outputs["externalSites"]["healthDetails"];
@@ -104,15 +102,15 @@ describe("scraper observability", () => {
     expect(html).not.toContain("Disabled");
   });
 
-  it("shows runtime, robots, and review-policy readiness", () => {
+  it("shows runtime, robots, and review publishing", () => {
     const html = renderToStaticMarkup(<ScraperReadiness site={site} />);
 
     expect(html).toContain("Connection");
     expect(html).toContain("Disabled");
     expect(html).toContain("Origins");
     expect(html).toContain("Not checked");
-    expect(html).toContain("Publication");
-    expect(html).toContain("disabled");
+    expect(html).toContain("Review publishing");
+    expect(html).toContain("Not published");
   });
 
   it("shows responsible-request and deferral telemetry", () => {

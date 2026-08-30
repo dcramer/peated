@@ -2,8 +2,8 @@ import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
 import { publishResolvedReviews } from "@peated/server/externalReviews/publication";
@@ -12,50 +12,35 @@ import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleS
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
-  ExternalReviewSourcePolicyInputSchema,
-  ExternalReviewSourcePolicySchema,
+  ExternalReviewPublicationInputSchema,
+  ExternalReviewPublicationSchema,
   ExternalSiteKeySchema,
 } from "@peated/server/schemas";
-import { serializeExternalReviewSourcePolicy } from "@peated/server/serializers/externalSite";
+import { serializeExternalReviewPublication } from "@peated/server/serializers/externalSite";
 import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z
   .object({
     site: ExternalSiteKeySchema,
-    policy: ExternalReviewSourcePolicyInputSchema,
+    publication: ExternalReviewPublicationInputSchema,
   })
   .strict();
 
 const RECOMPUTE_BATCH_SIZE = 50;
 
-function auditFields(
-  policy: z.infer<typeof ExternalReviewSourcePolicySchema> | null,
-) {
-  return policy
-    ? {
-        publicationMode: policy.publicationMode,
-        allowLlmProcessing: policy.allowLlmProcessing,
-        allowScoreDisplay: policy.allowScoreDisplay,
-        allowSummaryDisplay: policy.allowSummaryDisplay,
-      }
-    : null;
-}
-
 export default procedure
   .use(requireMod)
   .route({
     method: "PUT",
-    path: "/admin/external-sites/{site}/review-policy",
-    summary: "Update external review source policy",
-    operationId: "updateExternalReviewSourcePolicy",
+    path: "/admin/external-sites/{site}/review-publication",
+    summary: "Update external review publication",
+    operationId: "updateExternalReviewPublication",
   })
   .input(InputSchema)
-  .output(ExternalReviewSourcePolicySchema)
+  .output(ExternalReviewPublicationSchema)
   .handler(async ({ input, context, errors }) => {
-    const { policy: inputPolicy } = input;
-
-    const { previous, policy, site } = await db.transaction(async (tx) => {
+    const { previous, publication, site } = await db.transaction(async (tx) => {
       const [site] = await tx
         .select()
         .from(externalSites)
@@ -64,77 +49,58 @@ export default procedure
         .for("update");
       if (!site) throw errors.NOT_FOUND({ message: "Site not found." });
 
-      const [previousPolicy] = await tx
+      const [existing] = await tx
         .select()
-        .from(externalReviewSourcePolicies)
-        .where(eq(externalReviewSourcePolicies.externalSiteId, site.id))
+        .from(externalReviewPublications)
+        .where(eq(externalReviewPublications.externalSiteId, site.id))
         .limit(1)
         .for("update");
-      if (!previousPolicy && !isExternalReviewSiteKey(input.site)) {
+      if (!existing && !isExternalReviewSiteKey(input.site)) {
         throw errors.NOT_FOUND({ message: "Review source not found." });
       }
-      const previous = serializeExternalReviewSourcePolicy(
-        site.id,
-        previousPolicy ?? null,
-      );
-      const values =
-        inputPolicy.publicationMode === "disabled"
-          ? {
-              externalSiteId: site.id,
-              publicationMode: "disabled" as const,
-              allowLlmProcessing: false,
-              allowScoreDisplay: false,
-              allowSummaryDisplay: false,
-            }
-          : {
-              externalSiteId: site.id,
-              ...inputPolicy,
-            };
 
-      const [policy] = await tx
-        .insert(externalReviewSourcePolicies)
-        .values(values)
+      const previous = serializeExternalReviewPublication(
+        site.id,
+        existing ?? null,
+      );
+      const approvedAt = input.publication.approved
+        ? (existing?.approvedAt ?? new Date())
+        : null;
+      const [publication] = await tx
+        .insert(externalReviewPublications)
+        .values({ externalSiteId: site.id, approvedAt })
         .onConflictDoUpdate({
-          target: externalReviewSourcePolicies.externalSiteId,
-          set: {
-            ...values,
-            updatedAt: sql`NOW()`,
-          },
+          target: externalReviewPublications.externalSiteId,
+          set: { approvedAt, updatedAt: sql`NOW()` },
         })
         .returning();
-      if (!policy) {
+      if (!publication) {
         throw errors.INTERNAL_SERVER_ERROR({
-          message: "Failed to update review source policy.",
+          message: "Failed to update review publishing.",
         });
       }
 
-      if (
-        previous.publicationMode !== "automatic" &&
-        policy.publicationMode === "automatic"
-      ) {
+      if (!previous.approved && input.publication.approved) {
         await publishResolvedReviews(tx, site.id);
       }
 
-      return { previous, policy, site };
+      return { previous, publication, site };
     });
 
-    const serialized = serializeExternalReviewSourcePolicy(site.id, policy);
+    const result = serializeExternalReviewPublication(site.id, publication);
     auditLog({
-      event: AuditEvent.EXTERNAL_REVIEW_SOURCE_POLICY_UPDATED,
+      event: AuditEvent.EXTERNAL_REVIEW_PUBLICATION_UPDATED,
       userId: context.user.id,
       ip: context.ip,
       userAgent: context.userAgent,
       metadata: {
         site: site.type,
-        previous: auditFields(previous),
-        next: auditFields(serialized),
+        previous: previous.approved,
+        approved: result.approved,
       },
     });
 
-    if (
-      previous.allowScoreDisplay !== serialized.allowScoreDisplay ||
-      previous.publicationMode !== serialized.publicationMode
-    ) {
+    if (previous.approved !== result.approved) {
       const affected = await db
         .selectDistinct({
           reviewId: externalReviews.id,
@@ -171,5 +137,5 @@ export default procedure
       }
     }
 
-    return serialized;
+    return result;
   });

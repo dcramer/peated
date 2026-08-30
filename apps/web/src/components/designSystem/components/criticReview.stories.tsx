@@ -13,8 +13,6 @@ const meta = {
     publishedAt: "14 Mar 2025",
     rating: 92,
     reviewerName: "Jonny McCormick",
-    summary:
-      "Dense smoke, preserved citrus, and a maritime finish with excellent balance.",
   },
   decorators: [
     (Story) => (

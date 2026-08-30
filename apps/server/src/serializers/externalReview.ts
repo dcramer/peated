@@ -6,11 +6,9 @@ import {
   bottles,
   bottleTombstones,
   externalReviewArticles,
-  externalReviewSourcePolicies,
   externalSites,
   type ExternalReview,
   type ExternalReviewArticle,
-  type ExternalReviewSourcePolicy,
   type User,
 } from "../db/schema";
 import { type BottleSchema, type ExternalReviewSchema } from "../schemas";
@@ -20,13 +18,9 @@ import { ExternalSiteSerializer } from "./externalSite";
 type ExternalReviewAttrs = {
   article: Pick<
     ExternalReviewArticle,
-    "canonicalUrl" | "contentHash" | "externalSiteId" | "publishedAt" | "title"
+    "canonicalUrl" | "externalSiteId" | "publishedAt" | "title"
   >;
   bottle: z.infer<typeof BottleSchema> | null;
-  policy: Pick<
-    ExternalReviewSourcePolicy,
-    "allowLlmProcessing" | "allowScoreDisplay" | "allowSummaryDisplay"
-  > | null;
   site: ReturnType<(typeof ExternalSiteSerializer)["item"]>;
 };
 
@@ -50,7 +44,6 @@ export const ExternalReviewSerializer = serializer({
       .select({
         id: externalReviewArticles.id,
         canonicalUrl: externalReviewArticles.canonicalUrl,
-        contentHash: externalReviewArticles.contentHash,
         externalSiteId: externalReviewArticles.externalSiteId,
         publishedAt: externalReviewArticles.publishedAt,
         title: externalReviewArticles.title,
@@ -97,15 +90,6 @@ export const ExternalReviewSerializer = serializer({
           .from(externalSites)
           .where(inArray(externalSites.id, siteIds))
       : [];
-    const policyList = siteIds.length
-      ? await db
-          .select()
-          .from(externalReviewSourcePolicies)
-          .where(inArray(externalReviewSourcePolicies.externalSiteId, siteIds))
-      : [];
-    const policiesBySiteId = new Map(
-      policyList.map((policy) => [policy.externalSiteId, policy]),
-    );
     const sitesByRef = Object.fromEntries(
       (await serialize(ExternalSiteSerializer, siteList, currentUser)).map(
         (data, index) => [siteList[index].id, data],
@@ -134,7 +118,6 @@ export const ExternalReviewSerializer = serializer({
           {
             article,
             bottle,
-            policy: policiesBySiteId.get(article.externalSiteId) ?? null,
             site: sitesByRef[article.externalSiteId],
           },
         ];
@@ -145,12 +128,8 @@ export const ExternalReviewSerializer = serializer({
   item: (
     item: ExternalReview,
     attrs: ExternalReviewAttrs,
-    currentUser?: User,
   ): z.infer<typeof ExternalReviewSchema> => {
-    // This serializer owns the final display-capability check so every API
-    // consumer receives the same permitted view after policy revocation.
     const nativeScore =
-      attrs.policy?.allowScoreDisplay &&
       item.nativeScoreValue !== null &&
       item.nativeScoreScale !== null &&
       item.nativeScoreDisplay !== null
@@ -160,14 +139,6 @@ export const ExternalReviewSerializer = serializer({
             display: item.nativeScoreDisplay,
           }
         : null;
-    const summary =
-      attrs.policy?.allowLlmProcessing &&
-      attrs.policy.allowSummaryDisplay &&
-      attrs.article.contentHash !== null &&
-      attrs.article.contentHash === item.summaryContentHash
-        ? item.summary
-        : null;
-
     return {
       id: item.id,
       name: item.name,
@@ -179,7 +150,6 @@ export const ExternalReviewSerializer = serializer({
       bottle: attrs.bottle,
       reviewerName: item.reviewerName,
       nativeScore,
-      summary,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

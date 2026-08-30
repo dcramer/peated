@@ -108,7 +108,6 @@ test("fetches dates for the latest issue and checkpoints each review", async () 
           },
         ],
       },
-      externalReviewTexts: {},
     },
   });
   expect(checkpoint).toHaveBeenCalledTimes(166);

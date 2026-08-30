@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
@@ -81,10 +81,10 @@ export default implement(externalReviewListContract).handler(async function ({
       eq(externalReviews.articleId, externalReviewArticles.id),
     )
     .leftJoin(
-      externalReviewSourcePolicies,
+      externalReviewPublications,
       eq(
         externalReviewArticles.externalSiteId,
-        externalReviewSourcePolicies.externalSiteId,
+        externalReviewPublications.externalSiteId,
       ),
     )
     .where(and(...baseWhere, ...identityWhere))

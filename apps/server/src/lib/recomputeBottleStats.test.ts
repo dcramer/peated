@@ -4,6 +4,7 @@ import {
   bottleGroups,
   bottles,
   bottleTombstones,
+  externalReviewArticles,
   memberReviews,
   tastings,
 } from "@peated/server/db/schema";
@@ -119,18 +120,17 @@ describe("Bottle statistics recomputation", () => {
     });
   });
 
-  test("counts only permitted public whole-number external scores", async ({
+  test("counts only public whole-number external scores", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const allowedSite = await fixtures.ExternalSite({ type: "whiskyadvocate" });
     const blockedSite = await fixtures.ExternalSite({ type: "whiskyfun" });
-    await fixtures.EnabledExternalReviewSourcePolicy({
+    await fixtures.ApprovedExternalReviewPublication({
       externalSiteId: allowedSite.id,
     });
-    await fixtures.EnabledExternalReviewSourcePolicy({
+    await fixtures.ExternalReviewPublication({
       externalSiteId: blockedSite.id,
-      allowScoreDisplay: false,
     });
 
     for (const [site, value, scale, hidden] of [
@@ -149,6 +149,10 @@ describe("Bottle statistics recomputation", () => {
         nativeScoreDisplay: `${value}/${scale}`,
       });
     }
+    await db
+      .update(externalReviewArticles)
+      .set({ contentHash: "blocked-source-content" })
+      .where(eq(externalReviewArticles.externalSiteId, blockedSite.id));
     await fixtures.ExternalReview({
       externalSiteId: allowedSite.id,
       bottleId: bottle.id,
@@ -179,7 +183,7 @@ describe("Bottle statistics recomputation", () => {
       });
     }
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.EnabledExternalReviewSourcePolicy({
+    await fixtures.ApprovedExternalReviewPublication({
       externalSiteId: site.id,
     });
     await fixtures.ExternalReview({

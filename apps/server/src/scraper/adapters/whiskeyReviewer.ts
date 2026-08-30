@@ -201,7 +201,6 @@ export function parseWhiskeyReviewerArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews: [review],
     },
-    externalReviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
   });
 }
 

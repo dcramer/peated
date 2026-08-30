@@ -23,8 +23,8 @@ export enum AuditEvent {
   INVALID_CHALLENGE = "security.invalid_challenge",
   REPLAY_ATTACK_DETECTED = "security.replay_attack",
 
-  // External review content policy
-  EXTERNAL_REVIEW_SOURCE_POLICY_UPDATED = "external_review.source_policy.updated",
+  // External review publishing
+  EXTERNAL_REVIEW_PUBLICATION_UPDATED = "external_review.publication.updated",
 }
 
 interface AuditLogEntry {
