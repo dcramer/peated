@@ -24,9 +24,7 @@ export async function EntityCatalogPage({
         ? client.brands.list(queryParams)
         : kind === "bottler"
           ? client.bottlers.list(queryParams)
-          : kind === "company"
-            ? client.companies.list(queryParams)
-            : client.blenders.list(queryParams);
+          : client.companies.list(queryParams);
   const [entityList, countryList] = await Promise.all([
     entityListPromise,
     client.countries.list({ onlyMajor: true, sort: "-bottles" }),

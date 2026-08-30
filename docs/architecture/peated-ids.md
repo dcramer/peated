@@ -17,7 +17,7 @@ Peated IDs are serialized in uppercase with at least four digits. Input and sear
 
 - Bottle URLs use `/bottles/{numeric ID}`.
 - Entity URLs use the collection for their primary kind: `/brands`,
-  `/distillers`, `/bottlers`, `/blenders`, or `/companies`.
+  `/distillers`, `/bottlers`, or `/companies`.
 - Root ID URLs such as `/B0123`, `/B123`, and `/E0123` redirect permanently to
   the canonical collection URL.
 - Legacy `/entities/{numeric ID}` URLs redirect permanently to the Entity's

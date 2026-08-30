@@ -135,7 +135,7 @@ test("keeps a classifier-proposed kind for a new Entity", () => {
     abv: null,
     vintageYear: null,
     releaseYear: null,
-    brand: { id: null, name: "Compass Box", kind: "blender" },
+    brand: { id: null, name: "Compass Box", kind: "bottler" },
     distillers: [],
     bottler: null,
   };
@@ -144,7 +144,7 @@ test("keeps a classifier-proposed kind for a new Entity", () => {
     buildBottleInputFromProposedBottle(proposedBottle).brand,
   ).toMatchObject({
     name: "Compass Box",
-    kind: "blender",
+    kind: "bottler",
   });
 });
 

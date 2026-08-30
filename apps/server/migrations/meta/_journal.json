@@ -1737,6 +1737,20 @@
       "when": 1788059351225,
       "tag": "0247_plain_micromacro",
       "breakpoints": false
+    },
+    {
+      "idx": 248,
+      "version": "7",
+      "when": 1788070215901,
+      "tag": "0248_reclassify-blenders-as-bottlers",
+      "breakpoints": false
+    },
+    {
+      "idx": 249,
+      "version": "7",
+      "when": 1788070250801,
+      "tag": "0249_remove-blender-entity-kind",
+      "breakpoints": false
     }
   ]
 }

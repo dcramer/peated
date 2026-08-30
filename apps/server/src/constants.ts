@@ -149,7 +149,6 @@ export const ENTITY_KIND_LIST = [
   "brand",
   "distillery",
   "bottler",
-  "blender",
   "company",
 ] as const;
 

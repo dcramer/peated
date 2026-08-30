@@ -123,7 +123,7 @@ type CandidateEntity = {
   shortName: null | string;
   totalBottles: number;
   totalTastings: number;
-  kind: "brand" | "bottler" | "distillery" | "blender" | "company";
+  kind: "brand" | "bottler" | "distillery" | "company";
   website: null | string;
 };
 

@@ -14,7 +14,6 @@ const databaseItems = [
   { href: "/distillers", label: "Distillers" },
   { href: "/brands", label: "Brands" },
   { href: "/bottlers", label: "Bottlers" },
-  { href: "/blenders", label: "Blenders" },
 ] as const;
 
 const personalItems = [

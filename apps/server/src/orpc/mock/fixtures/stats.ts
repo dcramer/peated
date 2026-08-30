@@ -6,7 +6,6 @@ export const mockStats = {
   brands: 3_980,
   distilleries: 2_410,
   bottlers: 1_125,
-  blenders: 420,
   companies: 1_280,
   tastings: 142_580,
   memberReviews: 8_420,

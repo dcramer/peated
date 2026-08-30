@@ -25,8 +25,7 @@ function SignInShell() {
             { label: "Bottles", value: "28,430" },
             { label: "Distillers", value: "2,410" },
             { label: "Brands", value: "3,980" },
-            { label: "Bottlers", value: "1,125" },
-            { label: "Blenders", value: "420" },
+            { label: "Bottlers", value: "1,545" },
             { label: "Tastings", value: "142,580" },
             { label: "Reviews", value: "65,150" },
           ]}

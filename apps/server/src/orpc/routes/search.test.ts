@@ -31,11 +31,6 @@ describe("GET /search", () => {
       name: "Contractneedle Bottler",
       kind: "bottler",
     });
-    const blender = await fixtures.Entity({
-      name: "Contractneedle Blender",
-      type: [],
-      kind: "blender",
-    });
     const company = await fixtures.Entity({
       name: "Contractneedle Company",
       type: [],
@@ -53,7 +48,6 @@ describe("GET /search", () => {
         "companies",
         "brands",
         "bottles",
-        "blenders",
         "bottlers",
         "distilleries",
       ],
@@ -65,7 +59,6 @@ describe("GET /search", () => {
       "distilleries",
       "brands",
       "bottlers",
-      "blenders",
       "companies",
       "regions",
     ]);
@@ -78,7 +71,6 @@ describe("GET /search", () => {
       { type: "distilleries", total: 1, results: [{ id: distiller.id }] },
       { type: "brands", total: 1, results: [{ id: brand.id }] },
       { type: "bottlers", total: 1, results: [{ id: bottler.id }] },
-      { type: "blenders", total: 1, results: [{ id: blender.id }] },
       { type: "companies", total: 1, results: [{ id: company.id }] },
       { type: "regions", total: 1, results: [{ id: region.id }] },
     ]);
@@ -141,11 +133,6 @@ describe("GET /search", () => {
       kind: "bottler",
     });
     await fixtures.Entity({
-      name: "Population Blender",
-      type: [],
-      kind: "blender",
-    });
-    await fixtures.Entity({
       name: "Population Company",
       type: [],
       kind: "company",
@@ -153,12 +140,11 @@ describe("GET /search", () => {
 
     const data = await routerClient.search({
       query: "no-population-match",
-      scopes: ["bottles", "bottlers", "blenders", "companies"],
+      scopes: ["bottles", "bottlers", "companies"],
     });
 
     expect(data.scopeTotals.bottles).toBeGreaterThanOrEqual(1);
     expect(data.scopeTotals.bottlers).toBeGreaterThanOrEqual(1);
-    expect(data.scopeTotals.blenders).toBeGreaterThanOrEqual(1);
     expect(data.scopeTotals.companies).toBeGreaterThanOrEqual(1);
     expect(data.scopeTotals.members).toBeUndefined();
   });

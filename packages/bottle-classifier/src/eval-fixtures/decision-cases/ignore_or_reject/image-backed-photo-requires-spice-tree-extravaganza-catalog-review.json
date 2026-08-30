@@ -115,7 +115,7 @@
       {
         "entityId": 1422,
         "name": "Compass Box",
-        "kind": "blender",
+        "kind": "bottler",
         "source": ["context"]
       },
       {
@@ -226,7 +226,7 @@
       {
         "id": 1422,
         "name": "Compass Box",
-        "kind": "blender"
+        "kind": "bottler"
       },
       {
         "id": 15,

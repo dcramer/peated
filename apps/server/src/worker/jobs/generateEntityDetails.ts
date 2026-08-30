@@ -53,7 +53,7 @@ function generatePrompt(entity: InputEntity) {
       "'website' should be the official HTTPS website only when it is confidently known; otherwise return null.",
     ].join(" "),
     [
-      "'kind' must be the best single identity from: brand, distillery, bottler, blender, company.",
+      "'kind' must be the best single identity from: brand, distillery, bottler, company.",
     ].join(" "),
   ];
 

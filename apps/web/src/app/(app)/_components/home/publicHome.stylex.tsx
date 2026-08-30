@@ -75,7 +75,6 @@ export function PublicHome() {
             railBehavior="stack"
           >
             <Distilleries
-              totalBlenders={stats.data?.blenders}
               totalBottlers={stats.data?.bottlers}
               totalBrands={stats.data?.brands}
               totalDistilleries={stats.data?.distilleries}
@@ -291,12 +290,10 @@ function Origins() {
 }
 
 function Distilleries({
-  totalBlenders,
   totalBottlers,
   totalBrands,
   totalDistilleries,
 }: {
-  totalBlenders?: number;
   totalBottlers?: number;
   totalBrands?: number;
   totalDistilleries?: number;
@@ -355,13 +352,6 @@ function Distilleries({
             totalBottlers === undefined
               ? "Independent bottlers"
               : `${totalBottlers.toLocaleString("en-US")} bottlers`,
-        },
-        {
-          href: "/blenders",
-          label:
-            totalBlenders === undefined
-              ? "Blenders"
-              : `${totalBlenders.toLocaleString("en-US")} blenders`,
         },
         { href: "/locations", label: "Map" },
       ]}

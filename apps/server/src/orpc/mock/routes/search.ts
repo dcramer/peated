@@ -36,7 +36,6 @@ export default mockOS.search.handler(async ({ input, context }) => {
     distilleries: matchingEntities((entity) => entity.kind === "distillery"),
     brands: matchingEntities((entity) => entity.kind === "brand"),
     bottlers: matchingEntities((entity) => entity.kind === "bottler"),
-    blenders: matchingEntities((entity) => entity.kind === "blender"),
     companies: matchingEntities((entity) => entity.kind === "company"),
   } as const;
   const regions = mockRegions.filter((region) =>
@@ -54,7 +53,6 @@ export default mockOS.search.handler(async ({ input, context }) => {
     "distilleries",
     "brands",
     "bottlers",
-    "blenders",
     "companies",
   ] as const) {
     if (input.scopes.includes(scope)) {
@@ -111,8 +109,6 @@ export default mockOS.search.handler(async ({ input, context }) => {
           return entity.kind === "brand";
         case "bottlers":
           return entity.kind === "bottler";
-        case "blenders":
-          return entity.kind === "blender";
         case "companies":
           return entity.kind === "company";
         case "bottles":
@@ -135,7 +131,6 @@ export default mockOS.search.handler(async ({ input, context }) => {
       .length,
     brands: mockEntities.filter((entity) => entity.kind === "brand").length,
     bottlers: mockEntities.filter((entity) => entity.kind === "bottler").length,
-    blenders: mockEntities.filter((entity) => entity.kind === "blender").length,
     companies: mockEntities.filter((entity) => entity.kind === "company")
       .length,
     regions: mockRegions.length,

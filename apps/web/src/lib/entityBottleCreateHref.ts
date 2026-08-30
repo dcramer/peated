@@ -21,7 +21,6 @@ export function getEntityBottleCreateHref({
     case "distillery":
       params.set("distiller", String(id));
       break;
-    case "blender":
     case "company":
     case null:
       return undefined;

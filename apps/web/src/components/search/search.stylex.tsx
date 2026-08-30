@@ -35,7 +35,6 @@ const allApiScopes = [
   "distilleries",
   "brands",
   "bottlers",
-  "blenders",
   "companies",
   "regions",
   "members",
@@ -205,8 +204,6 @@ function getGroupLabel(type: SearchGroup["type"]) {
       return "Brands";
     case "bottlers":
       return "Bottlers";
-    case "blenders":
-      return "Blenders";
     case "companies":
       return "Companies";
     case "regions":
@@ -235,7 +232,6 @@ function groupItems(
     case "distilleries":
     case "brands":
     case "bottlers":
-    case "blenders":
     case "companies":
       return group.results.map(entityItem);
     case "regions":
@@ -304,7 +300,6 @@ function nearestItem(nearest: SearchNearest, bottleOptions: BottleItemOptions) {
     case "distilleries":
     case "brands":
     case "bottlers":
-    case "blenders":
     case "companies":
       return entityItem(nearest.result);
     case "regions":

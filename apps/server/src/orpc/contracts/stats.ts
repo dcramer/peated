@@ -20,7 +20,6 @@ export default contract
       brands: z.number().int().nonnegative().describe("Brands"),
       distilleries: z.number().int().nonnegative().describe("Distilleries"),
       bottlers: z.number().int().nonnegative().describe("Bottlers"),
-      blenders: z.number().int().nonnegative().describe("Blenders"),
       companies: z.number().int().nonnegative().describe("Companies"),
       tastings: z
         .number()

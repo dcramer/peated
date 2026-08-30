@@ -4,7 +4,6 @@ const ENTITY_COLLECTION_BY_KIND = {
   brand: "/brands",
   distillery: "/distillers",
   bottler: "/bottlers",
-  blender: "/blenders",
   company: "/companies",
 } as const satisfies Record<EntityKind, `/${string}`>;
 
@@ -42,9 +41,6 @@ export function getEntityKindSearchUrl(kind: EntityKind) {
       break;
     case "distillery":
       link = "/distillers";
-      break;
-    case "blender":
-      link = "/blenders";
       break;
     case "company":
       link = "/companies";

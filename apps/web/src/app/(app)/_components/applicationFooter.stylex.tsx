@@ -13,7 +13,6 @@ const groups = [
       { href: "/distillers", label: "Distillers" },
       { href: "/brands", label: "Brands" },
       { href: "/bottlers", label: "Bottlers" },
-      { href: "/blenders", label: "Blenders" },
       { href: "/locations", label: "Locations" },
     ],
   },
@@ -58,7 +57,6 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
         formatCount(stats.distilleries, "distilleries"),
         formatCount(stats.brands, "brands"),
         formatCount(stats.bottlers, "bottlers"),
-        formatCount(stats.blenders, "blenders"),
         formatCount(stats.tastings, "tastings"),
       ].join(" · ")
     : undefined;

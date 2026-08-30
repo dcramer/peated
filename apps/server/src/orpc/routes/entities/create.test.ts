@@ -79,12 +79,11 @@ describe("POST /entities", () => {
 
   test("accepts every entity kind", async ({ defaults }) => {
     const created = await Promise.all(
-      (["brand", "distillery", "bottler", "blender", "company"] as const).map(
-        (kind) =>
-          routerClient.entities.create(
-            { name: `Generic ${kind}`, kind },
-            { context: { user: defaults.user } },
-          ),
+      (["brand", "distillery", "bottler", "company"] as const).map((kind) =>
+        routerClient.entities.create(
+          { name: `Generic ${kind}`, kind },
+          { context: { user: defaults.user } },
+        ),
       ),
     );
 
@@ -92,7 +91,6 @@ describe("POST /entities", () => {
       "brand",
       "distillery",
       "bottler",
-      "blender",
       "company",
     ]);
   });
@@ -162,7 +160,7 @@ describe("POST /entities", () => {
     fixtures,
     defaults,
   }) => {
-    await fixtures.Entity({ name: "Compass Box", kind: "blender" });
+    await fixtures.Entity({ name: "Compass Box", kind: "bottler" });
 
     const err = await waitError(
       routerClient.entities.create(

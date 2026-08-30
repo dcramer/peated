@@ -14,10 +14,10 @@ describe("entity classifier contract", () => {
     expect(
       SearchEntitiesArgsSchema.parse({
         query: "Compass Box",
-        kind: "blender",
+        kind: "bottler",
         limit: 5,
       }),
-    ).toEqual({ query: "Compass Box", kind: "blender", limit: 5 });
+    ).toEqual({ query: "Compass Box", kind: "bottler", limit: 5 });
   });
 
   test("parses a suspect entity reference", () => {

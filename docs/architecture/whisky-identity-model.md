@@ -26,7 +26,7 @@ Classifier terms are governed by the
   observation. It may preserve facts more specific or less certain than the
   canonical Bottle identity.
 - **Entity** is a catalog identity with exactly one top-level `kind`: `brand`,
-  `distillery`, `bottler`, `blender`, or `company`. Kind controls browse
+  `distillery`, `bottler`, or `company`. Kind controls browse
   placement. It does not restrict Bottle relationships. A Bottle can use any
   Entity as its brand, bottler, or distiller, and one Entity can fill more than
   one of those relationships.

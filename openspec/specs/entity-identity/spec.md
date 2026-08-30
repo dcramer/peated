@@ -8,7 +8,8 @@ shows those facts to users.
 ### Requirement: One Entity kind
 
 The system SHALL keep one Entity record for each whisky identity or owning
-company. Each Entity SHALL have exactly one kind from the approved kind list.
+company. Each Entity SHALL have exactly one kind from Brand, Distillery,
+Bottler, or Company.
 
 #### Scenario: Distillery also appears as a Brand
 
@@ -55,17 +56,17 @@ links. It MUST NOT copy those uses into an Entity type list.
 
 ### Requirement: Clear API names
 
-The system SHALL use dedicated Brand, Distillery, Bottler, Blender, and Company
-API collections for what an Entity is. Bottle APIs SHALL use Brand, Bottler,
-and Distiller as Bottle field names. The system SHALL keep the generic Entity
-API for cross-kind selectors, creation, updates, and other shared Entity
+The system SHALL use dedicated Brand, Distillery, Bottler, and Company API
+collections for what an Entity is. Bottle APIs SHALL use Brand, Bottler, and
+Distiller as Bottle field names. The system SHALL keep the generic Entity API
+for cross-kind selectors, creation, updates, and other shared Entity
 operations. It MUST NOT add a stored Entity role, use the generic collection
 for kind browse pages, or use `type` for both meanings.
 
 #### Scenario: List one Entity kind
 
-- **WHEN** a caller lists `/blenders`
-- **THEN** every result has kind `blender` and the caller does not pass a kind
+- **WHEN** a caller lists `/bottlers`
+- **THEN** every result has kind `bottler` and the caller does not pass a kind
   filter
 
 #### Scenario: Browse one Entity kind
@@ -76,13 +77,13 @@ for kind browse pages, or use `type` for both meanings.
 #### Scenario: Select across Entity kinds
 
 - **WHEN** a Bottle or ownership field needs to select any Entity
-- **THEN** `GET /entities` searches all five kinds and returns each result's
+- **THEN** `GET /entities` searches all four kinds and returns each result's
   kind
 
 #### Scenario: Create an Entity
 
-- **WHEN** a caller creates a Blender through `POST /entities`
-- **THEN** the caller passes kind `blender` and the server stores that kind
+- **WHEN** a caller creates a Bottler through `POST /entities`
+- **THEN** the caller passes kind `bottler` and the server stores that kind
 
 #### Scenario: Update an Entity
 
@@ -197,8 +198,8 @@ list.
 
 #### Scenario: Review unclear rows
 
-- **WHEN** the existing data does not clearly distinguish Brand, Bottler,
-  Blender, or Company
+- **WHEN** the existing data does not clearly distinguish Brand, Bottler, or
+  Company
 - **THEN** the Entity remains unchanged until its kind is researched
 
 #### Scenario: Apply a reviewed kind
