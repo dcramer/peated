@@ -3,9 +3,11 @@ import {
   changes,
   entities,
   entityAliases,
+  entityImages,
   entityTombstones,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import { deleteOwnedEntityImage } from "@peated/server/lib/entityImages";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -35,6 +37,11 @@ export default procedure
       });
     }
 
+    const images = await db
+      .select({ imageUrl: entityImages.imageUrl })
+      .from(entityImages)
+      .where(eq(entityImages.entityId, entity.id));
+
     await db.transaction(async (tx) => {
       const actorId = (await getUserActorForDatabase(tx, context.user)).id;
 
@@ -59,6 +66,10 @@ export default procedure
 
       await tx.delete(entities).where(eq(entities.id, entity.id));
     });
+
+    await Promise.all(
+      images.map((image) => deleteOwnedEntityImage(image.imageUrl)),
+    );
 
     return {};
   });

@@ -10,6 +10,7 @@ import {
   entityAliases,
   entityEvents,
   entityFollows,
+  entityImages,
   entityTombstones,
 } from "@peated/server/db/schema";
 import {
@@ -580,6 +581,43 @@ async function performEntityMerge({
       .update(entityAliases)
       .set({ entityId: toEntity.id })
       .where(inArray(entityAliases.entityId, fromEntityIds));
+
+    const [destinationPrimaryImage] = await tx
+      .select({ id: entityImages.id })
+      .from(entityImages)
+      .where(
+        and(
+          eq(entityImages.entityId, toEntity.id),
+          eq(entityImages.isPrimary, true),
+        ),
+      )
+      .limit(1);
+    const sourceImages = await tx
+      .select({ id: entityImages.id, isPrimary: entityImages.isPrimary })
+      .from(entityImages)
+      .where(inArray(entityImages.entityId, fromEntityIds))
+      .orderBy(asc(entityImages.id));
+    const nextPrimaryImageId = destinationPrimaryImage
+      ? null
+      : (sourceImages.find((image) => image.isPrimary)?.id ??
+        sourceImages[0]?.id ??
+        null);
+    if (sourceImages.length) {
+      await tx
+        .update(entityImages)
+        .set({ isPrimary: false, updatedAt: new Date() })
+        .where(inArray(entityImages.entityId, fromEntityIds));
+      await tx
+        .update(entityImages)
+        .set({ entityId: toEntity.id, idempotencyKey: null })
+        .where(inArray(entityImages.entityId, fromEntityIds));
+      if (nextPrimaryImageId) {
+        await tx
+          .update(entityImages)
+          .set({ isPrimary: true, updatedAt: new Date() })
+          .where(eq(entityImages.id, nextPrimaryImageId));
+      }
+    }
 
     // An Entity merge keeps each user's follow on the surviving Entity.
     await tx

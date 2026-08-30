@@ -15,6 +15,7 @@ import {
   entityAliases,
   entityEvents,
   entityFollows,
+  entityImages,
   entityTombstones,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -165,6 +166,56 @@ test("repoints history when Entities merge", async ({ fixtures }) => {
       where: eq(entityEvents.id, duplicateEvent.id),
     }),
   ).toBeUndefined();
+});
+
+test("keeps images when Entities merge", async ({ fixtures }) => {
+  const source = await fixtures.Entity();
+  const destination = await fixtures.Entity();
+  const [destinationImage, sourceImage] = await db
+    .insert(entityImages)
+    .values([
+      {
+        entityId: destination.id,
+        imageUrl: "/uploads/entities/destination.webp",
+        isPrimary: true,
+        createdByActorId: destination.createdByActorId,
+        idempotencyKey: "shared-upload",
+      },
+      {
+        entityId: source.id,
+        imageUrl: "/uploads/entities/source.webp",
+        caption: "Source image",
+        isPrimary: true,
+        createdByActorId: destination.createdByActorId,
+        idempotencyKey: "shared-upload",
+      },
+    ])
+    .returning();
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const images = await db
+    .select()
+    .from(entityImages)
+    .where(eq(entityImages.entityId, destination.id));
+  expect(images).toHaveLength(2);
+  expect(images).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        id: destinationImage!.id,
+        isPrimary: true,
+        idempotencyKey: "shared-upload",
+      }),
+      expect.objectContaining({
+        id: sourceImage!.id,
+        isPrimary: false,
+        idempotencyKey: null,
+      }),
+    ]),
+  );
 });
 
 test("rejects a merge with conflicting current owners", async ({

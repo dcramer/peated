@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { entityFollows, entityTombstones } from "@peated/server/db/schema";
+import {
+  entityFollows,
+  entityImages,
+  entityTombstones,
+} from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -25,6 +30,38 @@ describe("GET /entities/:entity", () => {
 
     expect(data.createdAt).toBe(createdAt.toISOString());
     expect(data.updatedAt).toBe(updatedAt.toISOString());
+  });
+
+  test("returns images with the primary image first", async ({ fixtures }) => {
+    const entity = await fixtures.Entity();
+    const actor = await getUserActor(await fixtures.User());
+    await db.insert(entityImages).values([
+      {
+        entityId: entity.id,
+        imageUrl: "/uploads/entities/secondary.webp",
+        caption: null,
+        isPrimary: false,
+        createdByActorId: actor.id,
+      },
+      {
+        entityId: entity.id,
+        imageUrl: "/uploads/entities/primary.webp",
+        caption: "Front gate",
+        isPrimary: true,
+        createdByActorId: actor.id,
+      },
+    ]);
+
+    const data = await routerClient.entities.details({ entity: entity.id });
+
+    expect(data.images).toHaveLength(2);
+    expect(data.images[0]).toMatchObject({
+      caption: "Front gate",
+      isPrimary: true,
+    });
+    expect(data.images[0]?.imageUrl).toContain(
+      "/uploads/entities/primary.webp",
+    );
   });
 
   test("returns the current direct owner", async ({ fixtures }) => {
