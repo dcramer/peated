@@ -12,6 +12,8 @@ const GUARDED_PATCH_FIELDS = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
+  "releaseMonth",
+  "releaseDay",
   "maturation",
   "caskNumber",
   "outturn",
@@ -31,6 +33,8 @@ const EVIDENCE_FIELD_NAMES = {
   vintageYear: ["vintageYear", "vintage_year"],
   bottlingYear: ["bottlingYear", "bottling_year"],
   releaseYear: ["releaseYear", "release_year"],
+  releaseMonth: ["releaseMonth", "release_month"],
+  releaseDay: ["releaseDay", "release_day"],
   maturation: ["maturation"],
   caskNumber: ["caskNumber", "cask_number"],
   outturn: ["outturn"],
@@ -54,6 +58,8 @@ function currentFieldValue(
     case "vintageYear":
     case "bottlingYear":
     case "releaseYear":
+    case "releaseMonth":
+    case "releaseDay":
     case "maturation":
     case "caskNumber":
     case "outturn":

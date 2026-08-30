@@ -144,6 +144,8 @@ export const BottlePatchSchema = z
     vintageYear: ProposedBottleFields.vintageYear.removeDefault().optional(),
     bottlingYear: ProposedBottleFields.bottlingYear,
     releaseYear: ProposedBottleFields.releaseYear.removeDefault().optional(),
+    releaseMonth: ProposedBottleFields.releaseMonth,
+    releaseDay: ProposedBottleFields.releaseDay,
     maturation: ProposedBottleFields.maturation.removeDefault().optional(),
     caskNumber: ProposedBottleFields.caskNumber.removeDefault().optional(),
     outturn: ProposedBottleFields.outturn.removeDefault().optional(),

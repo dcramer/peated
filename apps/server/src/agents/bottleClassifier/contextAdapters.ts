@@ -44,6 +44,8 @@ function exactBottleContext(
     vintageYear: number | null;
     bottlingYear: number | null;
     releaseYear: number | null;
+    releaseMonth: number | null;
+    releaseDay: number | null;
     caskNumber: BottleContextExact["caskNumber"];
     maturation: BottleContextExact["maturation"];
     outturn: BottleContextExact["outturn"];
@@ -59,6 +61,8 @@ function exactBottleContext(
     vintageYear: bottle.vintageYear,
     bottlingYear: bottle.bottlingYear,
     releaseYear: bottle.releaseYear,
+    releaseMonth: bottle.releaseMonth,
+    releaseDay: bottle.releaseDay,
     caskNumber: bottle.caskNumber,
     maturation: bottle.maturation,
     outturn: bottle.outturn,
@@ -200,6 +204,8 @@ export async function getBottleClassifierContext(
               vintageYear: bottles.vintageYear,
               bottlingYear: bottles.bottlingYear,
               releaseYear: bottles.releaseYear,
+              releaseMonth: bottles.releaseMonth,
+              releaseDay: bottles.releaseDay,
               caskNumber: bottles.caskNumber,
               maturation: bottles.maturation,
               outturn: bottles.outturn,

@@ -76,7 +76,6 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
         await queryClient.invalidateQueries({
           queryKey: orpc.bottles.details.key({
             input: { bottle: context.bottleId },
-            type: "query",
           }),
           refetchType: "all",
         });

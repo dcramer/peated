@@ -1,6 +1,7 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { StorePriceInputSchema } from "@peated/server/schemas";
 import scrapeSingleCaskNation, {
+  parseReleaseMonth,
   scrapeProducts,
 } from "./scrapeSingleCaskNation";
 
@@ -9,16 +10,45 @@ process.env.DISABLE_HTTP_CACHE = "1";
 const firstPageUrl =
   "https://singlecasknation.com/collections/frontpage/products.json?limit=250&page=1&country=US";
 
+function mockProductPages(axiosMock: any) {
+  axiosMock
+    .onGet(/^https:\/\/singlecasknation\.com\/products\//u)
+    .reply(200, "<p>October 2024 Online Exclusive Release</p>");
+}
+
+test("parses a source-stated release month without inventing a day", () => {
+  expect(
+    parseReleaseMonth(
+      "<div>October 2024 <strong>Online Exclusive Release</strong></div>",
+    ),
+  ).toEqual({ releaseYear: 2024, releaseMonth: 10 });
+  expect(parseReleaseMonth("October release")).toBeNull();
+});
+
 test("scrapes every supported whisky type and excludes ineligible records", async ({
   axiosMock,
 }) => {
   const result = await loadFixture("singlecasknation", "bottle-list.json");
   axiosMock.onGet(firstPageUrl).reply(200, result);
+  mockProductPages(axiosMock);
 
   const items: unknown[] = [];
+  const identities: unknown[] = [];
   await scrapeProducts(firstPageUrl, async (item) => {
-    items.push(StorePriceInputSchema.parse(item));
+    const { sourceBottleIdentity, ...price } =
+      StorePriceInputSchema.parse(item);
+    identities.push(sourceBottleIdentity);
+    items.push(price);
   });
+
+  expect(identities).toMatchObject([
+    { category: "bourbon", release_year: 2024, release_month: 10 },
+    { category: "single_malt", release_year: 2024, release_month: 10 },
+    { category: "rye", release_year: 2024, release_month: 10 },
+    { category: "single_grain", release_year: 2024, release_month: 10 },
+    { category: "single_malt", release_year: 2024, release_month: 10 },
+    { category: "rye", release_year: 2024, release_month: 10 },
+  ]);
 
   expect(items).toEqual([
     {
@@ -87,6 +117,7 @@ test("paginates a dry run and stops after an empty page", async ({
 }) => {
   const result = await loadFixture("singlecasknation", "bottle-list.json");
   axiosMock.onGet(firstPageUrl).reply(200, result);
+  mockProductPages(axiosMock);
   axiosMock
     .onGet(
       "https://singlecasknation.com/collections/frontpage/products.json?limit=250&page=2&country=US",

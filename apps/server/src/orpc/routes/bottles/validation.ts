@@ -199,7 +199,8 @@ const BottlePreviewResultSchema = z.object({
   statedAge: z.number().nullable(),
   vintageYear: z.number().nullable(),
   releaseYear: z.number().nullable(),
-  releaseDate: z.string().date().nullable(),
+  releaseMonth: z.number().int().min(1).max(12).nullable(),
+  releaseDay: z.number().int().min(1).max(31).nullable(),
   caskStrength: z.boolean().nullish(),
   singleCask: z.boolean().nullish(),
 });
@@ -230,7 +231,8 @@ export default procedure
       statedAge: normalized.statedAge,
       vintageYear: normalized.vintageYear,
       releaseYear: normalized.releaseYear,
-      releaseDate: normalized.releaseDate ?? null,
+      releaseMonth: normalized.releaseMonth ?? null,
+      releaseDay: normalized.releaseDay ?? null,
       caskStrength: normalized.caskStrength,
       singleCask: normalized.singleCask,
     };

@@ -45,7 +45,10 @@ export function buildBottlePatch(
     patch.bottlingYear = value.bottlingYear;
   }
   if (dirtyFields.has("releaseYear")) patch.releaseYear = value.releaseYear;
-  if (dirtyFields.has("releaseDate")) patch.releaseDate = value.releaseDate;
+  if (dirtyFields.has("releaseMonth")) {
+    patch.releaseMonth = value.releaseMonth;
+  }
+  if (dirtyFields.has("releaseDay")) patch.releaseDay = value.releaseDay;
   if (dirtyFields.has("caskNumber")) patch.caskNumber = value.caskNumber;
   if (dirtyFields.has("maturation")) patch.maturation = value.maturation;
   if (dirtyFields.has("outturn")) patch.outturn = value.outturn;

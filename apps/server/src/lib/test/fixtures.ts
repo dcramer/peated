@@ -472,7 +472,8 @@ type BottleGroupMemberFixtureData = Partial<
     | "vintageYear"
     | "bottlingYear"
     | "releaseYear"
-    | "releaseDate"
+    | "releaseMonth"
+    | "releaseDay"
     | "caskNumber"
     | "maturation"
     | "outturn"
@@ -565,6 +566,8 @@ async function createBottleFixture(
             edition: data.edition ?? null,
             statedAge: data.statedAge ?? null,
             releaseYear: data.releaseYear ?? null,
+            releaseMonth: data.releaseMonth ?? null,
+            releaseDay: data.releaseDay ?? null,
             vintageYear: data.vintageYear ?? null,
             bottlingYear: data.bottlingYear ?? null,
             abv: data.abv ?? null,

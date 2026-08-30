@@ -39,7 +39,8 @@ test("bottle list", async ({ axiosMock }) => {
         ],
         "maturation": "American Rye Whisky",
         "name": "RW3.6 Truly a flavour bomb",
-        "releaseDate": "2023-10-06",
+        "releaseDay": 6,
+        "releaseMonth": 10,
         "releaseYear": 2023,
         "singleCask": true,
         "statedAge": 5,
@@ -76,7 +77,8 @@ test("bottle list", async ({ axiosMock }) => {
         ],
         "maturation": "2nd fill ex-bourbon hogshead",
         "name": "3.350 Gladrags of yesteryear",
-        "releaseDate": "2023-12-13",
+        "releaseDay": 13,
+        "releaseMonth": 12,
         "releaseYear": 2023,
         "singleCask": true,
         "statedAge": 19,
@@ -132,14 +134,17 @@ test("continues when optional SMWS catalog fields are absent", async ({
     maturation: null,
     caskNumber: "3.350",
     vintageYear: 2004,
-    releaseDate: "2023-12-13",
+    releaseYear: 2023,
+    releaseMonth: 12,
+    releaseDay: 13,
   });
   expect(items[1][0]).toMatchObject({
     name: "4.303 A nocturne sipper",
     vintageYear: null,
-    releaseDate: null,
-    releaseYear: null,
   });
+  expect(items[1][0]).not.toHaveProperty("releaseYear");
+  expect(items[1][0]).not.toHaveProperty("releaseMonth");
+  expect(items[1][0]).not.toHaveProperty("releaseDay");
 });
 
 test("uses the SKU volume and positive sale price", async ({ axiosMock }) => {

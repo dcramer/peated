@@ -97,6 +97,14 @@ export function normalizeProposedBottleDraft(
     statedAge: normalized.statedAge,
     vintageYear: normalized.vintageYear,
     releaseYear: normalized.releaseYear,
+    releaseMonth:
+      normalized.releaseYear === proposedBottle.releaseYear
+        ? (proposedBottle.releaseMonth ?? null)
+        : null,
+    releaseDay:
+      normalized.releaseYear === proposedBottle.releaseYear
+        ? (proposedBottle.releaseDay ?? null)
+        : null,
     caskStrength: normalized.caskStrength ?? null,
     singleCask: normalized.singleCask ?? null,
     distillers: Array.from(distillersByName.values()),

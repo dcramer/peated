@@ -854,20 +854,23 @@ describe("GET /bottles", () => {
       name: "Followed Bottler Release",
       bottlerId: bottler.id,
       releaseYear: 2026,
-      releaseDate: "2026-09-01",
+      releaseMonth: 9,
+      releaseDay: 1,
     });
     const exactLaterThisYear = await fixtures.Bottle({
       name: "Exact Later This Year",
       distillerIds: [distiller.id],
       releaseYear: 2026,
-      releaseDate: "2026-08-01",
+      releaseMonth: 8,
+      releaseDay: 1,
       createdAt: new Date("2025-01-01T00:00:00.000Z"),
     });
     const exactEarlierThisYear = await fixtures.Bottle({
       name: "Exact Earlier This Year",
       distillerIds: [distiller.id],
       releaseYear: 2026,
-      releaseDate: "2026-02-01",
+      releaseMonth: 2,
+      releaseDay: 1,
       createdAt: new Date("2026-08-15T00:00:00.000Z"),
     });
     const yearOnlyThisYear = await fixtures.Bottle({
@@ -896,7 +899,8 @@ describe("GET /bottles", () => {
       name: "Followed Brand Release",
       brandId: followedBrand.id,
       releaseYear: 2026,
-      releaseDate: "2026-06-01",
+      releaseMonth: 6,
+      releaseDay: 1,
     });
     await fixtures.Bottle({ name: "Unrelated Release", releaseYear: 2026 });
 

@@ -55,6 +55,8 @@ function buildBottleContext(): BottleContext {
       caskStrength: true,
       vintageYear: null,
       releaseYear: 2022,
+      releaseMonth: null,
+      releaseDay: null,
       caskNumber: null,
       maturation: null,
       outturn: null,

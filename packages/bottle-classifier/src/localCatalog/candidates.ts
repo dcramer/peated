@@ -67,6 +67,8 @@ function getSiblingBottleContext({
       statedAge: sibling.statedAge,
       edition: sibling.edition,
       releaseYear: sibling.releaseYear,
+      releaseMonth: sibling.releaseMonth,
+      releaseDay: sibling.releaseDay,
       vintageYear: sibling.vintageYear,
       bottlingYear: sibling.bottlingYear,
       abv: sibling.abv,
@@ -117,6 +119,8 @@ export function buildBottleCandidateFromCatalog({
     vintageYear: bottle.vintageYear,
     bottlingYear: bottle.bottlingYear,
     releaseYear: bottle.releaseYear,
+    releaseMonth: bottle.releaseMonth,
+    releaseDay: bottle.releaseDay,
     score,
     source,
     familyContext: {

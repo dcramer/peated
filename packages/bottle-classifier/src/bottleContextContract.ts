@@ -89,6 +89,8 @@ export const BottleContextExactFields = {
   vintageYear: ProposedBottleFields.vintageYear.removeDefault(),
   bottlingYear: ProposedBottleFields.bottlingYear,
   releaseYear: ProposedBottleFields.releaseYear.removeDefault(),
+  releaseMonth: z.number().int().min(1).max(12).nullable().default(null),
+  releaseDay: z.number().int().min(1).max(31).nullable().default(null),
   maturation: ProposedBottleFields.maturation.removeDefault(),
   caskNumber: ProposedBottleFields.caskNumber.removeDefault(),
   outturn: ProposedBottleFields.outturn.removeDefault(),

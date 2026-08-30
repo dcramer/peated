@@ -36,6 +36,8 @@ export function getDeterministicIdentitySeed(
     stated_age: null,
     abv: null,
     release_year: null,
+    release_month: null,
+    release_day: null,
     vintage_year: null,
     cask_strength: null,
     single_cask: true,

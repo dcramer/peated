@@ -225,6 +225,8 @@ async function resolveBottleReferenceTargetWithClassifier(
             stated_age: null,
             abv: null,
             release_year: null,
+            release_month: null,
+            release_day: null,
             vintage_year: null,
             maturation: null,
             cask_number: null,

@@ -14,10 +14,7 @@ import {
   bottleTombstones,
   entities,
 } from "@peated/server/db/schema";
-import {
-  getBottleExactIdentity,
-  type BottleExactIdentity,
-} from "@peated/server/lib/bottleIdentity";
+import { getBottleExactIdentity } from "@peated/server/lib/bottleIdentity";
 import { asc, eq } from "drizzle-orm";
 import { fail, loadEntity } from "./shared";
 
@@ -128,7 +125,7 @@ export function existingEntityChoice(entity: Entity) {
   };
 }
 
-export function bottleExact(resource: BottleResource): BottleExactIdentity {
+export function bottleExact(resource: BottleResource) {
   return getBottleExactIdentity({
     bottle: resource.bottle,
     sourceGroupStatedAge: resource.group.statedAge,

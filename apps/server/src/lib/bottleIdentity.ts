@@ -26,6 +26,13 @@ export type BottleExactIdentity = Pick<
 > & {
   bottlingYear?: Bottle["bottlingYear"];
   noAgeStatement?: Bottle["noAgeStatement"];
+  releaseMonth?: Bottle["releaseMonth"];
+  releaseDay?: Bottle["releaseDay"];
+};
+
+type CompleteBottleExactIdentity = BottleExactIdentity & {
+  releaseMonth: Bottle["releaseMonth"];
+  releaseDay: Bottle["releaseDay"];
 };
 
 export type BottleExactIdentityPatch = Partial<BottleExactIdentity>;
@@ -80,7 +87,7 @@ export function getBottleExactIdentity({
   bottle: BottleExactIdentity;
   sourceGroupStatedAge: number | null;
   exactPatch?: BottleExactIdentityPatch;
-}): BottleExactIdentity {
+}): CompleteBottleExactIdentity {
   return {
     edition: valueOrCurrent(exactPatch?.edition, bottle.edition),
     statedAge: getBottleExactStatedAge({
@@ -93,6 +100,14 @@ export function getBottleExactIdentity({
     ),
     bottlingYear: valueOrCurrent(exactPatch?.bottlingYear, bottle.bottlingYear),
     releaseYear: valueOrCurrent(exactPatch?.releaseYear, bottle.releaseYear),
+    releaseMonth: valueOrCurrent(
+      exactPatch?.releaseMonth,
+      bottle.releaseMonth ?? null,
+    ),
+    releaseDay: valueOrCurrent(
+      exactPatch?.releaseDay,
+      bottle.releaseDay ?? null,
+    ),
     vintageYear: valueOrCurrent(exactPatch?.vintageYear, bottle.vintageYear),
     abv: valueOrCurrent(exactPatch?.abv, bottle.abv),
     singleCask: valueOrCurrent(exactPatch?.singleCask, bottle.singleCask),

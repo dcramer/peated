@@ -35,6 +35,8 @@ const LocalCatalogBottleSchema = z
     vintageYear: z.number().int().gte(1800).nullable().default(null),
     bottlingYear: z.number().int().gte(1800).nullable().optional(),
     releaseYear: z.number().int().gte(1800).nullable().default(null),
+    releaseMonth: z.number().int().min(1).max(12).nullable().default(null),
+    releaseDay: z.number().int().min(1).max(31).nullable().default(null),
   })
   .strict();
 

@@ -229,6 +229,8 @@ function collectChangedBottleFields(
     "vintageYear",
     "bottlingYear",
     "releaseYear",
+    "releaseMonth",
+    "releaseDay",
     "caskNumber",
     "maturation",
     "outturn",

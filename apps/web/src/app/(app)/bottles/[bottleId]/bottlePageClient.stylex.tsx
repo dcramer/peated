@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
   Button,
   ButtonLink,
@@ -101,9 +102,7 @@ function getBottleSpecs(bottle: Bottle) {
     { label: "Cask", value: bottle.maturation },
     {
       label: "Release",
-      value:
-        bottle.releaseDate ??
-        (bottle.releaseYear === null ? null : String(bottle.releaseYear)),
+      value: formatReleaseDate(bottle),
     },
   ] as const;
 }

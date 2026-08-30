@@ -59,6 +59,8 @@ export type BottleCandidateQueryRow = {
   abv?: number | string | null;
   vintageYear?: number | string | null;
   releaseYear?: number | string | null;
+  releaseMonth?: number | string | null;
+  releaseDay?: number | string | null;
   maturation?: string | null;
   caskNumber?: string | null;
   outturn?: number | string | null;
@@ -101,6 +103,8 @@ const CANDIDATE_METADATA_FIELDS = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
+  "releaseMonth",
+  "releaseDay",
   "maturation",
   "caskNumber",
   "outturn",
@@ -326,6 +330,8 @@ function buildBottleCandidate(
     abv: normalizePotentialProofToAbv(parseNullableNumber(row.abv)),
     vintageYear: parseNullableNumber(row.vintageYear),
     releaseYear: parseNullableNumber(row.releaseYear),
+    releaseMonth: parseNullableNumber(row.releaseMonth),
+    releaseDay: parseNullableNumber(row.releaseDay),
     maturation: row.maturation ?? null,
     caskNumber: row.caskNumber ?? null,
     outturn: parseNullableNumber(row.outturn),
@@ -596,6 +602,8 @@ type CandidateBottleMetadataRow = {
   abv: number | null;
   vintageYear: number | null;
   releaseYear: number | null;
+  releaseMonth: number | null;
+  releaseDay: number | null;
   maturation: BottleCandidate["maturation"];
   caskNumber: BottleCandidate["caskNumber"];
   outturn: BottleCandidate["outturn"];
@@ -612,6 +620,8 @@ type CandidateBottleSiblingRow = {
   abv: number | null;
   vintageYear: number | null;
   releaseYear: number | null;
+  releaseMonth: number | null;
+  releaseDay: number | null;
   maturation: BottleCandidate["maturation"];
   caskNumber: BottleCandidate["caskNumber"];
   outturn: BottleCandidate["outturn"];
@@ -686,6 +696,8 @@ function buildBottleSiblingContext(
           statedAge: sibling.statedAge,
           edition: sibling.edition,
           releaseYear: sibling.releaseYear,
+          releaseMonth: sibling.releaseMonth,
+          releaseDay: sibling.releaseDay,
           vintageYear: sibling.vintageYear,
           abv: sibling.abv,
           singleCask: sibling.singleCask,
@@ -728,6 +740,8 @@ async function enrichBottleCandidates(
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
       releaseYear: bottles.releaseYear,
+      releaseMonth: bottles.releaseMonth,
+      releaseDay: bottles.releaseDay,
       maturation: bottles.maturation,
       caskNumber: bottles.caskNumber,
       outturn: bottles.outturn,
@@ -763,6 +777,8 @@ async function enrichBottleCandidates(
             abv: bottles.abv,
             vintageYear: bottles.vintageYear,
             releaseYear: bottles.releaseYear,
+            releaseMonth: bottles.releaseMonth,
+            releaseDay: bottles.releaseDay,
             maturation: bottles.maturation,
             caskNumber: bottles.caskNumber,
             outturn: bottles.outturn,
@@ -842,6 +858,8 @@ async function enrichBottleCandidates(
     candidate.abv ??= bottleMetadata.abv;
     candidate.vintageYear ??= bottleMetadata.vintageYear;
     candidate.releaseYear ??= bottleMetadata.releaseYear;
+    candidate.releaseMonth ??= bottleMetadata.releaseMonth;
+    candidate.releaseDay ??= bottleMetadata.releaseDay;
     candidate.maturation ??= bottleMetadata.maturation;
     candidate.caskNumber ??= bottleMetadata.caskNumber;
     candidate.outturn ??= bottleMetadata.outturn;
@@ -1055,6 +1073,8 @@ async function getOrdinaryBottleCandidateById(
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
       releaseYear: bottles.releaseYear,
+      releaseMonth: bottles.releaseMonth,
+      releaseDay: bottles.releaseDay,
       maturation: bottles.maturation,
       caskNumber: bottles.caskNumber,
       outturn: bottles.outturn,
@@ -1086,6 +1106,8 @@ async function getOrdinaryBottleCandidateById(
       abv: result.abv,
       vintageYear: result.vintageYear,
       releaseYear: result.releaseYear,
+      releaseMonth: result.releaseMonth,
+      releaseDay: result.releaseDay,
       maturation: result.maturation,
       caskNumber: result.caskNumber,
       outturn: result.outturn,
