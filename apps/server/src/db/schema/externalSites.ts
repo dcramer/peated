@@ -37,6 +37,7 @@ export const externalSites = pgTable(
     // scraper does not require a PostgreSQL enum migration.
     type: text("type").$type<string>().notNull(),
     name: text("name").notNull(),
+    imageUrl: text("image_url"),
     lastRunAt: timestamp("last_run_at"),
     lastRunId: bigint("last_run_id", { mode: "number" }).references(
       (): AnyPgColumn => externalSiteRuns.id,

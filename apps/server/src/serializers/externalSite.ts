@@ -1,11 +1,13 @@
 import { type z } from "zod";
 import { serializer } from ".";
+import config from "../config";
 import type {
   ExternalReviewPublication,
   ExternalSite,
   ExternalSiteRun,
   User,
 } from "../db/schema";
+import { absoluteUrl } from "../lib/urls";
 import {
   type ExternalReviewPublicationSchema,
   type ExternalSiteRunSchema,
@@ -19,6 +21,9 @@ export function serializeExternalSite(
     id: item.id,
     name: item.name,
     type: item.type,
+    imageUrl: item.imageUrl
+      ? absoluteUrl(config.API_SERVER, item.imageUrl)
+      : null,
     lastRunAt:
       item.lastRunId !== null ? (item.lastRunAt?.toISOString() ?? null) : null,
     nextRunAt: item.nextRunAt?.toISOString() ?? null,

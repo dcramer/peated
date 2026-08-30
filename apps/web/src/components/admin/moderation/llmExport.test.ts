@@ -142,6 +142,7 @@ function queueItem(overrides: Partial<QueueItem> = {}): QueueItem {
       updatedAt: timestamp,
       site: {
         id: 3,
+        imageUrl: null,
         name: "Example",
         type: "totalwine",
         lastRunAt: null,

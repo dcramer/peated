@@ -14,6 +14,7 @@ export const mockBottlePrices = [
     volume: 700,
     site: {
       id: 9931,
+      imageUrl: null,
       type: "totalwine",
       name: "Total Wine",
       lastRunAt: "2026-08-26T09:00:00.000Z",
@@ -36,6 +37,7 @@ export const mockBottlePrices = [
     volume: 750,
     site: {
       id: 9933,
+      imageUrl: null,
       type: "woodencork",
       name: "Wooden Cork",
       lastRunAt: "2026-08-25T09:00:00.000Z",
@@ -58,6 +60,7 @@ export const mockBottlePrices = [
     volume: 700,
     site: {
       id: 9935,
+      imageUrl: null,
       type: "healthyspirits",
       name: "Healthy Spirits",
       lastRunAt: "2026-08-01T09:00:00.000Z",

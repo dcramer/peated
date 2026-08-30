@@ -16,6 +16,7 @@ export const ExternalSiteSchema = z.object({
   id: z.number().describe("Unique identifier for the external site"),
   type: ExternalSiteKeySchema.describe("Stable key for the external site"),
   name: z.string().describe("Name of the external site"),
+  imageUrl: z.string().url().nullable().describe("Site icon URL"),
   lastRunAt: z
     .string()
     .datetime()

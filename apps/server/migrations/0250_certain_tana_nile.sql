@@ -1,0 +1,1 @@
+ALTER TABLE "external_site" ADD COLUMN "image_url" text;

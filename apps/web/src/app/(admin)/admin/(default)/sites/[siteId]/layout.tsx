@@ -13,6 +13,7 @@ import {
   AdminStat,
   AdminStatGrid,
 } from "@peated/web/components/admin/adminContent.stylex";
+import { ExternalSiteIdentity } from "@peated/web/components/admin/externalSiteIcon.stylex";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import { getScraperRunAvailability } from "@peated/web/components/admin/scraperRunAvailability";
 import { PageTabs } from "@peated/web/components/designSystem/components";
@@ -95,7 +96,13 @@ export default function Layout({
         ]}
       />
       <AdminPageHeader
-        title={site.name}
+        title={
+          <ExternalSiteIdentity
+            imageUrl={site.imageUrl}
+            name={site.name}
+            size="lg"
+          />
+        }
         eyebrow={site.type}
         metadata={<ExternalSiteRunStatus site={site} />}
         actions={
