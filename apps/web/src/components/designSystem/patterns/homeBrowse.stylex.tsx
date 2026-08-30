@@ -136,6 +136,7 @@ export function HomeLatestReleases({
               href={bottle.href}
               key={bottle.href}
               metadata={bottle.metadata}
+              metadataWrap
               title={bottle.name}
             />
           ))}

@@ -67,6 +67,7 @@ export type ItemRowProps = {
   id?: string;
   leading?: ReactNode;
   metadata?: ReactNode;
+  metadataWrap?: boolean;
   size?: ItemRowSize;
   title: ReactNode;
   variant?: ItemListVariant;
@@ -81,6 +82,7 @@ export function ItemRow({
   id,
   leading,
   metadata,
+  metadataWrap = false,
   size = "md",
   title,
   variant = "plain",
@@ -134,6 +136,7 @@ export function ItemRow({
               {...stylex.props(
                 styles.metadata,
                 size === "sm" && styles.smallMetadata,
+                metadataWrap && styles.wrappedMetadata,
               )}
             >
               {metadata}
@@ -251,6 +254,11 @@ const styles = stylex.create({
   },
   smallMetadata: {
     marginTop: "2px",
+  },
+  wrappedMetadata: {
+    overflow: "visible",
+    textOverflow: "clip",
+    whiteSpace: "normal",
   },
   description: {
     marginTop: space.x2,
