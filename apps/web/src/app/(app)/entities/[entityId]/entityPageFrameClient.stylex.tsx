@@ -32,7 +32,7 @@ import {
   type Entity,
 } from "./entityPageData";
 
-function DistilleryFollowAction({ entity }: { entity: Entity }) {
+function EntityFollowAction({ entity }: { entity: Entity }) {
   const { user } = useAuth();
   const orpc = useORPC();
   const queryClient = useQueryClient();
@@ -49,7 +49,7 @@ function DistilleryFollowAction({ entity }: { entity: Entity }) {
     return (
       <ButtonLink
         aria-label={`Follow ${entity.name}`}
-        href={`/login?redirectTo=${encodeURIComponent(`/distillers/${entity.id}`)}`}
+        href={`/login?redirectTo=${encodeURIComponent(getEntityUrl(entity))}`}
         size="lg"
         variant="tonal"
       >
@@ -86,7 +86,7 @@ function DistilleryFollowAction({ entity }: { entity: Entity }) {
           flash(
             error instanceof Error
               ? error.message
-              : "We couldn't update the distilleries you follow. Try again.",
+              : "We couldn't update this follow. Try again.",
             "error",
           );
         }
@@ -198,6 +198,7 @@ export function EntityPageFrameClient({
 
   const entity = entityQuery.data;
   const createBottleHref = getEntityBottleCreateHref(entity);
+  const canFollow = entity.kind === "bottler" || entity.kind === "distillery";
   const presentation = getEntityPresentation(entity);
   const currentHref = getEntityCurrentHref(entity, pathname);
 
@@ -205,15 +206,15 @@ export function EntityPageFrameClient({
     <div {...stylex.props(styles.page)}>
       <EntityPageHeader
         actions={
-          createBottleHref || entity.kind === "distillery" ? (
+          createBottleHref || canFollow ? (
             <>
               {createBottleHref ? (
                 <ButtonLink href={createBottleHref} size="lg" variant="accent">
                   Add a bottle
                 </ButtonLink>
               ) : null}
-              {entity.kind === "distillery" ? (
-                <DistilleryFollowAction key={entity.id} entity={entity} />
+              {canFollow ? (
+                <EntityFollowAction key={entity.id} entity={entity} />
               ) : null}
             </>
           ) : undefined

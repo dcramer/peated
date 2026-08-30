@@ -77,7 +77,7 @@ export default implement(bottleListContract).handler(async function ({
     : [];
 
   const where: (SQL<unknown> | undefined)[] = [];
-  let followedDistillerIds: number[] | null = null;
+  let followedEntityIds: number[] | null = null;
   let hasUnknownFlight = false;
   where.push(isNotNull(bottles.groupId));
   where.push(
@@ -88,28 +88,40 @@ export default implement(bottleListContract).handler(async function ({
     if (!context.user) {
       throw errors.UNAUTHORIZED();
     }
-    followedDistillerIds = (
-      await db
-        .select({ entityId: entityFollows.entityId })
-        .from(entityFollows)
-        .innerJoin(entities, eq(entities.id, entityFollows.entityId))
-        .where(
-          and(
-            eq(entityFollows.userId, context.user.id),
-            eq(entities.kind, "distillery"),
-          ),
-        )
-    ).map(({ entityId }) => entityId);
+    const followedEntities = await db
+      .select({ entityId: entityFollows.entityId, kind: entities.kind })
+      .from(entityFollows)
+      .innerJoin(entities, eq(entities.id, entityFollows.entityId))
+      .where(
+        and(
+          eq(entityFollows.userId, context.user.id),
+          inArray(entities.kind, ["bottler", "distillery"]),
+        ),
+      );
+    followedEntityIds = followedEntities.map(({ entityId }) => entityId);
+    const followedDistillerIds = followedEntities.flatMap((entity) =>
+      entity.kind === "distillery" ? [entity.entityId] : [],
+    );
+    const followedBottlerIds = followedEntities.flatMap((entity) =>
+      entity.kind === "bottler" ? [entity.entityId] : [],
+    );
     where.push(
-      followedDistillerIds.length
-        ? sql`EXISTS(
-              SELECT FROM ${bottlesToDistillers}
-              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-                AND ${inArray(
-                  bottlesToDistillers.distillerId,
-                  followedDistillerIds,
-                )}
-            )`
+      followedEntityIds.length
+        ? or(
+            followedDistillerIds.length
+              ? sql`EXISTS(
+                  SELECT FROM ${bottlesToDistillers}
+                  WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+                    AND ${inArray(
+                      bottlesToDistillers.distillerId,
+                      followedDistillerIds,
+                    )}
+                )`
+              : undefined,
+            followedBottlerIds.length
+              ? inArray(bottles.bottlerId, followedBottlerIds)
+              : undefined,
+          )
         : sql`FALSE`,
     );
   }
@@ -317,7 +329,7 @@ export default implement(bottleListContract).handler(async function ({
         return count > 0 ? [{ value, count }] : [];
       }),
     },
-    followedDistillerCount: followedDistillerIds?.length ?? null,
+    followedEntityCount: followedEntityIds?.length ?? null,
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,
       prevCursor: !hasUnknownFlight && cursor > 1 ? cursor - 1 : null,
