@@ -11,7 +11,10 @@ import {
 } from "../../../styles/tokens.stylex";
 import CountryMapIcon from "../../countryMapIcon";
 import {
+  Card,
+  CardActionLink,
   CardLink,
+  CardPrimaryLink,
   ItemList,
   ItemRow,
   RatingMeasure,
@@ -154,12 +157,72 @@ export function HomeRecentReviews({
 }
 
 export type HomeOrigin = {
-  description?: ReactNode;
+  description?: string;
   href: string;
   name: string;
   slug: string;
   totalBottles: number;
 };
+
+const REGION_DESCRIPTION_MAX_LENGTH = 80;
+
+function truncateRegionDescription(description: string) {
+  const normalized = description.trim().replace(/\s+/g, " ");
+
+  if (normalized.length <= REGION_DESCRIPTION_MAX_LENGTH) {
+    return { text: normalized, truncated: false };
+  }
+
+  const wordBoundary = normalized
+    .slice(0, REGION_DESCRIPTION_MAX_LENGTH + 1)
+    .lastIndexOf(" ");
+  const cutoff =
+    wordBoundary > 0 ? wordBoundary : REGION_DESCRIPTION_MAX_LENGTH;
+
+  return {
+    text: `${normalized.slice(0, cutoff).trimEnd()}…`,
+    truncated: true,
+  };
+}
+
+function RegionCard({ region }: { region: HomeOrigin }) {
+  const description = region.description
+    ? truncateRegionDescription(region.description)
+    : null;
+
+  return (
+    <Card
+      appearance="surface"
+      linked
+      padding="none"
+      {...stylex.props(styles.region)}
+    >
+      <span {...stylex.props(styles.regionLine)}>
+        <CardPrimaryLink href={region.href}>
+          <strong {...stylex.props(styles.regionName)}>{region.name}</strong>
+        </CardPrimaryLink>
+        <span {...stylex.props(styles.regionFacts)}>
+          {region.totalBottles.toLocaleString("en-US")}
+        </span>
+      </span>
+      {description ? (
+        <>
+          <span {...stylex.props(styles.regionDescription)}>
+            {description.text}
+          </span>
+          {description.truncated ? (
+            <CardActionLink
+              href={region.href}
+              {...stylex.props(styles.regionMore)}
+            >
+              Read more <span aria-hidden="true">→</span>
+            </CardActionLink>
+          ) : null}
+        </>
+      ) : null}
+    </Card>
+  );
+}
 
 export function HomeOrigins({
   countries,
@@ -238,27 +301,7 @@ export function HomeOrigins({
           <div {...stylex.props(styles.regionHeading)}>By region</div>
           <div {...stylex.props(styles.regionGrid)}>
             {regions.map((region) => (
-              <CardLink
-                appearance="surface"
-                href={region.href}
-                key={region.href}
-                padding="none"
-                {...stylex.props(styles.region)}
-              >
-                <span {...stylex.props(styles.regionLine)}>
-                  <strong {...stylex.props(styles.regionName)}>
-                    {region.name}
-                  </strong>
-                  <span {...stylex.props(styles.regionFacts)}>
-                    {region.totalBottles.toLocaleString("en-US")}
-                  </span>
-                </span>
-                {region.description ? (
-                  <span {...stylex.props(styles.regionDescription)}>
-                    {region.description}
-                  </span>
-                ) : null}
-              </CardLink>
+              <RegionCard key={region.href} region={region} />
             ))}
           </div>
         </>
@@ -533,8 +576,9 @@ const styles = stylex.create({
     },
   },
   region: {
-    display: "block",
+    display: "flex",
     minWidth: 0,
+    flexDirection: "column",
     padding: space.x3,
     color: colors.ink,
     textDecoration: "none",
@@ -570,6 +614,15 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: 1.45,
     textWrap: "pretty",
+  },
+  regionMore: {
+    width: "fit-content",
+    marginTop: space.x2,
+    color: colors.accentDeep,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+    lineHeight: 1.2,
   },
   countryGrid: {
     display: "grid",
