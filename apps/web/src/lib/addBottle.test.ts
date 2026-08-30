@@ -30,7 +30,13 @@ describe("getAddBottleHref", () => {
         bottleId: 42,
         resultSource: "created",
       }),
-    ).toBe("/addBottle?bottle=42&resultSource=created&intent=addBottle");
+    ).toBe("/addBottle?bottle=42&resultSource=created&intent=choose");
+  });
+
+  it("builds a catalog contribution route", () => {
+    expect(getAddBottleHref({ intent: "catalog" })).toBe(
+      "/addBottle?intent=catalog",
+    );
   });
 
   it("serializes the supported Bottle and return context", () => {

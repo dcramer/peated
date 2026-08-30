@@ -1,5 +1,5 @@
 export type AddBottleRouteIntent =
-  | "addBottle"
+  | "catalog"
   | "choose"
   | "library"
   | "tasting"
@@ -37,7 +37,7 @@ export function getAddBottleHref({
   pendingImageId,
   pendingImageUrl,
   resultSource,
-  intent = "addBottle",
+  intent = "choose",
 }: AddBottleRouteOptions) {
   const params = new URLSearchParams();
 

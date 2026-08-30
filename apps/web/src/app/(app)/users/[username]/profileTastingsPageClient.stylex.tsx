@@ -88,7 +88,7 @@ export function ProfileTastingsPageClient({
           >
             {isCurrentUser
               ? "Your tasting record will appear here."
-              : `${user.username} has not recorded a tasting yet.`}
+              : `${user.username} has not logged a tasting yet.`}
           </EmptyState>
         )}
         <CursorPager

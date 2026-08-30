@@ -162,7 +162,7 @@ export default function DesignSystemFoundations({
                 mineral finish. The texture stays light despite the long finish.
               </p>
               <p {...stylex.props(foundationStyles.interactive)}>
-                Record a tasting
+                Log a tasting
               </p>
             </article>
 

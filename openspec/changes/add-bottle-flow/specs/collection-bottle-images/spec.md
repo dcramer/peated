@@ -18,7 +18,7 @@ The system SHALL store an optional user-owned image URL on each collection bottl
 
 The system SHALL allow an authenticated user to save a pending image as the image for a Library collection bottle entry while adding the bottle or release to Library.
 
-#### Scenario: Add bottle to Library with image
+#### Scenario: Add a bottle to Library with image
 
 - **WHEN** an authenticated user adds a bottle to Library with an owned, unexpired pending image
 - **THEN** the system copies the pending image to a permanent collection bottle image location and saves the URL on the Library entry

@@ -45,7 +45,7 @@ const questions = [
   {
     question: "Do I need an account?",
     answer:
-      "Only to record a tasting, keep a library, or add a bottling. Every record page is readable without one.",
+      "Only to log a tasting, keep your Library, or add a bottle. Every record page is readable without one.",
   },
   {
     question: "Where do critic reviews come from?",

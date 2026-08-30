@@ -3,10 +3,10 @@
 Peated currently has three related but separate workflows:
 
 - `/addTasting` is a photo-first tasting flow that identifies a bottle, then immediately renders the tasting form.
-- `/addBottle` is a manual catalog creation form, even though the user-facing phrase "add bottle" now needs to mean the broader act of adding a bottle to Peated.
+- `/addBottle` is a manual catalog creation form, even though scan, search, and follow-up outcomes need one shared resolver.
 - Library and Favorites are saved-collection actions on existing bottle surfaces, with no image on the saved collection entry.
 
-The new Add Bottle flow should make bottle identification the shared first step. After identification, the user can add the bottle to Library, log a tasting, view the bottle, or create the catalog bottle when the bottle is missing.
+The new bottle flow should make bottle identification the shared first step. After identification, the user can add the bottle to Library, log a tasting, view the bottle, or add the catalog bottle when the bottle is missing.
 
 Photo identification follows the same product model as the rest of the classifier: first identify the observed bottle plus exact release or bottling details, then decide whether that identity maps to an existing Peated target or a create proposal. Peated catalog search and web search are evidence sources, not substitutes for the observed bottle identity. Manual search is the fallback only when the observed bottle identity is unresolved or ambiguous.
 
@@ -14,9 +14,9 @@ Photo identification follows the same product model as the rest of the classifie
 
 **Goals:**
 
-- Make `/addBottle` the user-facing universal Add Bottle route.
-- Rename visible tasting actions and titles from Add/Record Tasting to Log Tasting.
-- Move the current manual catalog creation form to a Create Bottle route, preferably `/bottles/new`.
+- Make `/addBottle` the shared bottle resolver route with intent-specific titles.
+- Rename visible tasting actions and titles from Add/Record Tasting to Log a tasting.
+- Move the current manual catalog creation form to `/bottles/new` with Add a bottle copy.
 - Reuse photo identification, search, and manual creation as branches of one resolver flow.
 - Store Library-specific images on `collection_bottle.image_url`.
 - Let a pending scan image be copied to Library, tasting, and approved catalog image destinations before it expires.
@@ -31,21 +31,22 @@ Photo identification follows the same product model as the rest of the classifie
 
 ## Decisions
 
-### `/addBottle` becomes the universal route
+### `/addBottle` becomes the shared resolver route
 
-Use `/addBottle` for the user-facing Add Bottle flow because that is the plain-language action users expect. Move the existing manual catalog form to `/bottles/new` with the title and primary action Create Bottle. Existing admin or moderation links that depend on current `/addBottle` query parameters can redirect to `/bottles/new` during migration.
+Use `/addBottle` for the shared resolver because every intent first identifies a bottle. Use Find a bottle when there is no specific intent. Use Add a bottle only for catalog contribution, Add to your Library for Library entry, and Log a tasting for tasting entry. Move the existing manual catalog form to `/bottles/new` with the title and primary action Add a bottle. Existing admin or moderation links that depend on current `/addBottle` query parameters can redirect to `/bottles/new` during migration.
 
-Alternative considered: create a new route such as `/checkIn` or `/captureBottle`. This avoids route migration but leaves the clearest label unused and keeps `/addBottle` ambiguous.
+Alternative considered: use Add a bottle for every resolver intent. Rejected because the shared resolver does not add anything until the user chooses an outcome, and the label conflates catalog creation with Library and tasting actions.
 
 ### Bottle resolution is shared before intent-specific actions
 
 Extract the scan/search/review logic from `/addTasting` into a reusable Bottle Resolver. The resolver returns a bottle target, optional release, optional pending image, and result provenance. Intent controls the preferred next action:
 
 - `intent=library`: Add to Library is primary.
-- `intent=tasting`: Log Tasting is primary.
-- no intent or `intent=choose`: show all applicable outcomes.
+- `intent=tasting`: Log a tasting is primary.
+- `intent=catalog`: Add a bottle is primary for a create proposal; View bottle is primary for an existing match.
+- no intent or `intent=choose`: use Find a bottle and show all applicable outcomes without presenting one as the stated intent.
 
-Existing bottle matches show Add to Library, Log Tasting, and View Bottle. Clear missing-target create proposals show Add to Library, Log Tasting, and Create Bottle; unresolved or ambiguous bottles show Search Again, Start Over, and Create Bottle when user creation is available.
+Existing bottle matches show Add to Library, Log a tasting, and View bottle. Clear missing-target create proposals show Add to Library, Log a tasting, and Add a bottle; unresolved or ambiguous bottles show Search again, Start over, and Add a new bottle when user creation is available.
 
 For scan-backed results, the classifier should preserve release and bottling traits visible on the label, including edition, batch, barrel/cask number, stated age, ABV, and expression name. If the exact identity exists in Peated, the resolver should confirm the match. If it does not exist and the identity is otherwise clear, the resolver should confirm a create proposal. Search Again should mean "the system could not identify the bottle/release," not "the target row is missing enrichment."
 
@@ -63,7 +64,7 @@ Only the third case should relax review policy, and the relaxation should remove
 
 ### Deterministic whisky rules stay closed-form
 
-The Add Bottle resolver follows the classifier's deterministic boundary.
+The bottle resolver follows the classifier's deterministic boundary.
 Deterministic code may parse closed-form identifiers and preserve source-backed
 facts, but it should not decide whisky-family semantics from string similarity
 or brand-specific heuristics.
@@ -109,13 +110,13 @@ The control should be unchecked unless product decides the scan suitability and 
 
 ### Added to Library is a terminal state
 
-After adding to Library, keep the user in the Add Bottle flow and show an Added to Library state with the saved entry and image. Primary action: Add Another Bottle. Secondary action: View Library. Add Another Bottle clears resolver state and starts a fresh Add Bottle flow.
+After adding to Library, show an Add to your Library flow with the saved entry and image. Primary action: Add another to Library. Secondary action: View Library. Add another to Library clears resolver state and starts a fresh Library-intent flow, even when the user entered with another intent and chose Library as a secondary outcome.
 
 ## Risks / Trade-offs
 
 - Pending upload semantics may conflict with existing attached/cleanup behavior. -> Update helper tests first and keep expiry/ownership checks authoritative.
 - Moving `/addBottle` can break admin/moderation links. -> Redirect legacy query patterns to `/bottles/new` until callers are migrated.
-- "Add Bottle" can still sound like catalog creation. -> Use Create Bottle consistently for the manual catalog branch.
+- Shared flow copy can promise the wrong outcome. -> Derive the title and preferred action from intent; reserve Add a bottle for catalog contribution.
 - Library images on collection entries may not appear in existing bottle tables. -> Serialize `imageUrl` and update Library views deliberately without changing canonical bottle art.
 - Catalog image approval could be misunderstood as private. -> Use "public image" in help text and hide the control when promotion is not allowed.
 - Deterministic review policy may block clear scan-backed classifier outcomes. -> Add evals that prove the classifier result first, then audit policy gates for deletion or narrowing instead of adding new whisky-family heuristics.
@@ -125,9 +126,9 @@ After adding to Library, keep the user in the Add Bottle flow and show an Added 
 1. Add backend image model/API support for collection entries and reusable pending image copies.
 2. Move the current manual `/addBottle` form to `/bottles/new` and add redirects for legacy create links.
 3. Extract the existing `/addTasting` resolver into a reusable component while keeping current tasting behavior intact.
-4. Make `/addBottle` render the Add Bottle resolver and outcome selection.
+4. Make `/addBottle` render the shared bottle resolver and outcome selection.
 5. Add the Added to Library terminal state and Library row image/menu UI.
-6. Update user-facing copy to Log Tasting across navigation, buttons, titles, and empty states.
+6. Update user-facing copy to Log a tasting across navigation, buttons, titles, and empty states.
 7. Add scan-backed classifier evals for observed production misses, including extractor facts, final catalog outcome, one-click resolver expectation, and provenance.
 8. Audit review policy gates that still downgrade eval-proven correct classifier outcomes and remove or narrow those gates after the classifier layer is correct.
 

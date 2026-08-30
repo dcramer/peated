@@ -136,7 +136,7 @@ function renderMatchedBottle(bottle: Bottle) {
       hasCreateDecision={false}
       proposedName={null}
       createPending={false}
-      createActionLabel="Create"
+      createActionLabel="Add a bottle"
       resolvingAction={null}
       hasLibraryEntry={false}
       pendingImage={null}

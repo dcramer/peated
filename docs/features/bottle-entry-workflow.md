@@ -6,7 +6,7 @@ field ownership, grouping, and merge semantics.
 
 ## Creation
 
-- Add Bottle accepts one flat Bottle input. The server owns field storage and
+- The Add a bottle form accepts one flat Bottle input. The server owns field storage and
   returns one independently complete Bottle.
 - A submitted stated age belongs to the new Bottle. The singleton BottleGroup
   starts without a shared age. A reviewed shared edit can establish one later.

@@ -601,7 +601,7 @@ The web application SHALL compose an entity overview from reusable StyleX compon
 #### Scenario: Entity has no associated bottles
 
 - **WHEN** a brand, bottler, distillery, or blender has no supplied bottle rows
-- **THEN** the page keeps its Bottles or Bottlings module visible and offers a button to record a bottle or bottling instead of removing the section
+- **THEN** the page keeps its Bottles or Bottlings module visible and offers an Add a bottle button instead of removing the section
 
 #### Scenario: Entity detail data is not owned
 

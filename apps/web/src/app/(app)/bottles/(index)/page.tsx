@@ -6,7 +6,7 @@ import { BottleCatalogPageClient } from "./bottleCatalogPageClient";
 
 export const metadata: Metadata = {
   title: "Whisky Bottles",
-  description: "Browse whisky bottles recorded in the Peated database.",
+  description: "Browse whisky bottles in the Peated database.",
 };
 
 export default async function BottleListPage(props: {

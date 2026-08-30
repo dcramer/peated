@@ -24,25 +24,25 @@
 
 ## 4. Route Restructure
 
-- [x] 4.1 Move the current manual `/addBottle` form to `/bottles/new` with visible Create Bottle copy.
+- [x] 4.1 Move the current manual `/addBottle` form to `/bottles/new` with visible Add a bottle copy.
 - [x] 4.2 Add compatibility redirects or link updates for current `/addBottle` create-form query patterns.
-- [x] 4.3 Update manual bottle creation return behavior so it can continue to Library, Log Tasting, View Bottle, or Add Bottle outcomes.
-- [x] 4.4 Update search add-missing-bottle links to target Create Bottle while preserving Add Bottle intent.
+- [x] 4.3 Update manual bottle creation return behavior so it can continue to Library, Log a tasting, View bottle, catalog, or generic outcomes.
+- [x] 4.4 Update search add-missing-bottle links to target the manual form while preserving bottle-flow intent.
 
-## 5. Add Bottle Resolver UI
+## 5. Bottle Resolver UI
 
 - [x] 5.1 Extract photo scan, preview, identification, result review, start-over, and search fallback from `/addTasting` into a reusable resolver component.
 - [x] 5.2 Update `/addTasting` or its replacement path to use the resolver with tasting intent without changing successful tasting behavior.
 - [x] 5.3 Make `/addBottle` render the resolver and outcome selection for existing, missing, and create-proposal results.
-- [x] 5.4 Update `/search` to understand Add Bottle intent instead of only the `tasting` boolean.
-- [x] 5.5 Add View Bottle, Add to Library, Log Tasting, Search Again, Start Over, and Create Bottle actions for the appropriate resolver states.
+- [x] 5.4 Update `/search` to understand bottle-flow intent instead of only the `tasting` boolean.
+- [x] 5.5 Add View bottle, Add to Library, Log a tasting, Search again, Start over, and Add a bottle actions for the appropriate resolver states.
 
 ## 6. Library Flow UI
 
 - [x] 6.1 Add direct Library save behavior that uses the scan image when present and shows exact-target In Library state when already saved.
 - [x] 6.2 Submit Library adds through the collection bottle create API with optional `pendingImageId`.
 - [x] 6.3 Add an Added to Library terminal state showing the saved entry and image.
-- [x] 6.4 Add Add Another Bottle behavior that resets the resolver and starts a fresh Add Bottle flow.
+- [x] 6.4 Add Add another to Library behavior that resets the resolver with Library intent.
 - [x] 6.5 Add View Library behavior that routes to the current user's Library page.
 - [x] 6.6 Add Library row thumbnail/options UI for editing the entry image or removing the entry from Library.
 
@@ -56,21 +56,21 @@
 
 ## 8. User-Facing Copy
 
-- [x] 8.1 Replace visible Add Tasting and Record Tasting copy with Log Tasting across buttons, page titles, empty states, and resolver actions.
-- [x] 8.2 Keep Add Bottle copy for the universal flow and Create Bottle copy for catalog creation.
+- [x] 8.1 Replace visible Add Tasting and Record Tasting copy with Log a tasting across buttons, page titles, empty states, and resolver actions.
+- [x] 8.2 Use Find a bottle for generic resolution and reserve Add a bottle for catalog contribution.
 - [x] 8.3 Review error and success copy for plain-language consistency.
 
 ## 9. Verification
 
 - [x] 9.1 Run targeted backend tests for collection bottle routes, pending uploads, and tasting image attach behavior.
-- [x] 9.2 Run targeted web checks for Add Bottle, Create Bottle, search intent, and Log Tasting copy changes.
-- [x] 9.3 Use local UI verification at mobile and desktop widths for scan to Library, search to Library, create bottle, Add Another Bottle, View Library, and Log Tasting paths.
+- [x] 9.2 Run targeted web checks for generic, catalog, Library, search, and tasting intent copy.
+- [x] 9.3 Use local UI verification at mobile and desktop widths for scan to Library, search to Library, add bottle, Add another to Library, View Library, and Log a tasting paths.
 - [x] 9.4 Run relevant package typechecks and lint for touched server and web surfaces.
 
 ## 10. Scan-Backed Classifier Outcomes
 
-- [x] 10.1 Add image extraction eval fixtures for the observed `photo_` Add Bottle misses, preserving the original image inputs.
-- [x] 10.2 Add final classifier eval fixtures that encode the verified Peated DB outcome, provenance, and expected Add Bottle UI next step.
+- [x] 10.1 Add image extraction eval fixtures for the observed `photo_` bottle resolver misses, preserving the original image inputs.
+- [x] 10.2 Add final classifier eval fixtures that encode the verified Peated DB outcome, provenance, and expected bottle resolver UI next step.
 - [x] 10.3 Update classifier and extractor instructions so visible bottle/release details are preserved before deciding match versus create.
 - [x] 10.4 Run focused image extraction evals and final classifier evals for the five scan-backed cases.
 - [x] 10.5 Audit review policy downgrades surfaced by those evals and remove or narrow gates only after the classifier result is proven correct.

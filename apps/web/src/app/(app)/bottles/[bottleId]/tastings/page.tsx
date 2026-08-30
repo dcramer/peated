@@ -54,7 +54,7 @@ export default async function BottleTastingsPage(props: {
           }
           heading="No tastings yet"
         >
-          No one has recorded a tasting for this bottle.
+          No one has logged a tasting for this bottle.
         </EmptyState>
       )}
       <CursorPager

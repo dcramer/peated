@@ -81,7 +81,7 @@ export default async function FlightPage(props: {
                       size="sm"
                       variant={hasTasted ? "tonal" : "accent"}
                     >
-                      Log tasting
+                      Log a tasting
                     </ButtonLink>
                   }
                   hasTasted={hasTasted}

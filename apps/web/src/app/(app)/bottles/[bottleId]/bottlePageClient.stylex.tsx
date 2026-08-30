@@ -210,7 +210,7 @@ function BottleLibraryAction({ bottle }: { bottle: Bottle }) {
   if (!user) {
     return (
       <ButtonLink href="/login" size="lg" variant="tonal">
-        Add to library
+        Add to Library
       </ButtonLink>
     );
   }
@@ -256,7 +256,7 @@ function BottleLibraryAction({ bottle }: { bottle: Bottle }) {
       size="lg"
       variant="tonal"
     >
-      {isLibrary ? "In library" : "Add to library"}
+      {isLibrary ? "In Library" : "Add to Library"}
     </Button>
   );
 }
@@ -271,7 +271,7 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
     [
       {
         href: getAddSimilarBottlePath(bottle.id),
-        label: "Add similar bottle",
+        label: "Add a similar bottle",
       },
       {
         label: "Share",

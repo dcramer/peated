@@ -62,7 +62,7 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
     return (
       <WorkflowLoading
         label="Loading bottle proposal"
-        title="Add a Similar Bottle"
+        title="Add a similar bottle"
       />
     );
   }
@@ -81,8 +81,8 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
 
   return (
     <BottleForm
-      title="Add a Similar Bottle"
-      saveLabel="Add Bottle"
+      title="Add a similar bottle"
+      saveLabel="Add a bottle"
       returnTo={returnTo}
       initialData={initialData}
       onSubmit={async ({ image, ...data }) => {

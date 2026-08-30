@@ -90,7 +90,7 @@ export function ProfileLayoutClient({
               cells={[
                 { label: "Tastings", value: initialUser.stats.tastings },
                 { label: "Unique bottles", value: initialUser.stats.bottles },
-                { label: "In library", value: initialUser.stats.library.total },
+                { label: "In Library", value: initialUser.stats.library.total },
                 {
                   label: "Contributions",
                   value: initialUser.stats.contributions,

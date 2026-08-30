@@ -5,7 +5,7 @@ import { RowMenu } from "./rowMenu.stylex";
 
 const groups = [
   [
-    { label: "Record a tasting", onSelect: () => undefined },
+    { label: "Log a tasting", onSelect: () => undefined },
     { label: "Add what you paid", onSelect: () => undefined },
   ],
   [{ label: "Remove from library", onSelect: () => undefined }],
@@ -42,7 +42,7 @@ export const Overview: Story = {
         {...args}
         groups={[
           [
-            { label: "Record a tasting", onSelect: () => undefined },
+            { label: "Log a tasting", onSelect: () => undefined },
             {
               disabled: true,
               label: "Add what you paid",

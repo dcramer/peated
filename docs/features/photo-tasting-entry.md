@@ -6,7 +6,7 @@ This document describes the current photo-assisted Bottle resolution contract.
 Code, runtime schemas, and tests remain authoritative for exact request and
 response shapes.
 
-`/addTasting` redirects to `/addBottle?intent=tasting`. The Add Bottle flow owns
+`/addTasting` redirects to `/addBottle?intent=tasting`. The shared bottle flow owns
 photo resolution, manual search, Bottle creation, Library continuation, and the
 tasting continuation so the same pending image can follow the user's selected
 action.
@@ -41,7 +41,7 @@ the Bottle and action before any tasting is saved.
 - A failed or uncertain identification must preserve a path to search or retry.
 - Multiple-Bottle or ambiguous evidence must not silently select a Bottle.
 - The user may remove or replace the pending image before tasting save.
-- General record-tasting entry uses the shared Add Bottle resolver. Existing
+- General tasting entry uses the shared bottle resolver. Existing
   Bottle-scoped tasting links may continue directly with their known Bottle.
 
 ## Identity And Classification

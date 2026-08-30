@@ -26,7 +26,7 @@ export const Overview: Story = {
   render: () => (
     <StoryStack>
       <EmptyState
-        action={<Button variant="accent">Record this bottle</Button>}
+        action={<Button variant="accent">Add this bottle</Button>}
         heading="No matches"
         status={<CountChip count={0} tone="neutral" />}
         supplementary={
@@ -49,8 +49,8 @@ export const Overview: Story = {
         action={<Button variant="accent">Browse bottles</Button>}
         heading="No bottles yet"
       >
-        Your library is empty. Add a bottle when you want to keep track of it
-        here.
+        Your Library is empty. Add your first bottle when you want to keep track
+        of it here.
       </EmptyState>
     </StoryStack>
   ),

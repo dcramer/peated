@@ -112,7 +112,7 @@ export function BottlePageHeader({
             ) : null}
             {memberStatus ? (
               <p {...stylex.props(styles.memberStatus)}>
-                {memberStatus.isLibrary ? "In library" : "Not in library"}
+                {memberStatus.isLibrary ? "In Library" : "Not in Library"}
                 <span aria-hidden="true"> · </span>
                 {memberStatus.hasTasted ? "Tasted" : "Not tasted"}
               </p>

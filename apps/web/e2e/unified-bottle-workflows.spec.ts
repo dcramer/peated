@@ -163,7 +163,7 @@ test.describe("unified Bottle workflows", () => {
     );
 
     await expect(
-      page.getByRole("heading", { name: "Add a Similar Bottle" }),
+      page.getByRole("heading", { name: "Add a similar bottle" }),
     ).toBeVisible();
     await expect(page.getByLabel("Bottle name", { exact: true })).toHaveValue(
       createdBottleName,
@@ -182,7 +182,9 @@ test.describe("unified Bottle workflows", () => {
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
     );
-    await page.getByRole("button", { name: "Add Bottle" }).click();
+    await page
+      .getByRole("button", { name: "Add a bottle", exact: true })
+      .click();
     const input = getRpcInput(await createRequestPromise);
 
     expect(Object.keys(input).sort()).toEqual([

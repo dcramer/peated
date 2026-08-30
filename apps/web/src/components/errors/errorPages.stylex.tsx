@@ -56,8 +56,8 @@ export function NotFoundPage({ document = false }: { document?: boolean }) {
       actions={
         <>
           <ButtonLink href="/search">Search the database</ButtonLink>
-          <ButtonLink href="/addBottle" variant="tonal">
-            Record a bottle
+          <ButtonLink href="/addBottle?intent=catalog" variant="tonal">
+            Add a bottle
           </ButtonLink>
         </>
       }
@@ -70,7 +70,7 @@ export function NotFoundPage({ document = false }: { document?: boolean }) {
       title="Nothing lives here"
     >
       This address does not match anything in the database. Search for the
-      record, or add the bottling if it is genuinely missing.
+      record, or add the bottle if it is genuinely missing.
     </ErrorPage>
   );
 

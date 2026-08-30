@@ -1490,8 +1490,7 @@ function createPhotoIdentificationBottle(request, input) {
       warnings: [
         {
           code: "CATALOG_IMAGE_COPY_FAILED",
-          message:
-            "The bottle was created, but the public image was not saved.",
+          message: "The bottle was added, but the public image was not saved.",
         },
       ],
     };
@@ -1782,7 +1781,7 @@ function buildDirectBottleProposal() {
 }
 
 /**
- * Builds the no-match photo-identification RPC fixture for Add Bottle fallback tests.
+ * Builds the no-match photo-identification RPC fixture for bottle resolver fallback tests.
  */
 function buildNoMatchPhotoIdentification() {
   return {

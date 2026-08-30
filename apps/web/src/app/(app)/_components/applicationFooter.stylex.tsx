@@ -29,7 +29,7 @@ const groups = [
   {
     label: "Contribute",
     links: [
-      { href: "/addBottle", label: "Record a bottle" },
+      { href: "/addBottle?intent=catalog", label: "Add a bottle" },
       { href: "/addEntity", label: "Add a distiller" },
       { href: "/updates", label: "Recent changes" },
     ],

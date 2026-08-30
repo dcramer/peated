@@ -1,13 +1,14 @@
 ## Why
 
-Bottle entry currently splits across tasting-first photo lookup, direct catalog creation, and separate Library/Favorites actions. Users need one Add Bottle flow that starts by identifying a bottle, then lets them add it to Library, log a tasting, view the bottle, or create the catalog bottle when Peated does not have it yet.
+Bottle entry currently splits across tasting-first photo lookup, direct catalog creation, and separate Library/Favorites actions. Users need one shared bottle flow that starts by identifying a bottle, then lets them add it to Library, log a tasting, view the bottle, or add the catalog bottle when Peated does not have it yet.
 
 ## What Changes
 
-- Make `/addBottle` the user-facing Add Bottle flow for scan, search, and outcome selection.
-- Move the current manual catalog creation form behind a Create Bottle route, preferably `/bottles/new`, with user-facing copy changed from Add Bottle to Create Bottle.
+- Make `/addBottle` the shared bottle flow for scan, search, and outcome selection. Use Find a bottle when the flow has no specific intent.
+- Use intent-specific entry copy: Add a bottle for catalog contribution, Add to your Library for Library entry, and Log a tasting for tasting entry.
+- Move the current manual catalog creation form to `/bottles/new` with user-facing Add a bottle copy.
 - Reuse the existing photo identification path as a shared bottle resolver instead of making it tasting-only.
-- Replace user-facing Add/Record Tasting copy with Log Tasting.
+- Replace user-facing Add/Record Tasting copy with Log a tasting.
 - Add Library image support by storing a user-specific image on `collection_bottle`.
 - Let Library add save a pending scan/upload image to the collection bottle entry and end on an Added to Library state.
 - Add a way to edit the Library entry image or remove the bottle from Library after it has already been added.
@@ -18,14 +19,14 @@ Bottle entry currently splits across tasting-first photo lookup, direct catalog 
 
 ### New Capabilities
 
-- `add-bottle-flow`: Universal Add Bottle flow, resolver outcomes, route/copy behavior, and Library/Tasting/View/Create branches.
+- `add-bottle-flow`: Shared bottle flow, resolver outcomes, intent-specific copy, and Library/Tasting/View/Catalog branches.
 - `collection-bottle-images`: User-owned collection bottle images, create-time save behavior, replacement/removal, and pending image copy semantics.
 
 ### Modified Capabilities
 
 ## Impact
 
-- Web routes and navigation: `/addBottle`, current manual add bottle form, `/search` intent handling, and visible Log Tasting copy.
+- Web routes and navigation: `/addBottle`, manual catalog form, `/search` intent handling, and visible bottle-flow copy.
 - Web components: photo resolver UI, search results, Added to Library state, Tasting form entry points, and collection bottle image controls.
 - Backend APIs: collection bottle create/list serializers, image update/delete routes for collection entries, pending upload copy behavior, and optional catalog image promotion on bottle creation.
 - Database: add nullable `image_url` to `collection_bottle`; add upload namespace support for collection bottle images.

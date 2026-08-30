@@ -4,7 +4,8 @@ import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
 import { z } from "zod";
 
 export type CreateBottleReturnAction =
-  | "addBottle"
+  | "catalog"
+  | "choose"
   | "library"
   | "tasting"
   | "view";
