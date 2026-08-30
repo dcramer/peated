@@ -26,6 +26,7 @@ import {
   exactMatchedBottleId,
   exactSearchBottle,
   existingBottle,
+  existingBottleDetails,
   existingBottleId,
   photoTastingNotes,
   testAccessToken,
@@ -603,7 +604,10 @@ test.describe("add bottle flow", () => {
       pendingScanImageUrl,
     );
     await expect(
-      getSelectedBottleImage(page, formatBottleDisplayName(existingBottle)),
+      getSelectedBottleImage(
+        page,
+        formatBottleDisplayName(existingBottleDetails),
+      ),
     ).toHaveAttribute("src", pendingScanImageUrl);
     await expect(
       page.getByRole("link", { name: "Search Bottles" }),
@@ -640,7 +644,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottle(page, formatBottleDisplayName(existingBottle)),
+      getSelectedBottle(page, formatBottleDisplayName(existingBottleDetails)),
     ).toBeVisible();
   });
 
@@ -732,10 +736,13 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottleImage(page, formatBottleDisplayName(existingBottle)),
+      getSelectedBottleImage(
+        page,
+        formatBottleDisplayName(existingBottleDetails),
+      ),
     ).toHaveAttribute("src", /library\.webp$/);
     await expect(
-      getSelectedBottle(page, formatBottleDisplayName(existingBottle)),
+      getSelectedBottle(page, formatBottleDisplayName(existingBottleDetails)),
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Add another to Library" }),
@@ -792,7 +799,10 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottleImage(page, formatBottleDisplayName(existingBottle)),
+      getSelectedBottleImage(
+        page,
+        formatBottleDisplayName(existingBottleDetails),
+      ),
     ).toHaveAttribute("src", /library\.webp$/);
   });
 
@@ -1126,7 +1136,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottle(page, formatBottleDisplayName(existingBottle)),
+      getSelectedBottle(page, formatBottleDisplayName(existingBottleDetails)),
     ).toBeVisible();
   });
 

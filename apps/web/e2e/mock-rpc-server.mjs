@@ -32,6 +32,7 @@ import {
   exactMergeOtherBottleId,
   exactSearchBottle,
   existingBottle,
+  existingBottleDetails,
   existingBottleId,
   failingTastingNotes,
   flightBottleFixture,
@@ -2061,11 +2062,7 @@ function getMockBottle(request, bottleId) {
     if (getAccessToken(request).includes("add-another-release")) {
       return addAnotherReleaseSourceBottle;
     }
-    return {
-      ...existingBottle,
-      groupId: destinationBottleGroup.id,
-      group: destinationBottleGroup,
-    };
+    return existingBottleDetails;
   }
   if (bottleId === exactMergeOtherBottleId) return exactMergeOtherBottle;
   if (bottleId === createdBottleId) {

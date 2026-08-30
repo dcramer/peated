@@ -47,6 +47,16 @@ describe("formatBottleDisplayName", () => {
     ).toBe("Decadent Drinks Whiskyland Glenburgie 38-year-old - 1988 Vintage");
   });
 
+  it("does not add a release year already used as the edition", () => {
+    expect(
+      formatBottleDisplayName({
+        ...bottle,
+        vintageYear: null,
+        edition: "2026 Release",
+      }),
+    ).toBe("Decadent Drinks Whiskyland Glenburgie 38-year-old - 2026 Release");
+  });
+
   it("does not repeat series or release wording", () => {
     expect(
       formatBottleDisplayName({
