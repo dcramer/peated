@@ -9,7 +9,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { Button } from "./button.stylex";
+import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { RatingMeasure, type BandCounts } from "./scoring.stylex";
 
@@ -66,6 +66,7 @@ export type SearchResultsProps = {
   scroll?: boolean;
   status?: "error" | "ready" | "searching";
   statusText?: string;
+  variant?: "database" | "default";
 };
 
 /** Presents supplied search results without owning search, ranking, or navigation. */
@@ -84,6 +85,7 @@ export function SearchResults({
   scroll = true,
   status = "ready",
   statusText,
+  variant = "default",
 }: SearchResultsProps) {
   const hasResults = groups.some((group) => group.items.length > 0);
   const hasColdLoadingState =
@@ -107,8 +109,28 @@ export function SearchResults({
         <p aria-live="polite" {...stylex.props(styles.searchingText)}>
           {statusText ?? "Searching…"}
         </p>
-      ) : emptyText ? (
+      ) : emptyText && variant === "default" ? (
         <p {...stylex.props(styles.stateText)}>{emptyText}</p>
+      ) : null}
+      {emptyText && variant === "database" ? (
+        <div {...stylex.props(styles.databaseEmptyState)}>
+          <h2 {...stylex.props(styles.databaseEmptyHeading)}>
+            Nothing matches “{query}”
+          </h2>
+          <p {...stylex.props(styles.databaseEmptyDescription)}>
+            Check the spelling, or record the bottle if the database is missing
+            it.
+          </p>
+          {visibleContribution ? (
+            <ButtonLink
+              href={visibleContribution.href}
+              size="sm"
+              variant="accent"
+            >
+              Record this bottle
+            </ButtonLink>
+          ) : null}
+        </div>
       ) : null}
       <div>
         {hasResults
@@ -121,6 +143,7 @@ export function SearchResults({
                   onItemSelect={onItemSelect}
                   optionIdPrefix={optionIdPrefix}
                   query={query}
+                  variant={variant}
                 />
               ) : null,
             )
@@ -139,7 +162,7 @@ export function SearchResults({
           ) : null}
         </div>
       ) : null}
-      {visibleContribution ? (
+      {visibleContribution && variant === "default" ? (
         <>
           <div aria-hidden="true" {...stylex.props(styles.contributionRule)} />
           <AppLink
@@ -175,12 +198,14 @@ function SearchResultsGroup({
   onItemSelect,
   optionIdPrefix,
   query,
+  variant,
 }: {
   activeId?: string;
   group: SearchResultGroup;
   onItemSelect?: (item: SearchResultItem) => void;
   optionIdPrefix?: string;
   query: string;
+  variant: "database" | "default";
 }) {
   const remaining =
     group.total === undefined
@@ -191,17 +216,35 @@ function SearchResultsGroup({
     <section
       aria-labelledby={`${optionIdPrefix ?? "search"}-group-${group.id}`}
     >
-      <div {...stylex.props(styles.groupHeading)}>
+      <div
+        {...stylex.props(
+          styles.groupHeading,
+          variant === "database" && styles.databaseGroupHeading,
+        )}
+      >
         <h2
           id={`${optionIdPrefix ?? "search"}-group-${group.id}`}
-          {...stylex.props(styles.groupName)}
+          {...stylex.props(
+            styles.groupName,
+            variant === "database" && styles.databaseGroupName,
+          )}
         >
           {group.label}
         </h2>
         {group.total !== undefined ? (
-          <span {...stylex.props(styles.groupCount)}>
+          <span
+            {...stylex.props(
+              styles.groupCount,
+              variant === "database" && styles.databaseGroupCount,
+            )}
+          >
             {group.total.toLocaleString("en-US")}
           </span>
+        ) : null}
+        {variant === "database" && group.moreHref ? (
+          <AppLink href={group.moreHref} {...stylex.props(styles.databaseMore)}>
+            See all {group.total?.toLocaleString("en-US")}
+          </AppLink>
         ) : null}
       </div>
       <ul {...stylex.props(styles.list)}>
@@ -222,6 +265,7 @@ function SearchResultsGroup({
               }}
               {...stylex.props(
                 styles.result,
+                variant === "database" && styles.databaseResult,
                 item.id === activeId && styles.activeResult,
               )}
             >
@@ -250,7 +294,7 @@ function SearchResultsGroup({
           </li>
         ))}
       </ul>
-      {group.moreHref ? (
+      {group.moreHref && variant === "default" ? (
         <AppLink href={group.moreHref} {...stylex.props(styles.more)}>
           <span>
             {remaining === undefined || remaining === 0
@@ -350,6 +394,33 @@ const styles = stylex.create({
     fontSize: "14px",
     lineHeight: 1.55,
   },
+  databaseEmptyState: {
+    paddingTop: space.x6,
+    paddingBottom: space.x2,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  databaseEmptyHeading: {
+    margin: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "17px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.2,
+  },
+  databaseEmptyDescription: {
+    maxWidth: "560px",
+    marginTop: space.x2,
+    marginRight: 0,
+    marginBottom: space.x4,
+    marginLeft: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    lineHeight: 1.5,
+  },
   groupHeading: {
     display: "flex",
     alignItems: "baseline",
@@ -358,6 +429,16 @@ const styles = stylex.create({
     paddingRight: "14px",
     paddingBottom: space.x1,
     paddingLeft: "14px",
+  },
+  databaseGroupHeading: {
+    gap: space.x2,
+    paddingTop: space.x6,
+    paddingRight: 0,
+    paddingBottom: space.x2,
+    paddingLeft: 0,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
   },
   groupName: {
     minWidth: 0,
@@ -371,12 +452,39 @@ const styles = stylex.create({
     lineHeight: 1.3,
     textTransform: "uppercase",
   },
+  databaseGroupName: {
+    flex: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "14px",
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
+    textTransform: "none",
+    whiteSpace: "nowrap",
+  },
   groupCount: {
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.3,
+  },
+  databaseGroupCount: {
+    flex: 0,
+  },
+  databaseMore: {
+    marginLeft: "auto",
+    outline: "none",
+    color: colors.accentDeep,
+    fontFamily: fonts.reading,
+    fontSize: "12px",
+    fontWeight: 700,
+    lineHeight: 1.3,
+    textDecoration: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   list: {
     margin: 0,
@@ -416,6 +524,12 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
+  },
+  databaseResult: {
+    marginRight: 0,
+    marginLeft: 0,
+    paddingRight: 0,
+    paddingLeft: 0,
   },
   activeResult: {
     backgroundColor: colors.surface,

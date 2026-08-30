@@ -2,9 +2,24 @@
 
 import * as stylex from "@stylexjs/stylex";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
-import { colors, controlMetrics, effects } from "../../../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../../../styles/tokens.stylex";
+import { Button } from "./button.stylex";
+import { FacetGroup, FilterPanel } from "./filterPanel.stylex";
 import { ScopedSearch, type ScopedSearchOption } from "./scopedSearch.stylex";
 import {
   SearchResults,
@@ -20,6 +35,7 @@ export type SearchBoxProps = Pick<
   "contribution" | "emptyText" | "onRetry" | "status" | "statusText"
 > & {
   autoFocus?: boolean;
+  browseHeader?: ReactNode;
   defaultOpen?: boolean;
   disabled?: boolean;
   fluid?: boolean;
@@ -30,15 +46,19 @@ export type SearchBoxProps = Pick<
   onScopeChange: (scope: string) => void;
   onSubmit?: (query: string) => void;
   placeholder?: string;
-  placement?: "overlay" | "page";
+  placement?: "database" | "overlay" | "page";
   query: string;
+  resultCount?: number;
   scope: string;
+  scopeFacets?: readonly ScopedSearchOption[];
   scopes: readonly ScopedSearchOption[];
+  submitLabel?: string;
 };
 
 /** Owns the keyboard and disclosure behavior for Peated's scoped search UI. */
 export function SearchBox({
   autoFocus = false,
+  browseHeader,
   contribution,
   defaultOpen = false,
   disabled = false,
@@ -54,10 +74,13 @@ export function SearchBox({
   placeholder = "bottles, distillers, brands…",
   placement = "overlay",
   query,
+  resultCount,
   scope,
+  scopeFacets,
   scopes,
   status = "ready",
   statusText,
+  submitLabel = "Search",
 }: SearchBoxProps) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -70,7 +93,9 @@ export function SearchBox({
     Boolean(emptyText) ||
     Boolean(contribution) ||
     status !== "ready";
-  const expanded = (placement === "page" || open) && hasPanelContent;
+  const expanded =
+    (placement === "database" || placement === "page" || open) &&
+    hasPanelContent;
 
   useEffect(() => {
     function focusSearch(event: KeyboardEvent) {
@@ -168,6 +193,140 @@ export function SearchBox({
     window.location.assign(item.href);
   }
 
+  const searchControl = (
+    <ScopedSearch
+      aria-activedescendant={
+        activeId ? `${panelId}-${encodeURIComponent(activeId)}` : undefined
+      }
+      aria-autocomplete="list"
+      aria-controls={expanded ? panelId : undefined}
+      autoFocus={autoFocus}
+      disabled={disabled}
+      expanded={placement !== "database" && expanded}
+      inputRef={inputRef}
+      onChange={(event) => {
+        onQueryChange(event.currentTarget.value);
+        setActiveId(items[0]?.id);
+        setOpen(true);
+      }}
+      onClear={() => {
+        onQueryChange("");
+        setActiveId(undefined);
+        inputRef.current?.focus();
+      }}
+      onFocus={() => setOpen(true)}
+      onKeyDown={handleKeyDown}
+      onScopeChange={(nextScope) => {
+        onScopeChange(nextScope);
+        setActiveId(undefined);
+        inputRef.current?.focus();
+        setOpen(true);
+      }}
+      placeholder={placeholder}
+      scope={scope}
+      scopes={
+        placement === "database"
+          ? scopes.filter((option) => option.value === scope)
+          : scopes
+      }
+      value={query}
+    />
+  );
+
+  if (placement === "database") {
+    const facetOptions = scopeFacets?.filter(
+      (option) => option.value !== "all",
+    );
+    const facetTotal = scopeFacets?.find(
+      (option) => option.value === "all",
+    )?.count;
+    const facets = facetOptions?.length ? (
+      <FacetGroup
+        label="Type"
+        onChange={(nextScope) => onScopeChange(nextScope || "all")}
+        options={facetOptions}
+        selected={scope === "all" ? undefined : scope}
+        total={facetTotal}
+      />
+    ) : null;
+    const searchRow = (
+      <div role="search" {...stylex.props(styles.databaseSearchRow)}>
+        <div {...stylex.props(styles.databaseSearchControl)}>
+          {searchControl}
+        </div>
+        <Button
+          disabled={!query.trim()}
+          onClick={() => onSubmit?.(query)}
+          size="md"
+          variant="accent"
+        >
+          {submitLabel}
+        </Button>
+      </div>
+    );
+
+    return (
+      <div ref={rootRef} {...stylex.props(styles.databaseRoot)}>
+        {!query.trim() ? (
+          <>
+            {browseHeader}
+            <div {...stylex.props(styles.databaseBrowseSearch)}>
+              {searchRow}
+            </div>
+          </>
+        ) : (
+          <div {...stylex.props(styles.databaseLayout)}>
+            <div {...stylex.props(styles.databaseMain)}>
+              {searchRow}
+              <div aria-hidden="true" {...stylex.props(styles.dividerTrack)}>
+                <span
+                  {...stylex.props(
+                    styles.divider,
+                    status === "searching" && styles.searchingDivider,
+                  )}
+                />
+              </div>
+              {facets ? (
+                <div {...stylex.props(styles.databaseMobileFacets)}>
+                  <FilterPanel ariaLabel="Search filters">
+                    <div {...stylex.props(styles.databaseMobileFacetContent)}>
+                      {facets}
+                    </div>
+                  </FilterPanel>
+                </div>
+              ) : null}
+              <p aria-live="polite" {...stylex.props(styles.databaseCount)}>
+                {(resultCount ?? 0).toLocaleString("en-US")}{" "}
+                {resultCount === 1 ? "result" : "results"}
+              </p>
+              {expanded ? (
+                <SearchResults
+                  activeId={activeId}
+                  contribution={contribution}
+                  embedded
+                  emptyText={emptyText}
+                  groups={groups}
+                  onItemSelect={selectResult}
+                  onRetry={onRetry}
+                  optionIdPrefix={panelId}
+                  panelId={panelId}
+                  query={query}
+                  scroll={false}
+                  status={status}
+                  statusText={statusText}
+                  variant="database"
+                />
+              ) : null}
+            </div>
+            {facets ? (
+              <aside {...stylex.props(styles.databaseFacets)}>{facets}</aside>
+            ) : null}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={rootRef}
@@ -184,39 +343,7 @@ export function SearchBox({
           placement === "page" && styles.pageSurface,
         )}
       >
-        <ScopedSearch
-          aria-activedescendant={
-            activeId ? `${panelId}-${encodeURIComponent(activeId)}` : undefined
-          }
-          aria-autocomplete="list"
-          aria-controls={expanded ? panelId : undefined}
-          autoFocus={autoFocus}
-          disabled={disabled}
-          expanded={expanded}
-          inputRef={inputRef}
-          onChange={(event) => {
-            onQueryChange(event.currentTarget.value);
-            setActiveId(items[0]?.id);
-            setOpen(true);
-          }}
-          onClear={() => {
-            onQueryChange("");
-            setActiveId(undefined);
-            inputRef.current?.focus();
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={handleKeyDown}
-          onScopeChange={(nextScope) => {
-            onScopeChange(nextScope);
-            setActiveId(undefined);
-            inputRef.current?.focus();
-            setOpen(true);
-          }}
-          placeholder={placeholder}
-          scope={scope}
-          scopes={scopes}
-          value={query}
-        />
+        {searchControl}
         {expanded ? (
           <div {...stylex.props(styles.results)}>
             <div aria-hidden="true" {...stylex.props(styles.dividerTrack)}>
@@ -255,6 +382,72 @@ const searchSweep = stylex.keyframes({
 });
 
 const styles = stylex.create({
+  databaseRoot: {
+    width: "100%",
+  },
+  databaseBrowseSearch: {
+    width: "100%",
+    maxWidth: "660px",
+    marginRight: "auto",
+    marginLeft: "auto",
+  },
+  databaseLayout: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: "minmax(0, 1fr) 300px",
+    gap: space.x12,
+    alignItems: "start",
+    "@media (max-width: 759px)": {
+      gridTemplateColumns: "minmax(0, 1fr)",
+    },
+  },
+  databaseMain: {
+    minWidth: 0,
+  },
+  databaseSearchRow: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "flex-start",
+    gap: space.x2,
+  },
+  databaseSearchControl: {
+    minWidth: 0,
+    flex: 1,
+  },
+  databaseCount: {
+    marginTop: space.x4,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    paddingBottom: space.x3,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "17px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.2,
+  },
+  databaseFacets: {
+    minWidth: 0,
+    paddingTop: "2px",
+    "@media (max-width: 759px)": {
+      display: "none",
+    },
+  },
+  databaseMobileFacets: {
+    display: "none",
+    marginTop: space.x4,
+    "@media (max-width: 759px)": {
+      display: "block",
+    },
+  },
+  databaseMobileFacetContent: {
+    minWidth: 0,
+    gridColumn: "1 / -1",
+  },
   root: {
     position: "relative",
     width: "100%",
