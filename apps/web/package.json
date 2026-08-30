@@ -19,6 +19,7 @@
     "test:e2e:policy": "node scripts/check-e2e-policy.mjs",
     "test:e2e:report": "playwright show-report .playwright/report",
     "test:e2e:ui": "playwright test --ui",
+    "visual:capture": "node visual/capture.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

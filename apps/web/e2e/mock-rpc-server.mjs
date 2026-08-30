@@ -50,6 +50,7 @@ import {
   storePriceList,
   suggestedTags,
   tastingNotes,
+  testBottler,
   testBrand,
   testOwnedEntity,
   testOwner,
@@ -199,16 +200,23 @@ async function handleRpcRequest({ request, response, url }) {
         });
         return true;
       }
+      if (input?.owner === testOwner.id) {
+        sendRpcResponse(response, {
+          ...emptyList,
+          results: [testOwnedEntity],
+        });
+        return true;
+      }
       return false;
     case "entities/details":
       if (
-        [testBrand, testOwnedEntity, testOwner].some(
+        [testBrand, testBottler, testOwnedEntity, testOwner].some(
           (entity) => entity.id === Number(input?.entity),
         )
       ) {
         sendRpcResponse(
           response,
-          [testBrand, testOwnedEntity, testOwner].find(
+          [testBrand, testBottler, testOwnedEntity, testOwner].find(
             (entity) => entity.id === Number(input?.entity),
           ),
         );
@@ -218,9 +226,12 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     case "entities/catalog":
       if (
-        ![testBrand.id, testOwnedEntity.id, testOwner.id].includes(
-          Number(input?.entity),
-        )
+        ![
+          testBrand.id,
+          testBottler.id,
+          testOwnedEntity.id,
+          testOwner.id,
+        ].includes(Number(input?.entity))
       ) {
         sendRpcError(response, "Unexpected entity catalog payload");
         return true;
@@ -685,7 +696,49 @@ async function handleRpcRequest({ request, response, url }) {
       }
       if (
         !getAccessToken(request).includes("flight-bottles") &&
-        input?.limit === 10 &&
+        [testBrand.id, testBottler.id, testOwnedEntity.id].includes(
+          input?.entity,
+        ) &&
+        input?.limit === 4 &&
+        input?.sort === "-tastings"
+      ) {
+        sendRpcResponse(response, {
+          results:
+            input.entity === testBottler.id
+              ? [homeBottle, existingBottle]
+              : [homeBottle],
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
+      if (
+        !getAccessToken(request).includes("flight-bottles") &&
+        [testBrand.id, testBottler.id, testOwnedEntity.id].includes(
+          input?.entity,
+        ) &&
+        input?.limit === 4 &&
+        input?.sort === "-release"
+      ) {
+        sendRpcResponse(response, {
+          results: [bottleGroupRepresentative],
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
+      if (
+        !getAccessToken(request).includes("flight-bottles") &&
+        input?.limit === 5 &&
+        input?.sort === "-release"
+      ) {
+        sendRpcResponse(response, {
+          results: [bottleGroupRepresentative],
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
+      if (
+        !getAccessToken(request).includes("flight-bottles") &&
+        [3, 10].includes(input?.limit) &&
         input?.sort === "-created"
       ) {
         sendRpcResponse(response, {
@@ -707,6 +760,16 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       sendRpcResponse(response, suggestedTags);
+      return true;
+    case "bottles/recommendations":
+      if (!isNumber(input?.bottle)) {
+        sendRpcError(response, "Unexpected bottle recommendations payload");
+        return true;
+      }
+      sendRpcResponse(response, {
+        reason: "People who liked this bottle also liked these bottles.",
+        results: [],
+      });
       return true;
     case "tastings/create": {
       if (
@@ -1020,6 +1083,30 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "users/libraryStats":
       sendRpcResponse(response, libraryInsightsStats);
+      return true;
+    case "users/tastingStats":
+      sendRpcResponse(response, {
+        total: 0,
+        uniqueBottles: 0,
+        bands: {
+          total: 0,
+          mediocre: 0,
+          good: 0,
+          very_good: 0,
+          outstanding: 0,
+          unicorn: 0,
+        },
+        mostTastedBottle: null,
+        age: {
+          knownCount: 0,
+          median: null,
+          oldest: null,
+          buckets: libraryInsightsStats.age.buckets.map((bucket) => ({
+            ...bucket,
+            count: 0,
+          })),
+        },
+      });
       return true;
     case "users/badgeList":
       sendRpcResponse(response, emptyList);

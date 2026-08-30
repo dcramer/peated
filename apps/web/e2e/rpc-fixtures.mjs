@@ -133,6 +133,15 @@ export const testOwnedEntity = {
   },
 };
 
+export const testBottler = {
+  ...testBrand,
+  id: 9204,
+  peatedId: "E9204",
+  name: "Gordon & MacPhail",
+  kind: "bottler",
+  totalBottles: 2,
+};
+
 export const emptyEntityCatalog = {
   totalBottles: 0,
   relationships: { brand: 0, bottler: 0, distiller: 0 },
