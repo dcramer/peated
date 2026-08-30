@@ -93,6 +93,9 @@ import { bottleObservationSink } from "./sinks/bottles";
 import { externalReviewSink } from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
 
+// TODO(scraper-source-migration): Delete these ordinary HTML adapters after
+// every site has an active database-managed parsing revision. New HTML sources
+// must use configured rules instead of joining this compatibility group.
 const legacyPriceSources = [
   {
     type: "astorwines",
@@ -217,6 +220,9 @@ const legacyPriceSources = [
   },
 ] as const;
 
+// Custom adapters remain available for sources that configured parsing cannot
+// express. SMWS emits bottle-catalog observations from an API, not HTML review
+// or price observations.
 const legacyBottleSources = [
   {
     type: "smws",
@@ -383,6 +389,8 @@ export const scraperRegistry = createScraperRegistry({
         sink: bottleObservationSink,
       }),
     ),
+    // TODO(scraper-source-migration): Remove these HTML review definitions as
+    // each publisher activates a database-managed parsing revision.
     defineScraperSource({
       key: "bourbonculture",
       externalSiteKey: "bourbonculture",

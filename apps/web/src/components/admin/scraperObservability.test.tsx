@@ -3,9 +3,18 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import ExternalSiteRunStatus from "./externalSiteRunStatus";
 import ExternalSiteRunTelemetry from "./externalSiteRunTelemetry";
+import ScraperAdapterStatus from "./scraperAdapterStatus";
 import ScraperCatalogCoverage from "./scraperCatalogCoverage";
+import {
+  ReviewPublishingAction,
+  ReviewPublishingState,
+} from "./scraperPublicationSettings";
 import ScraperReadiness from "./scraperReadiness";
 import { getScraperRunAvailability } from "./scraperRunAvailability";
+import {
+  getScheduleChoice,
+  getScheduleInterval,
+} from "./scraperScheduleSettings.stylex";
 
 const timestamp = "2026-08-18T12:00:00.000Z";
 
@@ -102,15 +111,54 @@ describe("scraper observability", () => {
     expect(html).not.toContain("Disabled");
   });
 
-  it("shows runtime, robots, and review publishing", () => {
+  it("shows runtime and robots without owning review publishing", () => {
     const html = renderToStaticMarkup(<ScraperReadiness site={site} />);
 
     expect(html).toContain("Connection");
     expect(html).toContain("Disabled");
-    expect(html).toContain("Origins");
+    expect(html).toContain("Sites");
     expect(html).toContain("Not checked");
-    expect(html).toContain("Review publishing");
-    expect(html).toContain("Not published");
+    expect(html).not.toContain("Review publishing");
+  });
+
+  it("shows review publishing with matched coverage", () => {
+    const html = renderToStaticMarkup(<ReviewPublishingState site={site} />);
+
+    expect(html).toContain("Not public");
+    expect(html).toContain("10 of 12 matched");
+  });
+
+  it("offers publishing without using review counts as permission", () => {
+    const html = renderToStaticMarkup(
+      <ReviewPublishingAction
+        approved={false}
+        disabled={false}
+        loading={false}
+        onToggle={() => undefined}
+      />,
+    );
+
+    expect(html).toContain("Publish reviews");
+    expect(html).not.toContain("disabled");
+  });
+
+  it("shows a stable custom-adapter state", () => {
+    const html = renderToStaticMarkup(<ScraperAdapterStatus />);
+
+    expect(html).toContain("Scraper");
+    expect(html).toContain("Managed in code");
+    expect(html).toContain("cannot be edited here");
+  });
+
+  it("maps manual, preset, and custom schedules", () => {
+    expect(getScheduleChoice(null)).toBe("manual");
+    expect(getScheduleChoice(1_440)).toBe("daily");
+    expect(getScheduleChoice(10_080)).toBe("weekly");
+    expect(getScheduleChoice(90)).toBe("custom");
+    expect(getScheduleInterval("manual", 90)).toBeNull();
+    expect(getScheduleInterval("daily", 90)).toBe(1_440);
+    expect(getScheduleInterval("weekly", 90)).toBe(10_080);
+    expect(getScheduleInterval("custom", 90)).toBe(90);
   });
 
   it("shows responsible-request and deferral telemetry", () => {

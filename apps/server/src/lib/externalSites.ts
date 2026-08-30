@@ -33,7 +33,6 @@ export async function syncExternalSites() {
           target: externalSites.type,
           set: {
             name: definition.name,
-            runEvery: definition.runEvery,
           },
         })
         .returning({ id: externalSites.id });

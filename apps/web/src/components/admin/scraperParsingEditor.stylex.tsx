@@ -460,7 +460,6 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: space.x6,
-    paddingTop: space.x6,
   },
   formStack: {
     display: "flex",
