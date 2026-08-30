@@ -30,8 +30,8 @@ export function EntitySiblingOverview({
   if (!entity.ownerId) return null;
 
   const heading = entity.owner?.name
-    ? `Also owned by ${entity.owner.name}`
-    : "Also owned";
+    ? `Also part of ${entity.owner.name}`
+    : "Related entities";
 
   if (pending) {
     return (

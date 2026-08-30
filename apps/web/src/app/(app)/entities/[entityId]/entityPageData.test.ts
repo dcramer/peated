@@ -4,6 +4,7 @@ import {
   entityHasBottleCatalog,
   getEntityClassification,
   getEntityCurrentHref,
+  getEntityOwnerLabel,
   getEntityTabs,
 } from "./entityPageData";
 
@@ -26,6 +27,26 @@ describe("getEntityClassification", () => {
         yearEstablished: 1816,
       }),
     ).toBe("Distillery · founded 1816 · Islay");
+  });
+});
+
+describe("getEntityOwnerLabel", () => {
+  it("describes a brand through its owner", () => {
+    expect(
+      getEntityOwnerLabel(
+        { kind: "brand" },
+        { name: "Diageo plc", shortName: "Diageo" },
+      ),
+    ).toBe("A Diageo brand");
+  });
+
+  it("describes other entity kinds as part of their owner", () => {
+    expect(
+      getEntityOwnerLabel(
+        { kind: "distillery" },
+        { name: "Diageo", shortName: null },
+      ),
+    ).toBe("Part of Diageo");
   });
 });
 
