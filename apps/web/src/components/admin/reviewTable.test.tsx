@@ -101,6 +101,8 @@ describe("ReviewTable", () => {
     );
 
     expect(html).toContain('href="/bottles/19"');
+    expect(html).toContain('title="Springbank review"');
+    expect(html).toContain('title="Springbank 12 Cask Strength Batch 24"');
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");
     expect(html).toContain("Published Jul 21, 2026");
     expect(html).toContain('dateTime="2026-07-21T00:00:00.000Z"');

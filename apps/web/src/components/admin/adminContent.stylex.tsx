@@ -191,11 +191,19 @@ export function AdminStatus({
 export function AdminTextLink({
   children,
   href,
+  title,
+  truncate = false,
 }: {
   children: ReactNode;
   href: string;
+  title?: string;
+  truncate?: boolean;
 }) {
-  return <TextLink href={href}>{children}</TextLink>;
+  return (
+    <TextLink href={href} title={title} truncate={truncate}>
+      {children}
+    </TextLink>
+  );
 }
 
 export function AdminCode({ children }: { children: ReactNode }) {

@@ -34,39 +34,58 @@ export function ReviewRows({
     <AdminTable
       columns={[
         {
+          fill: true,
           name: "review",
-          value: (review) => (
-            <span {...stylex.props(styles.review)}>
-              <span>
-                <AdminTextLink href={review.url}>{review.name}</AdminTextLink>
-              </span>
-              <span {...stylex.props(styles.metadata)}>
-                {review.bottle ? (
-                  <AdminTextLink href={`/bottles/${review.bottle.id}`}>
-                    {formatBottleDisplayName(review.bottle)}
-                  </AdminTextLink>
-                ) : (
-                  "No bottle"
-                )}
-                {" · "}
-                {review.article.publishedAt ? (
-                  <time dateTime={review.article.publishedAt}>
-                    Published{" "}
-                    {publishedDateFormatter.format(
-                      new Date(review.article.publishedAt),
+          value: (review) => {
+            const bottleName = review.bottle
+              ? formatBottleDisplayName(review.bottle)
+              : "No bottle";
+            return (
+              <span {...stylex.props(styles.review)}>
+                <AdminTextLink href={review.url} title={review.name} truncate>
+                  {review.name}
+                </AdminTextLink>
+                <span {...stylex.props(styles.matchLine)}>
+                  <span aria-hidden="true" {...stylex.props(styles.arrow)}>
+                    →
+                  </span>
+                  {review.bottle ? (
+                    <AdminTextLink
+                      href={`/bottles/${review.bottle.id}`}
+                      title={bottleName}
+                      truncate
+                    >
+                      {bottleName}
+                    </AdminTextLink>
+                  ) : (
+                    <span {...stylex.props(styles.match)}>{bottleName}</span>
+                  )}
+                  <span {...stylex.props(styles.metadata)}>
+                    {" · "}
+                    {review.article.publishedAt ? (
+                      <time dateTime={review.article.publishedAt}>
+                        Published{" "}
+                        {publishedDateFormatter.format(
+                          new Date(review.article.publishedAt),
+                        )}
+                      </time>
+                    ) : (
+                      "Publish date unknown"
                     )}
-                  </time>
-                ) : (
-                  "Publish date unknown"
-                )}
+                  </span>
+                </span>
               </span>
-            </span>
-          ),
+            );
+          },
         },
         {
           align: "right",
           name: "score",
-          value: (review) => review.nativeScore?.display ?? "—",
+          value: (review) => (
+            <span {...stylex.props(styles.score)}>
+              {review.nativeScore?.display ?? "—"}
+            </span>
+          ),
         },
       ]}
       items={reviews}
@@ -78,13 +97,33 @@ export function ReviewRows({
 const styles = stylex.create({
   review: {
     display: "flex",
+    minWidth: 0,
     flexDirection: "column",
     gap: space.x1,
+  },
+  matchLine: {
+    display: "flex",
     minWidth: 0,
+    alignItems: "baseline",
+    gap: space.x1,
+  },
+  arrow: {
+    flexShrink: 0,
+    color: colors.inkMuted,
+  },
+  match: {
+    minWidth: 0,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   metadata: {
+    flexShrink: 0,
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "11px",
+  },
+  score: {
+    whiteSpace: "nowrap",
   },
 });
