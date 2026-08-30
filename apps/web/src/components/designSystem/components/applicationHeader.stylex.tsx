@@ -104,6 +104,9 @@ export function ApplicationHeader({
             searchOpen && styles.primaryRowSearchOpen,
             !hasSearch && styles.primaryRowWithoutSearch,
             navigationPlacement === "inline" && styles.primaryRowWithInlineNav,
+            navigationPlacement === "inline" &&
+              Boolean(account) &&
+              styles.primaryRowWithInlineNavAndAccount,
           )}
         >
           <div
@@ -405,6 +408,12 @@ const styles = stylex.create({
   },
   primaryRowWithInlineNav: {
     gridTemplateColumns: "auto minmax(0, 1fr) auto",
+  },
+  primaryRowWithInlineNavAndAccount: {
+    gridTemplateColumns: "auto minmax(0, 1fr) auto auto",
+    [MOBILE]: {
+      gridTemplateColumns: "auto minmax(0, 1fr) auto",
+    },
   },
   mobileMenu: {
     display: "none",

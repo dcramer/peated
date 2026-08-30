@@ -167,6 +167,10 @@ export default implement(bottleListContract).handler(async function ({
       ),
     );
   }
+  // Release sorting owns release eligibility. Creation time only orders known releases.
+  if (rest.sort === "-release") {
+    where.push(isNotNull(bottles.releaseYear));
+  }
 
   if (rest.flight) {
     const [flight] = await db

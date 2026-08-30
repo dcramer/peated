@@ -13,7 +13,7 @@ import {
 import {
   HomeContributionPrompt,
   HomeDistilleries,
-  HomeHighestRated,
+  HomeLatestReleases,
   HomeOrigins,
   HomeQuestions,
   HomeRecentBottles,
@@ -24,8 +24,12 @@ import { HomeSectionLoading } from "@peated/web/components/designSystem/patterns
 import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import TimeSince from "@peated/web/components/timeSince";
+import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { publicHomeQueries } from "@peated/web/lib/orpc/homeQueries";
+import {
+  memberHomeQueries,
+  publicHomeQueries,
+} from "@peated/web/lib/orpc/homeQueries";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
@@ -57,6 +61,7 @@ const questions = [
 export function PublicHome() {
   const orpc = useORPC();
   const router = useRouter();
+  const { user } = useAuth();
   const stats = useQuery(publicHomeQueries.stats(orpc));
   const totalBottles = stats.data?.bottles;
 
@@ -65,7 +70,7 @@ export function PublicHome() {
       content={
         <>
           <div {...stylex.props(styles.ratingsGrid)}>
-            <HighestRated />
+            <LatestReleases />
             <RecentReviews />
           </div>
           <Origins />
@@ -75,8 +80,12 @@ export function PublicHome() {
                 <RecentBottles totalBottles={totalBottles} />
                 <HomeContributionPrompt
                   primaryAction={
-                    <ButtonLink href="/register" size="sm" variant="accent">
-                      Create an account
+                    <ButtonLink
+                      href={user ? "/addBottle?intent=catalog" : "/register"}
+                      size="sm"
+                      variant="accent"
+                    >
+                      {user ? "Add a bottle" : "Create an account"}
                     </ButtonLink>
                   }
                   secondaryAction={
@@ -117,55 +126,78 @@ export function PublicHome() {
           submitLabel="Search"
         />
       }
-      signedIn={false}
       title="A record of whisky, bottle by bottle."
     />
   );
 }
 
-function HighestRated() {
+function LatestReleases() {
   const orpc = useORPC();
-  const bottles = useQuery(publicHomeQueries.highestRated(orpc));
+  const { user } = useAuth();
+  const globalReleases = useQuery(publicHomeQueries.releases(orpc));
+  const followedReleases = useQuery({
+    ...memberHomeQueries.followedReleases(orpc),
+    enabled: Boolean(user),
+  });
+  const useFollowedReleases = Boolean(
+    user && followedReleases.data?.results.length,
+  );
+  const releases = useFollowedReleases
+    ? followedReleases.data
+    : globalReleases.data;
 
-  if (bottles.isPending) {
+  if (
+    !useFollowedReleases &&
+    (globalReleases.isPending || (Boolean(user) && followedReleases.isPending))
+  ) {
     return (
       <HomeSectionLoading>
-        <LoadingList label="Loading highest-rated bottles" rows={4} />
+        <LoadingList label="Loading latest releases" rows={4} />
       </HomeSectionLoading>
     );
   }
 
-  if (bottles.error) {
+  if (!releases) {
     return (
       <SectionError
-        heading="Highest-rated bottles are unavailable"
-        onRetry={() => void bottles.refetch()}
+        heading="Latest releases are unavailable"
+        onRetry={() => {
+          void globalReleases.refetch();
+          if (user) void followedReleases.refetch();
+        }}
       >
-        We couldn't load the highest-rated bottles. The rest of the database is
-        still available.
+        We couldn't load the latest releases. The rest of the database is still
+        available.
       </SectionError>
     );
   }
 
-  const items = bottles.data.results.flatMap((bottle) =>
-    bottle.medianScore === null
+  const items = releases.results.flatMap((bottle) =>
+    bottle.releaseYear === null
       ? []
       : [
           {
-            bandCounts: bottle.tastingBandCounts,
             href: `/bottles/${bottle.id}`,
-            metadata: getHighestRatedMetadata(bottle),
+            metadata: getReleaseMetadata(bottle),
             name: bottle.fullName,
-            scoreCount: bottle.scoreCount,
-            scoreHigh: bottle.maxScore,
-            scoreLow: bottle.minScore,
-            score: bottle.medianScore,
           },
         ],
   );
 
   return items.length ? (
-    <HomeHighestRated bottles={items} totalRated={bottles.data.total} />
+    <HomeLatestReleases
+      bottles={items}
+      seeAllHref={
+        useFollowedReleases
+          ? "/bottles?filter=following&sort=-release"
+          : "/bottles?sort=-release"
+      }
+      title={
+        useFollowedReleases
+          ? "New from distilleries you follow"
+          : "Latest releases"
+      }
+    />
   ) : null;
 }
 
@@ -405,13 +437,12 @@ function getBottleMetadata(bottle: Bottle) {
   ].filter((value): value is string => Boolean(value));
 }
 
-function getHighestRatedMetadata(bottle: Bottle) {
-  const distiller = bottle.distillers[0];
-  const origin = distiller?.region?.name ?? distiller?.country?.name;
+function getReleaseMetadata(bottle: Bottle) {
+  const distiller = bottle.distillers[0]?.name ?? bottle.brand.name;
 
   return [
-    origin,
-    bottle.vintageYear === null ? null : String(bottle.vintageYear),
+    distiller,
+    bottle.releaseYear === null ? null : `${bottle.releaseYear} release`,
     bottle.statedAge === null ? null : `${bottle.statedAge} yr`,
     bottle.abv === null ? null : `${bottle.abv.toFixed(1)}%`,
   ].filter((value): value is string => Boolean(value));

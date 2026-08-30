@@ -103,6 +103,48 @@ export function HomeHighestRated({
   );
 }
 
+export type HomeRelease = {
+  href: string;
+  metadata: readonly string[];
+  name: string;
+};
+
+/** Shows bottles with known release years in API release order. */
+export function HomeLatestReleases({
+  bottles,
+  seeAllHref,
+  title,
+}: {
+  bottles: readonly HomeRelease[];
+  seeAllHref: string;
+  title: string;
+}) {
+  return (
+    <section {...stylex.props(styles.section)}>
+      <HomeModuleHeading
+        action={
+          <Link href={seeAllHref} {...stylex.props(styles.moreLink)}>
+            View all <span aria-hidden="true">→</span>
+          </Link>
+        }
+        title={title}
+      />
+      <div {...stylex.props(styles.rows)}>
+        <ItemList ariaLabel={title}>
+          {bottles.map((bottle) => (
+            <ItemRow
+              href={bottle.href}
+              key={bottle.href}
+              metadata={bottle.metadata.join(" · ")}
+              title={bottle.name}
+            />
+          ))}
+        </ItemList>
+      </div>
+    </section>
+  );
+}
+
 export type HomeReview = {
   bottleHref: string;
   bottleName: string;

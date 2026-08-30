@@ -12,9 +12,9 @@ type ActivityList = Outputs["activity"]["list"];
 
 export const publicHomeQueries = {
   stats: (orpc: ORPCQueryUtils) => orpc.stats.queryOptions(),
-  highestRated: (orpc: ORPCQueryUtils) =>
+  releases: (orpc: ORPCQueryUtils) =>
     orpc.bottles.list.queryOptions({
-      input: { limit: 5, minScore: 0, sort: "-score" },
+      input: { limit: 5, sort: "-release" },
     }),
   recentReviews: (orpc: ORPCQueryUtils) =>
     orpc.externalReviews.list.queryOptions({
@@ -68,9 +68,9 @@ export const memberHomeQueries = {
     orpc.externalReviews.list.queryOptions({
       input: { limit: 2, sort: "recent" },
     }),
-  releases: (orpc: ORPCQueryUtils) =>
+  followedReleases: (orpc: ORPCQueryUtils) =>
     orpc.bottles.list.queryOptions({
-      input: { filter: "following", limit: 3, sort: "-release" },
+      input: { filter: "following", limit: 5, sort: "-release" },
     }),
   member: (orpc: ORPCQueryUtils) =>
     orpc.users.details.queryOptions({ input: { user: "me" } }),
