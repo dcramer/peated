@@ -218,6 +218,39 @@ const Input = z.object({
 });
 ```
 
+### OpenAPI Text
+
+Write OpenAPI text for a developer who cannot see the handler. Use a neutral,
+direct, and factual voice. Use present tense, active verbs, common words, and
+short sentences. Do not use humor, marketing language, or conversational
+filler.
+
+- Start an operation summary with a verb and name the resource, such as
+  `List bottles`.
+- Use the operation description for the endpoint's overall behavior, scope,
+  permission, or important side effect. Keep optional filter details on their
+  parameters.
+- Describe what each field means or changes. Include units, accepted identifier
+  forms, special values, ordering rules, and conditional requirements when
+  they are not clear from the schema.
+- Do not repeat a type, range, enum, or default that the generated schema
+  already shows unless the value needs domain context.
+- Use the canonical domain noun. Put parameter names and literal values in
+  backticks.
+- Start filter descriptions with a direct verb such as `Filter`, `Match`, or
+  `Search`. Use a short noun phrase when it is clearer, such as
+  `Page number to return`.
+- Describe the public contract. Do not mention database columns, framework
+  types, handler names, or other implementation details.
+
+Examples:
+
+| Avoid        | Write                                                           |
+| ------------ | --------------------------------------------------------------- |
+| Owner filter | Filter by the current owner Entity ID                           |
+| Region       | Filter by region slug or numeric ID. A slug requires `country`. |
+| Sort value   | Prefix a value with `-` for descending order.                   |
+
 ## 7. Error Handling
 
 `procedure` injects an `errors` helper with canonical REST errors like `NOT_FOUND`, `CONFLICT`, and `UNAUTHORIZED`. Prefer these over manual `ORPCError` construction.
