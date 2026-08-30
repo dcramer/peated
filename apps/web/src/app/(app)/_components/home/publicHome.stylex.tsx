@@ -15,7 +15,6 @@ import {
   HomeDistilleries,
   HomeLatestReleases,
   HomeOrigins,
-  HomeQuestions,
   HomeRecentBottles,
   HomeRecentReviews,
 } from "@peated/web/components/designSystem/patterns/homeBrowse.stylex";
@@ -34,29 +33,6 @@ import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
-
-const questions = [
-  {
-    question: "How is a score calculated?",
-    answer:
-      "It's the median of member scores and published scores that use a 100-point scale. Each score counts once. The number appears after 20 scores.",
-  },
-  {
-    question: "Why do some bottles have no score?",
-    answer:
-      "Some records are single casks that only a few people have tasted. We show what people said and leave the number blank until 20 scores.",
-  },
-  {
-    question: "Do I need an account?",
-    answer:
-      "Only to log a tasting, keep your Library, or add a bottle. Every record page is readable without one.",
-  },
-  {
-    question: "Where do critic reviews come from?",
-    answer:
-      "Each review names its publication and links to the original article.",
-  },
-] as const;
 
 export function PublicHome() {
   const orpc = useORPC();
@@ -105,7 +81,6 @@ export function PublicHome() {
               totalDistilleries={stats.data?.distilleries}
             />
           </PageColumns>
-          <HomeQuestions questions={questions} />
         </>
       }
       description="Browse whisky bottlings, including single casks, with critic scores and tasting notes. No account needed."
