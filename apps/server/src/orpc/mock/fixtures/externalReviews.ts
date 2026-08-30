@@ -10,6 +10,7 @@ export const mockExternalReview = {
   url: "https://example.com/reviews/lagavulin-16",
   site: {
     id: 9802,
+    imageUrl: null,
     type: "whiskyadvocate",
     name: "Whisky Advocate",
     lastRunAt: timestamp,

@@ -20,6 +20,7 @@ const timestamp = "2026-08-18T12:00:00.000Z";
 
 const site = {
   id: 1,
+  imageUrl: null,
   type: "whiskyadvocate",
   name: "Whisky Advocate",
   lastRunAt: null,

@@ -37,8 +37,8 @@ pnpm test:e2e:install
 
 ## What To Test
 
-- Use Vitest for deterministic component contracts: rendered fallback shape,
-  accessible roles, props, and route loading component output.
+- Use Vitest for logic such as state, validation, callbacks, and route loading
+  decisions.
 - Use Playwright to prove a user-visible behavior: a workflow completes,
   navigation reaches the right destination, a mutation changes state, a filter
   changes results, access boundaries hold, or a browser-only interaction works.
@@ -48,16 +48,14 @@ pnpm test:e2e:install
 - Add breakpoint-specific Playwright coverage only when responsive behavior
   changes the interaction or available workflow. Do not rerun the same contract
   at multiple sizes solely to verify presentation.
-- Do not use Playwright to lock down general copy, decorative rendering, DOM
-  structure, element counts, individual icons or labels, card composition, or
-  pixel geometry unless that exact output is the product contract.
-- Verify visual hierarchy, spacing, color, artwork, content quality, and broad
-  responsive appearance through manual QA or agent-browser screenshots.
+- Do not use automated tests to check copy, icons, labels, page structure, card
+  layout, element counts, or exact sizes and positions.
+- Check spacing, color, artwork, copy, and responsive layouts manually or with
+  browser screenshots.
 - Prefer the fewest assertions that prove the material outcome. Avoid repeating
   lower-level component or API contracts inside an end-to-end workflow.
-- Do not use Playwright for loading fallback structure or element geometry.
-  Prove fallback markup with focused tests. Check geometry during manual or
-  agent-based visual QA.
+- Test a loading fallback only when it changes what a user can do. Check how it
+  looks during browser QA.
 - For user-facing web route/layout changes, run the related Vitest coverage and
   targeted `pnpm test:e2e` checks only when the changed workflow has a browser
   behavior to prove.

@@ -1,15 +1,15 @@
 "use client";
 
 import { ExternalSiteKeySchema } from "@peated/server/schemas";
+import { AdminPage } from "@peated/web/components/admin/adminContent.stylex";
 import ScraperAdapterStatus from "@peated/web/components/admin/scraperAdapterStatus";
+import ScraperIconSettings from "@peated/web/components/admin/scraperIconSettings";
 import { ScraperParsingEditor } from "@peated/web/components/admin/scraperParsingEditor.stylex";
 import { getSetupAfterLatestVersion } from "@peated/web/components/admin/scraperParsingStatus";
 import ScraperPublicationSettings from "@peated/web/components/admin/scraperPublicationSettings";
 import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
 import ScraperScheduleSettings from "@peated/web/components/admin/scraperScheduleSettings.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { space } from "@peated/web/styles/tokens.stylex";
-import * as stylex from "@stylexjs/stylex";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
 
@@ -41,8 +41,9 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
   const source = sources[0];
 
   return (
-    <div {...stylex.props(styles.stack)}>
+    <AdminPage>
       <ScraperScheduleSettings key={site.runEvery ?? "manual"} site={site} />
+      <ScraperIconSettings site={site} />
       {site.reviewPublication ? (
         <ScraperPublicationSettings site={site} />
       ) : null}
@@ -60,16 +61,6 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
       ) : (
         <ScraperAdapterStatus />
       )}
-    </div>
+    </AdminPage>
   );
 }
-
-const styles = stylex.create({
-  stack: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x6,
-    paddingTop: space.x6,
-  },
-});

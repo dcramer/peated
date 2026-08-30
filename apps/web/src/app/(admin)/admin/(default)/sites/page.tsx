@@ -9,6 +9,7 @@ import {
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
+import { ExternalSiteIdentity } from "@peated/web/components/admin/externalSiteIcon.stylex";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperCatalogCoverage from "@peated/web/components/admin/scraperCatalogCoverage";
 import TimeSince from "@peated/web/components/timeSince";
@@ -62,7 +63,13 @@ export default function Page() {
               name: "name",
               sort: "name",
               sortDefaultOrder: "asc",
-              value: (site) => site.name,
+              value: (site) => (
+                <ExternalSiteIdentity
+                  imageUrl={site.imageUrl}
+                  name={site.name}
+                  size="sm"
+                />
+              ),
             },
             {
               name: "inventory",
