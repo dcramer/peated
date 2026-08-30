@@ -40,10 +40,12 @@ export type EntityFormInitialData = Partial<Entity> & {
 
 export default function EntityForm({
   initialData = {},
+  manageImages = false,
   onSubmit,
   title,
 }: {
   initialData?: EntityFormInitialData;
+  manageImages?: boolean;
   onSubmit: (
     data: EntityFormData,
     images: EntityImageDraft[],
@@ -252,13 +254,15 @@ export default function EntityForm({
             </Field>
           </FormSection>
 
-          <FormSection title="Images">
-            <EntityImageEditor
-              disabled={isSubmitting}
-              images={images}
-              onChange={setImages}
-            />
-          </FormSection>
+          {manageImages ? (
+            <FormSection title="Images">
+              <EntityImageEditor
+                disabled={isSubmitting}
+                images={images}
+                onChange={setImages}
+              />
+            </FormSection>
+          ) : null}
 
           <FormSection
             action={

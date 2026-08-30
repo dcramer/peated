@@ -1,14 +1,10 @@
 import {
   createEntityImage,
-  EntityImageForbiddenError,
   EntityImageNotFoundError,
   EntityImageTooLargeError,
 } from "@peated/server/lib/entityImages";
 import { procedure } from "@peated/server/orpc";
-import {
-  requireAuth,
-  requireTosAccepted,
-} from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityImageCaptionSchema,
   EntityImageSchema,
@@ -18,14 +14,13 @@ import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
 import { z } from "zod";
 
 export default procedure
-  .use(requireAuth)
-  .use(requireTosAccepted)
+  .use(requireMod)
   .route({
     method: "POST",
     path: "/entities/{entity}/images",
     summary: "Add entity image",
     description:
-      "Attach an image to an Entity. The first image becomes the primary image. Requires the Entity creator, a moderator, or an administrator.",
+      "Attach an image to an Entity. The first image becomes the primary image. Requires a moderator or administrator.",
     operationId: "createEntityImage",
   })
   .input(
@@ -52,9 +47,6 @@ export default procedure
     } catch (error) {
       if (error instanceof EntityImageNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
-      }
-      if (error instanceof EntityImageForbiddenError) {
-        throw errors.FORBIDDEN({ message: error.message, cause: error });
       }
       if (error instanceof EntityImageTooLargeError) {
         throw errors.PAYLOAD_TOO_LARGE({

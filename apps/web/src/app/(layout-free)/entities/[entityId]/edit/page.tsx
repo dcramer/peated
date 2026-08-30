@@ -57,6 +57,7 @@ function EntityEditForm({ entityId }: { entityId: string }) {
 
   return (
     <EntityForm
+      manageImages
       onSubmit={async (data, images) => {
         const updatedEntity = await entityUpdateMutation.mutateAsync({
           entity: entity.id,

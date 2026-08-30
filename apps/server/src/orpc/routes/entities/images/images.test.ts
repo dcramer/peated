@@ -20,9 +20,8 @@ describe("Entity images", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("requires ownership or moderator access", async ({
+  test("rejects the Entity creator without moderator access", async ({
     fixtures,
-    defaults,
   }) => {
     const owner = await fixtures.User();
     const ownerActor = await getUserActor(owner);
@@ -32,32 +31,13 @@ describe("Entity images", () => {
         {
           entity: entity.id,
           file: await fixtures.SampleSquareImage(),
-          idempotencyKey: "requires-ownership",
+          idempotencyKey: "creator-image",
         },
-        { context: { user: defaults.user } },
+        { context: { user: owner } },
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(
-      `[Error: You don't have permission to manage these images.]`,
-    );
-  });
-
-  test("lets the Entity creator add an image", async ({ fixtures }) => {
-    const owner = await fixtures.User();
-    const ownerActor = await getUserActor(owner);
-    const entity = await fixtures.Entity({ createdByActorId: ownerActor.id });
-
-    const image = await routerClient.entities.images.create(
-      {
-        entity: entity.id,
-        file: await fixtures.SampleSquareImage(),
-        idempotencyKey: "creator-image",
-      },
-      { context: { user: owner } },
-    );
-
-    expect(image).toMatchObject({ entityId: entity.id, isPrimary: true });
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("adds captioned images and keeps one primary image", async ({

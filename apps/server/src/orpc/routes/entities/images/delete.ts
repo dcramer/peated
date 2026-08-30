@@ -1,24 +1,19 @@
 import {
   deleteEntityImage,
-  EntityImageForbiddenError,
   EntityImageNotFoundError,
 } from "@peated/server/lib/entityImages";
 import { procedure } from "@peated/server/orpc";
-import {
-  requireAuth,
-  requireTosAccepted,
-} from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
 
 export default procedure
-  .use(requireAuth)
-  .use(requireTosAccepted)
+  .use(requireMod)
   .route({
     method: "DELETE",
     path: "/entities/{entity}/images/{image}",
     summary: "Delete entity image",
     description:
-      "Remove an image from an Entity. Another image becomes primary when needed. Requires the Entity creator, a moderator, or an administrator.",
+      "Remove an image from an Entity. Another image becomes primary when needed. Requires a moderator or administrator.",
     operationId: "deleteEntityImage",
   })
   .input(
@@ -39,9 +34,6 @@ export default procedure
     } catch (error) {
       if (error instanceof EntityImageNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
-      }
-      if (error instanceof EntityImageForbiddenError) {
-        throw errors.FORBIDDEN({ message: error.message, cause: error });
       }
       throw error;
     }

@@ -1,5 +1,6 @@
 /**
- * Owns Entity image files, permissions, and the one-primary-image rule.
+ * Owns Entity image files and the one-primary-image rule.
+ * API routes own moderator authorization.
  * Database rows are authoritative; file cleanup after deletion is best effort.
  */
 import { MAX_FILESIZE } from "@peated/server/constants";
@@ -26,13 +27,6 @@ export class EntityImageNotFoundError extends Error {
   constructor(readonly resource: "Entity" | "Image") {
     super(`${resource} not found.`);
     this.name = "EntityImageNotFoundError";
-  }
-}
-
-export class EntityImageForbiddenError extends Error {
-  constructor() {
-    super("You don't have permission to manage these images.");
-    this.name = "EntityImageForbiddenError";
   }
 }
 
@@ -69,14 +63,6 @@ export async function deleteOwnedEntityImage(imageUrl: string) {
   }
 }
 
-function canManageEntityImages(
-  user: User,
-  entityCreatorActorId: number,
-  actorId: number,
-) {
-  return user.admin || user.mod || entityCreatorActorId === actorId;
-}
-
 /** Adds one image and makes the first image primary. */
 export async function createEntityImage({
   entityId,
@@ -97,13 +83,10 @@ export async function createEntityImage({
 
   const entity = await db.query.entities.findFirst({
     where: eq(entities.id, entityId),
-    columns: { id: true, createdByActorId: true },
+    columns: { id: true },
   });
   if (!entity) throw new EntityImageNotFoundError("Entity");
   const actor = await getUserActorForDatabase(db, user);
-  if (!canManageEntityImages(user, entity.createdByActorId, actor.id)) {
-    throw new EntityImageForbiddenError();
-  }
 
   const existingImage = await db.query.entityImages.findFirst({
     where: and(
@@ -134,17 +117,11 @@ export async function createEntityImage({
         .select({
           id: entities.id,
           name: entities.name,
-          createdByActorId: entities.createdByActorId,
         })
         .from(entities)
         .where(eq(entities.id, entityId))
         .for("update");
       if (!lockedEntity) throw new EntityImageNotFoundError("Entity");
-      if (
-        !canManageEntityImages(user, lockedEntity.createdByActorId, actor.id)
-      ) {
-        throw new EntityImageForbiddenError();
-      }
 
       const [existingImage] = await tx
         .select()
@@ -233,7 +210,6 @@ export async function updateEntityImage({
       .select({
         id: entities.id,
         name: entities.name,
-        createdByActorId: entities.createdByActorId,
       })
       .from(entities)
       .where(eq(entities.id, entityId))
@@ -241,9 +217,6 @@ export async function updateEntityImage({
     if (!entity) throw new EntityImageNotFoundError("Entity");
 
     const actorId = (await getUserActorForDatabase(tx, user)).id;
-    if (!canManageEntityImages(user, entity.createdByActorId, actorId)) {
-      throw new EntityImageForbiddenError();
-    }
 
     const [image] = await tx
       .select()
@@ -316,7 +289,6 @@ export async function deleteEntityImage({
       .select({
         id: entities.id,
         name: entities.name,
-        createdByActorId: entities.createdByActorId,
       })
       .from(entities)
       .where(eq(entities.id, entityId))
@@ -324,9 +296,6 @@ export async function deleteEntityImage({
     if (!entity) throw new EntityImageNotFoundError("Entity");
 
     const actorId = (await getUserActorForDatabase(tx, user)).id;
-    if (!canManageEntityImages(user, entity.createdByActorId, actorId)) {
-      throw new EntityImageForbiddenError();
-    }
 
     const [image] = await tx
       .select()

@@ -1,13 +1,9 @@
 import {
-  EntityImageForbiddenError,
   EntityImageNotFoundError,
   updateEntityImage,
 } from "@peated/server/lib/entityImages";
 import { procedure } from "@peated/server/orpc";
-import {
-  requireAuth,
-  requireTosAccepted,
-} from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityImageCaptionSchema,
   EntityImageSchema,
@@ -17,14 +13,13 @@ import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
 import { z } from "zod";
 
 export default procedure
-  .use(requireAuth)
-  .use(requireTosAccepted)
+  .use(requireMod)
   .route({
     method: "PATCH",
     path: "/entities/{entity}/images/{image}",
     summary: "Update entity image",
     description:
-      "Update an image caption or make the image primary. Requires the Entity creator, a moderator, or an administrator.",
+      "Update an image caption or make the image primary. Requires a moderator or administrator.",
     operationId: "updateEntityImage",
   })
   .input(
@@ -49,9 +44,6 @@ export default procedure
     } catch (error) {
       if (error instanceof EntityImageNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
-      }
-      if (error instanceof EntityImageForbiddenError) {
-        throw errors.FORBIDDEN({ message: error.message, cause: error });
       }
       throw error;
     }
