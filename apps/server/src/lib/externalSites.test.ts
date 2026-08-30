@@ -32,7 +32,7 @@ test("syncs code-owned external-site definitions", async () => {
   expect(totalWine).toMatchObject({
     id: existing?.id,
     name: EXTERNAL_SITE_DEFINITIONS.totalwine.name,
-    runEvery: EXTERNAL_SITE_DEFINITIONS.totalwine.runEvery,
+    runEvery: 60,
     nextRunAt,
   });
 

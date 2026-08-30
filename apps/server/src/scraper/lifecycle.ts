@@ -80,6 +80,8 @@ async function insertRun(
     });
     return configured.run;
   }
+  // TODO(scraper-source-migration): Prefer an active database-managed revision
+  // before this registry fallback when existing-site shadow setup is added.
   requireEnabledScraperTargets(registry, source);
   let cursor = null;
   if (source.resumeFromLastRun) {

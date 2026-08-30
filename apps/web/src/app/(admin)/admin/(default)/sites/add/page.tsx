@@ -48,7 +48,7 @@ export default function Page() {
           .map((value) => value.trim())
           .filter(Boolean),
       });
-      router.push(`/admin/sites/${source.site.type}/parsing`);
+      router.push(`/admin/sites/${source.site.type}`);
     } catch (err) {
       setError(getFormErrorMessage(err));
     }

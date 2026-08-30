@@ -29,13 +29,13 @@ function TargetStatus({
 
 const robotsLabels = {
   unknown: "Not checked",
-  missing: "No published rules",
+  missing: "No rules found",
   rules: "Rules checked",
   not_applicable: "No check needed",
 } as const;
 
 export default function ScraperReadiness({ site }: { site: Site }) {
-  const { runtime, reviewPublication } = site;
+  const { runtime } = site;
   const synchronized =
     runtime.targets.length === runtime.targetKeys.length &&
     runtime.targetKeys.every((key) =>
@@ -52,7 +52,7 @@ export default function ScraperReadiness({ site }: { site: Site }) {
   return (
     <AdminSection
       title="Connection"
-      description="Request limits and access checks for this site."
+      description="Sites this scraper contacts and how often it can request pages."
       action={status}
     >
       {runtime.targets.map((target) => (
@@ -70,13 +70,13 @@ export default function ScraperReadiness({ site }: { site: Site }) {
           }
         >
           <DefinitionList>
-            <DefinitionList.Term>Rate</DefinitionList.Term>
+            <DefinitionList.Term>Requests</DefinitionList.Term>
             <DefinitionList.Details>
-              {formatDuration(target.minimumSpacingMs)} spacing ·{" "}
-              {target.requestsPerWindow.toLocaleString("en-US")} requests /{" "}
+              Wait {formatDuration(target.minimumSpacingMs)} between requests ·{" "}
+              {target.requestsPerWindow.toLocaleString("en-US")} requests per{" "}
               {formatDuration(target.windowMs)}
             </DefinitionList.Details>
-            <DefinitionList.Term>Origins</DefinitionList.Term>
+            <DefinitionList.Term>Sites</DefinitionList.Term>
             <DefinitionList.Details>
               {target.origins.map((origin, index) => (
                 <span key={origin.origin}>
@@ -94,16 +94,6 @@ export default function ScraperReadiness({ site }: { site: Site }) {
           </DefinitionList>
         </AdminDetails>
       ))}
-      {reviewPublication ? (
-        <AdminDetails summary="Review publishing">
-          <DefinitionList>
-            <DefinitionList.Term>Status</DefinitionList.Term>
-            <DefinitionList.Details>
-              {reviewPublication.approved ? "Publishing" : "Not published"}
-            </DefinitionList.Details>
-          </DefinitionList>
-        </AdminDetails>
-      ) : null}
     </AdminSection>
   );
 }

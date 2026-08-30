@@ -14,11 +14,8 @@ import {
   AdminStatGrid,
 } from "@peated/web/components/admin/adminContent.stylex";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
-import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
 import { getScraperRunAvailability } from "@peated/web/components/admin/scraperRunAvailability";
 import { PageTabs } from "@peated/web/components/designSystem/components";
-import TimeSince from "@peated/web/components/timeSince";
-import { formatDuration } from "@peated/web/lib/format";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,
@@ -116,34 +113,15 @@ export default function Layout({
           label="Prices"
           value={`${site.priceListings.matched.toLocaleString("en-US")} / ${site.priceListings.total.toLocaleString("en-US")}`}
         />
-        <AdminStat
-          label="Schedule"
-          value={
-            site.runEvery ? formatDuration(site.runEvery * 60 * 1000) : "Manual"
-          }
-        />
-        <AdminStat
-          label="Next run"
-          value={
-            site.nextRunAt ? (
-              <TimeSince date={site.nextRunAt} />
-            ) : site.runEvery !== null ? (
-              "Due now"
-            ) : (
-              "Not scheduled"
-            )
-          }
-        />
       </AdminStatGrid>
-      <ScraperReadiness site={site} />
       <PageTabs
         ariaLabel="Scraper"
         currentHref={pathname}
         items={[
-          { href: root, label: "Prices" },
-          { href: `${root}/external-reviews`, label: "External reviews" },
+          { href: root, label: "Setup" },
           { href: `${root}/runs`, label: "Runs" },
-          { href: `${root}/parsing`, label: "Setup" },
+          { href: `${root}/prices`, label: "Prices" },
+          { href: `${root}/external-reviews`, label: "External reviews" },
         ]}
       />
       {children}

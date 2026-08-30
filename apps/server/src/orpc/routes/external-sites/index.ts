@@ -5,6 +5,7 @@ import { healthDetails, healthList } from "./health";
 import list from "./list";
 import reviewPublication from "./review-publication";
 import runs from "./runs";
+import schedule from "./schedule";
 import scrapeSources from "./scrape-sources";
 import triggerJob from "./trigger-job";
 
@@ -13,6 +14,7 @@ export default base.tag("sites").router({
   healthList,
   healthDetails,
   runs,
+  schedule,
   details,
   triggerJob,
   config,

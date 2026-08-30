@@ -1,46 +1,75 @@
 "use client";
+
+import { ExternalSiteKeySchema } from "@peated/server/schemas";
+import ScraperAdapterStatus from "@peated/web/components/admin/scraperAdapterStatus";
+import { ScraperParsingEditor } from "@peated/web/components/admin/scraperParsingEditor.stylex";
+import { getSetupAfterLatestVersion } from "@peated/web/components/admin/scraperParsingStatus";
+import ScraperPublicationSettings from "@peated/web/components/admin/scraperPublicationSettings";
+import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
+import ScraperScheduleSettings from "@peated/web/components/admin/scraperScheduleSettings.stylex";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { space } from "@peated/web/styles/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
 
-import { type ExternalSiteKey } from "@peated/server/types";
-import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
-import StorePriceTable from "@peated/web/components/admin/storePriceTable";
-import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { useORPC } from "@peated/web/lib/orpc/context";
-import { useSuspenseQuery } from "@tanstack/react-query";
-
-export default function Page(props: {
-  params: Promise<{ siteId: ExternalSiteKey }>;
-}) {
-  const params = use(props.params);
-
-  const { siteId } = params;
-
-  const queryParams = useApiQueryParams({
-    numericFields: ["cursor", "limit"],
-    overrides: {
-      site: siteId,
+export default function Page(props: { params: Promise<{ siteId: string }> }) {
+  const { siteId } = use(props.params);
+  const siteKey = ExternalSiteKeySchema.parse(siteId);
+  const orpc = useORPC();
+  const queryClient = useQueryClient();
+  const { data: site } = useSuspenseQuery(
+    orpc.externalSites.healthDetails.queryOptions({ input: { site: siteKey } }),
+  );
+  const sourceQuery = orpc.externalSites.scrapeSources.list.queryOptions({
+    input: { site: siteKey },
+  });
+  const { data: sources } = useSuspenseQuery({
+    ...sourceQuery,
+    refetchInterval: ({ state }) => {
+      const current = state.data?.[0];
+      if (!current) return false;
+      const setup = getSetupAfterLatestVersion(current);
+      if (!current.revisions.length) {
+        return setup?.status === "failed" ? false : 2_000;
+      }
+      return setup?.status === "queued" || setup?.status === "running"
+        ? 2_000
+        : false;
     },
   });
-
-  const orpc = useORPC();
-  const { data: priceList } = useSuspenseQuery(
-    orpc.prices.list.queryOptions({
-      input: {
-        ...queryParams,
-        site: siteId,
-      },
-    }),
-  );
+  const source = sources[0];
 
   return (
-    <div>
-      {priceList.results.length > 0 ? (
-        <StorePriceTable priceList={priceList.results} rel={priceList.rel} />
+    <div {...stylex.props(styles.stack)}>
+      <ScraperScheduleSettings key={site.runEvery ?? "manual"} site={site} />
+      {site.reviewPublication ? (
+        <ScraperPublicationSettings site={site} />
+      ) : null}
+      <ScraperReadiness site={site} />
+      {source ? (
+        <ScraperParsingEditor
+          key={source.revisions[0]?.id ?? "setup"}
+          source={source}
+          refresh={async () => {
+            await queryClient.invalidateQueries({
+              queryKey: sourceQuery.queryKey,
+            });
+          }}
+        />
       ) : (
-        <EmptyActivity>
-          Looks like there's nothing in the database yet. Weird.
-        </EmptyActivity>
+        <ScraperAdapterStatus />
       )}
     </div>
   );
 }
+
+const styles = stylex.create({
+  stack: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x6,
+    paddingTop: space.x6,
+  },
+});
