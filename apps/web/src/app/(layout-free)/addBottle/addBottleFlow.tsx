@@ -22,14 +22,14 @@ import {
   SelectedBottleSummary,
   type CollectionBottleStatusValue,
 } from "@peated/web/components/designSystem/components";
-import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
-import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
-import { Search as BottleSearch } from "@peated/web/components/designSystem/product/search.stylex";
+import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
+import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
 import TastingForm, {
   type TastingCreateFormSubmitData,
 } from "@peated/web/components/tastingForm";
+import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import {

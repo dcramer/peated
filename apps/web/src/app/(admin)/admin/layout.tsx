@@ -1,4 +1,4 @@
-import { ForbiddenPage } from "@peated/web/components/designSystem/product/errorPages.stylex";
+import { ForbiddenPage } from "@peated/web/components/errors/errorPages.stylex";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";
 import { type Metadata } from "next";

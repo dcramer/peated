@@ -1,4 +1,4 @@
-import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
+import { AuthenticationPage } from "@peated/web/components/auth/authenticationPage.stylex";
 import PasswordResetChangeForm from "@peated/web/components/passwordResetChangeForm";
 import PasswordResetForm from "@peated/web/components/passwordResetForm";
 import { type Metadata } from "next";

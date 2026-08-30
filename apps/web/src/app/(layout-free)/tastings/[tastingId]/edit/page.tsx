@@ -2,7 +2,7 @@
 import { use } from "react";
 
 import type { Tasting } from "@peated/server/types";
-import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
+import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import TastingForm, {
   type TastingEditFormSubmitData,
 } from "@peated/web/components/tastingForm";

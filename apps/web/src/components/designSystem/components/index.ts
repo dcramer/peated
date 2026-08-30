@@ -12,7 +12,7 @@ export type {
 } from "./applicationHeader.stylex";
 export { Avatar } from "./avatar.stylex";
 export type { AvatarProps, AvatarSize } from "./avatar.stylex";
-export { BadgeImage, PlaceholderBadgeImage } from "./badgeImage.stylex";
+export { BadgeImage } from "./badgeImage.stylex";
 export type { BadgeImageProps } from "./badgeImage.stylex";
 export { BottleComparisonTable } from "./bottleComparisonTable.stylex";
 export type {
@@ -44,11 +44,7 @@ export { Checkbox } from "./checkbox.stylex";
 export type { CheckboxProps } from "./checkbox.stylex";
 export { Chip, CountChip } from "./chip.stylex";
 export type { ChipProps, ChipVariant } from "./chip.stylex";
-export {
-  CollectionBottleStatusChips,
-  CollectionBottleStatusLabel,
-  getCollectionBottleStatusLabel,
-} from "./collectionBottleStatus.stylex";
+export { CollectionBottleStatusChips } from "./collectionBottleStatus.stylex";
 export type {
   CollectionBottleStatus,
   CollectionBottleStatusValue,
@@ -135,12 +131,6 @@ export type {
   FormSectionProps,
   FormStepsProps,
 } from "./formLayout.stylex";
-export { HistoryTimeline } from "./historyTimeline.stylex";
-export type {
-  HistoryEvent,
-  HistoryState,
-  HistoryTimelineProps,
-} from "./historyTimeline.stylex";
 export { ItemList, ItemRow } from "./itemList.stylex";
 export type {
   ItemListProps,
@@ -169,16 +159,13 @@ export type {
   MemberPickerOption,
   MemberPickerProps,
 } from "./memberPicker.stylex";
-export { NotePicker, NotePickerField } from "./notePicker.stylex";
+export { NotePickerField } from "./notePicker.stylex";
 export type {
   NotePickerFieldProps,
   NotePickerOption,
-  NotePickerProps,
 } from "./notePicker.stylex";
 export { PageTabs } from "./pageTabs.stylex";
 export type { PageTabItem, PageTabsProps } from "./pageTabs.stylex";
-export { Passport } from "./passport.stylex";
-export type { PassportProps, PassportStamp } from "./passport.stylex";
 export { RowMenu } from "./rowMenu.stylex";
 export type { RowMenuGroup, RowMenuItem, RowMenuProps } from "./rowMenu.stylex";
 export { ScopedSearch } from "./scopedSearch.stylex";

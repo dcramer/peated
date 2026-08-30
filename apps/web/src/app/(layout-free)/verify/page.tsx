@@ -1,11 +1,11 @@
 "use client";
 
+import { AuthenticationPage } from "@peated/web/components/auth/authenticationPage.stylex";
 import { ButtonLink } from "@peated/web/components/designSystem/components";
 import {
   AuthenticationNotice,
   AuthenticationPanel,
 } from "@peated/web/components/designSystem/patterns/authentication.stylex";
-import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { updateSession } from "@peated/web/lib/auth.actions";
 import { logError } from "@peated/web/lib/log";

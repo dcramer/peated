@@ -15,7 +15,7 @@ import {
   TextInput,
   type EntityPickerOption,
 } from "@peated/web/components/designSystem/components";
-import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";

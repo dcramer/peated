@@ -13,7 +13,7 @@ import {
   TextInput,
   type SearchPickerOption,
 } from "@peated/web/components/designSystem/components";
-import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import {
   flightMembershipChanged,

@@ -22,7 +22,7 @@ import {
   type MemberPickerOption,
   type NotePickerOption,
 } from "@peated/web/components/designSystem/components";
-import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";

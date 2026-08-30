@@ -1,4 +1,4 @@
-import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
+import { AuthenticationPage } from "@peated/web/components/auth/authenticationPage.stylex";
 import LoginForm from "@peated/web/components/loginForm";
 import { getSafeRedirect } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";

@@ -1,6 +1,6 @@
 "use client";
 
-import { ErrorDocument } from "../components/designSystem/product/errorPages.stylex";
+import { ErrorDocument } from "@peated/web/components/errors/errorPages.stylex";
 import RouteErrorPage from "../components/routeErrorPage";
 import "../styles/error-document.css";
 

@@ -1,7 +1,7 @@
 import {
   AdminWorkspace,
   type AdminNavigationGroup,
-} from "@peated/web/components/designSystem/product/adminWorkspace.stylex";
+} from "@peated/web/components/admin/adminWorkspace.stylex";
 import React from "react";
 
 const navigationGroups = [

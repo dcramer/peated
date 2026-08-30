@@ -2,7 +2,6 @@
 
 import * as stylex from "@stylexjs/stylex";
 
-import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -11,11 +10,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 
-export const COLLECTION_BOTTLE_STATUS_VALUES = [
-  "sealed",
-  "open",
-  "empty",
-] as const;
+const COLLECTION_BOTTLE_STATUS_VALUES = ["sealed", "open", "empty"] as const;
 
 export type CollectionBottleStatus =
   (typeof COLLECTION_BOTTLE_STATUS_VALUES)[number];
@@ -27,26 +22,6 @@ const statusLabels = {
   open: "Open",
   empty: "Empty",
 } satisfies Record<CollectionBottleStatus, string>;
-
-export function getCollectionBottleStatusLabel(
-  status: CollectionBottleStatusValue | undefined,
-) {
-  return status ? statusLabels[status] : "Not set";
-}
-
-export function CollectionBottleStatusLabel({
-  status,
-}: {
-  status?: CollectionBottleStatusValue;
-}) {
-  if (!status) return null;
-
-  return (
-    <span {...stylex.props(foundationStyles.body, styles.label)}>
-      {statusLabels[status]}
-    </span>
-  );
-}
 
 export function CollectionBottleStatusChips({
   disabled = false,
@@ -94,11 +69,6 @@ const styles = stylex.create({
     justifyContent: "flex-start",
     gap: space.x1,
     flexWrap: "wrap",
-  },
-  label: {
-    display: "inline-flex",
-    alignItems: "center",
-    color: colors.inkMuted,
   },
   chip: {
     boxSizing: "border-box",

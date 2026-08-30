@@ -1,5 +1,5 @@
+import { AuthenticationPage } from "@peated/web/components/auth/authenticationPage.stylex";
 import { AuthenticationPanel } from "@peated/web/components/designSystem/patterns/authentication.stylex";
-import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import { getSafeRedirect } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";
 import type { Metadata } from "next";
