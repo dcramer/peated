@@ -219,6 +219,41 @@ export const mockEntities: Entity[] = [
     totalTastings: 640,
     totalBottles: 68,
   },
+  {
+    ...mockEntity,
+    id: 9214,
+    peatedId: "E9214",
+    name: "Caol Ila",
+    shortName: null,
+    ownerId: 9210,
+    owner: { id: 9210, peatedId: "E9210", name: "Diageo" },
+    description:
+      "An Islay distillery known for a lighter, maritime style of peated single malt.",
+    yearEstablished: 1846,
+    website: "https://www.malts.com/en-row/distilleries/caol-ila",
+    address: "Caol Ila Distillery, Port Askaig, Isle of Islay, PA46 7RL, UK",
+    location: [-6.109, 55.8543],
+    totalTastings: 720,
+    totalBottles: 604,
+  },
+  {
+    ...mockEntity,
+    id: 9215,
+    peatedId: "E9215",
+    name: "Talisker",
+    shortName: null,
+    ownerId: 9210,
+    owner: { id: 9210, peatedId: "E9210", name: "Diageo" },
+    description:
+      "An island distillery known for peppery, maritime single malt.",
+    yearEstablished: 1830,
+    website: "https://www.malts.com/en-row/distilleries/talisker",
+    region: null,
+    address: "Talisker Distillery, Carbost, Isle of Skye, IV47 8SR, UK",
+    location: [-6.3552, 57.3026],
+    totalTastings: 860,
+    totalBottles: 188,
+  },
 ];
 
 export const mockMacallanEntity = mockEntities[1]!;
@@ -228,3 +263,6 @@ export const mockYamazakiEntity = mockEntities[4]!;
 export const mockMidletonEntity = mockEntities[5]!;
 export const mockRedbreastEntity = mockEntities[6]!;
 export const mockLaphroaigEntity = mockEntities[10]!;
+export const mockDiageoEntity = mockEntities[9]!;
+export const mockCaolIlaEntity = mockEntities[13]!;
+export const mockTaliskerEntity = mockEntities[14]!;

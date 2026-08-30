@@ -10,6 +10,7 @@ import {
   mockBottlePrices,
   mockBottles,
   mockBottleTags,
+  mockCaolIlaEntity,
   mockChanges,
   mockCollectionBottles,
   mockCommentsByTasting,
@@ -25,11 +26,13 @@ import {
   mockFriendDetails,
   mockFriends,
   mockFriendships,
+  mockLaphroaigEntity,
   mockNotifications,
   mockPublicUserDetails,
   mockRegion,
   mockRegions,
   mockStats,
+  mockTaliskerEntity,
   mockTasting,
   mockUser,
   mockUserDetails,
@@ -88,6 +91,21 @@ describe("mock oRPC router", () => {
     const entities = await anonymousClient.entities.list({ limit: 100 });
     expect(entities.results).toHaveLength(mockEntities.length);
     expect(entities.results.every((entity) => entity.kind)).toBe(true);
+    const diageoEntities = await anonymousClient.entities.list({
+      owner: 9210,
+      sort: "-bottles",
+    });
+    expect(diageoEntities.results).toEqual([
+      mockCaolIlaEntity,
+      mockTaliskerEntity,
+    ]);
+    const laphroaigReleases = await anonymousClient.bottles.list({
+      entity: mockLaphroaigEntity.id,
+      sort: "-release",
+    });
+    expect(
+      laphroaigReleases.results.map((bottle) => bottle.releaseYear),
+    ).toEqual([2023, 2022]);
     await expect(
       authenticatedClient.entities.create({
         name: "New Bottler",
