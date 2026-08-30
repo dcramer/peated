@@ -3,7 +3,7 @@ import { mockBottle, mockBottles } from "./bottles";
 import { mockEntity } from "./entities";
 
 type Bottle = MockOutputs["bottles"]["list"]["results"][number];
-type Entity = MockOutputs["entities"]["details"];
+type Entity = MockOutputs["entities"]["list"]["results"][number];
 
 export const mockEntityCatalog = {
   totalBottles: mockEntity.totalBottles,

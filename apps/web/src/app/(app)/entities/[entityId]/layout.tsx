@@ -1,6 +1,6 @@
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { summarize } from "@peated/web/lib/markdown";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import type { ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
@@ -27,8 +27,9 @@ export default async function EntityLayout(props: {
   params: Promise<{ entityId: string }>;
 }) {
   const { entityId } = await props.params;
-  const { client } = await getAnonymousServerClient();
-  const entity = await getEntityPage(Number(entityId));
+  const canonicalEntity = await getEntityPage(Number(entityId));
+  const { client } = await getServerClient();
+  const entity = await client.entities.details({ entity: canonicalEntity.id });
 
   const owner = entity.ownerId
     ? await resolveOrNotFound(

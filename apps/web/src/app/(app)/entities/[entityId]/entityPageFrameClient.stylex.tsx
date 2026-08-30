@@ -1,11 +1,12 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import {
+  Button,
   ButtonLink,
   PageTabs,
   RowMenu,
@@ -27,6 +28,73 @@ import {
   getEntityTabs,
   type Entity,
 } from "./entityPageData";
+
+function DistilleryFollowAction({ entity }: { entity: Entity }) {
+  const { user } = useAuth();
+  const orpc = useORPC();
+  const queryClient = useQueryClient();
+  const { flash } = useFlashMessages();
+  const [followingOverride, setFollowingOverride] = useState<boolean | null>(
+    null,
+  );
+  const followMutation = useMutation(orpc.entities.follow.mutationOptions());
+  const unfollowMutation = useMutation(
+    orpc.entities.unfollow.mutationOptions(),
+  );
+
+  if (!user) {
+    return (
+      <ButtonLink
+        aria-label={`Follow ${entity.name}`}
+        href={`/login?redirectTo=${encodeURIComponent(`/distillers/${entity.id}`)}`}
+        size="lg"
+        variant="tonal"
+      >
+        Follow
+      </ButtonLink>
+    );
+  }
+
+  const isFollowing = followingOverride ?? entity.isFollowing;
+  const pending = followMutation.isPending || unfollowMutation.isPending;
+
+  return (
+    <Button
+      aria-label={
+        isFollowing ? `Unfollow ${entity.name}` : `Follow ${entity.name}`
+      }
+      aria-pressed={isFollowing}
+      loading={pending}
+      loadingLabel={isFollowing ? "Unfollowing…" : "Following…"}
+      onClick={async () => {
+        try {
+          if (isFollowing) {
+            await unfollowMutation.mutateAsync({ entity: entity.id });
+          } else {
+            await followMutation.mutateAsync({ entity: entity.id });
+          }
+          setFollowingOverride(!isFollowing);
+          await queryClient.invalidateQueries({
+            queryKey: orpc.entities.details.key({
+              input: { entity: entity.id },
+            }),
+          });
+        } catch (error) {
+          flash(
+            error instanceof Error
+              ? error.message
+              : "We couldn't update the distilleries you follow. Try again.",
+            "error",
+          );
+        }
+      }}
+      size="lg"
+      variant="tonal"
+    >
+      {isFollowing ? "Unfollow" : "Follow"}
+    </Button>
+  );
+}
 
 function EntityActions({ entity }: { entity: Entity }) {
   const { user } = useAuth();
@@ -136,12 +204,19 @@ export function EntityPageFrameClient({
     <div {...stylex.props(styles.page)}>
       <EntityPageHeader
         actions={
-          createBottleHref ? (
-            <ButtonLink href={createBottleHref} size="lg" variant="accent">
-              {presentation.bottleSectionLabel === "Bottlings"
-                ? "Record a bottling"
-                : "Record a bottle"}
-            </ButtonLink>
+          createBottleHref || entity.kind === "distillery" ? (
+            <>
+              {createBottleHref ? (
+                <ButtonLink href={createBottleHref} size="lg" variant="accent">
+                  {presentation.bottleSectionLabel === "Bottlings"
+                    ? "Record a bottling"
+                    : "Record a bottle"}
+                </ButtonLink>
+              ) : null}
+              {entity.kind === "distillery" ? (
+                <DistilleryFollowAction key={entity.id} entity={entity} />
+              ) : null}
+            </>
           ) : undefined
         }
         description={

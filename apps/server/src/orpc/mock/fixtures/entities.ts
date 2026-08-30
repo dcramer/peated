@@ -22,6 +22,7 @@ export const mockEntity = {
   location: [-6.126, 55.635],
   totalTastings: 1200,
   totalBottles: 84,
+  isFollowing: false,
   createdAt: timestamp,
   updatedAt: timestamp,
 } satisfies Entity;
