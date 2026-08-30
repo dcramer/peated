@@ -1,10 +1,14 @@
 import { db } from "@peated/server/db";
-import { entities, entityTombstones } from "@peated/server/db/schema";
+import {
+  entities,
+  entityFollows,
+  entityTombstones,
+} from "@peated/server/db/schema";
 import { implement } from "@peated/server/orpc";
 import entityDetailsContract from "@peated/server/orpc/contracts/entities/details";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 
 export default implement(entityDetailsContract).handler(async function ({
   input,
@@ -33,5 +37,23 @@ export default implement(entityDetailsContract).handler(async function ({
     }
   }
 
-  return await serialize(EntitySerializer, entity, context.user);
+  let isFollowing = false;
+  if (context.user) {
+    const [follow] = await db
+      .select({ entityId: entityFollows.entityId })
+      .from(entityFollows)
+      .where(
+        and(
+          eq(entityFollows.userId, context.user.id),
+          eq(entityFollows.entityId, entity.id),
+        ),
+      )
+      .limit(1);
+    isFollowing = Boolean(follow);
+  }
+
+  return {
+    ...(await serialize(EntitySerializer, entity, context.user)),
+    isFollowing,
+  };
 });

@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { entityTombstones } from "@peated/server/db/schema";
+import { entityFollows, entityTombstones } from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -38,6 +38,28 @@ describe("GET /entities/:entity", () => {
       peatedId: formatPeatedId("entity", owner.id),
       name: owner.name,
     });
+  });
+
+  test("returns whether the current user follows the entity", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await db.insert(entityFollows).values({
+      entityId: entity.id,
+      userId: defaults.user.id,
+    });
+
+    const anonymousData = await routerClient.entities.details({
+      entity: entity.id,
+    });
+    const userData = await routerClient.entities.details(
+      { entity: entity.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(anonymousData.isFollowing).toBe(false);
+    expect(userData.isFollowing).toBe(true);
   });
 
   test("errors on invalid entity", async () => {

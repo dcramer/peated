@@ -288,7 +288,7 @@ const styles = stylex.create({
     display: "flex",
     flexShrink: 0,
     alignItems: "center",
-    gap: space.x2,
+    gap: { default: space.x2, [MOBILE]: space.x1 },
     flexWrap: "wrap",
   },
   tabbedPage: {

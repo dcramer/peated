@@ -84,7 +84,7 @@ describe("mock oRPC router", () => {
   it("returns data used by the main pages", async () => {
     await expect(
       anonymousClient.entities.details({ entity: mockEntity.id }),
-    ).resolves.toEqual(mockEntity);
+    ).resolves.toEqual({ ...mockEntity, isFollowing: false });
     const entities = await anonymousClient.entities.list({ limit: 100 });
     expect(entities.results).toHaveLength(mockEntities.length);
     expect(entities.results.every((entity) => entity.kind)).toBe(true);
@@ -195,7 +195,7 @@ describe("mock oRPC router", () => {
     ).resolves.toEqual(kentucky);
     await expect(
       anonymousClient.entities.details({ entity: yamazaki.brand.id }),
-    ).resolves.toEqual(yamazaki.brand);
+    ).resolves.toEqual({ ...yamazaki.brand, isFollowing: false });
     await expect(
       anonymousClient.bottles.details({ bottle: yamazaki.id }),
     ).resolves.toMatchObject({ id: yamazaki.id, fullName: yamazaki.fullName });

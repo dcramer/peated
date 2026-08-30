@@ -2,7 +2,7 @@ import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
 import { mockCountries, mockCountry, mockRegion, mockRegions } from "./places";
 
-type Entity = MockOutputs["entities"]["details"];
+type Entity = MockOutputs["entities"]["list"]["results"][number];
 
 // Producers and bottles
 export const mockEntity = {

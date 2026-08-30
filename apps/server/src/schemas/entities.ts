@@ -112,6 +112,13 @@ export const EntitySchema = z.object({
     .describe("Timestamp when the entity was last updated"),
 });
 
+export const EntityDetailsSchema = EntitySchema.extend({
+  isFollowing: z
+    .boolean()
+    .readonly()
+    .describe("Whether the current user follows this entity"),
+});
+
 export const EntityInputFields = {
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
