@@ -27,6 +27,8 @@ const SCORE = /^Score\s*:?\s*(?<value>\d{1,3}(?:[.,]\d+)?)\s*\/\s*100\s*$/iu;
 export const WhiskySagaCursorSchema = currentReviewCursorSchema(
   MAX_CURRENT_ARTICLES,
 ).extend({
+  // Old saved progress skipped some dates. Start from the oldest list once.
+  checksReviewDates: z.boolean().default(false),
   nextHistoryUrl: z.url().nullable().default(null),
   processedHistoryArticleUrls: z
     .array(z.url())
@@ -176,8 +178,9 @@ export const whiskySagaAdapter: ScraperAdapter<
   WhiskySagaCursor,
   WhiskySagaObservation
 > = async ({ cursor, session }) => {
+  const savedProgress = cursor?.checksReviewDates ? cursor : null;
   let nextCursor = WhiskySagaCursorSchema.parse(
-    cursor ?? { processedArticleUrls: [] },
+    savedProgress ?? { checksReviewDates: true, processedArticleUrls: [] },
   );
   const indexResponse = await session.request({
     target: TARGET,

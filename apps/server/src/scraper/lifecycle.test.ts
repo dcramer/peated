@@ -129,6 +129,7 @@ test("opted-in source resumes the last successful run cursor", async ({
 
   expect(run.cursor).toEqual({
     ...successfulCursor,
+    checksReviewDates: false,
     currentArticleUrls: [],
     historyComplete: false,
   });

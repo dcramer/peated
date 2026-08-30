@@ -22,8 +22,12 @@ const OLDER_ARCHIVE_URL =
   "https://www.whiskyfun.com/archivedecember24-2-Lagavulin-Brora.html";
 const COMPLETED_HISTORY: Pick<
   WhiskyfunCursor,
-  "nextArchiveUrl" | "processedArchiveArticleUrls" | "historyComplete"
+  | "checksReviewDates"
+  | "nextArchiveUrl"
+  | "processedArchiveArticleUrls"
+  | "historyComplete"
 > = {
+  checksReviewDates: true,
   nextArchiveUrl: null,
   processedArchiveArticleUrls: [],
   historyComplete: true,
@@ -171,6 +175,7 @@ test("accepts a current-only cursor and adds history defaults", () => {
   expect(
     WhiskyfunCursorSchema.parse({ processedArticleUrls: [FIRST_URL] }),
   ).toEqual({
+    checksReviewDates: false,
     processedArticleUrls: [FIRST_URL],
     nextArchiveUrl: null,
     processedArchiveArticleUrls: [],
@@ -330,7 +335,7 @@ test("drops completed URLs that leave the current feed window", async () => {
   expect(new Set(completedUrls)).toEqual(new Set(currentUrls));
 });
 
-test("checks current externalReviews, imports one archive page, and advances", async () => {
+test("starts old saved progress again and checks one older page", async () => {
   const emit = vi.fn();
   const checkpoint = vi.fn();
   const request = vi.fn(async ({ url }: { url: URL }) => ({
@@ -351,7 +356,15 @@ test("checks current externalReviews, imports one archive page, and advances", a
     remainingRequests: () => 30,
   };
 
-  await whiskyfunAdapter({ cursor: null, session });
+  await whiskyfunAdapter({
+    cursor: WhiskyfunCursorSchema.parse({
+      processedArticleUrls: [],
+      nextArchiveUrl: null,
+      processedArchiveArticleUrls: [],
+      historyComplete: true,
+    }),
+    session,
+  });
 
   expect(request.mock.calls.map(([input]) => input.url.href)).toEqual([
     "https://www.whiskyfun.com/whatsnew.xml",
@@ -366,6 +379,7 @@ test("checks current externalReviews, imports one archive page, and advances", a
     }),
   );
   expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
+    checksReviewDates: true,
     processedArticleUrls: [],
     nextArchiveUrl: OLDER_ARCHIVE_URL,
     processedArchiveArticleUrls: [],
@@ -395,6 +409,7 @@ test("resumes within an archive page and records the archive end", async () => {
 
   await whiskyfunAdapter({
     cursor: {
+      checksReviewDates: true,
       processedArticleUrls: [],
       nextArchiveUrl: ARCHIVE_URL,
       processedArchiveArticleUrls: [completedUrl],
@@ -406,6 +421,7 @@ test("resumes within an archive page and records the archive end", async () => {
   expect(request).toHaveBeenCalledTimes(2);
   expect(emit).not.toHaveBeenCalled();
   expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
+    checksReviewDates: true,
     processedArticleUrls: [],
     nextArchiveUrl: null,
     processedArchiveArticleUrls: [],

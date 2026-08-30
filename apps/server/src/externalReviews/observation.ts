@@ -51,10 +51,12 @@ export type ExternalReviewArticleObservation = z.infer<
   typeof ExternalReviewArticleObservationSchema
 >;
 
-/** Shared adapter output. The sink passes this shape to article ingestion. */
+// A scraper must use the date shown by the publisher.
 export const ExternalReviewArticleIngestionSchema = z
   .object({
-    article: ExternalReviewArticleObservationSchema,
+    article: ExternalReviewArticleObservationSchema.safeExtend({
+      publishedAt: z.date(),
+    }),
   })
   .strict();
 

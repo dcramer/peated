@@ -438,6 +438,7 @@ export const scraperRegistry = createScraperRegistry({
       // Keep the slice budget above the target quota so one hourly deferral
       // consumes one execution attempt.
       requestLimit: 30,
+      resumeFromLastRun: true,
       cursorSchema: WhiskyAdvocateCursorSchema,
       observationSchema: WhiskyAdvocateObservationSchema,
       adapter: whiskyAdvocateAdapter,

@@ -22,6 +22,8 @@ const EXCLUDED_CATEGORIES = new Set([
 
 export const WhiskyNotesCursorSchema = z
   .object({
+    // Old saved progress skipped some dates. Start from page 1 once.
+    checksReviewDates: z.boolean().default(false),
     page: z.number().int().min(1),
     processedArticleUrls: z.array(z.url()).max(MAX_ARTICLES_PER_PAGE),
     currentArticleUrls: z.array(z.url()).max(MAX_ARTICLES_PER_PAGE).default([]),
@@ -126,8 +128,8 @@ export function parseWhiskyNotesArticle(
     .attr("datetime");
   const publishedAt = publishedValue ? parseDate(publishedValue) : null;
   if (!title) throw new Error("WhiskyNotes article title is missing.");
-  if (publishedValue && !publishedAt) {
-    throw new Error("WhiskyNotes article date is invalid.");
+  if (!publishedAt) {
+    throw new Error("WhiskyNotes article date is missing or invalid.");
   }
 
   const content = article.find(".entry-content").first().clone();
@@ -196,13 +198,15 @@ export const whiskyNotesAdapter: ScraperAdapter<
   WhiskyNotesCursor,
   WhiskyNotesObservation
 > = async ({ cursor, session }) => {
-  let page = cursor?.page ?? 1;
-  let processedArticleUrls = new Set(cursor?.processedArticleUrls ?? []);
-  let currentArticleUrls = new Set(cursor?.currentArticleUrls ?? []);
-  let historyComplete = cursor?.historyComplete ?? false;
+  const savedProgress = cursor?.checksReviewDates ? cursor : null;
+  let page = savedProgress?.page ?? 1;
+  let processedArticleUrls = new Set(savedProgress?.processedArticleUrls ?? []);
+  let currentArticleUrls = new Set(savedProgress?.currentArticleUrls ?? []);
+  let historyComplete = savedProgress?.historyComplete ?? false;
 
   const checkpoint = async () => {
     await session.checkpoint({
+      checksReviewDates: true,
       page,
       processedArticleUrls: [...processedArticleUrls],
       currentArticleUrls: [...currentArticleUrls],

@@ -53,3 +53,11 @@ test("rejects duplicate review source keys", () => {
     "External review source keys must be unique within an article.",
   );
 });
+
+test("requires scrapers to include the review date", () => {
+  expect(() =>
+    ExternalReviewArticleIngestionSchema.parse({
+      article: { ...observation(), publishedAt: null },
+    }),
+  ).toThrow();
+});

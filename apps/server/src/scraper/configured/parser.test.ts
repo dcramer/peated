@@ -101,7 +101,7 @@ describe("scrape source parser", () => {
   it("reads page fields for a single review", () => {
     const result = parseScrapeDetail(
       reviewConfig,
-      '<h1>Spring reviews</h1><h2>Example 12 Year</h2><article class="review"><span class="author">Ada</span><div class="body">Rich and balanced.</div></article>',
+      '<h1>Spring reviews</h1><time datetime="2026-04-02"></time><h2>Example 12 Year</h2><article class="review"><span class="author">Ada</span><div class="body">Rich and balanced.</div></article>',
       new URL("https://reviews.test/spring"),
     );
 
@@ -138,7 +138,7 @@ describe("scrape source parser", () => {
     );
     expect(result.kind).toBe("review");
     if (result.kind !== "review") throw new Error("Wrong kind");
-    expect(result.value?.article.externalReviews).toHaveLength(2);
+    expect(result.value).toBeNull();
     expect(result.issues).toEqual([
       { field: "detail.publishedAt", message: "Date is not valid." },
       {
@@ -158,6 +158,7 @@ describe("scrape source parser", () => {
     if (result.kind !== "review") throw new Error("Wrong kind");
     expect(result.value).toBeNull();
     expect(result.issues.map(({ field }) => field)).toEqual([
+      "detail.publishedAt",
       "detail.title",
       "detail.reviewItem",
     ]);

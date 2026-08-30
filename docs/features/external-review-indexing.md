@@ -59,7 +59,7 @@ extracts the publisher value and any fallback year.
 
 The adapter emits one strict article observation with:
 
-- canonical URL, title, optional issue, optional publication date, and content
+- review URL, title, optional issue, required publication date, and content
   hash;
 - one or more Bottle review observations;
 - a stable key, Bottle name, optional reviewer, optional native score, and
@@ -151,15 +151,18 @@ at most four historical archive pages. Each page supplies at most 20 article
 links. A new run continues from the last successful run cursor. When the
 archive ends, later runs check only the current page. Requests are at least 2.5
 seconds apart. The target allows 30 requests per hour, and each worker pass
-stops after 30 requests.
+stops after 30 requests. After this date fix, the scraper starts the archive
+from the beginning once so it can correct dates already in Peated.
 
-The Whisky Advocate pilot is also manual-only. It requests the issue index, the
-newest issue, and each listed review page to collect its explicit publication
-date. Requests are at least 2.5 seconds apart. Each worker pass has a 30-request
-budget, and the target allows at most 20 requests per hour. The run checkpoints
-each stored review and can resume for up to ten worker passes. The adapter keeps
-the complete source Bottle title for classification and reads the category
-before the separate price line. It does not persist review prose.
+The Whisky Advocate pilot is also manual-only. It checks one magazine issue at
+a time and reads the date from each review page. Later manual runs continue
+with older issues. This corrects reviews that were saved without their original
+date. Requests are at
+least 2.5 seconds apart. Each worker pass has a 30-request budget, and the
+target allows at most 20 requests per hour. The run checkpoints each stored
+review and can resume for up to ten worker passes. The adapter keeps the
+complete source Bottle title for classification and reads the category before
+the separate price line. It does not persist review prose.
 
 Whiskyfun runs once per day. It reads at most 20 current RSS items and skips
 clear non-whisky articles before it requests article pages. It then advances
@@ -168,8 +171,9 @@ run discovers the newest archive from the homepage. Each later page supplies
 the next older link. Historical articles keep the publisher's daily date anchor
 and date. When the archive ends, later runs check only the current feed.
 Requests are at least 2.5 seconds apart. The target allows 25 requests per hour,
-and each worker pass stops after 30 requests. The adapter stores dates, reviewer
-metadata, native scores, and canonical links. Review prose stays transient.
+and each worker pass stops after 30 requests. The scraper saves dates, reviewer
+names, scores, and review links. It does not save review text. After this date
+fix, the scraper starts the old archive from the beginning once.
 
 Dramface runs once per day. It reads at most 20 current links from the public
 review index. It does not request Squarespace feeds, JSON views, APIs, search,
@@ -193,7 +197,7 @@ public homepage Recent Reviews list. It does not request the alphabetical
 archive, category pages, sitemaps, feeds, search, or WordPress APIs. Requests
 are at least five seconds apart. The target allows 10 requests per hour, and
 each worker pass stops after six requests. The adapter stores the writer,
-canonical link, displayed letter grade, and URL date when valid. Tasting-note
+canonical link, displayed letter grade, and required URL date. Tasting-note
 paragraphs stay transient and are discarded after parsing.
 
 Bourbon Culture runs once per day. It reads only the six links under Latest
@@ -220,9 +224,9 @@ its last successful cursor. It follows only the publisher's Scotland category
 links with `offset` and `category` parameters. It does not request the full
 sitemap, search, other query filters, or Squarespace APIs. Requests are at
 least 2.5 seconds apart. The target allows 25 requests per hour, and each worker
-pass stops after 22 requests. The adapter stores the exact publication
-timestamp, author, canonical link, and native 100-point score. Review text
-stays transient and is discarded after parsing.
+pass stops after 22 requests. The scraper saves the exact date and time, author,
+review link, and 100-point score. It does not save review text. After this date
+fix, the scraper starts the old pages from the beginning once.
 
 The Whisky Study runs once per day. It reads only the 20 article cards on the
 first public Scotch review index page. It does not request older pagination,

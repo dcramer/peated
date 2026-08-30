@@ -60,21 +60,18 @@ test("extracts the grade and only tasting-note paragraphs", async () => {
   );
 });
 
-test("maps another grade and allows an article without an encoded date", async () => {
+test("rejects an article without an encoded date", async () => {
   const html = await loadFixture("whiskeyreviewer", "review.html");
   const undatedUrl =
     "https://whiskeyreviewer.com/2026/08/example-bourbon-review";
-  const parsed = parseWhiskeyReviewerArticle(
-    html
-      .replace("example-bourbon-review-081026", "example-bourbon-review")
-      .replace("Rating: B+", "Rating: A-"),
-    new URL(undatedUrl),
-  );
-
-  expect(parsed.article.publishedAt).toBeNull();
-  expect(parsed.article.externalReviews[0]).toMatchObject({
-    nativeScore: { value: 90, scale: 100, display: "A-" },
-  });
+  expect(() =>
+    parseWhiskeyReviewerArticle(
+      html
+        .replace("example-bourbon-review-081026", "example-bourbon-review")
+        .replace("Rating: B+", "Rating: A-"),
+      new URL(undatedUrl),
+    ),
+  ).toThrow("Whiskey Reviewer article date is missing.");
 });
 
 test("resumes without requesting a completed current article", async () => {

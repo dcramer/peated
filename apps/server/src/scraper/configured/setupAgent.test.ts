@@ -17,7 +17,7 @@ function reviewCandidate(nameSelector: string) {
       },
       detail: {
         title: { selector: "h1", attribute: null },
-        publishedAt: null,
+        publishedAt: { selector: "time", attribute: "datetime" },
         reviewItem: "article.review",
         name: { selector: nameSelector, attribute: null },
         reviewerName: null,

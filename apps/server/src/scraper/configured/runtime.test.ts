@@ -63,6 +63,7 @@ async function setupSource(titleSelector = "h1", paginate = false) {
       list,
       detail: {
         title: { selector: titleSelector },
+        publishedAt: { selector: "time", attribute: "datetime" },
         reviewItem: "article.review",
         name: { selector: "h2" },
         reviewText: { selector: ".body" },
@@ -104,12 +105,12 @@ function previewFetch(paginate = false) {
     }
     if (url.pathname === "/one") {
       return new Response(
-        '<h1>August reviews</h1><article class="review"><h2>Example Whisky</h2><div class="body">Publisher prose must not be stored in preview.</div></article>',
+        '<h1>August reviews</h1><time datetime="2026-08-12"></time><article class="review"><h2>Example Whisky</h2><div class="body">Publisher prose must not be stored in preview.</div></article>',
       );
     }
     if (url.pathname === "/two") {
       return new Response(
-        '<h1>Earlier reviews</h1><article class="review"><h2>Second Whisky</h2><div class="body">Another review.</div></article>',
+        '<h1>Earlier reviews</h1><time datetime="2026-07-30"></time><article class="review"><h2>Second Whisky</h2><div class="body">Another review.</div></article>',
       );
     }
     throw new Error(`Unexpected URL: ${url.toString()}`);

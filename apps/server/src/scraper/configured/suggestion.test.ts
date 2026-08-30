@@ -13,6 +13,7 @@ const reviewRules = {
   },
   detail: {
     title: { selector: "h1" },
+    publishedAt: { selector: "time", attribute: "datetime" },
     reviewItem: "article.review",
     name: { selector: "h2" },
     reviewText: { selector: ".body" },
@@ -104,7 +105,7 @@ test("parses supplied detail pages with the production parser", async () => {
     suppliedPages: [
       {
         url: "https://example.test/reviews/one",
-        html: '<h1>Autumn reviews</h1><article class="review"><h2>North Coast 12</h2><p class="body">Orange and oak.</p></article>',
+        html: '<h1>Autumn reviews</h1><time datetime="2026-08-12"></time><article class="review"><h2>North Coast 12</h2><p class="body">Orange and oak.</p></article>',
       },
     ],
     loadPage: async () => {
@@ -139,7 +140,7 @@ test("keeps complete review text in the checked output", async () => {
     suppliedPages: [
       {
         url: "https://example.test/reviews/one",
-        html: `<h1>Autumn reviews</h1><article class="review"><h2>North Coast 12</h2><p class="body">${reviewText}</p></article>`,
+        html: `<h1>Autumn reviews</h1><time datetime="2026-08-12"></time><article class="review"><h2>North Coast 12</h2><p class="body">${reviewText}</p></article>`,
       },
     ],
     loadPage: async () => {

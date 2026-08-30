@@ -26,9 +26,19 @@ const CurrentWhiskyAdvocateCursorSchema = z
   })
   .strict();
 
+const DatedWhiskyAdvocateCursorSchema = z
+  .object({
+    checksReviewDates: z.literal(true),
+    completedIssues: z.array(z.string().min(1)).max(500),
+    issue: z.string().min(1).nullable(),
+    completedReviewUrls: z.array(z.url()).max(500),
+  })
+  .strict();
+
 // Active runs can resume across deploys.
 // Accept cursors written by the prior adapter.
 export const WhiskyAdvocateCursorSchema = z.union([
+  DatedWhiskyAdvocateCursorSchema,
   LegacyWhiskyAdvocateCursorSchema,
   CurrentWhiskyAdvocateCursorSchema,
 ]);
@@ -55,7 +65,7 @@ function normalizeText(value: string): string {
   return value.replaceAll(/\s+/g, " ").trim();
 }
 
-export function parseReviewPublishedAt(data: string): Date | null {
+export function parseReviewPublishedAt(data: string): Date {
   const $ = cheerio(data);
   const metadata = $("script")
     .toArray()
@@ -63,7 +73,7 @@ export function parseReviewPublishedAt(data: string): Date | null {
     .find((value) => /"datePublished"\s*:/iu.test(value));
   const rawValue = metadata?.match(/"datePublished"\s*:\s*"(?<value>[^"]+)"/iu)
     ?.groups?.value;
-  if (!rawValue) return null;
+  if (!rawValue) throw new Error("Whisky Advocate review date is missing.");
 
   const templateValue = rawValue.match(
     /^\{\{\s*(?<value>.+?)\s*\|\s*iso8601\s*\}\}$/iu,
@@ -75,7 +85,7 @@ export function parseReviewPublishedAt(data: string): Date | null {
   return publishedAt;
 }
 
-function parseIssueList(data: string) {
+export function parseIssueList(data: string) {
   const $ = cheerio(data);
   const results: string[] = [];
   $("select")
@@ -152,18 +162,25 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
   WhiskyAdvocateCursor,
   WhiskyAdvocateObservation
 > = async ({ cursor, session }) => {
-  const activeCursor =
-    cursor && "processedReviewUrls" in cursor ? cursor : null;
-  let issue = activeCursor?.issue;
-  if (!issue) {
-    const issueListResponse = await session.request({
-      target: TARGET,
-      url: new URL("/ratings-reviews", ORIGIN),
-    });
-    issue = parseIssueList(issueListResponse.body)[0];
+  const issueListResponse = await session.request({
+    target: TARGET,
+    url: new URL("/ratings-reviews", ORIGIN),
+  });
+  const issueList = parseIssueList(issueListResponse.body);
+  if (issueList.length === 0) {
+    throw new Error("Whisky Advocate issue list is empty.");
   }
-  if (!issue) throw new Error("Whisky Advocate issue list is empty.");
-  const processedReviewUrls = new Set(activeCursor?.processedReviewUrls ?? []);
+  // Old saved progress skipped dates, so start again from the newest issue.
+  const completedIssues = new Set(
+    cursor && "checksReviewDates" in cursor ? cursor.completedIssues : [],
+  );
+  const activeIssue = cursor && "issue" in cursor ? cursor.issue : null;
+  const issue =
+    activeIssue ?? issueList.find((value) => !completedIssues.has(value));
+  if (!issue) return;
+  const completedReviewUrls = new Set(
+    cursor && "completedReviewUrls" in cursor ? cursor.completedReviewUrls : [],
+  );
 
   const reviewUrl = new URL("/ratings-reviews", ORIGIN);
   reviewUrl.searchParams.set("custom_rating_issue[0]", issue);
@@ -181,7 +198,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
   }
 
   for (const review of externalReviews) {
-    if (processedReviewUrls.has(review.url)) continue;
+    if (completedReviewUrls.has(review.url)) continue;
     const articleResponse = await session.request({
       target: TARGET,
       url: new URL(review.url),
@@ -221,10 +238,20 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
       },
     });
     await session.emit({ sourceKey: review.url, value });
-    processedReviewUrls.add(review.url);
+    completedReviewUrls.add(review.url);
     await session.checkpoint({
+      checksReviewDates: true,
+      completedIssues: [...completedIssues],
       issue,
-      processedReviewUrls: [...processedReviewUrls],
+      completedReviewUrls: [...completedReviewUrls],
     });
   }
+
+  completedIssues.add(issue);
+  await session.checkpoint({
+    checksReviewDates: true,
+    completedIssues: [...completedIssues],
+    issue: null,
+    completedReviewUrls: [],
+  });
 };

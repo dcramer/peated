@@ -24,7 +24,7 @@ test("Whisky Advocate observations use article and source identity", async ({
         canonicalUrl: url,
         title: bottle.fullName,
         issue: "Fall 2026",
-        publishedAt: null,
+        publishedAt: new Date("2026-08-20T00:00:00.000Z"),
         contentHash: "first",
         externalReviews: [
           {
@@ -48,6 +48,7 @@ test("Whisky Advocate observations use article and source identity", async ({
         ...observation.value,
         article: {
           ...observation.value.article,
+          publishedAt: new Date("2026-08-19T00:00:00.000Z"),
           contentHash: "second",
           externalReviews: [
             {
@@ -102,6 +103,7 @@ test("Whisky Advocate observations use article and source identity", async ({
       id: storedExternalReviews[0]!.externalReview.articleId,
       issue: "Fall 2026",
       title: bottle.fullName,
+      publishedAt: new Date("2026-08-19T00:00:00.000Z"),
       contentHash: expect.any(String),
       fetchedAt: expect.any(Date),
     },
