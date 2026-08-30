@@ -576,7 +576,7 @@ describe("GET /bottles", () => {
         category: [],
         ageBand: [],
       },
-      followedDistillerCount: null,
+      followedEntityCount: null,
       rel: {
         nextCursor: null,
         prevCursor: null,
@@ -819,21 +819,22 @@ describe("GET /bottles", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("returns an empty followed-distillery feed", async ({ defaults }) => {
+  test("returns an empty followed-entity feed", async ({ defaults }) => {
     const response = await routerClient.bottles.list(
       { filter: "following", sort: "-release" },
       { context: { user: defaults.user } },
     );
 
     expect(response.results).toEqual([]);
-    expect(response.followedDistillerCount).toBe(0);
+    expect(response.followedEntityCount).toBe(0);
   });
 
-  test("lists known releases from followed distillers", async ({
+  test("lists known releases from followed distillers and bottlers", async ({
     defaults,
     fixtures,
   }) => {
     const distiller = await fixtures.Entity({ kind: "distillery" });
+    const bottler = await fixtures.Entity({ kind: "bottler" });
     const followedBrand = await fixtures.Entity({ kind: "brand" });
     await db.insert(entityFollows).values([
       {
@@ -842,9 +843,19 @@ describe("GET /bottles", () => {
       },
       {
         userId: defaults.user.id,
+        entityId: bottler.id,
+      },
+      {
+        userId: defaults.user.id,
         entityId: followedBrand.id,
       },
     ]);
+    const followedBottlerRelease = await fixtures.Bottle({
+      name: "Followed Bottler Release",
+      bottlerId: bottler.id,
+      releaseYear: 2026,
+      releaseDate: "2026-09-01",
+    });
     const exactLaterThisYear = await fixtures.Bottle({
       name: "Exact Later This Year",
       distillerIds: [distiller.id],
@@ -888,7 +899,7 @@ describe("GET /bottles", () => {
     });
     await fixtures.Bottle({ name: "Unrelated Release", releaseYear: 2026 });
 
-    const { followedDistillerCount, results } = await routerClient.bottles.list(
+    const { followedEntityCount, results } = await routerClient.bottles.list(
       {
         filter: "following",
         limit: 10,
@@ -900,12 +911,13 @@ describe("GET /bottles", () => {
     );
 
     expect(results.map(({ id }) => id)).toEqual([
+      followedBottlerRelease.id,
       exactLaterThisYear.id,
       exactEarlierThisYear.id,
       yearOnlyThisYear.id,
       knownLastYear.id,
     ]);
-    expect(followedDistillerCount).toBe(1);
+    expect(followedEntityCount).toBe(2);
   });
 
   test("sorts bottles by tastings ascending", async ({ fixtures }) => {

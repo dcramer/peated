@@ -592,7 +592,7 @@ describe("mock oRPC router", () => {
     await expect(
       authenticatedClient.bottles.list({ filter: "following" }),
     ).resolves.toMatchObject({
-      followedDistillerCount: 2,
+      followedEntityCount: 2,
     });
   });
 

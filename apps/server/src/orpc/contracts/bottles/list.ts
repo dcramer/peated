@@ -41,7 +41,7 @@ const OutputSchema = listResponse(BottleSchema).extend({
       }),
     ),
   }),
-  followedDistillerCount: z.number().int().nonnegative().nullable(),
+  followedEntityCount: z.number().int().nonnegative().nullable(),
 });
 
 export default contract
@@ -50,7 +50,7 @@ export default contract
     path: "/bottles",
     summary: "List bottles",
     description:
-      "Find bottles, including releases from distillers the signed-in user follows",
+      "Find bottles, including releases from distillers and bottlers the signed-in user follows",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottles",

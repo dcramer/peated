@@ -131,7 +131,7 @@ export default mockOS.bottles.list.handler(
       ),
       total,
       facets,
-      followedDistillerCount: input.filter === "following" ? 2 : null,
+      followedEntityCount: input.filter === "following" ? 2 : null,
     };
   },
 );

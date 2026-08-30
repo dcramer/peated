@@ -170,7 +170,7 @@ function LatestReleases() {
       }
       title={
         useFollowedReleases
-          ? "New from distilleries you follow"
+          ? "New from distilleries and bottlers you follow"
           : "Recent releases"
       }
     />
