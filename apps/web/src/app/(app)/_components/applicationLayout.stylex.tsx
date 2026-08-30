@@ -52,6 +52,7 @@ export function ApplicationLayout({
   const { user } = useAuth();
   const [logoutPending, startLogout] = useTransition();
   const isHome = pathname === "/";
+  const usesInlineNavigation = isHome || pathname === "/search";
   const personalItems = user
     ? [
         {
@@ -110,10 +111,10 @@ export function ApplicationLayout({
               </>
             )
           }
-          background={isHome ? "page" : "surface"}
+          background={usesInlineNavigation ? "page" : "surface"}
           currentHref={pathname}
           databaseItems={databaseItems}
-          navigationPlacement={isHome ? "inline" : "separate"}
+          navigationPlacement={usesInlineNavigation ? "inline" : "separate"}
           personalItems={personalItems}
           search={
             pathname === "/search" || isHome ? undefined : (

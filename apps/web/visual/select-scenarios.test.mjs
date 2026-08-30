@@ -38,6 +38,30 @@ describe("selectScenarioIds", () => {
     ).toEqual(["bottle-detail"]);
   });
 
+  it("selects search for search page changes", () => {
+    expect(
+      selectScenarioIds([
+        "apps/web/src/app/(app)/search/searchPageClient.stylex.tsx",
+      ]),
+    ).toEqual(["search"]);
+  });
+
+  it("selects search for shared search result changes", () => {
+    expect(
+      selectScenarioIds([
+        "apps/web/src/components/designSystem/components/searchResults.stylex.tsx",
+      ]),
+    ).toEqual(["home", "search", "bottle-detail", "member-profile"]);
+  });
+
+  it("does not select search for another page's changes", () => {
+    expect(
+      selectScenarioIds([
+        "apps/web/src/app/(app)/users/[username]/profilePageClient.stylex.tsx",
+      ]),
+    ).toEqual(["member-profile"]);
+  });
+
   it("selects the tasting page for tasting workflow changes", () => {
     expect(
       selectScenarioIds([
@@ -67,6 +91,7 @@ describe("selectScenarioIds", () => {
       selectScenarioIds(["apps/web/e2e/rpc-fixtures.mjs"], { max: 20 }),
     ).toEqual([
       "home",
+      "search",
       "bottle-detail",
       "member-profile",
       "add-tasting",

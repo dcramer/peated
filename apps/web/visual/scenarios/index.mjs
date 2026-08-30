@@ -6,9 +6,11 @@ import { distilleryDetailScenario } from "./distillery-detail.mjs";
 import { homeScenario } from "./home.mjs";
 import { loginScenario } from "./login.mjs";
 import { memberProfileScenario } from "./member-profile.mjs";
+import { searchScenario } from "./search.mjs";
 
 export const SCENARIOS = [
   homeScenario,
+  searchScenario,
   bottleDetailScenario,
   memberProfileScenario,
   addTastingScenario,

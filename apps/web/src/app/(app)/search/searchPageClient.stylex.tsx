@@ -15,7 +15,7 @@ import {
   type AddBottleRouteIntent,
 } from "@peated/web/lib/addBottle";
 import { foundationStyles } from "../../../styles/foundations.stylex";
-import { space } from "../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../styles/tokens.stylex";
 
 const addBottleIntents = [
   "catalog",
@@ -24,6 +24,33 @@ const addBottleIntents = [
   "tasting",
   "view",
 ] as const satisfies readonly AddBottleRouteIntent[];
+
+const databaseScopes = [
+  "all",
+  "bottles",
+  "distilleries",
+  "brands",
+  "bottlers",
+  "members",
+] as const satisfies readonly SearchScope[];
+
+function getDatabaseScope(value: string | null): SearchScope {
+  return databaseScopes.find((scope) => scope === value) ?? "all";
+}
+
+function BrowseHeader({ bottleTotal }: { bottleTotal: number }) {
+  return (
+    <header {...stylex.props(styles.browseHeader)}>
+      <h1 {...stylex.props(foundationStyles.pageTitle, styles.browseTitle)}>
+        Search the database
+      </h1>
+      <p {...stylex.props(styles.browseDescription)}>
+        {bottleTotal.toLocaleString("en-US")} bottles, and someone has probably
+        logged yours. Search bottles, distillers, brands, and bottlers.
+      </p>
+    </header>
+  );
+}
 
 function getAddBottleIntent(value: string | null) {
   if (value === "addBottle") return "choose";
@@ -65,7 +92,7 @@ function getTitle({
   return "Search";
 }
 
-export function SearchPageClient() {
+export function SearchPageClient({ bottleTotal }: { bottleTotal: number }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") ?? "";
@@ -73,12 +100,13 @@ export function SearchPageClient() {
   const directToTasting = searchParams.has("tasting");
   const memberSearch = searchParams.get("type") === "users";
   const bottleSelection = Boolean(intent) || directToTasting;
+  const databaseSearch = !memberSearch && !bottleSelection;
   const pendingImage = getPendingImageFromParams(searchParams);
   const initialScope: SearchScope = memberSearch
     ? "members"
     : bottleSelection
       ? "bottles"
-      : "all";
+      : getDatabaseScope(searchParams.get("type"));
   const scopeValues = memberSearch
     ? (["members"] as const)
     : bottleSelection
@@ -118,27 +146,53 @@ export function SearchPageClient() {
     const nextParams = new URLSearchParams(searchParams);
     if (nextQuery) nextParams.set("q", nextQuery);
     else nextParams.delete("q");
-    router.replace(`/search?${nextParams.toString()}`);
+    replaceSearch(nextParams);
+  }
+
+  function updateScope(nextScope: SearchScope, nextQuery: string) {
+    const nextParams = new URLSearchParams(searchParams);
+    if (nextQuery) nextParams.set("q", nextQuery);
+    else nextParams.delete("q");
+    if (nextScope === "all") nextParams.delete("type");
+    else nextParams.set("type", nextScope);
+    replaceSearch(nextParams);
+  }
+
+  function replaceSearch(nextParams: URLSearchParams) {
+    const nextQuery = nextParams.toString();
+    router.replace(nextQuery ? `/search?${nextQuery}` : "/search");
   }
 
   return (
-    <div {...stylex.props(styles.page)}>
-      <header {...stylex.props(styles.header)}>
-        <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>
-          {getTitle({ directToTasting, intent, memberSearch })}
-        </h1>
-      </header>
+    <div {...stylex.props(styles.page, databaseSearch && styles.databasePage)}>
+      {!databaseSearch ? (
+        <header {...stylex.props(styles.header)}>
+          <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>
+            {getTitle({ directToTasting, intent, memberSearch })}
+          </h1>
+        </header>
+      ) : null}
       <section aria-label="Search Peated" {...stylex.props(styles.search)}>
         <Search
+          browseHeader={
+            databaseSearch ? (
+              <BrowseHeader bottleTotal={bottleTotal} />
+            ) : undefined
+          }
           getBottleHref={getBottleHref}
           getContributionHref={getContributionHref}
           initialQuery={query}
           initialScope={initialScope}
-          limit={50}
+          limit={databaseSearch ? 5 : 50}
+          onScopeChange={databaseSearch ? updateScope : undefined}
           onSubmit={submitSearch}
-          placement="page"
+          placement={databaseSearch ? "database" : "page"}
+          placeholder={
+            databaseSearch ? "Ardbeg 10, Lagavulin, Cadenhead's…" : undefined
+          }
           scopeValues={scopeValues}
           showBottleMeasures={false}
+          submitLabel={databaseSearch ? "Search" : undefined}
         />
       </section>
     </div>
@@ -152,6 +206,9 @@ const styles = stylex.create({
     marginRight: "auto",
     marginLeft: "auto",
   },
+  databasePage: {
+    maxWidth: "none",
+  },
   header: { marginBottom: space.x4 },
   title: {
     fontSize: "clamp(26px, 4vw, 32px)",
@@ -159,5 +216,28 @@ const styles = stylex.create({
   },
   search: {
     minWidth: 0,
+  },
+  browseHeader: {
+    maxWidth: "760px",
+    marginRight: "auto",
+    marginBottom: space.x6,
+    marginLeft: "auto",
+    paddingTop: space.x6,
+    textAlign: "center",
+  },
+  browseTitle: {
+    fontSize: "clamp(28px, 5vw, 38px)",
+    lineHeight: 1.05,
+  },
+  browseDescription: {
+    maxWidth: "720px",
+    marginTop: space.x4,
+    marginRight: "auto",
+    marginBottom: 0,
+    marginLeft: "auto",
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "15px",
+    lineHeight: 1.5,
   },
 });

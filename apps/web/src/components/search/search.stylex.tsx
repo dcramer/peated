@@ -17,7 +17,13 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
 import { space } from "../../styles/tokens.stylex";
@@ -63,8 +69,20 @@ type MemberSearchResult = Extract<
 >["results"][number];
 export type SearchScope = (typeof searchScopes)[number]["value"];
 
+type SearchSnapshot = {
+  count: number;
+  emptyText?: string;
+  groups: SearchResultGroup[];
+  hasExact: boolean;
+  query: string;
+  scope: SearchScope;
+  scopeCounts: Record<SearchScope, number>;
+  scopeTotals: SearchResponse["scopeTotals"];
+};
+
 export type SearchProps = {
   autoFocus?: boolean;
+  browseHeader?: ReactNode;
   contributionLabel?: string;
   defaultOpen?: boolean;
   getBottleHref?: (bottleId: number) => string;
@@ -72,8 +90,9 @@ export type SearchProps = {
   initialQuery?: string;
   initialScope?: SearchScope;
   limit?: number;
+  onScopeChange?: (scope: SearchScope, query: string) => void;
   onSubmit?: (query: string) => void;
-  placement?: "overlay" | "page";
+  placement?: "database" | "overlay" | "page";
   placeholder?: string;
   scopeValues?: readonly SearchScope[];
   showBottleMeasures?: boolean;
@@ -216,8 +235,11 @@ function getGroupLabel(type: SearchGroup["type"]) {
 
 function getMoreHref(query: string, type: SearchGroup["type"]) {
   const encodedQuery = encodeURIComponent(query);
-  return type === "members"
-    ? `/search?q=${encodedQuery}&type=users`
+  if (type === "members") {
+    return `/search?q=${encodedQuery}&type=users`;
+  }
+  return searchScopes.some((option) => option.value === type)
+    ? `/search?q=${encodedQuery}&type=${type}`
     : `/search?q=${encodedQuery}`;
 }
 
@@ -247,8 +269,9 @@ function resultGroups(
   query: string,
   bottleOptions: BottleItemOptions,
   showMoreLinks: boolean,
+  scope: SearchScope,
 ): SearchResultGroup[] {
-  if (response.exact) {
+  if (response.exact && exactMatchesScope(response.exact, scope)) {
     return [
       {
         id: "exact",
@@ -260,6 +283,7 @@ function resultGroups(
   }
 
   const groups = response.groups.flatMap((group): SearchResultGroup[] => {
+    if (!groupMatchesScope(group.type, scope)) return [];
     const items = groupItems(group, bottleOptions);
     if (!items.length) return [];
     return [
@@ -279,13 +303,47 @@ function resultGroups(
   if (!groups.length && response.nearest.length) {
     groups.push({
       id: "nearest",
-      items: response.nearest.map((nearest) =>
-        nearestItem(nearest, bottleOptions),
-      ),
+      items: response.nearest
+        .filter((nearest) => groupMatchesScope(nearest.type, scope))
+        .map((nearest) => nearestItem(nearest, bottleOptions)),
       label: "Did you mean?",
     });
   }
-  return groups;
+  return groups.filter((group) => group.items.length > 0);
+}
+
+function groupMatchesScope(type: SearchGroup["type"], scope: SearchScope) {
+  return scope === "all" || type === scope;
+}
+
+function exactMatchesScope(exact: SearchExact, scope: SearchScope) {
+  if (scope === "all") return true;
+  if (exact.type === "bottle") return scope === "bottles";
+  return (
+    (exact.ref.kind === "distillery" && scope === "distilleries") ||
+    (exact.ref.kind === "brand" && scope === "brands") ||
+    (exact.ref.kind === "bottler" && scope === "bottlers")
+  );
+}
+
+function getResultCount(response: SearchResponse, scope: SearchScope) {
+  if (response.exact && exactMatchesScope(response.exact, scope)) return 1;
+  return response.groups.reduce(
+    (total, group) =>
+      total + (groupMatchesScope(group.type, scope) ? group.total : 0),
+    0,
+  );
+}
+
+function getResultScopeTotals(response: SearchResponse) {
+  return {
+    all: getResultCount(response, "all"),
+    bottles: getResultCount(response, "bottles"),
+    distilleries: getResultCount(response, "distilleries"),
+    brands: getResultCount(response, "brands"),
+    bottlers: getResultCount(response, "bottlers"),
+    members: getResultCount(response, "members"),
+  } satisfies Record<SearchScope, number>;
 }
 
 function exactItem(exact: SearchExact, bottleOptions: BottleItemOptions) {
@@ -324,6 +382,7 @@ function getScopeCount(
 
 export function Search({
   autoFocus = false,
+  browseHeader,
   contributionLabel = "Add a new bottle",
   defaultOpen = false,
   getBottleHref = getDefaultBottleHref,
@@ -331,6 +390,7 @@ export function Search({
   initialQuery = "",
   initialScope = "all",
   limit = 3,
+  onScopeChange,
   onSubmit,
   placement = "overlay",
   placeholder = "bottles, distillers, brands…",
@@ -343,12 +403,7 @@ export function Search({
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
   const [scope, setScope] = useState<SearchScope>(initialScope);
-  const [groups, setGroups] = useState<SearchResultGroup[]>([]);
-  const [emptyText, setEmptyText] = useState<string>();
-  const [hasExactResult, setHasExactResult] = useState(false);
-  const [scopeTotals, setScopeTotals] =
-    useState<SearchResponse["scopeTotals"]>();
-  const [settledQuery, setSettledQuery] = useState<string>();
+  const [snapshot, setSnapshot] = useState<SearchSnapshot>();
   const [status, setStatus] = useState<"error" | "ready" | "searching">(
     initialQuery.trim() ? "searching" : "ready",
   );
@@ -366,10 +421,21 @@ export function Search({
   )
     ? scope
     : (availableScopeDefinitions[0]?.value ?? "all");
+  // Result metadata belongs only to the query and scope that produced it.
+  const currentSnapshot =
+    snapshot?.query === query.trim() && snapshot.scope === effectiveScope
+      ? snapshot
+      : undefined;
   const availableScopes = availableScopeDefinitions.map((option) => ({
     ...option,
-    count: getScopeCount(option.value, scopeTotals),
+    count: getScopeCount(option.value, currentSnapshot?.scopeTotals),
   }));
+  const availableScopeFacets = currentSnapshot
+    ? availableScopeDefinitions.map((option) => ({
+        ...option,
+        count: currentSnapshot.scopeCounts[option.value],
+      }))
+    : undefined;
 
   const runSearch = useCallback(
     async (nextQuery: string, nextScope: SearchScope) => {
@@ -377,10 +443,7 @@ export function Search({
       latestRequest.current = requestId;
       const trimmedQuery = nextQuery.trim();
       if (!trimmedQuery) {
-        setGroups([]);
-        setEmptyText(undefined);
-        setHasExactResult(false);
-        setSettledQuery(undefined);
+        setSnapshot(undefined);
         setStatus("ready");
         return;
       }
@@ -390,9 +453,14 @@ export function Search({
       try {
         const [response] = await Promise.all([
           orpc.search.call({
-            limit,
+            limit: placement === "database" && nextScope !== "all" ? 50 : limit,
             query: trimmedQuery,
-            scopes: [...getApiScopes(nextScope, Boolean(user))],
+            scopes: [
+              ...getApiScopes(
+                placement === "database" ? "all" : nextScope,
+                Boolean(user),
+              ),
+            ],
           }),
           indicatorFloor,
         ]);
@@ -401,22 +469,27 @@ export function Search({
           response,
           trimmedQuery,
           { getBottleHref, showMeasures: showBottleMeasures },
-          placement === "overlay",
+          placement === "database" || placement === "overlay",
+          nextScope,
         );
-        const hasMatches =
-          Boolean(response.exact) ||
-          response.groups.some((group) => group.results.length > 0);
-        setGroups(nextGroups);
-        setEmptyText(
-          hasMatches
+        const nextResultCount = getResultCount(response, nextScope);
+        const hasMatches = nextResultCount > 0;
+        setSnapshot({
+          count: nextResultCount,
+          emptyText: hasMatches
             ? undefined
             : response.nearest.length
               ? `No exact records match “${trimmedQuery}”.`
               : `No records match “${trimmedQuery}”.`,
-        );
-        setHasExactResult(Boolean(response.exact));
-        setScopeTotals(response.scopeTotals);
-        setSettledQuery(trimmedQuery);
+          groups: nextGroups,
+          hasExact: Boolean(
+            response.exact && exactMatchesScope(response.exact, nextScope),
+          ),
+          query: trimmedQuery,
+          scope: nextScope,
+          scopeCounts: getResultScopeTotals(response),
+          scopeTotals: response.scopeTotals,
+        });
         setStatus("ready");
       } catch {
         await indicatorFloor;
@@ -454,16 +527,15 @@ export function Search({
 
   function updateQuery(nextQuery: string) {
     setQuery(nextQuery);
+    // Invalidate the current request before the next debounced request starts.
+    latestRequest.current += 1;
     if (!nextQuery.trim()) {
-      latestRequest.current += 1;
       debouncedSearch.cancel();
-      setGroups([]);
-      setEmptyText(undefined);
-      setHasExactResult(false);
-      setSettledQuery(undefined);
+      setSnapshot(undefined);
       setStatus("ready");
       return;
     }
+    setStatus("searching");
     void debouncedSearch(nextQuery, effectiveScope);
   }
 
@@ -479,36 +551,42 @@ export function Search({
   const searchBox = (
     <SearchBox
       autoFocus={autoFocus}
+      browseHeader={browseHeader}
       contribution={
         query.trim() &&
-        settledQuery &&
-        !hasExactResult &&
+        currentSnapshot &&
+        !currentSnapshot.hasExact &&
         (effectiveScope === "all" || effectiveScope === "bottles")
           ? {
-              description: `Can't find “${settledQuery}”?`,
-              href: getContributionHref(settledQuery),
+              description: `Can't find “${currentSnapshot.query}”?`,
+              href: getContributionHref(currentSnapshot.query),
               label: contributionLabel,
             }
           : undefined
       }
       defaultOpen={defaultOpen || placement === "page"}
-      emptyText={emptyText}
+      emptyText={currentSnapshot?.emptyText}
       fluid={Boolean(submitLabel)}
-      groups={groups}
+      groups={snapshot?.groups ?? []}
       onQueryChange={updateQuery}
       onRetry={() => void runSearch(query, effectiveScope)}
       onResultSelect={(item) => router.push(item.href)}
       onScopeChange={(nextScope) => {
         if (!isSearchScope(nextScope)) return;
         debouncedSearch.cancel();
+        previousInitialScope.current = nextScope;
         setScope(nextScope);
+        onScopeChange?.(nextScope, query);
         void runSearch(query, nextScope);
       }}
       onSubmit={submitSearch}
       placement={placement}
       placeholder={placeholder}
       query={query}
+      resultCount={currentSnapshot?.count}
+      resultQuery={snapshot?.query}
       scope={effectiveScope}
+      scopeFacets={availableScopeFacets}
       scopes={availableScopes}
       status={status}
       statusText={
@@ -516,10 +594,11 @@ export function Search({
           ? getSearchingText(effectiveScope, Boolean(user))
           : undefined
       }
+      submitLabel={submitLabel}
     />
   );
 
-  if (!submitLabel) return searchBox;
+  if (!submitLabel || placement === "database") return searchBox;
 
   return (
     <div {...stylex.props(styles.searchWithSubmit)}>
