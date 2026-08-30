@@ -10,7 +10,6 @@ import ScraperIconSettings from "@peated/web/components/admin/scraperIconSetting
 import { ScraperParsingEditor } from "@peated/web/components/admin/scraperParsingEditor.stylex";
 import { getSetupAfterLatestVersion } from "@peated/web/components/admin/scraperParsingStatus";
 import ScraperPublicationSettings from "@peated/web/components/admin/scraperPublicationSettings";
-import ScraperReadiness from "@peated/web/components/admin/scraperReadiness";
 import ScraperScheduleSettings from "@peated/web/components/admin/scraperScheduleSettings.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import * as stylex from "@stylexjs/stylex";
@@ -48,10 +47,7 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
 
   return (
     <AdminPage>
-      <AdminSection
-        title="Site settings"
-        description="Set the schedule, update the site icon, and choose whether reviews linked to bottles are public."
-      >
+      <AdminSection>
         <div {...stylex.props(styles.settings)}>
           <ScraperScheduleSettings
             key={site.runEvery ?? "manual"}
@@ -67,7 +63,6 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
           ) : null}
         </div>
       </AdminSection>
-      <ScraperReadiness site={site} />
       {source ? (
         <ScraperParsingEditor
           key={source.revisions[0]?.id ?? "setup"}

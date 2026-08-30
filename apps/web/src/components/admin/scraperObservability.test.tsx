@@ -9,7 +9,6 @@ import {
   ReviewPublishingAction,
   ReviewPublishingState,
 } from "./scraperPublicationSettings";
-import ScraperReadiness from "./scraperReadiness";
 import { getScraperRunAvailability } from "./scraperRunAvailability";
 import {
   getScheduleChoice,
@@ -110,16 +109,6 @@ describe("scraper observability", () => {
     );
     expect(html).toContain("Never recorded");
     expect(html).not.toContain("Disabled");
-  });
-
-  it("shows runtime and robots without owning review publishing", () => {
-    const html = renderToStaticMarkup(<ScraperReadiness site={site} />);
-
-    expect(html).toContain("Connection");
-    expect(html).toContain("Disabled");
-    expect(html).toContain("Sites");
-    expect(html).toContain("Not checked");
-    expect(html).not.toContain("Review publishing");
   });
 
   it("shows review publishing with matched coverage", () => {
