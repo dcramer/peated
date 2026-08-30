@@ -9,11 +9,6 @@ type EntityTabSource = Pick<
 >;
 
 const entityKindPresentation = {
-  blender: {
-    bottleSectionLabel: "Bottlings",
-    establishmentLabel: "Founded",
-    label: "Blender",
-  },
   bottler: {
     bottleSectionLabel: "Bottlings",
     establishmentLabel: "Founded",

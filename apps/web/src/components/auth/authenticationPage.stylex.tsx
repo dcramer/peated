@@ -42,10 +42,6 @@ function DatabaseIntro() {
           value: stats.data?.bottlers.toLocaleString("en-US") ?? "–",
         },
         {
-          label: "Blenders",
-          value: stats.data?.blenders.toLocaleString("en-US") ?? "–",
-        },
-        {
           label: "Tastings",
           value: stats.data?.tastings.toLocaleString("en-US") ?? "–",
         },

@@ -4,7 +4,6 @@ export const EntityKindEnum = z.enum([
   "brand",
   "distillery",
   "bottler",
-  "blender",
   "company",
 ]);
 

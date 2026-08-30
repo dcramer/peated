@@ -5,7 +5,6 @@ import ai from "./ai";
 import audits from "./audits";
 import auth from "./auth";
 import badges from "./badges";
-import blenders from "./blenders";
 import bottleAliases from "./bottleAliases";
 import bottleBarcodes from "./bottleBarcodes";
 import bottleGroups from "./bottleGroups";
@@ -49,7 +48,6 @@ export interface Router {
   audits: typeof audits;
   auth: typeof auth;
   badges: typeof badges;
-  blenders: typeof blenders;
   bottles: typeof bottles;
   bottlers: typeof bottlers;
   brands: typeof brands;
@@ -94,7 +92,6 @@ export default api.router({
   audits,
   auth,
   badges,
-  blenders,
   bottles,
   bottlers,
   brands,

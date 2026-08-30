@@ -11,7 +11,6 @@ const groups: SiteFooterProps["groups"] = [
       { href: "/distillers", label: "Distillers" },
       { href: "/brands", label: "Brands" },
       { href: "/bottlers", label: "Bottlers" },
-      { href: "/blenders", label: "Blenders" },
       { href: "/locations", label: "Locations" },
     ],
   },
@@ -48,7 +47,7 @@ const meta = {
   component: SiteFooter,
   args: {
     coverage:
-      "47,402 bottles · 3,102 distilleries · 1,891 brands · 288 bottlers · 143 blenders · 312,000 tastings",
+      "47,402 bottles · 3,102 distilleries · 1,891 brands · 431 bottlers · 312,000 tastings",
     groups,
     provenance: "Community-edited · corrections welcome",
     referenceLinks: [

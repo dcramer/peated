@@ -12,7 +12,6 @@ export const ENTITY_SEARCH_SCOPE_LIST = [
   "distilleries",
   "brands",
   "bottlers",
-  "blenders",
   "companies",
 ] as const;
 
@@ -24,7 +23,6 @@ export const ENTITY_KIND_BY_SEARCH_SCOPE = {
   distilleries: "distillery",
   brands: "brand",
   bottlers: "bottler",
-  blenders: "blender",
   companies: "company",
 } as const satisfies Record<EntitySearchScope, EntityKind>;
 
@@ -64,11 +62,6 @@ const GroupSchema = z.discriminatedUnion("type", [
     results: z.array(EntitySchema),
   }),
   z.object({
-    type: z.literal("blenders"),
-    total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
-  }),
-  z.object({
     type: z.literal("companies"),
     total: z.number().int().nonnegative(),
     results: z.array(EntitySchema),
@@ -97,7 +90,6 @@ const NearestSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("distilleries"), result: EntitySchema }),
   z.object({ type: z.literal("brands"), result: EntitySchema }),
   z.object({ type: z.literal("bottlers"), result: EntitySchema }),
-  z.object({ type: z.literal("blenders"), result: EntitySchema }),
   z.object({ type: z.literal("companies"), result: EntitySchema }),
   z.object({ type: z.literal("regions"), result: RegionSchema }),
   z.object({ type: z.literal("members"), result: MemberResultSchema }),
@@ -108,7 +100,6 @@ export const ScopeTotalsSchema = z.object({
   distilleries: z.number().int().nonnegative(),
   brands: z.number().int().nonnegative(),
   bottlers: z.number().int().nonnegative(),
-  blenders: z.number().int().nonnegative(),
   companies: z.number().int().nonnegative(),
   regions: z.number().int().nonnegative(),
   members: z.number().int().nonnegative().optional(),
@@ -128,7 +119,7 @@ export default contract
     path: "/search",
     summary: "Global search",
     description:
-      "Search bottles, brands, distilleries, bottlers, blenders, companies, regions, and members",
+      "Search bottles, brands, distilleries, bottlers, companies, regions, and members",
     spec: (spec) => ({ ...spec, operationId: "search" }),
   })
   .input(

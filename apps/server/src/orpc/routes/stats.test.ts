@@ -25,7 +25,6 @@ describe("GET /stats", () => {
     await fixtures.Entity({ name: "Stats Brand", kind: "brand" });
     await fixtures.Entity({ name: "Stats Distillery", kind: "distillery" });
     await fixtures.Entity({ name: "Stats Bottler", kind: "bottler" });
-    await fixtures.Entity({ name: "Stats Blender", kind: "blender" });
     await fixtures.Entity({ name: "Stats Company", kind: "company" });
 
     const data = await routerClient.stats();
@@ -34,7 +33,6 @@ describe("GET /stats", () => {
       brands: 1,
       distilleries: 1,
       bottlers: 1,
-      blenders: 1,
       companies: 1,
     });
   });

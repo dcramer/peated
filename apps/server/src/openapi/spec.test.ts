@@ -75,7 +75,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
       "/brands",
       "/distilleries",
       "/bottlers",
-      "/blenders",
       "/companies",
     ] as const) {
       expect(spec.paths?.[path]?.post).toBeUndefined();
@@ -90,7 +89,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
       "/brands",
       "/distilleries",
       "/bottlers",
-      "/blenders",
       "/companies",
       "/bottle-series",
       "/search",

@@ -167,8 +167,7 @@ async function handleRpcRequest({ request, response, url }) {
         bottles: 28_430,
         brands: 3_980,
         distilleries: 2_410,
-        bottlers: 1_125,
-        blenders: 420,
+        bottlers: 1_545,
         companies: 1_280,
         tastings: 142_580,
         memberReviews: 8_420,
@@ -241,7 +240,6 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     case "bottlers/list":
-    case "blenders/list":
     case "companies/list":
     case "countries/list":
     case "regions/list":
@@ -278,13 +276,7 @@ async function handleRpcRequest({ request, response, url }) {
       const bottleGroupWorkflow = getAccessToken(request).includes(
         "bottle-group-workflows",
       );
-      const entityScopes = [
-        "distilleries",
-        "brands",
-        "bottlers",
-        "blenders",
-        "companies",
-      ];
+      const entityScopes = ["distilleries", "brands", "bottlers", "companies"];
       const expectedScopes = bottleGroupWorkflow
         ? ["bottles", "members", ...entityScopes]
         : input?.query === "playwright search"
@@ -312,7 +304,6 @@ async function handleRpcRequest({ request, response, url }) {
         distilleries: 0,
         brands: 0,
         bottlers: 0,
-        blenders: 0,
         companies: 0,
         regions: 0,
       };

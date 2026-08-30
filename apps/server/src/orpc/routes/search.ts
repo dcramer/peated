@@ -359,7 +359,6 @@ async function getScopeTotals(
     ),
     brands: await countRows(database, entities, entityScopeWhere("brands")),
     bottlers: await countRows(database, entities, entityScopeWhere("bottlers")),
-    blenders: await countRows(database, entities, entityScopeWhere("blenders")),
     companies: await countRows(
       database,
       entities,
@@ -443,7 +442,6 @@ async function searchGroup(
     case "distilleries":
     case "brands":
     case "bottlers":
-    case "blenders":
     case "companies":
       return {
         type: scope,
@@ -550,7 +548,6 @@ async function findNearest(
       case "distilleries":
       case "brands":
       case "bottlers":
-      case "blenders":
       case "companies":
         for (const result of group.results) {
           const key = `entities:${result.id}`;
@@ -692,7 +689,6 @@ async function serializeGroup(group: GroupRows, context: Context) {
     case "distilleries":
     case "brands":
     case "bottlers":
-    case "blenders":
     case "companies":
       return {
         ...group,
@@ -730,7 +726,6 @@ async function serializeNearest(row: NearestRow, context: Context) {
     case "distilleries":
     case "brands":
     case "bottlers":
-    case "blenders":
     case "companies":
       return {
         type: row.type,

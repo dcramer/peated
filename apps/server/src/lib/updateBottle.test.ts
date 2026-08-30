@@ -484,7 +484,7 @@ describe("Bottle updates", () => {
     });
     const selectedBottler = await fixtures.Entity({
       name: "Selected Bottler",
-      kind: "blender",
+      kind: "distillery",
     });
     const selectedDistiller = await fixtures.Entity({
       name: "Selected Distiller",
@@ -514,7 +514,7 @@ describe("Bottle updates", () => {
     });
     for (const [entityId, kind] of [
       [selectedBrand.id, "company"],
-      [selectedBottler.id, "blender"],
+      [selectedBottler.id, "distillery"],
       [selectedDistiller.id, "brand"],
     ] as const) {
       expect(
@@ -539,7 +539,7 @@ describe("Bottle updates", () => {
     });
     const selectedBrand = await fixtures.Entity({
       name: "Selected Existing Kind Brand",
-      kind: "blender",
+      kind: "bottler",
     });
     const { first } = await createGroup({
       user: mod,
@@ -559,7 +559,7 @@ describe("Bottle updates", () => {
       await db.query.entities.findFirst({
         where: eq(entities.id, selectedBrand.id),
       }),
-    ).toMatchObject({ kind: "blender", type: [] });
+    ).toMatchObject({ kind: "bottler", type: [] });
     const audits = await loadUpdateAudits([first.bottle.id]);
     expect(audits).toHaveLength(1);
     expect(audits[0].data).toMatchObject({ updateScope: "shared" });

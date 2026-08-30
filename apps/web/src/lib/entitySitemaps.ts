@@ -6,7 +6,6 @@ export const ENTITY_SITEMAP_PAGE_LIMIT = 1000;
 const API_PAGE_LIMIT = 500;
 
 type EntitySitemapStatsKey =
-  | "blenders"
   | "bottlers"
   | "brands"
   | "companies"
@@ -30,12 +29,6 @@ export const ENTITY_SITEMAP_COLLECTIONS = [
     collection: "bottlers",
     kind: "bottler",
     statsKey: "bottlers",
-  },
-  {
-    clientKey: "blenders",
-    collection: "blenders",
-    kind: "blender",
-    statsKey: "blenders",
   },
   {
     clientKey: "companies",

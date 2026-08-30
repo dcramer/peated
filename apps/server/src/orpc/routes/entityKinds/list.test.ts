@@ -11,10 +11,6 @@ describe("Entity kind collections", () => {
       name: "A Bottler",
       kind: "bottler",
     });
-    const blender = await fixtures.Entity({
-      name: "A Blender",
-      kind: "blender",
-    });
     const company = await fixtures.Entity({
       name: "A Company",
       kind: "company",
@@ -24,12 +20,11 @@ describe("Entity kind collections", () => {
       routerClient.brands.list(),
       routerClient.distilleries.list(),
       routerClient.bottlers.list(),
-      routerClient.blenders.list(),
       routerClient.companies.list(),
     ]);
 
     expect(results.map((result) => result.results.map(({ id }) => id))).toEqual(
-      [[brand.id], [distillery.id], [bottler.id], [blender.id], [company.id]],
+      [[brand.id], [distillery.id], [bottler.id], [company.id]],
     );
   });
 

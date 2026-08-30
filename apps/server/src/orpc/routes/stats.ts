@@ -41,7 +41,6 @@ export default implement(statsContract).handler(async function () {
         brands: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'brand')`,
         distilleries: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'distillery')`,
         bottlers: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'bottler')`,
-        blenders: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'blender')`,
         companies: sql<string>`COUNT(${entities.id}) FILTER (WHERE ${entities.kind} = 'company')`,
       })
       .from(entities),
@@ -84,7 +83,6 @@ export default implement(statsContract).handler(async function () {
     brands: Number(entityTotal.brands),
     distilleries: Number(entityTotal.distilleries),
     bottlers: Number(entityTotal.bottlers),
-    blenders: Number(entityTotal.blenders),
     companies: Number(entityTotal.companies),
     tastings: Number(tastingTotal.tastings),
     memberReviews: Number(memberReviewTotal.memberReviews),

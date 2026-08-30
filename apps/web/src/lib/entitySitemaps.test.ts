@@ -28,12 +28,6 @@ describe("Entity sitemaps", () => {
         statsKey: "bottlers",
       },
       {
-        clientKey: "blenders",
-        collection: "blenders",
-        kind: "blender",
-        statsKey: "blenders",
-      },
-      {
         clientKey: "companies",
         collection: "companies",
         kind: "company",

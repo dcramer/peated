@@ -24,7 +24,6 @@ test("search settles after one request", async ({ page }) => {
         "distilleries",
         "brands",
         "bottlers",
-        "blenders",
         "companies",
         "regions",
       ],

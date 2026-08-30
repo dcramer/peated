@@ -15,7 +15,7 @@ export type ClassifierEntityResolution = {
   entityId: number;
   name: string;
   shortName: string | null;
-  kind: "brand" | "bottler" | "distillery" | "blender" | "company";
+  kind: "brand" | "bottler" | "distillery" | "company";
   alias: string | null;
   score: number | null;
   source: ("contained" | "exact" | "text" | "prefix")[];

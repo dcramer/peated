@@ -149,7 +149,7 @@ export const mockEntities: Entity[] = [
     peatedId: "E9209",
     name: "Compass Box",
     shortName: null,
-    kind: "blender",
+    kind: "bottler",
     description: "A Scotch whisky blending house founded in London.",
     yearEstablished: 2000,
     website: "https://www.compassboxwhisky.com",

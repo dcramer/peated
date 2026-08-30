@@ -7,7 +7,7 @@ export type PeatedIdRouteResolution = {
 
 const ROOT_PEATED_ID_PATTERN = /^\/([BE]\d+)\/?$/i;
 const PUBLIC_ENTITY_PATTERN =
-  /^\/(brands|distillers|bottlers|blenders|companies)\/([1-9]\d*)(\/.*)?$/;
+  /^\/(brands|distillers|bottlers|companies)\/([1-9]\d*)(\/.*)?$/;
 
 export function resolvePeatedIdRoute(
   pathname: string,

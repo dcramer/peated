@@ -155,8 +155,7 @@ function EntityBottleOverview({
   const ownsBottleModule =
     entity.kind === "brand" ||
     entity.kind === "bottler" ||
-    entity.kind === "distillery" ||
-    entity.kind === "blender";
+    entity.kind === "distillery";
 
   if (!ownsBottleModule) return null;
 

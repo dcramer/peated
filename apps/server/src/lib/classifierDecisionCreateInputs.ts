@@ -12,7 +12,7 @@ function buildBottleEntityInput(
   choice: {
     id: number | null;
     name: string;
-    kind?: "brand" | "distillery" | "bottler" | "blender" | "company" | null;
+    kind?: "brand" | "distillery" | "bottler" | "company" | null;
   },
   defaultKind: "brand" | "distillery" | "bottler",
 ): RouteBottleInput["brand"] {

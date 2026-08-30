@@ -51,7 +51,7 @@ subcommand
       .from(entities)
       .where(
         and(
-          inArray(entities.kind, ["distillery", "bottler", "blender"]),
+          inArray(entities.kind, ["distillery", "bottler"]),
           isNotNull(entities.countryId),
           entityIds.length
             ? inArray(entities.id, entityIds)

@@ -90,10 +90,10 @@ describe("mock oRPC router", () => {
     expect(entities.results.every((entity) => entity.kind)).toBe(true);
     await expect(
       authenticatedClient.entities.create({
-        name: "New Blender",
-        kind: "blender",
+        name: "New Bottler",
+        kind: "bottler",
       }),
-    ).resolves.toMatchObject({ name: "New Blender", kind: "blender" });
+    ).resolves.toMatchObject({ name: "New Bottler", kind: "bottler" });
     await expect(
       anonymousClient.countries.details({ country: mockCountry.slug }),
     ).resolves.toEqual(mockCountry);
@@ -503,8 +503,6 @@ describe("mock oRPC router", () => {
         ).length,
         brands: mockEntities.filter((entity) => entity.kind === "brand").length,
         bottlers: mockEntities.filter((entity) => entity.kind === "bottler")
-          .length,
-        blenders: mockEntities.filter((entity) => entity.kind === "blender")
           .length,
         companies: mockEntities.filter((entity) => entity.kind === "company")
           .length,

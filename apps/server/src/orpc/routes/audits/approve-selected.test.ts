@@ -31,7 +31,7 @@ async function createStorePriceUpdateEntityCheck({
   entity: {
     id: number;
     name: string;
-    kind: "brand" | "bottler" | "distillery" | "blender" | "company" | null;
+    kind: "brand" | "bottler" | "distillery" | "company" | null;
   };
   nextName: string;
   price: { id: number; name: string };
