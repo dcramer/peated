@@ -223,9 +223,11 @@ function getGroupLabel(type: SearchGroup["type"]) {
 
 function getMoreHref(query: string, type: SearchGroup["type"]) {
   const encodedQuery = encodeURIComponent(query);
-  const scope = type === "members" ? "members" : type;
-  return searchScopes.some((option) => option.value === scope)
-    ? `/search?q=${encodedQuery}&type=${scope}`
+  if (type === "members") {
+    return `/search?q=${encodedQuery}&type=users`;
+  }
+  return searchScopes.some((option) => option.value === type)
+    ? `/search?q=${encodedQuery}&type=${type}`
     : `/search?q=${encodedQuery}`;
 }
 
