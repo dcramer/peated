@@ -105,7 +105,7 @@ export function HomeHighestRated({
 
 export type HomeRelease = {
   href: string;
-  metadata: readonly string[];
+  metadata: ReactNode;
   name: string;
 };
 
@@ -135,7 +135,7 @@ export function HomeLatestReleases({
             <ItemRow
               href={bottle.href}
               key={bottle.href}
-              metadata={bottle.metadata.join(" · ")}
+              metadata={bottle.metadata}
               title={bottle.name}
             />
           ))}

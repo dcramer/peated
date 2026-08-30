@@ -10,7 +10,7 @@ const meta = {
   args: {
     bottleId: "B00872",
     imageUrl: BottleImage.src,
-    metadata: "Islay · 16 yr · 43.0% · ex-bourbon",
+    metadata: "Islay · 16 years · 43.0% ABV · ex-bourbon",
     name: "Lagavulin 16",
     onChange: () => undefined,
   },
@@ -37,7 +37,7 @@ export const Overview: Story = {
       <SelectedBottleSummary
         bottleId="B104281"
         imageUrl={null}
-        metadata="Islay · NAS · 61.5% · oloroso and bourbon casks"
+        metadata="Islay · No age statement · 61.5% ABV · oloroso and bourbon casks"
         name="Octomore Edition 15.3 Islay Barley Super Heavily Peated"
       />
     </StoryStack>

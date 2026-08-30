@@ -22,6 +22,8 @@ import {
 import { HomePage } from "@peated/web/components/designSystem/patterns/homePage.stylex";
 import { HomeSectionLoading } from "@peated/web/components/designSystem/patterns/homeSummary.stylex";
 import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+import { EntityLinks } from "@peated/web/components/entityLinks";
+import Join from "@peated/web/components/join";
 import { Search } from "@peated/web/components/search/search.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -406,14 +408,25 @@ function getBottleMetadata(bottle: Bottle) {
 }
 
 function getReleaseMetadata(bottle: Bottle) {
-  const distiller = bottle.distillers[0]?.name ?? bottle.brand.name;
-
-  return [
-    distiller,
+  const facts = [
     bottle.releaseYear === null ? null : `${bottle.releaseYear} release`,
-    bottle.statedAge === null ? null : `${bottle.statedAge} yr`,
-    bottle.abv === null ? null : `${bottle.abv.toFixed(1)}%`,
+    bottle.statedAge === null ? null : `${bottle.statedAge} years`,
+    bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
   ].filter((value): value is string => Boolean(value));
+
+  return (
+    <Join divider=" · ">
+      {[
+        <EntityLinks
+          entities={
+            bottle.distillers.length ? bottle.distillers : [bottle.brand]
+          }
+          key="producers"
+        />,
+        ...facts,
+      ]}
+    </Join>
+  );
 }
 
 const STACKED = "@media (max-width: 759px)";

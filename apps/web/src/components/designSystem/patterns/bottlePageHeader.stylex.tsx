@@ -35,7 +35,7 @@ export type BottlePageHeaderProps = {
   bands?: BandStackProps | null;
   brand: string;
   brandHref?: string;
-  detail?: string;
+  detail?: ReactNode;
   id: string;
   imageUrl?: string | null;
   memberStatus?: BottleMemberStatus;

@@ -33,7 +33,7 @@ const rows: BottleComparisonTableProps["rows"] = [
   {
     href: "/bottles/2",
     id: "2",
-    metadata: "Islay · NAS · 54.2% ABV",
+    metadata: "Islay · No age statement · 54.2% ABV",
     name: "Ardbeg Uigeadail",
     values: [
       <RatingMeasure

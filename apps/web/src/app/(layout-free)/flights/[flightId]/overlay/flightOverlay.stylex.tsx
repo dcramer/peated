@@ -11,7 +11,7 @@ import {
 } from "@peated/web/components/designSystem/components";
 import QRCodeClient from "@peated/web/components/qrcode.client.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
@@ -51,6 +51,10 @@ export function FlightOverlay({
                 <ItemListItem key={bottle.id}>
                   <BottleIdentityRow
                     brand={bottle.brand.name}
+                    brandHref={getEntityUrl({
+                      id: bottle.brand.id,
+                      kind: "brand",
+                    })}
                     href={getBottleUrl(bottle)}
                     imageUrl={bottle.imageUrl}
                     metadata={getBottleMetadata(bottle).split(" · ")}

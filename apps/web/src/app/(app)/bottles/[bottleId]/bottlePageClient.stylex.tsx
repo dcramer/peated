@@ -28,7 +28,9 @@ import {
 } from "@peated/web/components/designSystem/components";
 import { BottleOverview } from "@peated/web/components/designSystem/patterns/bottleOverview.stylex";
 import { BottlePageHeader } from "@peated/web/components/designSystem/patterns/bottlePageHeader.stylex";
+import { EntityLinks } from "@peated/web/components/entityLinks";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import Join from "@peated/web/components/join";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
@@ -57,13 +59,19 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 function getBottleDetail(bottle: Bottle) {
-  return [
-    formatCategoryName(bottle.category),
-    bottle.distillers[0]?.name,
-    bottle.bottler?.name,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
+  return (
+    <Join divider=" · ">
+      {[
+        formatCategoryName(bottle.category),
+        bottle.distillers.length ? (
+          <EntityLinks entities={bottle.distillers} key="distillers" />
+        ) : null,
+        bottle.bottler ? (
+          <EntityLinks entities={[bottle.bottler]} key="bottler" />
+        ) : null,
+      ].filter((value) => value !== null)}
+    </Join>
+  );
 }
 
 function getBottleNotes(bottle: Bottle) {
@@ -86,7 +94,7 @@ function getBottleSpecs(bottle: Bottle) {
       value:
         bottle.statedAge === null
           ? bottle.noAgeStatement
-            ? "NAS"
+            ? "No age statement"
             : null
           : `${bottle.statedAge} years`,
     },
@@ -127,7 +135,12 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
             ? "Non-chill filtered"
             : "Chill filtered",
     },
-    { label: "Bottler", value: bottle.bottler?.name },
+    {
+      label: "Bottler",
+      value: bottle.bottler ? (
+        <EntityLinks entities={[bottle.bottler]} />
+      ) : null,
+    },
   ];
 }
 

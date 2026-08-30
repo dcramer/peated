@@ -31,7 +31,7 @@ export const Overview: Story = {
         <UnitInput {...args} />
       </Field>
       <Field htmlFor="age-input" label="Age">
-        <UnitInput defaultValue={16} id="age-input" unit="yr" />
+        <UnitInput defaultValue={16} id="age-input" unit="years" />
       </Field>
       <Field htmlFor="invalid-unit-input" label="ABV">
         <UnitInput

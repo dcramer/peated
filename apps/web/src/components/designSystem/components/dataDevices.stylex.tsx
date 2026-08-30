@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 
 import {
   colors,
@@ -7,10 +8,11 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 
+const COMPACT = "@media (max-width: 639px)";
 const PHONE = "@media (max-width: 480px)";
 
 export type RecordIdProps = {
-  detail?: string;
+  detail?: ReactNode;
   id: string;
 };
 
@@ -75,6 +77,7 @@ const styles = stylex.create({
     display: "flex",
     minWidth: 0,
     alignItems: "center",
+    flexWrap: { default: "nowrap", [COMPACT]: "wrap" },
     columnGap: space.x3,
     color: colors.inkMuted,
     fontFamily: fonts.data,
@@ -99,9 +102,10 @@ const styles = stylex.create({
   },
   idDetail: {
     minWidth: 0,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
+    width: { default: "auto", [COMPACT]: "100%" },
+    overflow: { default: "hidden", [COMPACT]: "visible" },
+    textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
+    whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
   },
   specStrip: {
     display: "grid",
