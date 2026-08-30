@@ -150,6 +150,7 @@ export type HomeReview = {
   bottleName: string;
   date: ReactNode;
   id: string;
+  metadata: readonly string[];
   rating?: number | null;
   source: string;
   sourceHref: string;
@@ -181,14 +182,22 @@ export function HomeRecentReviews({
               href={review.bottleHref}
               key={review.id}
               metadata={
-                <a
-                  href={review.sourceHref}
-                  rel="noreferrer"
-                  target="_blank"
-                  {...stylex.props(styles.sourceLink)}
-                >
-                  {review.source}
-                </a>
+                <>
+                  <a
+                    href={review.sourceHref}
+                    rel="noreferrer"
+                    target="_blank"
+                    {...stylex.props(styles.sourceLink)}
+                  >
+                    {review.source}
+                  </a>
+                  {review.metadata.map((item) => (
+                    <span key={item}>
+                      <span aria-hidden="true"> · </span>
+                      {item}
+                    </span>
+                  ))}
+                </>
               }
               title={review.bottleName}
             />

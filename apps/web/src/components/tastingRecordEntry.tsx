@@ -1,6 +1,10 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 import {
+  formatBottleDisplayName,
+  type BottleDisplayNameSource,
+} from "@peated/server/lib/bottleDisplayName";
+import {
   MemberAvatar,
   TastingEntry,
   type TastingEntryMember,
@@ -14,7 +18,7 @@ import {
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 type TastingEntryRecord = {
-  bottle: BottleMetadata & { fullName: string; id: number };
+  bottle: BottleDisplayNameSource & BottleMetadata & { id: number };
   id: number;
   notes?: string | null;
   ratingBand?: TastingEntryMember["ratingBand"] | null;
@@ -29,7 +33,7 @@ export function getTastingEntryMember(
     descriptionHref: `/tastings/${tasting.id}`,
     href: `/bottles/${tasting.bottle.id}`,
     metadata: getBottleMetadata(tasting.bottle),
-    name: tasting.bottle.fullName,
+    name: formatBottleDisplayName(tasting.bottle),
     notes: tasting.tags ?? undefined,
     ratingBand: tasting.ratingBand ?? undefined,
   };

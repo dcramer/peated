@@ -40,7 +40,6 @@ export default function BottleCheckConfigForm({
       ? initialData.bottle.map((i) => ({
           id: i,
           name: `(Bottle ID: ${i})`,
-          fullName: `(Bottle ID: ${i})`,
         }))
       : undefined,
   );

@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import {
@@ -251,7 +252,7 @@ export function PhotoMatchCreateState({
             bottleId={matchedBottle.peatedId}
             imageUrl={matchedBottle.imageUrl}
             metadata={getMatchedBottleMetadata(matchedBottle)}
-            name={matchedBottle.fullName}
+            name={formatBottleDisplayName(matchedBottle)}
           />
           <LabelFacts result={result} />
           {renderMatchedResultActions ? (

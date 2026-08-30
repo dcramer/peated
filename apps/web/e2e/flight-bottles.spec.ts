@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { expect, test } from "@playwright/test";
 
 import {
@@ -24,7 +25,7 @@ test.describe("Flight bottles", () => {
     for (const bottle of [existingBottle, exactSearchBottle]) {
       await bottleSearch.fill("Lagavulin");
       const option = page.getByRole("option", {
-        name: bottle.fullName,
+        name: formatBottleDisplayName(bottle),
       });
       await option.click();
     }

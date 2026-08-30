@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   Button,
   ButtonLink,
@@ -34,7 +35,6 @@ import {
   getAddBottleHref,
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
-import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
@@ -154,7 +154,7 @@ function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
   const member = {
     description: tasting.notes ?? undefined,
     descriptionHref: `/tastings/${tasting.id}`,
-    name: bottle.fullName,
+    name: formatBottleDisplayName(bottle, { includeBrand: false }),
     notes: tasting.tags,
     ratingBand: tasting.ratingBand ?? undefined,
   };
@@ -277,7 +277,10 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
         onSelect: () => {
           if (navigator.share) {
             navigator
-              .share({ title: bottle.fullName, url: window.location.href })
+              .share({
+                title: formatBottleDisplayName(bottle),
+                url: window.location.href,
+              })
               .catch((error) => logTelemetryError(error, {}));
             return;
           }
@@ -402,7 +405,7 @@ export function BottlePageFrameClient({
               : undefined
           }
           menu={<BottleActions bottle={bottle} />}
-          name={getBottleExpressionName(bottle)}
+          name={formatBottleDisplayName(bottle, { includeBrand: false })}
           notes={getBottleNotes(bottle)}
           score={
             bottle.scoreCount === 0
@@ -486,7 +489,7 @@ export function BottleOverviewClient({
       ]
         .filter((value): value is string => Boolean(value))
         .join(" · "),
-      name: recommendation.fullName,
+      name: formatBottleDisplayName(recommendation),
     })) ?? [];
   const mainPending =
     !criticReviews.length &&

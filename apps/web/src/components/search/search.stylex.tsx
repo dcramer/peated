@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type {
@@ -145,11 +146,11 @@ function bottleItem(
         }
       : undefined,
     metadata: metadata.join(" · "),
-    title: bottle.fullName,
+    title: formatBottleDisplayName(bottle, { includeBrand: false }),
     visual: {
       fallback: "B",
       imageUrl: bottle.imageUrl,
-      label: `${bottle.fullName} bottle`,
+      label: `${formatBottleDisplayName(bottle)} bottle`,
     },
   } satisfies SearchResultItem;
 }

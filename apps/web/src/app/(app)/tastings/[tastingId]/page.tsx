@@ -1,10 +1,10 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { AppLink } from "@peated/web/components/designSystem/components";
 import {
   PageHeader,
   PageSection,
 } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
-import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { cache } from "react";
@@ -23,7 +23,7 @@ export async function generateMetadata(props: {
 }) {
   const { tastingId } = await props.params;
   const tasting = await getTasting(Number(tastingId));
-  const title = `${getBottlePlainTextIdentity(tasting.bottle)} — tasting by ${tasting.createdBy.username}`;
+  const title = `${formatBottleDisplayName(tasting.bottle)} — tasting by ${tasting.createdBy.username}`;
 
   return {
     title,
@@ -56,7 +56,7 @@ export default async function TastingPage(props: {
             {tasting.createdBy.username}
           </AppLink>
         }
-        title={getBottlePlainTextIdentity(tasting.bottle)}
+        title={formatBottleDisplayName(tasting.bottle)}
       />
       <PageSection heading="Tasting">
         <TastingRecordEntry showFullNotes tasting={tasting} />

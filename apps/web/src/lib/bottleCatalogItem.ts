@@ -2,7 +2,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { BottleCatalogItem } from "@peated/web/components/designSystem/patterns/bottleCatalog.stylex";
 
-import { getBottleExpressionName } from "./bottleLabel";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { getReleaseFamilyHref } from "./releaseFamily";
 import { getEntityUrl } from "./urls";
 
@@ -31,7 +31,7 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
     imageUrl: bottle.imageUrl,
     isLibrary: bottle.isLibrary,
     metadata,
-    name: bottle.group?.name ?? getBottleExpressionName(bottle),
+    name: formatBottleDisplayName(bottle, { includeBrand: false }),
     relatedReleases:
       relatedReleaseCount > 1
         ? {

@@ -2,6 +2,7 @@ import { EMPTY_TASTING_BAND_COUNTS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { implement } from "@peated/server/orpc";
 import userTastingStatsContract from "@peated/server/orpc/contracts/users/tasting-stats";
 import { eq } from "drizzle-orm";
@@ -72,7 +73,7 @@ export default implement(userTastingStatsContract).handler(async function ({
       ? null
       : await db.query.bottles.findFirst({
           where: eq(bottles.id, mostTastedBottleId),
-          columns: { id: true, fullName: true },
+          with: { brand: true, group: true, series: true },
         });
 
   return {
@@ -82,7 +83,7 @@ export default implement(userTastingStatsContract).handler(async function ({
     mostTastedBottle: mostTastedBottle
       ? {
           id: mostTastedBottle.id,
-          name: mostTastedBottle.fullName,
+          name: formatBottleDisplayName(mostTastedBottle),
           count: mostTastedCount,
         }
       : null,

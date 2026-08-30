@@ -11,6 +11,7 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { getDefaultCollection } from "@peated/server/lib/db";
 import { createNotification } from "@peated/server/lib/notifications";
 import { choose, random, sample } from "@peated/server/lib/rand";
@@ -295,7 +296,11 @@ const loadDefaultBottles = async (
           }));
       }
     }
-    console.log(`Bottle ${bottle.fullName} created.`);
+    const brand = entityList.find((entity) => entity.id === bottle.brandId);
+    if (!brand) throw new Error(`Bottle ${bottle.id} has no brand`);
+    console.log(
+      `Bottle ${formatBottleDisplayName({ ...bottle, brand })} created.`,
+    );
   }
 };
 

@@ -9,6 +9,7 @@ import {
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   CursorPager,
   LoadingList,
@@ -23,7 +24,6 @@ import {
 import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
 import TimeSince from "@peated/web/components/timeSince";
-import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -159,7 +159,9 @@ function toActivityItem(activity: Activity): MemberActivityItem {
           id: String(entry.id),
           imageUrl: entry.imageUrl ?? entry.bottle.imageUrl,
           metadata: getBottleMetadata(entry.bottle).split(" · "),
-          name: getBottleExpressionName(entry.bottle),
+          name: formatBottleDisplayName(entry.bottle, {
+            includeBrand: false,
+          }),
         })),
         totalItems: activity.totalItems,
       },

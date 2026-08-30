@@ -6,6 +6,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Fragment, useEffect } from "react";
 import { useEventListener } from "usehooks-ts";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   AppLink,
   ButtonLink,
@@ -110,7 +111,7 @@ function CollectionActivityItem({
               href={`/bottles/${item.bottle.id}`}
               key={item.id}
               metadata={getBottleMetadata(item.bottle)}
-              title={item.bottle.fullName}
+              title={formatBottleDisplayName(item.bottle)}
             />
           ))}
           {remaining > 0 ? (

@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { useORPC } from "../../../lib/orpc/context";
 import {
   colors,
@@ -184,7 +185,7 @@ export default function ModerationBottlePicker({
                   type="button"
                   {...stylex.props(styles.result)}
                 >
-                  <strong>{bottle.fullName}</strong>
+                  <strong>{formatBottleDisplayName(bottle)}</strong>
                   <span {...stylex.props(styles.detail)}>
                     {bottle.distillers
                       .map((distiller) => distiller.name)

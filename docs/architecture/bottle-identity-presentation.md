@@ -19,10 +19,14 @@ identity.
 - Apply rules from field semantics rather than recognizing particular brands,
   series, or product families in code.
 
-This contract does not require a single shared renderer or a universal
-presentation object. React components, metadata generators, notifications, and
-other consumers may compose bottle fields differently while following the same
-semantic rules.
+Human-facing bottle names use `formatBottleDisplayName` from
+`apps/server/src/lib/bottleDisplayName.ts`. The formatter accepts a structured
+Bottle and returns its concise marketed identity. A caller can suppress brand
+context only when the surrounding layout already supplies it.
+
+React components still own truncation, links, line breaks, and supporting
+metadata. Canonical `fullName` remains available for matching, sorting,
+verification, and stored identity.
 
 ## Identity Layers
 

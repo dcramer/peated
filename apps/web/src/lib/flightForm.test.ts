@@ -7,12 +7,14 @@ import {
 } from "./flightForm";
 
 const bottle = {
+  brand: { name: "Springbank" },
   id: 7,
-  fullName: "Springbank 12 Batch 24",
+  name: "12 Batch 24",
 };
 const relatedBottle = {
+  brand: { name: "Springbank" },
   id: 8,
-  fullName: "Springbank 12 Batch 25",
+  name: "12 Batch 25",
 };
 
 describe("flight form membership", () => {

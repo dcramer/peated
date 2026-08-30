@@ -1,5 +1,10 @@
 import type { Bottle } from "@peated/server/types";
 
+import {
+  formatBottleDisplayName,
+  type BottleDisplayNameSource,
+} from "@peated/server/lib/bottleDisplayName";
+
 export type FlightBottleOption = {
   id: number;
   name: string;
@@ -12,11 +17,11 @@ export function getFlightBottleIds(
 }
 
 export function bottleToFlightOption(
-  bottle: Pick<Bottle, "id" | "fullName">,
+  bottle: BottleDisplayNameSource & Pick<Bottle, "id">,
 ): FlightBottleOption {
   return {
     id: bottle.id,
-    name: bottle.fullName,
+    name: formatBottleDisplayName(bottle),
   };
 }
 

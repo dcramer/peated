@@ -1,19 +1,21 @@
 "use client";
 
+import {
+  formatBottleDisplayName,
+  type BottleDisplayNameSource,
+} from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import type { ComponentProps } from "react";
 import SelectField from "./selectField";
 
 type BottleListItem = Outputs["bottles"]["list"]["results"][number];
-export type BottleOption = Pick<BottleListItem, "id" | "fullName"> & {
-  name: string;
-};
+export type BottleOption = Pick<BottleListItem, "id"> & { name: string };
 
 export function formatBottleOptionWithId(
-  bottle: Pick<BottleListItem, "fullName" | "id">,
+  bottle: BottleDisplayNameSource & Pick<BottleListItem, "id">,
 ): string {
-  return `${bottle.fullName} · Bottle ${bottle.id}`;
+  return `${formatBottleDisplayName(bottle)} · Bottle ${bottle.id}`;
 }
 
 export default function BottleField({
@@ -28,8 +30,7 @@ export default function BottleField({
       onQuery={async (query) => {
         const { results } = await orpc.bottles.list.call({ query });
         return results.map((r) => ({
-          name: formatOptionName?.(r) ?? r.fullName,
-          fullName: r.fullName,
+          name: formatOptionName?.(r) ?? formatBottleDisplayName(r),
           id: r.id,
         }));
       }}

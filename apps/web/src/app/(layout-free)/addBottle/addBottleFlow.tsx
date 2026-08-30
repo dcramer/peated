@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
 import BottleResolver, {
@@ -141,7 +142,7 @@ function BottlePanel({
       bottleId={bottle.peatedId}
       imageUrl={previewUrl ?? bottle.imageUrl}
       metadata={getBottleMetadata(bottle)}
-      name={bottle.fullName}
+      name={formatBottleDisplayName(bottle)}
     />
   );
 }
@@ -152,7 +153,7 @@ function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
       bottleId={entry.bottle.peatedId}
       imageUrl={entry.imageUrl ?? entry.bottle.imageUrl}
       metadata={getBottleMetadata(entry.bottle)}
-      name={entry.bottle.fullName}
+      name={formatBottleDisplayName(entry.bottle)}
     />
   );
 }

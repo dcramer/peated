@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   BottleIdentityRow,
   CursorPager,
@@ -5,7 +6,6 @@ import {
   ItemList,
   ItemListItem,
 } from "@peated/web/components/designSystem/components";
-import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -73,7 +73,9 @@ export default async function BottleReleasesPage(props: {
                 href={`/bottles/${bottle.id}`}
                 imageUrl={bottle.imageUrl}
                 metadata={getBottleMetadata(bottle).split(" · ")}
-                name={getBottleExpressionName(bottle)}
+                name={formatBottleDisplayName(bottle, {
+                  includeBrand: false,
+                })}
               />
             </ItemListItem>
           ))}

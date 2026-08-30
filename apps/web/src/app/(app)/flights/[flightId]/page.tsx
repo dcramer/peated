@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   BottleIdentityRow,
   ButtonLink,
@@ -10,7 +11,6 @@ import {
   PageSection,
 } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
@@ -89,7 +89,9 @@ export default async function FlightPage(props: {
                   imageUrl={bottle.imageUrl}
                   isLibrary={isLibrary}
                   metadata={getBottleMetadata(bottle).split(" · ")}
-                  name={getBottleExpressionName(bottle)}
+                  name={formatBottleDisplayName(bottle, {
+                    includeBrand: false,
+                  })}
                 />
               </ItemListItem>
             ))}

@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   ButtonLink,
   LoadingList,
@@ -19,7 +20,6 @@ import {
   type MemberLibraryItem,
 } from "@peated/web/components/designSystem/patterns/memberProfileContent.stylex";
 import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
-import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
@@ -357,7 +357,7 @@ function toLibraryItem(
     id: String(entry.id),
     imageUrl: entry.imageUrl ?? bottle.imageUrl,
     metadata: getLibraryMetadata(bottle),
-    name: getBottleExpressionName(bottle),
+    name: formatBottleDisplayName(bottle, { includeBrand: false }),
     status: entry.status ? capitalize(entry.status) : undefined,
   };
 }

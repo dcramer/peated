@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { ExternalReview, PagingRel } from "@peated/server/types";
 
 import { AdminTextLink } from "./adminContent.stylex";
@@ -34,7 +35,7 @@ export function ExternalReviewRows({
                 <>
                   {" · "}
                   <AdminTextLink href={`/bottles/${review.bottle.id}`}>
-                    {review.bottle.fullName}
+                    {formatBottleDisplayName(review.bottle)}
                   </AdminTextLink>
                 </>
               ) : (

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
@@ -150,7 +151,7 @@ function ListingTask({
           action: "match",
           bottle: bottle.id,
         }),
-      `Assigned ${item.price.name} to ${bottle.fullName}.`,
+      `Assigned ${item.price.name} to ${formatBottleDisplayName(bottle)}.`,
     );
     setSelecting(false);
   }
@@ -279,7 +280,7 @@ function ListingTask({
 
       {item.suggestedBottle ? (
         <AdminSection title="Recommended bottle" tone="accent">
-          <strong>{item.suggestedBottle.fullName}</strong>
+          <strong>{formatBottleDisplayName(item.suggestedBottle)}</strong>
           {" · "}
           <AdminTextLink href={`/bottles/${item.suggestedBottle.id}`}>
             View bottle #{item.suggestedBottle.id}
