@@ -15,9 +15,12 @@ import {
 } from "@peated/web/components/designSystem/patterns/bottleCatalog.stylex";
 import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import useAuth from "@peated/web/hooks/useAuth";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
+
+import { BottleCatalogNavigation } from "./bottleCatalogNavigation.stylex";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -57,7 +60,6 @@ const clearedFilterKeys = [
   "cursor",
   "distiller",
   "entity",
-  "filter",
   "flavorProfile",
   "flight",
   "minScore",
@@ -72,6 +74,7 @@ export function BottleCatalogPageClient({
   initialBottleList: BottleList;
 }) {
   const orpc = useORPC();
+  const { user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -95,6 +98,10 @@ export function BottleCatalogPageClient({
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
   const sort = searchParams.get("sort") ?? DEFAULT_SORT;
+  const filter =
+    searchParams.get("filter") === "following" ? "following" : "all";
+  const allHref = getScopeHref(pathname, searchParams, "all");
+  const followingHref = getScopeHref(pathname, searchParams, "following");
 
   function updateParams(updates: Record<string, string>) {
     const nextParams = new URLSearchParams(searchParams);
@@ -166,9 +173,35 @@ export function BottleCatalogPageClient({
           query={searchParams.get("query") ?? ""}
         />
       }
+      navigation={
+        user ? (
+          <BottleCatalogNavigation
+            allHref={allHref}
+            followingHref={followingHref}
+            scope={filter}
+          />
+        ) : undefined
+      }
       title="Bottles"
     >
       <BottleCatalogList
+        emptyAction={
+          filter === "following" && bottleList.followedEntityCount === 0 ? (
+            <ButtonLink href="/distillers" size="sm" variant="tonal">
+              Browse distillers
+            </ButtonLink>
+          ) : undefined
+        }
+        emptyDescription={
+          filter === "following" && bottleList.followedEntityCount === 0
+            ? "Follow a distiller, brand, or bottler to see its bottles here."
+            : undefined
+        }
+        emptyHeading={
+          filter === "following" && bottleList.followedEntityCount === 0
+            ? "No bottles here yet"
+            : undefined
+        }
         items={items}
         nextHref={getCursorHref(
           pathname,
@@ -189,4 +222,16 @@ export function BottleCatalogPageClient({
       />
     </CatalogPage>
   );
+}
+
+function getScopeHref(
+  pathname: string,
+  searchParams: { toString(): string },
+  filter: "all" | "following",
+) {
+  const nextParams = new URLSearchParams(searchParams.toString());
+  if (filter === "following") nextParams.set("filter", "following");
+  else nextParams.delete("filter");
+  nextParams.delete("cursor");
+  return buildSearchHref(pathname, nextParams);
 }

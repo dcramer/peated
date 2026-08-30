@@ -829,7 +829,7 @@ describe("GET /bottles", () => {
     expect(response.followedEntityCount).toBe(0);
   });
 
-  test("lists known releases from followed distillers and bottlers", async ({
+  test("lists bottles from followed distillers, brands, and bottlers", async ({
     defaults,
     fixtures,
   }) => {
@@ -892,10 +892,11 @@ describe("GET /bottles", () => {
       distillerIds: [distiller.id],
       createdAt: new Date("2025-12-01T00:00:00.000Z"),
     });
-    await fixtures.Bottle({
+    const followedBrandRelease = await fixtures.Bottle({
       name: "Followed Brand Release",
       brandId: followedBrand.id,
       releaseYear: 2026,
+      releaseDate: "2026-06-01",
     });
     await fixtures.Bottle({ name: "Unrelated Release", releaseYear: 2026 });
 
@@ -913,11 +914,12 @@ describe("GET /bottles", () => {
     expect(results.map(({ id }) => id)).toEqual([
       followedBottlerRelease.id,
       exactLaterThisYear.id,
+      followedBrandRelease.id,
       exactEarlierThisYear.id,
       yearOnlyThisYear.id,
       knownLastYear.id,
     ]);
-    expect(followedEntityCount).toBe(2);
+    expect(followedEntityCount).toBe(3);
   });
 
   test("sorts bottles by tastings ascending", async ({ fixtures }) => {

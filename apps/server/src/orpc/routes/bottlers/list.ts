@@ -10,5 +10,8 @@ export default implement(contract).handler(({ input, context, errors }) =>
     badRequest: (message) => {
       throw errors.BAD_REQUEST({ message });
     },
+    unauthorized: () => {
+      throw errors.UNAUTHORIZED();
+    },
   }),
 );

@@ -198,7 +198,10 @@ export function EntityPageFrameClient({
 
   const entity = entityQuery.data;
   const createBottleHref = getEntityBottleCreateHref(entity);
-  const canFollow = entity.kind === "bottler" || entity.kind === "distillery";
+  const canFollow =
+    entity.kind === "brand" ||
+    entity.kind === "bottler" ||
+    entity.kind === "distillery";
   const presentation = getEntityPresentation(entity);
   const currentHref = getEntityCurrentHref(entity, pathname);
 

@@ -1,6 +1,11 @@
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 import { listEntityKind } from "@peated/server/orpc/mock/routes/entityKinds/list";
 
-export default mockOS.brands.list.handler(async ({ input }) =>
-  listEntityKind("brand", input),
+export default mockOS.brands.list.handler(
+  async ({ input, context, errors }) => {
+    if (input.filter === "following" && !context.user) {
+      throw errors.UNAUTHORIZED();
+    }
+    return listEntityKind("brand", input);
+  },
 );

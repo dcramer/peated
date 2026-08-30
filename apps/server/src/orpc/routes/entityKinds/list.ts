@@ -3,6 +3,7 @@ import {
   countries,
   entities,
   entityAliases,
+  entityFollows,
   regions,
   type EntityKind,
   type User,
@@ -24,6 +25,7 @@ type ListEntitiesOptions = {
   badRequest: (message: string) => never;
   currentUser?: User | null;
   input: Input;
+  unauthorized: () => never;
 };
 
 export async function listEntities({
@@ -31,6 +33,7 @@ export async function listEntities({
   currentUser,
   input,
   kind,
+  unauthorized,
 }: ListEntitiesOptions & { kind?: EntityKind }) {
   const { query, cursor, limit } = input;
   const offset = (cursor - 1) * limit;
@@ -39,6 +42,17 @@ export async function listEntities({
   const where: (SQL<unknown> | undefined)[] = [
     kind ? eq(entities.kind, kind) : undefined,
   ];
+
+  if (input.filter === "following") {
+    if (!currentUser) return unauthorized();
+    where.push(
+      sql`EXISTS(
+        SELECT FROM ${entityFollows}
+        WHERE ${entityFollows.entityId} = ${entities.id}
+          AND ${entityFollows.userId} = ${currentUser.id}
+      )`,
+    );
+  }
 
   if (input.owner) {
     where.push(eq(entities.ownerId, input.owner));

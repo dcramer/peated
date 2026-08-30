@@ -11,10 +11,13 @@ type EntityListInput = {
   owner?: number | null;
   country?: string | null;
   region?: string | null;
+  filter: "all" | "following";
   sort: string;
   cursor: number;
   limit: number;
 };
+
+const followedEntityIds = new Set([9201, 9207, 9208]);
 
 export function listEntityKind(kind: EntityKind, input: EntityListInput) {
   return listEntities(input, kind);
@@ -27,6 +30,7 @@ export function listEntities(input: EntityListInput, kind?: EntityKind) {
     .filter(
       (entity) =>
         (kind === undefined || entity.kind === kind) &&
+        (input.filter !== "following" || followedEntityIds.has(entity.id)) &&
         (input.owner == null || entity.ownerId === input.owner) &&
         includesQuery(input.query, entity.name, entity.shortName) &&
         (input.name == null || entity.name === input.name) &&
