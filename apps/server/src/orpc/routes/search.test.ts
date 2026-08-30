@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleTombstones,
+  entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
@@ -274,6 +275,34 @@ describe("GET /search", () => {
     ]);
   });
 
+  test("uses materialized Entity activity to break equal text matches", async ({
+    fixtures,
+  }) => {
+    const lessActive = await fixtures.Entity({
+      name: "Entitytieneedle Alpha",
+      kind: "brand",
+      totalTastings: 1,
+    });
+    const moreActive = await fixtures.Entity({
+      name: "Entitytieneedle Beta",
+      kind: "brand",
+      totalTastings: 5,
+    });
+
+    const data = await routerClient.search({
+      query: "entitytieneedle",
+      scopes: ["brands"],
+      limit: 10,
+    });
+    const group = data.groups[0];
+
+    if (group?.type !== "brands") throw new Error("Expected Brands group");
+    expect(group.results.map(({ id }) => id)).toEqual([
+      moreActive.id,
+      lessActive.id,
+    ]);
+  });
+
   test("returns server-ranked nearest matches for a settled miss", async ({
     fixtures,
   }) => {
@@ -355,6 +384,26 @@ describe("GET /search", () => {
     ]);
     expect(legacySearch.groups).toMatchObject([
       { type: "bottles", total: 0, results: [] },
+    ]);
+  });
+
+  test("searches directly assigned Entity aliases", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({
+      name: "Canonical Entity Name",
+      kind: "brand",
+    });
+    await db.insert(entityAliases).values({
+      entityId: entity.id,
+      name: "Immediate Entity Alias",
+    });
+
+    const data = await routerClient.search({
+      query: "Immediate Entity Alias",
+      scopes: ["brands"],
+    });
+
+    expect(data.groups).toMatchObject([
+      { type: "brands", total: 1, results: [{ id: entity.id }] },
     ]);
   });
 

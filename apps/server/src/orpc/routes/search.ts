@@ -37,6 +37,7 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { RegionSerializer } from "@peated/server/serializers/region";
 import { UserSerializer } from "@peated/server/serializers/user";
+import * as Sentry from "@sentry/node";
 import {
   and,
   asc,
@@ -77,6 +78,8 @@ type SearchRows = {
   nearest: NearestRow[];
 };
 
+type SearchInput = { query: string; scopes: SearchScope[]; limit: number };
+
 function normalizeText(value: string) {
   return value
     .normalize("NFD")
@@ -92,14 +95,10 @@ function escapeLike(value: string) {
 function nameRank(
   names: SQL<unknown>[],
   query: string,
-  aliasChecks: {
-    exact: SQL<unknown>;
-    prefix: SQL<unknown>;
-    word: SQL<unknown>;
-  } | null,
+  exactAliasMatch?: SQL<unknown>,
 ) {
   // Use exact name, name prefix, word prefix, then other matches.
-  // Bottle and Entity queries use rating count and ID to break ties.
+  // Bottle and Entity queries use activity and ID to break ties.
   const normalizedQuery = normalizeText(query);
   const prefix = `${escapeLike(normalizedQuery)}%`;
   const wordPrefix = `% ${escapeLike(normalizedQuery)}%`;
@@ -113,16 +112,10 @@ function nameRank(
   return sql<number>`CASE
     WHEN ${or(
       ...normalizedNames.map((name) => eq(name, normalizedQuery)),
-      aliasChecks?.exact,
+      exactAliasMatch,
     )} THEN 0
-    WHEN ${or(
-      ...normalizedNames.map((name) => like(name, prefix)),
-      aliasChecks?.prefix,
-    )} THEN 1
-    WHEN ${or(
-      ...wordNames.map((name) => like(name, wordPrefix)),
-      aliasChecks?.word,
-    )} THEN 2
+    WHEN ${or(...normalizedNames.map((name) => like(name, prefix)))} THEN 1
+    WHEN ${or(...wordNames.map((name) => like(name, wordPrefix)))} THEN 2
     ELSE 3
   END`;
 }
@@ -159,65 +152,22 @@ function visibleMemberWhere(context: Context) {
   );
 }
 
-function bottleAliasRank(query: string) {
-  const normalizedQuery = normalizeText(query);
-  const prefix = `${escapeLike(normalizedQuery)}%`;
-  const wordPrefix = `% ${escapeLike(normalizedQuery)}%`;
-  const aliasName = sql`LOWER(unaccent(${bottleAliases.name}))`;
-  const wordName = sql`REGEXP_REPLACE(${aliasName}, '[^[:alnum:]]+', ' ', 'g')`;
-  const exists = (condition: SQL<unknown>) => sql`EXISTS(
-    SELECT FROM ${bottleAliases}
-    WHERE ${bottleAliases.bottleId} = ${bottles.id} AND ${condition}
-  )`;
-
-  return {
-    exact: exists(eq(aliasName, normalizedQuery)),
-    prefix: exists(like(aliasName, prefix)),
-    word: exists(like(wordName, wordPrefix)),
-  };
-}
-
-function bottleAliasMatches(query: string) {
-  const textQuery = plainTextSearchQuery(query);
-  const prefixQuery = prefixTextSearchQuery(query);
-  return sql`EXISTS(
-    SELECT FROM ${bottleAliases}
-    WHERE ${bottleAliases.bottleId} = ${bottles.id}
-      AND (
-        to_tsvector('english', unaccent(${bottleAliases.name})) @@ ${textQuery}
-        OR to_tsvector('english', unaccent(${bottleAliases.name})) @@ ${prefixQuery}
-      )
+function exactBottleAliasMatch(query: string) {
+  return sql`${bottles.id} IN (
+    SELECT ${bottleAliases.bottleId}
+    FROM ${bottleAliases}
+    WHERE LOWER(${bottleAliases.name}) = ${query.toLowerCase().trim()}
+      AND ${bottleAliases.ignored} IS NOT TRUE
+      AND ${bottleAliases.bottleId} IS NOT NULL
   )`;
 }
 
-function entityAliasRank(query: string) {
-  const normalizedQuery = normalizeText(query);
-  const prefix = `${escapeLike(normalizedQuery)}%`;
-  const wordPrefix = `% ${escapeLike(normalizedQuery)}%`;
-  const aliasName = sql`LOWER(unaccent(${entityAliases.name}))`;
-  const wordName = sql`REGEXP_REPLACE(${aliasName}, '[^[:alnum:]]+', ' ', 'g')`;
-  const exists = (condition: SQL<unknown>) => sql`EXISTS(
-    SELECT FROM ${entityAliases}
-    WHERE ${entityAliases.entityId} = ${entities.id} AND ${condition}
-  )`;
-
-  return {
-    exact: exists(eq(aliasName, normalizedQuery)),
-    prefix: exists(like(aliasName, prefix)),
-    word: exists(like(wordName, wordPrefix)),
-  };
-}
-
-function entityAliasMatches(query: string) {
-  const textQuery = plainTextSearchQuery(query);
-  const prefixQuery = prefixTextSearchQuery(query);
-  return sql`EXISTS(
-    SELECT FROM ${entityAliases}
-    WHERE ${entityAliases.entityId} = ${entities.id}
-      AND (
-        to_tsvector('english', unaccent(${entityAliases.name})) @@ ${textQuery}
-        OR to_tsvector('english', unaccent(${entityAliases.name})) @@ ${prefixQuery}
-      )
+function exactEntityAliasMatch(query: string) {
+  return sql`${entities.id} IN (
+    SELECT ${entityAliases.entityId}
+    FROM ${entityAliases}
+    WHERE LOWER(${entityAliases.name}) = ${query.toLowerCase().trim()}
+      AND ${entityAliases.entityId} IS NOT NULL
   )`;
 }
 
@@ -230,25 +180,6 @@ function bottleRatingCount() {
     + COALESCE((${bottles.tastingBandCounts}->>'very_good')::integer, 0)
     + COALESCE((${bottles.tastingBandCounts}->>'outstanding')::integer, 0)
     + COALESCE((${bottles.tastingBandCounts}->>'unicorn')::integer, 0)
-  )`;
-}
-
-function entityRatingCount() {
-  return sql<number>`(
-    SELECT COUNT(${tastings.id})
-    FROM ${tastings}
-    INNER JOIN ${bottles} AS rating_bottle
-      ON rating_bottle.id = ${tastings.bottleId}
-    WHERE ${tastings.ratingBand} IS NOT NULL
-      AND (
-        rating_bottle.brand_id = ${entities.id}
-        OR rating_bottle.bottler_id = ${entities.id}
-        OR EXISTS(
-          SELECT FROM bottle_distiller
-          WHERE bottle_distiller.bottle_id = rating_bottle.id
-            AND bottle_distiller.distiller_id = ${entities.id}
-        )
-      )
   )`;
 }
 
@@ -283,27 +214,33 @@ async function searchBottles(
   if (!query) return { total: 0, results: [] };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
+  const aliasMatch = exactBottleAliasMatch(query);
   const where = and(
     activeBottleWhere(),
     or(
       sql`${bottles.searchVector} @@ ${textQuery}`,
       sql`${bottles.searchVector} @@ ${prefixQuery}`,
-      bottleAliasMatches(query),
+      aliasMatch,
     ),
   );
   const rank = nameRank(
     [sql`${bottles.fullName}`, sql`${bottles.name}`],
     query,
-    bottleAliasRank(query),
+    aliasMatch,
   );
-  const total = await countRows(database, bottles, where);
-  const results = await database
-    .select()
+  const rows = await database
+    .select({
+      ...getTableColumns(bottles),
+      searchTotal: sql<number>`COUNT(*) OVER()`,
+    })
     .from(bottles)
     .where(where)
     .limit(limit)
     .orderBy(rank, sql`${bottleRatingCount()} DESC`, asc(bottles.id));
-  return { total, results };
+  return {
+    total: Number(rows[0]?.searchTotal ?? 0),
+    results: rows.map(({ searchTotal: _, ...result }) => result),
+  };
 }
 
 async function searchEntities(
@@ -315,27 +252,33 @@ async function searchEntities(
   if (!query) return { total: 0, results: [] };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
+  const aliasMatch = exactEntityAliasMatch(query);
   const where = and(
     entityScopeWhere(scope),
     or(
       sql`${entities.searchVector} @@ ${textQuery}`,
       sql`${entities.searchVector} @@ ${prefixQuery}`,
-      entityAliasMatches(query),
+      aliasMatch,
     ),
   );
   const rank = nameRank(
     [sql`${entities.name}`, sql`${entities.shortName}`],
     query,
-    entityAliasRank(query),
+    aliasMatch,
   );
-  const total = await countRows(database, entities, where);
-  const results = await database
-    .select()
+  const rows = await database
+    .select({
+      ...getTableColumns(entities),
+      searchTotal: sql<number>`COUNT(*) OVER()`,
+    })
     .from(entities)
     .where(where)
     .limit(limit)
-    .orderBy(rank, sql`${entityRatingCount()} DESC`, asc(entities.id));
-  return { total, results };
+    .orderBy(rank, sql`${entities.totalTastings} DESC`, asc(entities.id));
+  return {
+    total: Number(rows[0]?.searchTotal ?? 0),
+    results: rows.map(({ searchTotal: _, ...result }) => result),
+  };
 }
 
 async function searchRegions(
@@ -347,15 +290,20 @@ async function searchRegions(
   const normalizedQuery = normalizeText(query);
   const name = sql`LOWER(unaccent(${regions.name}))`;
   const where = like(name, `%${escapeLike(normalizedQuery)}%`);
-  const rank = nameRank([sql`${regions.name}`], query, null);
-  const total = await countRows(database, regions, where);
-  const results = await database
-    .select()
+  const rank = nameRank([sql`${regions.name}`], query);
+  const rows = await database
+    .select({
+      ...getTableColumns(regions),
+      searchTotal: sql<number>`COUNT(*) OVER()`,
+    })
     .from(regions)
     .where(where)
     .limit(limit)
     .orderBy(rank, sql`${regions.totalBottles} DESC`, asc(regions.id));
-  return { total, results };
+  return {
+    total: Number(rows[0]?.searchTotal ?? 0),
+    results: rows.map(({ searchTotal: _, ...result }) => result),
+  };
 }
 
 async function searchMembers(
@@ -373,15 +321,15 @@ async function searchMembers(
     visibleMemberWhere(context),
     like(username, `%${escapeLike(normalizedQuery)}%`),
   );
-  const rank = nameRank([sql`${users.username}`], normalizedQuery, null);
+  const rank = nameRank([sql`${users.username}`], normalizedQuery);
   const publicTastingCount = sql<number>`COUNT(${tastings.id}) FILTER (
     WHERE ${users.private} = FALSE
   )`;
-  const total = await countRows(database, users, where);
   const rows = await database
     .select({
       member: getTableColumns(users),
       totalTastings: publicTastingCount,
+      searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(users)
     .leftJoin(tastings, eq(tastings.createdById, users.id))
@@ -390,7 +338,7 @@ async function searchMembers(
     .limit(limit)
     .orderBy(rank, sql`${publicTastingCount} DESC`, asc(users.id));
   return {
-    total,
+    total: Number(rows[0]?.searchTotal ?? 0),
     results: rows.map((row) => ({
       member: row.member,
       totalTastings: Number(row.totalTastings),
@@ -511,6 +459,27 @@ async function searchGroup(
   }
 }
 
+function traceSearchGroup(
+  database: AnyDatabase,
+  context: Context,
+  scope: SearchScope,
+  query: string,
+  limit: number,
+  fallback: boolean,
+) {
+  return Sentry.startSpan(
+    {
+      name: "search.group",
+      op: "function",
+      attributes: {
+        "search.scope": scope,
+        "search.fallback": fallback,
+      },
+    },
+    () => searchGroup(database, context, scope, query, limit),
+  );
+}
+
 function levenshtein(left: string, right: string) {
   const previous = [...Array(right.length + 1).keys()];
   for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
@@ -547,7 +516,9 @@ async function findNearest(
   const prefix = normalizedQuery.slice(0, Math.min(3, normalizedQuery.length));
   const groups: GroupRows[] = [];
   for (const scope of scopes) {
-    groups.push(await searchGroup(database, context, scope, prefix, 10));
+    groups.push(
+      await traceSearchGroup(database, context, scope, prefix, 10, true),
+    );
   }
 
   const nearest: NearestRow[] = [];
@@ -638,7 +609,7 @@ async function findNearest(
 }
 
 async function readSearchRows(
-  input: { query: string; scopes: SearchScope[]; limit: number },
+  input: SearchInput,
   context: Context,
 ): Promise<SearchRows> {
   const scopes = SEARCH_SCOPE_LIST.filter(
@@ -647,8 +618,18 @@ async function readSearchRows(
   );
   return db.transaction(
     async (tx) => {
-      const scopeTotals = await getScopeTotals(tx, context);
-      const exact = await findExact(tx, input.query, scopes);
+      const scopeTotals = await Sentry.startSpan(
+        {
+          name: "search.scope_totals",
+          op: "function",
+          attributes: { "search.authenticated": !!context.user },
+        },
+        () => getScopeTotals(tx, context),
+      );
+      const exact = await Sentry.startSpan(
+        { name: "search.resolve_exact", op: "function" },
+        () => findExact(tx, input.query, scopes),
+      );
       if (parsePeatedId(input.query)) {
         return {
           query: input.query,
@@ -662,7 +643,14 @@ async function readSearchRows(
       const groups: GroupRows[] = [];
       for (const scope of scopes) {
         groups.push(
-          await searchGroup(tx, context, scope, input.query, input.limit),
+          await traceSearchGroup(
+            tx,
+            context,
+            scope,
+            input.query,
+            input.limit,
+            false,
+          ),
         );
       }
       const matchTotal = groups.reduce(
@@ -671,7 +659,10 @@ async function readSearchRows(
       );
       const nearest =
         input.query && matchTotal === 0
-          ? await findNearest(tx, context, scopes, input.query)
+          ? await Sentry.startSpan(
+              { name: "search.nearest", op: "function" },
+              () => findNearest(tx, context, scopes, input.query),
+            )
           : [];
       return {
         query: input.query,
@@ -765,11 +756,7 @@ async function serializeNearest(row: NearestRow, context: Context) {
   }
 }
 
-async function buildSearchResponse(
-  input: { query: string; scopes: SearchScope[]; limit: number },
-  context: Context,
-) {
-  const rows = await readSearchRows(input, context);
+async function serializeSearchRows(rows: SearchRows, context: Context) {
   const groups = [];
   for (const group of rows.groups) {
     groups.push(await serializeGroup(group, context));
@@ -799,7 +786,65 @@ async function buildSearchResponse(
   });
 }
 
+async function buildSearchResponse(input: SearchInput, context: Context) {
+  const rows = await Sentry.startSpan(
+    { name: "search.read", op: "function" },
+    () => readSearchRows(input, context),
+  );
+  return Sentry.startSpan({ name: "search.serialize", op: "function" }, () =>
+    serializeSearchRows(rows, context),
+  );
+}
+
+function searchQueryClass(query: string) {
+  const normalized = query.trim();
+  if (!normalized) return "empty";
+  if (parsePeatedId(normalized)) return "peated_id";
+  if (normalized.startsWith("@")) return "member_handle";
+  return normalized.split(/\s+/).length > 1 ? "multi_token" : "single_token";
+}
+
+async function executeSearch(input: SearchInput, context: Context) {
+  const normalized = input.query.trim();
+  return Sentry.startSpan(
+    {
+      name: "search.execute",
+      op: "function",
+      attributes: {
+        "search.query.class": searchQueryClass(input.query),
+        "search.query.length": normalized.length,
+        "search.query.token_count": normalized
+          ? normalized.split(/\s+/).length
+          : 0,
+        "search.scope_count": input.scopes.length,
+        "search.limit": input.limit,
+        "search.authenticated": !!context.user,
+      },
+    },
+    async (span) => {
+      const response = await buildSearchResponse(input, context);
+      const resultCount = response.groups.reduce(
+        (total, group) => total + group.results.length,
+        0,
+      );
+      span.setAttributes({
+        "search.outcome": response.exact
+          ? "exact"
+          : resultCount
+            ? "results"
+            : response.nearest.length
+              ? "nearest"
+              : "empty",
+        "search.group_count": response.groups.length,
+        "search.result_count": resultCount,
+        "search.nearest_count": response.nearest.length,
+      });
+      return response;
+    },
+  );
+}
+
 // Recent lookups stay in browser storage. This API does not store history.
 export default implement(searchContract).handler(({ input, context }) =>
-  buildSearchResponse(input, context),
+  executeSearch(input, context),
 );
