@@ -74,6 +74,16 @@
 - For production API work, use `https://api.peated.com`, not
   `https://peated.com`.
 
+## Sentry Operations
+
+- Peated uses the `peated` Sentry organization and the `peated` project at
+  `https://peated.sentry.io`.
+- Use [Sentry CLI](https://cli.sentry.dev) (`sentry`) to query production
+  issues, events, traces, spans, and logs. Let the CLI detect the target first.
+  Use `peated/peated` only if detection fails or selects the wrong project.
+- For agent-readable output, use `--json`, select only the required fields, and
+  set a small `--limit`. Full event and request data can contain sensitive data.
+
 ## Where Rules Live
 
 Read the relevant policy and owning feature documentation before changing code
