@@ -49,6 +49,7 @@ export type SearchBoxProps = Pick<
   placement?: "database" | "overlay" | "page";
   query: string;
   resultCount?: number;
+  resultQuery?: string;
   scope: string;
   scopeFacets?: readonly ScopedSearchOption[];
   scopes: readonly ScopedSearchOption[];
@@ -75,6 +76,7 @@ export function SearchBox({
   placement = "overlay",
   query,
   resultCount,
+  resultQuery = query,
   scope,
   scopeFacets,
   scopes,
@@ -295,10 +297,12 @@ export function SearchBox({
                   </FilterPanel>
                 </div>
               ) : null}
-              <p aria-live="polite" {...stylex.props(styles.databaseCount)}>
-                {(resultCount ?? 0).toLocaleString("en-US")}{" "}
-                {resultCount === 1 ? "result" : "results"}
-              </p>
+              {status === "ready" && resultCount !== undefined ? (
+                <p aria-live="polite" {...stylex.props(styles.databaseCount)}>
+                  {resultCount.toLocaleString("en-US")}{" "}
+                  {resultCount === 1 ? "result" : "results"}
+                </p>
+              ) : null}
               {expanded ? (
                 <SearchResults
                   activeId={activeId}
@@ -310,7 +314,7 @@ export function SearchBox({
                   onRetry={onRetry}
                   optionIdPrefix={panelId}
                   panelId={panelId}
-                  query={query}
+                  query={resultQuery}
                   scroll={false}
                   status={status}
                   statusText={statusText}
@@ -364,7 +368,7 @@ export function SearchBox({
               onRetry={onRetry}
               optionIdPrefix={panelId}
               panelId={panelId}
-              query={query}
+              query={resultQuery}
               scroll={placement === "overlay"}
               status={status}
               statusText={statusText}
