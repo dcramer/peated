@@ -2,6 +2,7 @@
 
 import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { ScraperParsingEditor } from "@peated/web/components/admin/scraperParsingEditor.stylex";
+import { getSetupAfterLatestVersion } from "@peated/web/components/admin/scraperParsingStatus";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
@@ -19,11 +20,11 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
     refetchInterval: ({ state }) => {
       const current = state.data?.[0];
       if (!current) return false;
+      const setup = getSetupAfterLatestVersion(current);
       if (!current.revisions.length) {
-        return current.setup?.status === "failed" ? false : 2_000;
+        return setup?.status === "failed" ? false : 2_000;
       }
-      return current.setup?.status === "queued" ||
-        current.setup?.status === "running"
+      return setup?.status === "queued" || setup?.status === "running"
         ? 2_000
         : false;
     },

@@ -3,9 +3,9 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { ScrapeRulesSchema } from "@peated/server/schemas";
 import * as stylex from "@stylexjs/stylex";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getFormErrorMessage } from "../../lib/formHelpers";
 import { useORPC } from "../../lib/orpc/context";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
@@ -22,41 +22,11 @@ import {
   AdminTextField,
 } from "./adminForm.stylex";
 import { AdminEmptyActivity } from "./adminUtility.stylex";
-import issueText from "./scraperIssueText";
+import { getSetupAfterLatestVersion } from "./scraperParsingStatus";
+import { ScraperPreviewResult } from "./scraperPreviewResult.stylex";
 
 type Source = Outputs["externalSites"]["scrapeSources"]["list"][number];
 type Revision = Source["revisions"][number];
-
-function defaultRules(kind: Source["kind"]) {
-  return kind === "review"
-    ? {
-        kind: "review",
-        list: {
-          detailLink: { selector: "a.review", attribute: "href" },
-          maxItems: 25,
-        },
-        detail: {
-          title: { selector: "h1" },
-          reviewItem: "article.review",
-          name: { selector: "h2" },
-          reviewerName: { selector: ".author" },
-          reviewText: { selector: ".review-body" },
-        },
-      }
-    : {
-        kind: "price",
-        list: {
-          detailLink: { selector: "a.product", attribute: "href" },
-          maxItems: 25,
-        },
-        detail: {
-          name: { selector: "h1" },
-          price: { selector: ".price" },
-          currency: "usd",
-          volume: { selector: ".volume" },
-        },
-      };
-}
 
 function revisionTone(status: Revision["previewStatus"]) {
   if (status === "passed") return "success" as const;
@@ -70,71 +40,6 @@ function revisionLabel(status: Revision["previewStatus"]) {
   return "Not tested";
 }
 
-function TestResult({ revision }: { revision: Revision }) {
-  const { issues, pages } = revision.previewResult;
-
-  return (
-    <div {...stylex.props(styles.results)}>
-      {issues.length > 0 ? (
-        <ul {...stylex.props(styles.issueList)}>
-          {issues.map((issue, index) => (
-            <li key={`${issue.field}-${index}`}>{issueText(issue.field)}</li>
-          ))}
-        </ul>
-      ) : null}
-      <div {...stylex.props(styles.pageList)}>
-        {pages.map((page) => (
-          <article key={page.url} {...stylex.props(styles.resultPage)}>
-            <a
-              href={page.url}
-              rel="noreferrer"
-              target="_blank"
-              {...stylex.props(styles.resultLink)}
-            >
-              {page.url}
-            </a>
-            {page.kind === "review" ? (
-              <div {...stylex.props(styles.resultBody)}>
-                <strong {...stylex.props(styles.resultTitle)}>
-                  {page.title}
-                </strong>
-                <span {...stylex.props(styles.muted)}>
-                  {page.reviews.length} review
-                  {page.reviews.length === 1 ? "" : "s"}
-                </span>
-                <ul {...stylex.props(styles.itemList)}>
-                  {page.reviews.map((review, index) => (
-                    <li key={`${review.name}-${index}`}>
-                      {review.name}
-                      {review.reviewerName ? ` · ${review.reviewerName}` : ""}
-                      {review.nativeScore !== null
-                        ? ` · score ${review.nativeScore.display}`
-                        : ""}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <ul {...stylex.props(styles.itemList)}>
-                {page.products.map((product, index) => (
-                  <li key={`${product.url}-${index}`}>
-                    {product.name} ·{" "}
-                    {(product.price / 100).toLocaleString(undefined, {
-                      style: "currency",
-                      currency: product.currency,
-                    })}{" "}
-                    · {product.volume} ml
-                  </li>
-                ))}
-              </ul>
-            )}
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ScraperParsingEditor({
   source,
   refresh,
@@ -144,10 +49,14 @@ export function ScraperParsingEditor({
 }) {
   const orpc = useORPC();
   const [error, setError] = useState<string>();
+  const [activePreview, setActivePreview] = useState<{
+    revisionId: number;
+    runId: number;
+  }>();
   const latest = source.revisions[0];
   const [listUrl, setListUrl] = useState(latest?.listUrl ?? source.listUrl);
   const [rulesText, setRulesText] = useState(() =>
-    JSON.stringify(latest?.rules ?? defaultRules(source.kind), null, 2),
+    latest ? JSON.stringify(latest.rules, null, 2) : "",
   );
   const createRevision = useMutation(
     orpc.externalSites.scrapeSources.createRevision.mutationOptions(),
@@ -155,6 +64,21 @@ export function ScraperParsingEditor({
   const preview = useMutation(
     orpc.externalSites.scrapeSources.preview.mutationOptions(),
   );
+  const previewRuns = useQuery({
+    ...orpc.externalSites.runs.queryOptions({
+      input: { site: source.site.type, cursor: 1, limit: 20 },
+    }),
+    enabled: activePreview !== undefined,
+    refetchInterval: ({ state }) => {
+      if (!activePreview) return false;
+      const run = state.data?.results.find(
+        (item) => item.id === activePreview.runId,
+      );
+      return !run || run.status === "queued" || run.status === "running"
+        ? 2_000
+        : false;
+    },
+  });
   const activate = useMutation(
     orpc.externalSites.scrapeSources.activate.mutationOptions(),
   );
@@ -167,28 +91,74 @@ export function ScraperParsingEditor({
   const busy =
     createRevision.isPending ||
     preview.isPending ||
+    activePreview !== undefined ||
     activate.isPending ||
     pause.isPending ||
     suggest.isPending;
-  const activeRevision = useMemo(
-    () =>
-      source.revisions.find(
-        (revision) => revision.id === source.activeRevisionId,
-      ),
-    [source],
+  const activeRevision = source.revisions.find(
+    (revision) => revision.id === source.activeRevisionId,
   );
-  const setupInProgress =
-    source.setup?.status === "queued" || source.setup?.status === "running";
+  const setup = getSetupAfterLatestVersion(source);
   const canSuggest =
-    !setupInProgress && (!latest || latest.previewStatus === "failed");
+    (!setup || setup.status === "failed") &&
+    (!latest || latest.previewStatus === "failed");
   const setupSteps = getSetupSteps(source);
   const setupDescription = getSetupDescription(source);
+  const previewRevisionId =
+    activePreview?.revisionId ??
+    (preview.isPending ? preview.variables?.revisionId : undefined);
+
+  useEffect(() => {
+    if (!activePreview) return;
+    if (previewRuns.error && !previewRuns.isFetching) {
+      // Preview runs in the worker. Stop waiting if its status cannot be read.
+      // oxlint-disable-next-line react/set-state-in-effect
+      setError(getFormErrorMessage(previewRuns.error));
+      setActivePreview(undefined);
+      return;
+    }
+    const run = previewRuns.data?.results.find(
+      (item) => item.id === activePreview.runId,
+    );
+    if (!run || run.status === "queued" || run.status === "running") return;
+
+    if (run.status === "failed") {
+      setError(run.error ?? "Preview failed.");
+    }
+    setActivePreview(undefined);
+    void (async () => {
+      try {
+        await refresh();
+      } catch (error) {
+        setError(getFormErrorMessage(error));
+      }
+    })();
+  }, [
+    activePreview,
+    previewRuns.data,
+    previewRuns.error,
+    previewRuns.isFetching,
+    refresh,
+  ]);
 
   async function runAndRefresh(callback: () => Promise<void>) {
     setError(undefined);
     try {
       await callback();
       await refresh();
+    } catch (err) {
+      setError(getFormErrorMessage(err));
+    }
+  }
+
+  async function startPreview(revisionId: number) {
+    setError(undefined);
+    try {
+      const run = await preview.mutateAsync({
+        id: source.id,
+        revisionId,
+      });
+      setActivePreview({ revisionId, runId: run.id });
     } catch (err) {
       setError(getFormErrorMessage(err));
     }
@@ -213,7 +183,7 @@ export function ScraperParsingEditor({
             >
               {latest
                 ? "Ask AI to repair"
-                : source.setup
+                : setup
                   ? "Retry AI setup"
                   : "Start AI setup"}
             </AdminButton>
@@ -228,83 +198,94 @@ export function ScraperParsingEditor({
             </li>
           ))}
         </ol>
-        {source.setup?.error ? (
-          <p {...stylex.props(styles.setupError)}>{source.setup.error}</p>
+        {setup?.error ? (
+          <p {...stylex.props(styles.setupError)}>{setup.error}</p>
         ) : null}
       </AdminSection>
-      <AdminSection
-        title={`How Peated reads ${source.kind === "review" ? "reviews" : "store prices"}`}
-        description={
-          activeRevision
-            ? `Revision ${activeRevision.revision} is active.`
-            : "No revision is active. Collection is paused."
-        }
-        action={
-          <AdminActions>
-            <AdminButton onClick={() => void refresh()} disabled={busy}>
-              Refresh
-            </AdminButton>
-            {source.enabled ? (
-              <AdminButton
-                color="danger"
-                disabled={busy}
-                onClick={() =>
-                  void runAndRefresh(async () => {
-                    await pause.mutateAsync({ id: source.id });
-                  })
-                }
-              >
-                Pause collection
+      {latest ? (
+        <AdminSection
+          title={`How Peated reads ${source.kind === "review" ? "reviews" : "store prices"}`}
+          description={
+            activeRevision && source.enabled
+              ? `Version ${activeRevision.revision} is active.`
+              : activeRevision
+                ? `Collection is paused. Version ${activeRevision.revision} is ready to resume.`
+                : "Collection is paused until you activate a version."
+          }
+          action={
+            <AdminActions>
+              <AdminButton onClick={() => void refresh()} disabled={busy}>
+                Refresh
               </AdminButton>
-            ) : null}
-          </AdminActions>
-        }
-      >
-        <div {...stylex.props(styles.formStack)}>
-          <AdminTextField
-            id="list-url"
-            label="List page"
-            type="url"
-            value={listUrl}
-            onChange={(event) => setListUrl(event.target.value)}
-            required
-          />
-          <AdminTextareaField
-            id="parsing-rules"
-            label="Parsing rules"
-            helpText="Advanced: edit these rules only when the test reads a page incorrectly."
-            format="data"
-            rows={18}
-            value={rulesText}
-            onChange={(event) => setRulesText(event.target.value)}
-            spellCheck={false}
-            required
-          />
-          <AdminActions>
-            <AdminButton
-              color="highlight"
-              disabled={busy}
-              onClick={() =>
-                void runAndRefresh(async () => {
-                  await createRevision.mutateAsync({
-                    id: source.id,
-                    listUrl,
-                    rules: ScrapeRulesSchema.parse(JSON.parse(rulesText)),
-                  });
-                })
-              }
-            >
-              Save as new revision
-            </AdminButton>
-          </AdminActions>
-        </div>
-      </AdminSection>
+              {source.enabled ? (
+                <AdminButton
+                  color="danger"
+                  disabled={busy}
+                  onClick={() =>
+                    void runAndRefresh(async () => {
+                      await pause.mutateAsync({ id: source.id });
+                    })
+                  }
+                >
+                  Pause collection
+                </AdminButton>
+              ) : null}
+            </AdminActions>
+          }
+        >
+          <AdminDetails summary="Edit site setup (advanced)">
+            <div {...stylex.props(styles.formStack)}>
+              <AdminTextField
+                id="list-url"
+                label="List page"
+                type="url"
+                value={listUrl}
+                onChange={(event) => setListUrl(event.target.value)}
+                required
+              />
+              <AdminTextareaField
+                id="parsing-rules"
+                label="Parsing rules"
+                helpText="Edit these rules only when the test reads a page incorrectly."
+                format="data"
+                rows={18}
+                value={rulesText}
+                onChange={(event) => setRulesText(event.target.value)}
+                spellCheck={false}
+                required
+              />
+              <AdminActions>
+                <AdminButton
+                  color="highlight"
+                  disabled={busy}
+                  onClick={() =>
+                    void runAndRefresh(async () => {
+                      await createRevision.mutateAsync({
+                        id: source.id,
+                        listUrl,
+                        rules: ScrapeRulesSchema.parse(JSON.parse(rulesText)),
+                      });
+                    })
+                  }
+                >
+                  Save as new version
+                </AdminButton>
+              </AdminActions>
+            </div>
+          </AdminDetails>
+        </AdminSection>
+      ) : null}
 
-      <AdminSection title="Revision history">
+      <AdminSection title="Versions">
         {source.revisions.length === 0 ? (
           <AdminEmptyActivity>
-            AI setup is running. Generated rules will appear here. Use Retry AI
-            setup if the run failed.
+            {setup?.status === "queued" || setup?.status === "running"
+              ? "AI setup is running. The first version will appear here."
+              : setup?.status === "succeeded"
+                ? "The first version is loading."
+                : setup?.status === "failed"
+                  ? "No version was created. Retry AI setup after you review the error."
+                  : "Start AI setup to create the first version."}
           </AdminEmptyActivity>
         ) : (
           <div {...stylex.props(styles.revisionList)}>
@@ -314,9 +295,11 @@ export function ScraperParsingEditor({
                 summary={
                   <span {...stylex.props(styles.revisionSummary)}>
                     <span>
-                      Revision {revision.revision}
+                      Version {revision.revision}
                       {revision.id === source.activeRevisionId
-                        ? " · Active"
+                        ? source.enabled
+                          ? " · Active"
+                          : " · Paused"
                         : ""}
                     </span>
                     <AdminStatus tone={revisionTone(revision.previewStatus)}>
@@ -334,20 +317,21 @@ export function ScraperParsingEditor({
                   <AdminActions>
                     <AdminButton
                       disabled={busy}
-                      onClick={() =>
-                        void runAndRefresh(async () => {
-                          await preview.mutateAsync({
-                            id: source.id,
-                            revisionId: revision.id,
-                          });
-                        })
-                      }
+                      loading={previewRevisionId === revision.id}
+                      onClick={() => void startPreview(revision.id)}
                     >
-                      Test revision
+                      {previewRevisionId === revision.id
+                        ? "Testing pages…"
+                        : "Test version"}
                     </AdminButton>
                     <AdminButton
                       color="highlight"
-                      disabled={busy || revision.previewStatus !== "passed"}
+                      disabled={
+                        busy ||
+                        revision.previewStatus !== "passed" ||
+                        (source.enabled &&
+                          revision.id === source.activeRevisionId)
+                      }
                       onClick={() =>
                         void runAndRefresh(async () => {
                           await activate.mutateAsync({
@@ -358,14 +342,22 @@ export function ScraperParsingEditor({
                       }
                     >
                       {revision.id === source.activeRevisionId
-                        ? "Active"
+                        ? source.enabled
+                          ? "Active"
+                          : "Resume collection"
                         : revision.revision < (activeRevision?.revision ?? 0)
                           ? "Roll back"
                           : "Activate"}
                     </AdminButton>
                   </AdminActions>
+                  {previewRevisionId === revision.id ? (
+                    <p {...stylex.props(styles.previewStatus)} role="status">
+                      The test is running. Results will appear here when it
+                      finishes.
+                    </p>
+                  ) : null}
                   {revision.previewStatus !== "pending" ? (
-                    <TestResult revision={revision} />
+                    <ScraperPreviewResult result={revision.previewResult} />
                   ) : null}
                 </div>
               </AdminDetails>
@@ -379,7 +371,7 @@ export function ScraperParsingEditor({
 
 function getSetupSteps(source: Source) {
   const latest = source.revisions[0];
-  const setupStatus = source.setup?.status;
+  const setupStatus = getSetupAfterLatestVersion(source)?.status;
   const setupComplete =
     Boolean(latest) && (!setupStatus || setupStatus === "succeeded");
 
@@ -420,17 +412,19 @@ function getSetupSteps(source: Source) {
     },
     {
       name: "Activate",
-      status: source.activeRevisionId ? "Active" : "Waiting",
-      tone: source.activeRevisionId
-        ? ("success" as const)
-        : ("neutral" as const),
+      status: source.enabled
+        ? "Active"
+        : source.activeRevisionId
+          ? "Paused"
+          : "Waiting",
+      tone: source.enabled ? ("success" as const) : ("neutral" as const),
     },
   ];
 }
 
 function getSetupDescription(source: Source) {
   const hasRevision = source.revisions.length > 0;
-  const setup = source.setup;
+  const setup = getSetupAfterLatestVersion(source);
 
   if (setup?.status === "running") {
     return hasRevision
@@ -446,9 +440,19 @@ function getSetupDescription(source: Source) {
   if (setup?.status === "succeeded") {
     return hasRevision
       ? "The generated setup is ready to test."
-      : "The generated revision is loading.";
+      : "The generated version is loading.";
   }
-  return "Start AI setup to create the first revision.";
+  const latest = source.revisions[0];
+  if (latest?.previewStatus === "failed") {
+    return "The latest version needs repair.";
+  }
+  if (latest?.previewStatus === "passed") {
+    return source.enabled
+      ? "Setup is complete."
+      : "The tested version is ready to activate.";
+  }
+  if (latest) return "The generated setup is ready to test.";
+  return "Start AI setup to create the first version.";
 }
 
 const styles = stylex.create({
@@ -514,52 +518,11 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x4,
   },
-  results: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x4,
-    padding: space.x4,
-    backgroundColor: colors.inset,
-    color: colors.ink,
+  previewStatus: {
+    margin: 0,
+    color: colors.inkMuted,
     fontFamily: fonts.reading,
     fontSize: "13px",
-  },
-  issueList: {
-    margin: 0,
-    paddingLeft: space.x6,
-    color: colors.accentDeep,
-  },
-  pageList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x4,
-  },
-  resultPage: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x2,
-    paddingTop: space.x3,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-  },
-  resultLink: {
-    color: colors.accentDeep,
-    overflowWrap: "anywhere",
-  },
-  resultBody: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x2,
-  },
-  resultTitle: { color: colors.ink },
-  itemList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x1,
-    margin: 0,
-    paddingLeft: space.x6,
   },
   muted: { color: colors.inkMuted },
 });
