@@ -32,6 +32,7 @@ import {
 import {
   getEntityClassification,
   getEntityCurrentHref,
+  getEntityOwnerLabel,
   getEntityPresentation,
   getEntityTabs,
   type Entity,
@@ -232,7 +233,7 @@ export function EntityPageFrameClient({
               href={getEntityUrl(owner)}
               {...stylex.props(styles.ownerLink)}
             >
-              Owned by {owner.shortName || owner.name}
+              {getEntityOwnerLabel(entity, owner)}
             </AppLink>
           ) : null}
           {entity.description ? (

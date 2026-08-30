@@ -127,7 +127,13 @@ current owner and the Entities directly owned by an owner.
 #### Scenario: Distillery owner
 
 - **WHEN** Lagavulin points to Diageo as its owner
-- **THEN** Lagavulin shows “Owned by Diageo” and Diageo lists Lagavulin
+- **THEN** Lagavulin shows “Part of Diageo” and Diageo lists Lagavulin
+
+#### Scenario: Brand owner
+
+- **WHEN** Johnnie Walker points to Diageo as its owner
+- **THEN** Johnnie Walker shows “A Diageo brand” and Diageo lists Johnnie
+  Walker
 
 #### Scenario: Owner chain
 

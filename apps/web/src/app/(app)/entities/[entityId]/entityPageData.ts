@@ -63,6 +63,17 @@ export function getEntityClassification(entity: EntityClassificationSource) {
     .join(" · ");
 }
 
+export function getEntityOwnerLabel(
+  entity: Pick<Entity, "kind">,
+  owner: Pick<Entity, "name" | "shortName">,
+) {
+  const ownerName = owner.shortName || owner.name;
+
+  return entity.kind === "brand"
+    ? `A ${ownerName} brand`
+    : `Part of ${ownerName}`;
+}
+
 export function entityHasBottleCatalog(entity: Pick<Entity, "kind">) {
   return (
     entity.kind === "brand" ||

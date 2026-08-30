@@ -37,7 +37,7 @@ const meta = {
         variant="page"
       />
     ),
-    parent: "Owned by Diageo",
+    parent: "Part of Diageo",
     specs: [
       { label: "Founded", value: 1816 },
       { label: "Country", value: "Scotland" },
