@@ -10,6 +10,7 @@ import { PageSection } from "@peated/web/components/designSystem/patterns/pageLa
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { getEntityPresentation, type Entity } from "./entityPageData";
+import { getEntitySiblings } from "./entitySiblingData";
 
 type EntityList = Outputs["entities"]["list"];
 
@@ -53,10 +54,8 @@ export function EntitySiblingOverview({
     );
   }
 
-  const siblings = siblingList?.results
-    .filter((sibling) => sibling.id !== entity.id)
-    .slice(0, 4);
-  if (!siblings?.length) return null;
+  const siblings = getEntitySiblings(entity.id, siblingList);
+  if (!siblings.length) return null;
 
   return (
     <PageSection heading={heading}>

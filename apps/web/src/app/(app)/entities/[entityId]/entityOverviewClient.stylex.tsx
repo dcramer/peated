@@ -14,6 +14,7 @@ import { EntityDetails, hasEntityDetails } from "./entityDetails.stylex";
 import { EntityMap } from "./entityMap.stylex";
 import { entityHasBottleCatalog, type Entity } from "./entityPageData";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
+import { shouldShowEntitySiblingOverview } from "./entitySiblingData";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
 type BottleList = Outputs["bottles"]["list"];
@@ -86,10 +87,15 @@ export function EntityOverviewClient({
   }
 
   const entity = entityQuery.data;
+  const hasSiblingOverview = shouldShowEntitySiblingOverview({
+    entityId: entity.id,
+    error: Boolean(siblingListQuery.error),
+    ownerId: entity.ownerId,
+    pending: siblingListQuery.isPending,
+    siblingList: siblingListQuery.data,
+  });
   const hasRail =
-    hasEntityDetails(entity) ||
-    Boolean(entity.location) ||
-    Boolean(entity.ownerId);
+    hasEntityDetails(entity) || Boolean(entity.location) || hasSiblingOverview;
 
   return (
     <div
