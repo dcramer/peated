@@ -242,7 +242,7 @@ export function PhotoMatchCreateState({
             <PhotoPreview
               metadata="Compare this photo with the record below"
               src={previewUrl}
-              title="Your label photo"
+              title="Label photo"
             />
           ) : null}
           <SelectedBottleSummary
@@ -296,9 +296,9 @@ export function PhotoMatchCreateState({
       >
         {previewUrl ? (
           <PhotoPreview
-            metadata="We used this label to fill the details below"
+            metadata="Details read from this photo"
             src={previewUrl}
-            title={proposedName ?? "Your label photo"}
+            title={proposedName ?? "Label photo"}
           />
         ) : null}
         <LabelFacts result={result} />
