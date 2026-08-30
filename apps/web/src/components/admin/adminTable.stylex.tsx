@@ -21,6 +21,7 @@ import { AdminPager } from "./adminUtility.stylex";
 
 export type AdminTableColumn<Item extends object> = {
   align?: "center" | "default" | "left" | "right";
+  fill?: boolean;
   hidden?: boolean;
   name: string;
   sort?: string;
@@ -186,6 +187,7 @@ export function AdminTableContent<
                         {...stylex.props(
                           styles.cell,
                           alignStyles[align],
+                          column.fill && styles.fill,
                           index > 0 && styles.secondary,
                         )}
                       >
@@ -343,6 +345,7 @@ const styles = stylex.create({
     lineHeight: 1.4,
     verticalAlign: "middle",
   },
+  fill: { width: "100%", maxWidth: 0 },
   cellContent: {},
   secondary: { "@media (max-width: 639px)": { display: "none" } },
   groupRow: {

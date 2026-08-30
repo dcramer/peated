@@ -9,6 +9,7 @@ export type TextLinkProps = Omit<
 > & {
   href: string;
   size?: "inherit" | "sm";
+  truncate?: boolean;
 };
 
 /** Uses the shared inline-link interaction treatment. */
@@ -16,15 +17,24 @@ export function TextLink({
   children,
   href,
   size = "sm",
+  truncate = false,
   ...props
 }: TextLinkProps) {
   return (
     <AppLink
       href={href}
       {...props}
-      {...stylex.props(styles.link, size === "sm" && styles.small)}
+      {...stylex.props(
+        styles.link,
+        size === "sm" && styles.small,
+        truncate && styles.truncate,
+      )}
     >
-      {children}
+      {truncate ? (
+        <span {...stylex.props(styles.truncateContent)}>{children}</span>
+      ) : (
+        children
+      )}
     </AppLink>
   );
 }
@@ -57,5 +67,16 @@ const styles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "13px",
     lineHeight: 1.3,
+  },
+  truncate: {
+    minWidth: 0,
+    maxWidth: "100%",
+  },
+  truncateContent: {
+    minWidth: 0,
+    maxWidth: "100%",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
 });
