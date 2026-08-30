@@ -35,7 +35,7 @@ const robotsLabels = {
 } as const;
 
 export default function ScraperReadiness({ site }: { site: Site }) {
-  const { runtime, reviewPolicy } = site;
+  const { runtime, reviewPublication } = site;
   const synchronized =
     runtime.targets.length === runtime.targetKeys.length &&
     runtime.targetKeys.every((key) =>
@@ -94,24 +94,12 @@ export default function ScraperReadiness({ site }: { site: Site }) {
           </DefinitionList>
         </AdminDetails>
       ))}
-      {reviewPolicy ? (
-        <AdminDetails summary="Review policy">
+      {reviewPublication ? (
+        <AdminDetails summary="Review publishing">
           <DefinitionList>
-            <DefinitionList.Term>Publication</DefinitionList.Term>
+            <DefinitionList.Term>Status</DefinitionList.Term>
             <DefinitionList.Details>
-              {reviewPolicy.publicationMode.replace("_", " ")}
-            </DefinitionList.Details>
-            <DefinitionList.Term>LLM processing</DefinitionList.Term>
-            <DefinitionList.Details>
-              {reviewPolicy.allowLlmProcessing ? "Allowed" : "Blocked"}
-            </DefinitionList.Details>
-            <DefinitionList.Term>Scores</DefinitionList.Term>
-            <DefinitionList.Details>
-              {reviewPolicy.allowScoreDisplay ? "Visible" : "Hidden"}
-            </DefinitionList.Details>
-            <DefinitionList.Term>Summaries</DefinitionList.Term>
-            <DefinitionList.Details>
-              {reviewPolicy.allowSummaryDisplay ? "Visible" : "Hidden"}
+              {reviewPublication.approved ? "Publishing" : "Not published"}
             </DefinitionList.Details>
           </DefinitionList>
         </AdminDetails>

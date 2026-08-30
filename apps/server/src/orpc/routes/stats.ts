@@ -4,8 +4,8 @@ import {
   bottleTombstones,
   entities,
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
   memberReviews,
   tastings,
 } from "@peated/server/db/schema";
@@ -62,10 +62,10 @@ export default implement(statsContract).handler(async function () {
         eq(externalReviews.articleId, externalReviewArticles.id),
       )
       .leftJoin(
-        externalReviewSourcePolicies,
+        externalReviewPublications,
         eq(
           externalReviewArticles.externalSiteId,
-          externalReviewSourcePolicies.externalSiteId,
+          externalReviewPublications.externalSiteId,
         ),
       )
       .innerJoin(bottles, eq(externalReviews.bottleId, bottles.id))

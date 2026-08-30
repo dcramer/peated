@@ -145,7 +145,6 @@ export async function createExternalReview(
               reviewerName: null,
               nativeScore: input.nativeScore,
               bottleId,
-              summary: null,
             },
           ],
         },

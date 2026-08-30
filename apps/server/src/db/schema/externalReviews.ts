@@ -65,11 +65,6 @@ export const externalReviews = pgTable(
     nativeScoreValue: doublePrecision("native_score_value"),
     nativeScoreScale: doublePrecision("native_score_scale"),
     nativeScoreDisplay: text("native_score_display"),
-    summary: text("summary"),
-    summaryContentHash: text("summary_content_hash"),
-    summaryModel: text("summary_model"),
-    summaryPromptVersion: text("summary_prompt_version"),
-    summaryGeneratedAt: timestamp("summary_generated_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -98,22 +93,6 @@ export const externalReviews = pgTable(
         AND ${table.nativeScoreValue} >= 0
         AND ${table.nativeScoreScale} > 0
         AND ${table.nativeScoreValue} <= ${table.nativeScoreScale}
-      )`,
-    ),
-    check(
-      "review_summary_provenance_check",
-      sql`(
-        ${table.summary} IS NULL
-        AND ${table.summaryContentHash} IS NULL
-        AND ${table.summaryModel} IS NULL
-        AND ${table.summaryPromptVersion} IS NULL
-        AND ${table.summaryGeneratedAt} IS NULL
-      ) OR (
-        ${table.summary} IS NOT NULL
-        AND ${table.summaryContentHash} IS NOT NULL
-        AND ${table.summaryModel} IS NOT NULL
-        AND ${table.summaryPromptVersion} IS NOT NULL
-        AND ${table.summaryGeneratedAt} IS NOT NULL
       )`,
     ),
   ],

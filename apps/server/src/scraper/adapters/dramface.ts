@@ -140,7 +140,7 @@ export function parseDramfaceArticle(
   );
   const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
     [];
-  const externalReviewTexts: Record<string, string> = {};
+  const reviewTexts: Record<string, string> = {};
 
   for (const [reviewIndex, start] of reviewStarts.entries()) {
     const end = reviewStarts[reviewIndex + 1] ?? elements.length;
@@ -198,7 +198,7 @@ export function parseDramfaceArticle(
             .map((element) => $(element).text())
             .join(" "),
     );
-    if (reviewText) externalReviewTexts[sourceKey] = reviewText;
+    if (reviewText) reviewTexts[sourceKey] = reviewText;
   }
 
   if (externalReviews.length === 0) {
@@ -208,7 +208,7 @@ export function parseDramfaceArticle(
   const contentText = JSON.stringify(
     externalReviews.map((review) => ({
       ...review,
-      reviewText: externalReviewTexts[review.sourceKey] ?? null,
+      reviewText: reviewTexts[review.sourceKey] ?? null,
     })),
   );
   return DramfaceObservationSchema.parse({
@@ -220,7 +220,6 @@ export function parseDramfaceArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews,
     },
-    externalReviewTexts,
   });
 }
 

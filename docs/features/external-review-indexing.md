@@ -1,48 +1,32 @@
 # External Review Indexing
 
 Peated indexes external reviews to help readers find the publisher's full
-article. Peated stores structured review facts and an optional short summary.
-It does not republish the article body, tasting notes, conclusion, or images.
+article. Peated stores structured review facts. It does not republish the
+article body, tasting notes, conclusion, or images.
 
-This document owns the runtime source-policy boundary, adapter contract, pilot
-procedure, and rollback path. The [scraper runtime](../../apps/server/src/scraper/README.md)
+This document owns review publishing, the adapter contract, source approval,
+and rollback. The [scraper runtime](../../apps/server/src/scraper/README.md)
 owns request control and run execution. The
 [source research](../research/external-review-content-supply.md) records the
 publisher robots rules and public terms that must be checked before enablement.
 
-## Source Policy Boundary
+## Review Publishing
 
-Every external review source starts with its content capabilities disabled.
-Missing policy has the same effect as disabled policy.
+Every external review source starts unapproved. Scraping and Bottle matching
+can run while a source is unapproved. Admins can inspect the collected names,
+Bottle matches, writers, dates, and scores before they approve publication.
 
-The source policy has these independent capabilities:
+Approval publishes reviews that have an active Bottle match. It also publishes
+future matches from that source. Unresolved, retired, and individually hidden
+reviews stay hidden.
 
-- `allowLlmProcessing` permits publisher text to enter the summary model.
-- `allowScoreDisplay` permits display of the publisher's native score.
-- `allowSummaryDisplay` permits display of a current Peated summary. This also
-  requires `allowLlmProcessing`.
-- `publicationMode` controls public review availability.
+Stopping publication removes fetched reviews from public results. It does not
+delete them or stop fetching. The update is moderator-only and audit logged.
+Article ingestion and publication updates lock the same source row before they
+decide visibility.
 
-The runtime checks source policy at each owning boundary:
-
-| Operation                             | Owning check                                                                    |
-| ------------------------------------- | ------------------------------------------------------------------------------- |
-| Send review text to a model           | Summary generation checks `allowLlmProcessing` immediately before model access. |
-| Return a native score or summary      | The review serializer checks the matching display capability.                   |
-| Return a fetched review to the public | The review must be visible and the source must use `automatic` mode.            |
-
-The moderator policy API accepts `disabled`, `review_only`, and `automatic`.
-The policy update is moderator-only and audit logged. A transition to
-`automatic` publishes staged reviews only when they have an active resolved
-Bottle. Unresolved and retired Bottle assignments remain hidden.
-
-Article ingestion and policy updates serialize on the source record. A refresh
-can publish a review when it gains its first active Bottle assignment. A refresh
-does not make an already matched review visible after a moderator hides it.
-
-Source policy does not control fetching. An admin can manually run a registered
-scraper when its targets are enabled. The scraper runtime still enforces target
-ownership, request limits, spacing, quotas, cooldowns, and robots rules.
+The scraper runtime still enforces target ownership, request limits, spacing,
+quotas, cooldowns, and robots rules.
 
 ## Source Adapter Contract
 
@@ -102,8 +86,7 @@ once in the scraper module. Each adapter test owns only publisher behavior.
 3. Test discovery with current publisher markup and unrelated links. The
    adapter must select only planned review URLs.
 4. Test one normal article. Verify its canonical URL, title, publication date,
-   writer, Bottle name, native score, source display text, and permitted
-   summary text.
+   writer, Bottle name, native score, and source display text.
 5. Test every source shape that can contain several reviews. Include repeated
    Bottle names or writers when the publisher can show them. Review keys must
    stay stable and unique without using array position alone.
@@ -115,9 +98,8 @@ once in the scraper module. Each adapter test owns only publisher behavior.
 8. Test resume behavior. A completed article must not be requested again while
    it remains in the current discovery window. A failed parse or sink call must
    remain eligible for replay.
-9. Keep publisher prose transient. Assert that summary input contains only the
-   planned review section and excludes introductions, prices, navigation,
-   conclusions, fallback markup, and scripts.
+9. Keep publisher prose transient. Parser setup can inspect the planned review
+   section, but collection must not store it or send it to another service.
 10. Before merge, run the registered source through the local scraper runtime
     against the current public pages. Inspect the terminal status, request
     count, emitted article and review counts, cursor, and observations. Replace
@@ -142,20 +124,9 @@ Fetched HTML and publisher prose stay in process memory only. Do not put them
 in article metadata, a cursor, checkpoint, log, error, database row, or test
 snapshot.
 
-If an enabled source supplies text for summary generation, keep it separate
-from the strict article metadata. A source-specific in-memory observation can
-carry only the text needed by its sink. The sink passes that text directly to
-the ingestion boundary as `externalReviewTexts`, keyed by the external review
-source key. The scraper runtime does not persist observations.
-
-The summary boundary sends the text to the model only when
-`allowLlmProcessing` is active. It uses provider storage disabled. It returns
-a validated two- or three-sentence summary with a content hash, model, prompt
-version, and generation time.
-
-Summary failure does not discard valid review metadata. An article content
-change makes the old summary unavailable until regeneration succeeds. Errors
-contain stable identifiers and the canonical URL, not publisher prose.
+Parser setup can use transient review text to prove that its selectors found
+the review body. The collection sink discards that text and stores only the
+structured article and review facts.
 
 ## Pilot Procedure
 
@@ -163,19 +134,17 @@ Use this sequence for each publisher:
 
 1. Check the current robots rules and public terms for the planned paths and
    request pattern. Do not work around a block or rate limit.
-2. Implement and fixture-test the adapter. Keep its source policy disabled
-   while the code is deployed.
+2. Implement and fixture-test the adapter. Keep publication unapproved while
+   the code is deployed.
 3. Synchronize scraper definitions. In **Admin → Scrapers**, confirm that the
    source is registered, its targets are enabled, and its robots state is safe.
-4. Use the moderator review-policy API to set `review_only` with the exact
-   capability flags when a hidden sample is needed.
-5. Trigger one bounded manual run or let the registered bounded schedule run.
-   A schedule does not bypass source policy or publish hidden reviews.
-6. Record article, review, extracted-item, matched, and unresolved counts.
+4. Trigger one bounded manual run or let the registered bounded schedule run.
+   A schedule does not publish reviews from an unapproved source.
+5. Record article, review, extracted-item, matched, and unresolved counts.
    Review the agreed hidden sample for extraction, multi-bottle splitting,
-   Bottle matches, and any enabled summaries.
-7. Require at least 90% extraction accuracy and acceptable Bottle-match
-   precision. Record the result before setting the source to `automatic`.
+   Bottle matches, and native scores.
+6. Require at least 90% extraction accuracy and acceptable Bottle-match
+   precision. Record the result before you approve and publish the source.
 
 WhiskyNotes runs once per day. It checks the current archive page and advances
 at most four historical archive pages. Each page supplies at most 20 article
@@ -216,26 +185,24 @@ archive, RSS, WordPress APIs, search, or the load-more endpoint. Requests are
 at least 2.5 seconds apart. The target allows 25 requests per hour, and each
 worker pass stops after 25 requests. The adapter splits multi-bottle articles
 into scored reviews. It stores exact timestamps, the published writer, native
-scores, and canonical links. Tasting notes stay transient. Article
-introductions and publisher conclusions are excluded from summary input.
+scores, and canonical links. Tasting notes stay transient and are discarded
+after parsing.
 
 The Whiskey Reviewer runs once per day. It reads only the five links in the
 public homepage Recent Reviews list. It does not request the alphabetical
 archive, category pages, sitemaps, feeds, search, or WordPress APIs. Requests
 are at least five seconds apart. The target allows 10 requests per hour, and
 each worker pass stops after six requests. The adapter stores the writer,
-canonical link, displayed letter grade, and URL date when valid. Only direct
-tasting-note paragraphs stay transient for summary generation. Introductions,
-prices, and publisher conclusions are excluded.
+canonical link, displayed letter grade, and URL date when valid. Tasting-note
+paragraphs stay transient and are discarded after parsing.
 
 Bourbon Culture runs once per day. It reads only the six links under Latest
 Whiskey Reviews on the public homepage. It does not request archives, ratings
 pages, sitemaps, feeds, search, or WordPress APIs. Requests are at least five
 seconds apart. The target allows 10 requests per hour, and each worker pass
 stops after seven requests. The adapter stores the writer, exact publication
-timestamp, canonical link, and native 10-point score. Only direct tasting-note
-paragraphs stay transient for summary generation. Introductions and publisher
-conclusions are excluded.
+timestamp, canonical link, and native 10-point score. Tasting-note paragraphs
+stay transient and are discarded after parsing.
 
 Fred Minnick runs once per day. It reads the public sitemap index and only the
 newest two post sitemaps. It does not request the empty Reviews page, the main
@@ -244,9 +211,8 @@ most five single-Bottle review URLs. Requests are at least 30 seconds apart.
 The target allows 10 requests per hour, and each worker pass stops after eight
 source requests plus the governed robots request when its cache is stale. The
 adapter stores the explicit date, canonical link, and Fred
-Minnick reviewer attribution. Native scores stay absent. Only
-direct tasting paragraphs stay transient for summary generation; comparisons,
-introductions, prices, related links, and site furniture are excluded.
+Minnick reviewer attribution. Native scores stay absent. Tasting paragraphs
+stay transient and are discarded after parsing.
 
 Whisky Saga runs once per day. It reads the 20 current article cards on the
 public Scotland category page, then advances one public Older Posts page from
@@ -255,9 +221,8 @@ links with `offset` and `category` parameters. It does not request the full
 sitemap, search, other query filters, or Squarespace APIs. Requests are at
 least 2.5 seconds apart. The target allows 25 requests per hour, and each worker
 pass stops after 22 requests. The adapter stores the exact publication
-timestamp, author, canonical link, and native 100-point score. Only direct
-nose, taste, palate, and finish paragraphs stay transient for summary
-generation.
+timestamp, author, canonical link, and native 100-point score. Review text
+stays transient and is discarded after parsing.
 
 The Whisky Study runs once per day. It reads only the 20 article cards on the
 first public Scotch review index page. It does not request older pagination,
@@ -265,19 +230,18 @@ the sitemap, search, query filters, or Squarespace APIs. Requests are at least
 2.5 seconds apart. The target allows 25 requests per hour, and each worker pass
 stops after 21 source requests plus the governed robots request when its cache
 is stale. The adapter stores the exact publication timestamp, author, canonical
-link, and native 100-point score. Only direct nose, taste, palate, and finish
-paragraphs stay transient for summary generation.
+link, and native 100-point score. Review text stays transient and is discarded
+after parsing.
 
-Enable automatic publication only after the reviewed sample passes the gate.
+Approve publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a
 generic crawler only because several sources use RSS or HTML.
 
 ## Stop And Roll Back
 
-Set the source policy to `disabled` first. This clears content-processing and
-display capabilities. Public fetched reviews disappear, and native scores and
-summaries are no longer returned. The policy change stays in the audit log.
-It does not block manual fetching.
+Stop review publishing first. Public fetched reviews disappear. Stored reviews
+and scores remain available to admins. The change stays in the audit log and
+does not block manual fetching.
 
 To stop remote requests, disable the code-owned scraper target. Do not delete
 review rows as the first response. Keep them hidden while the operator checks
@@ -287,4 +251,4 @@ registration in a follow-up deployment when the adapter itself is unsafe.
 The article/review schema cutover is complete. Do not restore an application
 version that reads the removed legacy review columns. Use an application
 version that supports the current schema and use a forward migration for any
-schema correction. Never reconstruct publisher facts from generated summaries.
+schema correction.

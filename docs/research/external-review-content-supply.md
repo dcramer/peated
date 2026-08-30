@@ -11,13 +11,9 @@ that republishes their work. A Bottle page may show:
 - publisher, reviewer, publication date, and canonical URL;
 - the publisher's score in its native scale;
 - a Peated critic consensus derived from several published scores;
-- a short, attributed Peated summary; and
 - a prominent link to read the full review at the publisher.
 
-Do not copy full tasting notes, conclusions, photographs, or article text. A
-generated summary must describe the review without imitating or closely
-paraphrasing the author's prose. It must remain attached to its source and be
-removed or regenerated when the source changes.
+Do not copy full tasting notes, conclusions, photographs, or article text.
 
 This narrower display is part of the publisher value proposition, but it does
 not override a site's terms, robots policy, copyright, or database rights.
@@ -26,11 +22,11 @@ licenses.
 
 ## Acquisition Modes
 
-| Mode            | Meaning                                                                  | Peated behavior                                                                    |
-| --------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| `public_index`  | Robots allow the planned paths and no reviewed public terms prohibit use | Index structured facts, generate enabled summaries, and link to the canonical page |
-| `licensed_only` | Public terms prohibit bots, aggregation, copying, or database creation   | Do not crawl                                                                       |
-| `do_not_ingest` | Robots, rate limits, or another site control blocks reliable access      | Do not work around the control                                                     |
+| Mode            | Meaning                                                                  | Peated behavior                                       |
+| --------------- | ------------------------------------------------------------------------ | ----------------------------------------------------- |
+| `public_index`  | Robots allow the planned paths and no reviewed public terms prohibit use | Index structured facts and link to the canonical page |
+| `licensed_only` | Public terms prohibit bots, aggregation, copying, or database creation   | Do not crawl                                          |
+| `do_not_ingest` | Robots, rate limits, or another site control blocks reliable access      | Do not work around the control                        |
 
 Peated should identify itself with a stable user agent and contact URL, obey
 robots rules and crawl delays, rate-limit requests, and honor takedowns. Public
@@ -118,8 +114,8 @@ a separate platform-terms and creator-rights review.
   one public Older Posts page from its last successful cursor. It follows only
   the publisher's Scotland category links with `offset` and `category`
   parameters. It does not use the full sitemap, search, other query filters, or
-  Squarespace APIs. Only direct nose, taste, palate, and finish paragraphs stay
-  transient for summary generation.
+  Squarespace APIs. Review text stays transient and is discarded after parser
+  validation.
 
 ### The Whisky Study
 
@@ -136,8 +132,8 @@ a separate platform-terms and creator-rights review.
   100-point score.
 - The implemented daily feed reads only those 20 current article cards. It does
   not follow older pagination or use the sitemap, search, query filters, or
-  Squarespace APIs. Only direct nose, taste, palate, and finish paragraphs stay
-  transient for summary generation.
+  Squarespace APIs. Review text stays transient and is discarded after parser
+  validation.
 
 ### Dramface
 
@@ -151,8 +147,8 @@ a separate platform-terms and creator-rights review.
   review-article model.
 - The implemented daily feed reads at most 20 links from the public review
   index. It uses only allowed article paths through the governed runtime. It
-  keeps each Bottle and reviewer section separate and excludes Dramface's
-  `TL;DR` text from transient summary input.
+  keeps each Bottle and reviewer section separate. It does not collect
+  Dramface's `TL;DR` text.
 - Dramface also republishes press releases in a clearly labeled news section.
   Use that as discovery; release facts should link to the original producer or
   issuer when available.
@@ -187,8 +183,7 @@ a separate platform-terms and creator-rights review.
 - The implemented daily feed reads at most 20 current tasting-note articles
   from the homepage. It does not use the full archive, RSS, WordPress APIs,
   search, or load-more endpoints. It keeps multi-bottle sections separate and
-  excludes article introductions and publisher conclusions from transient
-  summary input.
+  discards review text after parser validation.
 
 ### The Whiskey Reviewer
 
@@ -204,8 +199,8 @@ a separate platform-terms and creator-rights review.
   letter grade. Current URLs usually encode the publication date.
 - The implemented daily feed reads only the five links in the homepage Recent
   Reviews list. It does not use the alphabetical archive, category pages,
-  sitemaps, feeds, search, or WordPress APIs. It excludes introductions, price
-  text, and publisher conclusions from transient summary input.
+  sitemaps, feeds, search, or WordPress APIs. It discards review text after
+  parser validation.
 
 ### Bourbon Culture
 
@@ -220,8 +215,8 @@ a separate platform-terms and creator-rights review.
   timestamp, Bottle title, tasting-note section, and 10-point score.
 - The implemented daily feed reads only the six links under Latest Whiskey
   Reviews on the homepage. It does not use archives, ratings pages, sitemaps,
-  feeds, search, or WordPress APIs. It excludes introductions and publisher
-  conclusions from transient summary input.
+  feeds, search, or WordPress APIs. It discards review text after parser
+  validation.
 
 ### Fred Minnick
 
@@ -238,8 +233,8 @@ a separate platform-terms and creator-rights review.
 - The implemented daily feed reads the sitemap index and only the newest two
   post sitemaps. It selects at most five single-Bottle review URLs and skips
   comparisons. It stores explicit dates, canonical links, and Fred Minnick as
-  the reviewer. Native scores stay absent. Only direct tasting paragraphs stay
-  transient for summary generation.
+  the reviewer. Native scores stay absent. Review text stays transient and is
+  discarded after parser validation.
 
 ### Explicitly Restricted Sources
 
@@ -262,8 +257,8 @@ not negate those terms.
 
 ## Implemented Product Boundary
 
-The external-review feature now has the required article/review model, content
-policy, governed fetch boundary, and Bottle-page presentation. See
+The external-review feature now has the required article/review model,
+publication approval, governed fetch boundary, and Bottle-page presentation. See
 the [external review indexing guide](../features/external-review-indexing.md)
 for the current contract and pilot procedure.
 
@@ -273,7 +268,7 @@ The pilot started with these limits:
   several independent Bottle reviews.
 - Every review required a 0-100 score and an issue name.
 - Reviews had no author, publication date, article title, native score scale,
-  summary, source evidence, rights mode, or source-policy version.
+  source evidence, or rights mode.
 - There was no review-article record separate from a Bottle review.
 - Outbound requests did not use one governed runtime with request budgets,
   robots checks, and durable runs.
@@ -281,17 +276,16 @@ The pilot started with these limits:
 Relevant implementation:
 
 - [`reviews` schema](../../apps/server/src/db/schema/reviews.ts)
-- [review-source policy](../../apps/server/src/db/schema/externalReviewSources.ts)
+- [review publication](../../apps/server/src/db/schema/externalReviewPublications.ts)
 - [article observation contract](../../apps/server/src/externalReviews/observation.ts)
 - [external review ingestion](../../apps/server/src/externalReviews/ingest.ts)
 - [scraper runtime](../../apps/server/src/scraper/README.md)
 
 The current model separates:
 
-- a source and its content-processing/display policy;
+- a source and its publication approval;
 - a review article identified by publisher and canonical URL;
-- zero or more scored or unscored Bottle reviews from that article; and
-- a short generated summary with model provenance and source evidence.
+- zero or more scored or unscored Bottle reviews from that article.
 
 Add later publishers through source-specific adapters. Do not replace them
 with a generalized crawler unless repeated source work proves a smaller shared

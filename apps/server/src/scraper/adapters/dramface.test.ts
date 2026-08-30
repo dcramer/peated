@@ -64,12 +64,6 @@ test("extracts one scored review and only its tasting prose", async () => {
   expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
     "dramface:a376fb89d0ea5fe526068a1200d1482ec4ab6c6400e43ecfa9b44d65c932fffd",
   );
-  expect(Object.values(parsed.externalReviewTexts)).toEqual([
-    "Lemon oil and coastal peat. Dense malt with mineral smoke. A balanced and characterful release.",
-  ]);
-  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
-    /TL;DR|Publisher summary|Article introduction|Footer content/u,
-  );
 });
 
 test("accepts a standard HTML datetime value", async () => {
@@ -100,9 +94,6 @@ test("extracts each bottle and normalizes decimal scores", async () => {
       nativeScore: { value: 7.5, scale: 10, display: "7.5/10" },
     },
   ]);
-  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
-    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
-  );
 });
 
 test("keeps separate reviewers for the same bottle", async () => {

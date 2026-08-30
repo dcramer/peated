@@ -616,12 +616,10 @@ export const priceSite = {
       },
     ],
   },
-  reviewPolicy: {
+  reviewPublication: {
     externalSiteId: 9901,
-    publicationMode: "review_only",
-    allowLlmProcessing: false,
-    allowScoreDisplay: true,
-    allowSummaryDisplay: false,
+    approved: false,
+    approvedAt: null,
     updatedAt: timestamp,
   },
 };

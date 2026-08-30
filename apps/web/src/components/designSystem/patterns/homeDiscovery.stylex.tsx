@@ -27,7 +27,6 @@ export type HomeCriticReview = {
   rating?: number | null;
   source: string;
   sourceHref: string;
-  summary?: ReactNode;
 };
 
 export function CriticReviewCards({
@@ -81,9 +80,6 @@ export function CriticReviewCards({
                 <div {...stylex.props(styles.metadata)}>
                   {review.metadata.join(" · ")}
                 </div>
-              ) : null}
-              {review.summary ? (
-                <p {...stylex.props(styles.summary)}>{review.summary}</p>
               ) : null}
             </div>
           </Card>
@@ -252,15 +248,6 @@ const styles = stylex.create({
     lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-  },
-  summary: {
-    margin: 0,
-    marginTop: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
-    textWrap: "pretty",
   },
   releaseList: {
     display: "flex",

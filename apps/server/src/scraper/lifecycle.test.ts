@@ -78,7 +78,7 @@ test("manual run is attributed, dispatched deterministically, and does not move 
   expect(storedSite?.lastRunAt).toBeNull();
 });
 
-test("manual review runs do not require a publication policy", async ({
+test("manual review runs do not require publication approval", async ({
   fixtures,
 }) => {
   const requestedBy = await fixtures.User({ admin: true });

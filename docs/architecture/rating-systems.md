@@ -12,7 +12,7 @@ These records have different intent. Do not add review fields to a tasting.
 Member reviews and external reviews share the same basic meaning. Their source
 and fields differ. A member review has a member, a whole-number score from 0
 through 100, and optional notes. An external review can have a publication,
-reviewer, article link, summary, and the score format used by its source.
+reviewer, article link, and the score format used by its source.
 
 ## Tasting bands
 
@@ -61,7 +61,8 @@ An external score enters a Bottle summary only when all of these rules are
 true:
 
 - The review is public.
-- The source policy allows score display.
+- The source is approved for publication, or the review is a migrated public
+  record.
 - The review belongs to an active exact Bottle.
 - The source supplied a whole-number value on a 100-point scale.
 
@@ -97,10 +98,10 @@ middle value when the count is even.
 Exact Bottle summaries use only that Bottle. BottleGroup summaries combine all
 active members. They exclude retired Bottles.
 
-Writes queue the existing Bottle summary job after the database change finishes. This
-includes member review writes, tasting band changes, external review imports,
-moderation changes, assignments, and source score-policy changes. Large policy
-changes queue work in batches.
+Writes queue the existing Bottle summary job after the database change
+finishes. This includes member review writes, tasting band changes, external
+review imports, moderation changes, assignments, and review publication
+changes. Large publication changes queue work in batches.
 
 Run `pnpm cli bottles fix-stats [bottleIds...]` to rebuild active Bottle and
 BottleGroup summaries. The command also checks each stored external score count

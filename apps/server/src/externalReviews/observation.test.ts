@@ -53,12 +53,3 @@ test("rejects duplicate review source keys", () => {
     "External review source keys must be unique within an article.",
   );
 });
-
-test("rejects review text without a matching source key", () => {
-  expect(() =>
-    ExternalReviewArticleIngestionSchema.parse({
-      article: observation(),
-      externalReviewTexts: { missing: "Review text" },
-    }),
-  ).toThrow("External review text must match an external review source key.");
-});

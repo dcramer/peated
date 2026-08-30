@@ -19,8 +19,8 @@ import {
   comments,
   entities,
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
   externalSites,
   flightBottles,
   flights,
@@ -999,12 +999,12 @@ export const ExternalSite = async (
   return result;
 };
 
-export const ExternalReviewSourcePolicy = async (
-  { ...data }: Partial<dbSchema.NewExternalReviewSourcePolicy> = {},
+export const ExternalReviewPublication = async (
+  { ...data }: Partial<dbSchema.NewExternalReviewPublication> = {},
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.ExternalReviewSourcePolicy> => {
+): Promise<dbSchema.ExternalReviewPublication> => {
   const [result] = await db
-    .insert(externalReviewSourcePolicies)
+    .insert(externalReviewPublications)
     .values({
       externalSiteId:
         data.externalSiteId ?? (await ExternalSiteOrExisting({}, db)).id,
@@ -1012,23 +1012,17 @@ export const ExternalReviewSourcePolicy = async (
     })
     .returning();
   if (!result) {
-    throw new Error("Unable to create ExternalReviewSourcePolicy fixture");
+    throw new Error("Unable to create ExternalReviewPublication fixture");
   }
   return result;
 };
 
-export const EnabledExternalReviewSourcePolicy = async (
-  { ...data }: Partial<dbSchema.NewExternalReviewSourcePolicy> = {},
+export const ApprovedExternalReviewPublication = async (
+  { ...data }: Partial<dbSchema.NewExternalReviewPublication> = {},
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.ExternalReviewSourcePolicy> => {
-  return await ExternalReviewSourcePolicy(
-    {
-      publicationMode: "review_only",
-      allowLlmProcessing: true,
-      allowScoreDisplay: true,
-      allowSummaryDisplay: true,
-      ...data,
-    },
+): Promise<dbSchema.ExternalReviewPublication> => {
+  return await ExternalReviewPublication(
+    { approvedAt: new Date(), ...data },
     db,
   );
 };

@@ -1,34 +1,31 @@
-import {
-  normalizeBottle,
-  normalizeBottleAliasKey,
-} from "@peated/bottle-classifier/normalize";
+import { normalizeBottleAliasKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
+import { ExternalReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
-import { generateExternalReviewSummary } from "@peated/server/externalReviews/summary";
 import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
 import { logTelemetryError } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = ExternalReviewArticleIngestionSchema.safeExtend({
-  externalSiteId: z.number().int().positive(),
-  fetchedAt: z.date(),
-});
+const InputSchema = z
+  .object({
+    externalSiteId: z.number().int().positive(),
+    fetchedAt: z.date(),
+    article: ExternalReviewArticleObservationSchema,
+  })
+  .strict();
 type ExternalReviewArticleIngestionCandidate = Partial<
   z.input<typeof InputSchema>
 >;
 
 export interface ExternalReviewIngestionServices {
-  generateSummary: typeof generateExternalReviewSummary;
   queueMissingBottles: typeof pushUniqueJob;
   reportError: typeof logTelemetryError;
 }
 
 const externalReviewIngestionServices: ExternalReviewIngestionServices = {
-  generateSummary: generateExternalReviewSummary,
   queueMissingBottles: pushUniqueJob,
   reportError: logTelemetryError,
 };
@@ -50,40 +47,15 @@ export async function ingestExternalReviewArticle(
 
   for (const externalReview of input.article.externalReviews) {
     const rawName = externalReview.name;
-    const { name: normalizedName } = normalizeBottle({ name: rawName });
     const aliasKey = normalizeBottleAliasKey(rawName);
     let aliasMatch = null;
     for (const aliasName of new Set([aliasKey, rawName])) {
       aliasMatch = await findBottleAliasAssignment(aliasName);
       if (aliasMatch) break;
     }
-    let summary = null;
-    const sourceText = input.externalReviewTexts[externalReview.sourceKey];
-    if (sourceText !== undefined) {
-      try {
-        summary = await services.generateSummary({
-          externalSiteId: input.externalSiteId,
-          sourceKey: externalReview.sourceKey,
-          bottleName: normalizedName,
-          sourceText,
-          contentHash: input.article.contentHash,
-        });
-      } catch {
-        services.reportError("Unable to generate external review summary.", {
-          extra: {
-            review: {
-              externalSiteId: input.externalSiteId,
-              sourceKey: externalReview.sourceKey,
-              url: input.article.canonicalUrl,
-            },
-          },
-        });
-      }
-    }
     storedExternalReviews.push({
       ...externalReview,
       bottleId: aliasMatch?.bottleId ?? null,
-      summary,
     });
   }
 

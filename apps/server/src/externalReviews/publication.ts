@@ -3,14 +3,14 @@ import {
   bottles,
   bottleTombstones,
   externalReviewArticles,
+  externalReviewPublications,
   externalReviews,
-  externalReviewSourcePolicies,
   externalSites,
 } from "@peated/server/db/schema";
 import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
-/** Locks the source policy before a transaction decides review visibility. */
-export async function getExternalReviewPublicationModeInTransaction(
+/** Locks the source before a transaction decides review visibility. */
+export async function isExternalReviewPublicationApprovedInTransaction(
   tx: AnyTransaction,
   externalSiteId: number,
 ) {
@@ -22,11 +22,11 @@ export async function getExternalReviewPublicationModeInTransaction(
     .for("share");
   if (!source) throw new Error(`External site ${externalSiteId} not found.`);
 
-  const policy = await tx.query.externalReviewSourcePolicies.findFirst({
-    columns: { publicationMode: true },
-    where: eq(externalReviewSourcePolicies.externalSiteId, externalSiteId),
+  const publication = await tx.query.externalReviewPublications.findFirst({
+    columns: { approvedAt: true },
+    where: eq(externalReviewPublications.externalSiteId, externalSiteId),
   });
-  return policy?.publicationMode ?? "disabled";
+  return publication?.approvedAt != null;
 }
 
 /** Publishes one newly resolved review when its assigned Bottle is active. */

@@ -384,16 +384,13 @@ describe("createMissingBottles", () => {
     });
   });
 
-  test("publishes a newly resolved review in automatic mode", async ({
+  test("publishes a newly resolved review for an approved source", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.ExternalReviewSourcePolicy({
+    await fixtures.ExternalReviewPublication({
       externalSiteId: site.id,
-      publicationMode: "automatic",
-      allowLlmProcessing: true,
-      allowScoreDisplay: true,
-      allowSummaryDisplay: true,
+      approvedAt: new Date(),
     });
     const bottle = await fixtures.Bottle({ name: "Published Worker Bottle" });
     const review = await fixtures.ExternalReview({

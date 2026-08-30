@@ -1,7 +1,7 @@
 import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  externalReviewSourcePolicies,
+  externalReviewPublications,
   externalSites,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -42,9 +42,9 @@ test("syncs code-owned external-site definitions", async () => {
     .where(eq(externalSites.type, "finedrams"));
   expect(fineDrams).toMatchObject(EXTERNAL_SITE_DEFINITIONS.finedrams);
 
-  const policies = await db.select().from(externalReviewSourcePolicies);
-  expect(policies).toHaveLength(10);
-  expect(policies).toEqual(
+  const publications = await db.select().from(externalReviewPublications);
+  expect(publications).toHaveLength(10);
+  expect(publications).toEqual(
     expect.arrayContaining(
       [
         "bourbonculture",
@@ -60,10 +60,7 @@ test("syncs code-owned external-site definitions", async () => {
       ].map((type) =>
         expect.objectContaining({
           externalSiteId: sites.find((site) => site.type === type)?.id,
-          publicationMode: "disabled",
-          allowLlmProcessing: false,
-          allowScoreDisplay: false,
-          allowSummaryDisplay: false,
+          approvedAt: null,
         }),
       ),
     ),

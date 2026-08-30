@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  externalReviewSourcePolicies,
+  externalReviewPublications,
   externalSiteRuns,
   externalSites,
   externalSiteScrapeTargets,
@@ -122,12 +122,8 @@ export async function createSiteWithScrapeSource(
         .returning();
       if (!source) throw new Error("Failed to create scrape source.");
       if (input.kind === "review") {
-        await tx.insert(externalReviewSourcePolicies).values({
+        await tx.insert(externalReviewPublications).values({
           externalSiteId: site.id,
-          publicationMode: "disabled",
-          allowLlmProcessing: false,
-          allowScoreDisplay: false,
-          allowSummaryDisplay: false,
         });
       }
       return { site, source };

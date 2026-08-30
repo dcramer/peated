@@ -16,7 +16,11 @@ export type ScrapeListResult = {
 export type ScrapeDetailResult =
   | {
       kind: "review";
-      value: ExternalReviewArticleIngestion | null;
+      value:
+        | (ExternalReviewArticleIngestion & {
+            reviewTextByKey: Record<string, string>;
+          })
+        | null;
       issues: ScrapeIssue[];
     }
   | {
@@ -153,7 +157,6 @@ function validationIssues(
 }
 
 function reviewField(path: PropertyKey[]) {
-  if (path[0] === "externalReviewTexts") return "detail.reviewText";
   if (path[0] !== "article") return "detail";
   if (path[1] === "title") return "detail.title";
   if (path[1] === "publishedAt") return "detail.publishedAt";
@@ -202,7 +205,7 @@ function parseReviewDetail(
     reviewerName: string | null;
     nativeScore: { value: number; scale: number; display: string } | null;
   }> = [];
-  const externalReviewTexts: Record<string, string> = {};
+  const reviewTextByKey: Record<string, string> = {};
   const reviewItems = $(rules.detail.reviewItem).toArray();
   const readReviewValue = (
     item: ReturnType<typeof load>,
@@ -252,7 +255,7 @@ function parseReviewDetail(
       });
       if (rules.detail.reviewText) {
         const text = readReviewValue(item, rules.detail.reviewText);
-        if (text) externalReviewTexts[sourceKey] = text;
+        if (text) reviewTextByKey[sourceKey] = text.slice(0, 50_000);
       }
     });
   } catch (error) {
@@ -272,13 +275,16 @@ function parseReviewDetail(
       contentHash: createHash("sha256").update(html).digest("hex"),
       externalReviews,
     },
-    externalReviewTexts,
   });
   if (!result.success) {
     issues.push(...validationIssues(result.error, reviewField));
     return { kind: "review", value: null, issues };
   }
-  return { kind: "review", value: result.data, issues };
+  return {
+    kind: "review",
+    value: { ...result.data, reviewTextByKey },
+    issues,
+  };
 }
 
 function parseStorePriceDetail(

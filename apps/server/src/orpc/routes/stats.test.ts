@@ -83,9 +83,9 @@ describe("GET /stats", () => {
     ]);
 
     const automaticSite = await fixtures.ExternalSite({ type: "dramface" });
-    await fixtures.ExternalReviewSourcePolicy({
+    await fixtures.ExternalReviewPublication({
       externalSiteId: automaticSite.id,
-      publicationMode: "automatic",
+      approvedAt: new Date(),
     });
     await fixtures.ExternalReview({
       bottleId: activeBottle.id,

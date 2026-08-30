@@ -8,28 +8,17 @@ import {
   ExternalReviewArticleObservationSchema,
   ExternalReviewObservationSchema,
 } from "@peated/server/externalReviews/observation";
-import { getExternalReviewPublicationModeInTransaction } from "@peated/server/externalReviews/publication";
+import { isExternalReviewPublicationApprovedInTransaction } from "@peated/server/externalReviews/publication";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { and, eq, isNotNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
-
-const StoredSummarySchema = z
-  .object({
-    text: z.string().trim().min(1).max(1_000),
-    contentHash: z.string().trim().min(1).max(128),
-    model: z.string().trim().min(1).max(255),
-    promptVersion: z.string().trim().min(1).max(255),
-    generatedAt: z.date(),
-  })
-  .strict();
 
 const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
-  summary: StoredSummarySchema.nullable().default(null),
 });
 
 export const ExternalReviewArticleInputSchema =
@@ -37,19 +26,6 @@ export const ExternalReviewArticleInputSchema =
     externalSiteId: z.number().int().positive(),
     fetchedAt: z.date(),
     externalReviews: z.array(StoredExternalReviewSchema).min(1),
-  }).superRefine(({ contentHash, externalReviews }, context) => {
-    for (const [index, externalReview] of externalReviews.entries()) {
-      if (
-        externalReview.summary &&
-        externalReview.summary.contentHash !== contentHash
-      ) {
-        context.addIssue({
-          code: "custom",
-          message: "Summary content hash must match its article.",
-          path: ["externalReviews", index, "summary", "contentHash"],
-        });
-      }
-    }
   });
 
 type ParsedExternalReviewArticleInput = z.infer<
@@ -92,12 +68,12 @@ export async function storeExternalReviewArticleInTransaction(
     aliasLookupNames?: string[];
   },
 ) {
-  const publicationMode = await getExternalReviewPublicationModeInTransaction(
-    tx,
-    input.externalSiteId,
-  );
-  const publishesAutomatically =
-    origin === "source" && publicationMode === "automatic";
+  const publicationApproved =
+    await isExternalReviewPublicationApprovedInTransaction(
+      tx,
+      input.externalSiteId,
+    );
+  const publishesAutomatically = origin === "source" && publicationApproved;
 
   const articleUpdate =
     origin === "manual"
@@ -166,26 +142,6 @@ export async function storeExternalReviewArticleInTransaction(
       .for("update");
   }
 
-  if (origin === "source" && input.contentHash !== null) {
-    await tx
-      .update(externalReviews)
-      .set({
-        summary: null,
-        summaryContentHash: null,
-        summaryModel: null,
-        summaryPromptVersion: null,
-        summaryGeneratedAt: null,
-        updatedAt: sql<Date>`NOW()`,
-      })
-      .where(
-        and(
-          eq(externalReviews.articleId, article.id),
-          isNotNull(externalReviews.summary),
-          ne(externalReviews.summaryContentHash, input.contentHash),
-        ),
-      );
-  }
-
   const storedExternalReviews = [];
 
   for (const externalReview of input.externalReviews) {
@@ -237,13 +193,6 @@ export async function storeExternalReviewArticleInTransaction(
     if (origin === "source") {
       values.category = externalReview.category;
       values.reviewerName = externalReview.reviewerName;
-    }
-    if (externalReview.summary) {
-      values.summary = externalReview.summary.text;
-      values.summaryContentHash = externalReview.summary.contentHash;
-      values.summaryModel = externalReview.summary.model;
-      values.summaryPromptVersion = externalReview.summary.promptVersion;
-      values.summaryGeneratedAt = externalReview.summary.generatedAt;
     }
     const [stored] = existing
       ? await tx

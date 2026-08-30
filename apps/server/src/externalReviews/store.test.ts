@@ -109,16 +109,13 @@ describe("storeExternalReviewArticle", () => {
     ]);
   });
 
-  test("publishes only resolved reviews in automatic mode", async ({
+  test("publishes only resolved reviews for an approved source", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.ExternalReviewSourcePolicy({
+    await fixtures.ExternalReviewPublication({
       externalSiteId: site.id,
-      publicationMode: "automatic",
-      allowLlmProcessing: true,
-      allowScoreDisplay: true,
-      allowSummaryDisplay: true,
+      approvedAt: new Date(),
     });
     const bottle = await fixtures.Bottle({ name: "Resolved Review Bottle" });
     const input = inputFor(site.id);
@@ -149,12 +146,9 @@ describe("storeExternalReviewArticle", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.ExternalReviewSourcePolicy({
+    await fixtures.ExternalReviewPublication({
       externalSiteId: site.id,
-      publicationMode: "automatic",
-      allowLlmProcessing: true,
-      allowScoreDisplay: true,
-      allowSummaryDisplay: true,
+      approvedAt: new Date(),
     });
     const bottle = await fixtures.Bottle({ name: "Resolved Review Bottle" });
     const input = inputFor(site.id);
@@ -188,16 +182,13 @@ describe("storeExternalReviewArticle", () => {
     ).toMatchObject({ bottleId: bottle.id, hidden: true });
   });
 
-  test("serializes publication policy changes with article ingestion", async ({
+  test("serializes publication approval with article ingestion", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    await fixtures.ExternalReviewSourcePolicy({
+    await fixtures.ExternalReviewPublication({
       externalSiteId: site.id,
-      publicationMode: "review_only",
-      allowLlmProcessing: true,
-      allowScoreDisplay: true,
-      allowSummaryDisplay: true,
+      approvedAt: null,
     });
     const bottle = await fixtures.Bottle({ name: "Concurrent Review Bottle" });
     const input = inputFor(site.id);
@@ -221,8 +212,8 @@ describe("storeExternalReviewArticle", () => {
       });
       await waitForSessionBlockedBy(client, blockerPid);
       await client.query(
-        `UPDATE "external_review_source_policy"
-         SET "publication_mode" = 'automatic'
+        `UPDATE "external_review_publication"
+         SET "approved_at" = NOW()
          WHERE "external_site_id" = $1`,
         [site.id],
       );
@@ -279,56 +270,6 @@ describe("storeExternalReviewArticle", () => {
       nativeScoreScale: 10,
       nativeScoreDisplay: "8.1/10",
       legacyNormalizedScore: null,
-    });
-  });
-
-  test("keeps a current summary and clears it after the article changes", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    const generatedAt = new Date("2026-04-13T12:01:00Z");
-    const firstInput = inputFor(site.id);
-    await storeExternalReviewArticle({
-      ...firstInput,
-      externalReviews: firstInput.externalReviews.map((review, index) => ({
-        ...review,
-        summary:
-          index === 0
-            ? {
-                text: "The reviewer finds this whisky bright. They note a dry finish.",
-                contentHash: "sha256:first",
-                model: "gpt-5.4-2026-08-01",
-                promptVersion: "external-review-summary-v1",
-                generatedAt,
-              }
-            : null,
-      })),
-    });
-
-    await storeExternalReviewArticle(inputFor(site.id));
-    expect(
-      await db.query.externalReviews.findFirst({
-        where: eq(externalReviews.sourceKey, "ardbeg-ten"),
-      }),
-    ).toMatchObject({
-      summary: "The reviewer finds this whisky bright. They note a dry finish.",
-      summaryContentHash: "sha256:first",
-    });
-
-    const changedInput = inputFor(site.id);
-    changedInput.contentHash = "sha256:second";
-    await storeExternalReviewArticle(changedInput);
-
-    expect(
-      await db.query.externalReviews.findFirst({
-        where: eq(externalReviews.sourceKey, "ardbeg-ten"),
-      }),
-    ).toMatchObject({
-      summary: null,
-      summaryContentHash: null,
-      summaryModel: null,
-      summaryPromptVersion: null,
-      summaryGeneratedAt: null,
     });
   });
 

@@ -235,7 +235,6 @@ describe("POST /external-reviews", () => {
     });
     const admin = await fixtures.User({ admin: true });
     const url = "https://example.com/reviews/fetched-review";
-    const generatedAt = new Date("2026-08-20T12:00:00Z");
     await storeExternalReviewArticle({
       externalSiteId: site.id,
       canonicalUrl: url,
@@ -250,13 +249,6 @@ describe("POST /external-reviews", () => {
           name: "Fetched Review Bottle",
           reviewerName: "Source Reviewer",
           nativeScore: { value: 8.8, scale: 10, display: "8.8/10" },
-          summary: {
-            text: "The review describes a bright whisky. It notes a dry finish.",
-            contentHash: "sha256:fetched",
-            model: "summary-model",
-            promptVersion: "summary-v1",
-            generatedAt,
-          },
         },
       ],
     });
@@ -287,8 +279,6 @@ describe("POST /external-reviews", () => {
       nativeScoreValue: 90,
       reviewerName: "Source Reviewer",
       nativeScoreDisplay: "90/100",
-      summaryContentHash: "sha256:fetched",
-      summaryGeneratedAt: generatedAt,
     });
   });
 

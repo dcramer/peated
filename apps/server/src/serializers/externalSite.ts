@@ -1,13 +1,13 @@
 import { type z } from "zod";
 import { serializer } from ".";
 import type {
-  ExternalReviewSourcePolicy,
+  ExternalReviewPublication,
   ExternalSite,
   ExternalSiteRun,
   User,
 } from "../db/schema";
 import {
-  type ExternalReviewSourcePolicySchema,
+  type ExternalReviewPublicationSchema,
   type ExternalSiteRunSchema,
   type ExternalSiteSchema,
 } from "../schemas";
@@ -63,16 +63,14 @@ export function serializeExternalSiteRun(
   };
 }
 
-export function serializeExternalReviewSourcePolicy(
+export function serializeExternalReviewPublication(
   externalSiteId: number,
-  policy: ExternalReviewSourcePolicy | null,
-): z.infer<typeof ExternalReviewSourcePolicySchema> {
+  publication: ExternalReviewPublication | null,
+): z.infer<typeof ExternalReviewPublicationSchema> {
   return {
     externalSiteId,
-    publicationMode: policy?.publicationMode ?? "disabled",
-    allowLlmProcessing: policy?.allowLlmProcessing ?? false,
-    allowScoreDisplay: policy?.allowScoreDisplay ?? false,
-    allowSummaryDisplay: policy?.allowSummaryDisplay ?? false,
-    updatedAt: policy?.updatedAt.toISOString() ?? null,
+    approved: publication?.approvedAt != null,
+    approvedAt: publication?.approvedAt?.toISOString() ?? null,
+    updatedAt: publication?.updatedAt.toISOString() ?? null,
   };
 }

@@ -126,7 +126,7 @@ export function parseWordsOfWhiskyArticle(
   );
   const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
     [];
-  const externalReviewTexts: Record<string, string> = {};
+  const reviewTexts: Record<string, string> = {};
 
   for (const [reviewIndex, start] of reviewStarts.entries()) {
     const end = reviewStarts[reviewIndex + 1] ?? elements.length;
@@ -158,7 +158,7 @@ export function parseWordsOfWhiskyArticle(
         .filter((text) => TASTING_PARAGRAPH.test(text))
         .join(" "),
     );
-    if (reviewText) externalReviewTexts[sourceKey] = reviewText;
+    if (reviewText) reviewTexts[sourceKey] = reviewText;
   }
 
   if (externalReviews.length === 0) {
@@ -170,7 +170,7 @@ export function parseWordsOfWhiskyArticle(
   const contentText = JSON.stringify(
     externalReviews.map((review) => ({
       ...review,
-      reviewText: externalReviewTexts[review.sourceKey] ?? null,
+      reviewText: reviewTexts[review.sourceKey] ?? null,
     })),
   );
   return WordsOfWhiskyObservationSchema.parse({
@@ -182,7 +182,6 @@ export function parseWordsOfWhiskyArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews,
     },
-    externalReviewTexts,
   });
 }
 

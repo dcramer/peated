@@ -58,12 +58,6 @@ test("extracts the grade and only tasting-note paragraphs", async () => {
   expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
     reparsed.article.externalReviews[0]?.sourceKey,
   );
-  expect(Object.values(parsed.externalReviewTexts)).toEqual([
-    "The Bourbon The nose has orange peel and vanilla. The palate adds oak spice. The finish is long and dry.",
-  ]);
-  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
-    /introduction|conclusion|suggested price/iu,
-  );
 });
 
 test("maps another grade and allows an article without an encoded date", async () => {
