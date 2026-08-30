@@ -51,8 +51,8 @@
 ## Testing and Validation
 
 - Backend tests are integration-first.
-- Frontend tests prove deterministic component contracts and browser behavior;
-  visual presentation uses manual or agent-based QA.
+- Frontend tests prove deterministic logic and user behavior. Do not assert
+  visual markup; verify presentation with manual or agent-based QA.
 - Tests and live evals are separate gates. `pnpm test` runs deterministic Vitest
   tests; classifier model evals run through `pnpm evals`.
 - Before adding coverage, search existing test and eval layers for the behavior's
