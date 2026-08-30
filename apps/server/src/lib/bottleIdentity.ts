@@ -30,7 +30,11 @@ export type BottleExactIdentity = Pick<
   releaseDay?: Bottle["releaseDay"];
 };
 
-type CompleteBottleExactIdentity = BottleExactIdentity & {
+type CompleteBottleExactIdentity = Omit<
+  BottleExactIdentity,
+  "bottlingYear" | "releaseMonth" | "releaseDay"
+> & {
+  bottlingYear: Bottle["bottlingYear"];
   releaseMonth: Bottle["releaseMonth"];
   releaseDay: Bottle["releaseDay"];
 };
@@ -98,7 +102,10 @@ export function getBottleExactIdentity({
       exactPatch?.noAgeStatement,
       bottle.noAgeStatement,
     ),
-    bottlingYear: valueOrCurrent(exactPatch?.bottlingYear, bottle.bottlingYear),
+    bottlingYear: valueOrCurrent(
+      exactPatch?.bottlingYear,
+      bottle.bottlingYear ?? null,
+    ),
     releaseYear: valueOrCurrent(exactPatch?.releaseYear, bottle.releaseYear),
     releaseMonth: valueOrCurrent(
       exactPatch?.releaseMonth,
