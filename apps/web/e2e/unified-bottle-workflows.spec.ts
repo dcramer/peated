@@ -8,7 +8,7 @@ import {
   createdBottleName,
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
-  existingBottle,
+  existingBottleDetails,
   existingBottleId,
   testAccessToken,
   testBrand,
@@ -301,13 +301,13 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("radio", {
         exact: true,
-        name: `Keep ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}) Retire ${formatBottleDisplayName(existingBottle)} (${existingBottle.peatedId}).`,
+        name: `Keep ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}) Retire ${formatBottleDisplayName(existingBottleDetails)} (${existingBottleDetails.peatedId}).`,
       }),
     ).toBeChecked();
     await expect(
       page.getByRole("radio", {
         exact: true,
-        name: `Keep ${formatBottleDisplayName(existingBottle)} (${existingBottle.peatedId}) Retire ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}).`,
+        name: `Keep ${formatBottleDisplayName(existingBottleDetails)} (${existingBottleDetails.peatedId}) Retire ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}).`,
       }),
     ).toBeVisible();
 
