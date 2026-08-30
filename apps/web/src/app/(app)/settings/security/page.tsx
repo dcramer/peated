@@ -8,7 +8,7 @@ import {
   FormSection,
   FormStack,
   TextInput,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import PasskeyManager from "@peated/web/components/passkeyManager";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";

@@ -4,11 +4,11 @@ import {
   EmptyState,
   ItemList,
   ItemRow,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
-} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/pageLayout.stylex";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";

@@ -12,7 +12,7 @@ import { peatedViewports } from "./viewports";
 const preview: Preview = {
   globalTypes: {
     theme: {
-      description: "Design system color scheme",
+      description: "Color scheme",
       toolbar: {
         icon: "mirror",
         items: [
@@ -46,11 +46,19 @@ const preview: Preview = {
             "Actions",
             "Forms",
             "Selection",
+            "Identity",
+            "Measures",
             "Data Display",
+            "Layout",
+            "Editorial",
             "Feedback",
             "Navigation",
+            "Bottle",
+            "Entities",
+            "Profile",
+            "Search",
           ],
-          "Patterns",
+          "Pages",
         ],
       },
     },

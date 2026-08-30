@@ -12,7 +12,7 @@ import {
   PictureInput,
   Switch,
   TextInput,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
   acceptTosForm,

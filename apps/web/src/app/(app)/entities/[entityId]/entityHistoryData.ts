@@ -3,7 +3,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import type {
   HistoryEvent,
   HistoryState,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 
 type EntityEvent = Outputs["entities"]["events"]["list"]["results"][number];
 

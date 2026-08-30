@@ -5,8 +5,8 @@ import {
   RailList,
   RailListItem,
   SectionError,
-} from "@peated/web/components/designSystem/components";
-import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components";
+import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 import type { Entity } from "./entityPageData";

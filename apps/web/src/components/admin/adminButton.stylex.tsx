@@ -4,7 +4,7 @@ import {
   Button as DesignButton,
   type ButtonSize,
   type ButtonVariant,
-} from "../designSystem/components";
+} from "..";
 
 type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
 type AdminButtonSize = "small" | "base";

@@ -14,11 +14,11 @@ import {
   RailList,
   RailListItem,
   SectionError,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import {
   PageColumns,
   RailSection,
-} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/pageLayout.stylex";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";

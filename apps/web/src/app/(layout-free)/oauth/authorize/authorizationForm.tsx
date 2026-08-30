@@ -1,6 +1,6 @@
 import type { OAuthAuthorizationRequest } from "@peated/server/schemas";
-import { Button } from "@peated/web/components/designSystem/components";
-import { AuthenticationActions } from "@peated/web/components/designSystem/patterns/authentication.stylex";
+import { Button } from "@peated/web/components";
+import { AuthenticationActions } from "@peated/web/components/pages/authentication.stylex";
 import { approveOAuthAuthorization, denyOAuthAuthorization } from "./actions";
 
 function AuthorizationFields({

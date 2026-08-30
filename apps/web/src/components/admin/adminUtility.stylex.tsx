@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
+import { CursorPager } from "..";
 import { buildQueryString } from "../../lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
@@ -16,7 +17,6 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import { CursorPager } from "../designSystem/components";
 
 export function AdminPager({
   ariaLabel = "Pagination",

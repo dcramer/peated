@@ -34,7 +34,7 @@ import {
   UnitInput,
   type EntityPickerOption,
   type SearchPickerOption,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import {

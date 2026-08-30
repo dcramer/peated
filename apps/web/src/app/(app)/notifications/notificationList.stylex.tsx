@@ -15,8 +15,8 @@ import {
   IconButton,
   ItemList,
   ItemListItem,
-} from "@peated/web/components/designSystem/components";
-import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
+} from "@peated/web/components";
+import { Avatar } from "@peated/web/components/avatar.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";

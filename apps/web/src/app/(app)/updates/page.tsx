@@ -1,8 +1,8 @@
-import { EmptyState } from "@peated/web/components/designSystem/components";
+import { EmptyState } from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
-} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/pageLayout.stylex";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";

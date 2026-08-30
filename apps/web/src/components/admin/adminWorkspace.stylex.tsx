@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { SkipLink } from "@peated/web/components/designSystem/components/skipLink.stylex";
+import { SkipLink } from "@peated/web/components/skipLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,

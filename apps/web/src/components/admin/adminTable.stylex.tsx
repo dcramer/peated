@@ -16,7 +16,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import { linkedRowStyles } from "../designSystem/components/linkedRow.stylex";
+import { linkedRowStyles } from "../linkedRow.stylex";
 import { AdminPager } from "./adminUtility.stylex";
 
 export type AdminTableColumn<Item extends object> = {

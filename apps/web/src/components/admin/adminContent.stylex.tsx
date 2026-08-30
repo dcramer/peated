@@ -5,6 +5,7 @@ import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
 import type { HTMLAttributes, ReactNode } from "react";
 
+import { TextLink } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
@@ -13,7 +14,6 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import { TextLink } from "../designSystem/components";
 
 export type AdminBreadcrumb = {
   current?: boolean;

@@ -4,7 +4,7 @@ import {
   ContentPage,
   ContentSection,
   ContentText,
-} from "@peated/web/components/designSystem/patterns/contentPage.stylex";
+} from "@peated/web/components/pages/contentPage.stylex";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 

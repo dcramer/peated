@@ -2,10 +2,7 @@
 
 import * as stylex from "@stylexjs/stylex";
 
-import {
-  AppLink,
-  PageTabs,
-} from "@peated/web/components/designSystem/components";
+import { AppLink, PageTabs } from "@peated/web/components";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 export function BottleCatalogNavigation({

@@ -4,7 +4,7 @@ import type { Flight } from "@peated/server/types";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { RowMenu } from "@peated/web/components/designSystem/components";
+import { RowMenu } from "@peated/web/components";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 

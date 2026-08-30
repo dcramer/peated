@@ -7,7 +7,7 @@ import {
   AuthenticationIntro,
   AuthenticationLayout,
   AuthenticationLink,
-} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+} from "@peated/web/components/pages/authentication.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
 function DatabaseIntro() {

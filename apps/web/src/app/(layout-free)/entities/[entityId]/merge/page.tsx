@@ -10,7 +10,7 @@ import {
   FormStack,
   SearchSelect,
   type SearchPickerOption,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";

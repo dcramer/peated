@@ -4,7 +4,7 @@ import {
   AppLink,
   hasVisibleFacts,
   type FactListItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { parseDomain } from "@peated/web/lib/urls";
 import {
   colors,

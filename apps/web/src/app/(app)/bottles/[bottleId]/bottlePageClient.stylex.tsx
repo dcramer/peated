@@ -26,12 +26,12 @@ import {
   type PageTabItem,
   type RowMenuItem,
   type TastingEntryProps,
-} from "@peated/web/components/designSystem/components";
-import { BottleOverview } from "@peated/web/components/designSystem/patterns/bottleOverview.stylex";
-import { BottlePageHeader } from "@peated/web/components/designSystem/patterns/bottlePageHeader.stylex";
+} from "@peated/web/components";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import Join from "@peated/web/components/join";
+import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
+import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import {

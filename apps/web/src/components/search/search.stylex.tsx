@@ -6,11 +6,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import type {
   SearchResultGroup,
   SearchResultItem,
-} from "@peated/web/components/designSystem/components";
-import {
-  Button,
-  SearchBox,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
+import { Button, SearchBox } from "@peated/web/components";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";

@@ -48,9 +48,7 @@ describe("selectScenarioIds", () => {
 
   it("selects search for shared search result changes", () => {
     expect(
-      selectScenarioIds([
-        "apps/web/src/components/designSystem/components/searchResults.stylex.tsx",
-      ]),
+      selectScenarioIds(["apps/web/src/components/searchResults.stylex.tsx"]),
     ).toEqual(["home", "search", "bottle-detail", "member-profile"]);
   });
 
@@ -73,7 +71,7 @@ describe("selectScenarioIds", () => {
   it("selects login for authentication changes", () => {
     expect(
       selectScenarioIds([
-        "apps/web/src/components/designSystem/patterns/authentication.stylex.tsx",
+        "apps/web/src/components/pages/authentication.stylex.tsx",
       ]),
     ).toEqual(["login"]);
   });
@@ -103,7 +101,7 @@ describe("selectScenarioIds", () => {
 
   it("selects four representative pages for shared UI changes", () => {
     const selected = selectScenarioIds([
-      "apps/web/src/components/designSystem/components/button.stylex.tsx",
+      "apps/web/src/components/button.stylex.tsx",
     ]);
 
     expect(selected).toEqual([

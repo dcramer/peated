@@ -14,7 +14,7 @@ import {
   Textarea,
   TextInput,
   type EntityPickerOption,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import {
   entityImageDrafts,
   EntityImageEditor,

@@ -1,4 +1,4 @@
-import { CursorPager } from "@peated/web/components/designSystem/components";
+import { CursorPager } from "@peated/web/components";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";

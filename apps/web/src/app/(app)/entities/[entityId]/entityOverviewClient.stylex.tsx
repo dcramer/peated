@@ -4,7 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
-import { SectionError } from "@peated/web/components/designSystem/components";
+import { SectionError } from "@peated/web/components";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../styles/tokens.stylex";

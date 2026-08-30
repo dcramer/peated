@@ -1,4 +1,4 @@
-import { ButtonLink } from "@peated/web/components/designSystem/components";
+import { ButtonLink } from "@peated/web/components";
 import Markdown from "@peated/web/components/markdown";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";

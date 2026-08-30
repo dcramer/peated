@@ -9,6 +9,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import { Button } from "../..";
 import {
   colors,
   controlMetrics,
@@ -16,7 +17,6 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { Button } from "../../designSystem/components";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 

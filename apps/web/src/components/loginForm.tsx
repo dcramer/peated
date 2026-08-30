@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  Button,
-  Field,
-  TextInput,
-} from "@peated/web/components/designSystem/components";
+import { Button, Field, TextInput } from "@peated/web/components";
+import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import {
   AuthenticationActions,
   AuthenticationCard,
@@ -14,8 +11,7 @@ import {
   AuthenticationNotice,
   AuthenticationPanel,
   AuthenticationTextButton,
-} from "@peated/web/components/designSystem/patterns/authentication.stylex";
-import GoogleLoginButton from "@peated/web/components/googleLoginButton";
+} from "@peated/web/components/pages/authentication.stylex";
 import PasskeyLoginButton from "@peated/web/components/passkeyLoginButton";
 import config from "@peated/web/config";
 import { authenticate, authenticateForm } from "@peated/web/lib/auth.actions";

@@ -6,7 +6,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import {
   RatingMeasure,
   type BottleComparisonRow,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 

@@ -13,7 +13,7 @@ import {
   RowMenu,
   SectionError,
   type RowMenuItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import Markdown from "@peated/web/components/markdown";
 import useAuth from "@peated/web/hooks/useAuth";

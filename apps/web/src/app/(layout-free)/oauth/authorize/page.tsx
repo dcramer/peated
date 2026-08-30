@@ -2,7 +2,7 @@ import { AuthenticationPage } from "@peated/web/components/auth/authenticationPa
 import {
   AuthenticationNotice,
   AuthenticationPanel,
-} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+} from "@peated/web/components/pages/authentication.stylex";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import {
   oauthAuthorizationSearchParams,

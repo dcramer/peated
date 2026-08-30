@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  SearchPicker,
-  type SearchPickerOption,
-} from "@peated/web/components/designSystem/components";
+import { SearchPicker, type SearchPickerOption } from "@peated/web/components";
 import { useEffect, useMemo, useState } from "react";
 
 import type { OnQuery, Option } from "./types";

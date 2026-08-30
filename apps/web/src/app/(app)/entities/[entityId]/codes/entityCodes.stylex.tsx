@@ -1,12 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import {
-  Card,
-  RailList,
-  RailListItem,
-  TextLink,
-} from "@peated/web/components/designSystem/components";
-import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+import { Card, RailList, RailListItem, TextLink } from "@peated/web/components";
+import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
 
 type CodeGroup = {

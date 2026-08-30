@@ -11,7 +11,7 @@ import {
   Field,
   FieldGroup,
   TextInput,
-} from "./designSystem/components";
+} from ".";
 
 type EntityImage = Outputs["entities"]["details"]["images"][number];
 

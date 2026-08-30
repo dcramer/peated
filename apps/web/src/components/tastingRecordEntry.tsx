@@ -8,7 +8,7 @@ import {
   MemberAvatar,
   TastingEntry,
   type TastingEntryMember,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import TimeSince from "@peated/web/components/timeSince";
 import {
   getBottleMetadata,

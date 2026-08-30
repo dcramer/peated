@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import {
   PageHeader,
   TabbedPage,
-} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/pageLayout.stylex";
 
 const tabs = [
   { href: "/settings/profile", label: "Profile" },

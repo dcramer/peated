@@ -8,18 +8,14 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import {
-  ButtonLink,
-  LoadingList,
-  SectionError,
-} from "@peated/web/components/designSystem/components";
+import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
 import {
   MemberLibraryFilters,
   MemberLibraryList,
   type MemberLibraryFilterGroup,
   type MemberLibraryItem,
-} from "@peated/web/components/designSystem/patterns/memberProfileContent.stylex";
-import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/memberProfileContent.stylex";
+import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";

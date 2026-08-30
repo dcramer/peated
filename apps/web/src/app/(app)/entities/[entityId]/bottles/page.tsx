@@ -1,4 +1,4 @@
-import { ButtonLink } from "@peated/web/components/designSystem/components";
+import { ButtonLink } from "@peated/web/components";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";

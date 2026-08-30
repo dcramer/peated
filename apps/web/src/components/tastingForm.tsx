@@ -22,7 +22,7 @@ import {
   ValidationMessage,
   type MemberPickerOption,
   type NotePickerOption,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";

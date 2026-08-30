@@ -4,7 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { AliasManager } from "@peated/web/components/designSystem/components";
+import { AliasManager } from "@peated/web/components";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";

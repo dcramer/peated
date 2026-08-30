@@ -5,7 +5,7 @@ import {
   DataTable,
   EmptyState,
   type DataTableColumn,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 type LocationListItem = {

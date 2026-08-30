@@ -1,5 +1,5 @@
 import type { Badge } from "@peated/server/types";
-import { BadgeImage } from "@peated/web/components/designSystem/components";
+import { BadgeImage } from "@peated/web/components";
 import * as stylex from "@stylexjs/stylex";
 import Link from "next/link";
 

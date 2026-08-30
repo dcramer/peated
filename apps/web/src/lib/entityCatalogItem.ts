@@ -1,7 +1,7 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
 
-import type { EntityCatalogItem } from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
+import type { EntityCatalogItem } from "@peated/web/components/pages/entityCatalog.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 export function toEntityCatalogItem(

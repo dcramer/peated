@@ -4,13 +4,13 @@ import {
   DataTable,
   type DataTableColumn,
   RATING_BANDS,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import {
   ContentPage,
   ContentSection,
   ContentSubsection,
   ContentText,
-} from "@peated/web/components/designSystem/patterns/contentPage.stylex";
+} from "@peated/web/components/pages/contentPage.stylex";
 import type { Metadata } from "next";
 
 export const dynamic = "force-static";

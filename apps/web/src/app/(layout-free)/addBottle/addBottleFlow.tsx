@@ -3,14 +3,6 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
-import BottleResolver, {
-  type BottleResolverAction,
-  type BottleResolverCreateProposalActionsProps,
-  type BottleResolverMatchedActionsProps,
-  type BottleResolverResult,
-  type PendingImageRef,
-} from "@peated/web/components/bottleResolver";
-import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import {
   Button,
   ButtonLink,
@@ -22,7 +14,15 @@ import {
   LoadingList,
   SelectedBottleSummary,
   type CollectionBottleStatusValue,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
+import BottleResolver, {
+  type BottleResolverAction,
+  type BottleResolverCreateProposalActionsProps,
+  type BottleResolverMatchedActionsProps,
+  type BottleResolverResult,
+  type PendingImageRef,
+} from "@peated/web/components/bottleResolver";
+import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";

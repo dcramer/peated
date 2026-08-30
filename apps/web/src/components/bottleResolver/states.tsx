@@ -6,7 +6,7 @@ import {
   ButtonLink,
   FormStack,
   SelectedBottleSummary,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 

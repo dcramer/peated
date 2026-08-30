@@ -13,7 +13,7 @@ import {
   Textarea,
   TextInput,
   type SearchPickerOption,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import {

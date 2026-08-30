@@ -11,6 +11,6 @@ export const loginScenario = {
     filePath === "apps/web/src/components/loginForm.tsx" ||
     filePath === "apps/web/src/components/googleLoginButton.tsx" ||
     filePath === "apps/web/src/components/passkeyLoginButton.tsx" ||
-    filePath.includes("/designSystem/patterns/authentication.stylex"),
+    filePath.includes("/pages/authentication.stylex"),
   viewports: [DESKTOP, MOBILE],
 };

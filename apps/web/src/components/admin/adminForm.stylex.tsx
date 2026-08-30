@@ -6,7 +6,6 @@ import { forwardRef } from "react";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
 
-import { colors, fonts, space } from "../../styles/tokens.stylex";
 import {
   Field,
   FormActions,
@@ -17,7 +16,8 @@ import {
   Switch,
   Textarea,
   TextInput,
-} from "../designSystem/components";
+} from "..";
+import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { WorkflowScreen } from "../workflowScreen.stylex";
 
 type FieldError = { message?: string } | undefined;

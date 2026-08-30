@@ -5,7 +5,7 @@ import {
   EmptyState,
   ItemList,
   ItemListItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { getCursorHref } from "@peated/web/lib/cursorHref";

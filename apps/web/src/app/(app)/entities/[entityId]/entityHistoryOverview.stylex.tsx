@@ -5,8 +5,8 @@ import {
   HistoryTimeline,
   LoadingList,
   SectionError,
-} from "@peated/web/components/designSystem/components";
-import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components";
+import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 
 import { getEntityHistoryEvents } from "./entityHistoryData";
 

@@ -4,8 +4,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { AliasManager } from "@peated/web/components/designSystem/components";
-import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+import { AliasManager } from "@peated/web/components";
+import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";

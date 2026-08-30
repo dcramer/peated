@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { ButtonLink } from "../designSystem/components";
+import { ButtonLink } from "..";
 import {
   AdminPage,
   AdminPageHeader,

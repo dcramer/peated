@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  Button,
-  Checkbox,
-} from "@peated/web/components/designSystem/components";
+import { Button, Checkbox } from "@peated/web/components";
 import {
   AuthenticationActions,
   AuthenticationCard,
   AuthenticationLink,
   AuthenticationNotice,
-} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+} from "@peated/web/components/pages/authentication.stylex";
 import { acceptTosForm, logoutForm } from "@peated/web/lib/auth.actions";
 import { useActionState, useState } from "react";
 

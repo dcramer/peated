@@ -1,4 +1,4 @@
-import { GlobalLoading } from "@peated/web/components/designSystem/patterns/globalLoading.stylex";
+import { GlobalLoading } from "@peated/web/components/pages/globalLoading.stylex";
 
 export default function Loading() {
   return <GlobalLoading />;

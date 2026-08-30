@@ -19,9 +19,9 @@ import {
 import AvatarEditor from "react-avatar-editor";
 import { z } from "zod";
 
+import { Button, Field } from ".";
 import setRef from "../lib/setRef";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
-import { Button, Field } from "./designSystem/components";
 
 type Props = {
   error?: { message?: string };

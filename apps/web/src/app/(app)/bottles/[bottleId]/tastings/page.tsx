@@ -4,7 +4,7 @@ import {
   EmptyState,
   ItemList,
   ItemListItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { getCursorHref } from "@peated/web/lib/cursorHref";

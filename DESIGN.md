@@ -422,7 +422,7 @@ Thin data is normal.
 
 ### Component ownership
 
-Design-system components use StyleX and own their visual states. Name files that contain StyleX calls `*.stylex.ts` or `*.stylex.tsx`; this keeps the compile boundary narrow and explicit. Product screens compose these components instead of adding page-local visual classes.
+Shared components use StyleX and own their visual states. Name files that contain StyleX calls `*.stylex.ts` or `*.stylex.tsx`; this keeps the compile boundary narrow and explicit. Product screens compose these components instead of adding page-local visual classes.
 
 Use the shared composition baseline before adding another visual container:
 
@@ -436,7 +436,7 @@ Use the shared composition baseline before adding another visual container:
 
 Name an exported component after the Peated concept or user task that it owns. Use a normal UI noun for a generic control. Do not name a component after its implementation shape with words such as `Product`, `Experience`, `Surface`, `Shell`, `Widget`, `Module`, `Structure`, or `Record` unless that word is the real product concept. Storybook titles use the same nouns as the product and group them by their owning domain. State names describe what the reviewer sees or does.
 
-Storybook is the living view of the implemented shared system. Its sidebar lists foundation topics and reusable components grouped by domain. Keep each component's story file beside its implementation. A simple component starts with one Overview story that renders its useful static variants together and exposes narrow props through Storybook controls. Do not add separate stories for sizes, labels, selected values, item counts, or other prop permutations that can be understood in the overview or controls. Add a separate named story only when a behavior, asynchronous state, permission boundary, error, or responsive composition needs a stable direct review URL. A named behavior story renders its scenario directly and deterministically; reviewers do not click through setup steps to reach the state under review. Pin shared hover, pressed, and keyboard-focus rules in one interaction-state story so reviewers can inspect those real pseudo states without holding the pointer in place. Add a group only after it contains real exported tokens or components. Stories render the same components used by product screens. Do not add visual copies, placeholder controls, empty groups, route-specific sections, or complete page compositions.
+Storybook is the living view of the shared components and styles. Its sidebar lists foundation topics and reusable components grouped by domain. Keep each component's story file beside its implementation. A simple component starts with one Overview story that renders its useful static variants together and exposes narrow props through Storybook controls. Do not add separate stories for sizes, labels, selected values, item counts, or other prop permutations that can be understood in the overview or controls. Add a separate named story only when a behavior, asynchronous state, permission boundary, error, or responsive composition needs a stable direct review URL. A named behavior story renders its scenario directly and deterministically; reviewers do not click through setup steps to reach the state under review. Pin shared hover, pressed, and keyboard-focus rules in one interaction-state story so reviewers can inspect those real pseudo states without holding the pointer in place. Add a group only after it contains real exported tokens or components. Stories render the same components used by product screens. Do not add visual copies, placeholder controls, empty groups, route-specific sections, or complete page compositions.
 
 Storybook exposes an accessibility review panel and a local MCP endpoint for agents. Accessibility findings support manual review and do not create a presentation-test gate. Agent manifests use component types, concise JSDoc for non-obvious semantics, and real stories. Do not enable global Autodocs pages only to feed the manifest. CI builds the static Storybook as a compile gate.
 
@@ -448,15 +448,13 @@ Page compositions use the same ownership rule. A page component receives
 render-ready values and component slots. It owns page hierarchy and responsive
 layout, but it does not fetch data, inspect authentication, or run mutations.
 The product route owns those behaviors. When browser hooks are required, keep a
-small `*Client` component beside the route. Do not put route-only code in the
-design-system folders.
+small `*Client` component beside the route. Do not put route-only code in
+reusable components or `components/pages`.
 
-Keep the visual system app-local while the web app is its only runtime consumer.
-`components/designSystem/components` owns reusable visual components, and
-`components/designSystem/patterns` owns reusable render-only compositions.
-Route-only behavior lives beside its route. Behavior shared by several routes
-lives in a narrowly named feature folder outside the design-system tree. Do not
-add a catch-all product, experience, or feature layer inside the visual system.
+Keep reusable React components in `components`. Put page-sized, render-only
+components in `components/pages`. Route-only behavior lives beside its route.
+Behavior shared by several routes lives in a narrowly named feature folder. Do
+not add a catch-all product, experience, shared, or UI layer.
 
 Use one plain canvas treatment for spacing and width. Render each component directly instead of wrapping it in a decorative preview card. If a component needs a surface, radius, minimum height, or shadow, the component owns it. Keep a shared composite component in its owning component category. Do not use a separate pattern category for route-specific sections or page layouts; review those in the application. The Storybook theme toolbar changes the complete story canvas.
 
@@ -467,7 +465,7 @@ Stories use plain headings and unnumbered sections. They do not use editorial sl
 Implement one bounded slice at a time:
 
 1. Add the shared contract and real component states to the owning Storybook category.
-2. Run type and Storybook production-build checks. Do not add component or snapshot tests for design-system presentation.
+2. Run type and Storybook production-build checks. Do not add component or snapshot tests for presentation.
 3. Use the Storybook toolbar to inspect the story in light and dark modes at desktop and mobile widths.
 4. Pause for visual approval.
 5. Apply the approved component to a product surface.

@@ -14,8 +14,8 @@ import {
   ItemRow,
   MemberAvatar,
   RowMenu,
-} from "@peated/web/components/designSystem/components";
-import { PageHeader } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components";
+import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
