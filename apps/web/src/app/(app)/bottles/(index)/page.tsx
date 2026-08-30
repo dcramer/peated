@@ -1,4 +1,5 @@
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
+import { normalizeBottleCatalogQueryParams } from "@peated/web/lib/bottleCatalogQueryParams";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
 
@@ -12,20 +13,22 @@ export const metadata: Metadata = {
 export default async function BottleListPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const queryParams = getApiQueryParams(await props.searchParams, {
-    numericFields: [
-      "age",
-      "brand",
-      "bottler",
-      "cursor",
-      "distiller",
-      "entity",
-      "limit",
-      "minScore",
-      "series",
-    ],
-    overrides: { limit: 50 },
-  });
+  const queryParams = normalizeBottleCatalogQueryParams(
+    getApiQueryParams(await props.searchParams, {
+      numericFields: [
+        "age",
+        "brand",
+        "bottler",
+        "cursor",
+        "distiller",
+        "entity",
+        "limit",
+        "minScore",
+        "series",
+      ],
+      overrides: { limit: 50 },
+    }),
+  );
   const { client } = await getPublicPageServerClient();
   const bottleList = await client.bottles.list(queryParams);
 

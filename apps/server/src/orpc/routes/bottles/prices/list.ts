@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottles, externalSites, storePrices } from "@peated/server/db/schema";
+import {
+  bottles,
+  bottleTombstones,
+  externalSites,
+  storePrices,
+} from "@peated/server/db/schema";
 import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import { implement } from "@peated/server/orpc";
 import bottlePriceListContract from "@peated/server/orpc/contracts/bottles/prices/list";
@@ -20,10 +25,18 @@ export default implement(bottlePriceListContract).handler(async function ({
   context,
   errors,
 }) {
-  const [bottle] = await db
+  let [bottle] = await db
     .select()
     .from(bottles)
     .where(eq(bottles.id, input.bottle));
+
+  if (!bottle) {
+    [bottle] = await db
+      .select({ ...getTableColumns(bottles) })
+      .from(bottleTombstones)
+      .innerJoin(bottles, eq(bottleTombstones.newBottleId, bottles.id))
+      .where(eq(bottleTombstones.bottleId, input.bottle));
+  }
 
   if (!bottle) {
     throw errors.NOT_FOUND({
