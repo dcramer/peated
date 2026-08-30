@@ -138,7 +138,7 @@ export function EntityOverviewClient({
       </div>
 
       <aside {...stylex.props(styles.details)}>
-        <EntityImagePlaceholder entityName={entity.name} />
+        <EntityImagePlaceholder entityName={entity.name} kind={entity.kind} />
         <EntityMap entity={entity} />
         <EntityCatalogRelationships
           catalog={catalogQuery.data}
