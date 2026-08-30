@@ -1,5 +1,5 @@
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 
 import {
   EntityCatalogPageClient,
@@ -16,7 +16,7 @@ export async function EntityCatalogPage({
   const queryParams = getApiQueryParams(await searchParams, {
     numericFields: ["cursor", "limit"],
   });
-  const { client } = await getAnonymousServerClient();
+  const { client } = await getPublicPageServerClient();
   const entityListPromise =
     kind === "distillery"
       ? client.distilleries.list(queryParams)

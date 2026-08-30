@@ -6,7 +6,10 @@ import type { Entity, EntityKind } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { ButtonLink } from "@peated/web/components/designSystem/components";
+import {
+  ButtonLink,
+  PageTabs,
+} from "@peated/web/components/designSystem/components";
 import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
 import {
   EntityCatalogFilters,
@@ -14,6 +17,7 @@ import {
   type EntityCatalogItem,
 } from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import useAuth from "@peated/web/hooks/useAuth";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
@@ -52,6 +56,7 @@ export function EntityCatalogPageClient({
 }) {
   const config = catalogConfig[kind];
   const orpc = useORPC();
+  const { user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -82,6 +87,11 @@ export function EntityCatalogPageClient({
   const query = searchParams.get("query") ?? "";
   const region = searchParams.get("region") ?? "";
   const hasFilters = Boolean(country || query || region);
+  const filter =
+    searchParams.get("filter") === "following" ? "following" : "all";
+  const allHref = getScopeHref(pathname, searchParams, "all");
+  const followingHref = getScopeHref(pathname, searchParams, "following");
+  const showFollowing = Boolean(user && kind !== "company");
 
   function updateParams(updates: Record<string, string>) {
     const nextParams = new URLSearchParams(searchParams);
@@ -115,6 +125,7 @@ export function EntityCatalogPageClient({
       }
       filters={
         <EntityCatalogFilters
+          ariaLabel={`${config.title} filters`}
           countries={countryList.results.map((item) => ({
             label: item.name,
             value: String(item.id),
@@ -131,10 +142,41 @@ export function EntityCatalogPageClient({
           region={region ? formatRegion(region) : undefined}
         />
       }
+      navigation={
+        showFollowing ? (
+          <PageTabs
+            ariaLabel={`${config.title} views`}
+            currentHref={filter === "following" ? followingHref : allHref}
+            items={[
+              { href: allHref, label: `All ${config.title.toLowerCase()}` },
+              { href: followingHref, label: "Following" },
+            ]}
+          />
+        ) : undefined
+      }
       title={config.title}
     >
       <EntityCatalogList
         addHref={addHref}
+        emptyAction={
+          filter === "following" && !hasFilters ? (
+            <ButtonLink href={allHref} size="sm" variant="tonal">
+              Browse all {config.title.toLowerCase()}
+            </ButtonLink>
+          ) : undefined
+        }
+        emptyDescription={
+          filter === "following"
+            ? hasFilters
+              ? `No ${config.title.toLowerCase()} you follow match these filters.`
+              : `Follow a ${config.noun} to add it to this list.`
+            : undefined
+        }
+        emptyHeading={
+          filter === "following"
+            ? `You don't follow any ${config.title.toLowerCase()} yet`
+            : undefined
+        }
         items={items}
         nextHref={getCursorHref(
           pathname,
@@ -155,6 +197,18 @@ export function EntityCatalogPageClient({
       />
     </CatalogPage>
   );
+}
+
+function getScopeHref(
+  pathname: string,
+  searchParams: { toString(): string },
+  filter: "all" | "following",
+) {
+  const nextParams = new URLSearchParams(searchParams.toString());
+  if (filter === "following") nextParams.set("filter", "following");
+  else nextParams.delete("filter");
+  nextParams.delete("cursor");
+  return buildSearchHref(pathname, nextParams);
 }
 
 function toCatalogItem(entity: Entity): EntityCatalogItem {

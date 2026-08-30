@@ -12,23 +12,33 @@ export function CatalogPage({
   children,
   eyebrow = "Whisky database",
   filters,
+  navigation,
   title,
 }: {
   action?: ReactNode;
   children: ReactNode;
   eyebrow?: ReactNode;
   filters: ReactNode;
+  navigation?: ReactNode;
   title: ReactNode;
 }) {
   return (
     <div {...stylex.props(styles.page)}>
-      <header {...stylex.props(styles.titleRow)}>
+      <header
+        {...stylex.props(
+          styles.titleRow,
+          navigation ? styles.titleRowWithNavigation : null,
+        )}
+      >
         <div>
           <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
           <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
         </div>
         {action}
       </header>
+      {navigation ? (
+        <div {...stylex.props(styles.navigation)}>{navigation}</div>
+      ) : null}
       <div {...stylex.props(styles.layout)}>
         <div {...stylex.props(styles.results)}>{children}</div>
         <aside {...stylex.props(styles.filters)}>{filters}</aside>
@@ -64,6 +74,12 @@ const styles = stylex.create({
     [NARROW]: {
       alignItems: "flex-start",
     },
+  },
+  titleRowWithNavigation: {
+    marginBottom: space.x2,
+  },
+  navigation: {
+    marginBottom: space.x6,
   },
   eyebrow: {
     marginBottom: space.x1,

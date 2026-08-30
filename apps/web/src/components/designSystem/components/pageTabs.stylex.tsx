@@ -15,7 +15,7 @@ export type PageTabsProps = {
   items: readonly [PageTabItem, ...PageTabItem[]];
 };
 
-/** Shows peer destinations within one record or member page. */
+/** Shows peer destinations within one page or section. */
 export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
   return (
     <nav aria-label={ariaLabel} {...stylex.props(styles.tabs)}>

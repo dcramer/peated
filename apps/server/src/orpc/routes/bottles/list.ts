@@ -95,10 +95,13 @@ export default implement(bottleListContract).handler(async function ({
       .where(
         and(
           eq(entityFollows.userId, context.user.id),
-          inArray(entities.kind, ["bottler", "distillery"]),
+          inArray(entities.kind, ["brand", "bottler", "distillery"]),
         ),
       );
     followedEntityIds = followedEntities.map(({ entityId }) => entityId);
+    const followedBrandIds = followedEntities.flatMap((entity) =>
+      entity.kind === "brand" ? [entity.entityId] : [],
+    );
     const followedDistillerIds = followedEntities.flatMap((entity) =>
       entity.kind === "distillery" ? [entity.entityId] : [],
     );
@@ -108,6 +111,9 @@ export default implement(bottleListContract).handler(async function ({
     where.push(
       followedEntityIds.length
         ? or(
+            followedBrandIds.length
+              ? inArray(bottles.brandId, followedBrandIds)
+              : undefined,
             followedDistillerIds.length
               ? sql`EXISTS(
                   SELECT FROM ${bottlesToDistillers}

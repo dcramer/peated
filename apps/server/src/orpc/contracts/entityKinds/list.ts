@@ -42,6 +42,7 @@ export const EntityKindListInputSchema = z
       .describe(
         "Filter by region slug or numeric ID. A slug requires `country`.",
       ),
+    filter: z.enum(["all", "following"]).default("all"),
     sort: z
       .enum(SORT_OPTIONS)
       .default(DEFAULT_SORT)
@@ -61,6 +62,7 @@ export const EntityKindListInputSchema = z
   })
   .default({
     query: "",
+    filter: "all",
     sort: DEFAULT_SORT,
     cursor: 1,
     limit: 100,

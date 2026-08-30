@@ -1,6 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
 import {
@@ -31,6 +32,9 @@ export type EntityCatalogItem = {
 
 export type EntityCatalogListProps = {
   addHref: string;
+  emptyAction?: ReactNode;
+  emptyDescription?: ReactNode;
+  emptyHeading?: string;
   items: readonly EntityCatalogItem[];
   nextHref?: string;
   noun: string;
@@ -45,6 +49,9 @@ export type EntityCatalogListProps = {
 /** Presents one API-owned cursor page without inventing a total. */
 export function EntityCatalogList({
   addHref,
+  emptyAction,
+  emptyDescription = "Try a broader search or remove the current location filter.",
+  emptyHeading,
   items,
   nextHref,
   noun,
@@ -79,7 +86,8 @@ export function EntityCatalogList({
       ) : (
         <EmptyState
           action={
-            onClear ? (
+            emptyAction ??
+            (onClear ? (
               <Button onClick={onClear} size="sm" variant="tonal">
                 Clear filters
               </Button>
@@ -87,11 +95,11 @@ export function EntityCatalogList({
               <ButtonLink href={addHref} size="sm" variant="tonal">
                 Add {noun}
               </ButtonLink>
-            )
+            ))
           }
-          heading={`No ${noun}s found`}
+          heading={emptyHeading ?? `No ${noun}s found`}
         >
-          Try a broader search or remove the current location filter.
+          {emptyDescription}
         </EmptyState>
       )}
       <CursorPager
@@ -132,6 +140,7 @@ export type EntityCatalogCountry = {
 };
 
 export type EntityCatalogFiltersProps = {
+  ariaLabel: string;
   countries: readonly EntityCatalogCountry[];
   country: string;
   onClear: () => void;
@@ -144,6 +153,7 @@ export type EntityCatalogFiltersProps = {
 
 /** Keeps query and location filters reachable while the route owns URL state. */
 export function EntityCatalogFilters({
+  ariaLabel,
   countries,
   country,
   onClear,
@@ -154,7 +164,7 @@ export function EntityCatalogFilters({
   region,
 }: EntityCatalogFiltersProps) {
   return (
-    <FilterPanel ariaLabel="Entity filters">
+    <FilterPanel ariaLabel={ariaLabel}>
       <FilterQuery
         label="Find a record"
         onSubmit={onQuerySubmit}

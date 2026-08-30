@@ -592,7 +592,19 @@ describe("mock oRPC router", () => {
     await expect(
       authenticatedClient.bottles.list({ filter: "following" }),
     ).resolves.toMatchObject({
-      followedEntityCount: 2,
+      followedEntityCount: 3,
+    });
+  });
+
+  it("requires sign-in for followed catalog records", async () => {
+    await expect(
+      anonymousClient.brands.list({ filter: "following" }),
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+
+    await expect(
+      authenticatedClient.brands.list({ filter: "following" }),
+    ).resolves.toMatchObject({
+      results: [expect.objectContaining({ id: 9207, name: "Redbreast" })],
     });
   });
 

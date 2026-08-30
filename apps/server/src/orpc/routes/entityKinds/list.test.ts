@@ -1,3 +1,6 @@
+import { db } from "@peated/server/db";
+import { entityFollows } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("Entity kind collections", () => {
@@ -83,5 +86,35 @@ describe("Entity kind collections", () => {
     });
 
     expect(results.map(({ id }) => id)).toEqual([expected.id]);
+  });
+
+  test("requires authentication for followed entities", async () => {
+    const error = await waitError(() =>
+      routerClient.distilleries.list({ filter: "following" }),
+    );
+
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+
+  test("lists followed entities of the requested kind", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const followed = await fixtures.Entity({
+      name: "Followed Brand",
+      kind: "brand",
+    });
+    await fixtures.Entity({ name: "Other Brand", kind: "brand" });
+    await db.insert(entityFollows).values({
+      userId: defaults.user.id,
+      entityId: followed.id,
+    });
+
+    const { results } = await routerClient.brands.list(
+      { filter: "following" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map(({ id }) => id)).toEqual([followed.id]);
   });
 });
