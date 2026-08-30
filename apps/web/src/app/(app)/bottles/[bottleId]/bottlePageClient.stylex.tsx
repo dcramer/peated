@@ -153,6 +153,7 @@ function getCriticReview(
 function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
   const member = {
     description: tasting.notes ?? undefined,
+    descriptionHref: `/tastings/${tasting.id}`,
     name: bottle.fullName,
     notes: tasting.tags,
     ratingBand: tasting.ratingBand ?? undefined,

@@ -15,6 +15,7 @@ type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 type TastingEntryRecord = {
   bottle: BottleMetadata & { fullName: string; id: number };
+  id: number;
   notes?: string | null;
   ratingBand?: TastingEntryMember["ratingBand"] | null;
   tags?: readonly string[] | null;
@@ -24,7 +25,8 @@ export function getTastingEntryMember(
   tasting: TastingEntryRecord,
 ): TastingEntryMember {
   return {
-    description: tasting.notes,
+    description: tasting.notes ?? undefined,
+    descriptionHref: `/tastings/${tasting.id}`,
     href: `/bottles/${tasting.bottle.id}`,
     metadata: getBottleMetadata(tasting.bottle),
     name: tasting.bottle.fullName,
@@ -35,11 +37,15 @@ export function getTastingEntryMember(
 
 export function TastingRecordEntry({
   showAvatar = true,
+  showFullNotes = false,
   tasting,
 }: {
   showAvatar?: boolean;
+  showFullNotes?: boolean;
   tasting: Tasting;
 }) {
+  const member = getTastingEntryMember(tasting);
+
   return (
     <TastingEntry
       author={tasting.createdBy.username}
@@ -53,7 +59,9 @@ export function TastingRecordEntry({
           />
         ) : undefined
       }
-      members={[getTastingEntryMember(tasting)]}
+      members={[
+        showFullNotes ? { ...member, descriptionHref: undefined } : member,
+      ]}
     />
   );
 }

@@ -11,7 +11,8 @@ import {
 import { BandMark, type RatingBand } from "./scoring.stylex";
 
 export type TastingEntryMember = {
-  description?: ReactNode;
+  description?: string;
+  descriptionHref?: string;
   href?: string;
   metadata?: string;
   name: string;
@@ -99,7 +100,7 @@ export function TastingEntry({
               ) : null}
               {member.description ? (
                 <span {...stylex.props(styles.description)}>
-                  {member.description}
+                  <TastingDescription member={member} />
                 </span>
               ) : null}
             </div>
@@ -115,6 +116,39 @@ export function TastingEntry({
       </ul>
       {comment ? <p {...stylex.props(styles.comment)}>{comment}</p> : null}
     </article>
+  );
+}
+
+const DESCRIPTION_PREVIEW_LENGTH = 60;
+
+function TastingDescription({ member }: { member: TastingEntryMember }) {
+  const description = member.description?.trim().replace(/\s+/g, " ");
+
+  if (
+    !member.descriptionHref ||
+    !description ||
+    description.length <= DESCRIPTION_PREVIEW_LENGTH
+  ) {
+    return member.description;
+  }
+
+  const wordBoundary = description
+    .slice(0, DESCRIPTION_PREVIEW_LENGTH + 1)
+    .lastIndexOf(" ");
+  const cutoff = wordBoundary > 0 ? wordBoundary : DESCRIPTION_PREVIEW_LENGTH;
+  const preview = `${description.slice(0, cutoff).trimEnd()}…`;
+
+  return (
+    <>
+      <span {...stylex.props(styles.descriptionPreview)}>{preview}</span>
+      <a
+        aria-label={`Read the full tasting notes for ${member.name}`}
+        href={member.descriptionHref}
+        {...stylex.props(styles.descriptionLink)}
+      >
+        Read more <span aria-hidden="true">→</span>
+      </a>
+    </>
   );
 }
 
@@ -259,6 +293,25 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: 1.5,
     whiteSpace: "pre-wrap",
+  },
+  descriptionLink: {
+    display: "inline-block",
+    marginTop: space.x2,
+    color: colors.accentDeep,
+    fontWeight: 600,
+    textDecoration: {
+      default: "none",
+      ":hover": "underline",
+    },
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
+    whiteSpace: "nowrap",
+  },
+  descriptionPreview: {
+    display: "block",
   },
   measure: {
     display: "flex",
