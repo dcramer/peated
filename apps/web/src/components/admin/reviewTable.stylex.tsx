@@ -13,23 +13,21 @@ const publishedDateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
-export default function ExternalReviewTable({
-  externalReviewList,
+export default function ReviewTable({
+  reviews,
   rel,
 }: {
-  externalReviewList: ExternalReview[];
+  reviews: ExternalReview[];
   rel?: PagingRel;
 }) {
-  return (
-    <ExternalReviewRows externalReviewList={externalReviewList} rel={rel} />
-  );
+  return <ReviewRows reviews={reviews} rel={rel} />;
 }
 
-export function ExternalReviewRows({
-  externalReviewList,
+export function ReviewRows({
+  reviews,
   rel,
 }: {
-  externalReviewList: ExternalReview[];
+  reviews: ExternalReview[];
   rel?: PagingRel;
 }) {
   return (
@@ -67,11 +65,11 @@ export function ExternalReviewRows({
         },
         {
           align: "right",
-          name: "source score",
+          name: "score",
           value: (review) => review.nativeScore?.display ?? "—",
         },
       ]}
-      items={externalReviewList}
+      items={reviews}
       rel={rel}
     />
   );
@@ -80,9 +78,9 @@ export function ExternalReviewRows({
 const styles = stylex.create({
   review: {
     display: "flex",
-    minWidth: 0,
     flexDirection: "column",
     gap: space.x1,
+    minWidth: 0,
   },
   metadata: {
     color: colors.inkMuted,
