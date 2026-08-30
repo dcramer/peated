@@ -37,10 +37,18 @@ const fallbackPresentation = {
   label: "Entity",
 } as const;
 
-export function getEntityPresentation(entity: Entity) {
+export function getEntityPresentation(entity: Pick<Entity, "kind">) {
   return entity.kind
     ? entityKindPresentation[entity.kind]
     : fallbackPresentation;
+}
+
+export function entityHasBottleCatalog(entity: Pick<Entity, "kind">) {
+  return (
+    entity.kind === "brand" ||
+    entity.kind === "bottler" ||
+    entity.kind === "distillery"
+  );
 }
 
 export function getEntityLocationLabel(entity: Entity) {

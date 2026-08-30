@@ -1,6 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { getEntityCurrentHref, getEntityTabs } from "./entityPageData";
+import {
+  entityHasBottleCatalog,
+  getEntityCurrentHref,
+  getEntityTabs,
+} from "./entityPageData";
+
+describe("entityHasBottleCatalog", () => {
+  it("limits bottle modules to entity kinds that own bottles", () => {
+    expect(entityHasBottleCatalog({ kind: "brand" })).toBe(true);
+    expect(entityHasBottleCatalog({ kind: "bottler" })).toBe(true);
+    expect(entityHasBottleCatalog({ kind: "distillery" })).toBe(true);
+    expect(entityHasBottleCatalog({ kind: "company" })).toBe(false);
+  });
+});
 
 describe("getEntityTabs", () => {
   it("uses the canonical public Entity route", () => {
