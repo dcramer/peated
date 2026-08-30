@@ -2,7 +2,7 @@ import type { Bottle, Entity, ExternalReview } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { ExternalReviewRows } from "./externalReviewTable";
+import { ReviewRows } from "./reviewTable.stylex";
 
 const timestamp = "2026-07-22T12:00:00.000Z";
 
@@ -80,10 +80,7 @@ const bottle = {
   hasTasted: false,
 } satisfies Bottle;
 
-function makeExternalReview(
-  id: number,
-  reviewBottle: Bottle | null,
-): ExternalReview {
+function makeReview(id: number, reviewBottle: Bottle | null): ExternalReview {
   return {
     id,
     name: "Springbank review",
@@ -97,12 +94,10 @@ function makeExternalReview(
   };
 }
 
-describe("ExternalReviewTable", () => {
+describe("ReviewTable", () => {
   it("renders the direct Bottle identity", () => {
     const html = renderToStaticMarkup(
-      <ExternalReviewRows
-        externalReviewList={[makeExternalReview(1, bottle)]}
-      />,
+      <ReviewRows reviews={[makeReview(1, bottle)]} />,
     );
 
     expect(html).toContain('href="/bottles/19"');
@@ -113,7 +108,7 @@ describe("ExternalReviewTable", () => {
 
   it("renders unresolved review identity without a catalog link", () => {
     const html = renderToStaticMarkup(
-      <ExternalReviewRows externalReviewList={[makeExternalReview(3, null)]} />,
+      <ReviewRows reviews={[makeReview(3, null)]} />,
     );
 
     expect(html).toContain("No bottle");

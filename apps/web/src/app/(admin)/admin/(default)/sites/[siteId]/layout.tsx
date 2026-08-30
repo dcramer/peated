@@ -128,7 +128,7 @@ export default function Layout({
           { href: root, label: "Settings" },
           { href: `${root}/runs`, label: "Runs" },
           { href: `${root}/prices`, label: "Prices" },
-          { href: `${root}/external-reviews`, label: "Reviews" },
+          { href: `${root}/reviews`, label: "Reviews" },
         ]}
       />
       {children}
