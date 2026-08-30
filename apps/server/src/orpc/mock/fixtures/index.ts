@@ -8,6 +8,7 @@ export * from "./collections";
 export * from "./comments";
 export * from "./constants";
 export * from "./entities";
+export * from "./entity-history";
 export * from "./events";
 export * from "./externalReviews";
 export * from "./flights";

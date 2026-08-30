@@ -26,6 +26,7 @@ import distilleryList from "./routes/distilleries/list";
 import entityCatalog from "./routes/entities/catalog";
 import entityCreate from "./routes/entities/create";
 import entityDetails from "./routes/entities/details";
+import entityEventList from "./routes/entities/events/list";
 import entityList from "./routes/entities/list";
 import eventList from "./routes/events/list";
 import externalReviewList from "./routes/externalReviews/list";
@@ -110,6 +111,9 @@ export const mockRouter = mockOS.router({
     catalog: entityCatalog,
     create: entityCreate,
     details: entityDetails,
+    events: {
+      list: entityEventList,
+    },
     list: entityList,
   },
   events: {

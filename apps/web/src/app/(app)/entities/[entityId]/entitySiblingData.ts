@@ -13,24 +13,3 @@ export function getEntitySiblings<T extends EntitySiblingCandidate>(
       .slice(0, 4) ?? []
   );
 }
-
-export function shouldShowEntitySiblingOverview<
-  T extends EntitySiblingCandidate,
->({
-  entityId,
-  error,
-  ownerId,
-  pending,
-  siblingList,
-}: {
-  entityId: number;
-  error: boolean;
-  ownerId?: number | null;
-  pending: boolean;
-  siblingList?: EntitySiblingList<T>;
-}) {
-  return Boolean(
-    ownerId &&
-    (pending || error || getEntitySiblings(entityId, siblingList).length),
-  );
-}

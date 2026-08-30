@@ -7,6 +7,11 @@ type EntityTabSource = Pick<
   Entity,
   "id" | "kind" | "shortName" | "totalBottles" | "totalTastings"
 >;
+type EntityLocation = Pick<NonNullable<Entity["country"]>, "name">;
+type EntityClassificationSource = Pick<Entity, "kind" | "yearEstablished"> & {
+  country?: EntityLocation | null;
+  region?: EntityLocation | null;
+};
 
 const entityKindPresentation = {
   bottler: {
@@ -41,6 +46,21 @@ export function getEntityPresentation(entity: Pick<Entity, "kind">) {
   return entity.kind
     ? entityKindPresentation[entity.kind]
     : fallbackPresentation;
+}
+
+export function getEntityClassification(entity: EntityClassificationSource) {
+  const presentation = getEntityPresentation(entity);
+  const location = entity.region?.name ?? entity.country?.name;
+
+  return [
+    presentation.label,
+    entity.yearEstablished
+      ? `${presentation.establishmentLabel.toLowerCase()} ${entity.yearEstablished}`
+      : null,
+    location,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" · ");
 }
 
 export function entityHasBottleCatalog(entity: Pick<Entity, "kind">) {

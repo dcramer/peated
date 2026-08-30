@@ -14,7 +14,6 @@ import {
   SectionError,
   type RowMenuItem,
 } from "@peated/web/components/designSystem/components";
-import { EntityPageHeader } from "@peated/web/components/designSystem/patterns/entityPageHeader.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import Markdown from "@peated/web/components/markdown";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -22,11 +21,17 @@ import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHre
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import { effects, space } from "../../../../styles/tokens.stylex";
+import { foundationStyles } from "@peated/web/styles/foundations.stylex";
+import {
+  colors,
+  effects,
+  fonts,
+  space,
+} from "../../../../styles/tokens.stylex";
 
 import {
+  getEntityClassification,
   getEntityCurrentHref,
-  getEntityLocationLabel,
   getEntityPresentation,
   getEntityTabs,
   type Entity,
@@ -50,8 +55,8 @@ function EntityFollowAction({ entity }: { entity: Entity }) {
       <ButtonLink
         aria-label={`Follow ${entity.name}`}
         href={`/login?redirectTo=${encodeURIComponent(getEntityUrl(entity))}`}
-        size="lg"
-        variant="tonal"
+        size="md"
+        variant="accent"
       >
         Follow
       </ButtonLink>
@@ -91,8 +96,8 @@ function EntityFollowAction({ entity }: { entity: Entity }) {
           );
         }
       }}
-      size="lg"
-      variant="tonal"
+      size="md"
+      variant="accent"
     >
       {isFollowing ? "Unfollow" : "Follow"}
     </Button>
@@ -204,57 +209,79 @@ export function EntityPageFrameClient({
     entity.kind === "distillery";
   const presentation = getEntityPresentation(entity);
   const currentHref = getEntityCurrentHref(entity, pathname);
+  const bottleActionLabel =
+    entity.kind === "distillery" || entity.kind === "bottler"
+      ? "Record a bottling"
+      : "Add a bottle";
 
   return (
     <div {...stylex.props(styles.page)}>
-      <EntityPageHeader
-        actions={
-          createBottleHref || canFollow ? (
-            <>
-              {createBottleHref ? (
-                <ButtonLink href={createBottleHref} size="lg" variant="accent">
-                  Add a bottle
-                </ButtonLink>
-              ) : null}
-              {canFollow ? (
-                <EntityFollowAction key={entity.id} entity={entity} />
-              ) : null}
-            </>
-          ) : undefined
-        }
-        description={
-          entity.description ? (
-            <Markdown content={entity.description} />
-          ) : undefined
-        }
-        detail={presentation.label}
-        eyebrow={getEntityLocationLabel(entity) || undefined}
-        id={entity.peatedId}
-        menu={<EntityActions entity={entity} />}
-        parent={
-          owner ? (
+      <header>
+        <div {...stylex.props(styles.masthead)}>
+          <div {...stylex.props(styles.classification)}>
+            {getEntityClassification(entity)}
+          </div>
+          <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>
+            {entity.name}
+          </h1>
+        </div>
+
+        <div {...stylex.props(styles.summary)}>
+          {owner ? (
             <AppLink
               href={getEntityUrl(owner)}
               {...stylex.props(styles.ownerLink)}
             >
               Owned by {owner.shortName || owner.name}
             </AppLink>
-          ) : undefined
-        }
-        specs={[
-          {
-            label: presentation.establishmentLabel,
-            value: entity.yearEstablished,
-          },
-          { label: "Country", value: entity.country?.name },
-          { label: "Bottles", value: entity.totalBottles },
-          {
-            label: "Tastings",
-            value: entity.totalTastings.toLocaleString("en-US"),
-          },
-        ]}
-        title={entity.name}
-      />
+          ) : null}
+          {entity.description ? (
+            <div {...stylex.props(styles.description)}>
+              <Markdown content={entity.description} />
+            </div>
+          ) : null}
+          <div {...stylex.props(styles.headerActions)}>
+            {canFollow ? (
+              <EntityFollowAction key={entity.id} entity={entity} />
+            ) : null}
+            {createBottleHref ? (
+              <ButtonLink
+                href={createBottleHref}
+                size="md"
+                variant={canFollow ? "tonal" : "accent"}
+              >
+                {bottleActionLabel}
+              </ButtonLink>
+            ) : null}
+            <EntityActions entity={entity} />
+          </div>
+        </div>
+
+        <dl {...stylex.props(styles.figures)}>
+          {entity.yearEstablished ? (
+            <div {...stylex.props(styles.figure)}>
+              <dd {...stylex.props(styles.figureValue)}>
+                {entity.yearEstablished}
+              </dd>
+              <dt {...stylex.props(styles.figureLabel)}>
+                {presentation.establishmentLabel.toLowerCase()}
+              </dt>
+            </div>
+          ) : null}
+          <div {...stylex.props(styles.figure)}>
+            <dd {...stylex.props(styles.figureValue)}>
+              {entity.totalBottles.toLocaleString("en-US")}
+            </dd>
+            <dt {...stylex.props(styles.figureLabel)}>bottles recorded</dt>
+          </div>
+          <div {...stylex.props(styles.figure)}>
+            <dd {...stylex.props(styles.figureValue)}>
+              {entity.totalTastings.toLocaleString("en-US")}
+            </dd>
+            <dt {...stylex.props(styles.figureLabel)}>member tastings</dt>
+          </div>
+        </dl>
+      </header>
 
       <div {...stylex.props(styles.tabs)}>
         <PageTabs
@@ -274,7 +301,103 @@ const styles = stylex.create({
     minWidth: 0,
   },
   tabs: {
-    marginTop: space.x6,
+    marginTop: 0,
+  },
+  masthead: {
+    paddingTop: space.x3,
+    paddingBottom: space.x4,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.sectionRule,
+  },
+  classification: {
+    marginBottom: space.x2,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.4,
+  },
+  title: {
+    fontSize: "clamp(44px, 6vw, 72px)",
+    letterSpacing: "-0.05em",
+    lineHeight: 0.95,
+  },
+  summary: {
+    display: "flex",
+    maxWidth: "66ch",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: space.x3,
+    paddingTop: space.x6,
+    paddingBottom: space.x6,
+  },
+  description: {
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "15px",
+    lineHeight: 1.6,
+  },
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: space.x2,
+    flexWrap: "wrap",
+  },
+  figures: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(3, minmax(0, 1fr))",
+      "@media (max-width: 559px)": "minmax(0, 1fr)",
+    },
+    margin: 0,
+    paddingTop: space.x4,
+    paddingBottom: space.x4,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.sectionRule,
+  },
+  figure: {
+    minWidth: 0,
+    paddingRight: space.x6,
+    paddingLeft: {
+      default: space.x6,
+      "@media (max-width: 559px)": 0,
+    },
+    paddingTop: {
+      default: 0,
+      "@media (max-width: 559px)": space.x3,
+    },
+    paddingBottom: {
+      default: 0,
+      "@media (max-width: 559px)": space.x3,
+    },
+    borderLeftWidth: {
+      default: "1px",
+      "@media (max-width: 559px)": 0,
+    },
+    borderLeftStyle: "solid",
+    borderLeftColor: colors.hairline,
+    ":first-child": {
+      paddingLeft: 0,
+      borderLeftWidth: 0,
+    },
+  },
+  figureValue: {
+    margin: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "32px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
+    lineHeight: 1,
+  },
+  figureLabel: {
+    marginTop: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "12px",
+    lineHeight: 1.35,
   },
   ownerLink: {
     color: "inherit",

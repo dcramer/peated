@@ -1,56 +1,30 @@
 import { describe, expect, it } from "vitest";
 
-import { shouldShowEntitySiblingOverview } from "./entitySiblingData";
+import { getEntitySiblings } from "./entitySiblingData";
 
-describe("shouldShowEntitySiblingOverview", () => {
-  it("hides a successful result that only contains the current entity", () => {
-    expect(
-      shouldShowEntitySiblingOverview({
-        entityId: 1,
-        error: false,
-        ownerId: 10,
-        pending: false,
-        siblingList: { results: [{ id: 1 }] },
-      }),
-    ).toBe(false);
+describe("getEntitySiblings", () => {
+  it("removes the current entity", () => {
+    expect(getEntitySiblings(1, { results: [{ id: 1 }, { id: 2 }] })).toEqual([
+      { id: 2 },
+    ]);
   });
 
-  it("shows related entities and request feedback", () => {
+  it("limits the rail to four related entities", () => {
     expect(
-      shouldShowEntitySiblingOverview({
-        entityId: 1,
-        error: false,
-        ownerId: 10,
-        pending: false,
-        siblingList: { results: [{ id: 1 }, { id: 2 }] },
+      getEntitySiblings(1, {
+        results: [
+          { id: 1 },
+          { id: 2 },
+          { id: 3 },
+          { id: 4 },
+          { id: 5 },
+          { id: 6 },
+        ],
       }),
-    ).toBe(true);
-    expect(
-      shouldShowEntitySiblingOverview({
-        entityId: 1,
-        error: false,
-        ownerId: 10,
-        pending: true,
-      }),
-    ).toBe(true);
-    expect(
-      shouldShowEntitySiblingOverview({
-        entityId: 1,
-        error: true,
-        ownerId: 10,
-        pending: false,
-      }),
-    ).toBe(true);
+    ).toEqual([{ id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]);
   });
 
-  it("hides the module when the entity has no owner", () => {
-    expect(
-      shouldShowEntitySiblingOverview({
-        entityId: 1,
-        error: false,
-        ownerId: null,
-        pending: true,
-      }),
-    ).toBe(false);
+  it("returns no siblings before data is available", () => {
+    expect(getEntitySiblings(1)).toEqual([]);
   });
 });

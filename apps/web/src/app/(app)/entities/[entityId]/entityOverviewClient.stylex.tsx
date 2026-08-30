@@ -10,26 +10,34 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../styles/tokens.stylex";
 
 import { EntityBottleOverview } from "./entityBottleOverview";
+import { EntityCatalogRelationships } from "./entityCatalogRelationships";
 import { EntityDetails, hasEntityDetails } from "./entityDetails.stylex";
+import { EntityHistoryOverview } from "./entityHistoryOverview.stylex";
+import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
 import { entityHasBottleCatalog, type Entity } from "./entityPageData";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
-import { shouldShowEntitySiblingOverview } from "./entitySiblingData";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
 type BottleList = Outputs["bottles"]["list"];
+type EntityCatalog = Outputs["entities"]["catalog"];
+type EntityEventList = Outputs["entities"]["events"]["list"];
 type EntityList = Outputs["entities"]["list"];
 
 const NARROW = "@media (max-width: 759px)";
 
 export function EntityOverviewClient({
   initialBottleList,
+  initialCatalog,
   initialEntity,
+  initialEventList,
   initialReleaseList,
   initialSiblingList,
 }: {
   initialBottleList?: BottleList;
+  initialCatalog?: EntityCatalog;
   initialEntity: Entity;
+  initialEventList?: EntityEventList;
   initialReleaseList?: BottleList;
   initialSiblingList?: EntityList;
 }) {
@@ -40,6 +48,19 @@ export function EntityOverviewClient({
       input: { entity: initialEntity.id },
     }),
     initialData: initialEntity,
+  });
+  const catalogQuery = useQuery({
+    ...orpc.entities.catalog.queryOptions({
+      input: { entity: initialEntity.id },
+    }),
+    enabled: ownsBottleSections,
+    initialData: initialCatalog,
+  });
+  const eventListQuery = useQuery({
+    ...orpc.entities.events.list.queryOptions({
+      input: { entity: initialEntity.id },
+    }),
+    initialData: initialEventList,
   });
   const bottleListQuery = useQuery({
     ...orpc.bottles.list.queryOptions({
@@ -87,38 +108,10 @@ export function EntityOverviewClient({
   }
 
   const entity = entityQuery.data;
-  const hasSiblingOverview = shouldShowEntitySiblingOverview({
-    entityId: entity.id,
-    error: Boolean(siblingListQuery.error),
-    ownerId: entity.ownerId,
-    pending: siblingListQuery.isPending,
-    siblingList: siblingListQuery.data,
-  });
-  const hasRail =
-    hasEntityDetails(entity) || Boolean(entity.location) || hasSiblingOverview;
-
   return (
-    <div
-      {...stylex.props(
-        styles.overviewGrid,
-        !hasRail && styles.overviewGridWithoutDetails,
-      )}
-    >
-      {hasRail ? (
-        <aside {...stylex.props(styles.details)}>
-          <EntityDetails entity={entity} />
-          <EntityMap entity={entity} />
-          <EntitySiblingOverview
-            entity={entity}
-            error={Boolean(siblingListQuery.error)}
-            pending={siblingListQuery.isPending}
-            retry={() => void siblingListQuery.refetch()}
-            siblingList={siblingListQuery.data}
-          />
-        </aside>
-      ) : null}
-
+    <div {...stylex.props(styles.overviewGrid)}>
       <div {...stylex.props(styles.catalog)}>
+        {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
         <EntityBottleOverview
           bottleList={bottleListQuery.data}
           createBottleHref={getEntityBottleCreateHref(entity)}
@@ -135,7 +128,33 @@ export function EntityOverviewClient({
           releaseList={releaseListQuery.data}
           retry={() => void releaseListQuery.refetch()}
         />
+        <EntityHistoryOverview
+          entityName={entity.name}
+          error={Boolean(eventListQuery.error)}
+          eventList={eventListQuery.data}
+          pending={eventListQuery.isPending}
+          retry={() => void eventListQuery.refetch()}
+        />
       </div>
+
+      <aside {...stylex.props(styles.details)}>
+        <EntityImagePlaceholder entityName={entity.name} />
+        <EntityMap entity={entity} />
+        <EntityCatalogRelationships
+          catalog={catalogQuery.data}
+          entity={entity}
+          error={Boolean(catalogQuery.error)}
+          pending={catalogQuery.isPending}
+          retry={() => void catalogQuery.refetch()}
+        />
+        <EntitySiblingOverview
+          entity={entity}
+          error={Boolean(siblingListQuery.error)}
+          pending={siblingListQuery.isPending}
+          retry={() => void siblingListQuery.refetch()}
+          siblingList={siblingListQuery.data}
+        />
+      </aside>
     </div>
   );
 }
@@ -145,7 +164,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateAreas: {
       default: '"catalog details"',
-      [NARROW]: '"details" "catalog"',
+      [NARROW]: '"catalog" "details"',
     },
     gridTemplateColumns: {
       default: "minmax(0, 1fr) 336px",
@@ -153,13 +172,10 @@ const styles = stylex.create({
     },
     columnGap: space.x12,
   },
-  overviewGridWithoutDetails: {
-    gridTemplateAreas: '"catalog"',
-    gridTemplateColumns: "minmax(0, 1fr)",
-  },
   catalog: {
     gridArea: "catalog",
     minWidth: 0,
+    paddingTop: space.x4,
   },
   details: {
     gridArea: "details",

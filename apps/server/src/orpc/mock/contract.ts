@@ -26,6 +26,7 @@ import distilleryList from "@peated/server/orpc/contracts/distilleries/list";
 import entityCatalog from "@peated/server/orpc/contracts/entities/catalog";
 import entityCreate from "@peated/server/orpc/contracts/entities/create";
 import entityDetails from "@peated/server/orpc/contracts/entities/details";
+import entityEventList from "@peated/server/orpc/contracts/entities/events/list";
 import entityList from "@peated/server/orpc/contracts/entities/list";
 import eventList from "@peated/server/orpc/contracts/events/list";
 import externalReviewList from "@peated/server/orpc/contracts/externalReviews/list";
@@ -110,6 +111,9 @@ export const mockContract = {
     catalog: entityCatalog,
     create: entityCreate,
     details: entityDetails,
+    events: {
+      list: entityEventList,
+    },
     list: entityList,
   },
   events: {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   entityHasBottleCatalog,
+  getEntityClassification,
   getEntityCurrentHref,
   getEntityTabs,
 } from "./entityPageData";
@@ -12,6 +13,19 @@ describe("entityHasBottleCatalog", () => {
     expect(entityHasBottleCatalog({ kind: "bottler" })).toBe(true);
     expect(entityHasBottleCatalog({ kind: "distillery" })).toBe(true);
     expect(entityHasBottleCatalog({ kind: "company" })).toBe(false);
+  });
+});
+
+describe("getEntityClassification", () => {
+  it("uses the entity kind, establishment term, and most specific location", () => {
+    expect(
+      getEntityClassification({
+        country: { name: "Scotland" },
+        kind: "distillery",
+        region: { name: "Islay" },
+        yearEstablished: 1816,
+      }),
+    ).toBe("Distillery · founded 1816 · Islay");
   });
 });
 
