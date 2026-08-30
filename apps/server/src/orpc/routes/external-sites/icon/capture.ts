@@ -7,7 +7,7 @@ import {
 import { logWarn } from "@peated/server/lib/log";
 import {
   downloadSiteIcon,
-  SiteIconNotFoundError,
+  SITE_ICON_NOT_FOUND_MESSAGE,
 } from "@peated/server/lib/siteIcon";
 import { deleteFile, storeFile } from "@peated/server/lib/uploads";
 import { procedure } from "@peated/server/orpc";
@@ -82,17 +82,14 @@ export default procedure
     }
     if (!icon) {
       throw errors.BAD_REQUEST({
-        message: new SiteIconNotFoundError().message,
+        message: SITE_ICON_NOT_FOUND_MESSAGE,
       });
     }
 
     const imageUrl = await storeFile({
       data: {
         file: Readable.from(icon.data),
-        filename:
-          new URL(icon.sourceUrl).protocol === "data:"
-            ? "inline-icon"
-            : new URL(icon.sourceUrl).pathname.split("/").pop() || "icon",
+        filename: "site-icon",
       },
       directory: "external-sites",
       namespace: `site-icon-${site.type}`,

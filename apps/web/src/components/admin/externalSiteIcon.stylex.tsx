@@ -7,25 +7,25 @@ import {
   space,
 } from "../../styles/tokens.stylex";
 
-type IconSize = "sm" | "md" | "lg";
+type IconSize = "sm" | "lg";
 
-export function ExternalSiteIcon({
+function ExternalSiteIcon({
   imageUrl,
   name,
-  size = "md",
+  size,
 }: {
   imageUrl: string | null;
   name: string;
-  size?: IconSize;
+  size: IconSize;
 }) {
-  const sizeStyle =
-    size === "sm" ? styles.small : size === "lg" ? styles.large : null;
+  const dimension = size === "sm" ? 26 : 48;
+  const sizeStyle = size === "sm" ? styles.small : styles.large;
   return imageUrl ? (
     <img
       alt=""
-      height={size === "sm" ? 26 : size === "lg" ? 48 : 34}
+      height={dimension}
       src={imageUrl}
-      width={size === "sm" ? 26 : size === "lg" ? 48 : 34}
+      width={dimension}
       {...stylex.props(styles.icon, styles.image, sizeStyle)}
     />
   ) : (
@@ -47,7 +47,7 @@ export function ExternalSiteIdentity({
   children?: ReactNode;
   imageUrl: string | null;
   name: string;
-  size?: IconSize;
+  size: IconSize;
 }) {
   return (
     <span {...stylex.props(styles.identity)}>
@@ -61,8 +61,6 @@ const styles = stylex.create({
   icon: {
     display: "inline-flex",
     boxSizing: "border-box",
-    width: "34px",
-    height: "34px",
     flexShrink: 0,
     alignItems: "center",
     justifyContent: "center",
@@ -77,7 +75,6 @@ const styles = stylex.create({
   fallback: {
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "12px",
     fontWeight: 700,
     lineHeight: 1,
   },

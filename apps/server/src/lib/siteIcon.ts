@@ -9,6 +9,7 @@ const MAX_MANIFEST_BYTES = 256 * 1024;
 const MAX_ICON_BYTES = 2 * 1024 * 1024;
 const MAX_REDIRECTS = 3;
 const MAX_ICON_CANDIDATES = 12;
+export const SITE_ICON_NOT_FOUND_MESSAGE = "No site icon was found.";
 const META_ICON_SIZES = {
   "msapplication-tileimage": 144,
   "msapplication-square70x70logo": 70,
@@ -39,14 +40,6 @@ const ManifestSchema = z.looseObject({
     )
     .default([]),
 });
-
-export class SiteIconNotFoundError extends Error {
-  override name = "SiteIconNotFoundError";
-
-  constructor() {
-    super("No site icon was found.");
-  }
-}
 
 class SiteIconFetchError extends Error {
   override name = "SiteIconFetchError";
@@ -82,7 +75,6 @@ function iconSize(value: string | undefined, fallback: number) {
 function candidateUrl(value: string, baseUrl: URL) {
   try {
     const url = new URL(value, baseUrl);
-    if (url.protocol === "data:") return url;
     if (
       !["http:", "https:"].includes(url.protocol) ||
       url.username ||
@@ -223,20 +215,6 @@ async function fetchSameSite(
   throw new SiteIconFetchError("Site icon redirect failed.");
 }
 
-function readDataImage(url: URL) {
-  const match = /^data:(image\/[a-z0-9.+-]+)(;base64)?,(.*)$/is.exec(
-    url.toString(),
-  );
-  if (!match) throw new SiteIconFetchError("Site icon data URL was invalid.");
-  const data = match[2]
-    ? Buffer.from(match[3]!, "base64")
-    : Buffer.from(decodeURIComponent(match[3]!));
-  if (data.byteLength > MAX_ICON_BYTES) {
-    throw new SiteIconFetchError("Site icon response was too large.");
-  }
-  return data;
-}
-
 function sortCandidates(candidates: SiteIconCandidate[]) {
   const deduplicated = new Map<string, SiteIconCandidate>();
   for (const candidate of candidates) {
@@ -323,18 +301,13 @@ export async function downloadSiteIcon(
 
   for (const candidate of sortCandidates(candidates)) {
     try {
-      const data =
-        candidate.url.protocol === "data:"
-          ? readDataImage(candidate.url)
-          : (
-              await fetchSameSite(
-                candidate.url,
-                homepage.url,
-                MAX_ICON_BYTES,
-                "image/*,*/*;q=0.1",
-                fetchImpl,
-              )
-            ).data;
+      const { data } = await fetchSameSite(
+        candidate.url,
+        homepage.url,
+        MAX_ICON_BYTES,
+        "image/*,*/*;q=0.1",
+        fetchImpl,
+      );
       return {
         data: await normalizeIcon(data),
         sourceUrl: candidate.url.toString(),
@@ -344,5 +317,5 @@ export async function downloadSiteIcon(
       // Invalid and missing candidates are expected; try the next declaration.
     }
   }
-  throw new SiteIconNotFoundError();
+  throw new SiteIconFetchError(SITE_ICON_NOT_FOUND_MESSAGE);
 }
