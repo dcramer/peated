@@ -182,7 +182,9 @@ test.describe("unified Bottle workflows", () => {
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
     );
-    await page.getByRole("button", { name: "Add a bottle" }).click();
+    await page
+      .getByRole("button", { name: "Add a bottle", exact: true })
+      .click();
     const input = getRpcInput(await createRequestPromise);
 
     expect(Object.keys(input).sort()).toEqual([

@@ -1306,7 +1306,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.warnings).toEqual([
       {
         code: "CATALOG_IMAGE_COPY_FAILED",
-        message: "The bottle was created, but the public image was not saved.",
+        message: "The bottle was added, but the public image was not saved.",
       },
     ]);
     expect(response.bottle.id).toBeTruthy();
@@ -1360,7 +1360,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.warnings).toEqual([
       {
         code: "CATALOG_IMAGE_COPY_FAILED",
-        message: "The bottle was created, but the public image was not saved.",
+        message: "The bottle was added, but the public image was not saved.",
       },
     ]);
     expect(response.bottle.id).toBeTruthy();
