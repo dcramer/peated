@@ -119,7 +119,7 @@ export function PhotoLoadingState({
       {previewUrl ? (
         <PhotoPreview
           loading
-          metadata="Usually about 10 seconds"
+          metadata="Usually about a minute"
           src={previewUrl}
           title="Reading the label"
         />
