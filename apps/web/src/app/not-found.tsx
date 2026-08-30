@@ -1,5 +1,5 @@
-import { ErrorPage404 } from "../components/errorPage";
+import { NotFoundPage } from "../components/designSystem/product/errorPages.stylex";
 
 export default function NotFound() {
-  return <ErrorPage404 />;
+  return <NotFoundPage />;
 }

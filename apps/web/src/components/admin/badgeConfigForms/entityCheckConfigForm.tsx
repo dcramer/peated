@@ -1,8 +1,10 @@
 import { EntityCheckConfigSchema } from "@peated/server/lib/badges/checks/entityCheck";
 import { toTitleCase } from "@peated/server/lib/strings";
+import {
+  AdminFieldset as Fieldset,
+  AdminForm as Form,
+} from "@peated/web/components/admin/adminForm.stylex";
 import EntityField from "@peated/web/components/entityField";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import { zodResolver } from "@peated/web/lib/zodResolver";
@@ -62,8 +64,6 @@ export default function EntityCheckConfigForm({
                 label="Entity"
                 placeholder="e.g. High West Distillery"
                 helpText="The entity to match on."
-                canCreate={false}
-                required
                 onChange={(value) => {
                   onChange(value?.id);
                   setEntityValue(value);
@@ -84,7 +84,6 @@ export default function EntityCheckConfigForm({
                   value ? { id: value, name: toTitleCase(value) } : undefined
                 }
                 options={entityRoles}
-                simple
                 helpText="Optionally match only one Bottle relationship."
               />
             )}

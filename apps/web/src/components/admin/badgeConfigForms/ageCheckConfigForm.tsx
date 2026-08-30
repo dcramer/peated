@@ -1,7 +1,9 @@
 import { AgeCheckConfigSchema } from "@peated/server/lib/badges/checks/ageCheck";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
-import TextField from "@peated/web/components/textField";
+import {
+  AdminFieldset as Fieldset,
+  AdminForm as Form,
+  AdminTextField as TextField,
+} from "@peated/web/components/admin/adminForm.stylex";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";

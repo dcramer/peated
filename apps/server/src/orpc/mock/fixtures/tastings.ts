@@ -26,7 +26,7 @@ export const mockTasting = {
   createdBy: mockPublicUser,
 } satisfies Tasting;
 
-export const mockTastings = [
+export const mockTastings: Tasting[] = [
   mockTasting,
   {
     ...mockTasting,
@@ -117,7 +117,7 @@ export const mockTastings = [
     createdAt: "2026-08-12T20:15:00.000Z",
     createdBy: mockFriends[0]!,
   },
-] satisfies Tasting[];
+];
 
 export function mockTastingFor(
   user: User | null,

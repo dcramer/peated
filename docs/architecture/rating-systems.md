@@ -69,6 +69,11 @@ The shared SQL rule lives in `externalReviewScores.ts`. Imports store the value,
 scale, and display text exactly as published. Other scales remain visible with
 the external review but do not enter the Bottle score.
 
+The redesign interface shows a critic rating only when the permitted native
+score already uses the 100-point scale. It displays the numeric value without a
+scale explainer. Reviews on other scales remain attributed but omit the number;
+the interface does not convert them.
+
 `legacyNormalizedScore` is an old import field. Its SQL column remains
 `review.rating`. New writes do not fill it. Public APIs do not expose it, and
 summary queries do not use it.

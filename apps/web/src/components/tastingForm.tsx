@@ -2,41 +2,48 @@
 
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { ServingStyleEnum, type TastingSchema } from "@peated/server/schemas";
-import type { ServingStyle, User } from "@peated/server/types";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import ImageField from "@peated/web/components/imageField";
-import type { Option } from "@peated/web/components/selectField";
-import SelectField from "@peated/web/components/selectField";
-import TextAreaField from "@peated/web/components/textAreaField";
+import type { TastingSchema } from "@peated/server/schemas";
+import type { User } from "@peated/server/types";
+import {
+  ColourInput,
+  Field,
+  FormNotice,
+  FormSection,
+  FormStack,
+  FormSteps,
+  MemberPicker,
+  NotePickerField,
+  PictureInput,
+  RatingBandInput,
+  Select,
+  SelectedBottleSummary,
+  Textarea,
+  ValidationMessage,
+  type MemberPickerOption,
+  type NotePickerOption,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   buildTastingCreateFormSubmission,
   buildTastingEditFormSubmission,
   buildTastingTagOptions,
-  filterTastingTagOptions,
+  TastingCreateFormFieldsSchema,
   TastingFormFieldsSchema,
   type TastingCreateFormSubmitData,
   type TastingEditFormSubmitData,
   type TastingFormFields,
   type TastingFormImage,
-  type TastingTagOptionData,
   type TastingTagSuggestion,
 } from "@peated/web/lib/tastingForm";
 import { zodResolver } from "@peated/web/lib/zodResolver";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import type { z } from "zod";
-import ColorField from "./colorField";
-import Form from "./form";
-import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
-import ServingStyleIcon from "./servingStyleIcon";
-import TastingBandInput from "./tastingBandInput";
-import TastingBottleIdentity from "./tastingBottleIdentity";
 
 export type {
   TastingCreateFormSubmitData,
@@ -44,270 +51,314 @@ export type {
 } from "@peated/web/lib/tastingForm";
 
 type TastingCreateFormProps = {
-  mode?: "create";
-  onSubmit: SubmitHandler<TastingCreateFormSubmitData>;
   initialData: Partial<z.infer<typeof TastingSchema>> &
     Pick<z.infer<typeof TastingSchema>, "bottle">;
+  mode?: "create";
+  onSubmit: SubmitHandler<TastingCreateFormSubmitData>;
 };
 
 type TastingEditFormProps = {
+  initialData: z.infer<typeof TastingSchema>;
   mode: "edit";
   onSubmit: SubmitHandler<TastingEditFormSubmitData>;
-  initialData: z.infer<typeof TastingSchema>;
-};
-
-function formatServingStyle(style: ServingStyle) {
-  return toTitleCase(style);
-}
-
-const servingStyleList = SERVING_STYLE_LIST.map((c) => ({
-  id: c,
-  name: formatServingStyle(c),
-}));
-
-const userToOption = (user: User): Option => {
-  return {
-    id: user.id,
-    name: user.username,
-  };
 };
 
 export default function TastingForm(
   props: {
     errorMessage?: string;
-    title: string;
     suggestedTags: { results: TastingTagSuggestion[] };
+    title: string;
   } & (TastingCreateFormProps | TastingEditFormProps),
 ) {
-  const { errorMessage, title, suggestedTags } = props;
-  const initialData = props.initialData;
+  const { errorMessage, initialData, suggestedTags, title } = props;
+  const orpc = useORPC();
+  const [submitError, setSubmitError] = useState<string>();
+  const [image, setImage] = useState<TastingFormImage>();
+  const [imagePreview, setImagePreview] = useState(
+    initialData.imageUrl ?? undefined,
+  );
+  const [friendQuery, setFriendQuery] = useState("");
+  const [friends, setFriends] = useState<readonly MemberPickerOption[]>(
+    (initialData.friends ?? []).map(userToMember),
+  );
+  const friendResults = useQuery(
+    orpc.friends.list.queryOptions({
+      input: { filter: "active", query: friendQuery },
+    }),
+  );
   const {
     control,
-    register,
-    handleSubmit,
     formState: { errors, isSubmitting },
+    handleSubmit,
+    register,
+    trigger,
   } = useForm<TastingFormFields>({
-    resolver: zodResolver(TastingFormFieldsSchema),
     defaultValues: {
-      ratingBand: initialData.ratingBand,
-      notes: initialData.notes,
-      tags: initialData.tags,
       color: initialData.color,
+      friends: initialData.friends?.map((friend) => friend.id) ?? [],
+      notes: initialData.notes,
+      ratingBand: initialData.ratingBand,
       servingStyle: initialData.servingStyle,
-      friends: initialData.friends ? initialData.friends.map((d) => d.id) : [],
+      tags: initialData.tags,
     },
+    resolver: zodResolver(
+      props.mode === "edit"
+        ? TastingFormFieldsSchema
+        : TastingCreateFormFieldsSchema,
+    ),
   });
+  const ratingBand = useWatch({ control, name: "ratingBand" });
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = ["Rating", "Notes", "Details"] as const;
+  const isLastStep = currentStep === steps.length - 1;
+  const needsRating = props.mode !== "edit" && !ratingBand;
+  const noteOptions: NotePickerOption[] = buildTastingTagOptions(
+    suggestedTags.results,
+    initialData.tags ?? [],
+  ).map((option) => ({
+    category: option.tag ? toTitleCase(option.tag.tagCategory) : "Other notes",
+    common: option.count > 0,
+    name: option.id,
+    usageCount: option.count,
+  }));
 
-  const [error, setError] = useState<string | undefined>();
-  const [image, setImage] = useState<TastingFormImage>();
-  const [friendsValue, setFriendsValue] = useState<Option[]>(
-    initialData.friends ? initialData.friends.map(userToOption) : [],
-  );
-  const orpc = useORPC();
-  const onSubmitHandler: SubmitHandler<TastingFormFields> = async (data) => {
+  useEffect(() => {
+    return () => {
+      if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
+  const submit: SubmitHandler<TastingFormFields> = async (fields) => {
+    setSubmitError(undefined);
     try {
       if (props.mode === "edit") {
-        await props.onSubmit(
-          buildTastingEditFormSubmission({ fields: data, image }),
-        );
+        await props.onSubmit(buildTastingEditFormSubmission({ fields, image }));
       } else {
         await props.onSubmit(
           buildTastingCreateFormSubmission({
-            fields: data,
-            image,
             bottleId: props.initialData.bottle.id,
+            fields,
+            image,
           }),
         );
       }
-    } catch (err) {
-      setError(
-        getFormErrorMessage(err, {
+    } catch (error) {
+      setSubmitError(
+        getFormErrorMessage(error, {
           expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
         }),
       );
     }
   };
 
-  type TagOption = Option & TastingTagOptionData;
+  async function continueForm() {
+    const stepIsValid = await trigger(
+      currentStep === 0
+        ? ["ratingBand"]
+        : currentStep === 1
+          ? ["tags", "color", "notes"]
+          : ["servingStyle", "friends"],
+    );
+    if (!stepIsValid) return;
+    setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
+  }
 
-  const tagOptions: TagOption[] = buildTastingTagOptions(
-    suggestedTags.results,
-    initialData.tags ?? [],
-  ).map((option) => ({ ...option, name: toTitleCase(option.id) }));
+  const formAction = isLastStep
+    ? handleSubmit(submit)
+    : (event: React.FormEvent) => {
+        event.preventDefault();
+        void continueForm();
+      };
 
   return (
-    <FormScreen
+    <WorkflowScreen
+      mobileSaveBar
+      onPrevious={
+        currentStep > 0
+          ? () => setCurrentStep((step) => Math.max(0, step - 1))
+          : undefined
+      }
+      onSave={formAction}
+      saveDisabled={needsRating}
+      saveHint={
+        needsRating
+          ? "Pick a rating to continue."
+          : `Step ${currentStep + 1} of ${steps.length}`
+      }
+      saveLabel={isLastStep ? "Save tasting" : "Continue"}
+      saving={isSubmitting}
       title={title}
-      onSave={handleSubmit(onSubmitHandler)}
-      saveDisabled={isSubmitting}
     >
-      <div className="-mt-4 lg:-mt-8 lg:mb-8 lg:p-0">
-        <TastingBottleIdentity bottle={props.initialData.bottle} />
-      </div>
-
-      {(error || errorMessage) && (
-        <FormError values={[error, errorMessage].filter(Boolean)} />
-      )}
-
-      <Form
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
-      >
-        <Fieldset>
-          <Controller
-            name="ratingBand"
-            control={control}
-            render={({ field: { onChange, ...field } }) => (
-              <TastingBandInput
-                {...field}
-                onChange={onChange}
-                error={errors.ratingBand}
+      <form onSubmit={formAction}>
+        <FormStack>
+          <SelectedBottleSummary
+            bottleId={initialData.bottle.peatedId}
+            imageUrl={imagePreview ?? initialData.bottle.imageUrl}
+            metadata={getBottleMetadata(initialData.bottle)}
+            name={initialData.bottle.fullName}
+          />
+          {submitError || errorMessage ? (
+            <FormNotice>{submitError ?? errorMessage}</FormNotice>
+          ) : null}
+          <FormSteps currentStep={currentStep} steps={steps} />
+          {currentStep === 0 ? (
+            <FormSection title="Your rating">
+              <Controller
+                control={control}
+                name="ratingBand"
+                render={({ field }) => (
+                  <RatingBandInput
+                    disabled={isSubmitting}
+                    id="tasting-rating"
+                    label="How was it"
+                    name={field.name}
+                    onChange={field.onChange}
+                    required={props.mode !== "edit"}
+                    value={field.value ?? null}
+                  />
+                )}
               />
-            )}
-          />
-
-          <Controller
-            name="tags"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField<TagOption>
-                {...field}
-                error={errors.tags}
-                label="Notes"
-                targetOptions={5}
-                placeholder="What flavors and aromas come to mind with this spirit?"
-                options={tagOptions}
-                onQuery={async (query, options) => {
-                  return filterTastingTagOptions(query, options);
-                }}
-                onRenderOption={(option) => {
-                  return (
-                    <div className="flex flex-col items-start">
-                      <div>{option.name}</div>
-                      {option.tag && (
-                        <div className="text-muted font-normal">
-                          {toTitleCase(option.tag.tagCategory)}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }}
-                onChange={(value) => onChange(value.map((tag) => tag.id))}
-                value={
-                  value ? tagOptions.filter((o) => value?.includes(o.id)) : []
-                }
-                multiple
-              />
-            )}
-          />
-
-          <Controller
-            name="color"
-            control={control}
-            render={({ field: { ref, onChange, ...field } }) => (
-              <ColorField
-                {...field}
-                onChange={(value) => onChange(value)}
-                error={errors.color}
-                label="Color"
-              />
-            )}
-          />
-
-          <TextAreaField
-            {...register("notes")}
-            error={errors.notes}
-            rows={6}
-            label="Comments"
-            placeholder="Tell us how you really feel."
-          />
-
-          <ImageField
-            name="image"
-            label="Picture"
-            value={initialData.imageUrl}
-            onChange={(value) => setImage(value)}
-            imageWidth={1024 / 2}
-            imageHeight={768 / 2}
-          />
-
-          <Controller
-            name="servingStyle"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.servingStyle}
-                label="Serving Style"
-                noSort
-                noDialog
-                targetOptions={servingStyleList.length}
-                options={servingStyleList}
-                onRenderChip={(option) => {
-                  if (!option.id) return option.name;
-                  return (
-                    <ServingStyleIcon
-                      size={8}
-                      servingStyle={ServingStyleEnum.parse(option.id)}
-                      className="m-2"
+              {errors.ratingBand?.message ? (
+                <ValidationMessage>
+                  {errors.ratingBand.message}
+                </ValidationMessage>
+              ) : null}
+            </FormSection>
+          ) : null}
+          {currentStep === 1 ? (
+            <FormSection title="What you noticed">
+              <Field htmlFor="tasting-notes" label="Notes" optional>
+                <Controller
+                  control={control}
+                  name="tags"
+                  render={({ field }) => (
+                    <NotePickerField
+                      id="tasting-notes"
+                      notes={noteOptions}
+                      onChange={field.onChange}
+                      value={field.value ?? []}
                     />
-                  );
-                }}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: formatServingStyle(value),
-                      }
-                    : undefined
-                }
-              />
-            )}
-          />
-
-          <Controller
-            name="friends"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField<Option>
-                {...field}
-                onQuery={async (query) => {
-                  const { results } = await orpc.friends.list.call({
-                    query,
-                    filter: "active",
-                  });
-                  return results.map((d) => ({
-                    id: d.user.id,
-                    name: d.user.username,
-                  }));
-                }}
-                multiple
-                error={errors.friends}
-                label="Friends"
-                helpText="The people you're enjoying this tasting with."
-                placeholder="e.g. Bob Dylan"
-                onChange={(value) => {
-                  onChange(value.map((friend) => friend.id));
-                  setFriendsValue(value);
-                }}
-                emptyListItem={(query) => {
-                  return (
-                    <NoResultsFoundEntry
-                      message={
-                        query
-                          ? "We couldn't find anyone matching your query."
-                          : "It looks like you don't have any friends yet."
-                      }
+                  )}
+                />
+                {errors.tags?.message ? (
+                  <ValidationMessage>{errors.tags.message}</ValidationMessage>
+                ) : null}
+              </Field>
+              <Field htmlFor="tasting-colour" label="Colour" optional>
+                <Controller
+                  control={control}
+                  name="color"
+                  render={({ field }) => (
+                    <ColourInput
+                      disabled={isSubmitting}
+                      id="tasting-colour"
+                      name={field.name}
+                      onChange={field.onChange}
+                      value={field.value ?? null}
                     />
-                  );
-                }}
-                value={friendsValue}
+                  )}
+                />
+                {errors.color?.message ? (
+                  <ValidationMessage>{errors.color.message}</ValidationMessage>
+                ) : null}
+              </Field>
+              <Field
+                error={errors.notes?.message}
+                htmlFor="tasting-comments"
+                label="Comment"
+                optional
+              >
+                <Textarea
+                  {...register("notes", {
+                    setValueAs: (value) => value || null,
+                  })}
+                  aria-label="Comments"
+                  id="tasting-comments"
+                  invalid={Boolean(errors.notes)}
+                  placeholder="What stood out?"
+                  rows={6}
+                />
+              </Field>
+            </FormSection>
+          ) : null}
+          {currentStep === 2 ? (
+            <FormSection title="Picture and company">
+              {props.mode === "edit" ? (
+                <Field
+                  error={errors.servingStyle?.message}
+                  htmlFor="tasting-serving-style"
+                  label="Served"
+                  optional
+                >
+                  <Select
+                    {...register("servingStyle", {
+                      setValueAs: (value) => value || null,
+                    })}
+                    id="tasting-serving-style"
+                    invalid={Boolean(errors.servingStyle)}
+                  >
+                    <option value="">Not set</option>
+                    {SERVING_STYLE_LIST.map((style) => (
+                      <option key={style} value={style}>
+                        {toTitleCase(style)}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              ) : null}
+              <Field htmlFor="tasting-picture" label="Picture" optional>
+                <PictureInput
+                  disabled={isSubmitting}
+                  id="tasting-picture"
+                  name="image"
+                  onFilesSelected={(files) => {
+                    const file = files.item(0);
+                    if (!file) return;
+                    setImage(file);
+                    setImagePreview(URL.createObjectURL(file));
+                  }}
+                  onRemove={
+                    imagePreview
+                      ? () => {
+                          setImage(null);
+                          setImagePreview(undefined);
+                        }
+                      : undefined
+                  }
+                  preview={
+                    imagePreview
+                      ? { alt: "Tasting picture", src: imagePreview }
+                      : undefined
+                  }
+                />
+              </Field>
+              <Controller
+                control={control}
+                name="friends"
+                render={({ field }) => (
+                  <MemberPicker
+                    label="Drinking with"
+                    loading={friendResults.isFetching}
+                    onChange={(nextFriends) => {
+                      setFriends(nextFriends);
+                      field.onChange(nextFriends.map((friend) => friend.id));
+                    }}
+                    onQueryChange={setFriendQuery}
+                    options={(friendResults.data?.results ?? []).map(
+                      ({ user }) => userToMember(user),
+                    )}
+                    value={friends}
+                  />
+                )}
               />
-            )}
-          />
-        </Fieldset>
-      </Form>
-    </FormScreen>
+            </FormSection>
+          ) : null}
+        </FormStack>
+      </form>
+    </WorkflowScreen>
   );
+}
+
+function userToMember(user: User): MemberPickerOption {
+  return { id: user.id, username: user.username };
 }

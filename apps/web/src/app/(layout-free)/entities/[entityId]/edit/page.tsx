@@ -1,6 +1,7 @@
 "use client";
 import { use } from "react";
 
+import { toTitleCase } from "@peated/server/lib/strings";
 import EntityForm from "@peated/web/components/entityForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -52,7 +53,7 @@ function EntityEditForm({ entityId }: { entityId: string }) {
         );
       }}
       initialData={entity}
-      title="Edit Entity"
+      title={`Edit ${toTitleCase(entity.kind)}`}
     />
   );
 }

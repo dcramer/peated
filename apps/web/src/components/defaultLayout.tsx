@@ -1,9 +1,6 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
-export default function DefaultLayout({
-  children,
-}: Readonly<{
-  children: ReactNode;
-}>) {
-  return <>{children}</>;
+/** Supplies a server layout boundary for routes that only add metadata. */
+export default function DefaultLayout({ children }: { children: ReactNode }) {
+  return children;
 }

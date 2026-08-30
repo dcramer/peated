@@ -1,7 +1,9 @@
 import { RegionCheckConfigSchema } from "@peated/server/lib/badges/checks/regionCheck";
+import {
+  AdminFieldset as Fieldset,
+  AdminForm as Form,
+} from "@peated/web/components/admin/adminForm.stylex";
 import CountryField from "@peated/web/components/countryField";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
 import RegionField from "@peated/web/components/regionField";
 import type { Option } from "@peated/web/components/selectField";
 import { zodResolver } from "@peated/web/lib/zodResolver";
@@ -94,7 +96,6 @@ export default function RegionCheckConfigForm({
                   setRegionValue(value);
                 }}
                 value={regionValue}
-                rememberValues={false}
               />
             )}
           />

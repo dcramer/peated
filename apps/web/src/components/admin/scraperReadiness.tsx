@@ -2,50 +2,29 @@ import type { Outputs } from "@peated/server/orpc/router";
 import TimeSince from "@peated/web/components/timeSince";
 import { formatDuration } from "@peated/web/lib/format";
 
+import { AdminDetails, AdminSection, AdminStatus } from "./adminContent.stylex";
+import { AdminDefinitionList as DefinitionList } from "./adminUtility.stylex";
+
 type Site = Outputs["externalSites"]["healthDetails"];
 
-function Status({
-  children,
-  color,
-}: {
-  children: React.ReactNode;
-  color: "green" | "amber" | "red" | "slate";
-}) {
-  const colors = {
-    green: "bg-green-400",
-    amber: "bg-amber-400",
-    red: "bg-red-400",
-    slate: "bg-slate-500",
-  } as const;
-  return (
-    <span className="inline-flex items-center gap-2 font-medium">
-      <span
-        aria-hidden="true"
-        className={`h-2 w-2 rounded-full ${colors[color]}`}
-      />
-      {children}
-    </span>
-  );
-}
-
 function TargetStatus({
-  enabled,
   blockedUntil,
   coolingDown,
+  enabled,
 }: {
-  enabled: boolean;
   blockedUntil: string | null;
   coolingDown: boolean;
+  enabled: boolean;
 }) {
-  if (!enabled) return <Status color="red">Disabled</Status>;
+  if (!enabled) return <AdminStatus tone="danger">Disabled</AdminStatus>;
   if (blockedUntil && coolingDown) {
     return (
-      <Status color="amber">
+      <AdminStatus tone="warning">
         Cooling down · <TimeSince date={blockedUntil} />
-      </Status>
+      </AdminStatus>
     );
   }
-  return <Status color="green">Enabled</Status>;
+  return <AdminStatus tone="success">Enabled</AdminStatus>;
 }
 
 const robotsLabels = {
@@ -57,108 +36,86 @@ const robotsLabels = {
 
 export default function ScraperReadiness({ site }: { site: Site }) {
   const { runtime, reviewPolicy } = site;
-  const runtimeSynchronized =
+  const synchronized =
     runtime.targets.length === runtime.targetKeys.length &&
     runtime.targetKeys.every((key) =>
       runtime.targets.some((target) => target.key === key),
     );
+  const status = !runtime.registered ? (
+    <AdminStatus tone="danger">Not ready</AdminStatus>
+  ) : !synchronized ? (
+    <AdminStatus tone="warning">Setup incomplete</AdminStatus>
+  ) : (
+    <AdminStatus tone="success">Ready</AdminStatus>
+  );
 
   return (
-    <section
-      aria-labelledby="scraper-readiness-heading"
-      className="mb-6 rounded-xl border border-slate-800 bg-slate-950 p-4 sm:p-5"
+    <AdminSection
+      title="Connection"
+      description="Request limits and access checks for this site."
+      action={status}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2
-            id="scraper-readiness-heading"
-            className="text-lg font-semibold text-white"
-          >
-            Connection
-          </h2>
-          <p className="text-muted mt-1 text-sm">
-            Request limits and access checks for this site.
-          </p>
-        </div>
-        {!runtime.registered ? (
-          <Status color="red">Not ready</Status>
-        ) : !runtimeSynchronized ? (
-          <Status color="amber">Setup incomplete</Status>
-        ) : (
-          <Status color="green">Ready</Status>
-        )}
-      </div>
-
-      {runtime.targets.length > 0 ? (
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          {runtime.targets.map((target) => (
-            <div
-              key={target.key}
-              className="rounded-lg border border-slate-800 bg-slate-900/50 p-4"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <div className="font-semibold text-white">{target.key}</div>
-                  <div className="text-muted mt-1 text-xs">
-                    {formatDuration(target.minimumSpacingMs)} spacing ·{" "}
-                    {target.requestsPerWindow.toLocaleString("en-US")} requests
-                    / {formatDuration(target.windowMs)}
-                  </div>
-                </div>
-                <TargetStatus
-                  enabled={target.enabled}
-                  blockedUntil={target.blockedUntil}
-                  coolingDown={target.coolingDown}
-                />
-              </div>
-              <div className="mt-3 space-y-2">
-                {target.origins.map((origin) => (
-                  <div key={origin.origin} className="text-sm">
-                    <div className="break-all text-slate-200">
-                      {origin.origin}
-                    </div>
-                    <div className="text-muted mt-1 text-xs">
-                      Site access: {robotsLabels[origin.robotsStatus]}
-                      {origin.robotsFetchedAt ? (
-                        <>
-                          {" "}
-                          · checked <TimeSince date={origin.robotsFetchedAt} />
-                        </>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : null}
-
+      {runtime.targets.map((target) => (
+        <AdminDetails
+          key={target.key}
+          summary={
+            <>
+              {target.key} ·{" "}
+              <TargetStatus
+                enabled={target.enabled}
+                blockedUntil={target.blockedUntil}
+                coolingDown={target.coolingDown}
+              />
+            </>
+          }
+        >
+          <DefinitionList>
+            <DefinitionList.Term>Rate</DefinitionList.Term>
+            <DefinitionList.Details>
+              {formatDuration(target.minimumSpacingMs)} spacing ·{" "}
+              {target.requestsPerWindow.toLocaleString("en-US")} requests /{" "}
+              {formatDuration(target.windowMs)}
+            </DefinitionList.Details>
+            <DefinitionList.Term>Origins</DefinitionList.Term>
+            <DefinitionList.Details>
+              {target.origins.map((origin, index) => (
+                <span key={origin.origin}>
+                  {index ? " · " : null}
+                  {origin.origin} ({robotsLabels[origin.robotsStatus]}
+                  {origin.robotsFetchedAt ? (
+                    <>
+                      ; checked <TimeSince date={origin.robotsFetchedAt} />
+                    </>
+                  ) : null}
+                  )
+                </span>
+              ))}
+            </DefinitionList.Details>
+          </DefinitionList>
+        </AdminDetails>
+      ))}
       {reviewPolicy ? (
-        <div className="mt-4 border-t border-slate-800 pt-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="font-semibold text-white">Review policy</h3>
-              <div className="text-muted mt-1 text-xs capitalize">
-                Publication: {reviewPolicy.publicationMode.replace("_", " ")}
-              </div>
-            </div>
-          </div>
-          <div className="text-muted mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-            <span>
-              AI summaries:{" "}
-              {reviewPolicy.allowLlmProcessing ? "allowed" : "blocked"}
-            </span>
-            <span>
-              Scores: {reviewPolicy.allowScoreDisplay ? "visible" : "hidden"}
-            </span>
-            <span>
-              Summaries:{" "}
-              {reviewPolicy.allowSummaryDisplay ? "visible" : "hidden"}
-            </span>
-          </div>
-        </div>
+        <AdminDetails summary="Review policy">
+          <DefinitionList>
+            <DefinitionList.Term>Publication</DefinitionList.Term>
+            <DefinitionList.Details>
+              {reviewPolicy.publicationMode.replace("_", " ")}
+            </DefinitionList.Details>
+            <DefinitionList.Term>LLM processing</DefinitionList.Term>
+            <DefinitionList.Details>
+              {reviewPolicy.allowLlmProcessing ? "Allowed" : "Blocked"}
+            </DefinitionList.Details>
+            <DefinitionList.Term>Scores</DefinitionList.Term>
+            <DefinitionList.Details>
+              {reviewPolicy.allowScoreDisplay ? "Visible" : "Hidden"}
+            </DefinitionList.Details>
+            <DefinitionList.Term>Summaries</DefinitionList.Term>
+            <DefinitionList.Details>
+              {reviewPolicy.allowSummaryDisplay ? "Visible" : "Hidden"}
+            </DefinitionList.Details>
+          </DefinitionList>
+        </AdminDetails>
       ) : null}
-    </section>
+    </AdminSection>
   );
 }

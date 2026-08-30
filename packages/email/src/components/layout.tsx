@@ -1,7 +1,7 @@
-import theme from "@peated/design";
 import { Body, Container, Head, Html, Img, Section } from "jsx-email";
 import type { ReactNode } from "react";
 import React from "react";
+import theme from "../theme";
 
 const styles = `
 body {

@@ -1,4 +1,4 @@
-import LayoutSplash from "@peated/web/components/layoutSplash";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import LoginForm from "@peated/web/components/loginForm";
 import { getSafeRedirect } from "@peated/web/lib/auth";
 import { getSession } from "@peated/web/lib/session.server";
@@ -19,14 +19,8 @@ export default async function Login(props: {
   }
 
   return (
-    <LayoutSplash>
-      <div className="mb-16 flex flex-col items-center">
-        <h1 className="mb-4 text-2xl font-semibold">Welcome Back</h1>
-        <p className="text-muted text-center">
-          Continue with Google or enter your credentials.
-        </p>
-      </div>
+    <AuthenticationPage intro="database">
       <LoginForm />
-    </LayoutSplash>
+    </AuthenticationPage>
   );
 }

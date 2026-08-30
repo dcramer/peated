@@ -10,9 +10,12 @@ import bottlerList from "@peated/server/orpc/contracts/bottlers/list";
 import bottleDetails from "@peated/server/orpc/contracts/bottles/details";
 import bottleList from "@peated/server/orpc/contracts/bottles/list";
 import bottlePriceList from "@peated/server/orpc/contracts/bottles/prices/list";
+import bottleRecommendations from "@peated/server/orpc/contracts/bottles/recommendations";
+import bottleSuggestedTags from "@peated/server/orpc/contracts/bottles/suggested-tags";
 import bottleTags from "@peated/server/orpc/contracts/bottles/tags";
 import brandList from "@peated/server/orpc/contracts/brands/list";
 import changeList from "@peated/server/orpc/contracts/changes/list";
+import collectionBottleCreate from "@peated/server/orpc/contracts/collections/bottles/create";
 import collectionBottleDelete from "@peated/server/orpc/contracts/collections/bottles/delete";
 import collectionBottleList from "@peated/server/orpc/contracts/collections/bottles/list";
 import collectionBottleUpdate from "@peated/server/orpc/contracts/collections/bottles/update";
@@ -41,8 +44,10 @@ import root from "@peated/server/orpc/contracts/root";
 import search from "@peated/server/orpc/contracts/search";
 import smwsDistillerList from "@peated/server/orpc/contracts/smws/distiller-list";
 import stats from "@peated/server/orpc/contracts/stats";
+import tastingCreate from "@peated/server/orpc/contracts/tastings/create";
 import tastingDetails from "@peated/server/orpc/contracts/tastings/details";
 import tastingList from "@peated/server/orpc/contracts/tastings/list";
+import tastingPhotoIdentification from "@peated/server/orpc/contracts/tastings/photo-identification";
 import userActivityList from "@peated/server/orpc/contracts/users/activity/list";
 import userBadgeList from "@peated/server/orpc/contracts/users/badge-list";
 import userDetails from "@peated/server/orpc/contracts/users/details";
@@ -77,6 +82,8 @@ export const mockContract = {
     prices: {
       list: bottlePriceList,
     },
+    recommendations: bottleRecommendations,
+    suggestedTags: bottleSuggestedTags,
     tags: bottleTags,
   },
   bottlers: { list: bottlerList },
@@ -90,6 +97,7 @@ export const mockContract = {
   companies: { list: companyList },
   collections: {
     bottles: {
+      create: collectionBottleCreate,
       delete: collectionBottleDelete,
       list: collectionBottleList,
       update: collectionBottleUpdate,
@@ -136,8 +144,10 @@ export const mockContract = {
     distillerList: smwsDistillerList,
   },
   tastings: {
+    create: tastingCreate,
     details: tastingDetails,
     list: tastingList,
+    photoIdentification: tastingPhotoIdentification,
   },
   users: {
     activity: {

@@ -1,9 +1,5 @@
-import Spinner from "@peated/web/components/spinner";
+import { WorkflowLoading } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
 
 export default function Loading() {
-  return (
-    <div className="min-h-full">
-      <Spinner />
-    </div>
-  );
+  return <WorkflowLoading />;
 }

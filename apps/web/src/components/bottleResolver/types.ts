@@ -68,5 +68,7 @@ export type BottleResolverProps = {
     props: BottleResolverCreateProposalActionsProps,
   ) => ReactNode;
   createProposalActionLabel?: string;
+  /** Lets the route supply its existing bottle search. */
+  search?: ReactNode;
   searchActionLabel?: string;
 };

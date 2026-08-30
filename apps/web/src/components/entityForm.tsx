@@ -1,278 +1,337 @@
-import { BoltIcon } from "@heroicons/react/20/solid";
+"use client";
+
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
-import { type Entity } from "@peated/server/types";
-import CountryField from "@peated/web/components/countryField";
-import EntityField from "@peated/web/components/entityField";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import SelectField, { type Option } from "@peated/web/components/selectField";
-import TextField from "@peated/web/components/textField";
+import type { Entity } from "@peated/server/types";
+import {
+  Button,
+  EntityPicker,
+  Field,
+  FormNotice,
+  FormSection,
+  FormStack,
+  Select,
+  Textarea,
+  TextInput,
+  type EntityPickerOption,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
-import { getFormErrorMessage, toOption } from "@peated/web/lib/formHelpers";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { WandSparkles } from "lucide-react";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { z } from "zod";
-import Button from "./button";
-import Legend from "./legend";
-import RegionField from "./regionField";
-import TextAreaField from "./textAreaField";
 
-const entityKinds = EntityKindEnum.options.map((kind) => ({
-  id: kind,
-  name: toTitleCase(kind),
-}));
-
-type FormSchemaType = z.infer<typeof EntityInputSchema>;
+type EntityFormData = z.infer<typeof EntityInputSchema>;
 
 export default function EntityForm({
-  onSubmit,
   initialData = {},
+  onSubmit,
   title,
 }: {
-  onSubmit: SubmitHandler<FormSchemaType>;
   initialData?: Partial<Entity>;
+  onSubmit: SubmitHandler<EntityFormData>;
   title: string;
 }) {
+  const orpc = useORPC();
+  const { user } = useAuth();
+  const [submitError, setSubmitError] = useState<string>();
+  const [ownerQuery, setOwnerQuery] = useState("");
+  const [owner, setOwner] = useState<EntityPickerOption | null>(() =>
+    initialData.owner
+      ? {
+          detail: "Current direct owner",
+          id: String(initialData.owner.id),
+          meta: initialData.owner.peatedId,
+          name: initialData.owner.name,
+        }
+      : null,
+  );
   const {
-    control,
-    register,
-    handleSubmit,
-    getValues,
-    setValue,
     formState: { errors, isSubmitting },
-  } = useForm<FormSchemaType>({
-    resolver: zodResolver(EntityInputSchema),
+    getValues,
+    handleSubmit,
+    register,
+    setValue,
+    watch,
+  } = useForm<EntityFormData>({
     defaultValues: {
       ...initialData,
-      country: initialData.country ? initialData.country.id : null,
-      region: initialData.region ? initialData.region.id : null,
+      country: initialData.country?.id ?? null,
+      ownerId: initialData.owner?.id ?? initialData.ownerId ?? null,
+      region: initialData.region?.id ?? null,
     },
+    resolver: zodResolver(EntityInputSchema),
   });
-
-  const { user } = useAuth();
-
-  const [error, setError] = useState<string | undefined>();
-
-  const [countryValue, setCountryValue] = useState<Option | undefined>(
-    toOption(initialData.country),
+  const country = watch("country");
+  const { data: countries } = useSuspenseQuery(
+    orpc.countries.list.queryOptions({ input: { limit: 100, sort: "name" } }),
   );
-
-  const [regionValue, setRegionValue] = useState<Option | undefined>(
-    toOption(initialData.region),
+  const regions = useQuery({
+    ...orpc.regions.list.queryOptions({
+      input: { country: String(country ?? ""), limit: 100, sort: "name" },
+    }),
+    enabled: Boolean(country),
+  });
+  const ownerResults = useQuery(
+    orpc.entities.list.queryOptions({
+      input: {
+        limit: 25,
+        query: ownerQuery,
+        sort: ownerQuery ? "rank" : "name",
+      },
+    }),
   );
+  const generateData = useMutation(orpc.ai.entityLookup.mutationOptions());
 
-  const orpc = useORPC();
-  const generateDataMutation = useMutation(
-    orpc.ai.entityLookup.mutationOptions(),
-  );
-
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+  const submit: SubmitHandler<EntityFormData> = async (data) => {
+    setSubmitError(undefined);
     try {
       await onSubmit(data);
-    } catch (err) {
-      setError(getFormErrorMessage(err));
+    } catch (error) {
+      setSubmitError(getFormErrorMessage(error));
     }
   };
 
+  async function fillDetails() {
+    const result = await generateData.mutateAsync(getValues());
+    const current = getValues();
+    if (result?.description && !current.description) {
+      setValue("description", result.description);
+      setValue("descriptionSrc", "generated");
+    }
+    if (result?.yearEstablished && !current.yearEstablished) {
+      setValue("yearEstablished", result.yearEstablished);
+    }
+  }
+
   return (
-    <FormScreen
+    <WorkflowScreen
+      onSave={handleSubmit(submit)}
+      saving={isSubmitting}
       title={title}
-      saveDisabled={isSubmitting}
-      onSave={handleSubmit(onSubmitHandler)}
     >
-      {error && <FormError values={[error]} />}
-
-      <Form
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
-      >
-        <Fieldset>
-          <TextField
-            {...register("name")}
-            error={errors.name}
-            autoFocus
-            label="Name"
-            type="text"
-            placeholder="e.g. Macallan"
-            required
-            autoComplete="off"
-          />
-          <TextField
-            {...register("shortName")}
-            error={errors.name}
-            label="Short Name"
-            type="text"
-            placeholder="e.g. MC"
-            autoComplete="off"
-            helpText="An abberviated name if applicable. This will take place of the full name in bottle labels."
-          />
-        </Fieldset>
-
-        <Fieldset>
-          <Legend title="Additional Details">
-            {user && (user.mod || user.admin) && (
-              <Button
-                color="default"
-                onClick={async () => {
-                  const result =
-                    await generateDataMutation.mutateAsync(getValues());
-
-                  const currentValues = getValues();
-                  if (
-                    result &&
-                    result.description &&
-                    !currentValues.description
-                  )
-                    setValue("description", result.description);
-                  setValue("descriptionSrc", "generated");
-                  if (
-                    result &&
-                    result.yearEstablished &&
-                    !currentValues.yearEstablished
-                  )
-                    setValue("yearEstablished", result.yearEstablished);
-                }}
-                disabled={generateDataMutation.isPending}
-                icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
+      <form onSubmit={handleSubmit(submit)}>
+        <FormStack>
+          {submitError ? <FormNotice>{submitError}</FormNotice> : null}
+          <FormSection title="Identity">
+            <Field
+              error={errors.name?.message}
+              errorId="entity-name-error"
+              htmlFor="entity-name"
+              label="Name"
+              required
+            >
+              <TextInput
+                {...register("name")}
+                aria-describedby={errors.name ? "entity-name-error" : undefined}
+                autoComplete="off"
+                autoFocus
+                id="entity-name"
+                invalid={Boolean(errors.name)}
+                placeholder="Macallan"
+              />
+            </Field>
+            <Field
+              error={errors.shortName?.message}
+              errorId="entity-short-name-error"
+              hint="Use the shorter name printed on bottle labels, when one exists."
+              htmlFor="entity-short-name"
+              label="Short name"
+              optional
+            >
+              <TextInput
+                {...register("shortName", {
+                  setValueAs: (value) => value || null,
+                })}
+                aria-describedby="entity-short-name-error"
+                autoComplete="off"
+                id="entity-short-name"
+                invalid={Boolean(errors.shortName)}
+                placeholder="The Macallan"
+              />
+            </Field>
+            <Field
+              error={errors.kind?.message}
+              htmlFor="entity-kind"
+              label="Kind"
+              required
+            >
+              <Select
+                {...register("kind")}
+                id="entity-kind"
+                invalid={Boolean(errors.kind)}
               >
-                Help me fill this in [Beta]
-              </Button>
-            )}
-          </Legend>
+                {EntityKindEnum.options.map((kind) => (
+                  <option key={kind} value={kind}>
+                    {toTitleCase(kind)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </FormSection>
 
-          <Controller
-            control={control}
-            name="country"
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <CountryField
-                {...field}
-                error={errors.country}
-                label="Country"
-                placeholder="e.g. Scotland"
-                onChange={(value) => {
-                  onChange(value?.id);
-                  // if (regionValue?.country.id !== value?.id)
-                  setRegionValue(undefined);
-                  setCountryValue(value);
+          <FormSection title="Location">
+            <Field htmlFor="entity-country" label="Country" optional>
+              <Select
+                id="entity-country"
+                onChange={(event) => {
+                  const nextCountry = event.currentTarget.value;
+                  setValue("country", nextCountry ? Number(nextCountry) : null);
+                  setValue("region", null);
                 }}
-                value={countryValue}
-              />
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="region"
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <RegionField
-                {...field}
-                error={errors.region}
-                label="Region"
-                placeholder="e.g. Islay, Kentucky"
-                searchContext={{
-                  country: getValues("country"),
-                }}
-                onChange={(value) => {
-                  onChange(value?.id);
-                  setRegionValue(value);
-                }}
-                value={regionValue}
-                rememberValues={false}
-              />
-            )}
-          />
-
-          <TextAreaField
-            {...register("address")}
-            error={errors.description}
-            label="Address"
-            helpText="The address of the entity. This should be the location of the distiller or tasting room."
-            placeholder="e.g. 132 Whisky Ln, Islay, Scotland, PA42 7DU"
-            rows={2}
-          />
-          <Controller
-            name="kind"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                label="Kind"
-                required
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value ? { id: value, name: toTitleCase(value) } : undefined
+                value={country ?? ""}
+              >
+                <option value="">Not set</option>
+                {countries.results.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field htmlFor="entity-region" label="Region" optional>
+              <Select
+                disabled={!country || regions.isLoading}
+                id="entity-region"
+                onChange={(event) =>
+                  setValue(
+                    "region",
+                    event.currentTarget.value
+                      ? Number(event.currentTarget.value)
+                      : null,
+                  )
                 }
-                options={entityKinds}
-                simple
+                value={watch("region") ?? ""}
+              >
+                <option value="">
+                  {regions.isLoading ? "Loading regions…" : "Not set"}
+                </option>
+                {regions.data?.results.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field
+              error={errors.address?.message}
+              htmlFor="entity-address"
+              label="Address"
+              optional
+            >
+              <Textarea
+                {...register("address", {
+                  setValueAs: (value) => value || null,
+                })}
+                id="entity-address"
+                invalid={Boolean(errors.address)}
+                placeholder="132 Whisky Lane, Islay, Scotland"
+                rows={3}
               />
-            )}
-          />
-          <Controller
-            name="ownerId"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <EntityField
-                {...field}
-                label="Owned by"
-                helpText="The current direct owner, when one owner is known."
-                placeholder="Search all Entities"
-                onChange={(owner) => onChange(owner?.id ?? null)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name:
-                          initialData.owner?.id === value
-                            ? initialData.owner.name
-                            : `Entity ${value}`,
-                      }
-                    : undefined
-                }
-              />
-            )}
-          />
-          <TextField
-            {...register("website", {
-              setValueAs: (v) => (v === "" || !v ? null : v),
-            })}
-            error={errors.website}
-            label="Website"
-            type="text"
-            placeholder="e.g. https://example.com"
-            autoComplete="off"
-          />
-          <TextField
-            {...register("yearEstablished", {
-              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-            })}
-            error={errors.yearEstablished}
-            label="Year Established"
-            type="number"
-            placeholder="e.g. 1969"
-            autoComplete="off"
-          />
-          {user && (user.mod || user.admin) && (
-            <TextAreaField
-              {...register("description", {
-                setValueAs: (v) => (v === "" || !v ? null : v),
-                onChange: () => {
-                  setValue("descriptionSrc", "user");
-                },
-              })}
-              error={errors.description}
-              label="Description"
-              rows={8}
+            </Field>
+          </FormSection>
+
+          <FormSection
+            action={
+              user?.mod || user?.admin ? (
+                <Button
+                  loading={generateData.isPending}
+                  onClick={() => void fillDetails()}
+                  size="sm"
+                  variant="tonal"
+                >
+                  <WandSparkles aria-hidden="true" size={15} />
+                  Fill details
+                </Button>
+              ) : undefined
+            }
+            title="Details"
+          >
+            <EntityPicker
+              help="The current direct owner, when one is known."
+              kind="entity"
+              label="Owned by"
+              loading={ownerResults.isFetching}
+              onChange={(value) => {
+                setOwner(value);
+                setValue("ownerId", value ? Number(value.id) : null);
+              }}
+              onQueryChange={setOwnerQuery}
+              options={(ownerResults.data?.results ?? []).map((item) => ({
+                detail: [
+                  toTitleCase(item.kind),
+                  item.region?.name ?? item.country?.name,
+                ]
+                  .filter(Boolean)
+                  .join(" · "),
+                id: String(item.id),
+                meta: item.peatedId,
+                name: item.name,
+              }))}
+              placeholder="Search entities"
+              value={owner}
             />
-          )}
-        </Fieldset>
-      </Form>
-    </FormScreen>
+            <Field
+              error={errors.website?.message}
+              htmlFor="entity-website"
+              label="Website"
+              optional
+            >
+              <TextInput
+                {...register("website", {
+                  setValueAs: (value) => value || null,
+                })}
+                id="entity-website"
+                invalid={Boolean(errors.website)}
+                placeholder="https://example.com"
+                type="url"
+              />
+            </Field>
+            <Field
+              error={errors.yearEstablished?.message}
+              htmlFor="entity-year"
+              label="Year established"
+              optional
+            >
+              <TextInput
+                {...register("yearEstablished", {
+                  setValueAs: (value) => (value ? Number(value) : null),
+                })}
+                format="data"
+                id="entity-year"
+                invalid={Boolean(errors.yearEstablished)}
+                max={new Date().getFullYear()}
+                placeholder="1824"
+                type="number"
+              />
+            </Field>
+            {user?.mod || user?.admin ? (
+              <Field
+                error={errors.description?.message}
+                htmlFor="entity-description"
+                label="Description"
+                optional
+              >
+                <Textarea
+                  {...register("description", {
+                    onChange: () => setValue("descriptionSrc", "user"),
+                    setValueAs: (value) => value || null,
+                  })}
+                  id="entity-description"
+                  invalid={Boolean(errors.description)}
+                  rows={8}
+                />
+              </Field>
+            ) : null}
+          </FormSection>
+        </FormStack>
+      </form>
+    </WorkflowScreen>
   );
 }

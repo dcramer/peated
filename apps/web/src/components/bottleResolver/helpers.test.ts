@@ -145,7 +145,7 @@ describe("photo create prefill", () => {
 
     expect(getManualResultCopy(result)).toMatchObject({
       title: "We couldn't find this bottle",
-      createLabel: "Create Bottle",
+      createLabel: "Add a new bottle",
       primaryAction: "create",
     });
     expect(getCreateBottlePrefill(result)).toMatchObject({

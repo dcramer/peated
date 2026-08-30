@@ -215,6 +215,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build web
         run: pnpm build:web
+      - name: Build Storybook
+        run: pnpm storybook:build
 
   server-tests:
     name: "test / server (${{ matrix.shard }}/${{ matrix.total }})"

@@ -1,35 +1,53 @@
 "use client";
 
-import Button from "@peated/web/components/button";
-import TextField from "@peated/web/components/textField";
+import {
+  Button,
+  Field,
+  TextInput,
+} from "@peated/web/components/designSystem/components";
+import {
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationDivider,
+  AuthenticationLink,
+  AuthenticationLinks,
+  AuthenticationNotice,
+  AuthenticationPanel,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import { passwordResetForm } from "@peated/web/lib/auth.actions";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import Alert from "./alert";
 
-function FormComponent({ initialEmail }: { initialEmail: string }) {
+function RecoveryRequestFields({ initialEmail }: { initialEmail: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <>
-      <div className="-mx-4 -mt-4">
-        <TextField
-          name="email"
-          label="Email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="you@example.com"
-          autoFocus
-          defaultValue={initialEmail}
-        />
-      </div>
-      <div className="flex justify-center gap-x-2">
-        <Button type="submit" color="highlight" fullWidth loading={pending}>
-          Continue
-        </Button>
-      </div>
-    </>
+    <AuthenticationActions>
+      <AuthenticationCard>
+        <Field htmlFor="recovery-email" label="Email" required>
+          <TextInput
+            autoComplete="email"
+            autoFocus
+            defaultValue={initialEmail}
+            id="recovery-email"
+            name="email"
+            placeholder="you@example.com"
+            required
+            type="email"
+          />
+        </Field>
+      </AuthenticationCard>
+      <Button
+        align="start"
+        fullWidth
+        loading={pending}
+        size="lg"
+        type="submit"
+        variant="accent"
+      >
+        Send recovery link
+      </Button>
+    </AuthenticationActions>
   );
 }
 
@@ -40,18 +58,41 @@ export default function PasswordResetForm({
 }) {
   const [result, formAction] = useActionState(passwordResetForm, undefined);
 
+  if (result?.ok) {
+    return (
+      <AuthenticationPanel
+        description="Follow the secure link we sent to choose a new way to sign in."
+        title="Check your email"
+      >
+        <AuthenticationNotice>
+          Recovery instructions are on their way.
+        </AuthenticationNotice>
+        <AuthenticationDivider />
+        <AuthenticationLinks>
+          <AuthenticationLink href="/login">
+            Return to sign in
+          </AuthenticationLink>
+        </AuthenticationLinks>
+      </AuthenticationPanel>
+    );
+  }
+
   return (
-    <div className="min-w-sm flex flex-auto flex-col gap-y-4">
-      {result?.error && <Alert>{result.error}</Alert>}
-      {result?.ok ? (
-        <p className="mb-8 text-center">
-          We've sent instructions to your email address.
-        </p>
-      ) : (
-        <form action={formAction}>
-          <FormComponent initialEmail={initialEmail} />
-        </form>
-      )}
-    </div>
+    <AuthenticationPanel
+      description="We’ll email a one-time link so you can restore access."
+      title="Recover your account"
+    >
+      {result?.error ? (
+        <AuthenticationNotice>{result.error}</AuthenticationNotice>
+      ) : null}
+      <form action={formAction}>
+        <RecoveryRequestFields initialEmail={initialEmail} />
+      </form>
+      <AuthenticationDivider />
+      <AuthenticationLinks>
+        <span>Remembered how to sign in?</span>
+        <AuthenticationLink href="/login">Return to sign in</AuthenticationLink>
+      </AuthenticationLinks>
+    </AuthenticationPanel>
   );
 }

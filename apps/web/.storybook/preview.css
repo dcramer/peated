@@ -1,0 +1,12 @@
+html,
+body,
+#storybook-root {
+  min-height: 100%;
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}

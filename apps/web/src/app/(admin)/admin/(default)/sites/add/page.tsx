@@ -1,10 +1,20 @@
 "use client";
 
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Button from "@peated/web/components/button";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import TextField from "@peated/web/components/textField";
+import { AdminButton } from "@peated/web/components/admin/adminButton.stylex";
+import {
+  AdminBreadcrumbs,
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
+import {
+  AdminFieldset,
+  AdminForm,
+  AdminFormActions,
+  AdminFormError,
+  AdminSelectField,
+  AdminTextareaField,
+  AdminTextField,
+} from "@peated/web/components/admin/adminForm.stylex";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
@@ -25,9 +35,9 @@ export default function Page() {
     event.preventDefault();
     setError(undefined);
     const data = new FormData(event.currentTarget);
-    const textValue = (name: string) => {
-      return z.string().catch("").parse(data.get(name));
-    };
+    const textValue = (name: string) =>
+      z.string().catch("").parse(data.get(name));
+
     try {
       const source = await create.mutateAsync({
         name: textValue("name"),
@@ -45,20 +55,22 @@ export default function Page() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl p-3">
-      <Breadcrumbs
-        pages={[
-          { name: "Admin", href: "/admin" },
-          { name: "Scrapers", href: "/admin/sites" },
-          { name: "Add site", href: "/admin/sites/add", current: true },
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[
+          { label: "Scrapers", href: "/admin/sites" },
+          { label: "Add site", href: "/admin/sites/add", current: true },
         ]}
       />
-      <h1 className="my-6 text-3xl font-semibold text-white">Add site</h1>
-      {error && <FormError values={[error]} />}
-      <form onSubmit={submit} className="space-y-6">
-        <Fieldset>
-          <TextField name="name" label="Site name" required />
-          <TextField
+      <AdminPageHeader
+        title="Add site"
+        description="Peated will find the list, detail fields, and next pages. You will review the result before collection starts."
+      />
+      {error ? <AdminFormError values={[error]} /> : null}
+      <AdminForm isSubmitting={create.isPending} onSubmit={submit}>
+        <AdminFieldset>
+          <AdminTextField name="name" label="Site name" required />
+          <AdminTextField
             name="websiteUrl"
             type="url"
             label="Website"
@@ -66,54 +78,42 @@ export default function Page() {
             placeholder="https://example.com"
             required
           />
-          <label className="block">
-            <span className="mb-2 block font-semibold">Content to collect</span>
-            <select
-              className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
-              value={kind}
-              onChange={(event) =>
-                setKind(event.target.value === "price" ? "price" : "review")
-              }
-            >
-              <option value="review">Reviews</option>
-              <option value="price">Store prices</option>
-            </select>
-          </label>
-          <label className="block">
-            <span className="mb-2 block font-semibold">
-              {kind === "review"
+          <AdminSelectField
+            label="Content to collect"
+            name="kind"
+            value={kind}
+            onChange={(event) =>
+              setKind(event.target.value === "price" ? "price" : "review")
+            }
+            options={[
+              { label: "Reviews", value: "review" },
+              { label: "Store prices", value: "price" },
+            ]}
+          />
+          <AdminTextareaField
+            name="sampleUrls"
+            rows={3}
+            label={
+              kind === "review"
                 ? "Example review pages"
-                : "Example product pages"}{" "}
-              <span className="text-muted font-normal">(optional)</span>
-            </span>
-            <textarea
-              name="sampleUrls"
-              rows={3}
-              className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2"
-              placeholder="One URL per line"
-            />
-            <span className="text-muted mt-2 block text-sm">
-              Leave this blank unless the site is hard to navigate. Peated will
-              find examples from the main page first.
-            </span>
-          </label>
-          <p className="text-muted text-sm">
-            Peated will find the pages and information to collect. You will
-            preview the result before collection starts.
-          </p>
-        </Fieldset>
-        <div className="flex justify-end gap-2">
-          <Button href="/admin/sites">Cancel</Button>
-          <Button
+                : "Example product pages"
+            }
+            helpText="Leave this blank unless the site is hard to navigate. Peated will find examples from the main page first."
+            placeholder="One URL per line"
+          />
+        </AdminFieldset>
+        <AdminFormActions>
+          <AdminButton href="/admin/sites">Cancel</AdminButton>
+          <AdminButton
             type="submit"
             color="highlight"
             loading={create.isPending}
             disabled={create.isPending}
           >
             Add site
-          </Button>
-        </div>
-      </form>
-    </div>
+          </AdminButton>
+        </AdminFormActions>
+      </AdminForm>
+    </AdminPage>
   );
 }

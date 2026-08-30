@@ -1,13 +1,19 @@
 "use client";
 
-import Alert from "@peated/web/components/alert";
-import Button from "@peated/web/components/button";
-import EmptyActivity from "@peated/web/components/emptyActivity";
+import {
+  Button,
+  FormActions,
+  FormNotice,
+  FormStack,
+  IconButton,
+  ItemList,
+  ItemRow,
+  TextInput,
+} from "@peated/web/components/designSystem/components";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
 import { KeyRound, Pencil, Smartphone, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -16,219 +22,210 @@ export default function PasskeyManager() {
   const orpc = useORPC();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>();
   const [isRegistering, setIsRegistering] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingName, setEditingName] = useState<string>("");
-
+  const [editingId, setEditingId] = useState<number>();
+  const [editingName, setEditingName] = useState("");
   const { data: passkeys, isLoading } = useQuery(
-    orpc.auth.passkey.list.queryOptions({
-      input: undefined,
-    }),
+    orpc.auth.passkey.list.queryOptions({ input: undefined }),
   );
-
-  const registerChallengeMutation = useMutation(
+  const registerChallenge = useMutation(
     orpc.auth.passkey.registerChallenge.mutationOptions(),
   );
-  const registerVerifyMutation = useMutation(
+  const registerVerify = useMutation(
     orpc.auth.passkey.registerVerify.mutationOptions(),
   );
-  const deletePasskeyMutation = useMutation(
-    orpc.auth.passkey.delete.mutationOptions(),
-  );
-  const updatePasskeyMutation = useMutation(
-    orpc.auth.passkey.update.mutationOptions(),
-  );
+  const deletePasskey = useMutation(orpc.auth.passkey.delete.mutationOptions());
+  const updatePasskey = useMutation(orpc.auth.passkey.update.mutationOptions());
 
-  const handleAddPasskey = async () => {
-    // Check for WebAuthn support
+  async function addPasskey() {
     if (!globalThis.PublicKeyCredential) {
       router.push("/browser-not-supported");
       return;
     }
 
-    setError(null);
+    setError(undefined);
     setIsRegistering(true);
-
     try {
-      // Get registration options from server
-      const { options, signedChallenge } =
-        await registerChallengeMutation.mutateAsync({});
-
-      // Start WebAuthn registration
+      const { options, signedChallenge } = await registerChallenge.mutateAsync(
+        {},
+      );
       const response = await startRegistration({ optionsJSON: options });
-
-      // Verify registration with server
-      await registerVerifyMutation.mutateAsync({
+      await registerVerify.mutateAsync({
         response,
         signedChallenge,
-        nickname: `Passkey added ${new Date().toLocaleDateString()}`,
+        nickname: `Passkey added ${formatDate(new Date())}`,
       });
-
-      // Refresh passkeys list
-      void queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });
-    } catch (err: any) {
-      logError(err, { context: "passkey_add" });
-      setError(err.message || "Failed to add passkey. Please try again.");
+    } catch (caught) {
+      logError(caught, { context: "passkey_add" });
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Unable to add this passkey.",
+      );
     } finally {
       setIsRegistering(false);
     }
-  };
+  }
 
-  const handleDeletePasskey = async (passkeyId: number) => {
-    const isLastPasskey = passkeys?.results?.length === 1;
-    const confirmMessage = isLastPasskey
-      ? "Warning: This is your last passkey. If you don't have a password set, you may lose access to your account. Are you sure you want to delete it?"
-      : "Are you sure you want to delete this passkey? You won't be able to use it to sign in anymore.";
+  async function removePasskey(passkeyId: number) {
+    const lastPasskey = passkeys?.results.length === 1;
+    const confirmed = confirm(
+      lastPasskey
+        ? "This is your last passkey. Delete it only if you can still sign in with a password."
+        : "Delete this passkey? You will no longer be able to use it to sign in.",
+    );
+    if (!confirmed) return;
 
-    if (!confirm(confirmMessage)) {
-      return;
-    }
-
+    setError(undefined);
     try {
-      await deletePasskeyMutation.mutateAsync({ passkeyId });
-      void queryClient.invalidateQueries({
+      await deletePasskey.mutateAsync({ passkeyId });
+      await queryClient.invalidateQueries({
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });
-    } catch (err: any) {
-      setError(err.message || "Failed to delete passkey");
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : "Unable to delete passkey.",
+      );
     }
-  };
+  }
 
-  const handleEditPasskey = (passkeyId: number, currentName: string) => {
-    setEditingId(passkeyId);
-    setEditingName(currentName || "");
-  };
-
-  const handleSavePasskey = async (passkeyId: number) => {
+  async function savePasskey(passkeyId: number) {
+    setError(undefined);
     try {
-      await updatePasskeyMutation.mutateAsync({
-        passkeyId,
+      await updatePasskey.mutateAsync({
         nickname: editingName.trim() || undefined,
+        passkeyId,
       });
-      void queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });
-      setEditingId(null);
+      setEditingId(undefined);
       setEditingName("");
-    } catch (err: any) {
-      setError(err.message || "Failed to update passkey");
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : "Unable to rename passkey.",
+      );
     }
-  };
+  }
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditingName("");
-  };
-
-  const getTransportIcon = (transports: string[] | null) => {
-    if (!transports || transports.length === 0)
-      return <KeyRound className="h-5 w-5" />;
-    if (transports.includes("internal"))
-      return <Smartphone className="h-5 w-5" />;
-    return <KeyRound className="h-5 w-5" />;
-  };
+  if (isLoading) return <FormNotice>Loading passkeys…</FormNotice>;
 
   return (
-    <>
-      {error && <Alert type="error">{error}</Alert>}
-
-      <div className="space-y-3">
-        {isLoading ? (
-          <div className="text-muted">Loading passkeys...</div>
-        ) : passkeys?.results && passkeys.results.length > 0 ? (
-          passkeys.results.map((passkey) => (
-            <div
-              key={passkey.id}
-              className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800 p-4"
-            >
-              <div className="flex flex-1 items-center gap-3">
-                <div className="text-slate-400">
-                  {getTransportIcon(passkey.transports)}
-                </div>
-                <div className="flex-1">
-                  {editingId === passkey.id ? (
-                    <input
-                      type="text"
-                      value={editingName}
-                      onChange={(e) => setEditingName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          void handleSavePasskey(passkey.id);
-                        } else if (e.key === "Escape") {
-                          handleCancelEdit();
-                        }
-                      }}
-                      className="w-full rounded bg-slate-900 px-2 py-1 text-sm font-medium"
-                      placeholder="Passkey name"
+    <FormStack>
+      {error ? <FormNotice>{error}</FormNotice> : null}
+      {passkeys?.results.length ? (
+        <ItemList ariaLabel="Your passkeys">
+          {passkeys.results.map((passkey) => {
+            const editing = editingId === passkey.id;
+            return (
+              <ItemRow
+                key={passkey.id}
+                action={
+                  editing ? (
+                    <FormActions>
+                      <Button
+                        loading={updatePasskey.isPending}
+                        onClick={() => void savePasskey(passkey.id)}
+                        size="sm"
+                        variant="accent"
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        onClick={() => setEditingId(undefined)}
+                        size="sm"
+                        variant="text"
+                      >
+                        Cancel
+                      </Button>
+                    </FormActions>
+                  ) : (
+                    <FormActions>
+                      <IconButton
+                        icon={<Pencil aria-hidden="true" size={15} />}
+                        label={`Rename ${passkey.nickname || "passkey"}`}
+                        onClick={() => {
+                          setEditingId(passkey.id);
+                          setEditingName(passkey.nickname || "");
+                        }}
+                        size="sm"
+                        variant="text"
+                      />
+                      <IconButton
+                        disabled={deletePasskey.isPending}
+                        icon={<Trash2 aria-hidden="true" size={15} />}
+                        label={`Delete ${passkey.nickname || "passkey"}`}
+                        onClick={() => void removePasskey(passkey.id)}
+                        size="sm"
+                        variant="text"
+                      />
+                    </FormActions>
+                  )
+                }
+                leading={getTransportIcon(passkey.transports)}
+                metadata={
+                  passkey.lastUsedAt
+                    ? `Last used ${formatDate(passkey.lastUsedAt)}`
+                    : `Added ${formatDate(passkey.createdAt)}`
+                }
+                title={
+                  editing ? (
+                    <TextInput
+                      aria-label="Passkey name"
                       autoFocus
+                      onChange={(event) =>
+                        setEditingName(event.currentTarget.value)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") void savePasskey(passkey.id);
+                        if (event.key === "Escape") setEditingId(undefined);
+                      }}
+                      value={editingName}
                     />
                   ) : (
-                    <div className="font-medium">
-                      {passkey.nickname || "Unnamed Passkey"}
-                    </div>
-                  )}
-                  <div className="text-sm text-slate-400">
-                    {passkey.lastUsedAt
-                      ? `Last used ${formatDistanceToNow(new Date(passkey.lastUsedAt))} ago`
-                      : `Added ${formatDistanceToNow(new Date(passkey.createdAt))} ago`}
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                {editingId === passkey.id ? (
-                  <>
-                    <Button
-                      color="primary"
-                      onClick={() => handleSavePasskey(passkey.id)}
-                      disabled={updatePasskeyMutation.isPending}
-                    >
-                      Save
-                    </Button>
-                    <Button color="default" onClick={handleCancelEdit}>
-                      Cancel
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      color="default"
-                      onClick={() =>
-                        handleEditPasskey(passkey.id, passkey.nickname || "")
-                      }
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      color="default"
-                      onClick={() => handleDeletePasskey(passkey.id)}
-                      disabled={deletePasskeyMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <EmptyActivity>
-            You haven't added any passkeys yet. Passkeys let you sign in
-            securely using your fingerprint, face, or device PIN.
-          </EmptyActivity>
-        )}
-
+                    passkey.nickname || "Unnamed passkey"
+                  )
+                }
+              />
+            );
+          })}
+        </ItemList>
+      ) : (
+        <FormNotice>
+          No passkeys yet. Add one to sign in with your fingerprint, face, or
+          device PIN.
+        </FormNotice>
+      )}
+      <FormActions>
         <Button
-          onClick={handleAddPasskey}
-          disabled={isRegistering}
-          color="highlight"
-          fullWidth
+          loading={isRegistering}
+          loadingLabel="Adding passkey…"
+          onClick={() => void addPasskey()}
+          variant="accent"
         >
-          {isRegistering ? "Adding Passkey..." : "Add Passkey"}
+          Add passkey
         </Button>
-      </div>
-    </>
+      </FormActions>
+    </FormStack>
   );
+}
+
+function getTransportIcon(transports: string[] | null) {
+  return transports?.includes("internal") ? (
+    <Smartphone aria-hidden="true" size={18} />
+  ) : (
+    <KeyRound aria-hidden="true" size={18} />
+  );
+}
+
+function formatDate(value: string | Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
 }

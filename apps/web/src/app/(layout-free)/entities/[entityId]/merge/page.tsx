@@ -1,21 +1,26 @@
 "use client";
 
+import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityMergeSchema } from "@peated/server/schemas";
-import ChoiceField from "@peated/web/components/choiceField";
-import EntityField from "@peated/web/components/entityField";
-import Fieldset from "@peated/web/components/fieldset";
-import { useFlashMessages } from "@peated/web/components/flash";
-import Form from "@peated/web/components/form";
-import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
+import {
+  ChoiceList,
+  FieldGroup,
+  FormNotice,
+  FormSection,
+  FormStack,
+  SearchSelect,
+  type SearchPickerOption,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -28,10 +33,7 @@ import type { z } from "zod";
 type FormSchemaType = z.infer<typeof EntityMergeSchema>;
 
 export default function Page(props: { params: Promise<{ entityId: string }> }) {
-  const params = use(props.params);
-
-  const { entityId } = params;
-
+  const { entityId } = use(props.params);
   return (
     <ModRequired>
       <EntityMergeForm entityId={entityId} />
@@ -42,114 +44,145 @@ export default function Page(props: { params: Promise<{ entityId: string }> }) {
 function EntityMergeForm({ entityId }: { entityId: string }) {
   const orpc = useORPC();
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const { flash } = useFlashMessages();
   const { data: entity } = useSuspenseQuery(
     orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } }),
   );
-  const { flash } = useFlashMessages();
-
-  const router = useRouter();
-
-  const [otherEntityName, setOtherEntityName] = useState<string>("Other");
-
-  const entityMergeMutation = useMutation({
+  const [query, setQuery] = useState("");
+  const [other, setOther] = useState<SearchPickerOption | null>(null);
+  const [submitError, setSubmitError] = useState<string>();
+  const results = useQuery(
+    orpc.entities.list.queryOptions({
+      input: {
+        limit: 25,
+        query,
+        sort: query ? "rank" : "name",
+      },
+    }),
+  );
+  const merge = useMutation({
     ...orpc.entities.merge.mutationOptions(),
-    onSuccess: (newEntity) => {
+    onSuccess: (nextEntity) => {
       void queryClient.invalidateQueries({
         queryKey: orpc.entities.details.key({
-          input: { entity: newEntity.id },
+          input: { entity: nextEntity.id },
         }),
       });
     },
   });
-
   const {
     control,
-    handleSubmit,
     formState: { errors, isSubmitting },
+    handleSubmit,
   } = useForm<FormSchemaType>({
+    defaultValues: { direction: "mergeInto" },
     resolver: zodResolver(EntityMergeSchema),
-    defaultValues: {
-      direction: "mergeInto",
-    },
   });
 
-  const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await entityMergeMutation.mutateAsync(
-      {
+  const submit: SubmitHandler<FormSchemaType> = async (data) => {
+    setSubmitError(undefined);
+    try {
+      const nextEntity = await merge.mutateAsync({
+        direction: data.direction,
         entity: entity.id,
         other: data.entityId,
-        direction: data.direction,
-      },
-      {
-        onSuccess: (newEntity) => {
-          flash(
-            <div>
-              Performing merge asynchronously. Updates may take a few minutes.
-            </div>,
-          );
-          router.push(getEntityUrl(newEntity));
-        },
-      },
-    );
+      });
+      flash(
+        <div>
+          Performing merge asynchronously. Updates may take a few minutes.
+        </div>,
+      );
+      router.push(getEntityUrl(nextEntity));
+    } catch (error) {
+      setSubmitError(
+        getFormErrorMessage(error, { allowAnyErrorMessage: true }),
+      );
+    }
   };
 
   return (
-    <Layout
-      header={
-        <Header>
-          <FormHeader
-            title="Merge Entity"
-            saveDisabled={isSubmitting}
-            onSave={handleSubmit(onSubmit)}
-            saveLabel="Continue"
-          />
-        </Header>
-      }
+    <WorkflowScreen
+      onSave={handleSubmit(submit)}
+      saveLabel="Continue"
+      saving={isSubmitting}
+      title="Merge entity"
     >
-      <Form onSubmit={handleSubmit(onSubmit)} isSubmitting={isSubmitting}>
-        {entityMergeMutation.isError && (
-          <FormError values={[entityMergeMutation.error.message]} />
-        )}
-
-        <Fieldset>
-          <Controller
-            name="entityId"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <EntityField
-                {...field}
-                error={errors.entityId}
-                label="Other Entity"
-                required
-                onChange={(value) => {
-                  onChange(value?.id);
-                  setOtherEntityName(value?.name || "Other");
-                }}
-                onResults={(results) => {
-                  return results.filter((r) => r.id !== entity.id);
-                }}
-              />
-            )}
-          />
-          <ChoiceField
-            control={control}
-            name="direction"
-            label="Direction"
-            required
-            choices={[
-              {
-                id: "mergeFrom",
-                name: `Merge "${otherEntityName}" into "${entity.name}"`,
-              },
-              {
-                id: "mergeInto",
-                name: `Merge "${entity.name}" into "${otherEntityName}"`,
-              },
-            ]}
-            error={errors.direction}
-          />
-        </Fieldset>
-      </Form>
-    </Layout>
+      <form onSubmit={handleSubmit(submit)}>
+        <FormStack>
+          <FormNotice>Current record: {entity.name}</FormNotice>
+          {submitError ? <FormNotice>{submitError}</FormNotice> : null}
+          <FormSection title="Duplicate record">
+            <Controller
+              control={control}
+              name="entityId"
+              render={({ field }) => (
+                <FieldGroup
+                  error={errors.entityId?.message}
+                  label="Other entity"
+                  required
+                >
+                  <SearchSelect
+                    emptyText="No matching entities."
+                    label="Other entity"
+                    loading={results.isFetching}
+                    onChange={(option) => {
+                      setOther(option);
+                      field.onChange(option ? Number(option.id) : undefined);
+                    }}
+                    onQueryChange={setQuery}
+                    options={(results.data?.results ?? [])
+                      .filter((item) => item.id !== entity.id)
+                      .map((item) => ({
+                        detail: [
+                          toTitleCase(item.kind),
+                          item.region?.name ?? item.country?.name,
+                        ]
+                          .filter(Boolean)
+                          .join(" · "),
+                        id: item.id,
+                        label: item.name,
+                      }))}
+                    placeholder="Search entities"
+                    value={other}
+                  />
+                </FieldGroup>
+              )}
+            />
+          </FormSection>
+          <FormSection title="Record to keep">
+            <Controller
+              control={control}
+              name="direction"
+              render={({ field }) => (
+                <ChoiceList
+                  id="entity-merge-direction"
+                  label="Record to keep"
+                  name={field.name}
+                  onChange={field.onChange}
+                  options={[
+                    {
+                      description: other
+                        ? `Retire ${other.label}.`
+                        : "Retire the selected duplicate.",
+                      label: `Keep ${entity.name}`,
+                      value: "mergeFrom",
+                    },
+                    {
+                      description: `Retire ${entity.name}.`,
+                      label: other
+                        ? `Keep ${other.label}`
+                        : "Keep the duplicate",
+                      value: "mergeInto",
+                    },
+                  ]}
+                  value={field.value}
+                />
+              )}
+            />
+          </FormSection>
+        </FormStack>
+      </form>
+    </WorkflowScreen>
   );
 }

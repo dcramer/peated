@@ -1,5 +1,8 @@
-import Alert from "@peated/web/components/alert";
-import LayoutSplash from "@peated/web/components/layoutSplash";
+import {
+  AuthenticationNotice,
+  AuthenticationPanel,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+import { AuthenticationPage } from "@peated/web/components/designSystem/product/authenticationPage.stylex";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import {
   oauthAuthorizationSearchParams,
@@ -48,24 +51,23 @@ const pageServices: OAuthAuthorizationPageServices = {
   },
   redirectToLogin: redirectToAuth,
   renderForm: (request) => <AuthorizationForm request={request} />,
-  renderLayout: (children) => <LayoutSplash>{children}</LayoutSplash>,
+  renderLayout: (children) => (
+    <AuthenticationPage intro="database">{children}</AuthenticationPage>
+  ),
 };
 
 function InvalidAuthorizationRequest({
   renderLayout,
 }: Pick<OAuthAuthorizationPageServices, "renderLayout">) {
   return renderLayout(
-    <>
-      <div className="mb-8">
-        <h1 className="mb-4 text-2xl font-semibold">
-          Invalid authorization request
-        </h1>
-        <Alert noMargin>
-          This application supplied an unknown client, unsafe redirect, or
-          invalid PKCE request. Return to the application and try again.
-        </Alert>
-      </div>
-    </>,
+    <AuthenticationPanel
+      description="The requesting application supplied an unknown client, unsafe redirect, or invalid security challenge."
+      title="Invalid authorization request"
+    >
+      <AuthenticationNotice>
+        Return to the application that sent you here and try again.
+      </AuthenticationNotice>
+    </AuthenticationPanel>,
   );
 }
 
@@ -98,24 +100,16 @@ export function createOAuthAuthorizationPage(
     }
 
     return services.renderLayout(
-      <>
-        <div className="mb-8">
-          <div className="text-muted mb-2 text-sm font-semibold uppercase tracking-wide">
-            Application Access
-          </div>
-          <h1 className="mb-4 text-2xl font-semibold">
-            Authorize {clientDetails.name}?
-          </h1>
-          <p className="text-muted mb-4">
-            This application will receive API access as @{user.username}.
-          </p>
-          <Alert type="default" noMargin>
-            It can perform the same Peated API actions your account can. Peated
-            does not share your password or sign-in credentials.
-          </Alert>
-        </div>
+      <AuthenticationPanel
+        description={`This application will receive API access as @${user.username}.`}
+        title={`Authorize ${clientDetails.name}?`}
+      >
+        <AuthenticationNotice>
+          It can perform the same Peated API actions your account can. Peated
+          does not share your password or sign-in credentials.
+        </AuthenticationNotice>
         {services.renderForm(parsed.data)}
-      </>,
+      </AuthenticationPanel>,
     );
   };
 }

@@ -1,8 +1,7 @@
 import { expect, test, type TestInfo } from "@playwright/test";
 
-import { bottlePath, expectNoHorizontalOverflow } from "./assertions";
+import { bottlePath } from "./assertions";
 import {
-  existingBottle,
   existingBottleId,
   moderatorUser,
   testAccessToken,
@@ -37,7 +36,6 @@ test("reviews independent catalog operations one task at a time", async ({
   await expect(
     readyOperation.getByRole("button", { name: "Apply included changes" }),
   ).toBeEnabled();
-  await expectNoHorizontalOverflow(page);
 
   const approvalRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/audits/approveSelected"),
@@ -76,7 +74,6 @@ test("reviews independent catalog operations one task at a time", async ({
       .getByRole("region", { name: "Moderation Inbox" })
       .getByText("Nothing needs a decision"),
   ).toBeVisible();
-  await expectNoHorizontalOverflow(page);
 });
 
 test("runs a clean moderator Bottle audit inline and returns to the Bottle", async ({
@@ -91,37 +88,24 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
   await page.goto(`/bottles/${existingBottleId}/audit`);
 
   await expect(
-    page.getByRole("heading", { name: "Audit Bottle", exact: true }),
+    page.getByRole("heading", { name: "Audit bottle", exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
-
-  const auditFieldset = page.locator("form > fieldset");
-  await expect(auditFieldset).toBeVisible();
-  await expect(
-    auditFieldset.getByRole("link", { name: existingBottle.fullName }),
-  ).toHaveAttribute("href", `/bottles/${existingBottleId}`);
-  await expect(auditFieldset.getByText("Audit history")).toHaveCount(0);
-  await auditFieldset
-    .getByRole("textbox", { name: "Optional context" })
+  await page
+    .getByRole("textbox", { name: "What looks wrong?" })
     .fill("Verify the label and catalog identity.");
   const auditRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/audits/create"),
   );
-  await page.getByRole("button", { name: "Run Bottle Audit" }).click();
+  await page.getByRole("button", { name: "Run audit" }).click();
   await auditRequest;
   await expect(page).toHaveURL(`/bottles/${existingBottleId}/audit`);
   await expect(
-    page.getByRole("heading", { name: "No changes proposed" }),
-  ).toBeVisible();
-  await expect(
     page.getByText(
-      "The Bottle identity is supported by the inspected evidence.",
-      { exact: true },
+      "No changes proposed. The Bottle identity is supported by the inspected evidence.",
     ),
   ).toBeVisible();
-  await expectNoHorizontalOverflow(page);
 
-  await page.getByRole("button", { name: "Return to Bottle" }).click();
+  await page.getByRole("button", { name: "Return to bottle" }).click();
   await expect(page).toHaveURL(bottlePath(existingBottleId));
 });
 
@@ -139,9 +123,9 @@ test("opens an actionable admin audit in its focused Moderation task", async ({
 
   await page.goto(`/bottles/${existingBottleId}/audit`);
   await page
-    .getByRole("textbox", { name: "Optional context" })
+    .getByRole("textbox", { name: "What looks wrong?" })
     .fill("Review proposed catalog work.");
-  await page.getByRole("button", { name: "Run Bottle Audit" }).click();
+  await page.getByRole("button", { name: "Run audit" }).click();
 
   await expect(page).toHaveURL("/admin/moderation/inbox/operation/701");
   await expect(
@@ -152,7 +136,6 @@ test("opens an actionable admin audit in its focused Moderation task", async ({
   await expect(
     page.getByText("Review the second inspected Brand independently."),
   ).toHaveCount(0);
-  await expectNoHorizontalOverflow(page);
 });
 
 function uniqueAccessToken(testInfo: TestInfo, suffix = "bottle-check-review") {

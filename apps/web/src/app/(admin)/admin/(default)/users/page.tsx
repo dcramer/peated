@@ -1,7 +1,11 @@
 "use client";
 
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Table from "@peated/web/components/table";
+import {
+  AdminBreadcrumbs,
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
+import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -24,20 +28,21 @@ export default function Page() {
   );
 
   return (
-    <div>
-      <Breadcrumbs
-        pages={[
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[
           {
-            name: "Admin",
+            label: "Admin",
             href: "/admin",
           },
           {
-            name: "Users",
+            label: "Users",
             href: "/admin/users",
             current: true,
           },
         ]}
       />
+      <AdminPageHeader title="Users" />
 
       <Table
         items={userList.results}
@@ -54,6 +59,6 @@ export default function Page() {
           },
         ]}
       />
-    </div>
+    </AdminPage>
   );
 }

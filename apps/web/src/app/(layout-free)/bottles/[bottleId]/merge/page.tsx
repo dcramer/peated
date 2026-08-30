@@ -1,19 +1,22 @@
 "use client";
 
+import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { BottleMergeSchema } from "@peated/server/schemas";
-import BottleField, {
-  type BottleOption,
-  formatBottleOptionWithId,
-} from "@peated/web/components/bottleField";
-import ChoiceField from "@peated/web/components/choiceField";
-import Fieldset from "@peated/web/components/fieldset";
-import { useFlashMessages } from "@peated/web/components/flash";
-import Form from "@peated/web/components/form";
-import FormError from "@peated/web/components/formError";
-import FormHeader from "@peated/web/components/formHeader";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
+import {
+  ChoiceList,
+  FieldGroup,
+  FormNotice,
+  FormSection,
+  FormStack,
+  SearchSelect,
+  SelectedBottleSummary,
+  type SearchPickerOption,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
@@ -30,23 +33,10 @@ import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof BottleMergeSchema>;
 
-function formatMergeBottleIdentity({
-  id,
-  fullName,
-}: {
-  id: number;
-  fullName: string;
-}): string {
-  return `“${fullName}” (Bottle ${id})`;
-}
-
 export default function MergeBottle(props: {
   params: Promise<{ bottleId: string }>;
 }) {
-  const params = use(props.params);
-
-  const { bottleId } = params;
-
+  const { bottleId } = use(props.params);
   return (
     <ModRequired>
       <MergeBottleForm bottleId={bottleId} />
@@ -57,179 +47,163 @@ export default function MergeBottle(props: {
 function MergeBottleForm({ bottleId }: { bottleId: string }) {
   const orpc = useORPC();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const { flash } = useFlashMessages();
   const { data: bottle } = useSuspenseQuery(
     orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
   );
-  const { flash } = useFlashMessages();
-
-  const router = useRouter();
-  const prefilledOtherBottleId = Number(searchParams.get("other") ?? 0) || null;
+  const prefilledId = Number(searchParams.get("other") ?? 0) || null;
   const prefilledDirection =
     searchParams.get("direction") === "mergeFrom" ? "mergeFrom" : "mergeInto";
-  const prefillKey = prefilledOtherBottleId
-    ? `${prefilledOtherBottleId}:${prefilledDirection}`
-    : null;
-
-  const [otherBottleName, setOtherBottleName] = useState<string>("Other");
-  const [selectedOtherBottle, setSelectedOtherBottle] =
-    useState<BottleOption | null>(null);
-  const [appliedPrefillKey, setAppliedPrefillKey] = useState<null | string>(
-    null,
-  );
-
-  const { data: prefilledOtherBottle } = useQuery({
-    ...orpc.bottles.details.queryOptions({
-      input: { bottle: prefilledOtherBottleId ?? 0 },
+  const [query, setQuery] = useState("");
+  const [other, setOther] = useState<SearchPickerOption | null>(null);
+  const [submitError, setSubmitError] = useState<string>();
+  const results = useQuery(
+    orpc.bottles.list.queryOptions({
+      input: {
+        limit: 25,
+        query,
+        sort: query ? "rank" : "-tastings",
+      },
     }),
-    enabled: prefilledOtherBottleId !== null,
+  );
+  const prefilledBottle = useQuery({
+    ...orpc.bottles.details.queryOptions({
+      input: { bottle: prefilledId ?? 0 },
+    }),
+    enabled: prefilledId !== null,
   });
-
-  const bottleMergeMutation = useMutation({
+  const merge = useMutation({
     ...orpc.bottles.merge.mutationOptions(),
-    onSuccess: (newBottle) => {
+    onSuccess: (nextBottle) => {
       void queryClient.invalidateQueries({
         queryKey: orpc.bottles.details.key({
-          input: { bottle: newBottle.id },
+          input: { bottle: nextBottle.id },
         }),
       });
     },
   });
-
   const {
     control,
+    formState: { errors, isSubmitting },
     handleSubmit,
     setValue,
-    formState: { dirtyFields, errors, isSubmitting },
   } = useForm<FormSchemaType>({
+    defaultValues: { direction: prefilledDirection },
     resolver: zodResolver(BottleMergeSchema),
-    defaultValues: {
-      direction: prefilledDirection,
-    },
   });
 
   useEffect(() => {
-    if (
-      !prefilledOtherBottle ||
-      !prefillKey ||
-      appliedPrefillKey === prefillKey ||
-      dirtyFields.bottleId ||
-      dirtyFields.direction
-    ) {
-      return;
-    }
-
-    const nextBottle = {
-      id: prefilledOtherBottle.id,
-      name: formatBottleOptionWithId(prefilledOtherBottle),
-      fullName: prefilledOtherBottle.fullName,
+    if (!prefilledBottle.data || other) return;
+    const option = {
+      detail: getBottleMetadata(prefilledBottle.data),
+      id: prefilledBottle.data.id,
+      label: prefilledBottle.data.fullName,
     };
+    setOther(option);
+    setValue("bottleId", prefilledBottle.data.id);
+  }, [other, prefilledBottle.data, setValue]);
 
-    setSelectedOtherBottle(nextBottle);
-    setOtherBottleName(prefilledOtherBottle.fullName);
-    setValue("bottleId", prefilledOtherBottle.id, { shouldDirty: false });
-    setValue("direction", prefilledDirection, { shouldDirty: false });
-    setAppliedPrefillKey(prefillKey);
-  }, [
-    appliedPrefillKey,
-    dirtyFields.bottleId,
-    dirtyFields.direction,
-    prefillKey,
-    prefilledDirection,
-    prefilledOtherBottle,
-    setValue,
-  ]);
-
-  const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    await bottleMergeMutation.mutateAsync(
-      {
+  const submit: SubmitHandler<FormSchemaType> = async (data) => {
+    setSubmitError(undefined);
+    try {
+      const nextBottle = await merge.mutateAsync({
         bottle: bottle.id,
-        other: data.bottleId,
         direction: data.direction,
-      },
-      {
-        onSuccess: (newBottle) => {
-          flash(<div>Bottles merged successfully.</div>);
-          router.push(`/bottles/${newBottle.id}`);
-        },
-      },
-    );
+        other: data.bottleId,
+      });
+      flash(<div>Bottles merged successfully.</div>);
+      router.push(`/bottles/${nextBottle.id}`);
+    } catch (error) {
+      setSubmitError(
+        getFormErrorMessage(error, { allowAnyErrorMessage: true }),
+      );
+    }
   };
 
   return (
-    <Layout
-      header={
-        <Header>
-          <FormHeader
-            title="Merge Bottle"
-            saveDisabled={isSubmitting}
-            onSave={handleSubmit(onSubmit)}
-            saveLabel="Merge Bottles"
-          />
-        </Header>
-      }
+    <WorkflowScreen
+      onSave={handleSubmit(submit)}
+      saveLabel="Merge bottles"
+      saving={isSubmitting}
+      title="Merge bottle"
     >
-      <Form onSubmit={handleSubmit(onSubmit)} isSubmitting={isSubmitting}>
-        {bottleMergeMutation.isError && (
-          <FormError values={[bottleMergeMutation.error.message]} />
-        )}
-
-        <Fieldset>
-          <Controller
-            name="bottleId"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <BottleField
-                {...field}
-                error={errors.bottleId}
-                label="Other Bottle"
-                required
-                formatOptionName={formatBottleOptionWithId}
-                value={selectedOtherBottle}
-                onChange={(value) => {
-                  onChange(value?.id);
-                  setSelectedOtherBottle(value ?? null);
-                  setOtherBottleName(value?.fullName || "Other");
-                }}
-                onResults={(results) => {
-                  return results.filter((r) => r.id !== bottle.id);
-                }}
-              />
-            )}
+      <form onSubmit={handleSubmit(submit)}>
+        <FormStack>
+          <SelectedBottleSummary
+            bottleId={bottle.peatedId}
+            imageUrl={bottle.imageUrl}
+            metadata={getBottleMetadata(bottle)}
+            name={bottle.fullName}
           />
-          <ChoiceField
-            control={control}
-            name="direction"
-            label="Direction"
-            required
-            choices={[
-              {
-                id: "mergeFrom",
-                name: `Retire ${
-                  selectedOtherBottle
-                    ? formatMergeBottleIdentity({
-                        id: selectedOtherBottle.id,
-                        fullName: otherBottleName,
-                      })
-                    : "the selected Bottle"
-                }; keep ${formatMergeBottleIdentity(bottle)}`,
-              },
-              {
-                id: "mergeInto",
-                name: `Retire ${formatMergeBottleIdentity(bottle)}; keep ${
-                  selectedOtherBottle
-                    ? formatMergeBottleIdentity({
-                        id: selectedOtherBottle.id,
-                        fullName: otherBottleName,
-                      })
-                    : "the selected Bottle"
-                }`,
-              },
-            ]}
-            error={errors.direction}
-          />
-        </Fieldset>
-      </Form>
-    </Layout>
+          {submitError ? <FormNotice>{submitError}</FormNotice> : null}
+          <FormSection title="Duplicate bottle">
+            <Controller
+              control={control}
+              name="bottleId"
+              render={({ field }) => (
+                <FieldGroup
+                  error={errors.bottleId?.message}
+                  label="Other bottle"
+                  required
+                >
+                  <SearchSelect
+                    emptyText="No matching bottles."
+                    label="Other bottle"
+                    loading={results.isFetching}
+                    onChange={(option) => {
+                      setOther(option);
+                      field.onChange(option ? Number(option.id) : undefined);
+                    }}
+                    onQueryChange={setQuery}
+                    options={(results.data?.results ?? [])
+                      .filter((item) => item.id !== bottle.id)
+                      .map((item) => ({
+                        detail: getBottleMetadata(item),
+                        id: item.id,
+                        label: item.fullName,
+                      }))}
+                    placeholder="Search bottles"
+                    value={other}
+                  />
+                </FieldGroup>
+              )}
+            />
+          </FormSection>
+          <FormSection title="Bottle to keep">
+            <Controller
+              control={control}
+              name="direction"
+              render={({ field }) => (
+                <ChoiceList
+                  id="bottle-merge-direction"
+                  label="Bottle to keep"
+                  name={field.name}
+                  onChange={field.onChange}
+                  options={[
+                    {
+                      description: other
+                        ? `Retire ${other.label} (${formatPeatedId("bottle", Number(other.id))}).`
+                        : "Retire the selected duplicate.",
+                      label: `Keep ${bottle.fullName} (${bottle.peatedId})`,
+                      value: "mergeFrom",
+                    },
+                    {
+                      description: `Retire ${bottle.fullName} (${bottle.peatedId}).`,
+                      label: other
+                        ? `Keep ${other.label} (${formatPeatedId("bottle", Number(other.id))})`
+                        : "Keep the duplicate",
+                      value: "mergeInto",
+                    },
+                  ]}
+                  value={field.value}
+                />
+              )}
+            />
+          </FormSection>
+        </FormStack>
+      </form>
+    </WorkflowScreen>
   );
 }

@@ -1,6 +1,6 @@
-import theme from "@peated/design";
 import { Link } from "jsx-email";
 import React from "react";
+import theme from "../theme";
 import { Section, Text } from "./core";
 
 export enum Reason {

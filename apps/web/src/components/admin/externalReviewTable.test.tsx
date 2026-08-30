@@ -115,7 +115,7 @@ describe("ExternalReviewTable", () => {
       <ExternalReviewRows externalReviewList={[makeExternalReview(3, null)]} />,
     );
 
-    expect(html).toContain("No Bottle");
+    expect(html).toContain("No bottle");
     expect(html).not.toContain('href="/bottles/');
     expect(html).not.toContain("/releases");
   });

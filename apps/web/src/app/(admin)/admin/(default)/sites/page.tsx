@@ -1,11 +1,16 @@
 "use client";
 
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
+import {
+  AdminActions,
+  AdminBreadcrumbs,
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
+import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
+import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperCatalogCoverage from "@peated/web/components/admin/scraperCatalogCoverage";
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Button from "@peated/web/components/button";
-import EmptyActivity from "@peated/web/components/emptyActivity";
-import Table from "@peated/web/components/table";
 import TimeSince from "@peated/web/components/timeSince";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -30,26 +35,21 @@ export default function Page() {
   const coverage = coverageQuery.data;
 
   return (
-    <div>
-      <Breadcrumbs
-        pages={[
-          {
-            name: "Admin",
-            href: "/admin",
-          },
-          {
-            name: "Scrapers",
-            href: "/admin/sites",
-            current: true,
-          },
-        ]}
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[{ label: "Scrapers", href: "/admin/sites", current: true }]}
+      />
+      <AdminPageHeader
+        title="Scrapers"
+        actions={
+          <AdminActions>
+            <Button href="/admin/sites/add" color="highlight">
+              Add site
+            </Button>
+          </AdminActions>
+        }
       />
       <ScraperCatalogCoverage coverage={coverage} />
-      <div className="mb-4 flex justify-end">
-        <Button href="/admin/sites/add" color="highlight">
-          Add site
-        </Button>
-      </div>
       {siteList.results.length > 0 ? (
         <Table
           items={siteList.results}
@@ -62,55 +62,22 @@ export default function Page() {
               name: "name",
               sort: "name",
               sortDefaultOrder: "asc",
-              value: (site) => (
-                <div>
-                  <div>{site.name}</div>
-                  <div className="text-muted mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:hidden">
-                    <span>
-                      {site.externalReviews.total.toLocaleString("en-US")}{" "}
-                      reviews
-                    </span>
-                    <span>
-                      {site.priceListings.total.toLocaleString("en-US")} prices
-                    </span>
-                    <ExternalSiteRunStatus site={site} compact />
-                  </div>
-                </div>
-              ),
+              value: (site) => site.name,
             },
             {
               name: "inventory",
               title: "Inventory",
-              className: "hidden w-48 sm:table-column",
-              value: (site) => (
-                <div className="space-y-1 text-sm">
-                  <div>
-                    {site.externalReviews.total.toLocaleString("en-US")} reviews
-                    <span className="text-muted ml-2 text-xs">
-                      {site.externalReviews.matched.toLocaleString("en-US")}{" "}
-                      matched
-                    </span>
-                  </div>
-                  <div>
-                    {site.priceListings.total.toLocaleString("en-US")} prices
-                    <span className="text-muted ml-2 text-xs">
-                      {site.priceListings.matched.toLocaleString("en-US")}{" "}
-                      matched
-                    </span>
-                  </div>
-                </div>
-              ),
+              value: (site) =>
+                `${site.externalReviews.matched.toLocaleString("en-US")} / ${site.externalReviews.total.toLocaleString("en-US")} reviews · ${site.priceListings.matched.toLocaleString("en-US")} / ${site.priceListings.total.toLocaleString("en-US")} prices`,
             },
             {
               name: "status",
               title: "Status",
-              className: "hidden w-72 sm:table-column",
               value: (site) => <ExternalSiteRunStatus site={site} />,
             },
             {
               name: "nextRunAt",
               title: "Next Run",
-              className: "hidden w-32 sm:table-column",
               value: (site) =>
                 site.nextRunAt ? (
                   <TimeSince date={site.nextRunAt} />
@@ -123,10 +90,8 @@ export default function Page() {
           ]}
         />
       ) : (
-        <EmptyActivity>
-          Looks like there's nothing in the database yet. Weird.
-        </EmptyActivity>
+        <EmptyActivity>No scrapers are configured.</EmptyActivity>
       )}
-    </div>
+    </AdminPage>
   );
 }

@@ -1,24 +1,21 @@
 "use client";
 
-import { BoltIcon } from "@heroicons/react/20/solid";
 import { CountryInputSchema } from "@peated/server/schemas";
 import { type Country } from "@peated/server/types";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import TextField from "@peated/web/components/textField";
-import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
+import {
+  AdminFieldset as Fieldset,
+  AdminFormPage as FormPage,
+  AdminTextField as TextField,
+} from "@peated/web/components/admin/adminForm.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { WandSparkles } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type { z } from "zod";
-import Button from "../button";
-import Form from "../form";
-import Legend from "../legend";
-import TextAreaField from "../textAreaField";
-import AdminSidebar from "./sidebar";
+import { AdminButton as Button } from "./adminButton.stylex";
+import { AdminTextareaField as TextAreaField } from "./adminForm.stylex";
+import { useAdminFormSubmit } from "./useAdminFormSubmit";
 
 type FormSchemaType = z.infer<typeof CountryInputSchema>;
 
@@ -49,84 +46,71 @@ export default function CountryForm({
     orpc.ai.countryLookup.mutationOptions(),
   );
 
-  const [error, setError] = useState<string | undefined>();
-
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
-    try {
-      await onSubmit(data);
-    } catch (err) {
-      setError(getFormErrorMessage(err));
-    }
-  };
+  const { error, submit } = useAdminFormSubmit(onSubmit);
 
   return (
-    <FormScreen
+    <FormPage
+      error={error}
+      isSubmitting={isSubmitting}
+      onSubmit={handleSubmit(submit)}
       title={title}
-      saveDisabled={isSubmitting}
-      onSave={handleSubmit(onSubmitHandler)}
-      sidebar={<AdminSidebar />}
     >
-      {error && <FormError values={[error]} />}
+      <Fieldset>
+        <TextField
+          {...register("name")}
+          label="Name"
+          placeholder="e.g. United States"
+          readOnly={edit}
+          error={errors.name}
+          required
+        />
+      </Fieldset>
 
-      <Form
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
+      <Fieldset
+        title="Additional details"
+        action={
+          <Button
+            color="default"
+            onClick={async () => {
+              const result =
+                await generateDataMutation.mutateAsync(getValues());
+
+              const currentValues = getValues();
+              if (result && result.description && !currentValues.description)
+                setValue("description", result.description);
+              setValue("descriptionSrc", "generated");
+              if (result && result.summary && !currentValues.summary)
+                setValue("summary", result.summary);
+            }}
+            disabled={generateDataMutation.isPending}
+            icon={<WandSparkles aria-hidden="true" size={18} />}
+          >
+            Help me fill this in [Beta]
+          </Button>
+        }
       >
-        <Fieldset>
-          <TextField
-            {...register("name")}
-            label="Name"
-            placeholder="e.g. United States"
-            readOnly={edit}
-            error={errors.name}
-            required
-          />
-        </Fieldset>
+        <TextAreaField
+          {...register("description", {
+            setValueAs: (v) => (v === "" || !v ? null : v),
+            onChange: () => {
+              setValue("descriptionSrc", "user");
+            },
+          })}
+          error={errors.description}
+          autoFocus
+          label="Description"
+          rows={8}
+        />
 
-        <Fieldset>
-          <Legend title="Additional Details">
-            <Button
-              color="default"
-              onClick={async () => {
-                const result =
-                  await generateDataMutation.mutateAsync(getValues());
-
-                const currentValues = getValues();
-                if (result && result.description && !currentValues.description)
-                  setValue("description", result.description);
-                setValue("descriptionSrc", "generated");
-                if (result && result.summary && !currentValues.summary)
-                  setValue("summary", result.summary);
-              }}
-              disabled={generateDataMutation.isPending}
-              icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
-            >
-              Help me fill this in [Beta]
-            </Button>
-          </Legend>
-          <TextAreaField
-            {...register("description", {
-              setValueAs: (v) => (v === "" || !v ? null : v),
-              onChange: () => {
-                setValue("descriptionSrc", "user");
-              },
-            })}
-            error={errors.description}
-            autoFocus
-            label="Description"
-            rows={8}
-          />
-
-          <TextAreaField
-            {...register("summary")}
-            error={errors.description}
-            autoFocus
-            helpText="One or two sentences describing the rules for whisky in this region."
-            label="Summary"
-            rows={8}
-          />
-        </Fieldset>
-      </Form>
-    </FormScreen>
+        <TextAreaField
+          {...register("summary")}
+          error={errors.description}
+          autoFocus
+          helpText="One or two sentences describing the rules for whisky in this region."
+          label="Summary"
+          rows={8}
+        />
+      </Fieldset>
+    </FormPage>
   );
 }

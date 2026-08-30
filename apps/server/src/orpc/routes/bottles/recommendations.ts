@@ -1,15 +1,12 @@
 import { db } from "@peated/server/db";
 import { bottles, bottleTombstones, tastings } from "@peated/server/db/schema";
-import { procedure } from "@peated/server/orpc";
-import {
-  BOTTLE_RECOMMENDATION_REASON,
-  BottleRecommendationsSchema,
-} from "@peated/server/schemas";
+import { implement } from "@peated/server/orpc";
+import bottleRecommendationsContract from "@peated/server/orpc/contracts/bottles/recommendations";
+import { BOTTLE_RECOMMENDATION_REASON } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { and, asc, desc, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { z } from "zod";
 
 const MIN_SOURCE_MEMBERS = 3;
 const MIN_SHARED_MEMBERS = 2;
@@ -19,26 +16,8 @@ const activeBottleConditions = and(
   sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
 );
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/bottles/{bottle}/recommendations",
-    summary: "Get bottle recommendations",
-    description:
-      "Recommend bottles based on preferences from the Peated community",
-    spec: (spec) => ({
-      ...spec,
-      operationId: "listBottleRecommendations",
-    }),
-  })
-  .input(
-    z.object({
-      bottle: z.coerce.number(),
-      limit: z.coerce.number().gte(1).lte(12).default(6),
-    }),
-  )
-  .output(BottleRecommendationsSchema)
-  .handler(async function ({ input, context, errors }) {
+export default implement(bottleRecommendationsContract).handler(
+  async function ({ input, context, errors }) {
     const [source] = await db
       .select({ id: bottles.id })
       .from(bottles)
@@ -130,4 +109,5 @@ export default procedure
         "tastingNotes",
       ]),
     };
-  });
+  },
+);

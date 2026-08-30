@@ -1,35 +1,24 @@
 import { useSearchParams } from "next/navigation";
 
-type QueryParamValue = boolean | null | number | string | undefined;
-
-interface QueryParams {
-  [key: string]: QueryParamValue;
-}
+import {
+  getApiQueryParams,
+  type ApiQueryParams,
+} from "@peated/web/lib/apiQueryParams";
 
 export default function useApiQueryParams({
   defaults = {},
   numericFields = ["cursor", "limit"],
   overrides = {},
 }: {
-  defaults?: QueryParams;
-  numericFields?: string[];
-  overrides?: QueryParams;
+  defaults?: ApiQueryParams;
+  numericFields?: readonly string[];
+  overrides?: ApiQueryParams;
 }) {
   const searchParams = useSearchParams();
 
-  const nFields = new Set(numericFields);
-
-  return {
-    ...defaults,
-    ...Object.fromEntries(
-      [...searchParams.entries()]
-        .map(([k, v]) =>
-          nFields.has(k)
-            ? [k, v === "" ? null : parseInt(v, 10)]
-            : [k, v === "" ? null : v],
-        )
-        .filter(([k, v]) => !!v),
-    ),
-    ...overrides,
-  };
+  return getApiQueryParams(searchParams, {
+    defaults,
+    numericFields,
+    overrides,
+  });
 }

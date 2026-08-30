@@ -3,6 +3,10 @@
     "sentry": {
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp/peated/peated?experimental=1"
+    },
+    "peated-storybook": {
+      "type": "http",
+      "url": "http://localhost:6006/mcp"
     }
   }
 }

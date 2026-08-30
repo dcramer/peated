@@ -5,5 +5,5 @@ export default function ModerationLayout({
 }: {
   children: ReactNode;
 }) {
-  return <div className="-my-4 lg:-m-8">{children}</div>;
+  return children;
 }

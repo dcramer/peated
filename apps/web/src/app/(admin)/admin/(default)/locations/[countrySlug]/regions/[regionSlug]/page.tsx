@@ -1,73 +1,46 @@
 "use client";
+
 import { use } from "react";
 
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Button from "@peated/web/components/button";
-import PageHeader from "@peated/web/components/pageHeader";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
+import {
+  AdminBreadcrumbs,
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page(props: {
+export default function Page({
+  params,
+}: {
   params: Promise<{ countrySlug: string; regionSlug: string }>;
 }) {
-  const params = use(props.params);
-
-  const { countrySlug, regionSlug } = params;
-
+  const { countrySlug, regionSlug } = use(params);
   const orpc = useORPC();
   const { data: country } = useSuspenseQuery(
-    orpc.countries.details.queryOptions({
-      input: {
-        country: countrySlug,
-      },
-    }),
+    orpc.countries.details.queryOptions({ input: { country: countrySlug } }),
   );
-
   const { data: region } = useSuspenseQuery(
     orpc.regions.details.queryOptions({
-      input: {
-        country: countrySlug,
-        region: regionSlug,
-      },
+      input: { country: countrySlug, region: regionSlug },
     }),
   );
+  const href = `/admin/locations/${country.slug}/regions/${region.slug}`;
 
   return (
-    <div className="w-full p-3 lg:py-0">
-      <Breadcrumbs
-        pages={[
-          {
-            name: "Admin",
-            href: "/admin",
-          },
-          {
-            name: "Locations",
-            href: "/admin/locations",
-          },
-          {
-            name: country.name,
-            href: `/admin/locations/${country.slug}`,
-          },
-          {
-            name: region.name,
-            href: `/admin/locations/${country.slug}/regions/${region.slug}`,
-            current: true,
-          },
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[
+          { label: "Locations", href: "/admin/locations" },
+          { label: country.name, href: `/admin/locations/${country.slug}` },
+          { label: region.name, href, current: true },
         ]}
       />
-
-      <PageHeader
+      <AdminPageHeader
         title={`${region.name}, ${country.name}`}
-        metadata={
-          <div className="flex gap-x-1">
-            <Button
-              href={`/admin/locations/${country.slug}/regions/${region.slug}/edit`}
-            >
-              Edit Region
-            </Button>
-          </div>
-        }
+        actions={<Button href={`${href}/edit`}>Edit region</Button>}
       />
-    </div>
+    </AdminPage>
   );
 }

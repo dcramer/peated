@@ -4,18 +4,17 @@ import {
   OAuthClientInputSchema,
   type OAuthClientSchema,
 } from "@peated/server/schemas";
-import Fieldset from "@peated/web/components/fieldset";
-import Form from "@peated/web/components/form";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import TextAreaField from "@peated/web/components/textAreaField";
-import TextField from "@peated/web/components/textField";
-import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
+import {
+  AdminFieldset as Fieldset,
+  AdminFormPage as FormPage,
+  AdminTextareaField as TextAreaField,
+  AdminTextField as TextField,
+} from "@peated/web/components/admin/adminForm.stylex";
 import { zodResolver } from "@peated/web/lib/zodResolver";
-import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
-import AdminSidebar from "./sidebar";
+
+import { useAdminFormSubmit } from "./useAdminFormSubmit";
 
 export function parseOAuthClientRedirectUris(value: string): string[] {
   return value
@@ -77,60 +76,48 @@ export default function OAuthClientForm({
     resolver: zodResolver(OAuthClientFormSchema),
     defaultValues: getOAuthClientFormDefaults(initialData),
   });
-  const [error, setError] = useState<string>();
-
-  const onSubmitHandler: SubmitHandler<FormData> = async (data) => {
-    try {
-      await onSubmit(
-        OAuthClientInputSchema.parse({
-          name: data.name,
-          redirectUris: parseOAuthClientRedirectUris(data.redirectUris),
-        }),
-      );
-    } catch (err) {
-      setError(getFormErrorMessage(err));
-    }
-  };
+  const { error, submit } = useAdminFormSubmit<FormData>(async (data) => {
+    await onSubmit(
+      OAuthClientInputSchema.parse({
+        name: data.name,
+        redirectUris: parseOAuthClientRedirectUris(data.redirectUris),
+      }),
+    );
+  });
 
   return (
-    <FormScreen
+    <FormPage
+      error={error}
+      isSubmitting={isSubmitting}
+      onSubmit={handleSubmit(submit)}
       title={title}
-      saveDisabled={isSubmitting}
-      onSave={handleSubmit(onSubmitHandler)}
-      sidebar={<AdminSidebar />}
     >
-      {error && <FormError values={[error]} />}
-      <Form
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
-      >
-        <Fieldset>
-          {initialData?.clientId && (
-            <TextField
-              name="clientId"
-              label="Client ID"
-              value={initialData.clientId}
-              readOnly
-              helpText="Public identifier; OAuth clients do not have a secret."
-            />
-          )}
+      <Fieldset>
+        {initialData?.clientId && (
           <TextField
-            {...register("name")}
-            label="Name"
-            placeholder="e.g. Peated CLI"
-            error={errors.name}
-            required
+            name="clientId"
+            label="Client ID"
+            value={initialData.clientId}
+            readOnly
+            helpText="Public identifier; OAuth clients do not have a secret."
           />
-          <TextAreaField
-            {...register("redirectUris")}
-            label="Redirect URIs"
-            helpText="One URI per line. Use HTTPS, or HTTP with 127.0.0.1 or [::1] for local clients."
-            error={errors.redirectUris}
-            rows={6}
-            required
-          />
-        </Fieldset>
-      </Form>
-    </FormScreen>
+        )}
+        <TextField
+          {...register("name")}
+          label="Name"
+          placeholder="e.g. Peated CLI"
+          error={errors.name}
+          required
+        />
+        <TextAreaField
+          {...register("redirectUris")}
+          label="Redirect URIs"
+          helpText="One URI per line. Use HTTPS, or HTTP with 127.0.0.1 or [::1] for local clients."
+          error={errors.redirectUris}
+          rows={6}
+          required
+        />
+      </Fieldset>
+    </FormPage>
   );
 }

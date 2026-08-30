@@ -1,4 +1,3 @@
-import { RESERVED_COLLECTION_SLUGS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { CollectionBottle } from "@peated/server/db/schema";
 import { collectionBottles, collections } from "@peated/server/db/schema";
@@ -13,15 +12,12 @@ import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import collectionBottleCreateContract from "@peated/server/orpc/contracts/collections/bottles/create";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import {
-  CollectionBottleInputSchema,
-  CollectionBottleSchema,
-} from "@peated/server/schemas";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -34,28 +30,9 @@ import {
   validatePendingImageForCollectionBottle,
 } from "./imageHelpers";
 
-const CollectionBottleCreateFields = {
-  collection: z.union([z.enum(RESERVED_COLLECTION_SLUGS), z.coerce.number()]),
-  pendingImageId: z.string().trim().min(1).optional(),
-  user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-} as const;
-
-const CollectionBottleCreateInputSchema =
-  CollectionBottleInputSchema.safeExtend(CollectionBottleCreateFields).strict();
-
-export default procedure
+export default implement(collectionBottleCreateContract)
   .use(requireAuth)
   .use(requireTosAccepted)
-  .route({
-    method: "POST",
-    path: "/users/{user}/collections/{collection}/bottles",
-    summary: "Add a Bottle to a collection",
-    description:
-      "Add one Bottle to a user's collection. Requires authentication and ownership.",
-    operationId: "addBottleToCollection",
-  })
-  .input(CollectionBottleCreateInputSchema)
-  .output(CollectionBottleSchema)
   .handler(async function ({ input, context, errors }) {
     const statusProvided = Object.hasOwn(input, "status");
     const user = await getUserFromId(db, input.user, context.user);

@@ -1,12 +1,20 @@
 "use client";
 
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Button from "@peated/web/components/button";
-import DefinitionList from "@peated/web/components/definitionList";
-import PageHeader from "@peated/web/components/pageHeader";
+import { use } from "react";
+
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
+import {
+  AdminActions,
+  AdminBreadcrumbs,
+  AdminCode,
+  AdminPage,
+  AdminPageHeader,
+  AdminSection,
+  AdminStatus,
+} from "@peated/web/components/admin/adminContent.stylex";
+import { AdminDefinitionList as DefinitionList } from "@peated/web/components/admin/adminUtility.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { use } from "react";
 
 export default function Page({
   params,
@@ -21,22 +29,21 @@ export default function Page({
   const update = useMutation(orpc.admin.oauthClients.update.mutationOptions());
 
   return (
-    <div className="w-full p-3 lg:py-0">
-      <Breadcrumbs
-        pages={[
-          { name: "Admin", href: "/admin" },
-          { name: "OAuth Clients", href: "/admin/oauth-clients" },
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[
+          { label: "OAuth clients", href: "/admin/oauth-clients" },
           {
-            name: client.name,
+            label: client.name,
             href: `/admin/oauth-clients/${client.clientId}`,
             current: true,
           },
         ]}
       />
-      <PageHeader
+      <AdminPageHeader
         title={client.name}
-        metadata={
-          <div className="flex gap-2">
+        actions={
+          <AdminActions>
             <Button
               onClick={async () => {
                 await update.mutateAsync({
@@ -51,31 +58,34 @@ export default function Page({
               {client.active ? "Deactivate" : "Activate"}
             </Button>
             <Button href={`/admin/oauth-clients/${client.clientId}/edit`}>
-              Edit Client
+              Edit client
             </Button>
-          </div>
+          </AdminActions>
         }
       />
-      <DefinitionList>
-        <DefinitionList.Term>Client ID</DefinitionList.Term>
-        <DefinitionList.Details>
-          <code className="break-all">{client.clientId}</code>
-        </DefinitionList.Details>
-        <DefinitionList.Term>Status</DefinitionList.Term>
-        <DefinitionList.Details>
-          {client.active ? "Active" : "Inactive"}
-        </DefinitionList.Details>
-        <DefinitionList.Term>Redirect URIs</DefinitionList.Term>
-        <DefinitionList.Details>
-          <ul className="space-y-1">
-            {client.redirectUris.map((uri) => (
-              <li key={uri}>
-                <code className="break-all">{uri}</code>
-              </li>
+      <AdminSection title="Client details">
+        <DefinitionList>
+          <DefinitionList.Term>Client ID</DefinitionList.Term>
+          <DefinitionList.Details>
+            <AdminCode>{client.clientId}</AdminCode>
+          </DefinitionList.Details>
+          <DefinitionList.Term>Status</DefinitionList.Term>
+          <DefinitionList.Details>
+            <AdminStatus tone={client.active ? "success" : "neutral"}>
+              {client.active ? "Active" : "Inactive"}
+            </AdminStatus>
+          </DefinitionList.Details>
+          <DefinitionList.Term>Redirect URIs</DefinitionList.Term>
+          <DefinitionList.Details>
+            {client.redirectUris.map((uri, index) => (
+              <span key={uri}>
+                {index ? " · " : null}
+                <AdminCode>{uri}</AdminCode>
+              </span>
             ))}
-          </ul>
-        </DefinitionList.Details>
-      </DefinitionList>
-    </div>
+          </DefinitionList.Details>
+        </DefinitionList>
+      </AdminSection>
+    </AdminPage>
   );
 }

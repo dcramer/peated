@@ -1,9 +1,17 @@
 import { withSentryConfig } from "@sentry/nextjs";
+import withStylexTurbopack from "@stylexswc/nextjs-plugin/turbopack";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const { stylexOptions } = require("./stylex.config.cjs");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
   allowedDevOrigins: ["127.0.0.1"],
+  experimental: {
+    globalNotFound: true,
+  },
   env: {
     DEBUG: process.env.DEBUG ? "true" : "",
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
@@ -47,7 +55,24 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+const stylexNextConfig = withStylexTurbopack({
+  rsOptions: {
+    ...stylexOptions(),
+    include: ["src/**/*.stylex.{js,jsx,ts,tsx}"],
+  },
+})(nextConfig);
+
+// The StyleX Turbopack wrapper replaces `turbopack.rules`. Preserve Peated's
+// existing asset loaders after StyleX adds its source transforms.
+stylexNextConfig.turbopack = {
+  ...stylexNextConfig.turbopack,
+  rules: {
+    ...stylexNextConfig.turbopack?.rules,
+    ...nextConfig.turbopack?.rules,
+  },
+};
+
+export default withSentryConfig(stylexNextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 

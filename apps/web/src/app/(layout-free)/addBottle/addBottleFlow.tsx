@@ -2,8 +2,6 @@
 
 import type { Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
-import BadgeImage from "@peated/web/components/badgeImage";
-import BottleIdentity from "@peated/web/components/bottleIdentity";
 import BottleResolver, {
   type BottleResolverAction,
   type BottleResolverCreateProposalActionsProps,
@@ -12,44 +10,50 @@ import BottleResolver, {
   type PendingImageRef,
 } from "@peated/web/components/bottleResolver";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
-import Button from "@peated/web/components/button";
-import { useFlashMessages } from "@peated/web/components/flash";
-import FormError from "@peated/web/components/formError";
-import Header from "@peated/web/components/header";
-import Layout from "@peated/web/components/layout";
 import {
+  Button,
+  ButtonLink,
   CollectionBottleStatusChips,
+  FormGrid,
+  FormNotice,
+  FormSection,
+  FormStack,
+  LoadingList,
+  SelectedBottleSummary,
   type CollectionBottleStatusValue,
-} from "@peated/web/components/libraryBottleStatus";
-import Link from "@peated/web/components/link";
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
+import { Search as BottleSearch } from "@peated/web/components/designSystem/product/search.stylex";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
-import Spinner from "@peated/web/components/spinner";
 import TastingForm, {
   type TastingCreateFormSubmitData,
 } from "@peated/web/components/tastingForm";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
-import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
+import {
+  getAddBottleHref,
+  getPendingImageFromParams,
+} from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import type { TastingTagSuggestion } from "@peated/web/lib/tastingForm";
 import { uploadTastingImageAfterSave } from "@peated/web/lib/tastingImageUpload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  AlertTriangle,
-  BookOpen,
-  Check,
-  Eye,
-  Plus,
-  RotateCcw,
-  Search,
-  Wine,
-} from "lucide-react";
+import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { BadgeAwardMessage } from "./badgeAwardMessage.stylex";
 
 type AddBottleIntent = "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
@@ -109,19 +113,8 @@ function getLibraryActionLabel(state: {
   hasLibraryEntry: boolean;
   canSaveLibraryPhoto?: boolean;
 }) {
-  if (!state.hasLibraryEntry) return "Add to Library";
-  return state.canSaveLibraryPhoto ? "Save Photo" : "In Library";
-}
-
-function FlowHeader({ children }: { children: ReactNode }) {
-  return (
-    <Header>
-      <div className="flex w-full items-center gap-3">
-        <h1 className="text-2xl font-bold">Add Bottle</h1>
-      </div>
-      {children}
-    </Header>
-  );
+  if (!state.hasLibraryEntry) return "Add to library";
+  return state.canSaveLibraryPhoto ? "Save photo" : "In library";
 }
 
 function BottlePanel({
@@ -132,55 +125,31 @@ function BottlePanel({
   previewUrl?: string | null;
 }) {
   return (
-    <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        {previewUrl && (
-          <img
-            src={previewUrl}
-            alt="Selected bottle label"
-            className="h-24 w-24 shrink-0 rounded object-cover"
-          />
-        )}
-        <BottleIdentity
-          bottle={bottle}
-          href={getViewBottleHref(bottle)}
-          className="min-w-0 flex-1"
-          linkClassName="font-semibold text-white hover:underline"
-        />
-      </div>
-    </section>
+    <SelectedBottleSummary
+      bottleId={bottle.peatedId}
+      imageUrl={previewUrl ?? bottle.imageUrl}
+      metadata={getBottleMetadata(bottle)}
+      name={bottle.fullName}
+    />
   );
 }
 
 function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
   return (
-    <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        {entry.imageUrl && (
-          <img
-            src={entry.imageUrl}
-            alt="Selected bottle label"
-            className="h-24 w-24 shrink-0 rounded object-cover"
-          />
-        )}
-        <BottleIdentity
-          bottle={entry.bottle}
-          href={getViewBottleHref(entry.bottle)}
-          className="min-w-0 flex-1"
-          linkClassName="font-semibold text-white hover:underline"
-        />
-      </div>
-    </section>
+    <SelectedBottleSummary
+      bottleId={entry.bottle.peatedId}
+      imageUrl={entry.imageUrl ?? entry.bottle.imageUrl}
+      metadata={getBottleMetadata(entry.bottle)}
+      name={entry.bottle.fullName}
+    />
   );
 }
 
 function LoadingBottlePanel() {
   return (
-    <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl px-4 lg:px-0">
-        <Spinner />
-      </div>
-    </Layout>
+    <WorkflowScreen title="Add bottle">
+      <LoadingList label="Loading bottle" rows={3} />
+    </WorkflowScreen>
   );
 }
 
@@ -198,27 +167,21 @@ function BottleLoadErrorPanel({
   onStartOver: () => void;
 }) {
   return (
-    <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
-        <FormError values={[message]} />
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Button
-            href={getSearchHref()}
-            fullWidth
-            icon={<Search className="h-4 w-4" />}
-          >
-            Search Bottles
+    <WorkflowScreen title="Add bottle">
+      <FormStack>
+        <FormNotice>{message}</FormNotice>
+        <FormGrid>
+          <ButtonLink fullWidth href={getSearchHref()}>
+            <Search aria-hidden="true" size={16} />
+            Search bottles
+          </ButtonLink>
+          <Button fullWidth onClick={onStartOver} variant="tonal">
+            <RotateCcw aria-hidden="true" size={16} />
+            Start over
           </Button>
-          <Button
-            fullWidth
-            onClick={onStartOver}
-            icon={<RotateCcw className="h-4 w-4" />}
-          >
-            Start Over
-          </Button>
-        </div>
-      </div>
-    </Layout>
+        </FormGrid>
+      </FormStack>
+    </WorkflowScreen>
   );
 }
 
@@ -241,26 +204,26 @@ function OutcomeButton({
 }) {
   if (href) {
     return (
-      <Button
-        href={href}
-        color={emphasized ? "highlight" : "default"}
+      <ButtonLink
         fullWidth
-        icon={icon}
+        href={href}
+        variant={emphasized ? "accent" : "tonal"}
       >
+        {icon}
         {children}
-      </Button>
+      </ButtonLink>
     );
   }
 
   return (
     <Button
-      onClick={onClick}
-      color={emphasized ? "highlight" : "default"}
-      fullWidth
-      icon={icon}
       disabled={disabled}
+      fullWidth
       loading={loading}
+      onClick={onClick}
+      variant={emphasized ? "accent" : "tonal"}
     >
+      {icon}
       {children}
     </Button>
   );
@@ -279,12 +242,20 @@ function MatchedOutcomeActions({
   const canSaveLibraryPhoto = Boolean(
     pendingImage && hasLibraryEntry && libraryEntryImageUrl === null,
   );
+  const primaryAction =
+    intent === "tasting"
+      ? "tasting"
+      : intent === "view"
+        ? "view"
+        : hasLibraryEntry && !canSaveLibraryPhoto
+          ? "tasting"
+          : "library";
   const libraryButton = (
     <OutcomeButton
       key="library"
       onClick={() => onResolve("library")}
-      icon={<BookOpen className="h-4 w-4" />}
-      emphasized
+      icon={<BookOpen aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "library"}
       disabled={
         Boolean(resolvingAction) ||
         loadingExactLibraryStatus ||
@@ -299,29 +270,36 @@ function MatchedOutcomeActions({
     <OutcomeButton
       key="tasting"
       onClick={() => onResolve("tasting")}
-      icon={<Wine className="h-4 w-4" />}
-      emphasized
+      icon={<Wine aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "tasting"}
       disabled={Boolean(resolvingAction)}
       loading={resolvingAction === "tasting"}
     >
-      Log Tasting
+      Log tasting
     </OutcomeButton>
   );
   const viewButton = (
     <OutcomeButton
       key="view"
       href={getViewBottleHref(bottle)}
-      icon={<Eye className="h-4 w-4" />}
+      icon={<Eye aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "view"}
     >
-      View Bottle
+      View bottle
     </OutcomeButton>
   );
   const actionButtons =
     intent === "tasting"
       ? [tastingButton, libraryButton, viewButton]
       : [libraryButton, tastingButton, viewButton];
+  const [primaryButton, ...secondaryButtons] = actionButtons;
 
-  return <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>;
+  return (
+    <FormStack>
+      {primaryButton}
+      <FormGrid>{secondaryButtons}</FormGrid>
+    </FormStack>
+  );
 }
 
 function CreateProposalOutcomeActions({
@@ -331,39 +309,42 @@ function CreateProposalOutcomeActions({
   onResolve,
 }: BottleResolverCreateProposalActionsProps & { intent: AddBottleIntent }) {
   const creating = createPending || Boolean(resolvingAction);
+  const primaryAction =
+    intent === "tasting" ? "tasting" : intent === "view" ? "create" : "library";
   const libraryButton = (
     <OutcomeButton
       key="library"
       onClick={() => onResolve("library")}
-      icon={<BookOpen className="h-4 w-4" />}
-      emphasized
+      icon={<BookOpen aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "library"}
       disabled={creating}
       loading={resolvingAction === "library"}
     >
-      Add to Library
+      Add to library
     </OutcomeButton>
   );
   const tastingButton = (
     <OutcomeButton
       key="tasting"
       onClick={() => onResolve("tasting")}
-      icon={<Wine className="h-4 w-4" />}
-      emphasized
+      icon={<Wine aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "tasting"}
       disabled={creating}
       loading={resolvingAction === "tasting"}
     >
-      Log Tasting
+      Log tasting
     </OutcomeButton>
   );
   const createButton = (
     <OutcomeButton
       key="create"
       onClick={() => onResolve("create")}
-      icon={<Plus className="h-4 w-4" />}
+      icon={<Plus aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "create"}
       disabled={creating}
       loading={resolvingAction === "create"}
     >
-      Create Bottle
+      Add bottle
     </OutcomeButton>
   );
   const actionButtons =
@@ -372,8 +353,14 @@ function CreateProposalOutcomeActions({
       : intent === "view"
         ? [createButton, libraryButton, tastingButton]
         : [libraryButton, tastingButton, createButton];
+  const [primaryButton, ...secondaryButtons] = actionButtons;
 
-  return <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>;
+  return (
+    <FormStack>
+      {primaryButton}
+      <FormGrid>{secondaryButtons}</FormGrid>
+    </FormStack>
+  );
 }
 
 function OutcomeSelection({
@@ -400,15 +387,22 @@ function OutcomeSelection({
   const description = wasCreated
     ? "Choose what you want to do next."
     : "Choose what you want to do with this bottle.";
+  const canSaveLibrary = canSaveBottleToLibrary(selection);
+  const primaryAction =
+    intent === "tasting"
+      ? "tasting"
+      : intent === "view"
+        ? "view"
+        : canSaveLibrary
+          ? "library"
+          : "tasting";
   const libraryButton = (
     <OutcomeButton
       key="library"
       onClick={onAddToLibrary}
-      icon={<BookOpen className="h-4 w-4" />}
-      emphasized
-      disabled={
-        !canSaveBottleToLibrary(selection) || addingToLibrary || loggingTasting
-      }
+      icon={<BookOpen aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "library"}
+      disabled={!canSaveLibrary || addingToLibrary || loggingTasting}
       loading={addingToLibrary}
     >
       {getLibraryActionLabel({
@@ -423,21 +417,22 @@ function OutcomeSelection({
     <OutcomeButton
       key="tasting"
       onClick={onLogTasting}
-      icon={<Wine className="h-4 w-4" />}
-      emphasized
+      icon={<Wine aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "tasting"}
       disabled={loggingTasting}
       loading={loggingTasting}
     >
-      Log Tasting
+      Log tasting
     </OutcomeButton>
   );
   const viewButton = (
     <OutcomeButton
       key="view"
       href={getViewBottleHref(selection.bottle)}
-      icon={<Eye className="h-4 w-4" />}
+      icon={<Eye aria-hidden="true" size={16} />}
+      emphasized={primaryAction === "view"}
     >
-      View Bottle
+      View bottle
     </OutcomeButton>
   );
   const actionButtons =
@@ -446,58 +441,41 @@ function OutcomeSelection({
       : [libraryButton, tastingButton, viewButton];
 
   return (
-    <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
+    <WorkflowScreen title="Add bottle">
+      <FormStack>
         <BottlePanel
           bottle={selection.bottle}
           previewUrl={selection.previewUrl}
         />
         {selection.warnings?.length ? (
-          <section className="rounded border border-amber-900/70 bg-amber-950/30 p-4 text-sm text-amber-100">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-              <div className="space-y-1">
-                {selection.warnings.map((warning) => (
-                  <p key={warning}>{warning}</p>
-                ))}
-              </div>
-            </div>
-          </section>
+          <FormNotice>{selection.warnings.join(" ")}</FormNotice>
         ) : null}
-        {error && <FormError values={[error]} />}
-        <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-          <div className="space-y-4">
-            <div>
-              <h2 className="font-semibold text-white">{title}</h2>
-              <p className="text-muted mt-1 text-sm">{description}</p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>
-          </div>
-        </section>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Button
+        {error ? <FormNotice>{error}</FormNotice> : null}
+        <FormSection description={description} title={title}>
+          <FormGrid>{actionButtons}</FormGrid>
+        </FormSection>
+        <FormGrid>
+          <ButtonLink
+            fullWidth
             href={getSearchHref("", intent, selection.pendingImage)}
-            fullWidth
-            icon={<Search className="h-4 w-4" />}
+            variant="tonal"
           >
-            Search Bottles
+            <Search aria-hidden="true" size={16} />
+            Search bottles
+          </ButtonLink>
+          <Button fullWidth onClick={onStartOver} variant="tonal">
+            <RotateCcw aria-hidden="true" size={16} />
+            Start over
           </Button>
-          <Button
-            fullWidth
-            onClick={onStartOver}
-            icon={<RotateCcw className="h-4 w-4" />}
-          >
-            Start Over
-          </Button>
-        </div>
+        </FormGrid>
         {selection.photoTrace && (
           <PhotoIdentificationTraceFootnote
             traceId={selection.photoTrace.traceId}
             copyPayload={selection.photoTrace.copyPayload}
           />
         )}
-      </div>
-    </Layout>
+      </FormStack>
+    </WorkflowScreen>
   );
 }
 
@@ -519,78 +497,56 @@ function AddedToLibrary({
   updatingStatus?: boolean;
 }) {
   return (
-    <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
-        <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-          <div className="space-y-5">
-            <div className="flex items-start gap-3">
-              <div className="bg-highlight rounded-full p-2 text-black">
-                <Check className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-white">Added to Library</h2>
-                <p className="text-muted mt-1 text-sm">
-                  This bottle is now saved in your Library.
-                </p>
-              </div>
-            </div>
+    <WorkflowScreen title="Add bottle">
+      <FormStack>
+        <FormSection
+          description="This bottle is now saved in your Library."
+          title="Added to Library"
+        >
+          <FormStack>
             <CollectionBottlePanel entry={entry} />
-            {statusError && <FormError values={[statusError]} />}
-            <div className="border-t border-slate-800 pt-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h3 className="text-sm font-semibold text-white">
-                    Bottle status
-                  </h3>
-                </div>
-                <CollectionBottleStatusChips
-                  value={entry.status ?? null}
-                  disabled={updatingStatus}
-                  onChange={onStatusChange}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Button
-            color="highlight"
+            {statusError ? <FormNotice>{statusError}</FormNotice> : null}
+            <CollectionBottleStatusChips
+              disabled={updatingStatus}
+              onChange={onStatusChange}
+              value={entry.status ?? null}
+            />
+          </FormStack>
+        </FormSection>
+        <FormGrid>
+          <ButtonLink
+            variant="accent"
             href={`/bottles/${entry.bottle.id}/addTasting`}
             fullWidth
-            icon={<Wine className="h-4 w-4" />}
           >
-            Log Tasting
-          </Button>
-          <Button
+            <Wine aria-hidden="true" size={16} />
+            Log tasting
+          </ButtonLink>
+          <ButtonLink
             href={getViewBottleHref(entry.bottle)}
             fullWidth
-            icon={<Eye className="h-4 w-4" />}
+            variant="tonal"
           >
-            View Bottle
+            <Eye aria-hidden="true" size={16} />
+            View bottle
+          </ButtonLink>
+          <Button fullWidth onClick={onAddAnother} variant="tonal">
+            <Plus aria-hidden="true" size={16} />
+            Add another bottle
           </Button>
-          <Button
-            fullWidth
-            icon={<Plus className="h-4 w-4" />}
-            onClick={onAddAnother}
-          >
-            Add Another Bottle
-          </Button>
-          <Button
-            href={userLibraryHref}
-            fullWidth
-            icon={<BookOpen className="h-4 w-4" />}
-          >
+          <ButtonLink fullWidth href={userLibraryHref} variant="tonal">
+            <BookOpen aria-hidden="true" size={16} />
             View Library
-          </Button>
-        </div>
-        {photoTrace && (
+          </ButtonLink>
+        </FormGrid>
+        {photoTrace ? (
           <PhotoIdentificationTraceFootnote
-            traceId={photoTrace.traceId}
             copyPayload={photoTrace.copyPayload}
+            traceId={photoTrace.traceId}
           />
-        )}
-      </div>
-    </Layout>
+        ) : null}
+      </FormStack>
+    </WorkflowScreen>
   );
 }
 
@@ -638,6 +594,22 @@ function AddBottleFlowContent() {
   >();
   const [loadingTastingDraft, setLoadingTastingDraft] = useState(false);
   const userLibraryHref = user ? `/users/${user.username}/library` : "/library";
+  const inlineBottleHref = useCallback(
+    (bottleId: number) =>
+      getAddBottleHref({
+        bottleId,
+        intent: getCreateReturnAction(intent),
+      }),
+    [intent],
+  );
+  const inlineCreateBottleHref = useCallback(
+    (query: string) =>
+      getCreateBottleHref({
+        query,
+        returnAction: getCreateReturnAction(intent),
+      }),
+    [intent],
+  );
 
   const libraryCreateMutation = useMutation(
     orpc.collections.bottles.create.mutationOptions(),
@@ -951,17 +923,7 @@ function AddBottleFlowContent() {
     for (const award of awards) {
       if (award.level != award.prevLevel && award.level) {
         flash(
-          <div className="relative flex flex-row items-center gap-x-3">
-            <Link
-              href={`/badges/${award.badge.id}`}
-              className="absolute inset-0"
-            />
-            <BadgeImage badge={award.badge} size={48} level={award.level} />
-            <div className="flex flex-col">
-              <h5 className="font-semibold">{award.badge.name}</h5>
-              <p className="font-normal">You've reached level {award.level}!</p>
-            </div>
-          </div>,
+          <BadgeAwardMessage badge={award.badge} level={award.level} />,
           "info",
         );
       }
@@ -1001,7 +963,7 @@ function AddBottleFlowContent() {
   if (tastingDraft) {
     return (
       <TastingForm
-        title="Log Tasting"
+        title="Log tasting"
         initialData={{
           bottle: tastingDraft.bottle,
           imageUrl: tastingDraft.pendingImage?.imageUrl,
@@ -1034,7 +996,18 @@ function AddBottleFlowContent() {
 
   return (
     <BottleResolver
-      title="Add Bottle"
+      title="Add bottle"
+      search={
+        <BottleSearch
+          getBottleHref={inlineBottleHref}
+          getContributionHref={inlineCreateBottleHref}
+          initialScope="bottles"
+          placement="page"
+          placeholder="Search by bottle, brand, or distiller…"
+          scopeValues={["bottles"]}
+          showBottleMeasures={false}
+        />
+      }
       searchHrefForQuery={(query, pendingImage) =>
         getSearchHref(query, intent, pendingImage)
       }
@@ -1050,8 +1023,8 @@ function AddBottleFlowContent() {
           pendingImage,
         })
       }
-      createProposalActionLabel="Create Bottle"
-      searchActionLabel="Search Bottles"
+      createProposalActionLabel="Add bottle"
+      searchActionLabel="Search bottles"
       renderMatchedResultActions={(props) => (
         <MatchedOutcomeActions {...props} intent={intent} />
       )}

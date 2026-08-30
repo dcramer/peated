@@ -1,95 +1,80 @@
 "use client";
+
 import { use } from "react";
 
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Button from "@peated/web/components/button";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
+import {
+  AdminBreadcrumbs,
+  AdminPage,
+  AdminPageHeader,
+  AdminSection,
+  AdminTextLink,
+} from "@peated/web/components/admin/adminContent.stylex";
+import { AdminDefinitionList as DefinitionList } from "@peated/web/components/admin/adminUtility.stylex";
 import DateRange from "@peated/web/components/dateRange";
-import DefinitionList from "@peated/web/components/definitionList";
-import Heading from "@peated/web/components/heading";
-import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
-import PageHeader from "@peated/web/components/pageHeader";
-import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page(props: { params: Promise<{ eventId: string }> }) {
-  const params = use(props.params);
-
-  const { eventId } = params;
-
+export default function Page({
+  params,
+}: {
+  params: Promise<{ eventId: string }>;
+}) {
+  const { eventId } = use(params);
   const orpc = useORPC();
   const { data: event } = useSuspenseQuery(
     orpc.events.details.queryOptions({
-      input: {
-        event: parseInt(eventId, 10),
-      },
+      input: { event: Number.parseInt(eventId, 10) },
     }),
   );
 
   return (
-    <div className="w-full p-3 lg:py-0">
-      <Breadcrumbs
-        pages={[
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[
+          { label: "Events", href: "/admin/events" },
           {
-            name: "Admin",
-            href: "/admin",
-          },
-          {
-            name: "Events",
-            href: "/admin/events",
-          },
-          {
-            name: event.name,
+            label: event.name,
             href: `/admin/events/${event.id}`,
             current: true,
           },
         ]}
       />
-
-      <PageHeader
+      <AdminPageHeader
         title={event.name}
-        metadata={
-          <Button href={`/admin/events/${event.id}/edit`}>Edit Event</Button>
+        actions={
+          <Button href={`/admin/events/${event.id}/edit`}>Edit event</Button>
         }
       />
-
-      <Tabs border>
-        <TabItem as={Link} href={`/admin/events/${event.id}`} controlled>
-          Overview
-        </TabItem>
-      </Tabs>
-
-      {event.description && (
-        <>
-          <Heading as="h3">Description</Heading>
-          <div className="prose prose-invert -mt-1 max-w-none flex-auto">
-            <Markdown content={event.description} />
-          </div>
-        </>
-      )}
-
-      <Heading as="h3">Additional Information</Heading>
-
-      <DefinitionList>
-        <DefinitionList.Term>Dates</DefinitionList.Term>
-        <DefinitionList.Details>
-          <DateRange start={event.dateStart} end={event.dateEnd} />
-          {event.repeats && <> (repeats annually)</>}
-        </DefinitionList.Details>
-        <DefinitionList.Term>Country</DefinitionList.Term>
-        <DefinitionList.Details>
-          {event.country ? event.country.name : <em>n/a</em>}
-        </DefinitionList.Details>
-        <DefinitionList.Term>Website</DefinitionList.Term>
-        <DefinitionList.Details>
-          {event.website ? (
-            <a href={event.website}>{event.website}</a>
-          ) : (
-            <em>n/a</em>
-          )}
-        </DefinitionList.Details>
-      </DefinitionList>
-    </div>
+      {event.description ? (
+        <AdminSection title="Description">
+          <Markdown content={event.description} />
+        </AdminSection>
+      ) : null}
+      <AdminSection title="Details">
+        <DefinitionList>
+          <DefinitionList.Term>Dates</DefinitionList.Term>
+          <DefinitionList.Details>
+            <DateRange start={event.dateStart} end={event.dateEnd} />
+            {event.repeats ? " · repeats annually" : null}
+          </DefinitionList.Details>
+          <DefinitionList.Term>Country</DefinitionList.Term>
+          <DefinitionList.Details>
+            {event.country?.name ?? "Not set"}
+          </DefinitionList.Details>
+          <DefinitionList.Term>Website</DefinitionList.Term>
+          <DefinitionList.Details>
+            {event.website ? (
+              <AdminTextLink href={event.website}>
+                {event.website}
+              </AdminTextLink>
+            ) : (
+              "Not set"
+            )}
+          </DefinitionList.Details>
+        </DefinitionList>
+      </AdminSection>
+    </AdminPage>
   );
 }

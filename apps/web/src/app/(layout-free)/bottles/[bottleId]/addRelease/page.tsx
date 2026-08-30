@@ -3,11 +3,10 @@
 import { use } from "react";
 
 import BottleForm from "@peated/web/components/bottleForm";
-import { useFlashMessages } from "@peated/web/components/flash";
-import Spinner from "@peated/web/components/spinner";
+import { WorkflowLoading } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { useFlashMessages } from "@peated/web/components/designSystem/product/flashMessages.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
-import { toBlob } from "@peated/web/lib/blobs";
 import { buildBottleProposalDraft } from "@peated/web/lib/bottleProposalDraft";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -59,7 +58,14 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
   );
   const { flash } = useFlashMessages();
 
-  if (proposalId && proposalQuery.isLoading) return <Spinner />;
+  if (proposalId && proposalQuery.isLoading) {
+    return (
+      <WorkflowLoading
+        label="Loading bottle proposal"
+        title="Add a Similar Bottle"
+      />
+    );
+  }
   if (!sourceBottle.group) {
     throw new Error("Adding a similar Bottle requires source Bottle details.");
   }
@@ -91,7 +97,7 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
           try {
             await bottleImageUpdateMutation.mutateAsync({
               bottle: createdBottle.id,
-              file: await toBlob(image),
+              file: image,
             });
           } catch (error) {
             logError(error, {

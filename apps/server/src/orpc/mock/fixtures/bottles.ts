@@ -332,6 +332,13 @@ export function mockBottleFor(
     : bottle;
 }
 
+export function mockRecommendationBottlesFor(user: User | null) {
+  return mockBottles
+    .filter((bottle) => bottle.id !== mockBottle.id)
+    .slice(0, 6)
+    .map((bottle) => mockBottleFor(user, bottle));
+}
+
 export const mockBottleDetails = {
   ...mockBottle,
   barcodes: [{ value: "5000281016290", volume: 700 }],
@@ -379,5 +386,32 @@ export function mockBottleTagsFor(
       count: Math.max(4, Math.round(bottle.totalTastings / (index + 3))),
     })),
     totalCount: bottle.totalTastings,
+  };
+}
+
+function mockSuggestedTagCategory(name: string) {
+  if (/ash|brine|peat|sea|smoke/.test(name)) return "peaty" as const;
+  if (/apple|fruit|lemon|orange|peach|pear|raisin/.test(name)) {
+    return "fruity" as const;
+  }
+  if (/caramel|honey/.test(name)) return "cereal" as const;
+  return "woody" as const;
+}
+
+export function mockBottleSuggestedTagsFor(
+  bottle: Bottle,
+): MockOutputs["bottles"]["suggestedTags"] {
+  const tags = mockBottleTagsFor(bottle);
+
+  return {
+    results: tags.results.map(({ tag, count }) => ({
+      tag: {
+        name: tag,
+        synonyms: [],
+        tagCategory: mockSuggestedTagCategory(tag),
+        flavorProfiles: [],
+      },
+      count,
+    })),
   };
 }

@@ -1,5 +1,6 @@
 import type { OAuthAuthorizationRequest } from "@peated/server/schemas";
-import Button from "@peated/web/components/button";
+import { Button } from "@peated/web/components/designSystem/components";
+import { AuthenticationActions } from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import { approveOAuthAuthorization, denyOAuthAuthorization } from "./actions";
 
 function AuthorizationFields({
@@ -33,19 +34,25 @@ export default function AuthorizationForm({
   request: OAuthAuthorizationRequest;
 }) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row">
-      <form action={approveOAuthAuthorization} className="flex-1">
+    <AuthenticationActions>
+      <form action={approveOAuthAuthorization}>
         <AuthorizationFields request={request} />
-        <Button type="submit" color="highlight" fullWidth>
-          Allow Access
+        <Button
+          align="start"
+          fullWidth
+          size="lg"
+          type="submit"
+          variant="accent"
+        >
+          Allow access
         </Button>
       </form>
-      <form action={denyOAuthAuthorization} className="flex-1">
+      <form action={denyOAuthAuthorization}>
         <AuthorizationFields request={request} />
-        <Button type="submit" fullWidth>
+        <Button align="start" fullWidth size="lg" type="submit" variant="tonal">
           Deny
         </Button>
       </form>
-    </div>
+    </AuthenticationActions>
   );
 }

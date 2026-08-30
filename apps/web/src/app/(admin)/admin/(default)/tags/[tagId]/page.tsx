@@ -1,61 +1,44 @@
 "use client";
+
 import { use } from "react";
 
 import { toTitleCase } from "@peated/server/lib/strings";
-import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
-import Button from "@peated/web/components/button";
+import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
+import {
+  AdminBreadcrumbs,
+  AdminPage,
+  AdminPageHeader,
+} from "@peated/web/components/admin/adminContent.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export default function Page(props: { params: Promise<{ tagId: string }> }) {
-  const params = use(props.params);
-
-  const { tagId } = params;
-
+export default function Page({
+  params,
+}: {
+  params: Promise<{ tagId: string }>;
+}) {
+  const { tagId } = use(params);
   const orpc = useORPC();
   const { data: tag } = useSuspenseQuery(
-    orpc.tags.details.queryOptions({
-      input: {
-        tag: tagId,
-      },
-    }),
+    orpc.tags.details.queryOptions({ input: { tag: tagId } }),
   );
+  const name = toTitleCase(tag.name);
 
   return (
-    <div className="w-full p-3 lg:py-0">
-      <Breadcrumbs
-        pages={[
-          {
-            name: "Admin",
-            href: "/admin",
-          },
-          {
-            name: "Tags",
-            href: "/admin/tags",
-          },
-          {
-            name: toTitleCase(tag.name),
-            href: `/admin/tags/${tag.name}`,
-            current: true,
-          },
+    <AdminPage>
+      <AdminBreadcrumbs
+        items={[
+          { label: "Tags", href: "/admin/tags" },
+          { label: name, href: `/admin/tags/${tag.name}`, current: true },
         ]}
       />
-
-      <div className="my-8 flex min-w-full flex-wrap gap-y-4 sm:flex-nowrap">
-        <div className="flex w-full flex-col justify-center gap-y-4 px-4 sm:w-auto sm:flex-auto sm:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold text-white sm:self-start">
-            {toTitleCase(tag.name)}
-          </h3>
-          <div className="text-muted flex flex-col items-center self-center sm:flex-row sm:self-start lg:mb-8">
-            {toTitleCase(tag.tagCategory)}
-          </div>
-        </div>
-        <div className="flex w-full flex-col items-center justify-center sm:w-auto sm:items-end">
-          <div className="flex gap-x-2">
-            <Button href={`/admin/tags/${tag.name}/edit`}>Edit Tag</Button>
-          </div>
-        </div>
-      </div>
-    </div>
+      <AdminPageHeader
+        title={name}
+        description={toTitleCase(tag.tagCategory)}
+        actions={
+          <Button href={`/admin/tags/${tag.name}/edit`}>Edit tag</Button>
+        }
+      />
+    </AdminPage>
   );
 }

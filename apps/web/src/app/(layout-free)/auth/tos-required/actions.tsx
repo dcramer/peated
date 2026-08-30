@@ -1,27 +1,65 @@
 "use client";
 
-import Alert from "@peated/web/components/alert";
-import Button from "@peated/web/components/button";
+import {
+  Button,
+  Checkbox,
+} from "@peated/web/components/designSystem/components";
+import {
+  AuthenticationActions,
+  AuthenticationCard,
+  AuthenticationLink,
+  AuthenticationNotice,
+} from "@peated/web/components/designSystem/patterns/authentication.stylex";
 import { acceptTosForm, logoutForm } from "@peated/web/lib/auth.actions";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 export default function Actions({ redirectTo }: { redirectTo: string }) {
+  const [accepted, setAccepted] = useState(false);
   const [acceptState, acceptAction] = useActionState(acceptTosForm, undefined);
   const [, logoutAction] = useActionState(logoutForm, undefined);
+
   return (
-    <>
-      {acceptState?.error && <Alert>{acceptState.error}</Alert>}
+    <AuthenticationActions>
+      {acceptState?.error ? (
+        <AuthenticationNotice>{acceptState.error}</AuthenticationNotice>
+      ) : null}
       <form action={acceptAction}>
-        <input type="hidden" name="redirectTo" value={redirectTo} />
-        <Button type="submit" color="highlight" fullWidth>
-          Accept & Continue
-        </Button>
+        <AuthenticationActions>
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <AuthenticationCard>
+            <Checkbox
+              checked={accepted}
+              label={
+                <>
+                  I agree to the updated{" "}
+                  <AuthenticationLink href="/terms">
+                    Terms of Service
+                  </AuthenticationLink>
+                  .
+                </>
+              }
+              name="tosAccepted"
+              onChange={(event) => setAccepted(event.currentTarget.checked)}
+              required
+            />
+          </AuthenticationCard>
+          <Button
+            align="start"
+            disabled={!accepted}
+            fullWidth
+            size="lg"
+            type="submit"
+            variant="accent"
+          >
+            Accept and continue
+          </Button>
+        </AuthenticationActions>
       </form>
       <form action={logoutAction}>
-        <Button type="submit" color="default" fullWidth>
-          Log Out
+        <Button align="start" fullWidth size="lg" type="submit" variant="tonal">
+          Sign out
         </Button>
       </form>
-    </>
+    </AuthenticationActions>
   );
 }

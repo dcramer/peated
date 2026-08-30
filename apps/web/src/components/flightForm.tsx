@@ -2,130 +2,183 @@
 
 import { FlightInputSchema } from "@peated/server/schemas";
 import type { Bottle } from "@peated/server/types";
-import Fieldset from "@peated/web/components/fieldset";
-import FormError from "@peated/web/components/formError";
-import FormScreen from "@peated/web/components/formScreen";
-import TextField from "@peated/web/components/textField";
 import {
-  bottleToFlightOption,
+  Field,
+  FormNotice,
+  FormSection,
+  FormStack,
+  SearchPicker,
+  Switch,
+  Textarea,
+  TextInput,
+  type SearchPickerOption,
+} from "@peated/web/components/designSystem/components";
+import { WorkflowScreen } from "@peated/web/components/designSystem/patterns/workflowScreen.stylex";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import {
   flightMembershipChanged,
   getFlightBottleIds,
-  type FlightBottleOption,
 } from "@peated/web/lib/flightForm";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import Form from "./form";
-import SelectField from "./selectField";
 
-type FormSchemaType = z.infer<typeof FlightInputSchema>;
+type FlightFormData = z.infer<typeof FlightInputSchema>;
 
 export default function FlightForm({
-  onSubmit,
   initialData = {},
+  onSubmit,
   title,
 }: {
-  onSubmit: SubmitHandler<FormSchemaType>;
   initialData?: {
-    name?: string;
-    description?: string | null;
-    public?: boolean;
     bottles?: { bottle: Bottle }[];
+    description?: string | null;
+    name?: string;
+    public?: boolean;
   };
+  onSubmit: SubmitHandler<FlightFormData>;
   title: string;
 }) {
+  const orpc = useORPC();
+  const initialBottles = (initialData.bottles ?? []).map(
+    ({ bottle }) => bottle,
+  );
+  const initialBottleIds = getFlightBottleIds(initialBottles);
+  const [bottles, setBottles] = useState<readonly SearchPickerOption[]>(
+    initialBottles.map(toBottleOption),
+  );
+  const [bottleQuery, setBottleQuery] = useState("");
+  const [submitError, setSubmitError] = useState<string>();
+  const bottleResults = useQuery(
+    orpc.bottles.list.queryOptions({
+      input: {
+        limit: 10,
+        query: bottleQuery,
+        sort: bottleQuery ? "rank" : "-tastings",
+      },
+    }),
+  );
   const {
-    register,
-    handleSubmit,
+    control,
     formState: { errors, isSubmitting },
-  } = useForm<FormSchemaType>({
-    resolver: zodResolver(FlightInputSchema),
+    handleSubmit,
+    register,
+  } = useForm<FlightFormData>({
     defaultValues: {
-      name: initialData.name,
       description: initialData.description,
+      name: initialData.name,
+      public: initialData.public ?? false,
     },
+    resolver: zodResolver(FlightInputSchema),
   });
 
-  const [error, setError] = useState<string | undefined>();
-
-  const bottles = (initialData.bottles ?? []).map(({ bottle }) => bottle);
-  const initialBottleIds = getFlightBottleIds(bottles);
-  const [bottlesValue, setBottlesValue] = useState<FlightBottleOption[]>(
-    bottles.map(bottleToFlightOption),
-  );
-
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+  const submit: SubmitHandler<FlightFormData> = async (data) => {
+    setSubmitError(undefined);
     try {
-      const selectedBottleIds = bottlesValue.map(({ id }) => id);
-      const submission: FormSchemaType = { ...data };
+      const selectedBottleIds = bottles.map(({ id }) => Number(id));
+      const submission: FlightFormData = { ...data };
       if (flightMembershipChanged(initialBottleIds, selectedBottleIds)) {
         submission.bottles = selectedBottleIds;
       }
       await onSubmit(submission);
-    } catch (err) {
-      setError(getFormErrorMessage(err));
+    } catch (error) {
+      setSubmitError(getFormErrorMessage(error));
     }
   };
 
-  const orpc = useORPC();
-
   return (
-    <FormScreen
+    <WorkflowScreen
+      onSave={handleSubmit(submit)}
+      saving={isSubmitting}
       title={title}
-      saveDisabled={isSubmitting}
-      onSave={handleSubmit(onSubmitHandler)}
     >
-      <Form
-        className="self-center bg-slate-950 pb-6 sm:mx-16 sm:my-6"
-        onSubmit={handleSubmit(onSubmitHandler)}
-        isSubmitting={isSubmitting}
-      >
-        {error && <FormError values={[error]} />}
-        <Fieldset>
-          <TextField
-            {...register("name")}
-            error={errors.name}
-            type="text"
-            label="Name"
-            required
-            helpText="A name for your flight."
-            placeholder="e.g. Mucho Macallan"
-          />
-
-          <TextField
-            {...register("description")}
-            error={errors.description}
-            type="text"
-            label="Description"
-            helpText="An optional description.."
-            placeholder="e.g. 12-year-old"
-          />
-
-          <SelectField<FlightBottleOption>
-            label="Bottles"
-            helpText="Choose the specific Bottles included in this flight."
-            error={errors.bottles}
-            onQuery={async (query) => {
-              const bottleList = await orpc.bottles.list.call({
-                query,
-                limit: 10,
-                sort: query ? "rank" : "-tastings",
-              });
-
-              return bottleList.results.map(bottleToFlightOption);
-            }}
-            onRenderOption={(option) => <span>{option.name}</span>}
-            onRenderChip={(option) => <span>{option.name}</span>}
-            onChange={setBottlesValue}
-            value={bottlesValue}
-            multiple
-          />
-        </Fieldset>
-      </Form>
-    </FormScreen>
+      <form onSubmit={handleSubmit(submit)}>
+        <FormStack>
+          {submitError ? <FormNotice>{submitError}</FormNotice> : null}
+          <FormSection title="Flight">
+            <Field
+              error={errors.name?.message}
+              errorId="flight-name-error"
+              htmlFor="flight-name"
+              label="Name"
+              required
+            >
+              <TextInput
+                {...register("name")}
+                aria-describedby={errors.name ? "flight-name-error" : undefined}
+                autoFocus
+                id="flight-name"
+                invalid={Boolean(errors.name)}
+                placeholder="Islay classics"
+              />
+            </Field>
+            <Field
+              error={errors.description?.message}
+              htmlFor="flight-description"
+              label="Description"
+              optional
+            >
+              <Textarea
+                {...register("description", {
+                  setValueAs: (value) => value || null,
+                })}
+                id="flight-description"
+                invalid={Boolean(errors.description)}
+                placeholder="A short note about this lineup."
+                rows={4}
+              />
+            </Field>
+            <Controller
+              control={control}
+              name="public"
+              render={({ field }) => (
+                <Switch
+                  checked={field.value ?? false}
+                  description="Anyone with the link can see this flight."
+                  label="Public flight"
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+          </FormSection>
+          <FormSection
+            description="Add the bottles in the order you plan to taste them."
+            title="Bottles"
+          >
+            <SearchPicker
+              emptyText="No matching bottles."
+              help="Search the bottle database and add each pour to the lineup."
+              label="Flight bottles"
+              loading={bottleResults.isFetching}
+              onChange={setBottles}
+              onQueryChange={setBottleQuery}
+              options={(bottleResults.data?.results ?? []).map(toBottleOption)}
+              placeholder="Search bottles"
+              value={bottles}
+            />
+          </FormSection>
+        </FormStack>
+      </form>
+    </WorkflowScreen>
   );
+}
+
+function toBottleOption(
+  bottle: Pick<
+    Bottle,
+    "abv" | "category" | "fullName" | "id" | "noAgeStatement" | "statedAge"
+  >,
+): SearchPickerOption {
+  return {
+    detail: getBottleMetadata(bottle),
+    id: bottle.id,
+    label: bottle.fullName,
+  };
 }

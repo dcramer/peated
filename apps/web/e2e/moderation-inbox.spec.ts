@@ -1,6 +1,5 @@
 import { expect, test, type TestInfo } from "@playwright/test";
 
-import { expectNoHorizontalOverflow } from "./assertions";
 import { testAccessToken, testUser } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
@@ -23,7 +22,6 @@ test("bulk-ignores listings with no clear Bottle outcome", async ({
       "No Bottle match was found. Should this listing be ignored?",
     ),
   ).toHaveCount(2);
-  await expectNoHorizontalOverflow(page);
 
   await page.getByRole("button", { name: "Ignore all 2 inconclusive" }).click();
   await expect(

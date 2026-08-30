@@ -18,45 +18,25 @@ import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import tastingCreateContract from "@peated/server/orpc/contracts/tastings/create";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
 import { validateTags } from "@peated/server/orpc/validators/tags";
-import {
-  BadgeAwardSchema,
-  TastingInputSchema,
-  TastingSchema,
-} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { pushJob } from "@peated/server/worker/client";
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { z } from "zod";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
 
-export default procedure
+export default implement(tastingCreateContract)
   .use(requireAuth)
   .use(requireTosAccepted)
-  .route({
-    method: "POST",
-    path: "/tastings",
-    summary: "Create tasting",
-    description:
-      "Create a new tasting entry for a Bottle with notes, an optional rating band, and tasting details",
-    operationId: "createTasting",
-  })
-  .input(TastingInputSchema)
-  .output(
-    z.object({
-      tasting: TastingSchema,
-      awards: z.array(BadgeAwardSchema),
-    }),
-  )
   .handler(async function ({ input, context, errors }) {
     if (input.pendingImageId) {
       try {

@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorPage from "../components/errorPage";
+import RouteErrorPage from "../components/routeErrorPage";
 
 export default function Error({
   error,
@@ -9,5 +9,5 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  return <ErrorPage error={error} onTryAgain={reset} />;
+  return <RouteErrorPage error={error} reset={reset} />;
 }

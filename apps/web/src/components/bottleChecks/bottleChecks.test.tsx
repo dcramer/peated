@@ -1,18 +1,18 @@
 import type { ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import CheckResult from "./checkResult";
+import CheckResult from "./checkResult.stylex";
 import {
   type BottleCheck,
   BottleCheckOrigin,
   BottleCheckSubject,
   getBottleCheckOperationCount,
   getBottleCheckState,
-} from "./checkSummary";
+} from "./checkSummary.stylex";
 import OperationCard, {
   type BottleOperation,
   type BottleOperationReview,
-} from "./operationCard";
+} from "./operationCard.stylex";
 
 const entityProposal = {
   type: "update_entity",

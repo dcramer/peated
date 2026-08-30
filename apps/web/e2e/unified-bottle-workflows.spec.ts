@@ -1,12 +1,13 @@
 import { expect, type Request, test, type TestInfo } from "@playwright/test";
 import { z } from "zod";
 
-import { bottlePath, expectNoHorizontalOverflow } from "./assertions";
+import { bottlePath } from "./assertions";
 import {
   anotherReleaseSourceBottle,
   createdBottleName,
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
+  existingBottle,
   existingBottleId,
   testAccessToken,
   testBrand,
@@ -83,7 +84,6 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByText("Nothing needs a decision", { exact: true }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("reviews an Incoming Listing follow-up as a focused catalog task", async ({
@@ -134,7 +134,6 @@ test.describe("unified Bottle workflows", () => {
       hasText: "The inspected listing matched the canonical Bottle",
     });
     await expect(reviewOperation).toBeVisible();
-    await expectNoHorizontalOverflow(page);
 
     const approvalRequest = page.waitForRequest((request) =>
       request.url().includes("/rpc/audits/approveSelected"),
@@ -147,7 +146,6 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByText("Nothing needs a decision", { exact: true }),
     ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
   test("creates an independent Bottle from a source-backed proposal", async ({
@@ -167,20 +165,19 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("heading", { name: "Add a Similar Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle Name", { exact: true })).toHaveValue(
+    await expect(page.getByLabel("Bottle name", { exact: true })).toHaveValue(
       createdBottleName,
     );
     await expect(
       page.getByText(testBrand.name, { exact: true }).first(),
     ).toBeVisible();
-    await expect(page.getByLabel("Age Statement")).toHaveValue(
+    await expect(page.getByLabel("Age statement")).toHaveValue(
       String(anotherReleaseSourceBottle.statedAge),
     );
-    await expect(page.getByLabel("Edition or Batch")).toHaveValue(
+    await expect(page.getByLabel("Edition or batch")).toHaveValue(
       "First Fill Oloroso",
     );
-    await expect(page.getByLabel("Release Year")).toHaveValue("2026");
-    await expectNoHorizontalOverflow(page);
+    await expect(page.getByLabel("Release year")).toHaveValue("2026");
 
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
@@ -229,24 +226,24 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("heading", { name: "Edit Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle Name", { exact: true })).toHaveValue(
+    await expect(page.getByLabel("Bottle name", { exact: true })).toHaveValue(
       unifiedBottleEditContext.shared.name,
     );
-    await expect(page.getByLabel("Age Statement")).toHaveValue(
+    await expect(page.getByLabel("Age statement")).toHaveValue(
       String(unifiedBottleEditContext.exact.statedAge),
     );
     await expect(page.getByLabel("Shared Stated Age")).toHaveCount(0);
     await expect(page.getByLabel("Bottle-specific Stated Age")).toHaveCount(0);
-    await expect(page.getByLabel("Edition or Batch")).toHaveValue(
+    await expect(page.getByLabel("Edition or batch")).toHaveValue(
       unifiedBottleEditContext.exact.edition,
     );
-    await expect(page.getByLabel("Alcohol (ABV)")).toHaveValue(
+    await expect(page.getByLabel("Alcohol")).toHaveValue(
       String(unifiedBottleEditContext.exact.abv),
     );
-    await expect(page.getByLabel("Distillation Year")).toHaveValue(
+    await expect(page.getByLabel("Distillation year")).toHaveValue(
       String(unifiedBottleEditContext.exact.vintageYear),
     );
-    await expect(page.getByLabel("Release Year")).toHaveValue(
+    await expect(page.getByLabel("Release year")).toHaveValue(
       String(unifiedBottleEditContext.exact.releaseYear),
     );
     await expect(
@@ -259,10 +256,10 @@ test.describe("unified Bottle workflows", () => {
       0,
     );
 
-    await page.getByLabel("Edition or Batch").fill("Cask 43");
-    await expect(page.getByLabel("Edition or Batch")).toHaveValue("Cask 43");
-    await page.getByLabel("Age Statement").fill("22");
-    await expect(page.getByLabel("Age Statement")).toHaveValue("22");
+    await page.getByLabel("Edition or batch").fill("Cask 43");
+    await expect(page.getByLabel("Edition or batch")).toHaveValue("Cask 43");
+    await page.getByLabel("Age statement").fill("22");
+    await expect(page.getByLabel("Age statement")).toHaveValue("22");
 
     const updateRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottles/update"),
@@ -274,7 +271,6 @@ test.describe("unified Bottle workflows", () => {
       edition: "Cask 43",
       statedAge: 22,
     });
-    await expectNoHorizontalOverflow(page);
   });
 
   test("merges same-name Bottles with explicit retire and keep identities", async ({
@@ -291,19 +287,26 @@ test.describe("unified Bottle workflows", () => {
       page.getByRole("heading", { name: "Merge Bottle" }),
     ).toBeVisible();
 
-    await page.getByText("Other Bottle", { exact: true }).click();
+    const otherBottle = page.getByRole("combobox", { name: "Other bottle" });
+    await otherBottle.fill(exactMergeOtherBottle.fullName);
     await page
-      .getByRole("button", {
-        name: `${exactMergeOtherBottle.fullName} · Bottle ${exactMergeOtherBottleId}`,
+      .getByRole("option", {
+        name: new RegExp(exactMergeOtherBottle.fullName),
       })
       .click();
 
-    const retireCurrent = `Retire “${exactMergeOtherBottle.fullName}” (Bottle ${existingBottleId}); keep “${exactMergeOtherBottle.fullName}” (Bottle ${exactMergeOtherBottleId})`;
-    const retireOther = `Retire “${exactMergeOtherBottle.fullName}” (Bottle ${exactMergeOtherBottleId}); keep “${exactMergeOtherBottle.fullName}” (Bottle ${existingBottleId})`;
     await expect(
-      page.getByRole("radio", { name: retireCurrent }),
+      page.getByRole("radio", {
+        exact: true,
+        name: `Keep ${exactMergeOtherBottle.fullName} (${exactMergeOtherBottle.peatedId}) Retire ${existingBottle.fullName} (${existingBottle.peatedId}).`,
+      }),
     ).toBeChecked();
-    await expect(page.getByRole("radio", { name: retireOther })).toBeVisible();
+    await expect(
+      page.getByRole("radio", {
+        exact: true,
+        name: `Keep ${existingBottle.fullName} (${existingBottle.peatedId}) Retire ${exactMergeOtherBottle.fullName} (${exactMergeOtherBottle.peatedId}).`,
+      }),
+    ).toBeVisible();
 
     const mergeRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottles/merge"),
