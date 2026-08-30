@@ -11,6 +11,7 @@ import {
   Card,
   EmptyState,
   FactList,
+  hasVisibleFacts,
   LoadingList,
   RatingMeasure,
   SectionError,
@@ -266,16 +267,25 @@ export function EntityOverviewClient({
 
   const entity = entityQuery.data;
   const createBottleHref = getEntityBottleCreateHref(entity);
+  const entityFacts = getEntityFacts(entity);
+  const hasDetails = hasVisibleFacts(entityFacts);
 
   return (
-    <div {...stylex.props(styles.overviewGrid)}>
-      <aside {...stylex.props(styles.details)}>
-        <PageSection heading="Details">
-          <Card appearance="surface" padding="sm">
-            <FactList facts={getEntityFacts(entity)} />
-          </Card>
-        </PageSection>
-      </aside>
+    <div
+      {...stylex.props(
+        styles.overviewGrid,
+        !hasDetails && styles.overviewGridWithoutDetails,
+      )}
+    >
+      {hasDetails ? (
+        <aside {...stylex.props(styles.details)}>
+          <PageSection heading="Details">
+            <Card appearance="surface" padding="sm">
+              <FactList facts={entityFacts} />
+            </Card>
+          </PageSection>
+        </aside>
+      ) : null}
 
       <div {...stylex.props(styles.catalog)}>
         <EntityBottleOverview
@@ -304,6 +314,10 @@ const styles = stylex.create({
       [NARROW]: "minmax(0, 1fr)",
     },
     columnGap: space.x12,
+  },
+  overviewGridWithoutDetails: {
+    gridTemplateAreas: '"catalog"',
+    gridTemplateColumns: "minmax(0, 1fr)",
   },
   catalog: {
     gridArea: "catalog",

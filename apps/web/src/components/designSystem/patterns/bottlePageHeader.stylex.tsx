@@ -14,6 +14,7 @@ import {
   BandStack,
   BottleVisual,
   Chip,
+  hasVisibleSpecStripCells,
   RecordId,
   Score,
   SpecStrip,
@@ -115,9 +116,11 @@ export function BottlePageHeader({
           </div>
         </div>
       </div>
-      <div {...stylex.props(styles.specs)}>
-        <SpecStrip cells={specs} />
-      </div>
+      {hasVisibleSpecStripCells(specs) ? (
+        <div {...stylex.props(styles.specs)}>
+          <SpecStrip cells={specs} />
+        </div>
+      ) : null}
       {hasMeasures ? (
         <div aria-label="Community measures" {...stylex.props(styles.measures)}>
           {score ? (

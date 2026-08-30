@@ -16,6 +16,7 @@ import type {
 import {
   CriticReview,
   FactList,
+  hasVisibleFacts,
   RailList,
   RailListItem,
   SectionHeading,
@@ -61,8 +62,11 @@ export function BottleOverview({
   tastingCount,
   tastings = [],
 }: BottleOverviewProps) {
+  const hasDeclaredFacts = hasVisibleFacts(declaredFacts);
+  const hasRail = hasDeclaredFacts || recommendations.length > 0;
+
   return (
-    <div {...stylex.props(styles.layout)}>
+    <div {...stylex.props(styles.layout, !hasRail && styles.layoutWithoutRail)}>
       <div {...stylex.props(styles.main)}>
         {criticReviews.length ? (
           <section {...stylex.props(styles.section)}>
@@ -110,36 +114,42 @@ export function BottleOverview({
         {!criticReviews.length && !tastings.length ? mainState : null}
       </div>
 
-      <aside aria-label="Bottle details" {...stylex.props(styles.rail)}>
-        <section {...stylex.props(styles.railSection)}>
-          <h2 {...stylex.props(styles.railHeading)}>Declared on the label</h2>
-          <div {...stylex.props(styles.panel)}>
-            <FactList facts={declaredFacts} />
-          </div>
-        </section>
+      {hasRail ? (
+        <aside aria-label="Bottle details" {...stylex.props(styles.rail)}>
+          {hasDeclaredFacts ? (
+            <section {...stylex.props(styles.railSection)}>
+              <h2 {...stylex.props(styles.railHeading)}>
+                Declared on the label
+              </h2>
+              <div {...stylex.props(styles.panel)}>
+                <FactList facts={declaredFacts} />
+              </div>
+            </section>
+          ) : null}
 
-        {recommendations.length ? (
-          <section {...stylex.props(styles.railSection)}>
-            <h2 {...stylex.props(styles.railHeading)}>
-              {recommendationHeading}
-            </h2>
-            {recommendationIntro ? (
-              <p {...stylex.props(styles.railIntro)}>{recommendationIntro}</p>
-            ) : null}
-            <RailList ariaLabel={recommendationHeading}>
-              {recommendations.map((recommendation) => (
-                <RailListItem
-                  end={recommendation.end}
-                  href={recommendation.href}
-                  key={recommendation.href}
-                  metadata={recommendation.metadata}
-                  title={recommendation.name}
-                />
-              ))}
-            </RailList>
-          </section>
-        ) : null}
-      </aside>
+          {recommendations.length ? (
+            <section {...stylex.props(styles.railSection)}>
+              <h2 {...stylex.props(styles.railHeading)}>
+                {recommendationHeading}
+              </h2>
+              {recommendationIntro ? (
+                <p {...stylex.props(styles.railIntro)}>{recommendationIntro}</p>
+              ) : null}
+              <RailList ariaLabel={recommendationHeading}>
+                {recommendations.map((recommendation) => (
+                  <RailListItem
+                    end={recommendation.end}
+                    href={recommendation.href}
+                    key={recommendation.href}
+                    metadata={recommendation.metadata}
+                    title={recommendation.name}
+                  />
+                ))}
+              </RailList>
+            </section>
+          ) : null}
+        </aside>
+      ) : null}
     </div>
   );
 }
@@ -156,6 +166,9 @@ const styles = stylex.create({
     alignItems: "start",
     columnGap: space.x8,
     rowGap: space.x8,
+  },
+  layoutWithoutRail: {
+    gridTemplateColumns: "minmax(0, 1fr)",
   },
   main: {
     display: "flex",

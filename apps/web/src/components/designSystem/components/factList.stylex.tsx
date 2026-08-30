@@ -12,14 +12,32 @@ export type FactListProps = {
   facts: readonly [FactListItem, ...FactListItem[]];
 };
 
-/** Presents supplied label facts without inferring values for missing data. */
+function hasFactValue(value: ReactNode) {
+  return (
+    value !== null &&
+    value !== undefined &&
+    value !== "" &&
+    value !== false &&
+    value !== true
+  );
+}
+
+export function hasVisibleFacts(facts: readonly FactListItem[]) {
+  return facts.some((fact) => hasFactValue(fact.value));
+}
+
+/** Presents supplied facts and omits facts that have no value. */
 export function FactList({ facts }: FactListProps) {
+  const visibleFacts = facts.filter((fact) => hasFactValue(fact.value));
+
+  if (!visibleFacts.length) return null;
+
   return (
     <dl {...stylex.props(styles.list)}>
-      {facts.map((fact) => (
+      {visibleFacts.map((fact) => (
         <div key={fact.label} {...stylex.props(styles.row)}>
           <dt {...stylex.props(styles.label)}>{fact.label}</dt>
-          <dd {...stylex.props(styles.value)}>{fact.value ?? "Not stated"}</dd>
+          <dd {...stylex.props(styles.value)}>{fact.value}</dd>
         </div>
       ))}
     </dl>

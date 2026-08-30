@@ -55,7 +55,11 @@ export type {
 } from "./collectionBottleStatus.stylex";
 export { CriticReview } from "./criticReview.stylex";
 export type { CriticReviewProps } from "./criticReview.stylex";
-export { RecordId, SpecStrip } from "./dataDevices.stylex";
+export {
+  RecordId,
+  SpecStrip,
+  hasVisibleSpecStripCells,
+} from "./dataDevices.stylex";
 export type {
   RecordIdProps,
   SpecStripCell,
@@ -71,7 +75,7 @@ export type {
 } from "./entityPicker.stylex";
 export { FacetRow } from "./facetRow.stylex";
 export type { FacetRowProps } from "./facetRow.stylex";
-export { FactList } from "./factList.stylex";
+export { FactList, hasVisibleFacts } from "./factList.stylex";
 export type { FactListItem, FactListProps } from "./factList.stylex";
 export {
   EmptyState,
