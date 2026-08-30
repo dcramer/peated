@@ -9,6 +9,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
+  AppLink,
   BottleVisual,
   Card,
   CardActionLink,
@@ -148,9 +149,9 @@ export function FollowedReleaseList({
           Following {followedDistillerCount.toLocaleString("en-US")} distiller
           {followedDistillerCount === 1 ? "" : "s"}
         </span>
-        <a href={seeAllHref} {...stylex.props(styles.seeAll)}>
+        <AppLink href={seeAllHref} {...stylex.props(styles.seeAll)}>
           See all <span aria-hidden="true">→</span>
-        </a>
+        </AppLink>
       </div>
     </section>
   );

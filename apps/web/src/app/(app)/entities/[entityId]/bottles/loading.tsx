@@ -1,5 +1,5 @@
-import { LoadingList } from "@peated/web/components/designSystem/components";
+import { EntityTabLoading } from "../entityTabLoading.stylex";
 
 export default function EntityBottlesLoading() {
-  return <LoadingList label="Loading entity bottles" rows={4} />;
+  return <EntityTabLoading label="Loading entity bottles" />;
 }

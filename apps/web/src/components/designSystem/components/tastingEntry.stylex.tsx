@@ -8,6 +8,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import { BandMark, type RatingBand } from "./scoring.stylex";
 
 export type TastingEntryMember = {
@@ -50,12 +51,12 @@ export function TastingEntry({
         {leading}
         <div {...stylex.props(styles.headerCopy)}>
           {authorHref ? (
-            <a
+            <AppLink
               href={authorHref}
               {...stylex.props(styles.author, styles.authorLink)}
             >
               {author}
-            </a>
+            </AppLink>
           ) : (
             <strong {...stylex.props(styles.author)}>{author}</strong>
           )}
@@ -79,12 +80,12 @@ export function TastingEntry({
           >
             <div {...stylex.props(styles.memberCopy)}>
               {member.href ? (
-                <a
+                <AppLink
                   href={member.href}
                   {...stylex.props(styles.name, styles.nameLink)}
                 >
                   {member.name}
-                </a>
+                </AppLink>
               ) : (
                 <span {...stylex.props(styles.name)}>{member.name}</span>
               )}
@@ -141,13 +142,13 @@ function TastingDescription({ member }: { member: TastingEntryMember }) {
   return (
     <>
       <span {...stylex.props(styles.descriptionPreview)}>{preview}</span>
-      <a
+      <AppLink
         aria-label={`Read the full tasting notes for ${member.name}`}
         href={member.descriptionHref}
         {...stylex.props(styles.descriptionLink)}
       >
         Read more <span aria-hidden="true">→</span>
-      </a>
+      </AppLink>
     </>
   );
 }

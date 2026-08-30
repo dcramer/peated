@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -74,7 +75,7 @@ export function DataTable<Item>({
                     )}
                   >
                     {index === 0 && href ? (
-                      <a
+                      <AppLink
                         href={href}
                         {...stylex.props(
                           styles.rowLink,
@@ -82,7 +83,7 @@ export function DataTable<Item>({
                         )}
                       >
                         {column.cell(item)}
-                      </a>
+                      </AppLink>
                     ) : (
                       column.cell(item)
                     )}

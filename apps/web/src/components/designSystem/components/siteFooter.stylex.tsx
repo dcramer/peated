@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -78,9 +79,9 @@ export function SiteFooter({
 
 function FooterAnchor({ link }: { link: FooterLink }) {
   return (
-    <a href={link.href} {...stylex.props(styles.footerLink)}>
+    <AppLink href={link.href} {...stylex.props(styles.footerLink)}>
       {link.label}
-    </a>
+    </AppLink>
   );
 }
 

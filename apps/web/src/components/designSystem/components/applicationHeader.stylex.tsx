@@ -11,6 +11,7 @@ import { Menu as MenuIcon, Search, X } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import { IconButton } from "./button.stylex";
 import {
   isCurrentNavigationHref,
@@ -126,7 +127,7 @@ export function ApplicationHeader({
               variant="text"
             />
           </div>
-          <a
+          <AppLink
             href={brandHref}
             {...stylex.props(
               styles.brand,
@@ -134,7 +135,7 @@ export function ApplicationHeader({
             )}
           >
             {brand}
-          </a>
+          </AppLink>
           {navigationPlacement === "inline" ? (
             <div {...stylex.props(styles.inlineNavigation)}>
               <NavigationTabs
@@ -297,7 +298,7 @@ function AccountMenuItem({
   }
 
   return (
-    <a
+    <AppLink
       aria-current={current ? "page" : undefined}
       href={item.href}
       {...stylex.props(
@@ -307,7 +308,7 @@ function AccountMenuItem({
       )}
     >
       {content}
-    </a>
+    </AppLink>
   );
 }
 
@@ -326,7 +327,7 @@ function HeaderDrawerGroup({
       <ul {...stylex.props(styles.drawerList)}>
         {items.map((item) => (
           <li key={item.href} {...stylex.props(styles.drawerListItem)}>
-            <a
+            <AppLink
               aria-current={
                 isCurrentNavigationHref(currentHref, item.href)
                   ? "page"
@@ -340,7 +341,7 @@ function HeaderDrawerGroup({
               )}
             >
               {item.label}
-            </a>
+            </AppLink>
             {item.count !== undefined ? (
               <span {...stylex.props(styles.drawerCount)}>
                 {item.count.toLocaleString("en-US")}

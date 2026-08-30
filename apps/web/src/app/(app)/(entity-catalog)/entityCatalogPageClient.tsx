@@ -16,6 +16,7 @@ import {
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -170,7 +171,7 @@ function toCatalogItem(entity: Entity): EntityCatalogItem {
   ].filter((value): value is string => value !== null);
 
   return {
-    href: `/entities/${entity.id}`,
+    href: getEntityUrl(entity),
     id: entity.peatedId,
     metadata,
     name: entity.name,

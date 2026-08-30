@@ -11,6 +11,7 @@ import {
 } from "../../../styles/tokens.stylex";
 import CountryMapIcon from "../../countryMapIcon";
 import {
+  AppLink,
   Card,
   CardActionLink,
   CardLink,
@@ -352,9 +353,9 @@ export function HomeDistilleries({
                 ·
               </span>
             ) : null}
-            <a href={link.href} {...stylex.props(styles.moreLink)}>
+            <AppLink href={link.href} {...stylex.props(styles.moreLink)}>
               {link.label} <span aria-hidden="true">→</span>
-            </a>
+            </AppLink>
           </span>
         ))}
       </div>

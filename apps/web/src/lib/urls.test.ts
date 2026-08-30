@@ -16,6 +16,10 @@ describe("public catalog URLs", () => {
     expect(getEntityUrl({ id: 123, kind })).toBe(expected);
   });
 
+  it("uses the generic Entity route when kind is unavailable", () => {
+    expect(getEntityUrl({ id: 123, kind: null })).toBe("/entities/123");
+  });
+
   it("lists every route prefix that can resolve an Entity", () => {
     expect(getEntityRoutePrefixes(123)).toEqual([
       "/brands/123",

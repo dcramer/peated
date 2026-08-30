@@ -1,3 +1,4 @@
+import { AppLink } from "@peated/web/components/designSystem/components";
 import {
   PageHeader,
   PageSection,
@@ -51,9 +52,9 @@ export default async function TastingPage(props: {
       <PageHeader
         eyebrow="Tasting record"
         parent={
-          <a href={`/users/${tasting.createdBy.username}`}>
+          <AppLink href={`/users/${tasting.createdBy.username}`}>
             {tasting.createdBy.username}
-          </a>
+          </AppLink>
         }
         title={getBottlePlainTextIdentity(tasting.bottle)}
       />

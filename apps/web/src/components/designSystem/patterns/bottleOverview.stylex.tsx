@@ -14,6 +14,7 @@ import type {
   TastingEntryProps,
 } from "../components";
 import {
+  AppLink,
   CriticReview,
   FactList,
   hasVisibleFacts,
@@ -109,9 +110,12 @@ export function BottleOverview({
             {moreTastingsHref &&
             tastingCount !== undefined &&
             tastingCount > tastings.length ? (
-              <a href={moreTastingsHref} {...stylex.props(styles.moreLink)}>
+              <AppLink
+                href={moreTastingsHref}
+                {...stylex.props(styles.moreLink)}
+              >
                 Show all {tastingCount.toLocaleString("en-US")} tastings →
-              </a>
+              </AppLink>
             ) : null}
           </section>
         ) : null}

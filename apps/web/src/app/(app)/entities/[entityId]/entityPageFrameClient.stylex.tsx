@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
 import {
+  AppLink,
   Button,
   ButtonLink,
   PageTabs,
@@ -20,9 +21,11 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { effects, space } from "../../../../styles/tokens.stylex";
 
 import {
+  getEntityCurrentHref,
   getEntityLocationLabel,
   getEntityPresentation,
   getEntityTabs,
@@ -196,9 +199,7 @@ export function EntityPageFrameClient({
   const entity = entityQuery.data;
   const createBottleHref = getEntityBottleCreateHref(entity);
   const presentation = getEntityPresentation(entity);
-  const overviewHref = `/entities/${entity.id}`;
-  const currentHref =
-    pathname === `/${entity.peatedId}` ? overviewHref : pathname;
+  const currentHref = getEntityCurrentHref(entity, pathname);
 
   return (
     <div {...stylex.props(styles.page)}>
@@ -230,12 +231,12 @@ export function EntityPageFrameClient({
         menu={<EntityActions entity={entity} />}
         parent={
           owner ? (
-            <a
-              href={`/entities/${owner.id}`}
+            <AppLink
+              href={getEntityUrl(owner)}
               {...stylex.props(styles.ownerLink)}
             >
               Owned by {owner.shortName || owner.name}
-            </a>
+            </AppLink>
           ) : undefined
         }
         specs={[

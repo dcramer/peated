@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import Link from "next/link";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
 
@@ -22,7 +23,7 @@ export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
         const current = item.href === currentHref;
 
         return (
-          <a
+          <Link
             aria-current={current ? "page" : undefined}
             href={item.href}
             key={item.href}
@@ -34,7 +35,7 @@ export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
                 {item.count.toLocaleString("en-US")}
               </span>
             ) : null}
-          </a>
+          </Link>
         );
       })}
     </nav>

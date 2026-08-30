@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useId } from "react";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -77,7 +78,7 @@ export function BottleComparisonTable({
             >
               <th scope="row" {...stylex.props(styles.nameCell)}>
                 {row.href ? (
-                  <a
+                  <AppLink
                     href={row.href}
                     {...stylex.props(
                       styles.name,
@@ -86,7 +87,7 @@ export function BottleComparisonTable({
                     )}
                   >
                     {row.name}
-                  </a>
+                  </AppLink>
                 ) : (
                   <span {...stylex.props(styles.name)}>{row.name}</span>
                 )}

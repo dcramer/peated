@@ -5,6 +5,7 @@ import {
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { logError } from "@peated/web/lib/log";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { notFound } from "next/navigation";
 
 import { EntityCodes } from "./entityCodes.stylex";
@@ -60,7 +61,9 @@ export default async function EntityCodesPage(props: {
       rows.push({
         code,
         country: distiller?.country?.name ?? null,
-        href: distiller ? `/entities/${distiller.id}` : undefined,
+        href: distiller
+          ? getEntityUrl({ id: distiller.id, kind: "distillery" })
+          : undefined,
         name: distiller?.name ?? distillerName ?? "Unknown",
       });
     }
@@ -74,7 +77,7 @@ export default async function EntityCodesPage(props: {
     <EntityCodes
       entityName={entity.name}
       example={{
-        href: `/entities/${exampleDistiller.id}`,
+        href: getEntityUrl({ id: exampleDistiller.id, kind: "distillery" }),
         name: exampleDistiller.name,
       }}
       groups={groups}

@@ -10,6 +10,7 @@ import {
   space,
 } from "../../../styles/tokens.stylex";
 import {
+  AppLink,
   BottleIdentityRow,
   Button,
   Chip,
@@ -229,10 +230,12 @@ function CollectionActivity({
       <header {...stylex.props(styles.activityHeader)}>
         <div {...stylex.props(styles.activityCopy)}>
           <div {...stylex.props(styles.activitySentence)}>
-            <a href={activity.authorHref}>{activity.author}</a>
+            <AppLink href={activity.authorHref}>{activity.author}</AppLink>
             <span> added {formatBottleCount(activity.totalItems)} to </span>
             {activity.collectionHref ? (
-              <a href={activity.collectionHref}>{activity.collectionName}</a>
+              <AppLink href={activity.collectionHref}>
+                {activity.collectionName}
+              </AppLink>
             ) : (
               <strong>{activity.collectionName}</strong>
             )}

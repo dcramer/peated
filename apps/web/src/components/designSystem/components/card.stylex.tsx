@@ -1,10 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type {
-  AnchorHTMLAttributes,
-  CSSProperties,
-  HTMLAttributes,
-  ReactNode,
-} from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 
 import {
   colors,
@@ -12,6 +7,7 @@ import {
   effects,
   space,
 } from "../../../styles/tokens.stylex";
+import { AppLink, type AppLinkProps } from "./appLink";
 
 export type CardProps = HTMLAttributes<HTMLDivElement> & {
   appearance?: "outlined" | "surface";
@@ -49,7 +45,7 @@ export function Card({
   );
 }
 
-export type CardLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+export type CardLinkProps = AppLinkProps & {
   appearance?: "outlined" | "surface";
   children: ReactNode;
   href: string;
@@ -74,13 +70,13 @@ export function CardLink({
   );
 
   return (
-    <a
+    <AppLink
       {...props}
       className={joinClassNames(cardProps.className, className)}
       style={mergeStyles(cardProps.style, style)}
     >
       {children}
-    </a>
+    </AppLink>
   );
 }
 
@@ -90,20 +86,20 @@ export function CardPrimaryLink({
   className,
   style,
   ...props
-}: AnchorHTMLAttributes<HTMLAnchorElement> & {
+}: AppLinkProps & {
   children: ReactNode;
   href: string;
 }) {
   const linkProps = stylex.props(styles.primaryLink);
 
   return (
-    <a
+    <AppLink
       {...props}
       className={joinClassNames(linkProps.className, className)}
       style={mergeStyles(linkProps.style, style)}
     >
       {children}
-    </a>
+    </AppLink>
   );
 }
 
@@ -113,20 +109,20 @@ export function CardActionLink({
   className,
   style,
   ...props
-}: AnchorHTMLAttributes<HTMLAnchorElement> & {
+}: AppLinkProps & {
   children: ReactNode;
   href: string;
 }) {
   const actionProps = stylex.props(styles.nestedAction);
 
   return (
-    <a
+    <AppLink
       {...props}
       className={joinClassNames(actionProps.className, className)}
       style={mergeStyles(actionProps.style, style)}
     >
       {children}
-    </a>
+    </AppLink>
   );
 }
 

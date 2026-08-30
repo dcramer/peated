@@ -37,6 +37,7 @@ import {
 import { getBottleExpressionName } from "@peated/web/lib/bottleLabel";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 type Bottle = Outputs["bottles"]["details"];
@@ -389,7 +390,7 @@ export function BottlePageFrameClient({
               : null
           }
           brand={bottle.brand.shortName || bottle.brand.name}
-          brandHref={`/entities/${bottle.brand.id}`}
+          brandHref={getEntityUrl({ id: bottle.brand.id, kind: "brand" })}
           detail={getBottleDetail(bottle)}
           id={bottle.peatedId}
           imageUrl={bottle.imageUrl}

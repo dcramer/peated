@@ -182,6 +182,7 @@ const styles = stylex.create({
   },
   page: {
     boxSizing: "border-box",
+    minHeight: "calc(100dvh - 118px)",
     width: "100%",
     maxWidth: "1320px",
     marginRight: "auto",
@@ -191,6 +192,7 @@ const styles = stylex.create({
     paddingBottom: space.x12,
     paddingLeft: space.x8,
     [NARROW]: {
+      minHeight: "calc(100dvh - 70px)",
       paddingTop: space.x6,
       paddingRight: "20px",
       paddingBottom: space.x8,

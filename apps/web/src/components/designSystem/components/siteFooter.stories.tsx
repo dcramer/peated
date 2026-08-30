@@ -52,7 +52,7 @@ const meta = {
     groups,
     provenance: "Community-edited · corrections welcome",
     referenceLinks: [
-      { href: "/entities/4263/codes", label: "SMWS distillery codes" },
+      { href: "/bottlers/4263/codes", label: "SMWS distillery codes" },
     ],
     statement:
       "A record of every whisky bottling, what the critics said, and what the people who drank it said.",

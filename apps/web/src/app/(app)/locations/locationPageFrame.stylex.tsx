@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import {
+  AppLink,
   PageTabs,
   SpecStrip,
 } from "@peated/web/components/designSystem/components";
@@ -67,7 +68,11 @@ export function LocationPageFrame({
         description={description}
         eyebrow={country ? "Whisky region" : "Whisky country"}
         identity={visual ? <LocationVisual visual={visual} /> : undefined}
-        parent={country ? <a href={country.href}>{country.name}</a> : undefined}
+        parent={
+          country ? (
+            <AppLink href={country.href}>{country.name}</AppLink>
+          ) : undefined
+        }
         title={name}
       />
       <div {...stylex.props(styles.specs)}>

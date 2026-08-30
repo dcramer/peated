@@ -10,6 +10,8 @@ export type {
   HeaderAccountItem,
   HeaderNavigationItem,
 } from "./applicationHeader.stylex";
+export { AppLink, isInternalAppHref } from "./appLink";
+export type { AppLinkProps } from "./appLink";
 export { Avatar } from "./avatar.stylex";
 export type { AvatarProps, AvatarSize } from "./avatar.stylex";
 export { BadgeImage } from "./badgeImage.stylex";

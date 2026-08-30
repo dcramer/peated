@@ -11,6 +11,7 @@ import {
 } from "../../../styles/tokens.stylex";
 import type { BandStackProps, ScoreProps, SpecStripCells } from "../components";
 import {
+  AppLink,
   BandStack,
   BottleVisual,
   Chip,
@@ -61,7 +62,6 @@ export function BottlePageHeader({
   score,
   specs,
 }: BottlePageHeaderProps) {
-  const Brand = brandHref ? "a" : "span";
   const hasActions = Boolean(actions || menu);
   const hasMeasures = Boolean(score || bands);
 
@@ -85,9 +85,13 @@ export function BottlePageHeader({
             size="lg"
           />
           <div {...stylex.props(styles.identity)}>
-            <Brand href={brandHref} {...stylex.props(styles.brand)}>
-              {brand}
-            </Brand>
+            {brandHref ? (
+              <AppLink href={brandHref} {...stylex.props(styles.brand)}>
+                {brand}
+              </AppLink>
+            ) : (
+              <span {...stylex.props(styles.brand)}>{brand}</span>
+            )}
             <h1 {...stylex.props(foundationStyles.pageTitle, styles.name)}>
               {name}
             </h1>

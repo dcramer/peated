@@ -6,6 +6,7 @@ import {
   EmptyState,
   type DataTableColumn,
 } from "@peated/web/components/designSystem/components";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 type LocationListItem = {
   name: string;
@@ -102,7 +103,7 @@ export function LocationDistillerList({
         <DataTable
           caption={`Distillers in ${name}`}
           columns={distillerColumns}
-          getHref={(item) => `/entities/${item.id}`}
+          getHref={(item) => getEntityUrl(item)}
           getKey={(item) => item.id}
           items={items}
         />

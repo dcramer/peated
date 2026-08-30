@@ -8,6 +8,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
 const MOBILE = "@media (max-width: 559px)";
@@ -108,7 +109,7 @@ export function ItemRow({
         ) : null}
         <div {...stylex.props(styles.copy)}>
           {href ? (
-            <a
+            <AppLink
               href={href}
               {...stylex.props(
                 styles.title,
@@ -117,7 +118,7 @@ export function ItemRow({
               )}
             >
               {title}
-            </a>
+            </AppLink>
           ) : (
             <span
               {...stylex.props(

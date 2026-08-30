@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { colors, effects, fonts, space } from "../../../styles/tokens.stylex";
+import { AppLink } from "./appLink";
 
 const PERSONAL_FOLDS = "@media (max-width: 959px)";
 const NAV_SCROLLS = "@media (max-width: 759px)";
@@ -65,13 +66,13 @@ function NavigationLink({
   item: NavigationItem;
 }) {
   return (
-    <a
+    <AppLink
       aria-current={current ? "page" : undefined}
       href={item.href}
       {...stylex.props(styles.link, current && styles.currentLink)}
     >
       {item.label}
-    </a>
+    </AppLink>
   );
 }
 
