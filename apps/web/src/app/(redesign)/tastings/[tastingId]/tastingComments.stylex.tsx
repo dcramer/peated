@@ -48,18 +48,27 @@ export function TastingComments({
     ...newComments,
   ]).filter((item) => !deleted.includes(item.id));
 
-  async function submitComment(event: React.FormEvent<HTMLFormElement>) {
+  function submitComment(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const value = comment.trim();
     if (!user || !value || createComment.isPending) return;
 
-    const created = await createComment.mutateAsync({
-      comment: value,
-      createdAt: new Date().toISOString(),
-      tasting: tastingId,
-    });
-    setNewComments((items) => [...items, { ...created, createdBy: user }]);
-    setComment("");
+    createComment.mutate(
+      {
+        comment: value,
+        createdAt: new Date().toISOString(),
+        tasting: tastingId,
+      },
+      {
+        onSuccess: (created) => {
+          setNewComments((items) => [
+            ...items,
+            { ...created, createdBy: user },
+          ]);
+          setComment("");
+        },
+      },
+    );
   }
 
   if (commentList.error) {
