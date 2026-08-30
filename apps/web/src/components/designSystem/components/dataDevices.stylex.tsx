@@ -36,21 +36,34 @@ export type SpecStripCells =
   | readonly [SpecStripCell, SpecStripCell, SpecStripCell]
   | readonly [SpecStripCell, SpecStripCell, SpecStripCell, SpecStripCell];
 
+function hasSpecStripValue(cell: SpecStripCell) {
+  return cell.value !== null && cell.value !== undefined && cell.value !== "";
+}
+
+export function hasVisibleSpecStripCells(cells: SpecStripCells) {
+  return cells.some(hasSpecStripValue);
+}
+
 export function SpecStrip({ cells }: { cells: SpecStripCells }) {
+  const visibleCells = cells.filter(hasSpecStripValue);
+
+  if (!visibleCells.length) return null;
+
   return (
     <dl
-      {...stylex.props(styles.specStrip, specStripColumnStyles[cells.length])}
+      {...stylex.props(
+        styles.specStrip,
+        getSpecStripColumnStyle(visibleCells.length),
+      )}
     >
-      {cells.map((cell, index) => (
+      {visibleCells.map((cell, index) => (
         <div
           data-spec-cell={index + 1}
           key={`${cell.label}-${index}`}
           {...stylex.props(styles.specCell)}
         >
           <dt {...stylex.props(styles.specLabel)}>{cell.label}</dt>
-          <dd {...stylex.props(styles.specValue)}>
-            {cell.value === null || cell.value === undefined ? "–" : cell.value}
-          </dd>
+          <dd {...stylex.props(styles.specValue)}>{cell.value}</dd>
         </div>
       ))}
     </dl>
@@ -158,3 +171,10 @@ const specStripColumnStyles = {
   3: styles.specStripThree,
   4: styles.specStripFour,
 } satisfies Record<SpecStripCells["length"], stylex.StyleXStyles>;
+
+function getSpecStripColumnStyle(cellCount: number) {
+  if (cellCount === 1) return specStripColumnStyles[1];
+  if (cellCount === 2) return specStripColumnStyles[2];
+  if (cellCount === 3) return specStripColumnStyles[3];
+  return specStripColumnStyles[4];
+}

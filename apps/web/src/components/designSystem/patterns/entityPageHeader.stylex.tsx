@@ -2,7 +2,12 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { space } from "../../../styles/tokens.stylex";
-import { RecordId, SpecStrip, type SpecStripCells } from "../components";
+import {
+  hasVisibleSpecStripCells,
+  RecordId,
+  SpecStrip,
+  type SpecStripCells,
+} from "../components";
 import { PageHeader } from "./pageLayout.stylex";
 
 export type EntityPageHeaderProps = {
@@ -40,9 +45,11 @@ export function EntityPageHeader({
         parent={parent}
         title={title}
       />
-      <div {...stylex.props(styles.specs)}>
-        <SpecStrip cells={specs} />
-      </div>
+      {hasVisibleSpecStripCells(specs) ? (
+        <div {...stylex.props(styles.specs)}>
+          <SpecStrip cells={specs} />
+        </div>
+      ) : null}
     </div>
   );
 }

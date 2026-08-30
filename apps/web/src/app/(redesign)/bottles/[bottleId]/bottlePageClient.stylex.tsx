@@ -338,6 +338,7 @@ export function BottlePageFrameClient({
   children: ReactNode;
   initialBottle: Bottle;
 }) {
+  const { user } = useAuth();
   const orpc = useORPC();
   const pathname = usePathname();
   const bottleQuery = useQuery({
@@ -391,10 +392,14 @@ export function BottlePageFrameClient({
           detail={getBottleDetail(bottle)}
           id={bottle.peatedId}
           imageUrl={bottle.imageUrl}
-          memberStatus={{
-            hasTasted: bottle.hasTasted,
-            isLibrary: bottle.isLibrary,
-          }}
+          memberStatus={
+            user
+              ? {
+                  hasTasted: bottle.hasTasted,
+                  isLibrary: bottle.isLibrary,
+                }
+              : undefined
+          }
           menu={<BottleActions bottle={bottle} />}
           name={getBottleExpressionName(bottle)}
           notes={getBottleNotes(bottle)}
@@ -542,8 +547,8 @@ export function BottleOverviewClient({
       {recommendationsQuery.error ||
       (!mainFailed && (externalReviewsQuery.error || tastingsQuery.error)) ? (
         <p role="status" {...stylex.props(styles.partialError)}>
-          Some bottle details could not be loaded. The rest of this page is
-          still available.
+          Some reviews, tastings, or recommendations could not be loaded. The
+          rest of this page is still available.
         </p>
       ) : null}
     </>
