@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { expect, type Request, test, type TestInfo } from "@playwright/test";
 import { z } from "zod";
 
@@ -7,7 +8,7 @@ import {
   createdBottleName,
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
-  existingBottle,
+  existingBottleDetails,
   existingBottleId,
   testAccessToken,
   testBrand,
@@ -290,23 +291,23 @@ test.describe("unified Bottle workflows", () => {
     ).toBeVisible();
 
     const otherBottle = page.getByRole("combobox", { name: "Other bottle" });
-    await otherBottle.fill(exactMergeOtherBottle.fullName);
+    await otherBottle.fill(formatBottleDisplayName(exactMergeOtherBottle));
     await page
       .getByRole("option", {
-        name: new RegExp(exactMergeOtherBottle.fullName),
+        name: new RegExp(formatBottleDisplayName(exactMergeOtherBottle)),
       })
       .click();
 
     await expect(
       page.getByRole("radio", {
         exact: true,
-        name: `Keep ${exactMergeOtherBottle.fullName} (${exactMergeOtherBottle.peatedId}) Retire ${existingBottle.fullName} (${existingBottle.peatedId}).`,
+        name: `Keep ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}) Retire ${formatBottleDisplayName(existingBottleDetails)} (${existingBottleDetails.peatedId}).`,
       }),
     ).toBeChecked();
     await expect(
       page.getByRole("radio", {
         exact: true,
-        name: `Keep ${existingBottle.fullName} (${existingBottle.peatedId}) Retire ${exactMergeOtherBottle.fullName} (${exactMergeOtherBottle.peatedId}).`,
+        name: `Keep ${formatBottleDisplayName(existingBottleDetails)} (${existingBottleDetails.peatedId}) Retire ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}).`,
       }),
     ).toBeVisible();
 

@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useState } from "react";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   AppLink,
   Button,
@@ -18,7 +19,6 @@ import {
 import { Avatar } from "@peated/web/components/designSystem/components/avatar.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import TimeSince from "@peated/web/components/timeSince";
-import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -239,11 +239,11 @@ function getNotificationMessage(notification: Notification) {
       return "sent you a friend request";
     case "toast":
       return notification.ref
-        ? `toasted ${getBottlePlainTextIdentity(notification.ref.bottle)}`
+        ? `toasted ${formatBottleDisplayName(notification.ref.bottle)}`
         : "toasted an unavailable tasting";
     case "comment":
       return notification.ref
-        ? `commented on ${getBottlePlainTextIdentity(notification.ref.bottle)}`
+        ? `commented on ${formatBottleDisplayName(notification.ref.bottle)}`
         : "commented on an unavailable tasting";
   }
 }

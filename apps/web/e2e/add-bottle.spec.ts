@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   expect,
   type Locator,
@@ -25,6 +26,7 @@ import {
   exactMatchedBottleId,
   exactSearchBottle,
   existingBottle,
+  existingBottleDetails,
   existingBottleId,
   photoTastingNotes,
   testAccessToken,
@@ -589,7 +591,9 @@ test.describe("add bottle flow", () => {
     await page.goto(
       `/search?intent=choose&q=Lagavulin&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingScanImageUrl)}`,
     );
-    await page.getByRole("link", { name: existingBottle.fullName }).click();
+    await page
+      .getByRole("link", { name: formatBottleDisplayName(existingBottle) })
+      .click();
 
     await expect(page).toHaveURL(/\/addBottle\?/);
     const addBottleUrl = new URL(page.url());
@@ -600,7 +604,10 @@ test.describe("add bottle flow", () => {
       pendingScanImageUrl,
     );
     await expect(
-      getSelectedBottleImage(page, existingBottle.fullName),
+      getSelectedBottleImage(
+        page,
+        formatBottleDisplayName(existingBottleDetails),
+      ),
     ).toHaveAttribute("src", pendingScanImageUrl);
     await expect(
       page.getByRole("link", { name: "Search Bottles" }),
@@ -628,14 +635,16 @@ test.describe("add bottle flow", () => {
     });
 
     await page.goto("/search?intent=choose&q=Lagavulin");
-    await page.getByRole("link", { name: existingBottle.fullName }).click();
+    await page
+      .getByRole("link", { name: formatBottleDisplayName(existingBottle) })
+      .click();
     await page.getByRole("button", { name: "Add to Library" }).click();
 
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottle(page, existingBottle.fullName),
+      getSelectedBottle(page, formatBottleDisplayName(existingBottleDetails)),
     ).toBeVisible();
   });
 
@@ -727,10 +736,13 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottleImage(page, existingBottle.fullName),
+      getSelectedBottleImage(
+        page,
+        formatBottleDisplayName(existingBottleDetails),
+      ),
     ).toHaveAttribute("src", /library\.webp$/);
     await expect(
-      getSelectedBottle(page, existingBottle.fullName),
+      getSelectedBottle(page, formatBottleDisplayName(existingBottleDetails)),
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Add another to Library" }),
@@ -787,7 +799,10 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottleImage(page, existingBottle.fullName),
+      getSelectedBottleImage(
+        page,
+        formatBottleDisplayName(existingBottleDetails),
+      ),
     ).toHaveAttribute("src", /library\.webp$/);
   });
 
@@ -1121,7 +1136,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
     await expect(
-      getSelectedBottle(page, existingBottle.fullName),
+      getSelectedBottle(page, formatBottleDisplayName(existingBottleDetails)),
     ).toBeVisible();
   });
 
@@ -1146,7 +1161,9 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Log a tasting" }),
     ).toBeVisible();
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByText(formatBottleDisplayName(existingBottle)),
+    ).toBeVisible();
   });
 
   test("offers review and create when a low-confidence scan has label details", async ({

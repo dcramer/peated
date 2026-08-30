@@ -1,6 +1,7 @@
 import config from "@peated/server/config";
 import { getRatingBandById } from "@peated/server/constants";
 import { db } from "@peated/server/db";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatColor } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
@@ -42,7 +43,7 @@ export default async function notifyDiscordOnTasting(input: JobPayload) {
     await resolveActiveBottleIds(tx, [bottleId]);
     const bottle = await tx.query.bottles.findFirst({
       where: (bottles, { eq }) => eq(bottles.id, bottleId),
-      columns: { fullName: true },
+      with: { brand: true, group: true, series: true },
     });
     if (!bottle) {
       throw new Error(
@@ -104,7 +105,7 @@ export default async function notifyDiscordOnTasting(input: JobPayload) {
             ? absoluteUrl(config.API_SERVER, tasting.createdBy.pictureUrl)
             : null,
         },
-        title: tasting.bottle.fullName,
+        title: formatBottleDisplayName(tasting.bottle),
         url: `${config.URL_PREFIX}/tastings/${tasting.id}`,
         description: tasting.notes || null,
         fields,

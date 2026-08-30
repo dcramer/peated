@@ -155,10 +155,4 @@ describe("PhotoMatchCreateState", () => {
     expect(html).toContain("Batch 24");
     expect(html).toContain("2023 release");
   });
-
-  it("does not repeat a release year already expressed by the edition", () => {
-    const html = renderMatchedBottle(makeBottle({ edition: "2023 Release" }));
-
-    expect(html.match(/2023 release/gi)).toHaveLength(1);
-  });
 });

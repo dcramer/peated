@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
 import {
   Field,
@@ -86,7 +87,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
             bottleId={bottle.peatedId}
             imageUrl={bottle.imageUrl}
             metadata={getBottleMetadata(bottle)}
-            name={bottle.fullName}
+            name={formatBottleDisplayName(bottle)}
           />
           {error ? <FormNotice>{error}</FormNotice> : null}
           {summary ? (

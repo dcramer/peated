@@ -1,3 +1,4 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { PagingRel, StorePrice } from "@peated/server/types";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
@@ -24,7 +25,7 @@ export default function StorePriceTable({
                 <>
                   {" · "}
                   <AdminTextLink href={`/bottles/${price.bottle.id}`}>
-                    {price.bottle.fullName}
+                    {formatBottleDisplayName(price.bottle)}
                   </AdminTextLink>
                 </>
               ) : (

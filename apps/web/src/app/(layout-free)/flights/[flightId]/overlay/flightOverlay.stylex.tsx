@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Bottle } from "@peated/server/types";
 import { ClientOnly } from "@peated/web/components/clientOnly";
 import {
@@ -53,7 +54,9 @@ export function FlightOverlay({
                     href={getBottleUrl(bottle)}
                     imageUrl={bottle.imageUrl}
                     metadata={getBottleMetadata(bottle).split(" · ")}
-                    name={bottle.fullName}
+                    name={formatBottleDisplayName(bottle, {
+                      includeBrand: false,
+                    })}
                     variant="surface"
                   />
                 </ItemListItem>

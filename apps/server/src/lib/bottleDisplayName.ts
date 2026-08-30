@@ -1,4 +1,4 @@
-type BottleLabelSource = {
+export type BottleDisplayNameSource = {
   name: string;
   edition?: string | null;
   vintageYear?: number | null;
@@ -16,14 +16,18 @@ type BottleLabelSource = {
   } | null;
   group?: {
     name: string;
-  };
+  } | null;
+};
+
+export type BottleDisplayNameOptions = {
+  includeBrand?: boolean;
 };
 
 function includesIdentityText(value: string, candidate: string) {
   return value.toLocaleLowerCase().includes(candidate.toLocaleLowerCase());
 }
 
-export function getBottleExpressionName(bottle: BottleLabelSource) {
+function getExpressionName(bottle: BottleDisplayNameSource) {
   if (bottle.group) return bottle.group.name;
 
   const metadataSegments = new Set(
@@ -60,31 +64,44 @@ export function getBottleExpressionName(bottle: BottleLabelSource) {
   return titleSegments.join(" - ") || bottle.name;
 }
 
-export function getBottleContextLabel(bottle: BottleLabelSource) {
+function getReleaseName(bottle: BottleDisplayNameSource) {
+  const expressionName = getExpressionName(bottle);
+
+  if (bottle.edition) {
+    return includesIdentityText(expressionName, bottle.edition)
+      ? expressionName
+      : `${expressionName} - ${bottle.edition}`;
+  }
+  if (!bottle.group) return expressionName;
+  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
+    const vintage = `${bottle.vintageYear} Vintage`;
+    return includesIdentityText(expressionName, vintage)
+      ? expressionName
+      : `${expressionName} - ${vintage}`;
+  }
+  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
+    const release = `${bottle.releaseYear} Release`;
+    return includesIdentityText(expressionName, release)
+      ? expressionName
+      : `${expressionName} - ${release}`;
+  }
+
+  return expressionName;
+}
+
+/** Formats the concise marketed identity used for human-facing bottle names. */
+export function formatBottleDisplayName(
+  bottle: BottleDisplayNameSource,
+  { includeBrand = true }: BottleDisplayNameOptions = {},
+) {
+  const expressionName = getReleaseName(bottle);
   const brandName = bottle.brand.shortName || bottle.brand.name;
-  const expressionName = getBottleExpressionName(bottle);
   const seriesName =
     bottle.series && !includesIdentityText(expressionName, bottle.series.name)
       ? bottle.series.name
       : null;
 
-  return [brandName, seriesName, expressionName].filter(Boolean).join(" ");
-}
-
-export function getBottlePlainTextIdentity(bottle: BottleLabelSource) {
-  const contextLabel = getBottleContextLabel(bottle);
-
-  if (bottle.edition) {
-    return includesIdentityText(contextLabel, bottle.edition)
-      ? contextLabel
-      : `${contextLabel} - ${bottle.edition}`;
-  }
-  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
-    return `${contextLabel} - ${bottle.vintageYear} Vintage`;
-  }
-  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
-    return `${contextLabel} - ${bottle.releaseYear} Release`;
-  }
-
-  return contextLabel;
+  return [includeBrand ? brandName : null, seriesName, expressionName]
+    .filter(Boolean)
+    .join(" ");
 }

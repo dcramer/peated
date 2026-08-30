@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { FlightInputSchema } from "@peated/server/schemas";
 import type { Bottle } from "@peated/server/types";
 import {
@@ -173,12 +174,23 @@ export default function FlightForm({
 function toBottleOption(
   bottle: Pick<
     Bottle,
-    "abv" | "category" | "fullName" | "id" | "noAgeStatement" | "statedAge"
+    | "abv"
+    | "brand"
+    | "category"
+    | "edition"
+    | "group"
+    | "id"
+    | "name"
+    | "noAgeStatement"
+    | "releaseYear"
+    | "series"
+    | "statedAge"
+    | "vintageYear"
   >,
 ): SearchPickerOption {
   return {
     detail: getBottleMetadata(bottle),
     id: bottle.id,
-    label: bottle.fullName,
+    label: formatBottleDisplayName(bottle),
   };
 }

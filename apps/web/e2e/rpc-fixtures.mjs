@@ -538,6 +538,12 @@ export const destinationBottleGroup = {
   totalBottles: 2,
 };
 
+export const existingBottleDetails = {
+  ...existingBottle,
+  groupId: destinationBottleGroup.id,
+  group: destinationBottleGroup,
+};
+
 export const groupedBottleDetails = {
   ...bottleGroupRepresentative,
   group: bottleGroup,

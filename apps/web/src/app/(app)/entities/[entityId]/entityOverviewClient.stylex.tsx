@@ -5,6 +5,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   AppLink,
   BottleComparisonTable,
@@ -119,7 +120,7 @@ function toBottleTableRow(
     href: `/bottles/${bottle.id}`,
     id: bottle.peatedId,
     metadata: formatBottleMetadata(bottle),
-    name: bottle.fullName,
+    name: formatBottleDisplayName(bottle),
     values: [
       <RatingMeasure
         counts={bottle.tastingBandCounts}

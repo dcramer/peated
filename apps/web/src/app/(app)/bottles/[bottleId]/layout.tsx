@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
 
-import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
@@ -14,7 +14,7 @@ export async function generateMetadata(props: {
 }) {
   const { bottleId } = await props.params;
   const bottle = await getBottlePage(parseReleaseFamilyRouteId(bottleId));
-  const title = getBottlePlainTextIdentity(bottle);
+  const title = formatBottleDisplayName(bottle);
   const description = summarize(bottle.description || "", 200);
   const images = bottle.imageUrl ? [bottle.imageUrl] : [];
 
@@ -37,7 +37,7 @@ export default async function BottleLayout(props: {
   );
   const { client } = await getServerClient();
   const bottle = await client.bottles.details({ bottle: canonicalBottle.id });
-  const title = getBottlePlainTextIdentity(bottle);
+  const title = formatBottleDisplayName(bottle);
   const jsonLd: WithContext<Product> = {
     "@context": "https://schema.org",
     "@type": "Product",

@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   ButtonLink,
   LoadingList,
@@ -24,6 +25,7 @@ import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLa
 import { Search } from "@peated/web/components/search/search.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
+import { getBottleReviewMetadata } from "@peated/web/lib/bottleMetadata";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   memberHomeQueries,
@@ -153,7 +155,7 @@ function LatestReleases() {
           {
             href: `/bottles/${bottle.id}`,
             metadata: getReleaseMetadata(bottle),
-            name: bottle.fullName,
+            name: formatBottleDisplayName(bottle),
           },
         ],
   );
@@ -204,13 +206,14 @@ function RecentReviews() {
       ? [
           {
             bottleHref: `/bottles/${review.bottle.id}`,
-            bottleName: review.bottle.fullName,
+            bottleName: formatBottleDisplayName(review.bottle),
             date: (
               <TimeSince
                 date={review.article.publishedAt ?? review.createdAt}
               />
             ),
             id: String(review.id),
+            metadata: getBottleReviewMetadata(review.bottle),
             rating:
               review.nativeScore?.scale === 100
                 ? review.nativeScore.value
@@ -387,7 +390,7 @@ function RecentBottles({ totalBottles }: { totalBottles?: number }) {
       bottles={bottles.data.results.map((bottle) => ({
         href: `/bottles/${bottle.id}`,
         metadata: getBottleMetadata(bottle),
-        name: bottle.fullName,
+        name: formatBottleDisplayName(bottle),
       }))}
       totalBottles={totalBottles}
     />

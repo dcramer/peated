@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { BottleMergeSchema } from "@peated/server/schemas";
 import {
@@ -99,7 +100,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
     const option = {
       detail: getBottleMetadata(prefilledBottle.data),
       id: prefilledBottle.data.id,
-      label: prefilledBottle.data.fullName,
+      label: formatBottleDisplayName(prefilledBottle.data),
     };
     setOther(option);
     setValue("bottleId", prefilledBottle.data.id);
@@ -135,7 +136,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
             bottleId={bottle.peatedId}
             imageUrl={bottle.imageUrl}
             metadata={getBottleMetadata(bottle)}
-            name={bottle.fullName}
+            name={formatBottleDisplayName(bottle)}
           />
           {submitError ? <FormNotice>{submitError}</FormNotice> : null}
           <FormSection title="Duplicate bottle">
@@ -162,7 +163,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
                       .map((item) => ({
                         detail: getBottleMetadata(item),
                         id: item.id,
-                        label: item.fullName,
+                        label: formatBottleDisplayName(item),
                       }))}
                     placeholder="Search bottles"
                     value={other}
@@ -186,11 +187,11 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
                       description: other
                         ? `Retire ${other.label} (${formatPeatedId("bottle", Number(other.id))}).`
                         : "Retire the selected duplicate.",
-                      label: `Keep ${bottle.fullName} (${bottle.peatedId})`,
+                      label: `Keep ${formatBottleDisplayName(bottle)} (${bottle.peatedId})`,
                       value: "mergeFrom",
                     },
                     {
-                      description: `Retire ${bottle.fullName} (${bottle.peatedId}).`,
+                      description: `Retire ${formatBottleDisplayName(bottle)} (${bottle.peatedId}).`,
                       label: other
                         ? `Keep ${other.label} (${formatPeatedId("bottle", Number(other.id))})`
                         : "Keep the duplicate",

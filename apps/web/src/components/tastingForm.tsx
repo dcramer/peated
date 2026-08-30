@@ -1,6 +1,7 @@
 "use client";
 
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
 import type { User } from "@peated/server/types";
@@ -195,7 +196,7 @@ export default function TastingForm(
             bottleId={initialData.bottle.peatedId}
             imageUrl={imagePreview ?? initialData.bottle.imageUrl}
             metadata={getBottleMetadata(initialData.bottle)}
-            name={initialData.bottle.fullName}
+            name={formatBottleDisplayName(initialData.bottle)}
           />
           {submitError || errorMessage ? (
             <FormNotice>{submitError ?? errorMessage}</FormNotice>

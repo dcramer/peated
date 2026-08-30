@@ -21,6 +21,7 @@ import {
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signPayload } from "./auth";
+import { formatBottleDisplayName } from "./bottleDisplayName";
 import { logError, logInfo } from "./log";
 import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
 
@@ -99,7 +100,7 @@ export async function notifyComment({
     await resolveActiveBottleIds(tx, [comment.tasting.bottleId!]);
     return tx.query.bottles.findFirst({
       where: (bottles, { eq }) => eq(bottles.id, comment.tasting.bottleId!),
-      columns: { fullName: true },
+      with: { brand: true, group: true, series: true },
     });
   });
   if (!bottle) {
@@ -107,7 +108,7 @@ export async function notifyComment({
       `Tasting ${comment.tasting.id} references missing Bottle ${comment.tasting.bottleId}`,
     );
   }
-  const bottleFullName = bottle.fullName;
+  const bottleName = formatBottleDisplayName(bottle);
 
   const userIds =
     comment.createdById === comment.tasting.createdById
@@ -160,7 +161,7 @@ export async function notifyComment({
         },
         tasting: {
           id: comment.tasting.id,
-          bottleFullName,
+          bottleName,
         },
       },
     }),
@@ -179,7 +180,7 @@ export async function notifyComment({
         ...getMailDefaults(),
         to: email,
         subject: "New Comment on Tasting",
-        text: `View this comment on Peated: ${commentUrl}\n\n${bottleFullName}\n\n${comment.comment}`,
+        text: `View this comment on Peated: ${commentUrl}\n\n${bottleName}\n\n${comment.comment}`,
         html,
       });
     } catch (err) {

@@ -1,4 +1,4 @@
-import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
@@ -10,7 +10,7 @@ export async function generateMetadata(props: {
 }) {
   const { bottleId } = await props.params;
   const bottle = await getBottlePage(parseReleaseFamilyRouteId(bottleId));
-  return { title: `Other names for ${getBottlePlainTextIdentity(bottle)}` };
+  return { title: `Other names for ${formatBottleDisplayName(bottle)}` };
 }
 
 export default async function BottleAliasesPage(props: {
