@@ -1,6 +1,8 @@
 import {
   includesQuery,
+  isMockEntityFollowing,
   mockEntities,
+  mockEntityFor,
   mockPage,
 } from "@peated/server/orpc/mock/fixtures";
 import type { EntityKind } from "@peated/server/types";
@@ -15,22 +17,30 @@ type EntityListInput = {
   sort: string;
   cursor: number;
   limit: number;
+  kinds?: EntityKind[];
 };
 
-const followedEntityIds = new Set([9201, 9207, 9208]);
-
-export function listEntityKind(kind: EntityKind, input: EntityListInput) {
-  return listEntities(input, kind);
+export function listEntityKind(
+  kind: EntityKind,
+  input: EntityListInput,
+  signedIn = false,
+) {
+  return listEntities(input, kind, signedIn);
 }
 
-export function listEntities(input: EntityListInput, kind?: EntityKind) {
+export function listEntities(
+  input: EntityListInput,
+  kind?: EntityKind,
+  signedIn = false,
+) {
   const direction = input.sort.startsWith("-") ? -1 : 1;
   const sort = input.sort.replace(/^-/, "");
   const entities = mockEntities
     .filter(
       (entity) =>
         (kind === undefined || entity.kind === kind) &&
-        (input.filter !== "following" || followedEntityIds.has(entity.id)) &&
+        (input.kinds === undefined || input.kinds.includes(entity.kind)) &&
+        (input.filter !== "following" || isMockEntityFollowing(entity.id)) &&
         (input.owner == null || entity.ownerId === input.owner) &&
         includesQuery(input.query, entity.name, entity.shortName) &&
         (input.name == null || entity.name === input.name) &&
@@ -54,7 +64,8 @@ export function listEntities(input: EntityListInput, kind?: EntityKind) {
         default:
           return 0;
       }
-    });
+    })
+    .map((entity) => mockEntityFor(signedIn, entity));
 
   return mockPage(entities, input.cursor, input.limit);
 }

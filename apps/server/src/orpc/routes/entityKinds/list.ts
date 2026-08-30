@@ -16,15 +16,17 @@ import type { EntityKindListInputSchema } from "@peated/server/orpc/contracts/en
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 type Input = z.infer<typeof EntityKindListInputSchema>;
 
+type ListEntitiesInput = Input & { kinds?: EntityKind[] };
+
 type ListEntitiesOptions = {
   badRequest: (message: string) => never;
   currentUser?: User | null;
-  input: Input;
+  input: ListEntitiesInput;
   unauthorized: () => never;
 };
 
@@ -39,8 +41,9 @@ export async function listEntities({
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
+  const requestedKinds = kind ? [kind] : input.kinds;
   const where: (SQL<unknown> | undefined)[] = [
-    kind ? eq(entities.kind, kind) : undefined,
+    requestedKinds?.length ? inArray(entities.kind, requestedKinds) : undefined,
   ];
 
   if (input.filter === "following") {

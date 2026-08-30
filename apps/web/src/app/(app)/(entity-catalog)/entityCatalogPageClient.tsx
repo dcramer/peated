@@ -2,7 +2,7 @@
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
-import type { Entity, EntityKind } from "@peated/server/types";
+import type { EntityKind } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -14,13 +14,13 @@ import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalo
 import {
   EntityCatalogFilters,
   EntityCatalogList,
-  type EntityCatalogItem,
 } from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
+import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
+import { toEntityCatalogItem } from "@peated/web/lib/entityCatalogItem";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getEntityUrl } from "@peated/web/lib/urls";
 
 const DEFAULT_SORT = "-tastings";
 
@@ -57,6 +57,7 @@ export function EntityCatalogPageClient({
   const config = catalogConfig[kind];
   const orpc = useORPC();
   const { user } = useAuth();
+  const followControls = useEntityFollowing();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -114,7 +115,13 @@ export function EntityCatalogPageClient({
   }
 
   const addHref = `/addEntity?kind=${kind}`;
-  const items = entityList.results.map(toCatalogItem);
+  const visibleEntities =
+    filter === "following"
+      ? entityList.results.filter(followControls.isFollowing)
+      : entityList.results;
+  const items = visibleEntities.map((entity) =>
+    toEntityCatalogItem(entity, followControls.isFollowing(entity)),
+  );
 
   return (
     <CatalogPage
@@ -185,13 +192,24 @@ export function EntityCatalogPageClient({
         )}
         noun={config.noun}
         onClear={hasFilters ? clearFilters : undefined}
+        onToggleFollowing={
+          showFollowing
+            ? (item) =>
+                followControls.toggle({
+                  id: item.id,
+                  isFollowing: item.isFollowing,
+                })
+            : undefined
+        }
         onSortChange={(value) => updateParams({ sort: value })}
         page={page}
+        pendingId={followControls.pendingId}
         previousHref={getCursorHref(
           pathname,
           searchParams,
           entityList.rel.prevCursor,
         )}
+        showFollowingMarks={filter !== "following"}
         sort={sort}
         sortOptions={sortOptions}
       />
@@ -209,26 +227,6 @@ function getScopeHref(
   else nextParams.delete("filter");
   nextParams.delete("cursor");
   return buildSearchHref(pathname, nextParams);
-}
-
-function toCatalogItem(entity: Entity): EntityCatalogItem {
-  const location = [entity.region?.name, entity.country?.name]
-    .filter((value): value is string => Boolean(value))
-    .join(", ");
-  const metadata = [
-    entity.peatedId,
-    toTitleCase(entity.kind),
-    location || null,
-  ].filter((value): value is string => value !== null);
-
-  return {
-    href: getEntityUrl(entity),
-    id: entity.peatedId,
-    metadata,
-    name: entity.name,
-    totalBottles: entity.totalBottles,
-    totalTastings: entity.totalTastings,
-  };
 }
 
 function formatRegion(region: string) {

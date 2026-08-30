@@ -11,6 +11,7 @@ import {
 import { AppLink } from "./appLink";
 import { Button } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
+import { MemberStatusMark } from "./memberStatusMark.stylex";
 import { RatingMeasure, type BandCounts } from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 559px)";
@@ -26,6 +27,7 @@ export type SearchResultMeasure = {
 export type SearchResultItem = {
   href: string;
   id: string;
+  isFollowing?: boolean;
   measures?: SearchResultMeasure;
   metadata?: string;
   title: string;
@@ -229,6 +231,9 @@ function SearchResultsGroup({
               <span {...stylex.props(styles.copy)}>
                 <strong {...stylex.props(styles.title)}>
                   <MatchedText query={query} text={item.title} />
+                  {item.isFollowing ? (
+                    <MemberStatusMark kind="following" />
+                  ) : null}
                 </strong>
                 {item.metadata ? (
                   <span {...stylex.props(styles.metadata)}>

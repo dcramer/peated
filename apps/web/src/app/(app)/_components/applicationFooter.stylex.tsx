@@ -21,6 +21,7 @@ const groups = [
     links: [
       { href: "/library", label: "Library" },
       { href: "/tastings", label: "Tastings" },
+      { href: "/following", label: "Following" },
       { href: "/friends", label: "Friends" },
       { href: "/settings", label: "Settings" },
     ],

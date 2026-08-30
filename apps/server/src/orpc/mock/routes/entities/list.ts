@@ -6,6 +6,6 @@ export default mockOS.entities.list.handler(
     if (input.filter === "following" && !context.user) {
       throw errors.UNAUTHORIZED();
     }
-    return listEntities(input);
+    return listEntities(input, undefined, Boolean(context.user));
   },
 );

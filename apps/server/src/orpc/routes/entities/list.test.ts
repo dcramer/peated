@@ -1,3 +1,5 @@
+import { db } from "@peated/server/db";
+import { entityFollows } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /entities", () => {
@@ -65,5 +67,43 @@ describe("GET /entities", () => {
     });
 
     expect(results.map(({ id }) => id)).toEqual([brand.id, distillery.id]);
+  });
+
+  test("filters Entities by several kinds", async ({ fixtures }) => {
+    const brand = await fixtures.Entity({ name: "A Brand", kind: "brand" });
+    const bottler = await fixtures.Entity({
+      name: "B Bottler",
+      kind: "bottler",
+    });
+    await fixtures.Entity({ name: "C Company", kind: "company" });
+
+    const { results } = await routerClient.entities.list({
+      kinds: ["brand", "bottler"],
+      sort: "name",
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([brand.id, bottler.id]);
+  });
+
+  test("includes the current user's follow state", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const followed = await fixtures.Entity({ kind: "distillery" });
+    await db.insert(entityFollows).values({
+      userId: defaults.user.id,
+      entityId: followed.id,
+    });
+
+    const anonymous = await routerClient.entities.list({
+      kinds: ["distillery"],
+    });
+    const authenticated = await routerClient.entities.list(
+      { kinds: ["distillery"] },
+      { context: { user: defaults.user } },
+    );
+
+    expect(anonymous.results[0]?.isFollowing).toBe(false);
+    expect(authenticated.results[0]?.isFollowing).toBe(true);
   });
 });

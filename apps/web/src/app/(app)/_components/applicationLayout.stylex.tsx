@@ -59,6 +59,7 @@ export function ApplicationLayout({
           label: "Library",
         },
         { href: "/tastings", label: "Tastings" },
+        { href: "/following", label: "Following" },
         { href: "/friends", label: "Friends" },
       ]
     : [];

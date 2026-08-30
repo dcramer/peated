@@ -23,12 +23,22 @@ export default procedure
   .output(z.object({ following: z.literal(true) }))
   .handler(async function ({ input, context, errors }) {
     const [entity] = await db
-      .select({ id: entities.id })
+      .select({ id: entities.id, kind: entities.kind })
       .from(entities)
       .where(eq(entities.id, input.entity))
       .limit(1);
     if (!entity) {
       throw errors.NOT_FOUND({ message: "Entity not found." });
+    }
+    // This boundary owns which catalog records can participate in following.
+    if (
+      entity.kind !== "brand" &&
+      entity.kind !== "bottler" &&
+      entity.kind !== "distillery"
+    ) {
+      throw errors.BAD_REQUEST({
+        message: "You can follow distillers, brands, and bottlers.",
+      });
     }
 
     await db

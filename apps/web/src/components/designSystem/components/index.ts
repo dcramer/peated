@@ -168,6 +168,8 @@ export type {
   MemberPickerOption,
   MemberPickerProps,
 } from "./memberPicker.stylex";
+export { MemberStatusMark } from "./memberStatusMark.stylex";
+export type { MemberStatusMarkKind } from "./memberStatusMark.stylex";
 export { NotePickerField } from "./notePicker.stylex";
 export type {
   NotePickerFieldProps,

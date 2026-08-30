@@ -1,10 +1,11 @@
-import { inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import {
   countries,
   entities,
+  entityFollows,
   regions,
   type Entity,
   type User,
@@ -17,6 +18,7 @@ import { RegionSerializer } from "./region";
 
 interface EntityAttrs {
   country: z.infer<typeof EntitySchema>["country"];
+  isFollowing: boolean;
   owner: z.infer<typeof EntitySchema>["owner"];
   region: z.infer<typeof EntitySchema>["region"];
 }
@@ -24,6 +26,22 @@ interface EntityAttrs {
 export const EntitySerializer = serializer({
   name: "entity",
   attrs: async (itemList: Entity[], currentUser?: User) => {
+    const itemIds = itemList.map((item) => item.id);
+    const followedEntityIds = new Set(
+      currentUser && itemIds.length
+        ? (
+            await db
+              .select({ entityId: entityFollows.entityId })
+              .from(entityFollows)
+              .where(
+                and(
+                  eq(entityFollows.userId, currentUser.id),
+                  inArray(entityFollows.entityId, itemIds),
+                ),
+              )
+          ).map(({ entityId }) => entityId)
+        : [],
+    );
     const countryIds = itemList.map((i) => i.countryId).filter(notEmpty);
     const countryList = countryIds.length
       ? await db
@@ -77,6 +95,7 @@ export const EntitySerializer = serializer({
           item.id,
           {
             country: item.countryId ? countriesById[item.countryId] : null,
+            isFollowing: followedEntityIds.has(item.id),
             owner: item.ownerId ? ownersById[item.ownerId] : null,
             region: item.regionId ? regionsById[item.regionId] : null,
           },
@@ -109,6 +128,7 @@ export const EntitySerializer = serializer({
 
       totalTastings: item.totalTastings,
       totalBottles: item.totalBottles,
+      isFollowing: attrs.isFollowing,
     };
   },
 });

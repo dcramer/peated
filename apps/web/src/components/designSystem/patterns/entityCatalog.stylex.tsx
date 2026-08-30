@@ -15,6 +15,7 @@ import {
   ItemList,
   ItemRow,
   ListToolbar,
+  MemberStatusMark,
   type ListSortOption,
 } from "../components";
 import { CatalogPageLoading } from "./catalogPage.stylex";
@@ -23,7 +24,8 @@ const COMPACT = "@media (max-width: 639px)";
 
 export type EntityCatalogItem = {
   href: string;
-  id: string;
+  id: number;
+  isFollowing: boolean;
   metadata: readonly string[];
   name: string;
   totalBottles: number;
@@ -31,7 +33,7 @@ export type EntityCatalogItem = {
 };
 
 export type EntityCatalogListProps = {
-  addHref: string;
+  addHref?: string;
   emptyAction?: ReactNode;
   emptyDescription?: ReactNode;
   emptyHeading?: string;
@@ -39,9 +41,12 @@ export type EntityCatalogListProps = {
   nextHref?: string;
   noun: string;
   onClear?: () => void;
+  onToggleFollowing?: (item: EntityCatalogItem) => void;
   onSortChange: (value: string) => void;
   page: number;
+  pendingId?: number;
   previousHref?: string;
+  showFollowingMarks?: boolean;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
 };
@@ -56,9 +61,12 @@ export function EntityCatalogList({
   nextHref,
   noun,
   onClear,
+  onToggleFollowing,
   onSortChange,
   page,
+  pendingId,
   previousHref,
+  showFollowingMarks = true,
   sort,
   sortOptions,
 }: EntityCatalogListProps) {
@@ -75,11 +83,39 @@ export function EntityCatalogList({
         <ItemList ariaLabel={`${noun} records`} showTopDivider={false}>
           {items.map((item) => (
             <ItemRow
+              action={
+                onToggleFollowing ? (
+                  <Button
+                    aria-label={
+                      item.isFollowing
+                        ? `Unfollow ${item.name}`
+                        : `Follow ${item.name}`
+                    }
+                    aria-pressed={item.isFollowing}
+                    loading={pendingId === item.id}
+                    loadingLabel={
+                      item.isFollowing ? "Unfollowing…" : "Following…"
+                    }
+                    onClick={() => onToggleFollowing(item)}
+                    size="sm"
+                    variant={item.isFollowing ? "text" : "tonal"}
+                  >
+                    {item.isFollowing ? "Following" : "Follow"}
+                  </Button>
+                ) : undefined
+              }
               end={<EntityMeasures item={item} />}
               href={item.href}
               key={item.id}
               metadata={item.metadata.join(" · ")}
-              title={item.name}
+              title={
+                <>
+                  {item.name}
+                  {item.isFollowing && showFollowingMarks ? (
+                    <MemberStatusMark kind="following" />
+                  ) : null}
+                </>
+              }
             />
           ))}
         </ItemList>
@@ -91,11 +127,11 @@ export function EntityCatalogList({
               <Button onClick={onClear} size="sm" variant="tonal">
                 Clear filters
               </Button>
-            ) : (
+            ) : addHref ? (
               <ButtonLink href={addHref} size="sm" variant="tonal">
                 Add {noun}
               </ButtonLink>
-            ))
+            ) : undefined)
           }
           heading={emptyHeading ?? `No ${noun}s found`}
         >
@@ -116,6 +152,7 @@ function EntityMeasures({ item }: { item: EntityCatalogItem }) {
   return (
     <span
       aria-label={`${item.totalBottles.toLocaleString("en-US")} bottles and ${item.totalTastings.toLocaleString("en-US")} tastings`}
+      role="group"
       {...stylex.props(styles.measures)}
     >
       <span {...stylex.props(styles.measure)}>

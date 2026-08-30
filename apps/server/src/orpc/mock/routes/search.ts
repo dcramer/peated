@@ -4,6 +4,7 @@ import {
   mockBottleFor,
   mockBottles,
   mockEntities,
+  mockEntityFor,
   mockFriendDetails,
   mockFriends,
   mockRegions,
@@ -14,6 +15,9 @@ import { mockOS } from "@peated/server/orpc/mock/implementer";
 
 export default mockOS.search.handler(async ({ input, context }) => {
   const groups: MockOutputs["search"]["groups"] = [];
+  const entities = mockEntities.map((entity) =>
+    mockEntityFor(Boolean(context.user), entity),
+  );
   const bottles = mockBottles
     .filter((bottle) =>
       includesQuery(
@@ -27,7 +31,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
   const matchingEntities = (
     predicate: (entity: (typeof mockEntities)[number]) => boolean,
   ) =>
-    mockEntities.filter(
+    entities.filter(
       (entity) =>
         predicate(entity) &&
         includesQuery(input.query, entity.name, entity.shortName),
@@ -117,7 +121,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
           return false;
       }
     });
-  const exactEntity = mockEntities.find(
+  const exactEntity = entities.find(
     (entity) =>
       entityMatchesSelectedScope(entity) &&
       [entity.peatedId, entity.name, entity.shortName].some(

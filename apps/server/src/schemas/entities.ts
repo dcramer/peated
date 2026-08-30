@@ -100,6 +100,11 @@ export const EntitySchema = z.object({
     .readonly()
     .describe("Total number of bottles associated with this entity"),
 
+  isFollowing: z
+    .boolean()
+    .readonly()
+    .describe("Whether the current user follows this entity"),
+
   createdAt: z
     .string()
     .datetime()
