@@ -254,9 +254,14 @@ export function HomeOrigins({
                   </span>
                 </span>
                 {region.description ? (
-                  <span {...stylex.props(styles.regionDescription)}>
-                    {region.description}
-                  </span>
+                  <>
+                    <span {...stylex.props(styles.regionDescription)}>
+                      {region.description}
+                    </span>
+                    <span {...stylex.props(styles.regionMore)}>
+                      Read more <span aria-hidden="true">→</span>
+                    </span>
+                  </>
                 ) : null}
               </CardLink>
             ))}
@@ -533,8 +538,9 @@ const styles = stylex.create({
     },
   },
   region: {
-    display: "block",
+    display: "flex",
     minWidth: 0,
+    flexDirection: "column",
     padding: space.x3,
     color: colors.ink,
     textDecoration: "none",
@@ -563,13 +569,25 @@ const styles = stylex.create({
     lineHeight: 1.4,
   },
   regionDescription: {
-    display: "block",
+    display: "-webkit-box",
     marginTop: space.x1,
     color: colors.inkMuted,
     fontFamily: fonts.reading,
     fontSize: "13px",
     lineHeight: 1.45,
+    overflow: "hidden",
     textWrap: "pretty",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 3,
+  },
+  regionMore: {
+    display: "block",
+    marginTop: space.x2,
+    color: colors.accentDeep,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+    lineHeight: 1.2,
   },
   countryGrid: {
     display: "grid",

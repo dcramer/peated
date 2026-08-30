@@ -114,7 +114,7 @@ export function PublicHome() {
         />
       }
       signedIn={false}
-      title="Whisky bottlings, critic scores and tasting notes."
+      title="A record of whisky, bottle by bottle."
     />
   );
 }
