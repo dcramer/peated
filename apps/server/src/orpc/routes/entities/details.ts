@@ -2,13 +2,15 @@ import { db } from "@peated/server/db";
 import {
   entities,
   entityFollows,
+  entityImages,
   entityTombstones,
 } from "@peated/server/db/schema";
 import { implement } from "@peated/server/orpc";
 import entityDetailsContract from "@peated/server/orpc/contracts/entities/details";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
+import { and, asc, desc, eq, getTableColumns } from "drizzle-orm";
 
 export default implement(entityDetailsContract).handler(async function ({
   input,
@@ -52,8 +54,19 @@ export default implement(entityDetailsContract).handler(async function ({
     isFollowing = Boolean(follow);
   }
 
+  const images = await db
+    .select()
+    .from(entityImages)
+    .where(eq(entityImages.entityId, entity.id))
+    .orderBy(
+      desc(entityImages.isPrimary),
+      asc(entityImages.createdAt),
+      asc(entityImages.id),
+    );
+
   return {
     ...(await serialize(EntitySerializer, entity, context.user)),
+    images: await serialize(EntityImageSerializer, images, context.user),
     isFollowing,
   };
 });

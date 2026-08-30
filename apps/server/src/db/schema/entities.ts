@@ -3,6 +3,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  boolean,
   foreignKey,
   index,
   pgEnum,
@@ -102,6 +103,38 @@ export const entities = pgTable(
   ],
 );
 
+export const entityImages = pgTable(
+  "entity_image",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: bigint("entity_id", { mode: "number" })
+      .references(() => entities.id, { onDelete: "cascade" })
+      .notNull(),
+    imageUrl: text("image_url").notNull(),
+    caption: text("caption"),
+    idempotencyKey: varchar("idempotency_key", { length: 128 }),
+    // Image mutations keep exactly one primary image while an Entity has images.
+    isPrimary: boolean("is_primary").default(false).notNull(),
+    createdByActorId: bigint("created_by_actor_id", { mode: "number" })
+      .references(() => actors.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("entity_image_entity_idx").on(table.entityId),
+    index("entity_image_created_by_actor_idx").on(table.createdByActorId),
+    uniqueIndex("entity_image_primary_unq")
+      .on(table.entityId)
+      .where(sql`${table.isPrimary}`),
+    uniqueIndex("entity_image_idempotency_unq").on(
+      table.entityId,
+      table.createdByActorId,
+      table.idempotencyKey,
+    ),
+  ],
+);
+
 export const entitiesRelations = relations(entities, ({ one, many }) => ({
   distillersToBottles: many(bottlesToDistillers),
   brandsToBottles: many(bottles),
@@ -124,13 +157,27 @@ export const entitiesRelations = relations(entities, ({ one, many }) => ({
     references: [actors.id],
   }),
   events: many(entityEvents, { relationName: "entityEvents" }),
+  images: many(entityImages),
   acquisitionEvents: many(entityEvents, {
     relationName: "entityEventNewOwner",
   }),
 }));
 
+export const entityImagesRelations = relations(entityImages, ({ one }) => ({
+  entity: one(entities, {
+    fields: [entityImages.entityId],
+    references: [entities.id],
+  }),
+  createdByActor: one(actors, {
+    fields: [entityImages.createdByActorId],
+    references: [actors.id],
+  }),
+}));
+
 export type Entity = typeof entities.$inferSelect;
 export type NewEntity = typeof entities.$inferInsert;
+export type EntityImage = typeof entityImages.$inferSelect;
+export type NewEntityImage = typeof entityImages.$inferInsert;
 
 export const entityAliases = pgTable(
   "entity_alias",

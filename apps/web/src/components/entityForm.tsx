@@ -15,6 +15,11 @@ import {
   TextInput,
   type EntityPickerOption,
 } from "@peated/web/components/designSystem/components";
+import {
+  entityImageDrafts,
+  EntityImageEditor,
+  type EntityImageDraft,
+} from "@peated/web/components/entityImageEditor.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
@@ -29,19 +34,31 @@ import type { z } from "zod";
 
 type EntityFormData = z.infer<typeof EntityInputSchema>;
 
+export type EntityFormInitialData = Partial<Entity> & {
+  images?: Parameters<typeof entityImageDrafts>[0];
+};
+
 export default function EntityForm({
   initialData = {},
+  manageImages = false,
   onSubmit,
   title,
 }: {
-  initialData?: Partial<Entity>;
-  onSubmit: SubmitHandler<EntityFormData>;
+  initialData?: EntityFormInitialData;
+  manageImages?: boolean;
+  onSubmit: (
+    data: EntityFormData,
+    images: EntityImageDraft[],
+  ) => void | Promise<void>;
   title: string;
 }) {
   const orpc = useORPC();
   const { user } = useAuth();
   const [submitError, setSubmitError] = useState<string>();
   const [ownerQuery, setOwnerQuery] = useState("");
+  const [images, setImages] = useState(() =>
+    entityImageDrafts(initialData.images),
+  );
   const [owner, setOwner] = useState<EntityPickerOption | null>(() =>
     initialData.owner
       ? {
@@ -92,7 +109,7 @@ export default function EntityForm({
   const submit: SubmitHandler<EntityFormData> = async (data) => {
     setSubmitError(undefined);
     try {
-      await onSubmit(data);
+      await onSubmit(data, images);
     } catch (error) {
       setSubmitError(getFormErrorMessage(error));
     }
@@ -236,6 +253,16 @@ export default function EntityForm({
               />
             </Field>
           </FormSection>
+
+          {manageImages ? (
+            <FormSection title="Images">
+              <EntityImageEditor
+                disabled={isSubmitting}
+                images={images}
+                onChange={setImages}
+              />
+            </FormSection>
+          ) : null}
 
           <FormSection
             action={

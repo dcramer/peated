@@ -13,6 +13,7 @@ import { EntityBottleOverview } from "./entityBottleOverview";
 import { EntityCatalogRelationships } from "./entityCatalogRelationships";
 import { EntityDetails, hasEntityDetails } from "./entityDetails.stylex";
 import { EntityHistoryOverview } from "./entityHistoryOverview.stylex";
+import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
 import { entityHasBottleCatalog, type Entity } from "./entityPageData";
@@ -138,7 +139,11 @@ export function EntityOverviewClient({
       </div>
 
       <aside {...stylex.props(styles.details)}>
-        <EntityImagePlaceholder entityName={entity.name} kind={entity.kind} />
+        {entity.images.length ? (
+          <EntityImageGallery entity={entity} />
+        ) : (
+          <EntityImagePlaceholder entityName={entity.name} kind={entity.kind} />
+        )}
         <EntityMap entity={entity} />
         <EntityCatalogRelationships
           catalog={catalogQuery.data}

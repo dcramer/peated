@@ -65,6 +65,28 @@ const EntityLocationSchema = PointSchema.nullable()
   .default(null)
   .describe("Geographic coordinates of the entity");
 
+export const EntityImageSchema = z.object({
+  id: z.number().readonly().describe("Unique identifier for the image"),
+  entityId: z.number().readonly().describe("Entity that owns the image"),
+  imageUrl: z.string().url().readonly().describe("URL of the stored image"),
+  caption: z.string().nullable().readonly().describe("Optional image caption"),
+  isPrimary: z
+    .boolean()
+    .readonly()
+    .describe("Whether this is the Entity's default image"),
+  createdAt: z.string().datetime().readonly(),
+  updatedAt: z.string().datetime().readonly(),
+});
+
+export const EntityImageCaptionSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(500)
+  .nullable()
+  .default(null)
+  .describe("Optional image caption");
+
 export const EntitySchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the entity"),
   peatedId: z
@@ -118,6 +140,10 @@ export const EntitySchema = z.object({
 });
 
 export const EntityDetailsSchema = EntitySchema.extend({
+  images: z
+    .array(EntityImageSchema)
+    .readonly()
+    .describe("Images attached to the Entity, with the primary image first"),
   isFollowing: z
     .boolean()
     .readonly()

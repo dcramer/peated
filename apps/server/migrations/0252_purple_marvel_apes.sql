@@ -1,0 +1,2 @@
+ALTER TABLE "entity_image" ADD COLUMN "idempotency_key" varchar(128);
+CREATE UNIQUE INDEX "entity_image_idempotency_unq" ON "entity_image" USING btree ("entity_id","created_by_actor_id","idempotency_key");
