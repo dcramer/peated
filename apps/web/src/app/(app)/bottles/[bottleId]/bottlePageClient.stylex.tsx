@@ -62,7 +62,7 @@ function getBottleDetail(bottle: Bottle) {
   return (
     <Join divider=" · ">
       {[
-        formatCategoryName(bottle.category),
+        bottle.category ? formatCategoryName(bottle.category) : null,
         bottle.distillers.length ? (
           <EntityLinks entities={bottle.distillers} key="distillers" />
         ) : null,
