@@ -17,7 +17,6 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
         ? "No age statement"
         : null,
     bottle.abv !== null ? `${formatAbv(bottle.abv)}% ABV` : null,
-    `${bottle.totalTastings.toLocaleString("en-US")} ${bottle.totalTastings === 1 ? "tasting" : "tastings"}`,
   ].filter((value): value is string => value !== null);
   const relatedReleaseCount = bottle.group?.totalBottles ?? 1;
 
@@ -43,6 +42,7 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
     scoreHigh: bottle.maxScore,
     scoreLow: bottle.minScore,
     scoreCount: bottle.scoreCount,
+    totalTastings: bottle.totalTastings,
   };
 }
 
