@@ -1,0 +1,51 @@
+{
+  "changedFiles": [
+    "apps/web/e2e/mock-rpc-server.mjs",
+    "apps/web/src/app/(app)/entities/[entityId]/entityImageGallery.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entityOverviewClient.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/layout.tsx"
+  ],
+  "commitSha": "fe536ade672265f593eb10d95c7f3316c9ce6b57",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "member-profile"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
