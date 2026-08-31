@@ -8,13 +8,13 @@ import { StoryCanvas } from "./storyFixtures.stylex";
 
 const options = [
   {
-    description: "Retire the selected duplicate and keep the current record.",
-    label: "Keep this record",
+    description: "Retire the selected duplicate and keep the current one.",
+    label: "Keep the current one",
     value: "current",
   },
   {
-    description: "Retire the current record and keep the selected duplicate.",
-    label: "Keep the selected record",
+    description: "Retire the current one and keep the selected duplicate.",
+    label: "Keep the selected one",
     value: "other",
   },
 ] as const;
@@ -24,7 +24,7 @@ const meta = {
   component: ChoiceList,
   args: {
     id: "merge-direction",
-    label: "Merge direction",
+    label: "Which one should remain?",
     name: "merge-direction",
     onChange: () => undefined,
     options,

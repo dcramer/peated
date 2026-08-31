@@ -100,10 +100,10 @@ export function EntityOverviewClient({
   if (entityQuery.error) {
     return (
       <SectionError
-        heading="Entity details are unavailable"
+        heading="Details are unavailable"
         onRetry={() => void entityQuery.refetch()}
       >
-        We could not load this entity. Try again.
+        We could not load these details. Try again.
       </SectionError>
     );
   }

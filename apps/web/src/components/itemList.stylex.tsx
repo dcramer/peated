@@ -13,31 +13,27 @@ import { linkedRowStyles } from "./linkedRow.stylex";
 
 const MOBILE = "@media (max-width: 559px)";
 
-export type ItemListVariant = "plain" | "surface";
 export type ItemRowSize = "sm" | "md";
 
 export type ItemListProps = {
   ariaLabel: string;
   children: ReactNode;
   showTopDivider?: boolean;
-  variant?: ItemListVariant;
 };
 
-/** Groups aligned records with one shared divider and surface contract. */
+/** Groups aligned items with one shared row-divider contract. */
 export function ItemList({
   ariaLabel,
   children,
   showTopDivider = true,
-  variant = "plain",
 }: ItemListProps) {
   return (
     <ul
       aria-label={ariaLabel}
       {...stylex.props(
         styles.list,
-        variant === "plain" && styles.plainList,
-        variant === "plain" && !showTopDivider && styles.withoutTopDivider,
-        variant === "surface" && styles.surfaceList,
+        styles.listWithDivider,
+        !showTopDivider && styles.withoutTopDivider,
       )}
     >
       {children}
@@ -70,10 +66,9 @@ export type ItemRowProps = {
   metadataWrap?: boolean;
   size?: ItemRowSize;
   title: ReactNode;
-  variant?: ItemListVariant;
 };
 
-/** Renders one aligned record with a primary link across the row surface. */
+/** Renders one aligned item with a primary link across the complete row. */
 export function ItemRow({
   action,
   description,
@@ -85,7 +80,6 @@ export function ItemRow({
   metadataWrap = false,
   size = "md",
   title,
-  variant = "plain",
 }: ItemRowProps) {
   const hasLinkedContent = Boolean(href);
 
@@ -95,15 +89,9 @@ export function ItemRow({
         {...stylex.props(
           styles.content,
           size === "sm" && styles.smallContent,
-          variant === "surface" && styles.surfaceContent,
-          hasLinkedContent &&
-            variant === "plain" &&
-            styles.plainInteractiveContent,
+          hasLinkedContent && styles.interactiveContent,
           hasLinkedContent && linkedRowStyles.container,
-          hasLinkedContent &&
-            (variant === "plain"
-              ? linkedRowStyles.onGround
-              : linkedRowStyles.onSurface),
+          hasLinkedContent && linkedRowStyles.onGround,
         )}
       >
         {leading ? (
@@ -159,21 +147,13 @@ const styles = stylex.create({
     padding: 0,
     listStyle: "none",
   },
-  plainList: {
+  listWithDivider: {
     borderTopWidth: "1px",
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
   },
   withoutTopDivider: {
     borderTopWidth: 0,
-  },
-  surfaceList: {
-    overflow: "visible",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-    borderRadius: 0,
-    backgroundColor: "transparent",
   },
   row: {
     minWidth: 0,
@@ -201,11 +181,7 @@ const styles = stylex.create({
     paddingTop: "11px",
     paddingBottom: "11px",
   },
-  surfaceContent: {
-    paddingRight: 0,
-    paddingLeft: 0,
-  },
-  plainInteractiveContent: {
+  interactiveContent: {
     width: "calc(100% + 24px)",
     marginRight: "-12px",
     marginLeft: "-12px",

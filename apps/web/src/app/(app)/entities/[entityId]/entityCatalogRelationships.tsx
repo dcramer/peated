@@ -48,17 +48,20 @@ export function EntityCatalogRelationships({
 
   if (pending) {
     return (
-      <PageSection heading="Related records">
-        <LoadingList label="Loading related records" rows={3} />
+      <PageSection heading="Related brands and producers">
+        <LoadingList label="Loading related brands and producers" rows={3} />
       </PageSection>
     );
   }
 
   if (error) {
     return (
-      <PageSection heading="Related records">
-        <SectionError heading="Related records are unavailable" onRetry={retry}>
-          Try loading the related records again.
+      <PageSection heading="Related brands and producers">
+        <SectionError
+          heading="Related brands and producers are unavailable"
+          onRetry={retry}
+        >
+          Try loading the related brands and producers again.
         </SectionError>
       </PageSection>
     );

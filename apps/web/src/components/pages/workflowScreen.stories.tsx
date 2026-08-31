@@ -6,7 +6,7 @@ import { SelectedBottleSummary } from "../selectedBottleSummary.stylex";
 import { WorkflowScreen } from "../workflowScreen.stylex";
 
 const meta = {
-  title: "Pages/Workflow",
+  title: "Components/Layout/Workflow Screen",
   component: WorkflowScreen,
   args: {
     children: null,

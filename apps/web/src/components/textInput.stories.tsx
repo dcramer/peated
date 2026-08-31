@@ -6,7 +6,7 @@ import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 const meta = {
   title: "Components/Forms/Text Input",
   component: TextInput,
-  args: { placeholder: "Bottling name" },
+  args: { placeholder: "Bottle name" },
   decorators: [
     (Story) => (
       <StoryCanvas width="compact">

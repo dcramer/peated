@@ -58,7 +58,6 @@ function TastingActivity({ session }: { session: TastingSession }) {
         />
       }
       members={members}
-      surface
     />
   );
 }

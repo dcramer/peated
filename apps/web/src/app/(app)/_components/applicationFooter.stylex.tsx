@@ -37,7 +37,7 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
         },
       ]}
       responsibility="Drink responsibly"
-      statement="A record of whisky bottlings, critic scores, and tasting notes from the people who drank them."
+      statement="A record of whisky bottles, critic scores, and tasting notes from the people who drank them."
     />
   );
 }

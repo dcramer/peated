@@ -37,7 +37,7 @@ export function AliasManager({
       cell: (item) => (
         <span {...stylex.props(styles.name)}>
           <span>{item.name}</span>
-          {item.isCanonical ? <Chip variant="tinted">Canonical</Chip> : null}
+          {item.isCanonical ? <Chip variant="tinted">Primary</Chip> : null}
         </span>
       ),
       header: "Name",

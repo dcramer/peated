@@ -68,10 +68,6 @@ export const colors = stylex.defineVars({
     default: "rgb(22 25 20 / 0.16)",
     [DARK]: "rgb(232 234 227 / 0.16)",
   },
-  dividerOnPanel: {
-    default: "rgb(22 25 20 / 0.14)",
-    [DARK]: "rgb(232 234 227 / 0.15)",
-  },
   fieldRule: {
     default: "rgb(22 25 20 / 0.28)",
     [DARK]: "rgb(232 234 227 / 0.32)",
@@ -119,7 +115,6 @@ export const lightColorTheme = stylex.createTheme(colors, {
   verdictTrack: "rgb(22 25 20 / 0.20)",
   hairline: "rgb(22 25 20 / 0.11)",
   sectionRule: "rgb(22 25 20 / 0.16)",
-  dividerOnPanel: "rgb(22 25 20 / 0.14)",
   fieldRule: "rgb(22 25 20 / 0.28)",
   fieldBackground: "rgb(255 255 255 / 0.55)",
   imageBackground: "#ffffff",
@@ -155,7 +150,6 @@ export const darkColorTheme = stylex.createTheme(colors, {
   verdictTrack: "rgb(232 234 227 / 0.22)",
   hairline: "rgb(232 234 227 / 0.11)",
   sectionRule: "rgb(232 234 227 / 0.16)",
-  dividerOnPanel: "rgb(232 234 227 / 0.15)",
   fieldRule: "rgb(232 234 227 / 0.32)",
   fieldBackground: "rgb(255 255 255 / 0.04)",
   imageBackground: "#ffffff",

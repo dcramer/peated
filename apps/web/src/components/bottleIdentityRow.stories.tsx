@@ -68,24 +68,6 @@ export const Overview: Story = {
   ),
 };
 
-export const Surface: Story = {
-  render: (args) => (
-    <ItemList ariaLabel="Bottle identity surface examples" variant="surface">
-      <ItemListItem>
-        <BottleIdentityRow {...args} variant="surface" />
-      </ItemListItem>
-      <ItemListItem>
-        <BottleIdentityRow
-          {...args}
-          imageUrl={null}
-          name="Lagavulin 16-year-old"
-          variant="surface"
-        />
-      </ItemListItem>
-    </ItemList>
-  ),
-};
-
 export const InteractionStates: Story = {
   render: (args) => (
     <StoryStack>

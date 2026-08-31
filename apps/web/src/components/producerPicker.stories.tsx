@@ -3,13 +3,16 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { EntityPicker, type EntityPickerOption } from "./entityPicker.stylex";
+import {
+  ProducerPicker,
+  type ProducerPickerOption,
+} from "./producerPicker.stylex";
 import { distillerOptions } from "./storyData";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Catalog/Entity Picker",
-  component: EntityPicker,
+  title: "Components/Catalog/Brand and Producer Picker",
+  component: ProducerPicker,
   args: {
     kind: "distiller",
     onChange: () => undefined,
@@ -28,7 +31,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof EntityPicker>;
+} satisfies Meta<typeof ProducerPicker>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -36,8 +39,8 @@ type Story = StoryObj<typeof meta>;
 export const Search: Story = {
   render: (args) => (
     <StoryStack>
-      <ControlledEntityPicker {...args} />
-      <ControlledEntityPicker
+      <ControlledProducerPicker {...args} />
+      <ControlledProducerPicker
         {...args}
         error="Brand is required."
         kind="brand"
@@ -49,18 +52,18 @@ export const Search: Story = {
 
 export const Selected: Story = {
   args: { value: distillerOptions[0] },
-  render: (args) => <ControlledEntityPicker {...args} />,
+  render: (args) => <ControlledProducerPicker {...args} />,
 };
 
 export const WithCreateHandoff: Story = {
   render: (args) => (
-    <ControlledEntityPicker {...args} onCreate={() => undefined} />
+    <ControlledProducerPicker {...args} onCreate={() => undefined} />
   ),
 };
 
-function ControlledEntityPicker(
-  props: React.ComponentProps<typeof EntityPicker>,
+function ControlledProducerPicker(
+  props: React.ComponentProps<typeof ProducerPicker>,
 ) {
-  const [value, setValue] = useState<EntityPickerOption | null>(props.value);
-  return <EntityPicker {...props} onChange={setValue} value={value} />;
+  const [value, setValue] = useState<ProducerPickerOption | null>(props.value);
+  return <ProducerPicker {...props} onChange={setValue} value={value} />;
 }

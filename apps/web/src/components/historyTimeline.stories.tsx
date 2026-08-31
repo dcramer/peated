@@ -61,7 +61,7 @@ const meta = {
   args: {
     events: broraHistory,
     summary:
-      "silent 1983–2021 · in production since 2021 · 5 recorded items, oldest first",
+      "silent 1983–2021 · in production since 2021 · 5 events, oldest first",
   },
 } satisfies Meta<typeof HistoryTimeline>;
 
@@ -93,6 +93,6 @@ export const ContinuouslyOperating: Story = {
         title: "Stillhouse expanded",
       },
     ],
-    summary: "in continuous production · 3 recorded items, oldest first",
+    summary: "in continuous production · 3 events, oldest first",
   },
 };

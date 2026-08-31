@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, fonts } from "../styles/tokens.stylex";
+import { colors, fonts, space } from "../styles/tokens.stylex";
 
 export type SummaryStripCell = {
   detail?: string;
@@ -52,7 +52,7 @@ const styles = stylex.create({
     display: "grid",
     width: "100%",
     gridTemplateColumns: "repeat(auto-fit, minmax(min(128px, 100%), 1fr))",
-    gap: "6px",
+    gap: space.x4,
     margin: 0,
     padding: 0,
   },
@@ -61,12 +61,6 @@ const styles = stylex.create({
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
-    paddingRight: "24px",
-    paddingLeft: "24px",
-    borderLeftWidth: "1px",
-    borderLeftStyle: "solid",
-    borderLeftColor: colors.hairline,
-    ":first-child": { paddingLeft: 0, borderLeftWidth: 0 },
   },
   label: {
     order: 2,

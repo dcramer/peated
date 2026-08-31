@@ -31,7 +31,7 @@ export default function Page() {
       />
       <AdminPageHeader
         actions={
-          <Button color="primary" href="/admin/oauth-clients/add">
+          <Button variant="default" href="/admin/oauth-clients/add">
             Register Client
           </Button>
         }

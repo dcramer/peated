@@ -37,14 +37,14 @@ export const Overview: Story = {
       <SummaryStrip {...args} />
       <SummaryStrip
         cells={[
-          { label: "Bottlings", value: "2,841" },
+          { label: "Bottles", value: "2,841" },
           { label: "Distillers", value: 148 },
           { label: "Countries", value: 12 },
         ]}
       />
       <SummaryStrip
         cells={[
-          { label: "Bottlings", value: 41 },
+          { label: "Bottles", value: 41 },
           { label: "Tastings", value: 128 },
           { label: "Distillers", value: 23 },
           { label: "Regions", value: 5 },

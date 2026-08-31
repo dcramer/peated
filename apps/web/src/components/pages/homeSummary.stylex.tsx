@@ -95,12 +95,6 @@ const styles = stylex.create({
   recordPanel: {
     paddingTop: "22px",
     paddingBottom: "22px",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
     backgroundColor: "transparent",
   },
   recordTotal: {

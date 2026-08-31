@@ -21,6 +21,9 @@ export function LocationCard({
   totalBottles,
   totalDistillers,
 }: LocationCardProps) {
+  const bottleNoun = totalBottles === 1 ? "bottle" : "bottles";
+  const distillerNoun = totalDistillers === 1 ? "distiller" : "distillers";
+
   return (
     <CardLink href={href}>
       <div {...stylex.props(styles.map)}>
@@ -33,8 +36,8 @@ export function LocationCard({
       <h2 {...stylex.props(styles.title)}>{name}</h2>
       {summary ? <p {...stylex.props(styles.summary)}>{summary}</p> : null}
       <p {...stylex.props(styles.counts)}>
-        {totalBottles.toLocaleString("en-US")} bottles ·{" "}
-        {totalDistillers.toLocaleString("en-US")} distillers
+        {totalBottles.toLocaleString("en-US")} {bottleNoun} ·{" "}
+        {totalDistillers.toLocaleString("en-US")} {distillerNoun}
       </p>
     </CardLink>
   );

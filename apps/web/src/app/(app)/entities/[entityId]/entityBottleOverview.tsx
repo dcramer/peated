@@ -57,14 +57,13 @@ export function EntityBottleOverview({
           heading="Associated bottles are unavailable"
           onRetry={retry}
         >
-          The entity record is still available. Try loading its bottles again.
+          The rest of this page still works. Try loading its bottles again.
         </SectionError>
       </PageSection>
     );
   }
 
   if (!bottleList?.results.length) {
-    const isBottling = presentation.bottleSectionLabel === "Bottlings";
     const addBottleHref =
       createBottleHref ??
       `/bottles/new?${new URLSearchParams({
@@ -79,7 +78,7 @@ export function EntityBottleOverview({
               Add a bottle
             </ButtonLink>
           }
-          heading={isBottling ? "No bottlings yet" : "No bottles yet"}
+          heading="No bottles yet"
         >
           No {presentation.bottleSectionLabel.toLowerCase()} have been added for
           {entity.name} yet.

@@ -7,9 +7,9 @@ const meta = {
   title: "Components/Forms/Field",
   component: Field,
   args: {
-    children: <TextInput id="bottling-name" placeholder="Bottling name" />,
-    htmlFor: "bottling-name",
-    label: "Bottling name",
+    children: <TextInput id="bottle-name" placeholder="Bottle name" />,
+    htmlFor: "bottle-name",
+    label: "Bottle name",
   },
   argTypes: { children: { control: false } },
   decorators: [
@@ -28,28 +28,28 @@ export const Overview: Story = {
   render: (args) => (
     <StoryStack>
       <Field {...args} />
-      <Field htmlFor="required-bottling-name" label="Bottling name" required>
-        <TextInput id="required-bottling-name" placeholder="Bottling name" />
+      <Field htmlFor="required-bottle-name" label="Bottle name" required>
+        <TextInput id="required-bottle-name" placeholder="Bottle name" />
       </Field>
       <Field
         hint="The name printed on the bottle."
-        htmlFor="optional-bottling-name"
-        label="Bottling name"
+        htmlFor="optional-bottle-name"
+        label="Bottle name"
         optional
       >
-        <TextInput id="optional-bottling-name" placeholder="Bottling name" />
+        <TextInput id="optional-bottle-name" placeholder="Bottle name" />
       </Field>
       <Field
         error="Check the spelling before publishing."
-        errorId="bottling-name-error"
-        htmlFor="bottling-name-error-input"
-        label="Bottling name"
+        errorId="bottle-name-error"
+        htmlFor="bottle-name-error-input"
+        label="Bottle name"
         required
       >
         <TextInput
-          aria-describedby="bottling-name-error"
+          aria-describedby="bottle-name-error"
           defaultValue="Lagavln"
-          id="bottling-name-error-input"
+          id="bottle-name-error-input"
           invalid
         />
       </Field>

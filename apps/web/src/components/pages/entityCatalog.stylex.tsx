@@ -149,9 +149,12 @@ export function EntityCatalogList({
 }
 
 function EntityCounts({ item }: { item: EntityCatalogItem }) {
+  const bottleNoun = item.totalBottles === 1 ? "bottle" : "bottles";
+  const tastingNoun = item.totalTastings === 1 ? "tasting" : "tastings";
+
   return (
     <span
-      aria-label={`${item.totalBottles.toLocaleString("en-US")} bottles and ${item.totalTastings.toLocaleString("en-US")} tastings`}
+      aria-label={`${item.totalBottles.toLocaleString("en-US")} ${bottleNoun} and ${item.totalTastings.toLocaleString("en-US")} ${tastingNoun}`}
       role="group"
       {...stylex.props(styles.counts)}
     >
@@ -159,13 +162,13 @@ function EntityCounts({ item }: { item: EntityCatalogItem }) {
         <strong {...stylex.props(styles.countValue)}>
           {item.totalBottles.toLocaleString("en-US")}
         </strong>
-        <span {...stylex.props(styles.countLabel)}>Bottles</span>
+        <span {...stylex.props(styles.countLabel)}>{bottleNoun}</span>
       </span>
       <span {...stylex.props(styles.count, styles.tastingCount)}>
         <strong {...stylex.props(styles.countValue)}>
           {item.totalTastings.toLocaleString("en-US")}
         </strong>
-        <span {...stylex.props(styles.countLabel)}>Tastings</span>
+        <span {...stylex.props(styles.countLabel)}>{tastingNoun}</span>
       </span>
     </span>
   );

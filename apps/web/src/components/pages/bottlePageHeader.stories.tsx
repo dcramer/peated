@@ -33,7 +33,7 @@ const meta = {
             { href: "#share", label: "Share" },
           ],
         ]}
-        label="Bottle record"
+        label="Bottle actions"
         variant="page"
       />
     ),

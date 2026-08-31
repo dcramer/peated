@@ -117,7 +117,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
           : `${bottle.maltPhenolPpm.toLocaleString("en-US")} PPM`,
     },
     {
-      label: "Colouring",
+      label: "Coloring",
       value:
         bottle.naturalColor === null
           ? null
@@ -344,7 +344,7 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
     ]);
   }
 
-  return <RowMenu groups={groups} label="Bottle record" variant="page" />;
+  return <RowMenu groups={groups} label="Bottle actions" variant="page" />;
 }
 
 export function BottlePageFrameClient({

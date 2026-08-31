@@ -82,7 +82,7 @@ export function PublicHome() {
           </PageColumns>
         </>
       }
-      description="Browse whisky bottlings, including single casks, with critic scores and tasting notes. No account needed."
+      description="Browse whisky bottles, including single casks, with critic scores and tasting notes. No account needed."
       search={
         <Search
           onSubmit={(query) =>
@@ -92,11 +92,11 @@ export function PublicHome() {
           }
           placeholder={
             totalBottles === undefined
-              ? "Search bottlings…"
-              : `Search ${totalBottles.toLocaleString("en-US")} bottlings…`
+              ? "Search bottles…"
+              : `Search ${totalBottles.toLocaleString("en-US")} bottles…`
           }
           scopeValues={["all"]}
-          showBottleMeasures={false}
+          showBottleRatings={false}
           submitLabel="Search"
         />
       }
@@ -312,7 +312,7 @@ function Distilleries({
         heading="Distilleries are unavailable"
         onRetry={() => void distilleries.refetch()}
       >
-        We couldn't load the distilleries with the most bottlings. The other
+        We couldn't load the distilleries with the most bottles. The other
         homepage sections still work.
       </SectionError>
     );

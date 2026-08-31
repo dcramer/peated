@@ -30,7 +30,7 @@ const meta = {
           [{ label: "Share", onSelect: () => undefined }],
           [
             { href: "#aliases", label: "View aliases" },
-            { href: "#edit", label: "Edit entity" },
+            { href: "#edit", label: "Edit distillery" },
           ],
         ]}
         label="Lagavulin"
@@ -67,6 +67,6 @@ export const ThinData: Story = {
       { label: "Bottles", value: 0 },
       { label: "Tastings", value: 0 },
     ],
-    title: "Unnamed distillery record with a deliberately long catalog name",
+    title: "A deliberately long unnamed distillery name",
   },
 };

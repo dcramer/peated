@@ -4,7 +4,7 @@ import { StoryCanvas } from "../storyFixtures.stylex";
 import { HomeRecentReviews } from "./homeBrowse.stylex";
 
 const meta = {
-  title: "Pages/Home",
+  title: "Components/Home/Recent Reviews",
   component: HomeRecentReviews,
   decorators: [
     (Story) => (

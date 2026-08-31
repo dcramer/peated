@@ -25,7 +25,7 @@ export type BottleComparisonTableProps = {
 
 /** Compares bottles across one or more compact rating or fact columns. */
 export function BottleComparisonTable({
-  ariaLabel = "Bottle records",
+  ariaLabel = "Bottle comparison",
   columns,
   detail,
   heading,

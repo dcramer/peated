@@ -160,7 +160,7 @@ export default function InboxPage({
                 action={
                   data.results[0] ? (
                     <Button
-                      color="highlight"
+                      variant="accent"
                       href={inboxTaskHref(data.results[0], searchParams)}
                     >
                       Start with the oldest

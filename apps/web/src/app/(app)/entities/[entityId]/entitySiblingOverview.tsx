@@ -31,12 +31,12 @@ export function EntitySiblingOverview({
 
   const heading = entity.owner?.name
     ? `Also part of ${entity.owner.name}`
-    : "Related entities";
+    : "Related brands and producers";
 
   if (pending) {
     return (
       <PageSection heading={heading}>
-        <LoadingList label="Loading related entities" rows={3} />
+        <LoadingList label="Loading related brands and producers" rows={3} />
       </PageSection>
     );
   }
@@ -45,10 +45,10 @@ export function EntitySiblingOverview({
     return (
       <PageSection heading={heading}>
         <SectionError
-          heading="Related entities are unavailable"
+          heading="Related brands and producers are unavailable"
           onRetry={retry}
         >
-          Try loading the related entities again.
+          Try loading the related brands and producers again.
         </SectionError>
       </PageSection>
     );

@@ -1043,7 +1043,7 @@ function AddBottleFlowContent() {
           placement="page"
           placeholder="Search by bottle, brand, or distiller…"
           scopeValues={["bottles"]}
-          showBottleMeasures={false}
+          showBottleRatings={false}
         />
       }
       searchHrefForQuery={(query, pendingImage) =>

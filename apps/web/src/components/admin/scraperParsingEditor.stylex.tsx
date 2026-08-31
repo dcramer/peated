@@ -219,7 +219,7 @@ export function ScraperParsingEditor({
               </AdminButton>
               {source.enabled ? (
                 <AdminButton
-                  color="danger"
+                  variant="danger"
                   disabled={busy}
                   onClick={() =>
                     void runAndRefresh(async () => {
@@ -256,7 +256,7 @@ export function ScraperParsingEditor({
               />
               <AdminActions>
                 <AdminButton
-                  color="highlight"
+                  variant="accent"
                   disabled={busy}
                   onClick={() =>
                     void runAndRefresh(async () => {
@@ -325,7 +325,7 @@ export function ScraperParsingEditor({
                         : "Test version"}
                     </AdminButton>
                     <AdminButton
-                      color="highlight"
+                      variant="accent"
                       disabled={
                         busy ||
                         revision.previewStatus !== "passed" ||

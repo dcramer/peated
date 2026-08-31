@@ -29,7 +29,7 @@ export const Overview: Story = {
       <CardLink href="#lagavulin">
         <SectionHeading>Lagavulin</SectionHeading>
       </CardLink>
-      <Card appearance="surface" linked>
+      <Card appearance="plain" linked>
         <CardPrimaryLink href="#springbank">
           <SectionHeading>Springbank 10-year-old</SectionHeading>
         </CardPrimaryLink>

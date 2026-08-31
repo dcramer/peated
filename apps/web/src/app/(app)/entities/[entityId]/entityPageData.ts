@@ -15,7 +15,7 @@ type EntityClassificationSource = Pick<Entity, "kind" | "yearEstablished"> & {
 
 const entityKindPresentation = {
   bottler: {
-    bottleSectionLabel: "Bottlings",
+    bottleSectionLabel: "Bottles",
     establishmentLabel: "Founded",
     label: "Bottler",
   },
@@ -30,7 +30,7 @@ const entityKindPresentation = {
     label: "Company",
   },
   distillery: {
-    bottleSectionLabel: "Bottlings",
+    bottleSectionLabel: "Bottles",
     establishmentLabel: "Founded",
     label: "Distillery",
   },
@@ -39,7 +39,7 @@ const entityKindPresentation = {
 const fallbackPresentation = {
   bottleSectionLabel: "Bottles",
   establishmentLabel: "Established",
-  label: "Entity",
+  label: "Brand or producer",
 } as const;
 
 export function getEntityPresentation(entity: Pick<Entity, "kind">) {

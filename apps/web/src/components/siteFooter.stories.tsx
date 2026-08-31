@@ -22,7 +22,7 @@ const meta = {
       { href: "/bottlers/4263/codes", label: "SMWS distillery codes" },
     ],
     statement:
-      "A record of every whisky bottling, what the critics said, and what the people who drank it said.",
+      "A record of whisky bottles, critic scores, and tasting notes from the people who drank them.",
   },
   argTypes: {
     links: { control: false },

@@ -16,7 +16,6 @@ import type { Entity, EntityKind } from "@peated/server/types";
 import {
   BottleIdentityRow,
   Button,
-  EntityPicker,
   Field,
   FieldGroup,
   FormActions,
@@ -26,13 +25,14 @@ import {
   FormSection,
   FormStack,
   PictureInput,
+  ProducerPicker,
   SearchPicker,
   Select,
   Switch,
   Textarea,
   TextInput,
   UnitInput,
-  type EntityPickerOption,
+  type ProducerPickerOption,
   type SearchPickerOption,
 } from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
@@ -209,7 +209,7 @@ function toDistillerChoiceValues(
 }
 
 function choiceName(value: number | Entity | ChoiceLike) {
-  return isNumericChoice(value) ? `Entity ${value}` : value.name;
+  return isNumericChoice(value) ? `Catalog item ${value}` : value.name;
 }
 
 function choiceId(value: number | Entity | ChoiceLike) {
@@ -218,18 +218,18 @@ function choiceId(value: number | Entity | ChoiceLike) {
 }
 
 function choiceDetail(value: number | Entity | ChoiceLike) {
-  if (isNumericChoice(value)) return "Catalog entity";
+  if (isNumericChoice(value)) return "Existing catalog item";
   if (isCatalogEntity(value)) {
     return [toTitleCase(value.kind), value.region?.name ?? value.country?.name]
       .filter(Boolean)
       .join(" · ");
   }
-  return value.id ? "Catalog entity" : "New entity";
+  return value.id ? "Existing catalog item" : "New catalog item";
 }
 
-function toEntityPickerOption(
+function toProducerPickerOption(
   value: number | Entity | ChoiceLike | null | undefined,
-): EntityPickerOption | null {
+): ProducerPickerOption | null {
   if (value === null || value === undefined) return null;
   return {
     detail: choiceDetail(value),
@@ -249,7 +249,7 @@ function toSearchPickerOption(
   };
 }
 
-function entityPickerOption(entity: Entity): EntityPickerOption {
+function producerPickerOption(entity: Entity): ProducerPickerOption {
   return {
     detail: choiceDetail(entity),
     id: String(entity.id),
@@ -267,7 +267,7 @@ function entitySearchOption(entity: Entity): SearchPickerOption {
 }
 
 function entityChoiceFromOption(
-  option: EntityPickerOption,
+  option: ProducerPickerOption,
   kind: EntityKind,
 ): z.infer<typeof EntityChoiceSchema> {
   return option.id.startsWith("new:")
@@ -290,7 +290,7 @@ function draftSeries(name: string): NonNullable<FormSchemaType["series"]> {
 function makeDraftEntityOption(
   name: string,
   kind: EntityKind,
-): EntityPickerOption {
+): ProducerPickerOption {
   return {
     detail: `New ${toTitleCase(kind).toLocaleLowerCase()}`,
     id: `new:${name}`,
@@ -326,11 +326,11 @@ export default function BottleForm({
   const [brandQuery, setBrandQuery] = useState("");
   const [bottlerQuery, setBottlerQuery] = useState("");
   const [distillerQuery, setDistillerQuery] = useState("");
-  const [brand, setBrand] = useState<EntityPickerOption | null>(() =>
-    toEntityPickerOption(initialData.brand),
+  const [brand, setBrand] = useState<ProducerPickerOption | null>(() =>
+    toProducerPickerOption(initialData.brand),
   );
-  const [bottler, setBottler] = useState<EntityPickerOption | null>(() =>
-    toEntityPickerOption(initialData.bottler),
+  const [bottler, setBottler] = useState<ProducerPickerOption | null>(() =>
+    toProducerPickerOption(initialData.bottler),
   );
   const [distillers, setDistillers] = useState<readonly SearchPickerOption[]>(
     () => initialData.distillers?.map(toSearchPickerOption) ?? [],
@@ -482,8 +482,8 @@ export default function BottleForm({
           {submitError ? (
             <FormNotice role="alert">{submitError}</FormNotice>
           ) : null}
-          <FormSection title="Identity">
-            <EntityPicker
+          <FormSection title="Bottle details">
+            <ProducerPicker
               error={errors.brand?.message}
               help="The main label the bottle is sold under."
               kind="brand"
@@ -516,7 +516,7 @@ export default function BottleForm({
               }}
               onQueryChange={setBrandQuery}
               options={(brandResults.data?.results ?? []).map(
-                entityPickerOption,
+                producerPickerOption,
               )}
               placeholder="Laphroaig"
               required
@@ -659,7 +659,7 @@ export default function BottleForm({
               placeholder="Search distilleries"
               value={distillers}
             />
-            <EntityPicker
+            <ProducerPicker
               help="The market-facing bottler or release imprint, when one is stated."
               kind="bottler"
               loading={bottlerResults.isFetching}
@@ -685,7 +685,7 @@ export default function BottleForm({
               }}
               onQueryChange={setBottlerQuery}
               options={(bottlerResults.data?.results ?? []).map(
-                entityPickerOption,
+                producerPickerOption,
               )}
               placeholder="Search bottlers"
               value={bottler}

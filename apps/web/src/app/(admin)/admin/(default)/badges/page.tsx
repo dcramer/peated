@@ -44,7 +44,7 @@ export default function Page() {
       />
       <AdminPageHeader
         actions={
-          <Button color="primary" href="/admin/badges/add">
+          <Button variant="default" href="/admin/badges/add">
             Add Badge
           </Button>
         }

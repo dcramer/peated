@@ -70,7 +70,6 @@ export const Overview: Story = {
           />
         </ItemListItem>
       </ItemList>
-      <TastingEntry {...args} surface />
     </StoryStack>
   ),
 };

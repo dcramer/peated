@@ -184,7 +184,7 @@ function ListingTask({
     if (item.status === "errored") {
       return (
         <Button
-          color="highlight"
+          variant="accent"
           disabled={busy}
           icon={<RotateCcw aria-hidden="true" size={16} />}
           loading={retry.isPending}
@@ -197,7 +197,7 @@ function ListingTask({
     if (item.proposalType === "match_existing" && item.suggestedBottle) {
       return (
         <Button
-          color="highlight"
+          variant="accent"
           disabled={busy}
           loading={resolve.isPending}
           onClick={() =>
@@ -219,7 +219,7 @@ function ListingTask({
     if (item.proposalType === "create_new" && item.proposedBottle) {
       return (
         <Button
-          color="highlight"
+          variant="accent"
           disabled={busy}
           loading={createBottle.isPending}
           onClick={() =>
@@ -242,7 +242,7 @@ function ListingTask({
     if (item.proposalType === "correction" && item.proposedBottle) {
       return (
         <Button
-          color="highlight"
+          variant="accent"
           disabled={busy}
           loading={repair.isPending}
           onClick={() =>
@@ -583,7 +583,7 @@ function AuditTask({
           />
           {error ? <Alert type="error">{error}</Alert> : null}
           <Button
-            color="highlight"
+            variant="accent"
             disabled={busy}
             loading={close.isPending}
             onClick={() => void closeFindings()}

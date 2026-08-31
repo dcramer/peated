@@ -4,33 +4,28 @@ import { useMemo, type ReactNode } from "react";
 
 import { SearchSelect, type SearchPickerOption } from "./searchPicker.stylex";
 
-export type EntityPickerKind =
-  | "brand"
-  | "bottler"
-  | "distiller"
-  | "entity"
-  | "note";
+export type ProducerPickerKind = "brand" | "bottler" | "distiller" | "producer";
 
-export type EntityPickerOption = {
+export type ProducerPickerOption = {
   detail: string;
   id: string;
   meta: string;
   name: string;
 };
 
-export type EntityPickerProps = {
+export type ProducerPickerProps = {
   error?: ReactNode;
   help?: string;
-  kind: EntityPickerKind;
+  kind: ProducerPickerKind;
   label?: string;
   loading?: boolean;
-  onChange: (value: EntityPickerOption | null) => void;
+  onChange: (value: ProducerPickerOption | null) => void;
   onCreate?: (query: string) => void;
   onQueryChange?: (query: string) => void;
-  options: readonly EntityPickerOption[];
+  options: readonly ProducerPickerOption[];
   placeholder?: string;
   required?: boolean;
-  value: EntityPickerOption | null;
+  value: ProducerPickerOption | null;
 };
 
 const kindCopy = {
@@ -41,15 +36,18 @@ const kindCopy = {
     plural: "distillers",
     singular: "distiller",
   },
-  entity: { label: "Entity", plural: "entities", singular: "entity" },
-  note: { label: "Note", plural: "notes", singular: "note" },
+  producer: {
+    label: "Brand or producer",
+    plural: "brands and producers",
+    singular: "brand or producer",
+  },
 } satisfies Record<
-  EntityPickerKind,
+  ProducerPickerKind,
   { label: string; plural: string; singular: string }
 >;
 
-/** Supplies entity data and copy to the shared single-record picker. */
-export function EntityPicker({
+/** Supplies brand and producer choices to the shared single-choice picker. */
+export function ProducerPicker({
   error,
   help,
   kind,
@@ -62,7 +60,7 @@ export function EntityPicker({
   placeholder,
   required = false,
   value,
-}: EntityPickerProps) {
+}: ProducerPickerProps) {
   const copy = kindCopy[kind];
   const entitiesById = useMemo(
     () =>
@@ -75,7 +73,7 @@ export function EntityPicker({
     [options, value],
   );
 
-  function toPickerOption(option: EntityPickerOption): SearchPickerOption {
+  function toPickerOption(option: ProducerPickerOption): SearchPickerOption {
     return {
       detail: `${option.id} · ${option.meta}`,
       id: option.id,

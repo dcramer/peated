@@ -16,7 +16,6 @@ export function PeatedId({ detail, id }: PeatedIdProps) {
     <div {...stylex.props(styles.idStamp)}>
       <span {...stylex.props(styles.idLabel)}>Peated ID</span>
       <span {...stylex.props(styles.idValue)}>{id}</span>
-      <span aria-hidden="true" {...stylex.props(styles.idRule)} />
       {detail ? <span {...stylex.props(styles.idDetail)}>{detail}</span> : null}
     </div>
   );
@@ -95,15 +94,10 @@ const styles = stylex.create({
     flexShrink: 0,
     color: colors.accentDeep,
   },
-  idRule: {
-    minWidth: space.x3,
-    height: "1px",
-    flex: 1,
-    backgroundColor: colors.hairline,
-  },
   idDetail: {
     minWidth: 0,
     width: { default: "auto", [COMPACT]: "100%" },
+    marginLeft: { default: "auto", [COMPACT]: 0 },
     overflow: { default: "hidden", [COMPACT]: "visible" },
     textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
     whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
@@ -116,9 +110,6 @@ const styles = stylex.create({
     margin: 0,
     paddingTop: "20px",
     paddingBottom: "20px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   keyFactsOne: {
     gridTemplateColumns: "minmax(0, 1fr)",
@@ -145,19 +136,12 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     paddingRight: space.x6,
-    paddingLeft: space.x6,
-    borderLeftWidth: "1px",
-    borderLeftStyle: "solid",
-    borderLeftColor: colors.hairline,
-    ":first-child": { paddingLeft: 0, borderLeftWidth: 0 },
   },
   keyFactPhoneOdd: {
-    paddingLeft: { default: null, [PHONE]: 0 },
-    borderLeftWidth: { default: null, [PHONE]: 0 },
+    paddingLeft: 0,
   },
   keyFactPhoneEven: {
-    paddingLeft: { default: null, [PHONE]: space.x6 },
-    borderLeftWidth: { default: null, [PHONE]: "1px" },
+    paddingLeft: { default: 0, [PHONE]: space.x6 },
   },
   keyFactLabel: {
     order: 2,

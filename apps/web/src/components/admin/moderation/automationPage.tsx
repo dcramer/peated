@@ -163,7 +163,7 @@ export default function AutomationPage() {
                 disabled={Boolean(activeRun.data.run) || retryAll.isPending}
                 loading={retryAll.isPending}
                 onClick={() => void startRetry()}
-                size="small"
+                size="sm"
               >
                 Retry actionable listings
               </Button>

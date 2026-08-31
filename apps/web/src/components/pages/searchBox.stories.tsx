@@ -62,7 +62,7 @@ export const Results: Story = {};
 export const Searching: Story = {
   args: {
     status: "searching",
-    statusText: "Searching bottles, entities, and members…",
+    statusText: "Searching bottles, brands, producers, and members…",
   },
 };
 
@@ -79,17 +79,17 @@ export const Loading: Story = {
     contribution: undefined,
     groups: [],
     status: "searching",
-    statusText: "Searching bottles, entities, and members…",
+    statusText: "Searching bottles, brands, producers, and members…",
   },
 };
 
 export const SearchingAfterNoResults: Story = {
   args: {
-    emptyText: "No records match “glenfarcls”.",
+    emptyText: "Nothing matches “glenfarcls”.",
     groups: [],
     query: "glenfarclse",
     status: "searching",
-    statusText: "Searching bottles, entities, and members…",
+    statusText: "Searching bottles, brands, producers, and members…",
   },
 };
 
@@ -104,7 +104,7 @@ export const NoResults: Story = {
 
 export const NearestMatch: Story = {
   args: {
-    emptyText: "No exact records match “lagavulinn”.",
+    emptyText: "No exact matches for “lagavulinn”.",
     groups: [
       {
         id: "nearest",

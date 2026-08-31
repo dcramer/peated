@@ -47,7 +47,7 @@ const preview: Preview = {
             "Forms",
             "Selection",
             "Identity",
-            "Measures",
+            "Ratings",
             "Data Display",
             "Layout",
             "Editorial",

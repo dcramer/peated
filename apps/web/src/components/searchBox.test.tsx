@@ -12,9 +12,7 @@ function renderDatabaseSearch({
 }) {
   return renderToStaticMarkup(
     <SearchBox
-      emptyText={
-        status === "ready" ? "No records match this query." : undefined
-      }
+      emptyText={status === "ready" ? "Nothing matches this query." : undefined}
       groups={[]}
       onQueryChange={() => undefined}
       onScopeChange={() => undefined}
@@ -24,7 +22,7 @@ function renderDatabaseSearch({
       scope="all"
       scopes={[{ label: "Everything", value: "all" }]}
       status={status}
-      statusText="Searching bottles and entities…"
+      statusText="Searching bottles, brands, and producers…"
     />,
   );
 }
@@ -34,7 +32,7 @@ describe("SearchBox database result count", () => {
     const html = renderDatabaseSearch({ resultCount: 0, status: "searching" });
 
     expect(html).not.toContain("0 results");
-    expect(html).toContain("Searching bottles and entities");
+    expect(html).toContain("Searching bottles, brands, and producers");
   });
 
   it("shows zero after the search settles", () => {

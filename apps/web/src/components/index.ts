@@ -65,12 +65,6 @@ export { CriticReview } from "./criticReview.stylex";
 export type { CriticReviewProps } from "./criticReview.stylex";
 export { DataTable } from "./dataTable.stylex";
 export type { DataTableColumn, DataTableProps } from "./dataTable.stylex";
-export { EntityPicker } from "./entityPicker.stylex";
-export type {
-  EntityPickerKind,
-  EntityPickerOption,
-  EntityPickerProps,
-} from "./entityPicker.stylex";
 export { FacetRow } from "./facetRow.stylex";
 export type { FacetRowProps } from "./facetRow.stylex";
 export { FactList, hasVisibleFacts } from "./factList.stylex";
@@ -146,7 +140,6 @@ export { ItemList, ItemListItem, ItemRow } from "./itemList.stylex";
 export type {
   ItemListItemProps,
   ItemListProps,
-  ItemListVariant,
   ItemRowProps,
   ItemRowSize,
 } from "./itemList.stylex";
@@ -180,37 +173,12 @@ export type {
 } from "./notePicker.stylex";
 export { PageTabs } from "./pageTabs.stylex";
 export type { PageTabItem, PageTabsProps } from "./pageTabs.stylex";
-export { Panel } from "./panel.stylex";
-export type { PanelProps } from "./panel.stylex";
-export {
-  CompleteBottleDetails,
-  FactGrid,
-  FigureRow,
-  RailLinkList,
-  RailSection,
-  RecordMasthead,
-  RecordSection,
-  RecordTabs,
-  ReviewQuote,
-  TastingNote,
-} from "./recordDetails.stylex";
+export { ProducerPicker } from "./producerPicker.stylex";
 export type {
-  BottleDetailPrompt,
-  CompleteBottleDetailsProps,
-  FactGridProps,
-  FigureRowProps,
-  RailLinkItem,
-  RailLinkListProps,
-  RailSectionProps,
-  RecordFact,
-  RecordFigure,
-  RecordMastheadProps,
-  RecordSectionProps,
-  RecordTabItem,
-  RecordTabsProps,
-  ReviewQuoteProps,
-  TastingNoteProps,
-} from "./recordDetails.stylex";
+  ProducerPickerKind,
+  ProducerPickerOption,
+  ProducerPickerProps,
+} from "./producerPicker.stylex";
 export { RowMenu } from "./rowMenu.stylex";
 export type { RowMenuGroup, RowMenuItem, RowMenuProps } from "./rowMenu.stylex";
 export { ScopedSearch } from "./scopedSearch.stylex";

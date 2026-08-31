@@ -193,20 +193,11 @@ export function ApplicationHeader({
               </MenuButton>
               <MenuItems portal={false} {...stylex.props(styles.accountMenu)}>
                 {(accountItems ?? personalItems).map((item) => (
-                  <MenuItem
-                    as={Fragment}
-                    disabled={"onSelect" in item && item.disabled}
+                  <AccountMenuItem
+                    currentHref={currentHref}
+                    item={item}
                     key={"onSelect" in item ? item.label : item.href}
-                  >
-                    {({ close, focus }) => (
-                      <AccountMenuItem
-                        close={close}
-                        currentHref={currentHref}
-                        focused={focus}
-                        item={item}
-                      />
-                    )}
-                  </MenuItem>
+                  />
                 ))}
               </MenuItems>
             </HeadlessMenu>
@@ -257,61 +248,63 @@ export function ApplicationHeader({
 }
 
 function AccountMenuItem({
-  close,
   currentHref,
-  focused,
   item,
 }: {
-  close: () => void;
   currentHref: string;
-  focused: boolean;
   item: HeaderAccountItem;
 }) {
-  const content = (
-    <>
-      <span>{item.label}</span>
-      {item.count !== undefined ? (
-        <span {...stylex.props(styles.accountMenuCount)}>
-          {item.count.toLocaleString("en-US")}
-        </span>
-      ) : null}
-    </>
-  );
-  const current =
-    "href" in item && isCurrentNavigationHref(currentHref, item.href);
-
-  if ("onSelect" in item) {
-    return (
-      <button
-        disabled={item.disabled}
-        onClick={() => {
-          close();
-          item.onSelect();
-        }}
-        type="button"
-        {...stylex.props(
-          styles.accountMenuItem,
-          styles.accountMenuAction,
-          focused && styles.focusedAccountMenuItem,
-        )}
-      >
-        {content}
-      </button>
-    );
-  }
-
   return (
-    <AppLink
-      aria-current={current ? "page" : undefined}
-      href={item.href}
-      {...stylex.props(
-        styles.accountMenuItem,
-        current && styles.currentMenuLink,
-        focused && styles.focusedAccountMenuItem,
-      )}
-    >
-      {content}
-    </AppLink>
+    <MenuItem as={Fragment} disabled={"onSelect" in item && item.disabled}>
+      {({ close, focus }) => {
+        const content = (
+          <>
+            <span>{item.label}</span>
+            {item.count !== undefined ? (
+              <span {...stylex.props(styles.accountMenuCount)}>
+                {item.count.toLocaleString("en-US")}
+              </span>
+            ) : null}
+          </>
+        );
+        const current =
+          "href" in item && isCurrentNavigationHref(currentHref, item.href);
+
+        if ("onSelect" in item) {
+          return (
+            <button
+              disabled={item.disabled}
+              onClick={() => {
+                close();
+                item.onSelect();
+              }}
+              type="button"
+              {...stylex.props(
+                styles.accountMenuItem,
+                styles.accountMenuAction,
+                focus && styles.focusedAccountMenuItem,
+              )}
+            >
+              {content}
+            </button>
+          );
+        }
+
+        return (
+          <AppLink
+            aria-current={current ? "page" : undefined}
+            href={item.href}
+            {...stylex.props(
+              styles.accountMenuItem,
+              current && styles.currentMenuLink,
+              focus && styles.focusedAccountMenuItem,
+            )}
+          >
+            {content}
+          </AppLink>
+        );
+      }}
+    </MenuItem>
   );
 }
 

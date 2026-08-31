@@ -238,12 +238,12 @@ export function PhotoMatchCreateState({
           </Button>
         </BottleResolverInlineAction>
         <BottleResolverSection
-          description="Compare this record with the label before you continue."
+          description="Compare this bottle with the label before you continue."
           title="Check the bottle"
         >
           {previewUrl ? (
             <PhotoPreview
-              metadata="Compare this photo with the record below"
+              metadata="Compare this photo with the bottle below"
               src={previewUrl}
               title="Label photo"
             />
@@ -342,7 +342,7 @@ function getMatchedBottleMetadata(bottle: Bottle) {
       : null;
 
   return [
-    bottle.category ? formatCategoryName(bottle.category) : "Bottle record",
+    bottle.category ? formatCategoryName(bottle.category) : "Bottle",
     bottle.edition,
     release,
   ]

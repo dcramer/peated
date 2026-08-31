@@ -209,8 +209,7 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
               <HistoryDetails eventKey={selectedKey} />
             ) : (
               <ModerationEmpty title="Choose a completed decision">
-                History is read-only and comes from the original durable
-                records.
+                History is read-only and comes from completed decisions.
               </ModerationEmpty>
             )}
           </ModerationDetailFrame>

@@ -9,7 +9,7 @@ const meta = {
   args: {
     facts: [
       { label: "Phenols", value: null },
-      { label: "Colouring", value: "E150a" },
+      { label: "Coloring", value: "E150a" },
       { label: "Filtration", value: "Chill filtered" },
       { label: "Bottling", value: "Official" },
     ],

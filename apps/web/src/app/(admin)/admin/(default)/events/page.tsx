@@ -46,7 +46,7 @@ export default function Page() {
       />
       <AdminPageHeader
         actions={
-          <Button color="primary" href="/admin/events/add">
+          <Button variant="default" href="/admin/events/add">
             Add Event
           </Button>
         }

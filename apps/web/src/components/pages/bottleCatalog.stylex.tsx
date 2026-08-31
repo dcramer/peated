@@ -90,13 +90,13 @@ export function BottleCatalogList({
         total={total}
       />
       {items.length ? (
-        <ItemList ariaLabel="Bottle records" showTopDivider={false}>
+        <ItemList ariaLabel="Bottles" showTopDivider={false}>
           {items.map((item) => (
             <ItemListItem key={item.id}>
               <BottleIdentityRow
                 brand={item.brand}
                 brandHref={item.brandHref}
-                end={<BottleCatalogMeasures item={item} />}
+                end={<BottleCatalogRatings item={item} />}
                 hasTasted={item.hasTasted}
                 href={item.href}
                 imageUrl={item.imageUrl}
@@ -141,7 +141,7 @@ export function BottleCatalogList({
   );
 }
 
-function BottleCatalogMeasures({ item }: { item: BottleCatalogItem }) {
+function BottleCatalogRatings({ item }: { item: BottleCatalogItem }) {
   return (
     <div {...stylex.props(styles.ratings)}>
       <BottleRatings

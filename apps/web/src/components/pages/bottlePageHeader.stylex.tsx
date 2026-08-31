@@ -94,7 +94,11 @@ export function BottlePageHeader({
               {name}
             </h1>
             {notes.length ? (
-              <div aria-label="Bottle details" {...stylex.props(styles.notes)}>
+              <div
+                aria-label="Bottle details"
+                role="group"
+                {...stylex.props(styles.notes)}
+              >
                 {notes.map((note, index) => (
                   <Chip key={`${note}-${index}`} variant="tinted">
                     {note}

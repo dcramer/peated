@@ -9,7 +9,6 @@ import {
   space,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import type { ItemListVariant } from "./itemList.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { MemberStatus } from "./memberStatus.stylex";
 
@@ -70,7 +69,6 @@ export type BottleIdentityRowProps = {
     count: number;
     href: string;
   };
-  variant?: ItemListVariant;
 };
 
 /** Presents one catalog bottle using Peated's existing identity and member-status meanings. */
@@ -85,18 +83,13 @@ export function BottleIdentityRow({
   metadata = [],
   name,
   relatedReleases,
-  variant = "plain",
 }: BottleIdentityRowProps) {
   return (
     <div
       {...stylex.props(
         styles.row,
-        variant === "surface" && styles.surfaceRow,
         Boolean(href) && linkedRowStyles.container,
-        Boolean(href) &&
-          (variant === "plain"
-            ? linkedRowStyles.onGround
-            : linkedRowStyles.onSurface),
+        Boolean(href) && linkedRowStyles.onGround,
       )}
     >
       <BottleVisual imageUrl={imageUrl} />
@@ -224,13 +217,6 @@ const styles = stylex.create({
     paddingRight: "12px",
     paddingBottom: space.x3,
     paddingLeft: "12px",
-  },
-  surfaceRow: {
-    width: "100%",
-    marginRight: 0,
-    marginLeft: 0,
-    paddingRight: "18px",
-    paddingLeft: "18px",
   },
   copy: {
     display: "flex",

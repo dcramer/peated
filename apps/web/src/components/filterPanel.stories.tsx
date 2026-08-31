@@ -41,7 +41,7 @@ function ControlledFilters({ ariaLabel }: FilterPanelProps) {
   return (
     <FilterPanel ariaLabel={ariaLabel}>
       <FilterQuery
-        label="Find a record"
+        label="Find a bottle"
         onSubmit={setQuery}
         placeholder="Name"
         query={query}

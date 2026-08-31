@@ -35,7 +35,7 @@ export const Overview: Story = {
         facts={[
           { label: "Founded", value: "1816" },
           { label: "Capacity", value: "2.4m L" },
-          { label: "Bottlings", value: "148" },
+          { label: "Bottles", value: "148" },
         ]}
       />
       <KeyFacts

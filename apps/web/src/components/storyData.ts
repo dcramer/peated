@@ -1,28 +1,28 @@
-import type { EntityPickerOption } from "./entityPicker.stylex";
 import type { MemberPickerOption } from "./memberPicker.stylex";
 import type { NotePickerOption } from "./notePicker.stylex";
+import type { ProducerPickerOption } from "./producerPicker.stylex";
 import type { SearchResultGroup } from "./searchResults.stylex";
 
 export const distillerOptions = [
   {
-    detail: "Islay · 412 bottlings · owned by Rémy Cointreau",
+    detail: "Islay · 412 bottles · owned by Rémy Cointreau",
     id: "D00192",
-    meta: "412 bottlings",
+    meta: "412 bottles",
     name: "Bruichladdich",
   },
   {
-    detail: "Islay · 86 bottlings · owned by Rémy Cointreau",
+    detail: "Islay · 86 bottles · owned by Rémy Cointreau",
     id: "D00193",
-    meta: "86 bottlings",
+    meta: "86 bottles",
     name: "Bruichladdich (Port Charlotte)",
   },
   {
-    detail: "Islay · 64 bottlings · owned by Rémy Cointreau",
+    detail: "Islay · 64 bottles · owned by Rémy Cointreau",
     id: "D00481",
-    meta: "64 bottlings",
+    meta: "64 bottles",
     name: "Bruichladdich (Octomore)",
   },
-] as const satisfies readonly EntityPickerOption[];
+] as const satisfies readonly ProducerPickerOption[];
 
 export const noteOptions = [
   { category: "Peaty", common: true, name: "Smoke", usageCount: 12880 },

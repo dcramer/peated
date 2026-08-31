@@ -27,7 +27,7 @@ export function ReviewPublishingAction({
 }) {
   return (
     <AdminButton
-      color={approved ? "danger" : "highlight"}
+      variant={approved ? "danger" : "accent"}
       disabled={disabled}
       loading={loading}
       onClick={onToggle}

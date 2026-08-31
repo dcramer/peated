@@ -35,7 +35,7 @@ function ToolbarExample() {
 const meta = {
   title: "Components/Lists & Tables/Lists",
   component: RailList,
-  args: { ariaLabel: "Records", children: null },
+  args: { ariaLabel: "Bottles", children: null },
   decorators: [
     (Story) => (
       <StoryCanvas width="wide">
@@ -67,7 +67,7 @@ export const Overview: Story = {
       </RailList>
       <CursorPager nextHref="#page-4" page={3} previousHref="#page-2" />
       <CursorPager
-        ariaLabel="Cursor-only record pages"
+        ariaLabel="Bottle pages"
         nextHref="#next-cursor"
         previousHref="#previous-cursor"
       />

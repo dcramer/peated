@@ -35,7 +35,7 @@ export function EntityMap({ entity }: { entity: Entity }) {
 
   return (
     <PageSection heading="Where">
-      <Card appearance="surface" padding="sm">
+      <Card appearance="plain" padding="sm">
         {entity.address ? (
           <p {...stylex.props(styles.address)}>{entity.address}</p>
         ) : null}

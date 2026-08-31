@@ -63,7 +63,7 @@ const rows: BottleComparisonTableProps["rows"] = [
     href: "/bottles/4",
     id: "4",
     metadata: "Campbeltown · 15 years · 51.4% ABV",
-    name: "A deliberately long independent bottling name that tests the aligned row",
+    name: "A deliberately long independent bottle name that tests the aligned row",
     values: [
       <BottleRatings
         counts={{

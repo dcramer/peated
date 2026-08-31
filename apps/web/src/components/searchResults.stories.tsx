@@ -41,7 +41,7 @@ export const Loading: Story = {
     contribution: undefined,
     groups: [],
     status: "searching",
-    statusText: "Searching bottles, entities, and members…",
+    statusText: "Searching bottles, brands, producers, and members…",
   },
 };
 

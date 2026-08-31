@@ -30,7 +30,7 @@ export type ListToolbarProps = {
   total?: number;
 };
 
-/** Pairs the record count with sorting and optional export actions. */
+/** Pairs an item count with sorting and optional export actions. */
 export function ListToolbar({
   count,
   noun,
@@ -56,7 +56,7 @@ export function ListToolbar({
         <label {...stylex.props(styles.sortLabel)}>
           <span>Sort</span>
           <CompactSelect
-            aria-label="Sort records"
+            aria-label={`Sort ${noun}s`}
             onChange={(event) => onSortChange(event.currentTarget.value)}
             value={sort}
           >
@@ -70,7 +70,7 @@ export function ListToolbar({
         {onExport ? (
           <IconButton
             icon={<Download aria-hidden="true" size={15} strokeWidth={1.75} />}
-            label="Export records"
+            label={`Export ${noun}s`}
             onClick={onExport}
             size="sm"
             variant="text"
@@ -109,7 +109,7 @@ export type CursorPagerProps = {
 
 /** Presents only the cursor actions supplied by the owning API. */
 export function CursorPager({
-  ariaLabel = "Record pages",
+  ariaLabel = "Pages",
   nextHref,
   page,
   previousHref,

@@ -10,13 +10,13 @@ import {
 import { AppLink, type AppLinkProps } from "./appLink";
 
 export type CardProps = HTMLAttributes<HTMLDivElement> & {
-  appearance?: "outlined" | "surface";
+  appearance?: "outlined" | "plain";
   children: ReactNode;
   linked?: boolean;
   padding?: "none" | "sm" | "md";
 };
 
-/** A neutral content surface. Feature components own the content inside it. */
+/** Groups related content with either a complete frame or no frame. */
 export function Card({
   appearance = "outlined",
   children,
@@ -28,7 +28,7 @@ export function Card({
 }: CardProps) {
   const cardProps = stylex.props(
     styles.card,
-    appearance === "outlined" ? styles.outlined : styles.surface,
+    appearance === "outlined" ? styles.outlined : styles.plain,
     padding === "sm" && styles.paddingSmall,
     padding === "md" && styles.paddingMedium,
     linked && styles.linked,
@@ -46,7 +46,7 @@ export function Card({
 }
 
 export type CardLinkProps = AppLinkProps & {
-  appearance?: "outlined" | "surface";
+  appearance?: "outlined" | "plain";
   children: ReactNode;
   href: string;
   padding?: "none" | "sm" | "md";
@@ -63,7 +63,7 @@ export function CardLink({
 }: CardLinkProps) {
   const cardProps = stylex.props(
     styles.card,
-    appearance === "outlined" ? styles.outlined : styles.surface,
+    appearance === "outlined" ? styles.outlined : styles.plain,
     padding === "sm" && styles.paddingSmall,
     padding === "md" && styles.paddingMedium,
     styles.link,
@@ -153,7 +153,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: colors.hairline,
   },
-  surface: {
+  plain: {
     borderWidth: 0,
   },
   paddingSmall: {

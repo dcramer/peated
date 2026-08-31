@@ -100,7 +100,7 @@ export default function RegionForm({
         title="Additional details"
         action={
           <Button
-            color="default"
+            variant="tonal"
             onClick={async () => {
               const result =
                 await generateDataMutation.mutateAsync(getValues());

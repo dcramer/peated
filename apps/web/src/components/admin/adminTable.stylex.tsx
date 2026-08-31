@@ -92,7 +92,7 @@ export function AdminTableContent<
             {...stylex.props(styles.searchIcon)}
           />
           <input
-            aria-label="Search records"
+            aria-label="Search"
             defaultValue={searchParams.get("query") ?? ""}
             name="query"
             placeholder="Search"

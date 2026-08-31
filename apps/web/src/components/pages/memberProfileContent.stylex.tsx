@@ -240,13 +240,10 @@ function CollectionActivity({
       </header>
       {activity.items.length ? (
         <div {...stylex.props(styles.collectionItems)}>
-          <ItemList
-            ariaLabel={`${activity.collectionName} additions`}
-            variant="surface"
-          >
+          <ItemList ariaLabel={`${activity.collectionName} additions`}>
             {activity.items.map(({ id, ...identity }) => (
               <ItemListItem key={id}>
-                <BottleIdentityRow {...identity} variant="surface" />
+                <BottleIdentityRow {...identity} />
               </ItemListItem>
             ))}
             {hiddenCount ? (

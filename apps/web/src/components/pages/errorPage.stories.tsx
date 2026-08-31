@@ -39,7 +39,7 @@ function NotFoundState() {
       title="Nothing lives here"
     >
       This address does not match anything in the database. Search for the
-      record, or add the bottle if it is genuinely missing.
+      bottle, or add it if it is genuinely missing.
     </ErrorPage>
   );
 }

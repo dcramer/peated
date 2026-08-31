@@ -24,7 +24,6 @@ export type TastingEntryProps = {
   leading?: ReactNode;
   members: readonly [TastingEntryMember, ...TastingEntryMember[]];
   menu?: ReactNode;
-  surface?: boolean;
 };
 
 /** Treats one tasting sitting as one entry whose bottles are member content. */
@@ -37,10 +36,9 @@ export function TastingEntry({
   leading,
   members,
   menu,
-  surface = false,
 }: TastingEntryProps) {
   return (
-    <article {...stylex.props(styles.entry, surface && styles.surfaceEntry)}>
+    <article {...stylex.props(styles.entry)}>
       <header {...stylex.props(styles.header)}>
         {leading}
         <div {...stylex.props(styles.headerCopy)}>
@@ -66,7 +64,7 @@ export function TastingEntry({
         </div>
         {menu ? <div {...stylex.props(styles.menu)}>{menu}</div> : null}
       </header>
-      <ul {...stylex.props(styles.members, surface && styles.surfaceMembers)}>
+      <ul {...stylex.props(styles.members)}>
         {members.map((member) => (
           <li
             key={`${member.href ?? member.name}-${member.name}`}
@@ -155,10 +153,6 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
   },
-  surfaceEntry: {
-    paddingTop: "22px",
-    paddingBottom: "22px",
-  },
   header: {
     display: "flex",
     minWidth: 0,
@@ -211,9 +205,6 @@ const styles = stylex.create({
     borderTopColor: colors.hairline,
     backgroundColor: "transparent",
     listStyle: "none",
-  },
-  surfaceMembers: {
-    backgroundColor: "transparent",
   },
   member: {
     display: "flex",

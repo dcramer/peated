@@ -217,6 +217,10 @@ export type HomeOrigin = {
   totalBottles: number;
 };
 
+function formatBottleCount(count: number) {
+  return `${count.toLocaleString("en-US")} ${count === 1 ? "bottle" : "bottles"}`;
+}
+
 const REGION_DESCRIPTION_MAX_LENGTH = 80;
 
 function truncateRegionDescription(description: string) {
@@ -321,7 +325,7 @@ export function HomeOrigins({
               </strong>
             </span>
             <span {...stylex.props(styles.countryCount)}>
-              {country.totalBottles.toLocaleString("en-US")} bottles
+              {formatBottleCount(country.totalBottles)}
             </span>
           </CardLink>
         ))}
@@ -344,7 +348,7 @@ export function HomeOrigins({
               </strong>
             </span>
             <span {...stylex.props(styles.countryCount)}>
-              {remainingCountries.totalBottles.toLocaleString("en-US")} bottles
+              {formatBottleCount(remainingCountries.totalBottles)}
             </span>
           </CardLink>
         ) : null}
@@ -389,7 +393,7 @@ export function HomeDistilleries({
               metadata={
                 <>
                   {distillery.location ? `${distillery.location} · ` : null}
-                  {distillery.totalBottles.toLocaleString("en-US")} bottlings
+                  {formatBottleCount(distillery.totalBottles)}
                 </>
               }
               title={distillery.name}
@@ -439,7 +443,7 @@ export function HomeRecentBottles({
         title="Added this week"
       />
       <div {...stylex.props(styles.recentBottles)}>
-        <ItemList ariaLabel="Bottles added this week" variant="surface">
+        <ItemList ariaLabel="Bottles added this week">
           {bottles.map((bottle) => (
             <ItemRow
               href={bottle.href}
@@ -447,7 +451,6 @@ export function HomeRecentBottles({
               metadata={bottle.metadata.join(" · ")}
               size="sm"
               title={bottle.name}
-              variant="surface"
             />
           ))}
         </ItemList>
@@ -465,7 +468,7 @@ export function HomeContributionPrompt({
 }) {
   return (
     <section {...stylex.props(styles.prompt)}>
-      <h2 {...stylex.props(styles.promptTitle)}>Missing a bottling?</h2>
+      <h2 {...stylex.props(styles.promptTitle)}>Missing a bottle?</h2>
       <p {...stylex.props(styles.promptCopy)}>
         Add it. Cask number, vintage, ABV, finish—as much as the label tells
         you.
@@ -770,12 +773,6 @@ const styles = stylex.create({
   prompt: {
     paddingTop: "18px",
     paddingBottom: "18px",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
     backgroundColor: "transparent",
   },
   promptTitle: {

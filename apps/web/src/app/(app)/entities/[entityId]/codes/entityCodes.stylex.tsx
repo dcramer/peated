@@ -27,7 +27,7 @@ export function EntityCodes({
   return (
     <div {...stylex.props(styles.content)}>
       <PageSection heading="How the codes work">
-        <Card appearance="surface" padding="sm">
+        <Card appearance="plain" padding="sm">
           <div {...stylex.props(styles.intro)}>
             <p {...stylex.props(styles.paragraph)}>
               {entityName} uses the number before the decimal point to identify

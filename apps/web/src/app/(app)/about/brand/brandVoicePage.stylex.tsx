@@ -92,7 +92,7 @@ const rules: readonly VoiceRule[] = [
 const comparisons = [
   {
     before: "Discover your next favourite dram",
-    after: "184,204 bottlings. Someone has probably logged yours.",
+    after: "184,204 bottles. Someone has probably logged yours.",
     reason: "“Discover” is marketing jargon. The number is the actual pitch.",
   },
   {
