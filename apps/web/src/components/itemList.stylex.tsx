@@ -58,6 +58,7 @@ export function ItemListItem({ children, id }: ItemListItemProps) {
 
 export type ItemRowProps = {
   action?: ReactNode;
+  align?: "center" | "start";
   description?: ReactNode;
   end?: ReactNode;
   href?: string;
@@ -66,12 +67,14 @@ export type ItemRowProps = {
   metadata?: ReactNode;
   metadataWrap?: boolean;
   size?: ItemRowSize;
+  subtitle?: ReactNode;
   title: ReactNode;
 };
 
 /** Renders one aligned item with a primary link across the complete row. */
 export function ItemRow({
   action,
+  align = "center",
   description,
   end,
   href,
@@ -80,6 +83,7 @@ export function ItemRow({
   metadata,
   metadataWrap = false,
   size = "md",
+  subtitle,
   title,
 }: ItemRowProps) {
   const hasLinkedContent = Boolean(href);
@@ -90,6 +94,7 @@ export function ItemRow({
         {...stylex.props(
           styles.content,
           size === "sm" && styles.smallContent,
+          align === "start" && styles.startAlignedContent,
           hasLinkedContent && styles.interactiveContent,
           hasLinkedContent && linkedRowStyles.container,
           hasLinkedContent && linkedRowStyles.onGround,
@@ -122,6 +127,14 @@ export function ItemRow({
               {title}
             </span>
           )}
+          {subtitle ? (
+            <div
+              title={getTextTitle(subtitle)}
+              {...stylex.props(styles.subtitle)}
+            >
+              {subtitle}
+            </div>
+          ) : null}
           {metadata ? (
             <div
               title={getTextTitle(metadata)}
@@ -185,6 +198,9 @@ const styles = stylex.create({
     paddingTop: "11px",
     paddingBottom: "11px",
   },
+  startAlignedContent: {
+    alignItems: "flex-start",
+  },
   interactiveContent: {
     width: "calc(100% + 24px)",
     marginRight: "-12px",
@@ -194,7 +210,8 @@ const styles = stylex.create({
   },
   leading: {
     display: "flex",
-    width: "32px",
+    width: "auto",
+    minWidth: "32px",
     minHeight: "48px",
     flexShrink: 0,
     alignItems: "center",
@@ -203,6 +220,17 @@ const styles = stylex.create({
   copy: {
     minWidth: 0,
     flex: 1,
+  },
+  subtitle: {
+    marginTop: "3px",
+    maxWidth: "100%",
+    overflow: "hidden",
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.3,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   title: {
     display: "block",

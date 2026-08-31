@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatCategoryName } from "@peated/server/lib/format";
 import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import Join from "@peated/web/components/join";
@@ -146,18 +147,31 @@ function LatestReleases() {
     );
   }
 
-  const items = releases.results.flatMap((bottle) =>
-    bottle.releaseYear === null
-      ? []
-      : [
-          {
-            href: `/bottles/${bottle.id}`,
-            imageUrl: bottle.imageUrl,
-            metadata: getReleaseMetadata(bottle),
-            name: formatBottleDisplayName(bottle),
-          },
-        ],
-  );
+  const items = releases.results.flatMap((bottle) => {
+    if (bottle.releaseYear === null) return [];
+
+    const distillers = bottle.distillers.filter(
+      (distiller) => distiller.id !== bottle.brand.id,
+    );
+    const subtitle = [
+      distillers.length ? (
+        <EntityLinks entities={distillers} key="distillers" />
+      ) : null,
+      bottle.category ? formatCategoryName(bottle.category) : null,
+    ].filter((value) => value !== null);
+
+    return [
+      {
+        href: `/bottles/${bottle.id}`,
+        imageUrl: bottle.imageUrl,
+        metadata: getReleaseMetadata(bottle),
+        name: formatBottleDisplayName(bottle),
+        subtitle: subtitle.length ? (
+          <Join divider=" · ">{subtitle}</Join>
+        ) : undefined,
+      },
+    ];
+  });
 
   return items.length ? (
     <HomeLatestReleases
@@ -402,25 +416,11 @@ function getBottleMetadata(bottle: Bottle) {
 }
 
 function getReleaseMetadata(bottle: Bottle) {
-  const facts = [
+  return [
     bottle.releaseYear === null ? null : `${bottle.releaseYear} release`,
     bottle.statedAge === null ? null : `${bottle.statedAge} years`,
     bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
   ].filter((value): value is string => Boolean(value));
-
-  return (
-    <Join divider=" · ">
-      {[
-        <EntityLinks
-          entities={
-            bottle.distillers.length ? bottle.distillers : [bottle.brand]
-          }
-          key="producers"
-        />,
-        ...facts,
-      ]}
-    </Join>
-  );
 }
 
 const STACKED = "@media (max-width: 759px)";
