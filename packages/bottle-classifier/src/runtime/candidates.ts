@@ -89,7 +89,7 @@ export function mergeResolvedEntity(
 ): void {
   /**
    * Entity search is additive and opportunistic. Prefer the highest-confidence
-   * hit, but preserve alternate evidence sources and any alias/short-name
+   * hit, but preserve alternate evidence sources and any reference/short-name
    * metadata the first result may not have carried.
    */
   const existing = entities.get(entity.entityId);
@@ -120,8 +120,8 @@ export function mergeResolvedEntity(
     existing.score = entity.score;
   }
 
-  if (!existing.alias && entity.alias) {
-    existing.alias = entity.alias;
+  if (!existing.reference && entity.reference) {
+    existing.reference = entity.reference;
   }
 
   if (!existing.shortName && entity.shortName) {

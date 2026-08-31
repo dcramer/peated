@@ -31,7 +31,6 @@ export function AliasList({
       <AliasManager
         aliases={aliases.map((alias) => ({
           created: <TimeSince date={alias.createdAt} />,
-          isPrimary: false,
           name: alias.name,
         }))}
         canEdit={user?.mod}

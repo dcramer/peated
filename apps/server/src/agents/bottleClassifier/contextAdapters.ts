@@ -24,6 +24,7 @@ import {
   countries,
   entities,
   entityAliases,
+  entityReferences,
   entityTombstones,
   regions,
   tastings,
@@ -351,67 +352,78 @@ export async function getEntityClassifierContext(
     return null;
   }
 
-  const [aliases, brandBottles, bottlerBottles, distillerBottles] =
-    await Promise.all([
-      db
-        .select({ name: entityAliases.name })
-        .from(entityAliases)
-        .where(eq(entityAliases.entityId, entityId))
-        .orderBy(asc(entityAliases.name))
-        .limit(MAX_ENTITY_CONTEXT_ALIASES),
-      db
-        .select({ bottleId: bottles.id, fullName: bottles.fullName })
-        .from(bottles)
-        .where(
-          and(
-            eq(bottles.brandId, entityId),
-            isNotNull(bottles.groupId),
-            notExists(
-              db
-                .select({ bottleId: bottleTombstones.bottleId })
-                .from(bottleTombstones)
-                .where(eq(bottleTombstones.bottleId, bottles.id)),
-            ),
+  const [
+    references,
+    aliasRows,
+    brandBottles,
+    bottlerBottles,
+    distillerBottles,
+  ] = await Promise.all([
+    db
+      .select({ name: entityReferences.name })
+      .from(entityReferences)
+      .where(eq(entityReferences.entityId, entityId))
+      .orderBy(asc(entityReferences.name))
+      .limit(MAX_ENTITY_CONTEXT_ALIASES),
+    db
+      .select({ name: entityAliases.name })
+      .from(entityAliases)
+      .where(eq(entityAliases.entityId, entityId))
+      .orderBy(asc(entityAliases.name))
+      .limit(MAX_ENTITY_CONTEXT_ALIASES),
+    db
+      .select({ bottleId: bottles.id, fullName: bottles.fullName })
+      .from(bottles)
+      .where(
+        and(
+          eq(bottles.brandId, entityId),
+          isNotNull(bottles.groupId),
+          notExists(
+            db
+              .select({ bottleId: bottleTombstones.bottleId })
+              .from(bottleTombstones)
+              .where(eq(bottleTombstones.bottleId, bottles.id)),
           ),
-        )
-        .orderBy(asc(bottles.id))
-        .limit(MAX_ENTITY_CONTEXT_BOTTLES),
-      db
-        .select({ bottleId: bottles.id, fullName: bottles.fullName })
-        .from(bottles)
-        .where(
-          and(
-            eq(bottles.bottlerId, entityId),
-            isNotNull(bottles.groupId),
-            notExists(
-              db
-                .select({ bottleId: bottleTombstones.bottleId })
-                .from(bottleTombstones)
-                .where(eq(bottleTombstones.bottleId, bottles.id)),
-            ),
+        ),
+      )
+      .orderBy(asc(bottles.id))
+      .limit(MAX_ENTITY_CONTEXT_BOTTLES),
+    db
+      .select({ bottleId: bottles.id, fullName: bottles.fullName })
+      .from(bottles)
+      .where(
+        and(
+          eq(bottles.bottlerId, entityId),
+          isNotNull(bottles.groupId),
+          notExists(
+            db
+              .select({ bottleId: bottleTombstones.bottleId })
+              .from(bottleTombstones)
+              .where(eq(bottleTombstones.bottleId, bottles.id)),
           ),
-        )
-        .orderBy(asc(bottles.id))
-        .limit(MAX_ENTITY_CONTEXT_BOTTLES),
-      db
-        .select({ bottleId: bottles.id, fullName: bottles.fullName })
-        .from(bottlesToDistillers)
-        .innerJoin(bottles, eq(bottles.id, bottlesToDistillers.bottleId))
-        .where(
-          and(
-            eq(bottlesToDistillers.distillerId, entityId),
-            isNotNull(bottles.groupId),
-            notExists(
-              db
-                .select({ bottleId: bottleTombstones.bottleId })
-                .from(bottleTombstones)
-                .where(eq(bottleTombstones.bottleId, bottles.id)),
-            ),
+        ),
+      )
+      .orderBy(asc(bottles.id))
+      .limit(MAX_ENTITY_CONTEXT_BOTTLES),
+    db
+      .select({ bottleId: bottles.id, fullName: bottles.fullName })
+      .from(bottlesToDistillers)
+      .innerJoin(bottles, eq(bottles.id, bottlesToDistillers.bottleId))
+      .where(
+        and(
+          eq(bottlesToDistillers.distillerId, entityId),
+          isNotNull(bottles.groupId),
+          notExists(
+            db
+              .select({ bottleId: bottleTombstones.bottleId })
+              .from(bottleTombstones)
+              .where(eq(bottleTombstones.bottleId, bottles.id)),
           ),
-        )
-        .orderBy(asc(bottles.id))
-        .limit(MAX_ENTITY_CONTEXT_BOTTLES),
-    ]);
+        ),
+      )
+      .orderBy(asc(bottles.id))
+      .limit(MAX_ENTITY_CONTEXT_BOTTLES),
+  ]);
 
   const relatedBottles = new Map<
     number,
@@ -444,9 +456,13 @@ export async function getEntityClassifierContext(
     ...entity,
     shortName: normalizedOptionalText(entity.shortName),
     website: normalizedHttpUrl(entity.website),
-    aliases: aliases
-      .map(({ name }) => name.trim())
-      .filter((name) => name.length > 0),
+    aliases: Array.from(
+      new Set(
+        [...references, ...aliasRows]
+          .map(({ name }) => name.trim())
+          .filter((name) => name.length > 0),
+      ),
+    ).slice(0, MAX_ENTITY_CONTEXT_ALIASES),
     relatedBottles: Array.from(relatedBottles.values()),
   });
 }

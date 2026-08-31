@@ -8,6 +8,7 @@ import {
   bottleSeries,
   bottlesToDistillers,
   entityAliases,
+  entityReferences,
   entityTombstones,
 } from "@peated/server/db/schema";
 import {
@@ -84,6 +85,11 @@ async function entityImpact(database: AnyDatabase, entityId: number) {
     .from(bottleSeries)
     .where(eq(bottleSeries.brandId, entityId))
     .then(([row]) => row?.total ?? 0);
+  const referenceCount = await database
+    .select({ total: count() })
+    .from(entityReferences)
+    .where(eq(entityReferences.entityId, entityId))
+    .then(([row]) => row?.total ?? 0);
   const aliasCount = await database
     .select({ total: count() })
     .from(entityAliases)
@@ -95,6 +101,7 @@ async function entityImpact(database: AnyDatabase, entityId: number) {
     bottlerGroups,
     distillerGroups,
     series: seriesCount,
+    references: referenceCount,
     aliases: aliasCount,
   };
 }
@@ -316,18 +323,21 @@ export async function prepareEntityUpdate(
   };
 }
 
-async function entityAliasesFor(database: AnyDatabase, entityId: number) {
+async function getEntityReferenceNames(
+  database: AnyDatabase,
+  entityId: number,
+) {
   return database
-    .select({ name: entityAliases.name })
-    .from(entityAliases)
-    .where(eq(entityAliases.entityId, entityId))
-    .orderBy(asc(entityAliases.name))
+    .select({ name: entityReferences.name })
+    .from(entityReferences)
+    .where(eq(entityReferences.entityId, entityId))
+    .orderBy(asc(entityReferences.name))
     .then((rows) => rows.map(({ name }) => name));
 }
 
 function entityMergeIdentityState(
   current: EntityWithLocation,
-  aliases: string[],
+  references: string[],
   tombstoneDestinationEntityId: number | null,
 ) {
   return {
@@ -335,18 +345,22 @@ function entityMergeIdentityState(
     name: current.entity.name,
     shortName: current.entity.shortName,
     kind: current.entity.kind!,
-    aliasDigest: relationshipDigest(aliases),
+    referenceDigest: relationshipDigest(references),
     tombstoneDestinationEntityId,
   };
 }
 
 function entityMergeSourceState(
   current: EntityWithLocation,
-  aliases: string[],
+  references: string[],
   tombstoneDestinationEntityId: number | null,
 ) {
   return {
-    ...entityMergeIdentityState(current, aliases, tombstoneDestinationEntityId),
+    ...entityMergeIdentityState(
+      current,
+      references,
+      tombstoneDestinationEntityId,
+    ),
     website: current.entity.website,
     countryId: current.entity.countryId,
     regionId: current.entity.regionId,
@@ -442,11 +456,11 @@ export async function prepareEntityMerge(
   requireInspectedEntity(destinationEntityId, context);
   const source = await loadEntity(context.database, sourceEntityId);
   const destination = await loadEntity(context.database, destinationEntityId);
-  const sourceAliases = await entityAliasesFor(
+  const sourceReferences = await getEntityReferenceNames(
     context.database,
     sourceEntityId,
   );
-  const destinationAliases = await entityAliasesFor(
+  const destinationReferences = await getEntityReferenceNames(
     context.database,
     destinationEntityId,
   );
@@ -502,10 +516,10 @@ export async function prepareEntityMerge(
         warnings,
       },
       stateToken: {
-        source: entityMergeSourceState(source, sourceAliases, null),
+        source: entityMergeSourceState(source, sourceReferences, null),
         destination: entityMergeIdentityState(
           destination,
-          destinationAliases,
+          destinationReferences,
           null,
         ),
         relationshipDigest: relationshipDigest(

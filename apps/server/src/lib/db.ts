@@ -1,13 +1,13 @@
 import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import type { InferSelectModel, Table } from "drizzle-orm";
-import { and, eq, getTableColumns, inArray, ne, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, ne, or, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import type { ReservedCollectionSlug } from "../constants";
 import type { AnyDatabase } from "../db";
 import type { Collection, Entity, EntityKind } from "../db/schema";
-import { changes, collections, entities, entityAliases } from "../db/schema";
+import { changes, collections, entities, entityReferences } from "../db/schema";
 import {
   EntityInputSchema,
   EntityKindEnum,
@@ -88,40 +88,37 @@ export function coerceToUpsert({
   return rv;
 }
 
-export class DuplicateEntityAliasError extends Error {
+export class EntityReferenceConflictError extends Error {
   constructor(
     readonly entityId: number,
-    readonly aliasName: string,
+    readonly referenceName: string,
   ) {
-    super(`Duplicate entity alias found (${entityId}) for "${aliasName}".`);
-    this.name = "DuplicateEntityAliasError";
+    super(`The name "${referenceName}" belongs to Entity ${entityId}.`);
+    this.name = "EntityReferenceConflictError";
   }
 }
 
-function getEntityAliasNames({
+export function requiredEntityReferenceNames({
   name,
   shortName,
 }: {
   name: string;
   shortName?: string | null;
 }) {
-  return Array.from(
-    new Set(
-      [
-        name,
-        shortName,
-        name.startsWith("The ") ? name.substring(4) : null,
-      ].filter((value): value is string => Boolean(value)),
-    ),
-  );
+  const seen = new Set<string>();
+  return [
+    name,
+    shortName,
+    name.startsWith("The ") ? name.substring(4) : null,
+  ].filter((value): value is string => {
+    if (!value || seen.has(value.toLowerCase())) return false;
+    seen.add(value.toLowerCase());
+    return true;
+  });
 }
 
-/**
- * Bottle creation accepts entity ids or lightweight draft objects. When a draft
- * name is already known as an exact canonical name, short name, or alias, we
- * should reuse that entity instead of minting a duplicate brand/bottler.
- */
-export async function findEntityByExactNameOrAlias(
+/** Finds an Entity only when the name is accepted for automatic matching. */
+export async function findEntityByExactNameOrReference(
   db: AnyDatabase,
   name: string,
 ): Promise<Entity | null> {
@@ -131,61 +128,44 @@ export async function findEntityByExactNameOrAlias(
   }
 
   const lowerName = normalizedName.toLowerCase();
+  const nameMatch = eq(sql`LOWER(${entities.name})`, lowerName);
+  const shortNameMatch = eq(
+    sql`LOWER(COALESCE(${entities.shortName}, ''))`,
+    lowerName,
+  );
+  const trimmedNameMatch = eq(
+    sql`LOWER(
+      CASE
+        WHEN ${entities.name} ILIKE 'The %'
+          THEN SUBSTRING(${entities.name} FROM 5)
+        ELSE ''
+      END
+    )`,
+    lowerName,
+  );
+  const referenceMatch = eq(sql`LOWER(${entityReferences.name})`, lowerName);
 
-  const [entityByName] = await db
-    .select()
+  const [row] = await db
+    .select({ entity: entities })
     .from(entities)
-    .where(eq(sql`LOWER(${entities.name})`, lowerName))
-    .limit(1);
-  if (entityByName) {
-    return entityByName;
-  }
-
-  const [entityByShortName] = await db
-    .select()
-    .from(entities)
-    .where(eq(sql`LOWER(COALESCE(${entities.shortName}, ''))`, lowerName))
-    .limit(1);
-  if (entityByShortName) {
-    return entityByShortName;
-  }
-
-  const [entityByTrimmedArticle] = await db
-    .select()
-    .from(entities)
-    .where(
-      eq(
-        sql`LOWER(
-          CASE
-            WHEN ${entities.name} ILIKE 'The %'
-              THEN SUBSTRING(${entities.name} FROM 5)
-              ELSE ''
-          END
-        )`,
-        lowerName,
-      ),
+    .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
+    .where(or(nameMatch, shortNameMatch, trimmedNameMatch, referenceMatch))
+    .orderBy(
+      sql`CASE
+        WHEN ${nameMatch} THEN 0
+        WHEN ${shortNameMatch} THEN 1
+        WHEN ${trimmedNameMatch} THEN 2
+        ELSE 3
+      END`,
+      entities.id,
     )
     .limit(1);
-  if (entityByTrimmedArticle) {
-    return entityByTrimmedArticle;
-  }
 
-  const [entityByAlias] = await db
-    .select({ entity: entities })
-    .from(entityAliases)
-    .innerJoin(entities, eq(entityAliases.entityId, entities.id))
-    .where(eq(sql`LOWER(${entityAliases.name})`, lowerName))
-    .limit(1);
-
-  return entityByAlias?.entity ?? null;
+  return row?.entity ?? null;
 }
 
-/**
- * Keep entity aliases in sync anywhere we can create or rename entities.
- * Exact short-name and alias matching is one of the cheap deterministic paths
- * that lets ingestion bypass the classifier safely when the identity is known.
- */
-export async function upsertEntityAliases({
+/** Keeps the names used for automatic matching in sync with the Entity. */
+export async function upsertEntityReferences({
   db,
   entity,
   previousEntity = null,
@@ -194,73 +174,84 @@ export async function upsertEntityAliases({
   entity: Pick<Entity, "id" | "name" | "shortName" | "createdAt">;
   previousEntity?: Pick<Entity, "name" | "shortName"> | null;
 }) {
-  const nextAliasNames = getEntityAliasNames(entity);
-  const nextAliasNamesLower = new Set(
-    nextAliasNames.map((aliasName) => aliasName.toLowerCase()),
+  const nextReferenceNames = requiredEntityReferenceNames(entity);
+  const nextReferenceNamesLower = new Set(
+    nextReferenceNames.map((referenceName) => referenceName.toLowerCase()),
   );
 
-  for (const aliasName of nextAliasNames) {
-    const existingAlias = await db.query.entityAliases.findFirst({
-      where: eq(sql`LOWER(${entityAliases.name})`, aliasName.toLowerCase()),
+  for (const referenceName of nextReferenceNames) {
+    const existingReference = await db.query.entityReferences.findFirst({
+      where: eq(
+        sql`LOWER(${entityReferences.name})`,
+        referenceName.toLowerCase(),
+      ),
     });
 
-    if (existingAlias?.entityId === entity.id) {
-      if (existingAlias.name !== aliasName) {
+    if (existingReference?.entityId === entity.id) {
+      if (existingReference.name !== referenceName) {
         await db
-          .update(entityAliases)
-          .set({ name: aliasName })
+          .update(entityReferences)
+          .set({ name: referenceName })
           .where(
             eq(
-              sql`LOWER(${entityAliases.name})`,
-              existingAlias.name.toLowerCase(),
+              sql`LOWER(${entityReferences.name})`,
+              existingReference.name.toLowerCase(),
             ),
           );
       }
       continue;
     }
 
-    if (!existingAlias) {
-      await db.insert(entityAliases).values({
-        name: aliasName,
+    if (!existingReference) {
+      await db.insert(entityReferences).values({
+        name: referenceName,
         entityId: entity.id,
         createdAt: entity.createdAt,
       });
       continue;
     }
 
-    if (!existingAlias.entityId) {
+    if (!existingReference.entityId) {
       await db
-        .update(entityAliases)
+        .update(entityReferences)
         .set({ entityId: entity.id })
         .where(
           eq(
-            sql`LOWER(${entityAliases.name})`,
-            existingAlias.name.toLowerCase(),
+            sql`LOWER(${entityReferences.name})`,
+            existingReference.name.toLowerCase(),
           ),
         );
       continue;
     }
 
-    throw new DuplicateEntityAliasError(existingAlias.entityId, aliasName);
+    throw new EntityReferenceConflictError(
+      existingReference.entityId,
+      referenceName,
+    );
   }
 
   if (!previousEntity) {
     return;
   }
 
-  const retiredAliasNames = getEntityAliasNames(previousEntity).filter(
-    (aliasName) => !nextAliasNamesLower.has(aliasName.toLowerCase()),
+  const retiredReferenceNames = requiredEntityReferenceNames(
+    previousEntity,
+  ).filter(
+    (referenceName) =>
+      !nextReferenceNamesLower.has(referenceName.toLowerCase()),
   );
-  if (!retiredAliasNames.length) {
+  if (!retiredReferenceNames.length) {
     return;
   }
 
-  await db.delete(entityAliases).where(
+  await db.delete(entityReferences).where(
     and(
-      eq(entityAliases.entityId, entity.id),
+      eq(entityReferences.entityId, entity.id),
       inArray(
-        sql`LOWER(${entityAliases.name})`,
-        retiredAliasNames.map((aliasName) => aliasName.toLowerCase()),
+        sql`LOWER(${entityReferences.name})`,
+        retiredReferenceNames.map((referenceName) =>
+          referenceName.toLowerCase(),
+        ),
       ),
     ),
   );
@@ -326,7 +317,7 @@ export const upsertEntity = async ({
   });
   const actorId = createdByActorId;
 
-  const existingEntity = await findEntityByExactNameOrAlias(
+  const existingEntity = await findEntityByExactNameOrReference(
     db,
     normalizedData.name,
   );
@@ -368,7 +359,7 @@ export const upsertEntity = async ({
       createdAt: result.createdAt,
     });
 
-    await upsertEntityAliases({
+    await upsertEntityReferences({
       db,
       entity: result,
     });
@@ -381,7 +372,7 @@ export const upsertEntity = async ({
     };
   }
 
-  const resultConflict = await findEntityByExactNameOrAlias(
+  const resultConflict = await findEntityByExactNameOrReference(
     db,
     normalizedData.name,
   );

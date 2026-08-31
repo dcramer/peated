@@ -1800,6 +1800,20 @@
       "when": 1788194149105,
       "tag": "0256_exotic_leo",
       "breakpoints": false
+    },
+    {
+      "idx": 257,
+      "version": "7",
+      "when": 1788200498127,
+      "tag": "0257_gigantic_kat_farrell",
+      "breakpoints": false
+    },
+    {
+      "idx": 258,
+      "version": "7",
+      "when": 1788200515122,
+      "tag": "0258_silky_warstar",
+      "breakpoints": false
     }
   ]
 }

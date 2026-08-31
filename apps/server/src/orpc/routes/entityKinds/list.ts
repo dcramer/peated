@@ -2,8 +2,8 @@ import { db } from "@peated/server/db";
 import {
   countries,
   entities,
-  entityAliases,
   entityFollows,
+  entityReferences,
   regions,
   type EntityKind,
   type User,
@@ -73,11 +73,11 @@ export async function listEntities({
     where.push(
       sql`exists(${db
         .select({ n: sql`1` })
-        .from(entityAliases)
+        .from(entityReferences)
         .where(
           and(
-            eq(entityAliases.entityId, entities.id),
-            ilike(entityAliases.name, input.name),
+            eq(entityReferences.entityId, entities.id),
+            ilike(entityReferences.name, input.name),
           ),
         )})`,
     );

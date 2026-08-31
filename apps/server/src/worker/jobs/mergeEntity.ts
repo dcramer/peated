@@ -7,10 +7,10 @@ import {
   bottlesToDistillers,
   changes,
   entities,
-  entityAliases,
   entityEvents,
   entityFollows,
   entityImages,
+  entityReferences,
   entityTombstones,
 } from "@peated/server/db/schema";
 import {
@@ -23,6 +23,7 @@ import {
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
+import { moveEntityAliases } from "@peated/server/lib/entityAliases";
 import {
   EntityMergeOperationExecutionError,
   loadEntityMergeOperation,
@@ -577,10 +578,16 @@ async function performEntityMerge({
       );
     }
 
+    await moveEntityAliases(tx, fromEntityIds, {
+      id: toEntity.id,
+      name: toEntity.name,
+      shortName: toEntity.shortName,
+    });
+
     await tx
-      .update(entityAliases)
+      .update(entityReferences)
       .set({ entityId: toEntity.id })
-      .where(inArray(entityAliases.entityId, fromEntityIds));
+      .where(inArray(entityReferences.entityId, fromEntityIds));
 
     const [destinationPrimaryImage] = await tx
       .select({ id: entityImages.id })

@@ -30,6 +30,10 @@ Classifier terms are governed by the
   placement. It does not restrict Bottle relationships. A Bottle can use any
   Entity as its brand, bottler, or distiller, and one Entity can fill more than
   one of those relationships.
+- **EntityReference** is a name that Peated can match to one Entity without a
+  classifier. Each reference belongs to at most one Entity.
+- **EntityAlias** is another name shown on an Entity page and used in search.
+  An alias alone is not enough to match new input to an Entity.
 
 Collection membership describes a user's physical unit, status, and image. It
 does not create another catalog identity layer.
@@ -209,6 +213,15 @@ BottleSeries does not aggregate ratings and is never sufficient grouping
 authority.
 
 ## Naming And Entity Boundaries
+
+An Entity `name` is its full catalog name. `shortName` is the compact name used
+in Bottle names. The alias list includes `shortName`, but it can be changed only
+by editing the Entity.
+
+Peated keeps references for the Entity name, short name, and the name without a
+leading “The.” A moderator can add more references. Adding or deleting an alias
+does not change these references. The same alias can belong to more than one
+Entity.
 
 - `brand` is the consumer-facing label brand.
 - `bottler` is the named, market-facing bottler or release imprint for the

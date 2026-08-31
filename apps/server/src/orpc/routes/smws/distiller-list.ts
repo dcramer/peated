@@ -1,6 +1,6 @@
 import { SMWS_DISTILLERY_CODES } from "@peated/bottle-classifier/smws";
 import { db } from "@peated/server/db";
-import { entities, entityAliases } from "@peated/server/db/schema";
+import { entities, entityReferences } from "@peated/server/db/schema";
 import { implement } from "@peated/server/orpc";
 import smwsDistillerListContract from "@peated/server/orpc/contracts/smws/distiller-list";
 import { serialize } from "@peated/server/serializers";
@@ -21,8 +21,8 @@ export default implement(smwsDistillerListContract).handler(async function ({
         eq(entities.kind, "distillery"),
         sql`(LOWER(${entities.name}) IN ${distilleryNames}
           OR ${entities.id} IN (
-            SELECT ${entityAliases.entityId} FROM ${entityAliases}
-            WHERE LOWER(${entityAliases.name}) IN ${distilleryNames}
+            SELECT ${entityReferences.entityId} FROM ${entityReferences}
+            WHERE LOWER(${entityReferences.name}) IN ${distilleryNames}
           ))`,
       ),
     );

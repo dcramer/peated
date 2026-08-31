@@ -144,7 +144,7 @@ describe("searchClassifierEntities", () => {
     expect(results[0]?.entityId).toBe(created.at(-1)?.id);
   });
 
-  test("deduplicates matching aliases before limiting contained entities", async ({
+  test("deduplicates matching references before limiting contained entities", async ({
     fixtures,
   }) => {
     const aliasHeavy = await fixtures.Entity({
@@ -155,18 +155,18 @@ describe("searchClassifierEntities", () => {
       name: "Needle Producer",
       kind: "distillery",
     });
-    const aliases = Array.from(
+    const references = Array.from(
       { length: 10 },
-      (_, index) => `Very Long Crowd Alias Number ${index}`,
+      (_, index) => `Very Long Crowd Reference Number ${index}`,
     );
     await Promise.all(
-      aliases.map((name) =>
-        fixtures.EntityAlias({ entityId: aliasHeavy.id, name }),
+      references.map((name) =>
+        fixtures.EntityReference({ entityId: aliasHeavy.id, name }),
       ),
     );
 
     const results = await searchClassifierEntities({
-      query: `${aliases.join(" ")} Needle Producer Company`,
+      query: `${references.join(" ")} Needle Producer Company`,
       limit: 2,
     });
 
@@ -178,7 +178,7 @@ describe("searchClassifierEntities", () => {
     );
   });
 
-  test("does not rank alias matches by unrelated canonical name length", async ({
+  test("does not rank reference matches by unrelated canonical name length", async ({
     fixtures,
   }) => {
     const misleading = await Promise.all(
@@ -187,9 +187,9 @@ describe("searchClassifierEntities", () => {
           name: `Unrelated Extremely Long Canonical Distillery Name ${index}`,
           kind: "distillery",
         });
-        await fixtures.EntityAlias({
+        await fixtures.EntityReference({
           entityId: entity.id,
-          name: `Alias${index}`,
+          name: `Reference${index}`,
         });
         return entity;
       }),
@@ -200,7 +200,7 @@ describe("searchClassifierEntities", () => {
     });
 
     const results = await searchClassifierEntities({
-      query: `${misleading.map((_, index) => `Alias${index}`).join(" ")} Needle Producer Company`,
+      query: `${misleading.map((_, index) => `Reference${index}`).join(" ")} Needle Producer Company`,
       limit: 1,
     });
 
@@ -208,28 +208,32 @@ describe("searchClassifierEntities", () => {
     expect(results[0]?.entityId).toBe(specific.id);
   });
 
-  test("returns the longest matching alias used for contained scoring", async ({
+  test("returns the longest matching reference used for contained scoring", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
       name: "Canonical Producer",
       kind: "distillery",
     });
-    await fixtures.EntityAlias({ entityId: entity.id, name: "Zed Alias" });
-    await fixtures.EntityAlias({
+    await fixtures.EntityReference({
       entityId: entity.id,
-      name: "Alpha Very Long Specific Producer Alias",
+      name: "Zed Reference",
+    });
+    await fixtures.EntityReference({
+      entityId: entity.id,
+      name: "Alpha Very Long Specific Producer Reference",
     });
 
     const results = await searchClassifierEntities({
-      query: "Zed Alias Alpha Very Long Specific Producer Alias Company",
+      query:
+        "Zed Reference Alpha Very Long Specific Producer Reference Company",
       limit: 5,
     });
 
     expect(results).toContainEqual(
       expect.objectContaining({
         entityId: entity.id,
-        alias: "Alpha Very Long Specific Producer Alias",
+        reference: "Alpha Very Long Specific Producer Reference",
       }),
     );
   });

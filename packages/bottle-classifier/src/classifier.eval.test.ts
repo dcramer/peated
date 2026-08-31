@@ -833,7 +833,7 @@ function auditEntityContext(entity: EntityResolution): EntityContext {
     country: null,
     region: null,
     yearEstablished: null,
-    aliases: entity.alias ? [entity.alias] : [],
+    aliases: entity.reference ? [entity.reference] : [],
     relatedBottles: [],
   });
 }
@@ -858,7 +858,7 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
       id: entity.entityId,
       name: entity.name,
       shortName: entity.shortName,
-      aliases: entity.alias ? [entity.alias] : [],
+      aliases: entity.reference ? [entity.reference] : [],
       kind: entity.kind,
     })),
     bottles: [],

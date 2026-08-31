@@ -97,9 +97,9 @@ const loadDefaultEntities = async () => {
   const results: Entity[] = [];
 
   for (const data of mocks) {
-    const existingMatch = await db.query.entityAliases.findFirst({
-      where: (entityAliases, { eq }) =>
-        eq(sql`LOWER(${entityAliases.name})`, data.name.toLowerCase()),
+    const existingMatch = await db.query.entityReferences.findFirst({
+      where: (entityReferences, { eq }) =>
+        eq(sql`LOWER(${entityReferences.name})`, data.name.toLowerCase()),
       with: {
         entity: true,
       },

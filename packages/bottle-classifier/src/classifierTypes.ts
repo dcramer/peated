@@ -689,7 +689,7 @@ export const EntityResolutionSchema = z.object({
   name: z.string(),
   shortName: z.string().nullable().default(null),
   kind: EntityKindEnum,
-  alias: z.string().nullable().default(null),
+  reference: z.string().nullable().default(null),
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
   retrievedFor: z

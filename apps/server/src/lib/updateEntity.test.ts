@@ -7,6 +7,7 @@ import {
   changes,
   entities,
   entityAliases,
+  entityReferences,
 } from "@peated/server/db/schema";
 import {
   EntityUpdateAuthorizationError,
@@ -74,13 +75,13 @@ describe("updateEntity", () => {
     }
 
     expect(
-      await db.query.entityAliases.findFirst({
-        where: eq(entityAliases.name, "Old Harbor"),
+      await db.query.entityReferences.findFirst({
+        where: eq(entityReferences.name, "Old Harbor"),
       }),
     ).toBeUndefined();
     expect(
-      await db.query.entityAliases.findFirst({
-        where: eq(entityAliases.name, "Harbor House"),
+      await db.query.entityReferences.findFirst({
+        where: eq(entityReferences.name, "Harbor House"),
       }),
     ).toMatchObject({ entityId: entity.id });
 
@@ -106,12 +107,38 @@ describe("updateEntity", () => {
     });
   });
 
-  test("rolls back a direct update when the canonical alias is owned elsewhere", async ({
+  test("removes a stored alias when it becomes the short name", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ name: "Harbor House" });
+    const alias = await fixtures.EntityAlias({
+      entityId: entity.id,
+      name: "HH",
+    });
+    const moderator = await fixtures.User({ mod: true });
+
+    await updateEntity({
+      entityId: entity.id,
+      input: { shortName: "HH" },
+      user: moderator,
+    });
+
+    expect(
+      await db.query.entityAliases.findFirst({
+        where: eq(entityAliases.id, alias.id),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
+    ).toMatchObject({ shortName: "HH" });
+  });
+
+  test("rolls back an update when the new name belongs to another Entity", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({ name: "Original Distillery" });
     const aliasOwner = await fixtures.Entity({ name: "Alias Owner" });
-    await fixtures.EntityAlias({
+    await fixtures.EntityReference({
       entityId: aliasOwner.id,
       name: "Claimed Name",
     });
@@ -125,7 +152,7 @@ describe("updateEntity", () => {
       }),
     ).rejects.toMatchObject({
       name: EntityUpdateConflictError.name,
-      message: `Duplicate entity alias found (${aliasOwner.id}) for "Claimed Name".`,
+      message: `The name "Claimed Name" belongs to Entity ${aliasOwner.id}.`,
     });
 
     const unchanged = await db.query.entities.findFirst({

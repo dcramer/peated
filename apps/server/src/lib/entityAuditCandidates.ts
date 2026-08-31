@@ -1,8 +1,8 @@
 import { normalizeString } from "@peated/bottle-classifier/normalize";
 import type {
   EntityClassificationCandidateTarget,
+  EntityClassificationContext,
   EntityClassificationReason,
-  EntityClassificationReference,
   EntityClassificationSampleBottle,
 } from "@peated/entity-classifier";
 import { db } from "@peated/server/db";
@@ -12,6 +12,7 @@ import {
   countries,
   entities,
   entityAliases,
+  entityReferences,
   regions,
 } from "@peated/server/db/schema";
 import {
@@ -129,14 +130,14 @@ type CandidateEntity = {
 
 type CandidateTargetInternal = Omit<
   EntityClassificationCandidateTarget,
-  "aliases" | "supportingBottleIds"
+  "otherNames" | "supportingBottleIds"
 > & {
-  aliases?: string[];
+  otherNames?: string[];
   supportingBottleIds?: number[];
 };
 
 type EntityAuditCandidateInternal = {
-  aliases: string[];
+  otherNames: string[];
   candidateTargets: CandidateTargetInternal[];
   entity: CandidateEntity;
   reasons: EntityClassificationReason[];
@@ -320,9 +321,9 @@ function mergeCandidateTarget(
     return;
   }
 
-  existing.aliases = uniqueStrings([
-    ...(existing.aliases ?? []),
-    ...(candidate.aliases ?? []),
+  existing.otherNames = uniqueStrings([
+    ...(existing.otherNames ?? []),
+    ...(candidate.otherNames ?? []),
   ]);
   existing.source = Array.from(
     new Set([...existing.source, ...candidate.source]),
@@ -355,7 +356,7 @@ function mergeCandidateTarget(
 async function getBrandLookup() {
   const rows = await db
     .select({
-      alias: entityAliases.name,
+      reference: entityReferences.name,
       countryName: countries.name,
       entity: {
         id: entities.id,
@@ -371,26 +372,26 @@ async function getBrandLookup() {
       regionName: regions.name,
     })
     .from(entities)
-    .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+    .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
     .leftJoin(countries, eq(countries.id, entities.countryId))
     .leftJoin(regions, eq(regions.id, entities.regionId))
     .where(or(eq(entities.kind, "brand"), entityBrandUseCondition()));
 
   const brandsById = new Map<number, CandidateEntity>();
-  const brandAliasesById = new Map<number, string[]>();
+  const brandNamesById = new Map<number, string[]>();
   const lookup = new Map<string, BrandLookupEntry[]>();
 
   for (const row of rows) {
     brandsById.set(row.entity.id, row.entity);
-    brandAliasesById.set(row.entity.id, [
-      ...(brandAliasesById.get(row.entity.id) ?? []),
-      ...uniqueStrings([row.alias]),
+    brandNamesById.set(row.entity.id, [
+      ...(brandNamesById.get(row.entity.id) ?? []),
+      ...uniqueStrings([row.reference]),
     ]);
 
     for (const name of uniqueStrings([
       row.entity.name,
       row.entity.shortName,
-      row.alias,
+      row.reference,
     ])) {
       const normalizedName = normalizeComparableText(name);
       if (!normalizedName) {
@@ -408,7 +409,7 @@ async function getBrandLookup() {
   }
 
   return {
-    brandAliasesById,
+    brandNamesById,
     brandsById,
     lookup,
   };
@@ -498,11 +499,11 @@ async function findQueryMatchedEntityRows({
           sql`exists(
             ${db
               .select({ n: sql`1` })
-              .from(entityAliases)
+              .from(entityReferences)
               .where(
                 and(
-                  eq(entityAliases.entityId, entities.id),
-                  ilike(entityAliases.name, `%${query}%`),
+                  eq(entityReferences.entityId, entities.id),
+                  ilike(entityReferences.name, `%${query}%`),
                 ),
               )}
           )`,
@@ -534,35 +535,41 @@ async function findTopEntityRows(): Promise<CandidateEntity[]> {
     .limit(MAX_ENTITY_SCAN_LIMIT);
 }
 
-async function getAliasesByEntityIds(entityIds: number[]) {
+async function getKnownNamesByEntityIds(entityIds: number[]) {
   if (entityIds.length === 0) {
     return new Map<number, string[]>();
   }
 
-  const rows = await db
-    .select({
-      entityId: entityAliases.entityId,
-      name: entityAliases.name,
-    })
-    .from(entityAliases)
-    .where(inArray(entityAliases.entityId, entityIds));
+  const [referenceRows, aliasRows] = await Promise.all([
+    db
+      .select({
+        entityId: entityReferences.entityId,
+        name: entityReferences.name,
+      })
+      .from(entityReferences)
+      .where(inArray(entityReferences.entityId, entityIds)),
+    db
+      .select({ entityId: entityAliases.entityId, name: entityAliases.name })
+      .from(entityAliases)
+      .where(inArray(entityAliases.entityId, entityIds)),
+  ]);
 
-  const aliasesByEntityId = new Map<number, string[]>();
-  for (const row of rows) {
+  const namesByEntityId = new Map<number, string[]>();
+  for (const row of [...referenceRows, ...aliasRows]) {
     if (row.entityId === null) {
       continue;
     }
 
-    aliasesByEntityId.set(row.entityId, [
-      ...(aliasesByEntityId.get(row.entityId) ?? []),
+    namesByEntityId.set(row.entityId, [
+      ...(namesByEntityId.get(row.entityId) ?? []),
       row.name,
     ]);
   }
 
   return new Map(
-    Array.from(aliasesByEntityId.entries()).map(([entityId, aliases]) => [
+    Array.from(namesByEntityId.entries()).map(([entityId, names]) => [
       entityId,
-      uniqueStrings(aliases),
+      uniqueStrings(names),
     ]),
   );
 }
@@ -625,11 +632,11 @@ async function getSampleBottlesByBrandIds(brandIds: number[]) {
 }
 
 function buildSuffixTargetCandidates({
-  brandAliasesById,
+  brandNamesById,
   brandLookup,
   entity,
 }: {
-  brandAliasesById: Map<number, string[]>;
+  brandNamesById: Map<number, string[]>;
   brandLookup: Map<string, BrandLookupEntry[]>;
   entity: CandidateEntity;
 }): CandidateTargetInternal[] {
@@ -645,7 +652,7 @@ function buildSuffixTargetCandidates({
         entityId: entry.entity.id,
         name: entry.entity.name,
         shortName: entry.entity.shortName,
-        aliases: brandAliasesById.get(entry.entity.id) ?? [],
+        otherNames: brandNamesById.get(entry.entity.id) ?? [],
         kind: entry.entity.kind,
         website: entry.entity.website,
         score: 0.7,
@@ -662,11 +669,11 @@ function buildSuffixTargetCandidates({
 }
 
 function buildBrandRepairTargets({
-  brandAliasesById,
+  brandNamesById,
   brandsById,
   groups,
 }: {
-  brandAliasesById: Map<number, string[]>;
+  brandNamesById: Map<number, string[]>;
   brandsById: Map<number, CandidateEntity>;
   groups: BrandRepairGroup[];
 }): CandidateTargetInternal[] {
@@ -677,32 +684,32 @@ function buildBrandRepairTargets({
       entityId: group.targetBrand.id,
       name: group.targetBrand.name,
       shortName: targetBrand?.shortName ?? group.targetBrand.shortName,
-      aliases: brandAliasesById.get(group.targetBrand.id) ?? [],
+      otherNames: brandNamesById.get(group.targetBrand.id) ?? [],
       kind: targetBrand?.kind ?? "brand",
       website: targetBrand?.website ?? null,
       score: null,
       candidateCount: group.candidateCount,
       totalTastings: group.totalTastings,
       supportingBottleIds: [],
-      reason: `${group.candidateCount} bottle${group.candidateCount === 1 ? "" : "s"} already match ${group.targetBrand.name} from bottle title or alias evidence.`,
+      reason: `${group.candidateCount} bottle${group.candidateCount === 1 ? "" : "s"} already match ${group.targetBrand.name} from bottle title or reference evidence.`,
       source: ["grouped_brand_repair"],
     };
   });
 }
 
 function buildCandidate({
-  brandAliasesById,
+  brandNamesById,
   brandsById,
   brandLookup,
   entity,
-  entityAliases,
+  otherNames,
   groupedBrandRepairs,
 }: {
-  brandAliasesById: Map<number, string[]>;
+  brandNamesById: Map<number, string[]>;
   brandsById: Map<number, CandidateEntity>;
   brandLookup: Map<string, BrandLookupEntry[]>;
   entity: CandidateEntity;
-  entityAliases: string[];
+  otherNames: string[];
   groupedBrandRepairs: BrandRepairGroup[];
 }): EntityAuditCandidateInternal | null {
   const reasons: EntityClassificationReason[] = [];
@@ -711,7 +718,7 @@ function buildCandidate({
   if (groupedBrandRepairs.length > 0) {
     reasons.push(buildBrandRepairReason(groupedBrandRepairs));
     for (const target of buildBrandRepairTargets({
-      brandAliasesById,
+      brandNamesById,
       brandsById,
       groups: groupedBrandRepairs,
     })) {
@@ -725,7 +732,7 @@ function buildCandidate({
   }
 
   const suffixTargets = buildSuffixTargetCandidates({
-    brandAliasesById,
+    brandNamesById,
     brandLookup,
     entity,
   });
@@ -758,7 +765,7 @@ function buildCandidate({
   );
 
   return {
-    aliases: entityAliases,
+    otherNames,
     candidateTargets: mergedTargets,
     entity,
     reasons,
@@ -774,7 +781,7 @@ function buildCandidate({
 
 async function materializeCandidates(
   candidates: EntityAuditCandidateInternal[],
-): Promise<EntityClassificationReference[]> {
+): Promise<EntityClassificationContext[]> {
   if (candidates.length === 0) {
     return [];
   }
@@ -785,10 +792,10 @@ async function materializeCandidates(
       candidate.candidateTargets.map((target) => target.entityId),
     ),
   );
-  const [sourceAliasesById, targetAliasesById, sampleBottlesByBrandId] =
+  const [sourceNamesById, targetNamesById, sampleBottlesByBrandId] =
     await Promise.all([
-      getAliasesByEntityIds(sourceIds),
-      getAliasesByEntityIds(targetIds),
+      getKnownNamesByEntityIds(sourceIds),
+      getKnownNamesByEntityIds(targetIds),
       getSampleBottlesByBrandIds(
         candidates.map((candidate) => candidate.entity.id),
       ),
@@ -821,9 +828,9 @@ async function materializeCandidates(
   return candidates.map((candidate) => ({
     entity: {
       ...candidate.entity,
-      aliases: uniqueStrings([
+      otherNames: uniqueStrings([
         candidate.entity.name,
-        ...(sourceAliasesById.get(candidate.entity.id) ?? candidate.aliases),
+        ...(sourceNamesById.get(candidate.entity.id) ?? candidate.otherNames),
       ]),
     },
     reasons: candidate.reasons,
@@ -838,9 +845,9 @@ async function materializeCandidates(
 
       return {
         ...target,
-        aliases: uniqueStrings([
+        otherNames: uniqueStrings([
           target.name,
-          ...(targetAliasesById.get(target.entityId) ?? target.aliases ?? []),
+          ...(targetNamesById.get(target.entityId) ?? target.otherNames ?? []),
         ]),
         candidateCount: target.source.includes("grouped_brand_repair")
           ? groupedBottleIds.length
@@ -859,7 +866,7 @@ async function collectEntityAuditCandidates({
   query?: string;
 }): Promise<EntityAuditCandidateInternal[]> {
   const trimmedQuery = query.trim();
-  const { brandAliasesById, brandsById, lookup } = await getBrandLookup();
+  const { brandNamesById, brandsById, lookup } = await getBrandLookup();
 
   if (entityId) {
     const [entity] = await getEntityRowsByIds([entityId]);
@@ -867,7 +874,7 @@ async function collectEntityAuditCandidates({
       return [];
     }
 
-    const aliasesById = await getAliasesByEntityIds([entity.id]);
+    const namesById = await getKnownNamesByEntityIds([entity.id]);
     const groupedBrandRepairs = (
       await getBrandRepairGroups({
         currentBrandId: entity.id,
@@ -876,11 +883,11 @@ async function collectEntityAuditCandidates({
     ).results;
 
     const candidate = buildCandidate({
-      brandAliasesById,
+      brandNamesById,
       brandsById,
       brandLookup: lookup,
       entity,
-      entityAliases: aliasesById.get(entity.id) ?? [],
+      otherNames: namesById.get(entity.id) ?? [],
       groupedBrandRepairs,
     });
 
@@ -921,7 +928,7 @@ async function collectEntityAuditCandidates({
   }
 
   const entityRows = await getEntityRowsByIds(Array.from(subjectIds));
-  const aliasesById = await getAliasesByEntityIds(
+  const namesById = await getKnownNamesByEntityIds(
     entityRows.map((entity) => entity.id),
   );
   const groupsByBrandId = new Map<number, BrandRepairGroup[]>();
@@ -937,11 +944,11 @@ async function collectEntityAuditCandidates({
 
   for (const entity of entityRows) {
     const candidate = buildCandidate({
-      brandAliasesById,
+      brandNamesById,
       brandsById,
       brandLookup: lookup,
       entity,
-      entityAliases: aliasesById.get(entity.id) ?? [],
+      otherNames: namesById.get(entity.id) ?? [],
       groupedBrandRepairs: groupsByBrandId.get(entity.id) ?? [],
     });
 
@@ -956,13 +963,13 @@ async function collectEntityAuditCandidates({
   return results;
 }
 
-export async function getEntityClassificationReference({
+export async function getEntityClassificationContext({
   entity,
   includeManualFallback = true,
 }: {
   entity: number;
   includeManualFallback?: boolean;
-}): Promise<EntityClassificationReference | null> {
+}): Promise<EntityClassificationContext | null> {
   const [candidate] = await collectEntityAuditCandidates({
     entityId: entity,
   });
@@ -977,10 +984,10 @@ export async function getEntityClassificationReference({
       return null;
     }
 
-    const aliasesById = await getAliasesByEntityIds([entityRow.id]);
-    const [reference] = await materializeCandidates([
+    const namesById = await getKnownNamesByEntityIds([entityRow.id]);
+    const [context] = await materializeCandidates([
       {
-        aliases: aliasesById.get(entityRow.id) ?? [],
+        otherNames: namesById.get(entityRow.id) ?? [],
         candidateTargets: [],
         entity: entityRow,
         reasons: [
@@ -1000,7 +1007,7 @@ export async function getEntityClassificationReference({
       },
     ]);
 
-    return reference ?? null;
+    return context ?? null;
   }
 
   const [reference] = await materializeCandidates([candidate]);

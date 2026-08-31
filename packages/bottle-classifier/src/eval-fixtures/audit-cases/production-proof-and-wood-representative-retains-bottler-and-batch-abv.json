@@ -74,7 +74,7 @@
           "name": "Proof and Wood",
           "shortName": null,
           "kind": "brand",
-          "alias": null,
+          "reference": null,
           "score": 1,
           "source": ["context"]
         }

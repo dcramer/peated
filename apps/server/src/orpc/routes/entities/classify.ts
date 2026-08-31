@@ -1,6 +1,6 @@
 import { EntityClassificationResultSchema } from "@peated/entity-classifier";
 import { classifyEntity as classifyEntityWithAgent } from "@peated/server/agents/entityClassifier";
-import { getEntityClassificationReference } from "@peated/server/lib/entityAuditCandidates";
+import { getEntityClassificationContext } from "@peated/server/lib/entityAuditCandidates";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
@@ -30,18 +30,18 @@ export function createEntityClassifyProcedure(
     )
     .output(EntityClassificationResultSchema)
     .handler(async function ({ input, errors }) {
-      const reference = await getEntityClassificationReference({
+      const context = await getEntityClassificationContext({
         entity: input.entity,
       });
 
-      if (!reference) {
+      if (!context) {
         throw errors.NOT_FOUND({
           message: "Entity not found.",
         });
       }
 
       return await classify({
-        reference,
+        context,
       });
     });
 }

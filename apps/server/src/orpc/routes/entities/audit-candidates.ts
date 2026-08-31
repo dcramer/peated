@@ -1,4 +1,4 @@
-import { EntityClassificationReferenceSchema } from "@peated/entity-classifier";
+import { EntityClassificationContextSchema } from "@peated/entity-classifier";
 import { getEntityAuditCandidates } from "@peated/server/lib/entityAuditCandidates";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -26,7 +26,7 @@ export default procedure
   )
   .output(
     z.object({
-      results: z.array(EntityClassificationReferenceSchema),
+      results: z.array(EntityClassificationContextSchema),
       rel: z.object({
         nextCursor: z.number().nullable(),
         prevCursor: z.number().nullable(),

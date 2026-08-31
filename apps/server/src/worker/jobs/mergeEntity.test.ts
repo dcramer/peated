@@ -16,6 +16,7 @@ import {
   entityEvents,
   entityFollows,
   entityImages,
+  entityReferences,
   entityTombstones,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -74,9 +75,10 @@ async function deleteDestinationWhileMergeWaits<TResult>(
     const blockerPid = (
       await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
     ).rows[0]!.pid;
-    await blocker.query(`DELETE FROM "entity_alias" WHERE "entity_id" = $1`, [
-      destinationEntityId,
-    ]);
+    await blocker.query(
+      `DELETE FROM "entity_reference" WHERE "entity_id" = $1`,
+      [destinationEntityId],
+    );
     await blocker.query(`DELETE FROM "entity" WHERE "id" = $1`, [
       destinationEntityId,
     ]);
@@ -515,6 +517,34 @@ test("merge A into B", async ({ fixtures }) => {
   expect(tombstone.newEntityId).toEqual(newEntityB.id);
 });
 
+test("moves and deduplicates display aliases", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ name: "Source Entity" });
+  const destination = await fixtures.Entity({
+    name: "Destination Entity",
+    shortName: "Destination",
+  });
+  await fixtures.EntityAlias({
+    entityId: source.id,
+    name: "Moved Name",
+  });
+  await fixtures.EntityAlias({
+    entityId: source.id,
+    name: "Destination",
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db
+      .select({ entityId: entityAliases.entityId, name: entityAliases.name })
+      .from(entityAliases)
+      .where(eq(entityAliases.entityId, destination.id)),
+  ).toEqual([{ entityId: destination.id, name: "Moved Name" }]);
+});
+
 test("preserves generated Bottle content during an equivalent Entity merge", async ({
   fixtures,
 }) => {
@@ -599,9 +629,9 @@ test("merges an SMWS collision while replacing a duplicate distiller", async ({
     .set({ distillerId: destination.id })
     .where(eq(bottleGroupDistillers.groupId, duplicateBottle.groupId));
   await db
-    .update(entityAliases)
+    .update(entityReferences)
     .set({ entityId: destination.id })
-    .where(eq(entityAliases.name, source.name));
+    .where(eq(entityReferences.name, source.name));
 
   await mergeEntity({
     fromEntityIds: [source.id],
@@ -627,8 +657,8 @@ test("merges an SMWS collision while replacing a duplicate distiller", async ({
     }),
   ).toMatchObject({ newBottleId: canonicalBottle.id });
   expect(
-    await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, source.name),
+    await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, source.name),
     }),
   ).toMatchObject({ entityId: destination.id });
   expect(

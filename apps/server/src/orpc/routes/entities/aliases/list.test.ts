@@ -1,22 +1,46 @@
 import { routerClient } from "@peated/server/orpc/router";
-import { describe, expect, test } from "vitest";
 
 describe("GET /entities/:entity/aliases", () => {
-  test("lists entity aliases", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ name: "Foo" });
-    await fixtures.EntityAlias({
+  test("includes the short name and marks it", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({
+      name: "The Scotch Malt Whisky Society",
+      shortName: "SMWS",
+    });
+    const alias = await fixtures.EntityAlias({
       entityId: entity.id,
-      name: "Foo Bar",
+      name: "The Society",
     });
 
     const { results } = await routerClient.entities.aliases.list({
       entity: entity.id,
     });
 
-    expect(results.length).toEqual(2);
-    expect(results[0].name).toEqual("Foo");
-    expect(results[0].isCanonical).toEqual(true);
-    expect(results[1].name).toEqual("Foo Bar");
-    expect(results[1].isCanonical).toEqual(false);
+    expect(results).toEqual([
+      {
+        id: null,
+        name: "SMWS",
+        isShortName: true,
+        createdAt: null,
+      },
+      {
+        id: alias.id,
+        name: "The Society",
+        isShortName: false,
+        createdAt: alias.createdAt.toISOString(),
+      },
+    ]);
+  });
+
+  test("does not repeat a short name equal to the Entity name", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Wolfburn",
+      shortName: "Wolfburn",
+    });
+    const { results } = await routerClient.entities.aliases.list({
+      entity: entity.id,
+    });
+    expect(results).toEqual([]);
   });
 });

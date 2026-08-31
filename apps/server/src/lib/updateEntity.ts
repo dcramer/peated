@@ -13,9 +13,10 @@ import {
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { ExactBottleReferenceConflictError } from "@peated/server/lib/bottleReferences";
 import {
-  DuplicateEntityAliasError,
-  upsertEntityAliases,
+  EntityReferenceConflictError,
+  upsertEntityReferences,
 } from "@peated/server/lib/db";
+import { removePrimaryEntityAliases } from "@peated/server/lib/entityAliases";
 import {
   assertValidEntityOwner,
   EntityOwnerNotFoundError,
@@ -338,14 +339,15 @@ export async function updateEntityInTransaction(
 
   try {
     if (data.name || data.shortName !== undefined) {
+      await removePrimaryEntityAliases(transaction, newEntity);
       try {
-        await upsertEntityAliases({
+        await upsertEntityReferences({
           db: transaction,
           entity: newEntity,
           previousEntity: entity,
         });
       } catch (error) {
-        if (error instanceof DuplicateEntityAliasError) {
+        if (error instanceof EntityReferenceConflictError) {
           throw new EntityUpdateConflictError(error.message, {
             cause: error,
           });

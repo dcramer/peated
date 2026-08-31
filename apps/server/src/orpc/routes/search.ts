@@ -4,7 +4,7 @@ import {
   bottles,
   bottleTombstones,
   entities,
-  entityAliases,
+  entityReferences,
   entityTombstones,
   follows,
   regions,
@@ -95,7 +95,7 @@ function escapeLike(value: string) {
 function nameRank(
   names: SQL<unknown>[],
   query: string,
-  exactAliasMatch?: SQL<unknown>,
+  exactReferenceMatch?: SQL<unknown>,
 ) {
   // Use exact name, name prefix, word prefix, then other matches.
   // Bottle and Entity queries use activity and ID to break ties.
@@ -112,7 +112,7 @@ function nameRank(
   return sql<number>`CASE
     WHEN ${or(
       ...normalizedNames.map((name) => eq(name, normalizedQuery)),
-      exactAliasMatch,
+      exactReferenceMatch,
     )} THEN 0
     WHEN ${or(...normalizedNames.map((name) => like(name, prefix)))} THEN 1
     WHEN ${or(...wordNames.map((name) => like(name, wordPrefix)))} THEN 2
@@ -162,12 +162,12 @@ function exactBottleReferenceMatch(query: string) {
   )`;
 }
 
-function exactEntityAliasMatch(query: string) {
+function exactEntityReferenceMatch(query: string) {
   return sql`${entities.id} IN (
-    SELECT ${entityAliases.entityId}
-    FROM ${entityAliases}
-    WHERE LOWER(${entityAliases.name}) = ${query.toLowerCase().trim()}
-      AND ${entityAliases.entityId} IS NOT NULL
+    SELECT ${entityReferences.entityId}
+    FROM ${entityReferences}
+    WHERE LOWER(${entityReferences.name}) = ${query.toLowerCase().trim()}
+      AND ${entityReferences.entityId} IS NOT NULL
   )`;
 }
 
@@ -214,19 +214,19 @@ async function searchBottles(
   if (!query) return { total: 0, results: [] };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
-  const aliasMatch = exactBottleReferenceMatch(query);
+  const referenceMatch = exactBottleReferenceMatch(query);
   const where = and(
     activeBottleWhere(),
     or(
       sql`${bottles.searchVector} @@ ${textQuery}`,
       sql`${bottles.searchVector} @@ ${prefixQuery}`,
-      aliasMatch,
+      referenceMatch,
     ),
   );
   const rank = nameRank(
     [sql`${bottles.fullName}`, sql`${bottles.name}`],
     query,
-    aliasMatch,
+    referenceMatch,
   );
   const rows = await database
     .select({
@@ -252,19 +252,19 @@ async function searchEntities(
   if (!query) return { total: 0, results: [] };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
-  const aliasMatch = exactEntityAliasMatch(query);
+  const referenceMatch = exactEntityReferenceMatch(query);
   const where = and(
     entityScopeWhere(scope),
     or(
       sql`${entities.searchVector} @@ ${textQuery}`,
       sql`${entities.searchVector} @@ ${prefixQuery}`,
-      aliasMatch,
+      referenceMatch,
     ),
   );
   const rank = nameRank(
     [sql`${entities.name}`, sql`${entities.shortName}`],
     query,
-    aliasMatch,
+    referenceMatch,
   );
   const rows = await database
     .select({

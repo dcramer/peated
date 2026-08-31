@@ -30,11 +30,14 @@ export function EntityAliasList({
   );
 
   return (
-    <PageSection heading="Aliases">
+    <PageSection heading="Also known as">
       <AliasManager
         aliases={aliases.map((alias) => ({
-          created: <TimeSince date={alias.createdAt} />,
-          isPrimary: alias.isCanonical,
+          badge: alias.isShortName ? "Short name" : undefined,
+          canDelete: !alias.isShortName,
+          created: alias.createdAt ? (
+            <TimeSince date={alias.createdAt} />
+          ) : null,
           name: alias.name,
         }))}
         canEdit={user?.mod}
@@ -51,7 +54,9 @@ export function EntityAliasList({
           });
         }}
         onDelete={async (name) => {
-          await deleteAlias.mutateAsync({ name });
+          const alias = aliases.find((value) => value.name === name);
+          if (!alias?.id) return;
+          await deleteAlias.mutateAsync({ entity: entityId, alias: alias.id });
           setAliases((values) => values.filter((value) => value.name !== name));
         }}
       />

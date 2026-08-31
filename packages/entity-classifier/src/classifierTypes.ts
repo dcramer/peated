@@ -43,7 +43,7 @@ export const EntityClassificationCandidateTargetSchema = z
     entityId: z.number().int(),
     name: z.string().trim().min(1),
     shortName: z.string().trim().nullable().default(null),
-    aliases: z.array(z.string().trim().min(1)).default([]),
+    otherNames: z.array(z.string().trim().min(1)).default([]),
     kind: EntityKindEnum,
     website: z.string().trim().nullable().default(null),
     score: z.number().nullable().default(null),
@@ -60,7 +60,7 @@ export const EntityClassificationSubjectSchema = z
     id: z.number().int(),
     name: z.string().trim().min(1),
     shortName: z.string().trim().nullable().default(null),
-    aliases: z.array(z.string().trim().min(1)).default([]),
+    otherNames: z.array(z.string().trim().min(1)).default([]),
     kind: EntityKindEnum,
     website: z.string().trim().nullable().default(null),
     countryName: z.string().trim().nullable().default(null),
@@ -70,7 +70,7 @@ export const EntityClassificationSubjectSchema = z
   })
   .strict();
 
-export const EntityClassificationReferenceSchema = z
+export const EntityClassificationContextSchema = z
   .object({
     entity: EntityClassificationSubjectSchema,
     reasons: z.array(EntityClassificationReasonSchema).default([]),
@@ -95,7 +95,7 @@ export const EntityResolutionSchema = z
     name: z.string().trim().min(1),
     shortName: z.string().trim().nullable().default(null),
     kind: EntityKindEnum,
-    alias: z.string().trim().nullable().default(null),
+    reference: z.string().trim().nullable().default(null),
     score: z.number().nullable().default(null),
     source: z.array(z.enum(["exact", "text", "prefix"])).default([]),
   })
@@ -153,8 +153,8 @@ export type EntityClassificationCandidateTarget = z.infer<
 export type EntityClassificationSubject = z.infer<
   typeof EntityClassificationSubjectSchema
 >;
-export type EntityClassificationReference = z.infer<
-  typeof EntityClassificationReferenceSchema
+export type EntityClassificationContext = z.infer<
+  typeof EntityClassificationContextSchema
 >;
 export type SearchEntitiesArgs = z.infer<typeof SearchEntitiesArgsSchema>;
 export type EntityResolution = z.infer<typeof EntityResolutionSchema>;

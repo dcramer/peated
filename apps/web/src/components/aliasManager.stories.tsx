@@ -8,10 +8,14 @@ const meta = {
   component: AliasManager,
   args: {
     aliases: [
-      { created: "Aug 12, 2026", isPrimary: true, name: "Lagavulin" },
+      {
+        badge: "Short name",
+        canDelete: false,
+        created: null,
+        name: "Lagavulin",
+      },
       {
         created: "Aug 18, 2026",
-        isPrimary: false,
         name: "Lagavulin Distillery",
       },
     ],

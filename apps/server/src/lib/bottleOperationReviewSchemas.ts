@@ -216,6 +216,7 @@ export const EntityImpactSchema = z
     bottlerGroups: z.number().int().nonnegative(),
     distillerGroups: z.number().int().nonnegative(),
     series: z.number().int().nonnegative(),
+    references: z.number().int().nonnegative(),
     aliases: z.number().int().nonnegative(),
   })
   .strict();
@@ -373,7 +374,7 @@ const EntityMergeIdentityStateSchema = z
     name: NonEmptyTextSchema,
     shortName: RawEntityShortNameSchema,
     kind: EntityContextFields.kind,
-    aliasDigest: RelationshipDigestSchema,
+    referenceDigest: RelationshipDigestSchema,
     tombstoneDestinationEntityId: PositiveIdSchema.nullable(),
   })
   .strict();

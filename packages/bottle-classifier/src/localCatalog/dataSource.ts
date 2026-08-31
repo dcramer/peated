@@ -61,28 +61,28 @@ function getEntitySearchMatch({
   aliases: string[];
 }) {
   const candidates = [
-    { value: name, alias: null },
-    { value: shortName, alias: null },
-    ...aliases.map((alias) => ({ value: alias, alias })),
+    { value: name, reference: null },
+    { value: shortName, reference: null },
+    ...aliases.map((reference) => ({ value: reference, reference })),
   ];
   let bestMatch:
     | {
-        alias: string | null;
+        reference: string | null;
         score: number;
         source: "exact" | "text" | "contained";
       }
     | undefined;
 
-  for (const { value, alias } of candidates) {
+  for (const { value, reference } of candidates) {
     const normalizedValue = normalizeSearchText(value);
     const match =
       normalizedValue === query
-        ? { alias, score: 1, source: "exact" as const }
+        ? { reference, score: 1, source: "exact" as const }
         : normalizedValue.includes(query)
-          ? { alias, score: 0.8, source: "text" as const }
+          ? { reference, score: 0.8, source: "text" as const }
           : normalizedValue.length >= 4 && query.includes(normalizedValue)
             ? {
-                alias,
+                reference,
                 score: containedEntityScore(query, normalizedValue),
                 source: "contained" as const,
               }
@@ -395,7 +395,7 @@ function searchCatalogEntities(
           name: entity.name,
           shortName: entity.shortName,
           kind: entity.kind,
-          alias: match.alias,
+          reference: match.reference,
           score: match.score,
           source: ["local_catalog", match.source],
         }),

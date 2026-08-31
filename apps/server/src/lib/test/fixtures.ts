@@ -359,7 +359,7 @@ export const Entity = async (
 
     if (!entity) throw new Error("Unable to create Entity fixture");
 
-    await tx.insert(dbSchema.entityAliases).values({
+    await tx.insert(dbSchema.entityReferences).values({
       entityId: entity.id,
       name: entity.name,
       createdAt: entity.createdAt,
@@ -379,13 +379,13 @@ export const Entity = async (
   });
 };
 
-export const EntityAlias = async (
-  { ...data }: Partial<dbSchema.NewEntityAlias> = {},
+export const EntityReference = async (
+  { ...data }: Partial<dbSchema.NewEntityReference> = {},
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.EntityAlias> => {
+): Promise<dbSchema.EntityReference> => {
   const [result] = await db.transaction(async (tx) => {
     return await tx
-      .insert(dbSchema.entityAliases)
+      .insert(dbSchema.entityReferences)
       .values({
         entityId: data.entityId || (await Entity({}, tx)).id,
         name: choose(distilleryNames),
@@ -394,6 +394,29 @@ export const EntityAlias = async (
       })
       .returning();
   });
+  if (!result) throw new Error("Unable to create EntityReference fixture");
+  return result;
+};
+
+export const EntityAlias = async (
+  { ...data }: Partial<dbSchema.NewEntityAlias> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.EntityAlias> => {
+  const entityId = data.entityId ?? (await Entity({}, db)).id;
+  const name = data.name ?? choose(distilleryNames);
+  const createdByActorId =
+    data.createdByActorId ??
+    (await getUserActorByIdForDatabase(db, (await User({}, db)).id)).id;
+  const [result] = await db
+    .insert(dbSchema.entityAliases)
+    .values({
+      ...data,
+      entityId,
+      name,
+      normalizedName: data.normalizedName ?? name.trim().toLowerCase(),
+      createdByActorId,
+    })
+    .returning();
   if (!result) throw new Error("Unable to create EntityAlias fixture");
   return result;
 };

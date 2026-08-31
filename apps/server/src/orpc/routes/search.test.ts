@@ -2,13 +2,14 @@ import { db } from "@peated/server/db";
 import {
   bottleReferences,
   bottleTombstones,
-  entityAliases,
+  entityReferences,
   entityTombstones,
 } from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import indexBottleSearchVectors from "@peated/server/worker/jobs/indexBottleSearchVectors";
+import indexEntitySearchVectors from "@peated/server/worker/jobs/indexEntitySearchVectors";
 import { describe, expect, test } from "vitest";
 
 describe("GET /search", () => {
@@ -396,18 +397,41 @@ describe("GET /search", () => {
     ]);
   });
 
-  test("searches directly assigned Entity aliases", async ({ fixtures }) => {
+  test("searches directly assigned Entity references", async ({ fixtures }) => {
     const entity = await fixtures.Entity({
       name: "Canonical Entity Name",
       kind: "brand",
     });
-    await db.insert(entityAliases).values({
+    await db.insert(entityReferences).values({
       entityId: entity.id,
-      name: "Immediate Entity Alias",
+      name: "Immediate Entity Reference",
     });
 
     const data = await routerClient.search({
-      query: "Immediate Entity Alias",
+      query: "Immediate Entity Reference",
+      scopes: ["brands"],
+    });
+
+    expect(data.groups).toMatchObject([
+      { type: "brands", total: 1, results: [{ id: entity.id }] },
+    ]);
+  });
+
+  test("finds an Entity by a display alias without exact-match authority", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Canonical Entity Name",
+      kind: "brand",
+    });
+    await fixtures.EntityAlias({
+      entityId: entity.id,
+      name: "Marketed Entity Name",
+    });
+    await indexEntitySearchVectors({ entityId: entity.id });
+
+    const data = await routerClient.search({
+      query: "Marketed Entity Name",
       scopes: ["brands"],
     });
 

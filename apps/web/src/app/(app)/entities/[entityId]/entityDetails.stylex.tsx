@@ -54,7 +54,7 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
         </TextLink>
       ) : null,
     },
-    { label: "Also known as", value: entity.shortName },
+    { label: "Short name", value: entity.shortName },
   ];
 }
 

@@ -11,8 +11,9 @@ import { DataTable, type DataTableColumn } from "./dataTable.stylex";
 import { Field, TextInput, ValidationMessage } from "./field.stylex";
 
 export type AliasManagerItem = {
+  badge?: string;
+  canDelete?: boolean;
   created: ReactNode;
-  isPrimary: boolean;
   name: string;
 };
 
@@ -37,7 +38,7 @@ export function AliasManager({
       cell: (item) => (
         <span {...stylex.props(styles.name)}>
           <span>{item.name}</span>
-          {item.isPrimary ? <Chip variant="tinted">Primary</Chip> : null}
+          {item.badge ? <Chip variant="tinted">{item.badge}</Chip> : null}
         </span>
       ),
       header: "Name",
@@ -54,7 +55,7 @@ export function AliasManager({
           {
             align: "right",
             cell: (item: AliasManagerItem) =>
-              item.isPrimary ? null : (
+              item.canDelete === false ? null : (
                 <Button
                   disabled={pending !== null}
                   loading={pending === item.name}

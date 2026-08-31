@@ -1,6 +1,6 @@
 import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { entities, entityAliases } from "@peated/server/db/schema";
+import { entities, entityReferences } from "@peated/server/db/schema";
 import { webSearchQuery } from "@peated/server/lib/search";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 
@@ -16,7 +16,7 @@ export type ClassifierEntityResolution = {
   name: string;
   shortName: string | null;
   kind: "brand" | "bottler" | "distillery" | "company";
-  alias: string | null;
+  reference: string | null;
   score: number | null;
   source: ("contained" | "exact" | "text" | "prefix")[];
 };
@@ -53,8 +53,8 @@ function mergeResult(
     existing.score = candidate.score;
   }
 
-  if (!existing.alias && candidate.alias) {
-    existing.alias = candidate.alias;
+  if (!existing.reference && candidate.reference) {
+    existing.reference = candidate.reference;
   }
 }
 
@@ -70,10 +70,10 @@ export async function searchClassifierEntities(
       name: entities.name,
       shortName: entities.shortName,
       kind: entities.kind,
-      alias: entityAliases.name,
+      reference: entityReferences.name,
     })
     .from(entities)
-    .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+    .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
     .where(
       and(
         args.kind ? eq(entities.kind, args.kind) : undefined,
@@ -84,7 +84,7 @@ export async function searchClassifierEntities(
             args.query.toLowerCase(),
           ),
           eq(
-            sql`LOWER(COALESCE(${entityAliases.name}, ''))`,
+            sql`LOWER(COALESCE(${entityReferences.name}, ''))`,
             args.query.toLowerCase(),
           ),
           normalizedQuery
@@ -94,7 +94,7 @@ export async function searchClassifierEntities(
             ? eq(normalizedSql(entities.shortName), normalizedQuery)
             : undefined,
           normalizedQuery
-            ? eq(normalizedSql(entityAliases.name), normalizedQuery)
+            ? eq(normalizedSql(entityReferences.name), normalizedQuery)
             : undefined,
         ),
       ),
@@ -107,7 +107,7 @@ export async function searchClassifierEntities(
       name: row.name,
       shortName: row.shortName,
       kind: row.kind!,
-      alias: row.alias,
+      reference: row.reference,
       score: 1,
       source: ["exact"],
     });
@@ -140,7 +140,7 @@ export async function searchClassifierEntities(
       name: row.name,
       shortName: row.shortName,
       kind: row.kind!,
-      alias: null,
+      reference: null,
       score: row.score === null ? null : Number(row.score),
       source: ["text"],
     });
@@ -152,17 +152,17 @@ export async function searchClassifierEntities(
       name: entities.name,
       shortName: entities.shortName,
       kind: entities.kind,
-      alias: entityAliases.name,
+      reference: entityReferences.name,
     })
     .from(entities)
-    .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+    .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
     .where(
       and(
         args.kind ? eq(entities.kind, args.kind) : undefined,
         or(
           ilike(entities.name, `${args.query}%`),
           sql`COALESCE(${entities.shortName}, '') ILIKE ${`${args.query}%`}`,
-          sql`COALESCE(${entityAliases.name}, '') ILIKE ${`${args.query}%`}`,
+          sql`COALESCE(${entityReferences.name}, '') ILIKE ${`${args.query}%`}`,
         ),
       ),
     )
@@ -174,20 +174,20 @@ export async function searchClassifierEntities(
       name: row.name,
       shortName: row.shortName,
       kind: row.kind!,
-      alias: row.alias,
+      reference: row.reference,
       score: 0.5,
       source: ["prefix"],
     });
   }
 
   // Containment only widens retrieval; the length floor and low score keep it from implying identity.
-  const matchingAlias = sql<string | null>`(
+  const matchingReference = sql<string | null>`(
     array_agg(
-      ${entityAliases.name}
-      ORDER BY length(${normalizedSql(entityAliases.name)}) DESC, ${entityAliases.name}
+      ${entityReferences.name}
+      ORDER BY length(${normalizedSql(entityReferences.name)}) DESC, ${entityReferences.name}
     ) FILTER (
-      WHERE length(${normalizedSql(entityAliases.name)}) >= 4
-        AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityAliases.name)} || '%'
+      WHERE length(${normalizedSql(entityReferences.name)}) >= 4
+        AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityReferences.name)} || '%'
     )
   )[1]`;
   const matchingNameLength = sql<number>`CASE
@@ -202,16 +202,16 @@ export async function searchClassifierEntities(
     THEN length(${normalizedSql(entities.shortName)})
     ELSE 0
   END`;
-  const matchingAliasLength = sql<number>`coalesce(max(CASE
-    WHEN length(${normalizedSql(entityAliases.name)}) >= 4
-      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityAliases.name)} || '%'
-    THEN length(${normalizedSql(entityAliases.name)})
+  const matchingReferenceLength = sql<number>`coalesce(max(CASE
+    WHEN length(${normalizedSql(entityReferences.name)}) >= 4
+      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityReferences.name)} || '%'
+    THEN length(${normalizedSql(entityReferences.name)})
     ELSE 0
   END), 0)`;
   const containedSpecificity = sql<number>`GREATEST(
     ${matchingNameLength},
     ${matchingShortNameLength},
-    ${matchingAliasLength}
+    ${matchingReferenceLength}
   )`;
   const containedMatches = normalizedQuery
     ? await db
@@ -220,18 +220,18 @@ export async function searchClassifierEntities(
           name: entities.name,
           shortName: entities.shortName,
           kind: entities.kind,
-          alias: matchingAlias,
+          reference: matchingReference,
           specificity: containedSpecificity,
         })
         .from(entities)
-        .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+        .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
         .where(
           and(
             args.kind ? eq(entities.kind, args.kind) : undefined,
             or(
               sql`length(${normalizedSql(entities.name)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.name)} || '%'`,
               sql`length(${normalizedSql(entities.shortName)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.shortName)} || '%'`,
-              sql`length(${normalizedSql(entityAliases.name)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityAliases.name)} || '%'`,
+              sql`length(${normalizedSql(entityReferences.name)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityReferences.name)} || '%'`,
             ),
           ),
         )
@@ -248,7 +248,7 @@ export async function searchClassifierEntities(
       name: row.name,
       shortName: row.shortName,
       kind: row.kind!,
-      alias: row.alias,
+      reference: row.reference,
       score,
       source: ["contained"],
     });

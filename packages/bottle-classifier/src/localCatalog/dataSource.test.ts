@@ -354,7 +354,7 @@ describe("local catalog data source", () => {
     expect(results?.[0]?.score).toBeGreaterThan(results?.[1]?.score ?? 0);
   });
 
-  test("resolves exact entity aliases ahead of contained names", async () => {
+  test("resolves exact Entity references ahead of contained names", async () => {
     const dataSource = createLocalCatalogDataSource({
       ...shieldaigCatalog,
       entities: [
@@ -384,7 +384,7 @@ describe("local catalog data source", () => {
     ).resolves.toEqual([
       expect.objectContaining({
         entityId: 1953,
-        alias: "Mars Shinshu Distillery",
+        reference: "Mars Shinshu Distillery",
         score: 1,
         source: ["local_catalog", "exact"],
       }),

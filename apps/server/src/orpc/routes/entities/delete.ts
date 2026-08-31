@@ -4,6 +4,7 @@ import {
   entities,
   entityAliases,
   entityImages,
+  entityReferences,
   entityTombstones,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
@@ -20,7 +21,7 @@ export default procedure
     path: "/entities/{entity}",
     summary: "Delete entity",
     description:
-      "Delete an entity and create a tombstone record. Removes associated aliases. Requires admin privileges",
+      "Delete an Entity and create a tombstone. Removes its aliases and references. Requires administrator privileges.",
     operationId: "deleteEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))
@@ -58,6 +59,9 @@ export default procedure
         }),
 
         tx.delete(entityAliases).where(eq(entityAliases.entityId, entity.id)),
+        tx
+          .delete(entityReferences)
+          .where(eq(entityReferences.entityId, entity.id)),
 
         tx.insert(entityTombstones).values({
           entityId: entity.id,

@@ -1,56 +1,67 @@
 import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { and, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
   .route({
     method: "GET",
     path: "/entities/{entity}/aliases",
-    summary: "List entity aliases",
-    description:
-      "Retrieve all aliases for a specific entity, indicating which is canonical",
+    summary: "List Entity aliases",
+    description: "List an Entity's other names, including its short name.",
     operationId: "listEntityAliases",
   })
-  .input(
-    z.object({
-      entity: z.coerce.number(),
-    }),
-  )
+  .input(z.object({ entity: z.coerce.number().int().positive() }))
   .output(
     z.object({
       results: z.array(
         z.object({
+          id: z.number().nullable(),
           name: z.string(),
-          isCanonical: z.boolean(),
-          createdAt: z.string(),
+          isShortName: z.boolean(),
+          createdAt: z.string().nullable(),
         }),
       ),
     }),
   )
-  .handler(async function ({ input, errors }) {
+  .handler(async ({ input, errors }) => {
     const [entity] = await db
-      .select()
+      .select({
+        id: entities.id,
+        name: entities.name,
+        shortName: entities.shortName,
+      })
       .from(entities)
       .where(eq(entities.id, input.entity));
+    if (!entity) throw errors.NOT_FOUND({ message: "Entity not found." });
 
-    if (!entity) {
-      throw errors.NOT_FOUND({
-        message: "Entity not found.",
-      });
-    }
-
-    const results = await db
+    const aliases = await db
       .select()
       .from(entityAliases)
-      .where(and(eq(entityAliases.entityId, entity.id)));
-
+      .where(eq(entityAliases.entityId, entity.id))
+      .orderBy(asc(entityAliases.name), asc(entityAliases.id));
+    const shortName = entity.shortName?.trim();
     return {
-      results: results.map((a) => ({
-        name: a.name,
-        isCanonical: a.name === entity.name,
-        createdAt: a.createdAt.toISOString(),
-      })),
+      results: [
+        ...(shortName &&
+        shortName.toLocaleLowerCase("en-US") !==
+          entity.name.toLocaleLowerCase("en-US")
+          ? [
+              {
+                id: null,
+                name: shortName,
+                isShortName: true,
+                createdAt: null,
+              },
+            ]
+          : []),
+        ...aliases.map((alias) => ({
+          id: alias.id,
+          name: alias.name,
+          isShortName: false,
+          createdAt: alias.createdAt.toISOString(),
+        })),
+      ],
     };
   });

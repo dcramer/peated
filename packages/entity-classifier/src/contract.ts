@@ -1,14 +1,14 @@
 import { z } from "zod";
 import {
   EntityClassificationAdviceSchema,
-  EntityClassificationReferenceSchema,
+  EntityClassificationContextSchema,
   EntityClassificationSearchEvidenceSchema,
   EntityResolutionSchema,
 } from "./classifierTypes";
 
 export const ClassifyEntityInputSchema = z
   .object({
-    reference: EntityClassificationReferenceSchema,
+    context: EntityClassificationContextSchema,
   })
   .strict();
 
