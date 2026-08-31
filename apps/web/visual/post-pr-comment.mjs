@@ -41,20 +41,72 @@ function git(args, options = {}) {
   });
 }
 
-export function buildBody(manifest, imageBaseUrl) {
+function imageLabels(...manifests) {
+  return new Map(
+    manifests.flatMap((manifest) =>
+      (manifest?.screenshots ?? []).map((screenshot) => [
+        screenshot.file,
+        String(screenshot.label).replace(/[\r\n[\]()]/g, " "),
+      ]),
+    ),
+  );
+}
+
+function validateImagePath(value, prefix = "") {
+  if (
+    value?.constructor !== String ||
+    value.startsWith("/") ||
+    value.includes("\\") ||
+    path.posix.normalize(value) !== value ||
+    value.split("/").includes("..") ||
+    !value.endsWith(".png") ||
+    (prefix && !value.startsWith(prefix))
+  ) {
+    throw new Error(`Invalid report image path: ${value}`);
+  }
+}
+
+export function validateReport(report) {
+  if (report?.version !== 1 || !Array.isArray(report.files)) {
+    throw new Error("Invalid visual diff report");
+  }
+  const statuses = new Set(["added", "changed", "removed", "unchanged"]);
+  for (const file of report.files) {
+    validateImagePath(file.file);
+    if (!statuses.has(file.status)) {
+      throw new Error(`Invalid visual diff status: ${file.status}`);
+    }
+    if (file.status !== "unchanged") {
+      validateImagePath(file.image, "images/");
+    }
+  }
+  return report;
+}
+
+export function buildBody({ baseline, candidate, report }, imageBaseUrl) {
+  const manifest = candidate;
   const changedFiles = manifest.changedFiles.length
     ? manifest.changedFiles
         .slice(0, 8)
         .map((file) => `- \`${file}\``)
         .join("\n")
     : "- None provided";
-  const screenshots = manifest.screenshots
+  const labels = imageLabels(baseline, candidate);
+  const changes = report.files.filter((file) => file.status !== "unchanged");
+  const screenshots = changes
     .map((screenshot) => {
-      const url = `${imageBaseUrl}/${screenshot.file}`;
+      const label = labels.get(screenshot.file) ?? screenshot.file;
+      const status =
+        screenshot.status[0].toUpperCase() + screenshot.status.slice(1);
+      const imagePath = screenshot.image
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/");
+      const url = `${imageBaseUrl}/${imagePath}`;
       return [
-        `### ${screenshot.label}`,
+        `### ${label} — ${status}`,
         "",
-        `![${screenshot.label}](${url})`,
+        `![${label} ${screenshot.status}](${url})`,
         "",
       ].join("\n");
     })
@@ -76,8 +128,10 @@ export function buildBody(manifest, imageBaseUrl) {
     "Changed files:",
     changedFiles,
     "",
-    screenshots,
-    "_Captured from local Peated with fixed test data. These images help review a change. They do not compare pixels or block a pull request because the page changed._",
+    changes.length === 0
+      ? "No visual changes in the selected pages."
+      : screenshots,
+    "_Compared from local Peated with fixed test data. Visual changes do not block the pull request._",
     "",
   ].join("\n");
 }
@@ -86,12 +140,21 @@ export function shouldPostComment(manifest) {
   return !manifest.skipped && manifest.screenshots.length > 0;
 }
 
-function publishImages(outDir, branch, commitSha) {
+function publishImages(reportDir, report, branch, commitSha) {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "peated-screenshots-"));
-  for (const file of fs.readdirSync(outDir)) {
-    if (file.endsWith(".png") || file === "manifest.json") {
-      fs.copyFileSync(path.join(outDir, file), path.join(tempDir, file));
+  fs.writeFileSync(
+    path.join(tempDir, "report.json"),
+    `${JSON.stringify(report, null, 2)}\n`,
+  );
+  for (const file of report.files) {
+    if (file.status === "unchanged") continue;
+    const source = path.join(reportDir, ...file.image.split("/"));
+    if (!fs.existsSync(source) || !fs.lstatSync(source).isFile()) {
+      throw new Error(`Missing report image: ${file.image}`);
     }
+    const destination = path.join(tempDir, ...file.image.split("/"));
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.copyFileSync(source, destination);
   }
 
   git(["init", "-q"], { cwd: tempDir });
@@ -159,13 +222,21 @@ function upsertComment(repo, prNumber, body) {
 
 function main() {
   const outDir = path.resolve(process.argv[2] ?? "apps/web/.playwright/visual");
-  const manifestPath = path.join(outDir, "manifest.json");
-  if (!fs.existsSync(manifestPath)) {
-    throw new Error(`Missing manifest at ${manifestPath}`);
+  const candidatePath = path.join(outDir, "candidate/manifest.json");
+  const baselinePath = path.join(outDir, "baseline/manifest.json");
+  const reportDir = path.join(outDir, "report");
+  const reportPath = path.join(reportDir, "report.json");
+  for (const file of [baselinePath, candidatePath, reportPath]) {
+    if (!fs.existsSync(file))
+      throw new Error(`Missing visual result at ${file}`);
   }
 
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  if (!shouldPostComment(manifest)) {
+  const result = {
+    baseline: JSON.parse(fs.readFileSync(baselinePath, "utf8")),
+    candidate: JSON.parse(fs.readFileSync(candidatePath, "utf8")),
+    report: validateReport(JSON.parse(fs.readFileSync(reportPath, "utf8"))),
+  };
+  if (!shouldPostComment(result.candidate)) {
     console.log("no screenshot scenarios matched; skipping PR comment");
     return;
   }
@@ -174,9 +245,9 @@ function main() {
   const repo = requiredEnv("GITHUB_REPOSITORY");
   const commitSha = process.env.GITHUB_SHA ?? "unknown";
   const branch = `web-screenshots/pr-${prNumber}`;
-  const imageRef = publishImages(outDir, branch, commitSha);
+  const imageRef = publishImages(reportDir, result.report, branch, commitSha);
   const body = buildBody(
-    manifest,
+    result,
     `https://raw.githubusercontent.com/${repo}/${imageRef}`,
   );
   upsertComment(repo, prNumber, body);

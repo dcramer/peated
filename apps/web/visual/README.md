@@ -1,7 +1,8 @@
 # Web screenshots in pull requests
 
-This tool takes repeatable screenshots for web changes. It posts the images on
-the pull request. It does not compare pixels. A page change does not fail CI.
+This tool takes repeatable screenshots for web changes. CI captures the pull
+request base and candidate revisions, compares matching PNG files, and posts
+only visual changes. A page change does not fail CI.
 
 Each page has its own file in `visual/scenarios/`. That file contains:
 
@@ -49,6 +50,46 @@ pnpm visual:web -- --changed-file /tmp/peated-screenshot-changes.txt
 ```
 
 Images and `manifest.json` go to `apps/web/.playwright/visual/`.
+
+Compare two capture directories:
+
+```sh
+pnpm --dir apps/web visual:diff -- \
+  --baseline /tmp/visual-base \
+  --candidate /tmp/visual-candidate \
+  --output /tmp/visual-report
+```
+
+The report contains `report.json` and one review image for each changed, added,
+or removed PNG. It does not copy unchanged images.
+
+CI uploads only the baseline and candidate manifests, `report.json`, and these
+review images. The full baseline and candidate screenshots stay on the runner.
+
+## Reuse the comparison action
+
+The comparison accepts any two directories of PNG files. Matching relative
+paths identify the same screenshot. Another public repository can use the
+bundled action without installing Peated dependencies:
+
+```yaml
+- uses: dcramer/peated/.github/actions/visual-diff@<commit-sha>
+  with:
+    baseline: path/to/baseline
+    candidate: path/to/candidate
+    output: path/to/report
+```
+
+The action writes the report directory and returns the number of visual changes
+as the `changes` output. Screenshot capture and report publication remain the
+calling repository's responsibility.
+
+After changing the comparison source, rebuild the committed action. Focused
+tests fail if the bundle or its license file is out of date.
+
+```sh
+pnpm --dir apps/web visual:diff:build-action
+```
 
 ## Add a scenario
 

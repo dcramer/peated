@@ -93,8 +93,8 @@ jobs:
         run: |
           set -euo pipefail
           out_dir=apps/web/.playwright/visual
-          if [[ ! -f "$out_dir/manifest.json" ]]; then
-            echo "No screenshot manifest was downloaded."
+          if [[ ! -f "$out_dir/report/report.json" ]]; then
+            echo "No screenshot report was downloaded."
             exit 0
           fi
           node apps/web/visual/post-pr-comment.mjs "$out_dir"

@@ -1,0 +1,21 @@
+name: Visual diff
+description: Compare two directories of PNG screenshots
+
+inputs:
+  baseline:
+    description: Directory with baseline PNG files
+    required: true
+  candidate:
+    description: Directory with candidate PNG files
+    required: true
+  output:
+    description: Directory for the report and changed images
+    required: true
+
+outputs:
+  changes:
+    description: Number of changed, added, and removed images
+
+runs:
+  using: node24
+  main: dist/index.mjs

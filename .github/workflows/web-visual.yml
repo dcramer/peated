@@ -7,6 +7,7 @@ on:
       - "apps/web/**"
       - "packages/design/**"
       - "packages/orpc/**"
+      - ".github/actions/visual-diff/**"
       - ".github/workflows/web-visual.yml"
       - ".github/workflows/web-visual-comment.yml"
       - "package.json"
@@ -34,8 +35,7 @@ jobs:
       - name: Choose pages
         id: mode
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.sha }}
+          MERGE_SHA: ${{ github.sha }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
           set -euo pipefail
@@ -44,8 +44,18 @@ jobs:
           else
             echo "all=false" >> "$GITHUB_OUTPUT"
           fi
-          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > /tmp/peated-screenshot-changes.txt
+          base_sha="$(git rev-parse "${MERGE_SHA}^1")"
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          git diff --name-only "$base_sha" "$MERGE_SHA" > /tmp/peated-screenshot-changes.txt
           cat /tmp/peated-screenshot-changes.txt
+
+      - name: Checkout base revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          path: base-source
+          persist-credentials: false
+          ref: ${{ steps.mode.outputs.base_sha }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
@@ -55,28 +65,62 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.18.0
-      - name: Install dependencies
+      - name: Install candidate dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install Playwright
+      - name: Install base dependencies
+        run: pnpm --dir base-source install --frozen-lockfile
+      - name: Install candidate Playwright
         run: pnpm --dir apps/web exec playwright install --with-deps chromium
-      - name: Capture screenshots
+      - name: Install base Playwright
+        run: pnpm --dir base-source/apps/web exec playwright install chromium
+      - name: Capture candidate screenshots
         env:
           ALL: ${{ steps.mode.outputs.all }}
+          VISUAL_ROOT: ${{ github.workspace }}/visual-output
         run: |
           set -euo pipefail
           args=(
             --changed-file /tmp/peated-screenshot-changes.txt
-            --out-dir .playwright/visual
+            --out-dir "$VISUAL_ROOT/candidate"
           )
           if [[ "$ALL" == "true" ]]; then
             args+=(--all)
           fi
           pnpm visual:web -- "${args[@]}"
-      - name: Upload screenshots
-        if: always()
+      - name: Capture base screenshots
+        env:
+          ALL: ${{ steps.mode.outputs.all }}
+          VISUAL_ROOT: ${{ github.workspace }}/visual-output
+        run: |
+          set -euo pipefail
+          args=(
+            --changed-file /tmp/peated-screenshot-changes.txt
+            --out-dir "$VISUAL_ROOT/baseline"
+          )
+          if [[ "$ALL" == "true" ]]; then
+            args+=(--all)
+          fi
+          pnpm --dir base-source visual:web -- "${args[@]}"
+      - name: Compare screenshots
+        uses: ./.github/actions/visual-diff
+        with:
+          baseline: ${{ github.workspace }}/visual-output/baseline
+          candidate: ${{ github.workspace }}/visual-output/candidate
+          output: ${{ github.workspace }}/visual-output/report
+      - name: Check screenshot report
+        run: |
+          set -euo pipefail
+          test -f visual-output/baseline/manifest.json
+          test -f visual-output/candidate/manifest.json
+          test -f visual-output/report/report.json
+      - name: Upload screenshot report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: web-screenshots
-          path: apps/web/.playwright/visual
-          if-no-files-found: warn
+          path: |
+            visual-output/baseline/manifest.json
+            visual-output/candidate/manifest.json
+            visual-output/report/report.json
+            visual-output/report/images/**/*.png
+          if-no-files-found: error
           retention-days: 14
