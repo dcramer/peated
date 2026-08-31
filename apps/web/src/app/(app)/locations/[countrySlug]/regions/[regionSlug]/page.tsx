@@ -1,5 +1,4 @@
-import { ButtonLink } from "@peated/web/components";
-import Markdown from "@peated/web/components/markdown";
+import { ButtonLink, ExpandableDescription } from "@peated/web/components";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -70,7 +69,7 @@ export default async function RegionPage(props: {
       }}
       description={
         region.description ? (
-          <Markdown content={region.description} noLinks />
+          <ExpandableDescription content={region.description} noLinks />
         ) : undefined
       }
       name={region.name}

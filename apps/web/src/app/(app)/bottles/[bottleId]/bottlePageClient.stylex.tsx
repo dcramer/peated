@@ -16,6 +16,7 @@ import {
   Button,
   ButtonLink,
   EmptyState,
+  ExpandableDescription,
   LoadingList,
   PageTabs,
   RowMenu,
@@ -435,6 +436,11 @@ export function BottlePageFrameClient({
             {bottle.aliases.join(" · ")}
           </p>
         ) : null}
+        {bottle.description ? (
+          <div {...stylex.props(styles.description)}>
+            <ExpandableDescription content={bottle.description} />
+          </div>
+        ) : null}
         <div {...stylex.props(styles.tabs)}>
           <PageTabs
             ariaLabel="Bottle sections"
@@ -601,6 +607,14 @@ const styles = stylex.create({
   aliasLabel: {
     color: colors.ink,
     fontWeight: 600,
+  },
+  description: {
+    maxWidth: "680px",
+    marginTop: space.x4,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    lineHeight: 1.55,
   },
   overview: {
     marginTop: space.x8,

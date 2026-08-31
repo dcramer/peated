@@ -8,13 +8,13 @@ import { type ReactNode } from "react";
 import {
   Button,
   ButtonLink,
+  ExpandableDescription,
   PageTabs,
   RowMenu,
   SectionError,
   type RowMenuItem,
 } from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
-import Markdown from "@peated/web/components/markdown";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
@@ -196,7 +196,9 @@ export function EntityPageFrameClient({
           </>
         }
         description={
-          entity.description ? <Markdown content={entity.description} /> : null
+          entity.description ? (
+            <ExpandableDescription content={entity.description} />
+          ) : null
         }
         eyebrow={getEntityClassification(entity)}
         menu={<EntityActions entity={entity} />}
