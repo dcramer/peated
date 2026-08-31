@@ -1,0 +1,39 @@
+{
+  "changedFiles": [
+    "apps/web/src/app/(app)/entities/[entityId]/entityPageFrameClient.stylex.tsx"
+  ],
+  "commitSha": "70940fdcc884e05c79e6f1e45d0f20f87dabb267",
+  "scenarioIds": [
+    "brand-detail",
+    "distillery-detail",
+    "bottler-detail"
+  ],
+  "screenshots": [
+    {
+      "file": "brand-detail__desktop.png",
+      "label": "Brand detail · desktop"
+    },
+    {
+      "file": "brand-detail__mobile.png",
+      "label": "Brand detail · mobile"
+    },
+    {
+      "file": "distillery-detail__desktop.png",
+      "label": "Distillery detail · desktop"
+    },
+    {
+      "file": "distillery-detail__mobile.png",
+      "label": "Distillery detail · mobile"
+    },
+    {
+      "file": "bottler-detail__desktop.png",
+      "label": "Bottler detail · desktop"
+    },
+    {
+      "file": "bottler-detail__mobile.png",
+      "label": "Bottler detail · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
