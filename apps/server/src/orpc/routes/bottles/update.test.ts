@@ -3,6 +3,7 @@ import type { Bottle, User } from "@peated/server/db/schema";
 import {
   bottleGroupDistillers,
   bottleGroups,
+  bottleImages,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -166,6 +167,14 @@ describe("PATCH /bottles/{bottle}", () => {
       imageUrl: "https://example.com/removed.jpg",
       rejectedImageUrls: ["https://example.com/older-removed.jpg"],
     });
+    await db.insert(bottleImages).values({
+      bottleId: bottle.id,
+      imageUrl: bottle.imageUrl!,
+      sourceUrl: "https://example.com/source-page",
+      license: "CC BY 4.0",
+      isPrimary: true,
+      createdByActorId: bottle.createdByActorId,
+    });
 
     await routerClient.bottles.update(
       { bottle: bottle.id, image: null },
@@ -181,6 +190,12 @@ describe("PATCH /bottles/{bottle}", () => {
         "https://example.com/removed.jpg",
       ],
     });
+    await expect(
+      db.query.bottleImages.findFirst({
+        where: (images, { and, eq }) =>
+          and(eq(images.bottleId, bottle.id), eq(images.isPrimary, true)),
+      }),
+    ).resolves.toBeUndefined();
   });
 
   test("clears an inherited stated age from a singleton group", async ({

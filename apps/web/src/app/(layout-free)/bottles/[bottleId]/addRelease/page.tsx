@@ -85,7 +85,7 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
       saveLabel="Add a bottle"
       returnTo={returnTo}
       initialData={initialData}
-      onSubmit={async ({ image, ...data }) => {
+      onSubmit={async ({ image, imageSourceUrl, imageLicense, ...data }) => {
         const createdBottle = proposalId
           ? await proposalBottleCreateMutation.mutateAsync({
               proposal: Number(proposalId),
@@ -98,6 +98,8 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
             await bottleImageUpdateMutation.mutateAsync({
               bottle: createdBottle.id,
               file: image,
+              sourceUrl: imageSourceUrl,
+              license: imageLicense,
             });
           } catch (error) {
             logError(error, {
@@ -105,7 +107,7 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
               extra: { bottleId: createdBottle.id, sourceBottleId: bottleId },
             });
             flash(
-              "There was an error uploading your image, but the bottle was saved.",
+              "We couldn't upload the image, but the bottle was saved. Try the image again.",
               "error",
             );
           }

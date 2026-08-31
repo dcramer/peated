@@ -8,6 +8,7 @@ import type { Bottle, User } from "../db/schema";
 import {
   bottleGroupDistillers,
   bottleGroups,
+  bottleImages,
   bottleSeries,
   bottlesToDistillers,
   collectionBottles,
@@ -33,6 +34,7 @@ type Attrs = {
   distillers: ReturnType<(typeof EntitySerializer)["item"]>[];
   bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
   series: ReturnType<(typeof BottleSeriesSerializer)["item"]> | null;
+  primaryImage: { sourceUrl: string | null; license: string | null } | null;
 };
 
 export type BottleSerializerContext = {
@@ -101,10 +103,28 @@ export const BottleSerializer = serializer({
       }
     }
 
-    const distillerList = await db
-      .select()
-      .from(bottlesToDistillers)
-      .where(inArray(bottlesToDistillers.bottleId, itemIds));
+    const [distillerList, primaryImageList] = await Promise.all([
+      db
+        .select()
+        .from(bottlesToDistillers)
+        .where(inArray(bottlesToDistillers.bottleId, itemIds)),
+      db
+        .select({
+          bottleId: bottleImages.bottleId,
+          sourceUrl: bottleImages.sourceUrl,
+          license: bottleImages.license,
+        })
+        .from(bottleImages)
+        .where(
+          and(
+            inArray(bottleImages.bottleId, itemIds),
+            eq(bottleImages.isPrimary, true),
+          ),
+        ),
+    ]);
+    const primaryImageByBottleId = new Map(
+      primaryImageList.map((image) => [image.bottleId, image] as const),
+    );
 
     const entityIds = Array.from(
       new Set(
@@ -215,6 +235,7 @@ export const BottleSerializer = serializer({
             distillers: distillersByBottleId[item.id] || [],
             bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
             series: item.seriesId ? seriesById[item.seriesId] : null,
+            primaryImage: primaryImageByBottleId.get(item.id) ?? null,
           },
         ];
       }),
@@ -264,6 +285,8 @@ export const BottleSerializer = serializer({
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
+      imageSourceUrl: attrs.primaryImage?.sourceUrl ?? null,
+      imageLicense: attrs.primaryImage?.license ?? null,
 
       medianScore: item.medianScore,
       minScore: item.minScore,

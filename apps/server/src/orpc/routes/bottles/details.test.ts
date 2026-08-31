@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleTombstones } from "@peated/server/db/schema";
+import { bottleImages, bottleTombstones } from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -22,11 +22,23 @@ describe("GET /bottles/:bottle", () => {
     const bottle = await fixtures.Bottle({
       imageUrl: "https://example.com/bottle.png",
     });
+    await db.insert(bottleImages).values({
+      bottleId: bottle.id,
+      imageUrl: bottle.imageUrl!,
+      sourceUrl: "https://example.com/original-bottle-photo",
+      license: "CC BY-SA 4.0",
+      isPrimary: true,
+      createdByActorId: bottle.createdByActorId,
+    });
     const data = await routerClient.bottles.details({
       bottle: bottle.id,
     });
 
     expect(data.imageUrl).toBe("https://example.com/bottle.png");
+    expect(data.imageSourceUrl).toBe(
+      "https://example.com/original-bottle-photo",
+    );
+    expect(data.imageLicense).toBe("CC BY-SA 4.0");
     expect("displayImageUrl" in data).toBe(false);
   });
 

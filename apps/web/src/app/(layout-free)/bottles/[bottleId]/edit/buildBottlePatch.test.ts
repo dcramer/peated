@@ -38,6 +38,8 @@ function formValue(
     outturn: null,
     description: "A batch release.",
     descriptionSrc: "user",
+    imageSourceUrl: null,
+    imageLicense: null,
     tastingNotes: null,
     image: undefined,
     ...overrides,
@@ -113,6 +115,8 @@ describe("buildBottlePatch", () => {
           caskNumber: "#5678",
           maturation: "Oloroso hogshead",
           outturn: 240,
+          imageSourceUrl: "https://example.com/bottle-photo",
+          imageLicense: "CC BY-SA 4.0",
         }),
         submitMeta(
           "name",
@@ -141,6 +145,8 @@ describe("buildBottlePatch", () => {
           "outturn",
           "description",
           "descriptionSrc",
+          "imageSourceUrl",
+          "imageLicense",
         ),
       ),
     ).toEqual({

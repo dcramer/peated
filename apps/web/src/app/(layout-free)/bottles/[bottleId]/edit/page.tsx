@@ -55,11 +55,16 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
           ...buildBottlePatch(value, meta),
         });
 
-        if (image) {
+        const imageMetadataChanged =
+          meta.dirtyFields.has("imageSourceUrl") ||
+          meta.dirtyFields.has("imageLicense");
+        if (image || (image !== null && imageMetadataChanged)) {
           try {
             await bottleImageUpdateMutation.mutateAsync({
               bottle: context.bottleId,
-              file: image,
+              file: image || undefined,
+              sourceUrl: value.imageSourceUrl,
+              license: value.imageLicense,
             });
           } catch (err) {
             logError(err, {
@@ -67,7 +72,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
               extra: { bottleId: context.bottleId },
             });
             flash(
-              "There was an error uploading your image, but the bottle was saved.",
+              "We couldn't upload the image, but the bottle was saved. Try the image again.",
               "error",
             );
           }

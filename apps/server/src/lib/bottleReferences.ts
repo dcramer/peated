@@ -8,6 +8,7 @@ import type {
   BottleReferenceAssignmentSource,
 } from "@peated/server/db/schema";
 import {
+  bottleImages,
   bottleReferences,
   bottleTombstones,
   bottles,
@@ -165,6 +166,8 @@ export type BottleReferenceAssignmentOptions = Pick<
 export type BottleImageCandidate = {
   bottleId: number;
   imageUrl: string;
+  sourceUrl: string | null;
+  createdByActorId: number;
 };
 
 export type BottleReferenceAssignmentResult = {
@@ -543,7 +546,7 @@ async function syncBottleReferenceConsumersInTransaction(
         priceIdentity,
       ),
     )
-    .returning({ imageUrl: storePrices.imageUrl });
+    .returning({ imageUrl: storePrices.imageUrl, url: storePrices.url });
 
   const reviewIdentity = or(
     isNull(externalReviews.bottleId),
@@ -578,7 +581,11 @@ async function syncBottleReferenceConsumersInTransaction(
   const priceWithImage = matchingPrices.find((price) => !!price.imageUrl);
   return {
     bottleImageCandidate: priceWithImage?.imageUrl
-      ? { bottleId, imageUrl: priceWithImage.imageUrl }
+      ? {
+          bottleId,
+          imageUrl: priceWithImage.imageUrl,
+          sourceUrl: priceWithImage.url,
+        }
       : null,
   };
 }
@@ -645,7 +652,9 @@ export async function assignBottleReferenceInTransaction(
     reference: claim.reference,
     referenceChanged: claim.changed,
     isNew: claim.inserted,
-    bottleImageCandidate,
+    bottleImageCandidate: bottleImageCandidate
+      ? { ...bottleImageCandidate, createdByActorId: assignedByActorId }
+      : null,
     bottleId,
   };
 }
@@ -763,18 +772,33 @@ export async function fillMissingBottleImage(
 ) {
   if (!bottleImageCandidate) return;
 
+  const attachImage = (targetBottleId: number) =>
+    db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(bottles)
+        .set({ imageUrl: bottleImageCandidate.imageUrl })
+        .where(
+          and(
+            eq(bottles.id, targetBottleId),
+            or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
+            sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
+          ),
+        )
+        .returning({ id: bottles.id });
+      if (!updated) return false;
+      await tx.insert(bottleImages).values({
+        bottleId: targetBottleId,
+        imageUrl: bottleImageCandidate.imageUrl,
+        sourceUrl: bottleImageCandidate.sourceUrl,
+        license: null,
+        isPrimary: true,
+        createdByActorId: bottleImageCandidate.createdByActorId,
+      });
+      return true;
+    });
+
   try {
-    const [updatedOriginal] = await db
-      .update(bottles)
-      .set({ imageUrl: bottleImageCandidate.imageUrl })
-      .where(
-        and(
-          eq(bottles.id, bottleImageCandidate.bottleId),
-          or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
-          sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
-        ),
-      )
-      .returning({ id: bottles.id });
+    const updatedOriginal = await attachImage(bottleImageCandidate.bottleId);
     if (updatedOriginal) return;
 
     const original = await db.query.bottles.findFirst({
@@ -802,17 +826,7 @@ export async function fillMissingBottleImage(
       return;
     }
 
-    const [updatedReplacement] = await db
-      .update(bottles)
-      .set({ imageUrl: bottleImageCandidate.imageUrl })
-      .where(
-        and(
-          eq(bottles.id, tombstone.newBottleId),
-          or(isNull(bottles.imageUrl), eq(bottles.imageUrl, "")),
-          sql`${bottleImageCandidate.imageUrl} <> ALL(${bottles.rejectedImageUrls})`,
-        ),
-      )
-      .returning({ id: bottles.id });
+    const updatedReplacement = await attachImage(tombstone.newBottleId);
     if (updatedReplacement) return;
 
     const replacement = await db.query.bottles.findFirst({

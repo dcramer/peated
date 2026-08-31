@@ -22,6 +22,7 @@ import type {
 import {
   bottleGroupDistillers,
   bottleGroups,
+  bottleImages,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -1583,6 +1584,18 @@ export async function updateBottleInTransaction(
           : (bottleDistillers.get(member.id) ?? []),
       },
     });
+  }
+
+  if (storage.exact?.image === null) {
+    await tx
+      .update(bottleImages)
+      .set({ isPrimary: false, updatedAt: new Date() })
+      .where(
+        and(
+          eq(bottleImages.bottleId, bottleId),
+          eq(bottleImages.isPrimary, true),
+        ),
+      );
   }
 
   const memberSeriesChanged =

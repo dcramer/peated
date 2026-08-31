@@ -12,6 +12,8 @@ export const EntityImageSerializer = serializer({
     entityId: image.entityId,
     imageUrl: absoluteUrl(config.API_SERVER, image.imageUrl),
     caption: image.caption,
+    sourceUrl: image.sourceUrl,
+    license: image.license,
     isPrimary: image.isPrimary,
     createdAt: image.createdAt.toISOString(),
     updatedAt: image.updatedAt.toISOString(),

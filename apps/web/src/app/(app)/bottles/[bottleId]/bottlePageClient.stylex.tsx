@@ -407,6 +407,8 @@ export function BottlePageFrameClient({
           detail={getBottleDetail(bottle)}
           id={bottle.peatedId}
           imageUrl={bottle.imageUrl}
+          imageSourceUrl={bottle.imageSourceUrl}
+          imageLicense={bottle.imageLicense}
           memberStatus={
             user
               ? {

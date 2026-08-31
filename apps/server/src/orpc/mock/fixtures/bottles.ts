@@ -271,6 +271,8 @@ export const mockBottles: Bottle[] = [
     description:
       "The 2022 Càirdeas release, matured in first-fill bourbon barrels in Warehouse 1.",
     imageUrl: mockImageUrls.cairdeasWarehouse1,
+    imageSourceUrl: "https://example.com/cairdeas-warehouse-1",
+    imageLicense: "Used with permission",
     flavorProfile: "heavily_peated",
     tastingNotes: {
       nose: "Sea spray, vanilla, and peat smoke",

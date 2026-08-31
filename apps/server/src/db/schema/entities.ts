@@ -112,6 +112,8 @@ export const entityImages = pgTable(
       .notNull(),
     imageUrl: text("image_url").notNull(),
     caption: text("caption"),
+    sourceUrl: text("source_url"),
+    license: varchar("license", { length: 255 }),
     idempotencyKey: varchar("idempotency_key", { length: 128 }),
     // Image mutations keep exactly one primary image while an Entity has images.
     isPrimary: boolean("is_primary").default(false).notNull(),

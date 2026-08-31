@@ -4,7 +4,7 @@
  * Bottle creation, and API-facing conflict mapping.
  */
 import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
+import { bottleImages, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
@@ -110,6 +110,7 @@ async function applyCatalogImageApproval({
   promote,
   pendingImageId,
   userId,
+  actorId,
   decision,
   result,
   copyImage,
@@ -117,6 +118,7 @@ async function applyCatalogImageApproval({
   promote: boolean;
   pendingImageId: string;
   userId: number;
+  actorId: number;
   decision: CreateDecision;
   result: CreateDecisionResult;
   copyImage: typeof copyPendingImageToBottle;
@@ -142,11 +144,23 @@ async function applyCatalogImageApproval({
       bottleId: result.bottleId,
     });
 
-    const [updatedBottle] = await db
-      .update(bottles)
-      .set({ imageUrl })
-      .where(and(eq(bottles.id, result.bottleId), isNull(bottles.imageUrl)))
-      .returning({ id: bottles.id });
+    const updatedBottle = await db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(bottles)
+        .set({ imageUrl })
+        .where(and(eq(bottles.id, result.bottleId), isNull(bottles.imageUrl)))
+        .returning({ id: bottles.id });
+      if (!updated) return null;
+      await tx.insert(bottleImages).values({
+        bottleId: result.bottleId,
+        imageUrl,
+        sourceUrl: null,
+        license: null,
+        isPrimary: true,
+        createdByActorId: actorId,
+      });
+      return updated;
+    });
     if (!updatedBottle) {
       logCatalogImageApprovalError(
         new Error("Catalog image was copied but not saved to the bottle."),
@@ -279,6 +293,7 @@ export function createPhotoIdentificationCreateProcedure(
         }),
         pendingImageId: pendingImage.id,
         userId: user.id,
+        actorId: actor.id,
         decision,
         result,
         copyImage,

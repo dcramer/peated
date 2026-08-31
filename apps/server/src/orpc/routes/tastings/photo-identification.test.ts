@@ -11,6 +11,7 @@ import { db } from "@peated/server/db";
 import {
   bottleChecks,
   bottleGroups,
+  bottleImages,
   bottleReferences,
   bottles,
   pendingUploads,
@@ -1148,6 +1149,20 @@ describe("POST /tastings/photo-identification", () => {
         `^/uploads/bottles/bottle-${response.bottle.id}-pending-upload-.+\\.webp$`,
       ),
     );
+    await expect(
+      db.query.bottleImages.findFirst({
+        where: (images, { and, eq }) =>
+          and(
+            eq(images.bottleId, response.bottle.id),
+            eq(images.isPrimary, true),
+          ),
+      }),
+    ).resolves.toMatchObject({
+      imageUrl: bottle?.imageUrl,
+      sourceUrl: null,
+      license: null,
+      createdByActorId: bottle?.createdByActorId,
+    });
   });
 
   test("canonical duplicate confirmation reuses the exact Bottle without promoting an image", async ({
