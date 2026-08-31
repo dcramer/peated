@@ -262,7 +262,13 @@ async function persistStorePriceInTransaction({
       })
       .onConflictDoNothing()
       .returning();
-    if (created) return { price: created, sourceIdentityReused: false };
+    if (created) {
+      return {
+        price: created,
+        identityChanged: false,
+        sourceIdentityReused: false,
+      };
+    }
 
     existing = await findStorePriceForUpdate(tx, identity);
     if (!existing) {
@@ -336,7 +342,7 @@ async function persistStorePriceInTransaction({
       `Store price changed while it was being saved (${existing.id}).`,
     );
   }
-  return { price: updated, sourceIdentityReused };
+  return { price: updated, identityChanged, sourceIdentityReused };
 }
 
 /** Persists one scraper batch with attribution chosen by the owning boundary. */
@@ -443,6 +449,7 @@ export async function createStorePrices(
               price: {
                 id: priceId,
                 imageUrl: persisted.price.imageUrl,
+                identityChanged: persisted.identityChanged,
                 hasDirectMatch,
                 directMatchSource: persisted.sourceIdentityReused
                   ? "source"
@@ -468,7 +475,13 @@ export async function createStorePrices(
           });
         }
 
-        if (price.directMatchSource === "barcode") {
+        // The old match was cleared. Do not reuse its completed job.
+        if (price.identityChanged) {
+          await pushJob("ResolveStorePriceBottle", {
+            priceId: price.id,
+            force: true,
+          });
+        } else if (price.directMatchSource === "barcode") {
           await pushUniqueJob("ResolveStorePriceBottle", {
             priceId: price.id,
             force: true,

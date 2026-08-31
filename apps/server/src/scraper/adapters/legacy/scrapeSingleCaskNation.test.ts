@@ -35,9 +35,10 @@ test("scrapes every supported whisky type and excludes ineligible records", asyn
   const items: unknown[] = [];
   const identities: unknown[] = [];
   await scrapeProducts(firstPageUrl, async (item) => {
-    const { sourceBottleIdentity, ...price } =
+    const { sourceBottleIdentity, sourceFingerprint, ...price } =
       StorePriceInputSchema.parse(item);
     identities.push(sourceBottleIdentity);
+    expect(sourceFingerprint).toBe("release-month-v1");
     items.push(price);
   });
 
@@ -49,7 +50,6 @@ test("scrapes every supported whisky type and excludes ineligible records", asyn
     { category: "single_malt", release_year: 2024, release_month: 10 },
     { category: "rye", release_year: 2024, release_month: 10 },
   ]);
-
   expect(items).toEqual([
     {
       barcode: "036602301979",
@@ -137,6 +137,31 @@ test("uses a saved release without fetching its product page", async ({
         url === "https://singlecasknation.com/products/rock-town-10-year-old",
     ),
   ).toBe(false);
+});
+
+test("returns each listing before fetching the next missing page", async ({
+  axiosMock,
+}) => {
+  const result = await loadFixture("singlecasknation", "bottle-list.json");
+  axiosMock.onGet(firstPageUrl).reply(200, result);
+  const events: string[] = [];
+  axiosMock
+    .onGet(/^https:\/\/singlecasknation\.com\/products\//u)
+    .reply(({ url }: { url?: string }) => {
+      events.push(`fetch ${url}`);
+      return [200, "<p>October 2024 Online Exclusive Release</p>"];
+    });
+
+  await scrapeProducts(firstPageUrl, async (item) => {
+    events.push(`listing ${item.url}`);
+  });
+
+  expect(events.slice(0, 4)).toEqual([
+    "fetch https://singlecasknation.com/products/rock-town-10-year-old",
+    "listing https://singlecasknation.com/products/rock-town-10-year-old",
+    "fetch https://singlecasknation.com/products/balcones-6-year-old",
+    "listing https://singlecasknation.com/products/balcones-6-year-old",
+  ]);
 });
 
 test("rejects malformed Shopify payloads", async ({ axiosMock }) => {
