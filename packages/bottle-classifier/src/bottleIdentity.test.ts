@@ -71,69 +71,14 @@ describe("bottleIdentity", () => {
 
     expect(resolved.statedAge).toBe(16);
     expect(resolved.bottlingYear).toBe(2010);
-    expect(
-      formatCanonicalBottleName({
-        bottleName: "Lagavulin Distillers Edition",
-        bottleFullName: "Lagavulin Distillers Edition",
-        bottleStatedAge: 16,
-        exact: resolved,
-      }),
-    ).toEqual({
-      name: "Lagavulin Distillers Edition - 2011 Release - 43.0% ABV",
-      fullName: "Lagavulin Distillers Edition - 2011 Release - 43.0% ABV",
-    });
   });
 
-  test("does not duplicate exact age already marketed in the stable name", () => {
-    expect(
-      formatCanonicalBottleName({
-        bottleName: "Speyside 12-year-old",
-        bottleFullName: "Shieldaig Speyside 12-year-old",
-        bottleStatedAge: null,
-        exact: {
-          edition: null,
-          statedAge: 12,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: null,
-          caskStrength: null,
-        },
-      }),
-    ).toEqual({
-      name: "Speyside 12-year-old",
-      fullName: "Shieldaig Speyside 12-year-old",
-    });
-  });
-
-  test("does not duplicate a release year already encoded by the edition", () => {
-    const exact = getResolvedBottleIdentity({
-      bottle: {
-        name: "Annual Selection",
-        fullName: "Example Annual Selection",
-        statedAge: null,
-      },
-      exact: {
-        edition: "2022 Edition",
-        statedAge: null,
-        releaseYear: 2022,
-        vintageYear: null,
-        abv: null,
-        singleCask: null,
-        caskStrength: null,
-      },
-    });
-
-    expect(exact).toMatchObject({
-      edition: "2022 Edition",
-      releaseYear: 2022,
-    });
+  test("adds the marketed edition to the stable expression", () => {
     expect(
       formatCanonicalBottleName({
         bottleName: "Annual Selection",
         bottleFullName: "Example Annual Selection",
-        bottleStatedAge: null,
-        exact,
+        edition: "2022 Edition",
       }),
     ).toEqual({
       name: "Annual Selection - 2022 Edition",
@@ -141,101 +86,50 @@ describe("bottleIdentity", () => {
     });
   });
 
-  test("matches YEAR Edition case-insensitively for display deduplication", () => {
+  test("does not repeat an edition already present in the expression", () => {
     expect(
       formatCanonicalBottleName({
-        bottleName: "Annual Selection",
-        bottleFullName: "Example Annual Selection",
-        bottleStatedAge: null,
-        exact: {
-          edition: "2022 EDITION",
-          statedAge: null,
-          releaseYear: 2022,
-          vintageYear: null,
-          abv: null,
-          singleCask: null,
-          caskStrength: null,
-        },
+        bottleName: "Annual Selection 2022 EDITION",
+        bottleFullName: "Example Annual Selection 2022 EDITION",
+        edition: "2022 Edition",
       }),
     ).toEqual({
-      name: "Annual Selection - 2022 EDITION",
-      fullName: "Example Annual Selection - 2022 EDITION",
+      name: "Annual Selection 2022 EDITION",
+      fullName: "Example Annual Selection 2022 EDITION",
+    });
+
+    expect(
+      formatCanonicalBottleName({
+        bottleName: "Annual Selection Act 10",
+        bottleFullName: "Example Annual Selection Act 10",
+        edition: "Act 1",
+      }),
+    ).toEqual({
+      name: "Annual Selection Act 10 - Act 1",
+      fullName: "Example Annual Selection Act 10 - Act 1",
     });
   });
 
-  test.each([
-    {
-      edition: "2021 Edition",
-      releaseYear: 2022,
-      expectedEdition: "2021 Edition",
-    },
-    {
-      edition: "Limited Edition",
-      releaseYear: 2022,
-      expectedEdition: "Limited Edition",
-    },
-    {
-      edition: "2022A Edition",
-      releaseYear: 2022,
-      expectedEdition: "2022A Edition",
-    },
-    {
-      edition: "Batch 2022",
-      releaseYear: 2022,
-      expectedEdition: "Batch 2022",
-    },
-    {
-      edition: "2022 Vintage",
-      releaseYear: 2022,
-      expectedEdition: "2022 Vintage",
-    },
-  ])(
-    "keeps release year separate from $edition",
-    ({ edition, releaseYear, expectedEdition }) => {
-      expect(
-        formatCanonicalBottleName({
-          bottleName: "Annual Selection",
-          bottleFullName: "Example Annual Selection",
-          bottleStatedAge: null,
-          exact: {
-            edition,
-            statedAge: null,
-            releaseYear,
-            vintageYear: null,
-            abv: null,
-            singleCask: null,
-            caskStrength: null,
-          },
-        }),
-      ).toEqual({
-        name: `Annual Selection - ${expectedEdition} - ${releaseYear} Release`,
-        fullName: `Example Annual Selection - ${expectedEdition} - ${releaseYear} Release`,
-      });
-    },
-  );
-
-  test("does not duplicate traits already present in the Bottle name", () => {
+  test("keeps SMWS and other exact-cask names on the general path", () => {
     expect(
       formatCanonicalBottleName({
-        bottleName: "Glendronach 1972 Single Cask",
-        bottleFullName: "Glendronach 1972 Single Cask",
-        bottleNameTraits: {
-          singleCask: true,
-        },
-        bottleStatedAge: 48,
-        exact: {
-          edition: "Batch 1",
-          statedAge: 48,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: true,
-          caskStrength: null,
-        },
+        bottleName: "64.149 A cake walk in the Black Forest",
+        bottleFullName: "SMWS 64.149 A cake walk in the Black Forest",
+        edition: null,
       }),
     ).toEqual({
-      name: "Glendronach 1972 Single Cask - Batch 1",
-      fullName: "Glendronach 1972 Single Cask - Batch 1",
+      name: "64.149 A cake walk in the Black Forest",
+      fullName: "SMWS 64.149 A cake walk in the Black Forest",
+    });
+    expect(
+      formatCanonicalBottleName({
+        bottleName: "64.149 Private Selection",
+        bottleFullName: "Example Brand 64.149 Private Selection",
+        edition: null,
+      }),
+    ).toEqual({
+      name: "64.149 Private Selection",
+      fullName: "Example Brand 64.149 Private Selection",
     });
   });
 });

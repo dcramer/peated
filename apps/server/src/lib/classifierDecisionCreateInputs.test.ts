@@ -63,9 +63,8 @@ test("materializes a classifier draft into one independently complete Bottle", (
       },
     }),
   ).toEqual({
-    name: "A Midwinter Night's Dram - Act 10 Scene 4 - 2022 Release - 49.3% ABV",
-    fullName:
-      "High West A Midwinter Night's Dram - Act 10 Scene 4 - 2022 Release - 49.3% ABV",
+    name: "A Midwinter Night's Dram - Act 10 Scene 4",
+    fullName: "High West A Midwinter Night's Dram - Act 10 Scene 4",
     statedAge: null,
   });
 });

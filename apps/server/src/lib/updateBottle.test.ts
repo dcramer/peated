@@ -17,7 +17,6 @@ import {
   createBottle,
   type BottleCreateInput,
 } from "@peated/server/lib/createBottle";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
@@ -933,6 +932,7 @@ describe("Bottle updates", () => {
     resetQueueMock();
     const selectedBefore = members[0].bottle;
     const siblingBefore = members[1].bottle;
+    const aliasesBefore = await loadAliases([selectedBefore.id]);
     const selectedSharedBefore = {
       brandId: selectedBefore.brandId,
       bottlerId: selectedBefore.bottlerId,
@@ -963,9 +963,8 @@ describe("Bottle updates", () => {
       bottle: {
         id: selectedBefore.id,
         groupId: groupBefore.id,
-        name: "Core - Batch 3 - 14-year-old - 2025 Release - 50.0% ABV - Cask Strength",
-        fullName:
-          "Exact Update Brand Core - Batch 3 - 14-year-old - 2025 Release - 50.0% ABV - Cask Strength",
+        name: "Core - Batch 3",
+        fullName: "Exact Update Brand Core - Batch 3",
         edition: "Batch 3",
         statedAge: 14,
         bottlingYear: 2024,
@@ -993,25 +992,7 @@ describe("Bottle updates", () => {
       distillersBefore,
     );
 
-    const aliases = await loadAliases([selectedBefore.id]);
-    expect(
-      aliases.filter(({ name }) =>
-        [selectedBefore.fullName, identityResult.bottle.fullName].includes(
-          name,
-        ),
-      ),
-    ).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: selectedBefore.fullName,
-          bottleId: selectedBefore.id,
-        }),
-        expect.objectContaining({
-          name: identityResult.bottle.fullName,
-          bottleId: selectedBefore.id,
-        }),
-      ]),
-    );
+    expect(await loadAliases([selectedBefore.id])).toEqual(aliasesBefore);
     expect((await loadGroupMembers(groupBefore.id))[1]).toEqual(siblingBefore);
     expect(identityResult.group).toEqual(groupBefore);
 
@@ -1136,7 +1117,7 @@ describe("Bottle updates", () => {
     });
   });
 
-  test("updates direct Bottle identity and owns aliases directly", async ({
+  test("updates direct Bottle identity without generating aliases", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -1148,11 +1129,11 @@ describe("Bottle updates", () => {
     });
     const oldLiteralName =
       "Direct Identity Brand Direct Identity   12 years old";
-    const oldNormalizedName = normalizeBottleAliasKey(oldLiteralName);
     await db
       .update(bottles)
       .set({ fullName: oldLiteralName })
       .where(eq(bottles.id, first.bottle.id));
+    const aliasesBefore = await loadAliases([first.bottle.id]);
     resetQueueMock();
 
     const result = await updateBottle({
@@ -1169,30 +1150,7 @@ describe("Bottle updates", () => {
         edition: "Updated",
       },
     });
-    const expectedAliasNames = Array.from(
-      new Set([
-        oldLiteralName,
-        oldNormalizedName,
-        result.bottle.fullName,
-        normalizeBottleAliasKey(result.bottle.fullName),
-      ]),
-    ).sort();
-    const directAliases = await db
-      .select({
-        name: bottleAliases.name,
-        bottleId: bottleAliases.bottleId,
-      })
-      .from(bottleAliases)
-      .where(inArray(bottleAliases.name, expectedAliasNames));
-    expect(directAliases).toHaveLength(expectedAliasNames.length);
-    expect(directAliases).toEqual(
-      expect.arrayContaining(
-        expectedAliasNames.map((name) => ({
-          name,
-          bottleId: first.bottle.id,
-        })),
-      ),
-    );
+    expect(await loadAliases([first.bottle.id])).toEqual(aliasesBefore);
     expect(await loadUpdateAudits([first.bottle.id])).toEqual([
       expect.objectContaining({
         objectId: first.bottle.id,
@@ -1205,12 +1163,10 @@ describe("Bottle updates", () => {
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: first.bottle.id,
     });
-    for (const name of expectedAliasNames) {
-      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-        "OnBottleAliasChange",
-        { name },
-      );
-    }
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      expect.anything(),
+    );
   });
 
   test("fans out every shared field and repairs member drift on an equal patch", async ({
@@ -1257,9 +1213,7 @@ describe("Bottle updates", () => {
       ],
     });
     const memberIds = members.map(({ bottle }) => bottle.id);
-    const oldNames = new Map(
-      members.map(({ bottle }) => [bottle.id, bottle.fullName]),
-    );
+    const aliasesBeforeFanout = await loadAliases(memberIds);
     const representativeBefore = first.group.representativeBottleId;
     const [persistedGroupBefore] = await db
       .select()
@@ -1390,15 +1344,7 @@ describe("Bottle updates", () => {
         newDistillers.map(({ id: distillerId }) => ({ bottleId, distillerId })),
       ),
     );
-    const aliasesAfterFanout = await loadAliases(memberIds);
-    for (const [bottleId, oldName] of oldNames) {
-      expect(aliasesAfterFanout).toContainEqual(
-        expect.objectContaining({
-          bottleId,
-          name: oldName,
-        }),
-      );
-    }
+    expect(await loadAliases(memberIds)).toEqual(aliasesBeforeFanout);
 
     const repairedMemberId = members[1].bottle.id;
     await db
@@ -1775,7 +1721,7 @@ describe("Bottle updates", () => {
     ).toEqual(members.map(({ bottle }) => ({ bottleId: bottle.id })));
   });
 
-  test("rolls back a shared update on Bottle or exact-alias collisions", async ({
+  test("keeps marketed-title updates separate from exact aliases", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -1796,44 +1742,11 @@ describe("Bottle updates", () => {
         name: "Collision Label",
         brand: brand.id,
         edition: "Two",
+        releaseYear: 2024,
       },
     });
     const memberIds = members.map(({ bottle }) => bottle.id);
-    const [groupBefore] = await db
-      .select()
-      .from(bottleGroups)
-      .where(eq(bottleGroups.id, first.group.id));
-    const membersBefore = await loadGroupMembers(first.group.id);
-    const distillersBefore = await loadBottleDistillers(memberIds);
     const aliasesBefore = await loadAliases(memberIds);
-    resetQueueMock();
-
-    const error = await waitError(
-      updateBottle({
-        bottleId: members[0].bottle.id,
-        input: {
-          name: "Collision Label",
-          distillers: [],
-        },
-        context: contextFor(mod),
-      }),
-      BottleUpdateConflictError,
-    );
-    expect(error).toMatchObject({ conflictingBottleId: outsider.bottle.id });
-    expect(
-      (
-        await db
-          .select()
-          .from(bottleGroups)
-          .where(eq(bottleGroups.id, first.group.id))
-      )[0],
-    ).toEqual(groupBefore);
-    expect(await loadGroupMembers(first.group.id)).toEqual(membersBefore);
-    expect(await loadBottleDistillers(memberIds)).toEqual(distillersBefore);
-    expect(await loadAliases(memberIds)).toEqual(aliasesBefore);
-    expect(await loadUpdateAudits(memberIds)).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
-
     const aliasOwner = await createBottle({
       context: contextFor(mod),
       input: {
@@ -1841,54 +1754,39 @@ describe("Bottle updates", () => {
         brand: brand.id,
       },
     });
-    const conflictingAliasName = "Collision Brand Alias Collision Label - Two";
+    const conflictingAliasName = "Collision Brand Collision Label - Two";
     expect(aliasOwner.bottle.fullName).not.toBe(conflictingAliasName);
-    expect(
-      await db
-        .select({ id: bottles.id })
-        .from(bottles)
-        .where(eq(bottles.fullName, conflictingAliasName)),
-    ).toEqual([]);
     await fixtures.BottleAlias({
       name: conflictingAliasName,
       bottleId: aliasOwner.bottle.id,
       assignmentSource: "human_approved",
     });
-    const aliasesBeforeAliasCollision = await loadAliases([
-      ...memberIds,
-      aliasOwner.bottle.id,
-    ]);
     resetQueueMock();
 
-    const aliasError = await waitError(
-      updateBottle({
-        bottleId: members[0].bottle.id,
-        input: {
-          name: "Alias Collision Label",
-          distillers: [],
-        },
-        context: contextFor(mod),
-      }),
-      BottleUpdateConflictError,
-    );
-    expect(aliasError).toMatchObject({
-      conflictingBottleId: aliasOwner.bottle.id,
+    const result = await updateBottle({
+      bottleId: members[0].bottle.id,
+      input: {
+        name: "Collision Label",
+        distillers: [],
+      },
+      context: contextFor(mod),
     });
+    expect(result.group.name).toBe("Collision Label");
     expect(
-      (
-        await db
-          .select()
-          .from(bottleGroups)
-          .where(eq(bottleGroups.id, first.group.id))
-      )[0],
-    ).toEqual(groupBefore);
-    expect(await loadGroupMembers(first.group.id)).toEqual(membersBefore);
-    expect(await loadBottleDistillers(memberIds)).toEqual(distillersBefore);
-    expect(await loadAliases([...memberIds, aliasOwner.bottle.id])).toEqual(
-      aliasesBeforeAliasCollision,
+      (await loadGroupMembers(first.group.id)).map(({ fullName }) => fullName),
+    ).toEqual([
+      "Collision Brand Collision Label - One",
+      outsider.bottle.fullName,
+    ]);
+    expect(await loadBottleDistillers(memberIds)).toEqual([]);
+    expect(await loadAliases(memberIds)).toEqual(aliasesBefore);
+    expect(
+      (await loadAliases([aliasOwner.bottle.id])).map(({ name }) => name),
+    ).toContain(conflictingAliasName);
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      expect.anything(),
     );
-    expect(await loadUpdateAudits(memberIds)).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
   test("rejects an equivalent SMWS code without partially updating", async ({

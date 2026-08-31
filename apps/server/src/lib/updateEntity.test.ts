@@ -64,6 +64,10 @@ describe("updateEntity", () => {
       expect(aliases).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ name: original.fullName }),
+        ]),
+      );
+      expect(aliases).not.toEqual(
+        expect.arrayContaining([
           expect.objectContaining({ name: updated?.fullName }),
         ]),
       );

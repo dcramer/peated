@@ -65,9 +65,10 @@ unresolved.
 The Bottle name stores the stable marketed expression relative to its brand.
 Bottle fields store edition, distillation year, bottling year, release year,
 effective stated age, ABV, single-cask and cask-strength flags, and cask
-details. Bottle creation includes fields that identify the release in its
-complete display name without repeating them. Bottling year is only a detail
-unless the producer markets that bottling as a separate release.
+details. Bottle creation appends an explicit edition to the stable expression.
+It does not generate name suffixes from age, year, ABV, or production flags.
+Wording already marketed in the expression remains there. Bottling year is only
+a detail unless the producer markets that bottling as a separate release.
 
 A Bottle is the durable exact record. Shared BottleGroup values are copied into
 every member Bottle so exact reads remain independently correct. A shared group
@@ -113,9 +114,11 @@ Alias lookup and alias writes use the same identity-preserving key for a
 workflow. Lossy or semantic normalization may retrieve evidence but cannot
 assign a Bottle unless that exact key was already accepted.
 
-Canonical Bottle creation reserves the Bottle's exact canonical alias in the
-same transaction. Alias conflicts block creation or require an explicit merge;
-code does not overwrite, suffix, or reinterpret another Bottle's assertion.
+A marketed Bottle title is not automatically an exact alias. Several structured
+releases can use the same title, so creation, update, and review preflight check
+the complete structured identity and leave alias assignment to accepted source
+or human decisions. Alias conflicts do not block a Bottle title. Code does not
+overwrite or reinterpret another Bottle's accepted alias assertion.
 
 ## Resolution Pipeline
 

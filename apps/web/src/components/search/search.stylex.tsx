@@ -1,7 +1,6 @@
 "use client";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type {
   SearchResultGroup,
@@ -13,6 +12,7 @@ import {
 } from "@peated/web/components/designSystem/components";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
@@ -145,12 +145,6 @@ function bottleItem(
     showMeasures: boolean;
   },
 ) {
-  const metadata = [
-    bottle.category ? formatCategoryName(bottle.category) : null,
-    bottle.statedAge === null ? null : `${bottle.statedAge} years`,
-    bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
-  ].filter((value): value is string => Boolean(value));
-
   return {
     href: getBottleHref(bottle.id),
     id: `bottle-${bottle.id}`,
@@ -163,7 +157,7 @@ function bottleItem(
           bands: bottle.tastingBandCounts,
         }
       : undefined,
-    metadata: metadata.join(" · "),
+    metadata: getBottleMetadata(bottle),
     title: formatBottleDisplayName(bottle),
     visual: {
       fallback: "B",

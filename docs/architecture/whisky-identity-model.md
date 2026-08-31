@@ -77,7 +77,8 @@ BottleGroup owns shared editing semantics for:
 Every Bottle durably materializes those shared values as part of its complete
 exact identity and additionally owns:
 
-- its complete marketed `name` and `fullName`;
+- its marketed `name` and `fullName`, composed from the stable expression and
+  an explicit edition when present;
 - edition or batch;
 - distillation, bottling, and release years;
 - effective stated age;
@@ -126,10 +127,11 @@ An exact edit changes only the selected Bottle. A shared edit updates the
 BottleGroup and atomically rematerializes every member Bottle's complete
 identity while preserving each member's exact fields.
 
-A shared edit that changes a name or prefix regenerates every member's
-canonical exact name. Previous canonical exact names remain aliases for their
-Bottles. Name or alias collisions, incomplete member updates, or audit failures
-roll back the entire shared edit.
+A shared edit that changes a name or prefix regenerates every member's marketed
+name while preserving that member's explicit edition. A title change does not
+create an exact alias because the same marketed title can identify several
+structured releases. SMWS code collisions, incomplete member updates, or audit
+failures roll back the entire shared edit.
 
 `Bottle.statedAge` stores the effective age. A non-null value that differs from
 the group's current age is an exact override; null or an equal value inherits
@@ -185,6 +187,9 @@ authority.
   `2024 Release`, or `S2B13`. Preserve its descriptor words. A printed batch or
   lot code is not an edition when the producer sells one ongoing product
   without batch-specific marketing.
+- Bottle names combine the stable expression with an explicit edition. Age,
+  year, ABV, and production flags remain structured facts and are not generated
+  as name suffixes. Wording already marketed in the expression remains there.
 - `vintageYear` is the distillation year. `bottlingYear` is the year the whisky
   was bottled. `releaseYear` is the known year the marketed release became
   available. Store `releaseMonth` and `releaseDay` only when the source gives
@@ -243,7 +248,9 @@ composed from an SMWS distillery number and single-cask number visible on the
 label. A code must not invent a missing component or subtitle. SMWS may rename
 the subtitle marketed for a cask, but that does not create a new Bottle: the
 code continues to identify the same Bottle, the new subtitle becomes its
-canonical name, and the previous canonical name remains an alias.
+canonical name, and the previous canonical name remains an alias. Its canonical
+Bottle name is `<distillery number>.<cask number> <subtitle>`. Exact traits stay
+in structured fields and are not appended to that name.
 
 ## Activity Identity
 

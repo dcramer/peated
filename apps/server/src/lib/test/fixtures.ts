@@ -694,13 +694,16 @@ async function createBottleFixture(
       }
     }
 
-    await tx.insert(bottleAliases).values({
-      bottleId: bottle.id,
-      name: bottle.fullName,
-      assignmentSource: legacy ? "legacy" : "canonical",
-      createdAt: bottle.createdAt,
-      assignedByActorId: bottle.createdByActorId,
-    });
+    await tx
+      .insert(bottleAliases)
+      .values({
+        bottleId: bottle.id,
+        name: bottle.fullName,
+        assignmentSource: legacy ? "legacy" : "canonical",
+        createdAt: bottle.createdAt,
+        assignedByActorId: bottle.createdByActorId,
+      })
+      .onConflictDoNothing();
 
     await tx.insert(changes).values({
       objectId: bottle.id,

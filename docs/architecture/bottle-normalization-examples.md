@@ -16,8 +16,8 @@ Use this alongside:
   It may retain truly stable marketed age, finish, or strength wording.
 - Structured exact fields such as `edition`, `vintageYear`, `releaseYear`,
   exact `statedAge`, ABV, and cask flags belong on that same Bottle.
-- Canonical materialization combines the stable name and structured fields into
-  one independently correct Bottle without duplicating exact markers.
+- Canonical materialization combines the stable name with an explicit edition.
+  Other exact facts remain structured and do not become generated name suffixes.
 - `observation` means the detail is real evidence but is not yet supported as
   reusable canonical Bottle identity.
 - BottleGroup assignment is automatic downstream and is never inferred by
@@ -30,7 +30,7 @@ Use this alongside:
 | `Aberfeldy 12`                                      | `12-year-old`                 | `statedAge = 12`                                              | `Aberfeldy 12-year-old`; stable marketed age wording remains renderable without group data.                                          |
 | `Springbank 12 Cask Strength Batch 24`              | `12-year-old Cask Strength`   | `statedAge = 12`, `caskStrength = true`, `edition = Batch 24` | `Springbank 12-year-old Cask Strength Batch 24`; Batch 24 is stored once as an exact field.                                          |
 | `Lagavulin Distillers Edition`                      | `Distillers Edition`          | none                                                          | `Lagavulin Distillers Edition`; the phrase is the stable expression.                                                                 |
-| `Lagavulin Distillers Edition 2011 Release`         | `Distillers Edition`          | `releaseYear = 2011`                                          | One complete dated Bottle; canonical materialization adds the year without changing the stable expression.                           |
+| `Lagavulin Distillers Edition 2011 Release`         | `Distillers Edition`          | `edition = 2011 Release`, `releaseYear = 2011`                | One complete dated Bottle; the marketed release phrase appears once and the year also remains queryable.                             |
 | `Maker's Mark Private Selection S2B13`              | `Private Selection`           | `edition = S2B13`                                             | One independently complete Bottle when reviewed evidence establishes S2B13 as marketed identity.                                     |
 | `Ardbeg Traigh Bhan 19-year-old Batch 5`            | `Traigh Bhan 19-year-old`     | `statedAge = 19`, `edition = Batch 5`                         | `Ardbeg Traigh Bhan 19-year-old Batch 5`; the exact batch remains structured.                                                        |
 | `Batch Strength`                                    | `Batch Strength`              | none                                                          | Stable expression wording; `Batch` is not an exact marker by itself.                                                                 |

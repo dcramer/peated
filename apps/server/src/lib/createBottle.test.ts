@@ -18,11 +18,9 @@ import {
   createBottleInTransaction,
   createOrReuseBottleInTransaction,
 } from "@peated/server/lib/createBottle";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, eq } from "drizzle-orm";
 import { vi } from "vitest";
-import { z } from "zod";
 
 function contextFor(user: User) {
   return { user };
@@ -77,9 +75,8 @@ describe("Bottle creation", () => {
     expect(result.bottle).toMatchObject({
       ...stableCompatibilityFields,
       groupId: result.group.id,
-      name: "Cask Strength - Batch 24 - 13-year-old - 2026 Release - 55.4% ABV",
-      fullName:
-        "Creation Test Brand Cask Strength - Batch 24 - 13-year-old - 2026 Release - 55.4% ABV",
+      name: "Cask Strength - Batch 24",
+      fullName: "Creation Test Brand Cask Strength - Batch 24",
       edition: "Batch 24",
       statedAge: 13,
       bottlingYear: 2025,
@@ -96,14 +93,6 @@ describe("Bottle creation", () => {
       representativeBottleId: result.bottle.id,
     });
     expect(Object.keys(result).sort()).toEqual(["bottle", "group"]);
-
-    const [alias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.bottleId, result.bottle.id));
-    expect(alias).toMatchObject({
-      assignmentSource: "canonical",
-    });
 
     const groupDistillers = await db
       .select()
@@ -136,34 +125,11 @@ describe("Bottle creation", () => {
     });
   });
 
-  test("owns normalized and literal canonical aliases and queues both after commit", async ({
+  test("does not turn a marketed title into an exact alias", async ({
     defaults,
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Literal™ Alias Brand" });
-    const queuedAliases: string[] = [];
-    let failedAliasName: string | null = null;
-    vi.mocked(workerClient.pushUniqueJob).mockImplementation(
-      async (jobName, args) => {
-        if (jobName !== "OnBottleAliasChange") return;
-
-        const { name } = z.object({ name: z.string() }).parse(args);
-        const [persistedAlias] = await db
-          .select()
-          .from(bottleAliases)
-          .where(eq(bottleAliases.name, name));
-        expect(persistedAlias).toMatchObject({
-          name,
-          assignmentSource: "canonical",
-          ignored: false,
-        });
-        queuedAliases.push(name);
-        if (failedAliasName === null) {
-          failedAliasName = name;
-          throw new Error("alias queue unavailable");
-        }
-      },
-    );
 
     const result = await createBottle({
       context: contextFor(defaults.user),
@@ -173,29 +139,15 @@ describe("Bottle creation", () => {
       },
     });
 
-    const literalName = result.bottle.fullName;
-    const normalizedName = normalizeBottleAliasKey(literalName);
-    expect(normalizedName).not.toBe(literalName);
-    const expectedNames = [literalName, normalizedName].sort();
     const aliases = await db
       .select()
       .from(bottleAliases)
       .where(eq(bottleAliases.bottleId, result.bottle.id));
-    expect(aliases).toHaveLength(expectedNames.length);
-    expect(aliases).toEqual(
-      expect.arrayContaining(
-        expectedNames.map((name) =>
-          expect.objectContaining({
-            name,
-            bottleId: result.bottle.id,
-            assignmentSource: "canonical",
-            ignored: false,
-          }),
-        ),
-      ),
+    expect(aliases).toEqual([]);
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      expect.anything(),
     );
-    expect(queuedAliases.sort()).toEqual(expectedNames);
-    expect(failedAliasName).not.toBeNull();
   });
 
   test("gives manual and classifier statedAge the same storage owner", async ({
@@ -396,7 +348,7 @@ describe("Bottle creation", () => {
     expect(() => BottleCreateInputSchema.parse(input)).toThrow();
   });
 
-  test("blocks exact canonical aliases and duplicate SMWS codes", async ({
+  test("blocks exact structured identities and duplicate SMWS codes", async ({
     defaults,
     fixtures,
   }) => {
@@ -412,7 +364,7 @@ describe("Bottle creation", () => {
     await expect(createBottle({ context, input })).rejects.toMatchObject({
       bottleId: first.bottle.id,
       collision: {
-        kind: "canonical_name",
+        kind: "canonical_identity",
         attemptedCanonicalFullName: first.bottle.fullName,
       },
     });
@@ -447,7 +399,7 @@ describe("Bottle creation", () => {
     );
   });
 
-  test("returns only Bottle-native identity when safely reusing a canonical duplicate", async ({
+  test("returns only Bottle-native identity when reusing an exact structured identity", async ({
     defaults,
     fixtures,
   }) => {
@@ -476,6 +428,38 @@ describe("Bottle creation", () => {
       bottle: { id: created.bottle.id },
       createResult: null,
     });
+  });
+
+  test("allows one marketed title to have distinct structured releases", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const context = contextFor(defaults.user);
+    const brand = await fixtures.Entity({ name: "Annual Release Brand" });
+    const first = await createBottle({
+      context,
+      input: {
+        name: "Annual Selection",
+        brand: brand.id,
+        releaseYear: 2025,
+        abv: 46,
+      },
+    });
+    const second = await createBottle({
+      context,
+      input: {
+        name: "Annual Selection",
+        brand: brand.id,
+        releaseYear: 2026,
+        abv: 48,
+      },
+    });
+
+    expect(second.bottle.id).not.toBe(first.bottle.id);
+    expect(second.bottle.fullName).toBe(first.bottle.fullName);
+    expect([first.bottle.releaseYear, second.bottle.releaseYear]).toEqual([
+      2025, 2026,
+    ]);
   });
 
   test("fails closed instead of reusing retired Bottle identities", async ({
@@ -524,7 +508,7 @@ describe("Bottle creation", () => {
     }
   });
 
-  test("rolls back the group, Bottle, aliases, and audit on a literal alias collision", async ({
+  test("keeps accepted aliases separate from marketed titles", async ({
     defaults,
     fixtures,
   }) => {
@@ -532,48 +516,19 @@ describe("Bottle creation", () => {
     const owner = await fixtures.Bottle({ name: "Existing Alias Owner" });
     const attemptedCanonicalFullName =
       "Collision™ Test Brand Blocked Expression";
-    const normalizedAliasName = normalizeBottleAliasKey(
-      attemptedCanonicalFullName,
-    );
     await fixtures.BottleAlias({
       name: attemptedCanonicalFullName,
       bottleId: owner.id,
       assignmentSource: "human_approved",
     });
-    const changesBefore = await db.select({ id: changes.id }).from(changes);
-    await expect(
-      createBottle({
-        context: contextFor(defaults.user),
-        input: {
-          name: "Blocked Expression",
-          brand: brand.id,
-        },
-      }),
-    ).rejects.toEqual(
-      new BottleAlreadyExistsError(owner.id, {
-        kind: "alias",
-        attemptedCanonicalFullName,
-      }),
-    );
-
-    expect(
-      await db
-        .select()
-        .from(bottleGroups)
-        .where(eq(bottleGroups.fullName, attemptedCanonicalFullName)),
-    ).toEqual([]);
-    expect(
-      await db
-        .select()
-        .from(bottles)
-        .where(eq(bottles.fullName, attemptedCanonicalFullName)),
-    ).toEqual([]);
-    expect(
-      await db
-        .select()
-        .from(bottleAliases)
-        .where(eq(bottleAliases.name, normalizedAliasName)),
-    ).toEqual([]);
+    const created = await createBottle({
+      context: contextFor(defaults.user),
+      input: {
+        name: "Blocked Expression",
+        brand: brand.id,
+      },
+    });
+    expect(created.bottle.fullName).toBe(attemptedCanonicalFullName);
     const [persistedCollision] = await db
       .select()
       .from(bottleAliases)
@@ -582,9 +537,6 @@ describe("Bottle creation", () => {
       bottleId: owner.id,
       assignmentSource: "human_approved",
     });
-    expect(await db.select({ id: changes.id }).from(changes)).toEqual(
-      changesBefore,
-    );
   });
 
   test("keeps similar independent creates in distinct singleton groups", async ({
@@ -663,12 +615,6 @@ describe("Bottle creation", () => {
         .select()
         .from(bottles)
         .where(eq(bottles.id, attempted.bottle.id)),
-    ).toEqual([]);
-    expect(
-      await db
-        .select()
-        .from(bottleAliases)
-        .where(eq(bottleAliases.name, attempted.newAliases[0])),
     ).toEqual([]);
     expect(
       await db

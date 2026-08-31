@@ -1,5 +1,6 @@
 "use client";
 
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   formatCategoryName,
   formatServingStyle,
@@ -10,8 +11,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
   Button,
   ButtonLink,
@@ -38,6 +37,7 @@ import {
   getAddBottleHref,
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
+import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
@@ -102,13 +102,25 @@ function getBottleSpecs(bottle: Bottle) {
     { label: "Cask", value: bottle.maturation },
     {
       label: "Release",
-      value: formatReleaseDate(bottle),
+      value: getBottleReleasePlacement(bottle).header,
     },
   ] as const;
 }
 
 function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   return [
+    {
+      label: "Vintage",
+      value: bottle.vintageYear === null ? null : String(bottle.vintageYear),
+    },
+    {
+      label: "Bottled",
+      value: bottle.bottlingYear === null ? null : String(bottle.bottlingYear),
+    },
+    {
+      label: "Released",
+      value: getBottleReleasePlacement(bottle).details,
+    },
     {
       label: "Phenols",
       value:

@@ -838,7 +838,7 @@ describe("Bottle operation review preparation", () => {
     expect(noOp).not.toHaveProperty("stateToken");
   });
 
-  test("allows an unassigned alias but blocks an alias owned by another Bottle", async ({
+  test("allows a marketed title that matches an unassigned or assigned alias", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({
@@ -889,10 +889,8 @@ describe("Bottle operation review preparation", () => {
 
     await expect(prepareOperation({ operation, ...context })).resolves.toEqual(
       expect.objectContaining({
-        status: "blocked",
-        preparationError: expect.objectContaining({
-          code: "identity_collision",
-        }),
+        status: "pending_review",
+        type: "update_bottle",
       }),
     );
   });

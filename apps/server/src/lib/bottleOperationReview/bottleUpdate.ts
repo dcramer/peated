@@ -11,7 +11,7 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import type { AnyDatabase } from "@peated/server/db";
 import type { BottleSeries, Entity } from "@peated/server/db/schema";
-import { bottleAliases, bottles, bottleSeries } from "@peated/server/db/schema";
+import { bottles, bottleSeries } from "@peated/server/db/schema";
 import {
   getBottleExactIdentity,
   materializeBottleIdentity,
@@ -26,7 +26,7 @@ import {
   bottleUpdateExpectedSelectedBottleState,
   bottleUpdateExpectedSharedState,
 } from "@peated/server/lib/updateBottle";
-import { and, asc, count, eq, isNotNull, sql } from "drizzle-orm";
+import { and, asc, count, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   MAX_OPERATION_PREVIEW_IDS,
@@ -346,18 +346,36 @@ function relevantBottleUpdateToken({
 async function requireNoBottleIdentityCollision({
   database,
   desiredFullName,
+  desiredBrandId,
+  desiredExact,
   allowedBottleIds,
 }: {
   database: AnyDatabase;
   desiredFullName: string;
+  desiredBrandId: number | null;
+  desiredExact: ReturnType<typeof bottleExact>;
   allowedBottleIds: readonly number[];
 }) {
+  if (desiredBrandId === null) return;
+
   const [bottleCollision] = await database
     .select({ bottleId: bottles.id })
     .from(bottles)
     .where(
       and(
+        eq(bottles.brandId, desiredBrandId),
         eq(sql`LOWER(${bottles.fullName})`, desiredFullName.toLowerCase()),
+        sql`${bottles.edition} IS NOT DISTINCT FROM ${desiredExact.edition}`,
+        sql`${bottles.statedAge} IS NOT DISTINCT FROM ${desiredExact.statedAge}`,
+        sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${desiredExact.noAgeStatement}`,
+        sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${desiredExact.vintageYear}`,
+        sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${desiredExact.releaseYear}`,
+        sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${desiredExact.releaseMonth}`,
+        sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${desiredExact.releaseDay}`,
+        sql`${bottles.abv} IS NOT DISTINCT FROM ${desiredExact.abv}`,
+        sql`${bottles.singleCask} IS NOT DISTINCT FROM ${desiredExact.singleCask}`,
+        sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${desiredExact.caskStrength}`,
+        sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${desiredExact.caskNumber}`,
         allowedBottleIds.length
           ? sql`${bottles.id} NOT IN (${sql.join(
               allowedBottleIds.map((id) => sql`${id}`),
@@ -373,28 +391,32 @@ async function requireNoBottleIdentityCollision({
       `Bottle identity "${desiredFullName}" is already assigned to Bottle ${bottleCollision.bottleId}.`,
     );
   }
-  const [aliasCollision] = await database
-    .select({ bottleId: bottleAliases.bottleId })
-    .from(bottleAliases)
-    .where(
-      and(
-        eq(sql`LOWER(${bottleAliases.name})`, desiredFullName.toLowerCase()),
-        isNotNull(bottleAliases.bottleId),
-        allowedBottleIds.length
-          ? sql`${bottleAliases.bottleId} NOT IN (${sql.join(
-              allowedBottleIds.map((id) => sql`${id}`),
-              sql`, `,
-            )})`
-          : undefined,
-      ),
-    )
-    .limit(1);
-  if (aliasCollision) {
-    fail(
-      "identity_collision",
-      `Bottle identity "${desiredFullName}" conflicts with an existing alias.`,
-    );
-  }
+}
+
+function structuredIdentityKey({
+  brandId,
+  fullName,
+  exact,
+}: {
+  brandId: number | null;
+  fullName: string;
+  exact: ReturnType<typeof bottleExact>;
+}) {
+  return JSON.stringify([
+    brandId,
+    fullName.toLowerCase(),
+    exact.edition,
+    exact.statedAge,
+    exact.noAgeStatement,
+    exact.vintageYear,
+    exact.releaseYear,
+    exact.releaseMonth,
+    exact.releaseDay,
+    exact.abv,
+    exact.singleCask,
+    exact.caskStrength,
+    exact.caskNumber,
+  ]);
 }
 
 export async function prepareBottleUpdate(
@@ -655,11 +677,20 @@ export async function prepareBottleUpdate(
   const sharedChanged = changedFields.some((field) =>
     field.startsWith("shared."),
   );
+  const desiredBrandId =
+    brand.preview.kind === "existing" ? brand.preview.entityId : null;
   if (sharedChanged) {
     const members = await groupBottles(context.database, resource.group.id);
     const memberIds = members.map(({ id: bottleId }) => bottleId);
-    const desiredNames = new Set<string>();
+    const desiredIdentities = new Set<string>();
     for (const member of members) {
+      const desiredExact =
+        member.id === resource.bottle.id
+          ? exactAfter
+          : getBottleExactIdentity({
+              bottle: member,
+              sourceGroupStatedAge: resource.group.statedAge,
+            });
       const desired =
         member.id === resource.bottle.id
           ? after
@@ -669,22 +700,25 @@ export async function prepareBottleUpdate(
                 fullName: stableFullName,
                 statedAge: sharedStatedAge,
               },
-              exact: getBottleExactIdentity({
-                bottle: member,
-                sourceGroupStatedAge: resource.group.statedAge,
-              }),
+              exact: desiredExact,
             });
-      const identityKey = desired.fullName.toLowerCase();
-      if (desiredNames.has(identityKey)) {
+      const identityKey = structuredIdentityKey({
+        brandId: desiredBrandId,
+        fullName: desired.fullName,
+        exact: desiredExact,
+      });
+      if (desiredIdentities.has(identityKey)) {
         fail(
           "identity_collision",
           `BottleGroup ${resource.group.id} would contain duplicate Bottle identity "${desired.fullName}".`,
         );
       }
-      desiredNames.add(identityKey);
+      desiredIdentities.add(identityKey);
       await requireNoBottleIdentityCollision({
         database: context.database,
         desiredFullName: desired.fullName,
+        desiredBrandId,
+        desiredExact,
         allowedBottleIds: memberIds,
       });
     }
@@ -692,6 +726,8 @@ export async function prepareBottleUpdate(
     await requireNoBottleIdentityCollision({
       database: context.database,
       desiredFullName: after.fullName,
+      desiredBrandId,
+      desiredExact: exactAfter,
       allowedBottleIds: [resource.bottle.id],
     });
   }

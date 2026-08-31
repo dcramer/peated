@@ -1443,7 +1443,7 @@ describe("price match queue", () => {
     }
   });
 
-  test("rolls back the repair and proposal approval when shared fanout conflicts", async ({
+  test("repairs shared names without overwriting an accepted alias", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -1508,28 +1508,15 @@ describe("price match queue", () => {
       .returning();
 
     const memberIds = [selected.id, sibling.id];
-    const [groupBefore, membersBefore, aliasesBefore] = await Promise.all([
-      db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, selected.groupId!),
-      }),
-      db
-        .select()
-        .from(bottles)
-        .where(inArray(bottles.id, memberIds))
-        .orderBy(asc(bottles.id)),
-      db.select().from(bottleAliases).orderBy(asc(bottleAliases.name)),
-    ]);
+    const aliasesBefore = await db
+      .select()
+      .from(bottleAliases)
+      .orderBy(asc(bottleAliases.name));
 
-    const error = await waitError(
-      routerClient.prices.matchQueue.applyBottleRepair(
-        { proposal: proposal.id },
-        { context: { user } },
-      ),
+    await routerClient.prices.matchQueue.applyBottleRepair(
+      { proposal: proposal.id },
+      { context: { user } },
     );
-    expect(error).toMatchObject({
-      status: 409,
-      data: { bottle: conflicting.id },
-    });
 
     const [
       groupAfter,
@@ -1568,19 +1555,26 @@ describe("price match queue", () => {
         ),
     ]);
 
-    expect(groupAfter).toEqual(groupBefore);
-    expect(membersAfter).toEqual(membersBefore);
+    expect(groupAfter).toMatchObject({
+      name: "Repair Collision Target",
+      category: "single_malt",
+    });
+    expect(membersAfter).toHaveLength(2);
+    expect(
+      membersAfter.every(({ fullName }) =>
+        fullName.includes("Repair Collision Target"),
+      ),
+    ).toBe(true);
     expect(aliasesAfter).toEqual(aliasesBefore);
     expect(proposalAfter).toMatchObject({
-      status: "pending_review",
-      reviewedById: null,
-      reviewedAt: null,
+      status: "approved",
+      reviewedById: user.id,
     });
     expect(priceAfter).toMatchObject({
       bottleId: selected.id,
     });
-    expect(observation).toBeUndefined();
-    expect(repairChanges).toEqual([]);
+    expect(observation).toMatchObject({ bottleId: selected.id });
+    expect(repairChanges).toHaveLength(2);
   });
 
   test("filters queue items by kind and orders ties by newest id", async ({

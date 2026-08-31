@@ -177,19 +177,15 @@ export async function persistBottleObservation(
     if (!(error instanceof BottleAlreadyExistsError)) throw error;
     // An SMWS cask code outlives its mutable subtitle. Reuse its Bottle id;
     // the update boundary makes the new title canonical and retains the old
-    // canonical title as an alias.
-    const updateInput = { ...createInput };
-    for (const field of [
-      "releaseYear",
-      "releaseMonth",
-      "releaseDay",
-    ] as const) {
-      if (!(field in bottle)) delete updateInput[field];
-    }
+    // canonical title as an alias. Scraped nulls are absence, not evidence to
+    // erase richer catalog facts, so repeated ingestion only fills known data.
+    const backfillPatch = Object.fromEntries(
+      Object.entries(bottle).filter(([, value]) => value != null),
+    );
     resultBottle = (
       await updateBottleAsPeated({
         bottleId: error.bottleId,
-        input: updateInput,
+        input: backfillPatch,
       })
     ).bottle;
   }

@@ -219,10 +219,6 @@ describe("POST /bottles", () => {
       generateDetails: true,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "OnBottleAliasChange",
-      { name: bottle.fullName },
-    );
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: bottle.id,
@@ -339,7 +335,7 @@ describe("POST /bottles", () => {
       .where(eq(bottles.id, data.id));
     expect(bottle).toMatchObject({
       groupId: data.group!.id,
-      name: "Delicious Wood - Batch 7 - 12-year-old - 2024 Release - 2010 Vintage - 57.1% ABV - Single Cask - Cask Strength",
+      name: "Delicious Wood - Batch 7",
       brandId: brand.id,
       bottlerId: distiller.id,
       category: "single_malt",
@@ -801,30 +797,29 @@ describe("POST /bottles", () => {
     );
   });
 
-  test("rejects exact duplicate bottle aliases without the classifier", async ({
+  test("allows a marketed title that matches an accepted alias", async ({
     defaults,
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = "test-key";
 
     const brand = await fixtures.Entity({ name: "Yamazaki" });
-    await fixtures.Bottle({
+    const existing = await fixtures.Bottle({
       brandId: brand.id,
       name: "12-year-old",
       statedAge: 12,
     });
 
-    const err = await waitError(
-      routerClient.bottles.create(
-        {
-          name: "Yamazaki 12-year-old",
-          brand: brand.id,
-        },
-        { context: { user: defaults.user } },
-      ),
+    const created = await routerClient.bottles.create(
+      {
+        name: "Yamazaki 12-year-old",
+        brand: brand.id,
+      },
+      { context: { user: defaults.user } },
     );
 
-    expect(err).toMatchInlineSnapshot(`[Error: Bottle already exists.]`);
+    expect(created.id).not.toBe(existing.id);
+    expect(created).toMatchObject({ name: "12-year-old" });
   });
 
   test("rejects duplicate SMWS bottle codes without requiring the subtitle", async ({
