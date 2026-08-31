@@ -48,6 +48,15 @@
   behavior. Report checks that you did not run. Pull request CI is the required
   full-repo `pnpm test` gate.
 
+## Catalog Operations
+
+- Before production catalog work, read the Catalog Enrichment guide and Whisky
+  Identity Model. Treat their identity, evidence, and verification rules as
+  required.
+- Keep Bottle `name` to the stable marketed expression. Do not generate it from
+  structured facts. Use exact producer wording only when it is part of the
+  marketed expression, and verify each changed Bottle after the write.
+
 ## Testing and Validation
 
 - Backend tests are integration-first.
