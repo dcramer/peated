@@ -6,15 +6,12 @@ import type { EntityKind } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import {
-  ButtonLink,
-  PageTabs,
-} from "@peated/web/components/designSystem/components";
-import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
+import { ButtonLink, PageTabs } from "@peated/web/components";
+import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import {
   EntityCatalogFilters,
   EntityCatalogList,
-} from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
+} from "@peated/web/components/pages/entityCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";

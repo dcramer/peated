@@ -6,11 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import {
-  ButtonLink,
-  LoadingList,
-  SectionError,
-} from "@peated/web/components/designSystem/components";
+import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
+import { EntityLinks } from "@peated/web/components/entityLinks";
+import Join from "@peated/web/components/join";
 import {
   HomeContributionPrompt,
   HomeDistilleries,
@@ -18,12 +16,10 @@ import {
   HomeOrigins,
   HomeRecentBottles,
   HomeRecentReviews,
-} from "@peated/web/components/designSystem/patterns/homeBrowse.stylex";
-import { HomePage } from "@peated/web/components/designSystem/patterns/homePage.stylex";
-import { HomeSectionLoading } from "@peated/web/components/designSystem/patterns/homeSummary.stylex";
-import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
-import { EntityLinks } from "@peated/web/components/entityLinks";
-import Join from "@peated/web/components/join";
+} from "@peated/web/components/pages/homeBrowse.stylex";
+import { HomePage } from "@peated/web/components/pages/homePage.stylex";
+import { HomeSectionLoading } from "@peated/web/components/pages/homeSummary.stylex";
+import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -86,7 +82,7 @@ export function PublicHome() {
           </PageColumns>
         </>
       }
-      description="Browse whisky bottlings, including single casks, with critic scores and tasting notes. No account needed."
+      description="Browse whisky bottles, including single casks, with critic scores and tasting notes. No account needed."
       search={
         <Search
           onSubmit={(query) =>
@@ -96,11 +92,11 @@ export function PublicHome() {
           }
           placeholder={
             totalBottles === undefined
-              ? "Search bottlings…"
-              : `Search ${totalBottles.toLocaleString("en-US")} bottlings…`
+              ? "Search bottles…"
+              : `Search ${totalBottles.toLocaleString("en-US")} bottles…`
           }
           scopeValues={["all"]}
-          showBottleMeasures={false}
+          showBottleRatings={false}
           submitLabel="Search"
         />
       }
@@ -316,7 +312,7 @@ function Distilleries({
         heading="Distilleries are unavailable"
         onRetry={() => void distilleries.refetch()}
       >
-        We couldn't load the distilleries with the most bottlings. The other
+        We couldn't load the distilleries with the most bottles. The other
         homepage sections still work.
       </SectionError>
     );

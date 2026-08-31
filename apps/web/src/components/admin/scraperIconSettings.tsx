@@ -52,7 +52,7 @@ export default function ScraperIconSettings({ site }: { site: Site }) {
       }
       action={
         <AdminButton
-          color="primary"
+          variant="default"
           disabled={!hasWebsite || capture.isPending}
           loading={capture.isPending}
           onClick={() => void findIcon()}

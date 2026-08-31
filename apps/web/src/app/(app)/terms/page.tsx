@@ -4,7 +4,7 @@ import {
   ContentSection,
   ContentSubsection,
   ContentText,
-} from "@peated/web/components/designSystem/patterns/contentPage.stylex";
+} from "@peated/web/components/pages/contentPage.stylex";
 import type { Metadata } from "next";
 
 export const dynamic = "force-static";

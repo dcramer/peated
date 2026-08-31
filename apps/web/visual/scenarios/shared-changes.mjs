@@ -6,18 +6,31 @@ export function isTestDataChange(filePath) {
   );
 }
 
+const COMPONENT_ROOT = "apps/web/src/components/";
+
+const focusedComponentFiles = new Set([
+  `${COMPONENT_ROOT}googleLoginButton.tsx`,
+  `${COMPONENT_ROOT}loginForm.tsx`,
+  `${COMPONENT_ROOT}passkeyLoginButton.tsx`,
+]);
+
+function isReusableComponentChange(filePath) {
+  if (!filePath.startsWith(COMPONENT_ROOT)) return false;
+  if (focusedComponentFiles.has(filePath)) return false;
+
+  const relativePath = filePath.slice(COMPONENT_ROOT.length);
+  return relativePath.startsWith("pages/") || !relativePath.includes("/");
+}
+
 /** Shared UI and web setup changes use a small representative page set. */
 export function isSharedPageChange(filePath) {
   // Login has a focused scenario. Keep authentication styles out of the
   // representative page set so the four-page limit cannot hide login.
-  const isLoginPattern = filePath.includes(
-    "/designSystem/patterns/authentication.stylex",
-  );
+  const isLoginPage = filePath.includes("/pages/authentication.stylex");
 
   return (
     filePath.startsWith("packages/design/") ||
-    (filePath.startsWith("apps/web/src/components/designSystem/") &&
-      !isLoginPattern) ||
+    (isReusableComponentChange(filePath) && !isLoginPage) ||
     filePath.startsWith("apps/web/src/styles/") ||
     filePath === "apps/web/src/app/(app)/layout.tsx" ||
     filePath.includes("/defaultLayout") ||

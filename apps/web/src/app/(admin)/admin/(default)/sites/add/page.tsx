@@ -106,7 +106,7 @@ export default function Page() {
           <AdminButton href="/admin/sites">Cancel</AdminButton>
           <AdminButton
             type="submit"
-            color="highlight"
+            variant="accent"
             loading={create.isPending}
             disabled={create.isPending}
           >

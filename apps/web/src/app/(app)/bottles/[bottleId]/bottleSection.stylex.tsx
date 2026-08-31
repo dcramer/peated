@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { SectionHeading } from "@peated/web/components/designSystem/components";
+import { SectionHeading } from "@peated/web/components";
 import { space } from "../../../../styles/tokens.stylex";
 
 export function BottleSection({

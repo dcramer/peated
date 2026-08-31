@@ -41,7 +41,7 @@ export default function Page() {
       />
       <AdminPageHeader
         actions={
-          <Button color="primary" href="/admin/tags/add">
+          <Button variant="default" href="/admin/tags/add">
             Add Tag
           </Button>
         }

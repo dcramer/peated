@@ -16,13 +16,13 @@ function operationTitle(
 ): string {
   switch (proposal.type) {
     case "update_bottle":
-      return `Update Bottle #${proposal.input.bottleId}`;
+      return `Update bottle #${proposal.input.bottleId}`;
     case "merge_bottles":
-      return `Merge Bottle #${proposal.input.sourceBottleId} into #${proposal.input.destinationBottleId}`;
+      return `Merge bottle #${proposal.input.sourceBottleId} into #${proposal.input.destinationBottleId}`;
     case "update_entity":
-      return `Update Entity #${proposal.input.entityId}`;
+      return `Update brand or producer #${proposal.input.entityId}`;
     case "merge_entities":
-      return `Merge Entity #${proposal.input.sourceEntityId} into #${proposal.input.destinationEntityId}`;
+      return `Merge brand or producer #${proposal.input.sourceEntityId} into #${proposal.input.destinationEntityId}`;
   }
 }
 

@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { LoadingList } from "@peated/web/components/designSystem/components";
+import { LoadingList } from "@peated/web/components";
 import { space } from "../../../../styles/tokens.stylex";
 
 export function EntityTabLoading({

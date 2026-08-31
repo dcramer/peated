@@ -180,7 +180,7 @@ describe("Bottle Check review components", () => {
       />,
     );
 
-    expect(html).toContain("Update Entity");
+    expect(html).toContain("Update brand or producer");
     expect(html).toContain("Pending review");
     expect(html).toContain('href="/entities/42/edit"');
     expect(html).toContain("The label and official producer site");
@@ -404,9 +404,9 @@ describe("Bottle Check review components", () => {
 
     expect(blocked).toContain("The target was not inspected.");
     expect(applying).toContain("Applying");
-    expect(applying).toContain("Entity #42 is being updated.");
+    expect(applying).toContain("Producer #42 is being updated.");
     expect(applied).toContain("Applied");
-    expect(applied).toContain("Entity #42 was updated.");
+    expect(applied).toContain("Producer #42 was updated.");
     expect(applied).not.toContain("&quot;updated&quot;");
     expect(stale).toContain("Stale");
     expect(stale).toContain("Relevant catalog state changed.");

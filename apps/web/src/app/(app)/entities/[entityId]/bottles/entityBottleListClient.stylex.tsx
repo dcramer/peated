@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { BottleCatalogList } from "@peated/web/components/designSystem/patterns/bottleCatalog.stylex";
+import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";

@@ -1,9 +1,9 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { AppLink } from "@peated/web/components/designSystem/components";
+import { AppLink } from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
-} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/pageLayout.stylex";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";

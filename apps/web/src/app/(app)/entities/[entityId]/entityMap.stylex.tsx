@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { Card } from "@peated/web/components/designSystem/components";
-import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+import { Card } from "@peated/web/components";
+import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import {
   colors,
   effects,
@@ -35,7 +35,7 @@ export function EntityMap({ entity }: { entity: Entity }) {
 
   return (
     <PageSection heading="Where">
-      <Card appearance="surface" padding="sm">
+      <Card appearance="plain" padding="sm">
         {entity.address ? (
           <p {...stylex.props(styles.address)}>{entity.address}</p>
         ) : null}

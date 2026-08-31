@@ -6,7 +6,7 @@ import {
   ItemList,
   ItemRow,
   TextLink,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import TimeSince from "@peated/web/components/timeSince";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 

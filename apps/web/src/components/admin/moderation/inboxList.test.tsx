@@ -11,9 +11,9 @@ const operationTask = {
   category: "catalog",
   state: "ready",
   inconclusive: false,
-  title: "Update Entity #42",
+  title: "Update brand or producer #42",
   sourceLabel: "Moderator audit",
-  question: "Apply these changes to the Entity?",
+  question: "Apply these changes to the brand or producer?",
   statusLabel: "Suggested change",
   attentionAt: "2026-08-12T10:00:00.000Z",
   source: { kind: "operation", checkId: 9, operationId: 22 },
@@ -54,7 +54,7 @@ describe("Moderation Inbox list", () => {
       />,
     );
 
-    expect(html).toContain("Apply these changes to the Entity?");
+    expect(html).toContain("Apply these changes to the brand or producer?");
     expect(html).toContain("How should this listing be resolved?");
     expect(html).toContain("Listings 1");
     expect(html).toContain("Catalog 1");

@@ -3,7 +3,7 @@ import {
   DataTable,
   EmptyState,
   type DataTableColumn,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";

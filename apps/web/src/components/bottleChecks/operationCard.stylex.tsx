@@ -2,8 +2,8 @@
 
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
+import { AppLink as Link } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
-import Link from "@peated/web/components/admin/adminLink.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight, Copy } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -54,10 +54,10 @@ const STATUS_LABELS = {
 } satisfies Record<BottleOperation["status"], string>;
 
 const OPERATION_LABELS = {
-  update_bottle: "Update Bottle",
-  merge_bottles: "Merge Bottles",
-  update_entity: "Update Entity",
-  merge_entities: "Merge Entities",
+  update_bottle: "Update bottle",
+  merge_bottles: "Merge bottles",
+  update_entity: "Update brand or producer",
+  merge_entities: "Merge brands or producers",
 } satisfies Record<BottleOperation["proposal"]["type"], string>;
 
 interface BottleFieldLabels {
@@ -351,7 +351,7 @@ function Preview({
     case "update_entity":
       return (
         <div {...stylex.props(styles.preview)}>
-          <div {...stylex.props(styles.eyebrow)}>Live Entity diff</div>
+          <div {...stylex.props(styles.eyebrow)}>Proposed changes</div>
           <FieldDiff
             after={review.preview.after}
             before={review.preview.before}
@@ -376,7 +376,7 @@ function Preview({
             <strong {...stylex.props(styles.strong)}>
               {review.preview.destination.name}
             </strong>
-            . Survivor kind: {review.preview.after.kind}.
+            . Keep as: {review.preview.after.kind}.
           </div>
           <ImpactList values={review.preview.impact} />
           <ImpactList
@@ -403,7 +403,7 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
           key="bottle"
           {...stylex.props(styles.link)}
         >
-          Edit Bottle #{proposal.input.bottleId}
+          Edit bottle #{proposal.input.bottleId}
         </Link>,
       ];
       break;
@@ -414,14 +414,14 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
           key="source"
           {...stylex.props(styles.link)}
         >
-          Edit source Bottle
+          Edit source bottle
         </Link>,
         <Link
           href={`/bottles/${proposal.input.destinationBottleId}/edit`}
           key="destination"
           {...stylex.props(styles.link)}
         >
-          Edit destination Bottle
+          Edit destination bottle
         </Link>,
       ];
       break;
@@ -432,7 +432,7 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
           key="entity"
           {...stylex.props(styles.link)}
         >
-          Edit Entity #{proposal.input.entityId}
+          Edit producer #{proposal.input.entityId}
         </Link>,
       ];
       break;
@@ -443,14 +443,14 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
           key="source"
           {...stylex.props(styles.link)}
         >
-          Edit source Entity
+          Edit source producer
         </Link>,
         <Link
           href={`/entities/${proposal.input.destinationEntityId}/edit`}
           key="destination"
           {...stylex.props(styles.link)}
         >
-          Edit destination Entity
+          Edit destination producer
         </Link>,
       ];
       break;
@@ -479,13 +479,13 @@ function ExecutionSummary({ operation }: { operation: BottleOperation }) {
       break;
     case "update_entity":
       message = inProgress
-        ? `Entity #${proposal.input.entityId} is being updated.`
-        : `Entity #${proposal.input.entityId} was updated.`;
+        ? `Producer #${proposal.input.entityId} is being updated.`
+        : `Producer #${proposal.input.entityId} was updated.`;
       break;
     case "merge_entities":
       message = inProgress
-        ? `Entity #${proposal.input.sourceEntityId} is being merged into Entity #${proposal.input.destinationEntityId}.`
-        : `Entity #${proposal.input.sourceEntityId} was merged into Entity #${proposal.input.destinationEntityId}.`;
+        ? `Producer #${proposal.input.sourceEntityId} is being merged into producer #${proposal.input.destinationEntityId}.`
+        : `Producer #${proposal.input.sourceEntityId} was merged into producer #${proposal.input.destinationEntityId}.`;
       break;
   }
 
@@ -526,7 +526,7 @@ export function EvidenceList({
           case "entity":
             return (
               <li key={`entity:${ref.entityId}`}>
-                Entity evidence:{" "}
+                Producer evidence:{" "}
                 <Link
                   href={`/entities/${ref.entityId}`}
                   {...stylex.props(styles.link)}
@@ -741,7 +741,7 @@ export default function OperationCard({
             </p>
           </div>
           {!savingRemoval ? (
-            <Button onClick={undoRemoval} ref={undoButton} size="small">
+            <Button onClick={undoRemoval} ref={undoButton} size="sm">
               Undo remove
             </Button>
           ) : null}
@@ -773,7 +773,7 @@ export default function OperationCard({
             icon={<Copy aria-hidden="true" {...stylex.props(styles.icon)} />}
             loading={copying}
             onClick={() => onCopy(operation.id)}
-            size="small"
+            size="sm"
             title="Copy structured audit operation data as JSON"
           >
             <span {...stylex.props(styles.srOnly)}>Copy operation payload</span>
@@ -830,13 +830,13 @@ export default function OperationCard({
           {canApply ? (
             <Button
               aria-label="Apply included changes"
-              color={
-                approvalReady && !allFieldsExcluded ? "highlight" : undefined
+              variant={
+                approvalReady && !allFieldsExcluded ? "accent" : undefined
               }
               disabled={disabled || !approvalReady || allFieldsExcluded}
               loading={actionPending}
               onClick={() => onApply?.(operation.id, [...excludedFields])}
-              size="small"
+              size="sm"
             >
               {actionPending
                 ? "Applying…"
@@ -850,7 +850,7 @@ export default function OperationCard({
               aria-label="Remove operation"
               disabled={disabled}
               onClick={() => setRejecting((value) => !value)}
-              size="small"
+              size="sm"
             >
               {compact ? "Remove" : "Remove operation"}
             </Button>
@@ -860,7 +860,7 @@ export default function OperationCard({
               disabled={disabled}
               loading={actionPending}
               onClick={() => onRetry?.(operation.id)}
-              size="small"
+              size="sm"
             >
               Retry failed operation
             </Button>
@@ -914,17 +914,17 @@ export default function OperationCard({
           </div>
           <div {...stylex.props(styles.rejectionActions)}>
             <Button
-              color="danger"
+              variant="danger"
               disabled={disabled || !canConfirmRejection}
               onClick={stageRemoval}
-              size="small"
+              size="sm"
             >
               Confirm removal
             </Button>
             <Button
               disabled={disabled}
               onClick={() => setRejecting(false)}
-              size="small"
+              size="sm"
             >
               Cancel
             </Button>
@@ -947,8 +947,7 @@ const styles = stylex.create({
     backgroundColor: colors.surface,
   },
   warningCard: {
-    borderLeftWidth: "3px",
-    borderLeftColor: colors.accent,
+    borderColor: colors.accent,
     backgroundColor: colors.accentTint,
   },
   cardHeader: {
@@ -973,7 +972,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
-    borderRadius: "999px",
+    borderRadius: controlMetrics.radiusSmall,
     color: colors.ink,
     fontFamily: fonts.data,
     fontSize: "11px",
@@ -1035,13 +1034,11 @@ const styles = stylex.create({
     lineHeight: 1.5,
   },
   warningNotice: {
-    borderLeftWidth: "3px",
-    borderLeftColor: colors.accent,
+    borderColor: colors.accent,
     backgroundColor: colors.accentTint,
   },
   dangerNotice: {
-    borderLeftWidth: "3px",
-    borderLeftColor: colors.accentDeep,
+    borderColor: colors.accentDeep,
     color: colors.ink,
   },
   bulletList: {
@@ -1180,11 +1177,21 @@ const styles = stylex.create({
   link: {
     color: { default: colors.inkMuted, ":hover": colors.accentDeep },
     textDecoration: "underline",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   externalLink: {
     color: { default: colors.inkMuted, ":hover": colors.accentDeep },
     textDecoration: "underline",
     overflowWrap: "anywhere",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   evidenceList: {
     display: "grid",
@@ -1232,6 +1239,11 @@ const styles = stylex.create({
     fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   rejectionPanel: {
     marginTop: space.x3,

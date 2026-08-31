@@ -1,8 +1,8 @@
 import type { Finding } from "@peated/bottle-classifier";
 import type { Outputs } from "@peated/server/orpc/router";
-import Link from "@peated/web/components/admin/adminLink.stylex";
+import { AppLink as Link } from "@peated/web/components";
 import * as stylex from "@stylexjs/stylex";
-import { colors } from "../../styles/tokens.stylex";
+import { colors, effects } from "../../styles/tokens.stylex";
 
 export type BottleCheck = Outputs["audits"]["list"]["results"][number];
 
@@ -95,6 +95,11 @@ const styles = stylex.create({
     color: colors.ink,
     fontWeight: 600,
     textDecoration: "underline",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
 });
 

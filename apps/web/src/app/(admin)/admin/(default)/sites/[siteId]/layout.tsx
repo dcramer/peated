@@ -4,6 +4,7 @@ import { use, useState, type ReactNode } from "react";
 
 import type { Outputs } from "@peated/server/orpc/router";
 import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
+import { PageTabs } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
@@ -16,7 +17,6 @@ import {
 import { ExternalSiteIdentity } from "@peated/web/components/admin/externalSiteIcon.stylex";
 import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import { getScraperRunAvailability } from "@peated/web/components/admin/scraperRunAvailability";
-import { PageTabs } from "@peated/web/components/designSystem/components";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,

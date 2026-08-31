@@ -1,5 +1,5 @@
+import { ButtonLink } from "@peated/web/components";
 import { AuthenticationPage } from "@peated/web/components/auth/authenticationPage.stylex";
-import { ButtonLink } from "@peated/web/components/designSystem/components";
 import {
   AuthenticationActions,
   AuthenticationCard,
@@ -8,7 +8,7 @@ import {
   AuthenticationLink,
   AuthenticationLinks,
   AuthenticationPanel,
-} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+} from "@peated/web/components/pages/authentication.stylex";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 

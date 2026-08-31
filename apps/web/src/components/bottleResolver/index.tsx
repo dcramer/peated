@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  FormNotice,
-  FormStack,
-} from "@peated/web/components/designSystem/components";
+import { FormNotice, FormStack } from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";

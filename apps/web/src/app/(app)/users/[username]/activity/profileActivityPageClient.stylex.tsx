@@ -16,12 +16,12 @@ import {
   MemberAvatar,
   SectionError,
   type TastingEntryMember,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import {
   MemberActivityList,
   type MemberActivityItem,
-} from "@peated/web/components/designSystem/patterns/memberProfileContent.stylex";
-import { PageColumns } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/memberProfileContent.stylex";
+import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";

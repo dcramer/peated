@@ -6,14 +6,14 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { ButtonLink } from "@peated/web/components/designSystem/components";
+import { ButtonLink } from "@peated/web/components";
 import {
   BottleCatalogFilters,
   BottleCatalogList,
   type BottleCatalogFacetGroup,
   type BottleCatalogFilterOption,
-} from "@peated/web/components/designSystem/patterns/bottleCatalog.stylex";
-import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
+} from "@peated/web/components/pages/bottleCatalog.stylex";
+import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";

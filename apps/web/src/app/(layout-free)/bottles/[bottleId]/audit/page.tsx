@@ -1,7 +1,6 @@
 "use client";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
 import {
   Field,
   FormNotice,
@@ -9,7 +8,8 @@ import {
   FormStack,
   SelectedBottleSummary,
   Textarea,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
+import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";

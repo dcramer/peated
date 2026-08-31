@@ -6,13 +6,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormEvent, ReactNode } from "react";
 
-import {
-  Button,
-  IconButton,
-  LoadingList,
-} from "@peated/web/components/designSystem/components";
+import { Button, IconButton, LoadingList } from "@peated/web/components";
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../styles/tokens.stylex";
 
 export type WorkflowScreenProps = {
   children: ReactNode;
@@ -28,6 +30,24 @@ export type WorkflowScreenProps = {
   title: string;
 };
 
+function BackButton({ onClick }: { onClick: () => void }) {
+  return (
+    <IconButton
+      icon={<ArrowLeft aria-hidden="true" size={17} />}
+      label="Go back"
+      onClick={onClick}
+      size="sm"
+      variant="text"
+    />
+  );
+}
+
+function RouterBackButton() {
+  const router = useRouter();
+
+  return <BackButton onClick={() => router.back()} />;
+}
+
 /** Keeps add and edit workflows usable without the full application chrome. */
 export function WorkflowScreen({
   children,
@@ -42,19 +62,11 @@ export function WorkflowScreen({
   saving = false,
   title,
 }: WorkflowScreenProps) {
-  const router = useRouter();
-
   return (
     <main {...stylex.props(foundationStyles.document, styles.screen)}>
       <header {...stylex.props(styles.header)}>
         <div {...stylex.props(styles.headerInner)}>
-          <IconButton
-            icon={<ArrowLeft aria-hidden="true" size={17} />}
-            label="Go back"
-            onClick={() => (onClose ? onClose() : router.back())}
-            size="sm"
-            variant="text"
-          />
+          {onClose ? <BackButton onClick={onClose} /> : <RouterBackButton />}
           <Link href="/" {...stylex.props(styles.brand)}>
             Peated
           </Link>
@@ -169,8 +181,8 @@ const styles = stylex.create({
     top: 0,
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    backgroundColor: colors.surface,
+    borderBottomColor: colors.sectionRule,
+    backgroundColor: colors.ground,
   },
   headerInner: {
     boxSizing: "border-box",
@@ -201,6 +213,10 @@ const styles = stylex.create({
     textDecoration: "none",
     outline: "none",
     borderRadius: controlMetrics.radiusSmall,
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     "@media (max-width: 559px)": { display: "none" },
   },
   title: {

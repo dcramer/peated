@@ -9,8 +9,8 @@ import {
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
+import { Button } from ".";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
-import { Button } from "./designSystem/components";
 
 export default function ConfirmationDialog({
   continueLabel = "Continue",

@@ -46,7 +46,7 @@ export default function EntityCheckConfigForm({
     initialData.entity
       ? {
           id: initialData.entity,
-          name: `(Entity ID: ${initialData.entity})`,
+          name: `(Brand or producer ID: ${initialData.entity})`,
         }
       : undefined,
   );
@@ -61,9 +61,9 @@ export default function EntityCheckConfigForm({
               <EntityField
                 {...field}
                 error={errors.entity}
-                label="Entity"
+                label="Brand or producer"
                 placeholder="e.g. High West Distillery"
-                helpText="The entity to match on."
+                helpText="The brand or producer to match."
                 onChange={(value) => {
                   onChange(value?.id);
                   setEntityValue(value);

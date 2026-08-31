@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 
+import { CursorPager } from "..";
 import { buildQueryString } from "../../lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
@@ -16,7 +17,6 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import { CursorPager } from "../designSystem/components";
 
 export function AdminPager({
   ariaLabel = "Pagination",
@@ -175,9 +175,7 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "center",
     padding: space.x8,
-    borderWidth: "1px",
-    borderStyle: "dashed",
-    borderColor: colors.hairline,
+    borderWidth: 0,
     color: colors.inkMuted,
     fontFamily: fonts.reading,
     fontSize: "14px",
@@ -195,8 +193,8 @@ const styles = stylex.create({
     alignItems: "flex-start",
     gap: space.x3,
     padding: space.x4,
-    borderLeftWidth: "3px",
-    borderLeftStyle: "solid",
+    borderWidth: "1px",
+    borderStyle: "solid",
     color: colors.ink,
     fontFamily: fonts.reading,
     fontSize: "14px",
@@ -204,19 +202,19 @@ const styles = stylex.create({
   },
   alertIcon: { flexShrink: 0 },
   alertDefault: {
-    borderLeftColor: colors.inkMuted,
-    backgroundColor: colors.surface,
+    borderColor: colors.hairline,
+    backgroundColor: "transparent",
   },
   alertError: {
-    borderLeftColor: colors.accentDeep,
+    borderColor: colors.criticalQuiet,
     backgroundColor: colors.accentTint,
   },
   alertSuccess: {
-    borderLeftColor: colors.ink,
-    backgroundColor: colors.surface,
+    borderColor: colors.sectionRule,
+    backgroundColor: "transparent",
   },
   alertWarn: {
-    borderLeftColor: colors.accent,
+    borderColor: colors.accent,
     backgroundColor: colors.accentTint,
   },
   markdown: {

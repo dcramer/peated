@@ -3,10 +3,15 @@
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef, type ReactNode } from "react";
 
-import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  fonts,
+  space,
+} from "../../../styles/tokens.stylex";
 
 export function ModerationDetailFrame({ children }: { children: ReactNode }) {
-  return <main {...stylex.props(styles.frame)}>{children}</main>;
+  return <div {...stylex.props(styles.frame)}>{children}</div>;
 }
 
 export function ModerationDetailContent({ children }: { children: ReactNode }) {
@@ -158,9 +163,6 @@ const styles = stylex.create({
   stack: { display: "grid", gap: space.x6 },
   taskHeader: {
     paddingBottom: space.x6,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   taskMeta: {
     color: colors.inkMuted,
@@ -194,11 +196,16 @@ const styles = stylex.create({
     gap: space.x4,
   },
   image: {
+    boxSizing: "border-box",
     width: "80px",
     height: "96px",
     flexShrink: 0,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: controlMetrics.radiusSmall,
     objectFit: "contain",
-    backgroundColor: colors.inset,
+    backgroundColor: colors.imageBackground,
   },
   mediaCopy: {
     minWidth: 0,
@@ -212,9 +219,6 @@ const styles = stylex.create({
     alignItems: "center",
     gap: space.x2,
     paddingTop: space.x6,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
     flexWrap: "wrap",
   },
   loading: {

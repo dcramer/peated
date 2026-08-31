@@ -4,7 +4,7 @@ import {
   Button,
   type ButtonVariant,
   ValidationMessage,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startAuthentication } from "@simplewebauthn/browser";

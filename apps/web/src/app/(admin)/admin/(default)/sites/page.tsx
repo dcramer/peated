@@ -44,7 +44,7 @@ export default function Page() {
         title="Scrapers"
         actions={
           <AdminActions>
-            <Button href="/admin/sites/add" color="highlight">
+            <Button href="/admin/sites/add" variant="accent">
               Add site
             </Button>
           </AdminActions>

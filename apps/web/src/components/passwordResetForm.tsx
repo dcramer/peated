@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Field,
-  TextInput,
-} from "@peated/web/components/designSystem/components";
+import { Button, Field, TextInput } from "@peated/web/components";
 import {
   AuthenticationActions,
   AuthenticationCard,
@@ -13,7 +9,7 @@ import {
   AuthenticationLinks,
   AuthenticationNotice,
   AuthenticationPanel,
-} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+} from "@peated/web/components/pages/authentication.stylex";
 import { passwordResetForm } from "@peated/web/lib/auth.actions";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";

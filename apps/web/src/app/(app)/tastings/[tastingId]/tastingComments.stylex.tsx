@@ -17,7 +17,7 @@ import {
   SectionError,
   Textarea,
   ValidationMessage,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";

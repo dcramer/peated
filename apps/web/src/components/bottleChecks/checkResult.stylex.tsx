@@ -1,6 +1,12 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../../styles/tokens.stylex";
 import {
   getBottleCheckFindings,
   getBottleCheckState,
@@ -130,8 +136,7 @@ const styles = stylex.create({
   },
   warningPanel: {
     padding: space.x6,
-    borderLeftWidth: "3px",
-    borderLeftColor: colors.accent,
+    borderColor: colors.accent,
     backgroundColor: colors.accentTint,
   },
   eyebrow: {
@@ -177,7 +182,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
-    borderRadius: "999px",
+    borderRadius: controlMetrics.radiusSmall,
     color: colors.ink,
     fontFamily: fonts.data,
     fontSize: "11px",
@@ -187,10 +192,6 @@ const styles = stylex.create({
     display: "grid",
     gap: space.x3,
     marginTop: space.x3,
-    paddingTop: space.x3,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
   },
   findingList: { display: "grid", gap: space.x3 },
   finding: {
@@ -207,6 +208,11 @@ const styles = stylex.create({
   },
   summary: {
     cursor: "pointer",
+    outline: "none",
     color: { default: colors.inkMuted, ":hover": colors.ink },
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
 });

@@ -16,6 +16,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { IconButton } from "../..";
 import { useORPC } from "../../../lib/orpc/context";
 import {
   colors,
@@ -24,7 +25,6 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { IconButton } from "../../designSystem/components";
 
 export default function ModerationBottlePicker({
   name,

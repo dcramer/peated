@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Button,
-  ButtonLink,
-  Field,
-  TextInput,
-} from "@peated/web/components/designSystem/components";
+import { Button, ButtonLink, Field, TextInput } from "@peated/web/components";
 import {
   AuthenticationActions,
   AuthenticationCard,
@@ -15,7 +10,7 @@ import {
   AuthenticationNotice,
   AuthenticationPanel,
   AuthenticationTextButton,
-} from "@peated/web/components/designSystem/patterns/authentication.stylex";
+} from "@peated/web/components/pages/authentication.stylex";
 import {
   passwordResetConfirmForm,
   passwordResetConfirmPasskeyForm,

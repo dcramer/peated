@@ -11,7 +11,7 @@ import {
   EmptyState,
   ItemList,
   ItemListItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";

@@ -5,11 +5,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import type {
   SearchResultGroup,
   SearchResultItem,
-} from "@peated/web/components/designSystem/components";
-import {
-  Button,
-  SearchBox,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
+import { Button, SearchBox } from "@peated/web/components";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
@@ -95,7 +92,7 @@ export type SearchProps = {
   placement?: "database" | "overlay" | "page";
   placeholder?: string;
   scopeValues?: readonly SearchScope[];
-  showBottleMeasures?: boolean;
+  showBottleRatings?: boolean;
   submitLabel?: string;
 };
 
@@ -139,16 +136,16 @@ function bottleItem(
   bottle: BottleSearchResult,
   {
     getBottleHref,
-    showMeasures,
+    showRatings,
   }: {
     getBottleHref: (bottleId: number) => string;
-    showMeasures: boolean;
+    showRatings: boolean;
   },
 ) {
   return {
     href: getBottleHref(bottle.id),
     id: `bottle-${bottle.id}`,
-    measures: showMeasures
+    ratings: showRatings
       ? {
           score:
             bottle.medianScore === null || bottle.scoreCount === 0
@@ -389,7 +386,7 @@ export function Search({
   placement = "overlay",
   placeholder = "bottles, distillers, brands…",
   scopeValues,
-  showBottleMeasures = true,
+  showBottleRatings = true,
   submitLabel,
 }: SearchProps = {}) {
   const { user } = useAuth();
@@ -462,7 +459,7 @@ export function Search({
         const nextGroups = resultGroups(
           response,
           trimmedQuery,
-          { getBottleHref, showMeasures: showBottleMeasures },
+          { getBottleHref, showRatings: showBottleRatings },
           placement === "database" || placement === "overlay",
           nextScope,
         );
@@ -473,8 +470,8 @@ export function Search({
           emptyText: hasMatches
             ? undefined
             : response.nearest.length
-              ? `No exact records match “${trimmedQuery}”.`
-              : `No records match “${trimmedQuery}”.`,
+              ? `No exact matches for “${trimmedQuery}”.`
+              : `Nothing matches “${trimmedQuery}”.`,
           groups: nextGroups,
           hasExact: Boolean(
             response.exact && exactMatchesScope(response.exact, nextScope),
@@ -491,7 +488,7 @@ export function Search({
         setStatus("error");
       }
     },
-    [getBottleHref, limit, orpc, placement, showBottleMeasures, user],
+    [getBottleHref, limit, orpc, placement, showBottleRatings, user],
   );
   const debouncedSearch = useDebounceCallback(runSearch, SEARCH_DEBOUNCE_MS);
 

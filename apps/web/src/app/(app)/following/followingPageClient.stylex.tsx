@@ -11,9 +11,9 @@ import {
   FilterPanel,
   FilterQuery,
   PageTabs,
-} from "@peated/web/components/designSystem/components";
-import { CatalogPage } from "@peated/web/components/designSystem/patterns/catalogPage.stylex";
-import { EntityCatalogList } from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
+} from "@peated/web/components";
+import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
+import { EntityCatalogList } from "@peated/web/components/pages/entityCatalog.stylex";
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { toEntityCatalogItem } from "@peated/web/lib/entityCatalogItem";

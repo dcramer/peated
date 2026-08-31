@@ -191,7 +191,7 @@ export function SearchPageClient({ bottleTotal }: { bottleTotal: number }) {
             databaseSearch ? "Ardbeg 10, Lagavulin, Cadenhead's…" : undefined
           }
           scopeValues={scopeValues}
-          showBottleMeasures={false}
+          showBottleRatings={false}
           submitLabel={databaseSearch ? "Search" : undefined}
         />
       </section>

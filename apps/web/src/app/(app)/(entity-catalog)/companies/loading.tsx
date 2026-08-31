@@ -1,4 +1,4 @@
-import { EntityCatalogLoading } from "@peated/web/components/designSystem/patterns/entityCatalog.stylex";
+import { EntityCatalogLoading } from "@peated/web/components/pages/entityCatalog.stylex";
 
 export default function Loading() {
   return <EntityCatalogLoading title="Companies" />;

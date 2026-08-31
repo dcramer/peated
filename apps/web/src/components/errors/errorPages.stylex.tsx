@@ -6,13 +6,13 @@ import {
   Button,
   ButtonLink,
   IconButton,
-} from "@peated/web/components/designSystem/components/button.stylex";
+} from "@peated/web/components/button.stylex";
 import {
   ErrorPage,
   ErrorPageLayout,
   ErrorReference,
   ErrorSupport,
-} from "@peated/web/components/designSystem/patterns/errorPage.stylex";
+} from "@peated/web/components/pages/errorPage.stylex";
 import config from "@peated/web/config";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors } from "../../styles/tokens.stylex";

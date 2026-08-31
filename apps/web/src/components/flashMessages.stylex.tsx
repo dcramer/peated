@@ -14,7 +14,7 @@ import { useInterval } from "usehooks-ts";
 import {
   FlashMessage,
   type FlashMessageTone,
-} from "@peated/web/components/designSystem/components/feedback.stylex";
+} from "@peated/web/components/feedback.stylex";
 import { space } from "../styles/tokens.stylex";
 
 const MESSAGE_LIFETIME = 8000;

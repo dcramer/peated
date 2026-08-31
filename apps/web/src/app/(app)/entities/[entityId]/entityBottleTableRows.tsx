@@ -7,9 +7,9 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 
 import {
-  RatingMeasure,
+  BottleRatings,
   type BottleComparisonRow,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
@@ -65,7 +65,7 @@ export function toBottleTableRow(
     metadata,
     name: formatBottleDisplayName(bottle),
     values: [
-      <RatingMeasure
+      <BottleRatings
         counts={bottle.tastingBandCounts}
         high={bottle.maxScore}
         key={`${bottle.id}-rating`}

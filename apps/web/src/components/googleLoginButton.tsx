@@ -4,10 +4,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { logWarn } from "../lib/log";
-import {
-  Button,
-  type ButtonVariant,
-} from "./designSystem/components/button.stylex";
+import { Button, type ButtonVariant } from "./button.stylex";
 
 export default function GoogleLoginButton({
   action,

@@ -220,7 +220,7 @@ describe("admin moderation tasks", () => {
       expect.objectContaining({
         key: `listing:${inconclusive!.id}`,
         inconclusive: true,
-        question: "No Bottle match was found. Should this listing be ignored?",
+        question: "No bottle match was found. Should this listing be ignored?",
         statusLabel: "Inconclusive",
       }),
     ]);

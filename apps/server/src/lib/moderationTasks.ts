@@ -22,13 +22,13 @@ const OPERATIONAL_STATUSES = new Set(["applying", "stale", "failed"]);
 function listingQuestion(proposalType: string): string {
   switch (proposalType) {
     case "match_existing":
-      return "Which Bottle should this listing use?";
+      return "Which bottle should this listing use?";
     case "create_new":
-      return "Should this Bottle be added to the catalog?";
+      return "Should this bottle be added to the catalog?";
     case "correction":
-      return "Should this Bottle record be corrected?";
+      return "Should this bottle be corrected?";
     case "no_match":
-      return "No Bottle match was found. Should this listing be ignored?";
+      return "No bottle match was found. Should this listing be ignored?";
     default:
       return "How should this listing be resolved?";
   }
@@ -45,23 +45,23 @@ function operationCopy(
   switch (proposal.type) {
     case "update_bottle":
       return {
-        question: "Apply these changes to the Bottle?",
-        title: `Update Bottle #${proposal.input.bottleId}`,
+        question: "Apply these changes to the bottle?",
+        title: `Update bottle #${proposal.input.bottleId}`,
       };
     case "merge_bottles":
       return {
-        question: "Merge these Bottle records?",
-        title: `Merge Bottle #${proposal.input.sourceBottleId} into #${proposal.input.destinationBottleId}`,
+        question: "Merge these bottles?",
+        title: `Merge bottle #${proposal.input.sourceBottleId} into #${proposal.input.destinationBottleId}`,
       };
     case "update_entity":
       return {
-        question: "Apply these changes to the Entity?",
-        title: `Update Entity #${proposal.input.entityId}`,
+        question: "Apply these changes to the brand or producer?",
+        title: `Update brand or producer #${proposal.input.entityId}`,
       };
     case "merge_entities":
       return {
-        question: "Merge these Entity records?",
-        title: `Merge Entity #${proposal.input.sourceEntityId} into #${proposal.input.destinationEntityId}`,
+        question: "Merge these brands or producers?",
+        title: `Merge brand or producer #${proposal.input.sourceEntityId} into #${proposal.input.destinationEntityId}`,
       };
   }
 }
@@ -73,7 +73,7 @@ function checkSourceLabel(check: ActionableBottleCheckSummary): string {
   if (check.sourceKind === "store_price") return "Incoming listing follow-up";
   if (check.sourceKind === "photo_identification")
     return "Photo identification";
-  return "Bottle check";
+  return "Catalog review";
 }
 
 function persistedFindingCount(

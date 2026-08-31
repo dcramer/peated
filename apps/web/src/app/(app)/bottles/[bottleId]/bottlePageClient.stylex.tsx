@@ -12,12 +12,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
+  BottleRatings,
   Button,
   ButtonLink,
   EmptyState,
   LoadingList,
   PageTabs,
-  RatingMeasure,
   RowMenu,
   SectionError,
   type CriticReviewProps,
@@ -25,12 +25,12 @@ import {
   type PageTabItem,
   type RowMenuItem,
   type TastingEntryProps,
-} from "@peated/web/components/designSystem/components";
-import { BottleOverview } from "@peated/web/components/designSystem/patterns/bottleOverview.stylex";
-import { BottlePageHeader } from "@peated/web/components/designSystem/patterns/bottlePageHeader.stylex";
+} from "@peated/web/components";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import Join from "@peated/web/components/join";
+import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
+import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
@@ -80,7 +80,7 @@ function getBottleNotes(bottle: Bottle) {
     bottle.caskStrength ? "Cask strength" : null,
     bottle.singleCask ? "Single cask" : null,
     bottle.nonChillFiltered ? "Non-chill filtered" : null,
-    bottle.naturalColor ? "Natural colour" : null,
+    bottle.naturalColor ? "Natural color" : null,
   ].filter((value): value is string => value !== null);
 }
 
@@ -129,13 +129,13 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
           : `${bottle.maltPhenolPpm.toLocaleString("en-US")} PPM`,
     },
     {
-      label: "Colouring",
+      label: "Coloring",
       value:
         bottle.naturalColor === null
           ? null
           : bottle.naturalColor
-            ? "Natural colour"
-            : "Colour added",
+            ? "Natural color"
+            : "Color added",
     },
     {
       label: "Filtration",
@@ -356,7 +356,7 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
     ]);
   }
 
-  return <RowMenu groups={groups} label="Bottle record" variant="page" />;
+  return <RowMenu groups={groups} label="Bottle actions" variant="page" />;
 }
 
 export function BottlePageFrameClient({
@@ -496,7 +496,7 @@ export function BottleOverviewClient({
   const recommendations =
     recommendationsQuery.data?.results.map((recommendation) => ({
       end: (
-        <RatingMeasure
+        <BottleRatings
           counts={recommendation.tastingBandCounts}
           high={recommendation.maxScore}
           low={recommendation.minScore}

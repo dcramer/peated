@@ -5,11 +5,11 @@ import {
   EmptyState,
   ItemList,
   ItemListItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
-} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/pageLayout.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { summarize } from "@peated/web/lib/markdown";

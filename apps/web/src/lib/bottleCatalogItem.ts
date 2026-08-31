@@ -1,6 +1,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
-import type { BottleCatalogItem } from "@peated/web/components/designSystem/patterns/bottleCatalog.stylex";
+import type { BottleCatalogItem } from "@peated/web/components/pages/bottleCatalog.stylex";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { getReleaseFamilyHref } from "./releaseFamily";

@@ -1,27 +1,18 @@
 import { forwardRef, type ReactNode } from "react";
-import {
-  ButtonLink,
-  Button as DesignButton,
-  type ButtonSize,
-  type ButtonVariant,
-} from "../designSystem/components";
-
-type ButtonColor = "primary" | "default" | "highlight" | "danger" | undefined;
-type AdminButtonSize = "small" | "base";
+import { Button, ButtonLink, type ButtonSize, type ButtonVariant } from "..";
 
 type BaseProps = {
   "aria-label"?: string;
   "aria-pressed"?: boolean | "false" | "true" | "mixed";
-  active?: boolean;
   children?: ReactNode;
-  color?: ButtonColor;
   disabled?: boolean;
   fullWidth?: boolean;
   icon?: ReactNode;
   loading?: boolean;
-  size?: AdminButtonSize;
+  size?: ButtonSize;
   title?: string;
   type?: "button" | "submit" | "reset";
+  variant?: ButtonVariant;
   [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 };
 
@@ -34,31 +25,19 @@ type ConditionalProps =
 
 type Props = BaseProps & ConditionalProps;
 
-function mapVariant(color: ButtonColor, active: boolean): ButtonVariant {
-  if (color === "highlight" || active) return "accent";
-  if (color === "danger") return "danger";
-  if (color === "primary") return "default";
-  return "tonal";
-}
-
-function mapSize(size: AdminButtonSize): ButtonSize {
-  return size === "small" ? "sm" : "md";
-}
-
 export const AdminButton = forwardRef<HTMLButtonElement, Props>(
   function AdminButton(
     {
-      active = false,
       children,
-      color = "default",
       disabled = false,
       fullWidth = false,
       href,
       icon,
       loading = false,
       onClick,
-      size = "base",
+      size = "md",
       type = "button",
+      variant = "tonal",
       ...props
     },
     ref,
@@ -69,8 +48,6 @@ export const AdminButton = forwardRef<HTMLButtonElement, Props>(
         {children}
       </>
     );
-    const variant = mapVariant(color, active);
-
     if (href) {
       return (
         <ButtonLink
@@ -78,7 +55,7 @@ export const AdminButton = forwardRef<HTMLButtonElement, Props>(
           aria-disabled={disabled || undefined}
           fullWidth={fullWidth}
           href={disabled ? undefined : href}
-          size={mapSize(size)}
+          size={size}
           variant={variant}
         >
           {content}
@@ -87,7 +64,7 @@ export const AdminButton = forwardRef<HTMLButtonElement, Props>(
     }
 
     return (
-      <DesignButton
+      <Button
         {...props}
         disabled={disabled}
         fullWidth={fullWidth}
@@ -95,12 +72,12 @@ export const AdminButton = forwardRef<HTMLButtonElement, Props>(
         loadingLabel="Working…"
         onClick={onClick}
         ref={ref}
-        size={mapSize(size)}
+        size={size}
         type={type}
         variant={variant}
       >
         {content}
-      </DesignButton>
+      </Button>
     );
   },
 );

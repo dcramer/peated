@@ -5,16 +5,16 @@ import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
 import type { Entity } from "@peated/server/types";
 import {
   Button,
-  EntityPicker,
   Field,
   FormNotice,
   FormSection,
   FormStack,
+  ProducerPicker,
   Select,
   Textarea,
   TextInput,
-  type EntityPickerOption,
-} from "@peated/web/components/designSystem/components";
+  type ProducerPickerOption,
+} from "@peated/web/components";
 import {
   entityImageDrafts,
   EntityImageEditor,
@@ -59,7 +59,7 @@ export default function EntityForm({
   const [images, setImages] = useState(() =>
     entityImageDrafts(initialData.images),
   );
-  const [owner, setOwner] = useState<EntityPickerOption | null>(() =>
+  const [owner, setOwner] = useState<ProducerPickerOption | null>(() =>
     initialData.owner
       ? {
           detail: "Current direct owner",
@@ -136,7 +136,7 @@ export default function EntityForm({
       <form onSubmit={handleSubmit(submit)}>
         <FormStack>
           {submitError ? <FormNotice>{submitError}</FormNotice> : null}
-          <FormSection title="Identity">
+          <FormSection title="Details">
             <Field
               error={errors.name?.message}
               errorId="entity-name-error"
@@ -280,9 +280,9 @@ export default function EntityForm({
             }
             title="Details"
           >
-            <EntityPicker
+            <ProducerPicker
               help="The current direct owner, when one is known."
-              kind="entity"
+              kind="producer"
               label="Owned by"
               loading={ownerResults.isFetching}
               onChange={(value) => {
@@ -301,7 +301,7 @@ export default function EntityForm({
                 meta: item.peatedId,
                 name: item.name,
               }))}
-              placeholder="Search entities"
+              placeholder="Search brands and producers"
               value={owner}
             />
             <Field

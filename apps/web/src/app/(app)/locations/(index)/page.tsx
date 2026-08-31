@@ -1,7 +1,4 @@
-import {
-  CardGrid,
-  LocationCard,
-} from "@peated/web/components/designSystem/components";
+import { CardGrid, LocationCard } from "@peated/web/components";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
 

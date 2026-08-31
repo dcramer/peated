@@ -123,7 +123,7 @@ export default function BadgeForm({
           }
           actions={BADGE_CHECK_TYPE_LIST.map((type) => (
             <Button
-              color="primary"
+              variant="default"
               key={type}
               onClick={(event) => {
                 event.preventDefault();
@@ -149,8 +149,8 @@ export default function BadgeForm({
               title={toTitleCase(check.type)}
               removeAction={
                 <Button
-                  color="danger"
-                  size="small"
+                  variant="danger"
+                  size="sm"
                   onClick={(event) => {
                     event.preventDefault();
                     const items = checks.items.filter(

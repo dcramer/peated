@@ -9,6 +9,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import { Button } from "../..";
 import {
   colors,
   controlMetrics,
@@ -16,7 +17,6 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
-import { Button } from "../../designSystem/components";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 
@@ -244,10 +244,7 @@ const styles = stylex.create({
     minWidth: 0,
     minHeight: 0,
     flexDirection: "column",
-    borderRightWidth: "1px",
-    borderRightStyle: "solid",
-    borderRightColor: colors.hairline,
-    backgroundColor: colors.surface,
+    backgroundColor: "transparent",
   },
   header: {
     padding: space.x4,
@@ -275,10 +272,12 @@ const styles = stylex.create({
     height: "40px",
     paddingRight: space.x3,
     paddingLeft: space.x3,
-    borderWidth: 0,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.fieldRule,
     borderRadius: controlMetrics.radius,
     outline: "none",
-    backgroundColor: colors.inset,
+    backgroundColor: colors.fieldBackground,
     color: colors.ink,
     fontFamily: fonts.reading,
     fontSize: "14px",
@@ -309,7 +308,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
-    borderRadius: "999px",
+    borderRadius: controlMetrics.radiusSmall,
     outline: "none",
     color: { default: colors.inkMuted, ":hover": colors.ink },
     fontFamily: fonts.data,
@@ -356,9 +355,7 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x2,
     padding: space.x4,
-    borderLeftWidth: "3px",
-    borderLeftStyle: "solid",
-    borderLeftColor: "transparent",
+    borderWidth: 0,
     outline: "none",
     backgroundColor: { default: "transparent", ":hover": colors.inset },
     color: colors.ink,
@@ -366,8 +363,7 @@ const styles = stylex.create({
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },
   selectedTask: {
-    borderLeftColor: colors.accent,
-    backgroundColor: colors.inset,
+    backgroundColor: colors.accentTint,
   },
   taskMeta: {
     display: "flex",

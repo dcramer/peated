@@ -5,6 +5,7 @@ import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
 import type { HTMLAttributes, ReactNode } from "react";
 
+import { TextLink } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
@@ -13,7 +14,6 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import { TextLink } from "../designSystem/components";
 
 export type AdminBreadcrumb = {
   current?: boolean;
@@ -242,11 +242,11 @@ export function AdminSplitView({
 }) {
   return (
     <div {...stylex.props(styles.splitView)}>
-      <aside
+      <div
         {...stylex.props(styles.splitList, selected && styles.splitListHidden)}
       >
         {list}
-      </aside>
+      </div>
       <div
         {...stylex.props(
           styles.splitDetail,
@@ -310,10 +310,7 @@ const styles = stylex.create({
     alignItems: "flex-end",
     justifyContent: "space-between",
     gap: space.x6,
-    paddingBottom: space.x6,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
+    paddingBottom: 0,
     "@media (max-width: 639px)": {
       alignItems: "stretch",
       flexDirection: "column",
@@ -360,15 +357,14 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
-    backgroundColor: colors.surface,
+    backgroundColor: "transparent",
   },
-  sectionAccent: { borderLeftWidth: "3px", borderLeftColor: colors.accent },
+  sectionAccent: { borderColor: colors.accent },
   sectionWarning: {
-    borderLeftWidth: "3px",
-    borderLeftColor: colors.dataAccent,
+    borderColor: colors.dataAccent,
     backgroundColor: colors.accentTint,
   },
-  sectionDanger: { borderLeftWidth: "3px", borderLeftColor: colors.accentDeep },
+  sectionDanger: { borderColor: colors.critical },
   sectionHeader: {
     display: "flex",
     minWidth: 0,
@@ -405,7 +401,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
-    backgroundColor: colors.surface,
+    backgroundColor: "transparent",
   },
   statLabel: {
     color: colors.inkMuted,
@@ -476,7 +472,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
-    backgroundColor: colors.surface,
+    backgroundColor: "transparent",
   },
   detailsSummary: {
     padding: space.x4,
@@ -485,6 +481,11 @@ const styles = stylex.create({
     fontWeight: 700,
     listStyle: "none",
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     "::-webkit-details-marker": { display: "none" },
   },
   detailsBody: {
@@ -505,7 +506,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
-    backgroundColor: colors.surface,
+    backgroundColor: "transparent",
     "@media (max-width: 839px)": { display: "block" },
   },
   splitList: {

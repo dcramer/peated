@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
+import { SearchBox } from "..";
 import BottleImage from "../../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
-import { SearchBox } from "../designSystem/components";
-import { StoryCanvas } from "../designSystem/storyFixtures.stylex";
+import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   PhotoLoadingState,
   PhotoReadFailureState,

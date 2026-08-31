@@ -1,4 +1,4 @@
-import { BottleCatalogLoading } from "@peated/web/components/designSystem/patterns/bottleCatalog.stylex";
+import { BottleCatalogLoading } from "@peated/web/components/pages/bottleCatalog.stylex";
 
 export default function Loading() {
   return <BottleCatalogLoading />;

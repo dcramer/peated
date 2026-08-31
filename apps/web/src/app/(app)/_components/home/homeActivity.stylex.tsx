@@ -18,7 +18,7 @@ import {
   SectionError,
   TastingEntry,
   type TastingEntryMember,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
@@ -58,7 +58,6 @@ function TastingActivity({ session }: { session: TastingSession }) {
         />
       }
       members={members}
-      surface
     />
   );
 }

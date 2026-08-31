@@ -19,9 +19,9 @@ import {
 import AvatarEditor from "react-avatar-editor";
 import { z } from "zod";
 
+import { Button, Field } from ".";
 import setRef from "../lib/setRef";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
-import { Button, Field } from "./designSystem/components";
 
 type Props = {
   error?: { message?: string };
@@ -130,7 +130,9 @@ const ImageField = forwardRef<HTMLInputElement, Props>(function ImageField(
       optional={!required}
       required={required}
     >
-      <div {...stylex.props(styles.frame)}>
+      <div
+        {...stylex.props(styles.frame, Boolean(preview) && styles.previewFrame)}
+      >
         {preview ? (
           <img
             alt="Image preview"
@@ -289,6 +291,10 @@ const styles = stylex.create({
     borderStyle: "dashed",
     borderColor: colors.hairline,
     backgroundColor: colors.inset,
+  },
+  previewFrame: {
+    borderStyle: "solid",
+    backgroundColor: colors.imageBackground,
   },
   preview: {
     display: "block",

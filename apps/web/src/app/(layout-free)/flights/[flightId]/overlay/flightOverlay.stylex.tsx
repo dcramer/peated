@@ -2,13 +2,13 @@
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Bottle } from "@peated/server/types";
-import { ClientOnly } from "@peated/web/components/clientOnly";
 import {
   BottleIdentityRow,
   Card,
   ItemList,
   ItemListItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
+import { ClientOnly } from "@peated/web/components/clientOnly";
 import QRCodeClient from "@peated/web/components/qrcode.client.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
@@ -46,7 +46,7 @@ export function FlightOverlay({
         </header>
         <div {...stylex.props(styles.layout)}>
           <Card padding="none">
-            <ItemList ariaLabel="Flight bottles" variant="surface">
+            <ItemList ariaLabel="Flight bottles">
               {bottles.map(({ bottle }) => (
                 <ItemListItem key={bottle.id}>
                   <BottleIdentityRow
@@ -61,7 +61,6 @@ export function FlightOverlay({
                     name={formatBottleDisplayName(bottle, {
                       includeBrand: false,
                     })}
-                    variant="surface"
                   />
                 </ItemListItem>
               ))}

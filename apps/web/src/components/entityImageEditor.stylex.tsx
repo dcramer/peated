@@ -5,13 +5,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ImagePlus } from "lucide-react";
 import { useRef } from "react";
 
+import { Button, Field, FieldGroup, TextInput } from ".";
 import { colors, space } from "../styles/tokens.stylex";
-import {
-  Button,
-  Field,
-  FieldGroup,
-  TextInput,
-} from "./designSystem/components";
 
 type EntityImage = Outputs["entities"]["details"]["images"][number];
 
@@ -178,10 +173,14 @@ const styles = stylex.create({
     paddingBottom: space.x4,
   },
   preview: {
-    backgroundColor: colors.inset,
+    boxSizing: "border-box",
+    backgroundColor: colors.imageBackground,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
     borderRadius: "3px",
     height: "112px",
-    objectFit: "cover",
+    objectFit: "contain",
     width: "112px",
   },
   fields: {

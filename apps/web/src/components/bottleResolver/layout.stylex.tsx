@@ -2,9 +2,9 @@ import * as stylex from "@stylexjs/stylex";
 import { Camera } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { Button } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
-import { Button } from "../designSystem/components";
 
 export function BottleResolverColumn({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.column)}>{children}</div>;

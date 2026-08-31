@@ -103,7 +103,7 @@ export default function ScraperScheduleSettings({ site }: { site: Site }) {
       description="Choose when this scraper runs. You can still run it manually."
       action={
         <AdminButton
-          color="highlight"
+          variant="accent"
           disabled={update.isPending || invalidCustom || automaticUnavailable}
           loading={update.isPending}
           title={

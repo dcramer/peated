@@ -69,7 +69,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: colors.hairline,
     borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.inset,
+    backgroundColor: colors.imageBackground,
   },
   image: { objectFit: "contain" },
   fallback: {

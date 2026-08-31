@@ -6,7 +6,7 @@ import { isSharedPageChange, isTestDataChange } from "./shared-changes.mjs";
 import { DESKTOP, MOBILE } from "./viewports.mjs";
 
 export const bottleDetailScenario = {
-  heading: existingBottleDetails.group.name,
+  heading: existingBottleDetails.group.fullName,
   id: "bottle-detail",
   label: "Bottle detail",
   path: `/bottles/${existingBottle.id}`,

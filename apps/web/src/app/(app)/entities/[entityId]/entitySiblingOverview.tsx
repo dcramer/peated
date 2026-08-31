@@ -5,8 +5,8 @@ import {
   RailList,
   RailListItem,
   SectionError,
-} from "@peated/web/components/designSystem/components";
-import { PageSection } from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components";
+import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { getEntityPresentation, type Entity } from "./entityPageData";
@@ -31,12 +31,12 @@ export function EntitySiblingOverview({
 
   const heading = entity.owner?.name
     ? `Also part of ${entity.owner.name}`
-    : "Related entities";
+    : "Related brands and producers";
 
   if (pending) {
     return (
       <PageSection heading={heading}>
-        <LoadingList label="Loading related entities" rows={3} />
+        <LoadingList label="Loading related brands and producers" rows={3} />
       </PageSection>
     );
   }
@@ -45,10 +45,10 @@ export function EntitySiblingOverview({
     return (
       <PageSection heading={heading}>
         <SectionError
-          heading="Related entities are unavailable"
+          heading="Related brands and producers are unavailable"
           onRetry={retry}
         >
-          Try loading the related entities again.
+          Try loading the related brands and producers again.
         </SectionError>
       </PageSection>
     );

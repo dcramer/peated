@@ -9,10 +9,8 @@ export const searchScenario = {
   shouldRunFor: (filePath) =>
     filePath.startsWith("apps/web/src/app/(app)/search/") ||
     filePath === "apps/web/src/components/search/search.stylex.tsx" ||
-    filePath ===
-      "apps/web/src/components/designSystem/components/searchBox.stylex.tsx" ||
-    filePath ===
-      "apps/web/src/components/designSystem/components/searchResults.stylex.tsx" ||
+    filePath === "apps/web/src/components/searchBox.stylex.tsx" ||
+    filePath === "apps/web/src/components/searchResults.stylex.tsx" ||
     isTestDataChange(filePath),
   viewports: [DESKTOP, MOBILE],
 };

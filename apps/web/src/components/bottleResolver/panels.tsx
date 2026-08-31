@@ -5,7 +5,7 @@ import {
   FormGrid,
   FormNotice,
   IconButton,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { logError } from "@peated/web/lib/log";
 import { Copy, Plus, RotateCcw, Search } from "lucide-react";

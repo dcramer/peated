@@ -6,11 +6,11 @@ import {
   CursorPager,
   ItemList,
   ItemRow,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
-} from "@peated/web/components/designSystem/patterns/pageLayout.stylex";
+} from "@peated/web/components/pages/pageLayout.stylex";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { colors, fonts } from "../../../../styles/tokens.stylex";
 

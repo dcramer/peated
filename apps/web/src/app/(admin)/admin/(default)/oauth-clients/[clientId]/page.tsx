@@ -53,7 +53,7 @@ export default function Page({
                 await refetch();
               }}
               loading={update.isPending}
-              color={client.active ? "danger" : "primary"}
+              variant={client.active ? "danger" : "default"}
             >
               {client.active ? "Deactivate" : "Activate"}
             </Button>

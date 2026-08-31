@@ -13,7 +13,7 @@ import {
   RowMenu,
   SectionError,
   type RowMenuItem,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import Markdown from "@peated/web/components/markdown";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -82,6 +82,7 @@ function EntityActions({ entity }: { entity: Entity }) {
   const router = useRouter();
   const { flash } = useFlashMessages();
   const deleteMutation = useMutation(orpc.entities.delete.mutationOptions());
+  const noun = getEntityPresentation(entity).label.toLocaleLowerCase();
   const groups: RowMenuItem[][] = [
     [
       {
@@ -96,7 +97,7 @@ function EntityActions({ entity }: { entity: Entity }) {
 
           void navigator.clipboard
             .writeText(window.location.href)
-            .then(() => flash("Entity link copied."))
+            .then(() => flash(`${noun} link copied.`))
             .catch((error) => logTelemetryError(error, {}));
         },
       },
@@ -106,8 +107,8 @@ function EntityActions({ entity }: { entity: Entity }) {
   if (user?.mod || user?.admin) {
     groups.push([
       { href: `/entities/${entity.id}/aliases`, label: "View aliases" },
-      { href: `/entities/${entity.id}/edit`, label: "Edit entity" },
-      { href: `/entities/${entity.id}/merge`, label: "Merge entity" },
+      { href: `/entities/${entity.id}/edit`, label: `Edit ${noun}` },
+      { href: `/entities/${entity.id}/merge`, label: `Merge ${noun}` },
     ]);
   }
 
@@ -115,11 +116,13 @@ function EntityActions({ entity }: { entity: Entity }) {
     groups.push([
       {
         disabled: deleteMutation.isPending,
-        label: deleteMutation.isPending ? "Deleting entity…" : "Delete entity",
+        label: deleteMutation.isPending
+          ? `Deleting ${noun}…`
+          : `Delete ${noun}`,
         onSelect: () => {
           if (
             !window.confirm(
-              "Permanently delete this entity? This cannot be undone.",
+              `Permanently delete this ${noun}? This cannot be undone.`,
             )
           ) {
             return;
@@ -132,7 +135,7 @@ function EntityActions({ entity }: { entity: Entity }) {
               flash(
                 error instanceof Error
                   ? error.message
-                  : "Unable to delete this entity.",
+                  : `Unable to delete this ${noun}.`,
                 "error",
               );
             });
@@ -165,10 +168,10 @@ export function EntityPageFrameClient({
   if (entityQuery.error) {
     return (
       <SectionError
-        heading="Entity details are unavailable"
+        heading={`${initialEntity.name} is unavailable`}
         onRetry={() => void entityQuery.refetch()}
       >
-        We could not load this entity. Try again.
+        We could not load these details. Try again.
       </SectionError>
     );
   }
@@ -181,10 +184,7 @@ export function EntityPageFrameClient({
     entity.kind === "distillery";
   const presentation = getEntityPresentation(entity);
   const currentHref = getEntityCurrentHref(entity, pathname);
-  const bottleActionLabel =
-    entity.kind === "distillery" || entity.kind === "bottler"
-      ? "Record a bottling"
-      : "Add a bottle";
+  const bottleActionLabel = "Add a bottle";
 
   return (
     <div {...stylex.props(styles.page)}>

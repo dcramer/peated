@@ -6,7 +6,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
 import type { User } from "@peated/server/types";
 import {
-  ColourInput,
+  ColorInput,
   Field,
   FormNotice,
   FormSection,
@@ -22,7 +22,7 @@ import {
   ValidationMessage,
   type MemberPickerOption,
   type NotePickerOption,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
@@ -245,14 +245,14 @@ export default function TastingForm(
                   <ValidationMessage>{errors.tags.message}</ValidationMessage>
                 ) : null}
               </Field>
-              <Field htmlFor="tasting-colour" label="Colour" optional>
+              <Field htmlFor="tasting-color" label="Color" optional>
                 <Controller
                   control={control}
                   name="color"
                   render={({ field }) => (
-                    <ColourInput
+                    <ColorInput
                       disabled={isSubmitting}
-                      id="tasting-colour"
+                      id="tasting-color"
                       name={field.name}
                       onChange={field.onChange}
                       value={field.value ?? null}

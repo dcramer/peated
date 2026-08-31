@@ -2,6 +2,7 @@
 
 import { use } from "react";
 
+import { BadgeImage } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminBreadcrumbs,
@@ -11,7 +12,6 @@ import {
   AdminSection,
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminDefinitionList as DefinitionList } from "@peated/web/components/admin/adminUtility.stylex";
-import { BadgeImage } from "@peated/web/components/designSystem/components";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 

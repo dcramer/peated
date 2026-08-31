@@ -10,7 +10,7 @@ import {
   FormStack,
   SearchSelect,
   type SearchPickerOption,
-} from "@peated/web/components/designSystem/components";
+} from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
@@ -52,6 +52,7 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
   const [query, setQuery] = useState("");
   const [other, setOther] = useState<SearchPickerOption | null>(null);
   const [submitError, setSubmitError] = useState<string>();
+  const noun = toTitleCase(entity.kind ?? "producer");
   const results = useQuery(
     orpc.entities.list.queryOptions({
       input: {
@@ -106,7 +107,7 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
       onSave={handleSubmit(submit)}
       saveLabel="Continue"
       saving={isSubmitting}
-      title="Merge entity"
+      title={`Merge ${noun.toLocaleLowerCase()}`}
     >
       <form onSubmit={handleSubmit(submit)}>
         <FormStack>
@@ -119,12 +120,12 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
               render={({ field }) => (
                 <FieldGroup
                   error={errors.entityId?.message}
-                  label="Other entity"
+                  label="Duplicate"
                   required
                 >
                   <SearchSelect
-                    emptyText="No matching entities."
-                    label="Other entity"
+                    emptyText="No matches."
+                    label="Duplicate"
                     loading={results.isFetching}
                     onChange={(option) => {
                       setOther(option);
@@ -143,7 +144,7 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
                         id: item.id,
                         label: item.name,
                       }))}
-                    placeholder="Search entities"
+                    placeholder="Search by name"
                     value={other}
                   />
                 </FieldGroup>

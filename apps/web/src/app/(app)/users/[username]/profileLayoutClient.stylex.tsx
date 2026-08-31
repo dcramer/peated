@@ -13,8 +13,8 @@ import {
   PageTabs,
   RowMenu,
   SummaryStrip,
-} from "@peated/web/components/designSystem/components";
-import { MemberProfileHeader } from "@peated/web/components/designSystem/patterns/memberProfileHeader.stylex";
+} from "@peated/web/components";
+import { MemberProfileHeader } from "@peated/web/components/pages/memberProfileHeader.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../styles/tokens.stylex";
 import { ProfileProvider, type ProfileUser } from "./profileContext";
