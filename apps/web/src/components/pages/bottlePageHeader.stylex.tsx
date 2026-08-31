@@ -77,6 +77,7 @@ export function BottlePageHeader({
         <div {...stylex.props(styles.identityContent)}>
           <div {...stylex.props(styles.image)}>
             <BottleVisual
+              expandable
               imageUrl={imageUrl}
               label={`${brand} ${name}`}
               size="lg"

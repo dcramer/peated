@@ -22,6 +22,7 @@ import { z } from "zod";
 import { Button, Field } from ".";
 import setRef from "../lib/setRef";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import { ImageViewer } from "./imageViewer.stylex";
 
 type Props = {
   error?: { message?: string };
@@ -134,10 +135,11 @@ const ImageField = forwardRef<HTMLInputElement, Props>(function ImageField(
         {...stylex.props(styles.frame, Boolean(preview) && styles.previewFrame)}
       >
         {preview ? (
-          <img
+          <ImageViewer
             alt="Image preview"
+            imageProps={stylex.props(styles.preview)}
+            label="image preview"
             src={preview}
-            {...stylex.props(styles.preview)}
           />
         ) : (
           <ImagePlus

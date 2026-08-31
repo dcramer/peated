@@ -7,6 +7,7 @@ import { useRef } from "react";
 
 import { Button, Field, FieldGroup, TextInput } from ".";
 import { colors, space } from "../styles/tokens.stylex";
+import { ImageViewer } from "./imageViewer.stylex";
 
 type EntityImage = Outputs["entities"]["details"]["images"][number];
 
@@ -67,10 +68,11 @@ export function EntityImageEditor({
       <div {...stylex.props(styles.root)}>
         {images.map((image) => (
           <div key={image.key} {...stylex.props(styles.row)}>
-            <img
+            <ImageViewer
               alt={image.caption || "Image preview"}
+              imageProps={stylex.props(styles.preview)}
+              label={image.caption || "image preview"}
               src={image.imageUrl}
-              {...stylex.props(styles.preview)}
             />
             <div {...stylex.props(styles.fields)}>
               <Field
