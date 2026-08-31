@@ -1,0 +1,58 @@
+{
+  "changedFiles": [
+    "apps/server/src/orpc/contracts/entities/list.ts",
+    "apps/server/src/orpc/contracts/entityKinds/list.ts",
+    "apps/server/src/orpc/mock/routes/entityKinds/list.ts",
+    "apps/server/src/orpc/routes/entityKinds/list.test.ts",
+    "apps/server/src/orpc/routes/entityKinds/list.ts",
+    "apps/web/src/app/(app)/(entity-catalog)/entityCatalogPageClient.tsx",
+    "apps/web/src/app/(app)/following/followingPageClient.stylex.tsx",
+    "apps/web/src/components/pages/bottleCatalog.stylex.tsx",
+    "apps/web/src/components/pages/entityCatalog.stylex.tsx",
+    "apps/web/src/lib/entityFollowing.test.ts",
+    "apps/web/src/lib/entityFollowing.ts"
+  ],
+  "commitSha": "8ce85934a1be5ff08a9930fc21fe20123c6ee94a",
+  "scenarioIds": [
+    "home",
+    "bottle-detail",
+    "member-profile",
+    "add-tasting"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    },
+    {
+      "file": "add-tasting__desktop.png",
+      "label": "Log a tasting · desktop"
+    },
+    {
+      "file": "add-tasting__mobile.png",
+      "label": "Log a tasting · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
