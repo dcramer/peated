@@ -92,7 +92,7 @@ export function BottleCheckSubject({
 const styles = stylex.create({
   subject: { color: colors.inkMuted },
   subjectLink: {
-    color: colors.ink,
+    color: { default: colors.ink, ":hover": colors.accentDeep },
     fontWeight: 600,
     textDecoration: "underline",
     outline: "none",

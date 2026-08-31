@@ -8,7 +8,6 @@ import { useEventListener } from "usehooks-ts";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
-  AppLink,
   ButtonLink,
   EmptyState,
   ItemList,
@@ -17,6 +16,7 @@ import {
   MemberAvatar,
   SectionError,
   TastingEntry,
+  TextLink,
   type TastingEntryMember,
 } from "@peated/web/components";
 import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
@@ -83,18 +83,15 @@ function CollectionActivityItem({
           username={activity.createdBy.username}
         />
         <div {...stylex.props(styles.collectionCopy)}>
-          <AppLink
-            href={`/users/${activity.createdBy.username}`}
-            {...stylex.props(styles.collectionAuthor)}
-          >
+          <TextLink href={`/users/${activity.createdBy.username}`}>
             {activity.createdBy.username}
-          </AppLink>
+          </TextLink>
           <span {...stylex.props(styles.collectionContext)}>
             added {formatBottleCount(activity.totalItems)} to{" "}
             {activity.collection.href ? (
-              <AppLink href={activity.collection.href}>
+              <TextLink href={activity.collection.href} size="inherit">
                 {activity.collection.name}
-              </AppLink>
+              </TextLink>
             ) : (
               activity.collection.name
             )}
@@ -265,12 +262,6 @@ const styles = stylex.create({
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
-  },
-  collectionAuthor: {
-    color: colors.ink,
-    fontSize: "13px",
-    fontWeight: 600,
-    textDecoration: "none",
   },
   collectionContext: {
     marginTop: "2px",

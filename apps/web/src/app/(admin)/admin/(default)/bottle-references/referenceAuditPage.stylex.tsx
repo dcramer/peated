@@ -2,7 +2,6 @@
 
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { useState } from "react";
 
 import { AdminButton } from "@peated/web/components/admin/adminButton.stylex";
@@ -12,6 +11,7 @@ import {
   AdminPage,
   AdminPageHeader,
   AdminStatus,
+  AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
@@ -109,9 +109,9 @@ export default function BottleReferenceAuditPage() {
       name: "Bottle",
       value: (item: AuditItem) => (
         <div>
-          <Link href={`/bottles/${item.bottle.id}`}>
+          <AdminTextLink href={`/bottles/${item.bottle.id}`}>
             {item.bottle.fullName}
-          </Link>
+          </AdminTextLink>
           <div>
             {item.group.siblings.length} other Bottle
             {item.group.siblings.length === 1 ? "" : "s"} in this group

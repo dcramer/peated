@@ -2,7 +2,7 @@
 
 import * as stylex from "@stylexjs/stylex";
 
-import { AppLink, PageTabs } from "@peated/web/components";
+import { PageTabs, TextLink } from "@peated/web/components";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 export function BottleCatalogNavigation({
@@ -27,9 +27,18 @@ export function BottleCatalogNavigation({
       {scope === "following" ? (
         <p {...stylex.props(styles.scopeHelp)}>
           Bottles from distillers, brands, and bottlers you follow. See followed{" "}
-          <AppLink href="/distillers?filter=following">distillers</AppLink>,{" "}
-          <AppLink href="/brands?filter=following">brands</AppLink>, or{" "}
-          <AppLink href="/bottlers?filter=following">bottlers</AppLink>.
+          <TextLink href="/distillers?filter=following" size="inherit">
+            distillers
+          </TextLink>
+          ,{" "}
+          <TextLink href="/brands?filter=following" size="inherit">
+            brands
+          </TextLink>
+          , or{" "}
+          <TextLink href="/bottlers?filter=following" size="inherit">
+            bottlers
+          </TextLink>
+          .
         </p>
       ) : null}
     </div>

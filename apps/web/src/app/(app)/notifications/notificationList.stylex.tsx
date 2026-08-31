@@ -269,9 +269,11 @@ const styles = stylex.create({
     lineHeight: 1.45,
   },
   author: {
-    color: colors.ink,
+    color: { default: colors.ink, ":hover": colors.accentDeep },
     fontWeight: 700,
-    textDecoration: "none",
+    textDecorationLine: { default: "none", ":hover": "underline" },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     outline: "none",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },

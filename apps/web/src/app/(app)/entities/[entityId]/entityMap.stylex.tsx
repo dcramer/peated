@@ -1,13 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { Card } from "@peated/web/components";
+import { Card, TextLink } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
-import {
-  colors,
-  effects,
-  fonts,
-  space,
-} from "../../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 import type { Entity } from "./entityPageData";
 
@@ -47,14 +42,9 @@ export function EntityMap({ entity }: { entity: Entity }) {
         />
         <div {...stylex.props(styles.mapFooter)}>
           <span {...stylex.props(styles.coordinates)}>{coordinateLabel}</span>
-          <a
-            href={mapHref}
-            rel="noreferrer"
-            target="_blank"
-            {...stylex.props(styles.mapLink)}
-          >
+          <TextLink href={mapHref} rel="noreferrer" target="_blank">
             Open in map →
-          </a>
+          </TextLink>
         </div>
       </Card>
     </PageSection>
@@ -91,18 +81,5 @@ const styles = stylex.create({
     fontFamily: fonts.data,
     fontSize: "10px",
     lineHeight: 1.4,
-  },
-  mapLink: {
-    color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    fontWeight: 700,
-    lineHeight: 1.3,
-    outline: "none",
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
 });

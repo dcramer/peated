@@ -206,7 +206,7 @@ const styles = stylex.create({
     },
   },
   brand: {
-    color: colors.ink,
+    color: { default: colors.ink, ":hover": colors.accentDeep },
     fontFamily: fonts.display,
     fontSize: "15px",
     fontWeight: 700,

@@ -16,7 +16,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { IconButton } from "../..";
+import { IconButton, TextLink } from "../..";
 import { useORPC } from "../../../lib/orpc/context";
 import {
   colors,
@@ -159,9 +159,14 @@ export default function ModerationBottlePicker({
               <>
                 {" "}
                 Source:{" "}
-                <a href={source} target="_blank" rel="noreferrer">
+                <TextLink
+                  href={source}
+                  rel="noreferrer"
+                  size="inherit"
+                  target="_blank"
+                >
                   {source}
-                </a>
+                </TextLink>
                 .
               </>
             ) : null}

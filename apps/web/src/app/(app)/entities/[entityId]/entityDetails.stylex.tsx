@@ -1,17 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 
 import {
-  AppLink,
+  TextLink,
   hasVisibleFacts,
   type FactListItem,
 } from "@peated/web/components";
 import { parseDomain } from "@peated/web/lib/urls";
-import {
-  colors,
-  effects,
-  fonts,
-  space,
-} from "../../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 import type { Entity } from "./entityPageData";
 
@@ -20,21 +15,18 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
     <>
       {entity.region ? (
         <>
-          <AppLink
+          <TextLink
             href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
-            {...stylex.props(styles.factLink)}
+            size="inherit"
           >
             {entity.region.name}
-          </AppLink>
+          </TextLink>
           <span>, </span>
         </>
       ) : null}
-      <AppLink
-        href={`/locations/${entity.country.slug}`}
-        {...stylex.props(styles.factLink)}
-      >
+      <TextLink href={`/locations/${entity.country.slug}`} size="inherit">
         {entity.country.name}
-      </AppLink>
+      </TextLink>
     </>
   ) : null;
 
@@ -43,25 +35,22 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
     {
       label: "Owned by",
       value: entity.owner ? (
-        <AppLink
-          href={`/entities/${entity.owner.id}`}
-          {...stylex.props(styles.factLink)}
-        >
+        <TextLink href={`/entities/${entity.owner.id}`} size="inherit">
           {entity.owner.name}
-        </AppLink>
+        </TextLink>
       ) : null,
     },
     {
       label: "Website",
       value: entity.website ? (
-        <a
+        <TextLink
           href={entity.website}
           rel="noreferrer"
+          size="inherit"
           target="_blank"
-          {...stylex.props(styles.factLink)}
         >
           {parseDomain(entity.website)}
-        </a>
+        </TextLink>
       ) : null,
     },
     { label: "Also known as", value: entity.shortName },
@@ -132,14 +121,5 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1.35,
     overflowWrap: "anywhere",
-  },
-  factLink: {
-    color: colors.accentDeep,
-    outline: "none",
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
 });

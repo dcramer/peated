@@ -39,6 +39,7 @@ const styles = stylex.create({
     gap: space.x3,
     borderRadius: "2px",
     outline: "none",
+    backgroundColor: { default: "transparent", ":hover": colors.surface },
     color: colors.ink,
     textDecoration: "none",
     boxShadow: {
