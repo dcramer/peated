@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    ".gitignore",
+    "AGENTS.md",
+    "apps/server/migrations/0253_numerous_jigsaw.sql",
+    "apps/server/migrations/meta/0253_snapshot.json",
+    "apps/server/migrations/meta/_journal.json",
+    "apps/server/src/agents/bottleClassifier/contextAdapters.ts",
+    "apps/server/src/db/schema/bottles.test.ts",
+    "apps/server/src/db/schema/bottles.ts",
+    "apps/server/src/lib/bottleIdentity.test.ts",
+    "apps/server/src/lib/bottleIdentity.ts",
+    "apps/server/src/lib/bottleOperationReview/bottleShared.ts",
+    "apps/server/src/lib/bottleOperationReview/bottleUpdate.ts",
+    "apps/server/src/lib/bottleOperationReviewSchemas.ts",
+    "apps/server/src/lib/bottleReferenceCandidates.ts",
+    "apps/server/src/lib/bottleReferenceResolution.ts",
+    "apps/server/src/lib/bottleRelease.test.ts",
+    "apps/server/src/lib/bottleRelease.ts",
+    "apps/server/src/lib/bottleSchemas.ts",
+    "apps/server/src/lib/classifierDecisionCreateInputs.ts",
+    "apps/server/src/lib/createBottle.ts"
+  ],
+  "commitSha": "07d94d9424ad3d608e61cbbacf9ac659ed4bf796",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "member-profile"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
