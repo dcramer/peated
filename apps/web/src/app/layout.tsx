@@ -25,12 +25,19 @@ export const viewport: Viewport = {
 
 export function generateMetadata(): Metadata {
   return {
+    metadataBase: new URL(config.URL_PREFIX),
+    applicationName: "Peated",
     title: {
       template: "%s | Peated",
       default: "Peated",
     },
     openGraph: {
+      type: "website",
+      locale: "en_US",
       siteName: "Peated",
+    },
+    twitter: {
+      card: "summary",
     },
     description: config.DESCRIPTION,
     other: {

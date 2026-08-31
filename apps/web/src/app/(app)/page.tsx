@@ -9,10 +9,13 @@ import {
 } from "@peated/web/lib/orpc/homeQueries";
 import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getPublicStats } from "@peated/web/lib/publicStats.server";
+import { homeMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { HomePageClient } from "./homePageClient";
+
+export const metadata = homeMetadata;
 
 export default async function Page() {
   const session = await getSession();

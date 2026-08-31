@@ -6,25 +6,17 @@ import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
+import { getBottleSeoMetadata } from "@peated/web/lib/seoMetadata";
+import type { Metadata } from "next";
 
 import { BottlePageFrameClient } from "./bottlePageClient.stylex";
 
 export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
-}) {
+}): Promise<Metadata> {
   const { bottleId } = await props.params;
   const bottle = await getBottlePage(parseReleaseFamilyRouteId(bottleId));
-  const title = formatBottleDisplayName(bottle);
-  const description = summarize(bottle.description || "", 200);
-  const images = bottle.imageUrl ? [bottle.imageUrl] : [];
-
-  return {
-    title,
-    description,
-    images,
-    openGraph: { title, description, images },
-    twitter: { card: "summary" as const, images },
-  };
+  return getBottleSeoMetadata(bottle);
 }
 
 export default async function BottleLayout(props: {

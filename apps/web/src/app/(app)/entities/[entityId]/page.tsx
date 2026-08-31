@@ -1,8 +1,18 @@
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
+import type { Metadata } from "next";
 
 import { EntityOverviewClient } from "./entityOverviewClient.stylex";
 import { entityHasBottleCatalog } from "./entityPageData";
+
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
+}): Promise<Metadata> {
+  const { entityId } = await props.params;
+  const entity = await getEntityPage(Number(entityId));
+  return getEntitySeoMetadata(entity, { canonical: true });
+}
 
 export default async function EntityPage(props: {
   params: Promise<{ entityId: string }>;
