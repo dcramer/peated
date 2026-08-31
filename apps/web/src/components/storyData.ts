@@ -5,19 +5,19 @@ import type { SearchResultGroup } from "./searchResults.stylex";
 
 export const distillerOptions = [
   {
-    detail: "Islay · 412 bottles · owned by Rémy Cointreau",
+    detail: "Islay · 412 bottles · part of Rémy Cointreau",
     id: "D00192",
     meta: "412 bottles",
     name: "Bruichladdich",
   },
   {
-    detail: "Islay · 86 bottles · owned by Rémy Cointreau",
+    detail: "Islay · 86 bottles · part of Rémy Cointreau",
     id: "D00193",
     meta: "86 bottles",
     name: "Bruichladdich (Port Charlotte)",
   },
   {
-    detail: "Islay · 64 bottles · owned by Rémy Cointreau",
+    detail: "Islay · 64 bottles · part of Rémy Cointreau",
     id: "D00481",
     meta: "64 bottles",
     name: "Bruichladdich (Octomore)",
