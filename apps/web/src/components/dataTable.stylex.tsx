@@ -103,9 +103,6 @@ const styles = stylex.create({
     width: "100%",
     minWidth: 0,
     overflowX: "auto",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
   },
   table: {
     width: "100%",

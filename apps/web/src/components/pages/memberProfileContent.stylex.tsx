@@ -64,7 +64,7 @@ export function MemberLibraryList({
         ) : null}
       </div>
       {items.length ? (
-        <ItemList ariaLabel="Library bottles" showTopDivider={false}>
+        <ItemList ariaLabel="Library bottles">
           {items.map(({ actions, id, status, ...identity }) => (
             <ItemListItem key={id}>
               <BottleIdentityRow
@@ -273,9 +273,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     gap: space.x2,
     paddingBottom: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
     color: colors.ink,
     fontFamily: fonts.display,
     fontSize: "17px",

@@ -151,9 +151,7 @@ export function RailList({
 }) {
   return (
     <div {...stylex.props(styles.railList)}>
-      <ItemList ariaLabel={ariaLabel} showTopDivider={false}>
-        {children}
-      </ItemList>
+      <ItemList ariaLabel={ariaLabel}>{children}</ItemList>
     </div>
   );
 }
@@ -212,9 +210,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: space.x4,
     paddingBottom: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
     [COMPACT]: {
       alignItems: "flex-start",
       flexDirection: "column",
@@ -318,9 +313,6 @@ const styles = stylex.create({
   },
   railList: {
     padding: 0,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
     borderRadius: 0,
     backgroundColor: "transparent",
   },

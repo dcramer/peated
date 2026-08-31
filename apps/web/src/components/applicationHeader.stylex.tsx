@@ -580,9 +580,6 @@ const styles = stylex.create({
     scrollbarWidth: "none",
     paddingTop: space.x1,
     paddingBottom: space.x2,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
     [MOBILE]: {
       display: "none",
     },

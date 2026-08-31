@@ -19,24 +19,12 @@ export type ItemRowSize = "sm" | "md";
 export type ItemListProps = {
   ariaLabel: string;
   children: ReactNode;
-  showTopDivider?: boolean;
 };
 
 /** Groups aligned items with one shared row-divider contract. */
-export function ItemList({
-  ariaLabel,
-  children,
-  showTopDivider = true,
-}: ItemListProps) {
+export function ItemList({ ariaLabel, children }: ItemListProps) {
   return (
-    <ul
-      aria-label={ariaLabel}
-      {...stylex.props(
-        styles.list,
-        styles.listWithDivider,
-        !showTopDivider && styles.withoutTopDivider,
-      )}
-    >
+    <ul aria-label={ariaLabel} {...stylex.props(styles.list)}>
       {children}
     </ul>
   );
@@ -163,14 +151,6 @@ const styles = stylex.create({
     margin: 0,
     padding: 0,
     listStyle: "none",
-  },
-  listWithDivider: {
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-  },
-  withoutTopDivider: {
-    borderTopWidth: 0,
   },
   row: {
     minWidth: 0,

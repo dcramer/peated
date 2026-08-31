@@ -133,11 +133,13 @@ export function AuthenticationActions({ children }: { children: ReactNode }) {
 export function AuthenticationDivider({ label }: { label?: string }) {
   return (
     <div aria-hidden="true" {...stylex.props(styles.divider)}>
-      <span {...stylex.props(styles.rule)} />
       {label ? (
-        <span {...stylex.props(styles.dividerLabel)}>{label}</span>
+        <>
+          <span {...stylex.props(styles.rule)} />
+          <span {...stylex.props(styles.dividerLabel)}>{label}</span>
+          <span {...stylex.props(styles.rule)} />
+        </>
       ) : null}
-      {label ? <span {...stylex.props(styles.rule)} /> : null}
     </div>
   );
 }
@@ -406,12 +408,6 @@ const styles = stylex.create({
     rowGap: space.x3,
     paddingTop: "22px",
     paddingBottom: "22px",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
     backgroundColor: "transparent",
   },
   actionStack: {

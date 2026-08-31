@@ -56,9 +56,6 @@ const styles = stylex.create({
     paddingRight: 0,
     paddingBottom: space.x3,
     paddingLeft: 0,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
     backgroundColor: "transparent",
   },
   copy: {

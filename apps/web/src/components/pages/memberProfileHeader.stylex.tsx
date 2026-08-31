@@ -135,9 +135,6 @@ const styles = stylex.create({
     gap: space.x6,
     paddingTop: space.x6,
     paddingBottom: space.x6,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
     backgroundColor: "transparent",
     [FOLDED]: {
       gridTemplateColumns: "76px minmax(0, 1fr)",

@@ -84,9 +84,6 @@ const styles = stylex.create({
   header: {
     maxWidth: "720px",
     paddingBottom: space.x6,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   eyebrow: {
     marginBottom: space.x2,
