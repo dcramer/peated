@@ -98,9 +98,6 @@ const styles = stylex.create({
     margin: 0,
     paddingTop: space.x4,
     paddingBottom: space.x4,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   fact: {
     minWidth: 0,

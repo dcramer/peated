@@ -55,6 +55,7 @@ export function LocationPageFrame({
       <PageHeader
         actions={actions}
         description={description}
+        divider={false}
         eyebrow={country ? "Whisky region" : "Whisky country"}
         parent={
           country ? (
