@@ -51,4 +51,34 @@ describe("TastingEntry descriptions", () => {
     expect(html).toContain("The final sentence.");
     expect(html).not.toContain("Read more");
   });
+
+  it("shows the recorded tasting details and discussion link", () => {
+    const html = renderToStaticMarkup(
+      <TastingEntry
+        author="peatfan"
+        date="Today"
+        members={[
+          {
+            color: "Deep gold",
+            comments: 4,
+            imageKind: "photo",
+            imageUrl: "/tasting.jpg",
+            name: "Springbank 15",
+            notes: ["wax", "coal smoke"],
+            ratingBand: "outstanding",
+            servingStyle: "Neat",
+            tastingId: 42,
+          },
+        ]}
+      />,
+    );
+
+    expect(html).toContain('src="/tasting.jpg"');
+    expect(html).toContain("No notes.");
+    expect(html).toContain("wax");
+    expect(html).toContain("Neat");
+    expect(html).toContain("Deep gold");
+    expect(html).toContain('href="/tastings/42#comments"');
+    expect(html).toContain("4 comments");
+  });
 });

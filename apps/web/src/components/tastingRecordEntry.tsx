@@ -4,6 +4,7 @@ import {
   formatBottleDisplayName,
   type BottleDisplayNameSource,
 } from "@peated/server/lib/bottleDisplayName";
+import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import {
   MemberAvatar,
   TastingEntry,
@@ -18,34 +19,52 @@ import {
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 type TastingEntryRecord = {
-  bottle: BottleDisplayNameSource & BottleMetadata & { id: number };
+  bottle: BottleDisplayNameSource &
+    BottleMetadata & { id: number; imageUrl?: string | null };
+  color?: number | null;
+  comments?: number;
+  hasToasted?: boolean;
   id: number;
+  imageUrl?: string | null;
   notes?: string | null;
   ratingBand?: TastingEntryMember["ratingBand"] | null;
+  servingStyle?: Parameters<typeof formatServingStyle>[0] | null;
   tags?: readonly string[] | null;
+  toasts?: number;
 };
 
 export function getTastingEntryMember(
   tasting: TastingEntryRecord,
 ): TastingEntryMember {
   return {
+    color:
+      tasting.color === null || tasting.color === undefined
+        ? undefined
+        : formatColor(tasting.color),
+    comments: tasting.comments,
     description: tasting.notes ?? undefined,
     descriptionHref: `/tastings/${tasting.id}`,
+    hasToasted: tasting.hasToasted,
     href: `/bottles/${tasting.bottle.id}`,
+    imageKind: tasting.imageUrl ? "photo" : "bottle",
+    imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
     metadata: getBottleMetadata(tasting.bottle),
     name: formatBottleDisplayName(tasting.bottle),
     notes: tasting.tags ?? undefined,
     ratingBand: tasting.ratingBand ?? undefined,
+    servingStyle: tasting.servingStyle
+      ? formatServingStyle(tasting.servingStyle)
+      : undefined,
+    tastingId: tasting.id,
+    toasts: tasting.toasts,
   };
 }
 
 export function TastingRecordEntry({
   showAvatar = true,
-  showFullNotes = false,
   tasting,
 }: {
   showAvatar?: boolean;
-  showFullNotes?: boolean;
   tasting: Tasting;
 }) {
   const member = getTastingEntryMember(tasting);
@@ -54,6 +73,7 @@ export function TastingRecordEntry({
     <TastingEntry
       author={tasting.createdBy.username}
       authorHref={`/users/${tasting.createdBy.username}`}
+      authorId={tasting.createdBy.id}
       date={<TimeSince date={tasting.createdAt} />}
       leading={
         showAvatar ? (
@@ -63,9 +83,7 @@ export function TastingRecordEntry({
           />
         ) : undefined
       }
-      members={[
-        showFullNotes ? { ...member, descriptionHref: undefined } : member,
-      ]}
+      members={[member]}
     />
   );
 }

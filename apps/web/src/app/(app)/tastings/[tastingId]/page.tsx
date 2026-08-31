@@ -1,15 +1,11 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { TextLink } from "@peated/web/components";
-import {
-  PageHeader,
-  PageSection,
-} from "@peated/web/components/pages/pageLayout.stylex";
-import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
+import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { cache } from "react";
 
 import { TastingComments } from "./tastingComments.stylex";
+import { TastingDetail } from "./tastingDetail.stylex";
 
 const getTasting = cache(async (tastingId: number) => {
   const { client } = await getPublicPageServerClient();
@@ -49,27 +45,15 @@ export default async function TastingPage(props: {
   const commentList = await client.comments.list({ tasting: tasting.id });
   return (
     <div>
-      <PageHeader
-        eyebrow="Tasting record"
-        parent={
-          <TextLink
-            href={`/users/${tasting.createdBy.username}`}
-            size="inherit"
-          >
-            {tasting.createdBy.username}
-          </TextLink>
-        }
-        title={formatBottleDisplayName(tasting.bottle)}
-      />
-      <PageSection heading="Tasting">
-        <TastingRecordEntry showFullNotes tasting={tasting} />
-      </PageSection>
-      <PageSection heading="Comments">
-        <TastingComments
-          initialCommentList={commentList}
-          tastingId={tasting.id}
-        />
-      </PageSection>
+      <TastingDetail tasting={tasting} />
+      <div id="comments">
+        <PageSection heading="Conversation">
+          <TastingComments
+            initialCommentList={commentList}
+            tastingId={tasting.id}
+          />
+        </PageSection>
+      </div>
     </div>
   );
 }
