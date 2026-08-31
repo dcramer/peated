@@ -42,16 +42,6 @@ function git(args, options = {}) {
 }
 
 export function buildBody(manifest, imageBaseUrl) {
-  if (manifest.skipped || manifest.screenshots.length === 0) {
-    return [
-      MARKER,
-      "## Web screenshots",
-      "",
-      "_No screenshot scenarios match these changed files._",
-      "",
-    ].join("\n");
-  }
-
   const changedFiles = manifest.changedFiles.length
     ? manifest.changedFiles
         .slice(0, 8)
@@ -90,6 +80,10 @@ export function buildBody(manifest, imageBaseUrl) {
     "_Captured from local Peated with fixed test data. These images help review a change. They do not compare pixels or block a pull request because the page changed._",
     "",
   ].join("\n");
+}
+
+export function shouldPostComment(manifest) {
+  return !manifest.skipped && manifest.screenshots.length > 0;
 }
 
 function publishImages(outDir, branch, commitSha) {
@@ -165,20 +159,22 @@ function upsertComment(repo, prNumber, body) {
 
 function main() {
   const outDir = path.resolve(process.argv[2] ?? "apps/web/.playwright/visual");
-  const prNumber = requiredEnv("PR_NUMBER");
-  const repo = requiredEnv("GITHUB_REPOSITORY");
-  const commitSha = process.env.GITHUB_SHA ?? "unknown";
-  const branch = `web-screenshots/pr-${prNumber}`;
   const manifestPath = path.join(outDir, "manifest.json");
   if (!fs.existsSync(manifestPath)) {
     throw new Error(`Missing manifest at ${manifestPath}`);
   }
 
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  const hasScreenshots = !manifest.skipped && manifest.screenshots.length > 0;
-  const imageRef = hasScreenshots
-    ? publishImages(outDir, branch, commitSha)
-    : branch;
+  if (!shouldPostComment(manifest)) {
+    console.log("no screenshot scenarios matched; skipping PR comment");
+    return;
+  }
+
+  const prNumber = requiredEnv("PR_NUMBER");
+  const repo = requiredEnv("GITHUB_REPOSITORY");
+  const commitSha = process.env.GITHUB_SHA ?? "unknown";
+  const branch = `web-screenshots/pr-${prNumber}`;
+  const imageRef = publishImages(outDir, branch, commitSha);
   const body = buildBody(
     manifest,
     `https://raw.githubusercontent.com/${repo}/${imageRef}`,
