@@ -34,7 +34,7 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
     { label: "Region", value: location },
     { label: "Established", value: entity.yearEstablished },
     {
-      label: "Owned by",
+      label: "Part of",
       value: entity.owner ? (
         <TextLink href={`/entities/${entity.owner.id}`} size="inherit">
           {entity.owner.name}

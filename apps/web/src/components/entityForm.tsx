@@ -62,7 +62,7 @@ export default function EntityForm({
   const [owner, setOwner] = useState<ProducerPickerOption | null>(() =>
     initialData.owner
       ? {
-          detail: "Current direct owner",
+          detail: "Currently part of",
           id: String(initialData.owner.id),
           meta: initialData.owner.peatedId,
           name: initialData.owner.name,
@@ -281,9 +281,9 @@ export default function EntityForm({
             title="Details"
           >
             <ProducerPicker
-              help="The current direct owner, when one is known."
+              help="The company or organization this is part of, when known."
               kind="producer"
-              label="Owned by"
+              label="Part of"
               loading={ownerResults.isFetching}
               onChange={(value) => {
                 setOwner(value);
