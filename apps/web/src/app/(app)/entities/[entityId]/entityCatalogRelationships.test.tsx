@@ -20,6 +20,11 @@ const baseCatalog: EntityCatalog = {
 function renderRelationships(
   kind: Entity["kind"],
   related: EntityCatalog["related"],
+  state: {
+    error?: boolean;
+    pending?: boolean;
+    withCatalog?: boolean;
+  } = {},
 ) {
   const entity = {
     ...mockEntity,
@@ -31,10 +36,12 @@ function renderRelationships(
 
   return renderToStaticMarkup(
     <EntityCatalogRelationships
-      catalog={{ ...baseCatalog, related }}
+      catalog={
+        state.withCatalog === false ? undefined : { ...baseCatalog, related }
+      }
       entity={entity}
-      error={false}
-      pending={false}
+      error={state.error ?? false}
+      pending={state.pending ?? false}
       retry={() => undefined}
     />,
   );
@@ -109,5 +116,46 @@ describe("EntityCatalogRelationships", () => {
 
     expect(html).toContain("Bottled by");
     expect(html).toContain("Independent Bottler");
+  });
+
+  test.each([
+    ["loading", { pending: true }, "Loading distilleries and bottlers"],
+    ["error", { error: true }, "Could not load distilleries and bottlers"],
+  ] as const)(
+    "uses a neutral heading for a brand %s state without catalog data",
+    (_state, options, message) => {
+      const html = renderRelationships(
+        "brand",
+        { brands: [], bottlers: [], distillers: [] },
+        { ...options, withCatalog: false },
+      );
+
+      expect(html).toContain("Distilleries and bottlers");
+      expect(html).toContain(message);
+    },
+  );
+
+  test("uses the known brand fallback in an error state", () => {
+    const html = renderRelationships(
+      "brand",
+      {
+        brands: [],
+        bottlers: [
+          {
+            id: 5,
+            name: "Independent Bottler",
+            shortName: null,
+            kind: "bottler",
+            count: 3,
+          },
+        ],
+        distillers: [],
+      },
+      { error: true },
+    );
+
+    expect(html).toContain("Bottled by");
+    expect(html).toContain("Could not load bottlers");
+    expect(html).not.toContain("Distilled at");
   });
 });

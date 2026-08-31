@@ -21,16 +21,37 @@ function getRelationshipGroup(entity: Entity, catalog?: EntityCatalog) {
 
   const groups: {
     heading: string;
+    itemLabel: string;
     items: RelatedEntity[];
   }[] =
     entity.kind === "distillery"
-      ? [{ heading: "Bottled by", items: catalog.related.bottlers }]
+      ? [
+          {
+            heading: "Bottled by",
+            itemLabel: "bottlers",
+            items: catalog.related.bottlers,
+          },
+        ]
       : entity.kind === "brand"
         ? [
-            { heading: "Distilled at", items: catalog.related.distillers },
-            { heading: "Bottled by", items: catalog.related.bottlers },
+            {
+              heading: "Distilled at",
+              itemLabel: "distilleries",
+              items: catalog.related.distillers,
+            },
+            {
+              heading: "Bottled by",
+              itemLabel: "bottlers",
+              items: catalog.related.bottlers,
+            },
           ]
-        : [{ heading: "Distilled at", items: catalog.related.distillers }];
+        : [
+            {
+              heading: "Distilled at",
+              itemLabel: "distilleries",
+              items: catalog.related.distillers,
+            },
+          ];
 
   return groups.find((group) => group.items.length) ?? null;
 }
@@ -50,29 +71,39 @@ export function EntityCatalogRelationships({
 }) {
   if (entity.kind === "company") return null;
 
-  const heading = entity.kind === "distillery" ? "Bottled by" : "Distilled at";
-  const relatedKind =
-    entity.kind === "distillery" ? "bottlers" : "distilleries";
+  const group = getRelationshipGroup(entity, catalog);
+  const state =
+    group ??
+    (entity.kind === "brand"
+      ? {
+          heading: "Distilleries and bottlers",
+          itemLabel: "distilleries and bottlers",
+        }
+      : entity.kind === "distillery"
+        ? { heading: "Bottled by", itemLabel: "bottlers" }
+        : { heading: "Distilled at", itemLabel: "distilleries" });
 
   if (pending) {
     return (
-      <PageSection heading={heading}>
-        <LoadingList label={`Loading ${relatedKind}`} rows={3} />
+      <PageSection heading={state.heading}>
+        <LoadingList label={`Loading ${state.itemLabel}`} rows={3} />
       </PageSection>
     );
   }
 
   if (error) {
     return (
-      <PageSection heading={heading}>
-        <SectionError heading={`Could not load ${relatedKind}`} onRetry={retry}>
+      <PageSection heading={state.heading}>
+        <SectionError
+          heading={`Could not load ${state.itemLabel}`}
+          onRetry={retry}
+        >
           Try again.
         </SectionError>
       </PageSection>
     );
   }
 
-  const group = getRelationshipGroup(entity, catalog);
   if (!group) return null;
 
   return (
