@@ -19,6 +19,7 @@ export default async function BottleListPage(props: {
 }) {
   const queryParams = normalizeBottleCatalogQueryParams(
     getApiQueryParams(await props.searchParams, {
+      defaults: { sort: "-release" },
       allowedValues: BOTTLE_CATALOG_ALLOWED_VALUES,
       fields: BOTTLE_CATALOG_QUERY_FIELDS,
       numericFields: [
