@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/server/migrations/0256_exotic_leo.sql",
+    "apps/server/migrations/meta/0256_snapshot.json",
+    "apps/server/migrations/meta/_journal.json",
+    "apps/server/src/constants.ts",
+    "apps/server/src/lib/badges/checks/categoryCheck.test.ts",
+    "apps/server/src/lib/bottleReferenceCandidates.ts",
+    "apps/server/src/lib/format.ts",
+    "apps/server/src/lib/priceMatching.test.ts",
+    "apps/server/src/lib/priceMatchingAutomation.test.ts",
+    "apps/server/src/lib/priceMatchingAutomation.ts",
+    "apps/server/src/orpc/routes/bottles/list.test.ts",
+    "apps/server/src/orpc/routes/countries/categories.test.ts",
+    "apps/server/src/orpc/routes/entities/categories/list.test.ts",
+    "apps/server/src/scraper/adapters/legacy/scrapeSMWS.test.ts",
+    "apps/server/src/scraper/adapters/legacy/scrapeSMWS.ts",
+    "apps/web/src/app/(app)/_components/applicationFooter.stylex.tsx",
+    "apps/web/src/app/(app)/about/categories/page.tsx",
+    "docs/architecture/whisky-identity-model.md",
+    "packages/bottle-classifier/src/bottleClassificationEvidence.test.ts",
+    "packages/bottle-classifier/src/bottleClassificationEvidence.ts"
+  ],
+  "commitSha": "b727e347b88c447bae8ba509ec5691e58246f959",
+  "scenarioIds": [
+    "home",
+    "bottle-detail",
+    "member-profile",
+    "add-tasting"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    },
+    {
+      "file": "add-tasting__desktop.png",
+      "label": "Log a tasting · desktop"
+    },
+    {
+      "file": "add-tasting__mobile.png",
+      "label": "Log a tasting · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
