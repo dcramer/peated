@@ -76,6 +76,7 @@ export function FilterQuery({
         <span {...stylex.props(styles.heading)}>{label}</span>
         <TextInput
           aria-label={label}
+          controlSize="sm"
           id={id}
           onChange={(event) =>
             setDraft({ source: query, value: event.currentTarget.value })

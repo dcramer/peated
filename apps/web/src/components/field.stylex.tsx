@@ -107,26 +107,33 @@ export function FieldGroup({
 }
 
 type InputFormat = "text" | "data";
+type InputSize = "sm" | "md" | "lg";
 
 export type TextInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "className" | "style"
 > & {
+  controlSize?: InputSize;
   format?: InputFormat;
   invalid?: boolean;
 };
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  function TextInput({ format = "text", invalid = false, ...props }, ref) {
+  function TextInput(
+    { controlSize = "lg", format = "text", invalid = false, ...props },
+    ref,
+  ) {
     return (
       <input
         {...props}
         aria-invalid={invalid || undefined}
         data-format={format}
+        data-size={controlSize}
         ref={ref}
         {...stylex.props(
           styles.control,
           styles.input,
+          inputSizeStyles[controlSize],
           format === "data" && styles.data,
           invalid && styles.invalid,
         )}
@@ -228,7 +235,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: {
-      default: colors.fieldRule,
+      default: colors.sectionRule,
       ":hover": colors.inkMuted,
       ":focus": colors.accent,
     },
@@ -253,9 +260,17 @@ const styles = stylex.create({
     },
   },
   input: {
-    height: controlMetrics.controlHeightLarge,
     paddingRight: "13px",
     paddingLeft: "13px",
+  },
+  inputSmall: {
+    height: controlMetrics.controlHeightSmall,
+  },
+  inputMedium: {
+    height: controlMetrics.controlHeight,
+  },
+  inputLarge: {
+    height: controlMetrics.controlHeightLarge,
   },
   textarea: {
     minHeight: "96px",
@@ -288,3 +303,9 @@ const styles = stylex.create({
     fontWeight: 600,
   },
 });
+
+const inputSizeStyles = {
+  sm: styles.inputSmall,
+  md: styles.inputMedium,
+  lg: styles.inputLarge,
+} satisfies Record<InputSize, stylex.StyleXStyles>;
