@@ -8,7 +8,8 @@
  * research and a regression test before they belong here; otherwise leave
  * the value unknown and let the web-enabled classifier decide.
  */
-import { CATEGORY_LIST, CategoryEnum } from "./classifierTypes";
+import type { CATEGORY_LIST } from "./classifierTypes";
+import { CategoryEnum } from "./classifierTypes";
 
 const ageSuffix = "-year-old";
 
@@ -60,34 +61,28 @@ export function normalizeString(value: string): string {
     .replace(/[\u00ae\u2122]/g, "");
 }
 
-function formatCategoryNameForMatch(
-  category: (typeof CATEGORY_LIST)[number],
-): string {
-  return category.replace(/_/g, " ");
-}
-
 export function normalizeCategory(
   name: string,
 ): (typeof CATEGORY_LIST)[number] | null {
-  const normalizedName = name.toLowerCase();
+  const normalizedName = name.toLowerCase().trim();
   const category = CategoryEnum.safeParse(normalizedName);
   if (category.success) return category.data;
 
-  if (
-    normalizedName.startsWith("single malt") ||
-    normalizedName.endsWith("single malt")
-  ) {
-    return "single_malt";
-  }
-
-  if (/\bsingle pot still\b/.test(normalizedName)) {
-    return "single_pot_still";
-  }
-
-  for (const category of CATEGORY_LIST) {
-    if (normalizedName.startsWith(formatCategoryNameForMatch(category))) {
-      return category;
-    }
+  // These matches normalize explicit, researched style names only. Local legal
+  // definitions still decide whether a producer may use the style. The specific
+  // grain style wins when a label also says that the whisky is blended.
+  // Sources: 27 CFR 5.143 and World Whiskies Awards 2026 definitions.
+  if (/\bblended malt\b/u.test(normalizedName)) return "blended_malt";
+  if (/\bblended grain\b/u.test(normalizedName)) return "blended_grain";
+  if (/\bsingle pot still\b/u.test(normalizedName)) return "single_pot_still";
+  if (/\bsingle malt\b/u.test(normalizedName)) return "single_malt";
+  if (/\bsingle grain\b/u.test(normalizedName)) return "single_grain";
+  if (/\bbourbon\b/u.test(normalizedName)) return "bourbon";
+  if (/\bcorn whisk(?:e?y|eys|ies)\b/u.test(normalizedName)) return "corn";
+  if (/\brye whisk(?:e?y|eys|ies)\b/u.test(normalizedName)) return "rye";
+  if (/\bwheat whisk(?:e?y|eys|ies)\b/u.test(normalizedName)) return "wheat";
+  if (/\bblend(?:ed)? whisk(?:e?y|eys|ies)\b/u.test(normalizedName)) {
+    return "blend";
   }
 
   return null;

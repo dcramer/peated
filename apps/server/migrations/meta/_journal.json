@@ -1793,6 +1793,13 @@
       "when": 1788189338433,
       "tag": "0255_smart_newton_destine",
       "breakpoints": false
+    },
+    {
+      "idx": 256,
+      "version": "7",
+      "when": 1788194149105,
+      "tag": "0256_exotic_leo",
+      "breakpoints": false
     }
   ]
 }

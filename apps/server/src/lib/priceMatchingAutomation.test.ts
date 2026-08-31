@@ -389,7 +389,7 @@ describe("priceMatchingAutomation", () => {
     ).toBe(true);
   });
 
-  test("does not let the legacy generic spirit category block a reviewed existing match", () => {
+  test("does not let an unknown category block a reviewed existing match", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",
       modelConfidence: 97,
@@ -416,7 +416,7 @@ describe("priceMatchingAutomation", () => {
           fullName: "Shibui Grain Select",
           brand: "Shibui",
           distillery: [],
-          category: "spirit",
+          category: null,
           statedAge: null,
           abv: null,
           maturation: null,
@@ -491,7 +491,7 @@ describe("priceMatchingAutomation", () => {
           reference: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
-          category: "spirit",
+          category: null,
           statedAge: null,
           abv: null,
           maturation: null,
@@ -571,7 +571,7 @@ describe("priceMatchingAutomation", () => {
           reference: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
-          category: "spirit",
+          category: null,
           statedAge: null,
           abv: null,
           maturation: null,
@@ -641,7 +641,7 @@ describe("priceMatchingAutomation", () => {
           reference: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
-          category: "spirit",
+          category: null,
           statedAge: null,
           abv: null,
           maturation: null,

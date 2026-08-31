@@ -456,9 +456,7 @@ function evidenceTextSupportsPlainAgeStatementTarget({
     return false;
   }
 
-  const expectedCategory = normalizeComparableCategory(
-    extractedLabel?.category ?? null,
-  );
+  const expectedCategory = extractedLabel?.category ?? null;
   if (!expectedCategory) {
     return true;
   }
@@ -468,23 +466,23 @@ function evidenceTextSupportsPlainAgeStatementTarget({
 
 function getCategoryKeywords(value: string): string[] {
   switch (value) {
+    case "blend":
+      return ["blended whisky", "blended whiskey"];
+    case "corn":
+      return ["corn whisky", "corn whiskey"];
+    case "rye":
+      return ["rye whisky", "rye whiskey"];
     case "single_malt":
       return ["single malt"];
     case "single_grain":
       return ["single grain"];
     case "single_pot_still":
       return ["single pot still"];
+    case "wheat":
+      return ["wheat whisky", "wheat whiskey"];
     default:
       return [value.replace(/_/g, " ")];
   }
-}
-
-// The legacy `spirit` bucket is a fallback for missing whisky category data,
-// so it should not count as either supportive identity evidence or a conflict.
-function normalizeComparableCategory(
-  value: BottleCandidate["category"] | null,
-) {
-  return value === "spirit" ? null : value;
 }
 
 function attributeMatchesText(
@@ -669,12 +667,8 @@ function buildExistingMatchSupportChecks({
   const checks: EvidenceCheck[] = [];
   const differentiatingAttributes = new Set<MatchAttribute>();
   const label = extractedLabel;
-  const comparableLabelCategory = normalizeComparableCategory(
-    label?.category ?? null,
-  );
-  const comparableTargetCategory = normalizeComparableCategory(
-    target.category ?? null,
-  );
+  const comparableLabelCategory = label?.category ?? null;
+  const comparableTargetCategory = target.category ?? null;
 
   if (label?.brand && candidateMatchesBrand(target, label.brand)) {
     addCheckIfPresent(checks, "brand", label.brand, false);
@@ -1113,12 +1107,8 @@ export function getExistingMatchIdentityConflicts({
   }
 
   const conflicts: string[] = [];
-  const comparableExtractedCategory = normalizeComparableCategory(
-    extractedLabel.category ?? null,
-  );
-  const comparableTargetCategory = normalizeComparableCategory(
-    target.category ?? null,
-  );
+  const comparableExtractedCategory = extractedLabel.category ?? null;
+  const comparableTargetCategory = target.category ?? null;
 
   if (
     extractedLabel.bottler &&

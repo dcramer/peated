@@ -392,14 +392,14 @@ describe("priceMatchingEvidence", () => {
     );
   });
 
-  test("does not treat the legacy generic spirit category as an existing-match conflict", () => {
+  test("does not treat an unknown category as an existing-match conflict", () => {
     expect(
       getExistingMatchIdentityConflicts({
         target: buildBottleCandidate({
           bottleId: 13025,
           fullName: "Shibui Grain Select",
           brand: "Shibui",
-          category: "spirit",
+          category: null,
           source: ["brand", "exact"],
         }),
         extractedLabel: buildExtractedLabel({

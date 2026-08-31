@@ -135,7 +135,7 @@ describe("GET /entities/:entity/categories", () => {
       name: "Retirement Destination Identity",
       brandId: otherEntity.id,
       distillerIds: [otherEntity.id],
-      category: "spirit",
+      category: null,
     });
     if (
       groupOnlyBottle.groupId === null ||

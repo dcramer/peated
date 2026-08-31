@@ -65,6 +65,31 @@ There is no parent-versus-release creation decision and no `repair_parent`
 workflow. Discovering another release does not change an existing Bottle's
 identity.
 
+## Whisky Categories
+
+Category records one normalized production style. Country and region remain
+separate facts. Use the most specific recognized local style. If local law does
+not define the style, use the baseline in `/about/categories`. Leave category
+null when the evidence does not establish one.
+
+The supported categories are Blended Whisky, Blended Grain, Blended Malt,
+Bourbon, Corn Whisky, Rye Whisky, Single Grain, Single Malt, Single Pot Still,
+and Wheat Whisky. Do not use a region, a country, or a generic spirit value as a
+category.
+
+Use this precedence when 2 descriptions apply:
+
+1. Bourbon takes precedence over Corn Whisky.
+2. Rye, Corn Whisky, and Wheat Whisky take precedence over Blended Whisky and
+   grain categories.
+3. Blended Malt and Blended Grain take precedence over Blended Whisky.
+4. Single Malt and Single Pot Still take precedence over Single Grain.
+
+These rules follow the overlapping blend and named-grain types in
+[27 CFR 5.143](https://www.ecfr.gov/current/title-27/chapter-I/subchapter-A/part-5/subpart-I/section-5.143)
+and the global baseline and local-rule precedence in the
+[World Whiskies Awards definitions](https://www.worldwhiskiesawards.com/shares/WWA_Categories_2026-Category-Definitions.pdf).
+
 ## Field Ownership
 
 BottleGroup owns shared editing semantics for:

@@ -76,12 +76,6 @@ const runBottleCandidateQuery: BottleCandidateQueryRunner = async (query) => {
   return result.rows;
 };
 
-function normalizeMatchCategory<T extends BottleCandidate["category"]>(
-  category: T,
-) {
-  return category === "spirit" ? null : category;
-}
-
 type BottleCandidateSearchInputRequest = z.input<
   typeof BottleCandidateSearchInputSchema
 >;
@@ -154,7 +148,7 @@ function buildSearchLabel(
     expression: input.expression,
     series: input.series,
     distillery: input.distillery,
-    category: normalizeMatchCategory(input.category),
+    category: input.category,
     stated_age: input.stated_age,
     abv: input.abv,
     release_year: input.release_year,
@@ -500,10 +494,7 @@ function getStructuredCandidateAdjustment(
   }
 
   if (extractedLabel.category && candidate.category) {
-    adjustment +=
-      candidate.category === normalizeMatchCategory(extractedLabel.category)
-        ? 0.03
-        : -0.06;
+    adjustment += candidate.category === extractedLabel.category ? 0.03 : -0.06;
   }
 
   if (extractedLabel.stated_age !== null && candidate.statedAge !== null) {
@@ -1280,7 +1271,7 @@ async function findBottleReferenceCandidatesWithEmbedding(
       expression: extractedLabel?.expression ?? null,
       series: extractedLabel?.series ?? null,
       distillery: extractedLabel?.distillery ?? [],
-      category: normalizeMatchCategory(extractedLabel?.category ?? null),
+      category: extractedLabel?.category ?? null,
       stated_age: extractedLabel?.stated_age ?? null,
       abv: extractedLabel?.abv ?? null,
       maturation: extractedLabel?.maturation ?? null,

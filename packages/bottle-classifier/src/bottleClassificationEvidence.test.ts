@@ -629,7 +629,7 @@ describe("bottleClassificationEvidence", () => {
     ).toContain("edition");
   });
 
-  test("does not treat the legacy generic spirit category as a hard existing-match conflict", () => {
+  test("does not treat an unknown category as a hard existing-match conflict", () => {
     expect(
       getExistingMatchIdentityConflicts({
         referenceName: "Shibui Grain Select Whisky 750ml",
@@ -655,7 +655,7 @@ describe("bottleClassificationEvidence", () => {
           bottleId: 13025,
           fullName: "Shibui Grain Select",
           brand: "Shibui",
-          category: "spirit",
+          category: null,
           source: ["brand", "exact"],
         }),
       }),

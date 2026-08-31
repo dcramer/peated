@@ -2180,7 +2180,7 @@ describe("priceMatching", () => {
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
       name: "Table Whiskey",
-      category: "spirit",
+      category: null,
       statedAge: null,
       abv: null,
       distillerIds: [],
@@ -2229,7 +2229,7 @@ describe("priceMatching", () => {
             bottler: null,
             series: null,
             distillery: [],
-            category: "spirit",
+            category: null,
             statedAge: null,
             edition: null,
             caskStrength: null,
@@ -2271,7 +2271,7 @@ describe("priceMatching", () => {
     });
     expect(updatedPrice?.bottleId).toBe(bottle.id);
     expect(updatedBottle).toMatchObject({
-      category: "spirit",
+      category: null,
       statedAge: null,
       abv: null,
     });

@@ -1,0 +1,11 @@
+UPDATE "public"."bottle_group" SET "category" = NULL WHERE "category" = 'spirit';
+UPDATE "public"."bottle" SET "category" = NULL WHERE "category" = 'spirit';
+UPDATE "public"."review" SET "category" = NULL WHERE "category" = 'spirit';
+ALTER TABLE "public"."bottle_group" ALTER COLUMN "category" SET DATA TYPE text;
+ALTER TABLE "public"."bottle" ALTER COLUMN "category" SET DATA TYPE text;
+ALTER TABLE "public"."review" ALTER COLUMN "category" SET DATA TYPE text;
+DROP TYPE "public"."category";
+CREATE TYPE "public"."category" AS ENUM('blend', 'blended_grain', 'blended_malt', 'bourbon', 'corn', 'rye', 'single_grain', 'single_malt', 'single_pot_still', 'wheat');
+ALTER TABLE "public"."bottle_group" ALTER COLUMN "category" SET DATA TYPE "public"."category" USING "category"::"public"."category";
+ALTER TABLE "public"."bottle" ALTER COLUMN "category" SET DATA TYPE "public"."category" USING "category"::"public"."category";
+ALTER TABLE "public"."review" ALTER COLUMN "category" SET DATA TYPE "public"."category" USING "category"::"public"."category";

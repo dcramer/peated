@@ -22,6 +22,7 @@ describe("smws", () => {
 
   test("maps SMWS cask codes to categories", () => {
     expect(getCategoryFromCask("RW3.6")).toBe("rye");
+    expect(getCategoryFromCask("CW1.4")).toBe("corn");
     expect(getCategoryFromCask("41.176")).toBe("single_malt");
     expect(getCategoryFromCask("R2.19")).toBeNull();
     expect(getCategoryFromCask("A5.6")).toBeNull();
