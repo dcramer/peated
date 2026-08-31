@@ -31,12 +31,12 @@ export function EntitySiblingOverview({
 
   const heading = entity.owner?.name
     ? `Also part of ${entity.owner.name}`
-    : "Related brands and producers";
+    : "Other distilleries and bottlers";
 
   if (pending) {
     return (
       <PageSection heading={heading}>
-        <LoadingList label="Loading related brands and producers" rows={3} />
+        <LoadingList label="Loading distilleries and bottlers" rows={3} />
       </PageSection>
     );
   }
@@ -45,10 +45,10 @@ export function EntitySiblingOverview({
     return (
       <PageSection heading={heading}>
         <SectionError
-          heading="Related brands and producers are unavailable"
+          heading="Could not load distilleries and bottlers"
           onRetry={retry}
         >
-          Try loading the related brands and producers again.
+          Try again.
         </SectionError>
       </PageSection>
     );

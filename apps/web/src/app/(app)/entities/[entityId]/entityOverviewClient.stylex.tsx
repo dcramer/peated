@@ -88,6 +88,7 @@ export function EntityOverviewClient({
   const siblingListQuery = useQuery({
     ...orpc.entities.list.queryOptions({
       input: {
+        kinds: ["distillery", "bottler"],
         limit: 5,
         owner: initialEntity.ownerId ?? undefined,
         sort: "-bottles",
