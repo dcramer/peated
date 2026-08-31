@@ -3,6 +3,7 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityMergeSchema } from "@peated/server/schemas";
 import {
+  Checkbox,
   ChoiceList,
   FieldGroup,
   FormNotice,
@@ -51,6 +52,8 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
   );
   const [query, setQuery] = useState("");
   const [other, setOther] = useState<SearchPickerOption | null>(null);
+  const [direction, setDirection] =
+    useState<FormSchemaType["direction"]>("mergeInto");
   const [submitError, setSubmitError] = useState<string>();
   const noun = toTitleCase(entity.kind ?? "producer");
   const results = useQuery(
@@ -77,7 +80,7 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
     formState: { errors, isSubmitting },
     handleSubmit,
   } = useForm<FormSchemaType>({
-    defaultValues: { direction: "mergeInto" },
+    defaultValues: { direction: "mergeInto", keepRetiredName: false },
     resolver: zodResolver(EntityMergeSchema),
   });
 
@@ -87,6 +90,7 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
       const nextEntity = await merge.mutateAsync({
         direction: data.direction,
         entity: entity.id,
+        keepRetiredName: data.keepRetiredName,
         other: data.entityId,
       });
       flash(
@@ -160,7 +164,13 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
                   id="entity-merge-direction"
                   label="Record to keep"
                   name={field.name}
-                  onChange={field.onChange}
+                  onChange={(value) => {
+                    const { direction: nextDirection } = EntityMergeSchema.pick(
+                      { direction: true },
+                    ).parse({ direction: value });
+                    field.onChange(nextDirection);
+                    setDirection(nextDirection);
+                  }}
                   options={[
                     {
                       description: other
@@ -180,6 +190,38 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
                   value={field.value}
                 />
               )}
+            />
+          </FormSection>
+          <FormSection title="Retired name">
+            <Controller
+              control={control}
+              name="keepRetiredName"
+              render={({ field }) => {
+                const retiredName =
+                  direction === "mergeInto" ? entity.name : other?.label;
+                const keptName =
+                  direction === "mergeInto" ? other?.label : entity.name;
+                return (
+                  <Checkbox
+                    checked={field.value}
+                    description={
+                      retiredName
+                        ? `${retiredName} will still work in search if you leave this off.`
+                        : "The retired name will still work in search if you leave this off."
+                    }
+                    label={
+                      retiredName && keptName
+                        ? `Keep ${retiredName} as another name for ${keptName}`
+                        : "Keep the retired name as another name"
+                    }
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    onChange={(event) =>
+                      field.onChange(event.currentTarget.checked)
+                    }
+                  />
+                );
+              }}
             />
           </FormSection>
         </FormStack>

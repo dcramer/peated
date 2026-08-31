@@ -8,6 +8,7 @@ export const LegacyEntityMergeJobInputSchema = z
   .object({
     toEntityId: PositiveIdSchema,
     fromEntityIds: z.array(PositiveIdSchema).nonempty(),
+    keepRetiredName: z.boolean().default(false),
   })
   .strict();
 

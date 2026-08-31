@@ -192,4 +192,5 @@ export const EntityMergeSchema = z.object({
   direction: z
     .enum(["mergeInto", "mergeFrom"])
     .describe("Direction of the merge operation"),
+  keepRetiredName: z.boolean().default(false),
 });

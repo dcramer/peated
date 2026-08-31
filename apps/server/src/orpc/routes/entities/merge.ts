@@ -24,6 +24,7 @@ export default procedure
       entity: z.coerce.number(),
       other: z.number(),
       direction: z.enum(["mergeInto", "mergeFrom"]).default("mergeInto"),
+      keepRetiredName: z.boolean().default(false),
     }),
   )
   .output(EntitySchema)
@@ -64,6 +65,7 @@ export default procedure
     await pushJob("MergeEntity", {
       toEntityId: toEntity.id,
       fromEntityIds: [fromEntity.id],
+      keepRetiredName: input.keepRetiredName,
     });
 
     return await serialize(EntitySerializer, toEntity, context.user);
