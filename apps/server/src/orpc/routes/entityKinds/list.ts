@@ -161,13 +161,19 @@ export async function listEntities({
       orderBy = desc(entities.totalTastings);
   }
 
-  const results = await db
-    .select()
-    .from(entities)
-    .where(and(...where))
-    .limit(limit + 1)
-    .offset(offset)
-    .orderBy(orderBy, asc(entities.id));
+  const [results, [totalRow]] = await Promise.all([
+    db
+      .select()
+      .from(entities)
+      .where(and(...where))
+      .limit(limit + 1)
+      .offset(offset)
+      .orderBy(orderBy, asc(entities.id)),
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(entities)
+      .where(and(...where)),
+  ]);
 
   return {
     results: await serialize(
@@ -175,6 +181,7 @@ export async function listEntities({
       results.slice(0, limit),
       currentUser,
     ),
+    total: Number(totalRow?.count ?? 0),
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,
       prevCursor: cursor > 1 ? cursor - 1 : null,

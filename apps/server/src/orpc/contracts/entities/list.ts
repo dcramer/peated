@@ -1,8 +1,10 @@
-import { EntitySchema, listResponse } from "@peated/server/schemas";
 import { EntityKindEnum } from "@peated/server/schemas/common";
 import { z } from "zod";
 import { contract } from "../base";
-import { EntityKindListInputSchema } from "../entityKinds/list";
+import {
+  EntityKindListInputSchema,
+  EntityKindListOutputSchema,
+} from "../entityKinds/list";
 
 export const EntityListInputSchema = EntityKindListInputSchema.unwrap()
   .extend({
@@ -30,4 +32,4 @@ export default contract
     operationId: "listEntities",
   })
   .input(EntityListInputSchema)
-  .output(listResponse(EntitySchema));
+  .output(EntityKindListOutputSchema);

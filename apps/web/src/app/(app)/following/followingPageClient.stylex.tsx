@@ -17,6 +17,7 @@ import { EntityCatalogList } from "@peated/web/components/pages/entityCatalog.st
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { toEntityCatalogItem } from "@peated/web/lib/entityCatalogItem";
+import { filterFollowingEntities } from "@peated/web/lib/entityFollowing";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
 import { getFollowingPageState } from "./followingPageData";
@@ -55,11 +56,11 @@ export function FollowingPageClient({
   });
   const followingHref = getViewHref(pathname, searchParams, "following");
   const findHref = getViewHref(pathname, searchParams, "find");
-  const visibleEntities =
+  const visibleList =
     state.view === "following"
-      ? entityList.results.filter(followControls.isFollowing)
-      : entityList.results;
-  const items = visibleEntities.map((entity) =>
+      ? filterFollowingEntities(entityList, followControls.isFollowing)
+      : entityList;
+  const items = visibleList.results.map((entity) =>
     toEntityCatalogItem(entity, followControls.isFollowing(entity)),
   );
 
@@ -163,6 +164,7 @@ export function FollowingPageClient({
         showFollowingMarks={state.view === "find"}
         sort={state.sort}
         sortOptions={sortOptions}
+        total={visibleList.total}
       />
     </CatalogPage>
   );
