@@ -104,6 +104,41 @@ test("scrapes every supported whisky type and excludes ineligible records", asyn
   ]);
 });
 
+test("uses a saved release without fetching its product page", async ({
+  axiosMock,
+}) => {
+  const result = await loadFixture("singlecasknation", "bottle-list.json");
+  axiosMock.onGet(firstPageUrl).reply(200, result);
+  mockProductPages(axiosMock);
+
+  const releases: Array<
+    [number | null | undefined, number | null | undefined]
+  > = [];
+  const loadedProductIds: string[][] = [];
+  await scrapeProducts(
+    firstPageUrl,
+    async (item) => {
+      const identity = StorePriceInputSchema.parse(item).sourceBottleIdentity;
+      releases.push([identity?.release_year, identity?.release_month]);
+    },
+    async (externalProductIds) => {
+      loadedProductIds.push(externalProductIds);
+      return new Map([
+        ["9031243464902", { releaseYear: 2025, releaseMonth: 11 }],
+      ]);
+    },
+  );
+
+  expect(loadedProductIds).toEqual([["9031243464902"]]);
+  expect(releases[0]).toEqual([2025, 11]);
+  expect(
+    axiosMock.history.get.some(
+      ({ url }: { url?: string }) =>
+        url === "https://singlecasknation.com/products/rock-town-10-year-old",
+    ),
+  ).toBe(false);
+});
+
 test("rejects malformed Shopify payloads", async ({ axiosMock }) => {
   axiosMock.onGet(firstPageUrl).reply(200, {
     products: [{ title: "Broken" }],

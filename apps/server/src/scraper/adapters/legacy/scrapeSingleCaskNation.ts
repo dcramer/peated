@@ -46,6 +46,17 @@ const RELEASE_MONTHS = new Map(
   ].map((name, index) => [name.toLowerCase(), index + 1]),
 );
 
+type Release = {
+  releaseYear: number;
+  releaseMonth: number;
+};
+
+type LoadReleases = (
+  externalProductIds: string[],
+) => Promise<Map<string, Release>>;
+
+const noSavedReleases: LoadReleases = async () => new Map();
+
 const SingleCaskNationProductSchema = ShopifyProductSchema.extend({
   product_type: z.string(),
   images: z.array(ShopifyImageSchema),
@@ -75,8 +86,14 @@ export function parseReleaseMonth(input: string) {
 async function parseSingleCaskNationProducts(
   input: JsonValue,
   sourceUrl: string,
+  loadReleases: LoadReleases,
 ): Promise<StorePrice[]> {
   const payload = SingleCaskNationProductsSchema.parse(input);
+  const savedReleases = await loadReleases(
+    payload.products.flatMap((product) =>
+      product.id === undefined ? [] : [String(product.id)],
+    ),
+  );
   const products = await Promise.all(
     payload.products.map(async (product): Promise<StorePrice | null> => {
       const category = CATEGORY_BY_PRODUCT_TYPE.get(product.product_type);
@@ -97,9 +114,18 @@ async function parseSingleCaskNationProducts(
         sourceUrl,
         `/products/${encodeURIComponent(product.handle)}`,
       );
-      const release = parseReleaseMonth(await getUrl(productUrl));
+      const shopifyIdentity = getShopifyStorePriceIdentity(
+        product,
+        pricedVariant,
+      );
+      let release: Release | null | undefined =
+        shopifyIdentity.externalProductId
+          ? savedReleases.get(shopifyIdentity.externalProductId)
+          : undefined;
+      // A saved release date does not change. Fetch the page until we have one.
+      if (!release) release = parseReleaseMonth(await getUrl(productUrl));
       const listing: StorePrice = {
-        ...getShopifyStorePriceIdentity(product, pricedVariant),
+        ...shopifyIdentity,
         name,
         price: pricedVariant.parsedPrice,
         currency: "usd",
@@ -125,22 +151,31 @@ async function parseSingleCaskNationProducts(
   return products.filter((product): product is StorePrice => product !== null);
 }
 
-export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
+export async function scrapeProducts(
+  url: string,
+  cb: ScrapePricesCallback,
+  loadReleases: LoadReleases = noSavedReleases,
+) {
   const data = await getUrl(url);
   const catalog = ShopifyCatalogSchema.parse(JSON.parse(data));
-  const products = await parseSingleCaskNationProducts(catalog, url);
+  const products = await parseSingleCaskNationProducts(
+    catalog,
+    url,
+    loadReleases,
+  );
   await Promise.all(products.map(cb));
   return { hasSourceProducts: catalog.products.length > 0 };
 }
 
-export default async function scrapeSingleCaskNation({
-  dryRun = false,
-}: { dryRun?: boolean } = {}) {
+export default async function scrapeSingleCaskNation(
+  { dryRun = false }: { dryRun?: boolean } = {},
+  loadReleases: LoadReleases = noSavedReleases,
+) {
   return await scrapePrices(
     SITE,
     (page) =>
       `${STORE_ORIGIN}/collections/frontpage/products.json?limit=250&page=${page}&country=US`,
-    scrapeProducts,
+    (url, cb) => scrapeProducts(url, cb, loadReleases),
     { dryRun },
   );
 }

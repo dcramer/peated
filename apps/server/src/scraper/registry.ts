@@ -89,6 +89,7 @@ import {
   defineScraperSource,
   defineScrapeTarget,
 } from "./definitions";
+import { loadSingleCaskNationReleases } from "./singleCaskNationReleases";
 import { bottleObservationSink } from "./sinks/bottles";
 import { externalReviewSink } from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
@@ -195,7 +196,8 @@ const legacyPriceSources = [
   {
     type: "singlecasknation",
     origin: "https://singlecasknation.com",
-    scrape: scrapeSingleCaskNation,
+    scrape: (options?: { dryRun?: boolean }) =>
+      scrapeSingleCaskNation(options, loadSingleCaskNationReleases),
   },
   {
     type: "thompsonbros",
