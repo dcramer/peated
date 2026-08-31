@@ -5,9 +5,10 @@ import { colors, space } from "../../../../styles/tokens.stylex";
 import type { Entity } from "./entityPageData";
 
 export function EntityImageGallery({ entity }: { entity: Entity }) {
-  if (!entity.images.length) return null;
+  const images = entity.images ?? [];
+  if (!images.length) return null;
 
-  const [primary, ...otherImages] = entity.images;
+  const [primary, ...otherImages] = images;
 
   return (
     <section

@@ -139,7 +139,7 @@ export function EntityOverviewClient({
       </div>
 
       <aside {...stylex.props(styles.details)}>
-        {entity.images.length ? (
+        {entity.images?.length ? (
           <EntityImageGallery entity={entity} />
         ) : (
           <EntityImagePlaceholder entityName={entity.name} kind={entity.kind} />

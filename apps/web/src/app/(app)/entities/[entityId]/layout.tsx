@@ -13,7 +13,8 @@ export async function generateMetadata(props: {
   const { entityId } = await props.params;
   const entity = await getEntityPage(Number(entityId));
   const description = summarize(entity.description || "", 200);
-  const images = entity.images[0] ? [entity.images[0].imageUrl] : [];
+  const primaryImage = entity.images?.[0];
+  const images = primaryImage ? [primaryImage.imageUrl] : [];
 
   return {
     title: entity.name,
@@ -41,7 +42,7 @@ export default async function EntityLayout(props: {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: entity.name,
-    image: entity.images[0]?.imageUrl,
+    image: entity.images?.[0]?.imageUrl,
     description: entity.description ?? undefined,
     address: entity.country
       ? [
