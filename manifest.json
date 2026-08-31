@@ -1,0 +1,50 @@
+{
+  "changedFiles": [
+    "apps/web/src/app/(app)/entities/[entityId]/entityDetails.stylex.tsx",
+    "apps/web/src/app/(app)/locations/locationPageFrame.stylex.tsx",
+    "apps/web/src/components/pages/pageLayout.stylex.tsx"
+  ],
+  "commitSha": "901bf8dfca560667dd22c52e0a76c2bcd0369d43",
+  "scenarioIds": [
+    "home",
+    "bottle-detail",
+    "region-detail",
+    "member-profile"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "region-detail__desktop.png",
+      "label": "Region detail · desktop"
+    },
+    {
+      "file": "region-detail__mobile.png",
+      "label": "Region detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
