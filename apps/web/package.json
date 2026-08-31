@@ -20,6 +20,8 @@
     "test:e2e:report": "playwright show-report .playwright/report",
     "test:e2e:ui": "playwright test --ui",
     "visual:capture": "node visual/capture.mjs",
+    "visual:diff": "node visual/diff/cli.mjs",
+    "visual:diff:build-action": "ncc build visual/diff/action.mjs -o ../../.github/actions/visual-diff/dist --minify --license THIRD_PARTY_LICENSES.txt",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -76,8 +78,11 @@
     "@types/pica": "^9.0.4",
     "@types/react": "^19.2.17",
     "@types/react-dom": "catalog:",
+    "@vercel/ncc": "^0.45.0",
     "@vitejs/plugin-react": "^6.1.1",
     "jsdom": "25.0.1",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
     "postcss": "^8.5.18",
     "postcss-import": "^16.1.1",
     "react-docgen-typescript": "2.4.0",
