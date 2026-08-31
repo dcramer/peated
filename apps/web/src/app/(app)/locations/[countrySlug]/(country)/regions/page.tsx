@@ -3,8 +3,16 @@ import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 
+import { REGION_LIST_SORT_OPTIONS } from "@peated/server/constants";
 import { LocationTable } from "../../../locationLists";
 
+const REGION_QUERY_FIELDS = [
+  "cursor",
+  "hasBottles",
+  "limit",
+  "query",
+  "sort",
+] as const;
 export default async function CountryRegionsPage(props: {
   params: Promise<{ countrySlug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -15,6 +23,8 @@ export default async function CountryRegionsPage(props: {
   ]);
   const queryParams = getApiQueryParams(searchParams, {
     defaults: { sort: "-bottles" },
+    allowedValues: { sort: REGION_LIST_SORT_OPTIONS },
+    fields: REGION_QUERY_FIELDS,
     numericFields: ["cursor", "limit"],
     overrides: { country: countrySlug, limit: 100 },
   });

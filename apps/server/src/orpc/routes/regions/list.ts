@@ -55,6 +55,12 @@ export default implement(regionListContract).handler(async function ({
     case "-bottles":
       orderBy = desc(regions.totalBottles);
       break;
+    case "distillers":
+      orderBy = asc(regions.totalDistillers);
+      break;
+    case "-distillers":
+      orderBy = desc(regions.totalDistillers);
+      break;
   }
 
   const results = await db

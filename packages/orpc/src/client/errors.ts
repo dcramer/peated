@@ -17,9 +17,17 @@ export function isORPCNotFoundError(
   );
 }
 
+export function isRequestAbort(error: ClientErrorCandidate): boolean {
+  return error instanceof Error && error.name === "AbortError";
+}
+
 export function shouldCaptureORPCClientError(
   error: ClientErrorCandidate,
 ): boolean {
+  if (isRequestAbort(error)) {
+    return false;
+  }
+
   if (!isORPCClientError(error)) {
     return true;
   }

@@ -17,7 +17,11 @@ import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
-import { normalizeBottleCatalogQueryParams } from "@peated/web/lib/bottleCatalogQueryParams";
+import {
+  BOTTLE_CATALOG_ALLOWED_VALUES,
+  BOTTLE_CATALOG_QUERY_FIELDS,
+  normalizeBottleCatalogQueryParams,
+} from "@peated/web/lib/bottleCatalogQueryParams";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
@@ -81,6 +85,8 @@ export function BottleCatalogPageClient({
   const searchParams = useSearchParams();
   const queryParams = normalizeBottleCatalogQueryParams(
     useApiQueryParams({
+      allowedValues: BOTTLE_CATALOG_ALLOWED_VALUES,
+      fields: BOTTLE_CATALOG_QUERY_FIELDS,
       numericFields: [
         "age",
         "brand",
@@ -100,7 +106,7 @@ export function BottleCatalogPageClient({
     initialData: initialBottleList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
-  const sort = searchParams.get("sort") ?? DEFAULT_SORT;
+  const sort = String(queryParams.sort ?? DEFAULT_SORT);
   const filter =
     searchParams.get("filter") === "following" ? "following" : "all";
   const allHref = getScopeHref(pathname, searchParams, "all");
