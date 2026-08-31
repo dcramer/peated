@@ -18,6 +18,14 @@ const meta = {
       options: ["default", "tonal", "accent", "text"],
     },
   },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use Button for actions and ButtonLink for navigation with the same treatment. Choose one accent action per view; use default or tonal variants for supporting actions.",
+      },
+    },
+  },
 } satisfies Meta<typeof Button>;
 
 export default meta;

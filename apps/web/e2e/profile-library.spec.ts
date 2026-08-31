@@ -175,7 +175,10 @@ function libraryBottleLink(page: Page, bottleId: number) {
 }
 
 function libraryBottleRow(page: Page, bottleId: number) {
-  return page.locator("li").filter({
-    has: page.locator(`a[href="/bottles/${bottleId}"]`),
-  });
+  return page
+    .locator("li")
+    .filter({
+      has: page.locator(`a[href="/bottles/${bottleId}"]`),
+    })
+    .filter({ visible: true });
 }

@@ -323,6 +323,8 @@ const styles = stylex.create({
     },
   },
   end: {
+    position: "relative",
+    zIndex: 2,
     display: "flex",
     flexShrink: 0,
     alignItems: "center",

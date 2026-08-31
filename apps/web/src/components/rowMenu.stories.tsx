@@ -28,6 +28,14 @@ const meta = {
       </StoryCanvas>
     ),
   ],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use Row Menu for secondary actions on one item. Keep the primary destination on the row and put only secondary actions in the menu.",
+      },
+    },
+  },
 } satisfies Meta<typeof RowMenu>;
 
 export default meta;

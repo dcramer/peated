@@ -10,6 +10,7 @@ import { StorybookTheme } from "./storybookTheme.stylex";
 import { peatedViewports } from "./viewports";
 
 const preview: Preview = {
+  tags: ["autodocs"],
   globalTypes: {
     theme: {
       description: "Color scheme",

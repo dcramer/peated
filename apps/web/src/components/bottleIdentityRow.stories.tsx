@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
+import { RowMenu } from "./rowMenu.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
@@ -22,6 +23,14 @@ const meta = {
     imageUrl: BottleImage.src,
     metadata: ["Single malt", "Islay"],
     name: "Elements L 2.0",
+  },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use Bottle Identity Row in bottle lists. The bottle name is the primary destination; brand, related-release, and row-action controls remain independently interactive.",
+      },
+    },
   },
 } satisfies Meta<typeof BottleIdentityRow>;
 
@@ -53,6 +62,25 @@ export const Overview: Story = {
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow {...args} hasTasted />
+      </ItemListItem>
+      <ItemListItem>
+        <BottleIdentityRow
+          {...args}
+          end={
+            <RowMenu
+              groups={[
+                [
+                  {
+                    label: "Remove from library",
+                    onSelect: () => undefined,
+                  },
+                ],
+              ]}
+              label={args.name}
+            />
+          }
+          isLibrary
+        />
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow

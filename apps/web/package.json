@@ -65,6 +65,7 @@
     "@peated/tsconfig": "workspace:*",
     "@playwright/test": "catalog:",
     "@storybook/addon-a11y": "10.5.10",
+    "@storybook/addon-docs": "10.5.10",
     "@storybook/addon-mcp": "0.7.0",
     "@storybook/nextjs-vite": "10.5.10",
     "@stylexjs/unplugin": "0.19.0",
