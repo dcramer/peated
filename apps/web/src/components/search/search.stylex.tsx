@@ -11,6 +11,11 @@ import { getCreateBottleHref } from "@peated/web/components/search/createBottleH
 import useAuth from "@peated/web/hooks/useAuth";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  addRecentSearch,
+  readRecentSearches,
+  writeRecentSearches,
+} from "@peated/web/lib/recentSearches";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 import { useRouter } from "next/navigation";
@@ -105,6 +110,21 @@ function getDefaultBottleHref(bottleId: number) {
 
 function getDefaultContributionHref(query: string) {
   return getCreateBottleHref({ query });
+}
+
+function recentSearchGroups(searches: readonly string[]): SearchResultGroup[] {
+  if (!searches.length) return [];
+  return [
+    {
+      id: "recent-searches",
+      items: searches.map((query) => ({
+        href: `/search?q=${encodeURIComponent(query)}`,
+        id: `recent-search-${query.toLocaleLowerCase()}`,
+        title: query,
+      })),
+      label: "Recent searches",
+    },
+  ];
 }
 
 function waitForSearchIndicator() {
@@ -393,6 +413,7 @@ export function Search({
   const orpc = useORPC();
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [scope, setScope] = useState<SearchScope>(initialScope);
   const [snapshot, setSnapshot] = useState<SearchSnapshot>();
   const [status, setStatus] = useState<"error" | "ready" | "searching">(
@@ -495,6 +516,13 @@ export function Search({
   useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
 
   useEffect(() => {
+    if (placement === "page") return;
+    // Browser storage is unavailable during server rendering.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setRecentSearches(readRecentSearches());
+  }, [placement]);
+
+  useEffect(() => {
     if (initialSearchStarted.current || !initialQuery.trim()) return;
     initialSearchStarted.current = true;
     void runSearch(initialQuery, effectiveScope);
@@ -532,12 +560,24 @@ export function Search({
 
   function submitSearch(value: string) {
     const trimmedValue = value.trim();
+    rememberSearch(trimmedValue);
     if (onSubmit) {
       onSubmit(trimmedValue);
       return;
     }
     router.push(`/search?q=${encodeURIComponent(trimmedValue)}`);
   }
+
+  function rememberSearch(value: string) {
+    if (placement === "page") return;
+    const next = addRecentSearch(readRecentSearches(), value);
+    writeRecentSearches(next);
+    setRecentSearches(next);
+  }
+
+  const groups = query.trim()
+    ? (currentSnapshot?.groups ?? [])
+    : recentSearchGroups(recentSearches);
 
   const searchBox = (
     <SearchBox
@@ -558,10 +598,13 @@ export function Search({
       defaultOpen={defaultOpen || placement === "page"}
       emptyText={currentSnapshot?.emptyText}
       fluid={Boolean(submitLabel)}
-      groups={snapshot?.groups ?? []}
+      groups={groups}
       onQueryChange={updateQuery}
       onRetry={() => void runSearch(query, effectiveScope)}
-      onResultSelect={(item) => router.push(item.href)}
+      onResultSelect={(item) => {
+        rememberSearch(query.trim() || item.title);
+        router.push(item.href);
+      }}
       onScopeChange={(nextScope) => {
         if (!isSearchScope(nextScope)) return;
         debouncedSearch.cancel();
