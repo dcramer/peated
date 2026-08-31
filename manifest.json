@@ -1,0 +1,56 @@
+{
+  "changedFiles": [
+    "apps/server/src/constants.ts",
+    "apps/server/src/orpc/contracts/bottles/list.ts",
+    "apps/server/src/orpc/contracts/regions/list.ts",
+    "apps/server/src/orpc/routes/regions/list.test.ts",
+    "apps/server/src/orpc/routes/regions/list.ts",
+    "apps/web/src/app/(app)/bottles/(index)/bottleCatalogPageClient.tsx",
+    "apps/web/src/app/(app)/bottles/(index)/page.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/bottles/entityBottleListClient.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/bottles/page.tsx",
+    "apps/web/src/app/(app)/locations/[countrySlug]/(country)/regions/page.tsx",
+    "apps/web/src/hooks/useApiQueryParams.tsx",
+    "apps/web/src/lib/apiQueryParams.test.ts",
+    "apps/web/src/lib/apiQueryParams.ts",
+    "apps/web/src/lib/bottleCatalogQueryParams.test.ts",
+    "apps/web/src/lib/bottleCatalogQueryParams.ts",
+    "apps/web/src/lib/orpc/errors.test.ts",
+    "packages/orpc/src/client/errors.ts",
+    "packages/orpc/src/client/interceptors.ts"
+  ],
+  "commitSha": "17c8b2fab0be9b79c6ed7c735adca5b9b1304a08",
+  "scenarioIds": [
+    "brand-detail",
+    "distillery-detail",
+    "bottler-detail"
+  ],
+  "screenshots": [
+    {
+      "file": "brand-detail__desktop.png",
+      "label": "Brand detail · desktop"
+    },
+    {
+      "file": "brand-detail__mobile.png",
+      "label": "Brand detail · mobile"
+    },
+    {
+      "file": "distillery-detail__desktop.png",
+      "label": "Distillery detail · desktop"
+    },
+    {
+      "file": "distillery-detail__mobile.png",
+      "label": "Distillery detail · mobile"
+    },
+    {
+      "file": "bottler-detail__desktop.png",
+      "label": "Bottler detail · desktop"
+    },
+    {
+      "file": "bottler-detail__mobile.png",
+      "label": "Bottler detail · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
