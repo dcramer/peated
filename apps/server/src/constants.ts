@@ -28,6 +28,31 @@ export const BOTTLE_AGE_BAND_LIST = [
   "25_plus",
 ] as const;
 
+export const BOTTLE_LIST_SORT_OPTIONS = [
+  "rank",
+  "brand",
+  "created",
+  "name",
+  "age",
+  "score",
+  "tastings",
+  "-created",
+  "-name",
+  "-age",
+  "-release",
+  "-score",
+  "-tastings",
+] as const;
+
+export const REGION_LIST_SORT_OPTIONS = [
+  "name",
+  "bottles",
+  "distillers",
+  "-name",
+  "-bottles",
+  "-distillers",
+] as const;
+
 export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 
 export const RESERVED_COLLECTION_SLUGS = ["default", "library"] as const;

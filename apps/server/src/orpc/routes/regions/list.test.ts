@@ -95,6 +95,38 @@ describe("GET /countries/:country/regions", () => {
     expect(results[1].id).toBe(region1.id);
   });
 
+  test("sorts regions by distiller count", async ({ fixtures }) => {
+    const country = await fixtures.Country();
+    const region1 = await fixtures.Region({
+      countryId: country.id,
+      name: "Alpha",
+      totalDistillers: 1,
+    });
+    const region2 = await fixtures.Region({
+      countryId: country.id,
+      name: "Beta",
+      totalDistillers: 4,
+    });
+
+    const ascending = await routerClient.regions.list({
+      country: country.slug,
+      sort: "distillers",
+    });
+    const descending = await routerClient.regions.list({
+      country: country.slug,
+      sort: "-distillers",
+    });
+
+    expect(ascending.results.map((region) => region.id)).toEqual([
+      region1.id,
+      region2.id,
+    ]);
+    expect(descending.results.map((region) => region.id)).toEqual([
+      region2.id,
+      region1.id,
+    ]);
+  });
+
   test("paginates results", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const regions = await Promise.all(

@@ -1,10 +1,9 @@
+import { REGION_LIST_SORT_OPTIONS } from "@peated/server/constants";
 import { RegionSchema, listResponse } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
 
 const DEFAULT_SORT = "name";
-const SORT_OPTIONS = ["name", "bottles", "-name", "-bottles"] as const;
-
 export default contract
   .route({
     method: "GET",
@@ -19,7 +18,7 @@ export default contract
       query: z.string().default(""),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(100),
-      sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
+      sort: z.enum(REGION_LIST_SORT_OPTIONS).default(DEFAULT_SORT),
       hasBottles: z.coerce.boolean().default(false),
     }),
   )

@@ -1,5 +1,6 @@
 import {
   BOTTLE_AGE_BAND_LIST,
+  BOTTLE_LIST_SORT_OPTIONS,
   CATEGORY_LIST,
   FLAVOR_PROFILES,
 } from "@peated/server/constants";
@@ -8,22 +9,6 @@ import { z } from "zod";
 import { contract } from "../base";
 
 const DEFAULT_SORT = "-tastings";
-
-const SORT_OPTIONS = [
-  "rank",
-  "brand",
-  "created",
-  "name",
-  "age",
-  "score",
-  "tastings",
-  "-created",
-  "-name",
-  "-age",
-  "-release",
-  "-score",
-  "-tastings",
-] as const;
 
 const OutputSchema = listResponse(BottleSchema).extend({
   total: z.number().int().nonnegative(),
@@ -77,7 +62,7 @@ export default contract
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       filter: z.enum(["all", "following"]).default("all"),
-      sort: z.enum(SORT_OPTIONS).default(DEFAULT_SORT),
+      sort: z.enum(BOTTLE_LIST_SORT_OPTIONS).default(DEFAULT_SORT),
     }),
   )
   // TODO(response-envelope): Return { data, meta } when all list routes use the

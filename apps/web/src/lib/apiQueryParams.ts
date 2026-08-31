@@ -9,7 +9,9 @@ export type SearchParamSource =
   | Record<string, string | string[] | undefined>;
 
 type ApiQueryParamOptions = {
+  allowedValues?: Readonly<Record<string, readonly string[]>>;
   defaults?: ApiQueryParams;
+  fields?: readonly string[];
   numericFields?: readonly string[];
   overrides?: ApiQueryParams;
 };
@@ -18,24 +20,36 @@ type ApiQueryParamOptions = {
 export function getApiQueryParams(
   searchParams: SearchParamSource,
   {
+    allowedValues = {},
     defaults = {},
+    fields,
     numericFields = ["cursor", "limit"],
     overrides = {},
   }: ApiQueryParamOptions = {},
 ) {
+  const fieldSet = fields ? new Set(fields) : null;
   const numericFieldSet = new Set(numericFields);
 
   return {
     ...defaults,
     ...Object.fromEntries(
       getSearchParamEntries(searchParams)
+        .filter(([name]) => !fieldSet || fieldSet.has(name))
         .map(([name, value]) => [
           name,
           parseSearchParamValue(name, value, numericFieldSet),
         ])
-        .filter(
-          ([, value]) => value !== null && value !== undefined && value !== "",
-        ),
+        .filter((entry) => {
+          const name = String(entry[0]);
+          const value = entry[1];
+          return (
+            value !== null &&
+            value !== undefined &&
+            value !== "" &&
+            (!allowedValues[name] ||
+              allowedValues[name].includes(String(value)))
+          );
+        }),
     ),
     ...overrides,
   };

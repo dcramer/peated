@@ -1,6 +1,6 @@
 import type { InterceptableOptions, Interceptor } from "@orpc/shared";
 import * as Sentry from "@sentry/core";
-import { shouldCaptureORPCClientError } from "./errors";
+import { isRequestAbort, shouldCaptureORPCClientError } from "./errors";
 
 /**
  * Safely stringify an object, handling circular references and other serialization issues
@@ -37,10 +37,12 @@ type Options = {
  * });
  * ```
  */
-const sentryInterceptor = (
-  options: Options = {},
-): Interceptor<InterceptableOptions, Promise<unknown>> =>
-  async function sentryInterceptor({ next, path, input }) {
+const sentryInterceptor =
+  (
+    options: Options = {},
+  ): Interceptor<InterceptableOptions, Promise<unknown>> =>
+  async (interceptorOptions) => {
+    const { input, path } = interceptorOptions;
     let originalError: unknown;
 
     try {
@@ -59,17 +61,19 @@ const sentryInterceptor = (
         },
         async (span) => {
           try {
-            const result = await next();
+            const result = await interceptorOptions.next();
             return result;
           } catch (error) {
             originalError = error;
 
             try {
-              span.setStatus({
-                code: 2,
-              });
-              if (shouldCaptureORPCClientError(error)) {
-                Sentry.captureException(error);
+              if (!isRequestAbort(error)) {
+                span.setStatus({
+                  code: 2,
+                });
+                if (shouldCaptureORPCClientError(error)) {
+                  Sentry.captureException(error);
+                }
               }
             } catch (sentryError) {
               // Log Sentry errors but don't let them interfere with the original error
@@ -90,7 +94,7 @@ const sentryInterceptor = (
       // If Sentry itself fails, log the error and continue with the original call
       // eslint-disable-next-line no-console
       console.error("Sentry interceptor failed:", sentryError);
-      return await next();
+      return await interceptorOptions.next();
     }
   };
 

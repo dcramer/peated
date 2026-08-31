@@ -9,6 +9,11 @@ import type { ReactNode } from "react";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
+import {
+  BOTTLE_CATALOG_ALLOWED_VALUES,
+  BOTTLE_CATALOG_QUERY_FIELDS,
+  normalizeBottleCatalogQueryParams,
+} from "@peated/web/lib/bottleCatalogQueryParams";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../../styles/tokens.stylex";
@@ -41,29 +46,33 @@ export function EntityBottleListClient({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryParams = useApiQueryParams({
-    defaults: { sort: DEFAULT_SORT },
-    numericFields: [
-      "age",
-      "brand",
-      "bottler",
-      "cursor",
-      "distiller",
-      "entity",
-      "limit",
-      "series",
-    ],
-    overrides: {
-      entity: entityId,
-      limit: 25,
-    },
-  });
+  const queryParams = normalizeBottleCatalogQueryParams(
+    useApiQueryParams({
+      defaults: { sort: DEFAULT_SORT },
+      allowedValues: BOTTLE_CATALOG_ALLOWED_VALUES,
+      fields: BOTTLE_CATALOG_QUERY_FIELDS,
+      numericFields: [
+        "age",
+        "brand",
+        "bottler",
+        "cursor",
+        "distiller",
+        "entity",
+        "limit",
+        "series",
+      ],
+      overrides: {
+        entity: entityId,
+        limit: 25,
+      },
+    }),
+  );
   const { data: bottleList } = useSuspenseQuery({
     ...orpc.bottles.list.queryOptions({ input: queryParams }),
     initialData: initialBottleList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
-  const sort = searchParams.get("sort") ?? DEFAULT_SORT;
+  const sort = String(queryParams.sort ?? DEFAULT_SORT);
 
   function updateSort(value: string) {
     const nextParams = new URLSearchParams(searchParams);
