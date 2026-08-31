@@ -235,7 +235,7 @@ function CreateBottleForm() {
 
   return (
     <BottleForm
-      onSubmit={async ({ image, ...data }) => {
+      onSubmit={async ({ image, imageSourceUrl, imageLicense, ...data }) => {
         const createdBottle = proposalId
           ? await proposalBottleCreateMutation.mutateAsync({
               proposal: Number(proposalId),
@@ -251,6 +251,8 @@ function CreateBottleForm() {
             await bottleImageUpdateMutation.mutateAsync({
               bottle: createdBottle.id,
               file: image,
+              sourceUrl: imageSourceUrl,
+              license: imageLicense,
             });
           } catch (err) {
             logError(err, {
@@ -260,7 +262,7 @@ function CreateBottleForm() {
               },
             });
             flash(
-              "There was an error uploading your image, but the bottle was saved.",
+              "We couldn't upload the image, but the bottle was saved. Try the image again.",
               "error",
             );
           }

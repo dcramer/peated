@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleImages,
   bottleReferences,
   bottleTombstones,
   externalReviews,
@@ -665,6 +666,17 @@ describe("finalizeBottleReferenceAssignment", () => {
         where: (bottles, { eq }) => eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ imageUrl });
+    await expect(
+      db.query.bottleImages.findFirst({
+        where: (images, { and, eq }) =>
+          and(eq(images.bottleId, bottle.id), eq(images.isPrimary, true)),
+      }),
+    ).resolves.toMatchObject({
+      imageUrl,
+      sourceUrl: price.url,
+      license: null,
+      createdByActorId: bottle.createdByActorId,
+    });
     expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleReference", {
       name: result.reference.name,
     });

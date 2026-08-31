@@ -1802,7 +1802,12 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     referenceResult,
     bottleImageCandidate:
       referenceResult === null && proposal.price.imageUrl
-        ? { bottleId, imageUrl: proposal.price.imageUrl }
+        ? {
+            bottleId,
+            imageUrl: proposal.price.imageUrl,
+            sourceUrl: proposal.price.url,
+            createdByActorId: actor.id,
+          }
         : null,
   };
 }

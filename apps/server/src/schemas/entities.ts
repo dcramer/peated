@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { ContentSourceEnum, EntityKindEnum } from "./common";
 import { CountrySchema } from "./countries";
+import { ImageLicenseSchema, ImageSourceUrlSchema } from "./images";
 import { RegionSchema } from "./regions";
 import { PointSchema } from "./shared";
 
@@ -70,6 +71,8 @@ export const EntityImageSchema = z.object({
   entityId: z.number().readonly().describe("Entity that owns the image"),
   imageUrl: z.string().url().readonly().describe("URL of the stored image"),
   caption: z.string().nullable().readonly().describe("Optional image caption"),
+  sourceUrl: ImageSourceUrlSchema.readonly(),
+  license: ImageLicenseSchema.readonly(),
   isPrimary: z
     .boolean()
     .readonly()
@@ -86,6 +89,14 @@ export const EntityImageCaptionSchema = z
   .nullable()
   .default(null)
   .describe("Optional image caption");
+
+export const EntityImageSourceUrlSchema = ImageSourceUrlSchema.describe(
+  "Original source page for the Entity image",
+);
+
+export const EntityImageLicenseSchema = ImageLicenseSchema.describe(
+  "License or reuse terms for the Entity image",
+);
 
 export const EntitySchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the entity"),

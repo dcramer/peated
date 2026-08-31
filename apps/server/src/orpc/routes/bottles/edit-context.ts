@@ -7,7 +7,12 @@ import {
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
-import { BottleGroupV1Fields, BottleV1Schema } from "@peated/server/schemas";
+import {
+  BottleGroupV1Fields,
+  BottleV1Schema,
+  ImageLicenseSchema,
+  ImageSourceUrlSchema,
+} from "@peated/server/schemas";
 import { z } from "zod";
 
 const BottleEditChoiceSchema = z
@@ -51,7 +56,12 @@ const BottleEditExactContextSchema = BottleV1Schema.pick({
   description: true,
   descriptionSrc: true,
   imageUrl: true,
-}).strict();
+})
+  .extend({
+    imageSourceUrl: ImageSourceUrlSchema,
+    imageLicense: ImageLicenseSchema,
+  })
+  .strict();
 
 export const BottleEditContextSchema = z
   .object({
@@ -102,6 +112,11 @@ export default procedure
         if (!bottle?.group) {
           throw new ActiveBottleSelectionError("unassigned", input.bottle);
         }
+        const primaryImage = await tx.query.bottleImages.findFirst({
+          where: (images, { and, eq }) =>
+            and(eq(images.bottleId, bottle.id), eq(images.isPrimary, true)),
+          columns: { sourceUrl: true, license: true },
+        });
 
         const { group } = bottle;
         if (!group.brand) {
@@ -176,6 +191,8 @@ export default procedure
             imageUrl: bottle.imageUrl
               ? absoluteUrl(config.API_SERVER, bottle.imageUrl)
               : null,
+            imageSourceUrl: primaryImage?.sourceUrl ?? null,
+            imageLicense: primaryImage?.license ?? null,
           },
         };
       });

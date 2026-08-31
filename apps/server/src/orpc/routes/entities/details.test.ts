@@ -47,6 +47,8 @@ describe("GET /entities/:entity", () => {
         entityId: entity.id,
         imageUrl: "/uploads/entities/primary.webp",
         caption: "Front gate",
+        sourceUrl: "https://example.com/front-gate-photo",
+        license: "CC BY 4.0",
         isPrimary: true,
         createdByActorId: actor.id,
       },
@@ -57,6 +59,8 @@ describe("GET /entities/:entity", () => {
     expect(data.images).toHaveLength(2);
     expect(data.images[0]).toMatchObject({
       caption: "Front gate",
+      sourceUrl: "https://example.com/front-gate-photo",
+      license: "CC BY 4.0",
       isPrimary: true,
     });
     expect(data.images[0]?.imageUrl).toContain(

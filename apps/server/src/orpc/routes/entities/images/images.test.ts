@@ -51,6 +51,8 @@ describe("Entity images", () => {
         entity: entity.id,
         file: await fixtures.SampleSquareImage(),
         caption: "Original distillery building",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Distillery.jpg",
+        license: "CC BY-SA 4.0",
         idempotencyKey: "first-image",
       },
       { context: { user: mod } },
@@ -77,6 +79,8 @@ describe("Entity images", () => {
     expect(first).toMatchObject({
       entityId: entity.id,
       caption: "Original distillery building",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Distillery.jpg",
+      license: "CC BY-SA 4.0",
       isPrimary: true,
     });
     expect(retriedFirst.id).toBe(first.id);
@@ -87,12 +91,16 @@ describe("Entity images", () => {
         entity: entity.id,
         image: second.id,
         caption: "Main visitor entrance",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Entrance.jpg",
+        license: "CC BY 4.0",
         makePrimary: true,
       },
       { context: { user: mod } },
     );
     expect(promoted).toMatchObject({
       caption: "Main visitor entrance",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Entrance.jpg",
+      license: "CC BY 4.0",
       isPrimary: true,
     });
 

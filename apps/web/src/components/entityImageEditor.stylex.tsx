@@ -16,6 +16,8 @@ export type EntityImageDraft = {
   file: File | null;
   imageUrl: string;
   caption: string;
+  sourceUrl: string;
+  license: string;
   isPrimary: boolean;
 };
 
@@ -28,6 +30,8 @@ export function entityImageDrafts(
     file: null,
     imageUrl: image.imageUrl,
     caption: image.caption ?? "",
+    sourceUrl: image.sourceUrl ?? "",
+    license: image.license ?? "",
     isPrimary: image.isPrimary,
   }));
 }
@@ -50,6 +54,8 @@ export function EntityImageEditor({
       file,
       imageUrl: URL.createObjectURL(file),
       caption: "",
+      sourceUrl: "",
+      license: "",
       isPrimary: false,
     }));
     if (!images.length && additions[0]) additions[0].isPrimary = true;
@@ -88,6 +94,53 @@ export function EntityImageEditor({
                   }}
                   placeholder="What does this image show?"
                   value={image.caption}
+                />
+              </Field>
+              <Field
+                htmlFor={`entity-image-source-${image.key}`}
+                label="Source URL"
+                optional
+              >
+                <TextInput
+                  disabled={disabled}
+                  id={`entity-image-source-${image.key}`}
+                  maxLength={2048}
+                  onChange={(event) => {
+                    const sourceUrl = event.currentTarget.value;
+                    onChange(
+                      images.map((candidate) =>
+                        candidate.key === image.key
+                          ? { ...candidate, sourceUrl }
+                          : candidate,
+                      ),
+                    );
+                  }}
+                  placeholder="https://commons.wikimedia.org/wiki/File:…"
+                  type="url"
+                  value={image.sourceUrl}
+                />
+              </Field>
+              <Field
+                htmlFor={`entity-image-license-${image.key}`}
+                label="License"
+                optional
+              >
+                <TextInput
+                  disabled={disabled}
+                  id={`entity-image-license-${image.key}`}
+                  maxLength={255}
+                  onChange={(event) => {
+                    const license = event.currentTarget.value;
+                    onChange(
+                      images.map((candidate) =>
+                        candidate.key === image.key
+                          ? { ...candidate, license }
+                          : candidate,
+                      ),
+                    );
+                  }}
+                  placeholder="CC BY-SA 4.0"
+                  value={image.license}
                 />
               </Field>
               <div {...stylex.props(styles.actions)}>

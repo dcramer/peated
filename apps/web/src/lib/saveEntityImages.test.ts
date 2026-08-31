@@ -13,6 +13,8 @@ function storedImage(overrides: Partial<EntityImage> = {}): EntityImage {
     entityId: 10,
     imageUrl: "https://api.example/uploads/entities/one.webp",
     caption: "Old caption",
+    sourceUrl: null,
+    license: null,
     isPrimary: true,
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
@@ -27,6 +29,8 @@ function draft(overrides: Partial<EntityImageDraft> = {}): EntityImageDraft {
     file: null,
     imageUrl: "https://api.example/uploads/entities/one.webp",
     caption: "Old caption",
+    sourceUrl: "",
+    license: "",
     isPrimary: true,
     ...overrides,
   };
@@ -70,6 +74,8 @@ describe("saveEntityImages", () => {
       entity: 10,
       file: fileOne,
       caption: "Primary",
+      sourceUrl: null,
+      license: null,
       isPrimary: true,
       idempotencyKey: "new-primary",
     });
@@ -89,6 +95,8 @@ describe("saveEntityImages", () => {
           key: "image-2",
           imageId: 2,
           caption: "Front gate",
+          sourceUrl: "https://commons.wikimedia.org/wiki/File:Gate.jpg",
+          license: "CC BY-SA 4.0",
           isPrimary: true,
         }),
       ],
@@ -101,6 +109,8 @@ describe("saveEntityImages", () => {
       entity: 10,
       image: 2,
       caption: "Front gate",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Gate.jpg",
+      license: "CC BY-SA 4.0",
       makePrimary: true,
     });
     expect(remove).toHaveBeenCalledWith({ entity: 10, image: 1 });

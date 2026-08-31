@@ -65,6 +65,8 @@ export const mockBottle = {
   description: "A rich, smoky Islay single malt with a long finish.",
   descriptionSrc: "user",
   imageUrl: null,
+  imageSourceUrl: null,
+  imageLicense: null,
   flavorProfile: "peated",
   tastingNotes: {
     nose: "Smoke and dried fruit",
@@ -271,6 +273,8 @@ export const mockBottles: Bottle[] = [
     description:
       "The 2022 Càirdeas release, matured in first-fill bourbon barrels in Warehouse 1.",
     imageUrl: mockImageUrls.cairdeasWarehouse1,
+    imageSourceUrl: "https://example.com/cairdeas-warehouse-1",
+    imageLicense: "Used with permission",
     flavorProfile: "heavily_peated",
     tastingNotes: {
       nose: "Sea spray, vanilla, and peat smoke",

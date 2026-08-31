@@ -68,6 +68,8 @@ export async function createEntityImage({
   entityId,
   file,
   caption,
+  sourceUrl,
+  license,
   isPrimary,
   idempotencyKey,
   user,
@@ -75,6 +77,8 @@ export async function createEntityImage({
   entityId: number;
   file: Blob;
   caption: string | null;
+  sourceUrl: string | null;
+  license: string | null;
   isPrimary: boolean;
   idempotencyKey: string;
   user: User;
@@ -155,6 +159,8 @@ export async function createEntityImage({
           entityId,
           imageUrl,
           caption,
+          sourceUrl,
+          license,
           isPrimary: makePrimary,
           createdByActorId: actor.id,
           idempotencyKey,
@@ -177,6 +183,8 @@ export async function createEntityImage({
             action: "add",
             id: image.id,
             caption: image.caption,
+            sourceUrl: image.sourceUrl,
+            license: image.license,
             isPrimary: image.isPrimary,
           },
         },
@@ -191,17 +199,21 @@ export async function createEntityImage({
   }
 }
 
-/** Changes a caption or selects a different primary image. */
+/** Changes image metadata or selects a different primary image. */
 export async function updateEntityImage({
   entityId,
   imageId,
   caption,
+  sourceUrl,
+  license,
   makePrimary,
   user,
 }: {
   entityId: number;
   imageId: number;
   caption?: string | null;
+  sourceUrl?: string | null;
+  license?: string | null;
   makePrimary?: true;
   user: User;
 }): Promise<EntityImage> {
@@ -229,6 +241,12 @@ export async function updateEntityImage({
     const data: Partial<typeof entityImages.$inferInsert> = {};
     if (caption !== undefined && caption !== image.caption) {
       data.caption = caption;
+    }
+    if (sourceUrl !== undefined && sourceUrl !== image.sourceUrl) {
+      data.sourceUrl = sourceUrl;
+    }
+    if (license !== undefined && license !== image.license) {
+      data.license = license;
     }
     if (makePrimary && !image.isPrimary) {
       await tx

@@ -7,7 +7,9 @@ import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityImageCaptionSchema,
+  EntityImageLicenseSchema,
   EntityImageSchema,
+  EntityImageSourceUrlSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
@@ -28,6 +30,8 @@ export default procedure
       entity: z.coerce.number(),
       file: z.instanceof(Blob),
       caption: EntityImageCaptionSchema,
+      sourceUrl: EntityImageSourceUrlSchema,
+      license: EntityImageLicenseSchema,
       isPrimary: z.boolean().default(false),
       idempotencyKey: z.string().trim().min(1).max(128),
     }),
@@ -39,6 +43,8 @@ export default procedure
         entityId: input.entity,
         file: input.file,
         caption: input.caption,
+        sourceUrl: input.sourceUrl,
+        license: input.license,
         isPrimary: input.isPrimary,
         idempotencyKey: input.idempotencyKey,
         user: context.user,

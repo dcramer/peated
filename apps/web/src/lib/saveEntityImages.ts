@@ -22,6 +22,10 @@ function caption(value: string) {
   return value.trim() || null;
 }
 
+function optionalText(value: string) {
+  return value.trim() || null;
+}
+
 export async function saveEntityImages({
   entityId,
   initialImages,
@@ -48,6 +52,8 @@ export async function saveEntityImages({
       entity: entityId,
       file: image.file,
       caption: caption(image.caption),
+      sourceUrl: optionalText(image.sourceUrl),
+      license: optionalText(image.license),
       isPrimary: image.isPrimary,
       idempotencyKey: image.key,
     });
@@ -58,14 +64,27 @@ export async function saveEntityImages({
     const initial = initialById.get(image.imageId);
     if (!initial) continue;
     const nextCaption = caption(image.caption);
+    const nextSourceUrl = optionalText(image.sourceUrl);
+    const nextLicense = optionalText(image.license);
     const captionChanged = nextCaption !== initial.caption;
+    const sourceUrlChanged = nextSourceUrl !== initial.sourceUrl;
+    const licenseChanged = nextLicense !== initial.license;
     const makePrimary = image.isPrimary && !initial.isPrimary;
-    if (!captionChanged && !makePrimary) continue;
+    if (
+      !captionChanged &&
+      !sourceUrlChanged &&
+      !licenseChanged &&
+      !makePrimary
+    ) {
+      continue;
+    }
     const input: Inputs["entities"]["images"]["update"] = {
       entity: entityId,
       image: image.imageId,
     };
     if (captionChanged) input.caption = nextCaption;
+    if (sourceUrlChanged) input.sourceUrl = nextSourceUrl;
+    if (licenseChanged) input.license = nextLicense;
     if (makePrimary) input.makePrimary = true;
     await update(input);
   }

@@ -1,6 +1,7 @@
 import {
   BottleImageBottleNotFoundError,
   BottleImageForbiddenError,
+  BottleImageNotFoundError,
   BottleImageTooLargeError,
   updateBottleImageForUser,
 } from "@peated/server/lib/updateBottleImage";
@@ -9,7 +10,28 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
+import {
+  BottleImageLicenseSchema,
+  BottleImageSourceUrlSchema,
+} from "@peated/server/schemas";
 import { z } from "zod";
+
+const InputSchema = z
+  .object({
+    bottle: z.coerce.number(),
+    file: z.instanceof(Blob).optional(),
+    sourceUrl: BottleImageSourceUrlSchema.unwrap().removeDefault().optional(),
+    license: BottleImageLicenseSchema.unwrap().removeDefault().optional(),
+  })
+  .strict()
+  .superRefine((input, ctx) => {
+    if (!input.file && !("sourceUrl" in input) && !("license" in input)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Add an image, source URL, or license.",
+      });
+    }
+  });
 
 export default procedure
   .use(requireAuth)
@@ -19,33 +41,35 @@ export default procedure
     path: "/bottles/{bottle}/image",
     summary: "Update bottle image",
     description:
-      "Upload and update the image for a bottle with automatic compression and resizing. Requires authentication and ownership or admin privileges",
+      "Upload a bottle image or update its source and license. Requires authentication and ownership or admin privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "updateBottleImage",
     }),
   })
-  .input(
-    z.object({
-      bottle: z.coerce.number(),
-      file: z.instanceof(Blob),
-    }),
-  )
+  .input(InputSchema)
   .output(
     z.object({
       imageUrl: z.string(),
+      sourceUrl: BottleImageSourceUrlSchema,
+      license: BottleImageLicenseSchema,
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const { bottle: bottleId, file } = input;
+    const { bottle: bottleId, file, sourceUrl, license } = input;
     try {
       return await updateBottleImageForUser({
         bottleId,
         file,
+        sourceUrl,
+        license,
         user: context.user,
       });
     } catch (error) {
       if (error instanceof BottleImageBottleNotFoundError) {
+        throw errors.NOT_FOUND({ message: error.message, cause: error });
+      }
+      if (error instanceof BottleImageNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
       }
       if (error instanceof BottleImageForbiddenError) {

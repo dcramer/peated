@@ -34,5 +34,6 @@ Useful starting points:
 - [Whisky Identity Model](./architecture/whisky-identity-model.md)
 - [Bottle Classifier](./architecture/bottle-classifier.md)
 - [Catalog Enrichment](./operations/catalog-enrichment.md)
+- [Catalog Image Maintenance](./operations/entity-images.md)
 - [Production Debugging](./operations/production-debugging.md)
 - [Policy Index](./policies/README.md)

@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
+import { ImageAttribution } from "@peated/web/components";
 import { colors, space } from "../../../../styles/tokens.stylex";
 
 import type { Entity } from "./entityPageData";
@@ -21,9 +22,13 @@ export function EntityImageGallery({ entity }: { entity: Entity }) {
           src={primary.imageUrl}
           {...stylex.props(styles.primaryImage)}
         />
-        {primary.caption ? (
+        {primary.caption || primary.sourceUrl || primary.license ? (
           <figcaption {...stylex.props(styles.caption)}>
-            {primary.caption}
+            {primary.caption ? <span>{primary.caption}</span> : null}
+            <ImageAttribution
+              license={primary.license}
+              sourceUrl={primary.sourceUrl}
+            />
           </figcaption>
         ) : null}
       </figure>
@@ -36,9 +41,13 @@ export function EntityImageGallery({ entity }: { entity: Entity }) {
                 src={image.imageUrl}
                 {...stylex.props(styles.secondaryImage)}
               />
-              {image.caption ? (
+              {image.caption || image.sourceUrl || image.license ? (
                 <figcaption {...stylex.props(styles.caption)}>
-                  {image.caption}
+                  {image.caption ? <span>{image.caption}</span> : null}
+                  <ImageAttribution
+                    license={image.license}
+                    sourceUrl={image.sourceUrl}
+                  />
                 </figcaption>
               ) : null}
             </figure>

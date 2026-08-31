@@ -9,6 +9,7 @@ import {
   FlavorProfileEnum,
 } from "./common";
 import { EntityInputSchema, EntitySchema } from "./entities";
+import { ImageLicenseSchema, ImageSourceUrlSchema } from "./images";
 
 const BottleNameSchema = z
   .string()
@@ -149,6 +150,13 @@ const BottleImageUrlSchema = z
   .default(null)
   .readonly()
   .describe("URL to the bottle's image");
+export const BottleImageSourceUrlSchema =
+  ImageSourceUrlSchema.optional().describe(
+    "Original source page for the bottle image",
+  );
+export const BottleImageLicenseSchema = ImageLicenseSchema.optional().describe(
+  "License or reuse terms for the bottle image",
+);
 const BottleFlavorProfileSchema = FlavorProfileEnum.nullable()
   .default(null)
   .describe("Primary flavor characteristics of the whisky");
@@ -216,6 +224,8 @@ export const BottleSchema = z.object({
   description: BottleDescriptionSchema,
   descriptionSrc: BottleDescriptionSourceSchema,
   imageUrl: BottleImageUrlSchema,
+  imageSourceUrl: BottleImageSourceUrlSchema.readonly(),
+  imageLicense: BottleImageLicenseSchema.readonly(),
   flavorProfile: BottleFlavorProfileSchema,
   tastingNotes: BottleTastingNotesSchema,
   suggestedTags: z

@@ -6,6 +6,7 @@ import {
   AppLink,
   BottleVisual,
   Chip,
+  ImageAttribution,
   PeatedId,
   ReviewScore,
   TastingRatingDistribution,
@@ -30,6 +31,8 @@ export type BottlePageHeaderProps = {
   detail?: ReactNode;
   id: string;
   imageUrl?: string | null;
+  imageSourceUrl?: string | null;
+  imageLicense?: string | null;
   memberStatus?: BottleMemberStatus;
   menu?: ReactNode;
   name: string;
@@ -46,6 +49,8 @@ export function BottlePageHeader({
   detail,
   id,
   imageUrl,
+  imageSourceUrl,
+  imageLicense,
   memberStatus,
   menu,
   name,
@@ -70,11 +75,13 @@ export function BottlePageHeader({
         )}
       >
         <div {...stylex.props(styles.identityContent)}>
-          <BottleVisual
-            imageUrl={imageUrl}
-            label={`${brand} ${name}`}
-            size="lg"
-          />
+          <div {...stylex.props(styles.image)}>
+            <BottleVisual
+              imageUrl={imageUrl}
+              label={`${brand} ${name}`}
+              size="lg"
+            />
+          </div>
           <div {...stylex.props(styles.identity)}>
             <h1
               {...stylex.props(
@@ -123,6 +130,14 @@ export function BottlePageHeader({
               </p>
             ) : null}
           </div>
+          {imageUrl ? (
+            <div {...stylex.props(styles.attribution)}>
+              <ImageAttribution
+                license={imageLicense}
+                sourceUrl={imageSourceUrl}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       {hasRatings ? (
@@ -192,6 +207,14 @@ const styles = stylex.create({
     columnGap: { default: space.x4, [COMPACT]: space.x2 },
   },
   identity: {
+    minWidth: 0,
+  },
+  image: {
+    minWidth: 0,
+  },
+  attribution: {
+    gridColumn: { default: "1", [COMPACT]: "1 / -1" },
+    marginTop: space.x1,
     minWidth: 0,
   },
   brand: {

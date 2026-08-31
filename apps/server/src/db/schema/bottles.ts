@@ -205,6 +205,8 @@ export const bottles = pgTable(
     // Exact content and aggregate state.
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
+    // TODO(catalog-images): Drop this after every Bottle image reader and
+    // writer uses bottle_image.
     imageUrl: text("image_url"),
     // A removed image must not return from a StorePrice match.
     rejectedImageUrls: text("rejected_image_urls")
@@ -316,6 +318,39 @@ export const bottles = pgTable(
 
 export type Bottle = typeof bottles.$inferSelect;
 export type NewBottle = typeof bottles.$inferInsert;
+
+/**
+ * Owns Bottle image files, sources, and reuse terms. The Bottle image URL
+ * mirrors the current primary image during the table migration.
+ */
+export const bottleImages = pgTable(
+  "bottle_image",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id, { onDelete: "cascade" })
+      .notNull(),
+    imageUrl: text("image_url").notNull(),
+    sourceUrl: text("source_url"),
+    license: varchar("license", { length: 255 }),
+    isPrimary: boolean("is_primary").default(false).notNull(),
+    createdByActorId: bigint("created_by_actor_id", { mode: "number" })
+      .references(() => actors.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("bottle_image_bottle_idx").on(table.bottleId),
+    index("bottle_image_created_by_actor_idx").on(table.createdByActorId),
+    uniqueIndex("bottle_image_primary_unq")
+      .on(table.bottleId)
+      .where(sql`${table.isPrimary}`),
+  ],
+);
+
+export type BottleImage = typeof bottleImages.$inferSelect;
+export type NewBottleImage = typeof bottleImages.$inferInsert;
 
 /**
  * Owns the shared identity prefix, aggregate statistics, and editing semantics.
@@ -441,10 +476,22 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
     references: [bottleSeries.id],
   }),
   bottlesToDistillers: many(bottlesToDistillers),
+  images: many(bottleImages),
   observations: many(bottleObservations),
   barcodes: many(bottleBarcodes),
   createdByActor: one(actors, {
     fields: [bottles.createdByActorId],
+    references: [actors.id],
+  }),
+}));
+
+export const bottleImagesRelations = relations(bottleImages, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottleImages.bottleId],
+    references: [bottles.id],
+  }),
+  createdByActor: one(actors, {
+    fields: [bottleImages.createdByActorId],
     references: [actors.id],
   }),
 }));

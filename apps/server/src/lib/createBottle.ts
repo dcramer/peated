@@ -214,7 +214,6 @@ async function prepareBottleCreateInTransaction(
       input.descriptionSrc ||
       (input.description && input.description !== null ? "user" : null);
   }
-
   const groupName = stripDuplicateBrandPrefixFromBottleName(
     bottleIdentity?.groupName ?? bottleData.name,
     bottleData.brand.name,

@@ -6,7 +6,9 @@ import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityImageCaptionSchema,
+  EntityImageLicenseSchema,
   EntityImageSchema,
+  EntityImageSourceUrlSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
@@ -19,7 +21,7 @@ export default procedure
     path: "/entities/{entity}/images/{image}",
     summary: "Update entity image",
     description:
-      "Update an image caption or make the image primary. Requires a moderator or administrator.",
+      "Update an image caption, source, license, or primary status. Requires a moderator or administrator.",
     operationId: "updateEntityImage",
   })
   .input(
@@ -27,6 +29,8 @@ export default procedure
       entity: z.coerce.number(),
       image: z.coerce.number(),
       caption: EntityImageCaptionSchema.removeDefault().optional(),
+      sourceUrl: EntityImageSourceUrlSchema.removeDefault().optional(),
+      license: EntityImageLicenseSchema.removeDefault().optional(),
       makePrimary: z.literal(true).optional(),
     }),
   )
@@ -37,6 +41,8 @@ export default procedure
         entityId: input.entity,
         imageId: input.image,
         caption: input.caption,
+        sourceUrl: input.sourceUrl,
+        license: input.license,
         makePrimary: input.makePrimary,
         user: context.user,
       });

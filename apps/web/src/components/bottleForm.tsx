@@ -11,6 +11,8 @@ import {
   BottleInputFields,
   EntityChoiceSchema,
   FlavorProfileEnum,
+  ImageLicenseSchema,
+  ImageSourceUrlSchema,
 } from "@peated/server/schemas";
 import type { Entity, EntityKind } from "@peated/server/types";
 import {
@@ -104,7 +106,13 @@ function booleanChoiceId(value: boolean | null | undefined) {
   return "unknown";
 }
 
-type FormSchemaType = z.infer<typeof BottleCreateInputSchema>;
+const BottleFormSchema = BottleCreateInputSchema.and(
+  z.object({
+    imageSourceUrl: ImageSourceUrlSchema,
+    imageLicense: ImageLicenseSchema,
+  }),
+);
+type FormSchemaType = z.infer<typeof BottleFormSchema>;
 type ChoiceLike = { id?: number | null; name: string };
 const ChoiceLikeSchema = z.object({
   id: z.number().nullable().optional(),
@@ -361,7 +369,7 @@ export default function BottleForm({
       distillers: toDistillerChoiceValues(initialData.distillers),
       series: toSeriesChoiceValue(initialData.series),
     },
-    resolver: zodResolver(BottleCreateInputSchema),
+    resolver: zodResolver(BottleFormSchema),
   });
 
   const brandResults = useQuery(
@@ -988,7 +996,7 @@ export default function BottleForm({
                 </Button>
               </FormActions>
             ) : null}
-            <FieldGroup label="Catalog image" optional>
+            <FieldGroup label="Bottle image" optional>
               <PictureInput
                 disabled={isSubmitting}
                 id="bottle-image"
@@ -999,12 +1007,18 @@ export default function BottleForm({
                   if (!file) return;
                   setImage(file);
                   setImagePreview(URL.createObjectURL(file));
+                  setValue("imageSourceUrl", null, { shouldDirty: true });
+                  setValue("imageLicense", null, { shouldDirty: true });
                 }}
                 onRemove={
                   imagePreview
                     ? () => {
                         setImage(null);
                         setImagePreview(undefined);
+                        setValue("imageSourceUrl", null, {
+                          shouldDirty: true,
+                        });
+                        setValue("imageLicense", null, { shouldDirty: true });
                       }
                     : undefined
                 }
@@ -1014,6 +1028,41 @@ export default function BottleForm({
                     : undefined
                 }
               />
+              {user?.mod || user?.admin ? (
+                <>
+                  <Field
+                    error={errors.imageSourceUrl?.message}
+                    htmlFor="bottle-image-source"
+                    label="Source URL"
+                    optional
+                  >
+                    <TextInput
+                      {...register("imageSourceUrl", {
+                        setValueAs: (value) => value || null,
+                      })}
+                      id="bottle-image-source"
+                      invalid={Boolean(errors.imageSourceUrl)}
+                      placeholder="https://example.com/original-image"
+                      type="url"
+                    />
+                  </Field>
+                  <Field
+                    error={errors.imageLicense?.message}
+                    htmlFor="bottle-image-license"
+                    label="License"
+                    optional
+                  >
+                    <TextInput
+                      {...register("imageLicense", {
+                        setValueAs: (value) => value || null,
+                      })}
+                      id="bottle-image-license"
+                      invalid={Boolean(errors.imageLicense)}
+                      placeholder="CC BY-SA 4.0"
+                    />
+                  </Field>
+                </>
+              ) : null}
             </FieldGroup>
             <Field
               error={errors.description?.message}
