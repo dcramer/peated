@@ -238,6 +238,17 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, emptyEntityCatalog);
       return true;
+    case "entities/events/list":
+      if (
+        ![testBrand.id, testBottler.id, testOwnedEntity.id].includes(
+          Number(input?.entity),
+        )
+      ) {
+        sendRpcError(response, "Unexpected entity events payload");
+        return true;
+      }
+      sendRpcResponse(response, { results: [] });
+      return true;
     case "brands/list":
       sendRpcResponse(response, {
         ...emptyList,
