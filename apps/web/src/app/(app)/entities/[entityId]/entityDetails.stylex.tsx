@@ -32,6 +32,7 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
 
   return [
     { label: "Region", value: location },
+    { label: "Established", value: entity.yearEstablished },
     {
       label: "Owned by",
       value: entity.owner ? (

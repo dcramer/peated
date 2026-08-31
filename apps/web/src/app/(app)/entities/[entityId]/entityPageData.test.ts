@@ -4,7 +4,6 @@ import {
   entityHasBottleCatalog,
   getEntityClassification,
   getEntityCurrentHref,
-  getEntityOwnerLabel,
   getEntityTabs,
 } from "./entityPageData";
 
@@ -18,35 +17,8 @@ describe("entityHasBottleCatalog", () => {
 });
 
 describe("getEntityClassification", () => {
-  it("uses the entity kind, establishment term, and most specific location", () => {
-    expect(
-      getEntityClassification({
-        country: { name: "Scotland" },
-        kind: "distillery",
-        region: { name: "Islay" },
-        yearEstablished: 1816,
-      }),
-    ).toBe("Distillery · founded 1816 · Islay");
-  });
-});
-
-describe("getEntityOwnerLabel", () => {
-  it("describes a brand through its owner", () => {
-    expect(
-      getEntityOwnerLabel(
-        { kind: "brand" },
-        { name: "Diageo plc", shortName: "Diageo" },
-      ),
-    ).toBe("A Diageo brand");
-  });
-
-  it("describes other entity kinds as part of their owner", () => {
-    expect(
-      getEntityOwnerLabel(
-        { kind: "distillery" },
-        { name: "Diageo", shortName: null },
-      ),
-    ).toBe("Part of Diageo");
+  it("uses the entity kind", () => {
+    expect(getEntityClassification({ kind: "distillery" })).toBe("Distillery");
   });
 });
 

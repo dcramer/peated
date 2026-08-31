@@ -50,12 +50,6 @@ const meta = {
       showCounts: true,
     },
     score: { count: 48, high: 96, low: 78, median: 88 },
-    specs: [
-      { label: "ABV", value: "59.6%" },
-      { label: "Age", value: null },
-      { label: "Cask", value: "Ex-bourbon" },
-      { label: "Release", value: "2024" },
-    ],
   },
   argTypes: {
     actions: { control: false },
@@ -95,12 +89,6 @@ export const LongName: Story = {
     id: "B49748",
     name: "SMWS Highland peaty potion",
     notes: [],
-    specs: [
-      { label: "ABV", value: "50.0%" },
-      { label: "Age", value: "10 years" },
-      { label: "Cask", value: "1st fill barrels and oloroso sherry hogsheads" },
-      { label: "Release", value: "Batch 42" },
-    ],
   },
 };
 
@@ -118,11 +106,5 @@ export const ThinData: Story = {
     notes: [],
     bands: null,
     score: null,
-    specs: [
-      { label: "ABV", value: "46.0%" },
-      { label: "Age", value: null },
-      { label: "Cask", value: null },
-      { label: "Release", value: null },
-    ],
   },
 };

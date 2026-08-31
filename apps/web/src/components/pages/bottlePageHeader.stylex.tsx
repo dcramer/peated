@@ -1,20 +1,14 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type {
-  KeyFactList,
-  ReviewScoreProps,
-  TastingRatingDistributionProps,
-} from "..";
+import type { ReviewScoreProps, TastingRatingDistributionProps } from "..";
 import {
   AppLink,
   BottleVisual,
   Chip,
-  KeyFacts,
   PeatedId,
   ReviewScore,
   TastingRatingDistribution,
-  hasVisibleKeyFacts,
 } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
@@ -41,10 +35,9 @@ export type BottlePageHeaderProps = {
   name: string;
   notes?: readonly string[];
   score?: ReviewScoreProps | null;
-  specs: KeyFactList;
 };
 
-/** Presents a bottle's catalog identity, member actions, community ratings, and core facts. */
+/** Presents a bottle's catalog identity, member actions, and community ratings. */
 export function BottlePageHeader({
   actions,
   bands,
@@ -58,7 +51,6 @@ export function BottlePageHeader({
   name,
   notes = [],
   score,
-  specs,
 }: BottlePageHeaderProps) {
   const hasActions = Boolean(actions || menu);
   const hasRatings = Boolean(score || bands);
@@ -133,11 +125,6 @@ export function BottlePageHeader({
           </div>
         </div>
       </div>
-      {hasVisibleKeyFacts(specs) ? (
-        <div {...stylex.props(styles.specs)}>
-          <KeyFacts facts={specs} />
-        </div>
-      ) : null}
       {hasRatings ? (
         <div aria-label="Community ratings" {...stylex.props(styles.ratings)}>
           {score ? (
@@ -329,11 +316,5 @@ const styles = stylex.create({
   },
   ratingContent: {
     minWidth: 0,
-  },
-  specs: {
-    minWidth: 0,
-    gridColumn: "1 / -1",
-    gridRow: "3",
-    marginTop: space.x3,
   },
 });

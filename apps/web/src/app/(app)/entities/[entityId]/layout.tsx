@@ -1,7 +1,6 @@
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import type { ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
 
@@ -33,11 +32,6 @@ export default async function EntityLayout(props: {
   const { client } = await getServerClient();
   const entity = await client.entities.details({ entity: canonicalEntity.id });
 
-  const owner = entity.ownerId
-    ? await resolveOrNotFound(
-        client.entities.details({ entity: entity.ownerId }),
-      )
-    : null;
   const jsonLd: WithContext<Organization> = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -61,7 +55,7 @@ export default async function EntityLayout(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <EntityPageFrameClient initialEntity={entity} owner={owner}>
+      <EntityPageFrameClient initialEntity={entity}>
         {props.children}
       </EntityPageFrameClient>
     </>

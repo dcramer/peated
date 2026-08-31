@@ -8,11 +8,9 @@ import { type ReactNode } from "react";
 import {
   Button,
   ButtonLink,
-  KeyFacts,
   PageTabs,
   RowMenu,
   SectionError,
-  TextLink,
   type RowMenuItem,
 } from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
@@ -29,7 +27,6 @@ import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 import {
   getEntityClassification,
   getEntityCurrentHref,
-  getEntityOwnerLabel,
   getEntityPresentation,
   getEntityTabs,
   type Entity,
@@ -146,11 +143,9 @@ function EntityActions({ entity }: { entity: Entity }) {
 export function EntityPageFrameClient({
   children,
   initialEntity,
-  owner,
 }: {
   children: ReactNode;
   initialEntity: Entity;
-  owner?: Entity | null;
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
@@ -178,7 +173,6 @@ export function EntityPageFrameClient({
     entity.kind === "brand" ||
     entity.kind === "bottler" ||
     entity.kind === "distillery";
-  const presentation = getEntityPresentation(entity);
   const currentHref = getEntityCurrentHref(entity, pathname);
   const bottleActionLabel = "Add a bottle";
 
@@ -195,11 +189,6 @@ export function EntityPageFrameClient({
         </div>
 
         <div {...stylex.props(styles.summary)}>
-          {owner ? (
-            <TextLink href={getEntityUrl(owner)} size="inherit">
-              {getEntityOwnerLabel(entity, owner)}
-            </TextLink>
-          ) : null}
           {entity.description ? (
             <div {...stylex.props(styles.description)}>
               <Markdown content={entity.description} />
@@ -220,25 +209,6 @@ export function EntityPageFrameClient({
             ) : null}
             <EntityActions entity={entity} />
           </div>
-        </div>
-
-        <div {...stylex.props(styles.specs)}>
-          <KeyFacts
-            facts={[
-              {
-                label: presentation.establishmentLabel,
-                value: entity.yearEstablished,
-              },
-              {
-                label: "Bottles recorded",
-                value: entity.totalBottles.toLocaleString("en-US"),
-              },
-              {
-                label: "Member tastings",
-                value: entity.totalTastings.toLocaleString("en-US"),
-              },
-            ]}
-          />
         </div>
       </header>
 
@@ -301,8 +271,5 @@ const styles = stylex.create({
     alignItems: "center",
     gap: space.x2,
     flexWrap: "wrap",
-  },
-  specs: {
-    marginBottom: space.x4,
   },
 });

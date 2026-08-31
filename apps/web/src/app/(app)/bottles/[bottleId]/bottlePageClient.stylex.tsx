@@ -79,12 +79,10 @@ function getBottleNotes(bottle: Bottle) {
   return [
     bottle.caskStrength ? "Cask strength" : null,
     bottle.singleCask ? "Single cask" : null,
-    bottle.nonChillFiltered ? "Non-chill filtered" : null,
-    bottle.naturalColor ? "Natural color" : null,
   ].filter((value): value is string => value !== null);
 }
 
-function getBottleSpecs(bottle: Bottle) {
+function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   return [
     {
       label: "ABV",
@@ -104,11 +102,6 @@ function getBottleSpecs(bottle: Bottle) {
       label: "Release",
       value: getBottleReleasePlacement(bottle).header,
     },
-  ] as const;
-}
-
-function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
-  return [
     {
       label: "Vintage",
       value: bottle.vintageYear === null ? null : String(bottle.vintageYear),
@@ -145,12 +138,6 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
           : bottle.nonChillFiltered
             ? "Non-chill filtered"
             : "Chill filtered",
-    },
-    {
-      label: "Bottler",
-      value: bottle.bottler ? (
-        <EntityLinks entities={[bottle.bottler]} />
-      ) : null,
     },
   ];
 }
@@ -441,7 +428,6 @@ export function BottlePageFrameClient({
                   median: bottle.medianScore,
                 }
           }
-          specs={getBottleSpecs(bottle)}
         />
         {bottle.aliases.length ? (
           <p {...stylex.props(styles.aliases)}>
