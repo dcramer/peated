@@ -129,10 +129,12 @@ async function assertOperationResultState(
 async function performEntityMerge({
   toEntityId,
   fromEntityIds,
+  keepRetiredName,
   operation,
 }: {
   toEntityId: number;
   fromEntityIds: number[];
+  keepRetiredName: boolean;
   operation: LoadedEntityMergeOperation | null;
 }) {
   logInfo("Merging entities into {toEntityId}", {
@@ -578,11 +580,16 @@ async function performEntityMerge({
       );
     }
 
-    await moveEntityAliases(tx, fromEntityIds, {
-      id: toEntity.id,
-      name: toEntity.name,
-      shortName: toEntity.shortName,
-    });
+    await moveEntityAliases(
+      tx,
+      mergeEntityRows.filter(({ id }) => fromEntityIds.includes(id)),
+      {
+        id: toEntity.id,
+        name: toEntity.name,
+        shortName: toEntity.shortName,
+      },
+      { createdByActorId: actor.id, keepRetiredName },
+    );
 
     await tx
       .update(entityReferences)
@@ -825,6 +832,7 @@ export default async function mergeEntity(rawInput: JobPayload) {
     return await performEntityMerge({
       toEntityId: input.toEntityId,
       fromEntityIds: input.fromEntityIds,
+      keepRetiredName: input.keepRetiredName,
       operation: null,
     });
   }
@@ -848,6 +856,7 @@ export default async function mergeEntity(rawInput: JobPayload) {
     return await performEntityMerge({
       toEntityId: operation.destinationEntityId,
       fromEntityIds: [operation.sourceEntityId],
+      keepRetiredName: false,
       operation,
     });
   } catch (error) {

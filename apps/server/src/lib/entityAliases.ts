@@ -118,9 +118,11 @@ export async function removePrimaryEntityAliases(
 
 export async function moveEntityAliases(
   tx: AnyTransaction,
-  sourceEntityIds: readonly number[],
+  sourceEntities: readonly { id: number; name: string }[],
   destination: { id: number; name: string; shortName: string | null },
+  options: { createdByActorId: number; keepRetiredName: boolean },
 ) {
+  const sourceEntityIds = sourceEntities.map(({ id }) => id);
   const aliases = await tx
     .select()
     .from(entityAliases)
@@ -137,6 +139,21 @@ export async function moveEntityAliases(
   destinationKeys.add(nameKey(destination.name));
   if (destination.shortName) {
     destinationKeys.add(nameKey(destination.shortName));
+  }
+
+  if (options.keepRetiredName) {
+    for (const source of sourceEntities) {
+      const name = normalizeName(source.name);
+      const normalizedName = nameKey(name);
+      if (destinationKeys.has(normalizedName)) continue;
+      await tx.insert(entityAliases).values({
+        entityId: destination.id,
+        name,
+        normalizedName,
+        createdByActorId: options.createdByActorId,
+      });
+      destinationKeys.add(normalizedName);
+    }
   }
 
   for (const alias of aliases.filter(({ entityId }) =>

@@ -545,6 +545,24 @@ test("moves and deduplicates display aliases", async ({ fixtures }) => {
   ).toEqual([{ entityId: destination.id, name: "Moved Name" }]);
 });
 
+test("keeps retired names when requested", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ name: "Hillside" });
+  const destination = await fixtures.Entity({ name: "Glenesk" });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    keepRetiredName: true,
+    toEntityId: destination.id,
+  });
+
+  expect(
+    await db
+      .select({ entityId: entityAliases.entityId, name: entityAliases.name })
+      .from(entityAliases)
+      .where(eq(entityAliases.entityId, destination.id)),
+  ).toEqual([{ entityId: destination.id, name: "Hillside" }]);
+});
+
 test("preserves generated Bottle content during an equivalent Entity merge", async ({
   fixtures,
 }) => {
