@@ -5,6 +5,7 @@ import { SiteFooter, type SiteFooterProps } from "@peated/web/components";
 const links = [
   { href: "/about", label: "About" },
   { href: "/about/categories", label: "Whisky categories" },
+  { href: "/about/ratings", label: "Rating guide" },
   { href: "/updates", label: "Recent changes" },
   { href: "https://github.com/peated/peated", label: "Source" },
   { href: "/terms", label: "Terms" },
