@@ -12,23 +12,27 @@ import { getEntityUrl } from "@peated/web/lib/urls";
 import type { Entity } from "./entityPageData";
 
 type EntityCatalog = Outputs["entities"]["catalog"];
-type RelatedEntity = EntityCatalog["related"]["brands"][number];
+type RelatedEntity =
+  | EntityCatalog["related"]["bottlers"][number]
+  | EntityCatalog["related"]["distillers"][number];
 
 function getRelationshipGroup(entity: Entity, catalog?: EntityCatalog) {
   if (!catalog) return null;
 
-  const candidates: Array<{
+  const groups: {
     heading: string;
     items: RelatedEntity[];
-  }> =
-    entity.kind === "brand"
-      ? [
-          { heading: "Distillers", items: catalog.related.distillers },
-          { heading: "Bottlers", items: catalog.related.bottlers },
-        ]
-      : [{ heading: "Brands", items: catalog.related.brands }];
+  }[] =
+    entity.kind === "distillery"
+      ? [{ heading: "Bottled by", items: catalog.related.bottlers }]
+      : entity.kind === "brand"
+        ? [
+            { heading: "Distilled at", items: catalog.related.distillers },
+            { heading: "Bottled by", items: catalog.related.bottlers },
+          ]
+        : [{ heading: "Distilled at", items: catalog.related.distillers }];
 
-  return candidates.find((candidate) => candidate.items.length > 0) ?? null;
+  return groups.find((group) => group.items.length) ?? null;
 }
 
 export function EntityCatalogRelationships({
@@ -46,22 +50,23 @@ export function EntityCatalogRelationships({
 }) {
   if (entity.kind === "company") return null;
 
+  const heading = entity.kind === "distillery" ? "Bottled by" : "Distilled at";
+  const relatedKind =
+    entity.kind === "distillery" ? "bottlers" : "distilleries";
+
   if (pending) {
     return (
-      <PageSection heading="Related brands and producers">
-        <LoadingList label="Loading related brands and producers" rows={3} />
+      <PageSection heading={heading}>
+        <LoadingList label={`Loading ${relatedKind}`} rows={3} />
       </PageSection>
     );
   }
 
   if (error) {
     return (
-      <PageSection heading="Related brands and producers">
-        <SectionError
-          heading="Related brands and producers are unavailable"
-          onRetry={retry}
-        >
-          Try loading the related brands and producers again.
+      <PageSection heading={heading}>
+        <SectionError heading={`Could not load ${relatedKind}`} onRetry={retry}>
+          Try again.
         </SectionError>
       </PageSection>
     );
@@ -78,7 +83,6 @@ export function EntityCatalogRelationships({
             end={related.count.toLocaleString("en-US")}
             href={getEntityUrl(related)}
             key={related.id}
-            metadata={related.kind === "brand" ? "Bottle brand" : undefined}
             title={related.shortName || related.name}
           />
         ))}

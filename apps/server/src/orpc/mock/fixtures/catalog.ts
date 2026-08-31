@@ -63,12 +63,15 @@ export function mockEntityCatalogFor(
       (categoryCounts.get(bottle.category) ?? 0) + 1,
     );
   }
-  const relatedEntities = (
+  const relatedEntities = <Kind extends "brand" | "bottler" | "distillery">(
     values: Entity[],
-  ): MockOutputs["entities"]["catalog"]["related"]["brands"] =>
+    kind: Kind,
+    matches: (bottle: Bottle, entityId: number) => boolean,
+  ) =>
     values
       .filter(
         (value, index) =>
+          value.kind === kind &&
           value.id !== entity.id &&
           values.findIndex((candidate) => candidate.id === value.id) === index,
       )
@@ -76,13 +79,9 @@ export function mockEntityCatalogFor(
         id: value.id,
         name: value.name,
         shortName: value.shortName,
-        kind: value.kind,
-        count: relatedBottles.filter(
-          (bottle) =>
-            bottle.brand.id === value.id ||
-            bottle.bottler?.id === value.id ||
-            bottle.distillers.some((distiller) => distiller.id === value.id),
-        ).length,
+        kind,
+        count: relatedBottles.filter((bottle) => matches(bottle, value.id))
+          .length,
       }));
 
   return {
@@ -112,14 +111,23 @@ export function mockEntityCatalogFor(
       ),
     })),
     related: {
-      brands: relatedEntities(relatedBottles.map((bottle) => bottle.brand)),
+      brands: relatedEntities(
+        relatedBottles.map((bottle) => bottle.brand),
+        "brand",
+        (bottle, entityId) => bottle.brand.id === entityId,
+      ),
       bottlers: relatedEntities(
         relatedBottles.flatMap((bottle) =>
           bottle.bottler ? [bottle.bottler] : [],
         ),
+        "bottler",
+        (bottle, entityId) => bottle.bottler?.id === entityId,
       ),
       distillers: relatedEntities(
         relatedBottles.flatMap((bottle) => bottle.distillers),
+        "distillery",
+        (bottle, entityId) =>
+          bottle.distillers.some((distiller) => distiller.id === entityId),
       ),
     },
     notableBottles: relatedBottles.map((bottle) => ({

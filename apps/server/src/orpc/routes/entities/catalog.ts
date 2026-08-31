@@ -81,7 +81,13 @@ export default implement(entityCatalogContract).handler(async function ({
       })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .where(and(associatedBottle, ne(entities.id, entity.id)))
+      .where(
+        and(
+          associatedBottle,
+          ne(entities.id, entity.id),
+          eq(entities.kind, "brand"),
+        ),
+      )
       .groupBy(entities.id)
       .orderBy(desc(sql`COUNT(DISTINCT ${bottles.id})`), asc(entities.name))
       .limit(7),
@@ -95,7 +101,13 @@ export default implement(entityCatalogContract).handler(async function ({
       })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.bottlerId))
-      .where(and(associatedBottle, ne(entities.id, entity.id)))
+      .where(
+        and(
+          associatedBottle,
+          ne(entities.id, entity.id),
+          eq(entities.kind, "bottler"),
+        ),
+      )
       .groupBy(entities.id)
       .orderBy(desc(sql`COUNT(DISTINCT ${bottles.id})`), asc(entities.name))
       .limit(7),
@@ -113,7 +125,13 @@ export default implement(entityCatalogContract).handler(async function ({
         eq(bottlesToDistillers.bottleId, bottles.id),
       )
       .innerJoin(entities, eq(entities.id, bottlesToDistillers.distillerId))
-      .where(and(associatedBottle, ne(entities.id, entity.id)))
+      .where(
+        and(
+          associatedBottle,
+          ne(entities.id, entity.id),
+          eq(entities.kind, "distillery"),
+        ),
+      )
       .groupBy(entities.id)
       .orderBy(desc(sql`COUNT(DISTINCT ${bottles.id})`), asc(entities.name))
       .limit(7),
@@ -135,12 +153,17 @@ export default implement(entityCatalogContract).handler(async function ({
     throw new Error(`Missing catalog summary for Entity ${entity.id}.`);
   }
 
-  const related = (rows: typeof brandRows) =>
+  const related = <Kind extends "brand" | "bottler" | "distillery">(
+    rows: typeof brandRows,
+    kind: Kind,
+  ) =>
     rows.map((row) => {
-      if (!row.kind) {
-        throw new Error(`Related Entity ${row.id} has no kind.`);
+      if (row.kind !== kind) {
+        throw new Error(
+          `Related Entity ${row.id} must have kind ${kind}, got ${row.kind}.`,
+        );
       }
-      return { ...row, kind: row.kind, count: Number(row.count) };
+      return { ...row, kind, count: Number(row.count) };
     });
   const totalBottles = Number(summary.totalBottles);
 
@@ -160,9 +183,9 @@ export default implement(entityCatalogContract).handler(async function ({
       count: Number(row.count),
     })),
     related: {
-      brands: related(brandRows),
-      bottlers: related(bottlerRows),
-      distillers: related(distillerRows),
+      brands: related(brandRows, "brand"),
+      bottlers: related(bottlerRows, "bottler"),
+      distillers: related(distillerRows, "distillery"),
     },
     notableBottles: notableBottleRows,
   };

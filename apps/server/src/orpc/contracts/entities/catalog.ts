@@ -1,4 +1,5 @@
-import { CategoryEnum, EntityKindEnum } from "@peated/server/schemas";
+import type { EntityKindEnum } from "@peated/server/schemas";
+import { CategoryEnum } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
 
@@ -6,9 +7,12 @@ const RelatedEntitySchema = z.object({
   id: z.number(),
   name: z.string(),
   shortName: z.string().nullable(),
-  kind: EntityKindEnum,
   count: z.number(),
 });
+
+const relatedEntitySchema = <Kind extends z.infer<typeof EntityKindEnum>>(
+  kind: Kind,
+) => RelatedEntitySchema.extend({ kind: z.literal(kind) });
 
 export default contract
   .route({
@@ -38,9 +42,9 @@ export default contract
         }),
       ),
       related: z.object({
-        brands: z.array(RelatedEntitySchema),
-        bottlers: z.array(RelatedEntitySchema),
-        distillers: z.array(RelatedEntitySchema),
+        brands: z.array(relatedEntitySchema("brand")),
+        bottlers: z.array(relatedEntitySchema("bottler")),
+        distillers: z.array(relatedEntitySchema("distillery")),
       }),
       notableBottles: z.array(
         z.object({
