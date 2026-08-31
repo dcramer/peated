@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "DESIGN.md",
+    "apps/server/src/lib/bottleConflicts.ts",
+    "apps/server/src/lib/bottleDisplayName.test.ts",
+    "apps/server/src/lib/bottleDisplayName.ts",
+    "apps/server/src/lib/bottleIdentity.test.ts",
+    "apps/server/src/lib/bottleIdentity.ts",
+    "apps/server/src/lib/bottleOperationReview.test.ts",
+    "apps/server/src/lib/bottleOperationReview/bottleUpdate.ts",
+    "apps/server/src/lib/bottleReferenceResolution.test.ts",
+    "apps/server/src/lib/classifierDecisionCreateInputs.test.ts",
+    "apps/server/src/lib/createBottle.test.ts",
+    "apps/server/src/lib/createBottle.ts",
+    "apps/server/src/lib/moderationHistory.ts",
+    "apps/server/src/lib/moderationTasks.ts",
+    "apps/server/src/lib/priceMatching.test.ts",
+    "apps/server/src/lib/test/fixtures.test.ts",
+    "apps/server/src/lib/test/fixtures.ts",
+    "apps/server/src/lib/updateBottle.test.ts",
+    "apps/server/src/lib/updateBottle.ts",
+    "apps/server/src/lib/updateEntity.test.ts"
+  ],
+  "commitSha": "eee4fd392df02f9f08eb3298831135970c5bb56f",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "member-profile"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
