@@ -1,16 +1,20 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type { BandStackProps, ScoreProps, SpecStripCells } from "..";
+import type {
+  KeyFactList,
+  ReviewScoreProps,
+  TastingRatingDistributionProps,
+} from "..";
 import {
   AppLink,
-  BandStack,
   BottleVisual,
   Chip,
-  hasVisibleSpecStripCells,
-  RecordId,
-  Score,
-  SpecStrip,
+  KeyFacts,
+  PeatedId,
+  ReviewScore,
+  TastingRatingDistribution,
+  hasVisibleKeyFacts,
 } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
@@ -26,7 +30,7 @@ export type BottleMemberStatus = {
 
 export type BottlePageHeaderProps = {
   actions?: ReactNode;
-  bands?: BandStackProps | null;
+  bands?: TastingRatingDistributionProps | null;
   brand: string;
   brandHref?: string;
   detail?: ReactNode;
@@ -36,11 +40,11 @@ export type BottlePageHeaderProps = {
   menu?: ReactNode;
   name: string;
   notes?: readonly string[];
-  score?: ScoreProps | null;
-  specs: SpecStripCells;
+  score?: ReviewScoreProps | null;
+  specs: KeyFactList;
 };
 
-/** Presents a bottle's catalog identity, member actions, community measures, and core facts. */
+/** Presents a bottle's catalog identity, member actions, community ratings, and core facts. */
 export function BottlePageHeader({
   actions,
   bands,
@@ -57,19 +61,19 @@ export function BottlePageHeader({
   specs,
 }: BottlePageHeaderProps) {
   const hasActions = Boolean(actions || menu);
-  const hasMeasures = Boolean(score || bands);
+  const hasRatings = Boolean(score || bands);
 
   return (
     <header
-      {...stylex.props(styles.root, hasMeasures && styles.rootWithMeasures)}
+      {...stylex.props(styles.root, hasRatings && styles.rootWithRatings)}
     >
       <div {...stylex.props(styles.stampPanel)}>
-        <RecordId detail={detail} id={id} />
+        <PeatedId detail={detail} id={id} />
       </div>
       <div
         {...stylex.props(
           styles.identityPanel,
-          hasMeasures && styles.identityPanelWithMeasures,
+          hasRatings && styles.identityPanelWithRatings,
         )}
       >
         <div {...stylex.props(styles.identityContent)}>
@@ -114,25 +118,25 @@ export function BottlePageHeader({
           </div>
         </div>
       </div>
-      {hasVisibleSpecStripCells(specs) ? (
+      {hasVisibleKeyFacts(specs) ? (
         <div {...stylex.props(styles.specs)}>
-          <SpecStrip cells={specs} />
+          <KeyFacts facts={specs} />
         </div>
       ) : null}
-      {hasMeasures ? (
-        <div aria-label="Community measures" {...stylex.props(styles.measures)}>
+      {hasRatings ? (
+        <div aria-label="Community ratings" {...stylex.props(styles.ratings)}>
           {score ? (
-            <section {...stylex.props(styles.measure)}>
-              <div {...stylex.props(styles.measureContent)}>
-                <Score {...score} />
+            <section {...stylex.props(styles.rating)}>
+              <div {...stylex.props(styles.ratingContent)}>
+                <ReviewScore {...score} />
               </div>
             </section>
           ) : null}
           {bands ? (
-            <section {...stylex.props(styles.measure)}>
-              <h2 {...stylex.props(styles.measureLabel)}>Tasting ratings</h2>
-              <div {...stylex.props(styles.measureContent)}>
-                <BandStack {...bands} />
+            <section {...stylex.props(styles.rating)}>
+              <h2 {...stylex.props(styles.ratingLabel)}>Tasting ratings</h2>
+              <div {...stylex.props(styles.ratingContent)}>
+                <TastingRatingDistribution {...bands} />
               </div>
             </section>
           ) : null}
@@ -150,7 +154,7 @@ const styles = stylex.create({
     minWidth: 0,
     gridTemplateColumns: "minmax(0, 1fr)",
   },
-  rootWithMeasures: {
+  rootWithRatings: {
     gridTemplateColumns: {
       default: "minmax(0, 1fr) 260px",
       [NARROW]: "minmax(0, 1fr)",
@@ -172,7 +176,7 @@ const styles = stylex.create({
     paddingBottom: { default: space.x6, [PHONE]: 0 },
     backgroundColor: "transparent",
   },
-  identityPanelWithMeasures: {
+  identityPanelWithRatings: {
     borderBottomRightRadius: 0,
   },
   identityContent: {
@@ -261,7 +265,7 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.45,
   },
-  measures: {
+  ratings: {
     boxSizing: "border-box",
     display: "grid",
     minWidth: 0,
@@ -283,7 +287,7 @@ const styles = stylex.create({
     borderTopColor: colors.hairline,
     backgroundColor: "transparent",
   },
-  measure: {
+  rating: {
     display: { default: "block", [PHONE]: "grid" },
     minWidth: 0,
     gridTemplateColumns: {
@@ -293,7 +297,7 @@ const styles = stylex.create({
     alignItems: "start",
     gap: { default: 0, [PHONE]: space.x3 },
   },
-  measureLabel: {
+  ratingLabel: {
     margin: 0,
     marginBottom: { default: space.x2, [PHONE]: 0 },
     color: colors.inkMuted,
@@ -304,7 +308,7 @@ const styles = stylex.create({
     lineHeight: 1.3,
     textTransform: "uppercase",
   },
-  measureContent: {
+  ratingContent: {
     minWidth: 0,
   },
   specs: {

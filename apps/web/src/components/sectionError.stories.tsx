@@ -4,7 +4,7 @@ import { SectionError } from "./feedback.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Feedback/Section Error",
+  title: "Components/Messages & Status/Section Error",
   component: SectionError,
   args: {
     children:

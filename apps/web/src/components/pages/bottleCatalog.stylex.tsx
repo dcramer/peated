@@ -6,6 +6,7 @@ import { useId } from "react";
 
 import {
   BottleIdentityRow,
+  BottleRatings,
   Button,
   ButtonLink,
   CursorPager,
@@ -16,11 +17,10 @@ import {
   ItemList,
   ItemListItem,
   ListToolbar,
-  RatingMeasure,
   Select,
   TextInput,
-  type BandCounts,
   type ListSortOption,
+  type TastingRatingCounts,
 } from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
@@ -29,7 +29,7 @@ const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (max-width: 759px)";
 
 export type BottleCatalogItem = {
-  bandCounts: BandCounts;
+  bandCounts: TastingRatingCounts;
   brand: string;
   brandHref?: string;
   hasTasted?: boolean;
@@ -143,8 +143,8 @@ export function BottleCatalogList({
 
 function BottleCatalogMeasures({ item }: { item: BottleCatalogItem }) {
   return (
-    <div {...stylex.props(styles.measures)}>
-      <RatingMeasure
+    <div {...stylex.props(styles.ratings)}>
+      <BottleRatings
         counts={item.bandCounts}
         high={item.scoreHigh}
         low={item.scoreLow}
@@ -306,7 +306,7 @@ const styles = stylex.create({
   catalog: {
     minWidth: 0,
   },
-  measures: {
+  ratings: {
     display: "flex",
     width: "152px",
     justifyContent: "flex-end",

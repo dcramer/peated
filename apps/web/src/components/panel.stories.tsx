@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { RailLinkList, RecordSection } from "./editorial.stylex";
 import { Panel } from "./panel.stylex";
+import { RailLinkList, RecordSection } from "./recordDetails.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Panel",
+  title: "Components/Layout/Panel",
   component: Panel,
   args: { children: null, title: "Recent changes" },
   decorators: [

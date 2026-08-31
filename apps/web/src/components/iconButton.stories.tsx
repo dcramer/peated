@@ -5,7 +5,7 @@ import { IconButton } from "./button.stylex";
 import { StoryRow, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Actions/Icon Button",
+  title: "Components/Buttons & Menus/Icon Button",
   component: IconButton,
   args: {
     icon: <Plus aria-hidden size={17} />,

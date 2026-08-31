@@ -49,9 +49,9 @@ export const RATING_BANDS = [
 ] as const;
 
 export type RatingBand = (typeof RATING_BANDS)[number]["key"];
-export type BandCounts = Partial<Record<RatingBand, number>>;
+export type TastingRatingCounts = Partial<Record<RatingBand, number>>;
 
-export type ScoreProps = {
+export type ReviewScoreProps = {
   /** Number of eligible member and external review scores in the median. */
   count: number;
   /** Highest eligible review score in the pool. */
@@ -67,14 +67,14 @@ export type ScoreProps = {
 };
 
 /** Shows the median of eligible member and external review scores. */
-export function Score({
+export function ReviewScore({
   contributionAction,
   count,
   high = null,
   low = null,
   median = null,
   minimumCount = 20,
-}: ScoreProps) {
+}: ReviewScoreProps) {
   const hasScore = median !== null && count >= minimumCount;
 
   return (
@@ -82,12 +82,12 @@ export function Score({
       data-state={hasScore ? "populated" : "withheld"}
       {...stylex.props(styles.score)}
     >
-      <div {...stylex.props(styles.measureLabel)}>Score</div>
+      <div {...stylex.props(styles.reviewScoreLabel)}>Score</div>
       {hasScore ? (
         <>
           <div {...stylex.props(styles.scoreHeading)}>
             <strong {...stylex.props(styles.scoreValue)}>{median}</strong>
-            <span {...stylex.props(styles.measureMetadata)}>
+            <span {...stylex.props(styles.scoreMetadata)}>
               / 100 · median of {formatCount(count)} scores
             </span>
           </div>
@@ -117,16 +117,19 @@ export function Score({
   );
 }
 
-export type BandStackProps = {
-  counts?: BandCounts;
+export type TastingRatingDistributionProps = {
+  counts?: TastingRatingCounts;
   showCounts?: boolean;
 };
 
 /** Shows aggregate tasting ratings as five fixed bins. */
-export function BandStack({ counts = {}, showCounts = false }: BandStackProps) {
-  const bins = getBandStackBins(counts);
+export function TastingRatingDistribution({
+  counts = {},
+  showCounts = false,
+}: TastingRatingDistributionProps) {
+  const bins = getTastingRatingBins(counts);
   const total = bins.reduce((sum, bin) => sum + bin.count, 0);
-  const shares = getBandStackShares(bins);
+  const shares = getTastingRatingShares(bins);
   const label = bins
     .map((bin) => `${bin.label} ${formatCount(bin.count)}`)
     .join(", ");
@@ -136,12 +139,12 @@ export function BandStack({ counts = {}, showCounts = false }: BandStackProps) {
       aria-label={label}
       data-state={total === 0 ? "empty" : "populated"}
       role="img"
-      {...stylex.props(styles.bandStack)}
+      {...stylex.props(styles.tastingRatingDistribution)}
     >
       <div
         {...stylex.props(
-          styles.bandStackTrack,
-          total === 0 && styles.emptyBandStackTrack,
+          styles.tastingRatingTrack,
+          total === 0 && styles.emptyTastingRatingTrack,
         )}
       >
         {total > 0
@@ -149,7 +152,7 @@ export function BandStack({ counts = {}, showCounts = false }: BandStackProps) {
               <span
                 key={bin.key}
                 {...stylex.props(
-                  styles.bandStackSegment(shares[index] ?? 0),
+                  styles.tastingRatingSegment(shares[index] ?? 0),
                   bandFillStyles[bin.fill],
                 )}
               />
@@ -157,11 +160,11 @@ export function BandStack({ counts = {}, showCounts = false }: BandStackProps) {
           : null}
       </div>
       {showCounts && total > 0 ? (
-        <div {...stylex.props(styles.bandStackLabels)}>
+        <div {...stylex.props(styles.tastingRatingLabels)}>
           {bins.map((bin, index) => (
             <span
               key={bin.key}
-              {...stylex.props(styles.bandStackLabel(shares[index] ?? 0))}
+              {...stylex.props(styles.tastingRatingLabel(shares[index] ?? 0))}
             >
               {formatCount(bin.count)}
             </span>
@@ -172,13 +175,13 @@ export function BandStack({ counts = {}, showCounts = false }: BandStackProps) {
   );
 }
 
-export type BandMarkProps = {
+export type TastingRatingProps = {
   /** One canonical tasting rating. */
   band: RatingBand;
 };
 
 /** Shows one tasting rating as five cells. */
-export function BandMark({ band }: BandMarkProps) {
+export function TastingRating({ band }: TastingRatingProps) {
   const selectedBand = RATING_BANDS.find((candidate) => candidate.key === band);
   const label = `${selectedBand?.label ?? "Unknown"} rating`;
 
@@ -187,7 +190,7 @@ export function BandMark({ band }: BandMarkProps) {
       aria-label={label}
       role="img"
       title={label}
-      {...stylex.props(styles.bandMark)}
+      {...stylex.props(styles.tastingRating)}
     >
       {RATING_BANDS.map((candidate) => {
         const selected = candidate.key === band;
@@ -196,7 +199,7 @@ export function BandMark({ band }: BandMarkProps) {
           <span
             key={candidate.key}
             {...stylex.props(
-              styles.bandMarkCell,
+              styles.tastingRatingCell,
               selected && bandFillStyles[bandFillForKey(candidate.key)],
             )}
           />
@@ -206,9 +209,9 @@ export function BandMark({ band }: BandMarkProps) {
   );
 }
 
-export type RatingMeasureProps = {
+export type BottleRatingsProps = {
   /** Tasting rating counts in the fixed five-band order. */
-  counts?: BandCounts;
+  counts?: TastingRatingCounts;
   /** Highest eligible score in the median pool. */
   high?: number | null;
   /** Lowest eligible score in the median pool. */
@@ -219,14 +222,14 @@ export type RatingMeasureProps = {
   scoreCount?: number;
 };
 
-/** Combines the five tasting bands and published score into one compact row measure. */
-export function RatingMeasure({
+/** Combines tasting ratings and the published review score for one bottle row. */
+export function BottleRatings({
   counts = {},
   high = null,
   low = null,
   median = null,
   scoreCount = 0,
-}: RatingMeasureProps) {
+}: BottleRatingsProps) {
   const bandCounts = RATING_BANDS.map((band) => counts[band.key] ?? 0);
   const tastingCount = bandCounts.reduce((sum, count) => sum + count, 0);
   const maxBandCount = Math.max(...bandCounts, 0);
@@ -248,7 +251,7 @@ export function RatingMeasure({
       data-state={tastingCount === 0 && median === null ? "empty" : "populated"}
       role="img"
       title={label}
-      {...stylex.props(styles.ratingMeasure)}
+      {...stylex.props(styles.bottleRatings)}
     >
       <span aria-hidden="true" {...stylex.props(styles.ratingPlot)}>
         <span {...stylex.props(styles.ratingBars)}>
@@ -287,7 +290,7 @@ export function RatingMeasure({
 }
 
 type BandFill = 1 | 2 | 3 | 4 | 5;
-type BandStackBin = {
+type TastingRatingBin = {
   count: number;
   fill: BandFill;
   key: string;
@@ -303,7 +306,7 @@ function bandFillForKey(key: RatingBand): BandFill {
   return 5;
 }
 
-function getBandStackBins(counts: BandCounts): BandStackBin[] {
+function getTastingRatingBins(counts: TastingRatingCounts): TastingRatingBin[] {
   return RATING_BANDS.map((band) => ({
     count: counts[band.key] ?? 0,
     fill: bandFillForKey(band.key),
@@ -313,7 +316,7 @@ function getBandStackBins(counts: BandCounts): BandStackBin[] {
   }));
 }
 
-function getBandStackShares(bins: readonly BandStackBin[]) {
+function getTastingRatingShares(bins: readonly TastingRatingBin[]) {
   const total = bins.reduce((sum, bin) => sum + bin.count, 0);
   if (total === 0) return bins.map(() => 0);
   return bins.map((bin) => (bin.count / total) * 100);
@@ -347,7 +350,7 @@ const styles = stylex.create({
   score: {
     width: "100%",
   },
-  measureLabel: {
+  reviewScoreLabel: {
     color: colors.inkMuted,
     fontFamily: fonts.reading,
     fontSize: "13px",
@@ -415,10 +418,10 @@ const styles = stylex.create({
     lineHeight: 1.5,
     flexWrap: "wrap",
   },
-  bandStack: {
+  tastingRatingDistribution: {
     width: "100%",
   },
-  bandStackTrack: {
+  tastingRatingTrack: {
     display: "flex",
     height: "10px",
     alignItems: "center",
@@ -426,11 +429,11 @@ const styles = stylex.create({
     overflow: "hidden",
     borderRadius: controlMetrics.radiusSmall,
   },
-  emptyBandStackTrack: {
+  emptyTastingRatingTrack: {
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.bandTrack,
   },
-  bandStackSegment: (share: number) => ({
+  tastingRatingSegment: (share: number) => ({
     boxSizing: "border-box",
     minWidth: "5px",
     height: "100%",
@@ -456,7 +459,7 @@ const styles = stylex.create({
   band5Fill: {
     backgroundColor: colors.band5,
   },
-  bandStackLabels: {
+  tastingRatingLabels: {
     display: "flex",
     gap: "2px",
     marginTop: "5px",
@@ -466,7 +469,7 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.35,
   },
-  bandStackLabel: (share: number) => ({
+  tastingRatingLabel: (share: number) => ({
     minWidth: 0,
     overflow: "hidden",
     flexBasis: 0,
@@ -474,12 +477,12 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   }),
-  bandMark: {
+  tastingRating: {
     display: "inline-flex",
     flexShrink: 0,
     gap: "2px",
   },
-  bandMarkCell: {
+  tastingRatingCell: {
     position: "relative",
     display: "inline-block",
     width: "12px",
@@ -488,7 +491,7 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.bandTrack,
   },
-  ratingMeasure: {
+  bottleRatings: {
     display: "inline-flex",
     width: "152px",
     minWidth: 0,
@@ -591,7 +594,7 @@ const styles = stylex.create({
       fontSize: "16px",
     },
   },
-  measureMetadata: {
+  scoreMetadata: {
     color: colors.inkMuted,
     fontFamily: fonts.reading,
     fontSize: "13px",

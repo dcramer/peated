@@ -97,7 +97,7 @@ export default function Foundations({
             />
             <TokenSwatch
               name="Accent"
-              use="Measures, links, and one main action"
+              use="Ratings, links, and one main action"
               light="9A5B12"
               dark="D9922F"
               colorStyle={styles.accent}

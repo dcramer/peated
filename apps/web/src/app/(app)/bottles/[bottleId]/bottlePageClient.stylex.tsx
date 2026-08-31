@@ -13,12 +13,12 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
+  BottleRatings,
   Button,
   ButtonLink,
   EmptyState,
   LoadingList,
   PageTabs,
-  RatingMeasure,
   RowMenu,
   SectionError,
   type CriticReviewProps,
@@ -484,7 +484,7 @@ export function BottleOverviewClient({
   const recommendations =
     recommendationsQuery.data?.results.map((recommendation) => ({
       end: (
-        <RatingMeasure
+        <BottleRatings
           counts={recommendation.tastingBandCounts}
           high={recommendation.maxScore}
           low={recommendation.minScore}

@@ -11,7 +11,7 @@ import {
 import { AppLink } from "./appLink";
 import type { ItemListVariant } from "./itemList.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
-import { MemberStatusMark } from "./memberStatusMark.stylex";
+import { MemberStatus } from "./memberStatus.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 const bottleIconUrl = "/assets/bottle.svg";
@@ -128,8 +128,8 @@ export function BottleIdentityRow({
           ) : (
             <span {...stylex.props(styles.name)}>{name}</span>
           )}
-          {isLibrary ? <MemberStatusMark kind="library" /> : null}
-          {hasTasted ? <MemberStatusMark kind="tasted" /> : null}
+          {isLibrary ? <MemberStatus kind="library" /> : null}
+          {hasTasted ? <MemberStatus kind="tasted" /> : null}
         </div>
         {metadata.length ? (
           <div {...stylex.props(styles.metadata)}>

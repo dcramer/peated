@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { RatingMeasure } from "./scoring.stylex";
+import { BottleRatings } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Measures/Rating Measure",
-  component: RatingMeasure,
+  title: "Components/Ratings/Bottle Ratings",
+  component: BottleRatings,
   args: {
     counts: {
       good: 34,
@@ -26,7 +26,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof RatingMeasure>;
+} satisfies Meta<typeof BottleRatings>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -34,8 +34,8 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <RatingMeasure {...args} />
-      <RatingMeasure
+      <BottleRatings {...args} />
+      <BottleRatings
         counts={{
           good: 8,
           mediocre: 10,
@@ -48,8 +48,8 @@ export const Overview: Story = {
         median={86}
         scoreCount={18}
       />
-      <RatingMeasure counts={{ outstanding: 2, unicorn: 1, very_good: 4 }} />
-      <RatingMeasure />
+      <BottleRatings counts={{ outstanding: 2, unicorn: 1, very_good: 4 }} />
+      <BottleRatings />
     </StoryStack>
   ),
 };

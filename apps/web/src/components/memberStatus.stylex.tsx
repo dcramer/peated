@@ -2,16 +2,16 @@ import * as stylex from "@stylexjs/stylex";
 
 import { colors } from "../styles/tokens.stylex";
 
-export type MemberStatusMarkKind = "following" | "library" | "tasted";
+export type MemberStatusKind = "following" | "library" | "tasted";
 
 const labels = {
   following: "Following",
   library: "In Library",
   tasted: "Tasted",
-} satisfies Record<MemberStatusMarkKind, string>;
+} satisfies Record<MemberStatusKind, string>;
 
-/** Marks personal state beside a record name without acting as a control. */
-export function MemberStatusMark({ kind }: { kind: MemberStatusMarkKind }) {
+/** Shows personal catalog state beside a name without acting as a control. */
+export function MemberStatus({ kind }: { kind: MemberStatusKind }) {
   const label = labels[kind];
 
   return (
@@ -22,17 +22,17 @@ export function MemberStatusMark({ kind }: { kind: MemberStatusMarkKind }) {
       {...stylex.props(styles.status)}
     >
       {kind === "library" ? (
-        <LibraryMark />
+        <LibraryIcon />
       ) : kind === "tasted" ? (
-        <TastedMark />
+        <TastedIcon />
       ) : (
-        <FollowingMark />
+        <FollowingIcon />
       )}
     </span>
   );
 }
 
-function LibraryMark() {
+function LibraryIcon() {
   return (
     <svg
       aria-hidden="true"
@@ -53,7 +53,7 @@ function LibraryMark() {
   );
 }
 
-function TastedMark() {
+function TastedIcon() {
   return (
     <svg
       aria-hidden="true"
@@ -75,7 +75,7 @@ function TastedMark() {
   );
 }
 
-function FollowingMark() {
+function FollowingIcon() {
   return (
     <svg
       aria-hidden="true"

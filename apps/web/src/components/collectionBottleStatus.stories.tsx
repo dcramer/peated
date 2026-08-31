@@ -4,7 +4,7 @@ import { CollectionBottleStatusChips } from "./collectionBottleStatus.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Collection Bottle Status",
+  title: "Components/Bottles/Collection Bottle Status",
   component: CollectionBottleStatusChips,
   args: {
     onChange: () => undefined,

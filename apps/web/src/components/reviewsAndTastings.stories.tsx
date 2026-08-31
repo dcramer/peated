@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { ReviewQuote, TastingNote } from "./editorial.stylex";
+import { ReviewQuote, TastingNote } from "./recordDetails.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Editorial/Reviews and tastings",
+  title: "Components/Reviews & Tastings/Reviews and Tastings",
   component: ReviewQuote,
   args: {
     publication: "Whisky Advocate",

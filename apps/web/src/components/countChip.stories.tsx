@@ -4,7 +4,7 @@ import { CountChip } from "./chip.stylex";
 import { StoryRow } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Count Chip",
+  title: "Components/Labels/Count Chip",
   component: CountChip,
   args: { count: 12, tone: "accent" },
   argTypes: {

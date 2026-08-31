@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { BandMark, type RatingBand } from "./scoring.stylex";
+import { TastingRating, type RatingBand } from "./scoring.stylex";
 
 export type TastingEntryMember = {
   description?: string;
@@ -99,9 +99,9 @@ export function TastingEntry({
                 </span>
               ) : null}
             </div>
-            <div {...stylex.props(styles.measure)}>
+            <div {...stylex.props(styles.rating)}>
               {member.ratingBand ? (
-                <BandMark band={member.ratingBand} />
+                <TastingRating band={member.ratingBand} />
               ) : (
                 <span {...stylex.props(styles.unknown)}>–</span>
               )}
@@ -302,7 +302,7 @@ const styles = stylex.create({
   descriptionPreview: {
     display: "block",
   },
-  measure: {
+  rating: {
     display: "flex",
     minWidth: "76px",
     flexShrink: 0,

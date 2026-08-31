@@ -44,7 +44,7 @@ const broraHistory = [
 ] as const;
 
 const meta = {
-  title: "Components/Data Display/History Timeline",
+  title: "Components/History/History Timeline",
   component: HistoryTimeline,
   decorators: [
     (Story, context) => (

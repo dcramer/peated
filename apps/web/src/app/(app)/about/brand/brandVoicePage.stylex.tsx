@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { RecordId, SectionHeading } from "@peated/web/components";
+import { PeatedId, SectionHeading } from "@peated/web/components";
 import { foundationStyles } from "../../../../styles/foundations.stylex";
 import {
   colors,
@@ -169,7 +169,7 @@ export function BrandVoicePage() {
   return (
     <article {...stylex.props(styles.page)}>
       <header {...stylex.props(styles.hero)}>
-        <RecordId id="VOICE" detail="tone · copy · the words themselves" />
+        <PeatedId id="VOICE" detail="tone · copy · the words themselves" />
         <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>
           Serious about the record.
           <br />

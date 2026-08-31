@@ -4,7 +4,7 @@ import { FacetRow, type FacetRowProps } from "./facetRow.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Facet Row",
+  title: "Components/Search/Facet Row",
   component: FacetRow,
   args: {
     count: 12,

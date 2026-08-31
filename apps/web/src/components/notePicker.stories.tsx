@@ -8,7 +8,7 @@ import { noteOptions } from "./storyData";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Note Picker",
+  title: "Components/Reviews & Tastings/Note Picker",
   component: NotePicker,
   args: {
     notes: noteOptions,

@@ -60,7 +60,7 @@ export const searchResultGroups = [
       {
         href: "/bottles/872",
         id: "bottle-872",
-        measures: {
+        ratings: {
           bands: {
             good: 8,
             mediocre: 3,
@@ -76,7 +76,7 @@ export const searchResultGroups = [
       {
         href: "/bottles/1188",
         id: "bottle-1188",
-        measures: {
+        ratings: {
           bands: {
             good: 3,
             mediocre: 1,

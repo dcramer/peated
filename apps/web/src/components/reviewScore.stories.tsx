@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button } from "./button.stylex";
-import { Score } from "./scoring.stylex";
+import { ReviewScore } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Measures/Score",
-  component: Score,
+  title: "Components/Ratings/Review Score",
+  component: ReviewScore,
   args: {
     count: 128,
     high: 96,
@@ -20,7 +20,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof Score>;
+} satisfies Meta<typeof ReviewScore>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -28,8 +28,8 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <Score {...args} />
-      <Score
+      <ReviewScore {...args} />
+      <ReviewScore
         contributionAction={
           <Button size="sm" variant="text">
             Write a review
@@ -40,7 +40,7 @@ export const Overview: Story = {
         low={79}
         median={89}
       />
-      <Score count={0} />
+      <ReviewScore count={0} />
     </StoryStack>
   ),
 };

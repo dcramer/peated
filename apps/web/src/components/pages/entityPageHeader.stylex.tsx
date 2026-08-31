@@ -1,12 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import {
-  hasVisibleSpecStripCells,
-  RecordId,
-  SpecStrip,
-  type SpecStripCells,
-} from "..";
+import { KeyFacts, PeatedId, hasVisibleKeyFacts, type KeyFactList } from "..";
 import { space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
@@ -18,7 +13,7 @@ export type EntityPageHeaderProps = {
   id: string;
   menu?: ReactNode;
   parent?: ReactNode;
-  specs: SpecStripCells;
+  specs: KeyFactList;
   title: ReactNode;
 };
 
@@ -40,14 +35,14 @@ export function EntityPageHeader({
         actions={actions}
         description={description}
         eyebrow={eyebrow}
-        identity={<RecordId detail={detail} id={id} />}
+        identity={<PeatedId detail={detail} id={id} />}
         menu={menu}
         parent={parent}
         title={title}
       />
-      {hasVisibleSpecStripCells(specs) ? (
+      {hasVisibleKeyFacts(specs) ? (
         <div {...stylex.props(styles.specs)}>
-          <SpecStrip cells={specs} />
+          <KeyFacts facts={specs} />
         </div>
       ) : null}
     </div>

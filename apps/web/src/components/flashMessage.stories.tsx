@@ -4,7 +4,7 @@ import { FlashMessage } from "./feedback.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Feedback/Flash Message",
+  title: "Components/Messages & Status/Flash Message",
   component: FlashMessage,
   args: {
     children: "Your tasting was saved.",

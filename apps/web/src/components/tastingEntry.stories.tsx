@@ -6,7 +6,7 @@ import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 import { TastingEntry } from "./tastingEntry.stylex";
 
 const meta = {
-  title: "Components/Data Display/Tasting Entry",
+  title: "Components/Reviews & Tastings/Tasting Entry",
   component: TastingEntry,
   args: {
     author: "David Cramer",

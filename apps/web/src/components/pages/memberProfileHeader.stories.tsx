@@ -8,7 +8,7 @@ import {
 } from "./memberProfileHeader.stylex";
 
 const meta = {
-  title: "Components/Profile/Profile Header",
+  title: "Components/Members/Profile Header",
   component: MemberProfileHeader,
   args: {
     bands: {

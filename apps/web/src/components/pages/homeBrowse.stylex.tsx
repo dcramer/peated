@@ -4,14 +4,14 @@ import type { ReactNode } from "react";
 
 import {
   AppLink,
+  BottleRatings,
   Card,
   CardActionLink,
   CardLink,
   CardPrimaryLink,
   ItemList,
   ItemRow,
-  RatingMeasure,
-  type BandCounts,
+  type TastingRatingCounts,
 } from "..";
 import {
   colors,
@@ -46,7 +46,7 @@ function HomeModuleHeading({
 }
 
 export type HomeRatedBottle = {
-  bandCounts: BandCounts;
+  bandCounts: TastingRatingCounts;
   href: string;
   metadata: readonly string[];
   name: string;
@@ -83,7 +83,7 @@ export function HomeHighestRated({
           {bottles.map((bottle) => (
             <ItemRow
               end={
-                <RatingMeasure
+                <BottleRatings
                   counts={bottle.bandCounts}
                   high={bottle.scoreHigh}
                   low={bottle.scoreLow}

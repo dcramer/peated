@@ -4,7 +4,7 @@ import { LocationCard } from "./locationCard.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Location Card",
+  title: "Components/Places/Location Card",
   component: LocationCard,
   args: {
     href: "#scotland",

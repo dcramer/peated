@@ -4,7 +4,7 @@ import { Button } from "./button.stylex";
 import { StoryRow, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Actions/Button",
+  title: "Components/Buttons & Menus/Button",
   component: Button,
   args: {
     children: "Add a bottle",

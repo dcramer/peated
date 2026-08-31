@@ -7,7 +7,7 @@ import {
   RailList,
   RailListItem,
 } from "./lists.stylex";
-import { BandMark } from "./scoring.stylex";
+import { TastingRating } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const sortOptions = [
@@ -33,7 +33,7 @@ function ToolbarExample() {
 }
 
 const meta = {
-  title: "Components/Data Display/Lists",
+  title: "Components/Lists & Tables/Lists",
   component: RailList,
   args: { ariaLabel: "Records", children: null },
   decorators: [
@@ -54,7 +54,7 @@ export const Overview: Story = {
       <ToolbarExample />
       <RailList ariaLabel="Recent tastings">
         <RailListItem
-          end={<BandMark band="outstanding" />}
+          end={<TastingRating band="outstanding" />}
           href="/tastings/1"
           metadata="Aug 22 · 46% ABV"
           title="Port Charlotte 10 Year Old"

@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { BandMark, RATING_BANDS } from "./scoring.stylex";
+import { RATING_BANDS, TastingRating } from "./scoring.stylex";
 import { StoryRow, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Measures/Band Mark",
-  component: BandMark,
+  title: "Components/Ratings/Tasting Rating",
+  component: TastingRating,
   args: { band: "outstanding" },
-} satisfies Meta<typeof BandMark>;
+} satisfies Meta<typeof TastingRating>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -17,7 +17,7 @@ export const Overview: Story = {
     <StoryStack>
       <StoryRow>
         {RATING_BANDS.map((band) => (
-          <BandMark band={band.key} key={band.key} />
+          <TastingRating band={band.key} key={band.key} />
         ))}
       </StoryRow>
     </StoryStack>

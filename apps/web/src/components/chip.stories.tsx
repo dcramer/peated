@@ -7,7 +7,7 @@ import { Chip } from "./chip.stylex";
 import { StoryRow } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Chip",
+  title: "Components/Labels/Chip",
   component: Chip,
   args: { children: "Smoke", variant: "neutral" },
   argTypes: {

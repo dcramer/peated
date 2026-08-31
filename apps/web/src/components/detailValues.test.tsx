@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { SpecStrip } from "./dataDevices.stylex";
+import { KeyFacts } from "./catalogDetails.stylex";
 import { FactList } from "./factList.stylex";
 
 describe("detail values", () => {
@@ -32,8 +32,8 @@ describe("detail values", () => {
 
   it("omits empty specs and keeps zero", () => {
     const html = renderToStaticMarkup(
-      <SpecStrip
-        cells={[
+      <KeyFacts
+        facts={[
           { label: "Founded", value: null },
           { label: "Country", value: "" },
           { label: "Bottles", value: 0 },

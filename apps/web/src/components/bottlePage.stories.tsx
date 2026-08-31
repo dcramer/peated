@@ -12,7 +12,7 @@ import {
   RecordMasthead,
   RecordSection,
   RecordTabs,
-} from "./editorial.stylex";
+} from "./recordDetails.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {

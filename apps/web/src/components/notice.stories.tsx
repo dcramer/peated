@@ -5,7 +5,7 @@ import { Notice } from "./feedback.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Feedback/Notice",
+  title: "Components/Messages & Status/Notice",
   component: Notice,
   args: { children: "The source lists two different bottling years." },
   decorators: [

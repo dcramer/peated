@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { MemberStatusMark } from "./memberStatusMark.stylex";
+import { MemberStatus } from "./memberStatus.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Member Status Mark",
-  component: MemberStatusMark,
+  title: "Components/Members/Member Status",
+  component: MemberStatus,
   decorators: [
     (Story) => (
       <StoryCanvas>
@@ -14,7 +14,7 @@ const meta = {
     ),
   ],
   args: { kind: "following" },
-} satisfies Meta<typeof MemberStatusMark>;
+} satisfies Meta<typeof MemberStatus>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -24,15 +24,15 @@ export const Overview: Story = {
     <StoryStack>
       <span>
         Ardbeg
-        <MemberStatusMark kind="following" />
+        <MemberStatus kind="following" />
       </span>
       <span>
         Uigeadail
-        <MemberStatusMark kind="library" />
+        <MemberStatus kind="library" />
       </span>
       <span>
         Corryvreckan
-        <MemberStatusMark kind="tasted" />
+        <MemberStatus kind="tasted" />
       </span>
     </StoryStack>
   ),

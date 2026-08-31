@@ -1,7 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { BandStack, CountChip, type BandCounts } from "..";
+import {
+  CountChip,
+  TastingRatingDistribution,
+  type TastingRatingCounts,
+} from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 
 export type HomeMemberFact = {
@@ -11,7 +15,7 @@ export type HomeMemberFact = {
 
 export type HomeMemberSummaryProps = {
   facts: readonly [HomeMemberFact, HomeMemberFact, HomeMemberFact];
-  bands: BandCounts;
+  bands: TastingRatingCounts;
   totalTastings: number;
 };
 
@@ -42,7 +46,7 @@ export function HomeMemberSummary({
           </span>
         </div>
         <div {...stylex.props(styles.recordDistribution)}>
-          <BandStack counts={bands} showCounts />
+          <TastingRatingDistribution counts={bands} showCounts />
         </div>
         <dl {...stylex.props(styles.recordFacts)}>
           {facts.map((fact) => (

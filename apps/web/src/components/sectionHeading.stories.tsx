@@ -4,7 +4,7 @@ import { SectionHeading } from "./sectionHeading.stylex";
 import { StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Section Heading",
+  title: "Components/Layout/Section Heading",
   component: SectionHeading,
   args: { children: "Similar bottles", count: 12 },
 } satisfies Meta<typeof SectionHeading>;

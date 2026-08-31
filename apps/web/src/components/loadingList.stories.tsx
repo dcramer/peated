@@ -4,7 +4,7 @@ import { LoadingList } from "./feedback.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Feedback/Loading List",
+  title: "Components/Messages & Status/Loading List",
   component: LoadingList,
   args: { rows: 3 },
   argTypes: {

@@ -1,7 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { BandStack, Chip, LoadingPlaceholder, type BandCounts } from "..";
+import {
+  Chip,
+  LoadingPlaceholder,
+  TastingRatingDistribution,
+  type TastingRatingCounts,
+} from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
@@ -20,7 +25,7 @@ export type MemberProfileHeaderProps = {
   pictureUrl?: string | null;
   privateProfile?: boolean;
   ratingLabel?: "How they rate" | "How you rate";
-  bands?: BandCounts;
+  bands?: TastingRatingCounts;
   ratingsLoading?: boolean;
   username: string;
 };
@@ -74,7 +79,7 @@ export function MemberProfileHeader({
         <section aria-label={ratingLabel} {...stylex.props(styles.ratings)}>
           <h2 {...stylex.props(styles.ratingLabel)}>{ratingLabel}</h2>
           {bands ? (
-            <BandStack counts={bands} showCounts />
+            <TastingRatingDistribution counts={bands} showCounts />
           ) : (
             <div
               aria-busy="true"

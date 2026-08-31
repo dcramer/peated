@@ -17,7 +17,7 @@ const options = [
 ] satisfies SearchPickerOption[];
 
 const meta = {
-  title: "Components/Selection/Search Picker",
+  title: "Components/Search/Search Picker",
   component: SearchPicker,
   args: {
     label: "Bottles",

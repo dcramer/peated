@@ -1,20 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { SpecStrip } from "./dataDevices.stylex";
+import { KeyFacts } from "./catalogDetails.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Spec Strip",
-  component: SpecStrip,
+  title: "Components/Catalog/Key Facts",
+  component: KeyFacts,
   args: {
-    cells: [
+    facts: [
       { label: "ABV", value: "43.0%" },
       { label: "Age", value: "16 years" },
       { label: "Cask", value: "ex-bourbon" },
       { label: "Size", value: "700 ml" },
     ],
   },
-  argTypes: { cells: { control: "object" } },
+  argTypes: { facts: { control: "object" } },
   decorators: [
     (Story) => (
       <StoryCanvas width="wide">
@@ -22,7 +22,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof SpecStrip>;
+} satisfies Meta<typeof KeyFacts>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -30,16 +30,16 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <SpecStrip {...args} />
-      <SpecStrip
-        cells={[
+      <KeyFacts {...args} />
+      <KeyFacts
+        facts={[
           { label: "Founded", value: "1816" },
           { label: "Capacity", value: "2.4m L" },
           { label: "Bottlings", value: "148" },
         ]}
       />
-      <SpecStrip
-        cells={[
+      <KeyFacts
+        facts={[
           { label: "ABV", value: "50.0%" },
           { label: "Age", value: null },
           { label: "Cask", value: null },

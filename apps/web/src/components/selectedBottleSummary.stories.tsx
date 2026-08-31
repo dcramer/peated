@@ -5,7 +5,7 @@ import { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Selected Bottle Summary",
+  title: "Components/Bottles/Selected Bottle Summary",
   component: SelectedBottleSummary,
   args: {
     bottleId: "B00872",

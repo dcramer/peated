@@ -5,7 +5,7 @@ import { searchResultGroups } from "./storyData";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Search Results",
+  title: "Components/Search/Search Results",
   component: SearchResults,
   args: {
     activeId: "bottle-872",

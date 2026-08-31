@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { colors, fonts } from "../styles/tokens.stylex";
 import { ItemList, ItemRow, type ItemListVariant } from "./itemList.stylex";
-import { RatingMeasure } from "./scoring.stylex";
+import { BottleRatings } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 function InteractionRows({
@@ -65,7 +65,7 @@ function InteractionRows({
 }
 
 const meta = {
-  title: "Components/Data Display/Item List",
+  title: "Components/Lists & Tables/Item List",
   component: ItemList,
   args: { ariaLabel: "Records", children: null },
   decorators: [
@@ -109,7 +109,7 @@ export const Overview: Story = {
       <ItemList ariaLabel="Rated bottles">
         <ItemRow
           end={
-            <RatingMeasure
+            <BottleRatings
               counts={{
                 good: 8,
                 mediocre: 2,

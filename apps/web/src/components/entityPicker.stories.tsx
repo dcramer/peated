@@ -8,7 +8,7 @@ import { distillerOptions } from "./storyData";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Entity Picker",
+  title: "Components/Catalog/Entity Picker",
   component: EntityPicker,
   args: {
     kind: "distiller",

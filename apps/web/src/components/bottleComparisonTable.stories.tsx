@@ -4,7 +4,7 @@ import {
   BottleComparisonTable,
   type BottleComparisonTableProps,
 } from "./bottleComparisonTable.stylex";
-import { RatingMeasure } from "./scoring.stylex";
+import { BottleRatings } from "./scoring.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const rows: BottleComparisonTableProps["rows"] = [
@@ -14,7 +14,7 @@ const rows: BottleComparisonTableProps["rows"] = [
     metadata: "Islay · 10 years · 46% ABV",
     name: "Port Charlotte 10 Year Old",
     values: [
-      <RatingMeasure
+      <BottleRatings
         counts={{
           good: 19,
           mediocre: 14,
@@ -36,7 +36,7 @@ const rows: BottleComparisonTableProps["rows"] = [
     metadata: "Islay · No age statement · 54.2% ABV",
     name: "Ardbeg Uigeadail",
     values: [
-      <RatingMeasure
+      <BottleRatings
         counts={{
           good: 14,
           mediocre: 9,
@@ -57,7 +57,7 @@ const rows: BottleComparisonTableProps["rows"] = [
     id: "3",
     metadata: "Islay · 12 years · 43% ABV",
     name: "Caol Ila 12 Year Old",
-    values: [<RatingMeasure counts={{}} key="rating" />],
+    values: [<BottleRatings counts={{}} key="rating" />],
   },
   {
     href: "/bottles/4",
@@ -65,7 +65,7 @@ const rows: BottleComparisonTableProps["rows"] = [
     metadata: "Campbeltown · 15 years · 51.4% ABV",
     name: "A deliberately long independent bottling name that tests the aligned row",
     values: [
-      <RatingMeasure
+      <BottleRatings
         counts={{
           good: 3,
           mediocre: 2,
@@ -84,7 +84,7 @@ const rows: BottleComparisonTableProps["rows"] = [
 ];
 
 const meta = {
-  title: "Components/Data Display/Bottle Comparison Table",
+  title: "Components/Bottles/Bottle Comparison Table",
   component: BottleComparisonTable,
   args: {
     columns: ["Rating"],

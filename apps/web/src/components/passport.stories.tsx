@@ -31,7 +31,7 @@ const largeStamps: readonly [PassportStamp, ...PassportStamp[]] = [
 ];
 
 const meta = {
-  title: "Components/Data Display/Passport",
+  title: "Components/Members/Passport",
   component: Passport,
   args: {
     kind: "closed",

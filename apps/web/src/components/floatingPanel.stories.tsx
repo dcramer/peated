@@ -10,7 +10,7 @@ import {
 } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Feedback/Floating Panel",
+  title: "Components/Messages & Status/Floating Panel",
   component: FloatingPanel,
   args: {
     children: (

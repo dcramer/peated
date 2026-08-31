@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { AppLink, PageTabs, SpecStrip } from "@peated/web/components";
+import { AppLink, KeyFacts, PageTabs } from "@peated/web/components";
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
@@ -72,8 +72,8 @@ export function LocationPageFrame({
         title={name}
       />
       <div {...stylex.props(styles.specs)}>
-        <SpecStrip
-          cells={[
+        <KeyFacts
+          facts={[
             { label: "Distillers", value: totalDistillers.toLocaleString() },
             { label: "Bottles", value: totalBottles.toLocaleString() },
           ]}

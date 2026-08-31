@@ -42,6 +42,16 @@ export {
   CardPrimaryLink,
 } from "./card.stylex";
 export type { CardLinkProps, CardProps } from "./card.stylex";
+export {
+  KeyFacts,
+  PeatedId,
+  hasVisibleKeyFacts,
+} from "./catalogDetails.stylex";
+export type {
+  KeyFact,
+  KeyFactList,
+  PeatedIdProps,
+} from "./catalogDetails.stylex";
 export { Checkbox } from "./checkbox.stylex";
 export type { CheckboxProps } from "./checkbox.stylex";
 export { Chip, CountChip } from "./chip.stylex";
@@ -53,47 +63,8 @@ export type {
 } from "./collectionBottleStatus.stylex";
 export { CriticReview } from "./criticReview.stylex";
 export type { CriticReviewProps } from "./criticReview.stylex";
-export {
-  RecordId,
-  SpecStrip,
-  hasVisibleSpecStripCells,
-} from "./dataDevices.stylex";
-export type {
-  RecordIdProps,
-  SpecStripCell,
-  SpecStripCells,
-} from "./dataDevices.stylex";
 export { DataTable } from "./dataTable.stylex";
 export type { DataTableColumn, DataTableProps } from "./dataTable.stylex";
-export {
-  FactGrid,
-  FigureRow,
-  RailLinkList,
-  RailSection,
-  RecordMasthead,
-  RecordSection,
-  RecordTabs,
-  ReviewQuote,
-  TastingNote,
-  ThinRecordPrompt,
-} from "./editorial.stylex";
-export type {
-  FactGridProps,
-  FigureRowProps,
-  RailLinkItem,
-  RailLinkListProps,
-  RailSectionProps,
-  RecordFact,
-  RecordFigure,
-  RecordMastheadProps,
-  RecordPrompt,
-  RecordSectionProps,
-  RecordTabItem,
-  RecordTabsProps,
-  ReviewQuoteProps,
-  TastingNoteProps,
-  ThinRecordPromptProps,
-} from "./editorial.stylex";
 export { EntityPicker } from "./entityPicker.stylex";
 export type {
   EntityPickerKind,
@@ -200,8 +171,8 @@ export type {
   MemberPickerOption,
   MemberPickerProps,
 } from "./memberPicker.stylex";
-export { MemberStatusMark } from "./memberStatusMark.stylex";
-export type { MemberStatusMarkKind } from "./memberStatusMark.stylex";
+export { MemberStatus } from "./memberStatus.stylex";
+export type { MemberStatusKind } from "./memberStatus.stylex";
 export { NotePickerField } from "./notePicker.stylex";
 export type {
   NotePickerFieldProps,
@@ -211,6 +182,35 @@ export { PageTabs } from "./pageTabs.stylex";
 export type { PageTabItem, PageTabsProps } from "./pageTabs.stylex";
 export { Panel } from "./panel.stylex";
 export type { PanelProps } from "./panel.stylex";
+export {
+  CompleteBottleDetails,
+  FactGrid,
+  FigureRow,
+  RailLinkList,
+  RailSection,
+  RecordMasthead,
+  RecordSection,
+  RecordTabs,
+  ReviewQuote,
+  TastingNote,
+} from "./recordDetails.stylex";
+export type {
+  BottleDetailPrompt,
+  CompleteBottleDetailsProps,
+  FactGridProps,
+  FigureRowProps,
+  RailLinkItem,
+  RailLinkListProps,
+  RailSectionProps,
+  RecordFact,
+  RecordFigure,
+  RecordMastheadProps,
+  RecordSectionProps,
+  RecordTabItem,
+  RecordTabsProps,
+  ReviewQuoteProps,
+  TastingNoteProps,
+} from "./recordDetails.stylex";
 export { RowMenu } from "./rowMenu.stylex";
 export type { RowMenuGroup, RowMenuItem, RowMenuProps } from "./rowMenu.stylex";
 export { ScopedSearch } from "./scopedSearch.stylex";
@@ -219,19 +219,19 @@ export type {
   ScopedSearchProps,
 } from "./scopedSearch.stylex";
 export {
-  BandMark,
-  BandStack,
+  BottleRatings,
   RATING_BANDS,
-  RatingMeasure,
-  Score,
+  ReviewScore,
+  TastingRating,
+  TastingRatingDistribution,
 } from "./scoring.stylex";
 export type {
-  BandCounts,
-  BandMarkProps,
-  BandStackProps,
+  BottleRatingsProps,
   RatingBand,
-  RatingMeasureProps,
-  ScoreProps,
+  ReviewScoreProps,
+  TastingRatingCounts,
+  TastingRatingDistributionProps,
+  TastingRatingProps,
 } from "./scoring.stylex";
 export { SearchBox } from "./searchBox.stylex";
 export type { SearchBoxProps } from "./searchBox.stylex";
@@ -245,7 +245,7 @@ export { SearchResults } from "./searchResults.stylex";
 export type {
   SearchResultGroup,
   SearchResultItem,
-  SearchResultMeasure,
+  SearchResultRatings,
   SearchResultsProps,
 } from "./searchResults.stylex";
 export { SectionHeading } from "./sectionHeading.stylex";

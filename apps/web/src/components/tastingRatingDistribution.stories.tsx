@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { BandStack } from "./scoring.stylex";
+import { TastingRatingDistribution } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const counts = {
@@ -12,8 +12,8 @@ const counts = {
 };
 
 const meta = {
-  title: "Components/Measures/Band Stack",
-  component: BandStack,
+  title: "Components/Ratings/Tasting Rating Distribution",
+  component: TastingRatingDistribution,
   args: { counts, showCounts: true },
   decorators: [
     (Story) => (
@@ -22,7 +22,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof BandStack>;
+} satisfies Meta<typeof TastingRatingDistribution>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -30,8 +30,8 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <BandStack {...args} />
-      <BandStack counts={{}} />
+      <TastingRatingDistribution {...args} />
+      <TastingRatingDistribution counts={{}} />
     </StoryStack>
   ),
 };

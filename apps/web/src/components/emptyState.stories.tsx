@@ -7,7 +7,7 @@ import { RailList, RailListItem } from "./lists.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Feedback/Empty State",
+  title: "Components/Messages & Status/Empty State",
   component: EmptyState,
   decorators: [
     (Story) => (

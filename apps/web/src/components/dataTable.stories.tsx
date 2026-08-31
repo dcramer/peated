@@ -90,7 +90,7 @@ const interactionColumns: DataTableColumn<LocationRow>[] = [
 ];
 
 const meta = {
-  title: "Components/Data Display/Table",
+  title: "Components/Lists & Tables/Table",
   component: DataTable,
   args: {
     caption: "Whisky locations",

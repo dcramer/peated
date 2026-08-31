@@ -32,7 +32,7 @@ export function LocationCard({
       </div>
       <h2 {...stylex.props(styles.title)}>{name}</h2>
       {summary ? <p {...stylex.props(styles.summary)}>{summary}</p> : null}
-      <p {...stylex.props(styles.measures)}>
+      <p {...stylex.props(styles.counts)}>
         {totalBottles.toLocaleString("en-US")} bottles ·{" "}
         {totalDistillers.toLocaleString("en-US")} distillers
       </p>
@@ -75,7 +75,7 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: 1.5,
   },
-  measures: {
+  counts: {
     margin: 0,
     marginTop: space.x3,
     color: colors.inkMuted,

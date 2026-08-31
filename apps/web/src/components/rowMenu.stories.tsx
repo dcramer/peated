@@ -12,7 +12,7 @@ const groups = [
 ] as const;
 
 const meta = {
-  title: "Components/Actions/Row Menu",
+  title: "Components/Buttons & Menus/Row Menu",
   component: RowMenu,
   args: {
     groups,

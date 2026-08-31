@@ -5,7 +5,7 @@ import { ItemList, ItemListItem } from "./itemList.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Critic Review",
+  title: "Components/Reviews & Tastings/Critic Review",
   component: CriticReview,
   args: {
     href: "#review",

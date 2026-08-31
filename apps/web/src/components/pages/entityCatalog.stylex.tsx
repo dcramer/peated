@@ -14,7 +14,7 @@ import {
   ItemList,
   ItemRow,
   ListToolbar,
-  MemberStatusMark,
+  MemberStatus,
   type ListSortOption,
 } from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
@@ -104,7 +104,7 @@ export function EntityCatalogList({
                   </Button>
                 ) : undefined
               }
-              end={<EntityMeasures item={item} />}
+              end={<EntityCounts item={item} />}
               href={item.href}
               key={item.id}
               metadata={item.metadata.join(" · ")}
@@ -112,7 +112,7 @@ export function EntityCatalogList({
                 <>
                   {item.name}
                   {item.isFollowing && showFollowingMarks ? (
-                    <MemberStatusMark kind="following" />
+                    <MemberStatus kind="following" />
                   ) : null}
                 </>
               }
@@ -148,24 +148,24 @@ export function EntityCatalogList({
   );
 }
 
-function EntityMeasures({ item }: { item: EntityCatalogItem }) {
+function EntityCounts({ item }: { item: EntityCatalogItem }) {
   return (
     <span
       aria-label={`${item.totalBottles.toLocaleString("en-US")} bottles and ${item.totalTastings.toLocaleString("en-US")} tastings`}
       role="group"
-      {...stylex.props(styles.measures)}
+      {...stylex.props(styles.counts)}
     >
-      <span {...stylex.props(styles.measure)}>
-        <strong {...stylex.props(styles.measureValue)}>
+      <span {...stylex.props(styles.count)}>
+        <strong {...stylex.props(styles.countValue)}>
           {item.totalBottles.toLocaleString("en-US")}
         </strong>
-        <span {...stylex.props(styles.measureLabel)}>Bottles</span>
+        <span {...stylex.props(styles.countLabel)}>Bottles</span>
       </span>
-      <span {...stylex.props(styles.measure, styles.tastingMeasure)}>
-        <strong {...stylex.props(styles.measureValue)}>
+      <span {...stylex.props(styles.count, styles.tastingCount)}>
+        <strong {...stylex.props(styles.countValue)}>
           {item.totalTastings.toLocaleString("en-US")}
         </strong>
-        <span {...stylex.props(styles.measureLabel)}>Tastings</span>
+        <span {...stylex.props(styles.countLabel)}>Tastings</span>
       </span>
     </span>
   );
@@ -237,7 +237,7 @@ const styles = stylex.create({
   catalog: {
     minWidth: 0,
   },
-  measures: {
+  counts: {
     display: "grid",
     width: "156px",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -247,14 +247,14 @@ const styles = stylex.create({
       gridTemplateColumns: "52px",
     },
   },
-  measure: {
+  count: {
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
     alignItems: "flex-end",
     gap: space.x1,
   },
-  measureValue: {
+  countValue: {
     overflow: "hidden",
     maxWidth: "100%",
     color: colors.ink,
@@ -266,7 +266,7 @@ const styles = stylex.create({
     lineHeight: 1,
     textOverflow: "ellipsis",
   },
-  measureLabel: {
+  countLabel: {
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "9px",
@@ -277,7 +277,7 @@ const styles = stylex.create({
       fontSize: "8px",
     },
   },
-  tastingMeasure: {
+  tastingCount: {
     [COMPACT]: {
       display: "none",
     },

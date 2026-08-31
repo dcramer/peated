@@ -4,7 +4,7 @@ import { FactList } from "./factList.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Fact List",
+  title: "Components/Lists & Tables/Fact List",
   component: FactList,
   args: {
     facts: [

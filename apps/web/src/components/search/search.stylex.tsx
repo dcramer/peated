@@ -151,7 +151,7 @@ function bottleItem(
   return {
     href: getBottleHref(bottle.id),
     id: `bottle-${bottle.id}`,
-    measures: showMeasures
+    ratings: showMeasures
       ? {
           score:
             bottle.medianScore === null || bottle.scoreCount === 0

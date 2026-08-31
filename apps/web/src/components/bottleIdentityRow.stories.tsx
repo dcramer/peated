@@ -6,7 +6,7 @@ import { ItemList, ItemListItem } from "./itemList.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Bottle Identity Row",
+  title: "Components/Bottles/Bottle Identity Row",
   component: BottleIdentityRow,
   decorators: [
     (Story) => (

@@ -11,24 +11,24 @@ import {
 import { AppLink } from "./appLink";
 import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
-import { MemberStatusMark } from "./memberStatusMark.stylex";
-import { RatingMeasure, type BandCounts } from "./scoring.stylex";
+import { MemberStatus } from "./memberStatus.stylex";
+import { BottleRatings, type TastingRatingCounts } from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 559px)";
 
-export type SearchResultMeasure = {
+export type SearchResultRatings = {
   score?: {
     count: number;
     value: number;
   };
-  bands?: BandCounts;
+  bands?: TastingRatingCounts;
 };
 
 export type SearchResultItem = {
   href: string;
   id: string;
   isFollowing?: boolean;
-  measures?: SearchResultMeasure;
+  ratings?: SearchResultRatings;
   metadata?: string;
   title: string;
   visual?: {
@@ -275,24 +275,22 @@ function SearchResultsGroup({
               <span {...stylex.props(styles.copy)}>
                 <strong {...stylex.props(styles.title)}>
                   <MatchedText query={query} text={item.title} />
-                  {item.isFollowing ? (
-                    <MemberStatusMark kind="following" />
-                  ) : null}
+                  {item.isFollowing ? <MemberStatus kind="following" /> : null}
                 </strong>
                 {item.metadata ? (
                   <span {...stylex.props(styles.metadata)}>
                     {item.metadata}
                   </span>
                 ) : null}
-                {item.measures ? (
-                  <span {...stylex.props(styles.compactMeasures)}>
-                    <ResultMeasures measures={item.measures} />
+                {item.ratings ? (
+                  <span {...stylex.props(styles.compactRatings)}>
+                    <ResultRatings ratings={item.ratings} />
                   </span>
                 ) : null}
               </span>
-              {item.measures ? (
-                <span {...stylex.props(styles.wideMeasures)}>
-                  <ResultMeasures measures={item.measures} />
+              {item.ratings ? (
+                <span {...stylex.props(styles.wideRatings)}>
+                  <ResultRatings ratings={item.ratings} />
                 </span>
               ) : null}
             </AppLink>
@@ -333,12 +331,12 @@ function ResultVisual({
   );
 }
 
-function ResultMeasures({ measures }: { measures: SearchResultMeasure }) {
-  return measures.score || measures.bands ? (
-    <RatingMeasure
-      counts={measures.bands}
-      median={measures.score?.value}
-      scoreCount={measures.score?.count}
+function ResultRatings({ ratings }: { ratings: SearchResultRatings }) {
+  return ratings.score || ratings.bands ? (
+    <BottleRatings
+      counts={ratings.bands}
+      median={ratings.score?.value}
+      scoreCount={ratings.score?.count}
     />
   ) : null;
 }
@@ -595,7 +593,7 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
-  wideMeasures: {
+  wideRatings: {
     display: "flex",
     minWidth: "152px",
     flexShrink: 0,
@@ -606,7 +604,7 @@ const styles = stylex.create({
       display: "none",
     },
   },
-  compactMeasures: {
+  compactRatings: {
     display: "none",
     alignItems: "center",
     gap: space.x3,

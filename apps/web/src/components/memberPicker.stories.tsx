@@ -8,7 +8,7 @@ import { memberOptions } from "./storyData";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Member Picker",
+  title: "Components/Members/Member Picker",
   component: MemberPicker,
   args: {
     onChange: () => undefined,

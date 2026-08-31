@@ -23,7 +23,7 @@ export type BottleComparisonTableProps = {
   rows: readonly [BottleComparisonRow, ...BottleComparisonRow[]];
 };
 
-/** Compares bottles across one or more compact measures. */
+/** Compares bottles across one or more compact rating or fact columns. */
 export function BottleComparisonTable({
   ariaLabel = "Bottle records",
   columns,

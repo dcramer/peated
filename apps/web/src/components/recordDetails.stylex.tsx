@@ -4,7 +4,7 @@ import type { MouseEvent, ReactNode } from "react";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { Avatar } from "./avatar.stylex";
-import { BandMark, RATING_BANDS, type RatingBand } from "./scoring.stylex";
+import { RATING_BANDS, TastingRating, type RatingBand } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -209,7 +209,7 @@ export function ReviewQuote({
   const hasRating = rating !== null && rating !== undefined;
   return (
     <article {...stylex.props(styles.entry)}>
-      <div {...stylex.props(styles.measure)}>
+      <div {...stylex.props(styles.rating)}>
         <div {...stylex.props(styles.score, !hasRating && styles.muted)}>
           {hasRating ? rating : "–"}
         </div>
@@ -255,12 +255,12 @@ export function TastingNote({
   const selectedBand = RATING_BANDS.find((candidate) => candidate.key === band);
   return (
     <article {...stylex.props(styles.entry, styles.tastingEntry)}>
-      <div {...stylex.props(styles.measure)}>
+      <div {...stylex.props(styles.rating)}>
         <div {...stylex.props(styles.bandName)}>
           {selectedBand?.label ?? "–"}
         </div>
         <div {...stylex.props(styles.bandSlot)}>
-          <BandMark band={band} />
+          <TastingRating band={band} />
         </div>
       </div>
       <div {...stylex.props(styles.entryCopy)}>
@@ -359,22 +359,22 @@ export function RailLinkList({ ariaLabel, items = [] }: RailLinkListProps) {
   );
 }
 
-export type RecordPrompt = { label: ReactNode; value: ReactNode };
-export type ThinRecordPromptProps = {
+export type BottleDetailPrompt = { label: ReactNode; value: ReactNode };
+export type CompleteBottleDetailsProps = {
   actions?: ReactNode;
   children: ReactNode;
   heading: ReactNode;
-  prompts?: readonly RecordPrompt[];
+  prompts?: readonly BottleDetailPrompt[];
 };
 
-export function ThinRecordPrompt({
+export function CompleteBottleDetails({
   actions,
   children,
   heading,
   prompts = [],
-}: ThinRecordPromptProps) {
+}: CompleteBottleDetailsProps) {
   return (
-    <section {...stylex.props(styles.thinRecord)}>
+    <section {...stylex.props(styles.completeBottleDetails)}>
       <h2 {...stylex.props(styles.emptyHeading)}>{heading}</h2>
       <div {...stylex.props(styles.emptyBody)}>{children}</div>
       {actions ? (
@@ -601,7 +601,7 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
   },
-  measure: { textAlign: "right" },
+  rating: { textAlign: "right" },
   score: {
     color: colors.ink,
     fontFamily: fonts.display,
@@ -749,7 +749,7 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.3,
   },
-  thinRecord: {
+  completeBottleDetails: {
     paddingTop: space.x2,
     paddingBottom: space.x8,
     borderBottomWidth: "1px",

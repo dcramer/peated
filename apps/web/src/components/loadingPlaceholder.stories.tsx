@@ -4,7 +4,7 @@ import { LoadingPlaceholder } from "./feedback.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Feedback/Loading Placeholder",
+  title: "Components/Messages & Status/Loading Placeholder",
   component: LoadingPlaceholder,
   args: { delay: 0, preset: "text" },
   argTypes: {

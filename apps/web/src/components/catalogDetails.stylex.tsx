@@ -6,12 +6,12 @@ import { colors, fonts, space } from "../styles/tokens.stylex";
 const COMPACT = "@media (max-width: 639px)";
 const PHONE = "@media (max-width: 480px)";
 
-export type RecordIdProps = {
+export type PeatedIdProps = {
   detail?: ReactNode;
   id: string;
 };
 
-export function RecordId({ detail, id }: RecordIdProps) {
+export function PeatedId({ detail, id }: PeatedIdProps) {
   return (
     <div {...stylex.props(styles.idStamp)}>
       <span {...stylex.props(styles.idLabel)}>Peated ID</span>
@@ -22,53 +22,53 @@ export function RecordId({ detail, id }: RecordIdProps) {
   );
 }
 
-export type SpecStripCell = {
+export type KeyFact = {
   label: string;
   value?: number | string | null;
 };
 
-export type SpecStripCells =
-  | readonly [SpecStripCell]
-  | readonly [SpecStripCell, SpecStripCell]
-  | readonly [SpecStripCell, SpecStripCell, SpecStripCell]
-  | readonly [SpecStripCell, SpecStripCell, SpecStripCell, SpecStripCell];
+export type KeyFactList =
+  | readonly [KeyFact]
+  | readonly [KeyFact, KeyFact]
+  | readonly [KeyFact, KeyFact, KeyFact]
+  | readonly [KeyFact, KeyFact, KeyFact, KeyFact];
 
-function hasSpecStripValue(cell: SpecStripCell) {
-  return cell.value !== null && cell.value !== undefined && cell.value !== "";
+function hasKeyFactValue(fact: KeyFact) {
+  return fact.value !== null && fact.value !== undefined && fact.value !== "";
 }
 
-export function hasVisibleSpecStripCells(cells: SpecStripCells) {
-  return cells.some(hasSpecStripValue);
+export function hasVisibleKeyFacts(facts: KeyFactList) {
+  return facts.some(hasKeyFactValue);
 }
 
-export function SpecStrip({ cells }: { cells: SpecStripCells }) {
-  const visibleCells = cells.filter(hasSpecStripValue);
+export function KeyFacts({ facts }: { facts: KeyFactList }) {
+  const visibleFacts = facts.filter(hasKeyFactValue);
 
-  if (!visibleCells.length) return null;
+  if (!visibleFacts.length) return null;
 
   return (
     <dl
       {...stylex.props(
-        styles.specStrip,
-        getSpecStripColumnStyle(visibleCells.length),
+        styles.keyFacts,
+        getKeyFactsColumnStyle(visibleFacts.length),
       )}
     >
-      {visibleCells.map((cell, index) => (
+      {visibleFacts.map((fact, index) => (
         <div
-          data-spec-cell={index + 1}
-          key={`${cell.label}-${index}`}
+          data-key-fact={index + 1}
+          key={`${fact.label}-${index}`}
           {...stylex.props(
-            styles.specCell,
-            visibleCells.length >= 3 &&
+            styles.keyFact,
+            visibleFacts.length >= 3 &&
               index % 2 === 0 &&
-              styles.specCellPhoneOdd,
-            visibleCells.length >= 3 &&
+              styles.keyFactPhoneOdd,
+            visibleFacts.length >= 3 &&
               index % 2 === 1 &&
-              styles.specCellPhoneEven,
+              styles.keyFactPhoneEven,
           )}
         >
-          <dt {...stylex.props(styles.specLabel)}>{cell.label}</dt>
-          <dd {...stylex.props(styles.specValue)}>{cell.value}</dd>
+          <dt {...stylex.props(styles.keyFactLabel)}>{fact.label}</dt>
+          <dd {...stylex.props(styles.keyFactValue)}>{fact.value}</dd>
         </div>
       ))}
     </dl>
@@ -108,7 +108,7 @@ const styles = stylex.create({
     textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
     whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
   },
-  specStrip: {
+  keyFacts: {
     display: "grid",
     width: "100%",
     minWidth: 0,
@@ -120,25 +120,25 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
   },
-  specStripOne: {
+  keyFactsOne: {
     gridTemplateColumns: "minmax(0, 1fr)",
   },
-  specStripTwo: {
+  keyFactsTwo: {
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   },
-  specStripThree: {
+  keyFactsThree: {
     gridTemplateColumns: {
       default: "repeat(3, minmax(0, 1fr))",
       [PHONE]: "repeat(2, minmax(0, 1fr))",
     },
   },
-  specStripFour: {
+  keyFactsFour: {
     gridTemplateColumns: {
       default: "repeat(4, minmax(0, 1fr))",
       [PHONE]: "repeat(2, minmax(0, 1fr))",
     },
   },
-  specCell: {
+  keyFact: {
     boxSizing: "border-box",
     minWidth: 0,
     flex: "1 1 0",
@@ -151,15 +151,15 @@ const styles = stylex.create({
     borderLeftColor: colors.hairline,
     ":first-child": { paddingLeft: 0, borderLeftWidth: 0 },
   },
-  specCellPhoneOdd: {
+  keyFactPhoneOdd: {
     paddingLeft: { default: null, [PHONE]: 0 },
     borderLeftWidth: { default: null, [PHONE]: 0 },
   },
-  specCellPhoneEven: {
+  keyFactPhoneEven: {
     paddingLeft: { default: null, [PHONE]: space.x6 },
     borderLeftWidth: { default: null, [PHONE]: "1px" },
   },
-  specLabel: {
+  keyFactLabel: {
     order: 2,
     marginTop: "6px",
     overflow: "hidden",
@@ -171,7 +171,7 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
-  specValue: {
+  keyFactValue: {
     order: 1,
     overflow: "hidden",
     margin: 0,
@@ -187,16 +187,16 @@ const styles = stylex.create({
   },
 });
 
-const specStripColumnStyles = {
-  1: styles.specStripOne,
-  2: styles.specStripTwo,
-  3: styles.specStripThree,
-  4: styles.specStripFour,
-} satisfies Record<SpecStripCells["length"], stylex.StyleXStyles>;
+const keyFactsColumnStyles = {
+  1: styles.keyFactsOne,
+  2: styles.keyFactsTwo,
+  3: styles.keyFactsThree,
+  4: styles.keyFactsFour,
+} satisfies Record<KeyFactList["length"], stylex.StyleXStyles>;
 
-function getSpecStripColumnStyle(cellCount: number) {
-  if (cellCount === 1) return specStripColumnStyles[1];
-  if (cellCount === 2) return specStripColumnStyles[2];
-  if (cellCount === 3) return specStripColumnStyles[3];
-  return specStripColumnStyles[4];
+function getKeyFactsColumnStyle(factCount: number) {
+  if (factCount === 1) return keyFactsColumnStyles[1];
+  if (factCount === 2) return keyFactsColumnStyles[2];
+  if (factCount === 3) return keyFactsColumnStyles[3];
+  return keyFactsColumnStyles[4];
 }

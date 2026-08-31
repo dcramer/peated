@@ -4,7 +4,7 @@ import { AliasManager } from "./aliasManager.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Aliases",
+  title: "Components/Catalog/Aliases",
   component: AliasManager,
   args: {
     aliases: [

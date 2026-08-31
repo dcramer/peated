@@ -4,7 +4,7 @@ import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 import { SummaryStrip } from "./summaryStrip.stylex";
 
 const meta = {
-  title: "Components/Data Display/Summary Strip",
+  title: "Components/Lists & Tables/Summary Strip",
   component: SummaryStrip,
   args: {
     cells: [

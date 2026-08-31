@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button, ButtonLink } from "./button.stylex";
-import { ThinRecordPrompt } from "./editorial.stylex";
+import { CompleteBottleDetails } from "./recordDetails.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Editorial/Thin record prompt",
-  component: ThinRecordPrompt,
+  title: "Components/Bottles/Complete Bottle Details",
+  component: CompleteBottleDetails,
   args: {
     children: "This record has the name, but not much else yet.",
     heading: "There is more to record here.",
@@ -18,7 +18,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof ThinRecordPrompt>;
+} satisfies Meta<typeof CompleteBottleDetails>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { RecordId } from "./dataDevices.stylex";
+import { PeatedId } from "./catalogDetails.stylex";
 import { StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Data Display/Record ID",
-  component: RecordId,
+  title: "Components/Catalog/Peated ID",
+  component: PeatedId,
   args: { detail: "Islay · single malt", id: "№ 00872" },
-} satisfies Meta<typeof RecordId>;
+} satisfies Meta<typeof PeatedId>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -15,8 +15,8 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <RecordId {...args} />
-      <RecordId id="B00872" />
+      <PeatedId {...args} />
+      <PeatedId id="B00872" />
     </StoryStack>
   ),
 };

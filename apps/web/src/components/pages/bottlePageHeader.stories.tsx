@@ -6,7 +6,7 @@ import { StoryCanvas } from "../storyFixtures.stylex";
 import { BottlePageHeader } from "./bottlePageHeader.stylex";
 
 const meta = {
-  title: "Components/Bottle/Bottle Header",
+  title: "Components/Bottles/Bottle Header",
   component: BottlePageHeader,
   args: {
     actions: (

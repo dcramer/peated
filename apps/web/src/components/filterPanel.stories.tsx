@@ -12,7 +12,7 @@ import {
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
-  title: "Components/Selection/Filter Panel",
+  title: "Components/Search/Filter Panel",
   component: FilterPanel,
   args: {
     ariaLabel: "Bottle filters",
