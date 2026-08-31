@@ -76,7 +76,7 @@ test("parses all-time archive bottle cards and skips non-bottle products", () =>
           <div class="itemInfoWrap"><ul>
             <li><span class="name">CASK NO.</span><span class="value">Batch 41</span></li>
             <li><span class="name">ABV</span><span class="value">50.0%</span></li>
-            <li><span class="name">SPIRIT</span><span class="value">Malt Whisky</span></li>
+            <li><span class="name">SPIRIT</span><span class="value">Single Grain</span></li>
           </ul></div>
         </article>
       </li>
@@ -110,9 +110,10 @@ test("parses all-time archive bottle cards and skips non-bottle products", () =>
     distillers: [],
   });
   expect(result.bottles[2]?.bottle).toMatchObject({
-    name: "Incognito (Batch 41)",
-    category: "single_malt",
-    caskNumber: "Batch 41",
+    name: "Incognito",
+    edition: "Batch 41",
+    category: "single_grain",
+    caskNumber: null,
     singleCask: false,
     distillers: [],
   });
@@ -513,7 +514,7 @@ test("prefers a known cask code encoded in the official SKU", async ({
   });
 });
 
-test("keeps a current small-batch bottle without a distillery code", async ({
+test("categorizes current small batches without distillery codes", async ({
   axiosMock,
 }) => {
   const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
@@ -525,16 +526,25 @@ test("keeps a current small-batch bottle without a distillery code", async ({
             sku: z.string(),
             name: z.string(),
             cask_no: z.string().nullable(),
+            region: z.string().nullish(),
+            spirit_type: z.string().nullish(),
           })
           .passthrough(),
       ),
     })
     .passthrough()
     .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
-  payload.items = [payload.items[0]];
-  payload.items[0].sku = "BATCH41GB0700";
+  payload.items = payload.items.slice(0, 2);
+  payload.items[0].sku = "SM0123GB0700609";
   payload.items[0].name = "Incognito";
   payload.items[0].cask_no = "Batch 41";
+  payload.items[0].region = null;
+  payload.items[0].spirit_type = "Single Grain";
+  payload.items[1].sku = "SM0124GB0700610";
+  payload.items[1].name = "Highland peaty potion";
+  payload.items[1].cask_no = "Batch 42";
+  payload.items[1].region = "Highland";
+  payload.items[1].spirit_type = "Malt Whisky";
   axiosMock.onGet(url).reply(200, payload);
 
   const items: any[] = [];
@@ -542,11 +552,25 @@ test("keeps a current small-batch bottle without a distillery code", async ({
     items.push(item);
   });
 
-  expect(items[0][0]).toMatchObject({
-    name: "Incognito (Batch 41)",
-    category: "spirit",
-    caskNumber: "Batch 41",
-    singleCask: false,
-    distillers: [],
-  });
+  expect(items).toHaveLength(2);
+  expect(items.map(([bottle]) => bottle)).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        name: "Incognito",
+        edition: "Batch 41",
+        category: "single_grain",
+        caskNumber: null,
+        singleCask: false,
+        distillers: [],
+      }),
+      expect.objectContaining({
+        name: "Highland peaty potion",
+        edition: "Batch 42",
+        category: "single_malt",
+        caskNumber: null,
+        singleCask: false,
+        distillers: [],
+      }),
+    ]),
+  );
 });
