@@ -30,9 +30,11 @@ shared boundary and needs no configuration format.
 
 ### Emit files and JSON
 
-The tool writes one diff PNG for each changed pair and a `report.json` file.
-Added and removed files are listed in the report. The Peated comment script
-uses this report instead of importing comparison code.
+For each changed pair, the tool writes the baseline, candidate, and pixel diff
+PNG files. Added files include only the candidate image. Removed files include
+only the baseline image. The tool records these paths in `report.json`. The
+Peated comment script uses this report instead of importing comparison code.
+It shows before and after first, with the pixel diff in a collapsed section.
 
 ### Capture both revisions in the pull request job
 

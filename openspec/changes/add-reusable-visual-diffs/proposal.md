@@ -8,7 +8,7 @@ and the comparison should be reusable in other repositories.
 
 - Add a small image comparison tool that accepts baseline and candidate PNG
   directories.
-- Write diff images and a JSON report for changed, added, and removed images.
+- Write before, after, and diff images with a JSON report for visual changes.
 - Capture Peated screenshots for the pull request base and candidate revisions.
 - Post only changed visual results in the existing pull request comment.
 - Keep visual changes informational. Tool or capture failures still fail CI.

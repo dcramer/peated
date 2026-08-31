@@ -83,16 +83,26 @@ describe("compareDirectories", () => {
 
     const report = await compareDirectories(paths);
     const diff = PNG.sync.read(
-      await fs.readFile(path.join(paths.output, "images/home.png")),
+      await fs.readFile(path.join(paths.output, "images/diff/home.png")),
     );
 
     expect(report.summary.changed).toBe(1);
     expect(report.files[0]).toMatchObject({
       file: "home.png",
-      image: "images/home.png",
+      images: {
+        baseline: "images/baseline/home.png",
+        candidate: "images/candidate/home.png",
+        diff: "images/diff/home.png",
+      },
       status: "changed",
     });
     expect([...diff.data.subarray(0, 4)]).toEqual([255, 0, 255, 255]);
+    await expect(
+      fs.stat(path.join(paths.output, "images/baseline/home.png")),
+    ).resolves.toBeDefined();
+    await expect(
+      fs.stat(path.join(paths.output, "images/candidate/home.png")),
+    ).resolves.toBeDefined();
   });
 
   it("writes a diff for resized images", async () => {
@@ -104,14 +114,18 @@ describe("compareDirectories", () => {
 
     const report = await compareDirectories(paths);
     const diff = PNG.sync.read(
-      await fs.readFile(path.join(paths.output, "images/nested/home.png")),
+      await fs.readFile(path.join(paths.output, "images/diff/nested/home.png")),
     );
 
     expect(report.summary.changed).toBe(1);
     expect(report.files[0]).toMatchObject({
       file: "nested/home.png",
       height: 2,
-      image: "images/nested/home.png",
+      images: {
+        baseline: "images/baseline/nested/home.png",
+        candidate: "images/candidate/nested/home.png",
+        diff: "images/diff/nested/home.png",
+      },
       status: "changed",
       width: 3,
     });
@@ -138,14 +152,22 @@ describe("compareDirectories", () => {
       unchanged: 0,
     });
     expect(report.files).toEqual([
-      { file: "added.png", image: "images/added.png", status: "added" },
-      { file: "removed.png", image: "images/removed.png", status: "removed" },
+      {
+        file: "added.png",
+        images: { candidate: "images/candidate/added.png" },
+        status: "added",
+      },
+      {
+        file: "removed.png",
+        images: { baseline: "images/baseline/removed.png" },
+        status: "removed",
+      },
     ]);
     await expect(
-      fs.stat(path.join(paths.output, "images/added.png")),
+      fs.stat(path.join(paths.output, "images/candidate/added.png")),
     ).resolves.toBeDefined();
     await expect(
-      fs.stat(path.join(paths.output, "images/removed.png")),
+      fs.stat(path.join(paths.output, "images/baseline/removed.png")),
     ).resolves.toBeDefined();
   });
 });

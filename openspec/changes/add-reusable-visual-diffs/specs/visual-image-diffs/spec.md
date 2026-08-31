@@ -14,7 +14,8 @@ the same relative path.
 #### Scenario: Matching images are changed
 
 - **WHEN** a baseline and candidate PNG have a visible pixel difference
-- **THEN** the report lists the image as changed and creates a diff image
+- **THEN** the report lists the image as changed
+- **AND** creates baseline, candidate, and pixel diff images
 
 ### Requirement: Report files that exist on one side
 
@@ -25,11 +26,13 @@ candidate directory.
 
 - **WHEN** a PNG exists only in the candidate directory
 - **THEN** the report lists the image as added
+- **AND** creates only a candidate review image
 
 #### Scenario: Candidate removes an image
 
 - **WHEN** a PNG exists only in the baseline directory
 - **THEN** the report lists the image as removed
+- **AND** creates only a baseline review image
 
 ### Requirement: Publish only visual changes
 
@@ -45,6 +48,12 @@ showing unchanged screenshots.
 
 - **WHEN** one or more images changed
 - **THEN** the pull request comment includes only those visual changes
+
+#### Scenario: A matching image changed
+
+- **WHEN** the report lists an image as changed
+- **THEN** the pull request comment shows its before and after images first
+- **AND** provides its pixel diff in a collapsed section
 
 ### Requirement: Compare revisions from the same test merge
 
