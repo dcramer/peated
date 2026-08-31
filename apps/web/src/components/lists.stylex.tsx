@@ -356,7 +356,7 @@ const styles = stylex.create({
   },
   railTitleLink: {
     color: {
-      default: null,
+      default: colors.ink,
       ":hover": colors.accentDeep,
       ":active": colors.accent,
     },
